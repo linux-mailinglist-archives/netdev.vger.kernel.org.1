@@ -1,125 +1,244 @@
-Return-Path: <netdev+bounces-169412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 573C6A43C18
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 11:45:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6F4FA43C1D
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 11:46:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2B6A3A9CB6
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:43:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 547D81884D02
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:45:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A66C266B43;
-	Tue, 25 Feb 2025 10:43:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2061B1A239E;
+	Tue, 25 Feb 2025 10:45:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="inVk5mhH"
+	dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b="cFuUV6cm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98D47265637
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 10:43:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BEED19E994
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 10:44:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740480188; cv=none; b=Z2ckLC6/YvJ2FHuM66kV4J6mxm2LBySFCRU7WKrPCMAstbWY5E7bvVvPAko25i0rLMxZeH5nHj3SZBvtheRKL0CGT+L7gzvQPCVweKG9DJwpf7XQRwlNT2LoXnvVYcDuxDecgb7Pu0p9hcWFYekCSO7O+gXdOEwQKlr3GuAEv8I=
+	t=1740480300; cv=none; b=cJSGv5Zr3iKSR/vxI1SOcE73P3fEYpwIB8uKpxh/NBm8bVT17Cy0xugvUEZGk9UZdaZcF1sXKO1kM3HcyN1W0BNhVwErWMZZ/GkO+x52sT3GMmzSb8uMjHRZbc0/602ABfKw9iodHoAgdDbySsXp2tLyWgftq4GF8GOZPYje0Z0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740480188; c=relaxed/simple;
-	bh=WmX/HKbPg2yhjHd2ztqu4hvAwiWSwjJEY8ElVwafig4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Rfn4kC32LhE5/Ke08giZRZ1cvg9Je2wm/c4Fq3Ho+gnqiuUx6reWmhcPa8pz8GAIKJbZkRRY0wyawOPcNDyEwJ94B/yVlYJ+HgtkTwU4YqXH2uPhQZSamv1fmKpUn6Gs5qZo7NKXbhx+1QoOScH3hSbwOgrP63z7Yaxto8jm98U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=inVk5mhH; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5ded51d31f1so9652303a12.3
-        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 02:43:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740480185; x=1741084985; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M/9NSaPWarJT8m9YpOKT1i1+rtd0gBduX7v6m0zq7l8=;
-        b=inVk5mhHcVvfBa/OvZghALCJSC8IGaIHJj2HRmXC8qA7ac6jPXlM+OkeFwKz77YeiC
-         9Jpjw6e8R9GaBqI1i+txEO9Kzr5ybFd4S/v3YGedIlFM3MmiO+qa0kEUtmcjgjTrJwGp
-         wFARFOUzKaQDvnCArannwbX2aixc9mp5Uii0vjDGaRGm4U23IJamhnLY0kYhAHeMC0Hc
-         svpHGMLfxl6akeMiC+bAIfJ9DAD2lShpUzOokinNAH0HuL0uCJjOrdT0IwYM6M0nRTei
-         f3cmL+yPgC2WJ63WWnPimm3OlJfvICD5ht1Ct84CNfu/in+FyI8rz9iZ6w8kLyoj2Ckp
-         qn/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740480185; x=1741084985;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=M/9NSaPWarJT8m9YpOKT1i1+rtd0gBduX7v6m0zq7l8=;
-        b=A7u5B9J6dAzXaEp/gtS/pN/4zir24k/i8nxmVEYPaqxvDSV2JVs5Qn8Sya3lu/7SQk
-         LtUz/dtKFVde6xAO/OWg50IB3dYT3Onhx7QPpy6RToTx/k9r3i9Bb//kiqWlNk53i6Py
-         o4fHCIgj0uEPajgU/lBRkNGeEPM5tQDLapeH6P1zDc3RH/APozPs5ZSLDd+ZbHFa+kMx
-         IKbJuoG5yMJcM8JYk3oL9THoCMQEDxm4TMYEVZAuAN2StlFQZsCH4NX0/HYSxejgOG+J
-         llQLqNBgKOdr1IVdMboStqSlps/D3rL6jhY3tTsUW11Rs5pulqKLqfDSc+fzhXLsUhj6
-         UwhA==
-X-Forwarded-Encrypted: i=1; AJvYcCXgGRVraDRjbVOVPZ4pMfGjiVnbEZlkwDdnraFe2j1YWUlseO0ti3C5gIEHcxug074gy6LXwPg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyA7WvshAdjLVuiGH3vaHqc8s9tQN5NxhrBNQMz1VdpsI80elm1
-	64OiZHY8fbMyGOu4CyjZQTPZppy5YTfGZHQlDD6rhOYhkoL0NXphEChsK+xXXaVL1z/UjI5SbB+
-	C1VWoHo1WuPnMiaXed3TiwYd60Pe3z9rRwnMikWthzzJ58urI1PT7
-X-Gm-Gg: ASbGncvHbkOJMJOVdazdjUM0hnOlxoIHEXkrN73SShnxDS3ZJAIxGM1v9juxjJUhnTq
-	qY/V1IFuxX43qKiCOE1uhzT7I8zuiNCpgJKgiOmshYHlKNZn4c02jx3dlZ7WYpSYAXl5Yb1Wfpq
-	2w3ib6I3Y7
-X-Google-Smtp-Source: AGHT+IFmvOYpL5a8G0B4ujBz7Hpsgq2tRXpKOvHe+Lsgvln4A1XoNRhCi1/G6JDb6Xa5vkpf1HeIgatPhogDTU0FDrk=
-X-Received: by 2002:a05:6402:51ce:b0:5e0:750a:5c30 with SMTP id
- 4fb4d7f45d1cf-5e0b721dfbcmr15731622a12.20.1740480184613; Tue, 25 Feb 2025
- 02:43:04 -0800 (PST)
+	s=arc-20240116; t=1740480300; c=relaxed/simple;
+	bh=J6ud03xBUei5hve99chh9QBHJ7vCcnVOXXWngWIzsB4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P3WUgsmpIBLT/Qok1RhHxduxretldnYjyqdua1yFVIusTuHO9cZHlFmU9cN7m+3VubGUGplMzvna1S4uoYJ7JDiyHauN9QvZvh6kINsSD1CEJTV05QXWIF0Air2mLvYwGIyUtUYPsy7rv5JcRucSWsgfTOlnxwQIM3B/5oMXqpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b=cFuUV6cm; arc=none smtp.client-ip=185.67.36.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
+Received: from submission (posteo.de [185.67.36.169]) 
+	by mout02.posteo.de (Postfix) with ESMTPS id 6E50C240103
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 11:44:56 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net; s=2017;
+	t=1740480296; bh=J6ud03xBUei5hve99chh9QBHJ7vCcnVOXXWngWIzsB4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:Content-Transfer-Encoding:From;
+	b=cFuUV6cmgHpdt2ZhN3Hb5NMGw8NXHw0r05Mqz6mdjb09YD7pt1QS4Sw9UJTwQFNyr
+	 9HqBKPyLjkgLY8bJIExqT1/0qPRS8y/vWOFMfsf+dvqb2Ugz9GrrFOc8FZkiefjmpt
+	 ABP/OuWKNcbkKiMzn4WcN16+S/EIxHDgZDg6+DjVn6Pyal56RT9Kula71WDSKCy/4l
+	 k3CS+3w8iKUuChFJN9HwPSbhXMiUw7nU4ua8snIisdO4lvxXPxMNsnSsOQI/BGseOk
+	 d0WVMAjFLxQwDTFt2LiMGw7B6wvJr7RXjVkFo16qSx8ccMzDtadBm10pj62lExIcwo
+	 G9VCXSZoBcj8A==
+Received: from customer (localhost [127.0.0.1])
+	by submission (posteo.de) with ESMTPSA id 4Z2Dks6y7zz9rxN;
+	Tue, 25 Feb 2025 11:44:53 +0100 (CET)
+Date: Tue, 25 Feb 2025 10:44:53 +0000
+From: =?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.ne@posteo.net>
+To: Rob Herring <robh@kernel.org>
+Cc: =?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.ne@posteo.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/3] dt-bindings: net: Convert fsl,gianfar to YAML
+Message-ID: <Z72fJSqng8od-5Z7@probook>
+References: <20250220-gianfar-yaml-v1-0-0ba97fd1ef92@posteo.net>
+ <20250220-gianfar-yaml-v1-3-0ba97fd1ef92@posteo.net>
+ <20250221233523.GA372501-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250224110654.707639-1-edumazet@google.com> <4f37d18c-6152-42cf-9d25-98abb5cd9584@redhat.com>
- <af310ccd-3b5f-4046-b8d7-ab38b76d4bde@kernel.org> <CANn89iJfXJi7CL2ekBo9Zn9KtVTRxwMCZiSxdC21uNfkdNU1Jg@mail.gmail.com>
- <927c8b04-5944-4577-b6bd-3fc50ef55e7e@kernel.org> <CANn89iJu5dPMF3BFN7bbNZR-zZF_xjxGqstHucmBc3EvcKZXJw@mail.gmail.com>
- <40fcf43d-b9c2-439a-9375-d2ff78be203f@kernel.org> <CANn89iLH_SgpWgAXvDjRbpFtVjWS-yLSiX0FbCweWjAJgzaASg@mail.gmail.com>
- <CANn89i+Zs2bLC7h2N5v15Xh=aTWdoa3v2d_A-EvRirsnFEPgwQ@mail.gmail.com>
-In-Reply-To: <CANn89i+Zs2bLC7h2N5v15Xh=aTWdoa3v2d_A-EvRirsnFEPgwQ@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 25 Feb 2025 11:42:53 +0100
-X-Gm-Features: AQ5f1JokaK0Wn2iXZTSfx7TAl06FEfUvmeqi1PbFvQDBlpMNXB96A8mb0s8x5Xk
-Message-ID: <CANn89iLf5hOnT=T+a9+msJ7=atWMMZQ+3syG75-8Nih8_MwHmw@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: be less liberal in tsecr received while in
- SYN_RECV state
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Jakub Kicinski <kuba@kernel.org>, 
-	Yong-Hao Zou <yonghaoz1994@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
-	Neal Cardwell <ncardwell@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250221233523.GA372501-robh@kernel.org>
 
-On Tue, Feb 25, 2025 at 11:39=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
->
+On Fri, Feb 21, 2025 at 05:35:23PM -0600, Rob Herring wrote:
+> On Thu, Feb 20, 2025 at 06:29:23PM +0100, J. Neuschäfer wrote:
+> > Add a binding for the "Gianfar" ethernet controller, also known as
+> > TSEC/eTSEC.
+> > 
+> > Signed-off-by: J. Neuschäfer <j.ne@posteo.net>
+> > ---
+> >  .../devicetree/bindings/net/fsl,gianfar.yaml       | 242 +++++++++++++++++++++
+> >  .../devicetree/bindings/net/fsl-tsec-phy.txt       |  39 +---
+> >  2 files changed, 243 insertions(+), 38 deletions(-)
+> > 
+> > diff --git a/Documentation/devicetree/bindings/net/fsl,gianfar.yaml b/Documentation/devicetree/bindings/net/fsl,gianfar.yaml
+> > new file mode 100644
+> > index 0000000000000000000000000000000000000000..dc75ceb5dc6fdee8765bb17273f394d01cce0710
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/fsl,gianfar.yaml
+> > @@ -0,0 +1,242 @@
+> > +# SPDX-License-Identifier: GPL-2.0
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/net/fsl,gianfar.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: Freescale Three-Speed Ethernet Controller (TSEC), "Gianfar"
+[...]
+> > +  "#address-cells": true
+> 
+> enum: [ 1, 2 ]
+> 
+> because 3 is not valid here.
+> 
+> > +
+> > +  "#size-cells": true
+> 
+> enum: [ 1, 2 ]
+> 
+> because 0 is not valid here.
 
->
-> Yes, this would be it :
->
-> diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
-> index 728bce01ccd3ddb1f374fa96b86434a415dbe2cb..3555567ba4fb1ccd5c5921e39=
-d11ff08f1d0cafd
-> 100644
-> --- a/net/ipv4/tcp_timer.c
-> +++ b/net/ipv4/tcp_timer.c
-> @@ -477,8 +477,8 @@ static void tcp_fastopen_synack_timer(struct sock
-> *sk, struct request_sock *req)
->          * regular retransmit because if the child socket has been accept=
-ed
->          * it's not good to give up too easily.
->          */
-> -       inet_rtx_syn_ack(sk, req);
->         req->num_timeout++;
-> +       inet_rtx_syn_ack(sk, req);
->         tcp_update_rto_stats(sk);
->         if (!tp->retrans_stamp)
->                 tp->retrans_stamp =3D tcp_time_stamp_ts(tp);
+Good point.
 
-Obviously, I need to refine the patch and send a V2 later.
+> 
+> 
+> > +
+> > +  cell-index:
+> > +    $ref: /schemas/types.yaml#/definitions/uint32
+> > +
+> > +  interrupts:
+> > +    maxItems: 3
+> 
+> Based on the if/then schema, you need 'minItems' here if the min is not 3.
+> 
+> Really, move the descriptions here and make them work for the combined 
+> interrupt case (just a guess).
+
+The difference here (as previously documented in prose) is by device
+variant:
+
+ for FEC:
+
+   - one combined interrupt
+
+ for TSEC, eTSEC:
+
+   - transmit interrupt
+   - receive interrupt
+   - error interrupt
+
+Combining these cases might look like this, not sure if it's good:
+
+  interrupts:
+    minItems: 1
+    description:
+      items:
+        - Transmit interrupt or combined interrupt
+        - Receive interrupt
+        - Error interrupt
+
+> 
+> > +
+> > +  dma-coherent:
+> > +    type: boolean
+> 
+> dma-coherent: true
+
+Will do.
+
+
+> > +
+> > +  fsl,num_rx_queues:
+> > +    $ref: /schemas/types.yaml#/definitions/uint32
+> > +    description: Number of receive queues
+> 
+> Constraints? I assume there's at least more than 0.
+> 
+> > +
+> > +  fsl,num_tx_queues:
+> > +    $ref: /schemas/types.yaml#/definitions/uint32
+> > +    description: Number of transmit queues
+> 
+> Constraints?
+
+Good point, for both of these the only value I can find in use is 8,
+which corresponds to the number of queues documented in at least one
+hardware manual (MPC8548E).
+
+
+> > +  # eTSEC2 controller nodes have "queue group" subnodes and don't need a "reg"
+> > +  # property.
+> > +  - if:
+> > +      properties:
+> > +        compatible:
+> > +          contains:
+> > +            const: fsl,etsec2
+> > +    then:
+> > +      patternProperties:
+> > +        "^queue-group@[0-9a-f]+$":
+> > +          type: object
+> > +
+> > +          properties:
+> > +            "#address-cells": true
+> > +
+> > +            "#size-cells": true
+> 
+> These have no effect if there are not child nodes or a 'ranges' 
+> property.
+
+Ah, good point, these properties are used in existing DTs, but I see no
+reason to keep them. I'll remove them.
+
+> 
+> > +
+> > +            reg:
+> > +              maxItems: 1
+> > +
+> > +            interrupts:
+> > +              maxItems: 3
+> 
+> Need to define what each one is.
+
+Will do.
+
+
+> > +  - |
+> > +    #include <dt-bindings/interrupt-controller/irq.h>
+> > +
+> > +    soc1 {
+> > +        #address-cells = <1>;
+> > +        #size-cells = <1>;
+> 
+> You don't need the soc1 node.
+
+Ah, true.
+
+> > +  - |
+> > +    #include <dt-bindings/interrupt-controller/irq.h>
+> > +    #include <dt-bindings/interrupt-controller/arm-gic.h>
+> > +
+> > +    soc2 {
+> 
+> bus {
+
+Will rename.
+
+
+Thanks,
+J. Neuschäfer
 
