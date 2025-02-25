@@ -1,235 +1,175 @@
-Return-Path: <netdev+bounces-169301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 797BBA434E8
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 07:06:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2121A434F1
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 07:10:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B259189C3E0
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 06:06:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1FB67A51EC
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 06:09:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65A51254B18;
-	Tue, 25 Feb 2025 06:06:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96DFE256C77;
+	Tue, 25 Feb 2025 06:10:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="mVNI6t79"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=Usama.Anjum@collabora.com header.b="XrVUEkmO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17144254875;
-	Tue, 25 Feb 2025 06:06:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 581D9256C6A;
+	Tue, 25 Feb 2025 06:10:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740463590; cv=fail; b=I9i8yz5kbaR+icHBqBwPA8u0GpRxHr2grV4RCghI+7humx9k5LcItgUq6kij43K7Gr/3DL1W00jYIHiKFdCsI2DSNAnGVWlKwREnXY+s2AArFxf9AGHCMRsMIv1KghUVo0jDus4KhAPy0LYshD+ivrVCf0yTXYPNKxaNux7rfaQ=
+	t=1740463815; cv=pass; b=OkE4r8gOOvUs43aWzWmx6U2ifxyO1GPwrRw17A1u+XsUa49HJQhlqQGoXIfqpffZE9JarBrlnB5+fTZsBNHvjpPFqLX8eS4vPe28fcKB6kMx+zdfhB9Bou5h6BxRqF9KSqf5VjFIi3SjWG70b2o0Vx92dyp1xTAdCTyhkj4P27U=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740463590; c=relaxed/simple;
-	bh=PLJZKy5zOhP6NUsPxAPYYDgCrmIFRquYmuoqGbwYICQ=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=lCUun2tjO1aATKopUaRgTrEwEmHCa8s3+7VS1H6U0KIPNLSah9iTKpJs+Yz6OOuZwBpMi04s3Z7zGKvtMYs0pucJV9v8/08XUA1vNLFEvfqnsodYhAhqfRcvN9qIAYqhWJeyix7x5wpLPagTyZhBRfm0sU1aBzh5ZHGFYmXa4bo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=mVNI6t79; arc=fail smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51ONUwHX005162;
-	Mon, 24 Feb 2025 22:06:01 -0800
-Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2043.outbound.protection.outlook.com [104.47.66.43])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4512gh8ra6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 24 Feb 2025 22:06:00 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RvjOB/wAXi5BCS1Hk9X7zsUogrSdsKcmSmeIIt+I8ZGN1VoKRYCc0HC3Hla5Ccr/bM/N80yRpUWpbpNTrm312RDiToBvzaBBsm/abL/uS5EviI5VmOVLih/Fg5rUix0JSuY8vo3dZOIUDmD+G64LtzLXy1nOBA49XRlP8TyGvd6gapwcPEP9i9TQ30BPkqGtdJ7HzVEjY9bDbC5NSRZTlJsIBeOTh1Rf3OeMRLl9jBNbCU+r7XhWM7nEThXRSLrfO6uah+ez4wA5Jkv0QC9Cx1pR45qagb9S90pAtGHUvzw22+gVtM6J3dcEQyNSr8r6ThGSv+HjgCfJJgmlbOFCxg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PLJZKy5zOhP6NUsPxAPYYDgCrmIFRquYmuoqGbwYICQ=;
- b=d7MZTJ7ZVsAYakUAsvZSVxBQL0Z48K0fqO074qeB3kBNBf5eX9X4oYJPxYP5r+HanfTZtoUPMSxDe+Ji0ahrMbpGXyVPI00N4lb7VEGFvInYLJZhXLZ4on6NiwTfsz/pvL/cFuIPfUUxdqRIkp4pzOKjwy7uRlivsTqZGxOOC9mItz2iyU5XKaje5Cw1yWbbOzMTGb1fowxWGguT1JECrrChdKlpVA9pjmjrQoJYeNPRVu6QlxBK1EAtakGhM7DYqZTZoqQRqzxABdWtwmwek+0MLCCQ411WM1ejaTlFMbtB/xx68fCE/8pGx14SU5PGAY53CveKCxsOa3s08nIhOg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PLJZKy5zOhP6NUsPxAPYYDgCrmIFRquYmuoqGbwYICQ=;
- b=mVNI6t79VU+DIXXNRSyNj4wxCJGTMwU+P6dYbR0zesmmMU83NNhBhvn57GE3YcqEmXHqWQ0OICWdp32aZwjCzL5K+z/T8VBoawB2DuuXxCKEmtAxmWB6Lbm0XyCADUDlwonH3MH7a+po272MuY7UWX4GPh7lkjNF7Ierpvvu3xk=
-Received: from BY3PR18MB4707.namprd18.prod.outlook.com (2603:10b6:a03:3ca::23)
- by MN0PR18MB6013.namprd18.prod.outlook.com (2603:10b6:208:4bc::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.19; Tue, 25 Feb
- 2025 06:05:57 +0000
-Received: from BY3PR18MB4707.namprd18.prod.outlook.com
- ([fe80::e225:5161:1478:9d30]) by BY3PR18MB4707.namprd18.prod.outlook.com
- ([fe80::e225:5161:1478:9d30%7]) with mapi id 15.20.8466.020; Tue, 25 Feb 2025
- 06:05:57 +0000
-From: Sai Krishna Gajula <saikrishnag@marvell.com>
-To: Paolo Abeni <pabeni@redhat.com>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-        Geethasowjanya Akula <gakula@marvell.com>,
-        Linu Cherian
-	<lcherian@marvell.com>, Jerin Jacob <jerinj@marvell.com>,
-        Hariprasad Kelam
-	<hkelam@marvell.com>,
-        Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
-        "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-        "kalesh-anakkur.purayil@broadcom.com" <kalesh-anakkur.purayil@broadcom.com>
-Subject: Re: [net-next PATCH v10 2/6] octeontx2-af: CN20k basic mbox
- operations and structures
-Thread-Topic: [net-next PATCH v10 2/6] octeontx2-af: CN20k basic mbox
- operations and structures
-Thread-Index: AQHbh0tW2txFP3w/hkKf+GAvXYfIJg==
-Date: Tue, 25 Feb 2025 06:05:57 +0000
-Message-ID:
- <BY3PR18MB4707CCD4F93834C9408DAD64A0C32@BY3PR18MB4707.namprd18.prod.outlook.com>
-References: <20250217085257.173652-1-saikrishnag@marvell.com>
- <20250217085257.173652-3-saikrishnag@marvell.com>
- <a0f4651c-31a3-4831-89a4-ee3010b3b4ca@redhat.com>
-In-Reply-To: <a0f4651c-31a3-4831-89a4-ee3010b3b4ca@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BY3PR18MB4707:EE_|MN0PR18MB6013:EE_
-x-ms-office365-filtering-correlation-id: d68ad3a3-5ef9-4e46-4ca6-08dd55627896
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|376014|366016|1800799024|921020|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?UDlzaEdHOG1DME1FTm1EemdGbnkzTCtPb2xYZndnbFhuU0wrYzRQQVMxZlU2?=
- =?utf-8?B?VHdHRWRaT0JMS3lCdlZvdUZMMFJNYkUzOEt4emxaUDAxc2pQSjNCc0t2eDA5?=
- =?utf-8?B?UW9CdHd4eHgrQ01Wa2hMTHFZWTZpY2x3Vy9Lb3dDOFpnMDhla2QwWktnTnZF?=
- =?utf-8?B?cEV1ZGttQ1RSTVc4TWs4ejJBUXJyaTgvcjZhNEV0Q3BKSnNRUkZkOXVvR3hQ?=
- =?utf-8?B?VHVDeVF5bVNpUG9LQlBFa0xwcE82WDJMK2dva1dZVWlkUHpmc1A2MUk2Wmhi?=
- =?utf-8?B?TzVYODdsL24ybHMwQk02OEJKSVJNcjBCMkhjVThSR2orMzAzKzNQWTRBVmx5?=
- =?utf-8?B?RGVISk1yd2JLbUEwcm5zSnNEQWQ2bXQwVmRqV3pxekVDRUgxbWczejQxVExl?=
- =?utf-8?B?Q1l2NTQ2VEdtTy9Dakl1UGdzcTF1MHhFR1J4YjlNNHZ5bzlMcWlhVlptTjlj?=
- =?utf-8?B?RlpKZENMa0xma0gwNGZzK24rZzh5V0JtNU1vbVlHUk1BdDhFNC94WDFlR0Iz?=
- =?utf-8?B?Q2RCRDJVcVdXRmFzTEZGcjNNb2wzTDdYWDBJZ01XQVhWaU5mTFB6K0RXTUxH?=
- =?utf-8?B?SFVtVFYwYTl6MUQzSmFGMkplaUs3cDZZT3JSQnROM2Zvb1U4N0x6VzhzcG1q?=
- =?utf-8?B?MUxkM28wa0NBMFRIbTBlRUdsQmdzL0JMblZVd0ZuTnhrRWxtT0x2Ui9KbUFJ?=
- =?utf-8?B?VFVXVWduT2VVTXdiRk96aTdYZVNWL2t0ZEVtU3hOV0paR3RIOWpHZEdNZTdZ?=
- =?utf-8?B?SzRLaEhqcWJNYTF3eCtLbjNXREI1NTRib3VRM3AxWElKeGNxYW5ZM0Z1cTha?=
- =?utf-8?B?bFNTSFpOTk1HRTVJbkh5cERKOXF3eXJ4T1NtRWxnb0NpK1ZCRit2VGFTWEgv?=
- =?utf-8?B?azZyeFU5bE5iVXpTR2EzT3M0aVNVWGxMSElBRS9lRHp5YThlcncra3J5cElE?=
- =?utf-8?B?SzZtbEpFMGFIQllrN0dWbm8rTjF3SmZwNXRUZ1hGbGRwN1JKN2VFQjZ6YXVv?=
- =?utf-8?B?V2pRTVFxTXVTUGVPK0c0UHQwR2lXTzBrc2FDWGVqYzJNdW40TVBvd3pXRjkw?=
- =?utf-8?B?WTN4bE5jUlpBMXpsRHVybnFpSjBnbExuSFhmbXlYTk13Y3p2WHYxTlJ4Snp5?=
- =?utf-8?B?Q295Z3VlV29mMldBcUx4WGV0cSs0YTQrWkJxWUtWZys5c0Nld0hDWEZPWWZt?=
- =?utf-8?B?eEkybHorL0VVOXovRHBORHUvOG5sOHFudjljZWg3T2tYNVBHZ3FBcXdhdk1O?=
- =?utf-8?B?dHZXOXhkM2FyVk1zMDdXYXlzeE9CUk56VjlHU3ZQRU9rVCtFK1BNMFZqaFNa?=
- =?utf-8?B?b0dFcVJqQ3RzOTRnL3dCNGVweENrcWhGRUxBajlxK3JZMFhYQWtEQ2pMQyty?=
- =?utf-8?B?S1Z4QVc0MzVtOG51ekxjMEdVald2UzVUSHQ5M0pOZnliL203WDcxc2wwS0dX?=
- =?utf-8?B?K1lYQ04yUXJxcmJDUklUaGhVNVVtVGtKaFZCTXVPTFRZWE9QOW1wL1dwejlh?=
- =?utf-8?B?TlZqZzBPd1ZHWEtlMkh2Q2ZzbzFBWEJ6cGNrZUFyUFV5cGpEbk9wYzZTTFVR?=
- =?utf-8?B?L2Y2bmp6ZG1ocG91WW1RbjlNTHJLdUlRUllkempZdGhnNWZGNlV2YkZ2WEM0?=
- =?utf-8?B?ZFFGMXloVWdzWE5FaWJKNUNZbXBiOG9LSGhyMmJyT2o0MlZSQy9xVnBsOE1s?=
- =?utf-8?B?SEt1RFFyZmNGZ3pMZVV1dURKVDdsU3FHWlJDTFI4ZEs2S2k3aE5URWhCQS9m?=
- =?utf-8?B?MWxJV21oL0RmVW5QTmhpR3hYU001Rjd2MUxUdUlZUDNkWlE1NEFWeEdXaUk4?=
- =?utf-8?B?dklvK3k1RFVWdXBtem4rMHNYd1YxNnp5aTZrZkNramZwcXRoK1ZnY3FCWFZ6?=
- =?utf-8?B?WHZSVnpqdGROcFp1TTRPNDBZMDhTMkpFMkFURW9wbGlKY0FiQm84N0dvOWFo?=
- =?utf-8?B?NXI3YlcvUEJENWtERGExVC9tNGVmMzVEem9oY2ZMTnhJRDkvckcrY20vVmtT?=
- =?utf-8?B?K0pOU2F6UG93PT0=?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY3PR18MB4707.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(921020)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?TW95SjhwNUorR3RmTDJIRVRHZUFGdlZOeDB1Ulo1cUV2eEFoMWNsYkQ0ZzNx?=
- =?utf-8?B?UHc2QjMrdVpMeDZWeVVWQzdBenJSWWVyTmU4SmtINStsVmd6YnlGMHRweXJZ?=
- =?utf-8?B?djVXeEU5Ri9RRHZIVk15NDFwVXFZbFI4dWhtQVFUZDYxVEd2QUpEREpXR1NQ?=
- =?utf-8?B?THVReUo0VEFtMUI0RURIclgyQWRlQ1U1dklLS0JhKy9nRW0rNEJhc2ZsaHZJ?=
- =?utf-8?B?M1NsY21HZ0poNkVRdlRpQ05SUGF3aCsyY1JKd0ZhSnp2Q0hpRHpGeXJhNHFx?=
- =?utf-8?B?T2JId1lxMVFUSzBnS2tEUW1JYWdBRjVaZ3BNKy9lQXRxdWsvVzlOaU1xWjFL?=
- =?utf-8?B?c1RUcWkzaDF5ajZlZVZvdzhTNTR0WXJESEZKVFlrclB3TTBpZWJGOTBReVBQ?=
- =?utf-8?B?VEJ6d1hMQmtsSFFpcWorNTZOdmlUY1d1ZFlDTXZEQWRLZlJuTmdCbVVNKzJI?=
- =?utf-8?B?eFVKRXI1dncyMXV1SGZacHAzWlhFVHRjL2t2TWJPWWpaUjFmeW1OeU00OG9k?=
- =?utf-8?B?aTdzdkoxSmRHYUxvbkZJa3NJMWQ0VVpMQjJRa1lWNjFSRXVQemdNQldaTng4?=
- =?utf-8?B?RFVVUnpndzAwOE1sQ2ZzUjltTnBXUzM4VXNrRWlpQzdSenhDbS83ZjZ1OGJ0?=
- =?utf-8?B?SU9FbzFLZVlqWHkvcXVhdUJUMmJ2MTZKY3FPamtCTzkyUkg1dmxKRVN2VjA3?=
- =?utf-8?B?bGpFc1BFT1FaYUpYWDNhZW9weit4elZ6ODE4N2Zjdnd4MnZZZk51YmNhUVdG?=
- =?utf-8?B?bGZsM01TTUhiOUdMQ3ZjQVhFRlVMZlVianllME5aWVRFdjZVMGpKTEY0R0o1?=
- =?utf-8?B?aUxmaWdhMjlPU1JlaFNoZWo0RjZ4dU1PN2gvelFMV3RiaWljSUljYjJZbVdG?=
- =?utf-8?B?bEtGV1FneEphTHJBUzZscUNvUk9Cd2FVNEVVUi9DMGRFQTVqQjFwWFo2MU5C?=
- =?utf-8?B?aExac2kvdFVZbjBiTzRReThRdys5dG00cExONE00aHFPRitZam9xaHRVajJk?=
- =?utf-8?B?c0pCZThiN2s3dWhPa1BSQ1ljTm5jcVJtNkxWWEZBT2ltenpteVBPZGVLVTd2?=
- =?utf-8?B?WjdRaUYxRHFTVldlTkpzdCt2Nkp3MmkxWHZHQ01SZzMyRmFUUnE1OGRiRnA0?=
- =?utf-8?B?cjZKQWFwSHI2Q1o5bW5pSVJON2V1RXg1TUt0Z1A5VTV0N2k1U25SNDBicnMr?=
- =?utf-8?B?VUNtY3djaFNVK0c0ejRzL2lIRnQyeWVGZXAvaE9NK3U4YXVIMkFtQVFZYW1T?=
- =?utf-8?B?N1huS0kreE5DYTNHWlJYV3M0SEdQN1ZzdldaV0ZNWVlUeFNGMnNpMWowRUF1?=
- =?utf-8?B?bEJIcWtDbUpYZVVmdUVOTEg0Wi9oY0VWVFU4Q3RyQUk1MC8xUkxDbUNGK1VQ?=
- =?utf-8?B?U3NQbkN3RjRjdHVqY1pmdkMrN3RreDVQY2hJdEtaZ2JnL3ZON2tlUlRVcG5m?=
- =?utf-8?B?VzVhRmlVajEvWnBHVWhVLzdDWDhLcjRJbGRHZHMzdTE3cHFEdDZ5TUtUUjMr?=
- =?utf-8?B?ZGhqbzlBbHQ1dEJjZG1rOW1EeDNaQWFOTGZYUlhsRzdjVkZ2LzBYRitqQWlj?=
- =?utf-8?B?K3lJYnNwdVp3c0lRSkNDdVUxS3lmUGhTRG8rTHFtUDRqV3JhN0NMYWZXWE1L?=
- =?utf-8?B?UVlNMDl0Y05JajdvY1E1ZFNsVzIrZ2E2RzZCRDdkcm9RdWtDS1NKcUdPNXBq?=
- =?utf-8?B?L0NvZEpKeDZERCtVNkJnektjelNaWXhkNEI3Rkx5S0JsNUROZGU5eVlNa05o?=
- =?utf-8?B?NVRDUlNqME5CSUo4eWJaMHVjUlFMc25ham5IZVFjVGlhZ1h2enBqcVY5NzNE?=
- =?utf-8?B?ejdqZ2hjbXFGOFRkeGhDN3ZKYXpwMWVldUczcmh5WnJXYlpNdmxnZG03RXlt?=
- =?utf-8?B?elc4TFRCU0k3UktDMzJNRzhxVDlzb0NjMzBKQXBFSXppZkJsQm8veEtqQWpo?=
- =?utf-8?B?Y3lYcVdORU03UTFMYWdITjFpV2hONW93ZU9MWWtHZ3BpeVo4TWZRRWVlMEM2?=
- =?utf-8?B?eTMyZmVwWURrYWQ5TkpuanMvZTJGN3d3elVob3pmODBvSldwcTVYVGN5UHpa?=
- =?utf-8?B?V2t5N3RRQ0xTZ0FxeGU3Rmt4U2o1WlIyZmVKOTRveFR4eGljMFF0d3BQU1cv?=
- =?utf-8?Q?+AYmJ4PWqx/NnecdZ2IAHavaX?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1740463815; c=relaxed/simple;
+	bh=fxjYhhopdIJkGIyF0ESuXORJasUN6Sxa6lF8FBEgu/s=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=O1DeISGbBASObqR68U6v8uPL1XYVsiVaeNGVS+LkA7d7H4fpDv8CIJ2w6VFMlsBoOYJ4s4vrfCSqrknC1GPwXrad2QpmjNdy7Ub8UhW3QgRNDdUtKQNtXZcPiPz+gMQMQ9r6+rVGzOCd3gi35i14tm7mp66F4js9ncuGTe6OR8Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=Usama.Anjum@collabora.com header.b=XrVUEkmO; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1740463767; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=MoxhigzgjKJZtjuMmmxtmjfd2B95WHy56Is1CRIbfGaDh5fXMdDFuTpf1hlCX1QvilcJ9Nyk582gyDVWQc58QhMk/SpRxfOhEQye4UJVl+VfUpv4Nrj5tnYUrGuOGMaKtaMrOX3+eRIt14XzgyLFXXazgnkQR9KqKn7cYRWSZbw=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1740463767; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=zlGJk/boTTi46WwLjRxSuU692UCYhuz4KWqBVlpFD2s=; 
+	b=E77T+47VTEpF9m5gWxnlb58MjXvuDgg52KvKgXSiFJxPvMKdCxqrD9zimoSZGjm+/cpZNcId17F8Z91szlW+0Ok7jZFYONkasLf2znA+KhMdf6AjF1s7iuQiDqjxbLnR0fpq7sCLkbL8VIzBL4CJwxKap3JjPf3fvAWFEfmj1GQ=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=Usama.Anjum@collabora.com;
+	dmarc=pass header.from=<Usama.Anjum@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1740463767;
+	s=zohomail; d=collabora.com; i=Usama.Anjum@collabora.com;
+	h=Message-ID:Date:Date:MIME-Version:Cc:Cc:Subject:Subject:To:To:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=zlGJk/boTTi46WwLjRxSuU692UCYhuz4KWqBVlpFD2s=;
+	b=XrVUEkmOoIzAxB8edEvVsTnEK14wqXdy3pGXFAylllaIlyWVgeyugUziAX+W/F9J
+	0Gke1Fh1EnBhDUJyGynb1WLxCfy9lPUTnYD7K77Ya1b32qOxaVdCxt0ei7oJW9FNXW9
+	sYBv1atwcZ4x4ru0xyrftIZQIR+Ij3yNovzfvOOg=
+Received: by mx.zohomail.com with SMTPS id 1740463764036975.0626584461274;
+	Mon, 24 Feb 2025 22:09:24 -0800 (PST)
+Message-ID: <b3540615-0dc1-41f8-bb8f-99f01f909b36@collabora.com>
+Date: Tue, 25 Feb 2025 11:10:00 +0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BY3PR18MB4707.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d68ad3a3-5ef9-4e46-4ca6-08dd55627896
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Feb 2025 06:05:57.4487
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 28g1GSLzEnh7MXqXPJXyvsOc9dvx9vGDUqkgJTsJe2bA1RAXfm2x9iIvDWuJkcTC3m4mICEIIv6oKqhJosoIRg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR18MB6013
-X-Proofpoint-GUID: sWqlKOGjFxyBfrdTp4HFr7p68ebIB0Pu
-X-Authority-Analysis: v=2.4 cv=FLrhx/os c=1 sm=1 tr=0 ts=67bd5dc9 cx=c_pps a=TJva2t+EO/r6NhP7QVz7tA==:117 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=T2h4t0Lz3GQA:10 a=-AAbraWEqlQA:10
- a=20KFwNOVAAAA:8 a=M5GUcnROAAAA:8 a=J1Y8HTJGAAAA:8 a=1XWaLZrsAAAA:8 a=VwQbUJbxAAAA:8 a=Q-fNiiVtAAAA:8 a=BDye6A67q35e6UNUlbwA:9 a=QEXdDO2ut3YA:10 a=OBjm3rFKGHvpk9ecZwUJ:22 a=y1Q9-5lHfBjTkpIzbSAN:22
-X-Proofpoint-ORIG-GUID: sWqlKOGjFxyBfrdTp4HFr7p68ebIB0Pu
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-25_02,2025-02-24_02,2024-11-22_01
+User-Agent: Mozilla Thunderbird
+Cc: Usama.Anjum@collabora.com, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Johan Hovold <johan@kernel.org>,
+ Loic Poulain <loic.poulain@linaro.org>, linux-arm-msm@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, mhi@lists.linux.dev,
+ kernel@collabora.com, ath11k@lists.infradead.org, jjohnson@kernel.org
+Subject: Re: [BUG REPORT] MHI's resume from hibernate is broken
+To: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+References: <59c036b6-a3d6-403b-8bb0-566a17f72abc@collabora.com>
+ <20250214070447.scs6lpytjtecz3ko@thinkpad>
+ <1cd4a1ed-f4e7-4c7b-a19f-f79afddbe310@collabora.com>
+ <20250220075034.unsd5cq7xkip2by6@thinkpad>
+ <ec8a01a3-5eaf-4fba-bb85-e7a677877e5f@collabora.com>
+ <20250224164400.w3lpzxxwfbrj5lb6@thinkpad>
+Content-Language: en-US
+From: Muhammad Usama Anjum <Usama.Anjum@collabora.com>
+In-Reply-To: <20250224164400.w3lpzxxwfbrj5lb6@thinkpad>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQYW9sbyBBYmVuaSA8cGFiZW5p
-QHJlZGhhdC5jb20+DQo+IFNlbnQ6IFRodXJzZGF5LCBGZWJydWFyeSAyMCwgMjAyNSA1OjIwIFBN
-DQo+IFRvOiBTYWkgS3Jpc2huYSBHYWp1bGEgPHNhaWtyaXNobmFnQG1hcnZlbGwuY29tPjsgZGF2
-ZW1AZGF2ZW1sb2Z0Lm5ldDsNCj4gZWR1bWF6ZXRAZ29vZ2xlLmNvbTsga3ViYUBrZXJuZWwub3Jn
-OyBuZXRkZXZAdmdlci5rZXJuZWwub3JnOyBsaW51eC0NCj4ga2VybmVsQHZnZXIua2VybmVsLm9y
-ZzsgU3VuaWwgS292dnVyaSBHb3V0aGFtIDxzZ291dGhhbUBtYXJ2ZWxsLmNvbT47DQo+IEdlZXRo
-YXNvd2phbnlhIEFrdWxhIDxnYWt1bGFAbWFydmVsbC5jb20+OyBMaW51IENoZXJpYW4NCj4gPGxj
-aGVyaWFuQG1hcnZlbGwuY29tPjsgSmVyaW4gSmFjb2IgPGplcmluakBtYXJ2ZWxsLmNvbT47IEhh
-cmlwcmFzYWQgS2VsYW0NCj4gPGhrZWxhbUBtYXJ2ZWxsLmNvbT47IFN1YmJhcmF5YSBTdW5kZWVw
-IEJoYXR0YSA8c2JoYXR0YUBtYXJ2ZWxsLmNvbT47DQo+IGFuZHJldytuZXRkZXZAbHVubi5jaDsg
-a2FsZXNoLWFuYWtrdXIucHVyYXlpbEBicm9hZGNvbS5jb20NCj4gU3ViamVjdDogUmU6IFtuZXQt
-bmV4dCBQQVRDSCB2MTAgMi82XSBvY3Rlb250eDItYWY6IENOMjBrIGJhc2ljDQo+IG1ib3ggb3Bl
-cmF0aW9ucyBhbmQgc3RydWN0dXJlcw0KPiANCj4gT24gMi8xNy8yNSA5OuKAijUyIEFNLCBTYWkg
-S3Jpc2huYSB3cm90ZTogPiBAQCAtMjQ0Myw2ICsyNDY5LDE4IEBAIHN0YXRpYw0KPiBpbnQgcnZ1
-X21ib3hfaW5pdChzdHJ1Y3QgcnZ1ICpydnUsIHN0cnVjdCBtYm94X3dxX2luZm8gKm13LCA+IH0g
-PiB9ID4gPiArDQo+IG5nX3J2dV9tYm94ID0ga3phbGxvYyhzaXplb2YoKm5nX3J2dV9tYm94KSwg
-R0ZQX0tFUk5FTCk7ID4gKyBpZg0KPiAoIW5nX3J2dV9tYm94KSANCj4gT24gMi8xNy8yNSA5OjUy
-IEFNLCBTYWkgS3Jpc2huYSB3cm90ZToNCj4gPiBAQCAtMjQ0Myw2ICsyNDY5LDE4IEBAIHN0YXRp
-YyBpbnQgcnZ1X21ib3hfaW5pdChzdHJ1Y3QgcnZ1ICpydnUsIHN0cnVjdA0KPiBtYm94X3dxX2lu
-Zm8gKm13LA0KPiA+ICAJCX0NCj4gPiAgCX0NCj4gPg0KPiA+ICsJbmdfcnZ1X21ib3ggPSBremFs
-bG9jKHNpemVvZigqbmdfcnZ1X21ib3gpLCBHRlBfS0VSTkVMKTsNCj4gPiArCWlmICghbmdfcnZ1
-X21ib3gpIHsNCj4gPiArCQllcnIgPSAtRU5PTUVNOw0KPiA+ICsJCWdvdG8gZnJlZV9iaXRtYXA7
-DQo+ID4gKwl9DQo+ID4gKw0KPiA+ICsJcnZ1LT5uZ19ydnUgPSBuZ19ydnVfbWJveA0KPiANCj4g
-QUZBSUNTIHJ2dS0+bmdfcnZ1IGlzIGZyZWVkIG9ubHkgYnkgcnZ1X3JlbW92ZSgpLCBzbyBpdCdz
-IGxlYWtlZCBvbiB0aGUgbGF0ZXINCj4gZXJyb3IgcGF0aHMuDQpBY2ssIHdpbGwgc3VibWl0IHYx
-MSB3aXRoIHVwZGF0ZXMuDQo+IA0KPiAvUA0KDQo=
+On 2/24/25 9:44 PM, Manivannan Sadhasivam wrote:
+> On Thu, Feb 20, 2025 at 05:34:06PM +0500, Muhammad Usama Anjum wrote:
+>> On 2/20/25 12:50 PM, Manivannan Sadhasivam wrote:
+>>> On Mon, Feb 17, 2025 at 07:35:50PM +0500, Muhammad Usama Anjum wrote:
+>>>> On 2/14/25 12:04 PM, Manivannan Sadhasivam wrote:
+>>>>> Hi,
+>>>> Thank you so much for replying.
+>>>>
+>>>>>
+>>>>> + ath11k list and Jeff
+>>>>>
+>>>>> On Tue, Feb 11, 2025 at 01:15:55PM +0500, Muhammad Usama Anjum wrote:
+>>>>>> Hi,
+>>>>>>
+>>>>>> I've been digging in the MHI code to find the reason behind broken
+>>>>>> resume from hibernation for MHI. The same resume function is used
+>>>>>> for both resume from suspend and resume from hibernation. The resume
+>>>>>> from suspend works fine because at resume time the state of MHI is 
+>>>>>> MHI_STATE_M3. On the other hand, the state is MHI_STATE_RESET when
+>>>>>> we resume from hibernation.
+>>>>>>
+>>>>>> It seems resume from MHI_STATE_RESET state isn't correctly supported.
+>>>>>> The channel state is MHI_CH_STATE_ENABLED at this point. We get error
+>>>>>> while switching channel state from MHI_CH_STATE_ENABLE to
+>>>>>> MHI_CH_STATE_RUNNING. Hence, channel state change fails and later mhi
+>>>>>> resume fails as well. 
+>>>>>>
+>>>>>> I've put some debug prints to understand the issue. These may be
+>>>>>> helpful:
+>>>>>>
+>>>>>> [  669.032683] mhi_update_channel_state: switch to MHI_CH_STATE_TYPE_START[2] channel state not possible cuzof channel current state[1]. mhi state: [0] Return -EINVAL
+>>>>>> [  669.032685] mhi_prepare_channel: mhi_update_channel_state to MHI_CH_STATE_TYPE_START[2] returned -22
+>>>>>> [  669.032693] qcom_mhi_qrtr mhi0_IPCR: failed to prepare for autoqueue transfer -22
+>>>>>>
+>>>>>
+>>>>> Thanks for the report!
+>>>>>
+>>>>> Could you please enable the MHI and ath11k debug logs and share the full dmesg
+>>>>> to help us understand the issue better?
+>>>> The ath11k debug was already enabled. CONFIG_MHI_BUS_DEBUG wasn't enabled. 
+>>>
+>>> Sorry for not being clear. I asked you to enable the dev_dbg() logs in the MHI
+>>> driver. But it is not required. See below.
+>> I've disabled the MHI_BUG_DEBUG. It only enables some files. Ideally if those files
+>> being used, there shouldn't be any difference. But they are definitely changing the
+>> timings.
+>>
+>>>
+>>>> I've
+>>>> enabled it and now the hibernate is working without any issue. It is very strange
+>>>> how can CONFIG_MHI_BUS_DEBUG make any difference. I don't have much background on
+>>>> how it is helping.
+>>>>
+>>>
+>>> Probably some timing issue. But enabling the MHI debug logs could also hide the
+>>> issue. So you should disable the CONFIG_MHI_BUS_DEBUG option and collect the MHI
+>>> trace logs that we recently added.
+>> Disabled the MHI_BUS_DEBUG and collected logs by Dynamic debug:
+>> [  584.040189] mhi mhi0: Allowing M3 transition
+>> [  584.040202] mhi mhi0: Waiting for M3 completion
+>> [  584.040480] mhi mhi0: State change event to state: M3
+>> ..
+>> [  584.535478] qcom_mhi_qrtr mhi0_IPCR: failed to prepare for autoqueue transfer -22
+>> [  584.535482] qcom_mhi_qrtr mhi0_IPCR: PM: dpm_run_callback(): qcom_mhi_qrtr_pm_resume_early [qrtr_mhi] returns -22
+>> [  584.535490] qcom_mhi_qrtr mhi0_IPCR: PM: failed to restore early: error -22
+>> [  584.831583] mhi mhi0: Entered with PM state: M3, MHI state: M3
+>>
+>> It seems like the state save was success at hibernate time. The error is originating
+>> at resume from hibernation.
+>>
+> 
+> I just tried hibernation on my RB5 board featuring QCA6390 WLAN chip which makes
+> use of ath11k driver. I did encounter the resume failure, but the error log was
+> slightly different. Then looking at the ath11k driver made me realize that they
+> reverted the hibernation support due to suspend issue reported on some Lenovo
+> platforms: 2f833e8948d6 ("Revert "wifi: ath11k: support hibernation"").
+> 
+> So that explained the resume failure. I reverted the revert and that allowed me
+> to resume properly from hibernation. So please try to do the same and see if it
+> helps you.
+On my side, I've reverted this. But it didn't create any difference. This commit is
+reverting hibernation for ath11k. It isn't changing anything in MHI. 
+
+On my side, it seems there is some timing issue on MHI side. I'll try to dig more in
+MHI.
+>> [  584.535478] qcom_mhi_qrtr mhi0_IPCR: failed to prepare for autoqueue transfer -22
+>> [  584.535482] qcom_mhi_qrtr mhi0_IPCR: PM: dpm_run_callback(): qcom_mhi_qrtr_pm_resume_early [qrtr_mhi] returns -22
+
+-- 
+BR,
+Muhammad Usama Anjum
 
