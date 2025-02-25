@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-169469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC2A5A4411C
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 14:42:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C778A4414F
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 14:51:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6ADDA1888BE7
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 13:41:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D7753A25D1
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 13:51:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36F96269830;
-	Tue, 25 Feb 2025 13:41:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3E5B26988C;
+	Tue, 25 Feb 2025 13:51:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="aABty445"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UP4byKOg"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26FE4267AE5;
-	Tue, 25 Feb 2025 13:41:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF54F233714;
+	Tue, 25 Feb 2025 13:51:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740490873; cv=none; b=movXY7DOQGC4jg+ifmkaedh5vhMwTpuVY6ADqndSTwn2rx2yhXtf2n8O93BWVTDBLW8GOHkYS6LlQ9r+ttmoBCGeLAB2nZWNwYoxqAymRWoqzVw4Jtcc0Gqej483iC45g7O57JLa6/rBMLknB46R8Q3V65jxjFk3Xn7N/pDqTew=
+	t=1740491480; cv=none; b=lsYrSN+Arub2xzWob0VtRjBKcnTQLGVy6X9qz47/TsEWyyIF3+81sBNNKjnxrTlL7Sbp5pMLqHID1MOMAH5JGG+kpZoNiUGtpyCGOmT1Shd2oTaYoqOVEeYCbvdd6QOi7Gke6lX0cFeglEhdVawrD4Amiiw095kdeh3py6HDU4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740490873; c=relaxed/simple;
-	bh=8o2HtVC4FM1XL6kCNAFsNzIUp3tYpuDgORl59KzI2dQ=;
+	s=arc-20240116; t=1740491480; c=relaxed/simple;
+	bh=PcXWHDco3CAdDPQSPgA+cZxIc/cAUc3MY9VoBBcOWbU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sh3VGMv8nBIA8qbhZ3asOynUZ4H05Mz3PD02ddp2fnWM7GAN0pEtK740GUo5hMzRI1JDi3xP8ptIIwj9jPXYR0ZDt53pDktnnSEAo91ELUGJUqsrBcOlJQ2UyxVx7D4BAbXVKn7G+ghjT9NxtZv37oz6y0p1f6omLZrSetmx678=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=aABty445; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=RM52yVYfkLgm47UhxD/Q5yW8v0mCBISHt6tWFVlw8+tEWo7F+F/brgNuzwZ85ofN9KC7alemU9lzu6Z1wlUpRvbXAfPSLQYEJZPJ3byYjn46qzYcX9gKk0+g0brIM/4rx0Iw4y0idvNVrNRoI7jrNTVAH4JNMl/sl3FfJmkxPSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UP4byKOg; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,33 +36,39 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=jKrGQQamhJ8YtplUcRQjmzSHfY9OrteybnOt/SSElS0=; b=aABty445XXKeIao5C45E3biwF2
-	EfP7YysQoO7WNpL550cbNMOlSyTc16oMQKSTLvRn7FkdprFZnlb9qTX1BRS4OMTMLi48L6RVHHun0
-	foT+ZyHpEiHco8U/j17i7B+avvjInmo+Nap3pTJptLscI68Uj6tmH22FjLAF7TsX+rMk=;
+	bh=e3VmXvqmgpmlkacg4yCqG6k/DWw/7LO2D1NyxSJiktc=; b=UP4byKOgV4ukVo21U5njdpdZC0
+	G4UYijU2274eCrrlkKTfbuZSamLwWkZdjJYtqnNdcNL8pIQoMObhFrr6qyHdQig4KiT6Wdj18Yzhx
+	yy/ckGOZzVfYTDYy1YR18vgMtRIB9TN5Uees+9P8PejyiR+5lwuHi2M5UswRsCsj1DPo=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tmvBI-00HWgW-Ue; Tue, 25 Feb 2025 14:41:04 +0100
-Date: Tue, 25 Feb 2025 14:41:04 +0100
+	id 1tmvKu-00HWpb-CB; Tue, 25 Feb 2025 14:51:00 +0100
+Date: Tue, 25 Feb 2025 14:51:00 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Simon Horman <horms@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Antoine Tenart <atenart@kernel.org>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Sean Anderson <sean.anderson@linux.dev>,
-	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>
-Subject: Re: [PATCH net-next v2 1/2] net: phy: sfp: Add support for SMBus
- module access
-Message-ID: <6ff4a225-07c0-40f6-9509-c4fa79966266@lunn.ch>
-References: <20250225112043.419189-1-maxime.chevallier@bootlin.com>
- <20250225112043.419189-2-maxime.chevallier@bootlin.com>
+To: SkyLake Huang =?utf-8?B?KOm7g+WVn+a+pCk=?= <SkyLake.Huang@mediatek.com>
+Cc: "daniel@makrotopia.org" <daniel@makrotopia.org>,
+	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	Steven Liu =?utf-8?B?KOWKieS6uuixqik=?= <steven.liu@mediatek.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"dqfext@gmail.com" <dqfext@gmail.com>,
+	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 1/3] net: phy: mediatek: Add 2.5Gphy firmware
+ dt-bindings and dts node
+Message-ID: <176f8fe1-f4cf-4bbd-9aea-5f407cef8ac5@lunn.ch>
+References: <20250219083910.2255981-1-SkyLake.Huang@mediatek.com>
+ <20250219083910.2255981-2-SkyLake.Huang@mediatek.com>
+ <a15cfd5d-7c1a-45b2-af14-aa4e8761111f@lunn.ch>
+ <Z7X5Dta3oUgmhnmk@makrotopia.org>
+ <ff96f5d38e089fdd76294265f33d7230c573ba69.camel@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,85 +77,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250225112043.419189-2-maxime.chevallier@bootlin.com>
+In-Reply-To: <ff96f5d38e089fdd76294265f33d7230c573ba69.camel@mediatek.com>
 
-On Tue, Feb 25, 2025 at 12:20:39PM +0100, Maxime Chevallier wrote:
-> The SFP module's eeprom and internals are accessible through an i2c bus.
-> However, all the i2c transfers that are performed are SMBus-style
-> transfers for read and write operations.
-> 
-> It is possible that the SFP might be connected to an SMBus-only
-> controller, such as the one found in some PHY devices in the VSC85xx
-> family.
-> 
-> Introduce a set of sfp read/write ops that are going to be used if the
-> i2c bus is only capable of doing smbus byte accesses.
-> 
-> As Single-byte SMBus transaction go against SFF-8472 and breaks the
-> atomicity for diagnostics data access, hwmon is disabled in the case
-> of SMBus access.
-> 
-> Moreover, as this may cause other instabilities, print a warning at
-> probe time to indicate that the setup may be unreliable because of the
-> hardware design.
-> 
-> Tested-by: Sean Anderson <sean.anderson@linux.dev>
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> ---
-> 
-> V2: - Added Sean's tested-by
->     - Added a warning indicating that operations won't be reliable, from
->       Russell and Andrew's reviews
->     - Also added a flag saying we're under a single-byte-access bus, to
->       both print the warning and disable hwmon.
-> 
->  drivers/net/phy/sfp.c | 79 +++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 73 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-> index 9369f5297769..6e9d3d95eb95 100644
-> --- a/drivers/net/phy/sfp.c
-> +++ b/drivers/net/phy/sfp.c
-> @@ -282,6 +282,7 @@ struct sfp {
->  	unsigned int rs_state_mask;
->  
->  	bool have_a2;
-> +	bool single_byte_access;
->  
->  	const struct sfp_quirk *quirk;
->  
-> @@ -690,14 +691,70 @@ static int sfp_i2c_write(struct sfp *sfp, bool a2, u8 dev_addr, void *buf,
->  	return ret == ARRAY_SIZE(msgs) ? len : 0;
->  }
->  
-> -static int sfp_i2c_configure(struct sfp *sfp, struct i2c_adapter *i2c)
-> +static int sfp_smbus_read(struct sfp *sfp, bool a2, u8 dev_addr, void *buf,
+> > Would using a 'reserved-memory' region be an option maybe?
+> Or maybe just leave those mapped registers' addresses in driver code
+> (mtk-2p5ge.c)? Like:
+> #define MT7988_2P5GE_PMB_BASE (0x0f100000)
+> #define MT7988_2P5GE_PMB_LEN  (0x20000)
 
-Maybe call this sfp_smbus_byte_read(), leaving space for
-sfp_smbus_word_read() in the future.
+The problem with hard coding them is you need some way to know which
+set of hard coded values to use, because the hardware engineers will
+not guarantee to never move them, or change the bit layout for the
+next generation of devices.
 
-> +			  size_t len)
->  {
-> -	if (!i2c_check_functionality(i2c, I2C_FUNC_I2C))
-> -		return -EINVAL;
-> +	u8 bus_addr = a2 ? 0x51 : 0x50;
-> +	union i2c_smbus_data smbus_data;
-> +	u8 *data = buf;
-> +	int ret;
-> +
-> +	while (len) {
-> +		ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-> +				     I2C_SMBUS_READ, dev_addr,
-> +				     I2C_SMBUS_BYTE_DATA, &smbus_data);
-> +		if (ret < 0)
-> +			return ret;
+PHYs don't use compatibles because they have an ID in register 2 and
+3. Is this ID specific to the MT7988?
 
-Isn't this the wrong order? You should do the upper byte first, then
-the lower?
-
-
-    Andrew
-
----
-pw-bot: cr
+	Andrew
 
