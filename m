@@ -1,246 +1,342 @@
-Return-Path: <netdev+bounces-169263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A0CAA43280
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 02:36:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76BE5A43284
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 02:39:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6779A176AE9
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 01:36:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E898B188D269
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 01:39:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C474E179A3;
-	Tue, 25 Feb 2025 01:36:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84363199B8;
+	Tue, 25 Feb 2025 01:38:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="CMUYvNPy"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="TNePHxPz"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2065.outbound.protection.outlook.com [40.107.244.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F1E94C76;
-	Tue, 25 Feb 2025 01:36:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740447407; cv=none; b=NsFzrq8C6TBywFLIi25vIOqX+uhn5ZQFnJ8VKJGuP3ukqL4662oeB4u+tnJ4f9GMp6kKFJ965RvIVzpgXcarV+D/rnaCwLvQRU1NazZPMJ8PEGT9bqGqvBC4rVxSgVveEQWKXknFu3PvVu0dXlBfIQsTOuQUL44eYtDwcrPbvnA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740447407; c=relaxed/simple;
-	bh=iRImChO2ZMyZnBTgCMRi32K6DA2pwjsam0wkmHE/YMg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MaMl7Rko5ChNXnuabsI52AS7KW2DiL/f8CAmK+hcxg8JImi+oK75WAzfZfqEWOSt12V7uhAMis2XIg2e2qdI5+KaicN3OodAAUfxZGIjyDrIgMrFUi1fGOqA+y86/k1ZC80ttHY2Y0kIdeKR8Giha+oYOfCtAQVxkpSTKRX+uHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=CMUYvNPy; arc=none smtp.client-ip=115.124.30.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1740447399; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=zWvMjmU2+SJ1elNZnAbHWtze8K8w97iUyKtJpyBPjjs=;
-	b=CMUYvNPyybKcJqAlcUbRsyRWkyxO43PBU09OTItxN3FlHxC+1/58Hyia3+TZVfFoAv+6/OMi9y9SjxMYf9GIlPZxzgggKau7n2tper6gzQNehpHwiwMh5vuBZK96I14HjOq2I4n4z7hkjv5rOLVDXBhE1Xa7KFRVV9dMsOkm1nE=
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WQCgAVB_1740447398 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 25 Feb 2025 09:36:38 +0800
-Date: Tue, 25 Feb 2025 09:36:38 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Alexandra Winter <wintera@linux.ibm.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Julian Ruess <julianr@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Peter Oberparleiter <oberpar@linux.ibm.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [RFC net-next 0/7] Provide an ism layer - naming
-Message-ID: <20250225013638.GC81943@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <D73H7Q080GUQ.3BDOH23P4WDOL@linux.ibm.com>
- <0f96574a-567e-495a-b815-6aef336f12e6@linux.ibm.com>
- <20250117021353.GF89233@linux.alibaba.com>
- <dc2ff4c83ce8f7884872068570454f285510bda2.camel@linux.ibm.com>
- <20250118153154.GI89233@linux.alibaba.com>
- <d1927140-443b-401c-92ff-f467c12d3e75@linux.ibm.com>
- <20250210050851.GS89233@linux.alibaba.com>
- <1e96806f-0a4e-4292-9483-928b1913d311@linux.ibm.com>
- <59d386fb-0612-4c2e-a4e7-ca26b474917f@linux.alibaba.com>
- <88bfde57-a653-472a-936b-40e68c349ac1@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B064C76
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 01:38:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.65
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740447538; cv=fail; b=oRCdRMjbDIcSnYnQObjqiMt/FHAoUiueahxAaQLospazSkHYk9az2c9s2PGDgR8kFk2Rtaa0QtaeiQU/5ZhRG/d0DCTrE+BnSu6SOXDinU4ln+p26Nuq5pKKJka/BV9j+qyAW6v8uAwqg+B8+LBuIeft7HxhS876zyxr+cdEQyY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740447538; c=relaxed/simple;
+	bh=sfaUORTETIB0t7MqZaWeAjtqFblMZOvRW9ddy34XHxE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=G3fKIp/O17BUB9iWnC+ARPkrx5zLqhTx2Ub4EX+BSFcbk4FhkbaFa3zWvn+Bdgt6/3t8pJRE+LoltPJDZ1BLEXX3orZaIaf4hw7m/5UBGX9XbhPtOZ1MK2/aW9FMUhVgQ3yI+NpICItMSJxj+CGGHZiS7gSn9RhKVbDTrfnYN20=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=TNePHxPz; arc=fail smtp.client-ip=40.107.244.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BrGmC23Dfq3DP9NUdcYE3QJVQBg1d0+MhNIoW2/9FDn2LScrylPdt9MmWRU7QIHdjYFE+46PR0iuoaJGIGppfzlci4AVT4jz/XA/TiEBCXA3JcE4vZpSiLnp/MY+9MKaoxObRyh3JnfQWCA9ZBz+4OiK7Yj3klmIofF6/lVn6vXFkDhHVNXkSwM+/fI3dRAWKGgg8SISAn6rOaE2BFDl5GDFcljC2g4yoDpyrJGObozXklvoSiKCDbQ8DDMMaR6rL4E5v6QsCQELRHXwHTjDYds2vhN3SoiVFykpa6nn3rENfpRUcTNyarpAoO9jMNlrEgjM1cxqMih1f/fw0qXxMQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cHqOunIlFuui8+JRUgNShoIFo+Av5zRT3540Qx0j5eI=;
+ b=D+7wZxUqolVlRCJc1n5LwviuDsl0lrytAe3/2l8H99IKlXYo+7cdnUu75nHa0NHUWlD27l8uXLqiM8EuZzeJ4jWEmX7HQFO4IuobZq0tOfrM8Gjdqi9icx4huO68+Ux2nDFIrQNIjnx0cuRBSXYXq9JZWH5v0EZ2n3uARN4FuZGSqSD3piM87kdgG6/PwahW3l2u5rPy+uxXSBXhWCrhRkfrt8FMjgugIujdl7B9oKAvGBDz334+1EydHZd4jy+yICvYe1R8vGPx/oWA2OtAyRPAY13Umz5MA6IbtrACLEx86oMdN/YvpyDV/cCzHCoEJB0rqFh9MXhYEf6ga3TrGA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=gmail.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cHqOunIlFuui8+JRUgNShoIFo+Av5zRT3540Qx0j5eI=;
+ b=TNePHxPzso8BhMifDBgRZa6sc+eBG2EXiePr/wwI0PGTuiJtavcMP1JapRF3H8MjkZzO8teA4yw0cDQ0Pr4jZC9TuEZg9OR8UQvkY8mOy7d4Tk8HrzMYiuXLum4nPEbQndfDf5kGwgs1YVBScoeFjaVpbKz74j2yvTmQFa5St+WQc3RmaZm4fcxsTwkt1g2OReO2aSKdVfZrruan9GjJnu1kwkgfGM2Dj3mZJs2R9YVsLcde8l+ge0Nanphy3gkiwTjwEhFMVr7s+5nWbsdlcConCE9jOEumLIeHZ0+/af/n84vVPm2Ftw4fbWVjiiNqOLWmEdSGHf6Ud6u2Tew/Bw==
+Received: from CH0PR08CA0001.namprd08.prod.outlook.com (2603:10b6:610:33::6)
+ by PH8PR12MB6676.namprd12.prod.outlook.com (2603:10b6:510:1c3::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.18; Tue, 25 Feb
+ 2025 01:38:47 +0000
+Received: from CH3PEPF0000000D.namprd04.prod.outlook.com
+ (2603:10b6:610:33:cafe::56) by CH0PR08CA0001.outlook.office365.com
+ (2603:10b6:610:33::6) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8466.21 via Frontend Transport; Tue,
+ 25 Feb 2025 01:38:47 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CH3PEPF0000000D.mail.protection.outlook.com (10.167.244.43) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8489.16 via Frontend Transport; Tue, 25 Feb 2025 01:38:47 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 24 Feb
+ 2025 17:38:37 -0800
+Received: from [10.19.165.106] (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Mon, 24 Feb
+ 2025 17:38:33 -0800
+Message-ID: <5ab59f2d-1c22-4602-95ab-a247b5bf048e@nvidia.com>
+Date: Tue, 25 Feb 2025 09:38:33 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv2 net-next] openvswitch: switch to per-action label
+ counting in conntrack
+To: Xin Long <lucien.xin@gmail.com>
+CC: network dev <netdev@vger.kernel.org>, <dev@openvswitch.org>,
+	<ovs-dev@openvswitch.org>, <davem@davemloft.net>, <kuba@kernel.org>, "Eric
+ Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Pravin B
+ Shelar" <pshelar@ovn.org>, Ilya Maximets <i.maximets@ovn.org>, Aaron Conole
+	<aconole@redhat.com>, Florian Westphal <fw@strlen.de>
+References: <6b9347d5c1a0b364e88d900b29a616c3f8e5b1ca.1723483073.git.lucien.xin@gmail.com>
+ <2ee4d016-5e57-4d86-9dca-e4685cb183bb@nvidia.com>
+ <CADvbK_ft=B310a9dcwgnwDrPKsxhicKJ4v9wAdgPSHhG+gPjLw@mail.gmail.com>
+Content-Language: en-US
+From: Jianbo Liu <jianbol@nvidia.com>
+In-Reply-To: <CADvbK_ft=B310a9dcwgnwDrPKsxhicKJ4v9wAdgPSHhG+gPjLw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <88bfde57-a653-472a-936b-40e68c349ac1@linux.ibm.com>
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PEPF0000000D:EE_|PH8PR12MB6676:EE_
+X-MS-Office365-Filtering-Correlation-Id: 34802199-b8f9-41e8-b514-08dd553d25f2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|7416014|376014|1800799024|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Zmc5Q2hwUW0yQVF1NTVzb2ZCZnhhZnF6QmtNNnVXTGtEOUxKOWw4akNKNW1Q?=
+ =?utf-8?B?MkFiUFhqQ3VSOEJMOFF3VjZuMjRjMlJrcFovSkZsVDlQQkJsQVJyUlVjK1NI?=
+ =?utf-8?B?bFBkZDI4TVV6VUFsck4vUjE4akoyaTVtQ3VmSFRHYTNoT0hXaStyem9IK3NZ?=
+ =?utf-8?B?djBuUkFJbWhFcGlQMXpERy9vSkVHSXVmS1VNV2MxbUxGeVNqN2FaN0F4N3dk?=
+ =?utf-8?B?cXpnTm5GNys5NVYyWDMrMjhjMjZIUGxaOUx6Sk44Q2JTZmtkZzhxbDcwRUZW?=
+ =?utf-8?B?NVErdExnd1ZMOUNuWk9aOHZVSkxUSFVMdUNjU2dVNW9XbzZHdTg0cUtZWUwz?=
+ =?utf-8?B?RERiOGFqSDBPQXZINGswaEl5aUtxTDNGekpuUnZCWGlHN1dEQTR4Q0NJYXlE?=
+ =?utf-8?B?Zk12OTc3V3FNa0tWYmErbWp6ZmlmMTNFM2R5K05CSHRjSFI5MHJLM2FMVHlX?=
+ =?utf-8?B?RDM4SzNWWmV3b0huamxBT0NiMXExc2lmV3dNd1NZd2hlZUNlTWsrdGhiMkc1?=
+ =?utf-8?B?eUR5VHo4ai9sUjdKUktGQnh1ZFgyUU1hRkF4SzdtMFZKeFgyeTVRaW1RWHZy?=
+ =?utf-8?B?ZDRTeTd5N0Y1YTBqVjFnaVVYZmRlVDlPQ1ByeXhNNHlCaVB5WXNEK3RQSy80?=
+ =?utf-8?B?ZzdLbEhHVmhNTWI3QmNnd3JjNEE3V2l6M25MaVBlSXJRTjU0aCt5MUtyQVJj?=
+ =?utf-8?B?OVgrMXB4WHc1WGtXMlNsQ3cyYjFwbks2RXlCUU1rN0dKMjBydGhhWGVvOEFi?=
+ =?utf-8?B?NG0xVEVRWktpWmhQN21rUXNYR1pGMmIrWlFCcUJ6UUNsdHZadmhZc2tIczBl?=
+ =?utf-8?B?VnBnN2U0QUJXeHZwdnkwTXl4ZGY2NFhJeDJERHlTVUpSUEtwOXZtVUdTditO?=
+ =?utf-8?B?RVd3Sm5EeTA1Um8yRU9kOG54L3FTYkN1dUJYQ20wK1pUUnh2ZURoNzlEUXlN?=
+ =?utf-8?B?OG5BaDJhKzdpckRpSlVYSUNsT1Y3M29EWFRrUmRPeHZVRjNrcUVEQUhPdEhx?=
+ =?utf-8?B?OEFmaGJJUzRTNVlTSjBlWnl1WmcwUmxFZXpsZ0JvWEREeG1jc3ZpaVJpK3Vq?=
+ =?utf-8?B?aFhlcU0xczArSFlxQVhhL0UxS3d5a2p1dUt3VHl5OS9iOXlyY0o4MWtUWjRM?=
+ =?utf-8?B?UmJJQUZnSGRtY2VWSG9kMWlDZExiWEdCOFdhOEpja3FnbUtyelhLVTF4U2ZN?=
+ =?utf-8?B?YTNFZ3MxdnJvSWxIR3BPVFptc2E2OGpIZW82b04vQjR5K2dBbjJzajZTam1L?=
+ =?utf-8?B?NHZHbzd0UGRUSDVTMDdQbldjaENtZzBjQjkxTlBLUG9OZEIwdDFmbW1tOGtU?=
+ =?utf-8?B?aHJ0TzMxcWNkODBkYlRwWjRtTUhLRVE5VHQwYm1PV2pKOUV6UUtVd08zbXZ2?=
+ =?utf-8?B?REpXellOYWRzV2gvelR3dTZtOGR2MVNSaHNlYjk2TzdzUnVXckRBcml0VEFN?=
+ =?utf-8?B?Y00wOXNqdllqT1hDN0ZQckYyanhOY3E4enJZeWJaOWFQbzZWRzhFYjgyS25J?=
+ =?utf-8?B?WHJrMk0xS3pjSzdkQ3BQeWRLRjl2cDZNVGVCMktyeEhuY3grWkxUUEhpU1FB?=
+ =?utf-8?B?YzNTeXpnV1drSHMwKytJOExVZ1UyU2Z5LzRCb2g5K1lhY0pOT3Q0c3ZLaUEy?=
+ =?utf-8?B?ckZhT2t5TFg2WGNkRjBXV1B3OWV0Zkw4TzRWNHV1RUpHZmk3TTArZkJJK0tT?=
+ =?utf-8?B?T2ZVRnhlUVBGbWdURjBDZjk5M0w5TDh1eG9IVlRPT0lKR3lrdGViUEo1clhS?=
+ =?utf-8?B?YWNFaFlBYmZ1MGRSZTQ1RTJ1a2Y0cHVEMVhNU3pOQTM4a2x5Rmg1czJLVlRI?=
+ =?utf-8?B?S2d4cGVGREE5NHdZTFkxcXAxeExZWkhoTFNkREJ4eGl4bUR1Wks1ZTRiOCtM?=
+ =?utf-8?B?TFA0ZzVXdnF3cWZ2cUhzWXpvVmoxRWpmd1A1Z0lremdaNkRHN05obFQvVitT?=
+ =?utf-8?B?TS9aaVJ2MVZQdm9nakw0TU13VFJ1eXA3SUpjZ2JUVitRMkl6T3o3bWtrdXFB?=
+ =?utf-8?Q?GeX+EXLAUHFNMBs7uVmEoiVGnsTzCs=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(7416014)(376014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2025 01:38:47.2945
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 34802199-b8f9-41e8-b514-08dd553d25f2
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH3PEPF0000000D.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6676
 
-On 2025-02-19 12:25:59, Alexandra Winter wrote:
->
->
->On 16.02.25 16:40, Wen Gu wrote:
->> 
->> 
->> On 2025/2/10 17:38, Alexandra Winter wrote:
->>>
->>>
->>> On 10.02.25 06:08, Dust Li wrote:
->>>> On 2025-01-28 17:04:53, Alexandra Winter wrote:
->>>>>
->>>>>
->>>>> On 18.01.25 16:31, Dust Li wrote:
->>>>>> On 2025-01-17 11:38:39, Niklas Schnelle wrote:
->>>>>>> On Fri, 2025-01-17 at 10:13 +0800, Dust Li wrote:
->>>>>>>>>
->>>>>>> ---8<---
->>>>>>>>> Here are some of my thoughts on the matter:
->>>>>>>>>>>
->>>>>>>>>>> Naming and Structure: I suggest we refer to it as SHD (Shared Memory
->>>>>>>>>>> Device) instead of ISM (Internal Shared Memory).
->>>>>>>>>
->>>>>>>>>
->>>>>>>>> So where does the 'H' come from? If you want to call it Shared Memory _D_evice?
->>>>>>>>
->>>>>>>> Oh, I was trying to refer to SHM(Share memory file in the userspace, see man
->>>>>>>> shm_open(3)). SMD is also OK.
->>>>>>>>
->>>>>>>>>
->>>>>>>>>
->>>>>>>>> To my knowledge, a
->>>>>>>>>>> "Shared Memory Device" better encapsulates the functionality we're
->>>>>>>>>>> aiming to implement.
->>>>>>>>>
->>>>>>>>>
->>>>>>>>> Could you explain why that would be better?
->>>>>>>>> 'Internal Shared Memory' is supposed to be a bit of a counterpart to the
->>>>>>>>> Remote 'R' in RoCE. Not the greatest name, but it is used already by our ISM
->>>>>>>>> devices and by ism_loopback. So what is the benefit in changing it?
->>>>>>>>
->>>>>>>> I believe that if we are going to separate and refine the code, and add
->>>>>>>> a common subsystem, we should choose the most appropriate name.
->>>>>>>>
->>>>>>>> In my opinion, "ISM" doesn’t quite capture what the device provides.
->>>>>>>> Since we’re adding a "Device" that enables different entities (such as
->>>>>>>> processes or VMs) to perform shared memory communication, I think a more
->>>>>>>> fitting name would be better. If you have any alternative suggestions,
->>>>>>>> I’m open to them.
->>>>>>>
->>>>>>> I kept thinking about this a bit and I'd like to propose yet another
->>>>>>> name for this group of devices: Memory Communication Devices (MCD)
->>>>>>>
->>>>>>> One important point I see is that there is a bit of a misnomer in the
->>>>>>> existing ISM name in that our ISM device does in fact *not* share
->>>>>>> memory in the common sense of the "shared memory" wording. Instead it
->>>>>>> copies data between partitions of memory that share a common
->>>>>>> cache/memory hierarchy while not sharing the memory itself. loopback-
->>>>>>> ism and a possibly future virtio-ism on the other hand would share
->>>>>>> memory in the "shared memory" sense. Though I'd very much hope they
->>>>>>> will retain a copy mode to allow use in partition scenarios.
->>>>>>>
->>>>>>> With that background I think the common denominator between them and
->>>>>>> the main idea behind ISM is that they facilitate communication via
->>>>>>> memory buffers and very simple and reliable copy/share operations. I
->>>>>>> think this would also capture our planned use-case of devices (TTYs,
->>>>>>> block devices, framebuffers + HID etc) provided by a peer on top of
->>>>>>> such a memory communication device.
->>>>>>
->>>>>> Make sense, I agree with MCD.
->>>>>>
->>>>>> Best regard,
->>>>>> Dust
->>>>>>
->>>>>
->>>>>
->>>>
->>>> Hi Winter,
->>>>
->>>> Sorry for the late reply; we were on break for the Chinese Spring
->>>> Festival.
->>>>
->>>>>
->>>>> In the discussion with Andrew Lunn, it showed that
->>>>> a) we need an abstract description of 'ISM' devices (noted)
->>>>> b) DMBs (Direct Memory Buffers) are a critical differentiator.
->>>>>
->>>>> So what do your think of Direct Memory Communication (DMC) as class name for these devices?
->>>>>
->>>>> I don't have a strong preference (we could also stay with ISM). But DMC may be a bit more
->>>>> concrete than MCD or ISM.
->>>>
->>>> I personally prefer MCD over Direct Memory Communication (DMC).
->>>>
->>>> For loopback or Virtio-ISM, DMC seems like a good choice. However, for
->>>> IBM ISM, since there's a DMA copy involved, it doesn’t seem truly "Direct,"
->>>> does it?
->>>>
->>>> Additionally, since we are providing a device, MCD feels like a more
->>>> fitting choice, as it aligns better with the concept of a "device."
->>>>
->>>> Best regards,
->>>> Dust
->>>
->>> Thank you for your thoughts, Dust.
->>> For me the 'D as 'direct' is not so much about the number of copies, but more about the
->>> aspect, that you can directly write at any offset into the buffer. I.e. no queues.
->>> More like the D in DMA or RDMA.
->>>
->> 
->> IMHO the 'D' means that the CPU copy does not need to be involved, and memory access
->> only involves between memory and IO devices. So under this semantics, I think 'DMC'
->> also applies to s390 ism device, since IIUC the s390 ism directly access to the memory
->> which is passed down by move_data(). The exception is lo-ism, where the device
->> actually doesn't need to access the memory(DMB), since the data has been put into the
->> shared memory once the sendmsg() is called and no copy or move is needed. But this
->> is not a violation of name, just a special kind of short-cut. So DMC makes sense
->> to me.
->> 
->>> I am preparing a talk for netdev in March about this subject, and the more I work on it,
->>> it seems to me that the buffers ('B'), that are
->>> a) only authorized for a single remote device and
->>> b) can be accessed at any offset
->>> are the important differentiator compared other virtual devices.
->>> So maybe 'D' for Dedicated?
->>>
->>> I even came up with
->>> dibs - Dedicated Internal Buffer Sharing or
->>> dibc - Dedicated Internal Buffer Communication
->>> (ok, I like the sound and look of the 'I'. But being on the same hardware as opposed
->>> to RDMA is also an important aspect.)
->>>
->>>
->>> MCD - 'memory communication device' sounds rather vague to me. But if it is the
->>> smallest common denominator, i.e. the only thing we can all agree on, I could live with it.
->>>
->
->
->Could you guys accept
->'DIBS - Dedicated Internal Buffer Sharing'
->as well?
->-> dibs_layer, /class/dibs/, dibs_dev
->
->That is currently my favourite.
->
 
-I think you might prefer a name that describes shared memory,
-but I personally believe that something reflecting the device itself
-would be more fitting.
 
-To be honest, here’s my ranking:
+On 2/25/2025 3:55 AM, Xin Long wrote:
+> On Mon, Feb 24, 2025 at 4:01 AM Jianbo Liu <jianbol@nvidia.com> wrote:
+>>
+>>
+>>
+>> On 8/13/2024 1:17 AM, Xin Long wrote:
+>>> Similar to commit 70f06c115bcc ("sched: act_ct: switch to per-action
+>>> label counting"), we should also switch to per-action label counting
+>>> in openvswitch conntrack, as Florian suggested.
+>>>
+>>> The difference is that nf_connlabels_get() is called unconditionally
+>>> when creating an ct action in ovs_ct_copy_action(). As with these
+>>> flows:
+>>>
+>>>     table=0,ip,actions=ct(commit,table=1)
+>>>     table=1,ip,actions=ct(commit,exec(set_field:0xac->ct_label),table=2)
+>>>
+>>> it needs to make sure the label ext is created in the 1st flow before
+>>> the ct is committed in ovs_ct_commit(). Otherwise, the warning in
+>>> nf_ct_ext_add() when creating the label ext in the 2nd flow will
+>>> be triggered:
+>>>
+>>>      WARN_ON(nf_ct_is_confirmed(ct));
+>>>
+>>
+>> Hi Xin Long,
+>>
+>> The ct can be committed before openvswitch handles packets with CT
+>> actions. And we can trigger the warning by creating VF and running ping
+>> over it with the following configurations:
+>>
+>> ovs-vsctl add-br br
+>> ovs-vsctl add-port br eth2
+>> ovs-vsctl add-port br eth4
+>> ovs-ofctl add-flow br "table=0, in_port=eth4,ip,ct_state=-trk
+>> actions=ct(table=1)"
+>> ovs-ofctl add-flow br "table=1, in_port=eth4,ip,ct_state=+trk+new
+>> actions=ct(exec(set_field:0xef7d->ct_label), commit), output:eth2"
+>> ovs-ofctl add-flow br "table=1, in_port=eth4,ip,ct_label=0xef7d,
+>> ct_state=+trk+est actions=output:eth2"
+>>
+>> The eth2 is PF, and eth4 is VF's representor.
+>> Would you like to fix it?
+> Hi, Jianbo,
+> 
+> Sure, we have to attach a new ct to the skb in __ovs_ct_lookup() for
+> this case, and even delete the one created before ovs_ct.
+> 
+> Can you check if this works on your env?
 
-MCD > DMC > DIBS
+Yes, it works.
+Could you please submit the formal patch? Thanks!
 
-Best regards,
-Dust
+> 
+> diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntrack.c
+> index 3bb4810234aa..c599ee013dfe 100644
+> --- a/net/openvswitch/conntrack.c
+> +++ b/net/openvswitch/conntrack.c
+> @@ -595,6 +595,11 @@ static bool skb_nfct_cached(struct net *net,
+>               rcu_dereference(timeout_ext->timeout))
+>               return false;
+>       }
+> +    if (IS_ENABLED(CONFIG_NF_CONNTRACK_LABELS) && !nf_ct_labels_find(ct)) {
+> +        if (nf_ct_is_confirmed(ct))
+> +            nf_ct_delete(ct, 0, 0);
+> +        return false;
+> +    }
+> 
+> Thanks.
+> 
+>>
+>> Thanks!
+>> Jianbo
+>>
+>>> Signed-off-by: Xin Long <lucien.xin@gmail.com>
+>>> ---
+>>> v2: move ovs_net into #if in ovs_ct_exit() as Jakub noticed.
+>>> ---
+>>>    net/openvswitch/conntrack.c | 30 ++++++++++++------------------
+>>>    net/openvswitch/datapath.h  |  3 ---
+>>>    2 files changed, 12 insertions(+), 21 deletions(-)
+>>>
+>>> diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntrack.c
+>>> index 8eb1d644b741..a3da5ee34f92 100644
+>>> --- a/net/openvswitch/conntrack.c
+>>> +++ b/net/openvswitch/conntrack.c
+>>> @@ -1368,11 +1368,8 @@ bool ovs_ct_verify(struct net *net, enum ovs_key_attr attr)
+>>>            attr == OVS_KEY_ATTR_CT_MARK)
+>>>                return true;
+>>>        if (IS_ENABLED(CONFIG_NF_CONNTRACK_LABELS) &&
+>>> -         attr == OVS_KEY_ATTR_CT_LABELS) {
+>>> -             struct ovs_net *ovs_net = net_generic(net, ovs_net_id);
+>>> -
+>>> -             return ovs_net->xt_label;
+>>> -     }
+>>> +         attr == OVS_KEY_ATTR_CT_LABELS)
+>>> +             return true;
+>>>
+>>>        return false;
+>>>    }
+>>> @@ -1381,6 +1378,7 @@ int ovs_ct_copy_action(struct net *net, const struct nlattr *attr,
+>>>                       const struct sw_flow_key *key,
+>>>                       struct sw_flow_actions **sfa,  bool log)
+>>>    {
+>>> +     unsigned int n_bits = sizeof(struct ovs_key_ct_labels) * BITS_PER_BYTE;
+>>>        struct ovs_conntrack_info ct_info;
+>>>        const char *helper = NULL;
+>>>        u16 family;
+>>> @@ -1409,6 +1407,12 @@ int ovs_ct_copy_action(struct net *net, const struct nlattr *attr,
+>>>                return -ENOMEM;
+>>>        }
+>>>
+>>> +     if (nf_connlabels_get(net, n_bits - 1)) {
+>>> +             nf_ct_tmpl_free(ct_info.ct);
+>>> +             OVS_NLERR(log, "Failed to set connlabel length");
+>>> +             return -EOPNOTSUPP;
+>>> +     }
+>>> +
+>>>        if (ct_info.timeout[0]) {
+>>>                if (nf_ct_set_timeout(net, ct_info.ct, family, key->ip.proto,
+>>>                                      ct_info.timeout))
+>>> @@ -1577,6 +1581,7 @@ static void __ovs_ct_free_action(struct ovs_conntrack_info *ct_info)
+>>>        if (ct_info->ct) {
+>>>                if (ct_info->timeout[0])
+>>>                        nf_ct_destroy_timeout(ct_info->ct);
+>>> +             nf_connlabels_put(nf_ct_net(ct_info->ct));
+>>>                nf_ct_tmpl_free(ct_info->ct);
+>>>        }
+>>>    }
+>>> @@ -2002,17 +2007,9 @@ struct genl_family dp_ct_limit_genl_family __ro_after_init = {
+>>>
+>>>    int ovs_ct_init(struct net *net)
+>>>    {
+>>> -     unsigned int n_bits = sizeof(struct ovs_key_ct_labels) * BITS_PER_BYTE;
+>>> +#if  IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+>>>        struct ovs_net *ovs_net = net_generic(net, ovs_net_id);
+>>>
+>>> -     if (nf_connlabels_get(net, n_bits - 1)) {
+>>> -             ovs_net->xt_label = false;
+>>> -             OVS_NLERR(true, "Failed to set connlabel length");
+>>> -     } else {
+>>> -             ovs_net->xt_label = true;
+>>> -     }
+>>> -
+>>> -#if  IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+>>>        return ovs_ct_limit_init(net, ovs_net);
+>>>    #else
+>>>        return 0;
+>>> @@ -2021,12 +2018,9 @@ int ovs_ct_init(struct net *net)
+>>>
+>>>    void ovs_ct_exit(struct net *net)
+>>>    {
+>>> +#if  IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+>>>        struct ovs_net *ovs_net = net_generic(net, ovs_net_id);
+>>>
+>>> -#if  IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+>>>        ovs_ct_limit_exit(net, ovs_net);
+>>>    #endif
+>>> -
+>>> -     if (ovs_net->xt_label)
+>>> -             nf_connlabels_put(net);
+>>>    }
+>>> diff --git a/net/openvswitch/datapath.h b/net/openvswitch/datapath.h
+>>> index 9ca6231ea647..365b9bb7f546 100644
+>>> --- a/net/openvswitch/datapath.h
+>>> +++ b/net/openvswitch/datapath.h
+>>> @@ -160,9 +160,6 @@ struct ovs_net {
+>>>    #if IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+>>>        struct ovs_ct_limit_info *ct_limit_info;
+>>>    #endif
+>>> -
+>>> -     /* Module reference for configuring conntrack. */
+>>> -     bool xt_label;
+>>>    };
+>>>
+>>>    /**
+>>
 
 
