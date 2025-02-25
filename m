@@ -1,119 +1,116 @@
-Return-Path: <netdev+bounces-169561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 688F8A449A2
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 19:09:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CE5FA449EC
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 19:15:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 337FF426A59
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 18:06:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BF23864ADD
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 18:08:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FC1A1624F5;
-	Tue, 25 Feb 2025 18:06:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8994A19CC06;
+	Tue, 25 Feb 2025 18:08:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="KYfkupEb"
+	dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b="oDlD88+F"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from dilbert.mork.no (dilbert.mork.no [65.108.154.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE73198831;
-	Tue, 25 Feb 2025 18:06:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18F4D19993B;
+	Tue, 25 Feb 2025 18:08:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.108.154.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740506782; cv=none; b=Zc7zTOPG0yHCoU0fSMkdkT/ECduFMwnk14BwbCQe5rYuap+hPsWTU7GVwl9XVyCKH+HxEFnrjAY1JND3hGEgqpMCefFm9d4Sp8FixDrbxfnCtwRcKfHD6ft0bhfu9lxm0HPUqWZsu7NmwxBc0ttNwCSQTFTXMVETAtBUyfdXuBs=
+	t=1740506895; cv=none; b=hGhIUgfrSvx9BUfSjZ0gLUhyar2TW/ujcsVZ5ym2c4G2/XOonC/m9fuMIjttIfbq1XrH0eyHFYfWOKl8GhGd4X6sOzlJyZnAWZKaoq6Kx5S0wo9zlTwgqftqVSB8a1HaeOeLqUoFfkVU6PYJqpD04Gzt4D+wJwmOZTWqMGiqYo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740506782; c=relaxed/simple;
-	bh=+mgjPcYbtBMafv2PEBke0dmjEk/XTdvICAF/+MhrcVY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PcEAKs15Pej48NUvHVVng4AG8gYc0PHdu6dKC9v7TjKcmw/lkYmRBXElfgFCv0tKRbPQkVT4Ra/8l3wYPkX6RspLjh8PxS6In6538Xo2uitLtqIsBetZ3ezImH+wUnJQIlVIRK2I9V2gP553gNXG7fmoyUUdH4GBrD/6rxZCbks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=KYfkupEb; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=AEGSWcKHG/DGt9gmn7ot1tseH2ZGwgQHNF6MKDhFdnA=; b=KYfkupEbzYdvsInYQ4QxQpYdDV
-	UAeDld9Vipi+m2Y1ukkkHO7GDy4pAWGsHZu+XKmbSshXL6h7bGCW+lWSf7gVwypgMgRGhDeGBMRyT
-	f15y/QaBTV0vL+TDqNqd9wpaMLkv7GNGm5Ap2TOvkM7WeeFSX7pgPV/K+dbpWRud6vH6wfjx2MGwL
-	jocI6Eazk1hLWhTG+LPpzLOT058nEcByt7RZW6wTLdoEpW+V48w4tyZXzact4gHDBQEcWwpPZra9z
-	A2EdJnlUA8e/EWL2DxEKeopdocFd5RhuFeaAmzFJH8l0T5brwHMEj39NK4OMi8h+6qG/MM6ie6URd
-	5tbtCDSA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54436)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tmzJu-0002Av-2R;
-	Tue, 25 Feb 2025 18:06:14 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tmzJt-0006DA-1D;
-	Tue, 25 Feb 2025 18:06:13 +0000
-Date: Tue, 25 Feb 2025 18:06:13 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Simon Horman <horms@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Antoine Tenart <atenart@kernel.org>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Sean Anderson <sean.anderson@linux.dev>,
-	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>
-Subject: Re: [PATCH net-next v2 1/2] net: phy: sfp: Add support for SMBus
- module access
-Message-ID: <Z74GlXKiExICQ6Rd@shell.armlinux.org.uk>
-References: <20250225112043.419189-1-maxime.chevallier@bootlin.com>
- <20250225112043.419189-2-maxime.chevallier@bootlin.com>
- <6ff4a225-07c0-40f6-9509-c4fa79966266@lunn.ch>
- <20250225145617.1ed1833d@fedora.home>
+	s=arc-20240116; t=1740506895; c=relaxed/simple;
+	bh=wefH7Rpmq54N4YPB2U8jXbjMtX7IaHJ1punDFwYSoxE=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=MRC2vXpA6DTCc4vKthSoihf1EpwWZNfmcX+aKQD/ijWYnlJksVTzWeIEfq2KMcZjX2X0Yh2QSS3gf10EyRHv99BB5q//amhNsoG60LIXmahUoC4dfiZJwc4JR/eyXhyDsiAv0nj6WuoaVnnejUdQ7vdR43dBWEUTlTFDg9/+UcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no; spf=pass smtp.mailfrom=miraculix.mork.no; dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b=oDlD88+F; arc=none smtp.client-ip=65.108.154.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=miraculix.mork.no
+Authentication-Results: dilbert.mork.no;
+	dkim=pass (1024-bit key; secure) header.d=mork.no header.i=@mork.no header.a=rsa-sha256 header.s=b header.b=oDlD88+F;
+	dkim-atps=neutral
+Received: from canardo.dyn.mork.no ([IPv6:2a01:799:10de:2e00:0:0:0:1])
+	(authenticated bits=0)
+	by dilbert.mork.no (8.18.1/8.18.1) with ESMTPSA id 51PI7fID1055590
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Tue, 25 Feb 2025 18:07:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mork.no; s=b;
+	t=1740506861; bh=XJFMpaLBtjREdFMRnck4vJ5NSVGA7jW7HlBTjc+VhXU=;
+	h=From:To:Cc:Subject:References:Date:Message-ID:From;
+	b=oDlD88+FsB93ZAgzk6Lr3ZECuDwCk9p+FZJ+VjSy9NZ3oezLp85OGFJ+7x6+hZcZb
+	 bQTk2o0p6lH09pNpwsY1i//T0LsgUb29tFp5zBGds++qh/5PIIOXF7M2sjv+zqi1uN
+	 cooA24KToIp6100WGut3zSE6/LU6JzGZUL19Tyvg=
+Received: from miraculix.mork.no ([IPv6:2a01:799:10de:2e0a:149a:2079:3a3a:3457])
+	(authenticated bits=0)
+	by canardo.dyn.mork.no (8.18.1/8.18.1) with ESMTPSA id 51PI7fao3242724
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Tue, 25 Feb 2025 19:07:41 +0100
+Received: (nullmailer pid 1167981 invoked by uid 1000);
+	Tue, 25 Feb 2025 18:07:41 -0000
+From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
+        Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+        Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        =?utf-8?Q?K=C3=B6ry?= Maincent <kory.maincent@bootlin.com>,
+        Simon Horman <horms@kernel.org>,
+        Romain Gantois <romain.gantois@bootlin.com>,
+        Antoine Tenart <atenart@kernel.org>,
+        Marek =?utf-8?Q?Beh=C3=BAn?= <kabel@kernel.org>
+Subject: Re: [PATCH net-next 0/2] net: phy: sfp: Add single-byte SMBus SFP
+ access
+Organization: m
+References: <20250223172848.1098621-1-maxime.chevallier@bootlin.com>
+	<Z7tdlaGfVHuaWPaG@shell.armlinux.org.uk>
+	<87o6yqrygp.fsf@miraculix.mork.no>
+	<Z736uAVe5MqRn7Se@shell.armlinux.org.uk>
+Date: Tue, 25 Feb 2025 19:07:41 +0100
+In-Reply-To: <Z736uAVe5MqRn7Se@shell.armlinux.org.uk> (Russell King's message
+	of "Tue, 25 Feb 2025 17:15:36 +0000")
+Message-ID: <87h64hsxsi.fsf@miraculix.mork.no>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250225145617.1ed1833d@fedora.home>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Virus-Scanned: clamav-milter 1.0.7 at canardo.mork.no
+X-Virus-Status: Clean
 
-On Tue, Feb 25, 2025 at 02:56:17PM +0100, Maxime Chevallier wrote:
-> > > +	while (len) {
-> > > +		ret = i2c_smbus_xfer(sfp->i2c, bus_addr, 0,
-> > > +				     I2C_SMBUS_READ, dev_addr,
-> > > +				     I2C_SMBUS_BYTE_DATA, &smbus_data);
-> > > +		if (ret < 0)
-> > > +			return ret;  
-> > 
-> > Isn't this the wrong order? You should do the upper byte first, then
-> > the lower?
-> 
-> You might be correct. As I have been running that code out-of-tree for
-> a while, I was thinking that surely I'd have noticed if this was
-> wrong, however there are only a few cases where we actually write to
-> SFP :
-> 
->  - sfp_modify_u8(...) => one-byte write
->  - in sfp_cotsworks_fixup_check(...) there are 2 writes : one 1-byte
-> write and a 3-bytes write.
-> 
-> As I don't have any cotsworks SFP, then it looks like having the writes
-> mis-ordered would have stayed un-noticed on my side as I only
-> stressed the 1 byte write path...
+"Russell King (Oracle)" <linux@armlinux.org.uk> writes:
 
-This Cotsworks module is not a SFP. It's a solder-on SFF module.
+>> I believe you are reading more into the spec than what's actually there.
+>
+> So I'm making up the quote above from SFF-8472.  Okay, if that's where
+> this discussion is going, I'm done here.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+No, not at all.  That was not what I meant.  Please accept my apologies.
+This came out wrong. You are absolutely correct about reading the 16bit
+diagnostic registers you quoted. I would never doubt that. I have an
+extreme respect for you and your knowledge of these standards and the
+practical hardware implications.
+
+It was the conclusion that this fact prevents SMBus hosts I wanted to
+question.  I still don't see that.  Some SMBus hosts might be able do 2
+byte reads.  And if they can't, then I believe they can safely ignore
+these registers without being out of spec.  Like the proposed solution.
+
+I'll shut up now, to avoid confusing the discussion of Maxime's patches
+further.
+
+
+Bj=C3=B8rn
+
+
 
