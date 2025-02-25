@@ -1,139 +1,85 @@
-Return-Path: <netdev+bounces-169525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA46DA445B8
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 17:17:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70F0CA445EF
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 17:25:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D59A03B3CF9
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 16:13:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E423C166661
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 16:23:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC0102FB2;
-	Tue, 25 Feb 2025 16:13:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08F3618DB17;
+	Tue, 25 Feb 2025 16:23:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oz2Kd9zi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ePltYH5g"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 813E321ABAB;
-	Tue, 25 Feb 2025 16:13:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5BCA18DB11;
+	Tue, 25 Feb 2025 16:23:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740500018; cv=none; b=ngVN/VNtt95UuTwhtx/GwCgTAWUFq+qjR9gdZl0mfLyqYd/bmnHcM+VcVau/bLe4fcAlm1/UGKd2Isz0/3aPcv9tK1L2Ow8zjwTkYhFHhQ5w8YVABeEVNOUlw3MspcwPpNdp8+i40JW3F3bB0JbBwc7lYQdwpqgyPjGPHPbDiiI=
+	t=1740500588; cv=none; b=mMLgB6+y3BtMhhQovy3fw2NkRlKa7B6SrzqTiUA50FQSz8i8tvZipV1Oebpj5z3fzWvxQDGhojSdzchs5HtiN91RC2koTtONPnf1YPOV2Cx2GzfSgqJClJTQtwzWwZtrzR+PvQibEG2Gs0IeoNZlv79ykqCz6jBPG0kNLfhCac4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740500018; c=relaxed/simple;
-	bh=zxHilzlwDf7ovEtBPkSL+tIZUqIVWUarGWX8NAWd+bQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bohQrny7OVSufcyJZepLHEsW3OdPsdP7imOnOORJoldzuibUZ5+YaTJDEmZvp8Min4whTyg5hBgKRZv+G9TRfqzHEChzgOLks5hosmSVHnLQQP33SFGDsiCuJYTtY+NfJS0L5iTzi8tGDdjnDh9mehVQMtDWYfizhVXkSyFWiEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oz2Kd9zi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8D60C4CEDD;
-	Tue, 25 Feb 2025 16:13:35 +0000 (UTC)
+	s=arc-20240116; t=1740500588; c=relaxed/simple;
+	bh=8ESREboIlA7s5wzo5W17sM0xvNvEQAcEtzyF1FX9XMI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MvZr4L+ylypJFab6/gFi8FulqwBXY91A4sQMiLVwwwmCJhY53hFjvUivq96U+6bE+vRhgYlYo5VT5blgtfsMdbw8b0X/aOn04JdT21YOsx1BZK1j6bCOf2c6ITn2bMwEg3dR56w3Tnp509+x0bUHf8vJ4kmyAZWr/igrckjn/1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ePltYH5g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D0E7C4CEDD;
+	Tue, 25 Feb 2025 16:23:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740500018;
-	bh=zxHilzlwDf7ovEtBPkSL+tIZUqIVWUarGWX8NAWd+bQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=oz2Kd9ziWB20Tn9xySVGugZduBZV1GtbCE11NCHQTqg2eFRVdD8gJ1voa9Iq/ZJX+
-	 AqU4ymCwQMPEPcKfZ+Q3/0sPK7Ra4SwsV2HQCE5uLxRL7fxBoDq1ig9UM5tYAqbOUb
-	 EC7lMCJRSjxbUPUvd1/dcRWpr8Km0w8h1b09Flc01m/esDg7fB9BIm6lRNYDB0fLE7
-	 QihjZMIqv+B66qa80w83pAJMUcfEt/gESTzJvuYp5Do+Qt+RGWCUjokSVIXPUCVExj
-	 6xIupq+6HZJt1jpJxceVp/GINA0+k8Ka8oLa9tO+F2B7EMr/TM7yfeHnmD2cFIuowD
-	 Dc0lehLXNQyPA==
-From: Lee Jones <lee@kernel.org>
-To: lee@kernel.org,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: stable@vger.kernel.org,
-	Quang Le <quanglex97@gmail.com>,
-	Cong Wang <cong.wang@bytedance.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH v6.1-v5.4 1/1] pfifo_tail_enqueue: Drop new packet when sch->limit == 0
-Date: Tue, 25 Feb 2025 16:13:09 +0000
-Message-ID: <20250225161310.2194361-1-lee@kernel.org>
-X-Mailer: git-send-email 2.48.1.658.g4767266eb4-goog
+	s=k20201202; t=1740500588;
+	bh=8ESREboIlA7s5wzo5W17sM0xvNvEQAcEtzyF1FX9XMI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ePltYH5gjyzqHRdOpO+thWExIGiwE4ZZBbpqBrw5S1mKLWIHCv7tWVnI49VhLFnv3
+	 +Esm0KCHIqxDZ5lCOgi6tyHxlZWluxNvz5q65i7k1M0rTJwqlii+6AlAWSkUOKjnx0
+	 OpSs+beS4P6H2CtWkGY0/tNAZTWL99bEx8A3D/Hg4nJOS8F3vlH5L6tLUnFNFCnRmk
+	 iarenm8vRHgZXON4+cSH6nQU1iRm6HsuATpuWHrGB/i3yzsNZsw03SayvbyPyi3khS
+	 ToF07HVXZY3VKE1RoRr1+hAUTRsUz98gWtYWLynkpNAjRlkEDyvswEEq4yu6i15QYC
+	 GlTvVeWr5uv5g==
+Date: Tue, 25 Feb 2025 08:23:06 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <andrew+netdev@lunn.ch>, <horms@kernel.org>, <shenjian15@huawei.com>,
+ <wangpeiyang1@huawei.com>, <liuyonglong@huawei.com>,
+ <chenhao418@huawei.com>, <sudongming1@huawei.com>, <xujunsheng@huawei.com>,
+ <shiyongbang@huawei.com>, <libaihan@huawei.com>,
+ <jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
+ <salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <kalesh-anakkur.purayil@broadcom.com>
+Subject: Re: [PATCH v3 net-next 2/6] net: hibmcge: Add support for rx
+ checksum offload
+Message-ID: <20250225082306.524e8d6a@kernel.org>
+In-Reply-To: <641ddf73-3497-433b-baf4-f7189384d19b@huawei.com>
+References: <20250221115526.1082660-1-shaojijie@huawei.com>
+	<20250221115526.1082660-3-shaojijie@huawei.com>
+	<20250224190937.05b421d0@kernel.org>
+	<641ddf73-3497-433b-baf4-f7189384d19b@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-[ Upstream commit 647cef20e649c576dff271e018d5d15d998b629d ]
+On Tue, 25 Feb 2025 17:00:45 +0800 Jijie Shao wrote:
+> >> +			     NETIF_F_RXCSUM)  
+> > I don't see you setting the checksum to anything other than NONE  
+> 
+> When receiving packets, MAC checks the checksum by default. This behavior cannot be disabled.
+> If the checksum is incorrect, the MAC notifies the driver through the descriptor.
+> 
+> If checksum offload is enabled, the driver drops the packet.
+> Otherwise, the driver set the checksum to NONE and sends the packet to the stack.
 
-Expected behaviour:
-In case we reach scheduler's limit, pfifo_tail_enqueue() will drop a
-packet in scheduler's queue and decrease scheduler's qlen by one.
-Then, pfifo_tail_enqueue() enqueue new packet and increase
-scheduler's qlen by one. Finally, pfifo_tail_enqueue() return
-`NET_XMIT_CN` status code.
-
-Weird behaviour:
-In case we set `sch->limit == 0` and trigger pfifo_tail_enqueue() on a
-scheduler that has no packet, the 'drop a packet' step will do nothing.
-This means the scheduler's qlen still has value equal 0.
-Then, we continue to enqueue new packet and increase scheduler's qlen by
-one. In summary, we can leverage pfifo_tail_enqueue() to increase qlen by
-one and return `NET_XMIT_CN` status code.
-
-The problem is:
-Let's say we have two qdiscs: Qdisc_A and Qdisc_B.
- - Qdisc_A's type must have '->graft()' function to create parent/child relationship.
-   Let's say Qdisc_A's type is `hfsc`. Enqueue packet to this qdisc will trigger `hfsc_enqueue`.
- - Qdisc_B's type is pfifo_head_drop. Enqueue packet to this qdisc will trigger `pfifo_tail_enqueue`.
- - Qdisc_B is configured to have `sch->limit == 0`.
- - Qdisc_A is configured to route the enqueued's packet to Qdisc_B.
-
-Enqueue packet through Qdisc_A will lead to:
- - hfsc_enqueue(Qdisc_A) -> pfifo_tail_enqueue(Qdisc_B)
- - Qdisc_B->q.qlen += 1
- - pfifo_tail_enqueue() return `NET_XMIT_CN`
- - hfsc_enqueue() check for `NET_XMIT_SUCCESS` and see `NET_XMIT_CN` => hfsc_enqueue() don't increase qlen of Qdisc_A.
-
-The whole process lead to a situation where Qdisc_A->q.qlen == 0 and Qdisc_B->q.qlen == 1.
-Replace 'hfsc' with other type (for example: 'drr') still lead to the same problem.
-This violate the design where parent's qlen should equal to the sum of its childrens'qlen.
-
-Bug impact: This issue can be used for user->kernel privilege escalation when it is reachable.
-
-Fixes: 57dbb2d83d10 ("sched: add head drop fifo queue")
-Reported-by: Quang Le <quanglex97@gmail.com>
-Signed-off-by: Quang Le <quanglex97@gmail.com>
-Signed-off-by: Cong Wang <cong.wang@bytedance.com>
-Link: https://patch.msgid.link/20250204005841.223511-2-xiyou.wangcong@gmail.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-[Lee: Backported to linux-6.6.y - fixed a minor surrounding diff conflict]
-(cherry picked from commit e40cb34b7f247fe2e366fd192700d1b4f38196ca)
-Signed-off-by: Lee Jones <lee@kernel.org>
----
-
-- Applies cleanly to v6.1, v5.15, v5.10 and v5.4
-
- net/sched/sch_fifo.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/net/sched/sch_fifo.c b/net/sched/sch_fifo.c
-index e1040421b797..af5f2ab69b8d 100644
---- a/net/sched/sch_fifo.c
-+++ b/net/sched/sch_fifo.c
-@@ -39,6 +39,9 @@ static int pfifo_tail_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- {
- 	unsigned int prev_backlog;
- 
-+	if (unlikely(READ_ONCE(sch->limit) == 0))
-+		return qdisc_drop(skb, sch, to_free);
-+
- 	if (likely(sch->q.qlen < sch->limit))
- 		return qdisc_enqueue_tail(skb, sch);
- 
--- 
-2.48.1.658.g4767266eb4-goog
-
+Dropping packets with bad csum is not correct.
+Packets where device validated L4 csum should have csum set
+to UNNECESSARY, most likely. Please read the comment in skbuff.h
 
