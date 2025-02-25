@@ -1,133 +1,78 @@
-Return-Path: <netdev+bounces-169511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84CA4A4442C
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 16:20:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1A83A44427
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 16:20:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 318A2171A3C
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 15:18:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D91C53A5E86
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 15:17:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9B8526D5B4;
-	Tue, 25 Feb 2025 15:18:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84630209F27;
+	Tue, 25 Feb 2025 15:17:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bai2wsL+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u7B6Eubm"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011E726BDA5
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 15:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5937A21ABA8;
+	Tue, 25 Feb 2025 15:17:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740496681; cv=none; b=PvB54COdi92RKTsvxn3XaXdQIiDYvc5N436f5+LesBuy21bs+5TrJFQSPp/s2RuryEbbl54jQTr0305roM+n1kiaA+wJ+CSISs5lM3/pq5PAnP3JtaDOfYTyV7W3wfKPZfF5szEX2+NeRMa8WbNAUgklXHMoT0jOb7u/s41Hj3I=
+	t=1740496675; cv=none; b=NgTIsOZ+5Qy9IijW831feW+5jmAK3wtl1Ri24FP1ofMgnR+SV8/lEqFHLLPO3Wa6TcgHnXZ/+7VX4qhkj5dgVzwQWG11SVkPpSDCAr5ujlSfmkJn+TA2cBF1rX54xaVRie0N8AMevA6uqXWBmT2gSAk3r6s3r5NYTnMrAOJLWo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740496681; c=relaxed/simple;
-	bh=rALszVeWffksEsP/Rrj6WAtB7agsaUXOmR/msDwji8U=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=aKqXfs13OxAFWtMhnqn55yGsZsFNrk2Lv0pkWtRKsy5pa3y/M/Rojr6jjWYcXNDWCERIvlUq1P856tRJOQNRus0/TQqAmOsJ6kYHkMr6X0yvRS82A+b5Xd6LRDd8jjKiNfAIDrn4qI1m6UtFOFa3KCRGCKlq1nknftRQ0fCLNdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bai2wsL+; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740496678;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+QyH+Q7MigOrd7puvdyRTTPCeyR6wog0WvQSvTNgWAg=;
-	b=Bai2wsL+9Ma0NirbXV4ZPzNp99byPp1UAAASH+bl9VE+bCakvt71B7+LuE6gj64SqXFxla
-	bCu3mGJzRX3CL+JSCOns+g/w9kr+FrdWLiRfSPF8hDKIfFUc2SHfu46EILmsypZZR2GezM
-	DFcHmGNlpLgAsThfZL4JR/LMxV+hKA4=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-184-q8YtqpU0OC6xToOGXJ3YDQ-1; Tue,
- 25 Feb 2025 10:17:53 -0500
-X-MC-Unique: q8YtqpU0OC6xToOGXJ3YDQ-1
-X-Mimecast-MFC-AGG-ID: q8YtqpU0OC6xToOGXJ3YDQ_1740496667
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1840F1A24789;
-	Tue, 25 Feb 2025 15:16:53 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.9])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A8A29180194B;
-	Tue, 25 Feb 2025 15:16:37 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <8f36be7c-6052-4c5d-85ff-0eed27cf1456@icloud.com>
-References: <8f36be7c-6052-4c5d-85ff-0eed27cf1456@icloud.com> <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com> <20250221-rmv_return-v1-1-cc8dff275827@quicinc.com> <20250221200137.GH7373@noisy.programming.kicks-ass.net>
-To: Zijun Hu <zijun_hu@icloud.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-    Will Deacon <will@kernel.org>,
-    "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
-    Andrew Morton <akpm@linux-foundation.org>,
-    Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>,
-    Thomas Gleixner <tglx@linutronix.de>,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    "David S. Miller" <davem@davemloft.net>,
-    "Rafael J. Wysocki" <rafael@kernel.org>,
-    Danilo Krummrich <dakr@kernel.org>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-    Johannes Berg <johannes@sipsolutions.net>,
-    Jamal Hadi Salim <jhs@mojatatu.com>,
-    Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-    Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-    Linus Walleij <linus.walleij@linaro.org>,
-    Bartosz Golaszewski <brgl@bgdev.pl>, Lee Jones <lee@kernel.org>,
-    Thomas Graf <tgraf@suug.ch>, Christoph Hellwig <hch@lst.de>,
-    Marek Szyprowski <m.szyprowski@samsung.com>,
-    Robin Murphy <robin.murphy@arm.com>,
-    Miquel Raynal <miquel.raynal@bootlin.com>,
-    Richard Weinberger <richard@nod.at>,
-    Vignesh Raghavendra <vigneshr@ti.com>, linux-arch@vger.kernel.org,
-    linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-    linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-    linux-wireless@vger.kernel.org, linux-rdma@vger.kernel.org,
-    linux-gpio@vger.kernel.org, linux-pm@vger.kernel.org,
-    iommu@lists.linux.dev, linux-mtd@lists.infradead.org
-Subject: Re: [PATCH *-next 01/18] mm/mmu_gather: Remove needless return in void API tlb_remove_page()
+	s=arc-20240116; t=1740496675; c=relaxed/simple;
+	bh=EJ3krwHNLtRc7GLB+HTKJlFuR9pfh4MhEWqR13XCfx4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KxYXmKtoIhNvaRLhIVJi6BWoHg0OFs1zMfG3rPaQkn0xm9WaPO+5CBW11WBAp/gJSRrpsX93MzfXT9D3VCtibyRLOqjLhq5i2mLX/6n284DuYZ9IVJnwoxUCZPzpWK+zFGMKe4LvbgUvkV1zf5MN4Uy/xs3ASB6ziCWbCb2Gv4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u7B6Eubm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6295BC4CEDD;
+	Tue, 25 Feb 2025 15:17:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740496673;
+	bh=EJ3krwHNLtRc7GLB+HTKJlFuR9pfh4MhEWqR13XCfx4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=u7B6EubmMG1vIqCyCLCmHxG9YZJ5wvt4tiggK9mMffgCfAvMzv7B/iJLpdLp7CCe/
+	 wJOrsZekMxNlw+lec+/Jx4Ivm+W8LZoI45O93zUzem0Z7i5ZLFTP2FQGl09+FCmtGk
+	 hkaf9FvXn8VX3cy2NSwZouNDTGv/TcQawJQoPZspOcwRL2S3ziCT95Pnw/ckv3pnPi
+	 cxgq0xIQ9YHMLYN6xRpR5+X9Fg6AW6rbJLNNfz6/BQriQrbbzAFJuoV9fkk3+ocUHa
+	 IZhW6/7uAKSet6En7FbjF7CwpE3P25K+33T/uSNKCUdFhzX53h/TiNavIpbPxfnr3J
+	 cDC22dHIjf85w==
+Date: Tue, 25 Feb 2025 15:17:49 +0000
+From: Simon Horman <horms@kernel.org>
+To: Peter Seiderer <ps.report@gmx.net>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+	Artem Chernyshev <artem.chernyshev@red-soft.ru>,
+	Nam Cao <namcao@linutronix.de>
+Subject: Re: [PATCH net-next v6 8/8] selftest: net: add proc_net_pktgen
+Message-ID: <20250225151749.GD1615191@kernel.org>
+References: <20250221215246.383373-1-ps.report@gmx.net>
+ <20250221215246.383373-9-ps.report@gmx.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2298250.1740496596.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 25 Feb 2025 15:16:36 +0000
-Message-ID: <2298251.1740496596@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250221215246.383373-9-ps.report@gmx.net>
 
-Zijun Hu <zijun_hu@icloud.com> wrote:
+On Fri, Feb 21, 2025 at 10:52:46PM +0100, Peter Seiderer wrote:
+> Add some test for /proc/net/pktgen/... interface.
+> 
+> - enable 'CONFIG_NET_PKTGEN=m' in tools/testing/selftests/net/config
+> 
+> Signed-off-by: Peter Seiderer <ps.report@gmx.net>
 
-> >>  static inline void tlb_remove_page(struct mmu_gather *tlb, struct pa=
-ge *page)
-> >>  {
-> >> -	return tlb_remove_page_size(tlb, page, PAGE_SIZE);
-> >> +	tlb_remove_page_size(tlb, page, PAGE_SIZE);
-> >>  }
-> > So I don't mind removing it, but note that that return enforces
-> > tlb_remove_page_size() has void return type.
-> >
-> =
-
-> tlb_remove_page_size() is void function already. (^^)
-
-That may be true... for now.  But if that is changed in the future, then y=
-ou
-will get an error indicating something you need to go and look at... so in
-that regard, it's *better* to do this ;-)
-
-David
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
