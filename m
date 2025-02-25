@@ -1,141 +1,139 @@
-Return-Path: <netdev+bounces-169468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAF25A4412E
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 14:45:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31863A44138
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 14:46:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 114DB162A7D
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 13:40:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BAD6D7ADA7E
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 13:44:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377FC269B12;
-	Tue, 25 Feb 2025 13:39:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78BBC2698AD;
+	Tue, 25 Feb 2025 13:44:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=gus@collabora.com header.b="AZfPrdW1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PMajdOsI"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65F55269B1C
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 13:39:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740490748; cv=pass; b=TGQfy7ywhWIvgUfkYdYCeEAYU08s2dJdDR5UdlzXfzMcUXP7Qcb9AWppI6AgU8SMjJzM0ckM9Tp2XKuaIKULlGm+dG5Ou+oXZ1glx8Q5xgrPyynMNClOpXuLQ1wTf7dnxb1EbL8cZ0EwqqG0j00RPhMPB/ZLkbPF5ym6UBzCwNA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740490748; c=relaxed/simple;
-	bh=Er8L/RidarTahqR7VycrG4OSXqfTiHAybWHQ6rol/5o=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=mDfVk/XvnwLPKh3WH/q5KIYziyeEsoOcgdq8BAryHW1r8TSzYBHJFTZe/faZeMOjfd+PWuXruMnev5iPAwFUtNubBOBkHdzU2+g3utQL4Aeaoq5hVt4nCxCxrEZUzTrl7DTQ8XQdwNW/gMIrm/6x/iWbRWm1FmRlEboH9oqflTs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=gus@collabora.com header.b=AZfPrdW1; arc=pass smtp.client-ip=136.143.188.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1740490723; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=PwggEEaZ9CQ2GimeIZGS1fmbi59boeo/kXePKMhJ2kcELz5F+pwwS7V5Gu0bqr+m09VOmQJInMo6L7Ra37jdBaT4j329+JwMt4vA4F9CnP23E6AKt72MFpaeRkCzjOgj3kV7e05+kWOHM17hEAMRIYvNgD54PhBdy2rxaS/gYWc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1740490723; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=Er8L/RidarTahqR7VycrG4OSXqfTiHAybWHQ6rol/5o=; 
-	b=OvE8JLmbyupMizpcVZwkCvMFhKetCZ7THftrTcirYcLzMS9HHjrXKLexpCvDKLhTF5dvnlYf3CH05Yzf9eOkUMKYSEU5/aK1aVUVeFFFd5JGTheaPw3An4828MFQyGj04SSMQTinsqjmb8xPwzmUmnJgkhd3JWah+DuhiR3QEVA=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=gus@collabora.com;
-	dmarc=pass header.from=<gus@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1740490723;
-	s=zohomail; d=collabora.com; i=gus@collabora.com;
-	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
-	bh=Er8L/RidarTahqR7VycrG4OSXqfTiHAybWHQ6rol/5o=;
-	b=AZfPrdW1ROB8wr0BspoOIaDwRjipKL5LrmmAC/s40lMo9SX7OcCnCQmAVzZeP7V0
-	gIgHDNk2LoBapnJtGyWO21kHBVDWDSZl3iGCOGjQ2NpzF9z4XaPHR1cFw6gkXx22Qlz
-	jaZI3whC9H5swCMAfAlga/Pzk2dbPH/FaFu31tpo=
-Received: by mx.zohomail.com with SMTPS id 1740490721679326.96450953391957;
-	Tue, 25 Feb 2025 05:38:41 -0800 (PST)
-Message-ID: <5e610cabe469732582afb752a0155ccf0e0d84fb.camel@collabora.com>
-Subject: Re: [PATCH v26 00/20] nvme-tcp receive offloads
-From: Gustavo Padovan <gus@collabora.com>
-To: Paolo Abeni <pabeni@redhat.com>, Aurelien Aptel <aaptel@nvidia.com>, 
-	linux-nvme@lists.infradead.org, netdev@vger.kernel.org, sagi@grimberg.me, 
-	hch@lst.de, kbusch@kernel.org, axboe@fb.com, chaitanyak@nvidia.com, 
-	davem@davemloft.net, kuba@kernel.org
-Cc: aurelien.aptel@gmail.com, smalin@nvidia.com, malin1024@gmail.com, 
- ogerlitz@nvidia.com, yorayz@nvidia.com, borisp@nvidia.com,
- galshalom@nvidia.com,  mgurtovoy@nvidia.com, edumazet@google.com
-Date: Tue, 25 Feb 2025 10:38:35 -0300
-In-Reply-To: <63ede1de-1ee3-4872-84b7-d65ec2f68856@redhat.com>
-References: <20250221095225.2159-1-aaptel@nvidia.com>
-	 <63ede1de-1ee3-4872-84b7-d65ec2f68856@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA362638AE
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 13:44:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740491089; cv=none; b=Vxzb53WlDJQWQp/e9UUYbSn2Ue9FaV6/1w8/By/y6J5x59kLukkkhqWnBQuuQLSg/LJi8I8ZcrQncAlbsuM1+WXLJZxXt25evh+YH2GnWadgpILB24A/3umOgA6MlgiMqPwx83llNw8zdUhTNhY197RrgjieTzoVake5sNkW/QY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740491089; c=relaxed/simple;
+	bh=n+RxzZHRUBGKVEMeXI9IeFSvvMS6jsZYYzWjVTruOos=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rUAYMIOBSA8T8kiGFsvHc586gyZW05xc3bJGC+32Z952+B529Taot6N6MPyp9lbQZSFdEFo5/lB/XIcUSHtT+lGyZK/8LivvruVW001veTJ66E61fxrLSxJZrdcbQAG9p1Nz7+sspZZLI7fl2P4eUS5wSkzX9VvzWOvU/Ld18e4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PMajdOsI; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740491088; x=1772027088;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=n+RxzZHRUBGKVEMeXI9IeFSvvMS6jsZYYzWjVTruOos=;
+  b=PMajdOsI/kpKm4SJsfK5e9Og1SV9LlvIOYzkUfk50jrLUcaOfBIBSlXk
+   0Wzw5BF4tXCJtlFY133iLTO6pTclGsBMWsJ8hoSfPZzEr7YoXVtbvOaYG
+   l50l2ouDtrmc7MVH0BW5tcRnIXUn17PVSN56FuUhy7EsMRx4bzM0lNCBA
+   tWO1CJFy4spqbO6Wx6VsEbbCk2XMv4kw+wItyN2CPWUCigRMtJAH5uKpi
+   6bo+qarptNM9CVjjNc47YE0Fudo5p2+HbQb3MvN07x/N6w0eAUTLeuT77
+   tOaLW0jD0dOw4yJJf0Uj2oLw/aEL1xSLNMQKSrUMI8+sntG57h7dwY2Ky
+   w==;
+X-CSE-ConnectionGUID: FA1/o66jTfeP2SbYLIEFHw==
+X-CSE-MsgGUID: eb+jAemjTduzAXIbwzhtpQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11356"; a="28885203"
+X-IronPort-AV: E=Sophos;i="6.13,314,1732608000"; 
+   d="scan'208";a="28885203"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2025 05:44:47 -0800
+X-CSE-ConnectionGUID: dy/9jhOETQSYm/UiQnMMvg==
+X-CSE-MsgGUID: GtQsOQzLRMmjt8DajDliNQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,314,1732608000"; 
+   d="scan'208";a="121003835"
+Received: from enterprise.igk.intel.com ([10.102.20.175])
+  by fmviesa005.fm.intel.com with ESMTP; 25 Feb 2025 05:44:45 -0800
+From: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	pmenzel@molgen.mpg.de,
+	Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-net v2] ice: fix fwlog after driver reinit
+Date: Tue, 25 Feb 2025 14:40:10 +0100
+Message-ID: <20250225134008.516924-3-martyna.szapar-mudlaw@linux.intel.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ZohoMailClient: External
+Content-Transfer-Encoding: 8bit
 
-Hello,
+Fix an issue when firmware logging stops after devlink reload action
+driver_reinit or driver reset. After the driver reinits and resumes
+operations, it must re-request event notifications from the firmware
+as a part of its recofiguration.
+Fix it by restoring fw logging when it was previously registered
+before these events.
 
+Restoring fw logging in these cases was faultily removed with new
+debugfs fw logging implementation.
 
-On Tue, 2025-02-25 at 11:12 +0100, Paolo Abeni wrote:
-> On 2/21/25 10:52 AM, Aurelien Aptel wrote:
-> > The next iteration of our nvme-tcp receive offload series, rebased
-> > on top of yesterdays
-> > net-next 671819852118 ("Merge branch 'selftests-drv-net-add-a-
-> > simple-tso-test'")
-> >=20
-> > We are pleased to announce that -as requested by Jakub- we now have
-> > continuous integration (via NIPA) testing running for this feature.
->=20
-> I'm sorry for the dumb question, but can you please share more
-> details
-> on this point?
->=20
-> I don't see any self-test included here, nor any test result feeded
-> to
-> the CI:
->=20
-> https://netdev.bots.linux.dev/devices.html
+Failure to init fw logging is not a critical error so it is safely
+ignored. Information log in case of failure are handled by
+ice_fwlog_register function.
 
+Fixes: 73671c3162c8 ("ice: enable FW logging")
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+---
 
-The integration is final stages of deployment. It is happening using
-KernelCI[1] as the hardware executor with the NICs hosted on a server
-in our lab and then publishing the results for NIPA consumption. We are
-currently working with Jakub on the integration of the results produced
-by KernelCI.
+v2:
+commit message extended, no changes in code
 
-Since last week, NIPA generates a special branch only for hw testing.
-This is the latest one for example:=20
-https://github.com/linux-netdev/testing/commits/net-next-2025-02-25--12-00/
+---
+ drivers/net/ethernet/intel/ice/ice_main.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-However, it doesn't include Aurelien patches yet, as from what I
-understood from Jakub, this new tree only includes patches that
-passed the existing SW CI. Currently this series has some fails:
-
-https://patchwork.kernel.org/project/netdevbpf/list/?series=3D936360
-
-Once, we get the series to pass the SW CI, I believe the patches
-will land in the hw testing branch and then be picked up by KernelCI
-for testing.
-
-For information purposes, here is the same test but being executed
-against aaptel tree last week:
-https://dashboard.kernelci.org/test/maestro:67b8d4ace3e60eeff606d9c7
-
-
-Once things are finalized, I'll send an email to the list describing
-the integration as I believe more folks might be interested in the
-integration through KernelCI.
-
-
-[1] https://kernelci.org/
-
-
-Best,
-
-- Gus
-
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index a03e1819e6d5..6d6873003bcb 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -5151,6 +5151,13 @@ int ice_load(struct ice_pf *pf)
+ 
+ 	devl_assert_locked(priv_to_devlink(pf));
+ 
++	if (pf->hw.fwlog_cfg.options & ICE_FWLOG_OPTION_IS_REGISTERED) {
++		err = ice_fwlog_register(&pf->hw);
++		if (err)
++			pf->hw.fwlog_cfg.options &=
++				~ICE_FWLOG_OPTION_IS_REGISTERED;
++	}
++
+ 	vsi = ice_get_main_vsi(pf);
+ 
+ 	/* init channel list */
+@@ -7701,6 +7708,13 @@ static void ice_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
+ 		goto err_init_ctrlq;
+ 	}
+ 
++	if (hw->fwlog_cfg.options & ICE_FWLOG_OPTION_IS_REGISTERED) {
++		err = ice_fwlog_register(hw);
++		if (err)
++			hw->fwlog_cfg.options &=
++				~ICE_FWLOG_OPTION_IS_REGISTERED;
++	}
++
+ 	/* if DDP was previously loaded successfully */
+ 	if (!ice_is_safe_mode(pf)) {
+ 		/* reload the SW DB of filter tables */
+-- 
+2.47.0
 
 
