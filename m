@@ -1,145 +1,152 @@
-Return-Path: <netdev+bounces-169416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B98D4A43C5A
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 11:56:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C6DBA43C7D
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 12:00:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC9163A3E6E
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:56:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F7813AEDAA
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:58:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04D3D26738F;
-	Tue, 25 Feb 2025 10:56:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="llW/+8+M"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74B0E2673B2;
+	Tue, 25 Feb 2025 10:58:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74113266EFA;
-	Tue, 25 Feb 2025 10:56:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE3379D0;
+	Tue, 25 Feb 2025 10:58:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740480976; cv=none; b=ttfdHO+hUiqNcQ12KbTT25DA+vSmJz97AyWynAxrZsKhpxjKwQNN5ph789SoY0p3muW/Ciits19nqv879xVUGyGl5u/Prj8i1D9S9sfJ+8bANXu9uczZgM3wDVnHJGVC3vyoV3GS74J7cWgBKNJUBb+PQbFctBx5+7oyOlCQ0iY=
+	t=1740481098; cv=none; b=IKmrYb/DMax8UTjmwFv+i//oWvdhwFYV9MI+rcyqWVAfGa1w9/9TORXafIRhdzQ0Es7aq3n0eoMavRlimqnskYlCUwPEHE2fC8kcaYGgXK6Ja4pyNFUMUoD6UoBVQhxK9yWFXKCxhiI9Y/Pe6wVvyaXnaAf48iUoYp6EeuHr01s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740480976; c=relaxed/simple;
-	bh=qk5AiaQz6PdkbWGnVQkm4jx/jLxIyHU0t509oubQRbY=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=TMrnvnLAub4XbYELnE0cYremmnQqDnlhWOUCkk+sFGSE48Q8BR7L+ATjFpRXSfyCTtEfgEKRDhofXBdv7EJ0UYdklChIsDPKUZYGrZaw6k24NfXo5ul+g/6ib5S/Tey6j2aeXToWr3Wvun9Ds/16nESzpwSukG108/8dMucPloI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=llW/+8+M; arc=none smtp.client-ip=193.238.174.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mx.ssi.bg (localhost [127.0.0.1])
-	by mx.ssi.bg (Potsfix) with ESMTP id 4D3D023481;
-	Tue, 25 Feb 2025 12:56:04 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
-	:content-type:content-type:date:from:from:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
-	 bh=TipT1tkO6RZzYUIkmyaB+EXc3EJaKclBzOrQySYWfSE=; b=llW/+8+M/+l1
-	+TXSWE8GrBA8ZI1xe5YEwHI8hAT8ywfSUfgmt2cdETi3wH+H+ceCHyQ55stwa2Ks
-	xE71Q5YPcKf+T251DYi6puxgn7bTZDgBpjsi1v/P++ItfQHAPqbdBKqXbpfBPQhL
-	LeFHH4GCD2jx+AhQAqneSC+zBR4mVaNQqXW4NA/TAsulXmIjzcCH+xoGhUlbjM5q
-	08tMYiKspFKUz9kjNk1CasyfMyd/Ffgg4RaZ0UA3Yl6FoufpMlukU/mMd1GHy+mX
-	grBZ0THRTC9aB8RvvfZ1nGJXh8d8QzoTjOfmc+AGKI/IEZK0CJ5ELTL7vxb+uK8Q
-	zi8+B7r5m0oDK+8gm9d/MJyrj3p0IoawPVQ1aQt7GMUkp77ce/0Cr29APFHeJUlV
-	L33fKDQUv00VQb6ejcSGACISXkKgJ2xshIb5YrxTTTU/nw5xlUsrUa/IfgJvoQZC
-	zGOkg8xgd887ORdaimnJNBMjMC5zfozklbd7ZeLqWOQKTxL7muWon2zivcFAMcba
-	qGThLux1Qk/EyRctBthZ8ibwtGl0pyTg0Jgu6LX428Pjpdggx4UC4uVGgUk90I3B
-	wT+YAEZhUMhfIUj6C18J7itG2ksH+dQodILiZqd5+sN/AAr5wgF0vzJqbOSNHCzX
-	VZdYr7hrIw6HDkPVNWXOKiVeh50d560=
-Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
-	by mx.ssi.bg (Potsfix) with ESMTPS;
-	Tue, 25 Feb 2025 12:56:03 +0200 (EET)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by ink.ssi.bg (Postfix) with ESMTPSA id C2AC11709E;
-	Tue, 25 Feb 2025 12:55:52 +0200 (EET)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.18.1/8.17.1) with ESMTP id 51PAte3H025739;
-	Tue, 25 Feb 2025 12:55:42 +0200
-Date: Tue, 25 Feb 2025 12:55:40 +0200 (EET)
-From: Julian Anastasov <ja@ssi.bg>
-To: Philo Lu <lulie@linux.alibaba.com>
-cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-        asml.silence@gmail.com, willemb@google.com, almasrymina@google.com,
-        chopps@labn.net, aleksander.lobakin@intel.com,
-        nicolas.dichtel@6wind.com, dust.li@linux.alibaba.com,
-        hustcat@gmail.com, horms@verge.net.au, bpf@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCHv2 net] ipvs: Always clear ipvs_property flag in
- skb_scrub_packet()
-In-Reply-To: <20250222033518.126087-1-lulie@linux.alibaba.com>
-Message-ID: <61a40de5-3b11-e84b-90a5-fefd8da3bb23@ssi.bg>
-References: <20250222033518.126087-1-lulie@linux.alibaba.com>
+	s=arc-20240116; t=1740481098; c=relaxed/simple;
+	bh=YE2cVH7ILPdji763dvBKtSttuGhyBEY/b0k+dsw7F3Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SZx4dJ+2v6WhAvTBLk7qRs7XLS7oRzmLauW+/8fGoVjZw7pBVUK0F35xhwrwTr1jc4fEIC3CA9H3ibcBvn/cEg7FuMO/nCwmkKvPa72sOjeUgHJrvQuKvr9iAAYUcF0pqfKaU51d5POGNOG6rkG5zn+/NjM8zD7+v3c/EZRLnVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5ded368fcd9so7831989a12.1;
+        Tue, 25 Feb 2025 02:58:15 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740481094; x=1741085894;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gVLEsWhXKjAp+8uIFfafhY+8jwVrpBjpGy0ScKqrlr4=;
+        b=uUNczNCTxdyTj8J768jGx47vQvboekOEmK/O1sXKzuHB/ckmhiWTHkbK7wdzta+UTT
+         p1A2N5VpBuyHrs3ZaiW3258S41n9zCz+WNALLbNL3r5PBNwyPCRp/fCMltb0sxcCw+A2
+         BmDKTfBowWA4Stf6zV++TaS9UPjs2o2GsszYtYdn/IS7lkjAEGqrLymM8MpZL4/hx4jH
+         8qT5AVL8Ur2GrWERD7SGDtuIdv70PhVZv8lecs9m1jZnDIN4aYNyMZcKua4wlJ3g5FGv
+         w2QZJJtjK4ilvhkvci/hkBLIH8MNWqr4Mw93ZmRcVkNPF8Gk3+bM/cOqon98/IYzoo3u
+         +TOw==
+X-Forwarded-Encrypted: i=1; AJvYcCUPsMDQn1I8q6F+nnKT2p13YxijBpXdJX0RH2CZorM6mE4KAVz+Gnxi9FdyIL4RV5weYLNXmGK7isje36U=@vger.kernel.org, AJvYcCVXA9EIQsiWrpIlUIcScSBbKppQxv8lxKQ6ng+zBvFf4ndsuhKRcsHqutcfAxdlilvnLQM5bUxm@vger.kernel.org, AJvYcCXcccvsHkIbseytSzwADgYUz0gZ763WN896ll9RITftgBp7k78fSMbZqgFscbq+poNjYy2TFAAL+naXpcUkde9p0xEg@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGPiKN17UtElzGmRPFcS/ozUtxNCL+VJm7t5tllyqYMhN86QRa
+	uzzzIyqZioqf/lcZpzU/gt1ciXLBPxpjpMzAqTedNhdREKfteIpU
+X-Gm-Gg: ASbGncuRe6pePO9Nc4Z+Jklj/sD+X2TfK6b2Huer3c0YHDWfWgSzfYfHxtnFi1eHYY3
+	h4ohPA20d2ykUgzH1lWMAGBhzDDLNkBqmq1abd95tyBOmzljv5dq6pjfit3pr0wIdv+GPORAgNC
+	5ziWP4gYZNnZ+JNhQyUss5ZPzEv2tkD6hU0LFKdpXYMoA0CFPf40+bEeFRrPW1TLMpWvela1RWa
+	oqcSR9vWA0OcUJI90LxatXV+iqTBIFqm27ZQpmIxNJ4a8yIvCfD+cgneyNbybWWxyC+o6X0M97a
+	LbVaobDmLQkne0CE
+X-Google-Smtp-Source: AGHT+IEfEbllpJqiUZsNY0r/y/6uQFmExRBKuIYrUFWMQE/Vjz9p0dnbVslSpj4Y3IbZeejiizwMxw==
+X-Received: by 2002:a17:907:3f92:b0:abb:e259:2a64 with SMTP id a640c23a62f3a-abc09b21c99mr1664018866b.33.1740481093781;
+        Tue, 25 Feb 2025 02:58:13 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:7::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abed1da0befsm121016066b.74.2025.02.25.02.58.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Feb 2025 02:58:13 -0800 (PST)
+Date: Tue, 25 Feb 2025 02:58:10 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Yonghong Song <yhs@meta.com>, Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>,
+	Kernel Team <kernel-team@meta.com>,
+	"yonghong.song@linux.dev" <yonghong.song@linux.dev>
+Subject: Re: [PATCH net-next] trace: tcp: Add tracepoint for tcp_sendmsg()
+Message-ID: <20250225-interesting-nocturnal-okapi-b43735@leitao>
+References: <20250224-tcpsendmsg-v1-1-bac043c59cc8@debian.org>
+ <CANn89iLybqJ22LVy00KUOVscRr8GQ88AcJ3Oy9MjBUgN=or0jA@mail.gmail.com>
+ <SA3PR15MB5630CFBB36C212008DA8ACC7CAC02@SA3PR15MB5630.namprd15.prod.outlook.com>
+ <CANn89i+zxMje+wbQzLKbSq_WKYnwGdMyAdStMm4GqkdJCvWPOg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89i+zxMje+wbQzLKbSq_WKYnwGdMyAdStMm4GqkdJCvWPOg@mail.gmail.com>
 
+Hello Eric,
 
-	Hello,
-
-On Sat, 22 Feb 2025, Philo Lu wrote:
-
-> We found an issue when using bpf_redirect with ipvs NAT mode after
-> commit ff70202b2d1a ("dev_forward_skb: do not scrub skb mark within
-> the same name space"). Particularly, we use bpf_redirect to return
-> the skb directly back to the netif it comes from, i.e., xnet is
-> false in skb_scrub_packet(), and then ipvs_property is preserved
-> and SNAT is skipped in the rx path.
+On Mon, Feb 24, 2025 at 08:23:00PM +0100, Eric Dumazet wrote:
+> On Mon, Feb 24, 2025 at 8:13 PM Yonghong Song <yhs@meta.com> wrote:
+> >
+> > > ________________________________________
+> > >
+> > > On Mon, Feb 24, 2025 at 7:24 PM Breno Leitao <leitao@debian.org> wrote:
+> > >>
+> > >> Add a lightweight tracepoint to monitor TCP sendmsg operations, enabling
+> > >> the tracing of TCP messages being sent.
+> > >>
+> > >> Meta has been using BPF programs to monitor this function for years,
+> > >> indicating significant interest in observing this important
+> > >> functionality. Adding a proper tracepoint provides a stable API for all
+> > >> users who need visibility into TCP message transmission.
+> > >>
+> > >> The implementation uses DECLARE_TRACE instead of TRACE_EVENT to avoid
+> > >> creating unnecessary trace event infrastructure and tracefs exports,
+> > >> keeping the implementation minimal while stabilizing the API.
+> > >>
+> > >> Given that this patch creates a rawtracepoint, you could hook into it
+> > >> using regular tooling, like bpftrace, using regular rawtracepoint
+> > >> infrastructure, such as:
+> > >>
+> > >>         rawtracepoint:tcp_sendmsg_tp {
+> > >>                 ....
+> > >>         }
+> > >
+> > > I would expect tcp_sendmsg() being stable enough ?
+> > >
+> > > kprobe:tcp_sendmsg {
+> > > }
+> >
+> > In LTO mode, tcp_sendmsg could be inlined cross files. For example,
+> >
+> >   net/ipv4/tcp.c:
+> >        int tcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+> >   net/ipv4/tcp_bpf.c:
+> >        ...
+> >       return tcp_sendmsg(sk, msg, size);
+> >   net/ipv6/af_inet6.c:
+> >        ...
+> >        return INDIRECT_CALL_2(prot->sendmsg, tcp_sendmsg, udpv6_sendmsg, ...)
+> >
+> > And this does happen in our production environment.
 > 
-> ipvs_property has been already cleared when netns is changed in
-> commit 2b5ec1a5f973 ("netfilter/ipvs: clear ipvs_property flag when
-> SKB net namespace changed"). This patch just clears it in spite of
-> netns.
+> And we do not have a way to make the kprobe work even if LTO decided
+> to inline a function ?
 > 
-> Fixes: 2b5ec1a5f973 ("netfilter/ipvs: clear ipvs_property flag when SKB net namespace changed")
-> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
+> This seems like a tracing or LTO issue, this could be addressed there
+> in a generic way
+> and avoid many other patches to work around this.
 
-	Looks good to me, thanks!
-
-Acked-by: Julian Anastasov <ja@ssi.bg>
-
-	It was safer to reset the flag when netns changes but
-it has role only before output device is reached or while
-packet is looped over lo device. New tunnel headers should
-be safe to reset it because nf ct and dst are dropped too.
-
-> ---
-> v1 -> v2:
->  - Add Fixes tag as suggested by Julian Anastasov
-> ---
->  net/core/skbuff.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index 7b03b64fdcb2..b1c81687e9d8 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -6033,11 +6033,11 @@ void skb_scrub_packet(struct sk_buff *skb, bool xnet)
->  	skb->offload_fwd_mark = 0;
->  	skb->offload_l3_fwd_mark = 0;
->  #endif
-> +	ipvs_reset(skb);
->  
->  	if (!xnet)
->  		return;
->  
-> -	ipvs_reset(skb);
->  	skb->mark = 0;
->  	skb_clear_tstamp(skb);
->  }
-> -- 
-> 2.32.0.3.g01195cf9f
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
-
+I understand that the {raw}tracepoint ensures the compiler cannot
+interfere with these hook points. For everything else, we rely on the
+hope that the compiler behaves favorably, which is far from ideal.
 
