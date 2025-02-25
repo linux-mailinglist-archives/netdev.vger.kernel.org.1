@@ -1,111 +1,117 @@
-Return-Path: <netdev+bounces-169373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41D80A43971
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:28:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 57BEAA43977
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:30:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE5DF1882903
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 09:24:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD2D3188E889
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 09:26:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21DE020C026;
-	Tue, 25 Feb 2025 09:24:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C01B257459;
+	Tue, 25 Feb 2025 09:26:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FPbN64AZ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="azZPTycN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A294C80
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 09:24:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4644C80;
+	Tue, 25 Feb 2025 09:26:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740475448; cv=none; b=gHhF3GyPwsG9B0G4GdX7l6mqrPKcEy69aG26/cQUEuyWM3acJkoN/Z3SW4VZPxBkthluywE4OK9JFMBjs5acLrSisTZeoTl7C2m03H6ntm1i7t3GrEiPokGzkWU/Afhgm127x6hJrNDS1hNqPYzuxTS4jBQ15Q6kXg6yQFrFtsU=
+	t=1740475571; cv=none; b=HRnx14dK6tAUJZwFn73Y37CLob8YvU4ZS3aZogOEAm/66kzq46JfKZIkRp6AmjJOAAZkNGlB6AmxAMwpb9u0ZRQIEG3JC7FN1SzlbU2Y6T0BV5AUzOcnZCgV9eIOwU9fukB1G5iXRb80E9ucFxAKfqDHy+zy2iqiik3PBwuLT1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740475448; c=relaxed/simple;
-	bh=kC00upbw2CNPSxlB1c1v2NPeDqUKHdWijPcrPdFqNQU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bUAG35VX3iH5NknE30TbZujkbFGWJIEaopr7dQLG8FjUGJ1sRA5PCr+NQ9jISzYBEmKSZ51TRQR2fa8qnrxdCCiNNw2yi9JIS3x8vTdwgVV1t732WHhk/Ktq3GDFOmMjEoflObmLxa3Xiqsztkq5T58XlvWy6tyVnAg4zRK+/1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FPbN64AZ; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740475447; x=1772011447;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=kC00upbw2CNPSxlB1c1v2NPeDqUKHdWijPcrPdFqNQU=;
-  b=FPbN64AZZE2n9/D2kbvPymeb+8JH0x8g/qTtybVayuCjk/VLzzBfVOia
-   /5F75XUHDnhwSPOVNhRqFsYnVWm0BGzCtj27GaCmml/0Wr/OOBLaCGVKq
-   MQP5VpPAIe0BpAeoXIHrUhIHFJ7gWfggxWa8lojy5znggE95C9+2GmASN
-   dclTLTje1sq+gQjXrF/oc9xuwBoyjXJqKQNY4fxvshfcIs7F6mRBDYd8/
-   4Q8btojsQLcKcKuAFS/Xw8ZvAwG8RYBytApYNewzjfmGvWm8qsSGLt46V
-   cJKzHsvkX29Twe5ydZBALOTm/zz/pOPOTbul3xakr0MP5DgXt95DJaBrg
-   A==;
-X-CSE-ConnectionGUID: 5nkrn+1ASWq0ONCtnTm1Rg==
-X-CSE-MsgGUID: Cybm8B9DSDOtYGLLNiVFdw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11355"; a="40508222"
-X-IronPort-AV: E=Sophos;i="6.13,313,1732608000"; 
-   d="scan'208";a="40508222"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2025 01:24:05 -0800
-X-CSE-ConnectionGUID: Aa5eIeEKTQeWDyLsGULWuQ==
-X-CSE-MsgGUID: JvZ6gVF+T++oBW7DINoAew==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="117262505"
-Received: from mszapar-mobl1.ger.corp.intel.com (HELO [10.245.112.135]) ([10.245.112.135])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2025 01:24:04 -0800
-Message-ID: <95382347-8e05-4164-98b8-eca168bf3969@linux.intel.com>
-Date: Tue, 25 Feb 2025 10:24:01 +0100
+	s=arc-20240116; t=1740475571; c=relaxed/simple;
+	bh=oSSm2Bj/9pPO/bqZuCZ2bbaPFZ8yEX3jYdNJxrGtFNA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=e8Q/ja4jp9KkfP5rCR3UtwqCYs1JAN66YsXLV5PUYZxn6C1ibulg1M5oWqqxJ5G+yBIG01+81ZgT8KsIEouiHsC9GSba3NKaelsr3B59q+Ovz5bqhamyuCYoxWkb961szam/xoeCGTiWV3vXph0FweerQV3CWRISipf+ELPMabQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=azZPTycN; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 3DC7C4328A;
+	Tue, 25 Feb 2025 09:25:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1740475560;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mV3cehY1GxgAILAv178GKa2jcX2i7pQTnmswZvAfL+Q=;
+	b=azZPTycNcKWAmSO4gNOl0NlryS9eh6MsVogc/zDwfqc0OW4L0dAEy5ZmJyKlaweI5TR/ZF
+	ZaucNvgDspZFecCuyLhAjhOblAlCoGi1fBJ6qjFmwcdyRqb3Hb4M8uD2YDfS1e9det3hB9
+	xyWhvWxMt6oNO7KdBLViEq/A3BVVyUMbn+118bYrJsek8ev2j+HK8uuX67zTD/TOM/jrXj
+	PSg+i1Xc170Da1io8g294kAS92PjCGnlu/GBNW/91zxTFaCiZs7TswgwcXS+yNq8OsChVk
+	Oag40wzCNDuLy3kKZ4dro4HP1V/KxHgaAfaRhSaQhWbRKtzcEJAqc6iIh4TA0A==
+Date: Tue, 25 Feb 2025 10:25:58 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
+ <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>, Rob Herring
+ <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman
+ <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor
+ Dooley <conor+dt@kernel.org>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
+ Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, Maxime
+ Chevallier <maxime.chevallier@bootlin.com>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 06/12] net: pse-pd: Add support for budget
+ evaluation strategies
+Message-ID: <20250225102558.2cf3d8a5@kmaincent-XPS-13-7390>
+In-Reply-To: <20250224134522.1cc36aa3@kernel.org>
+References: <20250218-feature_poe_port_prio-v5-0-3da486e5fd64@bootlin.com>
+	<20250218-feature_poe_port_prio-v5-6-3da486e5fd64@bootlin.com>
+	<20250220165129.6f72f51a@kernel.org>
+	<20250224141037.1c79122b@kmaincent-XPS-13-7390>
+	<20250224134522.1cc36aa3@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [iwl-net 0/4] ice: improve validation of virtchnl parameters
-To: Simon Horman <horms@kernel.org>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-References: <20250217102744.300357-2-martyna.szapar-mudlaw@linux.intel.com>
- <20250218194415.GL1615191@kernel.org>
-Content-Language: en-US
-From: "Szapar-Mudlaw, Martyna" <martyna.szapar-mudlaw@linux.intel.com>
-In-Reply-To: <20250218194415.GL1615191@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdekudefgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefguddtfeevtddugeevgfevtdfgvdfhtdeuleetffefffffhffgteekvdefudeiieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvgedprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepohdrrhgvmhhpvghlsehpvghnghhuthhrohhnihigrdguvgdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiiv
+ ghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheptghorhgsvghtsehlfihnrdhnvghtpdhrtghpthhtohepughonhgrlhgurdhhuhhnthgvrhesghhmrghilhdrtghomh
+X-GND-Sasl: kory.maincent@bootlin.com
 
+On Mon, 24 Feb 2025 13:45:22 -0800
+Jakub Kicinski <kuba@kernel.org> wrote:
 
+> On Mon, 24 Feb 2025 14:10:37 +0100 Kory Maincent wrote:
+> > > The "methods" can be mixed for ports in a single "domain" ?   =20
+> >=20
+> > No they can't for now. Even different PSE power domains within the same=
+ PSE
+> > controller. I will make it explicit. =20
+>=20
+> Sounds like the property is placed at the wrong level of the hierarchy,
+> then.
 
-On 2/18/2025 8:44 PM, Simon Horman wrote:
-> On Mon, Feb 17, 2025 at 11:27:41AM +0100, Martyna Szapar-Mudlaw wrote:
->> This patch series introduces improvements to the `ice` driver and `virtchnl`
->> interface by adding stricter validation checks and preventing potential
->> out-of-bounds scenarios.
-> 
-> Hi Martyna,
-> 
-> The above talks about this patchset in terms of improvements rather than
-> bug fixes (that manifest). If so, I think this should be targeted at
-> iwl-next (i.e. net-next) rather than iwl-net (net). And the Fixes tags
-> should be dropped.
-> 
+When a PSE controller appears to be able to support mixed budget strategy a=
+nd
+could switch between them it will be better to have it set at the PSE power
+domain level. As the budget is per PSE power domain, its strategy should al=
+so
+be per PSE power domain.
+For now, it is simply not configurable and can't be mixed. It is hard-coded=
+ by
+the PSE driver.
 
-Hi Simon,
-
-Thank for looking into this. I believe these patches provide fixes and 
-would fit better with iwl-net since they correct improper value 
-checking, ensuring that the driver can properly handle and reject 
-invalid inputs from potentially malicious VFs.
-I sent v2 with rephrased cover letter and some commit messages.
-
-Thanks.
-Martyna
-
-> ...
-> 
-
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
