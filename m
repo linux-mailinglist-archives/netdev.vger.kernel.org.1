@@ -1,152 +1,131 @@
-Return-Path: <netdev+bounces-169574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 660EAA44A3F
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 19:26:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44BB0A44A45
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 19:27:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC68019C5A81
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 18:25:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D857168640
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 18:26:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D6752054E9;
-	Tue, 25 Feb 2025 18:24:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7119C1A23A2;
+	Tue, 25 Feb 2025 18:24:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ync+WzAA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XFH3hp7r"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04471FBEAE;
-	Tue, 25 Feb 2025 18:24:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A151547F8;
+	Tue, 25 Feb 2025 18:24:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740507848; cv=none; b=KZ++s+AENm/9Ui4qR4Ckuuh3TMMhWG7KjWhbVp7m9xbkpQ26dvPN+ls0B/2mDPGNLH9p1zJuNittSFzeb4cx98tUIKTC7x4JmmOsfvhBqQ44uwUWwlIm8zlKFoRqlle8U9ZSf4VahBjYFrzz5nbLS6Uazd6oe6YvRGo9TsR9EEA=
+	t=1740507877; cv=none; b=WQDAZyxhRnmgQLb30KgJsCR24HKV3k9zQ+HalvRC32xmMseeVoXyNfIYavlvuTEVFQuiOvgJqT2UliSw/rYkdU3Dqnoyo1eCVsx+rL/HuZRinOPu8nu6WT5eK7aHG7jyLaRaTDGj0rkyjBS+5WIKTg8/rFZzXfdbbry67w3QJZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740507848; c=relaxed/simple;
-	bh=gkURQyDBFIIXVu+lUbjZG9GDidubVbJnt/AHKi//iwA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c/qxl7X0vt1GANZyXN28R4tfiyhhh0uA2wANAdSdMqgxTvRfVFPaWL72i+W7jBweKMS3WXIdKwH3JGg+/4e/ZkuonZYjewFmF2dzik0/frnUvLjMTKhkQOWdkuMQwSBCj0DF2/diXz50fMlRVLOE5L8VaqYPv+A3SVjIJdA+mTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ync+WzAA; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=HbEd1ycjERioNwQFESLBBImaWldcivxrxVLgLZpicQI=; b=ync+WzAAgbJ+vRdCqf9cvcOqmr
-	SZ1EskLrr7w1ZbMgwqat6LgAavMv4wwUOdWW/bWdwI4yyw+lyp0wlmaku8MKYklpDIyxuP9CpGgKN
-	dYyXhTlzGupfJZHM9+XgBSNXWyXpJaFj31RGLzwCj2JcP8BqfL7vz6Cwk10JHj1PaxEP9LmThQ90+
-	SBi8F7cG/cyvM/v4IOuV4unRaG4w0f+mUtdZslUROkhuT2O6+YstgXPfjmxPFzoMwH4D7qJi654iL
-	USgAZdQqcDP4LVUhou7/Ce1UbYxfnyxs52sQl10rM6oeqn8IIGwpnUEbcTHpXI2NxrQqk/lCPZpFC
-	rzuMKzog==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41384)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tmzb4-0002Dt-2S;
-	Tue, 25 Feb 2025 18:23:58 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tmzb2-0006EN-01;
-	Tue, 25 Feb 2025 18:23:56 +0000
-Date: Tue, 25 Feb 2025 18:23:55 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Simon Horman <horms@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Antoine Tenart <atenart@kernel.org>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Sean Anderson <sean.anderson@linux.dev>,
-	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>
-Subject: Re: [PATCH net-next v2 1/2] net: phy: sfp: Add support for SMBus
- module access
-Message-ID: <Z74Kuzb6kPJOZRQw@shell.armlinux.org.uk>
-References: <20250225112043.419189-1-maxime.chevallier@bootlin.com>
- <20250225112043.419189-2-maxime.chevallier@bootlin.com>
- <6ff4a225-07c0-40f6-9509-c4fa79966266@lunn.ch>
- <20250225145617.1ed1833d@fedora.home>
- <caa65ad9-9489-4d22-9e87-dd30e4e16cca@lunn.ch>
+	s=arc-20240116; t=1740507877; c=relaxed/simple;
+	bh=3XIq+v97MdxND3O722LZ/t+3NyB+KR8ITDStGEfj4lo=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=TbD2vyP6jH+IZ21qvUTehYyzAv7YUd6sB8VO75zBGP8FucODrlDloSd2PBmvLX9h2SXnBPMSFc20mJmAs0x0ouQ+EyYG+D0UWzEthyWmgv4kughmrzBGILlAGebOVaG+nScBlxvVfMarzPtkm7cSjBPuBylLGxrkwLSFQWPuE/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XFH3hp7r; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-47210ab1283so83351011cf.1;
+        Tue, 25 Feb 2025 10:24:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740507875; x=1741112675; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gcKgXdB49GE6Hh9aVe3uCcLofk+Gl6MbQhN+OvHH2B8=;
+        b=XFH3hp7rFtH4n3xrZGiiHgqipdpSM7my026I4/rm/2xSc8FEpMtWamIZ/sjdO+5Rru
+         +nrVBu5V5E7MMKqsoYoyox5+OCEswu5fvtbii91pj22t09ccqybKTcPN/c6uHdAA1b7+
+         woRFm4LUanBI7OMVCCuwFoYF9Cu1IiJQdPRTJuf+Yab0aTEC7MIe24vI1Ys1FVpb5zpo
+         lkKHqOJRwMj3kkrRZda4mjhTptGBHWClkjHBaV3vcRYFcJr/D1r49Az9H3N6ByXl1nc5
+         EvRdvUMCtEahHV/VwYdWY4m1+2QfpRbIxKABoxbFty9eiyu+xHnx2iE/UTAs8LEVWC6r
+         46ZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740507875; x=1741112675;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=gcKgXdB49GE6Hh9aVe3uCcLofk+Gl6MbQhN+OvHH2B8=;
+        b=rQMxNmExB1NXrYV+TMFyrf34Q4mQ8FhhXW7fk8qn6gC52/2d5gh57SEQsw5hPLMte2
+         R+AHsl4jaTKbVv+wnOAAV2cp8Lqet+SlYg7frCndeoLC1lSSBn/DYng2EKsS/bFgDHcl
+         rUQ/w1DFYxQ3sN2YNVjoLqLSV+PLzprGkJB5cBVu1YuYjAnrVTmT9yA+iSE70OhdHNve
+         CJMPCJsjdasoCLhbX94MsshE/992jweTRR4XtoOY9ZKocEMHZ7YTQIXZbxTCokCZsjHc
+         X+EAzqiT3stQ2k6St39g3Wld89f1J6mU3zDHkBbF9ng2GRN12iK/OyXVA3MLYnuY2DE3
+         M3zA==
+X-Forwarded-Encrypted: i=1; AJvYcCV2myv4BD5g0HKDixOQNjqlJoWrMzbmMihnXzrrquFRUMYOnK435oFsTdbbfaA9iXz4tnWmQvlGV42XiVcB@vger.kernel.org, AJvYcCWvF22XKDvGSmKsXmulFbfivBTRDmvWStHp71MJuVJNZ1KBYdDJVXWUfk5JK7ZlIsUTfh8=@vger.kernel.org, AJvYcCX1TS3zHZ8Slhm3+cs1AgRPyvSjf5XQ8luWgNnL92z4ZnglgF3jUrTX4ukO1Mr4F153VU1/ETqBdR8iRsbjWaBK@vger.kernel.org, AJvYcCXJ/RXCGMu9w2fwRyy/KQswZ4O+zarzK/HYIgzLh96t5HaN1pwp0/LITPEt2pkij/EM3lVye7cy@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6MEaD7lPRQH2jeRqaiRUuOEw42/X7qiDkVai4yb+yrgbW5HnE
+	MzKlbhOHEjcwwQbvZYPrFet/T+7oVyRs2dRa8h8mTan4Bht7n1tD
+X-Gm-Gg: ASbGncttNuRceT3UP4IXu69Z5D/sTHERA4aXCkneMLRZeOTAH6CMAbcalsIUIQB5mzK
+	Dk5LHhItEykRUpAFWwmRVe7QUjn/YoqkLqUjW1E1jdmsGaQ0MgZr7xw4XYG0CtvALqFSZduNqFR
+	0tbA60G7TwCb/TzBc+Gy+Vv1+HgetZ484GUihNA82JaexPdHRIA7lnEQJDIIIk7qNnvtFjR905v
+	J3s7LJv2UYWqikYV6TEAYB2LYFejPr7fZjZYt9tVPZ7eNrIRosqp3f4XkKk3hXU76MVw8xB5e8O
+	Hekht1R/Z4WtksTr29jGIuXUdxZ9003feL0u8IlVxZu4qi5udlmoYkLy0iTBZn/tSpaTHWB46go
+	Rbog=
+X-Google-Smtp-Source: AGHT+IFOopZa/1wU5Ofb0aMRHUO40bsVkgmw83ugxbCbpEvLcFfyvu3Aj5dity4kFsEHcpf7OP9MTQ==
+X-Received: by 2002:a05:622a:1481:b0:472:1601:c551 with SMTP id d75a77b69052e-4737725d705mr57841861cf.42.1740507874775;
+        Tue, 25 Feb 2025 10:24:34 -0800 (PST)
+Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4737806a53csm12814031cf.57.2025.02.25.10.24.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Feb 2025 10:24:34 -0800 (PST)
+Date: Tue, 25 Feb 2025 13:24:33 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org
+Cc: willemdebruijn.kernel@gmail.com, 
+ jasowang@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ andrii@kernel.org, 
+ eddyz87@gmail.com, 
+ mykolal@fb.com, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ martin.lau@linux.dev, 
+ song@kernel.org, 
+ yonghong.song@linux.dev, 
+ john.fastabend@gmail.com, 
+ kpsingh@kernel.org, 
+ sdf@fomichev.me, 
+ haoluo@google.com, 
+ jolsa@kernel.org, 
+ shuah@kernel.org, 
+ hawk@kernel.org, 
+ marcus.wichelmann@hetzner-cloud.de
+Message-ID: <67be0ae1dd4f5_25ccfc294fe@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250224152909.3911544-4-marcus.wichelmann@hetzner-cloud.de>
+References: <20250224152909.3911544-1-marcus.wichelmann@hetzner-cloud.de>
+ <20250224152909.3911544-4-marcus.wichelmann@hetzner-cloud.de>
+Subject: Re: [PATCH bpf-next v3 3/6] selftests/bpf: move open_tuntap to
+ network helpers
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <caa65ad9-9489-4d22-9e87-dd30e4e16cca@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Feb 25, 2025 at 03:58:31PM +0100, Andrew Lunn wrote:
-> > You might be correct. As I have been running that code out-of-tree for
-> > a while, I was thinking that surely I'd have noticed if this was
-> > wrong, however there are only a few cases where we actually write to
-> > SFP :
-> > 
-> >  - sfp_modify_u8(...) => one-byte write
-> >  - in sfp_cotsworks_fixup_check(...) there are 2 writes : one 1-byte
-> > write and a 3-bytes write.
-> > 
-> > As I don't have any cotsworks SFP, then it looks like having the writes
-> > mis-ordered would have stayed un-noticed on my side as I only
-> > stressed the 1 byte write path...
-> > 
-> > So, good catch :) Let me triple-check and see if I can find any
-> > conceivable way of testing that...
+Marcus Wichelmann wrote:
+> To test the XDP metadata functionality of the tun driver, it's necessary
+> to create a new tap device first. A helper function for this already
+> exists in lwt_helpers.h. Move it to the common network helpers header,
+> so it can be reused in other tests.
 > 
-> Read might be more important than write. This is particularly
-> important for the second page containing the diagnostics, and dumped
-> by ethtool -m. It could be the sensor values latch when you read the
-> higher byte, so you can read the lower byte without worrying about it
-> changing. This is why we don't want HWMON, if you can only do byte
-> access. You might be able to test this with the temperature
-> sensor. The value is in 1/256 degrees. So if you can get is going from
-> 21 255/256C to 22 0/256C and see if you ever read 21 0/256 or 22
-> 255/256C.
+> Signed-off-by: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
 
-<frustrated>
-
-Why don't we read SFF-8472 instead of testing module specific behaviour?
-Section 9.1 (Diagnostics overview) paragraphs 4 and 5 cover this.
-
-No, it's not latched when you read the high byte. Paragraph 4 states
-that multi-byte fields must be read using "a single two-byte read
-sequence across the 2-wire interface".
-
-Paragraph 5 states that "the transceiver shall not update a multi-byte
-field within the structure during the transfer of that multi-byte field
-to the host, such that partially updated data would be transferred to
-the host."
-
-In other words, while reading the the individual bytes of a multi-byte
-field, the value will remain stable _while the bus transaction which
-is required to be a multi-byte read is in progress_.
-
-So, when the STOP condition is signalled on the bus, the transceiver
-is then free to change the values. So accessing the high byte and
-low byte seperately does not guarantee to be coherent.
-
-It *might* work with some modules. It may not work with others. It
-might crash or lock the I2C bus with other modules. (I already know
-that at least one GPON module locks the bus with byte reads of
-0xA0 EEPROM offset 0x51.)
-
-We've had this before. We have a byte-mode fallback in the SFP code,
-and we've had to be *very* careful when enabling this only for
-modules that need it.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
