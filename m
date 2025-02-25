@@ -1,207 +1,280 @@
-Return-Path: <netdev+bounces-169532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6862EA44745
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 18:03:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D1010A447E4
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 18:24:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DFB53A5FAB
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 16:57:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82A503A6FB8
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 17:14:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AFA1440C;
-	Tue, 25 Feb 2025 16:57:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D8A4194A59;
+	Tue, 25 Feb 2025 17:10:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SkMW0v+i"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kuF/+PQt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BFBE21ABC4;
-	Tue, 25 Feb 2025 16:57:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D20192590
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 17:10:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740502672; cv=none; b=AWRMq7MsnYKhaekt+U1Pls1X7hhUBvto1osx0/JUQ90DTipWeeiiNkqk9H5PHGaHdbXXhsYTcbDwiaFO2To2XKgKJZCipin3K5ws5Q6kp7QvqONBxoY8l48/PT9Jr7LU/MXeZsbJNqAklJwGywASb21oZtvS/tcQa547TaQPpN0=
+	t=1740503453; cv=none; b=F6vejzULlGjggkcaGJmR3KwK0OPJCak3OiHVvQbQmIDrtsciIVCUPu0i2mqiwnf/s+lxkahpG/vvIcIvnvk/O+ro1mr7aVgSn4ZJBvvGJSSm6Ty3AJ8FDpt3cBb8N7hjxBC1WXDDWxpPFVBwWSaytGH7yXqJfqmX2GQ0OyqjZd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740502672; c=relaxed/simple;
-	bh=qadF+V0pCnFQNycLz+FvUseJRs1YmaEo0AdSamAZ7zg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KxmgXXy3yIrjnXVmpOZ9Qxc/MBswewwXIgYpdIq/5vOFQgq38CsizEdhbHctWhydRfkLHjal65fLVualib7rtF8aIMjCkUqsZIbrcF3tsAP8DNbxn03UggHGxUXR0urceGVXmFoNH+CaK/ew0h7SYnj2vey39CgKK7lQknysd1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SkMW0v+i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0296CC4CEDD;
-	Tue, 25 Feb 2025 16:57:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740502671;
-	bh=qadF+V0pCnFQNycLz+FvUseJRs1YmaEo0AdSamAZ7zg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SkMW0v+iW9ctHfiu3Qcq3SQLpY+OEbUio/MjSX4deqcR6Bpb87ooZrB7Y68V22dxG
-	 dZWzG9Zwfh6lhxscJsRHGaoivs+A6QRXF1cJYH3uolKkA1X3dhc97KkH0RdAuAAgTc
-	 DxRVBFCGdY4IxaAYv6LVoFpU2r7Xr8KxMoaT44tXGbW/GPJAV016sGnFxWZDmLHBpw
-	 jyedUAZIzFE2Dm4We9hmaY5F02LucYFBFcwgXSHxhEPF1rdk4CY2bmoXE/aSrq5a4t
-	 vvis4/fewAytbGhaOO9fIAxwmvRbs4RGxRhglxoUay349tnmAzfIEEkhbCK1ZrQG9l
-	 mkUTAPEtDa75g==
-Date: Tue, 25 Feb 2025 18:57:46 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-	linux-pci@vger.kernel.org, Ariel Almog <ariela@nvidia.com>,
-	Aditya Prabhune <aprabhune@nvidia.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Arun Easi <aeasi@marvell.com>, Jonathan Chocron <jonnyc@amazon.com>,
-	Bert Kenward <bkenward@solarflare.com>,
-	Matt Carlson <mcarlson@broadcom.com>,
-	Kai-Heng Feng <kai.heng.feng@canonical.com>,
-	Jean Delvare <jdelvare@suse.de>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Stephen Hemminger <stephen@networkplumber.org>
-Subject: Re: [PATCH v4] PCI/sysfs: Change read permissions for VPD attributes
-Message-ID: <20250225165746.GH53094@unreal>
-References: <c93a253b24701513dbeeb307cb2b9e3afd4c74b5.1737271118.git.leon@kernel.org>
- <20250225160542.GA507421@bhelgaas>
+	s=arc-20240116; t=1740503453; c=relaxed/simple;
+	bh=hE3roQvAPi8R7ODiGLb9uxlCAFrEG2WFaHvORI+FEYY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=b7xPaWrkJ1vOE2XHt5pAVO/NqlV4aPY9bQaCDC4CbLFQuleJyVW9jwhNGB5Eiu+DHMKutgpqoTQ3+x/kqhb89Ua+ifqZLtATevpkEznKv+xSUz4SevJD7b5KeBGOxIM33IWZw+uGHSvG0NSDVUBoqfAPARurjCcPSGME2ctfBAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kuF/+PQt; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7c0b7ee195bso1196162985a.1
+        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 09:10:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740503450; x=1741108250; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=HahNWZG3Qvj28ZxW51ubfCQbIb9BiMhmlUgjW+j94rQ=;
+        b=kuF/+PQtDfXsCo9P1eik4I+z5hJDWtlBZSTKmxNNMkDeX6QT9GV9nDClNAwtbtDlWS
+         5+flwh7CVmMnjP2Xp+OSql8HyJZdK0H0zhXTVi0XD92MUUeVjgZjTsPzA9YhH5CQ+PcX
+         nT9+rMlm4MmYIufCPz6ubltCkSA31sKYaoa3hWF0KIjMDrUJIKX5QFmchaNWNzOgqrwq
+         gi/bUi1aBaRnhmk2OWi5Hujml2UVQPI8vP8NvyjC/RIhrjXq4mmS6CQm2s866anYYqv0
+         3rHmwYa0zq+6vgABv3veiLsT4rjyJNcw1kwKw3u+I82m0jXQUprKJwtsHrEB3Uwcjr0S
+         b6Ew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740503450; x=1741108250;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HahNWZG3Qvj28ZxW51ubfCQbIb9BiMhmlUgjW+j94rQ=;
+        b=IoahOE1imgot68ic2/lRhAIxJCR1eu8Ids85VRroJjzVJ8ygyBI8/1yCVdVkLCJfor
+         OQ0ZztN/AT4Yuw75kQ77GQHg/ZAac2M7pI7VADN9ER4qe/dQtdIvUeGg7C25BkAeMW9+
+         nwD8lw9HUdQ2bE/KwG+HiPBZhfpMEnuPbQk1cDOQo09k1+c2dPsgS4HMKg7JnHF54GKC
+         eYEzbGMWGtutrzrCMs55a4QSme42h6skemxh5GzllYVpVuZi/SoqARPrPRs2eN0aW6gZ
+         d1Xp9ZY/u/UKJ7PXMzV/0mqmtFJpAvUxxA3RTkSM56UdUqW7S/jLQHnrQlT7mtVDLEFr
+         eJ0A==
+X-Forwarded-Encrypted: i=1; AJvYcCVe/qMWSog+XhnP1hSqIj8F8sRvpfOhrrVMMe4IthaVP9VLVRahDjq8ICoo+NJZFMJAXeG57pE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmTg/ydDo88UKx/MJAvkhNAEy4eONN2qGrI1Q2d3zCj1tkakMB
+	QS6thCygeo+gUTzxy8iWF4lynHKz6PQOqmnR96edzx+t5YIzagx3bizmCLpv/5y7SbwdHVzPPxL
+	8tfYURwoVAQ==
+X-Google-Smtp-Source: AGHT+IFvumpQf7Yl652XlILF0U04kxqrbgqIAQZrF4ZWCKDNuRuYI+2KTsfFrLE8nKdPbL4sLVxiCYANkTEs5g==
+X-Received: from qtbcp6.prod.google.com ([2002:a05:622a:4206:b0:467:83cf:bfb9])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:2916:b0:7c0:ae97:7fba with SMTP id af79cd13be357-7c0cf955b78mr2094655485a.43.1740503450064;
+ Tue, 25 Feb 2025 09:10:50 -0800 (PST)
+Date: Tue, 25 Feb 2025 17:10:48 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250225160542.GA507421@bhelgaas>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.658.g4767266eb4-goog
+Message-ID: <20250225171048.3105061-1-edumazet@google.com>
+Subject: [PATCH v2 net-next] tcp: be less liberal in TSEcr received while in
+ SYN_RECV state
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
+	Yong-Hao Zou <yonghaoz1994@gmail.com>, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Feb 25, 2025 at 10:05:42AM -0600, Bjorn Helgaas wrote:
-> On Sun, Jan 19, 2025 at 09:27:54AM +0200, Leon Romanovsky wrote:
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> > 
-> > The Vital Product Data (VPD) attribute is not readable by regular
-> > user without root permissions. Such restriction is not needed at
-> > all for Mellanox devices, as data presented in that VPD is not
-> > sensitive and access to the HW is safe and well tested.
-> > 
-> > This change changes the permissions of the VPD attribute to be accessible
-> > for read by all users for Mellanox devices, while write continue to be
-> > restricted to root only.
-> > 
-> > The main use case is to remove need to have root/setuid permissions
-> > while using monitoring library [1].
-> 
-> As far as I can tell, this is basically a device identification
-> problem, which would be better handled by the Vendor, Device, and
-> Revision IDs.  If that would solve the problem, it would also make
-> standard unprivileged lspci output more specific.
+Yong-Hao Zou mentioned that linux was not strict as other OS in 3WHS,
+for flows using TCP TS option (RFC 7323)
 
-Yes, unfortunately these devices have same IDs as "regular" NICs and the
-difference in some FW configuration.
+As hinted by an old comment in tcp_check_req(),
+we can check the TSEcr value in the incoming packet corresponds
+to one of the SYNACK TSval values we have sent.
 
-> 
-> VPD has never been user readable, so I assume you have some existing
-> method for device identification?
+In this patch, I record the oldest and most recent values
+that SYNACK packets have used.
 
-We always read VPD by using "sudo ..." command, until one of our customers
-requested to provide a way to run monitoring library without any root access.
-It runs on hypervisor and being non-root there is super important for them.
+Send a challenge ACK if we receive a TSEcr outside
+of this range, and increase a new SNMP counter.
 
-> 
-> Other concerns raised in previous threads include:
-> 
->   - Potential for sensitive information in VPD, similar to dmesg and
->     dmidecode
-> 
->   - Kernel complexity of reading VPD (mutex, address/data registers)
-> 
->   - Performance and potential denial of service as a consequence of
->     mutex and hardware interaction
-> 
->   - Missing EEPROMs or defective or incompletely-installed firmware
->     breaking VPD read
-> 
->   - Broken devices that crash when VPD is read
+nstat -az | grep TSEcrRejected
+TcpExtTSEcrRejected            0                  0.0
 
-This patch allows non-root read for Mellanox (NICs) devices only and
-such access is going to be used only once during library initiation
-flow. So nothing from above is applicable in our case.
+Due to TCP fastopen implementation, do not apply yet these checks
+for fastopen flows.
 
-In general case, all devices in the world were accessed at least once
-with "sudo lspci ....", during their bringup, installation, daily use
-e.t.c. Broken devices are filtered by kernel and have limited access
-to VPD.
+v2: No longer use req->num_timeout, but treq->snt_tsval_first
+    to detect when first SYNACK is prepared. This means
+    we make sure to not send an initial zero TSval.
+    Make sure MPTCP and TCP selftests are passing.
+    Change MIB name to TcpExtTSEcrRejected
 
-So if it is broken, it will be broken with sudo too.
+v1: https://lore.kernel.org/netdev/CADVnQykD8i4ArpSZaPKaoNxLJ2if2ts9m4As+=Jvdkrgx1qMHw@mail.gmail.com/T/
 
-> 
->   - Potential for issues with future Mellanox devices, even though all
->     current ones work fine
+Reported-by: Yong-Hao Zou <yonghaoz1994@gmail.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+ .../networking/net_cachelines/snmp.rst        |  1 +
+ include/linux/tcp.h                           |  2 ++
+ include/uapi/linux/snmp.h                     |  1 +
+ net/ipv4/proc.c                               |  1 +
+ net/ipv4/syncookies.c                         |  1 +
+ net/ipv4/tcp_input.c                          |  1 +
+ net/ipv4/tcp_minisocks.c                      | 26 +++++++++++--------
+ net/ipv4/tcp_output.c                         |  6 +++++
+ 8 files changed, 28 insertions(+), 11 deletions(-)
 
-It is not different from any other feature. MLNX devices exist for more
-than 25 years already and we never exposed anything sensitive through VPD.
+diff --git a/Documentation/networking/net_cachelines/snmp.rst b/Documentation/networking/net_cachelines/snmp.rst
+index 90ca2d92547d44fa5b4d28cb9d00820662c3f0fd..bc96efc92cf5b888c1e441412c78f3974be1f587 100644
+--- a/Documentation/networking/net_cachelines/snmp.rst
++++ b/Documentation/networking/net_cachelines/snmp.rst
+@@ -36,6 +36,7 @@ unsigned_long  LINUX_MIB_TIMEWAITRECYCLED
+ unsigned_long  LINUX_MIB_TIMEWAITKILLED
+ unsigned_long  LINUX_MIB_PAWSACTIVEREJECTED
+ unsigned_long  LINUX_MIB_PAWSESTABREJECTED
++unsigned_long  LINUX_MIB_TSECR_REJECTED
+ unsigned_long  LINUX_MIB_DELAYEDACKLOST
+ unsigned_long  LINUX_MIB_LISTENOVERFLOWS
+ unsigned_long  LINUX_MIB_LISTENDROPS
+diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+index f88daaa76d836654b2a2e217d0d744d3713d368e..159b2c59eb6271030dc2c8d58b43229ebef10ea5 100644
+--- a/include/linux/tcp.h
++++ b/include/linux/tcp.h
+@@ -160,6 +160,8 @@ struct tcp_request_sock {
+ 	u32				rcv_isn;
+ 	u32				snt_isn;
+ 	u32				ts_off;
++	u32				snt_tsval_first;
++	u32				snt_tsval_last;
+ 	u32				last_oow_ack_time; /* last SYNACK */
+ 	u32				rcv_nxt; /* the ack # by SYNACK. For
+ 						  * FastOpen it's the seq#
+diff --git a/include/uapi/linux/snmp.h b/include/uapi/linux/snmp.h
+index 848c7784e684c03bdf743e42594317f3d889d83f..eb9fb776fdc3e50c2ecfc6b36d5472f8f65b5985 100644
+--- a/include/uapi/linux/snmp.h
++++ b/include/uapi/linux/snmp.h
+@@ -186,6 +186,7 @@ enum
+ 	LINUX_MIB_TIMEWAITKILLED,		/* TimeWaitKilled */
+ 	LINUX_MIB_PAWSACTIVEREJECTED,		/* PAWSActiveRejected */
+ 	LINUX_MIB_PAWSESTABREJECTED,		/* PAWSEstabRejected */
++	LINUX_MIB_TSECRREJECTED,		/* TSEcrRejected */
+ 	LINUX_MIB_PAWS_OLD_ACK,			/* PAWSOldAck */
+ 	LINUX_MIB_DELAYEDACKS,			/* DelayedACKs */
+ 	LINUX_MIB_DELAYEDACKLOCKED,		/* DelayedACKLocked */
+diff --git a/net/ipv4/proc.c b/net/ipv4/proc.c
+index affd21a0f57281947f88c6563be3d99aae613baf..10cbeb76c27456ae7f220acf0a22203bad6bbc53 100644
+--- a/net/ipv4/proc.c
++++ b/net/ipv4/proc.c
+@@ -189,6 +189,7 @@ static const struct snmp_mib snmp4_net_list[] = {
+ 	SNMP_MIB_ITEM("TWKilled", LINUX_MIB_TIMEWAITKILLED),
+ 	SNMP_MIB_ITEM("PAWSActive", LINUX_MIB_PAWSACTIVEREJECTED),
+ 	SNMP_MIB_ITEM("PAWSEstab", LINUX_MIB_PAWSESTABREJECTED),
++	SNMP_MIB_ITEM("TSEcrRejected", LINUX_MIB_TSECRREJECTED),
+ 	SNMP_MIB_ITEM("PAWSOldAck", LINUX_MIB_PAWS_OLD_ACK),
+ 	SNMP_MIB_ITEM("DelayedACKs", LINUX_MIB_DELAYEDACKS),
+ 	SNMP_MIB_ITEM("DelayedACKLocked", LINUX_MIB_DELAYEDACKLOCKED),
+diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
+index 26816b876dd8b37626a3220da71fd697b997e147..5459a78b9809594e4c9e5a69dd1156a3e0cc06bc 100644
+--- a/net/ipv4/syncookies.c
++++ b/net/ipv4/syncookies.c
+@@ -279,6 +279,7 @@ static int cookie_tcp_reqsk_init(struct sock *sk, struct sk_buff *skb,
+ 		ireq->smc_ok = 0;
+ 
+ 	treq->snt_synack = 0;
++	treq->snt_tsval_first = 0;
+ 	treq->tfo_listener = false;
+ 	treq->txhash = net_tx_rndhash();
+ 	treq->rcv_isn = ntohl(th->seq) - 1;
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 217a8747a79b5a52216dfde4b25569586eef90c8..d22ad553b45b17218d5362ea58a4f82559afb851 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -7081,6 +7081,7 @@ static void tcp_openreq_init(struct request_sock *req,
+ 	tcp_rsk(req)->rcv_isn = TCP_SKB_CB(skb)->seq;
+ 	tcp_rsk(req)->rcv_nxt = TCP_SKB_CB(skb)->seq + 1;
+ 	tcp_rsk(req)->snt_synack = 0;
++	tcp_rsk(req)->snt_tsval_first = 0;
+ 	tcp_rsk(req)->last_oow_ack_time = 0;
+ 	req->mss = rx_opt->mss_clamp;
+ 	req->ts_recent = rx_opt->saw_tstamp ? rx_opt->rcv_tsval : 0;
+diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+index 1eccc518b957eb9b81cab8b288cb6a5bca931e5a..4f87406ddbcd4420425c60fe4f625c7f5a2241f5 100644
+--- a/net/ipv4/tcp_minisocks.c
++++ b/net/ipv4/tcp_minisocks.c
+@@ -663,6 +663,7 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+ 	struct sock *child;
+ 	const struct tcphdr *th = tcp_hdr(skb);
+ 	__be32 flg = tcp_flag_word(th) & (TCP_FLAG_RST|TCP_FLAG_SYN|TCP_FLAG_ACK);
++	bool tsecr_reject = false;
+ 	bool paws_reject = false;
+ 	bool own_req;
+ 
+@@ -672,8 +673,13 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+ 
+ 		if (tmp_opt.saw_tstamp) {
+ 			tmp_opt.ts_recent = READ_ONCE(req->ts_recent);
+-			if (tmp_opt.rcv_tsecr)
++			if (tmp_opt.rcv_tsecr) {
++				if (inet_rsk(req)->tstamp_ok && !fastopen)
++					tsecr_reject = !between(tmp_opt.rcv_tsecr,
++							tcp_rsk(req)->snt_tsval_first,
++							READ_ONCE(tcp_rsk(req)->snt_tsval_last));
+ 				tmp_opt.rcv_tsecr -= tcp_rsk(req)->ts_off;
++			}
+ 			/* We do not store true stamp, but it is not required,
+ 			 * it can be estimated (approximately)
+ 			 * from another data.
+@@ -788,18 +794,14 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+ 	     tcp_rsk(req)->snt_isn + 1))
+ 		return sk;
+ 
+-	/* Also, it would be not so bad idea to check rcv_tsecr, which
+-	 * is essentially ACK extension and too early or too late values
+-	 * should cause reset in unsynchronized states.
+-	 */
+-
+ 	/* RFC793: "first check sequence number". */
+ 
+-	if (paws_reject || !tcp_in_window(TCP_SKB_CB(skb)->seq,
+-					  TCP_SKB_CB(skb)->end_seq,
+-					  tcp_rsk(req)->rcv_nxt,
+-					  tcp_rsk(req)->rcv_nxt +
+-					  tcp_synack_window(req))) {
++	if (paws_reject || tsecr_reject ||
++	    !tcp_in_window(TCP_SKB_CB(skb)->seq,
++			   TCP_SKB_CB(skb)->end_seq,
++			   tcp_rsk(req)->rcv_nxt,
++			   tcp_rsk(req)->rcv_nxt +
++			   tcp_synack_window(req))) {
+ 		/* Out of window: send ACK and drop. */
+ 		if (!(flg & TCP_FLAG_RST) &&
+ 		    !tcp_oow_rate_limited(sock_net(sk), skb,
+@@ -808,6 +810,8 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+ 			req->rsk_ops->send_ack(sk, skb, req);
+ 		if (paws_reject)
+ 			NET_INC_STATS(sock_net(sk), LINUX_MIB_PAWSESTABREJECTED);
++		else if (tsecr_reject)
++			NET_INC_STATS(sock_net(sk), LINUX_MIB_TSECRREJECTED);
+ 		return NULL;
+ 	}
+ 
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index 9a3cf51eab787859ec82432ee6eb9f94e709b292..0a660075add5bea05a61b4fe2d9d334a89d956a7 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -943,6 +943,12 @@ static unsigned int tcp_synack_options(const struct sock *sk,
+ 		opts->options |= OPTION_TS;
+ 		opts->tsval = tcp_skb_timestamp_ts(tcp_rsk(req)->req_usec_ts, skb) +
+ 			      tcp_rsk(req)->ts_off;
++		if (!tcp_rsk(req)->snt_tsval_first) {
++			if (!opts->tsval)
++				opts->tsval = ~0U;
++			tcp_rsk(req)->snt_tsval_first = opts->tsval;
++		}
++		WRITE_ONCE(tcp_rsk(req)->snt_tsval_last, opts->tsval);
+ 		opts->tsecr = READ_ONCE(req->ts_recent);
+ 		remaining -= TCPOLEN_TSTAMP_ALIGNED;
+ 	}
+-- 
+2.48.1.658.g4767266eb4-goog
 
-I'm confident that we have no plans to change this policy in the future
-either.
-
-> 
-> This is basically similar to mmapping a device BAR, for which we also
-> require root.
-
-It is kernel controlled exposure, through well defined sysfs file and
-in-kernel API for very specific PCI section. Device BAR is much more
-than that.
-
-Thanks
-
-> 
-> > [leonro@vm ~]$ lspci |grep nox
-> > 00:09.0 Ethernet controller: Mellanox Technologies MT2910 Family [ConnectX-7]
-> > 
-> > Before:
-> > [leonro@vm ~]$ ls -al /sys/bus/pci/devices/0000:00:09.0/vpd
-> > -rw------- 1 root root 0 Nov 13 12:30 /sys/bus/pci/devices/0000:00:09.0/vpd
-> > After:
-> > [leonro@vm ~]$ ls -al /sys/bus/pci/devices/0000:00:09.0/vpd
-> > -rw-r--r-- 1 root root 0 Nov 13 12:30 /sys/bus/pci/devices/0000:00:09.0/vpd
-> > 
-> > [1] https://developer.nvidia.com/management-library-nvml
-> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > ---
-> > Changelog:
-> > v4:
-> >  * Change comment to the variant suggested by Stephen
-> > v3: https://lore.kernel.org/all/18f36b3cbe2b7e67eed876337f8ba85afbc12e73.1733227737.git.leon@kernel.org
-> >  * Used | to change file attributes
-> >  * Remove WARN_ON
-> > v2: https://lore.kernel.org/all/61a0fa74461c15edfae76222522fa445c28bec34.1731502431.git.leon@kernel.org
-> >  * Another implementation to make sure that user is presented with
-> >    correct permissions without need for driver intervention.
-> > v1: https://lore.kernel.org/all/cover.1731005223.git.leonro@nvidia.com
-> >  * Changed implementation from open-read-to-everyone to be opt-in
-> >  * Removed stable and Fixes tags, as it seems like feature now.
-> > v0: https://lore.kernel.org/all/65791906154e3e5ea12ea49127cf7c707325ca56.1730102428.git.leonro@nvidia.com/
-> > ---
-> >  drivers/pci/vpd.c | 7 +++++++
-> >  1 file changed, 7 insertions(+)
-> > 
-> > diff --git a/drivers/pci/vpd.c b/drivers/pci/vpd.c
-> > index a469bcbc0da7..c873ab47526b 100644
-> > --- a/drivers/pci/vpd.c
-> > +++ b/drivers/pci/vpd.c
-> > @@ -332,6 +332,13 @@ static umode_t vpd_attr_is_visible(struct kobject *kobj,
-> >  	if (!pdev->vpd.cap)
-> >  		return 0;
-> >  
-> > +	/*
-> > +	 * On Mellanox devices reading VPD is safe for unprivileged users,
-> > +	 * so just add needed bits to allow read.
-> > +	 */
-> > +	if (unlikely(pdev->vendor == PCI_VENDOR_ID_MELLANOX))
-> > +		return a->attr.mode | 0044;
-> > +
-> >  	return a->attr.mode;
-> >  }
-> >  
-> > -- 
-> > 2.47.1
-> > 
 
