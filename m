@@ -1,122 +1,148 @@
-Return-Path: <netdev+bounces-169600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 183C6A44B18
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 20:10:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E56A6A44B79
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 20:39:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51D4C7ACDD1
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 19:09:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C92EA420C2C
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 19:39:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D04A61A7045;
-	Tue, 25 Feb 2025 19:09:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6FE620CCE9;
+	Tue, 25 Feb 2025 19:39:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="E3wvSy/z"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="NSZHyqkx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from mx25lb.world4you.com (mx25lb.world4you.com [81.19.149.135])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 415901993A3;
-	Tue, 25 Feb 2025 19:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC46020C006;
+	Tue, 25 Feb 2025 19:39:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.135
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740510598; cv=none; b=Tx7ScLhV7tfWh76Z9090nj1lOvagowFD+WKaqLBbuV9vhflMcBN8PCdPoff2AthNEETqSnCX7viFPX3xyvUUlLwOD2gwvITQjlQSvFxF4PF+TlIStmf8Gxzq41k3DQ62LQ+vhKGzhkxKgWrna4sf34kjYZii0/4F77LKCxx1vUY=
+	t=1740512375; cv=none; b=WIgPDOBp5OzShCh5/uizX45sxIvj3yNw6CHd2v2jjptSjEhKlpHe/oR2yzGUZrTa6GIbhVmskNIYcVtFjVrrjA5ZBtQffwBtrsgnQxsyEa5bWbu16FSkX8wOZr6sfzvu27aS7bVeeJ+WXNdJ6qdgq0nIiaqXZQZ5YqOqgpqNxLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740510598; c=relaxed/simple;
-	bh=D0R0gOP7f1rXDtUFelNCY9sIdTlCLQB5EjHfxs5aKI0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q2/1NXltKwupdFRW4HsQd/zlOcxcHiUvIP6R0x6CvLqJS7cUruEgQ3vurtFXVYBWCKZQIA1c5lIrGvl2RZwZ0J2N+Cx8ziXYWI+1+yB4WgMM1gIqZ9v0fNofluVKgKgdOVj2A2EzOwScrx+ZgdWNK1BgIVRpy7Ls6j6UUgyXGHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=E3wvSy/z; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1740510597; x=1772046597;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=fAaDGD2JHhDlK7rhyevHUPzqoJBaFoz+baMHVW/dWFc=;
-  b=E3wvSy/z6eFUrp1P9lNplRmoITyPDVkpFGWAvlRzQwLQ2dlwhUDGoQmS
-   bxw1fG11+cXjLN2LQnjUAWwAjc7FDXNOh8SpPVts+uOESJCQOqrRfDDpA
-   Z8Nk1l1ck4qm3bFRqDEZjEm0YbS4xX6S+2qNXPMpQnMtwlNxVJ0x227ov
-   E=;
-X-IronPort-AV: E=Sophos;i="6.13,314,1732579200"; 
-   d="scan'208";a="175875990"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2025 19:09:55 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:46435]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.35.58:2525] with esmtp (Farcaster)
- id ef180c6f-5d64-4289-ac8a-d957de4ea901; Tue, 25 Feb 2025 19:09:55 +0000 (UTC)
-X-Farcaster-Flow-ID: ef180c6f-5d64-4289-ac8a-d957de4ea901
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 25 Feb 2025 19:09:54 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.106.100.5) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 25 Feb 2025 19:09:52 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <adrianhuang0701@gmail.com>
-CC: <ahuang12@lenovo.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH v2 1/1] af_unix: Fix memory leak in unix_dgram_sendmsg()
-Date: Tue, 25 Feb 2025 11:09:42 -0800
-Message-ID: <20250225190942.79227-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250225021457.1824-1-ahuang12@lenovo.com>
-References: <20250225021457.1824-1-ahuang12@lenovo.com>
+	s=arc-20240116; t=1740512375; c=relaxed/simple;
+	bh=Xvt8IjPQniAU3unHdTZNJ7+x2xb6VbQHY3p2fi8W+EQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hy9vqKpWpJ6eckuR9YYG7b705V0yVkYrZ5RbiFwK0Uf2XCBBqaDI+lskqsPmgSlb1yOdpOD2wPEdHYV8D/lk85lyk2KNdMx0+dqHFukZp+P5Cr2GAQ4k3KvkIGCLcrIlNCqxVkANgnbTA3E+aq3naD26VLDL4yrpMl76+DRqodI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=NSZHyqkx; arc=none smtp.client-ip=81.19.149.135
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=4kLJhwKp4a4wG/8lLsj5hZ9Nkskn7kgFDs+gfjkBo4s=; b=NSZHyqkxgDLzxO93hgamLOrlIJ
+	zM+fgXC2R6B9QK0a5KlebUd9xD+0F7OBzc9edJuaQZ/OzGobQPZ8Uolv9zMWIDhFingFAOw24LhDw
+	9LHjOO4LDVIZh4g6qLz3owCRtSiaBoI3sxW4fMcP4KyKvMPeiNLepUkVF513HIi28OxY=;
+Received: from [88.117.55.1] (helo=[10.0.0.160])
+	by mx25lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1tn0Xc-000000003XD-0rtK;
+	Tue, 25 Feb 2025 20:24:28 +0100
+Message-ID: <085f0a9b-654d-4ce7-986c-043a6ca135de@engleder-embedded.com>
+Date: Tue, 25 Feb 2025 20:24:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D044UWB004.ant.amazon.com (10.13.139.134) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] selftests: drv-net: Check if combined-count exists
+To: Joe Damato <jdamato@fastly.com>
+Cc: dw@davidwei.uk, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Shuah Khan <shuah@kernel.org>,
+ "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+ open list <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org
+References: <20250225181455.224309-1-jdamato@fastly.com>
+Content-Language: en-US
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+In-Reply-To: <20250225181455.224309-1-jdamato@fastly.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AV-Do-Run: Yes
 
-From: Adrian Huang <adrianhuang0701@gmail.com>
-Date: Tue, 25 Feb 2025 10:14:57 +0800
-> From: Adrian Huang <ahuang12@lenovo.com>
+On 25.02.25 19:14, Joe Damato wrote:
+> Some drivers, like tg3, do not set combined-count:
 > 
-> After running the 'sendmsg02' program of Linux Test Project (LTP),
-> kmemleak reports the following memory leak:
+> $ ethtool -l enp4s0f1
+> Channel parameters for enp4s0f1:
+> Pre-set maximums:
+> RX:		4
+> TX:		4
+> Other:		n/a
+> Combined:	n/a
+> Current hardware settings:
+> RX:		4
+> TX:		1
+> Other:		n/a
+> Combined:	n/a
 > 
->   # cat /sys/kernel/debug/kmemleak
->   unreferenced object 0xffff888243866800 (size 2048):
->     comm "sendmsg02", pid 67, jiffies 4294903166
->     hex dump (first 32 bytes):
->       00 00 00 00 00 00 00 00 5e 00 00 00 00 00 00 00  ........^.......
->       01 00 07 40 00 00 00 00 00 00 00 00 00 00 00 00  ...@............
->     backtrace (crc 7e96a3f2):
->       kmemleak_alloc+0x56/0x90
->       kmem_cache_alloc_noprof+0x209/0x450
->       sk_prot_alloc.constprop.0+0x60/0x160
->       sk_alloc+0x32/0xc0
->       unix_create1+0x67/0x2b0
->       unix_create+0x47/0xa0
->       __sock_create+0x12e/0x200
->       __sys_socket+0x6d/0x100
->       __x64_sys_socket+0x1b/0x30
->       x64_sys_call+0x7e1/0x2140
->       do_syscall_64+0x54/0x110
->       entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> In the case where combined-count is not set, the ethtool netlink code
+> in the kernel elides the value and the code in the test:
 > 
-> Commit 689c398885cc ("af_unix: Defer sock_put() to clean up path in
-> unix_dgram_sendmsg().") defers sock_put() in the error handling path.
-> However, it fails to account for the condition 'msg->msg_namelen != 0',
-> resulting in a memory leak when the code jumps to the 'lookup' label.
+>    netnl.channels_get(...)
 > 
-> Fix issue by calling sock_put() if 'msg->msg_namelen != 0' is met.
+> With a tg3 device, the returned dictionary looks like:
 > 
-> Fixes: 689c398885cc ("af_unix: Defer sock_put() to clean up path in unix_dgram_sendmsg().")
-> Signed-off-by: Adrian Huang <ahuang12@lenovo.com>
+> {'header': {'dev-index': 3, 'dev-name': 'enp4s0f1'},
+>   'rx-max': 4,
+>   'rx-count': 4,
+>   'tx-max': 4,
+>   'tx-count': 1}
+> 
+> Note that the key 'combined-count' is missing. As a result of this
+> missing key the test raises an exception:
+> 
+>   # Exception|     if channels['combined-count'] == 0:
+>   # Exception|        ~~~~~~~~^^^^^^^^^^^^^^^^^^
+>   # Exception| KeyError: 'combined-count'
+> 
+> Change the test to check if 'combined-count' is a key in the dictionary
+> first and if not assume that this means the driver has separate RX and
+> TX queues.
+> 
+> With this change, the test now passes successfully on tg3 and mlx5
+> (which does have a 'combined-count').
+> 
+> Fixes: 1cf270424218 ("net: selftest: add test for netdev netlink queue-get API")
+> Signed-off-by: Joe Damato <jdamato@fastly.com>
+> ---
+>   tools/testing/selftests/drivers/net/queues.py | 9 ++++++---
+>   1 file changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/drivers/net/queues.py b/tools/testing/selftests/drivers/net/queues.py
+> index 38303da957ee..baa8845d9f64 100755
+> --- a/tools/testing/selftests/drivers/net/queues.py
+> +++ b/tools/testing/selftests/drivers/net/queues.py
+> @@ -45,10 +45,13 @@ def addremove_queues(cfg, nl) -> None:
+>   
+>       netnl = EthtoolFamily()
+>       channels = netnl.channels_get({'header': {'dev-index': cfg.ifindex}})
+> -    if channels['combined-count'] == 0:
+> -        rx_type = 'rx'
+> +    if 'combined-count' in channels:
+> +        if channels['combined-count'] == 0:
+> +            rx_type = 'rx'
+> +        else:
+> +            rx_type = 'combined'
+>       else:
+> -        rx_type = 'combined'
+> +        rx_type = 'rx'
+>   
+>       expected = curr_queues - 1
+>       cmd(f"ethtool -L {cfg.dev['ifname']} {rx_type} {expected}", timeout=10)
+> 
+> base-commit: bc50682128bde778a1ddc457a02d92a637c20c6f
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-
-Thanks!
+Reviewed-by: Gerhard Engleder <gerhard@engleder-embedded.com>
 
