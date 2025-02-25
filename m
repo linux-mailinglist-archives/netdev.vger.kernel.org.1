@@ -1,204 +1,276 @@
-Return-Path: <netdev+bounces-169388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E31E7A43A8F
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 11:03:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 602DCA43AA1
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 11:05:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 193BF18950B3
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:02:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D236D3B1F9A
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:02:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1728B262806;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4E68267AF5;
 	Tue, 25 Feb 2025 09:59:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KBIvFAJf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NyFhLe+H"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2065.outbound.protection.outlook.com [40.107.223.65])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B41264F9D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D504D265601
 	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 09:59:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.65
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740477549; cv=fail; b=Yp0VOebfxZzayKhfgkSGpJGn5DSQav51TKq0lbN7FwdciXJFhQbBiVxx4K12pwnzCe8uGD4JYq0pnyGJrQoN/jYaYoUrudA9Rf+np41YvSP35c6tL5zvoOhYzNOC838HCHelDBXr42Cj7Nc4UDtfyZHeTNBXRvIb88P8TqKjU30=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740477549; cv=none; b=WPLUGexr1kLWvwdhG34EYnwUaod20pnAyOGXHmGTu/VwlBaZZU00W6musJTRt1XAJq22juUNUMpV6UnnBHxEQYGqLIiYYd6EMKQSdJtDjiVRwie3fMdcQrMF46SS/kwjNaitc7znNIYCO5+BVlpPvWhcqB6IVWNmiJ2sm4wjEJQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1740477549; c=relaxed/simple;
-	bh=YqwuOxgsMu61AbfM9+HYOdw4oeFCGXM7GjsxnevazeI=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=nPEDYIAEPksFpDLBz0vGjXekmF4K9vB4PKx+lDqWh32ds9vhkHhodvojuxbL+nsPgcmzFa7F444Ot90Sb3M5qM1pKLQ5QzGVO3ULQVkzxwSnffTw7g302uudSJeQDX+ngCgXkYq+xClWKEAGD7xc1uoALYU5zXtkiOr48xq3bqQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=KBIvFAJf; arc=fail smtp.client-ip=40.107.223.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=lCllmZBqf29hidFeh49qR1bFrqokcTOPu79XlDS+nL74sip7iSlnq6KwlILc2NoNL4uEzq6/tC/35KppKq+LO22hrdqOKgn6FBHWaLZm/A4KSBFg27c8o1pTU78W1vCgOmkHJjd7PJsnOtK88R9nq+3cFTKsJUJnJQJxI+VT72M75j7xrJ49uPJCXhenm3XNbt/uR0WClGZymgT3ipLYHRaC8uXvra5U2HByMSdJzfRmsprvYmsRfBTAHNIDKmozfWFh1SAwkSZZSyVLre09DE5/iaeP3KTr/HuBaAXeRBM23HUWHizWoo4jRR9folnu0kYsEydnWErZ2nNnlTMvFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=x8yPg2L0G058lNAea+p7Yt/000W55se/Df1OI0VQTh0=;
- b=j3EftTOE2PzRdca4EENxKez/JYr0YPwoL+d8t7UUDv9WEIMH3zL49gt+NiGYG3QGC9nh6Fg9pgAdtOvvv/c8Y3h/5eHdnUAhAMlSMoETt5WGang1r+s5gUbjnrShLFOIDZd6OKFne08jwn3TE/NL6AP50rm/8i0fFqt8XJf5HT9KEdOVdHB7+yb2ecfhYLdBsF7Tq9G/C/7XwyKVq7pw8us9gyo9wF9t2tjY6kJiYjvS0Hnp/qTrXJfxTCIBMc8DBzggljVxKteI+Xyh6PCtryROUV4HxkNwSHQ88YXbaN9AXZyi0axra5sjBLeak34YrpoggYj1rDiZZRaDD2oJMw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=x8yPg2L0G058lNAea+p7Yt/000W55se/Df1OI0VQTh0=;
- b=KBIvFAJf1U4hzCd+U7Zd2f3SMmQtGp+2MVb3dJ8BWoQHGRZcddOOLa3GVSlSQ/zkNcv1lY0k2fT4pXoiHAWpxRHTqf54tcwuKQ7VR6n3Tg6Se+TSZfzh2JJ0XTwVWI0sCoa/N2LuXp17lrFl4PClJUiPg2Dn70lqAkIDknDpD1RGsULj7Rohc+YGWe/yuyBZnF9HC0Y+eEVr/6y4a5+6aDNOkRUFyds2tP5uOaBV2mJSE99pcBW2s/M9FPqsKXsbDgdNWIReHKQnQLp5nNAPtqH62P1uE2Zp9tqyHaAcGClMEuRMf6Nvb43VykOb2EgWj43fj6bGp+Qj0SWEaVgJ3g==
-Received: from CH0PR13CA0026.namprd13.prod.outlook.com (2603:10b6:610:b1::31)
- by IA1PR12MB7685.namprd12.prod.outlook.com (2603:10b6:208:423::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.21; Tue, 25 Feb
- 2025 09:59:02 +0000
-Received: from DS3PEPF0000C37E.namprd04.prod.outlook.com
- (2603:10b6:610:b1:cafe::f) by CH0PR13CA0026.outlook.office365.com
- (2603:10b6:610:b1::31) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8466.18 via Frontend Transport; Tue,
- 25 Feb 2025 09:59:02 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- DS3PEPF0000C37E.mail.protection.outlook.com (10.167.23.8) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8489.16 via Frontend Transport; Tue, 25 Feb 2025 09:59:02 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 25 Feb
- 2025 01:58:50 -0800
-Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 25 Feb
- 2025 01:58:46 -0800
-References: <20250225090917.499376-1-idosch@nvidia.com>
- <20250225090917.499376-5-idosch@nvidia.com>
-User-agent: mu4e 1.8.14; emacs 29.4
-From: Petr Machata <petrm@nvidia.com>
-To: Ido Schimmel <idosch@nvidia.com>
-CC: <netdev@vger.kernel.org>, <stephen@networkplumber.org>,
-	<dsahern@gmail.com>, <gnault@redhat.com>, <petrm@nvidia.com>
-Subject: Re: [PATCH iproute2-next v2 4/5] iprule: Add port mask support
-Date: Tue, 25 Feb 2025 10:58:28 +0100
-In-Reply-To: <20250225090917.499376-5-idosch@nvidia.com>
-Message-ID: <878qpuibvw.fsf@nvidia.com>
+	bh=p4CmMFvGz4GnZuL7UKpm5LFmwyrMDK7TdvYwpQCZxls=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WVA/nYhR6yopeUZq2GjJX3vDdiNmB0NVJcIIj//0QLFodWYI+9pJTtb6MyJu6pXsCcQj10lSZM3aRU1haHY6hxsxtv/CulA93viLkdWs3R2izVofsxdClv7KGHn8IrMGJ/UT1eP57iBbytirgJkSmZGUx8z/ozaxo65S5+pnx9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NyFhLe+H; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740477546;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JSN8ipOdoK6nr7GKwtPTgRwDHFeV4MnRHm175qJcIAE=;
+	b=NyFhLe+Hp5wjltee3rsppWoHo75FZ7EhZzptAwEeqnkwUffpLez/3F5QWQgKWbR3rFHol/
+	4ojVg341GrRy9uudd2yUD/b7FSSYU4j9lqeXuKS1VnyhLqG0gr/tiOFMYwFSB4uwfjVOlJ
+	UHCEgRRMSg8hIqvUAWUCdZOccwXFWqg=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-303-xoc1X3PIOAK-6m8W0pA9Qw-1; Tue, 25 Feb 2025 04:59:04 -0500
+X-MC-Unique: xoc1X3PIOAK-6m8W0pA9Qw-1
+X-Mimecast-MFC-AGG-ID: xoc1X3PIOAK-6m8W0pA9Qw_1740477543
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4393e89e910so29874895e9.0
+        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 01:59:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740477543; x=1741082343;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JSN8ipOdoK6nr7GKwtPTgRwDHFeV4MnRHm175qJcIAE=;
+        b=jHu6KKpF2QEsDIFfqnHycTfV8ogZW6A9tGBwgciUQqKclFBGuSceekVsPqrUzRrmwQ
+         DSLA/pM0RItQCNZqejr6pHLH2YU+PGf9BAT/jQWgBpskMDPNwjdH5t2V1VLd2g7eSTZZ
+         YFiYBR1YzJlliRyFWVDjiQkFCWM/xW30TaVP0SKKrzXqAFyE8HWQetUoPFx3PbXYvGwS
+         TnhW4ZWAP+dMmERLw99Sd4rGeKQj8WJ4DOHlR9eigSsDhEoVMY1D8NwRQIUDZZmluZ+7
+         puCAs6nyBhxGSR+jbMctJ7+oPxpSxeNPmTDlrVmXafoxl8Pm+Re3LZxw9u8F3wTsjnMx
+         mQ1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXib+J/HNrleUpOCry+0LEtaKTXauyehxZsCehq6ph1NMG3sp6w9gYzAzHhtmEo8pwm+JYc0JA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YywtUc7yldNYCB9fcgU9HifFVyoTKZEirJGuDVFxrrdJ/Z3ihEF
+	5sdKdsg1vuHOkHoOaZFgkmalYHrPyaUc+KOHl6DyehI5kB8Qj66fHhIoAoS7rN78qPDfNt3x8Fd
+	r8gks07On7OJBbdkyQ6yl8V6xWkJtV8llEun6ckdy/3ckGXHK4UM/mA==
+X-Gm-Gg: ASbGncuywvkhOC3GUW6MeFYVTHVWG0A+UJbva39sBIbf9dKBNvuqaSciP53toHXwszK
+	l1F7euAGIyx8CgNxqsvE1H1iXjrTXYSHIHl2wAMu1FqxiYiewy9gmWAhlQO/s3yeXt1XnLEQgHh
+	oT397infP8s8szw8iDLc/L5NNabR74UHK3BG1XI7nxEJDg0N9xX7QLF6L8UQZod75uoKZqn7zch
+	bwgNvkszN1pw+Nfkz7QoXpLdvTjfhu1gtnD24/9+5X+lZONB0NHv07XhJgMalb+qZZtI8ppHaGP
+	Uxj6MoDLYoefG6r0i+v0tJhIY8JgubXa2JnG+t21y+U=
+X-Received: by 2002:a05:6000:1447:b0:385:ee40:2d88 with SMTP id ffacd0b85a97d-390cc5f20e0mr2112736f8f.3.1740477542898;
+        Tue, 25 Feb 2025 01:59:02 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFH60QjK9vH760gSUBPSCwYP4IhpIh63CiCbHL+6qOm3E8hNdxGsRrsrYn2d6kVVeMOzjquFg==
+X-Received: by 2002:a05:6000:1447:b0:385:ee40:2d88 with SMTP id ffacd0b85a97d-390cc5f20e0mr2112696f8f.3.1740477542496;
+        Tue, 25 Feb 2025 01:59:02 -0800 (PST)
+Received: from [192.168.88.253] (146-241-59-53.dyn.eolo.it. [146.241.59.53])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390cd883934sm1747035f8f.59.2025.02.25.01.59.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Feb 2025 01:59:02 -0800 (PST)
+Message-ID: <4f37d18c-6152-42cf-9d25-98abb5cd9584@redhat.com>
+Date: Tue, 25 Feb 2025 10:59:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF0000C37E:EE_|IA1PR12MB7685:EE_
-X-MS-Office365-Filtering-Correlation-Id: beab6cbe-2faa-4ad4-2a87-08dd55830849
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?FK4rnW8FKRCB2bUHoJRzRtBCkt0YDpo5V24O0HfcSHE9BqdLHH5vy1qEhNLa?=
- =?us-ascii?Q?iaaeOwKbxwKZPyaijp87Zh09cHledeav/XdxXeVzL/jQP2sAa36qZ67XExdb?=
- =?us-ascii?Q?RPRDRWSJukQGf5cAONe+GS7WJlZ1eJXXhlq1S1wNb2IL4Dm7Up/nhLb4u2t3?=
- =?us-ascii?Q?1J6YYCjVkPLnMa+tmJlR45Q8OoUszafiJHp53qGMam5DJaT1ZTYQaXuJNc9W?=
- =?us-ascii?Q?VRy466r6QbM+gkxeDzp1rBar4XZT1DzHFgVzqEHfV/dE4ftXPoAGFpuuNJws?=
- =?us-ascii?Q?yBp0uZ1gF6Fma1RnoGudogMp5SLcOf3Ij3W+2KVXK+F4Rur8G851JAPhK7uU?=
- =?us-ascii?Q?NLZX4YC4bbfxH0BbMeMTfz+hHUMcDm4X/4qytexjf2tN7Tvs+r3F7PwmO8Im?=
- =?us-ascii?Q?k0l8PbxnSb9IMefs2tlh5bqYapIn3cZqAzQmOkh/Hth1LSP469UIJvFuB78Z?=
- =?us-ascii?Q?g+2eDPU/JbX7sewQ7B6HlV4uIAljUEG5hN0XMZT8R4D1xpgIP1CP1cXlUVJo?=
- =?us-ascii?Q?NLCK+jMpqeZECcMIcLAQpIcBKtL0v2NYQPVE6a44KwCXW9FcTpp94xIl3TKH?=
- =?us-ascii?Q?7HiiyWtohdRLK9u4y7uGHt6n+ersx5nbSVQ7T37xSwRy8jzamlv1oUaT3OUu?=
- =?us-ascii?Q?ZMsRE/0S3YiVtjPIC8AphK28ulJ3Xd1gfWlTjC2WZ/dnJ+iZHredEG5L54Ej?=
- =?us-ascii?Q?RH0oZmZEXmHBqrMC4M1YbuG2zTGyIhElZnt4oWcrIOrYQp2xI4rEXLl0cuaz?=
- =?us-ascii?Q?vxxq8cpElNbK2nNgB8iJ/1EoDnb3+7WjKuimacXCWEjCHh20DZxZZYE+ebxx?=
- =?us-ascii?Q?IboTePe6kZwPIQuF+91nXwJ5QkD2Pe5ysp463SoLZ2BVnGcaiVjhA4A6zXui?=
- =?us-ascii?Q?GtN2XN+774H4qYnPuQnxGUkGlap+RzMUWNZEuI70aiW9BUnnsfAIRN7uTfXY?=
- =?us-ascii?Q?LjlAAfwxMinHqKeuNSrMQsU2B8oDnegv0fIHMDQ0Hiu0ClxHOkaGEpPSWIbb?=
- =?us-ascii?Q?BkfqUyWVO/A43q3Q3NbH4L5tLY8lrDI/J0ty1fDNferecn3gUl0z4gLL76Og?=
- =?us-ascii?Q?/zW6gFpgcTUG9uxRjVNyyGYP76FyA109vvHlOLpJJ3HH3iBY+ckOG1p3GdGn?=
- =?us-ascii?Q?54x1MKGhSySAVTBvMFlpQm93ybOwSmrTlgHSR69yGkYOKYsglCtO7/Zh68Pa?=
- =?us-ascii?Q?xzjp3B2etmthWhuAYVCh03fgw4U4bsCq2F5qUirSbLlnQvHFBWQJwpZSossS?=
- =?us-ascii?Q?fbEIhuC9I69SE0vJ3LpfEoLO3tNGKda2nBF4bUqQDqe7tkOcu3GtqxJT+KEK?=
- =?us-ascii?Q?cwT769rJyVAGVVODGULseaMXGPdtd3E3s7KIBgh8NLBcMcttdleZioBtJLJk?=
- =?us-ascii?Q?ZAx2b/GrBQxI7Gr7w7XaVK3pqfRFqi7fC1bZdUU2+CePQW9mGX5c0LUjdSpP?=
- =?us-ascii?Q?W+z0G681w9Nrm1fefeJeREziSFG72XsADMIf2sExr0hg0lrChjDrwhOoPzbP?=
- =?us-ascii?Q?40aWaUbFdQqSspQ=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2025 09:59:02.3005
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: beab6cbe-2faa-4ad4-2a87-08dd55830849
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF0000C37E.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7685
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] tcp: be less liberal in tsecr received while in
+ SYN_RECV state
+To: Eric Dumazet <edumazet@google.com>,
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>,
+ Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com, Jakub Kicinski <kuba@kernel.org>,
+ Yong-Hao Zou <yonghaoz1994@gmail.com>, "David S . Miller"
+ <davem@davemloft.net>, Neal Cardwell <ncardwell@google.com>
+References: <20250224110654.707639-1-edumazet@google.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250224110654.707639-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 2/24/25 12:06 PM, Eric Dumazet wrote:
+> Yong-Hao Zou mentioned that linux was not strict as other OS in 3WHS,
+> for flows using TCP TS option (RFC 7323)
+> 
+> As hinted by an old comment in tcp_check_req(),
+> we can check the TSecr value in the incoming packet corresponds
+> to one of the SYNACK TSval values we have sent.
+> 
+> In this patch, I record the oldest and most recent values
+> that SYNACK packets have used.
+> 
+> Send a challenge ACK if we receive a TSecr outside
+> of this range, and increase a new SNMP counter.
+> 
+> nstat -az | grep TcpExtTSECR_Rejected
+> TcpExtTSECR_Rejected            0                  0.0
+> 
+> Reported-by: Yong-Hao Zou <yonghaoz1994@gmail.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  .../networking/net_cachelines/snmp.rst        |  1 +
+>  include/linux/tcp.h                           |  2 ++
+>  include/uapi/linux/snmp.h                     |  1 +
+>  net/ipv4/proc.c                               |  1 +
+>  net/ipv4/tcp_minisocks.c                      | 25 +++++++++++--------
+>  net/ipv4/tcp_output.c                         |  3 +++
+>  6 files changed, 22 insertions(+), 11 deletions(-)
+> 
+> diff --git a/Documentation/networking/net_cachelines/snmp.rst b/Documentation/networking/net_cachelines/snmp.rst
+> index 90ca2d92547d44fa5b4d28cb9d00820662c3f0fd..bc96efc92cf5b888c1e441412c78f3974be1f587 100644
+> --- a/Documentation/networking/net_cachelines/snmp.rst
+> +++ b/Documentation/networking/net_cachelines/snmp.rst
+> @@ -36,6 +36,7 @@ unsigned_long  LINUX_MIB_TIMEWAITRECYCLED
+>  unsigned_long  LINUX_MIB_TIMEWAITKILLED
+>  unsigned_long  LINUX_MIB_PAWSACTIVEREJECTED
+>  unsigned_long  LINUX_MIB_PAWSESTABREJECTED
+> +unsigned_long  LINUX_MIB_TSECR_REJECTED
+>  unsigned_long  LINUX_MIB_DELAYEDACKLOST
+>  unsigned_long  LINUX_MIB_LISTENOVERFLOWS
+>  unsigned_long  LINUX_MIB_LISTENDROPS
+> diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+> index f88daaa76d836654b2a2e217d0d744d3713d368e..159b2c59eb6271030dc2c8d58b43229ebef10ea5 100644
+> --- a/include/linux/tcp.h
+> +++ b/include/linux/tcp.h
+> @@ -160,6 +160,8 @@ struct tcp_request_sock {
+>  	u32				rcv_isn;
+>  	u32				snt_isn;
+>  	u32				ts_off;
+> +	u32				snt_tsval_first;
+> +	u32				snt_tsval_last;
+>  	u32				last_oow_ack_time; /* last SYNACK */
+>  	u32				rcv_nxt; /* the ack # by SYNACK. For
+>  						  * FastOpen it's the seq#
+> diff --git a/include/uapi/linux/snmp.h b/include/uapi/linux/snmp.h
+> index 848c7784e684c03bdf743e42594317f3d889d83f..b85dd84dda5c13471e2f62c3a4ffb11b22f787f8 100644
+> --- a/include/uapi/linux/snmp.h
+> +++ b/include/uapi/linux/snmp.h
+> @@ -186,6 +186,7 @@ enum
+>  	LINUX_MIB_TIMEWAITKILLED,		/* TimeWaitKilled */
+>  	LINUX_MIB_PAWSACTIVEREJECTED,		/* PAWSActiveRejected */
+>  	LINUX_MIB_PAWSESTABREJECTED,		/* PAWSEstabRejected */
+> +	LINUX_MIB_TSECR_REJECTED,		/* TSECR_Rejected */
+>  	LINUX_MIB_PAWS_OLD_ACK,			/* PAWSOldAck */
+>  	LINUX_MIB_DELAYEDACKS,			/* DelayedACKs */
+>  	LINUX_MIB_DELAYEDACKLOCKED,		/* DelayedACKLocked */
+> diff --git a/net/ipv4/proc.c b/net/ipv4/proc.c
+> index affd21a0f57281947f88c6563be3d99aae613baf..2f0d2cf7cae45d824f8c506df3f83c175e794a0a 100644
+> --- a/net/ipv4/proc.c
+> +++ b/net/ipv4/proc.c
+> @@ -189,6 +189,7 @@ static const struct snmp_mib snmp4_net_list[] = {
+>  	SNMP_MIB_ITEM("TWKilled", LINUX_MIB_TIMEWAITKILLED),
+>  	SNMP_MIB_ITEM("PAWSActive", LINUX_MIB_PAWSACTIVEREJECTED),
+>  	SNMP_MIB_ITEM("PAWSEstab", LINUX_MIB_PAWSESTABREJECTED),
+> +	SNMP_MIB_ITEM("TSECR_Rejected", LINUX_MIB_TSECR_REJECTED),
+>  	SNMP_MIB_ITEM("PAWSOldAck", LINUX_MIB_PAWS_OLD_ACK),
+>  	SNMP_MIB_ITEM("DelayedACKs", LINUX_MIB_DELAYEDACKS),
+>  	SNMP_MIB_ITEM("DelayedACKLocked", LINUX_MIB_DELAYEDACKLOCKED),
+> diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+> index 1eccc518b957eb9b81cab8b288cb6a5bca931e5a..a87ab5c693b524aa6a324afe5bf5ff0498e528cc 100644
+> --- a/net/ipv4/tcp_minisocks.c
+> +++ b/net/ipv4/tcp_minisocks.c
+> @@ -663,6 +663,7 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+>  	struct sock *child;
+>  	const struct tcphdr *th = tcp_hdr(skb);
+>  	__be32 flg = tcp_flag_word(th) & (TCP_FLAG_RST|TCP_FLAG_SYN|TCP_FLAG_ACK);
+> +	bool tsecr_reject = false;
+>  	bool paws_reject = false;
+>  	bool own_req;
+>  
+> @@ -672,8 +673,12 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+>  
+>  		if (tmp_opt.saw_tstamp) {
+>  			tmp_opt.ts_recent = READ_ONCE(req->ts_recent);
+> -			if (tmp_opt.rcv_tsecr)
+> +			if (tmp_opt.rcv_tsecr) {
+> +				tsecr_reject = !between(tmp_opt.rcv_tsecr,
+> +							tcp_rsk(req)->snt_tsval_first,
+> +							READ_ONCE(tcp_rsk(req)->snt_tsval_last));
+>  				tmp_opt.rcv_tsecr -= tcp_rsk(req)->ts_off;
+> +			}
+>  			/* We do not store true stamp, but it is not required,
+>  			 * it can be estimated (approximately)
+>  			 * from another data.
+> @@ -788,18 +793,14 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+>  	     tcp_rsk(req)->snt_isn + 1))
+>  		return sk;
+>  
+> -	/* Also, it would be not so bad idea to check rcv_tsecr, which
+> -	 * is essentially ACK extension and too early or too late values
+> -	 * should cause reset in unsynchronized states.
+> -	 */
+> -
+>  	/* RFC793: "first check sequence number". */
+>  
+> -	if (paws_reject || !tcp_in_window(TCP_SKB_CB(skb)->seq,
+> -					  TCP_SKB_CB(skb)->end_seq,
+> -					  tcp_rsk(req)->rcv_nxt,
+> -					  tcp_rsk(req)->rcv_nxt +
+> -					  tcp_synack_window(req))) {
+> +	if (paws_reject || tsecr_reject ||
+> +	    !tcp_in_window(TCP_SKB_CB(skb)->seq,
+> +			   TCP_SKB_CB(skb)->end_seq,
+> +			   tcp_rsk(req)->rcv_nxt,
+> +			   tcp_rsk(req)->rcv_nxt +
+> +			   tcp_synack_window(req))) {
+>  		/* Out of window: send ACK and drop. */
+>  		if (!(flg & TCP_FLAG_RST) &&
+>  		    !tcp_oow_rate_limited(sock_net(sk), skb,
+> @@ -808,6 +809,8 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+>  			req->rsk_ops->send_ack(sk, skb, req);
+>  		if (paws_reject)
+>  			NET_INC_STATS(sock_net(sk), LINUX_MIB_PAWSESTABREJECTED);
+> +		else if (tsecr_reject)
+> +			NET_INC_STATS(sock_net(sk), LINUX_MIB_TSECR_REJECTED);
+>  		return NULL;
+>  	}
+>  
+> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> index 9a3cf51eab787859ec82432ee6eb9f94e709b292..485ca131091e58616b4f3076acc2ad7a478de89d 100644
+> --- a/net/ipv4/tcp_output.c
+> +++ b/net/ipv4/tcp_output.c
+> @@ -943,6 +943,9 @@ static unsigned int tcp_synack_options(const struct sock *sk,
+>  		opts->options |= OPTION_TS;
+>  		opts->tsval = tcp_skb_timestamp_ts(tcp_rsk(req)->req_usec_ts, skb) +
+>  			      tcp_rsk(req)->ts_off;
+> +		if (!req->num_timeout)
+> +			tcp_rsk(req)->snt_tsval_first = opts->tsval;
+> +		WRITE_ONCE(tcp_rsk(req)->snt_tsval_last, opts->tsval);
+>  		opts->tsecr = READ_ONCE(req->ts_recent);
+>  		remaining -= TCPOLEN_TSTAMP_ALIGNED;
+>  	}
 
-Ido Schimmel <idosch@nvidia.com> writes:
+It looks like this change causes mptcp self-test failures:
 
-> Add port mask support, allowing users to specify a source or destination
-> port with an optional mask. Example:
->
->  # ip rule add sport 80 table 100
->  # ip rule add sport 90/0xffff table 200
->  # ip rule add dport 1000-2000 table 300
->  # ip rule add sport 0x123/0xfff table 400
->  # ip rule add dport 0x4/0xff table 500
->  # ip rule add dport 0x8/0xf table 600
->  # ip rule del dport 0x8/0xf table 600
->
-> In non-JSON output, the mask is not printed in case of exact match:
->
->  $ ip rule show
->  0:      from all lookup local
->  32761:  from all dport 0x4/0xff lookup 500
->  32762:  from all sport 0x123/0xfff lookup 400
->  32763:  from all dport 1000-2000 lookup 300
->  32764:  from all sport 90 lookup 200
->  32765:  from all sport 80 lookup 100
->  32766:  from all lookup main
->  32767:  from all lookup default
->
-> Dump can be filtered by port value and mask:
->
->  $ ip rule show sport 80
->  32765:  from all sport 80 lookup 100
->  $ ip rule show sport 90
->  32764:  from all sport 90 lookup 200
->  $ ip rule show sport 0x123/0x0fff
->  32762:  from all sport 0x123/0xfff lookup 400
->  $ ip rule show dport 4/0xff
->  32761:  from all dport 0x4/0xff lookup 500
->
-> In JSON output, the port mask is printed as an hexadecimal string to be
-> consistent with other masks. The port value is printed as an integer in
-> order not to break existing scripts:
->
->  $ ip -j -p rule show sport 0x123/0xfff table 400
->  [ {
->          "priority": 32762,
->          "src": "all",
->          "sport": 291,
->          "sport_mask": "0xfff",
->          "table": "400"
->      } ]
->
-> The mask attribute is only sent to the kernel in case of inexact match
-> so that iproute2 will continue working with kernels that do not support
-> the attribute.
->
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+https://netdev-3.bots.linux.dev/vmksft-mptcp/results/6642/1-mptcp-join-sh/stdout
 
-Reviewed-by: Petr Machata <petrm@nvidia.com>
+ipv6 subflows creation fails due to the added check:
+
+# TcpExtTSECR_Rejected            3                  0.0
+
+(for unknown reasons the ipv4 variant of the test is successful)
+
+I haven't digged into the code yet. I'll hope to have a better look
+later, but it will not be too soon.
+
+Cheers,
+
+Paolo
+
 
