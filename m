@@ -1,380 +1,284 @@
-Return-Path: <netdev+bounces-169480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82D4CA4428D
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 15:24:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CB3CEA44292
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 15:26:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 996C116CDC4
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 14:20:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA06842318B
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 14:21:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 893C9269CEB;
-	Tue, 25 Feb 2025 14:20:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 620D126B082;
+	Tue, 25 Feb 2025 14:21:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l32UPZdx"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="oCx2znV3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2085.outbound.protection.outlook.com [40.107.93.85])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F32126C18;
-	Tue, 25 Feb 2025 14:20:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740493239; cv=none; b=rWGQCZbhZHBEhIPfKx2VbJKAsipAUlPYhyUYdWZODtizOkAjXK0LVpL4s07DanArzNoJmJGIWXBaMm/sYApxqQxlrlKW0KfEISTWdt/uGJ09gFUw+88hzNjSqQLKRiiUZvB2x1UCN9QCBG9FEpEetKjA9rWOHkNPue68K2wh+FA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740493239; c=relaxed/simple;
-	bh=igL96eUEZrEr7nXbYX4xSAi+Is+y1+sZ4i8SGsdn+rw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kFX/iqEZGgV018mmTvOmgvjtsxvSjMbo3HLL7wFjFrouNeSLhIMykrUQhgH8Fe5QYCnwSNQpPKQ5DExm0yXeMq2RzURIJafkufKqdsPXyX941X0rDwFIr4GbfvUyUSc1drsRxEZnkp9zPDcUGUeuAm+hF0JYCFjoYjC6dmln82o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l32UPZdx; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-220d28c215eso87779015ad.1;
-        Tue, 25 Feb 2025 06:20:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740493237; x=1741098037; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pH6kCz8lTpjp3q7JFqjKA+FgBtUVtLCpjnGefR5mF5k=;
-        b=l32UPZdx67KNPYRn63WdCiA5o1RngRRcjta9ekdoM4ODbTaDBwtniCLew39vzy79N8
-         2vR51cK/kBRvgSBqK/Q1VOalgI08fxRmwyoIlbhGgOFapSocVm6L2PnPU2iRPD/3pdlu
-         Cxi9lyQPkmqN0zYkX0Bao3VqgVTA9nw+O0Wdlg1gM40i8lhg6Cv7M+jIZdhTydLRoY/c
-         eR0Q6HlTyMQXt6NrfVRDBOxbLvcRISpMZX/hPJ51P6Y/Qej+uGIrLrPGJw4e78bgmJ5X
-         7JmikLePAXGw3RhGd0Qrgt4F2cynzoMjsPLS6tFviuGN7H1bzOc9h5z4owrkyi1Td0KN
-         1xrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740493237; x=1741098037;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pH6kCz8lTpjp3q7JFqjKA+FgBtUVtLCpjnGefR5mF5k=;
-        b=hkUihvKc6DPrj9NR0Oo+LEeu3YZQ9DqoUD419eMO0H8j1YTDGiPCtp7MpEah0fj2xC
-         Hp8QaMVLjNweCCYSQX8TG+xasOR52rZHhXt0n0g+rpjSRRg+3/xb/KPX26YJKbrYF8Lw
-         VuqUpOUgPk9MqC+ZTotJRdUyxkZZp/4DK5YDWhhqBla1nLBNgTlJ7T8tJr2aB5tVCNWS
-         Equ4yg92WTOmSmlLbDehjqTaGsCN1PHu7iKe4M01kk/TzQgoPKt7oCpoZHVDYlA9hHjD
-         yWj+8dROVDIk6OV7wg8TfZApWpRhyD+BW8HTbqcms/sbbnrAuI/38VQGaYqoOkC7HNn9
-         vOdg==
-X-Forwarded-Encrypted: i=1; AJvYcCU1DIrzUzrhtepBROBkn5gVsBuaHb6fnyJAPsvLMzG5InWDbSFp7ntzMIi7vmQoG5122qg=@vger.kernel.org, AJvYcCUGJP75ulyZJeTtkYcthdvw1IGm2TUdKeTmR6tGARwCDS80toPhECx4wAWohgMv8lXwHDamz/LnMX5C6BE=@vger.kernel.org, AJvYcCW1G/sRPezlb6Tx0gfsqpzl0QzXfe1bC4xbozwfYY/2pd+uC5ajpfGARIw9+7u8Bv/59CdlNKR4pt7BdOd1b+8=@vger.kernel.org, AJvYcCWjdDiTYXviznEV4fPTHiMa4dnjerg6fpDac1cCbXV3Ax0j6HQ4pGtnM/zOJbjsUWGL5rRV8lgc0y1cxZd6@vger.kernel.org, AJvYcCX/W1hvsrXueQsd8AANgUvBCgtOgvidLJyQn2KDntm3Th6FwpgcydNd1zPhhMf6lHtiCnkxKH88wV/3Cz6t@vger.kernel.org, AJvYcCXMiMod8z4lh0qgjvJf4xQJsHelcf0DHfchUUlAXA5bjgZhxO6jTyfqITSb2wKU/gkQdsmgpyZ1@vger.kernel.org, AJvYcCXUvEo7acbk8Iic/OabaEvH0+kARNiuNDb9FQHvXnE1FEgvHd9lEosk8xDAgzGNE6BWwN4jb2yWMGDUwuo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkdD8+2F8Vec3/ek29a0PsxsU0tBiCDLDoOp7odiO+vBnc9FMW
-	r51qZXUSCyQe8WJCaSfZtj2yzLRlHzoQ4pdTrQfkQtorFcc9+onq
-X-Gm-Gg: ASbGncvZQFb+bL6wKtMgPk66kQxQwI+PTik994XtBCbO2I/roHMQc6q9w2lSWMOFkm0
-	gfHuYFphQ5yO5jeHJFzZhxbdSp1/CNaZyUe7yR8Ew5SWdNDjGaLvKtiPBTi8v/zKb32LsofC8zm
-	vF4L6i8dAqQ5W+9FHANwRc1+IrJN1qxe5koou5zhlqF6zz2vKAbmILoGGJV7J6So+nOw/tAfl4M
-	OpmcY1NIrA2F0hAotxyliJYa9FwRR7ResbCuqmCBk2WALsBM9TC+j1N84JN77NdPBA8PZ1GIONu
-	dClQ3GRp3MYeY8HW7ooNX9/NSAgk5yr2eKCadT92ZgXFssvF1YUNpA==
-X-Google-Smtp-Source: AGHT+IF5xwcyMuEse5d6U24DTrm7La/i/EXLcWUjTbDTBaLHgklr2LYp0Shxn4PZ0SRkVV82FkT4WQ==
-X-Received: by 2002:a05:6a00:3392:b0:730:9946:5973 with SMTP id d2e1a72fcca58-734790a2af5mr5118831b3a.5.1740493236834;
-        Tue, 25 Feb 2025 06:20:36 -0800 (PST)
-Received: from visitorckw-System-Product-Name ([140.113.216.168])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7347a72ef60sm1586035b3a.75.2025.02.25.06.20.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Feb 2025 06:20:36 -0800 (PST)
-Date: Tue, 25 Feb 2025 22:20:26 +0800
-From: Kuan-Wei Chiu <visitorckw@gmail.com>
-To: Yury Norov <yury.norov@gmail.com>
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, x86@kernel.org, jk@ozlabs.org,
-	joel@jms.id.au, eajames@linux.ibm.com, andrzej.hajda@intel.com,
-	neil.armstrong@linaro.org, rfoss@kernel.org,
-	maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-	tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
-	dmitry.torokhov@gmail.com, mchehab@kernel.org,
-	awalls@md.metrocast.net, hverkuil@xs4all.nl,
-	miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
-	louis.peens@corigine.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	parthiban.veerasooran@microchip.com, arend.vanspriel@broadcom.com,
-	johannes@sipsolutions.net, gregkh@linuxfoundation.org,
-	jirislaby@kernel.org, akpm@linux-foundation.org, hpa@zytor.com,
-	alistair@popple.id.au, linux@rasmusvillemoes.dk,
-	Laurent.pinchart@ideasonboard.com, jonas@kwiboo.se,
-	jernej.skrabec@gmail.com, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, linux-fsi@lists.ozlabs.org,
-	dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
-	oss-drivers@corigine.com, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev,
-	brcm80211-dev-list.pdl@broadcom.com, linux-serial@vger.kernel.org,
-	bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw,
-	Yu-Chun Lin <eleanor15x@gmail.com>
-Subject: Re: [PATCH 02/17] bitops: Add generic parity calculation for u64
-Message-ID: <Z73RqnMRS+31wzrv@visitorckw-System-Product-Name>
-References: <20250223164217.2139331-1-visitorckw@gmail.com>
- <20250223164217.2139331-3-visitorckw@gmail.com>
- <Z7zIBwH4aUA7G9MY@thinkpad>
- <Z73FxIv353lbXO3A@visitorckw-System-Product-Name>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9B3269803;
+	Tue, 25 Feb 2025 14:21:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.85
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740493285; cv=fail; b=CYu+Q8TJVcuyioptpErSXn1NyXhX6tGaulZgvdkKabC+sARt4lsPKLUdT+sZ6Jikqu5iADmWtdj+ISXP79Q5gPFJg7Ivcsc8f/nfimTeNoUVGvlQM0HYvfeKPw0AOMW1No+qo8lajjAHMfcvYoxZtYZ7GfJJU/4DKEF+Rv1lt9M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740493285; c=relaxed/simple;
+	bh=lMPqFHNmGrj7dIrim2wtt8TZCe4jZe7c8mLJeO/ts2g=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=H35VfBRS+ao7YhV0XOLsS7Ay6PwsVRPHCxnMzontWmOkl7rsCEga1unTXBS03eYVk9dItEXDV5TYyWMhn6kEASlfBa/JomW9Oncf6mbZSRW7aSKFzFau2/AKn1hz3HOzTIBJ3cWzEfWhHEkcErewROfT72G7CqtEa686lT6gK6E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=oCx2znV3; arc=fail smtp.client-ip=40.107.93.85
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=WSQm8e2lbdLMG0W8vrdE86J0dyAxgRDdVzvKfJZfWpYueQQoeQ3DWSoOfavQk7pU+KkPE78IkxSPF3tpbgSwafgL9rcBZApfYgFN3QIWZvGWRg9OMmN9nHKGEQeXY1+R8J+RRS6ztXD+tLKRXIT9BdOKnPs2tEIioUKrtzv1MPSosZ4/abn9gCrq9vrk+kBAQD/R03aKfp7E2Rkn7F+m4+ZF6uRbb7Ei01kTP4BeVP/nNnbL0FIlRDSb5aiwCjlaQ8/8G2v05KwUwwyHZV+Yzi6r9d/JmdHScWQdRG6imOb6COzqEgDZrY2D7beYTIPC7RcgStlGvzu7rXCFKkx1CA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=c3cl0mYF1Tw6ztEBysd6MbBFFKn2Jv3whEDlQfgPMs8=;
+ b=johJMWE2YgzLh1OuuyVmHGnUfMhERuhoRrW3VY0KM8OdFQBJc7gxIu0bM+J9+R7q/W77xtCDzxiNDSLt7XSpjuOahjZp8LbZFHd5DiMevbFTSr49VoopXewKgCAeb9yYk3EEcryMOJ62a3gKjoBcAIK5/c/yZ1P/V6L2c/S9w9KpdJRzqQZtUqcC2/H/Aq901hUSVaj/LLzFbl/Sj6Jm7PAAGVP2NATJVDbYVT23LXUf6sTEmmwOEuwK3gvnGwil0ewpnYN7QJr5vWPbP10oMd3esuLe8ypt+YNdd+cwR2qok8cQSZzEii88S571JjdYtLrRSDAwb+lCCOCZK+kigg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=c3cl0mYF1Tw6ztEBysd6MbBFFKn2Jv3whEDlQfgPMs8=;
+ b=oCx2znV3B+ntfV8g+smLf9OoL6P9iX99peH0HfcylNAg2EbEyJrW5AGjU/vncG4JboDuSubg2CTARmCSBWaB5qvDOz3Yji4/st4n9WjAO+CsvJlfCBA9LLNOinqxybFlhJ2Mp2+nARZfDBW988yQOoIUujRx1fsp+MocHuse02Kdhqu4zNe1MKaggnRhOvXt5iZbmRsMHNqmxc9eBza0UTqUoF0t9xczRIm3dZ2/RKsgVJ8wrFrmVexm5tb2/3/sGCf3mS5nkW2hFDu8OGI8ROsX9y9FHXzXJwz2VduAM4fgYq+465ZqbzAY8ly6KbmuIQWeu8+kZf/RfHTeGtypzw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SJ2PR12MB8784.namprd12.prod.outlook.com (2603:10b6:a03:4d0::11)
+ by SN7PR12MB6765.namprd12.prod.outlook.com (2603:10b6:806:26b::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.13; Tue, 25 Feb
+ 2025 14:21:16 +0000
+Received: from SJ2PR12MB8784.namprd12.prod.outlook.com
+ ([fe80::1660:3173:eef6:6cd9]) by SJ2PR12MB8784.namprd12.prod.outlook.com
+ ([fe80::1660:3173:eef6:6cd9%6]) with mapi id 15.20.8466.016; Tue, 25 Feb 2025
+ 14:21:16 +0000
+Message-ID: <31731125-ab8f-48d9-bd6f-431d49431957@nvidia.com>
+Date: Tue, 25 Feb 2025 14:21:01 +0000
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 9/9] net: stmmac: convert to phylink managed EEE
+ support
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ Bryan Whitehead <bryan.whitehead@microchip.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com,
+ "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+References: <6ab08068-7d70-4616-8e88-b6915cbf7b1d@nvidia.com>
+ <Z63Zbaf_4Rt57sox@shell.armlinux.org.uk>
+ <Z63e-aFlvKMfqNBj@shell.armlinux.org.uk>
+ <05987b45-94b9-4744-a90d-9812cf3566d9@nvidia.com>
+ <Z68nSJqVxcnCc1YB@shell.armlinux.org.uk>
+ <86fae995-1700-420b-8d84-33ab1e1f6353@nvidia.com>
+ <Z7X6Z8yLMsQ1wa2D@shell.armlinux.org.uk>
+ <203871c2-c673-4a98-a0a3-299d1cf71cf0@nvidia.com>
+ <Z7YtWmkVl0rWFvQO@shell.armlinux.org.uk>
+ <fd4af708-0c92-4295-9801-bf53db3a16cc@nvidia.com>
+ <Z7ZF0dA4-jwU7O2E@shell.armlinux.org.uk>
+From: Jon Hunter <jonathanh@nvidia.com>
+Content-Language: en-US
+In-Reply-To: <Z7ZF0dA4-jwU7O2E@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CWLP123CA0063.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:401:59::27) To SJ2PR12MB8784.namprd12.prod.outlook.com
+ (2603:10b6:a03:4d0::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z73FxIv353lbXO3A@visitorckw-System-Product-Name>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR12MB8784:EE_|SN7PR12MB6765:EE_
+X-MS-Office365-Filtering-Correlation-Id: c1e70885-0438-43d3-3cda-08dd55a7aa4d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?WG9Rb2c0dWE5WkJGYlREQUdNSDVOR0dZMEVFemdZbm1TT2RUdTczNkN1ZGN0?=
+ =?utf-8?B?a0wwN3kreFo4Y2xJUFViMS9Xdk5kYkh0MW1oazhpdTNYbUN3Qjc5Sk9NamVJ?=
+ =?utf-8?B?UmRLUjJGOGlqWitxeVV3VnZNNzk3bnFXNzhHZDJud294Nk9xMlArNXhtb3lE?=
+ =?utf-8?B?ZUlqWXdKRGw2aGNsckUzSU5XSUcxSjFMd3BRTWV0MW4yektBNWN2dHVSdDUz?=
+ =?utf-8?B?TjlxSkxkMDVMVWwyL3lNcjBqVnIxM29hOWVFcWtweVVjaDV0RFNCRkRLMHNj?=
+ =?utf-8?B?MWw2RVJVTEVyLzlkcndHRUN6Rk9FbEpVNWE1TjlncTVOVGlIYVRzQWh1bm1u?=
+ =?utf-8?B?T2svd2dzdmdtV3ptK1lEZnduc1pLTHY1dU9neVhsVlJ1YXhxMnFRdDM2b1RX?=
+ =?utf-8?B?TythRUtYOUZndGl6dlR3NXRHc1NxY1F2WmVJU1dJbGozRWUxOUtWcWMxWnRX?=
+ =?utf-8?B?L296UkJCcUlTb0FzejdydjhDcDhRMnJVVXFEYTI4TU13eTB3L05WdHNyT3dU?=
+ =?utf-8?B?MlFZUHZZZXdZd20vNlY2b0VHM3dvd1cva1dGL2VWN1IyaGlXSXQ1RkorL2sx?=
+ =?utf-8?B?WDFsNFZaUVNDWUw0MW5RRFhBYXdBR2lPVDJHOW51YkdsWDFveEsyU1BXY1la?=
+ =?utf-8?B?ZFhHNFVWRHVCRlRrUHJ1ME5GUE8ranpQTGtOWnVqVzkwd2hYU2tWVXpBSW0w?=
+ =?utf-8?B?SWxXcWNGTnlMN0VGblQyR0RKTHNubmVDdnMyZmFaK01WOFEybHlDRzNwVjAw?=
+ =?utf-8?B?L3JWV09KbTVEMmlEWXRSaHgwWDhhcmh6S1dyRE1pUWQ5dmRmYVpqYm9obGds?=
+ =?utf-8?B?aE9nN3YzZ0wyWGx6VGZ1QjdPMkxhNmtmV0FKM2RMZ0NOOXEvaGhYaHNEU2Iy?=
+ =?utf-8?B?YVI4cjQ2bktPRk0rKzN3dS9PRE9uNFVITG1kcEsvTUdKYTBvYWY5c0RXLzFX?=
+ =?utf-8?B?NUw0TWR2Z21qTFdVYVU4Q0F3bWUrVUc4aGJQbU16WFN0MjZtR0oxTEJQakRU?=
+ =?utf-8?B?UHJCOFRvU1RJd01tUmdLeDZNZHIxRDVFNVd4eTUrZXI2QVMzckYyeHhON3R6?=
+ =?utf-8?B?TkVjR1U2ay85aEdkaGtuNjNuc1IzTm9ramRlaS9wVHBLbVA3NDlvRWRLWll5?=
+ =?utf-8?B?alpmdk04VnBCY01wMmlMQVBpL1Q2WHVTNjcyRXJKYVdaQXVoTzVYRWk3RS9B?=
+ =?utf-8?B?elZaNXRuVVRWU3BqdUJqLzhYdlNnMWVVbGwwVVVkVlpPNG82QVJISFlNU2Ew?=
+ =?utf-8?B?T002SGUyNEgyd3BnbUc2dkxJRlhIaVJXMmtLMERyS2FsZDhsQmMrYXd2dDFj?=
+ =?utf-8?B?N3FTd1hKQys1eTdBa1dEeXptN0cvY1lsZUdrVVZrYXNFNjZ6SndORDVVRGV6?=
+ =?utf-8?B?eXYxOUppUGVQN1hGQlR2YXdyLzJtVFYzb1ZyVlNGQjVWZ1ZQWG9wc3JNMDZa?=
+ =?utf-8?B?U0NJQTNiNnVzRGs0NkZhSGFPMGpLdForRXc4emRpOWdFSmtnRWZtZ3F3Q1p1?=
+ =?utf-8?B?a3lWVlhIbElGMGVwL2VGSm9oditxZkE3OVlvVXZvNG40UjlxQmJyVFJCOWxo?=
+ =?utf-8?B?cGdLT21ZQ2pzYXZkd1NkVDQxeVhhYVBVcGtncEJRNm0vYXBjSlN4bk9IWUQ3?=
+ =?utf-8?B?VzVxMXdjR25JTnRHM0tRY0ZMNlBjbkl0bzgxWDlVOXQzMyttb1IzaERHbUg0?=
+ =?utf-8?B?M09jTSt6R0Q4TzdiMXAzZ3MxWHR6SzZ1bFFqUWNnV3JSdTVWUWFmM05jQXZp?=
+ =?utf-8?B?N0lQT250WGRNTkQ2Z0pVeFNJUC9IbU1GK2pEZittUW9mNlRSRkUyWGpDc2Y1?=
+ =?utf-8?B?aHo0c0wvSkxiZ2lHNnZFODJnR0dTeU1Fb3RHU1VLaHU5aEU4NWNieHVyMmI5?=
+ =?utf-8?Q?CXulxPokJ/+jl?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR12MB8784.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Q1RSWkFjR3N0aXMxemhkZlQwS25Kclg4S2JzSjNMd2JLYmNiSDRUeW9KTHhS?=
+ =?utf-8?B?NXhIbmtmMUR5MEhNYmxuY3dMUkFCZG1GRzZRa29DMWliVDBpR25zelBOMENi?=
+ =?utf-8?B?eVN6L3B2dzVyM1RPUWIxY1pNSG56TmtMSEM3WFJHMm5BRXB2emlROUtOSnVk?=
+ =?utf-8?B?WVRmVWc2R3ZvS01QVUMrSjFWMHVCcjNqRC9uYytQRC9QMWRNT0h1aWpNcHk4?=
+ =?utf-8?B?TUZOQThpRXZzc1o4WlBSY09sWmJvM25WR1ludVZrZmFxamlzQ3dWQUxXaTZJ?=
+ =?utf-8?B?VFZXSG4wS0NGS0wzcGhzeDRsbG5xdng2SVh0cEJ6cTZSeXpzdlp4NmNrbTUx?=
+ =?utf-8?B?VVNUeGlpYjZTUXhrYnFQVTlZR3g5KzlCOFgvSmpmWml0RmZXS0pWQ1FWYitN?=
+ =?utf-8?B?NlB6bFptMXd5bVlkejFLV0RhS2R5emQ3c0pERVpKSE05aWNPekR0SGhJdGZQ?=
+ =?utf-8?B?TlhYOEVoNnVlM0xUdXZzYWlEU00vMDFJOTd4ZURLMmFyTUZpY2RaNHlmZkRQ?=
+ =?utf-8?B?c09kS2czZE5rbjNhNGZOaEx6Vk5VUmJWY1A5bnQvRzhVUDlpSFZ5dUROVURH?=
+ =?utf-8?B?cTZCNHFneVdrdmZFVTlSSjhLSEsveUdpQWEzNlB1QmxrWmZyb0syRDgvQ3o1?=
+ =?utf-8?B?REtnRVlMQ1RUbmdueDVVZTd3bG96SEtFMHgyWW5yTjczQktzQjRvZTk1SnBK?=
+ =?utf-8?B?VEhBTDVXSS9HdkZsbjBXSzAvMlVCRk5hMHp2MENGblBvaUdFSW9FWGdrK1VI?=
+ =?utf-8?B?emM4MENUNXFvakZYOTlZV3FLNzZid3lBcGdRUnVwMGVmT1lxb2dQVmZyaVJ4?=
+ =?utf-8?B?aG45ZnAvOHU1bjhtTjJmcEJWcHVYaUxUZEtkQlAyRmJoNkJ0VzU0LzVOU0Er?=
+ =?utf-8?B?Qm94K0xCWWF3eFBEYWYyelFQMkFyK1pYa01KK25ZYTVPNmJkKzBxd3lXVWtG?=
+ =?utf-8?B?RS9NV0hWZngwazVFNlI3MCtxUXNrZU90Yk83Y2VidjYxbkQ2eXYrQkVVMW8w?=
+ =?utf-8?B?OVlqb1ZqZDE5dVVYY3cxSDNsaU92K2ZsNU9uRkRoQ3ZtWThXSlZXZDFQZ3B6?=
+ =?utf-8?B?ZFZTVTJEMm8rZTc5cTJ0WGxXS0gzdnpPWjhOdnVnUG41TFpKVVk0bktjTm8w?=
+ =?utf-8?B?ZXMyWk5FNC9Rb3ROZ1dHTEVtZ2tSUU9kRFQzQmlhTWdKc1FKSnVEQlpKSlhD?=
+ =?utf-8?B?aDZqcW5UNHpqZVd5ZSs0RVo4RnBOblFmWFNRVEt2eC9nM1pveElONG1CWFRJ?=
+ =?utf-8?B?NFcyZVFUamJISSs4OG1LUzN1MXhsMzhhQ2JFVk9CUzJRWjU2STE4aDhEcG5X?=
+ =?utf-8?B?MW9LRWxDTzg3ZTBIbmovM1pCc1JOUTBXcWtaUlJ1Z2dRTXdSS3YvSURhbG85?=
+ =?utf-8?B?aGxad1REY2o2cHNhNDVNY3Z6dnliYUhhR2ZtUndBTVBtT001RW1EQVp5NlIz?=
+ =?utf-8?B?Tm1rczhRemc2NlRoMi9uamtlbWNTbjI4UHdoc0N4dGk2V2lPOW5PNFFuZXNY?=
+ =?utf-8?B?d0hVNHQrVFdYNjFlVERpOFpSQjRRdHdDK3Avb0k3UDNVdDRFSUdSZlkwUldk?=
+ =?utf-8?B?TjQxeCs4b1dqNmlGYWJuTThpWWFlS2JhRjdZbjYreENhTy91Q0RGN1o3Wis1?=
+ =?utf-8?B?em45d25iSFA1YS9uaXRlVnBvcEcrMWNXL3BwY3ZPNWtvWlhyekxvS05KaVhJ?=
+ =?utf-8?B?MFNkSW1xOVRodWtvMll3ZnpMTEc3Wm92M1lpd010SXM2dlloc0dYZE5VOXpk?=
+ =?utf-8?B?ZC9RcHh3M3JyRVliWnlsZWdFcm1ibmdCdkNUYkI0d3E5VHM2VzhnbU5IeThU?=
+ =?utf-8?B?UHg2QkxIVnljUk4wRHg1R0pFMElEZmZGMlJHQWtOWVpRcTl5Nnd5YlNxbTNF?=
+ =?utf-8?B?UmVqckttTGUwQU9OTXF1VFNHd1dnTTkrUVR5RkZ1S2hjV0pTQ2hMcyttbkhk?=
+ =?utf-8?B?NDZ2MjgreWN6bXZTMnBqakhPTExyLzNabU5vZ21EOVlSckZQdkpGNXlYYWFK?=
+ =?utf-8?B?T2dBMENjSDNiTXJBOGVGRU5Pb0dsRmROV2hVTUdUUG5SVzJjbzlMQnJ6L1c2?=
+ =?utf-8?B?aWg2Qmp3VlgvZldIUURvVDZIeDROdDYrZ1ZOODZjNVk2OGJRZUVOZnFuaW52?=
+ =?utf-8?Q?+ibhw3NQYbqhnqhqVXkrT+/jO?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c1e70885-0438-43d3-3cda-08dd55a7aa4d
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR12MB8784.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2025 14:21:16.2853
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: AaQXDQAw1pIS16uyVYZCC9x3ouzG4WxJ+kx75RY7P+g9OWpIQ1UEoWJFKuPpYQQ2aUzyzEfjMwkDU8vlsLxaTg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6765
 
-On Tue, Feb 25, 2025 at 09:29:51PM +0800, Kuan-Wei Chiu wrote:
-> Hi Yury,
-> 
-> On Mon, Feb 24, 2025 at 02:27:03PM -0500, Yury Norov wrote:
-> > On Mon, Feb 24, 2025 at 12:42:02AM +0800, Kuan-Wei Chiu wrote:
-> > > Several parts of the kernel open-code parity calculations using
-> > > different methods. Add a generic parity64() helper implemented with the
-> > > same efficient approach as parity8().
-> > 
-> > No reason to add parity32() and parity64() in separate patches
-> 
-> Ack.
-> 
-> >  
-> > > Co-developed-by: Yu-Chun Lin <eleanor15x@gmail.com>
-> > > Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
-> > > Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail.com>
-> > > ---
-> > >  include/linux/bitops.h | 22 ++++++++++++++++++++++
-> > >  1 file changed, 22 insertions(+)
-> > > 
-> > > diff --git a/include/linux/bitops.h b/include/linux/bitops.h
-> > > index fb13dedad7aa..67677057f5e2 100644
-> > > --- a/include/linux/bitops.h
-> > > +++ b/include/linux/bitops.h
-> > > @@ -281,6 +281,28 @@ static inline int parity32(u32 val)
-> > >  	return (0x6996 >> (val & 0xf)) & 1;
-> > >  }
-> > >  
-> > > +/**
-> > > + * parity64 - get the parity of an u64 value
-> > > + * @value: the value to be examined
-> > > + *
-> > > + * Determine the parity of the u64 argument.
-> > > + *
-> > > + * Returns:
-> > > + * 0 for even parity, 1 for odd parity
-> > > + */
-> > > +static inline int parity64(u64 val)
-> > > +{
-> > > +	/*
-> > > +	 * One explanation of this algorithm:
-> > > +	 * https://funloop.org/codex/problem/parity/README.html
-> > 
-> > This is already referenced in sources. No need to spread it for more.
-> 
-> Ack.
-> 
-> > 
-> > > +	 */
-> > > +	val ^= val >> 32;
-> > > +	val ^= val >> 16;
-> > > +	val ^= val >> 8;
-> > > +	val ^= val >> 4;
-> > > +	return (0x6996 >> (val & 0xf)) & 1;
-> > 
-> > It's better to avoid duplicating the same logic again and again.
-> 
-> Ack.
-> 
-> > 
-> > > +}
-> > > +
-> > 
-> > So maybe make it a macro?
-> > 
-> > 
-> > From f17a28ae3429f49825d65ebc0f7717c6a191a3e2 Mon Sep 17 00:00:00 2001
-> > From: Yury Norov <yury.norov@gmail.com>
-> > Date: Mon, 24 Feb 2025 14:14:27 -0500
-> > Subject: [PATCH] bitops: generalize parity8()
-> > 
-> > The generic parity calculation approach may be easily generalized for
-> > other standard types. Do that and drop sub-optimal implementation of
-> > parity calculation in x86 code.
-> > 
-> > Signed-off-by: Yury Norov [NVIDIA] <yury.norov@gmail.com>
-> > ---
-> >  arch/x86/kernel/bootflag.c | 14 +-----------
-> >  include/linux/bitops.h     | 47 +++++++++++++++++++++++++++-----------
-> >  2 files changed, 35 insertions(+), 26 deletions(-)
-> > 
-> > diff --git a/arch/x86/kernel/bootflag.c b/arch/x86/kernel/bootflag.c
-> > index 3fed7ae58b60..4a85c69a28f8 100644
-> > --- a/arch/x86/kernel/bootflag.c
-> > +++ b/arch/x86/kernel/bootflag.c
-> > @@ -2,6 +2,7 @@
-> >  /*
-> >   *	Implement 'Simple Boot Flag Specification 2.0'
-> >   */
-> > +#include <linux/bitops.h>
-> >  #include <linux/types.h>
-> >  #include <linux/kernel.h>
-> >  #include <linux/init.h>
-> > @@ -20,19 +21,6 @@
-> >  
-> >  int sbf_port __initdata = -1;	/* set via acpi_boot_init() */
-> >  
-> > -static int __init parity(u8 v)
-> > -{
-> > -	int x = 0;
-> > -	int i;
-> > -
-> > -	for (i = 0; i < 8; i++) {
-> > -		x ^= (v & 1);
-> > -		v >>= 1;
-> > -	}
-> > -
-> > -	return x;
-> > -}
-> > -
-> >  static void __init sbf_write(u8 v)
-> >  {
-> >  	unsigned long flags;
-> > diff --git a/include/linux/bitops.h b/include/linux/bitops.h
-> > index c1cb53cf2f0f..29601434f5f4 100644
-> > --- a/include/linux/bitops.h
-> > +++ b/include/linux/bitops.h
-> > @@ -230,10 +230,10 @@ static inline int get_count_order_long(unsigned long l)
-> >  }
-> >  
-> >  /**
-> > - * parity8 - get the parity of an u8 value
-> > + * parity - get the parity of a value
-> >   * @value: the value to be examined
-> >   *
-> > - * Determine the parity of the u8 argument.
-> > + * Determine parity of the argument.
-> >   *
-> >   * Returns:
-> >   * 0 for even parity, 1 for odd parity
-> > @@ -241,24 +241,45 @@ static inline int get_count_order_long(unsigned long l)
-> >   * Note: This function informs you about the current parity. Example to bail
-> >   * out when parity is odd:
-> >   *
-> > - *	if (parity8(val) == 1)
-> > + *	if (parity(val) == 1)
-> >   *		return -EBADMSG;
-> >   *
-> >   * If you need to calculate a parity bit, you need to draw the conclusion from
-> >   * this result yourself. Example to enforce odd parity, parity bit is bit 7:
-> >   *
-> > - *	if (parity8(val) == 0)
-> > + *	if (parity(val) == 0)
-> >   *		val ^= BIT(7);
-> > + *
-> > + * One explanation of this algorithm:
-> > + * https://funloop.org/codex/problem/parity/README.html
-> >   */
-> > -static inline int parity8(u8 val)
-> > -{
-> > -	/*
-> > -	 * One explanation of this algorithm:
-> > -	 * https://funloop.org/codex/problem/parity/README.html
-> > -	 */
-> > -	val ^= val >> 4;
-> > -	return (0x6996 >> (val & 0xf)) & 1;
-> > -}
-> > +#define parity(val)					\
-> > +({							\
-> > +	u64 __v = (val);				\
-> > +	int __ret;					\
-> > +	switch (BITS_PER_TYPE(val)) {			\
-> > +	case 64:					\
-> > +		__v ^= __v >> 32;			\
-> > +		fallthrough;				\
-> > +	case 32:					\
-> > +		__v ^= __v >> 16;			\
-> > +		fallthrough;				\
-> > +	case 16:					\
-> > +		__v ^= __v >> 8;			\
-> > +		fallthrough;				\
-> > +	case 8:						\
-> > +		__v ^= __v >> 4;			\
-> > +		__ret =  (0x6996 >> (__v & 0xf)) & 1;	\
-> > +		break;					\
-> > +	default:					\
-> > +		BUILD_BUG();				\
-> > +	}						\
-> > +	__ret;						\
-> > +})
-> > +
-> > +#define parity8(val)	parity((u8)(val))
-> > +#define parity32(val)	parity((u32)(val))
-> > +#define parity64(val)	parity((u64)(val))
-> >  
-> What do you think about using these inline functions instead of macros?
-> Except for parity8(), each function is a single line and follows the
-> same logic. I find inline functions more readable, and coding-style.rst
-> also recommends them over macros.
-> 
-> Regards,
-> Kuan-Wei
-> 
-> diff --git a/include/linux/bitops.h b/include/linux/bitops.h
-> index c1cb53cf2f0f..d518a382f1fe 100644
-> --- a/include/linux/bitops.h
-> +++ b/include/linux/bitops.h
-> @@ -260,6 +260,26 @@ static inline int parity8(u8 val)
->  	return (0x6996 >> (val & 0xf)) & 1;
->  }
->  
-> +static inline parity16(u16 val)
-> +{
-> +	return parity8(val ^ (val >> 8));
-> +}
-> +
-> +static inline parity16(u16 val)
-> +{
-> +	return parity8(val ^ (val >> 8));
-> +}
-> +
-> +static inline parity32(u32)
-> +{
-> +	return parity16(val ^ (val >> 16));
-> +}
-> +
-> +static inline parity64(u64)
-> +{
-> +	return parity32(val ^ (val >> 32));
-> +}
-> +
->  /**
->   * __ffs64 - find first set bit in a 64 bit word
->   * @word: The 64 bit word
-> 
->
-Oops... I made a lot of fat-finger mistakes. Here's the correct one.
+Hi Russell,
 
-diff --git a/include/linux/bitops.h b/include/linux/bitops.h
-index c1cb53cf2f0f..427e4c06055e 100644
---- a/include/linux/bitops.h
-+++ b/include/linux/bitops.h
-@@ -260,6 +260,21 @@ static inline int parity8(u8 val)
- 	return (0x6996 >> (val & 0xf)) & 1;
- }
- 
-+static inline int parity16(u16 val)
-+{
-+	return parity8(val ^ (val >> 8));
-+}
-+
-+static inline int parity32(u32 val)
-+{
-+	return parity16(val ^ (val >> 16));
-+}
-+
-+static inline int parity64(u64 val)
-+{
-+	return parity32(val ^ (val >> 32));
-+}
-+
- /**
-  * __ffs64 - find first set bit in a 64 bit word
-  * @word: The 64 bit word
+On 19/02/2025 20:57, Russell King (Oracle) wrote:
+> On Wed, Feb 19, 2025 at 08:05:57PM +0000, Jon Hunter wrote:
+>> On 19/02/2025 19:13, Russell King (Oracle) wrote:
+>>> On Wed, Feb 19, 2025 at 05:52:34PM +0000, Jon Hunter wrote:
+>>>> On 19/02/2025 15:36, Russell King (Oracle) wrote:
+>>>>> So clearly the phylink resolver is racing with the rest of the stmmac
+>>>>> resume path - which doesn't surprise me in the least. I believe I raised
+>>>>> the fact that calling phylink_resume() before the hardware was ready to
+>>>>> handle link-up is a bad idea precisely because of races like this.
+>>>>>
+>>>>> The reason stmmac does this is because of it's quirk that it needs the
+>>>>> receive clock from the PHY in order for stmmac_reset() to work.
+>>>>
+>>>> I do see the reset fail infrequently on previous kernels with this device
+>>>> and when it does I see these messages ...
+>>>>
+>>>>    dwc-eth-dwmac 2490000.ethernet: Failed to reset the dma
+>>>>    dwc-eth-dwmac 2490000.ethernet eth0: stmmac_hw_setup: DMA engine
+>>>>     initialization failed
+>>>
+>>> I wonder whether it's also racing with phylib, but phylink_resume()
+>>> calling phylink_start() going in to call phy_start() is all synchronous.
+>>> That causes __phy_resume() to be called.
+>>>
+>>> Which PHY device/driver is being used?
+>>
+>>
+>> Looks like it is this Broadcom driver ...
+>>
+>>   Broadcom BCM89610 stmmac-0:00: phy_eee_rx_clock_stop: clk_stop_enable 1
+> 
+> I don't see anything special happening in the PHY driver - it doesn't
+> implement suspend/resume/config_aneg methods, so there's nothing going
+> on with clocks in that driver beyond generic stuff.
+> 
+> So, let's try something (I haven't tested this, and its likely you
+> will need to work it in to your other change.)
+> 
+> Essentially, this disables the receive clock stop around the reset,
+> something the stmmac driver has never done in the past.
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 1cbea627b216..8e975863a2e3 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -7926,6 +7926,8 @@ int stmmac_resume(struct device *dev)
+>   	rtnl_lock();
+>   	mutex_lock(&priv->lock);
+>   
+> +	phy_eee_rx_clock_stop(priv->dev->phydev, false);
+> +
+>   	stmmac_reset_queues_param(priv);
+>   
+>   	stmmac_free_tx_skbufs(priv);
+> @@ -7937,6 +7939,9 @@ int stmmac_resume(struct device *dev)
+>   
+>   	stmmac_restore_hw_vlan_rx_fltr(priv, ndev, priv->hw);
+>   
+> +	phy_eee_rx_clock_stop(priv->dev->phydev,
+> +			      priv->phylink_config.eee_rx_clk_stop_enable);
+> +
+>   	stmmac_enable_all_queues(priv);
+>   	stmmac_enable_all_dma_irq(priv);
+>   
 
 
-> >  /**
-> >   * __ffs64 - find first set bit in a 64 bit word
-> > -- 
-> > 2.43.0
-> > 
+Sorry for the delay, I have been testing various issues recently and 
+needed a bit more time to test this.
+
+It turns out that what I had proposed last week does not work. I believe 
+that with all the various debug/instrumentation I had added, I was again 
+getting lucky. So when I tested again this week on top of vanilla 
+v6.14-rc2, it did not work :-(
+
+However, what you are suggesting above, all by itself, is working. I 
+have tested this on top of vanilla v6.14-rc2 and v6.14-rc4 and it is 
+working reliably. I have also tested on some other boards that use the 
+same stmmac driver (but use the Aquantia PHY) and I have not seen any 
+issues. So this does fix the issue I am seeing.
+
+I know we are getting quite late in the rc for v6.14, but not sure if we 
+could add this as a fix?
+
+Thanks!
+Jon
+
+-- 
+nvpublic
+
 
