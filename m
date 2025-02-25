@@ -1,154 +1,112 @@
-Return-Path: <netdev+bounces-169555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB80FA44936
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 18:59:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C63FA44993
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 19:08:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 396D03BB169
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 17:53:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A825425442
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 18:05:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12C1719993B;
-	Tue, 25 Feb 2025 17:53:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B35DF18C035;
+	Tue, 25 Feb 2025 18:03:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="HuTK/Fk+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gVmnxV6o"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92F1314F9C4
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 17:53:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7744A15445D;
+	Tue, 25 Feb 2025 18:03:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740506011; cv=none; b=XPoE5xifsAq+j9sV8Cob4AIRUPq0N+qYQm59uygd9ZpSwQwaUqrPy0u0j12rpbztCdwEjM4DKp3DzR7D6uxOK6X9uB9lIF9U2615SNd2atTSaMfuZylIXUzzoWrD5MKjumwYBPLt22X8WQa06j/EghfAyglfI9dloTp6As4RVKE=
+	t=1740506610; cv=none; b=qh447+iMZhDHmNpTqYZ/UlC7DTg15GO4WRMevk59h1h2kdwmc2yXE/33j1BLvIO2tV45u2WENNj+JYHgjq7MsNJCvalXYNvEMZEks8Cwv9BM1UmrSEGL9Jt5OPhMSlctFCewoYf/zv+t4s0W2zy4RHTgJqL5QQqYGc8hO8auaWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740506011; c=relaxed/simple;
-	bh=2aOM906+3hyJ0FMFSgPDacZPxXA7tPP73eMAwY4IRzU=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=izcA0InrfAzk+kO7Z07dv8C7JgSVDj9hDJ5hvyg5ttLj/aV/xXcUCNkxyuX2qsAJKgfo5nKT1D5s7TJef+fc3XdQ+IPPSW4ImV4qWE14c8EcksFTqXLlopTsUh3+BrOP15y0fUTDvxY5ntInWIWcOn537z7PQQvi5R4Gl7mEXX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=HuTK/Fk+; arc=none smtp.client-ip=99.78.197.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1740506009; x=1772042009;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=j4UI7YuMtjTGMb/1QpuMHTA5XJ93q9VNuMXjYYMYv8U=;
-  b=HuTK/Fk+lZd0TuIwsw65hzJQHy0gP2wtjqMOHkNMkafsNEaRDSiR8Iqn
-   O4rPCHV3vQFItO5bUBmV40b7vEmQYGJjs7pcS67gIrIQEulKUJ3vouHfM
-   3RV+oqIOSR9Ciq5EC2efhqAu91wqfAWVE3sWpchkBciDyOJhZwIWtqaFM
-   8=;
-X-IronPort-AV: E=Sophos;i="6.13,314,1732579200"; 
-   d="scan'208";a="25928283"
-Subject: RE: [PATCH v7 net-next 4/5] net: ena: PHC stats through sysfs
-Thread-Topic: [PATCH v7 net-next 4/5] net: ena: PHC stats through sysfs
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2025 17:53:27 +0000
-Received: from EX19MTAEUC002.ant.amazon.com [10.0.17.79:47044]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.30.133:2525] with esmtp (Farcaster)
- id a1f908e3-96cb-4dea-99fd-e63b57665d59; Tue, 25 Feb 2025 17:53:26 +0000 (UTC)
-X-Farcaster-Flow-ID: a1f908e3-96cb-4dea-99fd-e63b57665d59
-Received: from EX19D006EUA002.ant.amazon.com (10.252.50.65) by
- EX19MTAEUC002.ant.amazon.com (10.252.51.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 25 Feb 2025 17:53:26 +0000
-Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19D006EUA002.ant.amazon.com (10.252.50.65) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 25 Feb 2025 17:53:25 +0000
-Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
- EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
- 15.02.1544.014; Tue, 25 Feb 2025 17:53:25 +0000
-From: "Arinzon, David" <darinzon@amazon.com>
-To: Simon Horman <horms@kernel.org>
-CC: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard Cochran
-	<richardcochran@gmail.com>, "Woodhouse, David" <dwmw@amazon.co.uk>,
-	"Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander"
-	<matua@amazon.com>, "Bshara, Saeed" <saeedb@amazon.com>, "Wilson, Matt"
-	<msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
-	<nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal,
- Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
-	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit"
-	<amitbern@amazon.com>, "Allen, Neil" <shayagr@amazon.com>, "Abboud, Osama"
-	<osamaabb@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik,
- Ofir" <ofirt@amazon.com>, "Machnikowski, Maciek" <maciek@machnikowski.net>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Thread-Index: AQHbgjSY2YmZf3/qrUmDalvDVwEGQ7NXzb6AgACJ3tA=
-Date: Tue, 25 Feb 2025 17:53:25 +0000
-Message-ID: <c650369bb0394184951161eb34772a1a@amazon.com>
-References: <20250218183948.757-1-darinzon@amazon.com>
- <20250218183948.757-5-darinzon@amazon.com>
- <20250225093851.GJ1615191@kernel.org>
-In-Reply-To: <20250225093851.GJ1615191@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1740506610; c=relaxed/simple;
+	bh=DCOUoVzVNSydpQ/dS03bguPxoI1g9gTndpvRpxQgL5U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=srth9ON8cS7uxndXqUHBDmn9wpykmuZ+mn7qV5y1maA+YtJAU7Mx5QyF9K42QD+sYLEzHKYXXrKvvBHfDdlWluSJXAAjFEUWGE4kfCHe+cmYGfhPAAriq6CXlhiglvjXI6Kyz3mZz7vnDLrb/bQAo2hyrHwRrDrs4TgY5lwEF94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gVmnxV6o; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 989D2C4CEDD;
+	Tue, 25 Feb 2025 18:03:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740506610;
+	bh=DCOUoVzVNSydpQ/dS03bguPxoI1g9gTndpvRpxQgL5U=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=gVmnxV6oNNkD0+ncPquUaGL++hfjCkZTHvhFuvpdtUabzc6pemipfQ4iZYzu83xon
+	 pRwkkf5xh/DVcSTsBOX65vog+SrmsoUmcy6ISp3y3vPCDVurmE28vRuAbOA/+Ya32A
+	 JKlciHKttoak86VlLAj2HyuQbfVQNMDQmXlqq6l7ILI7CC/yt2TIsGXOa7JBex7k9t
+	 65QZV1j/M3zjdFuI0UtXgEQwMl9DrT46m6rptwZ/UblGoodb8aOozG/rzaulK2Gabh
+	 4Pk7Gy6R/BzrOashE02ihMAjxNzjWR1VF0rYixW9TLQ5/hZRNb8Zwm8AQ0/nOtbqBq
+	 3Lfft0A1FtP7A==
+Message-ID: <a003b144-0abf-4274-abff-a6e391a3e20b@kernel.org>
+Date: Tue, 25 Feb 2025 11:03:27 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 3/9] net: devmem: Implement TX path
+Content-Language: en-US
+To: Mina Almasry <almasrymina@google.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, virtualization@lists.linux.dev,
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Jeroen de Borst <jeroendb@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn
+ <willemb@google.com>, Neal Cardwell <ncardwell@google.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin"
+ <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Shuah Khan <shuah@kernel.org>, sdf@fomichev.me,
+ asml.silence@gmail.com, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
+ <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>,
+ Kaiyuan Zhang <kaiyuanz@google.com>
+References: <20250222191517.743530-1-almasrymina@google.com>
+ <20250222191517.743530-4-almasrymina@google.com>
+ <a814c41a-40f9-4632-a5bb-ad3da5911fb6@redhat.com>
+ <CAHS8izNfNJLrMtdR0je3DsXDAvP2Hs8HfKf5Jq7_kQJsVUbrzg@mail.gmail.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <CAHS8izNfNJLrMtdR0je3DsXDAvP2Hs8HfKf5Jq7_kQJsVUbrzg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-> > The patch allows retrieving PHC statistics through sysfs.
-> > In case the feature is not enabled (through `phc_enable` sysfs entry),
-> > no output will be written.
-> >
-> > Signed-off-by: David Arinzon <darinzon@amazon.com>
->=20
-> ...
->=20
-> > diff --git a/drivers/net/ethernet/amazon/ena/ena_sysfs.c
-> > b/drivers/net/ethernet/amazon/ena/ena_sysfs.c
-> > index d0ded92d..10993594 100644
-> > --- a/drivers/net/ethernet/amazon/ena/ena_sysfs.c
-> > +++ b/drivers/net/ethernet/amazon/ena/ena_sysfs.c
-> > @@ -65,6 +65,52 @@ static ssize_t ena_phc_enable_get(struct device
-> > *dev,  static DEVICE_ATTR(phc_enable, S_IRUGO | S_IWUSR,
-> ena_phc_enable_get,
-> >                  ena_phc_enable_set);
-> >
-> > +#define ENA_STAT_ENA_COM_PHC_ENTRY(stat) { \
-> > +     .name =3D #stat, \
-> > +     .stat_offset =3D offsetof(struct ena_com_stats_phc, stat) /
-> > +sizeof(u64) \ }
-> > +
-> > +const struct ena_stats ena_stats_ena_com_phc_strings[] =3D {
-> > +     ENA_STAT_ENA_COM_PHC_ENTRY(phc_cnt),
-> > +     ENA_STAT_ENA_COM_PHC_ENTRY(phc_exp),
-> > +     ENA_STAT_ENA_COM_PHC_ENTRY(phc_skp),
-> > +     ENA_STAT_ENA_COM_PHC_ENTRY(phc_err),
-> > +};
->=20
-> Hi David,
->=20
-> Some very minor nits from my side:
->=20
-> Is seems that ena_stats_ena_com_phc_strings is only used in this file and
-> thus should be static.
->=20
+On 2/25/25 10:41 AM, Mina Almasry wrote:
+> On Tue, Feb 25, 2025 at 5:04 AM Paolo Abeni <pabeni@redhat.com> wrote:
+>>
+>> On 2/22/25 8:15 PM, Mina Almasry wrote:
+>> [...]
+>>> @@ -119,6 +122,13 @@ void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding)
+>>>       unsigned long xa_idx;
+>>>       unsigned int rxq_idx;
+>>>
+>>> +     xa_erase(&net_devmem_dmabuf_bindings, binding->id);
+>>> +
+>>> +     /* Ensure no tx net_devmem_lookup_dmabuf() are in flight after the
+>>> +      * erase.
+>>> +      */
+>>> +     synchronize_net();
+>>
+>> Is the above statement always true? can the dmabuf being stuck in some
+>> qdisc? or even some local socket due to redirect?
+>>
+> 
+> Yes, we could have have netmems in the TX path in the qdisc or waiting
+> for retransmits that still have references to the dmabuf, and that's
+> fine here I think.
 
-Thanks Simon, I also saw it in the compilation warnings in patchwork.
-This code will be modified/removed in v8.
+skbs with references to netmem from a dmabuf can get stuck in retransmit
+queues for a long time. The comment should at least acknowledge that.
 
-Thanks,
-David
 
-> > +
-> > +u16 ena_stats_array_ena_com_phc_size =3D
-> > +ARRAY_SIZE(ena_stats_ena_com_phc_strings);
->=20
-> Likewise for ena_stats_array_ena_com_phc_size.
->=20
-> ...
 
