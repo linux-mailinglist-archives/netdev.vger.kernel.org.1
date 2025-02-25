@@ -1,170 +1,123 @@
-Return-Path: <netdev+bounces-169461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EE74A44093
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 14:21:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4404A440DC
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 14:32:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB67D16D693
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 13:18:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3E601891785
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 13:30:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD70926982A;
-	Tue, 25 Feb 2025 13:17:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D212269CED;
+	Tue, 25 Feb 2025 13:29:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="dT56dw5w"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="YCV4xAKa"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2089.outbound.protection.outlook.com [40.107.236.89])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1905226980D;
-	Tue, 25 Feb 2025 13:17:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.89
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740489476; cv=fail; b=e+Z2HvQe8I6k234/Pg86G4EehO03o4pxM+uLTrZH9eED9GzfiEG+5zCXx97u4hBfWY7idu4ODcW10Xa+jtoUpiOOmAza8t5Z7YDhRzrKnurbaos3mRj38b6QrNUDXvWaEd5VkdEcVAK8vsID7RHKbZ8O3W0EGXEP2ZyxJkX/jyQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740489476; c=relaxed/simple;
-	bh=B7QQprOXrNujSLYufbrklxQPkoZ13tRgwS9CtAdyovc=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=bsoGix+m+uFCWdlMVcYVyqkcueuNkMdONQEpxZ9Hvd85PRFoFgWGyFUzg44dPVoNaZ0lDDnz9FLCWJ2uqA3JX5TDvMdHQFNHfmehJ754najuZbxC9HD3R9Cz3G67cd9cxLdxIOSmFl2uaHmLUNXKC7Xtqwio9hWjiABXg5lLkZU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=dT56dw5w; arc=fail smtp.client-ip=40.107.236.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=k+jdHEbEBaE+XViXws/oYmdLO4JZ1BXJLDjQ9A8QlqGuj1pGXtWvQStL9l02wzUE3Tq1nCIdz7wE+2o011GjTRQp5Tdwbj8GCXAQGrVKM7rmsTYK7ONDUt0C12d0QoOfp7aQ/IJcFlFskauI0r5v2tpqLl9nb7Vr1p/XSXaFV8oqFGp7FFnGdRiduqJrNksurMt4LxBox4IFL90lKp+pl0Gi8Y1zxXtk0xVKq+U9fgj5Dbwi/MtV2pKhPJRn/jW0jWz0r/RdDwuo/yYKS67lB45Dmf1isg+61VQQMUxuobHxVo6nHHCVfa3rTPAO7eItfqt8Xp5iYzLxKwArlNed8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dOPxLHcYSVlscbMH6VFN+DxPDfh7qqVL30fx8sxPRTo=;
- b=G6NOwWs5mCZG6KgWEAhK+eqZoQerB051Pa7qRzYwwp/F2tNZvEYy53TziseOTGDmc88p84CSAnk5GHBdDFnZmxHlsZPZa+zpfZ0s9KlVH1Yd9d2SBrnvQ/B/ZyOiYy1SPK8MEo7/cQ3Up3bozMp0/p0m26HwshsbNNZPU47gYcUwRAtHccMb96iMtr9+jRNLJs+NSvX3E+RTKT/yS+kR6LkGYdQrOGmSiRqijmuV8lykdFIOkcyqRcrfInX8lRtHOsuBMvGxgV5LFn7V/dbCeJ/3DIrUci1+HFro6TV1E7zWa1xwRZXEKYNcCV+nkyZRSukJ4lKVqfLCHFiulEXMhw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dOPxLHcYSVlscbMH6VFN+DxPDfh7qqVL30fx8sxPRTo=;
- b=dT56dw5wF5jTDL5H0JLm6BBl0UMcewX/V3iV303L1ubSiVLw8ffdQtQrC1RQ6RtEJBbLdzN1tA/X7M6L7IU9P3oKeGy3DlD5Dvd2owM0/HClhzbDS5VXRUV+Dui0EJsPK/ObQnv8Ye9ZbMOfSlsocsIpxAzN6M3Mu7IPVwu/IoiCFnJIFFftKd9ROyctZAJykCHrpWVoGlgvmNgM3oMh7nWaIg2Ot1E+tCwz/esBYMxvoNW5UmEyxTS6oVQCPIAgnrF1EgFNbtwWFNKmd9L594s9G4H6dojTVMr1o8/cOtpTC7W3MxnD4cgKhRF4dotitz0bPWHrjsiw3qGliEAwvA==
-Received: from PH8PR07CA0003.namprd07.prod.outlook.com (2603:10b6:510:2cd::17)
- by PH7PR12MB6762.namprd12.prod.outlook.com (2603:10b6:510:1ac::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.21; Tue, 25 Feb
- 2025 13:17:51 +0000
-Received: from SJ1PEPF000023D8.namprd21.prod.outlook.com
- (2603:10b6:510:2cd:cafe::cb) by PH8PR07CA0003.outlook.office365.com
- (2603:10b6:510:2cd::17) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8466.20 via Frontend Transport; Tue,
- 25 Feb 2025 13:17:50 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SJ1PEPF000023D8.mail.protection.outlook.com (10.167.244.73) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8511.0 via Frontend Transport; Tue, 25 Feb 2025 13:17:50 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 25 Feb
- 2025 05:17:35 -0800
-Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 25 Feb
- 2025 05:17:31 -0800
-References: <20250218164555.1955400-1-krakauer@google.com>
-User-agent: mu4e 1.8.14; emacs 29.4
-From: Petr Machata <petrm@nvidia.com>
-To: Kevin Krakauer <krakauer@google.com>
-CC: <netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] selftests/net: deflake GRO tests and fix return value
- and output
-Date: Tue, 25 Feb 2025 14:16:09 +0100
-In-Reply-To: <20250218164555.1955400-1-krakauer@google.com>
-Message-ID: <87v7sygo4a.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 417A52698A8;
+	Tue, 25 Feb 2025 13:29:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740490166; cv=none; b=ROqXy0cS6qlLxmdhG+qXEkTR9Vj5YPo8wx4mb3jT//uqDjM0FRieYljZhTORL9AuGHlwH4Mfb151qcrWVybeHyzu/ZrtUI3sfVZjCaaAJo0rpzYVSfQ9ck24UH5/9H4y+Y6t8BPWqI8XsMoI5sUy9WNIm0FUowc6zFHwiH/uMqQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740490166; c=relaxed/simple;
+	bh=XKT29zyPl/6rMAEQBmoeJ0BVDBK/Oh1IqxR3cDabHzU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iM70kZvptSV9kEbGkR5W7ax/ylxzT8S8tNoL/cDSoiBwuBM2lHIF6skNjIo1DaRlkqC9XMA/J7qzSB+Nj3N7ya5B7L/Mcvma/sWjVjaEn11wfPNG25woWEYB9zQiUBm4i3sTjGI+8JkYIpHrqLioVTVjQuCJsoiDkUyd8sznfVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=YCV4xAKa; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=uJshx9Cl0huHmfj7HI+rUlQ35Kzo6ku6m/Ek5CqQZDo=; b=YCV4xAKadB6QaQu6y4a2pGF8SI
+	1DK6e/jxzXcam5kc9jnk+9YpBgr0jZjlrYmE0xBlZzff250/ZR2CVHnAg7J+TvKli/LNMvqU/KjBl
+	lXxhivNVQwj8vsYqkuw97UehwLVUlYQzhzDupu5d1/lBKaU9JE6fvsgNEfTJOii+mTTk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tmuzi-00HWQQ-OY; Tue, 25 Feb 2025 14:29:06 +0100
+Date: Tue, 25 Feb 2025 14:29:06 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: =?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Simon Horman <horms@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Antoine Tenart <atenart@kernel.org>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
+Subject: Re: [PATCH net-next 0/2] net: phy: sfp: Add single-byte SMBus SFP
+ access
+Message-ID: <5e2fef46-f332-4ba1-93af-4e2881ec0c93@lunn.ch>
+References: <20250223172848.1098621-1-maxime.chevallier@bootlin.com>
+ <Z7tdlaGfVHuaWPaG@shell.armlinux.org.uk>
+ <87o6yqrygp.fsf@miraculix.mork.no>
+ <20250225140640.382fec83@fedora.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF000023D8:EE_|PH7PR12MB6762:EE_
-X-MS-Office365-Filtering-Correlation-Id: 859d32e7-87bd-4002-2efc-08dd559ece36
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|376014|1800799024|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?nuLv76BU1vHKsnJTy0866phwHp88O/Gz/dCCYhgcKxNlnJJgIbhjcIq6TI5t?=
- =?us-ascii?Q?BCgNdN6vw7kB0shGN6CtatOnUtgaKJ0zBlm3O+PMfL+oJ5YRuAFMnNIDRFIt?=
- =?us-ascii?Q?4a1pwWFKllbsBkF9Rb+9BOQbM3xyB2wkJiySmS5b2uHL1L8MeIM+YIrlgFAq?=
- =?us-ascii?Q?4eBoIkAPVkUJAp4vatI+Nz2pqz/PhnylUA0cdhg7C/bLvN71JDJmru0tKp6T?=
- =?us-ascii?Q?jHfAOPtbStll/vTNKKGdYunkYNM0hlr1suZuHlKF28jlAmrdEMmmyw5bO321?=
- =?us-ascii?Q?Ld5my53PrD7GGhfKZan9/Ay8bWPFJnngjbrcwbMs6aqG7N8nP/ls0LH14yAg?=
- =?us-ascii?Q?MXJ736FXC3SV5aOlDqGm39Xw9K9jZ/Ri26E0XDBinWJ8xUWpzuVnANhFghNy?=
- =?us-ascii?Q?tQI+4KxdlLw/Q2SgZ7Jt4I++L3AoQMHForJ5IlMCjrpxOk1XzijfoklpKpWh?=
- =?us-ascii?Q?G4wdzfIbyTf6O9r6Xky8pdwHJ8hnNvKLoCSvQYPgTViQUs6tmNYqOLtQJqdS?=
- =?us-ascii?Q?H5gfk3SOAJ6UgwikgFTT7JhaT8T2aEKcs9y2nqV0WWEy15W1sBS/0HkWVXCO?=
- =?us-ascii?Q?1rjEDEOD7h/H21sqnjn+ijjG29KGk/9cwOz8wofZ8LbOCgxDnn4Yz9R5Vcnx?=
- =?us-ascii?Q?7I3H2wdDBBotf+Iu2OCtf6F5kQASFY2XVwGLCCqCN8L2vHfZMx0H0cP+BSvl?=
- =?us-ascii?Q?2MMfgV8SEMMRVqBugwGtKJ8lEYAWzDJJnrveKDXbgp10rOVsjjG8jgmPJf/x?=
- =?us-ascii?Q?9WnMZ0PWxTzkdXCFddUn3qhwFN7ezsvoXv6ucTPaZdY+IMdhodgmTmksl5S+?=
- =?us-ascii?Q?Q6d9eu3qFQWEyQ9RVAg9RJoPrerQV3AhW1kPmOZLjKesN9pptlnVYGSnHbg6?=
- =?us-ascii?Q?abhE5N/3mAnom3WCNdD9ewjpCD6n1XnAvev9QoF/VzCxSTZcfjSwSPmCr7kJ?=
- =?us-ascii?Q?SjYhJscg6WKUFUkhkLarxwXR7c4rSRW2mo81A90LkewdIkuhUCHM2Far4ws5?=
- =?us-ascii?Q?+dc4XCGD2pLAmf8599ErQDh1X0g9WPb+ywzDdWHoWd50JSQryhxm8h/znvhE?=
- =?us-ascii?Q?JDDkd5sTezBVm950cYfOZLR2sqKCRidj1aeUABoxFq/TcHu6+11P2GPhZUWX?=
- =?us-ascii?Q?BbdaCSJN+ALhQlVQPvIu6M8XewyfhD8UD79z80x3XNZJiTlORr1co7nNh0Co?=
- =?us-ascii?Q?qhnN4/xyIlj0CQzM3+nTbR1PvG2BkgrfqWWOQkxtSTIrH4k/uHvah2zk2oid?=
- =?us-ascii?Q?qTTUMtkKaOjYMO6MTMmfSpW4G1zqzqYW2+LJbg9B/QjdCSISL1jiVdlH/AId?=
- =?us-ascii?Q?HsYARf36eQwzCJfsMeDN/RF9uR0YyTMP4Xx+zIdXvd3YrFXz54WFyrP5EJ/h?=
- =?us-ascii?Q?Ua7xOyZ4VF/Quu7UhHlZl/ZqhAmrf13qXRQKMaHb6svchUTifeFwj+w0ESWk?=
- =?us-ascii?Q?KaOEyIswc1xEHPbYMAr5DjbGdrmp91FN3rM/LnxN2f3l80izHYez47e1Q2gc?=
- =?us-ascii?Q?IENdS+UeVrt9a9M=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(1800799024)(7416014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2025 13:17:50.8548
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 859d32e7-87bd-4002-2efc-08dd559ece36
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF000023D8.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6762
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250225140640.382fec83@fedora.home>
 
+> > Would SMBus word reads be an alternative for hwmon, if the SMBus
+> > controller support those?  Should qualify as "a single two-byte read
+> > sequence across the 2-wire interface."
+> 
+> There are different flavors when it comes to what an SMBus controller
+> can do. In the case of what this patchset supports, its really about
+> SMBus controllers that can only perform single-byte operations, which
+> will cause issues here.
+> 
+> What I have is a controller that only supports I2C_FUNC_SMBUS_BYTE, in
+> that the controller will issue a STOP after reading/writing one byte.
+> 
+> But if you have a controller that supports, say,
+> I2C_FUNC_SMBUS_WORD_DATA (i.e. 16 bits words xfers), that's already a
+> different story, as the diags situation Russell mentions will fit in a
+> word. That will also make MDIO accesses to embedded PHYs easier, at
+> least for C22. 
 
-Kevin Krakauer <krakauer@google.com> writes:
+Agreed.
 
-> diff --git a/tools/testing/selftests/net/gro.sh b/tools/testing/selftests/net/gro.sh
-> index 02c21ff4ca81..703173f8c8a9 100755
-> --- a/tools/testing/selftests/net/gro.sh
-> +++ b/tools/testing/selftests/net/gro.sh
-> @@ -21,7 +21,7 @@ run_test() {
->    # Each test is run 3 times to deflake, because given the receive timing,
+> > > Whether PHY access works correctly or not is probably module specific.
+> > > E.g. reading the MII_BMSR register may not return latched link status
+> > > because the reads of the high and low bytes may be interpreted as two
+> > > seperate distinct accesses.  
+> > 
+> > Bear with me.  Trying to learn here.  AFAIU, we only have a defacto
+> > specification of the clause 22 phy interface over i2c, based on the
+> > 88E1111 implementation.  As Maxime pointed out, this explicitly allows
+> > two sequential distinct byte transactions to read or write the 16bit
+> > registers. See figures 27 and 30 in
+> > https://www.marvell.com/content/dam/marvell/en/public-collateral/transceivers/marvell-phys-transceivers-alaska-88e1111-datasheet.pdf
+> > 
+> > Looks like the latch timing restrictions are missing, but I still do not
+> > think that's enough reason to disallow access to phys over SMBus.  If
+> > this is all the interface specification we have?
 
--    # Each test is run 3 times to deflake, because given the receive timing,
-+    # Each test is run 6 times to deflake, because given the receive timing,
+We are not suggesting it is disallowed. We are simply saying add a
+warning that it is possibly broken, bad things can happen, and there
+is nothing we can do about it, so don't report issues when it does
+break.
 
->    # not all packets that should coalesce will be considered in the same flow
->    # on every try.
-> -  for tries in {1..3}; do
-> +  for tries in {1..6}; do
->      # Actual test starts here
->      ip netns exec $server_ns ./gro "${ARGS[@]}" "--rx" "--iface" "server" \
->        1>>log.txt &
+It might work enough that users are happy to take the risk, and need
+to unplug/plug the cable every so often to get the link back when the
+link peer changes etc.
+
+	Andrew
 
