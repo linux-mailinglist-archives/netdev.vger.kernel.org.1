@@ -1,143 +1,149 @@
-Return-Path: <netdev+bounces-169591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD68CA44AC1
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 19:43:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AC66A44AA7
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 19:38:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13B7E860CED
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 18:37:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 790E517FA58
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 18:37:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCD7E19B5B4;
-	Tue, 25 Feb 2025 18:36:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5762819F42C;
+	Tue, 25 Feb 2025 18:37:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="gN6APM9D"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H9BXYcqX"
 X-Original-To: netdev@vger.kernel.org
-Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 836481A2392
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 18:36:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740508611; cv=none; b=XWttHL+/nTi3xht4L3hTAU3p2gBay42U3j4fnew5D2cJd+ENTmvplMHvGDQ0IV4FYmJl6Vwfy5TrkdP2Fwoe/aoHpZrcXEu+UO16SrrRDw8kVPDsdUgZwdwr9a/V9Ebla05zXbOJxqa1YE8L61YxJXcYATg15aiKe6rfWdw7YnA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740508611; c=relaxed/simple;
-	bh=GDYXtvbh87M4jA9Yf67OTbD8hZcmjQEkRG280jMADfY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dprHZeYLlFYpWjsllXMDIg0XILENvgDlb154yWq5wKpjHcdxiEVaHDjJMATS95nGlATcSsT4gMYdfkAP5352eQppdsum/ZSxuI3zpoGGmEgZqhgOz953KXBQSLnfz64hT1zhCVeR/DwbPvz5N8mangUyM+jGzkoB7eN59gnIBQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=gN6APM9D; arc=none smtp.client-ip=139.165.32.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
-Received: from [192.168.1.58] (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id BF1C9200E2BD;
-	Tue, 25 Feb 2025 19:36:47 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be BF1C9200E2BD
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1740508607;
-	bh=s5xgb3xloy/EFWinVmbOjbANWLDdpM+4OjDM9+M17ZQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=gN6APM9DGx6ifuXNS0/0Cl9in7bbb1r6LZ6mOLrzmASg4rzTVjBfvwhPFgRvSjRX5
-	 korpRv+QbMTRt6Kd38BVbGa8oQ5g3oc14a7PMbu/qIwLN4P/yOOQIiJlgRcQtySJqU
-	 3X4WvJim869KD52yi63R9gGQHW8t4N/z3hiV7q/YxbAfBnc9v+aRGmeov6H2Y/0wD+
-	 ZVbzRO+dK4GxsRgZgUyVTmxZdHk+Pz32JDhf3VjdInBTD6TZ6GMhKg+MR1tWOfPluv
-	 dx+TIhuMhPJUE54QDLv1NWVCXXx+/2rWfVLUAFuPtiaSgA8K+EITXa41MgjWfGsFPX
-	 Pj3tv6Y4rhOYg==
-Message-ID: <87ad31d7-2ef6-47ca-be31-2ba2ac85d708@uliege.be>
-Date: Tue, 25 Feb 2025 19:36:47 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759FA18C903
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 18:37:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740508672; cv=none; b=tZuRMBnF3F+20Re3li45kqh/Gs09Xu24Y0ikQZOd/Eu6qRkyNb5VnVKG1fAe9zHG7D0gR1frKuWTfqq2+EZ/iZcsWZxyvMa6hGdm1sJx1BWFfL5rh+/2QaByb/15CGlfQu5lvC9amt3UTGPf4h/1veTLkiFUamLQGrFlGUAka8o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740508672; c=relaxed/simple;
+	bh=mtc5kHV4yfcg8CvyLXlfl9YFsPEAtSKI4leOBz+u5+c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HddaZ3JJTZCnI+oURUpzbwCKEm82rwZW9qm9DuN4it1Xxqjd0uyo/Mt8zC40Si3TRYAkBvneLdNLWyH7TxERztFu65jN8lCxnt0yosMhSyzNmHbmoTaUWIFI2DbUJG3oIltetlxaoby3WnTASjo9J/143nMMHF8ezzJYrWkuv8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H9BXYcqX; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4398738217aso52181675e9.3
+        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 10:37:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740508669; x=1741113469; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3iaVHc4/XfXA2DF9jl+povuubBeCM8bFfr3Gc9B5VcM=;
+        b=H9BXYcqXQ7E++rZhRJiuDcUzKyE2g4XZyAToIdHlMt/lkZlhTYgIL5Wfqp5boPA7E/
+         pE8YlKFcd0xdMnDxGNKW8rJq6gtF04PgS/3l2S7yXbDbhW3ZmMjZiRBEBX7dij3ZqJo/
+         0YA2Sx9q3afM44clKvtUN9EFLcXy2zeKF+ii5Oikvlkz1i/bk+Y1hBDxUkp3iJu2QPHt
+         mzS5cej0gyiHsxPeXuER4CbMIn6JwHgFrU4FBroTD8wNkpnJWeKWfS2CKoeswCvtpA6I
+         aBS/2apF9K1FHD7hYKTnz4bs1Aje9Cu04JLeqv24JERPrMS15c2a2vOaJGjpTZ6cGkh1
+         figA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740508669; x=1741113469;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3iaVHc4/XfXA2DF9jl+povuubBeCM8bFfr3Gc9B5VcM=;
+        b=HVkr7Pk2Zz5ljy4b4R3x3YjOXW0cR/v8bZXUblSSh4fWN8HtR+/prR+M1qmdMzOBiK
+         tA/sIRTMYTLtn/+VbTitvx76zEUj01MplBvJsLG0VJTGaKJaTd2WIz2gpkfRBUlmOCEw
+         DJDwe/21MpJzv7aRdHPcymc8GxHiH0HaoG5gaPgShJJIkj3Jnk9YxOp4txSR4PLB3FD8
+         fmeLK0bnY/eUvepkCscxOrVntxjb79kX1yT7mQRDMR2h1BP1+jlxMJ65Hi6v0BJBFlxa
+         9ywi/zWfDaaHDq8xNFlB3Pf6GAdpB//Dec1TX4l8S+pGi+4kasg4q/YvPIR4bluqKQda
+         W5BQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVWFqLH8qOx4JqnstBzWWvEksdZwJb8JoNycAjD8YeVLhR64ESCVPXS0mPR8PgQGoGO+fh/baI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFTbmvrwgeRbLnwN2TSvYkp9mfK/Wlx4ers02RMwxGGdWuf521
+	BxXLQEC3jD4nAK02QFLXrIT3Xg5Jxhe5Atab6pgvSl8cT4mQ37rt
+X-Gm-Gg: ASbGnctEkNXztQDpPsBcnh0fiP1oI+s+G1+BUxCrWdkJbxFAJYF7t3547N52fWz+oEj
+	v5UjJqnN+OYIupTWy2TNI6XtGKVAidcjdGC20bqxLD6qBotjt4MUE58B1n1DctEU44wombp470q
+	LwUr1GCHgcxThtJttnpK+EWLK4K6lv+5pn2zJosWV/51cNqS+GcsTNUth3UgSukrIZQAdoPvw4Z
+	6Meel6UpSWW8lSJwDOf+u9bmjL0gDrlwtfwPI7KaF3uqEkMCfCkfT5Zj7fW3i1WafgckXT7RbSq
+	fLDFn8qIiO3gFGjm7bIrnbr5rAAn3Nj8aHHK7h1xF1I1ugnZQfP7ipkb6MPSGTkiovGYa8WZp3G
+	vg0PegGpTRgWE
+X-Google-Smtp-Source: AGHT+IH5jV0WLJwr4meYw5t5geNhiZJeRS99N5uTizzJ/xzS+uRzG3Le5O1v29l/A3y6EY3d135kgQ==
+X-Received: by 2002:a05:600c:1d0e:b0:439:6712:643d with SMTP id 5b1f17b1804b1-43ab8fd8620mr5118395e9.9.1740508668374;
+        Tue, 25 Feb 2025 10:37:48 -0800 (PST)
+Received: from orome (p200300e41f187700f22f74fffe1f3a53.dip0.t-ipconnect.de. [2003:e4:1f18:7700:f22f:74ff:fe1f:3a53])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-439b02ce735sm149842745e9.3.2025.02.25.10.37.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Feb 2025 10:37:46 -0800 (PST)
+Date: Tue, 25 Feb 2025 19:37:44 +0100
+From: Thierry Reding <thierry.reding@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v3 0/2] net: stmmac: dwc-qos: clean up clock
+ initialisation
+Message-ID: <5qx6hg33brb2zjjqzk3cr7dt56m5jxcwzioejtw5woweemskg5@suu43pp3nsg4>
+References: <Z7yj_BZa6yG02KcI@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 2/3] net: ipv6: fix lwtunnel loops in ioam6, rpl
- and seg6
-To: Ido Schimmel <idosch@idosch.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- Alexander Aring <alex.aring@gmail.com>, David Lebrun <dlebrun@google.com>
-References: <20250211221624.18435-1-justin.iurman@uliege.be>
- <20250211221624.18435-3-justin.iurman@uliege.be> <Z63zgLQ_ZFmkO9ys@shredder>
- <a375f869-9fc3-4a58-a81a-c9c8175463dd@uliege.be> <Z7ISxnU0QhtRGTnb@shredder>
-Content-Language: en-US
-From: Justin Iurman <justin.iurman@uliege.be>
-In-Reply-To: <Z7ISxnU0QhtRGTnb@shredder>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="f3i4x2skmc3z4dxx"
+Content-Disposition: inline
+In-Reply-To: <Z7yj_BZa6yG02KcI@shell.armlinux.org.uk>
 
-On 2/16/25 17:31, Ido Schimmel wrote:
-> On Thu, Feb 13, 2025 at 11:51:49PM +0100, Justin Iurman wrote:
->> On 2/13/25 14:28, Ido Schimmel wrote:
->>> On Tue, Feb 11, 2025 at 11:16:23PM +0100, Justin Iurman wrote:
->>>> When the destination is the same post-transformation, we enter a
->>>> lwtunnel loop. This is true for ioam6_iptunnel, rpl_iptunnel, and
->>>> seg6_iptunnel, in both input() and output() handlers respectively, where
->>>> either dst_input() or dst_output() is called at the end. It happens for
->>>> instance with the ioam6 inline mode, but can also happen for any of them
->>>> as long as the post-transformation destination still matches the fib
->>>> entry. Note that ioam6_iptunnel was already comparing the old and new
->>>> destination address to prevent the loop, but it is not enough (e.g.,
->>>> other addresses can still match the same subnet).
->>>>
->>>> Here is an example for rpl_input():
->>>>
->>>> dump_stack_lvl+0x60/0x80
->>>> rpl_input+0x9d/0x320
->>>> lwtunnel_input+0x64/0xa0
->>>> lwtunnel_input+0x64/0xa0
->>>> lwtunnel_input+0x64/0xa0
->>>> lwtunnel_input+0x64/0xa0
->>>> lwtunnel_input+0x64/0xa0
->>>> [...]
->>>> lwtunnel_input+0x64/0xa0
->>>> lwtunnel_input+0x64/0xa0
->>>> lwtunnel_input+0x64/0xa0
->>>> lwtunnel_input+0x64/0xa0
->>>> lwtunnel_input+0x64/0xa0
->>>> ip6_sublist_rcv_finish+0x85/0x90
->>>> ip6_sublist_rcv+0x236/0x2f0
->>>>
->>>> ... until rpl_do_srh() fails, which means skb_cow_head() failed.
->>>>
->>>> This patch prevents that kind of loop by redirecting to the origin
->>>> input() or output() when the destination is the same
->>>> post-transformation.
->>>
->>> A loop was reported a few months ago with a similar stack trace:
->>> https://lore.kernel.org/netdev/2bc9e2079e864a9290561894d2a602d6@akamai.com/
->>>
->>> But even with this series applied my VM gets stuck. Can you please check
->>> if the fix is incomplete?
->>
->> Good catch! Indeed, seg6_local also needs to be fixed the same way.
->>
->> Back to my first idea: maybe we could directly fix it in lwtunnel_input()
->> and lwtunnel_output() to make our lives easier, but we'd have to be careful
->> to modify all users accordingly. The users I'm 100% sure that are concerned:
->> ioam6 (output), rpl (input/output), seg6 (input/output), seg6_local (input).
->> Other users I'm not totally sure (to be checked): ila (output), bpf (input).
->>
->> Otherwise, we'll need to apply the fix to each user concerned (probably the
->> safest (best?) option right now). Any opinions?
-> 
-> I audited the various lwt users and I agree with your analysis about
-> which users seem to be effected by this issue.
-> 
-> I'm not entirely sure how you want to fix this in
-> lwtunnel_{input,output}() given that only the input()/output() handlers
-> of the individual lwt users are aware of both the old and new dst
-> entries.
 
-Right. The idea was to compare "orig_dst" with "new dst" before/after a 
-call to input()/output() in lwtunnel_input()/lwtunnel_output(). Which, 
-of course, would require to modify each of those input/output handlers 
-respectively, so that they don't call dst_input()/dst_output() nor 
-orig_input()/orig_output() anymore. Would be easier to apply the fix at 
-that level, instead of each one by one.
+--f3i4x2skmc3z4dxx
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next v3 0/2] net: stmmac: dwc-qos: clean up clock
+ initialisation
+MIME-Version: 1.0
+
+On Mon, Feb 24, 2025 at 04:53:16PM +0000, Russell King (Oracle) wrote:
+> Hi,
+>=20
+> My single v1 patch has become two patches as a result of the build
+> error, as it appears this code uses "data" differently from others.
+> v2 still produced build warnings despite local builds being clean,
+> so v3 addresses those.
+>=20
+> The first patch brings some consistency with other drivers, naming
+> local variables that refer to struct plat_stmmacenet_data as
+> "plat_dat", as is used elsewhere in this driver.
+>=20
+>  .../ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c    | 53 ++++++++++++----=
+------
+>  1 file changed, 29 insertions(+), 24 deletions(-)
+
+Tested and works fine on Jetson TX2:
+
+Tested-by: Thierry Reding <treding@nvidia.com>
+
+--f3i4x2skmc3z4dxx
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEiOrDCAFJzPfAjcif3SOs138+s6EFAme+DfgACgkQ3SOs138+
+s6Hc5xAAns6YS5EqizTjVtcybrFLTInegeZ0X+D5ciydxOvm9iHAwZY2/4ywuY9e
+gq6UePIgB51vAzfDfxy5R5X4GvK5+922IL841tyDAJejg54ylBHTFiDoWJVNXUll
+QJbbhM+dL0vRRaxTqPzJfJzkIO7ZyU0BylQwr3GYka21DUkYK4J/LnTleP1b3LMu
+1W0QlEMWq5DznlUJuQ8C9Tn1C4Pr4+ZRmDjSPF7t8coFAP5XNs9Db5KK0DWkTWto
+P0HugDfCHPdDHodfPFzHnT9QxCESDiIHjX4P+PTcR9w4eqg+gjMkiXq1EDpTYu/O
+ph05+xPdywaHeGftW0K2RAf3ZdSRep1YWI90autg4U/g0JTq/P9fCyOwR8p3WEen
+AtGz3MvZmcGbe6FGY7ZjnY/tVKAwPVP07DVSJcD1DzTe+YusCryfWRUTIHfpe69L
+Ric7GRdggYEOZL88Y/bpybtv6kb3baNOpUDwKHj8xDn72FA8coa6Xl8KYDhZvzQe
+4jxMzrghudcWAQ8XKxgxB2q+lZ7B+ZFRt1xU6jc7x+KdMsAGI8XHXc1Y0LiiJMfs
+xNyl8+5hHbissm7ie2JbC/UyuXB4pCtB51+qfRJrzdZs+DTHXbyZZT5TtUWbtHpB
+AzcgVhxrv05jSv7AzsbQiFjNoCC9WZvdMfzZg3Ja2bAh62bFw+o=
+=BS53
+-----END PGP SIGNATURE-----
+
+--f3i4x2skmc3z4dxx--
 
