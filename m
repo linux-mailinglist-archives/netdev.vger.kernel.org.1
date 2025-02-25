@@ -1,172 +1,171 @@
-Return-Path: <netdev+bounces-169295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEB56A433A2
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 04:34:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C84B9A433B9
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 04:41:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC128172B48
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 03:34:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47CDD1794E3
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 03:40:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7DCA126C10;
-	Tue, 25 Feb 2025 03:34:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FF6124BC07;
+	Tue, 25 Feb 2025 03:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Lz5WZOWZ"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="iF9iqF5I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from terminus.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D05367
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 03:34:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63B96242912;
+	Tue, 25 Feb 2025 03:40:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740454487; cv=none; b=mcekyNqfbwXn6KIDfc5gLs76VzWZTt94IfYaQASLmnTfjNgw82536uOkd4Mm2J1JBMVt1qWw+Dk+GmF7+xl1ciB6v7klfT6yqSX+UYi1DgXrIhYyofs+dJ6gwKjlLlhAvsv6H/6h5sADr1uDKDHhtVoWc0DB8w3ZW9Ije6tofZo=
+	t=1740454819; cv=none; b=tOxmGkDYcy/je214/o7eMIXkgj8xvGTCsAJYhnabekgcWaFxCH6eluKDFjN9yYGZaNAqtZcOM/e6LEH5i/7gZDIhF187ugjL0mIhK8rSPRdG2cZVB9VWyVWnOuN9dN4T4UzaQSOnXvcZdu0Bf8vCdIwdw8lpz6Cpn1YskCgE0u8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740454487; c=relaxed/simple;
-	bh=n0MPU9u76WNuFC1lbMNQO5d/2rQxWm8o0Yxwgpl063c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LU1dUxYIzhIOJ5gZBs/kpgPjBiiiGUdftfn8n780cwKr8nc3egoIxL1oZ0Zg5INk7nJldw1w+LUJyzAq7NNT5Zu9RJvbgCfov2arpy17jc45TJd+8R7ikd0D+NffOZoZ9sgj8MtLoq8p2iZtgZoRJhsQ6CI6ZupeZCNF36sx4Qk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Lz5WZOWZ; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7c0a3d6a6e4so483674285a.1
-        for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 19:34:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1740454485; x=1741059285; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EjFBxuOiXJIQ9GfmIov4LXWy04rxAtfY7qOfc8aFDww=;
-        b=Lz5WZOWZHkRT4qRZ6RJrbdPKIvNJep8GJu4WiYFeNxTy3In0uAnT8KzmH5usNM3/M/
-         Ew3ehJLTX5mooCyP9AB2kyGrKkml6tdBHGbh4CmsEQTVVrrrM75SWEwC+rica2DOCnUf
-         sOBCGGfBSdvgKr5Irv8DqyGx0GRu+WAeTjfvA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740454485; x=1741059285;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EjFBxuOiXJIQ9GfmIov4LXWy04rxAtfY7qOfc8aFDww=;
-        b=jHtvIDfaZKNNFjaXDKMYqor8x0u1cT2e4QR1tzg1HQ7SWx/QbPZpgqOMU18q0rydeH
-         8Iw4Dg6iq1NFwJc0magzpxPSeYtm5C2qKbWfmAiLvkTtJaZ2EWNLxiXp+hVdYFuiZjxm
-         lmgulM5RLxENesAh/rBTXwzJLUU2AsNlRmtNnghl9OQ8llKSK1mngy7PKG2TW3YYQboA
-         +wjq2s2WOhuE/HIuAImXyYkeRtbKvmseTZ51AFd+soIA0EBnI/wmmMNUbWCqUKa8OEQ0
-         IApo0WN/AjuqrByPb4cJZjJeHW4SXheha/Tq+LSNOE1Z/OH+I/9sGi10Ue3dyMUFHXD6
-         SzVg==
-X-Gm-Message-State: AOJu0Yzf0mbN5plsX70pqmlrcELfx3au14W8Hx7FuAwPvV5oXgWUzaHK
-	gD7RxM+uuLK6frAyyYXeL9FNd1P/VQTck2IXmfWKgeYTCfV3XpElHHQZKjbXaSE=
-X-Gm-Gg: ASbGnctBQFBOoGXwayLn56NanqGdSN99oGDa+unLLYCTO70KyPOiEagYP2k47Z8V1OL
-	FkIleehgHbolzVmf9j6AVNvV67PkDQ3Otr5bZCBZWcwQHFiGNX2qb3PYiJpX7sjYHOhkzS6KmsK
-	6RkiLgd6oWmIT8M6sOBeM+1avWuNZ1eBDrxInTLu/XvVOjxlfXHlzG5lT1tgIzgAsIO6u/QlnxN
-	I8cRb/+VcFrBceCvU77jna3YUBq1eavsE0+3Jt15uhKpVl4YaeCKckS5ryUROdW/XQTNbDEHEI8
-	GsGl8DpR0OkXpzB+LGa7JsOktEoEJPLl0Gw8jL+ZcXI+dlrxDljj8g6bVQBfwnxy
-X-Google-Smtp-Source: AGHT+IFHkbzVnBuItC7VfdXYx1LXxjkLcMBO/fE0/E/a/exzAcVXGwtfB/3cvjO68IYZQw/2sqjkKQ==
-X-Received: by 2002:a05:620a:2a0f:b0:7c0:ae97:7fa0 with SMTP id af79cd13be357-7c0cef460c8mr2223585085a.45.1740454485042;
-        Mon, 24 Feb 2025 19:34:45 -0800 (PST)
-Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c23c329b8esm57045285a.86.2025.02.24.19.34.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Feb 2025 19:34:44 -0800 (PST)
-Date: Mon, 24 Feb 2025 22:34:40 -0500
-From: Joe Damato <jdamato@fastly.com>
-To: Xin Tian <tianx@yunsilicon.com>
-Cc: netdev@vger.kernel.org, leon@kernel.org, andrew+netdev@lunn.ch,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	davem@davemloft.net, jeff.johnson@oss.qualcomm.com,
-	przemyslaw.kitszel@intel.com, weihg@yunsilicon.com,
-	wanry@yunsilicon.com, horms@kernel.org,
-	parthiban.veerasooran@microchip.com, masahiroy@kernel.org
-Subject: Re: [PATCH net-next v5 13/14] xsc: Add eth reception data path
-Message-ID: <Z706ULnEoemYWdvQ@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Xin Tian <tianx@yunsilicon.com>, netdev@vger.kernel.org,
-	leon@kernel.org, andrew+netdev@lunn.ch, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, davem@davemloft.net,
-	jeff.johnson@oss.qualcomm.com, przemyslaw.kitszel@intel.com,
-	weihg@yunsilicon.com, wanry@yunsilicon.com, horms@kernel.org,
-	parthiban.veerasooran@microchip.com, masahiroy@kernel.org
-References: <20250224172416.2455751-1-tianx@yunsilicon.com>
- <20250224172443.2455751-14-tianx@yunsilicon.com>
+	s=arc-20240116; t=1740454819; c=relaxed/simple;
+	bh=qJuy0nK2q6YCUlorfPoA1uGhIzEe0LfAfeiGmFKmujU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=l6I6aJyqp12dgdp4fK0A+SJCajV6XuJuc5ajjDVqpMRw5RwboP8Blz/UCCEiKFyFPkvlM4Ja7tldkfsdTEL6BNo+gb/V4Vqp0JGhfM1eBOy3zvfTZhq+CELWQLdQKcKWl7LC0Jmi3eRJwwl++RzwqTX5Nj1T4nsrSrbMtzqiJNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=iF9iqF5I; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [172.27.1.176] ([76.133.66.138])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 51P3aPQT1061652
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Mon, 24 Feb 2025 19:36:26 -0800
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 51P3aPQT1061652
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025021701; t=1740454597;
+	bh=ISdSv8V44MsbYhNsZikfbFNm2jh7tbbEZwA+56mURdo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=iF9iqF5IJij6HEIYPvvetQ6+tmIzHsh+pMTMVnu3P5ykEhZfImV1libD4devCmagC
+	 3iyNSk1XFew7r8nfwrcPOMDwT9Cet01bBs8IAXImpdZtFUNL3xujHc86QVgJiUt4X2
+	 0obQOYiKlDxXVK9eiAHHN4J1RQO+t4f6a/s1DU/qIj/jceKMbtNss8wjpWMLBt7Ymh
+	 YFL/VhabUdylO/46/55nX8FOwHbYthWKv8154FTojDQ/TbamsE3xTiQ8D2e6xanXYX
+	 Oq30jBmkXfmGEjBRSmTsnad5TAIoXsXj3RQH1SppbmnJ0+TSzbTmjlZvJzSgp8i1Fw
+	 p0rBDMFAbZAag==
+Message-ID: <d0067e6a-a6af-4b38-ac72-f655af4d3b3d@zytor.com>
+Date: Mon, 24 Feb 2025 19:36:25 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250224172443.2455751-14-tianx@yunsilicon.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 03/17] x86: Replace open-coded parity calculation with
+ parity8()
+To: Uros Bizjak <ubizjak@gmail.com>
+Cc: Kuan-Wei Chiu <visitorckw@gmail.com>, tglx@linutronix.de,
+        Ingo Molnar <mingo@redhat.com>, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, jk@ozlabs.org,
+        joel@jms.id.au, eajames@linux.ibm.com, andrzej.hajda@intel.com,
+        neil.armstrong@linaro.org, rfoss@kernel.org,
+        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+        tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
+        dmitry.torokhov@gmail.com, mchehab@kernel.org, awalls@md.metrocast.net,
+        hverkuil@xs4all.nl, miquel.raynal@bootlin.com, richard@nod.at,
+        vigneshr@ti.com, louis.peens@corigine.com, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+        parthiban.veerasooran@microchip.com, arend.vanspriel@broadcom.com,
+        johannes@sipsolutions.net, gregkh@linuxfoundation.org,
+        jirislaby@kernel.org, yury.norov@gmail.com, akpm@linux-foundation.org,
+        mingo@kernel.org, alistair@popple.id.au, linux@rasmusvillemoes.dk,
+        Laurent.pinchart@ideasonboard.com, jonas@kwiboo.se,
+        jernej.skrabec@gmail.com, kuba@kernel.org,
+        linux-kernel@vger.kernel.org, linux-fsi@lists.ozlabs.org,
+        dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
+        oss-drivers@corigine.com, netdev@vger.kernel.org,
+        linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev,
+        brcm80211-dev-list.pdl@broadcom.com, linux-serial@vger.kernel.org,
+        bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw,
+        Yu-Chun Lin <eleanor15x@gmail.com>
+References: <20250223164217.2139331-1-visitorckw@gmail.com>
+ <20250223164217.2139331-4-visitorckw@gmail.com>
+ <d080a2d6-9ec7-1c86-4cf4-536400221f68@gmail.com>
+ <e0b1c299-7f19-4453-a1ce-676068601213@zytor.com>
+ <CAFULd4a_AnP4iqgQs7a6xAsnUFL8oZXxFcAWLmZFMm6MPF_zDQ@mail.gmail.com>
+Content-Language: en-US
+From: "H. Peter Anvin" <hpa@zytor.com>
+In-Reply-To: <CAFULd4a_AnP4iqgQs7a6xAsnUFL8oZXxFcAWLmZFMm6MPF_zDQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 25, 2025 at 01:24:44AM +0800, Xin Tian wrote:
-> rx data path:
 
-[...]
+On 2/24/25 14:08, Uros Bizjak wrote:
+> On Mon, Feb 24, 2025 at 10:56 PM H. Peter Anvin <hpa@zytor.com> wrote:
+>>
+>> On 2/24/25 07:24, Uros Bizjak wrote:
+>>>
+>>>
+>>> On 23. 02. 25 17:42, Kuan-Wei Chiu wrote:
+>>>> Refactor parity calculations to use the standard parity8() helper. This
+>>>> change eliminates redundant implementations and improves code
+>>>> efficiency.
+>>>
+>>> The patch improves parity assembly code in bootflag.o from:
+>>>
+>>>     58:    89 de                    mov    %ebx,%esi
+>>>     5a:    b9 08 00 00 00           mov    $0x8,%ecx
+>>>     5f:    31 d2                    xor    %edx,%edx
+>>>     61:    89 f0                    mov    %esi,%eax
+>>>     63:    89 d7                    mov    %edx,%edi
+>>>     65:    40 d0 ee                 shr    %sil
+>>>     68:    83 e0 01                 and    $0x1,%eax
+>>>     6b:    31 c2                    xor    %eax,%edx
+>>>     6d:    83 e9 01                 sub    $0x1,%ecx
+>>>     70:    75 ef                    jne    61 <sbf_init+0x51>
+>>>     72:    39 c7                    cmp    %eax,%edi
+>>>     74:    74 7f                    je     f5 <sbf_init+0xe5>
+>>>     76:
+>>>
+>>> to:
+>>>
+>>>     54:    89 d8                    mov    %ebx,%eax
+>>>     56:    ba 96 69 00 00           mov    $0x6996,%edx
+>>>     5b:    c0 e8 04                 shr    $0x4,%al
+>>>     5e:    31 d8                    xor    %ebx,%eax
+>>>     60:    83 e0 0f                 and    $0xf,%eax
+>>>     63:    0f a3 c2                 bt     %eax,%edx
+>>>     66:    73 64                    jae    cc <sbf_init+0xbc>
+>>>     68:
+>>>
+>>> which is faster and smaller (-10 bytes) code.
+>>>
+>>
+>> Of course, on x86, parity8() and parity16() can be implemented very simply:
+>>
+>> (Also, the parity functions really ought to return bool, and be flagged
+>> __attribute_const__.)
+>>
+>> static inline __attribute_const__ bool _arch_parity8(u8 val)
+>> {
+>>          bool parity;
+>>          asm("and %0,%0" : "=@ccnp" (parity) : "q" (val));
+> 
+> asm("test %0,%0" : "=@ccnp" (parity) : "q" (val));
+> 
+> because we are interested only in flags.
+> 
 
-> diff --git a/drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_rx.c b/drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_rx.c
-> index 72f33bb53..b87105c26 100644
-> --- a/drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_rx.c
-> +++ b/drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_rx.c
-> @@ -5,44 +5,594 @@
+Also, needs to be %1,%1 (my mistake, thought flags outputs didn't count.)
 
-[...]
+Finally, this is kind of an obvious improvement:
 
->  struct sk_buff *xsc_skb_from_cqe_linear(struct xsc_rq *rq,
->  					struct xsc_wqe_frag_info *wi,
->  					u32 cqe_bcnt, u8 has_pph)
->  {
-> -	// TBD
-> -	return NULL;
-> +	int pph_len = has_pph ? XSC_PPH_HEAD_LEN : 0;
-> +	u16 rx_headroom = rq->buff.headroom;
-> +	struct xsc_dma_info *di = wi->di;
-> +	struct sk_buff *skb;
-> +	void *va, *data;
-> +	u32 frag_size;
-> +
-> +	va = page_address(di->page) + wi->offset;
-> +	data = va + rx_headroom + pph_len;
-> +	frag_size = XSC_SKB_FRAG_SZ(rx_headroom + cqe_bcnt);
-> +
-> +	dma_sync_single_range_for_cpu(rq->cq.xdev->device, di->addr, wi->offset,
-> +				      frag_size, DMA_FROM_DEVICE);
-> +	prefetchw(va); /* xdp_frame data area */
-> +	prefetch(data);
+  static void __init sbf_write(u8 v)
+  {
+         unsigned long flags;
 
-net_prefetchw and net_prefetch, possibly?
+         if (sbf_port != -1) {
+-               v &= ~SBF_PARITY;
+                 if (!parity(v))
+-                       v |= SBF_PARITY;
++                       v ^= SBF_PARITY;
 
-[...]
+	-hpa
 
->  struct sk_buff *xsc_skb_from_cqe_nonlinear(struct xsc_rq *rq,
->  					   struct xsc_wqe_frag_info *wi,
->  					   u32 cqe_bcnt, u8 has_pph)
->  {
-> -	// TBD
-> -	return NULL;
-> +	struct xsc_rq_frag_info *frag_info = &rq->wqe.info.arr[0];
-> +	u16 headlen  = min_t(u32, XSC_RX_MAX_HEAD, cqe_bcnt);
-> +	struct xsc_wqe_frag_info *head_wi = wi;
-> +	struct xsc_wqe_frag_info *rx_wi = wi;
-> +	u16 head_offset = head_wi->offset;
-> +	u16 byte_cnt = cqe_bcnt - headlen;
-> +	u16 frag_consumed_bytes = 0;
-> +	u16 frag_headlen = headlen;
-> +	struct net_device *netdev;
-> +	struct xsc_channel *c;
-> +	struct sk_buff *skb;
-> +	struct device *dev;
-> +	u8 fragcnt = 0;
-> +	int i = 0;
-> +
-> +	c = rq->cq.channel;
-> +	dev = c->adapter->dev;
-> +	netdev = c->adapter->netdev;
-> +
-> +	skb = napi_alloc_skb(rq->cq.napi, ALIGN(XSC_RX_MAX_HEAD, sizeof(long)));
-> +	if (unlikely(!skb))
-> +		return NULL;
-> +
-> +	prefetchw(skb->data);
-
-Same as above: net_prefetchw ?
 
