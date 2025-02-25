@@ -1,86 +1,139 @@
-Return-Path: <netdev+bounces-169524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24FEFA4458F
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 17:12:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA46DA445B8
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 17:17:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 237D5166683
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 16:12:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D59A03B3CF9
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 16:13:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7003189912;
-	Tue, 25 Feb 2025 16:12:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC0102FB2;
+	Tue, 25 Feb 2025 16:13:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NU2EeJ8F"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oz2Kd9zi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E7F17E015;
-	Tue, 25 Feb 2025 16:12:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 813E321ABAB;
+	Tue, 25 Feb 2025 16:13:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740499940; cv=none; b=D01MrrJqucRiRhfE4XPEVRviPPB2C2mXYEqNyUEEmZBfXiGprN6OeqPRHprWFMOSs7A63anbVp03UPIJNfLGCgSF+HbJW2NKTkAaGLZ34iOaHOV2Pb4bDxFZK6CIJIl7YLzByCREUOD437f02cfdAM61OvJHfJ07JRbi6vat9yY=
+	t=1740500018; cv=none; b=ngVN/VNtt95UuTwhtx/GwCgTAWUFq+qjR9gdZl0mfLyqYd/bmnHcM+VcVau/bLe4fcAlm1/UGKd2Isz0/3aPcv9tK1L2Ow8zjwTkYhFHhQ5w8YVABeEVNOUlw3MspcwPpNdp8+i40JW3F3bB0JbBwc7lYQdwpqgyPjGPHPbDiiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740499940; c=relaxed/simple;
-	bh=6TPSx9DDdcDsDZc4Z3MH/7GdfIzQc59GGd56ID/Sx5g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LOWCQUtXF3Ze3KVqjFuY4n7z/mjJ34pSg6wP8Vh4BZ6ES3qy9Z0K055TB/WGr/R6KjgbJUk9IEhdgS05Yy6rxAa1g+43hyzDDhyczuwkszgSUHd8d5oeZF3Q8uoizeUnv10mwkrbMr5DLuzAeLHBGyu3S6YYSDmQb3TtYgOOh1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NU2EeJ8F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7572C4CEDD;
-	Tue, 25 Feb 2025 16:12:19 +0000 (UTC)
+	s=arc-20240116; t=1740500018; c=relaxed/simple;
+	bh=zxHilzlwDf7ovEtBPkSL+tIZUqIVWUarGWX8NAWd+bQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bohQrny7OVSufcyJZepLHEsW3OdPsdP7imOnOORJoldzuibUZ5+YaTJDEmZvp8Min4whTyg5hBgKRZv+G9TRfqzHEChzgOLks5hosmSVHnLQQP33SFGDsiCuJYTtY+NfJS0L5iTzi8tGDdjnDh9mehVQMtDWYfizhVXkSyFWiEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oz2Kd9zi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8D60C4CEDD;
+	Tue, 25 Feb 2025 16:13:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740499940;
-	bh=6TPSx9DDdcDsDZc4Z3MH/7GdfIzQc59GGd56ID/Sx5g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NU2EeJ8FyzWf7HI2/8kGM+qhJabN/O1VJNuarGCTaaTAf7SR0p+tXbOv0rNLPxQ1P
-	 GkqL3qVSbuxuVt9WmUtYt4eLECgRNhSgxMT0XJ/QUI9wAN5TWpY3nPWU8jNdGjfQJ1
-	 LEUk04YN6vDTgqNHfkNpZ21fN8T0YcAAhr04EjLYBM4jAXdRaS7W4XTBxCiIxrqv4P
-	 57Y+JoPZ9jyr40AvmvoOKNnT4zak99uCOcC7BXyI5g+RhLFg7ZZKkroT5cbSGKYFZx
-	 /ZFM9Ce6EOdxSFVina9oQWVocBhDIDX72LveN6lPTQLAoVJoBBHIB2h6yRFVQvtex7
-	 lT6g4Vkayq9QA==
-Date: Tue, 25 Feb 2025 10:12:18 -0600
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Amelie Delaunay <amelie.delaunay@foss.st.com>
-Cc: linux-kernel@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Will Deacon <will@kernel.org>, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	devicetree@vger.kernel.org,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Christophe Roullier <christophe.roullier@foss.st.com>,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v2 04/10] dt-bindings: stm32: add STM32MP21 and STM32MP23
- compatibles for syscon
-Message-ID: <174049993788.2634473.18262936778020471573.robh@kernel.org>
-References: <20250225-b4-stm32mp2_new_dts-v2-0-1a628c1580c7@foss.st.com>
- <20250225-b4-stm32mp2_new_dts-v2-4-1a628c1580c7@foss.st.com>
+	s=k20201202; t=1740500018;
+	bh=zxHilzlwDf7ovEtBPkSL+tIZUqIVWUarGWX8NAWd+bQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=oz2Kd9ziWB20Tn9xySVGugZduBZV1GtbCE11NCHQTqg2eFRVdD8gJ1voa9Iq/ZJX+
+	 AqU4ymCwQMPEPcKfZ+Q3/0sPK7Ra4SwsV2HQCE5uLxRL7fxBoDq1ig9UM5tYAqbOUb
+	 EC7lMCJRSjxbUPUvd1/dcRWpr8Km0w8h1b09Flc01m/esDg7fB9BIm6lRNYDB0fLE7
+	 QihjZMIqv+B66qa80w83pAJMUcfEt/gESTzJvuYp5Do+Qt+RGWCUjokSVIXPUCVExj
+	 6xIupq+6HZJt1jpJxceVp/GINA0+k8Ka8oLa9tO+F2B7EMr/TM7yfeHnmD2cFIuowD
+	 Dc0lehLXNQyPA==
+From: Lee Jones <lee@kernel.org>
+To: lee@kernel.org,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: stable@vger.kernel.org,
+	Quang Le <quanglex97@gmail.com>,
+	Cong Wang <cong.wang@bytedance.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH v6.1-v5.4 1/1] pfifo_tail_enqueue: Drop new packet when sch->limit == 0
+Date: Tue, 25 Feb 2025 16:13:09 +0000
+Message-ID: <20250225161310.2194361-1-lee@kernel.org>
+X-Mailer: git-send-email 2.48.1.658.g4767266eb4-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250225-b4-stm32mp2_new_dts-v2-4-1a628c1580c7@foss.st.com>
+Content-Transfer-Encoding: 8bit
 
+[ Upstream commit 647cef20e649c576dff271e018d5d15d998b629d ]
 
-On Tue, 25 Feb 2025 09:54:07 +0100, Amelie Delaunay wrote:
-> Add the new syscon compatibles for STM32MP21 syscfg = "st,stm32mp21-syscfg"
-> and for STM32MP23 syscfg = "st,stm32mp23-syscfg".
-> 
-> Signed-off-by: Amelie Delaunay <amelie.delaunay@foss.st.com>
-> ---
->  Documentation/devicetree/bindings/arm/stm32/st,stm32-syscon.yaml | 2 ++
->  1 file changed, 2 insertions(+)
-> 
+Expected behaviour:
+In case we reach scheduler's limit, pfifo_tail_enqueue() will drop a
+packet in scheduler's queue and decrease scheduler's qlen by one.
+Then, pfifo_tail_enqueue() enqueue new packet and increase
+scheduler's qlen by one. Finally, pfifo_tail_enqueue() return
+`NET_XMIT_CN` status code.
 
-Acked-by: Rob Herring (Arm) <robh@kernel.org>
+Weird behaviour:
+In case we set `sch->limit == 0` and trigger pfifo_tail_enqueue() on a
+scheduler that has no packet, the 'drop a packet' step will do nothing.
+This means the scheduler's qlen still has value equal 0.
+Then, we continue to enqueue new packet and increase scheduler's qlen by
+one. In summary, we can leverage pfifo_tail_enqueue() to increase qlen by
+one and return `NET_XMIT_CN` status code.
+
+The problem is:
+Let's say we have two qdiscs: Qdisc_A and Qdisc_B.
+ - Qdisc_A's type must have '->graft()' function to create parent/child relationship.
+   Let's say Qdisc_A's type is `hfsc`. Enqueue packet to this qdisc will trigger `hfsc_enqueue`.
+ - Qdisc_B's type is pfifo_head_drop. Enqueue packet to this qdisc will trigger `pfifo_tail_enqueue`.
+ - Qdisc_B is configured to have `sch->limit == 0`.
+ - Qdisc_A is configured to route the enqueued's packet to Qdisc_B.
+
+Enqueue packet through Qdisc_A will lead to:
+ - hfsc_enqueue(Qdisc_A) -> pfifo_tail_enqueue(Qdisc_B)
+ - Qdisc_B->q.qlen += 1
+ - pfifo_tail_enqueue() return `NET_XMIT_CN`
+ - hfsc_enqueue() check for `NET_XMIT_SUCCESS` and see `NET_XMIT_CN` => hfsc_enqueue() don't increase qlen of Qdisc_A.
+
+The whole process lead to a situation where Qdisc_A->q.qlen == 0 and Qdisc_B->q.qlen == 1.
+Replace 'hfsc' with other type (for example: 'drr') still lead to the same problem.
+This violate the design where parent's qlen should equal to the sum of its childrens'qlen.
+
+Bug impact: This issue can be used for user->kernel privilege escalation when it is reachable.
+
+Fixes: 57dbb2d83d10 ("sched: add head drop fifo queue")
+Reported-by: Quang Le <quanglex97@gmail.com>
+Signed-off-by: Quang Le <quanglex97@gmail.com>
+Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+Link: https://patch.msgid.link/20250204005841.223511-2-xiyou.wangcong@gmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+[Lee: Backported to linux-6.6.y - fixed a minor surrounding diff conflict]
+(cherry picked from commit e40cb34b7f247fe2e366fd192700d1b4f38196ca)
+Signed-off-by: Lee Jones <lee@kernel.org>
+---
+
+- Applies cleanly to v6.1, v5.15, v5.10 and v5.4
+
+ net/sched/sch_fifo.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/net/sched/sch_fifo.c b/net/sched/sch_fifo.c
+index e1040421b797..af5f2ab69b8d 100644
+--- a/net/sched/sch_fifo.c
++++ b/net/sched/sch_fifo.c
+@@ -39,6 +39,9 @@ static int pfifo_tail_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ {
+ 	unsigned int prev_backlog;
+ 
++	if (unlikely(READ_ONCE(sch->limit) == 0))
++		return qdisc_drop(skb, sch, to_free);
++
+ 	if (likely(sch->q.qlen < sch->limit))
+ 		return qdisc_enqueue_tail(skb, sch);
+ 
+-- 
+2.48.1.658.g4767266eb4-goog
 
 
