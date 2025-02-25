@@ -1,136 +1,213 @@
-Return-Path: <netdev+bounces-169529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB60AA44646
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 17:38:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EF06A44656
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 17:40:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C249166907
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 16:35:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3DFE19C26DB
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 16:37:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 396A6191F88;
-	Tue, 25 Feb 2025 16:35:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="IiYinB/o"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63511195980;
+	Tue, 25 Feb 2025 16:37:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com [209.85.222.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72DF518B475
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 16:35:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F1E21946DF
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 16:37:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740501311; cv=none; b=m2LyyIgMu2/SsEz4Vgq39fFOt+0Rzq+TDxYk+sq0x+n1Myfo4Im0jNvI2574tFw5uG6StsD9glBNSf5ACkEsMteamTHomdTejJhMzKQX64sbIN/895l7a9KyLlRoq/eT0M73aoG42XntCrML+EGlsZY2vwUhRsZUwW2ywJIwQjo=
+	t=1740501442; cv=none; b=aRklietJzm7qiDp7u5XN6U9PeTtsXWrueHBMWYBQxJXzdvM+iR+pVBfk1YEUGjJY3Ip4g30EptmqQyDOIroUbTtAYIOH1s/pn8Qy5Pc4d9e4GoNcHjLseilXvbRNuOZtycnuAwrxGn+zK+Drxq7QCon24p26TSvGXKhzF7hHRz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740501311; c=relaxed/simple;
-	bh=jem3zFrU3iVsgiinhnBrVus3W9ZGzYLT1GZLC3giy7c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q2YKdeubvMiRTaGcQMvh9Sy2LB1nihkQNwoytq+jpSBhZAKGTHHyJgS/Sqkj9tB6b86kPLrPPlNrKiGz780U/MF029hSK0vf5hE3eSCealB20XlOVcuXRneuXClADvLmBNL7CztkR6VjVA7M7FY2ntSbgEAGPg2WqLkFEw2xZ88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=IiYinB/o; arc=none smtp.client-ip=209.85.222.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7c22ac6d856so246840885a.1
-        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 08:35:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1740501308; x=1741106108; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1cWhMg8zrgaEeASgPaC492tuyAY/j8k61hn8EbblVbM=;
-        b=IiYinB/ovJLyGuAOFS3hgSAQl/v+Kj64gGUbmJtkegMdNA7Zh/ki9IFSOJOT2w/6Jq
-         nhbuX81s8r0AyOtgO277EVEcnDFoe5cxtjr98QeIdmkhbX6e5VYPYkCJ/r/LpZJp67w4
-         woLO/ByOxAEoDV86LvxtWNJU73eo0kjNCC4PY=
+	s=arc-20240116; t=1740501442; c=relaxed/simple;
+	bh=JXGNsMAKA/cIr0fw23heKnD8Fpk+70VhQUoueMIU+dA=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=WR2faLop9jECzipDSSiZq0IvkdWBdaxzZ/4+bbIwTN/OYkkNTpt9jHyjmHSuZGQ3rhbCj2QHpbUc2DEKrYTYdlOMelgbVwK7CQq1HclAsrZ65CMvd9mgo+Fc66KTGiqKHbUQEiYuw/y6z8WzkH3s3YfVoqeEQo/OrSWQ11/RMZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=devklog.net; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=devklog.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-867129fdb0aso3565849241.1
+        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 08:37:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740501308; x=1741106108;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1cWhMg8zrgaEeASgPaC492tuyAY/j8k61hn8EbblVbM=;
-        b=YgKltIKDMDaZG5bPukWDKEckteUr6AFdOwgdXnV/yf8MIIieeY4B+2TukbiM2Nnkg2
-         NplIpVTQxsKTm6bfdIhOuUy3N+PUn6N/Sl0go1Duwcw8oCLPUpvp7qj5k4MS0di0OsbM
-         +XheS/AiwJHcds7aUQvu43PHOlPjE6LF1o9uumoOFQRQTdq26rFtHm4WUv0IpsHFJQLd
-         P4SWC7LV1MW2ONw7Nlhgd1g+LgfP22EV+DThBq/V9gUHwEEvSESKadP0fELo52chhaY8
-         fE73HeIBSg1WNScvtNMKRnb2liT9bp2Cxj3dCKE3YGiR4yzRqRdLnSMc5PPvmzHexT3A
-         2yVA==
-X-Forwarded-Encrypted: i=1; AJvYcCX2OHOq4HY2RAPaFqCA0HRiNHHwbyOqwBK5yzcPvMXqubttGU95ywiqQ9/zLdDk4LzPLXRSwG0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEsfLa71ljUpJjdFDFub7rDYbhmasV9SvTc/eIyc/mgd/OyF6H
-	bySIhdI+mYbBKXGXjb5i0uACa2uYANstiLOonUiB8usRPUFmI9fH75HhCV9whdo=
-X-Gm-Gg: ASbGncvE6QBRQeDPG1A8oLZkeXD6/b1+96uT2G3OpU7comhBYsmyglMjBeX+Sjhoiux
-	59hEYKLfFvd4/yXvVSgW0bFtvL1fIRg1npyYJPZBoPntWaDjtdNpbOk9W3gUgZADgO65ZzCXuUz
-	f7MMgTc8jYL0wdVm8BmAiZYZwEC5YBoeFMMZUAAHrMt3GGfhedL0Y2LOEvyVZXUP3VcuFgY6dWO
-	/+JKTG46ch6Yke3jyx3tfPpHphBzASkokgT1MIBkZST8Kw5tK3Z5ImTZ9THTfdNYp43SBHUL/Sf
-	MCAKxoeRAmTvnFQjpGQngnMkiKBOOCXFloTEebzVTfgHOSA/GproWaliVVLJIhZX
-X-Google-Smtp-Source: AGHT+IGgDvy4xoDzig5kXJxe/3Fu+Tdps3+mFFwNS++FrVKpndvMvxqHL1EZ7SqClO+KATO6q7p1LA==
-X-Received: by 2002:a05:620a:2405:b0:7c0:88e6:f76c with SMTP id af79cd13be357-7c0cef6da4fmr2613205185a.51.1740501308330;
-        Tue, 25 Feb 2025 08:35:08 -0800 (PST)
-Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c23c33d06bsm123899685a.110.2025.02.25.08.35.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Feb 2025 08:35:07 -0800 (PST)
-Date: Tue, 25 Feb 2025 11:35:05 -0500
-From: Joe Damato <jdamato@fastly.com>
-To: Gal Pressman <gal@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [PATCH net-next] net: ethtool: Don't check if RSS context exists
- in case of context 0
-Message-ID: <Z73xOUPuGL7jvyV5@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Gal Pressman <gal@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>
-References: <20250225071348.509432-1-gal@nvidia.com>
+        d=1e100.net; s=20230601; t=1740501439; x=1741106239;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bE1Bm++4+aG0JvqzXHtfxZSxbwfywYe7NdW94QidQIg=;
+        b=ce7PZlxV/g021h+uweascBG+TmYtkg3JDP8Z3qteQdQ6RAyQzOJkUpRkhd/AqSE9xm
+         5Ig5YkiAV70YJ6lAjww4LUPwW+uPjkN3m3jWZjkPexegiEIFwX4jrgOsxLHWGd8FRqJR
+         UTNXOx5CMCapGT1cdiWsWWDyzO2FclUCvn1RuRHVEwLOZp//VNu6jVxjxhsMkIp8mspy
+         DUgqhRmuO6Vgef5/ah3puhdMDXlOoTV0gptQQeQ9X13iRycAPxctrUcPX/4k76Xwg0Fn
+         hhI1pXGHoxcYk9DJk7B9Rv9LDywLekojb8nyFAU6FsdIyc0JBIPk1cAQjLwh1X0R3Zw9
+         VY4A==
+X-Gm-Message-State: AOJu0YwO6ruXAfxmpWBx7w48VnC8KUdxBxuc0tDX09ZKlgmnc8WUkj0O
+	HF6PWH/BtvpcQz6PMqnRxYCWN/1C1TE1R5L/L0wp59kifI/ie6LdP/wzvQ==
+X-Gm-Gg: ASbGncst8hYgHr+B0hc+VmXUPhu5wLBb+k6dVmpkKofrru/zBolSp6WRagcVkHp0Oh0
+	Ni6ajwS0L8Q7aCazorEa7LVJ4wAutVmVar3ZhY7Cwp9zeIF0wd3BCp/Zu/mNG7d7Tm+oJnY4CLG
+	2s8Ca5ZDh3SxXehZal/hU4xSyN2HztVyUtSFYHKTzg68Mqv1oXjEeO7XkI/jMLGd4svNgawV2Kv
+	AgbiYQMF/br1adppgkoTCnDPlta7MTt0aDlI4Vo6/JqSltZhnTMZeux96uyKGx25ALXyUjciUX2
+	o/lLQGNkuHVrVNhxTV8fyI34aoTq6VmnY5HO87hygNE9b+e5rKuvsOnv
+X-Google-Smtp-Source: AGHT+IGtphQAYN6SnLqeaj5u52N4Txa3SVmxouAupr2eOfFq6jmRr6ZOtpRRvyUVwLWR4d77hzbivQ==
+X-Received: by 2002:a05:6102:2928:b0:4bb:e36f:6a35 with SMTP id ada2fe7eead31-4bfc280482fmr9208524137.14.1740501438955;
+        Tue, 25 Feb 2025 08:37:18 -0800 (PST)
+Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com. [209.85.222.52])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-86b1ed6eb5esm404222241.16.2025.02.25.08.37.18
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Feb 2025 08:37:18 -0800 (PST)
+Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-868f19a9421so3642165241.2
+        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 08:37:18 -0800 (PST)
+X-Received: by 2002:a05:6102:cd4:b0:4bb:e8c5:b157 with SMTP id
+ ada2fe7eead31-4bfc29465dcmr9309040137.25.1740501438406; Tue, 25 Feb 2025
+ 08:37:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250225071348.509432-1-gal@nvidia.com>
+From: =?UTF-8?B?SmVhbi1GcmFuw6dvaXMgUm95?= <jf@devklog.net>
+Date: Tue, 25 Feb 2025 08:37:07 -0800
+X-Gmail-Original-Message-ID: <CAE8T=_Go-A_W9j18oO+5S52pXKwgFDcR8XgHiywwSRSZmO2LEw@mail.gmail.com>
+X-Gm-Features: AQ5f1Jo3XzyJQ3CwFhNx5fD629OTGZIyNneongY_0kMjUOJ_-HTtCNaCYjZWHvM
+Message-ID: <CAE8T=_Go-A_W9j18oO+5S52pXKwgFDcR8XgHiywwSRSZmO2LEw@mail.gmail.com>
+Subject: mlx5e_xmit: detected field-spanning write (6.12.16)
+To: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Feb 25, 2025 at 09:13:48AM +0200, Gal Pressman wrote:
-> Context 0 (default context) always exists, there is no need to check
-> whether it exists or not when adding a flow steering rule.
-> 
-> The existing check fails when creating a flow steering rule for context
-> 0 as it is not stored in the rss_ctx xarray.
-> 
-> For example:
-> $ ethtool --config-ntuple eth2 flow-type tcp4 dst-ip 194.237.147.23 dst-port 19983 context 0 loc 618
-> rmgr: Cannot insert RX class rule: Invalid argument
-> Cannot insert classification rule
-> 
-> Fixes: de7f7582dff2 ("net: ethtool: prevent flow steering to RSS contexts which don't exist")
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
-> Signed-off-by: Gal Pressman <gal@nvidia.com>
-> ---
->  net/ethtool/ioctl.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
+I'm regularly seeing field-spanning write dumps from the mlx5 driver
+on one of my Talos Linux + Cilium nodes running Linux 6.12.16. I don't
+know if this is caused by a bug in one of Cilum's bpf programs or if
+it's a legitimate issue with the driver.
 
-I was initially confused why
-tools/testing/selftests/drivers/net/hw/rss_ctx.py didn't catch this
-bug, but if I'm reading the tests there correctly it doesn't test
-this case AFAICT.
-
-Do you think it's worth adding a test for this case as a separate
-patch to net-next ?
-
-That said, since context 0 isn't tracked in rss_ctx, the fix makes
-sense to me:
-
-Reviewed-by: Joe Damato <jdamato@fastly.com>
+kantai1: kern: warning: [2025-02-25T16:19:43.741311529Z]:
+------------[ cut here ]------------
+kantai1: kern: warning: [2025-02-25T16:19:43.741322529Z]: memcpy:
+detected field-spanning write (size 32) of single field "h6 + 1" at
+drivers/net/ethernet/mellanox/mlx5/core/en_tx.c:469 (size 0)
+kantai1: kern: warning: [2025-02-25T16:19:43.741350529Z]: WARNING:
+CPU: 2 PID: 5273 at
+drivers/net/ethernet/mellanox/mlx5/core/en_tx.c:469
+mlx5e_xmit+0x99b/0xe00 [mlx5_core]
+kantai1: kern: warning: [2025-02-25T16:19:43.741401529Z]: Modules
+linked in: nbd nvme_tcp nvme_fabrics nvme_keyring nvidia_uvm(O)
+nvidia_modeset(O) nvidia(O) zfs(PO) spl(O) mlx5_ib nvme mlx5_core ahci
+ixgbe sp5100_tco nvme_core mpt3sas ccp mlxfw libahci mdio watchdog
+k10temp
+kantai1: kern: warning: [2025-02-25T16:19:43.741426529Z]: CPU: 2 UID:
+50 PID: 5273 Comm: apid Tainted: P           O       6.12.16-talos #1
+kantai1: kern: warning: [2025-02-25T16:19:43.741433529Z]: Tainted:
+[P]=PROPRIETARY_MODULE, [O]=OOT_MODULE
+kantai1: kern: warning: [2025-02-25T16:19:43.741435529Z]: Hardware
+name: To Be Filled By O.E.M. ROMED8-2T/ROMED8-2T, BIOS P3.80
+08/01/2023
+kantai1: kern: warning: [2025-02-25T16:19:43.741439529Z]: RIP:
+0010:mlx5e_xmit+0x99b/0xe00 [mlx5_core]
+kantai1: kern: warning: [2025-02-25T16:19:43.741470529Z]: Code: 48 c7
+c2 30 98 52 c0 4c 89 ce 89 04 24 48 c7 c7 78 98 52 c0 44 89 44 24 18
+4c 89 5c 24 10 c6 05 08 1d 0c 00 01 e8 25 63 72 f2 <0f> 0b 44 8b 44 24
+18 4c 8b 5c 24 10 8b 04 24 e9 9a fe ff ff 48 8b
+kantai1: kern: warning: [2025-02-25T16:19:43.741474529Z]: RSP:
+0018:ffffb42af65274f0 EFLAGS: 00010282
+kantai1: kern: warning: [2025-02-25T16:19:43.741478529Z]: RAX:
+0000000000000000 RBX: ffff8ebf75968840 RCX: 0000000000000027
+kantai1: kern: warning: [2025-02-25T16:19:43.741482529Z]: RDX:
+ffff8efd8d91bbc8 RSI: 0000000000000001 RDI: ffff8efd8d91bbc0
+kantai1: kern: warning: [2025-02-25T16:19:43.741484529Z]: RBP:
+ffff8ec29b976ee8 R08: 0000000000000000 R09: 732d646c65696620
+kantai1: kern: warning: [2025-02-25T16:19:43.741487529Z]: R10:
+ffffb42af6527290 R11: 203a7970636d656d R12: ffff8ebf7596f930
+kantai1: kern: warning: [2025-02-25T16:19:43.741489529Z]: R13:
+ffffb42ac29a34c0 R14: ffffb42ac29a34e0 R15: ffff8ebfc8411040
+kantai1: kern: warning: [2025-02-25T16:19:43.741492529Z]: FS:
+000000c000102e98(0000) GS:ffff8efd8d900000(0000)
+knlGS:0000000000000000
+kantai1: kern: warning: [2025-02-25T16:19:43.741495529Z]: CS:  0010
+DS: 0000 ES: 0000 CR0: 0000000080050033
+kantai1: kern: warning: [2025-02-25T16:19:43.741498529Z]: CR2:
+000000c0116fd000 CR3: 0000000174728002 CR4: 0000000000f70ef0
+kantai1: kern: warning: [2025-02-25T16:19:43.741501529Z]: PKRU: 55555554
+kantai1: kern: warning: [2025-02-25T16:19:43.741503529Z]: Call Trace:
+kantai1: kern: warning: [2025-02-25T16:19:43.741507529Z]:  <TASK>
+kantai1: kern: warning: [2025-02-25T16:19:43.741509529Z]:  ?
+mlx5e_xmit+0x99b/0xe00 [mlx5_core]
+kantai1: kern: warning: [2025-02-25T16:19:43.741533529Z]:  ?
+__warn.cold+0x93/0xe0
+kantai1: kern: warning: [2025-02-25T16:19:43.741539529Z]:  ?
+mlx5e_xmit+0x99b/0xe00 [mlx5_core]
+kantai1: kern: warning: [2025-02-25T16:19:43.741568529Z]:  ?
+report_bug+0xeb/0x130
+kantai1: kern: warning: [2025-02-25T16:19:43.741573529Z]:  ?
+handle_bug+0x53/0x90
+kantai1: kern: warning: [2025-02-25T16:19:43.741578529Z]:  ?
+exc_invalid_op+0x17/0x70
+kantai1: kern: warning: [2025-02-25T16:19:43.741581529Z]:  ?
+asm_exc_invalid_op+0x1a/0x20
+kantai1: kern: warning: [2025-02-25T16:19:43.741588529Z]:  ?
+mlx5e_xmit+0x99b/0xe00 [mlx5_core]
+kantai1: kern: warning: [2025-02-25T16:19:43.741611529Z]:  ?
+netif_skb_features+0xc1/0x2e0
+kantai1: kern: warning: [2025-02-25T16:19:43.741616529Z]:
+dev_hard_start_xmit+0x64/0x1a0
+kantai1: kern: warning: [2025-02-25T16:19:43.741622529Z]:
+sch_direct_xmit+0xb0/0x360
+kantai1: kern: warning: [2025-02-25T16:19:43.741627529Z]:
+__qdisc_run+0x143/0x590
+kantai1: kern: warning: [2025-02-25T16:19:43.741630529Z]:
+__dev_queue_xmit+0x578/0xe00
+kantai1: kern: warning: [2025-02-25T16:19:43.741636529Z]:
+ip6_finish_output2+0x2b7/0x600
+kantai1: kern: warning: [2025-02-25T16:19:43.741641529Z]:  ?
+nf_nat_ipv6_out+0x18/0x100
+kantai1: kern: warning: [2025-02-25T16:19:43.741644529Z]:  ?
+nf_hook_slow+0x41/0xe0
+kantai1: kern: warning: [2025-02-25T16:19:43.741650529Z]:
+ip6_finish_output+0x186/0x340
+kantai1: kern: warning: [2025-02-25T16:19:43.741654529Z]:  ip6_xmit+0x2cd/0x630
+kantai1: kern: warning: [2025-02-25T16:19:43.741657529Z]:  ?
+ip6_output+0x150/0x150
+kantai1: kern: warning: [2025-02-25T16:19:43.741661529Z]:  ?
+__sk_dst_check+0x39/0xa0
+kantai1: kern: warning: [2025-02-25T16:19:43.741665529Z]:  ?
+inet6_csk_route_socket+0x138/0x200
+kantai1: kern: warning: [2025-02-25T16:19:43.741671529Z]:
+inet6_csk_xmit+0xce/0x130
+kantai1: kern: warning: [2025-02-25T16:19:43.741676529Z]:
+__tcp_transmit_skb+0x583/0xca0
+kantai1: kern: warning: [2025-02-25T16:19:43.741682529Z]:
+tcp_write_xmit+0x495/0x1580
+kantai1: kern: warning: [2025-02-25T16:19:43.741688529Z]:
+__tcp_push_pending_frames+0x32/0xc0
+kantai1: kern: warning: [2025-02-25T16:19:43.741693529Z]:
+tcp_sendmsg_locked+0xb0b/0xf50
+kantai1: kern: warning: [2025-02-25T16:19:43.741699529Z]:  tcp_sendmsg+0x2b/0x40
+kantai1: kern: warning: [2025-02-25T16:19:43.741703529Z]:
+sock_write_iter+0x12d/0x1a0
+kantai1: kern: warning: [2025-02-25T16:19:43.741709529Z]:  vfs_write+0x37e/0x430
+kantai1: kern: warning: [2025-02-25T16:19:43.741716529Z]:  ksys_write+0xb9/0xf0
+kantai1: kern: warning: [2025-02-25T16:19:43.741721529Z]:
+do_syscall_64+0x6b/0xa60
+kantai1: kern: warning: [2025-02-25T16:19:43.741729529Z]:
+entry_SYSCALL_64_after_hwframe+0x55/0x5d
+kantai1: kern: warning: [2025-02-25T16:19:43.741736529Z]: RIP: 0033:0x480c0e
+kantai1: kern: warning: [2025-02-25T16:19:43.741741529Z]: Code: 24 28
+44 8b 44 24 2c e9 70 ff ff ff cc cc cc cc cc cc cc cc cc cc cc cc cc
+cc cc cc 49 89 f2 48 89 fa 48 89 ce 48 89 df 0f 05 <48> 3d 01 f0 ff ff
+76 15 48 f7 d8 48 89 c1 48 c7 c0 ff ff ff ff 48
+kantai1: kern: warning: [2025-02-25T16:19:43.741747529Z]: RSP:
+002b:000000c00087d730 EFLAGS: 00000212 ORIG_RAX: 0000000000000001
+kantai1: kern: warning: [2025-02-25T16:19:43.741753529Z]: RAX:
+ffffffffffffffda RBX: 000000000000000d RCX: 0000000000480c0e
+kantai1: kern: warning: [2025-02-25T16:19:43.741756529Z]: RDX:
+0000000000004016 RSI: 000000c000b4a000 RDI: 000000000000000d
+kantai1: kern: warning: [2025-02-25T16:19:43.741760529Z]: RBP:
+000000c00087d770 R08: 0000000000000000 R09: 0000000000000000
+kantai1: kern: warning: [2025-02-25T16:19:43.741764529Z]: R10:
+0000000000000000 R11: 0000000000000212 R12: 000000c00087d8a0
+kantai1: kern: warning: [2025-02-25T16:19:43.741768529Z]: R13:
+000000000000000a R14: 000000c000685a40 R15: 000000c00067c640
+kantai1: kern: warning: [2025-02-25T16:19:43.741773529Z]:  </TASK>
+kantai1: kern: warning: [2025-02-25T16:19:43.741777529Z]: ---[ end
+trace 0000000000000000 ]---
 
