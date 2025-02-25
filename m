@@ -1,146 +1,124 @@
-Return-Path: <netdev+bounces-169392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA9BEA43AE7
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 11:12:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D55CA43B0F
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 11:15:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 518A07A6182
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:10:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6345C188B779
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:12:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6EDA26139E;
-	Tue, 25 Feb 2025 10:11:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3688A2144BF;
+	Tue, 25 Feb 2025 10:12:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yhA2ohUn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FWuC+/UB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0613263C86
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 10:11:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61442263F4D
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 10:12:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740478282; cv=none; b=nzE99bTFpfd8xhMFdwBvXfHKIZnuYXIfnD5o2R9hIEzlYiiQm0ZX6QFzMR21H0ql8QQQO5q/fAYRIbBoMfdDSOTw2XahTW7CM4JYTSUGSimrP95aiWS9eZBu1VPq4dhwcPV225pp+n6j4Zx+CbR9oxRmoMFR60wLojgG2sVXVjM=
+	t=1740478340; cv=none; b=Bi0wmxU2nA0Or26AbwZXpBzuM9mSEkyVxtw6ntwT42NmixxjgRdFRu24XAwJSlWsCoLn6asZ9U3L/VJCta68PRVXkcUQTOJF0B3aXCssVNEzcytecXKpLVN7mpMJ9hG8CCKK7L3qUK/jHavT+P9ZnfhTQj5FCDi+rd2IzqlSPvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740478282; c=relaxed/simple;
-	bh=/TukNZfdZcJnJqlGUTayo+cbdcCXDF60f5HiFsnr8zk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=snwjOB8OTkW5eo0q2aarlkUJgwu6Pfde+dSJXJaBLCZsu6ABGAW8YFNCxwVrK6Yo8yLUYTtGwPlgqAYE6BM7XC/OJb/kB3hRBUX8cWEp4EAEDjsh5fmxMB7/MiAdmueBEcgiaDubf/9htjVp66HOZgl8sC0sMW9tcCMnZIHf010=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yhA2ohUn; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5e0373c7f55so8329952a12.0
-        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 02:11:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740478279; x=1741083079; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MzseC7TE5yROJInpw1BHLRzHMDpvksChoWt2dWl13XA=;
-        b=yhA2ohUnx/nTn05oyk/Hl/TBMgZZAJDLv8ioMmwCdtUnXptNPmP1x6cvzMwfT+zYdt
-         /Tkvc2nD2OUourZ/7vmbGNo5TdBO7lelxApVrV2RYZ/L1xuZShimt54NKqAHgNKLb99o
-         qy6c4xLOOcIndur/nvElA6JAxGXOa4qCgga7Ut1YnROCQTKS+rKq95EYHqU/Rxf7CDcF
-         qxiqC0pgFxeliAOvctAZwUdO1gj8mPPnLM6c+M8B68hoeF5uBafoAg8hc+ksycKJ2lya
-         vmBlSYEcvyTLPg+m+uploneKQ3DanJvBINK6xEdfY0qCnTWsOsnXyKD+B1rkR3QZYc1N
-         AUAw==
+	s=arc-20240116; t=1740478340; c=relaxed/simple;
+	bh=mJMkajuphg9Tig2oGHdnxIYcTJzX5VVeUg1rFBOJsSQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dsu1JloJqHHYf1fpqm8iKteLBUC1dWWAkF4w3M9xxe3pwa3qshhRy+l5g6DWa3wmzONnQdP5EffbdUDwhQc1ldkn/P0pCd7EQTPfRGzqDDZidLrkil/UlcBKBNO9q9FYCwOc/EL/vXrRVdq8/6GKZsY4e+mpH1ulQzsDnNw7GaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FWuC+/UB; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740478337;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CZI2gzOBB0xJ5jkNLy+GmteL5L1iI7Kqn7pTf+x7Cc0=;
+	b=FWuC+/UBeYsz2czjNWuXl4UMoeNhNHtdv23FzX0s4r81C3V3KE+kRhtuDG62KQfiNDxpRa
+	tXTgFBWB/+L9S+5atxKrj6+nM7eusFi7hOp/9QCtMNaiNQiXxh27dwPgOZqjUX4a4RJAov
+	YAT5kdBnkd8DEfyzq4gyRxqlklI+eQQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-83-1cfWpeR3MQisyOXMWB6G0Q-1; Tue, 25 Feb 2025 05:12:15 -0500
+X-MC-Unique: 1cfWpeR3MQisyOXMWB6G0Q-1
+X-Mimecast-MFC-AGG-ID: 1cfWpeR3MQisyOXMWB6G0Q_1740478334
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-439a5c4dfb2so24526595e9.1
+        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 02:12:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740478279; x=1741083079;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MzseC7TE5yROJInpw1BHLRzHMDpvksChoWt2dWl13XA=;
-        b=ZfUJLmg4qlIEYzoAl01o8Gy66HoVsUyTLQyj9xk9a+GnEYs6u+pr+Y4vgWQXS8ByO9
-         ri6z1oNZLixY0v0uJRcnIYTY4U6fp4E9/HJOSqRIGV5kxm8h67sRRjRqS8mzabO28Zwu
-         dgHMwWkXAfwKsJs1akCgvXC+ENTBsoPEAPdDdrdjBIYXSSSzeF6MFuzUZ6Q+M2D/Mi1F
-         2+/wxtnuPVm4enFdDBS0Wzon/YQMj00JsuoIVPCIO8RpzrR6xaCaOp3ZSH7L9EE4fG1C
-         gJAdx/Pjgwsnlb0a3W/tlaUhbj8CfW3SZs3FmPvyYms7+Fv1UZ1fuUsQYfNMvRqJaaci
-         BIfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVdS1PTRns8I2Bhzl2dJevTJ3EE67YE4Mx8kui3efAYZ1d6+QdHqkE/2Pbu4PRn6MMeDDS5x4k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTi7b297ZMUTxL5Bbf+UYE9DbPtSvi/WjaEbywJSc7gtF4Cnvf
-	IaK9KRrwm+X9U/xuSTz7xSzdLNSd7i1dr+6ie9J1a3NqIfTBuzdRpDRf243EIwxb7c1GiD9bS+d
-	hVmWsAhg6M58YxT6FyJxBMlMwYr5Z+IdsaHSl
-X-Gm-Gg: ASbGncuxG5vWDayKQC303JAR2UmZLI05eyA4jBx39ivFXNFTmTCdycFJtkX+FIgKmn+
-	5KDr5ixqLgek98MJcTWngJL7mzNCwxVTSEccGsntDaIxGUNgXHwcRDWe1vlbUjK08umjv/FwtVK
-	tuLeGdbbnS
-X-Google-Smtp-Source: AGHT+IEMaFRlnjVZhNHnGBw1w+Bc7lVMznsgl6XDNDSP6NEMAFA7rS+ab1fUgPl9w6DuKngpyvAzAAaN3tEUcm5QE7E=
-X-Received: by 2002:a05:6402:4611:b0:5e2:81c:fde9 with SMTP id
- 4fb4d7f45d1cf-5e2081d05ccmr2908336a12.15.1740478279057; Tue, 25 Feb 2025
- 02:11:19 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740478334; x=1741083134;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CZI2gzOBB0xJ5jkNLy+GmteL5L1iI7Kqn7pTf+x7Cc0=;
+        b=gcOr3ydXc9tbuswl76/UYkTFWzMQEJ2v/j1nEBbA/D4dKpWRb70wVMw5ayY3NjAt56
+         TMTOVlzbDkAhPwlUR0Kqxhc5rwtOVuedWKeEo4R2Vtgf/ikpMvaod9Pe0RctV2QN8Qui
+         YkW5H5/fHOfD/m4lnGuTkNZ5ScDKvVZqPMX4edY8D2glGBumc0WnhJrNGSQ6DHYO/aHR
+         eiAESbyv0oo36e4r2o5T6D6kUtnqPFRkpy7XCBDZoTGqfsA6ol+grnjkbotJW+vrVTFX
+         fUAtCEVihYm0debj7dAgoxpnHdNnSdotY454AjGowigu0jYgtHSwZZ6bM/ltA7jwKA1Z
+         vC1w==
+X-Forwarded-Encrypted: i=1; AJvYcCUFKl3axB7ZP1DiCR9IHv2NLCZW3EuZft1mHG2IT4BvujSZ4iMUkVMfKivv8DBuoq1eTVD4kgw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzo8XiNeYCjDOhS1M7JJPnIIBO1sCQnXeLnUvekfhHU89AfF3o6
+	yMRwozNpX3GlWYJaurOqhCCMEamVhR1ltXLNvlMsBM5JgfV2ohFQjPJ2Ad2J18vSsiLcV3JVYGq
+	T9W9+igPAI2ka7BgdoB9mKSF0GUXK2evUj+Kil9zYw9IRfPJ96iPB4w==
+X-Gm-Gg: ASbGncv/1UuQPGMtv7FGvuPA5TnUO3RlUhgvpuc+IgVQwDgKoDlrFnxy6h9892lVXNg
+	wxCATAPz1f8Ic8twt5+/LHpEVIkcv0Db3KnVyDo2IvPXgfaj18hiNLdl0wNUpq2wC/gBXlR5kNv
+	W0mZ8lb5P1t7tWUHZC5c3Mpa1swRlqeX22SbT1miojspo2zSvafP416YEESTYQElWDaGplLEZIy
+	fGM70Rgm+xkp9CzV0K4jF/ABrPJxQfdiMyiV3Ema7en2jMKkSn2ngzHBSuJAqWwX1Qo+6l9rdSo
+	8qfsQDyEykRtpJJZ17n5IMZ3iFXQrUF+PA4OHTaBwFU=
+X-Received: by 2002:a05:600c:1d1a:b0:439:94f8:fc68 with SMTP id 5b1f17b1804b1-439ba0b391dmr108465415e9.0.1740478334197;
+        Tue, 25 Feb 2025 02:12:14 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGiHtQb5hxUTUOWs8xAwnTVhAiAYLd0pv51f4bf2sD27cc5lb1TBJ+Vtress/OEMZlCb1ZWKg==
+X-Received: by 2002:a05:600c:1d1a:b0:439:94f8:fc68 with SMTP id 5b1f17b1804b1-439ba0b391dmr108465065e9.0.1740478333874;
+        Tue, 25 Feb 2025 02:12:13 -0800 (PST)
+Received: from [192.168.88.253] (146-241-59-53.dyn.eolo.it. [146.241.59.53])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-439b02ce615sm135773035e9.5.2025.02.25.02.12.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Feb 2025 02:12:13 -0800 (PST)
+Message-ID: <63ede1de-1ee3-4872-84b7-d65ec2f68856@redhat.com>
+Date: Tue, 25 Feb 2025 11:12:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250224110654.707639-1-edumazet@google.com> <4f37d18c-6152-42cf-9d25-98abb5cd9584@redhat.com>
- <af310ccd-3b5f-4046-b8d7-ab38b76d4bde@kernel.org>
-In-Reply-To: <af310ccd-3b5f-4046-b8d7-ab38b76d4bde@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 25 Feb 2025 11:11:07 +0100
-X-Gm-Features: AQ5f1JpRxGTaxp4PmKphbnEyB6yo1_O2aZmaLk681OaNP8yNyH_Qsr0VfGp33_A
-Message-ID: <CANn89iJfXJi7CL2ekBo9Zn9KtVTRxwMCZiSxdC21uNfkdNU1Jg@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: be less liberal in tsecr received while in
- SYN_RECV state
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Jakub Kicinski <kuba@kernel.org>, 
-	Yong-Hao Zou <yonghaoz1994@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
-	Neal Cardwell <ncardwell@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v26 00/20] nvme-tcp receive offloads
+To: Aurelien Aptel <aaptel@nvidia.com>, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, sagi@grimberg.me, hch@lst.de, kbusch@kernel.org,
+ axboe@fb.com, chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org
+Cc: aurelien.aptel@gmail.com, smalin@nvidia.com, malin1024@gmail.com,
+ ogerlitz@nvidia.com, yorayz@nvidia.com, borisp@nvidia.com,
+ galshalom@nvidia.com, mgurtovoy@nvidia.com, edumazet@google.com
+References: <20250221095225.2159-1-aaptel@nvidia.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250221095225.2159-1-aaptel@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Feb 25, 2025 at 11:09=E2=80=AFAM Matthieu Baerts <matttbe@kernel.or=
-g> wrote:
->
-> Hi Paolo, Eric,
->
-> On 25/02/2025 10:59, Paolo Abeni wrote:
-> > On 2/24/25 12:06 PM, Eric Dumazet wrote:
-> >> Yong-Hao Zou mentioned that linux was not strict as other OS in 3WHS,
-> >> for flows using TCP TS option (RFC 7323)
-> >>
-> >> As hinted by an old comment in tcp_check_req(),
-> >> we can check the TSecr value in the incoming packet corresponds
-> >> to one of the SYNACK TSval values we have sent.
-> >>
-> >> In this patch, I record the oldest and most recent values
-> >> that SYNACK packets have used.
-> >>
-> >> Send a challenge ACK if we receive a TSecr outside
-> >> of this range, and increase a new SNMP counter.
-> >>
-> >> nstat -az | grep TcpExtTSECR_Rejected
-> >> TcpExtTSECR_Rejected            0                  0.0
->
-> (...)
->
-> > It looks like this change causes mptcp self-test failures:
-> >
-> > https://netdev-3.bots.linux.dev/vmksft-mptcp/results/6642/1-mptcp-join-=
-sh/stdout
-> >
-> > ipv6 subflows creation fails due to the added check:
-> >
-> > # TcpExtTSECR_Rejected            3                  0.0
->
-> You have been faster to report the issue :-)
->
-> > (for unknown reasons the ipv4 variant of the test is successful)
->
-> Please note that it is not the first time the MPTCP test suite caught
-> issues with the IPv6 stack. It is likely possible the IPv6 stack is less
-> covered than the v4 one in the net selftests. (Even if I guess here the
-> issue is only on MPTCP side.)
+On 2/21/25 10:52 AM, Aurelien Aptel wrote:
+> The next iteration of our nvme-tcp receive offload series, rebased on top of yesterdays
+> net-next 671819852118 ("Merge branch 'selftests-drv-net-add-a-simple-tso-test'")
+> 
+> We are pleased to announce that -as requested by Jakub- we now have
+> continuous integration (via NIPA) testing running for this feature.
 
+I'm sorry for the dumb question, but can you please share more details
+on this point?
 
-subflow_prep_synack() does :
+I don't see any self-test included here, nor any test result feeded to
+the CI:
 
- /* clear tstamp_ok, as needed depending on cookie */
-if (foc && foc->len > -1)
-     ireq->tstamp_ok =3D 0;
+https://netdev.bots.linux.dev/devices.html
 
-I will double check fastopen code then.
+Thanks,
+
+Paolo
+
 
