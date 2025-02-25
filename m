@@ -1,124 +1,136 @@
-Return-Path: <netdev+bounces-169290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D33C7A4337B
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 04:17:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA307A4338D
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 04:20:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C08F2174B60
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 03:17:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF62B7A4E53
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 03:18:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFEB424A04B;
-	Tue, 25 Feb 2025 03:17:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DC80245027;
+	Tue, 25 Feb 2025 03:19:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="MppD3nCy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="22496/5r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 005C324418E
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 03:17:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA8613632B
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 03:19:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740453458; cv=none; b=A9GJR4C6wxIughEXD8z4xJ+E1EaSmELEWwSFqgZ1R6dyP9GnlOy8Tb7Rye+lH3si5AVEgW93WHBjEiVA0EV8WNO1FNqztDihAsSs/Pm8Eps3/qVfiwMbGLuqYhGhoU95oAJeQIbax3zVox8D0+Q/ZGMqpq4liOhPG4bRwAYhV0E=
+	t=1740453582; cv=none; b=Z8DSkVjWsPgXSr6e7aHaxf5PfKRUY48uqm5yn+ZrpIkwW/XYf2YGSyioBwmHm7vOt/UWOeB9XKJcm66NQ00NtKTIa/omURug4gsUnlGuG6GJSdyS3SKADTVcP2EwA+ydlwxufM64Hh0iZ7g/G/UuSGR8Bu7DHIJvNX68LcrDNac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740453458; c=relaxed/simple;
-	bh=P4xMosJeZHRsgLEK+WpB7Nt+0vpaNhYzi/3+8wiBTko=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t0irmF24f2VB5LUztp/Ubuh0zINIZmoFXJvsjLqLOJgn4MQQLsAd5zg5caPOPr9ogJ3YqNQKX08K4TMKb+yhK2YBn0uZOTfk9bUZFur2ZYz4IsyrzVaC9NufpDTdTy9v/J5/DO89VK1gyxSavNDAUS2dpQR6cB/YsmvL/R+2e7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=MppD3nCy; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-471fe5e0a80so43721051cf.1
-        for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 19:17:36 -0800 (PST)
+	s=arc-20240116; t=1740453582; c=relaxed/simple;
+	bh=KmqJ5UPyUn4QKWhlPOJYvXUy8SdtTAvRkRSjnFipiZ8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rdOxvSOCSCJ4kI9FRNjHfmtG2J/6p41Y9cHvNzmGDVxdoLlI4F3EKXDW6h2hfuXDnSpdrR3smq0yUyrT+cCDsksluHpIFMYGeViG9W1FPuOv9KONux4gZ5rQJ5wY4x/feWJLY0eNlcjKLJ7vs6geMTaiF8TIbJ8EqfnC7/wqKcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=22496/5r; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2212222d4cdso81375ad.0
+        for <netdev@vger.kernel.org>; Mon, 24 Feb 2025 19:19:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1740453456; x=1741058256; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Eb3P4NZJu02aAKSAk2NE05Ofs+1SxirmBohjwHsIlTk=;
-        b=MppD3nCy9SJdRRNi0eGFYDFC/nPzOYbMt8+/t2UpBUAdmkk4/ZjFka4kTK24z8tmVS
-         p/cf0nVJYxB9RM1+NdsiArDP6ekyUy91+zaJw+I0JQ5rYehuapPmXgpiqqnlXF5RudPA
-         GtZJFU23k/XzL8CQVStBz/aD9y+gLIY9+tLdQ=
+        d=google.com; s=20230601; t=1740453580; x=1741058380; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SG0vPvDkU+Cn7gEuriL77ttwykS6l1lmqIssAkQWxSI=;
+        b=22496/5rvjtyzQzH0W2UwpDmopdQIHamOSIGdKMwVApZn6ch4fQ7Rqj75B9/Hqax71
+         +Yq2guFcmiIDCFM5gOL/3n3a1zsTYzeK2zX6xQogM7DHiRuZNXEehzGvBlbUsdu50CTm
+         mftau51LHosFLeUs/pqIyOpgizpPQcu5lqGW/9z8WuaT2erles+9DpullQ/Hgrz0rJ+V
+         96bXfVjA9CXMKyPmef9qdpDOu7gavaPAfTguaIdeencBnHK496j7byYM6Njsx5+OH3af
+         sddMiBAr7k2QoAs0ifssP5UvX1ekfIShCO7e7H+rXm7Leq4pVOfkIkgnE3BbpINsvTMJ
+         rZoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740453456; x=1741058256;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Eb3P4NZJu02aAKSAk2NE05Ofs+1SxirmBohjwHsIlTk=;
-        b=oK0N/HWxz4x5BZ1DlnBixA3Lcl97JtjJ9kcp/Uk6exXiX/uwVxaLUm5X0d+bFHYhk+
-         e137AZz1uSqmEjnEqwLC0/MWugVWJX+4a9uTTXanIQsD2G8Ztu1lPwqnXXPvmDF5qVEY
-         Bu1VCXnykom9rkk51Tpi9KReFTP1QkU2jFahG1d1QumEfe+nzhHp7ORqeoZFSvHVXLaY
-         dcNua0Y65Kei8zRzPb347xIY7NLMB2b483taqKlOzWQjrlfYbX8N6gJduUL38PLozCU0
-         pzFGmjVDrZsbHOEDC2GTCiEEJEP3tR3hlCMCd2FQyisMW5YYZ6zfKgPTvv2GnZyA8krI
-         ObEA==
-X-Forwarded-Encrypted: i=1; AJvYcCXRwT8xzRozYZ+sZk2L1jUN0/Lype898NH4xOY6ytEjMxKeTqAg2QZfhXG0dfFhRg+wk6YCltY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSm5drRiHW+HuvuWnWh/4k4inEB5bV4Zh2SU2Mj0RZb/24U8UZ
-	x1A0U1MZbWHKQqRV9k50oKu9IsJgMwlGJ0BKmCwbfxGzjXKBVRh+MQS1uolpNdc6SN5J5laN0r/
-	O
-X-Gm-Gg: ASbGncsrAA+SkDes0lVFtCjM74Ktx5MA+9VKCbvOtL8YTwi96VViVMXkhmoIRcNZQC0
-	zS0g2rPvB3JAyyvgQX/K1o3yaF+PWUP/gzjea1bPqXDxIfofGq+DaBn4S2AO8azQCj+1NBZPEvK
-	eJJFJXQlK1pmC47LyLJ+F+J07nvw6W+hpb/sx5/yaUSUBqFJb4D+m0qj9f/Yrd48kx2Vf08p3hk
-	lxYinzHfoRM9OJL1VBxy9QC/1Vrs6krLo81oLQDAtdPw4OYnVGVzMwYxUgHeeeefTm5sdnt5C5F
-	kWMizRADyMfSS4/bP27n+/N5jDs3j/T2qfRxZU/rgB+DfVTPegU7bg1MYGOZBX4/
-X-Google-Smtp-Source: AGHT+IGF/zmWkZGN4tGUWHZ0IVvEWSUR3xbsxzWrLlmfPxO8NikBjLRvWJ/b5+ih3jHT1nFbIx/HVw==
-X-Received: by 2002:ac8:7d45:0:b0:472:1225:bd99 with SMTP id d75a77b69052e-47224716778mr203069491cf.2.1740453455852;
-        Mon, 24 Feb 2025 19:17:35 -0800 (PST)
-Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4737806a530sm4747131cf.59.2025.02.24.19.17.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Feb 2025 19:17:34 -0800 (PST)
-Date: Mon, 24 Feb 2025 22:17:32 -0500
-From: Joe Damato <jdamato@fastly.com>
-To: John Daley <johndale@cisco.com>
-Cc: benve@cisco.com, satishkh@cisco.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	kernel test robot <lkp@intel.com>,
-	Nelson Escobar <neescoba@cisco.com>
-Subject: Re: [PATCH net-next 1/1] enic: add dependency on Page Pool
-Message-ID: <Z702TLsTKDIvTQN_@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	John Daley <johndale@cisco.com>, benve@cisco.com,
-	satishkh@cisco.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, kernel test robot <lkp@intel.com>,
-	Nelson Escobar <neescoba@cisco.com>
-References: <20250224234350.23157-1-johndale@cisco.com>
- <20250224234350.23157-2-johndale@cisco.com>
+        d=1e100.net; s=20230601; t=1740453580; x=1741058380;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SG0vPvDkU+Cn7gEuriL77ttwykS6l1lmqIssAkQWxSI=;
+        b=rr2LR3aC9Q1s0pcHCH/EtwogYv2QV03lpoZlRNLkJFE933CRtgXBupvgwCb/0J6750
+         VSt7QuHisXkCVnGhc11eZmgH4aSA/vA6lgKDRNGrc8UgQ+XFCpGB13zR74EaO439+VfN
+         d2k2En1goi53jSgcG2ltTvyrmnnEx/ZAp3/BnYoP9wLWrwxC4/v0tVSVuyqpClq2DGYw
+         PV7sePRMKO+EM8oWfvN/fXSV0yXK8e4UNaPeNTV4ntTHc9pT1HuQrVVCz6UgVXINPaiY
+         5SrgO0wOn9irCOkQ8D1gU/TaZX7WDnyZHat/zj/LTzfXhkiAFIcfJUY1UM6u5M83KZDP
+         z6Fg==
+X-Gm-Message-State: AOJu0YxN476LcJg9NB4Cf5puWyb611QaCsCBnW3xWobjfRYHRGxmSuYG
+	8Hde+hTFUR3r1K8OH3Rlzjmpp4OqGkIgFhsNQqA9209DbnIprgm4gB5dC//fOoZ2yDBjtvTLqoY
+	lqJcBq8WqAAIW/HzZjFea09IaMT1sRORa+j5+
+X-Gm-Gg: ASbGncsTc+9F5um320brZF7qEvH4OFHRhmG51xx4Ra7Dy8hMKHTaw6x03SL+MhSp02L
+	szZxp2nQpAEkz57STXzVmNLd9+XczlO0u1cJJh4cNxhrgQuJ+TKIB7rlFxQu1k5qwnsd7su1apX
+	eTRp+cj8E=
+X-Google-Smtp-Source: AGHT+IEtZxuCVd0tnzxcUGZ4gQTicVs14GYdJr0CNhWdXPCDZapgO9XyLPZYzQJgLaG9UA9AQIHRIeLixV4juXWMkIc=
+X-Received: by 2002:a17:902:db10:b0:21f:2306:e453 with SMTP id
+ d9443c01a7336-22307a3d994mr1928995ad.7.1740453579681; Mon, 24 Feb 2025
+ 19:19:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250224234350.23157-2-johndale@cisco.com>
+References: <20250222191517.743530-1-almasrymina@google.com> <CAPpAL=xvVYmiekEkQZO314JczbNK3kf_2Sw=15crgjQLfzQU4w@mail.gmail.com>
+In-Reply-To: <CAPpAL=xvVYmiekEkQZO314JczbNK3kf_2Sw=15crgjQLfzQU4w@mail.gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 24 Feb 2025 19:19:25 -0800
+X-Gm-Features: AWEUYZkE739kPYOS1vvRcfM-p2BwFYz8vTlR5KcbwCGeAbQzIBCCJ-WS6P6ifgA
+Message-ID: <CAHS8izNtGrMV+6T83-tNGpXsFqLo5N5jZpHueZ=SkDZ24pvKsw@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 0/9] Device memory TCP TX
+To: Lei Yang <leiyang@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, virtualization@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Jeroen de Borst <jeroendb@google.com>, 
+	Harshitha Ramamurthy <hramamurthy@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 24, 2025 at 03:43:50PM -0800, John Daley wrote:
-> Driver was not configured to select page_pool, causing a compile error
-> if page pool module was not already selected.
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202502211253.3XRosM9I-lkp@intel.com/
-> Fixes: d24cb52b2d8a ("enic: Use the Page Pool API for RX")
-> Reviewed-by: Nelson Escobar <neescoba@cisco.com>
-> Signed-off-by: John Daley <johndale@cisco.com>
-> ---
->  drivers/net/ethernet/cisco/enic/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
+On Mon, Feb 24, 2025 at 6:54=E2=80=AFPM Lei Yang <leiyang@redhat.com> wrote=
+:
+>
+> Hi Mina
+>
+> I'd like to test this series of patches because these changes are network=
+-related. But there was some conflict when I tried to apply this feature. C=
+ould you please help review it.
+> The latest commit id which I tested is following:
+> # git log
+> commit d082ecbc71e9e0bf49883ee4afd435a77a5101b6 (HEAD -> master, tag: v6.=
+14-rc4, origin/master, origin/HEAD)
+> Author: Linus Torvalds <torvalds@linux-foundation.org>
+> Date:   Sun Feb 23 12:32:57 2025 -0800
+>
+>     Linux 6.14-rc4
+>
+> About conflict content please review attachment.
+>
 
-Hrm. This is a fixes, so normally the subject line should probably
-be "PATCH net" instead of "PATCH net-next" and stable would be CC'd
-- however - it looks like the commit it fixes is only in net-next.
+Thanks Lei,
 
-So, CC-ing stable is probably unnecessary ?
+Did you just want me to review the code in the attached file to make
+sure it looks good or was there a merge conflict with some repro steps
+that you wanted me to look at? Or you do have a diff of the conflict
+you want me to resolve?
 
-At any rate, I'd probably skip the cover letter for a simple patch
-like this in the future.
+The attached file in your email looks like an exact copy of my first
+patch in the series,  "[PATCH net-next v5 1/9] net: add
+get_netmem/put_netmem support", so it looks good to me.
 
-Reviewed-by: Joe Damato <jdamato@fastly.com>
+--=20
+Thanks,
+Mina
 
