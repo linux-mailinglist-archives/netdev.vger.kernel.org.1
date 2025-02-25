@@ -1,65 +1,91 @@
-Return-Path: <netdev+bounces-169492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C18BFA4435A
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 15:46:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6023A4436C
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 15:49:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70E913B5A29
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 14:42:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43131421643
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 14:45:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D37AE26B2DB;
-	Tue, 25 Feb 2025 14:40:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D49521ABDE;
+	Tue, 25 Feb 2025 14:43:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fe/2Mwjk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WZbh/dVP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A43A721ABDA;
-	Tue, 25 Feb 2025 14:40:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B555121ABDA
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 14:43:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740494440; cv=none; b=MwEtYThDVWwZSSdbSqK8EmqhLVWn/1zBrmxse3GF8SfPVLAJbImGgdjnlqFWpCbgyVayFYJJHmL+50Cy/jU2H0LgKSWalpStNt1z+m9rpvRTdkZdTJrg0rqpPUqNmbIawvYcUreeKMXO0Jbvs1lOeDx7x2e4ZOhfOHv+qN5MRRA=
+	t=1740494605; cv=none; b=LH51W5YNuVzqQ89yYYz2AgBvDGXOKXDBsve2b+zb2YEMrvhw3f9o/lTJRtfearMtcfXZGfns12umWocE6dq075FdfrqTDSf8Zx6FwJyvaaCXDu+OW+AAOpfGJdLX2eW9yNAtB3MdnEltgYOtXKg0khGhDKFRaytIj7NMlWiaPlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740494440; c=relaxed/simple;
-	bh=AYjrae84t0alupk1jpkw8gvE8OxPjRpVWE2iYxMspZs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pi6Y0P36D7IaCDPyrXNvayGHokjf+Cb0yoSS9V3hMfexeQV8kG0RDzy4UftbWtocJV2MF8vVel3LQbVWqGfXZ2+TY+9jfFFEO8ATfwcg+ot4N8jTvyUNzuxdXw+OncXK4d1vLo4rxkp3hFqi05eXrA0+wZfY/sI9qxAqFQHUHlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fe/2Mwjk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24BDBC4CEE8;
-	Tue, 25 Feb 2025 14:40:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740494440;
-	bh=AYjrae84t0alupk1jpkw8gvE8OxPjRpVWE2iYxMspZs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fe/2MwjkyiKWE+JXgg7zimg0A0OrZhiJmAVudNyrhW49GgfSE9smaTVNTUO0qmNiN
-	 mkyfQ3XI7b8PLfd9P6u5w6Isu0TLH/u8OW1FpvZecdWtyBc/rQFQt4phDrwRe7r8Qw
-	 h0G73DgEA2Tx//WnUASWE1AnDvdpk+m8mMIYmNbP+AfoOWhaUewOlnl/XlQiWpX+po
-	 IN/WaPCOrHZIWdGFlq+wLT2dvP9dL7hGjHXfxLIs6W47nFoDf3GZVcJjrPViAmzWtc
-	 LZmvz7H6CLKkLz9H8+I+H9aSgDhZKoqUAoRQxrd1/8fcUlPFV3p++A+583VT5v9fb0
-	 FrlQsVNexWLJA==
-Date: Tue, 25 Feb 2025 14:40:35 +0000
-From: Simon Horman <horms@kernel.org>
-To: Uday Shankar <ushankar@purestorage.com>
-Cc: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next v5 2/2] netconsole: allow selection of egress
- interface via MAC address
-Message-ID: <20250225144035.GY1615191@kernel.org>
-References: <20250220-netconsole-v5-0-4aeafa71debf@purestorage.com>
- <20250220-netconsole-v5-2-4aeafa71debf@purestorage.com>
+	s=arc-20240116; t=1740494605; c=relaxed/simple;
+	bh=TfFdmFzTETqlhhVxDnxdVRDF+x0N9DAM6Nq/eK5rnis=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=fQOBeyE1oGgAHYF4oohCgc/MEiJH9V+j2r6lToi4OGazk1e7OMm3usljpHwkTACYoYyuXSaLUXwRJrCrhlkan0sG3BT20rsve6FQTxJhnAbI8fyxHK0mDQuKHw46fuCccDFvDtJH1lX2bi6ixRspKWqH0ZDBQo0iovB31fFluhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WZbh/dVP; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740494602;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=z2IuNxX2NPMxHmnsxTa3HIddhf3xrEIXhrl9Im2LlOA=;
+	b=WZbh/dVPjHspIOTdltfIM9bAfaW2MaGqGIsWXcqR1YuUkEc6Ant8R8hG3zJrypVnnMFqkd
+	4e8aq2+uiMbFL8skVj+VbQGrSFNqJn5HefLi3PQiznzckpXBe/svnKTRJMke7YcNKlaJHi
+	mGdJnYMX8NXQQ12ZPDCSDWmQy4egFCI=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-64-yoyKFL6YMSm8xadkRR4wWQ-1; Tue, 25 Feb 2025 09:43:21 -0500
+X-MC-Unique: yoyKFL6YMSm8xadkRR4wWQ-1
+X-Mimecast-MFC-AGG-ID: yoyKFL6YMSm8xadkRR4wWQ_1740494600
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4394b8bd4e1so29336195e9.0
+        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 06:43:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740494600; x=1741099400;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=z2IuNxX2NPMxHmnsxTa3HIddhf3xrEIXhrl9Im2LlOA=;
+        b=nz2+h+fgP45YJJAJXB+YTPRFDyW553q4V1p14uWfHoWDEuUlIH3OdSMNquoE36hnL2
+         DGgSAOpkfYqMO7PtBF7IfY1NbXfEpPxIB3ByFlLaLy34xkq4zdBlYBEv0FjG1v/Fqt2z
+         uAf8qY83yL2z4D6xkTOWv3mx2ljXDtjASpJqxzV2qBH7dYSmrkkB4+w56m5Plo6vpGJR
+         lyEz5cnwomtzXEL4J3x13HcbGsdOZVC+ocr1+Q8jQNbH2v+nCD1slpV93FU4xPAqZVnQ
+         lUzf6E+HxCWrnIE07alNMxwYTgtHh7n+h50+5eDn4gH1nzuqcLT79JrC/t2UyW1FOru+
+         +I5g==
+X-Gm-Message-State: AOJu0YxMElRPubDUmxUz0A/FTrlrEIAYIYBJBst28c3IqET/zqhPZ40q
+	t2Ek6TlX4WzlzGKTaAVVfJZXlw1TnA/mGFY6zu5fvlZKux6GeDxxhWLsP/jgPS7e8xzHcWzlygb
+	VrkP/b9HBOXe17wANO9EvVkq7R8+k6ZY4bNN7YtFreH2TM9aO6c+pqQ==
+X-Gm-Gg: ASbGncvdzbzeGnhaFBey+D3SZpc3eqM1LiRBNzyOUy9H+87SQW70mQYMKGauLjoS1iR
+	gdT7IPSAkN7GGCuEjmbBckc9TW1w0K00aatK7pKUorsyRt29ZxXIE9FWHr9a7aI3KG4Z4eXUCEx
+	5c9hlJBeaMFJoVrlRjr6BnfEKKIwi7VseclhX/JaIioD7Mw3ib3aAvsr9NVlQxbnjJ5miegwopt
+	HyG51WCjpqtAm8iNsfhp6oRVUH0/RKIq4rrMf/u9FcCIjUOfsPrwULPaMHXUzd+riv/pE/++lKF
+	opk=
+X-Received: by 2002:a05:600c:4e50:b0:439:8653:20bb with SMTP id 5b1f17b1804b1-439b2b06189mr164275985e9.14.1740494599938;
+        Tue, 25 Feb 2025 06:43:19 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFwc3yZF0TXJFXoc8xCSWpH2Xvbffd82tkxYKpR2BESliV/qJXm9VDE9+cJ+IufkRMkDZcssA==
+X-Received: by 2002:a05:600c:4e50:b0:439:8653:20bb with SMTP id 5b1f17b1804b1-439b2b06189mr164275745e9.14.1740494599608;
+        Tue, 25 Feb 2025 06:43:19 -0800 (PST)
+Received: from debian ([2001:4649:f075:0:a45e:6b9:73fc:f9aa])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ab1533104sm29184555e9.5.2025.02.25.06.43.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Feb 2025 06:43:19 -0800 (PST)
+Date: Tue, 25 Feb 2025 15:43:16 +0100
+From: Guillaume Nault <gnault@redhat.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Antonio Quartulli <antonio@mandelbit.com>,
+	Ido Schimmel <idosch@idosch.org>
+Subject: [PATCH net v3 0/2] gre: Fix regressions in IPv6 link-local address
+ generation.
+Message-ID: <cover.1740493813.git.gnault@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,38 +94,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250220-netconsole-v5-2-4aeafa71debf@purestorage.com>
 
-On Thu, Feb 20, 2025 at 06:29:21PM -0700, Uday Shankar wrote:
-> Currently, netconsole has two methods of configuration - module
-> parameter and configfs. The former interface allows for netconsole
-> activation earlier during boot (by specifying the module parameter on
-> the kernel command line), so it is preferred for debugging issues which
-> arise before userspace is up/the configfs interface can be used. The
-> module parameter syntax requires specifying the egress interface name.
-> This requirement makes it hard to use for a couple reasons:
-> - The egress interface name can be hard or impossible to predict. For
->   example, installing a new network card in a system can change the
->   interface names assigned by the kernel.
-> - When constructing the module parameter, one may have trouble
->   determining the original (kernel-assigned) name of the interface
->   (which is the name that should be given to netconsole) if some stable
->   interface naming scheme is in effect. A human can usually look at
->   kernel logs to determine the original name, but this is very painful
->   if automation is constructing the parameter.
-> 
-> For these reasons, allow selection of the egress interface via MAC
-> address when configuring netconsole using the module parameter. Update
-> the netconsole documentation with an example of the new syntax.
-> Selection of egress interface by MAC address via configfs is far less
-> interesting (since when this interface can be used, one should be able
-> to easily convert between MAC address and interface name), so it is left
-> unimplemented.
-> 
-> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
-> Reviewed-by: Breno Leitao <leitao@debian.org>
-> Tested-by: Breno Leitao <leitao@debian.org>
+IPv6 link-local address generation has some special cases for GRE
+devices. This has led to several regressions in the past, and some of
+them are still not fixed. This series fixes the remaining problems,
+like the ipv6.conf.<dev>.addr_gen_mode sysctl being ignored and the
+router discovery process not being started (see details in patch 1).
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+To avoid any further regressions, patch 2 adds selftests covering
+IPv4 and IPv6 gre/gretap devices with all combinations of currently
+supported addr_gen_mode values.
+
+v3: Rework patch 1's commit message (typos + GRE device types
+    clarifications).
+v2: Add Makefile entry for the new selftest (patch 2).
+
+Guillaume Nault (2):
+  gre: Fix IPv6 link-local address generation.
+  selftests: Add IPv6 link-local address generation tests for GRE
+    devices.
+
+ net/ipv6/addrconf.c                           |  15 +-
+ tools/testing/selftests/net/Makefile          |   1 +
+ .../testing/selftests/net/gre_ipv6_lladdr.sh  | 227 ++++++++++++++++++
+ 3 files changed, 237 insertions(+), 6 deletions(-)
+ create mode 100755 tools/testing/selftests/net/gre_ipv6_lladdr.sh
+
+-- 
+2.39.2
 
 
