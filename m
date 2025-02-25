@@ -1,150 +1,134 @@
-Return-Path: <netdev+bounces-169631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EA88A44E01
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 21:47:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98BDCA44E0A
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 21:52:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D37F189701C
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 20:47:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CC7C172767
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 20:52:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 554B618A6A8;
-	Tue, 25 Feb 2025 20:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E0619DFA2;
+	Tue, 25 Feb 2025 20:52:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MdDaVdFH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h1zWit8W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F09341632D9
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 20:47:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39DBBDF59
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 20:52:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740516424; cv=none; b=gR7+dagWf8K60NM5UmKIpNln3lidcSPViVZm1wfefK/lwAAtC0wd04HS/dDT9LtOS48mxONwIcN+D3Yiqi/PhYaZBb0iDbQQOSm6v2KslLgAFOfhlIlULJ7tZkdvm7DxrwIAp4kjFD+EXdOKc11NeoH2o3S9CigursTmF/xh3T4=
+	t=1740516762; cv=none; b=ntKdZX4A67GST/wpI/ufejqAX7y/4nhI3GNxdQ3WFI6NZWJii7WCQYoXaQOBoTy2o89LUkRT3Jtk06qTx5aaGSt+bN8YNrt6TvOnEwvGJ40MvSzV84ZxOzUlAK0+zVmO71h8QMKCZ/5IOrcR7mURlDs3rJpUFrWDPQNMrTLf0es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740516424; c=relaxed/simple;
-	bh=Act62FROw5FKgMdYrI/D7fctk9vB8HfEjrEmQQTWIAU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J/28+lawyhlnRG3kdlHSsoxi1UM22nUhhzJl6nc70OA+UIL+zzW1flhX7lY4KEkMzV4jJBJH6jyj9gFxsgoYPNetlT8xOCvNuaODoQLbpHADIjxMdnsyIFW5IGcpkpomIZ9dO2wcR9ymOkZCKCObvCnkbclOmXPhPtAH+nrSdtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MdDaVdFH; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4394a823036so58065725e9.0
-        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 12:47:01 -0800 (PST)
+	s=arc-20240116; t=1740516762; c=relaxed/simple;
+	bh=hjz0gBE9twZOOp7C9S3tpcPR8h5pPtLgczWgnTi26HM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tu/8A9eP1mDg6/2QL2rjRwgefokJvaKw7xiPzYWbYBOeYEY/l6+xooffUab8YTM0pEOmhZxaYIaRGkMHIoPtYG8nfoB3RDZliIiN30osNIQrZI8eaAEcWJO+65wH0s2KXl/p+eJ274Ai3S43oyXkebmhfJR9fXLFKb6Sj+MfdhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h1zWit8W; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-471fa3b19bcso53801cf.0
+        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 12:52:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740516420; x=1741121220; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=E918OTHi2yvVgDkqR2WK0eqY1K7lmB4Humnmkm0YU/k=;
-        b=MdDaVdFH/W7R9JmPDdfaH1XoCPQG8EyzM4G5WfrRajBgFS+M3H0jEf5pMor2QXM5W2
-         nmmYMqOcboIELv0KKoZ8Y0QM+FpcMJ+BFXb3Y30ShQjDqjm3ySkXkHtY5ivMhmLFG9ge
-         jd8eSBrrMGdAzgMU2AobWMclcqAiRlMNax0xx1geOpuNLhwNg1UiFNzW2AzlM+KwRlAg
-         5EzMQ7pH/FSB4yrXDv1atuFVKLaVsEKLMvfR/FPgqeMPAiYgHYYD82Q45sv6s73PrVGT
-         t4OvRtqiig6oFwtXAw0f6+h490SZwqcz5y7I98pbkTEqSvWWC7Cxi2px5HREfWBrt2wL
-         cYPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740516420; x=1741121220;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1740516760; x=1741121560; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=E918OTHi2yvVgDkqR2WK0eqY1K7lmB4Humnmkm0YU/k=;
-        b=FGOwSkIa4E+9ztI2e5sB9PHIWtzEI4AtHMaYk0GrjpDOKgWwAnUqRpvuK/gpe6x7jI
-         /yAuBxudQdojJacWZxO3awtIbOSdcwTwFWSUYv0F2A+7bJIs8T5bUlcFeSu20KbIs+We
-         ZKdzqAJgDgpyScj3AmARjUGWylvEF2OPjxCSDI3O8LzvyG3vMm/thTf22G84wi/Icd5m
-         84rZVby1+QZmIQmaE9Bu0nWbhqWwWNTvCrjLRU09rcNQGi1r0EOe1QKpIlJrknxVxoMs
-         v+f+VhEFDOz1wjlBt5bEJseGIB/BD5Vk3hLgWZW6ntUaQvRa5puGfz1dY2Zya7JwUJ1P
-         1gtA==
-X-Forwarded-Encrypted: i=1; AJvYcCUp+ZOfj0CELP8sMyfG2v31FBvEEeSDjgCB9tbktGJGctHfCjFQDWF1g6L4r+Xe76N0tc+JCT8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxztKF6zviAmLA7DNQ3hCgbXT+PaYBNZ6oMWpBwLkncspBWgb4q
-	GMQ42L4OjFaP2pNgm9TlAVYrYJdiZ/kKvFAYjJ+1Ac99mHekfVdt
-X-Gm-Gg: ASbGncv2ErEEzHqZF1gnlXu3RQkPEuY9lWkJip7VjlIuEUi+LysAkEEXiQTnX7HaXwg
-	iDv8eO8O4Cgf6Ma1tcjpd3ONSl9dUG3Oo7LM/W6CcKiE/8xfbbKxaOXGLBw97FcBt0BoRHOV8P7
-	RLpwKo5909xfISmBDCo62CcmWOJRqKhFZI2k3AoZeUVlbAqLiZXs3Rd9WUqcInL509kk0MFIyWI
-	xSH/gaCSjLZSkZa3z9+g5OZPtdqsKI3u6ASZpqWRKTHZUNaUCjr5jwplil9IdGd7L0F+aRc7IjY
-	IufYHJ50/bmptHRjzv30Jp0Dg4CLKfUB9XY70xGpe6EQ7x5S+0aKhHYI/RGfZcwrXiyE+Hgjg1H
-	hzpNPzu7B2dXc
-X-Google-Smtp-Source: AGHT+IEmw7lSBpfSNj3LhieZeCNYI4bj4PCJf7zwnwb1ygbIuUippUUYOdeYMqmm611SGM3iLvGYVw==
-X-Received: by 2002:a05:6000:4010:b0:38f:6697:af6e with SMTP id ffacd0b85a97d-38f7077dc73mr14301433f8f.1.1740516419999;
-        Tue, 25 Feb 2025 12:46:59 -0800 (PST)
-Received: from orome (p200300e41f187700f22f74fffe1f3a53.dip0.t-ipconnect.de. [2003:e4:1f18:7700:f22f:74ff:fe1f:3a53])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ab156a11bsm38026395e9.36.2025.02.25.12.46.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Feb 2025 12:46:58 -0800 (PST)
-Date: Tue, 25 Feb 2025 21:46:56 +0100
-From: Thierry Reding <thierry.reding@gmail.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Emil Renner Berthing <kernel@esmil.dk>, 
-	Eric Dumazet <edumazet@google.com>, Fabio Estevam <festevam@gmail.com>, imx@lists.linux.dev, 
-	Inochi Amaoto <inochiama@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Jan Petrous <jan.petrous@oss.nxp.com>, Jon Hunter <jonathanh@nvidia.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Minda Chen <minda.chen@starfivetech.com>, netdev@vger.kernel.org, 
-	NXP S32 Linux Team <s32@nxp.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Pengutronix Kernel Team <kernel@pengutronix.de>, Sascha Hauer <s.hauer@pengutronix.de>, 
-	Shawn Guo <shawnguo@kernel.org>, Thierry Reding <treding@nvidia.com>
-Subject: Re: [PATCH RFC net-next 6/7] net: stmmac: intel: use generic
- stmmac_set_clk_tx_rate()
-Message-ID: <n67c4bq7n7ejakmqmglve3os6vqvm57umysjjzexxkygvusnoo@ndee4gfnmsst>
-References: <Z7RrnyER5ewy0f3T@shell.armlinux.org.uk>
- <E1tkLZB-004RZU-4A@rmk-PC.armlinux.org.uk>
+        bh=gPNE7Tr/f423mFCnHjLQC6m2BRNVKkHqF77gxN6IZs4=;
+        b=h1zWit8WhOFD1ivQDjr7zZT61jOgQEOczLLabZQm3rc/OHcM3qouEdTyXVKNbE+Cl7
+         N59Hca8aYMqciHZndzsHrFfpbv9jt37XhFbQ4KKKqs0qx5xSyDi/6HlCBq76BPFx6PcB
+         7wSyuzXvQTUzkdeRJADcK/rZW5hqSQoSa8rviiOWfFIRPBPjZzj5h9KDt2g7hueV2aup
+         vOmdsMe7PhGSXgRUvvWqiJvOrvGTkmFATPpiJI6xjxDFyYZ3O8PhPotleNnfkKI3doaA
+         EWF2KJr0gyjuEty31ZC04HhVoVc/ktAaiMR7V4IVrSIVgqqXFwVmc8n/TqPgs+3y9tQA
+         8pkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740516760; x=1741121560;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gPNE7Tr/f423mFCnHjLQC6m2BRNVKkHqF77gxN6IZs4=;
+        b=SMCJonVahE6MxzeefjZ8udf/bzt5XDWA3rqQqKF0799qWA1Ks4WCpWjn0BF+4EWPqt
+         4his9fqd48Wwp9UUcZ66IBqJ5g1kHJVp1H7zljJx6FosS0vrykp942+FHQHj09GiOdVs
+         8d6+UUQr4Ahua+/+sr65JV3BhFyb2ykG/pGGAbhhZgHUiup833PWFKuC+KwBFfp9a5b3
+         Ns+/lWabThn7datNSbGz+pp6wrpchoe83rfgAORh96VIvgj2onjoEkxIQFOK3sdB4CS2
+         yB3JpFXA3O7OTsxND9o6B1xMDr1IK9O1pGFydl//UPik2QuKfDppA0DC6iu0uW1Xpqwc
+         6e2g==
+X-Forwarded-Encrypted: i=1; AJvYcCW1zgjDXm4QkbfIuJwSwZkyQaXluMixOG2oj2DtaGr7E7rJMmSA25ZQMzpC9Kau+sFsbViFTvA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1hxAyATuIhxo20Io7cH1QGhZh6w7cvapq55RgJTOCM0J4rlMy
+	pz3G04pipgnxIW9nWJKqwWuR/Jsv5F8w0186SCDas+494aZyPlWH3Mn0MBfLcvoIkv1svAyGkKH
+	XcKE2/a3wPxbToHyCP1I3ZvPhzAX3DvBSO7zZ
+X-Gm-Gg: ASbGnctvViEpxLT4KEHtg2+Bpv1tx7eJ9NORGPJDKxfZ6c13eHDroV5lrEy3isPxvGr
+	TWoJbLHdyEtoOjE7Am/Hs6CXr5dhj8RzLf2lSY/ZEIOJ3/9bCgTIrUp7jNf+SJndlfztLnAkfIr
+	6Vw/QuTY26EJzw3AMRQlbEVbnx59VUv6dw3fy6tSA06dW2AoNX2M2G620=
+X-Google-Smtp-Source: AGHT+IH5AOCS6JZ2mI1zqQHspQOD7FeMuXqDxmTdFaEGEJFBMjiPH8AbqUufH0Pq+y/PtHGWArocPqx+AtmwFJ0TV9A=
+X-Received: by 2002:a05:622a:1342:b0:471:fe4a:b907 with SMTP id
+ d75a77b69052e-47376e8f66bmr6550781cf.15.1740516759767; Tue, 25 Feb 2025
+ 12:52:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="4kydm3gogek2i4nx"
-Content-Disposition: inline
-In-Reply-To: <E1tkLZB-004RZU-4A@rmk-PC.armlinux.org.uk>
-
-
---4kydm3gogek2i4nx
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
+References: <20250225171048.3105061-1-edumazet@google.com>
+In-Reply-To: <20250225171048.3105061-1-edumazet@google.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Tue, 25 Feb 2025 15:52:23 -0500
+X-Gm-Features: AQ5f1JpYfH8_Bpyyei96smq3SqWZZnw1RkiJsvvSwH2wsP6M20b6Krsq7JB9thY
+Message-ID: <CADVnQynMnDaDBkKy9c+DVRL6mf=bmpzjiyVEgxX0df-5iRS8Mg@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next] tcp: be less liberal in TSEcr received while
+ in SYN_RECV state
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>, 
+	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Yong-Hao Zou <yonghaoz1994@gmail.com>, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH RFC net-next 6/7] net: stmmac: intel: use generic
- stmmac_set_clk_tx_rate()
-MIME-Version: 1.0
 
-On Tue, Feb 18, 2025 at 11:15:05AM +0000, Russell King (Oracle) wrote:
-> Use the generic stmmac_set_clk_tx_rate() to configure the MAC transmit
-> clock.
->=20
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+On Tue, Feb 25, 2025 at 12:10=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
+ wrote:
+>
+> Yong-Hao Zou mentioned that linux was not strict as other OS in 3WHS,
+> for flows using TCP TS option (RFC 7323)
+>
+> As hinted by an old comment in tcp_check_req(),
+> we can check the TSEcr value in the incoming packet corresponds
+> to one of the SYNACK TSval values we have sent.
+>
+> In this patch, I record the oldest and most recent values
+> that SYNACK packets have used.
+>
+> Send a challenge ACK if we receive a TSEcr outside
+> of this range, and increase a new SNMP counter.
+>
+> nstat -az | grep TSEcrRejected
+> TcpExtTSEcrRejected            0                  0.0
+>
+> Due to TCP fastopen implementation, do not apply yet these checks
+> for fastopen flows.
+>
+> v2: No longer use req->num_timeout, but treq->snt_tsval_first
+>     to detect when first SYNACK is prepared. This means
+>     we make sure to not send an initial zero TSval.
+>     Make sure MPTCP and TCP selftests are passing.
+>     Change MIB name to TcpExtTSEcrRejected
+>
+> v1: https://lore.kernel.org/netdev/CADVnQykD8i4ArpSZaPKaoNxLJ2if2ts9m4As+=
+=3DJvdkrgx1qMHw@mail.gmail.com/T/
+>
+> Reported-by: Yong-Hao Zou <yonghaoz1994@gmail.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 > ---
->  .../stmicro/stmmac/dwmac-intel-plat.c         | 24 +++----------------
->  1 file changed, 3 insertions(+), 21 deletions(-)
 
-This isn't quite the same code, but the result should be the same since
-clk_set_rate() will be ignored if the clock is NULL, which would be the
-case for !dwmac->data->tx_clk_en.
+Reviewed-by: Neal Cardwell <ncardwell@google.com>
 
-Reviewed-by: Thierry Reding <treding@nvidia.com>
+Thanks, Eric!
 
---4kydm3gogek2i4nx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEiOrDCAFJzPfAjcif3SOs138+s6EFAme+LEAACgkQ3SOs138+
-s6FCDhAAscpV7eVp/AZQnvvZ4nw0Ad/YhFSj9yZtfDGHgapuDwrpMtuoI8uo9AXY
-D8+01yo35J7QfixSJ8u9vwrs2sZQLQsWQ1a90UudQueW5LuaW+Mjp7ErJgrh4B4C
-lsm3cUuv+/GblfCX4FgnceY9YHJGqoZNDzYAb+e6xmZCgFzRpT4emSCYCyVHnyS8
-sELpHrLTdgJlso7x8hWn3GsSgG6te0ToqLcru4HZ+gl4zRjh8ljfx+5tUkiCSdIf
-53t4tdRo/qhu/4EurhryxxJEsXSju1iYV57knOQp0QsplHARC7c4D10xVHFiYi4j
-M3mTMnRYGY/d9MMsd0pr193DktSogHur2k7zUdccpE7X34CPZcmfg5wLPO/qYK0S
-rJvto6QcJqqB4XagVfuoXoANvAOzlMXUviQBUHFFSumHmnwerkU0ntPzQdk5oQqt
-7I+TFMNlEiKA1VpLGbTWw8cEbvj7ZPGHnVd3EQIQp24lYqK/6IZiNB5ZOC0Q9ayk
-ydkm9PWQzIdlL3MFh/nho8iZ43nJF3rkTsML1leqt1/CdjHPHi+csCYATi2TqGEp
-GhcrScX9mxWkBZ7xWzFfETX610z1DwlzZDuZSlLtc1ZbyxLacU8EDIqY8bha661b
-8Irrrgzw/UAFApkCGAQxQ3NsIsc87T+t10FfEW8cdTCjolZd+hU=
-=eyD5
------END PGP SIGNATURE-----
-
---4kydm3gogek2i4nx--
+neal
 
