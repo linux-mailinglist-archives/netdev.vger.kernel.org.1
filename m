@@ -1,134 +1,161 @@
-Return-Path: <netdev+bounces-169632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98BDCA44E0A
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 21:52:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCAA7A44E75
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 22:11:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CC7C172767
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 20:52:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 887D4188BC37
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 21:11:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E0619DFA2;
-	Tue, 25 Feb 2025 20:52:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AABE01A2392;
+	Tue, 25 Feb 2025 21:10:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h1zWit8W"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Fc1G2cBo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39DBBDF59
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 20:52:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD4C1A0BCD
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 21:10:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740516762; cv=none; b=ntKdZX4A67GST/wpI/ufejqAX7y/4nhI3GNxdQ3WFI6NZWJii7WCQYoXaQOBoTy2o89LUkRT3Jtk06qTx5aaGSt+bN8YNrt6TvOnEwvGJ40MvSzV84ZxOzUlAK0+zVmO71h8QMKCZ/5IOrcR7mURlDs3rJpUFrWDPQNMrTLf0es=
+	t=1740517842; cv=none; b=TD0Igl/b/j9iF/fgz4xcjWgvHMQcFYeyKHDmRXDP4fr8oufxdeQ5O4l+9FME76XJVfqI82sy18NfIoAefA6+5OZYgLxo14N/Mk/sz5gf5GTIsmnHp7B0o0lUeBHWSuePmv80jD4LUy15juNhfZ/qjAj+zj9e8qLxnAIEMMh+lX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740516762; c=relaxed/simple;
-	bh=hjz0gBE9twZOOp7C9S3tpcPR8h5pPtLgczWgnTi26HM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tu/8A9eP1mDg6/2QL2rjRwgefokJvaKw7xiPzYWbYBOeYEY/l6+xooffUab8YTM0pEOmhZxaYIaRGkMHIoPtYG8nfoB3RDZliIiN30osNIQrZI8eaAEcWJO+65wH0s2KXl/p+eJ274Ai3S43oyXkebmhfJR9fXLFKb6Sj+MfdhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h1zWit8W; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-471fa3b19bcso53801cf.0
-        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 12:52:40 -0800 (PST)
+	s=arc-20240116; t=1740517842; c=relaxed/simple;
+	bh=6dprDHN+SCFUF0U2fdxnIeTe38NLwITDcuIDXLLNULE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HoiGuRvF6DZfhY2OOONs/POf8fa4gtQiXHCv5pWNVUkpWDoTOTKMQzxv9blyVjODMTLl0nVLzDHaWLrSOr1zeR1VjGzHYODnFvq/2AY8+2Tni9UrUsW//lYVsI0liL+j9gTjTfwppv7NBUBfEXR3/N3x8P+ynLwULow6lntJu34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Fc1G2cBo; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740516760; x=1741121560; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gPNE7Tr/f423mFCnHjLQC6m2BRNVKkHqF77gxN6IZs4=;
-        b=h1zWit8WhOFD1ivQDjr7zZT61jOgQEOczLLabZQm3rc/OHcM3qouEdTyXVKNbE+Cl7
-         N59Hca8aYMqciHZndzsHrFfpbv9jt37XhFbQ4KKKqs0qx5xSyDi/6HlCBq76BPFx6PcB
-         7wSyuzXvQTUzkdeRJADcK/rZW5hqSQoSa8rviiOWfFIRPBPjZzj5h9KDt2g7hueV2aup
-         vOmdsMe7PhGSXgRUvvWqiJvOrvGTkmFATPpiJI6xjxDFyYZ3O8PhPotleNnfkKI3doaA
-         EWF2KJr0gyjuEty31ZC04HhVoVc/ktAaiMR7V4IVrSIVgqqXFwVmc8n/TqPgs+3y9tQA
-         8pkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740516760; x=1741121560;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gPNE7Tr/f423mFCnHjLQC6m2BRNVKkHqF77gxN6IZs4=;
-        b=SMCJonVahE6MxzeefjZ8udf/bzt5XDWA3rqQqKF0799qWA1Ks4WCpWjn0BF+4EWPqt
-         4his9fqd48Wwp9UUcZ66IBqJ5g1kHJVp1H7zljJx6FosS0vrykp942+FHQHj09GiOdVs
-         8d6+UUQr4Ahua+/+sr65JV3BhFyb2ykG/pGGAbhhZgHUiup833PWFKuC+KwBFfp9a5b3
-         Ns+/lWabThn7datNSbGz+pp6wrpchoe83rfgAORh96VIvgj2onjoEkxIQFOK3sdB4CS2
-         yB3JpFXA3O7OTsxND9o6B1xMDr1IK9O1pGFydl//UPik2QuKfDppA0DC6iu0uW1Xpqwc
-         6e2g==
-X-Forwarded-Encrypted: i=1; AJvYcCW1zgjDXm4QkbfIuJwSwZkyQaXluMixOG2oj2DtaGr7E7rJMmSA25ZQMzpC9Kau+sFsbViFTvA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1hxAyATuIhxo20Io7cH1QGhZh6w7cvapq55RgJTOCM0J4rlMy
-	pz3G04pipgnxIW9nWJKqwWuR/Jsv5F8w0186SCDas+494aZyPlWH3Mn0MBfLcvoIkv1svAyGkKH
-	XcKE2/a3wPxbToHyCP1I3ZvPhzAX3DvBSO7zZ
-X-Gm-Gg: ASbGnctvViEpxLT4KEHtg2+Bpv1tx7eJ9NORGPJDKxfZ6c13eHDroV5lrEy3isPxvGr
-	TWoJbLHdyEtoOjE7Am/Hs6CXr5dhj8RzLf2lSY/ZEIOJ3/9bCgTIrUp7jNf+SJndlfztLnAkfIr
-	6Vw/QuTY26EJzw3AMRQlbEVbnx59VUv6dw3fy6tSA06dW2AoNX2M2G620=
-X-Google-Smtp-Source: AGHT+IH5AOCS6JZ2mI1zqQHspQOD7FeMuXqDxmTdFaEGEJFBMjiPH8AbqUufH0Pq+y/PtHGWArocPqx+AtmwFJ0TV9A=
-X-Received: by 2002:a05:622a:1342:b0:471:fe4a:b907 with SMTP id
- d75a77b69052e-47376e8f66bmr6550781cf.15.1740516759767; Tue, 25 Feb 2025
- 12:52:39 -0800 (PST)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1740517842; x=1772053842;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=qaGNJ2cIdd4i6EslMnG00QzilPkJVKYuTbJrGIJfP9g=;
+  b=Fc1G2cBoeKa1MwNgEeW6dopiw3Ied7skofyTX7rsohMZS1uU1zEV7sQ7
+   irtYW3vuC2ywcjqsE1/wjEZv2n2IEi3/simCMqNN1xZaQ4BYorMcGWAZ/
+   /fKeJ4IGc4Syv9BpUcKNe+Sr+lh8qJqRTa5xI+K0JJsfdU6neKWR1LbVf
+   0=;
+X-IronPort-AV: E=Sophos;i="6.13,314,1732579200"; 
+   d="scan'208";a="380762879"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2025 21:10:38 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:12061]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.48.97:2525] with esmtp (Farcaster)
+ id 10b98729-a9e5-49a4-b649-3f11dae61f5f; Tue, 25 Feb 2025 21:10:36 +0000 (UTC)
+X-Farcaster-Flow-ID: 10b98729-a9e5-49a4-b649-3f11dae61f5f
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 25 Feb 2025 21:10:35 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.100.5) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 25 Feb 2025 21:10:32 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, Breno Leitao
+	<leitao@debian.org>
+Subject: [PATCH v1 net] net: Use rtnl_net_dev_lock() in register_netdevice_notifier_dev_net().
+Date: Tue, 25 Feb 2025 13:10:23 -0800
+Message-ID: <20250225211023.96448-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250225171048.3105061-1-edumazet@google.com>
-In-Reply-To: <20250225171048.3105061-1-edumazet@google.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Tue, 25 Feb 2025 15:52:23 -0500
-X-Gm-Features: AQ5f1JpYfH8_Bpyyei96smq3SqWZZnw1RkiJsvvSwH2wsP6M20b6Krsq7JB9thY
-Message-ID: <CADVnQynMnDaDBkKy9c+DVRL6mf=bmpzjiyVEgxX0df-5iRS8Mg@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next] tcp: be less liberal in TSEcr received while
- in SYN_RECV state
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Yong-Hao Zou <yonghaoz1994@gmail.com>, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D046UWB003.ant.amazon.com (10.13.139.174) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Tue, Feb 25, 2025 at 12:10=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> Yong-Hao Zou mentioned that linux was not strict as other OS in 3WHS,
-> for flows using TCP TS option (RFC 7323)
->
-> As hinted by an old comment in tcp_check_req(),
-> we can check the TSEcr value in the incoming packet corresponds
-> to one of the SYNACK TSval values we have sent.
->
-> In this patch, I record the oldest and most recent values
-> that SYNACK packets have used.
->
-> Send a challenge ACK if we receive a TSEcr outside
-> of this range, and increase a new SNMP counter.
->
-> nstat -az | grep TSEcrRejected
-> TcpExtTSEcrRejected            0                  0.0
->
-> Due to TCP fastopen implementation, do not apply yet these checks
-> for fastopen flows.
->
-> v2: No longer use req->num_timeout, but treq->snt_tsval_first
->     to detect when first SYNACK is prepared. This means
->     we make sure to not send an initial zero TSval.
->     Make sure MPTCP and TCP selftests are passing.
->     Change MIB name to TcpExtTSEcrRejected
->
-> v1: https://lore.kernel.org/netdev/CADVnQykD8i4ArpSZaPKaoNxLJ2if2ts9m4As+=
-=3DJvdkrgx1qMHw@mail.gmail.com/T/
->
-> Reported-by: Yong-Hao Zou <yonghaoz1994@gmail.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> ---
+Breno Leitao reported the splat below. [0]
 
-Reviewed-by: Neal Cardwell <ncardwell@google.com>
+Commit 65161fb544aa ("net: Fix dev_net(dev) race in
+unregister_netdevice_notifier_dev_net().") added the
+DEBUG_NET_WARN_ON_ONCE(), assuming that the netdev is not
+registered before register_netdevice_notifier_dev_net().
 
-Thanks, Eric!
+But the assumption was simply wrong.
 
-neal
+Let's use rtnl_net_dev_lock() in register_netdevice_notifier_dev_net().
+
+[0]:
+WARNING: CPU: 25 PID: 849 at net/core/dev.c:2150 register_netdevice_notifier_dev_net (net/core/dev.c:2150)
+ <TASK>
+ ? __warn (kernel/panic.c:242 kernel/panic.c:748)
+ ? register_netdevice_notifier_dev_net (net/core/dev.c:2150)
+ ? register_netdevice_notifier_dev_net (net/core/dev.c:2150)
+ ? report_bug (lib/bug.c:? lib/bug.c:219)
+ ? handle_bug (arch/x86/kernel/traps.c:285)
+ ? exc_invalid_op (arch/x86/kernel/traps.c:309)
+ ? asm_exc_invalid_op (./arch/x86/include/asm/idtentry.h:621)
+ ? register_netdevice_notifier_dev_net (net/core/dev.c:2150)
+ ? register_netdevice_notifier_dev_net (./include/net/net_namespace.h:406 ./include/linux/netdevice.h:2663 net/core/dev.c:2144)
+ mlx5e_mdev_notifier_event+0x9f/0xf0 mlx5_ib
+ notifier_call_chain.llvm.12241336988804114627 (kernel/notifier.c:85)
+ blocking_notifier_call_chain (kernel/notifier.c:380)
+ mlx5_core_uplink_netdev_event_replay (drivers/net/ethernet/mellanox/mlx5/core/main.c:352)
+ mlx5_ib_roce_init.llvm.12447516292400117075+0x1c6/0x550 mlx5_ib
+ mlx5r_probe+0x375/0x6a0 mlx5_ib
+ ? kernfs_put (./include/linux/instrumented.h:96 ./include/linux/atomic/atomic-arch-fallback.h:2278 ./include/linux/atomic/atomic-instrumented.h:1384 fs/kernfs/dir.c:557)
+ ? auxiliary_match_id (drivers/base/auxiliary.c:174)
+ ? mlx5r_mp_remove+0x160/0x160 mlx5_ib
+ really_probe (drivers/base/dd.c:? drivers/base/dd.c:658)
+ driver_probe_device (drivers/base/dd.c:830)
+ __driver_attach (drivers/base/dd.c:1217)
+ bus_for_each_dev (drivers/base/bus.c:369)
+ ? driver_attach (drivers/base/dd.c:1157)
+ bus_add_driver (drivers/base/bus.c:679)
+ driver_register (drivers/base/driver.c:249)
+
+Fixes: 7fb1073300a2 ("net: Hold rtnl_net_lock() in (un)?register_netdevice_notifier_dev_net().")
+Reported-by: Breno Leitao <leitao@debian.org>
+Closes: https://lore.kernel.org/netdev/20250224-noisy-cordial-roadrunner-fad40c@leitao/
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+ net/core/dev.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
+
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 1b252e9459fd..70c01bd1799e 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -2141,21 +2141,15 @@ int register_netdevice_notifier_dev_net(struct net_device *dev,
+ 					struct notifier_block *nb,
+ 					struct netdev_net_notifier *nn)
+ {
+-	struct net *net = dev_net(dev);
+ 	int err;
+ 
+-	/* rtnl_net_lock() assumes dev is not yet published by
+-	 * register_netdevice().
+-	 */
+-	DEBUG_NET_WARN_ON_ONCE(!list_empty(&dev->dev_list));
+-
+-	rtnl_net_lock(net);
+-	err = __register_netdevice_notifier_net(net, nb, false);
++	rtnl_net_dev_lock(dev);
++	err = __register_netdevice_notifier_net(dev_net(dev), nb, false);
+ 	if (!err) {
+ 		nn->nb = nb;
+ 		list_add(&nn->list, &dev->net_notifier_list);
+ 	}
+-	rtnl_net_unlock(net);
++	rtnl_net_dev_unlock(dev);
+ 
+ 	return err;
+ }
+-- 
+2.39.5 (Apple Git-154)
+
 
