@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-169630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 955DFA44DF9
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 21:46:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EA88A44E01
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 21:47:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD87D3B0DDE
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 20:43:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D37F189701C
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 20:47:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F6AE19F41B;
-	Tue, 25 Feb 2025 20:44:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 554B618A6A8;
+	Tue, 25 Feb 2025 20:47:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mC0+ebBZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MdDaVdFH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A08B0DF59
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 20:44:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F09341632D9
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 20:47:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740516243; cv=none; b=txQdnhPKsJejKAAcfXfq0AegirC2MvF8LTm51iDV3+SJ6vqiVJrUxQjMMWKM8FHrs4X0tuNdOFzofi/zm55+/1/s7VrO2KHmhaspclXSPhhV+LrUHmVVqBeYC79gslbXdBUNwFfHaTjDpnWVQlycbivuWMwFuj7quYHWnZw6fsc=
+	t=1740516424; cv=none; b=gR7+dagWf8K60NM5UmKIpNln3lidcSPViVZm1wfefK/lwAAtC0wd04HS/dDT9LtOS48mxONwIcN+D3Yiqi/PhYaZBb0iDbQQOSm6v2KslLgAFOfhlIlULJ7tZkdvm7DxrwIAp4kjFD+EXdOKc11NeoH2o3S9CigursTmF/xh3T4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740516243; c=relaxed/simple;
-	bh=km6GgyUtBYWlPDyGMWfcUJBELXq839o82rzSdqdT8ck=;
+	s=arc-20240116; t=1740516424; c=relaxed/simple;
+	bh=Act62FROw5FKgMdYrI/D7fctk9vB8HfEjrEmQQTWIAU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PQ60KtqMbtKUA8Om6Mcm92eLcwwdCHw4/1XSVk/SQOritrl/W/T/QHKBxWm0bgPSrDQe0pSRs9udSRw5ypVBF/KOxcAUq//1sShUKaTNP/s9I3um01EROHs/Hba5q84YuxgrUyRx+V1kZf+1OtVjCi0GPWDAC5DmKLsxjRGFiPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mC0+ebBZ; arc=none smtp.client-ip=209.85.221.41
+	 Content-Type:Content-Disposition:In-Reply-To; b=J/28+lawyhlnRG3kdlHSsoxi1UM22nUhhzJl6nc70OA+UIL+zzW1flhX7lY4KEkMzV4jJBJH6jyj9gFxsgoYPNetlT8xOCvNuaODoQLbpHADIjxMdnsyIFW5IGcpkpomIZ9dO2wcR9ymOkZCKCObvCnkbclOmXPhPtAH+nrSdtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MdDaVdFH; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-38a8b17d7a7so3463724f8f.2
-        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 12:44:01 -0800 (PST)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4394a823036so58065725e9.0
+        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 12:47:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740516240; x=1741121040; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1740516420; x=1741121220; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=km6GgyUtBYWlPDyGMWfcUJBELXq839o82rzSdqdT8ck=;
-        b=mC0+ebBZD0oeqvEl5JEc5WzS8WWrsw8T2c34WtE6Qnzg2B0YR6nNgJc0kc5TLTnPxb
-         A5KCsQEpjUFwf0omviC7N1SpeDpPARDi4SPGrjtjQWdhiFRXprMQzr266Jj+N20k6vXf
-         qCG1Lo+E+Ple9dSISZnTE5uJSFfBgEiLCY8ziqUoiwz+DDz/ueysTksENkcdxrW3pzhi
-         sqmx/LXXBGmHjn1rnu8HLzK9ze49/IxQrsegzJnDCdd5Jec4UjL4Nt/Ijhuu7ZS4M1js
-         ebH2wYfDfosU2CjiyUGqTV70NOvAEW/MuVr0jMiFXGzD/xR3sbjvpqYD6gkj2fOQdlH9
-         hYUA==
+        bh=E918OTHi2yvVgDkqR2WK0eqY1K7lmB4Humnmkm0YU/k=;
+        b=MdDaVdFH/W7R9JmPDdfaH1XoCPQG8EyzM4G5WfrRajBgFS+M3H0jEf5pMor2QXM5W2
+         nmmYMqOcboIELv0KKoZ8Y0QM+FpcMJ+BFXb3Y30ShQjDqjm3ySkXkHtY5ivMhmLFG9ge
+         jd8eSBrrMGdAzgMU2AobWMclcqAiRlMNax0xx1geOpuNLhwNg1UiFNzW2AzlM+KwRlAg
+         5EzMQ7pH/FSB4yrXDv1atuFVKLaVsEKLMvfR/FPgqeMPAiYgHYYD82Q45sv6s73PrVGT
+         t4OvRtqiig6oFwtXAw0f6+h490SZwqcz5y7I98pbkTEqSvWWC7Cxi2px5HREfWBrt2wL
+         cYPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740516240; x=1741121040;
+        d=1e100.net; s=20230601; t=1740516420; x=1741121220;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=km6GgyUtBYWlPDyGMWfcUJBELXq839o82rzSdqdT8ck=;
-        b=az3vtYN2SKwfopk4bJSnGYfl2VRNRZpQ9hprUtoRIjuGKNuPy7KlDLlXuLeenleYyz
-         E91QSreODZdNIXbLLCJviyu/ZXO2TUZqVjkad6IA21ENwDYY+0oTfclzfZYRLFrG83Nh
-         p6E73j/f03xKwTToIX0fwo0kvQaoGVqyQVeeaPLdvzwOs6yS5N5Yt+r2kXbnAFHgrvKM
-         PX6syIEqVAsLCVS4Xi7YhWFTYKhZfysT2KCkHitsup9Yg/pG0Z3Fh82kONcculF4vSDL
-         /GDatU5Rh9WWXo+cC5w1d8SXyVAC/4R5qxicNTbSgFbC4rzNW5OIiLLQjlywdslPxXhx
-         HMvA==
-X-Forwarded-Encrypted: i=1; AJvYcCXcjEAc9JZqcAsfHkrm4hmEqCx1X9fywazKdP+EoubDx5BTNajY48Qiha5uKJoH6bLEnNWi3dc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxa+fbj4jUT8lVuOsLlCzpxRm8osFnLY0tq3ic/FkCJ/b7adYri
-	0e95GzaY32lRZViPyUOMESo7xbRI3aIftKvnuv3cauQYa4GKEe6Y
-X-Gm-Gg: ASbGnct/D2aABmyFP4PaHuUrki9q2GhZ2O113CcXONNNnW6Is0CQJ2FRLXh8M9o+SjQ
-	hKg1E6+4+QL7+LLO/qbfVUL1SZsjbl/sETkFi9ejLTVvb+2k94Vt6jVYNRk1Tb8TGKa93V1vf1O
-	UB65sVgtwNtSMfwV5QSLB7Nvgl8k28tbY/zihOK3Y5WB+M10eoscZcNNZ405R7IS7P05PH0cyFU
-	/wE/nqAUbJmIHK7Ot7cxFiTO0nPmZS34FYiKAD5vGsFum8+AwbpAVabFwUUL73MgA9Zij2wNovN
-	cCljOWcy+0kTta+zlGph7Ep07zNPsWo58s0mJnGhwehHqz/HoNsFhsH9Gtgpi0Ch1+oPcTn/Gp0
-	GrE6eHtw4Y8u9
-X-Google-Smtp-Source: AGHT+IFn60vNyjvN8suXWrn3N7MNMCvoYB7tyLvf0VIb/vaa4GNGBrrZf3vgpHtm6zuKbQT61XRnPw==
-X-Received: by 2002:a5d:64e9:0:b0:38b:f4dc:4483 with SMTP id ffacd0b85a97d-390d4f421e7mr518360f8f.29.1740516239496;
-        Tue, 25 Feb 2025 12:43:59 -0800 (PST)
+        bh=E918OTHi2yvVgDkqR2WK0eqY1K7lmB4Humnmkm0YU/k=;
+        b=FGOwSkIa4E+9ztI2e5sB9PHIWtzEI4AtHMaYk0GrjpDOKgWwAnUqRpvuK/gpe6x7jI
+         /yAuBxudQdojJacWZxO3awtIbOSdcwTwFWSUYv0F2A+7bJIs8T5bUlcFeSu20KbIs+We
+         ZKdzqAJgDgpyScj3AmARjUGWylvEF2OPjxCSDI3O8LzvyG3vMm/thTf22G84wi/Icd5m
+         84rZVby1+QZmIQmaE9Bu0nWbhqWwWNTvCrjLRU09rcNQGi1r0EOe1QKpIlJrknxVxoMs
+         v+f+VhEFDOz1wjlBt5bEJseGIB/BD5Vk3hLgWZW6ntUaQvRa5puGfz1dY2Zya7JwUJ1P
+         1gtA==
+X-Forwarded-Encrypted: i=1; AJvYcCUp+ZOfj0CELP8sMyfG2v31FBvEEeSDjgCB9tbktGJGctHfCjFQDWF1g6L4r+Xe76N0tc+JCT8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxztKF6zviAmLA7DNQ3hCgbXT+PaYBNZ6oMWpBwLkncspBWgb4q
+	GMQ42L4OjFaP2pNgm9TlAVYrYJdiZ/kKvFAYjJ+1Ac99mHekfVdt
+X-Gm-Gg: ASbGncv2ErEEzHqZF1gnlXu3RQkPEuY9lWkJip7VjlIuEUi+LysAkEEXiQTnX7HaXwg
+	iDv8eO8O4Cgf6Ma1tcjpd3ONSl9dUG3Oo7LM/W6CcKiE/8xfbbKxaOXGLBw97FcBt0BoRHOV8P7
+	RLpwKo5909xfISmBDCo62CcmWOJRqKhFZI2k3AoZeUVlbAqLiZXs3Rd9WUqcInL509kk0MFIyWI
+	xSH/gaCSjLZSkZa3z9+g5OZPtdqsKI3u6ASZpqWRKTHZUNaUCjr5jwplil9IdGd7L0F+aRc7IjY
+	IufYHJ50/bmptHRjzv30Jp0Dg4CLKfUB9XY70xGpe6EQ7x5S+0aKhHYI/RGfZcwrXiyE+Hgjg1H
+	hzpNPzu7B2dXc
+X-Google-Smtp-Source: AGHT+IEmw7lSBpfSNj3LhieZeCNYI4bj4PCJf7zwnwb1ygbIuUippUUYOdeYMqmm611SGM3iLvGYVw==
+X-Received: by 2002:a05:6000:4010:b0:38f:6697:af6e with SMTP id ffacd0b85a97d-38f7077dc73mr14301433f8f.1.1740516419999;
+        Tue, 25 Feb 2025 12:46:59 -0800 (PST)
 Received: from orome (p200300e41f187700f22f74fffe1f3a53.dip0.t-ipconnect.de. [2003:e4:1f18:7700:f22f:74ff:fe1f:3a53])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390cd86ce49sm3473823f8f.36.2025.02.25.12.43.57
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ab156a11bsm38026395e9.36.2025.02.25.12.46.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Feb 2025 12:43:58 -0800 (PST)
-Date: Tue, 25 Feb 2025 21:43:56 +0100
+        Tue, 25 Feb 2025 12:46:58 -0800 (PST)
+Date: Tue, 25 Feb 2025 21:46:56 +0100
 From: Thierry Reding <thierry.reding@gmail.com>
 To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
@@ -86,11 +86,11 @@ Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	NXP S32 Linux Team <s32@nxp.com>, Paolo Abeni <pabeni@redhat.com>, 
 	Pengutronix Kernel Team <kernel@pengutronix.de>, Sascha Hauer <s.hauer@pengutronix.de>, 
 	Shawn Guo <shawnguo@kernel.org>, Thierry Reding <treding@nvidia.com>
-Subject: Re: [PATCH RFC net-next 5/7] net: stmmac: s32: use generic
+Subject: Re: [PATCH RFC net-next 6/7] net: stmmac: intel: use generic
  stmmac_set_clk_tx_rate()
-Message-ID: <x56yik7opvpr3o5vjlxoxzxdicrz2pimsh4lkpxol7c64r6irs@t7dfqy7ybn2a>
+Message-ID: <n67c4bq7n7ejakmqmglve3os6vqvm57umysjjzexxkygvusnoo@ndee4gfnmsst>
 References: <Z7RrnyER5ewy0f3T@shell.armlinux.org.uk>
- <E1tkLZ6-004RZO-0H@rmk-PC.armlinux.org.uk>
+ <E1tkLZB-004RZU-4A@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,55 +98,53 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ofk7odbwikmdng6s"
+	protocol="application/pgp-signature"; boundary="4kydm3gogek2i4nx"
 Content-Disposition: inline
-In-Reply-To: <E1tkLZ6-004RZO-0H@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1tkLZB-004RZU-4A@rmk-PC.armlinux.org.uk>
 
 
---ofk7odbwikmdng6s
+--4kydm3gogek2i4nx
 Content-Type: text/plain; protected-headers=v1; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH RFC net-next 5/7] net: stmmac: s32: use generic
+Subject: Re: [PATCH RFC net-next 6/7] net: stmmac: intel: use generic
  stmmac_set_clk_tx_rate()
 MIME-Version: 1.0
 
-On Tue, Feb 18, 2025 at 11:15:00AM +0000, Russell King (Oracle) wrote:
+On Tue, Feb 18, 2025 at 11:15:05AM +0000, Russell King (Oracle) wrote:
 > Use the generic stmmac_set_clk_tx_rate() to configure the MAC transmit
 > clock.
 >=20
 > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+>  .../stmicro/stmmac/dwmac-intel-plat.c         | 24 +++----------------
+>  1 file changed, 3 insertions(+), 21 deletions(-)
 
-I wonder if the clk_set_rate() call for gmac->tx_clk could also be
-removed from s32_gmac_init(). Comparing to the other drivers that
-doesn't seem to be relevant since ->set_clk_tx_rate() will be called
-anyway when the interface is brought up.
-
-But it might be more difficult because somebody would actually have to
-go and test this, whereas this patch here is the equivalent of the
-previous code, so:
+This isn't quite the same code, but the result should be the same since
+clk_set_rate() will be ignored if the clock is NULL, which would be the
+case for !dwmac->data->tx_clk_en.
 
 Reviewed-by: Thierry Reding <treding@nvidia.com>
 
---ofk7odbwikmdng6s
+--4kydm3gogek2i4nx
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCAAdFiEEiOrDCAFJzPfAjcif3SOs138+s6EFAme+K4wACgkQ3SOs138+
-s6G4pQ/9HAe8mzGeYLufQVT2wUZVpeDW6XeOv6EOFIvwsgTf+44yqDw3xiulERM5
-tTs3b8w6d4j3xO1PLdXoIlx3vANG5xRtGEcxXY3sB8HjmuSGWWig1zuSTAOJegbs
-we7h3FfZwYlMaSJAfvQNZsX/rDN/auA0R8opcByCxOqFAqRwwJSEH+avYvvVgKEZ
-Mmzov1YSzCyzB0pEEsAkdaB07XMdwl6Ee+ShlKaXzk88WS8KhxZKhYHWNFaAmqLo
-1jyGoa08Vz/Y1WMhLPLCMPrjmWjrMcVjhjCNp9xmCffiJHDAec+eRfV41Cwmp6HC
-wjh85xTUS/4hGh+Md5EWO8bxv9aTGHOkGwI4qVxl6xZVFJRkwZkAgrO4teY2RXy1
-/flh/cJcM9x88N9LAemunvF+RuPBv5mHV8VWgnJW2a91p7hWKZWV2gxcbzEL4L8p
-oKBcQDleR7I9gCunuLnQRiQlwSyw4oKX/96IQ86Dbr8th4/4pKsWtxfDPjHtqzo0
-XzbRtT+vlLIFlTprG9nh5PLO/Lxs9OzJ0kiqhJh24nAwMNxbXS/msQ+m8PRWT3C/
-/okF5ojWT+0ZijDIGhWi5uwBNWxiwav1tElTfJGEHIyz2qOiFZyFhUH7oi5E9iB4
-rin6SAkxYbIF5XDT+zuqAifn/g0BNDr2moVdUvgImYtAMQUCLmo=
-=c/GH
+iQIzBAABCAAdFiEEiOrDCAFJzPfAjcif3SOs138+s6EFAme+LEAACgkQ3SOs138+
+s6FCDhAAscpV7eVp/AZQnvvZ4nw0Ad/YhFSj9yZtfDGHgapuDwrpMtuoI8uo9AXY
+D8+01yo35J7QfixSJ8u9vwrs2sZQLQsWQ1a90UudQueW5LuaW+Mjp7ErJgrh4B4C
+lsm3cUuv+/GblfCX4FgnceY9YHJGqoZNDzYAb+e6xmZCgFzRpT4emSCYCyVHnyS8
+sELpHrLTdgJlso7x8hWn3GsSgG6te0ToqLcru4HZ+gl4zRjh8ljfx+5tUkiCSdIf
+53t4tdRo/qhu/4EurhryxxJEsXSju1iYV57knOQp0QsplHARC7c4D10xVHFiYi4j
+M3mTMnRYGY/d9MMsd0pr193DktSogHur2k7zUdccpE7X34CPZcmfg5wLPO/qYK0S
+rJvto6QcJqqB4XagVfuoXoANvAOzlMXUviQBUHFFSumHmnwerkU0ntPzQdk5oQqt
+7I+TFMNlEiKA1VpLGbTWw8cEbvj7ZPGHnVd3EQIQp24lYqK/6IZiNB5ZOC0Q9ayk
+ydkm9PWQzIdlL3MFh/nho8iZ43nJF3rkTsML1leqt1/CdjHPHi+csCYATi2TqGEp
+GhcrScX9mxWkBZ7xWzFfETX610z1DwlzZDuZSlLtc1ZbyxLacU8EDIqY8bha661b
+8Irrrgzw/UAFApkCGAQxQ3NsIsc87T+t10FfEW8cdTCjolZd+hU=
+=eyD5
 -----END PGP SIGNATURE-----
 
---ofk7odbwikmdng6s--
+--4kydm3gogek2i4nx--
 
