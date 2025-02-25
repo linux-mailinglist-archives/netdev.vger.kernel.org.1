@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-169365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C50E3A43937
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:20:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91E53A43926
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:19:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E3D919E1AFA
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 09:14:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 551657AA87A
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 09:13:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97DC52676C1;
-	Tue, 25 Feb 2025 09:11:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAD8F2676DF;
+	Tue, 25 Feb 2025 09:11:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="aA9NpURB"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="sWuM+61g"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2048.outbound.protection.outlook.com [40.107.93.48])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2076.outbound.protection.outlook.com [40.107.220.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60B5D266EF7
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 09:11:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F09852676C8
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 09:11:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.76
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740474669; cv=fail; b=Rwxl0SKD9n7anq6MfQgkd6zwSX9XhYs5YZo5DGiGQzGUtQxx3R416E5dsW0b/FgpyIqwf5nEzCbRX8OKAF7rMKczqorBUjorfTvv3KLFbJDjggiRWisbHtZ/3IPZM6qIijcD1ejOPSnL5nhCrLdAmLjFhSf8cEqCPO164M0ACVg=
+	t=1740474671; cv=fail; b=psqkqjRYSl+YS+DXOiSHBptBZ2FVrq4kuHflHR3Gou79UH2It7DPvD4+kw2/Oo5nFGLq7+twrCy3HHfxGzCPbz8PzOxuisk4ZigOt0mysBK+yvEw67UI3LjpxyfkBzRfumGvUXCRKwTK6fmfIjkVXCKhNSamLi85bpP4eEMoUgM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740474669; c=relaxed/simple;
-	bh=Cq9f1gQjooFsSduhXofgZieiMr+Zxas9pjcSkbAqGbk=;
+	s=arc-20240116; t=1740474671; c=relaxed/simple;
+	bh=BHoDNf/62t5mUw9AuBq8uXZfuCSIo6A9TmtCkDgMWgk=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WD+Ryp5P0YWFyqsaYtvmRZNYRiQwdMTIMiW6F0sq43iycL9oYQGVzZebPSpNTqVBgzhs/YoCKPkW2Tp6h7DqjeuB+nbKsQ4TfTpvrGGpmQJhD/oYiNkkJm8u/xS+IpWwbMXlgW9lGmvwGwYjQQkWNBCzc4Uk0bRoD2Oc/5rH0ZA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=aA9NpURB; arc=fail smtp.client-ip=40.107.93.48
+	 MIME-Version:Content-Type; b=Z9yBe1paRZFPH5S045QwnZ7vHFkvOaASWYK198BAYENzJ+viKw5hlQuMYlpeKAhVl/SsqB/LopgroZqTx1oo9e4clkBgKEhXRiu/JNLHMwyeVew3vaYPv6bH/ItSZnVlDTr3XW1WjYYNSBDGcOkqMgnmJ26lEMrk4DUzkKI/mPg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=sWuM+61g; arc=fail smtp.client-ip=40.107.220.76
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kIYjrI+0vN2i1mpqju5whQVmxqs8mxYROy1AkdMC4OVTRXSSdhb29/Mjn1+QEYydNv7sd0FlspSEh9MDR3hvhRndEqg6XIUF1sdUTjiAzu4QjQbb8JGnoO0da1p1Q4vj/r8T2FBxntDJ4eJKd9pflpX1QtWVrdqWj/78fZQFDFo8+bqMX56GA8BRwcIMe1SeHyFKaSzeuYDlvhjZJczJE3ChV+trx+Eq0aSZpYsU9TLk72EB9wE6Zrd1cmtyOOTONWEGMm6jZkQ7QdOJT6m3xhhoULZ1WEy7uibeT9kjYzPbN2VLmqPArxrzEMD4Tk7y8GkQGLVAE21l5m4P6FXSXw==
+ b=R5Sw7ElcExQH5R/TILbHci0HZY73uD8bf2t/RCtae1wP3xfEQK7IQaAavc5WGxUy+gm6D+WeRCjOsFwo5+14PD2ujxH1TF0xNR6zMbwBmNDsoBu8rKZg0mFdI9vAlIFSnGoDXJNtY76INnaiyBuI/lptBZBpW30EakHk44vCVR5MS5RzkXQ90Iv/TxJMXN+5PcqQW1fvgMKBiCWRqUfhlRspN6/C0suLRRRugM8+X5wPp4HNqTkUt6z5K0aalwIRpfO6Z7/Ve6FATxk6BiI/0bYmvVIFI9fgJOEISp9PorUDBUPSKkPH0nJrD4WWMVEShEMfzpA9GKteA3ciTU5eDQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ks+PMvczbLnUo7KOn4L0GlQp8MBRHLCiVVj92m60gUY=;
- b=VOtUuk+6cVVmqJpldXChJaRqQn3ZQd+2NgAHcwfV4DF5NRea8AEy9KRB8F43zb7wQgM7ERxcqooUQDEJt6/kneYDfRsTEaaSDGepEFbTSOYRtQ/NEkMFGkOhU/5mb2O31mVKl1DSPJdZLFDKN6Demax0pheg1oIIqBeRJRWiR2S9U+cs1CEZQ2xfnjIoY8WHhM50jFtgoNAZHnSSSy/SySodNVd4eVdFwamChEZxLO/m5hFaFg6HePUBiZ1t7ZgvFfdLL8WhVQJ7/wK2eBiDbsScu+razzAzN9Y1hF+DlwJxbBb446Of2cRVRfD4h5gHg7x07JDsf/GE/OxvI64d/Q==
+ bh=39AvaITQDZTIFfmPFfIDhCqh2H44mrgDEUvouteNpro=;
+ b=ae0rsZHdDSScTXhNjKCcLKLGKYeG575pUVKzssaejI/1B6UHk36zM6dFbmdSd71VIeClqzvMcTnqjj1q9jErOid/qdg5QJTr6gsHqrE84yr9Puna+D4/UO44Ed+9fkJJS+cBL0Uifanajjs0QHqj3WNd8jL7J0ZV0ESCR7+PMdVwjEqtqwKZ8UbTVecs5VzttjC556muo4iyzZw/aekquP16tR0LHtXaX5grDYl7NgD4Xn0f3al2zYoyiBfK1KbwJl/kTuK6bR8znlSNKg1/sWJaAkiH7/STzizkpUFvDdXPUqJs0AZ74t5wAjIkJTrM1talbHF8ZHCBGmIqPtVciQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -45,18 +45,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ks+PMvczbLnUo7KOn4L0GlQp8MBRHLCiVVj92m60gUY=;
- b=aA9NpURBLbCsUTz76xttiUSNQYBYDrFVFZEPtwSDPYHKIAypLtmGqUnN1P5J1S5dF9Rhch0Gl2nlOLwZWvlvEznQnKvsKuKRrZl7yu0Rvj8cQDQ1KdQMETHIVIxCUtSawsxBiJBkrJCPlqqVLzGH1DpWkurwuwRg19Sl5qevehIUywryZfluDrLXmNWZMiDx9Tl0Sbuj+zaH7s/KF/P7oF95xJmJUJXfPtpVpyoiWNYtS4oOs/2LIhki41cfGSNJLlL7QQsW07fJkyasHhcqhkskseytqG2x1pIbXVSncENKU4Kn4Dk6SI0xmNo6qVtFuzzaZbg/6hTyGN+VUZM95Q==
-Received: from SA9PR13CA0161.namprd13.prod.outlook.com (2603:10b6:806:28::16)
- by CY8PR12MB7562.namprd12.prod.outlook.com (2603:10b6:930:95::16) with
+ bh=39AvaITQDZTIFfmPFfIDhCqh2H44mrgDEUvouteNpro=;
+ b=sWuM+61g9Efj9Coj3kuDKfSZn5bSVt90UlEbSzc4U0xL6uSySCW78uMX33DLkfCRUTCBzIWmk15F5xHcLdg6/4ZCVGV76/EPvY3lS6cpg2Po0kFRvHImk07ANV1s06/pNukhkbZOoy7AlFjnxXRc9DGwhnp/fZEFxV5eeNtbYZJ4p0zIwQwRYjFLugHw9xz027B0MtHP4LNMsdrfVIo9yzP2jg7kSWGTpDctkyT3vK2mB+Ie8I0FfYNFSYToBWnY1LvvUpWNvcQbKGvd8tjEW97gT/yvNIGwdfpeKnvWZw28vasP6teLiN68GxWM69a6/IFl7LivBVl8dKrhhQujbQ==
+Received: from SA1PR05CA0003.namprd05.prod.outlook.com (2603:10b6:806:2d2::14)
+ by SA1PR12MB8886.namprd12.prod.outlook.com (2603:10b6:806:375::6) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.19; Tue, 25 Feb
- 2025 09:11:02 +0000
-Received: from SA2PEPF0000150A.namprd04.prod.outlook.com
- (2603:10b6:806:28:cafe::1d) by SA9PR13CA0161.outlook.office365.com
- (2603:10b6:806:28::16) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.18; Tue, 25 Feb
+ 2025 09:11:05 +0000
+Received: from SA2PEPF00001504.namprd04.prod.outlook.com
+ (2603:10b6:806:2d2:cafe::52) by SA1PR05CA0003.outlook.office365.com
+ (2603:10b6:806:2d2::14) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.8489.15 via Frontend Transport; Tue,
- 25 Feb 2025 09:11:02 +0000
+ 25 Feb 2025 09:11:05 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -64,24 +64,24 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.161 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.161) by
- SA2PEPF0000150A.mail.protection.outlook.com (10.167.242.42) with Microsoft
+ SA2PEPF00001504.mail.protection.outlook.com (10.167.242.36) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8489.16 via Frontend Transport; Tue, 25 Feb 2025 09:11:01 +0000
+ 15.20.8489.16 via Frontend Transport; Tue, 25 Feb 2025 09:11:05 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 25 Feb
- 2025 01:10:51 -0800
+ 2025 01:10:55 -0800
 Received: from shredder.mtl.com (10.126.230.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 25 Feb
- 2025 01:10:48 -0800
+ 2025 01:10:51 -0800
 From: Ido Schimmel <idosch@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <stephen@networkplumber.org>, <dsahern@gmail.com>, <gnault@redhat.com>,
 	<petrm@nvidia.com>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH iproute2-next v2 4/5] iprule: Add port mask support
-Date: Tue, 25 Feb 2025 11:09:16 +0200
-Message-ID: <20250225090917.499376-5-idosch@nvidia.com>
+Subject: [PATCH iproute2-next v2 5/5] iprule: Add DSCP mask support
+Date: Tue, 25 Feb 2025 11:09:17 +0200
+Message-ID: <20250225090917.499376-6-idosch@nvidia.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250225090917.499376-1-idosch@nvidia.com>
 References: <20250225090917.499376-1-idosch@nvidia.com>
@@ -97,98 +97,94 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF0000150A:EE_|CY8PR12MB7562:EE_
-X-MS-Office365-Filtering-Correlation-Id: a432d89c-f8d8-48e4-21aa-08dd557c5370
+X-MS-TrafficTypeDiagnostic: SA2PEPF00001504:EE_|SA1PR12MB8886:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4f4e974a-a679-43a8-767b-08dd557c5598
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014;
+	BCL:0;ARA:13230040|36860700013|82310400026|376014|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?n22FXny3XIYB/m9T9Ilv01bQVsgNW30eq2KhJ+qBQVDvrHM38qCYufzEMoNo?=
- =?us-ascii?Q?nI4b2i1/fUyIQleaUwQcun/5cBmAvkCcp76qiqRCApDC1cE9jL2Dm+pdIwxO?=
- =?us-ascii?Q?TQdphVu7+IxFQcbeRs8u/HfHiVCwV7cmIE2Z6x66U/mhors2NMgZt7cp6AF+?=
- =?us-ascii?Q?2gqsOvvk6rYu1uqJwH3Xt+zH29Eza3TeZtMxFQvSqd2Y1h5iSicfGdgQcETn?=
- =?us-ascii?Q?hnaghT9pcmox2drRfbMc+gn6OdQ4Je8J0HTBS+1lutsROCqSeoXCnbo9DTUj?=
- =?us-ascii?Q?XX/++tqF1qzxEkiMdrQEILWmVxJJiXWKqLRXtCowTY8INGdXNInLJRapbEQx?=
- =?us-ascii?Q?Qndx1Vv/OsZpDzJU4Zq+NO9cnOg2AcLxgJ0/OPpFUCZ7J8T9Bw2H63toUJrG?=
- =?us-ascii?Q?IPLzedAoeXr2RMxW/FEIl6upPtaxRUFKYueM6vjUqyq/rEqo/a9zLYRIsaUt?=
- =?us-ascii?Q?DxuIKm/gltadTV5EegCk1CPDvjv6E4xxf9Co6EC4GRFYeNnoGczuaW9FFsl+?=
- =?us-ascii?Q?FCt6yw1jYhP1adcDjnCDCcQLHpzHmZLCIKWeg1Vq29DvG+ZxfZGYTZ/DJSbd?=
- =?us-ascii?Q?Mvg5AGlQqKmjX0I8pAm3mjIZA9OQ0zMRuH3XLN51/FSSwmby1lZhnlJDv0OE?=
- =?us-ascii?Q?gFLjDVavegP2E76LvaG64wYfrDE26bDai4shv3yGsFd0ddzRVswzYRT9kJbh?=
- =?us-ascii?Q?0fpAru7jjKi0ZwVo+9t5y2praMQkP0yGkB/vaUeO+2xDz8krxig7q5pA7CU1?=
- =?us-ascii?Q?q1vX6N+cOT3diBENdM3rx5xWpPvlPmho7ByxeBPnf5jO1yi8YzztgCHSgol2?=
- =?us-ascii?Q?EJXmXDp15xJikLIm2HuqYcEusvlnTRQ8k+ORBCiXE5IgrMwysJGmvNiTx6IK?=
- =?us-ascii?Q?ZAb7Rat7eARaU48TEIxTbqi3L/J7Q7M6MvWsIRf4/JuTl4uaeTrCVeXID2gP?=
- =?us-ascii?Q?562t6h5eqGgTKc4Dxx8yj3SLKXgAYqMe+i6oqYLqlvVf69AxaKaAYeXKp3Nj?=
- =?us-ascii?Q?k0s8jkERAxf5VYFyaV0P4KCHdJaR4f5SXPDKDB/QBE/awqG5A8qMmEIAT6OU?=
- =?us-ascii?Q?PpNIEETBFzjxk0CyBE2Ea+AEScUFA0QIz+el1B40FWHLwqzw46XHzCXp+Iad?=
- =?us-ascii?Q?jo/KvMdH+YjeP+6F7l89V+xEEH26Br191tX/YXswpC0GkQNjLxKOzQ85gPYb?=
- =?us-ascii?Q?7N55Y7uXLi5zGi5+MLVpHZsjJf2NlqoWReDfd6qZqLvlELkrxaz1Oy7nbBuK?=
- =?us-ascii?Q?fsHB6vdmCDv3tthOTYDVHQ1QZUkFriu2zRdrISfIHstUf10wAh3M5ww5dMny?=
- =?us-ascii?Q?OaB6mMt5EbNsl9i2Rt+w0G0peZ8IabXThiGvCLGUN/DSKmapfzlh6HGbVRHh?=
- =?us-ascii?Q?trRshEJpfk2j9RMSy1Nnl9v31SBNb7D36wH1Yrlb6wmWzNurtzX/cQx6IQHA?=
- =?us-ascii?Q?9tTu7ngjRH75EBU6FMMltQyKA1YbXxOWz1QFkkT6Hhnpq7JlJ0BmpjRjA08c?=
- =?us-ascii?Q?c+KE48ij5VQD020=3D?=
+	=?us-ascii?Q?9cFhSCGKcog92DCTItag2+pgLVVbgdsZCAbbmbVgrzBVe7PIem6FQvOhbaNP?=
+ =?us-ascii?Q?aTD2QM8Af4IMsYc7VIq+3cN9hZOjuOI/tOqtIj8q1evu9I1Pw9qvCvH8xi9h?=
+ =?us-ascii?Q?en/jIv0zegNW+DCCvLO9vSTlxzYL37u11bGtV4Ua4Y2F3g7Si2XwYpdTN7Fb?=
+ =?us-ascii?Q?daxiF5dS74DWLDB4246WAO0mG+EECqbhY/6XknW3iBRf4+leZKsuX2NikHjH?=
+ =?us-ascii?Q?WRASE4fTYLaG+qZjdP3PPF89vVnaF6mDcE5ghZrFcQL+N9fljmjnoB4A7ew8?=
+ =?us-ascii?Q?t9i3/F8zPknMiUMCaK1Kmnt//dbTzv8hySfONYl//DY1WIXgnqqCwzfNOp2e?=
+ =?us-ascii?Q?USzpy2oYoeFa9tOGNj7frez0muLp31MfNAP8lrLJet/jDjx9nBVXs9fdR99R?=
+ =?us-ascii?Q?NZC8v9qJVv3Sw1Ts+ALP5EZiJMQ/YMMHkVLj/qGw11e3Y64WFFwnepWwQ/ck?=
+ =?us-ascii?Q?5tM3/RWG1mLQo/PqmITRnEp5g9kQOxCHUalMQkWFgbbXTqqfA5HncyRL/KUZ?=
+ =?us-ascii?Q?/ayY0oZb3xHiKAuvIhEgR5JjYAreDjCQrzdBBO+bWgICqvr7y91WydGqH6yk?=
+ =?us-ascii?Q?x62bUuqDsIt9ITnZguH3wsFI77K0nRZLwJaVCFAKMDEWAAd81kQOLkHqFKF8?=
+ =?us-ascii?Q?dSwax707qZuuH4NEiOadFDs7umLpFwW+mCc4RSLMBG0UuVGs47caA5zSvi3u?=
+ =?us-ascii?Q?kZ1GWgNaRKrkfMPGLT1IxdFmB2vicyxejq/kzfH+uDZnEYDSNmYXjKuHpHRZ?=
+ =?us-ascii?Q?eFgEouB1wXudsxwvqBHFqJb1IqOgFxrK6/EmW8XlBxYOT154Gr9DgrmTLCc6?=
+ =?us-ascii?Q?n78+rL/DqSJ6FG2lhjcv1hNmcvN8UbjOvVZJmohMRCvHw+gwd0WXXk1iKcoi?=
+ =?us-ascii?Q?9KN+xXUaOoq7Thq79CoR1g0tgguWsJ5ec204pjUoYGTfO12q4wzDaKIR+c9b?=
+ =?us-ascii?Q?dXIQ5wlLBexlzjJV/r4BGrhyOKwQ81cDaaEWamk2KlVKM7gx8TNzRJfvlUya?=
+ =?us-ascii?Q?IJG/XeJRQxDklBR+w4zdAK7fgMwqvxcul6TREkBrNlVMkiLFEW+fRq/zYC5v?=
+ =?us-ascii?Q?A4+Vlw9pwQBIslblEnO3rqGHZSoK3PJMcIVLt3KpGkc8NoSRM/gSX6Q1rlYh?=
+ =?us-ascii?Q?m5U/nQCJz4JY4OXJfMFqL/pQ4jxY8urg7zXTAOXnPaT8cu+uK+uvmC5zxyY1?=
+ =?us-ascii?Q?n5j5aKfZekGoLy9KLUrc3zEHTr7/YvZVZ7IyN2PVwSd9yTtxeDPCjZA2Kkm9?=
+ =?us-ascii?Q?AfEuAK9LQme7WNS8jR4eLmRBAlMtkB3+OOmkX9ENdBgZ4meJFY5WbM4xHbMq?=
+ =?us-ascii?Q?2upu4R1z2Y0czsj6HDmhNIX1eeCUFJCPGwpqMhCjliPOzlr5giy9X0VoNrbQ?=
+ =?us-ascii?Q?z5+ZlvoBBt+Kd2NFHUxvZ+rlqsfvkI3v9m6oj3/6slflMwLibpYLj+DVfrom?=
+ =?us-ascii?Q?JAZraDeDmw7ZUg4AYxAJMZFiz4EssdGYvpCIsn81sYhGbR2gCKlUzSZ59K6Y?=
+ =?us-ascii?Q?U8VfDCSZGssbzjo=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2025 09:11:01.8923
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2025 09:11:05.4808
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a432d89c-f8d8-48e4-21aa-08dd557c5370
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4f4e974a-a679-43a8-767b-08dd557c5598
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF0000150A.namprd04.prod.outlook.com
+	SA2PEPF00001504.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7562
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8886
 
-Add port mask support, allowing users to specify a source or destination
-port with an optional mask. Example:
+Add DSCP mask support, allowing users to specify a DSCP value with an
+optional mask. Example:
 
- # ip rule add sport 80 table 100
- # ip rule add sport 90/0xffff table 200
- # ip rule add dport 1000-2000 table 300
- # ip rule add sport 0x123/0xfff table 400
- # ip rule add dport 0x4/0xff table 500
- # ip rule add dport 0x8/0xf table 600
- # ip rule del dport 0x8/0xf table 600
+ # ip rule add dscp 1 table 100
+ # ip rule add dscp 0x02/0x3f table 200
+ # ip rule add dscp AF42/0x3f table 300
+ # ip rule add dscp 0x10/0x30 table 400
 
-In non-JSON output, the mask is not printed in case of exact match:
+In non-JSON output, the DSCP mask is not printed in case of exact match
+and the DSCP value is printed in hexadecimal format in case of inexact
+match:
 
  $ ip rule show
  0:      from all lookup local
- 32761:  from all dport 0x4/0xff lookup 500
- 32762:  from all sport 0x123/0xfff lookup 400
- 32763:  from all dport 1000-2000 lookup 300
- 32764:  from all sport 90 lookup 200
- 32765:  from all sport 80 lookup 100
+ 32762:  from all lookup 400 dscp 0x10/0x30
+ 32763:  from all lookup 300 dscp AF42
+ 32764:  from all lookup 200 dscp 2
+ 32765:  from all lookup 100 dscp 1
  32766:  from all lookup main
  32767:  from all lookup default
 
-Dump can be filtered by port value and mask:
+Dump can be filtered by DSCP value and mask:
 
- $ ip rule show sport 80
- 32765:  from all sport 80 lookup 100
- $ ip rule show sport 90
- 32764:  from all sport 90 lookup 200
- $ ip rule show sport 0x123/0x0fff
- 32762:  from all sport 0x123/0xfff lookup 400
- $ ip rule show dport 4/0xff
- 32761:  from all dport 0x4/0xff lookup 500
+ $ ip rule show dscp 1
+ 32765:  from all lookup 100 dscp 1
+ $ ip rule show dscp AF42
+ 32763:  from all lookup 300 dscp AF42
+ $ ip rule show dscp 0x10/0x30
+ 32762:  from all lookup 400 dscp 0x10/0x30
 
-In JSON output, the port mask is printed as an hexadecimal string to be
-consistent with other masks. The port value is printed as an integer in
+In JSON output, the DSCP mask is printed as an hexadecimal string to be
+consistent with other masks. The DSCP value is printed as an integer in
 order not to break existing scripts:
 
- $ ip -j -p rule show sport 0x123/0xfff table 400
+ $ ip -j -p -N rule show dscp 0x10/0x30
  [ {
          "priority": 32762,
          "src": "all",
-         "sport": 291,
-         "sport_mask": "0xfff",
-         "table": "400"
+         "table": "400",
+         "dscp": "16",
+         "dscp_mask": "0x30"
      } ]
 
 The mask attribute is only sent to the kernel in case of inexact match
@@ -196,257 +192,171 @@ so that iproute2 will continue working with kernels that do not support
 the attribute.
 
 Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+Reviewed-by: Petr Machata <petrm@nvidia.com>
 ---
-
-Notes:
-    v2:
-    
-    * Do not duplicate port parsing in iprule_port_parse().
-    * s/supports/Supports/ in man page.
-
- ip/iprule.c           | 96 ++++++++++++++++++++++++++++++++++++++-----
- man/man8/ip-rule.8.in | 14 ++++---
- 2 files changed, 93 insertions(+), 17 deletions(-)
+ ip/iprule.c           | 73 ++++++++++++++++++++++++++++++++-----------
+ man/man8/ip-rule.8.in |  9 +++---
+ 2 files changed, 60 insertions(+), 22 deletions(-)
 
 diff --git a/ip/iprule.c b/ip/iprule.c
-index 64d389bebb76..3338c7d6773a 100644
+index 3338c7d6773a..3af02da24950 100644
 --- a/ip/iprule.c
 +++ b/ip/iprule.c
-@@ -23,6 +23,8 @@
- #include "ip_common.h"
+@@ -24,6 +24,7 @@
  #include "json_print.h"
  
-+#define PORT_MAX_MASK 0xFFFF
-+
+ #define PORT_MAX_MASK 0xFFFF
++#define DSCP_MAX_MASK 0x3F
+ 
  enum list_action {
  	IPRULE_LIST,
- 	IPRULE_FLUSH,
-@@ -44,8 +46,8 @@ static void usage(void)
- 		"            [ iif STRING ] [ oif STRING ] [ pref NUMBER ] [ l3mdev ]\n"
- 		"            [ uidrange NUMBER-NUMBER ]\n"
+@@ -48,7 +49,7 @@ static void usage(void)
  		"            [ ipproto PROTOCOL ]\n"
--		"            [ sport [ NUMBER | NUMBER-NUMBER ]\n"
--		"            [ dport [ NUMBER | NUMBER-NUMBER ] ]\n"
-+		"            [ sport [ NUMBER[/MASK] | NUMBER-NUMBER ]\n"
-+		"            [ dport [ NUMBER[/MASK] | NUMBER-NUMBER ] ]\n"
- 		"            [ dscp DSCP ] [ flowlabel FLOWLABEL[/MASK] ]\n"
+ 		"            [ sport [ NUMBER[/MASK] | NUMBER-NUMBER ]\n"
+ 		"            [ dport [ NUMBER[/MASK] | NUMBER-NUMBER ] ]\n"
+-		"            [ dscp DSCP ] [ flowlabel FLOWLABEL[/MASK] ]\n"
++		"            [ dscp DSCP[/MASK] ] [ flowlabel FLOWLABEL[/MASK] ]\n"
  		"ACTION := [ table TABLE_ID ]\n"
  		"          [ protocol PROTO ]\n"
-@@ -80,6 +82,7 @@ static struct
- 	int protocolmask;
- 	struct fib_rule_port_range sport;
- 	struct fib_rule_port_range dport;
-+	__u16 sport_mask, dport_mask;
- 	__u8 ipproto;
- } filter;
- 
-@@ -186,8 +189,9 @@ static bool filter_nlmsg(struct nlmsghdr *n, struct rtattr **tb, int host_len)
- 			return false;
+ 		"          [ nat ADDRESS ]\n"
+@@ -238,14 +239,21 @@ static bool filter_nlmsg(struct nlmsghdr *n, struct rtattr **tb, int host_len)
  	}
  
--	if (filter.sport.start) {
-+	if (filter.sport_mask) {
- 		const struct fib_rule_port_range *r;
-+		__u16 sport_mask = PORT_MAX_MASK;
+ 	if (filter.dscpmask) {
+-		if (tb[FRA_DSCP]) {
+-			__u8 dscp = rta_getattr_u8(tb[FRA_DSCP]);
++		__u8 dscp_mask = DSCP_MAX_MASK;
++		__u8 dscp;
  
- 		if (!tb[FRA_SPORT_RANGE])
- 			return false;
-@@ -196,10 +200,16 @@ static bool filter_nlmsg(struct nlmsghdr *n, struct rtattr **tb, int host_len)
- 		if (r->start != filter.sport.start ||
- 		    r->end != filter.sport.end)
- 			return false;
-+
-+		if (tb[FRA_SPORT_MASK])
-+			sport_mask = rta_getattr_u16(tb[FRA_SPORT_MASK]);
-+		if (filter.sport_mask != sport_mask)
+-			if (filter.dscp != dscp)
+-				return false;
+-		} else {
++		if (!tb[FRA_DSCP])
 +			return false;
- 	}
- 
--	if (filter.dport.start) {
-+	if (filter.dport_mask) {
- 		const struct fib_rule_port_range *r;
-+		__u16 dport_mask = PORT_MAX_MASK;
- 
- 		if (!tb[FRA_DPORT_RANGE])
- 			return false;
-@@ -208,6 +218,11 @@ static bool filter_nlmsg(struct nlmsghdr *n, struct rtattr **tb, int host_len)
- 		if (r->start != filter.dport.start ||
- 		    r->end != filter.dport.end)
- 			return false;
 +
-+		if (tb[FRA_DPORT_MASK])
-+			dport_mask = rta_getattr_u16(tb[FRA_DPORT_MASK]);
-+		if (filter.dport_mask != dport_mask)
++		dscp = rta_getattr_u8(tb[FRA_DSCP]);
++		if (filter.dscp != dscp)
 +			return false;
++
++		if (tb[FRA_DSCP_MASK])
++			dscp_mask = rta_getattr_u8(tb[FRA_DSCP_MASK]);
++
++		if (filter.dscpmask != dscp_mask)
+ 			return false;
+-		}
  	}
  
- 	if (filter.tun_id) {
-@@ -390,7 +405,26 @@ int print_rule(struct nlmsghdr *n, void *arg)
- 		struct fib_rule_port_range *r = RTA_DATA(tb[FRA_SPORT_RANGE]);
+ 	if (filter.flowlabel_mask) {
+@@ -552,8 +560,24 @@ int print_rule(struct nlmsghdr *n, void *arg)
+ 	if (tb[FRA_DSCP]) {
+ 		__u8 dscp = rta_getattr_u8(tb[FRA_DSCP]);
  
- 		if (r->start == r->end) {
--			print_uint(PRINT_ANY, "sport", " sport %u", r->start);
-+			if (tb[FRA_SPORT_MASK]) {
-+				__u16 mask;
+-		print_string(PRINT_ANY, "dscp", " dscp %s",
+-			     rtnl_dscp_n2a(dscp, b1, sizeof(b1)));
++		if (tb[FRA_DSCP_MASK]) {
++			__u8 mask = rta_getattr_u8(tb[FRA_DSCP_MASK]);
 +
-+				mask = rta_getattr_u16(tb[FRA_SPORT_MASK]);
-+				print_uint(PRINT_JSON, "sport", NULL, r->start);
-+				print_0xhex(PRINT_JSON, "sport_mask", NULL,
-+					    mask);
-+				if (mask == PORT_MAX_MASK) {
-+					print_uint(PRINT_FP, NULL, " sport %u",
-+						   r->start);
-+				} else {
-+					print_0xhex(PRINT_FP, NULL,
-+						    " sport %#x", r->start);
-+					print_0xhex(PRINT_FP, NULL, "/%#x",
-+						    mask);
-+				}
++			print_string(PRINT_JSON, "dscp", NULL,
++				     rtnl_dscp_n2a(dscp, b1, sizeof(b1)));
++			print_0xhex(PRINT_JSON, "dscp_mask", NULL, mask);
++			if (mask == DSCP_MAX_MASK) {
++				print_string(PRINT_FP, NULL, " dscp %s",
++					     rtnl_dscp_n2a(dscp, b1,
++							   sizeof(b1)));
 +			} else {
-+				print_uint(PRINT_ANY, "sport", " sport %u",
-+					   r->start);
++				print_0xhex(PRINT_FP, NULL, " dscp %#x", dscp);
++				print_0xhex(PRINT_FP, NULL, "/%#x", mask);
 +			}
- 		} else {
- 			print_uint(PRINT_ANY, "sport_start", " sport %u",
- 				   r->start);
-@@ -402,7 +436,26 @@ int print_rule(struct nlmsghdr *n, void *arg)
- 		struct fib_rule_port_range *r = RTA_DATA(tb[FRA_DPORT_RANGE]);
++		} else {
++			print_string(PRINT_ANY, "dscp", " dscp %s",
++				     rtnl_dscp_n2a(dscp, b1, sizeof(b1)));
++		}
+ 	}
  
- 		if (r->start == r->end) {
--			print_uint(PRINT_ANY, "dport", " dport %u", r->start);
-+			if (tb[FRA_DPORT_MASK]) {
-+				__u16 mask;
-+
-+				mask = rta_getattr_u16(tb[FRA_DPORT_MASK]);
-+				print_uint(PRINT_JSON, "dport", NULL, r->start);
-+				print_0xhex(PRINT_JSON, "dport_mask", NULL,
-+					    mask);
-+				if (mask == 0xFFFF) {
-+					print_uint(PRINT_FP, NULL, " dport %u",
-+						   r->start);
-+				} else {
-+					print_0xhex(PRINT_FP, NULL,
-+						    " dport %#x", r->start);
-+					print_0xhex(PRINT_FP, NULL, "/%#x",
-+						    mask);
-+				}
-+			} else {
-+				print_uint(PRINT_ANY, "dport", " dport %u",
-+					   r->start);
-+			}
- 		} else {
- 			print_uint(PRINT_ANY, "dport_start", " dport %u",
- 				   r->start);
-@@ -600,10 +653,13 @@ static int flush_rule(struct nlmsghdr *n, void *arg)
- 	return 0;
+ 	/* The kernel will either provide both attributes, or none */
+@@ -687,6 +711,21 @@ static void iprule_port_parse(char *arg, struct fib_rule_port_range *r,
+ 	r->end = r->start;
  }
  
--static void iprule_port_parse(char *arg, struct fib_rule_port_range *r)
-+static void iprule_port_parse(char *arg, struct fib_rule_port_range *r,
-+			      __u16 *mask)
++static void iprule_dscp_parse(char *arg, __u32 *dscp, __u32 *mask)
++{
++	char *slash;
++
++	*mask = DSCP_MAX_MASK;
++
++	slash = strchr(arg, '/');
++	if (slash != NULL)
++		*slash = '\0';
++	if (rtnl_dscp_a2n(dscp, arg))
++		invarg("invalid dscp", arg);
++	if (slash && get_u32(mask, slash + 1, 0))
++		invarg("invalid dscp mask", slash + 1);
++}
++
+ static void iprule_flowlabel_parse(char *arg, __u32 *flowlabel,
+ 				   __u32 *flowlabel_mask)
  {
- 	char *sep;
- 
-+	*mask = PORT_MAX_MASK;
-+
- 	sep = strchr(arg, '-');
- 	if (sep) {
- 		*sep = '\0';
-@@ -617,6 +673,14 @@ static void iprule_port_parse(char *arg, struct fib_rule_port_range *r)
- 		return;
- 	}
- 
-+	sep = strchr(arg, '/');
-+	if (sep) {
-+		*sep = '\0';
-+
-+		if (get_u16(mask, sep + 1, 0))
-+			invarg("invalid mask", sep + 1);
-+	}
-+
- 	if (get_u16(&r->start, arg, 0))
- 		invarg("invalid port", arg);
- 
-@@ -770,10 +834,12 @@ static int iprule_list_flush_or_save(int argc, char **argv, int action)
- 			filter.ipproto = ipproto;
- 		} else if (strcmp(*argv, "sport") == 0) {
- 			NEXT_ARG();
--			iprule_port_parse(*argv, &filter.sport);
-+			iprule_port_parse(*argv, &filter.sport,
-+					  &filter.sport_mask);
- 		} else if (strcmp(*argv, "dport") == 0) {
- 			NEXT_ARG();
--			iprule_port_parse(*argv, &filter.dport);
-+			iprule_port_parse(*argv, &filter.dport,
-+					  &filter.dport_mask);
+@@ -841,13 +880,9 @@ static int iprule_list_flush_or_save(int argc, char **argv, int action)
+ 			iprule_port_parse(*argv, &filter.dport,
+ 					  &filter.dport_mask);
  		} else if (strcmp(*argv, "dscp") == 0) {
- 			__u32 dscp;
- 
-@@ -1043,18 +1109,26 @@ static int iprule_modify(int cmd, int argc, char **argv)
- 			addattr8(&req.n, sizeof(req), FRA_IP_PROTO, ipproto);
- 		} else if (strcmp(*argv, "sport") == 0) {
- 			struct fib_rule_port_range r;
-+			__u16 sport_mask;
- 
+-			__u32 dscp;
+-
  			NEXT_ARG();
--			iprule_port_parse(*argv, &r);
-+			iprule_port_parse(*argv, &r, &sport_mask);
- 			addattr_l(&req.n, sizeof(req), FRA_SPORT_RANGE, &r,
- 				  sizeof(r));
-+			if (sport_mask != PORT_MAX_MASK)
-+				addattr16(&req.n, sizeof(req), FRA_SPORT_MASK,
-+					  sport_mask);
- 		} else if (strcmp(*argv, "dport") == 0) {
- 			struct fib_rule_port_range r;
-+			__u16 dport_mask;
- 
+-			if (rtnl_dscp_a2n(&dscp, *argv))
+-				invarg("invalid dscp\n", *argv);
+-			filter.dscp = dscp;
+-			filter.dscpmask = 1;
++			iprule_dscp_parse(*argv, &filter.dscp,
++					  &filter.dscpmask);
+ 		} else if (strcmp(*argv, "flowlabel") == 0) {
  			NEXT_ARG();
--			iprule_port_parse(*argv, &r);
-+			iprule_port_parse(*argv, &r, &dport_mask);
- 			addattr_l(&req.n, sizeof(req), FRA_DPORT_RANGE, &r,
- 				  sizeof(r));
-+			if (dport_mask != PORT_MAX_MASK)
-+				addattr16(&req.n, sizeof(req), FRA_DPORT_MASK,
-+					  dport_mask);
+ 
+@@ -1130,12 +1165,14 @@ static int iprule_modify(int cmd, int argc, char **argv)
+ 				addattr16(&req.n, sizeof(req), FRA_DPORT_MASK,
+ 					  dport_mask);
  		} else if (strcmp(*argv, "dscp") == 0) {
- 			__u32 dscp;
+-			__u32 dscp;
++			__u32 dscp, dscp_mask;
+ 
+ 			NEXT_ARG();
+-			if (rtnl_dscp_a2n(&dscp, *argv))
+-				invarg("invalid dscp\n", *argv);
++			iprule_dscp_parse(*argv, &dscp, &dscp_mask);
+ 			addattr8(&req.n, sizeof(req), FRA_DSCP, dscp);
++			if (dscp_mask != DSCP_MAX_MASK)
++				addattr8(&req.n, sizeof(req), FRA_DSCP_MASK,
++					 dscp_mask);
+ 		} else if (strcmp(*argv, "flowlabel") == 0) {
+ 			__u32 flowlabel, flowlabel_mask;
  
 diff --git a/man/man8/ip-rule.8.in b/man/man8/ip-rule.8.in
-index 6fc741d4f470..6a2a3cd848df 100644
+index 6a2a3cd848df..6331a021d95a 100644
 --- a/man/man8/ip-rule.8.in
 +++ b/man/man8/ip-rule.8.in
-@@ -52,10 +52,10 @@ ip-rule \- routing policy database management
- .B ipproto
- .IR PROTOCOL " ] [ "
- .BR sport " [ "
--.IR NUMBER " | "
-+.IR NUMBER\fR[\fB/\fIMASK "] | "
- .IR NUMBER "-" NUMBER " ] ] [ "
- .BR dport " [ "
--.IR NUMBER " | "
-+.IR NUMBER\fR[\fB/\fIMASK "] | "
- .IR NUMBER "-" NUMBER " ] ] [ "
- .B  tun_id
- .IR TUN_ID " ] [ "
-@@ -270,12 +270,14 @@ value to match.
- select the ip protocol value to match.
+@@ -37,7 +37,7 @@ ip-rule \- routing policy database management
+ .B  tos
+ .IR TOS " ] [ "
+ .B  dscp
+-.IR DSCP " ] [ "
++.IR DSCP\fR[\fB/\fIMASK "] ] [ "
+ .B  fwmark
+ .IR FWMARK\fR[\fB/\fIMASK "] ] [ "
+ .B  iif
+@@ -239,9 +239,10 @@ a device.
+ select the TOS value to match.
  
  .TP
--.BI sport " NUMBER | NUMBER-NUMBER"
--select the source port value to match. supports port range.
-+.BI sport " NUMBER\fR[\fB/\fIMASK\fR] | NUMBER-NUMBER"
-+select the source port value to match with an optional mask. Supports port
-+range.
- 
- .TP
--.BI dport " NUMBER | NUMBER-NUMBER"
--select the destination port value to match. supports port range.
-+.BI dport " NUMBER\fR[\fB/\fIMASK\fR] | NUMBER-NUMBER"
-+select the destination port value to match with an optional mask. Supports port
-+range.
- 
- .TP
- .BI priority " PREFERENCE"
+-.BI dscp " DSCP"
+-select the DSCP value to match. DSCP values can be written either directly as
+-numeric values (valid values are 0-63), or using symbolic names specified in
++.BI dscp " DSCP\fR[\fB/\fIMASK\fR]"
++select the DSCP value to match with an optional mask. DSCP values can be
++written either directly as numeric values (valid values are 0-63), or using
++symbolic names specified in
+ .BR @SYSCONF_USR_DIR@/rt_dsfield " or " @SYSCONF_ETC_DIR@/rt_dsfield
+ (has precedence if exists).
+ However, note that the file specifies full 8-bit dsfield values, whereas
 -- 
 2.48.1
 
