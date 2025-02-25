@@ -1,139 +1,117 @@
-Return-Path: <netdev+bounces-169425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86997A43D3E
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 12:17:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 00A7BA43D55
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 12:21:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DFDB19C07FF
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 11:17:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20E8C19C3BB5
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 11:21:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFDCE1FCFD9;
-	Tue, 25 Feb 2025 11:17:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 693D9267AE1;
+	Tue, 25 Feb 2025 11:20:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="N3thMSVN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2670B1A239E;
-	Tue, 25 Feb 2025 11:17:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68BB32673AF;
+	Tue, 25 Feb 2025 11:20:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740482260; cv=none; b=TvQViiDLZIeJlGsnApVsY9pBxLhVYWuA1GQfo9qFsGh1tN5VyE0KzjSb+zUysklgXTOl28ar1feUq/cUaKJJ0yUrwSR7WLWPMNdOBcaVXczOw90ihht3AgwnNmErJ2pBxtC1FakbaLg0Wr9rPr46MVGk4Pb1YuJbWgnGWhmYtTQ=
+	t=1740482450; cv=none; b=kSqnOWlM31bYbnDo2OlhKxNNL5T1IM3oesdwF/YvaqcNDpsIWoEdegxvILPWrld/3q/gk4z7S51BqKFFjkM1vcA3jI65ejob/K4PcJnMVznUbR2axliUimJrOqMHFFPPzZO7T5iFJfGWe6z7H1OR5Lwwn492bszzJGWRDYknguE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740482260; c=relaxed/simple;
-	bh=Y4qrHsZ4YlKYiMw1liY09TYi5suU2srUrdPV71CkQiE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dTxMbz0RPtPbdbYhm/sYFzh34FU0LxdJ1OgGLQQEjcaBjWMLxyJQ2h02lq+SCfu4llqH32+g0BuRcDZ2HQua2MSV8ccvbyrLrPWRSSm6KN+MrvPskXrC0BSbk/J09mAOd+7YPH2j+aQUpmyijD9QCiFK6tllxZ8sM+6SmtYDmvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-abb999658fbso681915766b.3;
-        Tue, 25 Feb 2025 03:17:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740482257; x=1741087057;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1j29+YwywkVdnOwJpODDXLXoxVQ80C41eZ3nGoHPbf4=;
-        b=Df+K/BVTSZ/FqgrWjulI3eyLIxO3aIZSwXCw7zluU+nT/HVEYg/RgauJAOlO3VdhBs
-         4EuASt3XFlhFLici9PYpIDVpDmx/AwFiGdoMQWsN7jywrlHs4SE0N9Fc9akwzhYeqgTy
-         Aa7n0u7ykIIHlN1H3CFaCIUekzXRoKthjz2jdvqFFSIA9CCGe14q6AaeON07tZRpmvfr
-         lOuDsw98ERZqM4wpqDYk/wxb1uAa4jhjy/R6AiA6US9hoEgrVDHxTwoQ6YO20qtrZOkC
-         ypvR2v9wXeLJtJVgAm0Kwx8SR06+JqQivFSRPlCVyd3w7VojSkR+MqzLWPpooAFG3H8k
-         TFZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUP7juvDNcZzQZiHBW78+8HwecbW/lnEA9GsQBn/Waem2Nw+gN7P2RKvUk/n0cIYLVC3GOYiRFI@vger.kernel.org, AJvYcCW4CTCPWntj3TpSgI8TVXiAJePaiuYuk5E+JEGEDOxI+E3WFoinpGjdiZQ3tGhXV66Or45djW8zJjU=@vger.kernel.org, AJvYcCWmt3hUi4jRx8f+ECaUOkHXx23MegENHGHMoIo3rHPqvRKZIeaypcTsPXGeIxIi8CbjjnAQy9tii+vCjeM2@vger.kernel.org, AJvYcCXLDJOa2USegPdllpZWmNmd61QVJnq8KYV6pzzpKQC7iEa9wsnY6MkW2iH+LlT7N7b0ZEx1n0p5vm3/LbEUK3Ho@vger.kernel.org
-X-Gm-Message-State: AOJu0YyO4EXn6N/vDmUSKbK1BPoylpZwMMy/U39h+RNo9rZqv2gPKsx7
-	qy8XiCfqTUHDCX2qNBYaaA2uJSk+Fvbkr7jZor4aZFwSQpqNC1pw
-X-Gm-Gg: ASbGncsrBl0ISsRmfKyFlDO1sPyve6HKgiNSWNjMl4L4idsaRs9CMyUMCWXhEcv/Mwp
-	4OOfGFn/ZyP+9Ouq+46hQ2KPnsVKBS+lJhYHNxvAVpldQqN9K7KlyG9DSghM6PJxzsiEfe1vsA9
-	Lt7AzD9uHE3vF77CQEEzXYPg2SJHnY5gRh/J1RYmkNP2OnywQrg/7HMGVugSwGnoVnWJ5p4h04t
-	hpn4pfCFvCn1Q5lPQqqchXN5hcXUoZyRLFoJRbAYreGFJWU+jO6llSGidlHqmvWX2dtIxTlZfwp
-	6xcyvglItCaqEFugGA==
-X-Google-Smtp-Source: AGHT+IF9N08H7jTMLFCvTUzvTml6TjwoMntNUKf+GwIhdyS7gvhSXa+0EhXsIhy4Y/1NGXa86oTn0A==
-X-Received: by 2002:a05:6402:34d0:b0:5e0:818a:5f4d with SMTP id 4fb4d7f45d1cf-5e44bb36997mr7209455a12.28.1740482257036;
-        Tue, 25 Feb 2025 03:17:37 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:73::])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e45a8b8b48sm1069172a12.20.2025.02.25.03.17.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Feb 2025 03:17:35 -0800 (PST)
-Date: Tue, 25 Feb 2025 03:17:33 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1740482450; c=relaxed/simple;
+	bh=v7F3hSk/X3JDb2HAN34QsZFKdg0OGqiV2zFYyKnFFCM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Bv653bwmEvZSVwbx9Fr5B6iSscGPGCYXNDIihFmNHsRlEORhvGTzYNlSV71x1B8JPp/nGz4hc7L6UBC5VXuDxOjjrCfZKrCSpCIp06mQYDtZidHJfHKfb9RHwLd80IAOG/fznb4S5PQtBHuU2Ney9lyrQmTHV96Wd/TdwoK/eWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=N3thMSVN; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A5FC920484;
+	Tue, 25 Feb 2025 11:20:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1740482446;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=TjN0KbmQJwKC/VPowiOLg00sDmSlmM1PT1Bs4HCZ79Q=;
+	b=N3thMSVN1NfvP+t/mlV0Q/auU37MuxBb6ZsSBr5mSsLaDUyOJ7QRlLl5L5dSxiwlZzOaVE
+	9YM2fSYyekvukOgjsHiGnNn1GHCjFAy6i9ol1tRTOrAJzsL41+GcTnKJo4aVlrtup5hCtk
+	ROBFGuzmObhhrK1b4cD5Jdbl2VkhBjYt/S2e0+0P0x40yXMC6xViOPRrvtO3uWqf2CoxSz
+	nfuGy7Gjg6fFwsypq6seV/xZVpwfFJzTWnlheoTifc16uNFMj+1NJUQ2mw32UTrCtAVEr9
+	aT/Ifxo5FXVuM8vBQseBLAjWcwTdDr1vIyRzeBS9WlzdC78N2I21gmoCUKTEDA==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	kernel-team@meta.com
-Subject: Re: [PATCH net-next 5/7] netconsole: add task name to extra data
- fields
-Message-ID: <20250225-doberman-of-scientific-champagne-640c69@leitao>
-References: <20250221-netcons_current-v1-0-21c86ae8fc0d@debian.org>
- <20250221-netcons_current-v1-5-21c86ae8fc0d@debian.org>
- <20250225101910.GM1615191@kernel.org>
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	Simon Horman <horms@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Antoine Tenart <atenart@kernel.org>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	Sean Anderson <sean.anderson@linux.dev>,
+	=?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>
+Subject: [PATCH net-next v2 0/2] net: phy: sfp: Add single-byte SMBus SFP access
+Date: Tue, 25 Feb 2025 12:20:38 +0100
+Message-ID: <20250225112043.419189-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250225101910.GM1615191@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdekudehjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeejhfelieehgfffiefftdffiedvheefteehkedukefgteffteevffeuueejiedtveenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecukfhppedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgdphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudelpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlr
+ dhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhm
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hello Simon,
+Hello everyone,
 
-On Tue, Feb 25, 2025 at 10:19:10AM +0000, Simon Horman wrote:
-> On Fri, Feb 21, 2025 at 05:52:10AM -0800, Breno Leitao wrote:
-> > This is the core patch for this whole patchset. Add support for
-> > including the current task's name in netconsole's extra data output.
-> > This adds a new append_taskname() function that writes the task name
-> > (from current->comm) into the target's extradata buffer, similar to how
-> > CPU numbers are handled.
-> > 
-> > The task name is included when the SYSDATA_TASKNAME field is set,
-> > appearing in the format "taskname=<name>" in the output. This additional
-> > context can help with debugging by showing which task generated each
-> > console message.
-> > 
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > ---
-> >  drivers/net/netconsole.c | 14 +++++++++++++-
-> >  1 file changed, 13 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-> > index 5a29144ae37ee7b487b1a252b0f2ce8574f9cefa..625f4c0be11d8deb454139b1c526abc842697219 100644
-> > --- a/drivers/net/netconsole.c
-> > +++ b/drivers/net/netconsole.c
-> > @@ -1179,12 +1179,22 @@ static int append_cpu_nr(struct netconsole_target *nt, int offset)
-> >  			 raw_smp_processor_id());
-> >  }
-> >  
-> > +static int append_taskname(struct netconsole_target *nt, int offset)
-> > +{
-> > +	if (WARN_ON_ONCE(!current))
-> > +		return 0;
-> 
-> Hi Breno,
-> 
-> I gather that theoretically this could occur, but it isn't expected
-> to happen in practice. Is that right?
+This is V2 for the single-byte SMBus support for SFP cages as well as
+embedded PHYs accessed over mdio-i2c.
 
-That's correct. `current` isn't expected to be NULL in practice.
-I've been running this code on several servers for days and have never
-encountered this warning. 
+Discussions in V1 [1] with Russell and Andrew showed that we should be mor
+conservative with SMBus access, as it is either stated as non-compliant
+with SFF-8472 for diag data, or simply blurry as to how well this will work
+with Copper modules.
 
-While the taskname feature isn't enabled during early boot, netconsole
-might be active at that time, which is why I exercised extra caution
-here.
+Tests on a variety of modules show that it looks OK however this is
+really not enough to guarantee that it will work with all modules, so in
+this V2 we :
+ - Disable hwmon
+ - Print a big warning indicating that it may not work as expected, but
+   more importantly that the kernel isn't to blame, but rather the HW
+   design.
 
-If you also think this is safe, I am more than happy to remove this
-check.
+I've added Sean's tested-by tags, I hope that's OK given I've added the
+new flag to disable hwmon.
 
-Thanks for the review,
---breno
+V1 ([1]): https://lore.kernel.org/netdev/20250223172848.1098621-1-maxime.chevallier@bootlin.com/#t
+
+Maxime Chevallier (2):
+  net: phy: sfp: Add support for SMBus module access
+  net: mdio: mdio-i2c: Add support for single-byte SMBus operations
+
+ drivers/net/mdio/mdio-i2c.c | 79 ++++++++++++++++++++++++++++++++++++-
+ drivers/net/phy/sfp.c       | 79 ++++++++++++++++++++++++++++++++++---
+ 2 files changed, 151 insertions(+), 7 deletions(-)
+
+-- 
+2.48.1
+
 
