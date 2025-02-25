@@ -1,93 +1,67 @@
-Return-Path: <netdev+bounces-169523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58D89A44572
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 17:07:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C4F3A4457E
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 17:08:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9272422E1A
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 16:06:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9131019E07F5
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 16:06:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E087118DB18;
-	Tue, 25 Feb 2025 16:05:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 971AD1632F2;
+	Tue, 25 Feb 2025 16:05:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="zHh4LHk9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g+A2GzTS"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C807918DB09
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 16:05:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C98215DBB3;
+	Tue, 25 Feb 2025 16:05:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740499548; cv=none; b=mz9MhzfFE5JKNuSlVsxblrSmKwhtSR68QdVpEc8mIuw6IiO6kOAb/Jkjy2ygTZkc7vYQkWx54SBa/BXRQdILPDaPtXJv6jb8CKx0KFIuBqEjBS48UTpLTIScP9DObP8KzxiT27UyuR9iRwj4+bQKXGoTIakCRFegx3kNJRsptFE=
+	t=1740499545; cv=none; b=DVpyWO7rWtN+g59jbjkWmKCs8bgGOq0eI+L7085hDkOTk+vP/0wmHhO0QtjVa9k7ZjqlLepDeRCpVUQGObNRsWeYL34/v+LcXeYoWBX3N1y7tL47IzsAV+HFBK1u5vY4baLbIGVJXHlHwfSv2HsldJiMnj5TeENz18xpYWUEhV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740499548; c=relaxed/simple;
-	bh=f1gB/U017DI3+yOGGw3YzckoQCKCbGxHsePswjmt4UE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FXTKBbm9TKqq6/myOWLANnh5NtDk9qHQrklqP3Ks2xDPaEv+quyfIovf86Ik1mbpQN2GXFiSlcfqa5bhyjfVZKODLtjShGSqZO1px/c/LYklYH7BwW/nA4eAeR86dGsxxD4mAQZZVfKmI7xrUfV3LbGnTwRME2VaAmoiq3ESGbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=zHh4LHk9; arc=none smtp.client-ip=103.168.172.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
-	by mailfout.phl.internal (Postfix) with ESMTP id BCF2213801A6;
-	Tue, 25 Feb 2025 11:05:44 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-01.internal (MEProxy); Tue, 25 Feb 2025 11:05:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1740499544; x=1740585944; bh=HSzbiwKLkoSh2DwEr9eobg0mlFMzZpLYpuK
-	OmkOpl3c=; b=zHh4LHk91KF+f3gHIiPZ8Fc0Ngu8uhB6Le7n8laPXXJ9CTzJLkx
-	8vWLJOGNNL7jv4I2+XNmAoQxWylsrhRlHOqpFx2WGwkcGEneFmjO5MC6V4rjPsr+
-	UsLOEqhI3mQmQbeZwr4sU1Y1lQRWQsNmye57NvtjQOo2I2jHqwnU75iT/HEM5x4i
-	129El2jWmWO3VH6+EwqPGOyWjDpS460xE4oTQsEzUTbC29rCR5UnGjMTcy+rDhSO
-	nbPHgN2TdbGrlazPmWxkBs+/AwKDip6WtbPH7Pn6mdCfx+KWER3/93X2XwAYXwDl
-	No+YXn2+TktRiCSWkBd0/8ixzKqWneRsdMg==
-X-ME-Sender: <xms:WOq9Z8S_xKEPksVLv6Thdyg032jol6R_vH0gfhwv2N2tMJHCJT2VBg>
-    <xme:WOq9Z5zata3apSXNtvDo0hK7_SKSuNUEgmv6J7-VvVtuXBUz8bSxOMaiW9DG118vk
-    Nvym-2YkNMEBwU>
-X-ME-Received: <xmr:WOq9Z52UBiDk9NpkGFt4sp8LNP9mnB0sDxXz5xjx8X22rNoHnCQwY-ACywIFr0Ch3y1HfmF973jcPN_Llsa0AzW_N9bJag>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdekvddugecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddv
-    necuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrd
-    horhhgqeenucggtffrrghtthgvrhhnpedvudefveekheeugeeftddvveefgfduieefudei
-    fefgleekheegleegjeejgeeghfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
-    epmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhnsggprhgtphht
-    thhopeelpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehgnhgruhhlthesrhgvug
-    hhrghtrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdp
-    rhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnh
-    hisehrvgguhhgrthdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgv
-    rdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpd
-    hrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepughsrghh
-    vghrnheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnthhonhhiohesmhgrnhguvg
-    hlsghithdrtghomh
-X-ME-Proxy: <xmx:WOq9ZwDB8fdusgDKC7bZYciKK4Z_AZtusrYfpYhnQsuqf0Z5L8o-RA>
-    <xmx:WOq9Z1jxmO1xlXufiHf9NlrOIK9hIORi93p8Fnw3S6qnIHw2tBYfdQ>
-    <xmx:WOq9Z8pu-uDAQvLdBIyFqAW8t9deRzHhDzyUAVKK1MgTeJMvR3cXFA>
-    <xmx:WOq9Z4g5AIvVQ9_AG1b56mZv_WQQ1ycpOy1p5MEUyxQJkq_IFmRYPA>
-    <xmx:WOq9Z2Xep53WXeyBLl3cZ4oAlB_1heB1To0Xym3FEDx594u-rMmHNW_Z>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 25 Feb 2025 11:05:43 -0500 (EST)
-Date: Tue, 25 Feb 2025 18:05:40 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Guillaume Nault <gnault@redhat.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Antonio Quartulli <antonio@mandelbit.com>
-Subject: Re: [PATCH net v3 1/2] gre: Fix IPv6 link-local address generation.
-Message-ID: <Z73qVCxg8r34i_Pg@shredder>
-References: <cover.1740493813.git.gnault@redhat.com>
- <dd92b7f4b6bb81ce64e304381bedaf0d15ff5613.1740493813.git.gnault@redhat.com>
+	s=arc-20240116; t=1740499545; c=relaxed/simple;
+	bh=tlTvOMZwj97UVNjSaaTvJei+ugzd5xJk1GS03Pt4Yhc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=Uved1QGIGLDbIpktCio4NF+dmA65hTCqRjo6NnDQVGftpvMLQdrqQTCegLKGTpRjPKmS9m6xbrd1py1bM3gk0UPZ2emMaTHIhnnsPACyEni+XXbqLKE9DVqXpIukxk/TrqmWWbwvzL0ZkryC/dgCiqHLf4vtFH+F30CWj36lZ6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g+A2GzTS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5615C4CEDD;
+	Tue, 25 Feb 2025 16:05:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740499543;
+	bh=tlTvOMZwj97UVNjSaaTvJei+ugzd5xJk1GS03Pt4Yhc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=g+A2GzTSFFbK4mzi4EkihsKJcLfvmGL2MOcrFjgSVZwq+NsA1SqgBighAyr48AEYv
+	 u/2dpAxXLjx2gV+hujvr5fA6iCxr7DCPRYBYwN+Nw0wCrb1skECCvYy5FJVvc4phck
+	 JzkHj6J5yooVncOgCMlLffNHBJADthz/UQ97vD16srnbnh5q58AtCiH+uo/mCHFH8V
+	 Aa4BFZf7Bw8Kswb4R3lBa1RPZQWn4/LcNiRFUA0IQGyTGYA9SRnXDI/y0Fc4jMZckw
+	 /Sm76hNf593+fBfpLQPGzASwx5sD+zBP/CHJ79MbDbBgdN/qkM2gikgF1mXKXe8dfG
+	 Lqy7IjqZba8qg==
+Date: Tue, 25 Feb 2025 10:05:42 -0600
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Leon Romanovsky <leonro@nvidia.com>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+	linux-pci@vger.kernel.org, Ariel Almog <ariela@nvidia.com>,
+	Aditya Prabhune <aprabhune@nvidia.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Arun Easi <aeasi@marvell.com>, Jonathan Chocron <jonnyc@amazon.com>,
+	Bert Kenward <bkenward@solarflare.com>,
+	Matt Carlson <mcarlson@broadcom.com>,
+	Kai-Heng Feng <kai.heng.feng@canonical.com>,
+	Jean Delvare <jdelvare@suse.de>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+	Stephen Hemminger <stephen@networkplumber.org>
+Subject: Re: [PATCH v4] PCI/sysfs: Change read permissions for VPD attributes
+Message-ID: <20250225160542.GA507421@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,61 +70,101 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <dd92b7f4b6bb81ce64e304381bedaf0d15ff5613.1740493813.git.gnault@redhat.com>
+In-Reply-To: <c93a253b24701513dbeeb307cb2b9e3afd4c74b5.1737271118.git.leon@kernel.org>
 
-On Tue, Feb 25, 2025 at 03:43:20PM +0100, Guillaume Nault wrote:
-> Use addrconf_addr_gen() to generate IPv6 link-local addresses on GRE
-> devices in most cases and fall back to using add_v4_addrs() only in
-> case the GRE configuration is incompatible with addrconf_addr_gen().
+On Sun, Jan 19, 2025 at 09:27:54AM +0200, Leon Romanovsky wrote:
+> From: Leon Romanovsky <leonro@nvidia.com>
 > 
-> GRE used to use addrconf_addr_gen() until commit e5dd729460ca
-> ("ip/ip6_gre: use the same logic as SIT interfaces when computing v6LL
-> address") restricted this use to gretap and ip6gretap devices, and
-> created add_v4_addrs() (borrowed from SIT) for non-Ethernet GRE ones.
+> The Vital Product Data (VPD) attribute is not readable by regular
+> user without root permissions. Such restriction is not needed at
+> all for Mellanox devices, as data presented in that VPD is not
+> sensitive and access to the HW is safe and well tested.
 > 
-> The original problem came when commit 9af28511be10 ("addrconf: refuse
-> isatap eui64 for INADDR_ANY") made __ipv6_isatap_ifid() fail when its
-> addr parameter was 0. The commit says that this would create an invalid
-> address, however, I couldn't find any RFC saying that the generated
-> interface identifier would be wrong. Anyway, since gre over IPv4
-> devices pass their local tunnel address to __ipv6_isatap_ifid(), that
-> commit broke their IPv6 link-local address generation when the local
-> address was unspecified.
+> This change changes the permissions of the VPD attribute to be accessible
+> for read by all users for Mellanox devices, while write continue to be
+> restricted to root only.
 > 
-> Then commit e5dd729460ca ("ip/ip6_gre: use the same logic as SIT
-> interfaces when computing v6LL address") tried to fix that case by
-> defining add_v4_addrs() and calling it to generate the IPv6 link-local
-> address instead of using addrconf_addr_gen() (apart for gretap and
-> ip6gretap devices, which would still use the regular
-> addrconf_addr_gen(), since they have a MAC address).
-> 
-> That broke several use cases because add_v4_addrs() isn't properly
-> integrated into the rest of IPv6 Neighbor Discovery code. Several of
-> these shortcomings have been fixed over time, but add_v4_addrs()
-> remains broken on several aspects. In particular, it doesn't send any
-> Router Sollicitations, so the SLAAC process doesn't start until the
-> interface receives a Router Advertisement. Also, add_v4_addrs() mostly
-> ignores the address generation mode of the interface
-> (/proc/sys/net/ipv6/conf/*/addr_gen_mode), thus breaking the
-> IN6_ADDR_GEN_MODE_RANDOM and IN6_ADDR_GEN_MODE_STABLE_PRIVACY cases.
-> 
-> Fix the situation by using add_v4_addrs() only in the specific scenario
-> where the normal method would fail. That is, for interfaces that have
-> all of the following characteristics:
-> 
->   * run over IPv4,
->   * transport IP packets directly, not Ethernet (that is, not gretap
->     interfaces),
->   * tunnel endpoint is INADDR_ANY (that is, 0),
->   * device address generation mode is EUI64.
-> 
-> In all other cases, revert back to the regular addrconf_addr_gen().
-> 
-> Also, remove the special case for ip6gre interfaces in add_v4_addrs(),
-> since ip6gre devices now always use addrconf_addr_gen() instead.
-> 
-> Fixes: e5dd729460ca ("ip/ip6_gre: use the same logic as SIT interfaces when computing v6LL address")
-> Signed-off-by: Guillaume Nault <gnault@redhat.com>
+> The main use case is to remove need to have root/setuid permissions
+> while using monitoring library [1].
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+As far as I can tell, this is basically a device identification
+problem, which would be better handled by the Vendor, Device, and
+Revision IDs.  If that would solve the problem, it would also make
+standard unprivileged lspci output more specific.
+
+VPD has never been user readable, so I assume you have some existing
+method for device identification?
+
+Other concerns raised in previous threads include:
+
+  - Potential for sensitive information in VPD, similar to dmesg and
+    dmidecode
+
+  - Kernel complexity of reading VPD (mutex, address/data registers)
+
+  - Performance and potential denial of service as a consequence of
+    mutex and hardware interaction
+
+  - Missing EEPROMs or defective or incompletely-installed firmware
+    breaking VPD read
+
+  - Broken devices that crash when VPD is read
+
+  - Potential for issues with future Mellanox devices, even though all
+    current ones work fine
+
+This is basically similar to mmapping a device BAR, for which we also
+require root.
+
+> [leonro@vm ~]$ lspci |grep nox
+> 00:09.0 Ethernet controller: Mellanox Technologies MT2910 Family [ConnectX-7]
+> 
+> Before:
+> [leonro@vm ~]$ ls -al /sys/bus/pci/devices/0000:00:09.0/vpd
+> -rw------- 1 root root 0 Nov 13 12:30 /sys/bus/pci/devices/0000:00:09.0/vpd
+> After:
+> [leonro@vm ~]$ ls -al /sys/bus/pci/devices/0000:00:09.0/vpd
+> -rw-r--r-- 1 root root 0 Nov 13 12:30 /sys/bus/pci/devices/0000:00:09.0/vpd
+> 
+> [1] https://developer.nvidia.com/management-library-nvml
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> ---
+> Changelog:
+> v4:
+>  * Change comment to the variant suggested by Stephen
+> v3: https://lore.kernel.org/all/18f36b3cbe2b7e67eed876337f8ba85afbc12e73.1733227737.git.leon@kernel.org
+>  * Used | to change file attributes
+>  * Remove WARN_ON
+> v2: https://lore.kernel.org/all/61a0fa74461c15edfae76222522fa445c28bec34.1731502431.git.leon@kernel.org
+>  * Another implementation to make sure that user is presented with
+>    correct permissions without need for driver intervention.
+> v1: https://lore.kernel.org/all/cover.1731005223.git.leonro@nvidia.com
+>  * Changed implementation from open-read-to-everyone to be opt-in
+>  * Removed stable and Fixes tags, as it seems like feature now.
+> v0: https://lore.kernel.org/all/65791906154e3e5ea12ea49127cf7c707325ca56.1730102428.git.leonro@nvidia.com/
+> ---
+>  drivers/pci/vpd.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/drivers/pci/vpd.c b/drivers/pci/vpd.c
+> index a469bcbc0da7..c873ab47526b 100644
+> --- a/drivers/pci/vpd.c
+> +++ b/drivers/pci/vpd.c
+> @@ -332,6 +332,13 @@ static umode_t vpd_attr_is_visible(struct kobject *kobj,
+>  	if (!pdev->vpd.cap)
+>  		return 0;
+>  
+> +	/*
+> +	 * On Mellanox devices reading VPD is safe for unprivileged users,
+> +	 * so just add needed bits to allow read.
+> +	 */
+> +	if (unlikely(pdev->vendor == PCI_VENDOR_ID_MELLANOX))
+> +		return a->attr.mode | 0044;
+> +
+>  	return a->attr.mode;
+>  }
+>  
+> -- 
+> 2.47.1
+> 
 
