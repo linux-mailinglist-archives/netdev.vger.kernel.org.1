@@ -1,183 +1,101 @@
-Return-Path: <netdev+bounces-169635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C124A44ED5
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 22:28:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9915BA44EE5
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 22:30:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F8DF171872
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 21:28:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1EFB3AE6E6
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 21:29:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1498120C476;
-	Tue, 25 Feb 2025 21:28:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A87FA20E6F0;
+	Tue, 25 Feb 2025 21:29:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i+ZbVft9"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="IUbygT/9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21B3B18DB2E
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 21:27:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC3920E6FB;
+	Tue, 25 Feb 2025 21:29:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740518881; cv=none; b=B4CwDHGRMJb9KOLGER+CKIMpYbJ2sBQF8m4StL7+SWnDoSxdvyaS04YV/93MQElhT4cyFuoN3T4Mul8Yp5Er94TlUZgs8dWimf6rGupurZqC3yd5bPnMSPYNNQr/0UKi8lKZlgZzKKYvMq7PNwmN42EhP7496r0iF5R9yJihrxU=
+	t=1740518982; cv=none; b=RpTwYWGcffCu4Y/gZYBm+qL7L/bP6pem/B8sZZj3jnhl4PEuQU0IiSyQGAbOVPoDqg9ClmW+2j0H6vljjVw25uPPYncn2tPGeLI3GJdszmknUHdimwyiwGEOmfnVSRx97CMdGg0OvwFnWw9KDvhQj6sm8FXT+TQl4b1jRMR3o4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740518881; c=relaxed/simple;
-	bh=mHtexZIWhP733gfukHNRKtZLR0AZlEi0tEpTlNqDts4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oEVFwPMsoQx4efpT+2c4Xvl9yIuNrtXqi/3zJ+R6u1ulQkmrxL5Ot1cuoSwXeLlN6Fih6gv6xl6Y+1nS3m6FUVt1LXDEMa35dUJIFrKBbRzVvqbG2jpNU/sVRE8Xiq5wwXOwpN0YzVRzA+xKVD0sPWySZ8cJ4MqsMod1CfVPPJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i+ZbVft9; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740518879; x=1772054879;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=mHtexZIWhP733gfukHNRKtZLR0AZlEi0tEpTlNqDts4=;
-  b=i+ZbVft9zqHPko+bpIJRJD1mpr/bRwdAfi3eUb47SByGmFMMGU4vVbxH
-   S0nxMF0eAkNnPFb4jdZ9yITjsttuXI/n4N2+wOTGroi5FZ6P0e9hOSvJf
-   aHu/wKFNmt3DI8V6BmKeCtHaSwxG/NcT4uqQsqXKpS7inlH/B6758+WIf
-   kbUiyGd5D5JkibDwjEcIcXn8jw7zC3z43MC/AqMeIv8WjjxB2/qyhq0vT
-   98k5a6m8Iw6BgAiuCXHxukn1THEZAT+fPkCYMFwE0N5LBJuiaf9JKuLYK
-   gMkkj/w7gPvl6snqkLjiInTEG+ryU0pXrzHSKqKcuTbqlXGQkhBN0hkHh
-   g==;
-X-CSE-ConnectionGUID: HDlqYGppSQik8VG0xhz9yQ==
-X-CSE-MsgGUID: l39G+VR4Tj2i35b9Ni6dQQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="41550866"
-X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="41550866"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2025 13:27:59 -0800
-X-CSE-ConnectionGUID: N/qjuDE/TmiVQqv3PlIh3g==
-X-CSE-MsgGUID: eumm2o4SQX6+T6sIxiXnUw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="121756092"
-Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
-  by orviesa005.jf.intel.com with ESMTP; 25 Feb 2025 13:27:57 -0800
-Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tn2Su-000An9-11;
-	Tue, 25 Feb 2025 21:27:46 +0000
-Date: Wed, 26 Feb 2025 05:25:54 +0800
-From: kernel test robot <lkp@intel.com>
-To: Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
-	Florian Westphal <fw@strlen.de>
-Subject: Re: [PATCH ipsec-next] xfrm: remove hash table alloc/free helpers
-Message-ID: <202502260536.BzRJ7jGr-lkp@intel.com>
-References: <20250224171055.15951-1-fw@strlen.de>
+	s=arc-20240116; t=1740518982; c=relaxed/simple;
+	bh=aHHyjCAajZkQBWBMhyoGC/7GAgkHuLUmQVhT+GBpm8M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qEy7VXk4Vxtv6xXwomUL/yBU5OzvewpjN1avvXPnC6YX5YHy8N2/H4mYRH6C5HFy1cnJVJzjB3TLhPnalZKHeSib2Ph2h7ZUf7/rqkhDoqjDe92fHSpW8xvH35aVNUbUu00db/T6P86C2csslY5f+2PO5FCXbF/N8NRu/Vm0WPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=IUbygT/9; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=NPV+XQRTDkSrWqMSsd/KziJIjpUy3f0cPCBDdb7eSPg=; b=IUbygT/9dPtUnipf9zMkO3mWPZ
+	MbTJrXWnnS0PXZAIsTFJMT+0G8bmAuKqmMEdRjAuwVXQS1XHU71SX2uedDOPwL0KE+dI1NTAiW38v
+	mlry7ayptZtL9mcK8PxcysD76hVrHo/Rf2qZqvabOc9ExNronCaj1LCUNIiNoYuk2nyO2j3aoMvGl
+	yFAlzBzOoTeg8FTGD23XOHk96ox3cb1808N/kN3AKvE7jpCnp2w5cc083U3sCD0iQyklj68K0jIHp
+	+JPRfdtwzHqpv9ilgQzPIRZn2wj+NBOXsrfN2zm7vcp8JTceYg1VZkcWtKz9yil6rPmicaMRQLwP7
+	2/bBP3ug==;
+Received: from 22.248.197.178.dynamic.cust.swisscom.net ([178.197.248.22] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1tn2Ua-000HHd-1R;
+	Tue, 25 Feb 2025 22:29:28 +0100
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: kuba@kernel.org
+Cc: netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Philo Lu <lulie@linux.alibaba.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Martin KaFai Lau <martin.lau@kernel.org>
+Subject: [PATCH net] netkit: Remove double invocation to clear ipvs property flag
+Date: Tue, 25 Feb 2025 22:29:27 +0100
+Message-ID: <20250225212927.69271-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250224171055.15951-1-fw@strlen.de>
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 1.0.7/27560/Tue Feb 25 10:44:40 2025)
 
-Hi Florian,
+With ipvs_reset() now done unconditionally in skb_scrub_packet()
+we would then call the former twice netkit_prep_forward(). Thus
+remove the now unnecessary explicit call.
 
-kernel test robot noticed the following build warnings:
+Fixes: de2c211868b9 ("ipvs: Always clear ipvs_property flag in skb_scrub_packet()")
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Philo Lu <lulie@linux.alibaba.com>
+Cc: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: Martin KaFai Lau <martin.lau@kernel.org>
+---
+ [ Sending to net since de2c211868b9 is in net ]
 
-[auto build test WARNING on klassert-ipsec-next/master]
-[also build test WARNING on klassert-ipsec/master net/main net-next/main linus/master v6.14-rc4 next-20250225]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+ drivers/net/netkit.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Florian-Westphal/xfrm-remove-hash-table-alloc-free-helpers/20250225-011758
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec-next.git master
-patch link:    https://lore.kernel.org/r/20250224171055.15951-1-fw%40strlen.de
-patch subject: [PATCH ipsec-next] xfrm: remove hash table alloc/free helpers
-config: x86_64-buildonly-randconfig-004-20250226 (https://download.01.org/0day-ci/archive/20250226/202502260536.BzRJ7jGr-lkp@intel.com/config)
-compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250226/202502260536.BzRJ7jGr-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202502260536.BzRJ7jGr-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> net/xfrm/xfrm_state.c:165:26: warning: variable 'ohashmask' set but not used [-Wunused-but-set-variable]
-     165 |         unsigned int nhashmask, ohashmask;
-         |                                 ^
-   1 warning generated.
-
-
-vim +/ohashmask +165 net/xfrm/xfrm_state.c
-
-f034b5d4efdfe0 David S. Miller  2006-08-24  160  
-63082733858502 Alexey Dobriyan  2008-11-25  161  static void xfrm_hash_resize(struct work_struct *work)
-f034b5d4efdfe0 David S. Miller  2006-08-24  162  {
-63082733858502 Alexey Dobriyan  2008-11-25  163  	struct net *net = container_of(work, struct net, xfrm.state_hash_work);
-fe9f1d8779cb47 Sabrina Dubroca  2021-04-25  164  	struct hlist_head *ndst, *nsrc, *nspi, *nseq, *odst, *osrc, *ospi, *oseq;
-f034b5d4efdfe0 David S. Miller  2006-08-24 @165  	unsigned int nhashmask, ohashmask;
-ef6562fb0dcb1a Florian Westphal 2025-02-24  166  	unsigned long nsize;
-f034b5d4efdfe0 David S. Miller  2006-08-24  167  	int i;
-f034b5d4efdfe0 David S. Miller  2006-08-24  168  
-63082733858502 Alexey Dobriyan  2008-11-25  169  	nsize = xfrm_hash_new_size(net->xfrm.state_hmask);
-44e36b42a8378b David S. Miller  2006-08-24  170  	ndst = xfrm_hash_alloc(nsize);
-f034b5d4efdfe0 David S. Miller  2006-08-24  171  	if (!ndst)
-0244790c8ad240 Ying Xue         2014-08-29  172  		return;
-44e36b42a8378b David S. Miller  2006-08-24  173  	nsrc = xfrm_hash_alloc(nsize);
-f034b5d4efdfe0 David S. Miller  2006-08-24  174  	if (!nsrc) {
-ef6562fb0dcb1a Florian Westphal 2025-02-24  175  		xfrm_hash_free(ndst);
-0244790c8ad240 Ying Xue         2014-08-29  176  		return;
-f034b5d4efdfe0 David S. Miller  2006-08-24  177  	}
-44e36b42a8378b David S. Miller  2006-08-24  178  	nspi = xfrm_hash_alloc(nsize);
-f034b5d4efdfe0 David S. Miller  2006-08-24  179  	if (!nspi) {
-ef6562fb0dcb1a Florian Westphal 2025-02-24  180  		xfrm_hash_free(ndst);
-ef6562fb0dcb1a Florian Westphal 2025-02-24  181  		xfrm_hash_free(nsrc);
-0244790c8ad240 Ying Xue         2014-08-29  182  		return;
-f034b5d4efdfe0 David S. Miller  2006-08-24  183  	}
-fe9f1d8779cb47 Sabrina Dubroca  2021-04-25  184  	nseq = xfrm_hash_alloc(nsize);
-fe9f1d8779cb47 Sabrina Dubroca  2021-04-25  185  	if (!nseq) {
-ef6562fb0dcb1a Florian Westphal 2025-02-24  186  		xfrm_hash_free(ndst);
-ef6562fb0dcb1a Florian Westphal 2025-02-24  187  		xfrm_hash_free(nsrc);
-ef6562fb0dcb1a Florian Westphal 2025-02-24  188  		xfrm_hash_free(nspi);
-fe9f1d8779cb47 Sabrina Dubroca  2021-04-25  189  		return;
-fe9f1d8779cb47 Sabrina Dubroca  2021-04-25  190  	}
-f034b5d4efdfe0 David S. Miller  2006-08-24  191  
-283bc9f35bbbcb Fan Du           2013-11-07  192  	spin_lock_bh(&net->xfrm.xfrm_state_lock);
-e88add19f68191 Ahmed S. Darwish 2021-03-16  193  	write_seqcount_begin(&net->xfrm.xfrm_state_hash_generation);
-f034b5d4efdfe0 David S. Miller  2006-08-24  194  
-f034b5d4efdfe0 David S. Miller  2006-08-24  195  	nhashmask = (nsize / sizeof(struct hlist_head)) - 1U;
-c8406998b80183 Florian Westphal 2016-08-09  196  	odst = xfrm_state_deref_prot(net->xfrm.state_bydst, net);
-63082733858502 Alexey Dobriyan  2008-11-25  197  	for (i = net->xfrm.state_hmask; i >= 0; i--)
-fe9f1d8779cb47 Sabrina Dubroca  2021-04-25  198  		xfrm_hash_transfer(odst + i, ndst, nsrc, nspi, nseq, nhashmask);
-f034b5d4efdfe0 David S. Miller  2006-08-24  199  
-c8406998b80183 Florian Westphal 2016-08-09  200  	osrc = xfrm_state_deref_prot(net->xfrm.state_bysrc, net);
-c8406998b80183 Florian Westphal 2016-08-09  201  	ospi = xfrm_state_deref_prot(net->xfrm.state_byspi, net);
-fe9f1d8779cb47 Sabrina Dubroca  2021-04-25  202  	oseq = xfrm_state_deref_prot(net->xfrm.state_byseq, net);
-63082733858502 Alexey Dobriyan  2008-11-25  203  	ohashmask = net->xfrm.state_hmask;
-f034b5d4efdfe0 David S. Miller  2006-08-24  204  
-c8406998b80183 Florian Westphal 2016-08-09  205  	rcu_assign_pointer(net->xfrm.state_bydst, ndst);
-c8406998b80183 Florian Westphal 2016-08-09  206  	rcu_assign_pointer(net->xfrm.state_bysrc, nsrc);
-c8406998b80183 Florian Westphal 2016-08-09  207  	rcu_assign_pointer(net->xfrm.state_byspi, nspi);
-fe9f1d8779cb47 Sabrina Dubroca  2021-04-25  208  	rcu_assign_pointer(net->xfrm.state_byseq, nseq);
-63082733858502 Alexey Dobriyan  2008-11-25  209  	net->xfrm.state_hmask = nhashmask;
-f034b5d4efdfe0 David S. Miller  2006-08-24  210  
-e88add19f68191 Ahmed S. Darwish 2021-03-16  211  	write_seqcount_end(&net->xfrm.xfrm_state_hash_generation);
-283bc9f35bbbcb Fan Du           2013-11-07  212  	spin_unlock_bh(&net->xfrm.xfrm_state_lock);
-f034b5d4efdfe0 David S. Miller  2006-08-24  213  
-df7274eb70b7c8 Florian Westphal 2016-08-09  214  	synchronize_rcu();
-df7274eb70b7c8 Florian Westphal 2016-08-09  215  
-ef6562fb0dcb1a Florian Westphal 2025-02-24  216  	xfrm_hash_free(odst);
-ef6562fb0dcb1a Florian Westphal 2025-02-24  217  	xfrm_hash_free(osrc);
-ef6562fb0dcb1a Florian Westphal 2025-02-24  218  	xfrm_hash_free(ospi);
-ef6562fb0dcb1a Florian Westphal 2025-02-24  219  	xfrm_hash_free(oseq);
-f034b5d4efdfe0 David S. Miller  2006-08-24  220  }
-f034b5d4efdfe0 David S. Miller  2006-08-24  221  
-
+diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
+index 1e1b00756be7..20088f781376 100644
+--- a/drivers/net/netkit.c
++++ b/drivers/net/netkit.c
+@@ -65,7 +65,6 @@ static void netkit_prep_forward(struct sk_buff *skb,
+ 	skb_reset_mac_header(skb);
+ 	if (!xnet)
+ 		return;
+-	ipvs_reset(skb);
+ 	skb_clear_tstamp(skb);
+ 	if (xnet_scrub)
+ 		netkit_xnet(skb);
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.43.0
+
 
