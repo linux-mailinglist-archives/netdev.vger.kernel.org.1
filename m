@@ -1,246 +1,328 @@
-Return-Path: <netdev+bounces-169538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A5B9A44819
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 18:31:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C775BA44828
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 18:32:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E1DF3AB47A
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 17:20:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D5F6423AAA
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 17:27:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73C9E199EAF;
-	Tue, 25 Feb 2025 17:18:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87CB720D4EF;
+	Tue, 25 Feb 2025 17:25:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dIER00XO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BSOEIyKg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF6B14A60A
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 17:18:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5BC20B7F7
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 17:25:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740503925; cv=none; b=IHu1NdEeEeACtRTLfirAJIcqgjyU+5K8M61FsalHeKKvNsQDL8ECMzyKU8elFXC0zsd81ZB/+LK1shPPoZShnVzo6fEFyMDm8h6IWZCeTqmNDuKI6ZO5AtEaZmZ1ebwdB2NhLJsMnRpzgog2pYrC6UAjJrFs98T4Lou4mOEI/u4=
+	t=1740504307; cv=none; b=Ozb4vUAXO6B3b1WxVcQlaZpH/0rK8zV2/xwc4aJlY1PMw2XrCZFwUh3F641KT9wz7TAtaQ5sqEKLwYN22cb/1pc8lzNY92/XvbbXgqTq3BI65+4+MytUh6EgX2k//MXKdwQ/BTnRGtjVO1tXSlP4X36ELgrothOoYoISqPSMgqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740503925; c=relaxed/simple;
-	bh=cS3wVg6LUjFtV+qB2te3Q6/t8UomdZ2zGsL912FwBkQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VRheUgrmF7Pes2C7Ih4BbOYguuTOl+rdNbRFBAJzOPE733hwqXuxJhshBcv+YLguvKOfs+bv2LodQSCXRrHzqi0LCSWcy88ee0buV7iOLPIXl7nmwzWuqJtTQWzHYhjb0A2veHD0miy7Ms9xz27GUTIfcD2yoWl9qZt2Aeyv1wE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dIER00XO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CAC0C4CEDD;
-	Tue, 25 Feb 2025 17:18:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740503924;
-	bh=cS3wVg6LUjFtV+qB2te3Q6/t8UomdZ2zGsL912FwBkQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dIER00XOuKCbgEDtj9/s6wohSZTAK7Nz4i2h9oPchLr5L7odTPTyHaix5OgeXTkke
-	 Fp/DcuWUj9RIOUlbOmuqFqHDZNq6HrwiFL6B3KI4Gl3kHbbqSUPY0lOrtEPBmid4Z4
-	 EI2rgV/AoNGKumRbBWvMQY1ODuOvZ4Gfld+dV164t7YYPSetGmyJh2Z3WiSMkyrfcJ
-	 ZDG37TTC/w05+RbJaQyxw4y/MXA+LQiwMhgifhLQpvoh14i3bUgVwmgGvf2sHrV5zd
-	 XI9apywrp2Rsvzw3RznvkA0ThCs9Ws4o08mzDbpbYDE/1rFZ1dbYV+4ofL7ZBzWab6
-	 pFM1zrmBze2dA==
-Message-ID: <d7510d93-7469-4dee-8a09-f80c0f1df3b3@kernel.org>
-Date: Tue, 25 Feb 2025 18:18:39 +0100
+	s=arc-20240116; t=1740504307; c=relaxed/simple;
+	bh=GxOQwmQiGHnba5gt1J2RmU+W0OoyNHD9HFAHgmbtgAU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=X27qIcujVW+lb71qk80d7lMcrfPE4ln5S2MiqAxQJAU7hHSYbmyDanJKZ6BConA2OPrdd7yxf2HkprRKXQAwm300uVlHPtriDnbSD+leJcENhqll8OzSeJZnbyZsuFtqsLFx4kO0+0SYMkhyguF007sqPMz9zcZmyTQz92AiEko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BSOEIyKg; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-472098e6e75so387171cf.1
+        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 09:25:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740504304; x=1741109104; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=75hfp2Z42eIGcb2goeqHLvg9bqhQMwNL1ix3XCMfK/g=;
+        b=BSOEIyKg+wqDPj297jpYLlT9DvmkW328Zxh39BLSq6YgYDjGTqp734WsNWOVHV6t1V
+         C9ujTtg174EpY8hudHrecTll7veayTfYx0z3mmwBbH85ieWVJ2UrasGjio8u1Ufi/xtZ
+         6/Vc8jmdGsnwsC6lifpC1UdqPGmtDqI+9DM/AdxQ+RyS92KvtUxD85z+7Ra2uCSwjWJr
+         rfqvP8R9OkhPIeWt2ueJMjtDEx2IjYSOqHT08moYafZx14aFKS2QctEdTuOcohUdCe9C
+         r4jPU9Upgfr80C6Vkkrzan1Sn87cfZhQmk45eaQcpjhTI5vyzWw7WnHvUEIseb5ZLzOg
+         Blww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740504304; x=1741109104;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=75hfp2Z42eIGcb2goeqHLvg9bqhQMwNL1ix3XCMfK/g=;
+        b=C7xownMjNc3/9q/JZOGcak2sWfBxyVX4LTmwCZMD4/MmRRaOmfisil6BvGXOkxoayW
+         x29TK4REKrEHb6eyC4iQ/vCi87F3FhNrP4p1ZifCaHvodOD0w38flzsMjY6OGrGAuyPD
+         cJR6dT7105obJQbF4JS+4z3HUqJXJ32eDl9wDwaKGtycylIU0pJdGFlUTmm5KsuDBq5U
+         Kmeh/EwseeoZVZDs7KZEVFhUBPTEsvtaUcEnZ54nRcyG6SiYPDq170HAyiqe2340nn1E
+         01kzSQXnrcwOO5tmwhvgcooklLHaW58QN/gHA98QCt1UjKNegTy/CYFYhep18XjTNE04
+         dPbA==
+X-Forwarded-Encrypted: i=1; AJvYcCUHHQjWJT7wKX8S3bzTgiwBeu6/45h+Jbu1NcMrbc5WooAugMnh976x5/0N6eSuiStEI4iFRJE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymS5Rp9mJDelQYw8eIYy2Kqxu7ybtOLRpdduzHtWDn92oIv+8M
+	o0qFCiKdpauDh0S0jKW3PKCAtkosVAt8NO/t9PGJf/i8u83auBmPMsXe8D1SH1W1qTQm9g3pilF
+	TkJodq+48nvy8MRx3IZvjQtgIuEJcdmBC97ZT
+X-Gm-Gg: ASbGncu0hU67UEFMTlvpbhqTgd5LVu6UtOuYXhuijIs6SNg8a2tGGFQ1asvElXas17+
+	ATwtYIEQRVAuyN9Mz0AMt5fdmJOVe+eEv2d/qhkOswjFSJ4q98IGBDWWPWnoQ9UwkZN7V86eYbM
+	Ga+CMqSv9sTDm70TbDqNHPqS/MmjQ0rRqPnG9BIIx9
+X-Google-Smtp-Source: AGHT+IEgCi3luOMK49RIezNsV02TX8cvdABlFxynF3pOmgArh3s4ioMJGNwkhQ3fRzLYgZez6QpvvC35o8BZxQK3q5E=
+X-Received: by 2002:ac8:7f8d:0:b0:46e:2561:e8a9 with SMTP id
+ d75a77b69052e-47376e5b001mr5537451cf.2.1740504304120; Tue, 25 Feb 2025
+ 09:25:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next] tcp: be less liberal in tsecr received while in
- SYN_RECV state
-Content-Language: en-GB
-To: Eric Dumazet <edumazet@google.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
- Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>,
- netdev@vger.kernel.org, eric.dumazet@gmail.com,
- Jakub Kicinski <kuba@kernel.org>, Yong-Hao Zou <yonghaoz1994@gmail.com>,
- "David S . Miller" <davem@davemloft.net>,
- Neal Cardwell <ncardwell@google.com>
-References: <20250224110654.707639-1-edumazet@google.com>
- <4f37d18c-6152-42cf-9d25-98abb5cd9584@redhat.com>
- <af310ccd-3b5f-4046-b8d7-ab38b76d4bde@kernel.org>
- <CANn89iJfXJi7CL2ekBo9Zn9KtVTRxwMCZiSxdC21uNfkdNU1Jg@mail.gmail.com>
- <927c8b04-5944-4577-b6bd-3fc50ef55e7e@kernel.org>
- <CANn89iJu5dPMF3BFN7bbNZR-zZF_xjxGqstHucmBc3EvcKZXJw@mail.gmail.com>
- <40fcf43d-b9c2-439a-9375-d2ff78be203f@kernel.org>
- <CANn89iLH_SgpWgAXvDjRbpFtVjWS-yLSiX0FbCweWjAJgzaASg@mail.gmail.com>
- <CANn89i+Zs2bLC7h2N5v15Xh=aTWdoa3v2d_A-EvRirsnFEPgwQ@mail.gmail.com>
- <CANn89iLf5hOnT=T+a9+msJ7=atWMMZQ+3syG75-8Nih8_MwHmw@mail.gmail.com>
- <8beaf62e-6257-452d-904a-fec6b21c891e@kernel.org>
- <CANn89i+3M1bJf=gXMH1zK3LiR-=XMRPe+qR8HNu94o2Xzm4vQQ@mail.gmail.com>
- <f970e46e-7153-4000-beef-f2d621998a8e@kernel.org>
- <CANn89iLZSO+Swf78jV0mc9jLUFLiqOtcjbTWsoYmdr=jn0SUxg@mail.gmail.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <CANn89iLZSO+Swf78jV0mc9jLUFLiqOtcjbTWsoYmdr=jn0SUxg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <CADVnQynUspJL4e3UnZTKps9WmgnE-0ngQnQmn=8gjSmyg4fQ5A@mail.gmail.com>
+ <20241203181839.7d0ed41c@kernel.org> <Z0/O1ivIwiVVNRf0@perf>
+ <CANn89iKms_9EX+wArf1FK7Cy3-Cr_ryX+MJ2YC8yt1xmvpY=Uw@mail.gmail.com>
+ <009e01db4620$f08f42e0$d1adc8a0$@samsung.com> <CADVnQykPo35mQ1y16WD3zppENCeOi+2Ea_2m-AjUQVPc9SXm4g@mail.gmail.com>
+ <Z4nl0h1IZ5R/KDEc@perf> <CADVnQykZYT+CTWD3Ss46aGHPp5KtKMYqKjLxEmd5DDgdG3gfDA@mail.gmail.com>
+ <CGME20250120001504epcas2p1d766c193256b4b7f79d19f61d76d697d@epcas2p1.samsung.com>
+ <Z42WaFf9+oNkoBKJ@perf> <Z6BSXCRw/9Ne1eO1@perf> <CADVnQykpHsN1rPJobKVfFGwtAJ9qwPrwG21HiunHqfykxyPD1g@mail.gmail.com>
+In-Reply-To: <CADVnQykpHsN1rPJobKVfFGwtAJ9qwPrwG21HiunHqfykxyPD1g@mail.gmail.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Tue, 25 Feb 2025 12:24:47 -0500
+X-Gm-Features: AQ5f1JqXanvSWbiSecfhBvqTILnS-DUPnw2qWauzzQvA4KjLlHyi1MixCzeF3Xg
+Message-ID: <CADVnQymr=sst5foNOF7ydr-fUyAK6XLvRyNvnTVBV=wgPLpBBQ@mail.gmail.com>
+Subject: Re: [PATCH] tcp: check socket state before calling WARN_ON
+To: Youngmin Nam <youngmin.nam@samsung.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, 
+	dsahern@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	guo88.liu@samsung.com, yiwang.cai@samsung.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, joonki.min@samsung.com, hajun.sung@samsung.com, 
+	d7271.choe@samsung.com, sw.ju@samsung.com, 
+	"Dujeong.lee" <dujeong.lee@samsung.com>, Yuchung Cheng <ycheng@google.com>, Kevin Yang <yyd@google.com>, 
+	Xueming Feng <kuro@kuroa.me>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Eric,
+On Mon, Feb 24, 2025 at 4:13=E2=80=AFPM Neal Cardwell <ncardwell@google.com=
+> wrote:
+>
+> On Mon, Feb 3, 2025 at 12:17=E2=80=AFAM Youngmin Nam <youngmin.nam@samsun=
+g.com> wrote:
+> >
+> > > Hi Neal,
+> > > Thank you for looking into this issue.
+> > > When we first encountered this issue, we also suspected that tcp_writ=
+e_queue_purge() was being called.
+> > > We can provide any information you would like to inspect.
+>
+> Thanks again for raising this issue, and providing all that data!
+>
+> I've come up with a reproducer for this issue, and an explanation for
+> why this has only been seen on Android so far, and a theory about a
+> related socket leak issue, and a proposed fix for the WARN and the
+> socket leak.
+>
+> Here is the scenario:
+>
+> + user process A has a socket in TCP_ESTABLISHED
+>
+> + user process A calls close(fd)
+>
+> + socket calls __tcp_close() and tcp_close_state() decides to enter
+> TCP_FIN_WAIT1 and send a FIN
+>
+> + FIN is lost and retransmitted, making the state:
+> ---
+>  tp->packets_out =3D 1
+>  tp->sacked_out =3D 0
+>  tp->lost_out =3D 1
+>  tp->retrans_out =3D 1
+> ---
+>
+> + someone invokes "ss" to --kill the socket using the functionality in
+> (1e64e298b8 "net: diag: Support destroying TCP sockets")
+>
+>   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
+it/?id=3Dc1e64e298b8cad309091b95d8436a0255c84f54a
+>
+>  (note: this was added for Android, so would not be surprising to have
+> this inet_diag --kill run on Android)
+>
+> + the ss --kill causes a call to tcp_abort()
+>
+> + tcp_abort() calls tcp_write_queue_purge()
+>
+> + tcp_write_queue_purge() sets packets_out=3D0 but leaves lost_out=3D1,
+> retrans_out=3D1
+>
+> + tcp_sock still exists in TCP_FIN_WAIT1 but now with an inconsistent sta=
+te
+>
+> + ACK arrives and causes a WARN_ON from tcp_verify_left_out():
+>
+> #define tcp_verify_left_out(tp) WARN_ON(tcp_left_out(tp) > tp->packets_ou=
+t)
+>
+> because the state has:
+>
+>  ---
+>  tcp_left_out(tp) =3D sacked_out + lost_out =3D 1
+>   tp->packets_out =3D 0
+> ---
+>
+> because the state is:
+>
+> ---
+>  tp->packets_out =3D 0
+>  tp->sacked_out =3D 0
+>  tp->lost_out =3D 1
+>  tp->retrans_out =3D 1
+> ---
+>
+> I guess perhaps one fix would be to just have tcp_write_queue_purge()
+> zero out those other fields:
+>
+> ---
+>  tp->sacked_out =3D 0
+>  tp->lost_out =3D 0
+>  tp->retrans_out =3D 0
+> ---
+>
+> However, there is a related and worse problem. Because this killed
+> socket has tp->packets_out, the next time the RTO timer fires,
+> tcp_retransmit_timer() notices !tp->packets_out is true, so it short
+> circuits and returns without setting another RTO timer or checking to
+> see if the socket should be deleted. So the tcp_sock is now sitting in
+> memory with no timer set to delete it. So we could leak a socket this
+> way. So AFAICT to fix this socket leak problem, perhaps we want a
+> patch like the following (not tested yet), so that we delete all
+> killed sockets immediately, whether they are SOCK_DEAD (orphans for
+> which the user already called close() or not) :
+>
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index 28cf19317b6c2..a266078b8ec8c 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -5563,15 +5563,12 @@ int tcp_abort(struct sock *sk, int err)
+>         local_bh_disable();
+>         bh_lock_sock(sk);
+>
+> -       if (!sock_flag(sk, SOCK_DEAD)) {
+> -               if (tcp_need_reset(sk->sk_state))
+> -                       tcp_send_active_reset(sk, GFP_ATOMIC);
+> -               tcp_done_with_error(sk, err);
+> -       }
+> +       if (tcp_need_reset(sk->sk_state))
+> +               tcp_send_active_reset(sk, GFP_ATOMIC);
+> +       tcp_done_with_error(sk, err);
+>
+>         bh_unlock_sock(sk);
+>         local_bh_enable();
+> -       tcp_write_queue_purge(sk);
+>         release_sock(sk);
+>         return 0;
+>  }
+> ---
 
-On 25/02/2025 18:11, Eric Dumazet wrote:
-> On Tue, Feb 25, 2025 at 5:56 PM Matthieu Baerts <matttbe@kernel.org> wrote:
->>
->> Hi Eric,
->>
->> On 25/02/2025 11:51, Eric Dumazet wrote:
->>> On Tue, Feb 25, 2025 at 11:48 AM Matthieu Baerts <matttbe@kernel.org> wrote:
->>>>
->>>> On 25/02/2025 11:42, Eric Dumazet wrote:
->>>>> On Tue, Feb 25, 2025 at 11:39 AM Eric Dumazet <edumazet@google.com> wrote:
->>>>>>
->>>>>
->>>>>>
->>>>>> Yes, this would be it :
->>>>>>
->>>>>> diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
->>>>>> index 728bce01ccd3ddb1f374fa96b86434a415dbe2cb..3555567ba4fb1ccd5c5921e39d11ff08f1d0cafd
->>>>>> 100644
->>>>>> --- a/net/ipv4/tcp_timer.c
->>>>>> +++ b/net/ipv4/tcp_timer.c
->>>>>> @@ -477,8 +477,8 @@ static void tcp_fastopen_synack_timer(struct sock
->>>>>> *sk, struct request_sock *req)
->>>>>>          * regular retransmit because if the child socket has been accepted
->>>>>>          * it's not good to give up too easily.
->>>>>>          */
->>>>>> -       inet_rtx_syn_ack(sk, req);
->>>>>>         req->num_timeout++;
->>>>>> +       inet_rtx_syn_ack(sk, req);
->>>>>>         tcp_update_rto_stats(sk);
->>>>>>         if (!tp->retrans_stamp)
->>>>>>                 tp->retrans_stamp = tcp_time_stamp_ts(tp);
->>>>>
->>>>> Obviously, I need to refine the patch and send a V2 later.
->>>>
->>>> Sorry, I still have the issue with this modification. I also checked
->>>> with the previous patch, just to be sure, but the problem is still there
->>>> as well.
->>>
->>> I said "req->num_timeout" is not updated where I thought it was.
->>
->> I think that in case of SYN+ACK retransmission, req->num_timeout is
->> incremented after tcp_synack_options():
->>
->>   reqsk_timer_handler()
->>   --> inet_rtx_syn_ack()
->>     --> tcp_rtx_synack()
->>       --> tcp_v6_send_synack()
->>         --> tcp_make_synack()
->>           --> tcp_synack_options()
->>   then: req->num_timeout++
->>
->>> Look at all the places were req->num_timeout or req->num_retrans are
->>> set/changed.... this will give you some indications.
->>
->> I'm probably missing something obvious, but if the goal is to set
->> snt_tsval_first only the first time, why can we not simply set
->>
->>   tcp_rsk(req)->snt_tsval_first = 0;
->>
->> in tcp_conn_request(), and only set it to tsval in tcp_synack_options()
->> when it is 0? Something like that:
->>
->>
->>> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
->>> index 217a8747a79b..26b3daa5efd2 100644
->>> --- a/net/ipv4/tcp_input.c
->>> +++ b/net/ipv4/tcp_input.c
->>> @@ -7249,6 +7249,7 @@ int tcp_conn_request(struct request_sock_ops *rsk_ops,
->>>         tcp_rsk(req)->af_specific = af_ops;
->>>         tcp_rsk(req)->ts_off = 0;
->>>         tcp_rsk(req)->req_usec_ts = false;
->>> +       tcp_rsk(req)->snt_tsval_first = 0;
->>>  #if IS_ENABLED(CONFIG_MPTCP)
->>>         tcp_rsk(req)->is_mptcp = 0;
->>>  #endif
->>> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
->>> index 485ca131091e..020c624532d7 100644
->>> --- a/net/ipv4/tcp_output.c
->>> +++ b/net/ipv4/tcp_output.c
->>> @@ -943,7 +943,7 @@ static unsigned int tcp_synack_options(const struct sock *sk,
->>>                 opts->options |= OPTION_TS;
->>>                 opts->tsval = tcp_skb_timestamp_ts(tcp_rsk(req)->req_usec_ts, skb) +
->>>                               tcp_rsk(req)->ts_off;
->>> -               if (!req->num_timeout)
->>> +               if (!tcp_rsk(req)->snt_tsval_first)
->>>                         tcp_rsk(req)->snt_tsval_first = opts->tsval;
->>>                 WRITE_ONCE(tcp_rsk(req)->snt_tsval_last, opts->tsval);
->>>                 opts->tsecr = READ_ONCE(req->ts_recent)
->>
->>
->> Or is the goal to update this field as long as the timeout didn't fire?
->> In this case maybe req->num_timeout should be updated before calling
->> inet_rtx_syn_ack() in reqsk_timer_handler(), no?
->>
->>> Do not worry, I will make sure V2 is fine.
->>
->> I don't doubt about that, thank you! :)
-> 
-> I can see you are super excited to see this patch landing ;)
+Actually, it seems like a similar fix was already merged into Linux v6.11:
 
-Oh no, sorry, when I read your previous email, I understood you wanted
-me to look at it. That's why I took a bit of time this afternoon looking
-at all the places where req->num_timeout is incremented, and sent this
-email :)
+bac76cf89816b tcp: fix forever orphan socket caused by tcp_abort
 
-So no hurry for me to have this patch landed. All I wanted was it not to
-break MPTCP selftests, and help to understand why it was causing issues
-in the first place (not due to MPTCP apparently, for once :) )
+Details below.
 
-> I sent the V2, after running all my tests.
+Youngmin, does your kernel have this bac76cf89816b fix? If not, can
+you please cherry-pick this fix and retest?
 
-Thank you!
+Thanks!
+neal
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+ps: details for bac76cf89816b:
 
+commit bac76cf89816bff06c4ec2f3df97dc34e150a1c4
+Author: Xueming Feng <kuro@kuroa.me>
+Date:   Mon Aug 26 18:23:27 2024 +0800
+
+    tcp: fix forever orphan socket caused by tcp_abort
+
+    We have some problem closing zero-window fin-wait-1 tcp sockets in our
+    environment. This patch come from the investigation.
+
+    Previously tcp_abort only sends out reset and calls tcp_done when the
+    socket is not SOCK_DEAD, aka orphan. For orphan socket, it will only
+    purging the write queue, but not close the socket and left it to the
+    timer.
+
+    While purging the write queue, tp->packets_out and sk->sk_write_queue
+    is cleared along the way. However tcp_retransmit_timer have early
+    return based on !tp->packets_out and tcp_probe_timer have early
+    return based on !sk->sk_write_queue.
+
+    This caused ICSK_TIME_RETRANS and ICSK_TIME_PROBE0 not being resched
+    and socket not being killed by the timers, converting a zero-windowed
+    orphan into a forever orphan.
+
+    This patch removes the SOCK_DEAD check in tcp_abort, making it send
+    reset to peer and close the socket accordingly. Preventing the
+    timer-less orphan from happening.
+
+    According to Lorenzo's email in the v1 thread, the check was there to
+    prevent force-closing the same socket twice. That situation is handled
+    by testing for TCP_CLOSE inside lock, and returning -ENOENT if it is
+    already closed.
+
+    The -ENOENT code comes from the associate patch Lorenzo made for
+    iproute2-ss; link attached below, which also conform to RFC 9293.
+
+    At the end of the patch, tcp_write_queue_purge(sk) is removed because i=
+t
+    was already called in tcp_done_with_error().
+
+    p.s. This is the same patch with v2. Resent due to mis-labeled "changes
+    requested" on patchwork.kernel.org.
+
+    Link: https://patchwork.ozlabs.org/project/netdev/patch/1450773094-7978=
+-3-git-send-email-lorenzo@google.com/
+    Fixes: c1e64e298b8c ("net: diag: Support destroying TCP sockets.")
+    Signed-off-by: Xueming Feng <kuro@kuroa.me>
+    Tested-by: Lorenzo Colitti <lorenzo@google.com>
+    Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+    Reviewed-by: Eric Dumazet <edumazet@google.com>
+    Link: https://patch.msgid.link/20240826102327.1461482-1-kuro@kuroa.me
+    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index e03a342c9162b..831a18dc7aa6d 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -4637,6 +4637,13 @@ int tcp_abort(struct sock *sk, int err)
+                /* Don't race with userspace socket closes such as tcp_clos=
+e. */
+                lock_sock(sk);
+
++       /* Avoid closing the same socket twice. */
++       if (sk->sk_state =3D=3D TCP_CLOSE) {
++               if (!has_current_bpf_ctx())
++                       release_sock(sk);
++               return -ENOENT;
++       }
++
+        if (sk->sk_state =3D=3D TCP_LISTEN) {
+                tcp_set_state(sk, TCP_CLOSE);
+                inet_csk_listen_stop(sk);
+@@ -4646,16 +4653,13 @@ int tcp_abort(struct sock *sk, int err)
+        local_bh_disable();
+        bh_lock_sock(sk);
+
+-       if (!sock_flag(sk, SOCK_DEAD)) {
+-               if (tcp_need_reset(sk->sk_state))
+-                       tcp_send_active_reset(sk, GFP_ATOMIC,
+-                                             SK_RST_REASON_NOT_SPECIFIED);
+-               tcp_done_with_error(sk, err);
+-       }
++       if (tcp_need_reset(sk->sk_state))
++               tcp_send_active_reset(sk, GFP_ATOMIC,
++                                     SK_RST_REASON_NOT_SPECIFIED);
++       tcp_done_with_error(sk, err);
+
+        bh_unlock_sock(sk);
+        local_bh_enable();
+-       tcp_write_queue_purge(sk);
+        if (!has_current_bpf_ctx())
+                release_sock(sk);
+        return 0;
 
