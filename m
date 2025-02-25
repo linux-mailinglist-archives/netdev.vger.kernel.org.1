@@ -1,121 +1,79 @@
-Return-Path: <netdev+bounces-169265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 596F1A43292
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 02:45:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB88EA432BD
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 03:01:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7DC7189C619
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 01:45:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5F7117B313
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 02:01:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9705B22094;
-	Tue, 25 Feb 2025 01:45:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A5502030A;
+	Tue, 25 Feb 2025 02:01:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m0YNl8hV"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9CF0FC1D;
-	Tue, 25 Feb 2025 01:45:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E3C84C6E;
+	Tue, 25 Feb 2025 02:01:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740447932; cv=none; b=ZeFnJXXOywbFZAVgbTp51v18e5eK4n8LfjuIHrc+t7DdqzTjeSqon7gJ+NmFKI7fSefb/RqqCP6kdAHPERwk829cQwxfSd6f4yW20GO93Buu0ghwMKgzr8XDnItzhdjhLaNHSmQoVsaVW3tQdVTqZKnMQcuZhvO6dw5xaARsSTA=
+	t=1740448914; cv=none; b=bZEdTlzQrU9/fZwfkvk29rEp27MpBFKd058ASr1gORkjEPhGA26MleaNygvSfcBC1GGdtdMvEhRiy20Tu4DSZVVO/Q2P3KvGUz/5PtfmxnSANOd2R87n6qvN2SH7zCwju3mAAQ27yuiaJlBwL6XUbLshSCdolX4Q3Y7rgJ0obuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740447932; c=relaxed/simple;
-	bh=2+6V7qQVaa6iDdECCvN7iEz0i0TmM7x99EjDo6Sdr7M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=fYX2S9cy9EJ7PgrmBxYzCRVJr/tSIsxvs35GUlb6CFJZWegeTIjioSYFZO3B1JAV9H2o6lKQbpMUZ/SH6QBV10U/7FBpxwlGPq4wwkDmJ7rWKqgR8SalbaJEVoUKPuukSPmRd7Gd2vPbQ1D6aAmW7ulDsCoYMmtlJmbTdzJpZpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Z20fz3Lz5zdb7N;
-	Tue, 25 Feb 2025 09:40:43 +0800 (CST)
-Received: from kwepemg200005.china.huawei.com (unknown [7.202.181.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 137501402C3;
-	Tue, 25 Feb 2025 09:45:27 +0800 (CST)
-Received: from [10.174.176.70] (10.174.176.70) by
- kwepemg200005.china.huawei.com (7.202.181.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 25 Feb 2025 09:45:25 +0800
-Message-ID: <df5b1deb-7d72-4f52-86c2-959ea4dffad4@huawei.com>
-Date: Tue, 25 Feb 2025 09:45:12 +0800
+	s=arc-20240116; t=1740448914; c=relaxed/simple;
+	bh=24jiysXyB/JxeRxXGrThD+4qS8hUsrobbYzYvxv5lPA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nb/F8HQjGSNIKbo+oNGT64EdhNuTWa6CB42Y5y+jQuV1vb8nd7J1AZi/Bmuj9KmlRLB4PhB9sJ7/Ffu/eqNjqz7bW6Jp9XmYuWh15fyRlTS+UTGjB3e+qpPMsNUwV+9P9DdkBvDfZMMockxJMIKcDalVquLpb5wCKSe2wnh4PKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m0YNl8hV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10831C4CED6;
+	Tue, 25 Feb 2025 02:01:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740448913;
+	bh=24jiysXyB/JxeRxXGrThD+4qS8hUsrobbYzYvxv5lPA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=m0YNl8hVNoFUnLUYdBUeOSUQqFi/NzUh2IxX88Qn1nBbE8mqcAfiNoOZbZwaLzQtf
+	 l5x0F7/7X7AcH+mJypeRs0RJbWk4GKBbY6AIO6jl0HVx/lGfxwRb30J6dV8DSNTUvL
+	 /dihr4AzMzwMmM7oQm30NB9WTrJB9oexReCzvF7N3e7Un4tS79Mu+aSy7P+/j92cGv
+	 8dJ9bzyXYG9dQZ9gsOmhikj9CAM0VpjeM8U104aFyOe8Ev3Xy0pRGKBGbLE93lTSpY
+	 AzYZISjHKGN3lsKJytI6kyyO3+zdvpZTnws4MYR2waLZtXO1kt2P3TxW5IxtgXXCiD
+	 EYgsGn4O28c3g==
+Date: Mon, 24 Feb 2025 18:01:52 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Heiner Kallweit <hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ David Miller <davem@davemloft.net>, Daniel Golle <daniel@makrotopia.org>,
+ Qingfang Deng <dqfext@gmail.com>, SkyLake Huang
+ <SkyLake.Huang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Richard Cochran <richardcochran@gmail.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, linux-mediatek@lists.infradead.org,
+ linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH net-next 3/8] net: phy: add getters for public members
+ of struct phy_package_shared
+Message-ID: <20250224180152.6e0d3a8b@kernel.org>
+In-Reply-To: <b505ed6a-533d-42ad-82d0-93315ce27e7f@gmail.com>
+References: <c02c50ab-da01-4cfa-af72-4bed109fa8e2@gmail.com>
+	<b505ed6a-533d-42ad-82d0-93315ce27e7f@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] xsk: fix __xsk_generic_xmit() error code when cq is
- full
-To: Magnus Karlsson <magnus.karlsson@gmail.com>, Stanislav Fomichev
-	<stfomichev@gmail.com>
-CC: <bjorn@kernel.org>, <magnus.karlsson@intel.com>,
-	<maciej.fijalkowski@intel.com>, <jonathan.lemon@gmail.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <ast@kernel.org>,
-	<daniel@iogearbox.net>, <hawk@kernel.org>, <john.fastabend@gmail.com>,
-	<yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
-	<netdev@vger.kernel.org>, <bpf@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20250222093007.3607691-1-wangliang74@huawei.com>
- <CAJ8uoz1fZ3zYVKergPn-QYRQEpPfC_jNgtY3wzoxxJWFF22LKA@mail.gmail.com>
- <Z7yXhHezJTgYh76T@mini-arch>
- <CAJ8uoz12bmCPsr_LFwCDypiwzmH+U7TeLqqykgRhp=8vKX4nQw@mail.gmail.com>
-From: Wang Liang <wangliang74@huawei.com>
-In-Reply-To: <CAJ8uoz12bmCPsr_LFwCDypiwzmH+U7TeLqqykgRhp=8vKX4nQw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemg200005.china.huawei.com (7.202.181.32)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Wed, 19 Feb 2025 22:04:47 +0100 Heiner Kallweit wrote:
+> +struct device_node *phy_package_shared_get_node(struct phy_device *phydev);
+> +void *phy_package_shared_get_priv(struct phy_device *phydev);
 
-在 2025/2/25 1:14, Magnus Karlsson 写道:
-> On Mon, 24 Feb 2025 at 17:00, Stanislav Fomichev <stfomichev@gmail.com> wrote:
->> On 02/24, Magnus Karlsson wrote:
->>> On Sat, 22 Feb 2025 at 10:18, Wang Liang <wangliang74@huawei.com> wrote:
->>>> When the cq reservation is failed, the error code is not set which is
->>>> initialized to zero in __xsk_generic_xmit(). That means the packet is not
->>>> send successfully but sendto() return ok.
->>>>
->>>> Set the error code and make xskq_prod_reserve_addr()/xskq_prod_reserve()
->>>> return values more meaningful when the queue is full.
->>> Hi Wang,
->>>
->>> I agree that this would have been a really good idea if it was
->>> implemented from day one, but now I do not dare to change this since
->>> it would be changing the uapi. Let us say you have the following quite
->>> common code snippet for sending a packet with AF_XDP in skb mode:
->>>
->>> err = sendmsg();
->>> if (err && err != -EAGAIN && err != -EBUSY)
->>>      goto die_due_to_error;
->>> continue with code
->>>
->>> This code would with your change go and die suddenly when the
->>> completion ring is full instead of working. Maybe there is a piece of
->>> code that cleans the completion ring after these lines of code and
->>> next time sendmsg() is called, the packet will get sent, so the
->>> application used to work.
->>>
->>> So I say: let us not do this. But if anyone has another opinion, please share.
->> Can we return -EBUSY from this 'if (xsk_cq_reserve_addr_locked())' case as
->> well?
-> That is a good idea! Though I would return -EAGAIN. When -EBUSY is
-> returned, the buffer was consumed but not sent. But -EAGAIN means that
-> the user just has to perform then sendmsg() again and that is exactly
-> what the user has to do here too.
-
-
-Thank you for the suggestion!
-Changing the uapi is indeed a high-risk act. Return -EAGAIN is a much 
-better choice.
-The cq is full usually because it is not released in time, try to send 
-msg again is appropriate.
-I will send a new patch later, and look forward to getting more advice. 
-Thanks.
-
-
+A bit sad that none of the users can fit in a line with this naming.
+Isn't "shared" implied by "package" here ?
+How would you feel about phy_package_get_priv() ?
 
