@@ -1,190 +1,247 @@
-Return-Path: <netdev+bounces-169403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1007A43B98
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 11:29:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1C74A43B87
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 11:28:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4746D423516
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:23:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBF7A3BDDAB
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:24:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FB0426658B;
-	Tue, 25 Feb 2025 10:21:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A9AF267F42;
+	Tue, 25 Feb 2025 10:22:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Rrq7nidp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YrNSTlVL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9128199931
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 10:21:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164D2267B9C
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 10:22:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740478889; cv=none; b=AVcUvndUKNLBxqnacQO3QXtpB0DNUpl98H6ztnXpqwV6dtFlA5buElFy396pLT+ClwMzD53ysHFYCY4EiTXofcyOjdNWaq07PNxecC0SbRkl2TQ5+K+wH4COQSogXOxo9bXrfIIHkQRf6/BnBNz5zp7JKwZ8X/LY6VStVQLqxAw=
+	t=1740478934; cv=none; b=aebACTB4gJw7pLubECseFOIQ2Wz32aTbRbvoacQ2KEVJuua2kHcXl4MauDfSvppld7bo/2NhO3aaAfEUlng44MRF2uBKK8gyEGTj4362drbnJ2XySo2ps+MdqLcJvi9OXBVzUfzfkwO+rrCz0ym5aRPc6D3pTGpFxMEtjMcYOaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740478889; c=relaxed/simple;
-	bh=C2oBCIh40Uo2sRbtgS3V2zZY2p3qcwdSfi51JffFrJw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RzbrPuGXDf81VAmk1xAK9ReWe/9FHgzYj0LWI1GvjcDe6nJ8UVDKgzj4FjZNQOcgfhdCpOniCN8AdYaiAf67XiHZxq/EPAe0ixP394zj6UDONPpV0JcxnOg3aQcv1PpSYoJim3b+fAS1lSDXVq3zDuURysPtayH6Y+rs4necrZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Rrq7nidp; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5dedd4782c6so10044285a12.3
-        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 02:21:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740478886; x=1741083686; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HYOhXzCvS79eHMrb8gADmSyJ5Or8uMXx3EEs0rcyef8=;
-        b=Rrq7nidpUmEO7wpwMM023kLuk6Et3xoGiU/338d7WU8Vw665gwmerM4ohHyUY2NpjP
-         /CsSh82dj67jA8ww25TnMt/oSPtEfnm4Krsyl6BeXmp6A1WC2y54muUZjMQ/FPgesW1+
-         QKEXcLnJ5fpLVtdmdRr2bLyySE2Pq4leQ/9qnwiDTIQqCKqRkYG/wLqUR37IZap6E4Ui
-         F8saVbGrllTGLC6R0K/ybE1g7U8I84ZQnEVHpOTI8y5N2d9GCvn4EB0aUtjd0EJPeVYY
-         7ezYsbqdn6OciAXoLV+1Nd7ZE6RNWVUU7hTJvJCfAS6ufYtnWAu34tjxMfkg914vTuKJ
-         R08g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740478886; x=1741083686;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HYOhXzCvS79eHMrb8gADmSyJ5Or8uMXx3EEs0rcyef8=;
-        b=lqjuw7ErFFWoBqW58opUakd2/8S9uDUOtuSu5fKWH1jPfuIH8OjBMsPBaD7UmLHG3W
-         IOLl2c1IYhCxpqntZYBt3xuGxpVKt3k2epz67NYyJ0RgtVS5DXAU4isX4tSZ7RAPFSjJ
-         YriHu3SZmuIBjjZvjXas+HtY0Uc59TphkuIlWGa2XsnrbqfyHHgWuVkrUynAlpjKNf2M
-         VSplRCH3ZMShi0cpOdnJ6mfy4bDF/dOBHoH1AazMPa7zRQ6oIoKPuxCQl+xK7NcJ5+YI
-         1PnASx4R9KniK4uIfcTYKxxjnKvFaiUpgix8OVkekL/+RUgic65Og1jRGXSicbWj2qgA
-         K1Xw==
-X-Forwarded-Encrypted: i=1; AJvYcCVVdgyVzulqmBA3Z8Xv6+QoxEx/2HUBqhpHsrjJuJupNY8uQlgBegExovxaXinmzTkxNlCEvXo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywd6FTNJoXZ23jYv8cWv7DrcKjR50VNkK1tXIjYjrb0XSAS0rAw
-	FOCyM2R7t5laitN0Qzxrdx00rNUwaP1kT7SQp4j+EisVrwKgquYZeNJndf7BxiSu4Kgf4Jz3XF2
-	w4up3Pm7zCH3Q6OW8X/6PgedGdJKplrY0R4iA
-X-Gm-Gg: ASbGncs7m71sgyWNC79ET1j+M6pmp08BzmzVvMRi93K3ryDVUZuWucnC2dpFyeBMYY2
-	hW7H9EZiLTYF1YAG9+GMAK2JD/CtDb9E0gg2lLyIuPbviorPTTjpQsrVkq6xFcxBK/nc8AiLvLO
-	5TYVKw0+e3
-X-Google-Smtp-Source: AGHT+IExencjeu3IPdOjSQfGC2bxpFY8qFQUPq24NFIQp9PyPsobpRHCFo5zPp2hqzNCZB7GCi/xszck8ci/bfsmR28=
-X-Received: by 2002:a05:6402:520d:b0:5d3:d9f5:bf08 with SMTP id
- 4fb4d7f45d1cf-5e44448155cmr2383503a12.7.1740478885885; Tue, 25 Feb 2025
- 02:21:25 -0800 (PST)
+	s=arc-20240116; t=1740478934; c=relaxed/simple;
+	bh=v9twrmLMUDvtPrU79VyArvUo+LlqBK8BJXTwvQSKJQw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ony5Xhe9Khl6Vl946j6koApjwqhP2SpwJ9Ez6e+npJ6NoGdHKCb18iwS++eUk5YiLoFQmi8zL3ldwdYvFO/EV0zEvReb7cZQ0pULip9xqD8JT+YSXP4R9s+YGIsAKgNwNsNAqRKdtGAo4b3ZmajSTYnwURKtAnZs8FW+j4WxxjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YrNSTlVL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC0CDC4CEE8;
+	Tue, 25 Feb 2025 10:22:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740478933;
+	bh=v9twrmLMUDvtPrU79VyArvUo+LlqBK8BJXTwvQSKJQw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YrNSTlVLchFo7ick0DndFzAAKh75PBrP95jjkzQQpZxxtvRfFOLq93T16vkxpxwy7
+	 9k3IQxUs1jEHUjUsmLQqRYBrqW+SBv650zTmFRjStkVUyq2V0M55+y3trGDPWCnVMB
+	 RdeBTAxv+kfqE2FYtsk9PNz2kLhx4nckcrnVL8u6+2WEE0twtpNt4G/hqQAw/VHeOA
+	 RemgyC/Fp3xVZQ+MAsY9Uq0Uz08O99RckHT6XYFwpwegIYBRIrYfS3DdAlZ46CHCfw
+	 KN2i0DViHp+garDsxpKE8N5r/GRm19I6NyemV/dmLJv0sSKJ84iWJNM9Zd+5an701B
+	 o4p356k4TLtpg==
+Date: Tue, 25 Feb 2025 10:22:08 +0000
+From: Simon Horman <horms@kernel.org>
+To: Xin Tian <tianx@yunsilicon.com>
+Cc: netdev@vger.kernel.org, leon@kernel.org, andrew+netdev@lunn.ch,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	davem@davemloft.net, jeff.johnson@oss.qualcomm.com,
+	przemyslaw.kitszel@intel.com, weihg@yunsilicon.com,
+	wanry@yunsilicon.com, parthiban.veerasooran@microchip.com,
+	masahiroy@kernel.org
+Subject: Re: [PATCH v4 05/14] net-next/yunsilicon: Add eq and alloc
+Message-ID: <20250225102208.GS1615191@kernel.org>
+References: <20250213091402.2067626-1-tianx@yunsilicon.com>
+ <20250213091412.2067626-6-tianx@yunsilicon.com>
+ <20250218171036.GB1615191@kernel.org>
+ <b0adf539-8104-452d-ba34-14a120602bd5@yunsilicon.com>
+ <20250224185817.GH1615191@kernel.org>
+ <9b96cab4-e433-4752-a668-1d8ff262be2a@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250224110654.707639-1-edumazet@google.com> <4f37d18c-6152-42cf-9d25-98abb5cd9584@redhat.com>
- <af310ccd-3b5f-4046-b8d7-ab38b76d4bde@kernel.org> <CANn89iJfXJi7CL2ekBo9Zn9KtVTRxwMCZiSxdC21uNfkdNU1Jg@mail.gmail.com>
- <927c8b04-5944-4577-b6bd-3fc50ef55e7e@kernel.org>
-In-Reply-To: <927c8b04-5944-4577-b6bd-3fc50ef55e7e@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 25 Feb 2025 11:21:14 +0100
-X-Gm-Features: AQ5f1JqlAiB1IILIbCxx_GgyikILffUZf9GqJoyYBZ_jUh6AIMota3zXWcS-YZI
-Message-ID: <CANn89iJu5dPMF3BFN7bbNZR-zZF_xjxGqstHucmBc3EvcKZXJw@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: be less liberal in tsecr received while in
- SYN_RECV state
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Jakub Kicinski <kuba@kernel.org>, 
-	Yong-Hao Zou <yonghaoz1994@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
-	Neal Cardwell <ncardwell@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9b96cab4-e433-4752-a668-1d8ff262be2a@yunsilicon.com>
 
-On Tue, Feb 25, 2025 at 11:19=E2=80=AFAM Matthieu Baerts <matttbe@kernel.or=
-g> wrote:
->
-> Hi Eric,
->
-> On 25/02/2025 11:11, Eric Dumazet wrote:
-> > On Tue, Feb 25, 2025 at 11:09=E2=80=AFAM Matthieu Baerts <matttbe@kerne=
-l.org> wrote:
-> >>
-> >> Hi Paolo, Eric,
-> >>
-> >> On 25/02/2025 10:59, Paolo Abeni wrote:
-> >>> On 2/24/25 12:06 PM, Eric Dumazet wrote:
-> >>>> Yong-Hao Zou mentioned that linux was not strict as other OS in 3WHS=
-,
-> >>>> for flows using TCP TS option (RFC 7323)
-> >>>>
-> >>>> As hinted by an old comment in tcp_check_req(),
-> >>>> we can check the TSecr value in the incoming packet corresponds
-> >>>> to one of the SYNACK TSval values we have sent.
-> >>>>
-> >>>> In this patch, I record the oldest and most recent values
-> >>>> that SYNACK packets have used.
-> >>>>
-> >>>> Send a challenge ACK if we receive a TSecr outside
-> >>>> of this range, and increase a new SNMP counter.
-> >>>>
-> >>>> nstat -az | grep TcpExtTSECR_Rejected
-> >>>> TcpExtTSECR_Rejected            0                  0.0
-> >>
-> >> (...)
-> >>
-> >>> It looks like this change causes mptcp self-test failures:
+On Tue, Feb 25, 2025 at 10:34:24AM +0800, Xin Tian wrote:
+> On 2025/2/25 2:58, Simon Horman wrote:
+> > On Thu, Feb 20, 2025 at 11:35:26PM +0800, tianx wrote:
+> >> On 2025/2/19 1:10, Simon Horman wrote:
+> >>> On Thu, Feb 13, 2025 at 05:14:14PM +0800, Xin Tian wrote:
+> > ...
+> >
+> >>>> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.c b/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.c
+> >>> ...
 > >>>
-> >>> https://netdev-3.bots.linux.dev/vmksft-mptcp/results/6642/1-mptcp-joi=
-n-sh/stdout
+> >>>> +/* Handling for queue buffers -- we allocate a bunch of memory and
+> >>>> + * register it in a memory region at HCA virtual address 0.  If the
+> >>>> + * requested size is > max_direct, we split the allocation into
+> >>>> + * multiple pages, so we don't require too much contiguous memory.
+> >>>> + */
+> >>> I can't help but think there is an existing API to handle this.
+> >> failed to find one
+> > Yes, me neither.
+> >
+> >>>> +int xsc_buf_alloc(struct xsc_core_device *xdev, int size, int max_direct,
+> >>> I think unsigned long would be slightly better types for size and max_direct.
+> >> yes, will modify
+> >>>> +		  struct xsc_buf *buf)
+> >>>> +{
+> >>>> +	dma_addr_t t;
+> >>>> +
+> >>>> +	buf->size = size;
+> >>>> +	if (size <= max_direct) {
+> >>>> +		buf->nbufs        = 1;
+> >>>> +		buf->npages       = 1;
+> >>>> +		buf->page_shift   = get_order(size) + PAGE_SHIFT;
+> >>>> +		buf->direct.buf   = dma_alloc_coherent(&xdev->pdev->dev,
+> >>>> +						       size,
+> >>>> +						       &t,
+> >>>> +						       GFP_KERNEL | __GFP_ZERO);
+> >>>> +		if (!buf->direct.buf)
+> >>>> +			return -ENOMEM;
+> >>>> +
+> >>>> +		buf->direct.map = t;
+> >>>> +
+> >>>> +		while (t & ((1 << buf->page_shift) - 1)) {
+> >>> I think GENMASK() can be used here.
+> >> ok
+> >>>> +			--buf->page_shift;
+> >>>> +			buf->npages *= 2;
+> >>>> +		}
+> >>>> +	} else {
+> >>>> +		int i;
+> >>>> +
+> >>>> +		buf->direct.buf  = NULL;
+> >>>> +		buf->nbufs       = (size + PAGE_SIZE - 1) / PAGE_SIZE;
+> >>> I think this is open-coding DIV_ROUND_UP
+> >> right, I'll change
+> >>>> +		buf->npages      = buf->nbufs;
+> >>>> +		buf->page_shift  = PAGE_SHIFT;
+> >>>> +		buf->page_list   = kcalloc(buf->nbufs, sizeof(*buf->page_list),
+> >>>> +					   GFP_KERNEL);
+> >>>> +		if (!buf->page_list)
+> >>>> +			return -ENOMEM;
+> >>>> +
+> >>>> +		for (i = 0; i < buf->nbufs; i++) {
+> >>>> +			buf->page_list[i].buf =
+> >>>> +				dma_alloc_coherent(&xdev->pdev->dev, PAGE_SIZE,
+> >>>> +						   &t, GFP_KERNEL | __GFP_ZERO);
+> >>>> +			if (!buf->page_list[i].buf)
+> >>>> +				goto err_free;
+> >>>> +
+> >>>> +			buf->page_list[i].map = t;
+> >>>> +		}
+> >>>> +
+> >>>> +		if (BITS_PER_LONG == 64) {
+> >>>> +			struct page **pages;
+> >>>> +
+> >>>> +			pages = kmalloc_array(buf->nbufs, sizeof(*pages),
+> >>>> +					      GFP_KERNEL);
+> >>>> +			if (!pages)
+> >>>> +				goto err_free;
+> >>>> +			for (i = 0; i < buf->nbufs; i++) {
+> >>>> +				void *addr = buf->page_list[i].buf;
+> >>>> +
+> >>>> +				if (is_vmalloc_addr(addr))
+> >>>> +					pages[i] = vmalloc_to_page(addr);
+> >>>> +				else
+> >>>> +					pages[i] = virt_to_page(addr);
+> >>>> +			}
+> >>>> +			buf->direct.buf = vmap(pages, buf->nbufs,
+> >>>> +					       VM_MAP, PAGE_KERNEL);
+> >>>> +			kfree(pages);
+> >>>> +			if (!buf->direct.buf)
+> >>>> +				goto err_free;
+> >>>> +		}
+> >>> I think some explanation is warranted of why the above is relevant
+> >>> only when BITS_PER_LONG == 64.
+> >> Some strange historical reasons, and no need for the check now. I'll
+> >> clean this up
+> > Thanks.
+> >
+> > If you do need 64bit only logic, then perhaps it can be moved to a
+> > separate function. It could guard code using something like this.
+> >
+> > int some_func(struct xsc_buf *buf)
+> > {
+> > 	if (!IS_ENABLED(CONFIG_64BIT))
+> > 		return 0;
+> >
+> > 	...
+> > }
+> >
+> > Or if that is not possible, something like this:
+> >
+> > #ifdef CONFIG_64BIT
+> > int some_func(struct xsc_buf *buf)
+> > {
+> > 	...
+> > }
+> > #else /* CONFIG_64BIT */
+> > int some_func(struct xsc_buf *buf) { return 0; }
+> > #fi /* CONFIG_64BIT */
+> >
+> >>>> +	}
+> >>>> +
+> >>>> +	return 0;
+> >>>> +
+> >>>> +err_free:
+> >>>> +	xsc_buf_free(xdev, buf);
+> >>>> +
+> >>>> +	return -ENOMEM;
+> >>>> +}
+> >>> ...
 > >>>
-> >>> ipv6 subflows creation fails due to the added check:
+> >>>> +void xsc_fill_page_array(struct xsc_buf *buf, __be64 *pas, int npages)
+> >>> As per my comment on unsigned long in my response to another patch,
+> >>> I think npages can be unsigned long.
+> >> ok
+> >>>> +{
+> >>>> +	int shift = PAGE_SHIFT - PAGE_SHIFT_4K;
+> >>>> +	int mask = (1 << shift) - 1;
+> >>> Likewise, I think that mask should be an unsigned long.
+> >>> Or, both shift and mask could be #defines, as they are compile-time
+> >>> constants.
 > >>>
-> >>> # TcpExtTSECR_Rejected            3                  0.0
+> >>> Also, mask can be generated using GENMASK, e.g.
+> >>>
+> >>> #define XSC_PAGE_ARRAY_MASK GENMASK(PAGE_SHIFT, PAGE_SHIFT_4K)
+> >>> #define XSC_PAGE_ARRAY_SHIFT (PAGE_SHIFT - PAGE_SHIFT_4K)
+> >>>
+> >>> And I note, in the (common) case of 4k pages, that both shift and mask are 0.
+> >> Thank you for the suggestion, but that's not quite the case here. The
+> >> |shift| and |mask| are not used to extract fields from data. Instead,
+> >> they are part of a calculation. In |xsc_buf_alloc|, we allocate the
+> >> buffer based on the system's page size. However, in this function, we
+> >> need to break each page in the |buflist| into 4KB chunks, populate the
+> >> |pas| array with the corresponding DMA addresses, and then map them to
+> >> hardware.
 > >>
-> >> You have been faster to report the issue :-)
+> >> The |shift| is calculated as |PAGE_SHIFT - PAGE_SHIFT_4K|, allowing us
+> >> to convert the 4KB chunk index (|i|) to the corresponding page index in
+> >> |buflist| with |i >> shift|. The |i & mask| gives us the offset of the
+> >> current 4KB chunk within the page, and by applying |((i & mask) <<
+> >> PAGE_SHIFT_4K)|, we can compute the offset of that chunk within the page.
 > >>
-> >>> (for unknown reasons the ipv4 variant of the test is successful)
-> >>
-> >> Please note that it is not the first time the MPTCP test suite caught
-> >> issues with the IPv6 stack. It is likely possible the IPv6 stack is le=
-ss
-> >> covered than the v4 one in the net selftests. (Even if I guess here th=
-e
-> >> issue is only on MPTCP side.)
+> >> I hope this makes things clearer!
+> > Thanks, that is clear.
 > >
-> >
-> > subflow_prep_synack() does :
-> >
-> >  /* clear tstamp_ok, as needed depending on cookie */
-> > if (foc && foc->len > -1)
-> >      ireq->tstamp_ok =3D 0;
-> >
-> > I will double check fastopen code then.
->
-> Fastopen is not used in the failing tests. To be honest, it is not clear
-> to me why only the two tests I mentioned are failing, they are many
-> other tests using IPv6 in the MP_JOIN.
+> > I do still think that the shift and mask could
+> > be compile-time constants rather than local variables.
+> > And it does seem to me that GENMASK can be used to generate the mask.
+> 
+> Hi, Simon,
+> 
+> Assuming we use GENMASK, the mask should be defined as GENMASK(shift - 
+> 1, 0).
+> 
+> When the system page size is 4K, shift will be 0, which will cause an error.
 
-Yet, clearing tstamp_ok might be key here.
-
-Apparently tcp_check_req() can get a non zero tmp_opt.rcv_tsecr even
-if tstamp_ok has been cleared at SYNACK generation.
-
-I would test :
-
-diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-index a87ab5c693b524aa6a324afe5bf5ff0498e528cc..0ed27f5c923edafdf4891960049=
-1eb1cb50bc913
-100644
---- a/net/ipv4/tcp_minisocks.c
-+++ b/net/ipv4/tcp_minisocks.c
-@@ -674,7 +674,8 @@ struct sock *tcp_check_req(struct sock *sk, struct
-sk_buff *skb,
-                if (tmp_opt.saw_tstamp) {
-                        tmp_opt.ts_recent =3D READ_ONCE(req->ts_recent);
-                        if (tmp_opt.rcv_tsecr) {
--                               tsecr_reject =3D !between(tmp_opt.rcv_tsecr=
-,
-+                               if (inet_rsk(req)->tstamp_ok)
-+                                       tsecr_reject =3D
-!between(tmp_opt.rcv_tsecr,
-
-tcp_rsk(req)->snt_tsval_first,
-
-READ_ONCE(tcp_rsk(req)->snt_tsval_last));
-                                tmp_opt.rcv_tsecr -=3D tcp_rsk(req)->ts_off=
-;
+Understood, so much for that idea.
 
