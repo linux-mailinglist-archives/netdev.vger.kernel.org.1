@@ -1,106 +1,110 @@
-Return-Path: <netdev+bounces-169569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81E2CA44A2C
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 19:24:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B5DEA44A71
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 19:33:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E682216764A
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 18:23:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D08FF86265D
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 18:25:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0759119E98D;
-	Tue, 25 Feb 2025 18:21:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B88B1DB12E;
+	Tue, 25 Feb 2025 18:23:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CVqql2uZ"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Tzcy6D17"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70D8F19DF4F;
-	Tue, 25 Feb 2025 18:21:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC921D63C6
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 18:23:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740507667; cv=none; b=uHnbVGh6RMr9EbPZdtHVGn0/PMLIdD2zL/cUthuAnF6Sj67/Ja6bNZA6vVThGguRz9sIATeuBBno8QAdk18x669L5xLuhHx+xn2yuMbVVMpe2o6LwtNQyKhvVra+KzL2G6vfIM5sPeWxRuyM945sfb8+/soXLzecyJ/GfUr+IDw=
+	t=1740507825; cv=none; b=Na6jjSAZYc3238FmZGusjWrF6slvYO/dN6xlCi0kew/4lWKVaaqyvDplLqlaTn9JmWIjzlonWMP0wTewRzuURkbH8AES8rNkojbdmuZCjPRT9GNzJUXqhDdlzvBsYr5Iym+KugInj2E3jedJ0Ck9qV7QMZt9tZJCIJ72+SC5VZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740507667; c=relaxed/simple;
-	bh=Cn/mewwWYXy4+YNwH4XczW57RlDnZqheZRJagcYXGkY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Y9lF6UExRDmAQSg4qyh3Qb9Oy0gTVASigbzcegYcT5BOanlBE7VKCRFDMRd3ouD7bDB8FWYb+4LGhoR8CUyZolm8LT+JlO1ee2f/1yz2P0Tr82JyY3BT4/VdAdA17qgALu80beNkKTFYkNND1FVIPaZaTECWrnBkudGvBAVnvZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CVqql2uZ; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 7B44B44469;
-	Tue, 25 Feb 2025 18:20:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1740507658;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fLHCu1SzDUA81bfOLrX40HQiaQBQLCEnAu274pcYQI8=;
-	b=CVqql2uZnn25u38xUpnKUfNUVQhNWeQZuyo6ovNiU1q2OF6rFT5LluPVTdNoaKf2ZsujlG
-	VOb37t+gS+AzpzdUlsffmNG0uh1OsUZY2+1GWauWuS4Vi3PaY4WYelX/aJwiaQTd7AtJWe
-	ewCKVjysXsjeSm5CUlMTgoNu6NGL72OEbEzqM6loCbrDNz8ndhEaW8E0MGwsggFhS+3C2S
-	CGRs0VMzSfV6FYN8LfaxQYM87mxjDMwaTCFKj0msLbuErOhH5NcH/jVbf6Bf5ZIG5o96Lj
-	gk8qeb2ljL2AndLEM4VHkx2J2jixaTIqZuC0oUPtajmQSEAKS9zVRdOi0eeJww==
-Date: Tue, 25 Feb 2025 19:20:55 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Florian Fainelli <f.fainelli@gmail.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Simon Horman
- <horms@kernel.org>, Romain Gantois <romain.gantois@bootlin.com>, Antoine
- Tenart <atenart@kernel.org>, Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>,
- Sean Anderson <sean.anderson@linux.dev>, =?UTF-8?B?QmrDuHJu?= Mork
- <bjorn@mork.no>
-Subject: Re: [PATCH net-next v2 1/2] net: phy: sfp: Add support for SMBus
- module access
-Message-ID: <20250225192055.32168b48@fedora.home>
-In-Reply-To: <Z74GLblGUPhHID8a@shell.armlinux.org.uk>
-References: <20250225112043.419189-1-maxime.chevallier@bootlin.com>
-	<20250225112043.419189-2-maxime.chevallier@bootlin.com>
-	<Z74GLblGUPhHID8a@shell.armlinux.org.uk>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1740507825; c=relaxed/simple;
+	bh=DigQ5HavSs9VmQ4Athi7l6gsXNnOK7D5avpL9FnF/l0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=c5oyzDc5QzrS2tbTyk3Jydio0cwrbxBb23tQ9oZPCACGa5I+/bs191bGW2ekjwuEogQaCqZXBLa/Ma7uOAyWB7VIpZ8hFIOhW2apWGtXkimImzkycE2GT1ZXZrUKOe08eNHslRworgUHBt7xeECQP9K0Xk8fR0qGjqKEp7ickWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Tzcy6D17; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1740507824; x=1772043824;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=MoaYwpRZGlY/DsDkAwT1IH2p3w9wLzLkuNsor2WiHkA=;
+  b=Tzcy6D17gHnbrsM/+51pq+UxkFj2v/e8GvRgcYCEEMkREoVj07D1BVjG
+   dNLVHGSsq+SgHF495xaoKZpsnd6EKz+HNR87kfiD7iTK2lgZB3xw6V1Gd
+   rIUH9CzAYEAEMGeCl8YJPIf1QdjLyfJLh+RA76ggh97p54JHTQeL1s1oo
+   s=;
+X-IronPort-AV: E=Sophos;i="6.13,314,1732579200"; 
+   d="scan'208";a="69146873"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2025 18:23:25 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:36054]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.48.97:2525] with esmtp (Farcaster)
+ id d42d56e4-16c8-41e4-a254-94aab6b20e51; Tue, 25 Feb 2025 18:23:24 +0000 (UTC)
+X-Farcaster-Flow-ID: d42d56e4-16c8-41e4-a254-94aab6b20e51
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 25 Feb 2025 18:23:04 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.100.5) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 25 Feb 2025 18:23:01 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v1 net-next 00/12] ipv4: fib: Convert RTM_NEWROUTE and RTM_DELROUTE to per-netns RTNL.
+Date: Tue, 25 Feb 2025 10:22:38 -0800
+Message-ID: <20250225182250.74650-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdekvdegudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedukedprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtt
- hhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D038UWB003.ant.amazon.com (10.13.139.157) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Tue, 25 Feb 2025 18:04:29 +0000
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+Patch 1 is a misc cleanup.
+Patch 2 ~ 8 converts two fib_info hash tables to per-netns.
+Patch 9 ~ 12 converts rtnl_lock() to rtnl_net_lcok().
 
-> On Tue, Feb 25, 2025 at 12:20:39PM +0100, Maxime Chevallier wrote:
-> > The SFP module's eeprom and internals are accessible through an i2c bus.
-> > However, all the i2c transfers that are performed are SMBus-style
-> > transfers for read and write operations.  
-> 
-> Note that there are SFPs that fail if you access them by byte - the
-> 3FE46541AA locks the bus if you byte access the emulated EEPROM at
-> 0x50, address 0x51. This is documented in sfp_sm_mod_probe().
-> 
-> So there's a very real reason for adding the warning - this module
-> will not work!
 
-That's indeed pretty serious and since we can't even read the
-eeprom, there's not even a chance to have, say, a list of modules that
-will break with 1-byte io. So indeed the warning is needed...
+Kuniyuki Iwashima (12):
+  ipv4: fib: Use cached net in fib_inetaddr_event().
+  ipv4: fib: Allocate fib_info_hash[] and fib_info_laddrhash[] by
+    kvmalloc_array().
+  ipv4: fib: Allocate fib_info_hash[] during netns initialisation.
+  ipv4: fib: Make fib_info_hashfn() return struct hlist_head.
+  ipv4: fib: Remove fib_info_laddrhash pointer.
+  ipv4: fib: Remove fib_info_hash_size.
+  ipv4: fib: Add fib_info_hash_grow().
+  ipv4: fib: Namespacify fib_info hash tables.
+  ipv4: fib: Hold rtnl_net_lock() for ip_fib_net_exit().
+  ipv4: fib: Hold rtnl_net_lock() in ip_rt_ioctl().
+  ipv4: fib: Move fib_valid_key_len() to rtm_to_fib_config().
+  ipv4: fib: Convert RTM_NEWROUTE and RTM_DELROUTE to per-netns RTNL.
 
-Thanks
+ include/net/ip_fib.h     |   2 +
+ include/net/netns/ipv4.h |   3 +
+ net/ipv4/fib_frontend.c  |  72 ++++++++++----
+ net/ipv4/fib_semantics.c | 207 +++++++++++++++++++--------------------
+ net/ipv4/fib_trie.c      |  22 -----
+ 5 files changed, 158 insertions(+), 148 deletions(-)
 
-Maxime
+-- 
+2.39.5 (Apple Git-154)
+
 
