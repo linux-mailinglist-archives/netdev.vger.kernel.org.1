@@ -1,134 +1,141 @@
-Return-Path: <netdev+bounces-169467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5366A440F3
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 14:36:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAF25A4412E
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 14:45:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E8033A74BF
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 13:36:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 114DB162A7D
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 13:40:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAB3A26982F;
-	Tue, 25 Feb 2025 13:36:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377FC269B12;
+	Tue, 25 Feb 2025 13:39:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="zKBcbCuE"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=gus@collabora.com header.b="AZfPrdW1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A08A2269819
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 13:36:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740490574; cv=none; b=Ab9n0IQzCGoaNqY6wrtBIYZ3XseFccLp/c8R73Tee3G2aPIoiFy1+BTR9coWmHKbFWUEq0MawMZmI2kSJsqijXZvKPejWsTV1sueSjGgrnlHfgLCJdmDN95PKGOsfhmBWeU1ujhi6XqB5LZ/QSKuOBHCARqBic+Hgg7ayOx7mKE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740490574; c=relaxed/simple;
-	bh=6zIDGY7o8wonG5XSWfvfNzMNhLDCQ4e5sFlmf6YJhHg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZTL1T6VKnnvRVSitzriIURu7JnRwYGvWdEt3ETX3DqIyvWfVnsytLoHhr4/GSvSbUQ2WL7+endbLOimL+1Vsrkb3HftVhgH+S10nEWY9wEFKhaYgf3X/mYZKMz1CSs6JAimCB4VJIZ43OrVA3SQ6k/BIO3rTm2Oe1vrzUpq2+uU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=zKBcbCuE; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-abb999658fbso698227666b.3
-        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 05:36:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1740490571; x=1741095371; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=AZPYRoqfrPagvwL/VaIj4ZSda7O5NYpHMyVSIETeVto=;
-        b=zKBcbCuET1NBYuwsZqMtPPNWwln0LKbAGf9DiFhMvxHo3ePFgv2ZRwHQ1m+/X3IXF0
-         /0SyQqa7PogVHz8goMiWLt/TcbuRvjr61hXI6Yae2IYtOQ8Qc2PTJ6GeOKMcJm07Lj1S
-         7OKvrE31v1Jg1a7dgnH6XD2udWEbDnBhB3JWSufEr3izLLu6QVF4woo+GD4kOay2Dbxx
-         6+6LshdWjmMXJiGBnp8jmvL4CP1ppPdxBwzFEiVr32IaTGIAk0VIHGawXnTF4Ng7F7Mp
-         Nv8dajrEdryY97lRYRzVO5k7lLkXEGcYFFF+DloGD19YYuiCmIjxymramJBqepcGpBQY
-         zHOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740490571; x=1741095371;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AZPYRoqfrPagvwL/VaIj4ZSda7O5NYpHMyVSIETeVto=;
-        b=SEAAZcMX+MGwpGaWUUL67fBRKOTqaBdbNmKI/rp1BzHFAB0L6LnXMGVUF7tLsw3aPU
-         /KNkJMw3Umtt2BbKVIKtChh0KWZDao1QfeLf4ypcxlATwh2UUbbpO7cKjVskCOmxM4Fw
-         ktxtw+fxVV1Zj8kVFNU3OozLzIQGu7B0nasUYBbRkDIYmGgfJPhhpas4BS+cJV+XtjRI
-         YfFoc5bSw1IzxYB1AqY3RitBFq43APu+Moi3tLFRkjrREWFBuxHBCLKSVmkCYEvFmduR
-         p+UlOPIkkunRCUJdE+gM4Hki9xx4LMxRPZnP9r1YgXO+SFNYussxKdauMskksBAnceN3
-         Nx7A==
-X-Forwarded-Encrypted: i=1; AJvYcCV6h0i922IMjhGfsTBGucRUMszA5GIM7PHLhZljHtYRFV/vJHjv29Prr4hvV+bdUMH6drvuLMU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXPoFBH/EbuDxXt/kT0zgEhBZCJWk3GNl43Z1KJRzVTvUCUbYs
-	LaUwIzd6IaYm+joF6vJf0yYDnueA+29ROcgBf5Ge/sQpwO10bV3C9kqNtlbxcbg=
-X-Gm-Gg: ASbGncs6gL0lU+uJMrPzMXY/Cf9+aqDNhOkkVSJdLjEmTdwQ/C84f26ww9ZrQg0pfXL
-	C4TnfqbMwomyIyTPYREcdDf+EvS1ZvSpbzA8c31Zm0NiHUr5oBYSyVs69FFOTPkoACJwRDL77J/
-	OVCqLlwxit5Y9GrFOUJ62k6vMl5CxDf9oqdWeamotwykjvTNjBgVpPuQnnl3dwR7lHSRXRzL9l4
-	AAmC9hvMQpLRjBYVhcctL4Y4hPmGUSujfRZ1A529aa3YM4UWl/CeCK1jTL2MH6XyYp4tSbFmBH2
-	T9NVfaS6c6ZRvo0PM3SlKYQrtQssDdrE8qd4DocqK5H/YXseZE7oSw==
-X-Google-Smtp-Source: AGHT+IGwZxstsJgbZbrGjWctQYTkmnZEeqGMf6YIvXycHvPmwGPJt3l7AO/RiG5BKR9nAP88NqhdmQ==
-X-Received: by 2002:a05:6402:4604:b0:5e0:7cc4:ec57 with SMTP id 4fb4d7f45d1cf-5e44bb37281mr6445272a12.31.1740490570625;
-        Tue, 25 Feb 2025 05:36:10 -0800 (PST)
-Received: from jiri-mlt.client.nvidia.com ([140.209.217.212])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abed2057276sm143453466b.142.2025.02.25.05.36.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Feb 2025 05:36:10 -0800 (PST)
-Date: Tue, 25 Feb 2025 14:36:07 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Tariq Toukan <tariqt@nvidia.com>, 
-	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Jiri Pirko <jiri@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>, 
-	Carolina Jubran <cjubran@nvidia.com>, Gal Pressman <gal@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next 03/10] devlink: Serialize access to rate domains
-Message-ID: <qaznnl77zg24zh72axtv7vhbfdbxnzmr73bqr7qir5wu2r6n52@ob25uqzyxytm>
-References: <20250213180134.323929-1-tariqt@nvidia.com>
- <20250213180134.323929-4-tariqt@nvidia.com>
- <ieeem2dc5mifpj2t45wnruzxmo4cp35mbvrnsgkebsqpmxj5ib@hn7gphf6io7x>
- <20250218182130.757cc582@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65F55269B1C
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 13:39:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740490748; cv=pass; b=TGQfy7ywhWIvgUfkYdYCeEAYU08s2dJdDR5UdlzXfzMcUXP7Qcb9AWppI6AgU8SMjJzM0ckM9Tp2XKuaIKULlGm+dG5Ou+oXZ1glx8Q5xgrPyynMNClOpXuLQ1wTf7dnxb1EbL8cZ0EwqqG0j00RPhMPB/ZLkbPF5ym6UBzCwNA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740490748; c=relaxed/simple;
+	bh=Er8L/RidarTahqR7VycrG4OSXqfTiHAybWHQ6rol/5o=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=mDfVk/XvnwLPKh3WH/q5KIYziyeEsoOcgdq8BAryHW1r8TSzYBHJFTZe/faZeMOjfd+PWuXruMnev5iPAwFUtNubBOBkHdzU2+g3utQL4Aeaoq5hVt4nCxCxrEZUzTrl7DTQ8XQdwNW/gMIrm/6x/iWbRWm1FmRlEboH9oqflTs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=gus@collabora.com header.b=AZfPrdW1; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1740490723; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=PwggEEaZ9CQ2GimeIZGS1fmbi59boeo/kXePKMhJ2kcELz5F+pwwS7V5Gu0bqr+m09VOmQJInMo6L7Ra37jdBaT4j329+JwMt4vA4F9CnP23E6AKt72MFpaeRkCzjOgj3kV7e05+kWOHM17hEAMRIYvNgD54PhBdy2rxaS/gYWc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1740490723; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=Er8L/RidarTahqR7VycrG4OSXqfTiHAybWHQ6rol/5o=; 
+	b=OvE8JLmbyupMizpcVZwkCvMFhKetCZ7THftrTcirYcLzMS9HHjrXKLexpCvDKLhTF5dvnlYf3CH05Yzf9eOkUMKYSEU5/aK1aVUVeFFFd5JGTheaPw3An4828MFQyGj04SSMQTinsqjmb8xPwzmUmnJgkhd3JWah+DuhiR3QEVA=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=gus@collabora.com;
+	dmarc=pass header.from=<gus@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1740490723;
+	s=zohomail; d=collabora.com; i=gus@collabora.com;
+	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
+	bh=Er8L/RidarTahqR7VycrG4OSXqfTiHAybWHQ6rol/5o=;
+	b=AZfPrdW1ROB8wr0BspoOIaDwRjipKL5LrmmAC/s40lMo9SX7OcCnCQmAVzZeP7V0
+	gIgHDNk2LoBapnJtGyWO21kHBVDWDSZl3iGCOGjQ2NpzF9z4XaPHR1cFw6gkXx22Qlz
+	jaZI3whC9H5swCMAfAlga/Pzk2dbPH/FaFu31tpo=
+Received: by mx.zohomail.com with SMTPS id 1740490721679326.96450953391957;
+	Tue, 25 Feb 2025 05:38:41 -0800 (PST)
+Message-ID: <5e610cabe469732582afb752a0155ccf0e0d84fb.camel@collabora.com>
+Subject: Re: [PATCH v26 00/20] nvme-tcp receive offloads
+From: Gustavo Padovan <gus@collabora.com>
+To: Paolo Abeni <pabeni@redhat.com>, Aurelien Aptel <aaptel@nvidia.com>, 
+	linux-nvme@lists.infradead.org, netdev@vger.kernel.org, sagi@grimberg.me, 
+	hch@lst.de, kbusch@kernel.org, axboe@fb.com, chaitanyak@nvidia.com, 
+	davem@davemloft.net, kuba@kernel.org
+Cc: aurelien.aptel@gmail.com, smalin@nvidia.com, malin1024@gmail.com, 
+ ogerlitz@nvidia.com, yorayz@nvidia.com, borisp@nvidia.com,
+ galshalom@nvidia.com,  mgurtovoy@nvidia.com, edumazet@google.com
+Date: Tue, 25 Feb 2025 10:38:35 -0300
+In-Reply-To: <63ede1de-1ee3-4872-84b7-d65ec2f68856@redhat.com>
+References: <20250221095225.2159-1-aaptel@nvidia.com>
+	 <63ede1de-1ee3-4872-84b7-d65ec2f68856@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250218182130.757cc582@kernel.org>
+X-ZohoMailClient: External
 
-Wed, Feb 19, 2025 at 03:21:30AM +0100, kuba@kernel.org wrote:
->On Fri, 14 Feb 2025 13:54:43 +0100 Jiri Pirko wrote:
->> For the record, I'm still not convinced that introducing this kind of
->> shared inter-devlink lock is good idea. We spent quite a bit of painful
->> times getting rid of global devlink_mutex and making devlink locking
->> scheme nice and simple as it currently is.
->> 
->> But at the same time I admit I can't think of any other nicer solution
->> to the problem this patchset is trying to solve.
->> 
->> Jakub, any thoughts?
->
->The problem comes from having a devlink instance per function /
->port rather than for the ASIC. Spawn a single instance and the
->problem will go away 🤷️
-
-Yeah, we currently have VF devlink ports created under PF devlink instance.
-That is aligned with PCI geometry. If we have a single per-ASIC parent
-devlink, this does not change and we still need to configure cross
-PF devlink instances.
-
-The only benefit I see is that we don't need rate domain, but
-we can use parent devlink instance lock instead. The locking ordering
-might be a bit tricky to fix though.
+Hello,
 
 
->
->I think we talked about this multiple times, I think at least
->once with Jake, too. Not that I remember all the details now..
->-- 
->pw-bot: cr
+On Tue, 2025-02-25 at 11:12 +0100, Paolo Abeni wrote:
+> On 2/21/25 10:52 AM, Aurelien Aptel wrote:
+> > The next iteration of our nvme-tcp receive offload series, rebased
+> > on top of yesterdays
+> > net-next 671819852118 ("Merge branch 'selftests-drv-net-add-a-
+> > simple-tso-test'")
+> >=20
+> > We are pleased to announce that -as requested by Jakub- we now have
+> > continuous integration (via NIPA) testing running for this feature.
+>=20
+> I'm sorry for the dumb question, but can you please share more
+> details
+> on this point?
+>=20
+> I don't see any self-test included here, nor any test result feeded
+> to
+> the CI:
+>=20
+> https://netdev.bots.linux.dev/devices.html
+
+
+The integration is final stages of deployment. It is happening using
+KernelCI[1] as the hardware executor with the NICs hosted on a server
+in our lab and then publishing the results for NIPA consumption. We are
+currently working with Jakub on the integration of the results produced
+by KernelCI.
+
+Since last week, NIPA generates a special branch only for hw testing.
+This is the latest one for example:=20
+https://github.com/linux-netdev/testing/commits/net-next-2025-02-25--12-00/
+
+However, it doesn't include Aurelien patches yet, as from what I
+understood from Jakub, this new tree only includes patches that
+passed the existing SW CI. Currently this series has some fails:
+
+https://patchwork.kernel.org/project/netdevbpf/list/?series=3D936360
+
+Once, we get the series to pass the SW CI, I believe the patches
+will land in the hw testing branch and then be picked up by KernelCI
+for testing.
+
+For information purposes, here is the same test but being executed
+against aaptel tree last week:
+https://dashboard.kernelci.org/test/maestro:67b8d4ace3e60eeff606d9c7
+
+
+Once things are finalized, I'll send an email to the list describing
+the integration as I believe more folks might be interested in the
+integration through KernelCI.
+
+
+[1] https://kernelci.org/
+
+
+Best,
+
+- Gus
+
+
 
