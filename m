@@ -1,187 +1,129 @@
-Return-Path: <netdev+bounces-169378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C398BA439DC
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:40:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C1D0A439FB
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 10:43:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 630857AAF51
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 09:38:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95B34188778C
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 09:40:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3A4B26138C;
-	Tue, 25 Feb 2025 09:38:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8903726138E;
+	Tue, 25 Feb 2025 09:38:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HK3/pkvQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fOIslc/v"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B97F2770B;
-	Tue, 25 Feb 2025 09:38:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55DFB25A2CD
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 09:38:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740476298; cv=none; b=oA6g9XO1E9MxYJ7Aw2xZ+8Cyhkvo1hfNvI4d3XDNAvC2G7DmJg+hiDLpT0CjD/0yGvqZpLJH9HhkJtoKZPo9g4CnpB1Jj07KSLapoxLAaLuADrb4ymh3yrlKI8XF9XibN6XNt4K5PQCqTn7PzNLpJTOYxge60dSZPFL71RZGNUA=
+	t=1740476339; cv=none; b=SYw7wn7p9FDFSlf8cI6jbTddeOLE0kTF8UXCOSFRakOKow1VxzT0Ip3mZZzDbCIHQIpYz1R7mDkAfZQdJVQiHfZzPYMqkReR4rSLoUVr2hKN2XkGx/Ag0nV2Wbfli0++ZK4YhOouuJXbq2xUH7ToLAOl4SzDfx1+2eUxpePteTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740476298; c=relaxed/simple;
-	bh=KOoru/UvM5K/f5JN6eTxK6IWzYJgPBeHvrjFH+jOpOs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IQ3ielaSXMjcvRurahYJSDRdhf8huglCqrzDds9H4trIE7ec73BTBZSexmTA92YsxBOwHkss7cxxsguMsxXLA68HBwdO2NPoNk1ckt8WE3yP1uw5J2+/cE9T7aA/CxsK5B5TYiHLKz7hlMTu8RfylYPSix/IzWHUP8Rjo5ByHEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=HK3/pkvQ; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 600024427A;
-	Tue, 25 Feb 2025 09:38:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1740476294;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cLaYPj5f0Xs15lU0/MmHpF+ePqgHzxkdSGZO99S/riM=;
-	b=HK3/pkvQCXh4EvM47VppHUM/fN4OOUDgSH+BCI6umBBl56Ie70o5ZIDCn9Rex1VLBbd6Nv
-	aoAqxO9BftN/DDMajrXpOUv+vyJJ/fL19pknSOBOii4OmICT/jd717uJbTHcjGi+dmKVX8
-	avMvare7yTcSS4pUbXMCPTmSAg78uAYE1sjgVGfwav8dtKHBBC3pnTA7ApxZvitUSKjBi/
-	ugjHCT2i4pIvhySxk5d+aEydQgt7StUt+7V7zYwfmD+VsOeF/2Ztw735gsc0feXnPwTWFP
-	LcfzK4U1P+Jkdx0JxQpy3TB6bhUZr8fYFEuX7iXSwsV1OSwHHrWYbEJG68wfAw==
-Date: Tue, 25 Feb 2025 10:38:12 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Hans-Frieder Vogt <hfdevel@gmx.net>
-Cc: Hans-Frieder Vogt via B4 Relay <devnull+hfdevel.gmx.net@kernel.org>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, FUJITA Tomonori
- <fujita.tomonori@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 4/7] net: phy: aquantia: add essential
- functions to aqr105 driver
-Message-ID: <20250225103812.7e436d17@fedora.home>
-In-Reply-To: <d944c0bd-a652-4bfe-b6e8-c264f5b36562@gmx.net>
-References: <20250222-tn9510-v3a-v5-0-99365047e309@gmx.net>
-	<20250222-tn9510-v3a-v5-4-99365047e309@gmx.net>
-	<20250223113232.3092a990@fedora.home>
-	<d944c0bd-a652-4bfe-b6e8-c264f5b36562@gmx.net>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1740476339; c=relaxed/simple;
+	bh=Mpo0m6idNqGle/F9l+0n7I4xcC28MOswyoNwASQmucA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rg8MAd1WLYeNwZa2VqrrDFO6E2bW8U3PgZ0RkNo9vhyCzbZwPCRQFko74D6kq9PLkoZa/Bg23fsDuzPJ1LZpWXEj2yAGldptXP0g3mvLg4ueeqjK4tUC9Lkgl/tCcwHAgZ03F3QzBwYBdlsWBlz9jFhtN1VDociGRw/Zans84Iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fOIslc/v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A08A3C4CEDD;
+	Tue, 25 Feb 2025 09:38:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740476338;
+	bh=Mpo0m6idNqGle/F9l+0n7I4xcC28MOswyoNwASQmucA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fOIslc/vsGocaRlnnUFIID+FlY9KAiveCPU4AAYrDG6HHUNEPtiSqImvCump0OvLV
+	 weWJ+YRssQWo+GlI1XU6fvV9ix4wTjKLF+w2FYgI+GLsHZIwAtrwyPvRXeW9+kv4Pi
+	 JtgORv/XqoHzHJ3V+SMYA/1wIqyHYd17gXRvwjw90SJGLH0O8ltZOBVPQP3gmHWUuO
+	 KjZI1lA+J5Qo+J47v9+nl1H92ByRayHFj+JvnPApdORrSmHTY7lwmL3J77hg8lYDdZ
+	 aAa35n2zKZAmS+Jr+xiCfnL7O+z6zQMZfqFE7zLZwdYSWve3ts37VzMISp7dQNizem
+	 9J+TD30infOyw==
+Date: Tue, 25 Feb 2025 09:38:51 +0000
+From: Simon Horman <horms@kernel.org>
+To: David Arinzon <darinzon@amazon.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	"Woodhouse, David" <dwmw@amazon.com>,
+	"Machulsky, Zorik" <zorik@amazon.com>,
+	"Matushevsky, Alexander" <matua@amazon.com>,
+	Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>,
+	"Liguori, Anthony" <aliguori@amazon.com>,
+	"Bshara, Nafea" <nafea@amazon.com>,
+	"Schmeilin, Evgeny" <evgenys@amazon.com>,
+	"Belgazal, Netanel" <netanel@amazon.com>,
+	"Saidi, Ali" <alisaidi@amazon.com>,
+	"Herrenschmidt, Benjamin" <benh@amazon.com>,
+	"Kiyanovski, Arthur" <akiyano@amazon.com>,
+	"Dagan, Noam" <ndagan@amazon.com>,
+	"Bernstein, Amit" <amitbern@amazon.com>,
+	"Agroskin, Shay" <shayagr@amazon.com>,
+	"Abboud, Osama" <osamaabb@amazon.com>,
+	"Ostrovsky, Evgeny" <evostrov@amazon.com>,
+	"Tabachnik, Ofir" <ofirt@amazon.com>,
+	"Machnikowski, Maciek" <maciek@machnikowski.net>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Subject: Re: [PATCH v7 net-next 4/5] net: ena: PHC stats through sysfs
+Message-ID: <20250225093851.GJ1615191@kernel.org>
+References: <20250218183948.757-1-darinzon@amazon.com>
+ <20250218183948.757-5-darinzon@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdekudefiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeeuhfefgffgtdfhgffhvdfhhffhteeutdektefghfetveehheejjefgudeiudehudenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedufedprhgtphhtthhopehhfhguvghvvghlsehgmhigrdhnvghtpdhrtghpthhtohepuggvvhhnuhhllhdohhhfuggvvhgvlhdrghhmgidrnhgvtheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifsehluhhnn
- hdrtghhpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250218183948.757-5-darinzon@amazon.com>
 
-On Sun, 23 Feb 2025 23:26:49 +0100
-Hans-Frieder Vogt <hfdevel@gmx.net> wrote:
+On Tue, Feb 18, 2025 at 08:39:47PM +0200, David Arinzon wrote:
+> The patch allows retrieving PHC statistics
+> through sysfs.
+> In case the feature is not enabled (through `phc_enable`
+> sysfs entry), no output will be written.
+> 
+> Signed-off-by: David Arinzon <darinzon@amazon.com>
 
-> Hi Maxime,
->=20
-> On 23.02.2025 11.32, Maxime Chevallier wrote:
-> > Hi,
-> >
-> > On Sat, 22 Feb 2025 10:49:31 +0100
-> > Hans-Frieder Vogt via B4 Relay <devnull+hfdevel.gmx.net@kernel.org>
-> > wrote:
-> > =20
-> >> From: Hans-Frieder Vogt <hfdevel@gmx.net>
-> >>
-> >> This patch makes functions that were provided for aqr107 applicable to
-> >> aqr105, or replaces generic functions with specific ones. Since the aq=
-r105
-> >> was introduced before NBASE-T was defined (or 802.3bz), there are a nu=
-mber
-> >> of vendor specific registers involved in the definition of the
-> >> advertisement, in auto-negotiation and in the setting of the speed. The
-> >> functions have been written following the downstream driver for TN4010
-> >> cards with aqr105 PHY, and use code from aqr107 functions wherever it
-> >> seemed to make sense.
-> >>
-> >> Signed-off-by: Hans-Frieder Vogt <hfdevel@gmx.net>
-> >> ---
-> >>   drivers/net/phy/aquantia/aquantia_main.c | 242 +++++++++++++++++++++=
-+++++++++-
-> >>   1 file changed, 240 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/ph=
-y/aquantia/aquantia_main.c
-> >> index 86b0e63de5d88fa1050919a8826bdbec4bbcf8ba..38c6cf7814da1fb9a4e715=
-f242249eee15a3cc85 100644
-> >> --- a/drivers/net/phy/aquantia/aquantia_main.c
-> >> +++ b/drivers/net/phy/aquantia/aquantia_main.c
-> >> @@ -33,6 +33,9 @@
-> >>   #define PHY_ID_AQR115C	0x31c31c33
-> >>   #define PHY_ID_AQR813	0x31c31cb2
-> >>
-> >> +#define MDIO_AN_10GBT_CTRL_ADV_LTIM		BIT(0) =20
-> > This is a standard C45 definition, from :
-> > 45.2.7.10.15 10GBASE-T LD loop timing ability (7.32.0)
-> >
-> > So if you need this advertising capability, you should add that in the
-> > generic definitions for C45 registers in include/uapi/linux/mdio.h =20
-> Thanks. Wasn't aware this being a standard definition.
->=20
-> Wouldn't the definition
-> #define ADVERTISE_XNP=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BIT(12)
-> then need to go to include/uapi/linux/mii.h accordingly?
+...
 
-Looks like this is indeed part of the standard now, in=20
+> diff --git a/drivers/net/ethernet/amazon/ena/ena_sysfs.c b/drivers/net/ethernet/amazon/ena/ena_sysfs.c
+> index d0ded92d..10993594 100644
+> --- a/drivers/net/ethernet/amazon/ena/ena_sysfs.c
+> +++ b/drivers/net/ethernet/amazon/ena/ena_sysfs.c
+> @@ -65,6 +65,52 @@ static ssize_t ena_phc_enable_get(struct device *dev,
+>  static DEVICE_ATTR(phc_enable, S_IRUGO | S_IWUSR, ena_phc_enable_get,
+>  		   ena_phc_enable_set);
+>  
+> +#define ENA_STAT_ENA_COM_PHC_ENTRY(stat) { \
+> +	.name = #stat, \
+> +	.stat_offset = offsetof(struct ena_com_stats_phc, stat) / sizeof(u64) \
+> +}
+> +
+> +const struct ena_stats ena_stats_ena_com_phc_strings[] = {
+> +	ENA_STAT_ENA_COM_PHC_ENTRY(phc_cnt),
+> +	ENA_STAT_ENA_COM_PHC_ENTRY(phc_exp),
+> +	ENA_STAT_ENA_COM_PHC_ENTRY(phc_skp),
+> +	ENA_STAT_ENA_COM_PHC_ENTRY(phc_err),
+> +};
 
-28.2.4.1.3 Auto-Negotiation advertisement register (Register 4), so it seems
-to be the right move to modify ADVERTISE_RESV into  ADVERTISE_XNP.
+Hi David,
 
-> There, bit 12 is currently named ADVERTISE_RESV and commented as unused
-> (which it obviously is not, because it is used in
-> drivers/net/ethernet/sfc/falcon/mdio_10g.c
+Some very minor nits from my side:
 
-One note is that this driver uses the C45 MMD 7 AN register layout :
+Is seems that ena_stats_ena_com_phc_strings is only used in this file and
+thus should be static.
 
-45.2.7.1 AN control register (Register 7.0)
+> +
+> +u16 ena_stats_array_ena_com_phc_size = ARRAY_SIZE(ena_stats_ena_com_phc_strings);
 
-in which the eXtended Next Page bit is BIT(13).
+Likewise for ena_stats_array_ena_com_phc_size.
 
-That actually leads to an interesting point, as it appears the at803x.c
-driver mixes both, which looks incorrect to me :
-
-	/* Ar803x extended next page bit is enabled by default. Cisco
-	 * multigig switches read this bit and attempt to negotiate 10Gbps
-	 * rates even if the next page bit is disabled. This is incorrect
-	 * behaviour but we still need to accommodate it. XNP is only needed
-	 * for 10Gbps support, so disable XNP.
-	 */
-	return phy_modify(phydev, MII_ADVERTISE, MDIO_AN_CTRL1_XNP, 0);
-
-In such case, BIT(13) fot MII_ADVERTISE is ADVERTISE_RFAULT, if my
-understanding of the spec is correct.
-
-> I think, for now, I will just do the same as in the falcon driver and
-> use ADVERTISE_RESV instead. Then it may be renamed later in all places.
-
-Make sure you use the BIT(12) in your case indeed, looks to be the
-right way in that case.=20
-
-> >
-> > That being said, as it looks this is the first driver using this
-> > feature, do you actually need to advertise Loop Timing ability here ?
-> > I guess it comes from the vendor driver ? =20
-> you are right. The code just tries to replicate the vendor code.
-> However, I have now tested the driver without this flag and haven't
-> noticed any unusual behavior. So, I guess, it works indeed without.
-> I'll remove the flag in the next revision of the patch.
-
-So in that case, no need to define MDIO_AN_10GBT_CTRL_ADV_LTIM at all :)
-
-Thanks,
-
-Maxime
-
+...
 
