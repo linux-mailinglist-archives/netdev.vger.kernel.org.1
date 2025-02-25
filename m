@@ -1,115 +1,130 @@
-Return-Path: <netdev+bounces-169605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13FB8A44BF4
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 21:05:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5878BA44BFB
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 21:06:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2795A3A720C
-	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 20:05:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0300619C44F2
+	for <lists+netdev@lfdr.de>; Tue, 25 Feb 2025 20:06:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25DBC1ACEBB;
-	Tue, 25 Feb 2025 20:05:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3663F1EBFE6;
+	Tue, 25 Feb 2025 20:06:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WbHutTCA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BI26HtwV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B44AB1A727D
-	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 20:05:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 129A51A0B0E
+	for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 20:06:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740513912; cv=none; b=fI12ceRrlM75wE586w8vnXH3G5JgdmS+yhkWrUupsomziXTH08jxHTf/gBFgtYMM7m5qYaUcINK92IYzHnPby8xcU1WLSPUZEviWJKrA1Ar+oA1tHsk/R3fAofQrNB7KLMX2Ku9qNs2Xz6pgqojP1qnZPllRXSBIKnKWQ0B4DBA=
+	t=1740513987; cv=none; b=TdvWcDGX0KScUahseljQKE/NB0ohhToJSTUPx21DqLYSaZ+qc/d32kLXYS3lwWPBf0K6I1ol9rg0SuYcSNlI2ONEriodKlw0gdxdjy4QMsd34ob7ei1l+o7Sd/+2cm+dwaDXfJ54w8Zgrps1x5AzwHUDGU/lXoCCHW0FLI9iTxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740513912; c=relaxed/simple;
-	bh=ZbFhjhJzzPdU7qg4OL6BpZWoloFSSDxEJNo3uKjV7Aw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IVTK6bwbawY3eL3GMzmJe//bz7OaIJqZMdw30rUWK55RfJ+EAeFZZLqtHsInQRsQfnwiTWQshsbxUHQfUDWkQ/OVQnQUstza/SEd7JZr8I8WvkaHbAzx0c2mgubGAXWd8GAOw2nympL5xWLSEMYLPjiSAEKiZT+ureT+LAwNb8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WbHutTCA; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-220e6028214so132858695ad.0
-        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 12:05:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740513910; x=1741118710; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=M7rRRMf5SsNxWlQh/JxR+Ow4SZo3/cWOaF5W5bjLrDg=;
-        b=WbHutTCAXvbtYNGoD8NAazTBClp4JfYyVb0/Ll8MUyFINrHOnJKkhdF6t/4ENPYZcg
-         PjAkDk21KSB8AIdLlCVYVo6h6fMVF+pLQvRIFHdbQBhm23suhRHnqtOFcYKwt9iffS//
-         en0i5IlEP3C8GifQdzIr22F/mFbT0oWYwbJwempS2DfnkIYaSnuGp/b0dGcL9HwuyKTY
-         sVCcF/0+JPgZgkS+HjHrrJFKR8kCtBhNjft4njmydXj2obMkrQeXVg/5M4a5lCCPGHWe
-         RazeulqtEvqjqdVhGjg6EtL7VkMPdJ057B1LD71+Qt5Y0lnfJg+HcniZvJsuCZ7ylWvG
-         Ts4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740513910; x=1741118710;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M7rRRMf5SsNxWlQh/JxR+Ow4SZo3/cWOaF5W5bjLrDg=;
-        b=uF18EPwC3rDQinaB5plQlactSiY/dBL0355jkaN4hTFr/j8/k6MBaY+lwzmm5fcCe3
-         ugleMbJI2TMdQmfhV6lJSC3PaBsLJV3DNU8bQ6VU116zmTmypxxoIJt8D6DiSb8U7EOG
-         Oq8tzW1L7j3uEqUaCAV5XivYgPB0sr9KFxRSnPp14lcK1Wrv1NsGOx0YybYUQfMIirXf
-         kSo1IWUoMK8RSCUCtsfFWwlddxhengg2fm5UdrqsVwgtwKcaJ+8DX2YlL21wRhvOO2AB
-         Gx8AW+CFMztoajaSeyGDDMEoz5FTomLWXdxsXQMsS6FSeisE0VEitiQEaklQI30p0kOL
-         cXxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV+JkldUa/6ydpSZ/A761/BAIUtqrbhjt6Gr7rp1GVqdmPS5qPHdO2IVjEAs0UxKcN9OtCQpZI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHCa/G6bd68DAQXHgxkQnz3OI2qzVHyDvpG+FcJgLrZWhgLQ70
-	qI3n/DMyGQrXmyfbzwcIUBbvko5d9s2P6Bl6abmUKS5lQguYNttvJo93a48xS80fm3Q0oCQ79UK
-	rBbo=
-X-Gm-Gg: ASbGnctVUqVYDqWbuMBFW5nQeIPUBfcJzzbLHjYuJ8EEldw01ZkX+IsKXWkT0N6VZNN
-	9VDrAEkc0yjBCgKY4zOrVo6nhE5r55c6UflJIbKdPubCbDprX/BsuNFu6wb/wuEEMz0WstTH5s/
-	5kAP34PKnYaBNcbbhDa5TgMOzkBjl2F25CqG2Xq8+9QhUIsYzyYFdnnlUQHwOqscqgM5dp10dKj
-	5tZKc/n3993ddf13JGDgOcQSk7+mk3vBfQUkrm2hIdB0p+xUDLygZxold7g8bu9h7b3/7mpFGma
-	lL33SJPDWtUc9RhBHlMqfyHOYcmJDbP4atbM130lf8MbBcF7ux0CYS5AkA==
-X-Google-Smtp-Source: AGHT+IEmzpdRfroAIEPIL7+pwQe4f2ES9B0C6EZn6C+xpvOPqGSTIOstqonfdnt5BpA5MEdSGccDEw==
-X-Received: by 2002:a05:6a00:84a:b0:725:e4b9:a600 with SMTP id d2e1a72fcca58-73426d78ecemr30572954b3a.16.1740513909595;
-        Tue, 25 Feb 2025 12:05:09 -0800 (PST)
-Received: from google.com ([2a00:79e0:2e52:7:2633:28b9:cd56:888c])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7347a81ecaasm1920426b3a.153.2025.02.25.12.05.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Feb 2025 12:05:08 -0800 (PST)
-Date: Tue, 25 Feb 2025 12:05:04 -0800
-From: Kevin Krakauer <krakauer@google.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com, shuah@kernel.org
-Subject: Re: [PATCH] selftests/net: deflake GRO tests and fix return value
- and output
-Message-ID: <Z74icGa4rlnNafoW@google.com>
-References: <20250220170409.42cce424@kernel.org>
- <20250223151949.1886080-1-krakauer@google.com>
- <20250224124830.7c38608a@kernel.org>
+	s=arc-20240116; t=1740513987; c=relaxed/simple;
+	bh=VcfsQnksfk8sQcSSfz9I+EZRxSG+pl7g2bXtmhd8gKM=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=Pj6NWKaf05+AivEb/9wu3FPwut8KcLBJjC35ZgqMTX7zIwvgTyPVd9s2JF3hJJZTbfaVnvIRskM01/chnxqAGOsJvrjcMW0+cvxXBG8oUMBQeYqwGIOtFWGv3Oqnk0DIfdZnaXkpPHbA63gIoN8/f6I0GTWvoMDwf8tDZ+1Yh+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BI26HtwV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 004F1C4CEE7;
+	Tue, 25 Feb 2025 20:06:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740513986;
+	bh=VcfsQnksfk8sQcSSfz9I+EZRxSG+pl7g2bXtmhd8gKM=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=BI26HtwV0ZnB+n1682vmk38Bc4TsnziQdggDVVbFlWHE9osAlwRmXxCdhA5Dcl4DC
+	 5xm9ZaIHYVKI8JzOuX/L8EupB6OerJWncDiCG3KArEDSuxDCRTa8S5RBnmyNBWkgcx
+	 ZyLH7OtK5GJWQF2SwQPFYB0tTOI7tUtsQnBlR+G1q3jtKDyMLh3u0oel1O4cTrtEmm
+	 u6tZNeFv6UoKnRt/uLsNW7ORmCuuOhjVbgA9hgINz2IWRK4bksmJmyj8rFk/HP/Xc9
+	 kcsLhFHsC9f/YCFTOjj6YiTjwYd7BNtW9DwqnDcDtsBuDHNwCVTYWFxhM/7+9aI2cg
+	 ma8roWk2Lg+Qg==
+Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id D0188120006B;
+	Tue, 25 Feb 2025 15:06:24 -0500 (EST)
+Received: from phl-imap-12 ([10.202.2.86])
+  by phl-compute-10.internal (MEProxy); Tue, 25 Feb 2025 15:06:24 -0500
+X-ME-Sender: <xms:wCK-Z7x28LZOrtFKJNGwvcSbbHGKoZQkNKPKd4ydXxiQcL8IdVLwfg>
+    <xme:wCK-ZzSSVbTKY4vig0DaWTTMYF2BDAODDzdfrgyKvewU_RIUp7s3d9YH7-Yu4OGFP
+    ZfmY9YcHOlzNp2URrQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdekvdeivdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpefoggffhffvvefkjghfufgtgfesthejredtredt
+    tdenucfhrhhomhepfdfnvghonhcutfhomhgrnhhovhhskhihfdcuoehlvghonheskhgvrh
+    hnvghlrdhorhhgqeenucggtffrrghtthgvrhhnpeejvefflefgledvgfevvdetleehhfdv
+    ffehgeffkeevleeiveefjeetieelueeuvdenucevlhhushhtvghrufhiiigvpedtnecurf
+    grrhgrmhepmhgrihhlfhhrohhmpehlvghonhdomhgvshhmthhprghuthhhphgvrhhsohhn
+    rghlihhthidquddvfedtheefleekgedqvdejjeeljeejvdekqdhlvghonheppehkvghrnh
+    gvlhdrohhrgheslhgvohhnrdhnuhdpnhgspghrtghpthhtohepvddtpdhmohguvgepshhm
+    thhpohhuthdprhgtphhtthhopehjohhnnhihtgesrghmrgiiohhnrdgtohhmpdhrtghpth
+    htohepmhgtrghrlhhsohhnsegsrhhorggutghomhdrtghomhdprhgtphhtthhopehkrghi
+    rdhhvghnghdrfhgvnhhgsegtrghnohhnihgtrghlrdgtohhmpdhrtghpthhtohephhhkrg
+    hllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohephhgvlhhgrggrsheskhgv
+    rhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtph
+    htthhopehkfieslhhinhhugidrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhn
+    rdgthhdprhgtphhtthhopegrvggrshhisehmrghrvhgvlhhlrdgtohhm
+X-ME-Proxy: <xmx:wCK-Z1VQGoGLOyQ8gY_diAs7mCfx6Mey9x85h2uIGCuD9zDdEuwcQg>
+    <xmx:wCK-Z1j-n6VDEmk30t-cXQCYUvEMe9jVW8CdDYWV7cQrCoR3kTUZ1w>
+    <xmx:wCK-Z9AfBklA7ncfglEUSt675IEjgYuuGszQ6eEG179WKVoJk_KwXQ>
+    <xmx:wCK-Z-IH18xsZW_EOY-6dONU_T5ahdR_eVX9Cu8Za4cW7VlKDDJoEQ>
+    <xmx:wCK-Z8D4mBsutqmYSnLnGXh7QpL5Qi7PqxaHOs34vYFX5L9YCshsrs_I>
+Feedback-ID: i927946fb:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id A40981C20066; Tue, 25 Feb 2025 15:06:24 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250224124830.7c38608a@kernel.org>
+Date: Tue, 25 Feb 2025 22:05:49 +0200
+From: "Leon Romanovsky" <leon@kernel.org>
+To: "Andrew Lunn" <andrew@lunn.ch>
+Cc: "Bjorn Helgaas" <helgaas@kernel.org>,
+ =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kw@linux.com>,
+ linux-pci@vger.kernel.org, "Ariel Almog" <ariela@nvidia.com>,
+ "Aditya Prabhune" <aprabhune@nvidia.com>, "Hannes Reinecke" <hare@suse.de>,
+ "Heiner Kallweit" <hkallweit1@gmail.com>, "Arun Easi" <aeasi@marvell.com>,
+ "Jonathan Chocron" <jonnyc@amazon.com>,
+ "Bert Kenward" <bkenward@solarflare.com>,
+ "Matt Carlson" <mcarlson@broadcom.com>,
+ "Kai-Heng Feng" <kai.heng.feng@canonical.com>,
+ "Jean Delvare" <jdelvare@suse.de>,
+ "Alex Williamson" <alex.williamson@redhat.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, "Jakub Kicinski" <kuba@kernel.org>,
+ =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+ "Stephen Hemminger" <stephen@networkplumber.org>
+Message-Id: <e9943382-8d53-4e28-b600-066ef470f889@app.fastmail.com>
+In-Reply-To: <87c90b88-ea56-4b72-92f9-704cca28ae98@lunn.ch>
+References: 
+ <c93a253b24701513dbeeb307cb2b9e3afd4c74b5.1737271118.git.leon@kernel.org>
+ <20250225160542.GA507421@bhelgaas> <20250225165746.GH53094@unreal>
+ <7ff54e42-a76c-42b1-b95c-1dd2ee47fe93@lunn.ch>
+ <354ce060-fc42-4c15-a851-51976aa653ad@app.fastmail.com>
+ <87c90b88-ea56-4b72-92f9-704cca28ae98@lunn.ch>
+Subject: Re: [PATCH v4] PCI/sysfs: Change read permissions for VPD attributes
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Mon, Feb 24, 2025 at 12:48:30PM -0800, Jakub Kicinski wrote:
-> With msec-long deferrals we'll flush due to jiffies change. At least
-> that explains a bit. Could you maybe try lower timeouts than 1msec?
-> Previously we'd just keep partially-completed packets in GRO for up 
-> to 1msec, now we'll delay all packet processing for 1msec, that's a lot.
 
-Results again with each test run 1000 times:
 
-gro_flush_timeout=50us  napi_defer_hard_irqs=1 --> failed to GRO 0 times
-gro_flush_timeout=100us napi_defer_hard_irqs=1 --> failed to GRO 0 times
+On Tue, Feb 25, 2025, at 20:59, Andrew Lunn wrote:
+>> Chmod solution is something that I thought, but for now I'm looking
+>> for the out of the box solution. Chmod still require from
+>> administrator to run scripts with root permissions.
+>
+> It is more likely to be a udev rule. 
 
-gro_flush_timeout=50us  napi_defer_hard_irqs=0 --> failed to GRO 36 times
-gro_flush_timeout=100us napi_defer_hard_irqs=0 --> failed to GRO 46 times
+Udev rule is one of the ways to run such script.
 
-100us with 1 defer seems to work fine and is well below the duration of
-a jiffy. So we'll usually be testing the "default" GRO path and only
-occasionally the jiffy-update path. I'll make these the numbers in the
-revised patch unless someone thinks otherwise.
+systemd already has lots of
+> examples:
+>
+> /lib/udev/rules.d/50-udev-default.rules:KERNEL=="rfkill", MODE="0664"
+>
+> 	Andrew
 
