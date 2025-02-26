@@ -1,179 +1,112 @@
-Return-Path: <netdev+bounces-169962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63A96A46A32
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 19:53:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB61BA46A44
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 19:56:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E19391887210
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 18:54:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DDCA16D39F
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 18:56:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D8C233724;
-	Wed, 26 Feb 2025 18:53:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73344236A99;
+	Wed, 26 Feb 2025 18:55:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B/bileAy"
+	dkim=pass (1024-bit key) header.d=8x8.com header.i=@8x8.com header.b="EdwlVzix"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93DAD21D5AE
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 18:53:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD73236A74
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 18:55:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740596030; cv=none; b=Bxg7QL9S+BbzAsAOpxNIt5WZXsY0LITcsmeAdMb2URyC/9nH4FAuiVjzkmEsmtTT21CHMHJb9E3+6ghLiuebDlQn9f4TGK/3bEg0cwEdipH3RgFCgDeXkmD8n5hMJmX25u3OtkDAtU7LZbqRoQkUYCD5QK+0ln0jKAA4ImhWzdA=
+	t=1740596130; cv=none; b=qGP77gWWH77TZhACmsV8PVv7DIye/BZwGmsX1mFrgly1lxyKtwquk3mQuQ2wxLslKHpF5wQY/EWpprQoTotPVOdLooJNaXs+BxDsUFYVvC4FzYeEdH4WCKRYFKkxC+aAx8lRip4LStNHymRGQdIP6vKXusG6jrvyLJblNVon3WQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740596030; c=relaxed/simple;
-	bh=TsS84v9JdWmfPVDdVYGY/9M7Q6kFMPR93OYLjrN4ZrU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UhA4lZ1GVbRBvxRzeyNR685bSt/nSFQFEKvrh0Uv5GszWR8aPrVJXamSyfa+Dqp33GR+AFRwn8FRFOM3v/n0krZDULLA5n+kYcCcDJkB4Aglohpi9vp+Lu2VeroaGOTXeWXVJPxmfnnsPW6ND8xYT2WP4DzbZsPi+FndGoOJiho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B/bileAy; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2211acda7f6so1679305ad.3
-        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 10:53:48 -0800 (PST)
+	s=arc-20240116; t=1740596130; c=relaxed/simple;
+	bh=+5aKcX4BAT/Ww8EQkZi6p/Zbb4zOiuaunIBIytZJd0A=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=LTyqOXF88omLTflin/UcVyf/IIAUDfUuG8fCgbZiH0eoWEfRlpJ9QfEnb4O4lrR5GQAoCz854K7v2EaMXxV7MeDApCIIobE0EOnOXxVPjyiTj17tRiZzM91fGtfZsYfgDol/12U5dhHdvxfgkYsIZydAt7MlCqVXh5zZTfyHW+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=8x8.com; spf=pass smtp.mailfrom=8x8.com; dkim=pass (1024-bit key) header.d=8x8.com header.i=@8x8.com header.b=EdwlVzix; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=8x8.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=8x8.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7c0bb7328fbso11518685a.2
+        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 10:55:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740596028; x=1741200828; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=8x8.com; s=googlemail; t=1740596127; x=1741200927; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ApVb9aX9RMqgiQYUhLLiCvBNmIkleTTnf+cTqiJtybA=;
-        b=B/bileAyWDLjAT6RQTp35Bex7WfvlAeoVEMmb2yeb0bekqvqphqQ4VnP0FoQgFBYev
-         4WEd+CrorYKsL5c72lyLh6iZpKmhyP0/Qdl9DW60LdxyPyT3+x6RiBoSazIUcSioyE2l
-         hlAcQCDeRGTJTFFjP/TPrsxWcNiTJ0+vCuFbgmTLgkYrkNqjNGJbaCL7+RAJ87Sq2jbk
-         zWevCzfAg1KS2tGpwFT4uzknROlihyOETp0t3M/k1i4GwWfKI1D56Kxi3QeMZUSSebz+
-         bHnCz2BHOOpxo+pCEfxElXvYOq+BC7fkmtLKpA7LF394Wog0SCFll5bQaA4It07NNJxw
-         y3Tg==
+        bh=+5aKcX4BAT/Ww8EQkZi6p/Zbb4zOiuaunIBIytZJd0A=;
+        b=EdwlVzixeDOUZEV77X4KvAZbPdtCF0mHN7VHrYBkovX9iGR655wjJGDCaFURmDyrTy
+         dRu26PJOgh/RjF1hDexKWl/Rh89t15oc8DcFoiDJ2oFzoddfvLoDTUGA0jq1S5soIFSC
+         0oQ8SPdbLdtCuj7ewkbwCY+NqhzokaXlPGkyI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740596028; x=1741200828;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1740596127; x=1741200927;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ApVb9aX9RMqgiQYUhLLiCvBNmIkleTTnf+cTqiJtybA=;
-        b=XprCVE76KNKGePQFrQQkQdMjFpRcXfPfDXlvaqLIqp2R13qDuqeDjzXbwOq5gYOMQU
-         Yd3cigEMzbAxbzQ8SgkVq9IA2I/vI1SdRhWa+zDmhaOEOafmtfdRO9v9L7G60TcRV20A
-         GMFe4BMB+/hghnxRlc1R31N2BZn4Zo6evS2LCWOvjtDwZsm3E3rakYfIKVYtxHy4AiDl
-         XRt+a5QbbDwQXBbh68mituFQKa0QFX5TT6U3D+yZnTxH84D5gsY4mstimB+Oeyg1GB1x
-         +XUkL7gUAyHWZq+5IO/3S5sUkNuCkLzG9o03K151fxmwcOK2OoKwwudr/QpQDs54XAdt
-         kd+A==
-X-Forwarded-Encrypted: i=1; AJvYcCVH3n3AjyxdrNMg8WWlLbcVxSuyxXCoLKgGo57orYKrmePMDTT4LhD5KAwguTSZLSfzDKfIA88=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUcZqWaYMWpJiE1iFlnkESvosMEhRLth3jgGiSXlO9Pqh67t+D
-	9W5/zDCDTH0jSji5dvvK9qKSur9OPMnjhv47Z4DHafnSKCr99pY5kYx7BbUm
-X-Gm-Gg: ASbGncs6zAfJdIwxWyRPFppv4Z0tHPTIoF7Fq5PTAgiokwgwRfyXsz/A17OPkymE8aU
-	lgLqbCJRR66Vwa2ww8c3yqb9W5EgpWvoFh+EZ9lSgcGiOhZ+6KSytqDAoxzQPnE0CrNeg5faUGr
-	wcCNkSUkdT4TP12+7x59Yt0d1UlAdD2V5bRC81JLDgKlTLsRSwkHKWkSukDt0eb8aKbJJUgB5Ny
-	UaGT2quIPgowoJn1MkTp8QTI+hTWpCzygKcPRCeoXSYVHQAbWabAvB2+6ofOUZiFIih0OLMKyDH
-	d1M+MPxqfgmIkeyXwFMQ+WzKQNKpzev4jhMcsV0/azDO7MnIEYak
-X-Google-Smtp-Source: AGHT+IGN4L9yno/FUJDitdSHAryXQ3XRrRXjq5uV3DQ7crHcMRDe9NcQuj2qyEAX6vbANhox3fL3ew==
-X-Received: by 2002:a05:6a20:748d:b0:1ee:67ec:227b with SMTP id adf61e73a8af0-1f10ae8e409mr8062778637.26.1740596027659;
-        Wed, 26 Feb 2025 10:53:47 -0800 (PST)
-Received: from jlennox2.jitsi.com ([129.146.236.57])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7347a81edc4sm3960442b3a.133.2025.02.26.10.53.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Feb 2025 10:53:46 -0800 (PST)
-From: Jonathan Lennox <jonathan.lennox42@gmail.com>
-X-Google-Original-From: Jonathan Lennox <jonathan.lennox@8x8.com>
-To: David Ahern <dsahern@kernel.org>,
-	netdev@vger.kernel.org,
-	Stephen Hemminger <stephen@networkplumber.org>
-Cc: Jonathan Lennox <jonathan.lennox@8x8.com>
-Subject: [PATCH iproute2 v3] tc: Fix rounding in tc_calc_xmittime and tc_calc_xmitsize.
-Date: Wed, 26 Feb 2025 18:53:21 +0000
-Message-Id: <20250226185321.3243593-1-jonathan.lennox@8x8.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <5b9f16c1-450c-4a39-be2c-634b4f1864b5@kernel.org>
-References: <5b9f16c1-450c-4a39-be2c-634b4f1864b5@kernel.org>
+        bh=+5aKcX4BAT/Ww8EQkZi6p/Zbb4zOiuaunIBIytZJd0A=;
+        b=ZtmyVlH9no/TcYo2NhY+9nxDiXroQEz31z8ZssD++15qRXLEbyQXc4m5lf1ZXSH5e/
+         il6p53Fg+QkgB7f1PVlOPO4PbpKMNaQ5KipZiNSVhMyoltTCRbgwf+UEQAWmtpIJ+RBC
+         ooBBYmT+16b1CTuHB3Z+COouZq0jUzvYiysymERLGMKikyxh3Fr3LoIFuyca47ia6xEl
+         YZiNV+AVNVVqSrrAOdDHgDBi3ZYOpn5R1+iiTaRMHDcSzekwevKtbp1bIXmabazDj3Uj
+         QpL/osNvD9ImhcQ59DX3+KGzj/NrL6/wfdvjHU8Fd1QY+qkrdOk88VvS+id6pA8zuH2+
+         ybeA==
+X-Gm-Message-State: AOJu0YxieG6+mnq2OZFrfuzLqIu2kD/HOMYwYGAo+JZnaEyx2CV7qgRR
+	C/g127pNSIVq9lB/fpX7cjkk4lviEbrgMCvlN/buyizSkXspaCuft/Nv+kSeUVNF2MK7xUQ2Vfw
+	=
+X-Gm-Gg: ASbGncs2tGwhsw/bjO/alrSFFhsv0VxUEAzP3+s4KRY6r+tlwYZEc6qATCJ9QW79z/S
+	gg15SJMBrNg73ewvy9FJnHtP44bdhEdUGRAG4kPXavcE8J6GV4uT1ZOtw91kvuxEPvAayTXaDJx
+	njLtMnJHCTO6+LpYYapwF1X2iVdSB/BKnMCmBpVDxznFbqNNr/EqCLESSc2cxe/ACLhZiPnOrUi
+	mG4BqEbboH9MOmEp7LmKWa14WTvGUAq3jbFA0exXgtGrjnNsF6LlH6IiRrss20f6bpza/DBWQYV
+	xPcqTH2tSREWMBIgPjRCMfzIbrZ4Z33jeq5UUue967Leo1FZC4hFmKyM
+X-Google-Smtp-Source: AGHT+IGoTuR0xhxywmOPz7F7e1Iu+Av/zA2LRkDRuQCAahQ7KN9lUct5sev14Zf8GlBhr8rNpO3QGQ==
+X-Received: by 2002:a05:620a:2910:b0:7c0:abe0:ce5c with SMTP id af79cd13be357-7c23be146b7mr1064884385a.15.1740596127340;
+        Wed, 26 Feb 2025 10:55:27 -0800 (PST)
+Received: from smtpclient.apple ([2601:8c:4e80:49b0:28e8:71a0:ab4f:631c])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c23c327205sm280251385a.85.2025.02.26.10.55.26
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 26 Feb 2025 10:55:26 -0800 (PST)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="------------2.34.1"
-Content-Transfer-Encoding: 8bit
-
-This is a multi-part message in MIME format.
---------------2.34.1
-Content-Type: text/plain; charset=UTF-8; format=fixed
-Content-Transfer-Encoding: 8bit
-
-
-Currently, tc_calc_xmittime and tc_calc_xmitsize round from double to
-int three times — once when they call tc_core_time2tick /
-tc_core_tick2time (whose argument is int), once when those functions
-return (their return value is int), and then finally when the tc_calc_*
-functions return.  This leads to extremely granular and inaccurate
-conversions.
-
-As a result, for example, on my test system (where tick_in_usec=15.625,
-clock_factor=1, and hz=1000000000) for a bitrate of 1Gbps, all tc htb
-burst values between 0 and 999 bytes get encoded as 0 ticks; all values
-between 1000 and 1999 bytes get encoded as 15 ticks (equivalent to 960
-bytes); all values between 2000 and 2999 bytes as 31 ticks (1984 bytes);
-etc.
-
-The patch changes the code so these calculations are done internally in
-floating-point, and only rounded to integer values when the value is
-returned. It also changes tc_calc_xmittime to round its calculated value
-up, rather than down, to ensure that the calculated time is actually
-sufficient for the requested size.
-
-Signed-off-by: Jonathan Lennox <jonathan.lennox@8x8.com>
----
- tc/tc_core.c | 6 +++---
- tc/tc_core.h | 2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51.11.1\))
+Subject: Re: [PATCH iproute2 v3] tc: Fix rounding in tc_calc_xmittime and
+ tc_calc_xmitsize.
+From: Jonathan Lennox <jonathan.lennox@8x8.com>
+In-Reply-To: <a9473fc0-d721-466e-b70c-8e9010c5c541@kernel.org>
+Date: Wed, 26 Feb 2025 13:55:15 -0500
+Cc: netdev@vger.kernel.org,
+ Stephen Hemminger <stephen@networkplumber.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <B5CADB93-32D0-4816-969E-488D3271D909@8x8.com>
+References: <5b9f16c1-450c-4a39-be2c-634b4f1864b5@kernel.org>
+ <952BE2E8-CE07-4D82-A47D-D181C229720A@8x8.com>
+ <a9473fc0-d721-466e-b70c-8e9010c5c541@kernel.org>
+To: David Ahern <dsahern@kernel.org>
+X-Mailer: Apple Mail (2.3776.700.51.11.1)
 
 
---------------2.34.1
-Content-Type: text/x-patch; name="0001-tc-Fix-rounding-in-tc_calc_xmittime-and-tc_calc_xmit.patch"
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline; filename="0001-tc-Fix-rounding-in-tc_calc_xmittime-and-tc_calc_xmit.patch"
 
-diff --git a/tc/tc_core.c b/tc/tc_core.c
-index 37547e9b..32fd094f 100644
---- a/tc/tc_core.c
-+++ b/tc/tc_core.c
-@@ -23,12 +23,12 @@
- static double tick_in_usec = 1;
- static double clock_factor = 1;
- 
--static unsigned int tc_core_time2tick(unsigned int time)
-+static double tc_core_time2tick(double time)
- {
- 	return time * tick_in_usec;
- }
- 
--unsigned int tc_core_tick2time(unsigned int tick)
-+double tc_core_tick2time(double tick)
- {
- 	return tick / tick_in_usec;
- }
-@@ -45,7 +45,7 @@ unsigned int tc_core_ktime2time(unsigned int ktime)
- 
- unsigned int tc_calc_xmittime(__u64 rate, unsigned int size)
- {
--	return tc_core_time2tick(TIME_UNITS_PER_SEC*((double)size/(double)rate));
-+	return ceil(tc_core_time2tick(TIME_UNITS_PER_SEC*((double)size/(double)rate)));
- }
- 
- unsigned int tc_calc_xmitsize(__u64 rate, unsigned int ticks)
-diff --git a/tc/tc_core.h b/tc/tc_core.h
-index 7a986ac2..c0fb7481 100644
---- a/tc/tc_core.h
-+++ b/tc/tc_core.h
-@@ -12,7 +12,7 @@ enum link_layer {
- };
- 
- 
--unsigned tc_core_tick2time(unsigned tick);
-+double tc_core_tick2time(double tick);
- unsigned tc_core_time2ktime(unsigned time);
- unsigned tc_core_ktime2time(unsigned ktime);
- unsigned tc_calc_xmittime(__u64 rate, unsigned size);
+> On Feb 26, 2025, at 11:06=E2=80=AFAM, David Ahern <dsahern@kernel.org> =
+wrote:
+>=20
+> git am (and patch for that matter) is not liking your patch. Please =
+make
+> sure the patch is against iproute2-next and top of tree.
+>=20
+> You should also try sending the patch to yourself, saving to a file =
+and
+> applying using `git am`.
 
---------------2.34.1--
-
-
+Sorry, my mailer was mangling the patch (adding quoted-printable) and I =
+couldn=E2=80=99t get
+git send-email to work with my corporate e-mail. I=E2=80=99ve resent it =
+from my personal gmail account.=
 
