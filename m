@@ -1,202 +1,127 @@
-Return-Path: <netdev+bounces-169945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83BF6A46993
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 19:25:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7FB1A46995
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 19:25:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86780171F3D
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 18:25:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DF843ABA68
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 18:25:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 768A0235368;
-	Wed, 26 Feb 2025 18:17:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=ps.report@gmx.net header.b="AFPfr6hc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94BD12356C7;
+	Wed, 26 Feb 2025 18:18:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC68C22540A;
-	Wed, 26 Feb 2025 18:17:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC5B322540A;
+	Wed, 26 Feb 2025 18:18:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740593859; cv=none; b=Ht5l9oH2qGLFeGf8t7sE6SWMV+bMrUimBAhBbSBSC/Pgj9IybeivjSqkltHdQwzuP9z6bB2T0ugM7IjLniad1HLlC3TakVJlbXQIknpY/l6Fx9ri1AqcUr2DVpo4Paj+0aUK1xQuAyZpHzV8cAb11V+MeJCg3oLHdz+nVZADvMc=
+	t=1740593916; cv=none; b=rHaXla36FlL5UAsPeRX7WivORFglP/k01fJZtkDnE1tIYx77kiqoJpaoVCltqZ6PtjvOgfPMrkO3odtOqLNG5K3/pjZOV7gScf6asY0ayVoSzVosK52pqAP9PyEfw8OOT6MvK2eb6KN3WiQgaNawdgBIZSOMzJGdmQjlYZ5CizI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740593859; c=relaxed/simple;
-	bh=7SPYnAXBwd09mqrgJKm3M4GdXzEp3OFKfWGQm31sLMQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L1s3wsLJw/M4I+B/T0e3QgPJnuW0Fgg4J05khIQ2VICbYUq7WDa1Y66d5o9ztpWARG9R0E0Zg44cGV4MbulPsHNww4c3dalJ+Kr5hE1nfZQSFkRdk36jSgjAxHh568133AS0w7Jr04WXa1qmMWun5FJ21OCFcL25KtNgI0Dkzsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=ps.report@gmx.net header.b=AFPfr6hc; arc=none smtp.client-ip=212.227.17.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1740593845; x=1741198645; i=ps.report@gmx.net;
-	bh=ukU3KmpIwMHvG/ytdZW/bBTC6zT6SMO7B8X4f4buLc0=;
-	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:Message-ID:In-Reply-To:
-	 References:MIME-Version:Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=AFPfr6hcBztfz+NmL0B7stmiWF39iG0UeDKGr/YkwrCYTH9m6BM/KXupSrVqjjEa
-	 JRdP+687kJBC3zA+Pt5V02kTa/fxY9EAf8g21ZhABR/dh44XhRPKDsRAlyibcHVy7
-	 xbHWBecoxxPN5JmCFgIuLfE2CuEgBvyNFKReUHDCWTaY4/k6+3B9qe8Yr6DWzUEwl
-	 9uHXHs4eIBCOUBYFpIrH344Pyv/M7YaUQK9r8y1b/N57IpDeot0DziWow2CPm0twJ
-	 o1BmoXLfm8URn6xaCNM+s+Xe92AI8hOTrjOw1MNd19xA37UMPK3L68D6A0/Le+IAJ
-	 BZEoxama76MmT2dcVQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from localhost ([82.135.81.93]) by mail.gmx.net (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MEm6F-1tX8Xe0d6h-00DWHH; Wed, 26
- Feb 2025 19:17:25 +0100
-Date: Wed, 26 Feb 2025 19:17:23 +0100
-From: Peter Seiderer <ps.report@gmx.net>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Arnd Bergmann <arnd@arndb.de>, Simon Horman
- <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] pktgen: avoid unused-const-variable warning
-Message-ID: <20250226191723.7891b393@gmx.net>
-In-Reply-To: <20250225085722.469868-1-arnd@kernel.org>
-References: <20250225085722.469868-1-arnd@kernel.org>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-suse-linux-gnu)
+	s=arc-20240116; t=1740593916; c=relaxed/simple;
+	bh=VIygefJsmrqlayJetk/TuRE//08XHGhMXg4SxJl1N7g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p/SwXZC95Ks6qXrjJSbevxbt2WfuaIkrKaWa5hjWrFnY/n+dIDkQB7C/u3WaM9yYckl1TEzIm5cAP7n/QjsoMAkytamZ+AQtpoei2YT3T4oESCrPLOm+WHBMMT6JkkMqSjssJ1XnnVZ6OUKczFmQprNq/mKAd2N1C08EKOKx49M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-abb86beea8cso8867166b.1;
+        Wed, 26 Feb 2025 10:18:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740593913; x=1741198713;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ANOUXq6Q4nNmGnkwfSvFwfZWJzxkc6uaWJAjlNi6mrw=;
+        b=FfuFw6x4R1MjPcJV5iQBUDYP19L4w0UxZPtGELt60sGFAC2JgcSD3NSeLb4gETakMz
+         nJADBYI1nLzRIkm+asNkvHM9Hb9vcSTDx9T9sROfDJgZREywwtqaYLHnL9Qj9eErpDwt
+         OOs1i/Em4cd4BXXLndxBgx00YeeC8bzIGPdz+Cq1yjsJJmdl5KkLbtez4U2ViHkJLoYU
+         DXmExVsbtbmsW6FngHvPUV0Ex6FAL/6EUH/A5b+nNh8KKBKiFCwJszxtuBcuQJKttFRd
+         mMz8bOU18j9552NA7BFhKalfN7w0uQZ4va+AyniAlnxjGLXx6oJGt7/h6R7ceGN0NL69
+         VMSg==
+X-Forwarded-Encrypted: i=1; AJvYcCUzbFs+kAczICxZsGKmxIKpI097aF08XxrXFwfG1oDAiMk4tLL0ZWHOMQ83DoCltLorqBZG4qbOXIz9NT0=@vger.kernel.org, AJvYcCXQMCkFipIYBiqdUv3bII3vAwrnwtNumPnQ3acyK1gLu3+0z2BnxnP7yF/eq3yF4ODROInr5HmRgVI/+rRge4Fvt8pw@vger.kernel.org, AJvYcCXiVKkZmjhuoNCFeom82oAlUfKbu+wd5hGMjVvrVUJXjf7CMPygcPffIBt5tFvoAfsjNLPocWPW@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywbq+I8I9JA9oCGSS5v38UZ0z+5tQAXZ/I5+Y+lzqVSqBdhOUzC
+	4ObwPOPAtTIwGTeTxEwqhEqxgdNUwH9ktybH1X3D6+rEFd2x+0u4
+X-Gm-Gg: ASbGncttpHYl46vLQB5T8v0cvvNmHQTLwwkkHM37m8O+z/Zo2x+g3rnpO7TQYkUWCsP
+	hZ6m+dT86vsYQ0hcBWwthyhoO/MiZ2zIYV8pvSbUwZX3O0P1z09eR/u5v+goBkDNSV5CTy9AgW2
+	cZ3tRIFk+bXzZ2LKkRBPX+ZPESrRmA4+1OZiYTOaIozb5+q5RuP+zBJXNhJlixo33paH216rkRB
+	ZmuhLCRZ70BUYAU2vUlnNoPkQMVDQTC3mVl3xh+kB3SfxZkjlCi/RgwHmO/bCZUOnhLm0Rf4XSV
+	NPAcd0KrsqxajaBH
+X-Google-Smtp-Source: AGHT+IGHOxW1BBkFTturFyL0nAQ4vwJGMPYFC9ml9D+kyEb7X/IH12HFXFvHGQMhPjAVMLuRzx9bPg==
+X-Received: by 2002:a17:907:2cc2:b0:abc:cbf:ff1f with SMTP id a640c23a62f3a-abeeef42910mr615585566b.40.1740593912702;
+        Wed, 26 Feb 2025 10:18:32 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:5::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abed1d55b90sm373260066b.54.2025.02.26.10.18.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Feb 2025 10:18:32 -0800 (PST)
+Date: Wed, 26 Feb 2025 10:18:29 -0800
+From: Breno Leitao <leitao@debian.org>
+To: David Ahern <dsahern@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	kernel-team@meta.com, yonghong.song@linux.dev
+Subject: Re: [PATCH net-next] trace: tcp: Add tracepoint for tcp_sendmsg()
+Message-ID: <20250226-daft-inchworm-of-love-3a98c2@leitao>
+References: <20250224-tcpsendmsg-v1-1-bac043c59cc8@debian.org>
+ <CANn89iLybqJ22LVy00KUOVscRr8GQ88AcJ3Oy9MjBUgN=or0jA@mail.gmail.com>
+ <559f3da9-4b3d-41c2-bf44-18329f76e937@kernel.org>
+ <20250226-cunning-innocent-degu-d6c2fe@leitao>
+ <7e148fd2-b4b7-49a1-958f-4b0838571245@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:ilihWn6XSUXka8w4Opgx5nIzQpScpD4HwXJtjdcb9/251tDTrXj
- JpzqKlACqH6sGBWWsvOh1jNdQKqj/IOnr7Ar/pHaQQY4HPU0hFwd9hKNiuLzEWFzFe5i/9f
- g/0C4+V+vC5bBL9IIN0arPoKZgwbKoi9tgaSieXFYCYR+DM39XzePbvX1UGb8FGZ0QF2YbB
- JYEAWTMshD0rApFd7C9IA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:gQi6RG8KjxU=;aTnVN3p7RJX35+JhVMF/chgdJvW
- reT/KTUm6O5rRZXERB9xrD/fX9oCcIYkkSbpljIkSlaI/gnbnDNMgiLDwyE76YO7IO4HI+ApW
- Sf0bMe/s+KlJFIGcvWFR2OFP+T5i12tUykwU2zM/mK8y6q50NrWPw5HAq1lA150telttH752y
- 0YymL3foKuQTmGp6nSSs+7OVl/EPscZIUQ11EIPs7CLKt0DeWr6LKGIQ9oB20QVCHtibL6chp
- b9VnmAgOBmGpDF1Vj4ZOPwKmUMFs5RZLKTFUqKQblgOw7UqSBxneWKX7qrhufqlHCkNvioKxu
- sDXk/D6MtlfvTLgRjtJ4MbrYy6FGmMFRGqtlabFSw8DQSd8tV0DngJZomNcgFr8SwlnLkDvT/
- v6QfdpLRvQPd1zgTBulWKsxR8JLiTC1Ztz0CspfAzbLEX5P8XVXSx8B3AiO8vZ9KmGcQz0sYx
- 5cR/aWhkgOfQvktW4vlROQ0HFdqOgQ5+RFh/VMbaD3qjNWGtvyvGY05n0ywr2HCfwY7+1jLfO
- ZTSUSeIXEy/KR8MeJ5+Mtv5A0tjCvxvYIyxU9b1HOCWc0/b2C1eiwsFewOrBpMA3iRX7ATJb9
- hFfR6qJNMnRKdSC2MoGCrsWJDWD1kEweV7LmMAlwoR/sHt+H5oxUVcBS+NtYHDGjzFVqE8u3h
- b/42Rufc1D9yphlczebnksZ0qvYVKeRkmn6uUaUqU2T4gmA2ckSJAbSpFgAm4wOeM6MYF4xrG
- +UZXxsfakGtb3uRQG72wUrcQ3Ob/kjXP+FdAyNaoXtYEPT4LNn2G6aBMjqfotzG5hiYSzIUVM
- ouSKQCpVsdxrz34btWVWyq1RneySDZeSXMwvjm6fWqvVJkkndFSMAds01XzFmTShggbq0uVVA
- NOxglmJfzAaLDW1N7uvdaX7cWpf1CZ5bxPtmTKNg+7qB25dzo3dV156o0i6e5xRjc0trzAUmv
- Sw8EBL2EPyi5fyCd5XxW9Q9k0atJ0hXBgFz8JJC+zO2TfyZa151aJQHT+HkIw/GqjDbwJOU27
- 1ZuSBRV8j9lV9+blkzBo66ddESVDVJce5kl2wjyzUq9BHKm0GvXaQYvX26akJx8jPyZz6sIRR
- WEKDy4Yzld0IZew+/NhEbWv24Nmfj8MsJaxL7Q9qn7YZ+5TgEmoxWCg9EzL+EzsjLKaaLO0wI
- DmB2nACYU49XVpmybkxpp71hfRDCVQJxpOftQY+VHDVFTrtQo1AoO0ra+bdwsHyWMM4agrSQJ
- wQSBuxKGEXbtP2vxKWJtTXP9FJXBJ+A1C8RevLvtLwXoo6AnuertAQlzCvV45rEAsGOKaVz7s
- 9R4IicY7Ac6KEk5PmNYSE9f3HxF8pnPTIWcuLuVUKUY7SHYNjDfp1y1QbfZWxgoPrJxVkiCUb
- pWoByLIEbUt4kM/ltzdZETvh4j/OpiI0dwOeu4OEPA9kPE/DDzlYYHcyWy
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7e148fd2-b4b7-49a1-958f-4b0838571245@kernel.org>
 
-Hello Arnd,
+Hello David,
 
-On Tue, 25 Feb 2025 09:57:14 +0100, Arnd Bergmann <arnd@kernel.org> wrote:
+On Wed, Feb 26, 2025 at 10:12:08AM -0700, David Ahern wrote:
+> On 2/26/25 9:10 AM, Breno Leitao wrote:
+> >> Also, if a tracepoint is added, inside of tcp_sendmsg_locked would cover
+> >> more use cases (see kernel references to it).
+> > 
+> > Agree, this seems to provide more useful information
+> > 
+> >> We have a patch for a couple years now with a tracepoint inside the
+> > 
+> > Sorry, where do you have this patch? is it downstream?
+> 
+> company tree. Attached. Where to put tracepoints and what arguments to
+> supply so that it is beneficial to multiple users is always a touchy
+> subject :-)
 
-> From: Arnd Bergmann <arnd@arndb.de>
->
-> When extra warnings are enable, there are configurations that build
-> pktgen without CONFIG_XFRM, which leaves a static const variable unused:
->
-> net/core/pktgen.c:213:1: error: unused variable 'F_IPSEC' [-Werror,-Wunu=
-sed-const-variable]
->   213 | PKT_FLAGS
->       | ^~~~~~~~~
-> net/core/pktgen.c:197:2: note: expanded from macro 'PKT_FLAGS'
->   197 |         pf(IPSEC)               /* ipsec on for flows */        =
-        \
->       |         ^~~~~~~~~
->
-> This could be marked as __maybe_unused, or by making the one use visible
-> to the compiler by slightly rearranging the #ifdef blocks. The second
-> variant looks slightly nicer here, so use that.
->
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  net/core/pktgen.c | 9 ++-------
->  1 file changed, 2 insertions(+), 7 deletions(-)
->
-> diff --git a/net/core/pktgen.c b/net/core/pktgen.c
-> index 55064713223e..402e01a2ce19 100644
-> --- a/net/core/pktgen.c
-> +++ b/net/core/pktgen.c
-> @@ -158,9 +158,7 @@
->  #include <net/udp.h>
->  #include <net/ip6_checksum.h>
->  #include <net/addrconf.h>
-> -#ifdef CONFIG_XFRM
->  #include <net/xfrm.h>
-> -#endif
+Thanks. I would like to state that this would be useful for Meta as
+well.
 
-This ifdef/endif can be kept (as the xfrm stuff is still not used)...
+Right now, we (Meta) are using nasty `noinline` attribute in
+tcp_sendmsg() in order to make the API stable, and this tracepoint would
+solve this problem avoiding the `noinline` hack. So, at least two type
+of users would benefit from it.
 
->  #include <net/netns/generic.h>
->  #include <asm/byteorder.h>
->  #include <linux/rcupdate.h>
-> @@ -2363,13 +2361,13 @@ static inline int f_pick(struct pktgen_dev *pkt_=
-dev)
->  }
->
->
-> -#ifdef CONFIG_XFRM
->  /* If there was already an IPSEC SA, we keep it as is, else
->   * we go look for it ...
->  */
->  #define DUMMY_MARK 0
+> so I have not tried to push the patch out. sock arg should
+> be added to it for example.
 
-A now unused define...
+True, if it becomes a tracepoint instead of a rawtracepoint, the sock
+arg might be useful.
 
->  static void get_ipsec_sa(struct pktgen_dev *pkt_dev, int flow)
->  {
-> +#ifdef CONFIG_XFRM
->  	struct xfrm_state *x =3D pkt_dev->flows[flow].x;
->  	struct pktgen_net *pn =3D net_generic(dev_net(pkt_dev->odev), pg_net_i=
-d);
+How would you recommend me proceeding in this case?
 
-Maybe better this way here?
-
-	const u32 dummy_mark =3D 0;
-
->  	if (!x) {
-> @@ -2395,11 +2393,10 @@ static void get_ipsec_sa(struct pktgen_dev *pkt_=
-dev, int flow)
->  		}
->
->  	}
-> -}
->  #endif
-> +}
->  static void set_cur_queue_map(struct pktgen_dev *pkt_dev)
->  {
-> -
->  	if (pkt_dev->flags & F_QUEUE_MAP_CPU)
->  		pkt_dev->cur_queue_map =3D smp_processor_id();
->
-> @@ -2574,10 +2571,8 @@ static void mod_cur_headers(struct pktgen_dev *pk=
-t_dev)
->  				pkt_dev->flows[flow].flags |=3D F_INIT;
->  				pkt_dev->flows[flow].cur_daddr =3D
->  				    pkt_dev->cur_daddr;
-> -#ifdef CONFIG_XFRM
->  				if (pkt_dev->flags & F_IPSEC)
->  					get_ipsec_sa(pkt_dev, flow);
-> -#endif
->  				pkt_dev->nflows++;
->  			}
->  		}
-
-Otherwise works as expected, you can add my (with or without the suggested
-changes)
-
-Reviewed-by: Peter Seiderer <ps.report@gmx.net>
-
-Regards,
-Peter
-
+Thanks
+--breno
 
