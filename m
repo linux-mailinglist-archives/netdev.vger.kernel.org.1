@@ -1,178 +1,143 @@
-Return-Path: <netdev+bounces-169834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F7EAA45E0D
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 13:00:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C7BDA45E53
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 13:14:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8346D168A9D
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 12:00:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE4F316A447
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 12:14:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2080E19259A;
-	Wed, 26 Feb 2025 12:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68D6621B1A0;
+	Wed, 26 Feb 2025 12:06:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="MEfhioKc"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="HpW5DSRQ";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="p6hDxATe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF04E258CD0
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 12:00:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC7621A457;
+	Wed, 26 Feb 2025 12:06:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740571221; cv=none; b=a7nUsdLx42+k3KURuUhPAJH+VQwZMBl5OOmzF2In43wE/a2WD9FkIbyhBS0usruRUiSs4gz5Rteho5lzUKyAATkMX72bbWUyDfhmYMnHqUz4J3nLjthUDMywTxMSiis1y83vmGmeo4aFrgokHUdtxcUs9olmcXlXFJ/5ELO8Yqg=
+	t=1740571602; cv=none; b=mUjG8IewIadsNo9A09gFfJfPs7iXoG5ykY8ngTv6jk9AMEqu/D3+YDg/A3py57yjk4HYB/TpEYRGoCwFEynSh9lSShDIWt/RI8qSrsIV1q4vPEwnhYSVc/KQoBE4kOLshk83uvsha8GWtlqUDMBvHDkbnWmibRmmUO3It/thf4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740571221; c=relaxed/simple;
-	bh=er1Ww+9tyyTFAXp8hSUNX19VPi7rncOd1/8Keq3RpDU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kbw2PEf91hTHu0z4ImMiwYQOOcQNgs6TNtJBJWprhrVybPtUEbMajz+PUOG+ffn8YsHzPfLp4R/cJyj4mLC0bN5qWUzpAYIUP1crJuQVYeBbM95WxSaGLt50/VXV9LmBw1oEoO6QlhGwRytBJ4TVQiBgYUUr7+k0I/Qk/RzBF+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=MEfhioKc; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5e095d47a25so12304525a12.0
-        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 04:00:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1740571216; x=1741176016; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CH6e+f5O+dsI1InOjSydazsysZESkO1ORdvNZDtHKnk=;
-        b=MEfhioKcgAEo8Z2rqBYXecA7HD1Jx8XfRqgYHS0M7U7vVzt0GFtTh8iYb52/D/knWA
-         r/8Q+YLWswUZHkdDrEdkeLtJGXEFkD+qR9L+945YxJqBO8G/L6cZDMdvZnmr4hfB0fhU
-         DdaqIVEBl5lc1Sa4EDBFiyxOaIRWMd38b7SFs6Fy8C/c0BOGAy4QfPWZzFCXS7bXyxKw
-         pg+RAoHZqWWk9LUvg2rcNZqp7TqNAMtCxMrayg+39MIcqPzGe0O4TUxb3qAVpEUBhkrI
-         WjYvBl0JRwBx1pY0JTfKjdJeEpS4PDYVHdIYJZjBeDXgLOEN/5VAcmjJD2I1t6itVrZv
-         zyEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740571216; x=1741176016;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CH6e+f5O+dsI1InOjSydazsysZESkO1ORdvNZDtHKnk=;
-        b=DN4xjZ6bsWoDfWloeWQ1fUJdxfHetro5JDkqgPIsemAPumlnYAwNuJppH/2bgIG/G1
-         Tz3Y8KFZDTivOC4Xvy+G4kLpGB7K1ObxDrGrZyltJdba6GbLk0Zt/lT6PPQMsbt4ugvc
-         oTib5xloHH8j3GamX6cUQkgJgOl4qJ2XV3DYmAO/KFSuoQJJK1Z5Z+xjPyAT8GUbUQna
-         XsB2+GPqF0KessiMPFYFqYrUUA8g82DQ4FLlQ4hnOik/4U17UIIIXaticGM+qdKh8yN9
-         JXx67NucboV+OjLNp0w4GEWtofCZkTTT1OnvLQyStEALCv4xr/pOJkJyur6xt8Fy8wpb
-         h4AA==
-X-Forwarded-Encrypted: i=1; AJvYcCWiZw9OWZqfiK3ruDRt5clybd4LU+W2/s7arewdLh68Zz76OmTIOnS22bl7lg46q/bI7KsaQ3c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoIz5RhcC2mAlmIIkkAh9d2vzADA5PiJMnopRXAr0GxL1urL6M
-	bEfUveO00q8VoQr20IBnz1+mOxkezee5xvUFpanrbnSDcpTOa9kPtskmh2qsGjvWhwu+LfRYn5+
-	U
-X-Gm-Gg: ASbGncuK0kEhatnQGaw3zPqvhaZxCABQRglFb1SohFVHRSxqHjwBZHFDDCnAbQ97CcS
-	aQfCzMfsde7TBsMdFCCKq8yY0B7pDrYfAjS7G5PUmSE/ZRrF2lTG+L+l278XngQncOYwFP00wHE
-	3mDBhESu2+N3i9ttS9ePrI3AXfhMhM4NWkU8e69+685s7Y6wo0v3SP0MC/trby+6eJD/68+03gV
-	0ZQd/BnfCrBqYiRKH8NeD31sGsu/1Mu2M5pU6U9JTAer3QjzLeqjqRaXcObb11lyOYAQ/pHpGFG
-	MF0Mo+3aPUqOpf5nLNEvoRwan+u8g5j4F2G2K09+ClmF7YOSWUJRj0EC5Q==
-X-Google-Smtp-Source: AGHT+IGplmOUv11HYnINOeH5sEwVT7SLeB09pZLQYiAZ6MnTV77r6NQHr5JSXaRwvS8VPhSiHYcznQ==
-X-Received: by 2002:a05:6402:50c7:b0:5e0:90b5:a06e with SMTP id 4fb4d7f45d1cf-5e0b70bbf5bmr21415238a12.7.1740571215545;
-        Wed, 26 Feb 2025 04:00:15 -0800 (PST)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e462127029sm2725233a12.78.2025.02.26.04.00.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Feb 2025 04:00:14 -0800 (PST)
-Message-ID: <ed6723e3-4e47-4dac-bc42-b65f7d42cbea@blackwall.org>
-Date: Wed, 26 Feb 2025 14:00:13 +0200
+	s=arc-20240116; t=1740571602; c=relaxed/simple;
+	bh=6RPrb/oNCKfWLnwevJl9sd+mapqG0L+h8JUcaQ7Lsyk=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i79vZijTTckuS76NRV7Ol55V666yNHgeuQ47pUHWwr2sCYoOVFPRCjP7wM3I6Wt8oiJ554IKL8nXLYXTM/ye+olVZ0DtqmgO+JLkNnbi40Vr8o5XrsbVVugVu3f25hQM5Es4LLUFiyXY7fmzimud7MjPrfYs9VR2WerzsjiKptM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=HpW5DSRQ; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=p6hDxATe; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Wed, 26 Feb 2025 13:06:37 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1740571599;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lMbmogvqMvxoME+iCYsEFSMEAUVBtH4Ru2hAHUhAvGY=;
+	b=HpW5DSRQ+Vk4lb8c6SeDY1V0uDzcCqw3LBgjQWZii/SQTOoo9Kb3HyQTAo0J62pFwX4kNe
+	hGCox1TY9tZIJGg1UzafVxCJiHL9PGEf8IkigWCoy3hHmFfC1SySUORawWlH93Z28v9kuR
+	GiibHeh2bBe0rVX25SnUaVrle4iDkqqAZCc6D3BkH8kA35xxQHgHNZAlZvTJX8Rw7XP6zu
+	S5NKlBvdhnb81EObpIdqEV/1OiRa774Pny4bNMk+Bxg3T76DgUaR9ijcgCKSaRPHStKhjr
+	H9ShW30rnQ5JObMOtenL/SWxpZf8MkbMeXPopJCn+NMBuoRgRZ2DVcky3V4/wA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1740571599;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lMbmogvqMvxoME+iCYsEFSMEAUVBtH4Ru2hAHUhAvGY=;
+	b=p6hDxATeNgHlyRhMK/ycx/R6z0jXp2jEAMpM9WOU1b4RLwo1pqqZGq4UW6pRSvyFXB6pP+
+	Zl214dDNJB8DBcBA==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Joe Damato <jdamato@fastly.com>, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Leon Romanovsky <leon@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, Simon Horman <horms@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Yunsheng Lin <linyunsheng@huawei.com>
+Subject: Re: [PATCH net-next 1/2] page_pool: Convert page_pool_recycle_stats
+ to u64_stats_t.
+Message-ID: <20250226120637.2lx8aGWz@linutronix.de>
+References: <20250221115221.291006-1-bigeasy@linutronix.de>
+ <20250221115221.291006-2-bigeasy@linutronix.de>
+ <Z7i2JHiKX6rggsUz@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [6.12.15][be2net?] Voluntary context switch within RCU read-side
- critical section!
-To: Ian Kumlien <ian.kumlien@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
- Linux Kernel Network Developers <netdev@vger.kernel.org>
-References: <CAA85sZveppNgEVa_FD+qhOMtG_AavK9_mFiU+jWrMtXmwqefGA@mail.gmail.com>
- <CAA85sZuv3kqb1B-=UP0m2i-a0kfebNZy-994Dw_v5hd-PrxEGw@mail.gmail.com>
- <20250225170545.315d896c@kernel.org>
- <CAA85sZuYbXDKAEHpXxcDvntSjtkDEBGxU-FbXevZ+YH+eL6bEQ@mail.gmail.com>
- <CAA85sZswKt7cvogeze4FQH_h5EuibF0Zc7=OAS18FxXCiEki-g@mail.gmail.com>
- <a6753983-df29-4d79-a25c-e1339816bd02@blackwall.org>
- <CAA85sZsSTod+-tS1CuB+iZSfAjCS0g+jx+1iCEWxh2=9y-M7oQ@mail.gmail.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <CAA85sZsSTod+-tS1CuB+iZSfAjCS0g+jx+1iCEWxh2=9y-M7oQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Z7i2JHiKX6rggsUz@LQ3V64L9R2>
 
-On 2/26/25 13:52, Ian Kumlien wrote:
-> On Wed, Feb 26, 2025 at 11:33 AM Nikolay Aleksandrov
-> <razor@blackwall.org> wrote:
->>
->> On 2/26/25 11:55, Ian Kumlien wrote:
->>> On Wed, Feb 26, 2025 at 10:24 AM Ian Kumlien <ian.kumlien@gmail.com> wrote:
->>>>
->>>> On Wed, Feb 26, 2025 at 2:05 AM Jakub Kicinski <kuba@kernel.org> wrote:
->>>>>
->>>>> On Tue, 25 Feb 2025 11:13:47 +0100 Ian Kumlien wrote:
->>>>>> Same thing happens in 6.13.4, FYI
->>>>>
->>>>> Could you do a minor bisection? Does it not happen with 6.11?
->>>>> Nothing jumps out at quick look.
->>>>
->>>> I have to admint that i haven't been tracking it too closely until it
->>>> turned out to be an issue
->>>> (makes network traffic over wireguard, through that node very slow)
->>>>
->>>> But i'm pretty sure it was ok in early 6.12.x - I'll try to do a bisect though
->>>> (it's a gw to reach a internal server network in the basement, so not
->>>> the best setup for this)
->>>
->>> Since i'm at work i decided to check if i could find all the boot
->>> logs, which is actually done nicely by systemd
->>> first known bad: 6.11.7-300.fc41.x86_64
->>> last known ok: 6.11.6-200.fc40.x86_64
->>>
->>> Narrows the field for a bisect at least, =)
->>>
->>
->> Saw bridge, took a look. :)
->>
->> I think there are multiple issues with benet's be_ndo_bridge_getlink()
->> because it calls be_cmd_get_hsw_config() which can sleep in multiple
->> places, e.g. the most obvious is the mutex_lock() in the beginning of
->> be_cmd_get_hsw_config(), then we have the call trace here which is:
->> be_cmd_get_hsw_config -> be_mcc_notify_wait -> be_mcc_wait_compl -> usleep_range()
->>
->> Maybe you updated some tool that calls down that path along with the kernel and system
->> so you started seeing it in Fedora 41?
+On 2025-02-21 12:21:40 [-0500], Joe Damato wrote:
+> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+> > index 611ec4b6f3709..baff961970f25 100644
+> > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+> > @@ -513,11 +513,11 @@ static void mlx5e_stats_update_stats_rq_page_pool(struct mlx5e_channel *c)
+> >  	rq_stats->pp_alloc_waive = stats.alloc_stats.waive;
+> >  	rq_stats->pp_alloc_refill = stats.alloc_stats.refill;
+> >  
+> > -	rq_stats->pp_recycle_cached = stats.recycle_stats.cached;
+> > -	rq_stats->pp_recycle_cache_full = stats.recycle_stats.cache_full;
+> > -	rq_stats->pp_recycle_ring = stats.recycle_stats.ring;
+> > -	rq_stats->pp_recycle_ring_full = stats.recycle_stats.ring_full;
+> > -	rq_stats->pp_recycle_released_ref = stats.recycle_stats.released_refcnt;
+> > +	rq_stats->pp_recycle_cached = u64_stats_read(&stats.recycle_stats.cached);
+> > +	rq_stats->pp_recycle_cache_full = u64_stats_read(&stats.recycle_stats.cache_full);
+> > +	rq_stats->pp_recycle_ring = u64_stats_read(&stats.recycle_stats.ring);
+> > +	rq_stats->pp_recycle_ring_full = u64_stats_read(&stats.recycle_stats.ring_full);
+> > +	rq_stats->pp_recycle_released_ref = u64_stats_read(&stats.recycle_stats.released_refcnt);
+> >  }
+> >  #else
+> >  static void mlx5e_stats_update_stats_rq_page_pool(struct mlx5e_channel *c)
 > 
-> Could be but it's pretty barebones
-> 
->> IMO this has been problematic for a very long time, but obviously it depends on the
->> chip type. Could you share your benet chip type to confirm the path?
-> 
-> I don't know how to find the actual chip information but it's identified as:
-> Emulex Corporation OneConnect NIC (Skyhawk) (rev 10)
-> 
+> It might be better to convert mlx5 to
+> page_pool_ethtool_stats_get_strings and
+> page_pool_ethtool_stats_get_count instead ?
 
-Good, that confirms it. The skyhawk chip falls in the "else" of the block in
-be_ndo_bridge_getlink() which calls be_cmd_get_hsw_config().
+You mean something like
 
->> For the blamed commit I'd go with:
->>  commit b71724147e73
->>  Author: Sathya Perla <sathya.perla@broadcom.com>
->>  Date:   Wed Jul 27 05:26:18 2016 -0400
->>
->>      be2net: replace polling with sleeping in the FW completion path
->>
->> This one changed the udelay() (which is safe) to usleep_range() and the spinlock
->> to a mutex.
-> 
-> So, first try will be to try without that patch then, =)
-> 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+index 611ec4b6f3709..76be86ed35b03 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+@@ -506,18 +506,7 @@ static void mlx5e_stats_update_stats_rq_page_pool(struct mlx5e_channel *c)
+ 	if (!page_pool_get_stats(pool, &stats))
+ 		return;
+ 
+-	rq_stats->pp_alloc_fast = stats.alloc_stats.fast;
+-	rq_stats->pp_alloc_slow = stats.alloc_stats.slow;
+-	rq_stats->pp_alloc_slow_high_order = stats.alloc_stats.slow_high_order;
+-	rq_stats->pp_alloc_empty = stats.alloc_stats.empty;
+-	rq_stats->pp_alloc_waive = stats.alloc_stats.waive;
+-	rq_stats->pp_alloc_refill = stats.alloc_stats.refill;
+-
+-	rq_stats->pp_recycle_cached = stats.recycle_stats.cached;
+-	rq_stats->pp_recycle_cache_full = stats.recycle_stats.cache_full;
+-	rq_stats->pp_recycle_ring = stats.recycle_stats.ring;
+-	rq_stats->pp_recycle_ring_full = stats.recycle_stats.ring_full;
+-	rq_stats->pp_recycle_released_ref = stats.recycle_stats.released_refcnt;
++	page_pool_ethtool_stats_get(&rq_stats->pp_alloc_fast, &stats);
+ }
+ #else
+ static void mlx5e_stats_update_stats_rq_page_pool(struct mlx5e_channel *c)
 
-That would be a good try, yes. It is not a straight-forward revert though since a lot
-of changes have happened since that commit. Let me know if you need help with that,
-I can prepare the revert to test.
+?
+Because I've been staring on this for a while and it seems that they
+have their own logic around struct mlx5e_sw_stats for stats.
 
->> Cheers,
->>  Nik
->>
-
+Sebastian
 
