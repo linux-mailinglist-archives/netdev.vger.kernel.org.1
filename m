@@ -1,116 +1,132 @@
-Return-Path: <netdev+bounces-169879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CA67A46350
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 15:44:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEBA3A46354
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 15:44:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 588DC1899BDE
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 14:44:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 937D11899E8C
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 14:44:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3DAC2222C3;
-	Wed, 26 Feb 2025 14:44:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96898221D8E;
+	Wed, 26 Feb 2025 14:44:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ViwZCdeV"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="HKTP/rEo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 202922222BA
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 14:44:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43E1221712
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 14:44:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740581053; cv=none; b=GNOMSGXY1vYDt4uzGiU+4B4+D6bPmaphC8Z1tu0f4P0HCcwv0NUZsaqNiLU0fW49IyL4p6ZmQo22fh71KgWbMMWZrIxbiUeaIEfUBE9AvLci9YX9rCzyNx3rL06+bcWLAtX/aLCASAd2Mw6BZKWbm0PZPkttN6YzBClm7w7jy9c=
+	t=1740581082; cv=none; b=YWqXefcqs7RgAXcdFNJrBFn1SmKirfzzdFtS9vRVISNgL3NdGS0tuVNweCiNVIJ6TIBxUajtIPz9nVuof7iYQ7nmoLR2hUb6fr+ibeLYczdrpnhoeuoNi19MLlUBQOBPCodxvOVHlH4nkK4I6jaXVVOENFH28tE2lII0K+DC7Y0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740581053; c=relaxed/simple;
-	bh=86Vzm+AK4JTzuoN4Lz2MEMbGoeh2oTUlxV6CbUR/CVk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BBtX3yXsKayxxd5h/sIT/514M/5wDiab8G9Uf3LMKMb8Dshx44jzQNuOQMONgbCkEkQgR1NPDlT0RSQwVUMhOKAPHop+hXIcCE2FMIeX4st/bTAms5uobO6usNsDNjQc3aRDoZUtThHdp4KKmBYkRtX99Qyu/w28f8UmAbfydzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ViwZCdeV; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5dee1626093so1794115a12.1
-        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 06:44:11 -0800 (PST)
+	s=arc-20240116; t=1740581082; c=relaxed/simple;
+	bh=kU/v7wqnqnL/CUwnJwMJlEh59FgkJ8snU821pG4Y7vI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hhs/wy5MYC086kPMmfC7aWNsDnGWAWlvLZz1on7xbv7ZSj+z6Na3nuJnApiTKbCeblbFjMc5TRYsrOCQdKyMzPJZ0ohQecm31GRSq6vkML5vdHCN46rXQH7rGWsj++WrRKPxdeVV3xn72X9nTaTCuRtV4ks6L4TL/dpLIR/ngwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=HKTP/rEo; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-aaec61d0f65so1392543566b.1
+        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 06:44:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740581050; x=1741185850; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LTNfSDwIAlbfeRCgAq6FoXGBkAILchgvoUx40MasxJs=;
-        b=ViwZCdeVTiYK86TquTGoUjahwbeKiWYgGk8cWnA8Avz8v6ITjy8aF1HCLiIqWqmlDF
-         U3WKhwPrT88faXas+JwZl4UF6helPwL5SU4rjyoaIdBmLF1GyXEJmMqNz5zlZ2TIxp8R
-         i9h0y5T7Lov2mC4EOIHhBmMeU5g7dIscvyiF+G/4hhHjS5vXkBeSNVoqayo+QebE52Ga
-         t4ppgPGM585m+uCBfV1jz4RTRjWN9XD1ZZivqgvw3VDOxGTGZa9MhHC/nuLVqckB9r0q
-         hjIZczoQW+aPVBWjb64c2XdrzzubxOCw1U071Vup5BorSGzC0TiAPgaBmhIlngYuuC7q
-         /MZg==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1740581079; x=1741185879; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=t3lgX5xVuREpMskRYofLOpLEr+lAUcsjQpUjCM0xtcE=;
+        b=HKTP/rEol4MUDaKRuNqYBS4LAinMV1RbRDy5AIFnFpP37rJ+cHLPKFoxE4Ke7fga3d
+         luty92mDw39JL/6RPiQBQPc3Bvs1SuICsdL5bpjQ9fcnTtpH2eZoNrRE+ltjdz/hWdlj
+         UPUDUSwMsajcdFOH8jap2vAQWwZnok1dzcB8N5U7sZcCKLzlarGMd5czaF49V2e9XyKx
+         4pGkGTY1YctwNcH7/IOFozPvwB61T57iRHASXEcLxRU87haPmok09+FmGT0oN5MOF50T
+         3BRlq7tmgeeQVEDMHBkeSDe6R2UeaSfYrQ1NBP6aJGe35I37yZUnZZjEbCXhm8CLgqEM
+         /yRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740581050; x=1741185850;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LTNfSDwIAlbfeRCgAq6FoXGBkAILchgvoUx40MasxJs=;
-        b=kfs4ZIvt3wYpJitvTfdMaUZ25hVAWa/5/4LqAccUJivj8RrSYPingcb+PF4BIpEzXk
-         3A5TpbdMGC9IBzm3ZXZ5rDAbenvb2Mc23Ar28r5zeQLCg/0zapwL2dEUcYN/rmKrsRn4
-         8X2lGhZMSpenX459ZeXJnqo/IJaMvh/1kXrFTX4usKDy998+8nFhWJha8lmxF2an7k2T
-         0PbmXNZ8MA6kumUbSqtzheGeCnooKIit9XdgPctxC73dUU4Tw/UUJIYFTY0BnPXLjjYK
-         lKBn7lQSllwiA4TfCn+Xo7c8g5hUVToJCLA7wCI66wDzlcN0ZIj1FHBSQdJdK2E7i7Zr
-         BpLg==
-X-Forwarded-Encrypted: i=1; AJvYcCWaI+z+0QCJEbwjiSLgSLrQB7+Cyamrsl4DCpjeWSxslOU7v3CseIyVVrnCJAZyjZ8xzPNgY98=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNXkCunc1dQ+EyEaIMrYv6fGBKFCAEawdCAN1MjBCjbs9y+iBx
-	B30DawMH3r93qgBwupJFnMqzfTYZ0EOM1FHVHfM3IJcoweczq3QnOXwDcIJsQIpGLiD6YiLdHXA
-	EeWEHxDSALmzFMYWtRGDERiM3kZiBy6qDg0fk
-X-Gm-Gg: ASbGncup+r9CDCO79vU/P9xRZ8IfFAj4TQj8DszdbDd/tEH8Xxvqq6LMXRleuifQBVx
-	HAiiahtI2wl8eJ8nC9RH1bMQlLNvAAgSWlq+MlCEKWMbvG1AkJDLgOmVFksn5+pb4oZnOy42vv0
-	Onem85ecs=
-X-Google-Smtp-Source: AGHT+IExUmkWkDEUH6qgBarpkM5y1HC97eK44MeNGWJO6kg6aVqL+E9f2bv+6+tPIzjlcFL3Tj723r1hGFFbZxkwjcE=
-X-Received: by 2002:a05:6402:524b:b0:5de:50b4:b71f with SMTP id
- 4fb4d7f45d1cf-5e0a12baa86mr21959041a12.12.1740581050176; Wed, 26 Feb 2025
- 06:44:10 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740581079; x=1741185879;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=t3lgX5xVuREpMskRYofLOpLEr+lAUcsjQpUjCM0xtcE=;
+        b=KNqKXQEwEoLHiRRBJTTy42DQ4+qsfuRzPU+BH1E99BBox5oK0QGpkNzL52cLGZlO/7
+         QJQdgQfXs56T5/UQg/W+vom8v23W6Uo8NRCj/jdS2u4dCmjhcFTEmvXCbs/xUs3x1VwZ
+         iwmb5BL3UIzzNqkKIR1F88CT9dSFz/bBGR3FDIYJSRvfhIlSMH/fBTkNfmcpsO7l100n
+         GYPqdNVm7Ex0ZiyMAbI01L9sZNrkWcx3GRla9MYfKn3rTrkLNpyRTQDATejBbp3qcg5c
+         f7vC3H0rWRuEymKwqn8A1tKJurbk1EdiGHho9GEUA405+NUPn7HfIoP6ssdHRXdqQKAS
+         +/LQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXtvYpWkm/sJ5CcJaB8D/Z7LPo6bVtayXwg420HDCQAgnVG/Ik/+AXUkO+lbNY20SVKr2fdFEM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/ArO52m45F8xZeUlgoswuHuB85rJp2ow0Fv2JYLCj8LtqV6Y2
+	oSAV8muBHwH969m2b6iSpfak2xg6C+1U2Uzxxu7lABSMBN0NReNxD3OyOgGhSvw=
+X-Gm-Gg: ASbGnctPB2uyvLUskqCTNBCrU+FMSeL5vL/MMZsq8PVF2O+B0dqA7rrFTLaVEYwxMn3
+	VMESsfBtpDRaLWooS268CRprHg2BAcLnvjK587U6UBqrONLo3cvvdcCvzbJSXrgKGev7suiRw2Q
+	iYWzsiH+rcnRn3nP9NDugZ7ARua2pAOB6fWa8sFPs56yZvz3LCgBWnLEyJpP8xQbe7Swv6wxSTE
+	OT2NiP80ubx457EIclpe1cW+1NVivWOfYjvsy1+ew9LdPjDNOkvsVBUaUZsSrq0Q5RJrMgRSe6n
+	oEr183SBXMHRrPH73RCdIs0PBMYlsGJJSomdTRK6TDixgVIHF5KAtQ==
+X-Google-Smtp-Source: AGHT+IHIRtlrHZVjf/hDRjPSID8OLFIzIelRBHIadTGYyg2MUE07spOk+sYZauxSRswyF+7Ev7Qp5w==
+X-Received: by 2002:a17:906:c147:b0:ab6:d575:3c4c with SMTP id a640c23a62f3a-abed0cc511bmr827247366b.17.1740581078919;
+        Wed, 26 Feb 2025 06:44:38 -0800 (PST)
+Received: from jiri-mlt.client.nvidia.com ([140.209.217.212])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abed205c7efsm340987766b.149.2025.02.26.06.44.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Feb 2025 06:44:38 -0800 (PST)
+Date: Wed, 26 Feb 2025 15:44:35 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Tariq Toukan <tariqt@nvidia.com>, 
+	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Jiri Pirko <jiri@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>, 
+	Carolina Jubran <cjubran@nvidia.com>, Gal Pressman <gal@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
+	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next 03/10] devlink: Serialize access to rate domains
+Message-ID: <wgbtvsogtf4wgxyz7q4i6etcvlvk6oi3xyckie2f7mwb3gyrl4@m7ybivypoojl>
+References: <20250213180134.323929-1-tariqt@nvidia.com>
+ <20250213180134.323929-4-tariqt@nvidia.com>
+ <ieeem2dc5mifpj2t45wnruzxmo4cp35mbvrnsgkebsqpmxj5ib@hn7gphf6io7x>
+ <20250218182130.757cc582@kernel.org>
+ <qaznnl77zg24zh72axtv7vhbfdbxnzmr73bqr7qir5wu2r6n52@ob25uqzyxytm>
+ <20250225174005.189f048d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250225182250.74650-1-kuniyu@amazon.com> <20250225182250.74650-12-kuniyu@amazon.com>
-In-Reply-To: <20250225182250.74650-12-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 26 Feb 2025 15:43:59 +0100
-X-Gm-Features: AQ5f1JrU_5gC822nCl_IGuB7S0n4n4uFMofOgAKbAdQ6F2ZPPjKq2KMcZxOguhg
-Message-ID: <CANn89iKNGiLK-_LJu4tMriPMLeQs6ZWhEy6E-11dA1SEE68h2g@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 11/12] ipv4: fib: Move fib_valid_key_len() to rtm_to_fib_config().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250225174005.189f048d@kernel.org>
 
-On Tue, Feb 25, 2025 at 7:27=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
+Wed, Feb 26, 2025 at 02:40:05AM +0100, kuba@kernel.org wrote:
+>On Tue, 25 Feb 2025 14:36:07 +0100 Jiri Pirko wrote:
+>> >The problem comes from having a devlink instance per function /
+>> >port rather than for the ASIC. Spawn a single instance and the
+>> >problem will go away 🤷️  
+>> 
+>> Yeah, we currently have VF devlink ports created under PF devlink instance.
+>> That is aligned with PCI geometry. If we have a single per-ASIC parent
+>> devlink, this does not change and we still need to configure cross
+>> PF devlink instances.
 >
-> fib_valid_key_len() is called in the beginning of fib_table_insert()
-> or fib_table_delete() to check if the prefix length is valid.
->
-> fib_table_insert() and fib_table_delete() are called from 3 paths
->
->   - ip_rt_ioctl()
->   - inet_rtm_newroute() / inet_rtm_delroute()
->   - fib_magic()
->
-> In the first ioctl() path, rtentry_to_fib_config() checks the prefix
-> length with bad_mask().  Also, fib_magic() always passes the correct
-> prefix: 32 or ifa->ifa_prefixlen, which is already validated.
->
-> Let's move fib_valid_key_len() to the rtnetlink path, rtm_to_fib_config()=
-.
->
-> While at it, 2 direct returns in rtm_to_fib_config() are changed to
-> goto to match other places in the same function
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+>Why would there still be PF instances? I'm not suggesting that you
+>create a hierarchy of instances.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+I'm not sure how you imagine getting rid of them. One PCI PF
+instantiates one devlink now. There are lots of configuration (e.g. params)
+that is per-PF. You need this instance for that, how else would you do
+per-PF things on shared ASIC instance?
+Creating SFs is per-PF operation for example. I didn't to thorough
+analysis, but I'm sure there are couple of per-PF things like these.
+Also not breaking the existing users may be an argument to keep per-PF
+instances.
+
+>
+>> The only benefit I see is that we don't need rate domain, but
+>> we can use parent devlink instance lock instead. The locking ordering
+>> might be a bit tricky to fix though.
 
