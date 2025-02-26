@@ -1,126 +1,148 @@
-Return-Path: <netdev+bounces-169704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 371F8A4552A
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 06:59:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CF10A4552F
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 07:00:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32F723A573C
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 05:59:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 591DC7A1E26
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 05:59:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C540267B68;
-	Wed, 26 Feb 2025 05:59:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PfAREa7N"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21D6915852F;
+	Wed, 26 Feb 2025 06:00:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD71B2676CD
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 05:59:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E158433997
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 06:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740549569; cv=none; b=nyyEig5fSFv1diCs6U63cnjIiPcK94TiITUjCRaPSHC8IQcnh4GEWQXIQUodcxv01McGWCTfXdI1T02BaC9ECTg/6dPOD1YF4fCS8a70R7BzFWh3vVBCHLMDY8scuUvlh/bb00ZhEz6QNAKz07yYGcojVlatATPsgDzeQKLRzpI=
+	t=1740549630; cv=none; b=ePf6tn6Al6qYZNEJuWBA1fKDje8cGJ+MCw2ytvDdRMqHKk5InWLsciC7YfMIGmY6FFfRFpVKh7/EiBW8c2ZauVA61IJQy+WntJOQmwoBnApIPHpoHjz8ZzL4W+2ebJRWBjuPWAgqVQbeevPOeU3IDWDHvEiWWGA/7qOOX89qla8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740549569; c=relaxed/simple;
-	bh=m7gnNaSnVIQnhwXaGmMm7ApeqEyKQEEPJJKfMSkYWew=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Kg/J8qxl8it/u4zZ9bvedS7G5z38CREQJtilVrlzkNv44TE7WFxkisYu7W6EyKlbvpH/7NWeNSowev22G4FUzJnO2HgX5Y/gyN3EdzZePZl1QZSumYN2mFxKiDtKJLgDeXdtB716lDd/h85nZHwXblzlx5UUkgi/oKonD8Z1Bd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PfAREa7N; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740549566;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=m7gnNaSnVIQnhwXaGmMm7ApeqEyKQEEPJJKfMSkYWew=;
-	b=PfAREa7NjUAVOjJaRDNGG9uKIUR9M2DzXN5lsVlMkn9lOsJXJmfzrVJGDxQSeO0DTnxDvM
-	3rcdE0k7jhAunAEupe23L1YvdBq5L8+2kF6n3HqQDD2BuZh6MezaoA2zIMcXeHu6SgUQFP
-	qXwN6eqA8feelBQktZYdcEo72GuYBmg=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-657-w-EK7TIbMP6fhL2vK_bglQ-1; Wed, 26 Feb 2025 00:59:25 -0500
-X-MC-Unique: w-EK7TIbMP6fhL2vK_bglQ-1
-X-Mimecast-MFC-AGG-ID: w-EK7TIbMP6fhL2vK_bglQ_1740549564
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2fc1cb0c2cbso21025568a91.1
-        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 21:59:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740549564; x=1741154364;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=m7gnNaSnVIQnhwXaGmMm7ApeqEyKQEEPJJKfMSkYWew=;
-        b=hdNmTPdHzxd9vDYbCcz8M3MbRq2K73e0ZJCrEEUWIYLboAm/rdbm3bfb94WSrdlKeS
-         lFjmbIZPU9AuqIlUw9zc7cWQU3h5T6VmMXiZm/j1zg8+tOQzLdHR9L1NFB2miJFXjJBd
-         90b1Whcaof8mRVkkBVAwPcsRvAcJDlfT7KUVHPpPKULgVn80Jxbl52C99aWFJyVaAsfg
-         Oo3nJ0pHwDmQWoUV5D8Z4Oo4T30dUBJ/8AAKGTNL4pdl2/1dkSHzC+tbgNmWSvKGi5zg
-         Z6MhzJKNkbG8YSLg+7Jn1SD5KoiQGtzdQgdwqK1Rp6sLo2QH0Lvhp6xfrhCUNNMl77fA
-         ogqQ==
-X-Gm-Message-State: AOJu0YwDZMX81zwOpPlZvouZYZi4m2U3Z4L7/eJ5FOZg7kQTgtnHDTpe
-	u1n7xhKlUrQDzc4HN/cTzNz/8/Wtt0b4rbLWklzfAHML2sZeiPD1YeGnizoQ7Pbply4Uf5jF25+
-	Fdgc2lZM+UfnkuAQ2ABo0EDdftyOzVjIY0YQ79xANUeeFvAtlI9HqQzQxdBi2h19biWwCFRbbEq
-	HhbPbYcUVPEqzAOmBY0ls4micfbbkb
-X-Gm-Gg: ASbGncvvPz2XDwITRg0/R8hrIaF6sGs/LyFGRou5SGqptt6V4Q9/fk/7vLxlccjInrB
-	uSbUBxJUucTMDdHZTWxZtYsrg//rixhCPZJehNb/zzIdGmJdKnZICAQo209KS+6EQiERjuOzw+w
-	==
-X-Received: by 2002:a17:90b:2803:b0:2f4:4003:f3ea with SMTP id 98e67ed59e1d1-2fe692c8403mr10781890a91.33.1740549563994;
-        Tue, 25 Feb 2025 21:59:23 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEjfukw25/3dRjwBrKqTgNYjNEca8F88lv26UtFCag9qeKPB/TQL+bJT6mEpFZEyRdR+HxO/f/07hSLXK/EZbY=
-X-Received: by 2002:a17:90b:2803:b0:2f4:4003:f3ea with SMTP id
- 98e67ed59e1d1-2fe692c8403mr10781849a91.33.1740549563668; Tue, 25 Feb 2025
- 21:59:23 -0800 (PST)
+	s=arc-20240116; t=1740549630; c=relaxed/simple;
+	bh=PjPKATSdaH5JbvKv2y6nDT7XIJdOyM7DRFleSS8Wdes=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AYLVVZKVWK1lnxiRxwfqF+yswq9dUJS/Y1erBVQAic2wrc0E0o3f/MqEOLoLxCr3c2Afqa9ral1bDOrpXxYtg3AzudXQwLEMU2CLUJmF9rS8w0VPEChprWt1eTa2omMjQ8EN5tX2FBd3GSw+HGpw3g8PQVgm3Rc5wqFU8jBKxTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tnASU-0004lp-1A; Wed, 26 Feb 2025 06:59:50 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tnASP-002tnR-1n;
+	Wed, 26 Feb 2025 06:59:45 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tnASP-001SXr-1K;
+	Wed, 26 Feb 2025 06:59:45 +0100
+Date: Wed, 26 Feb 2025 06:59:45 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Kory Maincent <kory.maincent@bootlin.com>, Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	Kyle Swenson <kyle.swenson@est.tech>,
+	Dent Project <dentproject@linuxfoundation.org>,
+	kernel@pengutronix.de,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 06/12] net: pse-pd: Add support for budget
+ evaluation strategies
+Message-ID: <Z76t0VotFL7ji41M@pengutronix.de>
+References: <20250218-feature_poe_port_prio-v5-0-3da486e5fd64@bootlin.com>
+ <20250218-feature_poe_port_prio-v5-6-3da486e5fd64@bootlin.com>
+ <20250220165129.6f72f51a@kernel.org>
+ <20250224141037.1c79122b@kmaincent-XPS-13-7390>
+ <20250224134522.1cc36aa3@kernel.org>
+ <20250225102558.2cf3d8a5@kmaincent-XPS-13-7390>
+ <20250225174752.5dbf65e2@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250224152909.3911544-1-marcus.wichelmann@hetzner-cloud.de> <20250224152909.3911544-3-marcus.wichelmann@hetzner-cloud.de>
-In-Reply-To: <20250224152909.3911544-3-marcus.wichelmann@hetzner-cloud.de>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 26 Feb 2025 13:59:10 +0800
-X-Gm-Features: AWEUYZn3sINGV0LaU89f2SQBC-EkP65HckbvJbjb0aMWfaIJ_G6VZpbaC4mxxbg
-Message-ID: <CACGkMEt72ZwDQUUDPUrxiEJQLTWBQ25pP0wCO-FrZ2tZDj7itA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v3 2/6] net: tun: enable transfer of XDP metadata
- to skb
-To: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, willemdebruijn.kernel@gmail.com, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, andrii@kernel.org, eddyz87@gmail.com, 
-	mykolal@fb.com, ast@kernel.org, daniel@iogearbox.net, martin.lau@linux.dev, 
-	song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com, 
-	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, 
-	shuah@kernel.org, hawk@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250225174752.5dbf65e2@kernel.org>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, Feb 24, 2025 at 11:29=E2=80=AFPM Marcus Wichelmann
-<marcus.wichelmann@hetzner-cloud.de> wrote:
->
-> When the XDP metadata area was used, it is expected that the same
-> metadata can also be accessed from TC, as can be read in the description
-> of the bpf_xdp_adjust_meta helper function. In the tun driver, this was
-> not yet implemented.
->
-> To make this work, the skb that is being built on XDP_PASS should know
-> of the current size of the metadata area. This is ensured by adding
-> calls to skb_metadata_set. For the tun_xdp_one code path, an additional
-> check is necessary to handle the case where the externally initialized
-> xdp_buff has no metadata support (xdp->data_meta =3D=3D xdp->data + 1).
->
-> More information about this feature can be found in the commit message
-> of commit de8f3a83b0a0 ("bpf: add meta pointer for direct access").
->
-> Signed-off-by: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
+On Tue, Feb 25, 2025 at 05:47:52PM -0800, Jakub Kicinski wrote:
+> On Tue, 25 Feb 2025 10:25:58 +0100 Kory Maincent wrote:
+> > On Mon, 24 Feb 2025 13:45:22 -0800
+> > Jakub Kicinski <kuba@kernel.org> wrote:
+> > 
+> > > > No they can't for now. Even different PSE power domains within the same PSE
+> > > > controller. I will make it explicit.    
+> > > 
+> > > Sounds like the property is placed at the wrong level of the hierarchy,
+> > > then.  
+> > 
+> > When a PSE controller appears to be able to support mixed budget strategy and
+> > could switch between them it will be better to have it set at the PSE power
+> > domain level. As the budget is per PSE power domain, its strategy should also
+> > be per PSE power domain.
+> > For now, it is simply not configurable and can't be mixed. It is hard-coded by
+> > the PSE driver.
+> 
+> Yes, but uAPI is forever. We will have to live with those domain
+> attributes duplicated on each port. Presumably these port attributes
+> will never support a SET operation, since the set should be towards 
+> the domain? The uAPI does not inspire confidence. If we need more
+> drivers to define a common API maybe a local sysfs API in the driver
+> will do?
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+I tend to disagree here. The evaluation/allocation methods should be
+per port.  
 
-Thanks
+At this step, we support only "hardware"(firmware)-based methods:  
+1. Static – Plain hardware classification-based power allocation per
+port.  
+2. Dynamic – Hardware classification with constant measurement for
+optimization.  
 
+For some devices, the dynamic method may not work reliably enough,
+so we will need to switch to a fixed allocation method, which is
+currently not implemented but will be set via user space. This
+should be configurable per port.  
+
+At some point, we will need to introduce LLDP-based allocation from
+user space. This will be managed by a daemon.
+
+For testing, here’s an example of how LLDP-based power negotiation can
+be analyzed:
+https://telecomtest.com.au/wp-content/uploads/2016/12/PDA-LLDP-Powered-Device-LLDP-Analyzer.pdf
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
