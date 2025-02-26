@@ -1,186 +1,234 @@
-Return-Path: <netdev+bounces-169805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5DD0A45C6F
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 12:00:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 234C9A45CC4
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 12:11:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E80B93A3410
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 11:00:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4861B175BBD
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 11:11:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F17442AA5;
-	Wed, 26 Feb 2025 11:00:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="YpuC46+x"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40D55215187;
+	Wed, 26 Feb 2025 11:11:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0554B322A;
-	Wed, 26 Feb 2025 11:00:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA15420E31F;
+	Wed, 26 Feb 2025 11:11:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740567619; cv=none; b=l7Pv7TJcvBI24F6Jrk/4JnfkaRTf+rBqIq8z50be3wUVX8jxyPHPRvf38hCTnhL2luKRe0pp88Z80Nt74klkHzagyJGRsNkrs6DQZcvtSaOLBYC9unyq4h1/Cp1uM2RHpZspH4H29Xi1tSDmPYML3zKIPBwyVdF62aYpSerT0+c=
+	t=1740568279; cv=none; b=pLS6gTZMcSIFMWSBIgdUrlwW2KdxlYkNQlD/IsXV3mXbv5ZMCi1Di+ZRHsUNDtg0+gQwsesjO4t9vCphLadcF4hjapVtKl3BuRMGwuJR6a0bsaMrqYzNmbjomXMOzOnuBoM8U5EN8e/V6nSOtHloMH5lFlRFb+8FE+czQfEaPZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740567619; c=relaxed/simple;
-	bh=ApG6Ew9SI1aZoG+UxvBTZ+sutgnzMe2rdoFQZX2cS6Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b4ermQlUMQgT4EKYykJMps8NnDj06qZUjPNMs1zeo5/kWQwAQGYz7cb/UknGhxt5ePSaTlM3wCi35PH2Yv2dIwqgBFhcbx709res+px4Sq5uwiAVlC7hO2igUW9hU/kZcMjhVls+08M5/5wvCymdunMArcnDfsE6H5X59r5xMRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=YpuC46+x; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=u959TBYWOv9S7YvoxEBIspvDOHEq4YyJ10CaapL1Rnw=; b=YpuC46+xpDCnI9LSS2IXu08VWA
-	RAQ4FGKjOmXC7t3M5vbVF2q93gZ/nbORvFCxSvEZAW1CdpdJsBLQSOA50BBqM0qKA6NBQ1EQn2sQ7
-	jTAYkPaiNYVJvfNElRkwbjFDmwkq0XQG66S7ZKmB1Ze/GkTIa5moVBOKdTsULxLvxcsOj3lWeM9qe
-	pk5jghlkg/CZxlwKFYkAqfWWCoBmUwScTMyFqomSM5F6kfqHfV1c4O6PA3qlqDik3d7jlsrQNXPa1
-	8bV/HpTG2ICCPy2zXQutFS2/sUBKCvMlNpmdMnrUCXB5oIo8CKPMUu5j1AXX1R9KKE5AWTgAtk3US
-	1H5xstuQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52384)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tnF8z-00041N-02;
-	Wed, 26 Feb 2025 11:00:01 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tnF8v-000704-13;
-	Wed, 26 Feb 2025 10:59:57 +0000
-Date: Wed, 26 Feb 2025 10:59:57 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jon Hunter <jonathanh@nvidia.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Bryan Whitehead <bryan.whitehead@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com,
-	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
-Subject: Re: [PATCH net-next 9/9] net: stmmac: convert to phylink managed EEE
- support
-Message-ID: <Z770LRrhPOjOsdrd@shell.armlinux.org.uk>
-References: <Z68nSJqVxcnCc1YB@shell.armlinux.org.uk>
- <86fae995-1700-420b-8d84-33ab1e1f6353@nvidia.com>
- <Z7X6Z8yLMsQ1wa2D@shell.armlinux.org.uk>
- <203871c2-c673-4a98-a0a3-299d1cf71cf0@nvidia.com>
- <Z7YtWmkVl0rWFvQO@shell.armlinux.org.uk>
- <fd4af708-0c92-4295-9801-bf53db3a16cc@nvidia.com>
- <Z7ZF0dA4-jwU7O2E@shell.armlinux.org.uk>
- <31731125-ab8f-48d9-bd6f-431d49431957@nvidia.com>
- <Z77myuNCoe_la7e4@shell.armlinux.org.uk>
- <dd1f65bf-8579-4d32-9c9c-9815d25cc116@nvidia.com>
+	s=arc-20240116; t=1740568279; c=relaxed/simple;
+	bh=wWD2tZa/klVgH2MM/wWGbtZUpbPR49qn1Dj9rD0e90A=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mX0axvOuRp16npmmQAjpENozuDAlM7peD7vkq4c2H9NV4N5deOkKntv8TQ/1+ZGWUyVer6qTzA5DURVstyPlLYavwjmHJL0MS2gmbO/FultRg9KLXxlu6s+kEM2jxeA8JEG8bMdS/SzYJyStWai14dz528rk9q2nJSvZPGlJS5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Z2s9y354mzJ1Fl;
+	Wed, 26 Feb 2025 19:07:02 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id BEBBB18001B;
+	Wed, 26 Feb 2025 19:11:06 +0800 (CST)
+Received: from localhost.localdomain (10.90.30.45) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 26 Feb 2025 19:11:06 +0800
+From: Yunsheng Lin <linyunsheng@huawei.com>
+To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <zhangkun09@huawei.com>, <liuyonglong@huawei.com>,
+	<fanghaiqing@huawei.com>, Yunsheng Lin <linyunsheng@huawei.com>, Alexander
+ Lobakin <aleksander.lobakin@intel.com>, Robin Murphy <robin.murphy@arm.com>,
+	Alexander Duyck <alexander.duyck@gmail.com>, Andrew Morton
+	<akpm@linux-foundation.org>, Gaurav Batra <gbatra@linux.ibm.com>, Matthew
+ Rosato <mjrosato@linux.ibm.com>, IOMMU <iommu@lists.linux.dev>, MM
+	<linux-mm@kvack.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, Matthias Brugger
+	<matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>, <netdev@vger.kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, <bpf@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-mediatek@lists.infradead.org>
+Subject: [PATCH net-next v10 0/4] fix the DMA API misuse problem for page_pool
+Date: Wed, 26 Feb 2025 19:03:35 +0800
+Message-ID: <20250226110340.2671366-1-linyunsheng@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dd1f65bf-8579-4d32-9c9c-9815d25cc116@nvidia.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On Wed, Feb 26, 2025 at 10:11:58AM +0000, Jon Hunter wrote:
-> 
-> On 26/02/2025 10:02, Russell King (Oracle) wrote:
-> > On Tue, Feb 25, 2025 at 02:21:01PM +0000, Jon Hunter wrote:
-> > > Hi Russell,
-> > > 
-> > > On 19/02/2025 20:57, Russell King (Oracle) wrote:
-> > > > So, let's try something (I haven't tested this, and its likely you
-> > > > will need to work it in to your other change.)
-> > > > 
-> > > > Essentially, this disables the receive clock stop around the reset,
-> > > > something the stmmac driver has never done in the past.
-> > > > 
-> > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > > index 1cbea627b216..8e975863a2e3 100644
-> > > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > > @@ -7926,6 +7926,8 @@ int stmmac_resume(struct device *dev)
-> > > >    	rtnl_lock();
-> > > >    	mutex_lock(&priv->lock);
-> > > > +	phy_eee_rx_clock_stop(priv->dev->phydev, false);
-> > > > +
-> > > >    	stmmac_reset_queues_param(priv);
-> > > >    	stmmac_free_tx_skbufs(priv);
-> > > > @@ -7937,6 +7939,9 @@ int stmmac_resume(struct device *dev)
-> > > >    	stmmac_restore_hw_vlan_rx_fltr(priv, ndev, priv->hw);
-> > > > +	phy_eee_rx_clock_stop(priv->dev->phydev,
-> > > > +			      priv->phylink_config.eee_rx_clk_stop_enable);
-> > > > +
-> > > >    	stmmac_enable_all_queues(priv);
-> > > >    	stmmac_enable_all_dma_irq(priv);
-> > > 
-> > > 
-> > > Sorry for the delay, I have been testing various issues recently and needed
-> > > a bit more time to test this.
-> > > 
-> > > It turns out that what I had proposed last week does not work. I believe
-> > > that with all the various debug/instrumentation I had added, I was again
-> > > getting lucky. So when I tested again this week on top of vanilla v6.14-rc2,
-> > > it did not work :-(
-> > > 
-> > > However, what you are suggesting above, all by itself, is working. I have
-> > > tested this on top of vanilla v6.14-rc2 and v6.14-rc4 and it is working
-> > > reliably. I have also tested on some other boards that use the same stmmac
-> > > driver (but use the Aquantia PHY) and I have not seen any issues. So this
-> > > does fix the issue I am seeing.
-> > > 
-> > > I know we are getting quite late in the rc for v6.14, but not sure if we
-> > > could add this as a fix?
-> > 
-> > The patch above was something of a hack, bypassing the layering, so I
-> > would like to consider how this should be done properly.
-> > 
-> > I'm still wondering whether the early call to phylink_resume() is
-> > symptomatic of this same issue, or whether there is a PHY that needs
-> > phy_start() to be called to output its clock even with link down that
-> > we don't know about.
-> > 
-> > The phylink_resume() call is relevant to this because I'd like to put:
-> > 
-> > 	phy_eee_rx_clock_stop(priv->dev->phydev,
-> > 			      priv->phylink_config.eee_rx_clk_stop_enable);
-> > 
-> > in there to ensure that the PHY is correctly configured for clock-stop,
-> > but given stmmac's placement that wouldn't work.
-> > 
-> > I'm then thinking of phylink_pre_resume() to disable the EEE clock-stop
-> > at the PHY.
-> > 
-> > I think the only thing we could do is try solving this problem as per
-> > above and see what the fall-out from it is. I don't get the impression
-> > that stmmac users are particularly active at testing patches though, so
-> > it may take months to get breakage reports.
-> 
-> 
-> We can ask Furong to test as he seems to active and making changes, but
-> otherwise I am not sure how well it is being tested across various devices.
-> On the other hand, it feels like there are still lingering issues like this
-> with the driver and so I would hope this is moving in the right direction.
-> 
-> Let me know if you have a patch you want me to test and I will run in on our
-> Tegra186, Tegra194 and Tegra234 devices that all use this.
+This patchset fix the dma API misuse problem as below:
+Networking driver with page_pool support may hand over page
+still with dma mapping to network stack and try to reuse that
+page after network stack is done with it and passes it back
+to page_pool to avoid the penalty of dma mapping/unmapping.
+With all the caching in the network stack, some pages may be
+held in the network stack without returning to the page_pool
+soon enough, and with VF disable causing the driver unbound,
+the page_pool does not stop the driver from doing it's
+unbounding work, instead page_pool uses workqueue to check
+if there is some pages coming back from the network stack
+periodically, if there is any, it will do the dma unmmapping
+related cleanup work.
 
-Do we think this needs to be a patch for the net tree or the net-next
-tree? I think we've established that it's been a long-standing bug,
-so maybe if we target net-next to give it more time to be tested?
+As mentioned in [1], attempting DMA unmaps after the driver
+has already unbound may leak resources or at worst corrupt
+memory. Fundamentally, the page pool code cannot allow DMA
+mappings to outlive the driver they belong to.
+
+By using the 'struct page_pool_item' referenced by page->pp_item,
+page_pool is not only able to keep track of the inflight page to
+do dma unmmaping if some pages are still handled in networking
+stack when page_pool_destroy() is called, and networking stack is
+also able to find the page_pool owning the page when returning
+pages back into page_pool:
+1. When a page is added to the page_pool, an item is deleted from
+   pool->hold_items and set the 'pp_netmem' pointing to that page
+   and set item->state and item->pp_netmem accordingly in order to
+   keep track of that page, refill from pool->release_items when
+   pool->hold_items is empty or use the item from pool->slow_items
+   when fast items run out.
+2. When a page is released from the page_pool, it is able to tell
+   which page_pool this page belongs to by masking off the lower
+   bits of the pointer to page_pool_item *item, as the 'struct
+   page_pool_item_block' is stored in the top of a struct page.
+   And after clearing the pp_item->state', the item for the
+   released page is added back to pool->release_items so that it
+   can be reused for new pages or just free it when it is from the
+   pool->slow_items.
+3. When page_pool_destroy() is called, item->state is used to tell
+   if a specific item is being used/dma mapped or not by scanning
+   all the item blocks in pool->item_blocks, then item->netmem can
+   be used to do the dma unmmaping if the corresponding inflight
+   page is dma mapped.
+
+From the below performance data, the overhead is not so obvious
+due to performance variations in arm64 server and less than 1
+ns in x86 server for time_bench_page_pool01_fast_path() and
+time_bench_page_pool02_ptr_ring, and there is about 10~20ns
+overhead for time_bench_page_pool03_slow(), see more detail in
+[2].
+
+arm64 server:
+Before this patchset:
+              fast_path              ptr_ring            slow
+1.         31.171 ns               60.980 ns          164.917 ns
+2.         28.824 ns               60.891 ns          170.241 ns
+3.         14.236 ns               60.583 ns          164.355 ns
+
+With patchset:
+6.         26.163 ns               53.781 ns          189.450 ns
+7.         26.189 ns               53.798 ns          189.466 ns
+
+X86 server:
+| Test name  |Cycles |   1-5 |    | Nanosec |    1-5 |        |      % |
+| (tasklet_*)|Before | After |diff|  Before |  After |   diff | change |
+|------------+-------+-------+----+---------+--------+--------+--------|
+| fast_path  |    19 |    19 |   0|   5.399 |  5.492 |  0.093 |    1.7 |
+| ptr_ring   |    54 |    57 |   3|  15.090 | 15.849 |  0.759 |    5.0 |
+| slow       |   238 |   284 |  46|  66.134 | 78.909 | 12.775 |   19.3 |
+
+And about 16 bytes of memory is also needed for each page_pool owned
+page to fix the dma API misuse problem
+
+1. https://lore.kernel.org/lkml/8067f204-1380-4d37-8ffd-007fc6f26738@kernel.org/T/
+2. https://lore.kernel.org/all/f558df7a-d983-4fc5-8358-faf251994d23@kernel.org/
+
+CC: Alexander Lobakin <aleksander.lobakin@intel.com>
+CC: Robin Murphy <robin.murphy@arm.com>
+CC: Alexander Duyck <alexander.duyck@gmail.com>
+CC: Andrew Morton <akpm@linux-foundation.org>
+CC: Gaurav Batra <gbatra@linux.ibm.com>
+CC: Matthew Rosato <mjrosato@linux.ibm.com>
+CC: IOMMU <iommu@lists.linux.dev>
+CC: MM <linux-mm@kvack.org>
+
+Change log:
+V10:
+  1. Add nl API to dump item memory usage.
+  2. Use __acquires() and __releases() to avoid 'context imbalance'
+     warning.
+
+V9.
+  1. Drop the fix of a possible time window problem for NPAI recycling.
+  2. Add design description for the fix in patch 2.
+
+V8:
+  1. Drop last 3 patch as it causes observable performance degradation
+     for x86 system.
+  2. Remove rcu read lock in page_pool_napi_local().
+  3. Renaming item function more consistently.
+
+V7:
+  1. Fix a used-after-free bug reported by KASAN as mentioned by Jakub.
+  2. Fix the 'netmem' variable not setting up correctly bug as mentioned
+     by Simon.
+
+V6:
+  1. Repost based on latest net-next.
+  2. Rename page_pool_to_pp() to page_pool_get_pp().
+
+V5:
+  1. Support unlimit inflight pages.
+  2. Add some optimization to avoid the overhead of fixing bug.
+
+V4:
+  1. use scanning to do the unmapping
+  2. spilt dma sync skipping into separate patch
+
+V3:
+  1. Target net-next tree instead of net tree.
+  2. Narrow the rcu lock as the discussion in v2.
+  3. Check the ummapping cnt against the inflight cnt.
+
+V2:
+  1. Add a item_full stat.
+  2. Use container_of() for page_pool_to_pp().
+
+Yunsheng Lin (4):
+  page_pool: introduce page_pool_get_pp() API
+  page_pool: fix IOMMU crash when driver has already unbound
+  page_pool: support unlimited number of inflight pages
+  page_pool: skip dma sync operation for inflight pages
+
+ Documentation/netlink/specs/netdev.yaml       |  16 +
+ drivers/net/ethernet/freescale/fec_main.c     |   8 +-
+ .../ethernet/google/gve/gve_buffer_mgmt_dqo.c |   2 +-
+ drivers/net/ethernet/intel/iavf/iavf_txrx.c   |   6 +-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   |  14 +-
+ drivers/net/ethernet/intel/libeth/rx.c        |   2 +-
+ .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |   3 +-
+ drivers/net/netdevsim/netdev.c                |   6 +-
+ drivers/net/wireless/mediatek/mt76/mt76.h     |   2 +-
+ include/linux/mm_types.h                      |   2 +-
+ include/linux/skbuff.h                        |   1 +
+ include/net/libeth/rx.h                       |   3 +-
+ include/net/netmem.h                          |  31 +-
+ include/net/page_pool/helpers.h               |  15 +
+ include/net/page_pool/memory_provider.h       |   2 +-
+ include/net/page_pool/types.h                 |  46 +-
+ include/uapi/linux/netdev.h                   |   2 +
+ net/core/devmem.c                             |   6 +-
+ net/core/netmem_priv.h                        |   5 +-
+ net/core/page_pool.c                          | 423 ++++++++++++++++--
+ net/core/page_pool_priv.h                     |  12 +-
+ net/core/page_pool_user.c                     |  39 +-
+ tools/net/ynl/samples/page-pool.c             |  11 +
+ 23 files changed, 570 insertions(+), 87 deletions(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.33.0
+
 
