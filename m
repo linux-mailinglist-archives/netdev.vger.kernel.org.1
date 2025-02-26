@@ -1,163 +1,221 @@
-Return-Path: <netdev+bounces-169707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169708-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AB17A4553E
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 07:07:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DDEFA45548
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 07:08:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 994497A069C
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 06:06:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 204B7162411
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 06:08:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2186321C9F9;
-	Wed, 26 Feb 2025 06:07:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47DEC21C9F9;
+	Wed, 26 Feb 2025 06:08:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jwbHw1oC"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD5BF25D537
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 06:07:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740550037; cv=none; b=VHC67vlqn/tPYzIq+ezDc3G/z7NFzcC4/yLFB43FALD5Nj/dLkw0O92xuuG/QybUQ3TPnohnufjMPfKgGjBTGC/4vchKZ+rM7kuGNCPEewzsSYvaEKinjpkDrxc7IN/jDgXWJWMzFdL/sSQ7JN0OcnwCcWwnR+ZjUxleyumd5LQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740550037; c=relaxed/simple;
-	bh=EZKHHwTlf1DS55qsocYgo1K2E9wdQE7jRKyRGrwH4Xk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NH50WUDdq8wF8tqA724KxcJXwhHvRDVKAvAiE3Tb/GaiSkBRPF/sXhvJLImrR2+tLWQDx36lLXLjuxmEgETHezmTNKTyxQFKXigeRAf64K7Optwt3QxY2L56ibTACIcyAzPWQY0nkkTHWCW3GLxGghJCU9UdGa6Pfox1a+gdgWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tnAZM-0005bU-Bu; Wed, 26 Feb 2025 07:06:56 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tnAZL-002u4X-2J;
-	Wed, 26 Feb 2025 07:06:55 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tnAZL-001Sma-1q;
-	Wed, 26 Feb 2025 07:06:55 +0100
-Date: Wed, 26 Feb 2025 07:06:55 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Kory Maincent <kory.maincent@bootlin.com>, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 06/12] net: pse-pd: Add support for budget
- evaluation strategies
-Message-ID: <Z76vfyv5XoMKmyH_@pengutronix.de>
-References: <20250218-feature_poe_port_prio-v5-0-3da486e5fd64@bootlin.com>
- <20250218-feature_poe_port_prio-v5-6-3da486e5fd64@bootlin.com>
- <20250220165129.6f72f51a@kernel.org>
- <20250224141037.1c79122b@kmaincent-XPS-13-7390>
- <20250224134522.1cc36aa3@kernel.org>
- <20250225102558.2cf3d8a5@kmaincent-XPS-13-7390>
- <20250225174752.5dbf65e2@kernel.org>
- <Z76t0VotFL7ji41M@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624283FE4
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 06:08:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740550129; cv=fail; b=p73wi8as/UuaQfzmjWi4rEqQrTx3J/Mo9fSq9vc8WYQEFocJKjc5RNZxZ/7apdKxD9Ps/QhcjaEmv1m8BkImGXvZ4rjY9F5LC5URsdksgekWYtkPcnDm/Mll2SKxc/tJIuXnxk9NUgK5lXl6WoOcGQRPgjz3uBSqtutV3B8uDqI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740550129; c=relaxed/simple;
+	bh=jdX6q38/E7orBNPfsfymzyDnfM1GxwXLmJ8m5a8xqos=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=LKmA8soUg6Ky3hBDq/hcBXFnQbJsC3UIiKVp2QFQ4WFeGUHuP7u8Vg1xndV5mG70E5AONEhE78zVB19OUIpCbvg9vctuDl3TBZBbE84AwHww8C6ryjBO8wRS3e+howkajLMrcHvYxJU3BePHdf3lNSj9yWo39E66pBUN1FiJgVk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jwbHw1oC; arc=fail smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740550127; x=1772086127;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=jdX6q38/E7orBNPfsfymzyDnfM1GxwXLmJ8m5a8xqos=;
+  b=jwbHw1oC8SlISh3aBHCdR7D953NSw5rO3vcGEcB0+6SeMGZx3wFTiNF6
+   4Jpvo2JH0AdRxXHykJtFYu6LR00AOf6405KUDFjCB9FY1B6HYAjL3642s
+   EH06zm8kzp18uHE0Je7SZjWypey7dSiBDzV8wxLjasTvgVtM2wgYBde6f
+   v/XtTyuHrGz7K8eFNA166SVC7fX1lv7WS161rHGwFXIx8fID5jjpw7ZNm
+   7vSfIgF7DmMKyViG2keAtX0R1oPhWvQK6bwl3LXB248/l7IV/4aBO0mAc
+   zLukgaKlM46j/T1fm1L7k79Gvr3ePaIBtVPV8+9x+3IFEFFTje6STfRZk
+   Q==;
+X-CSE-ConnectionGUID: 2kJFIqCaT4OLMqAhYDEa0A==
+X-CSE-MsgGUID: 8NznMxZWSKGh7BM965zNdw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11356"; a="45032109"
+X-IronPort-AV: E=Sophos;i="6.13,316,1732608000"; 
+   d="scan'208";a="45032109"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2025 22:08:46 -0800
+X-CSE-ConnectionGUID: YufvM82ESRSNZc4bHYzVdg==
+X-CSE-MsgGUID: Heol0zw/R9aW9y1x+KQlgg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,316,1732608000"; 
+   d="scan'208";a="116611225"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2025 22:08:46 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Tue, 25 Feb 2025 22:08:45 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Tue, 25 Feb 2025 22:08:45 -0800
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.177)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Tue, 25 Feb 2025 22:08:45 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=LZPgluv8QvplZvhPHeq87dGz2sNsKRwtPXvHBMkCH7L7YxsaVwNfudmx/20wIQtTILSH06Vsn2e4pZiAWmBvfpdPcsWhpSclf0mY81uLtKuSEKLmljgVTLFuatjMcQ93xov/BEygdycPq902A8sn3G0FIh0fzUDvE9aXGmqSuq6fRIZ8S4TDEHNC7JAbEZQAJ7BiBm3O5jSLZQrhkNfX+JIZbnLszvNxmQlMIqyXjm1WnpniqIk2aKU/7714703CpFoPUKYhs1+i3Otf9WvMXG0qPIknHAjgI/xCEZDoTpxNORoybZja0bUxMUDI/2XvadIovgUbJLt+hWO0vP+/Rg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jdX6q38/E7orBNPfsfymzyDnfM1GxwXLmJ8m5a8xqos=;
+ b=i2teFOQ2jluk/fBD66XzkbgbdeLAARlAndReQOEVxGXHsFvfkm296Lzp5dWXLXd6WoojWeeLyS+pFv8DWhG9pDrwWy1U+xzHRylJEdKwHSQJMJ6JHBm+WQHtZB4HTqZpo314iWnLnnPs4Jbp8i6acSp8Z6dvbjS13NHujriCqAgQIKMf223Wpvea1Bzw+fGFzFwWN5OP2E1Zlv4T6RUsIgEHwk1B8PLGQVTQlnoRWarHkfvGOSPGtnY+qglMUcEUjP8fF+co6oOvzaIHbNAvQCVykAr1b8L/TQveRuA4PAedRdevipNk33n4gcmE81BUvEpsszuPgfE8OnuPQ/2ISA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
+ by DS7PR11MB6245.namprd11.prod.outlook.com (2603:10b6:8:9a::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.20; Wed, 26 Feb
+ 2025 06:08:38 +0000
+Received: from IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::90b0:6aad:5bb6:b3ae]) by IA1PR11MB6241.namprd11.prod.outlook.com
+ ([fe80::90b0:6aad:5bb6:b3ae%4]) with mapi id 15.20.8466.020; Wed, 26 Feb 2025
+ 06:08:38 +0000
+From: "Rinitha, SX" <sx.rinitha@intel.com>
+To: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kolacinski, Karol"
+	<karol.kolacinski@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "horms@kernel.org" <horms@kernel.org>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v2 1/3] ice: rename
+ ice_ptp_init_phc_eth56g function
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v2 1/3] ice: rename
+ ice_ptp_init_phc_eth56g function
+Thread-Index: AQHbe8Z5mZ2eDWiOa0q6bXepqpiDbLNXrIdg
+Date: Wed, 26 Feb 2025 06:08:38 +0000
+Message-ID: <IA1PR11MB6241575F4A4282391F1C19BC8BC22@IA1PR11MB6241.namprd11.prod.outlook.com>
+References: <20250210141112.3445723-1-grzegorz.nitka@intel.com>
+ <20250210141112.3445723-2-grzegorz.nitka@intel.com>
+In-Reply-To: <20250210141112.3445723-2-grzegorz.nitka@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|DS7PR11MB6245:EE_
+x-ms-office365-filtering-correlation-id: 5c2ddbdc-9ab8-4685-9114-08dd562c02f6
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|10070799003|376014|1800799024|366016|38070700018|7053199007;
+x-microsoft-antispam-message-info: =?us-ascii?Q?CtlTiVmtfidhWBXOaDXkMUk+Y0EV6J7aqeLjNY5vDqZ7hr4LAR309wd/Ts8z?=
+ =?us-ascii?Q?kV1OrlXmVHU6Yvh7gYTZ4c4kylCIkFvTn3gMwKAW5MQTdjfMqMPmXYt8KQSW?=
+ =?us-ascii?Q?tmhbw+Cz0YVcJfE1NEhfVURKetiGBVM42BP1rpSNC7+7I4B2mMrbjMopVAYn?=
+ =?us-ascii?Q?xig5wDFrMUjhMm+oElAGjvzsv2tw/t/2/Pysn0Q8s/xAiBooJ6O+B0Vb5Gwk?=
+ =?us-ascii?Q?kfcw6NN3hers8/1289dGmQesZkBlnx6wuLy6cqTePNCdMVl6QwkaVcK9Ku8V?=
+ =?us-ascii?Q?HdKnh5uecG3Iz/mEgB6zJLd0rejj8z7T3w84fw8EcPBptImRSZf9z+ktbpuQ?=
+ =?us-ascii?Q?87C4/5V6S7ixinox+d5ioJGh9L4Rvi5M4QWtJEhN3mLX27V7dAhtq2/Rj4sU?=
+ =?us-ascii?Q?TupfgFM4G/TBM3/Mt6QmMyn4Rj4bsnwLoq7fEFakf8s53ac27ms268TznseD?=
+ =?us-ascii?Q?/9mHz32F0geGbhWLvBhFcdd8pyRNRynd+yCta164YCpaVikBQoAtJItMAt/g?=
+ =?us-ascii?Q?VYU6UzHBpND7/IribmyfGrB8/WxeM8kcSsrIhN9RX/zKACOhTr+/EJv0CtWE?=
+ =?us-ascii?Q?zlgFVVc1FeMqeODF8GPr7dxY5LZFcjawfgj2du+oLxbyH2j4sYLSdWAZG8HE?=
+ =?us-ascii?Q?yKMgYZU/HH6AHTRqNkxhXOw6oa7HJb3Hw+uONh67Lc0lqzmkViJsYGrKTipa?=
+ =?us-ascii?Q?pEaW9xGhPMFaCjlySDeW5B3BVynOEp8rwqRI4tAj89yAByUiUmmR0zN9LWKk?=
+ =?us-ascii?Q?U4x4i24ymDeWUHSGP+5RSjo4zcez3ZLhEjcr3ohraaoJCMWp9VUsunuTOr+s?=
+ =?us-ascii?Q?MJzgbVsZQTQxHPdw9AgskAe6j4e34EcY2HWleSpJz78KGe9+oC3Br1gnDETq?=
+ =?us-ascii?Q?bZER/VMDlw2s5hwyHbZiMNBpHbKariSfJWRS/BGCdpVrQ/v1BcQ5SZuPufPL?=
+ =?us-ascii?Q?Sp1H1yz5WNbVtMi01kwiNWVws9JMM7fABrjiXI8RzRHrE90lMbcpIEzEt4No?=
+ =?us-ascii?Q?Xc+auk7w1jkOu49amAtQoey9H2/WlMS4uta3Ouo1fRdUT0Gg2BFCStIie8Mm?=
+ =?us-ascii?Q?7qXeXEWSDWwWfoi5EtPN01KWIZDarVu7Ec1ogqNzWgN163U9vF5QimEJThxX?=
+ =?us-ascii?Q?jBO6/OyGtq0Na8TZDv65/j8GqvQv3fcofehMHLpZfpLgldRVPf3IwOBXC9+X?=
+ =?us-ascii?Q?0nyDxAc6Nas3QlS4G9nBFOsmOSCNFdzW9UGX7hlYuNASvdxw51wItew2hFjQ?=
+ =?us-ascii?Q?btXqmrq+kF7Ey6d68iLkkMPV5BwMQaI7ISDfIOHFAVUh7WBS8m5tDlKAh5As?=
+ =?us-ascii?Q?nQniheheDegwN+HzW/J20is9c0VcI9SQztPX55r3TJ9jzgX/M1mbtLCIgk6B?=
+ =?us-ascii?Q?BrijmguLgfc+BgoaUlmRwPGof4ksvZf4alNJALUovFS/SHYyAW97dDlMzHen?=
+ =?us-ascii?Q?zbQTRixW4yo=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(376014)(1800799024)(366016)(38070700018)(7053199007);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?YeLwWPkwt9Hm48/UBxVpL5mVDcRmXgMeSRv7inPC2v5pQegvcUdDmYdQnDXa?=
+ =?us-ascii?Q?i28it+itxkCPVQokKLyN0mucAy0IxIsrZuhUxYz7sDFmhdDE+8lpbGaRz6TJ?=
+ =?us-ascii?Q?nR9t9/lT3Hz+ckaFJDF5CkP2cSwa4PZ3McTeJZs6/PgNx016hVsY3f2GmXxu?=
+ =?us-ascii?Q?28z6YvtD07H2xn+eIlop3TcFLY9YK47j1anXjnX2aSCJzKlTJSQiaEiPp8Ea?=
+ =?us-ascii?Q?9oHvEvjAKi9doJM1t3reqz+s1V4vdFXsuLmgKNaJoDPsEcWvfvmOF497Ym8V?=
+ =?us-ascii?Q?0eIfiPWdNSrvJesoLiuXCcvZwJ4lYkjxceZD8XrT+A1KzA1KzS2Aqy+topFf?=
+ =?us-ascii?Q?bEyAVCEefkXDIRSkaYGzUn/2KCXt+vCwFe6+pOerNFUZ6zekO+KlareGJaCM?=
+ =?us-ascii?Q?XK9E8+G8+rfIVH4KI/hQpPC79yNTNiK5EEqPc5FH1ozJ7VXGTT6Yvhamodz/?=
+ =?us-ascii?Q?d9ZuwF4/tSBtB1os5m8antAM/qO5qgaM3WoEM5+76vgawKMSHDdscVWNfIT0?=
+ =?us-ascii?Q?eI4G4TL5avuMvGTwXJbpdERVCvNO2ShMvLplb9My9QTfrkT77iUt3HVcjNNT?=
+ =?us-ascii?Q?HQxJv9kdu7VZ3r1MyhiYRjJ30cKDk1NArCr28SnyKT5N4aqYDt++JpCh40cv?=
+ =?us-ascii?Q?wJBn+wxs2uJIpJC2ilC1i54iYToOe2spPGqLdGBzQ7vjnlmTroB42Z7NYIOi?=
+ =?us-ascii?Q?g7Zwb9OBBZ1nJ9j55uHpY7p+TYl2bz2ESj9xhY6+yhMdyZOjz51aUTVS1z3I?=
+ =?us-ascii?Q?pAnOp9aH1LxBJbtUNZuzkOGiVgFJ5OEfo1sCodcpxAmloIt26PzJdKrHh5v1?=
+ =?us-ascii?Q?evRHYxBWR0kyGkXeVCvCsix/2InsvTDOjCnRNFll9g+7KysYOr9EX3Ogyp3N?=
+ =?us-ascii?Q?p/LZkKZ2zwV4pnsN0kNPzaUzsjn/Jx+Pg7BFaec2EoXLrPItjOT4zki3qumG?=
+ =?us-ascii?Q?HDt0C2zcOfhgtAD7q+8Hj5dXE3HkhZTqbN7QBIcWNoWl4EvQdTPA5moohytP?=
+ =?us-ascii?Q?41Eo/otR6ld6N2svhO1qd2n/RGsHPTgmFyZEOOVNpqVZXmQ3yuIk9dBuLj2q?=
+ =?us-ascii?Q?o9J3hj8okmghn/scjQPLPiNRf5umXVrNWy0GYgpEwxusjdFd3M/ClVtdquaC?=
+ =?us-ascii?Q?vt2WRN6qs0rsP5kiHYTmf89qhig0nlUxyV1zjZC20DRKKTELOTNWDSXaKM/n?=
+ =?us-ascii?Q?txP79TVWCO0BRLiDYozNJDKI/mcPq8LOTBOD1uFk094arIi+oMAQ0jXkfvWj?=
+ =?us-ascii?Q?Y901SeDsAqsWULcgkPPXlQkItOUEOiYb1PdWI3MCdGw8YWsc9OV8xG0+ZSs0?=
+ =?us-ascii?Q?R8GEYp+qFBu39B6QRDKCUHINeQXGNKVTTiyRPxdXUOEJVjV7ruAO3js1Hk8c?=
+ =?us-ascii?Q?CIbncw7J/7luTvV/d6Yp/qXqxosjyPQQJ7Da0K29adc3+HI5KOWvsqjWbYDe?=
+ =?us-ascii?Q?w7UIY+V+J514+azPFihN/gkYSJMP3h/qSrxYlfdxMmRjELGguvgoDHpm+NIU?=
+ =?us-ascii?Q?eOCizA2MB3KYI0NJFjRu3sRScPzcnsvSwnGhZM1Cw6MDtyhZbVPuH2/0v0SZ?=
+ =?us-ascii?Q?7ZXeg4YyIcd+gRca32TQrPmJar0XVJaQlhHHEzluZIPAWwVj+FTGCNwSsED3?=
+ =?us-ascii?Q?tvseZIECIQ+hgQIBkNFwnJM2FyxuYJJyzrEMPfEtx5Zg?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z76t0VotFL7ji41M@pengutronix.de>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5c2ddbdc-9ab8-4685-9114-08dd562c02f6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Feb 2025 06:08:38.4338
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: XSKewEqzwtFM5b/MrQgJohp1hxIKTf1hu4ihSKsMuSANASSHo3knafGoT17K4jJ5NFHxzP5Pi8zREkaEaMlTdQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6245
+X-OriginatorOrg: intel.com
 
-On Wed, Feb 26, 2025 at 06:59:45AM +0100, Oleksij Rempel wrote:
-> On Tue, Feb 25, 2025 at 05:47:52PM -0800, Jakub Kicinski wrote:
-> > On Tue, 25 Feb 2025 10:25:58 +0100 Kory Maincent wrote:
-> > > On Mon, 24 Feb 2025 13:45:22 -0800
-> > > Jakub Kicinski <kuba@kernel.org> wrote:
-> > > 
-> > > > > No they can't for now. Even different PSE power domains within the same PSE
-> > > > > controller. I will make it explicit.    
-> > > > 
-> > > > Sounds like the property is placed at the wrong level of the hierarchy,
-> > > > then.  
-> > > 
-> > > When a PSE controller appears to be able to support mixed budget strategy and
-> > > could switch between them it will be better to have it set at the PSE power
-> > > domain level. As the budget is per PSE power domain, its strategy should also
-> > > be per PSE power domain.
-> > > For now, it is simply not configurable and can't be mixed. It is hard-coded by
-> > > the PSE driver.
-> > 
-> > Yes, but uAPI is forever. We will have to live with those domain
-> > attributes duplicated on each port. Presumably these port attributes
-> > will never support a SET operation, since the set should be towards 
-> > the domain? The uAPI does not inspire confidence. If we need more
-> > drivers to define a common API maybe a local sysfs API in the driver
-> > will do?
-> 
-> I tend to disagree here. The evaluation/allocation methods should be
-> per port.  
-> 
-> At this step, we support only "hardware"(firmware)-based methods:  
-> 1. Static – Plain hardware classification-based power allocation per
-> port.  
-> 2. Dynamic – Hardware classification with constant measurement for
-> optimization.  
-> 
-> For some devices, the dynamic method may not work reliably enough,
-> so we will need to switch to a fixed allocation method, which is
-> currently not implemented but will be set via user space. This
-> should be configurable per port.  
-> 
-> At some point, we will need to introduce LLDP-based allocation from
-> user space. This will be managed by a daemon.
-> 
-> For testing, here’s an example of how LLDP-based power negotiation can
-> be analyzed:
-> https://telecomtest.com.au/wp-content/uploads/2016/12/PDA-LLDP-Powered-Device-LLDP-Analyzer.pdf
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of G=
+rzegorz Nitka
+> Sent: 10 February 2025 19:41
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Kolacinski, Karol <karol.kolacinski@intel.com=
+>; Nguyen, Anthony L <anthony.l.nguyen@intel.com>; horms@kernel.org; Kitsze=
+l, Przemyslaw <przemyslaw.kitszel@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-next v2 1/3] ice: rename ice_ptp_in=
+it_phc_eth56g function
+>
+> From: Karol Kolacinski <karol.kolacinski@intel.com>
+>=20
+> Refactor the code by changing ice_ptp_init_phc_eth56g function name to ic=
+e_ptp_init_phc_e825, to be consistent with the naming pattern for other dev=
+ices.
+>
+> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+> ---
+> drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 13 ++++++-------
+> 1 file changed, 6 insertions(+), 7 deletions(-)
+>
 
-Here is one example how it is done by HP switches:
-https://arubanetworking.hpe.com/techdocs/AOS-CX/10.08/HTML/monitoring_6200/Content/Chp_PoE/PoE_cmds/pow-ove-eth-all-by.htm
-
-switch(config)# interface 1/1/1    <---- per interface
-switch(config-if)# power-over-ethernet allocate-by usage
-switch(config-if)# power-over-ethernet allocate-by class
-
-Cisco example:
-https://www.cisco.com/c/en/us/td/docs/switches/datacenter/nexus9000/sw/93x/power-over-ethernet/configuration/configuring-power-over-ethernet/m-configuring-power-over-ethernet.html
-
-switch(config)# interface ethernet1/1   <---- per interface
-switch(config-if)# power inline auto
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 
