@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-170015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7A0AA46D29
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 22:12:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6B44A46D2A
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 22:13:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DB5116C344
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 21:12:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 575D5188CBBC
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 21:12:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1402625E470;
-	Wed, 26 Feb 2025 21:11:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4906F25EF95;
+	Wed, 26 Feb 2025 21:11:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C0CC25D55C
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 21:11:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF5AC25E466
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 21:11:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740604284; cv=none; b=L3Ldguy9gSvydhNPm1eClVvJx5iZjZTalgDMWKtkPrSlRBZfFvSHHA2UX0cZVbFZXg6LfTBNABE2QDAAkTrIyG1dQHLpxVAdhKfJCjtMb3/bAGLI7NuI2URppU8u/45bxt3qRLM79Lxw2ZwzVux3qvnaMTnqNnJFJIh0Ve9q8Zc=
+	t=1740604285; cv=none; b=YMwiZae6J4MxQfA28phi1Uq6qVQJFJn7SwMd/XXlGZ0n2Rrmi7PDhghPTSC7tGW1bIzbHdKt4TWEDfov5jsuFWYjaZZkxe6A10a527WyO+lGqqVEu/Yps7U1j2QN+fk+1benxSO3OYce796JRgyWXACBO6iRHlGLxrewkPt55o4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740604284; c=relaxed/simple;
-	bh=UKt+GHT+287Ipx8kS5ik7J/ptKY2auu75XN6XzRnZKA=;
+	s=arc-20240116; t=1740604285; c=relaxed/simple;
+	bh=srLPZP8yeoThoRIgaI6xtJ07FN5mmUup2hfIhck3uPU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tzECE/nkLAANZJ/HcsuHSyvOCcQ8CzYcW7o3ZrTLFelWqgfUkSFGCInLYFFWWs/6vC7gt+xcP/0FzX6djOFVTxkYoYCRmd7t3L6hdO+mBQCfZPeHUZh2afvL7sBzaxNe+/p/IZZQs2TEg7g7vEDgLOnOM5nHENjfDwGQJOE1xP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.176
+	 MIME-Version; b=dp5JKAWR4Sa1ttglbLMnIYiAMY6nQ9DWfh//uv9PpvsCEnZtovnYu8GgytYiNAIHAaPQ+DXORQVtA162Zq05TUPyr0zO6DkHgHCYeo7EEc4GjR+M1i+xkGFcwLDu2pbRWfyNvHWWDFiGfWrOfVyZ5yt4yGxK9JcnSK4MuoQe1xQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2210d92292eso5166125ad.1
-        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 13:11:22 -0800 (PST)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-22114b800f7so3694395ad.2
+        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 13:11:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740604282; x=1741209082;
+        d=1e100.net; s=20230601; t=1740604283; x=1741209083;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nUeugTVnayp4kxbgmhUld9dkErlJ887txv51ZBkIoKg=;
-        b=HZDDRNdEEsSwhuAR7aVZJhdzxNrpItNhdjV4VBqTW1EiEdrvZDDUuMXhAsBtClXy9t
-         CbZRSXj0lziK9Uxmycgsgg00SfMkhVnvwq8DCmWAL9uCxaCPq7+P8NUQUrmc/A1lD+ak
-         TnWh8aXIIBcjmZxbzKzZ3eVeRqXkLnWMh33JkUji13kIhVmanH2acdT1ZoVvLsS0zPan
-         X/mPNdACb1GN6kgiWEgxsEy+Srg3ZkDkxQki9TjMBs5QCuq1q9argT+7RRmKOSVS6IGK
-         zXiRq2i0znwSRQ/reLr03SfCLkegqj+wZCJZ0dnELvj/gCs5O5/jWIslKUg0rkZeBYeK
-         3Eng==
-X-Gm-Message-State: AOJu0Yzar/9zXapPKxUHmLIj4dB6YRRD7R1nojcQ/hqMYMgyYQO0pRLk
-	IczuZBHj32g5U4elA7i4P5SnVlkZWj86huBzFpfB56ZGMYO0o41OBL6/
-X-Gm-Gg: ASbGncu+lDe3ohs89g/Q6bcLmLBWVDF1WpQazP8QFRDIhZrDRIcy+XtQTtCN8O9kJyA
-	V34U+wPiLXHIWL0Cm/NksRNtIglR4WS+ZGIRv/We6A/Ek3KmimSeUC/Q4jqhla0p+DyHXAFr48v
-	wZiGy9ExnjleKuXd7iOsQt5ipgg8mPy3dNH+nMm3V/1HM1lzAYnbm9/MjcWQis4AMS3Jcmq/0ty
-	AqOfmybWZFtNANtsoaan2m6NoQzLTz9vZjfnH61I0vu1TZ63uw1MKPWpSEONWeIEvkH5Af0DbJw
-	YOsanI+O88u4XqDVwVQ7x/K+3Q==
-X-Google-Smtp-Source: AGHT+IF1/V3UST8QVzUgh5L2o6hPIp5VmFZzhMUOwgIOOSyTohWGkR6hkHKEwtTiH/yP8lRSLyc8gg==
-X-Received: by 2002:a17:902:e842:b0:220:ff93:e12e with SMTP id d9443c01a7336-22320082679mr77187815ad.1.1740604281677;
-        Wed, 26 Feb 2025 13:11:21 -0800 (PST)
+        bh=RrQlpyp/hJxEjROwpjxFWeF9DRf3GbUP7yL/ICVZ8Is=;
+        b=CXzQ7E0y8RPvbvlpQKPNvgHVv9qdNgER+oG4SD78LtdH6O6/dDLBbqOx8oUglTevIR
+         y4rk1xdls9SyFnVSnCHCDtPuBJ3wb1yuxS6Iaq9/nWemfkC0fjKb4PNUHXYxqlIu5yqF
+         mgUd1wsWRJ8nyCTkxC6DSz7FFP8O4QhKjThIdHx8s994FzMIb2sq8kY+NH7BqLV0hHF6
+         0to61MMfNZKDBGoyumCqzpuqfJqN6ngtlQRyBjktILdqPtuqJeC/zTM833+iGeyMAR+l
+         eOrqgK+ndDsKsxZPcJMulUZDAFvdf+U8rrD3mSVJgusjG2qpBYLpqEDq4tFA59kEkK+x
+         s3ZA==
+X-Gm-Message-State: AOJu0Yxw2zXTXKmIu2UvOFaLSmhScyGMs1sDyfknTc3PZoZjpLSKEISs
+	auAeX3XvJHv2iBob9pyUeBo5NvkerCoCGsUiA89W6v0ZXBVRrMfMyBfm
+X-Gm-Gg: ASbGncvPJZL4xdnxdnX9Dw3mxDk3VKyIGkylyuHL+fQ+gQjCfqomuJibi9KytW7Gksy
+	juX2j+7JeiNe+T3h9JSSdZJ/0we2bgiYtf4TxkvlDAkoTQ+kRrz79S299e5D/g4nZhGqa9WWCZb
+	vT19HHGQC9a0dEABbCJUDSGVX9d512CSsJ7DPzf5HxRoMbuoFO+R2HvTnV8wxIfEmKYZL/RE5AM
+	E2xmNG7+kgs8ryN8BUOHSLUG9wYIsq7OwjtWK7rfOqJelKr9Bt/LjtLwutXJdALnKJR40WA2gIA
+	j9G7OZruRyUBY8EvIajsT8JCeA==
+X-Google-Smtp-Source: AGHT+IF3dD5FCwNVrzxYEcC3gyc7HuuWNyE9asUY9Qm0gRZCrwswmF1BDgLEBWlxCMmB0UIVRl1bZw==
+X-Received: by 2002:a17:90b:56cc:b0:2f1:2fa5:1924 with SMTP id 98e67ed59e1d1-2fe7e39f2afmr6170006a91.26.1740604282767;
+        Wed, 26 Feb 2025 13:11:22 -0800 (PST)
 Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-7347a6abaddsm4015590b3a.20.2025.02.26.13.11.21
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-2fe825ecb8esm2093358a91.35.2025.02.26.13.11.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Feb 2025 13:11:21 -0800 (PST)
+        Wed, 26 Feb 2025 13:11:22 -0800 (PST)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -64,9 +64,9 @@ Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	Saeed Mahameed <saeed@kernel.org>
-Subject: [PATCH net-next v8 10/12] net: add option to request netdev instance lock
-Date: Wed, 26 Feb 2025 13:11:06 -0800
-Message-ID: <20250226211108.387727-11-sdf@fomichev.me>
+Subject: [PATCH net-next v8 11/12] docs: net: document new locking reality
+Date: Wed, 26 Feb 2025 13:11:07 -0800
+Message-ID: <20250226211108.387727-12-sdf@fomichev.me>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250226211108.387727-1-sdf@fomichev.me>
 References: <20250226211108.387727-1-sdf@fomichev.me>
@@ -78,55 +78,151 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Currently only the drivers that implement shaper or queue APIs
-are grabbing instance lock. Add an explicit opt-in for the
-drivers that want to grab the lock without implementing the above
-APIs.
-
-There is a 3-byte hole after @up, use it:
-
-        /* --- cacheline 47 boundary (3008 bytes) --- */
-        u32                        napi_defer_hard_irqs; /*  3008     4 */
-        bool                       up;                   /*  3012     1 */
-
-        /* XXX 3 bytes hole, try to pack */
-
-        struct mutex               lock;                 /*  3016   144 */
-
-        /* XXX last struct has 1 hole */
+Also clarify ndo_get_stats (that read and write paths can run
+concurrently) and mention only RCU.
 
 Cc: Saeed Mahameed <saeed@kernel.org>
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- include/linux/netdevice.h | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ Documentation/networking/netdevices.rst | 65 ++++++++++++++++++++-----
+ include/linux/netdevice.h               |  4 ++
+ 2 files changed, 56 insertions(+), 13 deletions(-)
 
+diff --git a/Documentation/networking/netdevices.rst b/Documentation/networking/netdevices.rst
+index 1d37038e9fbe..d235a7364893 100644
+--- a/Documentation/networking/netdevices.rst
++++ b/Documentation/networking/netdevices.rst
+@@ -210,49 +210,55 @@ packets is preferred.
+ struct net_device synchronization rules
+ =======================================
+ ndo_open:
+-	Synchronization: rtnl_lock() semaphore.
++	Synchronization: rtnl_lock() semaphore. In addition, netdev instance
++	lock if the driver implements queue management or shaper API.
+ 	Context: process
+ 
+ ndo_stop:
+-	Synchronization: rtnl_lock() semaphore.
++	Synchronization: rtnl_lock() semaphore. In addition, netdev instance
++	lock if the driver implements queue management or shaper API.
+ 	Context: process
+ 	Note: netif_running() is guaranteed false
+ 
+ ndo_do_ioctl:
+ 	Synchronization: rtnl_lock() semaphore.
+-	Context: process
+ 
+-        This is only called by network subsystems internally,
+-        not by user space calling ioctl as it was in before
+-        linux-5.14.
++	This is only called by network subsystems internally,
++	not by user space calling ioctl as it was in before
++	linux-5.14.
+ 
+ ndo_siocbond:
+-        Synchronization: rtnl_lock() semaphore.
++	Synchronization: rtnl_lock() semaphore. In addition, netdev instance
++	lock if the driver implements queue management or shaper API.
+         Context: process
+ 
+-        Used by the bonding driver for the SIOCBOND family of
+-        ioctl commands.
++	Used by the bonding driver for the SIOCBOND family of
++	ioctl commands.
+ 
+ ndo_siocwandev:
+-	Synchronization: rtnl_lock() semaphore.
++	Synchronization: rtnl_lock() semaphore. In addition, netdev instance
++	lock if the driver implements queue management or shaper API.
+ 	Context: process
+ 
+ 	Used by the drivers/net/wan framework to handle
+ 	the SIOCWANDEV ioctl with the if_settings structure.
+ 
+ ndo_siocdevprivate:
+-	Synchronization: rtnl_lock() semaphore.
++	Synchronization: rtnl_lock() semaphore. In addition, netdev instance
++	lock if the driver implements queue management or shaper API.
+ 	Context: process
+ 
+ 	This is used to implement SIOCDEVPRIVATE ioctl helpers.
+ 	These should not be added to new drivers, so don't use.
+ 
+ ndo_eth_ioctl:
+-	Synchronization: rtnl_lock() semaphore.
++	Synchronization: rtnl_lock() semaphore. In addition, netdev instance
++	lock if the driver implements queue management or shaper API.
+ 	Context: process
+ 
+ ndo_get_stats:
+-	Synchronization: rtnl_lock() semaphore, or RCU.
++	Synchronization: RCU (can be called concurrently with the stats
++	update path).
+ 	Context: atomic (can't sleep under RCU)
+ 
+ ndo_start_xmit:
+@@ -284,6 +290,10 @@ struct net_device synchronization rules
+ 	Synchronization: netif_addr_lock spinlock.
+ 	Context: BHs disabled
+ 
++Most ndo callbacks not specified in the list above are running
++under ``rtnl_lock``. In addition, netdev instance lock is taken as well if
++the driver implements queue management or shaper API.
++
+ struct napi_struct synchronization rules
+ ========================================
+ napi->poll:
+@@ -298,6 +308,35 @@ struct napi_struct synchronization rules
+ 		 softirq
+ 		 will be called with interrupts disabled by netconsole.
+ 
++struct netdev_queue_mgmt_ops synchronization rules
++==================================================
++
++All queue management ndo callbacks are holding netdev instance lock.
++
++RTNL and netdev instance lock
++=============================
++
++Historically, all networking control operations were protected by a single
++global lock known as ``rtnl_lock``. There is an ongoing effort to replace this
++global lock with separate locks for each network namespace. Additionally,
++properties of individual netdev are increasingly protected by per-netdev locks.
++
++For device drivers that implement shaping or queue management APIs, all control
++operations will be performed under the netdev instance lock. Currently, this
++instance lock is acquired within the context of ``rtnl_lock``. The drivers
++can also explicitly request instance lock to be acquired via
++``request_ops_lock``. In the future, there will be an option for individual
++drivers to opt out of using ``rtnl_lock`` and instead perform their control
++operations directly under the netdev instance lock.
++
++Devices drivers are encouraged to rely on the instance lock where possible.
++
++For the (mostly software) drivers that need to interact with the core stack,
++there are two sets of interfaces: ``dev_xxx`` and ``netif_xxx`` (e.g.,
++``dev_set_mtu`` and ``netif_set_mtu``). The ``dev_xxx`` functions handle
++acquiring the instance lock themselves, while the ``netif_xxx`` functions
++assume that the driver has already acquired the instance lock.
++
+ NETDEV_INTERNAL symbol namespace
+ ================================
+ 
 diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index f487a65f16a7..29f61bd0ddf1 100644
+index 29f61bd0ddf1..59bbe189d542 100644
 --- a/include/linux/netdevice.h
 +++ b/include/linux/netdevice.h
-@@ -2456,6 +2456,12 @@ struct net_device {
+@@ -2476,6 +2476,10 @@ struct net_device {
+ 	 *
+ 	 * Also protects some fields in struct napi_struct.
+ 	 *
++	 * For the drivers that implement shaper or queue API, the scope
++	 * of this lock is expanded to cover most ndo/queue/ethtool/sysfs
++	 * operations.
++	 *
+ 	 * Ordering: take after rtnl_lock.
  	 */
- 	bool			up;
- 
-+	/**
-+	 * @request_ops_lock: request the core to run all @netdev_ops and
-+	 * @ethtool_ops under the @lock.
-+	 */
-+	bool			request_ops_lock;
-+
- 	/**
- 	 * @lock: netdev-scope lock, protects a small selection of fields.
- 	 * Should always be taken using netdev_lock() / netdev_unlock() helpers.
-@@ -2745,7 +2751,7 @@ static inline void netdev_assert_locked_or_invisible(struct net_device *dev)
- 
- static inline bool netdev_need_ops_lock(struct net_device *dev)
- {
--	bool ret = !!dev->queue_mgmt_ops;
-+	bool ret = dev->request_ops_lock || !!dev->queue_mgmt_ops;
- 
- #if IS_ENABLED(CONFIG_NET_SHAPER)
- 	ret |= !!dev->netdev_ops->net_shaper_ops;
+ 	struct mutex		lock;
 -- 
 2.48.1
 
