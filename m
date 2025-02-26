@@ -1,232 +1,152 @@
-Return-Path: <netdev+bounces-169798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10A52A45BDD
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 11:32:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53E41A45BE0
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 11:33:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01248176464
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 10:32:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58A037A40D4
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 10:32:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 729C8238179;
-	Wed, 26 Feb 2025 10:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F419A211A36;
+	Wed, 26 Feb 2025 10:33:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="acRHnWda"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="PUNCYDW1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D7CC2459D4
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 10:31:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CA50211494
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 10:33:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740565899; cv=none; b=qfv/qyp13o/eqmc8pWp5AbVykRlrEc9bA/OaTokwt9dIo4KSE6u5KsE5eQT39AWasqV5HxgGe8EuWFEwAAMvEefYRC7jKX+blWCWKyKjGVjxBM7NB07CwR/Z5rxZGvRxI2o2ty0PwwELzStPu73GwQAkdzr24RsXPEVUEhuZpr8=
+	t=1740566007; cv=none; b=TMYFfRSnblcxcKK2PvbsPem7b189PbBv66//iwgLfmvmdIyuBmWBeafI+HMNFrvdCnKiqa9Rg93ij2LpYnySqMORTdPC+/IMRtHVFRCaOEE23xOTvWYzItmrAj3H6KN9xRJ84ep041pcl/QddyN9rU6AtQjyXIUFUOyhxhyHbBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740565899; c=relaxed/simple;
-	bh=eE6TEDJjEUVFfIcxM8iKB9praMK7xTPiqSf/9sV1pC4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=emOkN3BJVgV7/gS3bTI8toNrVtGqjO5/OOzUVRfmdZwnLEskx0aQlnOSPQO40TH2wQS0B3W8YKYNzLon6+CiIzDqLI9Q+Hn5vyrxIZj11wVR4AKzmz+mByLW58uEl+vrMOcceg9UjI2YuIhG/Y9APuEOixG82Pp03ZgfaEPrFr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=acRHnWda; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-abbec6a0bfeso1034936666b.2
-        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 02:31:37 -0800 (PST)
+	s=arc-20240116; t=1740566007; c=relaxed/simple;
+	bh=ynRJRA6fh8cdNAoV1rOcOBdNPaoBvJ60HtLCp7MCHHs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PKpZZuXvMTjq3cX6YGLXWGJwDgwqRA0kScEckGZMRlBS60Wj+4WAfdRhacfQeznW7mShPFdk6lwbkRmmODZoCK4C7DYjGBGDSsBNCFun6SGAyYiKkEyCAjRNLlzp84FiqBqLFqpMOPFtFX/RzdigqaN26ABSdcpBdbeX2cmnK7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=PUNCYDW1; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-abb7a6ee2deso1009022466b.0
+        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 02:33:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740565896; x=1741170696; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8YuDC37Jw+Zolzu5V30KigWgIEI9SejHaSTwT5Rkex4=;
-        b=acRHnWda/Z+QO80DeZpxs2wq9NcRC9nQF845v45rzVYX5WKaM7mxKypjh5wsKPz/F1
-         fXluH1LfTciao71Gcez7vuoNGBbL8I00Qmp8CouPqJFKpLNlAQXPr3ze0ec0TveCcBNu
-         jstDLj6/E3+J1IXRwYutyGcxj79fYh4TGEnvKxxoZn/oJ/dRVHDWOeYkviMyYwTERfN/
-         AOJ04Mu6f9egCoeEkm0qoPjpb3G22hWYhNlAA8kpP9ri99UyUHeUhGJw1RzlJU8To875
-         y2NuD7Lj1bQ/ZLN0/VPrbZ61b+V3XqV75w2Tv8qhFM8Qcw9pZ2Uybc53LODVuYHN1YZ0
-         SNzg==
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1740566005; x=1741170805; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/l/yqNANiIb9iFrI32DS8q0o6uDvSbvWNVDvRmR39Sc=;
+        b=PUNCYDW1AdC4F6ID0tre9GPVUaLRAEFQpcVZoPVIKAa/P3KyPjqDBm38EgL399mXqZ
+         H+xHu4NETzLDQM6RYRIzj6lAZh+8VaENCOh7aybD/LgkmPNXZYSnvZLPFKUIpeAFkCXp
+         Mr4JxPJxBnk470FLZ0OfiZprnBBqW8ANwpmidKX1qi67S4LzFufoDIm9X2QuXZgUArQ7
+         PDz+9bMpMMfz59JETGGrifs3151GAM0Z7LBAU4bBN6HUIJRItefgoOVsw1ti00bTzRYD
+         kHcodfCgdQHVKpWGdQaGZ2bObeVLEhDIgQ+QSWJR5qynCU0uPMRwd8YYPb5JSaBl+0Kn
+         eEcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740565896; x=1741170696;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8YuDC37Jw+Zolzu5V30KigWgIEI9SejHaSTwT5Rkex4=;
-        b=GLDh8gD5XkbMEZ8fH4GdGtcbjsBUt6lkeHF0sCsDeSb4DU705e8+pPe5swAIUa9o5J
-         FO771BQcEFH3gOS+Q8+825q8d8wn0SZnAWSMyaW6lyYP0AkjP3QQRRiP8S8lUQLjB4kV
-         dVS/XywhLCGomgqh/lWZRjlTAARwofpraphQpgHUH3nCT8awggECv1a4kx1ReNqjUbpu
-         ge3nccJMbBmrBoojb7iBuXg0I6KnuXJ/fXfMkXJKSYLZvfaDZt9o6eu2iq/7k/8sv4SH
-         J9AACOdd1PMElTEEz/ZngR0+rtOtVURXJQTeJf8RGbTyDR7g5sZIvqRI5kMkrFwTHXaT
-         atBw==
-X-Forwarded-Encrypted: i=1; AJvYcCVR32nnAcVambF81DtWzhQMyex0TWMfnAHD3+1ottltSOKW5DE6H0mf0hHkFC5IPPatrV68Ubg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxwqNVikecu/c1hwMvGqGj4ED87F6dcPucfAve1rFYSEXZrgyC
-	P2nSP4StfCYv2qcbI6pnodRmobb8Gqkpx4xX+8Ey19L5ZcvVB8N1YU7sqhxTPBj3g500HVOwl70
-	Cvy2imnXB+Cq3Ev/VcYxi5/kkLtGfc00DzBKn
-X-Gm-Gg: ASbGncuLIISuaclLAtGp9StmW1VRgZmZzCeG1eWA01aOb81l8HdmsD3gmOZ/RH2pMCa
-	UMgkZLNyDFWUjhAetDQT+NQuhVeHoD0bj27MH0CSRdtmrv+/L9voDSaVHTpAHpTPe/WZUtDg9iJ
-	eoy2+HRQo=
-X-Google-Smtp-Source: AGHT+IFAtFSzX90h2Iaz5b1UCMdYq9wwFG9cA0Om7iVgOoxBp3Dkrx+53LsEBr0LX2IvgijhMM8CQeoEfn63itsLTZU=
-X-Received: by 2002:a17:907:6ea2:b0:ab7:b072:8481 with SMTP id
- a640c23a62f3a-abc09c1a63dmr2056837866b.45.1740565895517; Wed, 26 Feb 2025
- 02:31:35 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740566005; x=1741170805;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/l/yqNANiIb9iFrI32DS8q0o6uDvSbvWNVDvRmR39Sc=;
+        b=DXixrUKl7R31vk3GkLvg3S/ddIFUSZgyWB9qYE1WDpQfDh9+8zudhZX+4W8RiHMoEg
+         lwHPY9IGBUBt977lAJAsgbvBjEdyl1BDAa0d2XbLH54/JapbVGJu0D0GNwaLw0zSjGVg
+         mqMUmdrFcMXxF6OeeyZQl1f9bODOrG8UcaXLlwwf+Anbn+BN9yD95rPFiR0H54/6Otkg
+         puFWQpn8g1diH9M3i8TWbD99vQN9UAZOIFEtZZYFG/d82oKKdsTSIMVbzNxukAB7ddEM
+         iLPnVN3jmg7IGj1x9CeapSfkQ4Pk4WYFiF+H5OZM+0/pk7se7okboqhq5fCzv7L6M6kd
+         96KA==
+X-Gm-Message-State: AOJu0YyIbQOi89EHeITNEkzMaiXv4mS0aUe4HXqGfjGoYTSdU+qRWoxO
+	Gq4wfhBtI1ViY/uvEcBmDjKd8RLQsdQRGnvjGY9QgQ51EgyrOKiVP5sYxRPtRFk=
+X-Gm-Gg: ASbGncuIgTx7XU4WwWiJGNcjfnhRWL5GPz2g2bMNybqjAu9mjdzzExC8WnBmeULj+sD
+	nxACJuG2H55RuOIzdKgSLFHI9ZGXATing4RLOoDUXyXe+XXQ5jBakfZckbiOyp8859Ej5walzPx
+	dC/wFR+SRYWMcCb/f1PbvST11f5QStbcUnp9SMgihbtITMeUw3QR1Awu+aGokmKqQx3bOahr9yI
+	S9kvsSqOImLlBksXDBK7KBa8DYfjqBEXrsjBjY863wEj8axFNzfGaGyJI0kWvczmXU2xHNEZvr4
+	x7V5JcgFGJlfT2fyGR3lJAheZpOB/awvcENXpNgiYL+HIKUHIDb5MeIsAQ==
+X-Google-Smtp-Source: AGHT+IFyViIUcT5L2jBWSWyZFNUHCk/WYK99JXGW5O4xzxAZXFR2THGsaEN/AdK09ibLNBMRg1p2Gw==
+X-Received: by 2002:a17:907:7848:b0:ab7:f9d5:9560 with SMTP id a640c23a62f3a-abeeed5b2dcmr239704266b.14.1740566004575;
+        Wed, 26 Feb 2025 02:33:24 -0800 (PST)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abed205e53fsm296530366b.159.2025.02.26.02.33.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Feb 2025 02:33:24 -0800 (PST)
+Message-ID: <a6753983-df29-4d79-a25c-e1339816bd02@blackwall.org>
+Date: Wed, 26 Feb 2025 12:33:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250223221708.27130-1-frederic@kernel.org>
-In-Reply-To: <20250223221708.27130-1-frederic@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 26 Feb 2025 11:31:24 +0100
-X-Gm-Features: AQ5f1Jrx9yGutHY5PqKi7Fh2IVQ9c2aE4kyGGSpHRcRgB13e9kVMxTBIFM7KXuw
-Message-ID: <CANn89iLgyPFY_u_CHozzk69dF3RQLrUVdLrf0NHj5+peXo2Yuw@mail.gmail.com>
-Subject: Re: [PATCH net v2] net: Handle napi_schedule() calls from non-interrupt
-To: Frederic Weisbecker <frederic@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
-	Breno Leitao <leitao@debian.org>, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Francois Romieu <romieu@fr.zoreil.com>, Paul Menzel <pmenzel@molgen.mpg.de>, 
-	Joe Damato <jdamato@fastly.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [6.12.15][be2net?] Voluntary context switch within RCU read-side
+ critical section!
+To: Ian Kumlien <ian.kumlien@gmail.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>
+References: <CAA85sZveppNgEVa_FD+qhOMtG_AavK9_mFiU+jWrMtXmwqefGA@mail.gmail.com>
+ <CAA85sZuv3kqb1B-=UP0m2i-a0kfebNZy-994Dw_v5hd-PrxEGw@mail.gmail.com>
+ <20250225170545.315d896c@kernel.org>
+ <CAA85sZuYbXDKAEHpXxcDvntSjtkDEBGxU-FbXevZ+YH+eL6bEQ@mail.gmail.com>
+ <CAA85sZswKt7cvogeze4FQH_h5EuibF0Zc7=OAS18FxXCiEki-g@mail.gmail.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <CAA85sZswKt7cvogeze4FQH_h5EuibF0Zc7=OAS18FxXCiEki-g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sun, Feb 23, 2025 at 11:17=E2=80=AFPM Frederic Weisbecker
-<frederic@kernel.org> wrote:
->
-> napi_schedule() is expected to be called either:
->
-> * From an interrupt, where raised softirqs are handled on IRQ exit
->
-> * From a softirq disabled section, where raised softirqs are handled on
->   the next call to local_bh_enable().
->
-> * From a softirq handler, where raised softirqs are handled on the next
->   round in do_softirq(), or further deferred to a dedicated kthread.
->
-> Other bare tasks context may end up ignoring the raised NET_RX vector
-> until the next random softirq handling opportunity, which may not
-> happen before a while if the CPU goes idle afterwards with the tick
-> stopped.
->
-> Such "misuses" have been detected on several places thanks to messages
-> of the kind:
->
->         "NOHZ tick-stop error: local softirq work is pending, handler #08=
-!!!"
->
-> For example:
->
->        __raise_softirq_irqoff
->         __napi_schedule
->         rtl8152_runtime_resume.isra.0
->         rtl8152_resume
->         usb_resume_interface.isra.0
->         usb_resume_both
->         __rpm_callback
->         rpm_callback
->         rpm_resume
->         __pm_runtime_resume
->         usb_autoresume_device
->         usb_remote_wakeup
->         hub_event
->         process_one_work
->         worker_thread
->         kthread
->         ret_from_fork
->         ret_from_fork_asm
->
-> And also:
->
-> * drivers/net/usb/r8152.c::rtl_work_func_t
-> * drivers/net/netdevsim/netdev.c::nsim_start_xmit
->
-> There is a long history of issues of this kind:
->
->         019edd01d174 ("ath10k: sdio: Add missing BH locking around napi_s=
-chdule()")
->         330068589389 ("idpf: disable local BH when scheduling napi for ma=
-rker packets")
->         e3d5d70cb483 ("net: lan78xx: fix "softirq work is pending" error"=
-)
->         e55c27ed9ccf ("mt76: mt7615: add missing bh-disable around rx nap=
-i schedule")
->         c0182aa98570 ("mt76: mt7915: add missing bh-disable around tx nap=
-i enable/schedule")
->         970be1dff26d ("mt76: disable BH around napi_schedule() calls")
->         019edd01d174 ("ath10k: sdio: Add missing BH locking around napi_s=
-chdule()")
->         30bfec4fec59 ("can: rx-offload: can_rx_offload_threaded_irq_finis=
-h(): add new  function to be called from threaded interrupt")
->         e63052a5dd3c ("mlx5e: add add missing BH locking around napi_schd=
-ule()")
->         83a0c6e58901 ("i40e: Invoke softirqs after napi_reschedule")
->         bd4ce941c8d5 ("mlx4: Invoke softirqs after napi_reschedule")
->         8cf699ec849f ("mlx4: do not call napi_schedule() without care")
->         ec13ee80145c ("virtio_net: invoke softirqs after __napi_schedule"=
-)
->
-> This shows that relying on the caller to arrange a proper context for
-> the softirqs to be handled while calling napi_schedule() is very fragile
-> and error prone. Also fixing them can also prove challenging if the
-> caller may be called from different kinds of contexts.
->
-> Therefore fix this from napi_schedule() itself with waking up ksoftirqd
-> when softirqs are raised from task contexts.
->
-> Reported-by: Paul Menzel <pmenzel@molgen.mpg.de>
-> Reported-by: Jakub Kicinski <kuba@kernel.org>
-> Reported-by: Francois Romieu <romieu@fr.zoreil.com>
-> Closes: https://lore.kernel.org/lkml/354a2690-9bbf-4ccb-8769-fa94707a9340=
-@molgen.mpg.de/
-> Cc: Breno Leitao <leitao@debian.org>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: Francois Romieu <romieu@fr.zoreil.com>
-> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> ---
->  net/core/dev.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 80e415ccf2c8..5c1b93a3f50a 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -4693,7 +4693,7 @@ static inline void ____napi_schedule(struct softnet=
-_data *sd,
->          * we have to raise NET_RX_SOFTIRQ.
->          */
->         if (!sd->in_net_rx_action)
-> -               __raise_softirq_irqoff(NET_RX_SOFTIRQ);
-> +               raise_softirq_irqoff(NET_RX_SOFTIRQ);
+On 2/26/25 11:55, Ian Kumlien wrote:
+> On Wed, Feb 26, 2025 at 10:24 AM Ian Kumlien <ian.kumlien@gmail.com> wrote:
+>>
+>> On Wed, Feb 26, 2025 at 2:05 AM Jakub Kicinski <kuba@kernel.org> wrote:
+>>>
+>>> On Tue, 25 Feb 2025 11:13:47 +0100 Ian Kumlien wrote:
+>>>> Same thing happens in 6.13.4, FYI
+>>>
+>>> Could you do a minor bisection? Does it not happen with 6.11?
+>>> Nothing jumps out at quick look.
+>>
+>> I have to admint that i haven't been tracking it too closely until it
+>> turned out to be an issue
+>> (makes network traffic over wireguard, through that node very slow)
+>>
+>> But i'm pretty sure it was ok in early 6.12.x - I'll try to do a bisect though
+>> (it's a gw to reach a internal server network in the basement, so not
+>> the best setup for this)
+> 
+> Since i'm at work i decided to check if i could find all the boot
+> logs, which is actually done nicely by systemd
+> first known bad: 6.11.7-300.fc41.x86_64
+> last known ok: 6.11.6-200.fc40.x86_64
+> 
+> Narrows the field for a bisect at least, =)
+> 
 
-Your patch is fine, but would silence performance bugs.
+Saw bridge, took a look. :)
 
-I would probably add something to let network developers be aware of them.
+I think there are multiple issues with benet's be_ndo_bridge_getlink()
+because it calls be_cmd_get_hsw_config() which can sleep in multiple
+places, e.g. the most obvious is the mutex_lock() in the beginning of
+be_cmd_get_hsw_config(), then we have the call trace here which is:
+be_cmd_get_hsw_config -> be_mcc_notify_wait -> be_mcc_wait_compl -> usleep_range()
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 1b252e9459fdbde42f6fb71dc146692c7f7ec17a..ae8882a622943a81ddd8e2d141d=
-f685637e334b6
-100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -4762,8 +4762,10 @@ static inline void ____napi_schedule(struct
-softnet_data *sd,
-        /* If not called from net_rx_action()
-         * we have to raise NET_RX_SOFTIRQ.
-         */
--       if (!sd->in_net_rx_action)
--               __raise_softirq_irqoff(NET_RX_SOFTIRQ);
-+       if (!sd->in_net_rx_action) {
-+               raise_softirq_irqoff(NET_RX_SOFTIRQ);
-+               DEBUG_NET_WARN_ON_ONCE(!in_interrupt());
-+       }
- }
+Maybe you updated some tool that calls down that path along with the kernel and system
+so you started seeing it in Fedora 41?
 
- #ifdef CONFIG_RPS
+IMO this has been problematic for a very long time, but obviously it depends on the
+chip type. Could you share your benet chip type to confirm the path?
 
+For the blamed commit I'd go with:
+ commit b71724147e73
+ Author: Sathya Perla <sathya.perla@broadcom.com>
+ Date:   Wed Jul 27 05:26:18 2016 -0400
 
-Looking at the list of patches, I can see idpf fix was not very good,
-I will submit another patch.
+     be2net: replace polling with sleeping in the FW completion path
+
+This one changed the udelay() (which is safe) to usleep_range() and the spinlock
+to a mutex.
+
+Cheers,
+ Nik
+
 
