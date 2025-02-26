@@ -1,161 +1,126 @@
-Return-Path: <netdev+bounces-169933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169934-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 919F3A46837
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 18:39:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD155A4684E
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 18:42:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A8E0170A4B
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 17:39:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A130188616E
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 17:42:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8557C2253EA;
-	Wed, 26 Feb 2025 17:39:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5232253FC;
+	Wed, 26 Feb 2025 17:42:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Hnfs2sSt"
 X-Original-To: netdev@vger.kernel.org
-Received: from dediextern.your-server.de (dediextern.your-server.de [85.10.215.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A78918DB2E;
-	Wed, 26 Feb 2025 17:39:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.10.215.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA7F2253F6
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 17:42:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740591566; cv=none; b=J3Sqj1sXshj85XqF+vTHcaqDEyuzL2IiXSNUQmWFkqBd2XuilCPU2jvrgJxBxiZN6mU7eA9Ip4zk8TxjyOd+7EqZzEKeC9Ap0P56gNrh9Mi0MOEBng5SJKFkA2f50Ro0uarZ73HPddyo33yFiIGU5NUft4p0FPE5Y/ZIDWvdVQg=
+	t=1740591756; cv=none; b=g90Kxzt29ImPHAe9NtnGH0pb98xinRFzF/xbaTFGF73j3+xHWwPPUBh0YbTcJBLSjqerabPWCGpOlErC7EGqVcbvegM871WqWBieePdYr8S73BYNKbI4PPPsvud00ICq6wXWifkDWmYjjh7I8V19yDYalPzHFTqEbJNcGcDS7A0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740591566; c=relaxed/simple;
-	bh=0Mdmv9+AoSpYnGPn3KxQqNGKuQfF0N0dh3bYqefhap0=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:Content-Type; b=m/fLhkGrqy0s1h6uf26SHonOnFYT6kWS6xYXmqAQY+agdakbaS60f9+Oo+QEJWnM0n9JICSJljYfFZ8im7I3m9Lj4OiVPiIomsopnJcKPy7K25CXazKJnM2RLUE1joOX7lRCbOHRlIv5OVXXCRa5ls6fagXJCHBhFmuL3ZiiBSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de; spf=pass smtp.mailfrom=hetzner-cloud.de; arc=none smtp.client-ip=85.10.215.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hetzner-cloud.de
-Received: from sslproxy03.your-server.de ([88.198.220.132])
-	by dediextern.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
-	id 1tnLND-000M9O-Nq; Wed, 26 Feb 2025 18:39:07 +0100
-Received: from [2a0d:3344:1523:1f10:f118:b2d4:edbb:54af]
-	by sslproxy03.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
-	id 1tnLND-0004cR-1G;
-	Wed, 26 Feb 2025 18:39:07 +0100
-Message-ID: <a05ba835-b109-46c9-ac3c-ddf8a3e48fcf@hetzner-cloud.de>
-Date: Wed, 26 Feb 2025 18:39:06 +0100
+	s=arc-20240116; t=1740591756; c=relaxed/simple;
+	bh=kBYSUUfKWgAedBFqiUb2p3B9LG89D2NzoFHX3U2MX2g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=shUiy4gHL4gud+HItQnkj9+uoTwZidQblxmbXq3kAPJF5Jwz29KPEzwJeouPQT2sr8+pkCIFxpzoJgcg5ZO5aVCMRQBzRlSFrNtuY35v+RWsstERhuXF+1b3MEusvhG7QyR03txr9X4nT/h7u4pQ9tbNZ0TblZzSm11/jsTh0do=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Hnfs2sSt; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6dd049b5428so1074216d6.2
+        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 09:42:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1740591753; x=1741196553; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cU7dpam59K3dSjMFOXnGTgrP5jzg9G2BzXwta4CbS68=;
+        b=Hnfs2sSt+ZvR+0tP7M7LQ0VqFvg6PrBxTjAcAAyze7ryKm1UaYGnTF5TrS9D3xWyYl
+         DCvvgxMiWdQLMSWOIRcI7o/C3I/PPkvRiANtGymqC6K8Qxl1j+QCuaESTzGxFUrbS5sD
+         JYfZsc8car+Tc1ycitXVCMUe5eKCs91iOZUic=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740591753; x=1741196553;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cU7dpam59K3dSjMFOXnGTgrP5jzg9G2BzXwta4CbS68=;
+        b=atT2VZV8EnmS6gS1e5RDDC3iLtr+BAuAX0WFS+iX0QqecMoS7TEvviqWGszAv1WwP0
+         m6ye4uIyVq856mMw91osZE94RP1NOt161nQI3H36D9IFLWv3sUsbGZrAiSwM2B+ohrCf
+         29Xyyn/aQ+4cU+oRReGtgngx4Cck05RU15Eq4nuuFd3pBtFCRe2cbAmnoVmk9zXpJozl
+         IeiKdLQeU55sm0lbMLAzrYJwTPZs52jC9K27aj4thKSiUzCLiAKyb16KPTTZVxIRUrL6
+         efwbSWwynevG7jVx08gzPUQlC8zbRXyh4WUkCaBA1k68GC7Pl7Q90ehH5nlWtRx4nWZ6
+         WtTg==
+X-Forwarded-Encrypted: i=1; AJvYcCXOe1ZE4SWlUYUI53FD7ZaqfhUmLEQazQLX/318i6aBHp5cLztCzJExBcpepjLdcNJrx+v1wW8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFFdsviS2OQqfUbsiYdLddHId2cYi5ujuEK+ynbFMQsn6AuHsR
+	5jT3LOHq8fB/AxFjLw3Otlkmx577kpA6IPjmyLO3RW0IpzYkZ9sGHWiI4AE786w=
+X-Gm-Gg: ASbGnctMprxfF0UF1q1w04gRXZcdQ9l3FMezQAInPTvvs6tJowaMUalwE0MNf24zq18
+	mKuDb1RfC8xdU7RyJSYi4iVRZftn/3kXD6E1YkL2dSzCGrHujzmYfe9pfPcM3PjKHCj9HVTUdmM
+	XvrSy5dpRfS5tiZA2jqlphvyOl2HCJxDb4nsPgP5/ODl/FZQeh0u3n2eGp5qwDw8nBX6UimRP6M
+	N8id9+Acnt25a45/pf5diHgbuYARuDymm/BHAoCiMmtOXi8yBoiBjqEs418wPUbt7AvLMd+TR44
+	PvBjuApfa/Yo2z9HcRGmGWVJBlkuo++Nmf1gHwh+PrBHEtBWF+WnXuUVNMjc0YSX
+X-Google-Smtp-Source: AGHT+IFFTLyJjs3r8uOBPJibjmVX1i678NyLJOcnFCP6n8KgNvJsA5WPPCR3imeabFVP4B5tek6QGg==
+X-Received: by 2002:a05:6214:45:b0:6e8:86d3:be78 with SMTP id 6a1803df08f44-6e886d3bfa7mr50675626d6.37.1740591753671;
+        Wed, 26 Feb 2025 09:42:33 -0800 (PST)
+Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e893a07bfdsm3579686d6.98.2025.02.26.09.42.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Feb 2025 09:42:32 -0800 (PST)
+Date: Wed, 26 Feb 2025 12:42:30 -0500
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Gal Pressman <gal@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH net-next] net: ethtool: Don't check if RSS context exists
+ in case of context 0
+Message-ID: <Z79Shk7-2HJM_3ec@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, Gal Pressman <gal@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>
+References: <20250225071348.509432-1-gal@nvidia.com>
+ <20250225170128.590baea1@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Cc: jasowang@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, andrii@kernel.org,
- eddyz87@gmail.com, mykolal@fb.com, ast@kernel.org, daniel@iogearbox.net,
- martin.lau@linux.dev, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, hawk@kernel.org
-References: <20250224152909.3911544-1-marcus.wichelmann@hetzner-cloud.de>
- <20250224152909.3911544-5-marcus.wichelmann@hetzner-cloud.de>
- <efcc6e11-2d3a-489e-80bc-cbc3f72f7afa@hetzner-cloud.de>
- <67be0aa61e400_25ccfc29426@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
-Autocrypt: addr=marcus.wichelmann@hetzner-cloud.de; keydata=
- xsFNBGJGrHIBEADXeHfBzzMvCfipCSW1oRhksIillcss321wYAvXrQ03a9VN2XJAzwDB/7Sa
- N2Oqs6JJv4u5uOhaNp1Sx8JlhN6Oippc6MecXuQu5uOmN+DHmSLObKVQNC9I8PqEF2fq87zO
- DCDViJ7VbYod/X9zUHQrGd35SB0PcDkXE5QaPX3dpz77mXFFWs/TvP6IvM6XVKZce3gitJ98
- JO4pQ1gZniqaX4OSmgpHzHmaLCWZ2iU+Kn2M0KD1+/ozr/2bFhRkOwXSMYIdhmOXx96zjqFV
- vIHa1vBguEt/Ax8+Pi7D83gdMCpyRCQ5AsKVyxVjVml0e/FcocrSb9j8hfrMFplv+Y43DIKu
- kPVbE6pjHS+rqHf4vnxKBi8yQrfIpQqhgB/fgomBpIJAflu0Phj1nin/QIqKfQatoz5sRJb0
- khSnRz8bxVM6Dr/T9i+7Y3suQGNXZQlxmRJmw4CYI/4zPVcjWkZyydq+wKqm39SOo4T512Nw
- fuHmT6SV9DBD6WWevt2VYKMYSmAXLMcCp7I2EM7aYBEBvn5WbdqkamgZ36tISHBDhJl/k7pz
- OlXOT+AOh12GCBiuPomnPkyyIGOf6wP/DW+vX6v5416MWiJaUmyH9h8UlhlehkWpEYqw1iCA
- Wn6TcTXSILx+Nh5smWIel6scvxho84qSZplpCSzZGaidHZRytwARAQABzTZNYXJjdXMgV2lj
- aGVsbWFubiA8bWFyY3VzLndpY2hlbG1hbm5AaGV0em5lci1jbG91ZC5kZT7CwZgEEwEIAEIW
- IQQVqNeGYUnoSODnU2dJ0we/n6xHDgUCYkascgIbAwUJEswDAAULCQgHAgMiAgEGFQoJCAsC
- BBYCAwECHgcCF4AACgkQSdMHv5+sRw4BNxAAlfufPZnHm+WKbvxcPVn6CJyexfuE7E2UkJQl
- s/JXI+OGRhyqtguFGbQS6j7I06dJs/whj9fOhOBAHxFfMG2UkraqgAOlRUk/YjA98Wm9FvcQ
- RGZe5DhAekI5Q9I9fBuhxdoAmhhKc/g7E5y/TcS1s2Cs6gnBR5lEKKVcIb0nFzB9bc+oMzfV
- caStg+PejetxR/lMmcuBYi3s51laUQVCXV52bhnv0ROk0fdSwGwmoi2BDXljGBZl5i5n9wuQ
- eHMp9hc5FoDF0PHNgr+1y9RsLRJ7sKGabDY6VRGp0MxQP0EDPNWlM5RwuErJThu+i9kU6D0e
- HAPyJ6i4K7PsjGVE2ZcvOpzEr5e46bhIMKyfWzyMXwRVFuwE7erxvvNrSoM3SzbCUmgwC3P3
- Wy30X7NS5xGOCa36p2AtqcY64ZwwoGKlNZX8wM0khaVjPttsynMlwpLcmOulqABwaUpdluUg
- soqKCqyijBOXCeRSCZ/KAbA1FOvs3NnC9nVqeyCHtkKfuNDzqGY3uiAoD67EM/R9N4QM5w0X
- HpxgyDk7EC1sCqdnd0N07BBQrnGZACOmz8pAQC2D2coje/nlnZm1xVK1tk18n6fkpYfR5Dnj
- QvZYxO8MxP6wXamq2H5TRIzfLN1C2ddRsPv4wr9AqmbC9nIvfIQSvPMBx661kznCacANAP/O
- wU0EYkascgEQAK15Hd7arsIkP7knH885NNcqmeNnhckmu0MoVd11KIO+SSCBXGFfGJ2/a/8M
- y86SM4iL2774YYMWePscqtGNMPqa8Uk0NU76ojMbWG58gow2dLIyajXj20sQYd9RbNDiQqWp
- RNmnp0o8K8lof3XgrqjwlSAJbo6JjgdZkun9ZQBQFDkeJtffIv6LFGap9UV7Y3OhU+4ZTWDM
- XH76ne9u2ipTDu1pm9WeejgJIl6A7Z/7rRVpp6Qlq4Nm39C/ReNvXQIMT2l302wm0xaFQMfK
- jAhXV/2/8VAAgDzlqxuRGdA8eGfWujAq68hWTP4FzRvk97L4cTu5Tq8WIBMpkjznRahyTzk8
- 7oev+W5xBhGe03hfvog+pA9rsQIWF5R1meNZgtxR+GBj9bhHV+CUD6Fp+M0ffaevmI5Untyl
- AqXYdwfuOORcD9wHxw+XX7T/Slxq/Z0CKhfYJ4YlHV2UnjIvEI7EhV2fPhE4WZf0uiFOWw8X
- XcvPA8u0P1al3EbgeHMBhWLBjh8+Y3/pm0hSOZksKRdNR6PpCksa52ioD+8Z/giTIDuFDCHo
- p4QMLrv05kA490cNAkwkI/yRjrKL3eGg26FCBh2tQKoUw2H5pJ0TW67/Mn2mXNXjen9hDhAG
- 7gU40lS90ehhnpJxZC/73j2HjIxSiUkRpkCVKru2pPXx+zDzABEBAAHCwXwEGAEIACYWIQQV
- qNeGYUnoSODnU2dJ0we/n6xHDgUCYkascgIbDAUJEswDAAAKCRBJ0we/n6xHDsmpD/9/4+pV
- IsnYMClwfnDXNIU+x6VXTT/8HKiRiotIRFDIeI2skfWAaNgGBWU7iK7FkF/58ys8jKM3EykO
- D5lvLbGfI/jrTcJVIm9bXX0F1pTiu3SyzOy7EdJur8Cp6CpCrkD+GwkWppNHP51u7da2zah9
- CQx6E1NDGM0gSLlCJTciDi6doAkJ14aIX58O7dVeMqmabRAv6Ut45eWqOLvgjzBvdn1SArZm
- 7AQtxT7KZCz1yYLUgA6TG39bhwkXjtcfT0J4967LuXTgyoKCc969TzmwAT+pX3luMmbXOBl3
- mAkwjD782F9sP8D/9h8tQmTAKzi/ON+DXBHjjqGrb8+rCocx2mdWLenDK9sNNsvyLb9oKJoE
- DdXuCrEQpa3U79RGc7wjXT9h/8VsXmA48LSxhRKn2uOmkf0nCr9W4YmrP+g0RGeCKo3yvFxS
- +2r2hEb/H7ZTP5PWyJM8We/4ttx32S5ues5+qjlqGhWSzmCcPrwKviErSiBCr4PtcioTBZcW
- VUssNEOhjUERfkdnHNeuNBWfiABIb1Yn7QC2BUmwOvN2DsqsChyfyuknCbiyQGjAmj8mvfi/
- 18FxnhXRoPx3wr7PqGVWgTJD1pscTrbKnoI1jI1/pBCMun+q9v6E7JCgWY181WjxgKSnen0n
- wySmewx3h/yfMh0aFxHhvLPxrO2IEQ==
-Subject: Re: [PATCH bpf-next v3 4/6] selftests/bpf: refactor
- xdp_context_functional test and bpf program
-In-Reply-To: <67be0aa61e400_25ccfc29426@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: marcus.wichelmann@hetzner-cloud.de
-X-Virus-Scanned: Clear (ClamAV 1.0.7/27561/Wed Feb 26 10:36:26 2025)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250225170128.590baea1@kernel.org>
 
-Am 25.02.25 um 19:23 schrieb Willem de Bruijn:
-> Marcus Wichelmann wrote:
->> Am 24.02.25 um 16:29 schrieb Marcus Wichelmann:
->>> [...]
->>> +	/* By default, Linux sends IPv6 multicast listener reports which
->>> +	 * interfere with this test. Set the IFF_NOARP flag to ensure
->>> +	 * silence on the interface.
->>> +	 */
->>> +	SYS(close, "ip link set dev " RX_NAME " arp off");
->>>    	SYS(close, "ip link set dev " RX_NAME " up");
->>
->> Hm, setting the NOARP flag seems to have not been sufficient to fix the flaky
->> test:
->> https://github.com/kernel-patches/bpf/actions/runs/13507111620/job/37739614229
->>
->> I was not able to reproduce it locally or with my own CI runs unfortunately, but
->> I'll try something else in the next patch version which should definitely stop
->> IPv6 multicast listener report packets from messing with the tests.
+On Tue, Feb 25, 2025 at 05:01:28PM -0800, Jakub Kicinski wrote:
+> On Tue, 25 Feb 2025 09:13:48 +0200 Gal Pressman wrote:
+> > Context 0 (default context) always exists, there is no need to check
+> > whether it exists or not when adding a flow steering rule.
+> > 
+> > The existing check fails when creating a flow steering rule for context
+> > 0 as it is not stored in the rss_ctx xarray.
 > 
-> You probably want to pass nodad to any ip -6 addr add.
-> 
-> This is a common option you'll find in tools/testing/selftests/net.
-> 
-> RFC 3810 section 5.2.13 says
-> 
-> "
->     For stateless autoconfiguration, as defined in [RFC2462], a node is
->     required to join several IPv6 multicast groups, in order to perform
->     Duplicate Address Detection (DAD).
-> "
+> But what is the use case for redirecting to context 0?
 
-I'm not explicitly adding an IPv6 address, but this rather comes from the IPv6
-link-local address being automatically assigned.
-This can be avoided by setting addrgenmode=none, either using "ip link" or by
-setting the corresponding sysctl.
+I think Gal's example is a good one and there could be users who are
+already directing flows to context 0 and so, as Gal mentioned, this
+might be a breakage? Not sure.
 
-But I think I'll add a filter for all non test related packets to the XDP program
-instead.
-I like this solution more, as it should be easier to grasp, very reliable and also
-solves this for all tests in just one place.
+I'll admit that I'd typically create a custom context and then set
+ntuple filters to direct traffic for those contexts (letting all the
+'other' traffic land in the default context 0), so I can understand
+Jakub's argument, as well.
 
-Thanks!
+I'm probably wrong because I'm not a python programmer, but IMHO
+it'd be a nice for the python RSS tests to be updated to cover this
+case (whichever way it goes). It seemed to me from a quick read
+(again, likely wrong) that it wasn't covered and could lead to
+confusion like this in the future?
 
