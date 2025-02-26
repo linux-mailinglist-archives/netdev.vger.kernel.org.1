@@ -1,140 +1,106 @@
-Return-Path: <netdev+bounces-169892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BADB7A4645B
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 16:16:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1DF8A46466
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 16:18:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B29D73AC90B
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 15:16:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCC67174717
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 15:18:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00B402222C6;
-	Wed, 26 Feb 2025 15:16:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28144221F02;
+	Wed, 26 Feb 2025 15:18:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="oQYj+R7W"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BaRCEFMi"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C68320C008;
-	Wed, 26 Feb 2025 15:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84CC820C008
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 15:18:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740583010; cv=none; b=WhGKOJlV4cymwuW9DgHyvpyzJK7kM6Tw1AdbXdNcZNyqBNDOgaIY+1QlPksrLqfkNcLwxrsLlqeYvUdMKztIC4MHdpexv2hkND+VAHPi/VisDW2c1BVSvg4FhSEW1Mj9e8rd6jQOkD1NZBwAWupheN+4IlZIyewQMdcBf/+pHfc=
+	t=1740583123; cv=none; b=rWRDE5SBsRLGINpr0NlV335wKqTj00UEwG2gupbhk5rFBqHBb09JXb+5KWGNZhvQCCUvVENzlW77Zf1pI2tPgZinycm9MrMI+MpP20ALr6ovLVGSDCv5wbSl5po+4E9k70R4j3Npflxnc8ptT6zjSYs3ZEQZES4o192+bTMU3qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740583010; c=relaxed/simple;
-	bh=SVdD8U7d/FDoTOYHC+jT1skSEd46CNF33xakYMMnULk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F1bOuiuJcHi0TzDJM+hiIEBxsQFzMOi6nxNWrUlK+sLLQHYK7RfIkXQbQbw47VJQSFz+/nnpQEOSjFvPlgfbfQhhQ12QzrvzlohzUdiIJPINE5uzH0go1c4a/1nHINMR8UTeF5hlzhlbs/dWuNjiBTZTBXUmdgK55PCYObaLbDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=oQYj+R7W; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6CF6E4433C;
-	Wed, 26 Feb 2025 15:16:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1740583000;
+	s=arc-20240116; t=1740583123; c=relaxed/simple;
+	bh=uZqpKRmZuulFM4M5k1miaq/vOU/5yHFwnDjpEDDJ/kw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NGTHg9Y/7+DriUpGudj9clqPrMfoc/GYjjE5hAuqULnGP1LrTVRmRAwjYZOmUMhkU4lFD7BMdRcIcke+YmoyRnyh+7f4uD+MUbjXwULd5fhiHLD4fRaB5oKjP41WiR3SVDCDuAhwtNt1mv8SmbTk+WC8uLYeBdBwhs97lM8burQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BaRCEFMi; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740583120;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=sJaZnLfOjI4LHuqpMppLemf30WiM8BMZnVVa5Y1FR+4=;
-	b=oQYj+R7WOnYA+MwRlTQIzmLyjq+90/o3hskqoEiVmNBKzmv/6rvFw3UgwaZHhz6jMc2OyI
-	9y0kuwsHY6qlDLb5e0z1Xm/6QmttvRq5lOpiQE/Lu02zCkUyYHSKcgXbY2AtU4M67KN3pW
-	W1n1ocgqqeVvlDNaw81c1/Ae47EhCR/djL9MNHB9nj9DjDod0rT0/YfSPMduXOTsPLpMuA
-	KhN8xZRXSf+BFuaABamiBdWznDI3hE+6RfJDVarHq/ZAhjEByQ8onXeBje9yMdSkltML50
-	dliR5gV7ykHjenp5GXJJwgJy/VlRqg7ecWeiutKp2d7ZFHfedKZy9zX+GyV2/g==
-Date: Wed, 26 Feb 2025 16:16:37 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, linux-arm-kernel@lists.infradead.org,
- Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina
- <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
- <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Simon Horman <horms@kernel.org>, Romain Gantois
- <romain.gantois@bootlin.com>
-Subject: Re: [PATCH net-next v2 09/13] net: phy: phylink: Use
- phy_caps_lookup for fixed-link configuration
-Message-ID: <20250226161637.58597e28@fedora.home>
-In-Reply-To: <Z78e1dmEuQzMER5L@shell.armlinux.org.uk>
-References: <20250226100929.1646454-1-maxime.chevallier@bootlin.com>
-	<20250226100929.1646454-10-maxime.chevallier@bootlin.com>
-	<Z78e1dmEuQzMER5L@shell.armlinux.org.uk>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	bh=uZqpKRmZuulFM4M5k1miaq/vOU/5yHFwnDjpEDDJ/kw=;
+	b=BaRCEFMi+yFtfuh18h/TZieaPKa2cWGqVUd3FUIrMYKWRlyCylR+PS4XzTRDIsnYrkZvgX
+	CgL+g5MAuRi9e89mOtedkVnYFfQTCRXouJ2bo9at8naQYeR30Ups2dRfbagGybmehZnu4b
+	K/DXrsA0dfjgwM3w0gAMsQ+oOsNdpLk=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-423-aD2MXcrDNwiHzsdoKWlpfA-1; Wed, 26 Feb 2025 10:18:39 -0500
+X-MC-Unique: aD2MXcrDNwiHzsdoKWlpfA-1
+X-Mimecast-MFC-AGG-ID: aD2MXcrDNwiHzsdoKWlpfA_1740583118
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-54531d9c128so4190967e87.1
+        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 07:18:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740583118; x=1741187918;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uZqpKRmZuulFM4M5k1miaq/vOU/5yHFwnDjpEDDJ/kw=;
+        b=HVjurwRJNfQwbpV63yMjc+HrTlGo3tOfYwWi3Vz1J4z4TIADNk0s3TIav6QJY1vGIp
+         kGeUhX2JgFmGAkGPAGYkXpFSNDdJFPgR5hRzX8ajhy3NURUOpXmKRxFTxpJINQPJT92A
+         4aCIUDsecK6s7jNtzfOp1j0NlfWfWosghUhmt55dj3m4yxMLM1Ygj12A35XbCv/SG2uT
+         LDwQ8Gv/FsvvhofOqqmz0zclhpYKRRBE6BfOH7v8BKSDagyTB6/cUahiJz1w7tB6qOCf
+         pYTyq3kL/mmgfzbsyQe9mGyyTFK0Srq6xROKySwTsQSMG8ygmD9lgyQPh6HJc287M+O/
+         53Pg==
+X-Gm-Message-State: AOJu0YwTRNBtH1CE5sk0E232DWi3Y/PNRYuiYavjomJhdggYn/MThq4h
+	FUt1Wi2czPJVX6OfHjoCIfN6pnBVkeycWI7+zeFNr+HpdFCRh5uy7jtqNb4hmRiNY3oBFN/9u64
+	NPsGwCUG+jLtA2Yyy1OtLCq/oxsfdhQ9HXQkCVvefVddkhbEWYBWvVw==
+X-Gm-Gg: ASbGnct3vcttdnDLO8dLjkDrTMNqelMMs3SkhVgo+yjwtw01oDgT9gUgmshxKU7TiAx
+	CGalsD6D3ncQIChGKvlyrmPF7CBsULK4zXBGoyDRrP0yy6RNDucAwoYlytqxHkxe9/YMTF4kaot
+	JDA/kkd0VsNBH4iZG/XyLqig1TP45JZvuUckSQPJFK0cxCLxrTJZVuvLXrDvbPSfQqE3+Asjfr9
+	E2WJJte4WXEgd+RK8G/tkrXbQFpimFm9k1ohEAJDM9XKJr0Dawb6ZfuOcOgIAfuBxPjpXa+JWRy
+	ZIQ=
+X-Received: by 2002:a05:6512:ba8:b0:546:2a27:ec35 with SMTP id 2adb3069b0e04-548392598c1mr10885731e87.37.1740583117637;
+        Wed, 26 Feb 2025 07:18:37 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG8cCV/CTAGNY1mRdej5W9AITBY3gWp8o5Gg9KdFUpKILkLXTUkqOfoBLoJXygHORRQPMT/gQ==
+X-Received: by 2002:a05:6512:ba8:b0:546:2a27:ec35 with SMTP id 2adb3069b0e04-548392598c1mr10885724e87.37.1740583117220;
+        Wed, 26 Feb 2025 07:18:37 -0800 (PST)
+Received: from debian ([2001:4649:f075:0:a45e:6b9:73fc:f9aa])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-548514f4d12sm476249e87.162.2025.02.26.07.18.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Feb 2025 07:18:35 -0800 (PST)
+Date: Wed, 26 Feb 2025 16:18:27 +0100
+From: Guillaume Nault <gnault@redhat.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, stephen@networkplumber.org, dsahern@gmail.com,
+	petrm@nvidia.com
+Subject: Re: [PATCH iproute2-next v2 0/5] iprule: Add mask support for L4
+ ports and DSCP
+Message-ID: <Z78ww29QI4X5bI+o@debian>
+References: <20250225090917.499376-1-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdekgeelvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduledprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtt
- hhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250225090917.499376-1-idosch@nvidia.com>
 
-Hi Russell,
+On Tue, Feb 25, 2025 at 11:09:12AM +0200, Ido Schimmel wrote:
+> Add mask support for L4 ports and DSCP in ip-rule following kernel
+> commit a60a27c7849f ("Merge branch 'net-fib_rules-add-port-mask-support'")
+> and commit 27422c373897 ("Merge branch 'net-fib_rules-add-dscp-mask-support'").
 
-On Wed, 26 Feb 2025 14:01:57 +0000
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+Reviewed-by: Guillaume Nault <gnault@redhat.com>
 
-> Please use a subject line of "net: phylink: " for phylink patches, not
-> "net: phy: " which is for phylib.
-
-Sure thing, I wasn't sure about the subject line for this one.
-
-> On Wed, Feb 26, 2025 at 11:09:24AM +0100, Maxime Chevallier wrote:
-> > When phylink creates a fixed-link configuration, it finds a matching
-> > linkmode to set as the advertised, lp_advertising and supported modes
-> > based on the speed and duplex of the fixed link.
-> > 
-> > Use the newly introduced phy_caps_lookup to get these modes instead of
-> > phy_lookup_settings(). This has the side effect that the matched
-> > settings and configured linkmodes may now contain several linkmodes (the
-> > intersection of supported linkmodes from the phylink settings and the
-> > linkmodes that match speed/duplex) instead of the one from
-> > phy_lookup_settings().
-> > 
-> > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-[...]
-
-> > @@ -879,8 +880,10 @@ static int phylink_parse_fixedlink(struct phylink *pl,
-> >  	linkmode_copy(pl->link_config.advertising, pl->supported);
-> >  	phylink_validate(pl, pl->supported, &pl->link_config);
-> >  
-> > -	s = phy_lookup_setting(pl->link_config.speed, pl->link_config.duplex,
-> > -			       pl->supported, true);
-> > +	c = phy_caps_lookup(pl->link_config.speed, pl->link_config.duplex,
-> > +			    pl->supported, true);
-> > +	if (c)
-> > +		linkmode_and(match, pl->supported, c->linkmodes);  
-> 
-> What's this for? Surely phy_caps_lookup() should not return a link mode
-> that wasn't in phy_caps_lookup()'s 3rd argument.
-
-The new lookup may return a linkmode that wasn't in the 3rd argument,
-as it will return ALL linkmodes that matched speed and duplex, provided
-that at least one of said linkmodes matched the 3rd parameter.
-
-Say you pass SPEED_1000, DUPLEX_FULL and a bitset containing only
-1000BaseTFull, you'll get :
-
- - 1000BaseTFull, 1000BaseKX, 1000BaseT1, etc. in c->linkmodes.
-
-That's the reason for re-andf'ing the modes afterwards.
-
-If that API is too convoluted or error-prone, I can come up with an API
-returning only what matched.
-
-Maxime
 
