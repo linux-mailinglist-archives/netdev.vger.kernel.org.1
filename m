@@ -1,105 +1,127 @@
-Return-Path: <netdev+bounces-169881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35072A46375
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 15:47:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0635CA4639E
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 15:50:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B78D189E33E
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 14:47:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0409718876E9
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 14:49:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1764227BB2;
-	Wed, 26 Feb 2025 14:46:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03DFC221703;
+	Wed, 26 Feb 2025 14:48:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2ZpyB00N"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="inpkz+vP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBE64225A39
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 14:46:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CFDE2222A1
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 14:48:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740581163; cv=none; b=Z/WV5KsoMJKgp1rQlzPQbl96LVcdGJlrd3fp9hzEbLXDyjfYr4gY2UM3Q4waSvvWKVUTNtifap7hqrCpVBTWPLLyXY9qkMXizwK2hxViH0B1lf0q5TAJRvCwQpzkitKS4GJYxqimHNsQKgIi1Sd1SHSw1TVRlKziwGBrW7Ixgu8=
+	t=1740581321; cv=none; b=lp4Jp/TcFdR+FVdTVyZqeJ2zObIZ2ZkIcdoD3aKIIcZzlXNNnVR2xkLgk+8JoYlI8viQyqieWTmsk8hSK6U7j6xseVa6rsOzaVSXz8jnrhpsArDVl8DWpRCgDOUcECTLgv+C6X57CmGhGWTK7OPKTn5uTVdDL1k/jZO4ry2IoP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740581163; c=relaxed/simple;
-	bh=jihNo/Yw8tRh7h785qdoh+h8SMQMktrediGBai4SMhk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=naqPEcKfWfzjzbcOZ/evUsfkiWxNT8LrYRRZJagKrliO3a/Ndu8xL6rqQ98Uh86nqLVzxul/2XEZYWnIRFMxjyDDO1xJ7bF1IY3NWxEN3IcKpay6KKRYjnttLexHtj3ehipz1r8G/Rx/ct0GJoQ2V9C8pVFlGr3F1qqXytGOxZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2ZpyB00N; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5e4b410e48bso691731a12.0
-        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 06:46:01 -0800 (PST)
+	s=arc-20240116; t=1740581321; c=relaxed/simple;
+	bh=su0PyH6fk/umxyHrvcwmhEHJXABA6CnmzbapAUQDlIc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z7JRIW8r+/nCDni++nLirejtNkAxlEHCRBogfeN110q5CwYD+SDR2t9xmjKAFY5gwyMt/afvqEWIlrHniwI8NXJ980W8nVS2mmcDB/bhhGZYPKkr/+6c/es53a3mdS4VFNk0xWT//aoGYDR71CkmGAFgGJaGj4emUglw4ESVW6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=inpkz+vP; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5e4ad1d67bdso799851a12.2
+        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 06:48:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740581160; x=1741185960; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jihNo/Yw8tRh7h785qdoh+h8SMQMktrediGBai4SMhk=;
-        b=2ZpyB00NtiQHWEH4V+MPPXfzzkRp79RnzfqpqqezD6dF4B4or2z+7MAxA5mbxFLEja
-         jIHlzfYAHnVnH8mgdYGve7cQvGmQmRIGKv4sqN2tMWg3hFhEYZZiay4vumaqU4R+va0V
-         IKpBq+UHtwbV3+KTs+53SHS1/skqMCYzGCwzM5skEtV2kLmIl2rfAR3StxFSqtPp7+4z
-         OHWX9qlRacNgKf/F1RMYwacUDDT+EB56QKwEw5w/1UsipZGfrv3fY+uvBgWf+74qhokW
-         GeGyGMsp0W56xrHahyxUaAUSIjCMKSwRIOBGlz1ChUJXUxv5M0jWYB6WKYXoMcnWqtSE
-         ThaQ==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1740581318; x=1741186118; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nMoILKIF7N8WQlVNtPKgkkC84yA+V5fRgKd3rLXRVvE=;
+        b=inpkz+vPNl0mlm9nSbeeNnKOTt1q+9n6oHZNQrX7CjQukEe9Avk9f8bqnPOxPu0XDW
+         2+hMyEhuzWWNA3Jzaw9AD8Or1ANsQAhJ+IT+M08iyUH99AJ3MkhkOMZSm2jLWDPmjWBv
+         78ZZUHS+AjxLiiV0aOpALNWZoIDcoUD+Yy4EyAsFTIFSAlUI9jLw8vKNaj8YF2FWg0eq
+         PrnjADb6w0dMtB9ytr7dq8WcoXjUNe7QfJWWOL3YiR0mcEA9Gwiup+qsdrKX+MAwN/I0
+         EKoIH+9MNh4vjab2EQBAqv311ZV9B1LtdgsSb7WA9Cx0g3sDOyvibT/smDai2GDpMHuR
+         jEkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740581160; x=1741185960;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jihNo/Yw8tRh7h785qdoh+h8SMQMktrediGBai4SMhk=;
-        b=UE1GLcjzs2x1Pkcr7ghh8PfbrDJaMOhVB0QpKzCahwV43rBfqL2gY8b6yVfT5wD+Nk
-         do+yIEgBbyD7xxPjFba8/jY1xbU6Pg4be8XR+UdGs3d4YmzUDQxVVFX8x86mfYvybk+f
-         dY4fG63XKKck1jb8mWTAFnj9b7WrkcQOjDFoRXP5qja95uPSfy/s9CSK5OUj1oeHAKgo
-         9ZIB7avPEvIDXM7oQFUHxMtewbQZrOGXlFtv0O8YxBbPPSTX/czQIgqv6HufkK4OtKme
-         4PBYgyAYkP2badpB3xAXxRCnf7rTCidt82nVgtJ53e/yk2MQ/+4yTRQgibq+yrWFsBIH
-         Pm2w==
-X-Forwarded-Encrypted: i=1; AJvYcCWFW1MdHszrxc0kbGpBVEvFL0NQ0+oQ903r5gVMgwW8LVzQQJ4BgKQImqjXBGPC3A4IPjeZwBQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyq2YPcVpX2NXhD4InnT0PucK7KN19MUSCFrguGCdMhPS7+iFtc
-	Lfs+ncEzGYPHMBm7Z/fhxfuYcvwtAqOtTPMrXx865yJFFuWDmsQ5urjdv10Xcw7ew1K+G/OwFHG
-	TbIs80WgY7fx1SpbQb9NuZ+HUUUmch68ypFKy
-X-Gm-Gg: ASbGnctu0K4WDkWP0lhMvk2KYa5SzB3mkAFmVE0ZAShEk6fjK9rtN6M4ka4vCLdl0df
-	EzvnVCiUM9MRNNZflRye/BO61e1vL2ojcxa4ggVh/ph3J6U+HrjTyBEzSdcw7IKg7KGFmpuTq2y
-	rXr4CLaiA=
-X-Google-Smtp-Source: AGHT+IGgrYEfSWpGqQaKhR9k+hBCb6H7SKyCMHhmEqNNBLgh5vItYiAfTDZOUsdtoJCuTwAUDiOA1XuTPqTaMF169pM=
-X-Received: by 2002:a05:6402:4611:b0:5e4:a1e8:3f07 with SMTP id
- 4fb4d7f45d1cf-5e4a1e8a318mr3059258a12.31.1740581160088; Wed, 26 Feb 2025
- 06:46:00 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740581319; x=1741186119;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nMoILKIF7N8WQlVNtPKgkkC84yA+V5fRgKd3rLXRVvE=;
+        b=v0MFPr9Tp/99EgrlvbajeCi7hEt3va39PIE+tMHnRyH3Yk+HnyvgFFcJBwwo8kzSv4
+         ZyYR95cBrEInJSV7Q1eKevhHHzK026LbV+cmkMEZa57mjz/t26RHk4V3neTpeZI3bSQL
+         gyt1pm+Kiw5QCm5Q/kictjAvC3XITDi/nOVIOejn0D9Z4KF7XpkjtlU5oHldGzDHyZLP
+         aKZ90jFEtWzdONLHGqtMOeZRg5BK5YMkWCP/9kCWORIm0u51p3NREUwPlQ1LUoTYQOkO
+         ilOSL8sJ38Vc7tDaSAy5+uTW8LUaKyt97x8kUfb8fuG9SxvaFznEtUBHECnA3DYwwdMO
+         mf1w==
+X-Forwarded-Encrypted: i=1; AJvYcCWPzjftvl/BxaVEWUIaCQIALwxdpu0LMolDSv4m7npfG512bitOQWf1/WAaCRQlcgXnQgUIi3Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkkTo039J+QP/UxaU+yUzviyoo4IgZ0MI4fHz4qhbnrQPfWbCO
+	zYObVk9XAF/jRV11qoUb39ogi9ny81FvfgSkgF/y9ojlhBDkqAWoxAN2uWP7GAI=
+X-Gm-Gg: ASbGnctESoNXKXW7vhwCfa+Nv5yPtDHp+qF5SwpS1wNvDAz9qP3wawxSczxf7B4vbx6
+	rpe0XTOlC4U2/MboMlXng2okOIPkYlLd7124P2Zs37o+8ORQWf2NsVbJwVK+4mofr3kIjEowBHy
+	ge5+yyHT3R/uOTKUvji5RNLnw5F4Hx/b8/AaEALb59RW6JyGXsjvurL6C+YcLxFXOEOHMcpkdqm
+	8o9gYCho10smd3JlU9lN4OLv5CjPFg2yUsh14vijlvaVJq/snTtDK6KyoWE4Lx6nFar/JwPVtze
+	1GuHgJT5Pbsivqpd/V5NmYUZM4CO/mNvV3oOU8fwuRW2E3yCZas3Kw==
+X-Google-Smtp-Source: AGHT+IGtH1CcVMxMCJwtVi3LYJ16g2hv5Xsh1dW0fQCUJV+H/J70PtPy1kYytDJYuVvZvlxBA+dtIg==
+X-Received: by 2002:a05:6402:5202:b0:5e0:7f52:226 with SMTP id 4fb4d7f45d1cf-5e4a0d45e24mr4468134a12.4.1740581317806;
+        Wed, 26 Feb 2025 06:48:37 -0800 (PST)
+Received: from jiri-mlt.client.nvidia.com ([140.209.217.212])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e462032b00sm2912497a12.68.2025.02.26.06.48.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Feb 2025 06:48:37 -0800 (PST)
+Date: Wed, 26 Feb 2025 15:48:35 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, 
+	Tony Nguyen <anthony.l.nguyen@intel.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Cosmin Ratiu <cratiu@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, netdev@vger.kernel.org, 
+	Konrad Knitter <konrad.knitter@intel.com>, Jacob Keller <jacob.e.keller@intel.com>, davem@davemloft.net, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, 
+	linux-kernel@vger.kernel.org, ITP Upstream <nxne.cnse.osdt.itp.upstreaming@intel.com>, 
+	Carolina Jubran <cjubran@nvidia.com>
+Subject: Re: [RFC net-next v2 1/2] devlink: add whole device devlink instance
+Message-ID: <iiemy2zwko4iehuw6cgbipszcxonanjpumxzv4nbdvgvdgi5fx@jz3hkez3lygw>
+References: <20250219164410.35665-1-przemyslaw.kitszel@intel.com>
+ <20250219164410.35665-2-przemyslaw.kitszel@intel.com>
+ <ybrtz77i3hbxdwau4k55xn5brsnrtyomg6u65eyqm4fh7nsnob@arqyloer2l5z>
+ <87855c66-0ab4-4b40-81fa-b37149c17dca@intel.com>
+ <zzyls3te4he2l5spf4wzfb53imuoemopwl774dzq5t5s22sg7l@37fk7fvgvnrr>
+ <e027f9e5-ff3a-4bc1-8297-9400a4ff62a6@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250225182250.74650-1-kuniyu@amazon.com> <20250225182250.74650-13-kuniyu@amazon.com>
-In-Reply-To: <20250225182250.74650-13-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 26 Feb 2025 15:45:48 +0100
-X-Gm-Features: AQ5f1JrAJN4A41NddttMCwQ8Ya1Y2S4s8yz7wZ16DKKTTGOeluXDWdvAXTGV8n4
-Message-ID: <CANn89i+5HnRqjJKt5VuSC_gkEuDW+3Dt=FWSeVTpXSOcYEp2iw@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 12/12] ipv4: fib: Convert RTM_NEWROUTE and
- RTM_DELROUTE to per-netns RTNL.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e027f9e5-ff3a-4bc1-8297-9400a4ff62a6@intel.com>
 
-On Tue, Feb 25, 2025 at 7:28=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> We converted fib_info hash tables to per-netns one and now ready to
-> convert RTM_NEWROUTE and RTM_DELROUTE to per-netns RTNL.
->
-> Let's hold rtnl_net_lock() in inet_rtm_newroute() and inet_rtm_delroute()=
-.
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Tue, Feb 25, 2025 at 04:40:49PM +0100, przemyslaw.kitszel@intel.com wrote:
+>On 2/25/25 15:35, Jiri Pirko wrote:
+>> Tue, Feb 25, 2025 at 12:30:49PM +0100, przemyslaw.kitszel@intel.com wrote:
 
+[...]
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+>> > output, for all PFs and VFs on given device:
+>> > 
+>> > pci/0000:af:00:
+>> >   name rss size 8 unit entry size_min 0 size_max 24 size_gran 1
+>> >     resources:
+>> >       name lut_512 size 0 unit entry size_min 0 size_max 16 size_gran 1
+>> >       name lut_2048 size 8 unit entry size_min 0 size_max 8 size_gran 1
+>> > 
+>> > What is contributing to the hardness, this is not just one for all ice
+>> > PFs, but one per device, which we distinguish via pci BDF.
+>> 
+>> How?
+>
+>code is in ice_adapter_index()
+
+If you pass 2 pfs of the same device to a VM with random BDF, you get 2
+ice_adapters, correct?
+
+[...]
 
