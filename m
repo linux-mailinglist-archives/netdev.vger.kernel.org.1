@@ -1,158 +1,118 @@
-Return-Path: <netdev+bounces-169964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87FCBA46A85
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 20:01:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B474A46AB2
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 20:15:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0147A16C7BD
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 19:01:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F76B7A73D8
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 19:14:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 021A72376F9;
-	Wed, 26 Feb 2025 19:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95071237702;
+	Wed, 26 Feb 2025 19:14:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PQ0TftWJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MrCNdM5B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C1916F288;
-	Wed, 26 Feb 2025 19:00:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED1C2248B4
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 19:14:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740596440; cv=none; b=j8qkpMYM75vbafzhyzYufV1XpqGehhAzfmx+eA7mUJbqytEIyyX8phdYbSzaDA5Uba24hh2LBe197so75qZyoeZ7j3AjPC+D7RXFPcPIWucCvCilnyXUXhG6lCNIw20W5IB5gPBnT0tOkZoe4ULDcoQgZBq2xQJUyNEUbS9Omu4=
+	t=1740597297; cv=none; b=VPifoIad7DpnCNAfxSsngLjWj1g0cAT26RrEw5QQIN8jOf1RA3Ul0pHnHohmsQWUdUnaRQ8Awrzb+mNGDnmDJRhGrjXNIyml6fy7Ww3e6lWeJY7AmYRHTiYRhjTnaoP50yxQbfPF3DTw9ppe0+TfgSurFOZL3G5fkLzIWfSuQIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740596440; c=relaxed/simple;
-	bh=ilnvCzetpSwt81QzijU6ZPwvYZCY439qILLVWdJZsMY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=URtiZWEKTD/cqON43XjZgCMnbXZ91Go8wPj9tkPfPJwsQFIryJJg+rjeMyyrmxduGh9k6g3KMl7TQ8vAk+ZN+Q8tjI3NlQMpgSECrWMdsiyWnQA7FI7GAQjq8PhQSD7tt3TL8FkhM1qBn8p5sRPOOmNZCQk+WxGhg0+bcds1IjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PQ0TftWJ; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-22349bb8605so2039595ad.0;
-        Wed, 26 Feb 2025 11:00:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740596438; x=1741201238; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=um3PjvaV3xemkSrnVeoxOKPhFWkje/02DmmZTZ1Ij9w=;
-        b=PQ0TftWJZmmrneq5j4aC/U7kDi/qc+iPH+01jFLexMX8+SpwmG5wcvNwDPRC5amn/y
-         ErY9ZUxqyy9u8nb66adfwl0xtjVRg7Ef7xPG+VO9ZcoFXmDFheZEtN6lELPFC26apwBe
-         Ltk51wgVFPGOZJJSBlUZlCVelCKhDcd9KI/oVfbH0pxtxTT2B3LvnbFTJbMmmSGKDagr
-         BW/Hdk0DVjDwPQj6H4VO+aBSpxJJS/0LxPSa1APzZDiKUU0rJR27RhdAliwtG5J2zgB3
-         YpPqkG/enk17ZC3cmDv84bHNDWVe5NKVFSRuuvSHWsA6HASpoJiQPsSocJ7TFjyWe3yD
-         MHLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740596438; x=1741201238;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=um3PjvaV3xemkSrnVeoxOKPhFWkje/02DmmZTZ1Ij9w=;
-        b=WIZxjLmwCuBWnugpBLtZw6yd6ZnLB62Tbagr8ZE2d2+nXJISlsLFn/EqKNCZKNinB4
-         tAK1A2yuwZKX9d/l4/q4afgMNhRu3K7xAsgTDb1FBf5c1yzsUiiDYEnUq9c502TtCLsY
-         8klm4Sbwa26c1EKOqsHDhtPHNFdaF7q3dhugAWI4L+K0lI/Htihq4H07jdCPKAUD2LPa
-         IvsSGHieFpREfGA1wdrlD9xijs398iUT6+L8DWYu01uNEVBAGKLLP1pUYJednQrvshe4
-         m2+gyRRVhn/S6uERWuRK2/ckNbSc70q6u0J2nDauON2E5PjoZG0T/jonvtTNgbKKRKrc
-         Fe0A==
-X-Forwarded-Encrypted: i=1; AJvYcCUs3sQyyHsIPdwaKMhMeXQtgcUw7LDW/BCZMnHXI+d/EipUlqLfJC3iUsMUyfhuuiCyXkZagVoMYcvNndn/A0WO@vger.kernel.org, AJvYcCVvUOPZIDdWQ+c54wBj0cCyujb1K6pyLuNeuVExXkLsdtNmgcwaJNf9gac1y4pN2PfQdb3vHtlsFk25YjSR@vger.kernel.org, AJvYcCXbJPhowuz+J7BL8rfKdxBPhsV9cQWcrFE8B9FiivGFbJOQN+axK+5cUB62cBSCtz7ZTbw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGKxZGzQm9kZ4G62bleFKlHIa3p0H+4prxHjCjUuhQplG0kCge
-	wp5hUB7PeBXgSp9yi0qreM+kCFwyIsx2iLC0dC2cTnj6JvNTg0g=
-X-Gm-Gg: ASbGnctZIJ1hmYBeWn5ygNWfH+FPjOkILpJYuyTEq0fLv8v6e2rk4Z+FMtLhKAdnSbM
-	g+c6d21wsODLvQPfeIZzQM39f8j41QoqOUQXNeQ4SxmyrZiskAkn+oF2fqMR+MSisFiUTEdyd8Q
-	An5dSQno6rmoPtIuDp9W4BuHu6fC72nZTgRElz8IvVKsRc3TKYuNkhHyuiRPP1Ibfldb3mfikDC
-	7lWK2F/gkAuRNl5IyH1pnLRTduaqThkSeWjXQafTWUxItzAS6rk6aTZrqHsaTfAAjsINdXsBO1x
-	ShU/Hpk9GviFhzjn1G5HhBmMvQ==
-X-Google-Smtp-Source: AGHT+IEXTCiiX7hd+vmSbpzizYEK0rijev1ZKtdKEhTs2LivmWOC4sXPFuIrmEnAwtEyjJANS3y/rg==
-X-Received: by 2002:a05:6a00:99c:b0:730:949d:2d3f with SMTP id d2e1a72fcca58-734790c8cadmr13431917b3a.7.1740596436989;
-        Wed, 26 Feb 2025 11:00:36 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-7347a81c57esm3969843b3a.136.2025.02.26.11.00.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Feb 2025 11:00:36 -0800 (PST)
-Date: Wed, 26 Feb 2025 11:00:34 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, andrii@kernel.org,
-	eddyz87@gmail.com, mykolal@fb.com, ast@kernel.org,
-	daniel@iogearbox.net, martin.lau@linux.dev, song@kernel.org,
-	yonghong.song@linux.dev, john.fastabend@gmail.com,
-	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com,
-	jolsa@kernel.org, shuah@kernel.org, hawk@kernel.org
-Subject: Re: [PATCH bpf-next v3 5/6] selftests/bpf: add test for XDP metadata
- support in tun driver
-Message-ID: <Z79k0vKn39XsZ-j7@mini-arch>
-References: <20250224152909.3911544-1-marcus.wichelmann@hetzner-cloud.de>
- <20250224152909.3911544-6-marcus.wichelmann@hetzner-cloud.de>
- <Z7yo3VfHofK-W7EY@mini-arch>
- <165bbf6e-ca06-4eac-a9a2-2033314aa027@hetzner-cloud.de>
+	s=arc-20240116; t=1740597297; c=relaxed/simple;
+	bh=NhmONbR6Kz0FVFEI1qzKO5/VG/mOkNn5G3jRJ1/Ui0E=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=EOCRRHoJfpIEVFJW+IUpVyaymNTmXtQWtf3xlvZ+Ju0prEaxWz5qcxh/cuizCIbx6RPSY/zOBFSYx7gzCw164Nezmh0H5FnTH8un6liOmGA5L/EXYIySgJCZaDzlr9AY8T1T5+qxEbTFl4LjF6IYQBYMaDrQUQjl9aAI4SlVd5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MrCNdM5B; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740597294;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JXusiqKUd0N8mZ+N1Pw+0C9FOXib+lo8DTi+DczZMkI=;
+	b=MrCNdM5BD/6RF0PCfSmvNuuPobM8uTyiTbrezwdsv5UB8rXrwoYqceT3vvbP/fcoPRjZVA
+	pjywx6DL8tl8YcwZWYTuWXFmMA6sLF0qqKK63olxacOvzJy8DJOFDeaPchKFC+oiqDie/F
+	gINdLoCHoYrxXkFQ6P+JG4IQkiqagYU=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-483-rO-D1SgOM8-pCV7c4lHKOQ-1; Wed,
+ 26 Feb 2025 14:14:51 -0500
+X-MC-Unique: rO-D1SgOM8-pCV7c4lHKOQ-1
+X-Mimecast-MFC-AGG-ID: rO-D1SgOM8-pCV7c4lHKOQ_1740597290
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EB52018EAB38;
+	Wed, 26 Feb 2025 19:14:49 +0000 (UTC)
+Received: from pablmart-thinkpadt14gen4.rmtes.csb (unknown [10.44.33.78])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5EA641944D02;
+	Wed, 26 Feb 2025 19:14:47 +0000 (UTC)
+Date: Wed, 26 Feb 2025 20:14:43 +0100 (CET)
+From: Pablo Martin Medrano <pablmart@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+    "David S . Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
+    Shuah Khan <shuah@kernel.org>
+Subject: Re: [PATCH net] selftests/net: big_tcp: longer netperf session on
+ slow machines
+In-Reply-To: <2a7ed528-ed5d-d995-f7fe-12e3319aba27@redhat.com>
+Message-ID: <d26ea97a-1ef8-aee0-d9fb-7ba80ddcdcb0@redhat.com>
+References: <bd55c0d5a90b35f7eeee6d132e950ca338ea1d67.1739895412.git.pablmart@redhat.com> <20250220165401.6d9bfc8c@kernel.org> <c36c6de0-fc01-4d8c-81e5-cbdf14936106@redhat.com> <20250221144408.784cc642@kernel.org>
+ <2a7ed528-ed5d-d995-f7fe-12e3319aba27@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <165bbf6e-ca06-4eac-a9a2-2033314aa027@hetzner-cloud.de>
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On 02/26, Marcus Wichelmann wrote:
-> Am 24.02.25 um 18:14 schrieb Stanislav Fomichev:
-> > On 02/24, Marcus Wichelmann wrote:
-> > > Add a selftest that creates a tap device, attaches XDP and TC programs,
-> > > writes a packet with a test payload into the tap device and checks the
-> > > test result. This test ensures that the XDP metadata support in the tun
-> > > driver is enabled and that the metadata size is correctly passed to the
-> > > skb.
-> > > 
-> > > See the previous commit ("selftests/bpf: refactor xdp_context_functional
-> > > test and bpf program") for details about the test design.
-> > > 
-> > > Signed-off-by: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
-> > > ---
-> > >   .../bpf/prog_tests/xdp_context_test_run.c     | 64 +++++++++++++++++++
-> > >   1 file changed, 64 insertions(+)
-> > > 
-> > > diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-> > > index 4043f220d7c0..60aad6bd8882 100644
-> > > --- a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-> > > +++ b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-> > > @@ -8,6 +8,7 @@
-> > >   #define TX_NAME "veth1"
-> > >   #define TX_NETNS "xdp_context_tx"
-> > >   #define RX_NETNS "xdp_context_rx"
-> > > +#define TAP_NAME "tap0"
-> > >   #define TEST_PAYLOAD_LEN 32
-> > >   static const __u8 test_payload[TEST_PAYLOAD_LEN] = {
-> > > @@ -251,3 +252,66 @@ void test_xdp_context_veth(void)
-> > >   	netns_free(tx_ns);
-> > >   }
-> > > +void test_xdp_context_tuntap(void)
-> > 
-> > tap0 is already used by lwt tests, so there is a chance this new test
-> > will clash with it? Should we run your new test in a net namespace
-> > to be safe? Bastien recently added a change where you can make
-> > your test run in a net ns by naming the function test_ns_xxx.
-> > 
-> 
-> Ah, cool, I didn't know of that feature.
-> 
-> For reference, you probably mean this one?
-> commit c047e0e0e435 ("selftests/bpf: Optionally open a dedicated namespace to run test in it")
 
-Yes.
- 
-> As long as the tests are not run in parallel, the test function SHOULD
-> clean up well enough behind itself that no conflicts should occur.
-> But having that bit of extra safety won't hurt.
 
-The test you're adding is gonna be running in parallel with most of the
-other test cases. If you want it to be executed in a serial fashion
-(which I don't think you do, running in parallel in a ns is a better
-option), the function as to be called serial_test_xxx.
+On Mon, 24 Feb 2025, Pablo Martin Medrano wrote:
+
+> On Fri, 21 Feb 2025, Jakub Kicinski wrote:
+>
+> > Hm. Wouldn't we ideally specify the flow length in bytes? Instead of
+> > giving all machines 1 sec, ask to transfer ${TDB number of bytes} and
+> > on fast machines it will complete in 1 sec, on slower machines take
+> > longer but have a good chance of still growing the windows?
+> >
+
+Testing in my development machine, the equivalent to 1 second worth of
+packages is around 1000000000, changing -l 1 to -l -1000000000 resulted
+in the same time and the same test behaviour.
+
+To force the failure I generate load using stress-ng --sock <n> with
+increasing values of n. The values for n needed for the test to fail are
+higher with the 'fixed number of packages' approach.
+
+Testing in the original 'slow system' it increases the time of each
+iteration to about 10 seconds, and it does not fail in the same
+circumstances.
+
+But I have some concerns about this approach instead of the xfail on
+slow:
+
+- If I generate load in the slow system, the "number of packages"
+  approach also fails, so it is not clear how many packages to set.
+
+- The test maybe slower in slower systems where it previously worked
+  fine.
+
+- The generation of packages and the time for the tcp window to adapt
+  increase linearly? Isn't there the possibility that in future _faster_
+  systems the test fails because the netperf session goes too fast?
+
 
