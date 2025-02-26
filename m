@@ -1,169 +1,125 @@
-Return-Path: <netdev+bounces-169923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B126FA467B4
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 18:15:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28BBBA467A1
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 18:14:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6B88188A585
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 17:12:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77BE43A184C
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 17:13:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A7922253A9;
-	Wed, 26 Feb 2025 17:12:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A1982248BA;
+	Wed, 26 Feb 2025 17:13:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dHfN+azv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iiL9z13G"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ED10225388;
-	Wed, 26 Feb 2025 17:12:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A1321CA1B
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 17:13:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740589930; cv=none; b=Br0PApZQO+nAJV0rnY0J0bQAHb/EnVDPkpQK6UVnQyvpsJZdXEiu8mBMS8bBAuzo2pEfk8QazzSS1Z3Wb2faW5Cq6VYiX1/468XME0ZSXB7lTF0m8Bl2YGG9Y5Jv7MDoyKc7TOosnrUDeMqumLy9co6M4qpZPOfnTcmQMojT2XI=
+	t=1740590036; cv=none; b=OOWxIQJ/Dq8uNBomuas9An6d7xS/JCZeihn4p4QC5fullBqpsbioJ8CG9q6DZun9DfoYv/aCMLiWagymIytw9tBvhCOiQ0qCrMZhV89rAe5in2D/nbwp3u6/CGCrCYc2qiVBD4JQZnK2UtoX+6YiwCF9MpQV4XVqqlrFjBoJS2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740589930; c=relaxed/simple;
-	bh=bCFsSQk2TidtJIcQabLL//jFR8PWOOUExaamwCnHd/U=;
-	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To; b=a1OZDFJs+LKZxX4CmUSZjdIEPvchpA/f3zaewbZn2DhRD3m3MagrmH/QEiF2aRT1x0cLXLxV48eOsHJOUFHIUAFC3fbgfvp+mILoaCK55xGWqM1Avbl5YtUw2V/O11if7rcbS+LySYdm8JRRFu13ZAegm9aIczhPsL7OdV9oN54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dHfN+azv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FCEDC4CEFF;
-	Wed, 26 Feb 2025 17:12:09 +0000 (UTC)
+	s=arc-20240116; t=1740590036; c=relaxed/simple;
+	bh=xeFuvmiK6yJyfBkZp/pDcBfAXa39Zzm+f1oT0x6JpPE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N6FLlCYoxTn1aKq7OQz9pocl7FO0gv/APC5FhKM07FEpstkuB/EbJsCp4OAHDHQ6Zr7cbkgn7M2NC+KMZsAtAamThKfaapicldot2l8W+m4IvT2Z1A2q5xdASAEYSm7NpYN/y9Ohk/xugMrPO+TY7bl4KBKBMXlnlEqrFLzK7TI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iiL9z13G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 383EFC4CEE9;
+	Wed, 26 Feb 2025 17:13:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740589929;
-	bh=bCFsSQk2TidtJIcQabLL//jFR8PWOOUExaamwCnHd/U=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dHfN+azv4iTM7t4HCjo5TdiYx2W9Qt4QVAkr4RIg+WgSKht2veBXhZ2WxaYxCw8Mn
-	 d7PjK//WZFoA08BFizGZWqmP8bpY4mUVmk3oWGAo0WZImxIQPbu/UMEK71ze9QkRPG
-	 UsBfrulQdP8Sw5jszB9gnwxpDRzPt4AKeA32vJUP2QOfiCedRZc4l4bZC5ZzaouUkH
-	 Gya3V3gJr5OjCP1cS+oB7aRIf6ojECHCbIUUvPOeDt4PqU3UadBwBpEJHhEDA4SXZR
-	 KSc7H7pifNpBxvWQT1aq8OHuKlat8147i8JnYSnt+pdWFeUEgYPTNm8/SbSWDJoPuj
-	 0+1ANN9R/aTPQ==
-Content-Type: multipart/mixed; boundary="------------VC1cxLU5U4YFqksw5cz0xkIc"
-Message-ID: <7e148fd2-b4b7-49a1-958f-4b0838571245@kernel.org>
-Date: Wed, 26 Feb 2025 10:12:08 -0700
+	s=k20201202; t=1740590035;
+	bh=xeFuvmiK6yJyfBkZp/pDcBfAXa39Zzm+f1oT0x6JpPE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=iiL9z13G01PfsB92Wd7SY5U2YxwCCqdxtg3NpbkEaXM2b9Tsfs/maHZX3QbhOh5H0
+	 P8Xc/M2paKIAz/kIrND6SBS7lRtogcgI6Pkqh7psBJ7KRBVyEwRNn4i90mR/OCo6qh
+	 kA/uPBEfS/91EiCdhF9Np0eXnCMxgNOMKQe4niyzNUAiq0NXudeBxboPPMVALk3s89
+	 uXECX8Dq4aLhICp0EVo5zCGiGoFUKO1dPSvJTaV6dXYZmgL3yjtyiueha9V2mWNRkW
+	 4GRQOird31Ff+n5tJ3l7yqFuiJphPgeurVerWgsJjjZPfS1h/PG1jiX1mapW5CFSaX
+	 7o8vBrv7zbxnQ==
+From: Antoine Tenart <atenart@kernel.org>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com
+Cc: Antoine Tenart <atenart@kernel.org>,
+	netdev@vger.kernel.org,
+	willemdebruijn.kernel@gmail.com,
+	pshelar@ovn.org
+Subject: [PATCH net] net: gso: fix ownership in __udp_gso_segment
+Date: Wed, 26 Feb 2025 18:13:42 +0100
+Message-ID: <20250226171352.258045-1-atenart@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] trace: tcp: Add tracepoint for tcp_sendmsg()
-Content-Language: en-US
-To: Breno Leitao <leitao@debian.org>
-Cc: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>,
- Kuniyuki Iwashima <kuniyu@amazon.com>, Steven Rostedt <rostedt@goodmis.org>,
- Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, kernel-team@meta.com,
- yonghong.song@linux.dev
-References: <20250224-tcpsendmsg-v1-1-bac043c59cc8@debian.org>
- <CANn89iLybqJ22LVy00KUOVscRr8GQ88AcJ3Oy9MjBUgN=or0jA@mail.gmail.com>
- <559f3da9-4b3d-41c2-bf44-18329f76e937@kernel.org>
- <20250226-cunning-innocent-degu-d6c2fe@leitao>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20250226-cunning-innocent-degu-d6c2fe@leitao>
+Content-Transfer-Encoding: 8bit
 
-This is a multi-part message in MIME format.
---------------VC1cxLU5U4YFqksw5cz0xkIc
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In __udp_gso_segment the skb destructor is removed before segmenting the
+skb but the socket reference is kept as-is. This is an issue if the
+original skb is later orphaned as we can hit the following bug:
 
-On 2/26/25 9:10 AM, Breno Leitao wrote:
->> Also, if a tracepoint is added, inside of tcp_sendmsg_locked would cover
->> more use cases (see kernel references to it).
-> 
-> Agree, this seems to provide more useful information
-> 
->> We have a patch for a couple years now with a tracepoint inside the
-> 
-> Sorry, where do you have this patch? is it downstream?
+  kernel BUG at ./include/linux/skbuff.h:3312!  (skb_orphan)
+  RIP: 0010:ip_rcv_core+0x8b2/0xca0
+  Call Trace:
+   ip_rcv+0xab/0x6e0
+   __netif_receive_skb_one_core+0x168/0x1b0
+   process_backlog+0x384/0x1100
+   __napi_poll.constprop.0+0xa1/0x370
+   net_rx_action+0x925/0xe50
 
-company tree. Attached. Where to put tracepoints and what arguments to
-supply so that it is beneficial to multiple users is always a touchy
-subject :-), so I have not tried to push the patch out. sock arg should
-be added to it for example.
+The above can happen following a sequence of events when using
+OpenVSwitch, when an OVS_ACTION_ATTR_USERSPACE action precedes an
+OVS_ACTION_ATTR_OUTPUT action:
 
-The key is to see how tcp_sendmsg_locked breaks up the buffers, and then
-another one in tcp_write_xmit to see when the actual push out happens.
-At the time I was looking at latency in the stack - from sendmsg call to
-driver pushing descriptors to hardware.
---------------VC1cxLU5U4YFqksw5cz0xkIc
-Content-Type: text/plain; charset=UTF-8;
- name="0001-tcp-Add-tracepoints-to-tcp_write_xmit-and-tcp_sendms.patch"
-Content-Disposition: attachment;
- filename*0="0001-tcp-Add-tracepoints-to-tcp_write_xmit-and-tcp_sendms.pa";
- filename*1="tch"
-Content-Transfer-Encoding: base64
+1. OVS_ACTION_ATTR_USERSPACE is handled (in do_execute_actions): the skb
+   goes through queue_gso_packets and then __udp_gso_segment, where its
+   destructor is removed.
+2. The segments' data are copied and sent to userspace.
+3. OVS_ACTION_ATTR_OUTPUT is handled (in do_execute_actions) and the
+   same original skb is sent to its path.
+4. If it later hits skb_orphan, we hit the bug.
 
-RnJvbSAyMjk4Y2E2NmMxNWJhZTZhOTU2OThhYmQ4ZDAyOWI5MjcxZmJlZmEzIE1vbiBTZXAg
-MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBEYXZpZCBBaGVybiA8ZHNhaGVybkBnbWFpbC5jb20+
-CkRhdGU6IEZyaSwgMjQgTWFyIDIwMjMgMjI6MDc6NTMgKzAwMDAKU3ViamVjdDogW1BBVENI
-XSB0Y3A6IEFkZCB0cmFjZXBvaW50cyB0byB0Y3Bfd3JpdGVfeG1pdCBhbmQgdGNwX3NlbmRt
-c2dfbG9ja2VkCgpTaWduZWQtb2ZmLWJ5OiBEYXZpZCBBaGVybiA8ZHNhaGVybkBnbWFpbC5j
-b20+Ci0tLQogaW5jbHVkZS90cmFjZS9ldmVudHMvdGNwLmggfCA1NyArKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKwogbmV0L2lwdjQvdGNwLmMgICAgICAgICAgICAg
-fCAgNCArKysKIG5ldC9pcHY0L3RjcF9vdXRwdXQuYyAgICAgIHwgIDEgKwogMyBmaWxlcyBj
-aGFuZ2VkLCA2MiBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvaW5jbHVkZS90cmFjZS9l
-dmVudHMvdGNwLmggYi9pbmNsdWRlL3RyYWNlL2V2ZW50cy90Y3AuaAppbmRleCA5MDFiNDQw
-MjM4ZDUuLjZiMTllMWQ0ZDc5ZCAxMDA2NDQKLS0tIGEvaW5jbHVkZS90cmFjZS9ldmVudHMv
-dGNwLmgKKysrIGIvaW5jbHVkZS90cmFjZS9ldmVudHMvdGNwLmgKQEAgLTE4Nyw2ICsxODcs
-NjMgQEAgREVGSU5FX0VWRU5UKHRjcF9ldmVudF9zaywgdGNwX3Jjdl9zcGFjZV9hZGp1c3Qs
-CiAJVFBfQVJHUyhzaykKICk7CiAKK1RSQUNFX0VWRU5UKHRjcF9zZW5kbXNnX2xvY2tlZCwK
-KworCVRQX1BST1RPKHN0cnVjdCBtc2doZHIgKm1zZywgc3RydWN0IHNrX2J1ZmYgKnNrYiwg
-aW50IHNpemVfZ29hbCksCisKKwlUUF9BUkdTKG1zZywgc2tiLCBzaXplX2dvYWwpLAorCisJ
-VFBfU1RSVUNUX19lbnRyeSgKKwkJX19maWVsZChfX3U2NCwgc2tiKQorCQlfX2ZpZWxkKGlu
-dCwgc2tiX2xlbikKKwkJX19maWVsZChpbnQsIG1zZ19sZWZ0KQorCQlfX2ZpZWxkKGludCwg
-c2l6ZV9nb2FsKQorCSksCisKKwlUUF9mYXN0X2Fzc2lnbigKKwkJX19lbnRyeS0+c2tiID0g
-KF9fdTY0KXNrYjsKKwkJX19lbnRyeS0+c2tiX2xlbiA9IHNrYiA/IHNrYi0+bGVuIDogMDsK
-KwkJX19lbnRyeS0+bXNnX2xlZnQgPSBtc2dfZGF0YV9sZWZ0KG1zZyk7CisJCV9fZW50cnkt
-PnNpemVfZ29hbCA9IHNpemVfZ29hbDsKKwkpLAorCisJVFBfcHJpbnRrKCJza2IgJWxseCBs
-ZW4gJWQgbXNnX2xlZnQgJWQgc2l6ZV9nb2FsICVkIiwKKwkJICBfX2VudHJ5LT5za2IsIF9f
-ZW50cnktPnNrYl9sZW4sCisJCSAgX19lbnRyeS0+bXNnX2xlZnQsIF9fZW50cnktPnNpemVf
-Z29hbCkKKyk7CisKK1RSQUNFX0VWRU5UKHRjcF93cml0ZV94bWl0LAorCisJVFBfUFJPVE8o
-c3RydWN0IHNvY2sgKnNrLCB1bnNpZ25lZCBpbnQgbXNzX25vdywgaW50IG5vbmFnbGUsIHUz
-MiBtYXhfc2VncyksCisKKwlUUF9BUkdTKHNrLCBtc3Nfbm93LCBub25hZ2xlLG1heF9zZWdz
-KSwKKworCVRQX1NUUlVDVF9fZW50cnkoCisJCV9fZmllbGQoX191NjQsIHRjcF93c3RhbXBf
-bnMpCisJCV9fZmllbGQoX191NjQsIHRjcF9jbG9ja19jYWNoZSkKKwkJX19maWVsZCh1bnNp
-Z25lZCBpbnQsIG1zc19ub3cpCisJCV9fZmllbGQodW5zaWduZWQgaW50LCBtYXhfc2VncykK
-KwkJX19maWVsZChpbnQsIG5vbmFnbGUpCisJCV9fZmllbGQoaW50LCBza19wYWNpbmcpCisJ
-KSwKKworCVRQX2Zhc3RfYXNzaWduKAorCQlzdHJ1Y3QgdGNwX3NvY2sgKnRwID0gdGNwX3Nr
-KHNrKTsKKworCQlfX2VudHJ5LT5tc3Nfbm93ICA9IG1zc19ub3c7CisJCV9fZW50cnktPm5v
-bmFnbGUgID0gbm9uYWdsZTsKKwkJX19lbnRyeS0+bWF4X3NlZ3MgPSBtYXhfc2VnczsKKwkJ
-X19lbnRyeS0+c2tfcGFjaW5nID0gdGNwX25lZWRzX2ludGVybmFsX3BhY2luZyhzayk7CisJ
-CV9fZW50cnktPnRjcF93c3RhbXBfbnMgPSB0cC0+dGNwX3dzdGFtcF9uczsKKwkJX19lbnRy
-eS0+dGNwX2Nsb2NrX2NhY2hlID0gdHAtPnRjcF9jbG9ja19jYWNoZTsKKwkpLAorCisJVFBf
-cHJpbnRrKCJtc3MgJXUgc2VncyAldSBub25hZ2xlICVkIHNrX3BhY2luZyAlZCB0Y3Bfd3N0
-YW1wX25zICVsbGQgdGNwX2Nsb2NrX2NhY2hlICVsbGQiLAorCQkgIF9fZW50cnktPm1zc19u
-b3csIF9fZW50cnktPm1heF9zZWdzLAorCQkgIF9fZW50cnktPm5vbmFnbGUsIF9fZW50cnkt
-PnNrX3BhY2luZywKKwkJICBfX2VudHJ5LT50Y3Bfd3N0YW1wX25zLCBfX2VudHJ5LT50Y3Bf
-Y2xvY2tfY2FjaGUpCispOworCiBUUkFDRV9FVkVOVCh0Y3BfcmV0cmFuc21pdF9zeW5hY2ss
-CiAKIAlUUF9QUk9UTyhjb25zdCBzdHJ1Y3Qgc29jayAqc2ssIGNvbnN0IHN0cnVjdCByZXF1
-ZXN0X3NvY2sgKnJlcSksCmRpZmYgLS1naXQgYS9uZXQvaXB2NC90Y3AuYyBiL25ldC9pcHY0
-L3RjcC5jCmluZGV4IDZiYjhlYjgwMzEwNS4uMGZhMmM4ZTAzNWI3IDEwMDY0NAotLS0gYS9u
-ZXQvaXB2NC90Y3AuYworKysgYi9uZXQvaXB2NC90Y3AuYwpAQCAtMjc5LDYgKzI3OSw3IEBA
-CiAjaW5jbHVkZSA8bGludXgvdWFjY2Vzcy5oPgogI2luY2x1ZGUgPGFzbS9pb2N0bHMuaD4K
-ICNpbmNsdWRlIDxuZXQvYnVzeV9wb2xsLmg+CisjaW5jbHVkZSA8dHJhY2UvZXZlbnRzL3Rj
-cC5oPgogCiAvKiBUcmFjayBwZW5kaW5nIENNU0dzLiAqLwogZW51bSB7CkBAIC0xMzEyLDYg
-KzEzMTMsOCBAQCBpbnQgdGNwX3NlbmRtc2dfbG9ja2VkKHN0cnVjdCBzb2NrICpzaywgc3Ry
-dWN0IG1zZ2hkciAqbXNnLCBzaXplX3Qgc2l6ZSkKIAkJaWYgKHNrYikKIAkJCWNvcHkgPSBz
-aXplX2dvYWwgLSBza2ItPmxlbjsKIAorCQl0cmFjZV90Y3Bfc2VuZG1zZ19sb2NrZWQobXNn
-LCBza2IsIHNpemVfZ29hbCk7CisKIAkJaWYgKGNvcHkgPD0gMCB8fCAhdGNwX3NrYl9jYW5f
-Y29sbGFwc2VfdG8oc2tiKSkgewogCQkJYm9vbCBmaXJzdF9za2I7CiAKZGlmZiAtLWdpdCBh
-L25ldC9pcHY0L3RjcF9vdXRwdXQuYyBiL25ldC9pcHY0L3RjcF9vdXRwdXQuYwppbmRleCA3
-NDE5MDUxODcwOGEuLmM4NGYxOGNkOWI3ZSAxMDA2NDQKLS0tIGEvbmV0L2lwdjQvdGNwX291
-dHB1dC5jCisrKyBiL25ldC9pcHY0L3RjcF9vdXRwdXQuYwpAQCAtMjYyMyw2ICsyNjIzLDcg
-QEAgc3RhdGljIGJvb2wgdGNwX3dyaXRlX3htaXQoc3RydWN0IHNvY2sgKnNrLCB1bnNpZ25l
-ZCBpbnQgbXNzX25vdywgaW50IG5vbmFnbGUsCiAJfQogCiAJbWF4X3NlZ3MgPSB0Y3BfdHNv
-X3NlZ3Moc2ssIG1zc19ub3cpOworCXRyYWNlX3RjcF93cml0ZV94bWl0KHNrLCBtc3Nfbm93
-LCBub25hZ2xlLCBtYXhfc2Vncyk7CiAJd2hpbGUgKChza2IgPSB0Y3Bfc2VuZF9oZWFkKHNr
-KSkpIHsKIAkJdW5zaWduZWQgaW50IGxpbWl0OwogCi0tIAoyLjQzLjAKCg==
+Fix this by also removing the reference to the socket in
+__udp_gso_segment.
 
---------------VC1cxLU5U4YFqksw5cz0xkIc--
+Fixes: ad405857b174 ("udp: better wmem accounting on gso")
+Signed-off-by: Antoine Tenart <atenart@kernel.org>
+---
+ net/ipv4/udp_offload.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+index a5be6e4ed326..ecfca59f31f1 100644
+--- a/net/ipv4/udp_offload.c
++++ b/net/ipv4/udp_offload.c
+@@ -321,13 +321,17 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+ 
+ 	/* clear destructor to avoid skb_segment assigning it to tail */
+ 	copy_dtor = gso_skb->destructor == sock_wfree;
+-	if (copy_dtor)
++	if (copy_dtor) {
+ 		gso_skb->destructor = NULL;
++		gso_skb->sk = NULL;
++	}
+ 
+ 	segs = skb_segment(gso_skb, features);
+ 	if (IS_ERR_OR_NULL(segs)) {
+-		if (copy_dtor)
++		if (copy_dtor) {
+ 			gso_skb->destructor = sock_wfree;
++			gso_skb->sk = sk;
++		}
+ 		return segs;
+ 	}
+ 
+-- 
+2.48.1
+
 
