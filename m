@@ -1,139 +1,125 @@
-Return-Path: <netdev+bounces-169895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 869EAA46498
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 16:27:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B212A464B6
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 16:29:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A951F3B5B32
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 15:26:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E9AEE1880650
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 15:29:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 827E7229B32;
-	Wed, 26 Feb 2025 15:25:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4708122FDEC;
+	Wed, 26 Feb 2025 15:26:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="lunz+Z8C"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="R9LQM1rT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D243229B17
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 15:25:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D7B227B9A;
+	Wed, 26 Feb 2025 15:26:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740583548; cv=none; b=k8AAsclJq2VwWGK2ol1MNWRuE8oA4IWioH6ClJ9bd0TYQEQlrxEiu64GHC978BVCDtQhGlUaVNZ//heXHILSHGURR9XspHLbUce/bV9J8/3W7YpCwi4NZMs8RdwL/f+OwNHG+3O6LCVVEJ8Jy7TG3+bB1iaT7UTNDINjW/TkDQ4=
+	t=1740583616; cv=none; b=I/d4zklgoExMj8O0datio2wEEWXtWqpTsxqA56HPI2uNwrOqKfAiAlI7jZqsSyWCWg8f1VfeMT5KxwtSbq0Nb0Wlg4BbDm4pn6wHu8AAu+B6HOCgXfwr5jhG1cES6jqJTFJsnb6OCtcRJwsZMplJY0exYX9eISIHO3ofIINdYmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740583548; c=relaxed/simple;
-	bh=7Jty2k2VPmJIiAMCrg8borokEqk8ISqVGkWDU1cB4VU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kHzJsSdVpda77E8+JIuP7Mh3LqDCFqYVIjSO352q1D4qvzJDWvzJ8BuiRvQTm6MU6Lt31X101i15xyYp0kytIjhn/KL+W+ogXI+OYCx8x+SeQFME4wIkMVTV8wxAMpHGM2BjJgwr9xSmisRKzeLMtNxOJnt8GsTKWXrYiuLQNwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=lunz+Z8C; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5e058ca6806so12278998a12.3
-        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 07:25:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1740583544; x=1741188344; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2cCFCorbQ79EPV2pbT8nLnau3UHQm0d9DNeVh1UKL6E=;
-        b=lunz+Z8Cvfb+XVlyXGhbyeHtUA9drYVFEA9zMTLZSVo4L4/HgAnBJnqVwFGoEBE09z
-         9YKXgCrhX8C91JcJu468SQSjTM5QnF+9PGc2Exp06fqTe84ylfF5UnQA92WKaC57nL50
-         jOAv01Mgr7OmimDEfSp2/FGIc5cjR4maUiTy+6bauOtYcZhpy2IJ6WkdQPWAGXtGq5sK
-         iMo6nrhCPv61Halv/VRGAvVaQiRKc8UHDVbnDT0ssb+N5oP9Q5LmbkV22orNfxQtUk6u
-         V7ojfJMKYcUMJOpkRurDvhUm+J0Eeiy73wxNiiZcEVtzn78RLmXz1V837LpU5yuBzWDE
-         KM5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740583544; x=1741188344;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2cCFCorbQ79EPV2pbT8nLnau3UHQm0d9DNeVh1UKL6E=;
-        b=s/BNQy9cbELwrElHr+A6AyC9gT6Q/9ftigVcwz9cpsdPdBtqCIa/ijVVNIs2NE0SbA
-         n+O5lW0Q3EZcWmAgdidvA87hXNo6qhXpw3fm7ReUUgP0f58C4XYji+jxPjzB0ip8Lzbf
-         rebp4gDi/3NmRsV/d7Fos7hkFajY9pBfzPOwni/bkz7wE5AL6OgXIn3FkH0qTgAiWZV7
-         TorNSOx9r/bNg14FwxLbaILct/bvUoyHxh69kqiMDLF4e40ljmirM3iz3pLKd/uHLu6t
-         o9gLAhcS0g8uCoUXr9pdhcnpxtbQ2FM+v5Jn7CT/wmu7tlTExD1bbPyKaUDMakvD0q3g
-         dJcA==
-X-Forwarded-Encrypted: i=1; AJvYcCVDO4AblVW+A2KLDIHInLrJxLtplDttOaLDmSXdC/rUJkm3GSSkX44XoUvcFl3+AqFK1cD7wsc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEBZHgZiNS2+okfBgaqlh5wMQ2cAeKKEgHyrk6PmApGTU1bV5p
-	Hjx1e8I8oH70CMAsAEnK5u5WGRhAwNfc48cH3uYLGAhQPqRfQVIctY4IwpJlU+w=
-X-Gm-Gg: ASbGncvnkknrRB0B6JBs/wta5Kh4VhvTEAGlckmnQCfPoRNgNUm2tl1bPS4crigFdOt
-	Mne5LgAnpeH1F9C2Zi8+UA2rOM+nup+mPCsVEq4lyezipf6aJvyEiVwz3GiIQJJK3j9U3N3UX6a
-	vcfw71o+zbB71soX3mHpPIx73mcW7NVS/e0zMIUZpJgO+71V4X8U2YGP93HorTGBXC4isqa5HZM
-	i7B5LoLDIWcfgCWVR6h/ddU+Bc8vkyOsJP/CRp1u9LOiHaeH+vVOqcN09QGtqxCZPpJEqXfBjkI
-	slAnEWxGCq9rDkAgaU3rMnXxACrctpDL5oGEuktjpfmwbVo0/rhCBg==
-X-Google-Smtp-Source: AGHT+IEAB0uZUjm/Wdvyv3vHgJUK+04TyiWeXLkLcV/pvCw1WVdLP+IcTgUanL5Fn+YUOt+NzbtPZQ==
-X-Received: by 2002:a05:6402:348d:b0:5dc:7823:e7e4 with SMTP id 4fb4d7f45d1cf-5e0b70f8732mr22414421a12.12.1740583544488;
-        Wed, 26 Feb 2025 07:25:44 -0800 (PST)
-Received: from jiri-mlt.client.nvidia.com ([140.209.217.212])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e461f3e84bsm2970646a12.76.2025.02.26.07.25.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Feb 2025 07:25:44 -0800 (PST)
-Date: Wed, 26 Feb 2025 16:25:41 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, 
-	Tony Nguyen <anthony.l.nguyen@intel.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Cosmin Ratiu <cratiu@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, netdev@vger.kernel.org, 
-	Konrad Knitter <konrad.knitter@intel.com>, Jacob Keller <jacob.e.keller@intel.com>, davem@davemloft.net, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, 
-	linux-kernel@vger.kernel.org, ITP Upstream <nxne.cnse.osdt.itp.upstreaming@intel.com>, 
-	Carolina Jubran <cjubran@nvidia.com>
-Subject: Re: [RFC net-next v2 1/2] devlink: add whole device devlink instance
-Message-ID: <rar5z5jtct4qbucpcr6i73zecl5mz2otdqq6uc5ygaukxzi4jb@4rugso6dgobh>
-References: <20250219164410.35665-1-przemyslaw.kitszel@intel.com>
- <20250219164410.35665-2-przemyslaw.kitszel@intel.com>
- <ybrtz77i3hbxdwau4k55xn5brsnrtyomg6u65eyqm4fh7nsnob@arqyloer2l5z>
- <87855c66-0ab4-4b40-81fa-b37149c17dca@intel.com>
- <zzyls3te4he2l5spf4wzfb53imuoemopwl774dzq5t5s22sg7l@37fk7fvgvnrr>
- <e027f9e5-ff3a-4bc1-8297-9400a4ff62a6@intel.com>
- <iiemy2zwko4iehuw6cgbipszcxonanjpumxzv4nbdvgvdgi5fx@jz3hkez3lygw>
- <31477321-c064-4f3d-b4c9-e858d98d5694@intel.com>
+	s=arc-20240116; t=1740583616; c=relaxed/simple;
+	bh=Px0TsxbCfQ9bAXB7TeNIXcIiDKaORZDXwBKEcQweDUQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jAnuY6I0cjCt6fdVBrDHfFNCcFdqnLDz+ptit0UEABdxdOuhFlYhy5sJcvHHmk7ui0aWA1tPZ0JLS2dpvT0UPVEQJ55Vn9mBIsm+99P2R96aLH+tcmsmWE5yXVOrissgKVw/qbT/7q6cgzCKS+3TnLIbWB/EPGRb1W/mtzPEGZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=R9LQM1rT; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id B3D44442DF;
+	Wed, 26 Feb 2025 15:26:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1740583611;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NYxcMPGYKbGinA0gFQqz77Ivwma0qnrykC+7U+WLLDY=;
+	b=R9LQM1rTBbQzW/3h544Dab7/s3B629oLhkrD52C73nvXc+5k5Xht4xixV5VXZlH1rRTdKp
+	FtF3Gqa9/6k4ieSgvAJzFWhnyWuvJszk0L45OQYO5GJoG3jVzEIEpKBfHutHBGE/O7A+IG
+	M+3BISZ2dOB66QbBhrPmZ3ctvmTx1zOYp4eUOn+fVUks6JG3Gwe1r/WfC9/3wrCVZz8dCU
+	alNVGDSZ/Cf6lYdhe1owXO8Kh147ldzivqk/Mt/CKq3a5wFFhICoiqPM+OpIFxpzz24yQE
+	EOQCUPjvyGr8TM5S+tfFaU1QT+lraNlF8KqDUFdOe/a+c/DItAkjVQAdEeINDQ==
+Date: Wed, 26 Feb 2025 16:26:49 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Martin Schiller <ms@dev.tdt.de>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, andrew@lunn.ch,
+ hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: sfp: add quirk for FS SFP-10GM-T copper
+ SFP+ module
+Message-ID: <20250226162649.641bba5d@kmaincent-XPS-13-7390>
+In-Reply-To: <d03103b9cab4a1d2d779b3044f340c6d@dev.tdt.de>
+References: <20250226141002.1214000-1-ms@dev.tdt.de>
+	<Z78neFoGNPC0PYjt@shell.armlinux.org.uk>
+	<d03103b9cab4a1d2d779b3044f340c6d@dev.tdt.de>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <31477321-c064-4f3d-b4c9-e858d98d5694@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdekgeelgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefguddtfeevtddugeevgfevtdfgvdfhtdeuleetffefffffhffgteekvdefudeiieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepvdgrtddumegtsgduleemleehrggvmeelfhdttdemrggsvggtmedugehfjeemvgdviegrmedufegttdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeelhegrvgemlehftddtmegrsggvtgemudegfhejmegvvdeirgemudeftgdtpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedutddprhgtphhtthhopehmshesuggvvhdrthguthdruggvpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopegrnhgurhgvfiesl
+ hhunhhnrdgthhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Wed, Feb 26, 2025 at 04:06:19PM +0100, przemyslaw.kitszel@intel.com wrote:
->On 2/26/25 15:48, Jiri Pirko wrote:
->> Tue, Feb 25, 2025 at 04:40:49PM +0100, przemyslaw.kitszel@intel.com wrote:
->> > On 2/25/25 15:35, Jiri Pirko wrote:
->> > > Tue, Feb 25, 2025 at 12:30:49PM +0100, przemyslaw.kitszel@intel.com wrote:
->> 
->> [...]
->> 
->> > > > output, for all PFs and VFs on given device:
->> > > > 
->> > > > pci/0000:af:00:
->> > > >    name rss size 8 unit entry size_min 0 size_max 24 size_gran 1
->> > > >      resources:
->> > > >        name lut_512 size 0 unit entry size_min 0 size_max 16 size_gran 1
->> > > >        name lut_2048 size 8 unit entry size_min 0 size_max 8 size_gran 1
->> > > > 
->> > > > What is contributing to the hardness, this is not just one for all ice
->> > > > PFs, but one per device, which we distinguish via pci BDF.
->> > > 
->> > > How?
->> > 
->> > code is in ice_adapter_index()
->> 
->> If you pass 2 pfs of the same device to a VM with random BDF, you get 2
->> ice_adapters, correct?
->
->Right now, yes
+On Wed, 26 Feb 2025 15:50:46 +0100
+Martin Schiller <ms@dev.tdt.de> wrote:
 
-That is a bug.
+> On 2025-02-26 15:38, Russell King (Oracle) wrote:
+> > On Wed, Feb 26, 2025 at 03:10:02PM +0100, Martin Schiller wrote: =20
+> >> Add quirk for a copper SFP that identifies itself as "FS"=20
+> >> "SFP-10GM-T".
+> >> It uses RollBall protocol to talk to the PHY and needs 4 sec wait=20
+> >> before
+> >> probing the PHY.
+> >>=20
+> >> Signed-off-by: Martin Schiller <ms@dev.tdt.de>
+> >> ---
+> >>  drivers/net/phy/sfp.c | 5 +++--
+> >>  1 file changed, 3 insertions(+), 2 deletions(-)
+> >>=20
+> >> diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+> >> index 9369f5297769..15284be4c38c 100644
+> >> --- a/drivers/net/phy/sfp.c
+> >> +++ b/drivers/net/phy/sfp.c
+> >> @@ -479,9 +479,10 @@ static const struct sfp_quirk sfp_quirks[] =3D {
+> >>  	// PHY.
+> >>  	SFP_QUIRK_F("FS", "SFP-10G-T", sfp_fixup_fs_10gt),
+> >>=20
+> >> -	// Fiberstore SFP-2.5G-T uses Rollball protocol to talk to the
+> >> PHY and
+> >> -	// needs 4 sec wait before probing the PHY.
+> >> +	// Fiberstore SFP-2.5G-T and SFP-10GM-T uses Rollball protocol to=20
+> >> talk
+> >> +	// to the PHY and needs 4 sec wait before probing the PHY.
+> >>  	SFP_QUIRK_F("FS", "SFP-2.5G-T", sfp_fixup_fs_2_5gt),
+> >> +	SFP_QUIRK_F("FS", "SFP-10GM-T", sfp_fixup_fs_2_5gt), =20
+> >=20
+> > Which makes sfp_fixup_fs_2_5gt mis-named. Please rename. =20
+>=20
+> OK, I'll rename it to sfp_fixup_rollball_wait.
 
->
->> 
->> [...]
->
->What I want is to keep two ice_adapters for two actual devices (SDNs)
+I would prefer sfp_fixup_fs_rollball_wait to keep the name of the manufactu=
+rer.
+It can't be a generic fixup as other FSP could have other waiting time valu=
+es
+like the Turris RTSFP-10G which needs 25s.
+
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
