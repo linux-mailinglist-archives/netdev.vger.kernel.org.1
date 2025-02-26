@@ -1,114 +1,167 @@
-Return-Path: <netdev+bounces-169909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DBC5A46684
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 17:26:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED273A4663F
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 17:13:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BE8519C4419
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 16:06:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19A9F3B3404
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 16:11:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AED321885B;
-	Wed, 26 Feb 2025 16:06:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gAcyqrHx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F118021D585;
+	Wed, 26 Feb 2025 16:10:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 063444A32
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 16:06:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0760721CFEA;
+	Wed, 26 Feb 2025 16:10:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740585972; cv=none; b=Wyn3ILMzb5/ihO38LBhTlGpqGS8gYtwAbhG+pa+pcGELTpwNYqj8DfSi201tRn06qmBg3euvmO78EiHkPOgkWdZ/umOi5WLVan8K7E2xm4sa7qtCqfGN44eN6mOzPGCx3QYrY7tJ3k7TJmQYS9ckcxOKdNNvzBrGNreHER/kf/4=
+	t=1740586256; cv=none; b=b/xdPSy6zlKFls0Ef6k5wNLkad7KSi1uHxmywtOhpUO5VDBqYNpi0/pOSLDHMDwTTPyqMYVDadSTIAq+XI+hueRIU4b6C8NnKDl+jrPChIQSXudh9GE3ZGQLMJ/CM3HrI4iBu22fzVH1akMC8W7yhbxwJ62PvaGwMVwi+l8muVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740585972; c=relaxed/simple;
-	bh=cTuIOhtjPEQgLhjl1tnvNS4Pdf98+E0hUj6iMccOpBY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QRLBKzuvslaghm+mlryRtuobI2TiZr+ekQxEbOjZgugtNbea90nkBmDxyXITxvNVqbpqS3QDCZHYJCSNy/vzCQqDAQT3SGRZwic6GBxybm5X57FnuVgFjSJnbDPdQVtcdtRHkXtGz1FhNqsO5WcEcWSrPVfqPg1LEC5aSE5XPvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gAcyqrHx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6248CC4CED6;
-	Wed, 26 Feb 2025 16:06:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740585971;
-	bh=cTuIOhtjPEQgLhjl1tnvNS4Pdf98+E0hUj6iMccOpBY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=gAcyqrHx+aG8uEGmEbb/r9BCDWVHMll8V8D8MZ1MttCI/d6JMp6HyBampCTBrqqZG
-	 m+IBYmRSdMMMiGxdvnEwqnVj9Kb6MrVnEU48ElDNv+i0/uZoBoOlrK47Y03t2I0Oj3
-	 iDTq71IOm9nb88FoqtkS6IycgiYuArO4d030mQa3rb7ONN9c+qr65FQpRckeDbbhPc
-	 3rHe3Wo9aHsI9vGZYTSrFncH88SJt7AShpmUJLAfbUoJhb/2Bvc31hbCPy3NAZylAQ
-	 8Q4O6SnoNuRV7Zdbgz3IhG7fLbeIE0Q2M2NTk8trMaRfMOCvXuUznhXV3AeHq9grrK
-	 C1x/3D6SxV6yw==
-Message-ID: <a9473fc0-d721-466e-b70c-8e9010c5c541@kernel.org>
-Date: Wed, 26 Feb 2025 09:06:10 -0700
+	s=arc-20240116; t=1740586256; c=relaxed/simple;
+	bh=NiH8SRXw2DXbtCKmXtL7dumfhM6oSyvlJXoK8NUJwS4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NF58IoizKlN/kIiGhLqD+UXEOEHQeckIWlaVSQ04aB+mY8RT6nhVaE7gKyLu3g9Z0v11YqoVqYqgDC2XpdY7owE8KlhDFS3WC9EAXG6fOUWT06KLlJEpvFsb6Djc+iT7IK8i79rdxy2W8YvScOPUwe3W45uvjXotxhaYsMGlD4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5e0505275b7so11196301a12.3;
+        Wed, 26 Feb 2025 08:10:54 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740586253; x=1741191053;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hdFq/RSQGllNMaaMkzzrwTZL0ht5WX0qvlwijavAzn4=;
+        b=qclbH2EuBUYx8LYlp/Z9ZNEq3RnnGNkkYw1HrE2GNta0jjZv5QGWwhPW6TnXB3jAUB
+         zfJRqqnJ2M9lS1wB/PP4YXxEUgc/asLeECiWd1yVgHHEzTRgxpoT2LKTY1LL/j1W0pgS
+         ZfFniFZ0qWxRvitQyJ6ohohnd3dN8soaFot7r+sQT+/8QB/qRrpwGEPmtz1G95J1tLpF
+         7tOXz2uKQcLEfP2GPodOR0DoEAaEj2to1vlSxbAF+67IKITPBSOK16oTeRiow9/IaWXh
+         C432ckyqC+jKg0gvIWIylebX9u2gid/bJnwgzZ3nL8JbiHg/UvAhGK5+Oa+LC45BJ6G7
+         ARNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUal/bnPxI+PGa4QfDRjLSourwJUANdmTQn0Llnfv1WFPHUoL6qFnKdrbj6bAzfe0wfEKzf9E07@vger.kernel.org, AJvYcCVv2X2iltq2d1tgjD2hIiCnS7al8h8sRbMM2sMqnC2fcp1zEeJIz2IwuO6EsDTCnfoaBjC9FaXKo24Jnrt4O0LnxNCx@vger.kernel.org, AJvYcCW25vYtNQ4IVVcA+4bwwkd4vlmgNyqVVhocvJsQqR5ybl0o6deEhZmqahyRgVpvUTsKS2b5Knaagm+qnOA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWCa66pf5z0Rg0dvVK6GDjGE6zuevt8tytrDuqlQi2c2YfbADY
+	IzoVaceF/be4LX37vLIKk0rP0ALP9nFmSVQvhBSZP12Z956i6S9cQmmuzg==
+X-Gm-Gg: ASbGncvBDbstiszZX7oJGZLW9bmjwrTsVexyCmDKlT1Oqebqoko0u2poDfMQtawxWrv
+	7CYr7dmP87V9Kr0htsZi+mIF6dM0rt5xP4Fc3atxjOGZtDQlGG7zHwvmYPURjdQI3OokWbeR595
+	E1aR/c7ysIpyXZcn/NSSlLOSjyrz+ncrX45Nx6hL8UMlwT1Pss5I36WQp19j8j/i7ty3VlrIwkz
+	dGlX6yiB8EhWKkWtufzXIGQ8sYJsIpg0ZcLY4B6C7Q+DDe3LHcYlRkK+nsn8yHp8bgKCbou2x5b
+	X9dx00ySDC8AQzMs
+X-Google-Smtp-Source: AGHT+IHkM42/HOpoB5e04qARcXv0azFNm3lcPy13WbWpWbJWwaQKpfFqbOJx/CyYcNMJ21Tke9hjgQ==
+X-Received: by 2002:a05:6402:4305:b0:5d4:1ac2:277f with SMTP id 4fb4d7f45d1cf-5e4a0d71fb1mr5146443a12.9.1740586253056;
+        Wed, 26 Feb 2025 08:10:53 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:4::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e460ff8aa2sm2954375a12.56.2025.02.26.08.10.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Feb 2025 08:10:52 -0800 (PST)
+Date: Wed, 26 Feb 2025 08:10:50 -0800
+From: Breno Leitao <leitao@debian.org>
+To: David Ahern <dsahern@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	kernel-team@meta.com, yonghong.song@linux.dev
+Subject: Re: [PATCH net-next] trace: tcp: Add tracepoint for tcp_sendmsg()
+Message-ID: <20250226-cunning-innocent-degu-d6c2fe@leitao>
+References: <20250224-tcpsendmsg-v1-1-bac043c59cc8@debian.org>
+ <CANn89iLybqJ22LVy00KUOVscRr8GQ88AcJ3Oy9MjBUgN=or0jA@mail.gmail.com>
+ <559f3da9-4b3d-41c2-bf44-18329f76e937@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2 v3] tc: Fix rounding in tc_calc_xmittime and
- tc_calc_xmitsize.
-Content-Language: en-US
-To: Jonathan Lennox <jonathan.lennox@8x8.com>
-Cc: netdev@vger.kernel.org, Stephen Hemminger <stephen@networkplumber.org>
-References: <5b9f16c1-450c-4a39-be2c-634b4f1864b5@kernel.org>
- <952BE2E8-CE07-4D82-A47D-D181C229720A@8x8.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <952BE2E8-CE07-4D82-A47D-D181C229720A@8x8.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <559f3da9-4b3d-41c2-bf44-18329f76e937@kernel.org>
 
-On 2/24/25 11:42 AM, Jonathan Lennox wrote:
-> diff --git a/tc/tc_core.c b/tc/tc_core.c
-> index 37547e9b..32fd094f 100644
-> --- a/tc/tc_core.c
-> +++ b/tc/tc_core.c
-> @@ -23,12 +23,12 @@
-> static double tick_in_usec = 1;
-> static double clock_factor = 1;
+Hello David,
+
+On Mon, Feb 24, 2025 at 12:16:04PM -0700, David Ahern wrote:
+> On 2/24/25 12:03 PM, Eric Dumazet wrote:
+> > On Mon, Feb 24, 2025 at 7:24 PM Breno Leitao <leitao@debian.org> wrote:
+> >>
+> >> Add a lightweight tracepoint to monitor TCP sendmsg operations, enabling
+> >> the tracing of TCP messages being sent.
+> >>
+> >> Meta has been using BPF programs to monitor this function for years,
+> >> indicating significant interest in observing this important
+> >> functionality. Adding a proper tracepoint provides a stable API for all
+> >> users who need visibility into TCP message transmission.
+> >>
+> >> The implementation uses DECLARE_TRACE instead of TRACE_EVENT to avoid
+> >> creating unnecessary trace event infrastructure and tracefs exports,
+> >> keeping the implementation minimal while stabilizing the API.
+> >>
+> >> Given that this patch creates a rawtracepoint, you could hook into it
+> >> using regular tooling, like bpftrace, using regular rawtracepoint
+> >> infrastructure, such as:
+> >>
+> >>         rawtracepoint:tcp_sendmsg_tp {
+> >>                 ....
+> >>         }
+> > 
+> > I would expect tcp_sendmsg() being stable enough ?
+> > 
+> > kprobe:tcp_sendmsg {
+> > }
 > 
-> -static unsigned int tc_core_time2tick(unsigned int time)
-> +static double tc_core_time2tick(double time)
-> {
-> 	return time * tick_in_usec;
+> Also, if a tracepoint is added, inside of tcp_sendmsg_locked would cover
+> more use cases (see kernel references to it).
+
+Agree, this seems to provide more useful information
+
+> We have a patch for a couple years now with a tracepoint inside the
+
+Sorry, where do you have this patch? is it downstream?
+
+> while (msg_data_left(msg)) {
 > }
 > 
-> -unsigned int tc_core_tick2time(unsigned int tick)
-> +double tc_core_tick2time(double tick)
-> {
-> 	return tick / tick_in_usec;
-> }
-> @@ -45,7 +45,7 @@ unsigned int tc_core_ktime2time(unsigned int ktime)
-> 
-> unsigned int tc_calc_xmittime(__u64 rate, unsigned int size)
-> {
-> -	return tc_core_time2tick(TIME_UNITS_PER_SEC*((double)size/(double)rate));
-> +	return ceil(tc_core_time2tick(TIME_UNITS_PER_SEC*((double)size/(double)rate)));
-> }
-> 
-> unsigned int tc_calc_xmitsize(__u64 rate, unsigned int ticks)
-> diff --git a/tc/tc_core.h b/tc/tc_core.h
-> index 7a986ac2..c0fb7481 100644
-> --- a/tc/tc_core.h
-> +++ b/tc/tc_core.h
-> @@ -12,7 +12,7 @@ enum link_layer {
-> };
-> 
-> 
-> -unsigned tc_core_tick2time(unsigned tick);
-> +double tc_core_tick2time(double tick);
-> unsigned tc_core_time2ktime(unsigned time);
-> unsigned tc_core_ktime2time(unsigned ktime);
-> unsigned tc_calc_xmittime(__u64 rate, unsigned size);
+> loop which is more useful than just entry to sendmsg.
 
+Do you mean something like the following?
 
-git am (and patch for that matter) is not liking your patch. Please make
-sure the patch is against iproute2-next and top of tree.
-
-You should also try sending the patch to yourself, saving to a file and
-applying using `git am`.
+diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
+index 1a40c41ff8c30..23318e252d6b9 100644
+--- a/include/trace/events/tcp.h
++++ b/include/trace/events/tcp.h
+@@ -259,6 +259,11 @@ TRACE_EVENT(tcp_retransmit_synack,
+ 		  __entry->saddr_v6, __entry->daddr_v6)
+ );
+ 
++DECLARE_TRACE(tcp_sendmsg_tp,
++	TP_PROTO(const struct sock *sk, const struct msghdr *msg, size_t size, ssize_t copied),
++	TP_ARGS(sk, msg, size, copied)
++);
++
+ DECLARE_TRACE(tcp_cwnd_reduction_tp,
+ 	TP_PROTO(const struct sock *sk, int newly_acked_sacked,
+ 		 int newly_lost, int flag),
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 08d73f17e8162..5fcef82275d4a 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -1290,6 +1290,8 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
+ 			sk_mem_charge(sk, copy);
+ 		}
+ 
++		trace_tcp_sendmsg_tp(sk, msg, size, copy);
++
+ 		if (!copied)
+ 			TCP_SKB_CB(skb)->tcp_flags &= ~TCPHDR_PSH;
+ 
 
