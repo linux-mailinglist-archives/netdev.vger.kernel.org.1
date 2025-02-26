@@ -1,164 +1,144 @@
-Return-Path: <netdev+bounces-169723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE7C7A455FE
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 07:50:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51B75A45622
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 07:59:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 080753A9692
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 06:49:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0278188E6C9
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 06:59:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3906625E46F;
-	Wed, 26 Feb 2025 06:50:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="Y9LPHaJJ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="c2bp7lRM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B139D2686AA;
+	Wed, 26 Feb 2025 06:59:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1451C84BD;
-	Wed, 26 Feb 2025 06:49:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D1D26A0F3
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 06:59:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740552600; cv=none; b=rHHXsJZ62fh3vOLEdPyfhaOwPYT1rEGQcJsJINcjkpR161YErBrCVVr1LwZdMYNuKV4+isyAHcUq/47YMuuqDmF7JdxOykeVutooi55uEkIZupQxFbSfd7mp1j5pZ/amOFxMX3H8MVFjLj6lKk4qFO5RCC3hJpdXRhbksZvyLsw=
+	t=1740553180; cv=none; b=KvNOw1KLBb6zrVyYKsBRgLFHsp5yP0UOew+rpdLzVnZyK03p4jbi2eML4poctd58Nzuq1fMTjngzvcsGlssCLCPE6itnDG/L8TFILwu2AxBQJEuaPpiFtfEzw+TptegcBMl+/76cwKyZhjLs8gH0yoUfbxbf5TDUBDGHCsXey/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740552600; c=relaxed/simple;
-	bh=XnItWZpT3oZZxPjd9HEvharwKL5dOWJMkAj2c8lY4Rw=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=svcqLLQ21orAQ5NX5G5FnosdKhES6P4KblRj2Y0tlpZqh681hVXrPazb16tBdlFuSD3E7VeEurF0eYQxuQsDQS7NnEysqgE5SIepfuZ+JchdEzsaK6Hu9LHYvTM5DTNZZ4D895NlVwMEaEtTBRr1g8tCvM+Qv0rzH0Pmn6T0Y7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=Y9LPHaJJ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=c2bp7lRM; arc=none smtp.client-ip=202.12.124.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id CD4FC25401F4;
-	Wed, 26 Feb 2025 01:49:55 -0500 (EST)
-Received: from phl-imap-11 ([10.202.2.101])
-  by phl-compute-11.internal (MEProxy); Wed, 26 Feb 2025 01:49:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1740552595;
-	 x=1740638995; bh=CND1Q8F/E/Zja91qSOuemRzNE+ygiM8qRxcIP8zqLs0=; b=
-	Y9LPHaJJQdansMPzLOkYEjlxNr4pRweYbEo8VUJ14Jaw7KGX6ZPZJpK5rPS2rfoq
-	ELSqUqKMc+ou7Bx4slNVjGARbvQo9rGjyiBpKMvQ8OrQt694BmpId+HKIBQ059b2
-	RCmzH3cJxbtBsX5MH8TCMiKRe6CFgkR3sGV16VtmyMFBCeN4DKfUtAEh0qF8LsXt
-	tM6eDYHrK+r1BBFNZvQAXymnDWOKtwrAwDtGyTzYAdKygqhoEWup+QP5iH72bXWR
-	O8qSFDCBRCpYgv/8NRXtjrCWumpLLDpC2unbnYrG9D8PV4aAQoVI36EPsO1rVXWZ
-	Et5vnm38wfKvKi7j6lwtzQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1740552595; x=
-	1740638995; bh=CND1Q8F/E/Zja91qSOuemRzNE+ygiM8qRxcIP8zqLs0=; b=c
-	2bp7lRM3NfsAVzd2PrutbWN/WOdnRM9BcUXSlyVK/mGKtNn8aXZ8tDEqzGPRd8MU
-	PAdt/0e3HHpCrBlh0ASE93XBhKlkpRkR3Oti6NbKPi4q6LpDIHb3U5Z5v8AT9BYO
-	OJtMP0m0LFSHwbw4Yi1A4+4hI6Ll9AeiXOo7awKU8IAJvGLprhSnxJUrW5sKHlsM
-	lMHdJsQdxrLB0RZ1T68E4AU3ZeUfBRDMpAKRaCAMV4xV5qpKvHbmm+fZPzg+dpFP
-	ZjtuAhVrdBon8Xr6isqqS1aUnI3ifKr9z69dMzw3xWALo97Jo7loJweUs7FbYvIc
-	rDgFo0atfvOnmmJUdj0Yw==
-X-ME-Sender: <xms:k7m-Z1XuMqeCAXyOMoV53IFSIR3O8v0mFNxDRLlhcNeQEQVai8jbaA>
-    <xme:k7m-Z1n0IacjfEuUpfGVZNTo-EohhMo-E8yH_1J0Nh9hHqd-vj48dwl0t9KZ4UWoi
-    -0PqP_WSQ5uGeOwntA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdekfeeklecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpefoggffhffvvefkjghfufgtgfesthejredtredt
-    tdenucfhrhhomhepfdetrhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusg
-    druggvqeenucggtffrrghtthgvrhhnpefhtdfhvddtfeehudekteeggffghfejgeegteef
-    gffgvedugeduveelvdekhfdvieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
-    epmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggvpdhnsggprhgtphhtthhopedu
-    gedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepuhdrkhhlvghinhgvqdhkohgvnh
-    highessggrhihlihgsrhgvrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhl
-    ohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpd
-    hrtghpthhtohepshgrlhhilhdrmhgvhhhtrgeshhhurgifvghirdgtohhmpdhrtghpthht
-    ohepshhhrghojhhijhhivgeshhhurgifvghirdgtohhmpdhrtghpthhtohepshhhvghnjh
-    hirghnudehsehhuhgrfigvihdrtghomhdprhgtphhtthhopegrrhhnugeskhgvrhhnvghl
-    rdhorhhgpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    epkhhusggrsehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:k7m-ZxZYaRIKDhkg0F8rPM2LOMRwnVAjmQsWBf8IqurddXLQnqM4hw>
-    <xmx:k7m-Z4WxKQkqVMnzoIoFrACJ1VSFKmTiWufuUbupsyjr-4ob8phJpg>
-    <xmx:k7m-Z_nXHZVYWoYNvRGZ8EalC3iqTItlNAb9S7wsNRHwx9wvFqBOcw>
-    <xmx:k7m-Z1dHMdax-zq8gK24rACd_ZpzBrhP0i34guJQpGxLv9b_jODMMw>
-    <xmx:k7m-Z5lDgYihus_fDhfVfmt_Vye5Eb-_LEmS3fFbycjz2wrKBIjIrY2f>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 0FED62220072; Wed, 26 Feb 2025 01:49:55 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1740553180; c=relaxed/simple;
+	bh=q3TROAVWAgk8f7+TCOM9K38XnJcQ5RmL26L3R4aAYCQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FczAm4LwjvTQ+dm8nB5FgAHLJeGrCldhjTrCWDNwnWXPrz2QTaiSSlcwn/GuH84D74LK0FFq5Tm6Ed+Oh4GR9IvPpW6jRGhJ9BOHuYz6Lc09aqnuyD3LESqK4Eve84q3pTOethAvAkmND2CGSSILM3MTnxQwOhsmpvcA7Esd1LU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tnBO3-0003ie-L6; Wed, 26 Feb 2025 07:59:19 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tnBO2-002uE4-0w;
+	Wed, 26 Feb 2025 07:59:18 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tnBO2-001TMd-0J;
+	Wed, 26 Feb 2025 07:59:18 +0100
+Date: Wed, 26 Feb 2025 07:59:18 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Alexandre TORGUE <alexandre.torgue@foss.st.com>
+Cc: "Rob Herring (Arm)" <robh@kernel.org>, linux-kernel@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, devicetree@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: Re: [PATCH v3 0/4] Add support for Priva E-Measuringbox board
+Message-ID: <Z767xqh9T8mdoiAP@pengutronix.de>
+References: <20250203085820.609176-1-o.rempel@pengutronix.de>
+ <173859694746.2601652.11244969424431209545.robh@kernel.org>
+ <Z6Msn8AxgG_JTVNs@pengutronix.de>
+ <6db6e1d4-a0b1-4ce3-9235-d92bb19da1d6@foss.st.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 26 Feb 2025 07:49:33 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Jijie Shao" <shaojijie@huawei.com>, "Arnd Bergmann" <arnd@kernel.org>,
- "Jian Shen" <shenjian15@huawei.com>, "Salil Mehta" <salil.mehta@huawei.com>,
- "Andrew Lunn" <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>
-Cc: "Simon Horman" <horms@kernel.org>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
- "Krzysztof Kozlowski" <krzysztof.kozlowski@linaro.org>,
- Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
-Message-Id: <c0a3d083-d6ae-491e-804d-28e4c37949d7@app.fastmail.com>
-In-Reply-To: <da799a9f-f0c7-4ee0-994b-4f5a6992e93b@huawei.com>
-References: <20250225163341.4168238-1-arnd@kernel.org>
- <da799a9f-f0c7-4ee0-994b-4f5a6992e93b@huawei.com>
-Subject: Re: [PATCH 1/2] net: hisilicon: hns_mdio: remove incorrect ACPI_PTR annotation
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6db6e1d4-a0b1-4ce3-9235-d92bb19da1d6@foss.st.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Wed, Feb 26, 2025, at 04:21, Jijie Shao wrote:
-> on 2025/2/26 0:33, Arnd Bergmann wrote:
->> From: Arnd Bergmann <arnd@arndb.de>
->>
->> Building with W=1 shows a warning about hns_mdio_acpi_match being unused when
->> CONFIG_ACPI is disabled:
->>
->> drivers/net/ethernet/hisilicon/hns_mdio.c:631:36: error: unused variable 'hns_mdio_acpi_match' [-Werror,-Wunused-const-variable]
->>
->> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
->> ---
->>   drivers/net/ethernet/hisilicon/hns_mdio.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/net/ethernet/hisilicon/hns_mdio.c b/drivers/net/ethernet/hisilicon/hns_mdio.c
->> index a1aa6c1f966e..6812be8dc64f 100644
->> --- a/drivers/net/ethernet/hisilicon/hns_mdio.c
->> +++ b/drivers/net/ethernet/hisilicon/hns_mdio.c
->> @@ -640,7 +640,7 @@ static struct platform_driver hns_mdio_driver = {
->>   	.driver = {
->>   		   .name = MDIO_DRV_NAME,
->>   		   .of_match_table = hns_mdio_match,
->> -		   .acpi_match_table = ACPI_PTR(hns_mdio_acpi_match),
->> +		   .acpi_match_table = hns_mdio_acpi_match,
->>   		   },
->>   };
->
->
-> But I think it can be changed to:
->
-> + #ifdef CONFIG_ACPI
-> static const struct acpi_device_id hns_mdio_acpi_match[] = {
-> 	{ "HISI0141", 0 },
-> 	{ },
-> };
-> MODULE_DEVICE_TABLE(acpi, hns_mdio_acpi_match);
-> + #endif
->
+Hi Alexandre,
 
-That would of course avoid the build warning, but otherwise
-would be worse: the only reason ACPI_PTR()/of_match_ptr() exist
-is to work around drivers that have to put their device ID
-table inside of an #ifdef for some other reason. Adding the
-#ifdef to work around an incorrect ACPI_PTR() makes no sense.
+Just wanted to check if there’s anything needed from my side for this
+patch. Let me know if further input is required.
 
-     Arnd
+Best Regards,
+Oleksij
+
+On Wed, Feb 05, 2025 at 05:02:19PM +0100, Alexandre TORGUE wrote:
+> Hi Oleksij
+> 
+> On 2/5/25 10:17, Oleksij Rempel wrote:
+> > Hi Alexandre,
+> > 
+> > On Mon, Feb 03, 2025 at 09:37:06AM -0600, Rob Herring (Arm) wrote:
+> > > 
+> > > On Mon, 03 Feb 2025 09:58:16 +0100, Oleksij Rempel wrote:
+> > > > This patch series introduces support for the Priva E-Measuringbox board
+> > > > based on the ST STM32MP133 SoC. The set includes all the necessary
+> > > > changes for device tree bindings, vendor prefixes, thermal support, and
+> > > > board-specific devicetree to pass devicetree validation and checkpatch
+> > > > tests.
+> > > > 
+> > 
+> > ...
+> > 
+> > > arch/arm/boot/dts/st/stm32mp133c-prihmb.dtb: adc@48004000: adc@0:interrupts: 0 was expected
+> > > 	from schema $id: http://devicetree.org/schemas/iio/adc/st,stm32-adc.yaml#
+> > > arch/arm/boot/dts/st/stm32mp133c-prihmb.dtb: adc@48003000: adc@0:interrupts: 0 was expected
+> > > 	from schema $id: http://devicetree.org/schemas/iio/adc/st,stm32-adc.yaml#
+> > 
+> > 
+> > Can I please get your attention here. The reported issue is not related
+> > to this patch set. adc@0:interrupts are set in the dtsi file.
+> 
+> Yes I saw this issue too when I tried to merge your series. I'm discussing
+> with STM32 ADC driver owner to fix the issue (either in stm32 adc yaml or
+> maybe in schema).
+> 
+> Anyway we also have the issue for STM32MP135F-DK board so I'll merge your
+> series as it doesn't introduce the issue.
+> 
+> regards
+> Alex
+> 
+> 
+> 
+> 
+> > Kind regards,
+> > Oleksij
+> 
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
