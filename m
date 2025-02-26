@@ -1,94 +1,132 @@
-Return-Path: <netdev+bounces-170018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF9B7A46D5E
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 22:25:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81818A46EA1
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 23:33:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB8A73A2404
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 21:25:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 625E316BACB
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 22:33:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 916E321ABB4;
-	Wed, 26 Feb 2025 21:25:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="tzIefyib"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A6041E1DEC;
+	Wed, 26 Feb 2025 22:33:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from vuizook.err.no (vuizook.err.no [178.255.151.162])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABF0C21884A
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 21:25:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CDD225D8EA
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 22:33:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.255.151.162
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740605123; cv=none; b=f71YpiXDEZzD+/3annvmHYpVN12jZog7aGkU4FvAfwAkVF4epzM9rQxrWyX0vFxfsjJLHIXectWehK2M7tAdstmlfRzfXOwIn8aAJJkomKf6rFlxdSBt/4S2OPB+ixteL533INZcgXnX25vBE7lmd17A+46JgbMyvk9VNubaBow=
+	t=1740609206; cv=none; b=QaFw+64KFqZOgEMiTiJVeW0eoy7PZExsgCxFcuDVZB8PnL2EJxEeaysx7MMv1LxbvO6R90Gi/cr4U1RI8ANNws/v+siwjGQyqNgaYEx9pjRLFMjhWy9HM9EXnwZjqzg0AlR7CJtchPNjvG1HZh7mgXUQhvIaeH618JLSUl+Gtr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740605123; c=relaxed/simple;
-	bh=ZqozZ7yikwsLwwqPCXrxoI3e5hGiagZta4POPpletsc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=msOwL0L6sQPOuKS1mCvlIXTBYZvjkdafz267eQV+ipazCpGB1c41Bi5DG2VnY0IT8GuDZRsDrNeylIJgs13XuNFhr8TzfdiukapDRwfWbMYq6RQCz/HJULM2zSqUnof/tdAxYRjLrAEHqsmag/XfP6GmvuBxU+pDvIvbw1O9Yxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=tzIefyib; arc=none smtp.client-ip=52.95.49.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1740605121; x=1772141121;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=4bGEGcn2FYkJDt/EFXSFkNrjLbc4UXXia+HqmAk544g=;
-  b=tzIefyibNokZctdmp9WF9xChzVMaUw+bTDnHhtdZlvAqZ358y20688y3
-   AJ0F8Thn9XRxMNDhD8bMkkb0W1stmj1Y3BKWupgxETDezAoX7PwhgxkZS
-   eUFiPRNNar8sbKGqQoOjbbJGJZhW5fkTRmIXneESew22ybZ/D8KFEV8LI
-   4=;
-X-IronPort-AV: E=Sophos;i="6.13,318,1732579200"; 
-   d="scan'208";a="475606647"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 21:25:17 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:48581]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.6.186:2525] with esmtp (Farcaster)
- id 07044637-c0f4-4ed3-bf55-d3ac73571f32; Wed, 26 Feb 2025 21:25:16 +0000 (UTC)
-X-Farcaster-Flow-ID: 07044637-c0f4-4ed3-bf55-d3ac73571f32
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 26 Feb 2025 21:25:16 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.187.170.36) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 26 Feb 2025 21:25:13 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <nicolas.dichtel@6wind.com>
-CC: <aleksander.lobakin@intel.com>, <andrew@lunn.ch>, <davem@davemloft.net>,
-	<edumazet@google.com>, <idosch@idosch.org>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v5 1/3] net: rename netns_local to netns_immutable
-Date: Wed, 26 Feb 2025 13:25:04 -0800
-Message-ID: <20250226212504.37165-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250226093232.644814-2-nicolas.dichtel@6wind.com>
-References: <20250226093232.644814-2-nicolas.dichtel@6wind.com>
+	s=arc-20240116; t=1740609206; c=relaxed/simple;
+	bh=INQPxkyTWE0Nu+i4dRTJknUgW7BYJfSPmWxAgpWNkfI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=mTan9nmGpI+4T0aDp+zslSYLPPANdgeX9Ad7/DIyHCHh1/HwopXIu/xziXr2f0GeVI0ucG1H1a+G0WS57xk6X9gDodROEJU63TTbnm27UF2R8FdcSc+jVhkzjnyLsUaYm/Nb/7B5XdlIIed5mYZaCL5xxRFpoPFcvtjmEJVjIH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hungry.com; spf=none smtp.mailfrom=hungry.com; arc=none smtp.client-ip=178.255.151.162
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hungry.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=hungry.com
+Received: from [2a02:fe1:180:7c00:3cca:aff:fe28:58e0] (helo=hjemme.reinholdtsen.name)
+	by vuizook.err.no with smtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <pere@hungry.com>)
+	id 1tnPSW-00CQsF-1e;
+	Wed, 26 Feb 2025 22:00:56 +0000
+Received: (nullmailer pid 79194 invoked by uid 10001);
+	Wed, 26 Feb 2025 22:00:45 -0000
+From: Petter Reinholdtsen <pere@hungry.com>
+To: netdev@vger.kernel.org
+Cc: Salvatore Bonaccorso <carnil@debian.org>, Ben Hutchings <benh@debian.org>
+Subject: [PATCH ethtool] Add AppStream metainfo XML with modalias documented
+ supported
+In-Reply-To: <Z7hoqCjls4wD88_S@eldamar.lan>
+References: <sa6ikx0igr9.fsf@hjemme.reinholdtsen.name>
+ <Z5R2sK8ehCUGxm35@hjemme.reinholdtsen.name>
+ <sa6ikx0igr9.fsf@hjemme.reinholdtsen.name>
+ <Z7hizPKGcnF3fBcW@hjemme.reinholdtsen.name> <Z7hoqCjls4wD88_S@eldamar.lan>
+Date: Wed, 26 Feb 2025 23:00:45 +0100
+Message-ID: <sa67c5cl62a.fsf@hjemme.reinholdtsen.name>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWB001.ant.amazon.com (10.13.138.82) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Date: Wed, 26 Feb 2025 10:31:56 +0100
-> The name 'netns_local' is confusing. A following commit will export it via
-> netlink, so let's use a more explicit name.
-> 
-> Reported-by: Eric Dumazet <edumazet@google.com>
-> Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
-Confirmed allmodconfig passed.
+I am not used to submitting patches like this, and hope I do not make
+too many mistakes.  Please forgive me if I did.  This patch was
+initially submitted to Debian as <URL: https://bugs.debian.org/1076629 >.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Here is the 'git format-patch' for it.
+
+From 81e64589dd2ebdc194c8198165aa093361682e89 Mon Sep 17 00:00:00 2001
+From: Petter Reinholdtsen <pere@debian.org>
+Date: Wed, 26 Feb 2025 22:36:03 +0100
+Subject: [PATCH] Add AppStream metainfo XML with modalias documented supported
+ hardware.
+
+This ensure all Linux distributions supporting AppStream share
+AppStream information for ethtool.
+
+Hardware mappings allow AppStream clients like isenkram to propose
+this package when supported hardware (ethernet card) is present.
+
+Appstream is documented on
+<URL: https://www.freedesktop.org/wiki/Distributions/AppStream/ >.
+---
+ Makefile.am                                      |  6 +++++-
+ org.kernel.software.network.ethtool.metainfo.xml | 16 ++++++++++++++++
+ 2 files changed, 21 insertions(+), 1 deletion(-)
+ create mode 100644 org.kernel.software.network.ethtool.metainfo.xml
+
+diff --git a/Makefile.am b/Makefile.am
+index 862886b..8d50ef6 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -3,7 +3,11 @@ AM_CPPFLAGS = -I$(top_srcdir)/uapi
+ LDADD = -lm
+ 
+ man_MANS = ethtool.8
+-EXTRA_DIST = LICENSE ethtool.8 ethtool.spec.in aclocal.m4 ChangeLog autogen.sh
++EXTRA_DIST = LICENSE ethtool.8 ethtool.spec.in aclocal.m4 ChangeLog autogen.sh \
++             org.kernel.software.network.ethtool.metainfo.xml
++
++dist_metainfo_DATA = org.kernel.software.network.ethtool.metainfo.xml
++metainfodir = $(datarootdir)/metainfo
+ 
+ sbin_PROGRAMS = ethtool
+ ethtool_SOURCES = ethtool.c uapi/linux/const.h uapi/linux/ethtool.h internal.h \
+diff --git a/org.kernel.software.network.ethtool.metainfo.xml b/org.kernel.software.network.ethtool.metainfo.xml
+new file mode 100644
+index 0000000..efe84c1
+--- /dev/null
++++ b/org.kernel.software.network.ethtool.metainfo.xml
+@@ -0,0 +1,16 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<component type="desktop">
++  <id>org.kernel.software.network.ethtool</id>
++  <metadata_license>MIT</metadata_license>
++  <name>ethtool</name>
++  <summary>display or change Ethernet device settings</summary>
++  <description>
++    <p>ethtool can be used to query and change settings such as speed,
++    auto- negotiation and checksum offload on many network devices,
++    especially Ethernet devices.</p>
++  </description>
++  <url type="homepage">https://www.kernel.org/pub/software/network/ethtool/</url>
++  <provides>
++    <modalias>pci:v*d*sv*sd*bc02sc80i*</modalias>
++  </provides>
++</component>
+-- 
+2.39.5
+
+-- 
+Happy hacking
+Petter Reinholdtsen
 
