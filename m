@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-169689-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFD4FA453E5
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 04:20:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADD57A453E9
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 04:21:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6614B1894801
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 03:20:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6871217C435
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 03:20:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2684D254878;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95383255E3C;
 	Wed, 26 Feb 2025 03:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="evGivSet"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cWHqqlYb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB047254866;
-	Wed, 26 Feb 2025 03:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 721F4254B0A
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 03:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740540007; cv=none; b=XB75i4JlJpvkSh8iu56vZ3cuP9U9WBCkXQd5HIktMdbG1NQwfRrEm3tC/hB8MRFj0pUAm5Bwa1OOBaqD5L9Vej4hff845nyawYA+v3bpQwNwyGozFXFb7Ez6BqS97wrVc5YlatvG6w+0xQuOkHmq/1YWj2PHHuxnFqVvV+gtM8w=
+	t=1740540007; cv=none; b=TgCTvvTZJvA+rTK96X1Zq5/AB7sKk6uaHXZbomsO+3YMmRFZVFY2O1ws4IjHsI4xyjq/vvoVhBgjOgkcex8GH7umutUpYYpqmfm39OeuDSa+2VbB+1uHP0I4F1IFBkB66tD9DOCLXKGHJM/ADkayF8hndDR0L7ZHvV86G03W9GA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1740540007; c=relaxed/simple;
-	bh=b5k6tZ8dJznrloCjwHORdnGfkAbX6eoHM8nK7ig9ZW0=;
+	bh=VbCFmxeJx7Ac4nxfBAqnkMyuN/iqSKbYO5JI34xsRT8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZZQ/khMaYfYfUrtBv3TSbjdqrqKTT1yRfnjmhJJBD0CyZlXvkJWmp6/iEKDtrkeX95NYLPMwsw+MgsiTSv/ZQefwVNzHY3s7cQJ9Cp4useBF50Fr9px17TV2OaZv6ddsVMvwqeqwiaYkgacMcTArJwRrBODtuNKcsdzk25Fh3a8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=evGivSet; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74CBBC4CEE4;
-	Wed, 26 Feb 2025 03:20:05 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=JzNBdZi5nLcOF3h6t7NIJc2QaxP88VcYyIbNSu3CpmapDCw2aDKjF5zbx8vm8hQjTnyP77b1ig9HpW64+5lcVW1nnbmrdhr3r47z+5NEkvcsKsfBucVfXI69syTRFpaq/sI4EEHBH64lA52ETKGzllLyrRIs1jxQuh7OYI99vGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cWHqqlYb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1B01C4CED6;
+	Wed, 26 Feb 2025 03:20:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740540005;
-	bh=b5k6tZ8dJznrloCjwHORdnGfkAbX6eoHM8nK7ig9ZW0=;
+	s=k20201202; t=1740540007;
+	bh=VbCFmxeJx7Ac4nxfBAqnkMyuN/iqSKbYO5JI34xsRT8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=evGivSethRPF2BMsaDGeBD1K93cwOyjHPTjg3dQQsi4Q+Zqg20Du8/oWBOC+r2MjF
-	 il8Q1MuQNUGDCJ5uihZLZ4EfAUR+fWz+p55xbOw/+EGeeT1EHkX199ntARZE4iiSMA
-	 UVthK0+g0M8eZdT7/aKiwXYmW5Dc/rQvM9nibBg9+egdFiB4KBf0NSnKeTPVLTJ1pR
-	 USyJPe6IE4xEXZUsm+UA+cgSH8PF4QKtds5BFP2PT4HFhihZIjp4Tx9lRRH6lujHdC
-	 zr7iWgNy7S0nHmidXeFK3cnfvAjlRhRa5S5+8vL6VVGCM3FOuN+5eMj5UxbyjVcA/X
-	 xkB+SUdXxyVfg==
+	b=cWHqqlYbJ5jaSxrUsV+Jb4nKM3/9bGhPQvKvIdTPV17Sp01G0cAD3YMxOzSe8Ofd1
+	 k45saoNu9xiprR1uP6sAE1EIJAlwu753/X/TLaOSDcFt+CS1sm8ITYiWz7pyQiYI34
+	 NDQkflqA24W/OHWo/NCWLyswS1MqRZ4P4+EG3ecXgfgA/ZyVEJdovUPRBndW52k0Dk
+	 1En1JU8Hgabs6iv+3dKXox6MPlrf6HXoa0xqPeCfPJIm+t7yxAgixkruFzw6qP9QuY
+	 hLRqDZUahz333V/NQh/uN9vl+j+LSutP3IMnqKuQ96v/7urxq6eXPCqT5QLTqwlI2G
+	 tGupbJ9x9LdmQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BAC380CFDD;
-	Wed, 26 Feb 2025 03:20:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEC0380CFDD;
+	Wed, 26 Feb 2025 03:20:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3] mptcp: misc. fixes
+Subject: Re: [PATCH net 0/5][pull request] Intel Wired LAN Driver Updates
+ 2025-02-24 (ice, idpf, iavf, ixgbe)
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174054003699.219541.10470016824852701686.git-patchwork-notify@kernel.org>
-Date: Wed, 26 Feb 2025 03:20:36 +0000
-References: <20250224-net-mptcp-misc-fixes-v1-0-f550f636b435@kernel.org>
-In-Reply-To: <20250224-net-mptcp-misc-fixes-v1-0-f550f636b435@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org,
- syzbot+cd3ce3d03a3393ae9700@syzkaller.appspotmail.com,
- chester.a.unal@xpedite-tech.com
+ <174054003849.219541.15972123501420371726.git-patchwork-notify@kernel.org>
+Date: Wed, 26 Feb 2025 03:20:38 +0000
+References: <20250224190647.3601930-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20250224190647.3601930-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org
 
 Hello:
 
 This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 24 Feb 2025 19:11:49 +0100 you wrote:
-> Here are two unrelated fixes, plus an extra patch:
+On Mon, 24 Feb 2025 11:06:40 -0800 you wrote:
+> For ice:
 > 
-> - Patch 1: prevent a warning by removing an unneeded and incorrect small
->   optimisation in the path-manager. A fix for v5.10.
+> Marcin moves incorrect call placement to clean up VF mailbox
+> tracking and changes call for configuring default VSI to allow
+> for existing rule.
 > 
-> - Patch 2: reset a subflow when MPTCP opts have been dropped after
->   having correctly added a new path. A fix for v5.19.
+> For idpf:
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/3] mptcp: always handle address removal under msk socket lock
-    https://git.kernel.org/netdev/net/c/f865c24bc551
-  - [net,2/3] mptcp: reset when MPTCP opts are dropped after join
-    https://git.kernel.org/netdev/net/c/8668860b0ad3
-  - [net,3/3] mptcp: safety check before fallback
-    https://git.kernel.org/netdev/net/c/db75a16813aa
+  - [net,1/5] ice: Fix deinitializing VF in error path
+    https://git.kernel.org/netdev/net/c/79990cf5e7ad
+  - [net,2/5] ice: Avoid setting default Rx VSI twice in switchdev setup
+    https://git.kernel.org/netdev/net/c/5c07be96d8b3
+  - [net,3/5] idpf: synchronize pending IRQs after disable
+    (no matching commit)
+  - [net,4/5] iavf: fix circular lock dependency with netdev_lock
+    (no matching commit)
+  - [net,5/5] ixgbe: fix media cage present detection for E610 device
+    https://git.kernel.org/netdev/net/c/b1e44b4aecb5
 
 You are awesome, thank you!
 -- 
