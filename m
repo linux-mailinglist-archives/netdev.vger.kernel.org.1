@@ -1,310 +1,152 @@
-Return-Path: <netdev+bounces-170019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B34C8A46E3A
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 23:11:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D1D7A46E45
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 23:13:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8775F7A31F8
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 22:10:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4DE416A913
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 22:13:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5653826E62D;
-	Wed, 26 Feb 2025 22:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69F0F26E155;
+	Wed, 26 Feb 2025 22:12:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cCcEjVid"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GoKTtbmX"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66A7726BD83
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 22:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B884626F44A
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 22:12:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740607887; cv=none; b=Hlrt9KtHp5b2cmMoRomIuuhJHOlI6T8vWJtHVMtGC1APEgaPJHJ915adonLstmqBPVCmhLmEmlaafpipQZzu26Y+VUTvPMNfDvj7gfF23msF7BQBSWaQ8+oV9u1Jh7JCHMK04iZRACa3UJlh0QKkvWvVFOA6EEPZo/yrHuKDpsY=
+	t=1740607977; cv=none; b=Th13zXi5XnAXgfBiXaPvoDL+XFrYaH1xCgDvbsiJhQtefzCSmHE4aF+TAren6Z7aG1TSkBoJV4JrDP7JkB9qCtyeG+axhhPfX6DAme1o+srJiELzlYR9jpjz1A6in/bjgUTEdur10VfS09XdxFPgM/wep6eDi2jcHI3xZa0JgNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740607887; c=relaxed/simple;
-	bh=V++Xmlo2Nswu93mayQmVsWDhp4ss6pyFSfa1fzm2HeM=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qYmrgDaiW0fDOSVhy1ff6XYhe6zHYmMR81P1M9rRkoQt73SLDpLD/jodPbSFjMcUgcUluCUbPqfO5WPSzriY90iO8LCVxw8fweNQaCMBmAwLBs89uMmSgSDLR8cYWvuM2wIbA9jGn6vuK0LOJ/CLw8YDxGjjpMS+hTJF83y+r+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cCcEjVid; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740607884;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SDLn/itlfNCF0HlLfDkYsSVrwBFlxuyO81r68eizKZU=;
-	b=cCcEjVidweduZlplLXxqqZ6v7yWtAM0DzS+JEjPo5FYrnc0eSB7rKbWOHN355hAvgKUp6Q
-	vEU9fePnygNy2qzJWl/DFywTZdqp/QbcnaEfSd0LBlzmd9UiMeaWvQYlde3ZLgReG2/83T
-	xpNk05+XKFKsUTGmbSOkzVBRsKKwIHg=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-563-jKeI16tCOOe1CeuImN3hXg-1; Wed, 26 Feb 2025 17:11:21 -0500
-X-MC-Unique: jKeI16tCOOe1CeuImN3hXg-1
-X-Mimecast-MFC-AGG-ID: jKeI16tCOOe1CeuImN3hXg_1740607881
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4399a5afcb3so3232905e9.3
-        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 14:11:21 -0800 (PST)
+	s=arc-20240116; t=1740607977; c=relaxed/simple;
+	bh=VMw6PwnSyOQuNLsxwWXJ1HC3mKzTS0VTMM8MtmY/nEw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=cYAfzHD08MroU3WzUgl3AX5OC5tqUfN5/iPS+WVsWl+8bXIeu00tKgEMV4ZZpQCw2YiX/HVlgBDqEFG3dBd8LUVZmZazNKSIz3ftga7MOVsJ2l6f1lruwUu440KNEQKh9C7Ytb2nV01b93tvqrzehxvI+g1DiD+iw02iVa9Tdeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GoKTtbmX; arc=none smtp.client-ip=209.85.160.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-472051849acso5422191cf.0
+        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 14:12:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740607974; x=1741212774; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0sTlK3EXl7m/fD1kmG4lPMc/3lamvwsB/3FfrlC/BqA=;
+        b=GoKTtbmX1ScFGaWbzynaJOMKfeEDqpPGax3FQz3UZpfIqy/VxIEO6JsKlYMQKALOmL
+         q1HaKnplWIx+rfDo6QDCEZ3ab39mz3FOjwfbmwPgMcofvvFd+thdLli0DnYl73d8SmfL
+         c0ha3tSKYIkyTAIp87nSUR2iuqV/rfnwafV1JVBlodr8YZsXXsM15LJeXWBH4GaNygtD
+         IoLjtU2dcuzvj5aEuukQkv9clpVHdwjUoAVeTIjt6lwp1h3CLPcTuwcyGOEASbUxNRdN
+         zQYwXLOQh4zO3KhK73xeb1Sage/Nj3ZoBmMVubi6TvUFmas4u/NV/Vo0jIyCATfWFxuU
+         aGUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740607881; x=1741212681;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SDLn/itlfNCF0HlLfDkYsSVrwBFlxuyO81r68eizKZU=;
-        b=MMAHDK2L1kaat7DjJ8cLCeZQKICZxEqXV5S573P+UzWQ5JjRAkbFHmYckofgFaBrxB
-         T8U2g17Y34/5+iWvL4DPYhwta8+kyDzSytm9Vq4Jkyh9uTPEvwu40tpnMDa2OFOqwo+/
-         Ssq9FvpMDKwmu1j254nJ7z3bFhcNBeQDe5rHgPBqIjEzJ9rmrv9+G6SfxSlanLRpoEfD
-         ZjLY08eOUWcuzGoL2a4BRAkVyRPbmgQW7KBxbayC531lEaUH2vxAT2Ibu9Sbur/BMa0D
-         huN0VaHfoLd/KERZ6oxGLPmkmt5HjrAnahgsr9HLLMNpMhC4C8NVUjIlt97hl4cLFAem
-         Smuw==
-X-Forwarded-Encrypted: i=1; AJvYcCUPz5qp2fIUiUxfvVcRZdF9/q0riHrC3GdrmuGGNvjzablRGwVf8VhyMnFzjf2VdAnDBBrjetw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxO56D/mUswSKQ8a1F1yTCl0bIk//56m4IpllLOMs+p9mRf3YLk
-	lCFj3sfEDiWq7z58dwSwdHMMBrVY+5iyHhx1iRY7HCQgxq9ThZJ1vr56DbMO/+Fm/5hAPTpkW2E
-	hkJWicjkPscjBDFEJGyEew/3SXT6QUfyIrMIAOVpoTUvqG8pT6v67Yg==
-X-Gm-Gg: ASbGnctyrdVKSW4ibbw4HY4uQgt6ofcEO4fI9xXYqjfIMKfzvvHt5Nvl2nlvw9ojxZU
-	ej1Q3G1cMc8mpchLztrVcQYBZU/MRPOxzrRcCoq1ssH+AoPn7dAGi0j4AYY7lhW2cYfLImER2pi
-	d6EVWsA1276YPuI75CPmL5+k2y+2xCKTUKSEuW9ZkBin6FcpFgPMhJTK2/xP905pm7MxflRvhWP
-	/cpgPOek6GSAhPDWdcY2zTw+iaY2ejgh8nhS2VXmGPFw3YALSU30vgZn+MuMrfcglvEzZII1hai
-	+NPsIz1LIg==
-X-Received: by 2002:a05:600c:3b12:b0:439:86c4:a8ec with SMTP id 5b1f17b1804b1-43ad6834cedmr18689555e9.15.1740607880659;
-        Wed, 26 Feb 2025 14:11:20 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEaelfXZLDUuHI3CpMumlbbQdNQDUp+SKRLlXHIvXK8BQFYRaYdUr1OnrM+q+ZUTw6/bJjjHA==
-X-Received: by 2002:a05:600c:3b12:b0:439:86c4:a8ec with SMTP id 5b1f17b1804b1-43ad6834cedmr18689355e9.15.1740607880188;
-        Wed, 26 Feb 2025 14:11:20 -0800 (PST)
-Received: from redhat.com ([2a02:14f:1eb:e270:8595:184c:7546:3597])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43b7a28bcfdsm2512865e9.40.2025.02.26.14.11.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Feb 2025 14:11:19 -0800 (PST)
-Date: Wed, 26 Feb 2025 17:11:15 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Joe Damato <jdamato@fastly.com>, Jason Wang <jasowang@redhat.com>,
-	netdev@vger.kernel.org, mkarsten@uwaterloo.ca,
-	gerhard@engleder-embedded.com, xuanzhuo@linux.alibaba.com,
-	kuba@kernel.org,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v4 3/4] virtio-net: Map NAPIs to queues
-Message-ID: <20250226171034-mutt-send-email-mst@kernel.org>
-References: <20250225020455.212895-1-jdamato@fastly.com>
- <20250225020455.212895-4-jdamato@fastly.com>
- <CACGkMEv6y+TkZnWWLPG4UE59iyREhkiaby8kj==cnp=6chmu+w@mail.gmail.com>
- <Z79XXQjp9Dz7OYYQ@LQ3V64L9R2>
+        d=1e100.net; s=20230601; t=1740607974; x=1741212774;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0sTlK3EXl7m/fD1kmG4lPMc/3lamvwsB/3FfrlC/BqA=;
+        b=tpd4ZWwifnzY/DCCczZJhBQD1XB8qlaJQUqvnFfgugyzQnNBKLzMPcCGQOwvwW7/O3
+         1pQwV9xDYJ7xUQgdT2RBDsrTcuOZ/LG139Zh9jJ6pdpTX9ZO4ccTWLgZi2yawL91GBPZ
+         4xEJTa2zaRDr5swlkfjW/8sIdqS8aXFyFaFGPby4QFbEgdnH+7yPacRkX2r9YQsE1Ysr
+         Mj35f7MqXgEuesaK6JpN9oaIDXIUzvZNJojw+B45rGVUILC8Qv2QGi1GMgKFZcjbR5s9
+         V/ju5x7bmT6Iac+b6tZNHmciWkNhb8Z+lgMof+RUx2gTWwoJwLMJNgbe9wT54mTVenEC
+         M5rQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU+d9buHmoRPXRKA5xdU8mc5I/F0+49xFgz9fs7v8pnq+615lL7rS4a6/+Q91+9+riojnt1O5A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyT4M7k5V9Zg/sjbxgrSS44j6JJMg20vQRq6viXEB+gfOjOsSXY
+	pA31W/5VtUntLvs/2guF6DBlch4XlkoaojzYuEzV0MVUObjTFYr99nVc7CWhhwp0RnYOxO0W0mW
+	T8ajS6T3jxQ==
+X-Google-Smtp-Source: AGHT+IE4+mg7d+uuqFj71ofTJ4ILQ4cihPABVqUz/DledT3xf0P433Bn9Dd+MmDtdI40ch+NJKyaynvK89Rohg==
+X-Received: from qtbbz16.prod.google.com ([2002:a05:622a:1e90:b0:471:f25c:e47d])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:ac8:5482:0:b0:472:673:6a5c with SMTP id d75a77b69052e-473813bb306mr61341551cf.32.1740607974569;
+ Wed, 26 Feb 2025 14:12:54 -0800 (PST)
+Date: Wed, 26 Feb 2025 22:12:52 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z79XXQjp9Dz7OYYQ@LQ3V64L9R2>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.658.g4767266eb4-goog
+Message-ID: <20250226221253.1927782-1-edumazet@google.com>
+Subject: [PATCH net] idpf: fix checksums set in idpf_rx_rsc()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Alan Brady <alan.brady@intel.com>, 
+	Joshua Hay <joshua.a.hay@intel.com>, Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Feb 26, 2025 at 01:03:09PM -0500, Joe Damato wrote:
-> On Wed, Feb 26, 2025 at 01:48:50PM +0800, Jason Wang wrote:
-> > On Tue, Feb 25, 2025 at 10:05 AM Joe Damato <jdamato@fastly.com> wrote:
-> > >
-> > > Use netif_queue_set_napi to map NAPIs to queue IDs so that the mapping
-> > > can be accessed by user apps, taking care to hold RTNL as needed.
-> > 
-> > I may miss something but I wonder whether letting the caller hold the
-> > lock is better.
-> 
-> Hmm...
-> 
-> Double checking all the paths over again, here's what I see:
->   - refill_work, delayed work that needs RTNL so this change seems
->     right?
-> 
->   - virtnet_disable_queue_pair, called from virtnet_open and
->     virtnet_close. When called via NDO these are safe and hold RTNL,
->     but they can be called from power management and need RTNL.
-> 
->   - virtnet_enable_queue_pair called from virtnet_open, safe when
->     used via NDO but needs RTNL when used via power management.
-> 
->   - virtnet_rx_pause called in both paths as you mentioned, one
->     which needs RTNL and one which doesn't.
-> 
-> I think there are a couple ways to fix this:
-> 
->   1. Edit this patch to remove the virtnet_queue_set_napi helper,
->      and call netif_queue_set_napi from the napi_enable and
->      napi_disable helpers directly. Modify code calling into these
->      paths to hold rtnl (or not) as described above.
-> 
->   2. Modify virtnet_enable_queue_pair, virtnet_disable_queue_pair,
->      and virtnet_rx_pause to take a "bool need_rtnl" as an a
->      function argument and pass that through.
-> 
-> I'm not sure which is cleaner and I do not have a preference.
-> 
-> Can you let me know which you prefer? I am happy to implement either
-> one for the next revision.
+idpf_rx_rsc() uses skb_transport_offset(skb) while the transport header
+is not set yet.
 
+This triggers the following warning for CONFIG_DEBUG_NET=y builds.
 
-1  seems cleaner.
-taking locks depending on paths is confusing
+DEBUG_NET_WARN_ON_ONCE(!skb_transport_header_was_set(skb))
 
-> [...]
-> 
-> > > ---
-> > >  drivers/net/virtio_net.c | 73 ++++++++++++++++++++++++++++------------
-> > >  1 file changed, 52 insertions(+), 21 deletions(-)
-> > >
-> > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > index e578885c1093..13bb4a563073 100644
-> > > --- a/drivers/net/virtio_net.c
-> > > +++ b/drivers/net/virtio_net.c
-> > > @@ -2807,6 +2807,20 @@ static void skb_recv_done(struct virtqueue *rvq)
-> > >         virtqueue_napi_schedule(&rq->napi, rvq);
-> > >  }
-> > >
-> > > +static void virtnet_queue_set_napi(struct net_device *dev,
-> > > +                                  struct napi_struct *napi,
-> > > +                                  enum netdev_queue_type q_type, int qidx,
-> > > +                                  bool need_rtnl)
-> > > +{
-> > > +       if (need_rtnl)
-> > > +               rtnl_lock();
-> > > +
-> > > +       netif_queue_set_napi(dev, qidx, q_type, napi);
-> > > +
-> > > +       if (need_rtnl)
-> > > +               rtnl_unlock();
-> > > +}
-> > > +
-> > >  static void virtnet_napi_do_enable(struct virtqueue *vq,
-> > >                                    struct napi_struct *napi)
-> > >  {
-> > > @@ -2821,15 +2835,21 @@ static void virtnet_napi_do_enable(struct virtqueue *vq,
-> > >         local_bh_enable();
-> > >  }
-> > >
-> > > -static void virtnet_napi_enable(struct receive_queue *rq)
-> > > +static void virtnet_napi_enable(struct receive_queue *rq, bool need_rtnl)
-> > >  {
-> > > +       struct virtnet_info *vi = rq->vq->vdev->priv;
-> > > +       int qidx = vq2rxq(rq->vq);
-> > > +
-> > >         virtnet_napi_do_enable(rq->vq, &rq->napi);
-> > > +       virtnet_queue_set_napi(vi->dev, &rq->napi,
-> > > +                              NETDEV_QUEUE_TYPE_RX, qidx, need_rtnl);
-> > >  }
-> > >
-> > > -static void virtnet_napi_tx_enable(struct send_queue *sq)
-> > > +static void virtnet_napi_tx_enable(struct send_queue *sq, bool need_rtnl)
-> > >  {
-> > >         struct virtnet_info *vi = sq->vq->vdev->priv;
-> > >         struct napi_struct *napi = &sq->napi;
-> > > +       int qidx = vq2txq(sq->vq);
-> > >
-> > >         if (!napi->weight)
-> > >                 return;
-> > > @@ -2843,20 +2863,31 @@ static void virtnet_napi_tx_enable(struct send_queue *sq)
-> > >         }
-> > >
-> > >         virtnet_napi_do_enable(sq->vq, napi);
-> > > +       virtnet_queue_set_napi(vi->dev, napi, NETDEV_QUEUE_TYPE_TX, qidx,
-> > > +                              need_rtnl);
-> > >  }
-> > >
-> > > -static void virtnet_napi_tx_disable(struct send_queue *sq)
-> > > +static void virtnet_napi_tx_disable(struct send_queue *sq, bool need_rtnl)
-> > >  {
-> > > +       struct virtnet_info *vi = sq->vq->vdev->priv;
-> > >         struct napi_struct *napi = &sq->napi;
-> > > +       int qidx = vq2txq(sq->vq);
-> > >
-> > > -       if (napi->weight)
-> > > +       if (napi->weight) {
-> > > +               virtnet_queue_set_napi(vi->dev, NULL, NETDEV_QUEUE_TYPE_TX,
-> > > +                                      qidx, need_rtnl);
-> > >                 napi_disable(napi);
-> > > +       }
-> > >  }
-> > >
-> > > -static void virtnet_napi_disable(struct receive_queue *rq)
-> > > +static void virtnet_napi_disable(struct receive_queue *rq, bool need_rtnl)
-> > >  {
-> > > +       struct virtnet_info *vi = rq->vq->vdev->priv;
-> > >         struct napi_struct *napi = &rq->napi;
-> > > +       int qidx = vq2rxq(rq->vq);
-> > >
-> > > +       virtnet_queue_set_napi(vi->dev, NULL, NETDEV_QUEUE_TYPE_TX, qidx,
-> > > +                              need_rtnl);
-> > >         napi_disable(napi);
-> > >  }
-> > >
-> > > @@ -2870,9 +2901,9 @@ static void refill_work(struct work_struct *work)
-> > >         for (i = 0; i < vi->curr_queue_pairs; i++) {
-> > >                 struct receive_queue *rq = &vi->rq[i];
-> > >
-> > > -               virtnet_napi_disable(rq);
-> > > +               virtnet_napi_disable(rq, true);
-> > >                 still_empty = !try_fill_recv(vi, rq, GFP_KERNEL);
-> > > -               virtnet_napi_enable(rq);
-> > > +               virtnet_napi_enable(rq, true);
-> > >
-> > >                 /* In theory, this can happen: if we don't get any buffers in
-> > >                  * we will *never* try to fill again.
-> > > @@ -3069,8 +3100,8 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
-> > >
-> > >  static void virtnet_disable_queue_pair(struct virtnet_info *vi, int qp_index)
-> > >  {
-> > > -       virtnet_napi_tx_disable(&vi->sq[qp_index]);
-> > > -       virtnet_napi_disable(&vi->rq[qp_index]);
-> > > +       virtnet_napi_tx_disable(&vi->sq[qp_index], false);
-> > > +       virtnet_napi_disable(&vi->rq[qp_index], false);
-> > >         xdp_rxq_info_unreg(&vi->rq[qp_index].xdp_rxq);
-> > >  }
-> > >
-> > > @@ -3089,8 +3120,8 @@ static int virtnet_enable_queue_pair(struct virtnet_info *vi, int qp_index)
-> > >         if (err < 0)
-> > >                 goto err_xdp_reg_mem_model;
-> > >
-> > > -       virtnet_napi_enable(&vi->rq[qp_index]);
-> > > -       virtnet_napi_tx_enable(&vi->sq[qp_index]);
-> > > +       virtnet_napi_enable(&vi->rq[qp_index], false);
-> > > +       virtnet_napi_tx_enable(&vi->sq[qp_index], false);
-> > >
-> > >         return 0;
-> > >
-> > > @@ -3342,7 +3373,7 @@ static void virtnet_rx_pause(struct virtnet_info *vi, struct receive_queue *rq)
-> > >         bool running = netif_running(vi->dev);
-> > >
-> > >         if (running) {
-> > > -               virtnet_napi_disable(rq);
-> > > +               virtnet_napi_disable(rq, true);
-> > 
-> > During the resize, the rtnl lock has been held on the ethtool path
-> > 
-> >         rtnl_lock();
-> >         rc = __dev_ethtool(net, ifr, useraddr, ethcmd, state);
-> >         rtnl_unlock();
-> > 
-> > virtnet_rx_resize()
-> >     virtnet_rx_pause()
-> > 
-> > and in the case of XSK binding, I see ASSERT_RTNL in xp_assign_dev() at least.
-> 
-> Thanks for catching this. I re-read all the paths and I think I've
-> outlined a few other issues above.
-> 
-> Please let me know which of the proposed methods above you'd like me
-> to implement to get this merged.
-> 
-> Thanks.
-> 
-> ---
-> pw-bot: cr
+[   69.261620] WARNING: CPU: 7 PID: 0 at ./include/linux/skbuff.h:3020 idpf_vport_splitq_napi_poll (include/linux/skbuff.h:3020) idpf
+[   69.261629] Modules linked in: vfat fat dummy bridge intel_uncore_frequency_tpmi intel_uncore_frequency_common intel_vsec_tpmi idpf intel_vsec cdc_ncm cdc_eem cdc_ether usbnet mii xhci_pci xhci_hcd ehci_pci ehci_hcd libeth
+[   69.261644] CPU: 7 UID: 0 PID: 0 Comm: swapper/7 Tainted: G S      W          6.14.0-smp-DEV #1697
+[   69.261648] Tainted: [S]=CPU_OUT_OF_SPEC, [W]=WARN
+[   69.261650] RIP: 0010:idpf_vport_splitq_napi_poll (include/linux/skbuff.h:3020) idpf
+[   69.261677] ? __warn (kernel/panic.c:242 kernel/panic.c:748)
+[   69.261682] ? idpf_vport_splitq_napi_poll (include/linux/skbuff.h:3020) idpf
+[   69.261687] ? report_bug (lib/bug.c:?)
+[   69.261690] ? handle_bug (arch/x86/kernel/traps.c:285)
+[   69.261694] ? exc_invalid_op (arch/x86/kernel/traps.c:309)
+[   69.261697] ? asm_exc_invalid_op (arch/x86/include/asm/idtentry.h:621)
+[   69.261700] ? __pfx_idpf_vport_splitq_napi_poll (drivers/net/ethernet/intel/idpf/idpf_txrx.c:4011) idpf
+[   69.261704] ? idpf_vport_splitq_napi_poll (include/linux/skbuff.h:3020) idpf
+[   69.261708] ? idpf_vport_splitq_napi_poll (drivers/net/ethernet/intel/idpf/idpf_txrx.c:3072) idpf
+[   69.261712] __napi_poll (net/core/dev.c:7194)
+[   69.261716] net_rx_action (net/core/dev.c:7265)
+[   69.261718] ? __qdisc_run (net/sched/sch_generic.c:293)
+[   69.261721] ? sched_clock (arch/x86/include/asm/preempt.h:84 arch/x86/kernel/tsc.c:288)
+[   69.261726] handle_softirqs (kernel/softirq.c:561)
+
+Fixes: 3a8845af66edb ("idpf: add RX splitq napi poll support")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Alan Brady <alan.brady@intel.com>
+Cc: Joshua Hay <joshua.a.hay@intel.com>
+Cc: Willem de Bruijn <willemb@google.com>
+---
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index 9be6a6b59c4e1414f993de39698b00fffa7d2940..977741c4149805b13b3b77fdfb612c514e2530e6 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -3013,7 +3013,6 @@ static int idpf_rx_rsc(struct idpf_rx_queue *rxq, struct sk_buff *skb,
+ 	skb_shinfo(skb)->gso_size = rsc_seg_len;
+ 
+ 	skb_reset_network_header(skb);
+-	len = skb->len - skb_transport_offset(skb);
+ 
+ 	if (ipv4) {
+ 		struct iphdr *ipv4h = ip_hdr(skb);
+@@ -3022,6 +3021,7 @@ static int idpf_rx_rsc(struct idpf_rx_queue *rxq, struct sk_buff *skb,
+ 
+ 		/* Reset and set transport header offset in skb */
+ 		skb_set_transport_header(skb, sizeof(struct iphdr));
++		len = skb->len - skb_transport_offset(skb);
+ 
+ 		/* Compute the TCP pseudo header checksum*/
+ 		tcp_hdr(skb)->check =
+@@ -3031,6 +3031,7 @@ static int idpf_rx_rsc(struct idpf_rx_queue *rxq, struct sk_buff *skb,
+ 
+ 		skb_shinfo(skb)->gso_type = SKB_GSO_TCPV6;
+ 		skb_set_transport_header(skb, sizeof(struct ipv6hdr));
++		len = skb->len - skb_transport_offset(skb);
+ 		tcp_hdr(skb)->check =
+ 			~tcp_v6_check(len, &ipv6h->saddr, &ipv6h->daddr, 0);
+ 	}
+-- 
+2.48.1.658.g4767266eb4-goog
 
 
