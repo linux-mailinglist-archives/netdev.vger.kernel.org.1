@@ -1,164 +1,79 @@
-Return-Path: <netdev+bounces-169647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 066CCA4512C
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 01:08:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75EC4A45161
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 01:23:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D444189B0C2
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 00:08:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EA283AA2AC
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 00:23:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 424C94A21;
-	Wed, 26 Feb 2025 00:08:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E25BF2940D;
+	Wed, 26 Feb 2025 00:23:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="eDYCsOZl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tR/y5lxe"
 X-Original-To: netdev@vger.kernel.org
-Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B53B7F9
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 00:08:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85F6219FF;
+	Wed, 26 Feb 2025 00:23:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740528484; cv=none; b=kdA5bGfFmyUSDcv2iElksYACK8eGzcfgLAg2a0WgsYO3NPoddKj1/6ahCAzlpJlUjHLOa4XAXefXJHCNH5LIgYuTy3nOYnEehNhpKdshfDbUYi+BOpN4fP2yhjZPeqxWYtHuCG4EH6dNr8IoMFm0CqK4NiikRue2FzB+x92eoV0=
+	t=1740529397; cv=none; b=O3lhjbCpzQwlW8qnZhkdS+AghZrq/HyMABiHXOgNEijs+RNCSF+Wt160QXcwjKZkoNBVtZkQUBXY7Q/7K57Af4KxTBhjsmGasmLwDemU8Tq0TWxHZtW+0w6NeDTqX55Lq3LtzppUhSUAxCPjYECXFZDB0tl4TSukoaI2TIjOmjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740528484; c=relaxed/simple;
-	bh=Zu5Gh9u3vWCOPeyMueyqnevSxVwPXlURSSnX/6Ov2Ro=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Q6lOGLTqMMZU5uvP1IQcVeNPYqK009Ak+5/pfe01cEHLfx8ux4uqWC95R+PdQ46EvxZN428xB2DpDHoszz55XbkM8Jy+ma1/KEogjvkkRfu6WYnET/WnvIDGg168VpIJwyptYY8nlksNq49DJZL/ESznwxhdXzW3Dl5XkhrJT0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=eDYCsOZl; arc=none smtp.client-ip=202.36.163.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
-Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 29C0A2C064D;
-	Wed, 26 Feb 2025 13:07:59 +1300 (NZDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1740528479;
-	bh=3GwO7BhrysL3Ix8kE0b5g9JR02RYSx1ZF5aIGqoanH4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eDYCsOZl2lC+8B90JQ4J0U0qaohEKGcKY5gM2aTOdMFt3uBiAHB+mOQunGFi8Miv8
-	 RNWQsMMUH4Gs71QrAOjrwfFfrtsA44yA3ob0H54ZIT1gep6/vQ6kKxyw1lPmILP5aM
-	 Rr39tv5IGLdtl0O2CqyDKGM6PfrZ8kNkx0u8t5lde33yqU9x9Yu+zMjTIAFGi7rQah
-	 WeUwiYKKW3GzpOdE/pfBj1DhviR6BameNdvOImey1l400bt9oA/Z8ypsBbLbAYyaRE
-	 +1nJsvxEfLCX02/ckpmTLpE3bY19EGH+2MJ2vvV+637MjXMicsCt/74fy0AYr6qoxq
-	 jQ1P+X7TVssVQ==
-Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B67be5b5e0000>; Wed, 26 Feb 2025 13:07:59 +1300
-Received: from chrisp-dl.ws.atlnz.lc (chrisp-dl.ws.atlnz.lc [10.33.22.30])
-	by pat.atlnz.lc (Postfix) with ESMTP id ECF0913EE7A;
-	Wed, 26 Feb 2025 13:07:58 +1300 (NZDT)
-Received: by chrisp-dl.ws.atlnz.lc (Postfix, from userid 1030)
-	id EAFCA280594; Wed, 26 Feb 2025 13:07:58 +1300 (NZDT)
-From: Chris Packham <chris.packham@alliedtelesis.co.nz>
-To: robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	tsbogend@alpha.franken.de,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	sander@svanheule.net,
-	markus.stockhausen@gmx.de
-Cc: devicetree@vger.kernel.org,
-	linux-mips@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Chris Packham <chris.packham@alliedtelesis.co.nz>
-Subject: [PATCH net-next v7 2/2] mips: dts: realtek: Add MDIO controller
-Date: Wed, 26 Feb 2025 13:07:48 +1300
-Message-ID: <20250226000748.3979148-3-chris.packham@alliedtelesis.co.nz>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250226000748.3979148-1-chris.packham@alliedtelesis.co.nz>
-References: <20250226000748.3979148-1-chris.packham@alliedtelesis.co.nz>
+	s=arc-20240116; t=1740529397; c=relaxed/simple;
+	bh=NquPViIB4WSmGW9cMez+qk1y/1afdXWIZ9aaaRhlJf8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=d0CD1llJj1Ssu4InjbIU2bbvRcImKM/o8tU02AA6PDzOQ2HwnlmS9EvqbIlgiJqBqtWfsByd1xfS9J79CNlqrVNPoBYf+V8TtvvAydQF8qBmEJjJbO+nwKyJW8Eypz/Wi0cXwy9k6tuzl248QiuPCT5BCSHIqkD0iJSld3J2aDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tR/y5lxe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C4E7C4CEDD;
+	Wed, 26 Feb 2025 00:23:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740529397;
+	bh=NquPViIB4WSmGW9cMez+qk1y/1afdXWIZ9aaaRhlJf8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tR/y5lxeVKIm5QCuNyTcbqqu8LaZ1f7DV1OUIXgoCbHM2iAe3uJVr1+3QufZFerZf
+	 GTlbw41yEaNzd0jp/nDLRFAz/0lttcwxvVrj1vvEp5o60blc5nVHaz1fibb4iLJlrO
+	 912CGa7lfNWRgknwZZKNPM1Ae/URXhlAegsL6JdLtFuEMPlP/LiyuD6YwfhbtCUHeR
+	 jMX6cBL5b6gvaOD9CYRxtgPmG8U3r86Yw19qlkCfBDv8t9J8lSz5JROUJFa2zjnv3R
+	 9aZBmRuSyVSRxPvqHfvjbC4NSiTnEocsQTz8QopCTNZ1rjIaOkNSeN6tyhGM5Pu0Im
+	 i6o6xdo0UvMxw==
+Date: Tue, 25 Feb 2025 16:23:15 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Gur Stavi <gur.stavi@huawei.com>
+Cc: Fan Gong <gongfan1@huawei.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ <linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Bjorn
+ Helgaas <helgaas@kernel.org>, Cai Huoqing <cai.huoqing@linux.dev>, luosifu
+ <luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>, Shen Chenyang
+ <shenchenyang1@hisilicon.com>, Zhou Shuai <zhoushuai28@huawei.com>, Wu Like
+ <wulike1@huawei.com>, Shi Jing <shijing34@huawei.com>, Meny Yossefi
+ <meny.yossefi@huawei.com>, Suman Ghosh <sumang@marvell.com>, Przemek
+ Kitszel <przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCH net-next v06 1/1] hinic3: module initialization and
+ tx/rx logic
+Message-ID: <20250225162315.5a9626cb@kernel.org>
+In-Reply-To: <0e13370a2a444eb4e906e49276b2d5c4b8862616.1740487707.git.gur.stavi@huawei.com>
+References: <cover.1740487707.git.gur.stavi@huawei.com>
+	<0e13370a2a444eb4e906e49276b2d5c4b8862616.1740487707.git.gur.stavi@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=ccpxrWDM c=1 sm=1 tr=0 ts=67be5b5f a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=T2h4t0Lz3GQA:10 a=Vd_wJYyKU8c0xNhbhIwA:9 a=3ZKOabzyN94A:10
-X-SEG-SpamProfiler-Score: 0
-x-atlnz-ls: pat
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Add a device tree node for the MDIO controller on the RTL9300 chips.
+On Tue, 25 Feb 2025 16:53:30 +0200 Gur Stavi wrote:
+>  .../ethernet/huawei/hinic3/hinic3_hw_cfg.c    |  25 +
 
-Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
----
-
-Notes:
-    Changes in v7:
-    - None
-    Changes in v6:
-    - None
-    Changes in v5:
-    - Add reg property to mdio-controller
-    Changes in v4:
-    - Have a single mdio-controller with the individual buses as child
-      nodes
-    Changes in v3:
-    - None
-    Changes in v2:
-    - None
-
- arch/mips/boot/dts/realtek/rtl930x.dtsi | 33 +++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
-
-diff --git a/arch/mips/boot/dts/realtek/rtl930x.dtsi b/arch/mips/boot/dts=
-/realtek/rtl930x.dtsi
-index f2e57ea3a60c..101bab72a95f 100644
---- a/arch/mips/boot/dts/realtek/rtl930x.dtsi
-+++ b/arch/mips/boot/dts/realtek/rtl930x.dtsi
-@@ -69,6 +69,39 @@ i2c1: i2c@388 {
- 			#size-cells =3D <0>;
- 			status =3D "disabled";
- 		};
-+
-+		mdio_controller: mdio-controller@ca00 {
-+			compatible =3D "realtek,rtl9301-mdio";
-+			reg =3D <0xca00 0x200>;
-+			#address-cells =3D <1>;
-+			#size-cells =3D <0>;
-+			status =3D "disabled";
-+
-+			mdio0: mdio-bus@0 {
-+				reg =3D <0>;
-+				#address-cells =3D <1>;
-+				#size-cells =3D <0>;
-+				status =3D "disabled";
-+			};
-+			mdio1: mdio-bus@1 {
-+				reg =3D <1>;
-+				#address-cells =3D <1>;
-+				#size-cells =3D <0>;
-+				status =3D "disabled";
-+			};
-+			mdio2: mdio-bus@2 {
-+				reg =3D <2>;
-+				#address-cells =3D <1>;
-+				#size-cells =3D <0>;
-+				status =3D "disabled";
-+			};
-+			mdio3: mdio-bus@3 {
-+				reg =3D <3>;
-+				#address-cells =3D <1>;
-+				#size-cells =3D <0>;
-+				status =3D "disabled";
-+			};
-+		};
- 	};
-=20
- 	soc: soc@18000000 {
---=20
-2.48.1
-
+drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.c:14:36-41: WARNING: conversion to bool not needed here
+-- 
+pw-bot: cr
 
