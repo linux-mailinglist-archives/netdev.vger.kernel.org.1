@@ -1,147 +1,224 @@
-Return-Path: <netdev+bounces-169823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7212A45D24
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 12:30:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0544FA45F89
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 13:42:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 688AC3AA64D
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 11:30:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B3FE188428C
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 12:41:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 980232153D3;
-	Wed, 26 Feb 2025 11:30:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84A4D21506A;
+	Wed, 26 Feb 2025 12:41:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="rWtw35VN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RHzSKtFN"
 X-Original-To: netdev@vger.kernel.org
-Received: from pv50p00im-ztdg10011301.me.com (pv50p00im-ztdg10011301.me.com [17.58.6.40])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98E8B215171
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 11:30:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E6CF212B23
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 12:41:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740569439; cv=none; b=FqHAyGEP8Drhq0zo8nGU6SlhoIWq+FbuzAtEkQIl/voEyDnUUqcjHOqN7wzwMn1hw6nlogFuWGE8vsd6qxKrjOzdxmhck5Mwv46SCCR7tvSQMp3OygyA+wZd30c8IkCqYPmiMbbj5XQBYdFl3D31Krw4KAE6T8o0adxIxTqN+CU=
+	t=1740573698; cv=none; b=D7ARhihKejAkSoXPyzQAiC+/EsqZ9qGpk0ICqk+4otAVZpixeao6EEYdwK9ig2vFfPUPWjbr3ARs1oZDBJfHZqICzc2RPLEuGEbv+Gc9tmkZsm0Ba8MxDRN9H0Sc/0Vqj1LAvrw6XY/d47wAHA2g9RWLcf9lEaYb/0qPLPy7Oqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740569439; c=relaxed/simple;
-	bh=SNcREccD3RAme9xYt3R+kilxl7SAdbri9ontWGXnon8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NATwmVanCs5baVK1/l8S0p3WIm48X6Se3M3TuL+tlPtnraRmF931pCL2aMWQwSe9vqJrPLCmJx0/Zi9JXc8jioWVX03fNH3wPZNG9GQRtgTKZNBTH4ik0dJK9xF3fHxW3YOGNm4YwsYVh0ANh1xNqZWlZfnAhvqryHoWMPwSq/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=rWtw35VN; arc=none smtp.client-ip=17.58.6.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; bh=SOdlXl7RXO630hj2D8KbTA/iuYN0f3n9ChpjV2oMRbU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:x-icloud-hme;
-	b=rWtw35VN5C7ebUryxGYabBiGNkfRxevNXaKu3lmmbcfRwCfqvGmsARTKGVlEDc3vJ
-	 IUw+i/jF2/O7wPykYL7GtrScwR7YHPk2KZArZBlYEByVg4HG2euMsCf4SLAhxqqINe
-	 T4aLRNRVMNlFJyn+/hO3Lmf6LkZiGLt8eWLCMvUUCNYIgCuhqhS16/5+FYQBrqDBv9
-	 cTNT5EvlskIwUWEEZthrUNkKMbaMBoPHtGY9C1f3/Wkj+mhDFLP1F1CqAqbIZvoN+x
-	 V8XpPNLsrc2QkugOEEdKPXC0Zg7dBaQpmDQ+gMVmCM7ShlzUTzFJzMqx6xBRgIBMy+
-	 ioIbkere3zE9w==
-Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-ztdg10011301.me.com (Postfix) with ESMTPSA id EAC1C18036A;
-	Wed, 26 Feb 2025 11:30:23 +0000 (UTC)
-Message-ID: <d70d059e-37aa-431d-986c-5666f006d610@icloud.com>
-Date: Wed, 26 Feb 2025 19:30:20 +0800
+	s=arc-20240116; t=1740573698; c=relaxed/simple;
+	bh=2Wtl/99KUY6VSqZjgNxx680yUju/s18Trdq/SjzInIA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HPfkqRKZUsaz9Dy9YhBYZx9fwRqzekYKZSUPLPvP/H087EhcJrtPwGIAyM7Ay1af/N/d/R5zrMuDSRIu0Bg932GOD4fPmFfnfvCd7ZW1W6e0+1Egi6C8PLd4j3dJb74ABWSjN/aDOKCIswO0M5D1ZMlcS9mCUcvejB0lImopcuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RHzSKtFN; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740573696; x=1772109696;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=2Wtl/99KUY6VSqZjgNxx680yUju/s18Trdq/SjzInIA=;
+  b=RHzSKtFNM1HHADfhkJreFZRL4fDOffOhBs22jNU4DdTTbzo1aDi6UHEz
+   NokJuF6cs8v3e6VmmaXDCdhg3z2L+6vpxZz4uBJURo3wswscTEk4MUhj8
+   YfUcYqyQ+y4445migzJnlEzsz0+DeKwrBggcIJNc4ZOBuJ+sKA0PESc2R
+   K0AzuRfZfRTLvEbxmErnhOBMwLKGGp4N42hwQBhJ5EPWWJ1radA3WRy2U
+   lcWsYsdHeTw6R0nCCO0GBaJ3jQWP66Nq4q+rp4K0DPmGmAr9weKuQKHgZ
+   OXHI/PyHLq3cXa2eH/G2lMs2WKmTAx7WV7pRqVV2vgCtvZEy9ets1+P+D
+   Q==;
+X-CSE-ConnectionGUID: k3isdd0tRlCioHbZf+jMqQ==
+X-CSE-MsgGUID: wZr/cYVOQrSzMk2O+tTXKA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11357"; a="41259257"
+X-IronPort-AV: E=Sophos;i="6.13,317,1732608000"; 
+   d="scan'208";a="41259257"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 04:41:35 -0800
+X-CSE-ConnectionGUID: OzUplYlUT0S491KkA4jXBA==
+X-CSE-MsgGUID: f72xxEfzQOapx08Ge0Mwdg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,317,1732608000"; 
+   d="scan'208";a="116882902"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa008.fm.intel.com with ESMTP; 26 Feb 2025 04:41:33 -0800
+Received: from ilmater.igk.intel.com (ilmater.igk.intel.com [10.123.220.50])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 19ECE12419;
+	Wed, 26 Feb 2025 12:41:32 +0000 (GMT)
+From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: [Intel-wired-lan] [PATCH iwl-next v1] ice: refactor the Tx scheduler feature
+Date: Wed, 26 Feb 2025 12:33:56 +0100
+Message-ID: <20250226113409.446325-1-mateusz.polchlopek@intel.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH *-next 01/18] mm/mmu_gather: Remove needless return in
- void API tlb_remove_page()
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Zijun Hu <quic_zijuhu@quicinc.com>, Peter Zijlstra
- <peterz@infradead.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Will Deacon <will@kernel.org>, "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>, Nick Piggin <npiggin@gmail.com>,
- Arnd Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Johannes Berg <johannes@sipsolutions.net>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, Jason Gunthorpe <jgg@ziepe.ca>,
- Leon Romanovsky <leon@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
- Bartosz Golaszewski <brgl@bgdev.pl>, Lee Jones <lee@kernel.org>,
- Thomas Graf <tgraf@suug.ch>, Christoph Hellwig <hch@lst.de>,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- Robin Murphy <robin.murphy@arm.com>,
- Miquel Raynal <miquel.raynal@bootlin.com>,
- Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
- linux-arch@vger.kernel.org, linux-mm@kvack.org,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-pm@vger.kernel.org, iommu@lists.linux.dev,
- linux-mtd@lists.infradead.org
-References: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
- <20250221-rmv_return-v1-1-cc8dff275827@quicinc.com>
- <20250221200137.GH7373@noisy.programming.kicks-ass.net>
- <8f36be7c-6052-4c5d-85ff-0eed27cf1456@icloud.com>
- <20250224132354.GC11590@noisy.programming.kicks-ass.net>
- <a28f04e5-ccde-4a08-b8fa-a9fa685240b1@icloud.com>
- <15c121c7-aeed-480e-8b1a-8ff23b4a3654@intel.com>
-Content-Language: en-US
-From: Zijun Hu <zijun_hu@icloud.com>
-In-Reply-To: <15c121c7-aeed-480e-8b1a-8ff23b4a3654@intel.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: BXt7ADwYEBiuzX8MsPltF1M0d6Q_8HN4
-X-Proofpoint-ORIG-GUID: BXt7ADwYEBiuzX8MsPltF1M0d6Q_8HN4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-26_02,2025-02-26_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0 phishscore=0
- clxscore=1015 suspectscore=0 mlxscore=0 adultscore=0 mlxlogscore=993
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2502260092
 
-On 2025/2/26 01:27, Przemek Kitszel wrote:
->>>>> It might not be your preferred coding style, but it is not completely
->>>>> pointless.
->>>>
->>>> based on below C spec such as C17 description. i guess language C does
->>>> not like this usage "return void function in void function";
->>>
->>> This is GNU extension IIRC. Note kernel uses GNU11, not C11
->>
->> any link to share about GNU11's description for this aspect ? (^^)
-> this is new for C17 or was there for long time?
-> 
+Embed ice_get_tx_topo_user_sel() inside the only caller:
+ice_devlink_tx_sched_layers_get().
+Instead of jump from the wrapper to the function that does "get" operation
+it does "get" itself.
 
-Standard C spec has that description for long time.
-Standard C11 spec also has that description.
+Remove unnecessary comment and make usage of str_enabled_disabled()
+in ice_init_tx_topology().
 
-> even if this is an extension, it is very nice for generating locked
-> wrappers, so you don't have to handle void case specially
-> 
-> void foo_bar(...)
-> {
->     lockdep_assert_held(&a_lock);
->     /// ...
-> }
-> 
-> // generated
-> void foo_bar_lock(...)
-> {
->     scoped_guard(mutex, &a_lock)
->         return foo_bar(...);
+Suggested-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+---
+ .../net/ethernet/intel/ice/devlink/devlink.c  | 56 +++++++------------
+ drivers/net/ethernet/intel/ice/ice_ddp.c      |  2 -
+ drivers/net/ethernet/intel/ice/ice_main.c     |  8 +--
+ 3 files changed, 23 insertions(+), 43 deletions(-)
 
-above is able to be written as below:
-      scoped_guard(mutex, &a_lock) {
-	foo_bar(...);
-	return;
-      }
-> }
-i will list my reasons why this usage "return void function in void
-function" is not good in cover letter [00/18] of this series.
-
+diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+index fcb199efbea5..2355e21d115c 100644
+--- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
++++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+@@ -529,41 +529,6 @@ ice_devlink_reload_empr_finish(struct ice_pf *pf,
+ 	return 0;
+ }
+ 
+-/**
+- * ice_get_tx_topo_user_sel - Read user's choice from flash
+- * @pf: pointer to pf structure
+- * @layers: value read from flash will be saved here
+- *
+- * Reads user's preference for Tx Scheduler Topology Tree from PFA TLV.
+- *
+- * Return: zero when read was successful, negative values otherwise.
+- */
+-static int ice_get_tx_topo_user_sel(struct ice_pf *pf, uint8_t *layers)
+-{
+-	struct ice_aqc_nvm_tx_topo_user_sel usr_sel = {};
+-	struct ice_hw *hw = &pf->hw;
+-	int err;
+-
+-	err = ice_acquire_nvm(hw, ICE_RES_READ);
+-	if (err)
+-		return err;
+-
+-	err = ice_aq_read_nvm(hw, ICE_AQC_NVM_TX_TOPO_MOD_ID, 0,
+-			      sizeof(usr_sel), &usr_sel, true, true, NULL);
+-	if (err)
+-		goto exit_release_res;
+-
+-	if (usr_sel.data & ICE_AQC_NVM_TX_TOPO_USER_SEL)
+-		*layers = ICE_SCHED_5_LAYERS;
+-	else
+-		*layers = ICE_SCHED_9_LAYERS;
+-
+-exit_release_res:
+-	ice_release_nvm(hw);
+-
+-	return err;
+-}
+-
+ /**
+  * ice_update_tx_topo_user_sel - Save user's preference in flash
+  * @pf: pointer to pf structure
+@@ -610,19 +575,36 @@ static int ice_update_tx_topo_user_sel(struct ice_pf *pf, int layers)
+  * @id: the parameter ID to set
+  * @ctx: context to store the parameter value
+  *
++ * Reads user's preference for Tx Scheduler Topology Tree from PFA TLV.
++ *
+  * Return: zero on success and negative value on failure.
+  */
+ static int ice_devlink_tx_sched_layers_get(struct devlink *devlink, u32 id,
+ 					   struct devlink_param_gset_ctx *ctx)
+ {
++	struct ice_aqc_nvm_tx_topo_user_sel usr_sel = {};
+ 	struct ice_pf *pf = devlink_priv(devlink);
++	struct ice_hw *hw = &pf->hw;
+ 	int err;
+ 
+-	err = ice_get_tx_topo_user_sel(pf, &ctx->val.vu8);
++	err = ice_acquire_nvm(hw, ICE_RES_READ);
+ 	if (err)
+ 		return err;
+ 
+-	return 0;
++	err = ice_aq_read_nvm(hw, ICE_AQC_NVM_TX_TOPO_MOD_ID, 0,
++			      sizeof(usr_sel), &usr_sel, true, true, NULL);
++	if (err)
++		goto exit_release_res;
++
++	if (usr_sel.data & ICE_AQC_NVM_TX_TOPO_USER_SEL)
++		ctx->val.vu8 = ICE_SCHED_5_LAYERS;
++	else
++		ctx->val.vu8 = ICE_SCHED_9_LAYERS;
++
++exit_release_res:
++	ice_release_nvm(hw);
++
++	return err;
+ }
+ 
+ /**
+diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.c b/drivers/net/ethernet/intel/ice/ice_ddp.c
+index 69d5b1a28491..a2f738eaf02e 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ddp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ddp.c
+@@ -2324,8 +2324,6 @@ enum ice_ddp_state ice_copy_and_init_pkg(struct ice_hw *hw, const u8 *buf,
+  * @flags: pointer to descriptor flags
+  * @set: 0-get, 1-set topology
+  *
+- * The function will get or set Tx topology
+- *
+  * Return: zero when set was successful, negative values otherwise.
+  */
+ static int
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index b084839eb811..9d9cad81b336 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -4544,10 +4544,10 @@ ice_init_tx_topology(struct ice_hw *hw, const struct firmware *firmware)
+ 	dev = ice_pf_to_dev(pf);
+ 	err = ice_cfg_tx_topo(hw, firmware->data, firmware->size);
+ 	if (!err) {
+-		if (hw->num_tx_sched_layers > num_tx_sched_layers)
+-			dev_info(dev, "Tx scheduling layers switching feature disabled\n");
+-		else
+-			dev_info(dev, "Tx scheduling layers switching feature enabled\n");
++		dev_info(dev, "Tx scheduling layers switching feature %s\n",
++			 str_enabled_disabled(hw->num_tx_sched_layers <=
++					      num_tx_sched_layers));
++
+ 		/* if there was a change in topology ice_cfg_tx_topo triggered
+ 		 * a CORER and we need to re-init hw
+ 		 */
+-- 
+2.48.1
 
 
