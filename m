@@ -1,76 +1,73 @@
-Return-Path: <netdev+bounces-170017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C5E9A46D28
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 22:12:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AF9B7A46D5E
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 22:25:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C46ED3A5538
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 21:12:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB8A73A2404
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 21:25:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DEBD260A20;
-	Wed, 26 Feb 2025 21:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 916E321ABB4;
+	Wed, 26 Feb 2025 21:25:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="tzIefyib"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1812025EF9A
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 21:11:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABF0C21884A
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 21:25:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740604287; cv=none; b=JQFzj4dBjsj2fmzrt5HnJsvPJv1Y0lCfRpz/3t1fg95HSsFh7jtIHtMYtycRDrD74LCSPRoOgIxaejH9d4Ml+HuCllzca3hS5+EScvwSKzQ+0FfBoj6QEPu+mcXY9n0KDJD1wD+SrrB1EnN+nJBYrFL7HkspqdTTXAL0dAEi9fk=
+	t=1740605123; cv=none; b=f71YpiXDEZzD+/3annvmHYpVN12jZog7aGkU4FvAfwAkVF4epzM9rQxrWyX0vFxfsjJLHIXectWehK2M7tAdstmlfRzfXOwIn8aAJJkomKf6rFlxdSBt/4S2OPB+ixteL533INZcgXnX25vBE7lmd17A+46JgbMyvk9VNubaBow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740604287; c=relaxed/simple;
-	bh=A6PIuCyeUQoG9W5h16e+eo7bR5ByD7IG+9zYYe5e3JE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=N8cfQGYN0Kum8qfW4aixOR3t9C9LaC95pt0oHDOu90+5fePmGGAyhlu2fDMna7NAFR7Z9SKaTWBPmDDIv2rjeny5n2q0cHxW/fj0uCVzdB1Uli1y4WIzqdODX4EZ+r8Xz2fZ4qVIOAnVs/GuP5iQSfbFr6W9mO8ChDlB3pUIxgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2f9d3d0f55dso477924a91.1
-        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 13:11:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740604284; x=1741209084;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PyFOKUXnVQCuZw73zRvcBpRbCUQr8zrHUJhC73LSwfg=;
-        b=P0F46JkpCvx8Xmp6EMEefz7NceAchg9PDbKv9FPcv1uNK5PAea3xIBDiwjHHZzGUtS
-         IvqiTd9naxQ7vkDYAgaN4acdbq0JH85gtvIdIE9CK9xfACFD+Xli6mfQo88yDm47ehcf
-         BgnH/yrcWDiqqWxB1aJDWVEylZwdVkkanUMbepEC0Df+IIoonRX05LQQCCVg3l5o+wuC
-         mAElLdiEzRMqTx9LrGFPoSe5p12HDp8kiuntiSQ0hLO9hMTdEgu1x1E75C9yLEe9C/Im
-         4aIay7zgsI5OrSsYdgHGIVgQIGhO+p993EB3sqdsXV9ncUut9j9kfljgII5OU5EAhg4g
-         ZtQg==
-X-Gm-Message-State: AOJu0Yy46V/719z+6inW+TJwxhh4lBaGlyQ4KqJcvSdQHi7o+y/K5WnG
-	6pLHr22BvvYQVmubKWHYJnep4clGza4a/B6hjkOXZ+9APRgVY6AGJsr4
-X-Gm-Gg: ASbGncuYjADzaN/OkHPjZuGLImzFVaqDg6beqQXOHHAAAukcZYe/51t7a+USga+siP8
-	Q0ZhtLHDhaVBPXqY5rVnyGCe2wT+uQ499uYPGyczHG9A+d+h09UAcI4tyxyM8DrnigYo0Tx0lzZ
-	YmMK73gInPPeamS/GGXKidQLFSMmMSn8fqx2Jekrnl1qyvHw+eTx9sLgrjoB4UhidDcJNiU0d8x
-	FvviFs9NI2RfRYUYHwfGQKqOzsQIdVG+ztVYNtHrvt+wf86fuv72KzkCofYMQxiE2B1pPwq1m16
-	yOBgQQSb9XQydOShJT+wIuyBhw==
-X-Google-Smtp-Source: AGHT+IHHkemHU4LpmKsgYmOtgwrAmV4g1JDZ+8+pvf2xYROqnGKSPlYDwyZ6hZW3JwXYv7zXvIH4Cw==
-X-Received: by 2002:a17:90b:524f:b0:2ee:863e:9ffc with SMTP id 98e67ed59e1d1-2fe7e33eb33mr7067077a91.21.1740604283999;
-        Wed, 26 Feb 2025 13:11:23 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-2fe825a9c86sm2311705a91.9.2025.02.26.13.11.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Feb 2025 13:11:23 -0800 (PST)
-From: Stanislav Fomichev <sdf@fomichev.me>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Saeed Mahameed <saeed@kernel.org>,
-	Michael Chan <michael.chan@broadcom.com>
-Subject: [PATCH net-next v8 12/12] eth: bnxt: remove most dependencies on RTNL
-Date: Wed, 26 Feb 2025 13:11:08 -0800
-Message-ID: <20250226211108.387727-13-sdf@fomichev.me>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250226211108.387727-1-sdf@fomichev.me>
-References: <20250226211108.387727-1-sdf@fomichev.me>
+	s=arc-20240116; t=1740605123; c=relaxed/simple;
+	bh=ZqozZ7yikwsLwwqPCXrxoI3e5hGiagZta4POPpletsc=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=msOwL0L6sQPOuKS1mCvlIXTBYZvjkdafz267eQV+ipazCpGB1c41Bi5DG2VnY0IT8GuDZRsDrNeylIJgs13XuNFhr8TzfdiukapDRwfWbMYq6RQCz/HJULM2zSqUnof/tdAxYRjLrAEHqsmag/XfP6GmvuBxU+pDvIvbw1O9Yxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=tzIefyib; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1740605121; x=1772141121;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=4bGEGcn2FYkJDt/EFXSFkNrjLbc4UXXia+HqmAk544g=;
+  b=tzIefyibNokZctdmp9WF9xChzVMaUw+bTDnHhtdZlvAqZ358y20688y3
+   AJ0F8Thn9XRxMNDhD8bMkkb0W1stmj1Y3BKWupgxETDezAoX7PwhgxkZS
+   eUFiPRNNar8sbKGqQoOjbbJGJZhW5fkTRmIXneESew22ybZ/D8KFEV8LI
+   4=;
+X-IronPort-AV: E=Sophos;i="6.13,318,1732579200"; 
+   d="scan'208";a="475606647"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 21:25:17 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:48581]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.6.186:2525] with esmtp (Farcaster)
+ id 07044637-c0f4-4ed3-bf55-d3ac73571f32; Wed, 26 Feb 2025 21:25:16 +0000 (UTC)
+X-Farcaster-Flow-ID: 07044637-c0f4-4ed3-bf55-d3ac73571f32
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 26 Feb 2025 21:25:16 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.170.36) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 26 Feb 2025 21:25:13 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <nicolas.dichtel@6wind.com>
+CC: <aleksander.lobakin@intel.com>, <andrew@lunn.ch>, <davem@davemloft.net>,
+	<edumazet@google.com>, <idosch@idosch.org>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v5 1/3] net: rename netns_local to netns_immutable
+Date: Wed, 26 Feb 2025 13:25:04 -0800
+Message-ID: <20250226212504.37165-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250226093232.644814-2-nicolas.dichtel@6wind.com>
+References: <20250226093232.644814-2-nicolas.dichtel@6wind.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,708 +75,20 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D040UWB001.ant.amazon.com (10.13.138.82) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Only devlink and sriov paths are grabbing rtnl explicitly. The rest is
-covered by netdev instance lock which the core now grabs, so there is
-no need to manage rtnl in most places anymore.
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Date: Wed, 26 Feb 2025 10:31:56 +0100
+> The name 'netns_local' is confusing. A following commit will export it via
+> netlink, so let's use a more explicit name.
+> 
+> Reported-by: Eric Dumazet <edumazet@google.com>
+> Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
-On the core side we can now try to drop rtnl in some places
-(do_setlink for example) for the drivers that signal non-rtnl
-mode (TBD).
+Confirmed allmodconfig passed.
 
-Boot-tested and with `ethtool -L eth1 combined 24` to trigger reset.
-
-Cc: Saeed Mahameed <saeed@kernel.org>
-Reviewed-by: Michael Chan <michael.chan@broadcom.com>
-Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 117 +++++++++---------
- .../net/ethernet/broadcom/bnxt/bnxt_devlink.c |   9 ++
- .../net/ethernet/broadcom/bnxt/bnxt_sriov.c   |   6 +
- drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c |  16 ++-
- drivers/net/ethernet/broadcom/bnxt/bnxt_vfr.c |  18 ++-
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |   3 +-
- include/linux/netdevice.h                     |   5 +
- 7 files changed, 101 insertions(+), 73 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index ead9fcaad6bd..1a1e6da77777 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -5246,8 +5246,10 @@ static void bnxt_free_ntp_fltrs(struct bnxt *bp, bool all)
- {
- 	int i;
- 
--	/* Under rtnl_lock and all our NAPIs have been disabled.  It's
--	 * safe to delete the hash table.
-+	netdev_assert_locked(bp->dev);
-+
-+	/* Under netdev instance lock and all our NAPIs have been disabled.
-+	 * It's safe to delete the hash table.
- 	 */
- 	for (i = 0; i < BNXT_NTP_FLTR_HASH_SIZE; i++) {
- 		struct hlist_head *head;
-@@ -12789,7 +12791,6 @@ static int __bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
- 	return rc;
- }
- 
--/* rtnl_lock held */
- int bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
- {
- 	int rc = 0;
-@@ -12805,9 +12806,9 @@ int bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
- 	return rc;
- }
- 
--/* rtnl_lock held, open the NIC half way by allocating all resources, but
-- * NAPI, IRQ, and TX are not enabled.  This is mainly used for offline
-- * self tests.
-+/* netdev instance lock held, open the NIC half way by allocating all
-+ * resources, but NAPI, IRQ, and TX are not enabled.  This is mainly used
-+ * for offline self tests.
-  */
- int bnxt_half_open_nic(struct bnxt *bp)
- {
-@@ -12842,8 +12843,8 @@ int bnxt_half_open_nic(struct bnxt *bp)
- 	return rc;
- }
- 
--/* rtnl_lock held, this call can only be made after a previous successful
-- * call to bnxt_half_open_nic().
-+/* netdev instance lock held, this call can only be made after a previous
-+ * successful call to bnxt_half_open_nic().
-  */
- void bnxt_half_close_nic(struct bnxt *bp)
- {
-@@ -12952,10 +12953,11 @@ void bnxt_close_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
- 	if (test_bit(BNXT_STATE_IN_FW_RESET, &bp->state)) {
- 		/* If we get here, it means firmware reset is in progress
- 		 * while we are trying to close.  We can safely proceed with
--		 * the close because we are holding rtnl_lock().  Some firmware
--		 * messages may fail as we proceed to close.  We set the
--		 * ABORT_ERR flag here so that the FW reset thread will later
--		 * abort when it gets the rtnl_lock() and sees the flag.
-+		 * the close because we are holding netdev instance lock.
-+		 * Some firmware messages may fail as we proceed to close.
-+		 * We set the ABORT_ERR flag here so that the FW reset thread
-+		 * will later abort when it gets the netdev instance lock
-+		 * and sees the flag.
- 		 */
- 		netdev_warn(bp->dev, "FW reset in progress during close, FW reset will be aborted\n");
- 		set_bit(BNXT_STATE_ABORT_ERR, &bp->state);
-@@ -13046,7 +13048,7 @@ static int bnxt_hwrm_port_phy_write(struct bnxt *bp, u16 phy_addr, u16 reg,
- 	return hwrm_req_send(bp, req);
- }
- 
--/* rtnl_lock held */
-+/* netdev instance lock held */
- static int bnxt_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
- {
- 	struct mii_ioctl_data *mdio = if_mii(ifr);
-@@ -13965,30 +13967,31 @@ static void bnxt_timer(struct timer_list *t)
- 	mod_timer(&bp->timer, jiffies + bp->current_interval);
- }
- 
--static void bnxt_rtnl_lock_sp(struct bnxt *bp)
-+static void bnxt_lock_sp(struct bnxt *bp)
- {
- 	/* We are called from bnxt_sp_task which has BNXT_STATE_IN_SP_TASK
- 	 * set.  If the device is being closed, bnxt_close() may be holding
--	 * rtnl() and waiting for BNXT_STATE_IN_SP_TASK to clear.  So we
--	 * must clear BNXT_STATE_IN_SP_TASK before holding rtnl().
-+	 * netdev instance lock and waiting for BNXT_STATE_IN_SP_TASK to clear.
-+	 * So we must clear BNXT_STATE_IN_SP_TASK before holding netdev
-+	 * instance lock.
- 	 */
- 	clear_bit(BNXT_STATE_IN_SP_TASK, &bp->state);
--	rtnl_lock();
-+	netdev_lock(bp->dev);
- }
- 
--static void bnxt_rtnl_unlock_sp(struct bnxt *bp)
-+static void bnxt_unlock_sp(struct bnxt *bp)
- {
- 	set_bit(BNXT_STATE_IN_SP_TASK, &bp->state);
--	rtnl_unlock();
-+	netdev_unlock(bp->dev);
- }
- 
- /* Only called from bnxt_sp_task() */
- static void bnxt_reset(struct bnxt *bp, bool silent)
- {
--	bnxt_rtnl_lock_sp(bp);
-+	bnxt_lock_sp(bp);
- 	if (test_bit(BNXT_STATE_OPEN, &bp->state))
- 		bnxt_reset_task(bp, silent);
--	bnxt_rtnl_unlock_sp(bp);
-+	bnxt_unlock_sp(bp);
- }
- 
- /* Only called from bnxt_sp_task() */
-@@ -13996,9 +13999,9 @@ static void bnxt_rx_ring_reset(struct bnxt *bp)
- {
- 	int i;
- 
--	bnxt_rtnl_lock_sp(bp);
-+	bnxt_lock_sp(bp);
- 	if (!test_bit(BNXT_STATE_OPEN, &bp->state)) {
--		bnxt_rtnl_unlock_sp(bp);
-+		bnxt_unlock_sp(bp);
- 		return;
- 	}
- 	/* Disable and flush TPA before resetting the RX ring */
-@@ -14037,7 +14040,7 @@ static void bnxt_rx_ring_reset(struct bnxt *bp)
- 	}
- 	if (bp->flags & BNXT_FLAG_TPA)
- 		bnxt_set_tpa(bp, true);
--	bnxt_rtnl_unlock_sp(bp);
-+	bnxt_unlock_sp(bp);
- }
- 
- static void bnxt_fw_fatal_close(struct bnxt *bp)
-@@ -14093,7 +14096,7 @@ static bool is_bnxt_fw_ok(struct bnxt *bp)
- 	return false;
- }
- 
--/* rtnl_lock is acquired before calling this function */
-+/* netdev instance lock is acquired before calling this function */
- static void bnxt_force_fw_reset(struct bnxt *bp)
- {
- 	struct bnxt_fw_health *fw_health = bp->fw_health;
-@@ -14136,9 +14139,9 @@ void bnxt_fw_exception(struct bnxt *bp)
- 	netdev_warn(bp->dev, "Detected firmware fatal condition, initiating reset\n");
- 	set_bit(BNXT_STATE_FW_FATAL_COND, &bp->state);
- 	bnxt_ulp_stop(bp);
--	bnxt_rtnl_lock_sp(bp);
-+	bnxt_lock_sp(bp);
- 	bnxt_force_fw_reset(bp);
--	bnxt_rtnl_unlock_sp(bp);
-+	bnxt_unlock_sp(bp);
- }
- 
- /* Returns the number of registered VFs, or 1 if VF configuration is pending, or
-@@ -14168,7 +14171,7 @@ static int bnxt_get_registered_vfs(struct bnxt *bp)
- void bnxt_fw_reset(struct bnxt *bp)
- {
- 	bnxt_ulp_stop(bp);
--	bnxt_rtnl_lock_sp(bp);
-+	bnxt_lock_sp(bp);
- 	if (test_bit(BNXT_STATE_OPEN, &bp->state) &&
- 	    !test_bit(BNXT_STATE_IN_FW_RESET, &bp->state)) {
- 		struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
-@@ -14214,7 +14217,7 @@ void bnxt_fw_reset(struct bnxt *bp)
- 		bnxt_queue_fw_reset_work(bp, tmo);
- 	}
- fw_reset_exit:
--	bnxt_rtnl_unlock_sp(bp);
-+	bnxt_unlock_sp(bp);
- }
- 
- static void bnxt_chk_missed_irq(struct bnxt *bp)
-@@ -14413,7 +14416,7 @@ static void bnxt_sp_task(struct work_struct *work)
- static void _bnxt_get_max_rings(struct bnxt *bp, int *max_rx, int *max_tx,
- 				int *max_cp);
- 
--/* Under rtnl_lock */
-+/* Under netdev instance lock */
- int bnxt_check_rings(struct bnxt *bp, int tx, int rx, bool sh, int tcs,
- 		     int tx_xdp)
- {
-@@ -14841,10 +14844,10 @@ static void bnxt_fw_reset_task(struct work_struct *work)
- 			return;
- 		}
- 		bp->fw_reset_timestamp = jiffies;
--		rtnl_lock();
-+		netdev_lock(bp->dev);
- 		if (test_bit(BNXT_STATE_ABORT_ERR, &bp->state)) {
- 			bnxt_fw_reset_abort(bp, rc);
--			rtnl_unlock();
-+			netdev_unlock(bp->dev);
- 			goto ulp_start;
- 		}
- 		bnxt_fw_reset_close(bp);
-@@ -14855,7 +14858,7 @@ static void bnxt_fw_reset_task(struct work_struct *work)
- 			bp->fw_reset_state = BNXT_FW_RESET_STATE_ENABLE_DEV;
- 			tmo = bp->fw_reset_min_dsecs * HZ / 10;
- 		}
--		rtnl_unlock();
-+		netdev_unlock(bp->dev);
- 		bnxt_queue_fw_reset_work(bp, tmo);
- 		return;
- 	}
-@@ -14929,7 +14932,7 @@ static void bnxt_fw_reset_task(struct work_struct *work)
- 		bp->fw_reset_state = BNXT_FW_RESET_STATE_OPENING;
- 		fallthrough;
- 	case BNXT_FW_RESET_STATE_OPENING:
--		while (!rtnl_trylock()) {
-+		while (!netdev_trylock(bp->dev)) {
- 			bnxt_queue_fw_reset_work(bp, HZ / 10);
- 			return;
- 		}
-@@ -14937,7 +14940,7 @@ static void bnxt_fw_reset_task(struct work_struct *work)
- 		if (rc) {
- 			netdev_err(bp->dev, "bnxt_open() failed during FW reset\n");
- 			bnxt_fw_reset_abort(bp, rc);
--			rtnl_unlock();
-+			netdev_unlock(bp->dev);
- 			goto ulp_start;
- 		}
- 
-@@ -14956,13 +14959,13 @@ static void bnxt_fw_reset_task(struct work_struct *work)
- 			bnxt_dl_health_fw_recovery_done(bp);
- 			bnxt_dl_health_fw_status_update(bp, true);
- 		}
--		rtnl_unlock();
-+		netdev_unlock(bp->dev);
- 		bnxt_ulp_start(bp, 0);
- 		bnxt_reenable_sriov(bp);
--		rtnl_lock();
-+		netdev_lock(bp->dev);
- 		bnxt_vf_reps_alloc(bp);
- 		bnxt_vf_reps_open(bp);
--		rtnl_unlock();
-+		netdev_unlock(bp->dev);
- 		break;
- 	}
- 	return;
-@@ -14975,9 +14978,9 @@ static void bnxt_fw_reset_task(struct work_struct *work)
- 		netdev_err(bp->dev, "fw_health_status 0x%x\n", sts);
- 	}
- fw_reset_abort:
--	rtnl_lock();
-+	netdev_lock(bp->dev);
- 	bnxt_fw_reset_abort(bp, rc);
--	rtnl_unlock();
-+	netdev_unlock(bp->dev);
- ulp_start:
- 	bnxt_ulp_start(bp, rc);
- }
-@@ -15069,13 +15072,14 @@ static int bnxt_init_board(struct pci_dev *pdev, struct net_device *dev)
- 	return rc;
- }
- 
--/* rtnl_lock held */
- static int bnxt_change_mac_addr(struct net_device *dev, void *p)
- {
- 	struct sockaddr *addr = p;
- 	struct bnxt *bp = netdev_priv(dev);
- 	int rc = 0;
- 
-+	netdev_assert_locked(dev);
-+
- 	if (!is_valid_ether_addr(addr->sa_data))
- 		return -EADDRNOTAVAIL;
- 
-@@ -15096,11 +15100,12 @@ static int bnxt_change_mac_addr(struct net_device *dev, void *p)
- 	return rc;
- }
- 
--/* rtnl_lock held */
- static int bnxt_change_mtu(struct net_device *dev, int new_mtu)
- {
- 	struct bnxt *bp = netdev_priv(dev);
- 
-+	netdev_assert_locked(dev);
-+
- 	if (netif_running(dev))
- 		bnxt_close_nic(bp, true, false);
- 
-@@ -16257,7 +16262,7 @@ int bnxt_restore_pf_fw_resources(struct bnxt *bp)
- {
- 	int rc;
- 
--	ASSERT_RTNL();
-+	netdev_ops_assert_locked(bp->dev);
- 	bnxt_hwrm_func_qcaps(bp);
- 
- 	if (netif_running(bp->dev))
-@@ -16657,7 +16662,7 @@ static void bnxt_shutdown(struct pci_dev *pdev)
- 	if (!dev)
- 		return;
- 
--	rtnl_lock();
-+	netdev_lock(dev);
- 	bp = netdev_priv(dev);
- 	if (!bp)
- 		goto shutdown_exit;
-@@ -16675,7 +16680,7 @@ static void bnxt_shutdown(struct pci_dev *pdev)
- 	}
- 
- shutdown_exit:
--	rtnl_unlock();
-+	netdev_unlock(dev);
- }
- 
- #ifdef CONFIG_PM_SLEEP
-@@ -16687,7 +16692,7 @@ static int bnxt_suspend(struct device *device)
- 
- 	bnxt_ulp_stop(bp);
- 
--	rtnl_lock();
-+	netdev_lock(dev);
- 	if (netif_running(dev)) {
- 		netif_device_detach(dev);
- 		rc = bnxt_close(dev);
-@@ -16696,7 +16701,7 @@ static int bnxt_suspend(struct device *device)
- 	bnxt_ptp_clear(bp);
- 	pci_disable_device(bp->pdev);
- 	bnxt_free_ctx_mem(bp, false);
--	rtnl_unlock();
-+	netdev_unlock(dev);
- 	return rc;
- }
- 
-@@ -16706,7 +16711,7 @@ static int bnxt_resume(struct device *device)
- 	struct bnxt *bp = netdev_priv(dev);
- 	int rc = 0;
- 
--	rtnl_lock();
-+	netdev_lock(dev);
- 	rc = pci_enable_device(bp->pdev);
- 	if (rc) {
- 		netdev_err(dev, "Cannot re-enable PCI device during resume, err = %d\n",
-@@ -16749,7 +16754,7 @@ static int bnxt_resume(struct device *device)
- 	}
- 
- resume_exit:
--	rtnl_unlock();
-+	netdev_unlock(bp->dev);
- 	bnxt_ulp_start(bp, rc);
- 	if (!rc)
- 		bnxt_reenable_sriov(bp);
-@@ -16784,7 +16789,7 @@ static pci_ers_result_t bnxt_io_error_detected(struct pci_dev *pdev,
- 
- 	bnxt_ulp_stop(bp);
- 
--	rtnl_lock();
-+	netdev_lock(netdev);
- 	netif_device_detach(netdev);
- 
- 	if (test_and_set_bit(BNXT_STATE_IN_FW_RESET, &bp->state)) {
-@@ -16793,7 +16798,7 @@ static pci_ers_result_t bnxt_io_error_detected(struct pci_dev *pdev,
- 	}
- 
- 	if (abort || state == pci_channel_io_perm_failure) {
--		rtnl_unlock();
-+		netdev_unlock(netdev);
- 		return PCI_ERS_RESULT_DISCONNECT;
- 	}
- 
-@@ -16812,7 +16817,7 @@ static pci_ers_result_t bnxt_io_error_detected(struct pci_dev *pdev,
- 	if (pci_is_enabled(pdev))
- 		pci_disable_device(pdev);
- 	bnxt_free_ctx_mem(bp, false);
--	rtnl_unlock();
-+	netdev_unlock(netdev);
- 
- 	/* Request a slot slot reset. */
- 	return PCI_ERS_RESULT_NEED_RESET;
-@@ -16842,7 +16847,7 @@ static pci_ers_result_t bnxt_io_slot_reset(struct pci_dev *pdev)
- 	    test_bit(BNXT_STATE_PCI_CHANNEL_IO_FROZEN, &bp->state))
- 		msleep(900);
- 
--	rtnl_lock();
-+	netdev_lock(netdev);
- 
- 	if (pci_enable_device(pdev)) {
- 		dev_err(&pdev->dev,
-@@ -16897,7 +16902,7 @@ static pci_ers_result_t bnxt_io_slot_reset(struct pci_dev *pdev)
- reset_exit:
- 	clear_bit(BNXT_STATE_IN_FW_RESET, &bp->state);
- 	bnxt_clear_reservations(bp, true);
--	rtnl_unlock();
-+	netdev_unlock(netdev);
- 
- 	return result;
- }
-@@ -16916,7 +16921,7 @@ static void bnxt_io_resume(struct pci_dev *pdev)
- 	int err;
- 
- 	netdev_info(bp->dev, "PCI Slot Resume\n");
--	rtnl_lock();
-+	netdev_lock(netdev);
- 
- 	err = bnxt_hwrm_func_qcaps(bp);
- 	if (!err) {
-@@ -16929,7 +16934,7 @@ static void bnxt_io_resume(struct pci_dev *pdev)
- 	if (!err)
- 		netif_device_attach(netdev);
- 
--	rtnl_unlock();
-+	netdev_unlock(netdev);
- 	bnxt_ulp_start(bp, err);
- 	if (!err)
- 		bnxt_reenable_sriov(bp);
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-index ef8288fd68f4..b06fcddfc81c 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-@@ -439,14 +439,17 @@ static int bnxt_dl_reload_down(struct devlink *dl, bool netns_change,
- 	case DEVLINK_RELOAD_ACTION_DRIVER_REINIT: {
- 		bnxt_ulp_stop(bp);
- 		rtnl_lock();
-+		netdev_lock(bp->dev);
- 		if (bnxt_sriov_cfg(bp)) {
- 			NL_SET_ERR_MSG_MOD(extack,
- 					   "reload is unsupported while VFs are allocated or being configured");
-+			netdev_unlock(bp->dev);
- 			rtnl_unlock();
- 			bnxt_ulp_start(bp, 0);
- 			return -EOPNOTSUPP;
- 		}
- 		if (bp->dev->reg_state == NETREG_UNREGISTERED) {
-+			netdev_unlock(bp->dev);
- 			rtnl_unlock();
- 			bnxt_ulp_start(bp, 0);
- 			return -ENODEV;
-@@ -459,6 +462,7 @@ static int bnxt_dl_reload_down(struct devlink *dl, bool netns_change,
- 			NL_SET_ERR_MSG_MOD(extack, "Failed to deregister");
- 			if (netif_running(bp->dev))
- 				dev_close(bp->dev);
-+			netdev_unlock(bp->dev);
- 			rtnl_unlock();
- 			break;
- 		}
-@@ -479,7 +483,9 @@ static int bnxt_dl_reload_down(struct devlink *dl, bool netns_change,
- 			return -EPERM;
- 		}
- 		rtnl_lock();
-+		netdev_lock(bp->dev);
- 		if (bp->dev->reg_state == NETREG_UNREGISTERED) {
-+			netdev_unlock(bp->dev);
- 			rtnl_unlock();
- 			return -ENODEV;
- 		}
-@@ -493,6 +499,7 @@ static int bnxt_dl_reload_down(struct devlink *dl, bool netns_change,
- 		if (rc) {
- 			NL_SET_ERR_MSG_MOD(extack, "Failed to activate firmware");
- 			clear_bit(BNXT_STATE_FW_ACTIVATE, &bp->state);
-+			netdev_unlock(bp->dev);
- 			rtnl_unlock();
- 		}
- 		break;
-@@ -568,7 +575,9 @@ static int bnxt_dl_reload_up(struct devlink *dl, enum devlink_reload_action acti
- 		}
- 		*actions_performed |= BIT(action);
- 	} else if (netif_running(bp->dev)) {
-+		netdev_lock(bp->dev);
- 		dev_close(bp->dev);
-+		netdev_unlock(bp->dev);
- 	}
- 	rtnl_unlock();
- 	if (action == DEVLINK_RELOAD_ACTION_DRIVER_REINIT)
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
-index 12b6ed51fd88..5ddddd89052f 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
-@@ -946,7 +946,9 @@ void bnxt_sriov_disable(struct bnxt *bp)
- 
- 	/* Reclaim all resources for the PF. */
- 	rtnl_lock();
-+	netdev_lock(bp->dev);
- 	bnxt_restore_pf_fw_resources(bp);
-+	netdev_unlock(bp->dev);
- 	rtnl_unlock();
- }
- 
-@@ -956,17 +958,21 @@ int bnxt_sriov_configure(struct pci_dev *pdev, int num_vfs)
- 	struct bnxt *bp = netdev_priv(dev);
- 
- 	rtnl_lock();
-+	netdev_lock(dev);
- 	if (!netif_running(dev)) {
- 		netdev_warn(dev, "Reject SRIOV config request since if is down!\n");
-+		netdev_unlock(dev);
- 		rtnl_unlock();
- 		return 0;
- 	}
- 	if (test_bit(BNXT_STATE_IN_FW_RESET, &bp->state)) {
- 		netdev_warn(dev, "Reject SRIOV config request when FW reset is in progress\n");
-+		netdev_unlock(dev);
- 		rtnl_unlock();
- 		return 0;
- 	}
- 	bp->sriov_cfg = true;
-+	netdev_unlock(dev);
- 	rtnl_unlock();
- 
- 	if (pci_vfs_assigned(bp->pdev)) {
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-index e4a7f37036ed..a8e930d5dbb0 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-@@ -112,7 +112,7 @@ int bnxt_register_dev(struct bnxt_en_dev *edev,
- 	struct bnxt_ulp *ulp;
- 	int rc = 0;
- 
--	rtnl_lock();
-+	netdev_lock(dev);
- 	mutex_lock(&edev->en_dev_lock);
- 	if (!bp->irq_tbl) {
- 		rc = -ENODEV;
-@@ -138,7 +138,7 @@ int bnxt_register_dev(struct bnxt_en_dev *edev,
- 	edev->flags |= BNXT_EN_FLAG_MSIX_REQUESTED;
- exit:
- 	mutex_unlock(&edev->en_dev_lock);
--	rtnl_unlock();
-+	netdev_unlock(dev);
- 	return rc;
- }
- EXPORT_SYMBOL(bnxt_register_dev);
-@@ -151,7 +151,7 @@ void bnxt_unregister_dev(struct bnxt_en_dev *edev)
- 	int i = 0;
- 
- 	ulp = edev->ulp_tbl;
--	rtnl_lock();
-+	netdev_lock(dev);
- 	mutex_lock(&edev->en_dev_lock);
- 	if (ulp->msix_requested)
- 		edev->flags &= ~BNXT_EN_FLAG_MSIX_REQUESTED;
-@@ -169,7 +169,7 @@ void bnxt_unregister_dev(struct bnxt_en_dev *edev)
- 		i++;
- 	}
- 	mutex_unlock(&edev->en_dev_lock);
--	rtnl_unlock();
-+	netdev_unlock(dev);
- 	return;
- }
- EXPORT_SYMBOL(bnxt_unregister_dev);
-@@ -309,12 +309,14 @@ void bnxt_ulp_irq_stop(struct bnxt *bp)
- 		if (!ulp->msix_requested)
- 			return;
- 
--		ops = rtnl_dereference(ulp->ulp_ops);
-+		netdev_lock(bp->dev);
-+		ops = rcu_dereference(ulp->ulp_ops);
- 		if (!ops || !ops->ulp_irq_stop)
- 			return;
- 		if (test_bit(BNXT_STATE_FW_RESET_DET, &bp->state))
- 			reset = true;
- 		ops->ulp_irq_stop(ulp->handle, reset);
-+		netdev_unlock(bp->dev);
- 	}
- }
- 
-@@ -333,7 +335,8 @@ void bnxt_ulp_irq_restart(struct bnxt *bp, int err)
- 		if (!ulp->msix_requested)
- 			return;
- 
--		ops = rtnl_dereference(ulp->ulp_ops);
-+		netdev_lock(bp->dev);
-+		ops = rcu_dereference(ulp->ulp_ops);
- 		if (!ops || !ops->ulp_irq_restart)
- 			return;
- 
-@@ -345,6 +348,7 @@ void bnxt_ulp_irq_restart(struct bnxt *bp, int err)
- 			bnxt_fill_msix_vecs(bp, ent);
- 		}
- 		ops->ulp_irq_restart(ulp->handle, ent);
-+		netdev_unlock(bp->dev);
- 		kfree(ent);
- 	}
- }
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_vfr.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_vfr.c
-index 1467b94a6427..619f0844e778 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_vfr.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_vfr.c
-@@ -257,8 +257,7 @@ bool bnxt_dev_is_vf_rep(struct net_device *dev)
- 
- /* Called when the parent PF interface is closed:
-  * As the mode transition from SWITCHDEV to LEGACY
-- * happens under the rtnl_lock() this routine is safe
-- * under the rtnl_lock()
-+ * happens under the netdev instance lock this routine is safe
-  */
- void bnxt_vf_reps_close(struct bnxt *bp)
- {
-@@ -278,8 +277,7 @@ void bnxt_vf_reps_close(struct bnxt *bp)
- 
- /* Called when the parent PF interface is opened (re-opened):
-  * As the mode transition from SWITCHDEV to LEGACY
-- * happen under the rtnl_lock() this routine is safe
-- * under the rtnl_lock()
-+ * happen under the netdev instance lock this routine is safe
-  */
- void bnxt_vf_reps_open(struct bnxt *bp)
- {
-@@ -348,7 +346,7 @@ void bnxt_vf_reps_destroy(struct bnxt *bp)
- 	/* Ensure that parent PF's and VF-reps' RX/TX has been quiesced
- 	 * before proceeding with VF-rep cleanup.
- 	 */
--	rtnl_lock();
-+	netdev_lock(bp->dev);
- 	if (netif_running(bp->dev)) {
- 		bnxt_close_nic(bp, false, false);
- 		closed = true;
-@@ -365,10 +363,10 @@ void bnxt_vf_reps_destroy(struct bnxt *bp)
- 		bnxt_open_nic(bp, false, false);
- 		bp->eswitch_mode = DEVLINK_ESWITCH_MODE_SWITCHDEV;
- 	}
--	rtnl_unlock();
-+	netdev_unlock(bp->dev);
- 
--	/* Need to call vf_reps_destroy() outside of rntl_lock
--	 * as unregister_netdev takes rtnl_lock
-+	/* Need to call vf_reps_destroy() outside of netdev instance lock
-+	 * as unregister_netdev takes it
- 	 */
- 	__bnxt_vf_reps_destroy(bp);
- }
-@@ -376,7 +374,7 @@ void bnxt_vf_reps_destroy(struct bnxt *bp)
- /* Free the VF-Reps in firmware, during firmware hot-reset processing.
-  * Note that the VF-Rep netdevs are still active (not unregistered) during
-  * this process. As the mode transition from SWITCHDEV to LEGACY happens
-- * under the rtnl_lock() this routine is safe under the rtnl_lock().
-+ * under the netdev instance lock this routine is safe.
-  */
- void bnxt_vf_reps_free(struct bnxt *bp)
- {
-@@ -413,7 +411,7 @@ static int bnxt_alloc_vf_rep(struct bnxt *bp, struct bnxt_vf_rep *vf_rep,
- /* Allocate the VF-Reps in firmware, during firmware hot-reset processing.
-  * Note that the VF-Rep netdevs are still active (not unregistered) during
-  * this process. As the mode transition from SWITCHDEV to LEGACY happens
-- * under the rtnl_lock() this routine is safe under the rtnl_lock().
-+ * under the netdev instance lock this routine is safe.
-  */
- int bnxt_vf_reps_alloc(struct bnxt *bp)
- {
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-index e6c64e4bd66c..0caf6e9bccb8 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-@@ -382,13 +382,14 @@ int bnxt_xdp_xmit(struct net_device *dev, int num_frames,
- 	return nxmit;
- }
- 
--/* Under rtnl_lock */
- static int bnxt_xdp_set(struct bnxt *bp, struct bpf_prog *prog)
- {
- 	struct net_device *dev = bp->dev;
- 	int tx_xdp = 0, tx_cp, rc, tc;
- 	struct bpf_prog *old;
- 
-+	netdev_assert_locked(dev);
-+
- 	if (prog && !prog->aux->xdp_has_frags &&
- 	    bp->dev->mtu > BNXT_MAX_PAGE_MODE_MTU) {
- 		netdev_warn(dev, "MTU %d larger than %d without XDP frag support.\n",
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 59bbe189d542..422f8b5fe357 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -2736,6 +2736,11 @@ static inline void netdev_lock(struct net_device *dev)
- 	mutex_lock(&dev->lock);
- }
- 
-+static inline bool netdev_trylock(struct net_device *dev)
-+{
-+	return mutex_trylock(&dev->lock);
-+}
-+
- static inline void netdev_unlock(struct net_device *dev)
- {
- 	mutex_unlock(&dev->lock);
--- 
-2.48.1
-
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
