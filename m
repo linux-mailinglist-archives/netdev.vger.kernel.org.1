@@ -1,73 +1,75 @@
-Return-Path: <netdev+bounces-170005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F201A46D1D
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 22:11:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FE96A46D1E
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 22:11:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 241E31887C09
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 21:11:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF1E61887F92
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 21:11:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86EB0257438;
-	Wed, 26 Feb 2025 21:11:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADDD725A2AB;
+	Wed, 26 Feb 2025 21:11:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 707B52755EE
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 21:11:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7703257440
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 21:11:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740604272; cv=none; b=AzbelKETN2T3oyGk/tP5wO/pDAt+RL1kEloKMG8UpyQT5gGNjSxqe88xC50paC7va+xJ7diH61FXgenchwBD3h/FrrBodRrI6mCT3dq3EJZWS+4WcqriKjBYLJlIPMe2IimBvmAcpMENltRVEvniP+oc6fu+5vuKgBPBQSidfNA=
+	t=1740604273; cv=none; b=TG71b3x6Lxf206IU9EqEf0vUx90Syk/6WzSO+11sONFcBYiVwA7NJIvgK/MOmEVYwP1zV3C1yb++IPdI8is9AgWo9SErRmMSGS7wgTqjimOpiP/dBsZiM9cmETmp46iDC7AqadKX5h1jE1b7mKuowFYiWkIUWNnPRua8a3GyI+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740604272; c=relaxed/simple;
-	bh=O6ZRols8i++Q7AH44u2ngyX5JjMhrigPjm0yveyY098=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NQYoFzsA1BLvIkLzTy0QynWaEYI19Rg1MqBwKd+DxPnu7GBXfbtmsVAZILSBxP7AfbErAumfA982S+eHGwrbETiIibJD+VvZiMBMO6dIBjGFvWZeNZTQ0RA8dITv8tg9WVmuDMZMWvigTAkoQlgSlvSVba8GHF4j7GK36QFTPMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.171
+	s=arc-20240116; t=1740604273; c=relaxed/simple;
+	bh=xlgbDJXDGLwzfjnEKxSuAGdMI572+pIRIoYrWpAd1EA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=n9kyp1wkuR6Cl7e0r6o8ixeBecqOaDLIZFzVxRM//3Ucs4LyhWZZaAROCyEbaqDpNUmVUVWHE19Au5r9D/8VIbSRD6KkKuMiSFDsKryG5wOkh8s6MA03t+3LmjIZ4d9wwPiD+HbQrbebSq0uFf67CWvvbaDKt6i8KXOgM8K/ukw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-22339936bbfso3199825ad.1
-        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 13:11:10 -0800 (PST)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-220c92c857aso5045885ad.0
+        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 13:11:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740604269; x=1741209069;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=edkZtQWijvR/AUUBSWXUM1st3kceT1crnMrwxWrSsBs=;
-        b=WkKUR1sb6lLO+mg9sbathLZYDsT7jMtIAzVb7q6Wg/2OavA7ahZgFQlwgTiHbcphJk
-         rt8xD7Tc+kpYUIsgf1Xc4VCyDo3NYcZmPv3lwrCSTp7fmYbsoyqMUqMiMFKIE1/oh5Wo
-         VrCUbz5RztDaVdrd/LEcfCPHXpwWtYgJOAoR6Mk241wCFTurMw4tKX7zOYx+rnGnQcH4
-         KtY/jBQENT3V771F6nr6eQtiGgAOThL6A7hiKoM7uXlBWVA5tdIGVViqU2ul+VcD9s0U
-         1eBF8QNRxbIoLMYPTmW/xp63NJ+k7CttZeOAoVTMBIklBjjgzMUUt+kAEDY0BWAdKFxg
-         5sLA==
-X-Gm-Message-State: AOJu0Yx9irjaUfhwVb1zJdonmD0eODX6DO3Rak39VXJf+DGOQJO84+rp
-	pxAGWDlGPkhooSpuf6iMdTcrxQwsQkIXsVtnSviorx/+tM3bL7Oeqj7q
-X-Gm-Gg: ASbGncvQNnjbDIskVpZeVITSWfqu+utjDkaGZ7f01+GkDTunQE3EdatVKSg5r9mDxel
-	+FCp5FjwtNKhAamnzyHj1zHLV3MClSZZr+G8ziMugU7SARLM4X3KHHvkSNjiw6qYfMOcDl1lZAB
-	EpKoN8lt7833NnvEx10tuqfSAJmpZKD8n/h4t2CnuNXtlGJRwj1vmMeccknreoqHdThbjbjhydD
-	nSFlQaqbekYsEQI8dlQVcZmwV2qkmGaw56ec7iZ24LK1qzJ/J5Rwk3STPAVDbq2n1pztztR3+wu
-	P/gj1ejJcDj0olbzW+qqBG/uTQ==
-X-Google-Smtp-Source: AGHT+IGJ1QHuENOLCBNVx4dsfSHbj/v3To3ngY9PGE5k/Nxi5z539ed4GrMvcmciwHBt293gsaoYjw==
-X-Received: by 2002:a05:6a00:1955:b0:732:564e:1ec6 with SMTP id d2e1a72fcca58-73426d9915cmr33323486b3a.22.1740604269303;
-        Wed, 26 Feb 2025 13:11:09 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740604271; x=1741209071;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZrQGQGpkhMZEwiGxI0nqs9TuNMdTxCrX+2AGTrWSNYo=;
+        b=Utpz5+FUIByUDUFuHbXpDw2lMzwq9eEpYeCdNGC32PQN1P4Lbn6zhdDU6aV4h3twy/
+         OyQohP8qKmBs0YD6fbYutMbX07ubiuj3ZYxhyHOR2KS3ooeqY9zxQxBB7tnyjFRIGxf+
+         k+02zeXoMee7pZGWLwYeKIzdvfD6HFaZlBX4QdjjUlRDN9DwzH6VWs0gqwf/4aZVk4uL
+         cfMb9ZOw9vjgOkZskOcnqU98X1ikVJvssQpZurKaOc3A2q7TYBBS3ZBn6t4ZuLUb6j1s
+         bbVRb07fq3iLcWnhh4uOyK2KwL+ITykZ9DqMoT6u+m127anIjMIoWh5jDRkRaN9NRh9i
+         NuNQ==
+X-Gm-Message-State: AOJu0YzzvWr6HQsjqGC6KpdMIxnA/RodK3zgxrRBH2lnAlNiUfCOGzWE
+	EKG+KvUrwEWHQg9OCierFVgPCT2h2ZfRgirEJrLn53nBhubKSivHqaHv
+X-Gm-Gg: ASbGnct3DoRnaTW7MbW8qXl5oDnMnr3fk0yn4cApYJ89D/kFDh3BBJaLJ4WqZYuaQrl
+	okWvCuuRkN0Dr9PhNijklII0dPcYTKnFoOzsQDD7gmnG19SCDLzlIvQsP6K2XZL/ThY9uUKqiGR
+	9GGaj8dXalegjQYrbLTb8bx3zwzqlATU9oXDUwRsgFzg1sIA6E4vEwH+zfWzvoXR9oP+5uakxNI
+	Yjg0ksQp0twUlYanGOeZDJT4SLHihkqkARGwEVi3XpflV8F58BzAHW6cBjYOVGIhrt865CsfZVS
+	AjuwL6mQ25HQQLvt+KywTg/0xQ==
+X-Google-Smtp-Source: AGHT+IGi6vNtB6wcF/u+FJXWbVvG+wgYwEFuIe3w85nfme2nbINsOn7fr/+4KX/jDFX1w25ZaQBldw==
+X-Received: by 2002:a17:902:ef81:b0:223:4dab:97e1 with SMTP id d9443c01a7336-2234dab9800mr5467085ad.24.1740604270522;
+        Wed, 26 Feb 2025 13:11:10 -0800 (PST)
 Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-7347a81ea39sm4139247b3a.147.2025.02.26.13.11.08
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-7347a7f9b8asm4131998b3a.103.2025.02.26.13.11.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Feb 2025 13:11:08 -0800 (PST)
+        Wed, 26 Feb 2025 13:11:10 -0800 (PST)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	Saeed Mahameed <saeed@kernel.org>,
-	David Wei <dw@davidwei.uk>
-Subject: [PATCH net-next v8 00/12] net: Hold netdev instance lock during ndo operations
-Date: Wed, 26 Feb 2025 13:10:56 -0800
-Message-ID: <20250226211108.387727-1-sdf@fomichev.me>
+	Saeed Mahameed <saeed@kernel.org>
+Subject: [PATCH net-next v8 01/12] net: hold netdev instance lock during ndo_open/ndo_stop
+Date: Wed, 26 Feb 2025 13:10:57 -0800
+Message-ID: <20250226211108.387727-2-sdf@fomichev.me>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250226211108.387727-1-sdf@fomichev.me>
+References: <20250226211108.387727-1-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,144 +78,267 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-As the gradual purging of rtnl continues, start grabbing netdev
-instance lock in more places so we can get to the state where
-most paths are working without rtnl. Start with requiring the
-drivers that use shaper api (and later queue mgmt api) to work
-with both rtnl and netdev instance lock. Eventually we might
-attempt to drop rtnl. This mostly affects iavf, gve, bnxt and
-netdev sim (as the drivers that implement shaper/queue mgmt)
-so those drivers are converted in the process.
+For the drivers that use shaper API, switch to the mode where
+core stack holds the netdev lock. This affects two drivers:
 
-call_netdevice_notifiers locking is very inconsistent and might need
-a separate follow up. Some notified events are covered by the
-instance lock, some are not, which might complicate the driver
-expectations.
+* iavf - already grabs netdev lock in ndo_open/ndo_stop, so mostly
+         remove these
+* netdevsim - switch to _locked APIs to avoid deadlock
 
-Changes since v7:
-- fix AA deadlock detection in netdev_lock_cmp_fn (Jakub)
+iavf_close diff is a bit confusing, the existing call looks like this:
+  iavf_close() {
+    netdev_lock()
+    ..
+    netdev_unlock()
+    wait_event_timeout(down_waitqueue)
+  }
 
-Changes since v6:
-- rebase on top of net-next
+I change it to the following:
+  netdev_lock()
+  iavf_close() {
+    ..
+    netdev_unlock()
+    wait_event_timeout(down_waitqueue)
+    netdev_lock() // reusing this lock call
+  }
+  netdev_unlock()
 
-Changes since v5:
-- fix comment in bnxt_lock_sp (Michael)
-- add netdev_lock/unlock around GVE suspend/resume (Sabrina)
-- grab netdev lock around ethtool_ops->reset in cmis_fw_update_reset (Sabrina)
-
-Changes since v4:
-- reword documentation about rtnl_lock and instance lock relation
-  (Jakub)
-- do s/RTNL/rtnl_lock/ in the documentation (Jakub)
-- mention dev_xxx/netif_xxx distinction (Paolo)
-- add new patch to add request_ops_lock opt-in (Jakub)
-- drop patch that adds shaper API to dummy (Jakub)
-- drop () around dev in netdev_need_ops_lock
-
-Changes since v3:
-- add instance lock to netdev_lockdep_set_classes,
-  move lock_set_cmp_fn to happen after set_class (NIPA)
-
-Changes since v2:
-- new patch to replace dev_addr_sem with instance lock (forwarding tests)
-- CONFIG_LOCKDEP around netdev_lock_cmp_fn (Jakub)
-- remove netif_device_present check from dev_setup_tc (bpf_offload.py)
-- reorder bpf_devs_locks and instance lock ordering in bpf map
-  offload (bpf_offload.py)
-
-Changes since v1:
-- fix netdev_set_mtu_ext_locked in the wrong place (lkp@intel.com)
-- add missing depend on CONFIG_NET_SHAPER for dummy device
-  (lkp@intel.com)
-  - not sure we need to apply dummy device patch..
-- need_netdev_ops_lock -> netdev_need_ops_lock (Jakub)
-- remove netdev_assert_locked near napi_xxx_locked calls (Jakub)
-- fix netdev_lock_cmp_fn comment and line length (Jakub)
-- fix kdoc style of dev_api.c routines (Jakub)
-- reflow dev_setup_tc to avoid indent (Jakub)
-- keep tc_can_offload checks outside of dev_setup_tc (Jakub)
-
-Changes since RFC:
-- other control paths are protected
-- bntx has been converted to mostly depend on netdev instance lock
+Since I'm reusing existing netdev_lock call, so it looks like I only
+add netdev_unlock.
 
 Cc: Saeed Mahameed <saeed@kernel.org>
-Cc: David Wei <dw@davidwei.uk>
+Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+---
+ drivers/net/ethernet/intel/iavf/iavf_main.c | 14 ++++++-------
+ drivers/net/netdevsim/netdev.c              | 14 ++++++++-----
+ include/linux/netdevice.h                   | 23 +++++++++++++++++++++
+ net/core/dev.c                              | 12 +++++++++++
+ net/core/dev.h                              |  6 ++++--
+ 5 files changed, 54 insertions(+), 15 deletions(-)
 
-Jakub Kicinski (1):
-  net: ethtool: try to protect all callback with netdev instance lock
-
-Stanislav Fomichev (11):
-  net: hold netdev instance lock during ndo_open/ndo_stop
-  net: hold netdev instance lock during ndo_setup_tc
-  net: hold netdev instance lock during queue operations
-  net: hold netdev instance lock during rtnetlink operations
-  net: hold netdev instance lock during ioctl operations
-  net: hold netdev instance lock during sysfs operations
-  net: hold netdev instance lock during ndo_bpf
-  net: replace dev_addr_sem with netdev instance lock
-  net: add option to request netdev instance lock
-  docs: net: document new locking reality
-  eth: bnxt: remove most dependencies on RTNL
-
- Documentation/networking/netdevices.rst       |  65 +++-
- drivers/net/bonding/bond_main.c               |  16 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 133 ++++----
- .../net/ethernet/broadcom/bnxt/bnxt_devlink.c |   9 +
- .../net/ethernet/broadcom/bnxt/bnxt_sriov.c   |   6 +
- drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c |  16 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_vfr.c |  18 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |   3 +-
- drivers/net/ethernet/google/gve/gve_main.c    |  12 +-
- drivers/net/ethernet/google/gve/gve_utils.c   |   6 +-
- drivers/net/ethernet/intel/iavf/iavf_main.c   |  16 +-
- drivers/net/netdevsim/ethtool.c               |   2 -
- drivers/net/netdevsim/netdev.c                |  39 ++-
- drivers/net/tap.c                             |   2 +-
- drivers/net/tun.c                             |   2 +-
- include/linux/netdevice.h                     |  90 ++++-
- kernel/bpf/offload.c                          |   6 +-
- net/8021q/vlan_dev.c                          |   4 +-
- net/core/Makefile                             |   2 +-
- net/core/dev.c                                | 284 ++++++----------
- net/core/dev.h                                |  22 +-
- net/core/dev_api.c                            | 318 ++++++++++++++++++
- net/core/dev_ioctl.c                          |  69 ++--
- net/core/net-sysfs.c                          |   9 +-
- net/core/netdev_rx_queue.c                    |   5 +
- net/core/rtnetlink.c                          |  50 ++-
- net/dsa/conduit.c                             |  16 +-
- net/dsa/user.c                                |   5 +-
- net/ethtool/cabletest.c                       |  20 +-
- net/ethtool/cmis_fw_update.c                  |   7 +-
- net/ethtool/features.c                        |   6 +-
- net/ethtool/ioctl.c                           |   6 +
- net/ethtool/module.c                          |   8 +-
- net/ethtool/netlink.c                         |  12 +
- net/ethtool/phy.c                             |  20 +-
- net/ethtool/rss.c                             |   2 +
- net/ethtool/tsinfo.c                          |   9 +-
- net/netfilter/nf_flow_table_offload.c         |   2 +-
- net/netfilter/nf_tables_offload.c             |   2 +-
- net/sched/cls_api.c                           |   2 +-
- net/sched/sch_api.c                           |   8 +-
- net/sched/sch_cbs.c                           |   8 +-
- net/sched/sch_etf.c                           |   8 +-
- net/sched/sch_ets.c                           |   4 +-
- net/sched/sch_fifo.c                          |   4 +-
- net/sched/sch_gred.c                          |   2 +-
- net/sched/sch_htb.c                           |   2 +-
- net/sched/sch_mq.c                            |   2 +-
- net/sched/sch_mqprio.c                        |   6 +-
- net/sched/sch_prio.c                          |   2 +-
- net/sched/sch_red.c                           |   5 +-
- net/sched/sch_taprio.c                        |  17 +-
- net/sched/sch_tbf.c                           |   4 +-
- net/xdp/xsk.c                                 |   3 +
- net/xdp/xsk_buff_pool.c                       |   2 +
- 55 files changed, 934 insertions(+), 464 deletions(-)
- create mode 100644 net/core/dev_api.c
-
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
+index 4c29739780bd..4cc8c55b8f95 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_main.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+@@ -4558,22 +4558,21 @@ static int iavf_open(struct net_device *netdev)
+ 	struct iavf_adapter *adapter = netdev_priv(netdev);
+ 	int err;
+ 
++	netdev_assert_locked(netdev);
++
+ 	if (adapter->flags & IAVF_FLAG_PF_COMMS_FAILED) {
+ 		dev_err(&adapter->pdev->dev, "Unable to open device due to PF driver failure.\n");
+ 		return -EIO;
+ 	}
+ 
+-	netdev_lock(netdev);
+ 	while (!mutex_trylock(&adapter->crit_lock)) {
+ 		/* If we are in __IAVF_INIT_CONFIG_ADAPTER state the crit_lock
+ 		 * is already taken and iavf_open is called from an upper
+ 		 * device's notifier reacting on NETDEV_REGISTER event.
+ 		 * We have to leave here to avoid dead lock.
+ 		 */
+-		if (adapter->state == __IAVF_INIT_CONFIG_ADAPTER) {
+-			netdev_unlock(netdev);
++		if (adapter->state == __IAVF_INIT_CONFIG_ADAPTER)
+ 			return -EBUSY;
+-		}
+ 
+ 		usleep_range(500, 1000);
+ 	}
+@@ -4622,7 +4621,6 @@ static int iavf_open(struct net_device *netdev)
+ 	iavf_irq_enable(adapter, true);
+ 
+ 	mutex_unlock(&adapter->crit_lock);
+-	netdev_unlock(netdev);
+ 
+ 	return 0;
+ 
+@@ -4635,7 +4633,6 @@ static int iavf_open(struct net_device *netdev)
+ 	iavf_free_all_tx_resources(adapter);
+ err_unlock:
+ 	mutex_unlock(&adapter->crit_lock);
+-	netdev_unlock(netdev);
+ 
+ 	return err;
+ }
+@@ -4657,12 +4654,12 @@ static int iavf_close(struct net_device *netdev)
+ 	u64 aq_to_restore;
+ 	int status;
+ 
+-	netdev_lock(netdev);
++	netdev_assert_locked(netdev);
++
+ 	mutex_lock(&adapter->crit_lock);
+ 
+ 	if (adapter->state <= __IAVF_DOWN_PENDING) {
+ 		mutex_unlock(&adapter->crit_lock);
+-		netdev_unlock(netdev);
+ 		return 0;
+ 	}
+ 
+@@ -4715,6 +4712,7 @@ static int iavf_close(struct net_device *netdev)
+ 	if (!status)
+ 		netdev_warn(netdev, "Device resources not yet released\n");
+ 
++	netdev_lock(netdev);
+ 	mutex_lock(&adapter->crit_lock);
+ 	adapter->aq_required |= aq_to_restore;
+ 	mutex_unlock(&adapter->crit_lock);
+diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+index a41dc79e9c2e..aaa3b58e2e3e 100644
+--- a/drivers/net/netdevsim/netdev.c
++++ b/drivers/net/netdevsim/netdev.c
+@@ -402,7 +402,7 @@ static int nsim_init_napi(struct netdevsim *ns)
+ 	for (i = 0; i < dev->num_rx_queues; i++) {
+ 		rq = ns->rq[i];
+ 
+-		netif_napi_add_config(dev, &rq->napi, nsim_poll, i);
++		netif_napi_add_config_locked(dev, &rq->napi, nsim_poll, i);
+ 	}
+ 
+ 	for (i = 0; i < dev->num_rx_queues; i++) {
+@@ -422,7 +422,7 @@ static int nsim_init_napi(struct netdevsim *ns)
+ 	}
+ 
+ 	for (i = 0; i < dev->num_rx_queues; i++)
+-		__netif_napi_del(&ns->rq[i]->napi);
++		__netif_napi_del_locked(&ns->rq[i]->napi);
+ 
+ 	return err;
+ }
+@@ -452,7 +452,7 @@ static void nsim_enable_napi(struct netdevsim *ns)
+ 		struct nsim_rq *rq = ns->rq[i];
+ 
+ 		netif_queue_set_napi(dev, i, NETDEV_QUEUE_TYPE_RX, &rq->napi);
+-		napi_enable(&rq->napi);
++		napi_enable_locked(&rq->napi);
+ 	}
+ }
+ 
+@@ -461,6 +461,8 @@ static int nsim_open(struct net_device *dev)
+ 	struct netdevsim *ns = netdev_priv(dev);
+ 	int err;
+ 
++	netdev_assert_locked(dev);
++
+ 	err = nsim_init_napi(ns);
+ 	if (err)
+ 		return err;
+@@ -478,8 +480,8 @@ static void nsim_del_napi(struct netdevsim *ns)
+ 	for (i = 0; i < dev->num_rx_queues; i++) {
+ 		struct nsim_rq *rq = ns->rq[i];
+ 
+-		napi_disable(&rq->napi);
+-		__netif_napi_del(&rq->napi);
++		napi_disable_locked(&rq->napi);
++		__netif_napi_del_locked(&rq->napi);
+ 	}
+ 	synchronize_net();
+ 
+@@ -494,6 +496,8 @@ static int nsim_stop(struct net_device *dev)
+ 	struct netdevsim *ns = netdev_priv(dev);
+ 	struct netdevsim *peer;
+ 
++	netdev_assert_locked(dev);
++
+ 	netif_carrier_off(dev);
+ 	peer = rtnl_dereference(ns->peer);
+ 	if (peer)
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 9a387d456592..d074ad66766e 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -2724,6 +2724,29 @@ static inline void netdev_assert_locked_or_invisible(struct net_device *dev)
+ 		netdev_assert_locked(dev);
+ }
+ 
++static inline bool netdev_need_ops_lock(struct net_device *dev)
++{
++	bool ret = false;
++
++#if IS_ENABLED(CONFIG_NET_SHAPER)
++	ret |= !!dev->netdev_ops->net_shaper_ops;
++#endif
++
++	return ret;
++}
++
++static inline void netdev_lock_ops(struct net_device *dev)
++{
++	if (netdev_need_ops_lock(dev))
++		netdev_lock(dev);
++}
++
++static inline void netdev_unlock_ops(struct net_device *dev)
++{
++	if (netdev_need_ops_lock(dev))
++		netdev_unlock(dev);
++}
++
+ static inline void netif_napi_set_irq_locked(struct napi_struct *napi, int irq)
+ {
+ 	napi->irq = irq;
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 3f525278a871..7b31d826a089 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -1627,6 +1627,8 @@ static int __dev_open(struct net_device *dev, struct netlink_ext_ack *extack)
+ 	if (ret)
+ 		return ret;
+ 
++	netdev_lock_ops(dev);
++
+ 	set_bit(__LINK_STATE_START, &dev->state);
+ 
+ 	if (ops->ndo_validate_addr)
+@@ -1646,6 +1648,8 @@ static int __dev_open(struct net_device *dev, struct netlink_ext_ack *extack)
+ 		add_device_randomness(dev->dev_addr, dev->addr_len);
+ 	}
+ 
++	netdev_unlock_ops(dev);
++
+ 	return ret;
+ }
+ 
+@@ -1716,11 +1720,19 @@ static void __dev_close_many(struct list_head *head)
+ 		 *	We allow it to be called even after a DETACH hot-plug
+ 		 *	event.
+ 		 */
++
++		/* TODO: move the lock up before clearing __LINK_STATE_START.
++		 * Generates spurious lockdep warning.
++		 */
++		netdev_lock_ops(dev);
++
+ 		if (ops->ndo_stop)
+ 			ops->ndo_stop(dev);
+ 
+ 		netif_set_up(dev, false);
+ 		netpoll_poll_enable(dev);
++
++		netdev_unlock_ops(dev);
+ 	}
+ }
+ 
+diff --git a/net/core/dev.h b/net/core/dev.h
+index caa13e431a6b..25bb9d6afbce 100644
+--- a/net/core/dev.h
++++ b/net/core/dev.h
+@@ -134,9 +134,11 @@ static inline void netif_set_up(struct net_device *dev, bool value)
+ 	else
+ 		dev->flags &= ~IFF_UP;
+ 
+-	netdev_lock(dev);
++	if (!netdev_need_ops_lock(dev))
++		netdev_lock(dev);
+ 	dev->up = value;
+-	netdev_unlock(dev);
++	if (!netdev_need_ops_lock(dev))
++		netdev_unlock(dev);
+ }
+ 
+ static inline void netif_set_gso_max_size(struct net_device *dev,
 -- 
 2.48.1
 
