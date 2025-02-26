@@ -1,123 +1,193 @@
-Return-Path: <netdev+bounces-169870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BD20A46142
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 14:49:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CC590A46195
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 15:02:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBC1818976B3
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 13:49:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA07F1887132
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 14:02:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3AE21B1A8;
-	Wed, 26 Feb 2025 13:49:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BA5318DB27;
+	Wed, 26 Feb 2025 14:02:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="AtDrnHJG"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="eDzRA9aG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40774217F5D
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 13:49:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03448192D63;
+	Wed, 26 Feb 2025 14:02:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740577763; cv=none; b=JOpA01Hip4Nd73vtKPCLbHrcX+1ffsqspqv7N8A4GnAR0jY1sAD/8ZALGxsHBeZxOBbgbjFKt599I75C39NQbHIkHwaZqu74/ckszexpkXEXvQWshjIa75dbqWbyO9HyvmVvCDOotHjRcQ9bnw6vNzZM2xueMDD9gTdlhe1kfiQ=
+	t=1740578532; cv=none; b=Dy41ZWtqhlDiJFl5GPOZEiG1H0yPZVm5JqAlCLCPVX/IzxhmHNXNfNCtOxC1Irt6omw8VNwWNFqncMGlEbwRtUZNQeAK77/ygpEVCWXLroe2Fpf+nGyKvL723Wi5rUAbLd4Y1Xfrj66OTJwbrWvhIudhldqgxsj9PhiVu6f0kYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740577763; c=relaxed/simple;
-	bh=7Sjqx+lWiFFlcoTpiTe2+WbeyQkokQywUdjL2faY724=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=fnPnTyG31ymIl7+itLigGSh4QNjsnTEyxaRMMcCF51g5EqpL8I6lBwyoFhxy5Zbc2fAZG6OGGVNdiKBN8EgR45AW4Zd5ct6P7qVr9hDIDik6d26oDGYzukYQbbm6NMK/pdVdt8Sk8lungfnz5otIN8A0IFW16m60zof5EgDO+w4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=AtDrnHJG; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5e033c2f106so8968423a12.3
-        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 05:49:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1740577759; x=1741182559; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6f2oUbpNnWs5FWgzYsSndrQ+qrKeORdGmzd9Kwn/DJU=;
-        b=AtDrnHJGALKkgx4DndQbc70sTkQKVbSkk8iRtM5+5Ti4nKYp1gqgmMwF+MDh+k8ayx
-         2tPHbWgqv2Bdp52ibZS0KWIwN8jM9HfxlFffXh8Gf3Zp1RaW+qbyoBX3p4DQb5OJANM3
-         TyaK+m89Q4WZmf+m6FZQTo5CJzUjM2KZkSBba6lWbg6M2Jn4TSqQNbeVqEpc/083f7G9
-         QvAQsZQKU9J0HDjGJJ/YQVsB7JpMA90cjyyzyj+JJXEDXx/37e23IB65vuBulH/z9WVh
-         sGkUgjSa9EEsrdN7eqznE+fOn30ofWbxo7oPP9aYp8I81r2q2FHLucEysCDr50rRWd8+
-         uQwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740577759; x=1741182559;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6f2oUbpNnWs5FWgzYsSndrQ+qrKeORdGmzd9Kwn/DJU=;
-        b=UzFS+ByfGuHQKu4/vmuCyRChQxYMSnvEE8TB4Gqf2pPMO7+mrT7SqcF8SlZRIjwuKa
-         CVXuv0RkjMY6xC3BNDMuBI6jo6u1zCVxoFa66468QU3ZoDxmyBvTRtQWXEODswVouwNJ
-         btmuh7WSEXgBGZbq//VqbBYWhH1HyF7aK49yZfzMGVcEoFg4J1cWLv5BbYxQYWuYuXrU
-         D8lSqrq2C4qC/cSk7X9QMxdzxPSO7dVgioebclaEJdIh3FM9A0Aad5F1fKGYYGPUPTYb
-         LGgsiAGGrofwNWTlY5F1RxEhtezYQI0C/sog+iHYl7Kfnuuf6Nn0rvvlM2rdNx2ewAJJ
-         EszQ==
-X-Gm-Message-State: AOJu0YzOpmCjGJzRdg//sSBJBfjyS7ZdytqwXhKjptk0tzCiZgdNXKA/
-	YSIUcNFP+qhKgYlvvQ/C1L35JiZhUOhmz2pmPnVu4vbbiDk18YPvUzNHLOjax2Y=
-X-Gm-Gg: ASbGncuMb8jfzy0p8zpLGRMa7C+2x5duwLLA7GT90HX3ASbjGtf7AM55NhNVWHTkRNy
-	8x1EQIov81sLIaG+mHNQeZmkpQOz1QzuiwNSnR1SXnJQKh/iAxszRG7xq1YXlhM0nLkgZqNSLIE
-	Wh7QJjy1rcrPJSjREv8D5njDW5em5+uYXFK3PCdiYIy77OEkvE9nYzTixNp9EdGg/bbUBrjJ0Sa
-	IHVz4hue03pSV3zqJYgKG9dl4vxSSOPNUCfdp1xK7JlMhKQpXHNgzkTvGHKEfEJmAZlqy5WK0g5
-	aTqQSzQEGFdCfDjaoGAVJf69wMsMlbmoih8=
-X-Google-Smtp-Source: AGHT+IF/g6bbTd7C6qwckxi2v5TGUNH2Ooq2NC0xGM9g91hQFRyQNdoBE7TwzGOd8cpZlq0Esto7cA==
-X-Received: by 2002:a05:6402:238f:b0:5e4:9348:72e3 with SMTP id 4fb4d7f45d1cf-5e49348799cmr9524629a12.21.1740577759419;
-        Wed, 26 Feb 2025 05:49:19 -0800 (PST)
-Received: from cloudflare.com ([2a09:bac5:506a:2dc::49:ca])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abed1cd564esm328612266b.21.2025.02.26.05.49.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Feb 2025 05:49:18 -0800 (PST)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org,  bpf@vger.kernel.org,  john.fastabend@gmail.com,
-  zhoufeng.zf@bytedance.com,  zijianzhang@bytedance.com,  Cong Wang
- <cong.wang@bytedance.com>
-Subject: Re: [Patch bpf-next 3/4] skmsg: use bitfields for struct sk_psock
-In-Reply-To: <20250222183057.800800-4-xiyou.wangcong@gmail.com> (Cong Wang's
-	message of "Sat, 22 Feb 2025 10:30:56 -0800")
-References: <20250222183057.800800-1-xiyou.wangcong@gmail.com>
-	<20250222183057.800800-4-xiyou.wangcong@gmail.com>
-Date: Wed, 26 Feb 2025 14:49:17 +0100
-Message-ID: <87ldtsu882.fsf@cloudflare.com>
+	s=arc-20240116; t=1740578532; c=relaxed/simple;
+	bh=fa/1P7ogjNcW9edAeSgAD7fMtt8lrWug2G/rwmhqosI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aKJDG2pM9z0K0aP/Oye2+h1yLM+XjLUjwtfTfji+Umy58Y+t3Utb0QD3Q9TMNkcp++j2IHLmvc/UwwGq4sR1m70rOxyr0yozE3xGV/GMJrhpHuHnFJ7cnMX8fE1z0E3YxqQO30dCLTx5iSVWrLC9MYpvKg78mFVy8/QL2bp9KJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=eDzRA9aG; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=y5HzTLv7sfh35EQ2e6vDNCEEGGk0nP1LY8agEPskJ2I=; b=eDzRA9aG3dT4rI9lZkaMzOrjmZ
+	rv+C9d15o3IJ3+YtPHUnTHtWlK8hAESaVfGfspCo975JDCmV933K8L7yqpkpuIQGH2gWjQG9ewtPV
+	YwtyJzU3OShw94RtyU2yApCNZ8C/kCh0AcduQYQP0CNK74cLRzN1uW2ebUwfOTChvcA102kfx7AkV
+	zH64ql/uIcsoXQDW5Xs9n1hDWlUmHrnGSivSXOOMIsFQ8wDIcooZvfUgY3MlVMeq2m/XgchSRV8a1
+	u2N5xutn/cXHlqVmuQkojsEy8VVnPTrkuSy7U8uE3eSRGSZi3c3GvwSts6+EDiRi/DIdtdbQmc87h
+	4//QnB4A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58138)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tnHz6-0004Pb-13;
+	Wed, 26 Feb 2025 14:02:00 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tnHz3-00078s-0d;
+	Wed, 26 Feb 2025 14:01:57 +0000
+Date: Wed, 26 Feb 2025 14:01:57 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Simon Horman <horms@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>
+Subject: Re: [PATCH net-next v2 09/13] net: phy: phylink: Use phy_caps_lookup
+ for fixed-link configuration
+Message-ID: <Z78e1dmEuQzMER5L@shell.armlinux.org.uk>
+References: <20250226100929.1646454-1-maxime.chevallier@bootlin.com>
+ <20250226100929.1646454-10-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250226100929.1646454-10-maxime.chevallier@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Sat, Feb 22, 2025 at 10:30 AM -08, Cong Wang wrote:
-> From: Cong Wang <cong.wang@bytedance.com>
->
-> psock->eval can only have 4 possible values, make it 8-bit is
-> sufficient.
->
-> psock->redir_ingress is just a boolean, using 1 bit is enough.
->
-> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+Please use a subject line of "net: phylink: " for phylink patches, not
+"net: phy: " which is for phylib.
+
+On Wed, Feb 26, 2025 at 11:09:24AM +0100, Maxime Chevallier wrote:
+> When phylink creates a fixed-link configuration, it finds a matching
+> linkmode to set as the advertised, lp_advertising and supported modes
+> based on the speed and duplex of the fixed link.
+> 
+> Use the newly introduced phy_caps_lookup to get these modes instead of
+> phy_lookup_settings(). This has the side effect that the matched
+> settings and configured linkmodes may now contain several linkmodes (the
+> intersection of supported linkmodes from the phylink settings and the
+> linkmodes that match speed/duplex) instead of the one from
+> phy_lookup_settings().
+> 
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 > ---
->  include/linux/skmsg.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-> index bf28ce9b5fdb..beaf79b2b68b 100644
-> --- a/include/linux/skmsg.h
-> +++ b/include/linux/skmsg.h
-> @@ -85,8 +85,8 @@ struct sk_psock {
->  	struct sock			*sk_redir;
->  	u32				apply_bytes;
->  	u32				cork_bytes;
-> -	u32				eval;
-> -	bool				redir_ingress; /* undefined if sk_redir is null */
-> +	unsigned int			eval : 8;
-> +	unsigned int			redir_ingress : 1; /* undefined if sk_redir is null */
->  	struct sk_msg			*cork;
->  	struct sk_psock_progs		progs;
->  #if IS_ENABLED(CONFIG_BPF_STREAM_PARSER)
+> V1 -> V2: - fixed pl->link_config.lp_advertising setting
+> 
+>  drivers/net/phy/phylink.c | 26 +++++++++++++++-----------
+>  1 file changed, 15 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> index 6c67d5c9b787..63fbf3d8708a 100644
+> --- a/drivers/net/phy/phylink.c
+> +++ b/drivers/net/phy/phylink.c
+> @@ -805,9 +805,10 @@ static int phylink_validate(struct phylink *pl, unsigned long *supported,
+>  static int phylink_parse_fixedlink(struct phylink *pl,
+>  				   const struct fwnode_handle *fwnode)
+>  {
+> +	__ETHTOOL_DECLARE_LINK_MODE_MASK(match) = { 0, };
+>  	__ETHTOOL_DECLARE_LINK_MODE_MASK(mask) = { 0, };
+> +	const struct link_capabilities *c;
+>  	struct fwnode_handle *fixed_node;
+> -	const struct phy_setting *s;
+>  	struct gpio_desc *desc;
+>  	u32 speed;
+>  	int ret;
+> @@ -879,8 +880,10 @@ static int phylink_parse_fixedlink(struct phylink *pl,
+>  	linkmode_copy(pl->link_config.advertising, pl->supported);
+>  	phylink_validate(pl, pl->supported, &pl->link_config);
+>  
+> -	s = phy_lookup_setting(pl->link_config.speed, pl->link_config.duplex,
+> -			       pl->supported, true);
+> +	c = phy_caps_lookup(pl->link_config.speed, pl->link_config.duplex,
+> +			    pl->supported, true);
+> +	if (c)
+> +		linkmode_and(match, pl->supported, c->linkmodes);
 
-Are you doing this bit packing to create a hole big enough to fit
-another u32 introduced in the next patch?
+What's this for? Surely phy_caps_lookup() should not return a link mode
+that wasn't in phy_caps_lookup()'s 3rd argument.
+
+Otherwise...
+
+>  	linkmode_set_bit(ETHTOOL_LINK_MODE_Pause_BIT, mask);
+>  	linkmode_set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT, mask);
+> @@ -889,9 +892,10 @@ static int phylink_parse_fixedlink(struct phylink *pl,
+>  
+>  	phylink_set(pl->supported, MII);
+>  
+> -	if (s) {
+> -		__set_bit(s->bit, pl->supported);
+> -		__set_bit(s->bit, pl->link_config.lp_advertising);
+> +	if (c) {
+> +		linkmode_or(pl->supported, pl->supported, match);
+> +		linkmode_or(pl->link_config.lp_advertising,
+> +			    pl->link_config.lp_advertising, match);
+>  	} else {
+>  		phylink_warn(pl, "fixed link %s duplex %dMbps not recognised\n",
+>  			     pl->link_config.duplex == DUPLEX_FULL ? "full" : "half",
+> @@ -1879,21 +1883,21 @@ static int phylink_register_sfp(struct phylink *pl,
+>  int phylink_set_fixed_link(struct phylink *pl,
+>  			   const struct phylink_link_state *state)
+>  {
+> -	const struct phy_setting *s;
+> +	const struct link_capabilities *c;
+>  	unsigned long *adv;
+>  
+>  	if (pl->cfg_link_an_mode != MLO_AN_PHY || !state ||
+>  	    !test_bit(PHYLINK_DISABLE_STOPPED, &pl->phylink_disable_state))
+>  		return -EINVAL;
+>  
+> -	s = phy_lookup_setting(state->speed, state->duplex,
+> -			       pl->supported, true);
+> -	if (!s)
+> +	c = phy_caps_lookup(state->speed, state->duplex,
+> +			    pl->supported, true);
+> +	if (!c)
+>  		return -EINVAL;
+>  
+>  	adv = pl->link_config.advertising;
+>  	linkmode_zero(adv);
+> -	linkmode_set_bit(s->bit, adv);
+> +	linkmode_and(adv, pl->supported, c->linkmodes);
+
+... this is wrong since this is basically doing the same as the above
+parsing.
+
+I'm not sure why you're generating different code for what is
+essentially the same thing.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
