@@ -1,133 +1,213 @@
-Return-Path: <netdev+bounces-170023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EB9FA46E68
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 23:22:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 130F7A46E8C
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 23:28:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80699169CC7
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 22:22:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96A9B188321F
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 22:29:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C1C425CC67;
-	Wed, 26 Feb 2025 22:21:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDBE225D8E9;
+	Wed, 26 Feb 2025 22:28:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hm1zb0fU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mflsRMg4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D315525CC61;
-	Wed, 26 Feb 2025 22:21:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 235E825D8E1
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 22:28:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740608519; cv=none; b=bpnUrMRbkkG9gUm+0gTbffWeZuKqSGmJqyIenGpMCXUEnBcYZDsdnIdDlcUvwnIMYfIZ3keWrmajezOuP5bfBLELP56TF0Yulia0c2jKDYhWTwS59v3mbA5dsBSU13B9yqqXNEYn3ol9xI2CnEW65+MCMK2Rt1W8qTV0WTq34Z0=
+	t=1740608932; cv=none; b=kAmPluiNdDGfBvvJdUhGZDC+/uilXeoKjWb8OuMJIlYAYJlbfQLQEFRGFHdHc604hCPjUuW+7lW6BS/tw8Tb0/pIg/jNTTLWzmXAfFDKSWGjMG5DKMPrlseJWe4ZC+Zbv9KnFwRfQ3xGE+q36XjojatvaqSyYNwxTuZdM8Lyzqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740608519; c=relaxed/simple;
-	bh=HXyUqkCKyonoD/i85uid9JPezXEkxc0LGOd/QM6n4yY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uaBMX8fvSebVxofJuPE1CMI4VYGnpdTAtRsn1tEv3XV/wb/NDajYiFAtGGr6E/d5aMM0tvMOXjPKI2UmzuI1e/b+Aem46Hpnxn9Wa60mgY8RViuTy2UjreEJfCeItjvp4z1HjICe2POh7BRkK+srcc2VH4NBfzMT8gL4soLY12M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hm1zb0fU; arc=none smtp.client-ip=209.85.216.41
+	s=arc-20240116; t=1740608932; c=relaxed/simple;
+	bh=XSzbhzUCKmv7IRps459MPdKjJ8sRAr736yzYA8hRTs8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pPOWSK8+54U01XwrU00FYcU918TuEDRiTnYwTGdw+oUZBB8htgk4fg312S7Uqhz/y44I0nkt7SM03nB7mWdBHsr/q23W7egUCE9Pdi6JPQm+57KC63mFAnc517x5BarTxrr6I9I8YxCr4s8qDXQl9JEpS8o6mzzoYG7yHbnS5wo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mflsRMg4; arc=none smtp.client-ip=209.85.221.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2f42992f608so579677a91.0;
-        Wed, 26 Feb 2025 14:21:55 -0800 (PST)
+Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-521c478d433so127424e0c.0
+        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 14:28:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740608515; x=1741213315; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OUmzfiox/3jvbaM/fwzHzjWIDzglvr/7YZ92pZc/Dc0=;
-        b=hm1zb0fUiJLECY2sBb9Wh/HH0eYFWaJKK5zFa30MAHF0tOH5i75MFYwO1MqL4MCmVd
-         SBZXh0/il6EBhmcdvjF65vYGoBvELsFicj1vdhRzsFsJSIItuEfWEBvniyd7oytszF+1
-         ZtFrQOa+MGmo5DF581UYEbrRAtjBQ6U4QsTa0uF5W9ZZf5lr6lb0hLAdSUKF940aaKeK
-         oJ2V6JKVcCOLzREGhzC36pAbpRpftVN6jWK6nDekU84UPKsUE6oSneMqI/n5BqulYgtW
-         usFKZRfTNFRYuJCdtH4UnASiWxT1wyO3sae16sX4At3UZs62UpYckLzb7SC9HwMWeoJy
-         yojw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740608515; x=1741213315;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1740608930; x=1741213730; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OUmzfiox/3jvbaM/fwzHzjWIDzglvr/7YZ92pZc/Dc0=;
-        b=FqQL+LiAXP2IrvJ2JSFod5NGsXC+qy7sheocyyVpP1NktF2WhHaaaIpL53V/2GIh1F
-         FO9M+0nykB3YaCCglAj/mfWzHf831bfCtNo7XkwUd9PXqLXD7flHG6lQmj2SBs97zNEM
-         +B1E4SqVP2JszK7OMugW3E68j9f0F5nUcLOJYiYflhY/zbUTQC9EW6xZd0QIOFbkpCIw
-         CUi3kK/1f8IYFkPfeigkIX7sPU3OJqwYGjhgnSr99rZB5ZCsdWtNZAPqers0KzMJYNWi
-         MZLuC+h6TktQhQRoKSdttFG2cNz/w4aSxZjCcfLEPh3hMNEfSymLKJVS83wbVhoj3xUc
-         ZpNg==
-X-Forwarded-Encrypted: i=1; AJvYcCVYX6xdO0Vw9zOV91FsWOfafyq+k92i+V+u6kMvihrUtOwY36yYE+vA/cYfK2YbPjjbRdI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxH9skQoLoezDIvFc0+1gAwmli+PBbSceZwOeIt0w9ubJpJ0eXu
-	CQJgs4n/nT13vi52Tq9LSgfhTsGKQITuGVM0Ih2xqKhWAkL/T+i5
-X-Gm-Gg: ASbGncsk/6L3Kw1Dhoz3CrdxNUEyumBlNKhXwt7PPjDv/mXvOrFlvsfqaBKj5xzkMnz
-	fFGN8oxxJUIDMVVFcNZ2wK6Wmt2tBRomYVNzTQaiH52jEaW5iR9QXmn7qyNcv/pRSPcn9AZO1Ek
-	lqbZiPjVL+yLswcRP0MDfyIf4iSPYaUPVIZplLo0DaWoU2OS4xWH/t4JrWQyp7XHDzuAwUny4d2
-	Q0h6ljJabWUgY7e8wxDFSqhgrXLmePWeiL/d+a9J09a6Zk0WyuR3hHDPsj1cx5xkMlhz18ENDnF
-	J8waTvQJre7J2T+h+3IztQqLlFzk/Q==
-X-Google-Smtp-Source: AGHT+IGRGzMs1q5pMy6lmn6oCgl14QSnsvDMKuTRDGlJK2WIcAZZlvN1hQ7MKzMzrEF3S+WKjQ/sWg==
-X-Received: by 2002:a17:90b:1f8e:b0:2ee:c9b6:c26a with SMTP id 98e67ed59e1d1-2fe68ada3bemr14818472a91.11.1740608515042;
-        Wed, 26 Feb 2025 14:21:55 -0800 (PST)
-Received: from localhost ([129.210.115.104])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fe6cf95a04sm2222017a91.0.2025.02.26.14.21.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Feb 2025 14:21:53 -0800 (PST)
-Date: Wed, 26 Feb 2025 14:21:52 -0800
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, john.fastabend@gmail.com,
-	zhoufeng.zf@bytedance.com, zijianzhang@bytedance.com,
-	Cong Wang <cong.wang@bytedance.com>
-Subject: Re: [Patch bpf-next 3/4] skmsg: use bitfields for struct sk_psock
-Message-ID: <Z7+UAA83/n9XgIdU@pop-os.localdomain>
-References: <20250222183057.800800-1-xiyou.wangcong@gmail.com>
- <20250222183057.800800-4-xiyou.wangcong@gmail.com>
- <87ldtsu882.fsf@cloudflare.com>
+        bh=tB3aKQ5Qdg/yHCe6O6N4irTTerSpKdg90NLbWIAGDGc=;
+        b=mflsRMg4CRks46cxOihfy5asZwi7PX8mWzBjig5aioLDXPN1QUErpNADBIQcf/AQ3P
+         q0BMtehbF+02HV0xW2V13RNrBJo9egcjG4hFWwIgDA+P5j6Q6q9+bXSs4jV76358qKtF
+         tCE74OolINGVMJmcHNR8DTZjr7ZxDziOPwxQbwRPhz4rKMFI2RMjQSeD+236IY92eSAl
+         LtL9gVliTuru8hOkRX9fH3cKmXANhBkubUAmrwv289cURrLgBd55SM5R5AxY/KxC3Ihw
+         agazY2cy/5jTBDN7ZkeuH8hYn/Too7TZPvlG6x8TqUM44w2ShcQd4kF4O97R3OWP8wER
+         mqIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740608930; x=1741213730;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tB3aKQ5Qdg/yHCe6O6N4irTTerSpKdg90NLbWIAGDGc=;
+        b=Nzr8QzJNjFZ3e3yQsVBQQselaZGlBeFQKfXfylOd7jX/jALTTMtnXS88kXxeZtPwmP
+         KrMf9qcsVR5pewlTar30YBxGZxXhhIkUlyqjzHnrMa3Zfc03oZAjfyKgyMxysbOkAGkz
+         G7nLOa/sWdnLgnc6rv0cCETXiBnT5Z9HE/n23UK2oHr9gvPC3anEbHWk6OMbX6aHhPkt
+         iNMx3ZXRTZjbou89u51FxLh5dy2Irw+kLrWit9WPGY583TwpeYEX8I8nVPqLz1AOg8aA
+         q3pLIy7jmjFB5MIhQu+oObU/X9PwyAy9gCS1+FDeBjV7jloVRvPm2xdBGp7Gxf5LbBp3
+         gqJA==
+X-Forwarded-Encrypted: i=1; AJvYcCXQ3TVwsi6ZQtoVHEA3vt+QlokaFUTVmLEDDoTPKdA3GQSFWRL19yYGyT7z6+er9PiAuPTu4P0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzzaJKdlOt8qIXH7QIrRRoVb1inLNsTy+p3aunStqJ2FOHJ2Fj1
+	dhwoHCSzN4Nr2QJebSnxT0wPBi2KW5BCftQN3CmSwxFKms7tUEE0YYS1lU+KazmJoIYb9bfdPgy
+	ffp0AJTnTZUkw612mXn1TL0FvaJAOzw==
+X-Gm-Gg: ASbGncuK1q1vrr/X3w/kJQ4SaREGzjCLqyp4h2kRO/cqrARfWeU6+VA24zLOCOrmQ40
+	vzF1u1ph19shVLasS0WZ7O0oDFUv4LnhpkNNTsrOj0klqLAPGx9Pv5Dy+SryezvzG5I6wiHf45u
+	TKorc7MA==
+X-Google-Smtp-Source: AGHT+IEdxx4RAUWUw2ym9Ie0VzFjtB74QZrtvu++aPd9E7KQDm75ZO4nAdNCkeu19knzxCkJC6+z57YzC1Pe83my2I0=
+X-Received: by 2002:a67:e70c:0:b0:4bb:5d61:1264 with SMTP id
+ ada2fe7eead31-4bfc027abcemr14084218137.24.1740608929895; Wed, 26 Feb 2025
+ 14:28:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87ldtsu882.fsf@cloudflare.com>
+References: <CAA85sZveppNgEVa_FD+qhOMtG_AavK9_mFiU+jWrMtXmwqefGA@mail.gmail.com>
+ <CAA85sZuv3kqb1B-=UP0m2i-a0kfebNZy-994Dw_v5hd-PrxEGw@mail.gmail.com>
+ <20250225170545.315d896c@kernel.org> <CAA85sZuYbXDKAEHpXxcDvntSjtkDEBGxU-FbXevZ+YH+eL6bEQ@mail.gmail.com>
+ <CAA85sZswKt7cvogeze4FQH_h5EuibF0Zc7=OAS18FxXCiEki-g@mail.gmail.com>
+ <a6753983-df29-4d79-a25c-e1339816bd02@blackwall.org> <CAA85sZsSTod+-tS1CuB+iZSfAjCS0g+jx+1iCEWxh2=9y-M7oQ@mail.gmail.com>
+ <ed6723e3-4e47-4dac-bc42-b65f7d42cbea@blackwall.org> <CAA85sZv5rQr4g=72-Tw47wSE_iFPHS4tB8Bgqcs59sdh1Me2sw@mail.gmail.com>
+ <4604b36b-4822-4755-a45c-c37d47a3adc2@blackwall.org>
+In-Reply-To: <4604b36b-4822-4755-a45c-c37d47a3adc2@blackwall.org>
+From: Ian Kumlien <ian.kumlien@gmail.com>
+Date: Wed, 26 Feb 2025 23:28:38 +0100
+X-Gm-Features: AQ5f1JpPMTlIuFyeibQ-xUxWiDDFdJZ4I4hhDZs5vJb4vG1pCz1Kgv5Z0SH1fxg
+Message-ID: <CAA85sZutt0Eydh4B5AUb2xgvPkPF2Wa2yU4iXprgmRFPVM5qUQ@mail.gmail.com>
+Subject: Re: [6.12.15][be2net?] Voluntary context switch within RCU read-side
+ critical section!
+To: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, 
+	Linux Kernel Network Developers <netdev@vger.kernel.org>, Sathya Perla <sathya.perla@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 26, 2025 at 02:49:17PM +0100, Jakub Sitnicki wrote:
-> On Sat, Feb 22, 2025 at 10:30 AM -08, Cong Wang wrote:
-> > From: Cong Wang <cong.wang@bytedance.com>
+On Wed, Feb 26, 2025 at 2:11=E2=80=AFPM Nikolay Aleksandrov <razor@blackwal=
+l.org> wrote:
+>
+> On 2/26/25 14:26, Ian Kumlien wrote:
+> > On Wed, Feb 26, 2025 at 1:00=E2=80=AFPM Nikolay Aleksandrov <razor@blac=
+kwall.org> wrote:
+> >>
+> >> On 2/26/25 13:52, Ian Kumlien wrote:
+> >>> On Wed, Feb 26, 2025 at 11:33=E2=80=AFAM Nikolay Aleksandrov
+> >>> <razor@blackwall.org> wrote:
+> >>>>
+> >>>> On 2/26/25 11:55, Ian Kumlien wrote:
+> >>>>> On Wed, Feb 26, 2025 at 10:24=E2=80=AFAM Ian Kumlien <ian.kumlien@g=
+mail.com> wrote:
+> >>>>>>
+> >>>>>> On Wed, Feb 26, 2025 at 2:05=E2=80=AFAM Jakub Kicinski <kuba@kerne=
+l.org> wrote:
+> >>>>>>>
+> >>>>>>> On Tue, 25 Feb 2025 11:13:47 +0100 Ian Kumlien wrote:
+> >>>>>>>> Same thing happens in 6.13.4, FYI
+> >>>>>>>
+> >>>>>>> Could you do a minor bisection? Does it not happen with 6.11?
+> >>>>>>> Nothing jumps out at quick look.
+> >>>>>>
+> >>>>>> I have to admint that i haven't been tracking it too closely until=
+ it
+> >>>>>> turned out to be an issue
+> >>>>>> (makes network traffic over wireguard, through that node very slow=
+)
+> >>>>>>
+> >>>>>> But i'm pretty sure it was ok in early 6.12.x - I'll try to do a b=
+isect though
+> >>>>>> (it's a gw to reach a internal server network in the basement, so =
+not
+> >>>>>> the best setup for this)
+> >>>>>
+> >>>>> Since i'm at work i decided to check if i could find all the boot
+> >>>>> logs, which is actually done nicely by systemd
+> >>>>> first known bad: 6.11.7-300.fc41.x86_64
+> >>>>> last known ok: 6.11.6-200.fc40.x86_64
+> >>>>>
+> >>>>> Narrows the field for a bisect at least, =3D)
+> >>>>>
+> >>>>
+> >>>> Saw bridge, took a look. :)
+> >>>>
+> >>>> I think there are multiple issues with benet's be_ndo_bridge_getlink=
+()
+> >>>> because it calls be_cmd_get_hsw_config() which can sleep in multiple
+> >>>> places, e.g. the most obvious is the mutex_lock() in the beginning o=
+f
+> >>>> be_cmd_get_hsw_config(), then we have the call trace here which is:
+> >>>> be_cmd_get_hsw_config -> be_mcc_notify_wait -> be_mcc_wait_compl -> =
+usleep_range()
+> >>>>
+> >>>> Maybe you updated some tool that calls down that path along with the=
+ kernel and system
+> >>>> so you started seeing it in Fedora 41?
+> >>>
+> >>> Could be but it's pretty barebones
+> >>>
+> >>>> IMO this has been problematic for a very long time, but obviously it=
+ depends on the
+> >>>> chip type. Could you share your benet chip type to confirm the path?
+> >>>
+> >>> I don't know how to find the actual chip information but it's identif=
+ied as:
+> >>> Emulex Corporation OneConnect NIC (Skyhawk) (rev 10)
+> >>>
+> >>
+> >> Good, that confirms it. The skyhawk chip falls in the "else" of the bl=
+ock in
+> >> be_ndo_bridge_getlink() which calls be_cmd_get_hsw_config().
+> >>
+> >>>> For the blamed commit I'd go with:
+> >>>>  commit b71724147e73
+> >>>>  Author: Sathya Perla <sathya.perla@broadcom.com>
+> >>>>  Date:   Wed Jul 27 05:26:18 2016 -0400
+> >>>>
+> >>>>      be2net: replace polling with sleeping in the FW completion path
+> >>>>
+> >>>> This one changed the udelay() (which is safe) to usleep_range() and =
+the spinlock
+> >>>> to a mutex.
+> >>>
+> >>> So, first try will be to try without that patch then, =3D)
+> >>>
+> >>
+> >> That would be a good try, yes. It is not a straight-forward revert tho=
+ugh since a lot
+> >> of changes have happened since that commit. Let me know if you need he=
+lp with that,
+> >> I can prepare the revert to test.
 > >
-> > psock->eval can only have 4 possible values, make it 8-bit is
-> > sufficient.
+> > Yeah, looked at the size of it and... well... I dunno if i'd have the t=
+ime =3D)
 > >
-> > psock->redir_ingress is just a boolean, using 1 bit is enough.
-> >
-> > Signed-off-by: Cong Wang <cong.wang@bytedance.com>
-> > ---
-> >  include/linux/skmsg.h | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-> > index bf28ce9b5fdb..beaf79b2b68b 100644
-> > --- a/include/linux/skmsg.h
-> > +++ b/include/linux/skmsg.h
-> > @@ -85,8 +85,8 @@ struct sk_psock {
-> >  	struct sock			*sk_redir;
-> >  	u32				apply_bytes;
-> >  	u32				cork_bytes;
-> > -	u32				eval;
-> > -	bool				redir_ingress; /* undefined if sk_redir is null */
-> > +	unsigned int			eval : 8;
-> > +	unsigned int			redir_ingress : 1; /* undefined if sk_redir is null */
-> >  	struct sk_msg			*cork;
-> >  	struct sk_psock_progs		progs;
-> >  #if IS_ENABLED(CONFIG_BPF_STREAM_PARSER)
-> 
-> Are you doing this bit packing to create a hole big enough to fit
-> another u32 introduced in the next patch?
+>
+> Can you try the attached patch?
+> It is on top of net-next (but also applies to Linus' tree):
+>  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git
+>
+> It partially reverts the mentioned commit above (only mutex -> spinlock a=
+nd usleep -> udelay)
+> because the commit does many more things.
+>
+> Also +CC original patch author which I forgot to do.
 
-Kinda, or at least trying to save some space for the next patch. I am
-not yet trying to reorder them to make it more packed, because it can
-be a separate patch.
+Thanks, built and installed but it refuses to boot it - will have to
+check during the weekend...
+(boots the latest fedora version even if this one is the selected one
+according to grubby)
 
-Thanks!
+> Thanks,
+>  Nik
+>
 
