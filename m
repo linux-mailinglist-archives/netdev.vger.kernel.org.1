@@ -1,179 +1,112 @@
-Return-Path: <netdev+bounces-169956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1491CA469E0
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 19:34:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC831A46A10
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 19:48:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B1E13A1953
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 18:34:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A240E7A2C05
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 18:47:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A55621CC53;
-	Wed, 26 Feb 2025 18:34:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A51E236428;
+	Wed, 26 Feb 2025 18:46:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ntYMS4pb"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="pBfjg8U5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E959C233D64
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 18:34:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B0D722D784;
+	Wed, 26 Feb 2025 18:46:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740594888; cv=none; b=KO70/MOMN2I7ej8f9I8a3+llAlgRyEEmU0qy85ab7g19fnx3jUdSIOxCVYbyvLE024o/Z6bvgm1ti299ZjQaixEtyyeTZYhtIMUNVbW8avskdGQksd5F8L/0j8+dWbdhm38uVOBVDU/twIpwy/KKtHLoud58ZnpXnnpDMV4wmCI=
+	t=1740595594; cv=none; b=AjOJKyojRLnb87yukzz42YRU8Zom4pn9d6neejomCERG73ZfJfHEOgn1FR/RPCifR4W8SsQBKRgzAnO3UH6c8iZwURIWiLXszzITYxs2mmGNyKtoopR179NEP0WrrARi/u21SBs87mCwy/r7Gww8RT8ORkKssM1I4HvKnSTeJIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740594888; c=relaxed/simple;
-	bh=3sZfZtOKL3PpVdC39mlrXhBge0rl1bXXre5FIIr8k4I=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BJU4ZK0du/6sJWmJzqJY31wB8UWcoLxC8agX0/r8pr/CTz9FQPmFjI/hyiq9iNiBMPFWv7lxpIZnQUhpOdx5UUC0nz/V3HJPiVnV0+U9+cfhO2ppf5Yo+zTXrBY/rbZDMq6+lNzyD/KsCrYnfft9oRj7IbcgKVfasCRbC4dWk8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ntYMS4pb; arc=none smtp.client-ip=209.85.219.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-6e66da368dcso3243766d6.2
-        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 10:34:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740594886; x=1741199686; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=I4hiN/VZM10UazaG5cSjXr3c/vEDQf1vDgCFbogESV0=;
-        b=ntYMS4pb8EWjl74dRC5pJvaYUxIQUB/KNFVhTe+NdHeR/R5sXvLagdd9iVx5yXEMHd
-         t34FSt40BhTxCVyd48MtSn0eC4wjLM2WubawZg/iC7jFEMT+aDsUo+ua0UOEKuwBji5z
-         GCoD59CFES9W44xK6OUqPI0lpsGrmwk0vWjaNeMSS/JeDRdKZa+KkelJoTxTLaVAgKFm
-         Zp0pie4nPYDQfwyM+p9re8QlD4+sYk44NCUWv3nBstqmZWeVpeVQaqNsdbLeoeiGnPTX
-         sEF7s8tRRtrN020/mYPR4BwWjHMtGBbndOy5Rgkr5F41sZmeA4FFpIwql5e5xM2OLa+4
-         6mTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740594886; x=1741199686;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=I4hiN/VZM10UazaG5cSjXr3c/vEDQf1vDgCFbogESV0=;
-        b=deSjGPjBo1FqVdLO5n7xtDc0NxVVf5CVa9ZLhnCh8WBmkddnQbUQIHtR3fFZh4rDmC
-         gSs5rpfx2K4FrEMT+1VcbqJW5zPTd4XGcXhL+ZgW7uQyrmROw34FuklqA09JWEJtcwST
-         Bx2uxlom90mhz/D77X9VSNa6IJELP5jYG1T5HGW+LiVVUbgGqoE7NDGPRLUUnkvTqJ+j
-         EdqhIl1OHNggyDnMf9kBzguHfn1b4Yh0d2PbrF6sqhoEYag3H2kmjU34MIHGMPYRe2we
-         pcv7FfC7OBRQUxrhEgUmaZ+fIYN+AwNnkAEUhxgNkry3rJxQLeHzH97F7SlYXEp/HXyL
-         +L8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU/X+3BV760bNfa6fTn/1ex9gfFuGGg+dUtuOYC2etjY6qQ0d4q9L90f2QHg/n+QQb7jG1Ox6o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6xA4FBC4Rg0EreHLcbdLTD9EChwqwcpUKyCcbPTQ7cHuJd9RP
-	zQAYQlXpZTJ3CMVMNvKYrUzEvfzuhOML+jyWuXN1SQ/c0YHd43CEhWPig4zVhhVSmS0m5AhqoAO
-	aoVBukrSTEQ==
-X-Google-Smtp-Source: AGHT+IG16cDtr7NH9TWdwx1dia+HRZzDsTVJZZbv7Fjlq5tfQQm4iGULi25+4YzjCIdvmFvEmC01UPEl7za0IA==
-X-Received: from qvzc2.prod.google.com ([2002:a05:6214:702:b0:6e6:5bdc:ac7d])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:2b08:b0:6e4:6ef7:b5fc with SMTP id 6a1803df08f44-6e6ae7f7ef2mr284964336d6.14.1740594885888;
- Wed, 26 Feb 2025 10:34:45 -0800 (PST)
-Date: Wed, 26 Feb 2025 18:34:37 +0000
-In-Reply-To: <20250226183437.1457318-1-edumazet@google.com>
+	s=arc-20240116; t=1740595594; c=relaxed/simple;
+	bh=av0A0EgMmZuF7k4uVACqRkbAc5DuEtFyJ21KJyF35nw=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hSZ0plLOTJjr1zBeIFDsNVtw+VX6z1E723wdxSY5pfR5aKKPSEDHJOGNPt0e9CZY2VZ230nNheNLLlo326MRT9MhqMwVEfTUDgayGSDkrNjWFbfiqPUXzZbaKQWy8JGyTG+tDcPiP/I6C8hx1VXfgcTaM5FUW9wNl3Ehkh09juw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=pBfjg8U5; arc=none smtp.client-ip=198.47.23.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 51QIi9ms2156450
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 26 Feb 2025 12:44:10 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1740595450;
+	bh=esbbA0aHxV2C7K7XPMRSKO3A35omNfgqBS1hPBjtmXg=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To;
+	b=pBfjg8U5jkATBCxBRPgW1hxkKxkjGDHEVGISh7VcEj5YIYrbU+fYbnsayWPzlFKcI
+	 47JaBvj4ZjrahbShEttZOLhtpYWrZvE+Dn2iMeKZduVs2P1eJ3xxTWysLT/29QlYTd
+	 cP2MVrU0/cHm+OCLt+4sGqm7SAwgQRmoH/hTrANA=
+Received: from DLEE108.ent.ti.com (dlee108.ent.ti.com [157.170.170.38])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 51QIi9GH029156
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 26 Feb 2025 12:44:09 -0600
+Received: from DLEE102.ent.ti.com (157.170.170.32) by DLEE108.ent.ti.com
+ (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 26
+ Feb 2025 12:44:08 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE102.ent.ti.com
+ (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 26 Feb 2025 12:44:08 -0600
+Received: from localhost (uda0133052.dhcp.ti.com [128.247.81.232])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 51QIi8S8076566;
+	Wed, 26 Feb 2025 12:44:08 -0600
+Date: Wed, 26 Feb 2025 12:44:08 -0600
+From: Nishanth Menon <nm@ti.com>
+To: parvathi <parvathi@couthit.com>
+CC: <danishanwar@ti.com>, <rogerq@kernel.org>, <andrew+netdev@lunn.ch>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <robh@kernel.org>, <krzk+dt@kernel.org>,
+        <conor+dt@kernel.org>, <ssantosh@kernel.org>,
+        <richardcochran@gmail.com>, <basharath@couthit.com>,
+        <schnelle@linux.ibm.com>, <diogo.ivo@siemens.com>,
+        <m-karicheri2@ti.com>, <horms@kernel.org>, <jacob.e.keller@intel.com>,
+        <m-malladi@ti.com>, <javier.carrasco.cruz@gmail.com>, <afd@ti.com>,
+        <s-anna@ti.com>, <linux-arm-kernel@lists.infradead.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <pratheesh@ti.com>, <prajith@ti.com>,
+        <vigneshr@ti.com>, <praneeth@ti.com>, <srk@ti.com>, <rogerq@ti.com>,
+        <krishna@couthit.com>, <pmohan@couthit.com>, <mohan@couthit.com>
+Subject: Re: [PATCH net-next v3 00/10] PRU-ICSSM Ethernet Driver
+Message-ID: <20250226184408.d4gpr3uu2dm7oxa2@handwork>
+References: <20250214054702.1073139-1-parvathi@couthit.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250226183437.1457318-1-edumazet@google.com>
-X-Mailer: git-send-email 2.48.1.658.g4767266eb4-goog
-Message-ID: <20250226183437.1457318-3-edumazet@google.com>
-Subject: [PATCH net-next 2/2] inet: ping: avoid skb_clone() dance in ping_rcv()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250214054702.1073139-1-parvathi@couthit.com>
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-ping_rcv() callers currently call skb_free() or consume_skb(),
-forcing ping_rcv() to clone the skb.
+On 11:16-20250214, parvathi wrote:
+[...]
+> The patches presented in this series have gone through the patch verification
+> tools and no warnings or errors are reported. Sample test logs verifying the
+> functionality on Linux next kernel are available here:
+> 
+> [Interface up Testing](https://gist.github.com/ParvathiPudi/f481837cc6994e400284cb4b58972804)
+> 
+> [Ping Testing](https://gist.github.com/ParvathiPudi/a121aad402defcef389e93f303d79317)
+> 
+> [Iperf Testing](https://gist.github.com/ParvathiPudi/581db46b0e9814ddb5903bdfee73fc6f)
+> 
 
-After this patch ping_rcv() is now 'consuming' the original skb,
-either moving to a socket receive queue, or dropping it.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/icmp.c |  5 +++--
- net/ipv4/ping.c | 20 +++++---------------
- net/ipv6/icmp.c |  7 ++-----
- 3 files changed, 10 insertions(+), 22 deletions(-)
+I am looking at https://lore.kernel.org/all/20250214085315.1077108-11-parvathi@couthit.com/
+and wondering if i can see the test log for am335x and am47xx to make
+sure that PRUs are functional on those two?
 
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index 058d4c1e300d0c0be7a04fd67e8e39924dfcd2cc..717cb7d3607a1c77a3f54b56d2bb98b1064dd878 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -1274,9 +1274,10 @@ int icmp_rcv(struct sk_buff *skb)
- 		}
- 	}
- 
--	if (icmph->type == ICMP_EXT_ECHOREPLY) {
-+	if (icmph->type == ICMP_EXT_ECHOREPLY ||
-+	    icmph->type == ICMP_ECHOREPLY) {
- 		reason = ping_rcv(skb);
--		goto reason_check;
-+		return reason ? NET_RX_DROP : NET_RX_SUCCESS;
- 	}
- 
- 	/*
-diff --git a/net/ipv4/ping.c b/net/ipv4/ping.c
-index 85d09f2ecadcb690f01985771afa37ce2cd0befc..c14baa6589c748026b49416688cbea399e6d461a 100644
---- a/net/ipv4/ping.c
-+++ b/net/ipv4/ping.c
-@@ -966,10 +966,9 @@ EXPORT_SYMBOL_GPL(ping_queue_rcv_skb);
- 
- enum skb_drop_reason ping_rcv(struct sk_buff *skb)
- {
--	enum skb_drop_reason reason = SKB_DROP_REASON_NO_SOCKET;
--	struct sock *sk;
- 	struct net *net = dev_net(skb->dev);
- 	struct icmphdr *icmph = icmp_hdr(skb);
-+	struct sock *sk;
- 
- 	/* We assume the packet has already been checked by icmp_rcv */
- 
-@@ -980,20 +979,11 @@ enum skb_drop_reason ping_rcv(struct sk_buff *skb)
- 	skb_push(skb, skb->data - (u8 *)icmph);
- 
- 	sk = ping_lookup(net, skb, ntohs(icmph->un.echo.id));
--	if (sk) {
--		struct sk_buff *skb2 = skb_clone(skb, GFP_ATOMIC);
--
--		pr_debug("rcv on socket %p\n", sk);
--		if (skb2)
--			reason = __ping_queue_rcv_skb(sk, skb2);
--		else
--			reason = SKB_DROP_REASON_NOMEM;
--	}
--
--	if (reason)
--		pr_debug("no socket, dropping\n");
-+	if (sk)
-+		return __ping_queue_rcv_skb(sk, skb);
- 
--	return reason;
-+	kfree_skb_reason(skb, SKB_DROP_REASON_NO_SOCKET);
-+	return SKB_DROP_REASON_NO_SOCKET;
- }
- EXPORT_SYMBOL_GPL(ping_rcv);
- 
-diff --git a/net/ipv6/icmp.c b/net/ipv6/icmp.c
-index 4d14ab7f7e99f152cd5f5adaa023f0280957f275..3fd19a84b358d169bbdc351c43ede830c60afcf3 100644
---- a/net/ipv6/icmp.c
-+++ b/net/ipv6/icmp.c
-@@ -957,12 +957,9 @@ static int icmpv6_rcv(struct sk_buff *skb)
- 		break;
- 
- 	case ICMPV6_ECHO_REPLY:
--		reason = ping_rcv(skb);
--		break;
--
- 	case ICMPV6_EXT_ECHO_REPLY:
--		reason = ping_rcv(skb);
--		break;
-+		ping_rcv(skb);
-+		return 0;
- 
- 	case ICMPV6_PKT_TOOBIG:
- 		/* BUGGG_FUTURE: if packet contains rthdr, we cannot update
 -- 
-2.48.1.658.g4767266eb4-goog
-
+Regards,
+Nishanth Menon
+Key (0xDDB5849D1736249D) / Fingerprint: F8A2 8693 54EB 8232 17A3  1A34 DDB5 849D 1736 249D
 
