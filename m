@@ -1,144 +1,116 @@
-Return-Path: <netdev+bounces-170028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23E99A46EB9
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 23:47:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ECF7A46EBC
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 23:48:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA8301889FFF
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 22:47:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 560561889D89
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 22:48:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D12725E80D;
-	Wed, 26 Feb 2025 22:47:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6633D25E81A;
+	Wed, 26 Feb 2025 22:48:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jwrbf/pK"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="a69NN89C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2331A25E800;
-	Wed, 26 Feb 2025 22:47:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DADDF25E812
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 22:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740610036; cv=none; b=ItMYul9mU70kNbTlJEGqESaVVlBLDalljK9/7DO25acoAeJmxrWJq6V4JV6wJ7Zk6ht/DAZFH0t30k0vkrXEfI7t+R4zR21IkKH9a3H+jn/dyRnknJIay62yN4M5osIyZcxeVNqnN7LwRVYsDjkdvEmiL7Td5ars8zMphnoBaKA=
+	t=1740610096; cv=none; b=KwOa92q+HykzjwD4U0rlcH8W31FnPhW5EZDFn/DSsUySY1PzjJAX58HR9LhixwwrJlCk0DhiIwbe+NwE0SbhwGhNvAhDVd/DYQRRtoMozDdCGf2fprWYgXJSysxRWtJ78xBGxI6b48touKPBUIrbmEsc3LiCkgrpbyCVLWwez/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740610036; c=relaxed/simple;
-	bh=NiB/0Hv7B9rJJ1mcVx0hEwGrXQNl2EhmmWqB8YzD7/s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EDHv4G5IFnPtF4rKYUe23Ix9gMi9XZqnNrGeGeHy8MztYwGLiLDjTSXD8/8iLp04WCQp9zHjZfZayWFHXpGZC5K5Vnnc6iO7XHWhk+qvARQbgv+c1QS4rj4OQsbNAAdDo9TvoBIILRM88Ldz/8b42Wz4Az7zPbM6K9PUuteMXNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jwrbf/pK; arc=none smtp.client-ip=209.85.166.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3d3db3b68a7so2953795ab.0;
-        Wed, 26 Feb 2025 14:47:14 -0800 (PST)
+	s=arc-20240116; t=1740610096; c=relaxed/simple;
+	bh=yasjO7UB0NVrYfYkCjgAxl7+bVeg1Tuv4du9O1hj5JU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tUwsREj5mXy+ul/C580bbY6UXio2Jxk/LwGofH6GS5iIdQxcvRKkHWf0CF5iv5xHyHJvnY3ywxcXTxyN4/ywbriSIubCDSqBTB8Rug9AEwV7LEBrwiuw2vDU+cqdgYM9Yzzuu4NrdeTP6kF/Vlr/v9gGYRQUo38Lso8GOKk/DTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=a69NN89C; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740610034; x=1741214834; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NiB/0Hv7B9rJJ1mcVx0hEwGrXQNl2EhmmWqB8YzD7/s=;
-        b=Jwrbf/pK1iy04D/uVkYIb8+4T3E6rGCqfKjvXPeN/6BvwLDBDqPspodbDNTEBicbv2
-         xZ597TNq+HKf2aO+Z8gVwFfLIKgPcAB1Z2Q3xmOCkTJ72qW7dLW5ZqWSdlPID4e8KB6x
-         M8T+uEEOh1foKWIoIkHx8IpJIw2iO7Tr/rXDWq4u+QJ31JuC3v/7HF8KJmbxtlwJbnL4
-         0xagzy462mnayguvawbnTUwg+V2YfJxiOZR4nlUD9QevdCZyi426X/sYJufIwOaLNjPN
-         rhFN6NjxXomp5ggySMItWeR0RbsWUP6uvhLvZeSw4k0b6geBg1cbvK4NWUA0STJZp7WE
-         snrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740610034; x=1741214834;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NiB/0Hv7B9rJJ1mcVx0hEwGrXQNl2EhmmWqB8YzD7/s=;
-        b=vCv/3diSbxg7kje2lkiTV62bM+sTl6Weoxvr1BqCjIwegE2a5gQPMYMqGPHGlrQwAA
-         vNjwYd2hnurpo5BgRYaOcBgnBqNSAL4c+iRalKQvz9DnShCuoTeyDjI0VJ0oXveFIiIc
-         KTfnY8XmxLWekkTpNlZtNm34uz7Q8IhiubcIG9rocQQWMh3x6qP8q0+0BB6lKHOhIRK4
-         ZZdC5sJIcCzSRRPQPXEk+oo1QkFaZCosYqprQYviJ95mRufTHGdH646t+Wk8d1615ThP
-         qUmd2GvyXtD5YYVCedVSH6Yj7hQ5xq9zd/caPvogS6Q3VH9j7cDvTh2mOrOtyVZrX89P
-         eQxA==
-X-Forwarded-Encrypted: i=1; AJvYcCUL80ZXWz7JFcO5tyx4xsPerCSmLOoZ5DI0/ZVkvQMjtYdiy91hSqk+U2uPkB/WvKRRMSwcIxMABWq8RIFA+8qG6gDL@vger.kernel.org, AJvYcCUvWNZUAuvs9Xfw622Zulkb3HytC4tLtwS8XF53USIHlAucSWI9ib3PBZIVtvdzuvmkVqBTLgFfaNCaFsA=@vger.kernel.org, AJvYcCUwBkU4fnEkAduD6kxVBD+/g+w/M/AeuAGJJ38dW6b9pxAEL7U8r6Tx+X7b3hkZKU2/6AOdZCtN@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyoo3MmD0J30uAZH2+lTEy8Cq+MmrmfOeEdEwy8cPnv3/CNKcgB
-	PxURwukOg87KseoPB1E0cpir2lEUkfEsXPM5v5QKKWqZQ9EXFKyBnr0TXyWayopXFUL8CGR4Klq
-	7Dy1VBVCfG9xAlrKVnLzE/Kj/6iE=
-X-Gm-Gg: ASbGncsATtoeWCkijLXIyQIEZuLK0AzmS6Iq6LfhJH50QrnlPSKnoC/ROardG9P8ld/
-	p2yiUFq79FMQ65l1kUJ8PSbt3sZOKYibpS2LUYRSayfZRtje7dqgReRnSEgNn8bzXjW2QEJ/bjx
-	PmN5USUQ==
-X-Google-Smtp-Source: AGHT+IEDkyaBCvKG+jeUfydmJPq42wxXEiOEt/9TtX3jBybuaop9pjY/6wyBbjbU66wKxWXE4vHNAz1ftRtsBuFlmHw=
-X-Received: by 2002:a05:6e02:1a64:b0:3d1:9cee:3d1d with SMTP id
- e9e14a558f8ab-3d3d1fa94camr61591535ab.19.1740610034120; Wed, 26 Feb 2025
- 14:47:14 -0800 (PST)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1740610094; x=1772146094;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=gF/xaKEPkK+nWmqUVAWVIhuIIdRyUZoqLz0kzNkoTtY=;
+  b=a69NN89Cokvu0M8Kq8pkHK+r1nUyHJqF5+mtR1tdn7a3b5iyZxdFqL/3
+   PWWMQms2pmuFL/CHOX/KM4xNKQQlSxc0YaBnHWwt0vSD8mFmNjU63jtO8
+   i0jywBqRdiPaHPePdkLklT8ioYMGNgvKejoLJYvE2+McpuE3EvZk6AE1e
+   4=;
+X-IronPort-AV: E=Sophos;i="6.13,318,1732579200"; 
+   d="scan'208";a="173539497"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 22:48:11 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:20517]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.6.186:2525] with esmtp (Farcaster)
+ id da105f19-3c00-4b4b-8924-412f34961914; Wed, 26 Feb 2025 22:48:11 +0000 (UTC)
+X-Farcaster-Flow-ID: da105f19-3c00-4b4b-8924-412f34961914
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 26 Feb 2025 22:48:05 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.170.36) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 26 Feb 2025 22:48:02 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <eric.dumazet@gmail.com>, <horms@kernel.org>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <matttbe@kernel.org>,
+	<ncardwell@google.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<yonghaoz1994@gmail.com>
+Subject: Re: [PATCH v2 net-next] tcp: be less liberal in TSEcr received while in SYN_RECV state
+Date: Wed, 26 Feb 2025 14:47:53 -0800
+Message-ID: <20250226224753.48208-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250225171048.3105061-1-edumazet@google.com>
+References: <20250225171048.3105061-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250224-tcpsendmsg-v1-1-bac043c59cc8@debian.org>
- <CANn89iLybqJ22LVy00KUOVscRr8GQ88AcJ3Oy9MjBUgN=or0jA@mail.gmail.com>
- <559f3da9-4b3d-41c2-bf44-18329f76e937@kernel.org> <20250226-cunning-innocent-degu-d6c2fe@leitao>
- <7e148fd2-b4b7-49a1-958f-4b0838571245@kernel.org>
-In-Reply-To: <7e148fd2-b4b7-49a1-958f-4b0838571245@kernel.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 27 Feb 2025 06:46:37 +0800
-X-Gm-Features: AQ5f1Jq74MBOJohSv6TMoUiiDhSuH1iCbMaNWpxMH7brzPoWODwXEvzccr-WXTk
-Message-ID: <CAL+tcoD=zr15PL5dMFzQm2huMsRrAsfxP1jqW57Atdk_gJjuDA@mail.gmail.com>
-Subject: Re: [PATCH net-next] trace: tcp: Add tracepoint for tcp_sendmsg()
-To: David Ahern <dsahern@kernel.org>
-Cc: Breno Leitao <leitao@debian.org>, Eric Dumazet <edumazet@google.com>, 
-	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, kernel-team@meta.com, 
-	yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D045UWA004.ant.amazon.com (10.13.139.91) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hi David,
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 25 Feb 2025 17:10:48 +0000
+> Yong-Hao Zou mentioned that linux was not strict as other OS in 3WHS,
+> for flows using TCP TS option (RFC 7323)
+> 
+> As hinted by an old comment in tcp_check_req(),
+> we can check the TSEcr value in the incoming packet corresponds
+> to one of the SYNACK TSval values we have sent.
+> 
+> In this patch, I record the oldest and most recent values
+> that SYNACK packets have used.
+> 
+> Send a challenge ACK if we receive a TSEcr outside
+> of this range, and increase a new SNMP counter.
+> 
+> nstat -az | grep TSEcrRejected
+> TcpExtTSEcrRejected            0                  0.0
+> 
+> Due to TCP fastopen implementation, do not apply yet these checks
+> for fastopen flows.
+> 
+> v2: No longer use req->num_timeout, but treq->snt_tsval_first
+>     to detect when first SYNACK is prepared. This means
+>     we make sure to not send an initial zero TSval.
+>     Make sure MPTCP and TCP selftests are passing.
+>     Change MIB name to TcpExtTSEcrRejected
+> 
+> v1: https://lore.kernel.org/netdev/CADVnQykD8i4ArpSZaPKaoNxLJ2if2ts9m4As+=Jvdkrgx1qMHw@mail.gmail.com/T/
+> 
+> Reported-by: Yong-Hao Zou <yonghaoz1994@gmail.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-On Thu, Feb 27, 2025 at 1:14=E2=80=AFAM David Ahern <dsahern@kernel.org> wr=
-ote:
->
-> On 2/26/25 9:10 AM, Breno Leitao wrote:
-> >> Also, if a tracepoint is added, inside of tcp_sendmsg_locked would cov=
-er
-> >> more use cases (see kernel references to it).
-> >
-> > Agree, this seems to provide more useful information
-> >
-> >> We have a patch for a couple years now with a tracepoint inside the
-> >
-> > Sorry, where do you have this patch? is it downstream?
->
-> company tree. Attached. Where to put tracepoints and what arguments to
-> supply so that it is beneficial to multiple users is always a touchy
-
-Right. I am always eager to establish a standard evaluation/method
-which developers have common sense in. It's really hard because I gave
-it a try before. Maintainers seem not to like to see too many
-tracepoints appearing in the stack.
-
-> subject :-), so I have not tried to push the patch out. sock arg should
-> be added to it for example.
->
-> The key is to see how tcp_sendmsg_locked breaks up the buffers, and then
-> another one in tcp_write_xmit to see when the actual push out happens.
-
-Agreed on this point because a fine-grained BPF program can take
-advantage of it. But it seems another small topic that is probably
-different from what the original motivation from Breno is in this
-patch: I guess, making the tcp_sendmsg_locked non-inlined can allow
-the BPF program to calculate the delta between when tcp_sendmsg_locked
-starts and when tcp_sendmsg_locked ends? I don't know. Probably as
-Eric said, using noinline or something like this is simpler?
-
-> At the time I was looking at latency in the stack - from sendmsg call to
-> driver pushing descriptors to hardware.
-
-So do I.
-
-Thanks,
-Jason
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
