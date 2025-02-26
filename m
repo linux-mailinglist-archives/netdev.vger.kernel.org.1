@@ -1,130 +1,92 @@
-Return-Path: <netdev+bounces-169658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5CC6A4523F
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 02:37:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFDB4A45249
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 02:40:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C80FB3A819D
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 01:37:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A22297A6EC6
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 01:39:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6490C199921;
-	Wed, 26 Feb 2025 01:37:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AF5919C578;
+	Wed, 26 Feb 2025 01:40:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kp7NLbUb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uphFgnPo"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B43198A19
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 01:37:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A6519994F;
+	Wed, 26 Feb 2025 01:40:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740533845; cv=none; b=uhuFuNWMnlexAMAIquNRCg40nQTVldmXA/KrnVsgH90Tsx7w/lxY44WI9bl253ZEkTXpOpXJKA/tqg8d0xf/+LhxnbTTSpLeA9SOUgfuH1+TUVqKTxEI6E9Y5IVAGsGvRHF2Kujye54yD2m2TequHG2jv1eCrEbxzZZ3j3XbfKc=
+	t=1740534008; cv=none; b=Kme4QWEQNJAFSp+svlA7VufsnMhb6D3sWVpZgT2pR+GDmevdcdjhwzMO6h0Q9q+0gkpxnua/6bShyZgKLB2z6qe5J3IxRR4bfr17xggAcyHPe/SJ+BDAXd5eDx/2baJhRT/Ubikt08ZcxHJTCrYPAJHD84EVkrsCHI2dkJ8JLjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740533845; c=relaxed/simple;
-	bh=6jMqSHCB1b/d3tIPznfvnPv5y2TPzXfyEbziUHnLOwg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eNabKdTNoeQ+9YD5UaJ/P/Aos0duZiQJXcUpBp9lYBIItK3qWA1PtbKOtk+nvCXDclJcOqjt5hDgCYmfsOySZcxYLZeYbXEAAv1GNMCIdp1+6kdBe2Kj6R6AhtyO6/YnMSm1H1M+T9cOp5TM9kNJHXvLfpyV4fyvbIZXoYB6mEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kp7NLbUb; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740533840;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=c6lV2O/MV07x2xCD5gRyXKU/naKq49lc8wVecRpyzJY=;
-	b=kp7NLbUbFkijnU8Nd3tRXnRzRt88xeE3r6qyYDNVsdcLu//PHlllllF9cw62u2LxU+5zBp
-	ECjKglKSRLHKZdKCdpmRA7RKSee9ZF81DFTevlbWlk7M0DsneewFBlbRtrXhJhTBYJ1e9j
-	Gyr3tKio/MAG0NQGh5i0tQCoI+cqNus=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: horms@kernel.org,
-	kuba@kernel.org
-Cc: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	ricardo@marliere.net,
-	viro@zeniv.linux.org.uk,
-	dmantipov@yandex.ru,
-	aleksander.lobakin@intel.com,
-	linux-ppp@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mrpre@163.com,
-	Jiayuan Chen <jiayuan.chen@linux.dev>,
-	syzbot+853242d9c9917165d791@syzkaller.appspotmail.com
-Subject: [PATCH net-next v4 1/1] ppp: Fix KMSAN warning by initializing 2-byte header
-Date: Wed, 26 Feb 2025 09:36:58 +0800
-Message-ID: <20250226013658.891214-2-jiayuan.chen@linux.dev>
-In-Reply-To: <20250226013658.891214-1-jiayuan.chen@linux.dev>
-References: <20250226013658.891214-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1740534008; c=relaxed/simple;
+	bh=qgHwa1uTYGNlZs1FSdv5nNpP+wTaMz+y1Oe8SjywQLI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GPtFExNRdXAM6ZCDM7pmZSPg1014UULUVHqC4eHHOGpukYbX3zl0kjR8gsU6adcvIZ4rruQ9sL8l1fwHihc6JlZLCEA8QwgcYgFgG3RAz5vqCEdkalo9lD+EBViQNqXvglfd3g38CsbqkoJVIIf6tef+Tw+ajYzHfMxRj2ywXLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uphFgnPo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABA80C4CEDD;
+	Wed, 26 Feb 2025 01:40:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740534007;
+	bh=qgHwa1uTYGNlZs1FSdv5nNpP+wTaMz+y1Oe8SjywQLI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uphFgnPovfymgldeHUGro1jxgiPCTC0ckwkZ5B7XmddbxY5yJh5GGb7Y0ma8C/+Fc
+	 2jH+Bd2/9aucGnV0bcNFpIA3y/8eJMNmoVXmNV70xoWkHr19Ht0a/PMIAk/gMDcUpS
+	 ejjI5yMWLqLv5FmElWjcYfHW5dDMo3k4HuOKW3ahHdadE4m9pUzugGnfqlX2FSkqL3
+	 +KkcUmSFiODbvsQM2rFhaW78kTqVkurJjK5k6DfOt/7AHvX2Ery5+0Gqf3JjQBHjOs
+	 PIcMUFZ+anoAuQQvvnJ0/QvxMGnSAo6d5CtAOc0/TscpSYOPf6IidRp6DkByEThdQR
+	 BHglpIkEsIBAQ==
+Date: Tue, 25 Feb 2025 17:40:05 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
+ <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Jiri Pirko
+ <jiri@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>, Carolina Jubran
+ <cjubran@nvidia.com>, Gal Pressman <gal@nvidia.com>, Mark Bloch
+ <mbloch@nvidia.com>, Donald Hunter <donald.hunter@gmail.com>, Jonathan
+ Corbet <corbet@lwn.net>, Saeed Mahameed <saeedm@nvidia.com>, Leon
+ Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next 03/10] devlink: Serialize access to rate
+ domains
+Message-ID: <20250225174005.189f048d@kernel.org>
+In-Reply-To: <qaznnl77zg24zh72axtv7vhbfdbxnzmr73bqr7qir5wu2r6n52@ob25uqzyxytm>
+References: <20250213180134.323929-1-tariqt@nvidia.com>
+	<20250213180134.323929-4-tariqt@nvidia.com>
+	<ieeem2dc5mifpj2t45wnruzxmo4cp35mbvrnsgkebsqpmxj5ib@hn7gphf6io7x>
+	<20250218182130.757cc582@kernel.org>
+	<qaznnl77zg24zh72axtv7vhbfdbxnzmr73bqr7qir5wu2r6n52@ob25uqzyxytm>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-The PPP driver adds an extra 2-byte header to enable socket filters to run
-correctly. However, the driver only initializes the first byte, which
-indicates the direction. For normal BPF programs, this is not a problem
-since they only read the first byte.
+On Tue, 25 Feb 2025 14:36:07 +0100 Jiri Pirko wrote:
+> >The problem comes from having a devlink instance per function /
+> >port rather than for the ASIC. Spawn a single instance and the
+> >problem will go away =F0=9F=A4=B7=EF=B8=8F =20
+>=20
+> Yeah, we currently have VF devlink ports created under PF devlink instanc=
+e.
+> That is aligned with PCI geometry. If we have a single per-ASIC parent
+> devlink, this does not change and we still need to configure cross
+> PF devlink instances.
 
-Nevertheless, for carefully crafted BPF programs, if they read the second
-byte, this will trigger a KMSAN warning for reading uninitialized data.
+Why would there still be PF instances? I'm not suggesting that you
+create a hierarchy of instances.
 
-Reported-by: syzbot+853242d9c9917165d791@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/bpf/000000000000dea025060d6bc3bc@google.com/
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
----
- drivers/net/ppp/ppp_generic.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
-index 4583e15ad03a..b4433badf03c 100644
---- a/drivers/net/ppp/ppp_generic.c
-+++ b/drivers/net/ppp/ppp_generic.c
-@@ -72,6 +72,10 @@
- #define PPP_PROTO_LEN	2
- #define PPP_LCP_HDRLEN	4
- 
-+/* These are fields recognized by libpcap */
-+#define PPP_FILTER_OUTBOUND_TAG 0x0100
-+#define PPP_FILTER_INBOUND_TAG  0x0000
-+
- /*
-  * An instance of /dev/ppp can be associated with either a ppp
-  * interface unit or a ppp channel.  In both cases, file->private_data
-@@ -1762,10 +1766,15 @@ ppp_send_frame(struct ppp *ppp, struct sk_buff *skb)
- 
- 	if (proto < 0x8000) {
- #ifdef CONFIG_PPP_FILTER
--		/* check if we should pass this packet */
--		/* the filter instructions are constructed assuming
--		   a four-byte PPP header on each packet */
--		*(u8 *)skb_push(skb, 2) = 1;
-+		/* Check if we should pass this packet.
-+		 * The filter instructions are constructed assuming
-+		 * a four-byte PPP header on each packet. The first byte
-+		 * indicates the direction, and the second byte is meaningless,
-+		 * but we still need to initialize it to prevent crafted BPF
-+		 * programs from reading them which would cause reading of
-+		 * uninitialized data.
-+		 */
-+		*(__be16 *)skb_push(skb, 2) = htons(PPP_FILTER_OUTBOUND_TAG);
- 		if (ppp->pass_filter &&
- 		    bpf_prog_run(ppp->pass_filter, skb) == 0) {
- 			if (ppp->debug & 1)
--- 
-2.47.1
-
+> The only benefit I see is that we don't need rate domain, but
+> we can use parent devlink instance lock instead. The locking ordering
+> might be a bit tricky to fix though.
 
