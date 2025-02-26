@@ -1,138 +1,115 @@
-Return-Path: <netdev+bounces-169916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5E73A46736
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 18:00:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 89881A46762
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 18:06:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAC6E188A751
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 16:52:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D487189384E
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 16:57:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D46421D583;
-	Wed, 26 Feb 2025 16:51:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59D93221DA0;
+	Wed, 26 Feb 2025 16:57:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=dev.tdt.de header.i=@dev.tdt.de header.b="QH4eEtXJ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="R66MwYLJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout70.expurgate.net (mxout70.expurgate.net [194.37.255.70])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EFC21A01BF;
-	Wed, 26 Feb 2025 16:51:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.37.255.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A069621C9E8;
+	Wed, 26 Feb 2025 16:57:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740588715; cv=none; b=cAXNCqwIO41w89dhEOIAy1U6PicDAVk/H1yeboDknrrRS7gslcp7sd0WLCkemKF9wBskmgdGQeyYbPtRUyfNdhK1l0AZ4VbqslNjPiZinmzKV7MX50KONggMSOkAW/JHqsq4yWgtGw2qsRIhaEBlh/XcjHP52P/9JzaCLQEvzm4=
+	t=1740589032; cv=none; b=YQRKjKqfb8AA9LYQ/Q7AoMiKkCLxN3avUwazykfeTLsbctLW5OUlIx0n+mSFGJSOiqCQhrmz+cci6+WtFopuPlpsgN4xyerlmzlA/+bc1H6e/uWY7dHq4j+tDNemOCS2Cj8sGg1kNnsKoWUAIY5jK99izFPv67U2Va1CZMwRYSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740588715; c=relaxed/simple;
-	bh=ypRzZ2zObNci18/WsswuAcEa0/e0UBSYDjvPeqxQn8I=;
-	h=MIME-Version:Content-Type:Date:From:To:Cc:Subject:In-Reply-To:
-	 References:Message-ID; b=TU2hDgELqgC7bJ86wfd3qmhURr7XsnoHOKiFBCsCKgBDYfijfTcZwhWrbkWj0okQW5mahK+VYmik4t8Ftdf4JEivnLHWIUR3GB/Tu0WKohx0FzEaxa9THs+T6i5KIl7F1t41nJpEhbmc68CPWJUdVfSS9M91QOi0+ITV8oxzOHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dev.tdt.de; spf=pass smtp.mailfrom=dev.tdt.de; dkim=temperror (0-bit key) header.d=dev.tdt.de header.i=@dev.tdt.de header.b=QH4eEtXJ; arc=none smtp.client-ip=194.37.255.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dev.tdt.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dev.tdt.de
-Received: from [194.37.255.9] (helo=mxout.expurgate.net)
-	by relay.expurgate.net with smtp (Exim 4.92)
-	(envelope-from <prvs=916645903c=ms@dev.tdt.de>)
-	id 1tnKdM-00CVZJ-Ta; Wed, 26 Feb 2025 17:51:45 +0100
-Received: from [195.243.126.94] (helo=securemail.tdt.de)
-	by relay.expurgate.net with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ms@dev.tdt.de>)
-	id 1tnKdL-009CW5-QK; Wed, 26 Feb 2025 17:51:43 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dev.tdt.de;
-	s=z1-selector1; t=1740588703;
-	bh=GM0VcKZjCHnEUU6GMlRDDDCbN9fpMRBoWK8fN5/nSw0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QH4eEtXJIFjsEOqQpy+3RX3TWZQvU5S7VA6pzazGAhtZ9YXIuoy+IlIB6r10Rd2XW
-	 rG4PeixWun2jOawcNDSBA7lKlUjSgmJLAI4TPGiIjbf9C8pcmxWxxUslC/HQgg4F9T
-	 yz0FCxVI2y1IWpZOjOpwLeh0BRGCi2ZzMla1GD7CA+nK8KpxZXTLzqwzh6M3faUYET
-	 8Y5xErBp/F2Nvb0yiVuUt5vseTqoW/OzGgvp4eNOSrqijtdc8SD+NVgRj9MhmacFQp
-	 NGePDuUcO2nZG2Zc1Hw1p2ED/hj9N3RJxZd4OMfj7Zw0V7A1hurbpRBVc0JZvbjy6W
-	 KZTnLzrhkA4Dg==
-Received: from securemail.tdt.de (localhost [127.0.0.1])
-	by securemail.tdt.de (Postfix) with ESMTP id 3C0B7240041;
-	Wed, 26 Feb 2025 17:51:43 +0100 (CET)
-Received: from mail.dev.tdt.de (unknown [10.2.4.42])
-	by securemail.tdt.de (Postfix) with ESMTP id 2ACB3240036;
-	Wed, 26 Feb 2025 17:51:43 +0100 (CET)
-Received: from mail.dev.tdt.de (localhost [IPv6:::1])
-	by mail.dev.tdt.de (Postfix) with ESMTP id CB4D4237BB;
-	Wed, 26 Feb 2025 17:51:42 +0100 (CET)
-Precedence: bulk
-X-Mailing-List: netdev@vger.kernel.org
-List-Id: <netdev.vger.kernel.org>
-List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Wed, 26 Feb 2025 17:51:42 +0100
-From: Martin Schiller <ms@dev.tdt.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, andrew@lunn.ch,
+	s=arc-20240116; t=1740589032; c=relaxed/simple;
+	bh=3WAySbhme57idwUAMGNOyLnrc2/y3hBo3tmaf5OeDQs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T5OCRRu8DXZqPHuKt/7qgCroNeo8nC0OkIpezd4SjD1DLaeQk40g/BcP/EsHe8oTNyTSjyPkspu54cT0GhKBq79EoeWbX2zUPY3m3TMAi3mIJxH0D0dc0K6cJ2gQ1cCGYhCtKuCuiXVynY3ErqPTYKMZ0aY669PeJBxTRLXS37I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=R66MwYLJ; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=4DPt7QYp04Ry8rLHfov5JpGHMDqB3/VtlthfMAT+pZ4=; b=R66MwYLJidHJxRhnCf+eiGeZN5
+	NuHhuLecYei0nkUnyQvusL+YSy2EIEie0vhOvFTGZQJj80P3nDErhnVUkaZByJeChLf2W5Jvl2GPX
+	RoHDo9SkYGiz4rQa+f0OMvRT7ZECJt2d+dKbd8qfVH7a6vNT3Ag4LafQEdmEdfmfVQZA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tnKiR-000Jnk-0D; Wed, 26 Feb 2025 17:56:59 +0100
+Date: Wed, 26 Feb 2025 17:56:58 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Martin Schiller <ms@dev.tdt.de>
+Cc: Kory Maincent <kory.maincent@bootlin.com>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
 	hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
 	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH net-next] net: sfp: add quirk for FS SFP-10GM-T copper
  SFP+ module
-Organization: TDT AG
-In-Reply-To: <20250226172754.1c3b054b@kmaincent-XPS-13-7390>
+Message-ID: <3c4e6613-f7fc-4105-b4ce-d959769f2944@lunn.ch>
 References: <20250226141002.1214000-1-ms@dev.tdt.de>
  <Z78neFoGNPC0PYjt@shell.armlinux.org.uk>
  <d03103b9cab4a1d2d779b3044f340c6d@dev.tdt.de>
  <20250226162649.641bba5d@kmaincent-XPS-13-7390>
  <b300404d2adf0df0199230d58ae83312@dev.tdt.de>
  <20250226172754.1c3b054b@kmaincent-XPS-13-7390>
-Message-ID: <daec1a6fe2a16988b0b0e59942a94ca9@dev.tdt.de>
-X-Sender: ms@dev.tdt.de
-User-Agent: Roundcube Webmail/1.3.17
-Content-Transfer-Encoding: quoted-printable
-X-purgate: clean
-X-purgate-ID: 151534::1740588704-2BC6995C-803E5AC5/0/0
-X-purgate-type: clean
+ <daec1a6fe2a16988b0b0e59942a94ca9@dev.tdt.de>
+Precedence: bulk
+X-Mailing-List: netdev@vger.kernel.org
+List-Id: <netdev.vger.kernel.org>
+List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <daec1a6fe2a16988b0b0e59942a94ca9@dev.tdt.de>
 
-On 2025-02-26 17:27, Kory Maincent wrote:
-> On Wed, 26 Feb 2025 16:55:38 +0100
-> Martin Schiller <ms@dev.tdt.de> wrote:
->=20
->> On 2025-02-26 16:26, Kory Maincent wrote:
->> > On Wed, 26 Feb 2025 15:50:46 +0100
->> > Martin Schiller <ms@dev.tdt.de> wrote:
->> >
->> >> On 2025-02-26 15:38, Russell King (Oracle) wrote:
->>  [...]
->>  [...]
->>  [...]
->> >>
->> >> OK, I'll rename it to sfp_fixup_rollball_wait.
->> >
->> > I would prefer sfp_fixup_fs_rollball_wait to keep the name of the
->> > manufacturer.
->> > It can't be a generic fixup as other FSP could have other waiting ti=
-me
->> > values
->> > like the Turris RTSFP-10G which needs 25s.
->>=20
->> I think you're getting two things mixed up.
->> The phy still has 25 seconds to wake up. With sfp_fixup_rollball_wait
->> there simply is an additional 4s wait at the beginning before we start
->> searching for a phy.
->=20
-> Indeed you are right, I was looking in older Linux sources, sorry.
-> Still, the additional 4s wait seems relevant only for FS SFP, so it=20
-> should
-> be included in the function naming to avoid confusion.
->=20
+On Wed, Feb 26, 2025 at 05:51:42PM +0100, Martin Schiller wrote:
+> On 2025-02-26 17:27, Kory Maincent wrote:
+> > On Wed, 26 Feb 2025 16:55:38 +0100
+> > Martin Schiller <ms@dev.tdt.de> wrote:
+> > 
+> > > On 2025-02-26 16:26, Kory Maincent wrote:
+> > > > On Wed, 26 Feb 2025 15:50:46 +0100
+> > > > Martin Schiller <ms@dev.tdt.de> wrote:
+> > > >
+> > > >> On 2025-02-26 15:38, Russell King (Oracle) wrote:
+> > >  [...]
+> > >  [...]
+> > >  [...]
+> > > >>
+> > > >> OK, I'll rename it to sfp_fixup_rollball_wait.
+> > > >
+> > > > I would prefer sfp_fixup_fs_rollball_wait to keep the name of the
+> > > > manufacturer.
+> > > > It can't be a generic fixup as other FSP could have other waiting time
+> > > > values
+> > > > like the Turris RTSFP-10G which needs 25s.
+> > > 
+> > > I think you're getting two things mixed up.
+> > > The phy still has 25 seconds to wake up. With sfp_fixup_rollball_wait
+> > > there simply is an additional 4s wait at the beginning before we start
+> > > searching for a phy.
+> > 
+> > Indeed you are right, I was looking in older Linux sources, sorry.
+> > Still, the additional 4s wait seems relevant only for FS SFP, so it
+> > should
+> > be included in the function naming to avoid confusion.
+> > 
+> 
+> You may be right for the moment. But perhaps there will soon be SFP
+> modules from other manufacturers that also need this quirk.
 
-You may be right for the moment. But perhaps there will soon be SFP
-modules from other manufacturers that also need this quirk.
+Since these are all kernel internal implementation details, we can
+rename them any time we want. There is no kernel ABI involved. So
+please use a name based on what we know now. If such a module does
+appear sometime in the future, we can change the name at that point.
 
-There is also the function sfp_fixup_rollball_cc, which is currently
-only used for modules with vendor string =E2=80=9COEM=E2=80=9D. However, =
-the function is
-not called sfp_fixup_oem_rollball_cc.
-
-Regards,
-Martin
+       Andrew
 
