@@ -1,162 +1,110 @@
-Return-Path: <netdev+bounces-169986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D440A46B1C
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 20:32:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A41EA46AFC
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 20:28:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3612A16EBC1
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 19:32:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2E35188BBE9
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 19:28:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4A2F244EA1;
-	Wed, 26 Feb 2025 19:32:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 257DD23959B;
+	Wed, 26 Feb 2025 19:28:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="rsvAAeBj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JtIjqmS6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311C221ABA9
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 19:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A977223959E
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 19:28:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740598353; cv=none; b=Wd0HiTyiwn2Rwz3WmbOd67vViYwd46poSMlNXrs8aDIFqwtdZwOa4Exq4Yfh1EeR+RsWiMJitb1tQ1Kbj2iS4XXG3DmLg5HtY/yKfTboYGTxGnH9zNDe+CLikXQ0SoCJyKLu9K9NFY32euFZkPYa7GZg7D9QU+rPHPsrqFPkknU=
+	t=1740598099; cv=none; b=AVP7m2+wRE6tWNGtBkrVO5kG6tYcrMbmgLvn7IFwi8/dYIZ+Hx8UiSVE6CupF99YtOPgq7apZ5n7QVsrFCvUKNEUYTX40vxS2fhU7w0XeNRf7Bcy5o1iPnJ9qXqdc4HbJhuW2eLD4Zfsn8Q3ioB8vDlAqeIOO776VJoGUoGcjG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740598353; c=relaxed/simple;
-	bh=bMBsBRjw/lRUtGuUMc71/I/S/lp0ZTwauL7I5alfvFI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tHDAerf5gAIfIQe2dtRj6DnV099MnqnG0jSiulgd4AQaYkFS4NzA6veE3phBAh8kR3EOH3K6uxCFJl0u8zftGgVBNuXtKX21JSjB5yK4guk8VsFdLgtKzzrnBs85olLRaxwjL+yEvdF+bUUf0DETsDj6lZ5dB/Xg1HncC9UVYxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=rsvAAeBj; arc=none smtp.client-ip=52.95.49.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1740598099; c=relaxed/simple;
+	bh=bl9Plq6JnXW74ZZ2OyZkxJ1bQfSDrH+0T8qUb2SbqgY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=TeZPYyBWx99VPRtolEAZJXtG+glqEOBSlZOZbHGNZARmFzyhoZO3qE3s/uEDjO51u02t8aAVvHRtEFfoBeg21FKe5zfttG62Y8PJoXzhR5I6dL1kWkiw7KFc6r8SpYFmbKwnApnhBGrDRHcwpMxjl/tqZv1cr/joRN+Mm3pacxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--krakauer.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JtIjqmS6; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--krakauer.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-220f0382404so1894615ad.1
+        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 11:28:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1740598349; x=1772134349;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=RdhpugZ0ovpSSzgmTLWYFM6J4IE8hkBH8r6QF5K7iSw=;
-  b=rsvAAeBjBG31eZOc9zSv/oAMFN/8wIU4MpwaEUPtH/eIGGYdwwE9vKxt
-   Qr3hvDoZnAys66PSCqMd2/QZtdENGWGk7gNGUlNyhcz00F7QDePloDiV4
-   LvSWU/wGRGMKih9qW1w9mpwBRV6kA2wkyv3wlYl6umy8OGfTQ9wAbwvDc
-   I=;
-X-IronPort-AV: E=Sophos;i="6.13,318,1732579200"; 
-   d="scan'208";a="475576113"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 19:31:20 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:18015]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.48.97:2525] with esmtp (Farcaster)
- id 7f691583-ec7b-4917-9905-2b6c92de0b8e; Wed, 26 Feb 2025 19:31:20 +0000 (UTC)
-X-Farcaster-Flow-ID: 7f691583-ec7b-4917-9905-2b6c92de0b8e
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 26 Feb 2025 19:31:04 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.187.170.36) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 26 Feb 2025 19:31:01 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v2 net-next 12/12] ipv4: fib: Convert RTM_NEWROUTE and RTM_DELROUTE to per-netns RTNL.
-Date: Wed, 26 Feb 2025 11:25:56 -0800
-Message-ID: <20250226192556.21633-13-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250226192556.21633-1-kuniyu@amazon.com>
-References: <20250226192556.21633-1-kuniyu@amazon.com>
+        d=google.com; s=20230601; t=1740598097; x=1741202897; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=qKg29E18EQ/8K9KKxW0a2f9wLs1Xc02tFARhkKQdFJI=;
+        b=JtIjqmS6IYgExDgS6kJWBRzm7hW5KLRv3qNhDdu4R5/AxHzceNro3vmM+Vz9BCpL4t
+         Rq5H4ZTpBA+0X5wzNrZdavjmpVQzGFqHl9wk4Ojrs/NpVPY5rfdNxJP6PsR6pwyiw2no
+         uujzXnSg94EReU8HPNdl1ZUbjsUIgpFeRYmDN+xHP3cT47gBZhKvuiIrywCdCWMlR/T9
+         x9QyacQapqkvSYxVDHXDNZTuBu0NYQuR55OC22xFoX3XA2+FYJFA6hcCexbCKgqVMdnU
+         o8t2vGZsfzvhCs10Oh1Vyjhgo+jKenDTysLDNfSDfg+rfjDmt0/qevl64d0ggr7xa7f9
+         aRCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740598097; x=1741202897;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qKg29E18EQ/8K9KKxW0a2f9wLs1Xc02tFARhkKQdFJI=;
+        b=GyxDZsp2btFVDv21vdvxXDraKy/tluf2h2SBN3ZOY3WjnxNnaKor7kBr4jr0ZF0Ldi
+         7XV6UBGjyJuBFxyOOkpsjTik6zRhLAxAOdLvtAfgbTRteeT5NQ/Spwh9PZN6akVfRvsn
+         vjabZWoj44KvN5YydVhgggqDUkW0ocqxVLOiLqeXahyh3zzNdr8HTl6XExONLEvmsvIA
+         eiXNd/HjUuCJuEQKtHyqnvWiuPHxZUlaA4+htkr1N3EAGVfmIEgsml8c9UXLxszOVcvk
+         aW8u5kzZ3oQZ0hM7w4sWajh96Qiyh+/svh7fNJMZYFvj+AWpfxcGA7Ph2FEyynw1CPJ9
+         FOqw==
+X-Gm-Message-State: AOJu0YwQB/2qhxEnIEKzuR8KbfjBchbRSc39tqonvnjpaBlXAP2Jjj1T
+	hk1LGJabbwsNAqj9/5TsUxFC/jHpA2vaCzBQBO8lzvP6LIE5CdhPbzcil9oVLIVikVnomURoUJf
+	y1T4qF6ewugL8D6hOVyJS7Rt6beMl1PEKR+Q2Prj2nHQsCtnSALiOTBYH47WpI2j7lRsvCSLi4z
+	8JfHtX2+iP9MzsDJfqzxhLPnwIE9YByfNwHFVkbN4+XA==
+X-Google-Smtp-Source: AGHT+IHKu4c7meNjkGUZE1g8urh4/azLv13+UGEM3NtUkBkRgsExSR+jbSrEuSkHB2KxuBwP29fasZf1vU6dkQ==
+X-Received: from pfhj23.prod.google.com ([2002:a62:e917:0:b0:725:1ef3:c075])
+ (user=krakauer job=prod-delivery.src-stubby-dispatcher) by
+ 2002:aa7:8d41:0:b0:72f:590f:2859 with SMTP id d2e1a72fcca58-7348bdd0046mr5402845b3a.13.1740598096762;
+ Wed, 26 Feb 2025 11:28:16 -0800 (PST)
+Date: Wed, 26 Feb 2025 11:27:22 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWA004.ant.amazon.com (10.13.139.9) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.658.g4767266eb4-goog
+Message-ID: <20250226192725.621969-1-krakauer@google.com>
+Subject: [PATCH v2 0/3] selftests/net: deflake GRO tests and fix return value
+ and output
+From: Kevin Krakauer <krakauer@google.com>
+To: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org, 
+	Kevin Krakauer <krakauer@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-We converted fib_info hash tables to per-netns one and now ready to
-convert RTM_NEWROUTE and RTM_DELROUTE to per-netns RTNL.
+The GRO selftests can flake and have some confusing behavior. These
+changes make the output and return value of GRO behave as expected, then
+deflake the tests.
 
-Let's hold rtnl_net_lock() in inet_rtm_newroute() and inet_rtm_delroute().
+v2:
+- Split into multiple commits.
+- Reduced napi_defer_hard_irqs to 1.
+- Reduced gro_flush_timeout to 100us.
+- Fixed comment that wasn't updated.
 
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/fib_frontend.c | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+v1: https://lore.kernel.org/netdev/20250218164555.1955400-1-krakauer@google.com/
 
-diff --git a/net/ipv4/fib_frontend.c b/net/ipv4/fib_frontend.c
-index a6372d934e45..6de77415b5b3 100644
---- a/net/ipv4/fib_frontend.c
-+++ b/net/ipv4/fib_frontend.c
-@@ -884,20 +884,24 @@ static int inet_rtm_delroute(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (err < 0)
- 		goto errout;
- 
-+	rtnl_net_lock(net);
-+
- 	if (cfg.fc_nh_id && !nexthop_find_by_id(net, cfg.fc_nh_id)) {
- 		NL_SET_ERR_MSG(extack, "Nexthop id does not exist");
- 		err = -EINVAL;
--		goto errout;
-+		goto unlock;
- 	}
- 
- 	tb = fib_get_table(net, cfg.fc_table);
- 	if (!tb) {
- 		NL_SET_ERR_MSG(extack, "FIB table does not exist");
- 		err = -ESRCH;
--		goto errout;
-+		goto unlock;
- 	}
- 
- 	err = fib_table_delete(net, tb, &cfg, extack);
-+unlock:
-+	rtnl_net_unlock(net);
- errout:
- 	return err;
- }
-@@ -914,15 +918,20 @@ static int inet_rtm_newroute(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (err < 0)
- 		goto errout;
- 
-+	rtnl_net_lock(net);
-+
- 	tb = fib_new_table(net, cfg.fc_table);
- 	if (!tb) {
- 		err = -ENOBUFS;
--		goto errout;
-+		goto unlock;
- 	}
- 
- 	err = fib_table_insert(net, tb, &cfg, extack);
- 	if (!err && cfg.fc_type == RTN_LOCAL)
- 		net->ipv4.fib_has_custom_local_routes = true;
-+
-+unlock:
-+	rtnl_net_unlock(net);
- errout:
- 	return err;
- }
-@@ -1683,9 +1692,9 @@ static struct pernet_operations fib_net_ops = {
- 
- static const struct rtnl_msg_handler fib_rtnl_msg_handlers[] __initconst = {
- 	{.protocol = PF_INET, .msgtype = RTM_NEWROUTE,
--	 .doit = inet_rtm_newroute},
-+	 .doit = inet_rtm_newroute, .flags = RTNL_FLAG_DOIT_PERNET},
- 	{.protocol = PF_INET, .msgtype = RTM_DELROUTE,
--	 .doit = inet_rtm_delroute},
-+	 .doit = inet_rtm_delroute, .flags = RTNL_FLAG_DOIT_PERNET},
- 	{.protocol = PF_INET, .msgtype = RTM_GETROUTE, .dumpit = inet_dump_fib,
- 	 .flags = RTNL_FLAG_DUMP_UNLOCKED | RTNL_FLAG_DUMP_SPLIT_NLM_DONE},
- };
+Kevin Krakauer (3):
+  selftests/net: have `gro.sh -t` return a correct exit code
+  selftests/net: only print passing message in GRO tests when tests pass
+  selftests/net: deflake GRO tests
+
+ tools/testing/selftests/net/gro.c         | 8 +++++---
+ tools/testing/selftests/net/gro.sh        | 7 ++++---
+ tools/testing/selftests/net/setup_veth.sh | 3 ++-
+ 3 files changed, 11 insertions(+), 7 deletions(-)
+
 -- 
-2.39.5 (Apple Git-154)
+2.48.1.658.g4767266eb4-goog
 
 
