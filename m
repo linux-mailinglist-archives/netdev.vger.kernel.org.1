@@ -1,93 +1,214 @@
-Return-Path: <netdev+bounces-169769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D866A45A6C
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 10:40:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23310A45A6F
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 10:40:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F3F916B858
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 09:40:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1273F16CBAB
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 09:40:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D12238153;
-	Wed, 26 Feb 2025 09:39:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7793620CCEA;
+	Wed, 26 Feb 2025 09:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="P6+krkY5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="UqutqlGJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from va-2-38.ptr.blmpb.com (va-2-38.ptr.blmpb.com [209.127.231.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59813238150
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 09:39:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B54C226D0D
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 09:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740562788; cv=none; b=FpBOunKhXOMOuKQanjd9eAsMiXHU4EYsfoL45P1XrEDPHOjDPhVqw1gjkXlJcP9LzdiJRkb2RXr9e/Rf/9xGJv8BnJuucYEH+LMkX2S8VXzAUzb/FGkdEDApPukDwXhb9mfR5C3zXGnZXtiQPCSwrhbBtarVRE2LLxUlyzTYYgo=
+	t=1740562813; cv=none; b=IjT4a4SCrvh842mKj3wRQWRx6ESFjLC0+Ab+wURXt3vVn3AYaX8wxhPkDRDWpeQuvONJJEyRp9WzvAcFlCBWxRmjFB+mrrMlzxWWiyMWQqYNCY8e0YjMWN1KVHNu8ogN7hpmxWY2VRTQEpwK6gU+EJi3SDv8IDYSeiEr2hzZ0VI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740562788; c=relaxed/simple;
-	bh=UaguqqGvt+D5AsXKD3kvNrWFJcsLdTdaSsH8DoN3kuw=;
-	h=Cc:Subject:Mime-Version:Content-Type:To:Date:Message-Id:From:
-	 In-Reply-To:References; b=aVhe37HIc5y3e+g4eAUiQYVh2IMehbOGIU/zibvizFZ8D2GcXgBzbrQxF2GPIbyYJtGu20pQN8MMa3audX6EmVgJzEbTlIGsKnCRAU3Fr2FKJHbzNmI0DqZw52HROqmhZxFupoy5F8uHY5reusgc7ib2jKwChf87o2YZhyxhClA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=P6+krkY5; arc=none smtp.client-ip=209.127.231.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
+	s=arc-20240116; t=1740562813; c=relaxed/simple;
+	bh=oXYrs8fLkSqwtRneRydxS1WiAhpp9hDEK2JtL3e2Wtc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AlgaKnh1H5f3XmfLvT5gESEtlpxEswIzsQFHTzDGKqJY728GB95jBOjDrCIVJNwf0k137ZzgLLFcfCBErBzu1p2rnYt1P9a7HrEJirFFFimH34MFf+pSspi1vM6plNPa448ZbY4fY8ddnj7Od6G9vJ8s2hdMKQCmgmlSuoVy0N8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=UqutqlGJ; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=feishu2403070942; d=yunsilicon.com; t=1740562770; h=from:subject:
- mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
- mime-version:in-reply-to:message-id;
- bh=QqjJG+8GIUXtUmeT1ngk+UmGKjddwmTixqOGo4vuayA=;
- b=P6+krkY5nHLfIF2DfMKtcw0hG+BJaK6xWsYtIyKhSVCqQJsDJhylqRnbXJknHSxUaWRDW9
- 2k6Bbgko9SakPOgj3odM7g0hXw6hLacsKvMVH+DvjIk803aTONpl00+tsXp6DO0lV4pn62
- LW0iy6NCbHTymap9zQbPr5wo+kBWZaEco9kU1d0vNJWsmbQHdq8Wolaj++asW7ttrpaqQ0
- X7HHEsVPvaJLfaDjzBIpiwKE1BE6IsYiXxBXDOgul4AfxQlO49C2rQQVuO+szCsLIchZ2K
- 5n7NMTZ1+GPn60y9PmCxpSlOAp1kGr7P692VR/to8lbm7dyKevsWNofGDbYcbQ==
-User-Agent: Mozilla Thunderbird
-Cc: <netdev@vger.kernel.org>, <leon@kernel.org>, <andrew+netdev@lunn.ch>, 
-	<pabeni@redhat.com>, <edumazet@google.com>, <davem@davemloft.net>, 
-	<jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>, 
-	<weihg@yunsilicon.com>, <wanry@yunsilicon.com>, <horms@kernel.org>, 
-	<parthiban.veerasooran@microchip.com>, <masahiroy@kernel.org>
-Subject: Re: [PATCH net-next v5 07/14] xsc: Init auxiliary device
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=83zqbI+x0U8gPtjXear3SquLiO46uugWTwSYAMtbREo=; b=UqutqlGJIvxUsGizH3OmMYEY79
+	1gUkhNTP6dnsG+xmSD9xemC1LTrj5vJtrHPQFCOEf8uykUCEgktMB9PRlBrgw8V9Plwa/r1N1Yhkn
+	tjB0bufEAycPO1r/FWfGxiEYGaWv8s0UhFkIlcCnfKsx7N08rKykXCsy0XjPqmxabduh/ypagv8JV
+	OJIuldAhllwqQGTb9TEsS/afmerYWy8+wPNqeO41sSu35L7UDEkVI8aawV/LmZftEmEtNxAm78bn5
+	olE6xbjjH8MHE2Vd1QBQp0bBVc/zGk2/FIviY8wWn6fzq90d4x5BM/Aq02WkJWFN87+xpfIhfuf21
+	dL2zjjyw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45812)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tnDtL-0003mS-2I;
+	Wed, 26 Feb 2025 09:39:49 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tnDt8-0006xF-1k;
+	Wed, 26 Feb 2025 09:39:34 +0000
+Date: Wed, 26 Feb 2025 09:39:34 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Furong Xu <0x1207@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Eric Dumazet <edumazet@google.com>,
+	Fabio Estevam <festevam@gmail.com>, imx@lists.linux.dev,
+	Inochi Amaoto <inochiama@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jan Petrous <jan.petrous@oss.nxp.com>,
+	Jon Hunter <jonathanh@nvidia.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Minda Chen <minda.chen@starfivetech.com>, netdev@vger.kernel.org,
+	NXP S32 Linux Team <s32@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Thierry Reding <treding@nvidia.com>, hailong.fan@siengine.com,
+	2694439648@qq.com
+Subject: Re: net: stmmac: weirdness in stmmac_hw_setup()
+Message-ID: <Z77hVrC5Lcbxrlx8@shell.armlinux.org.uk>
+References: <Z7dVp7_InAHe0q_y@shell.armlinux.org.uk>
+ <20250226104326.0000766e@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Original-From: Xin Tian <tianx@yunsilicon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-To: "Jakub Kicinski" <kuba@kernel.org>
-Date: Wed, 26 Feb 2025 17:39:27 +0800
-Message-Id: <5fd46c35-8aca-4242-8128-67ca4f41eb3c@yunsilicon.com>
-X-Lms-Return-Path: <lba+267bee150+d041ce+vger.kernel.org+tianx@yunsilicon.com>
-From: "Xin Tian" <tianx@yunsilicon.com>
-Received: from [127.0.0.1] ([218.1.186.193]) by smtp.feishu.cn with ESMTPS; Wed, 26 Feb 2025 17:39:27 +0800
-In-Reply-To: <20250225171229.0721fabb@kernel.org>
-References: <20250224172416.2455751-1-tianx@yunsilicon.com> <20250224172429.2455751-8-tianx@yunsilicon.com> <20250225171229.0721fabb@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250226104326.0000766e@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 2025/2/26 9:12, Jakub Kicinski wrote:
-> On Tue, 25 Feb 2025 01:24:31 +0800 Xin Tian wrote:
->> Our device supports both Ethernet and RDMA functionalities, and
->> leveraging the auxiliary bus perfectly addresses our needs for
->> managing these distinct features. This patch utilizes auxiliary
->> device to handle the Ethernet functionality, while defining
->> xsc_adev_list to reserve expansion space for future RDMA
->> capabilities.
-> drivers/net/ethernet/yunsilicon/xsc/pci/adev.c:90:6: warning: variable 'ret' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
->     90 |         if (adev_id < 0)
->        |             ^~~~~~~~~~~
-> drivers/net/ethernet/yunsilicon/xsc/pci/adev.c:104:9: note: uninitialized use occurs here
->    104 |         return ret;
->        |                ^~~
-> drivers/net/ethernet/yunsilicon/xsc/pci/adev.c:90:2: note: remove the 'if' if its condition is always false
->     90 |         if (adev_id < 0)
->        |         ^~~~~~~~~~~~~~~~
->     91 |                 goto err_free_adev_list;
->        |                 ~~~~~~~~~~~~~~~~~~~~~~~
-> drivers/net/ethernet/yunsilicon/xsc/pci/adev.c:82:9: note: initialize the variable 'ret' to silence this warning
->     82 |         int ret;
->        |                ^
->        |                 = 0
-My bad, will fix.
+On Wed, Feb 26, 2025 at 10:43:26AM +0800, Furong Xu wrote:
+> On Thu, 20 Feb 2025 16:17:43 +0000, "Russell King (Oracle)" wrote:
+> 
+> > While looking through the stmmac driver, I've come across some
+> > weirdness in stmmac_hw_setup() which looks completely barmy to me.
+> > 
+> > It seems that it follows the initialisation suggested by Synopsys
+> > (as best I can determine from the iMX8MP documentation), even going
+> > as far as to *enable* transmit and receive *before* the network
+> > device has been administratively brought up. stmmac_hw_setup() does
+> > this:
+> > 
+> >         /* Enable the MAC Rx/Tx */
+> >         stmmac_mac_set(priv, priv->ioaddr, true);
+> > 
+> > which sets the TE and RE bits in the MAC configuration register.
+> > 
+> > This means that if the network link is active, packets will start
+> > to be received and will be placed into the receive descriptors.
+> > 
+> > We won't transmit anything because we won't be placing packets in
+> > the transmit descriptors to be transmitted.
+> > 
+> > However, this in stmmac_hw_setup() is just wrong. Can it be deleted
+> > as per the below?
+> > Tested-by: Thierry Reding <treding@nvidia.com>
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > index c2913f003fe6..d6e492f523f5 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > @@ -3493,9 +3493,6 @@ static int stmmac_hw_setup(struct net_device *dev, bool ptp_register)
+> >  		priv->hw->rx_csum = 0;
+> >  	}
+> >  
+> > -	/* Enable the MAC Rx/Tx */
+> > -	stmmac_mac_set(priv, priv->ioaddr, true);
+> > -
+> >  	/* Set the HW DMA mode and the COE */
+> >  	stmmac_dma_operation_mode(priv);
+> >  
+> 
+> A better fix here:
+> https://lore.kernel.org/all/tencent_CCC29C4F562F2DEFE48289DB52F4D91BDE05@qq.com/
+
+I don't think that addresses the issue I highlighted above, since it's
+still calling stmmac_mac_set(, true) in stmmac_hw_setup(), which I
+believe to be wrong (as per my explanation above.)
+
+However, the removal of setting GMAC_CONFIG_TE in the start_tx method
+looks correct to me, because:
+
+- the start_tx method is called via stmmac_start_tx(), which is only
+  called from stmmac_start_tx_dma().
+
+- stmmac_start_tx_dma() is called from:
+  * stmmac_start_all_dma()
+  * stmmac_tx_err()
+  * stmmac_enable_tx_queue()
+
+* stmmac_start_all_dma() is called from the end of stmmac_hw_setup(),
+  but we've already called stmmac_mac_set(, true) both before and
+  after the patch in the above URL, so is redundant.
+
+  Incidentally, this brings the same set of questions I've stated in
+  my initial email, and to me this is wrong.
+
+* stmmac_tx_err() can only happen when we are already active (so
+  transmission was already enabled).
+
+* stmmac_enable_tx_queue() is called from stmmac_xdp_enable_pool(),
+  which will only call this if netif_running() returns true,
+  implying that the netdev is already adminstratively brought up
+  and thus stmmac_hw_setup() will have been called.
+
+  Again, this brings the same set of questions I've stated in my
+  initial email, and to me this is wrong.
+
+
+While looking at Simon's comment, he talks about stmmac_xdp_open(), so
+I just looked at that, and found:
+
+        netif_carrier_on(dev);
+
+Then there's:
+
+        netif_carrier_off(dev);
+
+in stmmac_xdp_release().
+
+These were introduced in commit ac746c8520d9 ("net: stmmac: enhance XDP
+ZC driver level switching performance"), well after stmmac had been
+converted to phylink. Phylink documents this:
+
+16. Verify that the driver does not call::
+
+        netif_carrier_on()
+        netif_carrier_off()
+
+    as these will interfere with phylink's tracking of the link state,
+    and cause phylink to omit calls via the :c:func:`mac_link_up` and
+    :c:func:`mac_link_down` methods.
+
+So, the presence of these calls will mess up phylink, resulting in
+mac_link_up() and/or mac_link_down() *NOT* being called at appropriate
+times.
+
+However, stmmac_xdp_(open|release)() doesn't seem to do anything to
+bring the PHY or PCS up/down. This makes me wonder whether XDP support
+in the stmmac driver is basically broken, or maybe the netdev needs to
+already be administratively up (ip li set dev ... up). I don't know
+XDP as I've never used it. If that is the case, then those
+netif_carrier_*() calls need removing. Or - I say again - stmmac needs
+to *stop* using phylink. It's one or the other. A network driver
+either needs to use phylink properly or not use phylink *at* *all*.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
