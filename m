@@ -1,238 +1,140 @@
-Return-Path: <netdev+bounces-169920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9430A4676A
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 18:07:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1761A46795
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 18:13:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B11AF7A1CD0
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 17:05:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C7EB188FDC8
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 17:06:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93FB12206B6;
-	Wed, 26 Feb 2025 17:06:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2789224228;
+	Wed, 26 Feb 2025 17:06:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="ooKFCYjn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a/8x3DgJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1882821C9E8
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 17:06:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70B4E221DA1;
+	Wed, 26 Feb 2025 17:06:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740589584; cv=none; b=gJnGSVff/Iqe5MQoHrjQJa4bbCVHxallfl5zJk4LXagoEePSZvBh28Q08jLfsuO5XmLc9c4CF2bNdPDvOqoIBZHchoEntJhN5+dQYpRDqlSxP09EfQrholdpgB3A+n5GbjDvNkpUynTGBxVHxgGq6PoIjWnjIcE8Yi467lql+7o=
+	t=1740589599; cv=none; b=CaEeYgcns8BONft+EgJNvRfBAfjeDwKA8KD8rJbgYjpVxbuNK2kfV3xAxbRsWoB7yEAV/IUO43e2u9Acv3Lgja47HgHI/z+iWtP9VHhJs23tNiZC8xmFMCxehYwdZAjtKlwTRUSKeQQUFA1GnP/Sy9fIbA2Gb4IrS2/+3SjC9pY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740589584; c=relaxed/simple;
-	bh=44NNnUD+hfGRR2F9rFgWYPI21r5uwakJT3FCaArWLuk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l3JgiqHnxmctq96bJ5fVqmk2TYFlJgNV5hNKmdd24w20YrQzPKcx9Y6Yeo7+sHxuIVooFzYGlkleqGCsmTJVD2tbK2JLUQ6NDyCEoGt/QNN+n0lMZe77zPhUj1uL+385kn/GAB1jp2E6tEqkC2uqraXeeXY8fArkHltH6ddKhw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=ooKFCYjn; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2234a03cfa4so171315ad.0
-        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 09:06:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1740589582; x=1741194382; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ge7xoU8UBAorBDaipzgy/G03+hB92T3wjFILg07gSac=;
-        b=ooKFCYjnJdlCJEnI7C65Q8ecY+k/S2Y1HLfnEFimOP563JL3cFnuPU3makRMK6PpwA
-         4DENhQSypLKautzEwFoESV2WAR3QIdQBG8jxh22Cze/9J0w3MtJF4bZkjhWkrW+ChzGF
-         yLTiX3OQm24GwXU3lQKS+IFsMtE3IxV+/m3JcP+ikLy8CFlawbFwz5vT9T3oC5PAO3zL
-         qE8x3OsUsKLMsf0bnT/U59wlWPMqvJdiwH6IqZsSUpKIm/0pIA82g5tUK6xNSxL24/QV
-         TROnPde52So3UFBF/eMfLtHx6z9q2qTu6FgdNrViQaBrfiak6lZjEgpqBMrtv88gJZv3
-         dMng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740589582; x=1741194382;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ge7xoU8UBAorBDaipzgy/G03+hB92T3wjFILg07gSac=;
-        b=upv3jHlnonBgS6yWMrIPCgLawNLk/3HXFEJZdH5eJRLz3z4/DcJyRUp8oUmn6hrqai
-         UPUv2tK1MqKPXaSN0qG3w5QP3WhTlEXK36Uln5jFwbcIrD+zS5VVNgU8S35DP5eGo6J2
-         PkxqC0HB1Ve/3lc1xyAE/WSJ8j3Jf9x6h3bQOj+JS/1F8MSlqFAvPNrrMWNmFE4LAmQd
-         ZNevklEsGOmJRZp8gU2ey7iQoq1r7bbnxt7pQZqZcl8Fq+UsEZqQ9Ikrf1imBSF/e6ds
-         f6mazybz4TWgMaY4FAeSEfaSZDTPiYedl66BedzD/3dKNAwODDhN7wXcbwS3glTIDYp7
-         BG+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVcyHq6m+2RtezjBcceO93l4JHbesApaQfnqojcDnFcWHMJBvD/1I6QGisXdYOaVVGdYQdY7OU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZD0eQwAaQTKRetH/mfpgfzBxXQ0wYLD8RP0T8SjDUDniXcQt3
-	CW3jr+B1nwDySVf3Y+nKhlw7s3GSy9lWCzjkGoa0aiExQ7tTw4F1JE23a3dyFr8=
-X-Gm-Gg: ASbGncsd3RiOLVX3M7ub8eLAyTmiIA7L6qPuNZmynLgiHdllJ8shHSi2tUMCo8UtYo6
-	wStId1zceRvR8l8+x1PF4DHDoBY056vb8IQTOQvJV0Og4tY/0QammrGtBZvKwCMC0LSbu/PJKTl
-	g2VGpSaDkaQxFxYYN1c/QicvGOm5MAebHGtGvmEYwsA2sSzzMhdmqwHq8NyzBvISxG6ACNreE85
-	2gZaAl7O4bdVB/Y2UEIdmtSYf2u9RQFqqEliaVQWRYn/OOE3Uq14+AUaROo88Lon5LXKOhcDpZ6
-	Auprbkey9B9uS1w=
-X-Google-Smtp-Source: AGHT+IFG6PPYtEosIJZGPzM849unBlSnZ7+rND8/XIdyITOovFgbB5eNE3jH+ynu/u20HtMC0RG5Ig==
-X-Received: by 2002:a05:6a21:e8d:b0:1ee:cac0:1b49 with SMTP id adf61e73a8af0-1eef3cdc55amr14833326637.5.1740589582235;
-        Wed, 26 Feb 2025 09:06:22 -0800 (PST)
-Received: from t14.. ([2001:5a8:4528:b100:c968:54d4:e478:4e80])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7347a7f8258sm3736863b3a.112.2025.02.26.09.06.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Feb 2025 09:06:21 -0800 (PST)
-From: Jordan Rife <jordan@jrife.io>
-To: Daniel Borkmann <daniel@iogearbox.net>,
-	Nikolay Aleksandrov <razor@blackwall.org>
-Cc: Jordan Rife <jordan@jrife.io>,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	stephen@networkplumber.org,
-	dsahern@kernel.org
-Subject: [PATCH iproute2-next v3] ip: link: netkit: Support scrub options
-Date: Wed, 26 Feb 2025 09:06:13 -0800
-Message-ID: <20250226170615.2237516-1-jordan@jrife.io>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1740589599; c=relaxed/simple;
+	bh=2R180IJ7APaALd1g+yyfkVhGYnf3hIvGDgk8lsKLG8A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m8TRhcxJ8E3aPz7bLSpfkPrnIcocCIott6ZVLDDO4z+gY8rni9T+BvmmjRIctFzF+QofmMWLcAbFzwExQjXQKv+VdbrC7nG5puN8Tlh/W1fTC0RneefW5rLhcyxMzR4OaDhIurtyCinpqBw8CK1ldNMHBnFs7mFA3Ih+1KSupnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a/8x3DgJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC56BC116B1;
+	Wed, 26 Feb 2025 17:06:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740589599;
+	bh=2R180IJ7APaALd1g+yyfkVhGYnf3hIvGDgk8lsKLG8A=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=a/8x3DgJgskglabgyo16PGJtzrAVaL3wlI4GWiUa2t3h6Arsj1fdxCDGHHUKE1qz+
+	 MkWqGYj4HEBPBct7yYViRQUjlal1IbYHMnBCcmswporwMRHlB0Nx9dMjqXBPC9R6BF
+	 4qXyHcAPiRTt8nxgOwp7kjYrgjhT3u1JQIevs3oxA6uy6x3/jSFm7QuEaI+C811iY+
+	 4AL2jhdvnuhR4d5R91R5M0A3eER7PnxdjHvqOLqUclMX+1F16ZGFfW+dcq/tsjnLMP
+	 kSGz3A674HrBV9uFQqMNpCDNbxrVVIxuFXU3Ie1gj1RsPLiIjEfUxTtzaPunB5VN6E
+	 gP899WOFULZWA==
+Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-5fcd811d939so580383eaf.0;
+        Wed, 26 Feb 2025 09:06:38 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCU1vPJFgkoyBTCdNw1rIiYiW8YUNF9HhM9VaqAZ4B4yEPdqoAAbEIDZ0o0Q6Rg5rux9WYh+meLb8lRKx12/@vger.kernel.org, AJvYcCUSDPE2Kl8M+7tbz7bCGjoKzqd1onjZylURVRI7FCYD6YzZyFNz6OdTPv/yOB0vjrMYKxRtBtjs5iD/hQ==@vger.kernel.org, AJvYcCUe+0MrzgLg5q81ot+3P7kXDFDDpCqjtquPJiLom3G8IZ/8+eEHtpmsu/JMEky5b95OP+iinJOa40YGBQ==@vger.kernel.org, AJvYcCV4bSwqvhjKgmoG7xQK1fRFqHrNEzNyFrQKgf8A3P/jZ7IA907+RNDZvJBWZJ6Bpirf5av6EhxOGc/4pd4ID/0=@vger.kernel.org, AJvYcCVPbHi1at06YwsIaMt0Yofh9Iwv1VohDT4wWsmGIcx4EpBCu4T/tD7p9UEfYG9rlvSwSAoVlLHREZrQFlwV@vger.kernel.org, AJvYcCVTiZbwv8Bom8+ndrw4bl9f5hnk6gLmH0fayyhA5BVKbndv4YgviLbEX6DI8qlpCDqPcjsvG5kv@vger.kernel.org, AJvYcCXMHLoZc61wf+WW7M961lIzX55prjUjgLz7iTtu4ijfS77SVyJYe4v5UlPajl+1kFx25VCrojkxJ0Oz@vger.kernel.org, AJvYcCXZPGPzuoeF0XjVRL9NSA/jtSnHijtGwqtGUeFEJ6VjYlVg8dhoxntEjp6qhuAJqrAI7eQ0MD8Nyrs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUiLgECOSOV+P096p4zKi6lxpj31zoCwRXzUM5tyAHOu1AF5mD
+	ZW3hbalWNlyMwAQpTLuHY8M5UEb3cCkCAJm1MCd6JNjTztaTELU4KRvgfYXrI+t+qzqkEFYJi52
+	bSGcfhHiGLdpvzdJFsVkC6RobjMc=
+X-Google-Smtp-Source: AGHT+IHyPLVjXp7kw5kgInAMNb4jd7h5cWQZCWKEZs0yMGYHKslrekdKrqf86zX892n/fj3IchT6bMpb2Dem6Q8+U3o=
+X-Received: by 2002:a05:6871:d20d:b0:2bd:286:d713 with SMTP id
+ 586e51a60fabf-2c155700434mr67466fac.11.1740589597661; Wed, 26 Feb 2025
+ 09:06:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com> <20250221-rmv_return-v1-14-cc8dff275827@quicinc.com>
+In-Reply-To: <20250221-rmv_return-v1-14-cc8dff275827@quicinc.com>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Wed, 26 Feb 2025 18:06:26 +0100
+X-Gmail-Original-Message-ID: <CAJZ5v0i-_08mhOpsecuU+XzS8rKbk9mtgr_Kwx-QGRPh9jumKw@mail.gmail.com>
+X-Gm-Features: AQ5f1Jo18T3Py72uAV75_Jf5fdQvWu4rZ8JYWNQWcMOGXjnJR1QY3tpi4Yj9mbE
+Message-ID: <CAJZ5v0i-_08mhOpsecuU+XzS8rKbk9mtgr_Kwx-QGRPh9jumKw@mail.gmail.com>
+Subject: Re: [PATCH *-next 14/18] PM: wakeup: Remove needless return in three
+ void APIs
+To: Zijun Hu <quic_zijuhu@quicinc.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Will Deacon <will@kernel.org>, 
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Nick Piggin <npiggin@gmail.com>, Peter Zijlstra <peterz@infradead.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Thomas Gleixner <tglx@linutronix.de>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Danilo Krummrich <dakr@kernel.org>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Johannes Berg <johannes@sipsolutions.net>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, Lee Jones <lee@kernel.org>, Thomas Graf <tgraf@suug.ch>, 
+	Christoph Hellwig <hch@lst.de>, Marek Szyprowski <m.szyprowski@samsung.com>, 
+	Robin Murphy <robin.murphy@arm.com>, Miquel Raynal <miquel.raynal@bootlin.com>, 
+	Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>, Zijun Hu <zijun_hu@icloud.com>, 
+	linux-arch@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-pm@vger.kernel.org, iommu@lists.linux.dev, 
+	linux-mtd@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add "scrub" option to configure IFLA_NETKIT_SCRUB and
-IFLA_NETKIT_PEER_SCRUB when setting up a link. Add "scrub" and
-"peer scrub" to device details as well when printing.
+On Fri, Feb 21, 2025 at 2:03=E2=80=AFPM Zijun Hu <quic_zijuhu@quicinc.com> =
+wrote:
+>
+> Remove needless 'return' in the following void APIs:
+>
+>  __pm_wakeup_event()
+>  pm_wakeup_event()
+>  pm_wakeup_hard_event()
+>
+> Since both the API and callee involved are void functions.
+>
+> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> ---
+>  include/linux/pm_wakeup.h | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/include/linux/pm_wakeup.h b/include/linux/pm_wakeup.h
+> index d501c09c60cd..51e0e8dd5f9e 100644
+> --- a/include/linux/pm_wakeup.h
+> +++ b/include/linux/pm_wakeup.h
+> @@ -205,17 +205,17 @@ static inline void device_set_awake_path(struct dev=
+ice *dev)
+>
+>  static inline void __pm_wakeup_event(struct wakeup_source *ws, unsigned =
+int msec)
+>  {
+> -       return pm_wakeup_ws_event(ws, msec, false);
+> +       pm_wakeup_ws_event(ws, msec, false);
+>  }
+>
+>  static inline void pm_wakeup_event(struct device *dev, unsigned int msec=
+)
+>  {
+> -       return pm_wakeup_dev_event(dev, msec, false);
+> +       pm_wakeup_dev_event(dev, msec, false);
+>  }
+>
+>  static inline void pm_wakeup_hard_event(struct device *dev)
+>  {
+> -       return pm_wakeup_dev_event(dev, 0, true);
+> +       pm_wakeup_dev_event(dev, 0, true);
+>  }
+>
+>  /**
+>
+> --
 
-$ sudo ./ip/ip link add jordan type netkit scrub default peer scrub none
-$ ./ip/ip -details link show jordan
-43: jordan@nk0: <BROADCAST,MULTICAST,NOARP,M-DOWN> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
-    link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff promiscuity 0 allmulti 0 minmtu 68 maxmtu 65535
-    netkit mode l3 type primary policy forward peer policy forward scrub default peer scrub none numtxqueues 1 numrxqueues 1 gso_max_size 65536 gso_max_segs 65535 tso_max_size 524280 tso_max_segs 65535 gro_max_size 65536 gso_ipv4_max_size 65536 gro_ipv4_max_size 65536
-
-v2->v3: Updated man page.
-v1->v2: Added some spaces around "scrub SCRUB" in the help message.
-
-Link: https://lore.kernel.org/netdev/20241004101335.117711-1-daniel@iogearbox.net/
-
-Signed-off-by: Jordan Rife <jordan@jrife.io>
----
- ip/iplink_netkit.c    | 46 ++++++++++++++++++++++++++++++++++++++++++-
- man/man8/ip-link.8.in | 15 ++++++++++++++
- 2 files changed, 60 insertions(+), 1 deletion(-)
-
-diff --git a/ip/iplink_netkit.c b/ip/iplink_netkit.c
-index 49550a2e..818da119 100644
---- a/ip/iplink_netkit.c
-+++ b/ip/iplink_netkit.c
-@@ -24,13 +24,19 @@ static const char * const netkit_policy_strings[] = {
- 	[NETKIT_DROP]		= "blackhole",
- };
- 
-+static const char * const netkit_scrub_strings[] = {
-+	[NETKIT_SCRUB_NONE]	= "none",
-+	[NETKIT_SCRUB_DEFAULT]	= "default",
-+};
-+
- static void explain(struct link_util *lu, FILE *f)
- {
- 	fprintf(f,
--		"Usage: ... %s [ mode MODE ] [ POLICY ] [ peer [ POLICY <options> ] ]\n"
-+		"Usage: ... %s [ mode MODE ] [ POLICY ] [ scrub SCRUB ] [ peer [ POLICY <options> ] ]\n"
- 		"\n"
- 		"MODE: l3 | l2\n"
- 		"POLICY: forward | blackhole\n"
-+		"SCRUB: default | none\n"
- 		"(first values are the defaults if nothing is specified)\n"
- 		"\n"
- 		"To get <options> type 'ip link add help'.\n",
-@@ -91,6 +97,23 @@ static int netkit_parse_opt(struct link_util *lu, int argc, char **argv,
- 			if (seen_peer)
- 				duparg("peer", *(argv + 1));
- 			seen_peer = true;
-+		} else if (strcmp(*argv, "scrub") == 0) {
-+			int attr_name = seen_peer ?
-+					IFLA_NETKIT_PEER_SCRUB :
-+					IFLA_NETKIT_SCRUB;
-+			enum netkit_scrub scrub;
-+
-+			NEXT_ARG();
-+
-+			if (strcmp(*argv, "none") == 0) {
-+				scrub = NETKIT_SCRUB_NONE;
-+			} else if (strcmp(*argv, "default") == 0) {
-+				scrub = NETKIT_SCRUB_DEFAULT;
-+			} else {
-+				fprintf(stderr, "Error: scrub must be either \"none\" or \"default\"\n");
-+				return -1;
-+			}
-+			addattr32(n, 1024, attr_name, scrub);
- 		} else {
- 			char *type = NULL;
- 
-@@ -144,6 +167,15 @@ static const char *netkit_print_mode(__u32 mode)
- 	return netkit_mode_strings[mode] ? : inv;
- }
- 
-+static const char *netkit_print_scrub(enum netkit_scrub scrub)
-+{
-+	const char *inv = "UNKNOWN";
-+
-+	if (scrub >= ARRAY_SIZE(netkit_scrub_strings))
-+		return inv;
-+	return netkit_scrub_strings[scrub] ? : inv;
-+}
-+
- static void netkit_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- {
- 	if (!tb)
-@@ -172,6 +204,18 @@ static void netkit_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 		print_string(PRINT_ANY, "peer_policy", "peer policy %s ",
- 			     netkit_print_policy(policy));
- 	}
-+	if (tb[IFLA_NETKIT_SCRUB]) {
-+		enum netkit_scrub scrub = rta_getattr_u32(tb[IFLA_NETKIT_SCRUB]);
-+
-+		print_string(PRINT_ANY, "scrub", "scrub %s ",
-+			     netkit_print_scrub(scrub));
-+	}
-+	if (tb[IFLA_NETKIT_PEER_SCRUB]) {
-+		enum netkit_scrub scrub = rta_getattr_u32(tb[IFLA_NETKIT_PEER_SCRUB]);
-+
-+		print_string(PRINT_ANY, "peer_scrub", "peer scrub %s ",
-+			     netkit_print_scrub(scrub));
-+	}
- }
- 
- static void netkit_print_help(struct link_util *lu,
-diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
-index efb62481..d6e05d94 100644
---- a/man/man8/ip-link.8.in
-+++ b/man/man8/ip-link.8.in
-@@ -882,10 +882,14 @@ the following additional arguments are supported:
- [
- .BI mode " MODE "
- ] [
-+.BI scrub " SCRUB "
-+] [
- .I "POLICY "
- ] [
- .BR peer
- [
-+.BI scrub " SCRUB "
-+] [
- .I "POLICY "
- ] [
- .I "NAME "
-@@ -898,6 +902,17 @@ the following additional arguments are supported:
- - specifies the operation mode of the netkit device with "l3" and "l2"
- as possible values. Default option is "l3".
- 
-+.sp
-+.BI scrub " SCRUB"
-+- specifies the scrub behavior of the netkit device with "default" and
-+"none" as possible values. With "default" the device zeroes the
-+skb->{mark,priority} fields before invoking the attached BPF program
-+when its peer device resides in a different network namespace. With
-+"none" the device leaves clearing skb->{mark,priority} up to the BPF
-+program. Default option is "default". Specifying scrub before the peer
-+option refers to the primary device, after the peer option refers to
-+the peer device.
-+
- .sp
- .I "POLICY"
- - specifies the default device policy when no BPF programs are attached
--- 
-2.43.0
-
+Applied as 6.15 material, thanks!
 
