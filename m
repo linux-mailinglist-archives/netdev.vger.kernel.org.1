@@ -1,111 +1,133 @@
-Return-Path: <netdev+bounces-169817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 038E1A45CDD
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 12:17:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 163CBA45CE3
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 12:17:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 857231881A55
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 11:17:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1816716196D
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 11:17:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33C8218C034;
-	Wed, 26 Feb 2025 11:16:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E07920FA9B;
+	Wed, 26 Feb 2025 11:17:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R/2rJWCV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HaeThs8N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817E3258CD9
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 11:16:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145931A2C0B;
+	Wed, 26 Feb 2025 11:17:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740568616; cv=none; b=L/4uX3TU4E3/O4s9nJcOEOwOlqaSVN4poX3QRRv4QBAJ+Mvg/qXouFmvJ65ON5HjAynUA8I3+ZHT70jpg0ZQXMLan+3JOGbDjdEwRtTZ0o9z6CEhmH3cjeuLvrUjdhaOa3TxIcOONoBl7C399rMJn6WSwScMOGcIQKooa3DC1Ow=
+	t=1740568658; cv=none; b=Apo30wq2NF8RQmqQfENAZIBWyNaF/NGavC/upP4Y3xi997VaISZ9bJaDr43apa0tySY7OkzXHpLKjfPVplC9i4b47kMUdYF8FywY3Wc0ob/84sX/9NMe85i9cccyudOp4qGahKwvHuiZRjRK2qBaKuirsv37lBWqbk2VrVl/rcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740568616; c=relaxed/simple;
-	bh=KRtKp3WL0mUuvEo01WZDc0YIx/eAYxHtU1a62l/aZhw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T7Kw4fzFBVFhT9YDz5BST3gWrazlcd+Bl5fsawzzTaG3NYU4s8ze28c6h18O9QYcYThpqSbx5rfgLGhYJFDXerp1SGipIkAWqRoP/es92gdGPPu049vm3R/Fr763z+AnlNMoGSa3z3KDY9sV1y/RTA5iLKWutOT8U7VvibEqxpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R/2rJWCV; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5e0373c7f55so10219945a12.0
-        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 03:16:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740568613; x=1741173413; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KRtKp3WL0mUuvEo01WZDc0YIx/eAYxHtU1a62l/aZhw=;
-        b=R/2rJWCV1sEJb1V5rynlcwohP+gvny1+jy1/MZ2Voq8BzGHKew27jYNP95IbRo4sOe
-         H0tQ5tsIFkJOWOY9XOh313G4cFo8iLhSdOFwi+k970MswjdxKFAjqGDwi0Z1c/zeDDFi
-         N3xQmjkXGLTxnZmADk4xi1dxq3lz67psu+daM+wkg5rvklOV6Y4wV0cNTfT7qoM1HDfS
-         Qbm5EwLUF7Vm1xEWhgJCmiLcbk4/+6woTYSMGAtAqCDDmp3VXCyDxvEUDkf3Oz/ahvJP
-         9K6uLnDSQ8INyy14shs+MdJTL7eQGF1s9QcFhqCRh2RV2coIzkFSuGTouDh1Pt2TH0hT
-         pLsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740568613; x=1741173413;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KRtKp3WL0mUuvEo01WZDc0YIx/eAYxHtU1a62l/aZhw=;
-        b=CXf1ML+MHHo359HyM035+w9UkUSl4g1lxMfr9ZpEBSgCmeXYB8C8LqdYItt46VWTBd
-         JifCmX7gaW+zlwZ9iyoycRzjTZceuppNrRHNFnZe/k7GEmpuSh3+Kk2PzUNG44AOPkf4
-         ia8Yu5lGdKQ4GJOXcrGwznJnM3Sb8AO26wUgnOTs9CCSnE63aNeG5+0ESFOeawUBtUF6
-         YNqcVs/z5azSpSSFu8ViHguu38px61yJbXWaKLOVvmoCmJpyXLi71dI1f556OKeY3G1R
-         jB2MCA/PcrUkBmK3CaiJFCjGFyMjYXBHLB+/2Qo8MYkLNTmbLGIpp1syxdVlTU6wAWOK
-         LY4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUijKoCgB+HzS6EX65V8BOB/e75z5f0d2rCiGs8sDIVGEqZGcaUS4EN4sgDxYFXRagIfs2idYY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwN/w5RZGoWZ+mFRpxVtP300FVexJO5AgfsKiLGi3eSr4nlXi9f
-	MLQ8fLTWxwoNvqQJZtfJkgAiAmsmulX+ySyekTa9Cr7AnYUMIN6wuBzKNaafHbgX5T42ecqErmu
-	gEyLcgFuTlOoOKVpwqpDk71bJOhhuNf15ubaz
-X-Gm-Gg: ASbGncuzfP7abfQINdT8jpxS5S1XZXQIDH8XDzpCxSNECiRmi6uAScyQhzCucyvPtdA
-	WPtnd3Q4Q/ba049IzoslPtfZnR7HrxQ33ee/gfjPHpZxQub9i3T08ZkcCgtgWryADVHN7QXmODp
-	zcS34PcN4=
-X-Google-Smtp-Source: AGHT+IE+wYgejaUlz3NoOC8oEoO31UtyOBiY30LE3QZPYjvNWT+8ceSvRQ4xI9uYoGc8LLQVRyBhUGGoO430SfFDSJ0=
-X-Received: by 2002:a05:6402:27d1:b0:5e0:68df:4fc1 with SMTP id
- 4fb4d7f45d1cf-5e4a0d72331mr2926211a12.10.1740568612656; Wed, 26 Feb 2025
- 03:16:52 -0800 (PST)
+	s=arc-20240116; t=1740568658; c=relaxed/simple;
+	bh=7/KhHCNzmJJ/t9mQPUjzLL7Pfm96XkWSysYhhYdAhdA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NRLGO5fnp3QrkG7ISSLRb4OKMoJBezuVmEFBP487ykp536RhX3ljyaA59H9SE0hUgkrZw+YCclNpIaHrRmP9p2OIw8ToN7C4x8ivD0f+gLvrPq+2rDmdePiWAc9wt9QLGmCMnda8v/xoTPYopod6rL06z7b5iNjgGqSuhQa0qeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HaeThs8N; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81E52C4CED6;
+	Wed, 26 Feb 2025 11:17:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740568657;
+	bh=7/KhHCNzmJJ/t9mQPUjzLL7Pfm96XkWSysYhhYdAhdA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=HaeThs8No7iKfcEzyWyPGDMXgGzg/WV1VlirWCoZHyaa/8V0xQ42bPzHNpfVsKBtO
+	 r2Cq0ssLOARGeFsKeuw9IEAJeHfa4omw74hbtn52v0ZC9zO8KdXb12yxVl6rp+Qngj
+	 gj986yXmu2Yd8jV1L1rWL6IrOsBWJymtuoFNGMs50tKmc9EazcG03GqtV7Zi35n8aB
+	 vfIHXcj8CK0KOp9s1EF3ZWpRvP/obwEt/Ww9c/AcGNhyBcIJaA3wbyyQNEtKQvFcwQ
+	 UajmadIZq2fZZD6zPqx5oFA7PpURvwDqQ+O5RF0QOWqGZ9bzBRPjZq3bBrWV7FHxvS
+	 HcRYpVMrMUQPA==
+Message-ID: <e535b0ed-b79f-4c98-8585-be5aea69f18d@kernel.org>
+Date: Wed, 26 Feb 2025 12:17:28 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250225182250.74650-1-kuniyu@amazon.com> <20250225182250.74650-7-kuniyu@amazon.com>
-In-Reply-To: <20250225182250.74650-7-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 26 Feb 2025 12:16:41 +0100
-X-Gm-Features: AQ5f1JpO3wA2O5sz-ocjX2lfnRc8G_JsZzQSIFDW5XnyfEHijvokCfDJFdLCDy4
-Message-ID: <CANn89iLzk1q8WQ78nmnc3uV2WN9NvKSWT+yg3V3dq4CW31_YDg@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 06/12] ipv4: fib: Remove fib_info_hash_size.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 6/6] arm64: defconfig: Build NSS Clock Controller
+ driver for IPQ9574
+To: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>, andersson@kernel.org,
+ mturquette@baylibre.com, sboyd@kernel.org, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, konradybcio@kernel.org,
+ catalin.marinas@arm.com, will@kernel.org, p.zabel@pengutronix.de,
+ richardcochran@gmail.com, geert+renesas@glider.be,
+ dmitry.baryshkov@linaro.org, arnd@arndb.de, nfraprado@collabora.com,
+ biju.das.jz@bp.renesas.com, quic_tdas@quicinc.com, ebiggers@google.com,
+ ardb@kernel.org, ross.burton@arm.com, quic_anusha@quicinc.com,
+ linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org
+Cc: quic_srichara@quicinc.com, quic_varada@quicinc.com
+References: <20250207073926.2735129-1-quic_mmanikan@quicinc.com>
+ <20250207073926.2735129-7-quic_mmanikan@quicinc.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20250207073926.2735129-7-quic_mmanikan@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Feb 25, 2025 at 7:25=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> We will allocate the fib_info hash tables per netns.
->
-> There are 5 global variables for fib_info hash tables:
-> fib_info_hash, fib_info_laddrhash, fib_info_hash_size,
-> fib_info_hash_bits, fib_info_cnt.
->
-> However, fib_info_laddrhash and fib_info_hash_size can be
-> easily calculated from fib_info_hash and fib_info_hash_bits.
->
-> Let's remove fib_info_hash_size and use (1 << fib_info_hash_bits)
-> instead.
->
-> Now we need not pass the new hash table size to fib_info_hash_move().
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+On 07/02/2025 08:39, Manikanta Mylavarapu wrote:
+> From: Devi Priya <quic_devipriy@quicinc.com>
+> 
+> NSSCC driver is needed to enable the ethernet interfaces present
+> in RDP433 based on IPQ9574. Since this is not necessary for bootup
+> enabling it as a module.
+> 
+> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
+> Signed-off-by: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
+> ---
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
+Best regards,
+Krzysztof
 
