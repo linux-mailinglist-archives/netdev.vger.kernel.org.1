@@ -1,91 +1,106 @@
-Return-Path: <netdev+bounces-169657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F2AEA45202
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 02:12:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D15AA4524D
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 02:40:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C151A3B0ACB
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 01:12:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20478189F225
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 01:39:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85143154423;
-	Wed, 26 Feb 2025 01:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2625B19C57C;
+	Wed, 26 Feb 2025 01:39:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H6RyuVP3"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="DSr0p5U6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D4E742A9D
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 01:12:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ADA8199EBB;
+	Wed, 26 Feb 2025 01:39:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740532351; cv=none; b=oGqDXZSpPqYm2AC5ftAltJOKYSPrt+hamz41Z0ryCsjAcOwmUo2F1IsNmDKXYbzfpbpbbnVNKn0gTYn8O5R0h/G2oE3qHw9uygc4f5RUHhN2PXBsCfICdeW0iWlTsNFfQ7cEd16ga5lWQQO6JFbRDZXYRJc3gh5eNRCoOU85Umg=
+	t=1740533965; cv=none; b=dOS7CTBjYzn+yCHcmpCBbAEWgHwdDiut8P9lzBSIdmKIRhE3Jcw1vBhOyyWdThHRE3Di2qQBT2ogsddVZN8E1OLjo7QxV4L14cw6WjK4VEOBKhhh+rhmaA6/NmeJ+vb+UvrEjlKEJqEcml8/RIfTViOEWDb9KolQJmQVYnvzsbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740532351; c=relaxed/simple;
-	bh=Q7XNbnyHVAO/AJkzOQub1PmkrtWAzONU+a89IzTOhbg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aj5/f10kv04TenjeBr9nB7RnAIDP1Miu24JecxtY/sVxnKltXeB+gxC1zsB/CFRz1bINIBcke4TYNNCrnZgCkAKSqWMOt9uvnMkFFUOGOGytctdsG/LjHgTgXi28QnI+GuGlUDFMgDGCZs1VW6mTARnx7OVecTALKf1v20R4dLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H6RyuVP3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37576C4CEDD;
-	Wed, 26 Feb 2025 01:12:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740532350;
-	bh=Q7XNbnyHVAO/AJkzOQub1PmkrtWAzONU+a89IzTOhbg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=H6RyuVP36/hX8I0JJ4a0gT2WLAxdQfra+wyrEsonhRFqX7TL6gthPJJuSogm9X3mD
-	 Todx73voTJ6OmQcYfjkaruU+vrfK9UHdmSs9hGBvzjEgoDTj5AF7jq+GemS/QUCTXT
-	 +xAVMvUgVJkRXf4XSkaI6FZgPpn/+DsZQlf/OyQ3L3TQD6Jli3aJ1g3Iv4fR1br6wZ
-	 /1n1TcoOf2L9avMOxi/aX2WmMKTh8/NKWK6YmvtDqf0oJDhjqD0D1w3e5/asvYzdYh
-	 o1MwcFQjb9XM+H0KDZIZkKTc3FNp4iP326SIlhLIwMbcqxwgZSvMJl63/MQYkSvNWZ
-	 IqhN/aA+w42Qw==
-Date: Tue, 25 Feb 2025 17:12:29 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Xin Tian" <tianx@yunsilicon.com>
-Cc: <netdev@vger.kernel.org>, <leon@kernel.org>, <andrew+netdev@lunn.ch>,
- <pabeni@redhat.com>, <edumazet@google.com>, <davem@davemloft.net>,
- <jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>,
- <weihg@yunsilicon.com>, <wanry@yunsilicon.com>, <horms@kernel.org>,
- <parthiban.veerasooran@microchip.com>, <masahiroy@kernel.org>
-Subject: Re: [PATCH net-next v5 07/14] xsc: Init auxiliary device
-Message-ID: <20250225171229.0721fabb@kernel.org>
-In-Reply-To: <20250224172429.2455751-8-tianx@yunsilicon.com>
-References: <20250224172416.2455751-1-tianx@yunsilicon.com>
-	<20250224172429.2455751-8-tianx@yunsilicon.com>
+	s=arc-20240116; t=1740533965; c=relaxed/simple;
+	bh=T0pKCclIvHKyDRUHCJs7P4mfoEs4SIcJGp6SSmwXCZc=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=l8J0kNGUdlNTI1ROnga+P6ZKjzmHhtm58VmT54d4SFKrvZU49bRDqNtemU45s5igZsN4W+2YCm/fWU+ZQxWPJkU6w+BBhKfe2BTTNqpbEch4mrZ3A8HI2hHEkvprDT9dTgg/v+rb7mZXyzYdNsH8WteQCCz82zAavl5g4EZDm0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=DSr0p5U6; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [127.0.0.1] ([76.133.66.138])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 51Q1ZSdu1502812
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Tue, 25 Feb 2025 17:35:29 -0800
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 51Q1ZSdu1502812
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025021701; t=1740533740;
+	bh=T0pKCclIvHKyDRUHCJs7P4mfoEs4SIcJGp6SSmwXCZc=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=DSr0p5U6PuFacB2sJlJBShpK+caegDMEmn8OYplTp/ukKNtEFfrkn97ga+OT2dXpz
+	 K/n5OJZ9p7wF026A4N5Ms8I4Ha7wXxIE31o+eevCv66LWleUk5egaKa/T1wzR+OiP5
+	 pBftNRMbRUke7ubIKWI6Trw88YIoPJ//UlgWSqbBalJrMQ6XLeWdsBqjIBFJ2BqBTU
+	 NxN3soIqU4psmCdpeI68cUVCZ/T8YSni/GX+FUYtyTt8DqQzRz5FBJx8rRSkQsq+0n
+	 LFOV9xO0DwzRQLOdgcR413cBdNqea/GHzmtBr2NpUvBJ8KgVfK7MCUU4fZDlrEdXny
+	 PWA/+ls6AlysA==
+Date: Tue, 25 Feb 2025 17:35:26 -0800
+From: "H. Peter Anvin" <hpa@zytor.com>
+To: Andrew Cooper <andrew.cooper3@citrix.com>
+CC: Laurent.pinchart@ideasonboard.com, airlied@gmail.com,
+        akpm@linux-foundation.org, alistair@popple.id.au,
+        andrew+netdev@lunn.ch, andrzej.hajda@intel.com,
+        arend.vanspriel@broadcom.com, awalls@md.metrocast.net, bp@alien8.de,
+        bpf@vger.kernel.org, brcm80211-dev-list.pdl@broadcom.com,
+        brcm80211@lists.linux.dev, dave.hansen@linux.intel.com,
+        davem@davemloft.net, david.laight.linux@gmail.com,
+        dmitry.torokhov@gmail.com, dri-devel@lists.freedesktop.org,
+        eajames@linux.ibm.com, edumazet@google.com, eleanor15x@gmail.com,
+        gregkh@linuxfoundation.org, hverkuil@xs4all.nl,
+        jernej.skrabec@gmail.com, jirislaby@kernel.org, jk@ozlabs.org,
+        joel@jms.id.au, johannes@sipsolutions.net, jonas@kwiboo.se,
+        jserv@ccns.ncku.edu.tw, kuba@kernel.org, linux-fsi@lists.ozlabs.org,
+        linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-serial@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux@rasmusvillemoes.dk, louis.peens@corigine.com,
+        maarten.lankhorst@linux.intel.com, mchehab@kernel.org,
+        mingo@redhat.com, miquel.raynal@bootlin.com, mripard@kernel.org,
+        neil.armstrong@linaro.org, netdev@vger.kernel.org,
+        oss-drivers@corigine.com, pabeni@redhat.com,
+        parthiban.veerasooran@microchip.com, rfoss@kernel.org, richard@nod.at,
+        simona@ffwll.ch, tglx@linutronix.de, tzimmermann@suse.de,
+        vigneshr@ti.com, visitorckw@gmail.com, x86@kernel.org,
+        yury.norov@gmail.com
+Subject: Re: [PATCH 02/17] bitops: Add generic parity calculation for u64
+User-Agent: K-9 Mail for Android
+In-Reply-To: <8052b316-9f72-42c7-9e11-e23e690d80c4@citrix.com>
+References: <3BC57C78-1DFF-4B83-85AA-A908DBF2B958@zytor.com> <8052b316-9f72-42c7-9e11-e23e690d80c4@citrix.com>
+Message-ID: <4259A207-7B5F-4D25-A8AE-144D24554201@zytor.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 25 Feb 2025 01:24:31 +0800 Xin Tian wrote:
-> Our device supports both Ethernet and RDMA functionalities, and
-> leveraging the auxiliary bus perfectly addresses our needs for
-> managing these distinct features. This patch utilizes auxiliary
-> device to handle the Ethernet functionality, while defining
-> xsc_adev_list to reserve expansion space for future RDMA
-> capabilities.
+On February 25, 2025 1:43:27 PM PST, Andrew Cooper <andrew=2Ecooper3@citrix=
+=2Ecom> wrote:
+>> Incidentally, in all of this, didn't anyone notice __builtin_parity()?
+>
+>Yes=2E=C2=A0 It it has done sane for a decade on x86, yet does things suc=
+h as
+>emitting a library call on other architectures=2E
+>
+>https://godbolt=2Eorg/z/6qG3noebq
+>
+>~Andrew
 
-drivers/net/ethernet/yunsilicon/xsc/pci/adev.c:90:6: warning: variable 'ret' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
-   90 |         if (adev_id < 0)
-      |             ^~~~~~~~~~~
-drivers/net/ethernet/yunsilicon/xsc/pci/adev.c:104:9: note: uninitialized use occurs here
-  104 |         return ret;
-      |                ^~~
-drivers/net/ethernet/yunsilicon/xsc/pci/adev.c:90:2: note: remove the 'if' if its condition is always false
-   90 |         if (adev_id < 0)
-      |         ^~~~~~~~~~~~~~~~
-   91 |                 goto err_free_adev_list;
-      |                 ~~~~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/yunsilicon/xsc/pci/adev.c:82:9: note: initialize the variable 'ret' to silence this warning
-   82 |         int ret;
-      |                ^
-      |                 = 0
--- 
-pw-bot: cr
+And not even a smart one at that=2E
 
