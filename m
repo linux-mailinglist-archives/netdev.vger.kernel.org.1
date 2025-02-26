@@ -1,819 +1,249 @@
-Return-Path: <netdev+bounces-169914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 192CCA46699
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 17:30:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 674C8A46411
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 16:06:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D63A77A4950
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 16:29:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E489B1885435
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 15:06:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CBAB21D3F7;
-	Wed, 26 Feb 2025 16:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 360072236E8;
+	Wed, 26 Feb 2025 15:06:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="pVoKPP65"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nn0p8RvN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9DE51F16B;
-	Wed, 26 Feb 2025 16:30:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740587422; cv=none; b=o/pL+pSocoeajjSt64TDndYjc+L2/QnncXRKgTq8TrfINKkkp/s8BI7z/IjWb8d2aQVCBj52QRkcb2DeF1h79rYuD3Q9rm+t/07COH2nrAZdtFdRXNLGyWDQfTh81Zzuw6LYh4kcySOJ71TDe/Ipa34YiA6GDV+0Ug+Bs91P83Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740587422; c=relaxed/simple;
-	bh=9ky/FceggP6jm4quVFH1usFzgqLhHwF5b/Evx2d/jvg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Zfee44cTCR8XJc9uJpl1k77hj+K9pTi5PuOyUiCXH7K+OgyNzUUzi4lJQ9bNx8V5R6CIJdxLI4ZxawUv7tdT+zlP3ig0GS3yvblXVqgZWN83D5wOiq5a6L716XmFUCb/1pNGQUIrGWxgNRXnlE8wJmIBDUJ3xpZra1Pis/NetV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=pVoKPP65; arc=none smtp.client-ip=185.132.182.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0288072.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51QFg1G1022180;
-	Wed, 26 Feb 2025 17:29:46 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	9FLFefJnGgFSQqKGfCrstDbnVUdPsOWpS9SfCKvwGFM=; b=pVoKPP65nHHJW6o4
-	PndAbAP5DpyDXRwOO0YMrU1gY/eVM7fRHtEv/tZ6iPeudy3jh/jIhyH0SgNd9wuC
-	i4J5WCDhEfeY4O0y/yGLMTIqHjpbnAg1TEowh3sgIXN4yZudb/aI1kimZ7J+BHGD
-	B5N59Du3db+770dJvDlNC0ty+5cNPDyTbcKwe7FtnMWKrP0KAOkq6QEU3t0VghGG
-	2eLUhCYjcAxtp+hgeSW+apwJtk27AhxktYbTVH9Ln91WO1ENXmAu2PctGrDYksHX
-	K5aH+coHrRpKhkgNfgYJiHGB859L4UqVgacptd+8/VPIblnUD0moBRS05kHTulET
-	auQP+A==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 451psrdtky-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Feb 2025 17:29:46 +0100 (CET)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id E5F71400C7;
-	Wed, 26 Feb 2025 17:28:13 +0100 (CET)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 4574B4B7C42;
-	Wed, 26 Feb 2025 15:58:41 +0100 (CET)
-Received: from [10.48.86.79] (10.48.86.79) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 26 Feb
- 2025 15:58:40 +0100
-Message-ID: <855130e1-534b-413c-b733-8326d3919e71@foss.st.com>
-Date: Wed, 26 Feb 2025 15:58:39 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D931223329;
+	Wed, 26 Feb 2025 15:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740582398; cv=fail; b=d0WQEHQWxXQXWKDCk9fX/A0UxCgQdpEeRdu7o5je4QzcAp3peqTsW35ZBywtwxx8ZPNpnwLW8DnbuYIj7MbOP4rtDMZrgh56UkMQOobjlslc8D2bNdoRJx/YKmTFKrvHS+kwrHpGRelGzCKkvk65LQAvHCiRQyrZ2U0qyr89XHU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740582398; c=relaxed/simple;
+	bh=YuACcydKKmZ4l/b4ipHIJNA8LNHVL8WmNziep64oTh0=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=J90PxEnhOnfdNDOvqYTOLMyfnNLgLsKtmMVKXrw8vXhuHiNtSgS+2JAkwxFi7XOC7Y5I2Qo2CVEQ0dYxdfNT0aZH87Lc4a0NC+QyJh01CDksf8gAR8W+H+l8+jGjFKmTvlNqEIF7dPrf1DSp8k1BqmGNiOa0ioD9I0C/cuH/4DU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nn0p8RvN; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740582396; x=1772118396;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=YuACcydKKmZ4l/b4ipHIJNA8LNHVL8WmNziep64oTh0=;
+  b=nn0p8RvNnRwgzyMuwYKM3SzMl9dYMNlEaZEGHvhmAp+6/VZ/fXeYMjq+
+   jQzNMg8l/xDxkTmi09YSAHo4crE7sZ3JmZr32PBp4/iiEZUV14E38LBeT
+   ltMq9f3ua9kz4D6NFIrtMpGQ2/h9szcRTG0U6rOsRCiwRcIgN+xG2WAue
+   8wKeklVGXpkTpyrVv36G2slcoCWhrgY+qYBo9jOK05i1nzSLyb6KtU2bq
+   U0tJkS6NfIJ9iHdKoXRYkAYGE2yOpX2EAHrnlhPP6rSj5E/AH+p2vQeVO
+   69PGcXP7jKNu28r30kif47ZjhTxFmFRif8OM1h3CAp5qyUJQxBmC27u4S
+   A==;
+X-CSE-ConnectionGUID: EtWt+tSCSVqBRGMRd+XquA==
+X-CSE-MsgGUID: AEEVEd5nQIKJsWe62xecmg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="52845893"
+X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
+   d="scan'208";a="52845893"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 07:06:35 -0800
+X-CSE-ConnectionGUID: Rv+ZkLG1R7Sc3ih6DNXq0Q==
+X-CSE-MsgGUID: SuyymWZBRMakeIAO6B5Czg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="117219817"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Feb 2025 07:06:35 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Wed, 26 Feb 2025 07:06:35 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Wed, 26 Feb 2025 07:06:35 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.173)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Wed, 26 Feb 2025 07:06:34 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=eUp4enZDajnEi4nPIcP2mL8pWE2unr5qX/HoOiEJYyKiuYBNxzHPUDGtQyeNg+zUP8cr7U4l16PbDKRBoKoMRYL9ndU4gsGS343DNjs/2VYBhIhSNnA4ac2B6hyV3QeYYLsrg7lNxbz9LV+9C/cswRViEuE/yh1TawlW8iswcUuD7kpQx+2pZe8uO+9qCVtAKB5MO9a/LouftKsJ1FdHAdFgJfkK8FHQmO0VNxtjlntkuG2qbEFRokA0f3jIIV12l1+7qrCZCtbGOVgGRVJ0T3P4736Xtja6v4cisKbzh/EJjX/JW91v5SanAJ3AINjMvAQl0aekHhoWfZOIQ9l5Og==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yt7Cq4MDofEmSlutBDOHT6V0emxKAnBalK1xrJbhzJs=;
+ b=ueQvUv1NX3+o3gCb4UYKVGwUwQlf3zlImedItZXJH6Akm9FWdwztV6zJapbHho+rzhS8EyA7YrketesEpdo3aTBMElgjxIY1Te7J7mU3uArV0SrLYq38KPttnwBf5o4V8CLm0GpwoezT+I8goJth9PZYfI/vvioy4DAU4T7L3I9TZvwBD6baGRoBvIBX6myb1bOZ+/F6sQdAhow6FWtPYVEMnWxn6WF8WLIOPQ9jd/+iyRq12uJ+/4P6p+WCCvTmletxWoemBLshb/CLG3toydt1lKkvEFBBGk8ss3l1d3jJBW9StRhXxuk3yBVxJjKgTa8/htR5A4RVRo30wVNU4A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by CH3PR11MB7894.namprd11.prod.outlook.com (2603:10b6:610:12c::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.18; Wed, 26 Feb
+ 2025 15:06:26 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.8466.016; Wed, 26 Feb 2025
+ 15:06:26 +0000
+Message-ID: <31477321-c064-4f3d-b4c9-e858d98d5694@intel.com>
+Date: Wed, 26 Feb 2025 16:06:19 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next v2 1/2] devlink: add whole device devlink instance
+To: Jiri Pirko <jiri@resnulli.us>
+CC: <intel-wired-lan@lists.osuosl.org>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, Jakub Kicinski <kuba@kernel.org>, Cosmin Ratiu
+	<cratiu@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+	<netdev@vger.kernel.org>, Konrad Knitter <konrad.knitter@intel.com>, "Jacob
+ Keller" <jacob.e.keller@intel.com>, <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+	<andrew@lunn.ch>, <linux-kernel@vger.kernel.org>, ITP Upstream
+	<nxne.cnse.osdt.itp.upstreaming@intel.com>, Carolina Jubran
+	<cjubran@nvidia.com>
+References: <20250219164410.35665-1-przemyslaw.kitszel@intel.com>
+ <20250219164410.35665-2-przemyslaw.kitszel@intel.com>
+ <ybrtz77i3hbxdwau4k55xn5brsnrtyomg6u65eyqm4fh7nsnob@arqyloer2l5z>
+ <87855c66-0ab4-4b40-81fa-b37149c17dca@intel.com>
+ <zzyls3te4he2l5spf4wzfb53imuoemopwl774dzq5t5s22sg7l@37fk7fvgvnrr>
+ <e027f9e5-ff3a-4bc1-8297-9400a4ff62a6@intel.com>
+ <iiemy2zwko4iehuw6cgbipszcxonanjpumxzv4nbdvgvdgi5fx@jz3hkez3lygw>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <iiemy2zwko4iehuw6cgbipszcxonanjpumxzv4nbdvgvdgi5fx@jz3hkez3lygw>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MR1P264CA0052.FRAP264.PROD.OUTLOOK.COM
+ (2603:10a6:501:3e::27) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 3/3] arm: dts: stm32: Add Plymovent AQM devicetree
-To: Oleksij Rempel <o.rempel@pengutronix.de>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Woojung Huh
-	<woojung.huh@microchip.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>
-CC: <kernel@pengutronix.de>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>
-References: <20250220090155.2937620-1-o.rempel@pengutronix.de>
- <20250220090155.2937620-4-o.rempel@pengutronix.de>
-Content-Language: en-US
-From: Alexandre TORGUE <alexandre.torgue@foss.st.com>
-In-Reply-To: <20250220090155.2937620-4-o.rempel@pengutronix.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-26_04,2025-02-26_01,2024-11-22_01
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|CH3PR11MB7894:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0c3c8fd4-acb5-4e0c-471b-08dd567723c2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?eGxiODhWc3cwckNJV2NsWVNiMVc3VHpsS1JQU1VQa1FrVkFBVUwyR25MOG1i?=
+ =?utf-8?B?S0gyRDE2WnhjdVMvVXJHcjdSdjRFVUZMQkNhK05DTmoyQ2JRMnIvTVBHcFI5?=
+ =?utf-8?B?UWZSRmpEOWMzUzZnREY3a003UlVLaDlHWndveGhEMWdqN2RIRGxlVXhheXVi?=
+ =?utf-8?B?WDZoeWFmYStJeW9QUkFpallUMWgyc2JVVzJjbE9yeGpoU2Qrd0JwK0FQUVJa?=
+ =?utf-8?B?QW04T3lKVVZtYTdYUko1eTBXWTNSb0k2aXgvNVFBaUUvSldtdXovelIvTzBE?=
+ =?utf-8?B?aTBxMHllamIvT0lIcERzdjhHMFR6TXhnbnRUTisyY1VJVFgybzdhRTZmT0lV?=
+ =?utf-8?B?eUxJcEptWENuZzFuRTdabkI2M0JSYXRQMW1nSC9Ba0lqN1krYVhtV2RFeHNh?=
+ =?utf-8?B?dGhBZWphbS9FSDdQbFlEeVQrYkNQVDIyajNESVJUayt2NGNXV05hMWt1aytl?=
+ =?utf-8?B?bE9zQTBaOUx3OE1RMVJGY0VIV1NmNk44K0psVXVmdXg4Nk15eFB0VXR3ZVZn?=
+ =?utf-8?B?QW56dklrZGxYakw2TXAzZ0p6UGlIT0tHYmVYUnlLRDBUMjFNT3BsMWhLeXpM?=
+ =?utf-8?B?c3UxV0xGOHdwbTFzaHhtRUp1bEhrVWRrbXJmNHRKa05EZFpJWlNidEkxSjVK?=
+ =?utf-8?B?aER4Q0RUKzQ1eGtMQTI0NFIydG1Xd1pqcEhyaGVjSnNFM2poY0hScFNmR3Vi?=
+ =?utf-8?B?VUlWZHdhSEc3OVJZRmU0c0ZnNGxnSnBCVkFtTHBnTEtUdkhtUTFaTFVTVkFD?=
+ =?utf-8?B?Ujh4YmlKcmdCRDhjZ2dTYjcxbEVwbUtqNEZXQ0NMWUxudExZYmRqVUIzdG9n?=
+ =?utf-8?B?c3g1N0Z0U2F6dVFlU1FlMGJjMTBVL1kzSlhHa3pmeFJ1ZlpQYTNSQ3RYcU9S?=
+ =?utf-8?B?VGo5Ni9LNXVnVmNudE9uK1FGeW9UL2NyQmJKYWw4aXJTQXdCNkk3bm4rL0FY?=
+ =?utf-8?B?VXJlL1ZWaktnL2ZjbEtIZG9CUVQyUVFBVDlFNUlsa1ZwRkI1OGplOU1CWnhX?=
+ =?utf-8?B?SkZscFlUTEJqVjJOdEM2aUhydWdTa0FyN1dDOXdGWWtCL0ZrMkkvWUxrbnE4?=
+ =?utf-8?B?REJlMkJLanNGd1RNQmlvSDB3dUFOYWYxWEV2N3NEL1krL0JqakVPNU4yWW9S?=
+ =?utf-8?B?aXJJTmd1aGN5MU5IWk1CL3lESGlJRDFJTEZwUGU5Q3dwNDV1aWVSbXBRVWFQ?=
+ =?utf-8?B?RFI3N2pPS2hqV2hoblVEMjNjV24wOGR0a0cxQVkwK25scTJ3Vld4MUtmbGRj?=
+ =?utf-8?B?UCt2elpKaVYxRzBjcGdFb1dPNE9ITTNCMkp4U1U0aGYrYkxjVDBKUGdKUVl1?=
+ =?utf-8?B?Wkw3cTlFOTlzc2s5WEJNUWpMZ25TcVJOR1l6K09RekhKanJ5cWpyRmNWUjYz?=
+ =?utf-8?B?MVVIenFoV1E4SHlMYUMrVE94ZXJRWmhnQTJ6d3NKNCtKUXB6RE14OVY5SXVh?=
+ =?utf-8?B?TjJyZVM0NW9TU1JzakN5R3ZQbjJsam5tUi9jWkRsZklmMUd0blZSbDI2UWhn?=
+ =?utf-8?B?Z3VXWTNMVjhIUWRKcnZReFVqdzJZMXVpR0pscGtPWVROTWRDRUE5L09mS0Fy?=
+ =?utf-8?B?aXFjNUIxeUxjR3NXTGpGMkMvNjdXSkZFekI1em1JRnRxaXdHb0VNUUxxMmZD?=
+ =?utf-8?B?ZDJSS00wVGs3SjBHMVFoRFBhdkExUWVwbm44VXAzTlYwbzZkamFyMzR4UlhT?=
+ =?utf-8?B?dTNpSFlha1RyK1RRbzRBbm5pQ0ZEcGxzWmtYQXZvZ1dZMzRnbVVSWmQzNUts?=
+ =?utf-8?B?V05jTFZTTlNsOHlBMzU0SlJOZ0dlSnBJaE8rQjlXZEFFZXdiajZZZktCaFlz?=
+ =?utf-8?B?b0JIZWZ1ZVJmeWkydU9Ldk5LcGU1aFA4R2RPUU5uK3p6M0hld1dRYzFQVmxU?=
+ =?utf-8?Q?j3gj2vs748Zkg?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VDlubXBLTUpQVTNPM2FjM3MvdXNSdHhyVFZ1b1VWOXNqV21jOGoxd1dwY2ZS?=
+ =?utf-8?B?TWg3Sm1FckFsY0dhWTlKRytuaHlEZmZ1OUkwck5VZHJSL3I3bDNOc29ObkRw?=
+ =?utf-8?B?QTFpNlk3UnpUOHhuREdhMG54WUp2MW90WXFVSGduZTAzeWZ3TWVrVk9xOGV1?=
+ =?utf-8?B?bkhOOWVtejVITExtNk1EcjV2Y2FUVDQrSm5tSDUwY2VMNFNKOGJhWmltV2ZR?=
+ =?utf-8?B?NVIwbnowUWlydEZDWVZRUTNnVnJGSDJYUHAyQm1OMkNOWWRmRmFKdUlVanA4?=
+ =?utf-8?B?dCt0WEZzRGczVHVGZjZxa2dpZnVXMXdqRDhENXJia2VHV2hVRktKNldPVVpQ?=
+ =?utf-8?B?UE02NEV2QitqK3hBaDhFZWo5MDN5L2w5Y0dZUmpxYVlnZVQzMzNmZVgvaHJK?=
+ =?utf-8?B?Q1RFbHNWdXp6WEZ5NUtXcE4wSkhNRFUwdVoxbmE0TFlvOWpWTmhVcFJ4d0pt?=
+ =?utf-8?B?N2swUk91TXpiV1dtQUFiaUUzTVNBZ0oxeE15VnhhN3liZEFIUVl1U2lYZnFK?=
+ =?utf-8?B?ZDFWTXNrYVBHQ0NVemo3VklHZTZ0SkdXWFV3L09qZHBvYXJ5K2JaS1lZVE8z?=
+ =?utf-8?B?SzZHV0NOM3ZQN0dxUFpNRDNrbFdlN3o1c1R5cml1N2RsRFVhTEZlWVlkcFZq?=
+ =?utf-8?B?M2kzUWVxcWRRMmNYVHNSS2xKelVvMU54NUhZYkQ5RDlEU1ZmODhseFJBTnY3?=
+ =?utf-8?B?T2FFcVoyMTh3RXZ5Y3I2cXBPYmxCZlI3ZnFjZm1QMW9QR3Fxc0U5UjA5VEZD?=
+ =?utf-8?B?a1NBQ1I4UkFGbjdLdW9IY09xVTZuZkxiMGRadll2TWNNTWIzVDZodVV1S2p2?=
+ =?utf-8?B?cXN6NzcrUFU2K0g4UWY3M2xGMnBNcVJXb3c2UzhyL3B4QkR4RWh0Z3ZOQWZV?=
+ =?utf-8?B?ZG5xSE5yeEE2TUFwNUpNL1FNd2x0ZGhQMndaOGRWMWVhak1hU3pPVW9xdk5F?=
+ =?utf-8?B?VlpIN0s1bzg2TDRpeURieWJSazlzV2hmOW1ENi8zR1hXNUQvblFzWFQvM1o2?=
+ =?utf-8?B?Zy83N1EvcGp4ek9LM0VrR0ZyMHRRRUR4VTdKZURUL3hwb2F2UDEvOXJaUVlW?=
+ =?utf-8?B?U1M2Wm9XRWF3OEdUZHBmWE5QZldLYlg0MFEwWW52eC9xQmE5SjUyczh6SVUx?=
+ =?utf-8?B?M1lMcWY5MWY2aGRnZHBLYmc3NTN3WXpFdkFxMXo5UVVKNEd0TU5pTGdNL050?=
+ =?utf-8?B?Ym5tWFRhOWZLUTU3N0hPRGVBbTg0bkMrQVEwRUljQndIMXZ3ZmZCQlZZV3RO?=
+ =?utf-8?B?VlV6dTd0NFh0aGZHNG5xUnQ4WmNINjVlZHdnQnFIUG1mMHY2UXdFUmMzMGNE?=
+ =?utf-8?B?VjZ1UWtmNy9PVTMwTTJ5eVVpNGh4RkFDdHAvMXFpdituM0p5eXp3bGNpU0Ev?=
+ =?utf-8?B?Ti9vMFlsUGFQN29NVDlDTGNBTitKL1J1UU4rM1lhV2xmejM1TGN3b2phNjFC?=
+ =?utf-8?B?QUIxN0NWdjE4YzdXWVpuZHpjdXFtNEtEMkxMWERReEdxNGZxUDNEaGQzVEhO?=
+ =?utf-8?B?cExNbXovaTRxbWlTYU9GYjRHZytQTnlmYlNPWHNha2F0OFd2UUl0ZmMzOUN1?=
+ =?utf-8?B?Yyt0WmZIeFR6VjkvNk41ekYrWGtmQ1BYVTZhL1A5VXRYRmVER3JCUVc3aEdR?=
+ =?utf-8?B?NG5ZUlRGSzFxM3c4Um1VVXBqb0kwNGRWZWhDbTI4SEZnVGlRYjU5SU04WSti?=
+ =?utf-8?B?UnhCNzhmMFFmVTdXQi9iclVMd2hPaG05NFdJQk9oaXVyN3BNd2tRNkdpQ0tZ?=
+ =?utf-8?B?REJFK3hOTlRoUHRETDIwOFVkU0NVUnN2cUV2U0ZoTVZoOWxBbUFia3FRTWZk?=
+ =?utf-8?B?MFMvSXVLTUF2TU5qcnVIRG9ieXJvTEVpRnV0a255c0lWTXZlemRsTE9qTEMy?=
+ =?utf-8?B?bTFVSE9GQW9tM0tqWnV4OHBkZlNJcS9WZTUwLy9KMUdNNjZtRXYxeW9aYUlr?=
+ =?utf-8?B?V2RtRjVBVE5PZU5iSUFjMVNXU3FtbFpwWU9BREZVSzNDVHowUmVVN0ovNDRa?=
+ =?utf-8?B?UDFOQ0pETnM0TWZHOXpFYWlvRmRpKy9yaXRTOEJ1aDNlSFhUT1Q3eXNkRytB?=
+ =?utf-8?B?YTE2THZqVk5tU0crUWQ0Nm9zSHZXU0VMN05sTGFhOUtlbVdRWVYxUDlNci9L?=
+ =?utf-8?B?eFVVdWR1cHg1OFozTit0azZxdXhxcEU3eWxKa2grSk1UNnoyd3Jha0c1Z1VD?=
+ =?utf-8?B?THc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0c3c8fd4-acb5-4e0c-471b-08dd567723c2
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2025 15:06:26.0091
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: xQ6oEDq87b5v44ixQBANfByfpR+UqOxCgru3qJ3mKTU7KFuGKYrWzvGelQxsyjJmAiAqT5+3TE4cIhoo6KCejnj3qoGD3cegsmLd30QkKMA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7894
+X-OriginatorOrg: intel.com
 
-Hi Oleksij
-
-On 2/20/25 10:01, Oleksij Rempel wrote:
-> Introduce the devicetree for the Plymovent AQM board
-> (stm32mp151c-plyaqm), based on the STM32MP151 SoC.
+On 2/26/25 15:48, Jiri Pirko wrote:
+> Tue, Feb 25, 2025 at 04:40:49PM +0100, przemyslaw.kitszel@intel.com wrote:
+>> On 2/25/25 15:35, Jiri Pirko wrote:
+>>> Tue, Feb 25, 2025 at 12:30:49PM +0100, przemyslaw.kitszel@intel.com wrote:
 > 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> ---
-> changes v2:
-> - remove spidev
-> ---
->   arch/arm/boot/dts/st/Makefile               |   1 +
->   arch/arm/boot/dts/st/stm32mp151c-plyaqm.dts | 669 ++++++++++++++++++++
->   2 files changed, 670 insertions(+)
->   create mode 100644 arch/arm/boot/dts/st/stm32mp151c-plyaqm.dts
+> [...]
 > 
-> diff --git a/arch/arm/boot/dts/st/Makefile b/arch/arm/boot/dts/st/Makefile
-> index d8f297035812..561819ef7a32 100644
-> --- a/arch/arm/boot/dts/st/Makefile
-> +++ b/arch/arm/boot/dts/st/Makefile
-> @@ -38,6 +38,7 @@ dtb-$(CONFIG_ARCH_STM32) += \
->   	stm32mp151a-dhcor-testbench.dtb \
->   	stm32mp151c-mecio1r0.dtb \
->   	stm32mp151c-mect1s.dtb \
-> +	stm32mp151c-plyaqm.dtb \
->   	stm32mp153c-dhcom-drc02.dtb \
->   	stm32mp153c-dhcor-drc-compact.dtb \
->   	stm32mp153c-lxa-tac-gen3.dtb \
-> diff --git a/arch/arm/boot/dts/st/stm32mp151c-plyaqm.dts b/arch/arm/boot/dts/st/stm32mp151c-plyaqm.dts
-> new file mode 100644
-> index 000000000000..4e050c49dfc5
-> --- /dev/null
-> +++ b/arch/arm/boot/dts/st/stm32mp151c-plyaqm.dts
-> @@ -0,0 +1,669 @@
-> +// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
-> +/dts-v1/;
-> +
-> +#include <arm/st/stm32mp151.dtsi>
-> +#include <arm/st/stm32mp15xc.dtsi>
-> +#include <arm/st/stm32mp15-pinctrl.dtsi>
-> +#include <arm/st/stm32mp15xxad-pinctrl.dtsi>
-> +#include <arm/st/stm32mp15-scmi.dtsi>
-> +#include <dt-bindings/gpio/gpio.h>
-> +#include <dt-bindings/leds/common.h>
-> +
-> +/ {
-> +	model = "Plymovent AQM board";
-> +	compatible = "ply,plyaqm", "st,stm32mp151";
-> +
-> +	aliases {
-> +		ethernet0 = &ethernet0;
-> +		serial0 = &uart4;
-> +		serial1 = &uart7;
-> +	};
-> +
-> +	codec {
-> +		compatible = "invensense,ics43432";
-> +
-> +		port {
-> +			codec_endpoint: endpoint {
-> +				remote-endpoint = <&i2s1_endpoint>;
-> +				dai-format = "i2s";
-> +			};
-> +		};
-> +	};
-> +
-> +	firmware {
-> +		optee {
-> +			compatible = "linaro,optee-tz";
-> +			method = "smc";
-> +		};
-> +	};
-> +
-> +	leds {
-> +		compatible = "gpio-leds";
-> +
-> +		led-0 {
-> +			gpios = <&gpioa 3 GPIO_ACTIVE_HIGH>; /* WHITE_EN */
-> +			color = <LED_COLOR_ID_WHITE>;
-> +			default-state = "on";
-> +		};
-> +	};
-> +
-> +	v3v3: fixed-regulator-v3v3 {
-> +		compatible = "regulator-fixed";
-> +		regulator-name = "v3v3";
-> +		regulator-min-microvolt = <3300000>;
-> +		regulator-max-microvolt = <3300000>;
-> +	};
-> +
-> +	v5v_sw: fixed-regulator-v5sw {
-> +		compatible = "regulator-fixed";
-> +		regulator-name = "5v-switched";
-> +		regulator-min-microvolt = <5000000>;
-> +		regulator-max-microvolt = <5000000>;
-> +		gpio = <&gpioe 10 GPIO_ACTIVE_HIGH>; /* 5V_SWITCHED_EN */
-> +		startup-delay-us = <100000>;
-> +		enable-active-high;
-> +		regulator-boot-on;
-> +	};
-> +
-> +	reserved-memory {
-> +		#address-cells = <1>;
-> +		#size-cells = <1>;
-> +		ranges;
-> +
-> +		optee@cfd00000 {
-> +			reg = <0xcfd00000 0x300000>;
-> +			no-map;
-> +		};
-> +	};
-> +
-> +	sound {
-> +		compatible = "audio-graph-card";
-> +		label = "STM32MP15";
-> +		dais = <&i2s1_port>;
-> +	};
-> +
-> +	wifi_pwrseq: wifi-pwrseq {
-> +		compatible = "mmc-pwrseq-simple";
-> +		reset-gpios = <&gpioe 12 GPIO_ACTIVE_LOW>; /* WLAN_REG_ON */
-> +	};
-> +};
-> +
-> +&adc {
-> +	pinctrl-names = "default";
-> +	pinctrl-0 = <&adc1_in10_aqm_pins_a>;
-> +	vdda-supply = <&v3v3>;
-> +	vref-supply = <&v3v3>;
-> +	status = "okay";
-> +
-> +	adc@0 {
-> +		#address-cells = <1>;
-> +		#size-cells = <0>;
-> +		status = "okay";
-> +
-> +		channel@10 { /* NTC */
-> +			reg = <10>;
-> +			st,min-sample-time-ns = <10000>;  /* 10µs sampling time */
-> +		};
-> +	};
-> +};
-> +
-> +&cpu0 {
-> +	clocks = <&scmi_clk CK_SCMI_MPU>;
-> +};
-> +
-> +&cryp1 {
-> +	clocks = <&scmi_clk CK_SCMI_CRYP1>;
-> +	resets = <&scmi_reset RST_SCMI_CRYP1>;
-> +	status = "okay";
-> +};
-> +
-> +&ethernet0 {
-> +	pinctrl-names = "default", "sleep";
-> +	pinctrl-0 = <&ethernet0_rmii_aqm_pins_a>;
-> +	pinctrl-1 = <&ethernet0_rmii_sleep_aqm_pins_a>;
-> +	phy-mode = "rmii";
-> +	max-speed = <100>;
-> +	phy-handle = <&ethphy0>;
-> +	status = "okay";
-> +
-> +	mdio {
-> +		#address-cells = <1>;
-> +		#size-cells = <0>;
-> +		compatible = "snps,dwmac-mdio";
-> +
-> +		/* KSZ8081RNA PHY */
-> +		ethphy0: ethernet-phy@0 {
-> +			reg = <0>;
-> +			interrupts-extended = <&gpiob 0 IRQ_TYPE_LEVEL_LOW>;
-> +			reset-gpios = <&gpiob 1 GPIO_ACTIVE_LOW>;
-> +			reset-assert-us = <10000>;
-> +			reset-deassert-us = <300>;
-> +		};
-> +	};
-> +};
-> +
-> +&gpioa {
-> +	gpio-line-names =
-> +		"", "", "", "", "", "", "", "",
-> +		"", "", "", "", "", "HWID_PL_N", "HWID_CP", "";
-> +};
-> +
-> +&gpiob {
-> +	gpio-line-names =
-> +		"", "", "", "", "", "", "LED_LATCH", "",
-> +		"", "RELAY1_EN", "", "", "", "", "", "";
-> +};
-> +
-> +&gpioc {
-> +	gpio-line-names =
-> +		"", "", "", "", "", "", "", "",
-> +		"", "", "", "", "", "HWID_Q7", "", "";
-> +};
-> +
-> +&gpioe {
-> +	gpio-line-names =
-> +		"", "", "", "", "RELAY2_EN", "", "", "",
-> +		"", "", "", "", "", "", "", "";
-> +};
-> +
-> +&gpiog {
-> +	gpio-line-names =
-> +		"", "", "", "", "", "", "", "SW1",
-> +		"", "", "", "", "", "", "", "";
-> +};
-> +
-> +&gpioz {
-> +	clocks = <&scmi_clk CK_SCMI_GPIOZ>;
-> +};
-> +
-> +&hash1 {
-> +	clocks = <&scmi_clk CK_SCMI_HASH1>;
-> +	resets = <&scmi_reset RST_SCMI_HASH1>;
-> +};
-> +
-> +&i2c1 {
-> +	pinctrl-names = "default", "sleep";
-> +	pinctrl-0 = <&i2c1_aqm_pins_a>;
-> +	pinctrl-1 = <&i2c1_sleep_aqm_pins_a>;
-> +	i2c-scl-rising-time-ns = <185>;
-> +	i2c-scl-falling-time-ns = <20>;
-> +	status = "okay";
-> +	/delete-property/dmas;
-> +	/delete-property/dma-names;
-> +
-> +	/* CYPD3177 USB PD controller 0x08 */
-
-Why this comment here ? You don't add the i2c device here. Will be done 
-on other board (which includes this one) ?
-
-> +};
-> +
-> +&i2c4 {
-> +	clocks = <&scmi_clk CK_SCMI_I2C4>;
-> +	resets = <&scmi_reset RST_SCMI_I2C4>;
-> +};
-> +
-> +&i2c6 {
-> +	pinctrl-names = "default", "sleep";
-> +	pinctrl-0 = <&i2c6_aqm_pins_a>;
-> +	pinctrl-1 = <&i2c6_sleep_aqm_pins_a>;
-> +	i2c-scl-rising-time-ns = <185>;
-> +	i2c-scl-falling-time-ns = <20>;
-> +	clocks = <&scmi_clk CK_SCMI_I2C6>;
-> +	resets = <&scmi_reset RST_SCMI_I2C6>;
-> +	status = "okay";
-> +	/delete-property/dmas;
-> +	/delete-property/dma-names;
-> +
-You could sort i2c device by reg adresses.
-
-> +	pm-sensor@69 {
-> +		compatible = "sensirion,sps30";
-> +		reg = <0x69>;
-> +	};
-> +
-> +	co2-sensor@62 {
-> +		compatible = "sensirion,scd41";
-> +		reg = <0x62>;
-> +		vdd-supply = <&v5v_sw>;
-> +	};
-> +
-> +	pressure-sensor@47 {
-> +		compatible = "bosch,bmp580";
-> +		reg = <0x47>;
-> +		vdda-supply = <&v5v_sw>;
-> +		vddd-supply = <&v5v_sw>;
-> +	};
-> +
-> +	/* Used for ZMOD4410 in userspace */
-
-Same question than above.
-
-> +};
-> +
-> +&i2s1 {
-> +	pinctrl-names = "default", "sleep";
-> +	pinctrl-0 = <&i2s1_aqm_pins>;
-> +	pinctrl-1 = <&i2s1_sleep_aqm_pins>;
-> +	clocks = <&rcc SPI1>, <&rcc SPI1_K>, <&rcc PLL3_Q>, <&rcc PLL3_R>;
-> +	clock-names = "pclk", "i2sclk", "x8k", "x11k";
-> +	#clock-cells = <0>; /* Set I2S2 as master clock provider */
-> +	status = "okay";
-> +
-> +	i2s1_port: port {
-> +		i2s1_endpoint: endpoint {
-> +			format = "i2s";
-> +			mclk-fs = <256>;
-> +			remote-endpoint = <&codec_endpoint>;
-> +		};
-> +	};
-> +};
-> +
-> +&iwdg2 {
-> +	clocks = <&rcc IWDG2>, <&scmi_clk CK_SCMI_LSI>;
-> +	status = "okay";
-> +};
-> +
-> +&m4_rproc {
-> +	/delete-property/ st,syscfg-holdboot;
-> +	resets = <&scmi_reset RST_SCMI_MCU>,
-> +		 <&scmi_reset RST_SCMI_MCU_HOLD_BOOT>;
-> +	reset-names =  "mcu_rst", "hold_boot";
-> +};
-> +
-> +&mdma1 {
-> +	resets = <&scmi_reset RST_SCMI_MDMA>;
-> +};
-> +
-> +&rcc {
-> +	compatible = "st,stm32mp1-rcc-secure", "syscon";
-> +	clock-names = "hse", "hsi", "csi", "lse", "lsi";
-> +	clocks = <&scmi_clk CK_SCMI_HSE>,
-> +		 <&scmi_clk CK_SCMI_HSI>,
-> +		 <&scmi_clk CK_SCMI_CSI>,
-> +		 <&scmi_clk CK_SCMI_LSE>,
-> +		 <&scmi_clk CK_SCMI_LSI>;
-> +};
-> +
-> +&rng1 {
-> +	clocks = <&scmi_clk CK_SCMI_RNG1>;
-> +	resets = <&scmi_reset RST_SCMI_RNG1>;
-> +	status = "okay";
-> +};
-> +
-> +&rtc {
-> +	clocks = <&scmi_clk CK_SCMI_RTCAPB>, <&scmi_clk CK_SCMI_RTC>;
-> +};
-> +
-> +/* SD card without Card-detect */
-> +&sdmmc1 {
-> +	pinctrl-names = "default", "opendrain", "sleep";
-> +	pinctrl-0 = <&sdmmc1_b4_pins_a>;
-> +	pinctrl-1 = <&sdmmc1_b4_od_pins_a>;
-> +	pinctrl-2 = <&sdmmc1_b4_sleep_pins_a>;
-> +	broken-cd;
-> +	no-sdio;
-> +	no-1-8-v;
-> +	st,neg-edge;
-> +	bus-width = <4>;
-> +	vmmc-supply = <&v3v3>;
-> +	status = "okay";
-> +};
-> +
-> +/* EMMC */
-> +&sdmmc2 {
-> +	pinctrl-names = "default", "opendrain", "sleep";
-> +	pinctrl-0 = <&sdmmc2_b4_aqm_pins_a>;
-> +	pinctrl-1 = <&sdmmc2_b4_od_aqm_pins_a>;
-> +	pinctrl-2 = <&sdmmc2_b4_sleep_aqm_pins_a>;
-> +	non-removable;
-> +	no-sd;
-> +	no-sdio;
-> +	no-1-8-v;
-> +	st,neg-edge;
-> +	bus-width = <8>;
-> +	vmmc-supply = <&v3v3>;
-> +	status = "okay";
-> +};
-> +
-> +/* Wifi */
-> +&sdmmc3 {
-> +	pinctrl-names = "default", "opendrain", "sleep";
-> +	pinctrl-0 = <&sdmmc3_b4_aqm_pins_a>;
-> +	pinctrl-1 = <&sdmmc3_b4_od_aqm_pins_a>;
-> +	pinctrl-2 = <&sdmmc3_b4_sleep_aqm_pins_a>;
-> +	non-removable;
-> +	st,neg-edge;
-> +	bus-width = <4>;
-> +	vmmc-supply = <&v3v3>;
-> +	mmc-pwrseq = <&wifi_pwrseq>;
-> +	#address-cells = <1>;
-> +	#size-cells = <0>;
-> +	status = "okay";
-> +
-> +	wifi@1 {
-> +		reg = <1>;
-> +		compatible = "brcm,bcm4329-fmac";
-> +	};
-> +};
-> +
-> +&timers5 {
-> +	status = "okay";
-> +	/delete-property/dmas;
-> +	/delete-property/dma-names;
-> +
-> +	pwm {
-> +		pinctrl-0 = <&pwm1_aqm_pins_a>;
-> +		pinctrl-1 = <&pwm1_sleep_aqm_pins_a>;
-> +		pinctrl-names = "default", "sleep";
-> +		status = "okay";
-> +	};
-> +};
-> +
-> +&uart4 {
-> +	pinctrl-names = "default", "sleep", "idle";
-> +	pinctrl-0 = <&uart4_aqm_pins_a>;
-> +	pinctrl-1 = <&uart4_idle_aqm_pins_a>;
-> +	pinctrl-2 = <&uart4_sleep_aqm_pins_a>;
-> +	/delete-property/dmas;
-> +	/delete-property/dma-names;
-> +	status = "okay";
-> +};
-> +
-> +&uart7 {
-> +	pinctrl-names = "default";
-> +	pinctrl-0 = <&uart7_aqm_pins_a>;
-> +	uart-has-rtscts;
-> +	status = "okay";
-> +
-> +	bluetooth {
-> +		compatible = "brcm,bcm43438-bt";
-> +		shutdown-gpios = <&gpioe 11 GPIO_ACTIVE_HIGH>; /* BT_REG_ON */
-> +		max-speed = <4000000>;
-> +		vbat-supply = <&v3v3>;
-> +		vddio-supply = <&v3v3>;
-> +		interrupt-parent = <&gpiog>;
-> +		interrupts = <12 IRQ_TYPE_EDGE_RISING>; /* BT_HOST_WAKE */
-> +		interrupt-names = "host-wakeup";
-> +	};
-> +};
-> +
-> +&pinctrl {
-
-You could put pin desc in pinctrl dtsi file. It could be confusing. I.e. 
-rmii-0 node is already defined in stm32mp15-pinctrl.dtsi with another 
-label.
-
-> +	adc1_in10_aqm_pins_a: adc1in10-0 {
-> +		pins {
-> +			pinmux = <STM32_PINMUX('C', 0, ANALOG)>; /* NTC */
-> +		};
-> +	};
-> +
-> +	ethernet0_rmii_aqm_pins_a: rmii-0 {
-> +		pins1 {
-> +			pinmux = <STM32_PINMUX('B', 12, AF11)>, /* ETH1_RMII_TXD0 */
-> +				 <STM32_PINMUX('B', 13, AF11)>, /* ETH1_RMII_TXD1 */
-> +				 <STM32_PINMUX('B', 11, AF11)>, /* ETH1_RMII_TX_EN */
-> +				 <STM32_PINMUX('A', 1, AF11)>, /* ETH1_RMII_REF_CLK */
-> +				 <STM32_PINMUX('A', 2, AF11)>, /* ETH1_MDIO */
-> +				 <STM32_PINMUX('C', 1, AF11)>; /* ETH1_MDC */
-> +			bias-disable;
-> +			drive-push-pull;
-> +			slew-rate = <2>;
-> +		};
-> +
-> +		pins2 {
-> +			pinmux = <STM32_PINMUX('C', 4, AF11)>, /* ETH1_RMII_RXD0 */
-> +				 <STM32_PINMUX('C', 5, AF11)>, /* ETH1_RMII_RXD1 */
-> +				 <STM32_PINMUX('A', 7, AF11)>; /* ETH1_RMII_CRS_DV */
-> +			bias-disable;
-> +		};
-> +	};
-> +
-> +	ethernet0_rmii_sleep_aqm_pins_a: rmii-sleep-0 {
-> +		pins1 {
-> +			pinmux = <STM32_PINMUX('B', 12, ANALOG)>, /* ETH1_RMII_TXD0 */
-> +				 <STM32_PINMUX('B', 13, ANALOG)>, /* ETH1_RMII_TXD1 */
-> +				 <STM32_PINMUX('B', 11, ANALOG)>, /* ETH1_RMII_TX_EN */
-> +				 <STM32_PINMUX('A', 2, ANALOG)>, /* ETH1_MDIO */
-> +				 <STM32_PINMUX('C', 1, ANALOG)>, /* ETH1_MDC */
-> +				 <STM32_PINMUX('C', 4, ANALOG)>, /* ETH1_RMII_RXD0 */
-> +				 <STM32_PINMUX('C', 5, ANALOG)>, /* ETH1_RMII_RXD1 */
-> +				 <STM32_PINMUX('A', 1, ANALOG)>, /* ETH1_RMII_REF_CLK */
-> +				 <STM32_PINMUX('A', 7, ANALOG)>; /* ETH1_RMII_CRS_DV */
-> +		};
-> +	};
-> +
-> +	/* i2c1 pins redefined because they differ from stm32mp15-pinctrl.dtsi */
-> +	i2c1_aqm_pins_a: i2c1-0 {
-> +		pins {
-> +			pinmux = <STM32_PINMUX('D', 12, AF5)>, /* I2C1_SCL */
-> +				 <STM32_PINMUX('D', 13, AF5)>; /* I2C1_SDA */
-> +			bias-disable;
-> +			drive-open-drain;
-> +			slew-rate = <0>;
-> +		};
-> +	};
-> +
-> +	i2c1_sleep_aqm_pins_a: i2c1-sleep-0 {
-> +		pins {
-> +			pinmux = <STM32_PINMUX('D', 12, ANALOG)>, /* I2C1_SCL */
-> +				 <STM32_PINMUX('D', 13, ANALOG)>; /* I2C1_SDA */
-> +		};
-> +	};
-> +
-> +	/* i2c6 pins redefined because they differ from stm32mp15-pinctrl.dtsi */
-> +	i2c6_aqm_pins_a: i2c6-0 {
-> +		pins {
-> +			pinmux = <STM32_PINMUX('A', 11, AF2)>, /* I2C6_SCL */
-> +				 <STM32_PINMUX('A', 12, AF2)>; /* I2C6_SDA */
-> +			bias-disable;
-> +			drive-open-drain;
-> +			slew-rate = <0>;
-> +		};
-> +	};
-> +
-> +	i2c6_sleep_aqm_pins_a: i2c6-sleep-0 {
-> +		pins {
-> +			pinmux = <STM32_PINMUX('A', 11, ANALOG)>, /* I2C6_SCL */
-> +				 <STM32_PINMUX('A', 12, ANALOG)>; /* I2C6_SDA */
-> +		};
-> +	};
-> +
-> +	i2s1_aqm_pins: i2s1-0 {
-> +		pins {
-> +			pinmux = <STM32_PINMUX('A', 6, AF5)>, /* I2S2_SDI */
-> +				 <STM32_PINMUX('A', 4, AF5)>, /* I2S2_WS */
-> +				 <STM32_PINMUX('A', 5, AF5)>; /* I2S2_CK */
-> +			slew-rate = <0>;
-> +			drive-push-pull;
-> +			bias-disable;
-> +		};
-> +	};
-> +
-> +	i2s1_sleep_aqm_pins: i2s1-sleep-0 {
-> +		pins {
-> +			pinmux = <STM32_PINMUX('A', 6, ANALOG)>, /* I2S2_SDI */
-> +				 <STM32_PINMUX('A', 4, ANALOG)>, /* I2S2_WS */
-> +				 <STM32_PINMUX('A', 5, ANALOG)>; /* I2S2_CK */
-> +		};
-> +	};
-> +
-> +	pwm1_aqm_pins_a: pwm1-0 {
-> +		pins {
-> +			pinmux = <STM32_PINMUX('A', 0, AF2)>; /* TIM5_CH1 */
-> +			bias-pull-down;
-> +			drive-push-pull;
-> +			slew-rate = <0>;
-> +		};
-> +	};
-> +
-> +	pwm1_sleep_aqm_pins_a: pwm1-sleep-0 {
-> +		pins {
-> +			pinmux = <STM32_PINMUX('A', 0, ANALOG)>;
-> +		};
-> +	};
-> +
-> +	/* SDMMC1 pins same as stm32mp15-pinctrl.dtsi */
-> +
-> +	sdmmc2_b4_sleep_aqm_pins_a: sdmmc2-b4-sleep-0 {
-> +		pins {
-> +			pinmux = <STM32_PINMUX('B', 14, ANALOG)>, /* SDMMC2_D0 */
-> +				 <STM32_PINMUX('B', 7, ANALOG)>, /* SDMMC2_D1 */
-> +				 <STM32_PINMUX('B', 3, ANALOG)>, /* SDMMC2_D2 */
-> +				 <STM32_PINMUX('B', 4, ANALOG)>, /* SDMMC2_D3 */
-> +				 <STM32_PINMUX('A', 8, ANALOG)>, /* SDMMC2_D4 */
-> +				 <STM32_PINMUX('A', 9, ANALOG)>, /* SDMMC2_D5 */
-> +				 <STM32_PINMUX('C', 6, ANALOG)>, /* SDMMC2_D6 */
-> +				 <STM32_PINMUX('C', 7, ANALOG)>, /* SDMMC2_D7 */
-> +				 <STM32_PINMUX('E', 3, ANALOG)>, /* SDMMC2_CK */
-> +				 <STM32_PINMUX('G', 6, ANALOG)>; /* SDMMC2_CMD */
-> +		};
-> +	};
-> +
-> +	sdmmc2_b4_aqm_pins_a: sdmmc2-b4-0 {
-> +		pins1 {
-> +			pinmux = <STM32_PINMUX('B', 14, AF9)>, /* SDMMC2_D0 */
-> +				 <STM32_PINMUX('B', 7, AF10)>, /* SDMMC2_D1 */
-> +				 <STM32_PINMUX('B', 3, AF9)>, /* SDMMC2_D2 */
-> +				 <STM32_PINMUX('B', 4, AF9)>, /* SDMMC2_D3 */
-> +				 <STM32_PINMUX('A', 8, AF9)>, /* SDMMC2_D4 */
-> +				 <STM32_PINMUX('A', 9, AF10)>, /* SDMMC2_D5 */
-> +				 <STM32_PINMUX('C', 6, AF10)>, /* SDMMC2_D6 */
-> +				 <STM32_PINMUX('C', 7, AF10)>, /* SDMMC2_D7 */
-> +				 <STM32_PINMUX('G', 6, AF10)>; /* SDMMC2_CMD */
-> +			slew-rate = <1>;
-> +			drive-push-pull;
-> +			bias-pull-up;
-> +		};
-> +
-> +		pins2 {
-> +			pinmux = <STM32_PINMUX('E', 3, AF9)>; /* SDMMC2_CK */
-> +			slew-rate = <2>;
-> +			drive-push-pull;
-> +			bias-pull-up;
-> +		};
-> +	};
-> +
-> +	sdmmc2_b4_od_aqm_pins_a: sdmmc2-b4-od-0 {
-> +		pins1 {
-> +			pinmux = <STM32_PINMUX('B', 14, AF9)>, /* SDMMC2_D0 */
-> +				 <STM32_PINMUX('B', 7, AF10)>, /* SDMMC2_D1 */
-> +				 <STM32_PINMUX('B', 3, AF9)>, /* SDMMC2_D2 */
-> +				 <STM32_PINMUX('B', 4, AF9)>, /* SDMMC2_D3 */
-> +				 <STM32_PINMUX('A', 8, AF9)>, /* SDMMC2_D4 */
-> +				 <STM32_PINMUX('A', 9, AF10)>, /* SDMMC2_D5 */
-> +				 <STM32_PINMUX('C', 6, AF10)>, /* SDMMC2_D6 */
-> +				 <STM32_PINMUX('C', 7, AF10)>; /* SDMMC2_D7 */
-> +			slew-rate = <1>;
-> +			drive-push-pull;
-> +			bias-pull-up;
-> +		};
-> +
-> +		pins2 {
-> +			pinmux = <STM32_PINMUX('E', 3, AF9)>; /* SDMMC2_CK */
-> +			slew-rate = <2>;
-> +			drive-push-pull;
-> +			bias-pull-up;
-> +		};
-> +
-> +		pins3 {
-> +			pinmux = <STM32_PINMUX('G', 6, AF10)>; /* SDMMC2_CMD */
-> +			slew-rate = <1>;
-> +			drive-open-drain;
-> +			bias-pull-up;
-> +		};
-> +	};
-> +
-> +	sdmmc3_b4_aqm_pins_a: sdmmc3-b4-0 {
-> +		pins1 {
-> +			pinmux = <STM32_PINMUX('D', 1, AF10)>, /* SDMMC3_D0 */
-> +				 <STM32_PINMUX('D', 4, AF10)>, /* SDMMC3_D1 */
-> +				 <STM32_PINMUX('D', 5, AF10)>, /* SDMMC3_D2 */
-> +				 <STM32_PINMUX('D', 7, AF10)>, /* SDMMC3_D3 */
-> +				 <STM32_PINMUX('D', 0, AF10)>; /* SDMMC3_CMD */
-> +			slew-rate = <1>;
-> +			drive-push-pull;
-> +			bias-pull-up;
-> +		};
-> +
-> +		pins2 {
-> +			pinmux = <STM32_PINMUX('G', 15, AF10)>; /* SDMMC3_CK */
-> +			slew-rate = <2>;
-> +			drive-push-pull;
-> +			bias-pull-up;
-> +		};
-> +	};
-> +
-> +	sdmmc3_b4_od_aqm_pins_a: sdmmc3-b4-od-0 {
-> +		pins1 {
-> +			pinmux = <STM32_PINMUX('D', 1, AF10)>, /* SDMMC3_D0 */
-> +				 <STM32_PINMUX('D', 4, AF10)>, /* SDMMC3_D1 */
-> +				 <STM32_PINMUX('D', 5, AF10)>, /* SDMMC3_D2 */
-> +				 <STM32_PINMUX('D', 7, AF10)>; /* SDMMC3_D3 */
-> +			slew-rate = <1>;
-> +			drive-push-pull;
-> +			bias-pull-up;
-> +		};
-> +
-> +		pins2 {
-> +			pinmux = <STM32_PINMUX('G', 15, AF10)>; /* SDMMC3_CK */
-> +			slew-rate = <2>;
-> +			drive-push-pull;
-> +			bias-pull-up;
-> +		};
-> +
-> +		pins3 {
-> +			pinmux = <STM32_PINMUX('D', 0, AF10)>; /* SDMMC3_CMD */
-> +			slew-rate = <1>;
-> +			drive-open-drain;
-> +			bias-pull-up;
-> +		};
-> +	};
-> +
-> +	sdmmc3_b4_sleep_aqm_pins_a: sdmmc3-b4-sleep-0 {
-> +		pins {
-> +			pinmux = <STM32_PINMUX('D', 1, ANALOG)>, /* SDMMC3_D0 */
-> +				 <STM32_PINMUX('D', 4, ANALOG)>, /* SDMMC3_D1 */
-> +				 <STM32_PINMUX('D', 5, ANALOG)>, /* SDMMC3_D2 */
-> +				 <STM32_PINMUX('D', 7, ANALOG)>, /* SDMMC3_D3 */
-> +				 <STM32_PINMUX('G', 15, ANALOG)>, /* SDMMC3_CK */
-> +				 <STM32_PINMUX('D', 0, ANALOG)>; /* SDMMC3_CMD */
-> +		};
-> +	};
-> +
-> +	uart4_aqm_pins_a: uart4-0 {
-> +		pins1 {
-> +			pinmux = <STM32_PINMUX('G', 11, AF6)>; /* UART4_TX */
-> +			bias-disable;
-> +			drive-push-pull;
-> +			slew-rate = <0>;
-> +		};
-> +
-> +		pins2 {
-> +			pinmux = <STM32_PINMUX('B', 8, AF8)>; /* UART4_RX */
-> +			bias-disable;
-> +		};
-> +	};
-> +
-> +	uart4_idle_aqm_pins_a: uart4-idle-0 {
-> +		pins1 {
-> +			pinmux = <STM32_PINMUX('G', 11, ANALOG)>; /* UART4_TX */
-> +		};
-> +
-> +		pins2 {
-> +			pinmux = <STM32_PINMUX('B', 8, AF8)>; /* UART4_RX */
-> +			bias-disable;
-> +		};
-> +	};
-> +
-> +	uart4_sleep_aqm_pins_a: uart4-sleep-0 {
-> +		pins {
-> +			pinmux = <STM32_PINMUX('G', 11, ANALOG)>, /* UART4_TX */
-> +				 <STM32_PINMUX('B', 2, ANALOG)>; /* UART4_RX */
-> +		};
-> +	};
-> +
-> +	uart7_aqm_pins_a: uart7-0 {
-> +		pins1 {
-> +			pinmux = <STM32_PINMUX('F', 7, AF7)>, /* UART7_TX */
-> +				 <STM32_PINMUX('F', 8, AF7)>; /* UART7_RTS */
-> +			bias-disable;
-> +			drive-push-pull;
-> +			slew-rate = <0>;
-> +		};
-> +
-> +		pins2 {
-> +			pinmux = <STM32_PINMUX('E', 7, AF7)>, /* UART7_RX */
-> +				 <STM32_PINMUX('F', 9, AF7)>; /* UART7_CTS */
-> +			bias-disable;
-> +		};
-> +	};
-> +};
-> --
-> 2.39.5
+>>>> output, for all PFs and VFs on given device:
+>>>>
+>>>> pci/0000:af:00:
+>>>>    name rss size 8 unit entry size_min 0 size_max 24 size_gran 1
+>>>>      resources:
+>>>>        name lut_512 size 0 unit entry size_min 0 size_max 16 size_gran 1
+>>>>        name lut_2048 size 8 unit entry size_min 0 size_max 8 size_gran 1
+>>>>
+>>>> What is contributing to the hardness, this is not just one for all ice
+>>>> PFs, but one per device, which we distinguish via pci BDF.
+>>>
+>>> How?
+>>
+>> code is in ice_adapter_index()
 > 
+> If you pass 2 pfs of the same device to a VM with random BDF, you get 2
+> ice_adapters, correct?
+
+Right now, yes
+
+> 
+> [...]
+
+What I want is to keep two ice_adapters for two actual devices (SDNs)
 
