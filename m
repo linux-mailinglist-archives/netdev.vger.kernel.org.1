@@ -1,122 +1,74 @@
-Return-Path: <netdev+bounces-169654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7C01A451B4
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 01:47:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFA23A451D2
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 02:01:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E77D57A1F85
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 00:46:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D3E3174339
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 01:01:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7FC020328;
-	Wed, 26 Feb 2025 00:47:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2FFF153BE8;
+	Wed, 26 Feb 2025 01:01:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Fb6nbj7K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MBb+v2n6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FCE88C11
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 00:47:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF1E263CF
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 01:01:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740530839; cv=none; b=b2TvkESCLj5ImQ5e16xBRa5/OfQwlfwDZYjbS6B4UhJmYXiQXpVpbCdzWlvn0o/9JE1xPbsc2gdr1jklR0G76b89THAvXV/l4yiFe/t5DDH3/Dm7WzlK75pHusQDrGdJChTSSFDK5crLHneLn5pSwO+Ep8t9Mw9HmKsZZReaDYU=
+	t=1740531690; cv=none; b=r98MUDHvvAoOZJMKDGZAxzHdwkSFnmViIiwl+yKjZIpHHYbgGrp1c0IeATqRcxa5lOk0EFcCBNzCpZOthH8Sm0FLigLGBAgIDImheVniPrCkQruHtxtPdVIOCdxyjH7TC3HybchjyPFaeAT82hBK17VIfKGveIZDV1azw5RTcsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740530839; c=relaxed/simple;
-	bh=pnwgXRfOnmpeUM02m1pqK2tJe9N1ca9L31gJDIvn648=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NDbsV2pyLF2CRWAURMrwoqj76ShpGkULnB4noZ5sfP6RkBo0tHnX4mNtRKAux1/HIG5Cm6D9wvP6nfWkJ+WT1AnxfOpz8ce5M6wfjx33lozHEbj+LD1qu6jVUFfkzi966iKvvT0bIiolCm2Pt+NPGbkgPLZQEoU52MnXTLeSekE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Fb6nbj7K; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1740530838; x=1772066838;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=xf009gOFuCYWJAKCOi3v4iB2mu8Gi1+bc5k7o6KSuq8=;
-  b=Fb6nbj7KgJfcDllzONIKgqpCYZ+fDOYuAHr5B+p3dO8ogeMS7ra1K+X6
-   dT07S13ZPkB+uM/aOwHYQhBD+W6TM+LRpt+NMKWigZx+FxbFJNkcWoAE9
-   g7lWlfwzAGNB6jvraJkRIVswLzZTelIAPA13g50+OvSDDxjRzOUzOqZNQ
-   g=;
-X-IronPort-AV: E=Sophos;i="6.13,316,1732579200"; 
-   d="scan'208";a="274349009"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 00:47:14 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:50295]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.18.70:2525] with esmtp (Farcaster)
- id 83602b6e-f3e4-4981-b50d-6e03fd995bc0; Wed, 26 Feb 2025 00:47:13 +0000 (UTC)
-X-Farcaster-Flow-ID: 83602b6e-f3e4-4981-b50d-6e03fd995bc0
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 26 Feb 2025 00:47:08 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.106.101.38) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 26 Feb 2025 00:47:05 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuba@kernel.org>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH v1 net-next 00/12] ipv4: fib: Convert RTM_NEWROUTE and RTM_DELROUTE to per-netns RTNL.
-Date: Tue, 25 Feb 2025 16:46:57 -0800
-Message-ID: <20250226004657.36987-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250225162448.3a3c4133@kernel.org>
-References: <20250225162448.3a3c4133@kernel.org>
+	s=arc-20240116; t=1740531690; c=relaxed/simple;
+	bh=cqDAvg1hS1oxsK1CW7JWXegriKn6gZKBAGqqrcMrXjQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LaRajCh7J0zMK7b8AVhrssTaSXMdHjkqPCp1lyQ+vxYZr56xhbFnQ2BN0mMY9/PWKacrjbxNZsk8hiez2tzUfY552xx9of/AYmMshbYCKtwIIoe5ZTlehlSiL2l9yyp5pFW7kE9HiceUk+jUeQTEuTM5Wje5seaaEE3y6ffOuQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MBb+v2n6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3594C4CEDD;
+	Wed, 26 Feb 2025 01:01:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740531690;
+	bh=cqDAvg1hS1oxsK1CW7JWXegriKn6gZKBAGqqrcMrXjQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MBb+v2n62ajLtiyhQqqq0Mv/CwqXeBJpCFdyIA3kse4wZ7cVpNczSQKYF3EKe1FDS
+	 +IAf36cWTbTkgCunzBwQn6nYN37c23BegTSmMm3yxjokT7kfMZJVBA9sZNIqR18ThD
+	 YOVC4rIP0H5fsxJdBbWgk6cz++xFoQs44Phlk28uBb3O9xKgJOvWKKqbBE4xz3yO72
+	 VY59Pl1FgHa9MR7DySJ9qB+1wfss75D5cVmApTwpkXp1h5/L5XW3GihjZSBJCaqZTm
+	 U/+FfcE/Y2cyRBOXwuf5KN8XaUg01eUslRWGZxWNNNlSLi6hRrMunuLEqPUZ3tRUtE
+	 lCuDpiA8AyoKw==
+Date: Tue, 25 Feb 2025 17:01:28 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Gal Pressman <gal@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, <netdev@vger.kernel.org>, Andrew Lunn
+ <andrew@lunn.ch>, Simon Horman <horms@kernel.org>, Joe Damato
+ <jdamato@fastly.com>, Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH net-next] net: ethtool: Don't check if RSS context
+ exists in case of context 0
+Message-ID: <20250225170128.590baea1@kernel.org>
+In-Reply-To: <20250225071348.509432-1-gal@nvidia.com>
+References: <20250225071348.509432-1-gal@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D032UWA003.ant.amazon.com (10.13.139.37) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Jakub Kicinski <kuba@kernel.org>
-Date: Tue, 25 Feb 2025 16:24:48 -0800
-> On Tue, 25 Feb 2025 10:22:38 -0800 Kuniyuki Iwashima wrote:
-> > Patch 1 is a misc cleanup.
-> > Patch 2 ~ 8 converts two fib_info hash tables to per-netns.
-> > Patch 9 ~ 12 converts rtnl_lock() to rtnl_net_lcok().
+On Tue, 25 Feb 2025 09:13:48 +0200 Gal Pressman wrote:
+> Context 0 (default context) always exists, there is no need to check
+> whether it exists or not when adding a flow steering rule.
 > 
-> Breaks quite a few tests :(
+> The existing check fails when creating a flow steering rule for context
+> 0 as it is not stored in the rss_ctx xarray.
 
-Oh, sorry... why I didn't notice this silly mistake :/
-I enabled kmemleak on my debug config.
-Will fix in v2.
-
----8<---
-diff --git a/net/ipv4/fib_frontend.c b/net/ipv4/fib_frontend.c
-index b9ead0257340..34cfea5c127b 100644
---- a/net/ipv4/fib_frontend.c
-+++ b/net/ipv4/fib_frontend.c
-@@ -1666,7 +1666,7 @@ static void __net_exit fib_net_exit(struct net *net)
- {
- 	fib_proc_exit(net);
- 	nl_fib_lookup_exit(net);
--	fib4_semantics_init(net);
-+	fib4_semantics_exit(net);
- }
- 
- static void __net_exit fib_net_exit_batch(struct list_head *net_list)
----8<---
-
-
-> 
-> unreferenced object 0xffff88800bfc6800 (size 256):
->   comm "ip", pid 577, jiffies 4294699578
->   hex dump (first 32 bytes):
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->   backtrace (crc 0):
->     __kmalloc_node_noprof+0x35d/0x4a0
->     fib4_semantics_init+0x25/0xf0
->     fib_net_init+0x17e/0x340
+But what is the use case for redirecting to context 0?
 
