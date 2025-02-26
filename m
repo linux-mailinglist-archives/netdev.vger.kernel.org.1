@@ -1,170 +1,282 @@
-Return-Path: <netdev+bounces-169779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DC2AA45B20
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 11:03:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 160DDA45B3F
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 11:09:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 09B407A2F2E
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 10:02:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8950B1896B4F
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 10:09:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 899F7226D02;
-	Wed, 26 Feb 2025 10:03:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9B192459CA;
+	Wed, 26 Feb 2025 10:09:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="a3jjbCej"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Vl+8t0fT"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE1620F076;
-	Wed, 26 Feb 2025 10:03:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1432623815F;
+	Wed, 26 Feb 2025 10:09:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740564184; cv=none; b=ryHGDNUpNjjanF+7HWLQhwbR+vzUBxcm9pLqQEwZuqLEVIFW5rvBYk9xlkvG6tiEvG9lbOhlDFLhX2WxjJ+eGQCE9RY18LUIWYUp8Flz90FHAuI9xdchdal4T+NrdK3o2gWJ8P9GVMsdAqhwB0CcAycvuNOxUHRHG2/O8NB64pA=
+	t=1740564578; cv=none; b=ovuutgSWq79IejHstmok7gs2nAVHKnwvDaAkg2uN1EpqclQT08SUXWLziHjEyicObEE1YDHqonRAuKS7+x2h9eMFdtN0Ui+yDg/R7Sx8trJ2VyX4IQAQUybF/IOVBY2CpAGk6tr44XWtdc4oHbqS9/W6mtPZjWHM6ZGHA2lNukM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740564184; c=relaxed/simple;
-	bh=ilF/MM0HvGAS0cu+PQ/B0oKUkCagzEcSVdzHJOh/TPs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=clfZJ1bG53qvrAm9XvK6Kf/u5E2gOj+mMJ3JQBLXVtJVGCJRaxA4Yp0ZDV8D4Mvxvf6pZCfo9hnh1tSsHmMIbl/V6cHCaOpdr2x9o5XmoFV1pInQ9BD+RA/7PuREV656+ShIV0smhtucTqtXWTsoTdUQ34LxkGfddqQkIhk6yVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=a3jjbCej; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=sOnGjWaUSP+NrqHGRjXXETsxWrtELjRMWXZ4J2QAXBI=; b=a3jjbCejJFHavFiOa/9msozzW1
-	gE/Kr1/w4AbrZZXkmidqaEKjoDPldXqb1Ca/Ve8uAESMYXtYi0f/7zt4ZqZyypSy6uGmrMw4WFBFq
-	ANh3d9rHgldCo9YJzaoYfYqpNDUZJNfiKcQDyWy6x7PxCM8B2I5aVs2jpgtq2UHw2xBesYHdXzeCU
-	yPCaciZaV14itjQ9S21Z1beS59Al0zbJj9FvhvENlTP45UXhd/rbHQDgh68ozZ9Zi7xz1Alb/lncv
-	2gyUfB/K+XfwQQY88PFlIpQYKmibRV2Iec1JUyxk8Zny3C3Je8hrY3i+A0n58nblXR6NcoiF8K2T3
-	WIVfdE/Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48516)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tnEFh-0003qa-0t;
-	Wed, 26 Feb 2025 10:02:53 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tnEFe-0006xo-1j;
-	Wed, 26 Feb 2025 10:02:50 +0000
-Date: Wed, 26 Feb 2025 10:02:50 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jon Hunter <jonathanh@nvidia.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Bryan Whitehead <bryan.whitehead@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	s=arc-20240116; t=1740564578; c=relaxed/simple;
+	bh=w+6G/iZ6JZRUr2xq7OaaCs1aEdwbk2Z/2SarFa9fPrs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tLHjMK6dDn7A81Yy4oes7BO/jRq2522IRuQn6zG/Weitrjoy3Rso/lhdgWm3I7bSVfSdrMDt8/Vk9DGKTe9an0nPKhPRXvRV++exmZWLx1j7Mt64WXhid61IRIxPv4/Up55PYUS/EPrnQMGz4XAZ2zGALDR6RpxRr0KkWCqex6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Vl+8t0fT; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id D54794321C;
+	Wed, 26 Feb 2025 10:09:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1740564574;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=irmKjgy54eKsa/wYtjIJ+UJ+LZLLIAEkq3oBzyxkhvQ=;
+	b=Vl+8t0fTI17niDSomkviT3W3Uv0NHyEusjarB94jIOFEoe9bH8kOD5pLoe3Pfpvq+Umu3w
+	q/qtZHOak0oadHxBr1MVv5XNWCuH/TmwxUp3iYMgschl0SppTMlUi+7i7MP1I94VI58uAG
+	AdIJcjKykD0m0+r3RrZk0rXoiW6aNv0efiS/061mBOMiVdrsd5kiUSN2spMOxfNo1RzkiE
+	nY+sJyvCIxcFzQh3niQ+asDSLDVSgZ54dB3Vsb9QxD6U4CM+swOO3djbI1S2OyM6gFHGue
+	u59B9UgHi6peebLLx14fqIJjI2znfbL07RSypbelzyBU13y3UUdCSIMx+gubGQ==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
 	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com,
-	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
-Subject: Re: [PATCH net-next 9/9] net: stmmac: convert to phylink managed EEE
- support
-Message-ID: <Z77myuNCoe_la7e4@shell.armlinux.org.uk>
-References: <Z63e-aFlvKMfqNBj@shell.armlinux.org.uk>
- <05987b45-94b9-4744-a90d-9812cf3566d9@nvidia.com>
- <Z68nSJqVxcnCc1YB@shell.armlinux.org.uk>
- <86fae995-1700-420b-8d84-33ab1e1f6353@nvidia.com>
- <Z7X6Z8yLMsQ1wa2D@shell.armlinux.org.uk>
- <203871c2-c673-4a98-a0a3-299d1cf71cf0@nvidia.com>
- <Z7YtWmkVl0rWFvQO@shell.armlinux.org.uk>
- <fd4af708-0c92-4295-9801-bf53db3a16cc@nvidia.com>
- <Z7ZF0dA4-jwU7O2E@shell.armlinux.org.uk>
- <31731125-ab8f-48d9-bd6f-431d49431957@nvidia.com>
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Simon Horman <horms@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>
+Subject: [PATCH net-next v2 00/13] net: phy: Rework linkmodes handling in a dedicated file
+Date: Wed, 26 Feb 2025 11:09:15 +0100
+Message-ID: <20250226100929.1646454-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <31731125-ab8f-48d9-bd6f-431d49431957@nvidia.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdekgeeftdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofggtgfgsehtkeertdertdejnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepieevffefgfevgeehveeftdeiheektddvheegtdevtdeivedtgffgvdejffefleffnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvtddprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvl
+ hdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomh
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Tue, Feb 25, 2025 at 02:21:01PM +0000, Jon Hunter wrote:
-> Hi Russell,
-> 
-> On 19/02/2025 20:57, Russell King (Oracle) wrote:
-> > So, let's try something (I haven't tested this, and its likely you
-> > will need to work it in to your other change.)
-> > 
-> > Essentially, this disables the receive clock stop around the reset,
-> > something the stmmac driver has never done in the past.
-> > 
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > index 1cbea627b216..8e975863a2e3 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > @@ -7926,6 +7926,8 @@ int stmmac_resume(struct device *dev)
-> >   	rtnl_lock();
-> >   	mutex_lock(&priv->lock);
-> > +	phy_eee_rx_clock_stop(priv->dev->phydev, false);
-> > +
-> >   	stmmac_reset_queues_param(priv);
-> >   	stmmac_free_tx_skbufs(priv);
-> > @@ -7937,6 +7939,9 @@ int stmmac_resume(struct device *dev)
-> >   	stmmac_restore_hw_vlan_rx_fltr(priv, ndev, priv->hw);
-> > +	phy_eee_rx_clock_stop(priv->dev->phydev,
-> > +			      priv->phylink_config.eee_rx_clk_stop_enable);
-> > +
-> >   	stmmac_enable_all_queues(priv);
-> >   	stmmac_enable_all_dma_irq(priv);
-> 
-> 
-> Sorry for the delay, I have been testing various issues recently and needed
-> a bit more time to test this.
-> 
-> It turns out that what I had proposed last week does not work. I believe
-> that with all the various debug/instrumentation I had added, I was again
-> getting lucky. So when I tested again this week on top of vanilla v6.14-rc2,
-> it did not work :-(
-> 
-> However, what you are suggesting above, all by itself, is working. I have
-> tested this on top of vanilla v6.14-rc2 and v6.14-rc4 and it is working
-> reliably. I have also tested on some other boards that use the same stmmac
-> driver (but use the Aquantia PHY) and I have not seen any issues. So this
-> does fix the issue I am seeing.
-> 
-> I know we are getting quite late in the rc for v6.14, but not sure if we
-> could add this as a fix?
+Hello everyone,
 
-The patch above was something of a hack, bypassing the layering, so I
-would like to consider how this should be done properly.
+This is the V2 of the phy_caps series. This series aims at reworking the way
+we do conversions between speed/duplex, linkmodes and interfaces. There's two
+goals here :
+ - Make that conversion easier to maintain and somewhat more efficient, by
+   avoiding the re-definitions of capabilities to linkmodes to interfaces that
+   exist in phylib and phylink
+ - create an internal API for these conversions, in preparation for the phy_port
+   work.
 
-I'm still wondering whether the early call to phylink_resume() is
-symptomatic of this same issue, or whether there is a PHY that needs
-phy_start() to be called to output its clock even with link down that
-we don't know about.
+This V2 reworks the way we deal with the phy_interface_t <-> caps <-> linkmodes,
+leaving the MAC_*** capabilities a phylink-only set of values.
 
-The phylink_resume() call is relevant to this because I'd like to put:
+This V2 also addresses the comments from Köry as well as a kdoc warning.
 
-	phy_eee_rx_clock_stop(priv->dev->phydev,
-			      priv->phylink_config.eee_rx_clk_stop_enable);
+V1 : https://lore.kernel.org/netdev/20250222142727.894124-1-maxime.chevallier@bootlin.com/
 
-in there to ensure that the PHY is correctly configured for clock-stop,
-but given stmmac's placement that wouldn't work.
+For context, The text below is an extract from the V1 cover :
 
-I'm then thinking of phylink_pre_resume() to disable the EEE clock-stop
-at the PHY.
+Following the V4 of the phy_port series [1] we've discussed about attempting
+to extract some of the linkmode <-> capabilities (speed/duplex) <-> interface
+logic into a dedicated file, so that we can re-use that logic out of
+phylink.
 
-I think the only thing we could do is try solving this problem as per
-above and see what the fall-out from it is. I don't get the impression
-that stmmac users are particularly active at testing patches though, so
-it may take months to get breakage reports.
+While trying to do that, I might have gotten a bit carried-away, and I'm
+therefore submitting this series to rework the way we are currently
+managing the linkmodes <-> capabilities handling.
+
+We are currently defining all the possible Ethernet linkmodes in an
+enum ethtool_link_mode_bit_indices value defined in uapi/linux/ethtool.h :
+
+	ETHTOOL_LINK_MODE_10baseT_Half_BIT	= 0,
+	ETHTOOL_LINK_MODE_10baseT_Full_BIT	= 1,
+	...
+
+Each of these modes represents a media-side link definition, and runs at
+a given speed and duplex.
+
+Specific attributes for each modes are stored in net/ethtool/common.c, as
+an array of struct link_mode_info :
+
+	struct link_mode_info {
+		int				speed;
+		u8				lanes;
+		u8				duplex;
+	}
+
+The link_mode_params[] array is the canonical definition for these modes,
+as (1) there are build-time checks to make sure any new linkmode
+definition is also defined in this array and (2) this array is always
+compiled-in, as it's part of the net stack (i.e. it is not phylib-specific).
+
+This array is however not optimized for lookups, as it is not ordered in
+any particular fashion (new modes go at the end, regardless of their speed
+and duplex).
+
+Phylib also includes a similar array, in the form of the phy_settings
+array in drivers/net/phy/phy-core.c :
+
+	struct phy_setting {
+		u32 speed;
+		u8 duplex;
+		u8 bit; // The enum index for the linkmode
+	};
+
+The phy_settings array however is ordered by descending speeds. A variety
+of helpers in phylib rely on that ordering to perform lookups, usually
+to get one or any linkmode corresponding to a requested speed and duplex.
+
+Finally, we have some helpers in phylink (phylink_caps_to_linkmodes) that
+allows getting the list of linkmodes that match a set of speed and duplex
+value, all at once.
+
+While the phylink and phylib helpers allows for efficient lookups, they
+have some drawbacks as well :
+
+	(1) : It's easy to forget updating of all of these helpers and structures
+		  when adding a new linkmode. New linkmodes are actually added fairly
+		  often, lately either for slow BaseT1 flavours, or for crazy-fast
+		  modes (800Gbps modes, but I guess people won't stop there)
+		  
+	(2) : Even though the phylink and phylib modes use carefull sorting
+		  to speed-up the lookup process, the phylib lookups are usually
+		  done in descending speed order and will therefore get slower
+		  as people add even faster link speeds.
+		  
+This series introduces a new "link_capabilities" structure that is used
+to build an array of link_caps :
+
+	struct link_capabilities {
+		int speed;                           
+		unsigned int duplex;
+		__ETHTOOL_DECLARE_LINK_MODE_MASK(linkmodes);
+	};
+
+We group these in an array, indexed with LINK_CAPA enums that are basically
+identical to the phylink MAC_CAPS :
+
+...
+LINK_CAPA_1000HD,             
+LINK_CAPA_1000FD,
+LINK_CAPA_2500FD,
+LINK_CAPA_5000FD,
+...
+
+We now have an associative array of <speed,duplex> <-> All compatible linkmodes
+
+This array is initialized at phylib-init time based on the content of
+the link_mode_params[] array from net/ethtool/common.c, that way it is
+always up-to-date with new modes, and always properly ordered.
+
+Patches 3 to 8 then convert all lookups from the phy_settings array into
+lookups from this link_caps array, hopefully speeding-up lookups in the
+meantime (we iterate over possible speeds instead of individual linkmodes)
+
+This series is not meant to introduce changes in behaviour, however patches
+9 and 10 do introduce functionnal changes. When configuring the advert
+for speeds >= 1G in PHY devices, as well as when constructing the link
+parameters for fixed links in phylink, we used to rely on phy_settings
+lookups returning one, and only one, compatible linkmode. This series will
+make so that the lookups will result on all matching linkmodes being
+returned, and MAY cause advert/fixed-link configuring more linkmodes.
+
+Patches 12 and 13 extract the conversion logic for interface <-> caps from
+phylink.
+
+There are cons as well for this, as this is a bit more init time for phylib,
+but maybe more importantly, we lose in the precision for the lookups in
+phy_settings. However, given all the uses for phy_settings (most are just
+to get speed/duplex), I think this is actually ok, but any comment would
+be very welcome.
+
+This series was tested with :
+ - 10/100/1000M links
+ - 2,5, 5, 10G BaseT links
+ - 1G Fixed link
+
+I also made sure that this compiles with the following options :
+
+CONFIG_PHYLIB=n
+
+CNFIG_PHYLINK=m
+CONFIG_PHYLIB=m
+
+CNFIG_PHYLINK=m
+CONFIG_PHYLIB=y
+
+CNFIG_PHYLINK=y
+CONFIG_PHYLIB=y
+
+All the new helpers that were introduced (in drivers/net/phy/phy-caps.h)
+are for internal use only (only users should be core stuff, such as phylib and
+phylink, and in the future, phy_port).
+
+Thanks,
+
+Maxime
+
+[1]: https://lore.kernel.org/netdev/20250213101606.1154014-1-maxime.chevallier@bootlin.com/
+
+
+
+Maxime Chevallier (13):
+  net: ethtool: Export the link_mode_params definitions
+  net: phy: Use an internal, searchable storage for the linkmodes
+  net: phy: phy_caps: Move phy_speeds to phy_caps
+  net: phy: phy_caps: Move __set_linkmode_max_speed to phy_caps
+  net: phy: phy_caps: Introduce phy_caps_valid
+  net: phy: phy_caps: Implement link_capabilities lookup by linkmode
+  net: phy: phy_caps: Allow looking-up link caps based on speed and
+    duplex
+  net: phy: phy_device: Use link_capabilities lookup for PHY aneg config
+  net: phy: phylink: Use phy_caps_lookup for fixed-link configuration
+  net: phy: drop phy_settings and the associated lookup helpers
+  net: phy: phylink: Add a mapping between MAC_CAPS and LINK_CAPS
+  net: phy: phylink: Convert capabilities to linkmodes using phy_caps
+  net: phy: phy_caps: Allow getting an phy_interface's capabilities
+
+ drivers/net/phy/Makefile     |   2 +-
+ drivers/net/phy/phy-caps.h   |  62 +++++++
+ drivers/net/phy/phy-core.c   | 253 ++------------------------
+ drivers/net/phy/phy.c        |  37 ++--
+ drivers/net/phy/phy_caps.c   | 340 +++++++++++++++++++++++++++++++++++
+ drivers/net/phy/phy_device.c |  13 +-
+ drivers/net/phy/phylink.c    | 337 +++++++++-------------------------
+ include/linux/ethtool.h      |   8 +
+ include/linux/phy.h          |  15 --
+ net/ethtool/common.c         |   1 +
+ net/ethtool/common.h         |   7 -
+ 11 files changed, 532 insertions(+), 543 deletions(-)
+ create mode 100644 drivers/net/phy/phy-caps.h
+ create mode 100644 drivers/net/phy/phy_caps.c
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.48.1
+
 
