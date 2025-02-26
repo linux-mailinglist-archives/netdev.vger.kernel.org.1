@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-169995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92BFDA46D13
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 22:10:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 212DFA46D14
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 22:10:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 482131887619
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 21:10:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EA6516B465
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 21:10:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B475F257438;
-	Wed, 26 Feb 2025 21:10:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 739BA258CE6;
+	Wed, 26 Feb 2025 21:10:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p8Qti8+0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d+bVolqZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8512325333F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503E82586ED
 	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 21:10:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740604218; cv=none; b=SxZrvG+DlQ2JUGP1aR4aNsm6ieXoV7pHhdzhtRiz87JTeVzP5Up+M6Rsv2jHLpmqKphaTtzAdfZ+wUIbUI8WoSLlr++Z4VqX8iewd0OHNyGnImy8QNoXUfWDAOk/OYnawFeuGCUpHZrG4M1ld4Zduvfh1z0yHBWHnrJytG9rOG8=
+	t=1740604219; cv=none; b=ICXR/QWQ8KNU0lGCQF3+Qq/EVqeCTB9JxAMIWwcWe5c0CE5V7Awv/6G+dyOcdi27BPk1/YuqgvKRQS/l2dorQ1bCdgHZlmwwHtVkfwGa1zSX26YbbbiyPwAggBCRpznaFdi/LfsFXl1I0plFRjMwwWGCDF5oWLxaRgAZZ0LW3QU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740604218; c=relaxed/simple;
-	bh=nBdGbQ7sksHO1rpAE/hUy+rxPb4XSIlU0+wSo+21w5k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LSn7bINff5VrAXJ/ZIJa/dTn4K9z7nT9plnDJc9G33gsbu0JJNcBFe5HiJEYtxzrdpK3HjfbNsE66THLW+ibB7guPc+cOVPzcY9X9xgP+SEAvjMpmIk6f+CockIhoR0MhfLpt+3AKAL+xBgsv6myQAK6me0wkUKCo5dn+Ex8IQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p8Qti8+0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12849C4CED6;
+	s=arc-20240116; t=1740604219; c=relaxed/simple;
+	bh=xlfesCAYFJuORciIZ6LM+t4QFT/GvQSC3mgpWimbL/E=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=NY81NysGEN2lb1V6EnSP4ikFXfxR0FeGxYYKErIbRK3QuV84+3GDeRGvJoA3xW5qKh9XRJPartWy6I+XlkR9yXvxL5+Fmhi/c3q6aTe2Hn46HGHJq15UOHnu/b6S6B/m82TJ+g9EjlolC4VVWa0vgXcb7uE0fTYBWSXVZONceSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d+bVolqZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 867CAC4CEE7;
 	Wed, 26 Feb 2025 21:10:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1740604218;
-	bh=nBdGbQ7sksHO1rpAE/hUy+rxPb4XSIlU0+wSo+21w5k=;
-	h=From:To:Cc:Subject:Date:From;
-	b=p8Qti8+0OaYJFKh3moXMRFY70orkrB/kWXc4AYUmVJfyr192LEeqfrrz7jJGOTQl8
-	 pmD9SBm7IKw0eaO+WeCmO/OruhqsZ/CH5wC9qcMQm77ya0AD9YbwfAk2ZfETHH//4u
-	 XSIw9FBCs6g0Rwc2I1mK+K+ruum1ouOM1nyobGcdlKDRu4mQPmuFblg8V0gtEQJsOs
-	 FlMvlrj+HlCUv73G1YBEJ09AVNiTy2uGQ8g1J9ugtA3BGv264lP7oyXITQA91mwyZb
-	 EvSBiIicWd3sGXKK60ptybSdOmR4Ffp5uQwX8Lzl3ibQWLca/juBZ2s7PBqMPuyyPI
-	 dJOfVQbYewg0A==
+	bh=xlfesCAYFJuORciIZ6LM+t4QFT/GvQSC3mgpWimbL/E=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=d+bVolqZx5kBorTC6tmzK334j46J9CimKYKEUOoxxvFH/k8juFqwgbUn+lZ0qFHk+
+	 dzW+hI84FZV8LO4vFvM3oJfCTSWahskR0qDF98dC4OobcVL2fPWQciImaZONVyz2TG
+	 PLHrYwwj+PCv/EsCyT+EnGd50fiJe+kWbchwyTjsh0mbhsFtBQEj335rMr1SjhVKIN
+	 vFfDAI5bXjqOLzO75hTpTXklgoqbeuZk9zL5WZ0ZNRYIdCWYQkmJJRlJJQXYqbAWpS
+	 eZQGMD8A9enqw9INS1LwLjtQGfOebUMvhkBBUPPZlLAcSSiDOPku121dPlb2IZLEEI
+	 w90qUwsvWwabA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -50,10 +51,12 @@ Cc: netdev@vger.kernel.org,
 	michael.chan@broadcom.com,
 	pavan.chebbi@broadcom.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 0/9] eth: bnxt: maintain basic pkt/byte counters in SW
-Date: Wed, 26 Feb 2025 13:09:54 -0800
-Message-ID: <20250226211003.2790916-1-kuba@kernel.org>
+Subject: [PATCH net-next 1/9] eth: bnxt: use napi_consume_skb()
+Date: Wed, 26 Feb 2025 13:09:55 -0800
+Message-ID: <20250226211003.2790916-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250226211003.2790916-1-kuba@kernel.org>
+References: <20250226211003.2790916-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,38 +65,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Some workloads want to be able to track bandwidth utilization on
-the scale of 10s of msecs. bnxt uses HW stats and async stats
-updates, with update frequency controlled via ethtool -C.
-Updating all HW stats more often than 100 msec is both hard for
-the device and consumes PCIe bandwidth. Switch to maintaining
-basic Rx / Tx packet and byte counters in SW.
+Use napi_consume_skb() to improve skb recycling.
+__bnxt_tx_int() already has the real NAPI passed in budget.
 
-Tested with drivers/net/stats.py:
-  # Totals: pass:7 fail:0 xfail:0 xpass:0 skip:0 error:0
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Manually tested by comparing the ethtool -S stats (which continues
-to show HW stats) with qstats, and total interface stats.
-With and without HW-GRO, and with XDP on / off.
-Stopping and starting the interface also doesn't corrupt the values. 
-
-Jakub Kicinski (9):
-  eth: bnxt: use napi_consume_skb()
-  eth: bnxt: don't run xdp programs on fallback traffic
-  eth: bnxt: rename ring_err_stats -> ring_drv_stats
-  eth: bnxt: snapshot driver stats
-  eth: bnxt: don't use ifdef to check for CONFIG_INET in GRO
-  eth: bnxt: consolidate the GRO-but-not-really paths in bnxt_gro_skb()
-  eth: bnxt: maintain rx pkt/byte stats in SW
-  eth: bnxt: maintain tx pkt/byte stats in SW
-  eth: bnxt: count xdp xmit packets
-
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  31 ++-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 240 ++++++++++++------
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  14 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |  15 ++
- 4 files changed, 208 insertions(+), 92 deletions(-)
-
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 15c57a06ecaf..f6a26f6f85bb 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -855,7 +855,7 @@ static bool __bnxt_tx_int(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
+ next_tx_int:
+ 		cons = NEXT_TX(cons);
+ 
+-		dev_consume_skb_any(skb);
++		napi_consume_skb(skb, budget);
+ 	}
+ 
+ 	WRITE_ONCE(txr->tx_cons, cons);
 -- 
 2.48.1
 
