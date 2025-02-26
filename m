@@ -1,225 +1,218 @@
-Return-Path: <netdev+bounces-169711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF83CA4554F
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 07:09:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0804A45556
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 07:14:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE15C188BE3D
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 06:09:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEC431764B1
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 06:14:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6787E267B75;
-	Wed, 26 Feb 2025 06:09:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D388267B8C;
+	Wed, 26 Feb 2025 06:14:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jHKhaZq2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U7o4M5jj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C97F4267B10
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 06:09:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740550181; cv=fail; b=s5kubHmOmjrmWo9WeG+qUJbBYaAsNfrAOo/Kn9podRPw3uidOelp/YUxA2KjlbZ3xbDPiaTjH1H7KNo2go3BJJa3WBmavBVJ4WVOYd56Wfmq4iKMYI1pC4Q40ziHEbP5r11c5KBOOGbupDEFI35b4LPnBxFjSACLLZ81k3dVB60=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740550181; c=relaxed/simple;
-	bh=rKnYFPfm4KnZI5IPZ8M9VUmX7pjnWVDhcjpKZ+uy8Dc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Y0he52TkcLPeCnpipt3mSZgHqll8wFjwZZgnD5Q8IVxOrzuCin1Qqhulib35ZDBiNeUY/1vsOooBEalyzZUKrz+Lw7K2fguobGAmjeIuubxVu3iTdgq2fzl7BLQg1Pumui3flwuNjbGUIZDbBZbvpVgXR/man0s8H2O84H7uVxs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jHKhaZq2; arc=fail smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740550180; x=1772086180;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=rKnYFPfm4KnZI5IPZ8M9VUmX7pjnWVDhcjpKZ+uy8Dc=;
-  b=jHKhaZq20HMahvt4wiHQJT0bCJoWUNLWLOAuAVBclOgx2fHmXM34pIyB
-   dhclbqRYaalym/cy8qkActFFekdg7+7u+WpQBnSYHY0hWmCIKWew1lGIG
-   yhb89lTLjzxkuz/Lq8lWwEtZtP++2fC1Gbm2V6zYpuk4vmr6jNgyr7CSR
-   umRznM4S76nnhiHM8dtfI56xIAajBcOZ666RzN0UTeQ2iVF201d+KSyr8
-   NGkQcbn1JIQ4AI/rZsGHEbMBfOEgtyMIHuHQvlmxDT8CjrisVEqkwsLS9
-   hu/lSqt02Dtpqmqp0i8NOFczmhLMKG0j0qiZcE7/fATPUbv0HGD/Lz/+7
-   w==;
-X-CSE-ConnectionGUID: AXFf31YDTFeY2WYpPILeBA==
-X-CSE-MsgGUID: ovtSnwdjRxSAM2eWlKd6Ew==
-X-IronPort-AV: E=McAfee;i="6700,10204,11356"; a="40618102"
-X-IronPort-AV: E=Sophos;i="6.13,316,1732608000"; 
-   d="scan'208";a="40618102"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2025 22:09:39 -0800
-X-CSE-ConnectionGUID: eo2WCdz4Rf6jKBamGPyl9Q==
-X-CSE-MsgGUID: t2NYHfJER+yMgFk3WIi1Jw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,316,1732608000"; 
-   d="scan'208";a="121546943"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2025 22:09:39 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Tue, 25 Feb 2025 22:09:38 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Tue, 25 Feb 2025 22:09:38 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.44) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Tue, 25 Feb 2025 22:09:35 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=KHbchy4V/NsAao/dvAKpm2UHr4OQIfgE76nUduAA58XhLPxdKMurzEf9p9cgjt9F74hJCYJLzTLWA4wlUu2mBHzxrjMdQ4VpVOvylelK0vOj7GJ1Ise+w5R5haxxBijmCiNKTCEpdszOPQQk8Qs74Vkp7kx4eF1uEfFkgYeDBiFdJBIQ95FKizt91k1iBE5DW+go3jFRYT8unHBFZrv6E7yAnqUb/s7uBtbl8MxSs3PzNQiGNGer5MXOIiDeVAp0QVh7iaJbigo9Ehygk/w05A7BBewq6wR/8rm27b0JTrwE++FuuVouXQ/3SmDxJUMyoqf5PeroTgyUWJ/6DpyTBQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rKnYFPfm4KnZI5IPZ8M9VUmX7pjnWVDhcjpKZ+uy8Dc=;
- b=XQbrZeeUU2HNfl4zv1n3aJ9QvEzS2+xalXTtzLscYOa20f3uP66veKmNz05ZX5pXy9gw+oo5yUhWncVTjod7MimtHgynW2LfR81p6RKqY+YKwN5hSl7Rd2/SNvKleeyDgBC1YP+pfhMQRSnNQbJF4ENWbo/xoLuj+y3ciAXhnJcEj1uJ3jg7TuYUOQI4znPneTdA6r8pJyd8YZttFlBaQdNjdMhtjq+uBynAsriN3YcGMa13qThVzavdj6+WYWqWq5qGjOqHP4LiZ8/6i5t7fWxGXzrhXv4++Mo4KY3LQ1qGeb8P7tnlm/AdzH/vtURLFLk4mgfgQrZsSFZ5t2cz0w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
- by DS7PR11MB6245.namprd11.prod.outlook.com (2603:10b6:8:9a::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.20; Wed, 26 Feb
- 2025 06:09:28 +0000
-Received: from IA1PR11MB6241.namprd11.prod.outlook.com
- ([fe80::90b0:6aad:5bb6:b3ae]) by IA1PR11MB6241.namprd11.prod.outlook.com
- ([fe80::90b0:6aad:5bb6:b3ae%4]) with mapi id 15.20.8466.020; Wed, 26 Feb 2025
- 06:09:28 +0000
-From: "Rinitha, SX" <sx.rinitha@intel.com>
-To: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kolacinski, Karol"
-	<karol.kolacinski@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "horms@kernel.org" <horms@kernel.org>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v2 3/3] ice: E825C PHY register
- cleanup
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v2 3/3] ice: E825C PHY
- register cleanup
-Thread-Index: AQHbe8aFZFDQJ6IZAkONvO5QBYc237NXqMSA
-Date: Wed, 26 Feb 2025 06:09:27 +0000
-Message-ID: <IA1PR11MB62413116ACFF6833FF296A408BC22@IA1PR11MB6241.namprd11.prod.outlook.com>
-References: <20250210141112.3445723-1-grzegorz.nitka@intel.com>
- <20250210141112.3445723-4-grzegorz.nitka@intel.com>
-In-Reply-To: <20250210141112.3445723-4-grzegorz.nitka@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|DS7PR11MB6245:EE_
-x-ms-office365-filtering-correlation-id: c27f959b-546b-4f06-383b-08dd562c2081
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|10070799003|376014|1800799024|366016|38070700018|7053199007;
-x-microsoft-antispam-message-info: =?us-ascii?Q?f7ISY0FK7x+y95+yoIwoRXfvlLNZVnbXwpF81sSK7tfe7GGGCjKb3qB5GQkP?=
- =?us-ascii?Q?jZ4ZENy5RwCdnzq1sVEl0K24L5YjP0oaHWyiGb9e/S8dESupujI6PDc/am2u?=
- =?us-ascii?Q?uc7z3b2QetjUsDDSOMfEA4Yk3RY4xvdg8Q10zxxwdBD4vpWREa3O9D8OeGVo?=
- =?us-ascii?Q?qqDUNT0vGz6DmtZHkO5E7t4e6jUl/uR3oRZn+2p9q94XKW04ehXh82v/IBRT?=
- =?us-ascii?Q?86yCcP+gmzGIH33AMKBdbRCWMFTR2b7Zco0acOXsjiKMyuURwxYU4hMebnfo?=
- =?us-ascii?Q?uael/6vAfRE+/auWL/WRW6NXPzoguh4CQOUjNYC7j2qKcnvZzOZAHY3kpLeV?=
- =?us-ascii?Q?GPMDuBxeJT9iAW4SIvF0e8REbK90BS5/KQKnKrPU06vS2fY1pfd+KDYK+oqQ?=
- =?us-ascii?Q?4xPsMNDqNQ0Ry58MrdrdfJNt8h4sMZu5gNM7fyKNd7QVmrf3AF6yE20QABgY?=
- =?us-ascii?Q?jYw93gusE6DL7HgLJ2jdO7LiGhSQkpatBdCLW1lFAXTWFqjMK6v9ya5Pkuj/?=
- =?us-ascii?Q?inSldKsu8rRcOgUMrUOJchHZ6cLFz4llj0F8wC2cjqQg3kvWovG19/AONy+3?=
- =?us-ascii?Q?B+UJEOHs2xFdoUuyMrlHCpWI0eDidyTDdoZhg14j95rwtgoXfdh7LJ8KM0y8?=
- =?us-ascii?Q?gImm6BQw3WHLtN6nihrywCLh0iCZbi8/4bmUUH5FFMQpfT7VC8RUJvk70UWM?=
- =?us-ascii?Q?q2oG53mlR0ixKQ2vHSjwu8GOaNzJIuL2kMlEv69G6yuCZFXiErUbamsjjZ7c?=
- =?us-ascii?Q?/s8b94HQmfgQ/gfPOuOPUVJlJ969VmdkN7HI/EuvAKyoo7mDY49hfRZVrc25?=
- =?us-ascii?Q?zgpZ3ohadmrcmV+akC87Io80n9EXzYbhFDfgZbvWq+vwnnJB6gloPp7X3oZ5?=
- =?us-ascii?Q?HL5cTwcbU2hhDPSzXHXYYVysBU2St1v64xXtB0E+SGYQ8oJu7mHbGhSp7aN2?=
- =?us-ascii?Q?0YBZZgqcSmiz7UvtyKitWOa4cSglCCOcLY3hXCHZ28UYoahDmNs2snXobCHS?=
- =?us-ascii?Q?aIPGt8gpLnDcSLap5Dz+3W5uqcptGx+5POvPLAwM1+Kz8nAnd8AaJtp1KwH2?=
- =?us-ascii?Q?J/n0xQXH8F/wcP+uk9IPUIpXqfV6gxbARbT2DTiFQ5LtthEsP+zhEqZAAtG7?=
- =?us-ascii?Q?6ee+/fJl2ws41aLrsWvjdNjjWVVU5ILQsChMCylSN+L1DIMJPJ0uONkk4W0c?=
- =?us-ascii?Q?UPI8iZ3iIl+FOts5lu9L3YpD1BcvYhjH0f1VHmj2Wp4e4c2FqyRf/r2pR5bO?=
- =?us-ascii?Q?zLdOZojYSqVruAVouxWPcsDjkH6r9T6F71FkaJKU2M1XJ3l+ckx46B2bGVLh?=
- =?us-ascii?Q?SA70uRsdYPJsdPpguM49dII5C1nloax2VoQuzfsbdb96QVUpPMPGxnWqG8H0?=
- =?us-ascii?Q?lR3a0muzPNna5eDGIq9Ogff+aZ0LkkyaGLGKwaYCpcRjm2J5GLkcZbJdkgeN?=
- =?us-ascii?Q?8aMr2lhEoGMbkDOM2CjDfcohscHuYB0Q?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(376014)(1800799024)(366016)(38070700018)(7053199007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?XPeCD9A3IgunpF/efIbPJ85S7FvS9iB7qyhRFhpdFQh2o7eWAAyHUk9ztZhD?=
- =?us-ascii?Q?IPZrJT2pF7rjY5b2JaLXQHv2cHaQiwxCzOPSqymaxdGYYcQgQgFAmfxrRfkP?=
- =?us-ascii?Q?TP1DcSH39r5/nJ2QG80De4Jza8LdJTi6XGSdqxh/OxLdr0TdoWsH72D0/+SW?=
- =?us-ascii?Q?8paF+n/d54zSU50vHNffdXXbU2FZLkCjXYR74pPlwo3CBTdEGkausFhxy1Gg?=
- =?us-ascii?Q?d5+n9EcevWLj1QNzD9FEzz8pK8fBOCNfIwM/sv1PszSU55JPwPGrEzxohzCX?=
- =?us-ascii?Q?q1bDMCN2OTD/v9QpiS0YkjIFK1Epv+fg+rIg5cME/1kzdy51Pat48RiuvQi4?=
- =?us-ascii?Q?tlMb3+BFdA93YXf4PNRJutVwclLXvuZeTdBggsdH2akJ8CdaF0mhnoJzuPBd?=
- =?us-ascii?Q?Q7rRR32KUPd8+AgHwSULfGNY4YM8dwtB5MK+ghT4T2AVBENNBZXQaWewD8tW?=
- =?us-ascii?Q?ycO0dGi5rDZNpfr/HE9ubiKBx+/gFoFByEn+T3T5igj+AICrDOWwhZraXUoJ?=
- =?us-ascii?Q?jQUu8ruN0IeGL32C4IaAnGlbLg55KGEhh05Q2oj36+CDcxoqoSW/eIaFt2YJ?=
- =?us-ascii?Q?KG5QrlM4fvLyqAO2n5SvK3e9R9emHYpNmx8ejpQeGxqapJA8GVpbnTCtoBTU?=
- =?us-ascii?Q?1jCByP3bWjWuNLNSErpI8Qkp2h/EAjhgIIUWS2V6xkmFmgRLIvAT0nb7hJGz?=
- =?us-ascii?Q?bIpx+e/9It5NKf60/AsxPTInFRqln4CgKzmegQIf2TcvUpF6f9zP0252/LvJ?=
- =?us-ascii?Q?VO3Vh6bjH1T7jT2+5CSMm/aNISXe52OmcJIqWgJRtEH1jNTr1dWI8987CvXp?=
- =?us-ascii?Q?YGYT79Q7plKz1dKY61J9XrPrLpwE3qXzpMswQ89twTpbxC8sPY8+4oPPVb3G?=
- =?us-ascii?Q?xLPiQmVT9Bz1QS87QOQJz0jBBwteV3Ulmm9ZBnOBoHJ80m+kbHlJrzP4pMZm?=
- =?us-ascii?Q?s+BRunVlF66/LjXx3Z3DhiY8WloJJDfzQTK5ru3fYcBKWJyhWQdrrTixpBFS?=
- =?us-ascii?Q?B1FVth2kTFJmUEyfSC1Jv/AfxgsX4a/6mkDdKfB55oMMWc9JNra8vzvECzlH?=
- =?us-ascii?Q?GvBB5Ohwm7IgLKgVLFCAD6wsMIZz7Ku1NoclUB/VefoHMhE3IbFy87Uj72Z2?=
- =?us-ascii?Q?YUvTymijCxWFFLZktlc2pJU0H4zQj6S62xYhD1DjfwwkYkqz2yBICPF+U76R?=
- =?us-ascii?Q?w8s9FatVS8zMoNo2pKCwbYMvaYDk0fd2tT44dYz+TB67lg9vNoNoI0UNZTwW?=
- =?us-ascii?Q?wPhOO0bhHSbfgseKJ0zrB64uzpyC2I0/pHDUp/ijSCXyveiFzXn0w4TfDj1R?=
- =?us-ascii?Q?uLFDkCiW01k9mFNW5shl4oNe6SWUApO9Ly9NeOFD8yPOFMRRHaDZGgQz3fZc?=
- =?us-ascii?Q?wZFJ0XpppQuzyFNyCXhivRE8Di7INPQ2V0lQFxUflDMvuHT+7y/4L5EYa4WI?=
- =?us-ascii?Q?Wua7rVLzG3nbBPHe72pQZeet5QJ55E0SFFRnuezb8NfQdvRTKD72KHD5yzWt?=
- =?us-ascii?Q?6tvIIjq/nr7rD3n/p0dV+ZK2tMmFoelL3wJ1ct7t4HtwPb/MPRItQsyav4zD?=
- =?us-ascii?Q?5Zdg2+Tuc/QZpm22k2lLabbmEL4WEILnYtagnYY0S66UhuYwUQvwGDEj8FJe?=
- =?us-ascii?Q?Ti6k504UFfT6qG7bD4EA5VJlzNtal2vbhIc0Ku58PliV?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E7B267AE9
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 06:14:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740550455; cv=none; b=BQjWXABUG4UNyASnp/KNR/jIPLmWTB4t3nPnS/alSGxPXTOn5HaBt3aMN7bWqGYhWUWFyQmaMbG7v8KJcGZI3zJjrQU+j0ZcI4qYN8W5Cnq4XRRgES3xJdmfUXH8IU14SfCJt/qgX1ZMDCHPwldya6z+9yg9QKWNMVWfXa+jRzU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740550455; c=relaxed/simple;
+	bh=occPEZDucJVb8lBD1jQ1GAuOO0994gL1zBT5kTdiRNo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZwhWQG/g26YmfZJDnbMHzFNvTfKIeStm1KTPddmfphR5+lPGNZXc/54kBqw7T9e1Su1MMSrBkdDd2qwQd+R9OiDKDCAbaHLnDSUI61CWbv8+6ijJBcjUaJrMH5Sm0of/5xctugNUrtMM5e2hbiVTJrtfH1GVViQECY6tQtkye/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U7o4M5jj; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740550452;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hrYuHXAnjLqXKtPJWbNFQh22GoqGfQZfdjz3jbFGr6E=;
+	b=U7o4M5jjn2mWAHWqZfkv8b72Noqn1G3mdq44tLhXJ7MbwDpY2IzY6XEZztfHuD+FAp/Z4Q
+	1wTDOiBwYrf/RS5Gne/1g0RsXyVQrt034FisTmjODD7QMYs6bR6AeMbkMmTXhPN9VjGnwL
+	FySscn+zuVB6hQx7sIvQt72j6cXIaQc=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-556-8KfLQYnpMRm9hIsFOL_Zrw-1; Wed, 26 Feb 2025 01:14:07 -0500
+X-MC-Unique: 8KfLQYnpMRm9hIsFOL_Zrw-1
+X-Mimecast-MFC-AGG-ID: 8KfLQYnpMRm9hIsFOL_Zrw_1740550446
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-ab77e03f2c0so667782366b.3
+        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 22:14:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740550446; x=1741155246;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hrYuHXAnjLqXKtPJWbNFQh22GoqGfQZfdjz3jbFGr6E=;
+        b=a6PUUy517gmvm+HEBcCG51J0p0YoZiDa2PsV3bB1jhbaKBkTY6ndr/hU/FbXcigxGO
+         pF2Tg736/bVbvvAjJgZncnBHkZKaZYomu92Ldq6xE8zY2ccnS/P46yzWeW/KV/w9+lyr
+         A6o2OmoeirVzB1569iM+IN+x7B/CLyWCOn9/L9NFprFSXC9BByiA4mkqpuri452j01O9
+         5+YmygpLKEfynNpOtzHBxOBYsCoqGz4aQ5166rqCrN+/FZrYIrSuILhDPmi6i7fHDy5z
+         gjVL5crN8TPM0kcAExMr5v+L8nqK8+vTmb5eKKASsjvHUUhUrn+xG0NuKoXvtUcTIlTK
+         MR6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUjcYC7sD7f0bgdHoIjii0a1vk9R4RGp/bqs1ZCL+rq2Z62k+Yz2lOOkLvOxr7MckZorN1zQZU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLeSHmikzn3kj3picTpNu3+GGzcJdeSxL2dnm0J1PBFtmHeqC6
+	mML8J0B/kEdZr1V0nAujM7BR2zdkYcIc5DCXYl1imKsIDY/1kq1zZcrsAYwUb8aOdn0UOXuv1/c
+	DAxsIV2WZTGBQxuJuHh1ro+5+enfji6qn+d1Vw7IGYjtB9yEuhoy+lSd9kpvG6FehXRsqJ+23Ib
+	qVxgIjigxrejE03d5Yi2+F3u7MAq2S
+X-Gm-Gg: ASbGncs8C95EUdcvw8NSzb/gjurYpHXCj4TgEUh0EncWrrf7foUgC62VWxRK4O9yfcf
+	/y5FtgzI6/eKA2LlEAndMqeWE9tngY5+O/Oi9ydMvAF5ZKo3WAzl6t+rlIPCZNV2hH8pTmaByvg
+	==
+X-Received: by 2002:a17:907:6d05:b0:aba:598b:dbde with SMTP id a640c23a62f3a-abc0d97e504mr2119382766b.8.1740550446137;
+        Tue, 25 Feb 2025 22:14:06 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEEPM7VfuOk/Au93iZs65YIRLhsjQkDmCkNqmGnjdzf1TQUXJWU9PFxQBBs189DJw6J4yaO/kqbah0ezftoIDw=
+X-Received: by 2002:a17:907:6d05:b0:aba:598b:dbde with SMTP id
+ a640c23a62f3a-abc0d97e504mr2119381266b.8.1740550445828; Tue, 25 Feb 2025
+ 22:14:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c27f959b-546b-4f06-383b-08dd562c2081
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Feb 2025 06:09:27.9981
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: In3PY//BxR3xJP3R45uEgzdD0pObrEsmtyD9+Y2ZSOQbsREI8yOCmcBwFO6/15to5xvcqywe8gXWColX5siMnA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6245
-X-OriginatorOrg: intel.com
+References: <20250223154042.556001-1-lulu@redhat.com> <20250223154042.556001-6-lulu@redhat.com>
+ <6vadeadshznfijaugusnwqprssqirxjtbtpprvokdk6yvvo6br@5ngvuz7peqoz>
+In-Reply-To: <6vadeadshznfijaugusnwqprssqirxjtbtpprvokdk6yvvo6br@5ngvuz7peqoz>
+From: Cindy Lu <lulu@redhat.com>
+Date: Wed, 26 Feb 2025 14:13:27 +0800
+X-Gm-Features: AQ5f1JoNoWEefztuGY9ylFIkLRXZ0YQ4UToF_h0n3mIP4S6r1pE-NAlUqjniIn0
+Message-ID: <CACLfguU8-F=i3N6cyouBxwneM1Fr0oNs9ac3+c5xoHr_zcZW6A@mail.gmail.com>
+Subject: Re: [PATCH v6 5/6] vhost: Add new UAPI to support change to task mode
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: jasowang@redhat.com, mst@redhat.com, michael.christie@oracle.com, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of G=
-rzegorz Nitka
-> Sent: 10 February 2025 19:41
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: netdev@vger.kernel.org; Kolacinski, Karol <karol.kolacinski@intel.com=
->; Nguyen, Anthony L <anthony.l.nguyen@intel.com>; horms@kernel.org; Kitsze=
-l, Przemyslaw <przemyslaw.kitszel@intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-next v2 3/3] ice: E825C PHY registe=
-r cleanup
+On Tue, Feb 25, 2025 at 7:31=E2=80=AFPM Stefano Garzarella <sgarzare@redhat=
+.com> wrote:
 >
-> From: Karol Kolacinski <karol.kolacinski@intel.com>
+> On Sun, Feb 23, 2025 at 11:36:20PM +0800, Cindy Lu wrote:
+> >Add a new UAPI to enable setting the vhost device to task mode.
+> >The userspace application can use VHOST_SET_INHERIT_FROM_OWNER
+> >to configure the mode if necessary.
+> >This setting must be applied before VHOST_SET_OWNER, as the worker
+> >will be created in the VHOST_SET_OWNER function
+> >
+> >Signed-off-by: Cindy Lu <lulu@redhat.com>
+> >---
+> > drivers/vhost/vhost.c      | 24 ++++++++++++++++++++++--
+> > include/uapi/linux/vhost.h | 18 ++++++++++++++++++
+> > 2 files changed, 40 insertions(+), 2 deletions(-)
+> >
+> >diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> >index d8c0ea118bb1..45d8f5c5bca9 100644
+> >--- a/drivers/vhost/vhost.c
+> >+++ b/drivers/vhost/vhost.c
+> >@@ -1133,7 +1133,7 @@ void vhost_dev_reset_owner(struct vhost_dev *dev, =
+struct vhost_iotlb *umem)
+> >       int i;
+> >
+> >       vhost_dev_cleanup(dev);
+> >-
+> >+      dev->inherit_owner =3D true;
+> >       dev->umem =3D umem;
+> >       /* We don't need VQ locks below since vhost_dev_cleanup makes sur=
+e
+> >        * VQs aren't running.
+> >@@ -2278,15 +2278,35 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsign=
+ed int ioctl, void __user *argp)
+> > {
+> >       struct eventfd_ctx *ctx;
+> >       u64 p;
+> >-      long r;
+> >+      long r =3D 0;
+> >       int i, fd;
+> >+      u8 inherit_owner;
+> >
+> >       /* If you are not the owner, you can become one */
+> >       if (ioctl =3D=3D VHOST_SET_OWNER) {
+> >               r =3D vhost_dev_set_owner(d);
+> >               goto done;
+> >       }
+> >+      if (ioctl =3D=3D VHOST_FORK_FROM_OWNER) {
+> >+              /*inherit_owner can only be modified before owner is set*=
+/
+> >+              if (vhost_dev_has_owner(d)) {
+> >+                      r =3D -EBUSY;
+> >+                      goto done;
+> >+              }
+> >+              if (copy_from_user(&inherit_owner, argp, sizeof(u8))) {
+> >+                      r =3D -EFAULT;
+> >+                      goto done;
+> >+              }
+> >+              /* Validate the inherit_owner value, ensuring it is eithe=
+r 0 or 1 */
+> >+              if (inherit_owner > 1) {
+> >+                      r =3D -EINVAL;
+> >+                      goto done;
+> >+              }
+> >+
+> >+              d->inherit_owner =3D (bool)inherit_owner;
+> >
+> >+              goto done;
+> >+      }
+> >       /* You must be the owner to do anything else */
+> >       r =3D vhost_dev_check_owner(d);
+> >       if (r)
+> >diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+> >index b95dd84eef2d..8f558b433536 100644
+> >--- a/include/uapi/linux/vhost.h
+> >+++ b/include/uapi/linux/vhost.h
+> >@@ -235,4 +235,22 @@
+> >  */
+> > #define VHOST_VDPA_GET_VRING_SIZE     _IOWR(VHOST_VIRTIO, 0x82,       \
+> >                                             struct vhost_vring_state)
+> >+
+> >+/**
+> >+ * VHOST_FORK_FROM_OWNER - Set the inherit_owner flag for the vhost dev=
+ice
+> >+ *
+> >+ * @param inherit_owner: An 8-bit value that determines the vhost threa=
+d mode
+> >+ *
+> >+ * When inherit_owner is set to 1:
+> >+ *   - The VHOST worker threads inherit its values/checks from
+> >+ *     the thread that owns the VHOST device, The vhost threads will
+> >+ *     be counted in the nproc rlimits.
+> >+ *
+> >+ * When inherit_owner is set to 0:
+> >+ *   - The VHOST worker threads will use the traditional kernel thread =
+(kthread)
+> >+ *     implementation, which may be preferred by older userspace applic=
+ations that
+> >+ *     do not utilize the newer vhost_task concept.
+> >+ */
+> >+#define VHOST_FORK_FROM_OWNER _IOW(VHOST_VIRTIO, 0x83, __u8)
 >
-> Minor PTP register refactor, including logical grouping E825C 1-step time=
-stamping registers. Remove unused register definitions (PHY_REG_GPCS_BITSLI=
-P, PHY_REG_REVISION).
-> Also, apply preferred GENMASK macro (instead of ICE_M) for register field=
-s definition affected by this patch.
+> I don't think we really care of the size of the parameter, so can we
+> just use `bool` or `unsigned int` or `int` for this IOCTL?
 >
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-> ---
-> drivers/net/ethernet/intel/ice/ice_ptp_hw.h | 31 ++++++++++-----------
-> 1 file changed, 14 insertions(+), 17 deletions(-)
+> As we did for other IOCTLs where we had to enable/disable something (e.g
+> VHOST_VSOCK_SET_RUNNING, VHOST_VDPA_SET_VRING_ENABLE).
+>
+hi Stefano
+I initially used it as a boolean, but during the code review, the
+maintainers considered it was unsuitable for the bool use as the
+interface in ioctl (I think in version 3 ?). So I changed it to u8,
+then will check if this is 1/0 in ioctl and the u8 should be
+sufficient for us to use
+Thanks
+cindy
+> Thanks,
+> Stefano
 >
 
-Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 
