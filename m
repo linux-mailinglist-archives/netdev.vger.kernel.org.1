@@ -1,107 +1,128 @@
-Return-Path: <netdev+bounces-169758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 041E7A459E2
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 10:24:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AF9DA45A19
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 10:29:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12F563AB9D3
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 09:24:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D499416585B
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 09:29:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7C891DC997;
-	Wed, 26 Feb 2025 09:24:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C75E215189;
+	Wed, 26 Feb 2025 09:29:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZYrz9dkK"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="dd6qq9k2";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Du3Vr4KR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com [209.85.222.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB8017F7
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 09:24:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC8CC22424E;
+	Wed, 26 Feb 2025 09:29:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740561855; cv=none; b=HyRrd9YoG+brDlf69RX6BA7jMxwniaXB9NYmJCzgWykpy190EJtyeoju1PC+5vnfYOfQHb/JAhkTHSA0vuyMgY/BJdULvT44u6OLZmw9pu3ZPT5tJ0aMThY/4kn5yAHE3zlmyElwm01yTvK/EhjqBiN2C4DfJ83WauuveVQ6o4U=
+	t=1740562142; cv=none; b=huQQ6h8d3ONqkBeiUrUlFe9WpBd1nhlm9du8nrT0p6uIZDT5kptXNidinpg1vXyNVICcps+PjV/4FuH9B4gtWlrhADVKes61XXR5UdEwgRukvS1UAYbf2EhZM0IQ/TYpFfy3o0GZE4qxEaqkkgeNcgPTgETbINw446orhAVeeno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740561855; c=relaxed/simple;
-	bh=nU61OwGTFXCZvdDVmhJ6WEVErE8fmVERbyw/HXcxy0E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QKpK+OW/RQ73l0gUBTj815dgnRnfFRrSnl5c6AEsa6372MR5wQjRQMUzMobcYbJj1WbX89lVwV12M/IJ53sY2Y/lv8oUeobIQPQFWEB7178j4wCinBnr71GeddeP7ueTQe9qYmekJM0rFRTp2LBrlRlE5MFsSZJQb5qWP2qFyHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZYrz9dkK; arc=none smtp.client-ip=209.85.222.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-86715793b1fso1933710241.0
-        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 01:24:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740561853; x=1741166653; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nU61OwGTFXCZvdDVmhJ6WEVErE8fmVERbyw/HXcxy0E=;
-        b=ZYrz9dkKpqI+QG9l7ajh23SwSvWNVga6+CNuuutxEvogTbnaRNnjPHpRV4EZQbAye8
-         f/hB1PwljJ78bhmpTb19Scyw21bAPjcNI6j5I/EPQ5CD/2i+366njEVjckCSbnlQFsSw
-         RU5rbQohT9U2ioDCEkQVQTigTM+IImsGVfeXghScKyJI5TfsCSUaYcGtXZCnWV4h4oup
-         NxnMTe+WBPoNAPNBzEPLfwQ0in3zUSrJWDoZ2oxa61Jxs1fgT7TNzTRAHp/hGol3sNRR
-         3HyM0HSUzckMPKry1Z1HOK841NCgBnRgSMuBW6gRjkxslPOhyUfeuydB23KCFLCR5WpL
-         8L/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740561853; x=1741166653;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nU61OwGTFXCZvdDVmhJ6WEVErE8fmVERbyw/HXcxy0E=;
-        b=suEo8gdIsNgVzr3aWkbWtrDbxzhxHu2+xv62gH3nlDYK8uzpJiP06l4syawlCOnTn8
-         2R5odanxIJjAaOx3IjMyoYu03XFd1hY4xQC4flDWdRnHihOIEo1ADK/o1PCWbunf777d
-         PDKf7O7g3BlM1CtJY73VKdeiRbiblyWwiIP0w2CJ6E4RM3lz+1pLJihgUIDQvmAntlEf
-         RmaMRa7+ZVKikGxvOGGfdUw6Cw+3KFbkPzAaR32R1kO6Y89gh1gNikbXd77SqXcSEVnz
-         +UaptzTQcw41UnWo/+gtkKuPmbh+q15S5Rx4rBGlUFIwHoNAtWYsP9Y0aYAIH0nDlZaM
-         qbdQ==
-X-Gm-Message-State: AOJu0YzYuIQ97GYN1r4Y31lO4t8XXrjIsyPaRvuhTayLt4OfuC8VzE/I
-	avZC3lMDq2IpG8sXg4faF1A2WfyEZ0FfwfDEgJJLY4zql9GiV2WCRcPf1Fd9Tbjpp5LOdL+egq0
-	qF+1k8IEuHX+0apQQoKQCwpcrjDJSTg==
-X-Gm-Gg: ASbGncv6V6/r3RonlSE8ufBoUPQ0b9UACg5xQQevN3HHdR1Bmv9GJ/U/8f3G1whoU1K
-	vRNx/Gget4utP6tO7oaojd26RFR4/cbDxWiwBS2gBXQEX45mNPO7nN92E9GhV8L+VmYORY5dDku
-	MEYf1pZQ==
-X-Google-Smtp-Source: AGHT+IHsSRcEFX3BB9H9y2lGuhYeojYKZOjN1TgBl4dYo2xQhkXbUkk4NgmKRd3bP2k5tUoz1bOlKY37bsJpY9wqNoQ=
-X-Received: by 2002:a05:6122:4286:b0:516:240b:58ff with SMTP id
- 71dfb90a1353d-5223cc120b2mr3547547e0c.5.1740561853123; Wed, 26 Feb 2025
- 01:24:13 -0800 (PST)
+	s=arc-20240116; t=1740562142; c=relaxed/simple;
+	bh=YhsSjtzXRvYZA9Qw98AirEaomPekRALwXcQG3tJuiFw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UnvpFsXlvQ7yJSipiVO8Aomg0hLQwUJOrQPUirbBWRgTekcJ5ISIDCnCeK4yovX7EGnFtGRisQpj1ynJ3xcxNio18EVJLxieZU6VQrM/4sW/1YlgsXHbopnanT14wE7C5XPNT1EM7Zx5f0GIuLlbu5bxuASAsWvFgZnHeuuK2I4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=dd6qq9k2; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Du3Vr4KR; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Wed, 26 Feb 2025 10:28:57 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1740562138;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+dVDKsl/jgCikGL6Si5UGaYai+g1mwDkISq2RZJ1jdQ=;
+	b=dd6qq9k2VXEtW5kWheJ/jtPsMowP9UYF/Spnm9jPM6LfC/jFplvpfX+TsPf5DxON4cfvHB
+	ImwJG0r0baUhAuU6ZxwxQUMVHPnw1xEPKICYCNjY1+t+oXjWgYVnUuZkQ/NVScFty7jL6J
+	rXbfeGJVfQ7/9HWJidj+OEWS3mM8ZMJk5bqjPWc7Zg5RuO5/kuVw7TO0xt6lKbQW91rI3h
+	je28olGGCtyNT9Ouql/PLlipxNDdLFNP40fQ5tdHuQRzK3ErbLNCDxjuzAaC/bgcigl7Hh
+	FXP7UYZ+zFRVsFdrEB5+CR3MlPjH44pbjTZAb/CCLyeJh9CLuSBF3K67XsJgrQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1740562138;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+dVDKsl/jgCikGL6Si5UGaYai+g1mwDkISq2RZJ1jdQ=;
+	b=Du3Vr4KRRcb3vJr5XmtjI66KPXuAJ37HuHQ0pAZUJ+H27QBGPKRAYGNhhiHNqR1709CF88
+	MN0vMXBq3YHWtwDw==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Leon Romanovsky <leon@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, Simon Horman <horms@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH net-next 1/2] page_pool: Convert page_pool_recycle_stats
+ to u64_stats_t.
+Message-ID: <20250226092857.La2UyrrB@linutronix.de>
+References: <20250221115221.291006-1-bigeasy@linutronix.de>
+ <20250221115221.291006-2-bigeasy@linutronix.de>
+ <307939b7-8f51-437a-b5b2-ac5342630504@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAA85sZveppNgEVa_FD+qhOMtG_AavK9_mFiU+jWrMtXmwqefGA@mail.gmail.com>
- <CAA85sZuv3kqb1B-=UP0m2i-a0kfebNZy-994Dw_v5hd-PrxEGw@mail.gmail.com> <20250225170545.315d896c@kernel.org>
-In-Reply-To: <20250225170545.315d896c@kernel.org>
-From: Ian Kumlien <ian.kumlien@gmail.com>
-Date: Wed, 26 Feb 2025 10:24:01 +0100
-X-Gm-Features: AQ5f1Jqt9X_nRfJT9SD5gJPqfOzsj2oKoD6eFhDmALP_iudBlTgNJ16RyGCnZBc
-Message-ID: <CAA85sZuYbXDKAEHpXxcDvntSjtkDEBGxU-FbXevZ+YH+eL6bEQ@mail.gmail.com>
-Subject: Re: [6.12.15][be2net?] Voluntary context switch within RCU read-side
- critical section!
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <307939b7-8f51-437a-b5b2-ac5342630504@huawei.com>
 
-On Wed, Feb 26, 2025 at 2:05=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 25 Feb 2025 11:13:47 +0100 Ian Kumlien wrote:
-> > Same thing happens in 6.13.4, FYI
->
-> Could you do a minor bisection? Does it not happen with 6.11?
-> Nothing jumps out at quick look.
+On 2025-02-22 16:13:35 [+0800], Yunsheng Lin wrote:
+> > @@ -99,11 +106,19 @@ bool page_pool_get_stats(const struct page_pool *p=
+ool,
+> >  		const struct page_pool_recycle_stats *pcpu =3D
+> >  			per_cpu_ptr(pool->recycle_stats, cpu);
+> > =20
+> > -		stats->recycle_stats.cached +=3D pcpu->cached;
+> > -		stats->recycle_stats.cache_full +=3D pcpu->cache_full;
+> > -		stats->recycle_stats.ring +=3D pcpu->ring;
+> > -		stats->recycle_stats.ring_full +=3D pcpu->ring_full;
+> > -		stats->recycle_stats.released_refcnt +=3D pcpu->released_refcnt;
+> > +		do {
+> > +			start =3D u64_stats_fetch_begin(&pcpu->syncp);
+> > +			u64_stats_add(&stats->recycle_stats.cached,
+> > +				      u64_stats_read(&pcpu->cached));
+> > +			u64_stats_add(&stats->recycle_stats.cache_full,
+> > +				      u64_stats_read(&pcpu->cache_full));
+> > +			u64_stats_add(&stats->recycle_stats.ring,
+> > +				      u64_stats_read(&pcpu->ring));
+> > +			u64_stats_add(&stats->recycle_stats.ring_full,
+> > +				      u64_stats_read(&pcpu->ring_full));
+> > +			u64_stats_add(&stats->recycle_stats.released_refcnt,
+> > +				      u64_stats_read(&pcpu->released_refcnt));
+>=20
+> It seems the above u64_stats_add() may be called more than one time
+> if the below u64_stats_fetch_retry() returns true, which might mean
+> the stats is added more than it is needed.
+>=20
+> It seems more correct to me that pool->alloc_stats is read into a
+> local varible in the while loop and then do the addition outside
+> the while loop?
 
-I have to admint that i haven't been tracking it too closely until it
-turned out to be an issue
-(makes network traffic over wireguard, through that node very slow)
+indeed, indeed, what was I thinking=E2=80=A6
 
-But i'm pretty sure it was ok in early 6.12.x - I'll try to do a bisect tho=
-ugh
-(it's a gw to reach a internal server network in the basement, so not
-the best setup for this)
+>=20
+> > +		} while (u64_stats_fetch_retry(&pcpu->syncp, start));
+> >  	}
+> > =20
+> >  	return true;
+
+Sebastian
 
