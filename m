@@ -1,175 +1,171 @@
-Return-Path: <netdev+bounces-169991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBBCBA46B4B
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 20:44:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F29F7A46BE0
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 21:06:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7300018890AF
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 19:44:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C91BC188CE30
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 20:06:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04B9F24A062;
-	Wed, 26 Feb 2025 19:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E3102580D7;
+	Wed, 26 Feb 2025 20:02:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=squebb.ca header.i=@squebb.ca header.b="B2NMNBYE";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="m/Cw8/sn"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="EC/dWWis"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2069.outbound.protection.outlook.com [40.107.105.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FBD6243952;
-	Wed, 26 Feb 2025 19:44:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740599074; cv=none; b=mzSzOub3XOeaWXMEN7UwRY+bNILU60yriwbaDpdTF7YtBoO/Rk9XEeu9vh1x66+ercrqqg6nNkYb/5JfS3PyOo9Lh3Hm5oYhFTM5gf2za1H0Ft3x3BuJbLJelRoc143o7WpKVMEUakSJyAVv6HSPACOKQZ4WP5w0HKWSJKn7jYg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740599074; c=relaxed/simple;
-	bh=WAGQ1/VOj0B487pwCVLtHo57Vl/9nLWFARmQS4Fx1Fg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lxMyFl0NuY64Up9o82lk1HtdUrYoa107Qf01lQ9nyvEb0VCh4e9Z5vchHIUzT7fF6cfILtAUwR/41TiBGTBJYJgD50XahW1cNEGr1tJKfj07ejoPm2cLG7bZFlQ+M2vsjRcaNbi0TuISg+VNYDop1tKHtFYTeF++qMRYCOV2Sjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=squebb.ca; spf=pass smtp.mailfrom=squebb.ca; dkim=pass (2048-bit key) header.d=squebb.ca header.i=@squebb.ca header.b=B2NMNBYE; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=m/Cw8/sn; arc=none smtp.client-ip=202.12.124.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=squebb.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=squebb.ca
-Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
-	by mailfout.stl.internal (Postfix) with ESMTP id E58C3114014F;
-	Wed, 26 Feb 2025 14:44:30 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-01.internal (MEProxy); Wed, 26 Feb 2025 14:44:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=squebb.ca; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1740599070; x=
-	1740685470; bh=rJ3GmCSN4dwV0luCHC1nQCCdc7NrbsQh/O3sm9V2O7U=; b=B
-	2NMNBYEe1f0QSIS02m5pHkN5AZfIIGuLkmC7956EegWQYMxNyEWTKWBYuUSQh229
-	B5uJ/IKcaAqTyQAX0/cFIO5GuQVEWhjBnjGkf6irogTIMIYvmOC9pH6/TvOa3FRX
-	8C+RM7E7yA0WTz3uVbs7iax7lYzGIDc0712Lcyt+Naw+1vPkPeHpyJikGlB2Jzw1
-	M+Hz3weXJnZUUMXd/0nh4UuwUMfycQ4OroNIQJ99hG8EFN1uzfC/ODnSKOyeUjDh
-	LboDoRZz2pFDfBJtnoRio9tlIkixExaZPYzw5MZufz0HxNSBELKUJik9smLswaRT
-	O6gqP/0eq0CCsBslqs5FA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm1; t=1740599070; x=1740685470; bh=r
-	J3GmCSN4dwV0luCHC1nQCCdc7NrbsQh/O3sm9V2O7U=; b=m/Cw8/snY3yxmjVwK
-	yWIN9ujYAdfTeLScm5r9V8kgGDzAI9EAAGI39msKGIo+fvChiWyRs4j/9cmKauok
-	JFTE5bCoLn2Ap2ZiGu8VvMYzr9Bmmwo3u7DecThI0p3JoaPD5XVSrNxtSig7FfdW
-	aeamCbKTUamWxac4SnF86O+Sg44VuJiJCpnuhdYecd+l21gO+Z/ZmDV9mvTEFCQX
-	ybw7vQmNqGfAjg+GIAinRSX4ko4+E37VE/9Zp0Jo2myjfnFiJYdxKQTOUyNCxDST
-	/2UTj35wtLB1EIpXJGoxUD+GPDYzSAPK0UNn7dL1vvAGjNwaM+jkZ90wpqy6EoRv
-	fUknw==
-X-ME-Sender: <xms:HW-_ZyGM7biCJSajAcIs00fqZOyqwp57zcDxeimz26DZwfzgM9CHTQ>
-    <xme:HW-_ZzVsbD1i7GTm_HbODigHMcW9Ri-MkxlNH4ln_xj0qcD-RHZVQTMYfOGaRWU5v
-    BNO0tUMxeRsdfXTMy8>
-X-ME-Received: <xmr:HW-_Z8IInj6Hg3B98dPo4RaE22AtDFvB5mOfXlNRfI6Mm_qii5ArhivFHxE5R6VajTTjfm5v5bR8vVAfApjz4kPfDdQzxSfp>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdekheegiecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecuogetfedtuddqtdduuc
-    dludehmdenucfjughrpefhvfevufffkffojghfggfgsedtkeertdertddtnecuhfhrohhm
-    peforghrkhcurfgvrghrshhonhcuoehmphgvrghrshhonhdqlhgvnhhovhhosehsqhhuvg
-    gssgdrtggrqeenucggtffrrghtthgvrhhnpeeftddvjeefleffvefhgfejjeehudetteei
-    geeugfekhffhgeejudeuteehgfdvffenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpehmphgvrghrshhonhdqlhgvnhhovhhosehsqhhuvggssgdr
-    tggrpdhnsggprhgtphhtthhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoh
-    epmhhpvggrrhhsohhnqdhlvghnohhvohesshhquhgvsggsrdgtrgdprhgtphhtthhopegr
-    nhhthhhonhihrdhlrdhnghhuhigvnhesihhnthgvlhdrtghomhdprhgtphhtthhopehprh
-    iivghmhihslhgrfidrkhhithhsiigvlhesihhnthgvlhdrtghomhdprhgtphhtthhopegr
-    nhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesug
-    grvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgv
-    rdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhope
-    hprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepihhnthgvlhdqfihirhgv
-    ugdqlhgrnheslhhishhtshdrohhsuhhoshhlrdhorhhg
-X-ME-Proxy: <xmx:HW-_Z8Fy4zg85irjJdiFr2NJP5sfm_s2HUVK_ajJkhxkIk-uTCW1Bw>
-    <xmx:HW-_Z4UGIfZ6sO9XWAQL8yqb9Isi5WmNfwkhhHQ7eFa_telo0UrT2Q>
-    <xmx:HW-_Z_PgbVEW7EhlTdPVcld_h1Jer4p5sC_tjDYV_Yllskcnmsrqtg>
-    <xmx:HW-_Z_2qhPCyx2J21_125mgdJl5O6Rn6aUDmmUhjocTLoJLdVKCxDQ>
-    <xmx:Hm-_Z3MWWtUASLoI18Pi_JnybmeW4jJ-tvHZVF5RFXBk4XC2_ViYQzvb>
-Feedback-ID: ibe194615:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 26 Feb 2025 14:44:29 -0500 (EST)
-From: Mark Pearson <mpearson-lenovo@squebb.ca>
-To: mpearson-lenovo@squebb.ca
-Cc: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] e1000e: Link flap workaround option for false IRP events
-Date: Wed, 26 Feb 2025 14:44:12 -0500
-Message-ID: <20250226194422.1030419-1-mpearson-lenovo@squebb.ca>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <mpearson-lenovo@squebb.ca>
-References: <mpearson-lenovo@squebb.ca>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B7021CC66
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 20:02:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.105.69
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740600160; cv=fail; b=nBuj6xxRJbruXFgvjHRx4lP3fLZ52T8s2o7jj31KabBS1i5MGhOdykfS2X17u6znSLFLWBC+zwnAAWRi47BUXAr9Ir/MtZ7S49ims3x5UdsXWlmdO3A07aSB/W0i/gyPbm+YSz7++SwAVWDsr/4z9TRJ0kFd6+BvNC+kdf2Yc9o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740600160; c=relaxed/simple;
+	bh=AVt0ypb/Ma+kQ/YB2FmYmT/nZ31uibOYjVmSeSFMx5c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=VLpjrhoTj4JvuL14xiu8qOoglh7jD11b6wGXEksPzwI9RKtSg1g9CjenMJVsMm9oF7sBai4ew7Fj6+edJwShkF92d4RK6DnhoEPfaWP4oKxNZHNZDadgR8IGxJIIKwrnLPfJg8WHlzZZZg/XWo4r03TRM04RVKvjEantvlkj+7g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=EC/dWWis; arc=fail smtp.client-ip=40.107.105.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Dv0K2Bb9NLHMbpUB0dK9VDf062qghQELf5pZ4Rey3eUJFj5ZgkTsGcxGZebMq9WFPhSEYF4L+velK3XI2QQ52oKyak/Bmm6YJk/Mb0wTdvBAqxKMGpohJWJNmeKQc8oHx5cOO7E7O3T6SqhZKeezpAjTPNApdK+HMgOOSV9J3GKm5hxjBLO5uMhcsQKzL1Qlt9SaG/DTXyFDv/YZjOEkGzx6/wSLW4tVzZ4F+zE80D3iVorhSS9Gqz34CTWVRv1vgZtyxEcibcPnPoJtp2uAKmab5SEa/5U8QdjEehEU9olWiB9rTDDCkiGPqRbZGXQADwms68xrvEur+zWOCJc0Ig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OTNbMuB9cYkyu4bbHMYJT4GmHVlDmnWLCh7ympLd3tw=;
+ b=DG05QJyN7Ce12qr+1u8vTrbr290Z/12vQpUgyr10AGP8bE5MkzSeyHQ6kZuKOjseTBvwAmv4+2mX5tAHw+pmRQ1ZY4MtOu4c5YbifZhamV1BAyPUCT9Y9+aOFN48O6g4z7cpfPk6g6OuEeFxg0JdYPtFBFU2kMNTQZIzZ5MGHjj7UW0hs/7/JYWBTkcc+/Wm093Sn9xTuoKe2pg0v3rjFWdMK6XGSxSF7JQpEtJ18VclMUX6LYSQ7mtZAMjwi0aIx0wzl5X6SGMSavHIGObtatAq3/ebOGYc9ipArX+k2/LLUD4aTm/1I7ryhOygG/PBK+wwIrpvPiYZevAno5qJzA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OTNbMuB9cYkyu4bbHMYJT4GmHVlDmnWLCh7ympLd3tw=;
+ b=EC/dWWisf70AbUhSYhmM8atpDuh24Ww6OtNA04okeKQYe5CNgwzaozzz/ynRf1gFKyR8i8sUUJOkOJf3dSguBqprIX234Hh17BdaTRE+aRelMMV7UWMdhRB8rNArZ9OaL0sEVSgihG1GO08Oorckznwj5WtnVu51fmS1FyaeBt5AY8N4L+/8KlUJlNUflAvh53nHskkznCXLS0NBMs8jvhKvuRWeiP5YrzdI1kUXlH6pzRCLIS8HStL7b7f9NSGzzqlczX5xkHUlO3bhcOGDIdIsf3nbxfkDoQiUq732nBlpUWfVeb6tr7OS9ffkO5ryNa8Mf8LSeD6D6L0GN5pEXg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
+ by GVXPR04MB9902.eurprd04.prod.outlook.com (2603:10a6:150:116::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.21; Wed, 26 Feb
+ 2025 20:02:33 +0000
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2%6]) with mapi id 15.20.8489.018; Wed, 26 Feb 2025
+ 20:02:33 +0000
+Date: Wed, 26 Feb 2025 22:02:29 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Shenwei Wang <shenwei.wang@nxp.com>
+Cc: Claudiu Manoil <claudiu.manoil@nxp.com>, Wei Fang <wei.fang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	dl-linux-imx <linux-imx@nxp.com>
+Subject: Re: [PATCH net-next] net: enetc: Support ethernet aliases in dts.
+Message-ID: <20250226200229.kdg2ls2ejhsbzbwi@skbuf>
+References: <20250225214458.658993-1-shenwei.wang@nxp.com>
+ <20250225214458.658993-1-shenwei.wang@nxp.com>
+ <20250226154753.soq575mvzquovufd@skbuf>
+ <AS8PR04MB91761FDBD0170D8773395E9289C22@AS8PR04MB9176.eurprd04.prod.outlook.com>
+ <20250226171045.kf7dd2zprpcjrnj7@skbuf>
+ <AS8PR04MB91767705160830CD63341E3089C22@AS8PR04MB9176.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AS8PR04MB91767705160830CD63341E3089C22@AS8PR04MB9176.eurprd04.prod.outlook.com>
+X-ClientProxiedBy: VI1P190CA0030.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:802:2b::43) To AM8PR04MB7779.eurprd04.prod.outlook.com
+ (2603:10a6:20b:24b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|GVXPR04MB9902:EE_
+X-MS-Office365-Filtering-Correlation-Id: ce5b76a1-05dc-4cd7-f0f7-08dd56a081f1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Mym7qPmv58/EtjKZDZIVB5T3eKBfpBxLEVwloKxqxAXJCk9faJ6ZcaeozoRx?=
+ =?us-ascii?Q?gigxLPEeYiGIF1E6FdzbF6uQ5t03Z38RJta/UUJrJJQE/XF84BATVxJfDqtp?=
+ =?us-ascii?Q?y8XM60IlfYg3I5b70bbCtH2GV44/dGpOMOGG4mn0p13rIdm4OUPfZCQxsW4y?=
+ =?us-ascii?Q?8Aqamwg+mj+pobSfgf0qIBUsbbyFxwY15wGKWQIOAcnnaXOL45IcX/KRV7aV?=
+ =?us-ascii?Q?BnwtBk8b8+ctNtpVm9usQAWH1CUZroDN5qLy+BSkAXzVo5emjFB5wx/hY3Sq?=
+ =?us-ascii?Q?g+eGkqfHpaYPdJbjqq2j7DP/qtkgzz2LzfTRlAAE2c65cs7m5AMfRd6Jbwl2?=
+ =?us-ascii?Q?9u+mZFyHBO7Dt/6W4vQCO9rzD8vRYiP+3JQr1YFlSFxRTwAbgOSij5M7KZ8d?=
+ =?us-ascii?Q?9M+hf4mCSU1e2GwwyjoaNKJz9TFLDiOkw0eqtdvdufMjdbeWSWpaUWkcaOLz?=
+ =?us-ascii?Q?AuNYUOyTdbl2SiDecZfAaNGdGMk0KgzIbPDpm09f4L6QUprItB3KalXzkvFm?=
+ =?us-ascii?Q?1QeernzR7qujMvQS6OY7NtXRKRC8j1/LtcuxazWbxV3zra2ZI9ylhclQ20f1?=
+ =?us-ascii?Q?mD2fKBxnBBpDC7n391defDDJVG93Bsktllf92L91ytR3oavivzUB4ygxY81w?=
+ =?us-ascii?Q?mrCgrgeaha+jOKo8ah8JtMEY1AMqBVagzCnsIT2UpulZh3PdUArDVr3ONx3D?=
+ =?us-ascii?Q?ttkS1AmOmT50YpE0y0iJA4Na1eDlfJJt3tqYWut9kBcBSCUSblP8yiuGmkyF?=
+ =?us-ascii?Q?yWByRbmPcJponftF/3KRB/cqyYdHOS9RuQZmbTnaP4qywwrEGplQNKvGXyXU?=
+ =?us-ascii?Q?4Nr++uWcyiAyQMJsgTVCoAiq1ACSjiAWNubHt0RCqPzfzhEN/g4SJ/NMTvqz?=
+ =?us-ascii?Q?9NaL7vdcNdkjrIEm0STc2iOGtt1rYH95eHx4nn8cnMcOfnKm9P/+6B8rUQOH?=
+ =?us-ascii?Q?6JhRa/O3TSP72Hd9FRxWxOAvBToqzLIuhTAE5Mv9qkTyhZA6A/NQfD7vxmtx?=
+ =?us-ascii?Q?dKf2S9fDfER7a6YuKEDsc6Oor6G1yCCVFYRv0m4ei9PY+UJ6vXZo9SEm9Bp6?=
+ =?us-ascii?Q?fWdxjKZ2t3a7W1XSqr5n9RsIFThoTOZCGOZ3b6nMq1mwMmYw7hEadr9Yzfzb?=
+ =?us-ascii?Q?WNpA2R9utjO23/j7QKuBwZaOCQVB6HhstZAjfez3ppvARG22lpiLbnwZevPy?=
+ =?us-ascii?Q?NxaB1EsLiQK1qSxV28C1erMVj7TW2hGwRaaVni6Eqtr3yRqDWHrUB3znT8bp?=
+ =?us-ascii?Q?+8dum3Ul4cXx/5FynKmxSqg5FYzXVydk42sfjWjCrrw9GsUVTAD8FnDm8TMf?=
+ =?us-ascii?Q?+lsFgVn4FeMlEXe4ZyCBLejgTmuQYAzQAd4T+din0fKungA6d23vUthLmUep?=
+ =?us-ascii?Q?Vrp3iECaoyCpeYvL2Wqj/nL4SE1s?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?gYI47KWiPu3Wi9S62W6KD3+7CPK/KUvKYh8N6Qf0G+6tJlUodTzX855q5CiM?=
+ =?us-ascii?Q?ftISXlJ5iNzAWhi9vLfN19WeeMdvHLrwLUa5OrHHRaIrqWtl422u+TAmM5pk?=
+ =?us-ascii?Q?Yaf5YCsKuqHvL8T5P+YW4AkfpItk7qU/8EMPpyNcK4R1FicrCvmLh0CwI71N?=
+ =?us-ascii?Q?3cTnD9PqwHeCnn2IcAOH1TLY1TiSFNl52rT2DFt9vinysj4mJf7efO4XsNA5?=
+ =?us-ascii?Q?Wz5dRSM0MVC/VGadGM6EROkkAIRxRr8cbsu7AlRczIxOwK+GPOQvGNld0ZiD?=
+ =?us-ascii?Q?K1vLcKlMXSki8nOReYqu32jAYEY7+IWI/BQPGhH8RDxtOM9OkckYTamzRPUS?=
+ =?us-ascii?Q?BKHPKtp27WJ/ZyBOeOBtqp7uejP+31JTjx4hVni9EWleJyKLeUAZ1pAPnJFE?=
+ =?us-ascii?Q?Hiw+DtroGUVprYehtSY4uUT+xx4FcIpi/VLJJxcHBbALUq4Z1S59yMG8YAci?=
+ =?us-ascii?Q?uYRAflN9rC6aNgYsv4iutI/Zesn6g+TMI58gMqj7EcmI6Q80XPINJVU+Q5lP?=
+ =?us-ascii?Q?gxUSH3h7ygMafXOBLpyqNzeMwv8sshBlIvb2BD+snNTE6bqPcMl5ThtrF8cm?=
+ =?us-ascii?Q?YjtWsWoGOTyVTQGc4UxPLwPTHxS2CO5ikXCcdCT8bXAkg8AGiMBHlSNEdED5?=
+ =?us-ascii?Q?bvO6xpTiPbMPbHG5hXCGpvHkY3s+ZSE4VJgVGSqYnseRD5CGiwC5TfWJu4kJ?=
+ =?us-ascii?Q?X4Mb6/cI0hpjdJ+88jqACFKepaklO3qg6kZg6LXPnuOtoJUixVRpb96fUkrN?=
+ =?us-ascii?Q?wcV8sn6Aw6Z32sd7VCTAkbrhR4pkw33zznP4DWMStuL1GCd31w5jK04nVPbh?=
+ =?us-ascii?Q?HrqwrpapJLocflFK4MApSRTY6LkbYQaLUosZ4L0tKLUqZogBe4s1nIvaN0NL?=
+ =?us-ascii?Q?bVKbfTL8ndPvazy5E4yMI4Sm3I2X8sKcenlMt4sn/Q1miJCeWTd8J1N/RGhx?=
+ =?us-ascii?Q?Gg49H9OlVoGEawpAnIXi8OHkYkPdFORcZBflXeJa5oum82DxaLsPcrFTGITW?=
+ =?us-ascii?Q?KYTW1skG+xU5VdRfKaI+SRE349BD6EKOBS4tDEddPWvE+20d5ubfFq/kefHf?=
+ =?us-ascii?Q?XFiG5+BNC6+m8NF7BdayQ7Cet4lCTv1UGuCvUOWUyj8vjb4XVTjpH3HTwrEq?=
+ =?us-ascii?Q?i03PcegRfIMBcFlhw8ILDsbNFqO5b8s78mVdI5zukM5+7iFxbxBtGwIQ26ZP?=
+ =?us-ascii?Q?PHrtuUfZh8kZekb6tvI90vUKob2ljgAmtjp1wb+CsWxIzRvUwBI6aoswC80l?=
+ =?us-ascii?Q?fu/VhObub3zPqfRfkyv8TJ7nUBwKhxvWzPJBnHadcplBMrzawheohvSMD+qE?=
+ =?us-ascii?Q?TlnwC3Vz9EpSjezFRdBKWIUEkunNlmX9avUZeEcjcYpFlkwKCoSysPZwuKxK?=
+ =?us-ascii?Q?TlKtbt93Au45vzfN1nelzof6Iv8dDiTapRa7aQwvjRNSgq57xpL8CpOYtfev?=
+ =?us-ascii?Q?FTMIb+TINwEcOEbh2ozrR0nWzoac4O060pWoBC14zQm7edFsEPw4PVW9Kkdn?=
+ =?us-ascii?Q?tbBp2JxFqH5uYeFJaXTfCUOzs1N/Z7ZdgpQthtobAphorSHlYhu+juYmZrIq?=
+ =?us-ascii?Q?06Daz8WPLCbBiatQVynG2gHt/GS4V83wlA3p8u4MCn+CQDVQJc1kwAgYqe74?=
+ =?us-ascii?Q?fQ=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ce5b76a1-05dc-4cd7-f0f7-08dd56a081f1
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Feb 2025 20:02:33.6151
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 06JlDfJtfQyf7aS6Umg7C67wMDDQk6ha4EoXYE3JXJfRXiSdr7HQl54B5f3JPc6r7NFykte49CSY09LeIGN5ew==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB9902
 
-Issue is seen on some Lenovo desktop workstations where there
-is a false IRP event which triggers a link flap.
-Condition is rare and only seen on networks where link speed
-may differ along the path between nodes (e.g 10M/100M)
+On Wed, Feb 26, 2025 at 07:43:34PM +0200, Shenwei Wang wrote:
+> So my understanding here is that the primary purpose of Ethernet aliases in the 
+> kernel DTS is simply to provide U-Boot with easier access to specific Ethernet nodes?
 
-Intel are not able to determine root cause but provided a
-workaround that does fix the issue. Tested extensively at Lenovo.
-
-Adding a module option to enable this workaround for users
-who are impacted by this issue.
-
-Signed-off-by: Mark Pearson <mpearson-lenovo@squebb.ca>
----
- drivers/net/ethernet/intel/e1000e/netdev.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
-index 286155efcedf..06774fb4b2dd 100644
---- a/drivers/net/ethernet/intel/e1000e/netdev.c
-+++ b/drivers/net/ethernet/intel/e1000e/netdev.c
-@@ -37,6 +37,10 @@ static int debug = -1;
- module_param(debug, int, 0);
- MODULE_PARM_DESC(debug, "Debug level (0=none,...,16=all)");
- 
-+static int false_irp_workaround;
-+module_param(false_irp_workaround, int, 0);
-+MODULE_PARM_DESC(false_irp_workaround, "Enable workaround for rare false IRP event causing link flap");
-+
- static const struct e1000_info *e1000_info_tbl[] = {
- 	[board_82571]		= &e1000_82571_info,
- 	[board_82572]		= &e1000_82572_info,
-@@ -1757,6 +1761,21 @@ static irqreturn_t e1000_intr_msi(int __always_unused irq, void *data)
- 	/* read ICR disables interrupts using IAM */
- 	if (icr & E1000_ICR_LSC) {
- 		hw->mac.get_link_status = true;
-+
-+		/*
-+		 * False IRP workaround
-+		 * Issue seen on Lenovo P5 and P7 workstations where if there
-+		 * are different link speeds in the network a false IRP event
-+		 * is received, leading to a link flap.
-+		 * Intel unable to determine root cause. This read prevents
-+		 * the issue occurring
-+		 */
-+		if (false_irp_workaround) {
-+			u16 phy_data;
-+
-+			e1e_rphy(hw, PHY_REG(772, 26), &phy_data);
-+		}
-+
- 		/* ICH8 workaround-- Call gig speed drop workaround on cable
- 		 * disconnect (LSC) before accessing any PHY registers
- 		 */
--- 
-2.43.0
-
+This is what my limited experience is telling me, yes.
 
