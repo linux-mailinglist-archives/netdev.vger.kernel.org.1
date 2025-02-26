@@ -1,199 +1,196 @@
-Return-Path: <netdev+bounces-169846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2BEBA45F82
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 13:40:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13AFEA45FD7
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 13:57:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CB9D168A9A
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 12:40:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A5843A9740
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 12:57:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09CFD14387B;
-	Wed, 26 Feb 2025 12:40:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66F90214817;
+	Wed, 26 Feb 2025 12:57:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="qeMkGQ3y"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="OGJ7X+ch"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE7E118024
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 12:40:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6A5C13C8EA
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 12:57:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740573639; cv=none; b=S7hJ9k6+fPCMFZAFgCB5CudxrRzjxQLOizfXUXaosNgBZg8jtiwhv9uz9AT9J+lepvnWelIfkL83HJJ0pq9qmqAdDQJ9F0UasUZv3tC44qla7V7KMaY+YskePj7d30fm3KwhIYwSDHq8YmySAPxcMs6B0PITS7oR+AYMw+dpvdw=
+	t=1740574626; cv=none; b=Yeh7uUGfc8vTrIVzH8DTboUi7kl+DI8qNktSyFHEtykHFZ3EN+nhzH0RXMXwP4rd7unrGTVwu8atUMvaL0OISyF4W8oa5sIY4C7As3llFiZb522sHr6PElyIXGuJwfnXXvHB82OL+unl+HuoCz8ptXZnVfqmzUxEGNf/boGW6oY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740573639; c=relaxed/simple;
-	bh=4l7oxSeeX+iwjdikDsl221mshHqE7XJYGKYFrPjhu+I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q3hQ9Yh0qyjIYXsl343S+ZZiTipauc5SAi32zLSS9GzRUVCvyKMRUGIrINaZVRjcldQCzNyB7mnrFImA+Mqwj5J98UGcKyYQ0l/s4QNMVHVs02k0e+PzDO+YhuksCfXQBcPbmGWrZjYoh0Pyzgad81KUUBW+tHHhiXzpugklCp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=qeMkGQ3y; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=jY/bwN9A5xa9iSopLwyTQOxIV4QgdsLsdC4BTyAYt0s=; b=qeMkGQ3y0EikusQ5iHd4bfTahQ
-	VIXzKqFJ8IuD3zi7Bds5zQxg6xqFWF1UTAxmGM5ZFoaZpFhfGgwlOywV9EthV0Aw1BXHUkvLrNKAV
-	rmcVXqxqtO4SQUrZ2YNITE4q9QJqb2A+zRm77pMqU3169CUNZCcoFYmCGRod2yFDfu8ydaJ+NHk6a
-	jQVGp+KrPPtvH8pDfAlr5i1MHou26K+PWMKnf+fbN40ZHh1D6KN9GJhwEUQ0jmwijbhhKS9UAj/h4
-	+kZw30OqsrDFWVsqH1MK6fFHR/ZAS5ERJK8l/v+NOP86YirCEDQ51wEXwnGxoIjp/dfaT3PbslIWO
-	IdQ4fMHQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:32848)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tnGi8-0004Ez-2J;
-	Wed, 26 Feb 2025 12:40:24 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tnGi5-000766-0H;
-	Wed, 26 Feb 2025 12:40:21 +0000
-Date: Wed, 26 Feb 2025 12:40:20 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Thierry Reding <thierry.reding@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Eric Dumazet <edumazet@google.com>,
-	Fabio Estevam <festevam@gmail.com>, imx@lists.linux.dev,
-	Inochi Amaoto <inochiama@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jan Petrous <jan.petrous@oss.nxp.com>,
-	Jon Hunter <jonathanh@nvidia.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Minda Chen <minda.chen@starfivetech.com>, netdev@vger.kernel.org,
-	NXP S32 Linux Team <s32@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Thierry Reding <treding@nvidia.com>
-Subject: Re: [PATCH RFC net-next 6/7] net: stmmac: intel: use generic
- stmmac_set_clk_tx_rate()
-Message-ID: <Z78LtBo2lfTGG-9o@shell.armlinux.org.uk>
-References: <Z7RrnyER5ewy0f3T@shell.armlinux.org.uk>
- <E1tkLZB-004RZU-4A@rmk-PC.armlinux.org.uk>
- <n67c4bq7n7ejakmqmglve3os6vqvm57umysjjzexxkygvusnoo@ndee4gfnmsst>
+	s=arc-20240116; t=1740574626; c=relaxed/simple;
+	bh=5NJhdx6ucj3v2O+FF60cWskxUdeL+Rqn/4bWrla/kVk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=H/Z8KU8GlTKgSPhBTVqwSAKQUyz5LIZ7UkGqveXS8supoDl91mw+qSAmyqAHbuB4SNVaiEO7mQXg5qZ1Akjz6bkaS0Bkt9nhQp8giI/FWOQ/L6DSkA3liCVt8NV6/4pcevXBRbFpkNTw8YqEmjBCPW4iya+Rvp6RVSvNNnny8dc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=OGJ7X+ch; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-220ecbdb4c2so72347875ad.3
+        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 04:57:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1740574624; x=1741179424; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=5NJhdx6ucj3v2O+FF60cWskxUdeL+Rqn/4bWrla/kVk=;
+        b=OGJ7X+chYVD3DaUZRShJg9t+vm+AP3UFNAtP+AID8YgidZ27STM9hHpKBY6P1tdKJA
+         f6SbYWl0it319oh/IRfH2gAuh/lLn2f/HAzcTUkhtuPlbcOWNvyiV6xrHQpPi5hAuLwZ
+         jxqMnRuZcv6ZghFB2AvnaLpOzCdzjhmxdP2GU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740574624; x=1741179424;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5NJhdx6ucj3v2O+FF60cWskxUdeL+Rqn/4bWrla/kVk=;
+        b=cGGza55oElSVyAnbqYT1+ThIjOrV7uJd5wVWn8SONyezIGvDVOOmZGnnwADL+fFhFO
+         UObcXkjRX4aLdjhDg1QlgA+V9SWalDOcGQyEts8U0cs52Pf+1g8sLbBKjTRFKh9CK+Qb
+         bnnQTIMwyFj20su5MdQO6j+H20niLt12SgZTRYvlB3IKyi8fuZANqcxVZhfhCU/zlzDt
+         pxgFmZwtJ0LppFYQ6+4BrBuSA9h7tTFBndwH384n+KEUuPeBTXb25D8auT8QJVhIrYrq
+         TmvRICI7dzgl4xeGyIo2LOcIvy8VHZ0ukuBs1UwMKrOen/Pw14Miaqh/8fKosIRr/cGU
+         1lPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVq8wxFwPdXbrJ1K4dGiv4goHNhz059ufvx5dud2GcYWzaTeUxRGSnDjTklasgT2i699KVKGHk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7aoGpQW5O04jj0Q4gw0A/OGqznxfxAMI3HBmpF079J/N1QOAA
+	KkFDurBL3uKj4gzF6roC7gHBTNzTYO8dm1f4OLBbpe5PHX8Ohc9EdHrC1aYgQ2chc78mmz5kBnW
+	ofrMWz1+F69jp5Q9Z6iyYim0ibsY+sJEmyIVJ
+X-Gm-Gg: ASbGncsPlEzsj4QDu/TnWE2UiHLkUa9FqKKhvXAiaqAmoOiSVLYLH5QMQCY25EaTGM6
+	gGC+bAIsVD1T3W2xgQJRRdJcvRqSMLUVY7Kdy8rYU0cUb3UUnCJ8P2+eLsPyx7TiM0fPvA3gMMk
+	sKMOlkWzg=
+X-Google-Smtp-Source: AGHT+IFH3g7HN4iE91lCdGVsGae6WaOOsrDSLzOQY6mUkXhf06h6hXf5Oi1Rks/zMbvBuJpRs08HcvYWUWO85ytWY7Q=
+X-Received: by 2002:aa7:8889:0:b0:730:97a6:f04 with SMTP id
+ d2e1a72fcca58-73426cbbd9bmr35547729b3a.7.1740574624074; Wed, 26 Feb 2025
+ 04:57:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <n67c4bq7n7ejakmqmglve3os6vqvm57umysjjzexxkygvusnoo@ndee4gfnmsst>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20250226122543.147594-1-tariqt@nvidia.com> <20250226122543.147594-5-tariqt@nvidia.com>
+In-Reply-To: <20250226122543.147594-5-tariqt@nvidia.com>
+From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
+Date: Wed, 26 Feb 2025 18:26:51 +0530
+X-Gm-Features: AQ5f1JqlTZboPJQTvHkvhpa3l5tKenQ-YqRM6hkbeJByf9oVSiOCakkF5Tlms9s
+Message-ID: <CAH-L+nP5o_cO0NOoKDKFQ4xZdLapBuQnuZaNpnm2ksX0ymLzqw@mail.gmail.com>
+Subject: Re: [PATCH net-next 4/4] net/mlx5: Add trust lockdown error to health
+ syndrome print function
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>, 
+	Leon Romanovsky <leonro@nvidia.com>, Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Shahar Shitrit <shshitrit@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000031bd08062f0b1c6a"
 
-On Tue, Feb 25, 2025 at 09:46:56PM +0100, Thierry Reding wrote:
-> On Tue, Feb 18, 2025 at 11:15:05AM +0000, Russell King (Oracle) wrote:
-> > Use the generic stmmac_set_clk_tx_rate() to configure the MAC transmit
-> > clock.
-> > 
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> > ---
-> >  .../stmicro/stmmac/dwmac-intel-plat.c         | 24 +++----------------
-> >  1 file changed, 3 insertions(+), 21 deletions(-)
-> 
-> This isn't quite the same code, but the result should be the same since
-> clk_set_rate() will be ignored if the clock is NULL, which would be the
-> case for !dwmac->data->tx_clk_en.
+--00000000000031bd08062f0b1c6a
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-You're right, thanks for spotting! I'll move it out of the if()
-statement so the code has the exact same behaviour. Replacement patch
-below.
+On Wed, Feb 26, 2025 at 6:02=E2=80=AFPM Tariq Toukan <tariqt@nvidia.com> wr=
+ote:
+>
+> From: Shahar Shitrit <shshitrit@nvidia.com>
+>
+> Add the new health syndrome value to hsynd_str() function
+> to indicate that the device got a trust lockdown fault.
+>
+> Signed-off-by: Shahar Shitrit <shshitrit@nvidia.com>
+> Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
-> Reviewed-by: Thierry Reding <treding@nvidia.com>
-
-Thanks for the review.
-
-8<====
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH net-next] net: stmmac: intel: use generic
- stmmac_set_clk_tx_rate()
-
-Use the generic stmmac_set_clk_tx_rate() to configure the MAC transmit
-clock.
-
-Note that given the current unpatched driver structure,
-plat_dat->fix_mac_speed will always be populated with
-kmb_eth_fix_mac_speed(), even when no clock is present. We preserve
-this behaviour in this patch by always initialising plat_dat->clk_tx_i
-and plat_dat->set_clk_tx_rate.
-
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- .../stmicro/stmmac/dwmac-intel-plat.c         | 24 +++----------------
- 1 file changed, 3 insertions(+), 21 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
-index 0591756a2100..599def7b3a64 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
-@@ -22,31 +22,12 @@ struct intel_dwmac {
- };
- 
- struct intel_dwmac_data {
--	void (*fix_mac_speed)(void *priv, int speed, unsigned int mode);
- 	unsigned long ptp_ref_clk_rate;
- 	unsigned long tx_clk_rate;
- 	bool tx_clk_en;
- };
- 
--static void kmb_eth_fix_mac_speed(void *priv, int speed, unsigned int mode)
--{
--	struct intel_dwmac *dwmac = priv;
--	long rate;
--	int ret;
--
--	rate = rgmii_clock(speed);
--	if (rate < 0) {
--		dev_err(dwmac->dev, "Invalid speed\n");
--		return;
--	}
--
--	ret = clk_set_rate(dwmac->tx_clk, rate);
--	if (ret)
--		dev_err(dwmac->dev, "Failed to configure tx clock rate\n");
--}
--
- static const struct intel_dwmac_data kmb_data = {
--	.fix_mac_speed = kmb_eth_fix_mac_speed,
- 	.ptp_ref_clk_rate = 200000000,
- 	.tx_clk_rate = 125000000,
- 	.tx_clk_en = true,
-@@ -89,8 +70,6 @@ static int intel_eth_plat_probe(struct platform_device *pdev)
- 	 * platform_match().
- 	 */
- 	dwmac->data = device_get_match_data(&pdev->dev);
--	if (dwmac->data->fix_mac_speed)
--		plat_dat->fix_mac_speed = dwmac->data->fix_mac_speed;
- 
- 	/* Enable TX clock */
- 	if (dwmac->data->tx_clk_en) {
-@@ -132,6 +111,9 @@ static int intel_eth_plat_probe(struct platform_device *pdev)
- 		}
- 	}
- 
-+	plat_dat->clk_tx_i = dwmac->tx_clk;
-+	plat_dat->set_clk_tx_rate = stmmac_set_clk_tx_rate;
-+
- 	plat_dat->bsp_priv = dwmac;
- 	plat_dat->eee_usecs_rate = plat_dat->clk_ptp_rate;
- 
--- 
-2.30.2
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+--=20
+Regards,
+Kalesh AP
+
+--00000000000031bd08062f0b1c6a
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
+BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
+hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
+JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
+aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
+FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
+T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
+o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
+aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
+YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
+cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
+ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
+HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
+Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
+LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
+zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
+4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
+cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
+u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
+a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
+x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
+VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
+bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
+AQkEMSIEIChhKF4zMThu/uJnFWD2ccZCbIwEo59bbUEXaqEmc3ycMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDIyNjEyNTcwNFowaQYJKoZIhvcNAQkPMVwwWjAL
+BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQC6OKhYlVaf
+5TblEQfMneveRz6rIGWExANuBa/pO+nj1T0/B126DswBe7Zx/OFKr67wWXTzvtRu5O73wL/8SYpi
+ySz1W0EoeFGqjV6J9vrz0lG5zN78UFum8QkeEjNeHVoUaBflI7PZxtlab+w5Vrb/2Nk8hhv32Ts2
+CIuE+pyzaDL+aNQTXiWrkVVnXL05UnO4d+1/drFPi18BoDEmv8WtaDk0g3pXlnCB5O/8wV3qlnT4
++jywlis2Xkm4v47Xuf1YksFpa3yzswEIaG9zxaihFqiXyDQzFXoJowExgo5gqMiDKOpL/Pdapo2P
+GHTwyH7kmsYJw3n5spU9Mj0w4GN6
+--00000000000031bd08062f0b1c6a--
 
