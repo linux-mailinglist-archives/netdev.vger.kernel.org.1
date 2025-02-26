@@ -1,143 +1,118 @@
-Return-Path: <netdev+bounces-169777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89F7FA45AD4
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 10:55:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08C4AA45AE5
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 10:57:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06F941891540
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 09:56:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E0CC3A40B1
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 09:57:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D156726E165;
-	Wed, 26 Feb 2025 09:53:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5944824E01A;
+	Wed, 26 Feb 2025 09:55:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="OPGZ5Uw8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NAI6nKc1"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9552459E0;
-	Wed, 26 Feb 2025 09:53:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD7F24DFF2
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 09:55:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740563588; cv=none; b=cwyTO1GJHGGy/vQnxLOWNgZU4LeNMeuBSF8cI/8beED/cHAV4GQRzqpRA4qjyG+E2Nddpk/pzws2id7/2jirBmjU1f1fWW1q9XqnfEAIpiEp+R0PEzDVTEeleaGy6Nfw599C/2YqXCRRUGZofozTHEXVVIw85KISTqGWbIV9erg=
+	t=1740563722; cv=none; b=NsZqZ89vf4bTc0sJ56NlDhEcyxlRTYQNQC2HOrGmIWX+fQcFpdCywYW4zU8d24Qqvt/J67IyQPlGpj7ObCN9qz8TPbWqnHBKDAIdNx8WseL4FPoThLk9TTMDEb1nlwKgl/D3mLxEppMiV0GgjENn3GlTkB+d8TlSMDxgJVjqRf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740563588; c=relaxed/simple;
-	bh=23AzTlA3i3e+EmS9Av59UpbDgrdMi/L7vS6N1uObpJE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JX5KoUhk6dMvuUiBQ1bGNSasjtB3lgIRkPpymQ6jkKvTwLz2K2lHYmGE1mzzmvNTCvgOlyGdkk+SrBZ390kirKRviFKNv5Nqj3IC3hU02bQCxh9TE0VtgOB6K9VrsGX+bmelteH48XA5n0BriAi4OV6aCcTtzcfRuXlg4U6szyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=OPGZ5Uw8; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=AWAnLAcd4Ax9L2XjpW/XTk1Vc6xaPxRyyPPHRuN7d+0=; b=OPGZ5Uw8vm2+odS8tBnxh6bn5y
-	bMKasJwtYxa0VWmFmqzAohjow9oPWH5b8OMTZQvCa9wo09JRu6bE/sDd73lDgAh47se8VFabVThHr
-	ZEiE8aZTIDBA0m1Wve/02buldgj1FI8v2SRhJYXiIzAoIf97cT4DyazORIRNjwBOF5DDRK9WBnV6K
-	Y4qMJE77GtOgbxK8usYH4b2LD27i8CGjtu97MKuJ0UoVx1PTybavKFR98wAiyQwrFulF1ibmMLeIc
-	iMKwl7NTa38QBqSY5ibw8JS1Knpd3qKga8UVNrgiF8xTXt8mdyUx154pmR0LA3lBt6bYao0tocNRe
-	ymF8xUhQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51782)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tnE63-0003om-0c;
-	Wed, 26 Feb 2025 09:52:55 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tnE5y-0006xe-26;
-	Wed, 26 Feb 2025 09:52:50 +0000
-Date: Wed, 26 Feb 2025 09:52:50 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: SkyLake Huang =?utf-8?B?KOm7g+WVn+a+pCk=?= <SkyLake.Huang@mediatek.com>
-Cc: "andrew@lunn.ch" <andrew@lunn.ch>,
-	"dqfext@gmail.com" <dqfext@gmail.com>,
-	Steven Liu =?utf-8?B?KOWKieS6uuixqik=?= <steven.liu@mediatek.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"daniel@makrotopia.org" <daniel@makrotopia.org>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>
-Subject: Re: [PATCH net-next v2 3/3] net: phy: mediatek: add driver for
- built-in 2.5G ethernet PHY on MT7988
-Message-ID: <Z77kcqzmCqdT6lE0@shell.armlinux.org.uk>
-References: <20250219083910.2255981-1-SkyLake.Huang@mediatek.com>
- <20250219083910.2255981-4-SkyLake.Huang@mediatek.com>
- <Z7WleP9v6Igx2MjC@shell.armlinux.org.uk>
- <5fae9c69a09320b0b24f25a178137bd0256a72d8.camel@mediatek.com>
+	s=arc-20240116; t=1740563722; c=relaxed/simple;
+	bh=HUmhfof7CFNKUEfgc4wqdwOSAaIFQEgJSYQ3FEevBT0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=h1naUdUGw0lRNmjbR2ZF+iIhvOKC6oKgV6/KBwYc7Hw54St7qVbB1WFLWo3bVO7jcEF4XTwNC7+DnwlvAt/i0lnHfUNHs7J1OH0nV2hXaq9+supDTBQcQYovGgmPf+PXX4AZm9cvigFJleEdXxAgLrxti8sjmOLnRt2fuNPTWhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NAI6nKc1; arc=none smtp.client-ip=209.85.221.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-520aede8ae3so1729431e0c.0
+        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 01:55:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740563719; x=1741168519; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HUmhfof7CFNKUEfgc4wqdwOSAaIFQEgJSYQ3FEevBT0=;
+        b=NAI6nKc1pfEI1R8NIG1pr96TuvMnv4h8dDHstXkb1PXqasGKic2JXoTCwv7HxTavUu
+         /Ppf2S5aLTBEihMlUJ4OmG8ppyhCZr3kRhFFC6crV0+CGCCVZpQrvMcb23deDjCLCUe7
+         mKhqvCoTqnlaF6BdM05Rj+AtNgd/uWxHN1+/s8GgVf2XKp0p4j/JCPIkAsQG2tIxmB4A
+         yL9TeITb6N3XmSJKH+UYY9cmHu9H1M4N1pust7bat0k6q/FkXENZbVvCPNJLPTG7Uz6N
+         V2KD+8AgTvo+2wgcuG0Mr8c5/KWR82C9AGI7/8sLK962LREFG6KzicaLmoZW2Jf5zBCC
+         8Jdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740563719; x=1741168519;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HUmhfof7CFNKUEfgc4wqdwOSAaIFQEgJSYQ3FEevBT0=;
+        b=W1qAkptzantffz94BFuKOUSx+jJDGVFFDt9Ny/UTWhz05M7LGhkOfDEIxRrObonRnj
+         0uxNaIoOzVXg2Ih8NMqWWvM3Y2MwYY91jb2HJvn6MWi8HqWS6+oET6bf/k/1nIW4zDdX
+         6E4uW7zDoaW9kGtEfCm5SKUdiXkYHSNJk6w+M1k9j2SulF6TRjnLhS6SmtwurErgnIHL
+         QSqXnKOCsoKLXl9N0JpyZnxgFV2m3PcB6kFDkAt787T2AJigPt6FvUeE4A6v6qFBj9Zy
+         /Fc6ySmfygKHZmkZgUxoXiMAksh+P1exHJW66B19f0CEWNKBIjrNPATyKzx+2AlqGdrD
+         00ZQ==
+X-Gm-Message-State: AOJu0YwD5eoegX4wePkCJhPn/wKM3oAd++wOOrUbl1VvhzT9Gaa5Z6hD
+	RNelY+VuCVLiLDnN3cwHHuBFjAi/Z1cwBhW8dgnidhp2coQ3UVendXny1Moi92tD6LfWOsk7+1j
+	Dr6jMdvG9wo/ZCkqKhAlC5oCvuzfZwQ3m
+X-Gm-Gg: ASbGncvqmaxnjjeobUlUZRIBi1iXQCulVQHYfPuDMHpIDe3w2+IOKVfjjH1vvnsLpX5
+	vi5J64BaCirMXE2X9B/ELjEfSwnTB4KeZP9JMY/mweo7YeiXJHEzwOvuWC9S7gu2qioCcalq6Z9
+	dbe6/AXw==
+X-Google-Smtp-Source: AGHT+IE8mQvgjLCVTbfJz3Mxrp1w/ZcuJh1+eaGdwZ1VE5yyX8tzJQOO9wTWlnBMJqsKFWwAEAKrj0Y4vqaY6O8ok3c=
+X-Received: by 2002:a05:6122:1820:b0:520:42d3:91aa with SMTP id
+ 71dfb90a1353d-5224cb9297amr1459819e0c.2.1740563719442; Wed, 26 Feb 2025
+ 01:55:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5fae9c69a09320b0b24f25a178137bd0256a72d8.camel@mediatek.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <CAA85sZveppNgEVa_FD+qhOMtG_AavK9_mFiU+jWrMtXmwqefGA@mail.gmail.com>
+ <CAA85sZuv3kqb1B-=UP0m2i-a0kfebNZy-994Dw_v5hd-PrxEGw@mail.gmail.com>
+ <20250225170545.315d896c@kernel.org> <CAA85sZuYbXDKAEHpXxcDvntSjtkDEBGxU-FbXevZ+YH+eL6bEQ@mail.gmail.com>
+In-Reply-To: <CAA85sZuYbXDKAEHpXxcDvntSjtkDEBGxU-FbXevZ+YH+eL6bEQ@mail.gmail.com>
+From: Ian Kumlien <ian.kumlien@gmail.com>
+Date: Wed, 26 Feb 2025 10:55:08 +0100
+X-Gm-Features: AQ5f1JrXUVafKBDWcfwCTsrXgm-WdGpicrJImlqrtgkuC7i7XXpfX371nlhL-rg
+Message-ID: <CAA85sZswKt7cvogeze4FQH_h5EuibF0Zc7=OAS18FxXCiEki-g@mail.gmail.com>
+Subject: Re: [6.12.15][be2net?] Voluntary context switch within RCU read-side
+ critical section!
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 26, 2025 at 06:48:34AM +0000, SkyLake Huang (黃啟澤) wrote:
-> On Wed, 2025-02-19 at 09:33 +0000, Russell King (Oracle) wrote:
-> > 
-> > External email : Please do not click links or open attachments until
-> > you have verified the sender or the content.
-> > 
-> > 
-> > On Wed, Feb 19, 2025 at 04:39:10PM +0800, Sky Huang wrote:
-> > > +static int mt798x_2p5ge_phy_config_init(struct phy_device *phydev)
-> > > +{
-> > > +     struct pinctrl *pinctrl;
-> > > +     int ret;
-> > > +
-> > > +     /* Check if PHY interface type is compatible */
-> > > +     if (phydev->interface != PHY_INTERFACE_MODE_INTERNAL)
-> > > +             return -ENODEV;
-> > > +
-> > > +     ret = mt798x_2p5ge_phy_load_fw(phydev);
-> > > +     if (ret < 0)
-> > > +             return ret;
-> > 
-> > Firmware should not be loaded in the .config_init method. The above
-> > call will block while holding the RTNL which will prevent all other
-> > network configuration until the firmware has been loaded or the load
-> > fails.
-> > 
-> > Thanks.
-> > 
-> > --
-> > RMK's Patch system:
-> > https://urldefense.com/v3/__https://www.armlinux.org.uk/developer/patches/__;!!CTRNKA9wMg0ARbw!iV-1ViPFsUV-lLj7aIycan8nery6sQO3t6mkpdlb_GW8hswhxc4ejJozxqkU3s2WzxSizs4kfdC77yr7HGGRIuU$
-> > FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
-> Hi Russell,
-> mt798x_p5ge_phy_load_fw() will only load firmware once after driver is
-> probed through priv->fw_loaded. And actually, firmware loading
-> procedure only takes about 11ms. This was discussed earlier in:
-> https://patchwork.kernel.org/project/linux-mediatek/patch/20240520113456.21675-6-SkyLake.Huang@mediatek.com/#25856462
-> https://patchwork.kernel.org/project/linux-mediatek/patch/20240520113456.21675-6-SkyLake.Huang@mediatek.com/#25857174
+On Wed, Feb 26, 2025 at 10:24=E2=80=AFAM Ian Kumlien <ian.kumlien@gmail.com=
+> wrote:
+>
+> On Wed, Feb 26, 2025 at 2:05=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> >
+> > On Tue, 25 Feb 2025 11:13:47 +0100 Ian Kumlien wrote:
+> > > Same thing happens in 6.13.4, FYI
+> >
+> > Could you do a minor bisection? Does it not happen with 6.11?
+> > Nothing jumps out at quick look.
+>
+> I have to admint that i haven't been tracking it too closely until it
+> turned out to be an issue
+> (makes network traffic over wireguard, through that node very slow)
+>
+> But i'm pretty sure it was ok in early 6.12.x - I'll try to do a bisect t=
+hough
+> (it's a gw to reach a internal server network in the basement, so not
+> the best setup for this)
 
-1. Wouldn't it be a good idea to include the loading time in the patch
-   description or a comment in the patch?
+Since i'm at work i decided to check if i could find all the boot
+logs, which is actually done nicely by systemd
+first known bad: 6.11.7-300.fc41.x86_64
+last known ok: 6.11.6-200.fc40.x86_64
 
-2. What about the time it takes for request_firmware() uses the sysfs
-   fallback, which essentially passes the firmware request to userspace
-   to deal with? That can block for an indeterminate amount of time.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Narrows the field for a bisect at least, =3D)
 
