@@ -1,225 +1,157 @@
-Return-Path: <netdev+bounces-169713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45B36A45562
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 07:17:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 170C9A45567
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 07:18:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7AEE189B3F9
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 06:17:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 980E61892562
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 06:18:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A53225D537;
-	Wed, 26 Feb 2025 06:16:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CcCj1lsJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47C3120C02C;
+	Wed, 26 Feb 2025 06:18:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC5719DF53
-	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 06:16:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE1616DEB1
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 06:18:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740550616; cv=none; b=P0lUyFbTwxA9iSo8MpDf7IwnWFteWDPhR1OmvPHhgcHwyJnk2CWrGB7xHp2A31KNi4ETPEm/IB3Dhc9SwVXc2cDUaq2/cPjTIarVy9c0ZoXdNYzqFq0MyPRTZpQSA+xCV92SQICglLBpD3WUral0bz2i2XhUEbs5ClkMibSo+18=
+	t=1740550703; cv=none; b=oe1hXEVIgLIuteqAbC1uyUmoiab3iI5qTryGrkd2nKY06B+s6YiAk5Py7cS3ZsXbVop0NHoy0tQ+yqyXgHCLVUkbo5AHrKWSKNr+VDId7MZuHLWWd0nTlG3V/b1PjXan/YLvHDBAeM3eqKjv/NVvKpi1yscJBvu3U6NuT30r3eY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740550616; c=relaxed/simple;
-	bh=s7RNNwS1VeCqaA1MtGD3SocRHTpkYCAIDVHP7LurC8E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=us73U+PMuDKmz9yhigmXf0RcQmr88S73gddjMzQ8gvhB9XRUWa8abMcYSm73nnywRyriRLu06oK8TFzMbmNyIPXlchxqj039T06oKH5GjFCplW4X/0vGj3QRqjrmEIdyGC+Rcg1SNsC/4L7vbfHuO4Z85dlBuKTnAPWZlkgEHjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CcCj1lsJ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740550613;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1FB4LOVmyku7dBx/0yNo7XDVAzCNkcepNULZYDZTsFo=;
-	b=CcCj1lsJ1t1catbGbcbflC2snKGY+EM/xFWb3N6Ii0A5HbnOhj0k94ltNYpwPz8jF6vBM6
-	cQ9uaGgNqRKEWsTgyx/6AUCKI9ksnn6wlXk4NUk1kNvhzuUsLnv/Z9LvWDWl1AI60VTkRW
-	d1PQA3KgnMjv0bwHdlTapvke59IpPwk=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-353-1XuNwx7tOFWlsz84nXweNw-1; Wed, 26 Feb 2025 01:16:49 -0500
-X-MC-Unique: 1XuNwx7tOFWlsz84nXweNw-1
-X-Mimecast-MFC-AGG-ID: 1XuNwx7tOFWlsz84nXweNw_1740550608
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-5d9fb24f87bso10219054a12.0
-        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 22:16:48 -0800 (PST)
+	s=arc-20240116; t=1740550703; c=relaxed/simple;
+	bh=JryWq7WV8uNmBfkhQojR45hf3u/Eku7l7OsIR6FXLt4=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=BcxLkbn0NNwO3XZtfzPqAld4Cmq3VR//vnai6VroYeZoGuWHE9YDFzCtoDWyuRsS1RamF+dHAUJTD6ONM4x9zRkPh2dQf86CbMSpaQ7UWuf2tnm/BahUbUO1RHHVIzPB+PUr05yzY8HEMWwgR7fd+tRY7t4WSiy79EV1CNyRudw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3d2a6b4b2dbso119252275ab.2
+        for <netdev@vger.kernel.org>; Tue, 25 Feb 2025 22:18:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740550608; x=1741155408;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1FB4LOVmyku7dBx/0yNo7XDVAzCNkcepNULZYDZTsFo=;
-        b=qXVaBqj8JGu451eU43cDmv9m5k+noB1On2UzERBmJWiSGujwnqo9VMRFJC60HIr7Cb
-         oM15j2xJ07W61CXXbUuJK6UHHM1vmocBBwpwioK+vcrR49PaeyFeEfvND8eHPrx5RKU9
-         JVOe+9yaRd/TsZXAZpGcwH7Oa2RzpnNFOe7jGpGyPA1Z53cViFDKzGmEY3LNNUZ2fH69
-         O9OWk7lcs5IV84UsBD128tySTyBOP4C62v+FEqqoOZ6/GKVNO/ggVs7iRN3eL2mOOyWH
-         A7167mt7xe35H9XNxXRB51g3PLmZddMhSlhRDPD913yJ9VSlDBtWL6j12p88hY1VtPze
-         q93g==
-X-Forwarded-Encrypted: i=1; AJvYcCXSgUn7CWHoC9N/apETdKkWAgQdWQ8KDrMzr3dDPpFpyC5SW0yddSMaq643GBIjFkwyzgveuz0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFQgquLCOmn/MrOSGcR7SMjGYM8yL+1eO5FsnGZzr4ks3P50q5
-	2USuAphNOzXob/hZ4jAXv8hoMpD75pvNRJTr1dA+Q5Rc2OJCL0uKUFzrPvReDbpSW22T7Y20s/j
-	8uKEdR9ShavgOdUVWmczjDIH0kmymOODG3toj26yc0tJw6fFmRSzeNDN9B3vxeR824noKCk5gVz
-	vh0R+WE2lToYNxOSPyOM1v0rEjsZBQ
-X-Gm-Gg: ASbGncu3TnzOac7V0XeK8W27es2kSx85PzNUqRCwXZ5zqCLqOQwexD5/uzGldj0Fijc
-	8NiVhEKeyGWu1cgCe3ksePRJ5RiDVAbmvy3hl5VWJz33RUPwynGOXCNNu3Kxq8YZDmQnhk04TUA
-	==
-X-Received: by 2002:a05:6402:34cc:b0:5dc:cfc5:9305 with SMTP id 4fb4d7f45d1cf-5e4a0dfc8b9mr2496854a12.25.1740550607929;
-        Tue, 25 Feb 2025 22:16:47 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH1Svm9zCE7jvsU1DaFVhMr5yn9In9YqFnmIGZJOqqstdyPg6Py8o1nFKh/wslu91Gg/91zZXUIrxektg2nXhQ=
-X-Received: by 2002:a05:6402:34cc:b0:5dc:cfc5:9305 with SMTP id
- 4fb4d7f45d1cf-5e4a0dfc8b9mr2496837a12.25.1740550607523; Tue, 25 Feb 2025
- 22:16:47 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740550701; x=1741155501;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KkxgE/b/3yDI6a3ezLAF95DWpHfHSO/kSkJ/250V8Pw=;
+        b=Og86SMXEYRQ15Ds2x0QVCzYF6n+8/jEcWpg/Ozgvb300+Ea/ihffOQjKAahKP97ruL
+         pfWd39BdAW4caf9EwsZVqwavTSkJg5tfg4ifcG1oKeM6NqNKjWa4MMZT1VZU9Syg611y
+         H4XJwDwBruWO1aCepBxxUQJGtqYwqgrwA3o8sAluX4LEnMn/bfK/qGlqT1ySyt4jLxBg
+         mGX870t4EI7Tt8p98HFZZzpLaF9FmopZC+Xb0ol/7rNUBBg6S7NGT7dwKePzV7iPkHIH
+         q3oCNwTwiLZsUJbwWPj3JhnKEnmlokMW5MD86wtki4g5JMxJDBTx414w6pDEdmTq3EsE
+         dkNA==
+X-Forwarded-Encrypted: i=1; AJvYcCVFs6cZmxYhtyFH9VxVfR1FMifxwkHy9VkVEe6Oq7HenfIiAf3Q27OYbR+8SPmF/IpRZ0hCM/E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFjq3uxBya9VwhdrudOMVDd/L2BavwS2KNk6fVVLTOPLbP0oHX
+	s36esrak8cIgS0lDTZR8lka1lAsvOthLyoT8ZEdv5K1xbmODXOTy8f+iztdRRAn6GCpCttFG8uL
+	BCMVNWI5iWNb/MwknXJxKu0VNh3LIfrPqqF80d4CzFyRuxGMiTRBgegU=
+X-Google-Smtp-Source: AGHT+IFdIux2xCtFwI+X+/UDsvvVlScy23UF65J2zNj1GVC4lv0CCjLGdoMoDNbuKgtiI8OrR3OPi0YijYbRJGd/OibgL9Kcz2RE
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250223154042.556001-1-lulu@redhat.com> <20250223154042.556001-6-lulu@redhat.com>
- <20250224164312-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20250224164312-mutt-send-email-mst@kernel.org>
-From: Cindy Lu <lulu@redhat.com>
-Date: Wed, 26 Feb 2025 14:16:09 +0800
-X-Gm-Features: AQ5f1JoQwYeVFJ0uSnuf6OMlUOLtzkJzFZrJtoyQ-MQBSJ8pPR3vnflY_UdihLw
-Message-ID: <CACLfguWpj=-Ad3o731xbRdGRr3NT6oEQ67Z-FPBmd93gYEhAXw@mail.gmail.com>
-Subject: Re: [PATCH v6 5/6] vhost: Add new UAPI to support change to task mode
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: jasowang@redhat.com, michael.christie@oracle.com, sgarzare@redhat.com, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org
+X-Received: by 2002:a92:cd8f:0:b0:3d0:405d:e94f with SMTP id
+ e9e14a558f8ab-3d3d1f90759mr21788395ab.17.1740550700768; Tue, 25 Feb 2025
+ 22:18:20 -0800 (PST)
+Date: Tue, 25 Feb 2025 22:18:20 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67beb22c.050a0220.2eba0.0049.GAE@google.com>
+Subject: [syzbot] [bluetooth?] WARNING in hci_send_cmd (2)
+From: syzbot <syzbot+d04bd412c1b0e2f36647@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 25, 2025 at 5:46=E2=80=AFAM Michael S. Tsirkin <mst@redhat.com>=
- wrote:
->
-> better subject:
->
-> vhost: uapi to control task mode (owner vs kthread)
->
->
-> On Sun, Feb 23, 2025 at 11:36:20PM +0800, Cindy Lu wrote:
-> > Add a new UAPI to enable setting the vhost device to task mode.
->
-> better:
->
-> Add a new UAPI to configure the vhost device to use the kthread mode
->
-Thanks MST, will change this
->
-> > The userspace application can use VHOST_SET_INHERIT_FROM_OWNER
-> > to configure the mode
->
-> ... to either owner or kthread.
->
-sure, will change this
-thanks
-cindy
->
-> > if necessary.
-> > This setting must be applied before VHOST_SET_OWNER, as the worker
-> > will be created in the VHOST_SET_OWNER function
-> >
-> > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> > ---
-> >  drivers/vhost/vhost.c      | 24 ++++++++++++++++++++++--
-> >  include/uapi/linux/vhost.h | 18 ++++++++++++++++++
-> >  2 files changed, 40 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > index d8c0ea118bb1..45d8f5c5bca9 100644
-> > --- a/drivers/vhost/vhost.c
-> > +++ b/drivers/vhost/vhost.c
-> > @@ -1133,7 +1133,7 @@ void vhost_dev_reset_owner(struct vhost_dev *dev,=
- struct vhost_iotlb *umem)
-> >       int i;
-> >
-> >       vhost_dev_cleanup(dev);
-> > -
-> > +     dev->inherit_owner =3D true;
-> >       dev->umem =3D umem;
-> >       /* We don't need VQ locks below since vhost_dev_cleanup makes sur=
-e
-> >        * VQs aren't running.
-> > @@ -2278,15 +2278,35 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsig=
-ned int ioctl, void __user *argp)
-> >  {
-> >       struct eventfd_ctx *ctx;
-> >       u64 p;
-> > -     long r;
-> > +     long r =3D 0;
-> >       int i, fd;
-> > +     u8 inherit_owner;
-> >
-> >       /* If you are not the owner, you can become one */
-> >       if (ioctl =3D=3D VHOST_SET_OWNER) {
-> >               r =3D vhost_dev_set_owner(d);
-> >               goto done;
-> >       }
-> > +     if (ioctl =3D=3D VHOST_FORK_FROM_OWNER) {
-> > +             /*inherit_owner can only be modified before owner is set*=
-/
-> > +             if (vhost_dev_has_owner(d)) {
-> > +                     r =3D -EBUSY;
-> > +                     goto done;
-> > +             }
-> > +             if (copy_from_user(&inherit_owner, argp, sizeof(u8))) {
-> > +                     r =3D -EFAULT;
-> > +                     goto done;
-> > +             }
-> > +             /* Validate the inherit_owner value, ensuring it is eithe=
-r 0 or 1 */
-> > +             if (inherit_owner > 1) {
-> > +                     r =3D -EINVAL;
-> > +                     goto done;
-> > +             }
-> > +
-> > +             d->inherit_owner =3D (bool)inherit_owner;
-> >
-> > +             goto done;
-> > +     }
-> >       /* You must be the owner to do anything else */
-> >       r =3D vhost_dev_check_owner(d);
-> >       if (r)
-> > diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-> > index b95dd84eef2d..8f558b433536 100644
-> > --- a/include/uapi/linux/vhost.h
-> > +++ b/include/uapi/linux/vhost.h
-> > @@ -235,4 +235,22 @@
-> >   */
-> >  #define VHOST_VDPA_GET_VRING_SIZE    _IOWR(VHOST_VIRTIO, 0x82,       \
-> >                                             struct vhost_vring_state)
-> > +
-> > +/**
-> > + * VHOST_FORK_FROM_OWNER - Set the inherit_owner flag for the vhost de=
-vice
-> > + *
-> > + * @param inherit_owner: An 8-bit value that determines the vhost thre=
-ad mode
-> > + *
-> > + * When inherit_owner is set to 1:
-> > + *   - The VHOST worker threads inherit its values/checks from
-> > + *     the thread that owns the VHOST device, The vhost threads will
-> > + *     be counted in the nproc rlimits.
-> > + *
-> > + * When inherit_owner is set to 0:
-> > + *   - The VHOST worker threads will use the traditional kernel thread=
- (kthread)
-> > + *     implementation, which may be preferred by older userspace appli=
-cations that
-> > + *     do not utilize the newer vhost_task concept.
-> > + */
-> > +#define VHOST_FORK_FROM_OWNER _IOW(VHOST_VIRTIO, 0x83, __u8)
-> > +
-> >  #endif
-> > --
-> > 2.45.0
->
+Hello,
 
+syzbot found the following issue on:
+
+HEAD commit:    28b04731a38c MAINTAINERS: fix DWMAC S32 entry
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=15507ae4580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b7bde34acd8f53b1
+dashboard link: https://syzkaller.appspot.com/bug?extid=d04bd412c1b0e2f36647
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/e10163bfe6ac/disk-28b04731.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/0bb611c3bfe3/vmlinux-28b04731.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c3fd8dd5fabb/bzImage-28b04731.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d04bd412c1b0e2f36647@syzkaller.appspotmail.com
+
+Bluetooth: MGMT ver 1.23
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 6674 at kernel/workqueue.c:2257 __queue_work+0xcd3/0xf50 kernel/workqueue.c:2256
+Modules linked in:
+CPU: 1 UID: 0 PID: 6674 Comm: syz.2.227 Not tainted 6.14.0-rc3-syzkaller-00154-g28b04731a38c #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
+RIP: 0010:__queue_work+0xcd3/0xf50 kernel/workqueue.c:2256
+Code: ff e8 e1 af 38 00 90 0f 0b 90 e9 b2 fe ff ff e8 d3 af 38 00 eb 13 e8 cc af 38 00 eb 0c e8 c5 af 38 00 eb 05 e8 be af 38 00 90 <0f> 0b 90 48 83 c4 60 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc
+RSP: 0018:ffffc9001b5ef6c8 EFLAGS: 00010087
+RAX: ffffffff81890ac4 RBX: ffff888028dc8000 RCX: 0000000000080000
+RDX: ffffc9000bf59000 RSI: 000000000003158c RDI: 000000000003158d
+RBP: 0000000000000000 R08: ffffffff8188ff24 R09: 0000000000000000
+R10: ffffc9001b5ef7a0 R11: fffff520036bdef5 R12: ffff888027d1c800
+R13: ffff888027d1c9c0 R14: dffffc0000000000 R15: 0000000000000008
+FS:  00007f93037aa6c0(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000110c381f89 CR3: 000000007d25a000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ queue_work_on+0x1c2/0x380 kernel/workqueue.c:2390
+ queue_work include/linux/workqueue.h:662 [inline]
+ hci_send_cmd+0xb6/0x180 net/bluetooth/hci_core.c:3048
+ set_link_security+0x606/0x820 net/bluetooth/mgmt.c:1909
+ hci_mgmt_cmd+0xa1f/0xf10 net/bluetooth/hci_sock.c:1712
+ hci_sock_sendmsg+0x7b8/0x11c0 net/bluetooth/hci_sock.c:1832
+ sock_sendmsg_nosec net/socket.c:718 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:733
+ sock_write_iter+0x2d7/0x3f0 net/socket.c:1137
+ new_sync_write fs/read_write.c:586 [inline]
+ vfs_write+0xacf/0xd10 fs/read_write.c:679
+ ksys_write+0x18f/0x2b0 fs/read_write.c:731
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f930298d169
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f93037aa038 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 00007f9302ba5fa0 RCX: 00007f930298d169
+RDX: 0000000000000007 RSI: 0000400000000000 RDI: 0000000000000008
+RBP: 00007f9302a0e2a0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007f9302ba5fa0 R15: 00007ffeb82b7bb8
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
