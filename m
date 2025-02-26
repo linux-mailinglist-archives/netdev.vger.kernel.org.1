@@ -1,188 +1,114 @@
-Return-Path: <netdev+bounces-169959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-169961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F636A46A28
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 19:50:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6871A46A31
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 19:53:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BE7716D6EB
-	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 18:50:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6588E1889703
+	for <lists+netdev@lfdr.de>; Wed, 26 Feb 2025 18:53:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE83C235362;
-	Wed, 26 Feb 2025 18:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB51236437;
+	Wed, 26 Feb 2025 18:53:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O+4/s9Lh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BtfAtb/F"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E9823372B;
-	Wed, 26 Feb 2025 18:50:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94D5D21D5AE
+	for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 18:53:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740595827; cv=none; b=keBNO0XJmHAZlgJtlUbJV0AVvCfrhpKbqgcc3fI85XSKz2p+KpK0ZuLqoQXXCsxqBIyvbK7IKC8igTuDpsllgjy1uT99jprh0vagtazTd0Razb01y7lPOIwkToI6D25BanGL80dLBE+vFYTS7aWyRwYIKmEQifu9MjGdyR2/jSg=
+	t=1740595993; cv=none; b=PWuvcTnAK9GwhQuaH0hrYuDJ6DM1aK04QUeyER5w2T/rH+7Woaml/O5xBB5v7Xmz3kI0owk5/K5bUlta98xzKbRGyUL2HYneAS4ScIF4fT8QkNKQWFwSO3wDVIpjN+PrJCCEyD+OmHwqDPKO2nXVXZvJaS+7CCzqk1VBAu3dF5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740595827; c=relaxed/simple;
-	bh=GAlBE1MxBLfuNJIdhoKlRlj8/U0KvapKDVttTpAWkto=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rus+tEedpumj0GiHDoqPOWRga+GcrY+LX7Mtvgd75EJbMRr7DxnwGrellJbB5y4Gk4wfXO2InV3WXH0upoESYASBXLrOcDdOxGnLECM7z8fsnSKlrVWDFYTpBFBN2EpXZyzsJYhY14GBTIAADvgcyNsdnDRffkpvHMFOaR+cED0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O+4/s9Lh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAB18C4CED6;
-	Wed, 26 Feb 2025 18:50:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740595827;
-	bh=GAlBE1MxBLfuNJIdhoKlRlj8/U0KvapKDVttTpAWkto=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=O+4/s9LhDb3+Glvl+MPUJGDHbmTaCE5lHu8qIRVou/5uMi4gLs+UsT45p/eEplF13
-	 X6+GbdS5V8QvUDsV1RYxM6s86Z7YRDs3bHSwEI9iMzoEAZxGs1F+fO/qoeo+Sy9+7e
-	 ah3TfR5ac/wpSWNargdVhkYDiz+jljWsfwnoIe4VcaLJU2MVYTL2UCTlXKvzVuHQCf
-	 4+5sX7Kb3qe311nMoFcvPRYbmG/9eypEHJYoCIkEwtbVxPMy6/vXZmltChkJuei9Uu
-	 Y1oStQ5jFCVLR4QsvoDvq9vj1QLyvljO07AT5MvdvcV+500o3dnfPEXtQk33vP0UZA
-	 lxWmXMOf2I8YA==
-Date: Wed, 26 Feb 2025 20:50:22 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: "Ertman, David M" <david.m.ertman@intel.com>
-Cc: "Nikolova, Tatyana E" <tatyana.e.nikolova@intel.com>,
-	"jgg@nvidia.com" <jgg@nvidia.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [iwl-next v4 1/1] iidc/ice/irdma: Update IDC to support multiple
- consumers
-Message-ID: <20250226185022.GM53094@unreal>
-References: <20250225050428.2166-1-tatyana.e.nikolova@intel.com>
- <20250225050428.2166-2-tatyana.e.nikolova@intel.com>
- <20250225075530.GD53094@unreal>
- <IA1PR11MB61944C74491DECA111E84021DDC22@IA1PR11MB6194.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1740595993; c=relaxed/simple;
+	bh=ssXShzytIovRoZES0R5YgADemeudwN/H5A5CejYFd3Q=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=mmbKYIMBTAxsA2DwQPZz6p0uZ414k/2DAuyzA0ajIv2n2wghWLltySkHjF/HoEbo+ux/Y775YFXMEwMAKG5wAK+UUUerVHJLfqShks7m6eG6FNSyc6db1/lcSJgmzsZKjmUQI6LmUaveGHHT9/dAQnznUkDi2ATaX0c0rtFv2ak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BtfAtb/F; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740595990;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=urGEhLujqDagoDvWK5gyybo4cFdKYt3C3On98zVKC1o=;
+	b=BtfAtb/F/63AiDN6E8o0fSWvCq8czYcrz5Bn5HWIS8Ecyiiulm2mkbyo1Y67kbLalUv6Nb
+	/UP9HHNwoWbK6AFmgav2A3EH/N4dkPgOnFj0G7UaQok45vaTw4WXogr1q82eoPB75kHGOx
+	YZ0pwUY4aPHKD3aZXB37qXddkSBYk8c=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-12-dCn1dCgPNaOU2pnQ2ZDLEA-1; Wed,
+ 26 Feb 2025 13:53:08 -0500
+X-MC-Unique: dCn1dCgPNaOU2pnQ2ZDLEA-1
+X-Mimecast-MFC-AGG-ID: dCn1dCgPNaOU2pnQ2ZDLEA_1740595986
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AE89F1801A13;
+	Wed, 26 Feb 2025 18:53:06 +0000 (UTC)
+Received: from pablmart-thinkpadt14gen4.rmtes.csb (unknown [10.44.33.78])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7C0951955DCE;
+	Wed, 26 Feb 2025 18:53:03 +0000 (UTC)
+Date: Wed, 26 Feb 2025 19:53:00 +0100 (CET)
+From: Pablo Martin Medrano <pablmart@redhat.com>
+To: Petr Machata <petrm@nvidia.com>
+cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+    Shuah Khan <shuah@kernel.org>, Petr Machata <petrm@nvidia.com>
+Subject: Re: [PATCH net v2] selftests/net: big_tcp: return xfail on slow
+ machines
+In-Reply-To: <87zfiagojj.fsf@nvidia.com>
+Message-ID: <3e35d85e-c136-f87e-a215-f2e9ccd43490@redhat.com>
+References: <23340252eb7bbc1547f5e873be7804adbd7ad092.1739983848.git.pablmart@redhat.com> <87zfiagojj.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <IA1PR11MB61944C74491DECA111E84021DDC22@IA1PR11MB6194.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Wed, Feb 26, 2025 at 05:36:44PM +0000, Ertman, David M wrote:
-> > -----Original Message-----
-> > From: Leon Romanovsky <leon@kernel.org>
-> > Sent: Monday, February 24, 2025 11:56 PM
-> > To: Nikolova, Tatyana E <tatyana.e.nikolova@intel.com>
-> > Cc: jgg@nvidia.com; intel-wired-lan@lists.osuosl.org; linux-
-> > rdma@vger.kernel.org; netdev@vger.kernel.org; Ertman, David M
-> > <david.m.ertman@intel.com>
-> > Subject: Re: [iwl-next v4 1/1] iidc/ice/irdma: Update IDC to support multiple
-> > consumers
-> > 
-> > On Mon, Feb 24, 2025 at 11:04:28PM -0600, Tatyana Nikolova wrote:
-> > > From: Dave Ertman <david.m.ertman@intel.com>
-> > >
-> > > To support RDMA for E2000 product, the idpf driver will use the IDC
-> > > interface with the irdma auxiliary driver, thus becoming a second
-> > > consumer of it. This requires the IDC be updated to support multiple
-> > > consumers. The use of exported symbols no longer makes sense because it
-> > > will require all core drivers (ice/idpf) that can interface with irdma
-> > > auxiliary driver to be loaded even if hardware is not present for those
-> > > drivers.
-> > 
-> > In auxiliary bus world, the code drivers (ice/idpf) need to created
-> > auxiliary devices only if specific device present. That auxiliary device
-> > will trigger the load of specific module (irdma in our case).
-> > 
-> > EXPORT_SYMBOL won't trigger load of irdma driver, but the opposite is
-> > true, load of irdma will trigger load of ice/idpf drivers (depends on
-> > their exported symbol).
-> > 
-> > >
-> > > To address this, implement an ops struct that will be universal set of
-> > > naked function pointers that will be populated by each core driver for
-> > > the irdma auxiliary driver to call.
-> > 
-> > No, we worked very hard to make proper HW discovery and driver autoload,
-> > let's not return back. For now, it is no-go.
-> 
-> Hi Leon,
-> 
-> I am a little confused about what the problem here is.  The main issue I pull
-> from your response is: Removing exported symbols will stop ice/idpf from
-> autoloading when irdma loads.  Is this correct or did I miss your point?
 
-It is one of the main points.
 
-> 
-> But, if there is an ice or idpf supported device present in the system, the
-> appropriate driver will have already been loaded anyway (and gone through its
-> probe flow to create auxiliary devices).  If it is not loaded, then the system owner
-> has either unloaded it manually or blacklisted it.  This would not cause an issue
-> anyway, since irdma and ice/idpf can load in any order.
+On Tue, 25 Feb 2025, Petr Machata wrote:
 
-There are two assumptions above, which both not true.
-1. Users never issue "modprobe irdma" command alone and always will call
-to whole chain "modprobe ice ..." before.
-2. You open-code module subsystem properly with reference counters,
-ownership and locks to protect from function pointers to be set/clear
-dynamically.
+> Due to all the &&'s peppered down there, do_test() only gets called at
+> most once, so it's OK in this case.
 
-> 
-> > 
-> > <...>
-> > 
-> > > +/* Following APIs are implemented by core PCI driver */
-> > > +struct idc_rdma_core_ops {
-> > > +	int (*vc_send_sync)(struct idc_rdma_core_dev_info *cdev_info, u8
-> > *msg,
-> > > +			    u16 len, u8 *recv_msg, u16 *recv_len);
-> > > +	int (*vc_queue_vec_map_unmap)(struct idc_rdma_core_dev_info
-> > *cdev_info,
-> > > +				      struct idc_rdma_qvlist_info *qvl_info,
-> > > +				      bool map);
-> > > +	/* vport_dev_ctrl is for RDMA CORE driver to indicate it is either
-> > ready
-> > > +	 * for individual vport aux devices, or it is leaving the state where it
-> > > +	 * can support vports and they need to be downed
-> > > +	 */
-> > > +	int (*vport_dev_ctrl)(struct idc_rdma_core_dev_info *cdev_info,
-> > > +			      bool up);
-> > > +	int (*request_reset)(struct idc_rdma_core_dev_info *cdev_info,
-> > > +			     enum idc_rdma_reset_type reset_type);
-> > > +};
-> > 
-> > Core driver can call to callbacks in irdma, like you already have for
-> > irdma_iidc_event_handler(), but all calls from irdma to core driver must
-> > be through exported symbols. It gives us race-free world in whole driver
-> > except one very specific place (irdma_iidc_event_handler).
-> 
-> I am confused here as well.  Calling a function through an exported symbol,
-> or calling the same function from a function pointer should not affect the
-> generation of a race condition, as the same function is being called.
-> What is inherently better about an exported symbol versus a function
-> pointer when considering race conditions?
+Actually do_test() do always returns 0, so it gets called all times in the
+code. check_err is setting RET and keeping it at the failing return
+value, so check_err is always returning error after the first error
 
-Exported symbol guarantees that function exists in core module. Module
-subsystem will ensure that core module is impossible to unload until all
-users are gone. Function pointer has no such guarantees.
+If I force the error by injecting in do_test():
 
-> 
-> Also, why is calling a function pointer from the irdma module ok, but calling
-> one from the core module not?
+  if [ $gw_tso = off -a $cli_tso = on ]; then
+    check_err 1 "forced to fail when GW_GSO is off and CLI GSO is on"
+  else
+    check_err $ret_check_counter "fail on link1"
+  fi
 
-Because we need to make sure that core module doesn't disappear while
-irdma executes its flow. The opposite is not true because core module
-controls irdma devices and aware than irdma module is loaded/unloaded.
+The output is:
 
-Thanks
+  Testing for BIG TCP:
+        CLI GSO | GW GRO | GW GSO | SER GRO
+  TEST: on        on       on       on                         [ OK ]
+  TEST: on        off      on       off                        [ OK ]
+  TEST: off       on       on       on                         [ OK ]
+  TEST: on        on       off      on                         [FAIL]
+          forced to fail when GW_GSO is off and CLI GSO is on
+  TEST: off       on       off      on                         [FAIL]
+          forced to fail when GW_GSO is off and CLI GSO is on
+  ***v4 Tests Done***
 
-> 
-> Again - Thank you for the review, and if I completely missed your points, please let me know!
-> 
-> Thanks
-> DaveE
-> 
-> > 
-> > Thanks
-> 
-> 
+So setting RET at the end of do_test is needed indeed.
+
 
