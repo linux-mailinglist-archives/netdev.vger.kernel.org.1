@@ -1,126 +1,92 @@
-Return-Path: <netdev+bounces-170202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBF86A47C34
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 12:29:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35DB6A47C38
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 12:30:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CE5F189201D
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 11:27:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C1537A9463
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 11:26:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A77022B8BD;
-	Thu, 27 Feb 2025 11:26:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 732AC22CBC8;
+	Thu, 27 Feb 2025 11:26:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ug0Unz01"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WO4VkYtb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3AEA22AE7F;
-	Thu, 27 Feb 2025 11:26:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F7DD22C35C
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 11:26:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740655610; cv=none; b=FXmuTHQ8Og5Klfz/Ei/CKcxvQZ8MTgZwiTrvo0BNNTot7ZsG2+Aiqc0PFooQjRvdqLumNY56at2mQHzwgos6z7PEl2FOLlrM9ZOmv1JIBLIvBB4U1H+M6x7m6nW2c5LEfthDDXdLfF/NicG3s8dpDxQ+T9SRNFrgOBRogdE6jQw=
+	t=1740655611; cv=none; b=aqmzkpP/mvPkWyFU6KQEMMobdNOOr9VFd5teFKzbCrezz1oplfr2m5pyz60UtoRXqYEoQdkoe7VlH0KUmvpJuHTbQMWoowec9IELYZ34ki1sciXy9T9xr41vXbTU/nBCm6Xjq3elBrcSaAf5/nrdD1EpG1ojHlyoxtfyqOAGS+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740655610; c=relaxed/simple;
-	bh=9f1LYLjtUld/AXdeeP1yoNxjoDC7B7LiPpoVoZbktfo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Fg5iMvTLPAcfCnHHLWbt5UUuiTY33uWr9O+hoZ52dSpAvUNx0cyaaZje05K+9PhQpyH4HH7zUt8aIGiamYp6YJSniycSeUTLWXKA/dnIwIKVxTn4RsfgOd0YaZn3pkiraaH0LLUgv1EvY3a6oCTOY3b0lmaV6nfr8QTtbqLjsa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ug0Unz01; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-38f504f087eso550890f8f.1;
-        Thu, 27 Feb 2025 03:26:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740655607; x=1741260407; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UgzSOC+sOCHJ8teJeXSltABfhwmnvmqFPoVaHnhTSP0=;
-        b=Ug0Unz01bFqp15ZsWtVRc6ZyMw6G9jd/Aj5Iaw1mKMXsICjPiCaDsXpRMVHxvZvGP5
-         2KgKbwItBORlKt68X8b0z1t2P2O1v+AhctcsQ2FgpJWUt2s2w6hV2Mef2VuMDcnFPN4O
-         xe82oOExw1pn30104GwjtAbRW6SihBQrHmwFIaym2Nj6CyeAwOIiZS1FvDVpqOdEmTSd
-         2X52H53AnWD8oT0l0WIq5kWZvrsb3JRYuzdskpIX84gF9tbaF+03F3d3PsaAj01gosJm
-         BrpPj4U/5R9LYuq9n6N7osDF2AT4CP47gCKDcEcCSoqjNT0T9fVWIxopFratHJl2PhWj
-         jt5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740655607; x=1741260407;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UgzSOC+sOCHJ8teJeXSltABfhwmnvmqFPoVaHnhTSP0=;
-        b=FQZJDfdabQRf48PNtSAx98SX0gjQI23fSgZVEKcboP9a/R2GQL1OjGQXuNFTX1N/LO
-         coRrBYsYLOkPFYw5bgVb0LSAy3GJUolrNJmNAwN5CF2TVo3FjguhPlskjycNplLJTAvP
-         Gd5is/eV2DJpAgWi8YbSBXUwSr7tgL+W9zPwoMNkH3v1O3OicbDAYmgzK8/tt3wh8Nms
-         Q8ttMANCF9fM3VhtvQvZrGnFd0zFG2/DA6yRAJCKvZ7EHAVjl1Q0x+HsnGD/giPCSt1+
-         I/HY21vZTDZgkWUm0CzsmV1va8NqYI3Lkk5eg/iMsIkTRMX1cTtt3AOeNGSVBrUfSXpf
-         +LOg==
-X-Forwarded-Encrypted: i=1; AJvYcCUmUgXUIvO5RjGlQCkqF+PZgLHvRE+qfLtvvLH1VIJQk8u1f84H9ndb+rJS44FVk3RNKXKzqZI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqDX9wFSFg5Akp4XrWkpVrfA4CjFzDT1CHuZS2CNHJhCNW6tzd
-	pyg0ZXa906j+YmWKtve2T0mkkjHcJgrLsX5tRjQBkvpeg76zj48s
-X-Gm-Gg: ASbGncu6ZsdQV3CbUcyBQjQSG5oQ812xZuUbeKFwT7xHvEb7kESp/B7Y1Anh0uS31sZ
-	y7Rmgx9WBJ6Gg77vyFl1aqjo2umyoNplUd7SFIaMzUx6XxPX+BEH0YWCwjQReiRbm3cG/7r4FVq
-	BLYQ5kNLL9owWmMsH0e8Bbeb5at/Rgzez75+KVsMQMqr+nGTbve8S134r1yKe274L2iu2FQEbgq
-	Orcx1hi95sT9RqkcqroDn1iv3iqvO5+UlWxjkagG5yzovuEqj5wkwncaFqhSDQu+8Jb9dbXHUGt
-	PiD2utKyIWcIqmd/gmkSi3NqWklT1v+yuII2KT4nyA5V7u8BudShY69XU+5tM2NfZDQT5A3Zdxr
-	0Ug5Hk+Yg27z2lfDv8T4=
-X-Google-Smtp-Source: AGHT+IHiRtWpGwxsC8E9LOk1wb2YniA1kHMY2QcXCFLAYxAbgmaT3LsvcBxBcYFDO0pnhH3J/e17iw==
-X-Received: by 2002:a5d:6d86:0:b0:38f:231a:635e with SMTP id ffacd0b85a97d-390d4f42f64mr6393841f8f.25.1740655607025;
-        Thu, 27 Feb 2025 03:26:47 -0800 (PST)
-Received: from labdl-itc-sw06.tmt.telital.com (static-82-85-31-68.clienti.tiscali.it. [82.85.31.68])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390e47b7a73sm1757685f8f.50.2025.02.27.03.26.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Feb 2025 03:26:46 -0800 (PST)
-From: Fabio Porcedda <fabio.porcedda@gmail.com>
-To: Oliver Neukum <oliver@neukum.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	=?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>
-Cc: netdev@vger.kernel.org,
-	Daniele Palmas <dnlplm@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net-next 3/3] net: usb: cdc_mbim: fix Telit Cinterion FE990A name
-Date: Thu, 27 Feb 2025 12:24:41 +0100
-Message-ID: <20250227112441.3653819-4-fabio.porcedda@gmail.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250227112441.3653819-1-fabio.porcedda@gmail.com>
-References: <20250227112441.3653819-1-fabio.porcedda@gmail.com>
+	s=arc-20240116; t=1740655611; c=relaxed/simple;
+	bh=joa65lQgJqepjK/oan+yreZVBckdZfznLoJjDlT+9+c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d9aJXQ49gvGAA2m40Qlm5d0P6JErWgG/wDq1DzfRthQK1TrCEPLfd8uiOJeoSyxVlxlsP2SRsi30iLz5CF4BLijis74vPPdpzIzAqCJfK2xlO0mVll6aFqsy/vNz6rHshyBFLVpMcTbmkVpcejOMGcQmuZ6CNCRvoOgjwRlVneg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WO4VkYtb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81A4FC4CEE8;
+	Thu, 27 Feb 2025 11:26:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740655610;
+	bh=joa65lQgJqepjK/oan+yreZVBckdZfznLoJjDlT+9+c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WO4VkYtbDvggp456HFQDWq+opgnr0uRB+sXmlxZC4c9FyKa0xULdPloHbUjSC0Fr5
+	 a6AgxefGgKtTmoyFfvol7YrlLLBwC3KMCCnOJUr8hEog+mUHGZIB5ZY/0PF4TcdQAQ
+	 7ZryLiw1CC36BMwf+/inL7cH73ps7uQCcn1lkWVePj4mYYacKXaFBidRAFgnkhI+51
+	 oeDD411JqxV/um6XzmqED41Q6GibghbsSMjs07/ITRjftrqEwkWwwMhYGZVTgfIrUV
+	 TZkHE9poo6c15xmK4x6leckJ4rrqAe8ScRFqXoedHY8MWZ05M5kI4LdQhmqRl4fKhH
+	 Y+8xXCCaHjRKg==
+Date: Thu, 27 Feb 2025 11:26:47 +0000
+From: Simon Horman <horms@kernel.org>
+To: Grzegorz Nitka <grzegorz.nitka@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: Re: [PATCH iwl-next v2] ice: Allow 100M speed for E825C SGMII device
+Message-ID: <20250227112647.GF1615191@kernel.org>
+References: <20250224205924.2861584-1-grzegorz.nitka@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250224205924.2861584-1-grzegorz.nitka@intel.com>
 
-The correct name for FE990 is FE990A so use it in order to avoid
-confusion with FE990B.
+On Mon, Feb 24, 2025 at 09:59:24PM +0100, Grzegorz Nitka wrote:
+> Add E825C 10GbE SGMII device to the list of devices supporting 100Mbit
+> link mode. Without that change, 100Mbit link mode is ignored in ethtool
+> interface. This change was missed while adding the support for E825C
+> devices family.
+> 
+> Testing hints (please note, for previous version, 100baseT/Full entry
+> was missing):
+> [root@localhost]# ethtool eth3
+> Settings for eth3:
+>         Supported ports: [ TP ]
+>         Supported link modes:   100baseT/Full
+>                                 1000baseT/Full
+>                                 10000baseT/Full
+>         Supported pause frame use: Symmetric
+>         Supports auto-negotiation: Yes
+>         Supported FEC modes: None
+>         Advertised link modes:  100baseT/Full
+>                                 1000baseT/Full
+>                                 10000baseT/Full
+> 	...
+> 
+> Fixes: f64e189442332 ("ice: introduce new E825C devices family")
+> Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Fabio Porcedda <fabio.porcedda@gmail.com>
----
- drivers/net/usb/cdc_mbim.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/usb/cdc_mbim.c b/drivers/net/usb/cdc_mbim.c
-index 88921c13b629..dbf01210b0e7 100644
---- a/drivers/net/usb/cdc_mbim.c
-+++ b/drivers/net/usb/cdc_mbim.c
-@@ -665,7 +665,7 @@ static const struct usb_device_id mbim_devs[] = {
- 	  .driver_info = (unsigned long)&cdc_mbim_info_avoid_altsetting_toggle,
- 	},
- 
--	/* Telit FE990 */
-+	/* Telit FE990A */
- 	{ USB_DEVICE_AND_INTERFACE_INFO(0x1bc7, 0x1081, USB_CLASS_COMM, USB_CDC_SUBCLASS_MBIM, USB_CDC_PROTO_NONE),
- 	  .driver_info = (unsigned long)&cdc_mbim_info_avoid_altsetting_toggle,
- 	},
--- 
-2.48.1
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
