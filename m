@@ -1,63 +1,59 @@
-Return-Path: <netdev+bounces-170356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4C7FA484D5
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 17:26:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF264A484F4
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 17:30:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6963C3BB9FC
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:21:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1660D18921D7
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:23:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E20631AA1DA;
-	Thu, 27 Feb 2025 16:21:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B94E514F9F4;
+	Thu, 27 Feb 2025 16:23:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j8RDKIiO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WbwZe4ej"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69308F40;
-	Thu, 27 Feb 2025 16:21:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 957F11A9B29
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 16:23:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740673305; cv=none; b=khhJE10ShYJlKjdu3E7uGMjC+HGL18tQkbsLbzc5v06kwkdKrNvNvdlVk+S4uWg6xCKxP8jzDTMQJaoPtajbEl79J+yRNaQTAIBAMRt9+tcQy1VWbEXoGubjyG8rdAg1ajqGyBn2QUfPqPki/ikNLhjGHAA46vFHGFUWVXVcRsE=
+	t=1740673398; cv=none; b=nbB/rh0YjZtaWNypS5lQ2zvww7AXjS9pWUalkpLNXUzA0EeTuVEvhE/MUnMXUekbhm0p1x63XxnkQ5pbfGgztYsKonfnZCEfC+AXjroBW8S/Gl5vBjRnFAMpPcR/DfS7pxaRHqoY9DxiAR3mPSONLxUNjdDC6EfkGr5Dvdy2f8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740673305; c=relaxed/simple;
-	bh=sQlGGH25GF/utpCa8TrdW+aJYJDmWgb1GYvuLn4jCAs=;
+	s=arc-20240116; t=1740673398; c=relaxed/simple;
+	bh=FyT0kqJbEPCvtf7m4BO+xl6iAo8J2v/GA5IY4v/8OAk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XVn0mxhFfqFe7SiphAp3KAeDwyGDWkcujW/dfgF7G12mZavzjfcSk3sACj9kSRJIlkN7RfvkSidMtzfnI2uu4XTGx4guJKTaed/nHtUsDmvIr+B4k6luxK6HqjdXe7YqhqM/4HQFIJt3lDWvJb+W4IDQHFr3VXUAaaWrko5TSOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j8RDKIiO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 560E8C4CEDD;
-	Thu, 27 Feb 2025 16:21:42 +0000 (UTC)
+	 MIME-Version:Content-Type; b=FpK602HPh9Oe/DoSumUR2aPNQQUadBIR7ltL36DLEeuCLsD9hEQD4Lb5WRlkNclN4gcKq0NmLKRU7IK6xQwXj6cYwN/C1Ovh2d2Z0W7tTh8jZQjETeGBS7g8mLmHaxS8aRjy6ICxzexP1VC1ng5e0BLOVx7OkKmjZEoRwymYvQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WbwZe4ej; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FF58C4CEDD;
+	Thu, 27 Feb 2025 16:23:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740673303;
-	bh=sQlGGH25GF/utpCa8TrdW+aJYJDmWgb1GYvuLn4jCAs=;
+	s=k20201202; t=1740673398;
+	bh=FyT0kqJbEPCvtf7m4BO+xl6iAo8J2v/GA5IY4v/8OAk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=j8RDKIiOyCSaYuBH82JphMKE2yS4OtBZVgpEa4tsNDfprl+ZiQ4F6hQ0colXqNNG5
-	 aNnHt6cPHK4gffZEMubVgqAJwCq24wsNqo+oza643jKiTF2+k1b/jk1V4xrP5Zv7Ws
-	 6cPWvWs59d/erzBLa5Z5wK/OL8akFXlGoGV5NCFwR8/KPRczckOzN0JSFL1zS0OXa8
-	 +Wl6KCYZyYuWfPUAXrc+TDQHtxHq2PCbWbozMauTar4/6HpPelyIeTv/WB/lfkjp8I
-	 /o70+GI34UHbh5p7pxKkYny8PDcEfU++Equ10mKQncWS7n0OIKf7PQjYA/YQV3L3eY
-	 Vq6Gn/Cs9PIcg==
-Date: Thu, 27 Feb 2025 08:21:41 -0800
+	b=WbwZe4eju/JVxAeqOBx+qZlmsC+Fd85DnhWxTdrtreyh8Gp2K/yBEFvWGmcl2MZcX
+	 7V3Hl8YW+ZazF+USvVLm0adhAZ+/eO9SZ9mG36ep6AljYdSb8rW6dnhjVndd/liPXx
+	 cHYerNls59iavnXNUMLqCWlKPS6z7AOtmW/9mF/JoJEw19AZz6X8JVK7dzyLat/8N+
+	 duGtMTUxhBPYZYctXzdBt2R2xmQUuSYALi4uzGlsfXK8bKCM99LJphiG+kEfogHF4x
+	 jLdYig27PBiBQ2rc0UjddYIUf2KSXfO2mriKZF7nugl6SCPeDTuO0QhN5vVgxAh2Ul
+	 oVjR2XkT3oB7Q==
+Date: Thu, 27 Feb 2025 08:23:16 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>, Shuah Khan
- <shuah@kernel.org>, sd@queasysnail.net, ryazanov.s.a@gmail.com, Andrew Lunn
- <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, Xiao Liang
- <shaw.leon@gmail.com>, Andrew Morton <akpm@linux-foundation.org>,
- steffen.klassert@secunet.com, antony.antony@secunet.com,
- willemdebruijn.kernel@gmail.com, David Ahern <dsahern@kernel.org>, Andrew
- Lunn <andrew@lunn.ch>, Shuah Khan <skhan@linuxfoundation.org>
-Subject: Re: [PATCH net-next v20 00/25] Introducing OpenVPN Data Channel
- Offload
-Message-ID: <20250227082141.3513de3d@kernel.org>
-In-Reply-To: <20250227-b4-ovpn-v20-0-93f363310834@openvpn.net>
-References: <20250227-b4-ovpn-v20-0-93f363310834@openvpn.net>
+To: "Xin Tian" <tianx@yunsilicon.com>
+Cc: <netdev@vger.kernel.org>, <leon@kernel.org>, <andrew+netdev@lunn.ch>,
+ <pabeni@redhat.com>, <edumazet@google.com>, <davem@davemloft.net>,
+ <jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>,
+ <weihg@yunsilicon.com>, <wanry@yunsilicon.com>, <horms@kernel.org>,
+ <parthiban.veerasooran@microchip.com>, <masahiroy@kernel.org>
+Subject: Re: [PATCH net-next v6 00/14] xsc: ADD Yunsilicon XSC Ethernet
+ Driver
+Message-ID: <20250227082316.5bd669a3@kernel.org>
+In-Reply-To: <20250227082558.151093-1-tianx@yunsilicon.com>
+References: <20250227082558.151093-1-tianx@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,23 +63,33 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 27 Feb 2025 02:21:25 +0100 Antonio Quartulli wrote:
-> After some time of struggle trying to fix all hidden bugs that Sabrina
-> has found...here is v20!
-
-> Please note that some patches were already reviewed/tested by a few
-> people. These patches have retained the tags as they have hardly been
-> touched.
-> (Due to the amount of changes applied to the kselftest scripts, I dropped
-> the Reviewed-by Shuah Khan tag on that specific patch)
+On Thu, 27 Feb 2025 16:26:36 +0800 Xin Tian wrote:
+> The patch series adds the xsc driver, which will support the YunSilicon
+> MS/MC/MV series of network cards. These network cards offer support for
+> high-speed Ethernet and RDMA networking, with speeds of up to 200Gbps.
 > 
-> The latest code can also be found at:
+> The Ethernet functionality is implemented by two modules. One is a
+> PCI driver(xsc_pci), which provides PCIe configuration,
+> CMDQ service (communication with firmware), interrupt handling,
+> hardware resource management, and other services, while offering
+> common interfaces for Ethernet and future InfiniBand drivers to
+> utilize hardware resources. The other is an Ethernet driver(xsc_eth),
+> which handles Ethernet interface configuration and data
+> transmission/reception.
 > 
-> https://github.com/OpenVPN/ovpn-net-next
+> - Patches 1-7 implement the PCI driver
+> - Patches 8-14 implement the Ethernet driver
+> 
+> This submission is the first phase, which includes the PF-based Ethernet
+> transmit and receive functionality. Once this is merged, we will submit
+> additional patches to implement support for other features, such as SR-IOV,
+> ethtool support, and a new RDMA driver.
 
-coccicheck has a new nitpick:
-
-drivers/net/ovpn/netlink.c:439:11-59: WARNING avoid newline at end of message in NL_SET_ERR_MSG_FMT_MOD
+drivers/net/ethernet/yunsilicon/xsc/pci/cmdq.c:525:14-15: WARNING: *_pool_zalloc should be used for mailbox -> buf, instead of *_pool_alloc/memset
+drivers/net/ethernet/yunsilicon/xsc/pci/hw.c:40:17-24: WARNING: vzalloc should be used for board_info [ i ], instead of vmalloc/memset
+drivers/net/ethernet/yunsilicon/xsc/net/main.c:1946:21-22: WARNING kvmalloc is used to allocate this memory at line 1933
+drivers/net/ethernet/yunsilicon/xsc/net/main.c:1968:22-28: ERROR: adapter is NULL but dereferenced.
+drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_tx.c:284:14-21: WARNING: Unsigned expression compared with zero: num_dma < 0
 -- 
 pw-bot: cr
 
