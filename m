@@ -1,66 +1,94 @@
-Return-Path: <netdev+bounces-170432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 878E7A48B32
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 23:17:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EE2DA48B3C
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 23:18:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EC207A5A9C
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 22:16:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03BAF3B5103
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 22:18:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4096D26B975;
-	Thu, 27 Feb 2025 22:17:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 539C2271824;
+	Thu, 27 Feb 2025 22:18:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UUs1oId+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WxzPfHti"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C89225A48
-	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 22:17:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2ACC270EC8;
+	Thu, 27 Feb 2025 22:18:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740694636; cv=none; b=ndmOGw0E5uBd4SYnDk7873EE5GKx4pjqkHF4PyIkFZ+AlO7GayxPQGct/AtimqTedNEaKEqd8Y3ZNGWdr+ARw4hLHY2WXr5+UHKXSuGL73vwFoidPh2GgdK9SRksqpCaEZZ/4e0pba+HoerBFQvXPSLGvm9KCumXulOvoZdmRZo=
+	t=1740694717; cv=none; b=Wpe7eefSSWBab9W9uHbqsJ7DgdPspDHPPdWQUdsKnog4ZZvJ2lQcCJaxKWGtwnJ54iRU6QZcNlFjId91HdnmwuIikXV05eTCAUCcn+1GJX5ckDgyojY+gZWyn4lLU3UBOdBseoRYxvN3HbcAxX4jvZW3zDVU5BrFACDgxyqTkxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740694636; c=relaxed/simple;
-	bh=gWlIQIEltm4pFVT0HLHXO6ICUNqyNhHaVSCNz8lff8Y=;
+	s=arc-20240116; t=1740694717; c=relaxed/simple;
+	bh=3yponD+CiJwDA+nxNRj1pPskZgBxg0bhUnaZKgP1MOk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y+SE3kPddWOpnkEDfvXCgdOB2s5HK5TF8lzaX3eoq3+lnM+b3mICpErTMnXhl70iBNmXyyqHKMBXtBCRUFGxBFXkKOyXdf3p5d1xVVMpj/P4RSW2+BlmblhDv3DmxFmIkrlkD7nlcXlXufUzBLW5ufVjTYFJ91pXW7OacLaLZRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UUs1oId+; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=EE25XAsvhnFPgPLYy6dng4+2igaG0tj5/voU58VKW+w=; b=UUs1oId+Z3hGUPkm+ucjt98CV+
-	psoOP9GEioeCf4nrItaN615xIiMApAJvd2LS7kYvsgooKqOJEYq88LAKDYnTOTXDlckJgd7IWUam4
-	WPdVee/CYkaIWtTHsTHsRAxVGygdj9D6COxC0358AIPapodzCVBFqc3M3VZBfvHDcy0s=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tnmBm-000jkS-MQ; Thu, 27 Feb 2025 23:17:06 +0100
-Date: Thu, 27 Feb 2025 23:17:06 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jon Hunter <jonathanh@nvidia.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Thierry Reding <treding@nvidia.com>
-Subject: Re: [PATCH RFC net-next 3/5] net: stmmac: remove unnecessary
- stmmac_mac_set() in stmmac_release()
-Message-ID: <dca35d31-e9af-4453-be2d-cae3a86a8ac9@lunn.ch>
-References: <Z8B-DPGhuibIjiA7@shell.armlinux.org.uk>
- <E1tnfRo-0057SL-Dz@rmk-PC.armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZTxA7glKjRHV1UwMlad/J1MGI1vHMTVvK+2HH5smFvjb8VraRr/67VxcMKOgdxH2KQwzmTiXxQXQcL0TOb6k4q0l9skIufjhevWBSqu9ZNE5+JM0OUYdf+KDhAPYEP39e0//O2BrzRXApJlR75YbnRpEu87HmQAxf+IlPQ33HZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WxzPfHti; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-22334203781so38403505ad.0;
+        Thu, 27 Feb 2025 14:18:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740694715; x=1741299515; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YlJns6J71zIa/bPLqRLBXvgjI74JYz0SciR5Tq+4TIM=;
+        b=WxzPfHtibi9SSMXFtTrkO2KwrqM0wx+bm2+GWUCbrV9X1UjI9mCWul3LIBpbmoOkOZ
+         7yvTPszH8pgnbx7i/4oovOYM4suD8QGHEnT496pt8o2Cwc0lykapJdNeUwVMUI7nzFLv
+         Mo+ZK2dqCyAOsmzqFO3daGFLbRZBcedcuXqcZ0SIbbvWrKcdDPt8Wjk4B3gLHWG2K24t
+         /RaN/wp7W5kDjKUcnuWjMhme2s90Iq2PDB24NAtff31/Je6yDuCxhRzLeAi4n1Wp2Iim
+         nibKtl9FgHuSbv6fZsTk11OFDfCEeiUOQwKW4Bvb6hZ9pkzhVZhrx+KcSKEpBSG+JVw4
+         saDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740694715; x=1741299515;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YlJns6J71zIa/bPLqRLBXvgjI74JYz0SciR5Tq+4TIM=;
+        b=OEPDYHsZwgBcEZlih8v6Hq1jal2NpmzFZeZ0jBglchtoLEcIShjxAs3Qf+wR0bZpZH
+         cxApRQ4UcbLYOaO7YvlTM12k8RhTGYczlqoIylJmCS0IssuejyX+gK66QwxBVBrjXaxa
+         If2iroEpi3H+yRb1JIvSm+y4i9wgW49TCQ/kTHnKS0tdBz9LKNI+LCySOasgIIywGFdQ
+         9IkuwqAxMgQhUlapnXfT5DZkUVWkK9bgL9ol2AlGbiQaCI8pxu0vVjakjBbJci+/6/pT
+         +D4WL7ZB/oGXUlClC+C70ooXH/8ebApIZJjdRRiPame/pxuGJqX2jkqH0r4NPnVWV4mC
+         yHZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU2W7wTbgnFWwujxzSskKbYmCveNrqeBIkNxjj+/AyrrtMAtJbRYAIZhA5+RoBmxVgqcxM=@vger.kernel.org, AJvYcCVdQpL7Tpp+wAbGOqXYc68HH4KdaBmFsJaLQLrHoKrFTvzN9wlMBYI8t6GbgXWUQgjvfGrIjQ4F5o25kdcR@vger.kernel.org, AJvYcCXHJBf0KWGakks5WGBFQBqcUbs8mJt/2JjJTMxce08mthLzOv/Zo8OJ4HHJBVIUNovii1b3oJKo@vger.kernel.org, AJvYcCXIZwBtk/1nMgOFWAnHkBRXxhWa3vpzlTbRDa9/DcsRkF9qEPfftzVgM/INMqWoiy3uUAoAki+UHjsEZpx/I4PR@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIbemmZXw+99EWpu9zLOkU+Jjzgr6pct9frywN4bmUv7/A4uHr
+	8aU/IzgAtktm+fiX9MiJyxHMdiFARyAbAYN3ejDtQr2OFsW9wK4u
+X-Gm-Gg: ASbGnctItoq0fQXYNTqh1lEt0Ir2f5CQpdikkOap6z1BkBxktjW71DfbjX5QJZbKC11
+	gjyLV3yNhRdUBUEyrzO+6I0VGhplS0BtDA0aYAUdf3dvEt7GbNQXLBisy6XcOb1bmTpvq3rJlDx
+	jHEBKV/Dg9eq3XZ8zyAepUXeaTGMM/FREoajqqo/7MgvZeWTipm0iThAZc/NGZXP3UsVAdyESzG
+	jtv+FqNbG50voHIyzMOsxN2/6i/Ay0L7CWSXyvfKAaTwGkjz0N4sLwc08bEYuva4ZSqOSDmNs7q
+	j3YeCAK9r+v4OfE5uYI1mPbx
+X-Google-Smtp-Source: AGHT+IGzZMBsgdbKVV5FmDa83vBtCX6XOQiQ6tfElBlkAjb5jJQbD4pqlBLxu0+RA82taM84mxDquw==
+X-Received: by 2002:a05:6a00:c86:b0:728:15fd:dabb with SMTP id d2e1a72fcca58-734ac428955mr1938550b3a.8.1740694714821;
+        Thu, 27 Feb 2025 14:18:34 -0800 (PST)
+Received: from gmail.com ([98.97.44.1])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-aee7ddf244fsm2048390a12.16.2025.02.27.14.18.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Feb 2025 14:18:33 -0800 (PST)
+Date: Thu, 27 Feb 2025 14:18:24 -0800
+From: John Fastabend <john.fastabend@gmail.com>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: cong.wang@bytedance.com, jakub@cloudflare.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, andrii@kernel.org, eddyz87@gmail.com,
+	mykolal@fb.com, ast@kernel.org, daniel@iogearbox.net,
+	martin.lau@linux.dev, song@kernel.org, yonghong.song@linux.dev,
+	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com,
+	jolsa@kernel.org, shuah@kernel.org, mhal@rbox.co,
+	sgarzare@redhat.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	mrpre@163.com
+Subject: Re: [PATCH bpf-next v1 3/3] selftests/bpf: Add edge case tests for
+ sockmap
+Message-ID: <20250227221824.m3jhsvydk5tb6l2n@gmail.com>
+References: <20250226132242.52663-1-jiayuan.chen@linux.dev>
+ <20250226132242.52663-4-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,17 +97,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E1tnfRo-0057SL-Dz@rmk-PC.armlinux.org.uk>
+In-Reply-To: <20250226132242.52663-4-jiayuan.chen@linux.dev>
 
-On Thu, Feb 27, 2025 at 03:05:12PM +0000, Russell King (Oracle) wrote:
-> stmmac_release() calls phylink_stop() and then goes on to call
-> stmmac_mac_set(, false). However, phylink_stop() will call
-> stmmac_mac_link_down() before returning, which will do this work.
-> Remove this unnecessary call.
+On 2025-02-26 21:22:42, Jiayuan Chen wrote:
+> Add edge case tests for sockmap.
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> ---
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: John Fastabend <john.fastabend@gmail.com>
 
-    Andrew
+>  .../selftests/bpf/prog_tests/sockmap_basic.c  | 57> +
+>  void test_sockmap_basic(void)
+>  {
+>  	if (test__start_subtest("sockmap create_update_free"))
+> @@ -1108,4 +1163,6 @@ void test_sockmap_basic(void)
+>  		test_sockmap_skb_verdict_vsock_poll();
+>  	if (test__start_subtest("sockmap vsock unconnected"))
+>  		test_sockmap_vsock_unconnected();
+> +	if (test__start_subtest("sockmap with unix and close"))
+> +		test_sockmap_with_close_on_write(AF_UNIX, SOCK_STREAM);
+
+Might also be worth running these with other types? No bug was
+fixed there but still testing close while writing is useful
+for testing RCU paths in TCP/UDP.
+
+Fine as a follow up patch IMO.
 
