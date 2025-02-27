@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-170076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC7AEA47342
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 04:00:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1796CA47343
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 04:00:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FDFC16F44B
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 03:00:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AA1016B9C2
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 03:00:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0314B1A4F2F;
-	Thu, 27 Feb 2025 03:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48D10187FEC;
+	Thu, 27 Feb 2025 03:00:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k5+570Ze"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oTRndnK/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E831A2554
-	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 03:00:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23964187858
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 03:00:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740625201; cv=none; b=DXlcPY5B9jJJxYwtbxQOwZJU/rqsTF7/YSPqb7DkGUkrVw+kooeU6839nF8PKN63QMs/yTxnqs6tggi1Z44XNVmew1AQAO55rfzwR3bDIQyfSA7n/8RFvC/antiRripXy01pOSvz2Lt7ZWyQK94NzJyZamI/Nwww7VsRADDyY+A=
+	t=1740625206; cv=none; b=m4xfzhhchppXbSFJEPQOWqzYg+s6iqts0XiVq7tDiV7TndfxaJtQo63MkBoOncYUYAcwxmkvsyjf1Ck60C4k0e4KxknK+IaVHnxu2y4e3z38qLNHDN2SU2YyARqHIGOeOmfAoYB85+OxukV8/RMmsLP4cwIuaS8wsKivDzf70nQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740625201; c=relaxed/simple;
-	bh=0jEhcXUWEY+p+LLE4YehWY7Z12DYYMvGfOvio1J4nOo=;
+	s=arc-20240116; t=1740625206; c=relaxed/simple;
+	bh=FeEUK4aoSyO8Z1CWfr2FXTPSv8KqDzg8jhjzPSgK+Ks=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CK9IEwQDfPy8MdlepIrVkmoAVd6pYKEmVYgygT4DONhvy65yEFSXavcqoj8cj4jThth8T0+Ktnr1vaH74c3iIcvCbGmByKex0ZHF/+gs0v9SEyhFtsOIUXlmD4VVXFRa5ZLEqwEZJvAoSV860/YQvES1kvrxl07q0jzwfbcHWsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k5+570Ze; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55CE9C4CEEB;
-	Thu, 27 Feb 2025 03:00:01 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=E7Hb1Rbm+62u7n6RGMOgGn4wA1dVAbI/hugefACR2nncUvx9Xp8iRFrvhozhuyq4zDaqwss7OXbhmYK3uzElVftD6qQpmrTkMjuZK806muCk2Bg1fBN36ZETtdFamgqLR3YnuBnZZgrpkAGH6Q8BWO5zaN0HpgvMIk6imSBC8Ow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oTRndnK/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88ECFC4CED6;
+	Thu, 27 Feb 2025 03:00:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740625201;
-	bh=0jEhcXUWEY+p+LLE4YehWY7Z12DYYMvGfOvio1J4nOo=;
+	s=k20201202; t=1740625204;
+	bh=FeEUK4aoSyO8Z1CWfr2FXTPSv8KqDzg8jhjzPSgK+Ks=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=k5+570ZehNn1aZWR1oMztszzzdvP9uFqUpYDFlJ4xwYvZv6y84X3MbRyH2zWZZ7Gu
-	 8BfCJ0AdP2svOi/mGEfDUJCN0qCooYUVjtOh1CqqMnOK29s3q0y6CAx6hZndsF8J61
-	 ergf35GZa1vdSmUK+M+P20WuZQVNkuVtUzOMycDOoVKGq3Ab+BybYyNoQz7V8Geqnn
-	 JCGmiBArDcVigY69FoM6FkIYi9uRqWMvKVT82ld99CPuh70HjE2RxfZDryi3+AupZC
-	 zAuTv2+4VPjXE8BgjPVmdxMjHraW2pYFFaIRq6pQ0wuv36ZPgAfV3ugF85o85TvlZm
-	 ew5njZbNnKO+A==
+	b=oTRndnK/p2MZu9FJ1igOqIKE+En6m6jJ+qhTegjYC7M4N2vpUgWnvHXQqM1KykRa0
+	 j4k9eYvZsBKGi6Chb0zpgm010bIn4b/P7BRhYxm9dT9PcCtHGrF1Y/U22hr4tRV24j
+	 U64Pj9Nri5jcDxJuFP9XEAJomZYTEXY8QIcJ9Z+gVem7LBwG9kRo4OLcnmbbE+uZW2
+	 PZPzBrrn7NlO23DJ0/qDGJSsqj9pzw5XgaHaL7KnK43tny2mSL90LyJmD2ToX964OG
+	 26a/4XEy/NkFgqaB8/+tec4iW9BkfN8XVheoV0L3sRLcmIn16aCupj51HWvLzsZLhh
+	 V8ON15vTGH70g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70FD5380CFE6;
-	Thu, 27 Feb 2025 03:00:34 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCBB380CFE6;
+	Thu, 27 Feb 2025 03:00:37 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,62 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] net: Clear old fragment checksum value in
- napi_reuse_skb
+Subject: Re: [PATCH v2 net-next] tcp: be less liberal in TSEcr received while in
+ SYN_RECV state
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174062523299.949564.12243959200939454238.git-patchwork-notify@kernel.org>
-Date: Thu, 27 Feb 2025 03:00:32 +0000
-References: <20250225112852.2507709-1-mheib@redhat.com>
-In-Reply-To: <20250225112852.2507709-1-mheib@redhat.com>
-To: Mohammad Heib <mheib@redhat.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
+ <174062523624.949564.171648574751933546.git-patchwork-notify@kernel.org>
+Date: Thu, 27 Feb 2025 03:00:36 +0000
+References: <20250225171048.3105061-1-edumazet@google.com>
+In-Reply-To: <20250225171048.3105061-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ ncardwell@google.com, kuniyu@amazon.com, horms@kernel.org,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, yonghaoz1994@gmail.com,
+ matttbe@kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 25 Feb 2025 13:28:52 +0200 you wrote:
-> In certain cases, napi_get_frags() returns an skb that points to an old
-> received fragment, This skb may have its skb->ip_summed, csum, and other
-> fields set from previous fragment handling.
+On Tue, 25 Feb 2025 17:10:48 +0000 you wrote:
+> Yong-Hao Zou mentioned that linux was not strict as other OS in 3WHS,
+> for flows using TCP TS option (RFC 7323)
 > 
-> Some network drivers set skb->ip_summed to either CHECKSUM_COMPLETE or
-> CHECKSUM_UNNECESSARY when getting skb from napi_get_frags(), while
-> others only set skb->ip_summed when RX checksum offload is enabled on
-> the device, and do not set any value for skb->ip_summed when hardware
-> checksum offload is disabled, assuming that the skb->ip_summed
-> initiated to zero by napi_reuse_skb, ionic driver for example will
-> ignore/unset any value for the ip_summed filed if HW checksum offload is
-> disabled, and if we have a situation where the user disables the
-> checksum offload during a traffic that could lead to the following
-> errors shown in the kernel logs:
-> <IRQ>
-> dump_stack_lvl+0x34/0x48
->  __skb_gro_checksum_complete+0x7e/0x90
-> tcp6_gro_receive+0xc6/0x190
-> ipv6_gro_receive+0x1ec/0x430
-> dev_gro_receive+0x188/0x360
-> ? ionic_rx_clean+0x25a/0x460 [ionic]
-> napi_gro_frags+0x13c/0x300
-> ? __pfx_ionic_rx_service+0x10/0x10 [ionic]
-> ionic_rx_service+0x67/0x80 [ionic]
-> ionic_cq_service+0x58/0x90 [ionic]
-> ionic_txrx_napi+0x64/0x1b0 [ionic]
->  __napi_poll+0x27/0x170
-> net_rx_action+0x29c/0x370
-> handle_softirqs+0xce/0x270
-> __irq_exit_rcu+0xa3/0xc0
-> common_interrupt+0x80/0xa0
-> </IRQ>
+> As hinted by an old comment in tcp_check_req(),
+> we can check the TSEcr value in the incoming packet corresponds
+> to one of the SYNACK TSval values we have sent.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v3] net: Clear old fragment checksum value in napi_reuse_skb
-    https://git.kernel.org/netdev/net/c/49806fe6e61b
+  - [v2,net-next] tcp: be less liberal in TSEcr received while in SYN_RECV state
+    https://git.kernel.org/netdev/net-next/c/3ba075278c11
 
 You are awesome, thank you!
 -- 
