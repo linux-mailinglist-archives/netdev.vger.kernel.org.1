@@ -1,187 +1,198 @@
-Return-Path: <netdev+bounces-170287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10B17A480D9
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 15:21:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B68DA48170
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 15:35:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC4553A87DA
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 14:19:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A38551883D9A
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 14:22:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C63C235BE2;
-	Thu, 27 Feb 2025 14:18:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 943DB22C35C;
+	Thu, 27 Feb 2025 14:22:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ANlyKDcz"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=ps.report@gmx.net header.b="LJOqE+/6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CFA5235348
-	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 14:18:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A9ED17BA6;
+	Thu, 27 Feb 2025 14:22:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740665907; cv=none; b=o7VKQDumybS//KPwRmzP9cnFA7OhylduRrDYB3lDNcZDUn3lKRnLP5yddF2934gYqvwlnixqRMqIPM7kyUcvLeAC6OiWPasa0EJTydICe5La4BzE5VFCeZH0zPXjFOD4/r8NbbrTQDhej2v8CMdwsttdspGmOiDQ5RJn6Teqftg=
+	t=1740666125; cv=none; b=rBdsaEk0OSAfoHDxWPmSK4Z5HHMbyL5fDQeitNe6K9xS8xgzI3nnq0kZ/qo4eKJMr/iIcPBWDAHdgioHEDYS+4jsy66R0rz+ia7zrOVCLRIB7XVwbv/asj3uc+l7N3be70+1WUJ75XH6SIsOr5fbPVfhbmrnVmnr2TehYyxBXtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740665907; c=relaxed/simple;
-	bh=VLcO+K6nhbLhNSZ0n16zAOBERBengOOksjgBwK2wrV8=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=n9tssTXETAjKjsX7TlHN4YC1duASB9i2U8hXkMPXziMkO2rctz7K0zvrLRUjB2akx3X/H3Gbe73KikC98/joeiSIUTTgilH0gNz/k2+l+3Ne/VKHVN/Nh1GoG0q2LrgYnnvkIYnV6wt/W4dWNjDb5jmvtNsSBKkLy/CHQMmtYzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ANlyKDcz; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-439ac3216dcso7118445e9.1
-        for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 06:18:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1740665903; x=1741270703; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:subject:reply-to:from:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3KjmgTTmGKnNMLEkQ2tYRKgEmMShvtFLmbhC7J1ZseQ=;
-        b=ANlyKDcze0VHBAf2a/p9W1obJzG0dAfLcIWjO4s/hhzCNQsbLhuAc7E5eI4sRKLTVi
-         eE5fk/6oCci1XoGWGB+SQULZJx3gfbzFM31FSs5J26hVI6Wdp0GguBeUqPGMuMPx8XYA
-         PCIxJCpiwfnd+WB1sa+pXJ3zQl7X60LNgoIcx8u4KitTkT+fjlhWdl7w9ju5XHk85TAv
-         CCOg11c0sl9wHI81SABO22ymtNXSBHj1RTRwNery4qB+DvOpPoEDIwri7nSBW8L/0rR7
-         VrSq3UYa9RSKytASafOEKkASDFqZ8ngUdQc4IiIAr5R6VTYVYdkVVNx/QaM+R5gAW1cZ
-         2SJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740665903; x=1741270703;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:subject:reply-to:from:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=3KjmgTTmGKnNMLEkQ2tYRKgEmMShvtFLmbhC7J1ZseQ=;
-        b=YSpOtgAP8L5ywtX4pvQ61oYXHmOYnjJuZtdS8btPmtj5rrhb+Lo6yf7pfP8TTUgYGn
-         jxA9YTbCZfG+dj/FOgZlYUmK2FStsjZj97n3u7uta9DFbfEcISsKW8Hx7qsmAYTxaTmM
-         Vn8S72bLBkAYXbEedkWfOEoQMdtS6VQO8qPCwyGek3vGOqn5DRQpVWzCEeHBVOKvLMv+
-         tFBl+eK/o/pFDJ2u4T4o1vs3hYAIMhyoF5DZD5uJIvq0TyWWX7zRAQGEzBDdr7N+mduU
-         H65zIZxzIsqYA7pmW9KAJJNXgVCFiW1n0LOGTvRgp+zv+PI9vO2rSzaOx07bJE8pfgAn
-         appA==
-X-Forwarded-Encrypted: i=1; AJvYcCVqX77iX3xWeFiFD3qNFiYodZvB5LrCzonUWRdBpSDoXU9cImSMxxVuNvp6uboUdY73DSL3Y1s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHMqtHISwh443flGglvXPpeNKE+ZbtwC41kFRIOH5q3rvnOSkr
-	E8YA36pxYEYZYz3O9ro/PcQu1RlIUsE68PQkyuOL+NQ5efwcF+v9ye7OU4+jZSc=
-X-Gm-Gg: ASbGncvADIrGtKB8JXq6vhScfGQnT3xg3GZaVxXkriFx5+WeFMc3Tvr0GDdpBx8lcSq
-	OyMydbXKaB8CkA6zIBRKa19PsYJjGFBc18ZJVNuQSyPfIWsvGDe6X8P/tGNgtszgahXadNmHmzb
-	DpmalsGhKVYt9Enl9rlmgjB2edmWEe7Zf3vh3EkfcUFf1jFQOw9Z4Nyz2axTc+mOeM4ZxArBpJZ
-	kgfZmVhGxnD0/mcJcKpr5OibG/2VAFv2B9yf3E6XTDPmhAHdVodyxSIoyW4MoFg4BNfSnq3YN2K
-	gza7imRbZi9RDJspz01Txij4N7SHf4PnWi7JU6plrJba5sNT7P8cxAh5xgvAXaD4s6AEdspjOLr
-	ZlqA=
-X-Google-Smtp-Source: AGHT+IFcL1gSMJCTCnZcd6HJw2zwybdNPIHKIrsiUSeI2jk/mbKwBJYRWGcu2yQ2deoYklOEQz/emw==
-X-Received: by 2002:a05:600c:4e50:b0:439:8653:20bb with SMTP id 5b1f17b1804b1-439b2b06189mr248030835e9.14.1740665903502;
-        Thu, 27 Feb 2025 06:18:23 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:982:cbb0:c5de:e7f3:73c7:7958? ([2a01:e0a:982:cbb0:c5de:e7f3:73c7:7958])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43aba5870e7sm59261405e9.35.2025.02.27.06.18.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Feb 2025 06:18:23 -0800 (PST)
-Message-ID: <2198e689-ed38-4842-9964-dca42468088a@linaro.org>
-Date: Thu, 27 Feb 2025 15:18:22 +0100
+	s=arc-20240116; t=1740666125; c=relaxed/simple;
+	bh=+HiwIAO6jMqFf5NIdCtX273/t0dTAzZqBdFWt3fzBRE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iddqSAobonm1g0f5706J/HTNM45RPv2uAm/Zonid2E2q01xuqAzn6cIwKMDbw6CVW4Ghq5kEx7USJ8ptbZsKwYGtuMK0ZD8Gc4YFrIRxLr0KAeOU4ufy1nM7XQbOK3bqFEV7OTjw1Yxv9Eqa/rxVvnJ6y7YKXCpMz9ZVFqBSQWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=ps.report@gmx.net header.b=LJOqE+/6; arc=none smtp.client-ip=212.227.17.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
+	s=s31663417; t=1740666115; x=1741270915; i=ps.report@gmx.net;
+	bh=ueH2mBJqBbPIc/pCwnFyLp23XYZ6U8XmkBzcWFHsgf8=;
+	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:Message-ID:In-Reply-To:
+	 References:MIME-Version:Content-Type:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=LJOqE+/6Kbsi/JFdbxtilxja5n1fDDG7NcK5QkzoewrTDq3gveKSPMLG4bRVR+wA
+	 owxQAa/dKue2ueICbPphQiIaGEW/JhuT7UF12sYNLs9WY6VEvLOS+nRypBiHeUdgM
+	 vHAoZAF68vhQoGXVSm8MMvwN5xlhaQKOk/s9fjck13N8Ifg4Jqm1pXFTgikRwhjsm
+	 vlb1BWDz0qahSCbfAsw2bWiFXFWzAXw+fSp2+t8OZFYI4oDNWE1qz8hd/NBo2pvJq
+	 Ga9qtsxNQoaTueUNAWPTuZCp/MYv+xjD9nzWIX9Mn9mRUx91KLpgxMssGPeQJ8MaS
+	 t+2LAX0BLInnZD4NLQ==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from localhost ([82.135.81.151]) by mail.gmx.net (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1Mn2aN-1tPHee2Kgx-00llbd; Thu, 27
+ Feb 2025 15:21:55 +0100
+Date: Thu, 27 Feb 2025 15:21:54 +0100
+From: Peter Seiderer <ps.report@gmx.net>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Arnd Bergmann <arnd@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Simon Horman
+ <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] pktgen: avoid unused-const-variable warning
+Message-ID: <20250227152154.4da61f2f@gmx.net>
+In-Reply-To: <4c260b13-3b08-409d-a88a-e5bbb3c18e03@redhat.com>
+References: <20250225085722.469868-1-arnd@kernel.org>
+	<20250226191723.7891b393@gmx.net>
+	<4c260b13-3b08-409d-a88a-e5bbb3c18e03@redhat.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-suse-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Neil Armstrong <neil.armstrong@linaro.org>
-Reply-To: neil.armstrong@linaro.org
-Subject: Re: [PATCH net-next 10/11] net: stmmac: meson: switch to use
- set_clk_tx_rate() hook
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Jerome Brunet <jbrunet@baylibre.com>,
- Kevin Hilman <khilman@baylibre.com>, linux-amlogic@lists.infradead.org,
- linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com,
- Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>
-References: <Z8AtX-wyPal1auVO@shell.armlinux.org.uk>
- <E1tna0z-0052tN-O1@rmk-PC.armlinux.org.uk>
-Content-Language: en-US, fr
-Autocrypt: addr=neil.armstrong@linaro.org; keydata=
- xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
- GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
- BVF2WzvGyyeV1o4RTCYDnZ9VLLylJ9bneEaIs/7cjCEbipGGFlfIML3sfqnIvMAxIMZrvcl9
- qPV2k+KQ7q+aXavU5W+yLNn7QtXUB530Zlk/d2ETgzQ5FLYYnUDAaRl+8JUTjc0CNOTpCeik
- 80TZcE6f8M76Xa6yU8VcNko94Ck7iB4vj70q76P/J7kt98hklrr85/3NU3oti3nrIHmHABEB
- AAHNKk5laWwgQXJtc3Ryb25nIDxuZWlsLmFybXN0cm9uZ0BsaW5hcm8ub3JnPsLAkQQTAQoA
- OwIbIwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgBYhBInsPQWERiF0UPIoSBaat7Gkz/iuBQJk
- Q5wSAhkBAAoJEBaat7Gkz/iuyhMIANiD94qDtUTJRfEW6GwXmtKWwl/mvqQtaTtZID2dos04
- YqBbshiJbejgVJjy+HODcNUIKBB3PSLaln4ltdsV73SBcwUNdzebfKspAQunCM22Mn6FBIxQ
- GizsMLcP/0FX4en9NaKGfK6ZdKK6kN1GR9YffMJd2P08EO8mHowmSRe/ExAODhAs9W7XXExw
- UNCY4pVJyRPpEhv373vvff60bHxc1k/FF9WaPscMt7hlkbFLUs85kHtQAmr8pV5Hy9ezsSRa
- GzJmiVclkPc2BY592IGBXRDQ38urXeM4nfhhvqA50b/nAEXc6FzqgXqDkEIwR66/Gbp0t3+r
- yQzpKRyQif3OwE0ETVkGzwEIALyKDN/OGURaHBVzwjgYq+ZtifvekdrSNl8TIDH8g1xicBYp
- QTbPn6bbSZbdvfeQPNCcD4/EhXZuhQXMcoJsQQQnO4vwVULmPGgtGf8PVc7dxKOeta+qUh6+
- SRh3vIcAUFHDT3f/Zdspz+e2E0hPV2hiSvICLk11qO6cyJE13zeNFoeY3ggrKY+IzbFomIZY
- 4yG6xI99NIPEVE9lNBXBKIlewIyVlkOaYvJWSV+p5gdJXOvScNN1epm5YHmf9aE2ZjnqZGoM
- Mtsyw18YoX9BqMFInxqYQQ3j/HpVgTSvmo5ea5qQDDUaCsaTf8UeDcwYOtgI8iL4oHcsGtUX
- oUk33HEAEQEAAcLAXwQYAQIACQUCTVkGzwIbDAAKCRAWmrexpM/4rrXiB/sGbkQ6itMrAIfn
- M7IbRuiSZS1unlySUVYu3SD6YBYnNi3G5EpbwfBNuT3H8//rVvtOFK4OD8cRYkxXRQmTvqa3
- 3eDIHu/zr1HMKErm+2SD6PO9umRef8V82o2oaCLvf4WeIssFjwB0b6a12opuRP7yo3E3gTCS
- KmbUuLv1CtxKQF+fUV1cVaTPMyT25Od+RC1K+iOR0F54oUJvJeq7fUzbn/KdlhA8XPGzwGRy
- 4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
- QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
-Organization: Linaro
-In-Reply-To: <E1tna0z-0052tN-O1@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:hDJsAmAOjPpfF5JEDV31dTu8+edNiRUwO+r1jBKb1aCDfIGRGO1
+ R+QKO+7q5sig+RghgQwqeEFj7/42NmeKZ52d9/B+7Xx3SA5j6T5nwErccttDO/uJ5GMXnT6
+ ePpg0oSTNPe4y+sFaNXIfM6h7wocQ7bSIgBD6+ww7YZtdZNDh3CRWmaAB4hTxq7vCvdSRh0
+ njDoIrqkznMUmzKBVVdnQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:PseNyx0c1kE=;1ioMzVyGdx66mcLe4jgHlVGtZya
+ +4Ol55nUkkFiR7tPzyRMbqWMfFGFqhkgnULlsUkofrsmXr3QxvT4aZ3wqE1Sul9AP97/ukJ/j
+ iViayGeS8ObY5bcbGjLMhMewrmHwhCxJ+lXHPsRRIrvd463/W12FZ5LNhqKmOB3/7CBmY96sj
+ /AA9wctnfxDrn4Sv0FgIKyC3rHsHl2CILbCtVXsoyJliFgVHjPt+nDY8tTeOc7BvVz0vI2GFl
+ lFuo1GqNmO2bIKDdIHXZBw711BWW5/rWk4v/XCdHLDTYwgiMXb/xI+Io+zKHmk4pSJL4oGUpr
+ eBz5R8Fp8901q3ZtryxrhpdQs3lmHsyw68xovENJthbg5kb2lhsSjjoU54rVYabt6Ma+7S44h
+ 5HkfX9lyIxfXS5HOXWYkg8jtSHUVZHRf56nVNvYsDtusZle8m4awbK/AlD4Pib/ZoKCBtU+/s
+ IZ0JlAFRKO018X4GcSDtHs6wAAqFFK+CK+Bd0skVSiR1E9i0dylxD607zo9F6evPq+RVvZ7oZ
+ ub7YpzXESg2Kh4YNb2f4tGiCdFg+ezSxIDm8hWB0i7DByknArTw112LJ7p7Vd68xsWIAVgmNm
+ mYIGzJ52zWHCLMv94Y+DncxUAAof4E9PusnaVvjGBN1dgJe/bc7yPgh496uaUQGgLVWYvLCf0
+ XHO0djihKC2n8MvwQZ7GVYU8vVa2Rd4k1MaBzD3GROk5R9pXe60BFASHfpaA8cgKelQIGEt5m
+ tmPo5QJjOkWan5Um4iIafBhoku6aV8g2tiFmo1/uEd/ZkKaRAI60knKpEycCFY8WGQynTHDRK
+ EGgfDmS5ntDcMeUr56mJlp/ikqsi5ro09H3XFjno8siLU8kyyKqYS7FfHy6bKAQenYIxhJea2
+ 2hM6UwHtpTcigcPewQUZamg9waRPL+HRVuk1aVWxzZHLD07X/NgsAb04L1pdFfz4AGOHeirZz
+ A+YvR0GxXc9KIcTSha4KvLPWuquyZccMVDyeJz4D75RyMEEK0a9IVwD7b+b8WcaStj71mAkNW
+ TTLzbz6YGCUjQk9Ivi4syVBjCuGuDFJtzZZCLIe1edJV4uCaAqfuCBvkhLNed3YDxghi14aVl
+ TwT+SPjCvtUnJ1Tm2uITzXp0K91EV3Joia6narRMG5WH+xFAb99lbMJH9YZZi8mjDlkW2L/Lv
+ UDMSb+yEs4LKBCgQWKxYkbNXsqGHqwHVIIEcbJoguLcPKuihNztVa68z0pV8WNtp8Apf0OK2i
+ Q5CYL1gZVtOy2QzZMvTAhdKjU3chE9uKnydv/0+tc6UKZCXzdXqDwF+gCXyDN+k8tWjQjNHI6
+ w0o4+lQZLcZyYVeC/skcUN9bfRa8gtobpvwxRW9RrZi38z3+brAEwd463xOYl9bGidkYw/lOX
+ vDkY3PVZm4vVa92ASHcXmtgWN3rL0lw9a5WwTRhPMLUhPtQ2OQBzvnXaOs
 
-Hi,
+Hello Paolo,
 
-On 27/02/2025 10:17, Russell King (Oracle) wrote:
-> Switch from using the fix_mac_speed() hook to set_clk_tx_rate() to
-> manage the transmit clock.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
->   drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c | 9 ++++++---
->   1 file changed, 6 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c
-> index b115b7873cef..07c504d07604 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c
-> @@ -22,9 +22,10 @@ struct meson_dwmac {
->   	void __iomem	*reg;
->   };
->   
-> -static void meson6_dwmac_fix_mac_speed(void *priv, int speed, unsigned int mode)
-> +static int meson6_dwmac_set_clk_tx_rate(void *bsp_priv, struct clk *clk_tx_i,
-> +					phy_interface_t interface, int speed)
+On Thu, 27 Feb 2025 12:35:45 +0100, Paolo Abeni <pabeni@redhat.com> wrote:
 
-You can keep priv as first argument name and remove the next changes
+> On 2/26/25 7:17 PM, Peter Seiderer wrote:
+> > From: Arnd Bergmann <arnd@arndb.de>
+> >> When extra warnings are enable, there are configurations that build
+> >> pktgen without CONFIG_XFRM, which leaves a static const variable unus=
+ed:
+> >>
+> >> net/core/pktgen.c:213:1: error: unused variable 'F_IPSEC' [-Werror,-W=
+unused-const-variable]
+> >>   213 | PKT_FLAGS
+> >>       | ^~~~~~~~~
+> >> net/core/pktgen.c:197:2: note: expanded from macro 'PKT_FLAGS'
+> >>   197 |         pf(IPSEC)               /* ipsec on for flows */     =
+           \
+> >>       |         ^~~~~~~~~
+> >>
+> >> This could be marked as __maybe_unused, or by making the one use visi=
+ble
+> >> to the compiler by slightly rearranging the #ifdef blocks. The second
+> >> variant looks slightly nicer here, so use that.
+> >>
+> >> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> >> ---
+> >>  net/core/pktgen.c | 9 ++-------
+> >>  1 file changed, 2 insertions(+), 7 deletions(-)
+> >>
+> >> diff --git a/net/core/pktgen.c b/net/core/pktgen.c
+> >> index 55064713223e..402e01a2ce19 100644
+> >> --- a/net/core/pktgen.c
+> >> +++ b/net/core/pktgen.c
+> >> @@ -158,9 +158,7 @@
+> >>  #include <net/udp.h>
+> >>  #include <net/ip6_checksum.h>
+> >>  #include <net/addrconf.h>
+> >> -#ifdef CONFIG_XFRM
+> >>  #include <net/xfrm.h>
+> >> -#endif
+> >
+> > This ifdef/endif can be kept (as the xfrm stuff is still not used)...
+>
+> FTR, I think dropping unneeded #ifdef is preferable in c files: only
+> such file build time is affected, and the code is more readable.
 
-Neil
+The ifdef/endif emphasizes no xfrm usage (even by mistake) in case CONFIG_=
+XFRM
+is not defined, but in the end a matter of taste ;-)
 
->   {
-> -	struct meson_dwmac *dwmac = priv;
-> +	struct meson_dwmac *dwmac = bsp_priv;
->   	unsigned int val;
->   
->   	val = readl(dwmac->reg);
-> @@ -39,6 +40,8 @@ static void meson6_dwmac_fix_mac_speed(void *priv, int speed, unsigned int mode)
->   	}
->   
->   	writel(val, dwmac->reg);
-> +
-> +	return 0;
->   }
->   
->   static int meson6_dwmac_probe(struct platform_device *pdev)
-> @@ -65,7 +68,7 @@ static int meson6_dwmac_probe(struct platform_device *pdev)
->   		return PTR_ERR(dwmac->reg);
->   
->   	plat_dat->bsp_priv = dwmac;
-> -	plat_dat->fix_mac_speed = meson6_dwmac_fix_mac_speed;
-> +	plat_dat->set_clk_tx_rate = meson6_dwmac_set_clk_tx_rate;
->   
->   	return stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
->   }
+>
+> >
+> >>  #include <net/netns/generic.h>
+> >>  #include <asm/byteorder.h>
+> >>  #include <linux/rcupdate.h>
+> >> @@ -2363,13 +2361,13 @@ static inline int f_pick(struct pktgen_dev *p=
+kt_dev)
+> >>  }
+> >>
+> >>
+> >> -#ifdef CONFIG_XFRM
+> >>  /* If there was already an IPSEC SA, we keep it as is, else
+> >>   * we go look for it ...
+> >>  */
+> >>  #define DUMMY_MARK 0
+> >
+> > A now unused define...
+> >
+> >>  static void get_ipsec_sa(struct pktgen_dev *pkt_dev, int flow)
+> >>  {
+> >> +#ifdef CONFIG_XFRM
+> >>  	struct xfrm_state *x =3D pkt_dev->flows[flow].x;
+> >>  	struct pktgen_net *pn =3D net_generic(dev_net(pkt_dev->odev), pg_ne=
+t_id);
+> >
+> > Maybe better this way here?
+> >
+> > 	const u32 dummy_mark =3D 0;
+>
+> I think the unused define is preferable; I think pre-processor defines
+> are cheaper than static const.
+
+In which regards cheaper (out of interest)?
+
+Both (with and without static) produce the same code see e.g.
+
+	https://godbolt.org/z/Tsr1jM45r
+	https://godbolt.org/z/6sr1o8da3
+
+Regards,
+Peter
+
+>
+> Thanks,
+>
+> Paolo
+>
 
 
