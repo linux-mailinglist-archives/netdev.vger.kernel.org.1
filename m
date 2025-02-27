@@ -1,245 +1,221 @@
-Return-Path: <netdev+bounces-170223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BE56A47DCF
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 13:33:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19914A47DCE
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 13:33:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E24957A73ED
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 12:32:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0723E3B469E
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 12:33:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22918224B1A;
-	Thu, 27 Feb 2025 12:33:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB43619D8A0;
+	Thu, 27 Feb 2025 12:33:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nSPXZi8i"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HgLGNO33"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340BA27003F;
-	Thu, 27 Feb 2025 12:33:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FDF22556E
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 12:33:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740659614; cv=none; b=EP1fcjSgUsyrj45wY7wrfLLsgCJed3c0OeAP7KyLdw/CtHnP/tsMv0YPq+UZDuBUaGqf3mhpZKnrAUNEFku9r62x/ssa5c9qK4SJgFsprxyGq7OqBJi/nL1R/vpYyXr/a7pMD/Iib1qOREFT5RkfNbHRTYrU/m3WWScDTHrF19w=
+	t=1740659613; cv=none; b=GOEeodNRxdBibuibsTzV9EztCNIbxpFL3kOvAKJzfpM1Af6PJDEtlKZ3yM0JAyGN9vxd1HRAXBM3FuWZkoFlhZOdOvjgDM1I/YpJXncaar+wbD7SI82tBxrCvXwaZ4zeNfFTuB4NCdLUEyUF2+bV9bx0EQt48yXt+coczvW4k+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740659614; c=relaxed/simple;
-	bh=eNCnDk3o13zHYhDmGLY3PfMS8o3BX2U8JaG67s0LvAY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Sb2/KUoQWSMmAChbfVLtnQ6FyBs+PxrggSOI851hts9JRjJWxvcPFZNwAmiXyIcYsNyByS9if3fztwFJg+k5s1J+2Wt+c0CsWCIpPoWzt8h7OOmOTbIoJIpZ7ldFqoK1mrJZxwHHkwq/TU2U2kmP2sFhUCWja3XWnwCeouqfj5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nSPXZi8i; arc=none smtp.client-ip=209.85.214.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-22349dc31bcso13574165ad.3;
-        Thu, 27 Feb 2025 04:33:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740659609; x=1741264409; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=E1UPW0Km5K8LrkkofbxPBeAljxlRf+qjqAALOT7M8Zw=;
-        b=nSPXZi8iW+ArB1SsTYka+EFlslyp/okKilHbHYPj7/NGlLbFfhtwtSIGRI5oMkQnJ7
-         AA+PgJAgp3xF4RU0O8M4ne16nIqCUeBSDKL6yfczwGEXQnBZZ92MpdhzlKqLgptvfvA+
-         OULbYWPk4LfPSRQvqiqnwRa1qgoWatAhLqroA/T1+Js2byMW7nUhJY/IiWoNwtSivq1g
-         DugnrvCZhPbuAUFSajwRsHf9vvJM/bL+ORkrshr3cn5MPTclu6BXkVGyT5grOeLeyinh
-         DAaFRkgau0NsgHjBnWmS/08Nv/mFMu3kXmNBSDhxqggxkT9hJdIB++xpp7+B4FliiSqX
-         +uww==
+	s=arc-20240116; t=1740659613; c=relaxed/simple;
+	bh=UUF3X91+llyZURTHOSpXPepCKrlN8rL/U4WR82VKFD0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Cjr0lZIbG3CRlfu5sQRg/BsG/+7ICcMX5b470d29X149hj35OMjOhmC0kmAp7gbtnZuwQ40AeE4xPxWByX+ue8HgGBDEjkWLd8SVr2934bG000GqEnerTTp8czdwUTKK5AJNxOd9O1qSMz9l+hJ7xSAzFtj77Z4CTwz2JVU8FKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HgLGNO33; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740659611;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JVZyoIiO2tKVS/DGhefvVf60W+221dDlikQw+QH0D28=;
+	b=HgLGNO33cqE069dD0VHzH0SSU5odJLLPWXtKGgq2/Z5o5b4tXl+F9KLiI2Mz8MfWUE9ORT
+	gJcaU4K/K6ma5/cmK9EApMyuUkUeopIBvq2wy+iBpQCp88AqFqlmd+Q2lCQH7/okIOiTLW
+	UrraCtPk4WkBPagLyk0/kxleM9XVwXk=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-53-xTc_OjKfM_q0GvwFnE_mwA-1; Thu, 27 Feb 2025 07:33:29 -0500
+X-MC-Unique: xTc_OjKfM_q0GvwFnE_mwA-1
+X-Mimecast-MFC-AGG-ID: xTc_OjKfM_q0GvwFnE_mwA_1740659608
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4399c32efb4so8560975e9.1
+        for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 04:33:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740659609; x=1741264409;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=E1UPW0Km5K8LrkkofbxPBeAljxlRf+qjqAALOT7M8Zw=;
-        b=vzHfs0ALT8NVAnNB+YefkMfhuO6dsCaj/VeBmOpfcIA2UkuOA66vaVH1qLbK3OuQJz
-         5x6GmKsMrvTp2YoLlbVtgjDomTO8kjpwbHxTGJeuoP127UAP1at4de3Re7q0fbgz+OcR
-         29vYRiWzjtHRntZHxe5NRy//PAE10k/5OUQMXLEYugffx5W2ZTS+wZsIYMEQ7Ud/G6sY
-         4geL/akWjNaOJHgmTOh4oY9E7o2oyxLiTiF3VSF2QkuGZhe3Sa50oWr+zbcZ3jytMZkU
-         GWIURmjUIeslVceXhtc6O0XizPUrWIlWgLXd9U1GfRW19mtP24v+gQBCbGfP7v6rNc6e
-         gOVg==
-X-Forwarded-Encrypted: i=1; AJvYcCWue/O4DqIef4k3qrKaWKgoDmDSrcYcLhIOXmaauGxcswfCI6rhPP77qcxpdJsWyxYGiSfO6Fy1@vger.kernel.org, AJvYcCXeUFrZMxtssfZlBBqEpxk/9rFtiCQnPS3LLZl9Xg5Qy5Z06sdLidVltaGeM60Ek6Jf7h9RtwrLe68xQ38=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxjKDhc2ek3f8pd6m0++ZKNz+FV9XRzwqLSaukTG58vGMWquPD
-	CJTtGI7aMog+UbFs0JYlMHFTxPkLIwcPvdoB5ixTZNn6W1HwNtuo
-X-Gm-Gg: ASbGncsJ5NaKlu8UxR22bobtL432iRVZMVr/O4LKPhkhWWGU1nmO0Yji2hh1OqfY5mb
-	VFqgVhlkGLJL39OCK7DY67Ca2zYX9FdlljhE0/Qw3XIhbICxI7w1rotbrc+5Zs+J6R//Odh5WCX
-	8qID6irplFH1QzNiSCdx6ywDCp3fiXIqXzb9Y/EGfBC72w2o0VJsmaQcOiOosFtX2y40kjVkLnx
-	k7QyEySJjXqxvZh0KqU1I9Hx4q/rqOJCbIY+VocJ9ziixBy3Z7METVSFplCXrRJ8IN5peuQm7iU
-	GYKfPtRiwDvgJ/h617H4dLay0nKQKZcF50ygZ8CL6go=
-X-Google-Smtp-Source: AGHT+IHbN+BZckJ+0jjRPlpmszaz/VaHtnknrWt71UWIDmqfJaql6oSUzuNp9uuWeO754PkxMFPphA==
-X-Received: by 2002:a17:902:e752:b0:223:3bf6:7e6a with SMTP id d9443c01a7336-2233bf6806bmr71862745ad.12.1740659609193;
-        Thu, 27 Feb 2025 04:33:29 -0800 (PST)
-Received: from localhost.localdomain ([43.129.244.20])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2235050ceb0sm13132615ad.203.2025.02.27.04.33.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        d=1e100.net; s=20230601; t=1740659608; x=1741264408;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JVZyoIiO2tKVS/DGhefvVf60W+221dDlikQw+QH0D28=;
+        b=FEz7vNouVF8TFMZYcBzMd/lJ+M/0WoWCGnndmKxQurkikg3agbjGxmdPk5NYTvgbd5
+         EUZD9nvYRwrDkWlaBl21uMzAogzAy5JpIElPCfWME09OcFdesWjvObKoS13hWBOW+qb4
+         OudKVBaqkW12s89Uw1UdNFYE0ON525xWsuAH8P/UBFxAACUKdfBuOvGUZoAB8n+Dbhh1
+         DsLS/iMo5jaqiNCyuZaf/0HsBsJzibelHJlBbWaHYki4Oatfu+ZNHBpSfTodnmh2n43h
+         jTh4TZUJ3CoVM0YhKjUJuSNgFeoEGocrbwlmuFAMsBsLOXZKik5MSmZNU9RGFFGofwQW
+         508A==
+X-Gm-Message-State: AOJu0Yw2xK6ItUeLB+Y0cwR/8NYepi1ow3JMvJKDQqy5p2WC9p/23H/8
+	nAqk7b2JUV0B2CS/LE7yQz5AM3oINHys9A26j/yNAZXmp3swV2uRAO6eygtRN+PxIczjIOD5WiM
+	29s3L2M8Y82IWazQxi5epHv/dLeiLDh/rliE1YUUq1tafT4+ij+hf+g==
+X-Gm-Gg: ASbGncsSkIPIjO3le2h3yp0YAq7KbYFQiTeISzrd5QPlrMky/2WcfWgUuDjViPZdLQd
+	MKjke/PJCS39LGNNfWpM1lZJRJOUnIpsE5k97Dt6wwdkF5TWpBXF2wtYK+kb6HqDwumar681mqc
+	wD40O2HAPKT+f5qDMCBXsW3JZefgGPnHh3oz3WKaEnEpRI2b8wGbOb8tgnxVTR4ENHATZn6Bx5a
+	PU2IGLBjEwUcgpvJQVaNntc5ycJx5uqtjU/6vlbAp2YGAKkB3i9bpXASDjQdsiv4vvsplTUkR8i
+	DkD0ZM+mdtVE1awbo+bEODax1k2DC5xGFI3Aec2Q+mV4XA==
+X-Received: by 2002:a05:600c:5252:b0:439:873a:1114 with SMTP id 5b1f17b1804b1-43b31f2020bmr20299015e9.6.1740659608395;
         Thu, 27 Feb 2025 04:33:28 -0800 (PST)
-From: Menglong Dong <menglong8.dong@gmail.com>
-X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
-To: edumazet@google.com
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	ncardwell@google.com,
-	kuniyu@amazon.com,
-	dsahern@kernel.org,
-	kerneljasonxing@gmail.com,
-	yyd@google.com,
-	dongml2@chinatelecom.cn,
-	petrm@nvidia.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH net-next] net: ip: add sysctl_ip_reuse_exact_match
-Date: Thu, 27 Feb 2025 20:31:37 +0800
-Message-Id: <20250227123137.138778-1-dongml2@chinatelecom.cn>
-X-Mailer: git-send-email 2.39.5
+X-Google-Smtp-Source: AGHT+IHJRVuDkKv1lD+05VcNthhgmdrXrOUOHQ1OuZCCPnpYc58GHcizWC6uipdF3o0/PTnA5BwnYg==
+X-Received: by 2002:a05:600c:5252:b0:439:873a:1114 with SMTP id 5b1f17b1804b1-43b31f2020bmr20298595e9.6.1740659607556;
+        Thu, 27 Feb 2025 04:33:27 -0800 (PST)
+Received: from [192.168.88.253] (146-241-81-153.dyn.eolo.it. [146.241.81.153])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43b73717230sm21170475e9.19.2025.02.27.04.33.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Feb 2025 04:33:27 -0800 (PST)
+Message-ID: <d1e3d6a6-90b8-45bd-a57f-c8175d0bd906@redhat.com>
+Date: Thu, 27 Feb 2025 13:33:25 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3 2/2] selftests: Add IPv6 link-local address
+ generation tests for GRE devices.
+To: Guillaume Nault <gnault@redhat.com>, David Miller <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+ David Ahern <dsahern@kernel.org>, Antonio Quartulli <antonio@mandelbit.com>,
+ Ido Schimmel <idosch@idosch.org>
+References: <cover.1740493813.git.gnault@redhat.com>
+ <a05174174b9fa6a79a9c3ee32e7a5c506d8553aa.1740493813.git.gnault@redhat.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <a05174174b9fa6a79a9c3ee32e7a5c506d8553aa.1740493813.git.gnault@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-For now, the socket lookup will terminate if the socket is reuse port in
-inet_lhash2_lookup(), which makes the socket is not the best match.
+On 2/25/25 3:43 PM, Guillaume Nault wrote:
+> diff --git a/tools/testing/selftests/net/gre_ipv6_lladdr.sh b/tools/testing/selftests/net/gre_ipv6_lladdr.sh
+> new file mode 100755
+> index 000000000000..85e40b6df55e
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/gre_ipv6_lladdr.sh
+> @@ -0,0 +1,227 @@
+> +#!/bin/sh
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +ERR=4 # Return 4 by default, which is the SKIP code for kselftest
+> +PAUSE_ON_FAIL="no"
+> +
+> +readonly NS0=$(mktemp -u ns0-XXXXXXXX)
+> +
+> +# Exit the script after having removed the network namespaces it created
+> +#
+> +# Parameters:
+> +#
+> +#   * The list of network namespaces to delete before exiting.
+> +#
+> +exit_cleanup()
+> +{
+> +	for ns in "$@"; do
+> +		ip netns delete "${ns}" 2>/dev/null || true
+> +	done
+> +
+> +	if [ "${ERR}" -eq 4 ]; then
+> +		echo "Error: Setting up the testing environment failed." >&2
+> +	fi
+> +
+> +	exit "${ERR}"
 
-For example, we have socket1 listening on "0.0.0.0:1234" and socket2
-listening on "192.168.1.1:1234", and both of them enabled reuse port. The
-socket1 will always be matched when a connection with the peer ip
-"192.168.1.xx" comes if the socket1 is created later than socket2. This
-is not expected, as socket2 has higher priority.
+I'm sorry for the late feedback, but if you use the helper from lib.sh
+you could avoid some code duplication for ns setup and cleanup.
 
-This can cause unexpected behavior if TCP MD5 keys is used, as described
-in Documentation/networking/vrf.rst -> Applications.
+> +}
+> +
+> +# Create the network namespaces used by the script (NS0)
+> +#
+> +create_namespaces()
+> +{
+> +	ip netns add "${NS0}" || exit_cleanup
 
-Introduce the sysctl_ip_reuse_exact_match to make it find a best matched
-socket when reuse port is used.
+Also no need to check for failures at this point. If there is no
+namespace support most/all selftests will fail badly
 
-Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
----
- include/net/netns/ipv4.h    |  1 +
- net/ipv4/inet_hashtables.c  | 22 ++++++++++++++++++----
- net/ipv4/sysctl_net_ipv4.c  |  9 +++++++++
- net/ipv6/inet6_hashtables.c | 22 ++++++++++++++++++----
- 4 files changed, 46 insertions(+), 8 deletions(-)
+> +}
+> +
+> +# The trap function handler
+> +#
+> +exit_cleanup_all()
+> +{
+> +	exit_cleanup "${NS0}"
+> +}
+> +
+> +# Add fake IPv4 and IPv6 networks on the loopback device, to be used as
+> +# underlay by future GRE devices.
+> +#
+> +setup_basenet()
+> +{
+> +	ip -netns "${NS0}" link set dev lo up
+> +	ip -netns "${NS0}" address add dev lo 192.0.2.10/24
+> +	ip -netns "${NS0}" address add dev lo 2001:db8::10/64 nodad
+> +}
+> +
+> +# Check if network device has an IPv6 link-local address assigned.
+> +#
+> +# Parameters:
+> +#
+> +#   * $1: The network device to test
+> +#   * $2: An extra regular expression that should be matched (to verify the
+> +#         presence of extra attributes)
+> +#   * $3: The expected return code from grep (to allow checking the abscence of
+> +#         a link-local address)
+> +#   * $4: The user visible name for the scenario being tested
+> +#
+> +check_ipv6_ll_addr()
+> +{
+> +	local DEV="$1"
+> +	local EXTRA_MATCH="$2"
+> +	local XRET="$3"
+> +	local MSG="$4"
+> +	local RET
+> +
+> +	printf "%-75s  " "${MSG}"
+> +
+> +	set +e
+> +	ip -netns "${NS0}" -6 address show dev "${DEV}" scope link | grep "fe80::" | grep -q "${EXTRA_MATCH}"
+> +	RET=$?
+> +	set -e
+> +
+> +	if [ "${RET}" -eq "${XRET}" ]; then
+> +		printf "[ OK ]\n"
 
-diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
-index 45ac125e8aeb..5e4b63c40e1c 100644
---- a/include/net/netns/ipv4.h
-+++ b/include/net/netns/ipv4.h
-@@ -142,6 +142,7 @@ struct netns_ipv4 {
- 	u8 sysctl_ip_fwd_update_priority;
- 	u8 sysctl_ip_nonlocal_bind;
- 	u8 sysctl_ip_autobind_reuse;
-+	u8 sysctl_ip_reuse_exact_match;
- 	/* Shall we try to damage output packets if routing dev changes? */
- 	u8 sysctl_ip_dynaddr;
- #ifdef CONFIG_NET_L3_MASTER_DEV
-diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index 9bfcfd016e18..5ca495361484 100644
---- a/net/ipv4/inet_hashtables.c
-+++ b/net/ipv4/inet_hashtables.c
-@@ -384,20 +384,34 @@ static struct sock *inet_lhash2_lookup(const struct net *net,
- 	struct sock *sk, *result = NULL;
- 	struct hlist_nulls_node *node;
- 	int score, hiscore = 0;
-+	bool reuse_exact_match;
- 
-+	reuse_exact_match = READ_ONCE(net->ipv4.sysctl_ip_reuse_exact_match);
- 	sk_nulls_for_each_rcu(sk, node, &ilb2->nulls_head) {
- 		score = compute_score(sk, net, hnum, daddr, dif, sdif);
- 		if (score > hiscore) {
--			result = inet_lookup_reuseport(net, sk, skb, doff,
--						       saddr, sport, daddr, hnum, inet_ehashfn);
--			if (result)
--				return result;
-+			if (!reuse_exact_match) {
-+				result = inet_lookup_reuseport(net, sk, skb,
-+							       doff, saddr,
-+							       sport, daddr,
-+							       hnum, inet_ehashfn);
-+				if (result)
-+					return result;
-+			}
- 
- 			result = sk;
- 			hiscore = score;
- 		}
- 	}
- 
-+	if (reuse_exact_match) {
-+		sk = inet_lookup_reuseport(net, result, skb, doff, saddr,
-+					   sport, daddr, hnum,
-+					   inet_ehashfn);
-+		if (sk)
-+			return sk;
-+	}
-+
- 	return result;
- }
- 
-diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
-index 3a43010d726f..be93b2c22d91 100644
---- a/net/ipv4/sysctl_net_ipv4.c
-+++ b/net/ipv4/sysctl_net_ipv4.c
-@@ -838,6 +838,15 @@ static struct ctl_table ipv4_net_table[] = {
- 		.extra1         = SYSCTL_ZERO,
- 		.extra2         = SYSCTL_ONE,
- 	},
-+	{
-+		.procname	= "ip_reuse_exact_match",
-+		.data		= &init_net.ipv4.sysctl_ip_reuse_exact_match,
-+		.maxlen		= sizeof(u8),
-+		.mode		= 0644,
-+		.proc_handler	= proc_dou8vec_minmax,
-+		.extra1         = SYSCTL_ZERO,
-+		.extra2         = SYSCTL_ONE,
-+	},
- 	{
- 		.procname	= "fwmark_reflect",
- 		.data		= &init_net.ipv4.sysctl_fwmark_reflect,
-diff --git a/net/ipv6/inet6_hashtables.c b/net/ipv6/inet6_hashtables.c
-index 9ec05e354baa..b8f130a2a135 100644
---- a/net/ipv6/inet6_hashtables.c
-+++ b/net/ipv6/inet6_hashtables.c
-@@ -157,20 +157,34 @@ static struct sock *inet6_lhash2_lookup(const struct net *net,
- 	struct sock *sk, *result = NULL;
- 	struct hlist_nulls_node *node;
- 	int score, hiscore = 0;
-+	bool reuse_exact_match;
- 
-+	reuse_exact_match = READ_ONCE(net->ipv4.sysctl_ip_reuse_exact_match);
- 	sk_nulls_for_each_rcu(sk, node, &ilb2->nulls_head) {
- 		score = compute_score(sk, net, hnum, daddr, dif, sdif);
- 		if (score > hiscore) {
--			result = inet6_lookup_reuseport(net, sk, skb, doff,
--							saddr, sport, daddr, hnum, inet6_ehashfn);
--			if (result)
--				return result;
-+			if (!reuse_exact_match) {
-+				result = inet6_lookup_reuseport(net, sk, skb,
-+								doff, saddr,
-+								sport, daddr,
-+								hnum, inet6_ehashfn);
-+				if (result)
-+					return result;
-+			}
- 
- 			result = sk;
- 			hiscore = score;
- 		}
- 	}
- 
-+	if (reuse_exact_match) {
-+		sk = inet6_lookup_reuseport(net, result, skb, doff, saddr,
-+					    sport, daddr, hnum,
-+					    inet6_ehashfn);
-+		if (sk)
-+			return sk;
-+	}
-+
- 	return result;
- }
- 
--- 
-2.39.5
+You can use check_err / log_test from lib.sh to reduce code duplication
+with other tests and more consistent output.
+
+> +	else
+> +		ERR=1
+> +		printf "[FAIL]\n"
+> +		if [ "${PAUSE_ON_FAIL}" = "yes" ]; then
+> +			printf "\nHit enter to continue, 'q' to quit\n"
+> +			read -r a
+> +			if [ "$a" = "q" ]; then
+> +				exit 1
+> +			fi
+> +		fi
+
+I guess something like this could be placed into lib.sh, but that would
+be net-next material
+
+Thanks,
+
+Paolo
 
 
