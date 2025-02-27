@@ -1,97 +1,89 @@
-Return-Path: <netdev+bounces-170353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4865CA484CB
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 17:24:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B4C7FA484D5
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 17:26:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D7AE3A6B11
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:20:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6963C3BB9FC
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:21:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EA4B1B21B5;
-	Thu, 27 Feb 2025 16:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E20631AA1DA;
+	Thu, 27 Feb 2025 16:21:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i+8iK5uw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j8RDKIiO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F1F1B21B4;
-	Thu, 27 Feb 2025 16:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69308F40;
+	Thu, 27 Feb 2025 16:21:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740673203; cv=none; b=GsC1FRmtSFdbwNUFkbu7vYAn68gkuYZy/E4Jmv1bU40FKsqlja4mLMOiXAvjh73VayKfEaa77FAK4XyQ2qV6bztRO3/Qi26rWmJQuCAsMaEoC1z4t0U6jOPW4j9Sb80wmDtBLdHHRhMqF6+JieOF3ouDy7dBT+OprDd1vgJaKvA=
+	t=1740673305; cv=none; b=khhJE10ShYJlKjdu3E7uGMjC+HGL18tQkbsLbzc5v06kwkdKrNvNvdlVk+S4uWg6xCKxP8jzDTMQJaoPtajbEl79J+yRNaQTAIBAMRt9+tcQy1VWbEXoGubjyG8rdAg1ajqGyBn2QUfPqPki/ikNLhjGHAA46vFHGFUWVXVcRsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740673203; c=relaxed/simple;
-	bh=VpDZza7QXbnhces+of61OvEOBdzoZhLzbcuTIudJynw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Z20Qx2kMac6Px4XK94FKKoYNdVBCoSn3iSap2GJrk9ae1KrAUMVJJ9bp57Aehf02ChDJtkSvSAQyLO0WJXVirG3tPdmAqA33Nrra3KoXloPyJsNmHxr0B3knT6C6aiztBKUqEAH9kW4ssmusjEsuqZfPfxTV9R5NVUvgRW8ZVuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i+8iK5uw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC1A2C4CEE6;
-	Thu, 27 Feb 2025 16:20:02 +0000 (UTC)
+	s=arc-20240116; t=1740673305; c=relaxed/simple;
+	bh=sQlGGH25GF/utpCa8TrdW+aJYJDmWgb1GYvuLn4jCAs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XVn0mxhFfqFe7SiphAp3KAeDwyGDWkcujW/dfgF7G12mZavzjfcSk3sACj9kSRJIlkN7RfvkSidMtzfnI2uu4XTGx4guJKTaed/nHtUsDmvIr+B4k6luxK6HqjdXe7YqhqM/4HQFIJt3lDWvJb+W4IDQHFr3VXUAaaWrko5TSOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j8RDKIiO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 560E8C4CEDD;
+	Thu, 27 Feb 2025 16:21:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740673202;
-	bh=VpDZza7QXbnhces+of61OvEOBdzoZhLzbcuTIudJynw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=i+8iK5uwh70kd0GxxW6snP2DPzw8Mq3aSRuYooC4m0M52JYgVJ7M5sG/J9xnyBCB5
-	 R61VgB7uv1EaFEEuNs9QHJl2QFanAEN8WpPWvZbnhBzh0SVmfamOsaKL3XxRIkTIJG
-	 knVOMemJjTh2fz02wv/7AODLLsBShcs7xFQPRekGBGpvhJYDsnfiQ+j4DqgG0il76P
-	 MvyK8pMpc2DT66QbOnEnkIGWxUD4IBbNkTbA8Je09TVlYYr/OA0PXUSlBkKx6elL8m
-	 GddSaEd3zYIjLfYMqfaRMpee6NkwRfxIMphjYgnPHm11pd/mLUcr6mgqBDq3hiFFPn
-	 8U1nC5nR30eyA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB540380AACB;
-	Thu, 27 Feb 2025 16:20:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1740673303;
+	bh=sQlGGH25GF/utpCa8TrdW+aJYJDmWgb1GYvuLn4jCAs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=j8RDKIiOyCSaYuBH82JphMKE2yS4OtBZVgpEa4tsNDfprl+ZiQ4F6hQ0colXqNNG5
+	 aNnHt6cPHK4gffZEMubVgqAJwCq24wsNqo+oza643jKiTF2+k1b/jk1V4xrP5Zv7Ws
+	 6cPWvWs59d/erzBLa5Z5wK/OL8akFXlGoGV5NCFwR8/KPRczckOzN0JSFL1zS0OXa8
+	 +Wl6KCYZyYuWfPUAXrc+TDQHtxHq2PCbWbozMauTar4/6HpPelyIeTv/WB/lfkjp8I
+	 /o70+GI34UHbh5p7pxKkYny8PDcEfU++Equ10mKQncWS7n0OIKf7PQjYA/YQV3L3eY
+	 Vq6Gn/Cs9PIcg==
+Date: Thu, 27 Feb 2025 08:21:41 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>, Shuah Khan
+ <shuah@kernel.org>, sd@queasysnail.net, ryazanov.s.a@gmail.com, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, Xiao Liang
+ <shaw.leon@gmail.com>, Andrew Morton <akpm@linux-foundation.org>,
+ steffen.klassert@secunet.com, antony.antony@secunet.com,
+ willemdebruijn.kernel@gmail.com, David Ahern <dsahern@kernel.org>, Andrew
+ Lunn <andrew@lunn.ch>, Shuah Khan <skhan@linuxfoundation.org>
+Subject: Re: [PATCH net-next v20 00/25] Introducing OpenVPN Data Channel
+ Offload
+Message-ID: <20250227082141.3513de3d@kernel.org>
+In-Reply-To: <20250227-b4-ovpn-v20-0-93f363310834@openvpn.net>
+References: <20250227-b4-ovpn-v20-0-93f363310834@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: ti: icss-iep: Reject perout generation request
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174067323473.1484560.3837727172875875732.git-patchwork-notify@kernel.org>
-Date: Thu, 27 Feb 2025 16:20:34 +0000
-References: <20250227092441.1848419-1-m-malladi@ti.com>
-In-Reply-To: <20250227092441.1848419-1-m-malladi@ti.com>
-To: Meghana Malladi <m-malladi@ti.com>
-Cc: vigneshr@ti.com, javier.carrasco.cruz@gmail.com, jacob.e.keller@intel.com,
- diogo.ivo@siemens.com, horms@kernel.org, richardcochran@gmail.com,
- pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
- andrew+netdev@lunn.ch, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, srk@ti.com, rogerq@kernel.org,
- danishanwar@ti.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 27 Feb 2025 02:21:25 +0100 Antonio Quartulli wrote:
+> After some time of struggle trying to fix all hidden bugs that Sabrina
+> has found...here is v20!
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 27 Feb 2025 14:54:41 +0530 you wrote:
-> IEP driver supports both perout and pps signal generation
-> but perout feature is faulty with half-cooked support
-> due to some missing configuration. Remove perout
-> support from the driver and reject perout requests with
-> "not supported" error code.
+> Please note that some patches were already reviewed/tested by a few
+> people. These patches have retained the tags as they have hardly been
+> touched.
+> (Due to the amount of changes applied to the kselftest scripts, I dropped
+> the Reviewed-by Shuah Khan tag on that specific patch)
 > 
-> Fixes: c1e0230eeaab2 ("net: ti: icss-iep: Add IEP driver")
-> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
+> The latest code can also be found at:
 > 
-> [...]
+> https://github.com/OpenVPN/ovpn-net-next
 
-Here is the summary with links:
-  - [net] net: ti: icss-iep: Reject perout generation request
-    https://git.kernel.org/netdev/net/c/54e1b4becf5e
+coccicheck has a new nitpick:
 
-You are awesome, thank you!
+drivers/net/ovpn/netlink.c:439:11-59: WARNING avoid newline at end of message in NL_SET_ERR_MSG_FMT_MOD
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
