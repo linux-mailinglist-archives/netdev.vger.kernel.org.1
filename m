@@ -1,81 +1,99 @@
-Return-Path: <netdev+bounces-170085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02145A473B1
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 04:43:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA598A473E0
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 05:00:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0622B16B10D
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 03:43:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0C2A16DCBB
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 04:00:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 014B91D6DA8;
-	Thu, 27 Feb 2025 03:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D4B1D90DB;
+	Thu, 27 Feb 2025 04:00:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dtmgAtm+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qN6JZkkB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C80CE1D61A1;
-	Thu, 27 Feb 2025 03:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13A5F270031;
+	Thu, 27 Feb 2025 03:59:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740627792; cv=none; b=YNxVzTYqUEMFZXEVg668c9e+Jc5jPm7aSNNMxTnbryfiEW20rH9CByHrlQ27ZOJA8Ym8tDOrohLVOTnZH0MNFP6oM98vR60NGpO1N94Ks9abZSKwrvt6YCAC11gHMtizWVHrqj+J3w/tu1hBfz84S/oWMVnHpYzEl6gqZvigpBg=
+	t=1740628800; cv=none; b=DXdXMeO6ns/vt/pELHMP8OpIV92Z9r+kYB1cX8YDYv+3avgQ82AYBzyO4WsZMZ4KTK0d8PnZN8WzWXxro1P+So25D5A0UDeW7ynbCkOW9DhTSeVvZpGJ3PScWYkt1dBg94cPRXzOndIGZqMyo1x03gDLP6m6RNCVu0JU+rszdbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740627792; c=relaxed/simple;
-	bh=HRAUJZiaXmc4gvllAhWu+rvpOk514k1RBIfgmxusrUo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K6E7hyw8bwDziIK2uClzuSn/aM9ScPXxGjR5jjcm8Fbbp8a/prIq0tLhOr8yAXN2oGAyTVfJtMkqo6IK2ubbOIeas/a+fDl1HstQOWIgcTrRE9AufBffsYtHPxOL3TATdiFXh5US/DtZin1scun/+Ft8/A+n8jVmq5qTAE4psM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dtmgAtm+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9152BC4CEDD;
-	Thu, 27 Feb 2025 03:43:11 +0000 (UTC)
+	s=arc-20240116; t=1740628800; c=relaxed/simple;
+	bh=PXwwjYBG0TEbPFo6wPf+Qlk8kiWbzki99+R+i9PcAlw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=I5/j3rGhqXUSOCM5nO0ODD71oYNEuYx6xc6b9s++psd0n0NsD1gkzvLbMxa6P9YolET0i8BbUMNvnW5M716b7+h/zf83lUH2NxqzDIdmYlcy7OgQ3mI/h9LNZRhfUtH8qG+wcvj0Wcn1X7hvCC6///Ox8bO2Vl1dpl7sVi7K4Dc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qN6JZkkB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C0E1C4CEDD;
+	Thu, 27 Feb 2025 03:59:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740627792;
-	bh=HRAUJZiaXmc4gvllAhWu+rvpOk514k1RBIfgmxusrUo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dtmgAtm+Qe2PheNsliaKRMSteSGk5zN7eklfKXZ8ucTjoq/tFgrq23nfNLtEFuPJd
-	 5vGDqgp0mJkY0URP8UVPlmOKF6rT4poVrSntpgkNHclC6tbtLPvghLxBavUCUZzWoz
-	 hRqGJ29uPhdG3NYkMSaiH1BBaHg04ei1MwlCyGLX/f+eJZ/YUpN6gxdMOwfXhOJSdP
-	 J7MmCZreolXJdyZbAlZ4ICWvgzIOZPb6VlMDp+HFEFu4WjD2yA1ATKKbNQLNcVKdbd
-	 jOuB0zd4ixcsqyiQX2NwkIubjFHu1e6R1IoAhI9dJMA/JwTrvNWe6rFVJ3bJhHaxwI
-	 skTFGGCISA09Q==
-Date: Wed, 26 Feb 2025 19:43:10 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Felix Fietkau <nbd@nbd.name>, Sean Wang
- <sean.wang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Philipp Zabel <p.zabel@pengutronix.de>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, "Chester A. Unal" <chester.a.unal@arinc9.com>,
- Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org,
- upstream@airoha.com, Sayantan Nandy <sayantan.nandy@airoha.com>
-Subject: Re: [PATCH net-next v7 13/15] net: airoha: Introduce flowtable
- offload support
-Message-ID: <20250226194310.03398da0@kernel.org>
-In-Reply-To: <20250224-airoha-en7581-flowtable-offload-v7-13-b4a22ad8364e@kernel.org>
-References: <20250224-airoha-en7581-flowtable-offload-v7-0-b4a22ad8364e@kernel.org>
-	<20250224-airoha-en7581-flowtable-offload-v7-13-b4a22ad8364e@kernel.org>
+	s=k20201202; t=1740628799;
+	bh=PXwwjYBG0TEbPFo6wPf+Qlk8kiWbzki99+R+i9PcAlw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=qN6JZkkBV5HIcGNQmUnMNUl0D/cnWKCb7pe8exBqMyO+R2lTfN5KxjWmBrY3IGs3l
+	 rNR+8Hp721FwcsUszXwXtX0SBV+UUuXzet6UlldpXobJ5J7ECGAllxYdX44ypk4h2y
+	 qO9PBKjGfxT6ZO8WyaTSt8KJpmgpd47H4uOX8X50GmoNGbGvJu+eCVwK4E5JHH2tFi
+	 KaSsMQgxGyH33KUBQczz/qxM13TT6yUkmSzDcJ79umK/p+vC+j7RDdfF/L6baj506m
+	 gKrvfKfYFdwLN9unOBdT7864ddEcrMA/y4U/YoRCN17uMbcxDJy5h/y7pR7ioyRszM
+	 3gTzS4OHqbMZw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE01E380CFE6;
+	Thu, 27 Feb 2025 04:00:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/3] mlx5 misc fixes 2025-02-25
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174062883149.960972.10978491350422097713.git-patchwork-notify@kernel.org>
+Date: Thu, 27 Feb 2025 04:00:31 +0000
+References: <20250225072608.526866-1-tariqt@nvidia.com>
+In-Reply-To: <20250225072608.526866-1-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, gal@nvidia.com,
+ mbloch@nvidia.com, saeedm@nvidia.com, leon@kernel.org, cratiu@nvidia.com,
+ cjubran@nvidia.com, shayd@nvidia.com, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Mon, 24 Feb 2025 12:25:33 +0100 Lorenzo Bianconi wrote:
-> +	foe_size = PPE_NUM_ENTRIES * sizeof(struct airoha_foe_entry);
-> +	ppe->foe = dmam_alloc_coherent(eth->dev, foe_size, &ppe->foe_dma,
-> +				       GFP_KERNEL | __GFP_ZERO);
+Hello:
 
-dmam_alloc_coherent() always zeros the memory, the GFP_ZERO is not necessary
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 25 Feb 2025 09:26:05 +0200 you wrote:
+> Hi,
+> 
+> This small patchset provides misc bug fixes from the team to the mlx5
+> core driver.
+> 
+> Thanks,
+> Tariq.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/3] net/mlx5: Fix vport QoS cleanup on error
+    https://git.kernel.org/netdev/net/c/7f3528f7d2f9
+  - [net,2/3] net/mlx5: Restore missing trace event when enabling vport QoS
+    https://git.kernel.org/netdev/net/c/47bcd9bf3d23
+  - [net,3/3] net/mlx5: IRQ, Fix null string in debug print
+    https://git.kernel.org/netdev/net/c/2f5a6014eb16
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
