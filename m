@@ -1,122 +1,91 @@
-Return-Path: <netdev+bounces-170443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 105E1A48C23
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 00:00:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09DBEA48C52
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 00:04:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E76F5188C2C0
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 23:00:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 734E6165BE0
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 23:04:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85A7823E357;
-	Thu, 27 Feb 2025 23:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2219722A1E6;
+	Thu, 27 Feb 2025 23:04:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LKduXEHU"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TmKxl2ev"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA7FB14BF8F;
-	Thu, 27 Feb 2025 23:00:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DCD3277817;
+	Thu, 27 Feb 2025 23:04:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740697207; cv=none; b=BDMAMJgGF3cmEFAhOaSQkFwabbSSUhTa2d0VNLQL+w6jO5Y+h/DT/CvxRITrs1hE4M5xbgIZ6IpKMaKxT40EhcM6HuWInTSkZGoRQHrq1VzaoVJ62phBiV+iw+c9SFNreMEGidzTTq13QSFSMTlO6CetTsvZURR4Td9t1lnIZdo=
+	t=1740697481; cv=none; b=Rcr3TdHGMnpNDX+0bbRlpQmWq4sEqXbY17JuU5Ag+eXWYkZ1dKaejmCE46gpIqI7VAgD21ksvpi3D+XmuAAxzEQmtMbvoZmNcuelBJV0LbAcsP74+J1Fk8zH8dKz19T7QLexhM74Rki4cyjFaw6WedT2FofPJUUItq4B3EW/orY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740697207; c=relaxed/simple;
-	bh=plZB6nttI4h15XHAy2tUctm4vCwJqkaepq/yarLTXjw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eKUFsFCMlLd50p4El9t2u+cgYlFmB+bqOlrBskT7oI15xDe3ZHkLbH1BDBWReeqYs5yJlGDC5/gGa+LVon2NyJ2RgKuP+aY25KIGqFE0YEZvUZkyx4siy6+2/O3j6I/UO97+t7wdZpL2ddphDqRFS/m+gYopvWW/4az8u658WP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LKduXEHU; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4394a0c65fcso15822765e9.1;
-        Thu, 27 Feb 2025 15:00:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740697204; x=1741302004; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=CSTTn8dgXr2XP2qmQgDysPC6clyA8S5gqjElXgR2Us8=;
-        b=LKduXEHU1CqRvnehJVWcwbJcUFxNEC3VQFbL+v5v2XtDzb/rksH56YRf/dHDK4zntc
-         9MBAeAqb60PRNftWi+S/DbXIExz5w7Ga9ZYi/Ow6ccSaLZH1fvjnYjfzGPg6LHMjiviD
-         V67wDfIU30VpjSLZYwkl4tY6K081ZKbcp5nm7m7ugrWid/GAOcpKH2h7bmqwcygIH0CL
-         v3k0XtqNG5+c6RDRW87srxLuFT04pUAB62Y5Sqz3DFHceYDFyj7jME24XdaKq8oXeLim
-         gByevqnedG+Xy61P9N+1Vati2a63g42bCgIpMKyGyglvfQVGVCU/7U2u02jzQr3Xw54G
-         e71A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740697204; x=1741302004;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CSTTn8dgXr2XP2qmQgDysPC6clyA8S5gqjElXgR2Us8=;
-        b=KuzZKxkkdaUrudaxzYfGER7laffosE42F+8xQxa3mn/NPnWQqHk1wLC4BuN5TbxAdL
-         IorJKaFQUheK1HmywBGbhZZ9lz3NaUx2TBFE84PYXnvr0zIgNMS8xhrnLOwnSSFRnPtJ
-         JYjMKIimaxWKeiAWXA8LfkS0pY9wN5ijCGynz79AZISJpMCHL9wOeuG2Eeb6FR3vDF8U
-         lb+KPCuJ4foyDZx5Q/o+2JriXo3LbuxFLdkzqkx0Q4lKazBtPA7UMO84OXHKsEh7uAT0
-         tsGhK3nUwkaUjPVFDJYYGAJrmp6+GkTpPeh6ngKPjH2RtvnV8vU+QaqOhlom/Is4tQ+y
-         qJCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU8CakssYPCB0bYfW/ct9DNjeieMIE02vrK71rAvl8g78COaINBNYch12UQ3LunHYXgFwIhzmZ5/oaf6JE=@vger.kernel.org, AJvYcCWAWwwPbWDF/QtS8WD2o5LPXOGldBQYKgfy/3Mer8OtIYfbfu6WI2rcxRCWlYUYwz2TNpicUSUI2JrqagLosCD1@vger.kernel.org, AJvYcCWn77oQYH6WlpylL2ZK4Y8cedkVzl2aZytm+9ctXYDnYHm3LQMS/IhtfIqg2l3KPn5Px4O7Ehq7@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9EkL8gdg3D8yaP2msAOFscEbzNOxEMaB5deYBtWtX3fvqcn5q
-	No6Hft2MI04K1qJaev3h7VY2tgZG3fI0MON3hpweYPqKKj+vbf2S
-X-Gm-Gg: ASbGncv+3o5lvfEXNYVudJODvGCNhrYk1+jXdfJ7B9/hQjLNwWBM1C41TD88icO+xgq
-	C9d4gPXHcx9uYlhxk6z/auec2+4WCrU5GIZilQ7ItHvjYhAHOOEniWFX+WunQ+xXbX6UBKs2h+y
-	NT9BVR5Ppcv5BKaQ/ipOQTn9HQ85fxfT1wKLym20ADfunbaepoFymHyqs5ZOPtrFlTp+c/e/nMT
-	xPF/4Q65p0OUc1YNNwJ9WFKnKvOOQGnfvPbZ1xq4Vp0GDDhAwpKoZohmSSQYzM53HGK7btoW8Py
-	4LtGUnToL/wcKyn1GBlHnVvD9DE=
-X-Google-Smtp-Source: AGHT+IGhA9c+hj1Gic7ekykbUYYS9qnUrSWSLFMiD7OZScDPu+zoBa4VJZ5UI8HQ4/XW0j7pZUBIHg==
-X-Received: by 2002:a05:600c:46d1:b0:439:8544:1903 with SMTP id 5b1f17b1804b1-43ba674c80fmr7864085e9.20.1740697203440;
-        Thu, 27 Feb 2025 15:00:03 -0800 (PST)
-Received: from localhost ([194.120.133.72])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-43b73718abcsm36327565e9.22.2025.02.27.15.00.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Feb 2025 15:00:03 -0800 (PST)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next] [NETFILTER]: nf_conntrack_h323: Fix spelling mistake "authenticaton" -> "authentication"
-Date: Thu, 27 Feb 2025 22:59:28 +0000
-Message-ID: <20250227225928.661471-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.47.2
+	s=arc-20240116; t=1740697481; c=relaxed/simple;
+	bh=KQnDSWfCyG4GFZ8z+w71H8Ba87KJiLSAkaj1oH1XyiI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=R32VUwqmdPSMyeeNURwW9hC5fOlMnROrTp57WUZFZ7CKgnmM9RIsQGhPlqB/73dW0Hiils/T/jUev2cFvG7axAF4m3jRPefHX3Ul72xsCHcCF8Vt76gYllJemT09OOtLzW1rRuiZLn1JfGIe3nWNaucT3O6he1wIz6X8xS9oW9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TmKxl2ev; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <84f25c32-1aa6-42d6-a5b1-efce822bfcd6@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1740697477;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s53PsMsT+VnZgU2wt1QKLZK3VWcUDg2UEoFqQhBbfUs=;
+	b=TmKxl2ev/7M/7kekUDzsyg4xu4/zQ0gcoHcFm9HW//fxbejxAifn9SEiGLWsOsWJSLpks8
+	9sFT6ChRjHvb2hmy8pvRw9ui4rDdewvIDBIXcYaZ8f/afR5jSwHJsiA1aEh3uknP90Kn91
+	3NaCKozg+PAo/v7rQIHf28cPHu5sE3Y=
+Date: Thu, 27 Feb 2025 15:04:26 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next v1 1/3] bpf, sockmap: avoid using sk_socket after
+ free
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: cong.wang@bytedance.com, john.fastabend@gmail.com, jakub@cloudflare.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, andrii@kernel.org, eddyz87@gmail.com,
+ mykolal@fb.com, ast@kernel.org, daniel@iogearbox.net, song@kernel.org,
+ yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, mhal@rbox.co,
+ sgarzare@redhat.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ mrpre@163.com, syzbot+dd90a702f518e0eac072@syzkaller.appspotmail.com
+References: <20250226132242.52663-1-jiayuan.chen@linux.dev>
+ <20250226132242.52663-2-jiayuan.chen@linux.dev>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20250226132242.52663-2-jiayuan.chen@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-There is a spelling mistake in a literal string. Fix it.
+On 2/26/25 5:22 AM, Jiayuan Chen wrote:
+> Use RCU lock to protect sk_socket, preventing concurrent close and release
+> by another thread.
+> 
+> Because TCP/UDP are already within a relatively large critical section:
+> '''
+> ip_local_deliver_finish
+>    rcu_read_lock
+>    ip_protocol_deliver_rcu
+>        tcp_rcv/udp_rcv
+>    rcu_read_unlock
+> '''
+> 
+> Adding rcu_read_{un}lock() at the entrance and exit of sk_data_ready
+> will not increase performance overhead.
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- net/netfilter/nf_conntrack_h323_types.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/netfilter/nf_conntrack_h323_types.c b/net/netfilter/nf_conntrack_h323_types.c
-index fb1cb67a5a71..4f6433998418 100644
---- a/net/netfilter/nf_conntrack_h323_types.c
-+++ b/net/netfilter/nf_conntrack_h323_types.c
-@@ -1108,7 +1108,7 @@ static const struct field_t _SecurityCapabilities[] = {	/* SEQUENCE */
- 	 _NonStandardParameter},
- 	{FNAME("encryption") CHOICE, 2, 3, 3, SKIP | EXT, 0,
- 	 _SecurityServiceMode},
--	{FNAME("authenticaton") CHOICE, 2, 3, 3, SKIP | EXT, 0,
-+	{FNAME("authentication") CHOICE, 2, 3, 3, SKIP | EXT, 0,
- 	 _SecurityServiceMode},
- 	{FNAME("integrity") CHOICE, 2, 3, 3, SKIP | EXT, 0,
- 	 _SecurityServiceMode},
--- 
-2.47.2
-
+Can it use a Fixes tag?
 
