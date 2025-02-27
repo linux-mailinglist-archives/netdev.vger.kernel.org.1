@@ -1,120 +1,93 @@
-Return-Path: <netdev+bounces-170436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3422FA48B8F
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 23:28:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E7A8A48B8D
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 23:28:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91D2E1890B7D
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 22:28:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 730C716D609
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 22:28:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D37B277808;
-	Thu, 27 Feb 2025 22:26:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EBEB23E333;
+	Thu, 27 Feb 2025 22:27:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LBuOerOu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sFs4eDMr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04882777FB;
-	Thu, 27 Feb 2025 22:26:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1A42777FB;
+	Thu, 27 Feb 2025 22:27:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740695185; cv=none; b=Zj1rI0F9z3gnMTe99wq/dJ7gkiwDOcyXHVvgn1xJu+0mUWUKtL+0eH4fbUX5YG9nEl24B2B8FfV7sIGAjRV0am3Fde8XRE9kfTCvIDlS4JydNE/nsZUcGw9MPg3jNwPevQioQgNISGEqXSkZ6fWFkmO7tHiUyh5bNnlWD+uSso8=
+	t=1740695249; cv=none; b=Sz3mViM0Exr4HQRyml97KTXiKlZTssc0WM7jVOAyI3V7Wkgmt8ejZ0aeRDAktvtLuO6n+/dfbyXsxC19ghn4p4tPMoNLpZMFdck4zdKqc5lUh3wvMwR19Y9pVOCUGV3web9GWv+JbNXrozy2v+qK+rFBne7Ff1vyHzvo8+YJ05c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740695185; c=relaxed/simple;
-	bh=gtM20++jDrE+rF2NeuuL1OFtGokuhEHrZ/ogXcm8k/Y=;
+	s=arc-20240116; t=1740695249; c=relaxed/simple;
+	bh=96pSSj+jAeeUv8Kf2rgomEwAi8sdHZX5niFNLuSN/dA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n2aRZexb/ETXtLBazm4MHgPWr6A+eAAq0lYb+is6Wmhg+RtwRUnsRgt86aY5hA7mOhub+0FDQyVGfkGp8+aRenW5tpGpdoQsvucCOQtHVaU7nK/jwP1Ma9VRzjIKOph9WcsXmaActuhj5epRD6c6vJC3HyozP/tDMHD2Y4z4C/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LBuOerOu; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-22334203781so38472645ad.0;
-        Thu, 27 Feb 2025 14:26:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740695183; x=1741299983; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HRAmuYxHtn4qlykZoKH68H6MRsOoeB/MCYKeQWiydf8=;
-        b=LBuOerOuUcjRhfQBVdZYDSr0b1u6kWeSoy4j7AfwTcQ/K8NfwGGOQ7No0mO82Meff/
-         jGNHHHXl4dyPlKx5CoFsJtsYSUqFXgyw39d9P7S3ZKHCA05HPx6xq8au9bhrGFIq+oad
-         D7gMY14SKI3lP5tdf2PDEEB+2N4I0HpFTrOQUe4nksBSMSKv4kIZJ+mMHmjFMzH1yNGO
-         EpVSxYUctduKeAEUA284DvfT3E9mOKbh7+MW1KGuX+ggJq+NH/LwqozUjolpa5h1JsC6
-         f9xmKBmY9MNBgHFHrwQAMQHZANxJpIPvWjKDC8dVEKWPbdILTYRDANqj/C9IEJtwVLQT
-         2dSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740695183; x=1741299983;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HRAmuYxHtn4qlykZoKH68H6MRsOoeB/MCYKeQWiydf8=;
-        b=JuwvITZrROgLd1Dw1CzJQaYFQ4ksxiGXXKl4y6dlyu+dBinJzROaVXAQmfWD57LgVl
-         llqGHNUH1ouyepB+bNgpyLW90elX/hvks/mhBiliSOQcZoNbp5NemqZmJScELgoP8aJZ
-         Z3JuLwS1gl7P/UtZlnbnGdu/ZWOiw6bZN+3vmiK+BMtoLP/AcZ7NlZa1ABAQiTvdYIoC
-         yfTdta47U7CEYdsKo9mf2s81wrLT3q7+PCjOBRZln0T3aGXELzdw4ECxh1Y6JB0xopPv
-         z99Wtgkg0Osge3z+E9veiaNg0almGY4t/3n5n9ra5la9/Tmd/CIlS8AOAL3Q5vBoTp04
-         1abQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVx6Ww+F3sdv/T5RyALwutYwDsn7Q67fJBDg4jD3XtbjVt+09+aenPOrmeNiheRYbdxSnBsyiZrzLawR999@vger.kernel.org, AJvYcCWIXB3q0/94z5HjzWffycDAAwpRY9w+oeuvEvdCkQl3m4nOjcJkdp8+TSzNTEiB9zW2RzaTaOMLmejrD9hT8BtY@vger.kernel.org, AJvYcCXzIXS8ChIjZ6HYV7We9On9s8q6ogLTx0L/bARC+1rx0TkjY4cSRsFfl6dT61FUlZkKxTY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOfAU1nmModPg+9+xV5wO3KYQL2RBXwPURScpgL5AM1HqxvfEF
-	ECSZ8RG0CObeomLiR98Op0BFqt9d76Q+4FBVYZIP7NI2FJjWA+Y=
-X-Gm-Gg: ASbGnct01SduJhvYusdMojpAblEW1daLT7kfy+uth0eKE/4Wikp6a31JjONOu1JsMr/
-	GOuBan2AQt3LZqSs9sDiMVqLNy2yNAokRqgnj76h557Su8x7t0/l1ZiFlb3fXV2mxGXXM3vnz5e
-	I1GVyQ9H9iULjaOULWVTUAr4tnEI/CNS1JebQvzrod0nu/9yI7SZMpC2ROYQfc64HwzPEFg1pE5
-	AZrK8Zij8WUWm7GCX5rIAa6N3XldNZ97jnF8mHEuSgbcHNhpOlMOYuvvRca9ZL15zYv1Z5idowv
-	eQNPUYronc9/2rMV3fkLM+RWcg==
-X-Google-Smtp-Source: AGHT+IEJQxSeClVai5A355sKLh6sw/aFvTF8JXX8Pd/cKD3GtL23IGmP4/0X1s8ZRpAGKrAk/jMSPQ==
-X-Received: by 2002:aa7:864e:0:b0:72a:83ec:b1cb with SMTP id d2e1a72fcca58-7349cea2519mr7370799b3a.0.1740695182960;
-        Thu, 27 Feb 2025 14:26:22 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-734a0024b61sm2334686b3a.107.2025.02.27.14.26.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Feb 2025 14:26:22 -0800 (PST)
-Date: Thu, 27 Feb 2025 14:26:21 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
-	haoluo@google.com, jolsa@kernel.org, mykolal@fb.com,
-	shuah@kernel.org, hawk@kernel.org
-Subject: Re: [PATCH bpf-next v4 5/6] selftests/bpf: add test for XDP metadata
- support in tun driver
-Message-ID: <Z8DmjRy9g_vFX4lj@mini-arch>
-References: <20250227142330.1605996-1-marcus.wichelmann@hetzner-cloud.de>
- <20250227142330.1605996-6-marcus.wichelmann@hetzner-cloud.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=NrP1YE6CNLgqhDS8Zkg6+Pve+3PLQtor1B5EDinRshFtvi8OSD7CPUmSf70O9nKF/Z+/nRvebGjcwTfG0fl94JRtvE9VDtAVFXWjACWbYhtn1FO6F+kX5GTELzNHPC4Bs6z8FDgcW9JCRgjsEgC55Qst1qKGva5FueU1kECrIZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sFs4eDMr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9A3AC4CEDD;
+	Thu, 27 Feb 2025 22:27:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740695248;
+	bh=96pSSj+jAeeUv8Kf2rgomEwAi8sdHZX5niFNLuSN/dA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sFs4eDMr34h2DDvmtOqE9WpoSYxpM0wNuqTpid8DU6vBtzUd9yqPhbUjL+OyqFcdH
+	 3S8B2yZ3b43Z/fOtECdTgU1jIU+oehc2T1F6Z7TrYEiMWbjIYsHGVsvQxBm0XVHYdH
+	 F7ADWh8uml4kA8MRsDSUz0BAEEovpY1HorLEbYg0Xt7nxjmndH6yqPPnKBv0BcTShu
+	 MhQoiQTAVF4zZVPnjjETaLio9sYsDi6nAuV5svCl2VDqfpXhMXl8F47NS1po1KkJYb
+	 r0ryZWd1/iEd8ddiTuB3bKpQNMsvYQwm+4quyz+dBahSYcHfLCavy4dEo9hr2dDHCN
+	 7qklH3IfnvzWA==
+Date: Thu, 27 Feb 2025 14:27:27 -0800
+From: Saeed Mahameed <saeed@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v3][next] net/mlx5e: Avoid a hundred
+ -Wflex-array-member-not-at-end warnings
+Message-ID: <Z8Dmz_UPfR-WS8LI@x130>
+References: <Z76HzPW1dFTLOSSy@kspp>
+ <Z79iP0glNCZOznu4@x130>
+ <20250226172519.11767ac9@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20250227142330.1605996-6-marcus.wichelmann@hetzner-cloud.de>
+In-Reply-To: <20250226172519.11767ac9@kernel.org>
 
-On 02/27, Marcus Wichelmann wrote:
-> Add a selftest that creates a tap device, attaches XDP and TC programs,
-> writes a packet with a test payload into the tap device and checks the
-> test result. This test ensures that the XDP metadata support in the tun
-> driver is enabled and that the metadata size is correctly passed to the
-> skb.
-> 
-> See the previous commit ("selftests/bpf: refactor xdp_context_functional
-> test and bpf program") for details about the test design.
-> 
-> The test runs in its own network namespace using the feature introduced
-> with commit c047e0e0e435 ("selftests/bpf: Optionally open a dedicated
-> namespace to run test in it"). This provides some extra safety against
-> conflicting interface names.
-> 
-> Signed-off-by: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
+On 26 Feb 17:25, Jakub Kicinski wrote:
+>On Wed, 26 Feb 2025 10:49:35 -0800 Saeed Mahameed wrote:
+>> On 26 Feb 13:47, Gustavo A. R. Silva wrote:
+>> >-struct mlx5e_umr_wqe {
+>> >+struct mlx5e_umr_wqe_hdr {
+>> > 	struct mlx5_wqe_ctrl_seg       ctrl;
+>> > 	struct mlx5_wqe_umr_ctrl_seg   uctrl;
+>> > 	struct mlx5_mkey_seg           mkc;
+>> >+};
+>> >+
+>> >+struct mlx5e_umr_wqe {
+>> >+	struct mlx5e_umr_wqe_hdr hdr;
+>>
+>> You missed or ignored my comment on v0, anyway:
+>>
+>> Can we have struct mlx5e_umr_wq_hdr defined anonymously within
+>> mlx5e_umr_wqe? Let's avoid namespace pollution.
+>
+>It's also used in struct mlx5e_rq, I don't think it can be anonymous?
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+Yep, I see now, Thanks!.
+
 
