@@ -1,127 +1,113 @@
-Return-Path: <netdev+bounces-170373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 247EBA485ED
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 17:59:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D7BBA485D7
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 17:56:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 519C6189408A
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:54:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 809853A99FD
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:56:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C93AF1BD03F;
-	Thu, 27 Feb 2025 16:54:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1127A1DD0D6;
+	Thu, 27 Feb 2025 16:56:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BEl7AAL1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Inum+z0T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2407D1BCA0A
-	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 16:54:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB8921ACECF
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 16:56:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740675287; cv=none; b=ncFah8E9AYqezNADA91xzKDrE+TeM5JI8Hg397CB2W6UEb+IaFeGzH1JC7vXoU+R3uInFwY+8VynzcDYptERvOfwRMz0e7LzYZdBfZwu3/9pIlhrmWnsy4p6fFkCgnUPGbvEv0jF2Tx70E//qakUmZZ2CMXVKY/4i+1H+w9sVQA=
+	t=1740675369; cv=none; b=QAMAJesElBY3y+UubTrAuxnDxe2cnuLUZv9gAbfXJl6G/QDKdL5L6ncx2TBXeOoJjhLpU64sBP/vfUG/qZNVIW9a2jNTtegDw7EdgYZcAEPV6le4nTp+CnMfX62DPG2pd/2QTBrPA7GNA2vT3tV5H4KTj+F3Cb24RLb9xgBnM8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740675287; c=relaxed/simple;
-	bh=iHxrFhFny83WmNWdCod6QcehhB4oKb3HS0mSV0lvjsM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a7a/qajJWYQHLcHudFwpfCqXhL0zZfbXFIdBwMQFkMpLWG4TueGon7vrl9LpxyAoCxsSsUmBwzJpdiRVRHISA0y2PJhVJopV9S42iUXLfcFdHEvzYzOvCDSDEstQsXJMdhuzWAHXixa5BcvyV7sF2l3fkfS+JHVctKtGEz1zsSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BEl7AAL1; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740675286; x=1772211286;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=iHxrFhFny83WmNWdCod6QcehhB4oKb3HS0mSV0lvjsM=;
-  b=BEl7AAL1re9gHMoSE4aVXDiL+2DSvjxw3jkeixiSVvyuA/GOa6zz739a
-   I4uCjpH5rImLmNE5bA99yAX5WBGHw6QUSqfG0Nb4jNBufL33z2+Y3NcTI
-   //xLvbq6yeJ3uYV5z/tHpF05dMEUEwQVl8Ft5uDmFfvOk5NPNzSk0y+qH
-   Vqg8h2Z+6enMYxchZE/pa6KtsO/ZLfFLWaE5WuBX614EJDYDj3/r0XN91
-   rx4e7t3U8xLkXTYAwEM6wLb7+nfy4EnEEO1zLbfnYkzQFei370xwholX1
-   Ec+promj48pGqwrSKMjPikqZPrmrk8iKj3GOZr66N8YDKy4zfwUlwNbnK
-   w==;
-X-CSE-ConnectionGUID: dMB3CgfsS6KXQHbB9oA9hQ==
-X-CSE-MsgGUID: UBvDZGGqSlSuULiwZAIVVg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11358"; a="45491724"
-X-IronPort-AV: E=Sophos;i="6.13,320,1732608000"; 
-   d="scan'208";a="45491724"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 08:54:45 -0800
-X-CSE-ConnectionGUID: 9TW28CJ7SrCShaLWzmAKWQ==
-X-CSE-MsgGUID: SsDBisBgTp2P76hZoAwH/A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,320,1732608000"; 
-   d="scan'208";a="117106485"
-Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
-  by orviesa006.jf.intel.com with ESMTP; 27 Feb 2025 08:54:42 -0800
-Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tnh9j-000Dja-39;
-	Thu, 27 Feb 2025 16:54:39 +0000
-Date: Fri, 28 Feb 2025 00:54:15 +0800
-From: kernel test robot <lkp@intel.com>
-To: Gerhard Engleder <gerhard@engleder-embedded.com>, andrew@lunn.ch,
-	hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Gerhard Engleder <gerhard@engleder-embedded.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>
-Subject: Re: [PATCH net-next v8 6/8] net: selftests: Support selftest sets
-Message-ID: <202502280012.b32B74S1-lkp@intel.com>
-References: <20250224211531.115980-7-gerhard@engleder-embedded.com>
+	s=arc-20240116; t=1740675369; c=relaxed/simple;
+	bh=HzxrezDueZWLOUuiVzvWvhBUY2zuMYKdpRPKpdryPhA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dP28eEwVJgUSlCniv8e6/9WA/QLZtzaUGGmLN9F2SmdES+ZktWkcS52Zb8nudM7pgxHX/cENzMaN6Unwk0MOSH2Q0SHyfhpWkwZq6huJM4ZOIgZd+sPc50HxS4Sf7zRQbTgn/9cJIQTgw4o+BmVzExeEs/PGpszkIx4p14aJb1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Inum+z0T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3688BC4CEE8;
+	Thu, 27 Feb 2025 16:56:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740675369;
+	bh=HzxrezDueZWLOUuiVzvWvhBUY2zuMYKdpRPKpdryPhA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Inum+z0TwvTO/u0cw+GEhs66hTxr5sd3q5HbAh11GFMlSjBIDwH0ycwbejHIlCWjz
+	 ocmmrA1+Bc+uMhbmd0FAWYtLkTMPTRw0y6SkGNX+le/u0oHGXdnBitgD0JBbLkq73Z
+	 9AhjpDpCz0GvkJoroyEWdDd0IvBoVcVdQu0StMiv2zN5/vBx1TrgEfNQzJnH0BWzt7
+	 8q96N0bxiSol3MIrI4WpBdie6nduVJn+tgX1Rg2+DSYt+3HK79usJ8caMBNJ3vbpGQ
+	 YCio3OJ7M1wmxXp+87mMecPKTwrqcZdNKWuqvatyUEslPS0kQXttKecVJNE0YMv3zY
+	 5129DzRZUw+HA==
+Date: Thu, 27 Feb 2025 08:56:08 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Edward Cree <ecree.xilinx@gmail.com>
+Cc: Gal Pressman <gal@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org, Andrew Lunn
+ <andrew@lunn.ch>, Simon Horman <horms@kernel.org>, Joe Damato
+ <jdamato@fastly.com>, Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH net-next] net: ethtool: Don't check if RSS context
+ exists in case of context 0
+Message-ID: <20250227085608.5a3e32d7@kernel.org>
+In-Reply-To: <c034259f-ec9a-2e78-1fc0-f16981cd4e54@gmail.com>
+References: <20250225071348.509432-1-gal@nvidia.com>
+	<20250225170128.590baea1@kernel.org>
+	<8a53adaa-7870-46a9-9e67-b534a87a70ed@nvidia.com>
+	<20250226182717.0bead94b@kernel.org>
+	<20250226204503.77010912@kernel.org>
+	<275696e3-b2dd-3000-1d7b-633fff4748f0@gmail.com>
+	<20250227072933.5bbb4e2c@kernel.org>
+	<c034259f-ec9a-2e78-1fc0-f16981cd4e54@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250224211531.115980-7-gerhard@engleder-embedded.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Gerhard,
+On Thu, 27 Feb 2025 16:24:52 +0000 Edward Cree wrote:
+> > I never uttered the thought that lead me to opposing. 
+> > ctx 0 is a poor man's pass / accept. If someone needs a pass we should
+> > add an explicit "action pass".  
+> 
+> To me 'pass' is just a shorthand for whatever specific behaviour
+>  happens to match the default.  I.e. if you can already express
+>  that behaviour directly, then 'pass' is a strictly nonorthogonal
+>  addition and therefore bad interface design.
 
-kernel test robot noticed the following build errors:
+I presume sfc matches only one rule. For devices which terminate on
+first hit and rules are ordered by ntuple ID, the following rules*:
 
-[auto build test ERROR on net-next/main]
+ src-ip 192.168.0.2                 context 0
+ src-ip 192.0.0.0   m 0.255.255.255 action -1
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Gerhard-Engleder/net-phy-Allow-loopback-speed-selection-for-PHY-drivers/20250225-103125
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250224211531.115980-7-gerhard%40engleder-embedded.com
-patch subject: [PATCH net-next v8 6/8] net: selftests: Support selftest sets
-config: mips-randconfig-r064-20250227 (https://download.01.org/0day-ci/archive/20250228/202502280012.b32B74S1-lkp@intel.com/config)
-compiler: clang version 21.0.0git (https://github.com/llvm/llvm-project 204dcafec0ecf0db81d420d2de57b02ada6b09ec)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250228/202502280012.b32B74S1-lkp@intel.com/reproduce)
+implement allowing only 192.168.0.2 out of the 192.0.0.0/8 subnet. 
+The device may not even support RSS contexts.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202502280012.b32B74S1-lkp@intel.com/
+I agree that pass is not very clean, but context 0 _is_ a pass.
+It's not asking for context 0, it's asking for a nop rule which
+prevents a more general rule from matching. To me at least.
 
-All error/warnings (new ones prefixed by >>):
+* coin toss on the mask polarity
 
-   In file included from drivers/net/usb/smsc95xx.c:25:
->> include/net/selftests.h:48:59: error: 'void' must be the first and only parameter if specified
-      48 | static inline int net_selftest_set_get_count(int set, void)
-         |                                                           ^
->> include/net/selftests.h:48:59: warning: omitting the parameter name in a function definition is a C23 extension [-Wc23-extensions]
-   1 warning and 1 error generated.
+> But then, I'm the guy who thinks ed(1) is a good UI, so...
+> 
+> > Using ctx 0 as implicit pass is a very easy thing to miss
+> > for driver developers.  
+> 
+> I don't see why drivers need anything special to handle "0 is
+>  pass".  They need to handle "0 isn't in the xarray" (so map it
+>  to the default HW context), which I suppose we ought to call out
+>  explicitly in the struct ethtool_rxnfc kdoc if we're going to
+>  continue allowing it, but it's not the fact that it's "an
+>  implicit pass" that makes this necessary.  If there's something
+>  I'm missing here please educate me :)
 
-
-vim +/void +48 include/net/selftests.h
-
-    47	
-  > 48	static inline int net_selftest_set_get_count(int set, void)
-    49	{
-    50		return 0;
-    51	}
-    52	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Nothing super specific, but it does produce corner cases.
+We may find out if someone got it wrong once we have the test.
 
