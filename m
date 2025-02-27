@@ -1,84 +1,97 @@
-Return-Path: <netdev+bounces-170412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D772DA48A13
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 21:47:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC205A48A2F
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 21:57:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B07B3A41A7
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 20:47:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93B653AA859
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 20:57:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4B5726F465;
-	Thu, 27 Feb 2025 20:47:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DF8F2702D7;
+	Thu, 27 Feb 2025 20:57:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FHMEHhIL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RAKj4lyA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B1951DE4C8;
-	Thu, 27 Feb 2025 20:47:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B1EF1AF0C9;
+	Thu, 27 Feb 2025 20:57:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740689231; cv=none; b=ngv66roNM1AniIGa4ZesLtaANj2SA7X+7Jrr8150XfuqGgQ6s9UiZJMabKVpASqPFPqEGJvRIUt259nTtAVACrR+p67zb2uAURCwCbN4LrVaDBxFS1vYWdnTfpqAvdFrZEICREFQFlo4Hk/+5xCouFUCR2jqBOePucE+b0qVcew=
+	t=1740689842; cv=none; b=oN/fOjS/uM4KDPDxaEsyRqDqLRMIO5t3Qfu874K6Z7Cn88rYYIk7MAm/s/2Iu3PgEPGEEyRbt802LP3LcxVxAPG9P+eo/IjrqFCqvOdbx6RivinaRrykGHlDAPswiCYWPdMBfQ5MyrWXyVL121B2tayIwfga9ODMBTofwQqxHkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740689231; c=relaxed/simple;
-	bh=utQVCfMq3XX4+WH1ud4ZibztAqFiiIfTgmuA4Y+wqLA=;
+	s=arc-20240116; t=1740689842; c=relaxed/simple;
+	bh=WETLlt6omqPXV2KLrdLSdBoe5L//2lLKp5zjDgYIFVg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pwt0gPGk+xvlKcc9KN9opMWgo0jjd9YLXyEwm1yalkLdpPU2gLocq+n6APgSPAhAiKp06bAlZrWXVkq4lkM2H3NlDhGMCm/1l4N6PyyI68ySiLvoa8658qBiqFczXNpphcD6qvfux4OD1G6EUaAtlJjdZ9BwRKEXEiJRWS7mVXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FHMEHhIL; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740689229; x=1772225229;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=utQVCfMq3XX4+WH1ud4ZibztAqFiiIfTgmuA4Y+wqLA=;
-  b=FHMEHhIL+4WQIZcNE7nb2fe7Ohcr53/hcOhl6cnBDSOJGeWwt2YnYAuj
-   bY4CNP5mSr3ZvYLJY7tFjDBob5CFr6M81rjd+JUN74mFqcSfPPcIA7lii
-   e9YAH8KrBqPea0tSSLvICGvNVR8P+ptQ6xCe/LY/v0JX3zC36xBuWSBlT
-   /09Bjf+T3SZIbhLpkxaEtChz8Z5HCt/NC730XB74j/2hyiGbm0Dtjo/Jd
-   lE0XA2wNYAk9zeSGlssCeiNyorxJRxt7tDQxuTDzb2ZL1CUFolr33ADMo
-   Y5l1+WezXiY6RasquuXnZRYztdkeLOY5JJU0UMlCCkQ7/N0jq2jXVH99+
-   Q==;
-X-CSE-ConnectionGUID: osap7yFDS164lmwIYAnmmw==
-X-CSE-MsgGUID: s4dX6GsqT8OGb+cCHKR3bw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11358"; a="40844740"
-X-IronPort-AV: E=Sophos;i="6.13,320,1732608000"; 
-   d="scan'208";a="40844740"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 12:47:08 -0800
-X-CSE-ConnectionGUID: rGYSMAJhT1+XTk4WV27ENA==
-X-CSE-MsgGUID: SM0f+tdaRo2Ez/7u3JP6Sw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,320,1732608000"; 
-   d="scan'208";a="117160740"
-Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
-  by orviesa006.jf.intel.com with ESMTP; 27 Feb 2025 12:47:01 -0800
-Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tnkmV-000E14-1N;
-	Thu, 27 Feb 2025 20:46:56 +0000
-Date: Fri, 28 Feb 2025 04:46:26 +0800
-From: kernel test robot <lkp@intel.com>
-To: Li Li <dualli@chromium.org>, dualli@google.com, corbet@lwn.net,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, donald.hunter@gmail.com,
-	gregkh@linuxfoundation.org, arve@android.com, tkjos@android.com,
-	maco@android.com, joel@joelfernandes.org, brauner@kernel.org,
-	cmllamas@google.com, surenb@google.com, omosnace@redhat.com,
-	shuah@kernel.org, arnd@arndb.de, masahiroy@kernel.org,
-	bagasdotme@gmail.com, horms@kernel.org, tweek@google.com,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	netdev@vger.kernel.org, selinux@vger.kernel.org, hridya@google.com
-Cc: oe-kbuild-all@lists.linux.dev, smoreland@google.com, ynaffit@google.com,
-	kernel-team@android.com
-Subject: Re: [PATCH v15 2/3] binder: report txn errors via generic netlink
-Message-ID: <202502280430.x785GFat-lkp@intel.com>
-References: <20250226192047.734627-3-dualli@chromium.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=hr8RseXACkUzfPCYW9n+VPnuhvAfc6pAhhN3qGv5VJLazBoRHQbHnkQmHPHl50BTcewee3JK7A9Zd2JA3+QXGczW2vp7FsS67bHxpk5Vivsx85HRmfCbHLZBoLmpGKUU2dj/yw7c3byHgQApMAOonfJ/A4h7XavaNVNuBJQoxM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RAKj4lyA; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2234daaf269so38456635ad.3;
+        Thu, 27 Feb 2025 12:57:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740689840; x=1741294640; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=T1JO3e+QHevCg59+ZmfEUzPgv3IgoTrdZwhSZpSiJuQ=;
+        b=RAKj4lyATEhAxowoDzRzMTR7pTD4aQNHCakFL4ZTz2+tmQlZpeGwwBnfNdLYoD6URS
+         YozA4/9nEQdLgV1E53boL6JyCQYAf9tCVfHiaZgYMHgKSDVBvL5Jb0FgV/jG4QlLr9px
+         qr03r+FylkWS0Z/T2EohH4crpEXWsKMFdi3YLSED7DSGLb29lsiVzboTbCPjgA/1C2mo
+         LHufbwDSG1+iYUqVexls7m2IJ9AzfafAR9FPWqwSa2tsDEfUgzJQsVDMcDcsjYDtKVbV
+         tAzTJMs8PN/jpwb/oT+r/v+knLCqUSbY8w+bG5DnCQxw2RyitAcz2kdIx1gPfrua9uTt
+         8oLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740689840; x=1741294640;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T1JO3e+QHevCg59+ZmfEUzPgv3IgoTrdZwhSZpSiJuQ=;
+        b=xU/uTCx0czNceMGzdg+oG7HjSIebN3t3t0r0GHJZq6bwqstQpB0a6rEvJsrAfkPGHZ
+         aHeCZeEzkdTd3i5x9uuPL9o9qYj+VIRjv7I/2NW8B4JioWpIbpZoWFVz7g/IOxearKzc
+         Y4i/efx3kU0fcfgQPCPuYCXHSOy5tUQbyuf8xDose2TkWRRIVHOGb+FJro+4wHY5EubK
+         5KP2IRs7OHKA4tmwjKS3lSPWrdFlNjKaRPfUcb9gz4PYHeLUJ3+bJmcE+gktMmZrVPPP
+         jtFHsPVCgWako7TfUUytd0My8l5nqfNA8+3S2ttH8TmhpupZCdgUsszINqD8g/f+EqZC
+         K8vg==
+X-Forwarded-Encrypted: i=1; AJvYcCUdMpVniOVkTmcbaqzelQBxbvkq4h83Xj8lrAdMiZY5ArIUbFfIMmA1/28Sqaex9snBNe6+KIaz67qUvPLa@vger.kernel.org, AJvYcCUy0LLy7xDU7cJHTKEuhiuiv1TTBTksgcbAacB14wi1ILccO/pbi68BHo4f5hm+cH7ynlntXLuc@vger.kernel.org, AJvYcCVlRfQcGIvcwDzVRq8STkO0pU0vlRxB4fRXyAD3kBLhMZWYRIuxbB32/sra8M/fCM0WlZBE9vm70LLm2vPyRQIb@vger.kernel.org, AJvYcCVr7fl9zhii/js8C0D3Rpvql/HYtMvXlZ/usdqFiaUjP3WQHIJnemg5YRzzQpUbrTIgUzc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy54s1YHN2e6r9y0Sj8ZdaD1nz+Ckw88UIBCK4mIMRfnjgLXh1C
+	54sr0WKM/q0i5aH18dvDrryB0phsc7WJPNr4sPMAQlIX67MNZOZ7
+X-Gm-Gg: ASbGncsuhyjBa4hIcBqvIbWKB1uhR3nbvDPPj+Cvd72i+nqNrntfrdVGOzePRCcbw1W
+	QKAJwvpWZsZCKkWRqKTiiKauKQca/Isrmvmh7L9RglQaAUvcDd9ihnxp5BLZaIAB4rg2WisL3Uv
+	dR18sRzL8CDgZXAufwiFlrZDj5LdQzy24LcaDXUGxTVKNswBqucnCT3sfvh2XLrjWHRdKaltasE
+	eMUP5gMzNyK+sK7gryswpgGrWDS2gN1c1KBbrleJkhmuXxoxOlsMlml/5SC4rdFecKVR8HmpjSp
+	O4f9D3aPua66U4/5BaynHn8T
+X-Google-Smtp-Source: AGHT+IG5tP/v9M8GFdg+P85S4xVexxykjdMhOzU4N2lwZtfUNFfRo9lvThSz2x7aSYdfRtQqlpTghQ==
+X-Received: by 2002:a17:902:f547:b0:216:2bd7:1c4a with SMTP id d9443c01a7336-223690e1b20mr10723225ad.26.1740689840131;
+        Thu, 27 Feb 2025 12:57:20 -0800 (PST)
+Received: from gmail.com ([98.97.44.1])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-223501d5247sm19775925ad.26.2025.02.27.12.57.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Feb 2025 12:57:19 -0800 (PST)
+Date: Thu, 27 Feb 2025 12:57:15 -0800
+From: John Fastabend <john.fastabend@gmail.com>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>, cong.wang@bytedance.com,
+	jakub@cloudflare.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	andrii@kernel.org, eddyz87@gmail.com, mykolal@fb.com,
+	ast@kernel.org, daniel@iogearbox.net, martin.lau@linux.dev,
+	song@kernel.org, yonghong.song@linux.dev, kpsingh@kernel.org,
+	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
+	shuah@kernel.org, mhal@rbox.co, sgarzare@redhat.com,
+	netdev@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	mrpre@163.com,
+	syzbot+dd90a702f518e0eac072@syzkaller.appspotmail.com
+Subject: Re: [PATCH bpf-next v1 1/3] bpf, sockmap: avoid using sk_socket
+ after free
+Message-ID: <20250227205641.n2zpm5yetkoopvcz@gmail.com>
+References: <20250226132242.52663-1-jiayuan.chen@linux.dev>
+ <20250226132242.52663-2-jiayuan.chen@linux.dev>
+ <Z8DA8TqMEYNziiT9@pop-os.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,132 +100,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250226192047.734627-3-dualli@chromium.org>
+In-Reply-To: <Z8DA8TqMEYNziiT9@pop-os.localdomain>
 
-Hi Li,
+On 2025-02-27 11:45:53, Cong Wang wrote:
+> On Wed, Feb 26, 2025 at 09:22:40PM +0800, Jiayuan Chen wrote:
+> > Use RCU lock to protect sk_socket, preventing concurrent close and release
+> > by another thread.
+> > 
+> > Because TCP/UDP are already within a relatively large critical section:
+> > '''
+> > ip_local_deliver_finish
+> >   rcu_read_lock
+> >   ip_protocol_deliver_rcu
+> >       tcp_rcv/udp_rcv
+> >   rcu_read_unlock
+> > '''
+> > 
+> > Adding rcu_read_{un}lock() at the entrance and exit of sk_data_ready
+> > will not increase performance overhead.
+> > 
+> > Reported-by: syzbot+dd90a702f518e0eac072@syzkaller.appspotmail.com
+> > Closes: https://lore.kernel.org/bpf/6734c033.050a0220.2a2fcc.0015.GAE@google.com/
+> > Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> 
+> sock_def_readable() already acquires RCU read lock anyway.
+> 
+> Reviewed-by: Cong Wang <xiyou.wangcong@gmail.com>
 
-kernel test robot noticed the following build errors:
+Thanks.
 
-[auto build test ERROR on 8433c776e1eb1371f5cd40b5fd3a61f9c7b7f3ad]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Li-Li/lsm-selinux-Add-setup_report-permission-to-binder/20250227-032351
-base:   8433c776e1eb1371f5cd40b5fd3a61f9c7b7f3ad
-patch link:    https://lore.kernel.org/r/20250226192047.734627-3-dualli%40chromium.org
-patch subject: [PATCH v15 2/3] binder: report txn errors via generic netlink
-config: arm-randconfig-001-20250227 (https://download.01.org/0day-ci/archive/20250228/202502280430.x785GFat-lkp@intel.com/config)
-compiler: arm-linux-gnueabi-gcc (GCC) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250228/202502280430.x785GFat-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202502280430.x785GFat-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/android/binder.c: In function 'binder_nl_report_setup_doit':
->> drivers/android/binder.c:6479:15: error: implicit declaration of function 'security_binder_setup_report' [-Wimplicit-function-declaration]
-    6479 |         ret = security_binder_setup_report(current_cred());
-         |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-vim +/security_binder_setup_report +6479 drivers/android/binder.c
-
-  6462	
-  6463	/**
-  6464	 * binder_nl_report_setup_doit() - netlink .doit handler
-  6465	 * @skb:	the metadata struct passed from netlink driver
-  6466	 * @info:	the generic netlink struct passed from netlink driver
-  6467	 *
-  6468	 * Implements the .doit function to process binder netlink commands.
-  6469	 */
-  6470	int binder_nl_report_setup_doit(struct sk_buff *skb, struct genl_info *info)
-  6471	{
-  6472		struct binder_context *context = NULL;
-  6473		struct binder_device *device;
-  6474		struct binder_proc *proc;
-  6475		u32 flags, pid;
-  6476		void *hdr;
-  6477		int ret;
-  6478	
-> 6479		ret = security_binder_setup_report(current_cred());
-  6480		if (ret < 0) {
-  6481			NL_SET_ERR_MSG(info->extack, "Permission denied");
-  6482			return ret;
-  6483		}
-  6484	
-  6485		hlist_for_each_entry(device, &binder_devices, hlist) {
-  6486			if (!nla_strcmp(info->attrs[BINDER_A_CMD_CONTEXT],
-  6487					device->context.name)) {
-  6488				context = &device->context;
-  6489				break;
-  6490			}
-  6491		}
-  6492	
-  6493		if (!context) {
-  6494			NL_SET_ERR_MSG(info->extack, "Unknown binder context");
-  6495			return -EINVAL;
-  6496		}
-  6497	
-  6498		pid = nla_get_u32(info->attrs[BINDER_A_CMD_PID]);
-  6499		flags = nla_get_u32(info->attrs[BINDER_A_CMD_FLAGS]);
-  6500	
-  6501		if (!pid) {
-  6502			/* Set the global flags for the whole binder context */
-  6503			context->report_flags = flags;
-  6504		} else {
-  6505			/* Set the per-process flags */
-  6506			proc = binder_find_proc(pid);
-  6507			if (!proc) {
-  6508				NL_SET_ERR_MSG_FMT(info->extack,
-  6509						   "Invalid binder report pid %u",
-  6510						   pid);
-  6511				ret = -EINVAL;
-  6512				goto err_exit;
-  6513			}
-  6514	
-  6515			proc->report_flags = flags;
-  6516		}
-  6517	
-  6518		skb = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
-  6519		if (!skb) {
-  6520			pr_err("Failed to alloc binder netlink reply message\n");
-  6521			ret = -ENOMEM;
-  6522			goto err_exit;
-  6523		}
-  6524	
-  6525		hdr = genlmsg_iput(skb, info);
-  6526		if (!hdr)
-  6527			goto free_skb;
-  6528	
-  6529		if (nla_put_string(skb, BINDER_A_CMD_CONTEXT, context->name) ||
-  6530		    nla_put_u32(skb, BINDER_A_CMD_PID, pid) ||
-  6531		    nla_put_u32(skb, BINDER_A_CMD_FLAGS, flags))
-  6532			goto cancel_skb;
-  6533	
-  6534		genlmsg_end(skb, hdr);
-  6535	
-  6536		if (genlmsg_reply(skb, info)) {
-  6537			pr_err("Failed to send binder netlink reply message\n");
-  6538			ret = -EFAULT;
-  6539			goto err_exit;
-  6540		}
-  6541	
-  6542		return 0;
-  6543	
-  6544	cancel_skb:
-  6545		pr_err("Failed to add reply attributes to binder netlink message\n");
-  6546		genlmsg_cancel(skb, hdr);
-  6547	free_skb:
-  6548		pr_err("Free binder netlink reply message on error\n");
-  6549		nlmsg_free(skb);
-  6550		ret = -EMSGSIZE;
-  6551	err_exit:
-  6552		return ret;
-  6553	}
-  6554	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Reviewed-by: John Fastabend <john.fastabend@gmail.com>
 
