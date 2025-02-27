@@ -1,186 +1,136 @@
-Return-Path: <netdev+bounces-170285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF1C8A4811D
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 15:27:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB70DA480E3
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 15:22:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76ED317C710
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 14:18:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BACF73B7166
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 14:20:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C03A233D8C;
-	Thu, 27 Feb 2025 14:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nh8Dnmrz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B974C2309A3;
+	Thu, 27 Feb 2025 14:18:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C58F233D64;
-	Thu, 27 Feb 2025 14:17:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14F5722DFAE
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 14:18:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740665879; cv=none; b=pIO/c/r1OpWzNsq1O0I2mkDPBfUDZV/ZuHncO9Gmq4Imvm3Hjpgx98YoYuv8Erkvauk/L8avhb9T3LErufpLudOAbFameuEc5TGG9pGfTpiSFiYjSibr8DG4gabvrtveZxr6E5jH2vsSw86RFP0hAw0Cdj3NJtRJJpjTYfdthsY=
+	t=1740665921; cv=none; b=L6EYOaRx3W0WFocFDyKziArx5tM5XSDHACbKj/XkKMayDNvMy9G1Dhp90MZhYKG8xdh575lu/wiXL3dzdJC1I4QtnisKVI+WmviFMOgmLS6JwLDDIBGYiuBIGHezS7lQTskQ8qEtWgAS79etEaKSv30OVLrZ6qS3VWg0M1LVhSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740665879; c=relaxed/simple;
-	bh=gyR+0JxDx9CPzhusE3qvrKMnhe9hQirZQUCl/pzcCfw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=F3g3QK3KzFWqPgAcNtdKcno97HRwPHyzWTZpx801ws2lN5GyOY6lBApO3fqRPHpIitEsbAZu/W6whA7B4TTh/gBOW28snn8qm+8DPy7C+5poJBbqFRCg4/PSHBkHiQoygWy9i3cwWCABR9STYrGvU9JsZOxyU7x4BL4F0+4SpZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nh8Dnmrz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56919C4CEDD;
-	Thu, 27 Feb 2025 14:17:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740665878;
-	bh=gyR+0JxDx9CPzhusE3qvrKMnhe9hQirZQUCl/pzcCfw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=nh8Dnmrzn7XEchhAjP3eClzJh4utXeaFC3LucBXwMr37WV4b+qfqnHxTyICJYc83/
-	 9WJjP4dK9ORAtgZVF4rRvvUHn9XQTJ8YqJqsN9XHE3hlHkB5oDrw7m+vecjOJDu0oG
-	 FNCJI3H58WVgXaI4RxT2FaK58CCAIM7ncn4HHGn7/evJF9Nb7NVJZG38vJ/KEP0Tq3
-	 2YxvW12wwrYXzZTe1HO9kutTbw/dq6W8Otj/OGHR740U1LvOOSnj93J5xppDYCBSPK
-	 kSbFfWaJ1tqtho6RU5yxjjGs+Uxob74/wPsa4hWFpgKbJJMyP9Tbnr70ganj8hyaJQ
-	 XZYNzGXUDJwjw==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Richard Cochran <richardcochran@gmail.com>
-Cc: =?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Tianfei Zhang <tianfei.zhang@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-	Calvin Owens <calvin@wbinvd.org>,
-	Philipp Stanner <pstanner@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-fpga@vger.kernel.org
-Subject: [PATCH] RFC: ptp: add comment about register access race
-Date: Thu, 27 Feb 2025 15:17:27 +0100
-Message-Id: <20250227141749.3767032-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1740665921; c=relaxed/simple;
+	bh=LxGqDDciDNPai+yMXfQ6y3up7TsSxsnZOwf8EJYTN8g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BNCyNQ3reA+KKL+UeDgGaQOZJfLPvua7OXRci5wxq6XwV9lis0XvUNYIFdRy2gBflW9YB+W9jhE7iLPzqDChjjLg2AAJUMauWIWZYaUDWvbTUDOPXNOcGQJX6l2EZhcMLbqW7mH+HZLdRQRWOAk4HOErS0QP88o6bsslTQfJx4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tnehz-0003GQ-MD; Thu, 27 Feb 2025 15:17:51 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tnehw-0038i4-0Z;
+	Thu, 27 Feb 2025 15:17:48 +0100
+Received: from pengutronix.de (p5b164285.dip0.t-ipconnect.de [91.22.66.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id C00033CD6A6;
+	Thu, 27 Feb 2025 14:17:47 +0000 (UTC)
+Date: Thu, 27 Feb 2025 15:17:47 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Cc: Ming Yu <a0282524688@gmail.com>, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org, tmyu0@nuvoton.com, lee@kernel.org, 
+	linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com
+Subject: Re: [PATCH v8 4/7] can: Add Nuvoton NCT6694 CANFD support
+Message-ID: <20250227-gregarious-garrulous-echidna-ca7975-mkl@pengutronix.de>
+References: <20250225081644.3524915-1-a0282524688@gmail.com>
+ <20250225081644.3524915-5-a0282524688@gmail.com>
+ <a32b4ca1-0bcf-48e4-87ab-61fbd077a3c3@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="i5nv6d7na7xl5d3b"
+Content-Disposition: inline
+In-Reply-To: <a32b4ca1-0bcf-48e4-87ab-61fbd077a3c3@wanadoo.fr>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
 
-While reviewing a patch to the ioread64_hi_lo() helpers, I noticed
-that there are several PTP drivers that use multiple register reads
-to access a 64-bit hardware register in a racy way.
+--i5nv6d7na7xl5d3b
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v8 4/7] can: Add Nuvoton NCT6694 CANFD support
+MIME-Version: 1.0
 
-There are usually safe ways of doing this, but at least these four
-drivers do that.  A third register read obviously makes the hardware
-access 50% slower. If the low word counds nanoseconds and a single
-register read takes on the order of 1µs, the resulting value is
-wrong in one of 4 million cases, which is pretty rare but common
-enough that it would be observed in practice.
+On 27.02.2025 11:08:50, Vincent Mailhol wrote:
+> > +static int nct6694_can_stop(struct net_device *ndev)
+> > +{
+> > +	struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> > +
+> > +	priv->can.ctrlmode =3D CAN_CTRLMODE_LISTENONLY;
+>=20
+> Hmmm, when Marc asked you to put the device in listen only mode, I think
+> he meant that you set it on the device side (i.e. flag
+> NCT6694_CAN_SETTING_CTRL1_MON) and not on the driver side. If you set
+> CAN_CTRLMODE_LISTENONLY flag, that will be reported in the netlink
+> interface. So you should not change that flag.
 
-Link: https://lore.kernel.org/all/96829b49-62a9-435b-9e35-fe3ef01d1c67@app.fastmail.com/
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
-Sorry I hadn't sent this out as a proper patch so far. Any ideas
-what we should do here?
----
- drivers/net/ethernet/xscale/ptp_ixp46x.c | 8 ++++++++
- drivers/ptp/ptp_dfl_tod.c                | 4 ++++
- drivers/ptp/ptp_ocp.c                    | 4 ++++
- drivers/ptp/ptp_pch.c                    | 8 ++++++++
- 4 files changed, 24 insertions(+)
+ACK
 
-diff --git a/drivers/net/ethernet/xscale/ptp_ixp46x.c b/drivers/net/ethernet/xscale/ptp_ixp46x.c
-index 94203eb46e6b..e9c8589fdef0 100644
---- a/drivers/net/ethernet/xscale/ptp_ixp46x.c
-+++ b/drivers/net/ethernet/xscale/ptp_ixp46x.c
-@@ -43,6 +43,10 @@ static u64 ixp_systime_read(struct ixp46x_ts_regs *regs)
- 	u64 ns;
- 	u32 lo, hi;
- 
-+	/*
-+	 * Caution: Split access lo/hi, which has a small race
-+	 * when the low half overflows while we read it.
-+	 */
- 	lo = __raw_readl(&regs->systime_lo);
- 	hi = __raw_readl(&regs->systime_hi);
- 
-@@ -61,6 +65,10 @@ static void ixp_systime_write(struct ixp46x_ts_regs *regs, u64 ns)
- 	hi = ns >> 32;
- 	lo = ns & 0xffffffff;
- 
-+	/*
-+	 * This can equally overflow when the low half of the new
-+	 * nanosecond value is close to 0xffffffff.
-+	 */
- 	__raw_writel(lo, &regs->systime_lo);
- 	__raw_writel(hi, &regs->systime_hi);
- }
-diff --git a/drivers/ptp/ptp_dfl_tod.c b/drivers/ptp/ptp_dfl_tod.c
-index f699d541b360..1eed76c3a256 100644
---- a/drivers/ptp/ptp_dfl_tod.c
-+++ b/drivers/ptp/ptp_dfl_tod.c
-@@ -104,6 +104,10 @@ static int coarse_adjust_tod_clock(struct dfl_tod *dt, s64 delta)
- 	if (delta == 0)
- 		return 0;
- 
-+	/*
-+	 * Caution: Split access lo/hi, which has a small race
-+	 * when the low half overflows while we read it.
-+	 */
- 	nanosec = readl(base + TOD_NANOSEC);
- 	seconds_lsb = readl(base + TOD_SECONDSL);
- 	seconds_msb = readl(base + TOD_SECONDSH);
-diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
-index b651087f426f..cdf2ebe7c9bc 100644
---- a/drivers/ptp/ptp_ocp.c
-+++ b/drivers/ptp/ptp_ocp.c
-@@ -1229,6 +1229,10 @@ __ptp_ocp_gettime_locked(struct ptp_ocp *bp, struct timespec64 *ts,
- 		sts->post_ts = ns_to_timespec64(ns - bp->ts_window_adjust);
- 	}
- 
-+	/*
-+	 * Caution: Split access to nanoseconds/seconds, which has a small
-+	 * race when the low half overflows while we read it.
-+	 */
- 	time_ns = ioread32(&bp->reg->time_ns);
- 	time_sec = ioread32(&bp->reg->time_sec);
- 
-diff --git a/drivers/ptp/ptp_pch.c b/drivers/ptp/ptp_pch.c
-index b8a9a54a176c..a90c206e320b 100644
---- a/drivers/ptp/ptp_pch.c
-+++ b/drivers/ptp/ptp_pch.c
-@@ -147,6 +147,10 @@ static u64 pch_systime_read(struct pch_ts_regs __iomem *regs)
- {
- 	u64 ns;
- 
-+	/*
-+	 * Caution: Split access lo/hi, which has a small race
-+	 * when the low half overflows while we read it.
-+	 */
- 	ns = ioread64_lo_hi(&regs->systime_lo);
- 
- 	return ns << TICKS_NS_SHIFT;
-@@ -154,6 +158,10 @@ static u64 pch_systime_read(struct pch_ts_regs __iomem *regs)
- 
- static void pch_systime_write(struct pch_ts_regs __iomem *regs, u64 ns)
- {
-+	/*
-+	 * This can equally overflow when the low half of the new
-+	 * nanosecond value is close to 0xffffffff.
-+	 */
- 	iowrite64_lo_hi(ns >> TICKS_NS_SHIFT, &regs->systime_lo);
- }
- 
--- 
-2.39.5
+> But before that, did you check the datasheet? Don't you have a device
+> flag to actually turn the device off (e.g. sleep mode)?
 
+Please test that the ifup -> ifdown -> ifup sequence works properly,
+even on a busy bus and on a bus without with a 2nd CAN station that is
+sending and you are the only receiver.
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--i5nv6d7na7xl5d3b
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmfAdAgACgkQDHRl3/mQ
+kZxjHQf/cl+NPaGA6wNUTa68Le8AS6tbcg6UkzWcAd8AS8/6CWkgPeebGEbmzKvl
+iENWrgc7mfiuy346ubOPufojybeeXMdOHLiwDPEkVgZegMycqUnS+2F/mTCm50fR
+vf9mETJuODrqvL4I265jS9Z+SUA/R/pzTcs0pQItMSzfUwGJ5nv9JQS8mv3MOQhM
+zOqyOMX1bv3+0Ov9ZTpjaV2JoOmTqpDFIYuN2DyqGl+NlJfZyHCp/Z8UJ7MyQykL
+Nzk53OPw0yb1MC6RT8m5ijRnpiVzfV5Et+2/FEXSW0aE/SXBRailPfDqdEmxXFnf
+f4DOoo4Z+H6xhf0L7EUZ1HcmpU+ckA==
+=2o2X
+-----END PGP SIGNATURE-----
+
+--i5nv6d7na7xl5d3b--
 
