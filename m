@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-170194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0158EA47BDC
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 12:20:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5762A47BE0
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 12:21:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E52CC188DACE
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 11:19:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A248A161162
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 11:19:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FA9022A816;
-	Thu, 27 Feb 2025 11:18:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D0B922D7AE;
+	Thu, 27 Feb 2025 11:18:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P0GodFDM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bZqxDYmG"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB60321324D;
-	Thu, 27 Feb 2025 11:18:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA70322D7A5;
+	Thu, 27 Feb 2025 11:18:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740655094; cv=none; b=cOAeawn0surdDQ5G+QIe7xWdSW5TfBV4b/wjDK/p4LmViyrIfHJ7y/ec2+9muNrWbF48QVzsHnx7HYfMX3s+irHVPXpMK0npNdx1+ol4jaA8vTHa7UGulbougsQE7ernID/vwEKHtx2FaPC8+trj6vbmOjS5NR9b2UqT43UYA3k=
+	t=1740655118; cv=none; b=Q1pko3WYiDVPWQ0w60x0DVc6vLCGSf1p5xAd7DhwX7dNlwbFqptiZQdraTgP1bSnp5XHaiHNzpEGtklt8m+1Rw1/z3vtMAMEB//lEcuNDlHYfvcl3nlQMNMoaOM209CRw7IyN8lG/Mt10w160GvMMVblCIho42W2RHiF+g7aMLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740655094; c=relaxed/simple;
-	bh=K9BvBv3hLYw0IGq8eJuii6hDq4mM87UTjkwNlZVz44I=;
+	s=arc-20240116; t=1740655118; c=relaxed/simple;
+	bh=IDZov/Dczn2f/ieNl0tUIoh9CnexHmfb2x1sTLNrFZA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hFpyTHGNuT56YvViZTgeEZP6zPFf69BmGST18z++eSQylmWgDKLKj/6RbOgxHlJ5aL70Ml/Em5ORstvzgrTtM5SokMyglm6Q07sPN4XfFkUwBF4bs764ps9JITVnj1/yVhfBNzzrrzQJgyWS5oCgQLa81WWfpp6ok7SMYSspcDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P0GodFDM; arc=none smtp.client-ip=198.175.65.10
+	 In-Reply-To:Content-Type; b=Sw8D+T4XcqP5S8TJNDWpOa690jhJsF2A8pF1LUZaiDU0O6lTbRMfb1Zhy5p3WFpp5jFPteC+NGElpx9sa8c8f/PtZXlsW+UlMEu/QyDUPqnpS+H+GMHJJ22fdnUgJCbr3K6CgKWL3Q/xNTKJzDLo2oT259umxzkhL2G7nSzilvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bZqxDYmG; arc=none smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740655093; x=1772191093;
+  t=1740655117; x=1772191117;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=K9BvBv3hLYw0IGq8eJuii6hDq4mM87UTjkwNlZVz44I=;
-  b=P0GodFDMBoFSHwz64pmcR4XSAZAWAyn1z8UM4Z4Kyz+Q37iAnXhhRpPx
-   ySANvXdGi63KdLMqnPNwDYFNhoNabHj4jAzX0yVCCdQniiCnmAvhZLTxi
-   zpbHaol7t+MCM/9JKOSHPC9RmW79+BQRnOrZvQSwGJAxBvd2DOnhfQS2W
-   1hu7e7FadgT8vTDwh8MPbRaB0Sx8gvObMEkdIFSJ067I8j3nwgA1LE3W5
-   1Z9bp2otGB1+f7wLT13XT/NX5WkJ+Lc2Nyr8knWvXHd8Unw4oaaKUF91x
-   BaBb7SRGblN3/tBZZqSEizuWKbhqI+C5pJlutaznhlLWooWO/WR4uqSSa
-   Q==;
-X-CSE-ConnectionGUID: mW5lYEBvQP6jsUfHuph8KQ==
-X-CSE-MsgGUID: 6IVdGN9EQ7GXMv7SWfPOCA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11357"; a="58955533"
+  bh=IDZov/Dczn2f/ieNl0tUIoh9CnexHmfb2x1sTLNrFZA=;
+  b=bZqxDYmGd8ofzhohhdB4mvgtrSgFqaVnT6LO+Pwl+Cw0mq4pzB4iyfCQ
+   P3l3X7C8LYYt/tGhqB9Mx8bdQg+rZn2Of5R9V6beds1xDzk8repbR2UAN
+   MGkGG/1hCQvxAOKW7+0PwyAc7naSgzlEVnT2ujba6H0dnbQrQ11RFv98S
+   134PJeRAQ7LSGNh51tGCjLuVMelXklr5eONj08WTtxl6vpnjnP9QJ8hpf
+   xjUvBxocNzoV0PTX67S8JW07mLEDWIGuE+gh5eh+8muECw6qTDD/Bf8PK
+   oLf55cH0qC25/1wMbDI3q+ZZUzbPfJdQs4ZFcH+mA9AsmeXEoUj+mqc15
+   w==;
+X-CSE-ConnectionGUID: Gjl+TKEYTnm8RlwIKCadJw==
+X-CSE-MsgGUID: S6HeA2jpSQWfUP8JkTrgXg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11357"; a="58955619"
 X-IronPort-AV: E=Sophos;i="6.13,319,1732608000"; 
-   d="scan'208";a="58955533"
+   d="scan'208";a="58955619"
 Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 03:18:12 -0800
-X-CSE-ConnectionGUID: PDI93uncReGm6znVKxCg+w==
-X-CSE-MsgGUID: 4PYYlND1R6+gWOxBvTmk5A==
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 03:18:36 -0800
+X-CSE-ConnectionGUID: CyeTxPjwSHeHLctx7MMYQw==
+X-CSE-MsgGUID: 9QUOdIUaRUO9MO1mKfn1Wg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,319,1732608000"; 
-   d="scan'208";a="117172348"
+   d="scan'208";a="117172376"
 Received: from choongyo-mobl.gar.corp.intel.com (HELO [10.247.81.210]) ([10.247.81.210])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 03:18:04 -0800
-Message-ID: <55ddacb9-dc00-4477-aeab-9b8861563194@linux.intel.com>
-Date: Thu, 27 Feb 2025 19:18:02 +0800
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 03:18:28 -0800
+Message-ID: <8395554a-4aaf-45fb-a89d-34f5b10255fb@linux.intel.com>
+Date: Thu, 27 Feb 2025 19:18:26 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,8 +67,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 2/6] net: pcs: xpcs: re-initiate clause 37
- Auto-negotiation
+Subject: Re: [PATCH net-next v8 4/6] stmmac: intel: configure SerDes according
+ to the interface mode
 To: "Russell King (Oracle)" <linux@armlinux.org.uk>
 Cc: Simon Horman <horms@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
  Jose Abreu <Jose.Abreu@synopsys.com>,
@@ -93,72 +93,40 @@ Cc: Simon Horman <horms@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
  linux-stm32@st-md-mailman.stormreply.com,
  linux-arm-kernel@lists.infradead.org
 References: <20250226074837.1679988-1-yong.liang.choong@linux.intel.com>
- <20250226074837.1679988-3-yong.liang.choong@linux.intel.com>
- <Z78141ZNWEYDSi5l@shell.armlinux.org.uk>
+ <20250226074837.1679988-5-yong.liang.choong@linux.intel.com>
+ <Z782i67tlpj6d57m@shell.armlinux.org.uk>
 Content-Language: en-US
 From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-In-Reply-To: <Z78141ZNWEYDSi5l@shell.armlinux.org.uk>
+In-Reply-To: <Z782i67tlpj6d57m@shell.armlinux.org.uk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
-On 26/2/2025 11:40 pm, Russell King (Oracle) wrote:
-> On Wed, Feb 26, 2025 at 03:48:33PM +0800, Choong Yong Liang wrote:
->> diff --git a/drivers/net/pcs/pcs-xpcs-wx.c b/drivers/net/pcs/pcs-xpcs-wx.c
->> index fc52f7aa5f59..f73ab04d09f0 100644
->> --- a/drivers/net/pcs/pcs-xpcs-wx.c
->> +++ b/drivers/net/pcs/pcs-xpcs-wx.c
->> @@ -172,11 +172,9 @@ int txgbe_xpcs_switch_mode(struct dw_xpcs *xpcs, phy_interface_t interface)
->>   		return 0;
->>   	}
->>   
->> -	if (xpcs->interface == interface && !txgbe_xpcs_mode_quirk(xpcs))
->> +	if (!txgbe_xpcs_mode_quirk(xpcs))
->>   		return 0;
->>   
->> -	xpcs->interface = interface;
->> -
+On 26/2/2025 11:43 pm, Russell King (Oracle) wrote:
+> On Wed, Feb 26, 2025 at 03:48:35PM +0800, Choong Yong Liang wrote:
+>> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+>> index 6d2aa77ea963..af22a11c2b8a 100644
+>> --- a/include/linux/stmmac.h
+>> +++ b/include/linux/stmmac.h
+>> @@ -236,6 +236,10 @@ struct plat_stmmacenet_data {
+>>   	int (*serdes_powerup)(struct net_device *ndev, void *priv);
+>>   	void (*serdes_powerdown)(struct net_device *ndev, void *priv);
+>>   	void (*speed_mode_2500)(struct net_device *ndev, void *priv);
+>> +	int (*mac_finish)(struct net_device *ndev,
+>> +			  void *priv,
+>> +			  unsigned int mode,
+>> +			  phy_interface_t interface);
+>>   	void (*ptp_clk_freq_config)(struct stmmac_priv *priv);
+>>   	int (*init)(struct platform_device *pdev, void *priv);
+>>   	void (*exit)(struct platform_device *pdev, void *priv);
 > 
-> ...
+> This should be part of patch 5, and the order of patches 4 and 5
+> reversed.
 > 
->> --- a/drivers/net/pcs/pcs-xpcs.c
->> +++ b/drivers/net/pcs/pcs-xpcs.c
->> @@ -602,12 +602,37 @@ static void xpcs_get_interfaces(struct dw_xpcs *xpcs, unsigned long *interfaces)
->>   		__set_bit(compat->interface, interfaces);
->>   }
->>   
->> +static int xpcs_switch_interface_mode(struct dw_xpcs *xpcs,
->> +				      phy_interface_t interface)
->> +{
->> +	int ret = 0;
->> +
->> +	if (xpcs->interface != interface) {
->> +		if (xpcs->info.pma == WX_TXGBE_XPCS_PMA_10G_ID) {
->> +			ret = txgbe_xpcs_switch_mode(xpcs, interface);
->> +			if (ret)
->> +				return ret;
+> The subject line should also be "net: stmmac: ..."
 > 
-> The above modification changes the functionality.
-> 
-> In the old code, txgbe_xpcs_switch_mode() does its work when
-> xpcs->interface is not the same as interface OR txgbe_xpcs_mode_quirk()
-> is true.
-> 
-> Your replacement code calls txgbe_xpcs_switch_mode() when
-> xpcs->interface is not the same as interface, *and* it can do its
-> work when txgbe_xpcs_mode_quirk() returns true.
-> 
-> So, e.g. when txgbe_xpcs_mode_quirk() returns false, but the interface
-> changes, txgbe_xpcs_mode_quirk() used to do its work, but as a result
-> if your changes, it becomes a no-op.
-> 
-> The point of txgbe_xpcs_mode_quirk() is to always do the work if it
-> returns true, even if the interface mode doesn't change.
-> 
-> Therefore, this patch is logically incorrect, and likely breaks TXGBE.
-> 
-Thank you for pointing out the oversight. I will review the logic and make 
-the necessary corrections to ensure the patch does not disrupt the expected 
-behavior.
+Thank you for your guidance. I will adjust the patch sequence as suggested 
+and update the subject line to "net: stmmac: ...". I appreciate your 
+attention to detail.
 
