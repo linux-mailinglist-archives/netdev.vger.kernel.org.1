@@ -1,124 +1,128 @@
-Return-Path: <netdev+bounces-170405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A1E4A488E0
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 20:20:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FF5DA48930
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 20:46:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09A3F166EF2
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 19:20:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6F963AB102
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 19:46:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CBFD26E940;
-	Thu, 27 Feb 2025 19:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECF0C26F47B;
+	Thu, 27 Feb 2025 19:45:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JEEBmo0O"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FZYKCxR9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44A16270054;
-	Thu, 27 Feb 2025 19:20:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 780AB1B0425;
+	Thu, 27 Feb 2025 19:45:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740684026; cv=none; b=ZFPQ748aSKrZStag8W70UW46p8EPsOhP85gauW+6sFfCVBNa54G7tx2gmqGDHjVKG3YFd7mXngBcTMb0h85rRx6RSzR4Pz/NxZN9vfVQYqDcxqdZksk1ZU0uaGiy/XJD4tHYL8aV/5n0d8e1f7Itzz2oatscnfIpjWnaum0+Kd0=
+	t=1740685556; cv=none; b=gtL39guBAFAQfKknjvE96q6HeORevlQeihXaOz7YaUBJi4gheJQtWsigVDUM/+T+HRZ3sZ382PsbczBrjLqwzKv8zOr5hJFFWcU9GjZovxYkYwrtCAjyftcyzk9fqC7Ywm3vw2FaXQXotZ90nrAPU9PRukRt+3hS5+A9rgfe/fE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740684026; c=relaxed/simple;
-	bh=xtfpr7hHwam7QkTVY8/dfHG6gdnWBz3qmp5PmCCeyqI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=h7v+BHRsMU0hL5GrNiV0eRPUmYO3ncHF3u0JGVkzw7ppvA5uNacm4HjCv5tDAZTL4cTO1tAkJPEr2SGDUWrH+7kQ3DzGt0rVKTnTXYU1cmRD3zJaJy4N4J0tZrapXJlT6IlkmXNYYhcpGJC2DTR0v1eFPsK2fKfbtC63eYzd4Q8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JEEBmo0O; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AECFBC4CEDD;
-	Thu, 27 Feb 2025 19:20:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740684025;
-	bh=xtfpr7hHwam7QkTVY8/dfHG6gdnWBz3qmp5PmCCeyqI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JEEBmo0OJyq4tnv7HxVytge08ygjACWegFDvH/0Z76VYA3+wdt+KYF0HTXWJYeduA
-	 lHaOmZtcPf10yU0dg4Px7QwiM+K4Qwid7qkzC9LKXrDSDPpXFNjFXQDH4QKcqk3M82
-	 aPpdOG6UMMpSPoBJdM30jDsMGVfVwyNHMbpsgrtlYBna8GvzrCa90ORgrmEW/oDPqH
-	 HdIcDg0/tf1bnyujbbPermj1gIm+9x+gsJHl182cv+cFq9HNALPBN5tlNCe00A5qGH
-	 AxywRT/o4IyPybiT5lD04RW3qGbXGDG97ujivGRuMK8Wxu3BcLu0DmzJCP9LYDeY5+
-	 zAHIhsf85xBig==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF31380AACB;
-	Thu, 27 Feb 2025 19:20:58 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1740685556; c=relaxed/simple;
+	bh=fxGI2P73JAE1BbX3qBIJnpU9JmGHhCzRhZk02qu+4IA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t8x2QFtGXF6gv4onJP0bGMSVXjgH4uezMNcwSoFoR6MBti2vPrYYX9V9kDdNgWHV8mkqqkDv5GQdhpMmdD467Vz7sWP27OE0JlgVlLex0y01Blwp5qtQ+iWcUH1ROPsNWfDts2/rCGq8V2sgRnDKEEdG4mDTh9fXLQPkf1Y2p0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FZYKCxR9; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2feb9076cdcso800968a91.0;
+        Thu, 27 Feb 2025 11:45:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740685555; x=1741290355; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hKrLEfNlUSucizGljfgxzp9FYBz9EtVzZ87+jjh5zyk=;
+        b=FZYKCxR9GNIKjczjfyNiHlyTbC84ol4Zqe35r0U3q+D1qvBTX0/7rmHjJsrtAcdU8D
+         jEwoElUmbpPuEVqdvTJwz+stdlGpp91RfXfsYx1skiVJtW8uhkrUxiFNlNQ6qrOkoFth
+         rQ89ItD38s9KxC0tRyj659a72anxse4ZAcgBczwqIuu/pbm7sSmVeVh2dfEKsIk/mkUH
+         jtXR6yupIee91OUxtMGmWg1scxaRYBQ/lZpe/KjwKIQcXpjERS8x5N0uXja7Hnhn+kYb
+         F9AJKM7NzealZrKJrCbVu9GX4U0U3692sc8j5X5PzH2BAg9QFpJzwd/EF8HjAFEf49rh
+         ip7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740685555; x=1741290355;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hKrLEfNlUSucizGljfgxzp9FYBz9EtVzZ87+jjh5zyk=;
+        b=IQjd7ZRW9iL6NY2z9pMDOb85dshLtdNJTSm4LQv10BsvpBNK/ujCrNPtLc2b/iCGLe
+         KqdJkeNG4Zrp3xgE9kS7J/xAKw2y8DrHm1AC950YstfdM/+JPj1Otiq3vcRt9eOaHmsK
+         XFXFWkkEsTn70Ua7z50/1KLE1ENmqeev4jrzslde30brHD76czbhi/ExT4LQ/ax2H/om
+         o3YZ1og70GSPTgV+yYwjBo+8G+i7UmqKU820pH0/7Kk7lri9c+9K/7xM2hvmAPQKJRX9
+         NOJHa7Lztl8KYAQhWL6x2BnUicmnuKMZ0hEhwfd+FDwE2amGvhMFGWvNeW1S2frrbOCt
+         YIGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVmF0Fq6clBV/OawBhLHUa4exARTwES/zoTRLtPT0qo0KC35dh2ojFTCH6PLYW8QAaqSsdUWnb1zrhlx2LO@vger.kernel.org, AJvYcCWV5iTzy8MnuZMBPf9npTu4Olp6BqHBYdNOclRcMNT11nNkENJAe5n09R2uVKyDogaPzNGB7Rw1@vger.kernel.org, AJvYcCWdkmo5sv6g3gQgW5UrF4tB5fJ7O89+b1nkd/wouOFBaTuOedTn+ARpr1nnAxPV0aqLgsJiv5fkj1BdpWFnko/t@vger.kernel.org, AJvYcCXzhCux8Yq9WoKbdxL/dcK8SjkpgemuU2o43LOWb36JYmBKbZCd/G8AjoJ5P/1p2OfY5SI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiQtW1GZ+19RkfkZGnVvObFrogdMiamf2IUrrXUoU5xx0emZZ4
+	+96jKb+PmCeekHyfqcphXwRO6cMLcckWeQWBVOBMbkHbIsBpgcWY
+X-Gm-Gg: ASbGncujawuASmenntDJqX4UbqoTnSYIWxAbZ3hZ7gvTz2lW8+ScPrf55Y8VpSmRGyB
+	0Q/c0vFQGnBiOLxtjCQEOQOzYawoV8PccNKAeR825NB19dCs+tYu+hygc5pCz5xx9bWmZHRbelt
+	+eo2adWDUSpt6RIFZLabJUjJLg/quNjWnrWbygR2twHy0RJTpZGXFUGKzDI/uqo+H8cYDhHlGRo
+	dWOM2CwGjNiHtz9zigvoWduGjonrLaC79nfidfQIeoyS2PLoj8O2fUAprWKiM1ymhz4G0eIpAAw
+	+5ay8NtVyR0phm62EJrCVABYk0ShMA==
+X-Google-Smtp-Source: AGHT+IF7KxgGQER56mHtTQNtxws1vcj+rbNToYaT+m7ci3YVeU2HRn/oym63rVGGHm8Fgqe9vgWxNg==
+X-Received: by 2002:a17:90b:1804:b0:2fe:8c22:48b0 with SMTP id 98e67ed59e1d1-2febab7876amr909701a91.15.1740685554682;
+        Thu, 27 Feb 2025 11:45:54 -0800 (PST)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22350529edasm18978725ad.230.2025.02.27.11.45.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Feb 2025 11:45:54 -0800 (PST)
+Date: Thu, 27 Feb 2025 11:45:53 -0800
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: cong.wang@bytedance.com, john.fastabend@gmail.com, jakub@cloudflare.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, andrii@kernel.org,
+	eddyz87@gmail.com, mykolal@fb.com, ast@kernel.org,
+	daniel@iogearbox.net, martin.lau@linux.dev, song@kernel.org,
+	yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me,
+	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, mhal@rbox.co,
+	sgarzare@redhat.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	mrpre@163.com,
+	syzbot+dd90a702f518e0eac072@syzkaller.appspotmail.com
+Subject: Re: [PATCH bpf-next v1 1/3] bpf, sockmap: avoid using sk_socket
+ after free
+Message-ID: <Z8DA8TqMEYNziiT9@pop-os.localdomain>
+References: <20250226132242.52663-1-jiayuan.chen@linux.dev>
+ <20250226132242.52663-2-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/15] afs,
- rxrpc: Clean up refcounting on afs_cell and afs_server records
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174068405775.1535916.5681071064674695791.git-patchwork-notify@kernel.org>
-Date: Thu, 27 Feb 2025 19:20:57 +0000
-References: <20250224234154.2014840-1-dhowells@redhat.com>
-In-Reply-To: <20250224234154.2014840-1-dhowells@redhat.com>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, marc.dionne@auristor.com, kuba@kernel.org,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- brauner@kernel.org, linux-afs@lists.infradead.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250226132242.52663-2-jiayuan.chen@linux.dev>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 24 Feb 2025 23:41:37 +0000 you wrote:
-> Here are some patches that fix an occasional hang that's only really
-> encountered when rmmod'ing the kafs module.  Arguably, this could also go
-> through the vfs tree, but I have a bunch more primarily crypto and rxrpc
-> patches that need to go through net-next on top of this[1].
+On Wed, Feb 26, 2025 at 09:22:40PM +0800, Jiayuan Chen wrote:
+> Use RCU lock to protect sk_socket, preventing concurrent close and release
+> by another thread.
 > 
-> Now, at the beginning of this set, I've included five fix patches that are
-> already committed to the net/main branch but that need to be applied first,
-> but haven't made their way into net-next/main or upstream as yet:
+> Because TCP/UDP are already within a relatively large critical section:
+> '''
+> ip_local_deliver_finish
+>   rcu_read_lock
+>   ip_protocol_deliver_rcu
+>       tcp_rcv/udp_rcv
+>   rcu_read_unlock
+> '''
 > 
-> [...]
+> Adding rcu_read_{un}lock() at the entrance and exit of sk_data_ready
+> will not increase performance overhead.
+> 
+> Reported-by: syzbot+dd90a702f518e0eac072@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/bpf/6734c033.050a0220.2a2fcc.0015.GAE@google.com/
+> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 
-Here is the summary with links:
-  - [net-next,01/15] rxrpc: rxperf: Fix missing decoding of terminal magic cookie
-    https://git.kernel.org/netdev/net-next/c/c34d999ca314
-  - [net-next,02/15] rxrpc: peer->mtu_lock is redundant
-    https://git.kernel.org/netdev/net-next/c/833fefa07444
-  - [net-next,03/15] rxrpc: Fix locking issues with the peer record hash
-    https://git.kernel.org/netdev/net-next/c/71f5409176f4
-  - [net-next,04/15] afs: Fix the server_list to unuse a displaced server rather than putting it
-    https://git.kernel.org/netdev/net-next/c/add117e48df4
-  - [net-next,05/15] afs: Give an afs_server object a ref on the afs_cell object it points to
-    https://git.kernel.org/netdev/net-next/c/1f0fc3374f33
-  - [net-next,06/15] afs: Remove the "autocell" mount option
-    (no matching commit)
-  - [net-next,07/15] afs: Change dynroot to create contents on demand
-    (no matching commit)
-  - [net-next,08/15] afs: Improve afs_volume tracing to display a debug ID
-    (no matching commit)
-  - [net-next,09/15] afs: Improve server refcount/active count tracing
-    (no matching commit)
-  - [net-next,10/15] afs: Make afs_lookup_cell() take a trace note
-    (no matching commit)
-  - [net-next,11/15] afs: Drop the net parameter from afs_unuse_cell()
-    (no matching commit)
-  - [net-next,12/15] rxrpc: Allow the app to store private data on peer structs
-    (no matching commit)
-  - [net-next,13/15] afs: Use the per-peer app data provided by rxrpc
-    (no matching commit)
-  - [net-next,14/15] afs: Fix afs_server ref accounting
-    (no matching commit)
-  - [net-next,15/15] afs: Simplify cell record handling
-    (no matching commit)
+sock_def_readable() already acquires RCU read lock anyway.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Reviewed-by: Cong Wang <xiyou.wangcong@gmail.com>
 
-
+Thanks!
 
