@@ -1,141 +1,120 @@
-Return-Path: <netdev+bounces-170349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA44EA484E6
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 17:28:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4580DA484C4
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 17:23:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6136917E782
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:16:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 394481899DF8
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:17:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D33A1A9B48;
-	Thu, 27 Feb 2025 16:14:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00ED21B4227;
+	Thu, 27 Feb 2025 16:14:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NPf5znqq"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="os+dzt96"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E218C1A5BBC;
-	Thu, 27 Feb 2025 16:14:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7593E1B0403;
+	Thu, 27 Feb 2025 16:14:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740672857; cv=none; b=q7aSxSjTjN5U3YobXLIjel/Yrz9tN8PpHDT2FqQ47wwG+7dp5jg2t2yyS4pBR7t1GObcspkpIXjl4waqbMFAyPiSledN1T5KjkihM48BeqP9HNG0iKeR7HhjwiwP+I1ndW9NeJBEqx+7d296ml9o+amkM7IYOud3mt9Vp4e4BHU=
+	t=1740672865; cv=none; b=pr3R0gAf+r670np6W7/+yQg5UxNMdiyt6sYO4A/9KGiunZsIq9w1JLgQeHithVmT6imoPAlw32hdsuptofhxFzSlwk2Uy1L09Vp+mMycFVCbf8+HO5EDAtZQdIlPfWsISaEtIrdeja+K5KpLXQR+3lgUtjXtD84ynwZ2hgcekps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740672857; c=relaxed/simple;
-	bh=xjPwITNH7+ilrCrjqvms3FCSS3zQDyqwi+pfjCjZKy8=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=KS/RrwQRtw6GJIAGtDY2hwDzm3QXtcz4UJUzmr0fMitQ3B+5/AJa9SDcpOZ/gJjdaws+wpEcfPWPWwBeNL3g9bxR3j7oJUJCOebWdTMp+i7KNxJoqabPT/YDL8fGPMOAN8gEUU7LZRDa+6K8I//XA5KXTO6bdzP6ZgkRobt0G6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NPf5znqq; arc=none smtp.client-ip=209.85.219.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6e41e18137bso8802996d6.1;
-        Thu, 27 Feb 2025 08:14:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740672855; x=1741277655; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=24tBlE0SjiGtrbKYq2EJ0HJHTRtUk/7GcqOiEwUKJXc=;
-        b=NPf5znqqhyeUxcGNp6rUQhej3Jwu0py7gcZJWoVDF7CTCsRKXHj2QXL+tiTlMDObSH
-         Bz+9vFEreoBSarHX3Z3b4EYuwmgqXhZQpRfPc7xLj6nhRJ3Tk45pTrxDh0VnIbFsxest
-         caPSMJJb4dN45qw2MpDXrAPaH8L7xmWid4oNprk5gLT1ACBUdV0ZUmsqYj74Grb3lN31
-         0IpRLakYdLuhZH2XpVp4DPIJwklDhBY5Kz5vJw79YFLxtZEbDMHIagFYKkVdVmIdO9yb
-         KJlnQwWhNrvQHc4R6oTb5q1CeAW/L8PbtslT6ra1AKGW6Y9cQ4t7n1FdTvAb+xdAEsUT
-         EKRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740672855; x=1741277655;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=24tBlE0SjiGtrbKYq2EJ0HJHTRtUk/7GcqOiEwUKJXc=;
-        b=RUjBhLi691qBbat1M8VrHRPzf2k+8BlOWwk5I6+hDBMZv5EvP0BCbKbE3PCZriIKO9
-         JIEdAlNalT66yDutMSBuCWBODOTqUV0uzjsi6gvbkWk/J6zVUz+Z0jmUhVCmhfmo/4pW
-         pu1VefL4wwiXEWCW9dVPQilp70HwBI4MEsdoviVJILUde6b4qXdtQG35F2IBCNWEzX69
-         j1+aWGFs7CxjOvqSoH7FKkLrVoi5nv0UoBTMYHNyksh5X+4tVklm8cU35wYASJRgV3nQ
-         TxtuEC1wu3jmDThYL2rg2kurcbs9k6lvIojuv8AXA0DSlke5rzeOLEyQb4vzbsRSnB3x
-         mxiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUPcm7nnE7pIFwAnuNgO6CL0dlNyyvJMtgXMQ4aUY34rVPMKZfJyQjq8f4YX/VuNEt4cNJmjDZc776uhzc=@vger.kernel.org, AJvYcCWS4/gONKPZ+zGXfBCJdLcYiBZpDjtBW6Vfqsy16NB53ekWZ1JLMjfIMlrTRLKTVL1cSdTaddwkjzzlo285n1Zy@vger.kernel.org, AJvYcCXXrw/oh2zQ3cOE69/lsv4uPI9GX4ip1Feo1sa9hLdasMMvq0LpdoLZYqMa5jqY1Xo2mYDOcUX9@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGjLk8dilo+A+lT5+2TP6MHH6hr5KivIyY8QGYpesRYP2fQD5/
-	OucYNYSZ95yCpngLewB/OsyM6w383NdH/okSL62rKuwso9TGIdIe
-X-Gm-Gg: ASbGncuc0kcRjamzrkgynQkgZw0986F2gmpR704Bs0Cq85WsoXbFj6OT5717Eb3i/it
-	8KGLzlwCM3fdJAAcpFs8UZbrjM9DMcm9kA3gxFZuFlJCe83djNKQAc5ZJZELkMEHQAxqZDTxHFq
-	Cl5BzMOUuIhktcZJLkM933Fr3zCrotiag4F3aKJ0uHlLCv49a6TMM2/9fl3tNOxZklFOur4bsK0
-	DBKJ9FLYe8zz/nurQuuGdaQV2Liu22LWEp72T7LpthoPgc068cBPbApeB9Dq9VmP9fXFPg0bf60
-	EzyaDMavMUFqQST+PwTW967dj0uqWmJ8M53bOskYnOKnZEVzehg1K0BqIUGXD8ryuLfu8NrWLZp
-	tODw=
-X-Google-Smtp-Source: AGHT+IEJu4vloD9rj2kOOUuk3C/htCmuMUCZeR17Cj5CrXzt4cKMVQSg8k/DVcyp3lCVS27qzQf8Iw==
-X-Received: by 2002:ad4:5d4b:0:b0:6d8:b371:6a0f with SMTP id 6a1803df08f44-6e6b01adbb2mr356197126d6.31.1740672854455;
-        Thu, 27 Feb 2025 08:14:14 -0800 (PST)
-Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e8976ec3absm11206356d6.122.2025.02.27.08.14.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Feb 2025 08:14:14 -0800 (PST)
-Date: Thu, 27 Feb 2025 11:14:13 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Kevin Krakauer <krakauer@google.com>, 
- netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, 
- linux-kernel@vger.kernel.org, 
- Kevin Krakauer <krakauer@google.com>
-Message-ID: <67c08f55b0ae7_37f929294b0@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250226192725.621969-4-krakauer@google.com>
-References: <20250226192725.621969-1-krakauer@google.com>
- <20250226192725.621969-4-krakauer@google.com>
-Subject: Re: [PATCH v2 3/3] selftests/net: deflake GRO tests
+	s=arc-20240116; t=1740672865; c=relaxed/simple;
+	bh=IiY6ZLF7JOMgPL1XZRpG6xEyfSFPHouFr+qz+8RP/ok=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ohZmkYxbCH5F1t+hHn26dItRqMVtj9uKPp+sIv4OPDxV/AptpAu4Zs5Wy8doumkL9iINGolqzmwy2GY60ThwfipZMl8CBiR93CG8OO49hzC+7EFfsq6m6KX2I/L0TPCQLUGg5gK5I9rGFn9T6jLQKjKsxdqA0xV2um9Jr4YYcGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=os+dzt96; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=E8uMYzZ6EkKf4Tjfs/lP4zNa1kerlGy7v4/Zfy2CCxQ=; b=os+dzt96tZaF+1MYknwshJAdfA
+	2CaijdEyu/OKcurqeCL+2aXJhcjXXHdVjXj2SBSz0ZNxju+0uV3c5w2tG8g2tONUPtJIjNKATzU3y
+	DCTVW/HasPxkaGD7wMU/1tVas55sECKIulDXs8wfxdlSsj2YsdRJk7539UbS7CeFwa38=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tngWh-000eFH-Jw; Thu, 27 Feb 2025 17:14:19 +0100
+Date: Thu, 27 Feb 2025 17:14:19 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Andrei Botila <andrei.botila@oss.nxp.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, s32@nxp.com,
+	Christophe Lizzi <clizzi@redhat.com>,
+	Alberto Ruiz <aruizrui@redhat.com>,
+	Enric Balletbo <eballetb@redhat.com>
+Subject: Re: [PATCH 1/3] net: phy: nxp-c45-tja11xx: add support for TJA1121
+Message-ID: <a9c98f2a-c5e9-43e3-b77a-0f20eb6cfa98@lunn.ch>
+References: <20250227160057.2385803-1-andrei.botila@oss.nxp.com>
+ <20250227160057.2385803-2-andrei.botila@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250227160057.2385803-2-andrei.botila@oss.nxp.com>
 
-Kevin Krakauer wrote:
-> GRO tests are timing dependent and can easily flake. This is partially
-> mitigated in gro.sh by giving each subtest 3 chances to pass. However,
-> this still flakes on some machines. Reduce the flakiness by:
+On Thu, Feb 27, 2025 at 06:00:54PM +0200, Andrei Botila wrote:
+> Add naming for TJA1121 since TJA1121 is based on TJA1120 but with
+> additional MACsec IP.
+> Same applies for TJA1103 which shares the same hardware as TJA1104 with
+> the latter having MACsec IP enabled.
 > 
-> - Bumping retries to 6.
-> - Setting napi_defer_hard_irqs to 1 to reduce the chance that GRO is
->   flushed prematurely. This also lets us reduce the gro_flush_timeout
->   from 1ms to 100us.
-> 
-> Tested: Ran `gro.sh -t large` 1000 times. There were no failures with
-> this change. Ran inside strace to increase flakiness.
-> 
-> Signed-off-by: Kevin Krakauer <krakauer@google.com>
-
-Nice! Thanks
-
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-
+> Signed-off-by: Andrei Botila <andrei.botila@oss.nxp.com>
 > ---
->  tools/testing/selftests/net/gro.sh        | 4 ++--
->  tools/testing/selftests/net/setup_veth.sh | 3 ++-
->  2 files changed, 4 insertions(+), 3 deletions(-)
+>  drivers/net/phy/Kconfig           | 2 +-
+>  drivers/net/phy/nxp-c45-tja11xx.c | 8 +++++---
+>  2 files changed, 6 insertions(+), 4 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/net/gro.sh b/tools/testing/selftests/net/gro.sh
-> index aabd6e5480b8..9e3f186bc2a1 100755
-> --- a/tools/testing/selftests/net/gro.sh
-> +++ b/tools/testing/selftests/net/gro.sh
-> @@ -18,10 +18,10 @@ run_test() {
->    "--smac" "${CLIENT_MAC}" "--test" "${test}" "--verbose" )
+> diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+> index 41c15a2c2037..d29f9f7fd2e1 100644
+> --- a/drivers/net/phy/Kconfig
+> +++ b/drivers/net/phy/Kconfig
+> @@ -328,7 +328,7 @@ config NXP_C45_TJA11XX_PHY
+>  	depends on MACSEC || !MACSEC
+>  	help
+>  	  Enable support for NXP C45 TJA11XX PHYs.
+> -	  Currently supports the TJA1103, TJA1104 and TJA1120 PHYs.
+> +	  Currently supports the TJA1103, TJA1104, TJA1120 and TJA1121 PHYs.
 >  
->    setup_ns
-> -  # Each test is run 3 times to deflake, because given the receive timing,
-> +  # Each test is run 6 times to deflake, because given the receive timing,
+>  config NXP_TJA11XX_PHY
+>  	tristate "NXP TJA11xx PHYs support"
+> diff --git a/drivers/net/phy/nxp-c45-tja11xx.c b/drivers/net/phy/nxp-c45-tja11xx.c
+> index 34231b5b9175..244b5889e805 100644
+> --- a/drivers/net/phy/nxp-c45-tja11xx.c
+> +++ b/drivers/net/phy/nxp-c45-tja11xx.c
+> @@ -1,6 +1,6 @@
+>  // SPDX-License-Identifier: GPL-2.0
+>  /* NXP C45 PHY driver
+> - * Copyright 2021-2023 NXP
+> + * Copyright 2021-2025 NXP
+>   * Author: Radu Pirea <radu-nicolae.pirea@oss.nxp.com>
+>   */
+>  
+> @@ -19,7 +19,9 @@
+>  
+>  #include "nxp-c45-tja11xx.h"
+>  
+> +/* Same id: TJA1103, TJA1104 */
+>  #define PHY_ID_TJA_1103			0x001BB010
+> +/* Same id: TJA1120, TJA1121 */
+>  #define PHY_ID_TJA_1120			0x001BB031
 
-Only if respinning: this was always imprecise: it is run up to X times. But
-exits immediately on success.
+Is there a way to tell them apart? Another register somewhere?
+
+	Andrew
 
