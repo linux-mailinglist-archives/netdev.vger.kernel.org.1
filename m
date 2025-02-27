@@ -1,119 +1,725 @@
-Return-Path: <netdev+bounces-170333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19EF1A4831E
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:37:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0514A48321
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:37:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0CC967A37AD
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 15:36:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D80816A440
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 15:37:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C57326B95D;
-	Thu, 27 Feb 2025 15:36:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7288526B959;
+	Thu, 27 Feb 2025 15:37:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R5VJ4E1N"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O+6AkNkO"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624FD26B959
-	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 15:36:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF6226B951;
+	Thu, 27 Feb 2025 15:37:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740670605; cv=none; b=IHKLkOFPQf9PRW3uS4QBWYTaXpRrQj8Rs1que0Y/TYFL1u2eO43qlrKUIBuxEZn/KkjDOm1hoYayImwGGb6iJwVX6D9hDTPKzsKISgjvUNXNxZjYqFPUkGcJjB2zluHyFI8wzj5oarPIqwRtKYs19pd4nkvPdXSRhnLjJFiuy5Y=
+	t=1740670663; cv=none; b=jT3uh9nSzbxqsJuInVJMAydEiM6nQkZ9ytwNeWvoiXc2QVLLx5H+hFS87Ma0TZNNhZC5kImhLAlQjsZQtL352DuyPgast1krWxPGRecQ8RxEmJDV+if5XN8F6a2x8X69LOqnrccNkBnomQRdlD3SZ13kAdMRU1LAA6whFoaUMsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740670605; c=relaxed/simple;
-	bh=/w6Iwr/eip4sWrku2LH/504RAKTBWVQAlp9hp1HEszE=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=UJcXoc4YLIAxyFoy8XjReWwIh0hpFwiQFtiTwR3rBg5ykhFJeM1CY7DBF3Lz571LyuQHDMFce6hn6nEV847Js+j9ubF2W+jpyAjMiipKbfrLJvdA5J+Mr6GS1MCSHaz0+q61ecqGo2+U3nK2xWvy+M76z1cZVRWRlArjdVRZzuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R5VJ4E1N; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740670602;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=654arh+d2qPqPE5taP6iEWvMfqZLmub5tQb2i6ChSXQ=;
-	b=R5VJ4E1NhUR2GOo+HNhN20R1YL97Epsnn6UBK3Fl80gIvIH2BOKlZoNIHvSLyT5lF4v8Sr
-	GN1VMt3veUqVAuy+PvaTPFyBiMszb5NrIniKZK20C43IQSnoe0QIRpTUiWWbVA7ngRge87
-	lXmItIYK63+VQiiJaOGPHLCRPv21n2c=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-154-kfhOam6CPliKK65O7dYukg-1; Thu,
- 27 Feb 2025 10:36:39 -0500
-X-MC-Unique: kfhOam6CPliKK65O7dYukg-1
-X-Mimecast-MFC-AGG-ID: kfhOam6CPliKK65O7dYukg_1740670597
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 402FB1801A17;
-	Thu, 27 Feb 2025 15:36:37 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.44.32.200])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4125E19560AB;
-	Thu, 27 Feb 2025 15:36:32 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <da1d5d1a-b0ae-4a40-907d-386bd035954c@redhat.com>
-References: <da1d5d1a-b0ae-4a40-907d-386bd035954c@redhat.com> <899dfc34-bff8-4f41-8c8c-b9aa457880df@redhat.com> <20250224234154.2014840-1-dhowells@redhat.com> <3151401.1740661831@warthog.procyon.org.uk>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: dhowells@redhat.com, netdev@vger.kernel.org,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Jakub Kicinski <kuba@kernel.org>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>,
-    Christian Brauner <brauner@kernel.org>,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Which tree to push afs + crypto + rxrpc spanning patches through?
+	s=arc-20240116; t=1740670663; c=relaxed/simple;
+	bh=UWnJG37E8NWa+c28LgLziml5812QQ88dk0JgXPMFhyw=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=s+HQebhw8Ck8i1UQKJFYiZZi9WraC3EhstfjXMvDoaeyZAQ50nBQr+34XT5h6Y0Mt6gYDgXNw4fw+f9zdwfhObRNGQyot1fXiwYR2qDLrtCndJEN3s6ex3zHcxIAalWU0RJtwV5baCP+zxtYQinx2hy9KPbZl6ZvFvIP6Vkm7kU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O+6AkNkO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A604C4CEDD;
+	Thu, 27 Feb 2025 15:37:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740670662;
+	bh=UWnJG37E8NWa+c28LgLziml5812QQ88dk0JgXPMFhyw=;
+	h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
+	b=O+6AkNkO7pm9bdxm0MAZGyD/ExhbSz2H2sOPn9eYcC1T2g01RlLmet1DsQ4WVBdTl
+	 LG3hCr+UKZLIu/PIk3zv0YDv1yllkxXkz5ssP2HkEiclPSXG1XyINfuRALop66KFPr
+	 G6VHyI0eBt2C8LPAPNra641rJ2q9WZGxaHh1ibEv+YN2IXNylEBVZKg3ftSwD/vFWF
+	 0eYrq1a1r9fvgdpkQC7GKUHWdkRsgt2B3p78VuAgO/z4TjywRpb6pK53AbM9GLj2Bm
+	 Y7pKU+I/oIwAf0fdlY7GYqfQP+KV7TJrLDO+FZzV9D+Gro7k74IUxk0L40yXZ6kEwb
+	 bY3MqsqI02bjw==
+Message-ID: <8f93a9a0-5d0c-47d6-9db6-af93acebf008@kernel.org>
+Date: Thu, 27 Feb 2025 17:37:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3158045.1740670591.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 27 Feb 2025 15:36:31 +0000
-Message-ID: <3158046.1740670591@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+User-Agent: Mozilla Thunderbird
+From: Roger Quadros <rogerq@kernel.org>
+Subject: Re: [PATCH net-next v3 3/3] net: ti: icssg-prueth: Add XDP support
+To: Meghana Malladi <m-malladi@ti.com>, danishanwar@ti.com,
+ pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+ davem@davemloft.net, andrew+netdev@lunn.ch
+Cc: bpf@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ u.kleine-koenig@baylibre.com, matthias.schiffer@ew.tq-group.com,
+ dan.carpenter@linaro.org, schnelle@linux.ibm.com, diogo.ivo@siemens.com,
+ glaroque@baylibre.com, macro@orcam.me.uk, john.fastabend@gmail.com,
+ hawk@kernel.org, daniel@iogearbox.net, ast@kernel.org, srk@ti.com,
+ Vignesh Raghavendra <vigneshr@ti.com>
+References: <20250224110102.1528552-1-m-malladi@ti.com>
+ <20250224110102.1528552-4-m-malladi@ti.com>
+Content-Language: en-US
+In-Reply-To: <20250224110102.1528552-4-m-malladi@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Paolo Abeni <pabeni@redhat.com> wrote:
 
-> >> The remaining patches in this series touch only AFS, I'm unsure if ne=
-t-next
-> >> if the best target here???
-> > =
 
-> > Yeah.  It's tricky as the complete set of patches I would like to post=
- spans
-> > three subsystems.
-> =
+On 24/02/2025 13:01, Meghana Malladi wrote:
+> From: Roger Quadros <rogerq@kernel.org>
+> 
+> Add native XDP support. We do not support zero copy yet.
+> 
+> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
+> ---
+> Changes since v2 (v3-v2):
+> - Use page_pool contained in the page instead of using passing page_pool
+> (rx_chn) as part of swdata
+> - dev_sw_netstats_tx_add() instead of incrementing the stats directly
+> - Add missing ndev->stats.tx_dropped++ wherever applicable
+> - Move k3_cppi_desc_pool_alloc() before the DMA mapping for easier cleanup
+> on failure
+> - Replace rxp->napi_id with emac->napi_rx.napi_id in prueth_create_xdp_rxqs()
+> 
+> All the above changes have been suggested by Roger Quadros <rogerq@kernel.org>
+> 
+>  drivers/net/ethernet/ti/icssg/icssg_common.c | 219 +++++++++++++++++--
+>  drivers/net/ethernet/ti/icssg/icssg_prueth.c | 125 ++++++++++-
+>  drivers/net/ethernet/ti/icssg/icssg_prueth.h |  17 ++
+>  3 files changed, 346 insertions(+), 15 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
+> index 01eeabe83eff..4716e24ea05d 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_common.c
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
+> @@ -98,11 +98,19 @@ void prueth_xmit_free(struct prueth_tx_chn *tx_chn,
+>  {
+>  	struct cppi5_host_desc_t *first_desc, *next_desc;
+>  	dma_addr_t buf_dma, next_desc_dma;
+> +	struct prueth_swdata *swdata;
+>  	u32 buf_dma_len;
+>  
+>  	first_desc = desc;
+>  	next_desc = first_desc;
+>  
+> +	swdata = cppi5_hdesc_get_swdata(desc);
+> +	if (swdata->type == PRUETH_SWDATA_PAGE) {
+> +		page_pool_recycle_direct(swdata->data.page->pp,
+> +					 swdata->data.page);
+> +		goto free_desc;
+> +	}
+> +
+>  	cppi5_hdesc_get_obuf(first_desc, &buf_dma, &buf_dma_len);
+>  	k3_udma_glue_tx_cppi5_to_dma_addr(tx_chn->tx_chn, &buf_dma);
+>  
+> @@ -126,6 +134,7 @@ void prueth_xmit_free(struct prueth_tx_chn *tx_chn,
+>  		k3_cppi_desc_pool_free(tx_chn->desc_pool, next_desc);
+>  	}
+>  
+> +free_desc:
+>  	k3_cppi_desc_pool_free(tx_chn->desc_pool, first_desc);
+>  }
+>  EXPORT_SYMBOL_GPL(prueth_xmit_free);
+> @@ -139,6 +148,7 @@ int emac_tx_complete_packets(struct prueth_emac *emac, int chn,
+>  	struct prueth_swdata *swdata;
+>  	struct prueth_tx_chn *tx_chn;
+>  	unsigned int total_bytes = 0;
+> +	struct xdp_frame *xdpf;
+>  	struct sk_buff *skb;
+>  	dma_addr_t desc_dma;
+>  	int res, num_tx = 0;
+> @@ -168,21 +178,28 @@ int emac_tx_complete_packets(struct prueth_emac *emac, int chn,
+>  			continue;
+>  		}
+>  
+> -		if (swdata->type != PRUETH_SWDATA_SKB) {
+> +		switch (swdata->type) {
+> +		case PRUETH_SWDATA_SKB:
+> +			skb = swdata->data.skb;
+> +			dev_sw_netstats_tx_add(skb->dev, 1, skb->len);
+> +			total_bytes += skb->len;
+> +			napi_consume_skb(skb, budget);
+> +			break;
+> +		case PRUETH_SWDATA_XDPF:
+> +			xdpf = swdata->data.xdpf;
+> +			dev_sw_netstats_tx_add(ndev, 1, xdpf->len);
+> +			total_bytes += xdpf->len;
+> +			xdp_return_frame(xdpf);
+> +			break;
+> +		default:
+>  			netdev_err(ndev, "tx_complete: invalid swdata type %d\n", swdata->type);
+>  			prueth_xmit_free(tx_chn, desc_tx);
+> +			ndev->stats.tx_dropped++;
+>  			budget++;
+>  			continue;
+>  		}
+>  
+> -		skb = swdata->data.skb;
+>  		prueth_xmit_free(tx_chn, desc_tx);
+> -
+> -		ndev = skb->dev;
+> -		ndev->stats.tx_packets++;
+> -		ndev->stats.tx_bytes += skb->len;
+> -		total_bytes += skb->len;
+> -		napi_consume_skb(skb, budget);
+>  		num_tx++;
+>  	}
+>  
+> @@ -541,7 +558,153 @@ void emac_rx_timestamp(struct prueth_emac *emac,
+>  	ssh->hwtstamp = ns_to_ktime(ns);
+>  }
+>  
+> -static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id)
+> +/**
+> + * emac_xmit_xdp_frame - transmits an XDP frame
+> + * @emac: emac device
+> + * @xdpf: data to transmit
+> + * @page: page from page pool if already DMA mapped
+> + * @q_idx: queue id
+> + *
+> + * Return: XDP state
+> + */
+> +int emac_xmit_xdp_frame(struct prueth_emac *emac,
+> +			struct xdp_frame *xdpf,
+> +			struct page *page,
+> +			unsigned int q_idx)
+> +{
+> +	struct cppi5_host_desc_t *first_desc;
+> +	struct net_device *ndev = emac->ndev;
+> +	struct prueth_tx_chn *tx_chn;
+> +	dma_addr_t desc_dma, buf_dma;
+> +	struct prueth_swdata *swdata;
+> +	u32 *epib;
+> +	int ret;
+> +
+drop new line and arrange below declarations in reverse xmas tree order.
 
-> Possibly sharing a stable tree somewhere, and let the relevant subsystem
-> pull the tree specific deps/bits could help?
+> +	void *data = xdpf->data;
+> +	u32 pkt_len = xdpf->len;
+> +
+> +	if (q_idx >= PRUETH_MAX_TX_QUEUES) {
+> +		netdev_err(ndev, "xdp tx: invalid q_id %d\n", q_idx);
+> +		return ICSSG_XDP_CONSUMED;	/* drop */
+> +	}
+> +
+> +	tx_chn = &emac->tx_chns[q_idx];
+> +
+> +	first_desc = k3_cppi_desc_pool_alloc(tx_chn->desc_pool);
+> +	if (!first_desc) {
+> +		netdev_dbg(ndev, "xdp tx: failed to allocate descriptor\n");
+> +		goto drop_free_descs;	/* drop */
+> +	}
+> +
+> +	if (page) { /* already DMA mapped by page_pool */
+> +		buf_dma = page_pool_get_dma_addr(page);
+> +		buf_dma += xdpf->headroom + sizeof(struct xdp_frame);
+> +	} else { /* Map the linear buffer */
+> +		buf_dma = dma_map_single(tx_chn->dma_dev, data, pkt_len, DMA_TO_DEVICE);
+> +		if (dma_mapping_error(tx_chn->dma_dev, buf_dma)) {
+> +			netdev_err(ndev, "xdp tx: failed to map data buffer\n");
+> +			goto drop_free_descs;	/* drop */
+> +		}
+> +	}
+> +
+> +	cppi5_hdesc_init(first_desc, CPPI5_INFO0_HDESC_EPIB_PRESENT,
+> +			 PRUETH_NAV_PS_DATA_SIZE);
+> +	cppi5_hdesc_set_pkttype(first_desc, 0);
+> +	epib = first_desc->epib;
+> +	epib[0] = 0;
+> +	epib[1] = 0;
+> +
+> +	/* set dst tag to indicate internal qid at the firmware which is at
+> +	 * bit8..bit15. bit0..bit7 indicates port num for directed
+> +	 * packets in case of switch mode operation
+> +	 */
+> +	cppi5_desc_set_tags_ids(&first_desc->hdr, 0, (emac->port_id | (q_idx << 8)));
+> +	k3_udma_glue_tx_dma_to_cppi5_addr(tx_chn->tx_chn, &buf_dma);
+> +	cppi5_hdesc_attach_buf(first_desc, buf_dma, pkt_len, buf_dma, pkt_len);
+> +	swdata = cppi5_hdesc_get_swdata(first_desc);
+> +	if (page) {
+> +		swdata->type = PRUETH_SWDATA_PAGE;
+> +		swdata->data.page = page;
+> +	} else {
+> +		swdata->type = PRUETH_SWDATA_XDPF;
+> +		swdata->data.xdpf = xdpf;
+> +	}
+> +
+> +	cppi5_hdesc_set_pktlen(first_desc, pkt_len);
+> +	desc_dma = k3_cppi_desc_pool_virt2dma(tx_chn->desc_pool, first_desc);
+> +
+> +	ret = k3_udma_glue_push_tx_chn(tx_chn->tx_chn, first_desc, desc_dma);
+> +	if (ret) {
+> +		netdev_err(ndev, "xdp tx: push failed: %d\n", ret);
+> +		goto drop_free_descs;
+> +	}
+> +
+> +	return ICSSG_XDP_TX;
+> +
+> +drop_free_descs:
+> +	prueth_xmit_free(tx_chn, first_desc);
+> +	return ICSSG_XDP_CONSUMED;
+> +}
+> +EXPORT_SYMBOL_GPL(emac_xmit_xdp_frame);
+> +
+> +/**
+> + * emac_run_xdp - run an XDP program
+> + * @emac: emac device
+> + * @xdp: XDP buffer containing the frame
+> + * @page: page with RX data if already DMA mapped
+> + *
+> + * Return: XDP state
+> + */
+> +static int emac_run_xdp(struct prueth_emac *emac, struct xdp_buff *xdp,
+> +			struct page *page)
+> +{
+> +	struct net_device *ndev = emac->ndev;
+> +	int err, result = ICSSG_XDP_PASS;
 
-The networking tree would still have to take the afs and crypto bits in or=
-der
-to take the rxrpc bits so that the code compiles.  Unfortunately, the rxrp=
-c
-bits depend on the other two.
+you could avoid initialization of result. see below.
 
-If you're okay with the rxrpc bits not going through the networking tree a=
-nd
-if Herbert is okay with the krb5 library not going through the crypto tree=
-, I
-can try pushing the whole lot through the filesystem tree.
+> +	struct bpf_prog *xdp_prog;
+> +	struct xdp_frame *xdpf;
+> +	int q_idx;
+> +	u32 act;
+> +
+> +	xdp_prog = READ_ONCE(emac->xdp_prog);
+> +	act = bpf_prog_run_xdp(xdp_prog, xdp);
+> +	switch (act) {
+> +	case XDP_PASS:
+> +		break;
+instead of break how about?
+		return ICSSG_XDP_PASS;
 
-David
+> +	case XDP_TX:
+> +		/* Send packet to TX ring for immediate transmission */
+> +		xdpf = xdp_convert_buff_to_frame(xdp);
+> +		if (unlikely(!xdpf))
+
+TX is dropped so here you need to
+			ndev->stats.tx_dropped++;
+> +			goto drop;
+> +
+> +		q_idx = smp_processor_id() % emac->tx_ch_num;
+> +		result = emac_xmit_xdp_frame(emac, xdpf, page, q_idx);
+> +		if (result == ICSSG_XDP_CONSUMED)
+> +			goto drop;
+
+need to increment rx stats as we received the packet successfully?
+
+> +		break;
+instead,
+		return ICSSG_XDP_TX;
+
+> +	case XDP_REDIRECT:
+> +		err = xdp_do_redirect(emac->ndev, xdp, xdp_prog);
+> +		if (err)
+> +			goto drop;
+> +		result = ICSSG_XDP_REDIR;
+> +		break;
+
+replace above 2 by
+		return ICSSG_XDP_REDIR;
+> +	default:
+> +		bpf_warn_invalid_xdp_action(emac->ndev, xdp_prog, act);
+> +		fallthrough;
+> +	case XDP_ABORTED:
+> +drop:
+> +		trace_xdp_exception(emac->ndev, xdp_prog, act);
+> +		fallthrough; /* handle aborts by dropping packet */
+> +	case XDP_DROP:
+> +		ndev->stats.tx_dropped++;
+
+shouldn't this be
+		ndev->stats.rx_dropped++;
+
+> +		result = ICSSG_XDP_CONSUMED;
+
+not required if we directly return this value below.
+
+> +		page_pool_recycle_direct(emac->rx_chns.pg_pool, page);
+> +		break;
+		return ICSSG_XDP_CONSUMED;
+> +	}
+> +
+> +	return result;
+
+drop this
+
+> +}
+> +
+> +static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id, int *xdp_state)
+>  {
+>  	struct prueth_rx_chn *rx_chn = &emac->rx_chns;
+>  	u32 buf_dma_len, pkt_len, port_id = 0;
+> @@ -552,10 +715,12 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id)
+>  	struct page *page, *new_page;
+>  	struct page_pool *pool;
+>  	struct sk_buff *skb;
+> +	struct xdp_buff xdp;
+>  	u32 *psdata;
+>  	void *pa;
+>  	int ret;
+>  
+> +	*xdp_state = 0;
+>  	pool = rx_chn->pg_pool;
+>  	ret = k3_udma_glue_pop_rx_chn(rx_chn->rx_chn, flow_id, &desc_dma);
+>  	if (ret) {
+> @@ -596,9 +761,21 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id)
+>  		goto requeue;
+>  	}
+>  
+> -	/* prepare skb and send to n/w stack */
+>  	pa = page_address(page);
+> -	skb = napi_build_skb(pa, PAGE_SIZE);
+
+We are running the xdp program after allocating the new page.
+How about running the xdp program first? if the packet has to be dropped
+then it is pointless to allocate a new page. We could just reuse the old page
+and save CPU cycles.
+
+> +	if (emac->xdp_prog) {
+> +		xdp_init_buff(&xdp, PAGE_SIZE, &rx_chn->xdp_rxq);
+> +		xdp_prepare_buff(&xdp, pa, PRUETH_HEADROOM, pkt_len, false);
+> +
+> +		*xdp_state = emac_run_xdp(emac, &xdp, page);
+> +		if (*xdp_state == ICSSG_XDP_PASS)
+> +			skb = xdp_build_skb_from_buff(&xdp);
+> +		else
+> +			goto requeue;
+> +	} else {
+> +		/* prepare skb and send to n/w stack */
+> +		skb = napi_build_skb(pa, PAGE_SIZE);
+> +	}
+> +
+>  	if (!skb) {
+>  		ndev->stats.rx_dropped++;
+>  		page_pool_recycle_direct(pool, page);
+
+instead of recycling the old page just reuse it
+		new_page = page;
+
+>		goto requeue;
+> 	}
+
+here you can allocate the new page cause now we're sure old page
+has to be sent to user space.
+
+> @@ -861,13 +1038,23 @@ static void prueth_tx_cleanup(void *data, dma_addr_t desc_dma)
+>  	struct prueth_tx_chn *tx_chn = data;
+>  	struct cppi5_host_desc_t *desc_tx;
+>  	struct prueth_swdata *swdata;
+> +	struct xdp_frame *xdpf;
+>  	struct sk_buff *skb;
+>  
+>  	desc_tx = k3_cppi_desc_pool_dma2virt(tx_chn->desc_pool, desc_dma);
+>  	swdata = cppi5_hdesc_get_swdata(desc_tx);
+> -	if (swdata->type == PRUETH_SWDATA_SKB) {
+> +
+> +	switch (swdata->type) {
+> +	case PRUETH_SWDATA_SKB:
+>  		skb = swdata->data.skb;
+>  		dev_kfree_skb_any(skb);
+> +		break;
+> +	case PRUETH_SWDATA_XDPF:
+> +		xdpf = swdata->data.xdpf;
+> +		xdp_return_frame(xdpf);
+> +		break;
+> +	default:
+> +		break;
+>  	}
+>  
+>  	prueth_xmit_free(tx_chn, desc_tx);
+> @@ -904,15 +1091,18 @@ int icssg_napi_rx_poll(struct napi_struct *napi_rx, int budget)
+>  		PRUETH_RX_FLOW_DATA_SR1 : PRUETH_RX_FLOW_DATA;
+>  	int flow = emac->is_sr1 ?
+>  		PRUETH_MAX_RX_FLOWS_SR1 : PRUETH_MAX_RX_FLOWS;
+> +	int xdp_state_or = 0;
+>  	int num_rx = 0;
+>  	int cur_budget;
+> +	int xdp_state;
+>  	int ret;
+>  
+>  	while (flow--) {
+>  		cur_budget = budget - num_rx;
+>  
+>  		while (cur_budget--) {
+> -			ret = emac_rx_packet(emac, flow);
+> +			ret = emac_rx_packet(emac, flow, &xdp_state);
+> +			xdp_state_or |= xdp_state;
+>  			if (ret)
+>  				break;
+>  			num_rx++;
+> @@ -922,6 +1112,9 @@ int icssg_napi_rx_poll(struct napi_struct *napi_rx, int budget)
+>  			break;
+>  	}
+>  
+> +	if (xdp_state_or & ICSSG_XDP_REDIR)
+> +		xdp_do_flush();
+> +
+>  	if (num_rx < budget && napi_complete_done(napi_rx, num_rx)) {
+>  		if (unlikely(emac->rx_pace_timeout_ns)) {
+>  			hrtimer_start(&emac->rx_hrtimer,
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> index 3ff8c322f9d9..1acbf9e1bade 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> @@ -559,6 +559,33 @@ const struct icss_iep_clockops prueth_iep_clockops = {
+>  	.perout_enable = prueth_perout_enable,
+>  };
+>  
+> +static int prueth_create_xdp_rxqs(struct prueth_emac *emac)
+> +{
+> +	struct xdp_rxq_info *rxq = &emac->rx_chns.xdp_rxq;
+> +	struct page_pool *pool = emac->rx_chns.pg_pool;
+> +	int ret;
+> +
+> +	ret = xdp_rxq_info_reg(rxq, emac->ndev, 0, emac->napi_rx.napi_id);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = xdp_rxq_info_reg_mem_model(rxq, MEM_TYPE_PAGE_POOL, pool);
+> +	if (ret)
+> +		xdp_rxq_info_unreg(rxq);
+> +
+> +	return ret;
+> +}
+> +
+> +static void prueth_destroy_xdp_rxqs(struct prueth_emac *emac)
+> +{
+> +	struct xdp_rxq_info *rxq = &emac->rx_chns.xdp_rxq;
+> +
+> +	if (!xdp_rxq_info_is_reg(rxq))
+> +		return;
+> +
+> +	xdp_rxq_info_unreg(rxq);
+> +}
+> +
+>  static int icssg_prueth_add_mcast(struct net_device *ndev, const u8 *addr)
+>  {
+>  	struct net_device *real_dev;
+> @@ -780,10 +807,14 @@ static int emac_ndo_open(struct net_device *ndev)
+>  	if (ret)
+>  		goto free_tx_ts_irq;
+>  
+> -	ret = k3_udma_glue_enable_rx_chn(emac->rx_chns.rx_chn);
+> +	ret = prueth_create_xdp_rxqs(emac);
+>  	if (ret)
+>  		goto reset_rx_chn;
+>  
+> +	ret = k3_udma_glue_enable_rx_chn(emac->rx_chns.rx_chn);
+> +	if (ret)
+> +		goto destroy_xdp_rxqs;
+> +
+>  	for (i = 0; i < emac->tx_ch_num; i++) {
+>  		ret = k3_udma_glue_enable_tx_chn(emac->tx_chns[i].tx_chn);
+>  		if (ret)
+> @@ -809,6 +840,8 @@ static int emac_ndo_open(struct net_device *ndev)
+>  	 * any SKB for completion. So set false to free_skb
+>  	 */
+>  	prueth_reset_tx_chan(emac, i, false);
+> +destroy_xdp_rxqs:
+> +	prueth_destroy_xdp_rxqs(emac);
+>  reset_rx_chn:
+>  	prueth_reset_rx_chan(&emac->rx_chns, max_rx_flows, false);
+>  free_tx_ts_irq:
+> @@ -879,7 +912,7 @@ static int emac_ndo_stop(struct net_device *ndev)
+>  	k3_udma_glue_tdown_rx_chn(emac->rx_chns.rx_chn, true);
+>  
+>  	prueth_reset_rx_chan(&emac->rx_chns, max_rx_flows, true);
+> -
+> +	prueth_destroy_xdp_rxqs(emac);
+>  	napi_disable(&emac->napi_rx);
+>  	hrtimer_cancel(&emac->rx_hrtimer);
+>  
+> @@ -1024,6 +1057,90 @@ static int emac_ndo_vlan_rx_del_vid(struct net_device *ndev,
+>  	return 0;
+>  }
+>  
+> +/**
+> + * emac_xdp_xmit - Implements ndo_xdp_xmit
+> + * @dev: netdev
+> + * @n: number of frames
+> + * @frames: array of XDP buffer pointers
+> + * @flags: XDP extra info
+> + *
+> + * Return: number of frames successfully sent. Failed frames
+> + * will be free'ed by XDP core.
+> + *
+> + * For error cases, a negative errno code is returned and no-frames
+> + * are transmitted (caller must handle freeing frames).
+> + **/
+> +static int emac_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
+> +			 u32 flags)
+> +{
+> +	struct prueth_emac *emac = netdev_priv(dev);
+> +	unsigned int q_idx;
+> +	int nxmit = 0;
+> +	int i;
+> +
+> +	q_idx = smp_processor_id() % emac->tx_ch_num;
+> +
+> +	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
+> +		return -EINVAL;
+> +
+> +	for (i = 0; i < n; i++) {
+> +		struct xdp_frame *xdpf = frames[i];
+> +		int err;
+> +
+> +		err = emac_xmit_xdp_frame(emac, xdpf, NULL, q_idx);
+> +		if (err != ICSSG_XDP_TX)
+> +			break;
+> +		nxmit++;
+> +	}
+> +
+> +	return nxmit;
+> +}
+> +
+> +/**
+> + * emac_xdp_setup - add/remove an XDP program
+> + * @emac: emac device
+> + * @bpf: XDP program
+> + *
+> + * Return: Always 0 (Success)
+> + **/
+> +static int emac_xdp_setup(struct prueth_emac *emac, struct netdev_bpf *bpf)
+> +{
+> +	struct bpf_prog *prog = bpf->prog;
+> +	xdp_features_t val;
+> +
+> +	val = NETDEV_XDP_ACT_BASIC | NETDEV_XDP_ACT_REDIRECT |
+> +	      NETDEV_XDP_ACT_NDO_XMIT;
+> +	xdp_set_features_flag(emac->ndev, val);
+> +
+> +	if (!emac->xdpi.prog && !prog)
+> +		return 0;
+> +
+> +	WRITE_ONCE(emac->xdp_prog, prog);
+> +
+> +	xdp_attachment_setup(&emac->xdpi, bpf);
+> +
+> +	return 0;
+> +}
+> +
+> +/**
+> + * emac_ndo_bpf - implements ndo_bpf for icssg_prueth
+> + * @ndev: network adapter device
+> + * @bpf: XDP program
+> + *
+> + * Return: 0 on success, error code on failure.
+> + **/
+> +static int emac_ndo_bpf(struct net_device *ndev, struct netdev_bpf *bpf)
+> +{
+> +	struct prueth_emac *emac = netdev_priv(ndev);
+> +
+> +	switch (bpf->command) {
+> +	case XDP_SETUP_PROG:
+> +		return emac_xdp_setup(emac, bpf);
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +}
+> +
+>  static const struct net_device_ops emac_netdev_ops = {
+>  	.ndo_open = emac_ndo_open,
+>  	.ndo_stop = emac_ndo_stop,
+> @@ -1038,6 +1155,8 @@ static const struct net_device_ops emac_netdev_ops = {
+>  	.ndo_fix_features = emac_ndo_fix_features,
+>  	.ndo_vlan_rx_add_vid = emac_ndo_vlan_rx_add_vid,
+>  	.ndo_vlan_rx_kill_vid = emac_ndo_vlan_rx_del_vid,
+> +	.ndo_bpf = emac_ndo_bpf,
+> +	.ndo_xdp_xmit = emac_xdp_xmit,
+>  };
+>  
+>  static int prueth_netdev_init(struct prueth *prueth,
+> @@ -1066,6 +1185,8 @@ static int prueth_netdev_init(struct prueth *prueth,
+>  	emac->prueth = prueth;
+>  	emac->ndev = ndev;
+>  	emac->port_id = port;
+> +	emac->xdp_prog = NULL;
+> +	emac->ndev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
+>  	emac->cmd_wq = create_singlethread_workqueue("icssg_cmd_wq");
+>  	if (!emac->cmd_wq) {
+>  		ret = -ENOMEM;
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+> index 3bbabd007129..0675919beb94 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+> @@ -8,6 +8,8 @@
+>  #ifndef __NET_TI_ICSSG_PRUETH_H
+>  #define __NET_TI_ICSSG_PRUETH_H
+>  
+> +#include <linux/bpf.h>
+> +#include <linux/bpf_trace.h>
+>  #include <linux/etherdevice.h>
+>  #include <linux/genalloc.h>
+>  #include <linux/if_vlan.h>
+> @@ -134,6 +136,7 @@ struct prueth_rx_chn {
+>  	unsigned int irq[ICSSG_MAX_RFLOWS];	/* separate irq per flow */
+>  	char name[32];
+>  	struct page_pool *pg_pool;
+> +	struct xdp_rxq_info xdp_rxq;
+>  };
+>  
+>  enum prueth_swdata_type {
+> @@ -141,6 +144,7 @@ enum prueth_swdata_type {
+>  	PRUETH_SWDATA_SKB,
+>  	PRUETH_SWDATA_PAGE,
+>  	PRUETH_SWDATA_CMD,
+> +	PRUETH_SWDATA_XDPF,
+>  };
+>  
+>  struct prueth_swdata {
+> @@ -149,6 +153,7 @@ struct prueth_swdata {
+>  		struct sk_buff *skb;
+>  		struct page *page;
+>  		u32 cmd;
+> +		struct xdp_frame *xdpf;
+>  	} data;
+>  };
+>  
+> @@ -159,6 +164,12 @@ struct prueth_swdata {
+>  
+>  #define PRUETH_MAX_TX_TS_REQUESTS	50 /* Max simultaneous TX_TS requests */
+>  
+> +/* XDP BPF state */
+> +#define ICSSG_XDP_PASS           0
+> +#define ICSSG_XDP_CONSUMED       BIT(0)
+> +#define ICSSG_XDP_TX             BIT(1)
+> +#define ICSSG_XDP_REDIR          BIT(2)
+> +
+>  /* Minimum coalesce time in usecs for both Tx and Rx */
+>  #define ICSSG_MIN_COALESCE_USECS 20
+>  
+> @@ -227,6 +238,8 @@ struct prueth_emac {
+>  	unsigned long rx_pace_timeout_ns;
+>  
+>  	struct netdev_hw_addr_list vlan_mcast_list[MAX_VLAN_ID];
+> +	struct bpf_prog *xdp_prog;
+> +	struct xdp_attachment_info xdpi;
+>  };
+>  
+>  /* The buf includes headroom compatible with both skb and xdpf */
+> @@ -465,5 +478,9 @@ void prueth_put_cores(struct prueth *prueth, int slice);
+>  
+>  /* Revision specific helper */
+>  u64 icssg_ts_to_ns(u32 hi_sw, u32 hi, u32 lo, u32 cycle_time_ns);
+> +int emac_xmit_xdp_frame(struct prueth_emac *emac,
+> +			struct xdp_frame *xdpf,
+> +			struct page *page,
+> +			unsigned int q_idx);
+>  
+>  #endif /* __NET_TI_ICSSG_PRUETH_H */
+
+-- 
+cheers,
+-roger
 
 
