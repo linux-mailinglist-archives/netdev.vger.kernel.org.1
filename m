@@ -1,308 +1,162 @@
-Return-Path: <netdev+bounces-170119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10E40A475C9
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 07:03:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4045AA47604
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 07:39:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B93881881D10
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 06:03:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38E1E16EB0F
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 06:39:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40EFB2192E7;
-	Thu, 27 Feb 2025 06:03:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2E9421CC78;
+	Thu, 27 Feb 2025 06:39:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BJEY7UlC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ttZ2TVNB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74BAA2E403;
-	Thu, 27 Feb 2025 06:03:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60A6117A2FB;
+	Thu, 27 Feb 2025 06:39:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740636216; cv=none; b=GLVtlWAjgavgDtdMgn97ow/xsf3n7PIFPKv71m2xpd1gJHJ3wnplG5j7rcQwceoA4Cx1qN4fJm8O+daiEiWdxKGFjRAGguY14WMhnsi6IAH0zBe1+0EuvJ4MDrMirbq50td9Wg5aje3DrX2895vYRDD7UkI+UjZVl9RtSjH769k=
+	t=1740638351; cv=none; b=O7xEsrw7u0fxZDSjJLpouZ3T96gBQoBrgIqb4HO1WKj5BAXMnjJKrKlAK9fqNJncpEY93XAvVgNY49gTSqzKyVAvnq1ZNXMNNfQldoWEleb9ZH2cjlT13e0hhT33UCiaJiC7XrjetprJ9SPobmE/3kxG5mXXcGFOqJ5L+O2aJzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740636216; c=relaxed/simple;
-	bh=5bQCSUlFL3cNMzqJxwc4JWiUDzaWUIigVUibvHYYM8I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=U7SInUxPaGpd2jQFdRtBR+mvuLdJ8quUbMU4EccYQf87GYQZpNK/BE9Y59v5Cofzcy4nESetdhPSFi9rX2Hq1jdMOzSMqP27wFV0BAlX4syV1K/TrMCSCDOLM2jnfzimqL0g2sRtOPOZ7CoI09LfOktqsiw3S3BTKQUGrRNBqeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BJEY7UlC; arc=none smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-6f77b9e0a34so4445677b3.2;
-        Wed, 26 Feb 2025 22:03:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740636213; x=1741241013; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KtYpkd2jzucIGjS+RbAQ8XkHU/fTQAGMdmomglbM5kM=;
-        b=BJEY7UlCawcICN9hVZhAMc9HiM/0JQxlBPGTwH08R0Ww+FNqclbWPmcOTE4RRPhF0u
-         LED6rA0XaiNmrLspCLhzl1S84RR8jK6xsy0RQ/ZxbP9O1AeArYrPdA5Jlpzf3gICQSf8
-         Rd+4H+slRTWLe7gllg/9kgyOLJcZiRr52484ppJzArcXVq2MZaza5D4+RTz9NpLAEPNQ
-         wkL6NPkfSbr2H0wa1AiW/TeZnVTRawDEtwBbghIximLZIco3yZNrhcakoJ254xHgPE5K
-         PsmmE65dU37D32EuAx8jJKrvWIfTwG5hf+bsh0aEHW8S08DIZLvau89c2AHhPR0iK2e2
-         kXBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740636213; x=1741241013;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KtYpkd2jzucIGjS+RbAQ8XkHU/fTQAGMdmomglbM5kM=;
-        b=D+XUxTE5cI9ICx5WE1Qt2w7+v+PuPlLdKVSNJxyw88qU25y2qcbulPwFaJHPv+1jHN
-         Zn9Y7AkGwlUTZ/nQkjDPLmah0+n8NhVeJlUrcjL/2S3mdjn5/vJTjMLANL9+LWg9eL6b
-         4GnU2Dt7SbCC15q0Pshoe+ulCa6ydSOnNIBI+KWy4mySxYcny+DtljtmIhW5kpcqNAxo
-         +hMrGNuqFgFJ07GhaUajGSwH1khseK5kZquDxKMepSlq7UE2sfEfjs1iupVv34KyWWJ/
-         fYN89odGWZ9k9FyE8OOockziLdYZz+P6YK4DtM6qt99kIu8KEqCHDv42L+F0+jul734r
-         PZgw==
-X-Forwarded-Encrypted: i=1; AJvYcCUCtpnbkPZqSSB90WJefVbF3UVGQg1vuOoULWpks/KSegecs4RbzDBqo4T73nJ7bE92vogJQLHLbgBU@vger.kernel.org, AJvYcCV+j6l6tZuN9AVBB7ZlkSkMNcE5O/CXnV5eKhgAO9Pq4lpf7sgm+f0aYWhuTD3hg5yyYggNuz6Tx8Y=@vger.kernel.org, AJvYcCVH0DJ55Mp9tfAwnGUegXwh0FcCxpffMTN24DubxzEukfS1QhEy2zPyGOE0yO7gLiARd4rcydKx@vger.kernel.org, AJvYcCVzFgwizoGpVPBuhgS78hyO9DE4onasxNiQHnO5ZlV8KQUj2f1dW4k0YwPdJT/kD2Qb9bfJ5FfcD8iSOA==@vger.kernel.org, AJvYcCW+hu2Rtr8Ks6A7o7TXB/zuHSlhpca7YR5yRR9jrRPsTqOvPXXxaHC+eSMSdrNHiP9eYw24zNmb89B5GobPy/8=@vger.kernel.org, AJvYcCW6bShUpiRSE8tdp+f3gVzDs6zQw6FvQxLjKRpdTx4u8HkZLVd3RvPJZce77guIDcc4A/8W05nbM7N8@vger.kernel.org, AJvYcCWIMyWYsWWOplUd4GM/tDE6eB40P19p9cj9vLKsf0eKyBPHZ9U3sdWEEjKFloTIU3TzPUdECCQQ9wdB@vger.kernel.org, AJvYcCWirC+hJdMP1c9kTaWzdyg9ETkQ6G6UbLWkF30DZH9ORqKlIUmBb45NhAsuiU/BKaA3LN9PBFVS31RPABY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7SxDqufp/AVuD3yLIvceMmgVIdlll+a1ycvLteY1quqaKQUvg
-	KIee2VS+LdVq3/+StNizNzxeWUWD+sGoGVe7JjerUKSzf4KGjP0rp3/T4+fE8yz22Hvd3LaMlJs
-	Kq3d0zlXXdZ732+sQgMAvTg2kKQgx42Pl
-X-Gm-Gg: ASbGnctx+olhuQtj5eanz+KcTeYbh7l5aFoFP/oH1x8eRwxTUPIV53UKdOi/lj74w3V
-	Okjr4+Hb3n9n4ZQjP2vDWyHgEwEOy1n3gb7XjxSHmJMTewv0OX3Da/41v8f5juKh+99VlsUyUmw
-	7Gfj1c11NLltB6RprIDauce9hbc/7eV+oqQqI1m8HqIA==
-X-Google-Smtp-Source: AGHT+IHhW5RmOkI7gkOjlnGO69YlG3Snu/7w3uKIK+tMNwqUqsl2+cEq6+/+Jh1ycoF05KXQ4giGB5nQbc+/Fln9Lv8=
-X-Received: by 2002:a05:690c:6402:b0:6fd:359a:8fd2 with SMTP id
- 00721157ae682-6fd359aa0f1mr37893927b3.26.1740636213413; Wed, 26 Feb 2025
- 22:03:33 -0800 (PST)
+	s=arc-20240116; t=1740638351; c=relaxed/simple;
+	bh=2VpGmHtpvddjKHb3CzB9R1qKMNlVQ7QPUa53zp9viUI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VVkznrKH22bcF5M6Mnea4iG9uv+w1OtItcA/QOx+eB+z4xni3fgHkhC5HbxgjkB8RmE3NYsLUlvkiqbkMFUxHWJGlQrLRQQdRVLsWZcB5J9VSjIBh3asS5itwVX7XxK4Dj/zRnAQv8ebsfIsBLyqt15tvsaDqNSKxkOleWN9FDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ttZ2TVNB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 067D1C4CEDD;
+	Thu, 27 Feb 2025 06:38:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740638350;
+	bh=2VpGmHtpvddjKHb3CzB9R1qKMNlVQ7QPUa53zp9viUI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ttZ2TVNBJZYxZ+s5GNHb10pG79Z9pg35Hdd7j1MxYovJup4of3OlLXb5fn0ZRRwvO
+	 qkngDZV6QH0DB1oGCeC69PjXudGdVZPnxilq3VbBx8Ea46vpHwTVFLglnRGaLrWOI8
+	 Hv44ss5oa5uF9n7VdfssWKsjkgrsavMRbuG6Fextdtwzfsn9CxhZOpwigNBYTDJEz7
+	 jmlYqRLIPpkClEhVg16s6NWuvVyF+IV8txsvtpW/JbX4SiBtzeluBOvoOq00TnIuqi
+	 ef90a72XayOByLY3mBcKOB/yw/RFDiEo/WpWtPKtvQ6/iGpyGLrB90+ZiF2vev0TC8
+	 ODi1vvSIejB4A==
+Message-ID: <a8c29dec-6178-4f8f-80f5-aece636c410b@kernel.org>
+Date: Thu, 27 Feb 2025 07:38:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250225081644.3524915-1-a0282524688@gmail.com>
- <20250225081644.3524915-5-a0282524688@gmail.com> <a32b4ca1-0bcf-48e4-87ab-61fbd077a3c3@wanadoo.fr>
-In-Reply-To: <a32b4ca1-0bcf-48e4-87ab-61fbd077a3c3@wanadoo.fr>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Thu, 27 Feb 2025 14:03:22 +0800
-X-Gm-Features: AQ5f1JqT0RaRfdM1W6C9qCDjKis5nvigOw3vz5qmtqucCho9jlDXbeZ2UgpSNeA
-Message-ID: <CAOoeyxXax83oNg1MpC7N4B6TrLMeg8z53SaHGqsej8ZDMP1SLA@mail.gmail.com>
-Subject: Re: [PATCH v8 4/7] can: Add Nuvoton NCT6694 CANFD support
-To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Cc: linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org, tmyu0@nuvoton.com, 
-	lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
-	andi.shyti@kernel.org, mkl@pengutronix.de, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	alexandre.belloni@bootlin.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 02/17] bitops: Add generic parity calculation for u64
+To: Yury Norov <yury.norov@gmail.com>
+Cc: Kuan-Wei Chiu <visitorckw@gmail.com>, tglx@linutronix.de,
+ mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+ jk@ozlabs.org, joel@jms.id.au, eajames@linux.ibm.com,
+ andrzej.hajda@intel.com, neil.armstrong@linaro.org, rfoss@kernel.org,
+ maarten.lankhorst@linux.intel.com, mripard@kernel.org, tzimmermann@suse.de,
+ airlied@gmail.com, simona@ffwll.ch, dmitry.torokhov@gmail.com,
+ mchehab@kernel.org, awalls@md.metrocast.net, hverkuil@xs4all.nl,
+ miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
+ louis.peens@corigine.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, parthiban.veerasooran@microchip.com,
+ arend.vanspriel@broadcom.com, johannes@sipsolutions.net,
+ gregkh@linuxfoundation.org, akpm@linux-foundation.org, hpa@zytor.com,
+ alistair@popple.id.au, linux@rasmusvillemoes.dk,
+ Laurent.pinchart@ideasonboard.com, jonas@kwiboo.se,
+ jernej.skrabec@gmail.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ linux-fsi@lists.ozlabs.org, dri-devel@lists.freedesktop.org,
+ linux-input@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mtd@lists.infradead.org, oss-drivers@corigine.com,
+ netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+ brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
+ linux-serial@vger.kernel.org, bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw,
+ Yu-Chun Lin <eleanor15x@gmail.com>
+References: <20250223164217.2139331-1-visitorckw@gmail.com>
+ <20250223164217.2139331-3-visitorckw@gmail.com> <Z7zIBwH4aUA7G9MY@thinkpad>
+ <Z73FxIv353lbXO3A@visitorckw-System-Product-Name>
+ <b5236ae4-7ebe-4a88-bbc9-3b9b3374de53@kernel.org> <Z79ebv630yuNOJKV@thinkpad>
+Content-Language: en-US
+From: Jiri Slaby <jirislaby@kernel.org>
+Autocrypt: addr=jirislaby@kernel.org; keydata=
+ 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
+In-Reply-To: <Z79ebv630yuNOJKV@thinkpad>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Dear Vincent,
+On 26. 02. 25, 19:33, Yury Norov wrote:
+>> Not in cases where macros are inevitable. I mean, do we need parityXX() for
+>> XX in (8, 16, 32, 64) at all? Isn't the parity() above enough for everybody?
+> 
+> The existing codebase has something like:
+> 
+>          int ret;
+> 
+>          ret = i3c_master_get_free_addr(m, last_addr + 1);
+>          ret |= parity8(ret) ? 0 : BIT(7)
+> 
+> So if we'll switch it to a macro like one above, it will become a
+> 32-bit parity. It wouldn't be an error because i3c_master_get_free_addr()
+> returns an u8 or -ENOMEM, and the error code is checked explicitly.
+> 
+> But if we decide to go with parity() only, some users will have to
+> call it like parity((u8)val) explicitly. Which is not bad actually.
 
-Thank you for reviewing,
+That cast looks ugly -- we apparently need parityXX(). (In this 
+particular case we could do parity8(last_addr), but I assume there are 
+more cases like this.) Thanks for looking up the case for this.
 
-Vincent Mailhol <mailhol.vincent@wanadoo.fr> =E6=96=BC 2025=E5=B9=B42=E6=9C=
-=8827=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8A=E5=8D=8810:09=E5=AF=AB=E9=81=93=
-=EF=BC=9A
->
-...
-> > +static void nct6694_can_handle_state_change(struct net_device *ndev,
-> > +                                         enum can_state new_state)
-> > +{
-> > +     struct nct6694_can_priv *priv =3D netdev_priv(ndev);
-> > +     struct can_berr_counter bec;
-> > +     struct can_frame *cf;
-> > +     struct sk_buff *skb;
-> > +
-> > +     skb =3D alloc_can_err_skb(ndev, &cf);
-> > +
-> > +     nct6694_can_get_berr_counter(ndev, &bec);
-> > +
-> > +     switch (new_state) {
-> > +     case CAN_STATE_ERROR_ACTIVE:
-> > +             priv->can.can_stats.error_warning++;
-> > +             priv->can.state =3D CAN_STATE_ERROR_ACTIVE;
-> > +             if (cf)
->
-> Set the CAN_ER_CRTL flag:
->
->                 if (cf) {
->                         cf->can_id |=3D CAN_ERR_CRTL;
->                         cf->data[1] |=3D CAN_ERR_CRTL_ACTIVE;
->                 }
->
+>> And if not, you can have all those parityXX() as inlines as you suggest, but
+>> also provide a macro such as the above to call (optimized) parityXX() as per
+>> datatype len.
+> 
+> Yes, if we need fixed-type parity's, they should all be one-liners
+> calling the same macro. Macros or inline functions - no preference for
+> me.
 
-Fix it in the v9.
-
-> > +                     cf->data[1] |=3D CAN_ERR_CRTL_ACTIVE;
-> > +             break;
-> > +     case CAN_STATE_ERROR_WARNING:
-> > +             priv->can.can_stats.error_warning++;
-> > +             priv->can.state =3D CAN_STATE_ERROR_WARNING;
-> > +             if (cf) {
-> > +                     cf->can_id |=3D CAN_ERR_CRTL;
->
-> Set the CAN_ERR_CNT flag when you populate cf->data[6] and cf->data[7]:
->
->                         cf->can_id |=3D CAN_ERR_CRTL | CAN_ERR_CNT;
->
-
-Fix it in the v9.
-
-> > +                     if (bec.txerr > bec.rxerr)
-> > +                             cf->data[1] =3D CAN_ERR_CRTL_TX_WARNING;
-> > +                     else
-> > +                             cf->data[1] =3D CAN_ERR_CRTL_RX_WARNING;
-> > +                     cf->data[6] =3D bec.txerr;
-> > +                     cf->data[7] =3D bec.rxerr;
-> > +             }
-> > +             break;
-> > +     case CAN_STATE_ERROR_PASSIVE:
-> > +             priv->can.can_stats.error_passive++;
-> > +             priv->can.state =3D CAN_STATE_ERROR_PASSIVE;
-> > +             if (cf) {
-> > +                     cf->can_id |=3D CAN_ERR_CRTL;
->
-> Set the CAN_ERR_CNT flag when you populate cf->data[6] and cf->data[7]:
->
->                         cf->can_id |=3D CAN_ERR_CRTL | CAN_ERR_CNT;
->
-
-Fix it in the v9.
-
-> > +                     cf->data[1] |=3D CAN_ERR_CRTL_RX_PASSIVE;
-> > +                     if (bec.txerr >=3D CAN_ERROR_PASSIVE_THRESHOLD)
-> > +                             cf->data[1] |=3D CAN_ERR_CRTL_TX_PASSIVE;
-> > +                     cf->data[6] =3D bec.txerr;
-> > +                     cf->data[7] =3D bec.rxerr;
-> > +             }
-> > +             break;
-> > +     case CAN_STATE_BUS_OFF:
-> > +             priv->can.state =3D CAN_STATE_BUS_OFF;
-> > +             priv->can.can_stats.bus_off++;
-> > +             if (cf)
-> > +                     cf->can_id |=3D CAN_ERR_BUSOFF;
-> > +             can_free_echo_skb(ndev, 0, NULL);
-> > +             netif_stop_queue(ndev);> +              can_bus_off(ndev)=
-;
-> > +             break;
-> > +     default:
-> > +             break;
-> > +     }
-> > +
-> > +     nct6694_can_rx_offload(&priv->offload, skb);
-> > +}
-> > +
-...
-> > +static int nct6694_can_stop(struct net_device *ndev)
-> > +{
-> > +     struct nct6694_can_priv *priv =3D netdev_priv(ndev);
-> > +
-> > +     priv->can.ctrlmode =3D CAN_CTRLMODE_LISTENONLY;
->
-> Hmmm, when Marc asked you to put the device in listen only mode, I think
-> he meant that you set it on the device side (i.e. flag
-> NCT6694_CAN_SETTING_CTRL1_MON) and not on the driver side. If you set
-> CAN_CTRLMODE_LISTENONLY flag, that will be reported in the netlink
-> interface. So you should not change that flag.
->
-> But before that, did you check the datasheet? Don't you have a device
-> flag to actually turn the device off (e.g. sleep mode)?
->
-
-Our firmware currently does not provide an interface to turn the
-device off, I will put the device in listen-only mode as an
-alternative.
-
-> > +     netif_stop_queue(ndev);
-> > +     free_irq(ndev->irq, ndev);
-> > +     destroy_workqueue(priv->wq);
-> > +     can_rx_offload_disable(&priv->offload);
-> > +     priv->can.state =3D CAN_STATE_STOPPED;
-> > +     close_candev(ndev);
-> > +
-> > +     return 0;
-> > +}
-> > +
-...
-> > +static int nct6694_can_probe(struct platform_device *pdev)
-> > +{
-> > +     const struct mfd_cell *cell =3D mfd_get_cell(pdev);
-> > +     struct nct6694 *nct6694 =3D dev_get_drvdata(pdev->dev.parent);
-> > +     struct nct6694_can_priv *priv;
-> > +     struct net_device *ndev;
-> > +     int ret, irq, can_clk;
-> > +
-> > +     irq =3D irq_create_mapping(nct6694->domain,
-> > +                              NCT6694_IRQ_CAN0 + cell->id);
-> > +     if (!irq)
-> > +             return irq;
-> > +
-> > +     ndev =3D alloc_candev(sizeof(struct nct6694_can_priv), 1);
-> > +     if (!ndev)
-> > +             return -ENOMEM;
-> > +
-> > +     ndev->irq =3D irq;
-> > +     ndev->flags |=3D IFF_ECHO;
-> > +     ndev->dev_port =3D cell->id;
-> > +     ndev->netdev_ops =3D &nct6694_can_netdev_ops;
-> > +     ndev->ethtool_ops =3D &nct6694_can_ethtool_ops;
-> > +
-> > +     priv =3D netdev_priv(ndev);
-> > +     priv->nct6694 =3D nct6694;
-> > +     priv->ndev =3D ndev;
-> > +
-> > +     can_clk =3D nct6694_can_get_clock(priv);
-> > +     if (can_clk < 0) {
-> > +             ret =3D dev_err_probe(&pdev->dev, can_clk,
-> > +                                 "Failed to get clock\n");
-> > +             goto free_candev;
-> > +     }
-> > +
-> > +     INIT_WORK(&priv->tx_work, nct6694_can_tx_work);
-> > +
-> > +     priv->can.state =3D CAN_STATE_STOPPED;
->
-> Marc asked you to remove this line during the v7 review.
->
-
-Sorry, drop it in the v9.
-
-> > +     priv->can.clock.freq =3D can_clk;
-> > +     priv->can.bittiming_const =3D &nct6694_can_bittiming_nominal_cons=
-t;
-> > +     priv->can.data_bittiming_const =3D &nct6694_can_bittiming_data_co=
-nst;
-> > +     priv->can.do_set_mode =3D nct6694_can_set_mode;
-> > +     priv->can.do_get_berr_counter =3D nct6694_can_get_berr_counter;
-> > +     priv->can.ctrlmode_supported =3D CAN_CTRLMODE_LOOPBACK |
-> > +             CAN_CTRLMODE_LISTENONLY | CAN_CTRLMODE_BERR_REPORTING |
-> > +             CAN_CTRLMODE_FD | CAN_CTRLMODE_FD_NON_ISO;
-> > +
-> > +     ret =3D can_rx_offload_add_manual(ndev, &priv->offload,
-> > +                                     NCT6694_NAPI_WEIGHT);
-> > +     if (ret) {
-> > +             dev_err_probe(&pdev->dev, ret, "Failed to add rx_offload\=
-n");
-> > +             goto free_candev;
-> > +     }
-> > +
-> > +     platform_set_drvdata(pdev, priv);
-> > +     SET_NETDEV_DEV(priv->ndev, &pdev->dev);
-> > +
-> > +     ret =3D register_candev(priv->ndev);
-> > +     if (ret)
-> > +             goto rx_offload_del;
-> > +
-> > +     return 0;
-> > +
-> > +rx_offload_del:
-> > +     can_rx_offload_del(&priv->offload);
-> > +free_candev:
-> > +     free_candev(ndev);
-> > +     return ret;
-> > +}
-> > +
-
-
-Best regards,
-Ming
+-- 
+js
+suse labs
 
