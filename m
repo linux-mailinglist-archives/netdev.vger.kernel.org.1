@@ -1,92 +1,97 @@
-Return-Path: <netdev+bounces-170210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB3E5A47CF3
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 13:09:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 771F0A47D19
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 13:13:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8C1416FDD5
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 12:09:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FFB63B0589
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 12:12:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 321F022E405;
-	Thu, 27 Feb 2025 12:08:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7319C233D88;
+	Thu, 27 Feb 2025 12:09:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uquTKJ94"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BvHmvkBD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF13322E3FA;
-	Thu, 27 Feb 2025 12:08:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5FD22F38B;
+	Thu, 27 Feb 2025 12:09:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740658086; cv=none; b=SSi1pChJuOGl8NtXYG6x/aqSqA/ibTYWKUQ0+ixRnbb7Ik/qcbOc+5jMmsY1dMP6EOCVe1ZGT1vQuL9vZwaoYy4Qe85jVyXk5lS+5Kta/O3diAz3i7MOW61jzqBwrj9wE50ZrsEEfvPuoij0WvYpuTjXJW9l3Ei04RBlmUkuVTg=
+	t=1740658198; cv=none; b=TrqtDh4OTKlPTLw8mRjl7KDK7aMStvXlf19JpbV4hTryXzoqyBTQqmBmtg5gBeKw+Az4dVGyGtFSt7bheJD4WPFy1fMooizDBq9LICJ6YCT43chOibLEKaoF8LRi+mko1pcnyE44zVodT7+E3RK2vGRZ//prJ7csnzUnAeV3a5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740658086; c=relaxed/simple;
-	bh=BnTBqvS3GhK4/kPtQtEy6PC0lkfa2QHa90IKHJd3wz8=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=Ki+I660yqvcSx56VtVztq1HrqxMSH8Kn7p5MmzDBQoyoCVUZPNShtMoLZfVllfSCn5idajov8549Mbv3xbGiqGW7vxihbwQAS1TQsOEQOOBVmpvyu+pIXxGbp/4OnteV1KAI8WrAzxsyJRMCYZTgHKSnZAkvmCTtt4zs8YTidmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uquTKJ94; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8B47C4CEDD;
-	Thu, 27 Feb 2025 12:08:00 +0000 (UTC)
+	s=arc-20240116; t=1740658198; c=relaxed/simple;
+	bh=yqRB5lzPN6YFf0epR/fplLg16wEnwUaEt6MfRnoCkG0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=b8reY4NJMQ2vuFF5vuEMxxAUR+yF3atuKN1qHTZSBzL0pY4cJ8NLjdHmRPEhkEo0KX1EvfhRMvFK1gWPOk/q5HSvG54HW2nExXxV49HfmQPYn7tHEzODaqVNE+STs6Q2HY8lb3va5Nq3cn+IWcK9Sbt/Jvy7FN8PUKAxHQkbxw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BvHmvkBD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBDDAC4CEDD;
+	Thu, 27 Feb 2025 12:09:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740658085;
-	bh=BnTBqvS3GhK4/kPtQtEy6PC0lkfa2QHa90IKHJd3wz8=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=uquTKJ94Qz5BkSDOuuJ5ClJ+zWxWF+wGOaxlrFXZvYZC2zBBZNaCY2MBl0W/XYvak
-	 w+wktTZfJN/4BUJ9C/6owR+CRC0ChI41iVxTY88mvK6O3PGbZWIaTgDk9t7A5vJcHt
-	 IBNbAMujFlrhzwPWKkquxT1EJqAmhKCw4TPJriIjnu42N0hnwFUcJCfQEA2Mwu4vmi
-	 x667jiClQj7Yyu2v1Bre72VjijxgDPJWj45f1NQzIVuNOsB3xKDh+oSlSEiqx5y+5D
-	 zvXWPCUQl6PN6XRDA0mmy9sOa0cY+AyJou+SIxSC00ylfvSFk4lu3AB7tuSeMaB1pr
-	 2IACkagKPrMpQ==
-From: Vinod Koul <vkoul@kernel.org>
-To: Peter Ujfalusi <peter.ujfalusi@gmail.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- MD Danish Anwar <danishanwar@ti.com>, 
- Siddharth Vadapalli <s-vadapalli@ti.com>, 
- Vignesh Raghavendra <vigneshr@ti.com>, Roger Quadros <rogerq@kernel.org>
-Cc: srk@ti.com, dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-In-Reply-To: <20250224-k3-udma-glue-single-fdq-v2-1-cbe7621f2507@kernel.org>
-References: <20250224-k3-udma-glue-single-fdq-v2-1-cbe7621f2507@kernel.org>
-Subject: Re: [PATCH v2] dmaengine: ti: k3-udma-glue: Drop skip_fdq argument
- from k3_udma_glue_reset_rx_chn
-Message-Id: <174065808054.367410.3286112232098432067.b4-ty@kernel.org>
-Date: Thu, 27 Feb 2025 17:38:00 +0530
+	s=k20201202; t=1740658197;
+	bh=yqRB5lzPN6YFf0epR/fplLg16wEnwUaEt6MfRnoCkG0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BvHmvkBDxKI81m8GYkC48N4ySh3HjxU/wMO/QOWxsXxRBQM7yvSQ7KwsaO+ukxM5l
+	 6NflidsF3RlQOPTyL0WzQrB8ZkBpiPTC3otpou6w7NYEoCf34s8NhtzyP437jSLBsQ
+	 uzUzXXMkNj47VP+lkgX5e0zcwNTivGzK9335PlxsUxM76h49r5Jtv7H4S/vvbXw156
+	 gxzkxbrazRaz76/5tp2Ug5j2E0I37BLWOHLeeuK58392O1U27gcVBfnddrre2I0JwC
+	 ICTVZRjbNdfNF38m+yEJhqtm9XtQIqX37VgG9/JWwNz7Q/j3OKH+lSx5bCXtVAictC
+	 co8bKMPuJqtxQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB19C380AA7F;
+	Thu, 27 Feb 2025 12:10:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.2
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] pktgen: avoid unused-const-variable warning
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174065822975.1403860.8629807772029389054.git-patchwork-notify@kernel.org>
+Date: Thu, 27 Feb 2025 12:10:29 +0000
+References: <20250225085722.469868-1-arnd@kernel.org>
+In-Reply-To: <20250225085722.469868-1-arnd@kernel.org>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, arnd@arndb.de, horms@kernel.org, ps.report@gmx.net,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
+Hello:
 
-On Mon, 24 Feb 2025 16:04:17 +0200, Roger Quadros wrote:
-> The user of k3_udma_glue_reset_rx_chn() e.g. ti_am65_cpsw_nuss can
-> run on multiple platforms having different DMA architectures.
-> On some platforms there can be one FDQ for all flows in the RX channel
-> while for others there is a separate FDQ for each flow in the RX channel.
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Tue, 25 Feb 2025 09:57:14 +0100 you wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
-> So far we have been relying on the skip_fdq argument of
-> k3_udma_glue_reset_rx_chn().
+> When extra warnings are enable, there are configurations that build
+> pktgen without CONFIG_XFRM, which leaves a static const variable unused:
+> 
+> net/core/pktgen.c:213:1: error: unused variable 'F_IPSEC' [-Werror,-Wunused-const-variable]
+>   213 | PKT_FLAGS
+>       | ^~~~~~~~~
+> net/core/pktgen.c:197:2: note: expanded from macro 'PKT_FLAGS'
+>   197 |         pf(IPSEC)               /* ipsec on for flows */                \
+>       |         ^~~~~~~~~
 > 
 > [...]
 
-Applied, thanks!
+Here is the summary with links:
+  - pktgen: avoid unused-const-variable warning
+    https://git.kernel.org/netdev/net-next/c/af4a5da8ed54
 
-[1/1] dmaengine: ti: k3-udma-glue: Drop skip_fdq argument from k3_udma_glue_reset_rx_chn
-      commit: 0da30874729baeb01889b0eca16cfda122687503
-
-Best regards,
+You are awesome, thank you!
 -- 
-~Vinod
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
