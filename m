@@ -1,61 +1,84 @@
-Return-Path: <netdev+bounces-170343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CC53A48484
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 17:16:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B002FA4848A
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 17:17:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 758D71758BB
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:08:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 892EE1888484
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:11:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE53D1A9B5B;
-	Thu, 27 Feb 2025 16:03:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BA3826E94E;
+	Thu, 27 Feb 2025 16:05:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0Tr/jzQg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VpbbLZRQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 580D04EB38;
-	Thu, 27 Feb 2025 16:03:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1E1C26E944;
+	Thu, 27 Feb 2025 16:05:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740672192; cv=none; b=dmEgFttjWOGZgyE/Rd8KFNWLdhqaANM/Yh2NWC8TS0LixqhuGSedTU0FCsMgrG2VM2Kf2DDsqAK5SKx3W8xynA1qg9vVKOMp3/obso+/54tWzDcaZu+ZpTUi/THAmgeBlSL9UjsoE94TA7tTx2rOV1uSluDp3k/ezr52H2JXk2s=
+	t=1740672306; cv=none; b=DtBFaWnEDt0rKtKTLQf8C9z+6PBbyTTFKhski/Ou9pEzm+zODcfWxE+/JR9gUeR28X1Wc0oE6MFE2DXim4djEUKNTXrO3yFG5bQzOw9IT10vzeqQMwTqxltYLcQi4UaKxGNtkXqOSqLOP6FHluzewLhuQR1SNn35L/SLDZPb8nQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740672192; c=relaxed/simple;
-	bh=kDR/3BsbGHNq1vO8Xg5bepJteccoLWRVMd1vEEh2v1c=;
+	s=arc-20240116; t=1740672306; c=relaxed/simple;
+	bh=sj5RoctSbIGx3p/cbQm/bVUcln1LHkula1nexu5M2Yc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hOEflF5bXzPprD47h6k0wBBmNVnPSoz4MCTSnjbeR6SyEj4yAl4iTmnoP1Urp9BECI6Le6tEPNQmRuV513xtY5vZl6LaxcRv4dpjl6VcdyAtoIht+gth7+zTaNr/EAaiN+RXljdSlhDMvhftcrsop5YZGdFBCUro9Yc24IVyQMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0Tr/jzQg; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=jHA36oJ30EP9uMa5rF7xPESwPrtKLCK7Cd5ezd49fWk=; b=0Tr/jzQg9aJuTcenur4l/oX+xr
-	4IxBeJe4kMTdHI7YinrnF4qym310wM1HdVJS+OF7M7xsmrryPnHn8zHfb8PzU3vAkbZ/v6gHkLBlb
-	FdB6ztqqpqTYHv544JgFMldLAiS8/Cz9HvXXzivirZGe+vQ12cfJb1itGb4RA/YgYkso=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tngLe-000e3j-3H; Thu, 27 Feb 2025 17:02:54 +0100
-Date: Thu, 27 Feb 2025 17:02:54 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Mark Pearson <mpearson-lenovo@squebb.ca>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] e1000e: Link flap workaround option for false IRP events
-Message-ID: <8c0a80fe-5e92-42c4-88cc-0fc46c17a936@lunn.ch>
-References: <mpearson-lenovo@squebb.ca>
- <20250226194422.1030419-1-mpearson-lenovo@squebb.ca>
- <36ae9886-8696-4f8a-a1e4-b93a9bd47b2f@lunn.ch>
- <50d86329-98b1-4579-9cf1-d974cf7a748d@app.fastmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=XMTpr9MR8I+MaFB1MjtHV2PMGEB/9sipEGXIL06yqhf5/ApdMVv2cru8eMmBPoKYaBOdMBLDnclpyjWQIrFveVh6pHD7Popk6sJs7QM38gZASI2HbuYvP4oqHEksg1Y3Ls/7q2/qodJ4hZN37GwNTZPQflQCjE72ixzjhC6TVnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VpbbLZRQ; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740672305; x=1772208305;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=sj5RoctSbIGx3p/cbQm/bVUcln1LHkula1nexu5M2Yc=;
+  b=VpbbLZRQ3VixHYzmJZQp1fx6e+tlLAVfLrYQQHG703jNi/x54nOH4nGy
+   NDPSFxjZ/OUgwgsspUqQTVJFKI93/Fg9N/H1aSLwr9D7jdyJDpZFToo8e
+   Ec0f9s63m7KoXkxf/SV3aNjp5eSWfaFQYGWVngzTHvveu2uMCrbQCKGpR
+   S8t90P55sPlj5tXppGQQEVVFbgT1S9mFF76JvB60OH2IKbMvPB1XUctoK
+   eJKTAX//IT2BOOXmUrfJKeUJVrZ1qtwSbPgr5GIgum3oOvJb4eivIVRpC
+   +iKEsJP/8b/HdsXTRbUTbb/Pm10fv1oQJjj4f+fSGUgd88a3qqFpaU1Wx
+   Q==;
+X-CSE-ConnectionGUID: acx7fHkGTKuH88/XDzgAgA==
+X-CSE-MsgGUID: VuWxpeIrTMigvEh834yw/A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11358"; a="58986105"
+X-IronPort-AV: E=Sophos;i="6.13,320,1732608000"; 
+   d="scan'208";a="58986105"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 08:05:01 -0800
+X-CSE-ConnectionGUID: ssF3YDBeRBu6QxaaafjaCg==
+X-CSE-MsgGUID: MU9sB79WT7iA8Qeu7d4S1w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,320,1732608000"; 
+   d="scan'208";a="140298768"
+Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
+  by fmviesa002.fm.intel.com with ESMTP; 27 Feb 2025 08:04:51 -0800
+Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tngMy-000Ddu-31;
+	Thu, 27 Feb 2025 16:04:21 +0000
+Date: Fri, 28 Feb 2025 00:03:49 +0800
+From: kernel test robot <lkp@intel.com>
+To: Li Li <dualli@chromium.org>, dualli@google.com, corbet@lwn.net,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, donald.hunter@gmail.com,
+	gregkh@linuxfoundation.org, arve@android.com, tkjos@android.com,
+	maco@android.com, joel@joelfernandes.org, brauner@kernel.org,
+	cmllamas@google.com, surenb@google.com, omosnace@redhat.com,
+	shuah@kernel.org, arnd@arndb.de, masahiroy@kernel.org,
+	bagasdotme@gmail.com, horms@kernel.org, tweek@google.com,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	netdev@vger.kernel.org, selinux@vger.kernel.org, hridya@google.com
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	smoreland@google.com, ynaffit@google.com, kernel-team@android.com
+Subject: Re: [PATCH v15 2/3] binder: report txn errors via generic netlink
+Message-ID: <202502272346.6XGVfFlz-lkp@intel.com>
+References: <20250226192047.734627-3-dualli@chromium.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,32 +87,132 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <50d86329-98b1-4579-9cf1-d974cf7a748d@app.fastmail.com>
+In-Reply-To: <20250226192047.734627-3-dualli@chromium.org>
 
-> The reason for the module option is I'm playing it safe, as Intel couldn't determine root cause.
+Hi Li,
 
-> The aim of the patch is to keep the effect to a minimum whilst
-> allowing users who are impacted to turn on the workaround, if they
-> are encountering the issue.
+kernel test robot noticed the following build errors:
 
-And how do such users determine this module parameter exists? You need
-to be a pretty savvy user to know about them, and how the set them,
-etc.
+[auto build test ERROR on 8433c776e1eb1371f5cd40b5fd3a61f9c7b7f3ad]
 
-> Issue details:
+url:    https://github.com/intel-lab-lkp/linux/commits/Li-Li/lsm-selinux-Add-setup_report-permission-to-binder/20250227-032351
+base:   8433c776e1eb1371f5cd40b5fd3a61f9c7b7f3ad
+patch link:    https://lore.kernel.org/r/20250226192047.734627-3-dualli%40chromium.org
+patch subject: [PATCH v15 2/3] binder: report txn errors via generic netlink
+config: hexagon-randconfig-002-20250227 (https://download.01.org/0day-ci/archive/20250227/202502272346.6XGVfFlz-lkp@intel.com/config)
+compiler: clang version 16.0.6 (https://github.com/llvm/llvm-project 7cbf1a2591520c2491aa35339f227775f4d3adf6)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250227/202502272346.6XGVfFlz-lkp@intel.com/reproduce)
 
-> We have seen the issue when running high level traffic on a network
-> involving at least two nodes and also having two different network
-> speeds are need. For example:
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502272346.6XGVfFlz-lkp@intel.com/
 
-> [Lenovo WS] <---1G link---> Network switch <---100M link--->[traffic source]
-> The link flap can take a day or two to reproduce - it's rare.
+All errors (new ones prefixed by >>):
 
-By flap, you mean down/up? So the network dies for a couple of seconds
-while autoneg happens? And this repeats at 1 to 2 day intervals?
+>> drivers/android/binder.c:6479:8: error: call to undeclared function 'security_binder_setup_report'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+           ret = security_binder_setup_report(current_cred());
+                 ^
+   1 error generated.
 
-Or does the link go down, and stay down, and it needs user
-intervention to get the link back?
 
-	Andrew
+vim +/security_binder_setup_report +6479 drivers/android/binder.c
+
+  6462	
+  6463	/**
+  6464	 * binder_nl_report_setup_doit() - netlink .doit handler
+  6465	 * @skb:	the metadata struct passed from netlink driver
+  6466	 * @info:	the generic netlink struct passed from netlink driver
+  6467	 *
+  6468	 * Implements the .doit function to process binder netlink commands.
+  6469	 */
+  6470	int binder_nl_report_setup_doit(struct sk_buff *skb, struct genl_info *info)
+  6471	{
+  6472		struct binder_context *context = NULL;
+  6473		struct binder_device *device;
+  6474		struct binder_proc *proc;
+  6475		u32 flags, pid;
+  6476		void *hdr;
+  6477		int ret;
+  6478	
+> 6479		ret = security_binder_setup_report(current_cred());
+  6480		if (ret < 0) {
+  6481			NL_SET_ERR_MSG(info->extack, "Permission denied");
+  6482			return ret;
+  6483		}
+  6484	
+  6485		hlist_for_each_entry(device, &binder_devices, hlist) {
+  6486			if (!nla_strcmp(info->attrs[BINDER_A_CMD_CONTEXT],
+  6487					device->context.name)) {
+  6488				context = &device->context;
+  6489				break;
+  6490			}
+  6491		}
+  6492	
+  6493		if (!context) {
+  6494			NL_SET_ERR_MSG(info->extack, "Unknown binder context");
+  6495			return -EINVAL;
+  6496		}
+  6497	
+  6498		pid = nla_get_u32(info->attrs[BINDER_A_CMD_PID]);
+  6499		flags = nla_get_u32(info->attrs[BINDER_A_CMD_FLAGS]);
+  6500	
+  6501		if (!pid) {
+  6502			/* Set the global flags for the whole binder context */
+  6503			context->report_flags = flags;
+  6504		} else {
+  6505			/* Set the per-process flags */
+  6506			proc = binder_find_proc(pid);
+  6507			if (!proc) {
+  6508				NL_SET_ERR_MSG_FMT(info->extack,
+  6509						   "Invalid binder report pid %u",
+  6510						   pid);
+  6511				ret = -EINVAL;
+  6512				goto err_exit;
+  6513			}
+  6514	
+  6515			proc->report_flags = flags;
+  6516		}
+  6517	
+  6518		skb = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
+  6519		if (!skb) {
+  6520			pr_err("Failed to alloc binder netlink reply message\n");
+  6521			ret = -ENOMEM;
+  6522			goto err_exit;
+  6523		}
+  6524	
+  6525		hdr = genlmsg_iput(skb, info);
+  6526		if (!hdr)
+  6527			goto free_skb;
+  6528	
+  6529		if (nla_put_string(skb, BINDER_A_CMD_CONTEXT, context->name) ||
+  6530		    nla_put_u32(skb, BINDER_A_CMD_PID, pid) ||
+  6531		    nla_put_u32(skb, BINDER_A_CMD_FLAGS, flags))
+  6532			goto cancel_skb;
+  6533	
+  6534		genlmsg_end(skb, hdr);
+  6535	
+  6536		if (genlmsg_reply(skb, info)) {
+  6537			pr_err("Failed to send binder netlink reply message\n");
+  6538			ret = -EFAULT;
+  6539			goto err_exit;
+  6540		}
+  6541	
+  6542		return 0;
+  6543	
+  6544	cancel_skb:
+  6545		pr_err("Failed to add reply attributes to binder netlink message\n");
+  6546		genlmsg_cancel(skb, hdr);
+  6547	free_skb:
+  6548		pr_err("Free binder netlink reply message on error\n");
+  6549		nlmsg_free(skb);
+  6550		ret = -EMSGSIZE;
+  6551	err_exit:
+  6552		return ret;
+  6553	}
+  6554	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
