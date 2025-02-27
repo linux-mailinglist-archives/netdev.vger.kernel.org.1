@@ -1,112 +1,137 @@
-Return-Path: <netdev+bounces-170408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9913A48945
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 20:53:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1EEDA48949
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 20:54:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BEBC3A1AF8
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 19:53:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBD9F16D80E
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 19:54:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D18E426F465;
-	Thu, 27 Feb 2025 19:53:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 519CA26F462;
+	Thu, 27 Feb 2025 19:54:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hHNC4JXL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MlzmiiCk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656DD1E832D;
-	Thu, 27 Feb 2025 19:53:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9425C1E3DD7
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 19:54:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740686020; cv=none; b=g8mRtNGLqV60N4MYW08BS3rlJ+7pLOxPds6X/tHNN51J2bq6w+310OR2qYyhT4Zk95YaU1/0uu5KPdMtOz+VTST22PkERusOlD93oXK2pxbeW5jIvPHrz+pbe/l1nzgpv8Xu12qmAaPZDpUVB3wjoyG1OKK6+9bmwcgUTQZChEU=
+	t=1740686062; cv=none; b=uSuipAzYkgOVuMHcNKOdtviE164YQ2joV4CLfJmYtqlIztpjyr/wnu7DJ/XPGCAXfd4Htz/KuMDJzFywXyX6Qd7ax7U8QhsiG5HtE4iHOHWJNvqCrcCKvL1VDKjL7bYqUaqyAEQ5jzJVL1sIZ60kcu8uvOI6Gr+GiCkhncBEhIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740686020; c=relaxed/simple;
-	bh=HIh3SJh9ze7Bx4OYk5eOB1XyiCWTpB1zmI+JgpGBW1s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BpEKVohQWGn2OmVbiWHpvdRV0Ihy3ym+EFlXXVc8L9wYHEq7oOIKqRWxSc6EQXPs9VWXmCToxUKJfNb9K0/RKy3zscj/YBjYkDJFxY0Y+piIpOzR9jJh9Y2E0mIqe9fc9rJQ/1O4uPO8fZS7KHRbud4MEuvBhDn/UsQKhHtI2kA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hHNC4JXL; arc=none smtp.client-ip=209.85.214.179
+	s=arc-20240116; t=1740686062; c=relaxed/simple;
+	bh=fpmz9TxgYoPHauye3q5xpCZiqO15uzV0X85juHs9ukQ=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=TLnF8xoycThB+wLicVBSzhU1cASpiKi/ho4KNAunar8S6/GLnGyASOA1dDAzJxB06zlvuykS2WgM8ctwL1d0CCi+S0dMwJ3O/YLXaYZaxXzwy/UqhFvkBW+B9EW1n8csACsOR7yb8lMuPnhHTQKUzQ2pasq0TrH1coZZVxiAVXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MlzmiiCk; arc=none smtp.client-ip=209.85.208.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2233622fdffso27529515ad.2;
-        Thu, 27 Feb 2025 11:53:39 -0800 (PST)
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5deb1266031so2182707a12.2
+        for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 11:54:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740686019; x=1741290819; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8p4zdATSo6YE56HLrMWWOx12sv8q8KTQRI7WFtnp7kc=;
-        b=hHNC4JXLrHc5JPE4J5I+n724Z7sIhcSqmeJgc40GiCkpM9xJk/WtH2OXyceV8E27R0
-         gjVPlMKdXT7MUAKneqMXHexNL90zqMCERGNB4/J6iARPK1BCx7M1EgU1PsjUPoeE64oi
-         QiYHgUQ9mhOnbtTdmwod66wEzedGra2z1wDFKR2kyqoZFVthvPF/5nQXireD4gwlpOTG
-         R5EGjztYJz9S8TkY4GxRI9xtNrWa6zbVtLxVkY0mUfjaiYrp3t8JBuks466wIZX82AQT
-         X1EthL0ubIyda9K+4FHK8MJRn/Sw/c+338rIuF8rVt1Fd3rp2EctVD3Xgc1+uXx7vvtn
-         lnQQ==
+        d=gmail.com; s=20230601; t=1740686059; x=1741290859; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AVx+M8ps2yONWKePyuV506c2UoijLLRqmgS3tRVD2ms=;
+        b=MlzmiiCkciRWT7zKENEVlNphtMOHTUyEA1RH6gNnNW9V/hykpw/fBbTtUBAQyNihql
+         ZUAZHXgSkm9kLnjNNpyQAd4QZ4Q+ZJCxVi7Z9KD2vyK1mDpMg9EuKRmUHtcSbW7MjgPc
+         rgsPYcO+11IrBFZNDh4fJxYjiamiCdD+QwihcXycvmlPfx0DKkNpF4Ys8LyccdLJgofh
+         P393lvifomyCUatnbsovSGKbKnWIYDhGXsTbKJp1xFRWDkRNgGt9y6nwOQBdxgZS+ToZ
+         FXcPDyPdkFQpxGAy2OPv8n+vOVJymsO119nhjc29mvyW51Fn3ZX1zHqncjf1KHkkAytA
+         FFKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740686019; x=1741290819;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8p4zdATSo6YE56HLrMWWOx12sv8q8KTQRI7WFtnp7kc=;
-        b=l2Rnqb/AVYJm7/z8beXRmaLvt9XVUKheVC+t+4cwM3aHh0OcnNuvjKcOUmhhIyZZYn
-         8HdaOTuWsQPgoyOAEmQIP9lgv4DLJhdmW7EL+b7Whk8rHdMReXgskw4Gq4yjPHw+DvBN
-         8mO0caBVgh7uzo/yM0BetARVc+YiqjdEcAX0aznkeJHo7Gqib9RLv2RUnMUr1fVCP0mv
-         0kHN5jHbcicHTqN30dK5qQNqlmCgSErj44ly1eFPYIJ7RjtYtKkMpvAN8OHmYjKSTasE
-         uxFKyQ+wehIgLeGOt/6aPJZuD8ObTqSsEkGCn8D+KrNkjTDuVQQmARp35S4A4CgxK8jL
-         Ugnw==
-X-Forwarded-Encrypted: i=1; AJvYcCUBM2WBGKca6NGl2/IAUjScqAVGpEuU7zfPRxem0tIZ6CMv6Yr6ik23CCQmtjcTHT/wN9qbeV64XsdyPBPTvZhZ@vger.kernel.org, AJvYcCVBhOS8N0dVutfJZTNQ73+pC3LC2c3K/01YLzown1M1zRzvEt2142BNHdeaJhDGRPo4k6Gn2tdhavy3FtZ8@vger.kernel.org, AJvYcCWiFkABi55Yf1ODKIxG5Cdu11zBFn32QmhqKrtc43y3Uh9Xg60RV71KT3VP7pOmIlWmzx8=@vger.kernel.org, AJvYcCX7t8JBGPhjc/QgkdbYi1iGD8xbJPcCcWAxY+LJ3O5Enh+/OTV0FvXpzE0QmEOYA6kexVecifq0@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9IdeLhaV1bEd5THfd8GuLKHghXfpyaxbItQc5PSLiZPtPeOTH
-	8ENhH7wsQ87Rkqj/uL8iqK782L4PJ8pZzjt4BwX4TVUiO7rL01Ln
-X-Gm-Gg: ASbGncvQwn8Fzj7iB0D30wl1eqRLv480G0pniVVTPMa9IUTY+UuR2/u9JkWzV5IOQxg
-	EtlrKHGSfpEif/3c/lCF9E1/DQFQzJRxn2XBbVeTK5lDpwZ7OpjvaPZGgk1jNokv5oH+0IMIW7M
-	Dclixc3Ct9vuwBchjIjn+6xIH7J2hsPkS7cKiBrewjjupBOl6gcL7fRcchCjqlgMwVggcwwqjRt
-	sIsniphlWARk6sZg8gGBxeCKUaOLDkCT29xkfwSF0z88B57JS5pHhnqFQ/Wl6dF3cQZPk82FdWY
-	UnaWcrTgmCxujRsccTN66SPDzQqk5A==
-X-Google-Smtp-Source: AGHT+IFoTSorehwp0vDxBGlMEsfxHl5RgKv1Cx/76s4b4eLSazPFfGflRJxd3UKy7vFWVcHqS6juLA==
-X-Received: by 2002:a05:6a00:b56:b0:732:2793:6b65 with SMTP id d2e1a72fcca58-734ac3f31d1mr965589b3a.15.1740686018630;
-        Thu, 27 Feb 2025 11:53:38 -0800 (PST)
-Received: from localhost ([129.210.115.104])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-734a0024df7sm2132126b3a.109.2025.02.27.11.53.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Feb 2025 11:53:37 -0800 (PST)
-Date: Thu, 27 Feb 2025 11:53:36 -0800
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: cong.wang@bytedance.com, john.fastabend@gmail.com, jakub@cloudflare.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, andrii@kernel.org,
-	eddyz87@gmail.com, mykolal@fb.com, ast@kernel.org,
-	daniel@iogearbox.net, martin.lau@linux.dev, song@kernel.org,
-	yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me,
-	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, mhal@rbox.co,
-	sgarzare@redhat.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	mrpre@163.com
-Subject: Re: [PATCH bpf-next v1 3/3] selftests/bpf: Add edge case tests for
- sockmap
-Message-ID: <Z8DCwLpLQ2pYte14@pop-os.localdomain>
-References: <20250226132242.52663-1-jiayuan.chen@linux.dev>
- <20250226132242.52663-4-jiayuan.chen@linux.dev>
+        d=1e100.net; s=20230601; t=1740686059; x=1741290859;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AVx+M8ps2yONWKePyuV506c2UoijLLRqmgS3tRVD2ms=;
+        b=sG2iwWz3HRJ9dv9GuJ4mJaQ4DWFZLGMbkttHMfYHovLdtTQ/YkkjGlCb8iEirI8WJD
+         H/aDqs9cAMBj4VVevre97zxQYy3sUDIiTu7KnA5zR2SkjG5kGqGBDfx2iROOKvhnehox
+         8fcLHMtxFA7OV0V35HQW79FosuecnudXOCjeQImXY+7BCQFzMdM7KTz1fz9XHa4egH7J
+         HV9Gs3dJDNTl0BdVeDTLFPwjSVbswkLh31itwrgSYf8gQptOArt8LWXHkU53Z9YM4Wqp
+         +N0X9+Fu0nE/EpNL2naTL6r5+xRkzZvPu6UH9FzsTHhktaV3XXrHN+14EBMw7ifvqZ7Y
+         6shQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVUSlFpLKDwHWVfu4JNPI0veEhMscqMKJ2/fI00hH5wJ3m9sfaxtJSl/JLUA4QQhjK5M1fR2a0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwssWqY2T4gjU38XHqzZWeOZRgw9iCI9DaAyKcBJj3v5XX96fVz
+	Gcsom6SL1fEHUvtK9VyWj3vOSqeu8rxF8xfDxFRLiEtSh9/QsXYt
+X-Gm-Gg: ASbGnctWF/Zyv7FwvgDWbbug7uknZQwGG6l35g0W0hGk1oArdynk/O73/nAhiif/DQy
+	vaykXnNunKUO+eAsPcHRObeYFqgd4dK/NBnMq6+I1XZbuQM7QCCBMA06jw7G/Ro6aCDEhVgBAeD
+	jwFZf9PyPMo3MIMsHbqB16Cg+hsTEInC4azquJ6B2+X/BbJxfm1BtD2UqHNRa7Du7M8e+Y4FLM9
+	ho8jxVNXiXyOrLrOxqqhJA+cJ309jwayj607GP9DDmZLA0ZHZluYSap0eDFAJO1LlRh0aLqtsrk
+	240LBbFgm83kFGK/t4vVxNE+hMm37JOzDnh6iL6YrC71JRisTsW4vFQ0BiFgzM7HMzCEfrHs9uv
+	Btjti2h1+sejwXA==
+X-Google-Smtp-Source: AGHT+IHd7oIEvhsBMP3mppCA676zTmgH+2a3BIufkIgbZz61zYRrJmTL1f7XhRihdhWfC+/BU8dTvQ==
+X-Received: by 2002:a17:906:6a22:b0:ab7:844e:1bc7 with SMTP id a640c23a62f3a-abf261fbb40mr68540766b.32.1740686058818;
+        Thu, 27 Feb 2025 11:54:18 -0800 (PST)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abf0c755c98sm172500466b.142.2025.02.27.11.54.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Feb 2025 11:54:18 -0800 (PST)
+Subject: Re: [PATCH net-next] net: ethtool: Don't check if RSS context exists
+ in case of context 0
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Gal Pressman <gal@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
+ Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>,
+ Joe Damato <jdamato@fastly.com>, Tariq Toukan <tariqt@nvidia.com>
+References: <20250225071348.509432-1-gal@nvidia.com>
+ <20250225170128.590baea1@kernel.org>
+ <8a53adaa-7870-46a9-9e67-b534a87a70ed@nvidia.com>
+ <20250226182717.0bead94b@kernel.org> <20250226204503.77010912@kernel.org>
+ <275696e3-b2dd-3000-1d7b-633fff4748f0@gmail.com>
+ <20250227072933.5bbb4e2c@kernel.org>
+ <c034259f-ec9a-2e78-1fc0-f16981cd4e54@gmail.com>
+ <20250227085608.5a3e32d7@kernel.org>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <cd0b748b-fe7d-86ac-098b-0d6ec78a04a2@gmail.com>
+Date: Thu, 27 Feb 2025 19:54:17 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250226132242.52663-4-jiayuan.chen@linux.dev>
+In-Reply-To: <20250227085608.5a3e32d7@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-On Wed, Feb 26, 2025 at 09:22:42PM +0800, Jiayuan Chen wrote:
-> Add edge case tests for sockmap.
+On 27/02/2025 16:56, Jakub Kicinski wrote:
+> On Thu, 27 Feb 2025 16:24:52 +0000 Edward Cree wrote:
+>>> I never uttered the thought that lead me to opposing. 
+>>> ctx 0 is a poor man's pass / accept. If someone needs a pass we should
+>>> add an explicit "action pass".  
+>>
+>> To me 'pass' is just a shorthand for whatever specific behaviour
+>>  happens to match the default.  I.e. if you can already express
+>>  that behaviour directly, then 'pass' is a strictly nonorthogonal
+>>  addition and therefore bad interface design.
 > 
-> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> I presume sfc matches only one rule. For devices which terminate on
+> first hit and rules are ordered by ntuple ID, the following rules*:
+> 
+>  src-ip 192.168.0.2                 context 0
+>  src-ip 192.0.0.0   m 0.255.255.255 action -1
+> 
+> implement allowing only 192.168.0.2 out of the 192.0.0.0/8 subnet. 
 
-Acked-by: Cong Wang <xiyou.wangcong@gmail.com>
+Ah, so the point is that "pass" wasn't expressible before RSS contexts
+ came along, and may therefore be surprising and new.  I get you now.
 
-I always love to see fixes with test cases.
+> The device may not even support RSS contexts.
 
-Thanks!
+I think in that case the driver will reject the first filter because it
+ doesn't recognise flow_type == FLOW_RSS | WHATEVER_FLOW.  Unless the
+ driver writer has deliberately added support for RSS filters despite
+ only having context 0, which seems like a signal they know it means
+ 'pass' and explicitly wanted that.
 
