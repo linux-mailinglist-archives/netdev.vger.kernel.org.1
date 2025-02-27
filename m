@@ -1,166 +1,193 @@
-Return-Path: <netdev+bounces-170188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D62E3A47A63
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 11:35:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15E5CA47AAD
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 11:46:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D36297A25EC
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 10:34:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A439F18905CB
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 10:46:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA50E227EBF;
-	Thu, 27 Feb 2025 10:34:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ACD3227E80;
+	Thu, 27 Feb 2025 10:46:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ijhtaovO"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="b8VgYZg1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2064.outbound.protection.outlook.com [40.107.237.64])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0148021C18F;
-	Thu, 27 Feb 2025 10:34:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740652489; cv=none; b=r6fWML+xDfvUlM2cBqp5Nb40J0brW6WaIZ5VgINz9rsBbQRGlOsMIB7GyrEC1Tw7EY4xUEgOya1/FhhCs9qMwgYjZ6IeUwMzjA1R4JyRHHCt2BvLbjtqwh6gc0T6wZFOTNZUnOf0z801/8Of5FiQi18foNl4TdFWICVD0lo2ILY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740652489; c=relaxed/simple;
-	bh=YJKmHFUcVEtxuOOaxd/RpiuUqI9ez1eSLQC9p5kpvjU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ovz0R2/8QQ5WQ8mv681hitG0rHDgfACc36WSFeJoHZEGHf7tpdP+tRFhdwAz6tLJA59Vy/qjhIGimf/fqxUePqioX2P3Uf4DFxWetW1XanW2LlQpExmx+8YhICn17kGKdrW2DPYqyzu4S222jMk4Z8ewOk670Fj7YX6GOnDp5AY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ijhtaovO; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5ded6c31344so966558a12.1;
-        Thu, 27 Feb 2025 02:34:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740652486; x=1741257286; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8F+iHOkiCbQfBJ8Gfn9W0Ck6s4OTNsybtRyz6gEBB30=;
-        b=ijhtaovOUqX4y8Jq0PL+uBHv6gUur6ai1CH4FMTtmd8ktoqeEh2/MhNUDb0mdEsJZr
-         ogZaJum8IiRyOWgZn8TtZgkF6qama5xIaSaGECAuAEJWY3VyzWLgbaOziSzGnGt1EJaE
-         uoQ2+r1w1jyI1wY1Z3mzPtcXW0rzeA6/BjPkuxaB4DfjoV7yg2yrjJ/GBUHmtQhkyonG
-         nN3/bQgNnOTBQgIyViYrongx6UXqWosET8ADY9tN2mvEKv4WpY6VJOrxEEuf38BXR7HO
-         mbW9ihJErb9O7LrDIMEj4h3lPs3u1iqPF4psYFd2W3SZK5smUTCwjsmR75/y9nfaNs91
-         LYfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740652486; x=1741257286;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8F+iHOkiCbQfBJ8Gfn9W0Ck6s4OTNsybtRyz6gEBB30=;
-        b=L1nTY3nytVlL51IOA7Ae85T4jBlrbzeMJ7bO0dKh+eO8U2LPXO4n75g5I4edhh9cHd
-         YSWCfYVaig//2ZW9+EL2X4u7G0dny8g40m/dRZ+w8FtlfCJIaumV743ryxWLjJajBZoE
-         1gIgKhSwINhl7cn0bGObgghXqu9B5IlcvXJ8mXkpneJoOyJC4JYqJfyG85Whm6hDXBeT
-         XASNKwi4ILVVotmw1KV4I+lawa8vT/WYiMugaRXQrUSziUy7MBg3vgOBwlzMKyy28qum
-         F8QdybuM0xb7m54v7nx4iq8v3AN9b9R/p8FF36LDAde/NqZO8gXigmsPyAZfFAyEP7KN
-         y+1A==
-X-Forwarded-Encrypted: i=1; AJvYcCULlBD0JK25b23IufI+1YQ1atuPj7IogEW9N+liBl30F6KnavM42Wc1rMqHnjTHOHI68sGKTF+Kq/EY9Xo=@vger.kernel.org, AJvYcCWYDLltmP8T8GA5JRKEihd2wADL4lDxVQHrzDTQR8VB4HbtTMjHBXvpTsl29jmLyw5tQnT6UHGC0+Pnvw==@vger.kernel.org, AJvYcCWmwdWuK4xhCRNyQ71kxiAKOO0Vee8ye4j3Lv2FFSMzQOnM+mpOLOPn6pdullBiUSJh/x2w2Dru@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPKva88GCKQhc2zfiy3gS95UGn/ZjXlYMlmhp/4afPWSwudZob
-	Jvr5qF61hOYbzXjVIWB0AVNpvghT91NTIH5LD9Mov/Y7dDOsDtoz
-X-Gm-Gg: ASbGnctfJFRj+sAcTYQFZaeDndrSOh/JuGY8fMY3ALV5440EmtjWIOaGO3FND+OaO+U
-	S06lDPMqhhFHrzZYsnLAePN1DuPxiSRuHvPFz8KF9M7JQWhNCIi0AkPUzI+XV9Vt4deGjhAV9cK
-	Oxhd5t/vOlm7Xu2e+muUVrJl2DQqhhr3qbs51m0X+iepyysnBfw+KCPdbnyfEXFRv2JdQCrCdRY
-	+NKOPLCi5VsMSWVtVuFadTVvNmS65egIKuXSWsxBpcYwIpc0ZWLMYfJq2NLKezQErf8Z6X/c305
-	9U60I9ngE/y2Rky2kJccjlv8s7p8mRBjDq69Nt+BVNOTrfM=
-X-Google-Smtp-Source: AGHT+IHXv8U7mkW1xq4Vnant0P7iLY68e80NUqnP+Id7Fkl+D0OacWn2R65BtGAAnIPruizAgHDIWA==
-X-Received: by 2002:a05:6402:2690:b0:5de:a6a8:5ec6 with SMTP id 4fb4d7f45d1cf-5e4455c2f52mr28423477a12.10.1740652485728;
-        Thu, 27 Feb 2025 02:34:45 -0800 (PST)
-Received: from [172.27.50.139] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e4c43a6f2bsm878709a12.75.2025.02.27.02.34.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Feb 2025 02:34:44 -0800 (PST)
-Message-ID: <3c8badc3-2f1e-4877-a770-ad133f69f14a@gmail.com>
-Date: Thu, 27 Feb 2025 12:34:41 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0DC4226D1B
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 10:46:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.64
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740653192; cv=fail; b=AMbT5zBzUJhzA0iNAHwMbG+ODzCMR4VmvXqKWZxTP+Yw6Oim2KPnla/gNceCWQ2QH0P0JvV/6vNnwmjsuD3EMrZJwQXL5+l6H0gn2jvGSQqBteXa2fIEiHJB1NRbjNsEFhUZPFh1fOt1iq9QFMNxp4QeYQeH75mHHvj/zgY7c5Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740653192; c=relaxed/simple;
+	bh=uaEstFw1DLkTbvdNJxGuHiunAP4pBJpE+e+WqGczeyI=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=ELrZD65GI6LR4ARCigAGDaiCSyK+ZM/q5RFH7RRtuUXgTZOwsdcbc2gJ5ckIWaU49PoWdU/sx9/8PWFnFA4kcOHBs/Xs4Ak5ZouptjMSQbIkQBI3ELH/MN65QMWaeQXRm3ZQn1G1Vhp24AZE4QCWrudYhf6T5p51B188wCZQhOo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=b8VgYZg1; arc=fail smtp.client-ip=40.107.237.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=FLJIIurxg+JTxcTywhv5jzb7oESK9EF36jvXX+90w+93iXjH3AdvMbZEe/CKYYC6ySzZdf0XSpxe0qiCp5TCu/vzixTRYsvofB/PiSJ97JgZLnd77tSY/gf3mnPGJFWiClsFXJDFwHDeH8nqOW/EaDE9Exem1ZfrbgTiyaUn0xjwZ9iuOn6ftZLLGd4aVaPQ0Dcmb6C+vf6RxANe+Jo/BOp1HbAsomhnb8MjbzVcHK3iEFwfyE6LjGFlR1yuFEjQNh/MTftsvSczIT4TjulQY/6ZD0KPqb63Crdnte4+fYGcixUOYgDToLQNoJzYsDG3zZnU+S7VO/B+JsH1MsughQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bAoluz8dhxJtwkqG5RsXG02ZMDshRZFMm+Ux32q9x+I=;
+ b=u1CVshUW5mOhMprhy6EuT+9pYLoCHRnX3SA0QixTist2+7RJnW1IJpGwG1h+Sh6MwQDU/mqNgU1PL8o1UbUqjsHFePctN+rLqTH0QRrPTL52OsY9A/CEwiDgkbnHVxTfrp6kdPO6sBPCz3T0e02SdV6vZro8CsmyIpZ8o3+8Zgbz6mF1CYIlR3B5swDKCcG2+Ol4vZjlAi6qj8hqZFvN8d2SKbz9Udu6kGMK2BSegpg6EOUEIIgt/tfDcHx85KeQ9Pj+lVf2/obCYiOhcoIknHjXqLrMVUyDII1MnTngwW2Y2WSHuYvfNiNgUG3gGhgtX5gROBRTIy1juQc2/gLdGQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bAoluz8dhxJtwkqG5RsXG02ZMDshRZFMm+Ux32q9x+I=;
+ b=b8VgYZg1nkN5r4KQWArs30XCC3CpHqmyZxyZav7sOXfXiWsBF0MuLOTQP6h4Gs/LpzoFIaqo/EDnU3pBKh3n6Zo2pVfWFUCksWR7gLGnJKUzON6jvQni0/CyWRF4MpJekuLXjEX+Z23uPoPiSRB+kthliAbEe6EXtLZKm1/U3XVe1I5QHrgC700+eIadeovxZ1O87yS315OXZOdo7+a3lFc+En81HdqPtOLvctHmvpDG77Lqt9vumx/F20HdKLuAY9WTlkCozDbM3IH1OzatFxw1NP0D+1SWEPsdByszlYgkdyy09vcvBMo4EowCnRF1vj8btdc5srDijx3bJ1BnDw==
+Received: from DM6PR10CA0036.namprd10.prod.outlook.com (2603:10b6:5:60::49) by
+ DM4PR12MB6637.namprd12.prod.outlook.com (2603:10b6:8:bb::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8466.24; Thu, 27 Feb 2025 10:46:23 +0000
+Received: from DS1PEPF00017090.namprd03.prod.outlook.com
+ (2603:10b6:5:60:cafe::cc) by DM6PR10CA0036.outlook.office365.com
+ (2603:10b6:5:60::49) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8489.18 via Frontend Transport; Thu,
+ 27 Feb 2025 10:46:23 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DS1PEPF00017090.mail.protection.outlook.com (10.167.17.132) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8489.16 via Frontend Transport; Thu, 27 Feb 2025 10:46:22 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 27 Feb
+ 2025 02:46:10 -0800
+Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Thu, 27 Feb
+ 2025 02:46:05 -0800
+References: <23340252eb7bbc1547f5e873be7804adbd7ad092.1739983848.git.pablmart@redhat.com>
+ <87zfiagojj.fsf@nvidia.com>
+ <3e35d85e-c136-f87e-a215-f2e9ccd43490@redhat.com>
+User-agent: mu4e 1.8.14; emacs 29.4
+From: Petr Machata <petrm@nvidia.com>
+To: Pablo Martin Medrano <pablmart@redhat.com>
+CC: <netdev@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Shuah Khan
+	<shuah@kernel.org>, Petr Machata <petrm@nvidia.com>
+Subject: Re: [PATCH net v2] selftests/net: big_tcp: return xfail on slow
+ machines
+Date: Thu, 27 Feb 2025 11:42:32 +0100
+In-Reply-To: <3e35d85e-c136-f87e-a215-f2e9ccd43490@redhat.com>
+Message-ID: <87ikovhdhy.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/4] net/mlx5: Expose crr in health buffer
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
- Tariq Toukan <tariqt@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
- Leon Romanovsky <leonro@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, Shahar Shitrit <shshitrit@nvidia.com>,
- Moshe Shemesh <moshe@nvidia.com>
-References: <20250226122543.147594-1-tariqt@nvidia.com>
- <20250226122543.147594-4-tariqt@nvidia.com>
- <Z7/+lxTndCRC6OtE@mev-dev.igk.intel.com>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <Z7/+lxTndCRC6OtE@mev-dev.igk.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS1PEPF00017090:EE_|DM4PR12MB6637:EE_
+X-MS-Office365-Filtering-Correlation-Id: e6644fa7-336f-4f95-3c70-08dd571bfa24
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?X17A4O40RUu67jlbHeTVJIT/j9kl5weGCUxSuhKpQ1F5b0S26eRhNFKmUppt?=
+ =?us-ascii?Q?JX1AOMKv9kD7KB0YaCseZ8Xsji59ul9JJLaiy11kxtY4bgn4UvhD2ro9bjWA?=
+ =?us-ascii?Q?f6asGRoksoiJkPuQyJ5b+6tQC+bqlwT0HZjLSMZ3UuZIUFQ5DneLbJcdvHTX?=
+ =?us-ascii?Q?qjpysXGFn70sillxppeWzZyNhw/v6Ufk3ifd6+CD2r/cOU1HlAhd/1pKTB4F?=
+ =?us-ascii?Q?I5UB7ETliO8Yn0zZkNbAvMcNcuN0tf2rIQ+dd8rGtkAxwwhMccWaKdSXkOeI?=
+ =?us-ascii?Q?4UGZU1BSIRtry6OLaoDiCMDUtvWS+QyS3nKa+UzLIiouyZANnALk1iOLxd1s?=
+ =?us-ascii?Q?HgVAVxIuofNkhR43V/+gfePiHm1zExwhHoXDFn06Wo8Pz9ssQ87I8z8qneia?=
+ =?us-ascii?Q?Q6oItagl6ealWdoa537JpwC81z1QRTxQxZjxyEvLb5OJNBjjKvCCYySNAWoJ?=
+ =?us-ascii?Q?SQS3Q+z1BrNfajBxPKzckixHWbjBU6Epx5qnjK7qoVVtA1Pz/Hy7lbXpUuTz?=
+ =?us-ascii?Q?IetXE9jvnxXK7+AO97m27Q/jbz7/ap6e1PRnW1VH2wuRVDgenqmn2muX5HKT?=
+ =?us-ascii?Q?pwcPm7XTu3QPS6+IQjoHVjPRkfVHFihcWWuwijiQMxmyUBID2h1MEkvEI4pX?=
+ =?us-ascii?Q?tY0WYwYJbdaCKZY2BEnzFxTaVoBA8xkWizRkLzs8PQZ/ds8AT5pTOoYQbPjS?=
+ =?us-ascii?Q?cR10LlFB6eeASa2+MU7d8Vl7GAC65jDWLYZhGvWeqGfjbdSFYpwCvyeTZJwz?=
+ =?us-ascii?Q?oMkMISdmEkDy65gUfUzhXqV20X+sJwrBIopoA25LBhGNfacDxZtVhuwSLEGn?=
+ =?us-ascii?Q?x2gxHsaLh3nqQyGo9bHxN+sQdDO8wb69CGDAch4lMFSsRS9C2BYZ66KO8mFG?=
+ =?us-ascii?Q?4/9eLo6QIseIS3b8KsrQivy8Ck1nytS0COmiQMfZ4ZR1lS9/+jhEo9PO/LBr?=
+ =?us-ascii?Q?alTdzX1Di9Tg1u970x5yDVxn1AdtIuxDyLRrr5enTDb0zxYZv/tFI89hyGKq?=
+ =?us-ascii?Q?78yiD0xRn/BMZRsmrxrm2wTZE6uQbjoBJCG6ksKmPmVmDkuw0qnPzxy25X6h?=
+ =?us-ascii?Q?a0qrRq2B0rZ09SpyEHGwA6OEawgsUYJmGp3ShzmYhQ0zMs6TXdbRkwnbTY0m?=
+ =?us-ascii?Q?lyBpHJjSDQdjMvquzmqjM6HPCIwEg+KDIX/I+y3fSY9qjsEZOmGm0HRWf0dn?=
+ =?us-ascii?Q?XqR6tamljiPQv0+OD5aT93TVkAbQ8Y1cYKo8YwPJVFEwKNAXp8pab1O4Dv6k?=
+ =?us-ascii?Q?iSoNNSrXUApkRBGx3rF88k4O02/GyMQtHr9HQL4RkF/YwSNZ0502OHogoyuA?=
+ =?us-ascii?Q?CoLmHo7BExA1b1BzD1ESoNJnTFJ59YQzpIqbecNBp58d+SLR8iWBLJ2mUAZw?=
+ =?us-ascii?Q?hAyp0OheqxUfj9KoBACczKskAbeONlEMCHvPZFIIN91nyG6jnvWewLJV1TO3?=
+ =?us-ascii?Q?zNraYijte5a4YAS12NGohzJdJphOZIDs2ZHSy0281/88zLcSjf1ACh7FegIF?=
+ =?us-ascii?Q?7PS16BJNXykn+v0=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2025 10:46:22.7328
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e6644fa7-336f-4f95-3c70-08dd571bfa24
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS1PEPF00017090.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6637
 
 
+Pablo Martin Medrano <pablmart@redhat.com> writes:
 
-On 27/02/2025 7:56, Michal Swiatkowski wrote:
-> On Wed, Feb 26, 2025 at 02:25:42PM +0200, Tariq Toukan wrote:
->> From: Shahar Shitrit <shshitrit@nvidia.com>
->>
->> Expose crr bit in struct health buffer. When set, it indicates that
->> the error cannot be recovered without flow involving a cold reset.
->> Add its value to the health buffer info log.
->>
->> Signed-off-by: Shahar Shitrit <shshitrit@nvidia.com>
->> Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
->> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
->> ---
->>   drivers/net/ethernet/mellanox/mlx5/core/health.c | 8 ++++++++
->>   1 file changed, 8 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/health.c b/drivers/net/ethernet/mellanox/mlx5/core/health.c
->> index 665cbce89175..c7ff646e0865 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/health.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/health.c
->> @@ -96,6 +96,11 @@ static int mlx5_health_get_rfr(u8 rfr_severity)
->>   	return rfr_severity >> MLX5_RFR_BIT_OFFSET;
->>   }
->>   
->> +static int mlx5_health_get_crr(u8 rfr_severity)
->> +{
->> +	return (rfr_severity >> MLX5_CRR_BIT_OFFSET) & 0x01;
->> +}
->> +
->>   static bool sensor_fw_synd_rfr(struct mlx5_core_dev *dev)
->>   {
->>   	struct mlx5_core_health *health = &dev->priv.health;
->> @@ -442,12 +447,15 @@ static void print_health_info(struct mlx5_core_dev *dev)
->>   	mlx5_log(dev, severity, "time %u\n", ioread32be(&h->time));
->>   	mlx5_log(dev, severity, "hw_id 0x%08x\n", ioread32be(&h->hw_id));
->>   	mlx5_log(dev, severity, "rfr %d\n", mlx5_health_get_rfr(rfr_severity));
->> +	mlx5_log(dev, severity, "crr %d\n", mlx5_health_get_crr(rfr_severity));
->>   	mlx5_log(dev, severity, "severity %d (%s)\n", severity, mlx5_loglevel_str(severity));
->>   	mlx5_log(dev, severity, "irisc_index %d\n", ioread8(&h->irisc_index));
->>   	mlx5_log(dev, severity, "synd 0x%x: %s\n", ioread8(&h->synd),
->>   		 hsynd_str(ioread8(&h->synd)));
->>   	mlx5_log(dev, severity, "ext_synd 0x%04x\n", ioread16be(&h->ext_synd));
->>   	mlx5_log(dev, severity, "raw fw_ver 0x%08x\n", ioread32be(&h->fw_ver));
->> +	if (mlx5_health_get_crr(rfr_severity))
->> +		mlx5_core_warn(dev, "Cold reset is required\n");
-> I wonder if it shouldn't be right after the print about crr value to
-> tell the user that cold reset is required because of that value.
-> 
+> On Tue, 25 Feb 2025, Petr Machata wrote:
+>
+>> Due to all the &&'s peppered down there, do_test() only gets called at
+>> most once, so it's OK in this case.
+>
+> Actually do_test() do always returns 0, so it gets called all times in the
 
-I think it's fine here, to not interfere the mlx5_log sequence.
-Also, in the future we might have multiple cold reset reasons, 
-generating the same single print.
+You are right, I missed that you kept the ret == PASS test at the end of
+the function. So just drop that? It's not adding anything, it could be
+replaced with a : or true if you truly want to return 0. Then local
+ret="PASS" can go away as well.
 
-I'll keep it as-is.
+> code. check_err is setting RET and keeping it at the failing return
+> value, so check_err is always returning error after the first error
+>
+> If I force the error by injecting in do_test():
+>
+>   if [ $gw_tso = off -a $cli_tso = on ]; then
+>     check_err 1 "forced to fail when GW_GSO is off and CLI GSO is on"
+>   else
+>     check_err $ret_check_counter "fail on link1"
+>   fi
+>
+> The output is:
+>
+>   Testing for BIG TCP:
+>         CLI GSO | GW GRO | GW GSO | SER GRO
+>   TEST: on        on       on       on                         [ OK ]
+>   TEST: on        off      on       off                        [ OK ]
+>   TEST: off       on       on       on                         [ OK ]
+>   TEST: on        on       off      on                         [FAIL]
+>           forced to fail when GW_GSO is off and CLI GSO is on
+>   TEST: off       on       off      on                         [FAIL]
+>           forced to fail when GW_GSO is off and CLI GSO is on
+>   ***v4 Tests Done***
+>
+> So setting RET at the end of do_test is needed indeed.
 
-> Patch looks fine, thanks.
-> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> 
-
-Thanks for your review.
-
+The convention is to do it at the start of the test, before the first
+check_err etc.
 
