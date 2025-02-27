@@ -1,113 +1,88 @@
-Return-Path: <netdev+bounces-170374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D7BBA485D7
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 17:56:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C986A48600
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 18:01:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 809853A99FD
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:56:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CAF6188DCC6
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:56:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1127A1DD0D6;
-	Thu, 27 Feb 2025 16:56:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D18DA1C6FEA;
+	Thu, 27 Feb 2025 16:56:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Inum+z0T"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Y7eFTTcb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB8921ACECF
-	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 16:56:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AB6B1B85DF;
+	Thu, 27 Feb 2025 16:56:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740675369; cv=none; b=QAMAJesElBY3y+UubTrAuxnDxe2cnuLUZv9gAbfXJl6G/QDKdL5L6ncx2TBXeOoJjhLpU64sBP/vfUG/qZNVIW9a2jNTtegDw7EdgYZcAEPV6le4nTp+CnMfX62DPG2pd/2QTBrPA7GNA2vT3tV5H4KTj+F3Cb24RLb9xgBnM8g=
+	t=1740675407; cv=none; b=RmN/j4aD9squK9elFxKJdJ31ShBj2ix36UwmcqlkCqDGI03xLdA+6N57PaAUwPVy7hY7LWEHDklf3YHOHM124KZJEqr2c/3kvisPn5At/UVR1yDsYh84PgVdaT0qVJK0raDtMrXYpw0biMrsru4eoneH+0bn/HcMtNia6IO9yLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740675369; c=relaxed/simple;
-	bh=HzxrezDueZWLOUuiVzvWvhBUY2zuMYKdpRPKpdryPhA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dP28eEwVJgUSlCniv8e6/9WA/QLZtzaUGGmLN9F2SmdES+ZktWkcS52Zb8nudM7pgxHX/cENzMaN6Unwk0MOSH2Q0SHyfhpWkwZq6huJM4ZOIgZd+sPc50HxS4Sf7zRQbTgn/9cJIQTgw4o+BmVzExeEs/PGpszkIx4p14aJb1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Inum+z0T; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3688BC4CEE8;
-	Thu, 27 Feb 2025 16:56:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740675369;
-	bh=HzxrezDueZWLOUuiVzvWvhBUY2zuMYKdpRPKpdryPhA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Inum+z0TwvTO/u0cw+GEhs66hTxr5sd3q5HbAh11GFMlSjBIDwH0ycwbejHIlCWjz
-	 ocmmrA1+Bc+uMhbmd0FAWYtLkTMPTRw0y6SkGNX+le/u0oHGXdnBitgD0JBbLkq73Z
-	 9AhjpDpCz0GvkJoroyEWdDd0IvBoVcVdQu0StMiv2zN5/vBx1TrgEfNQzJnH0BWzt7
-	 8q96N0bxiSol3MIrI4WpBdie6nduVJn+tgX1Rg2+DSYt+3HK79usJ8caMBNJ3vbpGQ
-	 YCio3OJ7M1wmxXp+87mMecPKTwrqcZdNKWuqvatyUEslPS0kQXttKecVJNE0YMv3zY
-	 5129DzRZUw+HA==
-Date: Thu, 27 Feb 2025 08:56:08 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Edward Cree <ecree.xilinx@gmail.com>
-Cc: Gal Pressman <gal@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org, Andrew Lunn
- <andrew@lunn.ch>, Simon Horman <horms@kernel.org>, Joe Damato
- <jdamato@fastly.com>, Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [PATCH net-next] net: ethtool: Don't check if RSS context
- exists in case of context 0
-Message-ID: <20250227085608.5a3e32d7@kernel.org>
-In-Reply-To: <c034259f-ec9a-2e78-1fc0-f16981cd4e54@gmail.com>
-References: <20250225071348.509432-1-gal@nvidia.com>
-	<20250225170128.590baea1@kernel.org>
-	<8a53adaa-7870-46a9-9e67-b534a87a70ed@nvidia.com>
-	<20250226182717.0bead94b@kernel.org>
-	<20250226204503.77010912@kernel.org>
-	<275696e3-b2dd-3000-1d7b-633fff4748f0@gmail.com>
-	<20250227072933.5bbb4e2c@kernel.org>
-	<c034259f-ec9a-2e78-1fc0-f16981cd4e54@gmail.com>
+	s=arc-20240116; t=1740675407; c=relaxed/simple;
+	bh=dwwXz15rnLwyQwuT+VNMV11IHrHQZ+V83M9c6sj8G+c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WUjMOXVXkW2h22aunzwWzJdc2IHZ2Ev37ACkVQ5ZRUiYNru3V2QpJlOJ7d3zeoRJ9iUKTq41Sk00a+kc+AlX+9hQ0o5kE4jkrK2TfzghCzKD/XoG/8CNoJWj5rEWf4wHaeMC9ZC5IaQz1KIO4RYIM0xr7ZP2sC7gpXhhBMtux54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Y7eFTTcb; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=hGUACzGWEEjLB5dmsGTv1IBmigcG0qIsLq4LcnANgeM=; b=Y7eFTTcb24BejeTcnuvUA5DmDZ
+	GB1IhmLscE+YZojLX4joqevIn79RR4atjCPLuNjbBePYTKH+hyGiu93j15N2kaaE7bAA2N7hOAd5s
+	t9+9+rHCCYdb/i386Gvdc7iXGLVNUvavbXCKL1tFeitPQtZiL7gjZqvTBUbnczEBP8UA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tnhBg-000exF-8u; Thu, 27 Feb 2025 17:56:40 +0100
+Date: Thu, 27 Feb 2025 17:56:40 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Andrei Botila <andrei.botila@oss.nxp.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, s32@nxp.com,
+	Christophe Lizzi <clizzi@redhat.com>,
+	Alberto Ruiz <aruizrui@redhat.com>,
+	Enric Balletbo <eballetb@redhat.com>
+Subject: Re: [PATCH 1/3] net: phy: nxp-c45-tja11xx: add support for TJA1121
+Message-ID: <4cd91b99-e88e-4f55-8fe7-8308cf6a35eb@lunn.ch>
+References: <20250227160057.2385803-1-andrei.botila@oss.nxp.com>
+ <20250227160057.2385803-2-andrei.botila@oss.nxp.com>
+ <a9c98f2a-c5e9-43e3-b77a-0f20eb6cfa98@lunn.ch>
+ <9de3e4c3-9f9e-41c0-9e2a-19e95e859c98@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9de3e4c3-9f9e-41c0-9e2a-19e95e859c98@oss.nxp.com>
 
-On Thu, 27 Feb 2025 16:24:52 +0000 Edward Cree wrote:
-> > I never uttered the thought that lead me to opposing. 
-> > ctx 0 is a poor man's pass / accept. If someone needs a pass we should
-> > add an explicit "action pass".  
+> > Is there a way to tell them apart? Another register somewhere?
 > 
-> To me 'pass' is just a shorthand for whatever specific behaviour
->  happens to match the default.  I.e. if you can already express
->  that behaviour directly, then 'pass' is a strictly nonorthogonal
->  addition and therefore bad interface design.
+> Unfortunately no, TJA1120 and TJA1121 share the same hardware the only
+> difference being that TJA1121 has MACsec support while TJA1120 does not.
+> It is the same for TJA1103 and TJA1104.
 
-I presume sfc matches only one rule. For devices which terminate on
-first hit and rules are ordered by ntuple ID, the following rules*:
+So the hardware can do MACsec, but it is disabled in firmware? Golden
+screw driver could be used?
 
- src-ip 192.168.0.2                 context 0
- src-ip 192.0.0.0   m 0.255.255.255 action -1
+So you can tell them apart, otherwise you would offer MACsec on both.
+It might be worth adding a .match_phy_device to the driver, so you can
+have an entry per device. Just watch out for the semantics of
+.match_phy_device, it gets called before the IDs are looked at.
 
-implement allowing only 192.168.0.2 out of the 192.0.0.0/8 subnet. 
-The device may not even support RSS contexts.
-
-I agree that pass is not very clean, but context 0 _is_ a pass.
-It's not asking for context 0, it's asking for a nop rule which
-prevents a more general rule from matching. To me at least.
-
-* coin toss on the mask polarity
-
-> But then, I'm the guy who thinks ed(1) is a good UI, so...
-> 
-> > Using ctx 0 as implicit pass is a very easy thing to miss
-> > for driver developers.  
-> 
-> I don't see why drivers need anything special to handle "0 is
->  pass".  They need to handle "0 isn't in the xarray" (so map it
->  to the default HW context), which I suppose we ought to call out
->  explicitly in the struct ethtool_rxnfc kdoc if we're going to
->  continue allowing it, but it's not the fact that it's "an
->  implicit pass" that makes this necessary.  If there's something
->  I'm missing here please educate me :)
-
-Nothing super specific, but it does produce corner cases.
-We may find out if someone got it wrong once we have the test.
+	Andrew
 
