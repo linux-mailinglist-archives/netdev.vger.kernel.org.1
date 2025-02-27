@@ -1,355 +1,230 @@
-Return-Path: <netdev+bounces-170319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85A8CA4825A
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:05:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B2CBA481B7
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 15:41:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92DD717BC0B
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 14:56:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25E6A17DCDB
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 14:32:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 312D825F7AD;
-	Thu, 27 Feb 2025 14:56:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07E1D2356BC;
+	Thu, 27 Feb 2025 14:31:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IbW+fQ3v"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ARVFvUGh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5218325E81F;
-	Thu, 27 Feb 2025 14:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AE1023315D
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 14:31:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740668167; cv=none; b=E8UBWsjgJKupzxz3hWs+LOEVNgqb1u3L4IMhQZeAtU45Q0Pvoc9iluqfkOIstJ9LkGILvL7Gs9VM3Hge/dslCmJKA34f7xHtGD91ERcf2Wk2iu7USDibF3WULHOlATI/Y3fnPoqex5337KcOdbyQXxByJfE+M9vOFCH7bVavMno=
+	t=1740666687; cv=none; b=MOCOE1vf+sL4sGYLH/qnEgYYC2xKjuMJno885Qug4u92S8Rvoqy0LIgqYmHQ0J61uZsMyJHAX/oEirnj+cICAsOXokvfPuvzGtvTmWkjxSCkuk4AMg4tkuMaXwmRyk0qZPO7Eo2X9+AyqjIO4JhZnsu4VmhAMyYv7YkZ3IwuTGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740668167; c=relaxed/simple;
-	bh=TqnvgyMWkrYEi2Qor6A2qUjZkniGUlY4nJeV8q2ZO/k=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XTxDr0ccDAykEhVqbo/LVDMM19J9LAqcEhdyyOarg8hXQI3mXDbD8hRC5gp8eO9sZinKI6/4nlFohSU2JtcuE1TilcAggBGdXCwJH4EytrC5aIwQbm5QtXVxiKCbwwp1qwNq1S4FqwsgTYRNgbFvu/tKCHYt72p1lE8z2mAxWtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IbW+fQ3v; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740668166; x=1772204166;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=TqnvgyMWkrYEi2Qor6A2qUjZkniGUlY4nJeV8q2ZO/k=;
-  b=IbW+fQ3vwjyk7VTtcBG/dLjXUXj2bD6F8wu41M6yH31uYsFxlnEItQxq
-   vNJCl6gT/K+vVZna6ZCQqMOhsk53NjgeLNAOWFUu6mC4eRL7XiDi/cPTY
-   9qN1kJIT5WPyPpEY3/yjeKtAO3IBJZs0gr/mI9N7YLqUYsQBy84pxblkm
-   qJAolXkhnxhubaPNteCedUQnFwAkiQyFALkBGF/DCK+q5H3U7OHzl+/hR
-   JRjGdDaH59DomUjnwkFYNmsxSg+N2bK8XwI46c3isTQPMkDCi1qYAo0FP
-   a+dUd1Ej9klx2NLyw5UoMg6TPA7FvYy6ONHHVF2HtAXo/vG4Rygx0cUzS
-   g==;
-X-CSE-ConnectionGUID: RTU2AiicQ1CAmz7h5p4apw==
-X-CSE-MsgGUID: CSVmYFcUTkmQC8fGA3MS6g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11358"; a="41480555"
-X-IronPort-AV: E=Sophos;i="6.13,320,1732608000"; 
-   d="scan'208";a="41480555"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 06:56:05 -0800
-X-CSE-ConnectionGUID: WEhk7NGuQqmeUWiW5hWCPg==
-X-CSE-MsgGUID: jE2xY6IBR6mEbseQ/OJL9A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,320,1732608000"; 
-   d="scan'208";a="117541131"
-Received: from brc05.iind.intel.com (HELO brc05..) ([10.190.162.156])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 06:56:01 -0800
-From: Tushar Vyavahare <tushar.vyavahare@intel.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	bjorn@kernel.org,
-	magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com,
-	jonathan.lemon@gmail.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	tirthendu.sarkar@intel.com,
-	tushar.vyavahare@intel.com
-Subject: [PATCH bpf-next v2 2/2] selftests/xsk: Add tail adjustment tests and support check
-Date: Thu, 27 Feb 2025 14:27:37 +0000
-Message-Id: <20250227142737.165268-3-tushar.vyavahare@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250227142737.165268-1-tushar.vyavahare@intel.com>
-References: <20250227142737.165268-1-tushar.vyavahare@intel.com>
+	s=arc-20240116; t=1740666687; c=relaxed/simple;
+	bh=T9QzWcLOXOQXQjcM6eYV/Cyk+UlJko/awLN5+bSG5io=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=anboa7YuLDtUWijKs0aNwgpeTZGbq0KE9Q26Awc9rbVE00szLo0gjlnuD7RSummHbSv+Ks1ygAnvnctGWI9I8qTnsCKshp+KZ8qhz9ywOBpeCyq923bbGr3cEMOfM3Z7tSWR5dTLE+wiUUAF+zy4NNO2g3ufrEwTIiw5pj5W5xg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ARVFvUGh; arc=none smtp.client-ip=209.85.221.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-520a48f37b4so906511e0c.2
+        for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 06:31:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740666685; x=1741271485; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E3eKcDG9f3N58Qw2/fYvN7NI4YADnHzKwIsHBe2Fbhk=;
+        b=ARVFvUGhl3MS2d8HH59j4cysfQy3xYm9VaB6e7oMImBlwd8wfBQ0dLEzTV1DPAsNrg
+         1OefeIcndBZ4kwJUSHyes5R96bjWflHaPHchgtBWtrUPFt6IMKQOokC6bqxIZ2kye4iX
+         hP1QQebmWMIouihk14AkGkUUIXZzdSINBAIv+g0OBnsodPSEHaLqmQlQ/Iv7Ppyqxx7o
+         CC5hmOZ43iOV+YQ8EF9PslBPNERJ2LLyxE36xmWwqII6MJ0TdGbHug7zpzIPxdR/pfWt
+         F79G1NViKKPukDY5oSOk/OIG4zgZBKx0Cnx11U2Bi7X2GCAGKEYaBzV5wR5G/O3EdD43
+         XZAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740666685; x=1741271485;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E3eKcDG9f3N58Qw2/fYvN7NI4YADnHzKwIsHBe2Fbhk=;
+        b=m7/h8yVwvppcAHtHXNnkCix9P3+P9PQa7Itgofqg8iiENZRp3s/HTAvJ18jGNf7JtT
+         4wk3pW1+SjvXfG0IE0zug7DKsriP7QhhCkVIWFRnSRsSLzECUVbboxNUXKxp0RrVrnO9
+         PF198yR13g5vSjeqiHKim9mX69T9SYD7O2WV3mb6gW+BPWz6/CmUh+D1/dSdPEW0HyLd
+         dVnlZ27DqC1LbEcHdbR2B/w46fLGIyjAZWd3d3STt//fgsOkOTbr4dnV4Qrc0na7BP5j
+         YAgpHYVNEIqbJBt1StiamsSwwCDGzQK0WSUgsx4i+48+/JiD978Ncz6vL7zTLrdZvkzr
+         8byg==
+X-Forwarded-Encrypted: i=1; AJvYcCVlQ7mTfYCPm7w/MxQuK0TkXjbFDscgKvjhpwNAaFzhB4rcqC7qf6jmTr2wk2ysa26GlKbF2f8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxICz0aOwygYPe5OIfEqD6ndM/nPI/tnfcXNrIHZcXAAq1mLfNl
+	+na9/QhNbQP8r5c9vum/7aiQPFnXIsgme54GY4mu+N0pgX6aEesrbCKMVdPBAd3NAeA6sr6xsnw
+	pvc33mIyUDqhWb8TeDjXF1CE+y32jBW3y
+X-Gm-Gg: ASbGncvFuhVlYv5CFPBHFYEVi7TlO7g8MuHQluk4+0x/7cpSZCfl+1DjYgV07CeC7u2
+	JC6wxbNm7Gfi7pB93xh0HSEwrPpo1GRWTocK3b7pCoDSPCCcJcoMkLlm6coZVgRbRJWTfrX0/BC
+	KJK9b1zg==
+X-Google-Smtp-Source: AGHT+IEzkcMXiZIJ7YowdawU1WwnjoPS/QTOmFxCkvkmtBOAbLENUgTIu4LU+fss1+L2ouy9GxhqIsO0JTPUqgwSgX0=
+X-Received: by 2002:a05:6122:4f9d:b0:520:5e9b:49b3 with SMTP id
+ 71dfb90a1353d-521efb648e1mr14591382e0c.3.1740666684920; Thu, 27 Feb 2025
+ 06:31:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAA85sZveppNgEVa_FD+qhOMtG_AavK9_mFiU+jWrMtXmwqefGA@mail.gmail.com>
+ <CAA85sZuv3kqb1B-=UP0m2i-a0kfebNZy-994Dw_v5hd-PrxEGw@mail.gmail.com>
+ <20250225170545.315d896c@kernel.org> <CAA85sZuYbXDKAEHpXxcDvntSjtkDEBGxU-FbXevZ+YH+eL6bEQ@mail.gmail.com>
+ <CAA85sZswKt7cvogeze4FQH_h5EuibF0Zc7=OAS18FxXCiEki-g@mail.gmail.com>
+ <a6753983-df29-4d79-a25c-e1339816bd02@blackwall.org> <CAA85sZsSTod+-tS1CuB+iZSfAjCS0g+jx+1iCEWxh2=9y-M7oQ@mail.gmail.com>
+ <ed6723e3-4e47-4dac-bc42-b65f7d42cbea@blackwall.org> <CAA85sZv5rQr4g=72-Tw47wSE_iFPHS4tB8Bgqcs59sdh1Me2sw@mail.gmail.com>
+ <4604b36b-4822-4755-a45c-c37d47a3adc2@blackwall.org> <CAA85sZutt0Eydh4B5AUb2xgvPkPF2Wa2yU4iXprgmRFPVM5qUQ@mail.gmail.com>
+In-Reply-To: <CAA85sZutt0Eydh4B5AUb2xgvPkPF2Wa2yU4iXprgmRFPVM5qUQ@mail.gmail.com>
+From: Ian Kumlien <ian.kumlien@gmail.com>
+Date: Thu, 27 Feb 2025 15:31:13 +0100
+X-Gm-Features: AQ5f1JrSVsBMnubVdYbs19ikWwpCkkrEg-A8EiFVLSR-cjc9PJKd3WNc97mBaNA
+Message-ID: <CAA85sZsq4JnatO0TjhN=o6S4adq7pQDC8A5dtRrBKeY9ry0NfQ@mail.gmail.com>
+Subject: Re: [6.12.15][be2net?] Voluntary context switch within RCU read-side
+ critical section!
+To: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, 
+	Linux Kernel Network Developers <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Introduce tail adjustment functionality in xskxceiver using
-bpf_xdp_adjust_tail(). Add `xsk_xdp_adjust_tail` to modify packet sizes
-and drop unmodified packets. Implement `is_adjust_tail_supported` to check
-helper availability. Develop packet resizing tests, including shrinking
-and growing scenarios, with functions for both single-buffer and
-multi-buffer cases. Update the test framework to handle various scenarios
-and adjust MTU settings. These changes enhance the testing of packet tail
-adjustments, improving AF_XDP framework reliability.
+On Wed, Feb 26, 2025 at 11:28=E2=80=AFPM Ian Kumlien <ian.kumlien@gmail.com=
+> wrote:
+>
+> On Wed, Feb 26, 2025 at 2:11=E2=80=AFPM Nikolay Aleksandrov <razor@blackw=
+all.org> wrote:
+> >
+> > On 2/26/25 14:26, Ian Kumlien wrote:
+> > > On Wed, Feb 26, 2025 at 1:00=E2=80=AFPM Nikolay Aleksandrov <razor@bl=
+ackwall.org> wrote:
+> > >>
+> > >> On 2/26/25 13:52, Ian Kumlien wrote:
+> > >>> On Wed, Feb 26, 2025 at 11:33=E2=80=AFAM Nikolay Aleksandrov
+> > >>> <razor@blackwall.org> wrote:
+> > >>>>
+> > >>>> On 2/26/25 11:55, Ian Kumlien wrote:
+> > >>>>> On Wed, Feb 26, 2025 at 10:24=E2=80=AFAM Ian Kumlien <ian.kumlien=
+@gmail.com> wrote:
+> > >>>>>>
+> > >>>>>> On Wed, Feb 26, 2025 at 2:05=E2=80=AFAM Jakub Kicinski <kuba@ker=
+nel.org> wrote:
+> > >>>>>>>
+> > >>>>>>> On Tue, 25 Feb 2025 11:13:47 +0100 Ian Kumlien wrote:
+> > >>>>>>>> Same thing happens in 6.13.4, FYI
+> > >>>>>>>
+> > >>>>>>> Could you do a minor bisection? Does it not happen with 6.11?
+> > >>>>>>> Nothing jumps out at quick look.
+> > >>>>>>
+> > >>>>>> I have to admint that i haven't been tracking it too closely unt=
+il it
+> > >>>>>> turned out to be an issue
+> > >>>>>> (makes network traffic over wireguard, through that node very sl=
+ow)
+> > >>>>>>
+> > >>>>>> But i'm pretty sure it was ok in early 6.12.x - I'll try to do a=
+ bisect though
+> > >>>>>> (it's a gw to reach a internal server network in the basement, s=
+o not
+> > >>>>>> the best setup for this)
+> > >>>>>
+> > >>>>> Since i'm at work i decided to check if i could find all the boot
+> > >>>>> logs, which is actually done nicely by systemd
+> > >>>>> first known bad: 6.11.7-300.fc41.x86_64
+> > >>>>> last known ok: 6.11.6-200.fc40.x86_64
+> > >>>>>
+> > >>>>> Narrows the field for a bisect at least, =3D)
+> > >>>>>
+> > >>>>
+> > >>>> Saw bridge, took a look. :)
+> > >>>>
+> > >>>> I think there are multiple issues with benet's be_ndo_bridge_getli=
+nk()
+> > >>>> because it calls be_cmd_get_hsw_config() which can sleep in multip=
+le
+> > >>>> places, e.g. the most obvious is the mutex_lock() in the beginning=
+ of
+> > >>>> be_cmd_get_hsw_config(), then we have the call trace here which is=
+:
+> > >>>> be_cmd_get_hsw_config -> be_mcc_notify_wait -> be_mcc_wait_compl -=
+> usleep_range()
+> > >>>>
+> > >>>> Maybe you updated some tool that calls down that path along with t=
+he kernel and system
+> > >>>> so you started seeing it in Fedora 41?
+> > >>>
+> > >>> Could be but it's pretty barebones
+> > >>>
+> > >>>> IMO this has been problematic for a very long time, but obviously =
+it depends on the
+> > >>>> chip type. Could you share your benet chip type to confirm the pat=
+h?
+> > >>>
+> > >>> I don't know how to find the actual chip information but it's ident=
+ified as:
+> > >>> Emulex Corporation OneConnect NIC (Skyhawk) (rev 10)
+> > >>>
+> > >>
+> > >> Good, that confirms it. The skyhawk chip falls in the "else" of the =
+block in
+> > >> be_ndo_bridge_getlink() which calls be_cmd_get_hsw_config().
+> > >>
+> > >>>> For the blamed commit I'd go with:
+> > >>>>  commit b71724147e73
+> > >>>>  Author: Sathya Perla <sathya.perla@broadcom.com>
+> > >>>>  Date:   Wed Jul 27 05:26:18 2016 -0400
+> > >>>>
+> > >>>>      be2net: replace polling with sleeping in the FW completion pa=
+th
+> > >>>>
+> > >>>> This one changed the udelay() (which is safe) to usleep_range() an=
+d the spinlock
+> > >>>> to a mutex.
+> > >>>
+> > >>> So, first try will be to try without that patch then, =3D)
+> > >>>
+> > >>
+> > >> That would be a good try, yes. It is not a straight-forward revert t=
+hough since a lot
+> > >> of changes have happened since that commit. Let me know if you need =
+help with that,
+> > >> I can prepare the revert to test.
+> > >
+> > > Yeah, looked at the size of it and... well... I dunno if i'd have the=
+ time =3D)
+> > >
+> >
+> > Can you try the attached patch?
+> > It is on top of net-next (but also applies to Linus' tree):
+> >  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git
+> >
+> > It partially reverts the mentioned commit above (only mutex -> spinlock=
+ and usleep -> udelay)
+> > because the commit does many more things.
+> >
+> > Also +CC original patch author which I forgot to do.
+>
+> Thanks, built and installed but it refuses to boot it - will have to
+> check during the weekend...
+> (boots the latest fedora version even if this one is the selected one
+> according to grubby)
 
-Signed-off-by: Tushar Vyavahare <tushar.vyavahare@intel.com>
----
- .../selftests/bpf/progs/xsk_xdp_progs.c       |  48 +++++++
- tools/testing/selftests/bpf/xsk_xdp_common.h  |   1 +
- tools/testing/selftests/bpf/xskxceiver.c      | 118 +++++++++++++++++-
- tools/testing/selftests/bpf/xskxceiver.h      |   2 +
- 4 files changed, 167 insertions(+), 2 deletions(-)
+So, saw that 6.13.5 was released so, fetched that, applied the patch
+and no more RCU issues in dmesg
 
-diff --git a/tools/testing/selftests/bpf/progs/xsk_xdp_progs.c b/tools/testing/selftests/bpf/progs/xsk_xdp_progs.c
-index ccde6a4c6319..2e8e2faf17e0 100644
---- a/tools/testing/selftests/bpf/progs/xsk_xdp_progs.c
-+++ b/tools/testing/selftests/bpf/progs/xsk_xdp_progs.c
-@@ -4,6 +4,8 @@
- #include <linux/bpf.h>
- #include <bpf/bpf_helpers.h>
- #include <linux/if_ether.h>
-+#include <linux/ip.h>
-+#include <linux/errno.h>
- #include "xsk_xdp_common.h"
- 
- struct {
-@@ -70,4 +72,50 @@ SEC("xdp") int xsk_xdp_shared_umem(struct xdp_md *xdp)
- 	return bpf_redirect_map(&xsk, idx, XDP_DROP);
- }
- 
-+SEC("xdp.frags") int xsk_xdp_adjust_tail(struct xdp_md *xdp)
-+{
-+	__u32 buff_len, curr_buff_len;
-+	int ret;
-+
-+	buff_len = bpf_xdp_get_buff_len(xdp);
-+	if (buff_len == 0)
-+		return XDP_DROP;
-+
-+	ret = bpf_xdp_adjust_tail(xdp, count);
-+	if (ret < 0) {
-+		/* Handle unsupported cases */
-+		if (ret == -EOPNOTSUPP) {
-+			/* Set count to -EOPNOTSUPP to indicate to userspace that this case is
-+			 * unsupported
-+			 */
-+			count = -EOPNOTSUPP;
-+			return bpf_redirect_map(&xsk, 0, XDP_DROP);
-+		}
-+
-+		return XDP_DROP;
-+	}
-+
-+	curr_buff_len = bpf_xdp_get_buff_len(xdp);
-+	if (curr_buff_len != buff_len + count)
-+		return XDP_DROP;
-+
-+	if (curr_buff_len > buff_len) {
-+		__u32 *pkt_data = (void *)(long)xdp->data;
-+		__u32 len, words_to_end, seq_num;
-+
-+		len = curr_buff_len - PKT_HDR_ALIGN;
-+		words_to_end = len / sizeof(*pkt_data) - 1;
-+		seq_num = words_to_end;
-+
-+		/* Convert sequence number to network byte order. Store this in the last 4 bytes of
-+		 * the packet. Use 'count' to determine the position at the end of the packet for
-+		 * storing the sequence number.
-+		 */
-+		seq_num = __constant_htonl(words_to_end);
-+		bpf_xdp_store_bytes(xdp, curr_buff_len - count, &seq_num, sizeof(seq_num));
-+	}
-+
-+	return bpf_redirect_map(&xsk, 0, XDP_DROP);
-+}
-+
- char _license[] SEC("license") = "GPL";
-diff --git a/tools/testing/selftests/bpf/xsk_xdp_common.h b/tools/testing/selftests/bpf/xsk_xdp_common.h
-index 5a6f36f07383..45810ff552da 100644
---- a/tools/testing/selftests/bpf/xsk_xdp_common.h
-+++ b/tools/testing/selftests/bpf/xsk_xdp_common.h
-@@ -4,6 +4,7 @@
- #define XSK_XDP_COMMON_H_
- 
- #define MAX_SOCKETS 2
-+#define PKT_HDR_ALIGN (sizeof(struct ethhdr) + 2) /* Just to align the data in the packet */
- 
- struct xdp_info {
- 	__u64 count;
-diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/selftests/bpf/xskxceiver.c
-index d60ee6a31c09..ee196b638662 100644
---- a/tools/testing/selftests/bpf/xskxceiver.c
-+++ b/tools/testing/selftests/bpf/xskxceiver.c
-@@ -524,6 +524,8 @@ static void __test_spec_init(struct test_spec *test, struct ifobject *ifobj_tx,
- 	test->nb_sockets = 1;
- 	test->fail = false;
- 	test->set_ring = false;
-+	test->adjust_tail = false;
-+	test->adjust_tail_support = false;
- 	test->mtu = MAX_ETH_PKT_SIZE;
- 	test->xdp_prog_rx = ifobj_rx->xdp_progs->progs.xsk_def_prog;
- 	test->xskmap_rx = ifobj_rx->xdp_progs->maps.xsk;
-@@ -992,6 +994,31 @@ static bool is_metadata_correct(struct pkt *pkt, void *buffer, u64 addr)
- 	return true;
- }
- 
-+static bool is_adjust_tail_supported(struct xsk_xdp_progs *skel_rx)
-+{
-+	struct bpf_map *data_map;
-+	int value = 0;
-+	int key = 0;
-+	int ret;
-+
-+	data_map = bpf_object__find_map_by_name(skel_rx->obj, "xsk_xdp_.bss");
-+	if (!data_map || !bpf_map__is_internal(data_map)) {
-+		ksft_print_msg("Error: could not find bss section of XDP program\n");
-+		exit_with_error(errno);
-+	}
-+
-+	ret = bpf_map_lookup_elem(bpf_map__fd(data_map), &key, &value);
-+	if (ret) {
-+		ksft_print_msg("Error: bpf_map_lookup_elem failed with error %d\n", ret);
-+		return false;
-+	}
-+
-+	/* Set the 'count' variable to -EOPNOTSUPP in the XDP program if the adjust_tail helper is
-+	 * not supported. Skip the adjust_tail test case in this scenario.
-+	 */
-+	return value != -EOPNOTSUPP;
-+}
-+
- static bool is_frag_valid(struct xsk_umem_info *umem, u64 addr, u32 len, u32 expected_pkt_nb,
- 			  u32 bytes_processed)
- {
-@@ -1768,8 +1795,13 @@ static void *worker_testapp_validate_rx(void *arg)
- 
- 	if (!err && ifobject->validation_func)
- 		err = ifobject->validation_func(ifobject);
--	if (err)
--		report_failure(test);
-+
-+	if (err) {
-+		if (test->adjust_tail && !is_adjust_tail_supported(ifobject->xdp_progs))
-+			test->adjust_tail_support = false;
-+		else
-+			report_failure(test);
-+	}
- 
- 	pthread_exit(NULL);
- }
-@@ -2516,6 +2548,84 @@ static int testapp_hw_sw_max_ring_size(struct test_spec *test)
- 	return testapp_validate_traffic(test);
- }
- 
-+static int testapp_xdp_adjust_tail(struct test_spec *test, int count)
-+{
-+	struct xsk_xdp_progs *skel_rx = test->ifobj_rx->xdp_progs;
-+	struct xsk_xdp_progs *skel_tx = test->ifobj_tx->xdp_progs;
-+	struct bpf_map *data_map;
-+	int key = 0;
-+
-+	test_spec_set_xdp_prog(test, skel_rx->progs.xsk_xdp_adjust_tail,
-+			       skel_tx->progs.xsk_xdp_adjust_tail,
-+			       skel_rx->maps.xsk, skel_tx->maps.xsk);
-+
-+	data_map = bpf_object__find_map_by_name(skel_rx->obj, "xsk_xdp_.bss");
-+	if (!data_map || !bpf_map__is_internal(data_map)) {
-+		ksft_print_msg("Error: could not find bss section of XDP program\n");
-+		return TEST_FAILURE;
-+	}
-+
-+	if (bpf_map_update_elem(bpf_map__fd(data_map), &key, &count, BPF_ANY)) {
-+		ksft_print_msg("Error: could not update count element\n");
-+		return TEST_FAILURE;
-+	}
-+
-+	return testapp_validate_traffic(test);
-+}
-+
-+static int testapp_adjust_tail(struct test_spec *test, u32 value, u32 pkt_len)
-+{
-+	u32 pkt_cnt = DEFAULT_BATCH_SIZE;
-+	int ret;
-+
-+	test->adjust_tail_support = true;
-+	test->adjust_tail = true;
-+	test->total_steps = 1;
-+
-+	pkt_stream_replace_ifobject(test->ifobj_tx, pkt_cnt, pkt_len);
-+	pkt_stream_replace_ifobject(test->ifobj_rx, pkt_cnt, pkt_len + value);
-+
-+	ret = testapp_xdp_adjust_tail(test, value);
-+	if (ret)
-+		return ret;
-+
-+	if (!test->adjust_tail_support) {
-+		ksft_test_result_skip("%s %sResize pkt with bpf_xdp_adjust_tail() not supported\n",
-+				      mode_string(test), busy_poll_string(test));
-+	return TEST_SKIP;
-+	}
-+
-+	return 0;
-+}
-+
-+static int testapp_adjust_tail_common(struct test_spec *test, int adjust_value, u32 len,
-+				      bool set_mtu)
-+{
-+	if (set_mtu)
-+		test->mtu = MAX_ETH_JUMBO_SIZE;
-+	return testapp_adjust_tail(test, adjust_value, len);
-+}
-+
-+static int testapp_adjust_tail_shrink(struct test_spec *test)
-+{
-+	return testapp_adjust_tail_common(test, -4, MIN_PKT_SIZE, false);
-+}
-+
-+static int testapp_adjust_tail_shrink_mb(struct test_spec *test)
-+{
-+	return testapp_adjust_tail_common(test, -4, XSK_RING_PROD__DEFAULT_NUM_DESCS * 3, true);
-+}
-+
-+static int testapp_adjust_tail_grow(struct test_spec *test)
-+{
-+	return testapp_adjust_tail_common(test, 4, MIN_PKT_SIZE, false);
-+}
-+
-+static int testapp_adjust_tail_grow_mb(struct test_spec *test)
-+{
-+	return testapp_adjust_tail_common(test, 4, XSK_RING_PROD__DEFAULT_NUM_DESCS * 3, true);
-+}
-+
- static void run_pkt_test(struct test_spec *test)
- {
- 	int ret;
-@@ -2622,6 +2732,10 @@ static const struct test_spec tests[] = {
- 	{.name = "TOO_MANY_FRAGS", .test_func = testapp_too_many_frags},
- 	{.name = "HW_SW_MIN_RING_SIZE", .test_func = testapp_hw_sw_min_ring_size},
- 	{.name = "HW_SW_MAX_RING_SIZE", .test_func = testapp_hw_sw_max_ring_size},
-+	{.name = "XDP_ADJUST_TAIL_SHRINK", .test_func = testapp_adjust_tail_shrink},
-+	{.name = "XDP_ADJUST_TAIL_SHRINK_MULTI_BUFF", .test_func = testapp_adjust_tail_shrink_mb},
-+	{.name = "XDP_ADJUST_TAIL_GROW", .test_func = testapp_adjust_tail_grow},
-+	{.name = "XDP_ADJUST_TAIL_GROW_MULTI_BUFF", .test_func = testapp_adjust_tail_grow_mb},
- 	};
- 
- static void print_tests(void)
-diff --git a/tools/testing/selftests/bpf/xskxceiver.h b/tools/testing/selftests/bpf/xskxceiver.h
-index e46e823f6a1a..67fc44b2813b 100644
---- a/tools/testing/selftests/bpf/xskxceiver.h
-+++ b/tools/testing/selftests/bpf/xskxceiver.h
-@@ -173,6 +173,8 @@ struct test_spec {
- 	u16 nb_sockets;
- 	bool fail;
- 	bool set_ring;
-+	bool adjust_tail;
-+	bool adjust_tail_support;
- 	enum test_mode mode;
- 	char name[MAX_TEST_NAME_SIZE];
- };
--- 
-2.34.1
+Will check more on the suspected performance bit as well when i get
+home later tonight
 
+I also understand Sathya Perla's motivation in saving power on this
+but things around it have been changed
+and it no longer works as intended....
+
+> > Thanks,
+> >  Nik
+> >
 
