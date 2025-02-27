@@ -1,342 +1,136 @@
-Return-Path: <netdev+bounces-170177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29ADBA47967
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 10:37:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D419A4799D
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 10:54:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2194A1721C5
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 09:37:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4162E3A92AD
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 09:53:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4E09226170;
-	Thu, 27 Feb 2025 09:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E6F42288CC;
+	Thu, 27 Feb 2025 09:53:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="y9YduzUA"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="QJyrWn3X"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7AE3270024;
-	Thu, 27 Feb 2025 09:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77FAF227EBF
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 09:53:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740649055; cv=none; b=Rkiss/o0rISqjvi2ZMBnh1JmGijWMP7gEGWJ5wtfqVtXYRe8ldmRvstUVvSfl3rSpviRiGOa8+ZY+/O8XdVX5W01FfO4ie7dpfTYK9IIew1l8in10t9hz76JlaOt8mBfZ6Fw5a2LADvTTNZvciKWpT3XwScV6p/NAO7ml7NSXe0=
+	t=1740650039; cv=none; b=sPMJnNiPc2hbw+1tzdl3l39zZ7cIJBg9C6Hv0Y/wh7MhxB775Os6wP4Pj07MWH8xGOxAzhoeLhSXTzcmTM+4ye93bP7QGy6LOyY0ihKnpJEH9l1WYcLlHKxGhchgyNE/tdYx5j5tl/vZymPJkx4ZTVbR7g8IK77ta+kPf2B4rZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740649055; c=relaxed/simple;
-	bh=s8jxRtmEa4JXDMzCHRkJA86F/q/YoZVW0KQQZ4JSHJs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u7z2X8s2qMKfYQ+JvD1x+0sH82+BSFCAzzarAE5VE+4l51DT3dEco2wmhtuDrl3V+++dOZr1gNooLYHh5RABJZ6hvCoDLOlrYD/ttL/GOQ5RTbdelGfVxM/foHcaS7vVuxz7T2uZZmPZKqgd7aw9BYp+aMq1dXXx2aU3ySks4EQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=y9YduzUA; arc=none smtp.client-ip=198.47.23.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 51R9bHOY2343129
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 27 Feb 2025 03:37:17 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1740649037;
-	bh=O7xVApe7OWt5Xaf5TUGNDnUX/j980sFAxGJ2aaz5evQ=;
-	h=From:To:CC:Subject:Date;
-	b=y9YduzUArvEuguZPJwviT0cS5Jj9prSjk7dvAFgbEekurVyGrKvt4b5D5HAGA9oUd
-	 dH1AM3K2Zq96uypvaRSZBG48d3r8pYcWwIWSvfvtqyMLY5XswPwEkBE4PNaxABJMkQ
-	 6fpSgt1zCUKUwzs9dQtb/woG9A253oFRA9uARr+k=
-Received: from DFLE115.ent.ti.com (dfle115.ent.ti.com [10.64.6.36])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 51R9bHUG039975
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 27 Feb 2025 03:37:17 -0600
-Received: from DFLE115.ent.ti.com (10.64.6.36) by DFLE115.ent.ti.com
- (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 27
- Feb 2025 03:37:17 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE115.ent.ti.com
- (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 27 Feb 2025 03:37:17 -0600
-Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 51R9bH7q057513;
-	Thu, 27 Feb 2025 03:37:17 -0600
-Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 51R9bGXH008583;
-	Thu, 27 Feb 2025 03:37:16 -0600
-From: MD Danish Anwar <danishanwar@ti.com>
-To: Meghana Malladi <m-malladi@ti.com>, Diogo Ivo <diogo.ivo@siemens.com>,
-        Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-        Eric
- Dumazet <edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Andrew Lunn <andrew+netdev@lunn.ch>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-Subject: [PATCH net-next] net: ti: icssg-prueth: Add ICSSG FW Stats
-Date: Thu, 27 Feb 2025 15:07:12 +0530
-Message-ID: <20250227093712.2130561-1-danishanwar@ti.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1740650039; c=relaxed/simple;
+	bh=cqlRr5ojGAieyydCsb1/xug57pPEpHK4ZXmBIZ1KQgc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=VuuVQOlkJ7Lkw8PVAu1VrrNAPtU8PEpdej9GUXAZ9/2KLR/rNs3zQgBEzpOJCob7LNR/27HZ68pyDk9fKh1abero2iv6I5xHX41B1LmLiolZClGNe/XBMHNidRgMiux1ewesiSCcYIllcSmDR2t3+7NFYKC1MO7w/Dai3s4N/PE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=QJyrWn3X; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5e4c0c12bccso1200891a12.1
+        for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 01:53:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1740650036; x=1741254836; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8To84FkdGIxaZ8ja4fPLSV1vzDgsMI1kjx5dHp2GFYU=;
+        b=QJyrWn3XtSIMdwL2IeZvBdhfOM4m4phOqLPriHEPsBjYyXupwJjTrx7OSzZo6bJZmk
+         rmJIqtImGfqV7kfki37zeDLL1XzzQot0bV9GvPVeC6UlBHuulfzQwuxwhtU3hbx66C6Y
+         kzv2m99Z0kl0g/57G2ymKz1jCgSA0b/0LHUUFQvrSeZ/8Ak/NkhcT6m2k3nL+vnbfv6H
+         PwmEXozwrzrr63fN8E+TKoS96ITK/eCDqjNZxv0684ZVDQf7JkDeoeBVr7bUb1GEXPl5
+         o4okjzESrQpNEK/66LO6BI7dIiG1eQ28fUNkf08rkBe+KR/1OyTCaK2pRbhg1aX9wo1l
+         z1tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740650036; x=1741254836;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8To84FkdGIxaZ8ja4fPLSV1vzDgsMI1kjx5dHp2GFYU=;
+        b=PQSGWSAUK5yNm7CTfgjOb8rrpGmCggJP152tk5+INnTDC3DX5ZAlLW/m2dsUEeqQ/9
+         59b6j+kUeNG5PARZTJCi832Wk0wQ4kEDRHbbw3yGSteTGdavZNfteucBngoTo1dxOO1C
+         Q+8Fe3TfYWe4SOldWgn54/+03XSFVkSQugnx3oN9rPV/yof5l5EXse8hXI3H2XmwhXx/
+         Avt0XVSbWgr42kbuyr3NP62qrpb3q68tYLovnjRCjytX9uSmFAQ3qZOA0UCXxrlReg3C
+         cT2l7v02qXoAy/7vV+GPaiWqhKqH8dJPbpFiaPsoOHZZhDKO6rHkL+qS5lA23xO6TUfb
+         ymrw==
+X-Gm-Message-State: AOJu0YwdK+yS9uRMUbPab5yloCcfDMySsIbvwqSAMqUDWoPBOnV3+iXZ
+	rY+miuhOCAnWiHwaMF9c9P1udk4eleFHrLLUMUI8PsBBzRr/YyfSvEkgcQJUiRo=
+X-Gm-Gg: ASbGncsxJYKZqvP0brKWNxrlzxfbix0M3Q7kzVpnGtYyq6iHYCr1EEFD17lPH3ty3O2
+	s+N5Z0eOEnhp1Yppo4mJI5IY8lUE8ZIzv6RsT2zcNiShXkjc1ncowiTtbbrwyzXlAZoSOZdI5Vn
+	bekpha6vcMY7m8E/SSQp+GopJd3Yzgr73NYfux27zBHZbnRa8xA/jDxFRv3uCbp5xpnZRtXzoVd
+	ra6iA52ajDWnS3VqBQbCoM6Q01WI/6u9+AG5iYmorPC0SiYRTen9LmBp/bGMJA2uPQ+WhQBumhY
+	SQug65eFaSg9M7T1
+X-Google-Smtp-Source: AGHT+IEvb+pBrV9uVzJjDkG4ZS9tPPbvylZOXC8K+43fLUECBRm2cHWiyPLaTwE9nAUdw6WM/yVelA==
+X-Received: by 2002:a05:6402:27cc:b0:5dc:1289:7f1c with SMTP id 4fb4d7f45d1cf-5e0b72546e9mr26148993a12.29.1740650035690;
+        Thu, 27 Feb 2025 01:53:55 -0800 (PST)
+Received: from cloudflare.com ([2a09:bac5:506a:2dc::49:df])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e4c3fb58f7sm826692a12.57.2025.02.27.01.53.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Feb 2025 01:53:54 -0800 (PST)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: netdev@vger.kernel.org,  bpf@vger.kernel.org,  john.fastabend@gmail.com,
+  zhoufeng.zf@bytedance.com,  zijianzhang@bytedance.com,  Cong Wang
+ <cong.wang@bytedance.com>
+Subject: Re: [Patch bpf-next 3/4] skmsg: use bitfields for struct sk_psock
+In-Reply-To: <Z7+UAA83/n9XgIdU@pop-os.localdomain> (Cong Wang's message of
+	"Wed, 26 Feb 2025 14:21:52 -0800")
+References: <20250222183057.800800-1-xiyou.wangcong@gmail.com>
+	<20250222183057.800800-4-xiyou.wangcong@gmail.com>
+	<87ldtsu882.fsf@cloudflare.com> <Z7+UAA83/n9XgIdU@pop-os.localdomain>
+Date: Thu, 27 Feb 2025 10:53:53 +0100
+Message-ID: <87eczju30u.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-The ICSSG firmware maintains set of stats called PA_STATS.
-Currently the driver only dumps 4 stats. Add support for dumping more
-stats.
+On Wed, Feb 26, 2025 at 02:21 PM -08, Cong Wang wrote:
+> On Wed, Feb 26, 2025 at 02:49:17PM +0100, Jakub Sitnicki wrote:
+>> On Sat, Feb 22, 2025 at 10:30 AM -08, Cong Wang wrote:
+>> > From: Cong Wang <cong.wang@bytedance.com>
+>> >
+>> > psock->eval can only have 4 possible values, make it 8-bit is
+>> > sufficient.
+>> >
+>> > psock->redir_ingress is just a boolean, using 1 bit is enough.
+>> >
+>> > Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+>> > ---
+>> >  include/linux/skmsg.h | 4 ++--
+>> >  1 file changed, 2 insertions(+), 2 deletions(-)
+>> >
+>> > diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
+>> > index bf28ce9b5fdb..beaf79b2b68b 100644
+>> > --- a/include/linux/skmsg.h
+>> > +++ b/include/linux/skmsg.h
+>> > @@ -85,8 +85,8 @@ struct sk_psock {
+>> >  	struct sock			*sk_redir;
+>> >  	u32				apply_bytes;
+>> >  	u32				cork_bytes;
+>> > -	u32				eval;
+>> > -	bool				redir_ingress; /* undefined if sk_redir is null */
+>> > +	unsigned int			eval : 8;
+>> > +	unsigned int			redir_ingress : 1; /* undefined if sk_redir is null */
+>> >  	struct sk_msg			*cork;
+>> >  	struct sk_psock_progs		progs;
+>> >  #if IS_ENABLED(CONFIG_BPF_STREAM_PARSER)
+>> 
+>> Are you doing this bit packing to create a hole big enough to fit
+>> another u32 introduced in the next patch?
+>
+> Kinda, or at least trying to save some space for the next patch. I am
+> not yet trying to reorder them to make it more packed, because it can
+> be a separate patch.
 
-The offset for different stats are defined as MACROs in icssg_switch_map.h
-file. All the offsets are for Slice0. Slice1 offsets are slice0 + 4.
-The offset calculation is taken care while reading the stats in
-emac_update_hardware_stats().
+OK. Asking because the intention is not expressed in the description.
 
-Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
----
- drivers/net/ethernet/ti/icssg/icssg_prueth.h  |   2 +-
- drivers/net/ethernet/ti/icssg/icssg_stats.c   |   6 +-
- drivers/net/ethernet/ti/icssg/icssg_stats.h   |  63 +++++++----
- .../net/ethernet/ti/icssg/icssg_switch_map.h  | 105 ++++++++++++++++++
- 4 files changed, 149 insertions(+), 27 deletions(-)
-
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-index 329b46e9ee53..569d3d53db59 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-@@ -50,7 +50,7 @@
- 
- #define ICSSG_MAX_RFLOWS	8	/* per slice */
- 
--#define ICSSG_NUM_PA_STATS	4
-+#define ICSSG_NUM_PA_STATS	37
- #define ICSSG_NUM_MIIG_STATS	60
- /* Number of ICSSG related stats */
- #define ICSSG_NUM_STATS (ICSSG_NUM_MIIG_STATS + ICSSG_NUM_PA_STATS)
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_stats.c b/drivers/net/ethernet/ti/icssg/icssg_stats.c
-index 8800bd3a8d07..3f1400e0207c 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_stats.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_stats.c
-@@ -11,7 +11,6 @@
- 
- #define ICSSG_TX_PACKET_OFFSET	0xA0
- #define ICSSG_TX_BYTE_OFFSET	0xEC
--#define ICSSG_FW_STATS_BASE	0x0248
- 
- static u32 stats_base[] = {	0x54c,	/* Slice 0 stats start */
- 				0xb18,	/* Slice 1 stats start */
-@@ -44,9 +43,8 @@ void emac_update_hardware_stats(struct prueth_emac *emac)
- 
- 	if (prueth->pa_stats) {
- 		for (i = 0; i < ARRAY_SIZE(icssg_all_pa_stats); i++) {
--			reg = ICSSG_FW_STATS_BASE +
--			      icssg_all_pa_stats[i].offset *
--			      PRUETH_NUM_MACS + slice * sizeof(u32);
-+			reg = icssg_all_pa_stats[i].offset +
-+			      slice * sizeof(u32);
- 			regmap_read(prueth->pa_stats, reg, &val);
- 			emac->pa_stats[i] += val;
- 		}
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_stats.h b/drivers/net/ethernet/ti/icssg/icssg_stats.h
-index e88b919f532c..8d0fe42a5a41 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_stats.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_stats.h
-@@ -155,24 +155,10 @@ static const struct icssg_miig_stats icssg_all_miig_stats[] = {
- 	ICSSG_MIIG_STATS(tx_bytes, true),
- };
- 
--/**
-- * struct pa_stats_regs - ICSSG Firmware maintained PA Stats register
-- * @fw_rx_cnt: Number of valid packets sent by Rx PRU to Host on PSI
-- * @fw_tx_cnt: Number of valid packets copied by RTU0 to Tx queues
-- * @fw_tx_pre_overflow: Host Egress Q (Pre-emptible) Overflow Counter
-- * @fw_tx_exp_overflow: Host Egress Q (Express) Overflow Counter
-- */
--struct pa_stats_regs {
--	u32 fw_rx_cnt;
--	u32 fw_tx_cnt;
--	u32 fw_tx_pre_overflow;
--	u32 fw_tx_exp_overflow;
--};
--
--#define ICSSG_PA_STATS(field)			\
--{						\
--	#field,					\
--	offsetof(struct pa_stats_regs, field),	\
-+#define ICSSG_PA_STATS(field)	\
-+{				\
-+	#field,			\
-+	field,			\
- }
- 
- struct icssg_pa_stats {
-@@ -181,10 +167,43 @@ struct icssg_pa_stats {
- };
- 
- static const struct icssg_pa_stats icssg_all_pa_stats[] = {
--	ICSSG_PA_STATS(fw_rx_cnt),
--	ICSSG_PA_STATS(fw_tx_cnt),
--	ICSSG_PA_STATS(fw_tx_pre_overflow),
--	ICSSG_PA_STATS(fw_tx_exp_overflow),
-+	ICSSG_PA_STATS(FW_RTU_PKT_DROP),
-+	ICSSG_PA_STATS(FW_Q0_OVERFLOW),
-+	ICSSG_PA_STATS(FW_Q1_OVERFLOW),
-+	ICSSG_PA_STATS(FW_Q2_OVERFLOW),
-+	ICSSG_PA_STATS(FW_Q3_OVERFLOW),
-+	ICSSG_PA_STATS(FW_Q4_OVERFLOW),
-+	ICSSG_PA_STATS(FW_Q5_OVERFLOW),
-+	ICSSG_PA_STATS(FW_Q6_OVERFLOW),
-+	ICSSG_PA_STATS(FW_Q7_OVERFLOW),
-+	ICSSG_PA_STATS(FW_DROPPED_PKT),
-+	ICSSG_PA_STATS(FW_RX_ERROR),
-+	ICSSG_PA_STATS(FW_RX_DS_INVALID),
-+	ICSSG_PA_STATS(FW_TX_DROPPED_PACKET),
-+	ICSSG_PA_STATS(FW_TX_TS_DROPPED_PACKET),
-+	ICSSG_PA_STATS(FW_INF_PORT_DISABLED),
-+	ICSSG_PA_STATS(FW_INF_SAV),
-+	ICSSG_PA_STATS(FW_INF_SA_BL),
-+	ICSSG_PA_STATS(FW_INF_PORT_BLOCKED),
-+	ICSSG_PA_STATS(FW_INF_DROP_TAGGED),
-+	ICSSG_PA_STATS(FW_INF_DROP_PRIOTAGGED),
-+	ICSSG_PA_STATS(FW_INF_DROP_NOTAG),
-+	ICSSG_PA_STATS(FW_INF_DROP_NOTMEMBER),
-+	ICSSG_PA_STATS(FW_PREEMPT_BAD_FRAG),
-+	ICSSG_PA_STATS(FW_PREEMPT_ASSEMBLY_ERR),
-+	ICSSG_PA_STATS(FW_PREEMPT_FRAG_CNT_TX),
-+	ICSSG_PA_STATS(FW_PREEMPT_ASSEMBLY_OK),
-+	ICSSG_PA_STATS(FW_PREEMPT_FRAG_CNT_RX),
-+	ICSSG_PA_STATS(FW_RX_EOF_SHORT_FRMERR),
-+	ICSSG_PA_STATS(FW_RX_B0_DROP_EARLY_EOF),
-+	ICSSG_PA_STATS(FW_TX_JUMBO_FRM_CUTOFF),
-+	ICSSG_PA_STATS(FW_RX_EXP_FRAG_Q_DROP),
-+	ICSSG_PA_STATS(FW_RX_FIFO_OVERRUN),
-+	ICSSG_PA_STATS(FW_CUT_THR_PKT),
-+	ICSSG_PA_STATS(FW_HOST_RX_PKT_CNT),
-+	ICSSG_PA_STATS(FW_HOST_TX_PKT_CNT),
-+	ICSSG_PA_STATS(FW_HOST_EGRESS_Q_PRE_OVERFLOW),
-+	ICSSG_PA_STATS(FW_HOST_EGRESS_Q_EXP_OVERFLOW),
- };
- 
- #endif /* __NET_TI_ICSSG_STATS_H */
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_switch_map.h b/drivers/net/ethernet/ti/icssg/icssg_switch_map.h
-index 424a7e945ea8..d30203a0978c 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_switch_map.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_switch_map.h
-@@ -231,4 +231,109 @@
- /* Start of 32 bits PA_STAT counters */
- #define PA_STAT_32b_START_OFFSET                           0x0080
- 
-+/* Diagnostic error counter which increments when RTU drops a locally injected
-+ * packet due to port disabled or rule violation.
-+ */
-+#define FW_RTU_PKT_DROP		0x0088
-+
-+/* Tx Queue Overflow Counters */
-+#define FW_Q0_OVERFLOW		0x0090
-+#define FW_Q1_OVERFLOW		0x0098
-+#define FW_Q2_OVERFLOW		0x00A0
-+#define FW_Q3_OVERFLOW		0x00A8
-+#define FW_Q4_OVERFLOW		0x00B0
-+#define FW_Q5_OVERFLOW		0x00B8
-+#define FW_Q6_OVERFLOW		0x00C0
-+#define FW_Q7_OVERFLOW		0x00C8
-+
-+/* Incremented if a packet is dropped at PRU because of a rule violation */
-+#define FW_DROPPED_PKT		0x00F8
-+
-+/* Incremented if there was a CRC error or Min/Max frame error at PRU0 */
-+#define FW_RX_ERROR		0x0100
-+
-+/* Incremented when RTU detects Data Status invalid condition */
-+#define FW_RX_DS_INVALID	0x0108
-+
-+/* Counter for packets dropped via TX Port */
-+#define FW_TX_DROPPED_PACKET	0x0110
-+
-+/* Counter for packets with TS flag dropped via TX Port */
-+#define FW_TX_TS_DROPPED_PACKET	0x0118
-+
-+/* Incremented when RX frame is dropped due to port being disabled */
-+#define FW_INF_PORT_DISABLED	0x0120
-+
-+/* Incremented when RX frame is dropped due to Source Address violation */
-+#define FW_INF_SAV		0x0128
-+
-+/* Incremented when RX frame is dropped due to Source Address being black
-+ * listed
-+ */
-+#define FW_INF_SA_BL		0x0130
-+
-+/* Incremented when RX frame is dropped due to port being blocked and frame
-+ * is being a special frame
-+ */
-+#define FW_INF_PORT_BLOCKED	0x0138
-+
-+/* Incremented when RX frame is dropped for being tagged */
-+#define FW_INF_DROP_TAGGED	0x0140
-+
-+/* Incremented when RX frame is dropped for being priority tagged */
-+#define FW_INF_DROP_PRIOTAGGED	0x0148
-+
-+/* Incremented when RX frame is dropped for being untagged */
-+#define FW_INF_DROP_NOTAG	0x0150
-+
-+/* Incremented when RX frame is dropped for port not being member of VLAN */
-+#define FW_INF_DROP_NOTMEMBER	0x0158
-+
-+/* Bad fragment Error Counter */
-+#define FW_PREEMPT_BAD_FRAG	0x0160
-+
-+/* Fragment assembly Error Counter */
-+#define FW_PREEMPT_ASSEMBLY_ERR	0x0168
-+
-+/* Fragment count in TX */
-+#define FW_PREEMPT_FRAG_CNT_TX	0x0170
-+
-+/* Assembly Completed */
-+#define FW_PREEMPT_ASSEMBLY_OK	0x0178
-+
-+/* Fragments received */
-+#define FW_PREEMPT_FRAG_CNT_RX	0x0180
-+
-+/* Incremented if EOF task is scheduled without seeing RX_B1 */
-+#define FW_RX_EOF_SHORT_FRMERR	0x0188
-+
-+/* Incremented when frame is dropped due to Early EOF received in B0 */
-+#define FW_RX_B0_DROP_EARLY_EOF	0x0190
-+
-+/* Incremented when frame is cut off to prevent packet size > 2000B */
-+#define FW_TX_JUMBO_FRM_CUTOFF	0x0198
-+
-+/* Incremented when express frame is received in the same queue as the previous
-+ * fragment
-+ */
-+#define FW_RX_EXP_FRAG_Q_DROP	0x01A0
-+
-+/* RX fifo overrun counter */
-+#define FW_RX_FIFO_OVERRUN	0x01A8
-+
-+/* Cut-through packet Counter */
-+#define FW_CUT_THR_PKT		0x01B0
-+
-+/* Number of valid packets sent by Rx PRU to Host on PSI */
-+#define FW_HOST_RX_PKT_CNT	0x0248
-+
-+/* Number of valid packets copied by RTU0 to Tx queues */
-+#define FW_HOST_TX_PKT_CNT	0x0250
-+
-+/* Host Egress Q (Pre-emptible) Overflow Counter */
-+#define FW_HOST_EGRESS_Q_PRE_OVERFLOW 0x0258
-+
-+/* Host Egress Q (Pre-emptible) Overflow Counter */
-+#define FW_HOST_EGRESS_Q_EXP_OVERFLOW 0x0260
-+
- #endif /* __NET_TI_ICSSG_SWITCH_MAP_H  */
-
-base-commit: 0493f7a54e5bcf490f943f7b25ec6e1051832f98
--- 
-2.34.1
+Nit: Why the switch to an implicitly sized integer type?
+It feels a bit silly when you can just declare an `u8 eval`.
 
 
