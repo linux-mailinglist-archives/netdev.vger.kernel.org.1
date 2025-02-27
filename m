@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-170216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBF13A47D6C
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 13:20:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF8AFA47D7A
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 13:21:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F36FF1892F09
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 12:18:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59CFB174821
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 12:19:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5A642309B9;
-	Thu, 27 Feb 2025 12:17:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83A9233148;
+	Thu, 27 Feb 2025 12:17:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Y8zF1MPz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nzjm99Kp"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38E80230993;
-	Thu, 27 Feb 2025 12:17:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B456223314B;
+	Thu, 27 Feb 2025 12:17:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740658629; cv=none; b=jtFhLtow8tL/gctUtunB6cDagaLhfBJHptnHfrKP12mg7Mt7jG1NIRDulM4Az2EaUX3OiNn9+5J+WpqDnl5OT1mo/YHSbaZWKbr50iK/MXZXPBoSLjCU4PXPKBtqtdHJDXCr5CPDnVs7x7qkh3Skg7lToADp7I5dRcxKaGhxRbk=
+	t=1740658638; cv=none; b=sBaP4Nw1itlWOMXRn2xPe0QD4r9l1e13O8UYO+wPCMKkPI2bnlAZ85d1XbI6lwYD8a09wc3yf+EVXl4gZvhVXgAl//B4gAC4mdYhvYaWGktHaarjiOfA1mCCDz7TJS1GTlb00MDM8s/+pNdGP7ZK5BdfwxitOmg7VoC14Gn2k0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740658629; c=relaxed/simple;
-	bh=J2WrRdXsHM4g/4BW0LGzBua9ax0dXvOez2jZneAIugs=;
+	s=arc-20240116; t=1740658638; c=relaxed/simple;
+	bh=23Wnyd3qZHaBZICVaJoi2NlVrSEsbcWxMjuwRlV42ko=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WFWgS8p8xWJ4o6U9/BJTaNLlSrpkHL19rztfPDMuki7hQVeNV504wuyu6X3Dn42A7VNwtvtdd03Uci3audPncKiBC2CXUtd4Gqhs2d82Vm+0JvJuVulcV5FVl7MNESY4/gZVZZRN99NMUYj9Zz+P9J89hBPx+KcOU/c4zaYbhRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Y8zF1MPz; arc=none smtp.client-ip=198.175.65.21
+	 MIME-Version; b=B8ve6g2J9CDtZWCSj/P0xlLZNw3N5JDtNFx7RZNZt7FJjFUQV5GHB4j+aqfYIEzoJXXtE2ekMerOetG4YoG5GtgUeBmdrlkUzNC0CxDKVaIddFzEMKiWI6CVZYqM4t8RUlwKWXwWIiS1ldwRflLXw6onz4R4mt9lG5mAmG/upwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nzjm99Kp; arc=none smtp.client-ip=198.175.65.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740658628; x=1772194628;
+  t=1740658636; x=1772194636;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=J2WrRdXsHM4g/4BW0LGzBua9ax0dXvOez2jZneAIugs=;
-  b=Y8zF1MPzn3nYGMR4IbT5/xaO5JfMxGb6XrfPEKhGqDqINRv//uz//Yjv
-   lSEFM+NeiSQzpjANXY9Ju20gwyUYITjpl3p0RO3oUCSoPCJpV+Ii9WfW7
-   N9BNwRWtmNdcp3EBLtm3JmJDhkLOO3Q8aTbKflYKK01/A0cnYXcCBFGAL
-   F0U5Ve403PbKxC2I9wb+iO+xTB6yR6PGNNfV+3xq7lWUUrqzbPufZAOS3
-   MjIYjCcIpOyPE7KefQYX4OzYRT4Tj18S/1sR/RbbvWlwwMz2R77Jiusqn
-   WC3tZ5lJ99gGm5fkr8zS8m6KhSaZLySCCZRqLuxJLagq5L1++5Zizj6zs
-   Q==;
-X-CSE-ConnectionGUID: vBmJyAzGS/ybK3vlbS/rvg==
-X-CSE-MsgGUID: mLnGj+56RBmDCiP+f0raMA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11358"; a="41464336"
+  bh=23Wnyd3qZHaBZICVaJoi2NlVrSEsbcWxMjuwRlV42ko=;
+  b=nzjm99Kpp5p+C8z9iI0+nyL7LItd86R8UCkdw1QlaSqukUqyoAUvtl6v
+   FVkfXLDwJix2ExrUZBLQzLWjrXPYYSo+o5FeLC7ISY+wHALvbmz8rXpL2
+   WNWm3d/eQa+teIfr6SggjZyhmOamAY/9yGaRhIO1jcf9Npqt28AMZXHRo
+   C7L8JBWu4HpBAQgruCcofC5eK07j24P+0jeNfiiWWoXatgT5p6BB2cB5Z
+   iVXHHkOLRaq+ofppKc3+rwpG8EzEj1UIpD70pED7VpS/fG2IKX+sCWyFj
+   flHTqZHzhplDhJ0UYB23Qs1xpJGClRbEdjdrxPZcWaerHKu3BMGBr7wJ7
+   g==;
+X-CSE-ConnectionGUID: 6rr7gYN2TpmGhz7LSwAyzA==
+X-CSE-MsgGUID: QQ6pcJq2Ry6ryB9lQ2BHjw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11358"; a="41464366"
 X-IronPort-AV: E=Sophos;i="6.13,319,1732608000"; 
-   d="scan'208";a="41464336"
+   d="scan'208";a="41464366"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 04:17:07 -0800
-X-CSE-ConnectionGUID: jO11jZUEQ5GkIZy6Ekm6yg==
-X-CSE-MsgGUID: cIZQCiqeTeqVaHk+ui2vJg==
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 04:17:15 -0800
+X-CSE-ConnectionGUID: t2HlU1RRQQOkaHSTBT+bwg==
+X-CSE-MsgGUID: WDg8vf6+Q46I63fgcAp6Sg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="117519221"
+   d="scan'208";a="117519259"
 Received: from yongliang-ubuntu20-ilbpg12.png.intel.com ([10.88.227.39])
-  by orviesa007.jf.intel.com with ESMTP; 27 Feb 2025 04:17:01 -0800
+  by orviesa007.jf.intel.com with ESMTP; 27 Feb 2025 04:17:09 -0800
 From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
 To: Simon Horman <horms@kernel.org>,
 	Jose Abreu <joabreu@synopsys.com>,
@@ -91,9 +91,9 @@ Cc: x86@kernel.org,
 	platform-driver-x86@vger.kernel.org,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH net-next v9 3/6] arch: x86: add IPC mailbox accessor function and add SoC register access
-Date: Thu, 27 Feb 2025 20:15:19 +0800
-Message-Id: <20250227121522.1802832-4-yong.liang.choong@linux.intel.com>
+Subject: [PATCH net-next v9 4/6] net: stmmac: configure SerDes on mac_finish
+Date: Thu, 27 Feb 2025 20:15:20 +0800
+Message-Id: <20250227121522.1802832-5-yong.liang.choong@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250227121522.1802832-1-yong.liang.choong@linux.intel.com>
 References: <20250227121522.1802832-1-yong.liang.choong@linux.intel.com>
@@ -105,135 +105,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: "David E. Box" <david.e.box@linux.intel.com>
+SerDes will configure according to the provided interface mode after
+finish a major reconfiguration of the interface mode.
 
-- Exports intel_pmc_ipc() for host access to the PMC IPC mailbox
-- Enables the host to access specific SoC registers through the PMC
-firmware using IPC commands. This access method is necessary for
-registers that are not available through direct Memory-Mapped I/O (MMIO),
-which is used for other accessible parts of the PMC.
-
-Signed-off-by: David E. Box <david.e.box@linux.intel.com>
-Signed-off-by: Chao Qin <chao.qin@intel.com>
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
 ---
- MAINTAINERS                                   |  1 +
- .../linux/platform_data/x86/intel_pmc_ipc.h   | 94 +++++++++++++++++++
- 2 files changed, 95 insertions(+)
- create mode 100644 include/linux/platform_data/x86/intel_pmc_ipc.h
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 13 +++++++++++++
+ include/linux/stmmac.h                            |  4 ++++
+ 2 files changed, 17 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 8019d5a97546..aff084824b89 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -11864,6 +11864,7 @@ L:	platform-driver-x86@vger.kernel.org
- S:	Maintained
- F:	Documentation/ABI/testing/sysfs-platform-intel-pmc
- F:	drivers/platform/x86/intel/pmc/
-+F:	linux/platform_data/x86/intel_pmc_ipc.h
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 424fa2fe31c6..72ec2ef3907f 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -1086,6 +1086,18 @@ static int stmmac_mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
+ 	return 0;
+ }
  
- INTEL PMIC GPIO DRIVERS
- M:	Andy Shevchenko <andy@kernel.org>
-diff --git a/include/linux/platform_data/x86/intel_pmc_ipc.h b/include/linux/platform_data/x86/intel_pmc_ipc.h
-new file mode 100644
-index 000000000000..6e603a8c075f
---- /dev/null
-+++ b/include/linux/platform_data/x86/intel_pmc_ipc.h
-@@ -0,0 +1,94 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Intel Core SoC Power Management Controller Header File
-+ *
-+ * Copyright (c) 2025, Intel Corporation.
-+ * All Rights Reserved.
-+ *
-+ */
-+#ifndef INTEL_PMC_IPC_H
-+#define INTEL_PMC_IPC_H
-+#include <linux/acpi.h>
-+
-+#define IPC_SOC_REGISTER_ACCESS			0xAA
-+#define IPC_SOC_SUB_CMD_READ			0x00
-+#define IPC_SOC_SUB_CMD_WRITE			0x01
-+#define PMC_IPCS_PARAM_COUNT			7
-+#define VALID_IPC_RESPONSE			5
-+
-+struct pmc_ipc_cmd {
-+	u32 cmd;
-+	u32 sub_cmd;
-+	u32 size;
-+	u32 wbuf[4];
-+};
-+
-+struct pmc_ipc_rbuf {
-+	u32 buf[4];
-+};
-+
-+/**
-+ * intel_pmc_ipc() - PMC IPC Mailbox accessor
-+ * @ipc_cmd:  Prepared input command to send
-+ * @rbuf:     Allocated array for returned IPC data
-+ *
-+ * Return: 0 on success. Non-zero on mailbox error
-+ */
-+static inline int intel_pmc_ipc(struct pmc_ipc_cmd *ipc_cmd, struct pmc_ipc_rbuf *rbuf)
++static int stmmac_mac_finish(struct phylink_config *config, unsigned int mode,
++			     phy_interface_t interface)
 +{
-+	struct acpi_buffer buffer = { ACPI_ALLOCATE_BUFFER, NULL };
-+	union acpi_object params[PMC_IPCS_PARAM_COUNT] = {
-+		{.type = ACPI_TYPE_INTEGER,},
-+		{.type = ACPI_TYPE_INTEGER,},
-+		{.type = ACPI_TYPE_INTEGER,},
-+		{.type = ACPI_TYPE_INTEGER,},
-+		{.type = ACPI_TYPE_INTEGER,},
-+		{.type = ACPI_TYPE_INTEGER,},
-+		{.type = ACPI_TYPE_INTEGER,},
-+	};
-+	struct acpi_object_list arg_list = { PMC_IPCS_PARAM_COUNT, params };
-+	union acpi_object *obj;
-+	int status;
++	struct net_device *ndev = to_net_dev(config->dev);
++	struct stmmac_priv *priv = netdev_priv(ndev);
 +
-+	if (!ipc_cmd || !rbuf)
-+		return -EINVAL;
-+
-+	/*
-+	 * 0: IPC Command
-+	 * 1: IPC Sub Command
-+	 * 2: Size
-+	 * 3-6: Write Buffer for offset
-+	 */
-+	params[0].integer.value = ipc_cmd->cmd;
-+	params[1].integer.value = ipc_cmd->sub_cmd;
-+	params[2].integer.value = ipc_cmd->size;
-+	params[3].integer.value = ipc_cmd->wbuf[0];
-+	params[4].integer.value = ipc_cmd->wbuf[1];
-+	params[5].integer.value = ipc_cmd->wbuf[2];
-+	params[6].integer.value = ipc_cmd->wbuf[3];
-+
-+	status = acpi_evaluate_object(NULL, "\\IPCS", &arg_list, &buffer);
-+	if (ACPI_FAILURE(status))
-+		return -ENODEV;
-+
-+	obj = buffer.pointer;
-+
-+	if (obj && obj->type == ACPI_TYPE_PACKAGE &&
-+	    obj->package.count == VALID_IPC_RESPONSE) {
-+		const union acpi_object *objs = obj->package.elements;
-+
-+		if ((u8)objs[0].integer.value != 0)
-+			return -EINVAL;
-+
-+		rbuf->buf[0] = objs[1].integer.value;
-+		rbuf->buf[1] = objs[2].integer.value;
-+		rbuf->buf[2] = objs[3].integer.value;
-+		rbuf->buf[3] = objs[4].integer.value;
-+	} else {
-+		return -EINVAL;
-+	}
++	if (priv->plat->mac_finish)
++		priv->plat->mac_finish(ndev, priv->plat->bsp_priv, mode, interface);
 +
 +	return 0;
 +}
 +
-+#endif /* INTEL_PMC_IPC_H */
+ static const struct phylink_mac_ops stmmac_phylink_mac_ops = {
+ 	.mac_get_caps = stmmac_mac_get_caps,
+ 	.mac_select_pcs = stmmac_mac_select_pcs,
+@@ -1094,6 +1106,7 @@ static const struct phylink_mac_ops stmmac_phylink_mac_ops = {
+ 	.mac_link_up = stmmac_mac_link_up,
+ 	.mac_disable_tx_lpi = stmmac_mac_disable_tx_lpi,
+ 	.mac_enable_tx_lpi = stmmac_mac_enable_tx_lpi,
++	.mac_finish = stmmac_mac_finish,
+ };
+ 
+ /**
+diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+index 6d2aa77ea963..af22a11c2b8a 100644
+--- a/include/linux/stmmac.h
++++ b/include/linux/stmmac.h
+@@ -236,6 +236,10 @@ struct plat_stmmacenet_data {
+ 	int (*serdes_powerup)(struct net_device *ndev, void *priv);
+ 	void (*serdes_powerdown)(struct net_device *ndev, void *priv);
+ 	void (*speed_mode_2500)(struct net_device *ndev, void *priv);
++	int (*mac_finish)(struct net_device *ndev,
++			  void *priv,
++			  unsigned int mode,
++			  phy_interface_t interface);
+ 	void (*ptp_clk_freq_config)(struct stmmac_priv *priv);
+ 	int (*init)(struct platform_device *pdev, void *priv);
+ 	void (*exit)(struct platform_device *pdev, void *priv);
 -- 
 2.34.1
 
