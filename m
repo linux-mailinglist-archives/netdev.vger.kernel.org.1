@@ -1,112 +1,129 @@
-Return-Path: <netdev+bounces-170151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CAD1A477F0
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 09:37:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F379FA477F2
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 09:37:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C4B3165145
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 08:37:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AEBB0188A728
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 08:37:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE098224B08;
-	Thu, 27 Feb 2025 08:37:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25794225403;
+	Thu, 27 Feb 2025 08:37:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mRkxdmgo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dxOM//RP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D39223715;
-	Thu, 27 Feb 2025 08:37:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B353413A3F2;
+	Thu, 27 Feb 2025 08:37:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740645425; cv=none; b=OG6QmdFelcE6ZHGXqy/CuRa+VQJLV95rfaPRqZOKL9DDFsz45NtL5L6o7Z7FmjewDXVBxkgiewneHCbmBrUFD6tOQ/VvdqdAyWekxISGn1ujXgsgZn2cZsjHRQ6uGLa+Sd1bOErHeuf/3cA/bMgZEA+x/64ZArEwTWr+9pPi4Ps=
+	t=1740645465; cv=none; b=q1gUWxZ9vbBK4JZcIPNRdDchdEvyj33RvS/yJy7XGpQNT8YQvmE3x+FC6JB5BcP67+TFwe6gb1BVob8TS4RhzneuHJpm9mPDtB5RUaVUTbGw8faEVqbtqJ1pZzbhCgazulQbLKX+hpnVY+sjNrjXSva9fqM8WLNfkTVuv+EoBL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740645425; c=relaxed/simple;
-	bh=nRbj/Wkfu4NpdGGUja9RSPwp1X8dZdVwrbBMJ/2V0wM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mhqazh9M7j9FRI2rGT+32HN0mRt1XglRK3vCYhBhcA7P2+vnSm2Li0Ftoq9I1wSN80tSi441w7rk/TcfFzh91eaD+cb88/Z7qVk/l0CmX3ASJjNXW7NcwttNFnmP0xEy/h3VamLfYUf2JerbkSwfTN4U1hcUltxI263dA7yIEpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mRkxdmgo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA9A9C4CEDD;
-	Thu, 27 Feb 2025 08:37:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740645425;
-	bh=nRbj/Wkfu4NpdGGUja9RSPwp1X8dZdVwrbBMJ/2V0wM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mRkxdmgokJlBe27n3RIU7ojbt+6jpjnxlL94eKr6TcvXAyZXXYLS+rBDbVJVjv5BR
-	 MZB6qyjZyrvjqgzO1hlFGzXr/ZK6e8Zj7Kx/AmDypMr3NuJOiPYeFSCJDJBtL1rAKi
-	 hU6iqYEbfpEh/YnEyctlqDgGjTODN3TYzh/YFVfimCs1ECvUBd6RA2+QbPpAuPtaOV
-	 LcwHnGjmBAtamEYnvRcabR4R+9O/oZM1rUOm4EFoU99TPGg9E03ouiJfb0FYqe580S
-	 2BQWn7cwGorXReTMdyhVlMgOiAVab+nE6XCa2lpFYoYQeRhl0oYSsURKDKlg2PBnTE
-	 mYXL0AK8kNe1Q==
-Date: Thu, 27 Feb 2025 09:37:02 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1740645465; c=relaxed/simple;
+	bh=osJRx72iR5wDmM0zItYjvKkdxyvdSPyeZ9V7H6SiRLU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qnZyuP+JiIanqmNFMfaQSm/7QSHQeCrovndO4LAR6kmC6t6/cJwTf8B0dgiXoUlsxu1R7gIjau9qKQ7v/aeXpMj42k1J6/fJep/0TGMClLRMWydUQho4BfCKjL95D8uqB4gRgv71v7S/Fg6JALPSXubG83vuK3t9Khijy7zn9yc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dxOM//RP; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-220d132f16dso8222555ad.0;
+        Thu, 27 Feb 2025 00:37:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740645462; x=1741250262; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lDDTkPtct+cToafdbSSTMQ1vEqIbe4HGt6h0hMNxLJg=;
+        b=dxOM//RPQYXqHoOzUEJf4Uzrbekhh1RSl/N8zh7IY6y5ZWc6IxDQ1VWqRqgdpHampZ
+         LvM3mLyklEY/36dHK6M50kr2T5bYT4nWs7TXJ4ljUmRS7/MqA+GoKyw5G3gUoWdcOp8m
+         2B7aaJf/Iv5Li6f8afU/aYn0K8wBTpgwL/IYpEtuuXHMjB+7k8+AL2LrtEnzJVsbhhGm
+         HjlOYT/U66aAv7U5fahGd3tUWe/duenNILEfVwQUskRytrYEBUVE4CD7ppFAZTlczPTF
+         mvoV1h5URrz1NO+EG2XmlA9toR/o7MFRWfqI3zk8vhf2P4sGEY38XXMNrmyatIZry1n8
+         3PDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740645462; x=1741250262;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lDDTkPtct+cToafdbSSTMQ1vEqIbe4HGt6h0hMNxLJg=;
+        b=BpJyFCsfJ48FMbzH9hW/CIbh9NnqSBy6qqq96CPQJK8sQEekQer6bq1XAhrXzX/Inh
+         DcWtRdionTE5fmeoEdpO16n0D4cnapWMS8DvTbJ4PV2eMw6mD6PwJlwzZ4nc84g86nZn
+         ly5CXuv6KEuzwR6l6XESe8YH97kb39hQyxtGwI2DN5EH1TaHd7Tn3vq7gmOS4HKMrc0W
+         JpLJS27dgIdX5pTUaMCbMfdb0KW/K2JaZTDzSRhPx0hfFkL+iLD+av9Twjg7xS2XFjY+
+         sbYrj6posuwOlgKHE3e2GH623FffnHFu1Co/j26H4pMrSEOAbP8X4kUZY30yYSj9X5hB
+         Q+iw==
+X-Forwarded-Encrypted: i=1; AJvYcCUWdJUc9CTyzXDLovyAL489Doz3LUHdecbTv7hzlW+YIWrIe4ci5J94ecqVwK9MiV8MMnyydgfPViNuBjpMCYQv@vger.kernel.org, AJvYcCVWdnr+5pvkSOC8BX+miFphGF/C3BvolJdlBlxXYNNV6hDyiNfWRKwt+La5a6nBb8jbVGcPOzwhF6spucY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOakbsJ75TfjEW/WupZVZYDpH0sVyXBoPSGLhtE7y8bQ4BY7iv
+	wBaxKlRb5dqzkt6Hmt/ZKqOHXkaXRPvkNSsUi0x9NmMbcsNCVLqcLmFfiDN3HtwoJg==
+X-Gm-Gg: ASbGncuYNkLWNnm4K2Ecf+bX/9hpX9Je2YqFJRqg2z1GcOuVnHTtUsdZ/29WDPNBrxo
+	rfCRnwx1FYp1/v8khifrypye5WIjcRKOBG+V1qGL6SR2oE5k6unJGZujQZaLqkknbAIJIM2n849
+	EpTv3lxO4nblsOhRXJJ6z2DnmLeHiyy6RuLDZtwjUwGoCiilfkxb5bdXsSygdgNdbW3VorOa/S8
+	YS8Fc6ePNBivggtLCsWInBEkVgmrVnJ74qIV3WHr3iG6AA0KpU9tLcCHDaYiEUirQz6b8s6RgkY
+	4maiLq31KA4a/hh21IwvtWnnwzZ5v7xoRHvOKWi/xbRrjw==
+X-Google-Smtp-Source: AGHT+IFTsOv4OZTdg0RRL8hOfOmWfjj1/2uRp6EEpZPXijygZJr2zqjYbBRiyKWEznjSRp7BSM106g==
+X-Received: by 2002:a05:6a21:178a:b0:1ee:650b:ac22 with SMTP id adf61e73a8af0-1f10ae7384cmr12534971637.40.1740645462359;
+        Thu, 27 Feb 2025 00:37:42 -0800 (PST)
+Received: from fedora.dns.podman ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-734a003ec7esm966796b3a.153.2025.02.27.00.37.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Feb 2025 00:37:41 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	DENG Qingfang <dqfext@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org,
-	upstream@airoha.com, Sayantan Nandy <sayantan.nandy@airoha.com>
-Subject: Re: [PATCH net-next v7 13/15] net: airoha: Introduce flowtable
- offload support
-Message-ID: <Z8AkLpF1svgNfXNu@lore-desk>
-References: <20250224-airoha-en7581-flowtable-offload-v7-0-b4a22ad8364e@kernel.org>
- <20250224-airoha-en7581-flowtable-offload-v7-13-b4a22ad8364e@kernel.org>
- <20250226194310.03398da0@kernel.org>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Jianbo Liu <jianbol@nvidia.com>,
+	Jarod Wilson <jarod@redhat.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Cosmin Ratiu <cratiu@nvidia.com>,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv3 net 0/3] bond: fix xfrm offload issues
+Date: Thu, 27 Feb 2025 08:37:14 +0000
+Message-ID: <20250227083717.4307-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="3EJw5ixjEJCaV9I4"
-Content-Disposition: inline
-In-Reply-To: <20250226194310.03398da0@kernel.org>
+Content-Transfer-Encoding: 8bit
 
+The first patch fixes the incorrect locks using in bond driver.
+The second patch fixes the xfrm offload feature during setup active-backup
+mode. The third patch add a ipsec offload testing.
 
---3EJw5ixjEJCaV9I4
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+v3: move the ipsec deletion to bond_ipsec_free_sa (Cosmin Ratiu)
+v2: do not turn carrier on if bond change link failed (Nikolay Aleksandrov)
+    move the mutex lock to a work queue (Cosmin Ratiu)
 
-> On Mon, 24 Feb 2025 12:25:33 +0100 Lorenzo Bianconi wrote:
-> > +	foe_size =3D PPE_NUM_ENTRIES * sizeof(struct airoha_foe_entry);
-> > +	ppe->foe =3D dmam_alloc_coherent(eth->dev, foe_size, &ppe->foe_dma,
-> > +				       GFP_KERNEL | __GFP_ZERO);
->=20
-> dmam_alloc_coherent() always zeros the memory, the GFP_ZERO is not necess=
-ary
+Hangbin Liu (3):
+  bonding: move IPsec deletion to bond_ipsec_free_sa
+  bonding: fix xfrm offload feature setup on active-backup mode
+  selftests: bonding: add ipsec offload test
 
-ack, I will fix it.
+ drivers/net/bonding/bond_main.c               |  36 ++--
+ drivers/net/bonding/bond_netlink.c            |  16 +-
+ include/net/bonding.h                         |   1 +
+ .../selftests/drivers/net/bonding/Makefile    |   3 +-
+ .../drivers/net/bonding/bond_ipsec_offload.sh | 155 ++++++++++++++++++
+ .../selftests/drivers/net/bonding/config      |   4 +
+ 6 files changed, 195 insertions(+), 20 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/bonding/bond_ipsec_offload.sh
 
-Regards,
-Lorenzo
+-- 
+2.46.0
 
---3EJw5ixjEJCaV9I4
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ8AkLgAKCRA6cBh0uS2t
-rHkvAQDr0fPTwe5MsGWTZebtC+cvgeqIcwk+UMbKIk75G9QRHQEAyMgTUip42VH/
-4sD9pimv2XO4Yc7c3UHDupHqbjzpkQw=
-=h8X6
------END PGP SIGNATURE-----
-
---3EJw5ixjEJCaV9I4--
 
