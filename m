@@ -1,148 +1,124 @@
-Return-Path: <netdev+bounces-170404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88D97A488CD
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 20:17:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A1E4A488E0
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 20:20:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A31E3AB189
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 19:16:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09A3F166EF2
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 19:20:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C77B26E950;
-	Thu, 27 Feb 2025 19:14:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CBFD26E940;
+	Thu, 27 Feb 2025 19:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TT4o6cEG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JEEBmo0O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 915FC26E94D;
-	Thu, 27 Feb 2025 19:14:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44A16270054;
+	Thu, 27 Feb 2025 19:20:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740683691; cv=none; b=GMIt33NtdgPs3PV2g1yRqkSGeF8BvoKdguH686WUC9hH6pw90Joz29XSEYRqLg1KH6M8j2ZBszQKsdavh9vWRNLIeNgcZpjwyzl9mp7pIT4gGvV96wXSK+ha571tvRV/iKbDpjnL+MsxlofiC7RaEOUiL1IuZiS5f9DW+zDKzbw=
+	t=1740684026; cv=none; b=ZFPQ748aSKrZStag8W70UW46p8EPsOhP85gauW+6sFfCVBNa54G7tx2gmqGDHjVKG3YFd7mXngBcTMb0h85rRx6RSzR4Pz/NxZN9vfVQYqDcxqdZksk1ZU0uaGiy/XJD4tHYL8aV/5n0d8e1f7Itzz2oatscnfIpjWnaum0+Kd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740683691; c=relaxed/simple;
-	bh=blYPvDH2ACr8bgPkdI15DSzbv23Pg8uT/Ia003sNOV0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DHIA7J+UcgshEL0L0V5kIz9rEmxp+wK5o6C75oyX2Vk5vQNb2gaujnV3BOeRtC2eRstBP3aE1fiXVSmCo4ZOUzCQi4NV4FkX/ifo0KadQ9rY7PY93wSSgGLp1pPAkbvtAc3ZMjMKx3IOhFiKy50h8WsrKNFEbLso52T+J5QE9Bc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TT4o6cEG; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2232aead377so27409025ad.0;
-        Thu, 27 Feb 2025 11:14:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740683689; x=1741288489; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ITI0j5SAALSQksAHWBdv3yk+wyS0uEKSyMIjI5OOl5s=;
-        b=TT4o6cEGn7O4GXxdgT62MqVYqYgRqUhPtkb8QQp2yh6czObq5pYs5vLZEnji9GCzJP
-         xPqt8oqAJxoItOQloZubDAVbwEQOsxRQ1YNwrEQLD30UdaUFLw89YsDGkOrYLHG+pjR2
-         3uDe5ffF75oJJJGaWkz6IYo3RdzGliNnJvrXwowpuj95dMTG0qXlhjAnJc4H7synALNA
-         NV7P/bSE6vmaq30spDVKj86D7kDkhpYIzzCxHg8fUOX9A22ILHnmmiuuOapMqezCBbdr
-         6ER8RRNMmHwws+NgiklU9wY6VeTv/9YOibdHaUuXYDphHWVa4I3MdyzyuY6N+EgG+psc
-         72rA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740683689; x=1741288489;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ITI0j5SAALSQksAHWBdv3yk+wyS0uEKSyMIjI5OOl5s=;
-        b=CqR0qMJHANh8nP0ufWttEv07wOlDT89Tcy2qoMMAQ4pJz0h3SQnrCcrAZLMTu95aeP
-         A7lYz9qkn7v4QRGqmo4P1ZTZIG+KDpNDtpHWgxiVqS1p9TZ/s3EFg9nI8Yps2J43AfnC
-         VSQD7igq6m/CG2iULbOh72sM2g8QxPLYLgohkbeSvpyG80poVsZtnR687BpzOCQ4uIqZ
-         NT0qhd9KshFu+h9fC0rYgWhVpDiJ73EKZxPYZUVeYw5j4N3o6b356DJdKNN/HbMhZKYu
-         WE+nZEnUN6R8sadkOQSK5sf89rQsNobP7nnOBnw/ThUO50i6jGoAywgXxTc1usz0VXSK
-         kClg==
-X-Forwarded-Encrypted: i=1; AJvYcCXf7BER97xSFvipEjYUbcMlb6xVoFF6E0No1fPgwVqXMxDFtkhJZv3aMh00VmYcIeTmabQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2FPAr7wl98aB15qOahN+8XhECr9xcovgF6WRSCLAZzqHey/wb
-	9MC9jsMF/TwE5yBmeXTDU8AnBKa7K178cXGxg4zwqIUkA0MpDhnX
-X-Gm-Gg: ASbGnct/UcUQofheD8PYVGRqABq9jxr/dCuJRkYS4rNDpmlIZEWNjjz5jvbwA5OHV+V
-	uBPLb1zvtLXMWOoy3EnC8n4YcrsXILGi7DjCiCnLKO6JXwwFBxZ6egcc+61/+VHUv9RH1vXfv+k
-	eKPjQnYm8XHrnZQkLe4/5z9ihjcKRTL4rPWgpx4jVuhkmpCtkqpiCSUHePKIVj6VSb6EM2M2656
-	ohA82arDwfTIZuk9uPTei3BiLxSMArr1b0B5kPVGtrqnIRWFmMB7MDQDw9KfrKTUTM+QUA1mp1/
-	42dI0X7M5LXzefZXXvZn5BsWyJ8ALQ==
-X-Google-Smtp-Source: AGHT+IGDzIkY5yHYl0IHOp2oPGj2SXmtdjk14H2yQf0nF0VaYoG8N+ji3afgP4KihV8+zf1RQlWz9Q==
-X-Received: by 2002:a05:6a00:464f:b0:730:9a85:c940 with SMTP id d2e1a72fcca58-734ac467393mr885641b3a.20.1740683688717;
-        Thu, 27 Feb 2025 11:14:48 -0800 (PST)
-Received: from localhost ([129.210.115.104])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7349fe6cd66sm2056821b3a.74.2025.02.27.11.14.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Feb 2025 11:14:48 -0800 (PST)
-Date: Thu, 27 Feb 2025 11:14:47 -0800
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, john.fastabend@gmail.com,
-	zhoufeng.zf@bytedance.com, zijianzhang@bytedance.com,
-	Cong Wang <cong.wang@bytedance.com>
-Subject: Re: [Patch bpf-next 3/4] skmsg: use bitfields for struct sk_psock
-Message-ID: <Z8C5pznZoY6fuZyV@pop-os.localdomain>
-References: <20250222183057.800800-1-xiyou.wangcong@gmail.com>
- <20250222183057.800800-4-xiyou.wangcong@gmail.com>
- <87ldtsu882.fsf@cloudflare.com>
- <Z7+UAA83/n9XgIdU@pop-os.localdomain>
- <87eczju30u.fsf@cloudflare.com>
+	s=arc-20240116; t=1740684026; c=relaxed/simple;
+	bh=xtfpr7hHwam7QkTVY8/dfHG6gdnWBz3qmp5PmCCeyqI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=h7v+BHRsMU0hL5GrNiV0eRPUmYO3ncHF3u0JGVkzw7ppvA5uNacm4HjCv5tDAZTL4cTO1tAkJPEr2SGDUWrH+7kQ3DzGt0rVKTnTXYU1cmRD3zJaJy4N4J0tZrapXJlT6IlkmXNYYhcpGJC2DTR0v1eFPsK2fKfbtC63eYzd4Q8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JEEBmo0O; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AECFBC4CEDD;
+	Thu, 27 Feb 2025 19:20:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740684025;
+	bh=xtfpr7hHwam7QkTVY8/dfHG6gdnWBz3qmp5PmCCeyqI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=JEEBmo0OJyq4tnv7HxVytge08ygjACWegFDvH/0Z76VYA3+wdt+KYF0HTXWJYeduA
+	 lHaOmZtcPf10yU0dg4Px7QwiM+K4Qwid7qkzC9LKXrDSDPpXFNjFXQDH4QKcqk3M82
+	 aPpdOG6UMMpSPoBJdM30jDsMGVfVwyNHMbpsgrtlYBna8GvzrCa90ORgrmEW/oDPqH
+	 HdIcDg0/tf1bnyujbbPermj1gIm+9x+gsJHl182cv+cFq9HNALPBN5tlNCe00A5qGH
+	 AxywRT/o4IyPybiT5lD04RW3qGbXGDG97ujivGRuMK8Wxu3BcLu0DmzJCP9LYDeY5+
+	 zAHIhsf85xBig==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF31380AACB;
+	Thu, 27 Feb 2025 19:20:58 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87eczju30u.fsf@cloudflare.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 00/15] afs,
+ rxrpc: Clean up refcounting on afs_cell and afs_server records
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174068405775.1535916.5681071064674695791.git-patchwork-notify@kernel.org>
+Date: Thu, 27 Feb 2025 19:20:57 +0000
+References: <20250224234154.2014840-1-dhowells@redhat.com>
+In-Reply-To: <20250224234154.2014840-1-dhowells@redhat.com>
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, marc.dionne@auristor.com, kuba@kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ brauner@kernel.org, linux-afs@lists.infradead.org,
+ linux-kernel@vger.kernel.org
 
-On Thu, Feb 27, 2025 at 10:53:53AM +0100, Jakub Sitnicki wrote:
-> On Wed, Feb 26, 2025 at 02:21 PM -08, Cong Wang wrote:
-> > On Wed, Feb 26, 2025 at 02:49:17PM +0100, Jakub Sitnicki wrote:
-> >> On Sat, Feb 22, 2025 at 10:30 AM -08, Cong Wang wrote:
-> >> > From: Cong Wang <cong.wang@bytedance.com>
-> >> >
-> >> > psock->eval can only have 4 possible values, make it 8-bit is
-> >> > sufficient.
-> >> >
-> >> > psock->redir_ingress is just a boolean, using 1 bit is enough.
-> >> >
-> >> > Signed-off-by: Cong Wang <cong.wang@bytedance.com>
-> >> > ---
-> >> >  include/linux/skmsg.h | 4 ++--
-> >> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >> >
-> >> > diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-> >> > index bf28ce9b5fdb..beaf79b2b68b 100644
-> >> > --- a/include/linux/skmsg.h
-> >> > +++ b/include/linux/skmsg.h
-> >> > @@ -85,8 +85,8 @@ struct sk_psock {
-> >> >  	struct sock			*sk_redir;
-> >> >  	u32				apply_bytes;
-> >> >  	u32				cork_bytes;
-> >> > -	u32				eval;
-> >> > -	bool				redir_ingress; /* undefined if sk_redir is null */
-> >> > +	unsigned int			eval : 8;
-> >> > +	unsigned int			redir_ingress : 1; /* undefined if sk_redir is null */
-> >> >  	struct sk_msg			*cork;
-> >> >  	struct sk_psock_progs		progs;
-> >> >  #if IS_ENABLED(CONFIG_BPF_STREAM_PARSER)
-> >> 
-> >> Are you doing this bit packing to create a hole big enough to fit
-> >> another u32 introduced in the next patch?
-> >
-> > Kinda, or at least trying to save some space for the next patch. I am
-> > not yet trying to reorder them to make it more packed, because it can
-> > be a separate patch.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 24 Feb 2025 23:41:37 +0000 you wrote:
+> Here are some patches that fix an occasional hang that's only really
+> encountered when rmmod'ing the kafs module.  Arguably, this could also go
+> through the vfs tree, but I have a bunch more primarily crypto and rxrpc
+> patches that need to go through net-next on top of this[1].
 > 
-> OK. Asking because the intention is not expressed in the description.
-
-I will add it to the patch description for V2 (after collecting other
-feedback).
-
+> Now, at the beginning of this set, I've included five fix patches that are
+> already committed to the net/main branch but that need to be applied first,
+> but haven't made their way into net-next/main or upstream as yet:
 > 
-> Nit: Why the switch to an implicitly sized integer type?
-> It feels a bit silly when you can just declare an `u8 eval`.
+> [...]
 
-I have no strong preference here, either should work. :)
+Here is the summary with links:
+  - [net-next,01/15] rxrpc: rxperf: Fix missing decoding of terminal magic cookie
+    https://git.kernel.org/netdev/net-next/c/c34d999ca314
+  - [net-next,02/15] rxrpc: peer->mtu_lock is redundant
+    https://git.kernel.org/netdev/net-next/c/833fefa07444
+  - [net-next,03/15] rxrpc: Fix locking issues with the peer record hash
+    https://git.kernel.org/netdev/net-next/c/71f5409176f4
+  - [net-next,04/15] afs: Fix the server_list to unuse a displaced server rather than putting it
+    https://git.kernel.org/netdev/net-next/c/add117e48df4
+  - [net-next,05/15] afs: Give an afs_server object a ref on the afs_cell object it points to
+    https://git.kernel.org/netdev/net-next/c/1f0fc3374f33
+  - [net-next,06/15] afs: Remove the "autocell" mount option
+    (no matching commit)
+  - [net-next,07/15] afs: Change dynroot to create contents on demand
+    (no matching commit)
+  - [net-next,08/15] afs: Improve afs_volume tracing to display a debug ID
+    (no matching commit)
+  - [net-next,09/15] afs: Improve server refcount/active count tracing
+    (no matching commit)
+  - [net-next,10/15] afs: Make afs_lookup_cell() take a trace note
+    (no matching commit)
+  - [net-next,11/15] afs: Drop the net parameter from afs_unuse_cell()
+    (no matching commit)
+  - [net-next,12/15] rxrpc: Allow the app to store private data on peer structs
+    (no matching commit)
+  - [net-next,13/15] afs: Use the per-peer app data provided by rxrpc
+    (no matching commit)
+  - [net-next,14/15] afs: Fix afs_server ref accounting
+    (no matching commit)
+  - [net-next,15/15] afs: Simplify cell record handling
+    (no matching commit)
 
-Thanks.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
