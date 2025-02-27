@@ -1,91 +1,115 @@
-Return-Path: <netdev+bounces-170444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09DBEA48C52
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 00:04:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 900E8A48C5B
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 00:06:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 734E6165BE0
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 23:04:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D719F7A4DAC
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 23:05:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2219722A1E6;
-	Thu, 27 Feb 2025 23:04:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22EF623E34F;
+	Thu, 27 Feb 2025 23:06:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TmKxl2ev"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bcyfu+iY"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DCD3277817;
-	Thu, 27 Feb 2025 23:04:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FC6122576A;
+	Thu, 27 Feb 2025 23:06:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740697481; cv=none; b=Rcr3TdHGMnpNDX+0bbRlpQmWq4sEqXbY17JuU5Ag+eXWYkZ1dKaejmCE46gpIqI7VAgD21ksvpi3D+XmuAAxzEQmtMbvoZmNcuelBJV0LbAcsP74+J1Fk8zH8dKz19T7QLexhM74Rki4cyjFaw6WedT2FofPJUUItq4B3EW/orY=
+	t=1740697563; cv=none; b=fkVaIKZN65bGtT/R6RH3rHSVIkr2l9M3vpyCISCbnSU1IScrTfjvjBACZPBbygIJMbziyvON6I/pVuOkb21QbNb6NNct9RyDdCZfUPw9CjH2argiUNZyn0GzCCWHVEFU4YY/aklkN47lIwzh16pSZ2smksVh+rDPh3O9BuRPzfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740697481; c=relaxed/simple;
-	bh=KQnDSWfCyG4GFZ8z+w71H8Ba87KJiLSAkaj1oH1XyiI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=R32VUwqmdPSMyeeNURwW9hC5fOlMnROrTp57WUZFZ7CKgnmM9RIsQGhPlqB/73dW0Hiils/T/jUev2cFvG7axAF4m3jRPefHX3Ul72xsCHcCF8Vt76gYllJemT09OOtLzW1rRuiZLn1JfGIe3nWNaucT3O6he1wIz6X8xS9oW9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TmKxl2ev; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <84f25c32-1aa6-42d6-a5b1-efce822bfcd6@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740697477;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=s53PsMsT+VnZgU2wt1QKLZK3VWcUDg2UEoFqQhBbfUs=;
-	b=TmKxl2ev/7M/7kekUDzsyg4xu4/zQ0gcoHcFm9HW//fxbejxAifn9SEiGLWsOsWJSLpks8
-	9sFT6ChRjHvb2hmy8pvRw9ui4rDdewvIDBIXcYaZ8f/afR5jSwHJsiA1aEh3uknP90Kn91
-	3NaCKozg+PAo/v7rQIHf28cPHu5sE3Y=
-Date: Thu, 27 Feb 2025 15:04:26 -0800
+	s=arc-20240116; t=1740697563; c=relaxed/simple;
+	bh=rgtrLuHOSA+BJDhMAVUtsCdxF0mStA5rtZm9Atuab/Q=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=cpOwHrhbD67XIUQtsUAiIW5sXkUMJRMoAeduyQz7SbAjR3NDspcvUgpEdLjWOdWIDjvOeYE7maATSsoLXbAs6fZ1Jn94p46+nhGAm766QiQadFp5EDAIEvjlptFEWIwR/DVHn/JHsyw9HU/MhxTn+s+3M4DnakgJbMUyOS5I4cU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bcyfu+iY; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2212a930001so38778175ad.0;
+        Thu, 27 Feb 2025 15:06:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740697561; x=1741302361; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Jiu1ZZXw7IbtEQRSg1vKDSS8D0FLIfuwYf9MN3udZxQ=;
+        b=bcyfu+iYnIRgtf0B/ehn7hMHaZ8L3mTza8LSasSCvlCkmlDITQiNh1N1UTFBbsSk45
+         65f0fB8MMjYuBkc0LGZPVpi0oG2Ga5a4/EFOsxYYLEn47S943+D4jzv1bjW6MiKWCsmx
+         /ldA+AmiOxvX5eOwmitXCoPhWvxcdGMUmm3CEUyWvWojzbdNcJzDqY+kuNMj/mWAALPE
+         AmtXp6ONafno4sZ2mirXM35f2PASUwx/dlht7bPqJZ8IP2ZBYIVp7z+iXuI5+CHNAgCH
+         NsXV45d0zbSuWifKY8CUn5e6EeZTOxNjvVAgy5wnMCnvgWeT0DfGN2rzf6iVjTZGkdo4
+         LUOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740697561; x=1741302361;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Jiu1ZZXw7IbtEQRSg1vKDSS8D0FLIfuwYf9MN3udZxQ=;
+        b=g80wSyB+NVhY2NqpQxK/1lrIVOieM5vLCqyXsUYHtPveTF05H4MpD8bcFaxDSqgSrA
+         H6oA/HlVZ3ZTLLnhPovEKuzvT25fqU/J1ggv1XUeX4cOuqJzpCZo4GGJ2xszhzHLLMsJ
+         m7KGEJ+B+V3YAruAnnCovHSappgbKSrwWBMondCByZUQhmCRy669Bmgy7hhxiMVrFIfR
+         /4gXGYge7je3PGWXGqlLm4GMZlfgy5S3nHRNR03gG7GuL7iIaxt65d4aWhtfcEY4YlxX
+         4+dNXTKxvogZ4DfAJs213gSQHgML7xGIa2e4bhYEAmOvdHUQaGl4608DDLlhnoQOzirf
+         DTzA==
+X-Forwarded-Encrypted: i=1; AJvYcCUeL8OPASt395C5FJoSRSWNP0vlJfLqC3y5/XyRUyylAs6qKfiJSZcJV2mthOo7wjjjWzKXYSNQ@vger.kernel.org, AJvYcCWOg4pCJtmumohQ/TLGl+r39mOhBZuAIObDDbFCuxMF9fTC6aMnNWGWpgr1tbOPHSrNxAhXyI10+t2+kv8=@vger.kernel.org, AJvYcCXZTtGHBwMO085r7t0bA9Y8G/AiJyO2UH3bUj8a8E1fi81NwoBK//qOC8cKuHm/kokMazkmg7SgQeJBvvyCxVg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxE6GXit1EjcfKpk320Ajf3JiQFR4uNlZ32ddqpKv6JebWzy0CA
+	IdmFnIcpYps+ipV88GW1B9v9dRIQLhpD+wxFxq/B9qgfSaZa3P5w
+X-Gm-Gg: ASbGnctDbaijNlSWgUitXFNakYM1uYLl2BKF1uFd6856zXtDAjFobPXRNKbq6ARu9Zt
+	cWIc5FeXdbR0Uumt2Y0nK+IaM7YTulggtmrkNjRbkAePNwgFtMTCnDWo9tPcbBE43LvnuWV395S
+	umge3q+uk/ETSfq4AAYzuoGzGwmgGRjplYr17m3GdBtPzjAKvEgd5t2uz28VqB/aV8NUe8sdwGD
+	hW+lYaeqqJYCue0hg4FcMMZi2oZ5xo7O3Ya+l9bVvqdjYavGP9OJW5TWV7Ze0u3Y8mIOWAieN88
+	aYp1rOK4tQzVmWn5g7lD2foa6dJJR3x2hi1+8ha40NIpkeNmMerJdFPDju49HWMbNAXypIciCPF
+	z2WygE6A=
+X-Google-Smtp-Source: AGHT+IFR2YCuurIowDt0hjyfCW8MB2cgilAQvppkruAaln0xxOMIftrIrBwIJmpCsUOH2jxFnOuCGA==
+X-Received: by 2002:a05:6a00:847:b0:732:516f:21fa with SMTP id d2e1a72fcca58-734ac36f3d1mr1877980b3a.14.1740697560726;
+        Thu, 27 Feb 2025 15:06:00 -0800 (PST)
+Received: from localhost (p3882177-ipxg22501hodogaya.kanagawa.ocn.ne.jp. [180.15.148.177])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-734a005fd15sm2298487b3a.168.2025.02.27.15.05.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Feb 2025 15:05:59 -0800 (PST)
+Date: Fri, 28 Feb 2025 08:05:50 +0900 (JST)
+Message-Id: <20250228.080550.354359820929821928.fujita.tomonori@gmail.com>
+To: daniel.almeida@collabora.com
+Cc: fujita.tomonori@gmail.com, linux-kernel@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, andrew@lunn.ch,
+ hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
+ alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
+ benno.lossin@proton.me, a.hindborg@samsung.com, aliceryhl@google.com,
+ anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de,
+ arnd@arndb.de, jstultz@google.com, sboyd@kernel.org, mingo@redhat.com,
+ peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
+ dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
+ mgorman@suse.de, vschneid@redhat.com, tgunders@redhat.com, me@kloenk.dev,
+ david.laight.linux@gmail.com
+Subject: Re: [PATCH v11 0/8] rust: Add IO polling
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <4647720C-28CA-4E18-AD1E-55844CF078E6@collabora.com>
+References: <20250220070611.214262-1-fujita.tomonori@gmail.com>
+	<4647720C-28CA-4E18-AD1E-55844CF078E6@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v1 1/3] bpf, sockmap: avoid using sk_socket after
- free
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: cong.wang@bytedance.com, john.fastabend@gmail.com, jakub@cloudflare.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, andrii@kernel.org, eddyz87@gmail.com,
- mykolal@fb.com, ast@kernel.org, daniel@iogearbox.net, song@kernel.org,
- yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, mhal@rbox.co,
- sgarzare@redhat.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- mrpre@163.com, syzbot+dd90a702f518e0eac072@syzkaller.appspotmail.com
-References: <20250226132242.52663-1-jiayuan.chen@linux.dev>
- <20250226132242.52663-2-jiayuan.chen@linux.dev>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20250226132242.52663-2-jiayuan.chen@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 2/26/25 5:22 AM, Jiayuan Chen wrote:
-> Use RCU lock to protect sk_socket, preventing concurrent close and release
-> by another thread.
-> 
-> Because TCP/UDP are already within a relatively large critical section:
-> '''
-> ip_local_deliver_finish
->    rcu_read_lock
->    ip_protocol_deliver_rcu
->        tcp_rcv/udp_rcv
->    rcu_read_unlock
-> '''
-> 
-> Adding rcu_read_{un}lock() at the entrance and exit of sk_data_ready
-> will not increase performance overhead.
+On Thu, 27 Feb 2025 14:29:45 -0300
+Daniel Almeida <daniel.almeida@collabora.com> wrote:
 
-Can it use a Fixes tag?
+> Would you be interested in working on read_poll_timeout_atomic() as well?
+> 
+> There would be a user for that.
+
+I think that I can add it.
+
+But I prefer to push the current patchset into mainline first. I need
+an ack or nack for the first patch from SCHEDULER maintainers.
 
