@@ -1,118 +1,147 @@
-Return-Path: <netdev+bounces-170192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9735A47BCA
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 12:18:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67997A47BD5
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 12:19:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F01D3A452E
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 11:17:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F11E3164F08
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 11:18:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B23C22A1C0;
-	Thu, 27 Feb 2025 11:14:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72CF722B8D1;
+	Thu, 27 Feb 2025 11:17:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Ukm+VJdB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jPNjd8QA"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9868F22A4C5;
-	Thu, 27 Feb 2025 11:14:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD7CE1DDD1;
+	Thu, 27 Feb 2025 11:17:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740654899; cv=none; b=YQJaLRGvQfQjvG9oHPizd6b7BUjMNFGQb5utV1vFyoejv79asMn+nCji+WcuyRgtj5O/yaHZTWwfBgM95cyRavwwkO8vUqAHCOSfXB27lOpWUe/HX93dfyNg1MxTtQOdE/b7F/7JvrU3m59XFTPUFle8xRm/0U6iOjdUKhjlzfs=
+	t=1740655071; cv=none; b=sLiprThhxp/HKSakvwFOR1XNzlBP9iEehm1Cozj2xPhnxHtZ5ar6o4bSZGLtiUcjUSrNByuVYsv2WXLcX5i9DqwmvbJSdVVVpq6mVCrvyxD+IEfRPvAxQHA0ZIeKQYO2DffA+vCI90V8EC7Rw+LuFeh1wMFcPetzbUKHoDDRDS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740654899; c=relaxed/simple;
-	bh=b8B0EikosVZ437a/eglgDC8USmkxAH6JQNTKeLA7SjU=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pE3qZ+de/S81a/JTAY+z2aHrY824TVhuU7zkgD6kpiM7Jw1e8ru7Ai5NhgMasvBG8TDuumyI1/r83ObiBr6lYaz7JD5uM8WnWgA61yWxM2xoM7muJdMO99hlSlrt+An9zWavwZJBRUj/OZ2VJiCTFdkppcRuFKJoGUiDMzyVTWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Ukm+VJdB; arc=none smtp.client-ip=198.47.19.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 51RBEhbp1752657
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 27 Feb 2025 05:14:43 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1740654883;
-	bh=CdJSw/chnCmKUnyDanFAYQUq+B+4rxHEynYliRPKg9I=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To;
-	b=Ukm+VJdBwN/9eAgRk7lq3nqBF/tGAqpn1gTRDCCvMPxi9jboA1H0AJUl5SHHOZ4aX
-	 LcFt+EnyG9amVrasX75wI52J6+izGlm2DMzw5H4+BYJo8/pe7d5hP7FUdCcMP+s6pK
-	 yaJymDkDgiqk1bez8J67a1Gl+Ld61F7zTP5rUNjo=
-Received: from DLEE104.ent.ti.com (dlee104.ent.ti.com [157.170.170.34])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 51RBEhYN009041
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 27 Feb 2025 05:14:43 -0600
-Received: from DLEE102.ent.ti.com (157.170.170.32) by DLEE104.ent.ti.com
- (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 27
- Feb 2025 05:14:42 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE102.ent.ti.com
- (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 27 Feb 2025 05:14:42 -0600
-Received: from localhost (uda0492258.dhcp.ti.com [10.24.72.113])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 51RBEfqT031097;
-	Thu, 27 Feb 2025 05:14:42 -0600
-Date: Thu, 27 Feb 2025 16:44:41 +0530
-From: Siddharth Vadapalli <s-vadapalli@ti.com>
-To: "A. Sverdlin" <alexander.sverdlin@siemens.com>
-CC: Siddharth Vadapalli <s-vadapalli@ti.com>,
-        Roger Quadros
-	<rogerq@kernel.org>, <netdev@vger.kernel.org>,
-        Andrew Lunn
-	<andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, <linux-omap@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: ethernet: ti: cpsw_new: populate netdev
- of_node
-Message-ID: <20250227111441.athqur6dcesdk5gb@uda0492258>
-References: <20250227074704.4067481-1-alexander.sverdlin@siemens.com>
+	s=arc-20240116; t=1740655071; c=relaxed/simple;
+	bh=CNhFV9T14sh7OY2SRFlpy7R8+gM04CqgJ0xYvF9HFpo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qdTIOCSbsRouaWTTTkkv4YyARemOy81YHCM8Ibpgr7OSw0CXP6uWbhIRa0FK7F2B42S5Tb4qdd9np2WFimudh27tJ4k17eXJJCHWVp05zPCu2SEe/LH3cwyDcXLjUiDn6S+NYragqIFRvJtjrjVo8gguc+KBau5+kJe7+i6zkDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jPNjd8QA; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740655070; x=1772191070;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=CNhFV9T14sh7OY2SRFlpy7R8+gM04CqgJ0xYvF9HFpo=;
+  b=jPNjd8QA/cmsBgf2MsfeALyTkg6vEvSV9xzSxwahOdKFiEoNAFU5EwxT
+   RDipRbNKcP5tiS2Z1eiaNWjx6pcRT/610pI+TdZBKbiq+dD3FV+UdYGyD
+   1FfIZXXOxsi1SzYujA8ynJ5AOY5GFj4xw7tQylVqSIvMfFefdv824ZfUT
+   ZVN84HkLX683KbumMMR8DwJTqi8XKGTJtJ8jQwdmF6astiQEGBinMJAFq
+   G8L+HlWlPs5YqNL0ibnX8YIjbb3yn839nVa16gChDLfVUMiCm0fELcK2L
+   g5i1ABUxm37lv9hxZhx5fzyAAxAPFFs20dxQ/Kv+3Obkak/bWApYT/5Bw
+   w==;
+X-CSE-ConnectionGUID: bPkUtZsIS4SM4zlGlNy5Bw==
+X-CSE-MsgGUID: DO6GtJHJQheOZQrZSPgFuQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11357"; a="58955498"
+X-IronPort-AV: E=Sophos;i="6.13,319,1732608000"; 
+   d="scan'208";a="58955498"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 03:17:49 -0800
+X-CSE-ConnectionGUID: 3Tb9u1sUQPaKicuPXGkj2w==
+X-CSE-MsgGUID: 45DyLiKXRPyvMBlpNWZcDw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,319,1732608000"; 
+   d="scan'208";a="117172315"
+Received: from choongyo-mobl.gar.corp.intel.com (HELO [10.247.81.210]) ([10.247.81.210])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 03:17:41 -0800
+Message-ID: <1ff2fcac-d9d5-4c70-a101-f7026b50646a@linux.intel.com>
+Date: Thu, 27 Feb 2025 19:17:39 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250227074704.4067481-1-alexander.sverdlin@siemens.com>
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 1/6] net: phylink: use pl->link_interface in
+ phylink_expects_phy()
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Simon Horman <horms@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+ Jose Abreu <Jose.Abreu@synopsys.com>,
+ David E Box <david.e.box@linux.intel.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H . Peter Anvin" <hpa@zytor.com>,
+ Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
+ David E Box <david.e.box@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jiawen Wu <jiawenwu@trustnetic.com>,
+ Mengyuan Lou <mengyuanlou@net-swift.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Hans de Goede <hdegoede@redhat.com>,
+ =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Serge Semin <fancer.lancer@gmail.com>, x86@kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ platform-driver-x86@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
+References: <20250226074837.1679988-1-yong.liang.choong@linux.intel.com>
+ <20250226074837.1679988-2-yong.liang.choong@linux.intel.com>
+ <Z780cM9bejxhzTXO@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+In-Reply-To: <Z780cM9bejxhzTXO@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 27, 2025 at 08:46:46AM +0100, A. Sverdlin wrote:
-> From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+
+
+On 26/2/2025 11:34 pm, Russell King (Oracle) wrote:
+> On Wed, Feb 26, 2025 at 03:48:32PM +0800, Choong Yong Liang wrote:
+>> The phylink_expects_phy() function allows MAC drivers to check if they are
+>> expecting a PHY to attach. The checking condition in phylink_expects_phy()
+>> aims to achieve the same result as the checking condition in
+>> phylink_attach_phy().
+>>
+>> However, the checking condition in phylink_expects_phy() uses
+>> pl->link_config.interface, while phylink_attach_phy() uses
+>> pl->link_interface.
+>>
+>> Initially, both pl->link_interface and pl->link_config.interface are set
+>> to SGMII, and pl->cfg_link_an_mode is set to MLO_AN_INBAND.
+>>
+>> When the interface switches from SGMII to 2500BASE-X,
+>> pl->link_config.interface is updated by phylink_major_config().
+>> At this point, pl->cfg_link_an_mode remains MLO_AN_INBAND, and
+>> pl->link_config.interface is set to 2500BASE-X.
+>> Subsequently, when the STMMAC link goes down and comes up again,
+>> it is blocked by phylink_expects_phy().
 > 
-> So that of_find_net_device_by_node() can find cpsw-nuss ports and other DSA
-> switches can be stacked downstream. Tested in conjunction with KSZ8873.
+> I thought we ascertained that it's not "link goes down" but when the
+> interface is taken down administratively. "Link goes down" to most
+> people mean an event such as the network cable being unplugged.
+> Please fix the patch description.
 > 
-> Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
-
-Reviewed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
-
-> ---
->  drivers/net/ethernet/ti/cpsw_new.c | 1 +
->  1 file changed, 1 insertion(+)
+>> Since phylink_expects_phy() and phylink_attach_phy() aim to achieve the
+>> same result, phylink_expects_phy() should check pl->link_interface,
+>> which never changes, instead of pl->link_config.interface, which is
+>> updated by phylink_major_config().
+>>
+>> Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
 > 
-> diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/ti/cpsw_new.c
-> index cec0a90659d94..66713bc931741 100644
-> --- a/drivers/net/ethernet/ti/cpsw_new.c
-> +++ b/drivers/net/ethernet/ti/cpsw_new.c
-> @@ -1418,6 +1418,7 @@ static int cpsw_create_ports(struct cpsw_common *cpsw)
->  		ndev->netdev_ops = &cpsw_netdev_ops;
->  		ndev->ethtool_ops = &cpsw_ethtool_ops;
->  		SET_NETDEV_DEV(ndev, dev);
-> +		ndev->dev.of_node = slave_data->slave_node;
->  
->  		if (!napi_ndev) {
->  			/* CPSW Host port CPDMA interface is shared between
-
-Regards,
-Siddharth.
+> With, and *only* with the above fixed:
+> 
+> Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> 
+> Thanks!
+> 
+Thank you for your feedback and clarification. I will update the patch 
+description to accurately reflect the administrative interface down scenario.
 
