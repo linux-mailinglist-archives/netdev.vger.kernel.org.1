@@ -1,154 +1,90 @@
-Return-Path: <netdev+bounces-170410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 715B4A489EB
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 21:32:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAA75A489ED
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 21:33:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61EDD3B7897
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 20:31:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E492A1668C8
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 20:33:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD8B019DF52;
-	Thu, 27 Feb 2025 20:31:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A9461DDA3E;
+	Thu, 27 Feb 2025 20:33:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="CtE8suJn"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gdaT5NOs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx02lb.world4you.com (mx02lb.world4you.com [81.19.149.112])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B39B2AEE0
-	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 20:31:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705963C1F
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 20:33:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740688318; cv=none; b=uFMHOdeJCW9rcLEmbFgacBvme4T9Vy5EXp3j7tiFzotNBzsX2ZRa7K42zcAQINLutqzXVWVLwHbh8rDCfY9JjnaLLZOMQej5/Zuddy5dE/x6NZgF2ZO7LgRkN6wZSViy2Iwt3PyKiwGsNCPT9nUtHXpCGm2avTZtRJ06edCInkc=
+	t=1740688382; cv=none; b=lwAtHw84fA/KAbirs7YejIubszN+2dXDdxMMKpUKz/8WCm1SAjTCCy+fVt45j4jjJFX15jT+UIV5eleWsMI/z5+vF1cLQLOTuSgugF/yLZIP0qduf5+2yd1EErFu7OzL+jxEHn+W4Gak1S+ZVb4zWNV0VD7cPQOw3LNqoQc3dEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740688318; c=relaxed/simple;
-	bh=VxARNUgP1YlGVkhMRSdQLQRUmxHNUAAWwoTX7cZtvng=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=eMo/CtvbjefAA4UmH/OIyznwMSpaDj1C/05uXfEyKh8lNCfZ1L2zMJ3087/83iDfj32k6Ny/k+gRUe9tcGVeAY/fZ9Hu5HSikbsDi4Yp2M2/3JCIhugoN4kyJbpR7a5xaGexG6e7WiA+8vgrKVW3Fj/s3AJD9P0ykrEmxlLY024=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=CtE8suJn; arc=none smtp.client-ip=81.19.149.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=j2RTWx/iEDaz/kSGFvPpAU09x18Ez11+jc7uAhpeyXs=; b=CtE8suJndnT7z2HNKn0Z8QRk8F
-	SHm05f852Xs2p8mPAiYoEJnlNL5/JgJyZBL7+RP4nF/4kgeq0PtnCSDdM4C9+y/ocCCpavYHrxi/V
-	jZbX46Gz58M59L7yobiLCHE0ZwdLiR2niyU35enG6KmNFpQD3KmWFt/Y6dfUK0rlXEa4=;
-Received: from 88-117-55-1.adsl.highway.telekom.at ([88.117.55.1] helo=hornet.engleder.at)
-	by mx02lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.97.1)
-	(envelope-from <gerhard@engleder-embedded.com>)
-	id 1tnkXx-000000000iA-2dEv;
-	Thu, 27 Feb 2025 21:31:53 +0100
-From: Gerhard Engleder <gerhard@engleder-embedded.com>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	Gerhard Engleder <gerhard@engleder-embedded.com>
-Subject: [PATCH net-next v9 8/8] tsnep: Add loopback selftests
-Date: Thu, 27 Feb 2025 21:31:38 +0100
-Message-Id: <20250227203138.60420-9-gerhard@engleder-embedded.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250227203138.60420-1-gerhard@engleder-embedded.com>
-References: <20250227203138.60420-1-gerhard@engleder-embedded.com>
+	s=arc-20240116; t=1740688382; c=relaxed/simple;
+	bh=4Kiaoz8/a4B77D0BEyUMCVK1pmYrQ7xhsz069exA5Sw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UgDX4EpNyvcbjBU4b1boYg22rsuvdx5ZE/1kbK4LDdxnoIzfQoqH4WJH/LcH5L97z4AMA9ovc4/ZyzT4Xp5xdDB+imiPgcjdutuYP8HkoBj8goPE/2DGXEnVI3D5h6MVwrJJbA34MCp5kOEpdrK4VHF1TtYwlfcEXihAqznsk+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gdaT5NOs; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <96dbd7df-1fa7-4caa-a52c-372d696e0f38@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1740688368;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lPZyfCvWgiJkshdLVHHVpjhInvVRGrB2U9muS4L7rYA=;
+	b=gdaT5NOsNx6vhF6HurGBbeJsiytfhlYTg2DTdVgjrlaCyyzJOhZG9MMPERFWjR6FmJmjrD
+	h0xAoJTauJKoeMYcdc21fnGxU63zghrkpQz6O9s86yKoH9sgj2dZ10r37Ti9wfOYABQE9F
+	Lss7denSZvxJqnFh3v1A31puS7Ossbw=
+Date: Thu, 27 Feb 2025 12:32:43 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-AV-Do-Run: Yes
-X-ACL-Warn: X-W4Y-Internal
+Subject: Re: [PATCH bpf-next 1/2] bpf: add get_netns_cookie helper to tracing
+ programs
+To: Mahe Tardy <mahe.tardy@gmail.com>
+Cc: daniel@iogearbox.net, john.fastabend@gmail.com, ast@kernel.org,
+ andrii@kernel.org, jolsa@kernel.org, bpf@vger.kernel.org,
+ Network Development <netdev@vger.kernel.org>
+References: <20250227182830.90863-1-mahe.tardy@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20250227182830.90863-1-mahe.tardy@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Add selftest sets with 100 Mbps and 1000 Mbps fixed speed to ethtool
-selftests.
+On 2/27/25 10:28 AM, Mahe Tardy wrote:
+> This is needed in the context of Cilium and Tetragon to retrieve netns
+> cookie from hostns when traffic leaves Pod, so that we can correlate
+> skb->sk's netns cookie.
+> 
+> Signed-off-by: Mahe Tardy <mahe.tardy@gmail.com>
+> ---
+> This is a follow-up of c221d3744ad3 ("bpf: add get_netns_cookie helper
+> to cgroup_skb programs") and eb62f49de7ec ("bpf: add get_netns_cookie
+> helper to tc programs"), adding this helper respectively to cgroup_skb
+> and tcx programs.
+> 
+> I looked up a patch doing a similar thing c5dbb89fc2ac ("bpf: Expose
+> bpf_get_socket_cookie to tracing programs") and there was an item about
+> "sleepable context". It seems it indeed concerns tracing and LSM progs
+> from reading 1e6c62a88215 ("bpf: Introduce sleepable BPF programs"). Is
+> this needed here?
 
-Signed-off-by: Gerhard Engleder <gerhard@engleder-embedded.com>
----
- .../net/ethernet/engleder/tsnep_selftests.c   | 30 +++++++++++++++----
- 1 file changed, 24 insertions(+), 6 deletions(-)
+Regarding sleepable, I think the bpf_get_netns_cookie_sock is only reading, 
+should be fine.
 
-diff --git a/drivers/net/ethernet/engleder/tsnep_selftests.c b/drivers/net/ethernet/engleder/tsnep_selftests.c
-index 8a9145f93147..b1f08f17f55b 100644
---- a/drivers/net/ethernet/engleder/tsnep_selftests.c
-+++ b/drivers/net/ethernet/engleder/tsnep_selftests.c
-@@ -4,6 +4,7 @@
- #include "tsnep.h"
- 
- #include <net/pkt_sched.h>
-+#include <net/selftests.h>
- 
- enum tsnep_test {
- 	TSNEP_TEST_ENABLE = 0,
-@@ -756,27 +757,36 @@ static bool tsnep_test_taprio_extension(struct tsnep_adapter *adapter)
- 
- int tsnep_ethtool_get_test_count(void)
- {
--	return TSNEP_TEST_COUNT;
-+	int count = TSNEP_TEST_COUNT;
-+
-+	count += net_selftest_set_get_count(NET_SELFTEST_LOOPBACK_SPEED);
-+	count += net_selftest_set_get_count(NET_SELFTEST_LOOPBACK_SPEED);
-+
-+	return count;
- }
- 
- void tsnep_ethtool_get_test_strings(u8 *data)
- {
- 	memcpy(data, tsnep_test_strings, sizeof(tsnep_test_strings));
-+	data += sizeof(tsnep_test_strings);
-+
-+	net_selftest_set_get_strings(NET_SELFTEST_LOOPBACK_SPEED, 100, &data);
-+	net_selftest_set_get_strings(NET_SELFTEST_LOOPBACK_SPEED, 1000, &data);
- }
- 
- void tsnep_ethtool_self_test(struct net_device *netdev,
- 			     struct ethtool_test *eth_test, u64 *data)
- {
- 	struct tsnep_adapter *adapter = netdev_priv(netdev);
-+	int count = tsnep_ethtool_get_test_count();
-+	int i;
- 
--	eth_test->len = TSNEP_TEST_COUNT;
-+	eth_test->len = count;
- 
- 	if (eth_test->flags != ETH_TEST_FL_OFFLINE) {
- 		/* no tests are done online */
--		data[TSNEP_TEST_ENABLE] = 0;
--		data[TSNEP_TEST_TAPRIO] = 0;
--		data[TSNEP_TEST_TAPRIO_CHANGE] = 0;
--		data[TSNEP_TEST_TAPRIO_EXTENSION] = 0;
-+		for (i = 0; i < count; i++)
-+			data[i] = 0;
- 
- 		return;
- 	}
-@@ -808,4 +818,12 @@ void tsnep_ethtool_self_test(struct net_device *netdev,
- 		eth_test->flags |= ETH_TEST_FL_FAILED;
- 		data[TSNEP_TEST_TAPRIO_EXTENSION] = 1;
- 	}
-+	data += TSNEP_TEST_COUNT;
-+
-+	net_selftest_set(NET_SELFTEST_LOOPBACK_SPEED, 100, netdev, eth_test,
-+			 data);
-+	data += net_selftest_set_get_count(NET_SELFTEST_LOOPBACK_SPEED);
-+
-+	net_selftest_set(NET_SELFTEST_LOOPBACK_SPEED, 1000, netdev, eth_test,
-+			 data);
- }
--- 
-2.39.5
+The immediate question is whether sock_net(sk) must be non-NULL for tracing.
 
 
