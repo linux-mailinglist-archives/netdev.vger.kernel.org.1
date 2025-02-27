@@ -1,352 +1,245 @@
-Return-Path: <netdev+bounces-170221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3A2EA47DC4
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 13:29:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BE56A47DCF
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 13:33:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CE6D17797C
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 12:27:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E24957A73ED
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 12:32:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B481722B8B6;
-	Thu, 27 Feb 2025 12:27:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22918224B1A;
+	Thu, 27 Feb 2025 12:33:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="itc5ZFp6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nSPXZi8i"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77E481991CD;
-	Thu, 27 Feb 2025 12:27:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340BA27003F;
+	Thu, 27 Feb 2025 12:33:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740659234; cv=none; b=bLUc0Fl9OjNfoekUG9iqOrBhARd6u9BGNc6uKP9YyCLpHRRqg/k+RphOkw9lMR1wdxayUmv7Wtq45cAeq5erNKc9pJM48DeI5L0enXePxwLY4hj9+fBTB8vRtWZFsxYDU8KdK7O54OsCR/t8XASJv2OK5aP2R3O6Go//bzTz8Lk=
+	t=1740659614; cv=none; b=EP1fcjSgUsyrj45wY7wrfLLsgCJed3c0OeAP7KyLdw/CtHnP/tsMv0YPq+UZDuBUaGqf3mhpZKnrAUNEFku9r62x/ssa5c9qK4SJgFsprxyGq7OqBJi/nL1R/vpYyXr/a7pMD/Iib1qOREFT5RkfNbHRTYrU/m3WWScDTHrF19w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740659234; c=relaxed/simple;
-	bh=uMZBezwxFUMj3RoW99boTcLGrIl4YTJQjxUXtEwbbp4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kRAE+BVYFTzpDdHBVXlFJKe0D8cWvYFUkbFuXnqm4HtZf8eaSNk+B800tdqjy5Px2JzDE/rdo5fVkOnsRHidcJimSp7ILA8zCrHmRO+2JSwgbrfRO2G7xlYwHiK6A2FbB1YV9qN+vkQMhd495dFx1vHekhtM5WRqFbSFbWOMUqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=itc5ZFp6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2917AC4CEDD;
-	Thu, 27 Feb 2025 12:27:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740659233;
-	bh=uMZBezwxFUMj3RoW99boTcLGrIl4YTJQjxUXtEwbbp4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=itc5ZFp69cMRKU04DpCA9d0bZ88EJhRVt6NNGlZ+Qw9D7t5vPq6Ukj/45zjJTFDyU
-	 IzDuTI32kdp4a/vl1Kaoyyj3UEDNXxnsg5N5y5It6XN/58Jdbes6PgQ7SlILJiw6Ht
-	 3sz3UdW8iED/pVzyCmCA7bs8wZf9FLgFBSNYuJkudPDWWjqxkiTyuX/nqOhSor5cyC
-	 0ih6Tlh5RRtuVkr4n7SvKmxDguNp32gAhzQmHiIk82IucvQ6NSM3lMmm2/jG3jZWrp
-	 tN8ofifaTdlTyp+ee4f9zT7obQQmgx1d6oQPhbhqxymGjY8O0BjzkotTMXIHMhTi4R
-	 QAd/y60enq0sw==
-Message-ID: <3d3d180a-12b7-4bee-8172-700f0dae2439@kernel.org>
-Date: Thu, 27 Feb 2025 14:27:05 +0200
+	s=arc-20240116; t=1740659614; c=relaxed/simple;
+	bh=eNCnDk3o13zHYhDmGLY3PfMS8o3BX2U8JaG67s0LvAY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Sb2/KUoQWSMmAChbfVLtnQ6FyBs+PxrggSOI851hts9JRjJWxvcPFZNwAmiXyIcYsNyByS9if3fztwFJg+k5s1J+2Wt+c0CsWCIpPoWzt8h7OOmOTbIoJIpZ7ldFqoK1mrJZxwHHkwq/TU2U2kmP2sFhUCWja3XWnwCeouqfj5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nSPXZi8i; arc=none smtp.client-ip=209.85.214.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-22349dc31bcso13574165ad.3;
+        Thu, 27 Feb 2025 04:33:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740659609; x=1741264409; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=E1UPW0Km5K8LrkkofbxPBeAljxlRf+qjqAALOT7M8Zw=;
+        b=nSPXZi8iW+ArB1SsTYka+EFlslyp/okKilHbHYPj7/NGlLbFfhtwtSIGRI5oMkQnJ7
+         AA+PgJAgp3xF4RU0O8M4ne16nIqCUeBSDKL6yfczwGEXQnBZZ92MpdhzlKqLgptvfvA+
+         OULbYWPk4LfPSRQvqiqnwRa1qgoWatAhLqroA/T1+Js2byMW7nUhJY/IiWoNwtSivq1g
+         DugnrvCZhPbuAUFSajwRsHf9vvJM/bL+ORkrshr3cn5MPTclu6BXkVGyT5grOeLeyinh
+         DAaFRkgau0NsgHjBnWmS/08Nv/mFMu3kXmNBSDhxqggxkT9hJdIB++xpp7+B4FliiSqX
+         +uww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740659609; x=1741264409;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=E1UPW0Km5K8LrkkofbxPBeAljxlRf+qjqAALOT7M8Zw=;
+        b=vzHfs0ALT8NVAnNB+YefkMfhuO6dsCaj/VeBmOpfcIA2UkuOA66vaVH1qLbK3OuQJz
+         5x6GmKsMrvTp2YoLlbVtgjDomTO8kjpwbHxTGJeuoP127UAP1at4de3Re7q0fbgz+OcR
+         29vYRiWzjtHRntZHxe5NRy//PAE10k/5OUQMXLEYugffx5W2ZTS+wZsIYMEQ7Ud/G6sY
+         4geL/akWjNaOJHgmTOh4oY9E7o2oyxLiTiF3VSF2QkuGZhe3Sa50oWr+zbcZ3jytMZkU
+         GWIURmjUIeslVceXhtc6O0XizPUrWIlWgLXd9U1GfRW19mtP24v+gQBCbGfP7v6rNc6e
+         gOVg==
+X-Forwarded-Encrypted: i=1; AJvYcCWue/O4DqIef4k3qrKaWKgoDmDSrcYcLhIOXmaauGxcswfCI6rhPP77qcxpdJsWyxYGiSfO6Fy1@vger.kernel.org, AJvYcCXeUFrZMxtssfZlBBqEpxk/9rFtiCQnPS3LLZl9Xg5Qy5Z06sdLidVltaGeM60Ek6Jf7h9RtwrLe68xQ38=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxjKDhc2ek3f8pd6m0++ZKNz+FV9XRzwqLSaukTG58vGMWquPD
+	CJTtGI7aMog+UbFs0JYlMHFTxPkLIwcPvdoB5ixTZNn6W1HwNtuo
+X-Gm-Gg: ASbGncsJ5NaKlu8UxR22bobtL432iRVZMVr/O4LKPhkhWWGU1nmO0Yji2hh1OqfY5mb
+	VFqgVhlkGLJL39OCK7DY67Ca2zYX9FdlljhE0/Qw3XIhbICxI7w1rotbrc+5Zs+J6R//Odh5WCX
+	8qID6irplFH1QzNiSCdx6ywDCp3fiXIqXzb9Y/EGfBC72w2o0VJsmaQcOiOosFtX2y40kjVkLnx
+	k7QyEySJjXqxvZh0KqU1I9Hx4q/rqOJCbIY+VocJ9ziixBy3Z7METVSFplCXrRJ8IN5peuQm7iU
+	GYKfPtRiwDvgJ/h617H4dLay0nKQKZcF50ygZ8CL6go=
+X-Google-Smtp-Source: AGHT+IHbN+BZckJ+0jjRPlpmszaz/VaHtnknrWt71UWIDmqfJaql6oSUzuNp9uuWeO754PkxMFPphA==
+X-Received: by 2002:a17:902:e752:b0:223:3bf6:7e6a with SMTP id d9443c01a7336-2233bf6806bmr71862745ad.12.1740659609193;
+        Thu, 27 Feb 2025 04:33:29 -0800 (PST)
+Received: from localhost.localdomain ([43.129.244.20])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2235050ceb0sm13132615ad.203.2025.02.27.04.33.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Feb 2025 04:33:28 -0800 (PST)
+From: Menglong Dong <menglong8.dong@gmail.com>
+X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
+To: edumazet@google.com
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	ncardwell@google.com,
+	kuniyu@amazon.com,
+	dsahern@kernel.org,
+	kerneljasonxing@gmail.com,
+	yyd@google.com,
+	dongml2@chinatelecom.cn,
+	petrm@nvidia.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH net-next] net: ip: add sysctl_ip_reuse_exact_match
+Date: Thu, 27 Feb 2025 20:31:37 +0800
+Message-Id: <20250227123137.138778-1-dongml2@chinatelecom.cn>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 2/3] net: ti: icssg-prueth: introduce and use
- prueth_swdata struct for SWDATA
-To: Meghana Malladi <m-malladi@ti.com>, danishanwar@ti.com,
- pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, andrew+netdev@lunn.ch
-Cc: bpf@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- u.kleine-koenig@baylibre.com, matthias.schiffer@ew.tq-group.com,
- dan.carpenter@linaro.org, schnelle@linux.ibm.com, diogo.ivo@siemens.com,
- glaroque@baylibre.com, macro@orcam.me.uk, john.fastabend@gmail.com,
- hawk@kernel.org, daniel@iogearbox.net, ast@kernel.org, srk@ti.com,
- Vignesh Raghavendra <vigneshr@ti.com>
-References: <20250224110102.1528552-1-m-malladi@ti.com>
- <20250224110102.1528552-3-m-malladi@ti.com>
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20250224110102.1528552-3-m-malladi@ti.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+For now, the socket lookup will terminate if the socket is reuse port in
+inet_lhash2_lookup(), which makes the socket is not the best match.
 
+For example, we have socket1 listening on "0.0.0.0:1234" and socket2
+listening on "192.168.1.1:1234", and both of them enabled reuse port. The
+socket1 will always be matched when a connection with the peer ip
+"192.168.1.xx" comes if the socket1 is created later than socket2. This
+is not expected, as socket2 has higher priority.
 
-On 24/02/2025 13:01, Meghana Malladi wrote:
-> From: Roger Quadros <rogerq@kernel.org>
-> 
-> We have different cases for SWDATA (skb, page, cmd, etc)
-> so it is better to have a dedicated data structure for that.
-> We can embed the type field inside the struct and use it
-> to interpret the data in completion handlers.
-> 
-> Increase SWDATA size to 48 so we have some room to add
-> more data if required.
-> 
-> Signed-off-by: Roger Quadros <rogerq@kernel.org>
-> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
-> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
-> ---
-> Changes since v2 (v3-v2):
-> - Fix leaking tx descriptor in emac_tx_complete_packets()
-> - Free rx descriptor if swdata type is not page in emac_rx_packet()
-> - Revert back the size of PRUETH_NAV_SW_DATA_SIZE
-> - Use build time check for prueth_swdata size
-> - re-write prueth_swdata to have enum type as first member in the struct
-> and prueth_data union embedded in the struct
-> 
-> All the above changes have been suggested by Roger Quadros <rogerq@kernel.org>
-> 
->  drivers/net/ethernet/ti/icssg/icssg_common.c  | 52 +++++++++++++------
->  drivers/net/ethernet/ti/icssg/icssg_prueth.c  |  3 ++
->  drivers/net/ethernet/ti/icssg/icssg_prueth.h  | 16 ++++++
->  .../net/ethernet/ti/icssg/icssg_prueth_sr1.c  |  4 +-
->  4 files changed, 57 insertions(+), 18 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
-> index acbb79ad8b0c..01eeabe83eff 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_common.c
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
-> @@ -136,12 +136,12 @@ int emac_tx_complete_packets(struct prueth_emac *emac, int chn,
->  	struct net_device *ndev = emac->ndev;
->  	struct cppi5_host_desc_t *desc_tx;
->  	struct netdev_queue *netif_txq;
-> +	struct prueth_swdata *swdata;
->  	struct prueth_tx_chn *tx_chn;
->  	unsigned int total_bytes = 0;
->  	struct sk_buff *skb;
->  	dma_addr_t desc_dma;
->  	int res, num_tx = 0;
-> -	void **swdata;
->  
->  	tx_chn = &emac->tx_chns[chn];
->  
-> @@ -163,12 +163,19 @@ int emac_tx_complete_packets(struct prueth_emac *emac, int chn,
->  		swdata = cppi5_hdesc_get_swdata(desc_tx);
->  
->  		/* was this command's TX complete? */
-> -		if (emac->is_sr1 && *(swdata) == emac->cmd_data) {
-> +		if (emac->is_sr1 && (void *)(swdata) == emac->cmd_data) {
->  			prueth_xmit_free(tx_chn, desc_tx);
->  			continue;
->  		}
->  
-> -		skb = *(swdata);
-> +		if (swdata->type != PRUETH_SWDATA_SKB) {
-> +			netdev_err(ndev, "tx_complete: invalid swdata type %d\n", swdata->type);
-> +			prueth_xmit_free(tx_chn, desc_tx);
-> +			budget++;
+This can cause unexpected behavior if TCP MD5 keys is used, as described
+in Documentation/networking/vrf.rst -> Applications.
 
-I don't recollect why we need to increase budget here.
+Introduce the sysctl_ip_reuse_exact_match to make it find a best matched
+socket when reuse port is used.
 
-> +			continue;
-> +		}
-> +
-> +		skb = swdata->data.skb;
->  		prueth_xmit_free(tx_chn, desc_tx);
+Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+---
+ include/net/netns/ipv4.h    |  1 +
+ net/ipv4/inet_hashtables.c  | 22 ++++++++++++++++++----
+ net/ipv4/sysctl_net_ipv4.c  |  9 +++++++++
+ net/ipv6/inet6_hashtables.c | 22 ++++++++++++++++++----
+ 4 files changed, 46 insertions(+), 8 deletions(-)
 
-if we set swdata->type to PRUETH_SWDATA_CMD in emac_send_command_sr1() then we could
-reduce all above code including both ifs to
-
-		swdata = cppi5_hdesc_get_swdata(desc_tx);
-		prueth_xmit_free(tx_chn, desc_tx);
-		if (swdata->type != PRUETH_SWDATA_SKB)
-			continue;
-
-		skb = swdata->data.skb;
-
->  
->  		ndev = skb->dev;
-> @@ -472,9 +479,9 @@ int prueth_dma_rx_push_mapped(struct prueth_emac *emac,
->  {
->  	struct net_device *ndev = emac->ndev;
->  	struct cppi5_host_desc_t *desc_rx;
-> +	struct prueth_swdata *swdata;
->  	dma_addr_t desc_dma;
->  	dma_addr_t buf_dma;
-> -	void **swdata;
->  
->  	buf_dma = page_pool_get_dma_addr(page) + PRUETH_HEADROOM;
->  	desc_rx = k3_cppi_desc_pool_alloc(rx_chn->desc_pool);
-> @@ -490,7 +497,8 @@ int prueth_dma_rx_push_mapped(struct prueth_emac *emac,
->  	cppi5_hdesc_attach_buf(desc_rx, buf_dma, buf_len, buf_dma, buf_len);
->  
->  	swdata = cppi5_hdesc_get_swdata(desc_rx);
-> -	*swdata = page;
-> +	swdata->type = PRUETH_SWDATA_PAGE;
-> +	swdata->data.page = page;
->  
->  	return k3_udma_glue_push_rx_chn(rx_chn->rx_chn, PRUETH_RX_FLOW_DATA,
->  					desc_rx, desc_dma);
-> @@ -539,11 +547,11 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id)
->  	u32 buf_dma_len, pkt_len, port_id = 0;
->  	struct net_device *ndev = emac->ndev;
->  	struct cppi5_host_desc_t *desc_rx;
-> +	struct prueth_swdata *swdata;
->  	dma_addr_t desc_dma, buf_dma;
->  	struct page *page, *new_page;
->  	struct page_pool *pool;
->  	struct sk_buff *skb;
-> -	void **swdata;
->  	u32 *psdata;
->  	void *pa;
->  	int ret;
-> @@ -561,7 +569,13 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id)
->  
->  	desc_rx = k3_cppi_desc_pool_dma2virt(rx_chn->desc_pool, desc_dma);
->  	swdata = cppi5_hdesc_get_swdata(desc_rx);
-> -	page = *swdata;
-> +	if (swdata->type != PRUETH_SWDATA_PAGE) {
-> +		netdev_err(ndev, "rx_pkt: invalid swdata->type %d\n", swdata->type);
-> +		k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
-> +		return 0;
-> +	}
-> +
-> +	page = swdata->data.page;
->  	page_pool_dma_sync_for_cpu(pool, page, 0, PAGE_SIZE);
->  	cppi5_hdesc_get_obuf(desc_rx, &buf_dma, &buf_dma_len);
->  	k3_udma_glue_rx_cppi5_to_dma_addr(rx_chn->rx_chn, &buf_dma);
-> @@ -626,15 +640,18 @@ static void prueth_rx_cleanup(void *data, dma_addr_t desc_dma)
->  {
->  	struct prueth_rx_chn *rx_chn = data;
->  	struct cppi5_host_desc_t *desc_rx;
-> +	struct prueth_swdata *swdata;
->  	struct page_pool *pool;
->  	struct page *page;
-> -	void **swdata;
->  
->  	pool = rx_chn->pg_pool;
->  	desc_rx = k3_cppi_desc_pool_dma2virt(rx_chn->desc_pool, desc_dma);
->  	swdata = cppi5_hdesc_get_swdata(desc_rx);
-> -	page = *swdata;
-> -	page_pool_recycle_direct(pool, page);
-> +	if (swdata->type == PRUETH_SWDATA_PAGE) {
-> +		page = swdata->data.page;
-> +		page_pool_recycle_direct(pool, page);
-> +	}
-> +
->  	k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
->  }
->  
-> @@ -671,13 +688,13 @@ enum netdev_tx icssg_ndo_start_xmit(struct sk_buff *skb, struct net_device *ndev
->  	struct prueth_emac *emac = netdev_priv(ndev);
->  	struct prueth *prueth = emac->prueth;
->  	struct netdev_queue *netif_txq;
-> +	struct prueth_swdata *swdata;
->  	struct prueth_tx_chn *tx_chn;
->  	dma_addr_t desc_dma, buf_dma;
->  	u32 pkt_len, dst_tag_id;
->  	int i, ret = 0, q_idx;
->  	bool in_tx_ts = 0;
->  	int tx_ts_cookie;
-> -	void **swdata;
->  	u32 *epib;
->  
->  	pkt_len = skb_headlen(skb);
-> @@ -739,7 +756,8 @@ enum netdev_tx icssg_ndo_start_xmit(struct sk_buff *skb, struct net_device *ndev
->  	k3_udma_glue_tx_dma_to_cppi5_addr(tx_chn->tx_chn, &buf_dma);
->  	cppi5_hdesc_attach_buf(first_desc, buf_dma, pkt_len, buf_dma, pkt_len);
->  	swdata = cppi5_hdesc_get_swdata(first_desc);
-> -	*swdata = skb;
-> +	swdata->type = PRUETH_SWDATA_SKB;
-> +	swdata->data.skb = skb;
->  
->  	/* Handle the case where skb is fragmented in pages */
->  	cur_desc = first_desc;
-> @@ -842,15 +860,17 @@ static void prueth_tx_cleanup(void *data, dma_addr_t desc_dma)
->  {
->  	struct prueth_tx_chn *tx_chn = data;
->  	struct cppi5_host_desc_t *desc_tx;
-> +	struct prueth_swdata *swdata;
->  	struct sk_buff *skb;
-> -	void **swdata;
->  
->  	desc_tx = k3_cppi_desc_pool_dma2virt(tx_chn->desc_pool, desc_dma);
->  	swdata = cppi5_hdesc_get_swdata(desc_tx);
-> -	skb = *(swdata);
-> -	prueth_xmit_free(tx_chn, desc_tx);
-> +	if (swdata->type == PRUETH_SWDATA_SKB) {
-> +		skb = swdata->data.skb;
-> +		dev_kfree_skb_any(skb);
-> +	}
->  
-> -	dev_kfree_skb_any(skb);
-> +	prueth_xmit_free(tx_chn, desc_tx);
->  }
->  
->  irqreturn_t prueth_rx_irq(int irq, void *dev_id)
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> index 00ed97860547..3ff8c322f9d9 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> @@ -1522,6 +1522,9 @@ static int prueth_probe(struct platform_device *pdev)
->  
->  	np = dev->of_node;
->  
-> +	BUILD_BUG_ON_MSG((sizeof(struct prueth_swdata) > PRUETH_NAV_SW_DATA_SIZE),
-> +			 "insufficient SW_DATA size");
-> +
->  	prueth = devm_kzalloc(dev, sizeof(*prueth), GFP_KERNEL);
->  	if (!prueth)
->  		return -ENOMEM;
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> index c7b906de18af..3bbabd007129 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> @@ -136,6 +136,22 @@ struct prueth_rx_chn {
->  	struct page_pool *pg_pool;
->  };
->  
-> +enum prueth_swdata_type {
-> +	PRUETH_SWDATA_INVALID = 0,
-> +	PRUETH_SWDATA_SKB,
-> +	PRUETH_SWDATA_PAGE,
-> +	PRUETH_SWDATA_CMD,
-
-PRUETH_SWDATA_CMD is not beig used so let's use it in emac_send_command_sr1()
-
-> +};
-> +
-> +struct prueth_swdata {
-> +	enum prueth_swdata_type type;
-> +	union prueth_data {
-> +		struct sk_buff *skb;
-> +		struct page *page;
-> +		u32 cmd;
-> +	} data;
-> +};
-> +
->  /* There are 4 Tx DMA channels, but the highest priority is CH3 (thread 3)
->   * and lower three are lower priority channels or threads.
->   */
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c b/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
-> index aeeb8a50376b..7bbe0808b3ec 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
-> @@ -275,10 +275,10 @@ static struct sk_buff *prueth_process_rx_mgm(struct prueth_emac *emac,
->  	struct net_device *ndev = emac->ndev;
->  	struct cppi5_host_desc_t *desc_rx;
->  	struct page *page, *new_page;
-> +	struct prueth_swdata *swdata;
->  	dma_addr_t desc_dma, buf_dma;
->  	u32 buf_dma_len, pkt_len;
->  	struct sk_buff *skb;
-> -	void **swdata;
->  	void *pa;
->  	int ret;
->  
-> @@ -301,7 +301,7 @@ static struct sk_buff *prueth_process_rx_mgm(struct prueth_emac *emac,
->  	}
->  
->  	swdata = cppi5_hdesc_get_swdata(desc_rx);
-> -	page = *swdata;
-> +	page = swdata->data.page;
->  	cppi5_hdesc_get_obuf(desc_rx, &buf_dma, &buf_dma_len);
->  	pkt_len = cppi5_hdesc_get_pktlen(desc_rx);
->  
-
+diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
+index 45ac125e8aeb..5e4b63c40e1c 100644
+--- a/include/net/netns/ipv4.h
++++ b/include/net/netns/ipv4.h
+@@ -142,6 +142,7 @@ struct netns_ipv4 {
+ 	u8 sysctl_ip_fwd_update_priority;
+ 	u8 sysctl_ip_nonlocal_bind;
+ 	u8 sysctl_ip_autobind_reuse;
++	u8 sysctl_ip_reuse_exact_match;
+ 	/* Shall we try to damage output packets if routing dev changes? */
+ 	u8 sysctl_ip_dynaddr;
+ #ifdef CONFIG_NET_L3_MASTER_DEV
+diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+index 9bfcfd016e18..5ca495361484 100644
+--- a/net/ipv4/inet_hashtables.c
++++ b/net/ipv4/inet_hashtables.c
+@@ -384,20 +384,34 @@ static struct sock *inet_lhash2_lookup(const struct net *net,
+ 	struct sock *sk, *result = NULL;
+ 	struct hlist_nulls_node *node;
+ 	int score, hiscore = 0;
++	bool reuse_exact_match;
+ 
++	reuse_exact_match = READ_ONCE(net->ipv4.sysctl_ip_reuse_exact_match);
+ 	sk_nulls_for_each_rcu(sk, node, &ilb2->nulls_head) {
+ 		score = compute_score(sk, net, hnum, daddr, dif, sdif);
+ 		if (score > hiscore) {
+-			result = inet_lookup_reuseport(net, sk, skb, doff,
+-						       saddr, sport, daddr, hnum, inet_ehashfn);
+-			if (result)
+-				return result;
++			if (!reuse_exact_match) {
++				result = inet_lookup_reuseport(net, sk, skb,
++							       doff, saddr,
++							       sport, daddr,
++							       hnum, inet_ehashfn);
++				if (result)
++					return result;
++			}
+ 
+ 			result = sk;
+ 			hiscore = score;
+ 		}
+ 	}
+ 
++	if (reuse_exact_match) {
++		sk = inet_lookup_reuseport(net, result, skb, doff, saddr,
++					   sport, daddr, hnum,
++					   inet_ehashfn);
++		if (sk)
++			return sk;
++	}
++
+ 	return result;
+ }
+ 
+diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
+index 3a43010d726f..be93b2c22d91 100644
+--- a/net/ipv4/sysctl_net_ipv4.c
++++ b/net/ipv4/sysctl_net_ipv4.c
+@@ -838,6 +838,15 @@ static struct ctl_table ipv4_net_table[] = {
+ 		.extra1         = SYSCTL_ZERO,
+ 		.extra2         = SYSCTL_ONE,
+ 	},
++	{
++		.procname	= "ip_reuse_exact_match",
++		.data		= &init_net.ipv4.sysctl_ip_reuse_exact_match,
++		.maxlen		= sizeof(u8),
++		.mode		= 0644,
++		.proc_handler	= proc_dou8vec_minmax,
++		.extra1         = SYSCTL_ZERO,
++		.extra2         = SYSCTL_ONE,
++	},
+ 	{
+ 		.procname	= "fwmark_reflect",
+ 		.data		= &init_net.ipv4.sysctl_fwmark_reflect,
+diff --git a/net/ipv6/inet6_hashtables.c b/net/ipv6/inet6_hashtables.c
+index 9ec05e354baa..b8f130a2a135 100644
+--- a/net/ipv6/inet6_hashtables.c
++++ b/net/ipv6/inet6_hashtables.c
+@@ -157,20 +157,34 @@ static struct sock *inet6_lhash2_lookup(const struct net *net,
+ 	struct sock *sk, *result = NULL;
+ 	struct hlist_nulls_node *node;
+ 	int score, hiscore = 0;
++	bool reuse_exact_match;
+ 
++	reuse_exact_match = READ_ONCE(net->ipv4.sysctl_ip_reuse_exact_match);
+ 	sk_nulls_for_each_rcu(sk, node, &ilb2->nulls_head) {
+ 		score = compute_score(sk, net, hnum, daddr, dif, sdif);
+ 		if (score > hiscore) {
+-			result = inet6_lookup_reuseport(net, sk, skb, doff,
+-							saddr, sport, daddr, hnum, inet6_ehashfn);
+-			if (result)
+-				return result;
++			if (!reuse_exact_match) {
++				result = inet6_lookup_reuseport(net, sk, skb,
++								doff, saddr,
++								sport, daddr,
++								hnum, inet6_ehashfn);
++				if (result)
++					return result;
++			}
+ 
+ 			result = sk;
+ 			hiscore = score;
+ 		}
+ 	}
+ 
++	if (reuse_exact_match) {
++		sk = inet6_lookup_reuseport(net, result, skb, doff, saddr,
++					    sport, daddr, hnum,
++					    inet6_ehashfn);
++		if (sk)
++			return sk;
++	}
++
+ 	return result;
+ }
+ 
 -- 
-cheers,
--roger
+2.39.5
 
 
