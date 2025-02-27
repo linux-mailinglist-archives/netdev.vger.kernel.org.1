@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-170086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA598A473E0
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 05:00:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD02EA473E3
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 05:00:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0C2A16DCBB
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 04:00:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 918313AD8E7
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 04:00:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D4B1D90DB;
-	Thu, 27 Feb 2025 04:00:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 798DA1EA7F3;
+	Thu, 27 Feb 2025 04:00:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qN6JZkkB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yr/7qiXH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13A5F270031;
-	Thu, 27 Feb 2025 03:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CE4E270031
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 04:00:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740628800; cv=none; b=DXdXMeO6ns/vt/pELHMP8OpIV92Z9r+kYB1cX8YDYv+3avgQ82AYBzyO4WsZMZ4KTK0d8PnZN8WzWXxro1P+So25D5A0UDeW7ynbCkOW9DhTSeVvZpGJ3PScWYkt1dBg94cPRXzOndIGZqMyo1x03gDLP6m6RNCVu0JU+rszdbI=
+	t=1740628803; cv=none; b=DfAJF+ADcct0bgQQulC3CgM1OinAKExT+Dz4RxJ1IzXfp1uOaaIc60nB+umdqGV0R94T/IVj+YXouu91cwGn6tYmtGb2s1/NiBQds98HnAArwbv9OMurjEE+dUMikGnvqBu2ConpMi8PxIy2EAg5AnRIlONweDSFJItlRt7AWRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740628800; c=relaxed/simple;
-	bh=PXwwjYBG0TEbPFo6wPf+Qlk8kiWbzki99+R+i9PcAlw=;
+	s=arc-20240116; t=1740628803; c=relaxed/simple;
+	bh=60YtClcORqYLLZhjdQN1g9T2hOXxpbaAlj9iALGeMOg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=I5/j3rGhqXUSOCM5nO0ODD71oYNEuYx6xc6b9s++psd0n0NsD1gkzvLbMxa6P9YolET0i8BbUMNvnW5M716b7+h/zf83lUH2NxqzDIdmYlcy7OgQ3mI/h9LNZRhfUtH8qG+wcvj0Wcn1X7hvCC6///Ox8bO2Vl1dpl7sVi7K4Dc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qN6JZkkB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C0E1C4CEDD;
-	Thu, 27 Feb 2025 03:59:59 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=M+lP/seIEogs4RjzqZyCIHjCokMRoBdc7bUzTK3/7ISNaxJCSmF/x5XDSJDNATQbJAlZW3mYwkdcB3k9BUfuuplF1ujQFT54yRhKInLsv+LU4Zz7PVP1J5WXGxihdo3FoB3BqK7uQQlQoCz41m1kOfZwuMOPb2OyQW2PceygQ7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yr/7qiXH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C63D5C4CEDD;
+	Thu, 27 Feb 2025 04:00:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740628799;
-	bh=PXwwjYBG0TEbPFo6wPf+Qlk8kiWbzki99+R+i9PcAlw=;
+	s=k20201202; t=1740628802;
+	bh=60YtClcORqYLLZhjdQN1g9T2hOXxpbaAlj9iALGeMOg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qN6JZkkBV5HIcGNQmUnMNUl0D/cnWKCb7pe8exBqMyO+R2lTfN5KxjWmBrY3IGs3l
-	 rNR+8Hp721FwcsUszXwXtX0SBV+UUuXzet6UlldpXobJ5J7ECGAllxYdX44ypk4h2y
-	 qO9PBKjGfxT6ZO8WyaTSt8KJpmgpd47H4uOX8X50GmoNGbGvJu+eCVwK4E5JHH2tFi
-	 KaSsMQgxGyH33KUBQczz/qxM13TT6yUkmSzDcJ79umK/p+vC+j7RDdfF/L6baj506m
-	 gKrvfKfYFdwLN9unOBdT7864ddEcrMA/y4U/YoRCN17uMbcxDJy5h/y7pR7ioyRszM
-	 3gTzS4OHqbMZw==
+	b=Yr/7qiXH/X4UzvRVEheI1El+/583DumERS4DzLWjLpLuFglyVvnB0BrMfHBC+hJrC
+	 wSCtGRnNK9bokUks82YPUl4VPZZMDxPDzntSx0QATJgdELLtobh97S3BXx9jzKhcef
+	 rw2T0WAcMLmcQRPYPn6guVekIivmEkxAKfxnpfoueWr8y5rp/qbJs8q3I3eGClrTHp
+	 Uqfoa7bDVlEy3N5IWxsQPRc5GZzyJFaJk6VhOmiF6C6uVED4fV6/REM9xfJWisvakQ
+	 L0t9Mqd9ADXjdZ0pfDN8g8mp2kLFDLeMyGCptYpTezyxk0I5Z0+07GHK2/8mWOBVKt
+	 q39GzUv5bJY7w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE01E380CFE6;
-	Thu, 27 Feb 2025 04:00:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE22380CFE6;
+	Thu, 27 Feb 2025 04:00:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,43 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3] mlx5 misc fixes 2025-02-25
+Subject: Re: [PATCH net-next v2] net: skb: free up one bit in tx_flags
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174062883149.960972.10978491350422097713.git-patchwork-notify@kernel.org>
-Date: Thu, 27 Feb 2025 04:00:31 +0000
-References: <20250225072608.526866-1-tariqt@nvidia.com>
-In-Reply-To: <20250225072608.526866-1-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, gal@nvidia.com,
- mbloch@nvidia.com, saeedm@nvidia.com, leon@kernel.org, cratiu@nvidia.com,
- cjubran@nvidia.com, shayd@nvidia.com, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+ <174062883448.960972.9031773189651154624.git-patchwork-notify@kernel.org>
+Date: Thu, 27 Feb 2025 04:00:34 +0000
+References: <20250225023416.2088705-1-willemdebruijn.kernel@gmail.com>
+In-Reply-To: <20250225023416.2088705-1-willemdebruijn.kernel@gmail.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, kerneljasonxing@gmail.com,
+ pav@iki.fi, gerhard@engleder-embedded.com, vinicius.gomes@intel.com,
+ anthony.l.nguyen@intel.com, willemb@google.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 25 Feb 2025 09:26:05 +0200 you wrote:
-> Hi,
+On Mon, 24 Feb 2025 21:33:55 -0500 you wrote:
+> From: Willem de Bruijn <willemb@google.com>
 > 
-> This small patchset provides misc bug fixes from the team to the mlx5
-> core driver.
+> The linked series wants to add skb tx completion timestamps.
+> That needs a bit in skb_shared_info.tx_flags, but all are in use.
 > 
-> Thanks,
-> Tariq.
+> A per-skb bit is only needed for features that are configured on a
+> per packet basis. Per socket features can be read from sk->sk_tsflags.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/3] net/mlx5: Fix vport QoS cleanup on error
-    https://git.kernel.org/netdev/net/c/7f3528f7d2f9
-  - [net,2/3] net/mlx5: Restore missing trace event when enabling vport QoS
-    https://git.kernel.org/netdev/net/c/47bcd9bf3d23
-  - [net,3/3] net/mlx5: IRQ, Fix null string in debug print
-    https://git.kernel.org/netdev/net/c/2f5a6014eb16
+  - [net-next,v2] net: skb: free up one bit in tx_flags
+    https://git.kernel.org/netdev/net-next/c/e6116fc60557
 
 You are awesome, thank you!
 -- 
