@@ -1,127 +1,103 @@
-Return-Path: <netdev+bounces-170330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A82F0A482D3
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:24:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F703A482EE
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:29:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 988713A8564
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 15:23:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 359E83B313A
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 15:29:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0EC826B099;
-	Thu, 27 Feb 2025 15:23:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D1925EF9C;
+	Thu, 27 Feb 2025 15:29:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fQQnLoZm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e7brH9Yn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A3225E473;
-	Thu, 27 Feb 2025 15:23:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10FEA22FAD3
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 15:29:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740669838; cv=none; b=fed1eIewVVscYpyj3LZ59FPXJ2ZgqbXBfe5Q7d4Yimc05hd2+vfcvxzcvk+3wQ4i0VsCPcMsHR915wu4izpYYmBonXOz+qoWf1pdsNIIKgvRmj7HGrNjf7330mUfuGh2k3KGASYpK1P4mE0ZIiYKvWpJqvHj+eREIPNf3bKLIDw=
+	t=1740670176; cv=none; b=WOL1LER0t8IkF34qD4B2CcavZHIE7WSWpqDS3kCsab9zyIsjxAozQ/h/nCwtiZIolCphsR3nEs6XLH0fpTjfirkk3Aa6hYb6wb1mPgmOI8LKxJC8pyrz0HKncXQQSTbYbAwv1VJYqOgkIh+6Ste+cNjVIFOfhCpTEJVoWnaYPMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740669838; c=relaxed/simple;
-	bh=hEZgWF5jcuzJTlTXwHCEelOsenWw00az0sbOKJzuIjs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d0B85kIzQAcTyIBO2kpKh1fV+qujcOy7I6SS2OH5wuWS+IYOtBg2zwQHzrcmuxfBDHelQ/thRy7Rklxp251zcChnwsGnFGfqI0fPqD4R8bliGDb7umzNkdjmf5PYFtOGpC/sI3TirVwIs1hOK+65OBvvGRQVWO5sakV+1l0a5bU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fQQnLoZm; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740669837; x=1772205837;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=hEZgWF5jcuzJTlTXwHCEelOsenWw00az0sbOKJzuIjs=;
-  b=fQQnLoZmKdaNfp3Ex90awzrYz1/XY9fjtuNzgBIJ1xB/PQSOHtdexhv+
-   FdPMfdC2MS5HRmLTizaaHWtGoonrZ3twRBboGr5vMf2HiyTzQXDYiNhd4
-   rbd6UASrbgpwS9JE9gaLJ/MwF0sXD/XoBI9hFsf+2Oj/arxjfmHitK606
-   scIthbG4P2leXgpJMgDdOn7i3bVzLgOxNb0tgt3sEfYO8LQ4FRBZjVV96
-   dOi1hmJ+7H6AFHERN/bFU2pRm8aAA9WiT+EIJafktn7FseKSmi4ixYFhd
-   M2jQLAR/dX1SAd6l77map2WJS+y9gicXdW5Swi4qkbBCYp3nJ/ctXt9Fd
-   Q==;
-X-CSE-ConnectionGUID: csLU+rl1TSOLlAwVrDpKhw==
-X-CSE-MsgGUID: hnN20fSdS2G2zceZtg8X4g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11358"; a="40742561"
-X-IronPort-AV: E=Sophos;i="6.13,320,1732608000"; 
-   d="scan'208";a="40742561"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 07:23:57 -0800
-X-CSE-ConnectionGUID: lz52O0lzRYyBZ25jMHRwTQ==
-X-CSE-MsgGUID: dkDwAZhSRGq/oPn17OU6/w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="117568615"
-Received: from smile.fi.intel.com ([10.237.72.58])
-  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 07:23:52 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1tnfjo-0000000FdE8-2tBf;
-	Thu, 27 Feb 2025 17:23:48 +0200
-Date: Thu, 27 Feb 2025 17:23:48 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: Richard Cochran <richardcochran@gmail.com>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>,
-	Arnd Bergmann <arnd@arndb.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Tianfei Zhang <tianfei.zhang@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Calvin Owens <calvin@wbinvd.org>,
-	Philipp Stanner <pstanner@redhat.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-fpga@vger.kernel.org
-Subject: Re: [PATCH] RFC: ptp: add comment about register access race
-Message-ID: <Z8CDhIN5vhcSm1ge@smile.fi.intel.com>
-References: <20250227141749.3767032-1-arnd@kernel.org>
+	s=arc-20240116; t=1740670176; c=relaxed/simple;
+	bh=QUpTJK9tlDJVqdDLV9qis63xou0rViMbX5C60ys6IJA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=R1SAome4JKFBPIwOxmCUcecuY52tCzr2v5hpqUdavX71daLF/v11Sy8idzvQO6gWjQbnplMaMwfcZ7tBCnB0zWT28/JheCYIf2HhSueiT+pc1jsIUA9qq/rJ41corHtGuz1iewJGA1rSK52gXDPi8QNuJ0HBrbwd5TXXLCak1kc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e7brH9Yn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED7B8C4CEDD;
+	Thu, 27 Feb 2025 15:29:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740670174;
+	bh=QUpTJK9tlDJVqdDLV9qis63xou0rViMbX5C60ys6IJA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=e7brH9YnsPQFi2xqwCGOTuWdTkLhVSiCtc8cdwtfsbDjLltDpbLR4oMNXw9ex5194
+	 niolhm+cCvJg/7acFRYQClInHldMdEfLvtinH2VbwaaiQFiUcySENg7u7Gh40TPkmc
+	 bSzO96ekk/75xkLp4/kpcBK/pxY/vToZFP7tl1sl4KkqljoqisOSOajuOiKCITrliV
+	 mY3kud9Qxgh31d6rIfbX0U7C7IIkLCvyPyCFDr93JZE5B11Tph0Z6fEmqs4DjyybAA
+	 kNSvpt+NaDNrb6f/7qNplxmf50SanLVoDPRXbbAcR0NaMetUPGLaOMJG141iQrFQRp
+	 889571eyMTwTQ==
+Date: Thu, 27 Feb 2025 07:29:33 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Edward Cree <ecree.xilinx@gmail.com>
+Cc: Gal Pressman <gal@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org, Andrew Lunn
+ <andrew@lunn.ch>, Simon Horman <horms@kernel.org>, Joe Damato
+ <jdamato@fastly.com>, Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH net-next] net: ethtool: Don't check if RSS context
+ exists in case of context 0
+Message-ID: <20250227072933.5bbb4e2c@kernel.org>
+In-Reply-To: <275696e3-b2dd-3000-1d7b-633fff4748f0@gmail.com>
+References: <20250225071348.509432-1-gal@nvidia.com>
+	<20250225170128.590baea1@kernel.org>
+	<8a53adaa-7870-46a9-9e67-b534a87a70ed@nvidia.com>
+	<20250226182717.0bead94b@kernel.org>
+	<20250226204503.77010912@kernel.org>
+	<275696e3-b2dd-3000-1d7b-633fff4748f0@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250227141749.3767032-1-arnd@kernel.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 27, 2025 at 03:17:27PM +0100, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
+On Thu, 27 Feb 2025 15:18:47 +0000 Edward Cree wrote:
+> On 27/02/2025 04:45, Jakub Kicinski wrote:
+> > The ordering guarantees of ntuple filters are a bit unclear.
+> > My understanding was that first match terminates the search,
+> > actually, so your example wouldn't work :S  
 > 
-> While reviewing a patch to the ioread64_hi_lo() helpers, I noticed
-> that there are several PTP drivers that use multiple register reads
-> to access a 64-bit hardware register in a racy way.
+> My understanding is that in most ntuple implementations more-
+>  specific filters override less-specific ones, in which case
+>  Gal's setup would work.
+
+The behavior of partially overlapping rules being undefined?
+
+> On other implementations which use the rule number as a
+>  position (like the API/naming implies) you could insert the
+>  5-tuple rule first and that would work too.
 > 
-> There are usually safe ways of doing this, but at least these four
-> drivers do that.  A third register read obviously makes the hardware
-> access 50% slower. If the low word counds nanoseconds and a single
-> register read takes on the order of 1µs, the resulting value is
-> wrong in one of 4 million cases, which is pretty rare but common
-> enough that it would be observed in practice.
+> > Oh, I think Ed may tell us that using context 0 + queue offset is legit.  
+> 
+> I hadn't actually thought of that, but yes that's true too.
+> 
+> Anyway, 'mechanism, not policy' says we should allow ctx 0
+>  unless there's some mechanism reason why it can't be
+>  supported, and I don't see one.
 
-...
+I never uttered the thought that lead me to opposing. 
+ctx 0 is a poor man's pass / accept. If someone needs a pass we should
+add an explicit "action pass". Or am I missing something magical that
+ctx 0 would do that's not 100% the same as pass (modulo the queue
+offset)? Using ctx 0 as implicit pass is a very easy thing to miss
+for driver developers.
 
-> Sorry I hadn't sent this out as a proper patch so far. Any ideas
-> what we should do here?
-
-Actually this reminds me one of the discussion where it was some interesting
-HW design that latches the value on the first read of _low_ part (IIRC), but
-I might be mistaken with the details.
-
-That said, it's from HW to HW, it might be race-less in some cases.
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+But yeah, the queue offset is legit.
 
