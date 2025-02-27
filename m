@@ -1,100 +1,95 @@
-Return-Path: <netdev+bounces-170073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170074-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1663EA47336
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 03:53:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2827A4733E
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 04:00:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA6AF3AC33C
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 02:53:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C029B3AD6E7
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 02:59:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A95317A5A4;
-	Thu, 27 Feb 2025 02:53:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 576CC17A5A4;
+	Thu, 27 Feb 2025 02:59:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dm72vgPE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bwb65igv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D430542A8F;
-	Thu, 27 Feb 2025 02:53:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21BFB2B9B7;
+	Thu, 27 Feb 2025 02:59:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740624793; cv=none; b=HEbK25Qxa9HmlqXivGTX49jSMiNOwrGDPEiUTYoSx1U32lB9o1wTKcsvdw3vYJaq75oX+XDg/4o/jwxeoEsfVgnJ9VKYc6vlxcQbMl/JLn9duZkrXNjlXwDMutpBOeXVjQaQ/oRZ8ExYeslzc6vwLS7WhmxnuBzpcgNdcgdLBJ8=
+	t=1740625199; cv=none; b=r0eHmum934euOzYoL0ZzIMCYzZ9NK5tcnx2cDAUNmKnN4P++SS2Ya1QKuV+pbvd1HGVAx7r0XdIQJk9CoM8qPp9kTOceD+ituDcuj7xG3Ufg6BQwPjWZCYAgVCJjux1JKFq0cevYHUmZs+Dz0W51xw7usWikicDqru+BcXOOq1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740624793; c=relaxed/simple;
-	bh=HQn3kFyIyqvH4epxW53yWGH/1SfObMrTDpgmVoEPrqk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L/u3G8OWXwbYMw3Phyc8i6lnhjuJVNucgTIPRFIUeqDgTh+1iqtPore8PhK/zo96Dgb0+/gVQxlNT5L+iRKcN+b8YvBRQqvYwxo/CVZcylVKqwmW6mrf9oEFgG2iIoyMVTR7Izr2jGTpJQdU/CvQhPuSgj7Fmzyx4xw33+Kvn3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dm72vgPE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A49E4C4CEE2;
-	Thu, 27 Feb 2025 02:53:11 +0000 (UTC)
+	s=arc-20240116; t=1740625199; c=relaxed/simple;
+	bh=FHNoUxelfTkKfhEU1o8kL2H4wpwFqMyC3TKoeJemjHw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=RCLqSejP5IweF2E8CElGADKf3UtBhC0Gf/7vD7GKiN0MtS3yDhQGKW2SXKlbZkY1uA5EERzGVUceKx6HanaILDngutp9R6cuiI/xOMEHzF53OnNR8Z+1ulnLLSQ0gO+p7X+pFH0VPMS+tX/eGRiouUrnIK03qbEkjR4540BgDnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bwb65igv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87A4DC4CED6;
+	Thu, 27 Feb 2025 02:59:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740624792;
-	bh=HQn3kFyIyqvH4epxW53yWGH/1SfObMrTDpgmVoEPrqk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dm72vgPEzDhxvXsgbDuBab5q4/HSlANu+hcSMiVek6Dli7PMo6Ut2OyQ8JRZJId/+
-	 l9oINZuu8w9LBLepUw0hj3uA40e2waZT4+0dFHGLsgMqR54gX7T51FxPZpJKI5Ah19
-	 NnQctRX3OJOkL63XXn+CXkEYC7GC1f8N1X5t5kMTgD8TQeBz0F24EjgQcRA+rSB2JZ
-	 bfau5kfi0old55RcolHdlHhebS1OpD0lTTOUMu1O8UR7EhOa0evwNThttf4EIuXmef
-	 oRfDDLCQ47Kl7rRQI//1SALuvxXiDDUJnqYaB/Gls5xgg1NVOzjv2f9+Nbxp2DS4NE
-	 JSoRWsGM5jn+Q==
-Date: Wed, 26 Feb 2025 18:53:10 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
- <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Jiri Pirko
- <jiri@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>, Carolina Jubran
- <cjubran@nvidia.com>, Gal Pressman <gal@nvidia.com>, Mark Bloch
- <mbloch@nvidia.com>, Donald Hunter <donald.hunter@gmail.com>, Jonathan
- Corbet <corbet@lwn.net>, Saeed Mahameed <saeedm@nvidia.com>, Leon
- Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next 03/10] devlink: Serialize access to rate
- domains
-Message-ID: <20250226185310.42305482@kernel.org>
-In-Reply-To: <wgbtvsogtf4wgxyz7q4i6etcvlvk6oi3xyckie2f7mwb3gyrl4@m7ybivypoojl>
-References: <20250213180134.323929-1-tariqt@nvidia.com>
-	<20250213180134.323929-4-tariqt@nvidia.com>
-	<ieeem2dc5mifpj2t45wnruzxmo4cp35mbvrnsgkebsqpmxj5ib@hn7gphf6io7x>
-	<20250218182130.757cc582@kernel.org>
-	<qaznnl77zg24zh72axtv7vhbfdbxnzmr73bqr7qir5wu2r6n52@ob25uqzyxytm>
-	<20250225174005.189f048d@kernel.org>
-	<wgbtvsogtf4wgxyz7q4i6etcvlvk6oi3xyckie2f7mwb3gyrl4@m7ybivypoojl>
+	s=k20201202; t=1740625198;
+	bh=FHNoUxelfTkKfhEU1o8kL2H4wpwFqMyC3TKoeJemjHw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=bwb65igv6QkvZnS8j3ciTH6rg7swP8ae6xX1ws90OWXbd4IFvKbN5pqOECarDRCTm
+	 8D6Z2ZWyCgaQL6ZuDOCWKdNp6s/3H/TUi2f2IeyaFFEli2DRNsqlucQ8Mr2pShmuV9
+	 3r0trqk7DZlMjQoiZYM9Q0hgA9czqHRanT8x2SoO5lmq5ZjE4IW9XFMFQLXkE+7CMF
+	 MgF33W4GKAZ9cBkUSYp2A2SsRGYh9U7T7CQPj18eL2oW1k1y9pNCMlFViQt/llv8vD
+	 E/99pzhW1TfZGUePzwG4LongWsEe7R0N7ni0EbqwjpxYkHAxwH2p5f09XmBBDi5kke
+	 2+eZ3aLgMYUnA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDAE380CFE6;
+	Thu, 27 Feb 2025 03:00:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] gve: unlink old napi when stopping a queue using queue
+ API
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174062523052.949564.4439537852018025351.git-patchwork-notify@kernel.org>
+Date: Thu, 27 Feb 2025 03:00:30 +0000
+References: <20250226003526.1546854-1-hramamurthy@google.com>
+In-Reply-To: <20250226003526.1546854-1-hramamurthy@google.com>
+To: Harshitha Ramamurthy <hramamurthy@google.com>
+Cc: netdev@vger.kernel.org, jeroendb@google.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ pkaligineedi@google.com, shailend@google.com, willemb@google.com,
+ jacob.e.keller@intel.com, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
 
-On Wed, 26 Feb 2025 15:44:35 +0100 Jiri Pirko wrote:
-> > Why would there still be PF instances? I'm not suggesting that you
-> > create a hierarchy of instances.  
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 26 Feb 2025 00:35:26 +0000 you wrote:
+> When a queue is stopped using the ndo queue API, before
+> destroying its page pool, the associated NAPI instance
+> needs to be unlinked to avoid warnings.
 > 
-> I'm not sure how you imagine getting rid of them. One PCI PF
-> instantiates one devlink now. There are lots of configuration (e.g. params)
-> that is per-PF. You need this instance for that, how else would you do
-> per-PF things on shared ASIC instance?
+> Handle this by calling page_pool_disable_direct_recycling()
+> when stopping a queue.
+> 
+> [...]
 
-There are per-PF ports, right?
+Here is the summary with links:
+  - [net] gve: unlink old napi when stopping a queue using queue API
+    https://git.kernel.org/netdev/net/c/de70981f295e
 
-> Creating SFs is per-PF operation for example. I didn't to thorough
-> analysis, but I'm sure there are couple of per-PF things like these.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Seems like adding a port attribute to SF creation would be a much
-smaller extension than adding a layer of objects.
 
-> Also not breaking the existing users may be an argument to keep per-PF
-> instances.
-
-We're talking about multi-PF devices only. Besides pretty sure we 
-moved multiple params and health reporters to be per port, so IDK 
-what changed now.
 
