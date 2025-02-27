@@ -1,150 +1,123 @@
-Return-Path: <netdev+bounces-170228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9AC3A47E79
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 14:04:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9918A47E9D
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 14:11:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 731D47A30ED
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 13:03:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B22E43B5166
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 13:11:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8BFE22F395;
-	Thu, 27 Feb 2025 13:04:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C682422F178;
+	Thu, 27 Feb 2025 13:11:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Dpw3udR3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lR1W0HlF"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B3111EB5ED;
-	Thu, 27 Feb 2025 13:04:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D98D21ABBE;
+	Thu, 27 Feb 2025 13:11:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740661469; cv=none; b=C5ITfpT4jcwVHPphaBwnLNLxsBkWZHknJf27p7kLafZYNzsQER/8cbATXfJsQxWxRP/npSOGDLcCO5/bLgmvkUnLpvlmWGW3/ENqC6AsLofmqOyBFVXt0Ajxu0L+/fFxJjbo8K8zyDG/dLPRB0tDdypV7v1CnzhT1G7feaUyEvw=
+	t=1740661876; cv=none; b=F4s9EpXBN4Qh77MZeO4IZVB3GHifElG48c9gNz7rH1CfVP92LyJ0zgHKNmwxn6lYNYCAAiIiMT0r2KVtSzz1LGMc7DVorpXsbtf00AbiNiyHq/CYYYAuhDDNAQCody4NlP4pgV9WQxDbfQhTesPS9KLQe5sd1DEGMexS5VySotQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740661469; c=relaxed/simple;
-	bh=RhAn648KZjGR1zL9fk7lBgC1kuhesOSbeueMHlrV+FQ=;
+	s=arc-20240116; t=1740661876; c=relaxed/simple;
+	bh=V/pUxgT+Vht4GXGhv/7+4ABfo2gbm6GzpoHQLy2bYws=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h3fhmBk9yNtZedd0uJfc6NMuRGpGM6oJBgaLn6l9YyJbMAPgyUga06ncKCQdauJ7mN5K9jc3/6wZd4tpACP54NvLTeDhZdJ4sfAKyhZ4b9DIjjshdPzL99wzFGw3EedNmfPBQQis/Uj4MELnRO0Ozx9ytmCHG+sOgLxtS5hvPzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Dpw3udR3; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=C4NTJOJ3dCAJ9+vpvzEprQrWJrpsHSJFBRqUQ8todYw=; b=Dpw3udR3BJAFq9SyV4WrEEtnAj
-	4AK/f2BJmM2iCspBbFHcvyAYokish3HnL+MnOj7JlEsRpxTpwaGNuOZ0GjF1xl2kJOx4qt3J2ahuW
-	az6fb102wILROrGzFvXwJPaH58zNpMOOcrCBc343TieQO3/CDGnn7X1+s/6kO95pgHKXAnEejIoZr
-	eB7TVgWCB6dlZRGlAflwAymbuHq47SCX9B61CP43qWtZ2O6ijiX7nvvVtATjJJOXC5cOJJTTKtd0a
-	0oXIb31u03yt/F+rw+NDupYNgVgy0IBHz3v3ZGkJAqcax4tYjHYegxiTUmQ4/XbT5eUfHjXU340Lp
-	d0XLYfiw==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tndYL-0000000Hb1D-0gW6;
-	Thu, 27 Feb 2025 13:03:49 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 45472300472; Thu, 27 Feb 2025 14:03:47 +0100 (CET)
-Date: Thu, 27 Feb 2025 14:03:47 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Zijun Hu <zijun_hu@icloud.com>
-Cc: Zijun Hu <quic_zijuhu@quicinc.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Will Deacon <will@kernel.org>,
-	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=T2TIhlUvNa/Qp9G23ce6uayIdaK6hpw9j2RK6ey7Y05JaBMRxKLnxGxZhpH2X03T96y8/VsEiZSZctsH8FfJe4PhhNAvH6/U19/QKYNNOBprAgwhOxfHNZ14oprXO3ixSgsZp8PIm+AQ4WNfs5UFI9cuVJ3n7wyx9sZIBWzWrLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lR1W0HlF; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740661875; x=1772197875;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=V/pUxgT+Vht4GXGhv/7+4ABfo2gbm6GzpoHQLy2bYws=;
+  b=lR1W0HlFJqJSz62mDLAeT31grP/v/2yyqyHuMUu4p+tBh9R1cz+PpG15
+   NsjEL26Cc+JW56a/WQbBqvriGpcpwBVuutHciMDzwwO7y0BAOzUcp+N/a
+   tRnZW627wDiEKUeayVu7+lceakOxO1dhwOygymKbP5jGvo+gBpf0M3A3O
+   OC1f9LGTfP+Ge+mOlHaZQHQEGY0EU8fbjeSK7F9Tv/9lUIedOVQWba5Oy
+   P3TFgjsTRI8mvRydSg1Bv5hpBXHmT/p87v/oUqh3f1jqyRIS9S+J+P5t/
+   6gVuoRj8ROByjxAc17LBadZ2PwtofGpzAoxYgC2nOT8t+vQowE07eIHbb
+   w==;
+X-CSE-ConnectionGUID: jOmQY6PJRm+gM+6Q0OIyuA==
+X-CSE-MsgGUID: 6nqxzcezQ3+m2uggEJB5IQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11358"; a="41680687"
+X-IronPort-AV: E=Sophos;i="6.13,319,1732608000"; 
+   d="scan'208";a="41680687"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 05:11:14 -0800
+X-CSE-ConnectionGUID: 4FlIhckrROSowiQsyIKYWA==
+X-CSE-MsgGUID: ahgclakuSvmWi4Ul3UEvZw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,319,1732608000"; 
+   d="scan'208";a="117667489"
+Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
+  by fmviesa009.fm.intel.com with ESMTP; 27 Feb 2025 05:11:10 -0800
+Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tndfQ-000DO4-06;
+	Thu, 27 Feb 2025 13:11:08 +0000
+Date: Thu, 27 Feb 2025 21:10:09 +0800
+From: kernel test robot <lkp@intel.com>
+To: =?iso-8859-1?Q?J=2E_Neusch=E4fer?= via B4 Relay <devnull+j.ne.posteo.net@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>, Lee Jones <lee@kernel.org>,
-	Thomas Graf <tgraf@suug.ch>, Christoph Hellwig <hch@lst.de>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>, linux-arch@vger.kernel.org,
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-gpio@vger.kernel.org, linux-pm@vger.kernel.org,
-	iommu@lists.linux.dev, linux-mtd@lists.infradead.org
-Subject: Re: [PATCH *-next 00/18] Remove weird and needless 'return' for void
- APIs
-Message-ID: <20250227130347.GA5880@noisy.programming.kicks-ass.net>
-References: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
- <46d17d84-5298-4460-96b0-9c62672167a0@icloud.com>
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	=?iso-8859-1?Q?J=2E_Neusch=E4fer?= <j.ne@posteo.net>
+Subject: Re: [PATCH 3/3] dt-bindings: net: Convert fsl,gianfar to YAML
+Message-ID: <202502272036.FSFdbXEm-lkp@intel.com>
+References: <20250220-gianfar-yaml-v1-3-0ba97fd1ef92@posteo.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <46d17d84-5298-4460-96b0-9c62672167a0@icloud.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250220-gianfar-yaml-v1-3-0ba97fd1ef92@posteo.net>
 
-On Thu, Feb 27, 2025 at 08:48:19PM +0800, Zijun Hu wrote:
-> On 2025/2/21 21:02, Zijun Hu wrote:
-> > void api_func_a(...);
-> > 
-> > static inline void api_func_b(...)
-> > {
-> > 	return api_func_a(...);
-> > }
-> 
-> The Usage : Return void function in void function
-> 
-> IMO, perhaps, the usage is not good since:
-> 
-> A) STD C does not like the usage, and i find GCC has no description
-> about the usage.
->    C11/C17: 6.8.6.4 The return statement
->    "A return statement with an expression shall not appear in a
-> function whose return type is void"
+Hi Neuschäfer,
 
-We really don't use STD C, the kernel is littered with extensions.
+kernel test robot noticed the following build warnings:
 
-> B) According to discussion, the usage have function that return type
->    of the callee api_func_a() is monitored. but this function has below
-> shortcoming as well:
-> 
-> the monitor is not needed if the caller api_func_b() is in the same
-> module with the callee api_func_a(), otherwise, provided the callee is
-> a API and provided by author of other module. the author needs to clean
-> up lot of usages of the API if he/she changes the API's return type from
-> void to any other type, so it is not nice to API provider.
-> 
-> C) perhaps, most ordinary developers don't known the function mentioned
->    by B), and also feel strange for the usage
+[auto build test WARNING on 2014c95afecee3e76ca4a56956a936e23283f05b]
 
-It is quite common to do kernel wide updates using scripts / cocinelle.
+url:    https://github.com/intel-lab-lkp/linux/commits/J-Neusch-fer-via-B4-Relay/dt-bindings-net-Convert-fsl-gianfar-mdio-tbi-to-YAML/20250221-013202
+base:   2014c95afecee3e76ca4a56956a936e23283f05b
+patch link:    https://lore.kernel.org/r/20250220-gianfar-yaml-v1-3-0ba97fd1ef92%40posteo.net
+patch subject: [PATCH 3/3] dt-bindings: net: Convert fsl,gianfar to YAML
+config: csky-randconfig-051-20250227 (https://download.01.org/0day-ci/archive/20250227/202502272036.FSFdbXEm-lkp@intel.com/config)
+compiler: csky-linux-gcc (GCC) 14.2.0
+dtschema version: 2025.3.dev3+gabf9328
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250227/202502272036.FSFdbXEm-lkp@intel.com/reproduce)
 
-If you have a specialization that wraps a function to fill out a default
-value, then you want the return types to keep matching.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502272036.FSFdbXEm-lkp@intel.com/
 
-Ex.
+All warnings (new ones prefixed by >>):
 
-return_type foo(type1 a1, type2 a2);
+   Documentation/devicetree/bindings/net/snps,dwmac.yaml: mac-mode: missing type definition
+>> Warning: Duplicate compatible "gianfar" found in schemas matching "$id":
+   	http://devicetree.org/schemas/net/fsl,gianfar-mdio.yaml#
+   	http://devicetree.org/schemas/net/fsl,gianfar.yaml#
 
-return_type my_foo(type1 a1)
-{
-	return foo(a1, value);
-}
-
-is a normal thing to do. The whole STD C cannot return void bollocks
-breaks that when return_type := void, so in that regards I would call
-this a STD C defect.
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
