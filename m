@@ -1,90 +1,135 @@
-Return-Path: <netdev+bounces-170362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93042A48559
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 17:41:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA221A48566
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 17:42:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D3C81884DA1
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:34:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 573571882D1B
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:36:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BECA1B0421;
-	Thu, 27 Feb 2025 16:34:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53F6C1B3943;
+	Thu, 27 Feb 2025 16:36:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M4RsCdOi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X3naGwzD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F671B041A
-	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 16:34:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689554EB38;
+	Thu, 27 Feb 2025 16:36:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740674087; cv=none; b=YgZw0fMl57qVj31wND53a1KSpvZmyM1MKufNLeCw0cbiFpCLW8+bH7ufA+HJu+ru1CrJiHom/FmiruIZ0852V4Y57P0x32Fk3uXhPIoRnYTus/snzM+4OQxHUvnHa5KxndrvMG2ssSB/2afBSjk9vEzuyyIHQsnsRDLz0pnc6R8=
+	t=1740674173; cv=none; b=HYxfSoZ8fz0sq/es52L6Y+4ivOWv/+p29MvFsOgl8NgXBknsMoIo1EOagm9VIyvzF4EaQLhyOnG9R2lR8VJN2zCLit5clroU8DDHnG1JpS58xO2LB6cA7v9L1hASyMpxgspzqeOH5mCzpZ4I26OZWogx7/QKr/7PYTdKhSBqKFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740674087; c=relaxed/simple;
-	bh=0OWAyt3dqDZpOPG8zEzY5KOJn6j0Uth/O3OxqkWjWog=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TCql47+aQkjIZ+S8gS7AV7wWhjJt5GGZ8dquXeKn8Zp/bmCgSRcz/npmNw3/vRXdq1joVTjKgqvSEZy6S1iyzDeiKPRbBDcPK7Ku9DO4Lre6xY59E7owwVDbdsWlyvzar9xEWyrMqMpRMKAiDdMYel8P2avRchYt2uOxIjt4ZiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M4RsCdOi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 113E0C4CEE6;
-	Thu, 27 Feb 2025 16:34:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740674086;
-	bh=0OWAyt3dqDZpOPG8zEzY5KOJn6j0Uth/O3OxqkWjWog=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=M4RsCdOiAW/CPvflutqrgmUImvsKfiP1bi5o8NgIi1N3SCFbjUJpno8fy9q8FOjc2
-	 aMDybi3dn2VwIi5Ub05jGVieL4yzNU3Unf00bVzVP7EbdwfgzbLM0rvPu9z7rykeLl
-	 OKUuPLxrf3R3ZBkpBmGQwqOk9/m1OTosmOVWwQmy0n2j3p9eQfK6P513e3mkISIJOY
-	 cfqNqBYSeN+wwTNgVRPvP4l66y4uPPExDiofozknh44JtCn8ubZcMz9E26v4ZZNVOg
-	 9H/bJFQ4+WWhbQC02goBB58duYf1RZJ0Me0clhDzAwYxMkkvzDUW4uBLIeRLaGiNvw
-	 ie3i9/terG3Ug==
-Date: Thu, 27 Feb 2025 08:34:45 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Alvin =?UTF-8?B?xaBpcHJhZ2E=?= <alsi@bang-olufsen.dk>, Andrew Lunn
- <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Luiz Angelo Daros de Luca <luizluca@gmail.com>,
- netdev@vger.kernel.org, kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH v3] net: dsa: rtl8366rb: Fix compilation problem
-Message-ID: <20250227083445.7613e2b9@kernel.org>
-In-Reply-To: <20250220-rtl8366rb-leds-compile-issue-v3-1-ecce664f1a27@linaro.org>
-References: <20250220-rtl8366rb-leds-compile-issue-v3-1-ecce664f1a27@linaro.org>
+	s=arc-20240116; t=1740674173; c=relaxed/simple;
+	bh=tW6s2JKeVYmMjgRZ0LxOh+ZtmueuEyrTI2i0CLDEnCA=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=tNrPYQsnOm+wo2JfnBDIq+oobRmpGt2spQIXflQVOd4LyBy23Taze5pz2EOmkm9HRHjVI2tpo0O5BWB+oMWzRybmuWO57tiSlLg8XN2e985USN9I/93M/u+0Cw8zmPjiS3pXh0jhjHEl/AlGzOndz1d5fzvD3Uge1hO8j4eXeEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X3naGwzD; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6e889e77249so10284536d6.1;
+        Thu, 27 Feb 2025 08:36:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740674167; x=1741278967; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YLuG7vjn/hSKib3SZKgP6rgyU2H+3BpnRfZM3277BQA=;
+        b=X3naGwzDxFd2n/juLJmVg9Ny9khVmzLCbtx62DaODl0y0UEEzymk0wTOlz0IOmCVoR
+         PNgS8fCNu6vPmXr0p0CGz/sywuNQaFq8U2hAj4OdlLBQwRZseem25H2nXtgezxsSlNk+
+         j1zRIAfLYaffgwaFuqXPij7zYU+31BByk7LQWxuxg0PFiq4FTy53GG0FwfJ/sbgDfLXR
+         WGDWVNim2o/rfuULyzx3h4k0aChT5VITm2HU8kOSp6wyT7oEF59pTVaP4ANBzjThbo1B
+         qLfN4VLgG2C+eOt3IV5VlqEBXF4sLZ7S5cDELn9XQLLT2rj8NpO7iwNdQW9X3FpoKaCd
+         4gwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740674167; x=1741278967;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=YLuG7vjn/hSKib3SZKgP6rgyU2H+3BpnRfZM3277BQA=;
+        b=aJdFt72erBp3+eUhltzxPRZoMc75yisJNnAKgUByZPF1qf2G7Jva6FTj2nBulmtK6I
+         DnnYVeqlGPZZdrz2hBDp8tLJ9ar9H5RM5E7R6+HOI57yZjPUmOrQhZ8zGGeaUSbXiTdx
+         7XnGq9RNHayEn9m7+INIAHsl7YwI0X1m45aoKRVZ8WgOTCkS64qC5x5bBVXuxoX7gjZS
+         pjvsRUe/zZ3vFdM8kijU/Yf/d6jc/bw28Kgd/dlqjg1KTBYVr7DEz6k1tAeCc3uB7M+d
+         YHF+uZGF+3kfzVSQyKMNAAjbWNc0RCqqNMVocWvcA+OGyUOvyn2+TN+HMKDPAUFjgSTB
+         4UBA==
+X-Forwarded-Encrypted: i=1; AJvYcCW6JhOG+/wLbQHm0/yPXffBVQtnI8JICM2FmuSifxyUtg11SWsvFgGR9eA6xeDwUojH4cXU8ynR2nUBzBx5imo9@vger.kernel.org, AJvYcCXTdzyqS/q1WWEOHkzeyExzC8P6REh8pAz/BQcdXUzuh8hnJsqvywx1yUFUDKfjOH3wq0+92PNfDkicfhs=@vger.kernel.org, AJvYcCXktGFKEwn0FqlOQYjpU9FUW/nI5221H/SB84PorwnGPCpmaTqRgJs5OnDa8GgGybcvphY7+Vvy@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4m5dDzQkYQZx7H/5jexhq8PTOUMR9eEvozwWrn0eGm3Mv+ByE
+	GI0Jjw++sgsfahHgNByeTzWdgjOuvlTkUmRBAL/X6J+xU33ZWKBZ
+X-Gm-Gg: ASbGncv20xY10jYH7ueSwIgpltXOaR0J41lWAtk8hivl2Qrm3ngOht6FeLCOBq5xXUo
+	T+/S2t3MxzJe6WOrIvaZ61GS4/UCLerD9CQcumJQr96oThLBZ9KPyoZWNoRlqo1Co4QCb6U26JX
+	F3548HA1WEK8s9X7X9AZySZl8cZpzzjh8HGDf6CJhYPrEmMadSNtUuDTSq+Qg8Ggdbu1+wo6h0H
+	x+InukQc2651Z4HyuIGdDMQdJUlF0ueGJyAb0gSebTjovsZ9uOVya+Lj1xgpSYm65iqBNFL7+aC
+	ci5num24ZthP4ocJ9zDiyPeXjOpzVelP++IERkhN8pK8ppNj48LZB759bGWieA47wDQvPZ3c2Hc
+	1jBo=
+X-Google-Smtp-Source: AGHT+IFNLlyGHLJ8yNyFO5ni48kZW3U6VXxOlfgUtSsr3Wug6ZtI+rA6mhO8eVO9q1umiyhsXnA4pQ==
+X-Received: by 2002:ad4:5f0a:0:b0:6e8:9444:7ac8 with SMTP id 6a1803df08f44-6e8a0d093a0mr1377866d6.17.1740674167401;
+        Thu, 27 Feb 2025 08:36:07 -0800 (PST)
+Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e897634d3esm11507256d6.11.2025.02.27.08.36.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Feb 2025 08:36:06 -0800 (PST)
+Date: Thu, 27 Feb 2025 11:36:06 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Kevin Krakauer <krakauer@google.com>, 
+ netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>, 
+ linux-kernel@vger.kernel.org, 
+ Kevin Krakauer <krakauer@google.com>
+Message-ID: <67c0947690e22_37f92929444@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250226192725.621969-1-krakauer@google.com>
+References: <20250226192725.621969-1-krakauer@google.com>
+Subject: Re: [PATCH v2 0/3] selftests/net: deflake GRO tests and fix return
+ value and output
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-On Thu, 20 Feb 2025 19:48:15 +0100 Linus Walleij wrote:
-> +config NET_DSA_REALTEK_RTL8366RB_LEDS
-> +	bool "Support RTL8366RB LED control"
-> +	depends on (LEDS_CLASS=y || LEDS_CLASS=NET_DSA_REALTEK_RTL8366RB)
-> +	depends on NET_DSA_REALTEK_RTL8366RB
-> +	default NET_DSA_REALTEK_RTL8366RB
+Kevin Krakauer wrote:
+> The GRO selftests can flake and have some confusing behavior. These
+> changes make the output and return value of GRO behave as expected, then
+> deflake the tests.
+> 
+> v2:
+> - Split into multiple commits.
+> - Reduced napi_defer_hard_irqs to 1.
+> - Reduced gro_flush_timeout to 100us.
+> - Fixed comment that wasn't updated.
+> 
+> v1: https://lore.kernel.org/netdev/20250218164555.1955400-1-krakauer@google.com/
 
-Is there a reason to prompt the user for this choice?
-IOW is it okay if I do:
+For next time: add target: [PATCH net-next]
 
-diff --git a/drivers/net/dsa/realtek/Kconfig b/drivers/net/dsa/realtek/Kconfig
-index 10687722d14c..d6eb6713e5f6 100644
---- a/drivers/net/dsa/realtek/Kconfig
-+++ b/drivers/net/dsa/realtek/Kconfig
-@@ -44,7 +44,7 @@ config NET_DSA_REALTEK_RTL8366RB
-          Select to enable support for Realtek RTL8366RB.
  
- config NET_DSA_REALTEK_RTL8366RB_LEDS
--       bool "Support RTL8366RB LED control"
-+       bool
-        depends on (LEDS_CLASS=y || LEDS_CLASS=NET_DSA_REALTEK_RTL8366RB)
-        depends on NET_DSA_REALTEK_RTL8366RB
-        default NET_DSA_REALTEK_RTL8366RB
+> Kevin Krakauer (3):
+>   selftests/net: have `gro.sh -t` return a correct exit code
+>   selftests/net: only print passing message in GRO tests when tests pass
+>   selftests/net: deflake GRO tests
+> 
+>  tools/testing/selftests/net/gro.c         | 8 +++++---
+>  tools/testing/selftests/net/gro.sh        | 7 ++++---
+>  tools/testing/selftests/net/setup_veth.sh | 3 ++-
+>  3 files changed, 11 insertions(+), 7 deletions(-)
+> 
+> -- 
+> 2.48.1.658.g4767266eb4-goog
+> 
 
-?
+
 
