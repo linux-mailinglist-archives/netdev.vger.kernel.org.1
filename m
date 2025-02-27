@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-170163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D10AA478CE
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 10:16:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D43F3A478D1
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 10:17:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0775B188C413
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 09:17:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80DE3188E4FC
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 09:17:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF01F1E1E08;
-	Thu, 27 Feb 2025 09:16:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAACF1E1E08;
+	Thu, 27 Feb 2025 09:16:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="UdCEG4Ut"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="vcjrEA4X"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A14226188
-	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 09:16:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A0B92153EA
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 09:16:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740647811; cv=none; b=XDKPesPUTEYgGPN0K4XbtWZLn7toSSE3Uo9wCC7qHys28UJwuIlC6jbOwNxVCZwy/3CWWC/+dJTPVWXihQXU/wIthdP3+bQx4y41CYqEI9eC3EPdLJ13Qm88KjGIziFNNgMPMiNE+3HXAgCf/L/G6DSAfCz2T/UxqwuRzBItW64=
+	t=1740647817; cv=none; b=DrL5yHl7ipNgIpPlrVLWySdtN3Rm8CB1kEx+zFfatt8/dwC4WhRART+Z2o2aqA7k2D1QmpL7cnm8YWXOWWCMZ8rFmxOG4hVXXOYVLi0eZVNS0hIHLJKZMEgiMBq/BFYwNpMN/OxSBpXdlBPGYDe9NO9tEuyrS37BXyjuVEPjRH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740647811; c=relaxed/simple;
-	bh=oV2l56ZByNTM5dNWmPtzF1lL29lUlMMH33IKm+GWPaA=;
+	s=arc-20240116; t=1740647817; c=relaxed/simple;
+	bh=RbhXV0HJc8fW4BgIFHZgkvkB3Ls6+0LNpZQb+ADIjJk=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=c/z8PHnEJvmcg0f19OfQNTa0DE4aZoJ/S/q0noAQ/yse3eGFsXnrH8lvj7M4GKk6NJrjXyvytwa2qEfJVAGtvaKDe4dpOBoxD/K14lF6WN6dcx2eZoegU6NT8hOg+8LlqmYu4Wbqs4B10jUSPFOqE/3tzlWA+h9TlqO0wj7Tod8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=UdCEG4Ut; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=oJMuPf9c29NmL5snaKxkVB4BXUeWb2m5wgccZowZMivKPMYTgZfb01hKZ9+tHxZmPCUw2O+Uoqu8zXCoudHcVoqCOixV8lVLxI1y3EQHl9jNFLOxuZ1zMjTkQ6EsQJQsOlu8X7iyebK18IsOJ5kQldzkzlg5f7l+M3vrvKTQ7UE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=vcjrEA4X; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=85VgIqhBATiy0aavPuYyQryWEVxMpvOYtGXBoWcV9P0=; b=UdCEG4Utz2Bq+l0roktewsEruR
-	q4XSHgKawZ3ddVXyAP5T9aBO9BwkenUH8I8mxH5vXUFniJSLslWDRlZ9sr0ja9HII1LDX/m3OVUem
-	nVd7B7Sb/ywC95kA/MI8wi3TtGDaSTOurQ1djMxcOqoKfebeCjpit1J4d5yOwX2DB//GslQ2m+BkX
-	XtE2K0ONJVXV8iYN2Cwnw2JtYJa+hzVDGfzYvuUBm95V364L+TjPnxTKdCwvd0Cj/YOz+TdmsMzOY
-	m4qN0tPp/MVrZ9ZNLl2b0z7n1y/CG38TBfcmnWCvh1JOHuI7kFoOOHUbgqGULjumqqS1gwY7UVzcP
-	rHp9CIBQ==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:36296 helo=rmk-PC.armlinux.org.uk)
+	bh=+Is/usG/uTbxek38OoQ9V19tnOww4Olpp8b53U8TJtM=; b=vcjrEA4XEg4A07h0C1gTEKrqbI
+	jKt8zGOvkremvhnM1/jbvZCu8x63BANbfIKHk81ELFCHmzAzbHxWQE74LpVEgK/3ovWhfb94M5YZQ
+	BUC0jtgRa5bU62QW52gxOyDBfsANj0T9x+iiI+frTJ+I1DDGrDEgpY5h/XT5YXESuoCNPZ2EY4gcw
+	w5HFyqMqn8lKK9RsI3aTbTBTlB7QW4AmrujK7wcUBjHEsBtfJSzOzx2PNo718A0EERCw/7XVm1MdP
+	ic4srHrzdOmnnDBLcA6Qg1tXxLBZWDpaqs5PFPn4usyxkTmm10VQ2QBhZznlkrd8p8yv6Y/QqzNJt
+	lOpNVEBA==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:36302 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tna0Z-0006bW-2F;
-	Thu, 27 Feb 2025 09:16:43 +0000
+	id 1tna0e-0006bo-2R;
+	Thu, 27 Feb 2025 09:16:48 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tna0F-0052sS-Lr; Thu, 27 Feb 2025 09:16:23 +0000
+	id 1tna0K-0052sY-QF; Thu, 27 Feb 2025 09:16:28 +0000
 In-Reply-To: <Z8AtX-wyPal1auVO@shell.armlinux.org.uk>
 References: <Z8AtX-wyPal1auVO@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -67,7 +67,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 01/11] net: stmmac: provide set_clk_tx_rate() hook
+Subject: [PATCH net-next 02/11] net: stmmac: provide generic implementation
+ for set_clk_tx_rate method
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,99 +78,78 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tna0F-0052sS-Lr@rmk-PC.armlinux.org.uk>
+Message-Id: <E1tna0K-0052sY-QF@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 27 Feb 2025 09:16:23 +0000
+Date: Thu, 27 Feb 2025 09:16:28 +0000
 
-Several stmmac sub-drivers which support RGMII follow the same pattern.
-They calculate the transmit clock rate, and then call clk_set_rate().
-
-Analysis of several implementation documents suggests that the platform
-is responsible for providing the transmit clock to the DWMAC core's
-clk_tx_i. The expected rates are:
-
-	10Mbps	100Mbps	1Gbps
-MII	2.5MHz	25MHz
-RMII	2.5MHz	25MHz
-GMII			125MHz
-RGMI	2.5MHz	25MHz	125MHz
-
-It seems some platforms require this clock to be manually configured,
-but there are outputs from the MAC core that indicate the speed, so a
-platform may use these to automatically configure the clock. Thus, we
-can't just provide one solution to configure this clock rate.
-
-Moreover, the clock may need to be derived from one of several sources
-depending on the interface mode.
-
-Provide a platform hook that is passed the transmit clock, interface
-mode and speed.
+Provide a generic implementation for the set_clk_tx_rate method
+introduced by the previous patch, which is capable of configuring the
+MAC transmit clock for 10M, 100M and 1000M speeds for at least MII,
+GMII, RGMII and RMII interface modes.
 
 Reviewed-by: Thierry Reding <treding@nvidia.com>
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 11 +++++++++++
- include/linux/stmmac.h                            |  4 ++++
- 2 files changed, 15 insertions(+)
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  2 ++
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 32 +++++++++++++++++++
+ 2 files changed, 34 insertions(+)
 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+index b32187284607..3a00a988cb36 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+@@ -407,6 +407,8 @@ int stmmac_dvr_probe(struct device *device,
+ int stmmac_reinit_queues(struct net_device *dev, u32 rx_cnt, u32 tx_cnt);
+ int stmmac_reinit_ringparam(struct net_device *dev, u32 rx_size, u32 tx_size);
+ int stmmac_bus_clks_config(struct stmmac_priv *priv, bool enabled);
++int stmmac_set_clk_tx_rate(void *bsp_priv, struct clk *clk_tx_i,
++			   phy_interface_t interface, int speed);
+ 
+ static inline bool stmmac_xdp_is_enabled(struct stmmac_priv *priv)
+ {
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 424fa2fe31c6..e66cd6889728 100644
+index e66cd6889728..aec230353ac4 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -928,6 +928,7 @@ static void stmmac_mac_link_up(struct phylink_config *config,
- 	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
- 	unsigned int flow_ctrl;
- 	u32 old_ctrl, ctrl;
-+	int ret;
+@@ -177,6 +177,38 @@ int stmmac_bus_clks_config(struct stmmac_priv *priv, bool enabled)
+ }
+ EXPORT_SYMBOL_GPL(stmmac_bus_clks_config);
  
- 	if ((priv->plat->flags & STMMAC_FLAG_SERDES_UP_AFTER_PHY_LINKUP) &&
- 	    priv->plat->serdes_powerup)
-@@ -1020,6 +1021,16 @@ static void stmmac_mac_link_up(struct phylink_config *config,
- 	if (ctrl != old_ctrl)
- 		writel(ctrl, priv->ioaddr + MAC_CTRL_REG);
- 
-+	if (priv->plat->set_clk_tx_rate) {
-+		ret = priv->plat->set_clk_tx_rate(priv->plat->bsp_priv,
-+						priv->plat->clk_tx_i,
-+						interface, speed);
-+		if (ret < 0)
-+			netdev_err(priv->dev,
-+				   "failed to configure transmit clock for %dMbps: %pe\n",
-+				   speed, ERR_PTR(ret));
-+	}
++/**
++ * stmmac_set_clk_tx_rate() - set the clock rate for the MAC transmit clock
++ * @bsp_priv: BSP private data structure (unused)
++ * @clk_tx_i: the transmit clock
++ * @interface: the selected interface mode
++ * @speed: the speed that the MAC will be operating at
++ *
++ * Set the transmit clock rate for the MAC, normally 2.5MHz for 10Mbps,
++ * 25MHz for 100Mbps and 125MHz for 1Gbps. This is suitable for at least
++ * MII, GMII, RGMII and RMII interface modes. Platforms can hook this into
++ * the plat_data->set_clk_tx_rate method directly, call it via their own
++ * implementation, or implement their own method should they have more
++ * complex requirements. It is intended to only be used in this method.
++ *
++ * plat_data->clk_tx_i must be filled in.
++ */
++int stmmac_set_clk_tx_rate(void *bsp_priv, struct clk *clk_tx_i,
++			   phy_interface_t interface, int speed)
++{
++	long rate = rgmii_clock(speed);
 +
- 	stmmac_mac_set(priv, priv->ioaddr, true);
- 	if (priv->dma_cap.eee)
- 		stmmac_set_eee_pls(priv, priv->hw, true);
-diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-index 6d2aa77ea963..cd0d1383df87 100644
---- a/include/linux/stmmac.h
-+++ b/include/linux/stmmac.h
-@@ -78,6 +78,7 @@
- 			| DMA_AXI_BLEN_32 | DMA_AXI_BLEN_64 \
- 			| DMA_AXI_BLEN_128 | DMA_AXI_BLEN_256)
- 
-+struct clk;
- struct stmmac_priv;
- 
- /* Platfrom data for platform device structure's platform_data field */
-@@ -231,6 +232,8 @@ struct plat_stmmacenet_data {
- 	u8 tx_sched_algorithm;
- 	struct stmmac_rxq_cfg rx_queues_cfg[MTL_MAX_RX_QUEUES];
- 	struct stmmac_txq_cfg tx_queues_cfg[MTL_MAX_TX_QUEUES];
-+	int (*set_clk_tx_rate)(void *priv, struct clk *clk_tx_i,
-+			       phy_interface_t interface, int speed);
- 	void (*fix_mac_speed)(void *priv, int speed, unsigned int mode);
- 	int (*fix_soc_reset)(void *priv, void __iomem *ioaddr);
- 	int (*serdes_powerup)(struct net_device *ndev, void *priv);
-@@ -252,6 +255,7 @@ struct plat_stmmacenet_data {
- 	struct clk *stmmac_clk;
- 	struct clk *pclk;
- 	struct clk *clk_ptp_ref;
-+	struct clk *clk_tx_i;		/* clk_tx_i to MAC core */
- 	unsigned long clk_ptp_rate;
- 	unsigned long clk_ref_rate;
- 	struct clk_bulk_data *clks;
++	/* Silently ignore unsupported speeds as rgmii_clock() only
++	 * supports 10, 100 and 1000Mbps. We do not want to spit
++	 * errors for 2500 and higher speeds here.
++	 */
++	if (rate < 0)
++		return 0;
++
++	return clk_set_rate(clk_tx_i, rate);
++}
++EXPORT_SYMBOL_GPL(stmmac_set_clk_tx_rate);
++
+ /**
+  * stmmac_verify_args - verify the driver parameters.
+  * Description: it checks the driver parameters and set a default in case of
 -- 
 2.30.2
 
