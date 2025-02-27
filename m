@@ -1,155 +1,335 @@
-Return-Path: <netdev+bounces-170111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D3BBA474FE
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 06:00:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DD08A4750C
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 06:09:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5EA1188ED11
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 05:00:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EADE3ADC66
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 05:09:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F0B31E8344;
-	Thu, 27 Feb 2025 05:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ACE51E833A;
+	Thu, 27 Feb 2025 05:09:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gl2tAF7B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iOtqU7PM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D5A186E2D
-	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 05:00:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD0B1E520F;
+	Thu, 27 Feb 2025 05:09:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740632421; cv=none; b=lgbWY/N9H598JKrwcf5vt3R4MON6wOz35d6EVEyJfeJyioDqAI7sr9DctDzk3qNuHNOVGl0oZU/XOP+fdZseYXhqKeEGi/QEa+tHGAAix/6qHgbo6AA76bjXeYvr9YJkMH+kOiHbrXP5isI6mGjI+9/keRhVf0F1f8b72d/M+uQ=
+	t=1740632974; cv=none; b=jEEwbQQpp0X9G+RUOeLBTrYJqZsJDAX8C/oAq0LIdGL0luslP5adbcOeMzslHyw8zVKxOTWJvSzWMN1i99LQ8mpTZ1S+EWeru6hWIerTKUI8Xb+GoBOWYFnAg3XJdBLh0YbclcMYsPduEoF1Gq/6RYP18eBMtA8I24LJVJWQPr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740632421; c=relaxed/simple;
-	bh=cH9ADhDyyzTH6t90hkfT2m+dij4Q/TZDKGKu0TYJDwk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V2XE/6jzrKE9ROC5SqJJe27Usfr3i8MbxhCJQkrXTZn30EKGVWz3ngsYTZ61UiMeUUhpwHBttK4lx+8MWN0JvFBSr0nm6lLDZIQ8hyU7Em9fFlPlrj3K4CEabMAOK1z/vwFjUq1hrZvximjXwfgMePqlabv3T/dARoHkXLT6csM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gl2tAF7B; arc=none smtp.client-ip=209.85.208.49
+	s=arc-20240116; t=1740632974; c=relaxed/simple;
+	bh=tSwdXWKtfUioELB3I5TAg6bL0cxmOAgsOW+zROkXk64=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=exZdcYGIFB2zk/MxVXXpGhT4dUj8QBrXaf1y0UDGUsWvJrwjozpDcv6LJaZmd5nMsWkbaARW/Wag/JF+gfaBQ0cXELDmgkKWUTiAuhRtv8H9SNjIk9NnuNc+GgFAft/qUUnq05Mx8KqfVNta+rQxREx1k4vOypQ7pIOHlfVAQzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iOtqU7PM; arc=none smtp.client-ip=209.85.167.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5e0939c6456so612476a12.3
-        for <netdev@vger.kernel.org>; Wed, 26 Feb 2025 21:00:19 -0800 (PST)
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-548430564d9so516355e87.2;
+        Wed, 26 Feb 2025 21:09:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740632418; x=1741237218; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cH9ADhDyyzTH6t90hkfT2m+dij4Q/TZDKGKu0TYJDwk=;
-        b=gl2tAF7BTDpAKGhNEgnULyI9JHskgcSSCXlylUTOaWTZXoIYW34PANujcd35h54ciy
-         lcF2vCZrjlSmiGzAVBsh3A29eg4uLMaOMpsxHOGErZvGDKzbp4ULRiCgJuk2wIJIxRA0
-         tizNrgCR48+AyJhI6EukQ5IAUPNu0oGesXyvHr/ciuUeHWZd5eCzkidDXG/zVPs9CO6J
-         8MfG421xlyZds3UzN7cn9OzXMPrEnqv9VdHWnplaDHvUsN5gJNavolI2MyKGaD0IgP3V
-         m+w0JWH1tWKHOgY62uYGWNNspn5EiHP58To86gWzv5g8m3H49+mOBofmINkIByEf/tqk
-         BqDg==
+        d=gmail.com; s=20230601; t=1740632970; x=1741237770; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wGBCUpPogRFvulwDFKcgsoDOfEUplF+Y7RwF1qwQX3A=;
+        b=iOtqU7PM7NwLXIdDzI+kJbtGOPwSXuppVXcoHXc0GBIcogupd0ue1FCSOuOldkCjNW
+         03ceczPGM0yhGS5HSCnnXQPxPcQfjK8d7KvD0NsqKBYZWzISmxRhYtunQ28ORiASXRp2
+         8duM3QsGSMOMRpVcWnmRi7HqtnM2fo79XouWRcOSuEgqRu62YqFlZzNJW9JV2a2UGFQd
+         pLViInK5gWvdKf4bdjXqMB8SvwIPv8fsVXIXo+IiLaYdGxU5vV3mTLMxld6PlfrfjUkK
+         S8pO1xTMOpCuLhERu+sKq9C5piYA/GdW0A1zDFLwiFnGBjORcMq45yXmZS0xxwqGHw25
+         dR+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740632418; x=1741237218;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cH9ADhDyyzTH6t90hkfT2m+dij4Q/TZDKGKu0TYJDwk=;
-        b=vf1avyh6h2l+hLBNqdjJWsTTqQBFhgWavpOKoWuAoXDi17SvNPmbR+Sn3fvorj9xJ0
-         xKECQNktEY/WnlOmTXFiPktkmRf6eeXZmHhNnoZZssdBo5rZuCXS3hjsS2+vj2w57bJG
-         18keW6RsKkZAYOI7uLBlAbXqTZxYYyyWPgYdgAdMkaYXfDTRa2VA48Qis1RBxycoUlpg
-         mfxCmoK0lprctOP65ZP+/iEN7w998lkRgkGWnZi+Y5WDspnScDmymCj55g9RkR1oBAvc
-         UDL31b+RDmZ8HDq8i0uXKx+REp3FWgts6h9GL8FgL2YMFHmeUImfegF/8eEnfXxv6zXZ
-         V41Q==
-X-Forwarded-Encrypted: i=1; AJvYcCViyuPoZpk+1E5aAjR10hL2hrhwjopDmcX1KrOBYLLcsuvD3T3/7f4Wj2WsNcpubSUGSwPxcec=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwlqkE6UuWl8krUj//vShgT0HgEPBU3Mqk8t5hJeMpzUNHOLS5n
-	3GHfivzjvzOGX1PyUE5V3ut+/GxY9OAOvfwwprtdC7VxYSLFFOJ6DsQ6WI9fcnZ97vFBfH0+Gms
-	4aqnNMkyxZxUZNMyiYnTKYlaTrMg=
-X-Gm-Gg: ASbGncsy3yNPwBMMJ0GutPqZGeKDaGOpICch7zWhVXwY7w0nRc/Xy7NPhgqfe2n41Oq
-	bGoQWmqbInL4kRV9YxqdC/losj/UXkHcUwgHHzIQr3fk6VaoEzGYiIG05a9bTf91IraoDrOGnpY
-	4fLVfpaS4T
-X-Google-Smtp-Source: AGHT+IEseA0D3pEUnkbra8fYAnp9NqRKGagbPXaFLuxa++Cz7j1QBEqId/ncNSTTyyq1qa5ZGWJzSwsC2bPh08jUMhI=
-X-Received: by 2002:a05:6402:40c6:b0:5df:a651:32ef with SMTP id
- 4fb4d7f45d1cf-5e0b7231cadmr25986265a12.27.1740632417638; Wed, 26 Feb 2025
- 21:00:17 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740632970; x=1741237770;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wGBCUpPogRFvulwDFKcgsoDOfEUplF+Y7RwF1qwQX3A=;
+        b=LS0DNMdLiF/5EINy2VTHFyQOe9xRbpU9yFs20SwpUAe5rKo7rsNLvxkxTIBEMiyWeK
+         n2Zi59ZgCM3eySbeC24WE+H82H1EJMLZSREkIyAMfSqde7FN9kn9+FM6E+NI6UZI7ebs
+         O7DdxhzxSsXzi2n51FTuwrhLoDj5RtIrdhGY2sXTyUqrNSZsuWyDqtI2qYt6ECDEtBqx
+         vcX/RedQjhZIluEhMj1zJwxu6pwzKercnFlpB7qTZlBFatw/rw/VKXKZmZ0OLqxQqNTX
+         tLUahEzFWhDzz/roCGzczMUJm9KY202MjrXUGsxwHagtJCT8zU7vE+yI0eDe+1NAAFqv
+         7mrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXpLNjVJdOlOEm0FTnXEuKsmN0340ziAkNdy7ekC4WXLN+rJfaGClC1Y1YLjEn7X6Dp5GiGRJI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNn7oq0qszxirqqA/VaRmOiJw3KRoiDxWYsIvm1gOZ6dZ4lyVP
+	mi4ssZNCPcVOnzvPmSvpTlGTkaE5621F9FzErUsss3iUiHEX2Tty
+X-Gm-Gg: ASbGncv4DEmTk4LL9DFiAVixb9s65Q4SmT13QkqygrmgXAbwENA6Y9aLoGcHwx3KQMf
+	T55D68aNvcK3KPl+fNTMJVYshsmm8aoknvU483hvlfkHCQcOyCRG9BaZlhTLkROhAAc6izvPu+f
+	26FIDhhI7EuOCHC0OAToFdlk2lSJ6/KT52C86+rlOE4E6aWnEm8Yoss1HmvOqsZP1989nUf1EV3
+	zwRAHIbmmWR4EBl5/o2RMSwJBkInWRT0xYr2uyhRY+hqL95wvri7nI+47e13QJrvyXc2gA5Bu8C
+	ZfmYY4tBYzA9syQTgFIzF5ewcG6NdoyM8jnQa4HLngb3v9uF
+X-Google-Smtp-Source: AGHT+IEo/5UeDMUmso7oidxY53h7Uw4w0If7bZKTwnbjRmQaS8H7yuGQrNbfyXstEwM6OG8KwCOY0g==
+X-Received: by 2002:a05:6512:b1f:b0:545:8a1:5377 with SMTP id 2adb3069b0e04-54839129b32mr9503779e87.2.1740632970079;
+        Wed, 26 Feb 2025 21:09:30 -0800 (PST)
+Received: from FI-L-7486715.nmea.abb.com ([147.161.186.106])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-549443cc9desm68509e87.221.2025.02.26.21.09.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Feb 2025 21:09:29 -0800 (PST)
+From: Jaakko Karrenpalo <jkarrenpalo@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Lukasz Majewski <lukma@denx.de>,
+	MD Danish Anwar <danishanwar@ti.com>
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Jaakko Karrenpalo <jaakko.karrenpalo@fi.abb.com>,
+	Jaakko Karrenpalo <jkarrenpalo@gmail.com>
+Subject: [PATCH net-next v3 1/2] net: hsr: Fix PRP duplicate detection
+Date: Thu, 27 Feb 2025 07:09:22 +0200
+Message-ID: <20250227050923.10241-1-jkarrenpalo@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250226061837.1435731-1-ap420073@gmail.com> <20250226061837.1435731-2-ap420073@gmail.com>
- <20250226180729.332e9940@kernel.org>
-In-Reply-To: <20250226180729.332e9940@kernel.org>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Thu, 27 Feb 2025 14:00:05 +0900
-X-Gm-Features: AQ5f1JqVuvL1ivFyFv_nKC4sgrkPDONDG5loxmr602eO1pUkcLFHoMHWLd6WOp4
-Message-ID: <CAMArcTWTV1FBi1vob7M8=vBQrn8LaVf1PB_193EffzmTAwVqWw@mail.gmail.com>
-Subject: Re: [PATCH net 1/3] eth: bnxt: fix truesize for mb-xdp-pass case
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
-	michael.chan@broadcom.com, pavan.chebbi@broadcom.com, andrew+netdev@lunn.ch, 
-	netdev@vger.kernel.org, gospo@broadcom.com, somnath.kotur@broadcom.com, 
-	dw@davidwei.uk, horms@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 27, 2025 at 11:07=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
+Add PRP specific function for handling duplicate
+packets. This is needed because of potential
+L2 802.1p prioritization done by network switches.
 
-Hi Jakub,
-Thanks a lot for your review!
+The L2 prioritization can re-order the PRP packets
+from a node causing the existing implementation to
+discard the frame(s) that have been received 'late'
+because the sequence number is before the previous
+received packet. This can happen if the node is
+sending multiple frames back-to-back with different
+priority.
 
-> On Wed, 26 Feb 2025 06:18:35 +0000 Taehee Yoo wrote:
-> > When mb-xdp is set and return is XDP_PASS, packet is converted from
-> > xdp_buff to sk_buff with xdp_update_skb_shared_info() in
-> > bnxt_xdp_build_skb().
-> > bnxt_xdp_build_skb() passes incorrect truesize argument to
-> > xdp_update_skb_shared_info().
-> > truesize is calculated as BNXT_RX_PAGE_SIZE * sinfo->nr_frags but
-> > sinfo->nr_frags should not be used because sinfo->nr_frags is not yet
-> > updated.
->
-> "not yet updated" sounds misleading the problem is that calling
-> build_skb() wipes the shared info back to 0, but it was initialized.
+Signed-off-by: Jaakko Karrenpalo <jkarrenpalo@gmail.com>
+---
+Changes in v3:
+- Fixed indentation
+- Renamed local variables
 
-I checked again after this review, and you're right.
-sinfo->nr_frags was wiped in the napi_build_skb() in the
-bnxt_rx_multi_page_skb(), this is called before bnxt_xdp_build_skb().
-So, this patch is wrong.
-Thanks a lot!
+ net/hsr/hsr_device.c   |  2 +
+ net/hsr/hsr_forward.c  |  4 +-
+ net/hsr/hsr_framereg.c | 95 ++++++++++++++++++++++++++++++++++++++++--
+ net/hsr/hsr_framereg.h |  8 +++-
+ net/hsr/hsr_main.h     |  2 +
+ 5 files changed, 104 insertions(+), 7 deletions(-)
 
->
-> > so it should use num_frags instead.
->
-> num_frags may be stale, tho. The program can trim the skb effectively
-> discarding the fragments. Maybe we should fix that also..
+diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
+index b6fb18469439..2c43776b7c4f 100644
+--- a/net/hsr/hsr_device.c
++++ b/net/hsr/hsr_device.c
+@@ -616,6 +616,7 @@ static struct hsr_proto_ops hsr_ops = {
+ 	.drop_frame = hsr_drop_frame,
+ 	.fill_frame_info = hsr_fill_frame_info,
+ 	.invalid_dan_ingress_frame = hsr_invalid_dan_ingress_frame,
++	.register_frame_out = hsr_register_frame_out,
+ };
+ 
+ static struct hsr_proto_ops prp_ops = {
+@@ -626,6 +627,7 @@ static struct hsr_proto_ops prp_ops = {
+ 	.fill_frame_info = prp_fill_frame_info,
+ 	.handle_san_frame = prp_handle_san_frame,
+ 	.update_san_info = prp_update_san_info,
++	.register_frame_out = prp_register_frame_out,
+ };
+ 
+ void hsr_dev_setup(struct net_device *dev)
+diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
+index a4bacf198555..c67c0d35921d 100644
+--- a/net/hsr/hsr_forward.c
++++ b/net/hsr/hsr_forward.c
+@@ -536,8 +536,8 @@ static void hsr_forward_do(struct hsr_frame_info *frame)
+ 		 * Also for SAN, this shouldn't be done.
+ 		 */
+ 		if (!frame->is_from_san &&
+-		    hsr_register_frame_out(port, frame->node_src,
+-					   frame->sequence_nr))
++		    hsr->proto_ops->register_frame_out &&
++		    hsr->proto_ops->register_frame_out(port, frame))
+ 			continue;
+ 
+ 		if (frame->is_supervision && port->type == HSR_PT_MASTER &&
+diff --git a/net/hsr/hsr_framereg.c b/net/hsr/hsr_framereg.c
+index 73bc6f659812..79e066422044 100644
+--- a/net/hsr/hsr_framereg.c
++++ b/net/hsr/hsr_framereg.c
+@@ -35,6 +35,7 @@ static bool seq_nr_after(u16 a, u16 b)
+ 
+ #define seq_nr_before(a, b)		seq_nr_after((b), (a))
+ #define seq_nr_before_or_eq(a, b)	(!seq_nr_after((a), (b)))
++#define PRP_DROP_WINDOW_LEN 32768
+ 
+ bool hsr_addr_is_redbox(struct hsr_priv *hsr, unsigned char *addr)
+ {
+@@ -176,8 +177,11 @@ static struct hsr_node *hsr_add_node(struct hsr_priv *hsr,
+ 		new_node->time_in[i] = now;
+ 		new_node->time_out[i] = now;
+ 	}
+-	for (i = 0; i < HSR_PT_PORTS; i++)
++	for (i = 0; i < HSR_PT_PORTS; i++) {
+ 		new_node->seq_out[i] = seq_out;
++		new_node->seq_expected[i] = seq_out + 1;
++		new_node->seq_start[i] = seq_out + 1;
++	}
+ 
+ 	if (san && hsr->proto_ops->handle_san_frame)
+ 		hsr->proto_ops->handle_san_frame(san, rx_port, new_node);
+@@ -482,9 +486,11 @@ void hsr_register_frame_in(struct hsr_node *node, struct hsr_port *port,
+  *	 0 otherwise, or
+  *	 negative error code on error
+  */
+-int hsr_register_frame_out(struct hsr_port *port, struct hsr_node *node,
+-			   u16 sequence_nr)
++int hsr_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame)
+ {
++	struct hsr_node *node = frame->node_src;
++	u16 sequence_nr = frame->sequence_nr;
++
+ 	spin_lock_bh(&node->seq_out_lock);
+ 	if (seq_nr_before_or_eq(sequence_nr, node->seq_out[port->type]) &&
+ 	    time_is_after_jiffies(node->time_out[port->type] +
+@@ -499,6 +505,89 @@ int hsr_register_frame_out(struct hsr_port *port, struct hsr_node *node,
+ 	return 0;
+ }
+ 
++/* Adaptation of the PRP duplicate discard algorithm described in wireshark
++ * wiki (https://wiki.wireshark.org/PRP)
++ *
++ * A drop window is maintained for both LANs with start sequence set to the
++ * first sequence accepted on the LAN that has not been seen on the other LAN,
++ * and expected sequence set to the latest received sequence number plus one.
++ *
++ * When a frame is received on either LAN it is compared against the received
++ * frames on the other LAN. If it is outside the drop window of the other LAN
++ * the frame is accepted and the drop window is updated.
++ * The drop window for the other LAN is reset.
++ *
++ * 'port' is the outgoing interface
++ * 'frame' is the frame to be sent
++ *
++ * Return:
++ *	 1 if frame can be shown to have been sent recently on this interface,
++ *	 0 otherwise
++ */
++int prp_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame)
++{
++	enum hsr_port_type other_port;
++	enum hsr_port_type rcv_port;
++	struct hsr_node *node;
++	u16 sequence_diff;
++	u16 sequence_exp;
++	u16 sequence_nr;
++
++	/* out-going frames are always in order
++	 *and can be checked the same way as for HSR
++	 */
++	if (frame->port_rcv->type == HSR_PT_MASTER)
++		return hsr_register_frame_out(port, frame);
++
++	/* for PRP we should only forward frames from the slave ports
++	 * to the master port
++	 */
++	if (port->type != HSR_PT_MASTER)
++		return 1;
++
++	node = frame->node_src;
++	sequence_nr = frame->sequence_nr;
++	sequence_exp = sequence_nr + 1;
++	rcv_port = frame->port_rcv->type;
++	other_port =
++		rcv_port == HSR_PT_SLAVE_A ? HSR_PT_SLAVE_B : HSR_PT_SLAVE_A;
++
++	spin_lock_bh(&node->seq_out_lock);
++	if (time_is_before_jiffies(node->time_out[port->type] +
++	    msecs_to_jiffies(HSR_ENTRY_FORGET_TIME)) ||
++	    (node->seq_start[rcv_port] == node->seq_expected[rcv_port] &&
++	    node->seq_start[other_port] == node->seq_expected[other_port])) {
++		/* the node hasn't been sending for a while
++		 * or both drop windows are empty, forward the frame
++		 */
++		node->seq_start[rcv_port] = sequence_nr;
++	} else if (seq_nr_before(sequence_nr, node->seq_expected[other_port]) &&
++		   seq_nr_before_or_eq(node->seq_start[other_port], sequence_nr)) {
++		/* drop the frame, update the drop window for the other port
++		 * and reset our drop window
++		 */
++		node->seq_start[other_port] = sequence_exp;
++		node->seq_expected[rcv_port] = sequence_exp;
++		node->seq_start[rcv_port] = node->seq_expected[rcv_port];
++		spin_unlock_bh(&node->seq_out_lock);
++		return 1;
++	}
++
++	/* update the drop window for the port where this frame was received
++	 * and clear the drop window for the other port
++	 */
++	node->seq_start[other_port] = node->seq_expected[other_port];
++	node->seq_expected[rcv_port] = sequence_exp;
++	sequence_diff = sequence_exp - node->seq_start[rcv_port];
++	if (sequence_diff > PRP_DROP_WINDOW_LEN)
++		node->seq_start[rcv_port] = sequence_exp - PRP_DROP_WINDOW_LEN;
++
++	node->time_out[port->type] = jiffies;
++	node->seq_out[port->type] = sequence_nr;
++	spin_unlock_bh(&node->seq_out_lock);
++	return 0;
++}
++
+ static struct hsr_port *get_late_port(struct hsr_priv *hsr,
+ 				      struct hsr_node *node)
+ {
+diff --git a/net/hsr/hsr_framereg.h b/net/hsr/hsr_framereg.h
+index 993fa950d814..b04948659d84 100644
+--- a/net/hsr/hsr_framereg.h
++++ b/net/hsr/hsr_framereg.h
+@@ -44,8 +44,7 @@ void hsr_addr_subst_dest(struct hsr_node *node_src, struct sk_buff *skb,
+ 
+ void hsr_register_frame_in(struct hsr_node *node, struct hsr_port *port,
+ 			   u16 sequence_nr);
+-int hsr_register_frame_out(struct hsr_port *port, struct hsr_node *node,
+-			   u16 sequence_nr);
++int hsr_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame);
+ 
+ void hsr_prune_nodes(struct timer_list *t);
+ void hsr_prune_proxy_nodes(struct timer_list *t);
+@@ -73,6 +72,8 @@ void prp_update_san_info(struct hsr_node *node, bool is_sup);
+ bool hsr_is_node_in_db(struct list_head *node_db,
+ 		       const unsigned char addr[ETH_ALEN]);
+ 
++int prp_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame);
++
+ struct hsr_node {
+ 	struct list_head	mac_list;
+ 	/* Protect R/W access to seq_out */
+@@ -89,6 +90,9 @@ struct hsr_node {
+ 	bool			san_b;
+ 	u16			seq_out[HSR_PT_PORTS];
+ 	bool			removed;
++	/* PRP specific duplicate handling */
++	u16			seq_expected[HSR_PT_PORTS];
++	u16			seq_start[HSR_PT_PORTS];
+ 	struct rcu_head		rcu_head;
+ };
+ 
+diff --git a/net/hsr/hsr_main.h b/net/hsr/hsr_main.h
+index 7561845b8bf6..1bc47b17a296 100644
+--- a/net/hsr/hsr_main.h
++++ b/net/hsr/hsr_main.h
+@@ -175,6 +175,8 @@ struct hsr_proto_ops {
+ 			       struct hsr_frame_info *frame);
+ 	bool (*invalid_dan_ingress_frame)(__be16 protocol);
+ 	void (*update_san_info)(struct hsr_node *node, bool is_sup);
++	int (*register_frame_out)(struct hsr_port *port,
++				  struct hsr_frame_info *frame);
+ };
+ 
+ struct hsr_self_node {
+-- 
+2.43.0
 
-I didn't think it through, Thanks!
-
->
-> Could you follow up and switch to xdp_build_skb_from_buff() in net-next?
-> It does all the right things already.
-
-Okay, I will try to switch to xdp_build_skb_from_buff() in net-next.
-
->
-> > How to reproduce:
-> > <Node A>
-> > ip link set $interface1 xdp obj xdp_pass.o
-> > ip link set $interface1 mtu 9000 up
-> > ip a a 10.0.0.1/24 dev $interface1
-> > <Node B>
-> > ip link set $interfac2 mtu 9000 up
-> > ip a a 10.0.0.2/24 dev $interface2
-> > ping 10.0.0.1 -s 65000
->
-> Would you be willing to turn this into a selftest?
-> The xdp program I added for HDS recently is a PASS so we can reuse it.
-> 29b036be1b0bfcf
-
-Of course, I will add selftest case for this.
-
-Thanks a lot!
-Taehee Yoo
-
-> --
-> pw-bot: cr
 
