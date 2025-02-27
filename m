@@ -1,111 +1,122 @@
-Return-Path: <netdev+bounces-170442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B290A48C04
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 23:50:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 105E1A48C23
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 00:00:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 306923B5601
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 22:50:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E76F5188C2C0
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 23:00:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 692644438B;
-	Thu, 27 Feb 2025 22:50:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85A7823E357;
+	Thu, 27 Feb 2025 23:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J9oXNkzV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LKduXEHU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AA031AA1E4
-	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 22:50:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA7FB14BF8F;
+	Thu, 27 Feb 2025 23:00:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740696619; cv=none; b=GjxcqfJudTndPq84LGA4/CTpfuvRIfiWDj6QSk57vaVF6NehPrY4upQdwSZZmn51DHrrdQSnvIllBin2qqpQFmAUGez86avQteaiLsKE4PHQ9hcI2SUfuolBz4qn85Dt8FWc4NyjdB1mHmptqsM14doEWlTtyYLTju9slrfdfgo=
+	t=1740697207; cv=none; b=BDMAMJgGF3cmEFAhOaSQkFwabbSSUhTa2d0VNLQL+w6jO5Y+h/DT/CvxRITrs1hE4M5xbgIZ6IpKMaKxT40EhcM6HuWInTSkZGoRQHrq1VzaoVJ62phBiV+iw+c9SFNreMEGidzTTq13QSFSMTlO6CetTsvZURR4Td9t1lnIZdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740696619; c=relaxed/simple;
-	bh=aZFWTG7VtFf3WD8yAt7fkM6zwzPU2g+tIuFZ9YrXYKg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mjOGFBDgkD6xtjga9exJ885dGkR9KhGXrEchaPzCrGD3XC9tDEn1qWWvnKXot88iX43QCyVbSmWcppk02r4ICGiCd4PTk28RfuZWP9oW0wELlyLbylqSYDZVd/dPX4jBISAAjkAoNCxjDLYL90nkGN9Bf4c8FwHmXy+81hdco1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=J9oXNkzV; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-30615661f98so14952541fa.2
-        for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 14:50:15 -0800 (PST)
+	s=arc-20240116; t=1740697207; c=relaxed/simple;
+	bh=plZB6nttI4h15XHAy2tUctm4vCwJqkaepq/yarLTXjw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eKUFsFCMlLd50p4El9t2u+cgYlFmB+bqOlrBskT7oI15xDe3ZHkLbH1BDBWReeqYs5yJlGDC5/gGa+LVon2NyJ2RgKuP+aY25KIGqFE0YEZvUZkyx4siy6+2/O3j6I/UO97+t7wdZpL2ddphDqRFS/m+gYopvWW/4az8u658WP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LKduXEHU; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4394a0c65fcso15822765e9.1;
+        Thu, 27 Feb 2025 15:00:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1740696613; x=1741301413; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RVmnmMz3k+cSRNarmhUlid1kyf/hUqoGSHHkmE8JTKY=;
-        b=J9oXNkzVGptuVEncNIhOUBLehuNNkGeTDL+7cPChf2m4M8qD0fjQufsg8Y2fWs3ZTW
-         gUouFyHKLrR5qT1+jo/1KokeiVUs5R70EejQfV11VPw8027enoaeKP4063h1bcM1OsE3
-         1UHSgHUrxcawRAPpcdj1eS5gl92XhLcnlAcNyVc+1kA4gO9NkWu6WUbR3/ST0PnfIOhf
-         viA71WK0ExU5IPS6VJ9OpJY5vXrgX5lwwByy9QSq+WKhEM7otqj3pDr7uYkTCooxjDpQ
-         t4iLr0qBm2sozep7uWb4qZLOHDxkKtI/p83PLVxDxi2iC22nupSP1EDpPswg9d42a6CW
-         r1ag==
+        d=gmail.com; s=20230601; t=1740697204; x=1741302004; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CSTTn8dgXr2XP2qmQgDysPC6clyA8S5gqjElXgR2Us8=;
+        b=LKduXEHU1CqRvnehJVWcwbJcUFxNEC3VQFbL+v5v2XtDzb/rksH56YRf/dHDK4zntc
+         9MBAeAqb60PRNftWi+S/DbXIExz5w7Ga9ZYi/Ow6ccSaLZH1fvjnYjfzGPg6LHMjiviD
+         V67wDfIU30VpjSLZYwkl4tY6K081ZKbcp5nm7m7ugrWid/GAOcpKH2h7bmqwcygIH0CL
+         v3k0XtqNG5+c6RDRW87srxLuFT04pUAB62Y5Sqz3DFHceYDFyj7jME24XdaKq8oXeLim
+         gByevqnedG+Xy61P9N+1Vati2a63g42bCgIpMKyGyglvfQVGVCU/7U2u02jzQr3Xw54G
+         e71A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740696613; x=1741301413;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RVmnmMz3k+cSRNarmhUlid1kyf/hUqoGSHHkmE8JTKY=;
-        b=hOxUpd63oyd7fuafMgBSZZ5+7nKfwcABsC570DQLsCysMh400wJMTJ6ifWk0+bl09A
-         Bunj+J+M0v7OhRU8EBGSGEvJ7oXeLxdh9ReoI0p+v12Z0UjV0ocj+cqoKiO2PmgyaIwB
-         UlcqLXBkBJPUmiFRIOHRzQJrSNJ6dOJC5ityqTE7Lqe9XW3Yo7ykOXqyOTDLAGXvnuoz
-         d07zFPAnsGGJwTkPOmQ3X9uX3fLx0AiY1orMCxNd60O4/fkYY23J4fZzlozThsaGVz7X
-         xWJBfGSEG32JQ+bBnXr5K1phZUAk/eSFpiZ10owtvImERaM5H2FNWGswX98Knus+vVFg
-         euRA==
-X-Forwarded-Encrypted: i=1; AJvYcCXJXtX1i341L46NCA3ZIC6k81Rpm4UZxJMAVN5YF1+lMeyEPvX3mcsAEVl6WW8mkWszZWTVwg8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRT5UqHkExXs6C1Okhw4d0M1M2hncK1JbotM5xBK0bSEy/ZovY
-	qIaENf5NoiuCiSi4s5QhMnajZY6ynKQ9/8ppOWl5ZfXGa9lFAmkqwIe0MvESiwmggyNASHYRpUZ
-	hdauDHv5Zh5tBglHCvEBnYW4vN9xx5938YK/DXw==
-X-Gm-Gg: ASbGnctvL1ba36fp2bDPr+pxcxzAphwDRd7wb480dpG4P+2WkPDU3tkYNJQt3qia7C9
-	derdXCHeyxF+39q55o+apSnRHTfiPv12luwAxSzm0PxFCxwnncc1mncucnkh3hkotAEnUsfTgr9
-	7V8zrOEOE=
-X-Google-Smtp-Source: AGHT+IFaGDCgZweCWq59FTimwVMWfklYJv4GRxdRUVc64bY/DI4b04q7zH7Uyt+7g+T9PXJUAoQ/pka3lTVU5esWdrg=
-X-Received: by 2002:a2e:9181:0:b0:309:2283:bea8 with SMTP id
- 38308e7fff4ca-30b934132f4mr2227491fa.34.1740696613518; Thu, 27 Feb 2025
- 14:50:13 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740697204; x=1741302004;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CSTTn8dgXr2XP2qmQgDysPC6clyA8S5gqjElXgR2Us8=;
+        b=KuzZKxkkdaUrudaxzYfGER7laffosE42F+8xQxa3mn/NPnWQqHk1wLC4BuN5TbxAdL
+         IorJKaFQUheK1HmywBGbhZZ9lz3NaUx2TBFE84PYXnvr0zIgNMS8xhrnLOwnSSFRnPtJ
+         JYjMKIimaxWKeiAWXA8LfkS0pY9wN5ijCGynz79AZISJpMCHL9wOeuG2Eeb6FR3vDF8U
+         lb+KPCuJ4foyDZx5Q/o+2JriXo3LbuxFLdkzqkx0Q4lKazBtPA7UMO84OXHKsEh7uAT0
+         tsGhK3nUwkaUjPVFDJYYGAJrmp6+GkTpPeh6ngKPjH2RtvnV8vU+QaqOhlom/Is4tQ+y
+         qJCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU8CakssYPCB0bYfW/ct9DNjeieMIE02vrK71rAvl8g78COaINBNYch12UQ3LunHYXgFwIhzmZ5/oaf6JE=@vger.kernel.org, AJvYcCWAWwwPbWDF/QtS8WD2o5LPXOGldBQYKgfy/3Mer8OtIYfbfu6WI2rcxRCWlYUYwz2TNpicUSUI2JrqagLosCD1@vger.kernel.org, AJvYcCWn77oQYH6WlpylL2ZK4Y8cedkVzl2aZytm+9ctXYDnYHm3LQMS/IhtfIqg2l3KPn5Px4O7Ehq7@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9EkL8gdg3D8yaP2msAOFscEbzNOxEMaB5deYBtWtX3fvqcn5q
+	No6Hft2MI04K1qJaev3h7VY2tgZG3fI0MON3hpweYPqKKj+vbf2S
+X-Gm-Gg: ASbGncv+3o5lvfEXNYVudJODvGCNhrYk1+jXdfJ7B9/hQjLNwWBM1C41TD88icO+xgq
+	C9d4gPXHcx9uYlhxk6z/auec2+4WCrU5GIZilQ7ItHvjYhAHOOEniWFX+WunQ+xXbX6UBKs2h+y
+	NT9BVR5Ppcv5BKaQ/ipOQTn9HQ85fxfT1wKLym20ADfunbaepoFymHyqs5ZOPtrFlTp+c/e/nMT
+	xPF/4Q65p0OUc1YNNwJ9WFKnKvOOQGnfvPbZ1xq4Vp0GDDhAwpKoZohmSSQYzM53HGK7btoW8Py
+	4LtGUnToL/wcKyn1GBlHnVvD9DE=
+X-Google-Smtp-Source: AGHT+IGhA9c+hj1Gic7ekykbUYYS9qnUrSWSLFMiD7OZScDPu+zoBa4VJZ5UI8HQ4/XW0j7pZUBIHg==
+X-Received: by 2002:a05:600c:46d1:b0:439:8544:1903 with SMTP id 5b1f17b1804b1-43ba674c80fmr7864085e9.20.1740697203440;
+        Thu, 27 Feb 2025 15:00:03 -0800 (PST)
+Received: from localhost ([194.120.133.72])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-43b73718abcsm36327565e9.22.2025.02.27.15.00.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Feb 2025 15:00:03 -0800 (PST)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH][next] [NETFILTER]: nf_conntrack_h323: Fix spelling mistake "authenticaton" -> "authentication"
+Date: Thu, 27 Feb 2025 22:59:28 +0000
+Message-ID: <20250227225928.661471-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250220-rtl8366rb-leds-compile-issue-v3-1-ecce664f1a27@linaro.org>
- <20250227083445.7613e2b9@kernel.org>
-In-Reply-To: <20250227083445.7613e2b9@kernel.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 27 Feb 2025 23:50:02 +0100
-X-Gm-Features: AQ5f1JodjXfeu0petcPPb0XF27xT2ehiK_DWi19zfaXJNpbyB3-gU9kXe20ILo0
-Message-ID: <CACRpkdahvGRx-ZS-dqYouiBzaCR2bNvc_tPOtz_cepRc4Opuyw@mail.gmail.com>
-Subject: Re: [PATCH v3] net: dsa: rtl8366rb: Fix compilation problem
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Luiz Angelo Daros de Luca <luizluca@gmail.com>, netdev@vger.kernel.org, 
-	kernel test robot <lkp@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 27, 2025 at 5:34=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
-> On Thu, 20 Feb 2025 19:48:15 +0100 Linus Walleij wrote:
-> > +config NET_DSA_REALTEK_RTL8366RB_LEDS
-> > +     bool "Support RTL8366RB LED control"
-> > +     depends on (LEDS_CLASS=3Dy || LEDS_CLASS=3DNET_DSA_REALTEK_RTL836=
-6RB)
-> > +     depends on NET_DSA_REALTEK_RTL8366RB
-> > +     default NET_DSA_REALTEK_RTL8366RB
->
-> Is there a reason to prompt the user for this choice?
-> IOW is it okay if I do:
+There is a spelling mistake in a literal string. Fix it.
 
-Yeah that's OK, go ahead.
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ net/netfilter/nf_conntrack_h323_types.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Yours,
-Linus Walleij
+diff --git a/net/netfilter/nf_conntrack_h323_types.c b/net/netfilter/nf_conntrack_h323_types.c
+index fb1cb67a5a71..4f6433998418 100644
+--- a/net/netfilter/nf_conntrack_h323_types.c
++++ b/net/netfilter/nf_conntrack_h323_types.c
+@@ -1108,7 +1108,7 @@ static const struct field_t _SecurityCapabilities[] = {	/* SEQUENCE */
+ 	 _NonStandardParameter},
+ 	{FNAME("encryption") CHOICE, 2, 3, 3, SKIP | EXT, 0,
+ 	 _SecurityServiceMode},
+-	{FNAME("authenticaton") CHOICE, 2, 3, 3, SKIP | EXT, 0,
++	{FNAME("authentication") CHOICE, 2, 3, 3, SKIP | EXT, 0,
+ 	 _SecurityServiceMode},
+ 	{FNAME("integrity") CHOICE, 2, 3, 3, SKIP | EXT, 0,
+ 	 _SecurityServiceMode},
+-- 
+2.47.2
+
 
