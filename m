@@ -1,94 +1,112 @@
-Return-Path: <netdev+bounces-170380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1B95A48692
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 18:27:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F742A486A1
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 18:31:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFDC91639E6
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 17:27:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 133143B60E1
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 17:31:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A57E51DE2AA;
-	Thu, 27 Feb 2025 17:27:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50E331C8636;
+	Thu, 27 Feb 2025 17:31:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="enwMmSL1"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b="JL52TaCD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F711CB9EA
-	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 17:27:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740677247; cv=none; b=XtdGQcH23sSkRSce27s3z+RJYqRgKGvme1eFhHennoE8qVewkYLa/DzSdEtsKGLv7gvoshAm7S3ZE1TyE9xvdbYfFrzkzfkMP2QM6pGqcGoz2FSncdUdv7Fzzdj/e296aqNmAS0FbFxLJAqPvHCEsEsRRiSK7lsC9fhqm/L/gXU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740677247; c=relaxed/simple;
-	bh=3rbgKRdPD57Q4504inUanYwfL6bZjk7Ar3Z9m1kYk8U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tQvThgjwLYyvmv/YcNFFtJDKfGwzqClimDc2tle1Ikc8C5qb8SWIEnGHz11W9OFh3u5kVmvhEKB68wFNWvFm7Fqx2gtrc0anp62Ma6Zr71RxY+HK4jaM/y20KiRXF2h9nP7Db0MSGMHkiGIOhYdWlgtNuq0zIry5Pt3Cz06kqcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=enwMmSL1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA61EC4CEDD;
-	Thu, 27 Feb 2025 17:27:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740677247;
-	bh=3rbgKRdPD57Q4504inUanYwfL6bZjk7Ar3Z9m1kYk8U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=enwMmSL1/rsdzfIYr8EZwClm9n5DN/KczIfu5ZOLTIJke0YNXaNWs8JQkh4gidrLr
-	 sgaqcHu5EYUf3T2noL7fw7ATnbwcRAUwPslurErbY0Vamw8d5XM2lMSyTNnJCATQe7
-	 4T8c4jLs2nXkqV9zAP+pGaPY9ZsO8d1aoa3orasd7YcdHKHI87usXvfsTrcBlksihu
-	 Na40zuhZSoiCHu+2Ed+IVNvfPfYuq9vmdkitoUrMEWvuUYZZPby0WA6cNCtaQiconA
-	 Pc+MrVdDLJ3BWanxm3sd4KKGiV29NefHy0x99lBoprjKbs8cg1bjJp2FBxGwe6ylHR
-	 JS5KTjT7zNzhg==
-Date: Thu, 27 Feb 2025 17:27:23 +0000
-From: Simon Horman <horms@kernel.org>
-To: Grzegorz Nitka <grzegorz.nitka@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Karol Kolacinski <karol.kolacinski@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Milena Olech <milena.olech@intel.com>
-Subject: Re: [PATCH iwl-net v1] ice: fix lane number calculation
-Message-ID: <20250227172723.GG1615191@kernel.org>
-References: <20250221093949.2436728-1-grzegorz.nitka@intel.com>
- <20250225095021.GK1615191@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9452F136351;
+	Thu, 27 Feb 2025 17:31:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740677477; cv=pass; b=Fuo6VdumJvj8w6YDNF3yr8LyIFZcgLtEvU8HEU7BFCIL4hcCxUalp79sXDLsxoDtOtzieu0ha9ALZ1L1vDO1kII4nu5FgL8VWYfY4rAppRpZFba0pmr2Y5STzUcHCIVLxkKgUD3Px3frrrr2/dSOTaZ5Cdk/Av/GaHD8yTGb+hs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740677477; c=relaxed/simple;
+	bh=pY0h9Uqj3mrF8jCMF8B0UPDavohCQ9bLCBbrtld9yos=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=HM/4GydM6ZonVA6S4ZuUnJ8hsP/3csIzwjyMPsulgiAM1zLeVHLfnp71VK+N8DVh7Ha5lOXmmT8eEbFN0cbdU9pl8KJajDlTS1RiXfJgzWT6FI4HjHHdBe9M6t5JvoriKjs85F2gu2GoCYQhchE/QBOpMzJSe/O8CP+IRFpMqIo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=daniel.almeida@collabora.com header.b=JL52TaCD; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1740677409; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=FTN4iejmJbD3zVMnol9SB/PeFykB9egs/6XaEr/QRjdTPaUdScVFt6lCZY6KEANYdHHDJy7fCZuRPdBEpKhrEFG7SHykfe5UPS7hwBGtm0xkzcnKbd5SR/flZeOajo7BsHmUaYtj9Oy6dqmuWmfeWKJ/d+BDkF/l/rqtyKNJqSg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1740677409; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=pY0h9Uqj3mrF8jCMF8B0UPDavohCQ9bLCBbrtld9yos=; 
+	b=OU4vLbh9z0Wy5rSJIPqAAiv0qNUjz4AmXUiLWpQ6fsJ4kSSGuqcfvGLDSTn8l8rsgKSm+TYNAJvdbiFXFpff2EF+3lU9XW0t1n3J8Dt0zKrNbhbPtRxzDCmO/xocviDo06i+l3xHHXTQomiq4gfIwGQ8FnbThMVrM0Ysr0rng5E=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=daniel.almeida@collabora.com;
+	dmarc=pass header.from=<daniel.almeida@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1740677409;
+	s=zohomail; d=collabora.com; i=daniel.almeida@collabora.com;
+	h=Content-Type:Mime-Version:Subject:Subject:From:From:In-Reply-To:Date:Date:Cc:Cc:Content-Transfer-Encoding:Message-Id:Message-Id:References:To:To:Reply-To;
+	bh=pY0h9Uqj3mrF8jCMF8B0UPDavohCQ9bLCBbrtld9yos=;
+	b=JL52TaCD/b1D2zQ/WgtmajSca6k2sVDq6Nnt4Hj57q3CcJEGAv4w7b1HwGEUjIJr
+	xVwrhtV/sA5C2hjR/uK6oo5gsYD3G5J5JLwnyLLVnxa42ojnl2h8udtN5mKbNquqzsD
+	VGlODyRoOomK1FPb5kIcGn0UJJHSCdPZqrNCSB/E=
+Received: by mx.zohomail.com with SMTPS id 1740677406210259.24822276471855;
+	Thu, 27 Feb 2025 09:30:06 -0800 (PST)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250225095021.GK1615191@kernel.org>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.300.87.4.3\))
+Subject: Re: [PATCH v11 0/8] rust: Add IO polling
+From: Daniel Almeida <daniel.almeida@collabora.com>
+In-Reply-To: <20250220070611.214262-1-fujita.tomonori@gmail.com>
+Date: Thu, 27 Feb 2025 14:29:45 -0300
+Cc: linux-kernel@vger.kernel.org,
+ rust-for-linux@vger.kernel.org,
+ netdev@vger.kernel.org,
+ andrew@lunn.ch,
+ hkallweit1@gmail.com,
+ tmgross@umich.edu,
+ ojeda@kernel.org,
+ alex.gaynor@gmail.com,
+ gary@garyguo.net,
+ bjorn3_gh@protonmail.com,
+ benno.lossin@proton.me,
+ a.hindborg@samsung.com,
+ aliceryhl@google.com,
+ anna-maria@linutronix.de,
+ frederic@kernel.org,
+ tglx@linutronix.de,
+ arnd@arndb.de,
+ jstultz@google.com,
+ sboyd@kernel.org,
+ mingo@redhat.com,
+ peterz@infradead.org,
+ juri.lelli@redhat.com,
+ vincent.guittot@linaro.org,
+ dietmar.eggemann@arm.com,
+ rostedt@goodmis.org,
+ bsegall@google.com,
+ mgorman@suse.de,
+ vschneid@redhat.com,
+ tgunders@redhat.com,
+ me@kloenk.dev,
+ david.laight.linux@gmail.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <4647720C-28CA-4E18-AD1E-55844CF078E6@collabora.com>
+References: <20250220070611.214262-1-fujita.tomonori@gmail.com>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+X-Mailer: Apple Mail (2.3826.300.87.4.3)
+X-ZohoMailClient: External
 
-On Tue, Feb 25, 2025 at 09:50:21AM +0000, Simon Horman wrote:
-> On Fri, Feb 21, 2025 at 10:39:49AM +0100, Grzegorz Nitka wrote:
-> > E82X adapters do not have sequential IDs, lane number is PF ID.
-> > 
-> > Add check for ICE_MAC_GENERIC and skip checking port options.
-> 
-> This I see.
+Hi Fujita,
 
-Sorry, this was part of an earlier draft. Please ignore.
+Would you be interested in working on read_poll_timeout_atomic() as =
+well?
 
-> 
-> > 
-> > Also, adjust logical port number for specific E825 device with external
-> > PHY support (PCI device id 0x579F). For this particular device,
-> > with 2x25G (PHY0) and 2x10G (PHY1) port configuration, modification of
-> > pf_id -> lane_number mapping is required. PF IDs on the 2nd PHY start
-> > from 4 in such scenario. Otherwise, the lane number cannot be
-> > determined correctly, leading to PTP init errors during PF initialization.
-> > 
-> > Fixes: 258f5f9058159 ("ice: Add correct PHY lane assignment")
-> > Co-developed-by: Karol Kolacinski <karol.kolacinski@intel.com>
-> > Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-> > Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-> > Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> > Reviewed-by: Milena Olech <milena.olech@intel.com>
-> 
-> Reviewed-by: Simon Horman <horms@kernel.org>
+There would be a user for that.
 
-I only meant to send this part :)
+=E2=80=94 Daniel=20=
 
