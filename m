@@ -1,135 +1,80 @@
-Return-Path: <netdev+bounces-170363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA221A48566
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 17:42:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBB4AA4857D
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 17:45:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 573571882D1B
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:36:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBE791882087
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:40:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53F6C1B3943;
-	Thu, 27 Feb 2025 16:36:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 146D31B87FB;
+	Thu, 27 Feb 2025 16:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X3naGwzD"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1WXalsEp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689554EB38;
-	Thu, 27 Feb 2025 16:36:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AFEB1B3955
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 16:40:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740674173; cv=none; b=HYxfSoZ8fz0sq/es52L6Y+4ivOWv/+p29MvFsOgl8NgXBknsMoIo1EOagm9VIyvzF4EaQLhyOnG9R2lR8VJN2zCLit5clroU8DDHnG1JpS58xO2LB6cA7v9L1hASyMpxgspzqeOH5mCzpZ4I26OZWogx7/QKr/7PYTdKhSBqKFI=
+	t=1740674405; cv=none; b=mo+eoyNez8fLOZktV0xv201CK1R84H2uPi8ZI8xikzi1Z5ngx4l1gs6kOtck4anSEXIOela2r0+h8179oj8o71r3epQq9MxV1OUw4xY79eCvR1nNXFr3C4AolsHNmX7YV0BgI9rSYpmA2RT2tGGo85BYQL3NDZSXbdGHduPgI8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740674173; c=relaxed/simple;
-	bh=tW6s2JKeVYmMjgRZ0LxOh+ZtmueuEyrTI2i0CLDEnCA=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=tNrPYQsnOm+wo2JfnBDIq+oobRmpGt2spQIXflQVOd4LyBy23Taze5pz2EOmkm9HRHjVI2tpo0O5BWB+oMWzRybmuWO57tiSlLg8XN2e985USN9I/93M/u+0Cw8zmPjiS3pXh0jhjHEl/AlGzOndz1d5fzvD3Uge1hO8j4eXeEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X3naGwzD; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6e889e77249so10284536d6.1;
-        Thu, 27 Feb 2025 08:36:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740674167; x=1741278967; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YLuG7vjn/hSKib3SZKgP6rgyU2H+3BpnRfZM3277BQA=;
-        b=X3naGwzDxFd2n/juLJmVg9Ny9khVmzLCbtx62DaODl0y0UEEzymk0wTOlz0IOmCVoR
-         PNgS8fCNu6vPmXr0p0CGz/sywuNQaFq8U2hAj4OdlLBQwRZseem25H2nXtgezxsSlNk+
-         j1zRIAfLYaffgwaFuqXPij7zYU+31BByk7LQWxuxg0PFiq4FTy53GG0FwfJ/sbgDfLXR
-         WGDWVNim2o/rfuULyzx3h4k0aChT5VITm2HU8kOSp6wyT7oEF59pTVaP4ANBzjThbo1B
-         qLfN4VLgG2C+eOt3IV5VlqEBXF4sLZ7S5cDELn9XQLLT2rj8NpO7iwNdQW9X3FpoKaCd
-         4gwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740674167; x=1741278967;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=YLuG7vjn/hSKib3SZKgP6rgyU2H+3BpnRfZM3277BQA=;
-        b=aJdFt72erBp3+eUhltzxPRZoMc75yisJNnAKgUByZPF1qf2G7Jva6FTj2nBulmtK6I
-         DnnYVeqlGPZZdrz2hBDp8tLJ9ar9H5RM5E7R6+HOI57yZjPUmOrQhZ8zGGeaUSbXiTdx
-         7XnGq9RNHayEn9m7+INIAHsl7YwI0X1m45aoKRVZ8WgOTCkS64qC5x5bBVXuxoX7gjZS
-         pjvsRUe/zZ3vFdM8kijU/Yf/d6jc/bw28Kgd/dlqjg1KTBYVr7DEz6k1tAeCc3uB7M+d
-         YHF+uZGF+3kfzVSQyKMNAAjbWNc0RCqqNMVocWvcA+OGyUOvyn2+TN+HMKDPAUFjgSTB
-         4UBA==
-X-Forwarded-Encrypted: i=1; AJvYcCW6JhOG+/wLbQHm0/yPXffBVQtnI8JICM2FmuSifxyUtg11SWsvFgGR9eA6xeDwUojH4cXU8ynR2nUBzBx5imo9@vger.kernel.org, AJvYcCXTdzyqS/q1WWEOHkzeyExzC8P6REh8pAz/BQcdXUzuh8hnJsqvywx1yUFUDKfjOH3wq0+92PNfDkicfhs=@vger.kernel.org, AJvYcCXktGFKEwn0FqlOQYjpU9FUW/nI5221H/SB84PorwnGPCpmaTqRgJs5OnDa8GgGybcvphY7+Vvy@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4m5dDzQkYQZx7H/5jexhq8PTOUMR9eEvozwWrn0eGm3Mv+ByE
-	GI0Jjw++sgsfahHgNByeTzWdgjOuvlTkUmRBAL/X6J+xU33ZWKBZ
-X-Gm-Gg: ASbGncv20xY10jYH7ueSwIgpltXOaR0J41lWAtk8hivl2Qrm3ngOht6FeLCOBq5xXUo
-	T+/S2t3MxzJe6WOrIvaZ61GS4/UCLerD9CQcumJQr96oThLBZ9KPyoZWNoRlqo1Co4QCb6U26JX
-	F3548HA1WEK8s9X7X9AZySZl8cZpzzjh8HGDf6CJhYPrEmMadSNtUuDTSq+Qg8Ggdbu1+wo6h0H
-	x+InukQc2651Z4HyuIGdDMQdJUlF0ueGJyAb0gSebTjovsZ9uOVya+Lj1xgpSYm65iqBNFL7+aC
-	ci5num24ZthP4ocJ9zDiyPeXjOpzVelP++IERkhN8pK8ppNj48LZB759bGWieA47wDQvPZ3c2Hc
-	1jBo=
-X-Google-Smtp-Source: AGHT+IFNLlyGHLJ8yNyFO5ni48kZW3U6VXxOlfgUtSsr3Wug6ZtI+rA6mhO8eVO9q1umiyhsXnA4pQ==
-X-Received: by 2002:ad4:5f0a:0:b0:6e8:9444:7ac8 with SMTP id 6a1803df08f44-6e8a0d093a0mr1377866d6.17.1740674167401;
-        Thu, 27 Feb 2025 08:36:07 -0800 (PST)
-Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e897634d3esm11507256d6.11.2025.02.27.08.36.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Feb 2025 08:36:06 -0800 (PST)
-Date: Thu, 27 Feb 2025 11:36:06 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Kevin Krakauer <krakauer@google.com>, 
- netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, 
- linux-kernel@vger.kernel.org, 
- Kevin Krakauer <krakauer@google.com>
-Message-ID: <67c0947690e22_37f92929444@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250226192725.621969-1-krakauer@google.com>
-References: <20250226192725.621969-1-krakauer@google.com>
-Subject: Re: [PATCH v2 0/3] selftests/net: deflake GRO tests and fix return
- value and output
+	s=arc-20240116; t=1740674405; c=relaxed/simple;
+	bh=c914o7krR20HY/HANDdBtPxRh6uu0KWI1bYuAmJWn8Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JQ8VfD0H4yx6+jsa67Ozh8xKezmV65HUa8YM8/0KeErkdW9wPh6bdm3PhGxcLLDgQE5VW4WC2BBNDdAtcJFi5OzrOvhYLG5lXRPrb+aOCbuF66P4BKwkreGnABPpvIeM4nfoIwAnPoQK60c7GM4EHTGgWnCSkdl3hLNXBr+uW+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1WXalsEp; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=pUdhhDhSvMAHkRpP1SRq17crgbNFJ8ekY404R3cVTuQ=; b=1WXalsEpDVasGFFkI5zqtDfCKs
+	Fpwmz2P6bR6aUb/sWCI/cUtltxoy95vsnKLTYAY46x0RVtakvrLOIYbEuIlpJ4L/9OYrytNXGsCXe
+	i9jHi1+TVmvZEZEP+XPpuk4InmSqTCVduKsdFQXZRc3lff1dkxa0OhEEORAYqxIyEokU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tngvM-000efO-5k; Thu, 27 Feb 2025 17:39:48 +0100
+Date: Thu, 27 Feb 2025 17:39:48 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jon Hunter <jonathanh@nvidia.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Thierry Reding <treding@nvidia.com>
+Subject: Re: [PATCH RFC net-next 1/5] net: phylink: add config of PHY receive
+ clock-stop in phylink_resume()
+Message-ID: <d02d6ef2-6a84-49b5-b493-a868aa7237b2@lunn.ch>
+References: <Z8B4tVd4nLUKXdQ4@shell.armlinux.org.uk>
+ <E1tnf1H-0056Kz-To@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1tnf1H-0056Kz-To@rmk-PC.armlinux.org.uk>
 
-Kevin Krakauer wrote:
-> The GRO selftests can flake and have some confusing behavior. These
-> changes make the output and return value of GRO behave as expected, then
-> deflake the tests.
-> 
-> v2:
-> - Split into multiple commits.
-> - Reduced napi_defer_hard_irqs to 1.
-> - Reduced gro_flush_timeout to 100us.
-> - Fixed comment that wasn't updated.
-> 
-> v1: https://lore.kernel.org/netdev/20250218164555.1955400-1-krakauer@google.com/
+On Thu, Feb 27, 2025 at 02:37:47PM +0000, Russell King (Oracle) wrote:
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-For next time: add target: [PATCH net-next]
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
- 
-> Kevin Krakauer (3):
->   selftests/net: have `gro.sh -t` return a correct exit code
->   selftests/net: only print passing message in GRO tests when tests pass
->   selftests/net: deflake GRO tests
-> 
->  tools/testing/selftests/net/gro.c         | 8 +++++---
->  tools/testing/selftests/net/gro.sh        | 7 ++++---
->  tools/testing/selftests/net/setup_veth.sh | 3 ++-
->  3 files changed, 11 insertions(+), 7 deletions(-)
-> 
-> -- 
-> 2.48.1.658.g4767266eb4-goog
-> 
-
-
+    Andrew
 
