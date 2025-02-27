@@ -1,123 +1,117 @@
-Return-Path: <netdev+bounces-170230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9918A47E9D
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 14:11:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C20BA47E99
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 14:11:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B22E43B5166
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 13:11:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50BCD1894542
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 13:11:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C682422F178;
-	Thu, 27 Feb 2025 13:11:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF92E22F397;
+	Thu, 27 Feb 2025 13:10:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lR1W0HlF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qk8bfTSw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D98D21ABBE;
-	Thu, 27 Feb 2025 13:11:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA4122F178
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 13:10:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740661876; cv=none; b=F4s9EpXBN4Qh77MZeO4IZVB3GHifElG48c9gNz7rH1CfVP92LyJ0zgHKNmwxn6lYNYCAAiIiMT0r2KVtSzz1LGMc7DVorpXsbtf00AbiNiyHq/CYYYAuhDDNAQCody4NlP4pgV9WQxDbfQhTesPS9KLQe5sd1DEGMexS5VySotQ=
+	t=1740661842; cv=none; b=Cs2EVdRk0BsunYCJkK8Rcb/QQrU08xBbAOD9VECjFyulcoMpKqlMEjE6DSdHBZV5qcb8hytnYiuQOIk4Onm1ZgOQNL5B88wT4gWqMtL9ZqxUgtlsAWFmnCAtlGTYy8nJ/QPr1K/onvQe5awXT4pZ6Q5o4KGMJ08aGzbn1q5QjwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740661876; c=relaxed/simple;
-	bh=V/pUxgT+Vht4GXGhv/7+4ABfo2gbm6GzpoHQLy2bYws=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T2TIhlUvNa/Qp9G23ce6uayIdaK6hpw9j2RK6ey7Y05JaBMRxKLnxGxZhpH2X03T96y8/VsEiZSZctsH8FfJe4PhhNAvH6/U19/QKYNNOBprAgwhOxfHNZ14oprXO3ixSgsZp8PIm+AQ4WNfs5UFI9cuVJ3n7wyx9sZIBWzWrLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lR1W0HlF; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740661875; x=1772197875;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=V/pUxgT+Vht4GXGhv/7+4ABfo2gbm6GzpoHQLy2bYws=;
-  b=lR1W0HlFJqJSz62mDLAeT31grP/v/2yyqyHuMUu4p+tBh9R1cz+PpG15
-   NsjEL26Cc+JW56a/WQbBqvriGpcpwBVuutHciMDzwwO7y0BAOzUcp+N/a
-   tRnZW627wDiEKUeayVu7+lceakOxO1dhwOygymKbP5jGvo+gBpf0M3A3O
-   OC1f9LGTfP+Ge+mOlHaZQHQEGY0EU8fbjeSK7F9Tv/9lUIedOVQWba5Oy
-   P3TFgjsTRI8mvRydSg1Bv5hpBXHmT/p87v/oUqh3f1jqyRIS9S+J+P5t/
-   6gVuoRj8ROByjxAc17LBadZ2PwtofGpzAoxYgC2nOT8t+vQowE07eIHbb
-   w==;
-X-CSE-ConnectionGUID: jOmQY6PJRm+gM+6Q0OIyuA==
-X-CSE-MsgGUID: 6nqxzcezQ3+m2uggEJB5IQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11358"; a="41680687"
-X-IronPort-AV: E=Sophos;i="6.13,319,1732608000"; 
-   d="scan'208";a="41680687"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 05:11:14 -0800
-X-CSE-ConnectionGUID: 4FlIhckrROSowiQsyIKYWA==
-X-CSE-MsgGUID: ahgclakuSvmWi4Ul3UEvZw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,319,1732608000"; 
-   d="scan'208";a="117667489"
-Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
-  by fmviesa009.fm.intel.com with ESMTP; 27 Feb 2025 05:11:10 -0800
-Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tndfQ-000DO4-06;
-	Thu, 27 Feb 2025 13:11:08 +0000
-Date: Thu, 27 Feb 2025 21:10:09 +0800
-From: kernel test robot <lkp@intel.com>
-To: =?iso-8859-1?Q?J=2E_Neusch=E4fer?= via B4 Relay <devnull+j.ne.posteo.net@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	=?iso-8859-1?Q?J=2E_Neusch=E4fer?= <j.ne@posteo.net>
-Subject: Re: [PATCH 3/3] dt-bindings: net: Convert fsl,gianfar to YAML
-Message-ID: <202502272036.FSFdbXEm-lkp@intel.com>
-References: <20250220-gianfar-yaml-v1-3-0ba97fd1ef92@posteo.net>
+	s=arc-20240116; t=1740661842; c=relaxed/simple;
+	bh=x0K9es0UVKWTnlmDD8ugRax1f8Iim+oHnXb/jzmCklw=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=m6qgMm1ZeQxt3EFUGviB8VSatYjlnuCjbj0U/hV90nGKTHc7W5Fp2XUmUuPvghM0TEx06+r+3bGzw3Lmy6qBu4yCQA6OIXpPinda8KBdSs3HHOY1JBgseYuabR86iRjmh0JHuNgZURcR8nhhKE+ylhlu1BOKENpaVg3QjLfadus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qk8bfTSw; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740661840;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RIJmqPFW7GnIJ0hY3Mu09dKEfAL2sWzM9Kk2euVLCuc=;
+	b=Qk8bfTSwYU/XQaDe38RHrm/m4iOGpz1903DaRVdwC0hzmc7zUFOyNbx+Iu9HFqMRPSfvIu
+	+JCt6EA+13YCZzhQeY3LwEygvIbOuywY/rkyuEoJ+l3LiRRR498jn7qblxLoTv+ThOZ1D1
+	kcYHB9DwLSjLZYUZLq9lRHslHOvYeoE=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-22-2AIoxtemOkG2Lhh5ZO9hsQ-1; Thu,
+ 27 Feb 2025 08:10:37 -0500
+X-MC-Unique: 2AIoxtemOkG2Lhh5ZO9hsQ-1
+X-Mimecast-MFC-AGG-ID: 2AIoxtemOkG2Lhh5ZO9hsQ_1740661836
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 195491944CFD;
+	Thu, 27 Feb 2025 13:10:36 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.32.200])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9DD781944CC9;
+	Thu, 27 Feb 2025 13:10:32 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <899dfc34-bff8-4f41-8c8c-b9aa457880df@redhat.com>
+References: <899dfc34-bff8-4f41-8c8c-b9aa457880df@redhat.com> <20250224234154.2014840-1-dhowells@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: dhowells@redhat.com, netdev@vger.kernel.org,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Jakub Kicinski <kuba@kernel.org>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>,
+    Christian Brauner <brauner@kernel.org>,
+    linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 00/15] afs, rxrpc: Clean up refcounting on afs_cell and afs_server records
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250220-gianfar-yaml-v1-3-0ba97fd1ef92@posteo.net>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3151400.1740661831.1@warthog.procyon.org.uk>
+Date: Thu, 27 Feb 2025 13:10:31 +0000
+Message-ID: <3151401.1740661831@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Hi Neuschäfer,
+Paolo Abeni <pabeni@redhat.com> wrote:
 
-kernel test robot noticed the following build warnings:
+> The remaining patches in this series touch only AFS, I'm unsure if net-next
+> if the best target here???
 
-[auto build test WARNING on 2014c95afecee3e76ca4a56956a936e23283f05b]
+Yeah.  It's tricky as the complete set of patches I would like to post spans
+three subsystems.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/J-Neusch-fer-via-B4-Relay/dt-bindings-net-Convert-fsl-gianfar-mdio-tbi-to-YAML/20250221-013202
-base:   2014c95afecee3e76ca4a56956a936e23283f05b
-patch link:    https://lore.kernel.org/r/20250220-gianfar-yaml-v1-3-0ba97fd1ef92%40posteo.net
-patch subject: [PATCH 3/3] dt-bindings: net: Convert fsl,gianfar to YAML
-config: csky-randconfig-051-20250227 (https://download.01.org/0day-ci/archive/20250227/202502272036.FSFdbXEm-lkp@intel.com/config)
-compiler: csky-linux-gcc (GCC) 14.2.0
-dtschema version: 2025.3.dev3+gabf9328
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250227/202502272036.FSFdbXEm-lkp@intel.com/reproduce)
+> The rxrpc follow-up could just wait the upcoming net -> net-next merge.
+> AFAICS crypto patches go trough their own tree.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202502272036.FSFdbXEm-lkp@intel.com/
+Ah, no.  That doesn't work.  The rxrpc follow-up needs the crypto patches to
+even compile and so needs to go through the same tree.
 
-All warnings (new ones prefixed by >>):
+Further, the afs patches in this patchset are also something of a
+pre-requisite for the afs part of the rxrpc follow-up.  The problem is that we
+have to be able to map back from the address in a challenge packet back to the
+managing socket and the server record in order that we can send find the info
+to put in the response packet and the key required in order to encrypt it.
 
-   Documentation/devicetree/bindings/net/snps,dwmac.yaml: mac-mode: missing type definition
->> Warning: Duplicate compatible "gianfar" found in schemas matching "$id":
-   	http://devicetree.org/schemas/net/fsl,gianfar-mdio.yaml#
-   	http://devicetree.org/schemas/net/fsl,gianfar.yaml#
+This is something that this patchset deals with, as part of fixing some a
+couple of very low-probability bugs (hence why I proposed it for net-next
+rather than pushing it Linuswards).
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+If you prefer, I can see about sending all the patches through the vfs tree or
+the crypto tree rather than net-next.  Or I can see if I can push this set as
+a bug fix through the VFS tree.
+
+David
+
 
