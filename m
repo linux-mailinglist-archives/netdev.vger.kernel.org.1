@@ -1,133 +1,125 @@
-Return-Path: <netdev+bounces-170415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D08FA48A56
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 22:16:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7C3BA48A6A
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 22:25:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B5B53B5F5C
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 21:16:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CB563B6245
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 21:25:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C921E51E0;
-	Thu, 27 Feb 2025 21:16:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA86A271277;
+	Thu, 27 Feb 2025 21:25:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T4uXkicO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YSr4jJsr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52EC48BEC
-	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 21:16:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E192626FA77
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 21:25:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740690977; cv=none; b=dQXtr53wlGrLxpd4o6IM9u4PWPHoXA0bxlG+5EQ0bfmCXdUS7nbomyl/FNyr8lHh9XbUkex+XjFO/DZmNxS/arwBN2P/BE/fIuLrEFaDhDOwJyJYHpIMbTgkIlTFMvGYi5H55nbrq1+JTOF3HBy0DEyKCA4k84suMtBjjl+nIiA=
+	t=1740691514; cv=none; b=ub8RzxpCnGdDvzRquV1n2cfr2T0rvVUDVD8gNTaXkQa43bSh/KptRbGuBOiS1S30feDYK9BYNTF0LlQqTuumiWJM2YDWEUkHfdojuXP1uV6CsGeSSQiSi6YpNPKJDhm5Uuw8TQacitywbcvSCYr2QuSw2twTntP2lBv3m+jy3KY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740690977; c=relaxed/simple;
-	bh=oh3IVZx752jbwhy7GaUotxI9REU9iazHHuSmuL5k8T8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i82boP6bc1Z2iaXt3zltsucuWq5/B0ry7YftNMkT0yJNrKbrbNcz5+4JrEahrdlGHyYh3kzebUBxdtKjot5RrtB6cRizrtn1+qhlthzVS+onJpER6wTVVHM1/j4n+ofc0vUikDbZlIkBCHDDC0dA/6+Ra0fA6lmnoKJPepscsQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T4uXkicO; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740690976; x=1772226976;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=oh3IVZx752jbwhy7GaUotxI9REU9iazHHuSmuL5k8T8=;
-  b=T4uXkicO5DkC650T+DZrvycAr4vQUim+S+YvfdNR1oRYjBAK+v7c3DDm
-   6jgTZLL5wA4G19RJJuUONND4LSj7zuky0ClQKLnNcey0EYeQgDZ+uNGN3
-   651eQhD5fMGSsVZb7K5CEMaj4z8NoAqi3l7ihBkxd3jHbLPKfTBB0jmA4
-   O69o8b6ntTYuYQJQutjkzrSNiocJPhE9DWVxGE25JjALjFRD58yWIGap5
-   mzDokKF5eWroTdrn+mucEHnOGs4ckQyIc/y/hhHBARkqNOwjxhg7ZdyCl
-   5Nt2q34AlJuvVAjLmffZ/UiHdKrPx5Xes63EUPEoC3vgjiWJHTPstXgd+
-   g==;
-X-CSE-ConnectionGUID: OPdDT65yQ7i+O5NaU1ctSQ==
-X-CSE-MsgGUID: oerNaE9hQ92diEZ4c4U1EA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11358"; a="29205991"
-X-IronPort-AV: E=Sophos;i="6.13,320,1732608000"; 
-   d="scan'208";a="29205991"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 13:16:15 -0800
-X-CSE-ConnectionGUID: ZbTco0XYQS+Xpr9XC8b88A==
-X-CSE-MsgGUID: 7lWfphKGRReHFJfnTXRGbA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,320,1732608000"; 
-   d="scan'208";a="140365217"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa002.fm.intel.com with ESMTP; 27 Feb 2025 13:16:14 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Ahmed Zaki <ahmed.zaki@intel.com>,
-	anthony.l.nguyen@intel.com,
-	willemb@google.com,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Samuel Salin <Samuel.salin@intel.com>
-Subject: [PATCH net v2] idpf: synchronize pending IRQs after disable
-Date: Thu, 27 Feb 2025 13:16:09 -0800
-Message-ID: <20250227211610.1154503-1-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1740691514; c=relaxed/simple;
+	bh=lzJuj68IPYELNEwepv8cKovi68A07a9ryFLZ7YUT620=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TQohMoCYf1w3QrNrlsNoubRSTVuhF/HxM9t+RU4ZRBifPSAB/y9hp6d+hMnifOy7BnNk66JdbXdeVw1aXZRS/ticrm1C0i7xnKLvdYtNB12C+nBbQFPGpUsHSlgn2sElFFjjpXYTxKm6SiP/L67/yebfVD/ygRsKOPJMS+pNRhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YSr4jJsr; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-22349dc31bcso26946035ad.3
+        for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 13:25:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740691511; x=1741296311; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LPasBJtfA1A6r+ygxWij1B6VOAarT8bcVJ1UsJBCOVA=;
+        b=YSr4jJsr8f6wYqWFiRV9qNusW9GB8PWYQ5IN2Ei6+3NEAcV/xNUyfZ5V5S/9neJUSp
+         TjTkexNn7u8LfMK79w8CnYZH8pBQNvC//R5ZYg2PUvGxZUHswPJz3CaTRjX1PNtn4SWn
+         WlocuQq+svWCNk1QU14FCUO90LACbM1RYN45+jcusYPFcnCS1eVQJtP7y+9wS3TimkiG
+         Z9rQJn3WvFYy6tFUe+DNAfLiHXVe15NU51mwUPRNwdbv9sY+DULQ3V2lyVnGcu4n7sFB
+         NIx1alDu0ex7/COJwyOLF09e/k38fX2ZVDvcaDMkUxX+RzFjXHP5dhb66Y9M8RAi3STL
+         FZqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740691511; x=1741296311;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LPasBJtfA1A6r+ygxWij1B6VOAarT8bcVJ1UsJBCOVA=;
+        b=jqZclEi62sHPmfwXD1pOTIXeOqWa2kXBe8Yf0CinE9C8xT2jsd7yLDW+LTHqLbVmcL
+         6GDWxwEiygv8stMLxfgWSmcrkg7bYMvyf3tQGCc6cBy5+S+96FyMV5U5i7BQPYhMjERo
+         MYtqfqH/RJRKJ2wUHp1toiRJf2z4beePGqM+zq1m95FI0ZzGsNapNxyRr3xOdwGjiGmn
+         wbC5Z6HK2n9kMpGcSDJkgcj4rGSZD4pQo+K1+gNDVLg0fkfP5uei4XPbs8UFBC4Xti9s
+         JbsuuWlbFf0G+7kbo5vDFilNkew5ECd9TUZnk7uvu3hSmjU5r1vKdAw8I3meWziGO7fr
+         T+Yg==
+X-Gm-Message-State: AOJu0YzybsyyVc6AHxo3xB59cBGeBHvHdtKKUG+vjFowp7irtrLUhZQh
+	1Z+EqdQ697jHQUl4mX7Ti5lApXm4S/rKsVV4uZptDxdu6uC+PVPARNs0nM1m
+X-Gm-Gg: ASbGncsLvG/a/xypEJ06sOrhSss8QkYhhRst5IDoJJQDNk1ibPAOuT7qHVBLT6QJj5l
+	mqDLOptzEgJKyoJyTY7NAeKuN+IXnX22+wmXRi1sz2GvxKZAhDuTrPPuFiPrqVrP7lKNNRJbvFD
+	puBgTkI9A1p7Zh8NDJTtQ6ju/fvUh+a25hVzYLuGk57i5BRvB911dMYr2RevC/bxIvu5JBhItFr
+	5p1PNtqbVHalGS4k46S0vlWBhOu0EaC2Q76Qonyhp9vIbRuk0BrTSHaUfu7syatx3FB0gO9GakA
+	elAH/cotX9SZS8zi6nJ/FJx9MjJeQjd4Ok68uQY8at+GJJoDQLJ6nIrOCw==
+X-Google-Smtp-Source: AGHT+IGBHq1s0yxlGfMCWYPgfiqJIRDa3hS7rAXHcG6G6Vcvw1+v3Kh3nPvhIl0+ny6yu9e75zJzBw==
+X-Received: by 2002:a17:90b:3803:b0:2fa:20f4:d277 with SMTP id 98e67ed59e1d1-2febabf1a7emr1399582a91.24.1740691510953;
+        Thu, 27 Feb 2025 13:25:10 -0800 (PST)
+Received: from google.com ([2a00:79e0:2e52:7:8e35:ae3c:1dad:1945])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fe825a98d8sm4299464a91.8.2025.02.27.13.25.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Feb 2025 13:25:10 -0800 (PST)
+Date: Thu, 27 Feb 2025 13:25:04 -0800
+From: Kevin Krakauer <krakauer@google.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] selftests/net: have `gro.sh -t` return a correct
+ exit code
+Message-ID: <Z8DYMBlzcK5sFG-M@google.com>
+References: <20250226192725.621969-1-krakauer@google.com>
+ <20250226192725.621969-2-krakauer@google.com>
+ <67c090bf9db73_37f929294ec@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <67c090bf9db73_37f929294ec@willemb.c.googlers.com.notmuch>
 
-From: Ahmed Zaki <ahmed.zaki@intel.com>
+On Thu, Feb 27, 2025 at 11:20:15AM -0500, Willem de Bruijn wrote:
+> > ---
+> >  tools/testing/selftests/net/gro.sh | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/tools/testing/selftests/net/gro.sh b/tools/testing/selftests/net/gro.sh
+> > index 02c21ff4ca81..aabd6e5480b8 100755
+> > --- a/tools/testing/selftests/net/gro.sh
+> > +++ b/tools/testing/selftests/net/gro.sh
+> > @@ -100,5 +100,6 @@ trap cleanup EXIT
+> >  if [[ "${test}" == "all" ]]; then
+> >    run_all_tests
+> >  else
+> > -  run_test "${proto}" "${test}"
+> > +  exit_code=$(run_test "${proto}" "${test}")
+> > +  exit $exit_code
+> >  fi;
+> 
+> This is due to run_test ending with echo ${exit_code}, which itself
+> always succeeds. Rather than the actual exit_code of the process it
+> ran, right?
+> 
+> It looks a bit odd, but this is always how run_all_tests uses
+> run_test.
 
-IDPF deinits all interrupts in idpf_vport_intr_deinit() by first disabling
-the interrupt registers in idpf_vport_intr_dis_irq_all(), then later on frees
-the irqs in idpf_vport_intr_rel_irq().
-
-Prevent any races by waiting for pending IRQ handler after it is disabled.
-This will ensure the IRQ is cleanly freed afterwards.
-
-Fixes: d4d558718266 ("idpf: initialize interrupts and enable vport")
-Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
-Suggested-by: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
-Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Samuel Salin <Samuel.salin@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
-v1 (originally from): https://lore.kernel.org/netdev/20250224190647.3601930-4-anthony.l.nguyen@intel.com/
-- Rewrote commit message
-
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 977741c41498..70387e091e69 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -3593,10 +3593,15 @@ static void idpf_vport_intr_rel_irq(struct idpf_vport *vport)
- static void idpf_vport_intr_dis_irq_all(struct idpf_vport *vport)
- {
- 	struct idpf_q_vector *q_vector = vport->q_vectors;
--	int q_idx;
-+	int q_idx, vidx, irq_num;
-+
-+	for (q_idx = 0; q_idx < vport->num_q_vectors; q_idx++) {
-+		vidx = vport->q_vector_idxs[q_idx];
-+		irq_num = vport->adapter->msix_entries[vidx].vector;
- 
--	for (q_idx = 0; q_idx < vport->num_q_vectors; q_idx++)
- 		writel(0, q_vector[q_idx].intr_reg.dyn_ctl);
-+		synchronize_irq(irq_num);
-+	}
- }
- 
- /**
--- 
-2.47.1
-
+Yep. I could change this to use exit codes and $? if that's desirable,
+but IME using echo to return is fairly common.
 
