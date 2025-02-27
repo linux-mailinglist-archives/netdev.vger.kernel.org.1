@@ -1,137 +1,154 @@
-Return-Path: <netdev+bounces-170409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1EEDA48949
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 20:54:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 715B4A489EB
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 21:32:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBD9F16D80E
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 19:54:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61EDD3B7897
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 20:31:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 519CA26F462;
-	Thu, 27 Feb 2025 19:54:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD8B019DF52;
+	Thu, 27 Feb 2025 20:31:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MlzmiiCk"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="CtE8suJn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx02lb.world4you.com (mx02lb.world4you.com [81.19.149.112])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9425C1E3DD7
-	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 19:54:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B39B2AEE0
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 20:31:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740686062; cv=none; b=uSuipAzYkgOVuMHcNKOdtviE164YQ2joV4CLfJmYtqlIztpjyr/wnu7DJ/XPGCAXfd4Htz/KuMDJzFywXyX6Qd7ax7U8QhsiG5HtE4iHOHWJNvqCrcCKvL1VDKjL7bYqUaqyAEQ5jzJVL1sIZ60kcu8uvOI6Gr+GiCkhncBEhIw=
+	t=1740688318; cv=none; b=uFMHOdeJCW9rcLEmbFgacBvme4T9Vy5EXp3j7tiFzotNBzsX2ZRa7K42zcAQINLutqzXVWVLwHbh8rDCfY9JjnaLLZOMQej5/Zuddy5dE/x6NZgF2ZO7LgRkN6wZSViy2Iwt3PyKiwGsNCPT9nUtHXpCGm2avTZtRJ06edCInkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740686062; c=relaxed/simple;
-	bh=fpmz9TxgYoPHauye3q5xpCZiqO15uzV0X85juHs9ukQ=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=TLnF8xoycThB+wLicVBSzhU1cASpiKi/ho4KNAunar8S6/GLnGyASOA1dDAzJxB06zlvuykS2WgM8ctwL1d0CCi+S0dMwJ3O/YLXaYZaxXzwy/UqhFvkBW+B9EW1n8csACsOR7yb8lMuPnhHTQKUzQ2pasq0TrH1coZZVxiAVXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MlzmiiCk; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5deb1266031so2182707a12.2
-        for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 11:54:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740686059; x=1741290859; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AVx+M8ps2yONWKePyuV506c2UoijLLRqmgS3tRVD2ms=;
-        b=MlzmiiCkciRWT7zKENEVlNphtMOHTUyEA1RH6gNnNW9V/hykpw/fBbTtUBAQyNihql
-         ZUAZHXgSkm9kLnjNNpyQAd4QZ4Q+ZJCxVi7Z9KD2vyK1mDpMg9EuKRmUHtcSbW7MjgPc
-         rgsPYcO+11IrBFZNDh4fJxYjiamiCdD+QwihcXycvmlPfx0DKkNpF4Ys8LyccdLJgofh
-         P393lvifomyCUatnbsovSGKbKnWIYDhGXsTbKJp1xFRWDkRNgGt9y6nwOQBdxgZS+ToZ
-         FXcPDyPdkFQpxGAy2OPv8n+vOVJymsO119nhjc29mvyW51Fn3ZX1zHqncjf1KHkkAytA
-         FFKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740686059; x=1741290859;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AVx+M8ps2yONWKePyuV506c2UoijLLRqmgS3tRVD2ms=;
-        b=sG2iwWz3HRJ9dv9GuJ4mJaQ4DWFZLGMbkttHMfYHovLdtTQ/YkkjGlCb8iEirI8WJD
-         H/aDqs9cAMBj4VVevre97zxQYy3sUDIiTu7KnA5zR2SkjG5kGqGBDfx2iROOKvhnehox
-         8fcLHMtxFA7OV0V35HQW79FosuecnudXOCjeQImXY+7BCQFzMdM7KTz1fz9XHa4egH7J
-         HV9Gs3dJDNTl0BdVeDTLFPwjSVbswkLh31itwrgSYf8gQptOArt8LWXHkU53Z9YM4Wqp
-         +N0X9+Fu0nE/EpNL2naTL6r5+xRkzZvPu6UH9FzsTHhktaV3XXrHN+14EBMw7ifvqZ7Y
-         6shQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVUSlFpLKDwHWVfu4JNPI0veEhMscqMKJ2/fI00hH5wJ3m9sfaxtJSl/JLUA4QQhjK5M1fR2a0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwssWqY2T4gjU38XHqzZWeOZRgw9iCI9DaAyKcBJj3v5XX96fVz
-	Gcsom6SL1fEHUvtK9VyWj3vOSqeu8rxF8xfDxFRLiEtSh9/QsXYt
-X-Gm-Gg: ASbGnctWF/Zyv7FwvgDWbbug7uknZQwGG6l35g0W0hGk1oArdynk/O73/nAhiif/DQy
-	vaykXnNunKUO+eAsPcHRObeYFqgd4dK/NBnMq6+I1XZbuQM7QCCBMA06jw7G/Ro6aCDEhVgBAeD
-	jwFZf9PyPMo3MIMsHbqB16Cg+hsTEInC4azquJ6B2+X/BbJxfm1BtD2UqHNRa7Du7M8e+Y4FLM9
-	ho8jxVNXiXyOrLrOxqqhJA+cJ309jwayj607GP9DDmZLA0ZHZluYSap0eDFAJO1LlRh0aLqtsrk
-	240LBbFgm83kFGK/t4vVxNE+hMm37JOzDnh6iL6YrC71JRisTsW4vFQ0BiFgzM7HMzCEfrHs9uv
-	Btjti2h1+sejwXA==
-X-Google-Smtp-Source: AGHT+IHd7oIEvhsBMP3mppCA676zTmgH+2a3BIufkIgbZz61zYRrJmTL1f7XhRihdhWfC+/BU8dTvQ==
-X-Received: by 2002:a17:906:6a22:b0:ab7:844e:1bc7 with SMTP id a640c23a62f3a-abf261fbb40mr68540766b.32.1740686058818;
-        Thu, 27 Feb 2025 11:54:18 -0800 (PST)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abf0c755c98sm172500466b.142.2025.02.27.11.54.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Feb 2025 11:54:18 -0800 (PST)
-Subject: Re: [PATCH net-next] net: ethtool: Don't check if RSS context exists
- in case of context 0
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Gal Pressman <gal@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
- Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>,
- Joe Damato <jdamato@fastly.com>, Tariq Toukan <tariqt@nvidia.com>
-References: <20250225071348.509432-1-gal@nvidia.com>
- <20250225170128.590baea1@kernel.org>
- <8a53adaa-7870-46a9-9e67-b534a87a70ed@nvidia.com>
- <20250226182717.0bead94b@kernel.org> <20250226204503.77010912@kernel.org>
- <275696e3-b2dd-3000-1d7b-633fff4748f0@gmail.com>
- <20250227072933.5bbb4e2c@kernel.org>
- <c034259f-ec9a-2e78-1fc0-f16981cd4e54@gmail.com>
- <20250227085608.5a3e32d7@kernel.org>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <cd0b748b-fe7d-86ac-098b-0d6ec78a04a2@gmail.com>
-Date: Thu, 27 Feb 2025 19:54:17 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+	s=arc-20240116; t=1740688318; c=relaxed/simple;
+	bh=VxARNUgP1YlGVkhMRSdQLQRUmxHNUAAWwoTX7cZtvng=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=eMo/CtvbjefAA4UmH/OIyznwMSpaDj1C/05uXfEyKh8lNCfZ1L2zMJ3087/83iDfj32k6Ny/k+gRUe9tcGVeAY/fZ9Hu5HSikbsDi4Yp2M2/3JCIhugoN4kyJbpR7a5xaGexG6e7WiA+8vgrKVW3Fj/s3AJD9P0ykrEmxlLY024=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=CtE8suJn; arc=none smtp.client-ip=81.19.149.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:MIME-Version:
+	References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=j2RTWx/iEDaz/kSGFvPpAU09x18Ez11+jc7uAhpeyXs=; b=CtE8suJndnT7z2HNKn0Z8QRk8F
+	SHm05f852Xs2p8mPAiYoEJnlNL5/JgJyZBL7+RP4nF/4kgeq0PtnCSDdM4C9+y/ocCCpavYHrxi/V
+	jZbX46Gz58M59L7yobiLCHE0ZwdLiR2niyU35enG6KmNFpQD3KmWFt/Y6dfUK0rlXEa4=;
+Received: from 88-117-55-1.adsl.highway.telekom.at ([88.117.55.1] helo=hornet.engleder.at)
+	by mx02lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1tnkXx-000000000iA-2dEv;
+	Thu, 27 Feb 2025 21:31:53 +0100
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	Gerhard Engleder <gerhard@engleder-embedded.com>
+Subject: [PATCH net-next v9 8/8] tsnep: Add loopback selftests
+Date: Thu, 27 Feb 2025 21:31:38 +0100
+Message-Id: <20250227203138.60420-9-gerhard@engleder-embedded.com>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250227203138.60420-1-gerhard@engleder-embedded.com>
+References: <20250227203138.60420-1-gerhard@engleder-embedded.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20250227085608.5a3e32d7@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-AV-Do-Run: Yes
+X-ACL-Warn: X-W4Y-Internal
 
-On 27/02/2025 16:56, Jakub Kicinski wrote:
-> On Thu, 27 Feb 2025 16:24:52 +0000 Edward Cree wrote:
->>> I never uttered the thought that lead me to opposing. 
->>> ctx 0 is a poor man's pass / accept. If someone needs a pass we should
->>> add an explicit "action pass".  
->>
->> To me 'pass' is just a shorthand for whatever specific behaviour
->>  happens to match the default.  I.e. if you can already express
->>  that behaviour directly, then 'pass' is a strictly nonorthogonal
->>  addition and therefore bad interface design.
-> 
-> I presume sfc matches only one rule. For devices which terminate on
-> first hit and rules are ordered by ntuple ID, the following rules*:
-> 
->  src-ip 192.168.0.2                 context 0
->  src-ip 192.0.0.0   m 0.255.255.255 action -1
-> 
-> implement allowing only 192.168.0.2 out of the 192.0.0.0/8 subnet. 
+Add selftest sets with 100 Mbps and 1000 Mbps fixed speed to ethtool
+selftests.
 
-Ah, so the point is that "pass" wasn't expressible before RSS contexts
- came along, and may therefore be surprising and new.  I get you now.
+Signed-off-by: Gerhard Engleder <gerhard@engleder-embedded.com>
+---
+ .../net/ethernet/engleder/tsnep_selftests.c   | 30 +++++++++++++++----
+ 1 file changed, 24 insertions(+), 6 deletions(-)
 
-> The device may not even support RSS contexts.
+diff --git a/drivers/net/ethernet/engleder/tsnep_selftests.c b/drivers/net/ethernet/engleder/tsnep_selftests.c
+index 8a9145f93147..b1f08f17f55b 100644
+--- a/drivers/net/ethernet/engleder/tsnep_selftests.c
++++ b/drivers/net/ethernet/engleder/tsnep_selftests.c
+@@ -4,6 +4,7 @@
+ #include "tsnep.h"
+ 
+ #include <net/pkt_sched.h>
++#include <net/selftests.h>
+ 
+ enum tsnep_test {
+ 	TSNEP_TEST_ENABLE = 0,
+@@ -756,27 +757,36 @@ static bool tsnep_test_taprio_extension(struct tsnep_adapter *adapter)
+ 
+ int tsnep_ethtool_get_test_count(void)
+ {
+-	return TSNEP_TEST_COUNT;
++	int count = TSNEP_TEST_COUNT;
++
++	count += net_selftest_set_get_count(NET_SELFTEST_LOOPBACK_SPEED);
++	count += net_selftest_set_get_count(NET_SELFTEST_LOOPBACK_SPEED);
++
++	return count;
+ }
+ 
+ void tsnep_ethtool_get_test_strings(u8 *data)
+ {
+ 	memcpy(data, tsnep_test_strings, sizeof(tsnep_test_strings));
++	data += sizeof(tsnep_test_strings);
++
++	net_selftest_set_get_strings(NET_SELFTEST_LOOPBACK_SPEED, 100, &data);
++	net_selftest_set_get_strings(NET_SELFTEST_LOOPBACK_SPEED, 1000, &data);
+ }
+ 
+ void tsnep_ethtool_self_test(struct net_device *netdev,
+ 			     struct ethtool_test *eth_test, u64 *data)
+ {
+ 	struct tsnep_adapter *adapter = netdev_priv(netdev);
++	int count = tsnep_ethtool_get_test_count();
++	int i;
+ 
+-	eth_test->len = TSNEP_TEST_COUNT;
++	eth_test->len = count;
+ 
+ 	if (eth_test->flags != ETH_TEST_FL_OFFLINE) {
+ 		/* no tests are done online */
+-		data[TSNEP_TEST_ENABLE] = 0;
+-		data[TSNEP_TEST_TAPRIO] = 0;
+-		data[TSNEP_TEST_TAPRIO_CHANGE] = 0;
+-		data[TSNEP_TEST_TAPRIO_EXTENSION] = 0;
++		for (i = 0; i < count; i++)
++			data[i] = 0;
+ 
+ 		return;
+ 	}
+@@ -808,4 +818,12 @@ void tsnep_ethtool_self_test(struct net_device *netdev,
+ 		eth_test->flags |= ETH_TEST_FL_FAILED;
+ 		data[TSNEP_TEST_TAPRIO_EXTENSION] = 1;
+ 	}
++	data += TSNEP_TEST_COUNT;
++
++	net_selftest_set(NET_SELFTEST_LOOPBACK_SPEED, 100, netdev, eth_test,
++			 data);
++	data += net_selftest_set_get_count(NET_SELFTEST_LOOPBACK_SPEED);
++
++	net_selftest_set(NET_SELFTEST_LOOPBACK_SPEED, 1000, netdev, eth_test,
++			 data);
+ }
+-- 
+2.39.5
 
-I think in that case the driver will reject the first filter because it
- doesn't recognise flow_type == FLOW_RSS | WHATEVER_FLOW.  Unless the
- driver writer has deliberately added support for RSS filters despite
- only having context 0, which seems like a signal they know it means
- 'pass' and explicitly wanted that.
 
