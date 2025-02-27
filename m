@@ -1,97 +1,97 @@
-Return-Path: <netdev+bounces-170103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33C82A4746F
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 05:27:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50B3CA47470
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 05:27:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE9113ABEEC
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 04:26:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 624F7188869B
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 04:27:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18AD21EB5DD;
-	Thu, 27 Feb 2025 04:26:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ABE71EB5F9;
+	Thu, 27 Feb 2025 04:26:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="bbQ+OWfE";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="V7YOnIPq"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="fQ6H3nhD";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="ieKA6gyk"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 232E51E833A
-	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 04:26:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89FB21EB5C8
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 04:26:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740630410; cv=fail; b=DGcpG+2ZHBDGv7XdbJzhaAtpWdUlK4f9tkbAmLUrsrMwI6ISOqezT8FgX4N+t6ZyFlgfYSbaY/n8rrbcJ2czw/fzDsWNUw33VFvgqS/AN5OIhDgt96hYIiokMOan4TqT0w15MmxtJytkGeqCdMs+98VN8fh86Wj1sHl23HwnjtY=
+	t=1740630411; cv=fail; b=Hgglkals1Ws2ZKCP3NeG78VniMIXu1ZDsiVNY7r1vfIbmx2MaDDwsA07pyEpnjOQyvt9uK+qvZ+1Y3dUQ1+aa8ts9FvmFIGeR8XuMAOguUXzv5mMiOxIJVRPZKgnJCfkRQbRcg6m3X2uTGEsW25vw6B4kg4Q/Q3256oN+bmAlD8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740630410; c=relaxed/simple;
-	bh=1kAIcZFQaP83OKZqO670+TCpX+32YP7f+OrYwTGWjDI=;
+	s=arc-20240116; t=1740630411; c=relaxed/simple;
+	bh=0kbc7CKMJlm+xG8z8Yd5UhGI94Ajkcsl9/SSgptX0tM=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=SgI+inEq+uBMClI4mVw9FXB1D6pvXTYPVvySpi6YhrvODSt+nknN5q75psxlctDxM1C49ZTITD4VswvSfjhtV8LVm6b9ZifHLzuJDAfv9TUQGNkNrPlCw3n0kiVMGgi9hCM0a/EmBdnohnjXB4VIb8BCzk2LVE7IebjJGyDFocw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=bbQ+OWfE; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=V7YOnIPq; arc=fail smtp.client-ip=205.220.177.32
+	 Content-Type:MIME-Version; b=LRFRvY344yA9CYJKcMEsCaCD8nH/spHfSYp038LUpRI1rZInKu/veQ2ML6dfffsELK3EARtxJKTwSyIhZJcamIEvAsQmW3RHP69usRV7gPD9bQ5Fz2IK3p/P00VKA/WCBkhlviIkTKoFR5NHU03iVL6m0XrEJWvtsIjPNjuysGU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=fQ6H3nhD; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=ieKA6gyk; arc=fail smtp.client-ip=205.220.177.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51R1gAwA003113
-	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 04:26:47 GMT
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51R1gJij021508
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 04:26:48 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
 	content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=
-	corp-2023-11-20; bh=yBTkSA8Hze0Bbqotlo9kvgN2MtjoYlVtVshaQJrRcJg=; b=
-	bbQ+OWfEDnnsihYnoca6ng9ubOl2ERuasTDb4B7BtRJ+wRhExnU/8a9agoYP+3/X
-	p/UsJIzCE1JS4FtmdmZX5E4NhaAfCFn3TeHOfgMxN5Ohp7tZJCJ/023a0GgcuuR6
-	K0mH06BLRmXVrRdeUn3PFp4gEgG2F42qxwD4JE6IfObTBS6N6EiWVpqBklkTfBkG
-	9pJXRXB39OWd2rkGpeEj/QEzi2WXjOflTAI8CesttEAPqZ552Vv4qEwRbMHlfY1P
-	oZ7grmcGNVkvLBzXmqNyl7Xz0bRdoX5/m5wDXbQZ+fOZi7mDbpTMpxo3fbg6P2Xq
-	yQyIMAxf/kAzwP1aX7Gpcg==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 451pse2mmd-1
+	corp-2023-11-20; bh=iZ5NBE9I70djLF74sN+w6odIO+OfqXLNUweyhByekHQ=; b=
+	fQ6H3nhDXQ4UvFdQWmwFezokgJzK8npUOKObGSKLEuoq+gPhdBdbaraddkn4ipJw
+	CCEimeaWfXk9VwWxX3obJ+Mzs645tMDBeDAc/rCWvUgK5tpRdYtxj8Sb3cQXSqCr
+	xRuf+sc/lfpOJuH33qs2euK1jx54w1GRXL6vuI69AMTY77yj/J3a9cXqbmLP3HXz
+	lIPW89CfpyNaiTOQw6WyCbh7Ld7EyWr4i5JIulZjt8tMrbYdQiWYJhwFDFSHC/3B
+	+drI0NHrIyYq1Wzs7E0C5j3PqzikaL5C49HurAojce7nC2TSYVR50tZZeKnZyeIr
+	zS4nGimejOw1AQkYL4uwbg==
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 451pscandd-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
-	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 04:26:46 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 51R4DwQC012594
-	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 04:26:45 GMT
-Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2168.outbound.protection.outlook.com [104.47.56.168])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 44y51cuy22-1
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 04:26:48 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 51R2eOKf002697
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 04:26:47 GMT
+Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2172.outbound.protection.outlook.com [104.47.56.172])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 44y51buaaf-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
-	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 04:26:45 +0000
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 04:26:47 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=IKzdhjoBnbEd4hvYsdlYvA66ldubJgcdu/uu9UZ3kLO7Gfxgge2L3drp5yHE7Rm5WJSIeGdisG3Z/HOHP4tP9dWMbME145xaSIjINTN5pJ5STOa8GC5e3CVca52KvqaAVuf7Hy7imgeTIwo1jOn2ZI8j2qLB2KEGNmjP4Am7dwdM4zbnwkaMgePhNoMIdAOLR+M3EM43uekmPnBhI3w+zWPE6XcgR9pVXmeCBPYNfVPD2evtYQRkjdF/hPyXXSLHY9ZAWsawJ/vfroBh6ZYpUQLwSJ59ZrjQxTm1i6rrLysSSJPOiXjkzTSXzq5LdnDJ1R15H6EeC1CZwWy6B91NGA==
+ b=yV/FWf+4taAFOSjcFTyE48cH5Afpdqd5O04tZvJN8ZnjFZ+QZsHq07HParugqS90vrRRJK6SyaLNEoVVa4099cJ4Uu+zlq2kAG5kRewz56hdKmp0bSCdFkrnXZEWF9FcUNMrboC/yJMOR/RK9a7HVMjv9GrYdes3VbYdnaHbMCZzplADI+qEQYd2SxE0hM3TtIVmn96GUq1xlfpeKUmjIkz72yd4hyVmG3gCABimo7PFA0SDwTw4fB945ElpfVn6wJnkjF7lCmslEPmfIcsUQmxix0rRTeVKzTsuzLsbAWLNA5TzqvVeaL1b/2Riw2X4UPH/QLSIR+07CwSfvw10VQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yBTkSA8Hze0Bbqotlo9kvgN2MtjoYlVtVshaQJrRcJg=;
- b=CppRyNMIf75oufLpRTjBh/9HwR0BheXturqFp/KEMgmHwFPXon9eKfCGMOLwBjvlmDxzwZJNdndi2mQo2gdQH1rA4lLr7BqSRjjJ0nO9oW7j41N/AET+coIOijHRj0DDBDx509Ux9+9Us2k/CiC1ozPxP11IlHJzZnzsBWdT/3plUGPRmgK6iQAvcW6dnA+tzPfZbF1BH6Bb0c7jR91vvf9yIlXMZwmArmzWBEbOF4H1+EZtxDZaYnGwVC+NCeN9feZlOb5NipKOjyi8vQL78rLOxLij88LZBV1JrgM8mwoPBRcm02vgL1g/X1ESMkhKp2sH+0k1cucbt4LwYoUczg==
+ bh=iZ5NBE9I70djLF74sN+w6odIO+OfqXLNUweyhByekHQ=;
+ b=ZCBdLs9KR9y5/pzRYWEwwNntnFhD4dB162nKznyBT//k3FoXiirKuCN/IoVOtCkR5K9tNRja25+9Hw++GQwvg/krN/vSvwOeCpfTKomAj3IhEaZzy1Col1H2iV+Xsv3e/cDAMXtDJEUSDt30p7DADz8Z+nA5YSCDQsgwZDKY5hVFgU1Vj7K8ie7HcWp+XjG1I8s8La7v3jXwrLsxcWqY6ts2J0bMimOkRL0DmTTDsbWpcV3yqeoGW5eLik560iBamZRLVb1WgNycwfBpRc63ApZNst1jH5Ns5OaWxPv6B5F6bSP+LbNgcuIHA9jGjxyraBkqE9SZartM72K/Zc69hw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yBTkSA8Hze0Bbqotlo9kvgN2MtjoYlVtVshaQJrRcJg=;
- b=V7YOnIPqVXRwbpErVN+JdH+vWmLIXITDc6++lc4tq3oLosmKRLnIAS6SC82aJFOyegytH+tZjBS1W8UpaKS2fwJK9S09QATfCPR9iSWVwvM6yNaGH1MC048hJ0oRTLvDMm41hRcv6054aItLroO0uNmMQStYMGr6mK2hLSMoYvk=
+ bh=iZ5NBE9I70djLF74sN+w6odIO+OfqXLNUweyhByekHQ=;
+ b=ieKA6gykazwD5z1e6L0IPlNckxjmcUYhLQv2NjLzLkzDN0/L2ZY/j9OJ65EdZkm0rHGGO1dYijkZgFkJLgns2lEMPn7AuOyXQ9qHwv0ga//neL0/w2xJULl7wL74lrhvLX5n58ci4u5vdAUqGmeQni09c021rhoUW/TUVVVZzwY=
 Received: from BY5PR10MB4306.namprd10.prod.outlook.com (2603:10b6:a03:211::7)
  by SA1PR10MB7587.namprd10.prod.outlook.com (2603:10b6:806:376::10) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8466.20; Thu, 27 Feb
- 2025 04:26:43 +0000
+ 2025 04:26:45 +0000
 Received: from BY5PR10MB4306.namprd10.prod.outlook.com
  ([fe80::b78:9645:2435:cf1b]) by BY5PR10MB4306.namprd10.prod.outlook.com
  ([fe80::b78:9645:2435:cf1b%7]) with mapi id 15.20.8489.019; Thu, 27 Feb 2025
- 04:26:43 +0000
+ 04:26:45 +0000
 From: allison.henderson@oracle.com
 To: netdev@vger.kernel.org
-Subject: [PATCH 2/6] net/rds: Re-factor and avoid superfluous queuing of reconnect work
-Date: Wed, 26 Feb 2025 21:26:34 -0700
-Message-ID: <20250227042638.82553-3-allison.henderson@oracle.com>
+Subject: [PATCH 3/6] net/rds: RDS/TCP does not initiate a connection
+Date: Wed, 26 Feb 2025 21:26:35 -0700
+Message-ID: <20250227042638.82553-4-allison.henderson@oracle.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250227042638.82553-1-allison.henderson@oracle.com>
 References: <20250227042638.82553-1-allison.henderson@oracle.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: PH7P220CA0130.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:510:327::14) To BY5PR10MB4306.namprd10.prod.outlook.com
+Content-Type: text/plain
+X-ClientProxiedBy: PH7P220CA0137.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:510:327::22) To BY5PR10MB4306.namprd10.prod.outlook.com
  (2603:10b6:a03:211::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -101,207 +101,298 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: BY5PR10MB4306:EE_|SA1PR10MB7587:EE_
-X-MS-Office365-Filtering-Correlation-Id: adb19c3e-c3df-4baf-328d-08dd56e6f065
+X-MS-Office365-Filtering-Correlation-Id: 7b73737f-cc27-469a-ca6f-08dd56e6f16e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?TFB0KzIrdFFkR0pCMmJNR2JNYmkzQ3hFQmw1K01UYm5ndEk3ODhpKzgyUHM3?=
- =?utf-8?B?T2Z1OG9PMG4xdGlPY1lVVTREMjJTZm5ZSkZLcUtmQTFTTGJCdDdiTEhEOXJT?=
- =?utf-8?B?UFk4cEtaMjNkdndlZ2VTMVozdGRBS2pXeFhicEFCUS9rTklDanJ0RU9OMlNE?=
- =?utf-8?B?L0VqNEkwMXRIM2ZFWjBvYmN2VDhSWkRlSjNQUHV3OWwwVEljSnp4ZUx0cVo1?=
- =?utf-8?B?YytOcjRoamxKUjVVa0xkeGRjTEFkMnlFZkcxbEZJWFNGTnJJK1VRWFoyMEZa?=
- =?utf-8?B?TmMxWTRjcnkyVGxpU1VCQ3VVQ05tWG9peGRsa0k2RG5pZFRBMnZFUmxOU3p5?=
- =?utf-8?B?dmNHTWsrTk8wYTVjeHloNm5HVHR4RC95WWIvNDlrUEFNMEdXWEJaWkh2V1g0?=
- =?utf-8?B?djFCME93d3VtMHAvaDhCMXkvaE8weWJTckU1MWFUM3ZKaTZncmZaL2Rpc2p1?=
- =?utf-8?B?M3RITWl5S090NGJSek1Uc2Fxd3poVzFTcWtVay90a0p5YTJKUzdYRWZnbEJr?=
- =?utf-8?B?RHBrKzB1S2xrSlZBQmt2MWNVZXlwSVBWdkVKMlQ2Q2ZLUU1UVUNmTm9NZkIr?=
- =?utf-8?B?bHlRWmN5MUtoMEJ3eGhEUU1yR2RTMnJpb09wRlpQL2FpcXBZNnFEdkE3TWtj?=
- =?utf-8?B?L0RTVFB3L1hrUmlTNU55VHo1THFHNm8xR1VqVDFFZU5aQ05KbmE4enZ3RGli?=
- =?utf-8?B?aFlISERHeFI5VXFkamk3Z0ZXUUJIaTRhb3hhdjBXQzFVbUg1dEpsRTM3VnF0?=
- =?utf-8?B?M21tRjhiQTFnSHE2Yk1ObGxKMDA2ZjkyQTNDYzVZS0RUQUt1dDhhR3B3MnRT?=
- =?utf-8?B?OEJyOG9hakxVeUJoSzZua1p5L0dIRTJqaHB0NkZKQ25NUXJCcHFMS0hRbTNF?=
- =?utf-8?B?SG5qZldReVU1YXh2OWN6TG9vODNHSm82M0RoY1cyWkkzL1J3YTlpTFN0QzJR?=
- =?utf-8?B?bXM0V1lzdXFidGwwUHNJYkYxQXM3UmxNNFBmZzVCNE03cy9vdWNubUI1Sit6?=
- =?utf-8?B?SFF0VGp0ZlBsZ3RHdWpoMEhYRnUxTUU1ajB2MW92WEp4UE9TRGpMQnFZRFEw?=
- =?utf-8?B?U3E0MlozZG1HQVNpYjRPWHRQZjRNQ1E3cVJjWlNXMm9GelQ0bS8xOEwyT29l?=
- =?utf-8?B?eVFqUVhoSHFZYjdFRDI3Sk1LWHdzSnVmbUZtdjNGaDRVOHN5eW1IRnBCUDNX?=
- =?utf-8?B?RGt6TVVlbzZsa0hET0hab1prejNLbTkzRk45aUZscmtUeXY3cWNBeEl4UW5l?=
- =?utf-8?B?OU8wL2M0Z0FWNkNYL2VlVmN1TWp0QTB1UzdWeEIzUkRERm5SaHpVeVdvaE9L?=
- =?utf-8?B?RW9VVmw1U29hUlhaVmtKcDdreWtEMWdKL0wyNHRybm9zNTQ1RTVSUVIzeXJn?=
- =?utf-8?B?RzVtVFJMeWNXek9DdWphMERtMGk3U29ucEtTZzRvUnd1T0c0T0dNZEkvRE1r?=
- =?utf-8?B?SUxWdWVMNjlia2xkOEtkNWNLc0Q0TzYva3JPYldZTENMclZJL0pLNHoyQUgy?=
- =?utf-8?B?SUxEZ3JqNkEvWktOc1ZMVFNwK09FYWdtbmxuNytyUDBQRHpJeDFYT25sRm0w?=
- =?utf-8?B?K081aFFnOVA4TG92U0R0U0tjTnJQM2ZDclZRLzIxcm9OTnJ3RmRiQkNiZnZB?=
- =?utf-8?B?RHV2VGhuNTdkODZnc0FaaGNLeFdmZ2MrOGUzWElhcTdIeVAxYkpCeGFkYnRp?=
- =?utf-8?B?MHZEaXlQZitIcDN1cmdod1Y0RWdlTlBBWmFQejBVckdUbWpTeUp3ejJDbjhV?=
- =?utf-8?B?VXc2clNwdFZwaDBSQ1NUbThsalN4RE9MVkpBWlVqVGpKTU42anlUZ21TRWdt?=
- =?utf-8?B?d3hUc3ZabnNLUXpUUGN0N3o5ZUwwUmtEQm1GcW9KNzVONzJmLy9hQ1FDb2NJ?=
- =?utf-8?Q?Tnc46dixocS75?=
+	=?us-ascii?Q?6vxdNr+Yza19bNPeQ+/GODWw3IlFc/SkfyleeRnfU7Ggr8Y1khpjgttbrSaq?=
+ =?us-ascii?Q?8XVwxXNI/1B8CYCuDNKK5EBfcZ1qvax9nSi9mD+PPeDzf0ovMsuhHsGdDmkP?=
+ =?us-ascii?Q?ofev+0WIZHPFC8ukasGZyhuHRvEfyo4qHTGPGEaACR4r73z2Ov6CQq326Y6N?=
+ =?us-ascii?Q?rPexMDW6G3laKGgKriBycq3CpUrPBSsa4asNffhG961emCx3zvkzomabUWru?=
+ =?us-ascii?Q?PSSQgf4NGVoGUJi3iyJvb/7Hhao8C81aa3UIEdM+LIH5etWxY9H34B/i2EAX?=
+ =?us-ascii?Q?Iz1JF7wGPVJXANznLukEhKO917VRrcpGKQMII4UXOuT4RIN3Q+E5Q8OU6DPO?=
+ =?us-ascii?Q?Sd4qVhYJevYKXVIKheFbRu4N38Z9q5KnR9meBFzXXtQJ/7epP19JwCKj/jk9?=
+ =?us-ascii?Q?6RJvrkej3/y3JvPlSQIaEpsYy6CDoW5rnZy9U9OOJnw0hBca7ACJ0K4qEp+f?=
+ =?us-ascii?Q?Y5dac0DwaoYSLPrUnRkTIwduQV6cULf2weIY4BDhbEQpEdLWw4qngyqw/zBM?=
+ =?us-ascii?Q?cHUpymTSnqI2YBpn82ri7/WZsVDXKKn0TmwiSu/SdjZrzgaQuJAAxiUozcc9?=
+ =?us-ascii?Q?WKiZ/Pzbdkfz1ct11FBQK5PsMXhsd1+52D+XQk355p8cLuPUZvDd6rRnwerg?=
+ =?us-ascii?Q?/bXXgnxWYCxE0zcoToptksI8t/v7OLFOus9fy6F5s0+pGoW0iJ7muwai5JPw?=
+ =?us-ascii?Q?/hE697XU4eyk0rnnTa6bS7AQ8O33zUC8gKauwCKm7YyLOufRKuhdEA3bgqRj?=
+ =?us-ascii?Q?PKpV39awuqoFAPpEtxWMXe34qPXnpsgB/KSfgjWSSOsBMVCDqTcAhcLsRE2C?=
+ =?us-ascii?Q?UPHV9LnjYGZUWYzlcqahzomT+Ys/rNq1ViBffQEAd8G1gGLYMjAqJ1bMYlKg?=
+ =?us-ascii?Q?HNyp0xmy9wvG5m/ZqaWIhVCU2u8OmKJ31UkxccCSb0kghUcHGSY0Wd169Hxj?=
+ =?us-ascii?Q?p1KnQzCn3HM3Q7uBmOJrS1Jdr7dtG098T+v76cQu3zgMDm/hu8SoVZE3+wWI?=
+ =?us-ascii?Q?TeyI4fvWU0aKWAP4E4RnZLX7pXYZsYcNBwdXaDYP1rcctD2x5dKCyiLW9MzW?=
+ =?us-ascii?Q?pbID8YwvVCYUgecGL6y/nEuWdy7YdH6UNyE1a4+xCCLMMiBVNKC0jvEFrFl4?=
+ =?us-ascii?Q?GEgoDFouJvd/YOmDIEaY5pxDHE7WljfpKp65+1fcLUU1C4hUUYsJfHT5gX87?=
+ =?us-ascii?Q?z5cAdRND1pGfQlbCHAMaf3bg/2N9BlvbWow9o7BStLxTo9G+BApUsj7Iy8r6?=
+ =?us-ascii?Q?ciufeVqurrgGnN16XYHwMUHAPzy8fh8FmUNZ3HAv0eG7+v1jtrsrNLg2hBLO?=
+ =?us-ascii?Q?6YgCrCmsvnzFh1spiQVQ1WZFjdnMVvlpp4G9WGqAgl2q9X0KvR1wUkdxKT03?=
+ =?us-ascii?Q?xv+Hgr45yAWTScCQRDCsbaH1R7M5?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR10MB4306.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VXlRME5UR0NHRTJsL3NEblJjR3hPMW95YnV4THhoNHc5bEZNTUlmQ1pZV0lR?=
- =?utf-8?B?d1ovcGo4b044T2NJaUVsR2QrYm9BZytibm1EOUo5M3ZPanlQSjVIem1OenB5?=
- =?utf-8?B?RmRCS3hvaGRYeWZuTmViS0kzV3FoWHIwY04wRUNoSWNPWlIwb0VKZ0hiQ2ND?=
- =?utf-8?B?SENBbFZNSWUzVHI0b1ZjNnVadklyZlV1SWROc1U3RXYzUlIrR3FSNlJLRDIw?=
- =?utf-8?B?YVdHU1gyK25KY0oyV3BLckFodC9RSHNtR0Z6R1hFSFBlRnZMMjN6UGRtb1hH?=
- =?utf-8?B?Mk5ua0FMMmpNWHBQQjZray9xSWMrRFd2UTMyV2JoUHYraGxrbzE1NTA1QkFn?=
- =?utf-8?B?TVVzdWEvNFZnTFZtWHRTMTNmSlMxc3ltSTdodnhHV0djRkJNeDJPYytPR2lC?=
- =?utf-8?B?dkFIeG5aQVdhTmF3WlJSVU1MTVRselFibTZINndNWnFreUcwYitxQnFVN0c1?=
- =?utf-8?B?U1RQRXN2RUJ2YkFTTU0rSE5RVjlaMGZ3Z1BIWU5DYkh3b245SnJlVW9RL2Zy?=
- =?utf-8?B?OWxqWXdPNnhBS05yU2ozdWxWaUhscDJxU3RabDU5TDRxdUFrVVJWOXlkRCti?=
- =?utf-8?B?bldZcVVQL2F4SmtPT3VuaDdJa1VDOHdBbGtaUitLam5jN1BRV1doVDZMeER5?=
- =?utf-8?B?cVljZzlxS3MwUm1XaGZYbWRxQWFid3QwaUYxWkp3NnUxTzNSVXJVRzB0dUR0?=
- =?utf-8?B?bFJ0Z3V4Q2Myamxkb0tzVnp2cjRNK3hiUURMNHdQNDdqNUZ3Nm9QUU9lT202?=
- =?utf-8?B?MUJkd0R1ZG5BWjR2b0xiUHFGS1ZJNGNYaHdwRXRMZTRsdkdIdGN2OEhaVmMv?=
- =?utf-8?B?TFJ4K0Q0TC9ZRWdLU1ZhRnRPQUFDVHBSUEgxazFwKzJpMDltd0JudE9YY0NJ?=
- =?utf-8?B?U1JuSDZXeTAvVk1zRGx5SFVKQXZ0YnhJdytXMXBWWUxLekI5Z3V1T1ZhbERX?=
- =?utf-8?B?QlVYNjBYMTFSOXpoZi9PMll2VzFvZy9WNVQvSEsyZlhqUU9NNGx0cVhzazcy?=
- =?utf-8?B?RDBNWWhFeUpGVitMdVlvYnh1UEZha0ErK1NOWFhyWTc4MmtMWFZ0bkh2OU01?=
- =?utf-8?B?MFVRazNGUkFDallITVhQeXpyUWx6Q0xpZzBWK2dMRkE3eTRTRVQ4dndPbmxo?=
- =?utf-8?B?VTJCckNyREdCRkZJUVMxU1FXdlNKaUJJMFJpK05RYU1xQ0dFWHNDTHhOZXNi?=
- =?utf-8?B?V28ydFAvcVVKUzJUMWJDKzl2RWdwSzhsdnZ2VUZwNFhtQkpURmpsbWhGdU42?=
- =?utf-8?B?MlkwR3VIR0VFcjdIL0xqek9KNE1JNnVWcHpkcHA0RDlKSUxjVEszZVB1WVo0?=
- =?utf-8?B?ZEZQb3kyZFhRMmZEQ3AzYU1mNml4V0tZK0psWjFZejVuM2tsTkNQVkIzclF1?=
- =?utf-8?B?Z1JyQUtmNjBFQldXMkxHV1Y0MElIZjJ4bkVYamxiWjlEQzVUUnhHQitjb3ZU?=
- =?utf-8?B?ZkdmYkdJN2dTY1dXU2l2eFJuWW5ZcFhyRWJGdndUQ0Rkc1FCTW0vM1hLOGxE?=
- =?utf-8?B?YWovY0dTcWlTT0dJTlNhVFNTSWQxMjJ1eldna1RnZEtaZEJHcFVndm1iYWN2?=
- =?utf-8?B?Z3ZCS0J2NVpsMy9rL3NvMW40TDhxNGZnNGdzSFdsVGUzUFZ5bjU4cWxoejc1?=
- =?utf-8?B?VzN1cHFST1hSZ01HSFFPTWptRXFOajRjeksxTTZiNDBDakpabUwvS0dFMmVx?=
- =?utf-8?B?U21ybnkvb3hQSkdGbVBrVzMxblRCM0hmR2pNZTF1SWVqaVgxbTVVUUdlN0pB?=
- =?utf-8?B?NGQ2Z0doZks0V1NCYzcxTFBjNFE2L09qUGNVUGdSL2lLb3hwa251ckdBbkRx?=
- =?utf-8?B?cFROQjI3YmErbno0anlLUEpXaTNRWlFPNDZZaFJlbDgzSlliL0dEY1J5bnQ5?=
- =?utf-8?B?YnNPMUNIWGM2NU0rNkloVDZJNGpqZ0lhMmJXb3IzL1NySWs5dGU1c2VSS0tV?=
- =?utf-8?B?bUt0YStOOGZlODVRMEtZaTlDSEFuVytCZ0JaWlRYZ1pKTGI3Sit2MDlGWXFM?=
- =?utf-8?B?VlZUaVB5RDJyd3JoSG1WZ1UxcmJFRStKQVFUa1hhVXVkT2FwUkFGK1NoMERt?=
- =?utf-8?B?cHJnN0svVXFYK25zZm85WXlWMnVia002aXpBT0RZbk96eFg0U1JSbmd5NVRo?=
- =?utf-8?B?NFl5NmhNalRteGRBQVVpTkhvVTZpaUZMZjZSWTVqaUtTdzBSSTJkWEU1YzlS?=
- =?utf-8?B?bHc9PQ==?=
+	=?us-ascii?Q?UruOV5Rvqc6OOWmuImDPoE+2w62ZEq2YfRyLtEDCSe6qbBEpGVaolK3tGAD9?=
+ =?us-ascii?Q?mN7prWx1WElQPPtNmZs+FgHxl8aHa1FUxGyrCmwGjJuNQEsxxAueqXpRYivx?=
+ =?us-ascii?Q?eDWTAhCEquJx773svCfrjbLKRosyt5aTFhsuWwKrc9xj/RGufCqYGC1Cb3SW?=
+ =?us-ascii?Q?1UQB8VYn03/V2ZADRqb7FV8zz8c8Ks1n7lXz0TvN84e9BgY+1dZssCHgnqrn?=
+ =?us-ascii?Q?clCzgcmKNDww7oFIU0RNJ2UMy5j7kGmspSs2Sowv0MJDiJv550Bf0it+jHaE?=
+ =?us-ascii?Q?D0I7kXLZupSoeqMLR6HBnkOFaQO5hRVr8qO6WtmaZGzpshry5GhSzkvoQmNJ?=
+ =?us-ascii?Q?xR8w7sENkxKIPGILcHE5pUfR8uFVZKiiTZmod4Djbta1icHubE8AznxsLNob?=
+ =?us-ascii?Q?BW3OatOH83VDrJws+SBQ/ZZpj+lXqdDNbDsu73t7zxBAJOWL5DSgr9nkLjy0?=
+ =?us-ascii?Q?uQuE0yyE6Cm4iBS01tSxZeN4iL/bXyB/GF6w63afD04WiNcNqreMbbv2W4oN?=
+ =?us-ascii?Q?Bid1nyk8mM5xr8dgijF+zJR2aMDvnjIIzP1mnkf72R+mpdiZ7XRkc5UbNwDO?=
+ =?us-ascii?Q?T8R/qvlBmnpBqCSXv5b3yF3nAf0stKSAgATHeEvXFpQhJgnaGtM80M5LKe3T?=
+ =?us-ascii?Q?vglWdBy9pIl9qHfcO89Tb0ER1+h3bOT4rqwsG7Hpa0R/FqkxrbYUcLlKtIal?=
+ =?us-ascii?Q?5+erHR78qZ+/Taz0r+pWKhzlqX7WxLNqq+Uueqr2FkQpIJqfsaeX/hMbe4Yb?=
+ =?us-ascii?Q?WPUsPoFH86BpIwR57JXBimXVCOnauZuWgXfPzEbHQ64vljZOLi4jJZoJRLO/?=
+ =?us-ascii?Q?aW+IJTdoyBBiGbk19IsmCX46AWMwTNooPu5yiqfl0Kd9Fv1g5HHVy/amUIFP?=
+ =?us-ascii?Q?Vt5AfbpGxEb7RZiWx+JtQbZEEe6mtAC2Tojhv1z8EJwV2dIwryS6/nUzM4Yk?=
+ =?us-ascii?Q?i/JmDkBfbQPHBsVpodbNBABpgchnaYQm2BtR1UwPMCR+WRH0Rou7zBaNMJrv?=
+ =?us-ascii?Q?xCAMD04FN7WqiAMge20ZG2bWnPHeJ4wJ/r6t5P2uv/PblhgFoxbAJfgP38bt?=
+ =?us-ascii?Q?cKhf4CJ+CqdHsVSuLysUWZbQr+nuycLhila7hOfSW4I9iqqF/vDpceEtDk1Q?=
+ =?us-ascii?Q?ZXFZZKEK+qJXk9QK6mtBZLayw47NDdmVI7yLLiKSP7jV5IW9Bjt0L0tWTRAF?=
+ =?us-ascii?Q?RRj856cOUL6r7EpU3GwVh3hMIaE0CWOcRmwOstDsCRfdNjhFn7OOvMKrltco?=
+ =?us-ascii?Q?mhe0a1yD/1z5KWsuvjTYyq6AGfA/arnBR+da28DrCnFhmCg6Uppsx9byJwj3?=
+ =?us-ascii?Q?BvdxVd3C5E8ZyJDy5PB183yJnS46PcxqRbqaZqSBG8o6h4pHt//X8mZIJ+O4?=
+ =?us-ascii?Q?3KkDlQzqtQgCf0jojAm393CHImYHC6sqauM4+pbru7VmD0eUD4XNUxwWBqtl?=
+ =?us-ascii?Q?U1XSvwhIsVBr8XpGLwqaizZUkN45lwfbfL5XNzdPIiRBzKFooh/vYUnicleS?=
+ =?us-ascii?Q?xA3d3/t81WULNXeG4iyn7vTlJl2oCSlQ7DiV1daZC7hLByvSNkBP/BCmpF/C?=
+ =?us-ascii?Q?E5P/4Csi+aKDAL4AbgDoQKc6V98j4i4CScfFHybI2EpLmssQONGPMnvmwk1B?=
+ =?us-ascii?Q?mg=3D=3D?=
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	wpEwyPxbHAh2T9sPTT/iBser3czk3mG6NpLIWUOLMQmJPBN+XsOkOM/zZSx0yjEBT5wp2YCk7DHfcDfQJWox4HK4s+fIM7z1eVlEWWyW7/+l9A248ldROFdkuwokJer2jx35voNQX51WL9/3TVrqaDTmMChr4Ij6rrheVvfDZvGxnkiLSb3yDLcyXHa84HwrgjGVCgMlwxgRjaFmwrszRUIUzz564s5yOKA63HIHkF2MtVileLBUricTwObAq4c58Liy8fzci8dIC13ssCcK6tQgDlk0Ajtw6uR3UqH+HhujwQy0F4pPdiZbjFE645KjLDl6h8ObKMy/JbbXQDlcdreq4Lpcm8VPu0o8fxugon6DbqqAfiNq7ak03lCiKgrBQ4gaP6kExjp/D9/5TRJgpDnwmw7imIrQzZZRNt3GfuZF6iaqvKkSphJQQdqHP+eKi7DTQ5IpIWM0QzmT4rX4eoAqXmqz35TWaxCArJKyFOCSA4BrtEnzhK0/h/VaciCN6MxL2GaoPkfqJLrH2+3wiIGJCMbut1rkRmwn4IqysSUoChL0riEozQxV9y5GA9DtrAVHsr1iYo9yZAH/kSPVxupWm9+Q8UyctXdIMpJvtaQ=
+	STrOx3KNvri9Vhf7uQENEIbHhia63zJVJ7L+Yk/el3CdgvaA5iobhBCNd2/9Qhs8osMVk+urZd9xB0vIERu6e74pidOLR3oTOKrTvmAXK1vKh3p7Ufj5Xd7OqRKNmpVIIt3RO9+QxpEd+8VuzCHhZwrY3lPkKecfpHvODH0OvdNRnDsAGRM+6R4Gl8zuu/VuzC8OXgVF5F9K/yum+cSKXlt1FTx6ae+tYFulyIwh0fCEyoDJfHRdikcKvvzpgetxuYbjl9iVW3Wn2dXhTgnAt0J/lV3egFULeIBRFS0XpjY4DSPl4uSe5J4b7YCF3rLeMXlpQlGx7M0HgFWanCz6AeYEsRcW+HPYpd3a4mQU+qHHUcC0C7D4alRKF3RXNWhlhTuW6pJl7g/rU7YdMkihgAQaUQFbZ87UM+5F9lnTRnW8YAHScQPN0PBZd8Q5PNyA1nZZqiY4em5tVpB0EqEt6DvKG+m32bEawpjWhnC7ixBnvf+8yB4KNF011uknbEStZuDuaROZwaPGM0ZWoxBhof5BDK9seOhCP1c/V4ga0dOx40imqoX0yV4FS7xcLkshA4uFBFspBGDWVUR3Cbej8kPyDL73Gtn4QtJ3MUS1oSs=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: adb19c3e-c3df-4baf-328d-08dd56e6f065
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7b73737f-cc27-469a-ca6f-08dd56e6f16e
 X-MS-Exchange-CrossTenant-AuthSource: BY5PR10MB4306.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2025 04:26:43.3469
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Feb 2025 04:26:45.1118
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rc9v0kzS+Zl1LuEBRp2TjOLP0jY0+UbSaum2JDID81z/yRXRmY7lt+MOq9k3xvWrSxmsd0139MkdJaHOs0P5RgTX/iL88v12PWSr2ulTS8E=
+X-MS-Exchange-CrossTenant-UserPrincipalName: vBb97IVLxGHsBOgK9rTLXWEd11a2eubbZVNylvEmotE02cC1LLF8VHC/C1Wrq09cZvNPzrApacrdSzMIv0pXluvxy8TcotNUFAaCx7aB6qI=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR10MB7587
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-02-27_02,2025-02-26_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0 mlxscore=0
- adultscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2502100000
- definitions=main-2502270031
-X-Proofpoint-ORIG-GUID: Xz0bjQRZkG9Fck-lyciKg2NTjeMO6k05
-X-Proofpoint-GUID: Xz0bjQRZkG9Fck-lyciKg2NTjeMO6k05
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ mlxscore=0 adultscore=0 bulkscore=0 phishscore=0 spamscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2502100000 definitions=main-2502270031
+X-Proofpoint-GUID: TP6kppX67gyF6n42LxSFtIrhiOIEyA4I
+X-Proofpoint-ORIG-GUID: TP6kppX67gyF6n42LxSFtIrhiOIEyA4I
 
-From: Håkon Bugge <haakon.bugge@oracle.com>
+From: Ka-Cheong Poon <ka-cheong.poon@oracle.com>
 
-rds_conn_path_connect_if_down() queues reconnect work with a zero
-delay, not checking if it is a passive or active connector. Re-factor
-by calling rds_queue_reconnect(). The zero re-connect delay on the
-passive side may cause a connect race.
+Commit ("rds: Re-factor and avoid superfluous queuing of shutdown
+work") changed rds_conn_path_connect_if_down() to call
+rds_queue_reconnect() instead of queueing the connection request.  In
+rds_queue_reconnect(), if the connection's transport is TCP and if the
+local address is "bigger" than the peer's, no request is queued.
+Beucause of this, no connection will be initiated to the peer.
 
-Helper functions are added to conditionally queue reconnect and
-properly clear the RDS_RECONNECT_PENDING bit.
+This patch keeps the code re-factoring of that commit.  But it
+initiates a connection request right away to make sure that a
+connection is set up to the peer.
 
-The clearing of said bit is moved to the end of the
-rds_connect_worker() function and by that also fixing a bug when
-rds_tcp is used, where the bit was never cleared.
-
-Signed-off-by: Håkon Bugge <haakon.bugge@oracle.com>
+Signed-off-by: Ka-Cheong Poon <ka-cheong.poon@oracle.com>
+Signed-off-by: Somasundaram Krishnasamy <somasundaram.krishnasamy@oracle.com>
 Signed-off-by: Gerd Rausch <gerd.rausch@oracle.com>
 Signed-off-by: Allison Henderson <allison.henderson@oracle.com>
 ---
- net/rds/connection.c |  5 ++---
- net/rds/rds.h        | 15 +++++++++++++++
- net/rds/threads.c    |  9 +++++----
- 3 files changed, 22 insertions(+), 7 deletions(-)
+ net/rds/af_rds.c      |  1 +
+ net/rds/connection.c  |  3 ++-
+ net/rds/rds.h         |  7 +++++--
+ net/rds/send.c        | 46 +++++++++++++++++++++++++++++++++----------
+ net/rds/tcp_connect.c |  1 +
+ net/rds/tcp_listen.c  |  1 +
+ 6 files changed, 46 insertions(+), 13 deletions(-)
 
+diff --git a/net/rds/af_rds.c b/net/rds/af_rds.c
+index 8435a20968ef..d6cba98f3d45 100644
+--- a/net/rds/af_rds.c
++++ b/net/rds/af_rds.c
+@@ -685,6 +685,7 @@ static int __rds_create(struct socket *sock, struct sock *sk, int protocol)
+ 	rs->rs_rx_traces = 0;
+ 	rs->rs_tos = 0;
+ 	rs->rs_conn = NULL;
++	rs->rs_conn_path = NULL;
+ 
+ 	spin_lock_bh(&rds_sock_lock);
+ 	list_add_tail(&rs->rs_item, &rds_sock_list);
 diff --git a/net/rds/connection.c b/net/rds/connection.c
-index 1d80586fdda2..73de221bd7c2 100644
+index 73de221bd7c2..84034a3c69bd 100644
 --- a/net/rds/connection.c
 +++ b/net/rds/connection.c
-@@ -913,9 +913,8 @@ void rds_conn_path_connect_if_down(struct rds_conn_path *cp)
+@@ -147,6 +147,7 @@ static void __rds_conn_path_init(struct rds_connection *conn,
+ 	INIT_WORK(&cp->cp_down_w, rds_shutdown_worker);
+ 	mutex_init(&cp->cp_cm_lock);
+ 	cp->cp_flags = 0;
++	init_waitqueue_head(&cp->cp_up_waitq);
+ }
+ 
+ /*
+@@ -913,7 +914,7 @@ void rds_conn_path_connect_if_down(struct rds_conn_path *cp)
  		rcu_read_unlock();
  		return;
  	}
--	if (rds_conn_path_state(cp) == RDS_CONN_DOWN &&
--	    !test_and_set_bit(RDS_RECONNECT_PENDING, &cp->cp_flags))
--		queue_delayed_work(rds_wq, &cp->cp_conn_w, 0);
-+	if (rds_conn_path_state(cp) == RDS_CONN_DOWN)
-+		rds_queue_reconnect(cp);
+-	if (rds_conn_path_state(cp) == RDS_CONN_DOWN)
++	if (rds_conn_path_down(cp))
+ 		rds_queue_reconnect(cp);
  	rcu_read_unlock();
  }
- EXPORT_SYMBOL_GPL(rds_conn_path_connect_if_down);
 diff --git a/net/rds/rds.h b/net/rds/rds.h
-index c9a22d0e887b..1fb27e1a2e46 100644
+index 1fb27e1a2e46..85b47ce52266 100644
 --- a/net/rds/rds.h
 +++ b/net/rds/rds.h
-@@ -794,6 +794,21 @@ void __rds_conn_path_error(struct rds_conn_path *cp, const char *, ...);
- 	__rds_conn_path_error(cp, KERN_WARNING "RDS: " fmt)
+@@ -134,6 +134,8 @@ struct rds_conn_path {
+ 	unsigned int		cp_unacked_packets;
+ 	unsigned int		cp_unacked_bytes;
+ 	unsigned int		cp_index;
++
++	wait_queue_head_t       cp_up_waitq;    /* start up waitq */
+ };
  
- extern struct workqueue_struct *rds_wq;
-+static inline void rds_cond_queue_reconnect_work(struct rds_conn_path *cp, unsigned long delay)
-+{
-+	if (!test_and_set_bit(RDS_RECONNECT_PENDING, &cp->cp_flags))
-+		queue_delayed_work(rds_wq, &cp->cp_conn_w, delay);
-+}
-+
-+static inline void rds_clear_reconnect_pending_work_bit(struct rds_conn_path *cp)
-+{
-+	/* clear_bit() does not imply a memory barrier */
-+	smp_mb__before_atomic();
-+	clear_bit(RDS_RECONNECT_PENDING, &cp->cp_flags);
-+	/* clear_bit() does not imply a memory barrier */
-+	smp_mb__after_atomic();
-+}
-+
- static inline void rds_cond_queue_send_work(struct rds_conn_path *cp, unsigned long delay)
+ /* One rds_connection per RDS address pair */
+@@ -607,10 +609,11 @@ struct rds_sock {
+ 	struct rds_transport    *rs_transport;
+ 
+ 	/*
+-	 * rds_sendmsg caches the conn it used the last time around.
+-	 * This helps avoid costly lookups.
++	 * rds_sendmsg caches the conn and conn_path it used the last time
++	 * around. This helps avoid costly lookups.
+ 	 */
+ 	struct rds_connection	*rs_conn;
++	struct rds_conn_path	*rs_conn_path;
+ 
+ 	/* flag indicating we were congested or not */
+ 	int			rs_congested;
+diff --git a/net/rds/send.c b/net/rds/send.c
+index 6329cc8ec246..85ab9e32105e 100644
+--- a/net/rds/send.c
++++ b/net/rds/send.c
+@@ -1044,15 +1044,15 @@ static int rds_cmsg_send(struct rds_sock *rs, struct rds_message *rm,
+ static int rds_send_mprds_hash(struct rds_sock *rs,
+ 			       struct rds_connection *conn, int nonblock)
  {
- 	if (!test_and_set_bit(RDS_SEND_WORK_QUEUED, &cp->cp_flags))
-diff --git a/net/rds/threads.c b/net/rds/threads.c
-index eedae5653051..634e9f431fd6 100644
---- a/net/rds/threads.c
-+++ b/net/rds/threads.c
-@@ -153,8 +153,8 @@ void rds_queue_reconnect(struct rds_conn_path *cp)
- 		 conn, &conn->c_laddr, &conn->c_faddr);
- 	rcu_read_lock();
- 	if (!rds_destroy_pending(cp->cp_conn))
--		queue_delayed_work(rds_wq, &cp->cp_conn_w,
--				   rand % cp->cp_reconnect_jiffies);
-+		rds_cond_queue_reconnect_work(cp,
-+					      rand % cp->cp_reconnect_jiffies);
- 	rcu_read_unlock();
++	struct rds_conn_path *cp;
+ 	int hash;
  
- 	cp->cp_reconnect_jiffies = min(cp->cp_reconnect_jiffies * 2,
-@@ -171,8 +171,7 @@ void rds_connect_worker(struct work_struct *work)
- 
- 	if (cp->cp_index > 0 &&
- 	    rds_addr_cmp(&cp->cp_conn->c_laddr, &cp->cp_conn->c_faddr) >= 0)
--		return;
--	clear_bit(RDS_RECONNECT_PENDING, &cp->cp_flags);
-+		goto out;
- 	ret = rds_conn_path_transition(cp, RDS_CONN_DOWN, RDS_CONN_CONNECTING);
- 	if (ret) {
- 		ret = conn->c_trans->conn_path_connect(cp);
-@@ -188,6 +187,8 @@ void rds_connect_worker(struct work_struct *work)
- 				rds_conn_path_error(cp, "connect failed\n");
+ 	if (conn->c_npaths == 0)
+ 		hash = RDS_MPATH_HASH(rs, RDS_MPATH_WORKERS);
+ 	else
+ 		hash = RDS_MPATH_HASH(rs, conn->c_npaths);
+-	if (conn->c_npaths == 0 && hash != 0) {
+-		rds_send_ping(conn, 0);
+-
++	cp = &conn->c_path[hash];
++	if (!conn->c_npaths && rds_conn_path_down(cp)) {
+ 		/* The underlying connection is not up yet.  Need to wait
+ 		 * until it is up to be sure that the non-zero c_path can be
+ 		 * used.  But if we are interrupted, we have to use the zero
+@@ -1066,10 +1066,19 @@ static int rds_send_mprds_hash(struct rds_sock *rs,
+ 				return 0;
+ 			if (wait_event_interruptible(conn->c_hs_waitq,
+ 						     conn->c_npaths != 0))
+-				hash = 0;
++				return 0;
  		}
+ 		if (conn->c_npaths == 1)
+ 			hash = 0;
++
++		/* Wait until the chosen path is up.  If it is interrupted,
++		 * just return as this is an optimization to make sure that
++		 * the message is sent.
++		 */
++		cp = &conn->c_path[hash];
++		if (rds_conn_path_down(cp))
++			wait_event_interruptible(cp->cp_up_waitq,
++						 !rds_conn_path_down(cp));
  	}
-+out:
-+	rds_clear_reconnect_pending_work_bit(cp);
+ 	return hash;
  }
+@@ -1290,6 +1299,7 @@ int rds_sendmsg(struct socket *sock, struct msghdr *msg, size_t payload_len)
+ 	if (rs->rs_conn && ipv6_addr_equal(&rs->rs_conn->c_faddr, &daddr) &&
+ 	    rs->rs_tos == rs->rs_conn->c_tos) {
+ 		conn = rs->rs_conn;
++		cpath = rs->rs_conn_path;
+ 	} else {
+ 		conn = rds_conn_create_outgoing(sock_net(sock->sk),
+ 						&rs->rs_bound_addr, &daddr,
+@@ -1300,14 +1310,30 @@ int rds_sendmsg(struct socket *sock, struct msghdr *msg, size_t payload_len)
+ 			ret = PTR_ERR(conn);
+ 			goto out;
+ 		}
++		if (conn->c_trans->t_mp_capable) {
++			/* c_npaths == 0 if we have not talked to this peer
++			 * before.  Initiate a connection request to the
++			 * peer right away.
++			 */
++			if (!conn->c_npaths &&
++			    rds_conn_path_down(&conn->c_path[0])) {
++				/* rds_connd_queue_reconnect_work() ensures
++				 * that only one request is queued.  And
++				 * rds_send_ping() ensures that only one ping
++				 * is outstanding.
++				 */
++				rds_cond_queue_reconnect_work(&conn->c_path[0],
++							      0);
++				rds_send_ping(conn, 0);
++			}
++			cpath = &conn->c_path[rds_send_mprds_hash(rs, conn, 0)];
++		} else {
++			cpath = &conn->c_path[0];
++		}
+ 		rs->rs_conn = conn;
++		rs->rs_conn_path = cpath;
+ 	}
  
- void rds_send_worker(struct work_struct *work)
+-	if (conn->c_trans->t_mp_capable)
+-		cpath = &conn->c_path[rds_send_mprds_hash(rs, conn, nonblock)];
+-	else
+-		cpath = &conn->c_path[0];
+-
+ 	rm->m_conn_path = cpath;
+ 
+ 	/* Parse any control messages the user may have included. */
+@@ -1335,7 +1361,7 @@ int rds_sendmsg(struct socket *sock, struct msghdr *msg, size_t payload_len)
+ 	}
+ 
+ 	if (rds_conn_path_down(cpath))
+-		rds_check_all_paths(conn);
++		rds_conn_path_connect_if_down(cpath);
+ 
+ 	ret = rds_cong_wait(conn->c_fcong, dport, nonblock, rs);
+ 	if (ret) {
+diff --git a/net/rds/tcp_connect.c b/net/rds/tcp_connect.c
+index a0046e99d6df..97596a3c346a 100644
+--- a/net/rds/tcp_connect.c
++++ b/net/rds/tcp_connect.c
+@@ -73,6 +73,7 @@ void rds_tcp_state_change(struct sock *sk)
+ 			rds_conn_path_drop(cp, false);
+ 		} else {
+ 			rds_connect_path_complete(cp, RDS_CONN_CONNECTING);
++			wake_up(&cp->cp_up_waitq);
+ 		}
+ 		break;
+ 	case TCP_CLOSE_WAIT:
+diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
+index d89bd8d0c354..60c52322b896 100644
+--- a/net/rds/tcp_listen.c
++++ b/net/rds/tcp_listen.c
+@@ -211,6 +211,7 @@ int rds_tcp_accept_one(struct socket *sock)
+ 	} else {
+ 		rds_tcp_set_callbacks(new_sock, cp);
+ 		rds_connect_path_complete(cp, RDS_CONN_CONNECTING);
++		wake_up(&cp->cp_up_waitq);
+ 	}
+ 	new_sock = NULL;
+ 	ret = 0;
 -- 
 2.43.0
 
