@@ -1,116 +1,230 @@
-Return-Path: <netdev+bounces-170157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F19D3A4782E
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 09:48:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68F8DA47832
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 09:50:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77ECB188ED9E
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 08:48:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EDD3188D427
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 08:50:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9184822259F;
-	Thu, 27 Feb 2025 08:48:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFBDA225A40;
+	Thu, 27 Feb 2025 08:50:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="R0edNGQV"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="Co0WY4qi"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E413F1DFD89
-	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 08:48:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0384122259F
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 08:50:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740646086; cv=none; b=Qo0vAZhN221qHu4Tvo3pC2I1ghnp+EFCr8CysJgPw3M8cXjvwnR42C/acXU5RC2mcHXtRnhJKX4vxj2TQCBsE5OEWVz1mmc+ibVUgL4TrQd6UNd0qMx7omNaOwitKpGJQH+iYjqvrXbaMCfzzoRuQ7SmhPeC9pUmi+zm7MzZfdE=
+	t=1740646213; cv=none; b=BEWzUHWTU5wguimSzbl6PyUsA5g0urGIjoi982yzGNu6ULu2ItkrngJmeRKvgRaQah6n4tFwMqCj90/OsSdcrdkWn8UC8khGj2e1UlS69KV+A207biQEuia+KRPPMmRtk3Fqvg3X28WE8OghK7T7mbrfFgzEqUXKraYgSXXbV+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740646086; c=relaxed/simple;
-	bh=zo9eTvQJqKk4YngFI7fy0wFdMOwgkMTRCF1XrKOIRkk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p/wi2UymBspQ2oP8x25/V3pON4ftMithflUv7AhSKeY9Z8iGAXeEjvePocGVUS9dUUh3cptTd2YhM4WIdkV17kMWfZbq7TuyMpW8raML8UoxbBmG8SOQEYOQxkLaQrdCSWjyxX/7NmOdap1D5ay5Xke2dV/olnJfm+v5bT4DHdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=R0edNGQV; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6099F20574;
-	Thu, 27 Feb 2025 08:48:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1740646082;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qlMiU8R4q8noHhgTQE/LGM7xtK8nq2FGAAil4AoS9M8=;
-	b=R0edNGQVzHQ8jXNZ8hskgKPGE+i64wp/Sp1RItnww8es7Kz8rreOum9iHEjhFAAD55/DiF
-	Hi+58u4WhFMu3Kcu65TxecS+/AirHQbZulKtbBEPc1/0zxDFszCF9oN7Y9V8UIeMs4qRge
-	XBVoQOR5u5WD1fGGXxKlAjjED2PR89PmtBkHtOpEHq6uBuj0bZyTVaOTxeY20yNqveEj4M
-	9Qv7eu4nAAu3lLOP1tRCKJE86WPsfkWhudG5zyjyYpOzgWNBB4KOgwT0ii0X0P69XJ34eu
-	ZTzHFodJjcxIMtNMGjpu8peapKyGrJe5i+nDx/6et+05pZxCTlUp5Ev2ZZy53Q==
-Date: Thu, 27 Feb 2025 09:48:00 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, Saeed Mahameed <saeed@kernel.org>
-Subject: Re: [PATCH net-next v8 08/12] net: ethtool: try to protect all
- callback with netdev instance lock
-Message-ID: <20250227094800.7ff48a71@fedora.home>
-In-Reply-To: <20250226211108.387727-9-sdf@fomichev.me>
-References: <20250226211108.387727-1-sdf@fomichev.me>
-	<20250226211108.387727-9-sdf@fomichev.me>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1740646213; c=relaxed/simple;
+	bh=JM+T7KfoPxmUdPAxF2o/EGA8MRCN5GsbvnEZMBkYBy0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z4v4YM+1lGpQ/AuPqn71QwLntdliJTBHK9PmAUMttG1dmzTX+I6fQU5jWJIaO9Uexzxt8pfLXxMX8/JtV3Sec1In1Q14affT7oqlo1VR8hELIFBpUFg/gqksEPk4lcLqdX6nNcu12I0gAN966i/N1LK/xdZ0+XAKxXyuPe8b+a4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=Co0WY4qi; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5e0373c7f55so930167a12.0
+        for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 00:50:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1740646210; x=1741251010; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZHAs0BomZnNCju/Ns/9yEvfqTk3h2ZNMb6EVPfKogsM=;
+        b=Co0WY4qiMvt8L+p7QCc5GqTOsWorDW9UQsd2Y3yjwWlm+OdTlyqTh22QaR6scm7vzW
+         tiwnGDKXLhgKUMFr25xLyBn8WbFcmb1/bR9bcUwzIqktAEWGrZpHq/COWq0Uw8gzOswq
+         N4JKiyAP1z3gC1UJVEqFa2LUIgRz2pfRPd7bdAXa+znVpDBLuNSTcT3F68gNrxGBOb1j
+         Ka7jF/7ANDh8zFIOWJpIj6isXszpalEn4w7E78wuQIphV77XqBJgA8Cunb1XnVakusKO
+         uHNVNxcfenDj8Hl2Ofcc51sMTYahyZYtL4rXBdBvHQCYeNr3kSQZOG/pPAC36pC5Oqup
+         PPnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740646210; x=1741251010;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZHAs0BomZnNCju/Ns/9yEvfqTk3h2ZNMb6EVPfKogsM=;
+        b=XqZd4Ut/WawylksTtnbpXFiaPFmPve72+K3Cl0UFVZV4cUrtQpansJY7v4yt72vVOk
+         DG/ul5erW782wEt89OABzDR0/B8ZoImih4TrwxMx0TJn1RvV4ZeWHhNm6o48WiIo3M98
+         tp5e2mnHDE27OdVmgmkd4PrUu3mh2+korRvp9imxDLlW87umTQ6BHNhkrSijrGqi77Eg
+         Lx5SJ3pihB7ewKm0CrT5f+vXHI9H1TDrGfzeMKXUwqV/tpRSKLT7qNNFLPlt70inpItF
+         0+kQLJBS48TJe1Kq6uGUPFm3ejzrTowp8INrE3+Kg4p8efpx3a7EjLLQ3wtojOeMAqO3
+         rGew==
+X-Forwarded-Encrypted: i=1; AJvYcCX8W8eJ+Jg70CgNfmBKSM2fNUtQsQkRNcF9AJop7gw6FHlO+WuU1IjoWRpKIBcjOaE91ulsvS0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaDPvUqgwJIrsYsr7cgA7xIX1ojjrG+c1S7u4AanHUyHUry3fp
+	0FP8ewc3D+hLwkUDVFBNmVwyOvBAFXgMRLcLO+u3k/DGHcdW5WTpu+2UcTMSkxP+1WoGe4EWclS
+	ucGY=
+X-Gm-Gg: ASbGnctdZyIwxE1yHaZmgm9BWD3MnFV/rF6t8RD7fQR9v15YoyMp7yPYETnnZrCGM2G
+	PJQ8s1u+epyrvPMMBsPXl6A9KTlfS5AeBYhdJlcuxN+R8db9CIGjL8JvtMISMrQ9p0VkqSy3GNB
+	8e8BZw7OdTg1yAwcbNH1EYMRE99wPvYzGyLPTuzuoYjmWp7SfXIqJUOFp6nFGdxuxkZOYOygX1i
+	c376y2zVT+mV4Y84NSoiCNrPyMJBOgxB2DUYCetBhos1ICrtkTzwAe7UC09YKS9loOgZ3nzaoDt
+	twV4gAgcPxntbK2JWI1VIHGuCCLrXEx42i2p9qINGMxhhF2rj2UeinEhmw==
+X-Google-Smtp-Source: AGHT+IFBWYi4qkBq4PKRHbFbNW+hgP9t6Ix0w6cYY5Br99KK5Bxk+XjMxKjzlfWob2i8Ld9tnj1i2g==
+X-Received: by 2002:a05:6402:239c:b0:5e4:a4d0:58cc with SMTP id 4fb4d7f45d1cf-5e4a4d05947mr5689642a12.29.1740646209890;
+        Thu, 27 Feb 2025 00:50:09 -0800 (PST)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e4c3b4aa3bsm764641a12.16.2025.02.27.00.50.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Feb 2025 00:50:09 -0800 (PST)
+Message-ID: <446e8ef4-7ac0-43ad-99ff-29c21a2ee117@blackwall.org>
+Date: Thu, 27 Feb 2025 10:50:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv3 net 1/3] bonding: move IPsec deletion to
+ bond_ipsec_free_sa
+To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
+ Jarod Wilson <jarod@redhat.com>,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ Cosmin Ratiu <cratiu@nvidia.com>, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250227083717.4307-1-liuhangbin@gmail.com>
+ <20250227083717.4307-2-liuhangbin@gmail.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20250227083717.4307-2-liuhangbin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdekjedtvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeejpdhrtghpthhtohepshgufhesfhhomhhitghhvghvrdhmvgdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpt
- hhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehsrggvvggusehkvghrnhgvlhdrohhrgh
-X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hi,
-
-On Wed, 26 Feb 2025 13:11:04 -0800
-Stanislav Fomichev <sdf@fomichev.me> wrote:
-
-> From: Jakub Kicinski <kuba@kernel.org>
+On 2/27/25 10:37, Hangbin Liu wrote:
+> The fixed commit placed mutex_lock() inside spin_lock_bh(), which triggers
+> a warning:
 > 
-> Protect all ethtool callbacks and PHY related state with the netdev
-> instance lock, for drivers which want / need to have their ops
-> instance-locked. Basically take the lock everywhere we take rtnl_lock.
-> It was tempting to take the lock in ethnl_ops_begin(), but turns
-> out we actually nest those calls (when generating notifications).
+>   BUG: sleeping function called from invalid context at...
 > 
-> Cc: Saeed Mahameed <saeed@kernel.org>
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> Fix this by moving the IPsec deletion operation to bond_ipsec_free_sa,
+> which is not held by spin_lock_bh().
+> 
+> Additionally, delete the IPsec list in bond_ipsec_del_sa_all() when the
+> XFRM state is DEAD to prevent xdo_dev_state_free() from being triggered
+> again in bond_ipsec_free_sa().
+> 
+> For bond_ipsec_free_sa(), there are now three conditions:
+> 
+>   1. if (!slave): When no active device exists.
+>   2. if (!xs->xso.real_dev): When xdo_dev_state_add() fails.
+>   3. if (xs->xso.real_dev != real_dev): When an xs has already been freed
+>      by bond_ipsec_del_sa_all() due to migration, and the active slave has
+>      changed to a new device. At the same time, the xs is marked as DEAD
+>      due to the XFRM entry is removed, triggering xfrm_state_gc_task() and
+>      bond_ipsec_free_sa().
+> 
+> In all three cases, xdo_dev_state_free() should not be called, only xs
+> should be removed from bond->ipsec list.
+> 
+> Fixes: 2aeeef906d5a ("bonding: change ipsec_lock from spin lock to mutex")
+> Reported-by: Jakub Kicinski <kuba@kernel.org>
+> Closes: https://lore.kernel.org/netdev/20241212062734.182a0164@kernel.org
+> Suggested-by: Cosmin Ratiu <cratiu@nvidia.com>
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 > ---
->  drivers/net/netdevsim/ethtool.c |  2 --
->  net/dsa/conduit.c               | 16 +++++++++++++++-
->  net/ethtool/cabletest.c         | 20 ++++++++++++--------
->  net/ethtool/cmis_fw_update.c    |  7 ++++++-
->  net/ethtool/features.c          |  6 ++++--
->  net/ethtool/ioctl.c             |  6 ++++++
->  net/ethtool/module.c            |  8 +++++---
->  net/ethtool/netlink.c           | 12 ++++++++++++
->  net/ethtool/phy.c               | 20 ++++++++++++++------
->  net/ethtool/rss.c               |  2 ++
->  net/ethtool/tsinfo.c            |  9 ++++++---
->  net/sched/sch_taprio.c          |  5 ++++-
->  12 files changed, 86 insertions(+), 27 deletions(-)
+>  drivers/net/bonding/bond_main.c | 34 ++++++++++++++++++++++-----------
+>  1 file changed, 23 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+> index e45bba240cbc..683bf1221caf 100644
+> --- a/drivers/net/bonding/bond_main.c
+> +++ b/drivers/net/bonding/bond_main.c
+> @@ -537,6 +537,10 @@ static void bond_ipsec_add_sa_all(struct bonding *bond)
+>  	}
+>  
+>  	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
+> +		/* Skip dead xfrm states, they'll be freed later. */
+> +		if (ipsec->xs->km.state == XFRM_STATE_DEAD)
+> +			continue;
+> +
+>  		/* If new state is added before ipsec_lock acquired */
+>  		if (ipsec->xs->xso.real_dev == real_dev)
+>  			continue;
+> @@ -560,7 +564,6 @@ static void bond_ipsec_del_sa(struct xfrm_state *xs)
+>  	struct net_device *bond_dev = xs->xso.dev;
+>  	struct net_device *real_dev;
+>  	netdevice_tracker tracker;
+> -	struct bond_ipsec *ipsec;
+>  	struct bonding *bond;
+>  	struct slave *slave;
+>  
+> @@ -592,15 +595,6 @@ static void bond_ipsec_del_sa(struct xfrm_state *xs)
+>  	real_dev->xfrmdev_ops->xdo_dev_state_delete(xs);
+>  out:
+>  	netdev_put(real_dev, &tracker);
+> -	mutex_lock(&bond->ipsec_lock);
+> -	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
+> -		if (ipsec->xs == xs) {
+> -			list_del(&ipsec->list);
+> -			kfree(ipsec);
+> -			break;
+> -		}
+> -	}
+> -	mutex_unlock(&bond->ipsec_lock);
+>  }
+>  
+>  static void bond_ipsec_del_sa_all(struct bonding *bond)
+> @@ -617,6 +611,12 @@ static void bond_ipsec_del_sa_all(struct bonding *bond)
+>  
+>  	mutex_lock(&bond->ipsec_lock);
+>  	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
+> +		if (ipsec->xs->km.state == XFRM_STATE_DEAD) {
+> +			list_del(&ipsec->list);
 
-FWIW I've tested that patchset with various PHY-related ethtool ops as
-well as the module ops and didn't notice any issue or strangeness.
+To be able to do this here, you'll have to use list_for_each_entry_safe().
 
-So to some extent,
+> +			kfree(ipsec);
+> +			continue;
+> +		}
+> +
+>  		if (!ipsec->xs->xso.real_dev)
+>  			continue;
+>  
+> @@ -640,6 +640,7 @@ static void bond_ipsec_free_sa(struct xfrm_state *xs)
+>  	struct net_device *bond_dev = xs->xso.dev;
+>  	struct net_device *real_dev;
+>  	netdevice_tracker tracker;
+> +	struct bond_ipsec *ipsec;
+>  	struct bonding *bond;
+>  	struct slave *slave;
+>  
+> @@ -659,13 +660,24 @@ static void bond_ipsec_free_sa(struct xfrm_state *xs)
+>  	if (!xs->xso.real_dev)
+>  		goto out;
+>  
+> -	WARN_ON(xs->xso.real_dev != real_dev);
+> +	if (xs->xso.real_dev != real_dev)
+> +		goto out;
+>  
+>  	if (real_dev && real_dev->xfrmdev_ops &&
+>  	    real_dev->xfrmdev_ops->xdo_dev_state_free)
+>  		real_dev->xfrmdev_ops->xdo_dev_state_free(xs);
+>  out:
+>  	netdev_put(real_dev, &tracker);
+> +
+> +	mutex_lock(&bond->ipsec_lock);
+> +	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
+> +		if (ipsec->xs == xs) {
+> +			list_del(&ipsec->list);
+> +			kfree(ipsec);
+> +			break;
+> +		}
+> +	}
+> +	mutex_unlock(&bond->ipsec_lock);
+>  }
+>  
+>  /**
 
-Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-Thanks,
-
-Maxime
 
