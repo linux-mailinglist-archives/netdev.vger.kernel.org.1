@@ -1,93 +1,93 @@
-Return-Path: <netdev+bounces-170437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E7A8A48B8D
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 23:28:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26277A48B8C
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 23:28:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 730C716D609
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 22:28:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E221B7A4052
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 22:27:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EBEB23E333;
-	Thu, 27 Feb 2025 22:27:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 004CE2777E7;
+	Thu, 27 Feb 2025 22:28:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sFs4eDMr"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VpEv/xRo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1A42777FB;
-	Thu, 27 Feb 2025 22:27:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5649C2777E0
+	for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 22:28:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740695249; cv=none; b=Sz3mViM0Exr4HQRyml97KTXiKlZTssc0WM7jVOAyI3V7Wkgmt8ejZ0aeRDAktvtLuO6n+/dfbyXsxC19ghn4p4tPMoNLpZMFdck4zdKqc5lUh3wvMwR19Y9pVOCUGV3web9GWv+JbNXrozy2v+qK+rFBne7Ff1vyHzvo8+YJ05c=
+	t=1740695287; cv=none; b=c65wAlH8Ig5f/6lEJWOKxrxZHfP1AniHiMqgwEb0dG1EziZUlnp/k25J92SEh3MglD3h57IKtPbt04BRe8igr8ykJBk0ae5XCmJXSiuOMB+DMGBcOY/L02r007yiXRIjoyLjj3pB9/KKdze8iOSNHOjbWDzk1GfSco73Nw1/cJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740695249; c=relaxed/simple;
-	bh=96pSSj+jAeeUv8Kf2rgomEwAi8sdHZX5niFNLuSN/dA=;
+	s=arc-20240116; t=1740695287; c=relaxed/simple;
+	bh=XwNeeD0hitmCyJjinlUo1z4dJouHptA3k99kn0S+SSU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NrP1YE6CNLgqhDS8Zkg6+Pve+3PLQtor1B5EDinRshFtvi8OSD7CPUmSf70O9nKF/Z+/nRvebGjcwTfG0fl94JRtvE9VDtAVFXWjACWbYhtn1FO6F+kX5GTELzNHPC4Bs6z8FDgcW9JCRgjsEgC55Qst1qKGva5FueU1kECrIZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sFs4eDMr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9A3AC4CEDD;
-	Thu, 27 Feb 2025 22:27:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740695248;
-	bh=96pSSj+jAeeUv8Kf2rgomEwAi8sdHZX5niFNLuSN/dA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sFs4eDMr34h2DDvmtOqE9WpoSYxpM0wNuqTpid8DU6vBtzUd9yqPhbUjL+OyqFcdH
-	 3S8B2yZ3b43Z/fOtECdTgU1jIU+oehc2T1F6Z7TrYEiMWbjIYsHGVsvQxBm0XVHYdH
-	 F7ADWh8uml4kA8MRsDSUz0BAEEovpY1HorLEbYg0Xt7nxjmndH6yqPPnKBv0BcTShu
-	 MhQoiQTAVF4zZVPnjjETaLio9sYsDi6nAuV5svCl2VDqfpXhMXl8F47NS1po1KkJYb
-	 r0ryZWd1/iEd8ddiTuB3bKpQNMsvYQwm+4quyz+dBahSYcHfLCavy4dEo9hr2dDHCN
-	 7qklH3IfnvzWA==
-Date: Thu, 27 Feb 2025 14:27:27 -0800
-From: Saeed Mahameed <saeed@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=M7EUL0DcUXHixdwRgJ5tRzjCWlvmsvjquwTnVCVNWuOdHRuPsrIATDhmSrQ2xMnjkmg7G648ZYhopJbrb4PxOfhG9m7r5Y/XzXMLmVkHnC40oWdYdE2pAo2cUgbSLwxXGBF6q3bFC+X0iNRtkbCOLxcMi9yn4mMKyuWo01Z43q4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=VpEv/xRo; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=SHOEZHu/+tii/WYRiY6/uQoRwGdb261OsJSFtvsTK3A=; b=VpEv/xRoCufejRZ7XLrUfeeTRj
+	wm9DCyNUBIe+2f1wR69e6f6gEyiAWArsnbN5nyylqdzs+pbhKYUokYYEDRbyaBGmWYszG7bBK6aLz
+	kdfphHaWibb8WWXtvvp13bFFKSZEqbZHTTtMnGaGL5ZE9iGDtHi+vt0m32cEQSGLE7wU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tnmMH-000jvl-IG; Thu, 27 Feb 2025 23:27:57 +0100
+Date: Thu, 27 Feb 2025 23:27:57 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v3][next] net/mlx5e: Avoid a hundred
- -Wflex-array-member-not-at-end warnings
-Message-ID: <Z8Dmz_UPfR-WS8LI@x130>
-References: <Z76HzPW1dFTLOSSy@kspp>
- <Z79iP0glNCZOznu4@x130>
- <20250226172519.11767ac9@kernel.org>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jon Hunter <jonathanh@nvidia.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Thierry Reding <treding@nvidia.com>
+Subject: Re: [PATCH RFC net-next 1/5] net: stmmac: call phylink_start() and
+ phylink_stop() in XDP functions
+Message-ID: <92442281-9896-4271-a040-0c14331cb1d3@lunn.ch>
+References: <Z8B-DPGhuibIjiA7@shell.armlinux.org.uk>
+ <E1tnfRe-0057S9-6W@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250226172519.11767ac9@kernel.org>
+In-Reply-To: <E1tnfRe-0057S9-6W@rmk-PC.armlinux.org.uk>
 
-On 26 Feb 17:25, Jakub Kicinski wrote:
->On Wed, 26 Feb 2025 10:49:35 -0800 Saeed Mahameed wrote:
->> On 26 Feb 13:47, Gustavo A. R. Silva wrote:
->> >-struct mlx5e_umr_wqe {
->> >+struct mlx5e_umr_wqe_hdr {
->> > 	struct mlx5_wqe_ctrl_seg       ctrl;
->> > 	struct mlx5_wqe_umr_ctrl_seg   uctrl;
->> > 	struct mlx5_mkey_seg           mkc;
->> >+};
->> >+
->> >+struct mlx5e_umr_wqe {
->> >+	struct mlx5e_umr_wqe_hdr hdr;
->>
->> You missed or ignored my comment on v0, anyway:
->>
->> Can we have struct mlx5e_umr_wq_hdr defined anonymously within
->> mlx5e_umr_wqe? Let's avoid namespace pollution.
->
->It's also used in struct mlx5e_rq, I don't think it can be anonymous?
+On Thu, Feb 27, 2025 at 03:05:02PM +0000, Russell King (Oracle) wrote:
+> Phylink does not permit drivers to mess with the netif carrier, as
+> this will de-synchronise phylink with the MAC driver. Moreover,
+> setting and clearing the TE and RE bits via stmmac_mac_set() in this
+> path is also wrong as the link may not be up.
+> 
+> Replace the netif_carrier_on(), netif_carrier_off() and
+> stmmac_mac_set() calls with the appropriate phylink_start() and
+> phylink_stop() calls, thereby allowing phylink to manage the netif
+> carrier and TE/RE bits through the .mac_link_up() and .mac_link_down()
+> methods.
+> 
+> Note that RE should only be set after the DMA is ready to avoid the
+> receive FIFO between the MAC and DMA blocks overflowing, so
+> phylink_start() needs to be placed after DMA has been started.
 
-Yep, I see now, Thanks!.
+Sorry, i don't know enough about XDP to review this :-(
 
+	Andrew
 
