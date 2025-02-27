@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-170352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F76DA484E2
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 17:27:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4865CA484CB
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 17:24:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A4791727DA
-	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:20:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D7AE3A6B11
+	for <lists+netdev@lfdr.de>; Thu, 27 Feb 2025 16:20:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7642F1A841C;
-	Thu, 27 Feb 2025 16:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EA4B1B21B5;
+	Thu, 27 Feb 2025 16:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CMtq2638"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i+8iK5uw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 442FF198823;
-	Thu, 27 Feb 2025 16:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F1F1B21B4;
+	Thu, 27 Feb 2025 16:20:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740673200; cv=none; b=Fc7La2vdDInJ1yxx42zbBF/mMyS90P+uq+JVUbU+mJ254wmEt5UW3N9EKCPa+GYAIXoMxcRLBMF9pHTvrRcE7CWJYcA9QIVksIl5x2DiYUtLoxzrQe1nVHoso7AlOEAss2C50OuWueWkhxXJuvT2AqdFoCK7WXh3PK7Q6BE4dEw=
+	t=1740673203; cv=none; b=GsC1FRmtSFdbwNUFkbu7vYAn68gkuYZy/E4Jmv1bU40FKsqlja4mLMOiXAvjh73VayKfEaa77FAK4XyQ2qV6bztRO3/Qi26rWmJQuCAsMaEoC1z4t0U6jOPW4j9Sb80wmDtBLdHHRhMqF6+JieOF3ouDy7dBT+OprDd1vgJaKvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740673200; c=relaxed/simple;
-	bh=y/2Nr36NXLKaDCoN5EX8Qk/6K0dQTdt6rNcVkgwm6DI=;
+	s=arc-20240116; t=1740673203; c=relaxed/simple;
+	bh=VpDZza7QXbnhces+of61OvEOBdzoZhLzbcuTIudJynw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mogavSuZky0wVMMD0zmk88A8OXsTOIeoGWprEQkiTOoOJuTap6pFzT08HjwlkLaEQuO7pjV6+ijhXTcrGRm7o+yS9KpiALwoQe6ZKFUFsGg7AzzyjQaGFaQXEb7qTwdrXQkVq3EY7PeqlqlMJo0X3MmuYdGcndnr9s9xc46mv8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CMtq2638; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B89D2C4CEDD;
-	Thu, 27 Feb 2025 16:19:59 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Z20Qx2kMac6Px4XK94FKKoYNdVBCoSn3iSap2GJrk9ae1KrAUMVJJ9bp57Aehf02ChDJtkSvSAQyLO0WJXVirG3tPdmAqA33Nrra3KoXloPyJsNmHxr0B3knT6C6aiztBKUqEAH9kW4ssmusjEsuqZfPfxTV9R5NVUvgRW8ZVuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i+8iK5uw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC1A2C4CEE6;
+	Thu, 27 Feb 2025 16:20:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740673199;
-	bh=y/2Nr36NXLKaDCoN5EX8Qk/6K0dQTdt6rNcVkgwm6DI=;
+	s=k20201202; t=1740673202;
+	bh=VpDZza7QXbnhces+of61OvEOBdzoZhLzbcuTIudJynw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CMtq2638oo+hngEcmTw3lpKtE1Ao9udiTyUaYD9Fk5U1zOMK5CPffOxsoWZomLbN6
-	 MIGAVVskGyLKqBo0tlL+PFtDfie2igvMcG6T/n+tflYep44X8yx4EAQc9gXHmkAq8Q
-	 muFLchyyZzpgQ9CFlfGwsv5Ls5xC6rywQk6DGTT4qDBPczWu3stHax7JUH0svMuHQV
-	 am+raCymkOcyWstED+Aoa2XGsZuUyjvH6xhtJ+iUWMrDdRsHHTLwUAIGg5kdyS/F4t
-	 utQ1WTHBeN5Ev7tFujrhHS0fKDvTgwEezxL6klihaZx7r8hsP2aJjXa9DKiPYoz7kP
-	 +zEqm9zUpo6Ng==
+	b=i+8iK5uwh70kd0GxxW6snP2DPzw8Mq3aSRuYooC4m0M52JYgVJ7M5sG/J9xnyBCB5
+	 R61VgB7uv1EaFEEuNs9QHJl2QFanAEN8WpPWvZbnhBzh0SVmfamOsaKL3XxRIkTIJG
+	 knVOMemJjTh2fz02wv/7AODLLsBShcs7xFQPRekGBGpvhJYDsnfiQ+j4DqgG0il76P
+	 MvyK8pMpc2DT66QbOnEnkIGWxUD4IBbNkTbA8Je09TVlYYr/OA0PXUSlBkKx6elL8m
+	 GddSaEd3zYIjLfYMqfaRMpee6NkwRfxIMphjYgnPHm11pd/mLUcr6mgqBDq3hiFFPn
+	 8U1nC5nR30eyA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB3FA380AACB;
-	Thu, 27 Feb 2025 16:20:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB540380AACB;
+	Thu, 27 Feb 2025 16:20:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,49 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v1 0/3] Optimize bpf selftest to increase CI success
- rate
+Subject: Re: [PATCH net] net: ti: icss-iep: Reject perout generation request
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174067323175.1484560.1369764651554494631.git-patchwork-notify@kernel.org>
-Date: Thu, 27 Feb 2025 16:20:31 +0000
-References: <20250227142646.59711-1-jiayuan.chen@linux.dev>
-In-Reply-To: <20250227142646.59711-1-jiayuan.chen@linux.dev>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: bpf@vger.kernel.org, john.fastabend@gmail.com, davem@davemloft.net,
- kuba@kernel.org, andrii@kernel.org, eddyz87@gmail.com, mykolal@fb.com,
- ast@kernel.org, daniel@iogearbox.net, martin.lau@linux.dev, song@kernel.org,
- yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, hawk@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, mrpre@163.com
+ <174067323473.1484560.3837727172875875732.git-patchwork-notify@kernel.org>
+Date: Thu, 27 Feb 2025 16:20:34 +0000
+References: <20250227092441.1848419-1-m-malladi@ti.com>
+In-Reply-To: <20250227092441.1848419-1-m-malladi@ti.com>
+To: Meghana Malladi <m-malladi@ti.com>
+Cc: vigneshr@ti.com, javier.carrasco.cruz@gmail.com, jacob.e.keller@intel.com,
+ diogo.ivo@siemens.com, horms@kernel.org, richardcochran@gmail.com,
+ pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+ andrew+netdev@lunn.ch, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, srk@ti.com, rogerq@kernel.org,
+ danishanwar@ti.com
 
 Hello:
 
-This series was applied to bpf/bpf-next.git (master)
-by Alexei Starovoitov <ast@kernel.org>:
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 27 Feb 2025 22:26:43 +0800 you wrote:
-> 1. Optimized some static bound port selftests to avoid port occupation
-> when running test_progs -j.
-> 2. Optimized the retry logic for test_maps.
+On Thu, 27 Feb 2025 14:54:41 +0530 you wrote:
+> IEP driver supports both perout and pps signal generation
+> but perout feature is faulty with half-cooked support
+> due to some missing configuration. Remove perout
+> support from the driver and reject perout requests with
+> "not supported" error code.
 > 
-> Some Failed CI:
-> https://github.com/kernel-patches/bpf/actions/runs/13275542359/job/37064974076
-> https://github.com/kernel-patches/bpf/actions/runs/13549227497/job/37868926343
-> https://github.com/kernel-patches/bpf/actions/runs/13548089029/job/37865812030
-> https://github.com/kernel-patches/bpf/actions/runs/13553536268/job/37883329296
-> (Perhaps it's due to the large number of pull requests requiring CI runs?)
+> Fixes: c1e0230eeaab2 ("net: ti: icss-iep: Add IEP driver")
+> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [bpf-next,v1,1/3] selftests/bpf: Allow auto port binding for cgroup connect
-    https://git.kernel.org/bpf/bpf-next/c/27e3162a0364
-  - [bpf-next,v1,2/3] selftests/bpf: Allow auto port binding for bpf nf
-    https://git.kernel.org/bpf/bpf-next/c/dbe7d46ed109
-  - [bpf-next,v1,3/3] selftests/bpf: Fixes for test_maps test
-    https://git.kernel.org/bpf/bpf-next/c/09de329523c8
+  - [net] net: ti: icss-iep: Reject perout generation request
+    https://git.kernel.org/netdev/net/c/54e1b4becf5e
 
 You are awesome, thank you!
 -- 
