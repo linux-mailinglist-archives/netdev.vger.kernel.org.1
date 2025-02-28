@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-170627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E318AA49661
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 11:06:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49D2FA4965B
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 11:06:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1578B16C70C
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 10:06:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 111EA7A3669
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 10:05:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3FF32620F6;
-	Fri, 28 Feb 2025 10:01:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 659A825C719;
+	Fri, 28 Feb 2025 10:00:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out198-11.us.a.mail.aliyun.com (out198-11.us.a.mail.aliyun.com [47.90.198.11])
+Received: from out198-12.us.a.mail.aliyun.com (out198-12.us.a.mail.aliyun.com [47.90.198.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E75F2620C1;
-	Fri, 28 Feb 2025 10:00:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=47.90.198.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD42A25C700;
+	Fri, 28 Feb 2025 10:00:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=47.90.198.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740736860; cv=none; b=Vmoawjxjk2L7LDK7KVrlMG5RZl8TdqUg8UGFOlRs5GDIs1cxUFiceN8f6YG+QlbX2oVpk8vgokDvMVz6q7EPDFFRx9A3Zq0E90kDsWSduX32ie5AHp6xBmbmXak5Cae6SN5Tvd2Fsn1O9gt+SMsmZv+XeUAM1qb6W2YIOx8qp9E=
+	t=1740736857; cv=none; b=Kju1I2a3pCefSctyqY9oyaOyMjz2HxTxz2jTUCaipqarEpvjmFHRkKGZiGPY6MxNsHZLe7JPyvpnksMbyiXnOfnycfixd+7L3FvUaw4w84EayKjmnoUTE72VyABAXYI/sDFX3dXSphG31XaoxNXTugRMT7l/aNQm9kXGnq+U3JM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740736860; c=relaxed/simple;
-	bh=Rjs6BCqM+SxeVg1lbFe9Ds4CosVf3jyDUn/fUVkK+dg=;
+	s=arc-20240116; t=1740736857; c=relaxed/simple;
+	bh=T/HPbv1PGiMRr03PFoY1hMdTweVwOtuTGKoPOotDdVw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hJFydqbmfABoorajR0kUE4vPLVKP0MUDjwkoqJBWjmuSBq3pVjHANgq1AEmPoUWtC4MrGx8bow/BfGFvIHzfWpXHAwUCcUgHJAcpWHKhDfuM4vMTo3xBlNdV/xOh5Y73FS+2FtBtQRn+e4jZmebQ/k7H+Kb85kkJYWFaWNxjTyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=47.90.198.11
+	 MIME-Version; b=V4+d9AOLAaopM+Jz/PxozTTX+qxfoJKu4j2THFv7zo+jUTTTzdSL++7ZeZqo17g2A5Nd2sKraiEYt0RMEyic6g5HSAnkG8B9K0RQV8Fq8Wi6lRlXFAVgO8UxmhP+4M72E2jHRNrAirBKSqw6nLsDkuw2FeIV8O7yYcrNBeMTU+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=47.90.198.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=motor-comm.com
-Received: from sun-VirtualBox..(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.bfyn1Lr_1740736840 cluster:ay29)
+Received: from sun-VirtualBox..(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.bfyn1Mk_1740736841 cluster:ay29)
           by smtp.aliyun-inc.com;
-          Fri, 28 Feb 2025 18:00:40 +0800
+          Fri, 28 Feb 2025 18:00:41 +0800
 From: Frank Sae <Frank.Sae@motor-comm.com>
 To: Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
@@ -48,9 +48,9 @@ Cc: Masahiro Yamada <masahiroy@kernel.org>,
 	xiaogang.fan@motor-comm.com,
 	fei.zhang@motor-comm.com,
 	hua.sun@motor-comm.com
-Subject: [PATCH net-next v3 12/14] motorcomm:yt6801: Implement pci_driver suspend and resume
-Date: Fri, 28 Feb 2025 18:00:18 +0800
-Message-Id: <20250228100020.3944-13-Frank.Sae@motor-comm.com>
+Subject: [PATCH net-next v3 13/14] motorcomm:yt6801: Add makefile and Kconfig
+Date: Fri, 28 Feb 2025 18:00:19 +0800
+Message-Id: <20250228100020.3944-14-Frank.Sae@motor-comm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250228100020.3944-1-Frank.Sae@motor-comm.com>
 References: <20250228100020.3944-1-Frank.Sae@motor-comm.com>
@@ -62,122 +62,107 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implement the pci_driver suspend function to enable the device to sleep,
- and implement the resume function to enable the device to resume
- operation.
+Add a Makefile in the motorcomm folder to build yt6801 driver.
+Add the YT6801 and NET_VENDOR_MOTORCOMM entry in the Kconfig.
+Add the CONFIG_YT6801 entry in the Makefile.
+Add the motorcomm entry in the Kconfig.
+Add the CONFIG_NET_VENDOR_MOTORCOMM entry in the Makefile.
 
 Signed-off-by: Frank Sae <Frank.Sae@motor-comm.com>
 ---
- .../ethernet/motorcomm/yt6801/yt6801_net.c    | 14 +++++
- .../ethernet/motorcomm/yt6801/yt6801_pci.c    | 58 +++++++++++++++++++
- 2 files changed, 72 insertions(+)
+ drivers/net/ethernet/Kconfig                  |  1 +
+ drivers/net/ethernet/Makefile                 |  1 +
+ drivers/net/ethernet/motorcomm/Kconfig        | 27 +++++++++++++++++++
+ drivers/net/ethernet/motorcomm/Makefile       |  6 +++++
+ .../net/ethernet/motorcomm/yt6801/Makefile    |  8 ++++++
+ 5 files changed, 43 insertions(+)
+ create mode 100644 drivers/net/ethernet/motorcomm/Kconfig
+ create mode 100644 drivers/net/ethernet/motorcomm/Makefile
+ create mode 100644 drivers/net/ethernet/motorcomm/yt6801/Makefile
 
-diff --git a/drivers/net/ethernet/motorcomm/yt6801/yt6801_net.c b/drivers/net/ethernet/motorcomm/yt6801/yt6801_net.c
-index d6c1c0fd4..01df945d0 100644
---- a/drivers/net/ethernet/motorcomm/yt6801/yt6801_net.c
-+++ b/drivers/net/ethernet/motorcomm/yt6801/yt6801_net.c
-@@ -1378,6 +1378,20 @@ static void fxgmac_restart_work(struct work_struct *work)
- 	rtnl_unlock();
- }
+diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
+index 977b42bc1..a02ef77f8 100644
+--- a/drivers/net/ethernet/Kconfig
++++ b/drivers/net/ethernet/Kconfig
+@@ -127,6 +127,7 @@ source "drivers/net/ethernet/micrel/Kconfig"
+ source "drivers/net/ethernet/microchip/Kconfig"
+ source "drivers/net/ethernet/mscc/Kconfig"
+ source "drivers/net/ethernet/microsoft/Kconfig"
++source "drivers/net/ethernet/motorcomm/Kconfig"
+ source "drivers/net/ethernet/moxa/Kconfig"
+ source "drivers/net/ethernet/myricom/Kconfig"
  
-+int fxgmac_net_powerup(struct fxgmac_pdata *priv)
-+{
-+	int ret;
+diff --git a/drivers/net/ethernet/Makefile b/drivers/net/ethernet/Makefile
+index 99fa180de..f1f44396f 100644
+--- a/drivers/net/ethernet/Makefile
++++ b/drivers/net/ethernet/Makefile
+@@ -63,6 +63,7 @@ obj-$(CONFIG_NET_VENDOR_META) += meta/
+ obj-$(CONFIG_NET_VENDOR_MICREL) += micrel/
+ obj-$(CONFIG_NET_VENDOR_MICROCHIP) += microchip/
+ obj-$(CONFIG_NET_VENDOR_MICROSEMI) += mscc/
++obj-$(CONFIG_NET_VENDOR_MOTORCOMM) += motorcomm/
+ obj-$(CONFIG_NET_VENDOR_MOXART) += moxa/
+ obj-$(CONFIG_NET_VENDOR_MYRI) += myricom/
+ obj-$(CONFIG_FEALNX) += fealnx.o
+diff --git a/drivers/net/ethernet/motorcomm/Kconfig b/drivers/net/ethernet/motorcomm/Kconfig
+new file mode 100644
+index 000000000..abcc6cbcc
+--- /dev/null
++++ b/drivers/net/ethernet/motorcomm/Kconfig
+@@ -0,0 +1,27 @@
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# Motorcomm network device configuration
++#
 +
-+	priv->powerstate = 0;/* clear all bits as normal now */
-+	ret = fxgmac_start(priv);
-+	if (ret < 0) {
-+		yt_err(priv, "%s: fxgmac_start ret: %d\n", __func__, ret);
-+		return ret;
-+	}
++config NET_VENDOR_MOTORCOMM
++	bool "Motorcomm devices"
++	default y
++	help
++	  If you have a network (Ethernet) device belonging to this class,
++	  say Y.
 +
-+	return 0;
-+}
++	  Note that the answer to this question doesn't directly affect the
++	  kernel: saying N will just cause the configurator to skip all
++	  the questions about Motorcomm devices. If you say Y, you will be
++	  asked for your specific device in the following questions.
 +
- static void fxgmac_config_powerdown(struct fxgmac_pdata *priv)
- {
- 	FXGMAC_MAC_IO_WR_BITS(priv, MAC_CR, RE, 1); /* Enable MAC Rx */
-diff --git a/drivers/net/ethernet/motorcomm/yt6801/yt6801_pci.c b/drivers/net/ethernet/motorcomm/yt6801/yt6801_pci.c
-index fba01e393..e9d2ac820 100644
---- a/drivers/net/ethernet/motorcomm/yt6801/yt6801_pci.c
-+++ b/drivers/net/ethernet/motorcomm/yt6801/yt6801_pci.c
-@@ -103,6 +103,59 @@ static void fxgmac_shutdown(struct pci_dev *pcidev)
- 	}
- 	mutex_unlock(&priv->mutex);
- }
++if NET_VENDOR_MOTORCOMM
 +
-+static int fxgmac_suspend(struct device *device)
-+{
-+	struct fxgmac_pdata *priv = dev_get_drvdata(device);
-+	struct net_device *netdev = priv->netdev;
-+	int ret = 0;
++config YT6801
++	tristate "Motorcomm(R) 6801 PCI-Express Gigabit Ethernet support"
++	depends on PCI && NET
++	help
++	  This driver supports Motorcomm(R) 6801 gigabit ethernet family of
++	  adapters.
 +
-+	mutex_lock(&priv->mutex);
-+	if (priv->dev_state != FXGMAC_DEV_START)
-+		goto unlock;
++endif # NET_VENDOR_MOTORCOMM
+diff --git a/drivers/net/ethernet/motorcomm/Makefile b/drivers/net/ethernet/motorcomm/Makefile
+new file mode 100644
+index 000000000..511940680
+--- /dev/null
++++ b/drivers/net/ethernet/motorcomm/Makefile
+@@ -0,0 +1,6 @@
++# SPDX-License-Identifier: GPL-2.0
++#
++# Makefile for the Motorcomm network device drivers.
++#
 +
-+	if (netif_running(netdev))
-+		__fxgmac_shutdown(to_pci_dev(device));
++obj-$(CONFIG_YT6801) += yt6801/
+diff --git a/drivers/net/ethernet/motorcomm/yt6801/Makefile b/drivers/net/ethernet/motorcomm/yt6801/Makefile
+new file mode 100644
+index 000000000..2f370d933
+--- /dev/null
++++ b/drivers/net/ethernet/motorcomm/yt6801/Makefile
+@@ -0,0 +1,8 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (c) 2021 Motor-comm Corporation.
++#
++# Makefile for the Motorcomm(R) 6801 PCI-Express ethernet driver
++#
 +
-+	priv->dev_state = FXGMAC_DEV_SUSPEND;
-+unlock:
-+	mutex_unlock(&priv->mutex);
-+
-+	return ret;
-+}
-+
-+static int fxgmac_resume(struct device *device)
-+{
-+	struct fxgmac_pdata *priv = dev_get_drvdata(device);
-+	struct net_device *netdev = priv->netdev;
-+	int ret = 0;
-+
-+	mutex_lock(&priv->mutex);
-+	if (priv->dev_state != FXGMAC_DEV_SUSPEND)
-+		goto unlock;
-+
-+	priv->dev_state = FXGMAC_DEV_RESUME;
-+	__clear_bit(FXGMAC_POWER_STATE_DOWN, &priv->powerstate);
-+
-+	rtnl_lock();
-+	if (netif_running(netdev)) {
-+		ret = fxgmac_net_powerup(priv);
-+		if (ret < 0) {
-+			dev_err(device, "%s, fxgmac_net_powerup err:%d\n",
-+				__func__, ret);
-+			goto unlock;
-+		}
-+	}
-+
-+	netif_device_attach(netdev);
-+	rtnl_unlock();
-+
-+unlock:
-+	mutex_unlock(&priv->mutex);
-+
-+	return ret;
-+}
-+
- #define MOTORCOMM_PCI_ID			0x1f0a
- #define YT6801_PCI_DEVICE_ID			0x6801
- 
-@@ -113,11 +166,16 @@ static const struct pci_device_id fxgmac_pci_tbl[] = {
- 
- MODULE_DEVICE_TABLE(pci, fxgmac_pci_tbl);
- 
-+static const struct dev_pm_ops fxgmac_pm_ops = {
-+	SYSTEM_SLEEP_PM_OPS(fxgmac_suspend, fxgmac_resume)
-+};
-+
- static struct pci_driver fxgmac_pci_driver = {
- 	.name		= FXGMAC_DRV_NAME,
- 	.id_table	= fxgmac_pci_tbl,
- 	.probe		= fxgmac_probe,
- 	.remove		= fxgmac_remove,
-+	.driver.pm	= pm_ptr(&fxgmac_pm_ops),
- 	.shutdown	= fxgmac_shutdown,
- };
- 
++obj-$(CONFIG_YT6801) += yt6801.o
++yt6801-objs :=  yt6801_desc.o  yt6801_net.o  yt6801_pci.o
 -- 
 2.34.1
 
