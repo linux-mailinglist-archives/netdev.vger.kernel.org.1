@@ -1,114 +1,77 @@
-Return-Path: <netdev+bounces-170491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 763ADA48DE6
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 02:26:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DEA1A48DEF
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 02:27:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67AEE7A50EA
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 01:25:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 064183ABF49
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 01:27:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CF1A35280;
-	Fri, 28 Feb 2025 01:25:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4063822097;
+	Fri, 28 Feb 2025 01:27:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hwC/DW5S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pf0Czs6b"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0180FDF42;
-	Fri, 28 Feb 2025 01:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CEFF182D0
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 01:27:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740705952; cv=none; b=nfvWD4igcOA/CVIaAeleDJNcxY3L4plt9CLCBSe1Y0qVvBrMjXJgxp+nX7VSCrCmKjFqPHvfTfS0LcNh4nA+8N8vrH3r6AU0limvJCPjv27Mb2fMszEc1OPK+G7CopyrWVKTeRqe6aD/iYwELEO4K3jyDdeQLDUQFbHrO2IsjlE=
+	t=1740706047; cv=none; b=coL+hJEis4m26IpGGgtMxQIIwoC/l39vdPX4/NwEUXa3kUVPSOlWkrcxsJxQLvUa0ZYntCC9fRLERwWxYhcgJVec7dWVLB/LCFfXLIjCvfb7IZumNr8btK13lno6GyJWaGoTqyfRnu/TAiPrsB2Fu/t7B5TWwFhI4dXFZx3kkYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740705952; c=relaxed/simple;
-	bh=xcDqeZCf41T+MlGm7yohZGZ8ilerz9IIxzHO/8x/mDI=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=BXFjCFOd/NzDi4IxSTV11aFkxTPaOrOe2rhkaTiGSvoPwCwIg9eEiDUDyXYkHe5ZTQKUqfpilxxYDTLdOWUH3AGwQM+xLza4JA1ePtBVMv9bWn8Bh58daXgqoP7n+kZF5mleiCwMVMocAr7xTSWkthobRFm5GoZBhIpXwNzi1Ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hwC/DW5S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53F6DC4CEDD;
-	Fri, 28 Feb 2025 01:25:51 +0000 (UTC)
+	s=arc-20240116; t=1740706047; c=relaxed/simple;
+	bh=LyfnNZuFL7X8hd1Y9mnhQZaqPmLCo3wd2Jx63TFRQuk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UgFhWCRJqawCTA2aC/Mnu3uJe+7XOCdDb0FkGUp9hi8+ATrR2Mzppap/ULucjLynFoSn2+ZcHutokfp6KNkO3Ef5iS83c5Qye25H4q3HrBVg+EzgOoPPbH8Ektve7ppisg5EVur9u7oFQBY1Xl87EIG1yUqEqUXRlstXCMeIqTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pf0Czs6b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4457CC4CEDD;
+	Fri, 28 Feb 2025 01:27:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740705951;
-	bh=xcDqeZCf41T+MlGm7yohZGZ8ilerz9IIxzHO/8x/mDI=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=hwC/DW5S2U4nB9Ci3hMWNwmDmdWFt6kvcPzg/81seza7Vl4FInyV/FbcCQjs3jOcI
-	 skSABr7VkSk2D6liCtmf6QhoRIk81JFm+OH/MVh3N7km0J80QxOMI8l/HMT1hQVVi0
-	 qoY9IAM8TPeVqdJHh33cm07c5WGygBXDzt9UhK0a/YD2/G3LWztOJDSJUgN6Vh4R1Y
-	 PFmFoNbN5WDh0eb8ksfSQq+jx1sw8bAjD3NkVMfKCjk+4DxMMKi5U8jOY4BuRSgzlm
-	 Kh7KJxq9QahUq+Y9/QAcQDdyBWheB+w1letSRjooa47OFKenKVXpAtVnt4LrMooGNm
-	 4ewYSs3nEGkJA==
-Date: Thu, 27 Feb 2025 19:25:49 -0600
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=k20201202; t=1740706046;
+	bh=LyfnNZuFL7X8hd1Y9mnhQZaqPmLCo3wd2Jx63TFRQuk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=pf0Czs6b1aQjRpF1L5pbem6I3SOHDPsNm4dnkG3NmkXE0YRkjcI4VPWOqxELQ9WhU
+	 4NJvAiEibQNUmb0FKjVhTDRiCdQjOUmKIuNHo3kXqCtgj+ByUX5Nl68cy2D1yLEDaV
+	 TUuCpkDMHxSqk7qIZli1ib5H4itxUTh7Q+TCLbJOkqD+nKhux1+fx8FlOvH8506KtU
+	 25VwbeVgh9izz0n3WBbvFCi4CYmR83zC08A6+KHDo6PV9/Bfzm/c9M2M52gEE8NDIL
+	 9N6ql4IuesicF0Ya7QQ20m5ooxxjGA6n4L75mIhQbwHcPeGTT+WkWKw0dUs+ZpBXM6
+	 LfdqajwXQy15A==
+Date: Thu, 27 Feb 2025 17:27:25 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, Saeed Mahameed <saeed@kernel.org>, David Wei
+ <dw@davidwei.uk>
+Subject: Re: [PATCH net-next v8 00/12] net: Hold netdev instance lock during
+ ndo operations
+Message-ID: <20250227172725.4312334e@kernel.org>
+In-Reply-To: <20250226211108.387727-1-sdf@fomichev.me>
+References: <20250226211108.387727-1-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, 
- Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
- jonas.gorski@gmail.com, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- netdev@vger.kernel.org, Philipp Zabel <p.zabel@pengutronix.de>, 
- Conor Dooley <conor+dt@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, 
- linux-kernel@vger.kernel.org, noltari@gmail.com, 
- "David S. Miller" <davem@davemloft.net>, 
- Russell King <linux@armlinux.org.uk>, 
- Florian Fainelli <florian.fainelli@broadcom.com>, 
- devicetree@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
- Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>
-To: Kyle Hendry <kylehendrydev@gmail.com>
-In-Reply-To: <20250228002722.5619-4-kylehendrydev@gmail.com>
-References: <20250228002722.5619-1-kylehendrydev@gmail.com>
- <20250228002722.5619-4-kylehendrydev@gmail.com>
-Message-Id: <174070594941.726878.5388041268672454945.robh@kernel.org>
-Subject: Re: [PATCH v3 3/3] dt-bindings: net: phy: add BCM63268 GPHY
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Wed, 26 Feb 2025 13:10:56 -0800 Stanislav Fomichev wrote:
+> As the gradual purging of rtnl continues, start grabbing netdev
+> instance lock in more places so we can get to the state where
+> most paths are working without rtnl. Start with requiring the
+> drivers that use shaper api (and later queue mgmt api) to work
+> with both rtnl and netdev instance lock. Eventually we might
+> attempt to drop rtnl. This mostly affects iavf, gve, bnxt and
+> netdev sim (as the drivers that implement shaper/queue mgmt)
+> so those drivers are converted in the process.
 
-On Thu, 27 Feb 2025 16:27:17 -0800, Kyle Hendry wrote:
-> Add YAML bindings for BCM63268 internal GPHY
-> 
-> Signed-off-by: Kyle Hendry <kylehendrydev@gmail.com>
-> ---
->  .../bindings/net/brcm,bcm63268-gphy.yaml      | 51 +++++++++++++++++++
->  1 file changed, 51 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/brcm,bcm63268-gphy.yaml
-> 
-
-My bot found errors running 'make dt_binding_check' on your patch:
-
-yamllint warnings/errors:
-
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/brcm,bcm63268-gphy.yaml: maintainers:0: 'TBD' does not match '@'
-	from schema $id: http://devicetree.org/meta-schemas/base.yaml#
-Error: Documentation/devicetree/bindings/net/brcm,bcm63268-gphy.example.dts:26.39-40 syntax error
-FATAL ERROR: Unable to parse input tree
-make[2]: *** [scripts/Makefile.dtbs:131: Documentation/devicetree/bindings/net/brcm,bcm63268-gphy.example.dtb] Error 1
-make[2]: *** Waiting for unfinished jobs....
-make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1511: dt_binding_check] Error 2
-make: *** [Makefile:251: __sub-make] Error 2
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250228002722.5619-4-kylehendrydev@gmail.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+Needs rebase after Ahmed's changes and the net merge
+-- 
+pw-bot: cr
 
