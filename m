@@ -1,91 +1,94 @@
-Return-Path: <netdev+bounces-170596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B790FA4930C
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 09:12:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00A40A4931C
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 09:14:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6D5347AB459
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 08:08:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FF881894C70
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 08:14:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 444461E0B73;
-	Fri, 28 Feb 2025 08:08:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E642B204845;
+	Fri, 28 Feb 2025 08:14:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="e4zPF7fE"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="GLOqmQrX"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 779741D6193;
-	Fri, 28 Feb 2025 08:08:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F4A1DE4F8;
+	Fri, 28 Feb 2025 08:14:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740730131; cv=none; b=ZZoFYtV4gRYftxqS2hf2ZzNGQj7tT1RnsKXeYEWM+MD/e2pGREHZjHfUJNrPae/ZVuzbNlDB7VDklFFh+lr7tk8vDv1ad0kUICBAlTPC2GTHZdT/PD/99FL4JwibA6Y4KQ4xCqc9YmMshrt5T6QcWB6mEYqLZ6RHSKt1iYOmkW8=
+	t=1740730447; cv=none; b=FSYM+bg8K96uubqdDPwEQQMIfYkysP34Bm8ZrX9ucDQRmiADDqCBRx0LtqIPyk0hX3AU+IxmTK3RhshqCminW3VIyUUJFTDVcmHpTxToyEDm7FIddcMIZOE9rGBeV3ZN6igHKmy7ELZ/Jizz14q4SBkLzb2cky448KftENAuc70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740730131; c=relaxed/simple;
-	bh=kNUkmfWCLaMSkrC9V6J9XgiSwUmUjbBx6cXilSJv014=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nEeU0q2CLTN0ocHZ+pobAAd1Y8up6zzanbW5rs97431NX1S3+cSoUcNDmI60juqvR6og/GQJmgNF5XFu1SVPKx5XAjfag717jyKGHqLjBy51HoXLabhERiQL0sWPozXbwb+s4maAYoHJpfGhUHdWaEJ1t8LysbVLdW3hgM3QuQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=e4zPF7fE; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=RHdi/8WZcnPqLCFpmzRLzJjDTVIhzP53KvbQDrz39Gg=; b=e4zPF7fEsYnBz0dHrVeKHx6VFs
-	g7dLWq+lzJAL9riUIXALF1Lor/sZHhiDFVq6HptsrC0z2KXu6q9maQxUC3r23mvokgx8ZbM5iTZ+N
-	JTz882PLWsqpaQmREmBhsXvBb5xe7YM38J5pXf9Lk0Z8d9gZAhHYdF4OhEpaNORClIw3vOlrzfE5i
-	IVBdjTHs62c3hW+88sUtlDsU6kczkPGHTiwQSdBvOObWMb+t8uCT5Va3FxgMjwVggcSrcAYr8xGd3
-	pPqci8u062X1EJqeO3NxNMOUui4D7MAjJ9kQz6UlzsLeNo1nmCMx0af0hLvgnvCzZy77AUpFJ55kA
-	KVJmksuw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tnvPq-002VXh-10;
-	Fri, 28 Feb 2025 16:08:15 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Feb 2025 16:08:14 +0800
-Date: Fri, 28 Feb 2025 16:08:14 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: David Howells <dhowells@redhat.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Christian Brauner <brauner@kernel.org>,
-	linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: Which tree to push afs + crypto + rxrpc spanning patches through?
-Message-ID: <Z8Fu7mi0UOS8xk80@gondor.apana.org.au>
-References: <da1d5d1a-b0ae-4a40-907d-386bd035954c@redhat.com>
- <899dfc34-bff8-4f41-8c8c-b9aa457880df@redhat.com>
- <20250224234154.2014840-1-dhowells@redhat.com>
- <3151401.1740661831@warthog.procyon.org.uk>
- <3158046.1740670591@warthog.procyon.org.uk>
+	s=arc-20240116; t=1740730447; c=relaxed/simple;
+	bh=uZFik38ukK67rSB3UbsyYb8IO5hHzu6g1JwC/lW210U=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iH26sTMRm8vLYMqSOJXN309CDkfXbpXo/ZwBvijDVpln4cBmBLcgeEAjohusiAA7BN4orNdDiO1JEv68fD9xXgBLCYGtVlRa6vu+m/ptW7+BJsWH7TCVjxK6gmt+7ckL0R6zlcDJuDSGM1z7mVss2pCmxBzTok2TvqghuYgah20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=GLOqmQrX; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id B4C8B4452E;
+	Fri, 28 Feb 2025 08:14:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1740730443;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pOa3s22YAm/GS76NctbdlTN04itDWk+8Ouif3lZJgQ8=;
+	b=GLOqmQrXUKtxZL+GRVzAyv1Mj0DEAQcSkiraYQ0fH0XoogpE7H53q4W40Y4kK58LVLSt4a
+	4iAGeQGRMndlOVFbbW3oIpfeyqb9c8WbK/eaxfroxXX5nAQRpw2j9VFFNRL3umEFkqMjyb
+	TIPrcZdTLBqr1YXB4VGu0zlOr6cct5NDux3Bbntk+SzTW2IjaIki2KwPT//8jpsy4iu3Ig
+	7VRJddudCQb9+2gT1iuBFBqCCHdA88CW7ShHX4fXpBcbCqnWbxDP9kfrP62UHP3b4KCJxo
+	xQ4RnWQ99rs1q/P4AyRtF8MS+9/v8yc+ypK14Wv2QJgHV8k9Tg/2QxiZ+fyd2Q==
+Date: Fri, 28 Feb 2025 09:14:00 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: <Parthiban.Veerasooran@microchip.com>
+Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <thomas.petazzoni@bootlin.com>, <linux-arm-kernel@lists.infradead.org>,
+ <christophe.leroy@csgroup.eu>, <herve.codina@bootlin.com>,
+ <f.fainelli@gmail.com>, <vladimir.oltean@nxp.com>,
+ <kory.maincent@bootlin.com>, <o.rempel@pengutronix.de>, <horms@kernel.org>,
+ <romain.gantois@bootlin.com>, <piergiorgio.beruto@gmail.com>,
+ <davem@davemloft.net>, <andrew@lunn.ch>, <kuba@kernel.org>,
+ <edumazet@google.com>, <pabeni@redhat.com>, <hkallweit1@gmail.com>
+Subject: Re: [PATCH net 0/2] net: ethtool: netlink: Fix notifications for
+Message-ID: <20250228091400.7ed7237c@fedora.home>
+In-Reply-To: <c6df7040-40d2-46e0-b8f3-a28227d2d98c@microchip.com>
+References: <20250227182454.1998236-1-maxime.chevallier@bootlin.com>
+	<c6df7040-40d2-46e0-b8f3-a28227d2d98c@microchip.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3158046.1740670591@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: 0
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdekleekjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgdphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvddtpdhrtghpthhtoheprfgrrhhthhhisggrnhdrgggvvghrrghsohhorhgrnhesmhhitghrohgthhhiphdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrn
+ hgvlhdrohhrghdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopehlihhnuhigqdgrrhhmqdhkvghrnhgvlheslhhishhtshdrihhnfhhrrgguvggrugdrohhrghdprhgtphhtthhopegthhhrihhsthhophhhvgdrlhgvrhhohiestghsghhrohhuphdrvghupdhrtghpthhtohephhgvrhhvvgdrtghoughinhgrsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepfhdrfhgrihhnvghllhhisehgmhgrihhlrdgtohhm
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Thu, Feb 27, 2025 at 03:36:31PM +0000, David Howells wrote:
->
-> If you're okay with the rxrpc bits not going through the networking tree and
-> if Herbert is okay with the krb5 library not going through the crypto tree, I
-> can try pushing the whole lot through the filesystem tree.
+On Fri, 28 Feb 2025 06:19:18 +0000
+<Parthiban.Veerasooran@microchip.com> wrote:
 
-Sure I have no objections.
+> Hi Maxime,
+> 
+> I did a quick test with your patches and it seems working fine without 
+> kernel crash.
+> 
+> Best regards,
+> Parthiban V
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks for testing, good to hear that this solves the issue :)
+
+Maxime
 
