@@ -1,233 +1,114 @@
-Return-Path: <netdev+bounces-170490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA278A48DE9
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 02:26:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 763ADA48DE6
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 02:26:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3DF716EC6D
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 01:26:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67AEE7A50EA
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 01:25:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 211C615A864;
-	Fri, 28 Feb 2025 01:25:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CF1A35280;
+	Fri, 28 Feb 2025 01:25:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WOfVNy+i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hwC/DW5S"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2C9A1586C8
-	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 01:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0180FDF42;
+	Fri, 28 Feb 2025 01:25:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740705943; cv=none; b=r1UhfhHqJXd+kfFJPPyKG77HPQmgDDNoPRfCm83kIrS8OmJBEOrf4QxLwS/ei+WSqkWQrq9OAg/lVl0EPJWcvlJu1v+TnXQltZUu5mx3ppgLKfw9GSmJlbmKhHshZZaQSVRffiX9+3aRWisqDk1H+xqZ6BDCsSf+N4IvJ1fLUUE=
+	t=1740705952; cv=none; b=nfvWD4igcOA/CVIaAeleDJNcxY3L4plt9CLCBSe1Y0qVvBrMjXJgxp+nX7VSCrCmKjFqPHvfTfS0LcNh4nA+8N8vrH3r6AU0limvJCPjv27Mb2fMszEc1OPK+G7CopyrWVKTeRqe6aD/iYwELEO4K3jyDdeQLDUQFbHrO2IsjlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740705943; c=relaxed/simple;
-	bh=zmgD7sv0H7HkTZaB19WsbIXaPUAL5eLTxdLW8zBya2s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sJ/w65v4X17QWtmAkKu9p5yAqQIfVybRKuz8+LHOYmdVX/QQKF7Kk4ShVtS4eimVhfg82BB9j3zhJgErAl2uwAggqhEsSMpq9seoc8vAaMYlqR+v/hzI1U8/xsCMGH+k6r1cx0adpvdTmyFcd5XyCcTiE3cJFeKj6E9Fwxptw2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WOfVNy+i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B360C4CEE8;
-	Fri, 28 Feb 2025 01:25:42 +0000 (UTC)
+	s=arc-20240116; t=1740705952; c=relaxed/simple;
+	bh=xcDqeZCf41T+MlGm7yohZGZ8ilerz9IIxzHO/8x/mDI=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=BXFjCFOd/NzDi4IxSTV11aFkxTPaOrOe2rhkaTiGSvoPwCwIg9eEiDUDyXYkHe5ZTQKUqfpilxxYDTLdOWUH3AGwQM+xLza4JA1ePtBVMv9bWn8Bh58daXgqoP7n+kZF5mleiCwMVMocAr7xTSWkthobRFm5GoZBhIpXwNzi1Ck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hwC/DW5S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53F6DC4CEDD;
+	Fri, 28 Feb 2025 01:25:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740705942;
-	bh=zmgD7sv0H7HkTZaB19WsbIXaPUAL5eLTxdLW8zBya2s=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WOfVNy+i6SDCwVU/AfHnq5/FLQ+1w3MrV3VscvsrT6ZY2KaqxJHuITv7fkhl9O0EG
-	 DtE1FTJVm0iAcvnhHN4UJsjBkmL9XZB/eHjLUfBJFfOJI9l62TgfipVRgdGt4uu+R1
-	 ubwaAhZrSCUw/caWrz3fFK4ntDX26n0IeBokvfVnX/g0aSmqHGAPw8TOsG+zp24voy
-	 tSg2OXtnajDL18cMZgqGmreG/7hbv2TrPx2qLazXiUAebsiIXneyqVkHa9jZaEMVZM
-	 7WusQOqMkahuYvEu789z25CW6A3WlSl8S5HHxKz8nLAG6JPsZDKRN772libEluym+D
-	 bqv7KztaO9mOA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com,
-	przemyslaw.kitszel@intel.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 9/9] eth: bnxt: count xdp xmit packets
-Date: Thu, 27 Feb 2025 17:25:34 -0800
-Message-ID: <20250228012534.3460918-10-kuba@kernel.org>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250228012534.3460918-1-kuba@kernel.org>
-References: <20250228012534.3460918-1-kuba@kernel.org>
+	s=k20201202; t=1740705951;
+	bh=xcDqeZCf41T+MlGm7yohZGZ8ilerz9IIxzHO/8x/mDI=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=hwC/DW5S2U4nB9Ci3hMWNwmDmdWFt6kvcPzg/81seza7Vl4FInyV/FbcCQjs3jOcI
+	 skSABr7VkSk2D6liCtmf6QhoRIk81JFm+OH/MVh3N7km0J80QxOMI8l/HMT1hQVVi0
+	 qoY9IAM8TPeVqdJHh33cm07c5WGygBXDzt9UhK0a/YD2/G3LWztOJDSJUgN6Vh4R1Y
+	 PFmFoNbN5WDh0eb8ksfSQq+jx1sw8bAjD3NkVMfKCjk+4DxMMKi5U8jOY4BuRSgzlm
+	 Kh7KJxq9QahUq+Y9/QAcQDdyBWheB+w1letSRjooa47OFKenKVXpAtVnt4LrMooGNm
+	 4ewYSs3nEGkJA==
+Date: Thu, 27 Feb 2025 19:25:49 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, 
+ Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+ jonas.gorski@gmail.com, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ netdev@vger.kernel.org, Philipp Zabel <p.zabel@pengutronix.de>, 
+ Conor Dooley <conor+dt@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ linux-kernel@vger.kernel.org, noltari@gmail.com, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Russell King <linux@armlinux.org.uk>, 
+ Florian Fainelli <florian.fainelli@broadcom.com>, 
+ devicetree@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
+ Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>
+To: Kyle Hendry <kylehendrydev@gmail.com>
+In-Reply-To: <20250228002722.5619-4-kylehendrydev@gmail.com>
+References: <20250228002722.5619-1-kylehendrydev@gmail.com>
+ <20250228002722.5619-4-kylehendrydev@gmail.com>
+Message-Id: <174070594941.726878.5388041268672454945.robh@kernel.org>
+Subject: Re: [PATCH v3 3/3] dt-bindings: net: phy: add BCM63268 GPHY
 
-Count XDP_TX and XDP_REDIRECT packets. Since the Tx rings are separate
-we count the packets sent to the base stats, not per-queues stats.
 
-The XDP stats are protected by the Rx syncp since they are in NAPI
-context. Feels slightly less ugly than having a Tx stats in Rx struct.
-But neither is ideal.
+On Thu, 27 Feb 2025 16:27:17 -0800, Kyle Hendry wrote:
+> Add YAML bindings for BCM63268 internal GPHY
+> 
+> Signed-off-by: Kyle Hendry <kylehendrydev@gmail.com>
+> ---
+>  .../bindings/net/brcm,bcm63268-gphy.yaml      | 51 +++++++++++++++++++
+>  1 file changed, 51 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/brcm,bcm63268-gphy.yaml
+> 
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-v2:
- - move tx_buf init sooner so that shinfo handling can access it
-v1: https://lore.kernel.org/20250226211003.2790916-10-kuba@kernel.org
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  7 +++++-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 23 +++++++++++++++--
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c | 25 +++++++++++++++----
- 3 files changed, 47 insertions(+), 8 deletions(-)
+My bot found errors running 'make dt_binding_check' on your patch:
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index d5f617fd5beb..415dda512329 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -880,7 +880,10 @@ struct bnxt_sw_tx_bd {
- 	struct page		*page;
- 	DEFINE_DMA_UNMAP_ADDR(mapping);
- 	DEFINE_DMA_UNMAP_LEN(len);
--	u16			extra_segs;
-+	union {
-+		u16			extra_segs;
-+		u16			xdp_len;
-+	};
- 	u8			hdr_size;
- 	u8			is_ts_pkt;
- 	u8			is_push;
-@@ -1134,6 +1137,8 @@ struct bnxt_tx_sw_stats {
- 	/* non-ethtool stats follow */
- 	u64			tx_packets;
- 	u64			tx_bytes;
-+	u64			xdp_packets; /* under rx syncp */
-+	u64			xdp_bytes;  /* under rx syncp */
- 	struct u64_stats_sync	syncp;
- };
- 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index f6308e4e8360..7dbb940c0591 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -13160,6 +13160,8 @@ static void bnxt_get_ring_stats(struct bnxt *bp,
- 
- 		stats->tx_packets += sw_stats.tx.tx_packets;
- 		stats->tx_bytes += sw_stats.tx.tx_bytes;
-+		stats->tx_packets += sw_stats.tx.xdp_packets;
-+		stats->tx_bytes += sw_stats.tx.xdp_bytes;
- 
- 		stats->rx_missed_errors +=
- 			BNXT_GET_RING_STATS64(sw, rx_discard_pkts);
-@@ -13251,8 +13253,9 @@ static void bnxt_get_one_ring_drv_stats(struct bnxt *bp,
- 	stats->rx_total_bytes += sw_stats.rx.rx_bytes;
- 	stats->rx_total_ring_discards +=
- 		BNXT_GET_RING_STATS64(hw_stats, rx_discard_pkts);
--	stats->tx_total_packets += sw_stats.tx.tx_packets;
--	stats->tx_total_bytes += sw_stats.tx.tx_bytes;
-+	stats->tx_total_packets +=
-+		sw_stats.tx.tx_packets + sw_stats.tx.xdp_packets;
-+	stats->tx_total_bytes += sw_stats.tx.tx_bytes + sw_stats.tx.xdp_bytes;
- 	stats->tx_total_resets += sw_stats.tx.tx_resets;
- 	stats->tx_total_ring_discards +=
- 		BNXT_GET_RING_STATS64(hw_stats, tx_discard_pkts);
-@@ -15677,6 +15680,7 @@ static void bnxt_get_base_stats(struct net_device *dev,
- 				struct netdev_queue_stats_tx *tx)
- {
- 	struct bnxt *bp = netdev_priv(dev);
-+	int i;
- 
- 	rx->packets = bp->ring_drv_stats_prev.rx_total_packets;
- 	rx->bytes = bp->ring_drv_stats_prev.rx_total_bytes;
-@@ -15684,6 +15688,21 @@ static void bnxt_get_base_stats(struct net_device *dev,
- 
- 	tx->packets = bp->ring_drv_stats_prev.tx_total_packets;
- 	tx->bytes = bp->ring_drv_stats_prev.tx_total_bytes;
-+
-+	for (i = 0; i < bp->cp_nr_rings; i++) {
-+		struct bnxt_sw_stats *sw_stats = bp->bnapi[i]->cp_ring.sw_stats;
-+		unsigned int seq;
-+		u64 pkts, bytes;
-+
-+		do {
-+			seq = u64_stats_fetch_begin(&sw_stats->rx.syncp);
-+			pkts = sw_stats->tx.xdp_packets;
-+			bytes = sw_stats->tx.xdp_bytes;
-+		} while (u64_stats_fetch_retry(&sw_stats->rx.syncp, seq));
-+
-+		tx->packets += pkts;
-+		tx->bytes += bytes;
-+	}
- }
- 
- static const struct netdev_stat_ops bnxt_stat_ops = {
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-index 16d3698cf0e9..644e4a7818a2 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-@@ -35,14 +35,17 @@ struct bnxt_sw_tx_bd *bnxt_xmit_bd(struct bnxt *bp,
- 	u16 prod;
- 	int i;
- 
--	if (xdp && xdp_buff_has_frags(xdp)) {
--		sinfo = xdp_get_shared_info_from_buff(xdp);
--		num_frags = sinfo->nr_frags;
--	}
--
- 	/* fill up the first buffer */
- 	prod = txr->tx_prod;
- 	tx_buf = &txr->tx_buf_ring[RING_TX(bp, prod)];
-+	tx_buf->xdp_len = len;
-+
-+	if (xdp && xdp_buff_has_frags(xdp)) {
-+		sinfo = xdp_get_shared_info_from_buff(xdp);
-+		tx_buf->xdp_len += sinfo->xdp_frags_size;
-+		num_frags = sinfo->nr_frags;
-+	}
-+
- 	tx_buf->nr_frags = num_frags;
- 	if (xdp)
- 		tx_buf->page = virt_to_head_page(xdp->data);
-@@ -120,9 +123,11 @@ static void __bnxt_xmit_xdp_redirect(struct bnxt *bp,
- 
- void bnxt_tx_int_xdp(struct bnxt *bp, struct bnxt_napi *bnapi, int budget)
- {
-+	struct bnxt_sw_stats *sw_stats = bnapi->cp_ring.sw_stats;
- 	struct bnxt_tx_ring_info *txr = bnapi->tx_ring[0];
- 	struct bnxt_rx_ring_info *rxr = bnapi->rx_ring;
- 	u16 tx_hw_cons = txr->tx_hw_cons;
-+	unsigned int pkts = 0, bytes = 0;
- 	bool rx_doorbell_needed = false;
- 	struct bnxt_sw_tx_bd *tx_buf;
- 	u16 tx_cons = txr->tx_cons;
-@@ -135,6 +140,10 @@ void bnxt_tx_int_xdp(struct bnxt *bp, struct bnxt_napi *bnapi, int budget)
- 	while (RING_TX(bp, tx_cons) != tx_hw_cons) {
- 		tx_buf = &txr->tx_buf_ring[RING_TX(bp, tx_cons)];
- 
-+		pkts++;
-+		bytes += tx_buf->xdp_len;
-+		tx_buf->xdp_len = 0;
-+
- 		if (tx_buf->action == XDP_REDIRECT) {
- 			struct pci_dev *pdev = bp->pdev;
- 
-@@ -163,6 +172,12 @@ void bnxt_tx_int_xdp(struct bnxt *bp, struct bnxt_napi *bnapi, int budget)
- 		tx_cons = NEXT_TX(tx_cons);
- 	}
- 
-+	/* Note: Rx sync here, because Rx == NAPI context */
-+	u64_stats_update_begin(&sw_stats->rx.syncp);
-+	sw_stats->tx.xdp_packets += pkts;
-+	sw_stats->tx.xdp_bytes += bytes;
-+	u64_stats_update_end(&sw_stats->rx.syncp);
-+
- 	bnapi->events &= ~BNXT_TX_CMP_EVENT;
- 	WRITE_ONCE(txr->tx_cons, tx_cons);
- 	if (rx_doorbell_needed) {
--- 
-2.48.1
+yamllint warnings/errors:
+
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/brcm,bcm63268-gphy.yaml: maintainers:0: 'TBD' does not match '@'
+	from schema $id: http://devicetree.org/meta-schemas/base.yaml#
+Error: Documentation/devicetree/bindings/net/brcm,bcm63268-gphy.example.dts:26.39-40 syntax error
+FATAL ERROR: Unable to parse input tree
+make[2]: *** [scripts/Makefile.dtbs:131: Documentation/devicetree/bindings/net/brcm,bcm63268-gphy.example.dtb] Error 1
+make[2]: *** Waiting for unfinished jobs....
+make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1511: dt_binding_check] Error 2
+make: *** [Makefile:251: __sub-make] Error 2
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250228002722.5619-4-kylehendrydev@gmail.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
 
 
