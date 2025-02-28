@@ -1,124 +1,127 @@
-Return-Path: <netdev+bounces-170716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2B9FA49AA5
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 14:35:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE328A49AA9
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 14:36:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8C713BB068
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 13:35:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9A301895D78
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 13:36:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74D7826D5BF;
-	Fri, 28 Feb 2025 13:34:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6950424A045;
+	Fri, 28 Feb 2025 13:36:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZeWx7vqy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lRieqnfR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD5AA26D5CC
-	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 13:34:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7C51D554;
+	Fri, 28 Feb 2025 13:36:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740749690; cv=none; b=PMvKQ/Ay4f+aH+jH/4gyTqD5P6DHzhI8xtBleFcVBMj6h/z2TJ5XKK32reFf6zyyKIfPE3tR1H7s+bR/leKwUGP/R0gvQiDqcwHLodkrEUKTFYotBRnjXyf6kQpjihdr4JZ1l6CpfKCxSTiYdJyopkYOG76fqk1kMNhMjk/8Siw=
+	t=1740749769; cv=none; b=FQMwS90xqaBKV7NE7pvi7QlNDlzfeluPz3VcTi99v8eFQ85cI1G+3UcS/V9Wfc2cF+TA/f9FLTs/Ivzv2B/w3TBg+NWURtvP675aJ/39Lau3ouEGTERNYQNuJNExL4m6n8j7nTjz/v6AGYuZBNgtBM9RIlC/p89z6F/I8kchFi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740749690; c=relaxed/simple;
-	bh=fM1vGbtn9BRrqauH7jzB0nWHvk07pSjPfl12eOWKxfQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jvrjGmVjLyqdiczH1gx/lilKRcML96S5Irw4y99p1GhdlRCZM8rTnrgZprvAmDL+XPIzU8ngfzdLhNT8J4ybH5chL8+nN0T6xknxwxoSwWzzar5748lJaUxUly7L7qdG+N82Mh8VSOyCj8wZokZgjXwQQIQhdDuJH7+MdZCbGk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZeWx7vqy; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-30b8f0c514cso9993271fa.2
-        for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 05:34:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740749687; x=1741354487; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LZe6QW5+O7em4pV86qIKjF01aAF3X24U/srLa/IV/aU=;
-        b=ZeWx7vqy2QhGO6ExC9vtEPWNFbHSwutqCFB3gqRs6J1hwNWXtOghgoJIkbmygdmHsI
-         AEHYGbJbfsiRwHJDQf0TIJwh2S/yfo2RG2S0eqgJ+pigS4YYfA4UvhtUFEwOG8DGwCX7
-         55CoMxooK4A/l+mXb+C8KoXno9fZnfNVR/vk8HaIAjV6qGtnazw2W5S7icHe/o8T06ZX
-         9htR3odLRdOGVz+4wPk+Vx+952DfQeRkvPw3WbLWg5s4X2bStRKC8b4lw2R3eHPAYyob
-         NCzEY6DouM/DpjQbyDkqe3z+4IdHNBzZVPhC3drx6/HLmNRpJv9mZz8cAVucmC0/KNMe
-         WgjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740749687; x=1741354487;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LZe6QW5+O7em4pV86qIKjF01aAF3X24U/srLa/IV/aU=;
-        b=Mrbx0UuhrQi87BzrnKXEbjnHxJUV660S4XTGKnjySjAhDnvqAuQ2cWCSsyYbnJXW01
-         dshjlPlRwSTiXBaXpT02Cs2Smk8K+tQ32j/Ps7cm4yxzliErX4EOXgzUIB8vEOB6EB8p
-         g5Gu/l61+trgynYcxdHXHGRKaS24445EAl/nnw/wNtwCS/deY6+1M03wbo0u+RugFipG
-         8onwH89PUnSRDXkUh4dqBDPm6dgFN29HD1M1XQvSE/zwiKbXiUPmWi5rzviP9ekE6VBv
-         0AySVNuwMvWWTliQVI+XDIedeaCjv9ca9Z3rEXRDbM1Zxn3At5Xl5Mm6zgAbTZLb+iLd
-         TpAw==
-X-Gm-Message-State: AOJu0Yxz7Hgpb8OoxZvRmDIPuXU6R5lN0Q25qEdo7OfeFaLFWGPr7hdP
-	LR+xP53Cn27pzmpjjcKMHyMxpH3YVOf2PZJ4K7F8oDKs1QyM/PWEhPNUO3VSlU8=
-X-Gm-Gg: ASbGncvLaxSV8TOTBPWM5L5ShutA0iAYp9TKay9aTE+wFgxxv7LDEulMccAWMjzph9S
-	vjFPZB6qKGpbYJwLZJWQnnVlSnCwwGAvEI4BfG3iy6Dqv/3mKyse1fPVAwrZxqi8IFjniFOrIK5
-	vne1dh1arnr/byJf/0DYkNgkNx0mClqBXTNIhn7UyzU2ABp5e3wVcqNo+VxMGHmytCGBVWyW/0n
-	JOloA41H7SOcGE8Y7EIZyjwAzRnwLFDhquQEalG6vAju8WicQYhvtbCAit548XUBaL+l9MXH0m6
-	Qt9jP6Qi7wxrssjYCdGV3X3e0Q==
-X-Google-Smtp-Source: AGHT+IFX2Zs6lrn0UuEELdnNGIKp3IAGsZAPhdnC7P0iel+GGDXg3THQd/lNb8l0JwcOAoivCIV0nw==
-X-Received: by 2002:a05:6512:e8b:b0:545:1d96:d6dd with SMTP id 2adb3069b0e04-5494c330ae4mr1151751e87.26.1740749686484;
-        Fri, 28 Feb 2025 05:34:46 -0800 (PST)
-Received: from X220-Tablet.. ([83.217.196.104])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-549443c074fsm492361e87.204.2025.02.28.05.34.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Feb 2025 05:34:45 -0800 (PST)
-From: Denis Kirjanov <kirjanov@gmail.com>
-To: stephen@networkplumber.org,
-	dsahern@kernel.org
-Cc: netdev@vger.kernel.org,
-	Denis Kirjanov <kirjanov@gmail.com>
-Subject: [PATCH iproute] libgenl: report a verbose error if rtnl_talk fails
-Date: Fri, 28 Feb 2025 16:34:31 +0300
-Message-ID: <20250228133431.20296-1-kirjanov@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1740749769; c=relaxed/simple;
+	bh=BNMzfWsIm08OVYoPCNeAqXulZ+4bQH3zfFLSQmv7AQc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=daMMIapRB83KhDMzpUcqzQIyqEHaM1P91xfav6i34hX8HP7OwSz8JVZvlK+Z8TBbS46sAENSwOiuIo08nPfKQu0oVnPOmKe4Jn+VAB873+kdz9blsBAItXr0x1HwaLvyDVZykf6kGkxpMiLhfre+WgDQEOdUWozLT4CV1Xs9CQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lRieqnfR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45AE7C4CEE2;
+	Fri, 28 Feb 2025 13:36:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740749768;
+	bh=BNMzfWsIm08OVYoPCNeAqXulZ+4bQH3zfFLSQmv7AQc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=lRieqnfR3SVNwJvbF592RrdFBJiSu6JXDN23Ei5YeaM/aTl6QejPIlMtJQECDLIqo
+	 rXr6Fhidto3P/zmt3pJGuLH/Qk5aVQr81PbfRDbeZJ4aDF6sajwvCL5Eezxv2XVKax
+	 lNsgDHynqInPa/GBsAWeKjaqOISdIkMnwvL6TSe7nsaDTomI0LQsCGDhAxllWlssm0
+	 FuyCDQRJZeOVyxFmsc9yRXEEvwEyCkwW7wG31bXuUMsGsUfJ2yR9mSZPs5TDGMhpMc
+	 j17slg7flLZX2eexy/AkiV6pd40+sYhKg1GnCb/jr1VnJK3R73tfCH57jifvd4ga0e
+	 ZmQnhTytm2oFQ==
+Message-ID: <27a2ef05-8de1-42ad-8cab-d430c49b72b9@kernel.org>
+Date: Fri, 28 Feb 2025 14:36:02 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net-next] mptcp: Remove unused declaration
+ mptcp_set_owner_r()
+Content-Language: en-GB
+To: Yue Haibing <yuehaibing@huawei.com>, martineau@kernel.org,
+ geliang@kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+References: <20250228095148.4003065-1-yuehaibing@huawei.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20250228095148.4003065-1-yuehaibing@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Currenlty rtnl_talk() doesn't give us the reason
-if it fails.
+Hi Yue,
 
-Signed-off-by: Denis Kirjanov <kirjanov@gmail.com>
----
- lib/libgenl.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+On 28/02/2025 10:51, Yue Haibing wrote:
+> Commit 6639498ed85f ("mptcp: cleanup mem accounting")
+> removed the implementation but leave declaration.
 
-diff --git a/lib/libgenl.c b/lib/libgenl.c
-index fca07f9f..9927af84 100644
---- a/lib/libgenl.c
-+++ b/lib/libgenl.c
-@@ -58,7 +58,8 @@ int genl_resolve_family(struct rtnl_handle *grth, const char *family)
- 		  family, strlen(family) + 1);
- 
- 	if (rtnl_talk(grth, &req.n, &answer) < 0) {
--		fprintf(stderr, "Error talking to the kernel\n");
-+		fprintf(stderr, "Error talking to the kernel: %s (errno %d)\n",
-+			strerror(errno), errno);
- 		return -2;
- 	}
- 
-@@ -103,7 +104,8 @@ int genl_add_mcast_grp(struct rtnl_handle *grth, __u16 fnum, const char *group)
- 	addattr16(&req.n, sizeof(req), CTRL_ATTR_FAMILY_ID, fnum);
- 
- 	if (rtnl_talk(grth, &req.n, &answer) < 0) {
--		fprintf(stderr, "Error talking to the kernel\n");
-+		fprintf(stderr, "Error talking to the kernel: %s (errno %d)\n",
-+			strerror(errno), errno);
- 		return -2;
- 	}
- 
+Thank you, it looks good to me.
+
+Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
+@Netdev maintainers: it can be applied in net-next directly.
+Cheers,
+Matt
 -- 
-2.43.0
+Sponsored by the NGI0 Core fund.
 
 
