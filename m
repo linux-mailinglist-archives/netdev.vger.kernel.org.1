@@ -1,172 +1,196 @@
-Return-Path: <netdev+bounces-170613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF72EA49524
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 10:35:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C74CA49574
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 10:39:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A40711895A81
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 09:34:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC5093A7A38
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 09:36:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EDB1256C8B;
-	Fri, 28 Feb 2025 09:34:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="VpEE74y8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 546CF256C9A;
+	Fri, 28 Feb 2025 09:36:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from mail-gw02.astralinux.ru (mail-gw02.astralinux.ru [195.16.41.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0E091C5F35;
-	Fri, 28 Feb 2025 09:34:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA9F2561B7;
+	Fri, 28 Feb 2025 09:35:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.16.41.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740735265; cv=none; b=ujXOmdXJloLX+rXboEUCdZvMlbo6RAcpRFcHuKJkkn2ChBegirT9PdoSv11BMX3F4rtBjxskFqWt+k0IRO+XyLIi1OdmI0Rej2wvYtozCIys3JkxV+Bp+c1o3XWYL9d0j5FPErW7QnJTStv2e01VnBo4Gc+b4BOLACtE42cYC2U=
+	t=1740735365; cv=none; b=XgY7uy3yo+KT0fgnozbWi0CzoP/xCoWfn6LfbIoOu9gYu+klM5cg64LcXYz807MTtPxlFQyfb0/ZNRu2T/i4VowtOWafTRIcG8iPORUPKK9GqUmzfDbTW7DpIAmUtG9ZlkzHnr1nfhKdL0rzKYFH8Aw8AFAvbvslgwleYofoq2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740735265; c=relaxed/simple;
-	bh=g9+9xUaUwrhPwRgGCZ7HZuFRaPu6I1eBAEeSfEt0wkE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eOL8ZFBF4jKCeSoejEHvMiHHD1VQpJZ4aLSYZFdQ7tzTiCs6QDLQPv93mbKuFfV8npNOmJGaT6vZsti5+Rk1znylTuYrIyGEugTENK7KDcYLvlbxfOsUqqYGAu6QZtIJLJkqn0iQBUgNjZQZmPvHTzoo0OBCY0WYovk7Ot49aL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=VpEE74y8; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 63E9944352;
-	Fri, 28 Feb 2025 09:34:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1740735255;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4nTGwSCRIvTj2ZMWI4KC7YS0Lsjd/3Yc5HpwcAnYob8=;
-	b=VpEE74y82YNYrxmUXzNnpeisG9EB8FmU8UiBYjfRFj2dufz1XpeE96XVOycCoSbOk2/wAI
-	yQELqIDVAwpis+IsXtGUh0Nf5NVY8pFYnxMVVlm1TjrsHsWUjmXKWl7nkmnVu9gGl3uX62
-	YSMQpJFGzCkLE6WxiNxzXTQgOtNNgV2yfjuS9geN/HlTS6qgoK5D+PUT7pEK3Gq8rhdL9j
-	thELazOL7kA3kGVRqcBPvvdx4HL7o9g892aYwbRrSRLBBhXRw+gKWhhnU19tSVceQmjHNz
-	7TTOgJEMn4TvCYzbP2BSiDGj8Nv7iX0HrQCkIVK4yXzJos+yqNAQESTWQPuvhw==
-Date: Fri, 28 Feb 2025 10:34:11 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Kyle Hendry <kylehendrydev@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Florian Fainelli <florian.fainelli@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Philipp Zabel
- <p.zabel@pengutronix.de>, noltari@gmail.com, jonas.gorski@gmail.com,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 1/3] net: phy: bcm63xx: add support for BCM63268 GPHY
-Message-ID: <20250228103411.4c203261@kmaincent-XPS-13-7390>
-In-Reply-To: <20250228002722.5619-2-kylehendrydev@gmail.com>
-References: <20250228002722.5619-1-kylehendrydev@gmail.com>
-	<20250228002722.5619-2-kylehendrydev@gmail.com>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1740735365; c=relaxed/simple;
+	bh=dvVuHsyaV1YMTJAXpLJmRkJdJcnxyYSL+ei2Hl8HF60=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DSEmoV1dYge/Zblg6a/6SQCU8QQCuS7X+2TmumjdS4+RNbLo/QreWgchg3Txr+oACbCW9tutBL6xkvM2j2K4OtBal5N33Yx0gJZfEFr4eW6pBpW0L/joK368LhvYNfwo0mzZUwY5qOxzEYwQCunD+O7fLfTcT2GawX0gk/i1P+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru; spf=pass smtp.mailfrom=astralinux.ru; arc=none smtp.client-ip=195.16.41.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=astralinux.ru
+Received: from gca-msk-a-srv-ksmg01.astralinux.ru (localhost [127.0.0.1])
+	by mail-gw02.astralinux.ru (Postfix) with ESMTP id E0F5E1FA1C;
+	Fri, 28 Feb 2025 12:35:49 +0300 (MSK)
+Received: from new-mail.astralinux.ru (gca-yc-ruca-srv-mail04.astralinux.ru [10.177.185.109])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail-gw02.astralinux.ru (Postfix) with ESMTPS;
+	Fri, 28 Feb 2025 12:35:48 +0300 (MSK)
+Received: from rbta-msk-lt-156703.astralinux.ru (unknown [10.177.20.117])
+	by new-mail.astralinux.ru (Postfix) with ESMTPA id 4Z433j4lgKzkWxV;
+	Fri, 28 Feb 2025 12:35:45 +0300 (MSK)
+From: Alexey Panov <apanov@astralinux.ru>
+To: stable@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Alexey Panov <apanov@astralinux.ru>,
+	Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzbot+3c47b5843403a45aef57@syzkaller.appspotmail.com,
+	Octavian Purdila <tavip@google.com>,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCH 5.10/5.15] team: prevent adding a device which is already a team device lower
+Date: Fri, 28 Feb 2025 12:35:04 +0300
+Message-Id: <20250228093504.31062-1-apanov@astralinux.ru>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeltddtgecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefguddtfeevtddugeevgfevtdfgvdfhtdeuleetffefffffhffgteekvdefudeiieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvtddprhgtphhtthhopehkhihlvghhvghnughrhiguvghvsehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtp
- hhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehrohgshheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhriihkodgutheskhgvrhhnvghlrdhorhhg
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 8bit
+X-KSMG-AntiPhishing: NotDetected, bases: 2025/02/28 06:59:00
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Envelope-From: apanov@astralinux.ru
+X-KSMG-AntiSpam-Info: LuaCore: 51 0.3.51 68896fb0083a027476849bf400a331a2d5d94398, {Tracking_one_url}, {Tracking_uf_ne_domains}, {Tracking_internal2}, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;astralinux.ru:7.1.1;new-mail.astralinux.ru:7.1.1;syzkaller.appspot.com:5.0.1,7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiSpam-Lua-Profiles: 191369 [Feb 28 2025]
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Version: 6.1.1.11
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.0.7854, bases: 2025/02/28 06:44:00 #27492638
+X-KSMG-AntiVirus-Status: NotDetected, skipped
+X-KSMG-LinksScanning: NotDetected, bases: 2025/02/28 07:00:00
+X-KSMG-Message-Action: skipped
+X-KSMG-Rule-ID: 1
 
-On Thu, 27 Feb 2025 16:27:15 -0800
-Kyle Hendry <kylehendrydev@gmail.com> wrote:
+From: Octavian Purdila <tavip@google.com>
 
-> Add support for the internal gigabit PHY on the BCM63268 SoC.
-> Some of the PHY functionality is configured out of band through
-> memory mapped registers. The GPHY control register contains bits
-> which need to be written to enable/disable low power mode. The
-> register is part of the SoC's GPIO controller, so accessing it
-> is done through a phandle to that syscon.
+commit 3fff5da4ca2164bb4d0f1e6cd33f6eb8a0e73e50 upstream.
 
-...
+Prevent adding a device which is already a team device lower,
+e.g. adding veth0 if vlan1 was already added and veth0 is a lower of
+vlan1.
 
-> +static int bcm63268_gphy_resume(struct phy_device *phydev)
-> +{
-> +	int ret;
-> +
-> +	ret =3D bcm63268_gphy_set(phydev, true);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret =3D genphy_resume(phydev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return 0;
+This is not useful in practice and can lead to recursive locking:
 
-No need for the last check. You can simply do this:
-	return genphy_resume(phydev);
+$ ip link add veth0 type veth peer name veth1
+$ ip link set veth0 up
+$ ip link set veth1 up
+$ ip link add link veth0 name veth0.1 type vlan protocol 802.1Q id 1
+$ ip link add team0 type team
+$ ip link set veth0.1 down
+$ ip link set veth0.1 master team0
+team0: Port device veth0.1 added
+$ ip link set veth0 down
+$ ip link set veth0 master team0
 
-> +}
-> +
-> +static int bcm63268_gphy_suspend(struct phy_device *phydev)
-> +{
-> +	int ret;
-> +
-> +	ret =3D genphy_suspend(phydev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret =3D bcm63268_gphy_set(phydev, false);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return 0;
+============================================
+WARNING: possible recursive locking detected
+6.13.0-rc2-virtme-00441-ga14a429069bb #46 Not tainted
+--------------------------------------------
+ip/7684 is trying to acquire lock:
+ffff888016848e00 (team->team_lock_key){+.+.}-{4:4}, at: team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
 
-Same here.
+but task is already holding lock:
+ffff888016848e00 (team->team_lock_key){+.+.}-{4:4}, at: team_add_slave (drivers/net/team/team_core.c:1147 drivers/net/team/team_core.c:1977)
 
-> +}
-> +
-> +static int bcm63268_gphy_probe(struct phy_device *phydev)
-> +{
-> +	struct mdio_device *mdio =3D &phydev->mdio;
-> +	struct device *dev =3D &mdio->dev;
-> +	struct reset_control *reset;
-> +	struct bcm_gphy_priv *priv;
-> +	struct regmap *regmap;
-> +	int ret;
-> +
-> +	priv =3D devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-> +	if (!priv)
-> +		return -ENOMEM;
-> +
-> +	phydev->priv =3D priv;
-> +
-> +	regmap =3D syscon_regmap_lookup_by_phandle(dev->of_node,
-> "brcm,gpio-ctrl");
-> +	if (IS_ERR(regmap))
-> +		return PTR_ERR(regmap);
-> +
-> +	priv->gpio_ctrl =3D regmap;
-> +
-> +	reset =3D devm_reset_control_get_optional_exclusive(dev, NULL);
-> +	if (IS_ERR(reset))
-> +		return PTR_ERR(reset);
-> +
-> +	ret =3D reset_control_reset(reset);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return 0;
+other info that might help us debug this:
+Possible unsafe locking scenario:
 
-Same here.
+CPU0
+----
+lock(team->team_lock_key);
+lock(team->team_lock_key);
 
+*** DEADLOCK ***
 
+May be due to missing lock nesting notation
 
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+2 locks held by ip/7684:
+
+stack backtrace:
+CPU: 3 UID: 0 PID: 7684 Comm: ip Not tainted 6.13.0-rc2-virtme-00441-ga14a429069bb #46
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+Call Trace:
+<TASK>
+dump_stack_lvl (lib/dump_stack.c:122)
+print_deadlock_bug.cold (kernel/locking/lockdep.c:3040)
+__lock_acquire (kernel/locking/lockdep.c:3893 kernel/locking/lockdep.c:5226)
+? netlink_broadcast_filtered (net/netlink/af_netlink.c:1548)
+lock_acquire.part.0 (kernel/locking/lockdep.c:467 kernel/locking/lockdep.c:5851)
+? team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+? trace_lock_acquire (./include/trace/events/lock.h:24 (discriminator 2))
+? team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+? lock_acquire (kernel/locking/lockdep.c:5822)
+? team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+__mutex_lock (kernel/locking/mutex.c:587 kernel/locking/mutex.c:735)
+? team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+? team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+? fib_sync_up (net/ipv4/fib_semantics.c:2167)
+? team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+team_device_event (drivers/net/team/team_core.c:2928 drivers/net/team/team_core.c:2951 drivers/net/team/team_core.c:2973)
+notifier_call_chain (kernel/notifier.c:85)
+call_netdevice_notifiers_info (net/core/dev.c:1996)
+__dev_notify_flags (net/core/dev.c:8993)
+? __dev_change_flags (net/core/dev.c:8975)
+dev_change_flags (net/core/dev.c:9027)
+vlan_device_event (net/8021q/vlan.c:85 net/8021q/vlan.c:470)
+? br_device_event (net/bridge/br.c:143)
+notifier_call_chain (kernel/notifier.c:85)
+call_netdevice_notifiers_info (net/core/dev.c:1996)
+dev_open (net/core/dev.c:1519 net/core/dev.c:1505)
+team_add_slave (drivers/net/team/team_core.c:1219 drivers/net/team/team_core.c:1977)
+? __pfx_team_add_slave (drivers/net/team/team_core.c:1972)
+do_set_master (net/core/rtnetlink.c:2917)
+do_setlink.isra.0 (net/core/rtnetlink.c:3117)
+
+Reported-by: syzbot+3c47b5843403a45aef57@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=3c47b5843403a45aef57
+Fixes: 3d249d4ca7d0 ("net: introduce ethernet teaming device")
+Signed-off-by: Octavian Purdila <tavip@google.com>
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+[Alexey: fixed path from team_core.c to team.c to resolve merge conflict]
+Signed-off-by: Alexey Panov <apanov@astralinux.ru>
+---
+ drivers/net/team/team.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
+index 5e5af71a85ac..015151cd2222 100644
+--- a/drivers/net/team/team.c
++++ b/drivers/net/team/team.c
+@@ -1166,6 +1166,13 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
+ 		return -EBUSY;
+ 	}
+ 
++	if (netdev_has_upper_dev(port_dev, dev)) {
++		NL_SET_ERR_MSG(extack, "Device is already a lower device of the team interface");
++		netdev_err(dev, "Device %s is already a lower device of the team interface\n",
++			   portname);
++		return -EBUSY;
++	}
++
+ 	if (port_dev->features & NETIF_F_VLAN_CHALLENGED &&
+ 	    vlan_uses_dev(dev)) {
+ 		NL_SET_ERR_MSG(extack, "Device is VLAN challenged and team device has VLAN set up");
+-- 
+2.30.2
+
 
