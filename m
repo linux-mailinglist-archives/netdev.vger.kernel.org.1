@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-170559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08BA2A49055
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 05:28:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 148A5A49056
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 05:28:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3F123B0D5A
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 04:28:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2035E16D9DC
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 04:28:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6639A1A2554;
-	Fri, 28 Feb 2025 04:28:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 454881A2643;
+	Fri, 28 Feb 2025 04:28:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="o6saptvO"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="CxjwX6u+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A66D419993D
-	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 04:28:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9FBF19993D
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 04:28:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740716904; cv=none; b=eqvSV7d7mfs2BUowFRj79+yYdVreRIaEGS433gh5EmaD3kjK0pN4dKgvGUzYuPNjAADH1QtMIJSDy6MqhR88gKAZlwH7YNhbzLsfUOGPa8ox3vTWZO7H8a/By1rnvz7dzKQvFuA4byBYI5klL+mlDno472G7nUZsNsx7aaDMdAg=
+	t=1740716926; cv=none; b=rk4w6zsOpKHINJ0uf6/CZZrSAuQBMFCXt9+ObAg4Po2VY7hqhZgxbqYUosfR4xCi5QdyE3Ss4DhU9LbW/OginZg5J9pnZOyUyI23m1G/0ZS1fMkFAp2tQqxTpy8s3eedZQLLL2M6nOgBmAp72/QaY9koTPfZrA3/PBjX/rS0DFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740716904; c=relaxed/simple;
-	bh=NOCEOsHGgXvgDmRQcg1G8XtMVxV4aXagCY4oAXbZ4OU=;
+	s=arc-20240116; t=1740716926; c=relaxed/simple;
+	bh=DYLNc15BlrRffj122jBUwbgcb9K78wC16Lw9kX7+I24=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RIb+Hb+vLHw3yvuacYx7LklK2amtveY76LeBwi4oigPmdOFw1jLbHwVjh9W1FjAVxuTmKIh1hGZvcGCMm2CGyiWyCbvt/n320TwBgym0g6WzF5q4c5lUXXUh0IC5/SX/l5IaKXR4+ZXbNJy0aKSJU2YbV/C6y9O89dQf8HAYdLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=o6saptvO; arc=none smtp.client-ip=52.95.48.154
+	 MIME-Version:Content-Type; b=gQmX5FnKxcGDXJGzCqlkRkr+27dMJlv8ZangZsNvruR1I94ziY4RhiRN3fCoOjDxcWE9PMksqy0EcBmUi6hqyAXmALwa3Ve6XJ4Atrz9ei1kntU5ZAM2H1SibP3QVrtVq/s4VsvNnPCqOd5elDzncPSn3+6ITFhmDIcRJDZWKs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=CxjwX6u+; arc=none smtp.client-ip=99.78.197.219
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1740716903; x=1772252903;
+  t=1740716924; x=1772252924;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=qSVQqwwEpLS+uYT5epUrSCVZ3Z26f3wUCIwLmhDTdXU=;
-  b=o6saptvOe/V5fLKNlr2+YbIpfQMojSsDOmDYD4ZtxQ1P1UECwTgYJmnv
-   eDob/WUa+iDMXuRdnOT/ea00+UZ3PzqCkKSCrvI9VVGF90EaFiHJj8CM8
-   Am/iC7bVNewI/uSTtCT+9OsQHFudYQPzKsG+cgGHeu7fetoGxktPwY/Ay
-   Q=;
+  bh=Kf8u5XcjAnoIuZ7kLyNUIbgMumUWbXNNlHcydAYTiRM=;
+  b=CxjwX6u+M9tdoJH6Vi58XrljJr1Qnk+9wQnZOkHf6tmiFhu8mN1j/uhD
+   D4uxy7X4vwosVZKhOBYJVl9ndeo/SxYf2oQbcmj9BmI24cBmi9aTuLn78
+   2wvmAR2+QDXP5bX5JqEw5kxqosvs/vwknTOKtNMDwLT6VSl0sR7zR6AnU
+   0=;
 X-IronPort-AV: E=Sophos;i="6.13,321,1732579200"; 
-   d="scan'208";a="466519331"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2025 04:28:19 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:8832]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.18.32:2525] with esmtp (Farcaster)
- id b81ee572-f03b-4a1b-8016-e05a701026d8; Fri, 28 Feb 2025 04:28:18 +0000 (UTC)
-X-Farcaster-Flow-ID: b81ee572-f03b-4a1b-8016-e05a701026d8
+   d="scan'208";a="173991139"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2025 04:28:44 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:36414]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.55.141:2525] with esmtp (Farcaster)
+ id e568552f-630c-44a8-84ab-5f0c4b0ab256; Fri, 28 Feb 2025 04:28:44 +0000 (UTC)
+X-Farcaster-Flow-ID: e568552f-630c-44a8-84ab-5f0c4b0ab256
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 28 Feb 2025 04:28:18 +0000
+ Fri, 28 Feb 2025 04:28:43 +0000
 Received: from 6c7e67bfbae3.amazon.com (10.106.101.51) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 28 Feb 2025 04:28:15 +0000
+ Fri, 28 Feb 2025 04:28:40 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
  Abeni" <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v3 net-next 11/12] ipv4: fib: Move fib_valid_key_len() to rtm_to_fib_config().
-Date: Thu, 27 Feb 2025 20:23:27 -0800
-Message-ID: <20250228042328.96624-12-kuniyu@amazon.com>
+Subject: [PATCH v3 net-next 12/12] ipv4: fib: Convert RTM_NEWROUTE and RTM_DELROUTE to per-netns RTNL.
+Date: Thu, 27 Feb 2025 20:23:28 -0800
+Message-ID: <20250228042328.96624-13-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <20250228042328.96624-1-kuniyu@amazon.com>
 References: <20250228042328.96624-1-kuniyu@amazon.com>
@@ -77,122 +77,86 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWC004.ant.amazon.com (10.13.139.205) To
+X-ClientProxiedBy: EX19D040UWA004.ant.amazon.com (10.13.139.93) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-fib_valid_key_len() is called in the beginning of fib_table_insert()
-or fib_table_delete() to check if the prefix length is valid.
+We converted fib_info hash tables to per-netns one and now ready to
+convert RTM_NEWROUTE and RTM_DELROUTE to per-netns RTNL.
 
-fib_table_insert() and fib_table_delete() are called from 3 paths
-
-  - ip_rt_ioctl()
-  - inet_rtm_newroute() / inet_rtm_delroute()
-  - fib_magic()
-
-In the first ioctl() path, rtentry_to_fib_config() checks the prefix
-length with bad_mask().  Also, fib_magic() always passes the correct
-prefix: 32 or ifa->ifa_prefixlen, which is already validated.
-
-Let's move fib_valid_key_len() to the rtnetlink path, rtm_to_fib_config().
-
-While at it, 2 direct returns in rtm_to_fib_config() are changed to
-goto to match other places in the same function
+Let's hold rtnl_net_lock() in inet_rtm_newroute() and inet_rtm_delroute().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 Reviewed-by: Eric Dumazet <edumazet@google.com>
 Reviewed-by: David Ahern <dsahern@kernel.org>
 ---
- net/ipv4/fib_frontend.c | 18 ++++++++++++++++--
- net/ipv4/fib_trie.c     | 22 ----------------------
- 2 files changed, 16 insertions(+), 24 deletions(-)
+ net/ipv4/fib_frontend.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
 diff --git a/net/ipv4/fib_frontend.c b/net/ipv4/fib_frontend.c
-index a76dacc3e577..a6372d934e45 100644
+index a6372d934e45..6de77415b5b3 100644
 --- a/net/ipv4/fib_frontend.c
 +++ b/net/ipv4/fib_frontend.c
-@@ -835,19 +835,33 @@ static int rtm_to_fib_config(struct net *net, struct sk_buff *skb,
- 		}
- 	}
+@@ -884,20 +884,24 @@ static int inet_rtm_delroute(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	if (err < 0)
+ 		goto errout;
  
-+	if (cfg->fc_dst_len > 32) {
-+		NL_SET_ERR_MSG(extack, "Invalid prefix length");
-+		err = -EINVAL;
-+		goto errout;
-+	}
++	rtnl_net_lock(net);
 +
-+	if (cfg->fc_dst_len < 32 && (ntohl(cfg->fc_dst) << cfg->fc_dst_len)) {
-+		NL_SET_ERR_MSG(extack, "Invalid prefix for given prefix length");
-+		err = -EINVAL;
-+		goto errout;
-+	}
-+
- 	if (cfg->fc_nh_id) {
- 		if (cfg->fc_oif || cfg->fc_gw_family ||
- 		    cfg->fc_encap || cfg->fc_mp) {
- 			NL_SET_ERR_MSG(extack,
- 				       "Nexthop specification and nexthop id are mutually exclusive");
--			return -EINVAL;
-+			err = -EINVAL;
-+			goto errout;
- 		}
+ 	if (cfg.fc_nh_id && !nexthop_find_by_id(net, cfg.fc_nh_id)) {
+ 		NL_SET_ERR_MSG(extack, "Nexthop id does not exist");
+ 		err = -EINVAL;
+-		goto errout;
++		goto unlock;
  	}
  
- 	if (has_gw && has_via) {
- 		NL_SET_ERR_MSG(extack,
- 			       "Nexthop configuration can not contain both GATEWAY and VIA");
--		return -EINVAL;
-+		err = -EINVAL;
-+		goto errout;
+ 	tb = fib_get_table(net, cfg.fc_table);
+ 	if (!tb) {
+ 		NL_SET_ERR_MSG(extack, "FIB table does not exist");
+ 		err = -ESRCH;
+-		goto errout;
++		goto unlock;
  	}
  
- 	if (!cfg->fc_table)
-diff --git a/net/ipv4/fib_trie.c b/net/ipv4/fib_trie.c
-index d6411ac81096..59a6f0a9638f 100644
---- a/net/ipv4/fib_trie.c
-+++ b/net/ipv4/fib_trie.c
-@@ -1187,22 +1187,6 @@ static int fib_insert_alias(struct trie *t, struct key_vector *tp,
- 	return 0;
+ 	err = fib_table_delete(net, tb, &cfg, extack);
++unlock:
++	rtnl_net_unlock(net);
+ errout:
+ 	return err;
  }
+@@ -914,15 +918,20 @@ static int inet_rtm_newroute(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	if (err < 0)
+ 		goto errout;
  
--static bool fib_valid_key_len(u32 key, u8 plen, struct netlink_ext_ack *extack)
--{
--	if (plen > KEYLENGTH) {
--		NL_SET_ERR_MSG(extack, "Invalid prefix length");
--		return false;
--	}
--
--	if ((plen < KEYLENGTH) && (key << plen)) {
--		NL_SET_ERR_MSG(extack,
--			       "Invalid prefix for given prefix length");
--		return false;
--	}
--
--	return true;
--}
--
- static void fib_remove_alias(struct trie *t, struct key_vector *tp,
- 			     struct key_vector *l, struct fib_alias *old);
++	rtnl_net_lock(net);
++
+ 	tb = fib_new_table(net, cfg.fc_table);
+ 	if (!tb) {
+ 		err = -ENOBUFS;
+-		goto errout;
++		goto unlock;
+ 	}
  
-@@ -1223,9 +1207,6 @@ int fib_table_insert(struct net *net, struct fib_table *tb,
+ 	err = fib_table_insert(net, tb, &cfg, extack);
+ 	if (!err && cfg.fc_type == RTN_LOCAL)
+ 		net->ipv4.fib_has_custom_local_routes = true;
++
++unlock:
++	rtnl_net_unlock(net);
+ errout:
+ 	return err;
+ }
+@@ -1683,9 +1692,9 @@ static struct pernet_operations fib_net_ops = {
  
- 	key = ntohl(cfg->fc_dst);
- 
--	if (!fib_valid_key_len(key, plen, extack))
--		return -EINVAL;
--
- 	pr_debug("Insert table=%u %08x/%d\n", tb->tb_id, key, plen);
- 
- 	fi = fib_create_info(cfg, extack);
-@@ -1717,9 +1698,6 @@ int fib_table_delete(struct net *net, struct fib_table *tb,
- 
- 	key = ntohl(cfg->fc_dst);
- 
--	if (!fib_valid_key_len(key, plen, extack))
--		return -EINVAL;
--
- 	l = fib_find_node(t, &tp, key);
- 	if (!l)
- 		return -ESRCH;
+ static const struct rtnl_msg_handler fib_rtnl_msg_handlers[] __initconst = {
+ 	{.protocol = PF_INET, .msgtype = RTM_NEWROUTE,
+-	 .doit = inet_rtm_newroute},
++	 .doit = inet_rtm_newroute, .flags = RTNL_FLAG_DOIT_PERNET},
+ 	{.protocol = PF_INET, .msgtype = RTM_DELROUTE,
+-	 .doit = inet_rtm_delroute},
++	 .doit = inet_rtm_delroute, .flags = RTNL_FLAG_DOIT_PERNET},
+ 	{.protocol = PF_INET, .msgtype = RTM_GETROUTE, .dumpit = inet_dump_fib,
+ 	 .flags = RTNL_FLAG_DUMP_UNLOCKED | RTNL_FLAG_DUMP_SPLIT_NLM_DONE},
+ };
 -- 
 2.39.5 (Apple Git-154)
 
