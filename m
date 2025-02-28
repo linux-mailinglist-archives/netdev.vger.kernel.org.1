@@ -1,103 +1,96 @@
-Return-Path: <netdev+bounces-170611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F2F7A494D8
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 10:25:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A9F2CA494D4
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 10:25:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 227AD3B480D
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 09:25:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2BEC3B430D
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 09:25:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F27F2561D6;
-	Fri, 28 Feb 2025 09:25:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C72FE2561B7;
+	Fri, 28 Feb 2025 09:25:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="CgXmWRrZ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="A6B/FC7u"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E0351F30A2;
-	Fri, 28 Feb 2025 09:25:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AAFE1EDA2F;
+	Fri, 28 Feb 2025 09:25:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740734728; cv=none; b=Aw7vwUYk1y1g/TMCp+7I3aBpVy181bPgERKvOAHPBj6Eg9k++Q2Scy9riT1Gg6vZXblzMbxfrrdOkVH3a+XRtlqnFsIJK7inWeDg4PYdmwHB+cxWe9Eq5aj/54qOi6ZVf92SCvMckW4wIK3k4o2OtG0hZOvJtw9R1cqrmvhNvN4=
+	t=1740734711; cv=none; b=k884Mm575ENbcgY7boovo6ePy1UOgkIUzNwfKeUUdTgGF67CXLIcZXvfoQhag7o30CO2JdyJltJkgi6aSw7xiEu6rOrZk6gMWhssA/2DVwhN84HPIqrJXP9Z/9q0uEVrfCE2XhFbcD3tjY03LDXxEz4jQ7QV9BoNWDNYkUefEbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740734728; c=relaxed/simple;
-	bh=oAPbqbblLWp21an+z84tAVzI3aljqmgqN18ng4MMmEQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ml1jdJAE6Z7MdGW5dCTUgd4kNpiYizJqwycA256DOueBMKDDGZqGuZQIpzz1JeSDV7wWrT20+UomFCw12Y6jUvQ0DnzaU6QOTrl4anYst758phbclwFARioxkVekfLA49ZshE1iQs6JO+TSJ0ewZwH9eiJqEEpFXypVPLav0lY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=CgXmWRrZ; arc=none smtp.client-ip=220.197.31.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=t+QWg
-	uMxoLDRH5vcXi4r28RqexjrSgeJPwqF3tPYLt8=; b=CgXmWRrZM2xX2nJAyw40J
-	Tk1nm51ZOnW4v/HxyQzhfxewHVx+ZluJqUH53ETnT3WSUvZRjeA2XGHcwmWX+fWO
-	MpyP+yaHfF1U3L7oAyLtAXZ257HUv2Zky5hmG8qK7lV4tBPuJOOHjjdRO2li59di
-	EaB/0cXsRaJaDcI5Ry0C9M=
-Received: from icess-ProLiant-DL380-Gen10.. (unknown [])
-	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wCnnh3kgMFn9GRbPQ--.63080S4;
-	Fri, 28 Feb 2025 17:24:53 +0800 (CST)
-From: Haoxiang Li <haoxiang_li2024@163.com>
-To: shshaikh@marvell.com,
-	manishc@marvell.com,
-	GR-Linux-NIC-Dev@marvell.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	rajesh.borundia@qlogic.com,
-	sucheta.chakraborty@qlogic.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Haoxiang Li <haoxiang_li2024@163.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] qlcnic: fix a memory leak in qlcnic_sriov_set_guest_vlan_mode()
-Date: Fri, 28 Feb 2025 17:24:49 +0800
-Message-Id: <20250228092449.3759573-1-haoxiang_li2024@163.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1740734711; c=relaxed/simple;
+	bh=WBcFDJByMQMtWT0RXtUsFwuOqIlRxlxgPiBO43pa9/0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CmNAJTzkTHRHPtvz0/PqES8+VpNgOSnFwxFJfGhyFTLcKxdDB0jSeIyjRh1jPu1mcsmygHvuH+/qD+7LCreGINtRHd9LR3YTYSIT/jWCRYU1X5RUUxra0V3RwLWgyKXYcGff5fLE2KLR1MgaXGidDjuE5x2vSPi7BJpjZkQBG0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=A6B/FC7u; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 84D2E443DF;
+	Fri, 28 Feb 2025 09:25:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1740734706;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WBcFDJByMQMtWT0RXtUsFwuOqIlRxlxgPiBO43pa9/0=;
+	b=A6B/FC7uNF+Sw7Y2G+M67FUaGF0x3XjICwzA7R9UX8puFZ5LIVhq55UrPsS3svQJYZGCMQ
+	xGcMGr2ltvJTl8Q8vFcypdQcjJKjRXIK5ySUhT/3mLo9XRUxpoNfz74rtMvfrHFnNMbHa0
+	+HloQwb+6fHM/hVmrugTqAINk+0pAQ4g/oup7T1E9ymwaz0uybJ1eFh7N227LdM6oFISsg
+	KRcZ+MTVCae0ZUhBF7rwwLUTEoS0rUXS3mpjGtBNe3GUz6SqMep+glBJzQRmkRGRCJSZc5
+	NWw5WHueSe6hatKuP2TZ//fEy57hUBHO9EfGDIOcjtmCas2ojZ2yFdG+c9K+mQ==
+Date: Fri, 28 Feb 2025 10:25:03 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Kyle Hendry <kylehendrydev@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Florian Fainelli <florian.fainelli@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Philipp Zabel
+ <p.zabel@pengutronix.de>, noltari@gmail.com, jonas.gorski@gmail.com,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 0/3] net: phy: bcm63xx: add support for BCM63268 GPHY
+Message-ID: <20250228102503.4a3014c2@kmaincent-XPS-13-7390>
+In-Reply-To: <20250228002722.5619-1-kylehendrydev@gmail.com>
+References: <20250228002722.5619-1-kylehendrydev@gmail.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wCnnh3kgMFn9GRbPQ--.63080S4
-X-Coremail-Antispam: 1Uf129KBjvdXoW7Jw4kAFWrtFy5ur4ktr15twb_yoWktFcEkF
-	17Zr1rX3yUCr9xK3y3twsru342gwnrX3WfZa4FgayrtwnrCF4jyw17Jas5JFyDX3yrZr9r
-	G3Wayry5C34IyjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sRNvtCUUUUUU==
-X-CM-SenderInfo: xkdr5xpdqjszblsqjki6rwjhhfrp/xtbB0hkCbmfBfo4+eQAAs2
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeltddtvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefguddtfeevtddugeevgfevtdfgvdfhtdeuleetffefffffhffgteekvdefudeiieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvtddprhgtphhtthhopehkhihlvghhvghnughrhiguvghvsehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtp
+ hhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehrohgshheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhriihkodgutheskhgvrhhnvghlrdhorhhg
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Add qlcnic_sriov_free_vlans() to free the memory allocated by
-qlcnic_sriov_alloc_vlans() if "sriov->allowed_vlans" fails to
-be allocated.
+On Thu, 27 Feb 2025 16:27:14 -0800
+Kyle Hendry <kylehendrydev@gmail.com> wrote:
 
-Fixes: 91b7282b613d ("qlcnic: Support VLAN id config.")
-Cc: stable@vger.kernel.org
-Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
----
- drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+> Some BCM63268 bootloaders do not enable the internal PHYs by default.
+> This patch series adds a phy driver to set the registers required=20
+> for the gigabit PHY to work.=20
 
-diff --git a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c
-index f9dd50152b1e..2c01a9ad444f 100644
---- a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c
-+++ b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c
-@@ -454,8 +454,10 @@ static int qlcnic_sriov_set_guest_vlan_mode(struct qlcnic_adapter *adapter,
- 
- 	num_vlans = sriov->num_allowed_vlans;
- 	sriov->allowed_vlans = kcalloc(num_vlans, sizeof(u16), GFP_KERNEL);
--	if (!sriov->allowed_vlans)
-+	if (!sriov->allowed_vlans) {
-+		qlcnic_sriov_free_vlans(adapter);
- 		return -ENOMEM;
-+	}
- 
- 	vlans = (u16 *)&cmd->rsp.arg[3];
- 	for (i = 0; i < num_vlans; i++)
--- 
-2.25.1
+These are no fixes, you should add net-next prefix in your series.
 
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
