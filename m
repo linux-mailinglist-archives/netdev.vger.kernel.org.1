@@ -1,298 +1,345 @@
-Return-Path: <netdev+bounces-170727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 917EAA49BCD
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 15:22:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51FC6A49BFC
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 15:27:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A33416ADE4
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 14:22:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AE53175081
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 14:26:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C665D26E946;
-	Fri, 28 Feb 2025 14:22:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B65926FDA7;
+	Fri, 28 Feb 2025 14:26:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="c9nJMMt4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IGIA2nfy"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11BFD1AA1FA;
-	Fri, 28 Feb 2025 14:22:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25AC26E63D
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 14:26:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740752565; cv=none; b=pj6ipJudrXZJ97zc08g6vU+A2fTYpswnZWlAC0VfaRjKoQvHqrNiwmIx2S1v4DgtIwXQ/azi4s0XDUy2glMxanRwDOE48lvuai/+SWOE58vOEs3KRD77gDMHXQMj67Q6wHyvR3Wt1Ul4OHXsCQsyj/hHzQ3XwATu6/1hhsJK3eE=
+	t=1740752774; cv=none; b=EJI1h//EaRQRK+phNj1iu5NTC0424HsUbEZuckpaUNPQa4jRJ0Prz9TkvKlprZ+X96BP7nFLitDCaOYeds1qrOpg5G0ACJg5Bm04qz1X/Jaa6tXUQM2nMAhKDpb/ULzs8Rzam6dvV8dHwUIGRRmKIwgBGce8fc4lCf5JSxFnDWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740752565; c=relaxed/simple;
-	bh=6UXEncONaPYz2j1TSNLuTfEKvtKMh5PTmmSy/EJTvtQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uTPyQbScT3JFDMq/06Vy3B2ixKMMXaG4dCHfo3LRchIkAIMZ01PEkNJwf/XXMNvS0CkfAgrt+w9LYR93KF13ALYPwhpcpT93zM/PTN2CMSl3IDmBSQxcPLNy4cNx/nsTYxTytRv+jxNijMwMFtDOouqieNYdxBhuN0rKHeXBCu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=c9nJMMt4; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Z/PkK21dX5bu6dg00h631OfOQu8sWV88qftNm6kJCdU=; b=c9nJMMt4G24TfQe5jMCZ4HldH+
-	cLQEXKYwwawK1xwt+CqoEXIH0CrV0i7Ur//g6P/nPDgjdeTaIyxyAWh+OPntPSvtYYPKJzSgGklA/
-	BghsEOMs3BOSzyuNrblnZq9HL0dkLeEtUlHe/QgzAQDG0nUd/9FcBC99L3r3zeS6TnePd+z4Me5od
-	gdgUcMrcIxNZ7m/+O+hNVU29AbBycEjFVEuuGM3GETLG9SanJKpqfazlRFd+hc1DKrmvJIMRl/PCN
-	dBuQBws5BM8eKurVQ3+Lvp7u1J0Nhn+Qrx7qsK9Wf9sIx0dYtIAG6tQc1jobdz5qtYII8qguCvMpW
-	rkiud2yg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38986)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1to1Fz-00025B-27;
-	Fri, 28 Feb 2025 14:22:27 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1to1Fv-0000o8-03;
-	Fri, 28 Feb 2025 14:22:23 +0000
-Date: Fri, 28 Feb 2025 14:22:22 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Lei Wei <quic_leiwei@quicinc.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, quic_kkumarcs@quicinc.com,
-	quic_suruchia@quicinc.com, quic_pavir@quicinc.com,
-	quic_linchen@quicinc.com, quic_luoj@quicinc.com,
-	srinivas.kandagatla@linaro.org, bartosz.golaszewski@linaro.org,
-	vsmuthu@qti.qualcomm.com, john@phrozen.org,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: Re: [PATCH net-next v5 0/5] Add PCS support for Qualcomm IPQ9574 SoC
-Message-ID: <Z8HGnop3ONe5mDGk@shell.armlinux.org.uk>
-References: <20250207-ipq_pcs_6-14_rc1-v5-0-be2ebec32921@quicinc.com>
- <20250211195934.47943371@kernel.org>
- <Z6x1xD0krK0_eycB@shell.armlinux.org.uk>
- <71a69eb6-9e24-48ab-8301-93ec3ff43cc7@quicinc.com>
+	s=arc-20240116; t=1740752774; c=relaxed/simple;
+	bh=ZrrKLGsH5gMFEQNvKUqdIRd0RgUyxmGgBynh9J5KInw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=J8eXbCFbW7gzdF2532ZfRN5kLbn2T+Cj3j5zlaVZ8D/gucOHeiceaP8mgkm/4C5M7Ve29Rg3XOIQ2/k7g6/6yFfyVhKfpMufqrCYFQ9dCDgQr3xUTcC9leH56u6vpRl7GxlHjjEijxJM/WY5EeeXb3W2NKEdK6PcnnYBMV1Y4vE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IGIA2nfy; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740752771;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=41YK/Fa93yH7WRyOoYN61ZIrQtcUxBsRdCYHbyJzOHk=;
+	b=IGIA2nfyHeNh8T0eDgKcpsQAZ0fcCxI59MYo9lS9JvLNXe/sk1GxaIQAtCps9zHyPwBA/p
+	6GxftEiY+/ERFKNnzJwKqE//D3m+3/dC/yzdefdDBiJ5jXTKRzydUAJpUzEF9u/5qzw20Q
+	Cd1CU+ecTiRb8RwkWHThYSHkgSDakq4=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-518-z_p5hxTEMD2OKATXS0GqyA-1; Fri, 28 Feb 2025 09:26:10 -0500
+X-MC-Unique: z_p5hxTEMD2OKATXS0GqyA-1
+X-Mimecast-MFC-AGG-ID: z_p5hxTEMD2OKATXS0GqyA_1740752769
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-abbae81829fso244282466b.3
+        for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 06:26:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740752769; x=1741357569;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=41YK/Fa93yH7WRyOoYN61ZIrQtcUxBsRdCYHbyJzOHk=;
+        b=qaneI+VZTtmzf0eXGvCKkl5d7Y5wLYHeOD5mLspgzIUKvxUipkbv/euJBki1rQvMpB
+         ZADO+xyRpOYdCAr5CdFOKiMOdwSvxUpn2MJ3Jha2x5qkmOJAUrIfgihhW6Njwxh7zC3K
+         2lhHqrpmByNxRbEVNh+7lu0hgeKe7JLFzQOZPOP7DqTkgakkUeijYXCcAgtNZABbqVIQ
+         eiSvCfcCprn+2ewgbWe+pkpVbfW5QgG7PYUUFO/ZwY4lIrQepGrWKvtHTPYdfex9lYLa
+         Ybt8NORND7OL5Jh/37tHkxdb9Aep85YUZLnysYhUJqt0O5vEWvM9oH88BZbUBThrWcuA
+         1oLw==
+X-Gm-Message-State: AOJu0Yyp5PFNNHTeyMtoRMBLIWEctC0F9Mn/iKTsYj3Mh7K7QvcToAHj
+	69vGqv3ISV/f6L1UEX3xr7ewPGN+VPfPRtQfcWWjWK8+Urm2HVzlR3LVf5jetjcxijMQETiy4dA
+	cJ+KElK6hPi6ou6O2Cn8Tbiorr1jq9YV2A5nXb+oIAQCm0RasRB5NShU6MV0UNhbhh/xrfMFl+N
+	Ro7zqM99t7kO9QZlm+owf5OUi5i26x
+X-Gm-Gg: ASbGncsW+Q6VYmIzsYht6RctcE1S/021yqPfA1G/Qmnofb203065CMIr8DYcOpieDE6
+	BQn770oPMjylY1N/dtU4RXABAkY/QcEWcIhcl1Gw6QD93Zfx8l29hXLx4AWuGKGLpN0S8PjM7eA
+	==
+X-Received: by 2002:a17:907:98b:b0:ab7:e47c:b54a with SMTP id a640c23a62f3a-abf268228a5mr413410066b.37.1740752768876;
+        Fri, 28 Feb 2025 06:26:08 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFFpT+ykpXihddLwZKH4O92h96tSGJga9CaU/UUNcYwAnblX7Ug+Sy1iNG8RRYaXgdCkAh2VWhiCNg1deaC5wk=
+X-Received: by 2002:a17:907:98b:b0:ab7:e47c:b54a with SMTP id
+ a640c23a62f3a-abf268228a5mr413404166b.37.1740752768319; Fri, 28 Feb 2025
+ 06:26:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <71a69eb6-9e24-48ab-8301-93ec3ff43cc7@quicinc.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20250227041209.2031104-1-almasrymina@google.com>
+In-Reply-To: <20250227041209.2031104-1-almasrymina@google.com>
+From: Lei Yang <leiyang@redhat.com>
+Date: Fri, 28 Feb 2025 22:25:30 +0800
+X-Gm-Features: AQ5f1JqVhDb-cZIWt74rFAUUwiHQfWAkkWi2rweLejB6ipoz1DdzdbSrPZJ_seg
+Message-ID: <CAPpAL=wzN2L_OOLG6b_D+pVvVnTu4N9X4knfgePtrtLMX7vQww@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 0/8] Device memory TCP TX
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
+	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Jeroen de Borst <jeroendb@google.com>, 
+	Harshitha Ramamurthy <hramamurthy@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 19, 2025 at 06:46:57PM +0800, Lei Wei wrote:
-> > 2) there's yet another open coded "_get" function for getting the
-> > PCS given a DT node which is different from every other "_get"
-> > function - this one checks the parent DT node has an appropriate
-> > compatible whereas others don't. The whole poliferation of "_get"
-> > methods that are specific to each PCS still needs solving, and I
-> > still have the big question around what happens when the PCS driver
-> > gets unbound - and whether that causes the kernel to oops. I'm also
-> > not a fan of "look up the struct device and then get its driver data".
-> > There is *no* locking over accessing the driver data.
-> 
-> The PCS device in IPQ9574 chipset is built into the SoC chip and is not
-> pluggable. Also, the PCS driver module is not unloadable until the MAC
-> driver that depends on it is unloaded. Therefore, marking the driver
-> '.suppress_bind_attrs = true' to disable user unbind action may be good
-> enough to cover all possible scenarios of device going away for IPQ9574 PCS
-> driver.
+I re-tested this series of patches v6 with virtio-net regression
+tests, everything works fine.
 
-What I am concerned about is the proliferation of these various PCS
-specific "_get" methods. Where the PCS is looked up by firmware
-reference, we should have a common way to do that, rather than all
-these PCS specific ways.
+Tested-by: Lei Yang <leiyang@redhat.com>
 
-I did start work on that, but I just haven't had the time to take it
-forward. This is about as far as I'd got:
+On Thu, Feb 27, 2025 at 12:13=E2=80=AFPM Mina Almasry <almasrymina@google.c=
+om> wrote:
+>
+> v6: https://lore.kernel.org/netdev/20250222191517.743530-1-almasrymina@go=
+ogle.com/
+> =3D=3D=3D
+>
+> v6 has no major changes. Addressed a few issues from Paolo and David,
+> and collected Acks from Stan. Thank you everyone for the review!
+>
+> Changes:
+> - retain behavior to process MSG_FASTOPEN even if the provided cmsg is
+>   invalid (Paolo).
+> - Rework the freeing of tx_vec slightly (it now has its own err label).
+>   (Paolo).
+> - Squash the commit that makes dmabuf unbinding scheduled work into the
+>   same one which implements the TX path so we don't run into future
+>   errors on bisecting (Paolo).
+> - Fix/add comments to explain how dmabuf binding refcounting works
+>   (David).
+>
+> v5: https://lore.kernel.org/netdev/20250220020914.895431-1-almasrymina@go=
+ogle.com/
+> =3D=3D=3D
+>
+> v5 has no major changes; it clears up the relatively minor issues
+> pointed out to in v4, and rebases the series on top of net-next to
+> resolve the conflict with a patch that raced to the tree. It also
+> collects the review tags from v4.
+>
+> Changes:
+> - Rebase to net-next
+> - Fix issues in selftest (Stan).
+> - Address comments in the devmem and netmem driver docs (Stan and Bagas)
+> - Fix zerocopy_fill_skb_from_devmem return error code (Stan).
+>
+> v4: https://lore.kernel.org/netdev/20250203223916.1064540-1-almasrymina@g=
+oogle.com/
+> =3D=3D=3D
+>
+> v4 mainly addresses the critical driver support issue surfaced in v3 by
+> Paolo and Stan. Drivers aiming to support netmem_tx should make sure not
+> to pass the netmem dma-addrs to the dma-mapping APIs, as these dma-addrs
+> may come from dma-bufs.
+>
+> Additionally other feedback from v3 is addressed.
+>
+> Major changes:
+> - Add helpers to handle netmem dma-addrs. Add GVE support for
+>   netmem_tx.
+> - Fix binding->tx_vec not being freed on error paths during the
+>   tx binding.
+> - Add a minimal devmem_tx test to devmem.py.
+> - Clean up everything obsolete from the cover letter (Paolo).
+>
+> v3: https://patchwork.kernel.org/project/netdevbpf/list/?series=3D929401&=
+state=3D*
+> =3D=3D=3D
+>
+> Address minor comments from RFCv2 and fix a few build warnings and
+> ynl-regen issues. No major changes.
+>
+> RFC v2: https://patchwork.kernel.org/project/netdevbpf/list/?series=3D920=
+056&state=3D*
+> =3D=3D=3D=3D=3D=3D=3D
+>
+> RFC v2 addresses much of the feedback from RFC v1. I plan on sending
+> something close to this as net-next  reopens, sending it slightly early
+> to get feedback if any.
+>
+> Major changes:
+> --------------
+>
+> - much improved UAPI as suggested by Stan. We now interpret the iov_base
+>   of the passed in iov from userspace as the offset into the dmabuf to
+>   send from. This removes the need to set iov.iov_base =3D NULL which may
+>   be confusing to users, and enables us to send multiple iovs in the
+>   same sendmsg() call. ncdevmem and the docs show a sample use of that.
+>
+> - Removed the duplicate dmabuf iov_iter in binding->iov_iter. I think
+>   this is good improvment as it was confusing to keep track of
+>   2 iterators for the same sendmsg, and mistracking both iterators
+>   caused a couple of bugs reported in the last iteration that are now
+>   resolved with this streamlining.
+>
+> - Improved test coverage in ncdevmem. Now multiple sendmsg() are tested,
+>   and sending multiple iovs in the same sendmsg() is tested.
+>
+> - Fixed issue where dmabuf unmapping was happening in invalid context
+>   (Stan).
+>
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+> The TX path had been dropped from the Device Memory TCP patch series
+> post RFCv1 [1], to make that series slightly easier to review. This
+> series rebases the implementation of the TX path on top of the
+> net_iov/netmem framework agreed upon and merged. The motivation for
+> the feature is thoroughly described in the docs & cover letter of the
+> original proposal, so I don't repeat the lengthy descriptions here, but
+> they are available in [1].
+>
+> Full outline on usage of the TX path is detailed in the documentation
+> included with this series.
+>
+> Test example is available via the kselftest included in the series as wel=
+l.
+>
+> The series is relatively small, as the TX path for this feature largely
+> piggybacks on the existing MSG_ZEROCOPY implementation.
+>
+> Patch Overview:
+> ---------------
+>
+> 1. Documentation & tests to give high level overview of the feature
+>    being added.
+>
+> 1. Add netmem refcounting needed for the TX path.
+>
+> 2. Devmem TX netlink API.
+>
+> 3. Devmem TX net stack implementation.
+>
+> 4. Make dma-buf unbinding scheduled work to handle TX cases where it gets
+>    freed from contexts where we can't sleep.
+>
+> 5. Add devmem TX documentation.
+>
+> 6. Add scaffolding enabling driver support for netmem_tx. Add helpers, dr=
+iver
+> feature flag, and docs to enable drivers to declare netmem_tx support.
+>
+> 7. Guard netmem_tx against being enabled against drivers that don't
+>    support it.
+>
+> 8. Add devmem_tx selftests. Add TX path to ncdevmem and add a test to
+>    devmem.py.
+>
+> Testing:
+> --------
+>
+> Testing is very similar to devmem TCP RX path. The ncdevmem test used
+> for the RX path is now augemented with client functionality to test TX
+> path.
+>
+> * Test Setup:
+>
+> Kernel: net-next with this RFC and memory provider API cherry-picked
+> locally.
+>
+> Hardware: Google Cloud A3 VMs.
+>
+> NIC: GVE with header split & RSS & flow steering support.
+>
+> Performance results are not included with this version, unfortunately.
+> I'm having issues running the dma-buf exporter driver against the
+> upstream kernel on my test setup. The issues are specific to that
+> dma-buf exporter and do not affect this patch series. I plan to follow
+> up this series with perf fixes if the tests point to issues once they're
+> up and running.
+>
+> Special thanks to Stan who took a stab at rebasing the TX implementation
+> on top of the netmem/net_iov framework merged. Parts of his proposal [2]
+> that are reused as-is are forked off into their own patches to give full
+> credit.
+>
+> [1] https://lore.kernel.org/netdev/20240909054318.1809580-1-almasrymina@g=
+oogle.com/
+> [2] https://lore.kernel.org/netdev/20240913150913.1280238-2-sdf@fomichev.=
+me/T/#m066dd407fbed108828e2c40ae50e3f4376ef57fd
+>
+> Cc: sdf@fomichev.me
+> Cc: asml.silence@gmail.com
+> Cc: dw@davidwei.uk
+> Cc: Jamal Hadi Salim <jhs@mojatatu.com>
+> Cc: Victor Nogueira <victor@mojatatu.com>
+> Cc: Pedro Tammela <pctammela@mojatatu.com>
+> Cc: Samiullah Khawaja <skhawaja@google.com>
+>
+>
+> Mina Almasry (7):
+>   net: add get_netmem/put_netmem support
+>   net: devmem: Implement TX path
+>   net: add devmem TCP TX documentation
+>   net: enable driver support for netmem TX
+>   gve: add netmem TX support to GVE DQO-RDA mode
+>   net: check for driver support in netmem TX
+>   selftests: ncdevmem: Implement devmem TCP TX
+>
+> Stanislav Fomichev (1):
+>   net: devmem: TCP tx netlink api
+>
+>  Documentation/netlink/specs/netdev.yaml       |  12 +
+>  Documentation/networking/devmem.rst           | 150 ++++++++-
+>  .../networking/net_cachelines/net_device.rst  |   1 +
+>  Documentation/networking/netdev-features.rst  |   5 +
+>  Documentation/networking/netmem.rst           |  23 +-
+>  drivers/net/ethernet/google/gve/gve_main.c    |   4 +
+>  drivers/net/ethernet/google/gve/gve_tx_dqo.c  |   8 +-
+>  include/linux/netdevice.h                     |   2 +
+>  include/linux/skbuff.h                        |  17 +-
+>  include/linux/skbuff_ref.h                    |   4 +-
+>  include/net/netmem.h                          |  23 ++
+>  include/net/sock.h                            |   1 +
+>  include/uapi/linux/netdev.h                   |   1 +
+>  net/core/datagram.c                           |  48 ++-
+>  net/core/dev.c                                |   3 +
+>  net/core/devmem.c                             | 115 ++++++-
+>  net/core/devmem.h                             |  77 ++++-
+>  net/core/netdev-genl-gen.c                    |  13 +
+>  net/core/netdev-genl-gen.h                    |   1 +
+>  net/core/netdev-genl.c                        |  73 ++++-
+>  net/core/skbuff.c                             |  48 ++-
+>  net/core/sock.c                               |   6 +
+>  net/ipv4/ip_output.c                          |   3 +-
+>  net/ipv4/tcp.c                                |  50 ++-
+>  net/ipv6/ip6_output.c                         |   3 +-
+>  net/vmw_vsock/virtio_transport_common.c       |   5 +-
+>  tools/include/uapi/linux/netdev.h             |   1 +
+>  .../selftests/drivers/net/hw/devmem.py        |  26 +-
+>  .../selftests/drivers/net/hw/ncdevmem.c       | 300 +++++++++++++++++-
+>  29 files changed, 950 insertions(+), 73 deletions(-)
+>
+>
+> base-commit: 80c4a0015ce249cf0917a04dbb3cc652a6811079
+> --
+> 2.48.1.658.g4767266eb4-goog
+>
+>
 
-diff --git a/drivers/net/pcs/Makefile b/drivers/net/pcs/Makefile
-index 4f7920618b90..0b670fee0757 100644
---- a/drivers/net/pcs/Makefile
-+++ b/drivers/net/pcs/Makefile
-@@ -1,6 +1,8 @@
- # SPDX-License-Identifier: GPL-2.0
- # Makefile for Linux PCS drivers
- 
-+obj-$(CONFIG_PHYLINK)		+= pcs-core.o
-+
- pcs_xpcs-$(CONFIG_PCS_XPCS)	:= pcs-xpcs.o pcs-xpcs-plat.o \
- 				   pcs-xpcs-nxp.o pcs-xpcs-wx.o
- 
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 976e569feb70..1c5492dab00e 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -2483,6 +2483,15 @@ void phylink_pcs_change(struct phylink_pcs *pcs, bool up)
- }
- EXPORT_SYMBOL_GPL(phylink_pcs_change);
- 
-+/**
-+ * phylink_pcs_remove() - notify phylink that a PCS is going away
-+ * @pcs: PCS that is going away
-+ */
-+void phylink_pcs_remove(struct phylink_pcs *pcs)
-+{
-+	
-+}
-+
- static irqreturn_t phylink_link_handler(int irq, void *data)
- {
- 	struct phylink *pl = data;
-diff --git a/include/linux/phylink.h b/include/linux/phylink.h
-index 071ed4683c8c..1e6b7ce0fa7a 100644
---- a/include/linux/phylink.h
-+++ b/include/linux/phylink.h
-@@ -1,6 +1,7 @@
- #ifndef NETDEV_PCS_H
- #define NETDEV_PCS_H
- 
-+#include <linux/list.h>
- #include <linux/phy.h>
- #include <linux/spinlock.h>
- #include <linux/workqueue.h>
-@@ -435,9 +436,11 @@ int mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
- #endif
- 
- struct phylink_pcs_ops;
-+struct pcs_lookup;
- 
- /**
-  * struct phylink_pcs - PHYLINK PCS instance
-+ * @lookup: private member for PCS core management
-  * @supported_interfaces: describing which PHY_INTERFACE_MODE_xxx
-  *                        are supported by this PCS.
-  * @ops: a pointer to the &struct phylink_pcs_ops structure
-@@ -455,6 +458,7 @@ struct phylink_pcs_ops;
-  * the PCS driver.
-  */
- struct phylink_pcs {
-+	struct pcs_lookup *lookup;
- 	DECLARE_PHY_INTERFACE_MASK(supported_interfaces);
- 	const struct phylink_pcs_ops *ops;
- 	struct phylink *phylink;
-@@ -692,6 +696,7 @@ int phylink_set_fixed_link(struct phylink *,
- 
- void phylink_mac_change(struct phylink *, bool up);
- void phylink_pcs_change(struct phylink_pcs *, bool up);
-+void phylink_pcs_remove(struct phylink_pcs *);
- 
- int phylink_pcs_pre_init(struct phylink *pl, struct phylink_pcs *pcs);
- 
-@@ -790,4 +795,11 @@ void phylink_mii_c45_pcs_get_state(struct mdio_device *pcs,
- 
- void phylink_decode_usxgmii_word(struct phylink_link_state *state,
- 				 uint16_t lpa);
-+
-+/* PCS lookup */
-+struct phylink_pcs *pcs_find(void *id);
-+void pcs_remove(struct phylink_pcs *pcs);
-+int pcs_add(struct phylink_pcs *pcs, void *id);
-+int devm_pcs_add(struct device *dev, struct phylink_pcs *pcs, void *id);
-+
- #endif
-
-The idea is that you add the device using whatever identifier you decide
-(the pointer value is what's matched). For example, a fwnode. You can
-then find it using pcs_find().
-
-If it returns NULL, then it's not (yet) registered - if you know that it
-should exist (e.g. because the fwnode is marked as available) then you
-can return -EPROBE_DEFER or fail.
-
-There is a hook present so phylink can do something on PCS removal -
-that's still to be implemented with this. I envision keeping a list
-of phylink instances, and walking that list to discover if any phylink
-instances are currently using the PCS. If they are, then we can take
-the link down.
-
-> I would like to clarify on the hardware supported configurations for the
-> UNIPHY PCS hardware instances. [Note: There are three instances of 'UNIPHY
-> PCS' in IPQ9574. However we take the example here for PCS0]
-> 
-> UNIPHY PCS0 --> pcs0_mii0..pcs0_mii4 (5 PCS MII channels maximum).
-> Possible combinations: QSGMII (4x 1 SGMII)
-> 			PSGMII (5 x 1 SGMII),
-> 			SGMII (1 x 1 SGMII)
-> 			USXGMII (1 x 1 USXGMII)
-> 	
-> As we can see above, different PCS channels in a 'UNIPHY' PCS block working
-> in different PHY interface modes is not supported by the hardware. So, it
-> might not be necessary to detect that conflict. If the interface mode
-> changes from one to another, the same interface mode is applicable to all
-> the PCS channels that are associated with the UNIPHY PCS block.
-> 
-> Below is an example of a DTS configuration which depicts one board
-> configuration where one 'UNIPHY' (PCS0) is connected with a QCA8075 Quad
-> PHY, it has 4 MII channels enabled and connected with 4 PPE MAC ports, and
-> all the PCS MII channels are in QSGMII mode. For the 'UNIPHY' connected with
-> single SGMII or USXGMII PHY (PCS1), only one MII channel is enabled and
-> connected with one PPE MAC port.
-> 
-> PHY:
-> &mdio {
-> 	ethernet-phy-package@0 {
->                 compatible = "qcom,qca8075-package";
->                 #address-cells = <1>;
->                 #size-cells = <0>;
->                 reg = <0x10>;
->                 qcom,package-mode = "qsgmii";
-> 
->                 phy0: ethernet-phy@10 {
->                         reg = <0x10>;
->                 };
-> 
->                 phy1: ethernet-phy@11 {
->                         reg = <0x11>;
->                 };
-> 
->                 phy2: ethernet-phy@12 {
->                         reg = <0x12>;
->                 };
-> 
->                 phy3: ethernet-phy@13 {
->                         reg = <0x13>;
->                 };
-> 	};
-> 	phy4: ethernet-phy@8 {
->                 compatible ="ethernet-phy-ieee802.3-c45";
->                 reg = <8>;
->         };
-> }
-> 
-> PCS:
-> pcs0: ethernet-pcs@7a00000 {
-> 	......
-> 	pcs0_mii0: pcs-mii@0 {
-> 		reg = <0>;
-> 		status = "enabled";
-> 	};
-> 
-> 	......
-> 
-> 	pcs0_mii3: pcs-mii@3 {
-> 		reg = <3>;
-> 		status = "enabled";
-> 	};
-> };
-
-Given that this is a package of several PCS which have a global mode, I
-think it would be a good idea to have a property like
-"qcom,package-mode" which defines which of the four modes should be used
-for all PCS.
-
-Then the PCS driver initialises supported_interfaces for each of these
-PCS to only contain that mode, thereby ensuring that unsupported
-dissimilar modes can't be selected or the mode unexpectedly changed.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
