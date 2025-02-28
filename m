@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-170808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69F9EA4A019
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 18:18:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 279B4A4A01A
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 18:18:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64BA01895FF0
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 17:18:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CA241886733
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 17:18:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 536EC1F4C8E;
-	Fri, 28 Feb 2025 17:18:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 317741F4C96;
+	Fri, 28 Feb 2025 17:18:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bEClTUQY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cDqbSAPM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24B431F4C85
-	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 17:18:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB111F4C8E
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 17:18:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740763104; cv=none; b=o/hIzKqQQWp8QFssGwz8LasAzCHANFcSA2NfJUCfiu4Ump55J4pHYayjklPNA3U59hT2FfLZtCNiXfiFqeqSzweENmLfqhfGj0YyyHjdYFpObHWu/jolIVMNTVI/fCjTTQm+l5nHHAGcLT77RXrj74366lKpt/pne1RQxxrF8is=
+	t=1740763117; cv=none; b=MY5Z0Uhk1UKzBSODwFV30hyA6drj7jTSgvfH4/kutNIX3G8I2wyRq42M3PfuOM66S6BeLbKKbhi0V2nnn6ApPFRt/jlOuEYmYP5ie30HcczVmK1pkJsIbtTmSGc0UagRs6L7eEkvvzTfG6VGlKCUyEO6yA/0SX8iteAIsxWBVvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740763104; c=relaxed/simple;
-	bh=xbrkC9wQmBAJq136ugYGbFVex3ldm3gZ7hWF2a+WG+0=;
+	s=arc-20240116; t=1740763117; c=relaxed/simple;
+	bh=kiAYDiNKPRsdXTw71BC5BaVg3ja1Aiiqb5jZ7oCOh6c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p5PEOygE7CZycTDHu49dy3oWcAVbiNIMHGXqHV+lAYcs13gS3LC5dWcfBoSO8gIGbQUWvA9FyIaa2ygFrh+FZYSn6f7L8hv4SE0F09VRA1bh19VAi/8s6zSY4ORRJiqgANnyZfgzJ8k4Nwp9hZ3LK0Wc+X4P8oVgN9kjwhhCqdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bEClTUQY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDD0FC4CED6;
-	Fri, 28 Feb 2025 17:18:21 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ulAyZ0lYUYTKnKXB7ePMh9VzRXz0NffkNVLRE0v1f/PBpFyIKzbJuz52FliArfJGwvF55N5/kaGj3N4Yk/nuy+yH1hVKWnq09Zhbq6Wx57AxJKeFCgVrYCzXYQWzzqI5lYJNOqkAjaKmtl/44V6NZh38eIBKPZnDSHZsuHl92g0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cDqbSAPM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B4E3C4CEE8;
+	Fri, 28 Feb 2025 17:18:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740763103;
-	bh=xbrkC9wQmBAJq136ugYGbFVex3ldm3gZ7hWF2a+WG+0=;
+	s=k20201202; t=1740763116;
+	bh=kiAYDiNKPRsdXTw71BC5BaVg3ja1Aiiqb5jZ7oCOh6c=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bEClTUQYb5N66+eanwlWPzSIy3au/N9+juhIcnpu4xPC5GuegR6xOdiVGYQTCbBoG
-	 F4PoULe1S6HNYvqje7H0TGXOa/D2V2Brmr2xDd/E/YA13KwItYymD+xNJ+Q5xbwxzR
-	 qzjrvZrPD4BA4elcB89OKGEUe5qe2Uwobk6NttLPRKj60jb2UYsn2tQSXpR70trE8S
-	 JEZqvsCScBurBbczLT1EXq0mmHfAV0gzuSvvMsh05PlffyMRH02+vgB3FfCdmZ6ebX
-	 FgRFM5xNY1zlMgrUtn7F3or6Kdo/Wdm7+FXX7yEQt2b8PvQITeZtyJLOFaa6/lMBXJ
-	 1pq70NoB5baKA==
-Date: Fri, 28 Feb 2025 17:18:19 +0000
+	b=cDqbSAPMbhgp6yZl1jn4ChyyyHUe2w5jr1E46ydocLKQO66B0LHaFWSgkkJB37D8k
+	 qX2DOOlxvNpf/ciMElQrnvB4pMF93JnuLMQNOZQjoAgGDckImCD0b2byGtG2uQbEHV
+	 Ac0rAPeUi1ml8pk5jTS2D4BA6jV6CLr88khDhg48TcBjm0P8W4vu64oTW1GARMJvLe
+	 LzeRz8rXu/3FqI/WG1+p9C7WfpUBBzlWypROMt6Bz2G2h3ocKABlyGRyIoDgF7yYsf
+	 l3EeikKwkdYxF6zhcvwVaEd33WE8Mo2Zf1oh7+giRJQ/pgWE4i0GhPZyR3aSeNplwo
+	 XAwRfVWSedsrg==
+Date: Fri, 28 Feb 2025 17:18:33 +0000
 From: Simon Horman <horms@kernel.org>
 To: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
 Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
 	Jan Glaza <jan.glaza@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
 	Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Subject: Re: [iwl-net v2 2/5] ice: stop truncating queue ids when checking
-Message-ID: <20250228171819.GM1615191@kernel.org>
+Subject: Re: [iwl-net v2 1/5] virtchnl: make proto and filter action count
+ unsigned
+Message-ID: <20250228171833.GN1615191@kernel.org>
 References: <20250225090847.513849-2-martyna.szapar-mudlaw@linux.intel.com>
- <20250225090847.513849-5-martyna.szapar-mudlaw@linux.intel.com>
+ <20250225090847.513849-4-martyna.szapar-mudlaw@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,16 +60,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250225090847.513849-5-martyna.szapar-mudlaw@linux.intel.com>
+In-Reply-To: <20250225090847.513849-4-martyna.szapar-mudlaw@linux.intel.com>
 
-On Tue, Feb 25, 2025 at 10:08:46AM +0100, Martyna Szapar-Mudlaw wrote:
+On Tue, Feb 25, 2025 at 10:08:45AM +0100, Martyna Szapar-Mudlaw wrote:
 > From: Jan Glaza <jan.glaza@intel.com>
 > 
-> Queue IDs can be up to 4096, fix invalid check to stop
-> truncating IDs to 8 bits.
+> The count field in virtchnl_proto_hdrs and virtchnl_filter_action_set
+> should never be negative while still being valid. Changing it from
+> int to u32 ensures proper handling of values in virtchnl messages in
+> driverrs and prevents unintended behavior.
+> In its current signed form, a negative count does not trigger
+> an error in ice driver but instead results in it being treated as 0.
+> This can lead to unexpected outcomes when processing messages.
+> By using u32, any invalid values will correctly trigger -EINVAL,
+> making error detection more robust.
 > 
-> Fixes: bf93bf791cec8 ("ice: introduce ice_virtchnl.c and ice_virtchnl.h")
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Fixes: 1f7ea1cd6a374 ("ice: Enable FDIR Configure for AVF")
 > Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
 > Signed-off-by: Jan Glaza <jan.glaza@intel.com>
 > Signed-off-by: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
