@@ -1,446 +1,430 @@
-Return-Path: <netdev+bounces-170516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52A06A48E65
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 03:15:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A018A48E68
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 03:15:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 215C83B69C7
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 02:14:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FB7816E718
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 02:15:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 262061A2622;
-	Fri, 28 Feb 2025 02:13:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Za4gS3d2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB5A15533F;
+	Fri, 28 Feb 2025 02:15:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 026A01A00F8
-	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 02:13:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24359139E;
+	Fri, 28 Feb 2025 02:15:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740708817; cv=none; b=VYLil+oustOG75yWn2gUkgkI2xPbQ7QnfYyrr5Du7ZciLv16ALLJJl8tmbS7AOzLJz22ZAe0T9SWQyTgVHMTCa9tiUNf2GsXRTI7qONag81G5+dnz/cSALbqSegDNeT6O7QYZlbqSti5oI7yf0shyzMVqzLqz7AElTJFchC0JNU=
+	t=1740708920; cv=none; b=QxwG7mx5KDz1fAQN+QAINHmgxKvrAXaEFUdVYgR+T3gC0YCY2gVN2Wm8SN3A7UFkNIcCjUmf98oa7jLL3bQHHoZSpHqQM7OMNzpThnDG9TLW4mSYTEpbuILc0UjAawN/Dg5OS9qilPlTxuYChxZdcjw02SVxlu7+i7flP1DG+hA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740708817; c=relaxed/simple;
-	bh=Oam0SwdgrnLXBsdBv5+rVEtOFSqJkQSxWJJSsjlOO58=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RslzieSZVtUwOa5wKBs7RtjlRmmEYD+A3fo0rWMWzORe8FTKwEZhIG7VMXtsb4C63NaN8gP6v07DXwPnxS2jtsxSL8yYwHl5wkw+FlSheXfbqxF87by1pUUqvNzy1kedtN5BE1yKIPMwy/LSDeA3lYd2OLT+os+6wuS2TSo+Vl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Za4gS3d2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66F14C4CEDD;
-	Fri, 28 Feb 2025 02:13:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740708816;
-	bh=Oam0SwdgrnLXBsdBv5+rVEtOFSqJkQSxWJJSsjlOO58=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Za4gS3d24ASBSkZje+YW3QSJ5IinRSskA4QBlf5oR/EQV9Ekd1T2ZQSrUB5QtyWFJ
-	 tin9Z+a17EGPL0FmdIdo5sI7CINPRLwg48ymazcuiEk9HDkkCyyruXCXZeVknTBzCQ
-	 Ywr8iG3HkM9hXyfICAOyHjn4ZEOsGHgYhbIOPJfbd7z8d4OC7BIXf4v4xyNjppaDWs
-	 amonYrjorsZ4UX9Q1fKxwvEJH9Pi1RD88sv0iPrjX5vYTVX7RivORMG/02b3wZbP61
-	 TeGPh9n+BlEG/QllElPRQCLgniWsi3ZCaNROYdGmlkiHA+2BuFybBsPfMysXQAfUYz
-	 CNQMh8kjStfkg==
-From: Saeed Mahameed <saeed@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Jiri Pirko <jiri@nvidia.com>
-Subject: [PATCH net-next 14/14] net/mlx5: Implement eSwitch hairpin per prio buffers devlink params
-Date: Thu, 27 Feb 2025 18:12:27 -0800
-Message-ID: <20250228021227.871993-15-saeed@kernel.org>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250228021227.871993-1-saeed@kernel.org>
-References: <20250228021227.871993-1-saeed@kernel.org>
+	s=arc-20240116; t=1740708920; c=relaxed/simple;
+	bh=lnSpolmVmbsLZUSV/Vy9GXK+El8CCUSe80kmO4zr6C0=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=er5Yrfp0ld+m+mm72gy8HGsPk5t2mRJKTg+MCkhAHXQhHa3OREGTFDGkVB/hjL7HimXig+LxqFYs9vPzvoL4C0EfE2Kxbx6n5yZPlpWm9Zi0gFVyqkpq+rfnC60UvVxvdTNn0NMHF33mpgj3e9+PjvzFoSfPKgg/DDpZRDvnCw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1tnptw-000000006iu-3YZk;
+	Fri, 28 Feb 2025 02:14:56 +0000
+Date: Fri, 28 Feb 2025 02:14:48 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Chester A. Unal" <chester.a.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Frank Wunderlich <frank-w@public-files.de>,
+	John Crispin <john@phrozen.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH net-next] net: dsa: mt7530: make use of REGMAP_IRQ
+Message-ID: <0d50a1437c6d298b13fb19db546a20d10b643cc3.1740708525.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-From: Saeed Mahameed <saeedm@nvidia.com>
+Use REGMAP_IRQ instead of open-coding irq chip handler and mask/unmask.
+This greatly simplifies the code and allows to remove (almost) all
+interrupt related functions from mt7530.c.
 
-E-Switch hairpin per prio buffers are controlled and configurable by the
-device, add two devlink params to control them.
+Tested on MT7988A built-in switch as well as MT7531AE IC.
 
-esw_haripin_per_prio_log_queue_size: p0,p1,....,p7
-  Log(base 2) of the number of packets descriptors allocated
-  internally for hairpin for IEEE802.1p priorities.
-  0 means that no descriptors are allocated for this priority
-  and traffic with this priority will be dropped.
-
-esw_hairpin_per_prio_log_buf_size: p0,p1,...,p7
-  Log(base 2) of the buffer size (in bytes) allocated internally
-  for hairpin for IEEE802.1p priorities.
-  0 means no buffer for this priority and traffic with this
-  priority will be dropped.
-
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- Documentation/networking/devlink/mlx5.rst     |  15 +
- .../net/ethernet/mellanox/mlx5/core/devlink.h |   4 +-
- .../mellanox/mlx5/core/lib/nv_param.c         | 272 ++++++++++++++++++
- 3 files changed, 290 insertions(+), 1 deletion(-)
+ drivers/net/dsa/Kconfig  |   1 +
+ drivers/net/dsa/mt7530.c | 235 +++++++++------------------------------
+ drivers/net/dsa/mt7530.h |   4 -
+ 3 files changed, 56 insertions(+), 184 deletions(-)
 
-diff --git a/Documentation/networking/devlink/mlx5.rst b/Documentation/networking/devlink/mlx5.rst
-index c9c064de4699..053060de6126 100644
---- a/Documentation/networking/devlink/mlx5.rst
-+++ b/Documentation/networking/devlink/mlx5.rst
-@@ -161,6 +161,21 @@ parameters.
-        * ``balanced`` : Merges fewer CQEs, resulting in a moderate compression ratio but maintaining a balance between bandwidth savings and performance
-        * ``aggressive`` : Merges more CQEs into a single entry, achieving a higher compression rate and maximizing performance, particularly under high traffic loads
+diff --git a/drivers/net/dsa/Kconfig b/drivers/net/dsa/Kconfig
+index 2d10b4d6cfbb..bb9812b3b0e8 100644
+--- a/drivers/net/dsa/Kconfig
++++ b/drivers/net/dsa/Kconfig
+@@ -37,6 +37,7 @@ config NET_DSA_LANTIQ_GSWIP
+ config NET_DSA_MT7530
+ 	tristate "MediaTek MT7530 and MT7531 Ethernet switch support"
+ 	select NET_DSA_TAG_MTK
++	select REGMAP_IRQ
+ 	imply NET_DSA_MT7530_MDIO
+ 	imply NET_DSA_MT7530_MMIO
+ 	help
+diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+index 8422262febaf..a62a6d3d3a59 100644
+--- a/drivers/net/dsa/mt7530.c
++++ b/drivers/net/dsa/mt7530.c
+@@ -2050,131 +2050,6 @@ mt7530_setup_gpio(struct mt7530_priv *priv)
+ }
+ #endif /* CONFIG_GPIOLIB */
  
-+   * - ``esw_hairpin_per_prio_log_queue_size``
-+     - u32 array[8]
-+     - permanent
-+     - each item is log(base 2) of the number of packet descriptors allocated
-+       internally for hairpin for IEEE802.1p priorities.
-+       0 means that no descriptors are allocated for this priority
-+       and traffic with this priority will be dropped.
-+
-+   * - ``esw_hairpin_per_prio_log_buf_size``
-+     - u32 array[8]
-+     - permanent
-+     - each item is log(base 2) of the buffer size (in bytes) allocated internally
-+       for hairpin for IEEE802.1p priorities.
-+       0 means no buffer for this priority and traffic with this priority will be dropped.
-+
- The ``mlx5`` driver supports reloading via ``DEVLINK_CMD_RELOAD``
- 
- Info versions
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/devlink.h b/drivers/net/ethernet/mellanox/mlx5/core/devlink.h
-index 74bcdfa70361..b2c10ce1eac5 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/devlink.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/devlink.h
-@@ -22,7 +22,9 @@ enum mlx5_devlink_param_id {
- 	MLX5_DEVLINK_PARAM_ID_ESW_MULTIPORT,
- 	MLX5_DEVLINK_PARAM_ID_HAIRPIN_NUM_QUEUES,
- 	MLX5_DEVLINK_PARAM_ID_HAIRPIN_QUEUE_SIZE,
--	MLX5_DEVLINK_PARAM_ID_CQE_COMPRESSION_TYPE
-+	MLX5_DEVLINK_PARAM_ID_CQE_COMPRESSION_TYPE,
-+	MLX5_DEVLINK_PARAM_ID_ESW_HAIRPIN_DESCRIPTORS,
-+	MLX5_DEVLINK_PARAM_ID_ESW_HAIRPIN_DATA_SIZE,
- };
- 
- struct mlx5_trap_ctx {
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
-index 159d75967a48..d9815c66ea58 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
-@@ -1,11 +1,15 @@
- // SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
- /* Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
- 
-+#include <net/dcbnl.h>
-+
- #include "nv_param.h"
- #include "mlx5_core.h"
- #include "en.h"
- 
- enum {
-+	MLX5_CLASS_0_CTRL_ID_NV_INTERNAL_HAIRPIN_CONF         = 0x13,
-+	MLX5_CLASS_0_CTRL_ID_NV_INTERNAL_HAIRPIN_CAP          = 0x14,
- 	MLX5_CLASS_0_CTRL_ID_NV_GLOBAL_PCI_CONF               = 0x80,
- 	MLX5_CLASS_0_CTRL_ID_NV_GLOBAL_PCI_CAP                = 0x81,
- 	MLX5_CLASS_0_CTRL_ID_NV_SW_OFFLOAD_CONFIG             = 0x10a,
-@@ -145,6 +149,19 @@ struct mlx5_ifc_nv_keep_link_up_bits {
- 	u8    keep_eth_link_up[0x1];
- };
- 
-+struct mlx5_ifc_nv_internal_hairpin_cap_bits {
-+	u8    log_max_hpin_total_num_descriptors[0x8];
-+	u8    log_max_hpin_total_data_size[0x8];
-+	u8    log_max_hpin_num_descriptor_per_prio[0x8];
-+	u8    log_max_hpin_data_size_per_prio[0x8];
-+};
-+
-+struct mlx5_ifc_nv_internal_hairpin_conf_bits {
-+	u8    log_hpin_num_descriptor[8][0x8];
-+
-+	u8    log_hpin_data_size[8][0x8];
-+};
-+
- #define MNVDA_HDR_SZ \
- 	(MLX5_ST_SZ_BYTES(mnvda_reg) - MLX5_BYTE_OFF(mnvda_reg, configuration_item_data))
- 
-@@ -531,6 +548,247 @@ static int mlx5_devlink_total_vfs_validate(struct devlink *devlink, u32 id,
- 	return 0;
+-static irqreturn_t
+-mt7530_irq_thread_fn(int irq, void *dev_id)
+-{
+-	struct mt7530_priv *priv = dev_id;
+-	bool handled = false;
+-	u32 val;
+-	int p;
+-
+-	mt7530_mutex_lock(priv);
+-	val = mt7530_mii_read(priv, MT7530_SYS_INT_STS);
+-	mt7530_mii_write(priv, MT7530_SYS_INT_STS, val);
+-	mt7530_mutex_unlock(priv);
+-
+-	for (p = 0; p < MT7530_NUM_PHYS; p++) {
+-		if (BIT(p) & val) {
+-			unsigned int irq;
+-
+-			irq = irq_find_mapping(priv->irq_domain, p);
+-			handle_nested_irq(irq);
+-			handled = true;
+-		}
+-	}
+-
+-	return IRQ_RETVAL(handled);
+-}
+-
+-static void
+-mt7530_irq_mask(struct irq_data *d)
+-{
+-	struct mt7530_priv *priv = irq_data_get_irq_chip_data(d);
+-
+-	priv->irq_enable &= ~BIT(d->hwirq);
+-}
+-
+-static void
+-mt7530_irq_unmask(struct irq_data *d)
+-{
+-	struct mt7530_priv *priv = irq_data_get_irq_chip_data(d);
+-
+-	priv->irq_enable |= BIT(d->hwirq);
+-}
+-
+-static void
+-mt7530_irq_bus_lock(struct irq_data *d)
+-{
+-	struct mt7530_priv *priv = irq_data_get_irq_chip_data(d);
+-
+-	mt7530_mutex_lock(priv);
+-}
+-
+-static void
+-mt7530_irq_bus_sync_unlock(struct irq_data *d)
+-{
+-	struct mt7530_priv *priv = irq_data_get_irq_chip_data(d);
+-
+-	mt7530_mii_write(priv, MT7530_SYS_INT_EN, priv->irq_enable);
+-	mt7530_mutex_unlock(priv);
+-}
+-
+-static struct irq_chip mt7530_irq_chip = {
+-	.name = KBUILD_MODNAME,
+-	.irq_mask = mt7530_irq_mask,
+-	.irq_unmask = mt7530_irq_unmask,
+-	.irq_bus_lock = mt7530_irq_bus_lock,
+-	.irq_bus_sync_unlock = mt7530_irq_bus_sync_unlock,
+-};
+-
+-static int
+-mt7530_irq_map(struct irq_domain *domain, unsigned int irq,
+-	       irq_hw_number_t hwirq)
+-{
+-	irq_set_chip_data(irq, domain->host_data);
+-	irq_set_chip_and_handler(irq, &mt7530_irq_chip, handle_simple_irq);
+-	irq_set_nested_thread(irq, true);
+-	irq_set_noprobe(irq);
+-
+-	return 0;
+-}
+-
+-static const struct irq_domain_ops mt7530_irq_domain_ops = {
+-	.map = mt7530_irq_map,
+-	.xlate = irq_domain_xlate_onecell,
+-};
+-
+-static void
+-mt7988_irq_mask(struct irq_data *d)
+-{
+-	struct mt7530_priv *priv = irq_data_get_irq_chip_data(d);
+-
+-	priv->irq_enable &= ~BIT(d->hwirq);
+-	mt7530_mii_write(priv, MT7530_SYS_INT_EN, priv->irq_enable);
+-}
+-
+-static void
+-mt7988_irq_unmask(struct irq_data *d)
+-{
+-	struct mt7530_priv *priv = irq_data_get_irq_chip_data(d);
+-
+-	priv->irq_enable |= BIT(d->hwirq);
+-	mt7530_mii_write(priv, MT7530_SYS_INT_EN, priv->irq_enable);
+-}
+-
+-static struct irq_chip mt7988_irq_chip = {
+-	.name = KBUILD_MODNAME,
+-	.irq_mask = mt7988_irq_mask,
+-	.irq_unmask = mt7988_irq_unmask,
+-};
+-
+-static int
+-mt7988_irq_map(struct irq_domain *domain, unsigned int irq,
+-	       irq_hw_number_t hwirq)
+-{
+-	irq_set_chip_data(irq, domain->host_data);
+-	irq_set_chip_and_handler(irq, &mt7988_irq_chip, handle_simple_irq);
+-	irq_set_nested_thread(irq, true);
+-	irq_set_noprobe(irq);
+-
+-	return 0;
+-}
+-
+-static const struct irq_domain_ops mt7988_irq_domain_ops = {
+-	.map = mt7988_irq_map,
+-	.xlate = irq_domain_xlate_onecell,
+-};
+-
+ static void
+ mt7530_setup_mdio_irq(struct mt7530_priv *priv)
+ {
+@@ -2191,49 +2066,71 @@ mt7530_setup_mdio_irq(struct mt7530_priv *priv)
+ 	}
  }
  
-+static int
-+mlx5_nv_param_read_internal_hairpin_conf(struct mlx5_core_dev *dev,
-+					 void *mnvda, size_t len)
-+{
-+	MLX5_SET_CONFIG_ITEM_TYPE(global, mnvda, type_class, 0);
-+	MLX5_SET_CONFIG_ITEM_TYPE(global, mnvda, parameter_index,
-+				  MLX5_CLASS_0_CTRL_ID_NV_INTERNAL_HAIRPIN_CONF);
-+	MLX5_SET_CONFIG_HDR_LEN(mnvda, nv_internal_hairpin_conf);
++static const struct regmap_irq mt7530_irqs[] = {
++	REGMAP_IRQ_REG_LINE(0, 32), /* PHY 0 */
++	REGMAP_IRQ_REG_LINE(1, 32), /* PHY 1 */
++	REGMAP_IRQ_REG_LINE(2, 32), /* PHY 2 */
++	REGMAP_IRQ_REG_LINE(3, 32), /* PHY 3 */
++	REGMAP_IRQ_REG_LINE(4, 32), /* PHY 4 */
++	REGMAP_IRQ_REG_LINE(5, 32), /* PHY 5 */
++	REGMAP_IRQ_REG_LINE(6, 82), /* PHY 6 */
++	REGMAP_IRQ_REG_LINE(16, 32), /* MAC */
++	REGMAP_IRQ_REG_LINE(17, 32), /* BMU */
++	REGMAP_IRQ_REG_LINE(18, 32), /* MIB */
++	REGMAP_IRQ_REG_LINE(22, 32), /* ARL_COL_FULL_COL */
++	REGMAP_IRQ_REG_LINE(23, 32), /* ARL_COL_FULL */
++	REGMAP_IRQ_REG_LINE(24, 32), /* ARL_TLB_ERR */
++	REGMAP_IRQ_REG_LINE(25, 32), /* ARL_PKT_QERR */
++	REGMAP_IRQ_REG_LINE(26, 32), /* ARL_EQ_ERR */
++	REGMAP_IRQ_REG_LINE(27, 32), /* ARL_PKT_BC */
++	REGMAP_IRQ_REG_LINE(28, 32), /* ARL_SEC_IG1X */
++	REGMAP_IRQ_REG_LINE(29, 32), /* ARL_SEC_VLAN */
++	REGMAP_IRQ_REG_LINE(30, 32), /* ARL_SEC_TAG */
++	REGMAP_IRQ_REG_LINE(31, 32), /* ACL */
++};
 +
-+	return mlx5_nv_param_read(dev, mnvda, len);
-+}
++static const struct regmap_irq_chip mt7530_regmap_irq_chip = {
++	.name = KBUILD_MODNAME,
++	.status_base = MT7530_SYS_INT_STS,
++	.unmask_base = MT7530_SYS_INT_EN,
++	.ack_base = MT7530_SYS_INT_STS,
++	.init_ack_masked = true,
++	.irqs = mt7530_irqs,
++	.num_irqs = ARRAY_SIZE(mt7530_irqs),
++	.num_regs = 1,
++};
 +
-+static int
-+mlx5_nv_param_read_internal_hairpin_cap(struct mlx5_core_dev *dev,
-+					void *mnvda, size_t len)
-+{
-+	MLX5_SET_CONFIG_ITEM_TYPE(global, mnvda, type_class, 0);
-+	MLX5_SET_CONFIG_ITEM_TYPE(global, mnvda, parameter_index,
-+				  MLX5_CLASS_0_CTRL_ID_NV_INTERNAL_HAIRPIN_CAP);
-+
-+	return mlx5_nv_param_read(dev, mnvda, len);
-+}
-+
-+static int
-+mlx5_nv_param_esw_hairpin_descriptors_get(struct devlink *devlink, u32 id,
-+					  struct devlink_param_gset_ctx *ctx)
-+
-+{
-+	struct mlx5_core_dev *dev = devlink_priv(devlink);
-+	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
-+	void *data;
-+	int err, i;
-+
-+	BUILD_BUG_ON(IEEE_8021QAZ_MAX_TCS > __DEVLINK_PARAM_MAX_ARRAY_SIZE);
-+
-+	err = mlx5_nv_param_read_internal_hairpin_conf(dev, mnvda, sizeof(mnvda));
-+	if (err)
-+		return err;
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+
-+	ctx->val.arr.size = IEEE_8021QAZ_MAX_TCS;
-+	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++)
-+		ctx->val.arr.vu32[i] = MLX5_GET(nv_internal_hairpin_conf, data,
-+						log_hpin_num_descriptor[i]);
-+	return 0;
-+}
-+
-+static int
-+mlx5_nv_param_esw_hairpin_descriptors_set(struct devlink *devlink, u32 id,
-+					  struct devlink_param_gset_ctx *ctx,
-+					  struct netlink_ext_ack *extack)
-+{
-+	struct mlx5_core_dev *dev = devlink_priv(devlink);
-+	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
-+	void *data;
-+	int err, i;
-+
-+	err = mlx5_nv_param_read_internal_hairpin_conf(dev, mnvda, sizeof(mnvda));
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack, "Unable to query internal hairpin conf");
-+		return err;
-+	}
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++)
-+		MLX5_SET(nv_internal_hairpin_conf, data,
-+			 log_hpin_num_descriptor[i], ctx->val.arr.vu32[i]);
-+
-+	return mlx5_nv_param_write(dev, mnvda,  sizeof(mnvda));
-+}
-+
-+static int
-+mlx5_nv_param_esw_hairpin_descriptors_validate(struct devlink *devlink, u32 id,
-+					       union devlink_param_value val,
-+					       struct netlink_ext_ack *extack)
-+{
-+	u8 log_max_num_descriptors, log_max_total_descriptors;
-+	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
-+	u16 total = 0;
-+	void *data;
-+	int err, i;
-+
-+	if (val.arr.size != IEEE_8021QAZ_MAX_TCS) {
-+		NL_SET_ERR_MSG_FMT_MOD(extack, "Array size must be %d",
-+				       IEEE_8021QAZ_MAX_TCS);
-+		return -EINVAL;
-+	}
-+	err = mlx5_nv_param_read_internal_hairpin_cap(devlink_priv(devlink),
-+						      mnvda, sizeof(mnvda));
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack, "Unable to query internal hairpin cap");
-+		return err;
-+	}
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+	log_max_total_descriptors = MLX5_GET(nv_internal_hairpin_cap, data,
-+					     log_max_hpin_total_num_descriptors);
-+	log_max_num_descriptors = MLX5_GET(nv_internal_hairpin_cap, data,
-+					   log_max_hpin_num_descriptor_per_prio);
-+
-+	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++) {
-+		if (val.arr.vu32[i] <= log_max_num_descriptors)
-+			continue;
-+
-+		NL_SET_ERR_MSG_FMT_MOD(extack,
-+				       "Max allowed value per prio is %d",
-+				       log_max_num_descriptors);
-+		return -ERANGE;
-+	}
-+
-+	/* Validate total number of descriptors */
-+	memset(mnvda, 0, sizeof(mnvda));
-+	err = mlx5_nv_param_read_internal_hairpin_conf(devlink_priv(devlink),
-+						       mnvda, sizeof(mnvda));
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack, "Unable to query internal hairpin conf");
-+		return err;
-+	}
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+
-+	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++)
-+		total += 1 << val.arr.vu32[i];
-+
-+	if (total > (1 << log_max_total_descriptors)) {
-+		NL_SET_ERR_MSG_FMT_MOD(extack,
-+				       "Log max total value allowed is %d",
-+				       log_max_total_descriptors);
-+		return -ERANGE;
-+	}
-+
-+	return 0;
-+}
-+
-+static int
-+mlx5_nv_param_esw_hairpin_data_size_get(struct devlink *devlink, u32 id,
-+					struct devlink_param_gset_ctx *ctx)
-+{
-+	struct mlx5_core_dev *dev = devlink_priv(devlink);
-+	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
-+	void *data;
-+	int err, i;
-+
-+	err = mlx5_nv_param_read_internal_hairpin_conf(dev, mnvda, sizeof(mnvda));
-+	if (err)
-+		return err;
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+	ctx->val.arr.size = IEEE_8021QAZ_MAX_TCS;
-+	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++)
-+		ctx->val.arr.vu32[i] = MLX5_GET(nv_internal_hairpin_conf, data,
-+						log_hpin_data_size[i]);
-+	return 0;
-+}
-+
-+static int
-+mlx5_nv_param_esw_hairpin_data_size_set(struct devlink *devlink, u32 id,
-+					struct devlink_param_gset_ctx *ctx,
-+					struct netlink_ext_ack *extack)
-+{
-+	struct mlx5_core_dev *dev = devlink_priv(devlink);
-+	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
-+	int err, i;
-+	void *data;
-+
-+	err = mlx5_nv_param_read_internal_hairpin_conf(dev, mnvda, sizeof(mnvda));
-+	if (err)
-+		return err;
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+
-+	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++)
-+		MLX5_SET(nv_internal_hairpin_conf, data, log_hpin_data_size[i],
-+			 ctx->val.arr.vu32[i]);
-+
-+	return mlx5_nv_param_write(dev, mnvda,  sizeof(mnvda));
-+}
-+
-+static int
-+mlx5_nv_param_esw_hairpin_data_size_validate(struct devlink *devlink, u32 id,
-+					     union devlink_param_value val,
-+					     struct netlink_ext_ack *extack)
-+{
-+	u8 log_max_data_size, log_max_total_data_size;
-+	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
-+	unsigned long total = 0;
-+	void *data;
-+	int err, i;
-+
-+	if (val.arr.size != IEEE_8021QAZ_MAX_TCS) {
-+		NL_SET_ERR_MSG_FMT_MOD(extack, "Array size must be %d",
-+				       IEEE_8021QAZ_MAX_TCS);
-+		return -EINVAL;
-+	}
-+
-+	err = mlx5_nv_param_read_internal_hairpin_cap(devlink_priv(devlink),
-+						      mnvda, sizeof(mnvda));
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack, "Unable to query internal hairpin cap");
-+		return err;
-+	}
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+	log_max_data_size = MLX5_GET(nv_internal_hairpin_cap, data,
-+				     log_max_hpin_data_size_per_prio);
-+	log_max_total_data_size = MLX5_GET(nv_internal_hairpin_cap, data,
-+					   log_max_hpin_total_data_size);
-+
-+	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++) {
-+		if (val.arr.vu32[i] <= log_max_data_size)
-+			continue;
-+
-+		NL_SET_ERR_MSG_FMT_MOD(extack,
-+				       "Max allowed value per prio is %d",
-+				       log_max_data_size);
-+		return -ERANGE;
-+	}
-+
-+	/* Validate total data size */
-+	memset(mnvda, 0, sizeof(mnvda));
-+	err = mlx5_nv_param_read_internal_hairpin_conf(devlink_priv(devlink),
-+						       mnvda, sizeof(mnvda));
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack, "Unable to query internal hairpin conf");
-+		return err;
-+	}
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+
-+	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++)
-+		total += 1 << val.arr.vu32[i];
-+
-+	if (total > (1 << log_max_total_data_size)) {
-+		NL_SET_ERR_MSG_FMT_MOD(extack,
-+				       "Log max total value allowed is %d",
-+				       log_max_total_data_size);
-+		return -ERANGE;
-+	}
-+
-+	return 0;
-+}
-+
- static const struct devlink_param mlx5_nv_param_devlink_params[] = {
- 	DEVLINK_PARAM_GENERIC(ENABLE_SRIOV, BIT(DEVLINK_PARAM_CMODE_PERMANENT),
- 			      mlx5_devlink_enable_sriov_get,
-@@ -544,6 +802,20 @@ static const struct devlink_param mlx5_nv_param_devlink_params[] = {
- 			     mlx5_nv_param_devlink_cqe_compress_get,
- 			     mlx5_nv_param_devlink_cqe_compress_set,
- 			     mlx5_nv_param_devlink_cqe_compress_validate),
-+	DEVLINK_PARAM_DRIVER(MLX5_DEVLINK_PARAM_ID_ESW_HAIRPIN_DESCRIPTORS,
-+			     "esw_hairpin_per_prio_log_queue_size",
-+			     DEVLINK_PARAM_TYPE_ARR_U32,
-+			     BIT(DEVLINK_PARAM_CMODE_PERMANENT),
-+			     mlx5_nv_param_esw_hairpin_descriptors_get,
-+			     mlx5_nv_param_esw_hairpin_descriptors_set,
-+			     mlx5_nv_param_esw_hairpin_descriptors_validate),
-+	DEVLINK_PARAM_DRIVER(MLX5_DEVLINK_PARAM_ID_ESW_HAIRPIN_DATA_SIZE,
-+			     "esw_hairpin_per_prio_log_buf_size",
-+			     DEVLINK_PARAM_TYPE_ARR_U32,
-+			     BIT(DEVLINK_PARAM_CMODE_PERMANENT),
-+			     mlx5_nv_param_esw_hairpin_data_size_get,
-+			     mlx5_nv_param_esw_hairpin_data_size_set,
-+			     mlx5_nv_param_esw_hairpin_data_size_validate),
- };
+ static int
+ mt7530_setup_irq(struct mt7530_priv *priv)
+ {
++	struct regmap_irq_chip_data *irq_data;
+ 	struct device *dev = priv->dev;
+ 	struct device_node *np = dev->of_node;
+-	int ret;
++	int irq, ret;
  
- int mlx5_nv_param_register_dl_params(struct devlink *devlink)
+ 	if (!of_property_read_bool(np, "interrupt-controller")) {
+ 		dev_info(dev, "no interrupt support\n");
+ 		return 0;
+ 	}
+ 
+-	priv->irq = of_irq_get(np, 0);
+-	if (priv->irq <= 0) {
+-		dev_err(dev, "failed to get parent IRQ: %d\n", priv->irq);
+-		return priv->irq ? : -EINVAL;
+-	}
+-
+-	if (priv->id == ID_MT7988 || priv->id == ID_EN7581)
+-		priv->irq_domain = irq_domain_add_linear(np, MT7530_NUM_PHYS,
+-							 &mt7988_irq_domain_ops,
+-							 priv);
+-	else
+-		priv->irq_domain = irq_domain_add_linear(np, MT7530_NUM_PHYS,
+-							 &mt7530_irq_domain_ops,
+-							 priv);
+-
+-	if (!priv->irq_domain) {
+-		dev_err(dev, "failed to create IRQ domain\n");
+-		return -ENOMEM;
++	irq = of_irq_get(np, 0);
++	if (irq <= 0) {
++		dev_err(dev, "failed to get parent IRQ: %d\n", irq);
++		return irq ? : -EINVAL;
+ 	}
+ 
+ 	/* This register must be set for MT7530 to properly fire interrupts */
+ 	if (priv->id == ID_MT7530 || priv->id == ID_MT7621)
+ 		mt7530_set(priv, MT7530_TOP_SIG_CTRL, TOP_SIG_CTRL_NORMAL);
+ 
+-	ret = request_threaded_irq(priv->irq, NULL, mt7530_irq_thread_fn,
+-				   IRQF_ONESHOT, KBUILD_MODNAME, priv);
+-	if (ret) {
+-		irq_domain_remove(priv->irq_domain);
+-		dev_err(dev, "failed to request IRQ: %d\n", ret);
++	ret = devm_regmap_add_irq_chip_fwnode(dev, dev_fwnode(dev),
++					      priv->regmap, irq,
++					      IRQF_ONESHOT,
++					      0, &mt7530_regmap_irq_chip, &irq_data);
++	if (ret)
+ 		return ret;
+-	}
++
++	priv->irq_domain = regmap_irq_get_domain(irq_data);
+ 
+ 	return 0;
+ }
+@@ -2253,26 +2150,6 @@ mt7530_free_mdio_irq(struct mt7530_priv *priv)
+ 	}
+ }
+ 
+-static void
+-mt7530_free_irq_common(struct mt7530_priv *priv)
+-{
+-	free_irq(priv->irq, priv);
+-	irq_domain_remove(priv->irq_domain);
+-}
+-
+-static void
+-mt7530_free_irq(struct mt7530_priv *priv)
+-{
+-	struct device_node *mnp, *np = priv->dev->of_node;
+-
+-	mnp = of_get_child_by_name(np, "mdio");
+-	if (!mnp)
+-		mt7530_free_mdio_irq(priv);
+-	of_node_put(mnp);
+-
+-	mt7530_free_irq_common(priv);
+-}
+-
+ static int
+ mt7530_setup_mdio(struct mt7530_priv *priv)
+ {
+@@ -2307,13 +2184,13 @@ mt7530_setup_mdio(struct mt7530_priv *priv)
+ 	bus->parent = dev;
+ 	bus->phy_mask = ~ds->phys_mii_mask;
+ 
+-	if (priv->irq && !mnp)
++	if (priv->irq_domain && !mnp)
+ 		mt7530_setup_mdio_irq(priv);
+ 
+ 	ret = devm_of_mdiobus_register(dev, bus, mnp);
+ 	if (ret) {
+ 		dev_err(dev, "failed to register MDIO bus: %d\n", ret);
+-		if (priv->irq && !mnp)
++		if (priv->irq_domain && !mnp)
+ 			mt7530_free_mdio_irq(priv);
+ 	}
+ 
+@@ -3096,8 +2973,6 @@ mt753x_setup(struct dsa_switch *ds)
+ 		return ret;
+ 
+ 	ret = mt7530_setup_mdio(priv);
+-	if (ret && priv->irq)
+-		mt7530_free_irq_common(priv);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -3108,11 +2983,11 @@ mt753x_setup(struct dsa_switch *ds)
+ 		priv->pcs[i].port = i;
+ 	}
+ 
+-	if (priv->create_sgmii) {
++	if (priv->create_sgmii)
+ 		ret = priv->create_sgmii(priv);
+-		if (ret && priv->irq)
+-			mt7530_free_irq(priv);
+-	}
++
++	if (ret && priv->irq_domain)
++		mt7530_free_mdio_irq(priv);
+ 
+ 	return ret;
+ }
+@@ -3356,8 +3231,8 @@ EXPORT_SYMBOL_GPL(mt7530_probe_common);
+ void
+ mt7530_remove_common(struct mt7530_priv *priv)
+ {
+-	if (priv->irq)
+-		mt7530_free_irq(priv);
++	if (priv->irq_domain)
++		mt7530_free_mdio_irq(priv);
+ 
+ 	dsa_unregister_switch(priv->ds);
+ 
+diff --git a/drivers/net/dsa/mt7530.h b/drivers/net/dsa/mt7530.h
+index 448200689f49..747ad2f9cd2b 100644
+--- a/drivers/net/dsa/mt7530.h
++++ b/drivers/net/dsa/mt7530.h
+@@ -815,9 +815,7 @@ struct mt753x_info {
+  * @p5_mode:		Holding the current mode of port 5 of the MT7530 switch
+  * @p5_sgmii:		Flag for distinguishing if port 5 of the MT7531 switch
+  *			has got SGMII
+- * @irq:		IRQ number of the switch
+  * @irq_domain:		IRQ domain of the switch irq_chip
+- * @irq_enable:		IRQ enable bits, synced to SYS_INT_EN
+  * @create_sgmii:	Pointer to function creating SGMII PCS instance(s)
+  * @active_cpu_ports:	Holding the active CPU ports
+  * @mdiodev:		The pointer to the MDIO device structure
+@@ -842,9 +840,7 @@ struct mt7530_priv {
+ 	struct mt753x_pcs	pcs[MT7530_NUM_PORTS];
+ 	/* protect among processes for registers access*/
+ 	struct mutex reg_mutex;
+-	int irq;
+ 	struct irq_domain *irq_domain;
+-	u32 irq_enable;
+ 	int (*create_sgmii)(struct mt7530_priv *priv);
+ 	u8 active_cpu_ports;
+ 	struct mdio_device *mdiodev;
 -- 
 2.48.1
 
