@@ -1,419 +1,112 @@
-Return-Path: <netdev+bounces-170814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E543A4A078
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 18:33:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF58BA4A0DB
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 18:51:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A3193B7080
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 17:32:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22E37189A1CE
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 17:51:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B30D126B0A1;
-	Fri, 28 Feb 2025 17:32:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F5551BD9CB;
+	Fri, 28 Feb 2025 17:51:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WMiuDfHr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0sA8WEGx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3361A8F9E;
-	Fri, 28 Feb 2025 17:32:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9BB21AA1FE
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 17:51:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740763973; cv=none; b=Wp0ZnWc4JxAmLRB48p2bdYEAlrk2CYis+lQKavXk7g2o7291SStxOTtofGEi9wz93UEOEnkNCaPM8Q+eVDd5tavD0rgO5gZK7Nydr7RfFdR08IM7RqzReKQRoR6uaQOcBQFSMgjpd/v9Uvw2JY7EjPefZFTLIB9XVsxpS4k1Uvs=
+	t=1740765077; cv=none; b=DWWcwbuxK9FEyq2U92VYCZHBbUZgXqdGJByKYcJNA/swDjRsNpliuDHWS8SpRxcVlGm2Os0GCJtGdswsgtgXkyIfAfnQNLtE3rckiLreWSLUwugCv63du+To074ujnIw9j/rY74m3RecJEVyfDPWp76+weinAiiV7b1TmTGLOWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740763973; c=relaxed/simple;
-	bh=ReYk6jJVsIMYTOIoTQKPS1h5Xno1Ot4VEYyDgi6Urow=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=tc84SRtddOLdgVtt21K06imeZpGF1iEV7bRsLGSV2C6VSYeJWssNV/UElDecv8nXkNEMLiGUQ72BGT9ROopjD5NwXZgUaMBR464WY0GH830GmiXMsMrbqnKaMk217BX6mquS06yM3QSpc2NVIMK6E5ZYlqvy6HGskPawgx8lLDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WMiuDfHr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 26895C4CEEB;
-	Fri, 28 Feb 2025 17:32:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740763973;
-	bh=ReYk6jJVsIMYTOIoTQKPS1h5Xno1Ot4VEYyDgi6Urow=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=WMiuDfHrsOTOiT9fkYgQcZe6NWwgSscn2LOTGDEhybHKG6aQfvaeyuFa1B//u6JAk
-	 y5V20oVeInfRPcosZEE2Fhz5wbJsM72uQPVtawaq7iL7iaXkp/EvZuv/t/EhomPjt3
-	 MadxB2L9fZSkj3uJuEEHoiWS9JuMXT+Lhm/sK5kTZ5T2kWtKEMAoRN6cGM9kFFd75p
-	 sojJmNnkt90L6gon/Bu5x92YCm6lIKZrbmGSsBB45hLPXDS70iv6eV97+UjSVUnuJA
-	 x6KexAn3TVmtybmXGhTCrgq8vo4JL1u+UPgqUYrigLQN7bRL8eSYJbE6YVdXQO1YrN
-	 171FdClvzYKyg==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DF0EC282D0;
-	Fri, 28 Feb 2025 17:32:53 +0000 (UTC)
-From: =?utf-8?q?J=2E_Neusch=C3=A4fer_via_B4_Relay?= <devnull+j.ne.posteo.net@kernel.org>
-Date: Fri, 28 Feb 2025 18:32:52 +0100
-Subject: [PATCH v2 3/3] dt-bindings: net: Convert fsl,gianfar to YAML
+	s=arc-20240116; t=1740765077; c=relaxed/simple;
+	bh=i90O7/FHVyjR7MxsQSaYgobcsFdF6N1pl357JzY65Cc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Lgzd7WtyMW9GUBomcwcrXLCH0SQ6UzdJhfsfkb1vlCDqOdb+T0H3Q2ur8p0mRR+zYnoGUMIxiK90qeeDEmwRtl4SqPdrKpqWtbxswn+nw3Cqh9kiUu7Ik1enAePZFbXeQU02L5OqkRU2lncVbPXc3f4p+FC50NeteY+22/u7/wU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0sA8WEGx; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-22342c56242so5015ad.0
+        for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 09:51:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740765074; x=1741369874; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i90O7/FHVyjR7MxsQSaYgobcsFdF6N1pl357JzY65Cc=;
+        b=0sA8WEGxQnS/Zf3Kf02AbA1nyiQcKsrWpuxn0YAeG46x+52fEUnDypBvXGwBCYajKw
+         lpJD+Mm+uqIgSjwb16aeLtKaLAY6I2ZreQgewZ3Wp6GLv+QGmEby7mFoiwGcPNX7HOmi
+         44thqa63eN4mMXckS7Jwf0zN1edMX5phq5TSeulEbs1Ha3LjVk+6gMjUOBhpmuiEk9Bi
+         pCs6IctbucworLfhawd06C8v0Y0ocVSU6rK/BnzULvv7042pQXhV1n2G1Y7aveuBLmlf
+         VsuZy4WMR5UJ4t4iroj8Md1V1LCcvXHxeek+5oeWQyAWUWQHxR1pJhMe9KknNVGP+uZT
+         fgKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740765074; x=1741369874;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=i90O7/FHVyjR7MxsQSaYgobcsFdF6N1pl357JzY65Cc=;
+        b=rrTAftiDXDchqm2C1tEfhvu4hQ/HB5OLoUxFNgOEE7lSYWMMDELZ5z4I4fcO7oxn3f
+         U3O/Z8ZdLTFotDFog5IRUcIQC6FaD+qtIcxeId71qVeTT395JW3g+HK2vX7VSK8syufv
+         uIwv6GvWQohP+6tLv4KhHlu+tPYoeZ5NS3QEFB9rLe2N9kPzJMz0DlbafdLlUWC6IRns
+         ClBsErkN0DlbFBPtSBMWQgnoabHBxbS/K/fHEUY2TrAS7J5RiEMxrBB/IS/Kg+ARmXC+
+         8QJYRDbdjuDeGk+4xvOyY745HpKriEvcCsLMF7xNlWTIU6KCmUTbI94fAWnoCavgl/yv
+         v51A==
+X-Forwarded-Encrypted: i=1; AJvYcCUOXzlpiKf13l4v8U/uukiTuAaOtx2EcwwJD8oz9fv/nwD1kfSJ11iWtVGD8aAMk526rpdhsMs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8dd9flWSzFEOX+dO1Gy03AyCxGrBH/DAA+WS/htMNusRkrECd
+	ER7fCSAQzxNZNYtgUjpzLBOvu7eP1FQ5+dls6fWYwbYCmAXQrvlVH/H8iuuwQ/+QcT2DNNVoE4R
+	J/aTbyjr0h2EdpsoTjDdtpAnXrYSvPukZPtCU
+X-Gm-Gg: ASbGncuWPOssNi9dWlKmlVHVrC6PknbVpoJkQ8N36pfuVOhDpJnLg3RKp+UUrwwpHDV
+	8M15Ohkch7W7SkR4anunjXdgosccTLE18jaYqWb518kbXIGMv/yfWTL/V1Hfpr28h+9E3B2q6q6
+	ocl7PG9gi+rJfP9DvN6i4hfyKkL+x7DetNSRneQQ==
+X-Google-Smtp-Source: AGHT+IFIdw83qwu5qQ7M0jSYLWA4Olvd7iOt6Uf+OiCdfuQjWjOsUe1tAjJCuFfQTQUfhDBz6gbEFI54iOYT2Q9LP8Q=
+X-Received: by 2002:a17:902:f693:b0:216:21cb:2e06 with SMTP id
+ d9443c01a7336-2236cfcbb24mr2629715ad.19.1740765073781; Fri, 28 Feb 2025
+ 09:51:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20250228-gianfar-yaml-v2-3-6beeefbd4818@posteo.net>
-References: <20250228-gianfar-yaml-v2-0-6beeefbd4818@posteo.net>
-In-Reply-To: <20250228-gianfar-yaml-v2-0-6beeefbd4818@posteo.net>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Claudiu Manoil <claudiu.manoil@nxp.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- =?utf-8?q?J=2E_Neusch=C3=A4fer?= <j.ne@posteo.net>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1740763971; l=10323;
- i=j.ne@posteo.net; s=20240329; h=from:subject:message-id;
- bh=PHFK6ij47fbj4JmpPy2/3CUOBG49DJDpgjnVIZVn6QQ=;
- b=/VCBlPdyWnO80kkJilZJV3r7UrvAJMz/C62Cpa6Havos22nHsYpxfX9+n0fs3K7MvWyWRg7bB
- 4lX/n31JzqxDaPlu/qLMfY6ZqyymJoP+2sELoQ1YS5WqAvKhIeh+0aS
-X-Developer-Key: i=j.ne@posteo.net; a=ed25519;
- pk=NIe0bK42wNaX/C4bi6ezm7NJK0IQE+8MKBm7igFMIS4=
-X-Endpoint-Received: by B4 Relay for j.ne@posteo.net/20240329 with
- auth_id=156
-X-Original-From: =?utf-8?q?J=2E_Neusch=C3=A4fer?= <j.ne@posteo.net>
-Reply-To: j.ne@posteo.net
+References: <20250227131314.2317200-1-milena.olech@intel.com> <20250227131314.2317200-2-milena.olech@intel.com>
+In-Reply-To: <20250227131314.2317200-2-milena.olech@intel.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 28 Feb 2025 09:50:58 -0800
+X-Gm-Features: AQ5f1JofnhFYf0RWrJwwbqdsiCN-tSJuCWfQ9-QLmtpIZzBiaBKZMC9Rgc5PCZU
+Message-ID: <CAHS8izMCExz_8Hnz3-Hg8EdyqoiJY8viMShKeRAsRC4iqGsLBA@mail.gmail.com>
+Subject: Re: [PATCH v8 iwl-next 01/10] idpf: add initial PTP support
+To: Milena Olech <milena.olech@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com, 
+	Alexander Lobakin <aleksander.lobakin@intel.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: "J. Neuschäfer" <j.ne@posteo.net>
+On Thu, Feb 27, 2025 at 5:16=E2=80=AFAM Milena Olech <milena.olech@intel.co=
+m> wrote:
+>
+> PTP feature is supported if the VIRTCHNL2_CAP_PTP is negotiated during th=
+e
+> capabilities recognition. Initial PTP support includes PTP initialization
+> and registration of the clock.
+>
+> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> Signed-off-by: Milena Olech <milena.olech@intel.com>
 
-Add a binding for the "Gianfar" ethernet controller, also known as
-TSEC/eTSEC.
+Thanks Milena!
 
-Signed-off-by: J. Neuschäfer <j.ne@posteo.net>
----
+Tested-by: Mina Almasry <almasrymina@google.com>
 
-V2:
-- change MAC address in example to 00:00:00:00:00:00 instead of a real
-  Motorola MAC address (suggested by Andrew Lunn)
-- add constraints to #address/size-cells, fsl,num_tr/rx_queues
-- remove unnecessary type from dma-coherent
-- add minItems to interrupts
-- remove unnecessary #address/size-cells from queue-group@.*
-- describe interrupts of queue-group@.*
-- remove unnecessary bus in example
-- consistently use "type: boolean" for fsl,magic-packet,
-  instead of "$ref: /schemas/types.yaml#/definitions/flag"
-- fix name of rx-stash-idx property
-- fix type of rx-stash-len/idx properties
-- actually reference fsl,gianfar-mdio schema for mdio@.* subnodes
-- disambiguate compatible = "gianfar" schemas by using a "select:" schema
----
- .../devicetree/bindings/net/fsl,gianfar.yaml       | 248 +++++++++++++++++++++
- .../devicetree/bindings/net/fsl-tsec-phy.txt       |  39 +---
- 2 files changed, 249 insertions(+), 38 deletions(-)
-
-diff --git a/Documentation/devicetree/bindings/net/fsl,gianfar.yaml b/Documentation/devicetree/bindings/net/fsl,gianfar.yaml
-new file mode 100644
-index 0000000000000000000000000000000000000000..f92f284aa05b0ee34e331661308b7258cbda43c0
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/fsl,gianfar.yaml
-@@ -0,0 +1,248 @@
-+# SPDX-License-Identifier: GPL-2.0
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/fsl,gianfar.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Freescale Three-Speed Ethernet Controller (TSEC), "Gianfar"
-+
-+maintainers:
-+  - J. Neuschäfer <j.ne@posteo.net>
-+
-+# This is needed to distinguish gianfar.yaml and gianfar-mdio.yaml, because
-+# both use compatible = "gianfar" (with different device_type values)
-+select:
-+  oneOf:
-+    - properties:
-+        compatible:
-+          contains:
-+            const: gianfar
-+        device_type:
-+          const: network
-+      required:
-+        - device_type
-+
-+    - properties:
-+        compatible:
-+          const: fsl,etsec2
-+
-+  required:
-+    - compatible
-+
-+properties:
-+  compatible:
-+    enum:
-+      - gianfar
-+      - fsl,etsec2
-+
-+  device_type:
-+    const: network
-+
-+  model:
-+    enum:
-+      - FEC
-+      - TSEC
-+      - eTSEC
-+
-+  reg:
-+    maxItems: 1
-+
-+  ranges: true
-+
-+  "#address-cells":
-+    enum: [ 1, 2 ]
-+
-+  "#size-cells":
-+    enum: [ 1, 2 ]
-+
-+  cell-index:
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+
-+  interrupts:
-+    minItems: 1
-+    items:
-+      - description: Transmit interrupt or single combined interrupt
-+      - description: Receive interrupt
-+      - description: Error interrupt
-+
-+  dma-coherent: true
-+
-+  fsl,magic-packet:
-+    type: boolean
-+    description:
-+      If present, indicates that the hardware supports waking up via magic packet.
-+
-+  fsl,wake-on-filer:
-+    type: boolean
-+    description:
-+      If present, indicates that the hardware supports waking up by Filer
-+      General Purpose Interrupt (FGPI) asserted on the Rx int line. This is
-+      an advanced power management capability allowing certain packet types
-+      (user) defined by filer rules to wake up the system.
-+
-+  bd-stash:
-+    type: boolean
-+    description:
-+      If present, indicates that the hardware supports stashing buffer
-+      descriptors in the L2.
-+
-+  rx-stash-len:
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    description:
-+      Denotes the number of bytes of a received buffer to stash in the L2.
-+
-+  rx-stash-idx:
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    description:
-+      Denotes the index of the first byte from the received buffer to stash in
-+      the L2.
-+
-+  fsl,num_rx_queues:
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    description: Number of receive queues
-+    const: 8
-+
-+  fsl,num_tx_queues:
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    description: Number of transmit queues
-+    const: 8
-+
-+  tbi-handle:
-+    $ref: /schemas/types.yaml#/definitions/phandle
-+    description: Reference (phandle) to the TBI node
-+
-+required:
-+  - compatible
-+  - model
-+
-+patternProperties:
-+  "^mdio@[0-9a-f]+$":
-+    $ref: /schemas/net/fsl,gianfar-mdio.yaml#
-+
-+allOf:
-+  - $ref: ethernet-controller.yaml#
-+
-+  # eTSEC2 controller nodes have "queue group" subnodes and don't need a "reg"
-+  # property.
-+  - if:
-+      properties:
-+        compatible:
-+          contains:
-+            const: fsl,etsec2
-+    then:
-+      patternProperties:
-+        "^queue-group@[0-9a-f]+$":
-+          type: object
-+
-+          properties:
-+            reg:
-+              maxItems: 1
-+
-+            interrupts:
-+              items:
-+                - description: Transmit interrupt
-+                - description: Receive interrupt
-+                - description: Error interrupt
-+
-+          required:
-+            - reg
-+            - interrupts
-+
-+          additionalProperties: false
-+    else:
-+      required:
-+        - reg
-+
-+  # TSEC and eTSEC devices require three interrupts
-+  - if:
-+      properties:
-+        model:
-+          contains:
-+            enum: [ TSEC, eTSEC ]
-+    then:
-+      properties:
-+        interrupts:
-+          items:
-+            - description: Transmit interrupt
-+            - description: Receive interrupt
-+            - description: Error interrupt
-+
-+
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    ethernet@24000 {
-+        device_type = "network";
-+        model = "TSEC";
-+        compatible = "gianfar";
-+        reg = <0x24000 0x1000>;
-+        local-mac-address = [ 00 00 00 00 00 00 ];
-+        interrupts = <29 2>, <30 2>, <34 2>;
-+        interrupt-parent = <&mpic>;
-+        phy-handle = <&phy0>;
-+    };
-+
-+  - |
-+    #include <dt-bindings/interrupt-controller/irq.h>
-+
-+    ethernet@24000 {
-+        compatible = "gianfar";
-+        reg = <0x24000 0x1000>;
-+        ranges = <0x0 0x24000 0x1000>;
-+        #address-cells = <1>;
-+        #size-cells = <1>;
-+        cell-index = <0>;
-+        device_type = "network";
-+        model = "eTSEC";
-+        local-mac-address = [ 00 00 00 00 00 00 ];
-+        interrupts = <32 IRQ_TYPE_LEVEL_LOW>,
-+                     <33 IRQ_TYPE_LEVEL_LOW>,
-+                     <34 IRQ_TYPE_LEVEL_LOW>;
-+        interrupt-parent = <&ipic>;
-+
-+        mdio@520 {
-+            #address-cells = <1>;
-+            #size-cells = <0>;
-+            compatible = "fsl,gianfar-mdio";
-+            reg = <0x520 0x20>;
-+        };
-+    };
-+
-+  - |
-+    #include <dt-bindings/interrupt-controller/irq.h>
-+    #include <dt-bindings/interrupt-controller/arm-gic.h>
-+
-+    bus {
-+        #address-cells = <2>;
-+        #size-cells = <2>;
-+
-+        ethernet {
-+            compatible = "fsl,etsec2";
-+            ranges;
-+            device_type = "network";
-+            #address-cells = <2>;
-+            #size-cells = <2>;
-+            interrupt-parent = <&gic>;
-+            model = "eTSEC";
-+            fsl,magic-packet;
-+            dma-coherent;
-+
-+            queue-group@2d10000 {
-+                reg = <0x0 0x2d10000 0x0 0x1000>;
-+                interrupts = <GIC_SPI 144 IRQ_TYPE_LEVEL_HIGH>,
-+                             <GIC_SPI 145 IRQ_TYPE_LEVEL_HIGH>,
-+                             <GIC_SPI 146 IRQ_TYPE_LEVEL_HIGH>;
-+            };
-+
-+            queue-group@2d14000  {
-+                reg = <0x0 0x2d14000 0x0 0x1000>;
-+                interrupts = <GIC_SPI 147 IRQ_TYPE_LEVEL_HIGH>,
-+                             <GIC_SPI 148 IRQ_TYPE_LEVEL_HIGH>,
-+                             <GIC_SPI 149 IRQ_TYPE_LEVEL_HIGH>;
-+            };
-+        };
-+    };
-+
-+...
-diff --git a/Documentation/devicetree/bindings/net/fsl-tsec-phy.txt b/Documentation/devicetree/bindings/net/fsl-tsec-phy.txt
-index 0e55e0af7d6f59cfb571dd3fcff704b7f4c140d2..b18bb4c997ea3a221e599f694d9a28692cbcaa7c 100644
---- a/Documentation/devicetree/bindings/net/fsl-tsec-phy.txt
-+++ b/Documentation/devicetree/bindings/net/fsl-tsec-phy.txt
-@@ -8,44 +8,7 @@ Refer to Documentation/devicetree/bindings/net/fsl,gianfar-mdio.yaml
- 
- * Gianfar-compatible ethernet nodes
- 
--Properties:
--
--  - device_type : Should be "network"
--  - model : Model of the device.  Can be "TSEC", "eTSEC", or "FEC"
--  - compatible : Should be "gianfar"
--  - reg : Offset and length of the register set for the device
--  - interrupts : For FEC devices, the first interrupt is the device's
--    interrupt.  For TSEC and eTSEC devices, the first interrupt is
--    transmit, the second is receive, and the third is error.
--  - phy-handle : See ethernet.txt file in the same directory.
--  - fixed-link : See fixed-link.txt in the same directory.
--  - phy-connection-type : See ethernet.txt file in the same directory.
--    This property is only really needed if the connection is of type
--    "rgmii-id", as all other connection types are detected by hardware.
--  - fsl,magic-packet : If present, indicates that the hardware supports
--    waking up via magic packet.
--  - fsl,wake-on-filer : If present, indicates that the hardware supports
--    waking up by Filer General Purpose Interrupt (FGPI) asserted on the
--    Rx int line.  This is an advanced power management capability allowing
--    certain packet types (user) defined by filer rules to wake up the system.
--  - bd-stash : If present, indicates that the hardware supports stashing
--    buffer descriptors in the L2.
--  - rx-stash-len : Denotes the number of bytes of a received buffer to stash
--    in the L2.
--  - rx-stash-idx : Denotes the index of the first byte from the received
--    buffer to stash in the L2.
--
--Example:
--	ethernet@24000 {
--		device_type = "network";
--		model = "TSEC";
--		compatible = "gianfar";
--		reg = <0x24000 0x1000>;
--		local-mac-address = [ 00 E0 0C 00 73 00 ];
--		interrupts = <29 2 30 2 34 2>;
--		interrupt-parent = <&mpic>;
--		phy-handle = <&phy0>
--	};
-+Refer to Documentation/devicetree/bindings/net/fsl,gianfar.yaml
- 
- * Gianfar PTP clock nodes
- 
-
--- 
-2.48.0.rc1.219.gb6b6757d772
-
-
+--=20
+Thanks,
+Mina
 
