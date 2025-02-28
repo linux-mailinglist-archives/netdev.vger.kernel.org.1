@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-170645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13554A496DE
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 11:19:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C6C4A49666
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 11:07:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4912316B221
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 10:18:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EE4716C70B
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 10:07:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D674525DAEB;
-	Fri, 28 Feb 2025 10:16:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70DC925D1ED;
+	Fri, 28 Feb 2025 10:01:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out28-121.mail.aliyun.com (out28-121.mail.aliyun.com [115.124.28.121])
+Received: from out28-148.mail.aliyun.com (out28-148.mail.aliyun.com [115.124.28.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 706D225DAE0;
-	Fri, 28 Feb 2025 10:16:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.121
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36A5A25CC89;
+	Fri, 28 Feb 2025 10:01:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740737814; cv=none; b=aipi5BhKJiRHNIHxFUTHO5oWr1kd99ISlBqVCEsfCyj9dEjI0rCNpCPjrtLtq8mAwoXPBTtjCCHO3ydV88yojS4lLCLjMf8KeN1uQJBr7e4IkNqqzu/Qlpntz/1akL0yx7vMzC3zKnh5W1EgVcfz76I0edSS1XV5vKYhWDmq6V0=
+	t=1740736881; cv=none; b=sqFQLB6a4LbuB7h3DXDkKWyVomoAqqmN+1mcZ76fr3+lD9Ud67Ua0c0AkYxc9eIypBdhGL8couKMJ3JhZNk0Z8g5spGRnVm0KSHomF3RTq5Qt5whxOwW9B8JV6GFtqSFOjmABoyoVPQFBv9PnI4buCLdaM5gdleikOuU2ST6Lyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740737814; c=relaxed/simple;
-	bh=RKmWoPNOf1kAlKhPJ+SYwGXfq2TmfaPQrjzaw1Hbt60=;
+	s=arc-20240116; t=1740736881; c=relaxed/simple;
+	bh=JmZvXSoE2b1I1y2BThOc2gOxaHDUsYTR2/2DKKnP+Lw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=E78fMj+7Kpoo5wnNrMwDNm2iCA4BPPWpedeeTVPbPTK0SBwwVX1TeLbtOHDYIipCb8NUEZcUHld7Irj6DOWh5rKnsLiXOXCwAxM97XtK3AyeWZVuEDit6H+8ErB/FeOkIKLm5RmQUlmCpIJKudvNuCH/7/OoVPU3ydyWqSdYkzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=115.124.28.121
+	 MIME-Version; b=HyxzBKV+AvmgQ5flnDkqZrHCDM+dTlTTzj/bQrbtrrqL1ZfxYoFUoJBmiX2zYkBffxPVSA49XhM2YD2JJYob5f+L+kQ2mQ1BFv6A/RktePCJT2cApKNhlyKExFvgrMhYezLasXbezyOwn7wE9MB1Eu3pfwpyhC+/hHQwFNYnXUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=115.124.28.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=motor-comm.com
-Received: from sun-VirtualBox..(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.bfyn1C7_1740736834 cluster:ay29)
+Received: from sun-VirtualBox..(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.bfyn1Iw_1740736838 cluster:ay29)
           by smtp.aliyun-inc.com;
-          Fri, 28 Feb 2025 18:00:34 +0800
+          Fri, 28 Feb 2025 18:00:38 +0800
 From: Frank Sae <Frank.Sae@motor-comm.com>
 To: Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
@@ -48,9 +48,9 @@ Cc: Masahiro Yamada <masahiroy@kernel.org>,
 	xiaogang.fan@motor-comm.com,
 	fei.zhang@motor-comm.com,
 	hua.sun@motor-comm.com
-Subject: [PATCH net-next v3 04/14] motorcomm:yt6801: Implement the fxgmac_init function
-Date: Fri, 28 Feb 2025 18:01:11 +0800
-Message-Id: <20250228100020.3944-5-Frank.Sae@motor-comm.com>
+Subject: [PATCH net-next v3 09/14] motorcomm:yt6801: Implement the poll functions
+Date: Fri, 28 Feb 2025 18:01:15 +0800
+Message-Id: <20250228100020.3944-10-Frank.Sae@motor-comm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250228100020.3944-1-Frank.Sae@motor-comm.com>
 References: <20250228100020.3944-1-Frank.Sae@motor-comm.com>
@@ -62,471 +62,760 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implement the fxgmac_init to init hardware settings, including setting
- function pointers, default configuration data, irq, base_addr, MAC
- address, DMA mask, device operations and device features.
-Implement the fxgmac_read_mac_addr function to read mac address form
-  efuse.
+Implement the fxgmac_request_irqs to request legacy or msix irqs, msix
+  irqs.
+Implement the fxgmac_create_skb to  create skb for rx.
+Implement the fxgmac_isr function to handle legacy irq.
+Implement the fxgmac_dma_isr function to handle tx and rx irq.
+Implement the fxgmac_all_poll for legacy irq.
+Implement the fxgmac_one_poll_rx and fxgmac_one_poll_tx for msix irq.
+Implement the fxgmac_tx_poll and fxgmac_rx_poll to handle tx and rx.
 
 Signed-off-by: Frank Sae <Frank.Sae@motor-comm.com>
 ---
- .../ethernet/motorcomm/yt6801/yt6801_net.c    | 423 ++++++++++++++++++
- 1 file changed, 423 insertions(+)
+ .../ethernet/motorcomm/yt6801/yt6801_desc.c   | 298 +++++++++++++
+ .../ethernet/motorcomm/yt6801/yt6801_net.c    | 397 ++++++++++++++++++
+ 2 files changed, 695 insertions(+)
 
+diff --git a/drivers/net/ethernet/motorcomm/yt6801/yt6801_desc.c b/drivers/net/ethernet/motorcomm/yt6801/yt6801_desc.c
+index 74a0bec45..a4d116f33 100644
+--- a/drivers/net/ethernet/motorcomm/yt6801/yt6801_desc.c
++++ b/drivers/net/ethernet/motorcomm/yt6801/yt6801_desc.c
+@@ -271,3 +271,301 @@ int fxgmac_channels_rings_alloc(struct fxgmac_pdata *priv)
+ 	fxgmac_channels_rings_free(priv);
+ 	return ret;
+ }
++
++static void fxgmac_set_buffer_data(struct fxgmac_buffer_data *bd,
++				   struct fxgmac_page_alloc *pa,
++				   unsigned int len)
++{
++	get_page(pa->pages);
++	bd->pa = *pa;
++
++	bd->dma_base = pa->pages_dma;
++	bd->dma_off = pa->pages_offset;
++	bd->dma_len = len;
++
++	pa->pages_offset += len;
++	if ((pa->pages_offset + len) > pa->pages_len) {
++		/* This data descriptor is responsible for unmapping page(s) */
++		bd->pa_unmap = *pa;
++
++		/* Get a new allocation next time */
++		pa->pages = NULL;
++		pa->pages_len = 0;
++		pa->pages_offset = 0;
++		pa->pages_dma = 0;
++	}
++}
++
++static int fxgmac_alloc_pages(struct fxgmac_pdata *priv,
++			      struct fxgmac_page_alloc *pa, gfp_t gfp,
++			      int order)
++{
++	struct page *pages = NULL;
++	dma_addr_t pages_dma;
++
++	/* Try to obtain pages, decreasing order if necessary */
++	gfp |= __GFP_COMP | __GFP_NOWARN;
++	while (order >= 0) {
++		pages = alloc_pages(gfp, order);
++		if (pages)
++			break;
++
++		order--;
++	}
++
++	if (!pages)
++		return -ENOMEM;
++
++	/* Map the pages */
++	pages_dma = dma_map_page(priv->dev, pages, 0, PAGE_SIZE << order,
++				 DMA_FROM_DEVICE);
++	if (dma_mapping_error(priv->dev, pages_dma)) {
++		put_page(pages);
++		return -ENOMEM;
++	}
++
++	pa->pages = pages;
++	pa->pages_len = PAGE_SIZE << order;
++	pa->pages_offset = 0;
++	pa->pages_dma = pages_dma;
++
++	return 0;
++}
++
++#define FXGMAC_SKB_ALLOC_SIZE 512
++
++int fxgmac_rx_buffe_map(struct fxgmac_pdata *priv, struct fxgmac_ring *ring,
++			struct fxgmac_desc_data *desc_data)
++{
++	int ret;
++
++	if (!ring->rx_hdr_pa.pages) {
++		ret = fxgmac_alloc_pages(priv, &ring->rx_hdr_pa, GFP_ATOMIC, 0);
++		if (ret)
++			return ret;
++	}
++	/* Set up the header page info */
++	fxgmac_set_buffer_data(&desc_data->rx.hdr, &ring->rx_hdr_pa,
++			       priv->rx_buf_size);
++
++	return 0;
++}
++
++void fxgmac_desc_tx_reset(struct fxgmac_desc_data *desc_data)
++{
++	struct fxgmac_dma_desc *dma_desc = desc_data->dma_desc;
++
++	/* Reset the Tx descriptor
++	 * Set buffer 1 (lo) address to zero
++	 * Set buffer 1 (hi) address to zero
++	 * Reset all other control bits (IC, TTSE, B2L & B1L)
++	 * Reset all other control bits (OWN, CTXT, FD, LD, CPC, CIC, etc)
++	 */
++	dma_desc->desc0 = 0;
++	dma_desc->desc1 = 0;
++	dma_desc->desc2 = 0;
++	dma_desc->desc3 = 0;
++
++	/* Make sure ownership is written to the descriptor */
++	dma_wmb();
++}
++
++void fxgmac_desc_rx_reset(struct fxgmac_desc_data *desc_data)
++{
++	struct fxgmac_dma_desc *dma_desc = desc_data->dma_desc;
++	dma_addr_t hdr_dma;
++
++	/* Reset the Rx descriptor
++	 * Set buffer 1 (lo) address to header dma address (lo)
++	 * Set buffer 1 (hi) address to header dma address (hi)
++	 * set control bits OWN and INTE
++	 */
++	hdr_dma = desc_data->rx.hdr.dma_base + desc_data->rx.hdr.dma_off;
++	dma_desc->desc0 = cpu_to_le32(lower_32_bits(hdr_dma));
++	dma_desc->desc1 = cpu_to_le32(upper_32_bits(hdr_dma));
++	dma_desc->desc2 = 0;
++	dma_desc->desc3 = 0;
++	FXGMAC_SET_BITS_LE(dma_desc->desc3, RX_NORMAL_DESC3, INTE, 1);
++	FXGMAC_SET_BITS_LE(dma_desc->desc3, RX_NORMAL_DESC3, BUF2V, 0);
++	FXGMAC_SET_BITS_LE(dma_desc->desc3, RX_NORMAL_DESC3, BUF1V, 1);
++
++	/* Since the Rx DMA engine is likely running, make sure everything
++	 * is written to the descriptor(s) before setting the OWN bit
++	 * for the descriptor
++	 */
++	dma_wmb();
++
++	FXGMAC_SET_BITS_LE(dma_desc->desc3, RX_NORMAL_DESC3, OWN, 1);
++
++	/* Make sure ownership is written to the descriptor */
++	dma_wmb();
++}
++
++int fxgmac_tx_skb_map(struct fxgmac_channel *channel, struct sk_buff *skb)
++{
++	struct fxgmac_pdata *priv = channel->priv;
++	struct fxgmac_ring *ring = channel->tx_ring;
++	unsigned int start_index, cur_index;
++	struct fxgmac_desc_data *desc_data;
++	unsigned int offset, datalen, len;
++	struct fxgmac_pkt_info *pkt_info;
++	unsigned int tso, vlan;
++	dma_addr_t skb_dma;
++	skb_frag_t *frag;
++
++	offset = 0;
++	start_index = ring->cur;
++	cur_index = ring->cur;
++	pkt_info = &ring->pkt_info;
++	pkt_info->desc_count = 0;
++	pkt_info->length = 0;
++
++	tso = FXGMAC_GET_BITS(pkt_info->attr, ATTR_TX, TSO_ENABLE);
++	vlan = FXGMAC_GET_BITS(pkt_info->attr, ATTR_TX, VLAN_CTAG);
++
++	/* Save space for a context descriptor if needed */
++	if ((tso && pkt_info->mss != ring->tx.cur_mss) ||
++	    (vlan && pkt_info->vlan_ctag != ring->tx.cur_vlan_ctag))
++		cur_index = FXGMAC_GET_ENTRY(cur_index, ring->dma_desc_count);
++
++	desc_data = FXGMAC_GET_DESC_DATA(ring, cur_index);
++
++	if (tso) {
++		/* Map the TSO header */
++		skb_dma = dma_map_single(priv->dev, skb->data,
++					 pkt_info->header_len, DMA_TO_DEVICE);
++		if (dma_mapping_error(priv->dev, skb_dma)) {
++			yt_err(priv, "dma_map_single err\n");
++			goto err_out;
++		}
++		desc_data->skb_dma = skb_dma;
++		desc_data->skb_dma_len = pkt_info->header_len;
++
++		offset = pkt_info->header_len;
++		pkt_info->length += pkt_info->header_len;
++
++		cur_index = FXGMAC_GET_ENTRY(cur_index, ring->dma_desc_count);
++		desc_data = FXGMAC_GET_DESC_DATA(ring, cur_index);
++	}
++
++	/* Map the (remainder of the) packet */
++	for (datalen = skb_headlen(skb) - offset; datalen;) {
++		len = min_t(unsigned int, datalen, FXGMAC_TX_MAX_BUF_SIZE);
++		skb_dma = dma_map_single(priv->dev, skb->data + offset, len,
++					 DMA_TO_DEVICE);
++		if (dma_mapping_error(priv->dev, skb_dma)) {
++			yt_err(priv, "dma_map_single err\n");
++			goto err_out;
++		}
++		desc_data->skb_dma = skb_dma;
++		desc_data->skb_dma_len = len;
++
++		datalen -= len;
++		offset += len;
++		pkt_info->length += len;
++
++		cur_index = FXGMAC_GET_ENTRY(cur_index, ring->dma_desc_count);
++		desc_data = FXGMAC_GET_DESC_DATA(ring, cur_index);
++	}
++
++	for (u32 i = 0; i < skb_shinfo(skb)->nr_frags; i++) {
++		frag = &skb_shinfo(skb)->frags[i];
++		offset = 0;
++
++		for (datalen = skb_frag_size(frag); datalen;) {
++			len = min_t(unsigned int, datalen,
++				    FXGMAC_TX_MAX_BUF_SIZE);
++			skb_dma = skb_frag_dma_map(priv->dev, frag, offset, len,
++						   DMA_TO_DEVICE);
++			if (dma_mapping_error(priv->dev, skb_dma)) {
++				yt_err(priv, "skb_frag_dma_map err\n");
++				goto err_out;
++			}
++			desc_data->skb_dma = skb_dma;
++			desc_data->skb_dma_len = len;
++			desc_data->mapped_as_page = 1;
++
++			datalen -= len;
++			offset += len;
++			pkt_info->length += len;
++
++			cur_index = FXGMAC_GET_ENTRY(cur_index,
++						     ring->dma_desc_count);
++			desc_data = FXGMAC_GET_DESC_DATA(ring, cur_index);
++		}
++	}
++
++	/* Save the skb address in the last entry. We always have some data
++	 * that has been mapped so desc_data is always advanced past the last
++	 * piece of mapped data - use the entry pointed to by cur_index - 1.
++	 */
++	desc_data = FXGMAC_GET_DESC_DATA(ring, (cur_index - 1) &
++					 (ring->dma_desc_count - 1));
++	desc_data->skb = skb;
++
++	/* Save the number of descriptor entries used */
++	if (start_index <= cur_index)
++		pkt_info->desc_count = cur_index - start_index;
++	else
++		pkt_info->desc_count =
++			ring->dma_desc_count - start_index + cur_index;
++
++	return pkt_info->desc_count;
++
++err_out:
++	while (start_index < cur_index) {
++		desc_data = FXGMAC_GET_DESC_DATA(ring, start_index);
++		start_index =
++			FXGMAC_GET_ENTRY(start_index, ring->dma_desc_count);
++		fxgmac_desc_data_unmap(priv, desc_data);
++	}
++
++	return 0;
++}
++
++void fxgmac_dump_rx_desc(struct fxgmac_pdata *priv, struct fxgmac_ring *ring,
++			 unsigned int idx)
++{
++	struct fxgmac_desc_data *desc_data;
++	struct fxgmac_dma_desc *dma_desc;
++
++	desc_data = FXGMAC_GET_DESC_DATA(ring, idx);
++	dma_desc = desc_data->dma_desc;
++	yt_dbg(priv,
++	       "RX: dma_desc=%p, dma_desc_addr=%pad, RX_NORMAL_DESC[%d RX BY DEVICE] = %08x:%08x:%08x:%08x\n\n",
++	       dma_desc, &desc_data->dma_desc_addr, idx,
++	       le32_to_cpu(dma_desc->desc0), le32_to_cpu(dma_desc->desc1),
++	       le32_to_cpu(dma_desc->desc2), le32_to_cpu(dma_desc->desc3));
++}
++
++void fxgmac_dump_tx_desc(struct fxgmac_pdata *priv, struct fxgmac_ring *ring,
++			 unsigned int idx, unsigned int count,
++			 unsigned int flag)
++{
++	struct fxgmac_desc_data *desc_data;
++
++	while (count--) {
++		desc_data = FXGMAC_GET_DESC_DATA(ring, idx);
++		yt_dbg(priv,
++		       "TX: dma_desc=%p, dma_desc_addr=%pad, TX_NORMAL_DESC[%d %s] = %08x:%08x:%08x:%08x\n",
++		       desc_data->dma_desc, &desc_data->dma_desc_addr, idx,
++		       (flag == 1) ? "QUEUED FOR TX" : "TX BY DEVICE",
++		       le32_to_cpu(desc_data->dma_desc->desc0),
++		       le32_to_cpu(desc_data->dma_desc->desc1),
++		       le32_to_cpu(desc_data->dma_desc->desc2),
++		       le32_to_cpu(desc_data->dma_desc->desc3));
++
++		idx++;
++	}
++}
++
++int fxgmac_is_tx_complete(struct fxgmac_dma_desc *dma_desc)
++{
++	return !FXGMAC_GET_BITS_LE(dma_desc->desc3, TX_NORMAL_DESC3, OWN);
++}
++
++int fxgmac_is_last_desc(struct fxgmac_dma_desc *dma_desc)
++{
++	/* Rx and Tx share LD bit, so check TDES3.LD bit */
++	return FXGMAC_GET_BITS_LE(dma_desc->desc3, TX_NORMAL_DESC3, LD);
++}
 diff --git a/drivers/net/ethernet/motorcomm/yt6801/yt6801_net.c b/drivers/net/ethernet/motorcomm/yt6801/yt6801_net.c
-index 7d557f6b0..350510174 100644
+index 14c59cece..ddfdde001 100644
 --- a/drivers/net/ethernet/motorcomm/yt6801/yt6801_net.c
 +++ b/drivers/net/ethernet/motorcomm/yt6801/yt6801_net.c
-@@ -302,6 +302,12 @@ static void fxgmac_disable_rx(struct fxgmac_pdata *priv)
- 		FXGMAC_DMA_IO_WR_BITS(channel, DMA_CH_RCR, SR, 0);
- }
- 
-+static void fxgmac_default_speed_duplex_config(struct fxgmac_pdata *priv)
-+{
-+	priv->mac_duplex = DUPLEX_FULL;
-+	priv->mac_speed = SPEED_1000;
-+}
-+
- /**
-  * fxgmac_set_oob_wol - disable or enable oob wol crtl function
-  * @priv: driver private struct
-@@ -322,12 +328,30 @@ static void fxgmac_pre_powerdown(struct fxgmac_pdata *priv)
- 	fsleep(2000);
- }
- 
-+static void fxgmac_restore_nonstick_reg(struct fxgmac_pdata *priv)
-+{
-+	for (u32 i = GLOBAL_CTRL0; i < MSI_PBA; i += 4)
-+		FXGMAC_IO_WR(priv, i,
-+			     priv->reg_nonstick[(i - GLOBAL_CTRL0) >> 2]);
-+}
-+
- static void fxgmac_phy_release(struct fxgmac_pdata *priv)
- {
- 	FXGMAC_IO_WR_BITS(priv, EPHY_CTRL, RESET, 1);
- 	fsleep(100);
- }
- 
-+static void fxgmac_hw_exit(struct fxgmac_pdata *priv)
-+{
-+	/* Reset CHIP, it will reset trigger circuit and reload efuse patch */
-+	FXGMAC_IO_WR_BITS(priv, SYS_RESET, RESET, 1);
-+	fsleep(9000);
-+
-+	fxgmac_phy_release(priv);
-+
-+	/* Reset will clear nonstick registers. */
-+	fxgmac_restore_nonstick_reg(priv);
-+}
- void fxgmac_phy_reset(struct fxgmac_pdata *priv)
- {
- 	FXGMAC_IO_WR_BITS(priv, EPHY_CTRL, RESET, 0);
-@@ -411,6 +435,405 @@ int fxgmac_net_powerdown(struct fxgmac_pdata *priv)
+@@ -102,17 +102,69 @@ static int fxgmac_mdio_register(struct fxgmac_pdata *priv)
  	return 0;
  }
  
-+#define EFUSE_FISRT_UPDATE_ADDR				255
-+#define EFUSE_SECOND_UPDATE_ADDR			209
-+#define EFUSE_MAX_ENTRY					39
-+#define EFUSE_PATCH_ADDR_START				0
-+#define EFUSE_PATCH_DATA_START				2
-+#define EFUSE_PATCH_SIZE				6
-+#define EFUSE_REGION_A_B_LENGTH				18
-+
-+static bool fxgmac_efuse_read_data(struct fxgmac_pdata *priv, u32 offset,
-+				   u8 *value)
++static unsigned int fxgmac_desc_tx_avail(struct fxgmac_ring *ring)
 +{
-+	u32 val = 0, wait = 1000;
-+	bool ret = false;
-+
-+	FXGMAC_SET_BITS(val, EFUSE_OP, ADDR, offset);
-+	FXGMAC_SET_BITS(val, EFUSE_OP, START, 1);
-+	FXGMAC_SET_BITS(val, EFUSE_OP, MODE, EFUSE_OP_MODE_ROW_READ);
-+	FXGMAC_IO_WR(priv, EFUSE_OP_CTRL_0, val);
-+
-+	while (wait--) {
-+		fsleep(20);
-+		val = FXGMAC_IO_RD(priv, EFUSE_OP_CTRL_1);
-+		if (FXGMAC_GET_BITS(val, EFUSE_OP, DONE)) {
-+			ret = true;
-+			break;
-+		}
-+	}
-+
-+	if (!ret) {
-+		yt_err(priv, "Fail to reading efuse Byte%d\n", offset);
-+		return ret;
-+	}
-+
-+	if (value)
-+		*value = FXGMAC_GET_BITS(val, EFUSE_OP, RD_DATA) & 0xff;
-+
-+	return ret;
++	if (ring->dirty > ring->cur)
++		return ring->dirty - ring->cur;
++	else
++		return ring->dma_desc_count - ring->cur + ring->dirty;
 +}
-+
-+static bool fxgmac_efuse_read_index_patch(struct fxgmac_pdata *priv, u8 index,
-+					  u32 *offset, u32 *value)
-+{
-+	u8 tmp[EFUSE_PATCH_SIZE - EFUSE_PATCH_DATA_START];
-+	u32 addr, i;
-+	bool ret;
-+
-+	if (index >= EFUSE_MAX_ENTRY) {
-+		yt_err(priv, "Reading efuse out of range, index %d\n", index);
-+		return false;
-+	}
-+
-+	for (i = EFUSE_PATCH_ADDR_START; i < EFUSE_PATCH_DATA_START; i++) {
-+		addr = EFUSE_REGION_A_B_LENGTH + index * EFUSE_PATCH_SIZE + i;
-+		ret = fxgmac_efuse_read_data(priv, addr,
-+					     tmp + i - EFUSE_PATCH_ADDR_START);
-+		if (!ret) {
-+			yt_err(priv, "Fail to reading efuse Byte%d\n", addr);
-+			return ret;
-+		}
-+	}
-+	/* tmp[0] is low 8bit date, tmp[1] is high 8bit date */
-+	if (offset)
-+		*offset = tmp[0] | (tmp[1] << 8);
-+
-+	for (i = EFUSE_PATCH_DATA_START; i < EFUSE_PATCH_SIZE; i++) {
-+		addr = EFUSE_REGION_A_B_LENGTH + index * EFUSE_PATCH_SIZE + i;
-+		ret = fxgmac_efuse_read_data(priv, addr,
-+					     tmp + i - EFUSE_PATCH_DATA_START);
-+		if (!ret) {
-+			yt_err(priv, "Fail to reading efuse Byte%d\n", addr);
-+			return ret;
-+		}
-+	}
-+	/* tmp[0] is low 8bit date, tmp[1] is low 8bit date
-+	 * ...  tmp[3] is highest 8bit date
-+	 */
-+	if (value)
-+		*value = tmp[0] | (tmp[1] << 8) | (tmp[2] << 16) |
-+			 (tmp[3] << 24);
-+
-+	return ret;
-+}
-+
-+static bool fxgmac_efuse_read_mac_subsys(struct fxgmac_pdata *priv,
-+					 u8 *mac_addr, u32 *subsys, u32 *revid)
-+{
-+	u32 machr = 0, maclr = 0, offset = 0, val = 0;
-+
-+	for (u8 index = 0; index < EFUSE_MAX_ENTRY; index++) {
-+		if (!fxgmac_efuse_read_index_patch(priv, index, &offset, &val))
-+			return false;
-+
-+		if (offset == 0x00)
-+			break; /* Reach the blank. */
-+		if (offset == MACA0LR_FROM_EFUSE)
-+			maclr = val;
-+		if (offset == MACA0HR_FROM_EFUSE)
-+			machr = val;
-+		if (offset == PCI_REVISION_ID && revid)
-+			*revid = val;
-+		if (offset == PCI_SUBSYSTEM_VENDOR_ID && subsys)
-+			*subsys = val;
-+	}
-+
-+	if (mac_addr) {
-+		mac_addr[5] = (u8)(maclr & 0xFF);
-+		mac_addr[4] = (u8)((maclr >> 8) & 0xFF);
-+		mac_addr[3] = (u8)((maclr >> 16) & 0xFF);
-+		mac_addr[2] = (u8)((maclr >> 24) & 0xFF);
-+		mac_addr[1] = (u8)(machr & 0xFF);
-+		mac_addr[0] = (u8)((machr >> 8) & 0xFF);
-+	}
-+
-+	return true;
-+}
-+
-+static int fxgmac_read_mac_addr(struct fxgmac_pdata *priv)
-+{
-+	u8 default_addr[ETH_ALEN] = { 0, 0x55, 0x7b, 0xb5, 0x7d, 0xf7 };
-+	struct net_device *netdev = priv->netdev;
-+	int ret;
-+
-+	/* If efuse have mac addr, use it. if not, use static mac address. */
-+	ret = fxgmac_efuse_read_mac_subsys(priv, priv->mac_addr, NULL, NULL);
-+	if (!ret)
-+		return -1;
-+
-+	if (is_zero_ether_addr(priv->mac_addr))
-+		/* Use a static mac address for test */
-+		memcpy(priv->mac_addr, default_addr, netdev->addr_len);
-+
-+	return 0;
-+}
-+
-+static void fxgmac_default_config(struct fxgmac_pdata *priv)
-+{
-+	priv->sysclk_rate = 125000000; /* System clock is 125 MHz */
-+	priv->tx_threshold = MTL_TX_THRESHOLD_128;
-+	priv->rx_threshold = MTL_RX_THRESHOLD_128;
-+	priv->tx_osp_mode = DMA_OSP_ENABLE;
-+	priv->tx_sf_mode = MTL_TSF_ENABLE;
-+	priv->rx_sf_mode = MTL_RSF_ENABLE;
-+	priv->pblx8 = DMA_PBL_X8_ENABLE;
-+	priv->tx_pbl = DMA_PBL_16;
-+	priv->rx_pbl = DMA_PBL_4;
-+	priv->tx_pause = 1;	/* Enable tx pause */
-+	priv->rx_pause = 1;	/* Enable rx pause */
-+
-+	fxgmac_default_speed_duplex_config(priv);
-+}
-+
-+static void fxgmac_get_all_hw_features(struct fxgmac_pdata *priv)
-+{
-+	struct fxgmac_hw_features *hw_feat = &priv->hw_feat;
-+	unsigned int mac_hfr0, mac_hfr1, mac_hfr2, mac_hfr3;
-+
-+	mac_hfr0 = FXGMAC_MAC_IO_RD(priv, MAC_HWF0R);
-+	mac_hfr1 = FXGMAC_MAC_IO_RD(priv, MAC_HWF1R);
-+	mac_hfr2 = FXGMAC_MAC_IO_RD(priv, MAC_HWF2R);
-+	mac_hfr3 = FXGMAC_MAC_IO_RD(priv, MAC_HWF3R);
-+	memset(hw_feat, 0, sizeof(*hw_feat));
-+	hw_feat->version = FXGMAC_MAC_IO_RD(priv, MAC_VR);
-+
-+	/* Hardware feature register 0 */
-+	hw_feat->phyifsel = FXGMAC_GET_BITS(mac_hfr0, MAC_HWF0R, ACTPHYIFSEL);
-+	hw_feat->vlhash = FXGMAC_GET_BITS(mac_hfr0, MAC_HWF0R, VLHASH);
-+	hw_feat->sma = FXGMAC_GET_BITS(mac_hfr0, MAC_HWF0R, SMASEL);
-+	hw_feat->rwk = FXGMAC_GET_BITS(mac_hfr0, MAC_HWF0R, RWKSEL);
-+	hw_feat->mgk = FXGMAC_GET_BITS(mac_hfr0, MAC_HWF0R, MGKSEL);
-+	hw_feat->mmc = FXGMAC_GET_BITS(mac_hfr0, MAC_HWF0R, MMCSEL);
-+	hw_feat->aoe = FXGMAC_GET_BITS(mac_hfr0, MAC_HWF0R, ARPOFFSEL);
-+	hw_feat->ts = FXGMAC_GET_BITS(mac_hfr0, MAC_HWF0R, TSSEL);
-+	hw_feat->eee = FXGMAC_GET_BITS(mac_hfr0, MAC_HWF0R, EEESEL);
-+	hw_feat->tx_coe = FXGMAC_GET_BITS(mac_hfr0, MAC_HWF0R, TXCOESEL);
-+	hw_feat->rx_coe = FXGMAC_GET_BITS(mac_hfr0, MAC_HWF0R, RXCOESEL);
-+	hw_feat->addn_mac = FXGMAC_GET_BITS(mac_hfr0, MAC_HWF0R, ADDMACADRSEL);
-+	hw_feat->ts_src = FXGMAC_GET_BITS(mac_hfr0, MAC_HWF0R, TSSTSSEL);
-+	hw_feat->sa_vlan_ins = FXGMAC_GET_BITS(mac_hfr0, MAC_HWF0R, SAVLANINS);
-+
-+	/* Hardware feature register 1 */
-+	hw_feat->rx_fifo_size =
-+		FXGMAC_GET_BITS(mac_hfr1, MAC_HWF1R, RXFIFOSIZE);
-+	hw_feat->tx_fifo_size =
-+		FXGMAC_GET_BITS(mac_hfr1, MAC_HWF1R, TXFIFOSIZE);
-+	hw_feat->adv_ts_hi = FXGMAC_GET_BITS(mac_hfr1, MAC_HWF1R, ADVTHWORD);
-+	hw_feat->dma_width = FXGMAC_GET_BITS(mac_hfr1, MAC_HWF1R, ADDR64);
-+	hw_feat->dcb = FXGMAC_GET_BITS(mac_hfr1, MAC_HWF1R, DCBEN);
-+	hw_feat->sph = FXGMAC_GET_BITS(mac_hfr1, MAC_HWF1R, SPHEN);
-+	hw_feat->tso = FXGMAC_GET_BITS(mac_hfr1, MAC_HWF1R, TSOEN);
-+	hw_feat->dma_debug = FXGMAC_GET_BITS(mac_hfr1, MAC_HWF1R, DBGMEMA);
-+	hw_feat->avsel = FXGMAC_GET_BITS(mac_hfr1, MAC_HWF1R, RAVSEL);
-+	hw_feat->ravsel = FXGMAC_GET_BITS(mac_hfr1, MAC_HWF1R, RAVSEL);
-+	hw_feat->hash_table_size =
-+		FXGMAC_GET_BITS(mac_hfr1, MAC_HWF1R, HASHTBLSZ);
-+	hw_feat->l3l4_filter_num =
-+		FXGMAC_GET_BITS(mac_hfr1, MAC_HWF1R, L3L4FNUM);
-+	hw_feat->tx_q_cnt = FXGMAC_GET_BITS(mac_hfr2, MAC_HWF2R, TXQCNT);
-+	hw_feat->rx_ch_cnt = FXGMAC_GET_BITS(mac_hfr2, MAC_HWF2R, RXCHCNT);
-+	hw_feat->tx_ch_cnt = FXGMAC_GET_BITS(mac_hfr2, MAC_HWF2R, TXCHCNT);
-+	hw_feat->pps_out_num = FXGMAC_GET_BITS(mac_hfr2, MAC_HWF2R, PPSOUTNUM);
-+	hw_feat->aux_snap_num =
-+		FXGMAC_GET_BITS(mac_hfr2, MAC_HWF2R, AUXSNAPNUM);
-+
-+	/* Translate the Hash Table size into actual number */
-+	switch (hw_feat->hash_table_size) {
-+	case 0:
-+		break;
-+	case 1:
-+		hw_feat->hash_table_size = 64;
-+		break;
-+	case 2:
-+		hw_feat->hash_table_size = 128;
-+		break;
-+	case 3:
-+		hw_feat->hash_table_size = 256;
-+		break;
-+	}
-+
-+	/* Translate the address width setting into actual number */
-+	switch (hw_feat->dma_width) {
-+	case 0:
-+		hw_feat->dma_width = 32;
-+		break;
-+	case 1:
-+		hw_feat->dma_width = 40;
-+		break;
-+	case 2:
-+		hw_feat->dma_width = 48;
-+		break;
-+	default:
-+		hw_feat->dma_width = 32;
-+	}
-+
-+	/* The Queue, Channel are zero based so increment them
-+	 * to get the actual number
-+	 */
-+	hw_feat->tx_q_cnt++;
-+	hw_feat->rx_ch_cnt++;
-+	hw_feat->tx_ch_cnt++;
-+
-+	/* HW implement 1 rx fifo, 4 dma channel.  but from software
-+	 * we see 4 logical queues. hardcode to 4 queues.
-+	 */
-+	hw_feat->rx_q_cnt = 4;
-+
-+	hw_feat->hwfr3 = mac_hfr3;
-+}
-+
-+static unsigned int fxgmac_usec_to_riwt(struct fxgmac_pdata *priv,
-+					unsigned int usec)
-+{
-+	/* Convert the input usec value to the watchdog timer value. Each
-+	 * watchdog timer value is equivalent to 256 clock cycles.
-+	 * Calculate the required value as:
-+	 *  ( usec * ( system_clock_mhz / 10^6) / 256
-+	 */
-+	return (usec * (priv->sysclk_rate / 1000000)) / 256;
-+}
-+
-+static void fxgmac_save_nonstick_reg(struct fxgmac_pdata *priv)
-+{
-+	for (u32 i = GLOBAL_CTRL0; i < MSI_PBA; i += 4) {
-+		priv->reg_nonstick[(i - GLOBAL_CTRL0) >> 2] =
-+			FXGMAC_IO_RD(priv, i);
-+	}
-+}
-+
-+static int fxgmac_init(struct fxgmac_pdata *priv, bool save_private_reg)
-+{
-+	struct net_device *netdev = priv->netdev;
-+	int ret;
-+
-+	fxgmac_default_config(priv);	/* Set default configuration data */
-+	netdev->irq = priv->dev_irq;
-+	netdev->base_addr = (unsigned long)priv->hw_addr;
-+
-+	ret = fxgmac_read_mac_addr(priv);
-+	if (ret) {
-+		yt_err(priv, "fxgmac_read_mac_addr err:%d\n", ret);
-+		return ret;
-+	}
-+	eth_hw_addr_set(netdev, priv->mac_addr);
-+
-+	if (save_private_reg)
-+		fxgmac_save_nonstick_reg(priv);
-+
-+	fxgmac_hw_exit(priv);	/* Reset here to get hw features correctly */
-+	fxgmac_get_all_hw_features(priv);
-+
-+	/* Set the DMA mask */
-+	ret = dma_set_mask_and_coherent(priv->dev,
-+					DMA_BIT_MASK(priv->hw_feat.dma_width));
-+	if (ret) {
-+		ret = dma_set_mask_and_coherent(priv->dev, DMA_BIT_MASK(32));
-+		if (ret) {
-+			yt_err(priv, "No usable DMA configuration, aborting\n");
-+			return ret;
-+		}
-+	}
-+
-+	if (FXGMAC_GET_BITS(priv->int_flag, INT_FLAG, LEGACY)) {
-+		/* We should disable msi and msix here when we use legacy
-+		 * interrupt,for two reasons:
-+		 * 1. Exit will restore msi and msix config regisiter,
-+		 * that may enable them.
-+		 * 2. When the driver that uses the msix interrupt by default
-+		 * is compiled into the OS, uninstall the driver through rmmod,
-+		 * and then install the driver that uses the legacy interrupt,
-+		 * at which time the msix enable will be turned on again by
-+		 * default after waking up from S4 on some
-+		 * platform. such as UOS platform.
-+		 */
-+		pci_disable_msi(to_pci_dev(priv->dev));
-+		pci_disable_msix(to_pci_dev(priv->dev));
-+	}
-+
-+	BUILD_BUG_ON_NOT_POWER_OF_2(FXGMAC_TX_DESC_CNT);
-+	priv->tx_desc_count = FXGMAC_TX_DESC_CNT;
-+	BUILD_BUG_ON_NOT_POWER_OF_2(FXGMAC_RX_DESC_CNT);
-+	priv->rx_desc_count = FXGMAC_RX_DESC_CNT;
-+
-+	ret = netif_set_real_num_tx_queues(netdev, FXGMAC_TX_1_Q);
-+	if (ret) {
-+		yt_err(priv, "error setting real tx queue count\n");
-+		return ret;
-+	}
-+
-+	priv->rx_ring_count = min_t(unsigned int,
-+				    netif_get_num_default_rss_queues(),
-+				    priv->hw_feat.rx_ch_cnt);
-+	priv->rx_ring_count = min_t(unsigned int, priv->rx_ring_count,
-+				    priv->hw_feat.rx_q_cnt);
-+	priv->rx_q_count = priv->rx_ring_count;
-+	ret = netif_set_real_num_rx_queues(netdev, priv->rx_q_count);
-+	if (ret) {
-+		yt_err(priv, "error setting real rx queue count\n");
-+		return ret;
-+	}
-+
-+	priv->channel_count =
-+		max_t(unsigned int, FXGMAC_TX_1_RING, priv->rx_ring_count);
-+
-+	netdev->min_mtu = ETH_MIN_MTU;
-+	netdev->max_mtu =
-+		FXGMAC_JUMBO_PACKET_MTU + (ETH_HLEN + VLAN_HLEN + ETH_FCS_LEN);
-+
-+	netdev->netdev_ops = fxgmac_get_netdev_ops();/* Set device operations */
-+
-+	/* Set device features */
-+	if (priv->hw_feat.tso) {
-+		netdev->hw_features = NETIF_F_TSO;
-+		netdev->hw_features |= NETIF_F_TSO6;
-+		netdev->hw_features |= NETIF_F_SG;
-+		netdev->hw_features |= NETIF_F_IP_CSUM;
-+		netdev->hw_features |= NETIF_F_IPV6_CSUM;
-+	} else if (priv->hw_feat.tx_coe) {
-+		netdev->hw_features = NETIF_F_IP_CSUM;
-+		netdev->hw_features |= NETIF_F_IPV6_CSUM;
-+	}
-+
-+	if (priv->hw_feat.rx_coe) {
-+		netdev->hw_features |= NETIF_F_RXCSUM;
-+		netdev->hw_features |= NETIF_F_GRO;
-+	}
-+
-+	netdev->hw_features |= NETIF_F_RXHASH;
-+	netdev->vlan_features |= netdev->hw_features;
-+	netdev->hw_features |= NETIF_F_HW_VLAN_CTAG_RX;
-+
-+	if (priv->hw_feat.sa_vlan_ins)
-+		netdev->hw_features |= NETIF_F_HW_VLAN_CTAG_TX;
-+
-+	netdev->features |= netdev->hw_features;
-+	priv->netdev_features = netdev->features;
-+
-+	netdev->priv_flags |= IFF_UNICAST_FLT;
-+	netdev->watchdog_timeo = msecs_to_jiffies(5000);
-+
-+#define NIC_MAX_TCP_OFFLOAD_SIZE 7300
-+	netif_set_tso_max_size(netdev, NIC_MAX_TCP_OFFLOAD_SIZE);
-+
-+/* Default coalescing parameters */
-+#define FXGMAC_INIT_DMA_TX_USECS INT_MOD_200_US
-+#define FXGMAC_INIT_DMA_TX_FRAMES 25
-+#define FXGMAC_INIT_DMA_RX_USECS INT_MOD_200_US
-+#define FXGMAC_INIT_DMA_RX_FRAMES 25
-+
-+	/* Tx coalesce parameters initialization */
-+	priv->tx_usecs = FXGMAC_INIT_DMA_TX_USECS;
-+	priv->tx_frames = FXGMAC_INIT_DMA_TX_FRAMES;
-+
-+	/* Rx coalesce parameters initialization */
-+	priv->rx_riwt = fxgmac_usec_to_riwt(priv, FXGMAC_INIT_DMA_RX_USECS);
-+	priv->rx_usecs = FXGMAC_INIT_DMA_RX_USECS;
-+	priv->rx_frames = FXGMAC_INIT_DMA_RX_FRAMES;
-+
-+	return 0;
-+}
-+
- #ifdef CONFIG_PCI_MSI
- static void fxgmac_init_interrupt_scheme(struct fxgmac_pdata *priv)
+ static void fxgmac_enable_msix_one_irq(struct fxgmac_pdata *priv, u32 int_id)
  {
+ 	FXGMAC_IO_WR(priv, MSIX_TBL_MASK + int_id * 16, 0);
+ }
+ 
++static void fxgmac_disable_msix_one_irq(struct fxgmac_pdata *priv, u32 intid)
++{
++	FXGMAC_IO_WR(priv, MSIX_TBL_MASK + intid * 16, 1);
++}
++
+ static void fxgmac_disable_mgm_irq(struct fxgmac_pdata *priv)
+ {
+ 	FXGMAC_IO_WR_BITS(priv, MGMT_INT_CTRL0, INT_MASK,
+ 			  MGMT_INT_CTRL0_INT_MASK_MASK);
+ }
+ 
++static irqreturn_t fxgmac_isr(int irq, void *data)
++{
++	struct fxgmac_pdata *priv = data;
++	u32 val;
++
++	val = FXGMAC_IO_RD(priv, MGMT_INT_CTRL0);
++	if (!(val & MGMT_INT_CTRL0_INT_STATUS_RXTXMISC))
++		return IRQ_NONE;
++
++	/* Restart the device on a Fatal Bus Error */
++	for (u32 i = 0; i < priv->channel_count; i++) {
++		val = FXGMAC_DMA_IO_RD(priv->channel_head + i, DMA_CH_SR);
++		if (FXGMAC_GET_BITS(val, DMA_CH_SR, FBE))
++			schedule_work(&priv->restart_work);
++	}
++
++	fxgmac_disable_mgm_irq(priv);
++	napi_schedule_irqoff(&priv->napi); /* Turn on polling */
++	return IRQ_HANDLED;
++}
++
++static irqreturn_t fxgmac_dma_isr(int irq, void *data)
++{
++	struct fxgmac_channel *channel = data;
++
++	if (irq == channel->dma_irq_tx) {
++		fxgmac_disable_msix_one_irq(channel->priv, MSI_ID_TXQ0);
++		/* Clear Tx signal */
++		FXGMAC_DMA_IO_WR(channel, DMA_CH_SR, BIT(DMA_CH_SR_TI_POS));
++		napi_schedule_irqoff(&channel->napi_tx);
++		return IRQ_HANDLED;
++	}
++
++	fxgmac_disable_msix_one_irq(channel->priv, channel->queue_index);
++	/* Clear Rx signal */
++	FXGMAC_DMA_IO_WR(channel, DMA_CH_SR, BIT(DMA_CH_SR_RI_POS));
++	napi_schedule_irqoff(&channel->napi_rx);
++	return IRQ_HANDLED;
++}
++
+ static void napi_disable_del(struct fxgmac_pdata *priv, struct napi_struct *n,
+ 			     u32 flag_pos)
+ {
+@@ -1880,6 +1932,30 @@ int fxgmac_drv_probe(struct device *dev, struct fxgmac_resources *res)
+ 	return ret;
+ }
+ 
++static void fxgmac_dbg_pkt(struct fxgmac_pdata *priv, struct sk_buff *skb,
++			   bool tx_rx)
++{
++	struct ethhdr *eth = (struct ethhdr *)skb->data;
++	unsigned char buffer[128];
++
++	yt_dbg(priv, "\n************** SKB dump ****************\n");
++	yt_dbg(priv, "%s, packet of %d bytes\n", (tx_rx ? "TX" : "RX"),
++	       skb->len);
++	yt_dbg(priv, "Dst MAC addr: %pM\n", eth->h_dest);
++	yt_dbg(priv, "Src MAC addr: %pM\n", eth->h_source);
++	yt_dbg(priv, "Protocol: %#06x\n", ntohs(eth->h_proto));
++
++	for (u32 i = 0; i < skb->len; i += 32) {
++		unsigned int len = min(skb->len - i, 32U);
++
++		hex_dump_to_buffer(&skb->data[i], len, 32, 1, buffer,
++				   sizeof(buffer), false);
++		yt_dbg(priv, "  %#06x: %s\n", i, buffer);
++	}
++
++	yt_dbg(priv, "\n************** SKB dump ****************\n");
++}
++
+ static const struct net_device_ops fxgmac_netdev_ops = {
+ 	.ndo_open		= fxgmac_open,
+ };
+@@ -1889,6 +1965,327 @@ const struct net_device_ops *fxgmac_get_netdev_ops(void)
+ 	return &fxgmac_netdev_ops;
+ }
+ 
++static void fxgmac_rx_refresh(struct fxgmac_channel *channel)
++{
++	struct fxgmac_ring *ring = channel->rx_ring;
++	struct fxgmac_pdata *priv = channel->priv;
++	struct fxgmac_desc_data *desc_data;
++
++	while (ring->dirty != ring->cur) {
++		desc_data = FXGMAC_GET_DESC_DATA(ring, ring->dirty);
++
++		/* Reset desc_data values */
++		fxgmac_desc_data_unmap(priv, desc_data);
++
++		if (fxgmac_rx_buffe_map(priv, ring, desc_data))
++			break;
++
++		fxgmac_desc_rx_reset(desc_data);
++		ring->dirty =
++			FXGMAC_GET_ENTRY(ring->dirty, ring->dma_desc_count);
++	}
++
++	/* Make sure everything is written before the register write */
++	wmb();
++
++	/* Update the Rx Tail Pointer Register with address of
++	 * the last cleaned entry
++	 */
++	desc_data = FXGMAC_GET_DESC_DATA(ring, (ring->dirty - 1) &
++					 (ring->dma_desc_count - 1));
++	FXGMAC_DMA_IO_WR(channel, DMA_CH_RDTR_LO,
++			 lower_32_bits(desc_data->dma_desc_addr));
++}
++
++static struct sk_buff *fxgmac_create_skb(struct fxgmac_pdata *priv,
++					 struct napi_struct *napi,
++					 struct fxgmac_desc_data *desc_data,
++					 unsigned int len)
++{
++	unsigned int copy_len;
++	struct sk_buff *skb;
++	u8 *packet;
++
++	skb = napi_alloc_skb(napi, desc_data->rx.hdr.dma_len);
++	if (!skb)
++		return NULL;
++
++	/* Start with the header buffer which may contain just the header
++	 * or the header plus data
++	 */
++	dma_sync_single_range_for_cpu(priv->dev, desc_data->rx.hdr.dma_base,
++				      desc_data->rx.hdr.dma_off,
++				      desc_data->rx.hdr.dma_len,
++				      DMA_FROM_DEVICE);
++
++	packet = page_address(desc_data->rx.hdr.pa.pages) +
++		 desc_data->rx.hdr.pa.pages_offset;
++	copy_len = min(desc_data->rx.hdr.dma_len, len);
++	skb_copy_to_linear_data(skb, packet, copy_len);
++	skb_put(skb, copy_len);
++
++	return skb;
++}
++
++static int fxgmac_tx_poll(struct fxgmac_channel *channel)
++{
++	struct fxgmac_pdata *priv = channel->priv;
++	unsigned int cur, tx_packets = 0, tx_bytes = 0;
++	struct fxgmac_ring *ring = channel->tx_ring;
++	struct net_device *netdev = priv->netdev;
++	struct fxgmac_desc_data *desc_data;
++	struct fxgmac_dma_desc *dma_desc;
++	struct netdev_queue *txq;
++	int processed = 0;
++
++	/* Nothing to do if there isn't a Tx ring for this channel */
++	if (!ring)
++		return 0;
++
++	if (ring->cur != ring->dirty && (netif_msg_tx_done(priv)))
++		yt_dbg(priv, "%s, ring_cur=%d,ring_dirty=%d,qIdx=%d\n",
++		       __func__, ring->cur, ring->dirty, channel->queue_index);
++
++	cur = ring->cur;
++
++	/* Be sure we get ring->cur before accessing descriptor data */
++	smp_rmb();
++
++	txq = netdev_get_tx_queue(netdev, channel->queue_index);
++	while (ring->dirty != cur) {
++		desc_data = FXGMAC_GET_DESC_DATA(ring, ring->dirty);
++		dma_desc = desc_data->dma_desc;
++
++		if (!fxgmac_is_tx_complete(dma_desc))
++			break;
++
++		/* Make sure descriptor fields are read after reading
++		 * the OWN bit
++		 */
++		dma_rmb();
++
++		if (netif_msg_tx_done(priv))
++			fxgmac_dump_tx_desc(priv, ring, ring->dirty, 1, 0);
++
++		if (fxgmac_is_last_desc(dma_desc)) {
++			tx_packets += desc_data->tx.packets;
++			tx_bytes += desc_data->tx.bytes;
++		}
++
++		/* Free the SKB and reset the descriptor for re-use */
++		fxgmac_desc_data_unmap(priv, desc_data);
++		fxgmac_desc_tx_reset(desc_data);
++
++		processed++;
++		ring->dirty =
++			FXGMAC_GET_ENTRY(ring->dirty, ring->dma_desc_count);
++	}
++
++	if (!processed)
++		return 0;
++
++	netdev_tx_completed_queue(txq, tx_packets, tx_bytes);
++
++	/* Make sure ownership is written to the descriptor */
++	smp_wmb();
++	if (ring->tx.queue_stopped == 1 &&
++	    (fxgmac_desc_tx_avail(ring) > FXGMAC_TX_DESC_MIN_FREE)) {
++		ring->tx.queue_stopped = 0;
++		netif_tx_wake_queue(txq);
++	}
++
++	return processed;
++}
++
++static int fxgmac_one_poll_tx(struct napi_struct *napi, int budget)
++{
++	struct fxgmac_channel *channel =
++		container_of(napi, struct fxgmac_channel, napi_tx);
++	struct fxgmac_pdata *priv = channel->priv;
++	int ret;
++
++	ret = fxgmac_tx_poll(channel);
++	if (napi_complete_done(napi, 0))
++		fxgmac_enable_msix_one_irq(priv, MSI_ID_TXQ0);
++
++	return ret;
++}
++
++static unsigned int fxgmac_desc_rx_dirty(struct fxgmac_ring *ring)
++{
++	unsigned int dirty;
++
++	if (ring->dirty <= ring->cur)
++		dirty = ring->cur - ring->dirty;
++	else
++		dirty = ring->dma_desc_count - ring->dirty + ring->cur;
++
++	return dirty;
++}
++
++static int fxgmac_rx_poll(struct fxgmac_channel *channel, int budget)
++{
++	struct fxgmac_pdata *priv = channel->priv;
++	struct fxgmac_ring *ring = channel->rx_ring;
++	struct net_device *netdev = priv->netdev;
++	u32 context_next, context, incomplete;
++	struct fxgmac_desc_data *desc_data;
++	struct fxgmac_pkt_info *pkt_info;
++	struct napi_struct *napi;
++	u32 len, max_len;
++	int packet_count = 0;
++
++	struct sk_buff *skb;
++
++	/* Nothing to do if there isn't a Rx ring for this channel */
++	if (!ring)
++		return 0;
++
++	napi = (priv->per_channel_irq) ? &channel->napi_rx : &priv->napi;
++	pkt_info = &ring->pkt_info;
++
++	while (packet_count < budget) {
++		memset(pkt_info, 0, sizeof(*pkt_info));
++		skb = NULL;
++		len = 0;
++
++read_again:
++		desc_data = FXGMAC_GET_DESC_DATA(ring, ring->cur);
++
++		if (fxgmac_desc_rx_dirty(ring) > FXGMAC_RX_DESC_MAX_DIRTY)
++			fxgmac_rx_refresh(channel);
++
++		if (fxgmac_dev_read(channel))
++			break;
++
++		ring->cur = FXGMAC_GET_ENTRY(ring->cur, ring->dma_desc_count);
++		incomplete = FXGMAC_GET_BITS(pkt_info->attr, ATTR_RX, INCOMPLETE);
++		context_next = FXGMAC_GET_BITS(pkt_info->attr, ATTR_RX, CONTEXT_NEXT);
++		context = FXGMAC_GET_BITS(pkt_info->attr, ATTR_RX, CONTEXT);
++
++		if (incomplete || context_next)
++			goto read_again;
++
++		if (pkt_info->errors) {
++			dev_kfree_skb(skb);
++			priv->netdev->stats.rx_dropped++;
++			yt_err(priv, "error in received packet\n");
++			goto next_packet;
++		}
++
++		if (!context) {
++			len = desc_data->rx.len;
++			if (len == 0) {
++				if (net_ratelimit())
++					yt_err(priv,
++					       "A packet of length 0 was received\n");
++				priv->netdev->stats.rx_length_errors++;
++				priv->netdev->stats.rx_dropped++;
++				goto next_packet;
++			}
++
++			if (len && !skb) {
++				skb = fxgmac_create_skb(priv, napi, desc_data,
++							len);
++				if (unlikely(!skb)) {
++					if (net_ratelimit())
++						yt_err(priv,
++						       "create skb err\n");
++					priv->netdev->stats.rx_dropped++;
++					goto next_packet;
++				}
++			}
++			max_len = netdev->mtu + ETH_HLEN;
++			if (!(netdev->features & NETIF_F_HW_VLAN_CTAG_RX) &&
++			    skb->protocol == htons(ETH_P_8021Q))
++				max_len += VLAN_HLEN;
++
++			if (len > max_len) {
++				if (net_ratelimit())
++					yt_err(priv,
++					       "len %d larger than max size %d\n",
++					       len, max_len);
++				priv->netdev->stats.rx_length_errors++;
++				priv->netdev->stats.rx_dropped++;
++				dev_kfree_skb(skb);
++				goto next_packet;
++			}
++		}
++
++		if (!skb) {
++			priv->netdev->stats.rx_dropped++;
++			goto next_packet;
++		}
++
++		if (netif_msg_pktdata(priv))
++			fxgmac_dbg_pkt(priv, skb, false);
++
++		skb_checksum_none_assert(skb);
++		if (netdev->features & NETIF_F_RXCSUM)
++			skb->ip_summed = CHECKSUM_UNNECESSARY;
++
++		if (FXGMAC_GET_BITS(pkt_info->attr, ATTR_RX, VLAN_CTAG))
++			__vlan_hwaccel_put_tag(skb, htons(ETH_P_8021Q),
++					       pkt_info->vlan_ctag);
++
++		if (FXGMAC_GET_BITS(pkt_info->attr, ATTR_RX, RSS_HASH))
++			skb_set_hash(skb, pkt_info->rss_hash,
++				     pkt_info->rss_hash_type);
++
++		skb->dev = netdev;
++		skb->protocol = eth_type_trans(skb, netdev);
++		skb_record_rx_queue(skb, channel->queue_index);
++		napi_gro_receive(napi, skb);
++
++next_packet:
++		packet_count++;
++		priv->netdev->stats.rx_packets++;
++		priv->netdev->stats.rx_bytes += len;
++	}
++
++	return packet_count;
++}
++
++static int fxgmac_one_poll_rx(struct napi_struct *napi, int budget)
++{
++	struct fxgmac_channel *channel =
++		container_of(napi, struct fxgmac_channel, napi_rx);
++	int processed = fxgmac_rx_poll(channel, budget);
++
++	if (processed < budget && (napi_complete_done(napi, processed)))
++		fxgmac_enable_msix_one_irq(channel->priv, channel->queue_index);
++
++	return processed;
++}
++
++static int fxgmac_all_poll(struct napi_struct *napi, int budget)
++{
++	struct fxgmac_channel *channel;
++	struct fxgmac_pdata *priv;
++	int processed = 0;
++
++	priv = container_of(napi, struct fxgmac_pdata, napi);
++	do {
++		channel = priv->channel_head;
++		/* Only support 1 tx channel, poll ch 0. */
++		fxgmac_tx_poll(priv->channel_head + 0);
++		for (u32 i = 0; i < priv->channel_count; i++, channel++)
++			processed += fxgmac_rx_poll(channel, budget);
++	} while (false);
++
++	/* If we processed everything, we are done */
++	if (processed < budget) {
++		/* Turn off polling */
++		if (napi_complete_done(napi, processed))
++			fxgmac_enable_mgm_irq(priv);
++	}
++
++	if ((processed) && (netif_msg_rx_status(priv)))
++		yt_dbg(priv, "%s, received : %d\n", __func__, processed);
++
++	return processed;
++}
++
+ static void napi_add_enable(struct fxgmac_pdata *priv, struct napi_struct *napi,
+ 			    int (*poll)(struct napi_struct *, int),
+ 			    u32 flag_pos)
 -- 
 2.34.1
 
