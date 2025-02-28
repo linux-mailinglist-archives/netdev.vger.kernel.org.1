@@ -1,146 +1,140 @@
-Return-Path: <netdev+bounces-170758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62770A49C9F
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 16:01:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 179F3A49CB0
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 16:03:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10B8C7A6C3A
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 15:00:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D33F3B9F2E
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 15:02:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 824E32755E5;
-	Fri, 28 Feb 2025 14:59:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 628911EF383;
+	Fri, 28 Feb 2025 15:02:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=squebb.ca header.i=@squebb.ca header.b="NUxlybCl";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="DuTvYExH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kO/YnkT1"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC4EE270EA9;
-	Fri, 28 Feb 2025 14:59:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC701EF363;
+	Fri, 28 Feb 2025 15:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740754770; cv=none; b=ZJJJGb+rxHZAL2ZWYeW5CBeyQ5+OkthblGAbjC1K6V4tTqbC32v1EPXFid0hjuFYFOzwVgvIpxx345MQEX6VYgQJXfeoWyl9Qa78TkH0rg1Svsg5w54YPvQe+9tsz1aOF9gVASasYP1PDt0JgJJhOC1jXwBbevIbO3Ly7UZloJ0=
+	t=1740754938; cv=none; b=LigcuBSbqjd27C4kEFNctNsLX+33TEZWuhOZD3K/lkdBlfwpToSyLoSVwfDmqQ19ujatrCWVmlNx9IXFMDBcFH0ApqfWbNN0IBGuZjNeSRmUnwlXcWQ3ElR3ry4mAEp6+h4zDhoQmwMD8wY6AT8ebSljhmsMzvZaJsbqrHSkDog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740754770; c=relaxed/simple;
-	bh=MR+6e54mvrr55U2P4InC/IkkhvtYltb38oGdqZ14wLA=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=m9XzIdI3fTYusz6C22b1qLAjiZWu1//eXXmckF9un65oJamhE3dQEXUgUfR55R8Dh5VItfswcPbIb/GlWhuEgn+updrj/776OGCioE99h0xv9jm7vpQlH4Z911k98pvrdUhIBRDn4KpaOTxf5nnIr2VfcSlIKW88qRHwetzAuLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=squebb.ca; spf=pass smtp.mailfrom=squebb.ca; dkim=pass (2048-bit key) header.d=squebb.ca header.i=@squebb.ca header.b=NUxlybCl; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=DuTvYExH; arc=none smtp.client-ip=202.12.124.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=squebb.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=squebb.ca
-Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
-	by mailfout.stl.internal (Postfix) with ESMTP id 7CC3911401A1;
-	Fri, 28 Feb 2025 09:59:26 -0500 (EST)
-Received: from phl-imap-10 ([10.202.2.85])
-  by phl-compute-06.internal (MEProxy); Fri, 28 Feb 2025 09:59:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=squebb.ca; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1740754766;
-	 x=1740841166; bh=SkKwIhvnfqN2r+QHSzxVSlp38AINO68uiTWQnDmFEaM=; b=
-	NUxlybClqhUUMJKEhwaSw9gahKPK/yi6cKqYkNcj/Z+SSv9EMtvrT81Z4JL7ujhl
-	4AtjvgXLqUMFGCYCTNWhsz6/pJSQp2GeaI41UMV18cW2LEXgqZfEBZn8LSbsHvgC
-	FjUv9D5DQtBnLxcpHyvtCzY+XIGVuSINivBhq4O1w6k50IpUFLNUGuEvnqZQ7wIT
-	QPgQ6BzSG3/qvr5a/N6Vz3sY0sDVfHjHjVR4O5vYElyIGwI96Q+CFFYxOXDm4VgN
-	mLGc089/E6fH5gqtzg3SZeCp/JCD0VV2Hbjt0tbvCEVeOdAXS4C8myyHFkoSvPFP
-	erFxVBVBfdEG8fqxySdCyQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1740754766; x=
-	1740841166; bh=SkKwIhvnfqN2r+QHSzxVSlp38AINO68uiTWQnDmFEaM=; b=D
-	uTvYExHaNIlUxU7caUsluXfPuLmeoLKJSy/k2F4mwCS/aeRiFiwUcQAnfO/YRN7Q
-	yAFVHY6hofkLpcP60hihjYTFciaZ1TEXUaBdPH5sVTUxdP/QPpuJGHiTxmaxw64J
-	vd2IYBrSEKzeUr5sSVe3fnBi6eMnw4AT04r6qXZ/QDKUbwaMoLwqZsuqHvhApWbL
-	CYHRLLqh58fllgFGiUHHfvMFQsVjbhr3hc7JhX9z1bcTyu8VUWyA5ubSM0cUgDVx
-	6AxsZ0nWxooV813ipSlyU0Ai/8N2yP+XB/ftSCVZDlWJbxObPMOl+KjDKrcjvCCV
-	tL792Fv0D/su1FvXqEjxw==
-X-ME-Sender: <xms:Tc_BZyRfJVovarecw5r84IZmVCOkEtAzwaudCPx7n957vpFzvXqivA>
-    <xme:Tc_BZ3z2iSoFyu7rOZ5oiwqIRzK74GsQRpfJ8kFBFJL93O9ZDDe5zaHHtk2k8iWku
-    cwmzQQ9RR9vAY4BwUw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeltdeilecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpefoggffhffvvefkjghfufgtgfesthejredtredt
-    tdenucfhrhhomhepfdforghrkhcurfgvrghrshhonhdfuceomhhpvggrrhhsohhnqdhlvg
-    hnohhvohesshhquhgvsggsrdgtrgeqnecuggftrfgrthhtvghrnhephfeuvdehteeghedt
-    hedtveehuddvjeejgffgieejvdegkefhfeelheekhedvffehnecuvehluhhsthgvrhfuih
-    iivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepmhhpvggrrhhsohhnqdhlvghnohhv
-    ohesshhquhgvsggsrdgtrgdpnhgspghrtghpthhtohepuddupdhmohguvgepshhmthhpoh
-    huthdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthht
-    ohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopegrnhhthhhonh
-    ihrdhlrdhnghhuhigvnhesihhnthgvlhdrtghomhdprhgtphhtthhopehprhiivghmhihs
-    lhgrfidrkhhithhsiigvlhesihhnthgvlhdrtghomhdprhgtphhtthhopehkuhgsrgeskh
-    gvrhhnvghlrdhorhhgpdhrtghpthhtohepihhnthgvlhdqfihirhgvugdqlhgrnheslhhi
-    shhtshdrohhsuhhoshhlrdhorhhgpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvh
-    eslhhunhhnrdgthhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphht
-    thhopehprggsvghnihesrhgvughhrghtrdgtohhm
-X-ME-Proxy: <xmx:Tc_BZ_2y4ckCx23_IJtJSJpM74WixsElSA9JsqF9gxnoE7Nz6sq2XA>
-    <xmx:Tc_BZ-DvB2iQbtIdAdbNTYviTfRMepNlnuC5QywMZSEBire0mHM5yA>
-    <xmx:Tc_BZ7gmqAu6cVv3Ovw99YRgaLlNVQW2Q4rT_1FFMzfr_NxdV__vpA>
-    <xmx:Tc_BZ6po6MsSJ-Hj_N1N9AtyH3dnMYZWBa70Dpir5wb33eJHrHSOMA>
-    <xmx:Ts_BZwbXxWGU-98a7GoEX06bG8wLsWjZi7oeM-MOl_g2BOX1Tf9Ju4vd>
-Feedback-ID: ibe194615:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 85C9D3C0066; Fri, 28 Feb 2025 09:59:25 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1740754938; c=relaxed/simple;
+	bh=Fr0Kcp6QDqAQkV+lMeqmYBHQenokCWygdszblwnmvIg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Y60wuD23s8OIInHH7lISepnVDys3y+sxu6IHk+KFdDH2yLooIb96AblME/WKpUxSMvfUBbIP5OqUgCXCef5+71Q5Wy0Op/oLBgMuoYrVvDsVSTRNFsSJFRTlssFr5vaZgO0D18DhF/xkXIXQ3TC5hN1kFcqeIwPXvUqG8X85rdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kO/YnkT1; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-6f4bc408e49so20550757b3.1;
+        Fri, 28 Feb 2025 07:02:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740754934; x=1741359734; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QU4BPFF3iVqQaLnqO+lftu/JhDH2027oRJaOrlL5uEk=;
+        b=kO/YnkT1QNyhal6sCBJiDwzwDJ0+xQ+PkPuxGgnPIRl/Vlm1ANXckoprHGmh+PKSPJ
+         4X46by8EwqDPibkrQj3LhpnTiA3jRWt5iODgI0SXRR6SIztBRSkUfej/+AHfxj/CqtXA
+         TH3k/YhwGETfrr8GZocwiTflc0RqIv4APBCZCC6795e6Yp/ZZ+7Pef/yRd7yIwKWe6Zv
+         hnYvzDvS7F2DR5MoTA6RS4GhYY32u0tyVFy7r4+TsduAikM4gYyZVMYOZbkgBTCFvUOL
+         ugWNVUoCkd0Ry2ZmFJ9b0zHTbw9ZhFC/akxqIk1AQ0uHQ0I9qYCuXkikI3wJEgYNzHmQ
+         uboQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740754934; x=1741359734;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QU4BPFF3iVqQaLnqO+lftu/JhDH2027oRJaOrlL5uEk=;
+        b=V2kwB1pkb569wNhjyLvDfFE+SVEOuvB1vKYxSViNzfCYHoFSL5pBABGiz4NPZMTb9t
+         0utfXN9cbn/MxwQdrau41p/MToPXQYEo2I8JAlF3hDw7PbqPoo9VhZbbu9oQlRGMwBOg
+         bW7ir1jEJctpMxnuGMWVYJfVdrk2sd8+fiwu3/YpkZzTebQZn3tQeqemgK+/QWvKAMaM
+         kZMG0qHG7P5rxJoz7UwN49zv7ymVGHHLfQVPuR65tqQbyUQwdt15vHlUBvlup8yemYOm
+         yV69FZ9DgxcIJ5WcVi5N9PihLb48PSRC1HgnCXIKALDLSB06Tm0Puy3sCB3UxaHizKww
+         etLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVx0GiUCGiEoYdYfsqNAdos4OAt3L9YjxYMNxnmY5bPiV7Y4SAj7qh9GsI8+QXOqe79sKf+LQnvSU3sDjg=@vger.kernel.org, AJvYcCWoHq3+HfRIAAnyJrxDjKOmQ0OxhcZhErdCXW/uLzEoPk9InbixVficgdJDzyFX4Vx/mjGohu9t@vger.kernel.org, AJvYcCXmTregfjYiiKzlZfg7EZFKvifJeGyV8b45TPkgRnzyiMUL1sfNV0f8Gc9vFLH6p/ZryfrBvjCk@vger.kernel.org
+X-Gm-Message-State: AOJu0YwEQ4QgKSnvCuZUZl1f8vyqFa/Hwo7PTmHwnlNBUgfgm8/r9+IU
+	IEefB5115G1bO5rgmamNahmO1SUbQurMkIMfGf/ULMgU/dbCVUul
+X-Gm-Gg: ASbGncsZflKwZU20yEGrZvlQVTSkcbHKLp4r59gIwgDHV2eumaL1MqHAppKwQ19vmBi
+	8B48JVRSK0YrX8Jle6bLgxHfqkGpsRsBKP5nWeN4dAQ6zdKv7VMoOj886oXpJcgXywI5w46PZvI
+	m4cQ5W0sch7Bs37QaxCW5UouKbFLGb4tt86zcdW9y9hUiCtPs+gBs7fqM88P9xd2FsLFG3DJcBO
+	U36GIvudn0sMZxk2cNKQz69PXgz45U86CfAMeaXJqNX+NsG0v8Ljnmuj4mSyy6UIEFsq2e9dY4m
+	CJx+ahd8Q9MqO65JIvIG599TWQDD72MvzGhmhKdOLPkE/I9O
+X-Google-Smtp-Source: AGHT+IEaKtUsiUXwdolE2DT2oFTOm0jau+e7kIBoYGtLYSYVGhb/VMQmuizvHERwzhKgYu84pFAY1Q==
+X-Received: by 2002:a05:690c:4b02:b0:6f9:8605:ec98 with SMTP id 00721157ae682-6fd4a1b5b85mr50874637b3.28.1740754934205;
+        Fri, 28 Feb 2025 07:02:14 -0800 (PST)
+Received: from newman.cs.purdue.edu ([128.10.127.250])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6fd3ca43145sm7575227b3.33.2025.02.28.07.02.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Feb 2025 07:02:13 -0800 (PST)
+From: Jiasheng Jiang <jiashengjiangcool@gmail.com>
+To: przemyslaw.kitszel@intel.com
+Cc: arkadiusz.kubalewski@intel.com,
+	davem@davemloft.net,
+	jan.glaza@intel.com,
+	jiashengjiangcool@gmail.com,
+	jiri@resnulli.us,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	stable@vger.kernel.org,
+	vadim.fedorenko@linux.dev
+Subject: [PATCH v4 net-next] dpll: Add an assertion to check freq_supported_num
+Date: Fri, 28 Feb 2025 15:02:10 +0000
+Message-Id: <20250228150210.34404-1-jiashengjiangcool@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Fri, 28 Feb 2025 09:59:05 -0500
-From: "Mark Pearson" <mpearson-lenovo@squebb.ca>
-To: "Andrew Lunn" <andrew@lunn.ch>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <9f460418-99c6-49f9-ac2c-7a957f781e17@app.fastmail.com>
-In-Reply-To: <1a4ed373-9d27-4f4b-9e75-9434b4f5cad9@lunn.ch>
-References: <mpearson-lenovo@squebb.ca>
- <20250226194422.1030419-1-mpearson-lenovo@squebb.ca>
- <36ae9886-8696-4f8a-a1e4-b93a9bd47b2f@lunn.ch>
- <50d86329-98b1-4579-9cf1-d974cf7a748d@app.fastmail.com>
- <1a4ed373-9d27-4f4b-9e75-9434b4f5cad9@lunn.ch>
-Subject: Re: [PATCH] e1000e: Link flap workaround option for false IRP events
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Andrew
+Since the driver is broken in the case that src->freq_supported is not
+NULL but src->freq_supported_num is 0, add an assertion for it.
 
-On Thu, Feb 27, 2025, at 11:07 AM, Andrew Lunn wrote:
->> >> +			e1e_rphy(hw, PHY_REG(772, 26), &phy_data);
->> >
->> > Please add some #define for these magic numbers, so we have some idea
->> > what PHY register you are actually reading. That in itself might help
->> > explain how the workaround actually works.
->> >
->> 
->> I don't know what this register does I'm afraid - that's Intel knowledge and has not been shared.
->
-> What PHY is it? Often it is just a COTS PHY, and the datasheet might
-> be available.
->
-> Given your setup description, pause seems like the obvious thing to
-> check. When trying to debug this, did you look at pause settings?
-> Knowing what this register is might also point towards pause, or
-> something totally different.
->
-> 	Andrew
+Signed-off-by: Jiasheng Jiang <jiashengjiangcool@gmail.com>
+---
+Changelog:
 
-For the PHY - do you know a way of determining this easily? I can reach out to the platform team but that will take some time. I'm not seeing anything in the kernel logs, but if there's a recommended way of confirming that would be appreciated.
+v3 -> v4:
 
-We did look at at the pause pieces - which I agree seems like an obvious candidate given the speed mismatch on the network.
-Experts on the Intel networking team did reproduce the issue in their lab and looked at this for many weeks without determining root cause. I wish it was as obvious as pause control configuration :)
+1. Add return after WARN_ON().
 
-Thanks
-Mark
+v2 -> v3:
+
+1. Add "net-next" to the subject.
+2. Remove the "Fixes" tag and "Cc: stable".
+3. Replace BUG_ON with WARN_ON.
+
+v1 -> v2:
+
+1. Replace the check with an assertion.
+---
+ drivers/dpll/dpll_core.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
+index 32019dc33cca..940c26b9dd53 100644
+--- a/drivers/dpll/dpll_core.c
++++ b/drivers/dpll/dpll_core.c
+@@ -443,8 +443,11 @@ static void dpll_pin_prop_free(struct dpll_pin_properties *prop)
+ static int dpll_pin_prop_dup(const struct dpll_pin_properties *src,
+ 			     struct dpll_pin_properties *dst)
+ {
++	if (WARN_ON(src->freq_supported && !src->freq_supported_num))
++		return -EINVAL;
++
+ 	memcpy(dst, src, sizeof(*dst));
+-	if (src->freq_supported && src->freq_supported_num) {
++	if (src->freq_supported) {
+ 		size_t freq_size = src->freq_supported_num *
+ 				   sizeof(*src->freq_supported);
+ 		dst->freq_supported = kmemdup(src->freq_supported,
+-- 
+2.25.1
+
 
