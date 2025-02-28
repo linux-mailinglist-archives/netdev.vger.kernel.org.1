@@ -1,71 +1,74 @@
-Return-Path: <netdev+bounces-170548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6953A4903F
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 05:23:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7672CA49040
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 05:24:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D00A7A461B
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 04:22:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9E0F16E878
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 04:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 732BF18FDC5;
-	Fri, 28 Feb 2025 04:23:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE507191F6C;
+	Fri, 28 Feb 2025 04:24:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="mshec9U4"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="KXHBgFPp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3DC2819
-	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 04:23:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A7D819
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 04:24:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740716625; cv=none; b=FGgvKQUZ7XkM0vXBuD/pgR8D/NsryiFXvYkMebYWC9SzIxVz97bJelI0MD2L2MkYMLQ5aDINKykaHe1eNrYEZfq2WhxsRH2syr9Le1h4jD2FrvnrJuyfu9QcGAXePfOG5w4oajVjdD63A42iu3x53WE+Y9rrXwdYy0ZjdnvKYp4=
+	t=1740716655; cv=none; b=rIgwrZe3wFt3EdSrZVnzgYhOBAazY0ZFs83B79k7C/0a+JBQProCPZ0jgnz/rWTwbyFTIFl7vGvl30y1lJLp/Ziutd1SWOwmn6AEU2ZHL/6fzIoBoH0LNldcWD0pPmEmDj+m003PC3B63VcHAIqNouVRRA+i5tRUZjAPQNtchsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740716625; c=relaxed/simple;
-	bh=jpQpvK8DVBkN4xhaJGMlHfhGs8fUgBj73uvLbJsxVSg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nkDHDeCrgIVddy9o4xz66nbozDUyiK3u7h0zSWm0im50nWOmvxxkYcuXB6P+ZHdYJbN0/EEqIl8tI+nxvyO3vSrkTU4L6zlZCijLpDzya95NcYv5Ch9Qb+RVH5XsAfLbn37VWmu+PEaE/pS2k1U/CAohkeEp6M7ILs3vog82Am4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=mshec9U4; arc=none smtp.client-ip=99.78.197.219
+	s=arc-20240116; t=1740716655; c=relaxed/simple;
+	bh=iAVUBpQ+jbWf97omJNdLKxwAIoDuxoYswIG0LDNW/DE=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qrLGVg9bQ3TxgUU7vFeS/iDeMUR62gapea4qawJMxNE3N1t6hH/JmxYGWKufPgwwnclGdAwKiN54RMbdxwKOU/+0oecvcJquXvzNBq8AAEx5jWwrmRucsixBG72bHVDL/pqiqD1QHZlnADRjq22HDhQYd3sfZ9DT5PicsMK6qrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=KXHBgFPp; arc=none smtp.client-ip=207.171.188.206
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1740716623; x=1772252623;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=H+tg/5E3LDk9s8k2g1dUELkil8mwYi7aVEsCQhQj8y0=;
-  b=mshec9U4FG9SoQyHOqmnKYc9SFD2jebDIcxFn2av1YpB2JmY7B3QxYxm
-   MOxNiguW8U56Voh3lVba6WmOKTGirYCU41JWOuek6AzcI2e5Sx50cfanV
-   7K5gKnZJMUhPlCyQQJRUJxgAiXYV32J/RT4F0DMFVmyH8PAw+5gFHBdyg
-   Y=;
+  t=1740716655; x=1772252655;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=OFS52OUXP616a1y29divC0YGpdp2orGv+IkMx8RVeS0=;
+  b=KXHBgFPpKSnlrhocitf3G9OePXG2WCjWuGnL9G3z7yYVhF57dXqhZ9Q0
+   eiCE/6gGyOG6eKbv7RXlxpLDAoHb/zBH9f0TJ5t9Bj8sCXYo4hfvx5vtG
+   kBQjX1JDGTWCLCfFhnPrYyr5E2YyUurAhGXuoyBOj1XaXSbJ0Qb4YRTHw
+   4=;
 X-IronPort-AV: E=Sophos;i="6.13,321,1732579200"; 
-   d="scan'208";a="173990387"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2025 04:23:42 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:54863]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.55.141:2525] with esmtp (Farcaster)
- id a07c7e8f-4a1e-4c0d-91fb-e55af0ac1a9c; Fri, 28 Feb 2025 04:23:41 +0000 (UTC)
-X-Farcaster-Flow-ID: a07c7e8f-4a1e-4c0d-91fb-e55af0ac1a9c
+   d="scan'208";a="802802666"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2025 04:24:09 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:23690]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.35.58:2525] with esmtp (Farcaster)
+ id ff8717d5-1971-4da3-8e8e-60e31bf7c6e4; Fri, 28 Feb 2025 04:24:08 +0000 (UTC)
+X-Farcaster-Flow-ID: ff8717d5-1971-4da3-8e8e-60e31bf7c6e4
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 28 Feb 2025 04:23:41 +0000
+ Fri, 28 Feb 2025 04:24:06 +0000
 Received: from 6c7e67bfbae3.amazon.com (10.106.101.51) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 28 Feb 2025 04:23:38 +0000
+ Fri, 28 Feb 2025 04:24:03 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
  Abeni" <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v3 net-next 00/12] ipv4: fib: Convert RTM_NEWROUTE and RTM_DELROUTE to per-netns RTNL.
-Date: Thu, 27 Feb 2025 20:23:16 -0800
-Message-ID: <20250228042328.96624-1-kuniyu@amazon.com>
+Subject: [PATCH v3 net-next 01/12] ipv4: fib: Use cached net in fib_inetaddr_event().
+Date: Thu, 27 Feb 2025 20:23:17 -0800
+Message-ID: <20250228042328.96624-2-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250228042328.96624-1-kuniyu@amazon.com>
+References: <20250228042328.96624-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,51 +77,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWB003.ant.amazon.com (10.13.139.157) To
+X-ClientProxiedBy: EX19D036UWC004.ant.amazon.com (10.13.139.205) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Patch 1 is misc cleanup.
-Patch 2 ~ 8 converts two fib_info hash tables to per-netns.
-Patch 9 ~ 12 converts rtnl_lock() to rtnl_net_lcok().
+net is available in fib_inetaddr_event(), let's use it.
 
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: David Ahern <dsahern@kernel.org>
+---
+ net/ipv4/fib_frontend.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Changes:
-  v3:
-    * Add Eric's and David's tags
-    * Patch 2
-      * Use kvcalloc() instead of kvmalloc_array(, __GFP_ZERO)
-
-  v2: https://lore.kernel.org/netdev/20250226192556.21633-1-kuniyu@amazon.com/
-    * Add Eric's tag except for patch 3 (due to a minor change for exit_batch())
-    * Patch 3
-      * Fix memleak by calling fib4_semantics_exit() properly
-      * Move fib4_semantics_exit() to fib_net_exit_batch()
-
-  v1: https://lore.kernel.org/netdev/20250225182250.74650-1-kuniyu@amazon.com/
-
-
-Kuniyuki Iwashima (12):
-  ipv4: fib: Use cached net in fib_inetaddr_event().
-  ipv4: fib: Allocate fib_info_hash[] and fib_info_laddrhash[] by
-    kvcalloc().
-  ipv4: fib: Allocate fib_info_hash[] during netns initialisation.
-  ipv4: fib: Make fib_info_hashfn() return struct hlist_head.
-  ipv4: fib: Remove fib_info_laddrhash pointer.
-  ipv4: fib: Remove fib_info_hash_size.
-  ipv4: fib: Add fib_info_hash_grow().
-  ipv4: fib: Namespacify fib_info hash tables.
-  ipv4: fib: Hold rtnl_net_lock() for ip_fib_net_exit().
-  ipv4: fib: Hold rtnl_net_lock() in ip_rt_ioctl().
-  ipv4: fib: Move fib_valid_key_len() to rtm_to_fib_config().
-  ipv4: fib: Convert RTM_NEWROUTE and RTM_DELROUTE to per-netns RTNL.
-
- include/net/ip_fib.h     |   2 +
- include/net/netns/ipv4.h |   3 +
- net/ipv4/fib_frontend.c  |  74 ++++++++++----
- net/ipv4/fib_semantics.c | 206 +++++++++++++++++++--------------------
- net/ipv4/fib_trie.c      |  22 -----
- 5 files changed, 159 insertions(+), 148 deletions(-)
-
+diff --git a/net/ipv4/fib_frontend.c b/net/ipv4/fib_frontend.c
+index 272e42d81323..6730e2034cf8 100644
+--- a/net/ipv4/fib_frontend.c
++++ b/net/ipv4/fib_frontend.c
+@@ -1450,7 +1450,7 @@ static int fib_inetaddr_event(struct notifier_block *this, unsigned long event,
+ 		fib_sync_up(dev, RTNH_F_DEAD);
+ #endif
+ 		atomic_inc(&net->ipv4.dev_addr_genid);
+-		rt_cache_flush(dev_net(dev));
++		rt_cache_flush(net);
+ 		break;
+ 	case NETDEV_DOWN:
+ 		fib_del_ifaddr(ifa, NULL);
+@@ -1461,7 +1461,7 @@ static int fib_inetaddr_event(struct notifier_block *this, unsigned long event,
+ 			 */
+ 			fib_disable_ip(dev, event, true);
+ 		} else {
+-			rt_cache_flush(dev_net(dev));
++			rt_cache_flush(net);
+ 		}
+ 		break;
+ 	}
 -- 
 2.39.5 (Apple Git-154)
 
