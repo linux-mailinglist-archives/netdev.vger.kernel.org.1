@@ -1,80 +1,81 @@
-Return-Path: <netdev+bounces-170589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B172EA492AB
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 09:01:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 95578A492B2
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 09:02:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 691867AA08E
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 07:59:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C31117A9691
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 07:59:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CF3E1DE3BC;
-	Fri, 28 Feb 2025 07:59:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0F341DE4FE;
+	Fri, 28 Feb 2025 07:59:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="LLGd/1b4"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="upbCXgDT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 621D01DE3A8
-	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 07:59:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 707A41DE4F8
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 07:59:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740729549; cv=none; b=Gp0HIyrvGsfcC6jgABE7hVl2cZnOkpyh0c4J45Gon8SNvsw8W9LSP0qAg574KiKrlYCkbgzXHE59JUSn/3Is+bI2wh742ug2237Hp6TU5boCTwGewJ378hMq6tuxwmjoSfCMkSc8fL3/6IfaW4FB++WxnE6HPohPjUNZH9CwPNw=
+	t=1740729555; cv=none; b=Kl3ikTcpDV0hPvdpO63bbfjM43nnAy4e5O+r1XAxtU8LCS5j0ke9V2OUEKL32uAgxcNQgRYuno9E5CI/GJFdaco9p1IbNdekNpQF9rtgGECMHrPM3altgeD3wh6fF9keIpupG9gOKZbF5qlo7FVrzRppLhkPXPl45eVpP259yCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740729549; c=relaxed/simple;
-	bh=9YjLGgOgxjd7KI1w2ki+88OGAWpCNcVzyGfWquchPGU=;
+	s=arc-20240116; t=1740729555; c=relaxed/simple;
+	bh=6JPnLhL8s35dB03n039XAvB3PJPp3xjiscDs8gfFdqE=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To; b=t3NoWD3BXqJtCCZN3WABZ2YvEQuO+P0gmpOXNB0ahdDTIrN8mN8qE9GkGDeaSLbFTWpU9giQcrwtgnD8f8+/m+9wnHBz4pPJNA2ucONNKoMSd9N59Lb8Eft14RZU4HQ8Q4+c9BKnaCWczJfOpawV1a/klGHhx2QXQYy7Sorle+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=LLGd/1b4; arc=none smtp.client-ip=209.85.214.181
+	 In-Reply-To:To; b=bkPCMowPC/Y4JL/3WNI6ftY1a4hzpUwW4zhKEHntzUSWzidCzJ/QlbtC8PKIfxpGak2AcfBPEqdTI13ulK8tRxc5wl5HmlK5YIE+cnOxxLjT0f7xdlZNTL8LyMAbO4cWPWheaXlMsoOzD0PcbNW2hsd2Rm5p+0ya/5GpPHPmAhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=upbCXgDT; arc=none smtp.client-ip=209.85.214.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2211cd4463cso34899025ad.2
-        for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 23:59:07 -0800 (PST)
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2210d92292eso47441495ad.1
+        for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 23:59:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1740729546; x=1741334346; darn=vger.kernel.org;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1740729554; x=1741334354; darn=vger.kernel.org;
         h=to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=b/qC0mfXfemQxtgPVvB5yWxcCoCf7wtW10EiI7eK4rY=;
-        b=LLGd/1b4J9e4rManhKFvZWbYz35lmXm5B8/zJ0dap34sVWV74mA0vWpm3JEIBssRyF
-         2DE66JUdaglylRMcVPJxpB/sOkSFwXx8YY9DFshINZ2SUeG/RJEBpIs/5ZEiwcEqmaFW
-         epN0oFbsDMmppAdnnQCoKFS6dYo4HGcAubgEdNGpyov1sNL61TWjapPXex1zEGdF7RH9
-         fIrqRp04UbTT7Bfv/3vyPkspHi6nUnUYvXm39JB28NP++FqUSVk4OPJf/HPJysGkigvf
-         sjQn1YXWynuttmjcCgtefvnORzcowYg0jZKE92jAyjQPBq7chezZj67ab+ZHX5XanuLU
-         ZZRQ==
+        bh=hY0V7oey/1irsg/oxeJVyzd/IX234qFLR74EBUPiqoM=;
+        b=upbCXgDTP3jqAxSxFR5FQGqaOOBHbmAbOZCYoWeCdICddCJGAHPWV1HIB7v0kTkNSr
+         83qScXZZY+31RojPTeGtTwtVLURPvfvvFJ2zKftrbQE/0LqjMo9U7LPASggjQtxwxuT0
+         8YsOwxn/E1rfQpdwltIVbXO7X77EaEq8M2tQUsEquljGOfP5PzVhcutZjgBEepFjaYWS
+         BjkXbpMWkyDcAUe1hPQLvqxGCk6EVO6VduygeFqvIlS1kS3Jieq8nphWftrlwGKIfgbX
+         6ajth9YiJ0F7fT+i8KaomPfSaKV2MPDnwQnjh2TLjWOZs1GYYJ8EkSfj6hZY6+Z7NxXG
+         tUjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740729546; x=1741334346;
+        d=1e100.net; s=20230601; t=1740729554; x=1741334354;
         h=to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=b/qC0mfXfemQxtgPVvB5yWxcCoCf7wtW10EiI7eK4rY=;
-        b=qSqp131YokQANwls6FWO3bdBlXBqUJinZEaUs+SZQ68O6ZZfnrfl91OxdowjH7zNmb
-         io4CuOWz5Q27haYuC2cZpTF+jHrmNafzIHujYEbqO/xNwNC32wQhW1H2Lmz5uVKuCkLu
-         tx9XeVmYC/S7wlsa9PGUmgRcqQKEXuOhj+SMULl5IKI5xTE0LomQMSe8cJwSXu7+XAob
-         tejX6QOnX7vlaQAqerDZc9eyTWvnK8bYuf3oAiIS9CwZuBzjlVglczWfK2A/y4Tpno9J
-         2nP53D11i/CbnUiPeG3/uFq3fB0aQAxaURNLpPFadNDBswKnkgMcaJKWJ3jDjoqYXq2g
-         eH0g==
-X-Forwarded-Encrypted: i=1; AJvYcCXf5GHcstoslBTh0iYpkIcUHwa99GdBxS6TL6mrbqU564YQt8ArBeaiFKBuCzYVUB6QzFhU9kw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/JF7CTHHZIgXgdX0YSdJasMvUm2Cr6ZvzBHg8Y6Ks05uknUz8
-	ndfFenUvqUwMAMkWDiJ1iUZUCsH8z6d481V4Mzke0fqJpoTej9opYXesQYfXPNE=
-X-Gm-Gg: ASbGncsLcTuvuGCPzr9v/k5Zt8U5dmszwX3LObX0q7S+sZY3qpHDnktovcyQ3jbytqe
-	h+O4QRia7dw+6y83Rr2153K2pOS6+Nnwrh0+oF3sb0F4Ylpbkp03kSdDMHUbqli5sG7bu2zwkDO
-	yw5CslrtRWqwjIxucU0+bJSYyi/c6CBYzNzr481DKbjPj77e1cgCL1rvlelgSHHiQOC3lWK91dZ
-	S5ux+NnmdroQVMOrZ7uEUzkt8eJfPs8wA2xoNhanMWt+lUkVaYtrst23BpqlOJwShe0Riw9yw+h
-	iY6OWOZb9l1r+9iWdWKEdY3rnwB0og==
-X-Google-Smtp-Source: AGHT+IF1Xg+68dSCJKnZOpLjf5U8ezLtmxq9887nRnMHK8BWszc4/AKMNeey5X8hDppZM/bzXADEWQ==
-X-Received: by 2002:a05:6a21:3289:b0:1f0:e736:a92f with SMTP id adf61e73a8af0-1f2f4e17c94mr4095422637.31.1740729546642;
-        Thu, 27 Feb 2025 23:59:06 -0800 (PST)
+        bh=hY0V7oey/1irsg/oxeJVyzd/IX234qFLR74EBUPiqoM=;
+        b=NcEGBWII2SP/o5r67Uy48xmVB+zF85anYchpnHfnhY0WxGRSXhzV11+SHmw8AaFeIZ
+         S9cXoBIsR/dUd3uCXkppuwKCMsj9Z+NZZm1JeASNG4vs+2HdmWNBh6zsYCB9O47y84Kr
+         6KgT6ukb4xO0rYQeJXV2ofuKwWM/Yn/4XUXIsmRN4Y0yNbYlmYUbhdX7jXYn46i1nPD0
+         5KChSG+GdnqBlSgSrmNk8hCeqd31Ej0UTLSrxuBH2MwROjk6krktU0xoNPCJTrNJ46Fx
+         F+PdsGWCXPtwigmKJpWkLC/iqO8HcmIqP/y9C/wr1+c19Ug4FFT1pUeXCr+etgSEShBj
+         YUrA==
+X-Forwarded-Encrypted: i=1; AJvYcCVFMwy5Qk3EUjzck8dGAVn8EIZhMutwFGrvkYAmVO++9Z1z0hFviawfHX6E8Fn1Yj0Hw0WyFgU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9+fXJSe8EOX8CA+fNwoOPORuZ8+0o9jO4JKofmFZ/BiyrFQbA
+	9CFdGUOyyTGam5vfHMO2xuJvZ1fF1IXP7LfecmmXc1cKc3SDi4WLIp/GITjBsA8=
+X-Gm-Gg: ASbGnct9kxwKGJMoWEbpfnbAW8HhyDZLrLVgg6XWh3UD+DOU6Brga9msONcnWlkxMdX
+	NqvBe58s75qBy8F9ny4e6CZZSI0L1QqJooVg+norVNX6/jShlnz/jYrlbx1ZGq1INE/GGHkKV7x
+	ofrVz+XbLDDpEElnjkloYk5kr8c64ZV57xcKTJKeK1g1N9Xymik7rkomhp7Ugq5VMrEObHsQ4mO
+	FR7RLqjfNLlHpOOnngrWaMZYYBxtl9q924m/MA3RrjgxFGumvkG6jj6S2QntvAPcy+V0s34mwbs
+	Une5NUheII1TtxXHc4cz4Mpke0Wz6A==
+X-Google-Smtp-Source: AGHT+IFWTUEIr1u8c10m45czztBToHuvUxMVabSMAgvvIo/y/63jq+3tXupc/0FfOTFltv8uY5F7yQ==
+X-Received: by 2002:a17:902:ecd0:b0:220:f030:376b with SMTP id d9443c01a7336-22368f91ed0mr42335305ad.21.1740729553732;
+        Thu, 27 Feb 2025 23:59:13 -0800 (PST)
 Received: from localhost ([157.82.207.107])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-7349fe2a65asm3108342b3a.28.2025.02.27.23.59.01
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-223504c5bfesm27643365ad.131.2025.02.27.23.59.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Feb 2025 23:59:06 -0800 (PST)
+        Thu, 27 Feb 2025 23:59:13 -0800 (PST)
 From: Akihiko Odaki <akihiko.odaki@daynix.com>
-Date: Fri, 28 Feb 2025 16:58:47 +0900
-Subject: [PATCH net-next v7 1/6] virtio_net: Add functions for hashing
+Date: Fri, 28 Feb 2025 16:58:48 +0900
+Subject: [PATCH net-next v7 2/6] net: flow_dissector: Export
+ flow_keys_dissector_symmetric
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,7 +84,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250228-rss-v7-1-844205cbbdd6@daynix.com>
+Message-Id: <20250228-rss-v7-2-844205cbbdd6@daynix.com>
 References: <20250228-rss-v7-0-844205cbbdd6@daynix.com>
 In-Reply-To: <20250228-rss-v7-0-844205cbbdd6@daynix.com>
 To: Jonathan Corbet <corbet@lwn.net>, 
@@ -101,213 +102,41 @@ To: Jonathan Corbet <corbet@lwn.net>,
  Lei Yang <leiyang@redhat.com>, Akihiko Odaki <akihiko.odaki@daynix.com>
 X-Mailer: b4 0.14.2
 
-They are useful to implement VIRTIO_NET_F_RSS and
-VIRTIO_NET_F_HASH_REPORT.
+flow_keys_dissector_symmetric is useful to derive a symmetric hash
+and to know its source such as IPv4, IPv6, TCP, and UDP.
 
 Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 ---
- include/linux/virtio_net.h | 188 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 188 insertions(+)
+ include/net/flow_dissector.h | 1 +
+ net/core/flow_dissector.c    | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-index 02a9f4dc594d02372a6c1850cd600eff9d000d8d..426f33b4b82440d61b2af9fdc4c0b0d4c571b2c5 100644
---- a/include/linux/virtio_net.h
-+++ b/include/linux/virtio_net.h
-@@ -9,6 +9,194 @@
- #include <uapi/linux/tcp.h>
- #include <uapi/linux/virtio_net.h>
+diff --git a/include/net/flow_dissector.h b/include/net/flow_dissector.h
+index ced79dc8e8560e25a4dd567a04f5710b53452b45..d01c1ec77b7d21b17c14b05c47e3cdda39651bec 100644
+--- a/include/net/flow_dissector.h
++++ b/include/net/flow_dissector.h
+@@ -423,6 +423,7 @@ __be32 flow_get_u32_src(const struct flow_keys *flow);
+ __be32 flow_get_u32_dst(const struct flow_keys *flow);
  
-+struct virtio_net_hash {
-+	u32 value;
-+	u16 report;
-+};
-+
-+struct virtio_net_toeplitz_state {
-+	u32 hash;
-+	const u32 *key;
-+};
-+
-+#define VIRTIO_NET_SUPPORTED_HASH_TYPES (VIRTIO_NET_RSS_HASH_TYPE_IPv4 | \
-+					 VIRTIO_NET_RSS_HASH_TYPE_TCPv4 | \
-+					 VIRTIO_NET_RSS_HASH_TYPE_UDPv4 | \
-+					 VIRTIO_NET_RSS_HASH_TYPE_IPv6 | \
-+					 VIRTIO_NET_RSS_HASH_TYPE_TCPv6 | \
-+					 VIRTIO_NET_RSS_HASH_TYPE_UDPv6)
-+
-+#define VIRTIO_NET_RSS_MAX_KEY_SIZE 40
-+
-+static inline void virtio_net_toeplitz_convert_key(u32 *input, size_t len)
-+{
-+	while (len >= sizeof(*input)) {
-+		*input = be32_to_cpu((__force __be32)*input);
-+		input++;
-+		len -= sizeof(*input);
-+	}
-+}
-+
-+static inline void virtio_net_toeplitz_calc(struct virtio_net_toeplitz_state *state,
-+					    const __be32 *input, size_t len)
-+{
-+	while (len >= sizeof(*input)) {
-+		for (u32 map = be32_to_cpu(*input); map; map &= (map - 1)) {
-+			u32 i = ffs(map);
-+
-+			state->hash ^= state->key[0] << (32 - i) |
-+				       (u32)((u64)state->key[1] >> i);
-+		}
-+
-+		state->key++;
-+		input++;
-+		len -= sizeof(*input);
-+	}
-+}
-+
-+static inline u8 virtio_net_hash_key_length(u32 types)
-+{
-+	size_t len = 0;
-+
-+	if (types & VIRTIO_NET_HASH_REPORT_IPv4)
-+		len = max(len,
-+			  sizeof(struct flow_dissector_key_ipv4_addrs));
-+
-+	if (types &
-+	    (VIRTIO_NET_HASH_REPORT_TCPv4 | VIRTIO_NET_HASH_REPORT_UDPv4))
-+		len = max(len,
-+			  sizeof(struct flow_dissector_key_ipv4_addrs) +
-+			  sizeof(struct flow_dissector_key_ports));
-+
-+	if (types & VIRTIO_NET_HASH_REPORT_IPv6)
-+		len = max(len,
-+			  sizeof(struct flow_dissector_key_ipv6_addrs));
-+
-+	if (types &
-+	    (VIRTIO_NET_HASH_REPORT_TCPv6 | VIRTIO_NET_HASH_REPORT_UDPv6))
-+		len = max(len,
-+			  sizeof(struct flow_dissector_key_ipv6_addrs) +
-+			  sizeof(struct flow_dissector_key_ports));
-+
-+	return len + sizeof(u32);
-+}
-+
-+static inline u32 virtio_net_hash_report(u32 types,
-+					 const struct flow_keys_basic *keys)
-+{
-+	switch (keys->basic.n_proto) {
-+	case cpu_to_be16(ETH_P_IP):
-+		if (!(keys->control.flags & FLOW_DIS_IS_FRAGMENT)) {
-+			if (keys->basic.ip_proto == IPPROTO_TCP &&
-+			    (types & VIRTIO_NET_RSS_HASH_TYPE_TCPv4))
-+				return VIRTIO_NET_HASH_REPORT_TCPv4;
-+
-+			if (keys->basic.ip_proto == IPPROTO_UDP &&
-+			    (types & VIRTIO_NET_RSS_HASH_TYPE_UDPv4))
-+				return VIRTIO_NET_HASH_REPORT_UDPv4;
-+		}
-+
-+		if (types & VIRTIO_NET_RSS_HASH_TYPE_IPv4)
-+			return VIRTIO_NET_HASH_REPORT_IPv4;
-+
-+		return VIRTIO_NET_HASH_REPORT_NONE;
-+
-+	case cpu_to_be16(ETH_P_IPV6):
-+		if (!(keys->control.flags & FLOW_DIS_IS_FRAGMENT)) {
-+			if (keys->basic.ip_proto == IPPROTO_TCP &&
-+			    (types & VIRTIO_NET_RSS_HASH_TYPE_TCPv6))
-+				return VIRTIO_NET_HASH_REPORT_TCPv6;
-+
-+			if (keys->basic.ip_proto == IPPROTO_UDP &&
-+			    (types & VIRTIO_NET_RSS_HASH_TYPE_UDPv6))
-+				return VIRTIO_NET_HASH_REPORT_UDPv6;
-+		}
-+
-+		if (types & VIRTIO_NET_RSS_HASH_TYPE_IPv6)
-+			return VIRTIO_NET_HASH_REPORT_IPv6;
-+
-+		return VIRTIO_NET_HASH_REPORT_NONE;
-+
-+	default:
-+		return VIRTIO_NET_HASH_REPORT_NONE;
-+	}
-+}
-+
-+static inline void virtio_net_hash_rss(const struct sk_buff *skb,
-+				       u32 types, const u32 *key,
-+				       struct virtio_net_hash *hash)
-+{
-+	struct virtio_net_toeplitz_state toeplitz_state = { .key = key };
-+	struct flow_keys flow;
-+	struct flow_keys_basic flow_basic;
-+	u16 report;
-+
-+	if (!skb_flow_dissect_flow_keys(skb, &flow, 0)) {
-+		hash->report = VIRTIO_NET_HASH_REPORT_NONE;
-+		return;
-+	}
-+
-+	flow_basic = (struct flow_keys_basic) {
-+		.control = flow.control,
-+		.basic = flow.basic
-+	};
-+
-+	report = virtio_net_hash_report(types, &flow_basic);
-+
-+	switch (report) {
-+	case VIRTIO_NET_HASH_REPORT_IPv4:
-+		virtio_net_toeplitz_calc(&toeplitz_state,
-+					 (__be32 *)&flow.addrs.v4addrs,
-+					 sizeof(flow.addrs.v4addrs));
-+		break;
-+
-+	case VIRTIO_NET_HASH_REPORT_TCPv4:
-+		virtio_net_toeplitz_calc(&toeplitz_state,
-+					 (__be32 *)&flow.addrs.v4addrs,
-+					 sizeof(flow.addrs.v4addrs));
-+		virtio_net_toeplitz_calc(&toeplitz_state, &flow.ports.ports,
-+					 sizeof(flow.ports.ports));
-+		break;
-+
-+	case VIRTIO_NET_HASH_REPORT_UDPv4:
-+		virtio_net_toeplitz_calc(&toeplitz_state,
-+					 (__be32 *)&flow.addrs.v4addrs,
-+					 sizeof(flow.addrs.v4addrs));
-+		virtio_net_toeplitz_calc(&toeplitz_state, &flow.ports.ports,
-+					 sizeof(flow.ports.ports));
-+		break;
-+
-+	case VIRTIO_NET_HASH_REPORT_IPv6:
-+		virtio_net_toeplitz_calc(&toeplitz_state,
-+					 (__be32 *)&flow.addrs.v6addrs,
-+					 sizeof(flow.addrs.v6addrs));
-+		break;
-+
-+	case VIRTIO_NET_HASH_REPORT_TCPv6:
-+		virtio_net_toeplitz_calc(&toeplitz_state,
-+					 (__be32 *)&flow.addrs.v6addrs,
-+					 sizeof(flow.addrs.v6addrs));
-+		virtio_net_toeplitz_calc(&toeplitz_state, &flow.ports.ports,
-+					 sizeof(flow.ports.ports));
-+		break;
-+
-+	case VIRTIO_NET_HASH_REPORT_UDPv6:
-+		virtio_net_toeplitz_calc(&toeplitz_state,
-+					 (__be32 *)&flow.addrs.v6addrs,
-+					 sizeof(flow.addrs.v6addrs));
-+		virtio_net_toeplitz_calc(&toeplitz_state, &flow.ports.ports,
-+					 sizeof(flow.ports.ports));
-+		break;
-+
-+	default:
-+		hash->report = VIRTIO_NET_HASH_REPORT_NONE;
-+		return;
-+	}
-+
-+	hash->value = toeplitz_state.hash;
-+	hash->report = report;
-+}
-+
- static inline bool virtio_net_hdr_match_proto(__be16 protocol, __u8 gso_type)
+ extern struct flow_dissector flow_keys_dissector;
++extern struct flow_dissector flow_keys_dissector_symmetric;
+ extern struct flow_dissector flow_keys_basic_dissector;
+ 
+ /* struct flow_keys_digest:
+diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
+index 9cd8de6bebb543c3d672f576e03b29aa86b9d34a..32c7ee31330cf52df05d7a23b3e50d1a1bed9908 100644
+--- a/net/core/flow_dissector.c
++++ b/net/core/flow_dissector.c
+@@ -1862,7 +1862,8 @@ void make_flow_keys_digest(struct flow_keys_digest *digest,
+ }
+ EXPORT_SYMBOL(make_flow_keys_digest);
+ 
+-static struct flow_dissector flow_keys_dissector_symmetric __read_mostly;
++struct flow_dissector flow_keys_dissector_symmetric __read_mostly;
++EXPORT_SYMBOL(flow_keys_dissector_symmetric);
+ 
+ u32 __skb_get_hash_symmetric_net(const struct net *net, const struct sk_buff *skb)
  {
- 	switch (gso_type & ~VIRTIO_NET_HDR_GSO_ECN) {
 
 -- 
 2.48.1
