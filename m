@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-170806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92C45A49FF8
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 18:11:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D75CEA4A018
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 18:18:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 826E2176F32
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 17:11:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C08B7189622B
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 17:18:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF0CA1A8F9E;
-	Fri, 28 Feb 2025 17:09:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C40BC1F4C8E;
+	Fri, 28 Feb 2025 17:17:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n4hukd2V"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PwWsI0uc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6301607AC
-	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 17:09:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D8361F4C81
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 17:17:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740762583; cv=none; b=i1UUE8i+MOXDRl3RQiB5xTa/D5H9p08b5P2qIQGhp65/TtgexN/vtlKDQ8Mybvt4c6s+EcA+97o+7JFH8+azFvlKRZk/9zfGYxf0fUIi3eUT/BQ36edItAAVIqiTxa5tnPYPay5vthGygsBHVRX+vQEDmB1TnXcw8rl17wkHuak=
+	t=1740763077; cv=none; b=gvgR4SsV5K+kdaa0lEr7MFhAy4nrPBlO2KusmdvqZzdNe1/M7M4thPe9P9MUi4Ks2znQqWn1A+xoLt6+N2NIcSKk8xQnnOcDbPEPeamf77m4I11FADf23mUjTbeHDPk3exbqlpm8igrZ5xoSQ+cc4Zcqpjp35wkWCmZz4rE4nnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740762583; c=relaxed/simple;
-	bh=S9zzy7A7bNCFlFQ9EkUF9Yue0Nn9SL09FASYNBH3ceg=;
+	s=arc-20240116; t=1740763077; c=relaxed/simple;
+	bh=L5qKmW9g5UE+AbZtglGmdI2i5mIH089oEROsqANpXdI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dq54ghFxnqzxKh7W234BxCwi+nyiDVha4ROvHojLmlvNVrY/7EpsdYkydCH2xFczFNHYg8WTOdyC+Qi6nd2e026wjLrS7REjyDUO5bRYprwwd5cf2VGfA6Cc6ro9zBFDi9JMR6PbolLgmsiB32iaLMK9K6LnjHsoOeAkcLpQbGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n4hukd2V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 235BEC4CED6;
-	Fri, 28 Feb 2025 17:09:41 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=GZNuEDuK2rz7y7yAibWLLdL7yoX9/RD+7d4JYUjiKF2CjDkgJp7WQ7jVfvFy/mgPYYZZfSu1JlZgJNAyxrxUIe7eCNegZOhKot4wxUNRuktcW3wCyhgCdtCOtti6Dq4Zm44XjUMBSRMyS5M3xo5zqBaIXYaLEDXdlIURjPlMF5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PwWsI0uc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E48FC4CED6;
+	Fri, 28 Feb 2025 17:17:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740762583;
-	bh=S9zzy7A7bNCFlFQ9EkUF9Yue0Nn9SL09FASYNBH3ceg=;
+	s=k20201202; t=1740763077;
+	bh=L5qKmW9g5UE+AbZtglGmdI2i5mIH089oEROsqANpXdI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=n4hukd2VmiE1dayEMU6q9Ah/OuSfy21KtM0dx1l1XCYTS32ikeHNUa1xLtPl1c7Nb
-	 5ULoNmMkI4OJfdtX5vUIO2U8LGLyLWkAbtjwu2ZZKZLaRp5h0I5oKnC3rbuzj1Ri7v
-	 iPKF4hutb2V8H+ajOGPmKOst69/Ikc2K+5Xel7ijQLUI7oH6XtB0wK6z39HQBhzQR5
-	 JHmFVCuep1eMSkQcLu3DjrOphWUyJDKWCKIk/U0+gA45TBuycy2cgKTmdGVmv52SEM
-	 ebbOKwl5K8/BTQRV9SJiBVo6DEty66EEa5vrZ/QtwOBvEumqz7XaE5m/giHTU6xmOz
-	 BE5N6GjAyRNzw==
-Date: Fri, 28 Feb 2025 17:09:39 +0000
+	b=PwWsI0ucRfx9BGYJa0tTEXgMIenITKpMGN896F4GhZH8T/JDflhvsfXM++C4XXeCn
+	 XghQqY/Ki232i7gmubV4auCpnUzX1y+tYgU6fG7FQGk+N3zNCWY0E0/0A4Q3zNCvWX
+	 01OWwqaW63i+w6FfVxBRKEzn1LbKIWwpSEgLBCq32sNGvlddYV05FwDas0en4fsYfC
+	 /sOYlDyx5ozyq0vr/dodCD9vtgrP3j+0Z8EdQ+aoT7nBZY87/0kv6vYZiQybzjcEf5
+	 hAzHQ+ySLaBVpcWSIVkM7BHZJQMRnGkIGAuNdknh+tGpAuQ+EfCVtVIiHLkZ74bhbj
+	 R+excFWex/xMw==
+Date: Fri, 28 Feb 2025 17:17:53 +0000
 From: Simon Horman <horms@kernel.org>
 To: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
 Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
 	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 Subject: Re: [iwl-net v2 5/5] ice: fix using untrusted value of pkt_len in
  ice_vc_fdir_parse_raw()
-Message-ID: <20250228170939.GK1615191@kernel.org>
+Message-ID: <20250228171753.GL1615191@kernel.org>
 References: <20250225090847.513849-2-martyna.szapar-mudlaw@linux.intel.com>
  <20250225090847.513849-8-martyna.szapar-mudlaw@linux.intel.com>
 Precedence: bulk
@@ -93,19 +93,18 @@ On Tue, Feb 25, 2025 at 10:08:49AM +0100, Martyna Szapar-Mudlaw wrote:
 > -	msk_buf = kzalloc(proto->raw.pkt_len, GFP_KERNEL);
 > +	if (!proto->raw.pkt_len)
 > +		return -EINVAL;
-> +
-> +	pkt_len = proto->raw.pkt_len;
 
 Hi Martyna,
 
-A check is made for !proto->raw.pkt_len above.
-And a check is made for !pkt_len below.
+It seems to me that the use of __free() above will result in
+kfree(msk_buf) being called here. But msk_buf is not initialised at this
+point.
 
-This seems redundant.
+My suggest would be to drop the use of __free().
+But if not, I think that in order to be safe it would be best to do this
+(completely untested;
 
-> +
-> +	if (!pkt_len || pkt_len > VIRTCHNL_MAX_SIZE_RAW_PACKET)
-> +		return -EINVAL;
+	u8 *pkt_buf, *msk_buf __free(kfree) = NULL;
 
 ...
 
