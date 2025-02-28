@@ -1,100 +1,132 @@
-Return-Path: <netdev+bounces-170540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E1B1A48EDE
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 03:50:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5041A48EE2
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 03:51:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21F333AD58B
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 02:49:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF1BA16CBDE
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 02:51:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13E7213D891;
-	Fri, 28 Feb 2025 02:49:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C68013665A;
+	Fri, 28 Feb 2025 02:51:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YymxivtC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l/uYqzsm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA8B8224D6;
-	Fri, 28 Feb 2025 02:49:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98961224D6
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 02:51:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740710999; cv=none; b=jFU2VAiLNGWyb516qRrU7DEwqztc46DMtzksBsAuYx62vQs3A+2fZiiJkz49PCHwHtJ20cPjIQ1pBCQrESGZJy4kvp4+R08JwXdQdYD/SeMsvlAnnzUykwbL52iT96I93kGVOtG06FZ3dec7+I8vFmsTq6nu3ejCSnzHE4fvz6A=
+	t=1740711090; cv=none; b=hhh+1zsBF6WqRNc6mnKV8gFxN4i5soW4yG+/+632OnW0UY4ezKnFdobCS6u2e0nOjmRqP+vQtFW+3u2/DQoBYunSlQtaLyajNKzYrDRUG/mYPcdGWZYbBvPFVYx+L7i3c9IMDua9kdX841HevUF6awG83HKVykT2trFFPquTlnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740710999; c=relaxed/simple;
-	bh=ydxu/skYurmAld4vb7S643yLAKc57hVF7vBSFY1pjPU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hWAW0ZAejwtX5h2lhu88zMUK0LYjrpm50k1IO5SGfofOp5rWXapMIDIUniXSraF4D2xM9KxzTHYRbxS2CpI3HIAJyEBYa5m1LSnHlh0i+pF8dHvJ04dI9yOVNGZD9Z4c39o0U0/QGUy8w3iOUI5TMtOyHfZ5kaRB4NoruymcaYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YymxivtC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FCE3C4CEDD;
-	Fri, 28 Feb 2025 02:49:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740710998;
-	bh=ydxu/skYurmAld4vb7S643yLAKc57hVF7vBSFY1pjPU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YymxivtCeZTphclh1mW2FSkq66ehF5xMsP6BU2pTHt2fO2EiJkm3VDw7JxUrij8Pq
-	 H3Vlt8dkB+TyYkiUElZDSHs7U8RuBRjL2Aco1pOckVRgqO1l1Of/ZJrribb4JQ0T8E
-	 cn0yt2ZNdFv00+l8F25OYnRZ2P/dF4OKtYq+ADDBzQp2srVGblT4P0cSKNJHFmixVo
-	 bjVtknKh86DAaSLr7hu+ovpdWUab4YbQlkBLbZSVYGAi9FH+i/ZtjSHzlKLdoHAhdj
-	 Bx6Qrm0XwEaode9SZkY0FXzViR0k2BQ0zGbBPxEEUs3g44ioPCr3F8D49DZGIi/zMr
-	 Ktm7ed+8qgDeQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDA8380AACB;
-	Fri, 28 Feb 2025 02:50:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1740711090; c=relaxed/simple;
+	bh=DdQjQjdMdCs7Msrb2W9TKdcK/ITMhmokuMzAUuB8Pbg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=e9x+8Zh2DP8YcMpy1FHdh9M05df/pFbxWbPB3zYq+RLr01heRC2VQGB9RFYwFJLRuxSulnIYerMk/XBDv52wstwlIPO1ZIVXQ8uKg5PanQuKNyzlY4JTj5DAsOYF7yVLwWDOyJmBjxSprJQ4KEDYpua3Hy/aTenITZjePBNr6xE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l/uYqzsm; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-22356471820so24108675ad.0
+        for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 18:51:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740711088; x=1741315888; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uxfrttinpfziJbmXgIfvT4LSMdxWcEB9U28aIsi8kko=;
+        b=l/uYqzsmtAh1qAXNerwg5S7MoFrVuEi65+eHCayz1s/0zMEWyEJ0COy9FWxJJkY4ph
+         QuFZ+MSf9lPAQABeiWmaRcVfzJdbVBxbbUKtOnOf5A4UsDSi/H/Ds4x0vzGYTjw9CDr/
+         jmRGQ6tT8cBsAQWdbuNeLHRk9zSDNDQLLKrscOQHaZoz0hBD2Ip8M3wPQLbpOKdzTKRJ
+         MpePeMTJ3mVLTLU+yiLdiNgOzob1K2v0P7K9rZQQgdWIfEfZIdax1njgdab+yFKysL2u
+         KcZQFEl42O/ydWNA1xDpB9XB5G7tic6tVNr3+JUVjcyWTOYlQFKEX8bSoipFZikHqqCt
+         xSVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740711088; x=1741315888;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uxfrttinpfziJbmXgIfvT4LSMdxWcEB9U28aIsi8kko=;
+        b=BC/CclerI3iSm2eknpMwAs78XloNZXA4s2TCQYv+7a56OcisF7oO07bdfgYGL5aOrJ
+         FXLtuS7zTxGJq/cHlXZYv2HqQshu4DTxKgQavN6CPisPRx7T8ouH5TzXmAk+OfYKsKi7
+         y61Z3LI4mO6gQfxgwE6nhAhg/cnsJJZ2eCgOX9Xg/Q6PFUqnfh6yMHDVLXyNKbVe/MnH
+         9scYqyjK4qz1wrlxp1EZZ1IqDGMUrjg4cJ9vLzRydkdDnPKwU6l5x51m/RDOkRVFlGbT
+         WniyAws+bgQaot+o+iBbUBd+pVtKmpzxvmtiv/NaxxDSBbRrW3e8WbQvoIRmwCeDBQEL
+         DFAA==
+X-Forwarded-Encrypted: i=1; AJvYcCXdwmsEk6lbm52sV0x68RRUS+sNXFvK0/gt4V8A2dGX93T4gnSxRElcQU5izahUmsatkuftQ6A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyybn+bhBVqLL9vDMP7o+duvZ25QsWycN2/EJEVKal0u4HCbxDr
+	caL0gTDtW5lwF7r7socBF3MaiP1Sc2Uheil+L+2SF7Yzt8faFxLm
+X-Gm-Gg: ASbGnctKEMEAl/jeHNJZl9X6WtJRy9heSL/MNZqd3UY9dzQqKCyQe6xvnsEsqpUVV1j
+	4pMKc7jG7tP3BokYKxQJ7IH6iNWHminq0DrtffRtdHtt816VlyY2/Lfx9ALfOiF/P3q3toqmaD/
+	sEnGRqhfV2Ypx6zzLO6j5upXjT+31aW4ykhXNMuK5mhHarm0vtyfRuzAF+8HC0EHRdrOq2GdluV
+	pTkw/ExZ1Bdl4E+EGNIdvj1V2gTMPwp7HY3hZkVDYIFpmCiwDfhoAh4/OPvNIAlXZIlBXxUP9eR
+	F8PXwRAnyF1KD3w0YTPRnl0=
+X-Google-Smtp-Source: AGHT+IEKF5Ov9wR3zxBGu/lY9K2QndPcV7vnjEoWJ66hnW/s1gKFCPCGJh1hzPM3pWau6kekz6Qo7Q==
+X-Received: by 2002:a17:902:d506:b0:216:3466:7414 with SMTP id d9443c01a7336-2236926a542mr23196615ad.44.1740711087768;
+        Thu, 27 Feb 2025 18:51:27 -0800 (PST)
+Received: from localhost ([129.146.253.192])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-223501d3e63sm22964315ad.11.2025.02.27.18.51.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Feb 2025 18:51:27 -0800 (PST)
+Date: Fri, 28 Feb 2025 10:51:18 +0800
+From: Furong Xu <0x1207@gmail.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Jon Hunter
+ <jonathanh@nvidia.com>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo Abeni
+ <pabeni@redhat.com>, Thierry Reding <treding@nvidia.com>
+Subject: Re: [PATCH RFC net-next 3/5] net: stmmac: remove unnecessary
+ stmmac_mac_set() in stmmac_release()
+Message-ID: <20250228105118.00002723@gmail.com>
+In-Reply-To: <E1tnfRo-0057SL-Dz@rmk-PC.armlinux.org.uk>
+References: <Z8B-DPGhuibIjiA7@shell.armlinux.org.uk>
+	<E1tnfRo-0057SL-Dz@rmk-PC.armlinux.org.uk>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 0/3] selftests/net: deflake GRO tests and fix return value
- and output
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174071103050.1664035.10238417641881750067.git-patchwork-notify@kernel.org>
-Date: Fri, 28 Feb 2025 02:50:30 +0000
-References: <20250226192725.621969-1-krakauer@google.com>
-In-Reply-To: <20250226192725.621969-1-krakauer@google.com>
-To: Kevin Krakauer <krakauer@google.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, shuah@kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 27 Feb 2025 15:05:12 +0000
+"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk> wrote:
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 26 Feb 2025 11:27:22 -0800 you wrote:
-> The GRO selftests can flake and have some confusing behavior. These
-> changes make the output and return value of GRO behave as expected, then
-> deflake the tests.
+> stmmac_release() calls phylink_stop() and then goes on to call
+> stmmac_mac_set(, false). However, phylink_stop() will call
+> stmmac_mac_link_down() before returning, which will do this work.
+> Remove this unnecessary call.
 > 
-> v2:
-> - Split into multiple commits.
-> - Reduced napi_defer_hard_irqs to 1.
-> - Reduced gro_flush_timeout to 100us.
-> - Fixed comment that wasn't updated.
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 ---
+>  1 file changed, 3 deletions(-)
 > 
-> [...]
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 9462d05c40c8..e47b702fb9f9 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -4120,9 +4120,6 @@ static int stmmac_release(struct net_device *dev)
+>  	/* Release and free the Rx/Tx resources */
+>  	free_dma_desc_resources(priv, &priv->dma_conf);
+>  
+> -	/* Disable the MAC Rx/Tx */
+> -	stmmac_mac_set(priv, priv->ioaddr, false);
+> -
+>  	/* Powerdown Serdes if there is */
+>  	if (priv->plat->serdes_powerdown)
+>  		priv->plat->serdes_powerdown(dev, priv->plat->bsp_priv);
 
-Here is the summary with links:
-  - [v2,1/3] selftests/net: have `gro.sh -t` return a correct exit code
-    https://git.kernel.org/netdev/net-next/c/784e6abd99f2
-  - [v2,2/3] selftests/net: only print passing message in GRO tests when tests pass
-    https://git.kernel.org/netdev/net-next/c/41cda5728470
-  - [v2,3/3] selftests/net: deflake GRO tests
-    https://git.kernel.org/netdev/net-next/c/51bef03e1a71
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Tested-by: Furong Xu <0x1207@gmail.com>
 
