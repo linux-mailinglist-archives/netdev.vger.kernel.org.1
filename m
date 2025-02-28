@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-170514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24992A48E63
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 03:14:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D47EFA48E64
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 03:14:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 066D416E581
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 02:14:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E2B33B4FB5
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 02:14:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FA54199EB2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E65F519D8A9;
 	Fri, 28 Feb 2025 02:13:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nj1bdqzl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KBe/7E4x"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F015F13CFB6
-	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 02:13:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2BA619D072
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 02:13:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740708815; cv=none; b=XYCdD8LijlKxf1WsCZvAWtTQDP+rAeoF4aeQfPr1v0FxCfxtwO+VW2x7grKVWr6YuBV/+iJ/pRwsB2ozsjM7fcsOilVfNkxOiC90KB1oogBpoX0zRVIQhcA8IZQDQaclNGi8B9ytyuQic/d8fcONIWlkZgZC91kt4ebRR8WyHWQ=
+	t=1740708815; cv=none; b=XAKCR0mPHnWyMbvg60AjJFw5SyP62Y4nxjMecDEmmNaB5wVDjA1glzFSzjYmWS7TSHYt4NVEgI9duWeWNB779jVdGfrEf+E7/8Cfj37rCS3xjeWriYiMxPVAqfR+CpqeB8jkfJZQhBDl9t4ky3uWKYJXKJWqg4OwZWsrNkMzbSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1740708815; c=relaxed/simple;
-	bh=9siPwIfoVJcZhNHyi79zcGD0Xh/USO3+aCRePeQRUkE=;
+	bh=c62ZRDd0F+6uZv6BYCldjcMlM/9fxG6MqD6bSR37KKA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uHnl3uxKucnqo29HmHg1uyBBdXsUi5tN8EOMy80FTWKsUxgBV/zAVbbBcSYmDaO2xAU/7COv8qsGAgtQOrasBQYSJbwuWnoUQ7f4Kfn3QE7QzFFI+fpsKEMuRaYZgwuAPtDwBTE9+ijN6QveCPmIhyj4wqx0kzUgH6Fac2tfbWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nj1bdqzl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5C79C4CEE7;
-	Fri, 28 Feb 2025 02:13:34 +0000 (UTC)
+	 MIME-Version; b=G/5FAUb7bv8lTX+ZV+XsOR3f9a+V2e6gwle0ONyFVVzHwm3pXo6i/Couv+giTurf1ywGyB6FqMuEMa3gm1gVAZTomHzmEV/8An641fx1v4g/69aso46z4c/nv/lhSMHo9HpLhEofc2whL/gE7HzM+tdwoIQ4Asy/BeI4KWVbIgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KBe/7E4x; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 962DEC4CEE7;
+	Fri, 28 Feb 2025 02:13:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740708814;
-	bh=9siPwIfoVJcZhNHyi79zcGD0Xh/USO3+aCRePeQRUkE=;
+	s=k20201202; t=1740708815;
+	bh=c62ZRDd0F+6uZv6BYCldjcMlM/9fxG6MqD6bSR37KKA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Nj1bdqzlnNzqChNhqdqpy8ljNiCjnTMxTOyI+2jvnzQHp/caiq/QVe/Aq93pyp7qJ
-	 /6t1BAgnyTWpVfVWhbj9ePVTEkfhB0EwMu36+MbcayXtDl5KiSyw+hpDFGMl8R2gdr
-	 gC8e2hscW9ZTAd5BKDOg104yWgI9zqD2l2E+lrLV7Ce1xnro9utf2HpklZEWph/R6R
-	 oQJfueADG/hs14cm2Z7eY/5txy6wfS0w9kOw0bQOkC0SYJvsvS5PuSXTU9CmXruTvE
-	 iDrdz1KR4QyzNnwahkGfpUPyR2pcqdvc3ZT4wh9ekfsDqWlVhHcRz7eu5+iJ9U2+Ii
-	 6/p3LDV4/X8uw==
+	b=KBe/7E4xwKLbKc4c+EN5R0H9zxeBNNtkAuMo7VYKAtA1d9HV/O7h1KEPOqbG8fCT2
+	 YeyDOTDw/opLYCxynF69aXKteKJ8oFR/1v1y8wB9g0u2eFbsolYoPtghDL+60eKAh6
+	 Y30F+6lQ9ZmsZg29u8WrjC5fWqtjRW0/0Ecf0moadFcBpgtQi3Ek/puVbzHUCKE0gd
+	 0fQWZv9duyGBr73vgcZNYX9l+Bb4h5lakC9YcHaS21pkUYpr/QE3P4i439PN7phkUn
+	 +WkpB49FYzLyzQYOukFSoxC5O8Yi5AlRhr522EHnZLD0tFxgK2ZBAeLA6/ygFqYvHs
+	 Zq6YbkT3f6K4g==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -52,9 +52,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
 	Jiri Pirko <jiri@nvidia.com>
-Subject: [PATCH net-next 12/14] devlink: Throw extack messages on param value validation error
-Date: Thu, 27 Feb 2025 18:12:25 -0800
-Message-ID: <20250228021227.871993-13-saeed@kernel.org>
+Subject: [PATCH net-next 13/14] devlink: Implement devlink param multi attribute nested data values
+Date: Thu, 27 Feb 2025 18:12:26 -0800
+Message-ID: <20250228021227.871993-14-saeed@kernel.org>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250228021227.871993-1-saeed@kernel.org>
 References: <20250228021227.871993-1-saeed@kernel.org>
@@ -68,124 +68,181 @@ Content-Transfer-Encoding: 8bit
 
 From: Saeed Mahameed <saeedm@nvidia.com>
 
-Centralize devlink param value data validation in one function and
-fill corresponding extack error messages on validation error.
+Devlink param value attribute is not defined since devlink is handling
+the value validating and parsing internally, this allows us to implement
+multi attribute values without breaking any policies.
+
+Devlink param multi-attribute values are considered to be dynamically
+sized arrays of u32 values, by introducing a new devlink param type
+DEVLINK_PARAM_TYPE_ARR_U32, driver and user space can set a variable
+count of u32 values into the DEVLINK_ATTR_PARAM_VALUE_DATA attribute.
+
+Implement get/set parsing and add to the internal value structure passed
+to drivers.
+
+This is useful for devices that need to configure a list of values for
+a specific configuration.
+
+example:
+ $ devlink dev param show pci/... name multi-value-param
+    name multi-value-param type driver-specific
+    values:
+      cmode permanent value: 0,1,2,3,4,5,6,7
+
+ $ devlink dev param set pci/... name multi-value-param \
+	value 4,5,6,7,0,1,2,3 cmode permanent
 
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 ---
- net/devlink/param.c | 76 +++++++++++++++++++++++++++++++++++----------
- 1 file changed, 60 insertions(+), 16 deletions(-)
+ include/net/devlink.h        |  7 ++++++
+ include/uapi/linux/devlink.h |  1 +
+ net/devlink/param.c          | 47 +++++++++++++++++++++++++++++++++++-
+ 3 files changed, 54 insertions(+), 1 deletion(-)
 
+diff --git a/include/net/devlink.h b/include/net/devlink.h
+index ca32c61583cf..c8f14ea3604e 100644
+--- a/include/net/devlink.h
++++ b/include/net/devlink.h
+@@ -420,12 +420,15 @@ typedef u64 devlink_resource_occ_get_t(void *priv);
+ #define DEVLINK_RESOURCE_GENERIC_NAME_PORTS "physical_ports"
+ 
+ #define __DEVLINK_PARAM_MAX_STRING_VALUE 32
++#define __DEVLINK_PARAM_MAX_ARRAY_SIZE 32
++
+ enum devlink_param_type {
+ 	DEVLINK_PARAM_TYPE_U8,
+ 	DEVLINK_PARAM_TYPE_U16,
+ 	DEVLINK_PARAM_TYPE_U32,
+ 	DEVLINK_PARAM_TYPE_STRING,
+ 	DEVLINK_PARAM_TYPE_BOOL,
++	DEVLINK_PARAM_TYPE_ARR_U32,
+ };
+ 
+ union devlink_param_value {
+@@ -434,6 +437,10 @@ union devlink_param_value {
+ 	u32 vu32;
+ 	char vstr[__DEVLINK_PARAM_MAX_STRING_VALUE];
+ 	bool vbool;
++	struct {
++		u32 size;
++		u32 vu32[__DEVLINK_PARAM_MAX_ARRAY_SIZE];
++	} arr;
+ };
+ 
+ struct devlink_param_gset_ctx {
+diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
+index 8cdd60eb3c43..df7c29bbb7a7 100644
+--- a/include/uapi/linux/devlink.h
++++ b/include/uapi/linux/devlink.h
+@@ -400,6 +400,7 @@ enum devlink_dyn_attr_type {
+ 	DEVLINK_DYN_ATTR_TYPE_BINARY,
+ 	__DEVLINK_DYN_ATTR_TYPE_CUSTOM_BASE = 0x80,
+ 	/* Any possible custom types, unrelated to NLA_* values go below */
++	DEVLINK_DYN_ATTR_TYPE_U32_ARRAY,
+ };
+ 
+ enum devlink_attr {
 diff --git a/net/devlink/param.c b/net/devlink/param.c
-index 03c65ccf2acf..1922ca5b9cbc 100644
+index 1922ca5b9cbc..31a8e61bae09 100644
 --- a/net/devlink/param.c
 +++ b/net/devlink/param.c
-@@ -458,45 +458,89 @@ devlink_param_type_get_from_info(struct genl_info *info,
- 	return 0;
- }
+@@ -195,6 +195,8 @@ devlink_param_type_to_dyn_attr_type(enum devlink_param_type param_type)
+ 		return DEVLINK_DYN_ATTR_TYPE_STRING;
+ 	case DEVLINK_PARAM_TYPE_BOOL:
+ 		return DEVLINK_DYN_ATTR_TYPE_FLAG;
++	case DEVLINK_PARAM_TYPE_ARR_U32:
++		return DEVLINK_DYN_ATTR_TYPE_U32_ARRAY;
+ 	default:
+ 		return -EINVAL;
+ 	}
+@@ -239,6 +241,13 @@ devlink_nl_param_value_fill_one(struct sk_buff *msg,
+ 		    nla_put_flag(msg, DEVLINK_ATTR_PARAM_VALUE_DATA))
+ 			goto value_nest_cancel;
+ 		break;
++	case DEVLINK_PARAM_TYPE_ARR_U32:
++		for (int i = 0; i < val.arr.size; i++) {
++			if (nla_put_u32(msg, DEVLINK_ATTR_PARAM_VALUE_DATA,
++					val.arr.vu32[i]))
++				goto value_nest_cancel;
++		}
++		break;
+ 	}
  
-+static int
-+devlink_param_value_validate(struct genl_info *info,
-+			     enum devlink_param_type type)
-+{
-+	struct netlink_ext_ack *extack = info->extack;
-+	struct nlattr *param_data;
-+	int len = 0;
-+
-+	if (type != DEVLINK_PARAM_TYPE_BOOL &&
-+	    GENL_REQ_ATTR_CHECK(info, DEVLINK_ATTR_PARAM_VALUE_DATA))
-+		return -EINVAL;
-+
-+	param_data = info->attrs[DEVLINK_ATTR_PARAM_VALUE_DATA];
-+
-+	if (param_data)
-+		len = nla_len(param_data);
-+
-+	switch (type) {
-+	case DEVLINK_PARAM_TYPE_U8:
-+		if (len == sizeof(u8))
+ 	nla_nest_end(msg, param_value_attr);
+@@ -451,6 +460,9 @@ devlink_param_type_get_from_info(struct genl_info *info,
+ 	case DEVLINK_DYN_ATTR_TYPE_FLAG:
+ 		*param_type = DEVLINK_PARAM_TYPE_BOOL;
+ 		break;
++	case DEVLINK_DYN_ATTR_TYPE_U32_ARRAY:
++		*param_type = DEVLINK_PARAM_TYPE_ARR_U32;
++		break;
+ 	default:
+ 		return -EINVAL;
+ 	}
+@@ -464,7 +476,7 @@ devlink_param_value_validate(struct genl_info *info,
+ {
+ 	struct netlink_ext_ack *extack = info->extack;
+ 	struct nlattr *param_data;
+-	int len = 0;
++	int len = 0, rem;
+ 
+ 	if (type != DEVLINK_PARAM_TYPE_BOOL &&
+ 	    GENL_REQ_ATTR_CHECK(info, DEVLINK_ATTR_PARAM_VALUE_DATA))
+@@ -507,6 +519,28 @@ devlink_param_value_validate(struct genl_info *info,
+ 			return 0;
+ 		NL_SET_ERR_MSG_MOD(extack, "Expected flag, got data");
+ 		break;
++	case DEVLINK_PARAM_TYPE_ARR_U32:
++		len = 0;
++		nla_for_each_attr_type(param_data,
++				       DEVLINK_ATTR_PARAM_VALUE_DATA,
++				       genlmsg_data(info->genlhdr),
++				       genlmsg_len(info->genlhdr), rem) {
++			if (nla_len(param_data) != sizeof(u32)) {
++				NL_SET_ERR_MSG_MOD(extack,
++						   "Array element size must be 4 bytes");
++				return -EINVAL;
++			}
++			if (++len > __DEVLINK_PARAM_MAX_ARRAY_SIZE) {
++				NL_SET_ERR_MSG_MOD(extack,
++						   "Array size exceeds maximum");
++				return -EINVAL;
++			}
++		}
++		if (len)
 +			return 0;
-+		NL_SET_ERR_MSG_FMT_MOD(extack,
-+				       "Expected uint8, got %d bytes", len);
++		NL_SET_ERR_MSG_MOD(extack,
++				   "Value array must have at least one entry");
 +		break;
-+	case DEVLINK_PARAM_TYPE_U16:
-+		if (len == sizeof(u16))
-+			return 0;
-+		NL_SET_ERR_MSG_FMT_MOD(extack,
-+				       "Expected uint16, got %d bytes", len);
-+		break;
-+	case DEVLINK_PARAM_TYPE_U32:
-+		if (len == sizeof(u32))
-+			return 0;
-+		NL_SET_ERR_MSG_FMT_MOD(extack,
-+				       "Expected uint32, got %d bytes", len);
-+		break;
-+	case DEVLINK_PARAM_TYPE_STRING:
-+		len = strnlen(nla_data(param_data), nla_len(param_data));
-+
-+		if (len < nla_len(param_data) &&
-+		    len < __DEVLINK_PARAM_MAX_STRING_VALUE)
-+			return 0;
-+		NL_SET_ERR_MSG_MOD(extack, "String too long");
-+		break;
-+	case DEVLINK_PARAM_TYPE_BOOL:
-+		if (!len)
-+			return 0;
-+		NL_SET_ERR_MSG_MOD(extack, "Expected flag, got data");
-+		break;
-+	default:
-+		NL_SET_ERR_MSG_FMT_MOD(extack,
-+				       "Not supported value type %d", type);
-+		break;
-+	}
-+	return -EINVAL;
-+}
-+
- static int
- devlink_param_value_get_from_info(const struct devlink_param *param,
- 				  struct genl_info *info,
+ 	default:
+ 		NL_SET_ERR_MSG_FMT_MOD(extack,
+ 				       "Not supported value type %d", type);
+@@ -521,6 +555,7 @@ devlink_param_value_get_from_info(const struct devlink_param *param,
  				  union devlink_param_value *value)
  {
  	struct nlattr *param_data;
--	int len;
--
--	param_data = info->attrs[DEVLINK_ATTR_PARAM_VALUE_DATA];
++	int rem, i = 0;
  
--	if (param->type != DEVLINK_PARAM_TYPE_BOOL && !param_data)
-+	if (devlink_param_value_validate(info, param->type))
+ 	if (devlink_param_value_validate(info, param->type))
  		return -EINVAL;
- 
-+	param_data = info->attrs[DEVLINK_ATTR_PARAM_VALUE_DATA];
-+
- 	switch (param->type) {
- 	case DEVLINK_PARAM_TYPE_U8:
--		if (nla_len(param_data) != sizeof(u8))
--			return -EINVAL;
- 		value->vu8 = nla_get_u8(param_data);
- 		break;
- 	case DEVLINK_PARAM_TYPE_U16:
--		if (nla_len(param_data) != sizeof(u16))
--			return -EINVAL;
- 		value->vu16 = nla_get_u16(param_data);
- 		break;
- 	case DEVLINK_PARAM_TYPE_U32:
--		if (nla_len(param_data) != sizeof(u32))
--			return -EINVAL;
- 		value->vu32 = nla_get_u32(param_data);
- 		break;
- 	case DEVLINK_PARAM_TYPE_STRING:
--		len = strnlen(nla_data(param_data), nla_len(param_data));
--		if (len == nla_len(param_data) ||
--		    len >= __DEVLINK_PARAM_MAX_STRING_VALUE)
--			return -EINVAL;
- 		strcpy(value->vstr, nla_data(param_data));
- 		break;
+@@ -543,6 +578,16 @@ devlink_param_value_get_from_info(const struct devlink_param *param,
  	case DEVLINK_PARAM_TYPE_BOOL:
--		if (param_data && nla_len(param_data))
--			return -EINVAL;
  		value->vbool = nla_get_flag(param_data);
  		break;
++	case DEVLINK_PARAM_TYPE_ARR_U32: {
++		nla_for_each_attr_type(param_data,
++				       DEVLINK_ATTR_PARAM_VALUE_DATA,
++				       genlmsg_data(info->genlhdr),
++				       genlmsg_len(info->genlhdr), rem)
++			value->arr.vu32[i++] = nla_get_u32(param_data);
++
++		value->arr.size = i;
++		break;
++		}
  	}
+ 	return 0;
+ }
 -- 
 2.48.1
 
