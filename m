@@ -1,185 +1,273 @@
-Return-Path: <netdev+bounces-170804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58A00A49F5A
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 17:52:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2178A49FB7
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 18:04:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58AFA16F245
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 16:52:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E05F11895894
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 17:03:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE8D3276021;
-	Fri, 28 Feb 2025 16:52:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8759C1F09B8;
+	Fri, 28 Feb 2025 17:03:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="YTkDYpJS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f4/Fj+lA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f67.google.com (mail-ej1-f67.google.com [209.85.218.67])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 456FC27293A
-	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 16:52:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE16C1F09A6
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 17:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740761543; cv=none; b=islV5KQRFw/bXfuHc1sdlNhFgH71I8NkeWiXFsJs63hSjOS8M0mRzSClYOlz0Cnt48uTXO7UftdKJMy8PErtVPNMuXZLNsfMSVU8hUHZiWqY3ykd3ICm/o6lDRpydh4ERqDO+VVX4rRd8esnQ8VKUWBco6pY9J6FL5wmCS6TLbU=
+	t=1740762221; cv=none; b=TmBR8G+Jl4oX0poBsUEfbmfjCGrVaqe6Rq4789rLInCZWvyFAIuoZf1+QnKrRjl4TaN449Op1yi1G17VXHzI0+RpQus1cUEWmYZPvCLeFeJVI7T1FRI7O4TQtIn+t+xY+Q9J2u7mUWu4xT99Lbtkzh5qk4wfRdX+4yoF4OrdJdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740761543; c=relaxed/simple;
-	bh=NsYtIP9Mw2b/nhaNRRDG6qj+beqFgzVf9yFx5qbgPTQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=G4yCD71umi3AefZo4RvlqINOp9msVnvR2lhOwWctcRNJkrdN381AAlXjsdj9WNflqUV2EuzKMnQ8UBzMpBganBn3agupVzy4YPFPe+NnfI7UQZGe12PBJix7KhUzEvK04fmjZVAr3B/dJO5Kfxqa0z2hSXUf4+0o603lCVGKQFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=YTkDYpJS; arc=none smtp.client-ip=209.85.218.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ej1-f67.google.com with SMTP id a640c23a62f3a-abf3d64849dso83815666b.3
-        for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 08:52:19 -0800 (PST)
+	s=arc-20240116; t=1740762221; c=relaxed/simple;
+	bh=rP2OpEz+UAqHglzOnri3Z0W/UW2I3t2l0gHiBGr0QYI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=gwNiJWUS75bHCouRAYyP8teDju8Ym9XFr8Ot0MJJ/6s5WuFjoUJTo+ajSpOlMP1OkG4LQii3r7JvzJvtuQN5hH4DK13ELv4N2tECRXs0jj3k/DFpeuGRcGfaUXIh6OyAVJvuRSeyFEyadpjK+m+uNkUGyM4Z8+RX7t47Lb3mvDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=f4/Fj+lA; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fe8c697ec3so5435391a91.1
+        for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 09:03:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1740761538; x=1741366338; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DMEGjq6WjEVsV0tBdx2rpYvL0pVPJ8Xct6E1Q4Bt1js=;
-        b=YTkDYpJS9a21ha422hVk0M8FVi/r7w5KDTgauOPejHxA01oz21EZNje4EDQpBVgejx
-         G3uvmDgSjBjnPvTWQsCnaqX2miIy2PwJL+Wo6rqlHmcWfe9dha4dtAaPp7Uj0ixE4nK6
-         IovPR0tWI2cyyilIJNq32XUiwoEtmmaNOTbWYfo+czwwuM234dNhSYgGYot0QW5JvCXN
-         C9dV/Uy8A08m623K5emrCA6nu19+2NwAOxsipR/93D8rrujFYQZOPbPTvC3yGgvpyvtw
-         qRsHLUbM+eAjLjb4g+kck3HAgMjOziYyQag1o+3lMyZ7bqlfUB6SMMndfb1lOoWrbUsY
-         B10g==
+        d=google.com; s=20230601; t=1740762219; x=1741367019; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yBae22rC1ZZWAm9wgaOrOy67AIEryr2XvHSDCCw/B3A=;
+        b=f4/Fj+lA1M99NVEKHpYIdOYqMDCZzDK4PSG1rKBwbYh6rmM1dUMWyY3HruoSV0XEgw
+         BkvVXq36oipTHRHZB5otj1B9eL19R0+Zs9Q0uFTSx4Oy2hFVijlyGu4rU+cFb6mMWEwM
+         tgrwoF1ozunEuzC5SASrWUQI4/OwxFdNP1xWxTlcfSRqdh72iKWS8fEdwPT8/KLcr9Rv
+         Dpxnx0cLOXCBPc5XUyAFQyns7xoK3MvgpgtmtpRXSY7ZP9LRWr8Qlh3MVEf0Lzt2/YVq
+         2WS9A0XttFatI6bSz9gNhb2aXAs27s5s+7Xrizc9Bw9fr3Z+DWgqy3T+2Jo7FUWm4C3K
+         NC7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740761538; x=1741366338;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DMEGjq6WjEVsV0tBdx2rpYvL0pVPJ8Xct6E1Q4Bt1js=;
-        b=RolOoZG1GywQ4Hee7gcEhdf7kjpRw6UsmHNYaE5jz68D3ZajwsYyb3fkLdp3to/SGF
-         mK0PirBsQeptBpeM6zR/0enTaxtNBqohW9siv8PJ5P63dYrrfcWIECfe4ABjBFystGpE
-         bhGx1neVmvJ0FITJRlVZ5StAzOK3BXB48adG2xc1gIT2k8rGR12CQ4zAZAVALZH/ZVFI
-         n2ai+tEnyd5sH9daBllOBMpG4HnVQv7pgTHFqSUN+HyNI0H7gSyTG20fFVUWA071/4al
-         fNA891RMzomsn3lEOuzzhd9b3CSj+JyQnMgoGKbkhdY30Ft6gQb72IgGXJRwJ0rlCPWH
-         ze7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVE2p/ay/oEY7ZCq6D6xi0pJQlmEoV+UzpgnFpWJ4C+UvirHE+9+A8f89HeAOGcUtG2fWrRaz4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzzN68W+lk+1mCX0GEhByndghx9SHdZoJEa5We9+eBDE2ycpBq+
-	T30tikfNPp/wijtB0CqDsX3fhiToKx+EtvxzH5oijA+ErHfz9glcFkQNYt3sy80=
-X-Gm-Gg: ASbGncvwfg9MV6skucx544LgMxt8K1xaRN0qbGuGL1UGoDfMlmRCzZwy2ct+PlhZHBN
-	wbG8NQRDAb41a1IA4uFl+rAUXmIKI3RHAN6uAIRN6oNYT3qbia+mq2RnbJ6eP5lkNJr6+nRQ7l9
-	JR5fngUzhVKnvmZifBfPmgu1sgODX94AWdmY4Rza0ZCg9TQcZ65T13/u6o91r54sDNey5mqhN1e
-	d8UZ4RCAgSpu+t7RpzyNlIzknEPW4gE4z4cfGuNwl8bnn+cvPDPhGlTrDn3Bd11WUpXpMKRXAH6
-	27XxSUaTsgGQGjjrMCrRtU7zi8sL
-X-Google-Smtp-Source: AGHT+IEs+LalzKtbPFpkKQgFWFd0Lu/RhKgnHSlViKu4ecCAJmjCZ0T6cL/fwlL89/H2Lwl2Cv9zFw==
-X-Received: by 2002:a05:6402:2790:b0:5df:6a:54ea with SMTP id 4fb4d7f45d1cf-5e4d6adc7a0mr7561214a12.11.1740761538383;
-        Fri, 28 Feb 2025 08:52:18 -0800 (PST)
-Received: from blackdock.suse.cz ([193.86.92.181])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e4c3b6d252sm2764784a12.26.2025.02.28.08.52.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Feb 2025 08:52:17 -0800 (PST)
-From: =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>
-To: netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	cgroups@vger.kernel.org
-Subject: [PATCH] netfilter: Make xt_cgroup independent from net_cls
-Date: Fri, 28 Feb 2025 17:52:16 +0100
-Message-ID: <20250228165216.339407-1-mkoutny@suse.com>
-X-Mailer: git-send-email 2.48.1
+        d=1e100.net; s=20230601; t=1740762219; x=1741367019;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yBae22rC1ZZWAm9wgaOrOy67AIEryr2XvHSDCCw/B3A=;
+        b=ZQuo5lwpdtoFVUeMPs+yxpY0ze1U+6xj28zYWyDViLAuiQ2/j+NpkVtcH+xvZIMEmH
+         pgBjMZhXWS8Rx8xy6JNmHQBNSbKPaJkSMQCwfhLN8BGwZ2UNdrkgA7VPngayvCJd816M
+         OQDJiBTDsT8zBdLP56zUGcTTAmZCct2AND/TCg8ESLW00+7kKFv+2isISeeqTYTyN+/u
+         te57iHbsoOxcinQxHtJgeudABk1FKdvcwqheprdR/D5TKHoDsE/u1HuE7O6PlpeelTH4
+         xetn3uqxdomzQptpgC5VYZg9DrivnvPo3NMeRo8RzDkYa19gQ/D0be/DszaiyEeEy+FL
+         JmNA==
+X-Forwarded-Encrypted: i=1; AJvYcCUtJFGIqEqSvKxFzWMi8dHoByx0f623nwLlV9n+1iwv0zE3diyhmw/mDjE+FTq3CnzSH4PeFrE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2clN6oW7xPy07zDc/lRMX62h3TvsvNogI1+6jT4moYen0V4gN
+	xNpRxh8LMqAxVsqWKNy0XPlYuavNW02TaxBcg0JbsU6m827H1KhITa/vvWaeWJ2XvDnZBRrW56q
+	5YA==
+X-Google-Smtp-Source: AGHT+IHfvWvtYClW4D8XZivqOIxKPdkMKph7B/KmPkdLz5hq7e1uqYxbJLhAYv1E7edLxL02jG9Sop91PHI=
+X-Received: from pjbsr16.prod.google.com ([2002:a17:90b:4e90:b0:2fa:2891:e310])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4ac6:b0:2f6:e47c:1750
+ with SMTP id 98e67ed59e1d1-2feba9325ffmr7047907a91.13.1740762219054; Fri, 28
+ Feb 2025 09:03:39 -0800 (PST)
+Date: Fri, 28 Feb 2025 09:03:37 -0800
+In-Reply-To: <3b1046fb-962c-4c15-9c4e-9356171532a0@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20250227230631.303431-1-kbusch@meta.com> <CAPpAL=zmMXRLDSqe6cPSHoe51=R5GdY0vLJHHuXLarcFqsUHMQ@mail.gmail.com>
+ <Z8HE-Ou-_9dTlGqf@google.com> <Z8HJD3m6YyCPrFMR@google.com>
+ <Z8HPENTMF5xZikVd@kbusch-mbp> <Z8HWab5J5O29xsJj@google.com>
+ <Z8HYAtCxKD8-tfAP@kbusch-mbp> <3b1046fb-962c-4c15-9c4e-9356171532a0@redhat.com>
+Message-ID: <Z8HsaS9r_OkpCGYk@google.com>
+Subject: Re: [PATCHv3 0/2]
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Keith Busch <kbusch@kernel.org>, Lei Yang <leiyang@redhat.com>, Keith Busch <kbusch@meta.com>, 
+	kvm@vger.kernel.org, virtualization@lists.linux.dev, x86@kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-The xt_group matching supports the default hierarchy since commit
-c38c4597e4bf3 ("netfilter: implement xt_cgroup cgroup2 path match").
-The cgroup v1 matching (based on clsid) and cgroup v2 matching (based on
-path) are rather independent. Adjust Kconfig so that xt_group can be
-built even without CONFIG_NET_CLS_CGROUP for path matching. Also add a
-message for users when they attempt to specify any non-trivial clsid.
+On Fri, Feb 28, 2025, Paolo Bonzini wrote:
+> On 2/28/25 16:36, Keith Busch wrote:
+> > On Fri, Feb 28, 2025 at 07:29:45AM -0800, Sean Christopherson wrote:
+> > > On Fri, Feb 28, 2025, Keith Busch wrote:
+> > > > On Fri, Feb 28, 2025 at 06:32:47AM -0800, Sean Christopherson wrote:
+> > > > > > @@ -35,10 +35,12 @@ static inline int call_once(struct once *once, int (*cb)(struct once *))
+> > > > > >                  return 0;
+> > > > > >           guard(mutex)(&once->lock);
+> > > > > > -        WARN_ON(atomic_read(&once->state) == ONCE_RUNNING);
+> > > > > > -        if (atomic_read(&once->state) != ONCE_NOT_STARTED)
+> > > > > > +        if (WARN_ON(atomic_read(&once->state) == ONCE_RUNNING))
+> > > > > >                   return -EINVAL;
+> > > > > > +        if (atomic_read(&once->state) == ONCE_COMPLETED)
+> > > > > > +                return 0;
+> > > > > > +
+> > > > > >           atomic_set(&once->state, ONCE_RUNNING);
+> > > > > >          r = cb(once);
+> > > > > >          if (r)
+> > > > 
+> > > > Possible suggestion since it seems odd to do an atomic_read twice on the
+> > > > same value.
+> > > 
+> > > Yeah, good call.  At the risk of getting too cute, how about this?
+> > 
+> > Sure, that also looks good to me.
+> 
+> Just to overthink it a bit more, I'm changing "if (r)" to "if (r < 0)". Not
+> because it's particularly useful to return a meaningful nonzero value on the
+> first initialization, but more because 0+ for success and -errno for failure
+> is a more common.
+> 
+> Queued with this change, thanks.
 
-Link: https://lists.opensuse.org/archives/list/kernel@lists.opensuse.org/thread/S23NOILB7MUIRHSKPBOQKJHVSK26GP6X/
-Signed-off-by: Michal Koutný <mkoutny@suse.com>
+If it's not too late, the first patch can/should use ERR_CAST() instead of a
+PTR_ERR() => ERR_PTR():
+
+	tsk = copy_process(NULL, 0, NUMA_NO_NODE, &args);
+	if (IS_ERR(tsk)) {
+		kfree(vtsk);
+		return ERR_CAST(tsk);
+	}
+
+And I was going to get greedy and replace spaces with tabs in call_once.
+
+The changelog for this patch is also misleading.  KVM_RUN doesn't currently return
+-ERESTARTNOINTR, it only ever returns -ENOMEN.  copy_process() is what returns
+-ERESTARTNOINTR.
+
+I also think it's worth calling out that it's a non-fatal signal.
+
+--
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 27 Feb 2025 15:06:31 -0800
+Subject: [PATCH] KVM: x86/mmu: Allow retry of nx_huge_page_recovery_thread
+ creation
+
+A VMM may send a non-fatal signal to its threads, including vCPU tasks,
+at any time, and thus may signal vCPU tasks during KVM_RUN.  If a vCPU
+task receives the signal while its trying to spawn the huge page recovery
+vhost task, then KVM_RUN will fail due to copy_process() returning
+-ERESTARTNOINTR.
+
+Rework call_once() to mark the call complete if and only if the called
+function succeeds, and plumb the function's true error code back to the
+call_once() invoker.  This provides userspace with the correct, non-fatal
+error code so that the VMM doesn't terminate the VM on -ENOMEM, and allows
+subsequent KVM_RUN a succeed by virtue of retrying creation of the NX huge
+page task.
+
+Opportunistically replace spaces with tabs in call_once.h.
+
+Fixes: 931656b9e2ff ("kvm: defer huge page recovery vhost task to later")
+Co-developed-by: Keith Busch <kbusch@kernel.org>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- net/netfilter/Kconfig     |  1 -
- net/netfilter/xt_cgroup.c | 23 +++++++++++++++++++++++
- 2 files changed, 23 insertions(+), 1 deletion(-)
+ arch/x86/kvm/mmu/mmu.c    | 10 ++++------
+ include/linux/call_once.h | 36 +++++++++++++++++++++---------------
+ 2 files changed, 25 insertions(+), 21 deletions(-)
 
-diff --git a/net/netfilter/Kconfig b/net/netfilter/Kconfig
-index df2dc21304efb..af9350386033e 100644
---- a/net/netfilter/Kconfig
-+++ b/net/netfilter/Kconfig
-@@ -1180,7 +1180,6 @@ config NETFILTER_XT_MATCH_CGROUP
- 	tristate '"control group" match support'
- 	depends on NETFILTER_ADVANCED
- 	depends on CGROUPS
--	select CGROUP_NET_CLASSID
- 	help
- 	Socket/process control group matching allows you to match locally
- 	generated packets based on which net_cls control group processes
-diff --git a/net/netfilter/xt_cgroup.c b/net/netfilter/xt_cgroup.c
-index c0f5e9a4f3c65..f30a62e803d22 100644
---- a/net/netfilter/xt_cgroup.c
-+++ b/net/netfilter/xt_cgroup.c
-@@ -23,6 +23,14 @@ MODULE_DESCRIPTION("Xtables: process control group matching");
- MODULE_ALIAS("ipt_cgroup");
- MODULE_ALIAS("ip6t_cgroup");
- 
-+static bool possible_classid(u32 classid)
-+{
-+	if (!IS_ENABLED(CONFIG_CGROUP_NET_CLASSID) && classid > 0)
-+		return false;
-+	else
-+		return true;
-+}
-+
- static int cgroup_mt_check_v0(const struct xt_mtchk_param *par)
- {
- 	struct xt_cgroup_info_v0 *info = par->matchinfo;
-@@ -30,6 +38,11 @@ static int cgroup_mt_check_v0(const struct xt_mtchk_param *par)
- 	if (info->invert & ~1)
- 		return -EINVAL;
- 
-+	if (!possible_classid(info->id)) {
-+		pr_info("xt_cgroup: invalid classid\n");
-+		return -EINVAL;
-+	}
-+
- 	return 0;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 70af12b693a3..63bb77ee1bb1 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -7633,7 +7633,7 @@ static bool kvm_nx_huge_page_recovery_worker(void *data)
+ 	return true;
  }
  
-@@ -51,6 +64,11 @@ static int cgroup_mt_check_v1(const struct xt_mtchk_param *par)
- 		return -EINVAL;
- 	}
+-static void kvm_mmu_start_lpage_recovery(struct once *once)
++static int kvm_mmu_start_lpage_recovery(struct once *once)
+ {
+ 	struct kvm_arch *ka = container_of(once, struct kvm_arch, nx_once);
+ 	struct kvm *kvm = container_of(ka, struct kvm, arch);
+@@ -7645,12 +7645,13 @@ static void kvm_mmu_start_lpage_recovery(struct once *once)
+ 				      kvm, "kvm-nx-lpage-recovery");
  
-+	if (!possible_classid(info->classid)) {
-+		pr_info("xt_cgroup: invalid classid\n");
-+		return -EINVAL;
-+	}
-+
- 	info->priv = NULL;
- 	if (info->has_path) {
- 		cgrp = cgroup_get_from_path(info->path);
-@@ -83,6 +101,11 @@ static int cgroup_mt_check_v2(const struct xt_mtchk_param *par)
- 		return -EINVAL;
- 	}
+ 	if (IS_ERR(nx_thread))
+-		return;
++		return PTR_ERR(nx_thread);
  
-+	if (info->has_classid && !possible_classid(info->classid)) {
-+		pr_info("xt_cgroup: invalid classid\n");
-+		return -EINVAL;
-+	}
+ 	vhost_task_start(nx_thread);
+ 
+ 	/* Make the task visible only once it is fully started. */
+ 	WRITE_ONCE(kvm->arch.nx_huge_page_recovery_thread, nx_thread);
++	return 0;
+ }
+ 
+ int kvm_mmu_post_init_vm(struct kvm *kvm)
+@@ -7658,10 +7659,7 @@ int kvm_mmu_post_init_vm(struct kvm *kvm)
+ 	if (nx_hugepage_mitigation_hard_disabled)
+ 		return 0;
+ 
+-	call_once(&kvm->arch.nx_once, kvm_mmu_start_lpage_recovery);
+-	if (!kvm->arch.nx_huge_page_recovery_thread)
+-		return -ENOMEM;
+-	return 0;
++	return call_once(&kvm->arch.nx_once, kvm_mmu_start_lpage_recovery);
+ }
+ 
+ void kvm_mmu_pre_destroy_vm(struct kvm *kvm)
+diff --git a/include/linux/call_once.h b/include/linux/call_once.h
+index 6261aa0b3fb0..56cb9625b48b 100644
+--- a/include/linux/call_once.h
++++ b/include/linux/call_once.h
+@@ -9,15 +9,15 @@
+ #define ONCE_COMPLETED   2
+ 
+ struct once {
+-        atomic_t state;
+-        struct mutex lock;
++	atomic_t state;
++	struct mutex lock;
+ };
+ 
+ static inline void __once_init(struct once *once, const char *name,
+ 			       struct lock_class_key *key)
+ {
+-        atomic_set(&once->state, ONCE_NOT_STARTED);
+-        __mutex_init(&once->lock, name, key);
++	atomic_set(&once->state, ONCE_NOT_STARTED);
++	__mutex_init(&once->lock, name, key);
+ }
+ 
+ #define once_init(once)							\
+@@ -26,20 +26,26 @@ do {									\
+ 	__once_init((once), #once, &__key);				\
+ } while (0)
+ 
+-static inline void call_once(struct once *once, void (*cb)(struct once *))
++static inline int call_once(struct once *once, int (*cb)(struct once *))
+ {
+-        /* Pairs with atomic_set_release() below.  */
+-        if (atomic_read_acquire(&once->state) == ONCE_COMPLETED)
+-                return;
++	int r, state;
+ 
+-        guard(mutex)(&once->lock);
+-        WARN_ON(atomic_read(&once->state) == ONCE_RUNNING);
+-        if (atomic_read(&once->state) != ONCE_NOT_STARTED)
+-                return;
++	/* Pairs with atomic_set_release() below.  */
++	if (atomic_read_acquire(&once->state) == ONCE_COMPLETED)
++		return 0;
+ 
+-        atomic_set(&once->state, ONCE_RUNNING);
+-        cb(once);
+-        atomic_set_release(&once->state, ONCE_COMPLETED);
++	guard(mutex)(&once->lock);
++	state = atomic_read(&once->state);
++	if (unlikely(state != ONCE_NOT_STARTED))
++		return WARN_ON_ONCE(state != ONCE_COMPLETED) ? -EINVAL : 0;
 +
- 	info->priv = NULL;
- 	if (info->has_path) {
- 		cgrp = cgroup_get_from_path(info->path);
++	atomic_set(&once->state, ONCE_RUNNING);
++	r = cb(once);
++	if (r)
++		atomic_set(&once->state, ONCE_NOT_STARTED);
++	else
++		atomic_set_release(&once->state, ONCE_COMPLETED);
++	return r;
+ }
+ 
+ #endif /* _LINUX_CALL_ONCE_H */
 
-base-commit: dd83757f6e686a2188997cb58b5975f744bb7786
+base-commit: 7d2322b0472eb402e8a206ba9b332b6c75f6f130
 -- 
-2.48.1
-
 
