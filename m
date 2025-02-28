@@ -1,103 +1,185 @@
-Return-Path: <netdev+bounces-170803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B903CA49F4D
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 17:50:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58A00A49F5A
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 17:52:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 959941894F83
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 16:50:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58AFA16F245
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 16:52:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22B7326F444;
-	Fri, 28 Feb 2025 16:49:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE8D3276021;
+	Fri, 28 Feb 2025 16:52:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="VsMpQDTm"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="YTkDYpJS"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f67.google.com (mail-ej1-f67.google.com [209.85.218.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B258E18E743;
-	Fri, 28 Feb 2025 16:49:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 456FC27293A
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 16:52:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740761398; cv=none; b=nC6hwk6UHrMLABiZIm9IAif2Or7WVO5/CSVvhbssDq9ed0XevZ1d+yEGBh4QTqG05YrnjMHucqyPhIpBHZAYdyVVbvkhEhC762p+96O81hFvSjibglpN7kef2986eTmPIjwEyrw2VokmOdUSKfBKrsJu6kxXc0Q5LeWn78e3XCI=
+	t=1740761543; cv=none; b=islV5KQRFw/bXfuHc1sdlNhFgH71I8NkeWiXFsJs63hSjOS8M0mRzSClYOlz0Cnt48uTXO7UftdKJMy8PErtVPNMuXZLNsfMSVU8hUHZiWqY3ykd3ICm/o6lDRpydh4ERqDO+VVX4rRd8esnQ8VKUWBco6pY9J6FL5wmCS6TLbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740761398; c=relaxed/simple;
-	bh=4ayIV09zA1aU9cNC0Dxn9dvfibquc77ZN+Q0+zzNyhg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dd5ZQkXEit6y9/o5aJdOh6z1R7Gc5vrKQs2m6tiqv0m6sxf3I99Oeu01b9dWV7T8VUYqF4JpkqF+41Nhrw38ki5qBe2xTgs6X1iA9hnI3KnS4tRnsgdMAd1avnSX2zTi3HBMSbnB23h0yIbwYRCZBCitNo8S7fKAL/CzLt8k448=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=VsMpQDTm; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 7A486432B3;
-	Fri, 28 Feb 2025 16:49:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1740761388;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x9fDfZJB/WezRePteXdcKn6DL3l6XX4XrV4HxKoRPK4=;
-	b=VsMpQDTmTRTfwdsJcEnPhDuR8dcLtn9+OYZ/jXEJDLTMH8x9BsC0R3jFrLYXDZbztvRrl+
-	TA6jKDzEDfxSRYzKGtuOUu9v1EQ+52cJ/eTBhHw3zo/yuktwCVcGwFL8+GBEYCwoEiNWMa
-	VJUGe6QuYYTHBWxogzuSTTNl22ql57r+FvLAYK2TiScaf9wuz0lQkVEl/Z3euDhKGKxR0X
-	gKsBnpKnWWaMfJidzwlgSM23rVtcgX42WCt7FumF+1+mgfoDCriyq/93bzl11cxP+gTLwI
-	a60cxKSPxNWKb3FR5jYBTklVEB1aVcmsCTnP5AemuDJJhpqzAyQ+AeRCleuljg==
-Date: Fri, 28 Feb 2025 17:49:45 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, linux-arm-kernel@lists.infradead.org,
- Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina
- <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
- <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Simon Horman <horms@kernel.org>, Romain Gantois
- <romain.gantois@bootlin.com>
-Subject: Re: [PATCH net-next v3 09/13] net: phylink: Use phy_caps_lookup for
- fixed-link configuration
-Message-ID: <20250228174945.791c3f74@fedora.home>
-In-Reply-To: <Z8HiZpxPLy9YKTsf@shell.armlinux.org.uk>
-References: <20250228145540.2209551-1-maxime.chevallier@bootlin.com>
-	<20250228145540.2209551-10-maxime.chevallier@bootlin.com>
-	<Z8HiZpxPLy9YKTsf@shell.armlinux.org.uk>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1740761543; c=relaxed/simple;
+	bh=NsYtIP9Mw2b/nhaNRRDG6qj+beqFgzVf9yFx5qbgPTQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=G4yCD71umi3AefZo4RvlqINOp9msVnvR2lhOwWctcRNJkrdN381AAlXjsdj9WNflqUV2EuzKMnQ8UBzMpBganBn3agupVzy4YPFPe+NnfI7UQZGe12PBJix7KhUzEvK04fmjZVAr3B/dJO5Kfxqa0z2hSXUf4+0o603lCVGKQFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=YTkDYpJS; arc=none smtp.client-ip=209.85.218.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ej1-f67.google.com with SMTP id a640c23a62f3a-abf3d64849dso83815666b.3
+        for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 08:52:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1740761538; x=1741366338; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DMEGjq6WjEVsV0tBdx2rpYvL0pVPJ8Xct6E1Q4Bt1js=;
+        b=YTkDYpJS9a21ha422hVk0M8FVi/r7w5KDTgauOPejHxA01oz21EZNje4EDQpBVgejx
+         G3uvmDgSjBjnPvTWQsCnaqX2miIy2PwJL+Wo6rqlHmcWfe9dha4dtAaPp7Uj0ixE4nK6
+         IovPR0tWI2cyyilIJNq32XUiwoEtmmaNOTbWYfo+czwwuM234dNhSYgGYot0QW5JvCXN
+         C9dV/Uy8A08m623K5emrCA6nu19+2NwAOxsipR/93D8rrujFYQZOPbPTvC3yGgvpyvtw
+         qRsHLUbM+eAjLjb4g+kck3HAgMjOziYyQag1o+3lMyZ7bqlfUB6SMMndfb1lOoWrbUsY
+         B10g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740761538; x=1741366338;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DMEGjq6WjEVsV0tBdx2rpYvL0pVPJ8Xct6E1Q4Bt1js=;
+        b=RolOoZG1GywQ4Hee7gcEhdf7kjpRw6UsmHNYaE5jz68D3ZajwsYyb3fkLdp3to/SGF
+         mK0PirBsQeptBpeM6zR/0enTaxtNBqohW9siv8PJ5P63dYrrfcWIECfe4ABjBFystGpE
+         bhGx1neVmvJ0FITJRlVZ5StAzOK3BXB48adG2xc1gIT2k8rGR12CQ4zAZAVALZH/ZVFI
+         n2ai+tEnyd5sH9daBllOBMpG4HnVQv7pgTHFqSUN+HyNI0H7gSyTG20fFVUWA071/4al
+         fNA891RMzomsn3lEOuzzhd9b3CSj+JyQnMgoGKbkhdY30Ft6gQb72IgGXJRwJ0rlCPWH
+         ze7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVE2p/ay/oEY7ZCq6D6xi0pJQlmEoV+UzpgnFpWJ4C+UvirHE+9+A8f89HeAOGcUtG2fWrRaz4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzzN68W+lk+1mCX0GEhByndghx9SHdZoJEa5We9+eBDE2ycpBq+
+	T30tikfNPp/wijtB0CqDsX3fhiToKx+EtvxzH5oijA+ErHfz9glcFkQNYt3sy80=
+X-Gm-Gg: ASbGncvwfg9MV6skucx544LgMxt8K1xaRN0qbGuGL1UGoDfMlmRCzZwy2ct+PlhZHBN
+	wbG8NQRDAb41a1IA4uFl+rAUXmIKI3RHAN6uAIRN6oNYT3qbia+mq2RnbJ6eP5lkNJr6+nRQ7l9
+	JR5fngUzhVKnvmZifBfPmgu1sgODX94AWdmY4Rza0ZCg9TQcZ65T13/u6o91r54sDNey5mqhN1e
+	d8UZ4RCAgSpu+t7RpzyNlIzknEPW4gE4z4cfGuNwl8bnn+cvPDPhGlTrDn3Bd11WUpXpMKRXAH6
+	27XxSUaTsgGQGjjrMCrRtU7zi8sL
+X-Google-Smtp-Source: AGHT+IEs+LalzKtbPFpkKQgFWFd0Lu/RhKgnHSlViKu4ecCAJmjCZ0T6cL/fwlL89/H2Lwl2Cv9zFw==
+X-Received: by 2002:a05:6402:2790:b0:5df:6a:54ea with SMTP id 4fb4d7f45d1cf-5e4d6adc7a0mr7561214a12.11.1740761538383;
+        Fri, 28 Feb 2025 08:52:18 -0800 (PST)
+Received: from blackdock.suse.cz ([193.86.92.181])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e4c3b6d252sm2764784a12.26.2025.02.28.08.52.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Feb 2025 08:52:17 -0800 (PST)
+From: =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>
+To: netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	cgroups@vger.kernel.org
+Subject: [PATCH] netfilter: Make xt_cgroup independent from net_cls
+Date: Fri, 28 Feb 2025 17:52:16 +0100
+Message-ID: <20250228165216.339407-1-mkoutny@suse.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeltdeludcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduledprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtt
- hhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, 28 Feb 2025 16:20:54 +0000
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+The xt_group matching supports the default hierarchy since commit
+c38c4597e4bf3 ("netfilter: implement xt_cgroup cgroup2 path match").
+The cgroup v1 matching (based on clsid) and cgroup v2 matching (based on
+path) are rather independent. Adjust Kconfig so that xt_group can be
+built even without CONFIG_NET_CLS_CGROUP for path matching. Also add a
+message for users when they attempt to specify any non-trivial clsid.
 
-> On Fri, Feb 28, 2025 at 03:55:34PM +0100, Maxime Chevallier wrote:
-> >  	adv = pl->link_config.advertising;
-> >  	linkmode_zero(adv);
-> > -	linkmode_set_bit(s->bit, adv);
-> > +	linkmode_and(adv, pl->supported, c->linkmodes);  
-> 
-> There is no need for linkmode_zero() with linkmode_and() immediately
-> after. linkmode_and() writes to its entire destination.
-> 
+Link: https://lists.opensuse.org/archives/list/kernel@lists.opensuse.org/thread/S23NOILB7MUIRHSKPBOQKJHVSK26GP6X/
+Signed-off-by: Michal Koutný <mkoutny@suse.com>
+---
+ net/netfilter/Kconfig     |  1 -
+ net/netfilter/xt_cgroup.c | 23 +++++++++++++++++++++++
+ 2 files changed, 23 insertions(+), 1 deletion(-)
 
-Ah true indeed, I'll address that.
+diff --git a/net/netfilter/Kconfig b/net/netfilter/Kconfig
+index df2dc21304efb..af9350386033e 100644
+--- a/net/netfilter/Kconfig
++++ b/net/netfilter/Kconfig
+@@ -1180,7 +1180,6 @@ config NETFILTER_XT_MATCH_CGROUP
+ 	tristate '"control group" match support'
+ 	depends on NETFILTER_ADVANCED
+ 	depends on CGROUPS
+-	select CGROUP_NET_CLASSID
+ 	help
+ 	Socket/process control group matching allows you to match locally
+ 	generated packets based on which net_cls control group processes
+diff --git a/net/netfilter/xt_cgroup.c b/net/netfilter/xt_cgroup.c
+index c0f5e9a4f3c65..f30a62e803d22 100644
+--- a/net/netfilter/xt_cgroup.c
++++ b/net/netfilter/xt_cgroup.c
+@@ -23,6 +23,14 @@ MODULE_DESCRIPTION("Xtables: process control group matching");
+ MODULE_ALIAS("ipt_cgroup");
+ MODULE_ALIAS("ip6t_cgroup");
+ 
++static bool possible_classid(u32 classid)
++{
++	if (!IS_ENABLED(CONFIG_CGROUP_NET_CLASSID) && classid > 0)
++		return false;
++	else
++		return true;
++}
++
+ static int cgroup_mt_check_v0(const struct xt_mtchk_param *par)
+ {
+ 	struct xt_cgroup_info_v0 *info = par->matchinfo;
+@@ -30,6 +38,11 @@ static int cgroup_mt_check_v0(const struct xt_mtchk_param *par)
+ 	if (info->invert & ~1)
+ 		return -EINVAL;
+ 
++	if (!possible_classid(info->id)) {
++		pr_info("xt_cgroup: invalid classid\n");
++		return -EINVAL;
++	}
++
+ 	return 0;
+ }
+ 
+@@ -51,6 +64,11 @@ static int cgroup_mt_check_v1(const struct xt_mtchk_param *par)
+ 		return -EINVAL;
+ 	}
+ 
++	if (!possible_classid(info->classid)) {
++		pr_info("xt_cgroup: invalid classid\n");
++		return -EINVAL;
++	}
++
+ 	info->priv = NULL;
+ 	if (info->has_path) {
+ 		cgrp = cgroup_get_from_path(info->path);
+@@ -83,6 +101,11 @@ static int cgroup_mt_check_v2(const struct xt_mtchk_param *par)
+ 		return -EINVAL;
+ 	}
+ 
++	if (info->has_classid && !possible_classid(info->classid)) {
++		pr_info("xt_cgroup: invalid classid\n");
++		return -EINVAL;
++	}
++
+ 	info->priv = NULL;
+ 	if (info->has_path) {
+ 		cgrp = cgroup_get_from_path(info->path);
 
-Thanks Russell,
+base-commit: dd83757f6e686a2188997cb58b5975f744bb7786
+-- 
+2.48.1
 
-Maxime
 
