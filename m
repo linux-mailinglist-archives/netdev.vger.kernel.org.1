@@ -1,220 +1,288 @@
-Return-Path: <netdev+bounces-170742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25399A49C73
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 15:54:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68CD9A49C7A
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 15:55:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 202B517526D
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 14:53:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EA8D1898C8D
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 14:56:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEECB270EA5;
-	Fri, 28 Feb 2025 14:53:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB4032702DF;
+	Fri, 28 Feb 2025 14:55:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T3MLbpq9"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="D4GQ4dIO"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C46C2702BF
-	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 14:53:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E7CA271260;
+	Fri, 28 Feb 2025 14:55:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740754411; cv=none; b=ion7VDikLzJdH/ZaWlnOk77ActcmYhTRhs6VbEHOSef8bvqEcx4avpQh3RxvjBpnZu5SIrvHJ3QAtg7q2xa/7vBBhmpMB0c5UVuBinMThs7reg5/qA/X9qGcOYZPd+2ZvfCRRGDSyrL+OvJ9YEgVf+M2VstapX9iPLSl31LOtuE=
+	t=1740754547; cv=none; b=M725oVQQc2QlDTHx6cE484BVSWYShUsPEKo7EPNgO2ZROmS61+BseMaeyWekK66ExkSC75CtIWiavgRdQuaDglhyXSnQZ7/AyGDZwB2Hjm7tQ0a2mrUEqGbQ3uALxVWA9yV2j5CeMp2PZWKlbPxkY+UVT3XkgPWrzLQ1M2QTeCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740754411; c=relaxed/simple;
-	bh=t1PAr2eEdMcCw9orI2VM67VmUdODOIx2DAcDEs7pVbw=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=IDOvrOmE6SFTZmzkmZq0bGhZXWBRQaXbzLG8PwxaTPckowTNXxBaCbwiEzfy/bii+EdbNgLgUEyQFjuSi6U+MDAP3G+CzQekz51wjYQC/a6fGULMtaccJLAQRXi1ER0OnMeAp1pn6ndai/SLByhceWJOkiUV5KR894A+Wb6XqJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T3MLbpq9; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740754408;
+	s=arc-20240116; t=1740754547; c=relaxed/simple;
+	bh=cZDEWIRto6mybFYqScjIJHXOSTfCON4Wzt7rpupUNbc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cVGLc0/Gg8p5ew4CnyZNjC/GBnVJAT2BoypAjVaFja0kLyuHmgfbXh+Nuj1KN5IL/rW1IBXJOYQEhO3m9W+9hU6qk1evH4Y21g4a50Nzeij6mL+8dQbxhNHNNbSj2ENfkjJHtEtmF5alWI3gJyiVAdZ5zQmYptG2OImhqByHxPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=D4GQ4dIO; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1E4B944390;
+	Fri, 28 Feb 2025 14:55:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1740754543;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=Y4Owtb6Y2XSyqYIbk6xQVrSNu7uVw1Cw1WOzP8Kp2SY=;
-	b=T3MLbpq9MIcFP0iTmP3EkKVUTe/JvUqC+B58HJt3n5Ko1ue24CFJEtfHtcUHFt/9U/Oodl
-	l63RwpKyh7VGPcgULWBRe7HL4LTaXzcxY55PgvEheBt/KV3DsVzgJAjGuyw9Yks288tBpu
-	/Pg0VHCgODRf52XevjW5LQmZ4M0ycjU=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-574-H5y_UyCeOcO65OrsRAm9Jg-1; Fri,
- 28 Feb 2025 09:53:25 -0500
-X-MC-Unique: H5y_UyCeOcO65OrsRAm9Jg-1
-X-Mimecast-MFC-AGG-ID: H5y_UyCeOcO65OrsRAm9Jg_1740754404
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 078F61944EB8;
-	Fri, 28 Feb 2025 14:53:24 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.44.32.200])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6EF2B1800358;
-	Fri, 28 Feb 2025 14:53:20 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <brauner@kernel.org>
-cc: David Howells <dhowells@redhat.com>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Jakub Kicinski <kuba@kernel.org>,
-    "David S.
- Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-    linux-afs@lists.infradead.org, linux-fsdevel@lists.infradead.org,
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [GIT PULL v2] afs, rxrpc: Clean up refcounting on afs_cell and afs_server records
+	bh=pD0aysiymrvllBFzGF1nBmIkQ51KRCeKfXG88hk7YFg=;
+	b=D4GQ4dIOy60FBFoSX3KDoMN6mwMMebvjw000ncNAfqP2sNmnKAik/1F0JoLS8XFBQk08WJ
+	WZkGSahOpFK3a5/HC+B/Rt+URDNuFR0RIIS4hg/ct5kiClXRJNsYqrVHEykTIotbzPFc1U
+	FfoQ5dlg+Mh/wrdoUXv5EZSBh7kJwNsZp2sDd/qXl0IC19miPw766LXvcphRX/mtMkscn8
+	QOn+peH7mrqJ1JLveJwPoOslvbLP+bKRY4+6zRfAcTSYvS1Ldu9QlnF2STcpnHQDQlW3Or
+	Fzf9m68J45wMZKke8ypYEMtY1ldTNzhgukqXWaRoAfiaYh45tqiMWbEcoSatdA==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Simon Horman <horms@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>
+Subject: [PATCH net-next v3 00/13] net: phy: Rework linkmodes handling in a dedicated file
+Date: Fri, 28 Feb 2025 15:55:25 +0100
+Message-ID: <20250228145540.2209551-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3399676.1740754398.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 28 Feb 2025 14:53:18 +0000
-Message-ID: <3399677.1740754398@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Transfer-Encoding: 8bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeltdeilecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeejhfelieehgfffiefftdffiedvheefteehkedukefgteffteevffeuueejiedtveenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecukfhppedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgdphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvddtpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlr
+ dhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhm
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hi Christian,
+Hello everyone,
 
-Could you pull this into the VFS tree onto a stable branch, replacing the
-earlier pull?  The patches were previously posted here as part of a longer
-series:
+This is V3 of the phy_caps series. In a nutshell, this series reworks the way
+we maintain the list of speed/duplex capablities for each linkmode so that we
+no longer have multiple definition of these associations.
 
-  https://lore.kernel.org/r/20250224234154.2014840-1-dhowells@redhat.com/
+That will help making sure that when people add new linkmodes in
+include/uapi/linux/ethtool.h, they don't have to update phylib and phylink as
+well, making the process more straightforward and less error-prone.
 
-The first five patches are fixes that have gone through the net tree to
-Linus and hence this patchset is based on the latest merge by Linus and
-I've dropped those from my branch.
+It also generalises the phy_caps interface to be able to lookup linkmodes
+from phy_interface_t, which is needed for the multi-port work I've been working
+on for a while.
 
-This fixes an occasional hang that's only really encountered when rmmod'in=
-g
-the kafs module, one of the reasons why I'm proposing it for the next merg=
-e
-window rather than immediate upstreaming.  The changes include:
+This V3 addresses Russell's comments on the naming for the patches, but doesn't
+contain any change in the code. There were a question from Russell on patch 9
+from the previous round which I answered, I have kept the same API in that round
+as I don't know if the conclusion from that discussion is that the phy_caps_lookup
+API is OK or not.
 
- (1) Remove the "-o autocell" mount option.  This is obsolete with the
-     dynamic root and removing it makes the next patch slightly easier.
+I understand that this series isn't easy to review, if that's too much to process
+for the limited gains, I'll come-up with a simpler approach for the phy_port and
+leave the phy_settings alone :)
 
- (2) Change how the dynamic root mount is constructed.  Currently, the roo=
-t
-     directory is (de)populated when it is (un)mounted if there are cells
-     already configured and, further, pairs of automount points have to be
-     created/removed each time a cell is added/deleted.
+V1 : https://lore.kernel.org/netdev/20250222142727.894124-1-maxime.chevallier@bootlin.com/
+V2 : https://lore.kernel.org/netdev/20250226100929.1646454-1-maxime.chevallier@bootlin.com/
 
-     This is changed so that readdir on the root dir lists all the known
-     cell automount pairs plus the @cell symlinks and the inodes and
-     dentries are constructed by lookup on demand.  This simplifies the
-     cell management code.
+For context, The text below is an extract from the V1 cover :
 
- (3) A few improvements to the afs_volume tracepoint.
+Following the V4 of the phy_port series [1] we've discussed about attempting
+to extract some of the linkmode <-> capabilities (speed/duplex) <-> interface
+logic into a dedicated file, so that we can re-use that logic out of
+phylink.
 
- (4) A few improvements to the afs_server tracepoint.
+While trying to do that, I might have gotten a bit carried-away, and I'm
+therefore submitting this series to rework the way we are currently
+managing the linkmodes <-> capabilities handling.
 
- (5) Pass trace info into the afs_lookup_cell() function to allow the trac=
-e
-     log to indicate the purpose of the lookup.
+We are currently defining all the possible Ethernet linkmodes in an
+enum ethtool_link_mode_bit_indices value defined in uapi/linux/ethtool.h :
 
- (6) Remove the 'net' parameter from afs_unuse_cell() as it's superfluous.
+	ETHTOOL_LINK_MODE_10baseT_Half_BIT	= 0,
+	ETHTOOL_LINK_MODE_10baseT_Full_BIT	= 1,
+	...
 
- (7) In rxrpc, allow a kernel app (such as kafs) to store a word of
-     information on rxrpc_peer records.
+Each of these modes represents a media-side link definition, and runs at
+a given speed and duplex.
 
- (8) Use the information stored on the rxrpc_peer record to point to the
-     afs_server record.  This allows the server address lookup to be done
-     away with.
+Specific attributes for each modes are stored in net/ethtool/common.c, as
+an array of struct link_mode_info :
 
- (9) Simplify the afs_server ref/activity accounting to make each one
-     self-contained and not garbage collected from the cell management wor=
-k
-     item.
+	struct link_mode_info {
+		int				speed;
+		u8				lanes;
+		u8				duplex;
+	}
 
-(10) Simplify the afs_cell ref/activity accounting to make each one of
-     these also self-contained and not driven by a central management work
-     item.
+The link_mode_params[] array is the canonical definition for these modes,
+as (1) there are build-time checks to make sure any new linkmode
+definition is also defined in this array and (2) this array is always
+compiled-in, as it's part of the net stack (i.e. it is not phylib-specific).
 
-     The current code was intended to make it such that a single timer for
-     the namespace and one work item per cell could do all the work
-     required to maintain these records.  This, however, made for some
-     sequencing problems when cleaning up these records.  Further, the
-     attempt to pass refs along with timers and work items made getting it
-     right rather tricky when the timer or work item already had a ref
-     attached and now a ref had to be got rid of.
+This array is however not optimized for lookups, as it is not ordered in
+any particular fashion (new modes go at the end, regardless of their speed
+and duplex).
+
+Phylib also includes a similar array, in the form of the phy_settings
+array in drivers/net/phy/phy-core.c :
+
+	struct phy_setting {
+		u32 speed;
+		u8 duplex;
+		u8 bit; // The enum index for the linkmode
+	};
+
+The phy_settings array however is ordered by descending speeds. A variety
+of helpers in phylib rely on that ordering to perform lookups, usually
+to get one or any linkmode corresponding to a requested speed and duplex.
+
+Finally, we have some helpers in phylink (phylink_caps_to_linkmodes) that
+allows getting the list of linkmodes that match a set of speed and duplex
+value, all at once.
+
+While the phylink and phylib helpers allows for efficient lookups, they
+have some drawbacks as well :
+
+	(1) : It's easy to forget updating of all of these helpers and structures
+		  when adding a new linkmode. New linkmodes are actually added fairly
+		  often, lately either for slow BaseT1 flavours, or for crazy-fast
+		  modes (800Gbps modes, but I guess people won't stop there)
+		  
+	(2) : Even though the phylink and phylib modes use carefull sorting
+		  to speed-up the lookup process, the phylib lookups are usually
+		  done in descending speed order and will therefore get slower
+		  as people add even faster link speeds.
+		  
+This series introduces a new "link_capabilities" structure that is used
+to build an array of link_caps :
+
+	struct link_capabilities {
+		int speed;                           
+		unsigned int duplex;
+		__ETHTOOL_DECLARE_LINK_MODE_MASK(linkmodes);
+	};
+
+We group these in an array, indexed with LINK_CAPA enums that are basically
+identical to the phylink MAC_CAPS :
+
+...
+LINK_CAPA_1000HD,             
+LINK_CAPA_1000FD,
+LINK_CAPA_2500FD,
+LINK_CAPA_5000FD,
+...
+
+We now have an associative array of <speed,duplex> <-> All compatible linkmodes
+
+This array is initialized at phylib-init time based on the content of
+the link_mode_params[] array from net/ethtool/common.c, that way it is
+always up-to-date with new modes, and always properly ordered.
+
+Patches 3 to 8 then convert all lookups from the phy_settings array into
+lookups from this link_caps array, hopefully speeding-up lookups in the
+meantime (we iterate over possible speeds instead of individual linkmodes)
+
+This series is not meant to introduce changes in behaviour, however patches
+9 and 10 do introduce functionnal changes. When configuring the advert
+for speeds >= 1G in PHY devices, as well as when constructing the link
+parameters for fixed links in phylink, we used to rely on phy_settings
+lookups returning one, and only one, compatible linkmode. This series will
+make so that the lookups will result on all matching linkmodes being
+returned, and MAY cause advert/fixed-link configuring more linkmodes.
+
+Patches 12 and 13 extract the conversion logic for interface <-> caps from
+phylink.
+
+There are cons as well for this, as this is a bit more init time for phylib,
+but maybe more importantly, we lose in the precision for the lookups in
+phy_settings. However, given all the uses for phy_settings (most are just
+to get speed/duplex), I think this is actually ok, but any comment would
+be very welcome.
+
+This series was tested with :
+ - 10/100/1000M links
+ - 2,5, 5, 10G BaseT links
+ - 1G Fixed link
+
+I also made sure that this compiles with the following options :
+
+CONFIG_PHYLIB=n
+
+CNFIG_PHYLINK=m
+CONFIG_PHYLIB=m
+
+CNFIG_PHYLINK=m
+CONFIG_PHYLIB=y
+
+CNFIG_PHYLINK=y
+CONFIG_PHYLIB=y
+
+All the new helpers that were introduced (in drivers/net/phy/phy-caps.h)
+are for internal use only (only users should be core stuff, such as phylib and
+phylink, and in the future, phy_port).
 
 Thanks,
-David
 
-Changes
-=3D=3D=3D=3D=3D=3D=3D
-ver #2)
- - Fix an error check of the form "unsigned value < 0".
+Maxime
 
-Link: https://lore.kernel.org/r//3190716.1740733119@warthog.procyon.org.uk=
-/ # v1
+[1]: https://lore.kernel.org/netdev/20250213101606.1154014-1-maxime.chevallier@bootlin.com/
 
----
-The following changes since commit 1e15510b71c99c6e49134d756df91069f7d1814=
-1:
+Maxime Chevallier (13):
+  net: ethtool: Export the link_mode_params definitions
+  net: phy: Use an internal, searchable storage for the linkmodes
+  net: phy: phy_caps: Move phy_speeds to phy_caps
+  net: phy: phy_caps: Move __set_linkmode_max_speed to phy_caps
+  net: phy: phy_caps: Introduce phy_caps_valid
+  net: phy: phy_caps: Implement link_capabilities lookup by linkmode
+  net: phy: phy_caps: Allow looking-up link caps based on speed and
+    duplex
+  net: phy: phy_device: Use link_capabilities lookup for PHY aneg config
+  net: phylink: Use phy_caps_lookup for fixed-link configuration
+  net: phy: drop phy_settings and the associated lookup helpers
+  net: phylink: Add a mapping between MAC_CAPS and LINK_CAPS
+  net: phylink: Convert capabilities to linkmodes using phy_caps
+  net: phy: phy_caps: Allow getting an phy_interface's capabilities
 
-  Merge tag 'net-6.14-rc5' of git://git.kernel.org/pub/scm/linux/kernel/gi=
-t/netdev/net (2025-02-27 09:32:42 -0800)
+ drivers/net/phy/Makefile     |   2 +-
+ drivers/net/phy/phy-caps.h   |  62 +++++++
+ drivers/net/phy/phy-core.c   | 253 ++------------------------
+ drivers/net/phy/phy.c        |  37 ++--
+ drivers/net/phy/phy_caps.c   | 340 +++++++++++++++++++++++++++++++++++
+ drivers/net/phy/phy_device.c |  13 +-
+ drivers/net/phy/phylink.c    | 337 +++++++++-------------------------
+ include/linux/ethtool.h      |   8 +
+ include/linux/phy.h          |  15 --
+ net/ethtool/common.c         |   1 +
+ net/ethtool/common.h         |   7 -
+ 11 files changed, 532 insertions(+), 543 deletions(-)
+ create mode 100644 drivers/net/phy/phy-caps.h
+ create mode 100644 drivers/net/phy/phy_caps.c
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags=
-/afs-next-20250228-2
-
-for you to fetch changes up to 1832e155fa7aafa7a983bb3db2e5a7dbe0f1b074:
-
-  afs: Simplify cell record handling (2025-02-28 14:42:00 +0000)
-
-----------------------------------------------------------------
-afs: Fix ref leak in rmmod
-
-----------------------------------------------------------------
-David Howells (10):
-      afs: Remove the "autocell" mount option
-      afs: Change dynroot to create contents on demand
-      afs: Improve afs_volume tracing to display a debug ID
-      afs: Improve server refcount/active count tracing
-      afs: Make afs_lookup_cell() take a trace note
-      afs: Drop the net parameter from afs_unuse_cell()
-      rxrpc: Allow the app to store private data on peer structs
-      afs: Use the per-peer app data provided by rxrpc
-      afs: Fix afs_server ref accounting
-      afs: Simplify cell record handling
-
- fs/afs/addr_list.c         |  50 ++++
- fs/afs/cell.c              | 436 ++++++++++++++------------------
- fs/afs/cmservice.c         |  82 +------
- fs/afs/dir.c               |   5 +-
- fs/afs/dynroot.c           | 484 +++++++++++++++---------------------
- fs/afs/fs_probe.c          |  32 ++-
- fs/afs/fsclient.c          |   4 +-
- fs/afs/internal.h          |  98 ++++----
- fs/afs/main.c              |  16 +-
- fs/afs/mntpt.c             |   5 +-
- fs/afs/proc.c              |  15 +-
- fs/afs/rxrpc.c             |   8 +-
- fs/afs/server.c            | 601 +++++++++++++++++++---------------------=
------
- fs/afs/server_list.c       |   6 +-
- fs/afs/super.c             |  25 +-
- fs/afs/vl_alias.c          |   7 +-
- fs/afs/vl_rotate.c         |   2 +-
- fs/afs/volume.c            |  15 +-
- include/net/af_rxrpc.h     |   2 +
- include/trace/events/afs.h |  83 ++++---
- net/rxrpc/ar-internal.h    |   1 +
- net/rxrpc/peer_object.c    |  30 ++-
- 22 files changed, 903 insertions(+), 1104 deletions(-)
+-- 
+2.48.1
 
 
