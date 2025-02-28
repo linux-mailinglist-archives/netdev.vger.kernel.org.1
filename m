@@ -1,86 +1,74 @@
-Return-Path: <netdev+bounces-170795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF540A49ED5
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 17:31:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E2C66A49F04
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 17:38:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76D853B3192
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 16:30:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4A513B7A2B
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 16:37:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B20D3199FBA;
-	Fri, 28 Feb 2025 16:30:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B28D27425D;
+	Fri, 28 Feb 2025 16:37:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ckz/PcP4"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fHOywo9E"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DD6C14A4DF
-	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 16:30:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08E5D274269
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 16:37:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740760233; cv=none; b=NzkorsrO4lnl0cXkUNX/O2B1xGFofNnEcEq56h5nx1lmESA2Td6oCh1vks8WVEyqfs+r3+PkrSBTRwSO55olJz/10ewu7bSObiuZzOLQnsLvkwSs4evSHLpwWsuiQBrzhxRFz1AJsj9/rJ3HNmb03/oMeygue0c6KqKZcpXXAqU=
+	t=1740760650; cv=none; b=YbefmhEUjFd9t2ImoJjk7/A6h/BoHjxJSclRwXffeK/D+d4Jujf/WefUnm/jOyrYkBm6f9rTAo9yxQS12oY/t08X/5iyDHKmtvcYJcNWkNjxmH7yC9gX7MxKnSeLgWYaC++VgsIe3G5UGlcn3rd4D586amnwKcjuFwPmMi50v/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740760233; c=relaxed/simple;
-	bh=3KtmV5ME+F1pYQp+xfSt0h4YT4MAlpymShBBSIhkOkA=;
+	s=arc-20240116; t=1740760650; c=relaxed/simple;
+	bh=bgjg/hEmlBXv67fTl4fRy81b4dDXu1T6gmhB1dO3WdI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i/xvnfg1VUTYb2VjZE6xdJfcqoGMdrZPJLaJdgePwlBy2mUd0kibnIeLp5OnFNapCyvqAbaJnS9XezFvCYqY/brIbgSQj2Vh6AVS+m8jJQday2giZuy6lm/yUJd/egM+6tE7VlKrqYlMQgm0XFS4bSWoRXFPceZl5Y2bkeGfEJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ckz/PcP4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B952DC4CED6;
-	Fri, 28 Feb 2025 16:30:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740760233;
-	bh=3KtmV5ME+F1pYQp+xfSt0h4YT4MAlpymShBBSIhkOkA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ckz/PcP4/9P4X2n/0Y8qpr1/yfjzOE0Oqk5scRqL9CNiTVHdDDIjPcHFFIT6hUxY/
-	 ZJdQjrjScPh6/RNSI5unjm+QmpFuoc/JgEP6VznqPsX74npi522D89IZLfs2j6S/IA
-	 zLfRePoRcDTNUH93fet4Y5J1zd4zALQYjOMj+U1dzRftH2K25zt1Ri+tyO1rHnIW7V
-	 xQzAGrbZrP88v1pOQJbYHM14y5lGPTjKegvk0eeFSRRAf3QoRHn6+Dy6zsJIR6ux9n
-	 Sn/nAdb5gtDdTYUw6g5lQ/enpWAbYHqZRWOVIIIyMU8szhBweqyM4OgosuKLF7eW0+
-	 yJlky2ZBwJMug==
-Message-ID: <02e5bf07-b722-475e-91e5-78def5e6a83a@kernel.org>
-Date: Fri, 28 Feb 2025 09:30:32 -0700
+	 In-Reply-To:Content-Type; b=CYnt5hfnm4s7MHcfltA+JzMxwikC9Q1jnfCShh5uUwVJ/Y33VIsiwkABJtRxRQvzXKWolafz23d6ZGI3skEKxYMbMgKltAmczESkpH+76K/RnCvRWHgVuWLU6Rve5CS7I2ihV6VUS4t2f7PWeABXZ9waX6Rk8OEVKFqz3zIBYJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fHOywo9E; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <64a6131a-79d8-4250-9215-5e565a598424@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1740760635;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yVrsBw3fKJbseyJjn+B6nGAkxIf2sXzvqUGFkrakjmA=;
+	b=fHOywo9ErC6m0P2jZEnXQ7vgcWmHdqXDSEWMuHjpx8US8oTSv8SFvwhhQGwmXILoZ1sSHW
+	2L+PDHrt4ebf5xGK0aUX26AV+QieJTdRzSQStv0zR8QJU1A4/yiUM9rFfZs2y+VadKZXIp
+	bcKMq1xV57NluZrX5IoESMTwIhEOJ6s=
+Date: Fri, 28 Feb 2025 16:37:10 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] inet: ping: avoid skb_clone() dance in
- ping_rcv()
+Subject: Re: [PATCH v4 net-next] dpll: Add an assertion to check
+ freq_supported_num
+To: Jiasheng Jiang <jiashengjiangcool@gmail.com>, przemyslaw.kitszel@intel.com
+Cc: arkadiusz.kubalewski@intel.com, davem@davemloft.net, jan.glaza@intel.com,
+ jiri@resnulli.us, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ stable@vger.kernel.org
+References: <20250228150210.34404-1-jiashengjiangcool@gmail.com>
 Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com
-References: <20250226183437.1457318-1-edumazet@google.com>
- <20250226183437.1457318-3-edumazet@google.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20250226183437.1457318-3-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250228150210.34404-1-jiashengjiangcool@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On 2/26/25 11:34 AM, Eric Dumazet wrote:
-> ping_rcv() callers currently call skb_free() or consume_skb(),
-> forcing ping_rcv() to clone the skb.
+On 28/02/2025 15:02, Jiasheng Jiang wrote:
+> Since the driver is broken in the case that src->freq_supported is not
+> NULL but src->freq_supported_num is 0, add an assertion for it.
 > 
-> After this patch ping_rcv() is now 'consuming' the original skb,
-> either moving to a socket receive queue, or dropping it.
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->  net/ipv4/icmp.c |  5 +++--
->  net/ipv4/ping.c | 20 +++++---------------
->  net/ipv6/icmp.c |  7 ++-----
->  3 files changed, 10 insertions(+), 22 deletions(-)
-> 
+> Signed-off-by: Jiasheng Jiang <jiashengjiangcool@gmail.com>
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
-
-
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
