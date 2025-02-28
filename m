@@ -1,91 +1,102 @@
-Return-Path: <netdev+bounces-170830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B43D7A4A242
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 19:56:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E268A4A25F
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 20:04:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 75565177E4D
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 18:56:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53BED3A52B0
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 19:04:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FE711F875A;
-	Fri, 28 Feb 2025 18:55:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48CAB1C5D43;
+	Fri, 28 Feb 2025 19:04:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JiW3mquv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YwbwhTjW"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 898211F8734;
-	Fri, 28 Feb 2025 18:55:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B8281ADC8C;
+	Fri, 28 Feb 2025 19:04:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740768943; cv=none; b=igVFRe1KA5phCpeqKDcRMUYxlX02aMm+d59ycJPURdUc3MQl/F8YXuusbzxIYRweNtRVTspelEQblSVjNWCt/0ssXiiY/bsMBUcJU8DmyJoGQF7WfvXqwmAVGyI9LYtsD6mkMAzk+q3yf6PdaqkByGBmvx0QzKpLYSXGJ9RL1fw=
+	t=1740769482; cv=none; b=DWduKpwGSEeKwpB2jsW2FkG92Jk719pkvy5pkUNkigNMUtWqAF5aFrFQoz4UKAMXk+EEYQgLxCJaktTgO+9FRG2uR/3IKORsMlxN9ZOkc/vkt6RhI4mjEgGS93PuCB2JhRt7ABE3Er8c71pVA/s/rWTfMvW7LKsZ0+0DnSoExk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740768943; c=relaxed/simple;
-	bh=/KcXav0rabKJcPCYp34mQZzZViXUMDBOctIouFNUP98=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kCNurjdPcgCZCMQ2e7NEwLo99HN4L4cJbV8yJtSq1ZB5MsW+1ZyqKTHKxc2UrjatX7Rhev5lraFkyMuLmAKYATb708CsGR9ndsKJMaDNsUEsOa0JRcEuGahbNb/H/j6iUYYXOeqV1fX/oxP7ouf9ZysrRRf7ebZZ97UEyWZOkt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JiW3mquv; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <331d97f7-c1de-4b46-a1e5-75a3261d4e97@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740768929;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1iKOUsrjeukuigNTKIIt0ORYtWT59cRVVyENYRJLiyo=;
-	b=JiW3mquvsYYc9+1X3hlSZ6D3wCDFr3YthSmAfPn2WKNtyuXY5diXF9fTzP/3k7YagJDkV1
-	AX0eb51cjtxIsG5kFnYBxVX8I0btbzILvOQ8EMHaKmq47f7ykhmHx8VslkRmkWxw+YP+21
-	Ani+b4ufzj/fMQxszueUhOr2es1MUeo=
-Date: Fri, 28 Feb 2025 10:55:19 -0800
+	s=arc-20240116; t=1740769482; c=relaxed/simple;
+	bh=iFXFYJac1x/01yzYwzJ7fG3+azm9dT5eKRfdOp1DA6I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NqqStaevUXzsPH2E3fT6Bsw9cZMs4tGcaUH+IUbEHeomXPfgxOaDH4ewcgeEXr/YF8yMQFXvs8+JjsMHT6OKMa/lcTXsYH1EeBfcrsyCuscOCyz+BxSZcWVY84BA9fB1RN+IWnXKgspQuk9vVUgVGsA75j8IBP2VkOR78TBSHV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YwbwhTjW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18765C4CED6;
+	Fri, 28 Feb 2025 19:04:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740769481;
+	bh=iFXFYJac1x/01yzYwzJ7fG3+azm9dT5eKRfdOp1DA6I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YwbwhTjWsm/rEWnBTsCJipxxwmUD2J8KuLUOGYi+aUpraG2/peo7/zWSvm5cvML68
+	 64lfs/0VLYwbXLLqym0E0nRDsrtuSW8UNewpyqQqE2FszcdwWxB4sgLqNfky9WGw29
+	 RCBpk9vdQMnAlPYZrxjOLdbW/Ia3d+/dZFStcL2ClIqwaGPKwNibBu9bC4eCSfPBKU
+	 7ahQ6elkUneoih0kqjfMqLoCU9n6jurYDR7VJUpOk1C9cYPPdTtrvk/sUprARGj2hx
+	 UBTHctqjCg8baiXi68DWjerob+3LMTwlBVswGBjpbvsamKiH8qx5n9eptpaRobqUgX
+	 1F8olGDoVjQ3A==
+Date: Fri, 28 Feb 2025 19:04:36 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Kever Yang <kever.yang@rock-chips.com>
+Cc: heiko@sntech.de, linux-rockchip@lists.infradead.org,
+	Jose Abreu <joabreu@synopsys.com>, devicetree@vger.kernel.org,
+	Conor Dooley <conor+dt@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Rob Herring <robh@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	David Wu <david.wu@rock-chips.com>, Paolo Abeni <pabeni@redhat.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 1/3] dt-bindings: net: Add support for rk3562 dwmac
+Message-ID: <20250228-exciting-utility-29ca9428f121@spud>
+References: <20250227110652.2342729-1-kever.yang@rock-chips.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next] net: filter: Avoid shadowing variable in
- bpf_convert_ctx_access()
-Content-Language: en-GB
-To: Breno Leitao <leitao@debian.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250228-fix_filter-v1-1-ce13eae66fe9@debian.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <20250228-fix_filter-v1-1-ce13eae66fe9@debian.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="s6OSw9lCrmZNjA6K"
+Content-Disposition: inline
+In-Reply-To: <20250227110652.2342729-1-kever.yang@rock-chips.com>
 
 
+--s6OSw9lCrmZNjA6K
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2/28/25 10:43 AM, Breno Leitao wrote:
-> Rename the local variable 'off' to 'offset' to avoid shadowing the existing
-> 'off' variable that is declared as an `int` in the outer scope of
-> bpf_convert_ctx_access().
->
-> This fixes a compiler warning:
->
->   net/core/filter.c:9679:8: warning: declaration shadows a local variable [-Wshadow]
->
-> Signed-off-by: Breno Leitao <leitao@debian.org>
+On Thu, Feb 27, 2025 at 07:06:50PM +0800, Kever Yang wrote:
+> Add a rockchip,rk3562-gmac compatible for supporting the 2 gmac
+> devices on the rk3562.
+> rk3562 only has 4 clocks availabl for gmac module.
+>=20
+> Signed-off-by: Kever Yang <kever.yang@rock-chips.com>
 
-Make sense to me.
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
 
-Acked-by: Yonghong Song <yonghong.song@linux.dev>
+--s6OSw9lCrmZNjA6K
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZ8IIwwAKCRB4tDGHoIJi
+0l7CAQDQfVhiOrJrK6vQiAo9PKlTv9kpqY0pN2q/by1QLSaqJAEAs+3bvp2mwkfQ
+MJSUw0vuqY+xCcyhOApXc3xtB4aolgM=
+=7KWW
+-----END PGP SIGNATURE-----
+
+--s6OSw9lCrmZNjA6K--
 
