@@ -1,134 +1,134 @@
-Return-Path: <netdev+bounces-170685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 958D1A498C4
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 13:06:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A9E9A4994C
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 13:29:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73FA53BBDA3
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 12:06:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECB023AE7B9
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 12:29:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 906DB26A1B8;
-	Fri, 28 Feb 2025 12:06:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57F6626B0A1;
+	Fri, 28 Feb 2025 12:28:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q4rkw6ga"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="arJtUswu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD7826A1AC;
-	Fri, 28 Feb 2025 12:06:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F118126A1CD
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 12:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740744408; cv=none; b=HUqqSBidPebujMOLhyQkRJ/LOTuU8I4CI9WY5I4otpjCRjiNicpv2qNK0ip3Kmjos/WYAqYNi7A1odSooCS/8l0iui2RJ6Arh80bVxS8tOfPHnvrHnHJI+1xcGrD3O4J4sKWU+TeucV108adBd77/H38IViSCBJ2sIcJ4gelbUk=
+	t=1740745734; cv=none; b=ayUPUVI3Oc6oe7YFVV+TJaDlpksG/1Yv0ymbhIqg9/N4ZXX936rQ0xvuUPunw724DtFIMUttYjz2wvEiLpEplSoBT+dqD5vviHmcNP66GS8xiKtelT8zQJ/QinwIMnl97/zt//sl/MH/RvMlkEfv1Efh5f0AzxrdTGrLrnL2Ieg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740744408; c=relaxed/simple;
-	bh=w5eQEphd9IgGKBxm1Q/3vLmaPTU3i/VUTyVIc4orTy4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WvqrZGL42asTVN/cFobkEhGv/aioltlDwmPcphvpRHw1nqlpdTeOyiM55zPiCaDp/f78F/+rxiQqdSxvAD0XqvFe/N71eFTu38pCNRAs1gbJZTO5/lF8T5fQT0yDZvc1Mx7nRFT22GOHA+C6qTvdg0C1hKBn1FgTwYPcr5Emydo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q4rkw6ga; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86352C4CED6;
-	Fri, 28 Feb 2025 12:06:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740744407;
-	bh=w5eQEphd9IgGKBxm1Q/3vLmaPTU3i/VUTyVIc4orTy4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=q4rkw6gaXJVQhwMV6G4ZxnLO5k7M4p1RAUVdQb07ViSe0ODxSw5GAe4l/c2U6a0mm
-	 KpD+C6asKvM/BfqxZSLfB35kaprAAVSVS5JIsmoPNvv9l4rghLcMIaRCzSm3WbJ0uK
-	 89EGnkcOgmH2HqsHW85f57dLNUat+3KE06eJPNDGZ+OrRDynjo3xEh7f+jDwHiV98p
-	 yuFvbqbeCD2b7XHZHZKFJZ99DvC+AMlnUyOTKqN9UV62CwXN7iLhpTK/WD6fmKzX2X
-	 prJPqx7V0FIwqU2a6yCPxl9OocxUIbgO6am4PuLQi20emdVPoUuyMrQ5CTQ1TMT2SY
-	 dTh6yGbCtGjlw==
-Message-ID: <1ce1c600-72db-4a95-86a3-c881f5b75a56@kernel.org>
-Date: Fri, 28 Feb 2025 13:06:41 +0100
+	s=arc-20240116; t=1740745734; c=relaxed/simple;
+	bh=dm1L2wKB0z2EWey2phj7wx7/Z77CtK2PGpa+bwO3ZAM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U3bR0g+JCS4t+znEot3WaqLKQrlXLJSp4UIIN4VI5Gqvt4PiF9LSTqEtPQhyAI0ArvPQ1ebdiItaQCWLNVijAA1o4/fABo8lVatr6AshAipjMUqzer+VIakS+VftnVu8hFJPfwBbR95WgaoK9FcYb2+mKeSCm0II+9zcMdQgSL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=arJtUswu; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-aaecf50578eso394178566b.2
+        for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 04:28:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1740745730; x=1741350530; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cMDBEWFAlSazDWvEnLIWUhKoprViCd/FBtt1Cw03Vw0=;
+        b=arJtUswuIvMCKa3TUljdlpjnxuxMKoX7+Unzl2BrgXuxjEzHR2aHcVf9s2JyP88k/g
+         oAh3bQNGUOQgYdn1gCNNbIb0pw/dwwgpFIFwDyq3hJG16RjGN3CPhyUjWoDzKetl4w1H
+         Kx84jJGUZmD5ohshLgaSkpOqf6ZTDAp9aJGRslH9ET4okepEOC35F0EFLnTm8BaTWymk
+         7o1quJ2lM8IaRojFLKpOK5zl9+DR8LYm218VyWU8Qd653VIUOtzLdDLQlN5alMNiMRXY
+         Uci2zGfNN4uW9JHa/d4li/jizKCzOkt1GzHT6O/V9oVS5xBshUE6NVW2B3UPhWvB+J5k
+         F5Fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740745730; x=1741350530;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cMDBEWFAlSazDWvEnLIWUhKoprViCd/FBtt1Cw03Vw0=;
+        b=qh1/WeP+R4TmMb4ftRwIkpNa/AzDWn03B1dFX/mWGr+sPd7saUlaiB+hODfvKre6kx
+         vS5AZti/lruy9ToOX2KhKGmfHZmJYltcyRaR+TeV7Bx6a5XqEXNfYFYEWAbmpvmXosVN
+         EzEFJmCQFvrcp70FbIZlPni2yJg1ngS/Lb2q0gWmh415lJm7N8dOTratVImTWSzM7oTm
+         bMmZANMDlA5k2w6L/TLWinvJolL9aU0bTocVVvyMfFdfDBiZ4fk+IV8UlK44ZJE0WKeZ
+         Tmvxb6sbHItHVmvqTXyu4Kx7qxBhsEQTFHlzqpZFl8rK3vybrcRHBGcGWzV4Cyjn7pcV
+         PVPg==
+X-Forwarded-Encrypted: i=1; AJvYcCXgcFsHoJEKkJaA5dndIfPmVW5k3BJv3ZRGmdlUxEabJw96ESyyY18TGkaUjv9khSUg+uDzUsw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyd2B7nLslE6TnpkORvkQ0CfxquRg2J+c086FDOBcA3Kj98x8ia
+	CoM87p+XtkrZNr/TFcs+fYbJQkTLzIK+dvmQmrk/khzzjJwQ6SAIQgkuCvWWNOA=
+X-Gm-Gg: ASbGncuHHo4PckHCt3IVH+IPUiGQmMMJ5kzwo7Da8zwocC2qeqMpjW0D3sb4P1ZI9GV
+	Ebwa5ClRqDxCYVdzVRMXM7Wvr6g6h/ZXxn6hZanGgWWfGOoOEfjnOl1xr6Ip7a0rlJriz9vfRVa
+	Jd9DSeqLLW/nx9fzA7VfEvt2Xl5u81JhBFx/AYpfmPNjj2qIvOxbZQvA+QGpeaGdxp04IXrZxxE
+	GMPB1ENeh41SfyvC5Wa2AMFGkdRmp7Uw70Gj1mCdFIh3LNA+WxPJHo8ERZ/dV4QZBgz0Q9OYP/V
+	FjJoZl0gSyJQSkGqsO3DgCTko3FQVmIk6RwWIrIN9hke8zD+MWCitA==
+X-Google-Smtp-Source: AGHT+IEu3m3agMJr8cwe0JNDxL/58cjFFWWEQ/7ZN+AsMdYriaOzXBJEdDBBPlM6IWMlMMb2viuqBQ==
+X-Received: by 2002:a17:907:8906:b0:ab7:6d59:3b4c with SMTP id a640c23a62f3a-abf25fcf2aemr319474266b.21.1740745729904;
+        Fri, 28 Feb 2025 04:28:49 -0800 (PST)
+Received: from jiri-mlt.client.nvidia.com ([140.209.217.212])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abf0c0fca17sm280745266b.79.2025.02.28.04.28.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Feb 2025 04:28:49 -0800 (PST)
+Date: Fri, 28 Feb 2025 13:28:46 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Saeed Mahameed <saeed@kernel.org>, Jiri Pirko <jiri@nvidia.com>, 
+	Saeed Mahameed <saeedm@nvidia.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>, 
+	Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>
+Subject: Re: [PATCH net-next 07/14] devlink: Implement port params
+ registration
+Message-ID: <oqeog7ztpavz657mxmhwvyzbay5e5znc6uezu2doqocftzngn6@kht552qiryha>
+References: <20250228021227.871993-1-saeed@kernel.org>
+ <20250228021227.871993-8-saeed@kernel.org>
+ <56581582-770d-4a3e-84cb-ad85bc23c1e7@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next v2 0/3] add sock_kmemdup helper
-Content-Language: en-GB
-To: Geliang Tang <geliang@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemb@google.com>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>,
- David Ahern <dsahern@kernel.org>, Mat Martineau <martineau@kernel.org>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Xin Long <lucien.xin@gmail.com>
-Cc: Geliang Tang <tanggeliang@kylinos.cn>, netdev@vger.kernel.org,
- mptcp@lists.linux.dev, linux-sctp@vger.kernel.org
-References: <cover.1740735165.git.tanggeliang@kylinos.cn>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <cover.1740735165.git.tanggeliang@kylinos.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <56581582-770d-4a3e-84cb-ad85bc23c1e7@intel.com>
 
-Hi Geliang,
+Fri, Feb 28, 2025 at 12:58:38PM +0100, przemyslaw.kitszel@intel.com wrote:
+>On 2/28/25 03:12, Saeed Mahameed wrote:
+>> From: Saeed Mahameed <saeedm@nvidia.com>
+>> 
+>> Port params infrastructure is incomplete and needs a bit of plumbing to
+>> support port params commands from netlink.
+>> 
+>> Introduce port params registration API, very similar to current devlink
+>> params API, add the params xarray to devlink_port structure and
+>> decouple devlink params registration routines from the devlink
+>> structure.
+>> 
+>> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+>> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+>> ---
+>>   include/net/devlink.h |  14 ++++
+>>   net/devlink/param.c   | 150 ++++++++++++++++++++++++++++++++++--------
+>>   net/devlink/port.c    |   3 +
+>>   3 files changed, 140 insertions(+), 27 deletions(-)
+>For me devlink and devlink-port should be really the same, to the point
+>that the only difference is `bool is_port` flag inside of the
+>struct devlink. Then you could put special logic if really desired (to
+>exclude something for port).
 
-On 28/02/2025 11:01, Geliang Tang wrote:
-> v2:
->  - add "EXPORT_SYMBOL(sock_kmemdup)" as Matthieu suggested.
->  - drop the patch "use sock_kmemdup for tcp_ao_key".
+Why? Why other devlink objects shouldn't be the same as well. Then we
+can have one union. Does not make sense to me. The only think dev and
+port is sharing would be params. What else? Totally different beast.
 
 
-Thank you for the v2!
-
-For the modifications in MPTCP code, this looks OK to me:
-
-Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+>Then for ease of driver programming you could have also a flag
+>"for_port" in the struct devlink_param, so developers will fill that
+>out statically and call it on all their devlinks (incl port).
+>
+>Multiplying the APIs instead of rethinking a problem is not a good long
+>term solution.
+>
 
