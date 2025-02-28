@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-170524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B113EA48E74
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 03:19:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EF6D7A48E76
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 03:19:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A675188E109
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 02:19:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F410C188A097
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 02:19:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7119E17A5BE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2BB1186294;
 	Fri, 28 Feb 2025 02:19:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bL9UBE+G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zp/U8quk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B98D17A308
-	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 02:19:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCDBB17BB21
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 02:19:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740709141; cv=none; b=YCO8bZE2hTEP7qi6aOJl16dxQJqtiqZ5yTCc5casX5fG5R6GR73l4KdcI3zQo1VX17zkqotBC+hjN03H1lOnGAjDbFes2MCom53mt0yt+uAMdCxgPQaVieHQNQqhbuH3WSu7cS/voVphOjSCvlOYGFzcYTrumO2Y1PU4G3cC4bc=
+	t=1740709141; cv=none; b=ESVBAswX5tH+9xYetRti59MofaW9pk0Jxf2R2uX0wTZvdhyCHTCMZKPtuiiNda1j6KC61jQcb2XNcfke/Mruqykq0FWMsXc5XiG6mz1pdPniCck03PW25yJr1Nab4z36T87DEQlJ/shweEXpF6TxrJ3So0HG5utjIxLsa51yapo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1740709141; c=relaxed/simple;
-	bh=Y97xMQGYdT8MMIV/cw/xozW+d8GQVXSy7LJeVAJ+Eos=;
+	bh=wJtBumU22MekIZIbnXIy8jl5ZlJQhVaFIGg58yN1rDw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CuzjIorK7uUA7ybbEn/iTs0A8WOHJCmieLPHVKgxCF/P7aWhlurPo31RP6AM4Fp9cK8+SQ1aAC8T8TIRmOkMquVQqyzElTwIMxv3mp7P5g0LYezErikiLg8nN3GYXb1j88JrbSxrO/iSA2k2vz3v39XwXkDrbAHnEQBMYPFnlVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bL9UBE+G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B48CEC4CEE6;
-	Fri, 28 Feb 2025 02:19:00 +0000 (UTC)
+	 MIME-Version; b=VY5v4R4gqGvCHzy2htEvllR7leOshUoTdegGq7WyFUYeOzXTVtGEtHA6wqrnZPp7KHTvmHVUsJb0hPVsy/c+ueH8NSriu1zUXRFkDNPMvhLKVb6KEgl84ula6c4+CC5e5JIjTKKXo3ZYZIVbfCIyC9rIGVPh/zBg6QuQq0sHgG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zp/U8quk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9019AC4CEDD;
+	Fri, 28 Feb 2025 02:19:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740709140;
-	bh=Y97xMQGYdT8MMIV/cw/xozW+d8GQVXSy7LJeVAJ+Eos=;
+	s=k20201202; t=1740709141;
+	bh=wJtBumU22MekIZIbnXIy8jl5ZlJQhVaFIGg58yN1rDw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bL9UBE+G6+oDBUT31JO+Jg0UUQhRi3PORcTlXbeEVy9sNLDeSxnqwl5uxcgD39VWI
-	 Nwv3B+MPPujO9cMDzrz+h3/lrmPkmkIIm3yF8skrhQr9b0av8ZeXtJWMwEkx7u/wn5
-	 y5C/LowaypdAZtUoWlbt6LRFpiO7EFo5+2uGJ+In/afhy1GymJ60Pk/EOctBgHxYbE
-	 XExoER1yFljYMXHmHHDFZXVkiEollq9cp67N6tAJbDctlRIqIHULgECDh2xfy1X4ad
-	 3wib67yufBBnLAZeO4JA5vFa59f5RW6vsriNsSfcYaon1Gw6x8eqnJTOjCIhZQU33t
-	 yNn56HBDzFlAQ==
+	b=Zp/U8qukel7kincCDXTYj9cOTOW77Y2MSjU0yHJZYdUCHMKA+mQXO6GT7Al9Bpfi5
+	 wUKgxZQIVuYN3GTN45OeXaKL6a5xUqqNlfWc/vrRyXTWjy6g9zsh5wzDljwg+ttBmz
+	 qUdOCKXo09l5amjcy2zNHWfA9KRwkBOlAoRpwoUzzHNAjO5fQpY4xTE/82Ja89tqhu
+	 ehFDtc1Mhs4KYyGvU1gXttrjC44KbckzoT471Da36vfPINmMLsXr2aF1NnmkyoiZdT
+	 SsnbPlEj4DS/PWSRvvWq39RdflKAxqHYxnff9mcL21ZcBOXfA7kg3C6vN0uWFMUkCY
+	 TIPW1xKsNBvMw==
 From: Saeed Mahameed <saeed@kernel.org>
 To: stephen@networkplumber.org,
 	dsahern@gmail.com,
@@ -48,9 +48,9 @@ To: stephen@networkplumber.org,
 	jiri@resnulli.us
 Cc: netdev@vger.kernel.org,
 	Saeed Mahameed <saeedm@nvidia.com>
-Subject: [PATCH iproute2 05/10] devlink: rename param_ctx to dl_param
-Date: Thu, 27 Feb 2025 18:18:32 -0800
-Message-ID: <20250228021837.880041-6-saeed@kernel.org>
+Subject: [PATCH iproute2 06/10] devlink: helper function to read user param input into dl_param
+Date: Thu, 27 Feb 2025 18:18:33 -0800
+Message-ID: <20250228021837.880041-7-saeed@kernel.org>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250228021837.880041-1-saeed@kernel.org>
 References: <20250228021837.880041-1-saeed@kernel.org>
@@ -64,230 +64,297 @@ Content-Transfer-Encoding: 8bit
 
 From: Saeed Mahameed <saeedm@nvidia.com>
 
-dl_param structure will be used in down stream patches to store and help
-process devlink param values that are read from user input and kernel.
-
-Rename it to reflect a more suitable name for it's purpose.
+Centralize user input parameter parsing in one helper function and store
+the vlue into struct dl_param.
 
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- devlink/devlink.c | 62 +++++++++++++++++++++++------------------------
- 1 file changed, 31 insertions(+), 31 deletions(-)
+ devlink/devlink.c | 207 ++++++++++++++++++++++------------------------
+ 1 file changed, 99 insertions(+), 108 deletions(-)
 
 diff --git a/devlink/devlink.c b/devlink/devlink.c
-index 09afc300..b41b06f9 100644
+index b41b06f9..edcc5a79 100644
 --- a/devlink/devlink.c
 +++ b/devlink/devlink.c
-@@ -3627,7 +3627,7 @@ static int cmd_dev_param_show_cb(const struct nlmsghdr *nlh, void *data)
- 	return MNL_CB_OK;
- }
+@@ -3640,6 +3640,77 @@ struct dl_param {
+ 	} value;
+ };
  
--struct param_ctx {
-+struct dl_param {
- 	struct dl *dl;
- 	enum devlink_dyn_attr_type type;
- 	bool cmode_found;
-@@ -3648,8 +3648,8 @@ static int cmd_param_set_cb(const struct nlmsghdr *nlh, void *data)
- 	struct nlattr *param_value_attr;
- 	enum devlink_dyn_attr_type type;
- 	enum devlink_param_cmode cmode;
--	struct param_ctx *ctx = data;
--	struct dl *dl = ctx->dl;
-+	struct dl_param *param = data;
-+	struct dl *dl = param->dl;
- 	int err;
- 
- 	mnl_attr_parse(nlh, sizeof(*genl), attr_cb, tb);
-@@ -3686,23 +3686,23 @@ static int cmd_param_set_cb(const struct nlmsghdr *nlh, void *data)
- 
- 		cmode = mnl_attr_get_u8(nla_value[DEVLINK_ATTR_PARAM_VALUE_CMODE]);
- 		if (cmode == dl->opts.cmode) {
--			ctx->cmode_found = true;
-+			param->cmode_found = true;
- 			val_attr = nla_value[DEVLINK_ATTR_PARAM_VALUE_DATA];
- 			switch (type) {
- 			case DEVLINK_DYN_ATTR_TYPE_U8:
--				ctx->value.vu8 = mnl_attr_get_u8(val_attr);
-+				param->value.vu8 = mnl_attr_get_u8(val_attr);
- 				break;
- 			case DEVLINK_DYN_ATTR_TYPE_U16:
--				ctx->value.vu16 = mnl_attr_get_u16(val_attr);
-+				param->value.vu16 = mnl_attr_get_u16(val_attr);
- 				break;
- 			case DEVLINK_DYN_ATTR_TYPE_U32:
--				ctx->value.vu32 = mnl_attr_get_u32(val_attr);
-+				param->value.vu32 = mnl_attr_get_u32(val_attr);
- 				break;
- 			case DEVLINK_DYN_ATTR_TYPE_STRING:
--				ctx->value.vstr = mnl_attr_get_str(val_attr);
-+				param->value.vstr = mnl_attr_get_str(val_attr);
- 				break;
- 			case DEVLINK_DYN_ATTR_TYPE_FLAG:
--				ctx->value.vbool = val_attr ? true : false;
-+				param->value.vbool = val_attr ? true : false;
- 				break;
- 			default:
- 				break;
-@@ -3710,13 +3710,13 @@ static int cmd_param_set_cb(const struct nlmsghdr *nlh, void *data)
- 			break;
- 		}
- 	}
--	ctx->type = type;
++/* Get the parameter value from the options and convert it to the
++ * appropriate type.
++ * @dl: dl struct
++ * @nla_type: type of the parameter value
++ * @param: parameter struct to store the value
++ * Returns: 0 on success, -errno on failure
++ */
++static int dl_param_opts_get(struct dl *dl, enum devlink_dyn_attr_type type,
++			     struct dl_param *param)
++{
++	uint32_t val_u32 = UINT32_MAX;
++	bool conv_exists;
++	int err = 0;
++
++	conv_exists = param_val_conv_exists(param_val_conv, PARAM_VAL_CONV_LEN,
++					    dl->opts.param_name);
 +	param->type = type;
- 	return MNL_CB_OK;
- }
- 
++	if (!conv_exists ||
++	    type == DEVLINK_DYN_ATTR_TYPE_STRING ||
++	    type == DEVLINK_DYN_ATTR_TYPE_FLAG ||
++	    type == DEVLINK_DYN_ATTR_TYPE_U32_ARRAY) {
++		switch (type) {
++		case DEVLINK_DYN_ATTR_TYPE_U8:
++			err = get_u8(&param->value.vu8, dl->opts.param_value, 10);
++			break;
++		case DEVLINK_DYN_ATTR_TYPE_U16:
++			err = get_u16(&param->value.vu16, dl->opts.param_value, 10);
++			break;
++		case DEVLINK_DYN_ATTR_TYPE_U32:
++			err = get_u32(&param->value.vu32, dl->opts.param_value, 10);
++			break;
++		case DEVLINK_DYN_ATTR_TYPE_FLAG:
++			err = strtobool(dl->opts.param_value, &param->value.vbool);
++			break;
++		case DEVLINK_DYN_ATTR_TYPE_STRING:
++			param->value.vstr = dl->opts.param_value;
++			err = 0;
++			break;
++		default:
++			err = -ENOTSUP;
++		}
++		return err;
++	}
++
++	/* conv_exists */
++	switch (type) {
++	case DEVLINK_DYN_ATTR_TYPE_U8:
++		err = param_val_conv_uint_get(param_val_conv, PARAM_VAL_CONV_LEN,
++					      dl->opts.param_name, dl->opts.param_value,
++					      &val_u32);
++		param->value.vu8 = val_u32;
++		break;
++	case DEVLINK_DYN_ATTR_TYPE_U16:
++		err = param_val_conv_uint_get(param_val_conv, PARAM_VAL_CONV_LEN,
++					      dl->opts.param_name, dl->opts.param_value,
++					      &val_u32);
++		param->value.vu16 = val_u32;
++		break;
++	case DEVLINK_DYN_ATTR_TYPE_U32:
++		err = param_val_conv_uint_get(param_val_conv, PARAM_VAL_CONV_LEN,
++					      dl->opts.param_name, dl->opts.param_value,
++					      &val_u32);
++		param->value.vu32 = val_u32;
++		break;
++	default:
++		err = -ENOTSUP;
++	}
++
++	return err;
++}
++
+ static int cmd_param_set_cb(const struct nlmsghdr *nlh, void *data)
+ {
+ 	struct genlmsghdr *genl = mnl_nlmsg_get_payload(nlh);
+@@ -3717,12 +3788,8 @@ static int cmd_param_set_cb(const struct nlmsghdr *nlh, void *data)
  static int cmd_dev_param_set(struct dl *dl)
  {
--	struct param_ctx ctx = {};
-+	struct dl_param kparam = {}; /* kernel param */
+ 	struct dl_param kparam = {}; /* kernel param */
++	struct dl_param uparam = {}; /* user param */
  	struct nlmsghdr *nlh;
- 	bool conv_exists;
- 	uint32_t val_u32 = 0;
-@@ -3737,11 +3737,11 @@ static int cmd_dev_param_set(struct dl *dl)
+-	bool conv_exists;
+-	uint32_t val_u32 = 0;
+-	uint16_t val_u16;
+-	uint8_t val_u8;
+-	bool val_bool;
+ 	int err;
+ 
+ 	err = dl_argv_parse(dl, DL_OPT_HANDLE |
+@@ -3750,74 +3817,38 @@ static int cmd_dev_param_set(struct dl *dl)
  			       NLM_F_REQUEST | NLM_F_ACK);
  	dl_opts_put(nlh, dl);
  
--	ctx.dl = dl;
--	err = mnlu_gen_socket_sndrcv(&dl->nlg, nlh, cmd_param_set_cb, &ctx);
-+	kparam.dl = dl;
-+	err = mnlu_gen_socket_sndrcv(&dl->nlg, nlh, cmd_param_set_cb, &kparam);
- 	if (err)
- 		return err;
--	if (!ctx.cmode_found) {
-+	if (!kparam.cmode_found) {
- 		pr_err("Configuration mode not supported\n");
- 		return -ENOTSUP;
- 	}
-@@ -3753,8 +3753,8 @@ static int cmd_dev_param_set(struct dl *dl)
- 	conv_exists = param_val_conv_exists(param_val_conv, PARAM_VAL_CONV_LEN,
- 					    dl->opts.param_name);
+-	conv_exists = param_val_conv_exists(param_val_conv, PARAM_VAL_CONV_LEN,
+-					    dl->opts.param_name);
++	err = dl_param_opts_get(dl, kparam.type, &uparam);
++	if (err)
++		goto err_param_value_parse;
  
--	mnl_attr_put_u8(nlh, DEVLINK_ATTR_PARAM_TYPE, ctx.type);
--	switch (ctx.type) {
-+	mnl_attr_put_u8(nlh, DEVLINK_ATTR_PARAM_TYPE, kparam.type);
-+	switch (kparam.type) {
+ 	mnl_attr_put_u8(nlh, DEVLINK_ATTR_PARAM_TYPE, kparam.type);
+ 	switch (kparam.type) {
  	case DEVLINK_DYN_ATTR_TYPE_U8:
- 		if (conv_exists) {
- 			err = param_val_conv_uint_get(param_val_conv,
-@@ -3768,7 +3768,7 @@ static int cmd_dev_param_set(struct dl *dl)
- 		}
- 		if (err)
- 			goto err_param_value_parse;
--		if (val_u8 == ctx.value.vu8)
-+		if (val_u8 == kparam.value.vu8)
+-		if (conv_exists) {
+-			err = param_val_conv_uint_get(param_val_conv,
+-						      PARAM_VAL_CONV_LEN,
+-						      dl->opts.param_name,
+-						      dl->opts.param_value,
+-						      &val_u32);
+-			val_u8 = val_u32;
+-		} else {
+-			err = get_u8(&val_u8, dl->opts.param_value, 10);
+-		}
+-		if (err)
+-			goto err_param_value_parse;
+-		if (val_u8 == kparam.value.vu8)
++		if (uparam.value.vu8 == kparam.value.vu8)
  			return 0;
- 		mnl_attr_put_u8(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u8);
+-		mnl_attr_put_u8(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u8);
++		mnl_attr_put_u8(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, uparam.value.vu8);
  		break;
-@@ -3785,7 +3785,7 @@ static int cmd_dev_param_set(struct dl *dl)
- 		}
- 		if (err)
- 			goto err_param_value_parse;
--		if (val_u16 == ctx.value.vu16)
-+		if (val_u16 == kparam.value.vu16)
+ 	case DEVLINK_DYN_ATTR_TYPE_U16:
+-		if (conv_exists) {
+-			err = param_val_conv_uint_get(param_val_conv,
+-						      PARAM_VAL_CONV_LEN,
+-						      dl->opts.param_name,
+-						      dl->opts.param_value,
+-						      &val_u32);
+-			val_u16 = val_u32;
+-		} else {
+-			err = get_u16(&val_u16, dl->opts.param_value, 10);
+-		}
+-		if (err)
+-			goto err_param_value_parse;
+-		if (val_u16 == kparam.value.vu16)
++		if (uparam.value.vu16 == kparam.value.vu16)
  			return 0;
- 		mnl_attr_put_u16(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u16);
+-		mnl_attr_put_u16(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u16);
++		mnl_attr_put_u16(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, uparam.value.vu16);
  		break;
-@@ -3800,7 +3800,7 @@ static int cmd_dev_param_set(struct dl *dl)
- 			err = get_u32(&val_u32, dl->opts.param_value, 10);
- 		if (err)
- 			goto err_param_value_parse;
--		if (val_u32 == ctx.value.vu32)
-+		if (val_u32 == kparam.value.vu32)
+ 	case DEVLINK_DYN_ATTR_TYPE_U32:
+-		if (conv_exists)
+-			err = param_val_conv_uint_get(param_val_conv,
+-						      PARAM_VAL_CONV_LEN,
+-						      dl->opts.param_name,
+-						      dl->opts.param_value,
+-						      &val_u32);
+-		else
+-			err = get_u32(&val_u32, dl->opts.param_value, 10);
+-		if (err)
+-			goto err_param_value_parse;
+-		if (val_u32 == kparam.value.vu32)
++		if (uparam.value.vu32 == kparam.value.vu32)
  			return 0;
- 		mnl_attr_put_u32(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u32);
+-		mnl_attr_put_u32(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u32);
++		mnl_attr_put_u32(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, uparam.value.vu32);
  		break;
-@@ -3808,7 +3808,7 @@ static int cmd_dev_param_set(struct dl *dl)
- 		err = strtobool(dl->opts.param_value, &val_bool);
- 		if (err)
- 			goto err_param_value_parse;
--		if (val_bool == ctx.value.vbool)
-+		if (val_bool == kparam.value.vbool)
+ 	case DEVLINK_DYN_ATTR_TYPE_FLAG:
+-		err = strtobool(dl->opts.param_value, &val_bool);
+-		if (err)
+-			goto err_param_value_parse;
+-		if (val_bool == kparam.value.vbool)
++		if (uparam.value.vbool == kparam.value.vbool)
  			return 0;
- 		if (val_bool)
+-		if (val_bool)
++		if (uparam.value.vbool)
  			mnl_attr_put(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA,
-@@ -3817,7 +3817,7 @@ static int cmd_dev_param_set(struct dl *dl)
+ 				     0, NULL);
+ 		break;
  	case DEVLINK_DYN_ATTR_TYPE_STRING:
  		mnl_attr_put_strz(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA,
- 				  dl->opts.param_value);
--		if (!strcmp(dl->opts.param_value, ctx.value.vstr))
-+		if (!strcmp(dl->opts.param_value, kparam.value.vstr))
+-				  dl->opts.param_value);
+-		if (!strcmp(dl->opts.param_value, kparam.value.vstr))
++				  uparam.value.vstr);
++		if (!strcmp(uparam.value.vstr, kparam.value.vstr))
  			return 0;
  		break;
  	default:
-@@ -5224,7 +5224,7 @@ static int cmd_port_function_set(struct dl *dl)
- 
+@@ -5225,12 +5256,8 @@ static int cmd_port_function_set(struct dl *dl)
  static int cmd_port_param_set(struct dl *dl)
  {
--	struct param_ctx ctx = {};
-+	struct dl_param kparam = {}; /* kernel param */
+ 	struct dl_param kparam = {}; /* kernel param */
++	struct dl_param uparam = {}; /* user param */
  	struct nlmsghdr *nlh;
- 	bool conv_exists;
- 	uint32_t val_u32 = 0;
-@@ -5245,8 +5245,8 @@ static int cmd_port_param_set(struct dl *dl)
+-	bool conv_exists;
+-	uint32_t val_u32 = 0;
+-	uint16_t val_u16;
+-	uint8_t val_u8;
+-	bool val_bool;
+ 	int err;
+ 
+ 	err = dl_argv_parse(dl, DL_OPT_HANDLEP |
+@@ -5254,74 +5281,38 @@ static int cmd_port_param_set(struct dl *dl)
  					  NLM_F_REQUEST | NLM_F_ACK);
  	dl_opts_put(nlh, dl);
  
--	ctx.dl = dl;
--	err = mnlu_gen_socket_sndrcv(&dl->nlg, nlh, cmd_param_set_cb, &ctx);
-+	kparam.dl = dl;
-+	err = mnlu_gen_socket_sndrcv(&dl->nlg, nlh, cmd_param_set_cb, &kparam);
- 	if (err)
- 		return err;
+-	conv_exists = param_val_conv_exists(param_val_conv, PARAM_VAL_CONV_LEN,
+-					    dl->opts.param_name);
++	err = dl_param_opts_get(dl, kparam.type, &uparam);
++	if (err)
++		goto err_param_value_parse;
  
-@@ -5257,8 +5257,8 @@ static int cmd_port_param_set(struct dl *dl)
- 	conv_exists = param_val_conv_exists(param_val_conv, PARAM_VAL_CONV_LEN,
- 					    dl->opts.param_name);
- 
--	mnl_attr_put_u8(nlh, DEVLINK_ATTR_PARAM_TYPE, ctx.type);
--	switch (ctx.type) {
-+	mnl_attr_put_u8(nlh, DEVLINK_ATTR_PARAM_TYPE, kparam.type);
-+	switch (kparam.type) {
+ 	mnl_attr_put_u8(nlh, DEVLINK_ATTR_PARAM_TYPE, kparam.type);
+ 	switch (kparam.type) {
  	case DEVLINK_DYN_ATTR_TYPE_U8:
- 		if (conv_exists) {
- 			err = param_val_conv_uint_get(param_val_conv,
-@@ -5272,7 +5272,7 @@ static int cmd_port_param_set(struct dl *dl)
- 		}
- 		if (err)
- 			goto err_param_value_parse;
--		if (val_u8 == ctx.value.vu8)
-+		if (val_u8 == kparam.value.vu8)
+-		if (conv_exists) {
+-			err = param_val_conv_uint_get(param_val_conv,
+-						      PARAM_VAL_CONV_LEN,
+-						      dl->opts.param_name,
+-						      dl->opts.param_value,
+-						      &val_u32);
+-			val_u8 = val_u32;
+-		} else {
+-			err = get_u8(&val_u8, dl->opts.param_value, 10);
+-		}
+-		if (err)
+-			goto err_param_value_parse;
+-		if (val_u8 == kparam.value.vu8)
++		if (uparam.value.vu8 == kparam.value.vu8)
  			return 0;
- 		mnl_attr_put_u8(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u8);
+-		mnl_attr_put_u8(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u8);
++		mnl_attr_put_u8(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, uparam.value.vu8);
  		break;
-@@ -5289,7 +5289,7 @@ static int cmd_port_param_set(struct dl *dl)
- 		}
- 		if (err)
- 			goto err_param_value_parse;
--		if (val_u16 == ctx.value.vu16)
-+		if (val_u16 == kparam.value.vu16)
+ 	case DEVLINK_DYN_ATTR_TYPE_U16:
+-		if (conv_exists) {
+-			err = param_val_conv_uint_get(param_val_conv,
+-						      PARAM_VAL_CONV_LEN,
+-						      dl->opts.param_name,
+-						      dl->opts.param_value,
+-						      &val_u32);
+-			val_u16 = val_u32;
+-		} else {
+-			err = get_u16(&val_u16, dl->opts.param_value, 10);
+-		}
+-		if (err)
+-			goto err_param_value_parse;
+-		if (val_u16 == kparam.value.vu16)
++		if (uparam.value.vu16 == kparam.value.vu16)
  			return 0;
- 		mnl_attr_put_u16(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u16);
+-		mnl_attr_put_u16(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u16);
++		mnl_attr_put_u16(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, uparam.value.vu16);
  		break;
-@@ -5304,7 +5304,7 @@ static int cmd_port_param_set(struct dl *dl)
- 			err = get_u32(&val_u32, dl->opts.param_value, 10);
- 		if (err)
- 			goto err_param_value_parse;
--		if (val_u32 == ctx.value.vu32)
-+		if (val_u32 == kparam.value.vu32)
+ 	case DEVLINK_DYN_ATTR_TYPE_U32:
+-		if (conv_exists)
+-			err = param_val_conv_uint_get(param_val_conv,
+-						      PARAM_VAL_CONV_LEN,
+-						      dl->opts.param_name,
+-						      dl->opts.param_value,
+-						      &val_u32);
+-		else
+-			err = get_u32(&val_u32, dl->opts.param_value, 10);
+-		if (err)
+-			goto err_param_value_parse;
+-		if (val_u32 == kparam.value.vu32)
++		if (uparam.value.vu32 == kparam.value.vu32)
  			return 0;
- 		mnl_attr_put_u32(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u32);
+-		mnl_attr_put_u32(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u32);
++		mnl_attr_put_u32(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, uparam.value.vu32);
  		break;
-@@ -5312,7 +5312,7 @@ static int cmd_port_param_set(struct dl *dl)
- 		err = strtobool(dl->opts.param_value, &val_bool);
- 		if (err)
- 			goto err_param_value_parse;
--		if (val_bool == ctx.value.vbool)
-+		if (val_bool == kparam.value.vbool)
+ 	case DEVLINK_DYN_ATTR_TYPE_FLAG:
+-		err = strtobool(dl->opts.param_value, &val_bool);
+-		if (err)
+-			goto err_param_value_parse;
+-		if (val_bool == kparam.value.vbool)
++		if (uparam.value.vbool == kparam.value.vbool)
  			return 0;
- 		if (val_bool)
+-		if (val_bool)
++		if (uparam.value.vbool)
  			mnl_attr_put(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA,
-@@ -5321,7 +5321,7 @@ static int cmd_port_param_set(struct dl *dl)
+ 				     0, NULL);
+ 		break;
  	case DEVLINK_DYN_ATTR_TYPE_STRING:
  		mnl_attr_put_strz(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA,
- 				  dl->opts.param_value);
--		if (!strcmp(dl->opts.param_value, ctx.value.vstr))
-+		if (!strcmp(dl->opts.param_value, kparam.value.vstr))
+-				  dl->opts.param_value);
+-		if (!strcmp(dl->opts.param_value, kparam.value.vstr))
++				  uparam.value.vstr);
++		if (!strcmp(uparam.value.vstr, kparam.value.vstr))
  			return 0;
  		break;
  	default:
