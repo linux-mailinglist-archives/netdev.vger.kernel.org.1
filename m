@@ -1,105 +1,126 @@
-Return-Path: <netdev+bounces-170822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C59FCA4A102
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 18:56:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3102A4A107
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 19:00:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9BBF5188A750
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 17:56:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D4463B29BA
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 18:00:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 331E51BDA97;
-	Fri, 28 Feb 2025 17:56:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 238281F09AB;
+	Fri, 28 Feb 2025 18:00:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XN+EDQ25"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sWJfdFCk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD7A01607AC
-	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 17:56:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED05C1F09B8;
+	Fri, 28 Feb 2025 18:00:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740765377; cv=none; b=gxEZW8bgkVl6sTicmCjEWDS9aNVtlQhzN3fX++BY3gaQ7UuBHv3jQd1anOH8gsVHomYzRg7njRW8a7F6lL8MqLTkGGU8Vh0B11gevbcWspaRi0jflB9Z4ELrYFmmRPSyusc7VyO6y63YI/y+0XfdEhD0cqUAWT7035MzulkGJAo=
+	t=1740765611; cv=none; b=tTn3qvfzD7/7pvwRCEOUo6X2HNez9Zc0bt1MQYKxZcdoHMYlnsWVgdAJXvK9gfKkBArb6WbgCzzDXkmGqTqp+3M3t9of5ND+F7sJcej/6Qxlfd+UT3MJ8J9Cw5M0hrMInqIZTHaB662sjFD6856XxX3ePXrpCXIPEdnFQIZabaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740765377; c=relaxed/simple;
-	bh=5hRTl3r3drZ3yXZusZSc/icHJkO/HrAa3AEWepjTDtw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GJMOvKgkPUxl6+V14DnEPZm2Cf2Cyn6C51H4U4GGaqnL7hztC65AiFzsQUrOrB4AHrVwqcwUcRwxm1BeQWE3ShVFVdlGe/UpBWXHHux8mlZRcHYou/f+38Jc3OPJIiYf7S4ECvZ6Z0J9AWfJSlyKjN3/ka9SFRyDDhB9OCjtZDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XN+EDQ25; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2237a32c03aso2685ad.1
-        for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 09:56:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740765375; x=1741370175; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5hRTl3r3drZ3yXZusZSc/icHJkO/HrAa3AEWepjTDtw=;
-        b=XN+EDQ25+0zHNrEMzUWz/MiANG0JDOltiNxQBgnKOuF3sfuuBRImAMIC9BE5nt8Ciw
-         Fh4Z9gclBZb7BkosIbxw2c9OMKgVcUkLGyJ0lcEcjsncb9RHW//0mAanPbDNKQxVo32+
-         vFxvha8AwwzMoDcVE7mLQx0qj0F80bWDD72RgSEFqq3d0n111/1eEhBa8qt6s2eXuTKY
-         FT5kjiusn5mdArDmukuU+LyNiaAM+S2YsEy6fBJYqtl8MVfoT0sJVBK2T0tGwb3r/jez
-         /iELFkRD+t9UkfyD9lSF4pHquk2DgFzgAypbbK1nQWGPaoh+lOsCif3fFPtln+Fl7ZnQ
-         SWnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740765375; x=1741370175;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5hRTl3r3drZ3yXZusZSc/icHJkO/HrAa3AEWepjTDtw=;
-        b=hWnNsEIulr9tpc5JrqKrXYU2bxbEBKGgglg9YGWLThU0kEoefYwZONc6nJ4wj5FxOv
-         DpL0Dudz802AuRpKYFeqy0iZKK72ByJnDcPFqJeSyxCjdqKSft8Fbh62b+hgO1x6jA3o
-         vmU7sLxsBofu1ERu4Iy5rUCEgeNUkQI4DHObjXoi++72TQirKg3336ptT8e8x8mDTDgx
-         pPRp8AT0l7YGaGyGOKrxX9w7AOiBOpCBiMS9q3yTb5oaJDl0vVPZ9mON26kW9OsXM7LC
-         AHbWy8LU1JmXQzVmtJ19PR637Yi/ahWS/Ew9R9O5psqYWkGSdGsJBEon0vi90p135wvF
-         FSQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXGqxPSreoM6tYUwatQgcdCqVk7oP49xqbTRvMr2myXC6/S5QJHKg9ocv1NZ2vVZ6+OmUWFYgk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLvf6riyRCfyucXL6koMg8Xv+SSNKH/mwxohjmIJ1dQgepq6+o
-	laseRhPdXoVIveOMpRpkvQM0xueO41hF2q6CUK2uMWlyzRjPDgDYoHdP9vttDCzQ74gXPbzVwyd
-	t/YXuQwm+msHU/IDq1rwDWt/39qpVzGTyZPWA
-X-Gm-Gg: ASbGncu4yshlGyG8jkstMhGjTMg2W4bkFpQLxnfw5zJINfnmxvqz26e/V8Z5kTWTLAw
-	Tnm4eOu3+g754K2EVV4ZZuSS0M8oT6uawRm51HhPuICHVioRTS/olzrDjEeH6D6CsFm3l71vdVc
-	F6ZP8jEyONlYAWoBsb7bdtQP80oW0Q4B4Yt4I1mw==
-X-Google-Smtp-Source: AGHT+IHvdnKescx2kw3tjKRz2tVygkrDpn+4ZfC4ReaPOfaumZ9avniHlNFfBe8qYKkmDTpQkbHQk317lMLV8Kp1TDc=
-X-Received: by 2002:a17:903:3289:b0:216:6ecd:8950 with SMTP id
- d9443c01a7336-2236cfcc5ddmr2648305ad.19.1740765374751; Fri, 28 Feb 2025
- 09:56:14 -0800 (PST)
+	s=arc-20240116; t=1740765611; c=relaxed/simple;
+	bh=LNGek2KEOoXjwsDtMm0drAz/BTi7FE9zL0fgU5scCuc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VJS9E379aGmWHKcYrSTkblV4VEzM6v76dk5vo/CgEVOBN9r6zuYsXRisibZXCMAWZZ2OstcvWXmX8tm3nfJ1kojJXVrr9QEIOc3acy+wI1Qyk0szvcnTPgsNo3aLQ75zVq2JLmMjYNYecXxh6Pg3Y1Euam9dWwUdibfHXXW539E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sWJfdFCk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17211C4CED6;
+	Fri, 28 Feb 2025 18:00:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740765609;
+	bh=LNGek2KEOoXjwsDtMm0drAz/BTi7FE9zL0fgU5scCuc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=sWJfdFCkuLChzaVVG2Q3xH+36H2Tzb90t2gwSQ6bQ4CRaC74cU8ZtkLyjol2ROJgs
+	 wzMgK/URjcxHzzcqYTcyLk9j6jjXuwiLRpI84ngHIEvuqnBVTyw03fIdIdbZdweVV2
+	 8kkn8d3b3LWzCYkX/mF56DXw1p5qJTEvBmEhNjK6/W8RAQ6k4H6fi5AhpxJxPTm5Jr
+	 sL269Zlw5+jF1vSGO7E1OkbKyvlf1ZRLvYGXynlSiC14B77EUv1BfVxvUq0cmp7NGq
+	 jkpjSTMrOAIUGHSz3IJh3htt8p0teRBnOWYe8CGPkgNQgwsKwvi7ANHfvJmYOEo/wC
+	 YZj8NS3irHYTw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	shuah@kernel.org,
+	petrm@nvidia.com,
+	matttbe@kernel.org,
+	willemb@google.com,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next] selftests: net: report output format as TAP 13 in Python tests
+Date: Fri, 28 Feb 2025 10:00:07 -0800
+Message-ID: <20250228180007.83325-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250227131314.2317200-1-milena.olech@intel.com> <20250227131314.2317200-10-milena.olech@intel.com>
-In-Reply-To: <20250227131314.2317200-10-milena.olech@intel.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 28 Feb 2025 09:56:01 -0800
-X-Gm-Features: AQ5f1JpliY1V3t3crBxg2aKI_RrAsIU8HZYa7-xkZpdESpK3YJeqZioAsHB4XfE
-Message-ID: <CAHS8izOL_ZGjN0nN_YTQu_py05QqDrYZvvU-z-Jv8RuWhfBUEw@mail.gmail.com>
-Subject: Re: [PATCH v8 iwl-next 09/10] idpf: add support for Rx timestamping
-To: Milena Olech <milena.olech@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 27, 2025 at 5:19=E2=80=AFAM Milena Olech <milena.olech@intel.co=
-m> wrote:
->
-> Add Rx timestamp function when the Rx timestamp value is read directly
-> from the Rx descriptor. In order to extend the Rx timestamp value to 64
-> bit in hot path, the PHC time is cached in the receive groups.
-> Add supported Rx timestamp modes.
->
-> Signed-off-by: Milena Olech <milena.olech@intel.com>
+The Python lib based tests report that they are producing
+"KTAP version 1", but really we aren't making use of any
+KTAP features, like subtests. Our output is plain TAP.
 
-Tested-by: Mina Almasry <almasrymina@google.com>
+Report TAP 13 instead of KTAP 1, this is what mptcp tests do,
+and what NIPA knows how to parse best. For HW testing we need
+precise subtest result tracking.
 
---=20
-Thanks,
-Mina
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: shuah@kernel.org
+CC: petrm@nvidia.com
+CC: matttbe@kernel.org
+CC: willemb@google.com
+CC: linux-kselftest@vger.kernel.org
+---
+ tools/testing/selftests/drivers/net/README.rst | 4 ++--
+ tools/testing/selftests/net/lib/py/ksft.py     | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tools/testing/selftests/drivers/net/README.rst b/tools/testing/selftests/drivers/net/README.rst
+index 3b6a29e6564b..eb838ae94844 100644
+--- a/tools/testing/selftests/drivers/net/README.rst
++++ b/tools/testing/selftests/drivers/net/README.rst
+@@ -107,7 +107,7 @@ Example
+   1..1
+   # timeout set to 45
+   # selftests: drivers/net: ping.py
+-  # KTAP version 1
++  # TAP version 13
+   # 1..3
+   # ok 1 ping.test_v4
+   # ok 2 ping.test_v6
+@@ -128,7 +128,7 @@ Example
+ Run the test::
+ 
+   [/root] # ./ksft-net-drv/drivers/net/ping.py
+-  KTAP version 1
++  TAP version 13
+   1..3
+   ok 1 ping.test_v4
+   ok 2 ping.test_v6 # SKIP Test requires IPv6 connectivity
+diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/selftests/net/lib/py/ksft.py
+index fd23349fa8ca..3cfad0fd4570 100644
+--- a/tools/testing/selftests/net/lib/py/ksft.py
++++ b/tools/testing/selftests/net/lib/py/ksft.py
+@@ -207,7 +207,7 @@ KSFT_DISRUPTIVE = True
+ 
+     totals = {"pass": 0, "fail": 0, "skip": 0, "xfail": 0}
+ 
+-    print("KTAP version 1")
++    print("TAP version 13")
+     print("1.." + str(len(cases)))
+ 
+     global KSFT_RESULT
+-- 
+2.48.1
+
 
