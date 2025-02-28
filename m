@@ -1,100 +1,187 @@
-Return-Path: <netdev+bounces-170586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78E9AA491CA
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 07:52:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E3FAA49237
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 08:31:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85AA116FC8E
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 06:52:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C03016C665
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 07:31:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81F011C5D69;
-	Fri, 28 Feb 2025 06:52:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEFF91ABEC1;
+	Fri, 28 Feb 2025 07:31:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vxydj1Bk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i8TD8hd9"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECE8B1C5496
-	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 06:52:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6496870825
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 07:31:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740725545; cv=none; b=BXkn9jGEcRtSS0PaCiFOhBO2bZQM9EraXhKdoTsGGoDJUm66qBmMErR3QsgZw/dZv0FLClBGcoZCTC49EcEg8nhXIwAtrZYUKCDzyi0iq5zyKIs1RqASXmN+fZC9ryQweVYh8E3D+Yen3ZVEcebkeTvJgn27NNv+3D6cvwXSPeE=
+	t=1740727899; cv=none; b=l9r+vAkOce0PdlmzjH+WBKMup5W1ga7sLQFstm2cNY4p9tAir7Hu7L3AypdHvmq7l8Ha/GHZFPgVhjLAN3NuX47NCGGFugqhLmknrEmyBhYRTycjBauOdxji6pwzfBIyFaN5NuORKxe57VoN35TgUvQfJ9SGRKdavaJsFhYhl0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740725545; c=relaxed/simple;
-	bh=Sbh5ZWWEWe26UKItzj+5zCsDrXi5+H0pVS+AgfDfnoE=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=CNPAWiiRz1tmxCJdR7nGMYOGa+pI41vu7Osf6g+SJm9Xn9VJWX1Ov+oWy0nsMNeqgMtRqtdSlDaEVP2wdZpT9ZgSeHi/rBBSH1EbGQm4NqUTHnsxEpq57UPlV8v/3BEJhHwjBJcM0WtFSSq2lWIU8DDQwGwXE09OAExM+ZzIcGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vxydj1Bk; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740725542;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qwtQNloEq7bsSV3GNAWMqzfEITJvoRQgxNj/TQm4A+M=;
-	b=Vxydj1BkFbkOKcLg1FX761Gsb6e5XloaTV3uw/4MBn/g1Emzoo34u2jax7RNPEwDIHoBEq
-	3daWg1DBD6m7p6b13HrcxI8vUiIR/5DHqhTp7khI+AoTPa48xZitPn3uES9O0qJF8Goy9h
-	S0TgdKefRTVNQ9sYx0h5w75k2aJhPBs=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-538-Nl4Ayov0OOyP92iDsWZVqA-1; Fri,
- 28 Feb 2025 01:52:16 -0500
-X-MC-Unique: Nl4Ayov0OOyP92iDsWZVqA-1
-X-Mimecast-MFC-AGG-ID: Nl4Ayov0OOyP92iDsWZVqA_1740725535
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D88C31944D01;
-	Fri, 28 Feb 2025 06:52:14 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.44.32.200])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AA825300019F;
-	Fri, 28 Feb 2025 06:52:10 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20250227164918.3b05d94e@kernel.org>
-References: <20250227164918.3b05d94e@kernel.org> <20250224234154.2014840-1-dhowells@redhat.com> <174068405775.1535916.5681071064674695791.git-patchwork-notify@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: dhowells@redhat.com, patchwork-bot+netdevbpf@kernel.org,
-    netdev@vger.kernel.org, marc.dionne@auristor.com,
-    davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-    brauner@kernel.org, linux-afs@lists.infradead.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 00/15] afs, rxrpc: Clean up refcounting on afs_cell and afs_server records
+	s=arc-20240116; t=1740727899; c=relaxed/simple;
+	bh=a+yZnMnQOi3TT4cgUbL3BVaBC8vqACxgWpdqMrUvyTQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oRUuP/96HvxhBkeCaX3B+ZCuLprgQ+UqV/oUVxvffQ3VYzMu2oTGzw9/O0slTGEUplnSb0V/d2oit+Bn6DAyFLonQpeDPonDbD9IWdqfAYcA54T36kcPpcXAhuEqCvRVrf2IY1LSyEGYFoixZg1bsfLTZDWz/9ZQ7ecZ98s/qYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i8TD8hd9; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2235c5818a3so33029125ad.1
+        for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 23:31:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740727897; x=1741332697; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OEo5Ilj/CnKUxlNE5iH4oY22/g/iUpKFoP4fBLWqvpA=;
+        b=i8TD8hd9A1GcvQCdMEIIDPMnrLJwKW75E+/vk6DSviRGgMcnUA5TI5WZUlwn+v5Nr0
+         WGPHgBDVusr9NsiJzOz//fVXQQW0zeQYxKIjQMSCiCgAWXhV79ladkL2jyoerAQcXGSb
+         NyJ/EoWdpqeubiSLwWgdmoKxLapd1LwljBrB5UBX3NYhRfpNKXiNcd77A//JEhbxBM9C
+         QWhaFhuu3FMvjvbnRAmUFaksLiU3/Pj+uwZ4Uejbwg6RUD5xh/ZS6+qr4etJ0Op7xOHq
+         JQbTNr082WCGyfeLIfG6l87aFzt2i1FAOC8ph4rQmNNl9QV3phAj7rLnJS4FLNZ7s07P
+         M6zQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740727897; x=1741332697;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OEo5Ilj/CnKUxlNE5iH4oY22/g/iUpKFoP4fBLWqvpA=;
+        b=i34jRtetYg2LHAZopQYpJKJMm4SDhtEXA4DXvJwXjA5kqfoW/iubSXYmLv1YKeKDi5
+         mzUQWcAAelxXe6+RYq4GSMgmt1/6s1TUb67tUwPcsTbDTgR9o54d+44AFfuhyxdjTyyM
+         wTI3x1ehvHxt4ZxRUhwWuw03Q7dRsmisbDSBt+SH/VhNUzhXMdU77BmKu2qxK/sYLEJW
+         1FcfH5gozeB04OF0OOjuBtyOxBy10K64JTGon7S7av5rSKrVqI6JG2qHBts9w6JgqTvn
+         fV9I3wE5IwdDb4QcLv9Yu52fjaocl4NdOsZmTDYtSH7pu1TKwNDUWQMjPq6xQbhZWs4T
+         FJ1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVhwkJyYHZZBqtTyhqu/uDnfQ7fmeIDiQg2yynV8+bouOTOwoNovnf1gjh2rtllR69GkXwlvq0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXxTtEs/ZHdl/b3acqfYsTebQMTW8y7NBtaxgxB9AOPDd/nxp+
+	TG+eEYB089AW3ZG8pQ2wtNCPgH5lia6q/XovG2IEVn9JFN9s4KnM
+X-Gm-Gg: ASbGncsCKDR+HofFfgDAXT3v+Az053N2B/6UVQJEVlCgyTzGvufNiSvXIdst3fLMHQL
+	GQ1Sgj/uCypTTDlCOvt+igCbfgR7mcWpYEM0MvnsXhOdJ3OZ48Dfyi3ufS2dT9LmlvnN/1gsd3c
+	ZDE+NsRE7b7ILut7Wamv2YxSpBqgtkLvuYC1MyW8wq90/L0bDkidMhIsBDxYKQe4PfvoVMPkA3l
+	qjA+wL5kIk9zorBXyJJuTiVGSgwnx/KTFVhlcDDW5ReTU5aPR1HrtDrFqBkyQFl5KS3i1lWqfQ4
+	q3/LOqmJOePW1kG3ZGIqc8s=
+X-Google-Smtp-Source: AGHT+IFrEMfFeWVgVjwA/8gquLeiMkDUEwznolmMGr2Xy7GVL3JkNx1UIJph/S+ONtF7kGxuiKo4sQ==
+X-Received: by 2002:a17:903:292:b0:21f:7e12:5642 with SMTP id d9443c01a7336-22368fbee43mr34263825ad.18.1740727897464;
+        Thu, 27 Feb 2025 23:31:37 -0800 (PST)
+Received: from localhost ([129.146.253.192])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fe999a5a1dsm3795470a91.33.2025.02.27.23.31.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Feb 2025 23:31:37 -0800 (PST)
+Date: Fri, 28 Feb 2025 15:31:22 +0800
+From: Furong Xu <0x1207@gmail.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Jon Hunter
+ <jonathanh@nvidia.com>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo Abeni
+ <pabeni@redhat.com>, Thierry Reding <treding@nvidia.com>
+Subject: Re: [PATCH RFC net-next 1/5] net: stmmac: call phylink_start() and
+ phylink_stop() in XDP functions
+Message-ID: <20250228153122.00007c75@gmail.com>
+In-Reply-To: <E1tnfRe-0057S9-6W@rmk-PC.armlinux.org.uk>
+References: <Z8B-DPGhuibIjiA7@shell.armlinux.org.uk>
+	<E1tnfRe-0057S9-6W@rmk-PC.armlinux.org.uk>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3182492.1740725529.1@warthog.procyon.org.uk>
-Date: Fri, 28 Feb 2025 06:52:09 +0000
-Message-ID: <3182493.1740725529@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Jakub Kicinski <kuba@kernel.org> wrote:
+On Thu, 27 Feb 2025 15:05:02 +0000
+"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk> wrote:
 
-> Nice job pw-bot! Turns out the first 5 patches were already in the net
-> tree with fixes, and now they made their way to Linus. So let's discard
-> those from v2.
+> Phylink does not permit drivers to mess with the netif carrier, as
+> this will de-synchronise phylink with the MAC driver. Moreover,
+> setting and clearing the TE and RE bits via stmmac_mac_set() in this
+> path is also wrong as the link may not be up.
+> 
+> Replace the netif_carrier_on(), netif_carrier_off() and
+> stmmac_mac_set() calls with the appropriate phylink_start() and
+> phylink_stop() calls, thereby allowing phylink to manage the netif
+> carrier and TE/RE bits through the .mac_link_up() and .mac_link_down()
+> methods.
+> 
+> Note that RE should only be set after the DMA is ready to avoid the
+> receive FIFO between the MAC and DMA blocks overflowing, so
+> phylink_start() needs to be placed after DMA has been started.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 14 ++++++--------
+>  1 file changed, 6 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 13796b1c8d7c..84d8b1c9f6d4 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -6887,6 +6887,8 @@ void stmmac_xdp_release(struct net_device *dev)
+>  	/* Ensure tx function is not running */
+>  	netif_tx_disable(dev);
+>  
+> +	phylink_stop(priv->phylink);
+> +
+>  	/* Disable NAPI process */
+>  	stmmac_disable_all_queues(priv);
+>  
+> @@ -6902,14 +6904,10 @@ void stmmac_xdp_release(struct net_device *dev)
+>  	/* Release and free the Rx/Tx resources */
+>  	free_dma_desc_resources(priv, &priv->dma_conf);
+>  
+> -	/* Disable the MAC Rx/Tx */
+> -	stmmac_mac_set(priv, priv->ioaddr, false);
+> -
+>  	/* set trans_start so we don't get spurious
+>  	 * watchdogs during reset
+>  	 */
+>  	netif_trans_update(dev);
+> -	netif_carrier_off(dev);
+>  }
+>  
+>  int stmmac_xdp_open(struct net_device *dev)
+> @@ -6992,25 +6990,25 @@ int stmmac_xdp_open(struct net_device *dev)
+>  		tx_q->txtimer.function = stmmac_tx_timer;
+>  	}
+>  
+> -	/* Enable the MAC Rx/Tx */
+> -	stmmac_mac_set(priv, priv->ioaddr, true);
+> -
+>  	/* Start Rx & Tx DMA Channels */
+>  	stmmac_start_all_dma(priv);
+>  
+> +	phylink_start(priv->phylink);
+> +
+>  	ret = stmmac_request_irq(dev);
+>  	if (ret)
+>  		goto irq_error;
+>  
+>  	/* Enable NAPI process*/
+>  	stmmac_enable_all_queues(priv);
+> -	netif_carrier_on(dev);
+>  	netif_tx_start_all_queues(dev);
+>  	stmmac_enable_all_dma_irq(priv);
+>  
+>  	return 0;
+>  
+>  irq_error:
+> +	phylink_stop(priv->phylink);
+> +
+>  	for (chan = 0; chan < priv->plat->tx_queues_to_use; chan++)
+>  		hrtimer_cancel(&priv->dma_conf.tx_queue[chan].txtimer);
+>  
 
-Yes.  I mentioned them specifically in the cover note.
+XDP programs work like a charm both before and after this patch.
 
-> And even less of a reason for this to go via networking :(
-
-The point wasn't those five patches, but the following rxrpc patches that I
-haven't posted yet that depend on these... but never mind.
-
-David
-
+Tested-by: Furong Xu <0x1207@gmail.com>
 
