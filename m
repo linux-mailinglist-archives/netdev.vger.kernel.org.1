@@ -1,212 +1,173 @@
-Return-Path: <netdev+bounces-170787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B06CBA49E19
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 16:56:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A825FA49E14
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 16:55:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FEF77A5D1C
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 15:55:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5DE2F18990F0
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 15:56:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63BE3272924;
-	Fri, 28 Feb 2025 15:56:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8319126F44B;
+	Fri, 28 Feb 2025 15:55:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="C44xf099"
 X-Original-To: netdev@vger.kernel.org
-Received: from dediextern.your-server.de (dediextern.your-server.de [85.10.215.232])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8EE227126A;
-	Fri, 28 Feb 2025 15:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.10.215.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCDF01EF360;
+	Fri, 28 Feb 2025 15:55:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740758170; cv=none; b=CgLKYZhzdsYnCB1Ik3dz1h2HMPssBg0aPpC+vys3xeHD4MfU72trv8jwK3JBehTsTq6cchA6JaMqzxaq0uhOw+DCkt9zhiKXlPoYOkXoCBeEtHlEqZOksGjt54Dv0EaxZn8cwYWLPMC+Gu/vD3Ft2efR9dhQl1dvRn5Y0oUHhfg=
+	t=1740758148; cv=none; b=FEvSoDRj7gHkq3pscQpc+9SV1FIEohJk57We6r2qDhahVjzFsvySVUMfPke2ktRyB+Z4EK+tD0RqHYd8B6hC/+lYDgjqnBdDLKLSB2nnRorjWMSrRxrBFaQZxeyT41gjdI95uJZQAoqnFkUQOVOnnrRl0Uivvo88NNYS4F2PI6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740758170; c=relaxed/simple;
-	bh=LLgN1Qa4YDx2jNxmqVz2R6UToXM6OqZZqylhOcuSfj4=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:Content-Type; b=KWaHN7cob+RX65ZXxy8I0szv5voQ9DlChFCM8irG0TnLhri6qDsNUrxPYN2Wn90KotLTMduxTIVED3SNGlFbFOVe1faN+8QSlrHVxb5O8rpjreWuGeEL7Wxuy/vH3draDEe/TRyn/P+4HwdNFQafhl6VRlV13/dD9Inw4PSbZO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de; spf=pass smtp.mailfrom=hetzner-cloud.de; arc=none smtp.client-ip=85.10.215.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hetzner-cloud.de
-Received: from sslproxy03.your-server.de ([88.198.220.132])
-	by dediextern.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
-	id 1to2i5-000PBv-7I; Fri, 28 Feb 2025 16:55:33 +0100
-Received: from [2a0d:3344:1523:1f10:f118:b2d4:edbb:54af]
-	by sslproxy03.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
-	id 1to2i5-000KUm-1R;
-	Fri, 28 Feb 2025 16:55:32 +0100
-Message-ID: <a1dcd271-c347-4d90-a1fc-fa18bbad3ebe@hetzner-cloud.de>
-Date: Fri, 28 Feb 2025 16:55:31 +0100
+	s=arc-20240116; t=1740758148; c=relaxed/simple;
+	bh=G0Jo1xC7rXjKjZbrf2HnafijiPsizuCd+0u7sgwzaMY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IhXgQFelB/CWz+OhhVmNiDB04m/6A5lNmvKqcGNncPQEpTKH9AeY0yi0zikOWgY8FI1YwdgmQ4jsL1xiOiK6Dse4jAlwhn1FAyJi3lgIyJ4eSWddSU0QCHOFuxtbtjGZMLVtg6wMcXkWPYx8c9EpnbSHHacaN6KyA4LEGQxvmmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=C44xf099; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 663534427A;
+	Fri, 28 Feb 2025 15:55:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1740758144;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0RnuSiKm23JcWF6Ab/jVuKak1mZScr6nXYjmv1TYGs0=;
+	b=C44xf0995MYpPrlcX0hzyrpkAsnPXj/LzWnxJyT5CJzvDEDCqeeP+hCobGvr6vrq8y5Dmd
+	vY+UiA5fo8swhT6DRWgEmAiiIHTxsrxRin5lPZuUmEhjvtl/u4XxBaUFmojIqmrX0BJoD4
+	7VgoJSgoyyCNr8k31F4c5WqzvboAisu6Ftabe8b3I28qzMUwztRn+/nl55p1FHpvIMCxh6
+	lOGEXl0VDgYNtfka6Rv6hKxSBj0jHI30lvSsFqSa/JpK6Zg615HnkxyooikSwsZjP3kuxN
+	bHMmdgwVWjyye4qZMHM4+iWNjeytT/pb7Bq9+C8WFJobKbVC3z17Z3BwXzkrog==
+Date: Fri, 28 Feb 2025 16:55:41 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina
+ <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
+ <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Simon Horman <horms@kernel.org>, Romain Gantois
+ <romain.gantois@bootlin.com>
+Subject: Re: [PATCH net-next v3 02/13] net: phy: Use an internal, searchable
+ storage for the linkmodes
+Message-ID: <20250228165541.04b6ba3c@fedora.home>
+In-Reply-To: <Z8HZJo9GE23uq5ew@shell.armlinux.org.uk>
+References: <20250228145540.2209551-1-maxime.chevallier@bootlin.com>
+	<20250228145540.2209551-3-maxime.chevallier@bootlin.com>
+	<Z8HZJo9GE23uq5ew@shell.armlinux.org.uk>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Lei Yang <leiyang@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- willemdebruijn.kernel@gmail.com, jasowang@redhat.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, mykolal@fb.com,
- shuah@kernel.org, hawk@kernel.org
-References: <20250227142330.1605996-1-marcus.wichelmann@hetzner-cloud.de>
- <CAPpAL=wLk0Z3jfg9eY75c3ZFhH-3w7H--WqFuaGMcCJ+Bm5q+g@mail.gmail.com>
-Content-Language: en-US
-From: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
-Autocrypt: addr=marcus.wichelmann@hetzner-cloud.de; keydata=
- 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
- wySmewx3h/yfMh0aFxHhvLPxrO2IEQ==
-Subject: Re: [PATCH bpf-next v4 0/6] XDP metadata support for tun driver
-In-Reply-To: <CAPpAL=wLk0Z3jfg9eY75c3ZFhH-3w7H--WqFuaGMcCJ+Bm5q+g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
-X-Authenticated-Sender: marcus.wichelmann@hetzner-cloud.de
-X-Virus-Scanned: Clear (ClamAV 1.0.7/27563/Fri Feb 28 11:01:44 2025)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeltdekudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduledprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtt
+ hhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-QW0gMjguMDIuMjUgdW0gMDY6NDMgc2NocmllYiBMZWkgWWFuZzoNCj4gSGkgTWFyY3VzDQo+
-IA0KPiBTaW5jZSB5b3VyIHBhdGNoZXMgYXJlIGFib3V0IHRoZSB2aXJ0dWFsIG5ldHdvcmss
-IEknZCBsaWtlIHRvIHRlc3QgaXQsDQo+IGJ1dCBpdCBjb25mbGljdHMgKFBsZWFzZSByZXZp
-ZXcgdGhlIGF0dGFjaG1lbnQgdG8gcmV2aWV3IG1vcmUgZGV0YWlscykNCj4gd2hlbiBJIGFw
-cGx5IGl0IHRvIHRoZSBtYXN0ZXIgYnJhbmNoLg0KPiBNeSB0ZXN0IGJhc2VkIG9uIHRoaXMg
-Y29tbWl0Og0KPiBjb21taXQgMWUxNTUxMGI3MWM5OWM2ZTQ5MTM0ZDc1NmRmOTEwNjlmN2Qx
-ODE0MSAob3JpZ2luL21hc3Rlciwgb3JpZ2luL0hFQUQpDQo+IE1lcmdlOiBmMDlkNjk0Y2Y3
-OTkgNTRlMWI0YmVjZjVlDQo+IEF1dGhvcjogTGludXMgVG9ydmFsZHMgPHRvcnZhbGRzQGxp
-bnV4LWZvdW5kYXRpb24ub3JnPg0KPiBEYXRlOiAgIFRodSBGZWIgMjcgMDk6MzI6NDIgMjAy
-NSAtMDgwMA0KPiANCj4gICAgICBNZXJnZSB0YWcgJ25ldC02LjE0LXJjNScgb2YNCj4gZ2l0
-Oi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L25ldGRldi9uZXQN
-Cj4gDQo+ICAgICAgUHVsbCBuZXR3b3JraW5nIGZpeGVzIGZyb20gSmFrdWIgS2ljaW5za2k6
-DQo+ICAgICAgICJJbmNsdWRpbmcgZml4ZXMgZnJvbSBibHVldG9vdGguDQo+IA0KDQpIaSwN
-Cg0KdGhhbmsgeW91IGZvciBpbmNsdWRpbmcgaXQgaW4geW91ciB0ZXN0cy4NCg0KVGhlIG1l
-bnRpb25lZCBjb21taXQgaXMgbm90IHlldCBpbiBicGYtbmV4dCwgYnV0IEkgcmViYXNlZCBt
-eSBwYXRjaCBvbg0KbGF0ZXN0IG1haW5saW5lIGFuZCBhdHRhY2hlZCB0aGUgdXBkYXRlZCBw
-YXRjaCBmb3IgdGhlIGNvbmZsaWN0aW5nDQpjb21taXQuDQoNClRoZSBjb25mbGljdCB3YXMg
-anVzdCBhYm91dCBhIHNlY3Rpb24gdGhhdCB3YXMgcmVtb3ZlZCByaWdodCBiZWxvdw0KbXkg
-YWRkZWQgbGluZSBpbiBuZXR3b3JrX2hlbHBlcnMuaCwgc28gbm8gZnVuY3Rpb25hbCBjaGFu
-Z2UuDQoNCi0tLQ0KDQogRnJvbSBjNzE4MmU1YTRkMjE2OTZiOWU4Y2QyNWY5MmU2NGUyODEy
-OWUyYzZlIE1vbiBTZXAgMTcgMDA6MDA6MDAgMjAwMQ0KRnJvbTogTWFyY3VzIFdpY2hlbG1h
-bm4gPG1hcmN1cy53aWNoZWxtYW5uQGhldHpuZXItY2xvdWQuZGU+DQpEYXRlOiBUaHUsIDEz
-IEZlYiAyMDI1IDE2OjI4OjE5ICswMDAwDQpTdWJqZWN0OiBbUEFUQ0hdIHNlbGZ0ZXN0cy9i
-cGY6IG1vdmUgb3Blbl90dW50YXAgdG8gbmV0d29yayBoZWxwZXJzDQoNClRvIHRlc3QgdGhl
-IFhEUCBtZXRhZGF0YSBmdW5jdGlvbmFsaXR5IG9mIHRoZSB0dW4gZHJpdmVyLCBpdCdzIG5l
-Y2Vzc2FyeQ0KdG8gY3JlYXRlIGEgbmV3IHRhcCBkZXZpY2UgZmlyc3QuIEEgaGVscGVyIGZ1
-bmN0aW9uIGZvciB0aGlzIGFscmVhZHkNCmV4aXN0cyBpbiBsd3RfaGVscGVycy5oLiBNb3Zl
-IGl0IHRvIHRoZSBjb21tb24gbmV0d29yayBoZWxwZXJzIGhlYWRlciwNCnNvIGl0IGNhbiBi
-ZSByZXVzZWQgaW4gb3RoZXIgdGVzdHMuDQoNClNpZ25lZC1vZmYtYnk6IE1hcmN1cyBXaWNo
-ZWxtYW5uIDxtYXJjdXMud2ljaGVsbWFubkBoZXR6bmVyLWNsb3VkLmRlPg0KUmV2aWV3ZWQt
-Ynk6IFdpbGxlbSBkZSBCcnVpam4gPHdpbGxlbWJAZ29vZ2xlLmNvbT4NCkFja2VkLWJ5OiBK
-YXNvbiBXYW5nIDxqYXNvd2FuZ0ByZWRoYXQuY29tPg0KLS0tDQogIHRvb2xzL3Rlc3Rpbmcv
-c2VsZnRlc3RzL2JwZi9uZXR3b3JrX2hlbHBlcnMuYyB8IDI4ICsrKysrKysrKysrKysrKysr
-Kw0KICB0b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9icGYvbmV0d29ya19oZWxwZXJzLmggfCAg
-MyArKw0KICAuLi4vc2VsZnRlc3RzL2JwZi9wcm9nX3Rlc3RzL2x3dF9oZWxwZXJzLmggICAg
-fCAyOSAtLS0tLS0tLS0tLS0tLS0tLS0tDQogIDMgZmlsZXMgY2hhbmdlZCwgMzEgaW5zZXJ0
-aW9ucygrKSwgMjkgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS90b29scy90ZXN0aW5n
-L3NlbGZ0ZXN0cy9icGYvbmV0d29ya19oZWxwZXJzLmMgYi90b29scy90ZXN0aW5nL3NlbGZ0
-ZXN0cy9icGYvbmV0d29ya19oZWxwZXJzLmMNCmluZGV4IDgwODQ0YTVmYjFmZS4uZmNlZTJj
-NGE2MzdhIDEwMDY0NA0KLS0tIGEvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMvYnBmL25ldHdv
-cmtfaGVscGVycy5jDQorKysgYi90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9icGYvbmV0d29y
-a19oZWxwZXJzLmMNCkBAIC01NDgsNiArNTQ4LDM0IEBAIHZvaWQgY2xvc2VfbmV0bnMoc3Ry
-dWN0IG5zdG9rZW4gKnRva2VuKQ0KICAJZnJlZSh0b2tlbik7DQogIH0NCiAgDQoraW50IG9w
-ZW5fdHVudGFwKGNvbnN0IGNoYXIgKmRldl9uYW1lLCBib29sIG5lZWRfbWFjKQ0KK3sNCisJ
-aW50IGVyciA9IDA7DQorCXN0cnVjdCBpZnJlcSBpZnI7DQorCWludCBmZCA9IG9wZW4oIi9k
-ZXYvbmV0L3R1biIsIE9fUkRXUik7DQorDQorCWlmICghQVNTRVJUX0dUKGZkLCAwLCAib3Bl
-bigvZGV2L25ldC90dW4pIikpDQorCQlyZXR1cm4gLTE7DQorDQorCWlmci5pZnJfZmxhZ3Mg
-PSBJRkZfTk9fUEkgfCAobmVlZF9tYWMgPyBJRkZfVEFQIDogSUZGX1RVTik7DQorCXN0cm5j
-cHkoaWZyLmlmcl9uYW1lLCBkZXZfbmFtZSwgSUZOQU1TSVogLSAxKTsNCisJaWZyLmlmcl9u
-YW1lW0lGTkFNU0laIC0gMV0gPSAnXDAnOw0KKw0KKwllcnIgPSBpb2N0bChmZCwgVFVOU0VU
-SUZGLCAmaWZyKTsNCisJaWYgKCFBU1NFUlRfT0soZXJyLCAiaW9jdGwoVFVOU0VUSUZGKSIp
-KSB7DQorCQljbG9zZShmZCk7DQorCQlyZXR1cm4gLTE7DQorCX0NCisNCisJZXJyID0gZmNu
-dGwoZmQsIEZfU0VURkwsIE9fTk9OQkxPQ0spOw0KKwlpZiAoIUFTU0VSVF9PSyhlcnIsICJm
-Y250bChPX05PTkJMT0NLKSIpKSB7DQorCQljbG9zZShmZCk7DQorCQlyZXR1cm4gLTE7DQor
-CX0NCisNCisJcmV0dXJuIGZkOw0KK30NCisNCiAgaW50IGdldF9zb2NrZXRfbG9jYWxfcG9y
-dChpbnQgc29ja19mZCkNCiAgew0KICAJc3RydWN0IHNvY2thZGRyX3N0b3JhZ2UgYWRkcjsN
-CmRpZmYgLS1naXQgYS90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9icGYvbmV0d29ya19oZWxw
-ZXJzLmggYi90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9icGYvbmV0d29ya19oZWxwZXJzLmgN
-CmluZGV4IGViZWM4YThkNmY4MS4uMTc1ZGQ1NDc4NDlmIDEwMDY0NA0KLS0tIGEvdG9vbHMv
-dGVzdGluZy9zZWxmdGVzdHMvYnBmL25ldHdvcmtfaGVscGVycy5oDQorKysgYi90b29scy90
-ZXN0aW5nL3NlbGZ0ZXN0cy9icGYvbmV0d29ya19oZWxwZXJzLmgNCkBAIC04LDYgKzgsNyBA
-QA0KICB0eXBlZGVmIF9fdTE2IF9fc3VtMTY7DQogICNpbmNsdWRlIDxsaW51eC9pZl9ldGhl
-ci5oPg0KICAjaW5jbHVkZSA8bGludXgvaWZfcGFja2V0Lmg+DQorI2luY2x1ZGUgPGxpbnV4
-L2lmX3R1bi5oPg0KICAjaW5jbHVkZSA8bGludXgvaXAuaD4NCiAgI2luY2x1ZGUgPGxpbnV4
-L2lwdjYuaD4NCiAgI2luY2x1ZGUgPGxpbnV4L2V0aHRvb2wuaD4NCkBAIC05OCw2ICs5OSw4
-IEBAIGludCBzZW5kX3JlY3ZfZGF0YShpbnQgbGZkLCBpbnQgZmQsIHVpbnQzMl90IHRvdGFs
-X2J5dGVzKTsNCiAgaW50IG1ha2VfbmV0bnMoY29uc3QgY2hhciAqbmFtZSk7DQogIGludCBy
-ZW1vdmVfbmV0bnMoY29uc3QgY2hhciAqbmFtZSk7DQogIA0KK2ludCBvcGVuX3R1bnRhcChj
-b25zdCBjaGFyICpkZXZfbmFtZSwgYm9vbCBuZWVkX21hYyk7DQorDQogIHN0YXRpYyBfX3Ux
-NiBjc3VtX2ZvbGQoX191MzIgY3N1bSkNCiAgew0KICAJY3N1bSA9IChjc3VtICYgMHhmZmZm
-KSArIChjc3VtID4+IDE2KTsNCmRpZmYgLS1naXQgYS90b29scy90ZXN0aW5nL3NlbGZ0ZXN0
-cy9icGYvcHJvZ190ZXN0cy9sd3RfaGVscGVycy5oIGIvdG9vbHMvdGVzdGluZy9zZWxmdGVz
-dHMvYnBmL3Byb2dfdGVzdHMvbHd0X2hlbHBlcnMuaA0KaW5kZXggZmIxZWI4YzY3MzYxLi5j
-Y2VjMGZjZGFiYzEgMTAwNjQ0DQotLS0gYS90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9icGYv
-cHJvZ190ZXN0cy9sd3RfaGVscGVycy5oDQorKysgYi90b29scy90ZXN0aW5nL3NlbGZ0ZXN0
-cy9icGYvcHJvZ190ZXN0cy9sd3RfaGVscGVycy5oDQpAQCAtNSw3ICs1LDYgQEANCiAgDQog
-ICNpbmNsdWRlIDx0aW1lLmg+DQogICNpbmNsdWRlIDxuZXQvaWYuaD4NCi0jaW5jbHVkZSA8
-bGludXgvaWZfdHVuLmg+DQogICNpbmNsdWRlIDxsaW51eC9pY21wLmg+DQogIA0KICAjaW5j
-bHVkZSAidGVzdF9wcm9ncy5oIg0KQEAgLTM3LDM0ICszNiw2IEBAIHN0YXRpYyBpbmxpbmUg
-aW50IG5ldG5zX2RlbGV0ZSh2b2lkKQ0KICAJcmV0dXJuIHN5c3RlbSgiaXAgbmV0bnMgZGVs
-ICIgTkVUTlMgIj4vZGV2L251bGwgMj4mMSIpOw0KICB9DQogIA0KLXN0YXRpYyBpbnQgb3Bl
-bl90dW50YXAoY29uc3QgY2hhciAqZGV2X25hbWUsIGJvb2wgbmVlZF9tYWMpDQotew0KLQlp
-bnQgZXJyID0gMDsNCi0Jc3RydWN0IGlmcmVxIGlmcjsNCi0JaW50IGZkID0gb3BlbigiL2Rl
-di9uZXQvdHVuIiwgT19SRFdSKTsNCi0NCi0JaWYgKCFBU1NFUlRfR1QoZmQsIDAsICJvcGVu
-KC9kZXYvbmV0L3R1bikiKSkNCi0JCXJldHVybiAtMTsNCi0NCi0JaWZyLmlmcl9mbGFncyA9
-IElGRl9OT19QSSB8IChuZWVkX21hYyA/IElGRl9UQVAgOiBJRkZfVFVOKTsNCi0Jc3RybmNw
-eShpZnIuaWZyX25hbWUsIGRldl9uYW1lLCBJRk5BTVNJWiAtIDEpOw0KLQlpZnIuaWZyX25h
-bWVbSUZOQU1TSVogLSAxXSA9ICdcMCc7DQotDQotCWVyciA9IGlvY3RsKGZkLCBUVU5TRVRJ
-RkYsICZpZnIpOw0KLQlpZiAoIUFTU0VSVF9PSyhlcnIsICJpb2N0bChUVU5TRVRJRkYpIikp
-IHsNCi0JCWNsb3NlKGZkKTsNCi0JCXJldHVybiAtMTsNCi0JfQ0KLQ0KLQllcnIgPSBmY250
-bChmZCwgRl9TRVRGTCwgT19OT05CTE9DSyk7DQotCWlmICghQVNTRVJUX09LKGVyciwgImZj
-bnRsKE9fTk9OQkxPQ0spIikpIHsNCi0JCWNsb3NlKGZkKTsNCi0JCXJldHVybiAtMTsNCi0J
-fQ0KLQ0KLQlyZXR1cm4gZmQ7DQotfQ0KLQ0KICAjZGVmaW5lIElDTVBfUEFZTE9BRF9TSVpF
-ICAgICAxMDANCiAgDQogIC8qIE1hdGNoIGFuIElDTVAgcGFja2V0IHdpdGggcGF5bG9hZCBs
-ZW4gSUNNUF9QQVlMT0FEX1NJWkUgKi8NCi0tIA0KMi40My4wDQoNCg==
+Hello Russell,
+
+On Fri, 28 Feb 2025 15:41:26 +0000
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+
+> On Fri, Feb 28, 2025 at 03:55:27PM +0100, Maxime Chevallier wrote:
+> > The canonical definition for all the link modes is in linux/ethtool.h,
+> > which is complemented by the link_mode_params array stored in
+> > net/ethtool/common.h . That array contains all the metadata about each
+> > of these modes, including the Speed and Duplex information.
+> > 
+> > Phylib and phylink needs that information as well for internal
+> > management of the link, which was done by duplicating that information
+> > in locally-stored arrays and lookup functions. This makes it easy for
+> > developpers adding new modes to forget modifying phylib and phylink
+> > accordingly.
+> > 
+> > However, the link_mode_params array in net/ethtool/common.c is fairly
+> > inefficient to search through, as it isn't sorted in any manner. Phylib
+> > and phylink perform a lot of lookup operations, mostly to filter modes
+> > by speed and/or duplex.
+> > 
+> > We therefore introduce the link_caps private array in phy_caps.c, that
+> > indexes linkmodes in a more efficient manner. Each element associated a
+> > tuple <speed, duplex> to a bitfield of all the linkmodes runs at these
+> > speed/duplex.
+> > 
+> > We end-up with an array that's fairly short, easily addressable and that
+> > it optimised for the typical use-cases of phylib/phylink.
+> > 
+> > That array is initialized at the same time as phylib. As the
+> > link_mode_params array is part of the net stack, which phylink depends
+> > on, it should always be accessible from phylib.
+> > 
+> > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> > ---
+[...]
+> > +static int speed_duplex_to_capa(int speed, unsigned int duplex)
+> > +{
+> > +	if (duplex == DUPLEX_UNKNOWN ||
+> > +	    (speed > SPEED_1000 && duplex != DUPLEX_FULL))
+> > +		return -EINVAL;
+> > +
+> > +	switch (speed) {
+> > +	case SPEED_10: return duplex == DUPLEX_FULL ?
+> > +			      LINK_CAPA_10FD : LINK_CAPA_10HD;
+> > +	case SPEED_100: return duplex == DUPLEX_FULL ?
+> > +			       LINK_CAPA_100FD : LINK_CAPA_100HD;
+> > +	case SPEED_1000: return duplex == DUPLEX_FULL ?
+> > +				LINK_CAPA_1000FD : LINK_CAPA_1000HD;
+> > +	case SPEED_2500: return LINK_CAPA_2500FD;
+> > +	case SPEED_5000: return LINK_CAPA_5000FD;
+> > +	case SPEED_10000: return LINK_CAPA_10000FD;
+> > +	case SPEED_20000: return LINK_CAPA_20000FD;
+> > +	case SPEED_25000: return LINK_CAPA_25000FD;
+> > +	case SPEED_40000: return LINK_CAPA_40000FD;
+> > +	case SPEED_50000: return LINK_CAPA_50000FD;
+> > +	case SPEED_56000: return LINK_CAPA_56000FD;
+> > +	case SPEED_100000: return LINK_CAPA_100000FD;
+> > +	case SPEED_200000: return LINK_CAPA_200000FD;
+> > +	case SPEED_400000: return LINK_CAPA_400000FD;
+> > +	case SPEED_800000: return LINK_CAPA_800000FD;  
+> 
+> I think one of the issues you mentioned is about the need to update
+> several places as new linkmodes are added.
+> 
+> One of the side effects of adding new linkmodes is that they generally
+> come with faster speeds, so this is a place that needs to be updated
+> along with the table above.
+> 
+> I'm not sure whether this makes that problem better or worse - if a
+> new linkmode is added with a SPEED_*, the author of such a change has
+> to be on the ball to update these, and I'm not sure that'll happen.
+
+That's true indeed, and it seems that's already the case today (there's
+no MAC_800000FD in phylink for example). It seems to me that NICs
+with very fast speeds don't care at all about phylib nor phylink...
+
+So yeah this work does not address the complexity of adding a new speed
+:(
+
+To solve that, we could consider some macro magic to define new speeds
+with an associated LINK_CAPA, however that's quite the overhaul.
+
+Do you see that new enum for link_caps as a blocking point for that
+series ? 
+
+Maxime
 
