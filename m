@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-170515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D47EFA48E64
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 03:14:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 52A06A48E65
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 03:15:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E2B33B4FB5
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 02:14:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 215C83B69C7
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 02:14:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E65F519D8A9;
-	Fri, 28 Feb 2025 02:13:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 262061A2622;
+	Fri, 28 Feb 2025 02:13:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KBe/7E4x"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Za4gS3d2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2BA619D072
-	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 02:13:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 026A01A00F8
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 02:13:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740708815; cv=none; b=XAKCR0mPHnWyMbvg60AjJFw5SyP62Y4nxjMecDEmmNaB5wVDjA1glzFSzjYmWS7TSHYt4NVEgI9duWeWNB779jVdGfrEf+E7/8Cfj37rCS3xjeWriYiMxPVAqfR+CpqeB8jkfJZQhBDl9t4ky3uWKYJXKJWqg4OwZWsrNkMzbSE=
+	t=1740708817; cv=none; b=VYLil+oustOG75yWn2gUkgkI2xPbQ7QnfYyrr5Du7ZciLv16ALLJJl8tmbS7AOzLJz22ZAe0T9SWQyTgVHMTCa9tiUNf2GsXRTI7qONag81G5+dnz/cSALbqSegDNeT6O7QYZlbqSti5oI7yf0shyzMVqzLqz7AElTJFchC0JNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740708815; c=relaxed/simple;
-	bh=c62ZRDd0F+6uZv6BYCldjcMlM/9fxG6MqD6bSR37KKA=;
+	s=arc-20240116; t=1740708817; c=relaxed/simple;
+	bh=Oam0SwdgrnLXBsdBv5+rVEtOFSqJkQSxWJJSsjlOO58=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G/5FAUb7bv8lTX+ZV+XsOR3f9a+V2e6gwle0ONyFVVzHwm3pXo6i/Couv+giTurf1ywGyB6FqMuEMa3gm1gVAZTomHzmEV/8An641fx1v4g/69aso46z4c/nv/lhSMHo9HpLhEofc2whL/gE7HzM+tdwoIQ4Asy/BeI4KWVbIgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KBe/7E4x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 962DEC4CEE7;
-	Fri, 28 Feb 2025 02:13:35 +0000 (UTC)
+	 MIME-Version; b=RslzieSZVtUwOa5wKBs7RtjlRmmEYD+A3fo0rWMWzORe8FTKwEZhIG7VMXtsb4C63NaN8gP6v07DXwPnxS2jtsxSL8yYwHl5wkw+FlSheXfbqxF87by1pUUqvNzy1kedtN5BE1yKIPMwy/LSDeA3lYd2OLT+os+6wuS2TSo+Vl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Za4gS3d2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66F14C4CEDD;
+	Fri, 28 Feb 2025 02:13:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740708815;
-	bh=c62ZRDd0F+6uZv6BYCldjcMlM/9fxG6MqD6bSR37KKA=;
+	s=k20201202; t=1740708816;
+	bh=Oam0SwdgrnLXBsdBv5+rVEtOFSqJkQSxWJJSsjlOO58=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KBe/7E4xwKLbKc4c+EN5R0H9zxeBNNtkAuMo7VYKAtA1d9HV/O7h1KEPOqbG8fCT2
-	 YeyDOTDw/opLYCxynF69aXKteKJ8oFR/1v1y8wB9g0u2eFbsolYoPtghDL+60eKAh6
-	 Y30F+6lQ9ZmsZg29u8WrjC5fWqtjRW0/0Ecf0moadFcBpgtQi3Ek/puVbzHUCKE0gd
-	 0fQWZv9duyGBr73vgcZNYX9l+Bb4h5lakC9YcHaS21pkUYpr/QE3P4i439PN7phkUn
-	 +WkpB49FYzLyzQYOukFSoxC5O8Yi5AlRhr522EHnZLD0tFxgK2ZBAeLA6/ygFqYvHs
-	 Zq6YbkT3f6K4g==
+	b=Za4gS3d24ASBSkZje+YW3QSJ5IinRSskA4QBlf5oR/EQV9Ekd1T2ZQSrUB5QtyWFJ
+	 tin9Z+a17EGPL0FmdIdo5sI7CINPRLwg48ymazcuiEk9HDkkCyyruXCXZeVknTBzCQ
+	 Ywr8iG3HkM9hXyfICAOyHjn4ZEOsGHgYhbIOPJfbd7z8d4OC7BIXf4v4xyNjppaDWs
+	 amonYrjorsZ4UX9Q1fKxwvEJH9Pi1RD88sv0iPrjX5vYTVX7RivORMG/02b3wZbP61
+	 TeGPh9n+BlEG/QllElPRQCLgniWsi3ZCaNROYdGmlkiHA+2BuFybBsPfMysXQAfUYz
+	 CNQMh8kjStfkg==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -52,9 +52,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
 	Jiri Pirko <jiri@nvidia.com>
-Subject: [PATCH net-next 13/14] devlink: Implement devlink param multi attribute nested data values
-Date: Thu, 27 Feb 2025 18:12:26 -0800
-Message-ID: <20250228021227.871993-14-saeed@kernel.org>
+Subject: [PATCH net-next 14/14] net/mlx5: Implement eSwitch hairpin per prio buffers devlink params
+Date: Thu, 27 Feb 2025 18:12:27 -0800
+Message-ID: <20250228021227.871993-15-saeed@kernel.org>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250228021227.871993-1-saeed@kernel.org>
 References: <20250228021227.871993-1-saeed@kernel.org>
@@ -68,181 +68,379 @@ Content-Transfer-Encoding: 8bit
 
 From: Saeed Mahameed <saeedm@nvidia.com>
 
-Devlink param value attribute is not defined since devlink is handling
-the value validating and parsing internally, this allows us to implement
-multi attribute values without breaking any policies.
+E-Switch hairpin per prio buffers are controlled and configurable by the
+device, add two devlink params to control them.
 
-Devlink param multi-attribute values are considered to be dynamically
-sized arrays of u32 values, by introducing a new devlink param type
-DEVLINK_PARAM_TYPE_ARR_U32, driver and user space can set a variable
-count of u32 values into the DEVLINK_ATTR_PARAM_VALUE_DATA attribute.
+esw_haripin_per_prio_log_queue_size: p0,p1,....,p7
+  Log(base 2) of the number of packets descriptors allocated
+  internally for hairpin for IEEE802.1p priorities.
+  0 means that no descriptors are allocated for this priority
+  and traffic with this priority will be dropped.
 
-Implement get/set parsing and add to the internal value structure passed
-to drivers.
-
-This is useful for devices that need to configure a list of values for
-a specific configuration.
-
-example:
- $ devlink dev param show pci/... name multi-value-param
-    name multi-value-param type driver-specific
-    values:
-      cmode permanent value: 0,1,2,3,4,5,6,7
-
- $ devlink dev param set pci/... name multi-value-param \
-	value 4,5,6,7,0,1,2,3 cmode permanent
+esw_hairpin_per_prio_log_buf_size: p0,p1,...,p7
+  Log(base 2) of the buffer size (in bytes) allocated internally
+  for hairpin for IEEE802.1p priorities.
+  0 means no buffer for this priority and traffic with this
+  priority will be dropped.
 
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 ---
- include/net/devlink.h        |  7 ++++++
- include/uapi/linux/devlink.h |  1 +
- net/devlink/param.c          | 47 +++++++++++++++++++++++++++++++++++-
- 3 files changed, 54 insertions(+), 1 deletion(-)
+ Documentation/networking/devlink/mlx5.rst     |  15 +
+ .../net/ethernet/mellanox/mlx5/core/devlink.h |   4 +-
+ .../mellanox/mlx5/core/lib/nv_param.c         | 272 ++++++++++++++++++
+ 3 files changed, 290 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/devlink.h b/include/net/devlink.h
-index ca32c61583cf..c8f14ea3604e 100644
---- a/include/net/devlink.h
-+++ b/include/net/devlink.h
-@@ -420,12 +420,15 @@ typedef u64 devlink_resource_occ_get_t(void *priv);
- #define DEVLINK_RESOURCE_GENERIC_NAME_PORTS "physical_ports"
+diff --git a/Documentation/networking/devlink/mlx5.rst b/Documentation/networking/devlink/mlx5.rst
+index c9c064de4699..053060de6126 100644
+--- a/Documentation/networking/devlink/mlx5.rst
++++ b/Documentation/networking/devlink/mlx5.rst
+@@ -161,6 +161,21 @@ parameters.
+        * ``balanced`` : Merges fewer CQEs, resulting in a moderate compression ratio but maintaining a balance between bandwidth savings and performance
+        * ``aggressive`` : Merges more CQEs into a single entry, achieving a higher compression rate and maximizing performance, particularly under high traffic loads
  
- #define __DEVLINK_PARAM_MAX_STRING_VALUE 32
-+#define __DEVLINK_PARAM_MAX_ARRAY_SIZE 32
++   * - ``esw_hairpin_per_prio_log_queue_size``
++     - u32 array[8]
++     - permanent
++     - each item is log(base 2) of the number of packet descriptors allocated
++       internally for hairpin for IEEE802.1p priorities.
++       0 means that no descriptors are allocated for this priority
++       and traffic with this priority will be dropped.
 +
- enum devlink_param_type {
- 	DEVLINK_PARAM_TYPE_U8,
- 	DEVLINK_PARAM_TYPE_U16,
- 	DEVLINK_PARAM_TYPE_U32,
- 	DEVLINK_PARAM_TYPE_STRING,
- 	DEVLINK_PARAM_TYPE_BOOL,
-+	DEVLINK_PARAM_TYPE_ARR_U32,
- };
- 
- union devlink_param_value {
-@@ -434,6 +437,10 @@ union devlink_param_value {
- 	u32 vu32;
- 	char vstr[__DEVLINK_PARAM_MAX_STRING_VALUE];
- 	bool vbool;
-+	struct {
-+		u32 size;
-+		u32 vu32[__DEVLINK_PARAM_MAX_ARRAY_SIZE];
-+	} arr;
- };
- 
- struct devlink_param_gset_ctx {
-diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
-index 8cdd60eb3c43..df7c29bbb7a7 100644
---- a/include/uapi/linux/devlink.h
-+++ b/include/uapi/linux/devlink.h
-@@ -400,6 +400,7 @@ enum devlink_dyn_attr_type {
- 	DEVLINK_DYN_ATTR_TYPE_BINARY,
- 	__DEVLINK_DYN_ATTR_TYPE_CUSTOM_BASE = 0x80,
- 	/* Any possible custom types, unrelated to NLA_* values go below */
-+	DEVLINK_DYN_ATTR_TYPE_U32_ARRAY,
- };
- 
- enum devlink_attr {
-diff --git a/net/devlink/param.c b/net/devlink/param.c
-index 1922ca5b9cbc..31a8e61bae09 100644
---- a/net/devlink/param.c
-+++ b/net/devlink/param.c
-@@ -195,6 +195,8 @@ devlink_param_type_to_dyn_attr_type(enum devlink_param_type param_type)
- 		return DEVLINK_DYN_ATTR_TYPE_STRING;
- 	case DEVLINK_PARAM_TYPE_BOOL:
- 		return DEVLINK_DYN_ATTR_TYPE_FLAG;
-+	case DEVLINK_PARAM_TYPE_ARR_U32:
-+		return DEVLINK_DYN_ATTR_TYPE_U32_ARRAY;
- 	default:
- 		return -EINVAL;
- 	}
-@@ -239,6 +241,13 @@ devlink_nl_param_value_fill_one(struct sk_buff *msg,
- 		    nla_put_flag(msg, DEVLINK_ATTR_PARAM_VALUE_DATA))
- 			goto value_nest_cancel;
- 		break;
-+	case DEVLINK_PARAM_TYPE_ARR_U32:
-+		for (int i = 0; i < val.arr.size; i++) {
-+			if (nla_put_u32(msg, DEVLINK_ATTR_PARAM_VALUE_DATA,
-+					val.arr.vu32[i]))
-+				goto value_nest_cancel;
-+		}
-+		break;
- 	}
- 
- 	nla_nest_end(msg, param_value_attr);
-@@ -451,6 +460,9 @@ devlink_param_type_get_from_info(struct genl_info *info,
- 	case DEVLINK_DYN_ATTR_TYPE_FLAG:
- 		*param_type = DEVLINK_PARAM_TYPE_BOOL;
- 		break;
-+	case DEVLINK_DYN_ATTR_TYPE_U32_ARRAY:
-+		*param_type = DEVLINK_PARAM_TYPE_ARR_U32;
-+		break;
- 	default:
- 		return -EINVAL;
- 	}
-@@ -464,7 +476,7 @@ devlink_param_value_validate(struct genl_info *info,
- {
- 	struct netlink_ext_ack *extack = info->extack;
- 	struct nlattr *param_data;
--	int len = 0;
-+	int len = 0, rem;
- 
- 	if (type != DEVLINK_PARAM_TYPE_BOOL &&
- 	    GENL_REQ_ATTR_CHECK(info, DEVLINK_ATTR_PARAM_VALUE_DATA))
-@@ -507,6 +519,28 @@ devlink_param_value_validate(struct genl_info *info,
- 			return 0;
- 		NL_SET_ERR_MSG_MOD(extack, "Expected flag, got data");
- 		break;
-+	case DEVLINK_PARAM_TYPE_ARR_U32:
-+		len = 0;
-+		nla_for_each_attr_type(param_data,
-+				       DEVLINK_ATTR_PARAM_VALUE_DATA,
-+				       genlmsg_data(info->genlhdr),
-+				       genlmsg_len(info->genlhdr), rem) {
-+			if (nla_len(param_data) != sizeof(u32)) {
-+				NL_SET_ERR_MSG_MOD(extack,
-+						   "Array element size must be 4 bytes");
-+				return -EINVAL;
-+			}
-+			if (++len > __DEVLINK_PARAM_MAX_ARRAY_SIZE) {
-+				NL_SET_ERR_MSG_MOD(extack,
-+						   "Array size exceeds maximum");
-+				return -EINVAL;
-+			}
-+		}
-+		if (len)
-+			return 0;
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Value array must have at least one entry");
-+		break;
- 	default:
- 		NL_SET_ERR_MSG_FMT_MOD(extack,
- 				       "Not supported value type %d", type);
-@@ -521,6 +555,7 @@ devlink_param_value_get_from_info(const struct devlink_param *param,
- 				  union devlink_param_value *value)
- {
- 	struct nlattr *param_data;
-+	int rem, i = 0;
- 
- 	if (devlink_param_value_validate(info, param->type))
- 		return -EINVAL;
-@@ -543,6 +578,16 @@ devlink_param_value_get_from_info(const struct devlink_param *param,
- 	case DEVLINK_PARAM_TYPE_BOOL:
- 		value->vbool = nla_get_flag(param_data);
- 		break;
-+	case DEVLINK_PARAM_TYPE_ARR_U32: {
-+		nla_for_each_attr_type(param_data,
-+				       DEVLINK_ATTR_PARAM_VALUE_DATA,
-+				       genlmsg_data(info->genlhdr),
-+				       genlmsg_len(info->genlhdr), rem)
-+			value->arr.vu32[i++] = nla_get_u32(param_data);
++   * - ``esw_hairpin_per_prio_log_buf_size``
++     - u32 array[8]
++     - permanent
++     - each item is log(base 2) of the buffer size (in bytes) allocated internally
++       for hairpin for IEEE802.1p priorities.
++       0 means no buffer for this priority and traffic with this priority will be dropped.
 +
-+		value->arr.size = i;
-+		break;
-+		}
- 	}
+ The ``mlx5`` driver supports reloading via ``DEVLINK_CMD_RELOAD``
+ 
+ Info versions
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/devlink.h b/drivers/net/ethernet/mellanox/mlx5/core/devlink.h
+index 74bcdfa70361..b2c10ce1eac5 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/devlink.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/devlink.h
+@@ -22,7 +22,9 @@ enum mlx5_devlink_param_id {
+ 	MLX5_DEVLINK_PARAM_ID_ESW_MULTIPORT,
+ 	MLX5_DEVLINK_PARAM_ID_HAIRPIN_NUM_QUEUES,
+ 	MLX5_DEVLINK_PARAM_ID_HAIRPIN_QUEUE_SIZE,
+-	MLX5_DEVLINK_PARAM_ID_CQE_COMPRESSION_TYPE
++	MLX5_DEVLINK_PARAM_ID_CQE_COMPRESSION_TYPE,
++	MLX5_DEVLINK_PARAM_ID_ESW_HAIRPIN_DESCRIPTORS,
++	MLX5_DEVLINK_PARAM_ID_ESW_HAIRPIN_DATA_SIZE,
+ };
+ 
+ struct mlx5_trap_ctx {
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
+index 159d75967a48..d9815c66ea58 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
+@@ -1,11 +1,15 @@
+ // SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
+ /* Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
+ 
++#include <net/dcbnl.h>
++
+ #include "nv_param.h"
+ #include "mlx5_core.h"
+ #include "en.h"
+ 
+ enum {
++	MLX5_CLASS_0_CTRL_ID_NV_INTERNAL_HAIRPIN_CONF         = 0x13,
++	MLX5_CLASS_0_CTRL_ID_NV_INTERNAL_HAIRPIN_CAP          = 0x14,
+ 	MLX5_CLASS_0_CTRL_ID_NV_GLOBAL_PCI_CONF               = 0x80,
+ 	MLX5_CLASS_0_CTRL_ID_NV_GLOBAL_PCI_CAP                = 0x81,
+ 	MLX5_CLASS_0_CTRL_ID_NV_SW_OFFLOAD_CONFIG             = 0x10a,
+@@ -145,6 +149,19 @@ struct mlx5_ifc_nv_keep_link_up_bits {
+ 	u8    keep_eth_link_up[0x1];
+ };
+ 
++struct mlx5_ifc_nv_internal_hairpin_cap_bits {
++	u8    log_max_hpin_total_num_descriptors[0x8];
++	u8    log_max_hpin_total_data_size[0x8];
++	u8    log_max_hpin_num_descriptor_per_prio[0x8];
++	u8    log_max_hpin_data_size_per_prio[0x8];
++};
++
++struct mlx5_ifc_nv_internal_hairpin_conf_bits {
++	u8    log_hpin_num_descriptor[8][0x8];
++
++	u8    log_hpin_data_size[8][0x8];
++};
++
+ #define MNVDA_HDR_SZ \
+ 	(MLX5_ST_SZ_BYTES(mnvda_reg) - MLX5_BYTE_OFF(mnvda_reg, configuration_item_data))
+ 
+@@ -531,6 +548,247 @@ static int mlx5_devlink_total_vfs_validate(struct devlink *devlink, u32 id,
  	return 0;
  }
+ 
++static int
++mlx5_nv_param_read_internal_hairpin_conf(struct mlx5_core_dev *dev,
++					 void *mnvda, size_t len)
++{
++	MLX5_SET_CONFIG_ITEM_TYPE(global, mnvda, type_class, 0);
++	MLX5_SET_CONFIG_ITEM_TYPE(global, mnvda, parameter_index,
++				  MLX5_CLASS_0_CTRL_ID_NV_INTERNAL_HAIRPIN_CONF);
++	MLX5_SET_CONFIG_HDR_LEN(mnvda, nv_internal_hairpin_conf);
++
++	return mlx5_nv_param_read(dev, mnvda, len);
++}
++
++static int
++mlx5_nv_param_read_internal_hairpin_cap(struct mlx5_core_dev *dev,
++					void *mnvda, size_t len)
++{
++	MLX5_SET_CONFIG_ITEM_TYPE(global, mnvda, type_class, 0);
++	MLX5_SET_CONFIG_ITEM_TYPE(global, mnvda, parameter_index,
++				  MLX5_CLASS_0_CTRL_ID_NV_INTERNAL_HAIRPIN_CAP);
++
++	return mlx5_nv_param_read(dev, mnvda, len);
++}
++
++static int
++mlx5_nv_param_esw_hairpin_descriptors_get(struct devlink *devlink, u32 id,
++					  struct devlink_param_gset_ctx *ctx)
++
++{
++	struct mlx5_core_dev *dev = devlink_priv(devlink);
++	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
++	void *data;
++	int err, i;
++
++	BUILD_BUG_ON(IEEE_8021QAZ_MAX_TCS > __DEVLINK_PARAM_MAX_ARRAY_SIZE);
++
++	err = mlx5_nv_param_read_internal_hairpin_conf(dev, mnvda, sizeof(mnvda));
++	if (err)
++		return err;
++	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
++
++	ctx->val.arr.size = IEEE_8021QAZ_MAX_TCS;
++	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++)
++		ctx->val.arr.vu32[i] = MLX5_GET(nv_internal_hairpin_conf, data,
++						log_hpin_num_descriptor[i]);
++	return 0;
++}
++
++static int
++mlx5_nv_param_esw_hairpin_descriptors_set(struct devlink *devlink, u32 id,
++					  struct devlink_param_gset_ctx *ctx,
++					  struct netlink_ext_ack *extack)
++{
++	struct mlx5_core_dev *dev = devlink_priv(devlink);
++	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
++	void *data;
++	int err, i;
++
++	err = mlx5_nv_param_read_internal_hairpin_conf(dev, mnvda, sizeof(mnvda));
++	if (err) {
++		NL_SET_ERR_MSG_MOD(extack, "Unable to query internal hairpin conf");
++		return err;
++	}
++
++	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
++	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++)
++		MLX5_SET(nv_internal_hairpin_conf, data,
++			 log_hpin_num_descriptor[i], ctx->val.arr.vu32[i]);
++
++	return mlx5_nv_param_write(dev, mnvda,  sizeof(mnvda));
++}
++
++static int
++mlx5_nv_param_esw_hairpin_descriptors_validate(struct devlink *devlink, u32 id,
++					       union devlink_param_value val,
++					       struct netlink_ext_ack *extack)
++{
++	u8 log_max_num_descriptors, log_max_total_descriptors;
++	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
++	u16 total = 0;
++	void *data;
++	int err, i;
++
++	if (val.arr.size != IEEE_8021QAZ_MAX_TCS) {
++		NL_SET_ERR_MSG_FMT_MOD(extack, "Array size must be %d",
++				       IEEE_8021QAZ_MAX_TCS);
++		return -EINVAL;
++	}
++	err = mlx5_nv_param_read_internal_hairpin_cap(devlink_priv(devlink),
++						      mnvda, sizeof(mnvda));
++	if (err) {
++		NL_SET_ERR_MSG_MOD(extack, "Unable to query internal hairpin cap");
++		return err;
++	}
++
++	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
++	log_max_total_descriptors = MLX5_GET(nv_internal_hairpin_cap, data,
++					     log_max_hpin_total_num_descriptors);
++	log_max_num_descriptors = MLX5_GET(nv_internal_hairpin_cap, data,
++					   log_max_hpin_num_descriptor_per_prio);
++
++	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++) {
++		if (val.arr.vu32[i] <= log_max_num_descriptors)
++			continue;
++
++		NL_SET_ERR_MSG_FMT_MOD(extack,
++				       "Max allowed value per prio is %d",
++				       log_max_num_descriptors);
++		return -ERANGE;
++	}
++
++	/* Validate total number of descriptors */
++	memset(mnvda, 0, sizeof(mnvda));
++	err = mlx5_nv_param_read_internal_hairpin_conf(devlink_priv(devlink),
++						       mnvda, sizeof(mnvda));
++	if (err) {
++		NL_SET_ERR_MSG_MOD(extack, "Unable to query internal hairpin conf");
++		return err;
++	}
++	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
++
++	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++)
++		total += 1 << val.arr.vu32[i];
++
++	if (total > (1 << log_max_total_descriptors)) {
++		NL_SET_ERR_MSG_FMT_MOD(extack,
++				       "Log max total value allowed is %d",
++				       log_max_total_descriptors);
++		return -ERANGE;
++	}
++
++	return 0;
++}
++
++static int
++mlx5_nv_param_esw_hairpin_data_size_get(struct devlink *devlink, u32 id,
++					struct devlink_param_gset_ctx *ctx)
++{
++	struct mlx5_core_dev *dev = devlink_priv(devlink);
++	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
++	void *data;
++	int err, i;
++
++	err = mlx5_nv_param_read_internal_hairpin_conf(dev, mnvda, sizeof(mnvda));
++	if (err)
++		return err;
++
++	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
++	ctx->val.arr.size = IEEE_8021QAZ_MAX_TCS;
++	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++)
++		ctx->val.arr.vu32[i] = MLX5_GET(nv_internal_hairpin_conf, data,
++						log_hpin_data_size[i]);
++	return 0;
++}
++
++static int
++mlx5_nv_param_esw_hairpin_data_size_set(struct devlink *devlink, u32 id,
++					struct devlink_param_gset_ctx *ctx,
++					struct netlink_ext_ack *extack)
++{
++	struct mlx5_core_dev *dev = devlink_priv(devlink);
++	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
++	int err, i;
++	void *data;
++
++	err = mlx5_nv_param_read_internal_hairpin_conf(dev, mnvda, sizeof(mnvda));
++	if (err)
++		return err;
++
++	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
++
++	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++)
++		MLX5_SET(nv_internal_hairpin_conf, data, log_hpin_data_size[i],
++			 ctx->val.arr.vu32[i]);
++
++	return mlx5_nv_param_write(dev, mnvda,  sizeof(mnvda));
++}
++
++static int
++mlx5_nv_param_esw_hairpin_data_size_validate(struct devlink *devlink, u32 id,
++					     union devlink_param_value val,
++					     struct netlink_ext_ack *extack)
++{
++	u8 log_max_data_size, log_max_total_data_size;
++	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
++	unsigned long total = 0;
++	void *data;
++	int err, i;
++
++	if (val.arr.size != IEEE_8021QAZ_MAX_TCS) {
++		NL_SET_ERR_MSG_FMT_MOD(extack, "Array size must be %d",
++				       IEEE_8021QAZ_MAX_TCS);
++		return -EINVAL;
++	}
++
++	err = mlx5_nv_param_read_internal_hairpin_cap(devlink_priv(devlink),
++						      mnvda, sizeof(mnvda));
++	if (err) {
++		NL_SET_ERR_MSG_MOD(extack, "Unable to query internal hairpin cap");
++		return err;
++	}
++
++	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
++	log_max_data_size = MLX5_GET(nv_internal_hairpin_cap, data,
++				     log_max_hpin_data_size_per_prio);
++	log_max_total_data_size = MLX5_GET(nv_internal_hairpin_cap, data,
++					   log_max_hpin_total_data_size);
++
++	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++) {
++		if (val.arr.vu32[i] <= log_max_data_size)
++			continue;
++
++		NL_SET_ERR_MSG_FMT_MOD(extack,
++				       "Max allowed value per prio is %d",
++				       log_max_data_size);
++		return -ERANGE;
++	}
++
++	/* Validate total data size */
++	memset(mnvda, 0, sizeof(mnvda));
++	err = mlx5_nv_param_read_internal_hairpin_conf(devlink_priv(devlink),
++						       mnvda, sizeof(mnvda));
++	if (err) {
++		NL_SET_ERR_MSG_MOD(extack, "Unable to query internal hairpin conf");
++		return err;
++	}
++
++	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
++
++	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++)
++		total += 1 << val.arr.vu32[i];
++
++	if (total > (1 << log_max_total_data_size)) {
++		NL_SET_ERR_MSG_FMT_MOD(extack,
++				       "Log max total value allowed is %d",
++				       log_max_total_data_size);
++		return -ERANGE;
++	}
++
++	return 0;
++}
++
+ static const struct devlink_param mlx5_nv_param_devlink_params[] = {
+ 	DEVLINK_PARAM_GENERIC(ENABLE_SRIOV, BIT(DEVLINK_PARAM_CMODE_PERMANENT),
+ 			      mlx5_devlink_enable_sriov_get,
+@@ -544,6 +802,20 @@ static const struct devlink_param mlx5_nv_param_devlink_params[] = {
+ 			     mlx5_nv_param_devlink_cqe_compress_get,
+ 			     mlx5_nv_param_devlink_cqe_compress_set,
+ 			     mlx5_nv_param_devlink_cqe_compress_validate),
++	DEVLINK_PARAM_DRIVER(MLX5_DEVLINK_PARAM_ID_ESW_HAIRPIN_DESCRIPTORS,
++			     "esw_hairpin_per_prio_log_queue_size",
++			     DEVLINK_PARAM_TYPE_ARR_U32,
++			     BIT(DEVLINK_PARAM_CMODE_PERMANENT),
++			     mlx5_nv_param_esw_hairpin_descriptors_get,
++			     mlx5_nv_param_esw_hairpin_descriptors_set,
++			     mlx5_nv_param_esw_hairpin_descriptors_validate),
++	DEVLINK_PARAM_DRIVER(MLX5_DEVLINK_PARAM_ID_ESW_HAIRPIN_DATA_SIZE,
++			     "esw_hairpin_per_prio_log_buf_size",
++			     DEVLINK_PARAM_TYPE_ARR_U32,
++			     BIT(DEVLINK_PARAM_CMODE_PERMANENT),
++			     mlx5_nv_param_esw_hairpin_data_size_get,
++			     mlx5_nv_param_esw_hairpin_data_size_set,
++			     mlx5_nv_param_esw_hairpin_data_size_validate),
+ };
+ 
+ int mlx5_nv_param_register_dl_params(struct devlink *devlink)
 -- 
 2.48.1
 
