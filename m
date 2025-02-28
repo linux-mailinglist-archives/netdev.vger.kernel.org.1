@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-170649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD9FEA49721
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 11:24:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8851BA49715
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 11:23:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D67843A65D1
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 10:22:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6525918892D5
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 10:22:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22A8525E459;
-	Fri, 28 Feb 2025 10:21:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8764025D526;
+	Fri, 28 Feb 2025 10:21:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="agMPWxwW"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="AgwWGUMG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f98.google.com (mail-lf1-f98.google.com [209.85.167.98])
+Received: from mail-wr1-f97.google.com (mail-wr1-f97.google.com [209.85.221.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379D825D91A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9395F157A55
 	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 10:21:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.98
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740738111; cv=none; b=ekp1YKz8a5/nNxBg8ilVC6dMKqMmajAJIbm9JmS/iTWiLJfzZLDK/U2FQavpa/Rlvfap/iCd+vOgsHgKMtU3+a3KRaA2WguRAeYwnlzYb1QoWzTwxMJGeTpo4qx5CZmrB271+yMBU8FKbuLnAfT202w3gPHSiYiBPrF8f8b+9Us=
+	t=1740738109; cv=none; b=GvnBho/lNMSKLL6pyJymS2fxvzBGdG0JKyWevAvSbMdlC7uJadpCVYG3l7T1BBfgIYtCh9IITFecDazUVJANPQHQGUSlOy2PAZzid9qvY36cmcfqX9/zDYdLfSBLLIn4ftizI7NPzIjyKSwSkLmqe6UxT4SmLdl+invK9Chtx4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740738111; c=relaxed/simple;
-	bh=frPzm9j71cvkMEtEZpIWAJv071SMJjD5djta3wBB06g=;
+	s=arc-20240116; t=1740738109; c=relaxed/simple;
+	bh=ev3jcClBm0/UlWGLZk9GAz3V7Axko4AwetFnS2iSMZs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bDlZB5um2wIxGYONuvTftv3fT52AO4dPyA6W79J3WGTurpoKTyvRCOD8RaqBu3Hq9NID6cbdHoLRKz8V9JwU5QrFa0PbtVHmWaxrNKJDKh2NOuMter3qv3BcsQeqONE+1vNWgUhE+iHoyi0Epxn/X7DrPW4YjFj4ydv0Rm8zasw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=agMPWxwW; arc=none smtp.client-ip=209.85.167.98
+	 MIME-Version; b=rMExqJfKlwhAJersz9qDcxNs8tkhxM8DOX+3xAEXMAWcCu3GHnQ4ruOlOEdTt13pFW0+u1mYnbcwrHuBCxJZhdc7oIy4MwBfXVS2ECwHzceB0oQkAYBPUTv/zCYZ/C5TAXo8rJHzKBNH0IBNlINTnn8g72GKSB39ItGnIvVSk5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=AgwWGUMG; arc=none smtp.client-ip=209.85.221.97
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-lf1-f98.google.com with SMTP id 2adb3069b0e04-5456a71a7d9so267582e87.3
+Received: by mail-wr1-f97.google.com with SMTP id ffacd0b85a97d-390debc81d1so177907f8f.3
         for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 02:21:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=6wind.com; s=google; t=1740738106; x=1741342906; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=l18lS/ZnTYlpD/f3P/AnhzLsGDqaeZpCSEDfJ847EHI=;
-        b=agMPWxwWeHZGO7xjxWgvtu3iq1PcrK/o6HpRlbkuUwNyl+dt/C8fgD9TGT5Gv2keqI
-         cIqzkYeYf3gmkn/tOH5lJ8XOMy2r1UBhEh5Ie/9t4Ij1/S2d9fczxYmOxAkTZ0tEvSwB
-         YZ9WfsgS8s7Z0vXw4vocfa2efWeCRj2t1ICaH6/O+GNspEfEbvTZonmtfCL5ObFpA590
-         oy5s2tKcBH4Y5XMQZtyOTHamgjYAjKa/L4rAso5qQ/E+jzQcUYdN/LsCxz3b3meK3iN8
-         iIedNNMAl4R+fz+BHBRbN0TsnjUbTt+Yee1EYRRRbFgV3tDdIeRQYrdRPuMfuw3vAGr/
-         Ztpw==
+        bh=Ph4NE2EWoc8N+xxWzSkjuPjoZHyPJIbxipfLCY5RZ24=;
+        b=AgwWGUMGV0YzbQBhoMs1E4jVPRCO3FIjCWa5PeTKFCXohK4B/91osDVb2J42qbK16f
+         Duo30O4M+wlBD0wYU+6aeXQUPZvXSVqOrWjMa01mp3Xs+dLMXJ41UTFpN3lqjPQIPmpH
+         9nwJ18PWAGUjxRe9Qd6PFEZtZ9ItUW2lyTlLz9bOtrcBD1rwGoCwBrhESoO8KmWG6iSr
+         hAv09xMVCodbmw3mRNo2tyhhpGU5r+Dr7Cx++JRYDqcl+65Psk+n4DyM6xN0QsrRLUD6
+         beRrUAkQqREnJqpKZBMGXoHRO9VSOQq7iQP7s19JDuYW3ohkiVBYgD3vWsXNkOnowHmR
+         p3kA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1740738106; x=1741342906;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=l18lS/ZnTYlpD/f3P/AnhzLsGDqaeZpCSEDfJ847EHI=;
-        b=CTT42/7+BfoWoDwL85rNJRioSJOpdgdAcWVftMfcrxvEqRz7xQfAlA09PjArP8JohL
-         p5fwdWvEXSwheZxXo6RmEGmKQyJpPvf68Ix0oCzwmtwWCibjMf9lIMMwZzGeCBehC+gp
-         UNiNsMDeeYpXzAE9TdjqIBS2hZBA28W4e5e4TTdg4eGl0quwnAOtvFVvVHFGDShN2qbj
-         pqwHNFND+w0xVs3Swn2pXCkNEWSDL92LMR92WzxrWAkv3wz+hu0J6TP7YhAz1x5s3Co0
-         bE1NkM674WaK4ZlVHEtRZ7nYV8sOxd7cuXAqyAFgDYhiOD3GpPhAgI3++t7d7wvD/uxO
-         46xQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX7p5yJS5/3e+9hu2BR/VhollA9uvgCU3vDY59gI5NJXvh3YloqsHyMwJKiiiPLJAPvmWcpjkI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyX4dEr1ePYFeK0VQRG2JMc1C/1jPUBm/Z/AZYFNZBoEkKjr3/X
-	PpWGqsGtKhmZ9ykkMbVnBqGn1Aol1Sv9kzr+PMS+6Fy2jDpP0HW3eY5XvhVKvwu2Exku+4+v47M
-	ZEOu2CfMtMpKX9bx1NJWlYWZbYRD1v3sI
-X-Gm-Gg: ASbGnctTtElVan7v+pkPt4xXHGQIzwir/se6Iep6JlZp90vtnJBDwH4KKCf4yDeUrej
-	iLAXszz+92FxvcPD4+KfJH0HfAvMsj3Ghcu8VHvggmQ2dOnnzcEhaU3Q3qGxdveclNX5Qzecapw
-	Ppa+00mXCXKRMad1JCdqxGggLJ1x82SFJ1kQ/9VGz9uj+yVLYMakWA4DfptbmYKKJ6imoe9N1HY
-	N5o7mtSen3O0gD9XhYRkxB8nLEJaICdzGoj5PDpAWT8fBGwZKWKRNj+GWCubZmf4toIlMi/c5Ef
-	pySY55/XgNhOieV4oUXvewK+b31tcK+/QVvezzNVir2T+XDU/94B7mNhZCTArS/2LfLnM38=
-X-Google-Smtp-Source: AGHT+IG8y0xDJLW/tpBkCm5AXI5pREnHHlRwTCq3+qOCw15Hes7yAmtk1tm/45aE+TR2sl3keeKHQ6hOtg4l
-X-Received: by 2002:a05:6512:281d:b0:545:8a1:536d with SMTP id 2adb3069b0e04-5494c1291c8mr327686e87.2.1740738106019;
-        Fri, 28 Feb 2025 02:21:46 -0800 (PST)
+        bh=Ph4NE2EWoc8N+xxWzSkjuPjoZHyPJIbxipfLCY5RZ24=;
+        b=AqOLGV/t6dgyEkUPAEYvFzOzwVTP0/SyzimLpm0mw+Sf2yIiJEPVCLHNVOBs1fHBZ8
+         lL7ij2oIw0JyyUV9nmp8ljpGKHnbTU3SwSUtinEniPO3pbxVKA//PuLFHz+NNU9oS8Z+
+         qQsxqep+PqwG6P/h1moTIGZQ9uJ3fGjCYXXFvQACeReSorKv/zwqhfIiSgvb/YUhrygT
+         7J583yQ3jL4qNnMGHI1xtGZ56Aikr4a3gudldf2AjWkph9OsC8VBhtg/9lM21YSOOE49
+         IBWKJB/vA3rEzJZsbjobjetEAvqNFq1Lj/UJ4ghnRfO/mZ7fYxtsXndmKHY8/saXNmru
+         9NJg==
+X-Forwarded-Encrypted: i=1; AJvYcCW22jGclGyQU4PObWn5yvEciNXgSOaheWVbvesBXx3yZpBWzhyZeBqaWCJwnzcaPGHZIuvs4nc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlpiYmIfHmqvPMq7A71JJUibnqV29OU/BU5b/kc02GUvgnyezJ
+	7flc+j46lzUyjO/Fdtue3XmUTcuUwyPeYN6lKkuYoHk7NC6xAJq59gySO6KzHA6qqRw6rPnKsg1
+	4rkELUKIx6s1BnYPPiOFTkGZfuwtDGgkF
+X-Gm-Gg: ASbGncvL8BJrzOQGeMqBVh9Mx5c74h1eNoxeFhb0DLXZvdZYXYDTL34tAQ7CCyWEutd
+	7SKfvhPqsm9mpi+/Uq8sK6hD0OYRYTgGQqQRXBu3vzhRSLhyulSAbn5GuhtqTdMfEI45YhCl5Uw
+	jxhTzHysOPD524BmqmkyKtCW9uZ91+aO4tQfqq8foIv17fmzYuPr2d7VlEZq0ODgXGWyTkdGtKS
+	nyJnua6WLGLITOBQR72h10kYoS5m1bWK3SbCOB16bIlHnW+9wP+GQpKF2D6jDvElt7WEM5BLrk/
+	CTmchKLDP5+poP+qq7pmdBwVApBjtbp+HPU8KzHOMRzQAapjCvmNEH3DG2AvTdej4RJxNfA=
+X-Google-Smtp-Source: AGHT+IEiF1Zzdx8mqFPfDVf+h2A/lqC/5lvOIS4uRjqOGRC1mYV1Ky4UK9tVxDvZxuyJtP9t+wA6DhERXb7F
+X-Received: by 2002:a05:6000:1887:b0:38d:e078:4393 with SMTP id ffacd0b85a97d-390ec9c1bb1mr841609f8f.6.1740738105739;
+        Fri, 28 Feb 2025 02:21:45 -0800 (PST)
 Received: from smtpservice.6wind.com ([185.13.181.2])
-        by smtp-relay.gmail.com with ESMTP id 2adb3069b0e04-5494417b519sm125094e87.40.2025.02.28.02.21.45;
-        Fri, 28 Feb 2025 02:21:46 -0800 (PST)
+        by smtp-relay.gmail.com with ESMTP id 5b1f17b1804b1-43aba5746dfsm4681995e9.44.2025.02.28.02.21.45;
+        Fri, 28 Feb 2025 02:21:45 -0800 (PST)
 X-Relaying-Domain: 6wind.com
 Received: from bretzel (bretzel.dev.6wind.com [10.17.1.57])
-	by smtpservice.6wind.com (Postfix) with ESMTPS id 85B9318601;
+	by smtpservice.6wind.com (Postfix) with ESMTPS id 8AD3E18602;
 	Fri, 28 Feb 2025 11:21:45 +0100 (CET)
 Received: from dichtel by bretzel with local (Exim 4.94.2)
 	(envelope-from <nicolas.dichtel@6wind.com>)
-	id 1tnxV3-000eHu-8c; Fri, 28 Feb 2025 11:21:45 +0100
+	id 1tnxV3-000eHx-AM; Fri, 28 Feb 2025 11:21:45 +0100
 From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 To: "David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -90,9 +90,9 @@ Cc: Ido Schimmel <idosch@idosch.org>,
 	Kuniyuki Iwashima <kuniyu@amazon.com>,
 	netdev@vger.kernel.org,
 	Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: [PATCH net-next v6 1/3] net: rename netns_local to netns_immutable
-Date: Fri, 28 Feb 2025 11:20:56 +0100
-Message-ID: <20250228102144.154802-2-nicolas.dichtel@6wind.com>
+Subject: [PATCH net-next v6 2/3] net: advertise netns_immutable property via netlink
+Date: Fri, 28 Feb 2025 11:20:57 +0100
+Message-ID: <20250228102144.154802-3-nicolas.dichtel@6wind.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250228102144.154802-1-nicolas.dichtel@6wind.com>
 References: <20250228102144.154802-1-nicolas.dichtel@6wind.com>
@@ -104,527 +104,74 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The name 'netns_local' is confusing. A following commit will export it via
-netlink, so let's use a more explicit name.
+Since commit 05c1280a2bcf ("netdev_features: convert NETIF_F_NETNS_LOCAL to
+dev->netns_local"), there is no way to see if the netns_immutable property
+s set on a device. Let's add a netlink attribute to advertise it.
 
-Reported-by: Eric Dumazet <edumazet@google.com>
-Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- Documentation/networking/net_cachelines/net_device.rst |  2 +-
- Documentation/networking/switchdev.rst                 |  2 +-
- drivers/net/amt.c                                      |  2 +-
- drivers/net/bonding/bond_main.c                        |  2 +-
- drivers/net/ethernet/adi/adin1110.c                    |  2 +-
- drivers/net/ethernet/marvell/prestera/prestera_main.c  |  2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c      |  4 ++--
- drivers/net/ethernet/mellanox/mlx5/core/en_rep.c       |  2 +-
- drivers/net/ethernet/mellanox/mlxsw/spectrum.c         |  2 +-
- drivers/net/ethernet/rocker/rocker_main.c              |  2 +-
- drivers/net/ethernet/ti/cpsw_new.c                     |  2 +-
- drivers/net/loopback.c                                 |  2 +-
- drivers/net/net_failover.c                             |  2 +-
- drivers/net/team/team_core.c                           |  2 +-
- drivers/net/vrf.c                                      |  2 +-
- include/linux/netdevice.h                              |  4 ++--
- net/batman-adv/soft-interface.c                        |  2 +-
- net/bridge/br_device.c                                 |  2 +-
- net/core/dev.c                                         |  4 ++--
- net/hsr/hsr_device.c                                   |  2 +-
- net/ieee802154/6lowpan/core.c                          |  2 +-
- net/ieee802154/core.c                                  | 10 +++++-----
- net/ipv4/ip_tunnel.c                                   |  2 +-
- net/ipv4/ipmr.c                                        |  2 +-
- net/ipv6/ip6_gre.c                                     |  2 +-
- net/ipv6/ip6_tunnel.c                                  |  2 +-
- net/ipv6/ip6mr.c                                       |  2 +-
- net/ipv6/sit.c                                         |  2 +-
- net/openvswitch/vport-internal_dev.c                   |  2 +-
- net/wireless/core.c                                    | 10 +++++-----
- tools/testing/selftests/net/forwarding/README          |  2 +-
- 31 files changed, 42 insertions(+), 42 deletions(-)
+ Documentation/netlink/specs/rt_link.yaml | 3 +++
+ include/uapi/linux/if_link.h             | 1 +
+ net/core/rtnetlink.c                     | 3 +++
+ 3 files changed, 7 insertions(+)
 
-diff --git a/Documentation/networking/net_cachelines/net_device.rst b/Documentation/networking/net_cachelines/net_device.rst
-index 15e31ece675f..6327e689e8a8 100644
---- a/Documentation/networking/net_cachelines/net_device.rst
-+++ b/Documentation/networking/net_cachelines/net_device.rst
-@@ -167,7 +167,7 @@ unsigned:1                          wol_enabled
- unsigned:1                          threaded                                                            napi_poll(napi_enable,dev_set_threaded)
- unsigned_long:1                     see_all_hwtstamp_requests
- unsigned_long:1                     change_proto_down
--unsigned_long:1                     netns_local
-+unsigned_long:1                     netns_immutable
- unsigned_long:1                     fcoe_mtu
- struct list_head                    net_notifier_list
- struct macsec_ops*                  macsec_ops
-diff --git a/Documentation/networking/switchdev.rst b/Documentation/networking/switchdev.rst
-index f355f0166f1b..2966b7122f05 100644
---- a/Documentation/networking/switchdev.rst
-+++ b/Documentation/networking/switchdev.rst
-@@ -137,7 +137,7 @@ would be sub-port 0 on port 1 on switch 1.
- Port Features
- ^^^^^^^^^^^^^
+diff --git a/Documentation/netlink/specs/rt_link.yaml b/Documentation/netlink/specs/rt_link.yaml
+index 8b5c0f067328..31238455f8e9 100644
+--- a/Documentation/netlink/specs/rt_link.yaml
++++ b/Documentation/netlink/specs/rt_link.yaml
+@@ -1160,6 +1160,9 @@ attribute-sets:
+         name: max-pacing-offload-horizon
+         type: uint
+         doc: EDT offload horizon supported by the device (in nsec).
++      -
++        name: netns-immutable
++        type: u8
+   -
+     name: af-spec-attrs
+     attributes:
+diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+index 3b586fb0bc4c..318386cc5b0d 100644
+--- a/include/uapi/linux/if_link.h
++++ b/include/uapi/linux/if_link.h
+@@ -378,6 +378,7 @@ enum {
+ 	IFLA_GRO_IPV4_MAX_SIZE,
+ 	IFLA_DPLL_PIN,
+ 	IFLA_MAX_PACING_OFFLOAD_HORIZON,
++	IFLA_NETNS_IMMUTABLE,
+ 	__IFLA_MAX
+ };
  
--dev->netns_local
-+dev->netns_immutable
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index b52e610e157e..8b6bf5e9bb34 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -1292,6 +1292,7 @@ static noinline size_t if_nlmsg_size(const struct net_device *dev,
+ 	       + nla_total_size(4) /* IFLA_TSO_MAX_SEGS */
+ 	       + nla_total_size(1) /* IFLA_OPERSTATE */
+ 	       + nla_total_size(1) /* IFLA_LINKMODE */
++	       + nla_total_size(1) /* IFLA_NETNS_IMMUTABLE */
+ 	       + nla_total_size(4) /* IFLA_CARRIER_CHANGES */
+ 	       + nla_total_size(4) /* IFLA_LINK_NETNSID */
+ 	       + nla_total_size(4) /* IFLA_GROUP */
+@@ -2046,6 +2047,7 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
+ 		       netif_running(dev) ? READ_ONCE(dev->operstate) :
+ 					    IF_OPER_DOWN) ||
+ 	    nla_put_u8(skb, IFLA_LINKMODE, READ_ONCE(dev->link_mode)) ||
++	    nla_put_u8(skb, IFLA_NETNS_IMMUTABLE, dev->netns_immutable) ||
+ 	    nla_put_u32(skb, IFLA_MTU, READ_ONCE(dev->mtu)) ||
+ 	    nla_put_u32(skb, IFLA_MIN_MTU, READ_ONCE(dev->min_mtu)) ||
+ 	    nla_put_u32(skb, IFLA_MAX_MTU, READ_ONCE(dev->max_mtu)) ||
+@@ -2234,6 +2236,7 @@ static const struct nla_policy ifla_policy[IFLA_MAX+1] = {
+ 	[IFLA_ALLMULTI]		= { .type = NLA_REJECT },
+ 	[IFLA_GSO_IPV4_MAX_SIZE]	= NLA_POLICY_MIN(NLA_U32, MAX_TCP_HEADER + 1),
+ 	[IFLA_GRO_IPV4_MAX_SIZE]	= { .type = NLA_U32 },
++	[IFLA_NETNS_IMMUTABLE]	= { .type = NLA_REJECT },
+ };
  
- If the switchdev driver (and device) only supports offloading of the default
- network namespace (netns), the driver should set this private flag to prevent
-diff --git a/drivers/net/amt.c b/drivers/net/amt.c
-index 53899b70fae1..734a0b3242a9 100644
---- a/drivers/net/amt.c
-+++ b/drivers/net/amt.c
-@@ -3099,7 +3099,7 @@ static void amt_link_setup(struct net_device *dev)
- 	dev->addr_len		= 0;
- 	dev->priv_flags		|= IFF_NO_QUEUE;
- 	dev->lltx		= true;
--	dev->netns_local	= true;
-+	dev->netns_immutable	= true;
- 	dev->features		|= NETIF_F_GSO_SOFTWARE;
- 	dev->hw_features	|= NETIF_F_SG | NETIF_F_HW_CSUM;
- 	dev->hw_features	|= NETIF_F_FRAGLIST | NETIF_F_RXCSUM;
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 7d98fee5a27f..fe7072336e8f 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -6025,7 +6025,7 @@ void bond_setup(struct net_device *bond_dev)
- 	bond_dev->lltx = true;
- 
- 	/* Don't allow bond devices to change network namespaces. */
--	bond_dev->netns_local = true;
-+	bond_dev->netns_immutable = true;
- 
- 	/* By default, we declare the bond to be fully
- 	 * VLAN hardware accelerated capable. Special
-diff --git a/drivers/net/ethernet/adi/adin1110.c b/drivers/net/ethernet/adi/adin1110.c
-index 68fad5575fd4..30f9d271e595 100644
---- a/drivers/net/ethernet/adi/adin1110.c
-+++ b/drivers/net/ethernet/adi/adin1110.c
-@@ -1599,7 +1599,7 @@ static int adin1110_probe_netdevs(struct adin1110_priv *priv)
- 		netdev->netdev_ops = &adin1110_netdev_ops;
- 		netdev->ethtool_ops = &adin1110_ethtool_ops;
- 		netdev->priv_flags |= IFF_UNICAST_FLT;
--		netdev->netns_local = true;
-+		netdev->netns_immutable = true;
- 
- 		port_priv->phydev = get_phy_device(priv->mii_bus, i + 1, false);
- 		if (IS_ERR(port_priv->phydev)) {
-diff --git a/drivers/net/ethernet/marvell/prestera/prestera_main.c b/drivers/net/ethernet/marvell/prestera/prestera_main.c
-index 8cdecf61253c..71ffb55d1fc4 100644
---- a/drivers/net/ethernet/marvell/prestera/prestera_main.c
-+++ b/drivers/net/ethernet/marvell/prestera/prestera_main.c
-@@ -634,7 +634,7 @@ static int prestera_port_create(struct prestera_switch *sw, u32 id)
- 		goto err_dl_port_register;
- 
- 	dev->features |= NETIF_F_HW_TC;
--	dev->netns_local = true;
-+	dev->netns_immutable = true;
- 	dev->netdev_ops = &prestera_netdev_ops;
- 	dev->ethtool_ops = &prestera_ethtool_ops;
- 	SET_NETDEV_DEV(dev, sw->dev->dev);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index 7e3aad015111..6eb8642d2e2b 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -4423,9 +4423,9 @@ static netdev_features_t mlx5e_fix_features(struct net_device *netdev,
- 
- 	if (mlx5e_is_uplink_rep(priv)) {
- 		features = mlx5e_fix_uplink_rep_features(netdev, features);
--		netdev->netns_local = true;
-+		netdev->netns_immutable = true;
- 	} else {
--		netdev->netns_local = false;
-+		netdev->netns_immutable = false;
- 	}
- 
- 	mutex_unlock(&priv->state_lock);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-index 07f38f472a27..2abab241f03b 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-@@ -905,7 +905,7 @@ static void mlx5e_build_rep_netdev(struct net_device *netdev,
- 
- 	netdev->features |= netdev->hw_features;
- 
--	netdev->netns_local = true;
-+	netdev->netns_immutable = true;
- }
- 
- static int mlx5e_init_rep(struct mlx5_core_dev *mdev,
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
-index 1f8362788c75..c7e6a3258244 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
-@@ -1579,7 +1579,7 @@ static int mlxsw_sp_port_create(struct mlxsw_sp *mlxsw_sp, u16 local_port,
- 			    NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM;
- 	dev->vlan_features |= NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM;
- 	dev->lltx = true;
--	dev->netns_local = true;
-+	dev->netns_immutable = true;
- 
- 	dev->min_mtu = ETH_MIN_MTU;
- 	dev->max_mtu = MLXSW_PORT_MAX_MTU - MLXSW_PORT_ETH_FRAME_HDR;
-diff --git a/drivers/net/ethernet/rocker/rocker_main.c b/drivers/net/ethernet/rocker/rocker_main.c
-index fe0bf1d3217a..36af94a2e062 100644
---- a/drivers/net/ethernet/rocker/rocker_main.c
-+++ b/drivers/net/ethernet/rocker/rocker_main.c
-@@ -2576,7 +2576,7 @@ static int rocker_probe_port(struct rocker *rocker, unsigned int port_number)
- 	rocker_carrier_init(rocker_port);
- 
- 	dev->features |= NETIF_F_SG;
--	dev->netns_local = true;
-+	dev->netns_immutable = true;
- 
- 	/* MTU range: 68 - 9000 */
- 	dev->min_mtu = ROCKER_PORT_MIN_MTU;
-diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/ti/cpsw_new.c
-index cec0a90659d9..b01289d4726d 100644
---- a/drivers/net/ethernet/ti/cpsw_new.c
-+++ b/drivers/net/ethernet/ti/cpsw_new.c
-@@ -1409,7 +1409,7 @@ static int cpsw_create_ports(struct cpsw_common *cpsw)
- 
- 		ndev->features |= NETIF_F_HW_VLAN_CTAG_FILTER |
- 				  NETIF_F_HW_VLAN_CTAG_RX | NETIF_F_HW_TC;
--		ndev->netns_local = true;
-+		ndev->netns_immutable = true;
- 
- 		ndev->xdp_features = NETDEV_XDP_ACT_BASIC |
- 				     NETDEV_XDP_ACT_REDIRECT |
-diff --git a/drivers/net/loopback.c b/drivers/net/loopback.c
-index f1d68153987e..201fddcd3b1e 100644
---- a/drivers/net/loopback.c
-+++ b/drivers/net/loopback.c
-@@ -172,7 +172,7 @@ static void gen_lo_setup(struct net_device *dev,
- 	dev->flags		= IFF_LOOPBACK;
- 	dev->priv_flags		|= IFF_LIVE_ADDR_CHANGE | IFF_NO_QUEUE;
- 	dev->lltx		= true;
--	dev->netns_local	= true;
-+	dev->netns_immutable	= true;
- 	netif_keep_dst(dev);
- 	dev->hw_features	= NETIF_F_GSO_SOFTWARE;
- 	dev->features		= NETIF_F_SG | NETIF_F_FRAGLIST
-diff --git a/drivers/net/net_failover.c b/drivers/net/net_failover.c
-index 54c8b9d5b5fc..5b50d9186f12 100644
---- a/drivers/net/net_failover.c
-+++ b/drivers/net/net_failover.c
-@@ -734,7 +734,7 @@ struct failover *net_failover_create(struct net_device *standby_dev)
- 	failover_dev->lltx = true;
- 
- 	/* Don't allow failover devices to change network namespaces. */
--	failover_dev->netns_local = true;
-+	failover_dev->netns_immutable = true;
- 
- 	failover_dev->hw_features = FAILOVER_VLAN_FEATURES |
- 				    NETIF_F_HW_VLAN_CTAG_TX |
-diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
-index 78edb8186b6d..fb917560d0a2 100644
---- a/drivers/net/team/team_core.c
-+++ b/drivers/net/team/team_core.c
-@@ -2203,7 +2203,7 @@ static void team_setup(struct net_device *dev)
- 	dev->lltx = true;
- 
- 	/* Don't allow team devices to change network namespaces. */
--	dev->netns_local = true;
-+	dev->netns_immutable = true;
- 
- 	dev->features |= NETIF_F_GRO;
- 
-diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
-index 849c3ced2690..36cf6191335e 100644
---- a/drivers/net/vrf.c
-+++ b/drivers/net/vrf.c
-@@ -1617,7 +1617,7 @@ static void vrf_setup(struct net_device *dev)
- 	dev->lltx = true;
- 
- 	/* don't allow vrf devices to change network namespaces. */
--	dev->netns_local = true;
-+	dev->netns_immutable = true;
- 
- 	/* does not make sense for a VLAN to be added to a vrf device */
- 	dev->features   |= NETIF_F_VLAN_CHALLENGED;
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 26a0c4e4d963..b8728d67ea91 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -2021,7 +2021,7 @@ enum netdev_reg_state {
-  *			regardless of source, even if those aren't
-  *			HWTSTAMP_SOURCE_NETDEV
-  *	@change_proto_down: device supports setting carrier via IFLA_PROTO_DOWN
-- *	@netns_local: interface can't change network namespaces
-+ *	@netns_immutable: interface can't change network namespaces
-  *	@fcoe_mtu:	device supports maximum FCoE MTU, 2158 bytes
-  *
-  *	@net_notifier_list:	List of per-net netdev notifier block
-@@ -2429,7 +2429,7 @@ struct net_device {
- 	/* priv_flags_slow, ungrouped to save space */
- 	unsigned long		see_all_hwtstamp_requests:1;
- 	unsigned long		change_proto_down:1;
--	unsigned long		netns_local:1;
-+	unsigned long		netns_immutable:1;
- 	unsigned long		fcoe_mtu:1;
- 
- 	struct list_head	net_notifier_list;
-diff --git a/net/batman-adv/soft-interface.c b/net/batman-adv/soft-interface.c
-index d893c8013261..e190fa954f22 100644
---- a/net/batman-adv/soft-interface.c
-+++ b/net/batman-adv/soft-interface.c
-@@ -1037,7 +1037,7 @@ static void batadv_softif_init_early(struct net_device *dev)
- 	dev->features |= NETIF_F_HW_VLAN_CTAG_FILTER;
- 	dev->priv_flags |= IFF_NO_QUEUE;
- 	dev->lltx = true;
--	dev->netns_local = true;
-+	dev->netns_immutable = true;
- 
- 	/* can't call min_mtu, because the needed variables
- 	 * have not been initialized yet
-diff --git a/net/bridge/br_device.c b/net/bridge/br_device.c
-index 0ab4613aa07a..9d8c72ed01ab 100644
---- a/net/bridge/br_device.c
-+++ b/net/bridge/br_device.c
-@@ -488,7 +488,7 @@ void br_dev_setup(struct net_device *dev)
- 	SET_NETDEV_DEVTYPE(dev, &br_type);
- 	dev->priv_flags = IFF_EBRIDGE | IFF_NO_QUEUE;
- 	dev->lltx = true;
--	dev->netns_local = true;
-+	dev->netns_immutable = true;
- 
- 	dev->features = COMMON_FEATURES | NETIF_F_HW_VLAN_CTAG_TX |
- 			NETIF_F_HW_VLAN_STAG_TX;
-diff --git a/net/core/dev.c b/net/core/dev.c
-index d6d68a2d2355..357ae88064a5 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -12151,7 +12151,7 @@ int __dev_change_net_namespace(struct net_device *dev, struct net *net,
- 
- 	/* Don't allow namespace local devices to be moved. */
- 	err = -EINVAL;
--	if (dev->netns_local)
-+	if (dev->netns_immutable)
- 		goto out;
- 
- 	/* Ensure the device has been registered */
-@@ -12533,7 +12533,7 @@ static void __net_exit default_device_exit_net(struct net *net)
- 		char fb_name[IFNAMSIZ];
- 
- 		/* Ignore unmoveable devices (i.e. loopback) */
--		if (dev->netns_local)
-+		if (dev->netns_immutable)
- 			continue;
- 
- 		/* Leave virtual devices for the generic cleanup */
-diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
-index b6fb18469439..c6f8614e9ed1 100644
---- a/net/hsr/hsr_device.c
-+++ b/net/hsr/hsr_device.c
-@@ -643,7 +643,7 @@ void hsr_dev_setup(struct net_device *dev)
- 	/* Not sure about this. Taken from bridge code. netdevice.h says
- 	 * it means "Does not change network namespaces".
- 	 */
--	dev->netns_local = true;
-+	dev->netns_immutable = true;
- 
- 	dev->needs_free_netdev = true;
- 
-diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
-index ee318d46817d..9a9da74b0a4f 100644
---- a/net/ieee802154/6lowpan/core.c
-+++ b/net/ieee802154/6lowpan/core.c
-@@ -116,7 +116,7 @@ static void lowpan_setup(struct net_device *ldev)
- 	ldev->netdev_ops	= &lowpan_netdev_ops;
- 	ldev->header_ops	= &lowpan_header_ops;
- 	ldev->needs_free_netdev	= true;
--	ldev->netns_local	= true;
-+	ldev->netns_immutable	= true;
- }
- 
- static int lowpan_validate(struct nlattr *tb[], struct nlattr *data[],
-diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
-index 88adb04e4072..89b671b12600 100644
---- a/net/ieee802154/core.c
-+++ b/net/ieee802154/core.c
-@@ -226,11 +226,11 @@ int cfg802154_switch_netns(struct cfg802154_registered_device *rdev,
- 	list_for_each_entry(wpan_dev, &rdev->wpan_dev_list, list) {
- 		if (!wpan_dev->netdev)
- 			continue;
--		wpan_dev->netdev->netns_local = false;
-+		wpan_dev->netdev->netns_immutable = false;
- 		err = dev_change_net_namespace(wpan_dev->netdev, net, "wpan%d");
- 		if (err)
- 			break;
--		wpan_dev->netdev->netns_local = true;
-+		wpan_dev->netdev->netns_immutable = true;
- 	}
- 
- 	if (err) {
-@@ -242,11 +242,11 @@ int cfg802154_switch_netns(struct cfg802154_registered_device *rdev,
- 						     list) {
- 			if (!wpan_dev->netdev)
- 				continue;
--			wpan_dev->netdev->netns_local = false;
-+			wpan_dev->netdev->netns_immutable = false;
- 			err = dev_change_net_namespace(wpan_dev->netdev, net,
- 						       "wpan%d");
- 			WARN_ON(err);
--			wpan_dev->netdev->netns_local = true;
-+			wpan_dev->netdev->netns_immutable = true;
- 		}
- 
- 		return err;
-@@ -291,7 +291,7 @@ static int cfg802154_netdev_notifier_call(struct notifier_block *nb,
- 	switch (state) {
- 		/* TODO NETDEV_DEVTYPE */
- 	case NETDEV_REGISTER:
--		dev->netns_local = true;
-+		dev->netns_immutable = true;
- 		wpan_dev->identifier = ++rdev->wpan_dev_id;
- 		list_add_rcu(&wpan_dev->list, &rdev->wpan_dev_list);
- 		rdev->devlist_generation++;
-diff --git a/net/ipv4/ip_tunnel.c b/net/ipv4/ip_tunnel.c
-index 011f2a5aab3b..4b06dc7e04f2 100644
---- a/net/ipv4/ip_tunnel.c
-+++ b/net/ipv4/ip_tunnel.c
-@@ -1162,7 +1162,7 @@ int ip_tunnel_init_net(struct net *net, unsigned int ip_tnl_net_id,
- 	 * Allowing to move it to another netns is clearly unsafe.
- 	 */
- 	if (!IS_ERR(itn->fb_tunnel_dev)) {
--		itn->fb_tunnel_dev->netns_local = true;
-+		itn->fb_tunnel_dev->netns_immutable = true;
- 		itn->fb_tunnel_dev->mtu = ip_tunnel_bind_dev(itn->fb_tunnel_dev);
- 		ip_tunnel_add(itn, netdev_priv(itn->fb_tunnel_dev));
- 		itn->type = itn->fb_tunnel_dev->type;
-diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
-index 21ae7594a852..b81c8131e23f 100644
---- a/net/ipv4/ipmr.c
-+++ b/net/ipv4/ipmr.c
-@@ -563,7 +563,7 @@ static void reg_vif_setup(struct net_device *dev)
- 	dev->flags		= IFF_NOARP;
- 	dev->netdev_ops		= &reg_vif_netdev_ops;
- 	dev->needs_free_netdev	= true;
--	dev->netns_local	= true;
-+	dev->netns_immutable	= true;
- }
- 
- static struct net_device *ipmr_reg_vif(struct net *net, struct mr_table *mrt)
-diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
-index d31a4ce3b19f..c6ebb6a6d390 100644
---- a/net/ipv6/ip6_gre.c
-+++ b/net/ipv6/ip6_gre.c
-@@ -1620,7 +1620,7 @@ static int __net_init ip6gre_init_net(struct net *net)
- 	/* FB netdevice is special: we have one, and only one per netns.
- 	 * Allowing to move it to another netns is clearly unsafe.
- 	 */
--	ign->fb_tunnel_dev->netns_local = true;
-+	ign->fb_tunnel_dev->netns_immutable = true;
- 
- 	ip6gre_fb_tunnel_init(ign->fb_tunnel_dev);
- 	ign->fb_tunnel_dev->rtnl_link_ops = &ip6gre_link_ops;
-diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
-index 89d206731af0..170a6ac30889 100644
---- a/net/ipv6/ip6_tunnel.c
-+++ b/net/ipv6/ip6_tunnel.c
-@@ -2265,7 +2265,7 @@ static int __net_init ip6_tnl_init_net(struct net *net)
- 	/* FB netdevice is special: we have one, and only one per netns.
- 	 * Allowing to move it to another netns is clearly unsafe.
- 	 */
--	ip6n->fb_tnl_dev->netns_local = true;
-+	ip6n->fb_tnl_dev->netns_immutable = true;
- 
- 	err = ip6_fb_tnl_dev_init(ip6n->fb_tnl_dev);
- 	if (err < 0)
-diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
-index 535e9f72514c..e8ade93a0f0e 100644
---- a/net/ipv6/ip6mr.c
-+++ b/net/ipv6/ip6mr.c
-@@ -668,7 +668,7 @@ static void reg_vif_setup(struct net_device *dev)
- 	dev->flags		= IFF_NOARP;
- 	dev->netdev_ops		= &reg_vif_netdev_ops;
- 	dev->needs_free_netdev	= true;
--	dev->netns_local	= true;
-+	dev->netns_immutable	= true;
- }
- 
- static struct net_device *ip6mr_reg_vif(struct net *net, struct mr_table *mrt)
-diff --git a/net/ipv6/sit.c b/net/ipv6/sit.c
-index f7b59bc957d3..6f04703fe638 100644
---- a/net/ipv6/sit.c
-+++ b/net/ipv6/sit.c
-@@ -1859,7 +1859,7 @@ static int __net_init sit_init_net(struct net *net)
- 	/* FB netdevice is special: we have one, and only one per netns.
- 	 * Allowing to move it to another netns is clearly unsafe.
- 	 */
--	sitn->fb_tunnel_dev->netns_local = true;
-+	sitn->fb_tunnel_dev->netns_immutable = true;
- 
- 	t = netdev_priv(sitn->fb_tunnel_dev);
- 	t->net = net;
-diff --git a/net/openvswitch/vport-internal_dev.c b/net/openvswitch/vport-internal_dev.c
-index 2412d7813d24..125d310871e9 100644
---- a/net/openvswitch/vport-internal_dev.c
-+++ b/net/openvswitch/vport-internal_dev.c
-@@ -149,7 +149,7 @@ static struct vport *internal_dev_create(const struct vport_parms *parms)
- 
- 	/* Restrict bridge port to current netns. */
- 	if (vport->port_no == OVSP_LOCAL)
--		vport->dev->netns_local = true;
-+		vport->dev->netns_immutable = true;
- 
- 	rtnl_lock();
- 	err = register_netdevice(vport->dev);
-diff --git a/net/wireless/core.c b/net/wireless/core.c
-index 12b780de8779..15bbc9d06c9e 100644
---- a/net/wireless/core.c
-+++ b/net/wireless/core.c
-@@ -162,11 +162,11 @@ int cfg80211_switch_netns(struct cfg80211_registered_device *rdev,
- 	list_for_each_entry(wdev, &rdev->wiphy.wdev_list, list) {
- 		if (!wdev->netdev)
- 			continue;
--		wdev->netdev->netns_local = false;
-+		wdev->netdev->netns_immutable = false;
- 		err = dev_change_net_namespace(wdev->netdev, net, "wlan%d");
- 		if (err)
- 			break;
--		wdev->netdev->netns_local = true;
-+		wdev->netdev->netns_immutable = true;
- 	}
- 
- 	if (err) {
-@@ -178,11 +178,11 @@ int cfg80211_switch_netns(struct cfg80211_registered_device *rdev,
- 						     list) {
- 			if (!wdev->netdev)
- 				continue;
--			wdev->netdev->netns_local = false;
-+			wdev->netdev->netns_immutable = false;
- 			err = dev_change_net_namespace(wdev->netdev, net,
- 							"wlan%d");
- 			WARN_ON(err);
--			wdev->netdev->netns_local = true;
-+			wdev->netdev->netns_immutable = true;
- 		}
- 
- 		return err;
-@@ -1513,7 +1513,7 @@ static int cfg80211_netdev_notifier_call(struct notifier_block *nb,
- 		SET_NETDEV_DEVTYPE(dev, &wiphy_type);
- 		wdev->netdev = dev;
- 		/* can only change netns with wiphy */
--		dev->netns_local = true;
-+		dev->netns_immutable = true;
- 
- 		cfg80211_init_wdev(wdev);
- 		break;
-diff --git a/tools/testing/selftests/net/forwarding/README b/tools/testing/selftests/net/forwarding/README
-index a652429bfd53..7b41cff993ad 100644
---- a/tools/testing/selftests/net/forwarding/README
-+++ b/tools/testing/selftests/net/forwarding/README
-@@ -6,7 +6,7 @@ to easily create and test complex environments.
- 
- Unfortunately, these namespaces can not be used with actual switching
- ASICs, as their ports can not be migrated to other network namespaces
--(dev->netns_local) and most of them probably do not support the
-+(dev->netns_immutable) and most of them probably do not support the
- L1-separation provided by namespaces.
- 
- However, a similar kind of flexibility can be achieved by using VRFs and
+ static const struct nla_policy ifla_info_policy[IFLA_INFO_MAX+1] = {
 -- 
 2.47.1
 
