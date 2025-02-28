@@ -1,92 +1,81 @@
-Return-Path: <netdev+bounces-170824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84F46A4A117
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 19:05:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 49AB0A4A130
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 19:11:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B7233A567E
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 18:05:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 209623B2A68
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 18:11:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AD4426E140;
-	Fri, 28 Feb 2025 18:05:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z1lSUyrC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D853226E140;
+	Fri, 28 Feb 2025 18:11:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from a3.inai.de (a3.inai.de [144.76.212.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F54C26B0A1;
-	Fri, 28 Feb 2025 18:05:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473251A2554;
+	Fri, 28 Feb 2025 18:11:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.212.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740765902; cv=none; b=i5CfGDRrRztHCkIhFQzqUxTeXeygWbqvWXIGoJy/cvZrrL8tQULELhQXbpPSnQRFZceXSvba0o6isxmbLgKhu6gTTRTEsgOwlQGoFtS5aHNH7vv9oBBfTfFaiLCVmHhMewRUVxeT3jcsbvlu0uwzgR8FVLdVlKNEjZNRR6v+TXY=
+	t=1740766307; cv=none; b=AZb0nci2vn98KWAV5Sqhaas1LWHNZC/XrZU7jP/aJpVCHBIL1x8jnUToJADdwaOXDFw5CanrPwqNAfgwEnPSAP5IV7dVlBrVnt30l3JOhMnT831xwjQ5xEq36GICU15vB/xt2zkeaMsN01f1MeyoiRJpArWxtuyB9OUprCpd+Ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740765902; c=relaxed/simple;
-	bh=ucBMCvlh2p5U+bYBr7YBt6icBbitc8jZM304oKBG//k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lyrwQ60xFJrT56Olc7LaJiN+w6fLjxP2y8w0Q5PDzk6CMw2a2NW6PJkL0DE1OOgT44+tq2ASQvGwm6WBbpUWzvN8fj6SpwQUyp4P79nWqmvY7XqVO5k6uVHUaHYroN8ew7q/fp9f0j2VmOJm4nnu9eJxKKmB3wYNSTrzlXA8Kg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z1lSUyrC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 723BEC4CED6;
-	Fri, 28 Feb 2025 18:05:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740765901;
-	bh=ucBMCvlh2p5U+bYBr7YBt6icBbitc8jZM304oKBG//k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Z1lSUyrCtRsDQBmpUweu9a8AyirOHuvXb+GJvN3kaWdPO+D/8idHtDHP/k/aF2sjn
-	 2LRc9zm/fPFpM7MCiPsbft5ez4L9lt5P12hHvy0RWS14mPJSsNMYEAc/xpBiGi3Okk
-	 2TQmETG2j7URruxb3XyiI20xSaG/+9GmUW2TKOt8FssYTa5L/9rV60Ourfjta46GIT
-	 etOWKs4QrplvzBXyoN52mmi0VZYmZZ8aK1ebGqHBXGalPseirPjtxuMFW2xrACRnJ3
-	 2kXQlyex178NWHCjSXtihdZj9R4ez4FQJcAIV2NBPI/fIPLtCG4OaLegg5wKVYclK+
-	 XVLoEKb/LpAGA==
-Date: Fri, 28 Feb 2025 10:05:00 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Danny Lin <danny@orbstack.dev>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] net: fully namespace net.core.{r,w}mem_{default,max}
- sysctls
-Message-ID: <20250228100500.4ed52499@kernel.org>
-In-Reply-To: <20250228083025.10322-1-danny@orbstack.dev>
-References: <20250228083025.10322-1-danny@orbstack.dev>
+	s=arc-20240116; t=1740766307; c=relaxed/simple;
+	bh=KnY61hLvrf2jTbQWMQPNQdlx+jAyWdmCTwJsF1oXWto=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=o/niNLcjv0ppZZqtNquQ1wdGvpmxDUBw48fp8TGcbAlaztj9sD12l7i8dnB+xEZARItCVHI8QhvLocV3Weko1Z5YATcZIvI9jQad/kEPUIse9/H/xMNhnH57h+qX6VoXufiejiNZ9YPBK/dY5iLXwozkbpUIY7U7hrGB3bj+UQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inai.de; spf=pass smtp.mailfrom=inai.de; arc=none smtp.client-ip=144.76.212.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inai.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inai.de
+Received: by a3.inai.de (Postfix, from userid 25121)
+	id C565A1003DF114; Fri, 28 Feb 2025 19:11:34 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by a3.inai.de (Postfix) with ESMTP id C51D51100AC40A;
+	Fri, 28 Feb 2025 19:11:34 +0100 (CET)
+Date: Fri, 28 Feb 2025 19:11:34 +0100 (CET)
+From: Jan Engelhardt <ej@inai.de>
+To: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>
+cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+    Pablo Neira Ayuso <pablo@netfilter.org>, 
+    Jozsef Kadlecsik <kadlec@netfilter.org>, 
+    "David S . Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+    cgroups@vger.kernel.org
+Subject: Re: [PATCH] netfilter: Make xt_cgroup independent from net_cls
+In-Reply-To: <20250228165216.339407-1-mkoutny@suse.com>
+Message-ID: <osn82ro6-08p7-q1so-r050-7poq60803250@vanv.qr>
+References: <20250228165216.339407-1-mkoutny@suse.com>
+User-Agent: Alpine 2.26 (LSU 649 2022-06-02)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 
-On Fri, 28 Feb 2025 00:19:41 -0800 Danny Lin wrote:
-> This builds on commit 19249c0724f2 ("net: make net.core.{r,w}mem_{default,max} namespaced")
-> by adding support for writing the sysctls from within net namespaces,
-> rather than only reading the values that were set in init_net. These are
-> relatively commonly-used sysctls, so programs may try to set them without
-> knowing that they're in a container. It can be surprising for such attempts
-> to fail with EACCES.
+
+On Friday 2025-02-28 17:52, Michal Koutný wrote:
+>@@ -23,6 +23,14 @@ MODULE_DESCRIPTION("Xtables: process control group matching");
+> MODULE_ALIAS("ipt_cgroup");
+> MODULE_ALIAS("ip6t_cgroup");
 > 
-> Unlike other net sysctls that were converted to namespaced ones, many
-> systems have a sysctl.conf (or other configs) that globally write to
-> net.core.rmem_default on boot and expect the value to propagate to
-> containers, and programs running in containers may depend on the increased
-> buffer sizes in order to work properly. This means that namespacing the
-> sysctls and using the kernel default values in each new netns would break
-> existing workloads.
-> 
-> As a compromise, inherit the initial net.core.*mem_* values from the
-> current process' netns when creating a new netns. This is not standard
-> behavior for most netns sysctls, but it avoids breaking existing workloads.
+>+static bool possible_classid(u32 classid)
+>+{
+>+	if (!IS_ENABLED(CONFIG_CGROUP_NET_CLASSID) && classid > 0)
+>+		return false;
+>+	else
+>+		return true;
+>+}
 
-You need to update:
+This has quite the potential for terseness ;-)
 
- tools/testing/selftests/net/netns-sysctl.sh
-
-and please CC Matteo on the next revision.
--- 
-pw-bot: cr
+{
+	return IS_ENABLED(CONFIG_CGROUP_NET_CLASSID) || classid == 0;
+}
 
