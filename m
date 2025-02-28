@@ -1,108 +1,163 @@
-Return-Path: <netdev+bounces-170603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78FFAA493F0
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 09:48:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A44C6A4940F
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 09:53:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 859C016A9E3
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 08:48:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E7013AF7FB
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 08:53:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1040E253F08;
-	Fri, 28 Feb 2025 08:48:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Vj71o07E"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7BF3254843;
+	Fri, 28 Feb 2025 08:53:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70BAF253F13
-	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 08:48:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 576F624FC08
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 08:53:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740732513; cv=none; b=t6+wPr01TLPauzyNTVZSL1V7rJbNSK4zXCWdzG7c/gJxLKCD0rYxGDlf42Qt9feJU96tP6jK8wT8vB1zpvbWA8v2+4vw0DNsn53OeXsTqPO28duvJWK4HTLk5HN9CYMWLhJ7Br2aSi2s48+fg421ATit69jqdgwVU3FdA64IU54=
+	t=1740732797; cv=none; b=mRcxBtaFcF5LxVhMXvFETbdDT8GA2Epf5017R9pQsSjxvgseMlUKHvUQcq0c/keQcHd/EjVbtsVL+jacgl8/QSfhH0+UiCp4uyAUEydzYWfJ2BbU7NGuyqMXj8sEvEtYtMbHJbk4nshpMuLLWg9+wA9maDVhJSXSUNAAL5fn7ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740732513; c=relaxed/simple;
-	bh=LZZ9jWgJN89HTnl3LE3UbhbcdJnL8R00Geyvxn9UOsY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bwllzxOdeDHvJKsR6QiKM1vB1XT7x4LL9tJz7C7pJrQsyUWyHEe0e916HsRGo8pu39tQaU2bAxovzmRC/S1JsJVFrsdVFDHI1eNAw1ymtCsYD2xNN0toSIe7iTllFXXg5L8noJBMXdMw4G84Jow7gUjpbxJD60Fg8ShTWejMJY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Vj71o07E; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4720fb0229fso16643521cf.0
-        for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 00:48:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740732510; x=1741337310; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LZZ9jWgJN89HTnl3LE3UbhbcdJnL8R00Geyvxn9UOsY=;
-        b=Vj71o07ENlkmSfAGe+5P/HQnZn+01ZcK42viNI6DHKOGv9sm51KmFobC8q14e7utZA
-         QybZ3d2cUX1DWd5kqymBSbqv+7nUgJ1ako8dbobrP0nVK9rUtQx3f3j+529ytas9kQLl
-         NPALeUEl0DB7hH2pTrg3UgJ6jjArZCpWMi0DDviHndByu1eEX87mnZvyms/MVtfW511E
-         /vRjOZQn9EwVmpDIlLfs+N9G4gXRu/1twYwBSNZ9iJmD9QsWCUt+kceOk8vMwOIuciYc
-         jIJ7/SJF633C3fcaghmWPrFA5i4xRGqESwHftjMyEWIvYFDv9AY7o9dV6YH0/uCxmFIV
-         qGaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740732510; x=1741337310;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LZZ9jWgJN89HTnl3LE3UbhbcdJnL8R00Geyvxn9UOsY=;
-        b=heCikpBFV/G6dMFI+spmOv+gcDncC7YI8LhShFCiTEUTwgIhYSMP+SSu5NyMUx95Xg
-         sDb/18CEA3cpKDivGzmbJnWblIh9FStb6K7pLIuhpJtG2X3eEXB1BqWR7EH5t6Ztdh0a
-         BVKaxTpPqDYSge4WbX1F0hYEUS4ebbKVzie5cW+UxXZBc+AGpZgwuFz0U7f06gS+6xQy
-         rP5Hr2qCPDeli73/zzxMw43Tm5YPbmNFFjPTvzq5dw6Un393pBejhVCrolpHZ5GQV9nP
-         DgsN36VkVHPmTTiMXfBDV9LocfunhKJppzNH3QqevTMIoU4elq4mG7GhsjEXEp1Yef3M
-         dXlg==
-X-Gm-Message-State: AOJu0Yx48/KgwtyP68wm8k1Lr8hiFS0FB6QiwevEi1ZfbR5VhKhNbf5q
-	fBXc/H1lWL8QxWywkCaIf5+txiOArILSR/w3XhLhRanVm36JndhieaYqlofwELR4XeQjMcXQjMy
-	pdK1nnBC4E2XCLfzjCadZPDoVeSH3SK+oH7UX
-X-Gm-Gg: ASbGncs/zk8zfiUwNCCCSyTyqNkr/WJmHb4balwak/14+QOiKLEmT18eKV9k4P8dUoI
-	o4FjBf9Ie26d2X/5rmzqrGkNOArvUpWxwsRZabg2XnvHeRaktVD3dQywol4DgErd0B8Er3N9SFf
-	oY5SinXJRv3AQdT8MXXanwfIrFeMI0C1RaWwCECZDg
-X-Google-Smtp-Source: AGHT+IG9tOW5h/IcPipfBAVFtiWzosZr+/XmRmEb1E8E3daJW8ExIaIl+jI6yRvr1tV2/a4p1j6mrg/6FbWG/tQZhtU=
-X-Received: by 2002:a05:622a:580c:b0:474:bc62:bfe8 with SMTP id
- d75a77b69052e-474bc62c075mr35089511cf.1.1740732510116; Fri, 28 Feb 2025
- 00:48:30 -0800 (PST)
+	s=arc-20240116; t=1740732797; c=relaxed/simple;
+	bh=qNe0LEGqpQQi8GIgH/wydL5K/ZSIvkZpuYesUP7jE8M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HBb83HGph5F0U8RP96ev85sfbmMjmeKGqJOz8brdU4ROQ7OSayyz16pas4Vblzg3F8xLnuZlTqcsWeSZAr7o5Qfi5Ht4sVnVggGFThJa7ZTzapzeV9nQVJjZmA0HyGKJFnGHtWQiD+D+n+jlQBSg6AKFR2ucnTKe/gFENl0iwiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tnw6m-0005fo-VB; Fri, 28 Feb 2025 09:52:36 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tnw6j-003GS3-27;
+	Fri, 28 Feb 2025 09:52:33 +0100
+Received: from pengutronix.de (p5b164285.dip0.t-ipconnect.de [91.22.66.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 28E693CDF52;
+	Fri, 28 Feb 2025 08:52:33 +0000 (UTC)
+Date: Fri, 28 Feb 2025 09:52:31 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Ming Yu <a0282524688@gmail.com>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
+	brgl@bgdev.pl, andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org, 
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH v8 1/7] mfd: Add core driver for Nuvoton NCT6694
+Message-ID: <20250228-married-bullfrog-of-reading-89042b-mkl@pengutronix.de>
+References: <20250225081644.3524915-1-a0282524688@gmail.com>
+ <20250225081644.3524915-2-a0282524688@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250228045353.1155942-1-sdf@fomichev.me> <20250228045353.1155942-4-sdf@fomichev.me>
-In-Reply-To: <20250228045353.1155942-4-sdf@fomichev.me>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 28 Feb 2025 09:48:18 +0100
-X-Gm-Features: AQ5f1Jowlo6bKAascIHpSBqBB_2SPaIeGAO0UTM_du4RvcOMwfECWfQ5I_Y4oNY
-Message-ID: <CANn89iLpknvoU+XKRB77qrbXrZv_XOSjvbYUZVbSAwHtTotVDQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v9 03/12] net: hold netdev instance lock during
- queue operations
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, Saeed Mahameed <saeed@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="thau7tfhkoq4fek3"
+Content-Disposition: inline
+In-Reply-To: <20250225081644.3524915-2-a0282524688@gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+
+
+--thau7tfhkoq4fek3
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v8 1/7] mfd: Add core driver for Nuvoton NCT6694
+MIME-Version: 1.0
 
-On Fri, Feb 28, 2025 at 5:53=E2=80=AFAM Stanislav Fomichev <sdf@fomichev.me=
-> wrote:
->
-> For the drivers that use queue management API, switch to the mode where
-> core stack holds the netdev instance lock. This affects the following
-> drivers:
-> - bnxt
-> - gve
-> - netdevsim
->
-> Originally I locked only start/stop, but switched to holding the
-> lock over all iterations to make them look atomic to the device
-> (feels like it should be easier to reason about).
->
-> Cc: Saeed Mahameed <saeed@kernel.org>
-> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+On 25.02.2025 16:16:38, Ming Yu wrote:
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+[...]
+
+> +static int nct6694_usb_probe(struct usb_interface *iface,
+> +			     const struct usb_device_id *id)
+> +{
+> +	struct usb_device *udev =3D interface_to_usbdev(iface);
+> +	struct usb_endpoint_descriptor *int_endpoint;
+> +	struct usb_host_interface *interface;
+> +	struct device *dev =3D &iface->dev;
+> +	struct nct6694 *nct6694;
+> +	int pipe, maxp;
+> +	int ret;
+> +
+> +	nct6694 =3D devm_kzalloc(dev, sizeof(*nct6694), GFP_KERNEL);
+> +	if (!nct6694)
+> +		return -ENOMEM;
+> +
+> +	pipe =3D usb_rcvintpipe(udev, NCT6694_INT_IN_EP);
+> +	maxp =3D usb_maxpacket(udev, pipe);
+> +
+> +	nct6694->usb_msg =3D devm_kzalloc(dev, sizeof(union nct6694_usb_msg), G=
+FP_KERNEL);
+> +	if (!nct6694->usb_msg)
+> +		return -ENOMEM;
+> +
+> +	nct6694->int_buffer =3D devm_kzalloc(dev, maxp, GFP_KERNEL);
+> +	if (!nct6694->int_buffer)
+> +		return -ENOMEM;
+> +
+> +	nct6694->int_in_urb =3D usb_alloc_urb(0, GFP_KERNEL);
+> +	if (!nct6694->int_in_urb)
+> +		return -ENOMEM;
+> +
+> +	nct6694->domain =3D irq_domain_add_simple(NULL, NCT6694_NR_IRQS, 0,
+> +						&nct6694_irq_domain_ops,
+> +						nct6694);
+> +	if (!nct6694->domain) {
+> +		ret =3D -ENODEV;
+> +		goto err_urb;
+> +	}
+> +
+> +	nct6694->dev =3D dev;
+> +	nct6694->udev =3D udev;
+> +	nct6694->timeout =3D NCT6694_URB_TIMEOUT;	/* Wait until URB completes */
+
+Why do you need this variable? You can directly use NCT6694_URB_TIMEOUT
+in the usb_bulk_msg() and friends calls.
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--thau7tfhkoq4fek3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmfBeUwACgkQDHRl3/mQ
+kZwj8Qf/ZqqBAFXxAYb+Ol2EYuIUSztYKNYnXALK+Hmv/b3tCAl+WuYuPRuK3nal
+tYrpJPUVfYcm7WGux3J3oGKiRAZDaOMCPHitSwdEscltvot8zwcA0hHcKqL7Itij
+Qu5x/rzaoPfQAc7vMQ1EFTQZRJEtrQUP2xe4c4tH+bSDbG0rWNy7I824ATNnl8mi
+UlFsGcRv6QZB0DtF7LX4qme7Ufm2+Io91ImVCkN19DH2Q3yW6rjTyQwEs9ZNBsgj
+X9rbbaIqxYYtkYD+4oJ0wC6OqIBhyuzTJvOWp8WOUb3rjgCuELkVrST4Jz86u/oy
+/+qVxFkZP/3CWH8ORdrd3TAfXxZSUQ==
+=5Ywe
+-----END PGP SIGNATURE-----
+
+--thau7tfhkoq4fek3--
 
