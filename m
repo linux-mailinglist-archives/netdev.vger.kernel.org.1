@@ -1,135 +1,164 @@
-Return-Path: <netdev+bounces-170501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D0F6A48E52
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 03:09:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6359FA48E58
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 03:13:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B078218902F3
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 02:09:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EE5816DE8D
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 02:13:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A98E51531D5;
-	Fri, 28 Feb 2025 02:09:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2AD457C93;
+	Fri, 28 Feb 2025 02:13:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L0th/sWW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aKsXwdtP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7381B140E5F;
-	Fri, 28 Feb 2025 02:09:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F316125B2
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 02:13:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740708555; cv=none; b=qFUHn6APUVBPjX8C7PeW6WmrmIBfA55Th3uLxp2hTywbCIlqRgsjFHbQLudDWZT7bzkbY+yZr37ciAJKo9rwHJUEzYGF+vdmsP/knKODx2CE393int7tJ+yJOqKtgHJYEtXl2zDJDv7LU87QKwt1UYJsF3a5zZv6LvEI0IopRUU=
+	t=1740708805; cv=none; b=B2HOkvX3YoifC7RSu6ABUgtlagVYIc6NPwGien/K2CfnhIRlZNwb3Y7lTWShEMqYfZcwDkPtx6yem3hXCLdlFap7tqz3JlwhfXTLVPWeToAPN+3mAsikA3ca4zEAnpB4GRrzpuRxhKkpMUJfvO5DcPKsLRpxptadMpgaEVz88QI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740708555; c=relaxed/simple;
-	bh=7aXQGxqBnGBVomTgWjndFPyhUKxp6YcF8yQM4y03MzE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EqJ9MOUDsDRhiZqizPuAgOzg1KFjoIIQStpvcQAR1uR592jsREKRhFXc570/Y/ybspCq82qJ9LsFDOT8OU0QLN0Ax/ruyQgbG59yl7/cBvlg8DjjHCFsMgBq/Qylll7Y5uiOKflIEzjTc2jb8xkoa0mQmT6mjqSVKNbER6quRXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L0th/sWW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDFDDC4CEDD;
-	Fri, 28 Feb 2025 02:09:13 +0000 (UTC)
+	s=arc-20240116; t=1740708805; c=relaxed/simple;
+	bh=lzn+mL+BZsADTYp5RGr6lGD0ewwELQ2WyLSixbX1Cmg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Pkv1FS3XhvaaaewXYCAPILPuBnRD/vI1thlgCwZxCj2719YPUoI+XGl/5QtoM/s8dZUikhBTULDJPYiSrj/U0b1DzqCyGtkIck9ZIdxJzWbkIK30Lt1EoJ4bhsosCGfPArAXArjBGA9DE9vA/pjfBpBVJ0KTdMtiq7FMnU/BB1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aKsXwdtP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1674BC4CEDD;
+	Fri, 28 Feb 2025 02:13:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740708555;
-	bh=7aXQGxqBnGBVomTgWjndFPyhUKxp6YcF8yQM4y03MzE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=L0th/sWWHGU3L3ZB4L4y9cOzD8ByR6pb7+el6BvGsXLUQ8iqm6AEhKVmCMM0SSSbk
-	 yxRLSqd/t3znZTsdxXcUSj3O1jq9dUnMd1m/OcuNnJ3Ke107rfyH8mwXjNpJoIcV7W
-	 Iml0gPtdfeIFLn9DFnTYhtlj+UsFUcezC77UgAQ12XwIZOzmL7TG/KQfGrJVv+MS/T
-	 CUWT8KIb6lSF7c+Uc2JF3DugJOodiS/lWvBJXFxpza2vn5ZXDMb9xszU4d58GZPuTN
-	 FAepguvrmXrScWdc3m25CSbbATulrU+oy5Gd0w9ngI3XOqjq+uvIR4O8xV4AjXuzID
-	 Dym3U7UP3jeGA==
-Date: Thu, 27 Feb 2025 18:09:13 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Pablo Neira Ayuso
- <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, Jiri Pirko
- <jiri@resnulli.us>, Ivan Vecera <ivecera@redhat.com>, Roopa Prabhu
- <roopa@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>, Matthias
- Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
- <angelogioacchino.delregno@collabora.com>, Kuniyuki Iwashima
- <kuniyu@amazon.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Joe
- Damato <jdamato@fastly.com>, Alexander Lobakin
- <aleksander.lobakin@intel.com>, Vladimir Oltean <olteanv@gmail.com>, "Frank
- Wunderlich" <frank-w@public-files.de>, Daniel Golle
- <daniel@makrotopia.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, bridge@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH v7 net-next 03/14] netfilter: bridge: Add conntrack
- double vlan and pppoe
-Message-ID: <20250227180913.6248bbd3@kernel.org>
-In-Reply-To: <20250225201616.21114-4-ericwouds@gmail.com>
-References: <20250225201616.21114-1-ericwouds@gmail.com>
-	<20250225201616.21114-4-ericwouds@gmail.com>
+	s=k20201202; t=1740708805;
+	bh=lzn+mL+BZsADTYp5RGr6lGD0ewwELQ2WyLSixbX1Cmg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=aKsXwdtPx8Za9Ctxy7zZF4V1czKmGj3BPIhuOQLgn6I51gJU6vV6y89C6rEDjJUYI
+	 Qj87Oa88Vfk5mR5rxgL+zl9RlQyztb5wKEUh8Utxo+GNpSWn4RVyCxoxTuH38YD4yK
+	 I2TlYshoLSSr9xu/aA/B5k9ZZ3cb+tGV6OT7PtwK9d6fykjqfmsYuaNOCgdrvD5FVa
+	 NoIRhdnlEXSFabzUJBIsUVBn3oqqVPQ3m0PxpcAFi0HIkp4qz+1lIDCdqirkkdMzHx
+	 rvnhyaV3Sb62qwo/Ow7C4mEezvV2TOtNARGH1uiyP9T2EzecWBTATEp3Pwt1+xtOWi
+	 NYcMdxiWOHwNA==
+From: Saeed Mahameed <saeed@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Jiri Pirko <jiri@nvidia.com>
+Subject: [PATCH net-next 00/14] devlink, mlx5: Add new parameters for link management and SRIOV/eSwitch configurations
+Date: Thu, 27 Feb 2025 18:12:13 -0800
+Message-ID: <20250228021227.871993-1-saeed@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Tue, 25 Feb 2025 21:16:05 +0100 Eric Woudstra wrote:
-> +		struct ppp_hdr {
-> +			struct pppoe_hdr hdr;
-> +			__be16 proto;
-> +		} *ph;
+From: Saeed Mahameed <saeedm@nvidia.com>
 
-W=1 C=1 GCC build gives us:
+This patch series introduces several devlink parameters improving device
+configuration capabilities, link management, and SRIOV/eSwitch, by adding
+NV config boot time parameters.
 
-net/bridge/netfilter/nf_conntrack_bridge.c: note: in included file (through ../include/linux/if_pppox.h, ../include/uapi/linux/netfilter_bridge.h, ../include/linux/netfilter_bridge.h):
-include/uapi/linux/if_pppox.h:153:29: warning: array of flexible structures
+Below is a summary of the key changes:
 
-I'm guessing it doesn't like that hdr has a zero-length array which
-overlaps proto.
+1) Enable support for devlink port parameters
 
-Looks like kernel code doesn't current need those arrays.
-Could you submit something like the diff below first, and then rebase on top?
-CC hardening folks on the submission.
+2) Implement multi attribute devlink param value data, for u32 array
+   type parameters
 
-diff --git a/drivers/net/ppp/pppoe.c b/drivers/net/ppp/pppoe.c
-index 2ea4f4890d23..3a800af4e987 100644
---- a/drivers/net/ppp/pppoe.c
-+++ b/drivers/net/ppp/pppoe.c
-@@ -881,7 +881,7 @@ static int pppoe_sendmsg(struct socket *sock, struct msghdr *m,
-        skb->protocol = cpu_to_be16(ETH_P_PPP_SES);
- 
-        ph = skb_put(skb, total_len + sizeof(struct pppoe_hdr));
--       start = (char *)&ph->tag[0];
-+       start = (char *)ph + sizeof(*ph);
- 
-        error = memcpy_from_msg(start, m, total_len);
-        if (error < 0) {
-diff --git a/include/uapi/linux/if_pppox.h b/include/uapi/linux/if_pppox.h
-index 9abd80dcc46f..29b804aa7474 100644
---- a/include/uapi/linux/if_pppox.h
-+++ b/include/uapi/linux/if_pppox.h
-@@ -122,7 +122,9 @@ struct sockaddr_pppol2tpv3in6 {
- struct pppoe_tag {
-        __be16 tag_type;
-        __be16 tag_len;
-+#ifndef __KERNEL__
-        char tag_data[];
-+#endif
- } __attribute__ ((packed));
- 
- /* Tag identifiers */
-@@ -150,7 +152,9 @@ struct pppoe_hdr {
-        __u8 code;
-        __be16 sid;
-        __be16 length;
-+#ifndef __KERNEL__
-        struct pppoe_tag tag[];
-+#endif
- } __packed;
- 
- /* Length of entire PPPoE + PPP header */
+3) Implement the following parameters:
+
+   3.a) total_vfs Parameter:
+   -------------------------
+
+Adds support for managing the number of VFs (total_vfs) and enabling
+SR-IOV (enable_sriov for mlx5) through devlink. These additions enhance
+user control over virtualization features directly from standard kernel
+interfaces without relying on additional external tools. total_vfs
+functionality is critical for environments that require flexible num VF
+configuration.
+
+   3.b) devlink keep_link_up Parameter:
+   ------------------------------------
+
+Introduces a new devlink parameter 'keep_link_up', allowing devices to
+keep the link active even when the driver is not loaded. This
+functionality is especially useful for maintaining link stability during
+driver upgrades or reboots without dropping connectivity.
+
+   3.c) eSwitch Hairpin per Priority Buffers:
+   ------------------------------------------
+
+Implements new devlink parameters to configure eSwitch hairpin per
+priority buffers. These parameters provide granular control over how
+packets are buffered for IEEE802.1p priorities, offering improved traffic
+management and efficiency for specific priority levels.
+
+   3.d) CQE Compression Type:
+   --------------------------
+
+Introduces a new devlink parameter, cqe_compress_type, to configure the
+rate of CQE compression based on PCIe bus conditions. This setting
+provides a balance between compression efficiency and overall NIC
+performance under different traffic loads.
+
+Detailed examples of usage for each parameter have been included in the
+respective commits.
+
+
+Jiri Pirko (2):
+  devlink: define enum for attr types of dynamic attributes
+  devlink: pass struct devlink_port * as arg to devlink_nl_param_fill()
+
+Saeed Mahameed (9):
+  net/mlx5: Implement cqe_compress_type via devlink params
+  devlink: Implement port params registration
+  devlink: Implement get/dump netlink commands for port params
+  devlink: Implement set netlink command for port params
+  devlink: Add 'keep_link_up' generic devlink device param
+  net/mlx5: Implement devlink keep_link_up port parameter
+  devlink: Throw extack messages on param value validation error
+  devlink: Implement devlink param multi attribute nested data values
+  net/mlx5: Implement eSwitch hairpin per prio buffers devlink params
+
+Vlad Dumitrescu (3):
+  devlink: Add 'total_vfs' generic device param
+  net/mlx5: Implement devlink enable_sriov parameter
+  net/mlx5: Implement devlink total_vfs parameter
+
+ Documentation/netlink/specs/devlink.yaml      |  45 +-
+ .../networking/devlink/devlink-params.rst     |   7 +
+ Documentation/networking/devlink/mlx5.rst     |  65 +-
+ .../net/ethernet/mellanox/mlx5/core/Makefile  |   2 +-
+ .../net/ethernet/mellanox/mlx5/core/devlink.c |   9 +
+ .../net/ethernet/mellanox/mlx5/core/devlink.h |   3 +
+ .../ethernet/mellanox/mlx5/core/en/devlink.c  |  16 +-
+ .../ethernet/mellanox/mlx5/core/en/devlink.h  |   3 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |   4 +-
+ .../mellanox/mlx5/core/lib/nv_param.c         | 944 ++++++++++++++++++
+ .../mellanox/mlx5/core/lib/nv_param.h         |  16 +
+ include/linux/mlx5/driver.h                   |   1 +
+ include/net/devlink.h                         |  30 +
+ include/uapi/linux/devlink.h                  |  18 +
+ net/devlink/health.c                          |  17 +-
+ net/devlink/netlink_gen.c                     |  23 +-
+ net/devlink/param.c                           | 437 ++++++--
+ net/devlink/port.c                            |   3 +
+ 18 files changed, 1536 insertions(+), 107 deletions(-)
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.h
+
 -- 
-pw-bot: cr
+2.48.1
+
 
