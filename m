@@ -1,266 +1,645 @@
-Return-Path: <netdev+bounces-170766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFB27A49DB5
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 16:41:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E671DA49DBF
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 16:42:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 474EC189A18E
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 15:41:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2DEE17360B
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 15:42:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9822C18CC1D;
-	Fri, 28 Feb 2025 15:41:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABD0C26FD9F;
+	Fri, 28 Feb 2025 15:41:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wh8fVZpJ"
+	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="FjPIU745"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from va-1-14.ptr.blmpb.com (va-1-14.ptr.blmpb.com [209.127.230.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18454187859;
-	Fri, 28 Feb 2025 15:41:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1774C2702B6
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 15:41:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.230.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740757302; cv=none; b=siIk8JOU67xT/4bWeeHnM7m0dSOHpOFWDF5owdDzmQRWZl3SxpHtS0W51EpZl6fHmd3HGQA3r9YuOLbyP2fxYuzmEXKgtuTSe1JOYAewDdE2TiRkPT6duyG2Hk+PmEGwYfQgrfHmQtxIS35bHSSyRsGs2VjX/qrjX1SLVouUuH4=
+	t=1740757308; cv=none; b=lMpiVLOXimf46XkQM9niRPW+Oog9XqXySmXIf5FISmBnHPrDF1pBrW2833QUWzky6fjcwCOE3GlSsFOLeMqwBa00qPaK0fu59lCt917pQSxMI5uqPBMgeqA2M6UlQOYHtOFT8k4TU9aAn2fcS5HorE/pknnyFv8j290cCewYh1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740757302; c=relaxed/simple;
-	bh=aY2kO9WANmtJtKhEUiqOw09UEMtnTKNz+8dyRnvMzzI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=alYK3edT9jCfViBYwwFw26VvQaD8zgIPcb+3xAYeCNpN5XCNqUmC7qDJS5p+gXsgFnR2xzsLzqYu87nGFsUB+rE4rwEdJz2Da8XP1NDtQJNBrC9ox38p1EvGzrnXMc7EhQbr21EjU0Z6hbK3MmY3IT9vX5Q84oUg1BgE9uasM8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wh8fVZpJ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+	s=arc-20240116; t=1740757308; c=relaxed/simple;
+	bh=xO9D1VmkLau/f46Ag0XkfNSkPELr0dJChd0yBaTjxXM=;
+	h=To:Subject:Content-Type:References:From:Date:Message-Id:Cc:
+	 Mime-Version:In-Reply-To; b=OcHvCKLCJq9I31WGY6SwSoTclbvqnUxia4VhFNIl3wsR1aQfx8MUhpe8xZu46lX2Z7+4Se3Z7/UkI8+LMhzW4fQ15WJUqMKeTy4zYKKI6wVxyKtOXKIwHHe/iiT0gApJOXNckRl3r/R9AQ7XdQUIkdG58s/+tZnp877JpIImMkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=FjPIU745; arc=none smtp.client-ip=209.127.230.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=OPyxcz+qZruqJAbTurcqgZiEIfW6EaIvOQmjH5Rvfb8=; b=wh8fVZpJ8GicT8IR9RR6P6QQUY
-	pV8hFf0nIYTO8jUHitVhT5EGH2nKkcq9n3H+v9SmJmfQ62okX6NOC0cUj5J6BfcPfEv5MhD4u6pt6
-	8x1wArrm1y8uNoazZOCihetjkrcaXtmJUAau7FEmXtNFz1A5jQKw1CWbgFY097OAaps8dt/KcVzXR
-	jDwuVzHSdT5TfJywPZGveTQbawu4rQNNfVu2HCIYMbpAx/1IsJ/ogAqX7P5JZIk7EYA1AzyKbdotn
-	oiCfbS1e8wSatw88zTsMjLkOhH9aq3+k+EtTvwMQf3LvLqTAVd0Wu3IEjZzU94kmiA869UwCfhJXq
-	2zo0xSKg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57018)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1to2UV-0002H9-2g;
-	Fri, 28 Feb 2025 15:41:31 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1to2UR-0000rP-01;
-	Fri, 28 Feb 2025 15:41:27 +0000
-Date: Fri, 28 Feb 2025 15:41:26 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Simon Horman <horms@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>
-Subject: Re: [PATCH net-next v3 02/13] net: phy: Use an internal, searchable
- storage for the linkmodes
-Message-ID: <Z8HZJo9GE23uq5ew@shell.armlinux.org.uk>
-References: <20250228145540.2209551-1-maxime.chevallier@bootlin.com>
- <20250228145540.2209551-3-maxime.chevallier@bootlin.com>
+ s=feishu2403070942; d=yunsilicon.com; t=1740757291; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=77hqBsVSJyaRDiziRO1xd6CzIJN8rZdN+FZrujS1MHE=;
+ b=FjPIU745zJabOQvmMJxIzSJfFBcz/84ZsuzK1dX4L0ysEU+e6+zJkUuMy5ehr43F248YvC
+ taNXsiU/YrWWZLPBL8iBlDjllQwiuLr4waiBPvk6ZD2bl8GxW7ILguC2Cez/SpDgd4p4cF
+ ZyFVHjKtbFIXBdNFid4vI9Kgoul1KnmU3awUHKyMudEt9OQT7LHNJ3ZQGl5lTuqFsk84RT
+ GLvnYt5IKrt6nTwjlwqldOD/5G+dDCgPPOklZdSRjrLdZrx74EY1OOgbeh2uI1fgnlka64
+ 9zb321RA2QvPOoCYYCql0i9P0hFhD51Q8+d9iAF3oUk8lELbyl4p1NRAG/v0nA==
+To: <netdev@vger.kernel.org>
+Subject: [PATCH net-next v7 03/14] xsc: Add hardware setup APIs
+Received: from ubuntu-liun.yunsilicon.com ([58.34.192.114]) by smtp.feishu.cn with ESMTPS; Fri, 28 Feb 2025 23:41:28 +0800
+Content-Type: text/plain; charset=UTF-8
+X-Original-From: Xin Tian <tianx@yunsilicon.com>
+References: <20250228154122.216053-1-tianx@yunsilicon.com>
+From: "Xin Tian" <tianx@yunsilicon.com>
+Date: Fri, 28 Feb 2025 23:41:28 +0800
+Message-Id: <20250228154127.216053-4-tianx@yunsilicon.com>
+Content-Transfer-Encoding: 7bit
+Cc: <leon@kernel.org>, <andrew+netdev@lunn.ch>, <kuba@kernel.org>, 
+	<pabeni@redhat.com>, <edumazet@google.com>, <davem@davemloft.net>, 
+	<jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>, 
+	<weihg@yunsilicon.com>, <wanry@yunsilicon.com>, <jacky@yunsilicon.com>, 
+	<horms@kernel.org>, <parthiban.veerasooran@microchip.com>, 
+	<masahiroy@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250228145540.2209551-3-maxime.chevallier@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Mime-Version: 1.0
+In-Reply-To: <20250228154122.216053-1-tianx@yunsilicon.com>
+X-Mailer: git-send-email 2.25.1
+X-Lms-Return-Path: <lba+267c1d929+ef9fb9+vger.kernel.org+tianx@yunsilicon.com>
 
-On Fri, Feb 28, 2025 at 03:55:27PM +0100, Maxime Chevallier wrote:
-> The canonical definition for all the link modes is in linux/ethtool.h,
-> which is complemented by the link_mode_params array stored in
-> net/ethtool/common.h . That array contains all the metadata about each
-> of these modes, including the Speed and Duplex information.
-> 
-> Phylib and phylink needs that information as well for internal
-> management of the link, which was done by duplicating that information
-> in locally-stored arrays and lookup functions. This makes it easy for
-> developpers adding new modes to forget modifying phylib and phylink
-> accordingly.
-> 
-> However, the link_mode_params array in net/ethtool/common.c is fairly
-> inefficient to search through, as it isn't sorted in any manner. Phylib
-> and phylink perform a lot of lookup operations, mostly to filter modes
-> by speed and/or duplex.
-> 
-> We therefore introduce the link_caps private array in phy_caps.c, that
-> indexes linkmodes in a more efficient manner. Each element associated a
-> tuple <speed, duplex> to a bitfield of all the linkmodes runs at these
-> speed/duplex.
-> 
-> We end-up with an array that's fairly short, easily addressable and that
-> it optimised for the typical use-cases of phylib/phylink.
-> 
-> That array is initialized at the same time as phylib. As the
-> link_mode_params array is part of the net stack, which phylink depends
-> on, it should always be accessible from phylib.
-> 
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> ---
->  drivers/net/phy/Makefile     |  2 +-
->  drivers/net/phy/phy-caps.h   | 44 ++++++++++++++++++++
->  drivers/net/phy/phy_caps.c   | 78 ++++++++++++++++++++++++++++++++++++
->  drivers/net/phy/phy_device.c |  2 +
->  4 files changed, 125 insertions(+), 1 deletion(-)
->  create mode 100644 drivers/net/phy/phy-caps.h
->  create mode 100644 drivers/net/phy/phy_caps.c
-> 
-> diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
-> index c8dac6e92278..7e800619162b 100644
-> --- a/drivers/net/phy/Makefile
-> +++ b/drivers/net/phy/Makefile
-> @@ -2,7 +2,7 @@
->  # Makefile for Linux PHY drivers
->  
->  libphy-y			:= phy.o phy-c45.o phy-core.o phy_device.o \
-> -				   linkmode.o phy_link_topology.o
-> +				   linkmode.o phy_link_topology.o phy_caps.o
->  mdio-bus-y			+= mdio_bus.o mdio_device.o
->  
->  ifdef CONFIG_MDIO_DEVICE
-> diff --git a/drivers/net/phy/phy-caps.h b/drivers/net/phy/phy-caps.h
-> new file mode 100644
-> index 000000000000..846d483269f6
-> --- /dev/null
-> +++ b/drivers/net/phy/phy-caps.h
-> @@ -0,0 +1,44 @@
-> +/* SPDX-License-Identifier: GPL-2.0-or-later */
-> +/*
-> + * link caps internal header, for link modes <-> capabilities <-> interfaces
-> + * conversions.
-> + */
-> +
-> +#ifndef __PHY_CAPS_H
-> +#define __PHY_CAPS_H
-> +
-> +#include <linux/ethtool.h>
-> +
-> +enum {
-> +	LINK_CAPA_10HD = 0,
-> +	LINK_CAPA_10FD,
-> +	LINK_CAPA_100HD,
-> +	LINK_CAPA_100FD,
-> +	LINK_CAPA_1000HD,
-> +	LINK_CAPA_1000FD,
-> +	LINK_CAPA_2500FD,
-> +	LINK_CAPA_5000FD,
-> +	LINK_CAPA_10000FD,
-> +	LINK_CAPA_20000FD,
-> +	LINK_CAPA_25000FD,
-> +	LINK_CAPA_40000FD,
-> +	LINK_CAPA_50000FD,
-> +	LINK_CAPA_56000FD,
-> +	LINK_CAPA_100000FD,
-> +	LINK_CAPA_200000FD,
-> +	LINK_CAPA_400000FD,
-> +	LINK_CAPA_800000FD,
-> +
-> +	__LINK_CAPA_LAST = LINK_CAPA_800000FD,
-> +	__LINK_CAPA_MAX,
-> +};
-> +
-> +struct link_capabilities {
-> +	int speed;
-> +	unsigned int duplex;
-> +	__ETHTOOL_DECLARE_LINK_MODE_MASK(linkmodes);
-> +};
-> +
-> +void phy_caps_init(void);
-> +
-> +#endif /* __PHY_CAPS_H */
-> diff --git a/drivers/net/phy/phy_caps.c b/drivers/net/phy/phy_caps.c
-> new file mode 100644
-> index 000000000000..367ca7110ddc
-> --- /dev/null
-> +++ b/drivers/net/phy/phy_caps.c
-> @@ -0,0 +1,78 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +
-> +#include <linux/ethtool.h>
-> +#include <linux/linkmode.h>
-> +#include <linux/phy.h>
-> +
-> +#include "phy-caps.h"
-> +
-> +static struct link_capabilities link_caps[__LINK_CAPA_MAX] __ro_after_init = {
-> +	{ SPEED_10, DUPLEX_HALF, {0} }, /* LINK_CAPA_10HD */
-> +	{ SPEED_10, DUPLEX_FULL, {0} }, /* LINK_CAPA_10FD */
-> +	{ SPEED_100, DUPLEX_HALF, {0} }, /* LINK_CAPA_100HD */
-> +	{ SPEED_100, DUPLEX_FULL, {0} }, /* LINK_CAPA_100FD */
-> +	{ SPEED_1000, DUPLEX_HALF, {0} }, /* LINK_CAPA_1000HD */
-> +	{ SPEED_1000, DUPLEX_FULL, {0} }, /* LINK_CAPA_1000FD */
-> +	{ SPEED_2500, DUPLEX_FULL, {0} }, /* LINK_CAPA_2500FD */
-> +	{ SPEED_5000, DUPLEX_FULL, {0} }, /* LINK_CAPA_5000FD */
-> +	{ SPEED_10000, DUPLEX_FULL, {0} }, /* LINK_CAPA_10000FD */
-> +	{ SPEED_20000, DUPLEX_FULL, {0} }, /* LINK_CAPA_20000FD */
-> +	{ SPEED_25000, DUPLEX_FULL, {0} }, /* LINK_CAPA_25000FD */
-> +	{ SPEED_40000, DUPLEX_FULL, {0} }, /* LINK_CAPA_40000FD */
-> +	{ SPEED_50000, DUPLEX_FULL, {0} }, /* LINK_CAPA_50000FD */
-> +	{ SPEED_56000, DUPLEX_FULL, {0} }, /* LINK_CAPA_56000FD */
-> +	{ SPEED_100000, DUPLEX_FULL, {0} }, /* LINK_CAPA_100000FD */
-> +	{ SPEED_200000, DUPLEX_FULL, {0} }, /* LINK_CAPA_200000FD */
-> +	{ SPEED_400000, DUPLEX_FULL, {0} }, /* LINK_CAPA_400000FD */
-> +	{ SPEED_800000, DUPLEX_FULL, {0} }, /* LINK_CAPA_800000FD */
-> +};
-> +
-> +static int speed_duplex_to_capa(int speed, unsigned int duplex)
-> +{
-> +	if (duplex == DUPLEX_UNKNOWN ||
-> +	    (speed > SPEED_1000 && duplex != DUPLEX_FULL))
-> +		return -EINVAL;
-> +
-> +	switch (speed) {
-> +	case SPEED_10: return duplex == DUPLEX_FULL ?
-> +			      LINK_CAPA_10FD : LINK_CAPA_10HD;
-> +	case SPEED_100: return duplex == DUPLEX_FULL ?
-> +			       LINK_CAPA_100FD : LINK_CAPA_100HD;
-> +	case SPEED_1000: return duplex == DUPLEX_FULL ?
-> +				LINK_CAPA_1000FD : LINK_CAPA_1000HD;
-> +	case SPEED_2500: return LINK_CAPA_2500FD;
-> +	case SPEED_5000: return LINK_CAPA_5000FD;
-> +	case SPEED_10000: return LINK_CAPA_10000FD;
-> +	case SPEED_20000: return LINK_CAPA_20000FD;
-> +	case SPEED_25000: return LINK_CAPA_25000FD;
-> +	case SPEED_40000: return LINK_CAPA_40000FD;
-> +	case SPEED_50000: return LINK_CAPA_50000FD;
-> +	case SPEED_56000: return LINK_CAPA_56000FD;
-> +	case SPEED_100000: return LINK_CAPA_100000FD;
-> +	case SPEED_200000: return LINK_CAPA_200000FD;
-> +	case SPEED_400000: return LINK_CAPA_400000FD;
-> +	case SPEED_800000: return LINK_CAPA_800000FD;
+After CMDQ is initialized, the driver can retrieve hardware
+information from the firmware. This patch provides APIs to
+obtain the Hardware Component Adapter (HCA) capabilities,
+the Globally Unique Identifier (GUID) of the board, activate
+the hardware configuration, and reset function-specific
+resources.
 
-I think one of the issues you mentioned is about the need to update
-several places as new linkmodes are added.
+Co-developed-by: Honggang Wei <weihg@yunsilicon.com>
+Signed-off-by: Honggang Wei <weihg@yunsilicon.com>
+Co-developed-by: Lei Yan <jacky@yunsilicon.com>
+Signed-off-by: Lei Yan <jacky@yunsilicon.com>
+Signed-off-by: Xin Tian <tianx@yunsilicon.com>
+---
+ .../ethernet/yunsilicon/xsc/common/xsc_core.h | 158 ++++++++++
+ .../net/ethernet/yunsilicon/xsc/pci/Makefile  |   2 +-
+ drivers/net/ethernet/yunsilicon/xsc/pci/hw.c  | 276 ++++++++++++++++++
+ drivers/net/ethernet/yunsilicon/xsc/pci/hw.h  |  18 ++
+ .../net/ethernet/yunsilicon/xsc/pci/main.c    |  27 ++
+ 5 files changed, 480 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/hw.c
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/hw.h
 
-One of the side effects of adding new linkmodes is that they generally
-come with faster speeds, so this is a place that needs to be updated
-along with the table above.
-
-I'm not sure whether this makes that problem better or worse - if a
-new linkmode is added with a SPEED_*, the author of such a change has
-to be on the ball to update these, and I'm not sure that'll happen.
-
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+index c9e8f89eb..b2dd57d96 100644
+--- a/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
++++ b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+@@ -29,6 +29,145 @@
+ 
+ #define XSC_REG_ADDR(dev, offset)	(((dev)->bar) + ((offset) - 0xA0000000))
+ 
++enum {
++	XSC_MAX_PORTS	= 2,
++};
++
++enum {
++	XSC_MAX_FW_PORTS	= 1,
++};
++
++enum {
++	XSC_BF_REGS_PER_PAGE	= 4,
++	XSC_MAX_UAR_PAGES	= 1 << 8,
++	XSC_MAX_UUARS		= XSC_MAX_UAR_PAGES * XSC_BF_REGS_PER_PAGE,
++};
++
++/* hw */
++struct xsc_reg_addr {
++	u64	tx_db;
++	u64	rx_db;
++	u64	complete_db;
++	u64	complete_reg;
++	u64	event_db;
++	u64	cpm_get_lock;
++	u64	cpm_put_lock;
++	u64	cpm_lock_avail;
++	u64	cpm_data_mem;
++	u64	cpm_cmd;
++	u64	cpm_addr;
++	u64	cpm_busy;
++};
++
++struct xsc_board_info {
++	u32			board_id;
++	char			board_sn[XSC_BOARD_SN_LEN];
++	__be64			guid;
++	u8			guid_valid;
++	u8			hw_config_activated;
++};
++
++struct xsc_port_caps {
++	int		gid_table_len;
++	int		pkey_table_len;
++};
++
++struct xsc_caps {
++	u8		log_max_eq;
++	u8		log_max_cq;
++	u8		log_max_qp;
++	u8		log_max_mkey;
++	u8		log_max_pd;
++	u8		log_max_srq;
++	u8		log_max_msix;
++	u32		max_cqes;
++	u32		max_wqes;
++	u32		max_sq_desc_sz;
++	u32		max_rq_desc_sz;
++	u64		flags;
++	u16		stat_rate_support;
++	u32		log_max_msg;
++	u32		num_ports;
++	u32		max_ra_res_qp;
++	u32		max_ra_req_qp;
++	u32		max_srq_wqes;
++	u32		bf_reg_size;
++	u32		bf_regs_per_page;
++	struct xsc_port_caps	port[XSC_MAX_PORTS];
++	u8		ext_port_cap[XSC_MAX_PORTS];
++	u32		reserved_lkey;
++	u8		local_ca_ack_delay;
++	u8		log_max_mcg;
++	u16		max_qp_mcg;
++	u32		min_page_sz;
++	u32		send_ds_num;
++	u32		send_wqe_shift;
++	u32		recv_ds_num;
++	u32		recv_wqe_shift;
++	u32		rx_pkt_len_max;
++
++	u32		msix_enable:1;
++	u32		port_type:1;
++	u32		embedded_cpu:1;
++	u32		eswitch_manager:1;
++	u32		ecpf_vport_exists:1;
++	u32		vport_group_manager:1;
++	u32		sf:1;
++	u32		wqe_inline_mode:3;
++	u32		raweth_qp_id_base:15;
++	u32		rsvd0:7;
++
++	u16		max_vfs;
++	u8		log_max_qp_depth;
++	u8		log_max_current_uc_list;
++	u8		log_max_current_mc_list;
++	u16		log_max_vlan_list;
++	u8		fdb_multi_path_to_table;
++	u8		log_esw_max_sched_depth;
++
++	u8		max_num_sf_partitions;
++	u8		log_max_esw_sf;
++	u16		sf_base_id;
++
++	u32		max_tc:8;
++	u32		ets:1;
++	u32		dcbx:1;
++	u32		dscp:1;
++	u32		sbcam_reg:1;
++	u32		qos:1;
++	u32		port_buf:1;
++	u32		rsvd1:2;
++	u32		raw_tpe_qp_num:16;
++	u32		max_num_eqs:8;
++	u32		mac_port:8;
++	u32		raweth_rss_qp_id_base:16;
++	u16		msix_base;
++	u16		msix_num;
++	u8		log_max_mtt;
++	u8		log_max_tso;
++	u32		hca_core_clock;
++	u32		max_rwq_indirection_tables; /* rss_caps */
++	u32		max_rwq_indirection_table_size; /* rss_caps */
++	u16		raweth_qp_id_end;
++	u32		qp_rate_limit_min;
++	u32		qp_rate_limit_max;
++	u32		hw_feature_flag;
++	u16		pf0_vf_funcid_base;
++	u16		pf0_vf_funcid_top;
++	u16		pf1_vf_funcid_base;
++	u16		pf1_vf_funcid_top;
++	u16		pcie0_pf_funcid_base;
++	u16		pcie0_pf_funcid_top;
++	u16		pcie1_pf_funcid_base;
++	u16		pcie1_pf_funcid_top;
++	u8		nif_port_num;
++	u8		pcie_host;
++	u8		mac_bit;
++	u16		funcid_to_logic_port;
++	u8		lag_logic_port_ofst;
++};
++
++/* xsc_core */
+ struct xsc_dev_resource {
+ 	/* protect buffer allocation according to numa node */
+ 	struct mutex		alloc_mutex;
+@@ -52,6 +191,9 @@ struct xsc_core_device {
+ 	void __iomem		*bar;
+ 	int			bar_num;
+ 
++	u8			mac_port;
++	u16			glb_func_id;
++
+ 	struct xsc_cmd		cmd;
+ 	u16			cmdq_ver;
+ 
+@@ -59,6 +201,22 @@ struct xsc_core_device {
+ 	enum xsc_pci_state	pci_state;
+ 	struct mutex		intf_state_mutex;	/* protect intf_state */
+ 	unsigned long		intf_state;
++
++	struct xsc_caps		caps;
++	struct xsc_board_info	*board_info;
++
++	struct xsc_reg_addr	regs;
++	u32			chip_ver_h;
++	u32			chip_ver_m;
++	u32			chip_ver_l;
++	u32			hotfix_num;
++	u32			feature_flag;
++
++	u8			fw_version_major;
++	u8			fw_version_minor;
++	u16			fw_version_patch;
++	u32			fw_version_tweak;
++	u8			fw_version_extra_flag;
+ };
+ 
+ #endif
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/Makefile b/drivers/net/ethernet/yunsilicon/xsc/pci/Makefile
+index 5e0f0a205..fea625d54 100644
+--- a/drivers/net/ethernet/yunsilicon/xsc/pci/Makefile
++++ b/drivers/net/ethernet/yunsilicon/xsc/pci/Makefile
+@@ -6,4 +6,4 @@ ccflags-y += -I$(srctree)/drivers/net/ethernet/yunsilicon/xsc
+ 
+ obj-$(CONFIG_YUNSILICON_XSC_PCI) += xsc_pci.o
+ 
+-xsc_pci-y := main.o cmdq.o
++xsc_pci-y := main.o cmdq.o hw.o
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/hw.c b/drivers/net/ethernet/yunsilicon/xsc/pci/hw.c
+new file mode 100644
+index 000000000..5e13cfe36
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/xsc/pci/hw.c
+@@ -0,0 +1,276 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++ * All rights reserved.
++ */
++
++#include <linux/module.h>
++#include <linux/vmalloc.h>
++#include "common/xsc_driver.h"
++#include "hw.h"
++
++#define MAX_BOARD_NUM	32
++
++static struct xsc_board_info *board_info[MAX_BOARD_NUM];
++
++static struct xsc_board_info *xsc_get_board_info(char *board_sn)
++{
++	int i;
++
++	for (i = 0; i < MAX_BOARD_NUM; i++) {
++		if (!board_info[i])
++			continue;
++		if (!strncmp(board_info[i]->board_sn, board_sn,
++			     XSC_BOARD_SN_LEN))
++			return board_info[i];
++	}
++	return NULL;
++}
++
++static struct xsc_board_info *xsc_alloc_board_info(void)
++{
++	int i;
++
++	for (i = 0; i < MAX_BOARD_NUM; i++) {
++		if (!board_info[i])
++			break;
++	}
++	if (i == MAX_BOARD_NUM)
++		return NULL;
++	board_info[i] = vzalloc(sizeof(*board_info[i]));
++	if (!board_info[i])
++		return NULL;
++	board_info[i]->board_id = i;
++	return board_info[i];
++}
++
++void xsc_free_board_info(void)
++{
++	int i;
++
++	for (i = 0; i < MAX_BOARD_NUM; i++)
++		vfree(board_info[i]);
++}
++
++int xsc_cmd_query_hca_cap(struct xsc_core_device *xdev,
++			  struct xsc_caps *caps)
++{
++	struct xsc_cmd_query_hca_cap_mbox_out *out;
++	struct xsc_cmd_query_hca_cap_mbox_in in;
++	struct xsc_board_info *board_info;
++	int err;
++	u16 t16;
++
++	out = kzalloc(sizeof(*out), GFP_KERNEL);
++	if (!out)
++		return -ENOMEM;
++
++	memset(&in, 0, sizeof(in));
++	in.hdr.opcode = cpu_to_be16(XSC_CMD_OP_QUERY_HCA_CAP);
++	in.cpu_num = cpu_to_be16(num_online_cpus());
++
++	err = xsc_cmd_exec(xdev, &in, sizeof(in), out, sizeof(*out));
++	if (err)
++		goto out_out;
++
++	if (out->hdr.status) {
++		err = xsc_cmd_status_to_err(&out->hdr);
++		goto out_out;
++	}
++
++	xdev->glb_func_id = be32_to_cpu(out->hca_cap.glb_func_id);
++	caps->pcie0_pf_funcid_base =
++		be16_to_cpu(out->hca_cap.pcie0_pf_funcid_base);
++	caps->pcie0_pf_funcid_top =
++		be16_to_cpu(out->hca_cap.pcie0_pf_funcid_top);
++	caps->pcie1_pf_funcid_base =
++		be16_to_cpu(out->hca_cap.pcie1_pf_funcid_base);
++	caps->pcie1_pf_funcid_top =
++		be16_to_cpu(out->hca_cap.pcie1_pf_funcid_top);
++	caps->funcid_to_logic_port =
++		be16_to_cpu(out->hca_cap.funcid_to_logic_port);
++
++	caps->pcie_host = out->hca_cap.pcie_host;
++	caps->nif_port_num = out->hca_cap.nif_port_num;
++	caps->hw_feature_flag = be32_to_cpu(out->hca_cap.hw_feature_flag);
++
++	caps->raweth_qp_id_base = be16_to_cpu(out->hca_cap.raweth_qp_id_base);
++	caps->raweth_qp_id_end = be16_to_cpu(out->hca_cap.raweth_qp_id_end);
++	caps->raweth_rss_qp_id_base =
++		be16_to_cpu(out->hca_cap.raweth_rss_qp_id_base);
++	caps->raw_tpe_qp_num = be16_to_cpu(out->hca_cap.raw_tpe_qp_num);
++	caps->max_cqes = 1 << out->hca_cap.log_max_cq_sz;
++	caps->max_wqes = 1 << out->hca_cap.log_max_qp_sz;
++	caps->max_sq_desc_sz = be16_to_cpu(out->hca_cap.max_desc_sz_sq);
++	caps->max_rq_desc_sz = be16_to_cpu(out->hca_cap.max_desc_sz_rq);
++	caps->flags = be64_to_cpu(out->hca_cap.flags);
++	caps->stat_rate_support = be16_to_cpu(out->hca_cap.stat_rate_support);
++	caps->log_max_msg = out->hca_cap.log_max_msg & 0x1f;
++	caps->num_ports = out->hca_cap.num_ports & 0xf;
++	caps->log_max_cq = out->hca_cap.log_max_cq & 0x1f;
++	caps->log_max_eq = out->hca_cap.log_max_eq & 0xf;
++	caps->log_max_msix = out->hca_cap.log_max_msix & 0xf;
++	caps->mac_port = out->hca_cap.mac_port & 0xff;
++	xdev->mac_port = caps->mac_port;
++	if (caps->num_ports > XSC_MAX_FW_PORTS) {
++		pci_err(xdev->pdev, "device has %d ports while the driver supports max %d ports\n",
++			caps->num_ports, XSC_MAX_FW_PORTS);
++		err = -EINVAL;
++		goto out_out;
++	}
++	caps->send_ds_num = out->hca_cap.send_seg_num;
++	caps->send_wqe_shift = out->hca_cap.send_wqe_shift;
++	caps->recv_ds_num = out->hca_cap.recv_seg_num;
++	caps->recv_wqe_shift = out->hca_cap.recv_wqe_shift;
++
++	caps->embedded_cpu = 0;
++	caps->ecpf_vport_exists = 0;
++	caps->log_max_current_uc_list = 0;
++	caps->log_max_current_mc_list = 0;
++	caps->log_max_vlan_list = 8;
++	caps->log_max_qp = out->hca_cap.log_max_qp & 0x1f;
++	caps->log_max_mkey = out->hca_cap.log_max_mkey & 0x3f;
++	caps->log_max_pd = out->hca_cap.log_max_pd & 0x1f;
++	caps->log_max_srq = out->hca_cap.log_max_srqs & 0x1f;
++	caps->local_ca_ack_delay = out->hca_cap.local_ca_ack_delay & 0x1f;
++	caps->log_max_mcg = out->hca_cap.log_max_mcg;
++	caps->log_max_mtt = out->hca_cap.log_max_mtt;
++	caps->log_max_tso = out->hca_cap.log_max_tso;
++	caps->hca_core_clock = be32_to_cpu(out->hca_cap.hca_core_clock);
++	caps->max_rwq_indirection_tables =
++		be32_to_cpu(out->hca_cap.max_rwq_indirection_tables);
++	caps->max_rwq_indirection_table_size =
++		be32_to_cpu(out->hca_cap.max_rwq_indirection_table_size);
++	caps->max_qp_mcg = be16_to_cpu(out->hca_cap.max_qp_mcg);
++	caps->max_ra_res_qp = 1 << (out->hca_cap.log_max_ra_res_qp & 0x3f);
++	caps->max_ra_req_qp = 1 << (out->hca_cap.log_max_ra_req_qp & 0x3f);
++	caps->max_srq_wqes = 1 << out->hca_cap.log_max_srq_sz;
++	caps->rx_pkt_len_max = be32_to_cpu(out->hca_cap.rx_pkt_len_max);
++	caps->max_vfs = be16_to_cpu(out->hca_cap.max_vfs);
++	caps->qp_rate_limit_min = be32_to_cpu(out->hca_cap.qp_rate_limit_min);
++	caps->qp_rate_limit_max = be32_to_cpu(out->hca_cap.qp_rate_limit_max);
++
++	caps->msix_enable = 1;
++	caps->msix_base = be16_to_cpu(out->hca_cap.msix_base);
++	caps->msix_num = be16_to_cpu(out->hca_cap.msix_num);
++
++	t16 = be16_to_cpu(out->hca_cap.bf_log_bf_reg_size);
++	if (t16 & 0x8000) {
++		caps->bf_reg_size = 1 << (t16 & 0x1f);
++		caps->bf_regs_per_page = XSC_BF_REGS_PER_PAGE;
++	} else {
++		caps->bf_reg_size = 0;
++		caps->bf_regs_per_page = 0;
++	}
++	caps->min_page_sz = ~(u32)((1 << PAGE_SHIFT) - 1);
++
++	caps->dcbx = 1;
++	caps->qos = 1;
++	caps->ets = 1;
++	caps->dscp = 1;
++	caps->max_tc = out->hca_cap.max_tc;
++	caps->log_max_qp_depth = out->hca_cap.log_max_qp_depth & 0xff;
++	caps->mac_bit = out->hca_cap.mac_bit;
++	caps->lag_logic_port_ofst = out->hca_cap.lag_logic_port_ofst;
++
++	xdev->chip_ver_h = be32_to_cpu(out->hca_cap.chip_ver_h);
++	xdev->chip_ver_m = be32_to_cpu(out->hca_cap.chip_ver_m);
++	xdev->chip_ver_l = be32_to_cpu(out->hca_cap.chip_ver_l);
++	xdev->hotfix_num = be32_to_cpu(out->hca_cap.hotfix_num);
++	xdev->feature_flag = be32_to_cpu(out->hca_cap.feature_flag);
++
++	board_info = xsc_get_board_info(out->hca_cap.board_sn);
++	if (!board_info) {
++		board_info = xsc_alloc_board_info();
++		if (!board_info)
++			return -ENOMEM;
++
++		memcpy(board_info->board_sn,
++		       out->hca_cap.board_sn,
++		       sizeof(out->hca_cap.board_sn));
++	}
++	xdev->board_info = board_info;
++
++	xdev->regs.tx_db = be64_to_cpu(out->hca_cap.tx_db);
++	xdev->regs.rx_db = be64_to_cpu(out->hca_cap.rx_db);
++	xdev->regs.complete_db = be64_to_cpu(out->hca_cap.complete_db);
++	xdev->regs.complete_reg = be64_to_cpu(out->hca_cap.complete_reg);
++	xdev->regs.event_db = be64_to_cpu(out->hca_cap.event_db);
++
++	xdev->fw_version_major = out->hca_cap.fw_ver.fw_version_major;
++	xdev->fw_version_minor = out->hca_cap.fw_ver.fw_version_minor;
++	xdev->fw_version_patch =
++		be16_to_cpu(out->hca_cap.fw_ver.fw_version_patch);
++	xdev->fw_version_tweak =
++		be32_to_cpu(out->hca_cap.fw_ver.fw_version_tweak);
++	xdev->fw_version_extra_flag = out->hca_cap.fw_ver.fw_version_extra_flag;
++out_out:
++	kfree(out);
++
++	return err;
++}
++
++static int xsc_cmd_query_guid(struct xsc_core_device *xdev)
++{
++	struct xsc_cmd_query_guid_mbox_out out;
++	struct xsc_cmd_query_guid_mbox_in in;
++	int err;
++
++	in.hdr.opcode = cpu_to_be16(XSC_CMD_OP_QUERY_GUID);
++	err = xsc_cmd_exec(xdev, &in, sizeof(in), &out, sizeof(out));
++	if (err)
++		return err;
++
++	if (out.hdr.status)
++		return xsc_cmd_status_to_err(&out.hdr);
++	xdev->board_info->guid = out.guid;
++	xdev->board_info->guid_valid = 1;
++	return 0;
++}
++
++int xsc_query_guid(struct xsc_core_device *xdev)
++{
++	if (xdev->board_info->guid_valid)
++		return 0;
++
++	return xsc_cmd_query_guid(xdev);
++}
++
++static int xsc_cmd_activate_hw_config(struct xsc_core_device *xdev)
++{
++	struct xsc_cmd_activate_hw_config_mbox_out out;
++	struct xsc_cmd_activate_hw_config_mbox_in in;
++	int err = 0;
++
++	in.hdr.opcode = cpu_to_be16(XSC_CMD_OP_ACTIVATE_HW_CONFIG);
++	err = xsc_cmd_exec(xdev, &in, sizeof(in), &out, sizeof(out));
++	if (err)
++		return err;
++	if (out.hdr.status)
++		return xsc_cmd_status_to_err(&out.hdr);
++	xdev->board_info->hw_config_activated = 1;
++	return 0;
++}
++
++int xsc_activate_hw_config(struct xsc_core_device *xdev)
++{
++	if (xdev->board_info->hw_config_activated)
++		return 0;
++
++	return xsc_cmd_activate_hw_config(xdev);
++}
++
++int xsc_reset_function_resource(struct xsc_core_device *xdev)
++{
++	struct xsc_function_reset_mbox_out out;
++	struct xsc_function_reset_mbox_in in;
++	int err;
++
++	memset(&in, 0, sizeof(in));
++	in.hdr.opcode = cpu_to_be16(XSC_CMD_OP_FUNCTION_RESET);
++	in.glb_func_id = cpu_to_be16(xdev->glb_func_id);
++	err = xsc_cmd_exec(xdev, &in, sizeof(in), &out, sizeof(out));
++	if (err || out.hdr.status)
++		return -EINVAL;
++
++	return 0;
++}
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/hw.h b/drivers/net/ethernet/yunsilicon/xsc/pci/hw.h
+new file mode 100644
+index 000000000..d1030bfde
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/xsc/pci/hw.h
+@@ -0,0 +1,18 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++ * All rights reserved.
++ */
++
++#ifndef __HW_H
++#define __HW_H
++
++#include "common/xsc_core.h"
++
++void xsc_free_board_info(void);
++int xsc_cmd_query_hca_cap(struct xsc_core_device *xdev,
++			  struct xsc_caps *caps);
++int xsc_query_guid(struct xsc_core_device *xdev);
++int xsc_activate_hw_config(struct xsc_core_device *xdev);
++int xsc_reset_function_resource(struct xsc_core_device *xdev);
++
++#endif
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/main.c b/drivers/net/ethernet/yunsilicon/xsc/pci/main.c
+index ead26a57a..4b505fd9a 100644
+--- a/drivers/net/ethernet/yunsilicon/xsc/pci/main.c
++++ b/drivers/net/ethernet/yunsilicon/xsc/pci/main.c
+@@ -5,6 +5,7 @@
+ 
+ #include "common/xsc_core.h"
+ #include "common/xsc_driver.h"
++#include "hw.h"
+ 
+ static const struct pci_device_id xsc_pci_id_table[] = {
+ 	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MC_PF_DEV_ID) },
+@@ -192,6 +193,31 @@ static int xsc_hw_setup(struct xsc_core_device *xdev)
+ 		goto err_cmd_cleanup;
+ 	}
+ 
++	err = xsc_cmd_query_hca_cap(xdev, &xdev->caps);
++	if (err) {
++		pci_err(xdev->pdev, "Failed to query hca, err=%d\n", err);
++		goto err_cmd_cleanup;
++	}
++
++	err = xsc_query_guid(xdev);
++	if (err) {
++		pci_err(xdev->pdev, "failed to query guid, err=%d\n", err);
++		goto err_cmd_cleanup;
++	}
++
++	err = xsc_activate_hw_config(xdev);
++	if (err) {
++		pci_err(xdev->pdev, "failed to activate hw config, err=%d\n",
++			err);
++		goto err_cmd_cleanup;
++	}
++
++	err = xsc_reset_function_resource(xdev);
++	if (err) {
++		pci_err(xdev->pdev, "Failed to reset function resource\n");
++		goto err_cmd_cleanup;
++	}
++
+ 	return 0;
+ err_cmd_cleanup:
+ 	xsc_cmd_cleanup(xdev);
+@@ -327,6 +353,7 @@ static int __init xsc_init(void)
+ static void __exit xsc_fini(void)
+ {
+ 	pci_unregister_driver(&xsc_pci_driver);
++	xsc_free_board_info();
+ }
+ 
+ module_init(xsc_init);
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.18.4
 
