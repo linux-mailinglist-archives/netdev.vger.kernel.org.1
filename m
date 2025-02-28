@@ -1,170 +1,97 @@
-Return-Path: <netdev+bounces-170498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74FB9A48E0C
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 02:40:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A48FA48E23
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 02:48:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6023B3B1E7F
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 01:39:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C5687A50D8
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 01:47:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFCB03596A;
-	Fri, 28 Feb 2025 01:39:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 743F525757;
+	Fri, 28 Feb 2025 01:48:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hc57WRjR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bh8eo2yH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B22B4276D0B;
-	Fri, 28 Feb 2025 01:39:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4046035953;
+	Fri, 28 Feb 2025 01:48:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740706797; cv=none; b=mVAwHYqHFLIlXFvYS4FUAqE4KbVAKvh1eLSlksGXzmuDiwO076HnFDD46x4pAIyvsIjWc9DQwrm76FEVet/7PuAdkXkj9skTsTCqklCoRB30ijCaRx3i8wd+HfGx9JCKvvlKvNhc0/IhKycNcJtLCcAxgqkBD0jeZQJ0YBbzy68=
+	t=1740707295; cv=none; b=auVzY16zwCKcQOQY7YFKPDoTdmGzTLYB5yRwEPD6KEmphMj2ex0aJ5yV1sxyPLGwF3wMHKJ9TgepMJ8ZlGsFx2CTPvHqaRx9N2/hwy7aA3RKZHjdzZ7O40mApbuDr0Y/6mIZD4XCRLj18WV328QZlGQb5j3/HFJ3bjDEyLEu0No=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740706797; c=relaxed/simple;
-	bh=ojYLpVNPiRkjG8JoB/rvzAys6XHFkDYl+wJ0eo47Uho=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=sLrJuLRfpB9+X+lcNO65t4DQ5xnCvoBUrD/mSdmNs4yowL4BbB6Ych+UQmfrvTcz8KbgDKQuJ2m//WRsv/UCLhVUBFHyh/jo1xgQ8MXtbntqCJoLzbFj6JGyVKlupVcZ+KxsR+gs2K73F3i2tJpDUdnu6CQfKcKVxVCpKVMvz7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hc57WRjR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 277B8C4CEDD;
-	Fri, 28 Feb 2025 01:39:57 +0000 (UTC)
+	s=arc-20240116; t=1740707295; c=relaxed/simple;
+	bh=BjmmzH/Au8DAGNDCASojsQ3C9P33uMc+Z3Tpdc2Lo1g=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ataVwjmzLGyebp8SvGmptC2XQ6smQsuIUP8Hn+Z7H7Fsi4Mcf9CFZKNWMuMh59Yw1OkAiqhaYYLiAdGqzjsoA5+tZuCtAssXnwqTplC2XktZw0CnljO7vc3RcaLwQJP/wz09NaDzxX6ZQ37CdkhgUmwD84Ra5q2govB1GjmvdO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bh8eo2yH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDF41C4CEDD;
+	Fri, 28 Feb 2025 01:48:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740706797;
-	bh=ojYLpVNPiRkjG8JoB/rvzAys6XHFkDYl+wJ0eo47Uho=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Hc57WRjRWgPxvI5x4oZe7U5i7nReS6+twzVrGZUGgkF9MevODBXdV9m6St3cK6xfH
-	 lOCgTx54ZLZ6Z90uJfRA1XlsOBfU+TQIx/K+nsamSVL7epVdUGTxdEwQRbSgNxjQo5
-	 oKaIz7LvmBM2BCo/Qu+WZL1wtzYcR0qOv0EFCZJSOmxkyWE2A2OcwMRQycEz2tvr9s
-	 UxahWL5eNe5jGEzpDj7v1/oiOM4wkz5awKSBDPHlN8263VBxqgKBFdzLh5UIEclXo+
-	 YENTZXWV6zwNeoolIjbHfdFiXRyOYdqdlryRlP96Oozg1+SWqTgeJYodW+8ivkxqbG
-	 OSOtLrAh2SOfg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DA1380AACB;
-	Fri, 28 Feb 2025 01:40:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1740707294;
+	bh=BjmmzH/Au8DAGNDCASojsQ3C9P33uMc+Z3Tpdc2Lo1g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Bh8eo2yHRBbRfMkXeOCkbJxDaQvEtf60/RyoWsFj7ssICKGqywm2umN6ufAdL2qT3
+	 Aq5p2mJ4Fk348BbIinCEykfNLyJz0MWM0ZBt3P1PSWdZAE1TApWSvLVCiuikqKJtCz
+	 UI6ntr0+ZqzVck+buqbBfboMG6w4h/SMgmBCGOTdMc5m66nIjGmbCuWxjcKl2VrNop
+	 TK7Z5pFLCuXeiXYXChkQfmyeNfX6EcQ5bgsAySpK35Q9y8+cCUJZgn3lrLpKVI3RYj
+	 kL3R8ocDkcfJZ7Sacp2cVWG6jEJl4mIRdsORSO1i7khc21fdJ89Mo4+dUXPWB9zixU
+	 gIzqcb6QQoWWQ==
+Date: Thu, 27 Feb 2025 17:48:12 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: horms@kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, ricardo@marliere.net, viro@zeniv.linux.org.uk,
+ dmantipov@yandex.ru, aleksander.lobakin@intel.com,
+ linux-ppp@vger.kernel.org, linux-kernel@vger.kernel.org, mrpre@163.com,
+ syzbot+853242d9c9917165d791@syzkaller.appspotmail.com
+Subject: Re: [PATCH net-next v4 1/1] ppp: Fix KMSAN warning by initializing
+ 2-byte header
+Message-ID: <20250227174812.50d2eabe@kernel.org>
+In-Reply-To: <20250226013658.891214-2-jiayuan.chen@linux.dev>
+References: <20250226013658.891214-1-jiayuan.chen@linux.dev>
+	<20250226013658.891214-2-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v20 00/25] Introducing OpenVPN Data Channel
- Offload
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174070682925.1649415.10325310803686050485.git-patchwork-notify@kernel.org>
-Date: Fri, 28 Feb 2025 01:40:29 +0000
-References: <20250227-b4-ovpn-v20-0-93f363310834@openvpn.net>
-In-Reply-To: <20250227-b4-ovpn-v20-0-93f363310834@openvpn.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, donald.hunter@gmail.com, shuah@kernel.org,
- sd@queasysnail.net, ryazanov.s.a@gmail.com, andrew+netdev@lunn.ch,
- horms@kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, shaw.leon@gmail.com,
- akpm@linux-foundation.org, steffen.klassert@secunet.com,
- antony.antony@secunet.com, willemdebruijn.kernel@gmail.com,
- dsahern@kernel.org, andrew@lunn.ch, skhan@linuxfoundation.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 27 Feb 2025 02:21:25 +0100 you wrote:
-> After some time of struggle trying to fix all hidden bugs that Sabrina
-> has found...here is v20!
+On Wed, 26 Feb 2025 09:36:58 +0800 Jiayuan Chen wrote:
+> The PPP driver adds an extra 2-byte header to enable socket filters to run
+> correctly. However, the driver only initializes the first byte, which
+> indicates the direction. For normal BPF programs, this is not a problem
+> since they only read the first byte.
 > 
-> Notable changes since v19:
-> * copyright years updated to 2025
-> * rtnl_link_ops.newlink adapted to new signature
-> * removed admindown del-peer-reason attribute from netlink API
->   (it should have gone away in v19 already)
-> * removed asynchronous socket cleanup. All cleanup now happens in the
->   same context as the peer removal. I used a "deferred list" to
->   collect all peers that needed socket release and traversed it
->   after releasing the socket. This wasy there was no need to spawn
->   workers to leave the atomic context. Code looks way more linear now
-> * provided implementation for sk_prot->close() in order to catch when
->   userspace is releasing a socet and act accordingly. This way we can
->   avoid the dangling netns problem discussed in v19
-> * due to the previous item, it is now expected that the process that
->   created a socket stays alive all time long.
-> * kselftest scripts have been re-arranged as per the previous item
->   in order to keep ovpn-cli processes alive in background during the
->   tests
-> * improved TCP shutdown coordination across involved components
-> * fixed false deadlock reporting by using nested lock class (thanks a
->   lot to Sean Anderson!)
-> * exported udpv6_prot via EXPORT_SYMBOL_GPL
-> * merged patch for exporting inet6_stream_ops with its user
-> * moved TCP code that may sleep during detach out of lock_sock area
-> * reverted tcp_release_cb to EXPORT_SYMBOL
-> * improved kselftest Makefile to allow kselftest_deps.sh to detect
->   all dependencies
+> Nevertheless, for carefully crafted BPF programs, if they read the second
+> byte, this will trigger a KMSAN warning for reading uninitialized data.
 > 
-> [...]
+> Reported-by: syzbot+853242d9c9917165d791@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/bpf/000000000000dea025060d6bc3bc@google.com/
+> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 
-Here is the summary with links:
-  - [net-next,v20,01/25] mailmap: remove unwanted entry for Antonio Quartulli
-    https://git.kernel.org/netdev/net/c/ada9ce437a4d
-  - [net-next,v20,02/25] net: introduce OpenVPN Data Channel Offload (ovpn)
-    (no matching commit)
-  - [net-next,v20,03/25] ovpn: add basic netlink support
-    (no matching commit)
-  - [net-next,v20,04/25] ovpn: add basic interface creation/destruction/management routines
-    (no matching commit)
-  - [net-next,v20,05/25] ovpn: keep carrier always on for MP interfaces
-    (no matching commit)
-  - [net-next,v20,06/25] ovpn: introduce the ovpn_peer object
-    (no matching commit)
-  - [net-next,v20,07/25] ovpn: introduce the ovpn_socket object
-    (no matching commit)
-  - [net-next,v20,08/25] ovpn: implement basic TX path (UDP)
-    (no matching commit)
-  - [net-next,v20,09/25] ovpn: implement basic RX path (UDP)
-    (no matching commit)
-  - [net-next,v20,10/25] ovpn: implement packet processing
-    (no matching commit)
-  - [net-next,v20,11/25] ovpn: store tunnel and transport statistics
-    (no matching commit)
-  - [net-next,v20,12/25] ovpn: implement TCP transport
-    (no matching commit)
-  - [net-next,v20,13/25] skb: implement skb_send_sock_locked_with_flags()
-    (no matching commit)
-  - [net-next,v20,14/25] ovpn: add support for MSG_NOSIGNAL in tcp_sendmsg
-    (no matching commit)
-  - [net-next,v20,15/25] ovpn: implement multi-peer support
-    (no matching commit)
-  - [net-next,v20,16/25] ovpn: implement peer lookup logic
-    (no matching commit)
-  - [net-next,v20,17/25] ovpn: implement keepalive mechanism
-    (no matching commit)
-  - [net-next,v20,18/25] ovpn: add support for updating local UDP endpoint
-    (no matching commit)
-  - [net-next,v20,19/25] ovpn: add support for peer floating
-    (no matching commit)
-  - [net-next,v20,20/25] ovpn: implement peer add/get/dump/delete via netlink
-    (no matching commit)
-  - [net-next,v20,21/25] ovpn: implement key add/get/del/swap via netlink
-    (no matching commit)
-  - [net-next,v20,22/25] ovpn: kill key and notify userspace in case of IV exhaustion
-    (no matching commit)
-  - [net-next,v20,23/25] ovpn: notify userspace when a peer is deleted
-    (no matching commit)
-  - [net-next,v20,24/25] ovpn: add basic ethtool support
-    (no matching commit)
-  - [net-next,v20,25/25] testing/selftests: add test tool and scripts for ovpn module
-    (no matching commit)
+Could you add:
 
-You are awesome, thank you!
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+
+And combine the cover letter with the commit message?
+For a single-patch postings cover letter is not necessary.
+
+> +		*(__be16 *)skb_push(skb, 2) = htons(PPP_FILTER_OUTBOUND_TAG);
+>  		if (ppp->pass_filter &&
+>  		    bpf_prog_run(ppp->pass_filter, skb) == 0) {
+>  			if (ppp->debug & 1)
+
+The exact same problem seems to be present in ppp_receive_nonmp_frame()
+please fix them both.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
