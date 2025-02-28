@@ -1,93 +1,269 @@
-Return-Path: <netdev+bounces-170579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD49EA490A2
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 05:55:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC45CA49110
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 06:44:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF42416EBC8
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 04:55:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 660701891978
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 05:44:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A9C11B040E;
-	Fri, 28 Feb 2025 04:55:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 973B91BEF9D;
+	Fri, 28 Feb 2025 05:44:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ov1dLN/b"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eivpzvKE"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F14E1ADC90
-	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 04:55:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEEC31BEF63
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 05:44:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740718553; cv=none; b=Lob7CkrEgIpokr8sc/aU5fscWEhUxKQdlV7/LkRi1HnGKVctEHP/zVPXjqf/WLpc1BdZiFJR5oA5Y7il410uP1x3c+r/iUbQm3xRBFiScHFIl/UCyN/7RlO/sacdPPay66Tg10SM4xI2XNx0X49IpdyE/jQ3zc8aLlVz2yo94Sk=
+	t=1740721453; cv=none; b=gjJae9vnXlcsRIlyxc/fsOuLXSOpk1MCf6/YKpBNrolj/8bulEhaj8Wcarke8xgw/VpbJjcZSCUOB7KcAIiKefvycjz0UdXj/bLRqkESHX02LbQArTQ6g8AMviHG65RZQUuL4IOWM9Dz+/obRP33FD6/379k/XD4XTJAJNLkpuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740718553; c=relaxed/simple;
-	bh=Oyl75bEPYRCX3+JQYAFY+KMkLUcjc1Apw/AyJ7p6sFo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=go5XmupWTbQaUSfPCHDA9Hc51sVulR00/vnlL1/b2fqYExp0XF9B9ToVIE/agczH0IlfWUQDtsmz6uNsiQ6zwcJ4VS3UDJAv1jlnqAYHIfZEpc5U/kYlj+YjYtr19tSeWCswvuuHuWC0Y/lYCXXzXfCj7muhGqjGawLNEubOGK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ov1dLN/b; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 28 Feb 2025 12:55:41 +0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740718549;
+	s=arc-20240116; t=1740721453; c=relaxed/simple;
+	bh=rRpxVlwugFLZbO6mF1iWY7x7cCslzYrhj9vEEQIjxx8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qgyaGan0nK+QJTkFAFckj3RwEuO5vPqUiP7WJrXP5RXMBj7GAKBbEFjULP2KgWDlIa9gy1TtuhTfkc0DlgFWT7MwrXClThoOT/yWqKD/sxjLhag+4QV4TQfpyy3frTy+LooTSG5fZUzUaqFGoqN5No1J79BONiWtvV1187qx/mE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eivpzvKE; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740721450;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=SFH/CqJL4UtfGWPxwRoIS4R5TULoVqXuJV5xQ2LtJhc=;
-	b=ov1dLN/bUvjED2SjAV4KH0ECQ1auhmOEqu2GjUfcbRzWJMMx5PPb0vVmG34IcYYT412OYp
-	/d951uvU/pF3XqsdnHL1Ljl7og/zEU9Zw7+r+3CaIVTY0lyP2UoKxyPFPCKwKI/2KYLWjJ
-	+BHmQVYM1WPu1rRW1FptChqRHigQRY8=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: horms@kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	ricardo@marliere.net, viro@zeniv.linux.org.uk, dmantipov@yandex.ru, 
-	aleksander.lobakin@intel.com, linux-ppp@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	mrpre@163.com, syzbot+853242d9c9917165d791@syzkaller.appspotmail.com
-Subject: Re: [PATCH net-next v4 1/1] ppp: Fix KMSAN warning by initializing
- 2-byte header
-Message-ID: <wm7gi3hafgaruhnjaz5bqdv7yrduf6cum3gljylypzqkvw2ctw@b2zb75i2hpid>
-References: <20250226013658.891214-1-jiayuan.chen@linux.dev>
- <20250226013658.891214-2-jiayuan.chen@linux.dev>
- <20250227174812.50d2eabe@kernel.org>
+	bh=OiMplhGrnygs9HIg2mHnNWtqWeq5kklG40WZ9V0FRdQ=;
+	b=eivpzvKEsQIrK9lAOYEpme8OWfruD8tRHwLHnylHVXH4el8SshghBT50WuBBkQpLF9J09R
+	Q7NAvY1SAcHNMbjlELlV/7jaC0BS9MlV51/GM/IBAmSCegDTV894R5X3op3JphN39vIq/D
+	teeQGnhz1OisZPFCUhsg/mfz+F93Gsc=
+Received: from mail-vk1-f198.google.com (mail-vk1-f198.google.com
+ [209.85.221.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-657-j1Rlw5rPPkywgiYZXVpQ8g-1; Fri, 28 Feb 2025 00:44:08 -0500
+X-MC-Unique: j1Rlw5rPPkywgiYZXVpQ8g-1
+X-Mimecast-MFC-AGG-ID: j1Rlw5rPPkywgiYZXVpQ8g_1740721448
+Received: by mail-vk1-f198.google.com with SMTP id 71dfb90a1353d-51f249a5a4dso626546e0c.0
+        for <netdev@vger.kernel.org>; Thu, 27 Feb 2025 21:44:08 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740721448; x=1741326248;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OiMplhGrnygs9HIg2mHnNWtqWeq5kklG40WZ9V0FRdQ=;
+        b=YpU/jObRfsZjMCD+WZOO83V3fq0VFuaOozwXHOtOctSiCfuPEbfUjbwvKpTFWtqabd
+         nCyhP05DddoZcVOc+39ji41ob3cw18xBzw170BBOc8OyyVFbIIaJXPWBt3gOcweAWv7L
+         Lmc+woOF2QznMjpeh29daHytsIP2/QrZaIh1r95TWfPLb/lGb0tUrhTnxX2431aERpa/
+         szyLT3qEwC3GUGeg0KFwWXDapHwV6MCZeoEErj8NWhGwFdIzlbYx4Az7+MPgAWHG8WSI
+         BzBp02rq0/nXWoMaecHofKx4sjhHNqd5zG5OByHPnUQ5mLZMpffY3I7dzJ2ejiga+HwK
+         1Kdg==
+X-Gm-Message-State: AOJu0YyA6iJubQELcG+bqTRyEFsY3x59uOhlNTHiyuWS4zBLMOv5EuTp
+	iu2vYULiKz1srquBX3jujl8v9aSd7lmBqtnhd1S56DssYgBCzNvwPXBrBRZ4OF1RniOluSL4/vA
+	Cvm7pnr9s5D5p8WaVlgcVxprwdUev/KPQ+bCxlBDkm3XrkHYIgnsxsMNM364RBTtYS3uZjiKW9D
+	ni0PCJu//Jv49mKTN0WHOIWskJ1FE4
+X-Gm-Gg: ASbGnctbBF6ZfUu+ExslmNhVc27n9kfYZwPfP2HBdZuixvX1t/H2cgOYQ4rSqwxUq98
+	BPS4V8hXa3sBKl00qh2ZvL4IDz9kdqbp78N3Yldz5jDcm8Dofl0tsZV7k8qeOeIQOrrjgcyFFVg
+	==
+X-Received: by 2002:a05:6122:f8f:b0:520:60c2:3fb with SMTP id 71dfb90a1353d-5235a8e57efmr1249830e0c.0.1740721448003;
+        Thu, 27 Feb 2025 21:44:08 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGRWW6rCHYFgAWLZ+yOH4s3GqLIHZakIdmjkSiaHkC8nUR9JmkpJKZdqgXMKByl9MuOasbquPfzxDJd0W6GIts=
+X-Received: by 2002:a05:6122:f8f:b0:520:60c2:3fb with SMTP id
+ 71dfb90a1353d-5235a8e57efmr1249811e0c.0.1740721447691; Thu, 27 Feb 2025
+ 21:44:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250227174812.50d2eabe@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+References: <20250227142330.1605996-1-marcus.wichelmann@hetzner-cloud.de>
+In-Reply-To: <20250227142330.1605996-1-marcus.wichelmann@hetzner-cloud.de>
+From: Lei Yang <leiyang@redhat.com>
+Date: Fri, 28 Feb 2025 13:43:29 +0800
+X-Gm-Features: AQ5f1JoObPo6-qhA8092fRMPocEO4grstqiE_F4aj34cMl6VxKYbAYrhG9DOQcg
+Message-ID: <CAPpAL=wLk0Z3jfg9eY75c3ZFhH-3w7H--WqFuaGMcCJ+Bm5q+g@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v4 0/6] XDP metadata support for tun driver
+To: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, willemdebruijn.kernel@gmail.com, 
+	jasowang@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, mykolal@fb.com, shuah@kernel.org, 
+	hawk@kernel.org
+Content-Type: multipart/mixed; boundary="0000000000008bb20a062f2d4ba7"
 
-On Thu, Feb 27, 2025 at 05:48:12PM -0800, Jakub Kicinski wrote:
-> On Wed, 26 Feb 2025 09:36:58 +0800 Jiayuan Chen wrote:
-> > The PPP driver adds an extra 2-byte header to enable socket filters to run
-> Could you add:
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> 
-> And combine the cover letter with the commit message?
-> For a single-patch postings cover letter is not necessary.
-> 
-> > +		*(__be16 *)skb_push(skb, 2) = htons(PPP_FILTER_OUTBOUND_TAG);
-> >  		if (ppp->pass_filter &&
-> >  		    bpf_prog_run(ppp->pass_filter, skb) == 0) {
-> >  			if (ppp->debug & 1)
-> 
-> The exact same problem seems to be present in ppp_receive_nonmp_frame()
-> please fix them both.
-> -- 
-> pw-bot: cr
-Thanks, Jakub! I'll do that.
+--0000000000008bb20a062f2d4ba7
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I was previously worried that the commit message would be too long,
-so I put the detailed information in the cover letter instead. I'll make
-the commit message more concise.
+Hi Marcus
+
+Since your patches are about the virtual network, I'd like to test it,
+but it conflicts (Please review the attachment to review more details)
+when I apply it to the master branch.
+My test based on this commit:
+commit 1e15510b71c99c6e49134d756df91069f7d18141 (origin/master, origin/HEAD=
+)
+Merge: f09d694cf799 54e1b4becf5e
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Thu Feb 27 09:32:42 2025 -0800
+
+    Merge tag 'net-6.14-rc5' of
+git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
+
+    Pull networking fixes from Jakub Kicinski:
+     "Including fixes from bluetooth.
+
+Thanks
+Lei
+
+On Thu, Feb 27, 2025 at 10:28=E2=80=AFPM Marcus Wichelmann
+<marcus.wichelmann@hetzner-cloud.de> wrote:
+>
+> Hi all,
+>
+> this series contains some improvements for the selftest patches. The othe=
+r
+> patches remain unchanged. Please check the changelist below.
+>
+> I have reverted the addition of the NOARP flag from the previous version,
+> as it was not effective and the CI was still failing occasionally because
+> of the race condition caused by foreign packets interfering with the veth
+> tests. This series contains an alternative solution by filtering all but
+> the test packets using the attached XDP program.
+>
+> Successful pipeline:
+> https://github.com/kernel-patches/bpf/actions/runs/13552017584
+>
+> ---
+>
+> v4:
+> - strip unrelated changes from the selftest patches
+> - extend commit message for "selftests/bpf: refactor xdp_context_function=
+al
+>   test and bpf program"
+> - the NOARP flag was not effective to prevent other packets from
+>   interfering with the tests, add a filter to the XDP program instead
+> - run xdp_context_tuntap in a separate namespace to avoid conflicts with
+>   other tests
+>
+> v3: https://lore.kernel.org/bpf/20250224152909.3911544-1-marcus.wichelman=
+n@hetzner-cloud.de/
+> - change the condition to handle xdp_buffs without metadata support, as
+>   suggested by Willem de Bruijn <willemb@google.com>
+> - add clarifying comment why that condition is needed
+> - set NOARP flag in selftests to ensure that the kernel does not send
+>   packets on the test interfaces that may interfere with the tests
+>
+> v2: https://lore.kernel.org/bpf/20250217172308.3291739-1-marcus.wichelman=
+n@hetzner-cloud.de/
+> - submit against bpf-next subtree
+> - split commits and improved commit messages
+> - remove redundant metasize check and add clarifying comment instead
+> - use max() instead of ternary operator
+> - add selftest for metadata support in the tun driver
+>
+> v1: https://lore.kernel.org/all/20250130171614.1657224-1-marcus.wichelman=
+n@hetzner-cloud.de/
+>
+> Marcus Wichelmann (6):
+>   net: tun: enable XDP metadata support
+>   net: tun: enable transfer of XDP metadata to skb
+>   selftests/bpf: move open_tuntap to network helpers
+>   selftests/bpf: refactor xdp_context_functional test and bpf program
+>   selftests/bpf: add test for XDP metadata support in tun driver
+>   selftests/bpf: fix file descriptor assertion in open_tuntap helper
+>
+>  drivers/net/tun.c                             |  28 +++-
+>  tools/testing/selftests/bpf/network_helpers.c |  28 ++++
+>  tools/testing/selftests/bpf/network_helpers.h |   3 +
+>  .../selftests/bpf/prog_tests/lwt_helpers.h    |  29 ----
+>  .../bpf/prog_tests/xdp_context_test_run.c     | 138 +++++++++++++++++-
+>  .../selftests/bpf/progs/test_xdp_meta.c       |  53 +++++--
+>  6 files changed, 223 insertions(+), 56 deletions(-)
+>
+> --
+> 2.43.0
+>
+>
+
+--0000000000008bb20a062f2d4ba7
+Content-Type: application/octet-stream; name=conflict
+Content-Disposition: attachment; filename=conflict
+Content-Transfer-Encoding: base64
+Content-ID: <f_m7ocjiew0>
+X-Attachment-Id: f_m7ocjiew0
+
+IyBnaXQgYW0gLS1zaG93LWN1cnJlbnQtcGF0Y2g9ZGlmZgotLS0KIHRvb2xzL3Rlc3Rpbmcvc2Vs
+ZnRlc3RzL2JwZi9uZXR3b3JrX2hlbHBlcnMuYyB8IDI4ICsrKysrKysrKysrKysrKysrKwogdG9v
+bHMvdGVzdGluZy9zZWxmdGVzdHMvYnBmL25ldHdvcmtfaGVscGVycy5oIHwgIDMgKysKIC4uLi9z
+ZWxmdGVzdHMvYnBmL3Byb2dfdGVzdHMvbHd0X2hlbHBlcnMuaCAgICB8IDI5IC0tLS0tLS0tLS0t
+LS0tLS0tLS0KIDMgZmlsZXMgY2hhbmdlZCwgMzEgaW5zZXJ0aW9ucygrKSwgMjkgZGVsZXRpb25z
+KC0pCgpkaWZmIC0tZ2l0IGEvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMvYnBmL25ldHdvcmtfaGVs
+cGVycy5jIGIvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMvYnBmL25ldHdvcmtfaGVscGVycy5jCmlu
+ZGV4IDczN2E5NTJkY2Y4MC4uZTFjZmExYjM3NzU0IDEwMDY0NAotLS0gYS90b29scy90ZXN0aW5n
+L3NlbGZ0ZXN0cy9icGYvbmV0d29ya19oZWxwZXJzLmMKKysrIGIvdG9vbHMvdGVzdGluZy9zZWxm
+dGVzdHMvYnBmL25ldHdvcmtfaGVscGVycy5jCkBAIC01NjUsNiArNTY1LDM0IEBAIHZvaWQgY2xv
+c2VfbmV0bnMoc3RydWN0IG5zdG9rZW4gKnRva2VuKQogICAgICAgIGZyZWUodG9rZW4pOwogfQog
+CitpbnQgb3Blbl90dW50YXAoY29uc3QgY2hhciAqZGV2X25hbWUsIGJvb2wgbmVlZF9tYWMpCit7
+CisgICAgICAgaW50IGVyciA9IDA7CisgICAgICAgc3RydWN0IGlmcmVxIGlmcjsKKyAgICAgICBp
+bnQgZmQgPSBvcGVuKCIvZGV2L25ldC90dW4iLCBPX1JEV1IpOworCisgICAgICAgaWYgKCFBU1NF
+UlRfR1QoZmQsIDAsICJvcGVuKC9kZXYvbmV0L3R1bikiKSkKKyAgICAgICAgICAgICAgIHJldHVy
+biAtMTsKKworICAgICAgIGlmci5pZnJfZmxhZ3MgPSBJRkZfTk9fUEkgfCAobmVlZF9tYWMgPyBJ
+RkZfVEFQIDogSUZGX1RVTik7CisgICAgICAgc3RybmNweShpZnIuaWZyX25hbWUsIGRldl9uYW1l
+LCBJRk5BTVNJWiAtIDEpOworICAgICAgIGlmci5pZnJfbmFtZVtJRk5BTVNJWiAtIDFdID0gJ1ww
+JzsKKworICAgICAgIGVyciA9IGlvY3RsKGZkLCBUVU5TRVRJRkYsICZpZnIpOworICAgICAgIGlm
+ICghQVNTRVJUX09LKGVyciwgImlvY3RsKFRVTlNFVElGRikiKSkgeworICAgICAgICAgICAgICAg
+Y2xvc2UoZmQpOworICAgICAgICAgICAgICAgcmV0dXJuIC0xOworICAgICAgIH0KKworICAgICAg
+IGVyciA9IGZjbnRsKGZkLCBGX1NFVEZMLCBPX05PTkJMT0NLKTsKKyAgICAgICBpZiAoIUFTU0VS
+VF9PSyhlcnIsICJmY250bChPX05PTkJMT0NLKSIpKSB7CisgICAgICAgICAgICAgICBjbG9zZShm
+ZCk7CisgICAgICAgICAgICAgICByZXR1cm4gLTE7CisgICAgICAgfQorCisgICAgICAgcmV0dXJu
+IGZkOworfQorCiBpbnQgZ2V0X3NvY2tldF9sb2NhbF9wb3J0KGludCBzb2NrX2ZkKQogewogICAg
+ICAgIHN0cnVjdCBzb2NrYWRkcl9zdG9yYWdlIGFkZHI7CmRpZmYgLS1naXQgYS90b29scy90ZXN0
+aW5nL3NlbGZ0ZXN0cy9icGYvbmV0d29ya19oZWxwZXJzLmggYi90b29scy90ZXN0aW5nL3NlbGZ0
+ZXN0cy9icGYvbmV0d29ya19oZWxwZXJzLmgKaW5kZXggOWY2ZTA1ZDg4NmM1Li45OWQxNDE3YzFk
+OGIgMTAwNjQ0Ci0tLSBhL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2JwZi9uZXR3b3JrX2hlbHBl
+cnMuaAorKysgYi90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9icGYvbmV0d29ya19oZWxwZXJzLmgK
+QEAgLTgsNiArOCw3IEBACiB0eXBlZGVmIF9fdTE2IF9fc3VtMTY7CiAjaW5jbHVkZSA8bGludXgv
+aWZfZXRoZXIuaD4KICNpbmNsdWRlIDxsaW51eC9pZl9wYWNrZXQuaD4KKyNpbmNsdWRlIDxsaW51
+eC9pZl90dW4uaD4KICNpbmNsdWRlIDxsaW51eC9pcC5oPgogI2luY2x1ZGUgPGxpbnV4L2lwdjYu
+aD4KICNpbmNsdWRlIDxsaW51eC9ldGh0b29sLmg+CkBAIC05OCw2ICs5OSw4IEBAIGludCBzZW5k
+X3JlY3ZfZGF0YShpbnQgbGZkLCBpbnQgZmQsIHVpbnQzMl90IHRvdGFsX2J5dGVzKTsKIGludCBt
+YWtlX25ldG5zKGNvbnN0IGNoYXIgKm5hbWUpOwogaW50IHJlbW92ZV9uZXRucyhjb25zdCBjaGFy
+ICpuYW1lKTsKIAoraW50IG9wZW5fdHVudGFwKGNvbnN0IGNoYXIgKmRldl9uYW1lLCBib29sIG5l
+ZWRfbWFjKTsKKwogLyoqCiAgKiBhcHBlbmRfdGlkKCkgLSBBcHBlbmQgdGhyZWFkIElEIHRvIHRo
+ZSBnaXZlbiBzdHJpbmcuCiAgKgpkaWZmIC0tZ2l0IGEvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMv
+YnBmL3Byb2dfdGVzdHMvbHd0X2hlbHBlcnMuaCBiL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2Jw
+Zi9wcm9nX3Rlc3RzL2x3dF9oZWxwZXJzLmgKaW5kZXggZmIxZWI4YzY3MzYxLi5jY2VjMGZjZGFi
+YzEgMTAwNjQ0Ci0tLSBhL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2JwZi9wcm9nX3Rlc3RzL2x3
+dF9oZWxwZXJzLmgKKysrIGIvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMvYnBmL3Byb2dfdGVzdHMv
+bHd0X2hlbHBlcnMuaApAQCAtNSw3ICs1LDYgQEAKIAogI2luY2x1ZGUgPHRpbWUuaD4KICNpbmNs
+dWRlIDxuZXQvaWYuaD4KLSNpbmNsdWRlIDxsaW51eC9pZl90dW4uaD4KICNpbmNsdWRlIDxsaW51
+eC9pY21wLmg+CiAKICNpbmNsdWRlICJ0ZXN0X3Byb2dzLmgiCkBAIC0zNywzNCArMzYsNiBAQCBz
+dGF0aWMgaW5saW5lIGludCBuZXRuc19kZWxldGUodm9pZCkKICAgICAgICByZXR1cm4gc3lzdGVt
+KCJpcCBuZXRucyBkZWwgIiBORVROUyAiPi9kZXYvbnVsbCAyPiYxIik7CiB9CiAKLXN0YXRpYyBp
+bnQgb3Blbl90dW50YXAoY29uc3QgY2hhciAqZGV2X25hbWUsIGJvb2wgbmVlZF9tYWMpCi17Ci0g
+ICAgICAgaW50IGVyciA9IDA7Ci0gICAgICAgc3RydWN0IGlmcmVxIGlmcjsKLSAgICAgICBpbnQg
+ZmQgPSBvcGVuKCIvZGV2L25ldC90dW4iLCBPX1JEV1IpOwotCi0gICAgICAgaWYgKCFBU1NFUlRf
+R1QoZmQsIDAsICJvcGVuKC9kZXYvbmV0L3R1bikiKSkKLSAgICAgICAgICAgICAgIHJldHVybiAt
+MTsKLQotICAgICAgIGlmci5pZnJfZmxhZ3MgPSBJRkZfTk9fUEkgfCAobmVlZF9tYWMgPyBJRkZf
+VEFQIDogSUZGX1RVTik7Ci0gICAgICAgc3RybmNweShpZnIuaWZyX25hbWUsIGRldl9uYW1lLCBJ
+Rk5BTVNJWiAtIDEpOwotICAgICAgIGlmci5pZnJfbmFtZVtJRk5BTVNJWiAtIDFdID0gJ1wwJzsK
+LQotICAgICAgIGVyciA9IGlvY3RsKGZkLCBUVU5TRVRJRkYsICZpZnIpOwotICAgICAgIGlmICgh
+QVNTRVJUX09LKGVyciwgImlvY3RsKFRVTlNFVElGRikiKSkgewotICAgICAgICAgICAgICAgY2xv
+c2UoZmQpOwotICAgICAgICAgICAgICAgcmV0dXJuIC0xOwotICAgICAgIH0KLQotICAgICAgIGVy
+ciA9IGZjbnRsKGZkLCBGX1NFVEZMLCBPX05PTkJMT0NLKTsKLSAgICAgICBpZiAoIUFTU0VSVF9P
+SyhlcnIsICJmY250bChPX05PTkJMT0NLKSIpKSB7Ci0gICAgICAgICAgICAgICBjbG9zZShmZCk7
+Ci0gICAgICAgICAgICAgICByZXR1cm4gLTE7Ci0gICAgICAgfQotCi0gICAgICAgcmV0dXJuIGZk
+OwotfQotCiAjZGVmaW5lIElDTVBfUEFZTE9BRF9TSVpFICAgICAxMDAKIAogLyogTWF0Y2ggYW4g
+SUNNUCBwYWNrZXQgd2l0aCBwYXlsb2FkIGxlbiBJQ01QX1BBWUxPQURfU0laRSAqLwotLSAKMi40
+My4wCg==
+--0000000000008bb20a062f2d4ba7--
+
 
