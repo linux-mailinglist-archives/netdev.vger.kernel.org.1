@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-170753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2E3DA49C91
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 15:59:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A67CA49C90
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 15:58:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDE0A174190
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 14:58:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AAF63AFB97
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 14:58:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC70028134B;
-	Fri, 28 Feb 2025 14:55:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B38A281364;
+	Fri, 28 Feb 2025 14:55:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="QOM92Ljj"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BU9AeyyT"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 923A427FE85;
-	Fri, 28 Feb 2025 14:55:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67949280A2F;
+	Fri, 28 Feb 2025 14:55:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740754557; cv=none; b=nnVycqzSHRD5QhFT3iD4imFLDMNaDub0FPL6l5sFtFDA7Nn8UsMk/JYKW49GM2mkN+4OD7N03Vp4Zw5Nji1SoHYVKZM5YT3fZMDePaB4qbmyatx+auzZf01AE/BbBSPdCv9XPLR196vRrPE+v7E/0Qm6CRzO8j+1m9pCcFBE6aM=
+	t=1740754558; cv=none; b=Uc/BVOesSLHXv3+Q35cJ2FCC1OStw4CqExLsZhU3CfTNFrDUsy93gmjT7pUkaeZZRq7M4S4Qg+Zdut3An3CVHe9n4KK8ij+KAEWjXrI6mT8IaLMmv+yj9G/7QeNlZ+eFsqRXg64p38mJ6y6PxNCKDKaPu946Hz/J3qW/7AcDUck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740754557; c=relaxed/simple;
-	bh=HaGWPiQLi8g2oCBDshsuN4+48r5L5ts5ve2sX78DEr4=;
+	s=arc-20240116; t=1740754558; c=relaxed/simple;
+	bh=hqV4OOG0n/DrQNNHEVkRJN55YLgWj4y8rT04JRVCViM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tNghlNBSb2YJby+S5W9xPmQAsuMY5qQTxEN8tdWuwIFCFolsKlo5Iw0uoXa02FmR6vaGhL8sfEREQkazpwtjqIz8D/8C16iCLUplRZrKBQvTl0KDt3NqD8FMnQUMi2gELElo/xh3le4eSyxhs/pucgTsC43lqAWl3xFMxgmJhC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=QOM92Ljj; arc=none smtp.client-ip=217.70.183.201
+	 MIME-Version; b=is5fEMkrssJROM9q5lcMaBzMSQtcuo9em5O6DltoYBw5tCwDu7EOadY6EZFG/3/DYA0VKOOfRkjIQ9Eg7Zy7w/uJ+c1D9AMYHZZnzrHFCGNYqcsALBDZM1C5JALsirIAU/+Z28r18WO5e2pAN3vRaphcq9NhuInQsAQ3s07NPvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BU9AeyyT; arc=none smtp.client-ip=217.70.183.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id F1F22443FA;
-	Fri, 28 Feb 2025 14:55:52 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 172AF443F9;
+	Fri, 28 Feb 2025 14:55:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1740754554;
+	t=1740754555;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kxC2ZGFkbRAqIZMBmo0qAZXeuOHlxHKdlpDBQ0LMTAE=;
-	b=QOM92LjjM62/ZcRAraYYD2ngWtiUKVHgE1OMbG80GwNtiAXb1HqJFBfOfj4UNVFQZJ8D+d
-	f6RRnf/WBcBZiaDHTA6YUbXJR7ywmMMKaG1CN1EaVljML6fmDebEHW8Wjosbbr2Wz5JIjJ
-	oxTeZ+GU4dyKXPHu1Xr5hHgSjzD0mzKX9KMIX2rwJ7/EuvmhoCFuKr57UioYcBwBSfmhTU
-	u8c3Na68MuSBAbNpiFkhE54lgCoEeZPdAgocwLuNpfNusOSeUYcrvExTL0UEDB9OcTtvlU
-	CF3pK+0LaFBwmeyatv+B0RgwbAd4jtdow3NeFCWR5bRXYgQ8j86JDm/lZAqHEg==
+	bh=MyQ7M51WXcJl0powGY6xoKP5Abak0f6Ih7qqeXgXjj4=;
+	b=BU9AeyyTwP88HwyTn/n7Vv+aD6Y53CYI2f0o6WXA3ps/VXqUf7Iyu/rjyXEfCrLVmduwj9
+	CFtGKyAOWrzsF4wA11ZMFWZ9HueEzJJQpisdUYHGAYYA6SaXk020CdIlKBxauAW010ckCm
+	+aSRCPid16mmJcXfoAkMV18xRj46U9edGtledxl5dtqAG/T5WG6Dn21+LY/vzeQfpexZN6
+	kv23u/kFPXHcw1Ycll+3rHLLT0aWG6U11nFonyo0ofDmLRWmKwe7+c/72xh/WnYuDTPbeA
+	uLnxxq0kVP/P6Cb6MYMLesJG8DfDzaRrr3TZoEOzWoWDqZNV2Yrrmd4Jc5O1/g==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -66,9 +66,9 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Oleksij Rempel <o.rempel@pengutronix.de>,
 	Simon Horman <horms@kernel.org>,
 	Romain Gantois <romain.gantois@bootlin.com>
-Subject: [PATCH net-next v3 10/13] net: phy: drop phy_settings and the associated lookup helpers
-Date: Fri, 28 Feb 2025 15:55:35 +0100
-Message-ID: <20250228145540.2209551-11-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next v3 11/13] net: phylink: Add a mapping between MAC_CAPS and LINK_CAPS
+Date: Fri, 28 Feb 2025 15:55:36 +0100
+Message-ID: <20250228145540.2209551-12-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250228145540.2209551-1-maxime.chevallier@bootlin.com>
 References: <20250228145540.2209551-1-maxime.chevallier@bootlin.com>
@@ -85,234 +85,88 @@ X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeltdeilecutefuodetggdotef
  igvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomh
 X-GND-Sasl: maxime.chevallier@bootlin.com
 
-The phy_settings array is no longer relevant as it has now been replaced
-by the link_caps array and associated phy_caps helpers.
+phylink allows MAC drivers to report the capabilities in terms of speed,
+duplex and pause support. This is done through a dedicated set of enum
+values in the form of the MAC_ capabilities. They are very close to what
+the LINK_CAPA_xxx can express, with the difference that LINK_CAPA don't
+have any information about Pause/Asym Pause support.
+
+To prepare converting phylink to using the phy_caps, add the mapping
+between MAC capabilities and phy_caps. While doing so, we move the
+phylink_caps_params array up a bit to simplify future commits.
 
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
- drivers/net/phy/phy-core.c | 184 -------------------------------------
- include/linux/phy.h        |  13 ---
- 2 files changed, 197 deletions(-)
+ drivers/net/phy/phylink.c | 49 ++++++++++++++++++++-------------------
+ 1 file changed, 25 insertions(+), 24 deletions(-)
 
-diff --git a/drivers/net/phy/phy-core.c b/drivers/net/phy/phy-core.c
-index 6cb8f857a7f1..e7d0137abd48 100644
---- a/drivers/net/phy/phy-core.c
-+++ b/drivers/net/phy/phy-core.c
-@@ -156,190 +156,6 @@ int phy_interface_num_ports(phy_interface_t interface)
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 63fbf3d8708a..aaf07094b821 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -292,6 +292,31 @@ static int phylink_interface_max_speed(phy_interface_t interface)
+ 	return SPEED_UNKNOWN;
  }
- EXPORT_SYMBOL_GPL(phy_interface_num_ports);
  
--/* A mapping of all SUPPORTED settings to speed/duplex.  This table
-- * must be grouped by speed and sorted in descending match priority
-- * - iow, descending speed.
-- */
--
--#define PHY_SETTING(s, d, b) { .speed = SPEED_ ## s, .duplex = DUPLEX_ ## d, \
--			       .bit = ETHTOOL_LINK_MODE_ ## b ## _BIT}
--
--static const struct phy_setting settings[] = {
--	/* 800G */
--	PHY_SETTING( 800000, FULL, 800000baseCR8_Full		),
--	PHY_SETTING( 800000, FULL, 800000baseKR8_Full		),
--	PHY_SETTING( 800000, FULL, 800000baseDR8_Full		),
--	PHY_SETTING( 800000, FULL, 800000baseDR8_2_Full		),
--	PHY_SETTING( 800000, FULL, 800000baseSR8_Full		),
--	PHY_SETTING( 800000, FULL, 800000baseVR8_Full		),
--	PHY_SETTING( 800000, FULL, 800000baseCR4_Full		),
--	PHY_SETTING( 800000, FULL, 800000baseKR4_Full		),
--	PHY_SETTING( 800000, FULL, 800000baseDR4_Full		),
--	PHY_SETTING( 800000, FULL, 800000baseDR4_2_Full		),
--	PHY_SETTING( 800000, FULL, 800000baseSR4_Full		),
--	PHY_SETTING( 800000, FULL, 800000baseVR4_Full		),
--	/* 400G */
--	PHY_SETTING( 400000, FULL, 400000baseCR8_Full		),
--	PHY_SETTING( 400000, FULL, 400000baseKR8_Full		),
--	PHY_SETTING( 400000, FULL, 400000baseLR8_ER8_FR8_Full	),
--	PHY_SETTING( 400000, FULL, 400000baseDR8_Full		),
--	PHY_SETTING( 400000, FULL, 400000baseSR8_Full		),
--	PHY_SETTING( 400000, FULL, 400000baseCR4_Full		),
--	PHY_SETTING( 400000, FULL, 400000baseKR4_Full		),
--	PHY_SETTING( 400000, FULL, 400000baseLR4_ER4_FR4_Full	),
--	PHY_SETTING( 400000, FULL, 400000baseDR4_Full		),
--	PHY_SETTING( 400000, FULL, 400000baseSR4_Full		),
--	PHY_SETTING( 400000, FULL, 400000baseCR2_Full		),
--	PHY_SETTING( 400000, FULL, 400000baseKR2_Full		),
--	PHY_SETTING( 400000, FULL, 400000baseDR2_Full		),
--	PHY_SETTING( 400000, FULL, 400000baseDR2_2_Full		),
--	PHY_SETTING( 400000, FULL, 400000baseSR2_Full		),
--	PHY_SETTING( 400000, FULL, 400000baseVR2_Full		),
--	/* 200G */
--	PHY_SETTING( 200000, FULL, 200000baseCR4_Full		),
--	PHY_SETTING( 200000, FULL, 200000baseKR4_Full		),
--	PHY_SETTING( 200000, FULL, 200000baseLR4_ER4_FR4_Full	),
--	PHY_SETTING( 200000, FULL, 200000baseDR4_Full		),
--	PHY_SETTING( 200000, FULL, 200000baseSR4_Full		),
--	PHY_SETTING( 200000, FULL, 200000baseCR2_Full		),
--	PHY_SETTING( 200000, FULL, 200000baseKR2_Full		),
--	PHY_SETTING( 200000, FULL, 200000baseLR2_ER2_FR2_Full	),
--	PHY_SETTING( 200000, FULL, 200000baseDR2_Full		),
--	PHY_SETTING( 200000, FULL, 200000baseSR2_Full		),
--	PHY_SETTING( 200000, FULL, 200000baseCR_Full		),
--	PHY_SETTING( 200000, FULL, 200000baseKR_Full		),
--	PHY_SETTING( 200000, FULL, 200000baseDR_Full		),
--	PHY_SETTING( 200000, FULL, 200000baseDR_2_Full		),
--	PHY_SETTING( 200000, FULL, 200000baseSR_Full		),
--	PHY_SETTING( 200000, FULL, 200000baseVR_Full		),
--	/* 100G */
--	PHY_SETTING( 100000, FULL, 100000baseCR4_Full		),
--	PHY_SETTING( 100000, FULL, 100000baseKR4_Full		),
--	PHY_SETTING( 100000, FULL, 100000baseLR4_ER4_Full	),
--	PHY_SETTING( 100000, FULL, 100000baseSR4_Full		),
--	PHY_SETTING( 100000, FULL, 100000baseCR2_Full		),
--	PHY_SETTING( 100000, FULL, 100000baseKR2_Full		),
--	PHY_SETTING( 100000, FULL, 100000baseLR2_ER2_FR2_Full	),
--	PHY_SETTING( 100000, FULL, 100000baseDR2_Full		),
--	PHY_SETTING( 100000, FULL, 100000baseSR2_Full		),
--	PHY_SETTING( 100000, FULL, 100000baseCR_Full		),
--	PHY_SETTING( 100000, FULL, 100000baseKR_Full		),
--	PHY_SETTING( 100000, FULL, 100000baseLR_ER_FR_Full	),
--	PHY_SETTING( 100000, FULL, 100000baseDR_Full		),
--	PHY_SETTING( 100000, FULL, 100000baseSR_Full		),
--	/* 56G */
--	PHY_SETTING(  56000, FULL,  56000baseCR4_Full	  	),
--	PHY_SETTING(  56000, FULL,  56000baseKR4_Full	  	),
--	PHY_SETTING(  56000, FULL,  56000baseLR4_Full	  	),
--	PHY_SETTING(  56000, FULL,  56000baseSR4_Full	  	),
--	/* 50G */
--	PHY_SETTING(  50000, FULL,  50000baseCR2_Full		),
--	PHY_SETTING(  50000, FULL,  50000baseKR2_Full		),
--	PHY_SETTING(  50000, FULL,  50000baseSR2_Full		),
--	PHY_SETTING(  50000, FULL,  50000baseCR_Full		),
--	PHY_SETTING(  50000, FULL,  50000baseKR_Full		),
--	PHY_SETTING(  50000, FULL,  50000baseLR_ER_FR_Full	),
--	PHY_SETTING(  50000, FULL,  50000baseDR_Full		),
--	PHY_SETTING(  50000, FULL,  50000baseSR_Full		),
--	/* 40G */
--	PHY_SETTING(  40000, FULL,  40000baseCR4_Full		),
--	PHY_SETTING(  40000, FULL,  40000baseKR4_Full		),
--	PHY_SETTING(  40000, FULL,  40000baseLR4_Full		),
--	PHY_SETTING(  40000, FULL,  40000baseSR4_Full		),
--	/* 25G */
--	PHY_SETTING(  25000, FULL,  25000baseCR_Full		),
--	PHY_SETTING(  25000, FULL,  25000baseKR_Full		),
--	PHY_SETTING(  25000, FULL,  25000baseSR_Full		),
--	/* 20G */
--	PHY_SETTING(  20000, FULL,  20000baseKR2_Full		),
--	PHY_SETTING(  20000, FULL,  20000baseMLD2_Full		),
--	/* 10G */
--	PHY_SETTING(  10000, FULL,  10000baseCR_Full		),
--	PHY_SETTING(  10000, FULL,  10000baseER_Full		),
--	PHY_SETTING(  10000, FULL,  10000baseKR_Full		),
--	PHY_SETTING(  10000, FULL,  10000baseKX4_Full		),
--	PHY_SETTING(  10000, FULL,  10000baseLR_Full		),
--	PHY_SETTING(  10000, FULL,  10000baseLRM_Full		),
--	PHY_SETTING(  10000, FULL,  10000baseR_FEC		),
--	PHY_SETTING(  10000, FULL,  10000baseSR_Full		),
--	PHY_SETTING(  10000, FULL,  10000baseT_Full		),
--	/* 5G */
--	PHY_SETTING(   5000, FULL,   5000baseT_Full		),
--	/* 2.5G */
--	PHY_SETTING(   2500, FULL,   2500baseT_Full		),
--	PHY_SETTING(   2500, FULL,   2500baseX_Full		),
--	/* 1G */
--	PHY_SETTING(   1000, FULL,   1000baseT_Full		),
--	PHY_SETTING(   1000, HALF,   1000baseT_Half		),
--	PHY_SETTING(   1000, FULL,   1000baseT1_Full		),
--	PHY_SETTING(   1000, FULL,   1000baseX_Full		),
--	PHY_SETTING(   1000, FULL,   1000baseKX_Full		),
--	/* 100M */
--	PHY_SETTING(    100, FULL,    100baseT_Full		),
--	PHY_SETTING(    100, FULL,    100baseT1_Full		),
--	PHY_SETTING(    100, HALF,    100baseT_Half		),
--	PHY_SETTING(    100, HALF,    100baseFX_Half		),
--	PHY_SETTING(    100, FULL,    100baseFX_Full		),
--	/* 10M */
--	PHY_SETTING(     10, FULL,     10baseT_Full		),
--	PHY_SETTING(     10, HALF,     10baseT_Half		),
--	PHY_SETTING(     10, FULL,     10baseT1L_Full		),
--	PHY_SETTING(     10, FULL,     10baseT1S_Full		),
--	PHY_SETTING(     10, HALF,     10baseT1S_Half		),
--	PHY_SETTING(     10, HALF,     10baseT1S_P2MP_Half	),
--	PHY_SETTING(     10, FULL,     10baseT1BRR_Full		),
++static struct {
++	unsigned long mask;
++	int speed;
++	unsigned int duplex;
++	unsigned int caps_bit;
++} phylink_caps_params[] = {
++	{ MAC_400000FD, SPEED_400000, DUPLEX_FULL, BIT(LINK_CAPA_400000FD) },
++	{ MAC_200000FD, SPEED_200000, DUPLEX_FULL, BIT(LINK_CAPA_200000FD) },
++	{ MAC_100000FD, SPEED_100000, DUPLEX_FULL, BIT(LINK_CAPA_100000FD) },
++	{ MAC_56000FD,  SPEED_56000,  DUPLEX_FULL, BIT(LINK_CAPA_56000FD) },
++	{ MAC_50000FD,  SPEED_50000,  DUPLEX_FULL, BIT(LINK_CAPA_50000FD) },
++	{ MAC_40000FD,  SPEED_40000,  DUPLEX_FULL, BIT(LINK_CAPA_40000FD) },
++	{ MAC_25000FD,  SPEED_25000,  DUPLEX_FULL, BIT(LINK_CAPA_25000FD) },
++	{ MAC_20000FD,  SPEED_20000,  DUPLEX_FULL, BIT(LINK_CAPA_20000FD) },
++	{ MAC_10000FD,  SPEED_10000,  DUPLEX_FULL, BIT(LINK_CAPA_10000FD) },
++	{ MAC_5000FD,   SPEED_5000,   DUPLEX_FULL, BIT(LINK_CAPA_5000FD) },
++	{ MAC_2500FD,   SPEED_2500,   DUPLEX_FULL, BIT(LINK_CAPA_2500FD) },
++	{ MAC_1000FD,   SPEED_1000,   DUPLEX_FULL, BIT(LINK_CAPA_1000FD) },
++	{ MAC_1000HD,   SPEED_1000,   DUPLEX_HALF, BIT(LINK_CAPA_1000HD) },
++	{ MAC_100FD,    SPEED_100,    DUPLEX_FULL, BIT(LINK_CAPA_100FD) },
++	{ MAC_100HD,    SPEED_100,    DUPLEX_HALF, BIT(LINK_CAPA_100HD) },
++	{ MAC_10FD,     SPEED_10,     DUPLEX_FULL, BIT(LINK_CAPA_10FD) },
++	{ MAC_10HD,     SPEED_10,     DUPLEX_HALF, BIT(LINK_CAPA_10HD) },
++};
++
+ /**
+  * phylink_caps_to_linkmodes() - Convert capabilities to ethtool link modes
+  * @linkmodes: ethtool linkmode mask (must be already initialised)
+@@ -445,30 +470,6 @@ static void phylink_caps_to_linkmodes(unsigned long *linkmodes,
+ 	}
+ }
+ 
+-static struct {
+-	unsigned long mask;
+-	int speed;
+-	unsigned int duplex;
+-} phylink_caps_params[] = {
+-	{ MAC_400000FD, SPEED_400000, DUPLEX_FULL },
+-	{ MAC_200000FD, SPEED_200000, DUPLEX_FULL },
+-	{ MAC_100000FD, SPEED_100000, DUPLEX_FULL },
+-	{ MAC_56000FD,  SPEED_56000,  DUPLEX_FULL },
+-	{ MAC_50000FD,  SPEED_50000,  DUPLEX_FULL },
+-	{ MAC_40000FD,  SPEED_40000,  DUPLEX_FULL },
+-	{ MAC_25000FD,  SPEED_25000,  DUPLEX_FULL },
+-	{ MAC_20000FD,  SPEED_20000,  DUPLEX_FULL },
+-	{ MAC_10000FD,  SPEED_10000,  DUPLEX_FULL },
+-	{ MAC_5000FD,   SPEED_5000,   DUPLEX_FULL },
+-	{ MAC_2500FD,   SPEED_2500,   DUPLEX_FULL },
+-	{ MAC_1000FD,   SPEED_1000,   DUPLEX_FULL },
+-	{ MAC_1000HD,   SPEED_1000,   DUPLEX_HALF },
+-	{ MAC_100FD,    SPEED_100,    DUPLEX_FULL },
+-	{ MAC_100HD,    SPEED_100,    DUPLEX_HALF },
+-	{ MAC_10FD,     SPEED_10,     DUPLEX_FULL },
+-	{ MAC_10HD,     SPEED_10,     DUPLEX_HALF },
 -};
--#undef PHY_SETTING
--
--/**
-- * phy_lookup_setting - lookup a PHY setting
-- * @speed: speed to match
-- * @duplex: duplex to match
-- * @mask: allowed link modes
-- * @exact: an exact match is required
-- *
-- * Search the settings array for a setting that matches the speed and
-- * duplex, and which is supported.
-- *
-- * If @exact is unset, either an exact match or %NULL for no match will
-- * be returned.
-- *
-- * If @exact is set, an exact match, the fastest supported setting at
-- * or below the specified speed, the slowest supported setting, or if
-- * they all fail, %NULL will be returned.
-- */
--const struct phy_setting *
--phy_lookup_setting(int speed, int duplex, const unsigned long *mask, bool exact)
--{
--	const struct phy_setting *p, *match = NULL, *last = NULL;
--	int i;
--
--	for (i = 0, p = settings; i < ARRAY_SIZE(settings); i++, p++) {
--		if (p->bit < __ETHTOOL_LINK_MODE_MASK_NBITS &&
--		    test_bit(p->bit, mask)) {
--			last = p;
--			if (p->speed == speed && p->duplex == duplex) {
--				/* Exact match for speed and duplex */
--				match = p;
--				break;
--			} else if (!exact) {
--				if (!match && p->speed <= speed)
--					/* Candidate */
--					match = p;
--
--				if (p->speed < speed)
--					break;
--			}
--		}
--	}
--
--	if (!match && !exact)
--		match = last;
--
--	return match;
--}
--EXPORT_SYMBOL_GPL(phy_lookup_setting);
--
- static void __set_phy_supported(struct phy_device *phydev, u32 max_speed)
- {
- 	phy_caps_linkmode_max_speed(max_speed, phydev->supported);
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 5749aad96862..4a59aa7254f4 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -1310,19 +1310,6 @@ const char *phy_rate_matching_to_str(int rate_matching);
- 
- int phy_interface_num_ports(phy_interface_t interface);
- 
--/* A structure for mapping a particular speed and duplex
-- * combination to a particular SUPPORTED and ADVERTISED value
-- */
--struct phy_setting {
--	u32 speed;
--	u8 duplex;
--	u8 bit;
--};
--
--const struct phy_setting *
--phy_lookup_setting(int speed, int duplex, const unsigned long *mask,
--		   bool exact);
 -
  /**
-  * phy_is_started - Convenience function to check whether PHY is started
-  * @phydev: The phy_device struct
+  * phylink_limit_mac_speed - limit the phylink_config to a maximum speed
+  * @config: pointer to a &struct phylink_config
 -- 
 2.48.1
 
