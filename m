@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-170494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B8D9A48DF4
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 02:29:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74562A48DF5
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 02:29:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 44FC71890F6C
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 01:29:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54A523A79BB
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 01:28:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E8C054782;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E111C13D62B;
 	Fri, 28 Feb 2025 01:28:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hBovp95j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CyuvtjOt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E169A42A83;
-	Fri, 28 Feb 2025 01:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD6DE13213E
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 01:28:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740706122; cv=none; b=OEMrrlshu1rR2rczafyfVYpa9UnHmtinHQ/KtL7+E8kZZ2Z73i3YyheOhdxZC33OsjA+EUT/ZmaXFE+56Q57S4UWMi2MfIHQiINN3unBDya9DGr6OSi0oWRNyJG1sNiBmrtMGwf9AkbuTFJL21nuLmtnX/69yk9jBT8tsdfm56k=
+	t=1740706122; cv=none; b=kREgIpszMRgIvhxuK62V1MwGoWg5g2XE2GqGe2oTWVwlCIWIHXbeuqwQgcFPCLPhHpfQlFTUJVp6GbvdNa1qUkb5stUMHMcqembbewE4o+Z52TjEX7OKTQpZ2EjkAhtlCE/JLgghP5VqxJVyUUbJVToUzo+hFI2jcgoMt8u8vgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1740706122; c=relaxed/simple;
-	bh=gL+75XNK+rhXzDnrXbU1NvzPSATq1+PzZn61HvSOuOM=;
+	bh=ySqNFrN7W0kPba9Wmk/Duuo2HQyeqPRFv6LMY5/cArE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ev8UBlxMW77c9o/70QxhatM+CVjuXGYFhmOq+1/U8Qq9HBxIC78+3hz23Ksi4HcMaohyZRRdN+RpXo87/PrScXMCuxmpLxIMxzFYs3s/Uxheju6jp8f6tPm8znJ9cdlIfLr7ivs42CdZTzGD837Uay1PSTeUdFNjWBPy89FSBwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hBovp95j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61660C4CEE7;
-	Fri, 28 Feb 2025 01:28:41 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=I5kp3A6Iir2jamVieb62tcjvrk3aKGfhq6sTOQDs7VDgLUlTsZpDnEKd08DdOrhEaW8ZxG2/70Tw6rTGoxbhgqSg+r9TpUBtREHhEsr9VU1NV0c9Z/neZ1iojEL7E91k9yBxngF7W1dzO/OQr//c48a1Rk8QyNzbqXABqJtrCiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CyuvtjOt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93B74C4CEDD;
+	Fri, 28 Feb 2025 01:28:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740706121;
-	bh=gL+75XNK+rhXzDnrXbU1NvzPSATq1+PzZn61HvSOuOM=;
+	s=k20201202; t=1740706122;
+	bh=ySqNFrN7W0kPba9Wmk/Duuo2HQyeqPRFv6LMY5/cArE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hBovp95jkZ/rzAyW6VMW/XovrVUBHqUgTVGgaAv/JPp05RteBpJygkZupdIrpEZp+
-	 ACVlsQYIhJawcvmvvAQp4DLJmU4113gR015oUoemB0wcw8trbLwcrMELfeTMsnXfzy
-	 V1/qUNYVhxk6rN0a0qijq93Qie9QEdT5dzxipQma/pFJWWGM7j9YnfKjlK4bkPTb6F
-	 EdnleZuo0g6gstU7sT6235nasp2pcXcQSgpXqB5plDMJTaDBLuk82aGoIGu0EaZd37
-	 1oDPefk8qZr9Vmyo+7t9A1efbKKSpX+26HidYlrkNd9pM55OPX7BzRiMj0tawAewp6
-	 G6zyGpClXebqw==
+	b=CyuvtjOtRfktqcIcLr/XfXgx8iVWoO6hs5+BkVT60RqZW/iqnJa47wZ+NuCG1cnn5
+	 PBVUydBTYfzEPvTE1K/fUd0GlYric59DqLL8jfHVBDbYbSyPB6CeoZBgF9nNNjd5eb
+	 gK690gJwhIapyBd3xuRWmp68K0LTPgwLKBUWsFO8edTcNV0TNGlzh+69ITLGxuSfCv
+	 GJ04bDC4yBa7IWErk5RfuBRwW44k2K4LT9i8xkIOsuKzY5L4kuUSRSwKZ1xywN28RG
+	 IaUhm4OUnN+/EWtPJVj0Sh+lp+TkbGbVwfYALx52OEvMq7CtvFkGa6EIjBDgu6S635
+	 5KPyK4Lp9Yg8g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD4B380AACB;
-	Fri, 28 Feb 2025 01:29:14 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EACA2380AACB;
+	Fri, 28 Feb 2025 01:29:15 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,45 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3][next] net/mlx5e: Avoid a hundred
- -Wflex-array-member-not-at-end warnings
+Subject: Re: [PATCH net-next v2 1/2] geneve: Allow users to specify source port
+ range
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174070615348.1621364.6459318760619423212.git-patchwork-notify@kernel.org>
-Date: Fri, 28 Feb 2025 01:29:13 +0000
-References: <Z76HzPW1dFTLOSSy@kspp>
-In-Reply-To: <Z76HzPW1dFTLOSSy@kspp>
-To: Gustavo A. R. Silva <gustavoars@kernel.org>
-Cc: saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
+ <174070615474.1621364.16941794449284060101.git-patchwork-notify@kernel.org>
+Date: Fri, 28 Feb 2025 01:29:14 +0000
+References: <20250226182030.89440-1-daniel@iogearbox.net>
+In-Reply-To: <20250226182030.89440-1-daniel@iogearbox.net>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 26 Feb 2025 13:47:32 +1030 you wrote:
-> -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
-> getting ready to enable it, globally.
-> 
-> So, in this particular case, we create a new `struct mlx5e_umr_wqe_hdr`
-> to enclose the header part of flexible structure `struct mlx5e_umr_wqe`.
-> This is, all the members except the flexible arrays `inline_mtts`,
-> `inline_klms` and `inline_ksms` in the anonymous union. We then replace
-> the header part with `struct mlx5e_umr_wqe_hdr hdr;` in `struct
-> mlx5e_umr_wqe`, and change the type of the object currently causing
-> trouble `umr_wqe` from `struct mlx5e_umr_wqe` to `struct
-> mlx5e_umr_wqe_hdr` --this last bit gets rid of the flex-array-in-the-middle
-> part and avoid the warnings.
+On Wed, 26 Feb 2025 19:20:29 +0100 you wrote:
+> Recently, in case of Cilium, we run into users on Azure who require to use
+> tunneling for east/west traffic due to hitting IPAM API limits for Kubernetes
+> Pods if they would have gone with publicly routable IPs for Pods. In case
+> of tunneling, Cilium supports the option of vxlan or geneve. In order to
+> RSS spread flows among remote CPUs both derive a source port hash via
+> udp_flow_src_port() which takes the inner packet's skb->hash into account.
+> For clusters with many nodes, this can then hit a new limitation [0]: Today,
+> the Azure networking stack supports 1M total flows (500k inbound and 500k
+> outbound) for a VM. [...] Once this limit is hit, other connections are
+> dropped. [...] Each flow is distinguished by a 5-tuple (protocol, local IP
+> address, remote IP address, local port, and remote port) information. [...]
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3,next] net/mlx5e: Avoid a hundred -Wflex-array-member-not-at-end warnings
-    https://git.kernel.org/netdev/net-next/c/bf08fd32cc55
+  - [net-next,v2,1/2] geneve: Allow users to specify source port range
+    https://git.kernel.org/netdev/net-next/c/e1f95b1992b8
+  - [net-next,v2,2/2] geneve, specs: Add port range to rt_link specification
+    https://git.kernel.org/netdev/net-next/c/5a41a00cd5d5
 
 You are awesome, thank you!
 -- 
