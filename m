@@ -1,126 +1,92 @@
-Return-Path: <netdev+bounces-170823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3102A4A107
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 19:00:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 84F46A4A117
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 19:05:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D4463B29BA
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 18:00:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B7233A567E
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 18:05:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 238281F09AB;
-	Fri, 28 Feb 2025 18:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AD4426E140;
+	Fri, 28 Feb 2025 18:05:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sWJfdFCk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z1lSUyrC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED05C1F09B8;
-	Fri, 28 Feb 2025 18:00:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F54C26B0A1;
+	Fri, 28 Feb 2025 18:05:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740765611; cv=none; b=tTn3qvfzD7/7pvwRCEOUo6X2HNez9Zc0bt1MQYKxZcdoHMYlnsWVgdAJXvK9gfKkBArb6WbgCzzDXkmGqTqp+3M3t9of5ND+F7sJcej/6Qxlfd+UT3MJ8J9Cw5M0hrMInqIZTHaB662sjFD6856XxX3ePXrpCXIPEdnFQIZabaE=
+	t=1740765902; cv=none; b=i5CfGDRrRztHCkIhFQzqUxTeXeygWbqvWXIGoJy/cvZrrL8tQULELhQXbpPSnQRFZceXSvba0o6isxmbLgKhu6gTTRTEsgOwlQGoFtS5aHNH7vv9oBBfTfFaiLCVmHhMewRUVxeT3jcsbvlu0uwzgR8FVLdVlKNEjZNRR6v+TXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740765611; c=relaxed/simple;
-	bh=LNGek2KEOoXjwsDtMm0drAz/BTi7FE9zL0fgU5scCuc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VJS9E379aGmWHKcYrSTkblV4VEzM6v76dk5vo/CgEVOBN9r6zuYsXRisibZXCMAWZZ2OstcvWXmX8tm3nfJ1kojJXVrr9QEIOc3acy+wI1Qyk0szvcnTPgsNo3aLQ75zVq2JLmMjYNYecXxh6Pg3Y1Euam9dWwUdibfHXXW539E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sWJfdFCk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17211C4CED6;
-	Fri, 28 Feb 2025 18:00:09 +0000 (UTC)
+	s=arc-20240116; t=1740765902; c=relaxed/simple;
+	bh=ucBMCvlh2p5U+bYBr7YBt6icBbitc8jZM304oKBG//k=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lyrwQ60xFJrT56Olc7LaJiN+w6fLjxP2y8w0Q5PDzk6CMw2a2NW6PJkL0DE1OOgT44+tq2ASQvGwm6WBbpUWzvN8fj6SpwQUyp4P79nWqmvY7XqVO5k6uVHUaHYroN8ew7q/fp9f0j2VmOJm4nnu9eJxKKmB3wYNSTrzlXA8Kg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z1lSUyrC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 723BEC4CED6;
+	Fri, 28 Feb 2025 18:05:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740765609;
-	bh=LNGek2KEOoXjwsDtMm0drAz/BTi7FE9zL0fgU5scCuc=;
-	h=From:To:Cc:Subject:Date:From;
-	b=sWJfdFCkuLChzaVVG2Q3xH+36H2Tzb90t2gwSQ6bQ4CRaC74cU8ZtkLyjol2ROJgs
-	 wzMgK/URjcxHzzcqYTcyLk9j6jjXuwiLRpI84ngHIEvuqnBVTyw03fIdIdbZdweVV2
-	 8kkn8d3b3LWzCYkX/mF56DXw1p5qJTEvBmEhNjK6/W8RAQ6k4H6fi5AhpxJxPTm5Jr
-	 sL269Zlw5+jF1vSGO7E1OkbKyvlf1ZRLvYGXynlSiC14B77EUv1BfVxvUq0cmp7NGq
-	 jkpjSTMrOAIUGHSz3IJh3htt8p0teRBnOWYe8CGPkgNQgwsKwvi7ANHfvJmYOEo/wC
-	 YZj8NS3irHYTw==
+	s=k20201202; t=1740765901;
+	bh=ucBMCvlh2p5U+bYBr7YBt6icBbitc8jZM304oKBG//k=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Z1lSUyrCtRsDQBmpUweu9a8AyirOHuvXb+GJvN3kaWdPO+D/8idHtDHP/k/aF2sjn
+	 2LRc9zm/fPFpM7MCiPsbft5ez4L9lt5P12hHvy0RWS14mPJSsNMYEAc/xpBiGi3Okk
+	 2TQmETG2j7URruxb3XyiI20xSaG/+9GmUW2TKOt8FssYTa5L/9rV60Ourfjta46GIT
+	 etOWKs4QrplvzBXyoN52mmi0VZYmZZ8aK1ebGqHBXGalPseirPjtxuMFW2xrACRnJ3
+	 2kXQlyex178NWHCjSXtihdZj9R4ez4FQJcAIV2NBPI/fIPLtCG4OaLegg5wKVYclK+
+	 XVLoEKb/LpAGA==
+Date: Fri, 28 Feb 2025 10:05:00 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	petrm@nvidia.com,
-	matttbe@kernel.org,
-	willemb@google.com,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next] selftests: net: report output format as TAP 13 in Python tests
-Date: Fri, 28 Feb 2025 10:00:07 -0800
-Message-ID: <20250228180007.83325-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.48.1
+To: Danny Lin <danny@orbstack.dev>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] net: fully namespace net.core.{r,w}mem_{default,max}
+ sysctls
+Message-ID: <20250228100500.4ed52499@kernel.org>
+In-Reply-To: <20250228083025.10322-1-danny@orbstack.dev>
+References: <20250228083025.10322-1-danny@orbstack.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The Python lib based tests report that they are producing
-"KTAP version 1", but really we aren't making use of any
-KTAP features, like subtests. Our output is plain TAP.
+On Fri, 28 Feb 2025 00:19:41 -0800 Danny Lin wrote:
+> This builds on commit 19249c0724f2 ("net: make net.core.{r,w}mem_{default,max} namespaced")
+> by adding support for writing the sysctls from within net namespaces,
+> rather than only reading the values that were set in init_net. These are
+> relatively commonly-used sysctls, so programs may try to set them without
+> knowing that they're in a container. It can be surprising for such attempts
+> to fail with EACCES.
+> 
+> Unlike other net sysctls that were converted to namespaced ones, many
+> systems have a sysctl.conf (or other configs) that globally write to
+> net.core.rmem_default on boot and expect the value to propagate to
+> containers, and programs running in containers may depend on the increased
+> buffer sizes in order to work properly. This means that namespacing the
+> sysctls and using the kernel default values in each new netns would break
+> existing workloads.
+> 
+> As a compromise, inherit the initial net.core.*mem_* values from the
+> current process' netns when creating a new netns. This is not standard
+> behavior for most netns sysctls, but it avoids breaking existing workloads.
 
-Report TAP 13 instead of KTAP 1, this is what mptcp tests do,
-and what NIPA knows how to parse best. For HW testing we need
-precise subtest result tracking.
+You need to update:
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: shuah@kernel.org
-CC: petrm@nvidia.com
-CC: matttbe@kernel.org
-CC: willemb@google.com
-CC: linux-kselftest@vger.kernel.org
----
- tools/testing/selftests/drivers/net/README.rst | 4 ++--
- tools/testing/selftests/net/lib/py/ksft.py     | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ tools/testing/selftests/net/netns-sysctl.sh
 
-diff --git a/tools/testing/selftests/drivers/net/README.rst b/tools/testing/selftests/drivers/net/README.rst
-index 3b6a29e6564b..eb838ae94844 100644
---- a/tools/testing/selftests/drivers/net/README.rst
-+++ b/tools/testing/selftests/drivers/net/README.rst
-@@ -107,7 +107,7 @@ Example
-   1..1
-   # timeout set to 45
-   # selftests: drivers/net: ping.py
--  # KTAP version 1
-+  # TAP version 13
-   # 1..3
-   # ok 1 ping.test_v4
-   # ok 2 ping.test_v6
-@@ -128,7 +128,7 @@ Example
- Run the test::
- 
-   [/root] # ./ksft-net-drv/drivers/net/ping.py
--  KTAP version 1
-+  TAP version 13
-   1..3
-   ok 1 ping.test_v4
-   ok 2 ping.test_v6 # SKIP Test requires IPv6 connectivity
-diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/selftests/net/lib/py/ksft.py
-index fd23349fa8ca..3cfad0fd4570 100644
---- a/tools/testing/selftests/net/lib/py/ksft.py
-+++ b/tools/testing/selftests/net/lib/py/ksft.py
-@@ -207,7 +207,7 @@ KSFT_DISRUPTIVE = True
- 
-     totals = {"pass": 0, "fail": 0, "skip": 0, "xfail": 0}
- 
--    print("KTAP version 1")
-+    print("TAP version 13")
-     print("1.." + str(len(cases)))
- 
-     global KSFT_RESULT
+and please CC Matteo on the next revision.
 -- 
-2.48.1
-
+pw-bot: cr
 
