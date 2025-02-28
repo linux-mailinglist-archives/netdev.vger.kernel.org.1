@@ -1,163 +1,209 @@
-Return-Path: <netdev+bounces-170604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A44C6A4940F
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 09:53:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E279A4942E
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 09:58:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E7013AF7FB
-	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 08:53:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BF5B16A932
+	for <lists+netdev@lfdr.de>; Fri, 28 Feb 2025 08:58:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7BF3254843;
-	Fri, 28 Feb 2025 08:53:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1A1B254861;
+	Fri, 28 Feb 2025 08:58:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NDD4dzVT"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 576F624FC08
-	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 08:53:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC151EDA2F
+	for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 08:58:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740732797; cv=none; b=mRcxBtaFcF5LxVhMXvFETbdDT8GA2Epf5017R9pQsSjxvgseMlUKHvUQcq0c/keQcHd/EjVbtsVL+jacgl8/QSfhH0+UiCp4uyAUEydzYWfJ2BbU7NGuyqMXj8sEvEtYtMbHJbk4nshpMuLLWg9+wA9maDVhJSXSUNAAL5fn7ew=
+	t=1740733133; cv=none; b=UsViuDfhNaiM1xQEEeII+ClfID7xC9H4JYrkBESd9m28LEVjT8ZsZfVy3B7UF4WwuZPhv7Wa84/4O9jLn6F4Rr8kWr+KcXLevyx8HCME/LL0KtrT8zDvUnBnXQaYHHhpUI5RfYt8VbgwndlHXnQa7ymvgZoiuL3k6ygvC+0m5Lg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740732797; c=relaxed/simple;
-	bh=qNe0LEGqpQQi8GIgH/wydL5K/ZSIvkZpuYesUP7jE8M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HBb83HGph5F0U8RP96ev85sfbmMjmeKGqJOz8brdU4ROQ7OSayyz16pas4Vblzg3F8xLnuZlTqcsWeSZAr7o5Qfi5Ht4sVnVggGFThJa7ZTzapzeV9nQVJjZmA0HyGKJFnGHtWQiD+D+n+jlQBSg6AKFR2ucnTKe/gFENl0iwiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tnw6m-0005fo-VB; Fri, 28 Feb 2025 09:52:36 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tnw6j-003GS3-27;
-	Fri, 28 Feb 2025 09:52:33 +0100
-Received: from pengutronix.de (p5b164285.dip0.t-ipconnect.de [91.22.66.133])
+	s=arc-20240116; t=1740733133; c=relaxed/simple;
+	bh=x0EkCU92Bz5vmrQHTWr3vyy9G6YHsz+fRat5JGXvLz4=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=G6MZX7PpmrXb40POwMqtI5EnDd59YJ68lw5qiVH2/NwXV5tpAjcDlVRQKUbrc5iL6mypK1O5KbL01+w5uqmbdAPrtntZMDvQ/38HyWSRm1R4303HKsYx8XdwsrTHpH6pR2G4+bqrbxjZxT4WeI4HHqieq5U2Ufrw6cVHnNFYZ0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NDD4dzVT; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740733130;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=hE/sVX5Vtj7I8hYQusRqxR4bCYSDWhvjZ0GyV0zAlME=;
+	b=NDD4dzVTsAnYyWI1doYfhu9lvfgwRYSnLvReDkQyAtiHjd/BG5MX4zaDcLMzXO0N5djl+t
+	3W9Ei2deoisSx8M6JOehKpixabap01x/jfL0ZMD6k7JopTwdiimxi+1Z1b6sA0DwlgWX5v
+	a3zlm0eyrjGUGdEnhoH6W5ayXksCTjU=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-421-r9pyO6UMO5qwEvIKogFU9A-1; Fri,
+ 28 Feb 2025 03:58:46 -0500
+X-MC-Unique: r9pyO6UMO5qwEvIKogFU9A-1
+X-Mimecast-MFC-AGG-ID: r9pyO6UMO5qwEvIKogFU9A_1740733125
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 28E693CDF52;
-	Fri, 28 Feb 2025 08:52:33 +0000 (UTC)
-Date: Fri, 28 Feb 2025 09:52:31 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Ming Yu <a0282524688@gmail.com>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
-	brgl@bgdev.pl, andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org, 
-	linux-usb@vger.kernel.org
-Subject: Re: [PATCH v8 1/7] mfd: Add core driver for Nuvoton NCT6694
-Message-ID: <20250228-married-bullfrog-of-reading-89042b-mkl@pengutronix.de>
-References: <20250225081644.3524915-1-a0282524688@gmail.com>
- <20250225081644.3524915-2-a0282524688@gmail.com>
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 23EBC1800877;
+	Fri, 28 Feb 2025 08:58:45 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.32.200])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5C9071955BCB;
+	Fri, 28 Feb 2025 08:58:41 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <brauner@kernel.org>
+cc: David Howells <dhowells@redhat.com>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Jakub Kicinski <kuba@kernel.org>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+    linux-afs@lists.infradead.org, linux-fsdevel@lists.infradead.org,
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [GIT PULL] afs, rxrpc: Clean up refcounting on afs_cell and afs_server records
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="thau7tfhkoq4fek3"
-Content-Disposition: inline
-In-Reply-To: <20250225081644.3524915-2-a0282524688@gmail.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-
-
---thau7tfhkoq4fek3
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3190715.1740733119.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v8 1/7] mfd: Add core driver for Nuvoton NCT6694
-MIME-Version: 1.0
+Date: Fri, 28 Feb 2025 08:58:39 +0000
+Message-ID: <3190716.1740733119@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On 25.02.2025 16:16:38, Ming Yu wrote:
+Hi Christian,
 
-[...]
+Could you pull this into the VFS tree onto a stable branch?  The patches
+were previously posted here as part of a longer series:
 
-> +static int nct6694_usb_probe(struct usb_interface *iface,
-> +			     const struct usb_device_id *id)
-> +{
-> +	struct usb_device *udev =3D interface_to_usbdev(iface);
-> +	struct usb_endpoint_descriptor *int_endpoint;
-> +	struct usb_host_interface *interface;
-> +	struct device *dev =3D &iface->dev;
-> +	struct nct6694 *nct6694;
-> +	int pipe, maxp;
-> +	int ret;
-> +
-> +	nct6694 =3D devm_kzalloc(dev, sizeof(*nct6694), GFP_KERNEL);
-> +	if (!nct6694)
-> +		return -ENOMEM;
-> +
-> +	pipe =3D usb_rcvintpipe(udev, NCT6694_INT_IN_EP);
-> +	maxp =3D usb_maxpacket(udev, pipe);
-> +
-> +	nct6694->usb_msg =3D devm_kzalloc(dev, sizeof(union nct6694_usb_msg), G=
-FP_KERNEL);
-> +	if (!nct6694->usb_msg)
-> +		return -ENOMEM;
-> +
-> +	nct6694->int_buffer =3D devm_kzalloc(dev, maxp, GFP_KERNEL);
-> +	if (!nct6694->int_buffer)
-> +		return -ENOMEM;
-> +
-> +	nct6694->int_in_urb =3D usb_alloc_urb(0, GFP_KERNEL);
-> +	if (!nct6694->int_in_urb)
-> +		return -ENOMEM;
-> +
-> +	nct6694->domain =3D irq_domain_add_simple(NULL, NCT6694_NR_IRQS, 0,
-> +						&nct6694_irq_domain_ops,
-> +						nct6694);
-> +	if (!nct6694->domain) {
-> +		ret =3D -ENODEV;
-> +		goto err_urb;
-> +	}
-> +
-> +	nct6694->dev =3D dev;
-> +	nct6694->udev =3D udev;
-> +	nct6694->timeout =3D NCT6694_URB_TIMEOUT;	/* Wait until URB completes */
+  https://lore.kernel.org/r/20250224234154.2014840-1-dhowells@redhat.com/
 
-Why do you need this variable? You can directly use NCT6694_URB_TIMEOUT
-in the usb_bulk_msg() and friends calls.
+The first five patches are fixes that have gone through the net tree to
+Linus and hence this patchset is based on the latest merge by Linus and
+I've dropped those from my branch.
 
-regards,
-Marc
+This fixes an occasional hang that's only really encountered when rmmod'in=
+g
+the kafs module, one of the reasons why I'm proposing it for the next merg=
+e
+window rather than immediate upstreaming.  The changes include:
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+ (1) Remove the "-o autocell" mount option.  This is obsolete with the
+     dynamic root and removing it makes the next patch slightly easier.
 
---thau7tfhkoq4fek3
-Content-Type: application/pgp-signature; name="signature.asc"
+ (2) Change how the dynamic root mount is constructed.  Currently, the roo=
+t
+     directory is (de)populated when it is (un)mounted if there are cells
+     already configured and, further, pairs of automount points have to be
+     created/removed each time a cell is added/deleted.
 
------BEGIN PGP SIGNATURE-----
+     This is changed so that readdir on the root dir lists all the known
+     cell automount pairs plus the @cell symlinks and the inodes and
+     dentries are constructed by lookup on demand.  This simplifies the
+     cell management code.
 
-iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmfBeUwACgkQDHRl3/mQ
-kZwj8Qf/ZqqBAFXxAYb+Ol2EYuIUSztYKNYnXALK+Hmv/b3tCAl+WuYuPRuK3nal
-tYrpJPUVfYcm7WGux3J3oGKiRAZDaOMCPHitSwdEscltvot8zwcA0hHcKqL7Itij
-Qu5x/rzaoPfQAc7vMQ1EFTQZRJEtrQUP2xe4c4tH+bSDbG0rWNy7I824ATNnl8mi
-UlFsGcRv6QZB0DtF7LX4qme7Ufm2+Io91ImVCkN19DH2Q3yW6rjTyQwEs9ZNBsgj
-X9rbbaIqxYYtkYD+4oJ0wC6OqIBhyuzTJvOWp8WOUb3rjgCuELkVrST4Jz86u/oy
-/+qVxFkZP/3CWH8ORdrd3TAfXxZSUQ==
-=5Ywe
------END PGP SIGNATURE-----
+ (3) A few improvements to the afs_volume tracepoint.
 
---thau7tfhkoq4fek3--
+ (4) A few improvements to the afs_server tracepoint.
+
+ (5) Pass trace info into the afs_lookup_cell() function to allow the trac=
+e
+     log to indicate the purpose of the lookup.
+
+ (6) Remove the 'net' parameter from afs_unuse_cell() as it's superfluous.
+
+ (7) In rxrpc, allow a kernel app (such as kafs) to store a word of
+     information on rxrpc_peer records.
+
+ (8) Use the information stored on the rxrpc_peer record to point to the
+     afs_server record.  This allows the server address lookup to be done
+     away with.
+
+ (9) Simplify the afs_server ref/activity accounting to make each one
+     self-contained and not garbage collected from the cell management wor=
+k
+     item.
+
+(10) Simplify the afs_cell ref/activity accounting to make each one of
+     these also self-contained and not driven by a central management work
+     item.
+
+     The current code was intended to make it such that a single timer for
+     the namespace and one work item per cell could do all the work
+     required to maintain these records.  This, however, made for some
+     sequencing problems when cleaning up these records.  Further, the
+     attempt to pass refs along with timers and work items made getting it
+     right rather tricky when the timer or work item already had a ref
+     attached and now a ref had to be got rid of.
+
+Thanks,
+David
+---
+The following changes since commit 1e15510b71c99c6e49134d756df91069f7d1814=
+1:
+
+  Merge tag 'net-6.14-rc5' of git://git.kernel.org/pub/scm/linux/kernel/gi=
+t/netdev/net (2025-02-27 09:32:42 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags=
+/afs-next-20250228
+
+for you to fetch changes up to 96269ca2db2dffe40253877f3f615e5ce6d3cbcd:
+
+  afs: Simplify cell record handling (2025-02-28 08:41:25 +0000)
+
+----------------------------------------------------------------
+afs: Fix ref leak in rmmod
+
+----------------------------------------------------------------
+David Howells (10):
+      afs: Remove the "autocell" mount option
+      afs: Change dynroot to create contents on demand
+      afs: Improve afs_volume tracing to display a debug ID
+      afs: Improve server refcount/active count tracing
+      afs: Make afs_lookup_cell() take a trace note
+      afs: Drop the net parameter from afs_unuse_cell()
+      rxrpc: Allow the app to store private data on peer structs
+      afs: Use the per-peer app data provided by rxrpc
+      afs: Fix afs_server ref accounting
+      afs: Simplify cell record handling
+
+ fs/afs/addr_list.c         |  50 ++++
+ fs/afs/cell.c              | 436 ++++++++++++++------------------
+ fs/afs/cmservice.c         |  82 +------
+ fs/afs/dir.c               |   5 +-
+ fs/afs/dynroot.c           | 484 +++++++++++++++---------------------
+ fs/afs/fs_probe.c          |  32 ++-
+ fs/afs/fsclient.c          |   4 +-
+ fs/afs/internal.h          |  98 ++++----
+ fs/afs/main.c              |  16 +-
+ fs/afs/mntpt.c             |   5 +-
+ fs/afs/proc.c              |  15 +-
+ fs/afs/rxrpc.c             |   8 +-
+ fs/afs/server.c            | 601 +++++++++++++++++++---------------------=
+-----
+ fs/afs/server_list.c       |   6 +-
+ fs/afs/super.c             |  25 +-
+ fs/afs/vl_alias.c          |   7 +-
+ fs/afs/vl_rotate.c         |   2 +-
+ fs/afs/volume.c            |  15 +-
+ include/net/af_rxrpc.h     |   2 +
+ include/trace/events/afs.h |  83 ++++---
+ net/rxrpc/ar-internal.h    |   1 +
+ net/rxrpc/peer_object.c    |  30 ++-
+ 22 files changed, 903 insertions(+), 1104 deletions(-)
+
 
