@@ -1,102 +1,115 @@
-Return-Path: <netdev+bounces-170959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EB41A4AD99
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 21:04:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B8F1A4ADC1
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 21:14:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DA1E3A982D
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 20:04:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5F0D3B0BA9
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 20:14:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB0F61DED49;
-	Sat,  1 Mar 2025 20:04:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6815B1E766E;
+	Sat,  1 Mar 2025 20:14:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="L3EtfVwx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FsGxBWRT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47EE31B6CE4
-	for <netdev@vger.kernel.org>; Sat,  1 Mar 2025 20:04:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE6821C3BE9
+	for <netdev@vger.kernel.org>; Sat,  1 Mar 2025 20:14:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740859474; cv=none; b=D/cBya1uJoq0csjjGYSk1mIIp2iZddtJxLNDhIC9OmCzbm0FIsUCfts15xQ48AWsrzmGZQAG/X/Np8I9aa5HVCAZI+tWJHq8duQe4j6uwPpmYBXaYtezZd/JsbxW3SSKWHQ6gMIwZcUdmLjQ47NmfvFavtzRs+TvtWG1UOr0WMI=
+	t=1740860069; cv=none; b=SxvzVGbsdsC8OsJQxe0oS4qSejv+SuSn9FvxEvENtKJ9KpMRy59SyRy4MiTDGuqMacJ3rTBFszdfTJpeOJz8QP2swbmPKf59VrEKfe3JvB4PVGiXdaHI5IOt4A0fo5Stg3e2vtQEtt7THkoj/LFAtNwZjtyRhooEEKFq63g14ow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740859474; c=relaxed/simple;
-	bh=SV9+QaJFu0EN8P0+o2WrwdM6ZgnSHNyIq5I2YTmzd34=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g1NgTbDaO4rmiz+L2KEpnjnl5UhotivH9d7G7IHzief2TP0Er1hgnwjR7p+Tqi3pbLezUw4vA+uACzIozIDhwzIz5jrn2ldW2fu7sGY0QM9E65KOzyaBZgO6sHNbDA9iG6u3pAg3D3gQJjOeezjfRudB038HzJRf5QZ107q3q3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=L3EtfVwx; arc=none smtp.client-ip=209.85.160.173
+	s=arc-20240116; t=1740860069; c=relaxed/simple;
+	bh=TvY2nUWvxWiCUZ+HqFp/8DINzTFv4g2BLuW2qLcLth4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=L9y825MPl463lV0ouu16Rw/iXZEVIiyCtspizouYF7+pe/JPYeDUhf6ONPOOZ4/FxDQE1cYMp8/k9Tt/AlWi3ntcKhatR/tK2Y2+cIn/SS4TSqFF6JjvSFXktx5USdVQrgRp8/WodVe/SFLiDM9Eti2tGz8EY3L+oi+mfh1FZnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FsGxBWRT; arc=none smtp.client-ip=209.85.160.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-472003f8c47so29882721cf.1
-        for <netdev@vger.kernel.org>; Sat, 01 Mar 2025 12:04:32 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-471fc73b941so95432651cf.1
+        for <netdev@vger.kernel.org>; Sat, 01 Mar 2025 12:14:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740859472; x=1741464272; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KviZHRnG5Iw9a9IYsWKRokcC2ICNIVORYihnsdKCC0k=;
-        b=L3EtfVwxNKiNuWlnGI0UuPyzwuKMh2hziMvNIwOJqXSZ+JUlMDFrKq0iAfdFI4rJvp
-         oLawotRK8cXcPGwCAbSNA8lQaWEpkfq608zet35FNmjJ/C0XcMqaW3kxzmEsx4LW4EaQ
-         2ZJVZjx8PS0wy61ri/E4V9VNGan6yQVyz9frOi1q54nEMpbuG+Jlh4tP+q6NpiAX/3cU
-         RX925iGCLlRAhGm3KeAG64uvRSrYk2Sk7rtKiT1ESIzNm8VO/tR4l7irMeo7h6Fb9KLF
-         q4fdT2Omc1gidWysAQzngq6yxy7HoDrH2zFVjbhnw8YbWvsWAxebFeTBdOtKpHGZi/VT
-         rStw==
+        d=google.com; s=20230601; t=1740860067; x=1741464867; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=lB/LArvGHpuZUIYZf5b6fGU7II7mfdDl1/EvjKY8pfY=;
+        b=FsGxBWRTkLq+Phdhjmz5stDGX2w6A9rZZHxuYeY3giQh2lv3diGQxOYnqXRqSkPmoE
+         V7bu7nxkxf8IOOlgzl84+sydcpChVXsLdGt2Tjs75Zd6/vMwoPNjHjWCZhLOeAg07x7q
+         IRz/I8havG6nkN8rYit4yRjwAMP/+dYRE4J0yMC1iHdyrk3Y/PEgDA095PhUkIA+i6HK
+         N4wCoPSoFzQmg20w4rzDOY9tCL3VWDIElcLb/tsG7nITahKgCGkUKiGFUNFHfhcjMF9g
+         eyajsQwcNdeGWZnSE3Z/tPywddiJ+6gfFHPYLnPonhBi1PpL/Og9W0Bfk1DNXnngReVn
+         n01g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740859472; x=1741464272;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KviZHRnG5Iw9a9IYsWKRokcC2ICNIVORYihnsdKCC0k=;
-        b=vPvUjHZdHZRtiemHatdNJm+q+6hSbr6aEP7900SzBkq49Tg0L/ps5TQL21qSJcjxXc
-         hJ12bZHxBaSevE5g7LsJ3BkcZDTvcwYztGuGqPA7GbDv0uEev3uhzy43k8JrBJUmU77q
-         MElk3saUqGiR4Cwco0BqidhgVdBc7XqsYAAimfK5C473WxubaHyTJSgsIaVLYw1BH6sN
-         Pd1G3WVT6djCGYvsfWhAnqlIDyVCWZVRAk9yLUJxFTzkRhPbOP1QpA/Q1uUEuvojhVsF
-         L+gM1nJtR9+Mxl+dczQCsRep0VvTtMicUdoWMRqDxBs75CvKMv77Px9VOgsxQzQncRcF
-         kjxw==
-X-Forwarded-Encrypted: i=1; AJvYcCXsMF5KVXpuLaJkF6ixdH0MK/yQCTfSgYUr1H2sYd6S0S2FAfgGKS6+EKuF2bfQwcy9xfuXkrI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoKcIq2X6+hojaygxhUyh4WOKGWGQ3cTc1b//G3FTCvUBySFtp
-	H8/gv400AKhii8QVncGb8P4D1bCZNk2UWgBaO7q2QDK1Y1DNxK5q3kaj/faHOTXdsBhJOnt+deB
-	rXxUFgOq5vRhBz7T0kfjlOmQyCZ3Gb/t1C/pl
-X-Gm-Gg: ASbGncthgyW9tMw+UdZo5EJKCNHc+hWStFdk32VkT/5opNlL/+zAUvrRfFeoVIqIypL
-	Ozwx1HMI1U2EPKY/ueBD7qiNYD5ASEQ5E/Ejzm8h0/zbNegn42KXdsv5RI7Saja5HC6c+QjBgwa
-	E7Tx4eKZPKEguCAVA256PQ5CKMSP4=
-X-Google-Smtp-Source: AGHT+IFQWWja2NkPTm83Q4ruayfvx2hZIyG2SbvbIrktnsXf8bdKGOc3XrJ7jAQS3yyL0QE2DtxbEfytBmhJQRbQ61A=
-X-Received: by 2002:a05:622a:3d4:b0:468:f858:6662 with SMTP id
- d75a77b69052e-473d8f9cb3fmr175435081cf.10.1740859471837; Sat, 01 Mar 2025
- 12:04:31 -0800 (PST)
+        d=1e100.net; s=20230601; t=1740860067; x=1741464867;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lB/LArvGHpuZUIYZf5b6fGU7II7mfdDl1/EvjKY8pfY=;
+        b=wWJG9Vd2GkQDUEpHb6P4wFrrzNxHPQ5t+8gfp7rjYp2kRK63IXATF1O45xsAHF7Tet
+         haPneV9kJ17/QRAtT7Cjt9oDDUyJnEXPJiVml2WDMyz2OpooKsh2UiyOgxcVGLNi4kfl
+         G2eIp5hcsPmgzLMR5WSKqNeiVBhxCmulQxVrg2m16V3yH84yS5MYopB9PYlfha4WXZx5
+         5vK6WBENR0JGtyDTMlX7/GCVVzQDJD7fKKq+J5a9s2tOUelMBFCpyvXYoqBY5cu3r9hD
+         XS7lhwOgEJ0pj9I94pmz2wJKve9z6RXgVg4jOyRdjd12EKfqJ6W6x0ex8HfMct9yEAcU
+         V3qQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV9KcAmCaIyT9W9G7RZsAsLEMQB89yuy+ph1Z4p/3MeajrQN7mFYwq07oPasvWD+UugeieBOIY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPQE6Xrh6go1fARbDel6rmqNWeip0ODQo+7s73T0Xw9vXO50SM
+	94KrolqRP+dQwjL2m1d6lGnevt5iMC0kiBhoJ7eQz2Xiwwa2jg09AwEKKiUenutZTRJyJark/I1
+	wYTyCs7EDeA==
+X-Google-Smtp-Source: AGHT+IHmahwmsW0YknXmM3S7MVbZmbBUE80eCM0fGI8Lh+6YP4lr+11lYrhlDqzfYlpCiozhQBna4KBfBvxR4g==
+X-Received: from qtbew4.prod.google.com ([2002:a05:622a:5144:b0:472:b5:a08a])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:ac8:594d:0:b0:472:13f8:a97c with SMTP id d75a77b69052e-474bc047442mr140981661cf.3.1740860066539;
+ Sat, 01 Mar 2025 12:14:26 -0800 (PST)
+Date: Sat,  1 Mar 2025 20:14:18 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250228132248.25899-1-edumazet@google.com> <20250228132248.25899-3-edumazet@google.com>
- <20250228142816.3077420d@kernel.org>
-In-Reply-To: <20250228142816.3077420d@kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
+Message-ID: <20250301201424.2046477-1-edumazet@google.com>
+Subject: [PATCH v2 net-next 0/6] tcp: misc changes
 From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 1 Mar 2025 21:04:20 +0100
-X-Gm-Features: AQ5f1JqmVIV4mpo9VT_qkD8XyhK2D-p26sqmAYrvzBUi_M3_efP_hbzogThkI6I
-Message-ID: <CANn89i+CSGY4Cp-c0q5wT7kHa-Vn2oO8EVUgHf4o3gr6sW_YZg@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/6] tcp: add four drop reasons to tcp_check_req()
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 28, 2025 at 11:28=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Fri, 28 Feb 2025 13:22:44 +0000 Eric Dumazet wrote:
-> > +     /** @SKB_DROP_TCP_REASON_LISTEN_OVERFLOW: listener queue full. */
-> > +          SKB_DROP_REASON_TCP_LISTEN_OVERFLOW,
->
-> nit: TCP_REASON vs REASON_TCP
+Minor changes, following recent changes in TCP stack.
 
-Oops, thanks !
+v2: typo for SKB_DROP_REASON_TCP_LISTEN_OVERFLOW kdoc (Jakub)
+
+Eric Dumazet (6):
+  tcp: add a drop_reason pointer to tcp_check_req()
+  tcp: add four drop reasons to tcp_check_req()
+  tcp: convert to dev_net_rcu()
+  net: gro: convert four dev_net() calls
+  tcp: remove READ_ONCE(req->ts_recent)
+  tcp: tcp_set_window_clamp() cleanup
+
+ include/net/dropreason-core.h  |  9 +++++++++
+ include/net/inet6_hashtables.h |  2 +-
+ include/net/inet_hashtables.h  |  2 +-
+ include/net/tcp.h              |  2 +-
+ net/ipv4/tcp.c                 | 36 +++++++++++++++++-----------------
+ net/ipv4/tcp_input.c           |  5 ++---
+ net/ipv4/tcp_ipv4.c            | 17 ++++++++--------
+ net/ipv4/tcp_metrics.c         |  6 +++---
+ net/ipv4/tcp_minisocks.c       | 17 +++++++++++-----
+ net/ipv4/tcp_offload.c         |  2 +-
+ net/ipv4/tcp_output.c          |  2 +-
+ net/ipv4/udp_offload.c         |  2 +-
+ net/ipv6/tcp_ipv6.c            | 27 +++++++++++++------------
+ net/ipv6/tcpv6_offload.c       |  2 +-
+ net/ipv6/udp_offload.c         |  2 +-
+ 15 files changed, 75 insertions(+), 58 deletions(-)
+
+-- 
+2.48.1.711.g2feabab25a-goog
+
 
