@@ -1,81 +1,123 @@
-Return-Path: <netdev+bounces-170889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62A2BA4A6EC
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 01:21:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB453A4A6F6
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 01:26:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7207F16AF8F
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 00:21:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDB9A3A4DD5
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 00:26:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A6AC63A9;
-	Sat,  1 Mar 2025 00:21:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A3CF79C8;
+	Sat,  1 Mar 2025 00:26:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I40fBvO0"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="gpv7V+AI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76DFC4C98
-	for <netdev@vger.kernel.org>; Sat,  1 Mar 2025 00:21:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAB7014A82
+	for <netdev@vger.kernel.org>; Sat,  1 Mar 2025 00:26:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740788510; cv=none; b=kaDsqdr43Phvu1Xf0OTFbVf6AF4SZpDclSsTEM+u02P2dhEVeby2EZFc99SZ+hzyzJG6rUZ4HB6opqRytAvmUzBaLPkTWHuqYVfmwH29HKiq1wqoKbFleYSDPpE52kBzu8cQCBy6Lg4erxyczWa1ZuixWlfcNDOUlR1csxhVLAc=
+	t=1740788768; cv=none; b=rCFSeuY9kfotdx26sa9xZNb3ifwRbhCrPsz02cWezo5+LT/T7kzhCDOVvDPIPEDgc1V9DZCZmeFgNWjS8CbOMkiTZOpfLH2qwxhsRLNBoxpYofZXlaSKXbk8LKW+FCShWDneciEOImFcZETQTY0b2Ok7z/t6tkvqwpu0LybBSGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740788510; c=relaxed/simple;
-	bh=aL/I8rHhO3fQ39gXZRKzRS9OTuR5y6q1r0Nfj7Kj7bc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Pxidsm+nlkIeE7up+llksiurDJhcwsGG8C5MyJmfyOoWAITdBjUtIVovZdXCA2Dz3QuvOJfUeIU1gC5ec/gItUhKOZP+ZZaM9vwyxehk5TjEffwpd8DhYV3QoXKIMad4GvJbHvdlvdN5fDulAetgUQ9V+Br/6D/3oS0Op1q0I28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I40fBvO0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D790FC4CED6;
-	Sat,  1 Mar 2025 00:21:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740788509;
-	bh=aL/I8rHhO3fQ39gXZRKzRS9OTuR5y6q1r0Nfj7Kj7bc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=I40fBvO0cr++89Nqr6eKQqGmKqNxDeE8cP5Ddh/CDwVFyngy5H4NA1xMC4fYlWAU0
-	 x/Z7ZyELTx7pksvXDNMb1qTlJNZA5EpRFCSGJjOlZ4tkbW6RnvJGykPeI1BM2F32RS
-	 3c+qahfg6wkyaAlXB10zPUQiXXBOE8QzFc673krlxJjPWYAIyUcs2Izz9mjzrPi8cm
-	 CRmpSEZqeZBxB1fl+fGQdBFblwcfHvd/Cjl8VH8nNbEGn1TDfNvSDPZJhkvOfzETOp
-	 IKlt/+6tYFJyJIcaE8gyNvDNR5nKiSbuecp4060PTq8RwXe14kBw1zrsfFWox8nfxX
-	 VrBtyEPoF/Jhg==
-Date: Fri, 28 Feb 2025 16:21:48 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: allison.henderson@oracle.com
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH 5/6] net/rds: rds_tcp_accept_one ought to not discard
- messages
-Message-ID: <20250228162148.3301b20c@kernel.org>
-In-Reply-To: <20250227042638.82553-6-allison.henderson@oracle.com>
-References: <20250227042638.82553-1-allison.henderson@oracle.com>
-	<20250227042638.82553-6-allison.henderson@oracle.com>
+	s=arc-20240116; t=1740788768; c=relaxed/simple;
+	bh=jt+YgGSiFXOrJ2kMp5YlfSPDZmSqABt1Sm51ooGPve4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u2vP2NaWnYGF3FcPU2KwrBuwaYqLHtLtGcHuqLQDl4TYulPK549lEI3zQzauSOAdvmgxOjzhBEHwrawyoqXOS+ECWhomKNG1goqwcHkdpcKun2FRIuA2Cvr3mLK1uyIH5Kl6To+EB06qMTmfCHufU25PIOVKa+NgPRq8m5GlgpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=gpv7V+AI; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7c0a4b030f2so347897785a.0
+        for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 16:26:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1740788766; x=1741393566; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0MtjatnVjNgixbPBCXKK66vO3DHibToClD747DlzON4=;
+        b=gpv7V+AIvU6HPQK/fWhrX9SypMpDstpd6Ga5Dge/1xDOpsTBmteK6W5UmEiu64Ob03
+         qLblIWyexxvbqX9E5t126afmtuaEw3piR7Dlg81JINouWlTB+UsXubzFKIBi7uLDeZ/g
+         VE+yTWEYQi+abKsSZJaTARDKtV8MXd4LOMuw/BA1quw07K9luLwUe9UQpANKm6rF0kAL
+         26U1JQeLEQIPrlZU2n7U7cSSIlAY1pkz+ZLy/QrVFUID4/qp1czyWJvEztL9KGLZnNgA
+         WLHF2RMGC0BD7e+UnvMA+19a63JE1AKnJd/kfEbA3F3M0VdajsmXaw41DpwKHUjglIgW
+         6N3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740788766; x=1741393566;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0MtjatnVjNgixbPBCXKK66vO3DHibToClD747DlzON4=;
+        b=ox4l1km8+cRiQ0kP9wWE91d6UhWieOhZqmhEXt3lhFO4TvloR3FfRqXH5u2cP7Fycp
+         umoa41F+jSlP4VJ7Z6ow/7rfBtyaoar4K/kM4IGAFf5F97Bawvwd3M3+OBdZuVdsbi5r
+         /FO/dQlmFR6CBLC/I5iY7lIBhd4NTmDUgUEIte94CCW+mwtXwzr9MmWEF40i48Zx/Hi7
+         5eZFbgJNoaa0dpnj1cSUFLaQ0Kyd5K3ozxuqXEBGlyq/hYSGvAX1uyF00Axty4iJZYbP
+         lU8urgC3J+ljmOC7hD2JkwdUQEj3UVGM7+ecwhCfB77bVzIu6Llmi7SPBAAUrX/N9L18
+         2fsw==
+X-Forwarded-Encrypted: i=1; AJvYcCWWuOC7/3aRuGxApjic88k5BkXUdifuLX2ry//LKNFrI7i6jcqY/JLOjJspfvM9pBECWApMxLE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfuRcYV7lg2BPzD03hjF4KzqETqFqWSj4XWlxewJh32b7MA5pY
+	3Gesbq166l/wpTse2UxJdumkgz77xNecAUh7qc2QgOMiTGbuzK0hSdhULczAExo=
+X-Gm-Gg: ASbGncv3CoKpWY/MgeZlAKjlesgv77Dcc2BdU+ZLvBUuGeY8PjPJU88aoq3hInchsyx
+	Y0H7CWRKOtcIk+pIiP01q3HuQbhqw80s7Dh0hi9WngOlXoTGxDl7oXkm3YFxt9WPJe+G4svl1kX
+	8tOoho5b+ZOxok5iOW47eqtgeP4AoP+I8SNQDBWzmqqOMDt6GtqUVUjP6u4vOeP9tqcFpMsFta/
+	io4vWGMHcf24O5CeYpFZaU/baNAHstqDLKSQA0TR0M/kah6MA3X3coJJTb7Qet2+lWu53nqDUMo
+	x0vTaIuY+mxZSPxhLfZ2IRjzYnbTOSQXG8IgkPatZQi32xkWoLKNzgOb2IT5wpgf77sprYuSf0U
+	wKMgTWqZ3553VbKj7Yg==
+X-Google-Smtp-Source: AGHT+IEyduZmKmDeBUENZfmGzGgg3DhASjWA/ktGwI0e/xDC6fTyc7s+TOl/wjMJMYfdyHxWvUKlYA==
+X-Received: by 2002:a05:620a:394e:b0:7c0:b7ca:7102 with SMTP id af79cd13be357-7c39c64d2cemr801166085a.38.1740788765786;
+        Fri, 28 Feb 2025 16:26:05 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e89765377csm27572316d6.45.2025.02.28.16.26.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Feb 2025 16:26:05 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1toAg8-00000000VLR-0rfV;
+	Fri, 28 Feb 2025 20:26:04 -0400
+Date: Fri, 28 Feb 2025 20:26:04 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: longli@linuxonhyperv.com
+Cc: Leon Romanovsky <leon@kernel.org>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	Long Li <longli@microsoft.com>
+Subject: Re: [Patch rdma-next] RDMA/mana_ib: handle net event for pointing to
+ the current netdev
+Message-ID: <20250301002604.GN5011@ziepe.ca>
+References: <1740782519-13485-1-git-send-email-longli@linuxonhyperv.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1740782519-13485-1-git-send-email-longli@linuxonhyperv.com>
 
-On Wed, 26 Feb 2025 21:26:37 -0700 allison.henderson@oracle.com wrote:
-> diff --git a/net/rds/rds.h b/net/rds/rds.h
-> index 85b47ce52266..422d5e26410e 100644
-> --- a/net/rds/rds.h
-> +++ b/net/rds/rds.h
-> @@ -548,6 +548,7 @@ struct rds_transport {
->  			   __u32 scope_id);
->  	int (*conn_alloc)(struct rds_connection *conn, gfp_t gfp);
->  	void (*conn_free)(void *data);
-> +	void (*conn_slots_available)(struct rds_connection *conn);
->  	int (*conn_path_connect)(struct rds_conn_path *cp);
->  	void (*conn_path_shutdown)(struct rds_conn_path *conn);
->  	void (*xmit_path_prepare)(struct rds_conn_path *cp);
+On Fri, Feb 28, 2025 at 02:41:59PM -0800, longli@linuxonhyperv.com wrote:
+> +	struct mana_ib_dev *dev = container_of(this, struct mana_ib_dev, nb);
+> +	struct net_device *event_dev = netdev_notifier_info_to_dev(ptr);
+> +	struct gdma_context *gc = dev->gdma_dev->gdma_context;
+> +	struct mana_context *mc = gc->mana.driver_data;
+> +	struct net_device *ndev;
+> +
+> +	if (event_dev != mc->ports[0])
+> +		return NOTIFY_DONE;
+> +
+> +	switch (event) {
+> +	case NETDEV_CHANGEUPPER:
+> +		rcu_read_lock();
+> +		ndev = mana_get_primary_netdev_rcu(mc, 0);
+> +		rcu_read_unlock();
 
-This struct has a kdoc, you need to document the new member.
-Or make the comment not a kdoc, if full documentation isn't necessary.
--- 
-pw-bot: cr
+That locking sure looks weird/wrong.
+
+Jason
 
