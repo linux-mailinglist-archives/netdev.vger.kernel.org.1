@@ -1,187 +1,172 @@
-Return-Path: <netdev+bounces-170921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13E8DA4AAD1
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 12:46:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0CCDA4AB0D
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 14:01:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFE8C1897B9D
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 11:46:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58D053B9E55
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 13:01:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 454421D5CD7;
-	Sat,  1 Mar 2025 11:45:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NF3Y8dRq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1862D1DA314;
+	Sat,  1 Mar 2025 13:01:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E44523F37D
-	for <netdev@vger.kernel.org>; Sat,  1 Mar 2025 11:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AE611C5D67
+	for <netdev@vger.kernel.org>; Sat,  1 Mar 2025 13:01:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740829551; cv=none; b=QHW0Uuhj1T23ZjD08qu3bckYkikWhey6o7xjqk1a5U58T2+9ThALKTIDapjPKcqJjreO48qkrJ/qhoi0Hc9uTfE9QqqMaKErAKc2idxPhmtH0VRETowOYj+pqykq4bhNaivitVs1tQdxCBXlHxrUR3+yEVwi9vScjfK8b14MsnU=
+	t=1740834073; cv=none; b=hWC5NmkJqOn1+KEgdPJWL9PA7o3KJ5JyFyaQAV7VgBBL83LHwgVL2+UsI/VwqUmMDL8mbOYuc55cPdTH/1aHWlIiMJxRVH22pddsgww0iMhacSepMpXw7as7gQ+XhNF0pc797L+WWeXPTzzCE4suAD527bYkYdViHGUE29zBNQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740829551; c=relaxed/simple;
-	bh=dU09FClwR0GDDMTVXUYblwOmALPNXdDnBNMK/tvDSpE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ELigqpHXlWKyAkXL+g+060epYiLwG1zO1jGTwm7u2FalGWqgUCU+MExdNegSg5xQTQlOXmhFenA/y5Y4ukAFc8O8AzBz6Y/KytaeUM5NkSFNXoEoJUDz43z7wSCNKd/4b1QNKeb8EJPoaq17Sdlv57/TGT6esUox2+Vaf9lXRUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NF3Y8dRq; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-6fd47dfe76cso19929257b3.3
-        for <netdev@vger.kernel.org>; Sat, 01 Mar 2025 03:45:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740829548; x=1741434348; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NmS1PPHq8lABZggEtaxPRHB7AJcK8W+QpIPwvdWaXGc=;
-        b=NF3Y8dRqYBtcAInY6YZUgRbZoFWGP3EoupLR/u0/zpk9aWdbYC8WVWA2x2EgPitdkB
-         svYgF7P9RMs58Zkew24eqFE2rnuYYTy1j1Xy5LhlsgQJVkp+isyLCMnpsC/ZNjZZEH08
-         czcgXddL1H4hgMpC4iEQZFjhdVckSIGyg8Q94K0/EJ+xy4vA43Z0StpCAElVs3+bf3rN
-         5qWz0Cfs254eIJlTnBJdVMvrfUN4ukgkS9w8d/DulXO1VZpQ4+YvynhCoXxTEKSwz1OE
-         Cthoj+mKhqzFpSW1KkekB23qjj4T4aohGqSLbyaMOSojSRWOcQCgzBnPsA4Ux5z3v5rr
-         En1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740829548; x=1741434348;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NmS1PPHq8lABZggEtaxPRHB7AJcK8W+QpIPwvdWaXGc=;
-        b=s6v31NuCi6ktvH7XvNxV+9aVKeUUFL1Fexdy1LFtkrAoNcPFqdi6LxohcIR3nsVliU
-         LnQa34yKNek6gPTbk5FHnsV67mE38VP99d1C06vQvMRjBuKbrhYBxOuqUsFjd1nZz7h0
-         J5gNn2GAWZbIaO6vFlA77W82lYExqEkKsL60uzhivfK31f98gBq11uP6IAp//2+GgXtv
-         Ezj1/D19teRoT1r0vqrpWlC0cuwYECQxB8BDUf7f/8vjmjuoPBxhKFNO2mWwdYWbuzId
-         mLf47TW5wsYxXaavFMOPMv6/0xgo4hwFh4b+f+kdz6XEI6tkxqmP5TIOfn5vizhwZGDx
-         yH1w==
-X-Forwarded-Encrypted: i=1; AJvYcCWa13RXkZDyJBnQf44hpHYcprsiDMlfCrIAKodrW4/5oN7sflgNLrtwe6hwr/Q1bK1oRym1Ang=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydyMzm2DcQzFZxDA8Fl6ZBTFkNOGaNjSRwuQ3vcVfaLQcGFyo/
-	rreuOysWkYXdcp6iorQ7n+VmVrdO6g+UFSUzY4ZVHHMoXvLx7814YeUeQ4XAQ+W5jTNJM5Vyt54
-	S8Csb6uZ0sYeB4+bkVTaMTRjmrw==
-X-Gm-Gg: ASbGncsZudkpIbXyBQZ+PKt4Voj8WXIzP/D1zHoBqMQcNy0nrQyCfANtsK0gFjcukjJ
-	yL87qgEakvYMJ4GVuz9HZqzCqF7EncuUfvn9nwfEjAUgSKeG8JvrflLnxklWxuhj1XKoG1VicDX
-	+SBd1FsOdAIQe51cAbEpgCaRInjRXAIXyrr2uDpQ==
-X-Google-Smtp-Source: AGHT+IECpiICxbXH9jPk+F9Q1HJ7oZnCGcThwvO9wNe1bDIbzkMtBVFOa8fAgziRLEizgNcyKtnpyvXEFLH1zjXDXRs=
-X-Received: by 2002:a05:690c:4b12:b0:6e3:323f:d8fb with SMTP id
- 00721157ae682-6fd4a068c4dmr90655127b3.14.1740829548485; Sat, 01 Mar 2025
- 03:45:48 -0800 (PST)
+	s=arc-20240116; t=1740834073; c=relaxed/simple;
+	bh=mKLPjyiZUnld6i3DaHnwwGaNNhqCVD5Nat+a58bVjWw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qr6FnvcYGuQ/qR8rr2rSfhx1niXohKuTMrA5vHdeOeG4rVXm+0T6UdcYvv1fEX7nZD5jZZJma9iKWWCOi/rEAv5mOKbz4+dHNBMYnjm8VlLe47CPcazWZHzV3iCDaCeCpgsgn5V8xOMGJgba4Qv2NRUKBpWK0T+5WHcrWfHShzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1toMSU-0003w3-PV; Sat, 01 Mar 2025 14:00:46 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1toMSR-003Sv8-2F;
+	Sat, 01 Mar 2025 14:00:43 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1toMSR-007APN-1n;
+	Sat, 01 Mar 2025 14:00:43 +0100
+Date: Sat, 1 Mar 2025 14:00:43 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	Kyle Swenson <kyle.swenson@est.tech>,
+	Dent Project <dentproject@linuxfoundation.org>,
+	kernel@pengutronix.de,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 06/12] net: pse-pd: Add support for budget
+ evaluation strategies
+Message-ID: <Z8ME-90Xg46-pNhA@pengutronix.de>
+References: <20250224134522.1cc36aa3@kernel.org>
+ <20250225102558.2cf3d8a5@kmaincent-XPS-13-7390>
+ <20250225174752.5dbf65e2@kernel.org>
+ <Z76t0VotFL7ji41M@pengutronix.de>
+ <Z76vfyv5XoMKmyH_@pengutronix.de>
+ <20250226184257.7d2187aa@kernel.org>
+ <Z8AW6S2xmzGZ0y9B@pengutronix.de>
+ <20250227155727.7bdc069f@kmaincent-XPS-13-7390>
+ <Z8CVimyMj261wc7w@pengutronix.de>
+ <20250227192640.20df155d@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250228173505.3636-1-rsalvaterra@gmail.com> <ebe829ef-342a-4986-975a-62194a793697@gmail.com>
-In-Reply-To: <ebe829ef-342a-4986-975a-62194a793697@gmail.com>
-From: Rui Salvaterra <rsalvaterra@gmail.com>
-Date: Sat, 1 Mar 2025 11:45:37 +0000
-X-Gm-Features: AQ5f1JozkqiAi_VC1Mt3fGSs8zJAEVTzmkevwiy1v2JdWPxc5Z1hz6tzslAX5ms
-Message-ID: <CALjTZva9+ufCR5+QhJXL+7CHDRJVLQqb4uPwumEO5BqssGKPMw@mail.gmail.com>
-Subject: Re: [PATCH] r8169: add support for 16K jumbo frames on RTL8125B
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: nic_swsd@realtek.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250227192640.20df155d@kmaincent-XPS-13-7390>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hi, Heiner,
+On Thu, Feb 27, 2025 at 07:26:40PM +0100, Kory Maincent wrote:
+> On Thu, 27 Feb 2025 17:40:42 +0100
+> Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+> 
+> > On Thu, Feb 27, 2025 at 03:57:27PM +0100, Kory Maincent wrote:
+> > > On Thu, 27 Feb 2025 08:40:25 +0100
+> > > Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+> > >   
+> > > > On Wed, Feb 26, 2025 at 06:42:57PM -0800, Jakub Kicinski wrote:  
+> >  [...]  
+> >  [...]  
+> >  [...]  
+> > > > 
+> > > > Ok, I see. @Köry, can you please provide regulator_summary with some
+> > > > inlined comments to regulators related to the PSE components and PSE
+> > > > related outputs of ethtool (or what ever tool you are using).
+> > > > 
+> > > > I wont to use this examples to answer.  
+> > > 
+> > > On my side, I am not close to using sysfs. As we do all configurations
+> > > through ethtool I have assumed we should continue with ethtool.  
+> > 
+> > Yes, I agree. But it won't be possible to do it for all components.
+> > 
+> > > I think we should set the port priority through ethtool.  
+> > 
+> > ack
+> > 
+> > > but indeed the PSE  power domain method get and set could be moved to
+> > > sysfs as it is not something  relative to the port but to a group of
+> > > ports.  
+> > 
+> > I would prefer to have it in the for of devlink or use regulator netlink
+> > interface. But, we do not need to do this discussion right now.
+> 
+> If we want to report the method we should discuss it now. We shouldn't add
+> BUDGET_EVAL_STRAT uAPI to ethtool if we use another way to get and set the
+> method later.
 
-On Fri, 28 Feb 2025 at 20:22, Heiner Kallweit <hkallweit1@gmail.com> wrote:
->
-> This has been proposed and discussed before. Decision was to not increase
-> the max jumbo packet size, as vendor drivers r8125/r8126 also support max=
- 9k.
+Ok, I assume we are talking about different things. I mean - not port
+specific configurations and diagnostic, will have different interface.
 
-I did a cursory search around the mailing list, but didn't find
-anything specific. Maybe I didn't look hard enough. However=E2=80=A6
+BUDGET_EVAL_STRAT is port specific. HP and Cisco implement it as port
+specific. PD692x0 Protocol manual describe it as port specific too:
+3.3.6 Set BT Port Parameters
+ Bits [3..0]—BT port PM mode
+  0x0: The port power that is used for power management purposes is
+       dynamic (Iport x Vmain).
+  0x1: The port power that is used for power management purposes is port
+       TPPL_BT.
+  0x2: The port power that is used for power management purposes is
+       dynamic for non LLDP/CDP/Autoclass ports and TPPL_BT for LLDP/CDP/Autoclass ports.
+  0xF: Do not change settings.
 
-> And in general it's not clear whether you would gain anything from jumbo =
-packets,
-> because hw TSO and c'summing aren't supported for jumbo packets.
+> We could also not report the method for now and assume the user knows it for
+> the two controllers currently supported.
 
-=E2=80=A6 I actually have numbers to justify it. For my use case, jumbo fra=
-mes
-make a *huge* difference. I have an Atom 330-based file server, this
-CPU is too slow to saturate the link with a MTU of 1500 bytes. The
-situation, however, changes dramatically when I use jumbo frames. Case
-in point=E2=80=A6
+On one side: it is not just status, but also active configuration. By
+implementing the interface we may break default configuration and user
+expectations.
 
+On other side: PD692x0 seems to need more then just setting prios to
+manage them correctly. For example power bank limits should be set,
+otherwise internal firmware won't be able to perform budget calculations.
 
-MTU =3D 1500 bytes:
+So, I assume, critical components are missing anyway.
 
-Accepted connection from 192.168.17.20, port 55514
-[  5] local 192.168.17.16 port 5201 connected to 192.168.17.20 port 55524
-[ ID] Interval           Transfer     Bitrate
-[  5]   0.00-1.00   sec   241 MBytes  2.02 Gbits/sec
-[  5]   1.00-2.00   sec   242 MBytes  2.03 Gbits/sec
-[  5]   2.00-3.00   sec   242 MBytes  2.03 Gbits/sec
-[  5]   3.00-4.00   sec   242 MBytes  2.03 Gbits/sec
-[  5]   4.00-5.00   sec   242 MBytes  2.03 Gbits/sec
-[  5]   5.00-6.00   sec   242 MBytes  2.03 Gbits/sec
-[  5]   6.00-7.00   sec   242 MBytes  2.03 Gbits/sec
-[  5]   7.00-8.00   sec   242 MBytes  2.03 Gbits/sec
-[  5]   8.00-9.00   sec   242 MBytes  2.03 Gbits/sec
-[  5]   9.00-10.00  sec   242 MBytes  2.03 Gbits/sec
-[  5]  10.00-10.00  sec   128 KBytes  1.27 Gbits/sec
-- - - - - - - - - - - - - - - - - - - - - - - - -
-[ ID] Interval           Transfer     Bitrate
-[  5]   0.00-10.00  sec  2.36 GBytes  2.03 Gbits/sec                  recei=
-ver
-
-
-MTU =3D 9000 bytes:
-
-Accepted connection from 192.168.17.20, port 53474
-[  5] local 192.168.17.16 port 5201 connected to 192.168.17.20 port 53490
-[ ID] Interval           Transfer     Bitrate
-[  5]   0.00-1.00   sec   295 MBytes  2.47 Gbits/sec
-[  5]   1.00-2.00   sec   295 MBytes  2.47 Gbits/sec
-[  5]   2.00-3.00   sec   294 MBytes  2.47 Gbits/sec
-[  5]   3.00-4.00   sec   295 MBytes  2.47 Gbits/sec
-[  5]   4.00-5.00   sec   294 MBytes  2.47 Gbits/sec
-[  5]   5.00-6.00   sec   295 MBytes  2.47 Gbits/sec
-[  5]   6.00-7.00   sec   295 MBytes  2.47 Gbits/sec
-[  5]   7.00-8.00   sec   295 MBytes  2.47 Gbits/sec
-[  5]   8.00-9.00   sec   295 MBytes  2.47 Gbits/sec
-[  5]   9.00-10.00  sec   295 MBytes  2.47 Gbits/sec
-[  5]  10.00-10.00  sec   384 KBytes  2.38 Gbits/sec
-- - - - - - - - - - - - - - - - - - - - - - - - -
-[ ID] Interval           Transfer     Bitrate
-[  5]   0.00-10.00  sec  2.88 GBytes  2.47 Gbits/sec                  recei=
-ver
-
-
-MTU =3D 12000 bytes (with my patch):
-
-Accepted connection from 192.168.17.20, port 59378
-[  5] local 192.168.17.16 port 5201 connected to 192.168.17.20 port 59388
-[ ID] Interval           Transfer     Bitrate
-[  5]   0.00-1.00   sec   296 MBytes  2.48 Gbits/sec
-[  5]   1.00-2.00   sec   296 MBytes  2.48 Gbits/sec
-[  5]   2.00-3.00   sec   295 MBytes  2.48 Gbits/sec
-[  5]   3.00-4.00   sec   296 MBytes  2.48 Gbits/sec
-[  5]   4.00-5.00   sec   295 MBytes  2.48 Gbits/sec
-[  5]   5.00-6.00   sec   296 MBytes  2.48 Gbits/sec
-[  5]   6.00-7.00   sec   295 MBytes  2.48 Gbits/sec
-[  5]   7.00-8.00   sec   296 MBytes  2.48 Gbits/sec
-[  5]   8.00-9.00   sec   296 MBytes  2.48 Gbits/sec
-[  5]   9.00-10.00  sec   294 MBytes  2.47 Gbits/sec
-[  5]  10.00-10.00  sec   512 KBytes  2.49 Gbits/sec
-- - - - - - - - - - - - - - - - - - - - - - - - -
-[ ID] Interval           Transfer     Bitrate
-[  5]   0.00-10.00  sec  2.89 GBytes  2.48 Gbits/sec                  recei=
-ver
-
-
-This demonstrates that the bottleneck is in the frame processing. With
-a larger frame size, the number of checksum calculations is also
-lower, for the same amount of payload data, and the CPU is able to
-handle them.
-
-
-Kind regards,
-
-Rui Salvaterra
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
