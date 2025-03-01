@@ -1,206 +1,155 @@
-Return-Path: <netdev+bounces-170960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65867A4ADBF
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 21:12:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08931A4AD7A
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 20:12:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E50E165A66
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 20:11:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5F523AA05C
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 19:12:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 298791E0B66;
-	Sat,  1 Mar 2025 20:11:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79C0E1E5B7A;
+	Sat,  1 Mar 2025 19:12:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PY3aCFPC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nevdjcf9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FD121C3BE9
-	for <netdev@vger.kernel.org>; Sat,  1 Mar 2025 20:11:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDFAA1DF965;
+	Sat,  1 Mar 2025 19:12:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740859916; cv=none; b=PmbRMOAItNfPDecGphVGUqb+Zb6lCAIXyzrguS/qoeLRN6EenwHHdd2uySTK2PxzZx+sJAGlw+T38QjbSNd5qLzEzawuoyC2pAZLummzSgMXoNxxSaXxtm5zaA4mgxPZoTAE92C9Qjvk69vY6ofOSiv+FvdaRDjDtHkH1blfPe8=
+	t=1740856345; cv=none; b=GRv5OFt5oUNFcvsCZoBGdvLRr8eWtgG6WiM295Vn/GAJL19SASU0D+vMUSgzIFSZcIOxAaPd5foWC+2FzTlqIMuyuBLNef55TMm6TKlCjcZAG5CMJApWNSXCrIqMoB9i+9Pox6b1Z1PEuXLcEA+t+uyJjDhcECZ3C4B+tjbCGEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740859916; c=relaxed/simple;
-	bh=CHprCrFSz1GiRHepl8Dq8IroyU5sN/LtO9aY6fu2A5k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=I1kKnU8AE4F2wTCmztGd6oFl0jokFyboPn1g3sQQiA0rIDFycyDKKfH3LJ1zNB1bRbbBOBq/cYShyW8p+N/80M8MgU770+g4nx1HdmxRVMsA+57XtiLLBT6NrmwE+ZiV9KKbzwE+MOn6K3meDhpp/11Zx48eFpX2REIoCi7b74U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PY3aCFPC; arc=none smtp.client-ip=198.175.65.9
+	s=arc-20240116; t=1740856345; c=relaxed/simple;
+	bh=DyVqMDTjFOtdYjGsdKm+c9WKb6UulDm2pWWftGGsFWw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GZSqbh/8TMrRx1n3RhRKbBBSlr7JXHy0g9QTFxFRD46weU6QDP+GorMOUpPE57MCWOvTx2Tx+fGhmTADIiIYAqRPpKHF0qKAJSWhKdKRk7PWb2a5jhOOhSRJRWz5L2eKDfGpfyMb7HzTSvu4hbM9mUuNJOHT8UIDK/isHhAdc30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nevdjcf9; arc=none smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740859915; x=1772395915;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=CHprCrFSz1GiRHepl8Dq8IroyU5sN/LtO9aY6fu2A5k=;
-  b=PY3aCFPCFM15CS02uC2HYD9FBBHb/eVTcv8OSrNfZrboOAzYRDc0Z2LT
-   Gy0NRyHd4/sfUIZ5RV6XjXTO1d3RlpqZp4tjQZW9iyaUSKxuizuuZ3Ayt
-   tMDwf9/suJRJra4031I5kgXWJDKbQEunrfMbxNrBX28shUck1xIo7sFtg
-   Rb4jsmTXZ+d3DdLcqJXWAc0qYc2wOdVFeq0xRzfwRzLTaeJL3MdOz3kMW
-   SZzFyPRW/dzPy0lERwrNEASVD4EheijPja87KxrnC5yYCIT4Nq/BDVHbR
-   uW1ebLOU0VFnqhiQDfug+FwUf7+MzBOHTCkV9hAvTmEVZYN8xSFY14zwb
-   g==;
-X-CSE-ConnectionGUID: 53CexmChS0SzU34UGNAx5Q==
-X-CSE-MsgGUID: gGAdfVG8R62S1boBKtlj+A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11360"; a="64229824"
+  t=1740856344; x=1772392344;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=DyVqMDTjFOtdYjGsdKm+c9WKb6UulDm2pWWftGGsFWw=;
+  b=nevdjcf9Nj3vePBP5CmTeLdVsGQ4s3MGgnYIxdQPX5sjc1es10uyKAyd
+   E5VXFHNKXOjNwdWWTUBoqMPRBZ114QQtaTpM9oOINRuWfIjIQ6Lj/c+NC
+   CD45thQWRqHuicbToobJDALiFglXiuhEAnGqK+fY47HMJ5T39BsrUynjB
+   ELdm6Pi0niMhJGjF6RtkbivgWb+DA2a+Pk33pKP+33HUu/RN3mpvkc492
+   k3yb/NPxT8YCZY54CUhegN7a+P075AwO381432qpL18xZFCGf0lDoiqxI
+   sHORcZdJkfBCwR6t3XhLIMS586MXcJmoB3rtZO9eKLrXgDKRVS3y4mCUn
+   w==;
+X-CSE-ConnectionGUID: AE7i2x5kRQmkbop/ItHrTw==
+X-CSE-MsgGUID: ZEGlDFGvTBmlSWk2/3UPLw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11360"; a="59312166"
 X-IronPort-AV: E=Sophos;i="6.13,326,1732608000"; 
-   d="scan'208";a="64229824"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2025 12:11:54 -0800
-X-CSE-ConnectionGUID: mqjQbMK5T6yO6U/VYAggmg==
-X-CSE-MsgGUID: HyT4tf/4TlKs7FYALxjmhw==
+   d="scan'208";a="59312166"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2025 11:12:23 -0800
+X-CSE-ConnectionGUID: ZKwj2oENQ26kcnYX2VV9KA==
+X-CSE-MsgGUID: GIqMLBn7SBWjMx3cSMshMg==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,326,1732608000"; 
-   d="scan'208";a="140861498"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa002.fm.intel.com with ESMTP; 01 Mar 2025 12:11:52 -0800
-Received: from ilmater.igk.intel.com (ilmater.igk.intel.com [10.123.220.50])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 21053125A0;
-	Sat,  1 Mar 2025 20:11:51 +0000 (GMT)
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [Intel-wired-lan] [PATCH iwl-next v2] idpf: assign extracted ptype to struct libeth_rqe_info field
-Date: Sat,  1 Mar 2025 20:02:44 +0100
-Message-ID: <20250301190423.613493-1-mateusz.polchlopek@intel.com>
-X-Mailer: git-send-email 2.48.1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="117494432"
+Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
+  by orviesa010.jf.intel.com with ESMTP; 01 Mar 2025 11:12:18 -0800
+Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1toSFo-000Gb8-0a;
+	Sat, 01 Mar 2025 19:12:06 +0000
+Date: Sun, 2 Mar 2025 03:10:48 +0800
+From: kernel test robot <lkp@intel.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Russell King - ARM Linux <linux@armlinux.org.uk>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	David Miller <davem@davemloft.net>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Richard Cochran <richardcochran@gmail.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	Robert Marko <robimarko@gmail.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>
+Subject: Re: [PATCH net-next v2 7/8] net: phy: move PHY package related code
+ from phy.h to phy_package.c
+Message-ID: <202503020223.C2TbkgPv-lkp@intel.com>
+References: <edba99c5-0f95-40bd-8398-98d811068369@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <edba99c5-0f95-40bd-8398-98d811068369@gmail.com>
 
-Assign the ptype extracted from qword to the ptype field of struct
-libeth_rqe_info.
-Remove the now excess ptype param of idpf_rx_singleq_extract_fields(),
-idpf_rx_singleq_extract_base_fields() and
-idpf_rx_singleq_extract_flex_fields().
+Hi Heiner,
 
-Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
----
-v2: removed excess function parameter 'ptype' description in
-idpf_rx_singleq_extract_fields() - reported by kernel bot. No code or
-functional changes.
+kernel test robot noticed the following build errors:
 
-v1: initial patch
-https://lore.kernel.org/netdev/20250227123837.547053-1-mateusz.polchlopek@intel.com/
----
- .../ethernet/intel/idpf/idpf_singleq_txrx.c   | 25 ++++++++-----------
- 1 file changed, 11 insertions(+), 14 deletions(-)
+[auto build test ERROR on net-next/main]
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-index eae1b6f474e6..2e356dd10812 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-@@ -891,7 +891,6 @@ bool idpf_rx_singleq_buf_hw_alloc_all(struct idpf_rx_queue *rx_q,
-  * idpf_rx_singleq_extract_base_fields - Extract fields from the Rx descriptor
-  * @rx_desc: the descriptor to process
-  * @fields: storage for extracted values
-- * @ptype: pointer that will store packet type
-  *
-  * Decode the Rx descriptor and extract relevant information including the
-  * size and Rx packet type.
-@@ -901,21 +900,20 @@ bool idpf_rx_singleq_buf_hw_alloc_all(struct idpf_rx_queue *rx_q,
-  */
- static void
- idpf_rx_singleq_extract_base_fields(const union virtchnl2_rx_desc *rx_desc,
--				    struct libeth_rqe_info *fields, u32 *ptype)
-+				    struct libeth_rqe_info *fields)
- {
- 	u64 qword;
- 
- 	qword = le64_to_cpu(rx_desc->base_wb.qword1.status_error_ptype_len);
- 
- 	fields->len = FIELD_GET(VIRTCHNL2_RX_BASE_DESC_QW1_LEN_PBUF_M, qword);
--	*ptype = FIELD_GET(VIRTCHNL2_RX_BASE_DESC_QW1_PTYPE_M, qword);
-+	fields->ptype = FIELD_GET(VIRTCHNL2_RX_BASE_DESC_QW1_PTYPE_M, qword);
- }
- 
- /**
-  * idpf_rx_singleq_extract_flex_fields - Extract fields from the Rx descriptor
-  * @rx_desc: the descriptor to process
-  * @fields: storage for extracted values
-- * @ptype: pointer that will store packet type
-  *
-  * Decode the Rx descriptor and extract relevant information including the
-  * size and Rx packet type.
-@@ -925,12 +923,12 @@ idpf_rx_singleq_extract_base_fields(const union virtchnl2_rx_desc *rx_desc,
-  */
- static void
- idpf_rx_singleq_extract_flex_fields(const union virtchnl2_rx_desc *rx_desc,
--				    struct libeth_rqe_info *fields, u32 *ptype)
-+				    struct libeth_rqe_info *fields)
- {
- 	fields->len = FIELD_GET(VIRTCHNL2_RX_FLEX_DESC_PKT_LEN_M,
- 				le16_to_cpu(rx_desc->flex_nic_wb.pkt_len));
--	*ptype = FIELD_GET(VIRTCHNL2_RX_FLEX_DESC_PTYPE_M,
--			   le16_to_cpu(rx_desc->flex_nic_wb.ptype_flex_flags0));
-+	fields->ptype = FIELD_GET(VIRTCHNL2_RX_FLEX_DESC_PTYPE_M,
-+				  le16_to_cpu(rx_desc->flex_nic_wb.ptype_flex_flags0));
- }
- 
- /**
-@@ -938,18 +936,17 @@ idpf_rx_singleq_extract_flex_fields(const union virtchnl2_rx_desc *rx_desc,
-  * @rx_q: Rx descriptor queue
-  * @rx_desc: the descriptor to process
-  * @fields: storage for extracted values
-- * @ptype: pointer that will store packet type
-  *
-  */
- static void
- idpf_rx_singleq_extract_fields(const struct idpf_rx_queue *rx_q,
- 			       const union virtchnl2_rx_desc *rx_desc,
--			       struct libeth_rqe_info *fields, u32 *ptype)
-+			       struct libeth_rqe_info *fields)
- {
- 	if (rx_q->rxdids == VIRTCHNL2_RXDID_1_32B_BASE_M)
--		idpf_rx_singleq_extract_base_fields(rx_desc, fields, ptype);
-+		idpf_rx_singleq_extract_base_fields(rx_desc, fields);
- 	else
--		idpf_rx_singleq_extract_flex_fields(rx_desc, fields, ptype);
-+		idpf_rx_singleq_extract_flex_fields(rx_desc, fields);
- }
- 
- /**
-@@ -972,7 +969,6 @@ static int idpf_rx_singleq_clean(struct idpf_rx_queue *rx_q, int budget)
- 		struct libeth_rqe_info fields = { };
- 		union virtchnl2_rx_desc *rx_desc;
- 		struct idpf_rx_buf *rx_buf;
--		u32 ptype;
- 
- 		/* get the Rx desc from Rx queue based on 'next_to_clean' */
- 		rx_desc = &rx_q->rx[ntc];
-@@ -993,7 +989,7 @@ static int idpf_rx_singleq_clean(struct idpf_rx_queue *rx_q, int budget)
- 		 */
- 		dma_rmb();
- 
--		idpf_rx_singleq_extract_fields(rx_q, rx_desc, &fields, &ptype);
-+		idpf_rx_singleq_extract_fields(rx_q, rx_desc, &fields);
- 
- 		rx_buf = &rx_q->rx_buf[ntc];
- 		if (!libeth_rx_sync_for_cpu(rx_buf, fields.len))
-@@ -1037,7 +1033,8 @@ static int idpf_rx_singleq_clean(struct idpf_rx_queue *rx_q, int budget)
- 		total_rx_bytes += skb->len;
- 
- 		/* protocol */
--		idpf_rx_singleq_process_skb_fields(rx_q, skb, rx_desc, ptype);
-+		idpf_rx_singleq_process_skb_fields(rx_q, skb, rx_desc,
-+						   fields.ptype);
- 
- 		/* send completed skb up the stack */
- 		napi_gro_receive(rx_q->pp->p.napi, skb);
+url:    https://github.com/intel-lab-lkp/linux/commits/Heiner-Kallweit/net-phy-move-PHY-package-code-from-phy_device-c-to-own-source-file/20250301-055302
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/edba99c5-0f95-40bd-8398-98d811068369%40gmail.com
+patch subject: [PATCH net-next v2 7/8] net: phy: move PHY package related code from phy.h to phy_package.c
+config: arc-randconfig-001-20250302 (https://download.01.org/0day-ci/archive/20250302/202503020223.C2TbkgPv-lkp@intel.com/config)
+compiler: arceb-elf-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250302/202503020223.C2TbkgPv-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202503020223.C2TbkgPv-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/net/phy/bcm54140.c: In function 'bcm54140_base_read_rdb':
+>> drivers/net/phy/bcm54140.c:436:15: error: implicit declaration of function '__phy_package_write'; did you mean '__phy_package_write_mmd'? [-Werror=implicit-function-declaration]
+     436 |         ret = __phy_package_write(phydev, BCM54140_BASE_ADDR,
+         |               ^~~~~~~~~~~~~~~~~~~
+         |               __phy_package_write_mmd
+>> drivers/net/phy/bcm54140.c:441:15: error: implicit declaration of function '__phy_package_read'; did you mean '__phy_package_read_mmd'? [-Werror=implicit-function-declaration]
+     441 |         ret = __phy_package_read(phydev, BCM54140_BASE_ADDR,
+         |               ^~~~~~~~~~~~~~~~~~
+         |               __phy_package_read_mmd
+   cc1: some warnings being treated as errors
+
+
+vim +436 drivers/net/phy/bcm54140.c
+
+4406d36dfdf1fb Michael Walle     2020-04-20  430  
+6937602ed3f9eb Michael Walle     2020-04-20  431  static int bcm54140_base_read_rdb(struct phy_device *phydev, u16 rdb)
+6937602ed3f9eb Michael Walle     2020-04-20  432  {
+6937602ed3f9eb Michael Walle     2020-04-20  433  	int ret;
+6937602ed3f9eb Michael Walle     2020-04-20  434  
+dc9989f173289f Michael Walle     2020-05-06  435  	phy_lock_mdio_bus(phydev);
+9eea577eb1155f Christian Marangi 2023-12-15 @436  	ret = __phy_package_write(phydev, BCM54140_BASE_ADDR,
+9eea577eb1155f Christian Marangi 2023-12-15  437  				  MII_BCM54XX_RDB_ADDR, rdb);
+6937602ed3f9eb Michael Walle     2020-04-20  438  	if (ret < 0)
+6937602ed3f9eb Michael Walle     2020-04-20  439  		goto out;
+6937602ed3f9eb Michael Walle     2020-04-20  440  
+9eea577eb1155f Christian Marangi 2023-12-15 @441  	ret = __phy_package_read(phydev, BCM54140_BASE_ADDR,
+9eea577eb1155f Christian Marangi 2023-12-15  442  				 MII_BCM54XX_RDB_DATA);
+6937602ed3f9eb Michael Walle     2020-04-20  443  
+6937602ed3f9eb Michael Walle     2020-04-20  444  out:
+dc9989f173289f Michael Walle     2020-05-06  445  	phy_unlock_mdio_bus(phydev);
+6937602ed3f9eb Michael Walle     2020-04-20  446  	return ret;
+6937602ed3f9eb Michael Walle     2020-04-20  447  }
+6937602ed3f9eb Michael Walle     2020-04-20  448  
+
 -- 
-2.48.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
