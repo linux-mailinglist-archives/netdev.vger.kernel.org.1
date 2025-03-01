@@ -1,180 +1,187 @@
-Return-Path: <netdev+bounces-170924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0223A4AB60
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 14:50:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3FA0A4AB6B
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 14:55:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C57953B8329
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 13:50:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D8881897B01
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 13:55:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B121F1DED5A;
-	Sat,  1 Mar 2025 13:50:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 489421DF269;
+	Sat,  1 Mar 2025 13:55:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R0fHVrJH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CeZpDrTC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA881DED51;
-	Sat,  1 Mar 2025 13:50:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD081E522;
+	Sat,  1 Mar 2025 13:55:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740837032; cv=none; b=qLWTwmBwdoTtIvRU9U1uwXcJqvqkWOwaCZMRPMZt7Jbp0LuYnBPE1vYIHbIZRe+qcJp8FeT05rHzjIf1trP/KPjWp2/hWXmtu2uO5VCX/oXWQ6SHc9Ev3e0qSRJen1gfeIcPW8P6z6oPfpU9BWv6tCv0pUZJHMpP+BumDS7Ib40=
+	t=1740837326; cv=none; b=nBPCtKecysU4Kr2N4UpaEjqjlvyT2HvAhSA20nAIgmDYZy/jxjf+ycu7TiPFNtejDr0DckedkdK9gjg55R/lTjNPKEFyx96+GVAJEUqg7K5bj1C+pqZUhpfLD7cbkuWXmJDiTKmC0DMpYkun7taStqMPovTfgSi1t8un0Ntfxbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740837032; c=relaxed/simple;
-	bh=ME5xNwEUvmZIhrCna/NGeAum7nG3bjJMPxsf3gI42Bc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ANzOm52PokiTjx1yBkvvsrshBlGP8YG16G0TtWpph9rDf43gNfJkW33oF5nN9t1nweCJ+6yoOrt9tMlDUlTkfpVsD9jMQEDpL3i/KCbmUL80v0q97q6ydWkaYVJvcVIzE9XFTQ9M1P3joYJw2sVMW88b5+guL5l96/jALh52zns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R0fHVrJH; arc=none smtp.client-ip=209.85.214.195
+	s=arc-20240116; t=1740837326; c=relaxed/simple;
+	bh=+mrPZHHSsQP7nU/rMAbtkBPhwztod/wRhwfeKlP8lC4=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=bz4XCCod6Q+BUcEb7ZQXEg3N4NRX81G4OSnZRuNjPec0UfRfZ3YnIeGSf53PDQ7AvLBQsq8mFT5ouzgaqBKplnx0dJunWV35RYufMjDLEuMd2JXyMfu9c7iliZPLocvDqKBjKU49k7q8is2Kek7G8NeYmbldSr397jFMoaDluo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CeZpDrTC; arc=none smtp.client-ip=209.85.214.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-22113560c57so59084025ad.2;
-        Sat, 01 Mar 2025 05:50:30 -0800 (PST)
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-223959039f4so3334695ad.3;
+        Sat, 01 Mar 2025 05:55:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740837030; x=1741441830; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pJgxQ9kTw71K96V2pNjoEy9ewjLpxCqdEPFpCMMN/U4=;
-        b=R0fHVrJH2Ms/6/iKsBK4NeJNQjyIXmFB6B9L4AarEAsS4eZ20pbaFImTy+TkRObknG
-         Zf/INMiGF6NJfZS1OhneR48y4QLpc0uM9btq8bFKvA6zkkzS9ydWW3Gj58ZNP76JfoUE
-         +eicF6T4hBFsHN5n05K7pVVRAF1jD1GLt/gNsLHfRAecUPCtt40UcWy0NmIxFtOt8Fo3
-         n6vqMjRg6tpFoFhcXNPgHbaBewVw+TB+oFGMw/vAn7fbZpqhLwr0cOMQ2nt0YAj6+mGF
-         3R6GCZ+BW5bPmVWoaHORgQ6GM5dAX77/cplkZ+AvJXxJgkWFoXNAIpa7jgVs8UjRhuBy
-         Rtig==
+        d=gmail.com; s=20230601; t=1740837324; x=1741442124; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=l1I8PVfs4+GvFFMfDb24JsmlYi7QK/OiALkoJ1xatCg=;
+        b=CeZpDrTCwIkkb6FvmCexsM1kkvzjI2QxeJw9Dw3T2lNibDQDrYcZR88xuJ12/2AXV4
+         QTdAtUT+Hl9SVfu6SkfG11dXnRWfUU+Y9vZ5BDpWLFx0HZFC1YJK0830iCF5ls/mgAWc
+         RZz1Z6vaIhDle4CUIgTKfk9937Wn0yDdFFEyl7JPKroDNsLLf5tIT7ydUdxexTTBuW8E
+         oZnkKI+c9UC3bQzywXX3wVMHHAx9DZIHAqeFqqx6U3kwJoondAzIMS5EEjG95jvtSKyW
+         ww913PA9no26RJAXM9BnYSlgvN9mlMf3WAXAuSwVH3mqqPskkmZa1yqbVxW3w2p3U0Fq
+         xweA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740837030; x=1741441830;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pJgxQ9kTw71K96V2pNjoEy9ewjLpxCqdEPFpCMMN/U4=;
-        b=dGMYXNGhvPWID0N6aessuO6+fBR+UgG7+HDDts8sldG1c3Pn8elZPBqyzy254P1nRI
-         L5VaVwPJO6qcDwvbYmGt5c2AWKXcfxHkENr1Xznit7J2BSS3yZdtFaIyCuWDAuC4COHo
-         2cFQSt+ANRxjbXqhD6I2KS2B2V+rUODDNN9hhhcMqBAuRGFyPRo9Z0Q0XSmKspJiLwxQ
-         cYO1k4JCAKWLuqMZg4tzJDyjMZlDG+ngM/zWXE7f4GwdBiq6E8h3sfC+CCDxRnLKFNho
-         77T3i/n1wDSOS63bSn+MvCxTuECf55YNYZMqleyPEBMO18K8WheLlmtEdiZ5BIZZgSb4
-         YWdA==
-X-Forwarded-Encrypted: i=1; AJvYcCVW1sRmtZY25fdaiHE/asicouqQ4d+mbisyV4s1tng6R/bp9lA/VjwTGqOriaofQqJPCY9smZ8W+b0WSXOz@vger.kernel.org, AJvYcCWR6O3z0/p2UsP9323KKWo0Lop2esRIMoQKYnKqNW5NC+yF11oXMqL7ivyACW5GF8fRNQOv2Oms@vger.kernel.org, AJvYcCX7z4RNFIwJhJ+oYKHXD2RaAsM6ZCWNZKcCnb/Gv4FEfsfd4HICVSk+9/f7s4vqy8aDgMfLE1GdRppWx3I=@vger.kernel.org, AJvYcCXUyUaZRc8JiI1vciBBvR/1zrrdbVFC9TDXuDk0o5A5zLN+vo8vOqokirhTEAFTJyjaR3qHnNm9@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhxRXvzL4mUvEFqao8JoYToVzf2sIpuL8LR9ALt/x7Fa68pKhL
-	6UoJ4NgqMtiVHB7tW2vCg3mNZ7hHbLVY1DFCvgxgzWFhs3iogInD
-X-Gm-Gg: ASbGncuPhgaVfc2VGjJBvzwxDTIFzK0DT4EcB8gBQUJiTnVF1oswPEbex/ZFKOsG3Fh
-	VUHrL3Z0fUlRyWERk/GtjOrm5gi6bX7IllPj08MOLEzyXjA38pQiyA8y4gJDjK9+b8Nv2dHazbD
-	oxiKiQ1UeM18x7bXjEdfgKk5EqNnqTcBOoEXsh9zjWvv7Jsg8LNR0w8CG2Vqmi1KUbDdQ+Ed+R6
-	S3sBrI6ONYYCDNsEYsOJqlew2imWsLE7DaHVIxqDEWiXGWd+O6bu/6SDX+UUfM1IgsACmiEJDel
-	kuLQYUlJmtfHJuSeAGP+vII8RACNTnidN9JAgevyEPv5G5up3zHJOhbuUH/TYxs6zi7VxRowKnD
-	A5A9FPT0sV22rVnmL0OZ9uP/AMafsdEKK
-X-Google-Smtp-Source: AGHT+IHaL4hbyWgR+iPuNLWB5nxuPIRAPj7rx5fVWakRllPjjwrCtFNjMmeB9yAzirq0UbQe6nIUbQ==
-X-Received: by 2002:a17:902:fc87:b0:223:6744:bfb9 with SMTP id d9443c01a7336-22369247768mr116255305ad.41.1740837030212;
-        Sat, 01 Mar 2025 05:50:30 -0800 (PST)
-Received: from ?IPV6:2409:8a55:301b:e120:3c9b:1380:5d8c:26d0? ([2409:8a55:301b:e120:3c9b:1380:5d8c:26d0])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2235052005fsm48280085ad.227.2025.03.01.05.50.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 01 Mar 2025 05:50:29 -0800 (PST)
-Message-ID: <cc3034c6-2589-4e9a-97af-a7879998d7d8@gmail.com>
-Date: Sat, 1 Mar 2025 21:49:55 +0800
+        d=1e100.net; s=20230601; t=1740837324; x=1741442124;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=l1I8PVfs4+GvFFMfDb24JsmlYi7QK/OiALkoJ1xatCg=;
+        b=doUdfCaFWt8GaE5ejhfC/wse974QKg4RO579zpA/iwNQiLv34my3HUjspq7ymwg5CC
+         yZ15YBys/SkY4h6cS8VjcE2KISaXEwvjc0XkPrcBvg0QNx5UKtU07be7MZrpC0zoYJuS
+         gnZUHyqIqnOI93jzAR3DxDUYyjMmu84KdJCXELGLPZamfBFnrV3ZYmWYTx5IT60e1NWL
+         qbKY8zaZYDs38gRs8cRs2hR2VeiGS7FFH3n9/mxCnn4rGKJUud97LNOH1Op4EgwPhOub
+         0PEjmA6a0QUYm0bUYvdyiESvzQcFSW7zk/6y2cL1FylUz6gf2QKJl4j5vLTp/GHMfgOx
+         RkpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU8yGATKSzJAvz0ljovnuS0NuXa/ydJjsoCoQubizypV86p9lV0DEYiAb4CVekdeY4WfBAHq9C/@vger.kernel.org, AJvYcCUUcVzcxnfV1VsoKsRCkaAMQRIWW1rXeDH2y4Ss0rV2W8ti7M5IC2TGiQxFCosnTCFcl03Ynx6LQQYF/Gg=@vger.kernel.org, AJvYcCXeMq4XcAc/REzqKHEQlGcmqE6QBUPUJpaDwRwSRfzzffmkzrvSzEVUsQ/RUYV8nhRJ4CDvRAUdguS0@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2cAMz2Hye3P+pBzXWCf6ITPYmOz0UwRKW1bH1ttAyYUiNhio2
+	4PTOW9kROZAsuDaJunNTlMNjsKhsOilJb26ZNQWxzBzaSesARxDt
+X-Gm-Gg: ASbGnctiwJuBD7zZS0ZhRKOpadfLwPE0XsCMHwn6zBhR6wZoJVHJ9O1/tYcLhrgdfBW
+	b7wD2KFCRAfY+ZQS3Pg/47087fPSsLAtPwcLeveZBj56XzkQTyrIk07+E311lNI9JSkhSLJ/Nuj
+	03URHunlY9rKpzdFM/Tqcat9liTf0lCppjOD5lJIfSk9dLS1oP/oJxGA5DU3tegJQyXaYY4reVl
+	OvprOIfBkTrTbWCj/b5AcjuqYlaOV/OjhIeiSA/ZwS0CIqWgBHMBDXtg4gu94is06JhoQIfvVHS
+	grHkaBhCoODRvsVAKYr5+1RQTx2wTycAHqFYQg==
+X-Google-Smtp-Source: AGHT+IHGKZRZmAndOYzn/cvVVCvYI8zxa3WIt8+bh7D6LpjEMNa15wqGPXXiDXP4Q07JmV+GvXCqRQ==
+X-Received: by 2002:a17:902:fccf:b0:220:e63c:5b08 with SMTP id d9443c01a7336-22368f6a1b5mr82188755ad.11.1740837323880;
+        Sat, 01 Mar 2025 05:55:23 -0800 (PST)
+Received: from gmail.com ([116.237.135.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-223501d529fsm49058765ad.48.2025.03.01.05.55.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 01 Mar 2025 05:55:23 -0800 (PST)
+From: Qingfang Deng <dqfext@gmail.com>
+To: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Michal Ostrowski <mostrows@earthlink.net>,
+	James Chapman <jchapman@katalix.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-ppp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] ppp: use IFF_NO_QUEUE in virtual interfaces
+Date: Sat,  1 Mar 2025 21:55:16 +0800
+Message-ID: <20250301135517.695809-1-dqfext@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] mm: page_frag: Fix refill handling in
- __page_frag_alloc_align()
-To: Haiyang Zhang <haiyangz@microsoft.com>, linux-hyperv@vger.kernel.org,
- akpm@linux-foundation.org, linux-mm@kvack.org
-Cc: decui@microsoft.com, kys@microsoft.com, paulros@microsoft.com,
- olaf@aepfle.de, vkuznets@redhat.com, davem@davemloft.net,
- wei.liu@kernel.org, longli@microsoft.com, linux-kernel@vger.kernel.org,
- linyunsheng@huawei.com, stable@vger.kernel.org, netdev@vger.kernel.org,
- Alexander Duyck <alexander.duyck@gmail.com>
-References: <1740794613-30500-1-git-send-email-haiyangz@microsoft.com>
-Content-Language: en-US
-From: Yunsheng Lin <yunshenglin0825@gmail.com>
-In-Reply-To: <1740794613-30500-1-git-send-email-haiyangz@microsoft.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-+cc netdev ML & Alexander
+For PPPoE, PPTP, and PPPoL2TP, the start_xmit() function directly
+forwards packets to the underlying network stack and never returns
+anything other than 1. So these interfaces do not require a qdisc,
+and the IFF_NO_QUEUE flag should be set.
 
-On 3/1/2025 10:03 AM, Haiyang Zhang wrote:
-> In commit 8218f62c9c9b ("mm: page_frag: use initial zero offset for
-> page_frag_alloc_align()"), the check for fragsz is moved earlier.
-> So when the cache is used up, and if the fragsz > PAGE_SIZE, it won't
-> try to refill, and just return NULL.
-> I tested it with fragsz:8192, cache-size:32768. After the initial four
-> successful allocations, it failed, even there is plenty of free memory
-> in the system.
+Introduces a direct_xmit flag in struct ppp_channel to indicate when
+IFF_NO_QUEUE should be applied. The flag is set in ppp_connect_channel()
+for relevant protocols.
 
-Hi, Haiyang
-It seems the PAGE_SIZE is 4K for the tested system?
-Which drivers or subsystems are passing the fragsz being bigger than
-PAGE_SIZE to page_frag_alloc_align() related API?
+While at it, remove the usused latency member from struct ppp_channel.
 
-> To fix, revert the refill logic like before: the refill is attempted
-> before the check & return NULL.
+Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+---
+RFC v3 -> v1: drop RFC, and remove the unused member
 
-page_frag API is not really for allocating memory being bigger than
-PAGE_SIZE as __page_frag_cache_refill() will not try hard enough to
-allocate order 3 compound page when calling __alloc_pages() and will
-fail back to allocate base page as the discussed in below:
-https://lore.kernel.org/all/ead00fb7-8538-45b3-8322-8a41386e7381@huawei.com/
+ drivers/net/ppp/ppp_generic.c | 4 ++++
+ drivers/net/ppp/pppoe.c       | 1 +
+ drivers/net/ppp/pptp.c        | 1 +
+ include/linux/ppp_channel.h   | 3 +--
+ net/l2tp/l2tp_ppp.c           | 1 +
+ 5 files changed, 8 insertions(+), 2 deletions(-)
 
-> 
-> Cc: linyunsheng@huawei.com
-> Cc: stable@vger.kernel.org
-> Fixes: 8218f62c9c9b ("mm: page_frag: use initial zero offset for page_frag_alloc_align()")
-> Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
-> ---
->   mm/page_frag_cache.c | 26 +++++++++++++-------------
->   1 file changed, 13 insertions(+), 13 deletions(-)
-> 
-> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
-> index d2423f30577e..82935d7e53de 100644
-> --- a/mm/page_frag_cache.c
-> +++ b/mm/page_frag_cache.c
-> @@ -119,19 +119,6 @@ void *__page_frag_alloc_align(struct page_frag_cache *nc,
->   	size = PAGE_SIZE << encoded_page_decode_order(encoded_page);
->   	offset = __ALIGN_KERNEL_MASK(nc->offset, ~align_mask);
->   	if (unlikely(offset + fragsz > size)) {
-> -		if (unlikely(fragsz > PAGE_SIZE)) {
-> -			/*
-> -			 * The caller is trying to allocate a fragment
-> -			 * with fragsz > PAGE_SIZE but the cache isn't big
-> -			 * enough to satisfy the request, this may
-> -			 * happen in low memory conditions.
-> -			 * We don't release the cache page because
-> -			 * it could make memory pressure worse
-> -			 * so we simply return NULL here.
-> -			 */
-> -			return NULL;
-> -		}
-> -
->   		page = encoded_page_decode_page(encoded_page);
->   
->   		if (!page_ref_sub_and_test(page, nc->pagecnt_bias))
-> @@ -149,6 +136,19 @@ void *__page_frag_alloc_align(struct page_frag_cache *nc,
->   		/* reset page count bias and offset to start of new frag */
->   		nc->pagecnt_bias = PAGE_FRAG_CACHE_MAX_SIZE + 1;
->   		offset = 0;
-> +
-> +		if (unlikely(fragsz > size)) {
-> +			/*
-> +			 * The caller is trying to allocate a fragment
-> +			 * with fragsz > size but the cache isn't big
-> +			 * enough to satisfy the request, this may
-> +			 * happen in low memory conditions.
-> +			 * We don't release the cache page because
-> +			 * it could make memory pressure worse
-> +			 * so we simply return NULL here.
-> +			 */
-> +			return NULL;
-> +		}
->   	}
->   
->   	nc->pagecnt_bias--;
+diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
+index 6220866258fc..815108c98b78 100644
+--- a/drivers/net/ppp/ppp_generic.c
++++ b/drivers/net/ppp/ppp_generic.c
+@@ -3493,6 +3493,10 @@ ppp_connect_channel(struct channel *pch, int unit)
+ 		ret = -ENOTCONN;
+ 		goto outl;
+ 	}
++	if (pch->chan->direct_xmit)
++		ppp->dev->priv_flags |= IFF_NO_QUEUE;
++	else
++		ppp->dev->priv_flags &= ~IFF_NO_QUEUE;
+ 	spin_unlock_bh(&pch->downl);
+ 	if (pch->file.hdrlen > ppp->file.hdrlen)
+ 		ppp->file.hdrlen = pch->file.hdrlen;
+diff --git a/drivers/net/ppp/pppoe.c b/drivers/net/ppp/pppoe.c
+index 2ea4f4890d23..68e631718ab0 100644
+--- a/drivers/net/ppp/pppoe.c
++++ b/drivers/net/ppp/pppoe.c
+@@ -693,6 +693,7 @@ static int pppoe_connect(struct socket *sock, struct sockaddr *uservaddr,
+ 		po->chan.mtu = dev->mtu - sizeof(struct pppoe_hdr) - 2;
+ 		po->chan.private = sk;
+ 		po->chan.ops = &pppoe_chan_ops;
++		po->chan.direct_xmit = true;
+ 
+ 		error = ppp_register_net_channel(dev_net(dev), &po->chan);
+ 		if (error) {
+diff --git a/drivers/net/ppp/pptp.c b/drivers/net/ppp/pptp.c
+index 689687bd2574..5feaa70b5f47 100644
+--- a/drivers/net/ppp/pptp.c
++++ b/drivers/net/ppp/pptp.c
+@@ -465,6 +465,7 @@ static int pptp_connect(struct socket *sock, struct sockaddr *uservaddr,
+ 	po->chan.mtu -= PPTP_HEADER_OVERHEAD;
+ 
+ 	po->chan.hdrlen = 2 + sizeof(struct pptp_gre_header);
++	po->chan.direct_xmit = true;
+ 	error = ppp_register_channel(&po->chan);
+ 	if (error) {
+ 		pr_err("PPTP: failed to register PPP channel (%d)\n", error);
+diff --git a/include/linux/ppp_channel.h b/include/linux/ppp_channel.h
+index 45e6e427ceb8..f73fbea0dbc2 100644
+--- a/include/linux/ppp_channel.h
++++ b/include/linux/ppp_channel.h
+@@ -42,8 +42,7 @@ struct ppp_channel {
+ 	int		hdrlen;		/* amount of headroom channel needs */
+ 	void		*ppp;		/* opaque to channel */
+ 	int		speed;		/* transfer rate (bytes/second) */
+-	/* the following is not used at present */
+-	int		latency;	/* overhead time in milliseconds */
++	bool		direct_xmit;	/* no qdisc, xmit directly */
+ };
+ 
+ #ifdef __KERNEL__
+diff --git a/net/l2tp/l2tp_ppp.c b/net/l2tp/l2tp_ppp.c
+index 53baf2dd5d5d..fc5c2fd8f34c 100644
+--- a/net/l2tp/l2tp_ppp.c
++++ b/net/l2tp/l2tp_ppp.c
+@@ -806,6 +806,7 @@ static int pppol2tp_connect(struct socket *sock, struct sockaddr *uservaddr,
+ 	po->chan.private = sk;
+ 	po->chan.ops	 = &pppol2tp_chan_ops;
+ 	po->chan.mtu	 = pppol2tp_tunnel_mtu(tunnel);
++	po->chan.direct_xmit	= true;
+ 
+ 	error = ppp_register_net_channel(sock_net(sk), &po->chan);
+ 	if (error) {
+-- 
+2.43.0
 
 
