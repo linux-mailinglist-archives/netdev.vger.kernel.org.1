@@ -1,113 +1,132 @@
-Return-Path: <netdev+bounces-170917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AF7CA4AA3E
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 11:39:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5356A4AA42
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 11:41:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3FA33BACE8
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 10:38:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 606A11899912
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 10:41:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4EEE1C07F6;
-	Sat,  1 Mar 2025 10:38:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21FCC1CAA9A;
+	Sat,  1 Mar 2025 10:41:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="KqrgluW3"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Trg6HRP+"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 196BE1E49F;
-	Sat,  1 Mar 2025 10:38:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CB781E49F
+	for <netdev@vger.kernel.org>; Sat,  1 Mar 2025 10:41:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740825537; cv=none; b=hlqc+0TpHZSghemcQlAUn53jUzJzMTCAIpp975JQWws5CwbxlDoM+COx+trC4kZi88UYE0rzKKSlEnKIt1aRy/UGR0j8qVlN7uWUUa35OCRekcc8FhMLThXLuSOojsm9PgnqvU/lzbLkejPvhr+a5XDsWO0Qe6bcfWAic06ZgOk=
+	t=1740825672; cv=none; b=ivBuUgIKDBMcthlEJcIECOHjuWuew+AQGwHHcSU3OQq9iqaEhwwlz6/nZrSxdNMNnykhRCR5lZ/hiVkWlmehdYNsQ7ywurUyri8kk5Lr3MGNWb7Q90lia5NzQx/XW737vG1lKsI/BfDVNnapjEi9spSCTTaXEBMKz7EjANb8St8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740825537; c=relaxed/simple;
-	bh=JQTs9bUhqydxLMWgj3vjSgvpLViqdm/Zd29g09a7KWo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FnUrzCMG2XTb6zL7unkJpsx1dLC6vxLZASoVWYShvz2FTt1Nsx7p2gSYHRin+mYBMUAWv9sW1bN1UbRaZXwe360N/I8z60n+nnBs+jXWNIZnrbaR9TAN44nDchnP1A0U6ccZaHZfWj/Mhhb7y/kUyXNR0VX57NaeZiIa4IURIN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=KqrgluW3; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 7478E43319;
-	Sat,  1 Mar 2025 10:38:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1740825527;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jnlxC8ZW/CfqDjl5QKxrbPd8VoYU7dt7zFWgQ1CDGLw=;
-	b=KqrgluW3hC8SfIGrUKkMKKLadJ1eu2tJh+1OKwN8pLZ5ENFClQlIrao6JGWw2C3gsdpNQu
-	0G7xW9aXdBnDd6Et46S01DCo2N+WTw4OHKnjhpY+QoR/dwU0Va3ov3eB0RvImmMpm47fSv
-	NYsUh0Klq7BvPIULXisXYYyG8RGPqMZgOINXbBEYG2wnpbyvD85Ej6rsrjatSn2R/RbiBh
-	GjL8kPHVxYxwBb2f65GC0aNe2Rug8j2bEzOaJKqH17t1M3GRSZ271Ktmo8xpZvtjT3N/2F
-	DD5faTJSD49wgxQns2R+Q2GacNNIr+DBmk7PNSvRpEDuMVU5wjaoPmjYysr5gQ==
-Date: Sat, 1 Mar 2025 11:38:43 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Parthiban Veerasooran
- <parthiban.veerasooran@microchip.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
- linux-arm-kernel@lists.infradead.org, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
- <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Simon Horman <horms@kernel.org>, Romain Gantois
- <romain.gantois@bootlin.com>, Piergiorgio Beruto
- <piergiorgio.beruto@gmail.com>
-Subject: Re: [PATCH net 2/2] net: ethtool: netlink: Pass a context for
- default ethnl notifications
-Message-ID: <20250301113843.3b9df0fe@fedora.home>
-In-Reply-To: <20250228182440.3c7f4709@kernel.org>
-References: <20250227182454.1998236-1-maxime.chevallier@bootlin.com>
-	<20250227182454.1998236-3-maxime.chevallier@bootlin.com>
-	<20250228182440.3c7f4709@kernel.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1740825672; c=relaxed/simple;
+	bh=axVvbg4f/XMx1VP+EM7fdMEfAM+ZiieklFFpiJyau4E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LHAYIhk1hK6+1IOn6FBCTIjhAYwaSv6zlRLkg59hR08/entkQvsLJBk3iCT1Z7ISUKQ0dCo6LFyIScv9xXUzwTAjJxxkFGUBW0Sxc0C10k2Yc0U6bmkifASWvTJj42tPvJRDiC/kV9GmxviI73G1VrZHHCpITyMneo7qrxjT3UY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Trg6HRP+; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=QKFTGOehFL46cXtqRQ3+zESpMtlY+tcTv0ubD9/y+6c=; b=Trg6HRP+asyq/AhpYZp8PCMXpU
+	P6abXB8fdAww95sHxSBpb5iQc4xNvsDF+eXQem4a8WkSlrTIbdhyEwdrMysAeEtyFqRUSEz4ZR3vi
+	yD0DvM9rNFapfCXBN7jLreOG5PYzRnlXJC8gfTOtFSdupK05xbq8KZ22Wr/MhZPWn/AUSoO366CFN
+	yJuVOpmy5su9V5IQ1tYmV0I4MyCBh6cfO6sIPC416v5tIxspDhfOm7cnSdYodr8EjTB4xqH4q8ZrR
+	RDsEzhyYqP7sdaJ5pALxzYeTDuAoOImADIRsz27+kz0n3/m2Wf1Iv7XdIrW/p4ACSnh0GnovZpLV+
+	v2mi/eBw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60874)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1toKHI-00045Z-0i;
+	Sat, 01 Mar 2025 10:41:04 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1toKHF-0001ia-23;
+	Sat, 01 Mar 2025 10:41:01 +0000
+Date: Sat, 1 Mar 2025 10:41:01 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>, netdev <netdev@vger.kernel.org>
+Subject: Re: [QUERY] : STMMAC Clocks
+Message-ID: <Z8LkPQ-w_jyXriFp@shell.armlinux.org.uk>
+References: <CA+V-a8u04AskomiOqBKLkTzq3uJnFas6sitF6wbNi=md6DtZbw@mail.gmail.com>
+ <84b9c6b7-46b1-444f-b8db-d1f6d4fc5d1c@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdelfedtjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvtddprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopegvughum
- hgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehprghrthhhihgsrghnrdhvvggvrhgrshhoohhrrghnsehmihgtrhhotghhihhprdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <84b9c6b7-46b1-444f-b8db-d1f6d4fc5d1c@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, 28 Feb 2025 18:24:40 -0800
-Jakub Kicinski <kuba@kernel.org> wrote:
-
-> On Thu, 27 Feb 2025 19:24:52 +0100 Maxime Chevallier wrote:
-> > The only relevant user for now is PLCA, and it very likely that we never
-> > ended-up in a situation where the follow-up notif wasn't targeting the
-> > correct PHY as :  
+On Sat, Mar 01, 2025 at 12:38:04AM +0100, Andrew Lunn wrote:
+> On Fri, Feb 28, 2025 at 09:51:15PM +0000, Lad, Prabhakar wrote:
+> > Hi All,
+> > 
+> > I am bit confused related clocks naming in with respect to STMMAC driver,
+> > 
+> > We have the below clocks in the binding doc:
+> > - stmmaceth
+> > - pclk
+> > - ptp_ref
+> > 
+> > But there isn't any description for this. Based on this patch [0]
+> > which isn't in mainline we have,
+> > - stmmaceth - system clock
+> > - pclk - CSR clock
+> > - ptp_ref - PTP reference clock.
+> > 
+> > [0] https://patches.linaro.org/project/netdev/patch/20210208135609.7685-23-Sergey.Semin@baikalelectronics.ru/
+> > 
+> > Can somebody please clarify on the above as I am planning to add a
+> > platform which supports the below clocks:
+> > - CSR clock
+> > - AXI system clock
+> > - Tx & Tx-180
+> > - Rx & Rx-180
 > 
-> PLCA uses the ethnl_default_* handlers but it seems to operate on PHYs
-> now. How does the dump work? Shoehorning the PHY support into
-> the ethnl_default_* handlers is starting to look pretty messy.
+> Please take a look at the recent patches to stmmac for clock handling,
+> in particular the clocks used for RGMII
+> 
+> For the meaning of the clocks, you need to look at the vendors binding
+> document. Vendors tend to call the clocks whatever they want, rather
+> than have one consistent naming between vendors. The IP might be
+> licensed, but each vendor integrates it differently, inventing their
+> own clock names. It might of helped if Synopsis had requested in there
+> databook what each clock was called, so there was some consistency,
+> but this does not appear to of happened.
 
-Thinking more about this, this patch shouldn't have targetted -net in
-the first place, as no usecase regressed yet (we don't have any
-multi-PHY PLCA setup that exists). The DUMP keeps working as it did
-before for that command, in that we dump the PLCA info for
-netdev->phydev.
+Part of the problem is that vendors can place clock muxes and gates
+and divisors around the Synopsys block, where some muxes/divisors can
+be controlled by signals output by the Synopsys block (and thus are
+hidden from software). This is especially true of the pair of clk_tx_i
+and pair of clk_rx_i clocks.
 
-That DUMP / notify situation needs to be addressed as tome point thouh,
-before the multi-PHY support through muxes lands (haven't sent it yet,
-I'm still on the preliminary series for phy_ports).
+Thus, the clocks that are visible may be functionally different from
+the Synopsys defined clocks.
 
-So I think that indeed, I'll resend patch 1, and find a more graceful
-solution for the phy-targetting commands in a separate series.
+However, I think that we should push to standardise on the Synopsys
+named clock names where they exist (essentially optional) and then
+allow platform specific clocks where they're buried out of view in
+the way I describe above.
 
-Maxime
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
