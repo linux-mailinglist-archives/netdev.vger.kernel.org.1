@@ -1,124 +1,127 @@
-Return-Path: <netdev+bounces-170949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A04F9A4AC7F
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 16:15:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6851A4AC9C
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 16:47:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5DDF17138A
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 15:15:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7947171844
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 15:47:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15F8C1DE3A3;
-	Sat,  1 Mar 2025 15:15:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3DAB1DFD86;
+	Sat,  1 Mar 2025 15:47:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SZqIo3Xr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PihMv54q"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FFA035976
-	for <netdev@vger.kernel.org>; Sat,  1 Mar 2025 15:15:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365E135971;
+	Sat,  1 Mar 2025 15:47:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740842136; cv=none; b=Ufwz3ISsbQ4U9eE4yEFKJphA9Dk1RUGudaTa8hjBwd0zOhwj3EqDMEUmVp0gcxsmY/fipfEj63VJAq4RtQQrVPirvKr72EtIgW0tIgeCroAXMIUsBKSSDT3HPP0YWII9HY1YrEQ8ObF15ClIMWvKGHD/akQvomyjvV9916t6lcM=
+	t=1740844060; cv=none; b=pdlOrfA2YgY1TTqTR9Z27VVw6yB5ghWk/VTX5wjZXTeMZj9jqWHfN2/x77wKWBQxPuXo8HRGzUkNPUA86CVGdbe3oztYvDYBPib9jZKpPVEzruQ40+D8OCyqFfFWBtGSItY3xuNe/dRWhkB7lnGk5UIqyIKtUCH57W5OK3Dl2aQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740842136; c=relaxed/simple;
-	bh=2KgDhait4VOyxn0K/Pb/xtbbcRtfybSnzOMuUpV1qRU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ps5o8/iSE9ywNp+TD2bG3rzGCnWcZxHsWytg841k7YlQLNKbZggQ6P/JzezW2w6+hKnXX5iUeghPb2t1u3i9TEwxuajr9gpfXn9A/1NoWH7YK22T3NTtMMUlWWJfretDuosPzaQKGdBcHEvI12wMfW47PJTtcH5Fv2BbUj4AX0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SZqIo3Xr; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=04Av02GWIrKnQFrIEX9q1ez63PubUFTQ9f9hPd/0h/4=; b=SZqIo3XrzrCFZqV5rqSkEpYS0l
-	1CahZqGALnxEJQS2XiSzTq14jMMpfLaVMSv/qFmGjmkzMW5yjLUwA6d1uISL4s/M57mcD1xeb9aUj
-	elqP0tzssi96dBXOHEDZc4CCdWaW0FncLuH6t794K9sX58NmUYnPwV+YZc/ruqPJFn2M=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1toOYf-001Hla-5s; Sat, 01 Mar 2025 16:15:17 +0100
-Date: Sat, 1 Mar 2025 16:15:17 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>, netdev <netdev@vger.kernel.org>
-Subject: Re: [QUERY] : STMMAC Clocks
-Message-ID: <e54bf5af-b2ab-496d-9146-41f88bc4b5f2@lunn.ch>
-References: <CA+V-a8u04AskomiOqBKLkTzq3uJnFas6sitF6wbNi=md6DtZbw@mail.gmail.com>
- <84b9c6b7-46b1-444f-b8db-d1f6d4fc5d1c@lunn.ch>
- <Z8LkPQ-w_jyXriFp@shell.armlinux.org.uk>
+	s=arc-20240116; t=1740844060; c=relaxed/simple;
+	bh=qaYwzM0tPLZWBNtMZwEjySSIGmwDhWL+JeN07b9+R70=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c1lkKMLyUCSBYmSKXItlTf0wwA+xdHmvK11XrUo9vuMGguPF2SW376l3alieSJCJVSUyPxwdl/NsMfrv/ndGlTephXITWQmnL7Nhtz73KfNJoD4Onwb/i61rQlu6Xilbpp5Lv5lVNnJ1WzSS31/brc8MxXqqUftOGghoBQNNN1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PihMv54q; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-ab7430e27b2so529128666b.3;
+        Sat, 01 Mar 2025 07:47:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740844057; x=1741448857; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pvcp/Ow9PKUt0GAoY+iQqvy3UdZ1k/popr5tmmzvjdw=;
+        b=PihMv54qMAT6tRv6Iyp0TGc1+p9MzOjOc/vVPs4jTYlvy+fFL6ARWQjnQbJoB9NHTV
+         MZRwo+y9gn5TIMErHDSzX4eDUgFVqwMwXm3zUUT9TF7RPVpxLUyqdQentt79D4EjgUoN
+         t1Nepo7h2Ek3F3AMfZVnv48v+DjCBT6xnJGinEkzE5NEUwC3KG4hHNJ/MADG1Dw/MneV
+         4UWz1/iPtMdrCsUdHFuUDPpNIC+qE1v/X2VSHi3VAXXhj4OFqhWR73EKgo/oTzudw3Cn
+         cobAYjxK3cQBVogUhM11NtNsatL3GhtXU1NzAy8Gu6Y+Om0fzjMiKspVURCu2Fr9ki5d
+         PfvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740844057; x=1741448857;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pvcp/Ow9PKUt0GAoY+iQqvy3UdZ1k/popr5tmmzvjdw=;
+        b=qUwk3BbXbDJD3JcwCqJrXyzAfAgQVGPmY3uNXuWz1HkSceBP8CkMftXE/b4L1dG+mb
+         UiFcaGfvz0On6kOeBeWmwrANGM6qr5gNp96EDcna5YvNOsklrBjdcgnn15h+P6lGV6y9
+         1kF3//XvSkMp4K6AED2vevcBTFKbTdzegvdlkkBp5Upg5Vpu+Ii/OxAlHZNHvH7hoAGg
+         G6TuJ8TnA9dV/V6tE7+DCcOwvnDrlMSq4FnGYeY5TWURlkipssxMyw7bWqX1xDV4W8MI
+         innGHhmJY+wgRZMIB+MwXlzsTSD+Q5I1xrASc8quZlqcCi1w/+jBhuboobjHKyDqhXBW
+         4P4g==
+X-Forwarded-Encrypted: i=1; AJvYcCV48j9TLc8ThyXTUKB50idw5FXFp403XVFuWpFZqcunVor2yp97qLPFqkTAfCw4CGZRfPc7/dd+8w4ZSPs4XUz1@vger.kernel.org, AJvYcCX9cb08MTLRg6X92+Zi0O3T7CDKZuQQ9ekNRcBnyA290B8hgfN2Jsd8BCFeD22LPMu/jls/3jfCJ7xRliMc@vger.kernel.org, AJvYcCXtlRk6/MXcq0C2rUCdBIJfqwlk8OM4yfSAiU0scvYrmBaTCkGRQQPHcFI80xaoaNjUKYBKxU6aZu19u+6SWX8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YztyTqUs35ERtd51dgcx1XxBx8wIcKR7EA3rw/XcXF4+jgRDWj+
+	8yFZwctPeaJcOVdpsIUyDXb0dbax4Zqvq1tVnK7aE3yp69jaXplf
+X-Gm-Gg: ASbGncvWQ2/Lw9cDag0GSAh05ZTw5cBwy17nnG1E/RTwpjsHxikXIXmYMqi+Ugz5fyL
+	aplN+TYN49DGJTTu9stR/MjN6WHpDdcIvYX/6Cy6wM9cSlay07cN5hsMgtPFoQ7CeaV4bc/EyU8
+	NLiIYctNVPn1qTkKOOrpIXK98BH381rcg6X/ctQNuHj0oD3mqKeQ0YAU1C9AGUI/L1L53BLHTSO
+	dE3NfaEAjkjH0Jy6NY9NtKccnICkbe5e8uzyxw5z95whK+s0E5vretK9QpUgELs2YJ2nuUGJgMe
+	UiUMTQhDpcHmrXvmBTcoaDtTgGZrkQi6lCzEQXZjK7D7JW7/0n7uVyfy0LBR56QhQXPB3KoNqRQ
+	qKqTi717Ijc/epfg0py4Axwvi4PJ/t6y2cGc7AHxrcM+Hujvzu60ckirVMe8/naCe6I0UNDXnIU
+	ZQpZLXv3enfx18FWic06Y=
+X-Google-Smtp-Source: AGHT+IG+eqrFeyO3A7KDD2S5BrzG0fkxCUE3rRFtAlmdPlWrBAor9q1vffWfk9dSAf3TW6qzlDGFvA==
+X-Received: by 2002:a17:907:2d8c:b0:abf:4c5f:7546 with SMTP id a640c23a62f3a-abf4c5f7590mr317216866b.38.1740844057241;
+        Sat, 01 Mar 2025 07:47:37 -0800 (PST)
+Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e4c3b6d252sm4287355a12.26.2025.03.01.07.47.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 01 Mar 2025 07:47:36 -0800 (PST)
+Message-ID: <fc5129dd-35a8-4bcc-8e54-b8facda2cbc4@gmail.com>
+Date: Sat, 1 Mar 2025 16:47:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z8LkPQ-w_jyXriFp@shell.armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 net-next 01/15] net: pppoe: avoid zero-length arrays in
+ struct pppoe_hdr
+To: Michal Ostrowski <mostrows@earthlink.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Jiri Pirko <jiri@resnulli.us>,
+ Ivan Vecera <ivecera@redhat.com>, Roopa Prabhu <roopa@nvidia.com>,
+ Nikolay Aleksandrov <razor@blackwall.org>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Ahmed Zaki <ahmed.zaki@intel.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Vladimir Oltean <olteanv@gmail.com>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Daniel Golle <daniel@makrotopia.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ bridge@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, linux-hardening@vger.kernel.org,
+ Kees Cook <kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>
+References: <20250228201533.23836-1-ericwouds@gmail.com>
+ <20250228201533.23836-2-ericwouds@gmail.com>
+From: Eric Woudstra <ericwouds@gmail.com>
+Content-Language: en-US
+In-Reply-To: <20250228201533.23836-2-ericwouds@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> However, I think that we should push to standardise on the Synopsys
-> named clock names where they exist (essentially optional) and then
-> allow platform specific clocks where they're buried out of view in
-> the way I describe above.
 
-Interestingly snps,dwc-qos-ethernet.txt has a pretty good description:
 
-- clock-names: May contain any/all of the following depending on the IP
-  configuration, in any order:
-  - "tx"
-    The EQOS transmit path clock. The HW signal name is clk_tx_i.
-    In some configurations (e.g. GMII/RGMII), this clock also drives the PHY TX
-    path. In other configurations, other clocks (such as tx_125, rmii) may
-    drive the PHY TX path.
-  - "rx"
-    The EQOS receive path clock. The HW signal name is clk_rx_i.
-    In some configurations (e.g. GMII/RGMII), this clock is derived from the
-    PHY's RX clock output. In other configurations, other clocks (such as
-    rx_125, rmii) may drive the EQOS RX path.
-    In cases where the PHY clock is directly fed into the EQOS receive path
-    without intervening logic, the DT need not represent this clock, since it
-    is assumed to be fully under the control of the PHY device/driver. In
-    cases where SoC integration adds additional logic to this path, such as a
-    SW-controlled clock gate, this clock should be represented in DT.
-  - "slave_bus"
-    The CPU/slave-bus (CSR) interface clock. This applies to any bus type;
-    APB, AHB, AXI, etc. The HW signal name is hclk_i (AHB) or clk_csr_i (other
-    buses).
-  - "master_bus"
-    The master bus interface clock. Only required in configurations that use a
-    separate clock for the master and slave bus interfaces. The HW signal name
-    is hclk_i (AHB) or aclk_i (AXI).
-  - "ptp_ref"
-    The PTP reference clock. The HW signal name is clk_ptp_ref_i.
-  - "phy_ref_clk"
-    This clock is deprecated and should not be used by new compatible values.
-    It is equivalent to "tx".
-  - "apb_pclk"
-    This clock is deprecated and should not be used by new compatible values.
-    It is equivalent to "slave_bus".
+On 2/28/25 9:15 PM, Eric Woudstra wrote:
+>  drivers/net/ppp/pppoe.c       | 2 +-
+>  include/uapi/linux/if_pppox.h | 4 ++++
+>  2 files changed, 5 insertions(+), 1 deletion(-)
 
-But snps,dwmac.yaml only has:
-
- clock-names:
-    minItems: 1
-    maxItems: 8
-    additionalItems: true
-    contains:
-      enum:
-        - stmmaceth
-        - pclk
-        - ptp_ref
-
-Could you improve the description in snps,dwmac.yaml, based on what
-you seen in the data book?
-
-	Andrew
+The maintainers email: Michal Ostrowski <mostrows@earthlink.net>
+Returns 403: 550 5.5.1 Recipient rejected. This mailbox does not exist here.
 
