@@ -1,133 +1,317 @@
-Return-Path: <netdev+bounces-170926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF884A4AB76
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 14:59:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C89AFA4AB87
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 15:11:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F28C8171AC6
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 13:59:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F24F2189688E
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 14:11:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D010C1DF96C;
-	Sat,  1 Mar 2025 13:59:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F130D1DEFEE;
+	Sat,  1 Mar 2025 14:11:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RohfkqhX"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Wr21Ju86"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99BEA1DE3CF;
-	Sat,  1 Mar 2025 13:59:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F72E1DED5A;
+	Sat,  1 Mar 2025 14:11:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740837575; cv=none; b=IIMFPrl8NrDJ4GcLahlAf3yDhS2ZCGxbJ5zjmzMKsDt8dH/g/ZqXsE2kbpCY9Sauio3LheaIDJQDFXH0Gk76phP21mOLPyLrfV8E5iHnVtsvD5BE631MLBLyfee3wnpTr+sVOpyYQg2Ru8Mvzw1hOHYb1j2VdDQ8cjX4RH8LJhI=
+	t=1740838282; cv=none; b=PlrKhbahfIvE24A3L7JXjbRBY6KrBYIu0ep1lgulCK7mOQOA2ewPo2c7HCs8dASX1RFDJmPsL2jhCMiho796D/lT0IyVe8rGikZrzOPP5WC3ZGGHeSDLwPypCN+avGKHeBdAewWL5mmX/w0UbxPzLyrkTWLD2j0C40fyjhtF5Jo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740837575; c=relaxed/simple;
-	bh=CyH5RNjtxFCfv3oIJOJKyf7js632Edfyw00lesyBqVc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W9EJBthu4afD+4Ra7x+DfFLXTg0dH9SvEQM1hvh4KP8BBFB4IjuOqmjvTsyJIz86bn+WKZTVJ3zEbe58QHVB3557Iv0TULg/dW6J8RdDfeAyW+E51vhNKpGzQVloY2bGGl+9eZ02eVys6SqGfkMumalZ7uXiKkIkkeKDDi5r+nU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RohfkqhX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0AC4C4CEDD;
-	Sat,  1 Mar 2025 13:59:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740837575;
-	bh=CyH5RNjtxFCfv3oIJOJKyf7js632Edfyw00lesyBqVc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=RohfkqhXXhpEpM+MwpsDmYTExRDZvdBeqZVyxeOUmPiXOcHGl5a0djuW2YlySjqHp
-	 M1k8nnXNOKBEQCHTPesI/ZxxrwfpH/xMTMeTt0/9RdPpYl4KsUlRphj4AByMuEw9U0
-	 DlYiWTmmmFKq0UCsT9XwU5QXKvPkHzsy0ncTzOOElY0xiHKOfx9CRhBoiZZ+QHGYuA
-	 qasRBNJuwVisafJXCidu6FvXkmWatKOO+LU+BTK1JhrLa/4WvmSrONjnDHq/uHgYQd
-	 g/hlLv74iCtqcrFMrSHJc2kyJ0lSi21fEvytc+wcb0cMy+hIUws9asECaGzft9nNVd
-	 p6jxfKydePaGw==
-Message-ID: <7328e538-31cf-4674-83d2-943f1a2d1455@kernel.org>
-Date: Sat, 1 Mar 2025 14:59:26 +0100
+	s=arc-20240116; t=1740838282; c=relaxed/simple;
+	bh=AswYZNkHo+Cu7mTOivQG5MxzgFbEE5CkE/SmqJv0IMU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r26nnpT+IkRyWeXdwDBHcVN9BoYG211uwFtEUmDH7igpqL4IkfrXEyR+gs5iTe3QYN9k/SkPzsyiLkkUyAdrQ3PUjjtpqM8E+pg1tZoZbtG3bHTPuOPaQCphkf3pq9FV5Q+LOH7CbxBNA6vszFYK27H3+xKEmtsgI2tCbZQBSJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Wr21Ju86; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 30CC743315;
+	Sat,  1 Mar 2025 14:11:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1740838277;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=gxxrA5TGUbh+xCz1QfWoVv9hBkCa7QJfvAHDsjuob1g=;
+	b=Wr21Ju86aahNvOxsQKgm/dmyd7gTFvapYwF7CMccXs7tJxrVHUkKQix+jnHC/IdBUst2jO
+	SAaEGu4mlRX14a7rp/nz8z3974E+LZIkplH3KWO1XE0a+Mwe7QtvqsMHqBKPJqtZGjrQdD
+	CMdi+CoMSAldwMQKiwKxzL2XP5uMfHzTDUQa5y2A5ZtZRSeOlWHUCceLlpj5oWimNqB27U
+	ex2H8Ukc92yyhcgs4luiaKO0zmHTW5rit2f3ay43SNZvMRhCd4Mur9LwT8pMswiyj2NK29
+	pqNeNxGfOEg75Kw3NdIaA+lwmUo5jakU2M0yrlPXzBvkBXWl1v7uKhXLaW2X3w==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Simon Horman <horms@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>
+Subject: [PATCH net v2] net: ethtool: netlink: Allow NULL nlattrs when getting a phy_device
+Date: Sat,  1 Mar 2025 15:11:13 +0100
+Message-ID: <20250301141114.97204-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 1/2] arm64: dts: fsd: Add Ethernet support for FSYS0
- Block of FSD SoC
-To: Swathi K S <swathi.ks@samsung.com>, krzk+dt@kernel.org,
- linux-fsd@tesla.com, robh@kernel.org, conor+dt@kernel.org,
- richardcochran@gmail.com, alim.akhtar@samsung.com
-Cc: jayati.sahu@samsung.com, linux-arm-kernel@lists.infradead.org,
- linux-samsung-soc@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- pankaj.dubey@samsung.com, ravi.patel@samsung.com, gost.dev@samsung.com
-References: <20250220073527.22233-1-swathi.ks@samsung.com>
- <CGME20250220073944epcas5p495ee305ca577a7e1be51ff916f20fc53@epcas5p4.samsung.com>
- <20250220073527.22233-2-swathi.ks@samsung.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20250220073527.22233-2-swathi.ks@samsung.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdelfeehtdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeejhfelieehgfffiefftdffiedvheefteehkedukefgteffteevffeuueejiedtveenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecukfhppedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgdphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvddupdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlr
+ dhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepphgrrhhthhhisggrnhdrvhgvvghrrghsohhorhgrnhesmhhitghrohgthhhiphdrtghomhdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhm
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On 20/02/2025 08:35, Swathi K S wrote:
->  &pinctrl_peric {
-> diff --git a/arch/arm64/boot/dts/tesla/fsd.dtsi b/arch/arm64/boot/dts/tesla/fsd.dtsi
-> index 690b4ed9c29b..01850fbf761f 100644
-> --- a/arch/arm64/boot/dts/tesla/fsd.dtsi
-> +++ b/arch/arm64/boot/dts/tesla/fsd.dtsi
-> @@ -1007,6 +1007,26 @@
->  			clocks = <&clock_fsys0 UFS0_MPHY_REFCLK_IXTAL26>;
->  			clock-names = "ref_clk";
->  		};
-> +
-> +		ethernet0: ethernet@15300000 {
-> +			compatible = "tesla,fsd-ethqos";
+ethnl_req_get_phydev() is used to lookup a phy_device, in the case an
+ethtool netlink command targets a specific phydev within a netdev's
+topology.
 
-I don't see bindings in the linux-next, so I am dropping this patch from
-my queue. Please resend when the bindings hit the linux-next.
+It takes as a parameter a const struct nlattr *header that's used for
+error handling :
 
-Best regards,
-Krzysztof
+       if (!phydev) {
+               NL_SET_ERR_MSG_ATTR(extack, header,
+                                   "no phy matching phyindex");
+               return ERR_PTR(-ENODEV);
+       }
+
+In the notify path after a ->set operation however, there's no request
+attributes available.
+
+The typical callsite for the above function looks like:
+
+	phydev = ethnl_req_get_phydev(req_base, tb[ETHTOOL_A_XXX_HEADER],
+				      info->extack);
+
+So, when tb is NULL (such as in the ethnl notify path), we have a nice
+crash.
+
+It turns out that there's only the PLCA command that is in that case, as
+the other phydev-specific commands don't have a notification.
+
+This commit fixes the crash by passing the cmd index and the nlattr
+array separately, allowing NULL-checking it directly inside the helper.
+
+Fixes: c15e065b46dc ("net: ethtool: Allow passing a phy index for some commands")
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
+
+V2: Send this patch as a standalone fix instead of including it in a
+series [1] containing patches that don't belong to net. No modifications
+were made besides a rebase on -net.
+
+[1]: https://lore.kernel.org/netdev/20250227182454.1998236-1-maxime.chevallier@bootlin.com/
+
+ net/ethtool/cabletest.c | 8 ++++----
+ net/ethtool/linkstate.c | 2 +-
+ net/ethtool/netlink.c   | 6 +++---
+ net/ethtool/netlink.h   | 5 +++--
+ net/ethtool/phy.c       | 2 +-
+ net/ethtool/plca.c      | 6 +++---
+ net/ethtool/pse-pd.c    | 4 ++--
+ net/ethtool/stats.c     | 2 +-
+ net/ethtool/strset.c    | 2 +-
+ 9 files changed, 19 insertions(+), 18 deletions(-)
+
+diff --git a/net/ethtool/cabletest.c b/net/ethtool/cabletest.c
+index f22051f33868..84096f6b0236 100644
+--- a/net/ethtool/cabletest.c
++++ b/net/ethtool/cabletest.c
+@@ -72,8 +72,8 @@ int ethnl_act_cable_test(struct sk_buff *skb, struct genl_info *info)
+ 	dev = req_info.dev;
+ 
+ 	rtnl_lock();
+-	phydev = ethnl_req_get_phydev(&req_info,
+-				      tb[ETHTOOL_A_CABLE_TEST_HEADER],
++	phydev = ethnl_req_get_phydev(&req_info, tb,
++				      ETHTOOL_A_CABLE_TEST_HEADER,
+ 				      info->extack);
+ 	if (IS_ERR_OR_NULL(phydev)) {
+ 		ret = -EOPNOTSUPP;
+@@ -339,8 +339,8 @@ int ethnl_act_cable_test_tdr(struct sk_buff *skb, struct genl_info *info)
+ 		goto out_dev_put;
+ 
+ 	rtnl_lock();
+-	phydev = ethnl_req_get_phydev(&req_info,
+-				      tb[ETHTOOL_A_CABLE_TEST_TDR_HEADER],
++	phydev = ethnl_req_get_phydev(&req_info, tb,
++				      ETHTOOL_A_CABLE_TEST_TDR_HEADER,
+ 				      info->extack);
+ 	if (IS_ERR_OR_NULL(phydev)) {
+ 		ret = -EOPNOTSUPP;
+diff --git a/net/ethtool/linkstate.c b/net/ethtool/linkstate.c
+index af19e1bed303..05a5f72c99fa 100644
+--- a/net/ethtool/linkstate.c
++++ b/net/ethtool/linkstate.c
+@@ -103,7 +103,7 @@ static int linkstate_prepare_data(const struct ethnl_req_info *req_base,
+ 	struct phy_device *phydev;
+ 	int ret;
+ 
+-	phydev = ethnl_req_get_phydev(req_base, tb[ETHTOOL_A_LINKSTATE_HEADER],
++	phydev = ethnl_req_get_phydev(req_base, tb, ETHTOOL_A_LINKSTATE_HEADER,
+ 				      info->extack);
+ 	if (IS_ERR(phydev)) {
+ 		ret = PTR_ERR(phydev);
+diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
+index b4c45207fa32..734849a57369 100644
+--- a/net/ethtool/netlink.c
++++ b/net/ethtool/netlink.c
+@@ -211,7 +211,7 @@ int ethnl_parse_header_dev_get(struct ethnl_req_info *req_info,
+ }
+ 
+ struct phy_device *ethnl_req_get_phydev(const struct ethnl_req_info *req_info,
+-					const struct nlattr *header,
++					struct nlattr **tb, unsigned int header,
+ 					struct netlink_ext_ack *extack)
+ {
+ 	struct phy_device *phydev;
+@@ -225,8 +225,8 @@ struct phy_device *ethnl_req_get_phydev(const struct ethnl_req_info *req_info,
+ 		return req_info->dev->phydev;
+ 
+ 	phydev = phy_link_topo_get_phy(req_info->dev, req_info->phy_index);
+-	if (!phydev) {
+-		NL_SET_ERR_MSG_ATTR(extack, header,
++	if (!phydev && tb) {
++		NL_SET_ERR_MSG_ATTR(extack, tb[header],
+ 				    "no phy matching phyindex");
+ 		return ERR_PTR(-ENODEV);
+ 	}
+diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
+index ff69ca0715de..ec6ab5443a6f 100644
+--- a/net/ethtool/netlink.h
++++ b/net/ethtool/netlink.h
+@@ -275,7 +275,8 @@ static inline void ethnl_parse_header_dev_put(struct ethnl_req_info *req_info)
+  * ethnl_req_get_phydev() - Gets the phy_device targeted by this request,
+  *			    if any. Must be called under rntl_lock().
+  * @req_info:	The ethnl request to get the phy from.
+- * @header:	The netlink header, used for error reporting.
++ * @tb:		The netlink attributes array, for error reporting.
++ * @header:	The netlink header index, used for error reporting.
+  * @extack:	The netlink extended ACK, for error reporting.
+  *
+  * The caller must hold RTNL, until it's done interacting with the returned
+@@ -289,7 +290,7 @@ static inline void ethnl_parse_header_dev_put(struct ethnl_req_info *req_info)
+  *	   is returned.
+  */
+ struct phy_device *ethnl_req_get_phydev(const struct ethnl_req_info *req_info,
+-					const struct nlattr *header,
++					struct nlattr **tb, unsigned int header,
+ 					struct netlink_ext_ack *extack);
+ 
+ /**
+diff --git a/net/ethtool/phy.c b/net/ethtool/phy.c
+index ed8f690f6bac..e067cc234419 100644
+--- a/net/ethtool/phy.c
++++ b/net/ethtool/phy.c
+@@ -125,7 +125,7 @@ static int ethnl_phy_parse_request(struct ethnl_req_info *req_base,
+ 	struct phy_req_info *req_info = PHY_REQINFO(req_base);
+ 	struct phy_device *phydev;
+ 
+-	phydev = ethnl_req_get_phydev(req_base, tb[ETHTOOL_A_PHY_HEADER],
++	phydev = ethnl_req_get_phydev(req_base, tb, ETHTOOL_A_PHY_HEADER,
+ 				      extack);
+ 	if (!phydev)
+ 		return 0;
+diff --git a/net/ethtool/plca.c b/net/ethtool/plca.c
+index d95d92f173a6..e1f7820a6158 100644
+--- a/net/ethtool/plca.c
++++ b/net/ethtool/plca.c
+@@ -62,7 +62,7 @@ static int plca_get_cfg_prepare_data(const struct ethnl_req_info *req_base,
+ 	struct phy_device *phydev;
+ 	int ret;
+ 
+-	phydev = ethnl_req_get_phydev(req_base, tb[ETHTOOL_A_PLCA_HEADER],
++	phydev = ethnl_req_get_phydev(req_base, tb, ETHTOOL_A_PLCA_HEADER,
+ 				      info->extack);
+ 	// check that the PHY device is available and connected
+ 	if (IS_ERR_OR_NULL(phydev)) {
+@@ -152,7 +152,7 @@ ethnl_set_plca(struct ethnl_req_info *req_info, struct genl_info *info)
+ 	bool mod = false;
+ 	int ret;
+ 
+-	phydev = ethnl_req_get_phydev(req_info, tb[ETHTOOL_A_PLCA_HEADER],
++	phydev = ethnl_req_get_phydev(req_info, tb, ETHTOOL_A_PLCA_HEADER,
+ 				      info->extack);
+ 	// check that the PHY device is available and connected
+ 	if (IS_ERR_OR_NULL(phydev))
+@@ -211,7 +211,7 @@ static int plca_get_status_prepare_data(const struct ethnl_req_info *req_base,
+ 	struct phy_device *phydev;
+ 	int ret;
+ 
+-	phydev = ethnl_req_get_phydev(req_base, tb[ETHTOOL_A_PLCA_HEADER],
++	phydev = ethnl_req_get_phydev(req_base, tb, ETHTOOL_A_PLCA_HEADER,
+ 				      info->extack);
+ 	// check that the PHY device is available and connected
+ 	if (IS_ERR_OR_NULL(phydev)) {
+diff --git a/net/ethtool/pse-pd.c b/net/ethtool/pse-pd.c
+index 2819e2ba6be2..4f6b99eab2a6 100644
+--- a/net/ethtool/pse-pd.c
++++ b/net/ethtool/pse-pd.c
+@@ -64,7 +64,7 @@ static int pse_prepare_data(const struct ethnl_req_info *req_base,
+ 	if (ret < 0)
+ 		return ret;
+ 
+-	phydev = ethnl_req_get_phydev(req_base, tb[ETHTOOL_A_PSE_HEADER],
++	phydev = ethnl_req_get_phydev(req_base, tb, ETHTOOL_A_PSE_HEADER,
+ 				      info->extack);
+ 	if (IS_ERR(phydev))
+ 		return -ENODEV;
+@@ -261,7 +261,7 @@ ethnl_set_pse(struct ethnl_req_info *req_info, struct genl_info *info)
+ 	struct phy_device *phydev;
+ 	int ret;
+ 
+-	phydev = ethnl_req_get_phydev(req_info, tb[ETHTOOL_A_PSE_HEADER],
++	phydev = ethnl_req_get_phydev(req_info, tb, ETHTOOL_A_PSE_HEADER,
+ 				      info->extack);
+ 	ret = ethnl_set_pse_validate(phydev, info);
+ 	if (ret)
+diff --git a/net/ethtool/stats.c b/net/ethtool/stats.c
+index 038a2558f052..3ca8eb2a3b31 100644
+--- a/net/ethtool/stats.c
++++ b/net/ethtool/stats.c
+@@ -138,7 +138,7 @@ static int stats_prepare_data(const struct ethnl_req_info *req_base,
+ 	struct phy_device *phydev;
+ 	int ret;
+ 
+-	phydev = ethnl_req_get_phydev(req_base, tb[ETHTOOL_A_STATS_HEADER],
++	phydev = ethnl_req_get_phydev(req_base, tb, ETHTOOL_A_STATS_HEADER,
+ 				      info->extack);
+ 	if (IS_ERR(phydev))
+ 		return PTR_ERR(phydev);
+diff --git a/net/ethtool/strset.c b/net/ethtool/strset.c
+index 6b76c05caba4..f6a67109beda 100644
+--- a/net/ethtool/strset.c
++++ b/net/ethtool/strset.c
+@@ -309,7 +309,7 @@ static int strset_prepare_data(const struct ethnl_req_info *req_base,
+ 		return 0;
+ 	}
+ 
+-	phydev = ethnl_req_get_phydev(req_base, tb[ETHTOOL_A_HEADER_FLAGS],
++	phydev = ethnl_req_get_phydev(req_base, tb, ETHTOOL_A_HEADER_FLAGS,
+ 				      info->extack);
+ 
+ 	/* phydev can be NULL, check for errors only */
+-- 
+2.48.1
+
 
