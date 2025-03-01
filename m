@@ -1,172 +1,105 @@
-Return-Path: <netdev+bounces-170922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0CCDA4AB0D
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 14:01:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBD87A4AB2F
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 14:23:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58D053B9E55
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 13:01:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04F447A9150
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 13:22:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1862D1DA314;
-	Sat,  1 Mar 2025 13:01:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E260D1DEFD9;
+	Sat,  1 Mar 2025 13:23:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RZEsfTCr"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AE611C5D67
-	for <netdev@vger.kernel.org>; Sat,  1 Mar 2025 13:01:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43D1C1DEFC6
+	for <netdev@vger.kernel.org>; Sat,  1 Mar 2025 13:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740834073; cv=none; b=hWC5NmkJqOn1+KEgdPJWL9PA7o3KJ5JyFyaQAV7VgBBL83LHwgVL2+UsI/VwqUmMDL8mbOYuc55cPdTH/1aHWlIiMJxRVH22pddsgww0iMhacSepMpXw7as7gQ+XhNF0pc797L+WWeXPTzzCE4suAD527bYkYdViHGUE29zBNQw=
+	t=1740835427; cv=none; b=nd4BJGNaAyBgP2WnN9vZ85nnQoxTK/W8Fp076Cswl5N7HYyqV0uSelKyDv6TQgTF8rde9gnC0S9UBs33j+xQrXTTtTcmoLb3C3Kn/YeW6mzcQR8+sDuwx+D1dNGQ2MnsRgFlSeP8MR92trq84SAddkQM92pkpuonBh6PWUWkQdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740834073; c=relaxed/simple;
-	bh=mKLPjyiZUnld6i3DaHnwwGaNNhqCVD5Nat+a58bVjWw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qr6FnvcYGuQ/qR8rr2rSfhx1niXohKuTMrA5vHdeOeG4rVXm+0T6UdcYvv1fEX7nZD5jZZJma9iKWWCOi/rEAv5mOKbz4+dHNBMYnjm8VlLe47CPcazWZHzV3iCDaCeCpgsgn5V8xOMGJgba4Qv2NRUKBpWK0T+5WHcrWfHShzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1toMSU-0003w3-PV; Sat, 01 Mar 2025 14:00:46 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1toMSR-003Sv8-2F;
-	Sat, 01 Mar 2025 14:00:43 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1toMSR-007APN-1n;
-	Sat, 01 Mar 2025 14:00:43 +0100
-Date: Sat, 1 Mar 2025 14:00:43 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 06/12] net: pse-pd: Add support for budget
- evaluation strategies
-Message-ID: <Z8ME-90Xg46-pNhA@pengutronix.de>
-References: <20250224134522.1cc36aa3@kernel.org>
- <20250225102558.2cf3d8a5@kmaincent-XPS-13-7390>
- <20250225174752.5dbf65e2@kernel.org>
- <Z76t0VotFL7ji41M@pengutronix.de>
- <Z76vfyv5XoMKmyH_@pengutronix.de>
- <20250226184257.7d2187aa@kernel.org>
- <Z8AW6S2xmzGZ0y9B@pengutronix.de>
- <20250227155727.7bdc069f@kmaincent-XPS-13-7390>
- <Z8CVimyMj261wc7w@pengutronix.de>
- <20250227192640.20df155d@kmaincent-XPS-13-7390>
+	s=arc-20240116; t=1740835427; c=relaxed/simple;
+	bh=e0rnZMhEMiAUQTxbgiZzUSFZ5nBLEt4/w7x9kl/MjuY=;
+	h=From:In-Reply-To:References:Cc:Subject:MIME-Version:Content-Type:
+	 Date:Message-ID; b=aa5Di7rBDRgTwaS31UCzz+yYsf548j+flFSKvcLFWz59dQCVVE0KHzrO9CeDEgGYtLDg143DHW8MUnxWNNBHaHnRZs1a59trXIfeFDgwjzzyGZwsy2ZfOmrGXUisPKX/hh3zsslnVoEYJ3qMBu2zIBHWI+OQy2bYEWrDEDpUj68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RZEsfTCr; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740835425;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Dz7l8w6UiNg+5Zdj84Y/hcID0P1LPNoS3K4bE+q9Cts=;
+	b=RZEsfTCrorw5AXD1zkpDuUJHe4ZT88xl3EHCoFm1pBQhjxoxuTU7JEQ6ifODvMo7W0tvwl
+	0sAssK0OmTRfl6plH9Gb89VRYJEO9YdSkpSSstoEPeHdaTNh+OF1jpGit8YALxjchyIMI2
+	yYbXbTm/3Ejdbfdi9xfNcRghV6tHZhs=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-329-oiz-hgX8P_GB2jjBtel0Hw-1; Sat,
+ 01 Mar 2025 08:23:32 -0500
+X-MC-Unique: oiz-hgX8P_GB2jjBtel0Hw-1
+X-Mimecast-MFC-AGG-ID: oiz-hgX8P_GB2jjBtel0Hw_1740835410
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 21B141801A0D;
+	Sat,  1 Mar 2025 13:23:30 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.32.200])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3FC4619560AB;
+	Sat,  1 Mar 2025 13:23:25 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <3399367.1740753918@warthog.procyon.org.uk>
+References: <3399367.1740753918@warthog.procyon.org.uk> <20250228062216.77e34415@kernel.org> <3190716.1740733119@warthog.procyon.org.uk>
+Cc: dhowells@redhat.com, Jakub Kicinski <kuba@kernel.org>,
+    Christian Brauner <brauner@kernel.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+    linux-afs@lists.infradead.org, linux-fsdevel@lists.infradead.org,
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [GIT PULL] afs, rxrpc: Clean up refcounting on afs_cell and afs_server records
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250227192640.20df155d@kmaincent-XPS-13-7390>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3475524.1740835404.1@warthog.procyon.org.uk>
+Date: Sat, 01 Mar 2025 13:23:24 +0000
+Message-ID: <3475525.1740835404@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Thu, Feb 27, 2025 at 07:26:40PM +0100, Kory Maincent wrote:
-> On Thu, 27 Feb 2025 17:40:42 +0100
-> Oleksij Rempel <o.rempel@pengutronix.de> wrote:
-> 
-> > On Thu, Feb 27, 2025 at 03:57:27PM +0100, Kory Maincent wrote:
-> > > On Thu, 27 Feb 2025 08:40:25 +0100
-> > > Oleksij Rempel <o.rempel@pengutronix.de> wrote:
-> > >   
-> > > > On Wed, Feb 26, 2025 at 06:42:57PM -0800, Jakub Kicinski wrote:  
-> >  [...]  
-> >  [...]  
-> >  [...]  
-> > > > 
-> > > > Ok, I see. @Köry, can you please provide regulator_summary with some
-> > > > inlined comments to regulators related to the PSE components and PSE
-> > > > related outputs of ethtool (or what ever tool you are using).
-> > > > 
-> > > > I wont to use this examples to answer.  
-> > > 
-> > > On my side, I am not close to using sysfs. As we do all configurations
-> > > through ethtool I have assumed we should continue with ethtool.  
-> > 
-> > Yes, I agree. But it won't be possible to do it for all components.
-> > 
-> > > I think we should set the port priority through ethtool.  
-> > 
-> > ack
-> > 
-> > > but indeed the PSE  power domain method get and set could be moved to
-> > > sysfs as it is not something  relative to the port but to a group of
-> > > ports.  
-> > 
-> > I would prefer to have it in the for of devlink or use regulator netlink
-> > interface. But, we do not need to do this discussion right now.
-> 
-> If we want to report the method we should discuss it now. We shouldn't add
-> BUDGET_EVAL_STRAT uAPI to ethtool if we use another way to get and set the
-> method later.
+David Howells <dhowells@redhat.com> wrote:
 
-Ok, I assume we are talking about different things. I mean - not port
-specific configurations and diagnostic, will have different interface.
+>         cell->dynroot_ino = idr_alloc_cyclic(&net->cells_dyn_ino, cell,
+>                                              2, INT_MAX / 2, GFP_KERNEL);
+> -       if (cell->dynroot_ino < 0)
+> +       if ((int)cell->dynroot_ino < 0)
+>                 goto error;
 
-BUDGET_EVAL_STRAT is port specific. HP and Cisco implement it as port
-specific. PD692x0 Protocol manual describe it as port specific too:
-3.3.6 Set BT Port Parameters
- Bits [3..0]—BT port PM mode
-  0x0: The port power that is used for power management purposes is
-       dynamic (Iport x Vmain).
-  0x1: The port power that is used for power management purposes is port
-       TPPL_BT.
-  0x2: The port power that is used for power management purposes is
-       dynamic for non LLDP/CDP/Autoclass ports and TPPL_BT for LLDP/CDP/Autoclass ports.
-  0xF: Do not change settings.
+That's not right.  I need to copy the error into 'ret' before jumping to
+error.  Probably better to do:
 
-> We could also not report the method for now and assume the user knows it for
-> the two controllers currently supported.
+	ret = idr_alloc_cyclic(&net->cells_dyn_ino, cell,
+                               2, INT_MAX / 2, GFP_KERNEL);
+	if (ret < 0)
+		goto error;
+	cell->dynroot_ino = ret;
 
-On one side: it is not just status, but also active configuration. By
-implementing the interface we may break default configuration and user
-expectations.
+David
 
-On other side: PD692x0 seems to need more then just setting prios to
-manage them correctly. For example power bank limits should be set,
-otherwise internal firmware won't be able to perform budget calculations.
-
-So, I assume, critical components are missing anyway.
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
