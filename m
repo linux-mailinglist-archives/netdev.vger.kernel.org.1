@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-170962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CD82A4ADC2
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 21:14:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFC2BA4ADC3
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 21:14:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7712016FD1B
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 20:14:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D628D170415
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 20:14:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5CB21E8351;
-	Sat,  1 Mar 2025 20:14:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1AD11E885C;
+	Sat,  1 Mar 2025 20:14:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bUvUx7Cl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nboJ73E+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F5941C5D77
-	for <netdev@vger.kernel.org>; Sat,  1 Mar 2025 20:14:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4373D1E8339
+	for <netdev@vger.kernel.org>; Sat,  1 Mar 2025 20:14:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740860070; cv=none; b=YbQbC02L8WGUtcUXEDFaO3kOA+PMMTIpxJuafzbgYJ+CQwBjH4IWje6pQFAos7CVC2SbzO2p2jysaCZg9d02hXjB1M8/06YNJSWeYLQ/uLbxzYh03Nv7YLYOPoofpkhl4DD/pwSclJbfM0KalAGVlpvXoCc8W2/qtPv9lXvNLKs=
+	t=1740860071; cv=none; b=g9hUlv553t9Ntbe9Ycp1i2G7io4Ey3ed44naFhfazwiPFz/6duT9C5wbIZ0p/SGV3kkZs/t8n7rXDGqsNic6K0jSiNkshVJOpwEP09LiM70CsISCfNdeAfwtfI7jlj4aQa5EhBelI7Xz+4pwW2Xb34rTupIJVvRA1c910Epli/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740860070; c=relaxed/simple;
-	bh=aB13b280MIcVuRc0VxldBo9bZY8SatpOVnXV+GjnvM0=;
+	s=arc-20240116; t=1740860071; c=relaxed/simple;
+	bh=2DBmuZPxm89N49KoZNLlsJjBc5JAdlLsTJTH8L+5GAA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pxkxwsKndnng5TF7ckn++ZI7/2jlyBHZrxgiXJS8p3jqK9cDpZHN1OEJv5tu019lKa5kxBo5H6BZe/UokP64lTew8xNIkA57UFm+tUGEXjzXAfYZAyNHdAGuG4sPalkyOtR/z5FUxwlLjE3ltYVHmMa2zl1KvVbgyrIzpubh7KA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bUvUx7Cl; arc=none smtp.client-ip=209.85.219.73
+	 To:Cc:Content-Type; b=JQggmxV+wKUjXgFZvANyUCzAI81E/4QmDeJ+sjemgljxjJkBxioreiHiSeHyI3uEu0xBEkcw/dLNUOAFi8uiMpzLI8WCFETnl3NirULfmCVVtdlf4Gc1X2An/YXFSUJIkoDME2V/X/GWWkZ2PN0HPEdn8XjDlZg0N0qqts8VZew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nboJ73E+; arc=none smtp.client-ip=209.85.160.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-6e2378169a4so69501046d6.2
-        for <netdev@vger.kernel.org>; Sat, 01 Mar 2025 12:14:28 -0800 (PST)
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-472051849acso59399771cf.0
+        for <netdev@vger.kernel.org>; Sat, 01 Mar 2025 12:14:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740860068; x=1741464868; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1740860069; x=1741464869; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=J+sHfABVNcOpkFnI0atmQ4P/qaUHSlV5OBnOnZJOtrk=;
-        b=bUvUx7ClSBsxHAyzIR8gg20swkVovXcCvbmpOvUKZ2nDt0T9tUvUEPGXUmA78WlyPz
-         +REuG45sYxorc6bZ8D1gJ8DmI/3Sw5vS93VwO/uYrahriHxmPcx+aOVJ+sTQtCBJ3F8J
-         JzpGNY3g40PRXZg9K7biVHXoOkF4zpnYCj2Va+x3CAwQrHKBNptT/eAzAneRujaSxaab
-         qtkaC7ufF1k8xnlIYbbOjtGHemsfk+tRj4FiS6B88bvB5bx/GM2Jt2XrReGdidUmBOQN
-         ptZDbCZdeux6tBHfzjMEuXLn5d6Q2gI7bwgPLLUXHGgsi1YnsroChWjP07ipUKNr2keX
-         LlOA==
+        bh=4nJSXPCHCYyFPg2zigqXBKrcmYgDBLIpc2vQxNNA29o=;
+        b=nboJ73E+//g0KB1viQ62fk99SFTBJfAz66CNgWzj2PWsabofLLZJpOTyN5G1P/8n0g
+         0miTT+sNcNyf5mhqUQJnOybhsfkUitCtDkXzBPO+WUtzDOFWqjhMPL9kfnpuZoMBeifU
+         U0dFz4/9EK2Q74IbQlITOVoOK5gPmmtMI1azrPiL7Xpj57VYu43zH2NjrXZBXdWpSqh3
+         eqLlZg3xQqUo8S2U4AnABEGqSNuDF6z5lwZlmWeXVUkdMXSf9NJ3hQj9truI/VmardDl
+         D/5Kbie4zf6fmIg5BLlzsmvXUFDUWsKbPoVo0QVOz95wMiH5mF+F1Ac4f6/CgCx+qRql
+         ueeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740860068; x=1741464868;
+        d=1e100.net; s=20230601; t=1740860069; x=1741464869;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J+sHfABVNcOpkFnI0atmQ4P/qaUHSlV5OBnOnZJOtrk=;
-        b=FhsVSZtnf+IeZxQ6FpElaO5ND8cu/cd524ZnGjXpa9n623OSGaOIVkLsx8XThIXRpX
-         25hqGav7Gi3c4wZB6EYyGLvVtqM6PPq+MN/AYsKTHXbO8Bjgd4DNbO4TDhVaZogTP6tx
-         vtClDjAQy78+Am5SjCwHppbFMgDcX8sry5IbFoBMVRzuONaF9FTCTHFWydHIkzVl78P7
-         DUlKA4h27GLxr45y5nKC7BxZg7yhAoIwvemSCxPGFRn760H6yR0HIijtYp6StV4AIOpL
-         oLhvmOyrh2QYqYeMHgG1Z+IOBEXCCdI6tc6G905E/ZX9AyKx5dcVeoHql1RUqeY2gg9G
-         IBGw==
-X-Forwarded-Encrypted: i=1; AJvYcCUfW2B1izdeh9IqigKCSMB9tWD3VF8l5UceDdUqZj1MntW5GAe1LPLXvWMmrc/msdW/jJWkBPg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAfyQv09KnmVV18ZczpXmanMbcaAm1/ww5MaN0chwxyFk2H2x3
-	wcMfKiA1LzcF7CLLdP9x559a6tfna67+aSd8JoXxOqacmHOaOW57Z0ZUj5OSkGKnUbCYbYVXn4T
-	+P+c3g6f7AQ==
-X-Google-Smtp-Source: AGHT+IHvwiIsFODfxSLy5j6cIxrSIBGWL71eXs+PUcfIigp3QmReeaZoPOp0SVZY0Vrag1HeCSSvbe18yqCnew==
-X-Received: from qtbhh4.prod.google.com ([2002:a05:622a:6184:b0:471:f1e9:e151])
+        bh=4nJSXPCHCYyFPg2zigqXBKrcmYgDBLIpc2vQxNNA29o=;
+        b=hFwV+/YSoDnFQAuJZa0LjX0jkkjWY/QIRjBt/Tr6gMNmFaUh3kxtBaYFtpGJbGGMvO
+         cDUBvOtryKN25nkByfnfxytpINIL0NwRKPovzBIwhM88abFtBJ7LsU4AC9xmfNRlhzRY
+         ZmTlZpqTSGhvfsHq+0gpGDnqsb+Go6vNln4NhTQkPXbxFGbiBBNM4S+aNMcsqWgfoKfq
+         WRO7mU3ThYZMSGVCC5pEqneskxtwwEEFOBdpPQ+lBswjcV56yHPiWtt1x2PxuVHQ7Ale
+         AvxN7qtMsIwQwchm7thbMdXZQDntLzxtceRkrZYYkkfe/KbbjW3WUq+evwdmTaZOnJYt
+         zILA==
+X-Forwarded-Encrypted: i=1; AJvYcCWHw+u0aTVKutVRjSLknBwfyjtMtoj418f02Fw9hxgY0AyvbRgEG4Z6lrBa/+MbNp/lHzSSuJc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6rvPBLPyEi3X5Yuhm9BPGNamXXEf1OIm0IfQmLEBoMBzW6G+J
+	W2NYXxzO81r66AdYnkEKXNhK/5O8OnaVUqoGk/2ZQeRGc7BAm6qvLYM2vwdwv4xR9pX39xQNBKr
+	7QOAE+g2xpg==
+X-Google-Smtp-Source: AGHT+IGx7dXq9WyxMETPGyQYQEnmMhgllGymNfXegzbvlLdT+Ss6MR0miF4UQnPW77FkhKp33e5RG1OZaX8/Kg==
+X-Received: from qtbhg22.prod.google.com ([2002:a05:622a:6116:b0:471:f7c8:bc02])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:2a8c:b0:6e6:61a5:aa4c with SMTP id 6a1803df08f44-6e8a0d6d798mr128658276d6.31.1740860068108;
- Sat, 01 Mar 2025 12:14:28 -0800 (PST)
-Date: Sat,  1 Mar 2025 20:14:19 +0000
+ 2002:a05:622a:294:b0:471:bd5e:d5e4 with SMTP id d75a77b69052e-474bc0e88f3mr106944771cf.42.1740860069383;
+ Sat, 01 Mar 2025 12:14:29 -0800 (PST)
+Date: Sat,  1 Mar 2025 20:14:20 +0000
 In-Reply-To: <20250301201424.2046477-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250301201424.2046477-1-edumazet@google.com>
 X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <20250301201424.2046477-2-edumazet@google.com>
-Subject: [PATCH v2 net-next 1/6] tcp: add a drop_reason pointer to tcp_check_req()
+Message-ID: <20250301201424.2046477-3-edumazet@google.com>
+Subject: [PATCH v2 net-next 2/6] tcp: add four drop reasons to tcp_check_req()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
@@ -83,93 +83,81 @@ Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>, netd
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-We want to add new drop reasons for packets dropped in 3WHS in the
-following patches.
+Use two existing drop reasons in tcp_check_req():
 
-tcp_rcv_state_process() has to set reason to TCP_FASTOPEN,
-because tcp_check_req() will conditionally overwrite the drop_reason.
+- TCP_RFC7323_PAWS
+
+- TCP_OVERWINDOW
+
+Add two new ones:
+
+- TCP_RFC7323_TSECR (corresponds to LINUX_MIB_TSECRREJECTED)
+
+- TCP_LISTEN_OVERFLOW (when a listener accept queue is full)
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/tcp.h        | 2 +-
- net/ipv4/tcp_input.c     | 5 ++---
- net/ipv4/tcp_ipv4.c      | 3 ++-
- net/ipv4/tcp_minisocks.c | 3 ++-
- net/ipv6/tcp_ipv6.c      | 3 ++-
- 5 files changed, 9 insertions(+), 7 deletions(-)
+ include/net/dropreason-core.h |  9 +++++++++
+ net/ipv4/tcp_minisocks.c      | 10 ++++++++--
+ 2 files changed, 17 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index f9b9377a289740b907594a0993fc5d70ed36aaac..a9bc959fb102fc6697b4a664b3773b47b3309f13 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -392,7 +392,7 @@ enum tcp_tw_status tcp_timewait_state_process(struct inet_timewait_sock *tw,
- 					      u32 *tw_isn);
- struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
- 			   struct request_sock *req, bool fastopen,
--			   bool *lost_race);
-+			   bool *lost_race, enum skb_drop_reason *drop_reason);
- enum skb_drop_reason tcp_child_process(struct sock *parent, struct sock *child,
- 				       struct sk_buff *skb);
- void tcp_enter_loss(struct sock *sk);
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index d22ad553b45b17218d5362ea58a4f82559afb851..4e221234808898131a462bc93ee4c9c0ae04309e 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -6812,10 +6812,9 @@ tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
- 		WARN_ON_ONCE(sk->sk_state != TCP_SYN_RECV &&
- 		    sk->sk_state != TCP_FIN_WAIT1);
- 
--		if (!tcp_check_req(sk, skb, req, true, &req_stolen)) {
--			SKB_DR_SET(reason, TCP_FASTOPEN);
-+		SKB_DR_SET(reason, TCP_FASTOPEN);
-+		if (!tcp_check_req(sk, skb, req, true, &req_stolen, &reason))
- 			goto discard;
--		}
- 	}
- 
- 	if (!th->ack && !th->rst && !th->syn) {
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 7900855237d929d8260e65fe95e367345bb3ecd2..218f01a8cc5f6c410043f07293e9e51840c1f1cb 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -2265,7 +2265,8 @@ int tcp_v4_rcv(struct sk_buff *skb)
- 			th = (const struct tcphdr *)skb->data;
- 			iph = ip_hdr(skb);
- 			tcp_v4_fill_cb(skb, iph, th);
--			nsk = tcp_check_req(sk, skb, req, false, &req_stolen);
-+			nsk = tcp_check_req(sk, skb, req, false, &req_stolen,
-+					    &drop_reason);
- 		} else {
- 			drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
- 		}
+diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+index 32a34dfe8cc58fb1afda8922a52249080f1183b5..e4fdc6b54ceffe9b225e613f739c089f3077d3ab 100644
+--- a/include/net/dropreason-core.h
++++ b/include/net/dropreason-core.h
+@@ -40,6 +40,8 @@
+ 	FN(TCP_OFOMERGE)		\
+ 	FN(TCP_RFC7323_PAWS)		\
+ 	FN(TCP_RFC7323_PAWS_ACK)	\
++	FN(TCP_RFC7323_TSECR)		\
++	FN(TCP_LISTEN_OVERFLOW)		\
+ 	FN(TCP_OLD_SEQUENCE)		\
+ 	FN(TCP_INVALID_SEQUENCE)	\
+ 	FN(TCP_INVALID_ACK_SEQUENCE)	\
+@@ -281,6 +283,13 @@ enum skb_drop_reason {
+ 	 * Corresponds to LINUX_MIB_PAWS_OLD_ACK.
+ 	 */
+ 	SKB_DROP_REASON_TCP_RFC7323_PAWS_ACK,
++	/**
++	 * @SKB_DROP_REASON_TCP_RFC7323_TSECR: PAWS check, invalid TSEcr.
++	 * Corresponds to LINUX_MIB_TSECRREJECTED.
++	 */
++	SKB_DROP_REASON_TCP_RFC7323_TSECR,
++	/** @SKB_DROP_REASON_TCP_LISTEN_OVERFLOW: listener queue full. */
++	SKB_DROP_REASON_TCP_LISTEN_OVERFLOW,
+ 	/** @SKB_DROP_REASON_TCP_OLD_SEQUENCE: Old SEQ field (duplicate packet) */
+ 	SKB_DROP_REASON_TCP_OLD_SEQUENCE,
+ 	/** @SKB_DROP_REASON_TCP_INVALID_SEQUENCE: Not acceptable SEQ field */
 diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-index 29b54ade757231dc264fd8a2c357eff1b2ccbb6b..46c86c4f80e9f450834c72f28e3d16b0cffbbd1d 100644
+index 46c86c4f80e9f450834c72f28e3d16b0cffbbd1d..ba4a5d7f251d8ed093b38155d9b1a9f50bfcfe32 100644
 --- a/net/ipv4/tcp_minisocks.c
 +++ b/net/ipv4/tcp_minisocks.c
-@@ -657,7 +657,8 @@ EXPORT_SYMBOL(tcp_create_openreq_child);
+@@ -809,10 +809,15 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+ 					  LINUX_MIB_TCPACKSKIPPEDSYNRECV,
+ 					  &tcp_rsk(req)->last_oow_ack_time))
+ 			req->rsk_ops->send_ack(sk, skb, req);
+-		if (paws_reject)
++		if (paws_reject) {
++			SKB_DR_SET(*drop_reason, TCP_RFC7323_PAWS);
+ 			NET_INC_STATS(sock_net(sk), LINUX_MIB_PAWSESTABREJECTED);
+-		else if (tsecr_reject)
++		} else if (tsecr_reject) {
++			SKB_DR_SET(*drop_reason, TCP_RFC7323_TSECR);
+ 			NET_INC_STATS(sock_net(sk), LINUX_MIB_TSECRREJECTED);
++		} else {
++			SKB_DR_SET(*drop_reason, TCP_OVERWINDOW);
++		}
+ 		return NULL;
+ 	}
  
- struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
- 			   struct request_sock *req,
--			   bool fastopen, bool *req_stolen)
-+			   bool fastopen, bool *req_stolen,
-+			   enum skb_drop_reason *drop_reason)
- {
- 	struct tcp_options_received tmp_opt;
- 	struct sock *child;
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index a806082602985fd351c5184f52dc3011c71540a9..d01088ab80d24eb0f829166faae791221d95bf9e 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -1828,7 +1828,8 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
- 			th = (const struct tcphdr *)skb->data;
- 			hdr = ipv6_hdr(skb);
- 			tcp_v6_fill_cb(skb, hdr, th);
--			nsk = tcp_check_req(sk, skb, req, false, &req_stolen);
-+			nsk = tcp_check_req(sk, skb, req, false, &req_stolen,
-+					    &drop_reason);
- 		} else {
- 			drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
- 		}
+@@ -882,6 +887,7 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+ 	return inet_csk_complete_hashdance(sk, child, req, own_req);
+ 
+ listen_overflow:
++	SKB_DR_SET(*drop_reason, TCP_LISTEN_OVERFLOW);
+ 	if (sk != req->rsk_listener)
+ 		__NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPMIGRATEREQFAILURE);
+ 
 -- 
 2.48.1.711.g2feabab25a-goog
 
