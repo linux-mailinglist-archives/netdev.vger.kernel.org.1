@@ -1,132 +1,141 @@
-Return-Path: <netdev+bounces-170918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5356A4AA42
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 11:41:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 952E0A4AA6E
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 11:52:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 606A11899912
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 10:41:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E541418962B2
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 10:52:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21FCC1CAA9A;
-	Sat,  1 Mar 2025 10:41:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABD501D89FD;
+	Sat,  1 Mar 2025 10:52:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Trg6HRP+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r7LvvUCW"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CB781E49F
-	for <netdev@vger.kernel.org>; Sat,  1 Mar 2025 10:41:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D42D1C54AF;
+	Sat,  1 Mar 2025 10:52:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740825672; cv=none; b=ivBuUgIKDBMcthlEJcIECOHjuWuew+AQGwHHcSU3OQq9iqaEhwwlz6/nZrSxdNMNnykhRCR5lZ/hiVkWlmehdYNsQ7ywurUyri8kk5Lr3MGNWb7Q90lia5NzQx/XW737vG1lKsI/BfDVNnapjEi9spSCTTaXEBMKz7EjANb8St8=
+	t=1740826332; cv=none; b=TJAy6LA+gyZpXV96uoDV+CsmX+nyaBMQWpZ+j4rpi+jNAkDXM3uTPccwTDzSYpZ6CBW4sbr3N9Ici6QbkuxfBs0vJEJIlnYS0sM03ZGkCPAvQtO1xMFHqq1M6qW6XKCJO7MnLdTnfMLpugZoz2QH+DZKf6r7s5yZo9ScG8G4mQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740825672; c=relaxed/simple;
-	bh=axVvbg4f/XMx1VP+EM7fdMEfAM+ZiieklFFpiJyau4E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LHAYIhk1hK6+1IOn6FBCTIjhAYwaSv6zlRLkg59hR08/entkQvsLJBk3iCT1Z7ISUKQ0dCo6LFyIScv9xXUzwTAjJxxkFGUBW0Sxc0C10k2Yc0U6bmkifASWvTJj42tPvJRDiC/kV9GmxviI73G1VrZHHCpITyMneo7qrxjT3UY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Trg6HRP+; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=QKFTGOehFL46cXtqRQ3+zESpMtlY+tcTv0ubD9/y+6c=; b=Trg6HRP+asyq/AhpYZp8PCMXpU
-	P6abXB8fdAww95sHxSBpb5iQc4xNvsDF+eXQem4a8WkSlrTIbdhyEwdrMysAeEtyFqRUSEz4ZR3vi
-	yD0DvM9rNFapfCXBN7jLreOG5PYzRnlXJC8gfTOtFSdupK05xbq8KZ22Wr/MhZPWn/AUSoO366CFN
-	yJuVOpmy5su9V5IQ1tYmV0I4MyCBh6cfO6sIPC416v5tIxspDhfOm7cnSdYodr8EjTB4xqH4q8ZrR
-	RDsEzhyYqP7sdaJ5pALxzYeTDuAoOImADIRsz27+kz0n3/m2Wf1Iv7XdIrW/p4ACSnh0GnovZpLV+
-	v2mi/eBw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60874)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1toKHI-00045Z-0i;
-	Sat, 01 Mar 2025 10:41:04 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1toKHF-0001ia-23;
-	Sat, 01 Mar 2025 10:41:01 +0000
-Date: Sat, 1 Mar 2025 10:41:01 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>, netdev <netdev@vger.kernel.org>
-Subject: Re: [QUERY] : STMMAC Clocks
-Message-ID: <Z8LkPQ-w_jyXriFp@shell.armlinux.org.uk>
-References: <CA+V-a8u04AskomiOqBKLkTzq3uJnFas6sitF6wbNi=md6DtZbw@mail.gmail.com>
- <84b9c6b7-46b1-444f-b8db-d1f6d4fc5d1c@lunn.ch>
+	s=arc-20240116; t=1740826332; c=relaxed/simple;
+	bh=7Kzf5j83KyRmfwK8jqjxolnpDSkpqtnmz6T1h7b/mDE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uuBFtSr7swuINfcGnM9kcbNT7K0ZoGUT/rnPngaNwJ4OLMU9Nhjzoa/n47BkuDpBshgGbgNjuz+OwqhicSbmWhCZ3j6Mn2kyG+OOrpiOEPG2cUWDVOSymIE7wcuYUDCaEQ1giZcph6/B1K5AUc2SvFn1tT7MLeMx9gy2J1NayXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r7LvvUCW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1458C4CEDD;
+	Sat,  1 Mar 2025 10:52:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740826331;
+	bh=7Kzf5j83KyRmfwK8jqjxolnpDSkpqtnmz6T1h7b/mDE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=r7LvvUCWtAdJnesn6UmLZ/754D/h/5U1Xa8Lr5zWOg0S4tj1QZNlgPyROCqFyzjv3
+	 OTkKULnQd/T2obpAtJW4KQnGHb7p7zc9Y4ow0tkHBQXxIISrC7CvPxutWwdux2KSh3
+	 NCZDN/xk+jKsvsbHxqHD2sqMnDDAnUoKjxvB9WiE8ndggUZeVPe83+pCJQo5z//DqK
+	 OBQqX3/rJPVxsZEart4d6MA7krV+w5gcZ2CKIW7qVU1l3KmUFVNDmzqpiNXK6aA6CC
+	 utpQ3bPf9L2dDGuGHIg01bFPczZAsfu0kA5WN0wCQV7AcyLpBw8dx4c0qJSA6kN3+j
+	 WDigLMhO2v66A==
+Message-ID: <0f196026-02ec-4db0-90b0-10c1e720c345@kernel.org>
+Date: Sat, 1 Mar 2025 11:52:06 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <84b9c6b7-46b1-444f-b8db-d1f6d4fc5d1c@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net-next] selftests: net: report output format as TAP 13
+ in Python tests
+Content-Language: en-GB
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org, petrm@nvidia.com,
+ willemb@google.com, linux-kselftest@vger.kernel.org
+References: <20250228180007.83325-1-kuba@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20250228180007.83325-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sat, Mar 01, 2025 at 12:38:04AM +0100, Andrew Lunn wrote:
-> On Fri, Feb 28, 2025 at 09:51:15PM +0000, Lad, Prabhakar wrote:
-> > Hi All,
-> > 
-> > I am bit confused related clocks naming in with respect to STMMAC driver,
-> > 
-> > We have the below clocks in the binding doc:
-> > - stmmaceth
-> > - pclk
-> > - ptp_ref
-> > 
-> > But there isn't any description for this. Based on this patch [0]
-> > which isn't in mainline we have,
-> > - stmmaceth - system clock
-> > - pclk - CSR clock
-> > - ptp_ref - PTP reference clock.
-> > 
-> > [0] https://patches.linaro.org/project/netdev/patch/20210208135609.7685-23-Sergey.Semin@baikalelectronics.ru/
-> > 
-> > Can somebody please clarify on the above as I am planning to add a
-> > platform which supports the below clocks:
-> > - CSR clock
-> > - AXI system clock
-> > - Tx & Tx-180
-> > - Rx & Rx-180
+Hi Jakub,
+
+On 28/02/2025 19:00, Jakub Kicinski wrote:
+> The Python lib based tests report that they are producing
+> "KTAP version 1", but really we aren't making use of any
+> KTAP features, like subtests. Our output is plain TAP.
 > 
-> Please take a look at the recent patches to stmmac for clock handling,
-> in particular the clocks used for RGMII
-> 
-> For the meaning of the clocks, you need to look at the vendors binding
-> document. Vendors tend to call the clocks whatever they want, rather
-> than have one consistent naming between vendors. The IP might be
-> licensed, but each vendor integrates it differently, inventing their
-> own clock names. It might of helped if Synopsis had requested in there
-> databook what each clock was called, so there was some consistency,
-> but this does not appear to of happened.
+> Report TAP 13 instead of KTAP 1, this is what mptcp tests do,
 
-Part of the problem is that vendors can place clock muxes and gates
-and divisors around the Synopsys block, where some muxes/divisors can
-be controlled by signals output by the Synopsys block (and thus are
-hidden from software). This is especially true of the pair of clk_tx_i
-and pair of clk_rx_i clocks.
+Indeed, and also TC tests, and all the ones using kselftest_harness.h I
+think.
 
-Thus, the clocks that are visible may be functionally different from
-the Synopsys defined clocks.
+> and what NIPA knows how to parse best. For HW testing we need
+> precise subtest result tracking.
 
-However, I think that we should push to standardise on the Synopsys
-named clock names where they exist (essentially optional) and then
-allow platform specific clocks where they're buried out of view in
-the way I describe above.
+I guess the best would be to have the kselftests infrastructure fully
+supporting KTAP, and then have a way for each test to print subtests
+correctly, not nested in the comments like it is done for the moment.
+But that looks harder to put in place, and the current solution is used
+in a few areas.
 
+Good idea to switch to 'TAP version 13' for the moment, and re-use the
+existing parsing in NIPA!
+
+Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
+Cheers,
+Matt
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Sponsored by the NGI0 Core fund.
+
 
