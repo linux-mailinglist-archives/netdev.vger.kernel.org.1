@@ -1,72 +1,60 @@
-Return-Path: <netdev+bounces-170892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E36ADA4A72D
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 01:43:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0888A4A738
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 01:47:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A65631655E5
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 00:43:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38ECE7A41B8
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 00:46:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72DE417BB6;
-	Sat,  1 Mar 2025 00:43:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63BCFA923;
+	Sat,  1 Mar 2025 00:47:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qqwYnfQY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GFNu1S3E"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3564B442C;
-	Sat,  1 Mar 2025 00:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F998149DFA
+	for <netdev@vger.kernel.org>; Sat,  1 Mar 2025 00:47:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740789784; cv=none; b=Tsp1kpGED9CwUv4ktAw+3USbmZnA5C5/2evpY8hOAGdS3WAgfzFDlR7+SDv5W1s0cPcbP0ixaqmyXmQ1OZNq46L4KHF9NoEq7EA/j3efNGPp88AgZBRYWxQmNYk+7KyhL1IET73zEfjiBJeSsTXMwWTHlnoHCgQfuk4ILJc5rUA=
+	t=1740790033; cv=none; b=amJJtfTBSRS3YEUR/ua5j9LLKfQABbDpbNruViDfnQ6EWV8eJKoKOICgfMNiXMZ/GhVF+Eoi1Hd48slrNYTi1/i5mKHxU7mAhr0GqvNHZflWdGOm/mJKrVtGdGpJ9I8NQyQ21QsguHxZED+3CEH0l2ft45FOWDrWGKpAdnDGePI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740789784; c=relaxed/simple;
-	bh=ea5nB3P0PJidb6Y9nt5u1AfiiG2H38AOo9WolZSdhKM=;
+	s=arc-20240116; t=1740790033; c=relaxed/simple;
+	bh=PFTRg5n1yzhK3KCfO45YFztDpSFdgdOKKpfJdeiGfXU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QTpL9ik0Ve/3RvLc9VGH+skmuDTaIeDMH6kyQ5lRM9yv/2ZtvM0uvF95z7cCF3zjrv0obk8IteP3vN5F2bzOOnEVgS7oXwoIITuGKSv0KFiGLoAwyG1ZFjt7vQYVjDOl4trJRIQXnNPzkn0NLMOKKluZf/qtUjZ1/B/SgJia2H8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qqwYnfQY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7277FC4CED6;
-	Sat,  1 Mar 2025 00:43:02 +0000 (UTC)
+	 MIME-Version:Content-Type; b=rXGLHb5L3rcxkTI5e02cfVEuznPW83HtykwnSlCBvnneYxl1I5n623brljt1bU24wMNYu72DYvI7D9p4lWljD7q9IdRpxSDAOn5cgmp+jOTt0tWgu+IO1vr+iSDGasYisRviECkbTObO/REm7nFyoTA1TQW/nWEcjBYBsIIN1oo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GFNu1S3E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58D54C4CED6;
+	Sat,  1 Mar 2025 00:47:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740789783;
-	bh=ea5nB3P0PJidb6Y9nt5u1AfiiG2H38AOo9WolZSdhKM=;
+	s=k20201202; t=1740790032;
+	bh=PFTRg5n1yzhK3KCfO45YFztDpSFdgdOKKpfJdeiGfXU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qqwYnfQYrlR1UpE8jgFQrfswPrd8Pu4rD5K17AXsR2Uxuv9cIki/GMieTKEhQWql1
-	 mumC5yO6c4Tx5JD/DtCgkBlaFLgVDkMdT2As2T71+mdqI1KAARm0smjT9Zrs+CWp/U
-	 B/WeWVvPuxnDKqLWhCkg0Gr2vR0t6YQw2sdF3OzkrMLhXPw3pU6Prqryse4avpW+5H
-	 iSMt0GZOPuEtACd51EBhAGMV1vKBUD1hFqrdZWfuVxTH2PTXVWhHJ5QZBfuvyLWRVw
-	 04jZdaEGkrWM5XKQYzJNo6qbd+xH7uPC3x5dQRRj+6WaQb5i0SVV0GzdkxwHoiVQ83
-	 JKSyI+RjW3gkA==
-Date: Fri, 28 Feb 2025 16:43:01 -0800
+	b=GFNu1S3Erpsp/0BCVqm563XgxRPPck0cRCwvPMuI3KIxmp/LDokMe8r0ZwTNwISGP
+	 0FvUs8FWrJJHjakkmv0IZD0wWUFZqgzweN/Lkj6nYOoLIwrB4Ndp5whzsfs5/qQ+T7
+	 IUEe6gqy/KHCM5cHNBcPHcEI0ApoLI46kqxg3EZapy7Ktd4H4CfTP9bVoUTG+JRs+K
+	 06nkH3eKBs6shdvSbq/Pfsvjg7CFC0yjv7INHaFhMz+fXlrd5LZJx3CIJVBcdwJWKm
+	 PNGfhYmXLyVt+5QOV3J9gwn2M+ZnbgBwzIvZ/R8AzTmOBe1kbU2jd92+7A5uTEri6w
+	 DJmH6gJRKMhcA==
+Date: Fri, 28 Feb 2025 16:47:11 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, Donald
- Hunter <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Jeroen de Borst <jeroendb@google.com>, Harshitha
- Ramamurthy <hramamurthy@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
- Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>,
- Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin"
- <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, "Eugenio =?UTF-8?B?UMOpcmV6?="
- <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano
- Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
- sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, Jamal Hadi Salim
- <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
- <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
-Subject: Re: [PATCH net-next v6 7/8] net: check for driver support in netmem
- TX
-Message-ID: <20250228164301.07af6753@kernel.org>
-In-Reply-To: <20250227041209.2031104-8-almasrymina@google.com>
-References: <20250227041209.2031104-1-almasrymina@google.com>
-	<20250227041209.2031104-8-almasrymina@google.com>
+To: Ahmed Zaki <ahmed.zaki@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
+ <pabeni@redhat.com>, <edumazet@google.com>, <andrew+netdev@lunn.ch>,
+ <netdev@vger.kernel.org>, <willemb@google.com>, Madhu Chittim
+ <madhu.chittim@intel.com>, Simon Horman <horms@kernel.org>, Samuel Salin
+ <Samuel.salin@intel.com>
+Subject: Re: [PATCH net v2] idpf: synchronize pending IRQs after disable
+Message-ID: <20250228164711.52f7a54a@kernel.org>
+In-Reply-To: <f186dc24-8cc5-427c-868a-1162e75dd3e8@intel.com>
+References: <20250227211610.1154503-1-anthony.l.nguyen@intel.com>
+	<20250228144051.4c3064b0@kernel.org>
+	<f186dc24-8cc5-427c-868a-1162e75dd3e8@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,12 +64,22 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 27 Feb 2025 04:12:08 +0000 Mina Almasry wrote:
-> +	if (!skb_frags_readable(skb) && !dev->netmem_tx)
+On Fri, 28 Feb 2025 16:59:47 -0700 Ahmed Zaki wrote:
+> Most drivers call synchronize_irq() in the same order as this patch, for ex:
+> bnxt_disable_int_sync()
+> iavf_irq_disable()
+> ice_vsi_dis_irq()
+> 
+> 
+> The order is:
+> 1 - disable IRQ registers
+> 2 - synchronize_irq()     <-- currently missed in IDPF
+> 3 - delete napis
+> 4 - free IRQs
+> 
+> May be "races" is the wrong word, I will try to re-word.
 
-How do you know it's for _this_ device tho?
-The driver doesn't seem to check the DMA mapping belongs to it either.
+I still have no idea what the problem is.
 
-Remind me, how do we prevent the unreadable skbs from getting into the
-Tx path today? 
+If you can't explain what the bug is let's just drop this patch :/
 
