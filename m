@@ -1,154 +1,158 @@
-Return-Path: <netdev+bounces-170967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 718E7A4ADC7
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 21:15:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEEA6A4ADCB
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 21:20:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 615BB1892A89
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 20:15:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDD5E17023B
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 20:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C36A01E9B1A;
-	Sat,  1 Mar 2025 20:14:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D6EB1E5B75;
+	Sat,  1 Mar 2025 20:20:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iH1ae+D4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ApgyKAAk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3392B1E8320
-	for <netdev@vger.kernel.org>; Sat,  1 Mar 2025 20:14:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E139B1B414F;
+	Sat,  1 Mar 2025 20:20:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740860077; cv=none; b=h65vdXPx41GpjKjpmxEmgncDuboi0Ip/bmusgf/x14wFL3L6uvA4nhIuqZea/m/rY2ykKQd3Kgu9UbvBj1SQecAuDpXLVM3gBZpoxU2FsMX8kGlviclOuuZniWjeZr93fk8YU1FGnB0i1wqUaUj8clzvRQewuZX/+X6++8G5fBE=
+	t=1740860433; cv=none; b=E98zZ3HGjwSHM95vPGI+vocWvj2LPPCQVTEpJEd7rmfMz0Jz1RUAo11gQQaz0HnEoYEiw/pzh2TQAmkjebeklp1SknoPzPDfoN5idIF284o/Kv+/q4859F6Zl7+3j1oKnUgWIjD6P9VexYVUDU7yiHkZ6bL1rqo4OYQhW3KHqH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740860077; c=relaxed/simple;
-	bh=FTYAPGA3SjXYPOXqynWOP8ZK5fmOsZH0A+0ezoAF2ic=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=R4kScBxEMgUpUUaKoYnEdg1ibLHqK/+KDvY8gB+ehGKnCYiVUkuwZrkk0QqGX5jaLbYBLJP+qSU/Dq9Gg2gj4USNno6ZWkGYsSClxYT3EwOXXY7RRGudpIeFQWk6FD0izAfydzpsz0D603WjupuzO/XYs3itvdIVDF49TC+igU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iH1ae+D4; arc=none smtp.client-ip=209.85.219.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-6e67c58f0f7so39751686d6.3
-        for <netdev@vger.kernel.org>; Sat, 01 Mar 2025 12:14:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740860075; x=1741464875; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4n0xFPxK7p0S/n7CVqaTwUqyGjTiJKBUlxqkm44laGU=;
-        b=iH1ae+D4+1SESWaSUWbRepfctLzamfN87ZnXM0Mvanq4jN9LPk+cF2mpKj80p6hTAC
-         CxXy9driMx/W9HVDCKPKm5Y8s3pxjvMGr/5n+7696DsuBFTVL546LCybspFMZfyZbidb
-         AkyjSglnm2D3JXUyitavHpRL5887rcHtmRak5k0DaP7IWJ4DLY0hUIsdEtOUw0uKI7R5
-         h9Nq3Fw6kKbdT0MQUfMLcAU6MdaUtMKVBdTm8LF527uIzkwEDvMH4/LJbOGxCa+S/yfO
-         ABsQXAaJ9wPdFvKr/cxzIRlIlt7wNhdL+IBQdd9Hj2UDOO3mX72d0jew/n42Y9PVhYDB
-         IZCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740860075; x=1741464875;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4n0xFPxK7p0S/n7CVqaTwUqyGjTiJKBUlxqkm44laGU=;
-        b=qGQqtNBRMl88GNOdk88+9UPf2X8QrBYM/RhOqwDX/PlrwHPwaypoN5hTLQEGYLvb+Z
-         Gx3/0FKaM8ccbFf7x1THpnRHcJg+Iz+LgYFaF5IsaPPi31sQRa34sS3TgLVsySre6yTy
-         3DOGyVf1dgnm8kXr7lOktdtkKqsoTMJxNKqTryyM3MKMtNKSYlVl9ehMNwaJbaBO9xzx
-         dXARQEe0e31t6JM5HoaIb70+XH5yRhiJaHi7s7yn/LtIKn+JcLlqlv6fTApvuWg2Vu13
-         YRO9fp3gtbUFzr+IhaJjMJ3LyjRfC93I91BC3EcOJEBF4eP12OIHmxzovaDmzZ3gv//V
-         xb8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXxYoRDMsu1uMx2mo6u4ZpiMis6qp2LX/Ax5oUvM9FPMVmYrG7vSVgSoWmw7YtX20+GvyXlgEk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzaXrBopHh413ilUB61TAZxYRrWE5lzuGpWSAaONAiOr8LGnflj
-	Gl7/8H+i0YSMLubpcK6b8ScN23U99BWwaGHYQz+IKnXgM0xhIskwiiYnpwNCjk1uXD4ZrNpTzaU
-	ts9fLDQwb/g==
-X-Google-Smtp-Source: AGHT+IEDkr1bl3B/kKUnYskkcqQj/VfPBzV6Ga8sg/OqcIl2IQ19mzG4BrRxMkx9vgKIgeByqxqFguVI7Fzr5A==
-X-Received: from qvop5.prod.google.com ([2002:a0c:fac5:0:b0:6e6:5f0e:8032])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ad4:5cad:0:b0:6e4:2f7f:d0bb with SMTP id 6a1803df08f44-6e8a0cccae9mr128294576d6.4.1740860075167;
- Sat, 01 Mar 2025 12:14:35 -0800 (PST)
-Date: Sat,  1 Mar 2025 20:14:24 +0000
-In-Reply-To: <20250301201424.2046477-1-edumazet@google.com>
+	s=arc-20240116; t=1740860433; c=relaxed/simple;
+	bh=rrQ//fnypHMrN3fd4zsduRE3QZa4hstc4Z87aOa0Lpo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iqUNZzEOlRjTMAopSdFaaXFaielDTAliDVIv8BIMeeXQEWVjtVHkT2vnTFLxCbsQjgn0ucciPMzJ9lPzA5jV0s41doPxp3ryTTkORpM7AxlQipKeGMCayfAkUOQ3p9UG023u/c46etirfZqjeGPr0kvDw7a0faUhsVTEAuu8HLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ApgyKAAk; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740860432; x=1772396432;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=rrQ//fnypHMrN3fd4zsduRE3QZa4hstc4Z87aOa0Lpo=;
+  b=ApgyKAAkZ7pfHEANNffFgrj7ZnGAWxXnIL1VwYXYAIfwsA0zgAESsLdM
+   2v6KmEO4NK9820gHXVCv27pO9r2K3PhPMvuH1Gt3PZePWrgAeUzRYeUJI
+   qIm0zzXl3IRhk0cu5V2h5UCt2OzeSvHwTCkqaXBa2gJKqitRf79OTOLa6
+   LZMX9w5I/OpODZacL5xH7915NCZpuUFO4Yi5dPKPX1WHa351TPEmBlMNL
+   O4eaI5ojnGyxy/YxTAPIIzX823wLDxp4qu1M7eP4xRODR5cwKhv78Y1mA
+   NPm2H0CYIiBpTv2vJ7h0tZ8PwShUqcnzJTH3y9J5qlIcFbiQz1caiJis+
+   g==;
+X-CSE-ConnectionGUID: AUCDU4c4Syqvf4hTdX7cVw==
+X-CSE-MsgGUID: su1bXrVQTcC6p38KBWGAFg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11360"; a="52411952"
+X-IronPort-AV: E=Sophos;i="6.13,326,1732608000"; 
+   d="scan'208";a="52411952"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2025 12:20:31 -0800
+X-CSE-ConnectionGUID: xuVHpwFRQROXxCZ9NKWMIg==
+X-CSE-MsgGUID: 2Mf5tN2yQliX1ZcvqY3OdQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="117501197"
+Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
+  by orviesa010.jf.intel.com with ESMTP; 01 Mar 2025 12:20:26 -0800
+Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1toTJs-000GfD-1E;
+	Sat, 01 Mar 2025 20:20:22 +0000
+Date: Sun, 2 Mar 2025 04:19:55 +0800
+From: kernel test robot <lkp@intel.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Russell King - ARM Linux <linux@armlinux.org.uk>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	David Miller <davem@davemloft.net>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Richard Cochran <richardcochran@gmail.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	Robert Marko <robimarko@gmail.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>
+Subject: Re: [PATCH net-next v2 8/8] net: phy: remove remaining PHY package
+ related definitions from phy.h
+Message-ID: <202503020420.v2TkGxj1-lkp@intel.com>
+References: <6ad490fa-61ad-48b8-9660-bb525f756f41@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250301201424.2046477-1-edumazet@google.com>
-X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <20250301201424.2046477-7-edumazet@google.com>
-Subject: [PATCH v2 net-next 6/6] tcp: tcp_set_window_clamp() cleanup
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6ad490fa-61ad-48b8-9660-bb525f756f41@gmail.com>
 
-Remove one indentation level.
+Hi Heiner,
 
-Use max_t() and clamp() macros.
+kernel test robot noticed the following build errors:
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/tcp.c | 36 ++++++++++++++++++------------------
- 1 file changed, 18 insertions(+), 18 deletions(-)
+[auto build test ERROR on net-next/main]
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 1184866922130aff0f4a4e6d5c0d95fd42713b7d..eb5a60c7a9ccdd23fb78a74d614c18c4f7e281c9 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -3693,33 +3693,33 @@ EXPORT_SYMBOL(tcp_sock_set_keepcnt);
- 
- int tcp_set_window_clamp(struct sock *sk, int val)
- {
-+	u32 old_window_clamp, new_window_clamp;
- 	struct tcp_sock *tp = tcp_sk(sk);
- 
- 	if (!val) {
- 		if (sk->sk_state != TCP_CLOSE)
- 			return -EINVAL;
- 		WRITE_ONCE(tp->window_clamp, 0);
--	} else {
--		u32 new_rcv_ssthresh, old_window_clamp = tp->window_clamp;
--		u32 new_window_clamp = val < SOCK_MIN_RCVBUF / 2 ?
--						SOCK_MIN_RCVBUF / 2 : val;
-+		return 0;
-+	}
- 
--		if (new_window_clamp == old_window_clamp)
--			return 0;
-+	old_window_clamp = tp->window_clamp;
-+	new_window_clamp = max_t(int, SOCK_MIN_RCVBUF / 2, val);
- 
--		WRITE_ONCE(tp->window_clamp, new_window_clamp);
--		if (new_window_clamp < old_window_clamp) {
--			/* need to apply the reserved mem provisioning only
--			 * when shrinking the window clamp
--			 */
--			__tcp_adjust_rcv_ssthresh(sk, tp->window_clamp);
-+	if (new_window_clamp == old_window_clamp)
-+		return 0;
- 
--		} else {
--			new_rcv_ssthresh = min(tp->rcv_wnd, tp->window_clamp);
--			tp->rcv_ssthresh = max(new_rcv_ssthresh,
--					       tp->rcv_ssthresh);
--		}
--	}
-+	WRITE_ONCE(tp->window_clamp, new_window_clamp);
-+
-+	/* Need to apply the reserved mem provisioning only
-+	 * when shrinking the window clamp.
-+	 */
-+	if (new_window_clamp < old_window_clamp)
-+		__tcp_adjust_rcv_ssthresh(sk, new_window_clamp);
-+	else
-+		tp->rcv_ssthresh = clamp(new_window_clamp,
-+					 tp->rcv_ssthresh,
-+					 tp->rcv_wnd);
- 	return 0;
- }
- 
+url:    https://github.com/intel-lab-lkp/linux/commits/Heiner-Kallweit/net-phy-move-PHY-package-code-from-phy_device-c-to-own-source-file/20250301-055302
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/6ad490fa-61ad-48b8-9660-bb525f756f41%40gmail.com
+patch subject: [PATCH net-next v2 8/8] net: phy: remove remaining PHY package related definitions from phy.h
+config: arc-randconfig-001-20250302 (https://download.01.org/0day-ci/archive/20250302/202503020420.v2TkGxj1-lkp@intel.com/config)
+compiler: arceb-elf-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250302/202503020420.v2TkGxj1-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202503020420.v2TkGxj1-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/net/phy/bcm54140.c: In function 'bcm54140_base_read_rdb':
+   drivers/net/phy/bcm54140.c:436:15: error: implicit declaration of function '__phy_package_write'; did you mean '__phy_package_write_mmd'? [-Werror=implicit-function-declaration]
+     436 |         ret = __phy_package_write(phydev, BCM54140_BASE_ADDR,
+         |               ^~~~~~~~~~~~~~~~~~~
+         |               __phy_package_write_mmd
+   drivers/net/phy/bcm54140.c:441:15: error: implicit declaration of function '__phy_package_read'; did you mean '__phy_package_read_mmd'? [-Werror=implicit-function-declaration]
+     441 |         ret = __phy_package_read(phydev, BCM54140_BASE_ADDR,
+         |               ^~~~~~~~~~~~~~~~~~
+         |               __phy_package_read_mmd
+   drivers/net/phy/bcm54140.c: In function 'bcm54140_probe':
+>> drivers/net/phy/bcm54140.c:594:9: error: implicit declaration of function 'devm_phy_package_join' [-Werror=implicit-function-declaration]
+     594 |         devm_phy_package_join(&phydev->mdio.dev, phydev, priv->base_addr, 0);
+         |         ^~~~~~~~~~~~~~~~~~~~~
+   cc1: some warnings being treated as errors
+
+
+vim +/devm_phy_package_join +594 drivers/net/phy/bcm54140.c
+
+6937602ed3f9eb Michael Walle 2020-04-20  578  
+6937602ed3f9eb Michael Walle 2020-04-20  579  static int bcm54140_probe(struct phy_device *phydev)
+6937602ed3f9eb Michael Walle 2020-04-20  580  {
+6937602ed3f9eb Michael Walle 2020-04-20  581  	struct bcm54140_priv *priv;
+6937602ed3f9eb Michael Walle 2020-04-20  582  	int ret;
+6937602ed3f9eb Michael Walle 2020-04-20  583  
+6937602ed3f9eb Michael Walle 2020-04-20  584  	priv = devm_kzalloc(&phydev->mdio.dev, sizeof(*priv), GFP_KERNEL);
+6937602ed3f9eb Michael Walle 2020-04-20  585  	if (!priv)
+6937602ed3f9eb Michael Walle 2020-04-20  586  		return -ENOMEM;
+6937602ed3f9eb Michael Walle 2020-04-20  587  
+6937602ed3f9eb Michael Walle 2020-04-20  588  	phydev->priv = priv;
+6937602ed3f9eb Michael Walle 2020-04-20  589  
+6937602ed3f9eb Michael Walle 2020-04-20  590  	ret = bcm54140_get_base_addr_and_port(phydev);
+6937602ed3f9eb Michael Walle 2020-04-20  591  	if (ret)
+6937602ed3f9eb Michael Walle 2020-04-20  592  		return ret;
+6937602ed3f9eb Michael Walle 2020-04-20  593  
+dc9989f173289f Michael Walle 2020-05-06 @594  	devm_phy_package_join(&phydev->mdio.dev, phydev, priv->base_addr, 0);
+dc9989f173289f Michael Walle 2020-05-06  595  
+
 -- 
-2.48.1.711.g2feabab25a-goog
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
