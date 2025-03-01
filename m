@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-170907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3BD5A4A828
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 03:40:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 39505A4A829
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 03:40:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C36E43B34C5
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 02:39:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7578E3B4B2F
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 02:39:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AD5C8615A;
-	Sat,  1 Mar 2025 02:39:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEA6C198E81;
+	Sat,  1 Mar 2025 02:39:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pd/kK81A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W6nbeQAm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06BEA179BC
-	for <netdev@vger.kernel.org>; Sat,  1 Mar 2025 02:39:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85293179BC;
+	Sat,  1 Mar 2025 02:39:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740796798; cv=none; b=Ugda9TCD4SRLaDdQX+HEXBycHTJrU+JiVxNJCuBKdRCg/f/diQeq8uDrUHgB3eI0WGErEzgkLVcUDxyjEKyLbu/74cyPEjoIeHM5jdVW6kRFTvVRVBUJe6E0IL62Hiv8CAnN07uV0djHO+nzmjTAvuDiLHslpMXDlZWzRGtpIME=
+	t=1740796799; cv=none; b=QFqUu008h2GxWpvgSzZhOfTJx5o2r85PRzV/G0sU/KcsFXBSdeWV1ZlfPpeENVBmnEeJDJMChhKV/hX+yViWzrla9hufD+CEPmUvo0gaXv/kYm4ghPFrZKYbDsxDJivq9/b6Vf2zRKxWbQgO9lDrR89GXO37MbqMq4V7YlEXgcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740796798; c=relaxed/simple;
-	bh=8szNnGeizuKKLxW9elJ88zK0SoN1RjBgC7zk6JwQ9EE=;
+	s=arc-20240116; t=1740796799; c=relaxed/simple;
+	bh=vQqG0OMDCP07ToP19OueaMqDHZCcFLtifyE4r5NZKOc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=IaPgBQ9YWH2smZSLTyHhgu/omSHT/mkIwaoH0HdFd7OPgM9JmEywyAoRSTFjWeGNHcilyVmwzdl9KM/JGGtJZEdmMkeCAfL/9NkVDgynPdHVzrWvWQupGcYTNzb+x6fgZvMLsFaaOtCAUE2D7rd9GbBTVHehAUaTCsrfnNlsbu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pd/kK81A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67EE1C4CED6;
-	Sat,  1 Mar 2025 02:39:57 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=cRBklQix+bFy0vKYe5ZqNSyQzGUuBjYzvs0VX69ZV/ap4ZdhuZw11+kfbf58rNeAsOseqVZuLmnqLM181+mUkU2hvER/YKp4ZqaY9i+kQ57BbXCCcTO9t3oYUSWlWKJBu72NEeO7WEXmN4xHyaT3Mnv0OIK7Ng1dvTQ7dgap2XI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W6nbeQAm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7517C4CEE4;
+	Sat,  1 Mar 2025 02:39:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740796797;
-	bh=8szNnGeizuKKLxW9elJ88zK0SoN1RjBgC7zk6JwQ9EE=;
+	s=k20201202; t=1740796799;
+	bh=vQqG0OMDCP07ToP19OueaMqDHZCcFLtifyE4r5NZKOc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pd/kK81AEfufh8fYb6D0j2Xp/33qf0uhXjALLDQlzGfA4f2KGPsaFXDzpAnFpIaHi
-	 XFKD6orE0wQlJjssjqP8hunGHAUWe1Y9UB4kc56UpBIABtPpOY3wkTcY8doCCYcgNd
-	 BJuouBcfMFC5CNKwC1PLKZCdBDljdz/XfBDOUgHq1bMIzYdwP5KLyCQhvy0neO1TsJ
-	 RJjpejpgtJ5BanzhEt5KS3oOmdQ3TZwUJMUnc2kVMLCX7hC8oTz5boVSIR2XBgDhgM
-	 xQmi+O2bTrPjAwQDyF7nE0DIUW0a8baFg208n7l9HVJzoUgs4yuFcZqUE0ZwEUm7Z9
-	 KMcKIFzNozESw==
+	b=W6nbeQAm1kNPSlcJ3DN+TWOx5Qrqf2htKUBDWq+rTKYlIdDDEWFBxyeobwDzu6rvq
+	 /mSZjiWdSYIx0/gUH0D+nAdpbzV26kAWOb3NpxCVSbwCgam7v1B1VesMxQ1COPFDbF
+	 Weusy62pbkYS5J4JsXnB2JvQNp32prKVmZy7CANtDiDEmf81+dbMqL6wEQTZcIHClB
+	 sTDP2vP7jf/Mcqh2E9/pYa1qDU4ri09vCxJcid7YaLz2CoS6QQwL7XQpmjbJ8AskOO
+	 K9ImbTmXyEZU1mTOW2AXNYnsFYDIQppa4BDtI9E54GH7Nix/J9df1PGAO9ca1j9Rgt
+	 mynD+ssm0/5Ew==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD50380CFF1;
-	Sat,  1 Mar 2025 02:40:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CB1380CFF1;
+	Sat,  1 Mar 2025 02:40:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: gso: fix ownership in __udp_gso_segment
+Subject: Re: [PATCH] caif_virtio: fix wrong pointer check in cfv_probe()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174079682976.2344768.9019830127984502086.git-patchwork-notify@kernel.org>
-Date: Sat, 01 Mar 2025 02:40:29 +0000
-References: <20250226171352.258045-1-atenart@kernel.org>
-In-Reply-To: <20250226171352.258045-1-atenart@kernel.org>
-To: Antoine Tenart <atenart@kernel.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, willemdebruijn.kernel@gmail.com,
- pshelar@ovn.org
+ <174079683098.2344768.8052382112959218283.git-patchwork-notify@kernel.org>
+Date: Sat, 01 Mar 2025 02:40:30 +0000
+References: <20250227184716.4715-1-v.shevtsov@mt-integration.ru>
+In-Reply-To: <20250227184716.4715-1-v.shevtsov@mt-integration.ru>
+To: Vitaliy Shevtsov <v.shevtsov@mt-integration.ru>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, mst@redhat.com, jiri@resnulli.us,
+ krzysztof.kozlowski@linaro.org, rusty@rustcorp.com.au,
+ erwan.yvin@stericsson.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 26 Feb 2025 18:13:42 +0100 you wrote:
-> In __udp_gso_segment the skb destructor is removed before segmenting the
-> skb but the socket reference is kept as-is. This is an issue if the
-> original skb is later orphaned as we can hit the following bug:
+On Thu, 27 Feb 2025 23:46:27 +0500 you wrote:
+> del_vqs() frees virtqueues, therefore cfv->vq_tx pointer should be checked
+> for NULL before calling it, not cfv->vdev. Also the current implementation
+> is redundant because the pointer cfv->vdev is dereferenced before it is
+> checked for NULL.
 > 
->   kernel BUG at ./include/linux/skbuff.h:3312!  (skb_orphan)
->   RIP: 0010:ip_rcv_core+0x8b2/0xca0
->   Call Trace:
->    ip_rcv+0xab/0x6e0
->    __netif_receive_skb_one_core+0x168/0x1b0
->    process_backlog+0x384/0x1100
->    __napi_poll.constprop.0+0xa1/0x370
->    net_rx_action+0x925/0xe50
+> Fix this by checking cfv->vq_tx for NULL instead of cfv->vdev before
+> calling del_vqs().
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: gso: fix ownership in __udp_gso_segment
-    https://git.kernel.org/netdev/net/c/ee01b2f2d7d0
+  - caif_virtio: fix wrong pointer check in cfv_probe()
+    https://git.kernel.org/netdev/net/c/a466fd7e9faf
 
 You are awesome, thank you!
 -- 
