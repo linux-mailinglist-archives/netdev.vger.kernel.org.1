@@ -1,85 +1,161 @@
-Return-Path: <netdev+bounces-170893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0888A4A738
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 01:47:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC33BA4A765
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 02:29:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38ECE7A41B8
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 00:46:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 848CA3B4CF6
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 01:29:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63BCFA923;
-	Sat,  1 Mar 2025 00:47:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 992DF3594D;
+	Sat,  1 Mar 2025 01:29:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GFNu1S3E"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S0VaiX8p"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F998149DFA
-	for <netdev@vger.kernel.org>; Sat,  1 Mar 2025 00:47:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A55E1BC58
+	for <netdev@vger.kernel.org>; Sat,  1 Mar 2025 01:29:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740790033; cv=none; b=amJJtfTBSRS3YEUR/ua5j9LLKfQABbDpbNruViDfnQ6EWV8eJKoKOICgfMNiXMZ/GhVF+Eoi1Hd48slrNYTi1/i5mKHxU7mAhr0GqvNHZflWdGOm/mJKrVtGdGpJ9I8NQyQ21QsguHxZED+3CEH0l2ft45FOWDrWGKpAdnDGePI=
+	t=1740792569; cv=none; b=qxV5vo8N829UD563avS5hWvMbC5xbUCTdyoSm27xsIhpmczALRkN6BOWXHxOYr5EpxVyqEJj4LKvXUAiC4CVH5fyIyOYf3fgHc36htY1KtssI7OvVR1zg9YO92c8Anxy5IPj3NIlKKd74DXZGzbwMTgnv8CWCMDb7pEJpenX2bA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740790033; c=relaxed/simple;
-	bh=PFTRg5n1yzhK3KCfO45YFztDpSFdgdOKKpfJdeiGfXU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rXGLHb5L3rcxkTI5e02cfVEuznPW83HtykwnSlCBvnneYxl1I5n623brljt1bU24wMNYu72DYvI7D9p4lWljD7q9IdRpxSDAOn5cgmp+jOTt0tWgu+IO1vr+iSDGasYisRviECkbTObO/REm7nFyoTA1TQW/nWEcjBYBsIIN1oo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GFNu1S3E; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58D54C4CED6;
-	Sat,  1 Mar 2025 00:47:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740790032;
-	bh=PFTRg5n1yzhK3KCfO45YFztDpSFdgdOKKpfJdeiGfXU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GFNu1S3Erpsp/0BCVqm563XgxRPPck0cRCwvPMuI3KIxmp/LDokMe8r0ZwTNwISGP
-	 0FvUs8FWrJJHjakkmv0IZD0wWUFZqgzweN/Lkj6nYOoLIwrB4Ndp5whzsfs5/qQ+T7
-	 IUEe6gqy/KHCM5cHNBcPHcEI0ApoLI46kqxg3EZapy7Ktd4H4CfTP9bVoUTG+JRs+K
-	 06nkH3eKBs6shdvSbq/Pfsvjg7CFC0yjv7INHaFhMz+fXlrd5LZJx3CIJVBcdwJWKm
-	 PNGfhYmXLyVt+5QOV3J9gwn2M+ZnbgBwzIvZ/R8AzTmOBe1kbU2jd92+7A5uTEri6w
-	 DJmH6gJRKMhcA==
-Date: Fri, 28 Feb 2025 16:47:11 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ahmed Zaki <ahmed.zaki@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
- <pabeni@redhat.com>, <edumazet@google.com>, <andrew+netdev@lunn.ch>,
- <netdev@vger.kernel.org>, <willemb@google.com>, Madhu Chittim
- <madhu.chittim@intel.com>, Simon Horman <horms@kernel.org>, Samuel Salin
- <Samuel.salin@intel.com>
-Subject: Re: [PATCH net v2] idpf: synchronize pending IRQs after disable
-Message-ID: <20250228164711.52f7a54a@kernel.org>
-In-Reply-To: <f186dc24-8cc5-427c-868a-1162e75dd3e8@intel.com>
-References: <20250227211610.1154503-1-anthony.l.nguyen@intel.com>
-	<20250228144051.4c3064b0@kernel.org>
-	<f186dc24-8cc5-427c-868a-1162e75dd3e8@intel.com>
+	s=arc-20240116; t=1740792569; c=relaxed/simple;
+	bh=x30Ghtnf2mwjQ7C24lb6dNTXdFIuMS5fxSzqclDeaDU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RcQDygfnl9/oMHxq7E42se/SEN2Z8czaJka7F/wBIqlxDO0q9YXRqGnRcK2R95hpQR+Y1Hn0ecwUnBvs/VPxbYszAmFVhVZQgh6UJ1QU6HBJJ+EJKxGfqqFvAIpXEjsIAualnXs2AhOEHGKLKMVfk+hFVyeM9woq3c6sBEDb0JU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S0VaiX8p; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2237a32c03aso37915ad.1
+        for <netdev@vger.kernel.org>; Fri, 28 Feb 2025 17:29:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740792567; x=1741397367; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Kc38nFBS6hSU0vji9D+YzzpAjSlnqZ5qJGUo2AO471s=;
+        b=S0VaiX8p5oTZx9ICATxbmh2T98PF+gxmFdn5K7Dqs3yN7BRYfSPZcD7BpIrlV3/JWD
+         g59Bpj5SyQ7kp7GDINxMbFp9sBrVu1zUYCkt5Lx0nWDgUEVBJTiCshbzOXvSvvVNLWK2
+         QWOBISMETj1cm6T+hbYmPck540G8K9T5Jl/QirOuVwzeeRV96vQeKFpCZQR0sU2T2oPo
+         HFPA6k+/LCZc92394kHeB0gnw3Iq3E3m+b88/NeZ/KCobUGJoSVnnqYQ1taIddl9IUlC
+         ciSumnvRSAIPV8TufYdNZM1nIHMj98bEI6Y1XCO41aCpMHKTpuSMdr/C9tPGsu7QYMCX
+         xH5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740792567; x=1741397367;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Kc38nFBS6hSU0vji9D+YzzpAjSlnqZ5qJGUo2AO471s=;
+        b=l4jF4mMtLFkrv4OXHuf2z4oz2Hz0Tih4P7FuTzS02veF+AZf9sZt0rRYoo/Ma5y1k4
+         UwstNo+ecRRTCinmfu14085B8LuBo0Hq8lrq+MBexrw3+SafIqqVvocb+eXynlPyCSdB
+         8oDkPFEjUh8J5AxxDPhravVD1vxEZrWfynlL3N1D89JnmhHArMPaJ3QqRX35o0d099Ac
+         hLBHVjF5/DPQv4r8uEmXzUMC7FYcOYG4Y8xfhCQGg/b2o87hxr7PsKOwRKsNXpCF5GaG
+         mnzjpHUBDK1Y3vin1updwT/aN7rgqoaV31in5sSHkvEYNLGpIH6DnRdYF0Tm50r09SUX
+         RRag==
+X-Gm-Message-State: AOJu0YzpB2t/mz+O/lOdL4NkPEw6Er7XTf4muCHW7XUdWmt9R9eH3Uej
+	k7C7MiF1/2irqPTIXx02ECmRUdvPoFcsFOSW1nG7vEBuyLM4lpZjC/5sDP8wfkiAIyOmxTL+9rs
+	ZdcTEVXNSzPzxHtT7IclHYEXUaSXrSCb5ssXq
+X-Gm-Gg: ASbGnctCel2FCGEPIOFi3D/8K/aPahjFIwAAVrXBNexUnRyIeRAKna5v97HyA/R4bqs
+	/2aWpI2jqvXJlIlpGXSeVeHyOmkduO9VWTmZjX3KaOreLDjtoTqKv1Ab08e8NUMFP3mISJv2+5V
+	iMN2n1TfgXPdmhwXMjN6mDDDeP/w==
+X-Google-Smtp-Source: AGHT+IGncPbBhrhz7q7nYtSkG3NCU3eJmen24UIv0X8fbRWFxDMMC/F2mnfn4/23C53PdlyFhZfhFGySOLAkJbQVaoI=
+X-Received: by 2002:a17:902:ccca:b0:220:c905:689f with SMTP id
+ d9443c01a7336-22385a2665emr571665ad.25.1740792566772; Fri, 28 Feb 2025
+ 17:29:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250227041209.2031104-1-almasrymina@google.com>
+ <20250227041209.2031104-2-almasrymina@google.com> <20250228163846.0a59fb40@kernel.org>
+In-Reply-To: <20250228163846.0a59fb40@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 28 Feb 2025 17:29:13 -0800
+X-Gm-Features: AQ5f1JqnucwSW-6yoUTgklaGGj9zlmp1rtei3-w0QbA66_zGizdQVdrhRtrAPr0
+Message-ID: <CAHS8izNQnTW7sad_oABtxhy3cHxGR0FWJucrHTSVX7ZAA6jT3Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 1/8] net: add get_netmem/put_netmem support
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
+	Donald Hunter <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 28 Feb 2025 16:59:47 -0700 Ahmed Zaki wrote:
-> Most drivers call synchronize_irq() in the same order as this patch, for ex:
-> bnxt_disable_int_sync()
-> iavf_irq_disable()
-> ice_vsi_dis_irq()
-> 
-> 
-> The order is:
-> 1 - disable IRQ registers
-> 2 - synchronize_irq()     <-- currently missed in IDPF
-> 3 - delete napis
-> 4 - free IRQs
-> 
-> May be "races" is the wrong word, I will try to re-word.
+On Fri, Feb 28, 2025 at 4:38=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Thu, 27 Feb 2025 04:12:02 +0000 Mina Almasry wrote:
+> >  static inline void __skb_frag_ref(skb_frag_t *frag)
+> >  {
+> > -     get_page(skb_frag_page(frag));
+> > +     get_netmem(skb_frag_netmem(frag));
+> >  }
+>
+> Silently handling types of memory the caller may not be expecting
+> always worries me.
 
-I still have no idea what the problem is.
+Sorry, I'm not following. What caller is not expecting netmem? Here
+we're making sure __skb_frag_ref() handles netmem correctly, i.e. we
+were not expecting netmem here before, and after this patch we'll
+handle it correctly.
 
-If you can't explain what the bug is let's just drop this patch :/
+> Why do we need this?
+>
+
+The MSG_ZEROCOPY TX path takes a page reference on the passed memory
+in zerocopy_fill_skb_from_iter() that kfree_skb() later drops when the
+skb is sent. We need an equivalent for netmem, which only supports pp
+refs today. This is my attempt at implementing a page_ref equivalent
+to net_iov and generic netmem.
+
+I think __skb_frag_[un]ref is used elsewhere in the TX path too,
+tcp_mtu_probe for example calls skb_frag_ref eventually.
+
+> In general, I'm surprised by the lack of bug reports for devmem.
+
+I guess we did a good job making sure we don't regress the page paths.
+
+The lack of support in any driver that qemu will run is an issue. I
+wonder if also the fact that devmem needs some setup is also an issue.
+We need headersplit enabled, udmabuf created, netlink API bound, and
+then a connection referring to created and we don't support loopback.
+I think maybe it all may make it difficult for syzbot to repro. I've
+had it on my todo list to investigate this more.
+
+> Can you think of any way we could expose this more to syzbot?
+> First thing that comes to mind is a simple hack in netdevsim,
+> to make it insert a netmem handle (allocated locally, not a real
+> memory provider), every N packets (controllable via debugfs).
+> Would that work?
+
+Yes, great idea. I don't see why it wouldn't work.
+
+We don't expect mixing of net_iovs and pages in the same skb, but
+netdevsim could create one net_iov skb every N skbs.
+
+I guess I'm not totally sure something is discoverable to syzbot. Is a
+netdevsim hack toggleable via a debugfs sufficient for syzbot? I'll
+investigate and ask.
+
+--
+Thanks,
+Mina
 
