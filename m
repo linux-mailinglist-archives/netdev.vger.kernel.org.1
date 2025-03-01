@@ -1,132 +1,171 @@
-Return-Path: <netdev+bounces-170915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D4C3A4AA32
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 11:18:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F38FBA4AA3D
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 11:36:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72A07173268
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 10:18:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 360E47A82D2
+	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 10:35:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3AA11D5CFB;
-	Sat,  1 Mar 2025 10:18:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95B61CAA9A;
+	Sat,  1 Mar 2025 10:36:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="wFEEFKU2"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="JRb0sxvH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.4])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A0461C1F21;
-	Sat,  1 Mar 2025 10:18:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84CD323F39D
+	for <netdev@vger.kernel.org>; Sat,  1 Mar 2025 10:36:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740824318; cv=none; b=NUTBNqcAIDfpd+bg/i5mwniDtQMVOt64VKMH+ad6KmNbtRrP/vsIO9TDS4lBRWQIwk0hxdEsu/0eNesAOZ36UQmMDFmMIjU1DLGEVqCD+4LXSHZ6bswbMnCsT1nMJXwXkyklnj1KxnQuUmneiBbcLu9BAA4DKT4tgiLw5V0MsBk=
+	t=1740825364; cv=none; b=g/5pMxfmFoJIazQIVdZYRoHT/aTQ8mkmPQAgWMV39hQRn3th0IfJ/ODPUWnhytk06Fxx5Pwn6KlK0iSCM/x8I/1RjvxGWkn/IKVbKYKOIM9okmhjOlUIjBlbJUVli+siyn4EQq1CkXUuP2ZtZs5weEQCn2zC8n+dcZ/gO8Lt7p0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740824318; c=relaxed/simple;
-	bh=Tih7/m1jCU6zo9dbLTjV9xhUlYXnOFqFkJ/TPENNJOs=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type; b=C8Qhs4OzNqR6/Xu18EtodO/f07/Od9wFfqyEU6wt1smPdcf1q0v8xvKW0jRUiyer7kvwL2bH48uwcHq7NBmjOvfCI6NIaAlpdpbC6dd7lOpjgCDMeHTvh8/q84kvWafHjjrbEdStnDN078dI8XHsu0l++yVUmkytr8jr1K0kqpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=wFEEFKU2; arc=none smtp.client-ip=212.227.15.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1740824314; x=1741429114; i=markus.elfring@web.de;
-	bh=JqgvWhDeBxn3+761cHTwCzYRQ8hleuaweJ38cwLMrf0=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:From:Subject:
-	 Cc:Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=wFEEFKU2thEBQiFzEdHl8tSvuoTMkCt4bE7IlLwC5/aw5mYmakxzlTGLctD/gH/+
-	 V+um6iDS0uxVctT6lrXfnaF396XIgNe+DvcV6+kWjgfkcjp8qiGTvNdgPcYa3lOr6
-	 F3aEEzGX3Gl7zIiV9reYkvarbvIVd233PqFV7Q8RszxUV5CxFr0WchP738yWW9EAW
-	 Js4YhG19aZ9uqQ9Qwse7DngX+3nOs7jdwY13qNSp+P9j80sR+jkfy8GnOkXnBtN47
-	 w/hXnkx0CeRPsL7ip8I7Q83xJYg57YUULq9wzgA2/yo4tBFODCfhZRAlUhYWCLvYe
-	 AdEzBQg16Ltv6ZR/iw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.93.42]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1McZnl-1tIXmj0VbR-00hdl0; Sat, 01
- Mar 2025 11:12:44 +0100
-Message-ID: <cbbc2dbd-2028-4623-8cb3-9d01be341daa@web.de>
-Date: Sat, 1 Mar 2025 11:12:31 +0100
+	s=arc-20240116; t=1740825364; c=relaxed/simple;
+	bh=bkCzMtITmd66ChNfEmMQxa/Yuy9+XVsN6MuATllnoSA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eFuCFddrKhAynhFrNm79yjdwTEfXOvHvWgMvlrcF/K2e1MjjCBkH5Ng/G2JkjdH9jJlyKWdxQuu5F7XsfNFREX36zNlKgXozqcDIAJZxh5azhJ91+bY5fzva6mWXVrqL6L6fUKfxZlUCX8VDIsH/+3xREADh9kTvDgtzDi10FVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=JRb0sxvH; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=NbnxRDsM7wFCSn7ZwguqUBN3uLZyyPrVe6UrA+DaIdw=; b=JRb0sxvH6lL+NBhHj9/orxr4zL
+	3GEuiWEMXv8XUYGrm/LlkO34tD5KfEmPRMuLBAdTDZO4ZQUpPrW56D96B3mVvokum52nAClC2TUb7
+	kzp4svreaaGmBusOG3TpDLiYJJpl5X9m7QLMw/a02gDunZm324BUL3yAF3vy2aF+ECvANtzEZmVWm
+	3/DncYyIBFjhgMvLIF008usQlxnHakXycvpKqltdiKsVxOuYxnPAW+jHS4JHSZLFQdHIemPCDGckc
+	I+uool87P9rPNmt5+EpYOJfaDZ3oqvldYhg87+t0dUGIWs2OFX3RtHsq044yHZHt75SHoEuS6TYeA
+	MzWQbBJw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49338)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1toKCC-00044v-2O;
+	Sat, 01 Mar 2025 10:35:48 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1toKC9-0001hZ-1N;
+	Sat, 01 Mar 2025 10:35:45 +0000
+Date: Sat, 1 Mar 2025 10:35:45 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>, netdev <netdev@vger.kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: Re: [QUERY] : STMMAC Clocks
+Message-ID: <Z8LjAbz5QmaMeHbO@shell.armlinux.org.uk>
+References: <CA+V-a8u04AskomiOqBKLkTzq3uJnFas6sitF6wbNi=md6DtZbw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
- Brett Creeley <brett.creeley@amd.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jacob Keller <jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Shannon Nelson <shannon.nelson@amd.com>
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-Subject: [PATCH net-next] ionic: Simplify maximum determination in
- ionic_adminq_napi()
-Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org,
- Qasim Ijaz <qasdev00@gmail.com>, Natalie Vock <natalie.vock@gmx.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:iAZ5wQXshMe1auUfVTMOjSnfhKROyESDT79eO6OuARkv2ggeQ7p
- +3J7+DAdHZZOHg1Gufq6YUBoZZSyZpqvkPlcUzpVDhNv3vyT5SnSarfmOkbmzrcDM6S+yGL
- 2suFLHJOTPMXsEuNNRtjvACJuDX810LCHyiLLt32NCJZARpKZtKfZLPldGXFhld3xqGGxGd
- hKpHlT36i5IFJ3IV+CpiA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:1RdTme0JumA=;zJ7GmkLyjP0ZpFdUxYl5KacwGZk
- fyCTfDztGHJ3Iis9Xpdlwpi00SkJ6h0VLeVIXOo0mRpPd3yl53AyCwbYpNVP/oSwOcpNwkZtN
- uIXXf4efz7/SkhSyB2UVnOpRsxN4DW/sPlJg/dnDdamTVudT6UiPzebbIGKPT16/HKDCSzz7E
- A8i4H8nKAJA2qQWlIowbzm4LLT91Zw0Zus0Uv2IoNb+seBQrO3oQHxuj9+X6G7xW0C0IXzCnc
- 7oAYcKHoC/f40b+Rs/FJPLN1AfBBjRSxCPYmck+yoquyBI8FMCnHejiBtwmASR7zDWVi1BEyI
- XhZ/WhC81zR38+WA03bTSDM0EauaKqmwo1N6t52+CSe9L7P9QKpvjeS6OUgxgEd0K3LkTZQkj
- LS/KYpQa1FQuQ0kKyLaYPDXK6MDY6pbExgf7xV3IUXxWqkK02uxjMSXTJbyXWIzTVi5afDuGy
- NZfBXzbFV7bmNtdtaEVluSIC9+0sKEMKcVRmVb04Vk/iWYGIKPB78HqUekKqUwJ+NfCM9q28J
- 4uOrijAWYTQ7TmATwoC98HkADkoAaLAtCJMJzAMYs46hMZkCg2CumnWpKSx9tcTogddL8vjWK
- X0+DXdIRgeTCJ1oKgoDtxDmTVQgTqaSieHtrUt80UymLv+kkCQeeLykpEerjEPLund4Mw/oJI
- u8AOsk5cdh3GDinjDKMuAZ4AS/tDAur/tMRJoV/Z1vfKKspmX6+J2P4yCVl1Zfxs9qJEoHHvD
- XqBU7LSKycjsIN8ghdX0/kTw03OrZR1tC1CzTINu4p5k5jYPyuFzRDFr4ee33udfM+WXtbBaL
- EgnVcKSQV+Vh6rYtig1Uxb1FZTSA56oz1O8lYhbhXM7DoDuc4dw0qx4HSCdgH7gWtoS9hG5K+
- WxpOkz1mNEmd/ouy0bhuGlSxTneyfad8EWPFu8DHv6K1yORXUezI5Me/KfY8X7oWDEFOekdpB
- MsQ0Zw7FvzwUZIlbx39gmHV8aF7UL130bYW5qLBPp/Zu0UCYe/ikzVXlWG5yK+m33Rwjf5euy
- lZI6NSxWVVAq3pA/HhJGog/a4dS4VHe9qQiNWR6mJTQdbGC/V76ro4z1iEP2hIHQ41BZV5vRL
- UYPBiqWXid2TRtUYHYwd2C6BJCZkteSscrD/IXhnQgpV0p1HAR+uBk/6StGeXDsuZw7+iFpM3
- dGMTCUAAagqUuBH3WlAquJmzrprLezi/RXauFB27rdKUl6ZnNOAygcPAJIrzTVxGT4ulQq328
- mzbEWfYzG+j4hsmnTmzu9p/KQWClTwLRzPozq5NYc3Itbh7r5+1qUkjJwP/b9snb27hZTFRgd
- w5aCCI9g3H9x9/inkqdDsuz9DfcbxOixuebb4tntFQnQX7UuOpqre64KQHrQ0BNzbxrg9+2aM
- sLoKyWcGsAhkiDdZPadFi25ALJv8TJheeYe7d02I+Q/RG5F3If5QpF3EFtb3PYaYctzDwDcy0
- IvWciIA==
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+V-a8u04AskomiOqBKLkTzq3uJnFas6sitF6wbNi=md6DtZbw@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Sat, 1 Mar 2025 11:01:28 +0100
+On Fri, Feb 28, 2025 at 09:51:15PM +0000, Lad, Prabhakar wrote:
+> Hi All,
+> 
+> I am bit confused related clocks naming in with respect to STMMAC driver,
+> 
+> We have the below clocks in the binding doc:
+> - stmmaceth
+> - pclk
+> - ptp_ref
+> 
+> But there isn't any description for this. Based on this patch [0]
+> which isn't in mainline we have,
+> - stmmaceth - system clock
+> - pclk - CSR clock
+> - ptp_ref - PTP reference clock.
+> 
+> [0] https://patches.linaro.org/project/netdev/patch/20210208135609.7685-23-Sergey.Semin@baikalelectronics.ru/
+> 
+> Can somebody please clarify on the above as I am planning to add a
+> platform which supports the below clocks:
+> - CSR clock
+> - AXI system clock
+> - Tx & Tx-180
+> - Rx & Rx-180
 
-Reduce nested max() calls by a single max3() call in this
-function implementation.
+I'm afraid the stmmac driver is a mess when it comes to clocks.
 
-The source code was transformed by using the Coccinelle software.
+According to the databook, the DW GMAC IP has several clocks:
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-=2D--
- drivers/net/ethernet/pensando/ionic/ionic_lif.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+clk_tx_i - 0° transmit clock
+clk_tx_180_i - 180° transmit clock (synchronous to the above)
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c b/drivers/net=
-/ethernet/pensando/ionic/ionic_lif.c
-index 7707a9e53c43..85c4b02bd054 100644
-=2D-- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-@@ -1242,7 +1242,7 @@ static int ionic_adminq_napi(struct napi_struct *nap=
-i, int budget)
- 	if (lif->hwstamp_txq)
- 		tx_work =3D ionic_tx_cq_service(&lif->hwstamp_txq->cq, budget, !!budget=
-);
+I've recently added generic support for clk_tx_i that platforms can
+re-use rather than implementing the same thing over and over. You can
+find that in net-next as of yesterday.
 
--	work_done =3D max(max(n_work, a_work), max(rx_work, tx_work));
-+	work_done =3D max3(n_work, a_work, max(rx_work, tx_work));
- 	if (work_done < budget && napi_complete_done(napi, work_done)) {
- 		flags |=3D IONIC_INTR_CRED_UNMASK;
- 		intr->rearm_count++;
-=2D-
-2.48.1
+clk_rx_i - 0° receive clock
+clk_rx_180_i - 180° of above
 
+These are synchronous to the datastream from the PHY, and generally
+come from the PHY's RXC or from the PCS block integrated with the
+GMAC. Normally these require no configuration, and thus generally
+don't need mentioning in firmware.
+
+The host specific interface clocks in your case are:
+
+- clock for AXI (for AXI DMA interface)
+- clock for CSR (for register access and MDC)
+
+There are several different possible synthesis options for these
+clocks, so there will be quite a bit of variability in these. I haven't
+yet reviewed the driver for these, but I would like there to be
+something more generic rather than each platform implementing basically
+the same thing but differently.
+
+snps,dwc-qos-ethernet.txt lists alternative names for these clocks:
+
+"tx" - clk_tx_i (even mentions the official name in the description!)
+"rx" - clk_rx_i (ditto)
+"slave_bus" - says this is the CSR clock - however depending on
+   synthesis options, could be one of several clocks
+"master_bus" - AHB or AXI clock (which have different hardware names)
+"ptp_ref" - clk_ptp_ref_i
+
+I would encourage a new platform to either use the DW GMAC naming for
+these clocks so we can start to have some uniformity, or maybe we could
+standardise on the list in dwc-qos-ethernet.
+
+However, I would like some standardisation around this. The names used
+in snps,dwmac with the exception of ptp_ref make no sense as they don't
+correspond with documentation, and convey no meaning.
+
+If we want to go fully with the documentation, then I would suggest:
+
+	hclk_i, aclk_i, clk_app_i - optional (depends on interface)
+	clk_csr_i - optional (if not one of the above should be supplied
+			      as CSR clock may be the same as one of the
+			      above.)
+	clk_tx_i - transmit clock
+	clk_rx_i - receive clock
+
+As there is a configuration where aclk_i and hclk_i could be present
+(where aclk_i is used for the interface and hclk_i is used for the CSR)
+it may be better to deviate for clk_csr_i and use "csr" - which would
+always point at the same clock as one of hclk_i, aclk_i, clk_app_i or
+the separate clk_csr_i.
+
+Essentially, this needs discussion before settling on something saner
+than what we currently have.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
