@@ -1,110 +1,121 @@
-Return-Path: <netdev+bounces-171062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4C72A4B4F4
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 22:37:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54DE7A4B4F7
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 22:40:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A57321890FCF
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 21:38:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C840A3AB6ED
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 21:40:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B72EC1EDA3E;
-	Sun,  2 Mar 2025 21:37:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43BD21EE017;
+	Sun,  2 Mar 2025 21:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W2cSkjb2"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="d70Nfatq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9621C3BE9;
-	Sun,  2 Mar 2025 21:37:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12CDE1EDA1B;
+	Sun,  2 Mar 2025 21:40:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740951471; cv=none; b=ZVftbys9YEMbndzTFWzCLSOgfsSaYNiKO8+NDUY9JRn/xCyV2rWINnbF4XjsCAOOJLqoocK6oARPvSwLWN2/rZWbJH8i1nLqBjsQef0Isnp2O+Ge4Z11Ol+MIu4u53KM5EfhCe486DRCJvybmL+KapymtcNpVLchvErOM3907gM=
+	t=1740951610; cv=none; b=fvs0D6d54Ja0F6/mISBOcksAxxfSmWxMlwpqiXxV7A0xTy0EQlrJ2eNnKBP+Wht/roZLRNjXYz95y354ILg4wFB5LoODGmhQtkS1+MZCj/CTn/6aCkmtCZN8EsnSOEdOWW1Iv8ePYY3Gx80x8J5ezXfi6JBj+4/CUYMdGQddrMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740951471; c=relaxed/simple;
-	bh=Wgxf63Ipcv8UPfI/p8lBtWriq28T9EuTCBgsysSB/ZQ=;
+	s=arc-20240116; t=1740951610; c=relaxed/simple;
+	bh=rXtDZ2yr0SyY14nrPLo+qp+HXF3u2NYAW1CktshMwZc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f+tbg9e7n2ENZAdX5D8pJUlUhBMqpqAqo39IYl5xS8cudLBFLVQK2gjlME/wcj7RC1jSMgdfM46d29lfVXyUvWGTRjQcwUqM8c+3LRJmYbXK5/IoaKLffO5N6dfdbp029uLJj9lsWG84EwDKSsfaIaNP8jImmQorlwyPDRQ7Jv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W2cSkjb2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14005C4CED6;
-	Sun,  2 Mar 2025 21:37:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740951471;
-	bh=Wgxf63Ipcv8UPfI/p8lBtWriq28T9EuTCBgsysSB/ZQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=W2cSkjb26U0ynFm1Gh9VzneNWevOT3h/eUGeEaXwPyA0aLkp1e+iH31VGJ2zS2f4p
-	 jj0EiThvfqTBzUIFGvgOVkn1LW6fzzbjEps5F8hNOBp10gvPCTdvjp+4eKFA7amN40
-	 oNbwaasmDgxWW91XAZLyDljn1d/nzu1D3inRXjhACzPyP0jxnjxLb9z8+vM9Ypf3EG
-	 sHdiCaWo1U+ZPei4AUitjTt65u0B/EKu74QZkEGr376e189FygCFQ5w24+IoQXDbRU
-	 1JlIcAqQrG2NUKkdc6ubVItxKLYsSkr3Vepn5P8ZAyHnjrs+Bcvp7cxejztuhddKuU
-	 eEavQscjhnPuQ==
-Date: Sun, 2 Mar 2025 13:37:42 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, David Howells <dhowells@redhat.com>,
-	Akinobu Mita <akinobu.mita@gmail.com>, Tejun Heo <htejun@gmail.com>
-Subject: Re: [PATCH v3 04/19] crypto: scatterwalk - add new functions for
- copying data
-Message-ID: <20250302213742.GB2079@quark.localdomain>
-References: <20250219182341.43961-5-ebiggers@kernel.org>
- <Z8P9eIGDlT3fs1gS@gondor.apana.org.au>
+	 Content-Type:Content-Disposition:In-Reply-To; b=cOkYtiR2biCmxjpASC//FALP5vFbH+3V2zQtmfJN1keEZfJ7CULX2NhggwPp8ZIDk1qw/w/FJzLb6YyFU1asn+ewgocZDro7yeE4qhHXKoYCLRXK2ouYoJm+Ucd/FiglQNbvQ2DlFOX3aPnooYixMkO0ebuMqjqWJYyjYOpapKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=d70Nfatq; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=N/2ZFPWYJb8JtWxhys3Oe+wy0c71G8tXb/B0rXelUc0=; b=d7
+	0NfatqjXuZ1sx7JmlmcPv0z+5ofjxToh4C2mEa1KU2WwVHnXyuOTQ7zIzGrffiAyyaMtlkM92p0wT
+	TTG24B1k8xnV+RoTA7HQrXJYYilSNV0ZiuCvVngRC2iRsuFrhU1QF9oqLFXcqMcNLrKvlHSywSrmz
+	MB3ltcXNifiqROI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tor2P-001c0v-Nr; Sun, 02 Mar 2025 22:39:53 +0100
+Date: Sun, 2 Mar 2025 22:39:53 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH 2/3] dt-bindings: net: Document GBETH bindings for
+ Renesas RZ/V2H(P) SoC
+Message-ID: <86f41f06-d544-42f5-b2c0-6c4a76ad9eac@lunn.ch>
+References: <20250302181808.728734-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250302181808.728734-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <c5a75f20-9b61-448e-941b-1106cd06ea04@lunn.ch>
+ <CA+V-a8sCMn+v5y5v9CyyV2VsRmLj-Uyowt61tTS9dWN43CD0_A@mail.gmail.com>
+ <Z8THE2hpybzP74bH@shell.armlinux.org.uk>
+ <CA+V-a8up3Kv08sNarvC3gWLRpik3=_aKb3JCTGkxyGYMcj4Wbg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <Z8P9eIGDlT3fs1gS@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+V-a8up3Kv08sNarvC3gWLRpik3=_aKb3JCTGkxyGYMcj4Wbg@mail.gmail.com>
 
-On Sun, Mar 02, 2025 at 02:40:56PM +0800, Herbert Xu wrote:
-> Eric Biggers <ebiggers@kernel.org> wrote:
+> > > I can certainly do that, but not sure in the DT we will be describing
+> > > the HW correctly then. I'll have to hide *-180  clocks In the DT and
+> > > handle and turning on/off these clocks in the clock driver.
+> > ...
+> > >              clocks =  <&cpg CPG_MOD 0xbd>,
+> > >                             <&cpg CPG_MOD 0xbc>,
+> > >                             <&cpg CPG_CORE R9A09G057_GBETH_0_CLK_PTP_REF_I>,
+> > >                             <&cpg CPG_MOD 0xb8>,
+> > >                             <&cpg CPG_MOD 0xb9>,
+> > >                             <&cpg CPG_MOD 0xba>,
+> > >                             <&cpg CPG_MOD 0xbb>;
 > >
-> > +void memcpy_from_sglist(void *buf, struct scatterlist *sg,
-> > +                       unsigned int start, unsigned int nbytes)
-> > {
-> >        struct scatter_walk walk;
-> > -       struct scatterlist tmp[2];
-> > 
-> > -       if (!nbytes)
-> > +       if (unlikely(nbytes == 0)) /* in case sg == NULL */
-> >                return;
-> > 
-> > -       sg = scatterwalk_ffwd(tmp, sg, start);
-> > +       scatterwalk_start_at_pos(&walk, sg, start);
-> > +       memcpy_from_scatterwalk(buf, &walk, nbytes);
-> > +}
-> > +EXPORT_SYMBOL_GPL(memcpy_from_sglist);
-> > +
-> > +void memcpy_to_sglist(struct scatterlist *sg, unsigned int start,
-> > +                     const void *buf, unsigned int nbytes)
-> 
-> These functions duplicate sg_copy_buffer.  Of course scatterwalk
-> in general duplicates SG miter which came later IIRC.
-> 
-> What's your plan for eliminating this duplication?
-> 
-> Thanks,
+> > Your SoC designer really implemented the 0° and 180° as two separate
+> > independently controllable clocks?
+> >
+> Yes there are separate bits to turn ON/OFF the 0° and 180° clocks.
 
-The new functions are much better than the lib/scatterlist.c ones: they have a
-much better implementation that is faster and doesn't use atomic kmaps, and
-(like scatterwalk_map_and_copy() which they are replacing first) they don't
-require the unhelpful 'nents' parameter.  My tentative plan is to move them into
-lib/scatterlist.c, reimplement sg_copy_buffer() et al on top of them, then
-eventually update the callers to use the new functions directly.
+Do you know what the clock tree actually looks like? I can think of
+two different ways this could be implemented:
 
-However, the 'nents' parameter that sg_copy_buffer() et al take will make the
-unification a bit difficult.  Currently those functions copy the minimum of
-'buflen' bytes and the first 'nents' scatterlist elements.  I'd like to remove
-the 'nents' parameter and just have 'buflen' (or rather 'nbytes'), like the
-crypto/scatterwalk.c functions.  I suspect that nearly all callers are passing
-in enough 'nents' to cover their 'buflen'.  But there may be some exceptions,
-which we'll need to check for.
+----+----------on/off---
+    |
+    +----not---on/off---
 
-- Eric
+or
+
+-------on/off-+------------------
+              |
+	      +---not---on/off---
+
+In the first, the clocks are siblings. In the second there is
+parent/child relationship.
+
+	Andrew
 
