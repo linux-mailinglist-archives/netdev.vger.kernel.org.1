@@ -1,207 +1,312 @@
-Return-Path: <netdev+bounces-171001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 656E3A4B0DC
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 10:55:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E8D1A4B154
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 12:57:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CC0816AAE4
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 09:55:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E88A16CFA0
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 11:57:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B29091D7E35;
-	Sun,  2 Mar 2025 09:55:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="HzrXsw+J"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A2611DF965;
+	Sun,  2 Mar 2025 11:57:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2061.outbound.protection.outlook.com [40.107.244.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02BAE5661
-	for <netdev@vger.kernel.org>; Sun,  2 Mar 2025 09:55:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.61
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740909346; cv=fail; b=gIzj3vPfhbs//WzDDJFexMV0BQeJyqja2Ms0A2dHUtQFDG+UaI3LU0GtcZzgbOHeHpIwsWaUNG7OSoIscPdkzS6CnlfCHh18ZG8xFNGXrn7gNAgRXt0KheyUum7OU2PIubm/ABOqzv6QfULPpIKH1xz3lxfAsEIxpwpCwVQAMSA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740909346; c=relaxed/simple;
-	bh=V6dYBEX+cpfWKB3AlKVgAO+vLmkAvNA2aBeJqVqaQ50=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=DDVcuKRdgE0VEVRXcAOanitaHBaBHFDZC2M+ZmAXLayymzwpMn6Ac3YYhrlbVrp2KPWZaEugmj5inroedbJpiWbtmCR1BXtPIWcmJGMznFhvwn27JjaBl8+1SQmFEErNt9y2QdBCRayOfCnzA4pZDDwtPtalhFBouXZiUvoQd7Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=HzrXsw+J; arc=fail smtp.client-ip=40.107.244.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gWlfIQX6+81SmwKyYxxXa57RExiI8FDxPMhTr4DhvDNYpZuYmwC9K8X3UlDi7MHEpDZZN4ixW30G9gsURd/Il+so1VLc+qRsYgv7aCYr/9j/TPRieeg1OyK11DrIWEJhUx/6v4zd6cYjY4yFk5t3+t0VjKVaezukPbm1TwqFCYemdcr5mbmwoQu/2Dg7WV5JrOpFaHNAj78qY9IYrQ3nmMX/1uIHSRmSDeaxAPS83VanLfT1B2oMspPM0bZWVkX4EAZNa0RoaQovQzkqqhWJ4+xlfoT41MkQqep5hFCoxMcw3x/6cL94zH5Xtb6l+Owe9WnP8ljlpGOhPe3ldjlWSw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CIVRZ63929O61VHJxs87x/b4AJgiN0XK29gkZjumB/M=;
- b=PALjFOUjRzz8/dQ6dl5cuoSpgcegWR5EUCoBsxeXWUJ8D/zQRcD95P/ni2Zs28YeQWZtByZT+nk6vr6faPKWO14tILhItdgsmFE64x2BiFxCoHD46z4TtptKAeWKmDhrcfiDXdzawxc7XPPeKxCW/GRBGYAd9mitDDfNwHCv1Qchx1nZ670P87obGRps6rB+13BQPrGjK3zyplDU+bfHG63qF2lXc1W3g7y+IVh896KmISibzf20N7S3WFTPlTujX/hscnmoq6SsEBAvDlMGoyOEUYKbnMDmJyWwIyAZ2DEKNG8sgUHWt56W8qOtR9W0w80XS1B9l5kGiJXLtXpgJA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CIVRZ63929O61VHJxs87x/b4AJgiN0XK29gkZjumB/M=;
- b=HzrXsw+JNpwJdrnQEB99Iz+HazVLvJoHRe4rUV4bwzkafZpW5b3PiaNNc8gMlCXexg974oYpqXqr7f6HWEN4pILVmHhKt3/Gd5jtI3DsJ6fYzHidddEeB/MOivFS2Hl4wPiwdaWxyj2tRIULbzbnYGkh/X7CqK6LI02TsDP+QyQg5t1F0pzVOumE5MSuWKV9brLVqquPwq9R+Ymbhw2+XgBovXOPG/efkmx0CdTBN6n+jMX5FnS+Nezm+IqitXmCAnyozeOmcRj6wIXLHjxGz5OnXAEfXZ8zLcGXGucWD90Ov2/zjbCT8e8Qfvhd5ngZL/+xW/Q9eqMcMHG4WwE41w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB7500.namprd12.prod.outlook.com (2603:10b6:610:148::17)
- by SJ0PR12MB5612.namprd12.prod.outlook.com (2603:10b6:a03:427::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.25; Sun, 2 Mar
- 2025 09:55:41 +0000
-Received: from CH3PR12MB7500.namprd12.prod.outlook.com
- ([fe80::7470:5626:d269:2bf2]) by CH3PR12MB7500.namprd12.prod.outlook.com
- ([fe80::7470:5626:d269:2bf2%6]) with mapi id 15.20.8489.021; Sun, 2 Mar 2025
- 09:55:41 +0000
-Message-ID: <f5bf9ab4-bc65-45fe-804d-9c84d8b7bf1f@nvidia.com>
-Date: Sun, 2 Mar 2025 11:55:34 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: ethtool: Don't check if RSS context exists
- in case of context 0
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
- Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>,
- Joe Damato <jdamato@fastly.com>, Tariq Toukan <tariqt@nvidia.com>,
- ecree.xilinx@gmail.com
-References: <20250225071348.509432-1-gal@nvidia.com>
- <20250225170128.590baea1@kernel.org>
- <8a53adaa-7870-46a9-9e67-b534a87a70ed@nvidia.com>
- <20250226182717.0bead94b@kernel.org>
-Content-Language: en-US
-From: Gal Pressman <gal@nvidia.com>
-In-Reply-To: <20250226182717.0bead94b@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MM0P280CA0044.SWEP280.PROD.OUTLOOK.COM
- (2603:10a6:190:b::12) To CH3PR12MB7500.namprd12.prod.outlook.com
- (2603:10b6:610:148::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 169581DBB0C
+	for <netdev@vger.kernel.org>; Sun,  2 Mar 2025 11:57:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740916649; cv=none; b=LRzaWc1wFz4pf1TujWl1mtrUC1Vn/uMa1pj7p+8r/cWBDGhmb1dbv9buukj5iAIWbA8q91C0t47RHbqXc0gktD/ACaZN3Aui5g2U4pPduUVNF82KMoB5sGzapAWkfuzCR/HqPjrjtUR+Rv+1tYGSspQhJ3k3d+Wnz+eOj3E5g40=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740916649; c=relaxed/simple;
+	bh=/beikVxTu1NGcAZWXy1YUVqubTtwr3l5ZFU1MMVz0HU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=h2SS9Bc/ArJJhaMeDquEGOQ9zo9SSOLgvHDJ5AFPfkMmwYHq+NcI6rV7+DsZRovZ5ojIBeRrX18fHz0AEDRiyEQJ0QmfHjq2NVTRtcesQlvID3xDS2YjiaHA5UXaLBnEm1SjfOg91hwVtggussYQ7NIDHu0nPurWoghwU35lePM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-851c4ef08b9so774244339f.0
+        for <netdev@vger.kernel.org>; Sun, 02 Mar 2025 03:57:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740916647; x=1741521447;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RF2w+Q4mJTL2WE4yO3ADOwLLA0YdZZYeo6J9OV011m4=;
+        b=ss/7NGsnokg5sB3SY+E+hpcDjjp7YEDna+aDj6iFFo7/GlokLLg7hmd9h+uwbupKBX
+         ZJD/O5ZA8lSLtcFenrmPxwMdCD2lKSa6sbqTHDOwtmsPIIxhiNaz88vbg7qkD6lSd8eE
+         KqhU0tQ4Bp2fbC+8dmsiMx5kIFnxDWSGbSVWMEsYmHQYM14AE7W4LI93krnthMtw89fO
+         NckI9re4Qkm5K76uBe2kmAkqduHDtKX+uo0QwSMlQI9ncZNXVvjspGVdsZob+Gg4F4m6
+         jpw6/sRNSWXy7MyGD2Xl7pHmEmamv0fef3oNtl1sCbAHWpWYcmh430pqkepRHNwoyTbs
+         wANQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXs3C2DbXE1yCgXyK85STsiZ0UZeyujWr/QapTcbNBBRBPxszc80peGy3J2ZFxda/X8YEsph18=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw54+tEwn+jrqTK4/wx2g+OPA0LHXtzRfpenp+soZdUks+mgSnQ
+	AtZtNN7yWobLg8HDZdZI2l62Mzrn3FM4nQmvhepY4eb9G+NmFWPHF6BigooqlGQwGDQJlyw7lT1
+	RbiqT1IJTqmx1ADTyfIZLs4qqjtAvUcFQk91S9QYmYvC5ZfTXLZjZzFM=
+X-Google-Smtp-Source: AGHT+IHtYNK+aHOtVvS2PMxS++2fmFsaYh7hMzNNVRvfXIcsU7VxICWixVW7OMwrlWq9D8PAmY4EyIrxOVH1MVjAV9TWV9ORPzgP
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB7500:EE_|SJ0PR12MB5612:EE_
-X-MS-Office365-Filtering-Correlation-Id: aed9535e-545f-4b9a-02d0-08dd5970644e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?TnY3bk1zVit6WGRSUVZQYzhudjNoNmRRV251cGl0R3pNV0pqejM5NzRHWGs0?=
- =?utf-8?B?dW5JRUlHTGc3azVwNlVwNVRyWVBiZzludWY5aGpLUUZLNGVsN2VEUm52R3E2?=
- =?utf-8?B?LzNtd3F2b0tUS1J1bW0rbDhueTU2V3NSb2YvdXJFWHBGSm15MXlkU2xUcUVl?=
- =?utf-8?B?UVcrSWEwaGVzZDFhZm5QOW8yN3MwZ2xaOU9HSmxMRTVWOFlDWWxON0FnV1Vx?=
- =?utf-8?B?WGtiaUlxaWZuTWM2TXlnWk5iVjNwMnFnYXNJRUZsdVpwbTc0alY1Nnc1NUFh?=
- =?utf-8?B?cXY3dngyVFFOeHVDbFJOUC8vNS9tYkh6ZnI1YVhGdngwY2oxWTVML3gvclNz?=
- =?utf-8?B?aWZBN3FpaWRMY3hnMkNBMU9sT1lnNHBEak02RU1mOEtBRWplam80bVk5VFBE?=
- =?utf-8?B?THg1OVF4V3NWYzRKbk1VT0pXVUlHODJ5UEZZSU1JTDdMNER6ZXVzVGt1RmNt?=
- =?utf-8?B?akcxakREcjM2UnNINUJ0NmRjSzQyTkprTmU4aFNRbGhhSW8rRUEzYVFxL2lT?=
- =?utf-8?B?RVB5ekltbGJIVGVlVUp6VGlQNkFxeEVtblM4SWFET2tPUllIN2xENHV6NlI0?=
- =?utf-8?B?aWI3Wmp4d20zUUN5OHhoWGd6N3VmdXUxYmNBSDVGeTlKU1ljUjV0cjR1ak1U?=
- =?utf-8?B?Tysxb0RVNXkrM05pTVBFb003aExCSnljd3luSzZFc2FZbUFJZ2ZkTVBxWHpq?=
- =?utf-8?B?eU9VdjJrYStRQy83MmNtT0oxV2JQbTZCK1F5VDUrNlFMZmdFclBOZ1FTVFQz?=
- =?utf-8?B?bUFiRXVsNmJCL2JOd1NjVFRSYUxhWUJrRy9IVzFhTldZWWRDTFFQRnZCdWRQ?=
- =?utf-8?B?YkRwS0M5UmxVYXMrT2tZTHd1U29LUUdnUmVMbTVUVlZVelhEZndzbDkzbnZP?=
- =?utf-8?B?N04vR1VjSy9rYVk0NmwrSDQzeUcyekl3UEg2WUZSMU9oaEswWjNsM2pVYXVh?=
- =?utf-8?B?cHlVWTZRVzBXRXg0eXoyZDJWUUxTWEFTbUh0a0NETkdQZGxzUGZnYjVBUTgw?=
- =?utf-8?B?SVBkVUp2UUdzZUxEcS9JdUZzN09jdzZuS1BQUGRLSVZaQlN1SzdPK3BkSlJR?=
- =?utf-8?B?R3cwU0tKSFhwT005UE1VSHB2dWJ1ZDk1QXc1cVBQeXh0OEd2V0Q0MVdpQ2kw?=
- =?utf-8?B?RzVTWkJoR28vUjF5ckRoV2xkK0RJeDZpdFpSYm1OcFFKbjZMUlFkUmNYakx2?=
- =?utf-8?B?MkF2NTkzcTNEMFJwcW02eEdIcEdrRmU1S20rTXBGV3FxVWRtTm1JTzF0ai9z?=
- =?utf-8?B?ZUpDV1RKa0Q2S0tTZ3dXMm02cm9QNzhNa2NUM2JNUE1QWnVJRzZXM21LUVNa?=
- =?utf-8?B?Y0hsTm1DRzRGRUtzRmplZ0Y1dmx1VFhOSlJXd2lLVm1EV3lXUi9RMWR2NnFW?=
- =?utf-8?B?dmFxalhSZXRlSDV1cVA4eFl0dkF4RVhZZzZkTUdyVWVKTGNtV1pXLzFyMkVh?=
- =?utf-8?B?V0ZjV2RxdEpuM3VmWE1sS0J0V2RiZzdpM3YzeTdGbHJBWDVOK3dxbnRhME41?=
- =?utf-8?B?YXpSWjJFVHdaZUs2aUUxL2E2RWJXcDN1OS9YU2dNaXZ3OEJZQnI3Rk5tMWkv?=
- =?utf-8?B?N0p2QVRiZ20rcDVxMktSZVZPOWhmY3JzMXJseDNZZmE3RW1yRjNpYTdnOHo0?=
- =?utf-8?B?bmpjd0t3VDl2bis4ekdYWlFiM1FxMXYrSmRYTkZzSmhqZFQ1YXpsMG93V0Mw?=
- =?utf-8?B?T3BiaGFuMXdJczBjY2pkNjFHdVZ1Sy9YcFczQTVHbDBnNkllN1JINnBsZ1E3?=
- =?utf-8?B?b0UyeFRMM1IwS1N3czdPRStTK0dTTnZiY2tVb0ZEaDBjem01MkRtdDZHN1A4?=
- =?utf-8?B?QnRrZklzbkNsVmU0Zmk4dldoL2xScHEvTTA4OC9xUVJlOVhTR3Q3c05jcWxE?=
- =?utf-8?Q?ewtJB2B4OHJg3?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7500.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ekZjZ1hILy9vMWNLZ0JrdWdBcWVSOUplU0pNUktzdVZhV3VBVWpkT3M0LzhB?=
- =?utf-8?B?VE5wU2ppOFdELzZZVHFtSEFONHZ2cFZaNUVqUk1HZFRxZmUrZE56V3ZnajN3?=
- =?utf-8?B?UGRqNC9MTVRBSWNyaHBTYk1vVWZleGFKN1UzcjdrQm1haXcyaGFlODBTR1VM?=
- =?utf-8?B?Tmc5SjEwUlBSZFpQaWRHWXFHcFBycW1TTDg5YnFma0pkZFdIdksxTkM1MTM0?=
- =?utf-8?B?aW11SkROVTI4dThQUVA5OGhZMXE5bko5eG5Ecmk4dmZ5b2tiY1cxWjBWWGpY?=
- =?utf-8?B?bFMzQi9LSnNVTmc1MC9paEVnNDM3bFpKRWo4ZFdNM2tyVm95K2pWT3dvb1FE?=
- =?utf-8?B?MXpWenVISHVSVWNOelc2MXNqOGdsOFJBYWU0QzhwMlM2VHNuUStjZXh6cklV?=
- =?utf-8?B?MEhvRW4vTTRvTW1oRis5L1JBMFlFek00VklURk5rKzZHQ2F6ZGE2RjNVNVkx?=
- =?utf-8?B?WWxCZDFvK0JHWFFab3NDM3hWRlJqSTQ5M200aWtkS2loMVZ2N2RIeGk5U2lN?=
- =?utf-8?B?T1BRTFRXRlI2cFF6Z20vYVJkZ3BkYktDZzJNQXIxRXZaSG5KRGxFVHZpOFk0?=
- =?utf-8?B?anlkMncraTIzZm04L1lZZWFqRGd0Uk9TdmRZaTl4aUpDOTFPRVBUWVNNV0lF?=
- =?utf-8?B?UHNuRm5IMzBPMC9zVjJtV0hhR1kxRWF0MUJSaytkYlh6UzRaT3NvYXlUQ1Ay?=
- =?utf-8?B?Mmhxdk0wUGdsRTZzcmJBclRhNnFSSS8rcEswWERBSWJ0Sk5QdnR3NzQxcmFk?=
- =?utf-8?B?T3JveTJsRkFDQXVLZG56bzMrWjJRMVd1eHFybnRVbHV0OVNsem5vSnR4a0I2?=
- =?utf-8?B?NkFxcWhzWGM4UmhmR2xhVElobXFYcUR6S01EY1dYR0lQOWF6b0xncVk5YXRD?=
- =?utf-8?B?dTVLalFsajBIWjNnZDFWdWhGcTBHbHBWN0dKYVV3dmdlS1RRUlZrSzY2eHRL?=
- =?utf-8?B?RDB0SGw2bU9pSERaZ1FTV1diUU5uQktoRmF1aWFScXA2eUhiSFlpYjdsRWh1?=
- =?utf-8?B?L2ZYVDdpS2FqdnRZSUpOckI4L2NDU3dGbFlqYnFQRSs5ZEZLdGovZEdDTVhS?=
- =?utf-8?B?YmxpS3A4VURFQmxEQldQaHRzYmdqUVF0dHA2WXdBN2s1MVhRQ0NDaXVGWXhJ?=
- =?utf-8?B?VEU5VDZURHplNnhCU3ZRV1I5ZlhKNmJWbVp4SUVWMC84Zm03WGt3MmVKMFFz?=
- =?utf-8?B?c00wdC8zc1ZxSUpJYWY5d2VQTzJIc0NaN2RmU2RteFN1cTFDcnV2LzkwWGtW?=
- =?utf-8?B?RElBc2IxYmtsaE40cVFtQkxKc1R0R05MR09qbkdObHF6YjgrbW9XSmExSjll?=
- =?utf-8?B?dzZyZ0FZUjV1VlIrUHJrLzhMdGduSjVnVk9IUUFCMzdvMmovZWlVSzRxc0xo?=
- =?utf-8?B?MHhic2txQi9GR1VheE50V05pUDNCMzdFTUxFSjVZN3drUmdWQzU1bE5ZbXVy?=
- =?utf-8?B?ZlhCbkorMHdJWnNKd25yb2JLb1RhMXNoaUoxa1UrT0RsRjNXM3ZvQkhjM1o2?=
- =?utf-8?B?c2F5M0x0YlhBeHdTSWJpTTNJU0xPemxwbk02NlVMWSs4dGJzRFljQktqSXVu?=
- =?utf-8?B?ZEpiRWUyM2JWdlh6OHBPdkw3TlluaFlwUWhBakNvbFVZYllVZjNJQUNzeE5O?=
- =?utf-8?B?YzNIRjV0YlQzbjUrMkIzTEZTUUJlcmtJdGtlWVc1OHZOYTVQZUE0SVUxQ2RL?=
- =?utf-8?B?K0JFVzNIbENkb21VSDlVYUh0R2RZQzNBbFUvZGtYLzBtMVBKa3cyenFsdWR2?=
- =?utf-8?B?R0RPdjZ2SmlnN3pGeXM1S2FkZUFCaXhWMDBla0pPd0pGSWJjTkIwTWxSOG9i?=
- =?utf-8?B?SE1TcVlaOEZkZ2tLRm5mOTFjeUFvQzBEU0ZOSzBWLzZmeHhtUTRDSDJWeGg2?=
- =?utf-8?B?OFU0MThrbkx3STE5TkRFR0pkUmpqZkdWRVYySG9vNlVjVWU2bnJKQnU5RjRl?=
- =?utf-8?B?bmhSRnZNMVJvbzM3OFJHMkhpSmRKOTgwZFdwaDhkaUZabVFUS2pXSitwdE5U?=
- =?utf-8?B?d0QwcHJkVnNUR05pTjNLNmxuelpicyszVHkyQ1ppbEdGbUhHMDExOFl6eGhw?=
- =?utf-8?B?Z2xkcW9Sc3JPakVUdXBsdE81U01abTNkUmltUHdhV3N6T3hmTXEzSEw5dnZE?=
- =?utf-8?Q?lRjwXtsWqtin6B70cBI0G2R7t?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: aed9535e-545f-4b9a-02d0-08dd5970644e
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7500.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Mar 2025 09:55:41.2938
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: i9i5APJyBkQjvkSsg/E59pNZbccn0PN9o/pRrt2WtwBX4dI1xwquODaE1kB3wZDC
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB5612
+X-Received: by 2002:a05:6e02:12ce:b0:3d3:d483:9079 with SMTP id
+ e9e14a558f8ab-3d3e6f9b143mr108651345ab.18.1740916647203; Sun, 02 Mar 2025
+ 03:57:27 -0800 (PST)
+Date: Sun, 02 Mar 2025 03:57:27 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67c447a7.050a0220.55417.04d3.GAE@google.com>
+Subject: [syzbot] [netfilter?] KASAN: slab-use-after-free Read in
+ nf_tables_trans_destroy_work (2)
+From: syzbot <syzbot+5d8c5789c8cb076b2c25@syzkaller.appspotmail.com>
+To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 27/02/2025 4:27, Jakub Kicinski wrote:
-> On Wed, 26 Feb 2025 08:08:40 +0200 Gal Pressman wrote:
->> On 26/02/2025 3:01, Jakub Kicinski wrote:
->>> On Tue, 25 Feb 2025 09:13:48 +0200 Gal Pressman wrote:  
->>>> Context 0 (default context) always exists, there is no need to check
->>>> whether it exists or not when adding a flow steering rule.
->>>>
->>>> The existing check fails when creating a flow steering rule for context
->>>> 0 as it is not stored in the rss_ctx xarray.  
->>>
->>> But what is the use case for redirecting to context 0?  
->>
->> I can think of something like redirecting all TCP traffic to context 1,
->> and then a specific TCP 5-tuple to the default context.
-> 
-> The ordering guarantees of ntuple filters are a bit unclear.
-> My understanding was that first match terminates the search,
-> actually, so your example wouldn't work :S
+Hello,
 
-The ordering should be done according to the rule location.
- * @location: Location of rule in the table.  Locations must be
- *	numbered such that a flow matching multiple rules will be
- *	classified according to the first (lowest numbered) rule.
+syzbot found the following issue on:
 
-The cited patch is a regression from user's perspective. Surely, not an
-intended one?
+HEAD commit:    03d38806a902 Merge tag 'thermal-6.14-rc5' of git://git.ker..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=115128b7980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8f2f8fb6ad08b539
+dashboard link: https://syzkaller.appspot.com/bug?extid=5d8c5789c8cb076b2c25
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=155128b7980000
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-03d38806.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1d06fe5cd112/vmlinux-03d38806.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/1615b4c586c7/bzImage-03d38806.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+5d8c5789c8cb076b2c25@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: slab-use-after-free in nft_ctx_update include/net/netfilter/nf_tables.h:1861 [inline]
+BUG: KASAN: slab-use-after-free in nft_commit_release net/netfilter/nf_tables_api.c:9958 [inline]
+BUG: KASAN: slab-use-after-free in nf_tables_trans_destroy_work+0x9af/0xae0 net/netfilter/nf_tables_api.c:10023
+Read of size 2 at addr ffff88804ee0e9c4 by task kworker/0:3/6521
+
+CPU: 0 UID: 0 PID: 6521 Comm: kworker/0:3 Not tainted 6.14.0-rc4-syzkaller-00248-g03d38806a902 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Workqueue: events nf_tables_trans_destroy_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:408 [inline]
+ print_report+0xc3/0x670 mm/kasan/report.c:521
+ kasan_report+0xd9/0x110 mm/kasan/report.c:634
+ nft_ctx_update include/net/netfilter/nf_tables.h:1861 [inline]
+ nft_commit_release net/netfilter/nf_tables_api.c:9958 [inline]
+ nf_tables_trans_destroy_work+0x9af/0xae0 net/netfilter/nf_tables_api.c:10023
+ process_one_work+0x9c5/0x1ba0 kernel/workqueue.c:3238
+ process_scheduled_works kernel/workqueue.c:3319 [inline]
+ worker_thread+0x6c8/0xf00 kernel/workqueue.c:3400
+ kthread+0x3af/0x750 kernel/kthread.c:464
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+Allocated by task 14088:
+ kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
+ kasan_save_track+0x14/0x30 mm/kasan/common.c:68
+ poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
+ __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:394
+ kmalloc_noprof include/linux/slab.h:901 [inline]
+ kzalloc_noprof include/linux/slab.h:1037 [inline]
+ nf_tables_newtable+0xd79/0x1b40 net/netfilter/nf_tables_api.c:1574
+ nfnetlink_rcv_batch+0x1a2a/0x24e0 net/netfilter/nfnetlink.c:524
+ nfnetlink_rcv_skb_batch net/netfilter/nfnetlink.c:647 [inline]
+ nfnetlink_rcv+0x3c3/0x430 net/netfilter/nfnetlink.c:665
+ netlink_unicast_kernel net/netlink/af_netlink.c:1312 [inline]
+ netlink_unicast+0x53c/0x7f0 net/netlink/af_netlink.c:1338
+ netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1882
+ sock_sendmsg_nosec net/socket.c:718 [inline]
+ __sock_sendmsg net/socket.c:733 [inline]
+ ____sys_sendmsg+0xaaf/0xc90 net/socket.c:2573
+ ___sys_sendmsg+0x135/0x1e0 net/socket.c:2627
+ __sys_sendmsg+0x16e/0x220 net/socket.c:2659
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Freed by task 14086:
+ kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
+ kasan_save_track+0x14/0x30 mm/kasan/common.c:68
+ kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:576
+ poison_slab_object mm/kasan/common.c:247 [inline]
+ __kasan_slab_free+0x51/0x70 mm/kasan/common.c:264
+ kasan_slab_free include/linux/kasan.h:233 [inline]
+ slab_free_hook mm/slub.c:2353 [inline]
+ slab_free mm/slub.c:4609 [inline]
+ kfree+0x2c4/0x4d0 mm/slub.c:4757
+ nf_tables_table_destroy+0xb3/0xf0 net/netfilter/nf_tables_api.c:1781
+ __nft_release_table+0xf8b/0x13d0 net/netfilter/nf_tables_api.c:11818
+ nft_rcv_nl_event+0x4c9/0x6b0 net/netfilter/nf_tables_api.c:11876
+ notifier_call_chain+0xb7/0x410 kernel/notifier.c:85
+ blocking_notifier_call_chain kernel/notifier.c:380 [inline]
+ blocking_notifier_call_chain+0x69/0xa0 kernel/notifier.c:368
+ netlink_release+0x1838/0x1fe0 net/netlink/af_netlink.c:764
+ __sock_release+0xb0/0x270 net/socket.c:647
+ sock_close+0x1c/0x30 net/socket.c:1398
+ __fput+0x3ff/0xb70 fs/file_table.c:464
+ task_work_run+0x14e/0x250 kernel/task_work.c:227
+ resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
+ exit_to_user_mode_loop kernel/entry/common.c:114 [inline]
+ exit_to_user_mode_prepare include/linux/entry-common.h:329 [inline]
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
+ syscall_exit_to_user_mode+0x27b/0x2a0 kernel/entry/common.c:218
+ do_syscall_64+0xda/0x250 arch/x86/entry/common.c:89
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Last potentially related work creation:
+ kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
+ kasan_record_aux_stack+0xb8/0xd0 mm/kasan/generic.c:548
+ insert_work+0x36/0x230 kernel/workqueue.c:2183
+ __queue_work+0x97e/0x10f0 kernel/workqueue.c:2341
+ queue_work_on+0x11a/0x140 kernel/workqueue.c:2392
+ queue_work include/linux/workqueue.h:662 [inline]
+ schedule_work include/linux/workqueue.h:723 [inline]
+ __rhashtable_remove_fast_one include/linux/rhashtable.h:1069 [inline]
+ __rhashtable_remove_fast.constprop.0.isra.0+0xed7/0x12b0 include/linux/rhashtable.h:1093
+ rhltable_remove include/linux/rhashtable.h:1144 [inline]
+ nft_chain_del+0x57/0x1a0 net/netfilter/nf_tables_api.c:10207
+ __nft_release_table+0xf0e/0x13d0 net/netfilter/nf_tables_api.c:11814
+ nft_rcv_nl_event+0x4c9/0x6b0 net/netfilter/nf_tables_api.c:11876
+ notifier_call_chain+0xb7/0x410 kernel/notifier.c:85
+ blocking_notifier_call_chain kernel/notifier.c:380 [inline]
+ blocking_notifier_call_chain+0x69/0xa0 kernel/notifier.c:368
+ netlink_release+0x1838/0x1fe0 net/netlink/af_netlink.c:764
+ __sock_release+0xb0/0x270 net/socket.c:647
+ sock_close+0x1c/0x30 net/socket.c:1398
+ __fput+0x3ff/0xb70 fs/file_table.c:464
+ task_work_run+0x14e/0x250 kernel/task_work.c:227
+ resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
+ exit_to_user_mode_loop kernel/entry/common.c:114 [inline]
+ exit_to_user_mode_prepare include/linux/entry-common.h:329 [inline]
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
+ syscall_exit_to_user_mode+0x27b/0x2a0 kernel/entry/common.c:218
+ do_syscall_64+0xda/0x250 arch/x86/entry/common.c:89
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+The buggy address belongs to the object at ffff88804ee0e800
+ which belongs to the cache kmalloc-cg-512 of size 512
+The buggy address is located 452 bytes inside of
+ freed 512-byte region [ffff88804ee0e800, ffff88804ee0ea00)
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x4ee0c
+head: order:2 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+memcg:ffff8880280fae01
+flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 00fff00000000040 ffff88801b04de00 dead000000000122 0000000000000000
+raw: 0000000000000000 0000000080100010 00000000f5000000 ffff8880280fae01
+head: 00fff00000000040 ffff88801b04de00 dead000000000122 0000000000000000
+head: 0000000000000000 0000000080100010 00000000f5000000 ffff8880280fae01
+head: 00fff00000000002 ffffea00013b8301 ffffffffffffffff 0000000000000000
+head: 0000000000000004 0000000000000000 00000000ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 2, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5653, tgid 5653 (dhcpcd), ts 208176970817, free_ts 208162705163
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x181/0x1b0 mm/page_alloc.c:1551
+ prep_new_page mm/page_alloc.c:1559 [inline]
+ get_page_from_freelist+0xfce/0x2f80 mm/page_alloc.c:3477
+ __alloc_frozen_pages_noprof+0x221/0x2470 mm/page_alloc.c:4739
+ alloc_pages_mpol+0x1fc/0x540 mm/mempolicy.c:2270
+ alloc_slab_page mm/slub.c:2423 [inline]
+ allocate_slab mm/slub.c:2587 [inline]
+ new_slab+0x23d/0x330 mm/slub.c:2640
+ ___slab_alloc+0xc5d/0x1720 mm/slub.c:3826
+ __slab_alloc.constprop.0+0x56/0xb0 mm/slub.c:3916
+ __slab_alloc_node mm/slub.c:3991 [inline]
+ slab_alloc_node mm/slub.c:4152 [inline]
+ __do_kmalloc_node mm/slub.c:4293 [inline]
+ __kmalloc_node_track_caller_noprof+0x2f1/0x510 mm/slub.c:4313
+ kmalloc_reserve+0xef/0x2c0 net/core/skbuff.c:537
+ __alloc_skb+0x164/0x380 net/core/skbuff.c:606
+ alloc_skb include/linux/skbuff.h:1331 [inline]
+ alloc_skb_with_frags+0xe4/0x850 net/core/skbuff.c:6522
+ sock_alloc_send_pskb+0x7f1/0x980 net/core/sock.c:2914
+ unix_dgram_sendmsg+0x45e/0x1880 net/unix/af_unix.c:2017
+ sock_sendmsg_nosec net/socket.c:718 [inline]
+ __sock_sendmsg net/socket.c:733 [inline]
+ sock_write_iter+0x4fe/0x5b0 net/socket.c:1137
+ new_sync_write fs/read_write.c:586 [inline]
+ vfs_write+0x5ae/0x1150 fs/read_write.c:679
+ ksys_write+0x207/0x250 fs/read_write.c:731
+page last free pid 14050 tgid 14050 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ free_pages_prepare mm/page_alloc.c:1127 [inline]
+ free_frozen_pages+0x6db/0xfb0 mm/page_alloc.c:2660
+ __put_partials+0x14c/0x170 mm/slub.c:3153
+ qlink_free mm/kasan/quarantine.c:163 [inline]
+ qlist_free_all+0x4e/0x120 mm/kasan/quarantine.c:179
+ kasan_quarantine_reduce+0x195/0x1e0 mm/kasan/quarantine.c:286
+ __kasan_slab_alloc+0x69/0x90 mm/kasan/common.c:329
+ kasan_slab_alloc include/linux/kasan.h:250 [inline]
+ slab_post_alloc_hook mm/slub.c:4115 [inline]
+ slab_alloc_node mm/slub.c:4164 [inline]
+ kmem_cache_alloc_noprof+0x226/0x3d0 mm/slub.c:4171
+ ptlock_alloc+0x1f/0x70 mm/memory.c:7055
+ ptlock_init include/linux/mm.h:2972 [inline]
+ pagetable_pte_ctor include/linux/mm.h:3020 [inline]
+ __pte_alloc_one_noprof include/asm-generic/pgalloc.h:73 [inline]
+ pte_alloc_one+0x74/0x390 arch/x86/mm/pgtable.c:44
+ do_fault_around mm/memory.c:5355 [inline]
+ do_read_fault mm/memory.c:5394 [inline]
+ do_fault mm/memory.c:5537 [inline]
+ do_pte_missing+0x1aff/0x3e10 mm/memory.c:4058
+ handle_pte_fault mm/memory.c:5900 [inline]
+ __handle_mm_fault+0x1166/0x2c60 mm/memory.c:6043
+ handle_mm_fault+0x3fa/0xaa0 mm/memory.c:6212
+ do_user_addr_fault+0x60d/0x13f0 arch/x86/mm/fault.c:1337
+ handle_page_fault arch/x86/mm/fault.c:1480 [inline]
+ exc_page_fault+0x5c/0xc0 arch/x86/mm/fault.c:1538
+ asm_exc_page_fault+0x26/0x30 arch/x86/include/asm/idtentry.h:623
+
+Memory state around the buggy address:
+ ffff88804ee0e880: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88804ee0e900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff88804ee0e980: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                           ^
+ ffff88804ee0ea00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff88804ee0ea80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
