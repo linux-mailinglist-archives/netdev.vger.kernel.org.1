@@ -1,333 +1,280 @@
-Return-Path: <netdev+bounces-171011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D94AA4B19E
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 13:43:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85C06A4B1C4
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 14:10:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12FA016DA85
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 12:43:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 284393B26D4
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 13:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDEE21E5716;
-	Sun,  2 Mar 2025 12:42:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1D1B1E51F3;
+	Sun,  2 Mar 2025 13:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="heFFxyzk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LbKvSX9x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 268BB1E3DE5
-	for <netdev@vger.kernel.org>; Sun,  2 Mar 2025 12:42:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740919366; cv=none; b=DHcQdVB70reWyM8SFOxKcbG/Wk+/7ezcQ+YTFOQHXB+1CDRtKW92ejU3vyd+vVsR1uXHuadKWPTPqbm4eDNk5irF1A8fCvuj49nK1jkuGaFu51pPvR3Eo3l4Whf9uFVDpEbmKuSpUHgQAYe/XPjk6Ctg6+97W7wWhVZoZIjc83E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740919366; c=relaxed/simple;
-	bh=ItXP/zyRAh+/67PmK7Z+y9460lXos/4E+fsmUnOBZBA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=q+muPrvc5msZpCwt00rQ1cSNCBEwyNlD1aLQPz9qe+7y/dr7MbAfCP54ci4UgWepibJ7GFcPMG5vqFaYqy4kp2wkUbwbRumxrmzr7JR2jQK+Ofv6TWvVo0qiyQMWTv07UL3EGE6NHHKLn6CZl2UV0f3+hDUPHOq7xzMWzPe3tBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=heFFxyzk; arc=none smtp.client-ip=209.85.160.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-471ec7f1969so92485911cf.1
-        for <netdev@vger.kernel.org>; Sun, 02 Mar 2025 04:42:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740919364; x=1741524164; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bIbXbn1qyNwXG/XGNxdRDEuAyo93hNv8FKSURSQEbM4=;
-        b=heFFxyzkco9dM3swFNshNCfwIIGaQfk/VQihNIyjTgRgFJIqbCRrDDDscndB8BOudQ
-         7fA2ywGdrx2vAsdkl84LW4Jd06huEFaZ0cbqZvSQG8Dt/WSpuGQlEzQ2qZgkJyoJoKGV
-         8Pf3EiQ/W0uUITZtUhOAr1YdmBpNoN+1erDcRws/bpbgIEgkv+oVyb+KFfW1XbjuY6zA
-         4S5rT9cxTGDkzR45o42/fVCE9IlpXYjU+Rqa7MFJLBMi92l0zGcJFlNnj8X4jT/hGUK6
-         RG970mrjxXCK7xLDjVGA+ayssHAMDiiC9XJ62Hse8uBKvP+Nf9Oyf3pMEi42I2ZW48Hm
-         GHEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740919364; x=1741524164;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bIbXbn1qyNwXG/XGNxdRDEuAyo93hNv8FKSURSQEbM4=;
-        b=S9fuVkKZAwcpCuf3EB00pfkq3+Ng+Jp7PTKtU6EeGEYKmasR4rOuxq4Glf53bE9xn+
-         uQ52TPnvbuqQnsYwc2mUOYbQczGF8xrAzspC4YqInxYAX16RYMedgtAKFpOXraeyaJIp
-         p1NZdK6ZMq0fgPUbylNztAWOYfRQIKj9DW+7R2bQjFrk/0dJvDqS50OtRZq1y3Vvh//S
-         G3vaqyNvlDub8+UkaGuTkqrgU1yY1BL1oxfseRWsiSncam7O7IotpHKmYA0Vcs9Jdz3C
-         DOQQO5Ll5pACSlOrG3/yw0HLASuDdwSdVPatSss3q09M0UAT64rY+LMWcg07qejzbpuV
-         zKNw==
-X-Forwarded-Encrypted: i=1; AJvYcCVxP2C6KPYnM66UGsAvkGvd5HWJ7PIP8N3+ttQqq/XxKXJypXRsCvIsVgVXUI273gPnXWAESn4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOUmAPM9gl51Tq5UK2QBnA2piX2lFvDUGFhKesnwjjF7mYG5xu
-	TEQpvZUUXbbp4VYlYwom+U2O6i4YGj5HdSRUUExuFb9BuV1rrJcnA9z2BmD7O0RTvw6cl9NGJwg
-	HUU1fPJS/JQ==
-X-Google-Smtp-Source: AGHT+IHof4z7aGHpuS92kAvQXiZc6abSJZ/Z16oiPqjR33sve5qy+MbHUoXtRbDD/TQ8hkxyarz6mnFTA2T4ng==
-X-Received: from qtbfi5.prod.google.com ([2002:a05:622a:58c5:b0:472:3db:8d3c])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:5f07:0:b0:471:fa00:fb9b with SMTP id d75a77b69052e-473d8f99c26mr199701181cf.7.1740919364071;
- Sun, 02 Mar 2025 04:42:44 -0800 (PST)
-Date: Sun,  2 Mar 2025 12:42:37 +0000
-In-Reply-To: <20250302124237.3913746-1-edumazet@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8BA71BD00C;
+	Sun,  2 Mar 2025 13:10:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740921029; cv=fail; b=HHtVrBm3zP++dRgU/etNIlB8vmpydlPOKx0zNGon6D9R+D+DQamCSF8LB0dMu8wcf0JFnAM3GgFnUeFEAItcW/sgsHnW4xoPjcT9Dx/XbNazaMFjl3K9zmc6EljFkLIvbat7SdgEzEuETiraIxPIGg7DVtEaRvGwJYL2zXJP9JA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740921029; c=relaxed/simple;
+	bh=DBxfPx1Qw3cFSsUyEYfgfz2kkRBeWKyu+dvUuwcMnEo=;
+	h=Subject:To:CC:References:From:Message-ID:Date:In-Reply-To:
+	 Content-Type:MIME-Version; b=PSL/TgyfbC9rBinIZpK9J1GlAsiOFdCLR+Ed0HwpwsMyms1JPGV4UJr9zWBTNyOZKQSg1zc9Re7PTGvTC7q+3Ab1Nw67kKtl2/7Ygyue6Mdtf+3/GG9HoEjV8zw63zeNdM81UDDs19M4SBqip+ZfHwkr2Ep854554O9up5Ki07Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LbKvSX9x; arc=fail smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740921027; x=1772457027;
+  h=subject:to:cc:references:from:message-id:date:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=DBxfPx1Qw3cFSsUyEYfgfz2kkRBeWKyu+dvUuwcMnEo=;
+  b=LbKvSX9xHdcAaM1Kc6q4S5xij/bs9tXRIjega67lO9gX3PKqwDrQ9mbx
+   dj+wYW4ch+1Phj2cXyM+0mNQJVH7a6QHp85f9yW/UVWtvNwTZm9FrSEHJ
+   ady7xe+m/WP8c/XD5/jvtsEqn6Wi7HiKaKFnG35dLDwjtkR0aY+CQ5dPI
+   Spm/DgJCcTHZ4qgW9D20hKeBg01+857y3aa0R90cnf9MDtU/QkdOmyMO2
+   70muGdQdpbGhmBz2ozbD2tGQe7iguSzdjN9fNllHp9O8BATX6SVkObXtY
+   cb3+lQzdW0aqfnFjZ7I8CL9IA4Z49nHdktemTJ4EZwdJjdrGm7TKJXYn0
+   Q==;
+X-CSE-ConnectionGUID: tqhKWg0/TKSCg7Hm29nF5A==
+X-CSE-MsgGUID: epJ7pkDxQHywqQ0lFr4O3A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11360"; a="52442164"
+X-IronPort-AV: E=Sophos;i="6.13,327,1732608000"; 
+   d="scan'208";a="52442164"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2025 05:10:26 -0800
+X-CSE-ConnectionGUID: 22mxE1dLRryEqTqFST77YQ==
+X-CSE-MsgGUID: rvPI7+uUSoy49YayPNn9kQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,327,1732608000"; 
+   d="scan'208";a="117762608"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2025 05:10:26 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Sun, 2 Mar 2025 05:10:25 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Sun, 2 Mar 2025 05:10:25 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.173)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Sun, 2 Mar 2025 05:10:25 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jjetns7d6qCfKSt6hfmhOcgVUk9sqjsSeb9lafh2OjdWN2InYCskoY4s3UqoTNtyWNJHp44/pgaeR7fSlPFtgHZv8limWpEkYlrT1LEFYtfTqnJIe1bJMIPmuH6ntwC1TcqL/FQd4pnEif8trXwqU27JjeyF0CoCJh2NsGNl/QKYmKiFw0pfiRQ6m3YhZ5Z6TCsdoadni7CiaOLOg9XQzMRMpii6eVcJJmjEocaR+XAlsuMSAny/SxNuDi3Uw0QoDKcBElngfa7PNbO9Z8DLDFfdJO66w+/C5pFRQfVeauPf94ed0/8dIq7OvsEbLlyNqR2GyQSAMBbt3qfhUFHNMg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cCaDCsr++QWXRO7nPpDVmQGYG+J4kkpdaEqWl/FXync=;
+ b=C6ckucqz/6ypDwx2htv1YXetHksfuglleV/2QNF4MUBwzAx7Q5VyfcROHUj5L+pDZeqCjEDO2SMHrelt+OsGR6hhSiJDYBbh8JUNhkqKkZgNARtwBrGPwPkGMuI/ZdiDnEELPYXOwMQ7ceeBVE4Vlw0wBwETBDaLuahspcBbh39nN4W0Zn9rSox5Y8Esh6O9Wdn6BdsBC+QwP6YI0Bbtlg2HexV7TOmyDXWhnYQxFYywidaCgpEtD5njHliQV58udmfly8l3y2QSMkwtdWB1lSqkUfm9WuRH84sciMZXQSvSs0zhJvCjV+PvGmdAsoLJgHCNQGBf6IwMM6iSKVMnkA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB5949.namprd11.prod.outlook.com (2603:10b6:510:144::6)
+ by SJ1PR11MB6226.namprd11.prod.outlook.com (2603:10b6:a03:45b::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.25; Sun, 2 Mar
+ 2025 13:09:42 +0000
+Received: from PH0PR11MB5949.namprd11.prod.outlook.com
+ ([fe80::1c5d:e556:f779:e861]) by PH0PR11MB5949.namprd11.prod.outlook.com
+ ([fe80::1c5d:e556:f779:e861%6]) with mapi id 15.20.8489.025; Sun, 2 Mar 2025
+ 13:09:42 +0000
+Subject: Re: [Intel-wired-lan] [PATCH] e1000e: Link flap workaround option for
+ false IRP events
+To: Mark Pearson <mpearson-lenovo@squebb.ca>, Andrew Lunn <andrew@lunn.ch>
+CC: <anthony.l.nguyen@intel.com>, <przemyslaw.kitszel@intel.com>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <intel-wired-lan@lists.osuosl.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <mpearson-lenovo@squebb.ca>
+ <20250226194422.1030419-1-mpearson-lenovo@squebb.ca>
+ <36ae9886-8696-4f8a-a1e4-b93a9bd47b2f@lunn.ch>
+ <50d86329-98b1-4579-9cf1-d974cf7a748d@app.fastmail.com>
+ <1a4ed373-9d27-4f4b-9e75-9434b4f5cad9@lunn.ch>
+ <9f460418-99c6-49f9-ac2c-7a957f781e17@app.fastmail.com>
+From: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
+Message-ID: <4b5b0f52-7ed8-7eef-2467-fa59ca5de937@intel.com>
+Date: Sun, 2 Mar 2025 15:09:35 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
+In-Reply-To: <9f460418-99c6-49f9-ac2c-7a957f781e17@app.fastmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: TLZP290CA0004.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:9::15) To PH0PR11MB5949.namprd11.prod.outlook.com
+ (2603:10b6:510:144::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250302124237.3913746-1-edumazet@google.com>
-X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <20250302124237.3913746-5-edumazet@google.com>
-Subject: [PATCH net-next 4/4] tcp: use RCU lookup in __inet_hash_connect()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Jason Xing <kerneljasonxing@gmail.com>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB5949:EE_|SJ1PR11MB6226:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4a35bcdb-fe2a-4407-97c1-08dd598b7eb6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?SjlaV0NINXR2NklJclRpVjlOR1pldW1QVThvQWw3M011eXdqWDhrQko5RzBz?=
+ =?utf-8?B?SDFLMkJHWCt2Rks5cGpSRk11b29tdFl6emxCOUJpMHlka1RoVUsxek1mS2t0?=
+ =?utf-8?B?UXVyalpEY3ljMWl3OTZxd2theDhxdjg5MTV6aVl2NWl0MzhqNWhmenRIRnRS?=
+ =?utf-8?B?Nm5USEM3MGJEYnZzbkx1U2orYm1zSXpNaHRmOU9tKzBXbGhUOTBEaWoyUmZS?=
+ =?utf-8?B?QVlpMndiZlJ1RFFJOXRodHIvdThqWUtzeVNwcmZreG5zY2ZabzRlMmlWcEFq?=
+ =?utf-8?B?c3p4cVZsRmpmV1E5VUF4RFFnSWl2TkU3SkwzdDRMaHdtMGhJSzJ1bEhoZnV6?=
+ =?utf-8?B?TG9EVGJRWHl4UklzTVh4MjIzd0dqbThrLzRSMkN1dGtUTmFRZjVmSFF3UXhX?=
+ =?utf-8?B?LzNHK1hFN2I4YUQwbWY4aVkxSmtuSWluN2RwZmQrLzJnK0psUytKNWxjWHJX?=
+ =?utf-8?B?M09tUytYdVdoYmt1NEdMMU1HMUJLYnNJYVZSQWk0SHZkUFhISnl2a3FMQ0I1?=
+ =?utf-8?B?UzEyaFEranRFR0U5QzJOQ3QrdElMN3FFc25ZTkpqd0IvamRZY0R2NWJ4eGd4?=
+ =?utf-8?B?UTNXUUVXOXVqcjQyYk1jQU9iZVNlQktmbWR4UUprWDVlSCt2SElua3dpenJh?=
+ =?utf-8?B?TTVhRGtYVE5URVRlWUg1b0gxNVpjR2NJbjREMWxxREduVXQzOXpUMHFsSlhO?=
+ =?utf-8?B?a2Z0Y0NnQTFtSDc5V0lienRmWGwwUEdDU0Y1MVpNOUNLdWdDcFAzM091bjRR?=
+ =?utf-8?B?SVQ5VzlwN1A4NlQzNmUzN2NpZk5QaTVadERtOFpGRnhuTU1VNDhheGV6bEpm?=
+ =?utf-8?B?MTF0VjVuM2M3VWJoeHkrU3pIY3hrVElNQldETlpoODFJdENqL3FCV0JVdGkx?=
+ =?utf-8?B?NzFaQnAyNnZEVDQxVHVyeDlJTWwwYzlnMXRXY0VmbXRSakdldXBCaW0ramtj?=
+ =?utf-8?B?R1RyYlJEdmsvand5TWJEamdFcXZXZXBTenhrRFM4Zy9WWnVzdmtnWk9Ub0Fa?=
+ =?utf-8?B?bFpOUDhzZHU5VVpJdnlrZUFOTG43cWxrMGdualVreWFYZnV0RkFYbXZ5byt4?=
+ =?utf-8?B?T0RDTHB1L2dlbnE1dVNTbmgyNUFPTHIzRjdsUUZ2S25XOWhGS1RqK2pibkxt?=
+ =?utf-8?B?VzRyS3lIaXp2UDZSWlFrYkdIdjJRc2RCUkpTZ29JSXJWdEhFZVk1RllmNzNU?=
+ =?utf-8?B?MFFFWXF5dGFEVWVsSzNFUk5qb295MlVwWFNwSU5yZW5EOGhYZmNlcWphWlF0?=
+ =?utf-8?B?T2FOUHZXVVBjNSt2S3RrSEs0cUxVMGZVaTVOcGVYR1FXK0d2TDg1OXM1ajhD?=
+ =?utf-8?B?UUdXaldQT2FDUXM5Lzl4VnpidGU2ZHNrUFMwRDlVWDNtN3pVamJmeSswS2o0?=
+ =?utf-8?B?bDJablM0M042YlJ4c1J1allBcVhYYnQ5OWtWWTBJZDV0MFVKNTZ1aGg3WlB3?=
+ =?utf-8?B?dCthM1VhNjdPaTc3TnQ5Wlh3cTVoTjlqcVNWMnRIaEVJWCtqenRrd3ByS0pq?=
+ =?utf-8?B?TFJZdWpTU0hzOVpHZVV1RU50SE5TVHM2N3JVUllZWkFJK2xvV2pvL2Z0Y3Rz?=
+ =?utf-8?B?MW9hMzRWQ3JacUZpT2NrVjFvdzBGQWM4cFgzcDl6ZG9xcVVFc1pTdkJCaVlj?=
+ =?utf-8?B?d0tpZHNWT1RMbWMvaFlWSk4zVHZNaFhKVjF3K2hHamhhdWRGT3A0d2hBM3Zy?=
+ =?utf-8?B?K3BXelo4bnQvSHBWb2lpUEcwcERkb2VmZlFGcWEzbDVYRnVVS0lRelU0eHJl?=
+ =?utf-8?B?eDJyS3l2bU0rMHdtMW82ZHZwajE4T1UrMUlWVm4yMTV6d1ZLckFwc2FSZW9J?=
+ =?utf-8?B?ZUI4aFNON1ZYeXo0dkFRdz09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5949.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NnZFWUNCNkZUU1VoY3d5K2wxS2hmOFAwdVVKeW5VZm9Cb21BVTlvV0Q5KytC?=
+ =?utf-8?B?N3pVTG44d2R3c3gwNFZYc1g1ZlcwbzRRTG5rNHRTaEV4YnFWL21vT0hIcWc2?=
+ =?utf-8?B?ZDVtVUVWb1UwN1FVc3M4SytqS3c2Q1dkZVpBWFdVTzZSd1lBSGN2TEhoaUVl?=
+ =?utf-8?B?RENOeHhzUWtzaUQxS0Nydlp0WHlJMm5oRVBRd3Q2dU9POUZRZHpwSjlMZ1Rz?=
+ =?utf-8?B?aEo2Zm5qcEU1REJTSGRhc3U3VGlpT0FvR1RHVjJMM05FbXE5QnlDRm1SNXpr?=
+ =?utf-8?B?UHF2V244eWRsVlU0SXJ0OVJyRmRCVytXNW9PTVVicG55SkdyZmlCSXhyZDM1?=
+ =?utf-8?B?amZ6eWhaUUZqcDRUR3ZFZm5zYzBzRTB0V3A0NW5nTVJxRFQzK1VLQktGclRt?=
+ =?utf-8?B?VkZacHpsMjhMQVI0ZkhvWnY3dFlhbVIxenUvVzdnaWRJbnkwUkwzNnd3b2tw?=
+ =?utf-8?B?WnY3cW1kcHNxdHJCZzN3cHFHK29xT1RzY0sydDYwTE56T3BqcGt4V2g1UGE0?=
+ =?utf-8?B?V01ZZS9MZXBTdmF5a0t2N3dHcVI1MEVReU9jR0VBWjBDNi8wSW8xZnFKSUlG?=
+ =?utf-8?B?c0k2OVVURCtJOGJ4bHM3RmZnQ1JQd0UweUFIWWg4Q2VNMjJQeE53Qk11N1lI?=
+ =?utf-8?B?NUhzZGNVYmhoNWc1NXhKbE5ybFoxbEoyT3p1VXVPWDB1SHhQQkdiWEZRQlVw?=
+ =?utf-8?B?WWpZOUExN1FxZGJjaUpJZUZvVWVIVCtPZWtwRXZLVElVSHJPelo3K2xVMllC?=
+ =?utf-8?B?N084VzZlK0N4K1RCUFd2R243NUJpTEZ3SVo5VW1IalJoMGE2Y3pPVlQrQjRQ?=
+ =?utf-8?B?R2REL3E0d250SXo0K0N3elFSQkowS0oxYXJLNVd3dGoxcTlKVjRVSkhGSUJ5?=
+ =?utf-8?B?RlRPRnZWZVFMZDVUem5US3JUVFFiZjVDRDNuUVF4YVR2TXJKNkl3dzVQRUpq?=
+ =?utf-8?B?Wldsc3VZOTRlZTVVeUlXV3Rlc2E3OEcrZ0cxUjVXRER2ajM3WWJzUFZJc1Fk?=
+ =?utf-8?B?NE5UYTRndzdjejM4K1V2TFdhK2dublVPMkFwMnI4dmptM3FibVhUOElJRDd1?=
+ =?utf-8?B?VjVTQXdkVmoyWkhZQS9tRjdrV3J1ZlpEWThVekdHMG1YQVBqdjNtV3R1M0Nw?=
+ =?utf-8?B?YWhrNytqMzVqN3pHMjR5dzNVOVpmSURxZDJlb05MNS9RTStpTENFdXRIa0VS?=
+ =?utf-8?B?ay9hZnZGYnBGUHR6dEZYRk02VnlZTkNjc2NhS0lmL2lmZ2plc3BwazJVL3pZ?=
+ =?utf-8?B?Z1V3aStLREZBNGZ4Vzkzb08wMmorTDR6cXQwT0hPaGFVZXlaaFFIUDl2ZVpM?=
+ =?utf-8?B?OVBNK2FZc0gzb3JCU2VDRUFhYnVqb2hORzdsNENad1hrN3BHZ0ozYVVoMkkz?=
+ =?utf-8?B?ZGZrbnBCS05NS2hDUVRKZ1djbTBhZSswUWEwUzd2YlBxbHovWlowZGUwZy9h?=
+ =?utf-8?B?M0R5NTRoYW02U014UWl6SkdIbnNNMGZ5VUlZZkxqclIwMFZTZUwvS3V2VTY3?=
+ =?utf-8?B?RVhlNE5KMEdZdE5senVZSW9RaGJFK3JzQ1NDR2ZBd0g5QmlXNGZUWDdjVU5B?=
+ =?utf-8?B?aWRWN1NTRVhhbVhRZDZPOW9TN3BhZmtRNzZVZ0hJSk5uUjJIU0t6bkdvOUx6?=
+ =?utf-8?B?cnppSjhUbFJDQis1TU5BNVZYNnZvelFwUjc0YU9wOEVOV3N4STdxSHVvWEc5?=
+ =?utf-8?B?dlQzdHE5dURMRVFHcFJsUkFUVERicjNUL1NkNlVsRE1hUXZaZjVKU3dyR2k5?=
+ =?utf-8?B?OHVXeTN2REJmek1WTzZ5WFBIaWhBbHJ1dm1kc2N5aE9sZHM1Tm1TOU8yYWFr?=
+ =?utf-8?B?U1g0aTdnVUZYcExUZFliUHY1MVRlaUk0UnJyajF1OUhFQkwxbWFPdkp2TURF?=
+ =?utf-8?B?M2hSaFFNN2lpOWpoQUdwOUJjTWpqL2ZvcWpEZGcySWh0eVdYZDA5RmpES0Uz?=
+ =?utf-8?B?KzB6Z2lKWHRaVGxqTUFNVHlSdmFCMmVkMWdaYWU0Vi9lSVZZMm1mUVhnU3lY?=
+ =?utf-8?B?MUl3anBnYld6VkxEaWhQdVAxSzNXU0tSUUJobXc1QjB6YWxvUUhzdkN2aHdM?=
+ =?utf-8?B?UW9QRmJCanRVcTVWR05veXBQVUV4ZDhjWUQvWHlTdUJIa1FxcTMzazlwMURQ?=
+ =?utf-8?B?YWJsMzhZeXdMUU9kcklWVHlxM1FiUmVmOFFsMGZrTkc5VENUUmtReFE0UWc3?=
+ =?utf-8?B?ZkE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4a35bcdb-fe2a-4407-97c1-08dd598b7eb6
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5949.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Mar 2025 13:09:41.9384
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Vnt+MJ6FRxm5j1CyZtWOClBioydLBZSNR8UWTkk5N53AsMw6W2V+/egoaYE/pGgtMOmI81+360gt2zfItQBHKgQM3TQPKD7/KxD8zMKYajk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6226
+X-OriginatorOrg: intel.com
 
-When __inet_hash_connect() has to try many 4-tuples before
-finding an available one, we see a high spinlock cost from
-the many spin_lock_bh(&head->lock) performed in its loop.
 
-This patch adds an RCU lookup to avoid the spinlock cost.
 
-check_established() gets a new @rcu_lookup argument.
-First reason is to not make any changes while head->lock
-is not held.
-Second reason is to not make this RCU lookup a second time
-after the spinlock has been acquired.
+Hi Mark,
 
-Tested:
+> Hi Andrew
+> 
+> On Thu, Feb 27, 2025, at 11:07 AM, Andrew Lunn wrote:
+>>>>> +			e1e_rphy(hw, PHY_REG(772, 26), &phy_data);
+>>>>
+>>>> Please add some #define for these magic numbers, so we have some idea
+>>>> what PHY register you are actually reading. That in itself might help
+>>>> explain how the workaround actually works.
+>>>>
+>>>
+>>> I don't know what this register does I'm afraid - that's Intel knowledge and has not been shared.
+>>
+>> What PHY is it? Often it is just a COTS PHY, and the datasheet might
+>> be available.
+>>
+>> Given your setup description, pause seems like the obvious thing to
+>> check. When trying to debug this, did you look at pause settings?
+>> Knowing what this register is might also point towards pause, or
+>> something totally different.
+>>
+>> 	Andrew
+> 
+> For the PHY - do you know a way of determining this easily? I can reach out to the platform team but that will take some time. I'm not seeing anything in the kernel logs, but if there's a recommended way of confirming that would be appreciated.
 
-Server:
+The PHY is I219 PHY.
+The datasheet is indeed accessible to the public: 
+https://cdrdv2-public.intel.com/612523/ethernet-connection-i219-datasheet.pdf
 
-ulimit -n 40000; neper/tcp_crr -T 200 -F 30000 -6 --nolog
+> 
+> We did look at at the pause pieces - which I agree seems like an obvious candidate given the speed mismatch on the network.
+> Experts on the Intel networking team did reproduce the issue in their lab and looked at this for many weeks without determining root cause. I wish it was as obvious as pause control configuration :)
+> 
+> Thanks
+> Mark
+> 
 
-Client:
+Reading this register was suggested for debug purposes to understand if 
+there is some misconfiguration. We did not find any misconfiguration.
+The issue as we discovered was a link status change interrupt caused the 
+CSME to reset the adapter causing the link flap.
 
-ulimit -n 40000; neper/tcp_crr -T 200 -F 30000 -6 --nolog -c -H server
+We were unable to determine what causes the link status change interrupt 
+in the first place. As stated in the comment, it was only ever observed 
+on Lenovo P5/P7systems and we couldn't ever reproduce on other systems. 
+The reproduction in our lab was on a P5 system as well.
 
-Before series:
 
-  utime_start=0.288582
-  utime_end=1.548707
-  stime_start=20.637138
-  stime_end=2002.489845
-  num_transactions=484453
-  latency_min=0.156279245
-  latency_max=20.922042756
-  latency_mean=1.546521274
-  latency_stddev=3.936005194
-  num_samples=312537
-  throughput=47426.00
-
-perf top on the client:
-
- 49.54%  [kernel]       [k] _raw_spin_lock
- 25.87%  [kernel]       [k] _raw_spin_lock_bh
-  5.97%  [kernel]       [k] queued_spin_lock_slowpath
-  5.67%  [kernel]       [k] __inet_hash_connect
-  3.53%  [kernel]       [k] __inet6_check_established
-  3.48%  [kernel]       [k] inet6_ehashfn
-  0.64%  [kernel]       [k] rcu_all_qs
-
-After this series:
-
-  utime_start=0.271607
-  utime_end=3.847111
-  stime_start=18.407684
-  stime_end=1997.485557
-  num_transactions=1350742
-  latency_min=0.014131929
-  latency_max=17.895073144
-  latency_mean=0.505675853  # Nice reduction of latency metrics
-  latency_stddev=2.125164772
-  num_samples=307884
-  throughput=139866.80      # 190 % increase
-
-perf top on client:
-
- 56.86%  [kernel]       [k] __inet6_check_established
- 17.96%  [kernel]       [k] __inet_hash_connect
- 13.88%  [kernel]       [k] inet6_ehashfn
-  2.52%  [kernel]       [k] rcu_all_qs
-  2.01%  [kernel]       [k] __cond_resched
-  0.41%  [kernel]       [k] _raw_spin_lock
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/inet_hashtables.h |  3 +-
- net/ipv4/inet_hashtables.c    | 52 +++++++++++++++++++++++------------
- net/ipv6/inet6_hashtables.c   | 24 ++++++++--------
- 3 files changed, 50 insertions(+), 29 deletions(-)
-
-diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables.h
-index 73c0e4087fd1a6d0d2a40ab0394165e07b08ed6d..b12797f13c9a3d66fab99c877d059f9c29c30d11 100644
---- a/include/net/inet_hashtables.h
-+++ b/include/net/inet_hashtables.h
-@@ -529,7 +529,8 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
- 			struct sock *sk, u64 port_offset,
- 			int (*check_established)(struct inet_timewait_death_row *,
- 						 struct sock *, __u16,
--						 struct inet_timewait_sock **));
-+						 struct inet_timewait_sock **,
-+						 bool rcu_lookup));
- 
- int inet_hash_connect(struct inet_timewait_death_row *death_row,
- 		      struct sock *sk);
-diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index b737e13f8459c53428980221355344327c4bc8dd..d1b5f45ee718410fdf3e78c113c7ebd4a1ddba40 100644
---- a/net/ipv4/inet_hashtables.c
-+++ b/net/ipv4/inet_hashtables.c
-@@ -537,7 +537,8 @@ EXPORT_SYMBOL_GPL(__inet_lookup_established);
- /* called with local bh disabled */
- static int __inet_check_established(struct inet_timewait_death_row *death_row,
- 				    struct sock *sk, __u16 lport,
--				    struct inet_timewait_sock **twp)
-+				    struct inet_timewait_sock **twp,
-+				    bool rcu_lookup)
- {
- 	struct inet_hashinfo *hinfo = death_row->hashinfo;
- 	struct inet_sock *inet = inet_sk(sk);
-@@ -556,17 +557,17 @@ static int __inet_check_established(struct inet_timewait_death_row *death_row,
- 	struct sock *sk2;
- 	spinlock_t *lock;
- 
--	rcu_read_lock();
--	sk_nulls_for_each(sk2, node, &head->chain) {
--		if (sk2->sk_hash != hash ||
--		    !inet_match(net, sk2, acookie, ports, dif, sdif))
--			continue;
--		if (sk2->sk_state == TCP_TIME_WAIT)
--			break;
--		rcu_read_unlock();
--		return -EADDRNOTAVAIL;
-+	if (rcu_lookup) {
-+		sk_nulls_for_each(sk2, node, &head->chain) {
-+			if (sk2->sk_hash != hash ||
-+			    !inet_match(net, sk2, acookie, ports, dif, sdif))
-+				continue;
-+			if (sk2->sk_state == TCP_TIME_WAIT)
-+				break;
-+			return -EADDRNOTAVAIL;
-+		}
-+		return 0;
- 	}
--	rcu_read_unlock();
- 
- 	lock = inet_ehash_lockp(hinfo, hash);
- 	spin_lock(lock);
-@@ -1007,7 +1008,8 @@ static u32 *table_perturb;
- int __inet_hash_connect(struct inet_timewait_death_row *death_row,
- 		struct sock *sk, u64 port_offset,
- 		int (*check_established)(struct inet_timewait_death_row *,
--			struct sock *, __u16, struct inet_timewait_sock **))
-+			struct sock *, __u16, struct inet_timewait_sock **,
-+			bool rcu_lookup))
- {
- 	struct inet_hashinfo *hinfo = death_row->hashinfo;
- 	struct inet_bind_hashbucket *head, *head2;
-@@ -1025,7 +1027,7 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
- 
- 	if (port) {
- 		local_bh_disable();
--		ret = check_established(death_row, sk, port, NULL);
-+		ret = check_established(death_row, sk, port, NULL, false);
- 		local_bh_enable();
- 		return ret;
- 	}
-@@ -1061,6 +1063,21 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
- 			continue;
- 		head = &hinfo->bhash[inet_bhashfn(net, port,
- 						  hinfo->bhash_size)];
-+		rcu_read_lock();
-+		hlist_for_each_entry_rcu(tb, &head->chain, node) {
-+			if (!inet_bind_bucket_match(tb, net, port, l3mdev))
-+				continue;
-+			if (tb->fastreuse >= 0 || tb->fastreuseport >= 0) {
-+				rcu_read_unlock();
-+				goto next_port;
-+			}
-+			if (!check_established(death_row, sk, port, &tw, true))
-+				break;
-+			rcu_read_unlock();
-+			goto next_port;
-+		}
-+		rcu_read_unlock();
-+
- 		spin_lock_bh(&head->lock);
- 
- 		/* Does not bother with rcv_saddr checks, because
-@@ -1070,12 +1087,12 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
- 			if (inet_bind_bucket_match(tb, net, port, l3mdev)) {
- 				if (tb->fastreuse >= 0 ||
- 				    tb->fastreuseport >= 0)
--					goto next_port;
-+					goto next_port_unlock;
- 				WARN_ON(hlist_empty(&tb->bhash2));
- 				if (!check_established(death_row, sk,
--						       port, &tw))
-+						       port, &tw, false))
- 					goto ok;
--				goto next_port;
-+				goto next_port_unlock;
- 			}
- 		}
- 
-@@ -1089,8 +1106,9 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
- 		tb->fastreuse = -1;
- 		tb->fastreuseport = -1;
- 		goto ok;
--next_port:
-+next_port_unlock:
- 		spin_unlock_bh(&head->lock);
-+next_port:
- 		cond_resched();
- 	}
- 
-diff --git a/net/ipv6/inet6_hashtables.c b/net/ipv6/inet6_hashtables.c
-index 3604a5cae5d29a25d24f9513308334ff8e64b083..9be315496459fcb391123a07ac887e2f59d27360 100644
---- a/net/ipv6/inet6_hashtables.c
-+++ b/net/ipv6/inet6_hashtables.c
-@@ -263,7 +263,8 @@ EXPORT_SYMBOL_GPL(inet6_lookup);
- 
- static int __inet6_check_established(struct inet_timewait_death_row *death_row,
- 				     struct sock *sk, const __u16 lport,
--				     struct inet_timewait_sock **twp)
-+				     struct inet_timewait_sock **twp,
-+				     bool rcu_lookup)
- {
- 	struct inet_hashinfo *hinfo = death_row->hashinfo;
- 	struct inet_sock *inet = inet_sk(sk);
-@@ -281,17 +282,18 @@ static int __inet6_check_established(struct inet_timewait_death_row *death_row,
- 	struct sock *sk2;
- 	spinlock_t *lock;
- 
--	rcu_read_lock();
--	sk_nulls_for_each(sk2, node, &head->chain) {
--		if (sk2->sk_hash != hash ||
--		    !inet6_match(net, sk2, saddr, daddr, ports, dif, sdif))
--			continue;
--		if (sk2->sk_state == TCP_TIME_WAIT)
--			break;
--		rcu_read_unlock();
--		return -EADDRNOTAVAIL;
-+	if (rcu_lookup) {
-+		sk_nulls_for_each(sk2, node, &head->chain) {
-+			if (sk2->sk_hash != hash ||
-+			    !inet6_match(net, sk2, saddr, daddr,
-+					 ports, dif, sdif))
-+				continue;
-+			if (sk2->sk_state == TCP_TIME_WAIT)
-+				break;
-+			return -EADDRNOTAVAIL;
-+		}
-+		return 0;
- 	}
--	rcu_read_unlock();
- 
- 	lock = inet_ehash_lockp(hinfo, hash);
- 	spin_lock(lock);
--- 
-2.48.1.711.g2feabab25a-goog
-
+Regarding the suggested workaround, there isn’t a clear understanding 
+why it works. We suspect that reading a PHY register is probably 
+prevents the CSME from resetting the PHY when it handles the LSC 
+interrupt it gets. However, it can also be a matter of slight timing 
+variations.
+We communicated that this solution is not likely to be accepted to the 
+kernel as is, and the initial responses on the mailing list demonstrate 
+the pushback. We do understand the frustration of end-users that may 
+experience the problem. A couple of suggestions that can make it look 
+less “out-of-the-blue” are: try a short delay instead of the register 
+read, or read a more common register like PHY STATUS instead.
+On a different topic, I suggest removing the part of the comment below:
+* Intel unable to determine root cause.
+The issue went through joint debug by Intel and Lenovo, and no obvious 
+spec violations by either party were found. There doesn’t seem to be 
+value in including this information in the comments of upstream code.
 
