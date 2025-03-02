@@ -1,180 +1,134 @@
-Return-Path: <netdev+bounces-171057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8F3BA4B4D0
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 22:00:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F264FA4B4D3
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 22:01:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 424853AA780
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 21:00:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 079E016CD84
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 21:01:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2A031D63D8;
-	Sun,  2 Mar 2025 21:00:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF73B1E7C10;
+	Sun,  2 Mar 2025 21:01:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="Sh5BiYH4"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="fa0+f6Rj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63BA1ADC9B
-	for <netdev@vger.kernel.org>; Sun,  2 Mar 2025 21:00:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0672E4A3C;
+	Sun,  2 Mar 2025 21:01:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740949250; cv=none; b=pXp0a/a6od/XDSfqOoMTwWzeM471XVx4PpvgOLx+CB27ii9mZk1OLVqkE/REqIIK0fvAieEpcVs5PLlvGAQbbpGpRzTwtXHuHjflOKgQ7oJi8lxwshwWrLbbq1MHJFW5ucVtvnaCrzPYpw4eHFqS239klI1M0pCm3tLhhSpngKo=
+	t=1740949292; cv=none; b=eJshFaz2XryCj1hd3zyrrCse719HIXUoaw2LKVFdLnR3SAd4pdo4/UQjPwTTYUODDcOQuSwsxMiK59/RNVqEby+AveDDV4sCuHL4rrLp1+Lvb8pPGfS7B6xSx1CXE+BE08M8sN6fXCfOdsQfsz/grFNQVtxv8TQq5fjEefSOgeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740949250; c=relaxed/simple;
-	bh=A9r6/gAuXlZda9mTxh9tjwvhwGO2D4It/Pq1azbEFuc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=D4Hfb5+kPwVI20Ew7DNSFmLXxSNSijSczfb83egN3qTUhKwUSXgTF7x4t4zMwyDtTghaGo20KjPMFiE0qQQtBl9TjYxAucGZ3MKBj2gTTsU+q0swuNnb1whOlySrwzZxcmRiEoAcxz91pQ6IxTg9aosb7XVLWLp+YrdC/3Foe4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=Sh5BiYH4; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4398ec2abc2so33942915e9.1
-        for <netdev@vger.kernel.org>; Sun, 02 Mar 2025 13:00:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1740949247; x=1741554047; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=hAnOp99iT1uPkgpsx2aoc6/2Km+LUZbQgjOhpFnZ3XA=;
-        b=Sh5BiYH40RDXR0S3zYi/IABMIXlq7d+w1flZY72X2TrQaOCKVu+porkU/OKNC/8JUL
-         JnEae3nxoygQhC3aYJmO93AN7SP5sVfZSpjYA0OIrPbwH2dB9parg01E9pwP9W4UAQpT
-         PzM69sBXKNZzb8EF9COIJOs9KsNL3MEg81IUpudsZJkX8+/nGXhfN7o3Gh/TmObYyF/H
-         TcInRI4qDQu4bub4EiWi25VEAYr/qRtQKLGkZPPwIOkFSzj/RvmDcoyqTseLx50BQsZE
-         iyUvlzugK/4RHVBF/pA/T1U7s5FmyYSIfRAj5Xga/aDQbShH3MI4AwnKqDxOwdqA3z51
-         rwUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740949247; x=1741554047;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hAnOp99iT1uPkgpsx2aoc6/2Km+LUZbQgjOhpFnZ3XA=;
-        b=k+G523FGLGPCTLryCkh1yR3b45rFMlhPbmxZNbgKbKTlNNd7H9zKdRnDMtaIyLDRm2
-         Wfu9/Laknr+9DuL9HYW0s45sYOmACxN5Y6TuzVc5OMBVhQuTeVl34tgKiQM90TLcOKLs
-         g0LADqGW2AICEHayzK19NZj8x6QP5tZJdc1cKM7YYeuR0KiR1fw2bk1EDWAqlkEtmE+Q
-         BqxrDYV8CX77b5hGnAtU64qXsadQFcT9V1KejrbElZkUlNm1ryxS3PM+/au684Wi1BC6
-         uYS2858Y3e4GF4FtUFn2ohDASylMfAYdPO+GjY9FezbT9N4yno/++LdxfxEk9jb21JMp
-         GQbQ==
-X-Gm-Message-State: AOJu0Yw0xy80a/JwF0lq/wRIRV9Ysv3LavAcIec7kpPsFEnXinzlEcCz
-	rmrUTD1GusaXTbqHgjSvK8ndCq2AcgQjXggF6Okb4fAsBUIqcBlQ7HoJKaJLrJ4=
-X-Gm-Gg: ASbGncuvCRYCb8HGjM7hUfQxc7/htKJ0sFOVRKB0ZSPTr3U6jwtrrNyAhv+Y02NxS/m
-	5rEoW2mTTjzr6grpraFa0Mw2IbkARl7qj0ePiEEcNDA6jwBFayJPgH3TCGPkaHYxDdYfUWuIAY3
-	q8CJjlFEm7kqeIqPM9mtRxYzOT4gtTEcfSPDZu7dDu85tbtQyfVmnIcV/Ezfx+XNeVyC8kUVzPN
-	dw3+0VGWvrpAYk4QqgTyg+Sd0IJFI5g5hegI9RqULFn8Nv2g1qPr3HwGuY91VtXWHP7OEfssKRC
-	q/13KOVBr/9SadKZPjA/YutfG7wVXBKogQFao7iTEf/xyr5b+NMvRwOFpYxChubACMrBpbbJptk
-	Mivs4z8s=
-X-Google-Smtp-Source: AGHT+IEH4nREHUeVRvdNi33MpgNfNuNmaut6ZGYlTG2Uj9fUuxIDGcP2iF49B8vv3JWDfNMtQ3fGtQ==
-X-Received: by 2002:a05:600c:1392:b0:439:6ab6:5d45 with SMTP id 5b1f17b1804b1-43ba6747775mr76635475e9.28.1740949247217;
-        Sun, 02 Mar 2025 13:00:47 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:6db2:7b02:2c7e:3704? ([2001:67c:2fbc:1:6db2:7b02:2c7e:3704])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43b7a28bf64sm132801285e9.39.2025.03.02.13.00.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 02 Mar 2025 13:00:45 -0800 (PST)
-Message-ID: <e640386e-46dd-4215-8824-751fc6655ed4@openvpn.net>
-Date: Sun, 2 Mar 2025 22:00:43 +0100
+	s=arc-20240116; t=1740949292; c=relaxed/simple;
+	bh=Ktknxaixw4jYjukpEyBo0fjDI8NFDTzyiF2hS45oJ4o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dFSsr73/8YLl8Wgm5BEvVcLSxc6MQzMt/FG4fV4d7Xq4E8He68vPuwRix4fpmANLkr7mlQWZku2btHCOFa9/JcqpS1usYqWxXK/yaR03ncVSi1AcXAIREFRyz7YcUNYHtjk5p/SZVBkm1NfCe0hYymBw61nNlVa8hv7lwa7JhzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=fa0+f6Rj; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=YR0pONPUa1aSzoYgGHrsHSg33e+oRGYIk/EYXBHsyy0=; b=fa0+f6Rj5hvafOp2ulinC+pOGA
+	0p1h0Dkgz9tD6DfBp48y1groqhC6ySDsf6P88p0hA9r8RkRxSpu7gTVPzadn0Hl9Cr+5qB36INB5C
+	p7a1wezPg1qaEkID7l94Lw3t9AviiCNhGcxzAMa2wJEwMY0ir7tMtID3cLqYuxkj3IrzfRGpfux+3
+	CmJ1eSkmnYzI+5thKRpPK6IesYZcIj/iET2uG1EaOZwJzdgXMoFpJuBk9Uwv46xOVHDqCanNrcIxa
+	UM7PVjfk6AZ2ohGrRFjdiPO9UnN+Db177vaou0uqca9I4q49Gs61U9xUDLidsa4V1pE/4981zKZ2n
+	eIEnYDxA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36196)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1toqQy-0007EE-1I;
+	Sun, 02 Mar 2025 21:01:14 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1toqQt-00035V-19;
+	Sun, 02 Mar 2025 21:01:07 +0000
+Date: Sun, 2 Mar 2025 21:01:07 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH 2/3] dt-bindings: net: Document GBETH bindings for
+ Renesas RZ/V2H(P) SoC
+Message-ID: <Z8THE2hpybzP74bH@shell.armlinux.org.uk>
+References: <20250302181808.728734-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250302181808.728734-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <c5a75f20-9b61-448e-941b-1106cd06ea04@lunn.ch>
+ <CA+V-a8sCMn+v5y5v9CyyV2VsRmLj-Uyowt61tTS9dWN43CD0_A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v20 20/25] ovpn: implement peer
- add/get/dump/delete via netlink
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-References: <20250227-b4-ovpn-v20-0-93f363310834@openvpn.net>
- <20250227-b4-ovpn-v20-20-93f363310834@openvpn.net> <Z8SiTgEmj2Vr-p-E@hog>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <Z8SiTgEmj2Vr-p-E@hog>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+V-a8sCMn+v5y5v9CyyV2VsRmLj-Uyowt61tTS9dWN43CD0_A@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-
-
-On 02/03/2025 19:24, Sabrina Dubroca wrote:
-> 2025-02-27, 02:21:45 +0100, Antonio Quartulli wrote:
->> @@ -1310,9 +1329,12 @@ void ovpn_peer_keepalive_work(struct work_struct *work)
->>   	if (next_run > 0 && ovpn->registered) {
->>   		netdev_dbg(ovpn->dev,
->>   			   "scheduling keepalive work: now=%llu next_run=%llu delta=%llu\n",
->> -			   next_run, now, next_run - now);
->> +			   next_run, now, next_run - now ?: 0);
+On Sun, Mar 02, 2025 at 08:41:39PM +0000, Lad, Prabhakar wrote:
+> Hi Andrew,
 > 
-> nit: I don't think this "?: 0" does anything
+> On Sun, Mar 2, 2025 at 7:25 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> >
+> > > +  clock-names:
+> > > +    items:
+> > > +      - const: stmmaceth
+> > > +      - const: pclk
+> > > +      - const: ptp_ref
+> > > +      - const: tx
+> > > +      - const: rx
+> > > +      - const: tx-180
+> > > +      - const: rx-180
+> >
+> > As Russell said in an older thread, tx and tx-180 are effectively the
+> > same clock, but with an inverter added. You should be able to arrange
+> > the clock tree that if you enable tx, it also enables tx-180 as a
+> > parent/sibling relationship.
+> >
+> I can certainly do that, but not sure in the DT we will be describing
+> the HW correctly then. I'll have to hide *-180  clocks In the DT and
+> handle and turning on/off these clocks in the clock driver.
+...
+>              clocks =  <&cpg CPG_MOD 0xbd>,
+>                             <&cpg CPG_MOD 0xbc>,
+>                             <&cpg CPG_CORE R9A09G057_GBETH_0_CLK_PTP_REF_I>,
+>                             <&cpg CPG_MOD 0xb8>,
+>                             <&cpg CPG_MOD 0xb9>,
+>                             <&cpg CPG_MOD 0xba>,
+>                             <&cpg CPG_MOD 0xbb>;
 
-Ouch, I missed the ">= 0".
-The idea is that now may have outgrown next_run and in that case we must 
-reschedule the worker immediately (while also avoid passing a negative 
-number as delay).
-
-
-Will get this fixed.
-
-Cheers,
-
-> 
->> +		/* due to the waiting above, the next_run deadline may have
->> +		 * passed: in this case we reschedule the worker immediately
->> +		 */
->>   		schedule_delayed_work(&ovpn->keepalive_work,
->> -				      (next_run - now) * HZ);
->> +				      (next_run - now) * HZ ?: 0);
-> 
-> nit: same here
-> 
+Your SoC designer really implemented the 0° and 180° as two separate
+independently controllable clocks?
 
 -- 
-Antonio Quartulli
-OpenVPN Inc.
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
