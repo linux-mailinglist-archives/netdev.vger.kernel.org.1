@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-171017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0985A4B244
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 15:34:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFC67A4B24C
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 15:35:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5618A7A7477
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 14:33:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 874DD3B3218
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 14:34:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84B591E3DD6;
-	Sun,  2 Mar 2025 14:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81C821E883A;
+	Sun,  2 Mar 2025 14:34:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VZqPuofJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gg+p4nEQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D3A1E4A9
-	for <netdev@vger.kernel.org>; Sun,  2 Mar 2025 14:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D72CC1E5B6D
+	for <netdev@vger.kernel.org>; Sun,  2 Mar 2025 14:34:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740926058; cv=none; b=AC4yaSWe/KRrrjTUTb7WCsPhwlob1VM7j5Soq1wlJLkaaQOY6KqGOuPfV3BeOHmaJslLtJs8ZQPiHjeGUjWC+U0GdeDk3kNNDRfoMxHvbNt+mlBh1BV2JX0kRPSw3lvZFUxfiXSVtqoPhfO7PvdT5YkEzjeWtO+pFeQ+XGour84=
+	t=1740926060; cv=none; b=OVXBSVPUBY1Xn8sE6PhTC3JmoIIgOM6d/dSbZDQjCyzillVYOpKM5bTsUMcq+N/0LhccZuJ3zJYDeDrSxU2zsxgIFKdLmZY7PZmhY69i9/mL5o6HOYJVkugPx6gNw8GCcD5PnSf6v2Pg2548h/cceHnlpKvnBhSNYn/IE1evuio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740926058; c=relaxed/simple;
-	bh=gQlhwm/UPdHEl0lHZ6zSydcD82rexseS8D8eO4RMhFU=;
+	s=arc-20240116; t=1740926060; c=relaxed/simple;
+	bh=uvSR+nHkOyddC0QdPQ72//WOuIk64mxGFFY2EA8HABQ=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=W7ESRkjB9c3kwJglDDkELBRTG3CtAr0mjCZ8rvU5knsIIYT7PGfJimzsoQIRlXesLmYlMmPnKgV91bcUQBkGkIlY8qxpDVEkbIhrUZgewBjv77irYwrxdMsog1xtPLVtVgsje/hx2AiEP5SZzQU2YkyPyI1lCOcf7tpxnehrgU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VZqPuofJ; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=o/B3r6r+MX4Mf3OqJkAwgxXpAhTnuidFb4eXG6mEsiKdxacCuiUgl6djtOQjsE6hugTqc+PRSHTEKMUa2RcT4KbydnKCamoUA6NxfVQeN/OI6pHK4AfytQpxTF+mqcACWXkCNASkmPYyjIWnqAd44h12XKYDIuRASZRze79TWLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gg+p4nEQ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740926055;
+	s=mimecast20190719; t=1740926057;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=A9IP3Rzux+HyTZ69cLNkjXI40jyB7zRAK3/LInKHI/I=;
-	b=VZqPuofJdNfQ+A3P2L0ozS+b8IHrxZ78KepU1x5huikvPZ9bOKHXz2qhB+Y7/YU3ftwymn
-	PMBU7kENqv4bXx/trIFNOMEjOxL/1rtK42eneSl1aCOhpSfhdKLlPuVu/03nV6uTMi8R/y
-	RSg9OCVAFK8Y6kR/mFjE7k++pB0fZMY=
+	bh=rlJT47zLkSfn9zom7PdH4akIw1D+Y3HK6R7VYjb50+Q=;
+	b=gg+p4nEQg6p4Uxu5biPj52LCquPCDLluDSuifewZ0MqYz8WXymH6UAW9/PI/k7Qzv30YmM
+	c400Gb3IcoGZMqd1I3yGb88bO9TfaCWoH5yyX+H0mmDGjYC4L36HfCeFZn6ceBfc2X9X4a
+	r4UJcsZmVO2ng1GPBkUAwTiDP7OOV1I=
 Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-252-sjnB76YwPnuKazIwHqJraw-1; Sun,
- 02 Mar 2025 09:34:09 -0500
-X-MC-Unique: sjnB76YwPnuKazIwHqJraw-1
-X-Mimecast-MFC-AGG-ID: sjnB76YwPnuKazIwHqJraw_1740926048
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-189-cKQuFv4DNUKVRzrAAVuWDg-1; Sun,
+ 02 Mar 2025 09:34:14 -0500
+X-MC-Unique: cKQuFv4DNUKVRzrAAVuWDg-1
+X-Mimecast-MFC-AGG-ID: cKQuFv4DNUKVRzrAAVuWDg_1740926053
 Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 508AB1954B1F;
-	Sun,  2 Mar 2025 14:34:08 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AF5351954B1C;
+	Sun,  2 Mar 2025 14:34:13 +0000 (UTC)
 Received: from server.redhat.com (unknown [10.72.112.49])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B9747195395A;
-	Sun,  2 Mar 2025 14:34:03 +0000 (UTC)
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2799019560AB;
+	Sun,  2 Mar 2025 14:34:08 +0000 (UTC)
 From: Cindy Lu <lulu@redhat.com>
 To: lulu@redhat.com,
 	jasowang@redhat.com,
@@ -66,9 +66,9 @@ To: lulu@redhat.com,
 	linux-kernel@vger.kernel.org,
 	virtualization@lists.linux-foundation.org,
 	netdev@vger.kernel.org
-Subject: [PATCH v7 6/8] vhost: uapi to control task mode (owner vs kthread)
-Date: Sun,  2 Mar 2025 22:32:08 +0800
-Message-ID: <20250302143259.1221569-7-lulu@redhat.com>
+Subject: [PATCH v7 7/8] vhost: Add check for inherit_owner status
+Date: Sun,  2 Mar 2025 22:32:09 +0800
+Message-ID: <20250302143259.1221569-8-lulu@redhat.com>
 In-Reply-To: <20250302143259.1221569-1-lulu@redhat.com>
 References: <20250302143259.1221569-1-lulu@redhat.com>
 Precedence: bulk
@@ -80,82 +80,32 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-Add a new UAPI to configure the vhost device to use the kthread mode
-The userspace application can use IOCTL VHOST_FORK_FROM_OWNER
-to choose between owner and kthread mode if necessary
-This setting must be applied before VHOST_SET_OWNER, as the worker
-will be created in the VHOST_SET_OWNER function
+The VHOST_NEW_WORKER requires the inherit_owner
+setting to be true. So we need to add a check for this.
 
 Signed-off-by: Cindy Lu <lulu@redhat.com>
 ---
- drivers/vhost/vhost.c      | 22 ++++++++++++++++++++--
- include/uapi/linux/vhost.h | 15 +++++++++++++++
- 2 files changed, 35 insertions(+), 2 deletions(-)
+ drivers/vhost/vhost.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index be97028a8baf..ff930c2e5b78 100644
+index ff930c2e5b78..fb0c7fb43f78 100644
 --- a/drivers/vhost/vhost.c
 +++ b/drivers/vhost/vhost.c
-@@ -1134,7 +1134,7 @@ void vhost_dev_reset_owner(struct vhost_dev *dev, struct vhost_iotlb *umem)
- 	int i;
- 
- 	vhost_dev_cleanup(dev);
--
-+	dev->inherit_owner = true;
- 	dev->umem = umem;
- 	/* We don't need VQ locks below since vhost_dev_cleanup makes sure
- 	 * VQs aren't running.
-@@ -2287,7 +2287,25 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *argp)
- 		r = vhost_dev_set_owner(d);
- 		goto done;
- 	}
--
-+	if (ioctl == VHOST_FORK_FROM_OWNER) {
-+		u8 inherit_owner;
-+		/*inherit_owner can only be modified before owner is set*/
-+		if (vhost_dev_has_owner(d)) {
-+			r = -EBUSY;
-+			goto done;
-+		}
-+		if (copy_from_user(&inherit_owner, argp, sizeof(u8))) {
-+			r = -EFAULT;
-+			goto done;
-+		}
-+		if (inherit_owner > 1) {
-+			r = -EINVAL;
-+			goto done;
-+		}
-+		d->inherit_owner = (bool)inherit_owner;
-+		r = 0;
-+		goto done;
-+	}
- 	/* You must be the owner to do anything else */
- 	r = vhost_dev_check_owner(d);
- 	if (r)
-diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-index b95dd84eef2d..547b4fa4c3bd 100644
---- a/include/uapi/linux/vhost.h
-+++ b/include/uapi/linux/vhost.h
-@@ -235,4 +235,19 @@
-  */
- #define VHOST_VDPA_GET_VRING_SIZE	_IOWR(VHOST_VIRTIO, 0x82,	\
- 					      struct vhost_vring_state)
-+
-+/**
-+ * VHOST_FORK_FROM_OWNER - Set the inherit_owner flag for the vhost device
-+ *
-+ * @param inherit_owner: An 8-bit value that determines the vhost thread mode
-+ *
-+ * When inherit_owner is set to 1(default value):
-+ *   - Vhost will create tasks similar to processes forked from the owner,
-+ *     inheriting all of the owner's attributes..
-+ *
-+ * When inherit_owner is set to 0:
-+ *   - Vhost will create tasks as kernel thread
-+ */
-+#define VHOST_FORK_FROM_OWNER _IOW(VHOST_VIRTIO, 0x83, __u8)
-+
- #endif
+@@ -1018,6 +1018,13 @@ long vhost_worker_ioctl(struct vhost_dev *dev, unsigned int ioctl,
+ 	switch (ioctl) {
+ 	/* dev worker ioctls */
+ 	case VHOST_NEW_WORKER:
++		/*
++		 * vhost_tasks will account for worker threads under the parent's
++		 * NPROC value but kthreads do not. To avoid userspace overflowing
++		 * the system with worker threads inherit_owner must be true.
++		 */
++		if (!dev->inherit_owner)
++			return -EFAULT;
+ 		ret = vhost_new_worker(dev, &state);
+ 		if (!ret && copy_to_user(argp, &state, sizeof(state)))
+ 			ret = -EFAULT;
 -- 
 2.45.0
 
