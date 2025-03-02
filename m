@@ -1,181 +1,164 @@
-Return-Path: <netdev+bounces-170994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ABFEA4B04F
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 08:30:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9195EA4B063
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 09:12:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E672D3BADCF
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 07:21:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DDA216C51C
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 08:12:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2724E1C2DB2;
-	Sun,  2 Mar 2025 07:11:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E74621D5CC4;
+	Sun,  2 Mar 2025 08:11:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YuFnaPrD"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="bF4eLKAl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E3DD158DD8
-	for <netdev@vger.kernel.org>; Sun,  2 Mar 2025 07:11:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E1648821;
+	Sun,  2 Mar 2025 08:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740899507; cv=none; b=H3QwH4FfsHlQ8I7zcFN4RGmT3S47zqNmle8x4wRemKOeuCSPY74uzQCYb9YUPSAFIiEbzY/YA+9WXMsmAJmV3VGQ14ReF8FDLUf+4yhFALCozb3pJTmUtBznspISP8t2us2S49mC9hsM73sT1x3sURm5AbKxTdBb/gONGJg77jc=
+	t=1740903117; cv=none; b=THkV0DIeCuKdxC72wxX5fHccWZs9GBKy3SrYyvpU5LzxzQcJokfN49FlH3I0qTFX8pVKllAz/2YvdFaFRnmscJ7ihwFriK4O3truobK+o2JxUOztDOGrbqFL95PEziZPdj0TsWXqOc32FtmtzEDMPU0cesH3dsZWD5VOY9oxy5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740899507; c=relaxed/simple;
-	bh=WTRmP/t2UHNNln+V06noRfWKJiHkyBrBwU7UtDpGLZc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mrnl6LhfxF5eVPT9cfqZtlr1bKobr/b936iB4srP8Rrui1k4WiiBq+xfKgssPjF1crsY5jfq80S7O+VlXAghiEbraEkWDKn3hYm913sv9RE5scLI6Z4HWIvHC4MqTm7waK8L6Xa4z0c0yf43qwIoo7k5qICZcb5nB2IjNjIR6tg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YuFnaPrD; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-47208e35f9cso42613701cf.3
-        for <netdev@vger.kernel.org>; Sat, 01 Mar 2025 23:11:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740899504; x=1741504304; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WTRmP/t2UHNNln+V06noRfWKJiHkyBrBwU7UtDpGLZc=;
-        b=YuFnaPrDSNwBYz6b08EVHeP/Nf/30is18TzTH9vTfnA7NgIdxEQb7U+uuaylLeWZ0V
-         IRWjUW6blIJvnunuSCHYg/tV/vM164o1Z4nWTdJd924goywtC9cJnMTl2MQI7S+HoQ5o
-         iDNbIaB0Ktnr6nkeOjumotUzpxUocsNd4+fLg0biw37aLDj9YJXEY9h17H9xPzJgkbvW
-         zAR4oEcmizEvcVZhdUeSuXVjaUGzgF8KMQW5ttS5so664wemtpEFw8FfYUK/3eXwb35e
-         9Emut3+2rBbskG5hTbVYj7qLUj/FAe3iih5/HB9Z+Q+EyqJOSOaBqwW87VGff7jTEABP
-         LQPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740899504; x=1741504304;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WTRmP/t2UHNNln+V06noRfWKJiHkyBrBwU7UtDpGLZc=;
-        b=A2suolLwjqeWts/sxqOmftEBBU4qes3YP3zFngpla/vL+Oy6M3RYm4aPzB4qD1ogV5
-         6NoYNPVb0kc8jq8nZIfw3PMN/+97f625/P7uC3n8fljomyVeV25rnKVvr8wDMt5GffrP
-         Nick/6tkWxWEP5f5yMxGbj2bDls3gXY39R7XpKhRvRgspyLKC82QkD8k2GpsC47a6gzU
-         f9k8DppPd16CaZtGyMg9Vf8dmxajGOWL7BFZ+HeVq4uVwOJTvwWWYkKaLtAWNagnRdfv
-         OcMjH0X+LSOBQZCIitWHUOHYtLB/kAEHznqf/jRSnHGEJ8p5IqDVYaNjNmI+MWcj3kuS
-         JKQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWlYRX1Xlpk6sxLLTKI1o+MZeqgQD9t+JbsIgBxlbR+iNZtfM7/676GbNXpxpTYy240+99eRqU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVxk9gslJgCASjCpXI/qszeQ7mMZKS2N2gSuHJNvlaAfsrm+Pq
-	VkR7hTF/dZxANzRCb0xK4ao+W65FA4gie5MnHcBur+hO0UqLwt+cpiWfjSZ39FF5LHsRT6F8o+P
-	TQDcM5AmmEWAlQ5McWRGYxeJ6cgCwGnDbt3NB
-X-Gm-Gg: ASbGncsL7hsl/I8NyrZozRBRSTNxnqfROfjJ9i1ODEqGxPfgoSdJ6yb5xki8GTb5D2y
-	TOsZ35fqeZiLuPRe7n2Y8hOozwE2cW5j99ed/me2kVfZg7wffesXlShHMbpZFYsuHlHu2I+e5xo
-	2HDuSiqgrUQrFGt2g0FjAPpBLxXqA=
-X-Google-Smtp-Source: AGHT+IEqJaHTEGCVfws3nkUj8JkxdioNYPfO/8HJCYDPORYK4qSnTZ24n6j/5Nmmpa0t/pepjQDeVx3j4D9b6GdDFJg=
-X-Received: by 2002:ac8:5890:0:b0:471:b8dd:6401 with SMTP id
- d75a77b69052e-474bc08ad3bmr133593931cf.21.1740899504087; Sat, 01 Mar 2025
- 23:11:44 -0800 (PST)
+	s=arc-20240116; t=1740903117; c=relaxed/simple;
+	bh=SypUWD7JvXsZ8WWu/4Aqu2lePFUiyZcBf45ug9F5Dg4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=VniVfikmo8d0kB6OMf3F5QC8WyTxUs7+KUlx/9PCfL2gU2/KNEWuFlwDcSvIETdWASZ9LYXxt1qv8kx+QHXfD8JrB2i98kg04GBjjZDhEPr/02esas4aeK2+i5AZRsp/OgLpqX/j+iJKUcAnF6jM911dzKN+dSxpjOQrR6aIrGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=bF4eLKAl; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
+	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=5kouLZOcAsnYgTyKbKrcWCTUkyAf0QX+/rOD4IR60EI=; b=bF4eLKAlIgOVJHOQNx2Wa4he05
+	JZmvAW98Cd35hzVxDE2QqZTceWAl5Km4FP1XenM8a28kQ1tUzsLEe9ccBYBZRKkQ8TGXWmu3+H/pS
+	byfxQWDvHFPGLCgRrkRirONWgjY+NbyiXNZiQywGzRxE1vmlkgHeDOXlTHNR3s6mdNsjR0pjZ9wsJ
+	zMyGyYziZhguHNMtmGOm+23jAc7LqJu8wzQZp+wFmB9PCr+lptsjKSyBBAHcFfot+EWL1lSyfozr4
+	c5HQCPlsQn+twftKU9IGVzc5kw0uGIrxnZBmYzk95efVkvtL43p4l1zgtko55mCc/xeQ6Dimme9uM
+	L23HsV/A==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1toeQR-0030qN-2n;
+	Sun, 02 Mar 2025 16:11:52 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 02 Mar 2025 16:11:51 +0800
+Date: Sun, 2 Mar 2025 16:11:51 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v3 00/19] crypto: scatterlist handling improvements
+Message-ID: <Z8QSx5_1khF4UsqD@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250301194624.1879919-1-edumazet@google.com> <CAL+tcoAY1xKgdFzQDcU4LJ7wEZ7oFSaY_aqwtiw4MV-W1RMBWg@mail.gmail.com>
-In-Reply-To: <CAL+tcoAY1xKgdFzQDcU4LJ7wEZ7oFSaY_aqwtiw4MV-W1RMBWg@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sun, 2 Mar 2025 08:11:33 +0100
-X-Gm-Features: AQ5f1JrVe7Kwrib-_J8qxFUThHxKSMXb7xbkvJkyfEhXdxo_a3wcZaTlQsHajsk
-Message-ID: <CANn89iLpVW5bs7y8Hr5b07_7CAV2XkOgC9E7goCWpjCaiEKj6A@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: use RCU in __inet{6}_check_established()
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250219182341.43961-1-ebiggers@kernel.org>
+X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel,apana.lists.os.linux.netdev
 
-On Sun, Mar 2, 2025 at 1:17=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.co=
-m> wrote:
->
-> On Sun, Mar 2, 2025 at 3:46=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
-> >
-> > When __inet_hash_connect() has to try many 4-tuples before
-> > finding an available one, we see a high spinlock cost from
-> > __inet_check_established() and/or __inet6_check_established().
-> >
-> > This patch adds an RCU lookup to avoid the spinlock
-> > acquisition if the 4-tuple is found in the hash table.
-> >
-> > Note that there are still spin_lock_bh() calls in
-> > __inet_hash_connect() to protect inet_bind_hashbucket,
-> > this will be fixed in a future patch.
-> >
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
->
-> Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
->
-> It can introduce extra system overhead in most cases because it takes
-> effect only when the socket is not unique in the hash table. I'm not
-> sure what the probability of seeing this case is in reality in
-> general. Considering performing a look-up seems not to consume much, I
-> think it looks good to me. Well, it's the only one I'm a bit worried
-> about.
->
-> As you said, it truly mitigates the huge contention in the earlier
-> mentioned case where the available port resources are becoming rare.
-> We've encountered this situation causing high cpu load before. Thanks
-> for the optimization!
+Eric Biggers <ebiggers@kernel.org> wrote:
+> This series can also be retrieved from:
+> 
+>    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git crypto-scatterlist-v3
+> 
+> This series cleans up and optimizes the code that translates between
+> scatterlists (the input to the API) and virtual addresses (what software
+> implementations operate on) for skcipher and aead algorithms.
+> 
+> This takes the form of cleanups and optimizations to the skcipher_walk
+> functions and a rework of the underlying scatter_walk functions.
+> 
+> The unnecessary use of scatterlists still remains a huge pain point of
+> many of the crypto APIs, with the exception of lib/crypto/, shash, and
+> scomp which do it properly.  But this series at least reduces (but not
+> eliminates) the impact on performance that the scatterlists have.
+> 
+> An an example, this patchset improves IPsec throughput by about 5%, as
+> measured using iperf3 bidirectional TCP between two c3d-standard-4 (AMD
+> Genoa) instances in Google Compute Engine using transport mode IPsec
+> with AES-256-GCM.
+> 
+> This series is organized as follows:
+> 
+> - Patch 1-5 improve scatter_walk, introducing easier-to-use functions
+>  and optimizing performance in some cases.
+> - Patch 6-17 convert users to use the new functions.
+> - Patch 18 removes functions that are no longer needed.
+> - Patch 19 optimizes the walker on !HIGHMEM platforms to start returning
+>  data segments that can cross a page boundary.  This can significantly
+>  improve performance in cases where messages can cross pages, such as
+>  IPsec.  Previously there was a large overhead caused by packets being
+>  unnecessarily divided into multiple parts by the walker, including
+>  hitting skcipher_next_slow() which uses a single-block bounce buffer.
+> 
+> Changed in v3:
+> - Dropped patches that were upstreamed.
+> - Added a Reviewed-by and Tested-by.
+> 
+> Changed in v2:
+> - Added comment to scatterwalk_done_dst().
+> - Added scatterwalk_get_sglist() and use it in net/tls/.
+> - Dropped the keywrap patch, as keywrap is being removed by
+>  https://lore.kernel.org/r/20241227220802.92550-1-ebiggers@kernel.org
+> 
+> Eric Biggers (19):
+>  crypto: scatterwalk - move to next sg entry just in time
+>  crypto: scatterwalk - add new functions for skipping data
+>  crypto: scatterwalk - add new functions for iterating through data
+>  crypto: scatterwalk - add new functions for copying data
+>  crypto: scatterwalk - add scatterwalk_get_sglist()
+>  crypto: skcipher - use scatterwalk_start_at_pos()
+>  crypto: aegis - use the new scatterwalk functions
+>  crypto: arm/ghash - use the new scatterwalk functions
+>  crypto: arm64 - use the new scatterwalk functions
+>  crypto: nx - use the new scatterwalk functions
+>  crypto: s390/aes-gcm - use the new scatterwalk functions
+>  crypto: s5p-sss - use the new scatterwalk functions
+>  crypto: stm32 - use the new scatterwalk functions
+>  crypto: x86/aes-gcm - use the new scatterwalk functions
+>  crypto: x86/aegis - use the new scatterwalk functions
+>  net/tls: use the new scatterwalk functions
+>  crypto: skcipher - use the new scatterwalk functions
+>  crypto: scatterwalk - remove obsolete functions
+>  crypto: scatterwalk - don't split at page boundaries when !HIGHMEM
+> 
+> arch/arm/crypto/ghash-ce-glue.c       |  15 +-
+> arch/arm64/crypto/aes-ce-ccm-glue.c   |  17 +--
+> arch/arm64/crypto/ghash-ce-glue.c     |  16 +-
+> arch/arm64/crypto/sm4-ce-ccm-glue.c   |  27 ++--
+> arch/arm64/crypto/sm4-ce-gcm-glue.c   |  31 ++--
+> arch/s390/crypto/aes_s390.c           |  33 ++---
+> arch/x86/crypto/aegis128-aesni-glue.c |  10 +-
+> arch/x86/crypto/aesni-intel_glue.c    |  28 ++--
+> crypto/aegis128-core.c                |  10 +-
+> crypto/scatterwalk.c                  |  91 +++++++-----
+> crypto/skcipher.c                     |  65 +++------
+> drivers/crypto/nx/nx-aes-ccm.c        |  16 +-
+> drivers/crypto/nx/nx-aes-gcm.c        |  17 +--
+> drivers/crypto/nx/nx.c                |  31 +---
+> drivers/crypto/nx/nx.h                |   3 -
+> drivers/crypto/s5p-sss.c              |  38 ++---
+> drivers/crypto/stm32/stm32-cryp.c     |  34 ++---
+> include/crypto/scatterwalk.h          | 203 +++++++++++++++++++++-----
+> net/tls/tls_device_fallback.c         |  31 +---
+> 19 files changed, 363 insertions(+), 353 deletions(-)
+> 
+> 
+> base-commit: c346fef6fef53fa57ff323b701e7bad82290d0e7
 
-Addition of bhash2 in 6.1 added a major regression.
-
-This is the reason I started to work on this stuff.
-I will send the whole series later today, but I get a ~200% increase
-in performance.
-I will provide numbers in the cover letter.
-
-neper/tcp_crr can be used to measure the gains.
-
-Both server/client have 240 cores, 480 hyperthreads (Intel(R) Xeon(R) 6985P=
--C)
-
-Server
-ulimit -n 40000; neper/tcp_crr -6 -T200 -F20000 --nolog
-
-Client
-ulimit -n 40000; neper/tcp_crr -6 -T200 -F20000 --nolog -c -H server
-
-Before this first patch:
-
-utime_start=3D0.210641
-utime_end=3D1.704755
-stime_start=3D11.842697
-stime_end=3D1997.341498
-nvcsw_start=3D18518
-nvcsw_end=3D18672
-nivcsw_start=3D26
-nivcsw_end=3D14828
-num_transactions=3D615906
-latency_min=3D0.051826868
-latency_max=3D12.015396087
-latency_mean=3D0.642949344
-latency_stddev=3D1.860316922
-num_samples=3D207534
-correlation_coefficient=3D1.00
-throughput=3D62524.04
-
-After this patch:
-
-utime_start=3D0.185656
-utime_end=3D2.436602
-stime_start=3D11.470889
-stime_end=3D1980.679087
-nvcsw_start=3D17327
-nvcsw_end=3D17514
-nivcsw_start=3D48
-nivcsw_end=3D77724
-num_transactions=3D821025
-latency_min=3D0.025097789
-latency_max=3D11.581610596
-latency_mean=3D0.475903462
-latency_stddev=3D1.597439931
-num_samples=3D206556
-time_end=3D173.321207377
-correlation_coefficient=3D1.00
-throughput=3D84387.19
+All applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
