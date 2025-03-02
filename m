@@ -1,148 +1,141 @@
-Return-Path: <netdev+bounces-171028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DD8AA4B311
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 17:21:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59FFDA4B389
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 17:51:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03F1D3B118F
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 16:21:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7828D1697F4
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 16:51:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DBBA1E9B18;
-	Sun,  2 Mar 2025 16:21:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C31EE1E9B2E;
+	Sun,  2 Mar 2025 16:51:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FlX0gW69"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mtDcSe7J"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D744F6DCE1;
-	Sun,  2 Mar 2025 16:21:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B09C018D65E
+	for <netdev@vger.kernel.org>; Sun,  2 Mar 2025 16:51:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740932512; cv=none; b=EYaNHwWOTlbxNxKvw2wwTkitAN772IfdIijJIC5O5qKFREDAartxEBZ8WkCX6WtU8NDTJDdTnW3JfA4H3MYqCGo5RCouZoWnmfaoplmxwwvzdWBxUEBQREQ9UqKCxsyfRCakjL5bTgGD0RYpg8MuJkCduuLYkMvSyxFAfbcXwuE=
+	t=1740934314; cv=none; b=ueBvsQ6YPusoZBv4ZQbdFllfJukELP0PQWHCVSfz2OUwB474G2p353U+ytG+atd67dq5gpPZ16iFgWh4Yztn17h6F8XD3rGdZTqI5sYHP3CY/j+QfHwoPZQ6McGalfOh2IwXBUAeA/8KsJo2M1z9XJldAAkmodCSj7VCYGxNj2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740932512; c=relaxed/simple;
-	bh=52pDudCLy5AhZ4j0hH7KhcrSAihM60axh6yD50qOTO4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gt8YIJHky6ELyVgLeW6LiNJR/QQSuLI/idP7q1bHursVw4MzThsbINZOj4jD+VkbNuiTY8mEcv+TTUkDJp2nsqu3rj8Z83aYbYR4wrPOLyjCJbmjZTVglCFxScVnY4oHGSThovESBv8xlZi+fSnDAroaWoCUYhnUFUzk4hWM5SY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FlX0gW69; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id EF1E144336;
-	Sun,  2 Mar 2025 16:21:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1740932502;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=6KTI0fexig/v/YZZ5okK/ZmxEJpGbbOd4uN7XeT0n0A=;
-	b=FlX0gW69pr0SQ0QmBZ03K24X6i254aSpwzlDunm1meTY2K0r/sshpkW/fqhKZydE/rjvby
-	k/X4dl82LwvEkWsii4x329avVPk+h9kbh+m+D8f0b07biLOAk3sZtD9dAvA6yKb6L+zso8
-	4oRm2Z66hiaivrG0M35VrWDyK1yYPK9UQskrXB4Fi81xxwqBxJj2GA+k9rLRy46AV5qUCl
-	Vizwo1tniq5wtaJRl+acO7XVYtoWBxaH1N7yOMKjU9QeDHBXy3VbamhwSBqMRNQ1D+Br1t
-	KSTguT1tTMtOZVBl/TSg3F9r7fYYO6wwTilO76OWC4pvQ3Nd7ULNslI4DB99aA==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Simon Horman <horms@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>
-Subject: [PATCH net] net: ethtool: Set the req_info->dev on DUMP requests for each dev
-Date: Sun,  2 Mar 2025 17:21:36 +0100
-Message-ID: <20250302162137.698092-1-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1740934314; c=relaxed/simple;
+	bh=as69cqRYwnP/h+X+9ax/t0ZGZCPA7bDUvqdhcRJHS1w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aIUyPh4qxAy7In5UXGl+4iHrkjehP3PWpMi/ObSLyhZWaMAQGDvCUQ3Na6Dk4E7WzxrnxsUDqkBXxivTNF6+rJokXHL2XWUynG74718ODjo0DmMzJ0ZiLSSkGcGIl7uh8Ef7GW0q99XShDJOBICrlr3QYHFo+OUXpZjbqGREcxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mtDcSe7J; arc=none smtp.client-ip=209.85.221.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-520847ad493so3623888e0c.1
+        for <netdev@vger.kernel.org>; Sun, 02 Mar 2025 08:51:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740934311; x=1741539111; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=as69cqRYwnP/h+X+9ax/t0ZGZCPA7bDUvqdhcRJHS1w=;
+        b=mtDcSe7JnE4T3UOwRc2caxv3muEtRtvQwDA5pzU+rXe+JqYyMiyodOm9IpAc7FEuEk
+         KPQ/p9WA2sbP+NAwxUeliBKwS6BL7W7bjpD4JBbE0uJ/RfP8g4tmYD70/YeNoUCAE+5N
+         kv8Y7KMup2s70MET3tz+uTr/p4lmkmYshDnpxO4Y+RTu61BIAZvsguCba3wWRnObBCzj
+         58EEGq5BZaHXa2LoW7fxuiUwZpVaM43T8KO2LD1oMVwczbEH66L8wJAvn4rRB8pf9yQq
+         NMyYgOe0+ZhsuNHTOOn+3Bsi1y7jf+4bS9CSa/IfjGK2NTsI6SdNaS/uPZH4yicoliVz
+         Q76A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740934311; x=1741539111;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=as69cqRYwnP/h+X+9ax/t0ZGZCPA7bDUvqdhcRJHS1w=;
+        b=OUPhhG7zPqbImqOEDImSnTSnPYgfwFGZdkUzR5gNCOZf/i0s53MNc04kaUjfiDG9VT
+         Plfer7l/6nBrruS3E7wyFhtcc27LOQknTue3CiENOKiJmJChh0mANS6blLAxqtCfkZT3
+         nhwCFQUQsu+TtKtlGaqWEGKX/EYLuqn5lo944ZzCF9tXvaJTmMhxvurwMAId+ljL6p5F
+         0ARXy+AN6APU+dckZS6gXh6D0uP7yropa7FeDme6mS1dPSpZDWNZXPNu4xEYlvwiuRrc
+         242dctHoDRC5v3CSql9+0oicPOyXgq8/QlwKIrFu2yUJ0Nvg+ss2KBrUm0QrNZBcPHFd
+         g0yw==
+X-Forwarded-Encrypted: i=1; AJvYcCX6KMRPqaPMqEGXZjHhToP+/8pxpnedMHAzlhFm9gW13uI6nyKla0fznR5d1DqhGlILIWrNnA4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFFnGHj6wEruCsM26xHnMhv0DMMdR9wF+KH9jTxyE3zSudmLK2
+	lX5cw0drKeRoh3PHQF3EVEhh6belNvtGqXWbnHTN1tFyiX3WZkLJMmQHvEHils5mt+cAz/jgAXY
+	GpLa6/M90jNPj0ZPZT+Q5EPXHC1Q=
+X-Gm-Gg: ASbGncvhglZlMSdd+YfkIg8MAksxKTYRlkOG98+4muqPM39iy+rxzrEKld1WLBjD3UJ
+	07op/FvABoE996GOvV/HgSmNS+sjulKbE9HMQNItLyanf7MVPq782w0BQ2MNp5hEeOYPzctIxTT
+	7j6Z/7OaZM9/5lt8E8HGkloD9LL9MK6FAYGBpMHs3mZmBJNjJ8Rs3XFb5/Dkw=
+X-Google-Smtp-Source: AGHT+IHkVpFk6ckEsvNZMniXzAGvjzD+qTT1IxBQkVl76sSlYPwaYujg+IJDf5DiGEeK4CS3IdB8ZqHPxxFKX/TryqY=
+X-Received: by 2002:a05:6122:3d4b:b0:522:1d6f:2b4d with SMTP id
+ 71dfb90a1353d-5235b773432mr6038327e0c.1.1740934311094; Sun, 02 Mar 2025
+ 08:51:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdelieeijecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeehtdehueefuedtkeduleefvdefgfeiudevteevuefhgfffkeekheeuffeuhefhueenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvuddprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvt
- hesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-GND-Sasl: maxime.chevallier@bootlin.com
+References: <CA+V-a8u04AskomiOqBKLkTzq3uJnFas6sitF6wbNi=md6DtZbw@mail.gmail.com>
+ <84b9c6b7-46b1-444f-b8db-d1f6d4fc5d1c@lunn.ch>
+In-Reply-To: <84b9c6b7-46b1-444f-b8db-d1f6d4fc5d1c@lunn.ch>
+From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Date: Sun, 2 Mar 2025 16:51:22 +0000
+X-Gm-Features: AQ5f1Jpfswj3v3flUMX3V8q19roDFMt_dMemWx51XFT1sVnR_Rikm_i4a-YF8a4
+Message-ID: <CA+V-a8tyZAAYeBoxaUM+7Cnha4+_pGHa4dBC+voHNk1PX+VfGw@mail.gmail.com>
+Subject: Re: [QUERY] : STMMAC Clocks
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Russell King <linux@armlinux.org.uk>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	netdev <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-There are a few netlink commands that rely on the req_info->dev field
-being populated by ethnl in their ->prepare_data() and ->fill_reply().
+Hi Andrew,
 
-For a regular GET request, this will be set by ethnl_default_parse(),
-which calls ethnl_parse_header_dev_get().
+On Fri, Feb 28, 2025 at 11:38=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote=
+:
+>
+> On Fri, Feb 28, 2025 at 09:51:15PM +0000, Lad, Prabhakar wrote:
+> > Hi All,
+> >
+> > I am bit confused related clocks naming in with respect to STMMAC drive=
+r,
+> >
+> > We have the below clocks in the binding doc:
+> > - stmmaceth
+> > - pclk
+> > - ptp_ref
+> >
+> > But there isn't any description for this. Based on this patch [0]
+> > which isn't in mainline we have,
+> > - stmmaceth - system clock
+> > - pclk - CSR clock
+> > - ptp_ref - PTP reference clock.
+> >
+> > [0] https://patches.linaro.org/project/netdev/patch/20210208135609.7685=
+-23-Sergey.Semin@baikalelectronics.ru/
+> >
+> > Can somebody please clarify on the above as I am planning to add a
+> > platform which supports the below clocks:
+> > - CSR clock
+> > - AXI system clock
+> > - Tx & Tx-180
+> > - Rx & Rx-180
+>
+> Please take a look at the recent patches to stmmac for clock handling,
+> in particular the clocks used for RGMII
+>
+Thank you for the pointer, Ive rebased my changes on this.
 
-In the case of a DUMP request, the ->prepare_data() and ->fill_reply()
-callbacks will be called with the req_info->dev being NULL, which can
-cause discrepancies in the behaviour between GET and DUMP results.
+> For the meaning of the clocks, you need to look at the vendors binding
+> document. Vendors tend to call the clocks whatever they want, rather
+> than have one consistent naming between vendors. The IP might be
+> licensed, but each vendor integrates it differently, inventing their
+> own clock names. It might of helped if Synopsis had requested in there
+> databook what each clock was called, so there was some consistency,
+> but this does not appear to of happened.
+>
+Thanks, I will have a look at vendors binding.
 
-The main impact is that ethnl_req_get_phydev() will not find any
-phy_device, impacting :
- - plca
- - pse-pd
- - stats
-
-Some other commands rely on req_info->dev, namely :
- - coalesce in ->fill_reply to look for an irq_moder
-
-Although cable_test and tunnels also rely on req_info->dev being set,
-that's not a problem for these commands as :
- - cable_test doesn't support DUMP
- - tunnels rolls its own ->dumpit (and sets dev in the req_info).
- - phy also has its own ->dumpit
-
-All other commands use reply_data->dev (probably the correct way of
-doing things) and aren't facing this issue.
-
-Simply set the dev in the req_info context when iterating to dump each
-dev.
-
-Fixes: c15e065b46dc ("net: ethtool: Allow passing a phy index for some commands")
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
-
-Fixes tag targets the phy-index commit, as it introduced a change in
-behaviour for PLCA. From what I can tell, coalesce never correctly
-detected irq_moder in DUMP requests.
-
-We could also consider fixing all individual commands that use
-req_info->dev, however I'm not actually sure it's incorrect to do so,
-feel free to correct me though.
-
-Maxime
-
- net/ethtool/netlink.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
-index b4c45207fa32..de967961d8fe 100644
---- a/net/ethtool/netlink.c
-+++ b/net/ethtool/netlink.c
-@@ -582,6 +582,7 @@ static int ethnl_default_dumpit(struct sk_buff *skb,
- 		dev_hold(dev);
- 		rcu_read_unlock();
- 
-+		ctx->req_info->dev = dev;
- 		ret = ethnl_default_dump_one(skb, dev, ctx, genl_info_dump(cb));
- 
- 		rcu_read_lock();
--- 
-2.48.1
-
+Cheers,
+Prabhakar
 
