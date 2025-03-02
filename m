@@ -1,202 +1,112 @@
-Return-Path: <netdev+bounces-170970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-170971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22C9CA4AE5E
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 00:23:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1298FA4AE7E
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 01:05:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0443188B536
-	for <lists+netdev@lfdr.de>; Sat,  1 Mar 2025 23:23:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2BA51894A94
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 00:05:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 347351D6DDA;
-	Sat,  1 Mar 2025 23:23:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9DC8A50;
+	Sun,  2 Mar 2025 00:05:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m8t4w7qf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TU4qahEI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D7F770808
-	for <netdev@vger.kernel.org>; Sat,  1 Mar 2025 23:23:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AD81191;
+	Sun,  2 Mar 2025 00:05:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740871420; cv=none; b=XjXHAd0rRFuXWaddkwKu82iTjyvcDtjHaiUWIftQWCF8no7cW4iIxyPPzZsumL+sbQlSfapm2IwaMXssQJISj+Rrh69XSN83G8BMelfBQea027nZC1wHOhQNIWS2CIlB4AKyTr43C9EHADdSJD30siH5DT5vxW1yom+fKh2NIiI=
+	t=1740873923; cv=none; b=quv4ew2YQyz8qUL4+4gDmVjcFvBlm/vWVFdC4i7qopRZDkGjnud3eyyaHfXeZ0wqMs2hnAgJj7Me2Ns18FQaK0UodkAKeAD9XPChUeZXmltP+xtkFA7sWM6BhoQG3eRMOH3f+0t+DCXTdqYG106Cp/YFjOsZDXFQJjyse4raTEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740871420; c=relaxed/simple;
-	bh=UyQgb+vzNU+0SZNfCmTAUHgtsZQ2K1rcC30RYOtUNKU=;
+	s=arc-20240116; t=1740873923; c=relaxed/simple;
+	bh=pNlHcVYXBb3wnhdO8V+5g9iulhvLVx8j8DP15FjqORM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OdXaZaqlrWowucIl+29BXqXa79zalVlR7cfMnD7rrkglDIDQIydUpYMVa2sU/QLZNTXog9n6oVpWxiZWpN05DJNUPZF/TxmGwENcq03MlAlhFixWITQxn8eNLurKfUthYL/p99TvvHdO3MkXeLgFMNyMa/qyV20lwkgVKZf6LHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=m8t4w7qf; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740871418; x=1772407418;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=UyQgb+vzNU+0SZNfCmTAUHgtsZQ2K1rcC30RYOtUNKU=;
-  b=m8t4w7qflQ+F263afb6VOB5Z3qchC1h6jiiGWDCapGydwnFvYj8BCmdp
-   LBCCBICtIYYEHSLLoWOYNnMGqaPnwF6JR8e4YEOU6g1hI0pLV4dkvEPe7
-   O4tPoVgGJxvkyfUmTfF/fzpQgUohh1jbEuhNnYxnX56y7DhbI1uC/JyAs
-   pKjWtAghO4uE5fYNhD/yuClCxVKhkrrvR/aQMYFrqQKQb4jFXurx6wwTh
-   MYRFPbMVjYc1ySs9MGxwVMWNtBqItGmXf6nEboN5Fb79RjJz5J5s6jd30
-   H0TpbAx0AMsri+VbT37POGUNRX6GTuuTcBvVlQy6z6DK766ZEcK58rXqP
-   Q==;
-X-CSE-ConnectionGUID: smpeZYnYQo2a4npDMn4roA==
-X-CSE-MsgGUID: 9/HRPk7ySGC0BMKyJoa0ew==
-X-IronPort-AV: E=McAfee;i="6700,10204,11360"; a="59318488"
-X-IronPort-AV: E=Sophos;i="6.13,326,1732608000"; 
-   d="scan'208";a="59318488"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2025 15:23:37 -0800
-X-CSE-ConnectionGUID: OeXhvlmlTjyfZuukmC1FKA==
-X-CSE-MsgGUID: vAyTAKFUTSirOg0xc41NMA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="118186861"
-Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
-  by orviesa007.jf.intel.com with ESMTP; 01 Mar 2025 15:23:36 -0800
-Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1toWBB-000GpS-1i;
-	Sat, 01 Mar 2025 23:23:33 +0000
-Date: Sun, 2 Mar 2025 07:22:37 +0800
-From: kernel test robot <lkp@intel.com>
-To: allison.henderson@oracle.com, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev
-Subject: Re: [PATCH 5/6] net/rds: rds_tcp_accept_one ought to not discard
- messages
-Message-ID: <202503020739.xWWyG7zO-lkp@intel.com>
-References: <20250227042638.82553-6-allison.henderson@oracle.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=dOzX87nmTFtHSLM0qK1dxylYw0JJl1X/2KOY4cB7a98pcT/NIRmpQGfjyiHfnpQGgT5KuvaIdsi9dV6IRiFC64+Jq4xzu/SsomR1aWq35JVmR9OLOORFFNOecVr4necAI0wKz9JoUQOjXN7CXQCYQyblK6ZrDKnr3uRh0a2KlRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TU4qahEI; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-22339936bbfso49097615ad.1;
+        Sat, 01 Mar 2025 16:05:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740873921; x=1741478721; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z2OyqeouO5QwwnloeGrC+8B6Ecolmoa4BOjTYKWnJQA=;
+        b=TU4qahEIEGAB4jLYwfC5sst66H573JkRYjzNqq3P+zyoBEz0N/vp8dzk8DEBOw6Sjt
+         8Cd0YeOfiXNtUhCgD3c4B7JgUZmaz27Q8jeOncQ6VKLmqSuhgc9Nbghglz7tdgHWbQ3n
+         cF+ALfFpOoN28Qg3bpwCRQVrypxF/RSETXHy7bS2byc27lolJ8F8nZOzdTiOgqrhSVGC
+         WVNLLdz8chb7/RLONJHZJv6OperIqOgMGIZiA36OmRjlxqyTX3pJdwLDCAfrg7YKjj5I
+         Wx0iRmh3gdkOI5rd7BiWf5prGuZtGMYz6F6ULf0E7Bh0C+ESccqcfjsWuao3bC5V5UWc
+         MDTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740873921; x=1741478721;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Z2OyqeouO5QwwnloeGrC+8B6Ecolmoa4BOjTYKWnJQA=;
+        b=RURdDseJP627LtS1MAjgKFGtmze1MpJe0XTWXbhZpuGVqJEDX0Bbm/l3zB8mQmIzAx
+         76mXgPIt5l8YQks+dJoKHVHf+HtqHkkaT8TGqUH84t30k37zfrvv+IuqLPNU5plw7JvY
+         rmu0GXfz5wl2uD6zrDvqMDO2iEyL1UFQ+zo4GoUaATnkoT9ikAdD/L22yy3gl3fh2vIs
+         fMmldQnx6/C9RxPx1leifGw9WPX6Dw6cRQHOpqybmOH0n1ntO8nakWsmBmmsEOm7C0W1
+         bj8UJbZio+mWtSMmnDeVPxs2JzSiB78SKOTJh81lNDUgK/SE2qjVWbmx2M7eZ7DSkTDm
+         Taiw==
+X-Forwarded-Encrypted: i=1; AJvYcCVI6N0e/3rW/CLxmB277aD0o1Q5rqxlKftfc/ZNmHIIiVUKeT1CRi3LU3fiFvkqtFN544E=@vger.kernel.org, AJvYcCVK2zMm49s02lsz7UZuSycl5KAobBbryUQ9YPycbuag3oBKDGo2Da+EuWKFunkCNCTIU2qnOkHF1uo5z/rD@vger.kernel.org, AJvYcCWLg9TFxVD+QzSzIEHXB1gt4epZSgb3u9f5KrhoLiZEVazWPBh8U1jnK7/eAMDekOeNpM7S2k4G@vger.kernel.org
+X-Gm-Message-State: AOJu0YwakPzR/0NH9L7frHWE6uJfzomy5R7uMMH/sPtyX4sl2c8wZPCF
+	2mLZrWMD2UbOEQjk3SKNduuMBDOei73srGRK1dwTuQIZfpNd77c=
+X-Gm-Gg: ASbGncuUDzykO9U97v45kXcWA92pX/px5Dlz+1xI5Q7ZCYffodjU1YbANBBh6bGPug7
+	7/VPKWuXyattfpS9vTlCLTjvYTqhRaqLxlmHu7iqft6EO47OY3Go5DKHGFGcafD4VUOlD4AlHIJ
+	4BaK41HMIvSxJDUL9iqgua4p1BdjJ0nO0B9NlW7B5qHBAk0ckOa0HIYsYf5znJSMnAdTE2R3Qmz
+	9WQKIcGjKTnG8+i/+FVL9zvT83CWCi0VX738xpytoj53ZyRAAkbLjKNXFcjR4RkQbf+zRPEdhyy
+	fMce+GMr35oDz6zslPzjfrR/bdTNit+fw9tKFqmaaC2a
+X-Google-Smtp-Source: AGHT+IEd9lfTivWnShpRqTxdD+vlD1k3kP332B8lqkJ6Uc4eu1+rjrqfcJ0w8LbcouW2Va/pgcnL4w==
+X-Received: by 2002:a05:6a00:b48:b0:730:4598:ddb5 with SMTP id d2e1a72fcca58-734ac338532mr13579526b3a.2.1740873921470;
+        Sat, 01 Mar 2025 16:05:21 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-7362a6d925bsm3282613b3a.66.2025.03.01.16.05.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 01 Mar 2025 16:05:21 -0800 (PST)
+Date: Sat, 1 Mar 2025 16:05:20 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Wang Liang <wangliang74@huawei.com>
+Cc: bjorn@kernel.org, magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, ast@kernel.org,
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+	yuehaibing@huawei.com, zhangchangzhong@huawei.com,
+	netdev@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] xsk: fix __xsk_generic_xmit() error code when cq
+ is full
+Message-ID: <Z8OgwFirBwWrdgH-@mini-arch>
+References: <20250227081052.4096337-1-wangliang74@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250227042638.82553-6-allison.henderson@oracle.com>
+In-Reply-To: <20250227081052.4096337-1-wangliang74@huawei.com>
 
-Hi,
+On 02/27, Wang Liang wrote:
+> When the cq reservation is failed, the error code is not set which is
+> initialized to zero in __xsk_generic_xmit(). That means the packet is not
+> send successfully but sendto() return ok.
+> 
+> Considering the impact on uapi, return -EAGAIN is a good idea. The cq is
+> full usually because it is not released in time, try to send msg again is
+> appropriate.
+> 
+> Suggested-by: Magnus Karlsson <magnus.karlsson@gmail.com>
+> Signed-off-by: Wang Liang <wangliang74@huawei.com>
 
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on net/main]
-[also build test WARNING on net-next/main linus/master v6.14-rc4 next-20250228]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/allison-henderson-oracle-com/net-rds-Avoid-queuing-superfluous-send-and-recv-work/20250227-123038
-base:   net/main
-patch link:    https://lore.kernel.org/r/20250227042638.82553-6-allison.henderson%40oracle.com
-patch subject: [PATCH 5/6] net/rds: rds_tcp_accept_one ought to not discard messages
-config: riscv-randconfig-002-20250302 (https://download.01.org/0day-ci/archive/20250302/202503020739.xWWyG7zO-lkp@intel.com/config)
-compiler: clang version 16.0.6 (https://github.com/llvm/llvm-project 7cbf1a2591520c2491aa35339f227775f4d3adf6)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250302/202503020739.xWWyG7zO-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202503020739.xWWyG7zO-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> net/rds/tcp_listen.c:137:6: warning: variable 'inet' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
-           if (!new_sock) {
-               ^~~~~~~~~
-   net/rds/tcp_listen.c:179:19: note: uninitialized use occurs here
-                    my_addr, ntohs(inet->inet_sport),
-                                   ^~~~
-   include/linux/byteorder/generic.h:142:27: note: expanded from macro 'ntohs'
-   #define ntohs(x) ___ntohs(x)
-                             ^
-   include/linux/byteorder/generic.h:137:35: note: expanded from macro '___ntohs'
-   #define ___ntohs(x) __be16_to_cpu(x)
-                                     ^
-   include/uapi/linux/byteorder/little_endian.h:43:59: note: expanded from macro '__be16_to_cpu'
-   #define __be16_to_cpu(x) __swab16((__force __u16)(__be16)(x))
-                                                             ^
-   include/uapi/linux/swab.h:105:31: note: expanded from macro '__swab16'
-           (__u16)(__builtin_constant_p(x) ?       \
-                                        ^
-   net/rds/tcp_listen.c:137:2: note: remove the 'if' if its condition is always true
-           if (!new_sock) {
-           ^~~~~~~~~~~~~~~
-   net/rds/tcp_listen.c:115:24: note: initialize the variable 'inet' to silence this warning
-           struct inet_sock *inet;
-                                 ^
-                                  = NULL
-   1 warning generated.
-
-
-vim +137 net/rds/tcp_listen.c
-
-   108	
-   109	int rds_tcp_accept_one(struct rds_tcp_net *rtn)
-   110	{
-   111		struct socket *listen_sock = rtn->rds_tcp_listen_sock;
-   112		struct socket *new_sock = NULL;
-   113		struct rds_connection *conn;
-   114		int ret;
-   115		struct inet_sock *inet;
-   116		struct rds_tcp_connection *rs_tcp = NULL;
-   117		int conn_state;
-   118		struct rds_conn_path *cp;
-   119		struct in6_addr *my_addr, *peer_addr;
-   120		struct proto_accept_arg arg = {
-   121			.flags = O_NONBLOCK,
-   122			.kern = true,
-   123		};
-   124	#if !IS_ENABLED(CONFIG_IPV6)
-   125		struct in6_addr saddr, daddr;
-   126	#endif
-   127		int dev_if = 0;
-   128	
-   129		mutex_lock(&rtn->rds_tcp_accept_lock);
-   130	
-   131		if (!listen_sock)
-   132			return -ENETUNREACH;
-   133	
-   134		new_sock = rtn->rds_tcp_accepted_sock;
-   135		rtn->rds_tcp_accepted_sock = NULL;
-   136	
- > 137		if (!new_sock) {
-   138			ret = sock_create_lite(listen_sock->sk->sk_family,
-   139					       listen_sock->sk->sk_type,
-   140					       listen_sock->sk->sk_protocol,
-   141					       &new_sock);
-   142			if (ret)
-   143				goto out;
-   144	
-   145			ret = listen_sock->ops->accept(listen_sock, new_sock, &arg);
-   146			if (ret < 0)
-   147				goto out;
-   148	
-   149			/* sock_create_lite() does not get a hold on the owner module so we
-   150			 * need to do it here.  Note that sock_release() uses sock->ops to
-   151			 * determine if it needs to decrement the reference count.  So set
-   152			 * sock->ops after calling accept() in case that fails.  And there's
-   153			 * no need to do try_module_get() as the listener should have a hold
-   154			 * already.
-   155			 */
-   156			new_sock->ops = listen_sock->ops;
-   157			__module_get(new_sock->ops->owner);
-   158	
-   159			rds_tcp_keepalive(new_sock);
-   160			if (!rds_tcp_tune(new_sock)) {
-   161				ret = -EINVAL;
-   162				goto out;
-   163			}
-   164	
-   165			inet = inet_sk(new_sock->sk);
-   166		}
-   167	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
