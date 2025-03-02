@@ -1,170 +1,148 @@
-Return-Path: <netdev+bounces-171027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C282A4B302
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 17:15:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DD8AA4B311
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 17:21:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 169C41893C1B
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 16:15:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03F1D3B118F
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 16:21:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19531E9B29;
-	Sun,  2 Mar 2025 16:14:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DBBA1E9B18;
+	Sun,  2 Mar 2025 16:21:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="G80g2gHm"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FlX0gW69"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C97971E9B1A;
-	Sun,  2 Mar 2025 16:14:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D744F6DCE1;
+	Sun,  2 Mar 2025 16:21:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740932059; cv=none; b=SG3pOfTgIIO9OygqGeRDJ9aEAIKFGfUgukEsm/BCSSk+Anb4aGBbENuyCwi/o6v0qsi3doPuduqnfHkGCaxPo98gEfnUZminKQmsSPtn0TruOlu2tcJ8XSE5BJlygBmiGUb7J/I2ibyoqgRmtATdi31S2BM0/iE+jddevNp5HOc=
+	t=1740932512; cv=none; b=EYaNHwWOTlbxNxKvw2wwTkitAN772IfdIijJIC5O5qKFREDAartxEBZ8WkCX6WtU8NDTJDdTnW3JfA4H3MYqCGo5RCouZoWnmfaoplmxwwvzdWBxUEBQREQ9UqKCxsyfRCakjL5bTgGD0RYpg8MuJkCduuLYkMvSyxFAfbcXwuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740932059; c=relaxed/simple;
-	bh=oxdHfYnR3WT0kdh9JqWocNJzCnrGPK7WPN31unxi4Bc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RSCFA+2+emxMCzp6hBxLWAw6PNU8knECVcYXrtxoAau15wMY71lLkLcsHwWRgBVU/lMrfnZwCZWIi/rC9VOlvlEBJt0K/Cnp31+mwKsX0c7u5E0odFj+Ob945Cgv6fDuiEkIpgEaGItgaBT3yB/yYkecF+XC0ualDRwMiJb7Gkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=G80g2gHm; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=+EEHHNKC7qnukuM0E3MdN9IeORIinbgYYPYrhGC8Q5A=; b=G8
-	0g2gHmzJXHxsPgc/TCzQPVOUWge4g3qPw7PvPwmyqNelMNt9FhOURO2BwwBibYY6Wavd9NuOkrtBp
-	DtG4YrCNj8AHmn+aif6O+vE5o6eyJkMuM70UrN/dKSOr3eyearHbFhYPf+4ivFHcmmeybainm4KLH
-	lCgr3nj7jawHEkQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tolwp-001Y9j-WA; Sun, 02 Mar 2025 17:13:48 +0100
-Date: Sun, 2 Mar 2025 17:13:47 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
-Cc: Mark Pearson <mpearson-lenovo@squebb.ca>, anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [Intel-wired-lan] [PATCH] e1000e: Link flap workaround option
- for false IRP events
-Message-ID: <698700ab-fd36-4a09-8457-a356d92f00ea@lunn.ch>
-References: <mpearson-lenovo@squebb.ca>
- <20250226194422.1030419-1-mpearson-lenovo@squebb.ca>
- <36ae9886-8696-4f8a-a1e4-b93a9bd47b2f@lunn.ch>
- <50d86329-98b1-4579-9cf1-d974cf7a748d@app.fastmail.com>
- <1a4ed373-9d27-4f4b-9e75-9434b4f5cad9@lunn.ch>
- <9f460418-99c6-49f9-ac2c-7a957f781e17@app.fastmail.com>
- <4b5b0f52-7ed8-7eef-2467-fa59ca5de937@intel.com>
+	s=arc-20240116; t=1740932512; c=relaxed/simple;
+	bh=52pDudCLy5AhZ4j0hH7KhcrSAihM60axh6yD50qOTO4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gt8YIJHky6ELyVgLeW6LiNJR/QQSuLI/idP7q1bHursVw4MzThsbINZOj4jD+VkbNuiTY8mEcv+TTUkDJp2nsqu3rj8Z83aYbYR4wrPOLyjCJbmjZTVglCFxScVnY4oHGSThovESBv8xlZi+fSnDAroaWoCUYhnUFUzk4hWM5SY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FlX0gW69; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id EF1E144336;
+	Sun,  2 Mar 2025 16:21:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1740932502;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=6KTI0fexig/v/YZZ5okK/ZmxEJpGbbOd4uN7XeT0n0A=;
+	b=FlX0gW69pr0SQ0QmBZ03K24X6i254aSpwzlDunm1meTY2K0r/sshpkW/fqhKZydE/rjvby
+	k/X4dl82LwvEkWsii4x329avVPk+h9kbh+m+D8f0b07biLOAk3sZtD9dAvA6yKb6L+zso8
+	4oRm2Z66hiaivrG0M35VrWDyK1yYPK9UQskrXB4Fi81xxwqBxJj2GA+k9rLRy46AV5qUCl
+	Vizwo1tniq5wtaJRl+acO7XVYtoWBxaH1N7yOMKjU9QeDHBXy3VbamhwSBqMRNQ1D+Br1t
+	KSTguT1tTMtOZVBl/TSg3F9r7fYYO6wwTilO76OWC4pvQ3Nd7ULNslI4DB99aA==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Simon Horman <horms@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>
+Subject: [PATCH net] net: ethtool: Set the req_info->dev on DUMP requests for each dev
+Date: Sun,  2 Mar 2025 17:21:36 +0100
+Message-ID: <20250302162137.698092-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <4b5b0f52-7ed8-7eef-2467-fa59ca5de937@intel.com>
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdelieeijecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeehtdehueefuedtkeduleefvdefgfeiudevteevuefhgfffkeekheeuffeuhefhueenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvuddprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvt
+ hesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Sun, Mar 02, 2025 at 03:09:35PM +0200, Lifshits, Vitaly wrote:
-> 
-> 
-> Hi Mark,
-> 
-> > Hi Andrew
-> > 
-> > On Thu, Feb 27, 2025, at 11:07 AM, Andrew Lunn wrote:
-> > > > > > +			e1e_rphy(hw, PHY_REG(772, 26), &phy_data);
-> > > > > 
-> > > > > Please add some #define for these magic numbers, so we have some idea
-> > > > > what PHY register you are actually reading. That in itself might help
-> > > > > explain how the workaround actually works.
-> > > > > 
-> > > > 
-> > > > I don't know what this register does I'm afraid - that's Intel knowledge and has not been shared.
-> > > 
-> > > What PHY is it? Often it is just a COTS PHY, and the datasheet might
-> > > be available.
-> > > 
-> > > Given your setup description, pause seems like the obvious thing to
-> > > check. When trying to debug this, did you look at pause settings?
-> > > Knowing what this register is might also point towards pause, or
-> > > something totally different.
-> > > 
-> > > 	Andrew
-> > 
-> > For the PHY - do you know a way of determining this easily? I can reach out to the platform team but that will take some time. I'm not seeing anything in the kernel logs, but if there's a recommended way of confirming that would be appreciated.
-> 
-> The PHY is I219 PHY.
-> The datasheet is indeed accessible to the public:
-> https://cdrdv2-public.intel.com/612523/ethernet-connection-i219-datasheet.pdf
+There are a few netlink commands that rely on the req_info->dev field
+being populated by ethnl in their ->prepare_data() and ->fill_reply().
 
-Thanks for the link.
+For a regular GET request, this will be set by ethnl_default_parse(),
+which calls ethnl_parse_header_dev_get().
 
-So it is reading page 772, register 26. Page 772 is all about LPI. So
-we can have a #define for that. Register 26 is Memories Power. So we
-can also have an #define for that.
+In the case of a DUMP request, the ->prepare_data() and ->fill_reply()
+callbacks will be called with the req_info->dev being NULL, which can
+cause discrepancies in the behaviour between GET and DUMP results.
 
-However, that does not really help explain how this helps prevent an
-interrupt. I assume playing with EEE settings was also played
-with. Not that is register appears to have anything to do with EEE!
+The main impact is that ethnl_req_get_phydev() will not find any
+phy_device, impacting :
+ - plca
+ - pse-pd
+ - stats
 
-> Reading this register was suggested for debug purposes to understand if
-> there is some misconfiguration. We did not find any misconfiguration.
-> The issue as we discovered was a link status change interrupt caused the
-> CSME to reset the adapter causing the link flap.
-> 
-> We were unable to determine what causes the link status change interrupt in
-> the first place. As stated in the comment, it was only ever observed on
-> Lenovo P5/P7systems and we couldn't ever reproduce on other systems. The
-> reproduction in our lab was on a P5 system as well.
-> 
-> 
-> Regarding the suggested workaround, there isn’t a clear understanding why it
-> works. We suspect that reading a PHY register is probably prevents the CSME
-> from resetting the PHY when it handles the LSC interrupt it gets. However,
-> it can also be a matter of slight timing variations.
+Some other commands rely on req_info->dev, namely :
+ - coalesce in ->fill_reply to look for an irq_moder
 
-I don't follow what you are saying here. As far as i can see, the
-interrupt handler will triggers a read of the BMCR to determine the
-link status. It should not matter if there is a spurious interrupt,
-the BMCR should report the truth. So does BMCR actually indicate the
-link did go down? I also see there is the usual misunderstanding with
-how BMCR is latching. It should not be read twice, processed once, it
-should be processed each time, otherwise you miss quick link down/up
-events.
+Although cable_test and tunnels also rely on req_info->dev being set,
+that's not a problem for these commands as :
+ - cable_test doesn't support DUMP
+ - tunnels rolls its own ->dumpit (and sets dev in the req_info).
+ - phy also has its own ->dumpit
 
-> We communicated that this solution is not likely to be accepted to the
-> kernel as is, and the initial responses on the mailing list demonstrate the
-> pushback.
+All other commands use reply_data->dev (probably the correct way of
+doing things) and aren't facing this issue.
 
-What it has done is start a discussion towards an acceptable
-solution. Which is a good thing. But at the moment, the discussion
-does not have sufficient details.
+Simply set the dev in the req_info context when iterating to dump each
+dev.
 
-Please could somebody describe the chain of events which results in
-the link down, and subsequent link up. Is the interrupt spurious, or
-does BMCR really indicate the link went down and up again?
+Fixes: c15e065b46dc ("net: ethtool: Allow passing a phy index for some commands")
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
 
-> On a different topic, I suggest removing the part of the comment below:
-> * Intel unable to determine root cause.
-> The issue went through joint debug by Intel and Lenovo, and no obvious spec
-> violations by either party were found. There doesn’t seem to be value in
-> including this information in the comments of upstream code.
+Fixes tag targets the phy-index commit, as it introduced a change in
+behaviour for PLCA. From what I can tell, coalesce never correctly
+detected irq_moder in DUMP requests.
 
-I partially agree. Assuming the root cause is not found, and a
-workaround is used, i expect a commit message with a detailed
-description of the chain of events which results in the link
-flap. Then a statement that the root cause is unknown, and lastly the
-commit message should say the introduced change, for unknown reasons,
-solves the issue, and is considered safe because.... Ideally the
-workaround should be safe for everybody, and can be just enabled.
+We could also consider fixing all individual commands that use
+req_info->dev, however I'm not actually sure it's incorrect to do so,
+feel free to correct me though.
 
-	Andrew
+Maxime
+
+ net/ethtool/netlink.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
+index b4c45207fa32..de967961d8fe 100644
+--- a/net/ethtool/netlink.c
++++ b/net/ethtool/netlink.c
+@@ -582,6 +582,7 @@ static int ethnl_default_dumpit(struct sk_buff *skb,
+ 		dev_hold(dev);
+ 		rcu_read_unlock();
+ 
++		ctx->req_info->dev = dev;
+ 		ret = ethnl_default_dump_one(skb, dev, ctx, genl_info_dump(cb));
+ 
+ 		rcu_read_lock();
+-- 
+2.48.1
+
 
