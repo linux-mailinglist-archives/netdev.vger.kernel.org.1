@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-171045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 710FCA4B44E
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 20:10:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61B13A4B45A
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 20:25:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F5A1169349
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 19:10:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 791CF16A3C3
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 19:25:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 495131EBA0D;
-	Sun,  2 Mar 2025 19:10:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91B621EB1BB;
+	Sun,  2 Mar 2025 19:25:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="B6urSYUr"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KQA0P2S0"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108531C5F3B;
-	Sun,  2 Mar 2025 19:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C143D2E630;
+	Sun,  2 Mar 2025 19:25:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740942645; cv=none; b=Q38uxAkHFo/AMrNFt2gQxNVPgON6PNxb1hJdrdnF65QZcgL5OZ3EZS7c7SjRXYceYwgMt1WkmV708LVsq10uaVHq1KkeNMagfLDXomKGD2i+ph5+VxuYIsGSJrbEVFfr7CCTujB9A3UuY2vmwbV54kgYnlzhUEEIPnl9M5Cuyvo=
+	t=1740943544; cv=none; b=Vjlg0wSg7lv6K5a0rgQ7V//LGOgFtyEwcplqZRb7pW5azektnB0H6SS5gP3StrEsJ1GXA0SwCkZbX4RxCRi+xvddBWn/mHPsjhnN7//hOltjH61CwK7pSViNZfUMnCBxr/0P2ZJlLb2VkNqbhrK5xH/QE3O0EhHRpguQ3R3kGBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740942645; c=relaxed/simple;
-	bh=JcZ+vMl+zjXx8xup6J9H0ZAOoYMsQu0rU+fdJTwpaBQ=;
+	s=arc-20240116; t=1740943544; c=relaxed/simple;
+	bh=bcP8aJJxsKa/KWTJKexAOrL1mPPbeI1txF9XNKtQrlQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LRn6TBdmJ1AyFYPEFSMbyiPPk8Hg40SHAl2lbFXkAdo5ncb8nJACQRGIjF45T0t8GVawhtLj90/65m/DC9jM4BtjRCkp0v6Y0ZVVyN8wsKbCaRJ1EVkGQ2wt5cSiY7djUR52w0Dd4dfcKE00piSXertDT+ByNc/LRh8wt6nLtWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=B6urSYUr; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=WaIVWGN9LuP1E2SimMhKnMGyVFGyRIXHzmdWUWmOi+P53rOmF0VMgLzft2a+ZpQMjdfNL0VGMMUS6zwrfYss+rEwph1/OaYLTPtjnJaDdkVyRZM34ItGXfZqx5wAZZQU7bqc7x+aHds4ZUSdw5EQQ7+MCfpw59GkxMuU1jlvKCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KQA0P2S0; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=IXF/lf9RkTF+j5lpFGM8UfHTw5xM20aqNxmAtRUwCzw=; b=B6urSYUrW1kGOkKWa8yrFzgQFz
-	i7bW8dVlm4httBvPnSc8962fMMtl2HE2UYGVNLiWBhDfaV0vCeHJ575n9ruOggIFzCTj/+Uc7VMn3
-	20WbnWJ5smlSyqLEBuAAxCaXeY4Vuiv7BpTYcTjq0brUw5V/BMFxAgGgfjBd0YDJkCcY=;
+	bh=j0CTaUExgsD2xbAb6YGTebdNGicGrr7+Ayy3shw6hew=; b=KQA0P2S00NDJ/9cRYqEVnarCHj
+	UlJKdEJp1pi35Y2CdYsLNRP/vSIDeup2hZPGYtvSinQ0DnMTgJvuAgmiwqJbOvRLvLef9MnyeATAE
+	xbLJ4HF6HKz3C1e96wyDx2L3McCeFNjmmNN3bTlW9OpFNG9dXLvzvtzTfT6PqLMKZk7E=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1toohm-001aK9-IT; Sun, 02 Mar 2025 20:10:26 +0100
-Date: Sun, 2 Mar 2025 20:10:26 +0100
+	id 1toowK-001aUg-T5; Sun, 02 Mar 2025 20:25:28 +0100
+Date: Sun, 2 Mar 2025 20:25:28 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Prabhakar <prabhakar.csengg@gmail.com>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -65,7 +65,7 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 Subject: Re: [PATCH 2/3] dt-bindings: net: Document GBETH bindings for
  Renesas RZ/V2H(P) SoC
-Message-ID: <a1dbb3e8-4a52-4cc2-8e7b-cf240f726d5e@lunn.ch>
+Message-ID: <c5a75f20-9b61-448e-941b-1106cd06ea04@lunn.ch>
 References: <20250302181808.728734-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
  <20250302181808.728734-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
 Precedence: bulk
@@ -78,38 +78,20 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20250302181808.728734-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-> +  interrupts:
+> +  clock-names:
 > +    items:
-> +      - description: Subsystem interrupt
-> +      - description: The interrupt to manage the remote wake-up packet detection
-> +      - description: The interrupt that occurs when Tx/Rx enters/exits the LPI state
-> +      - description: Per-channel transmission-0 completion interrupt
-> +      - description: Per-channel transmission-1 completion interrupt
-> +      - description: Per-channel transmission-2 completion interrupt
-> +      - description: Per-channel transmission-3 completion interrupt
-> +      - description: Per-channel receive-0 completion interrupt
-> +      - description: Per-channel receive-1 completion interrupt
-> +      - description: Per-channel receive-2 completion interrupt
-> +      - description: Per-channel receive-3 completion interrupt
-> +
-> +  interrupt-names:
-> +    items:
-> +      - const: macirq
-> +      - const: eth_wake_irq
-> +      - const: eth_lpi
-> +      - const: tx0
-> +      - const: tx1
-> +      - const: tx2
-> +      - const: tx3
-> +      - const: rx0
-> +      - const: rx1
-> +      - const: rx2
-> +      - const: rx3
+> +      - const: stmmaceth
+> +      - const: pclk
+> +      - const: ptp_ref
+> +      - const: tx
+> +      - const: rx
+> +      - const: tx-180
+> +      - const: rx-180
 
-There has already been a discussion about trying to make the clock
-names more uniform. But what about interrupts? Which of these are in
-the IP databook? What names does the databook use for these
-interrupts?
+As Russell said in an older thread, tx and tx-180 are effectively the
+same clock, but with an inverter added. You should be able to arrange
+the clock tree that if you enable tx, it also enables tx-180 as a
+parent/sibling relationship.
 
-	Andrew
+	       Andrew
 
