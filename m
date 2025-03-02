@@ -1,123 +1,170 @@
-Return-Path: <netdev+bounces-171026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83C2DA4B2E8
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 17:09:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C282A4B302
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 17:15:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 570C21676C1
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 16:08:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 169C41893C1B
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 16:15:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B41FE1EDA15;
-	Sun,  2 Mar 2025 16:07:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19531E9B29;
+	Sun,  2 Mar 2025 16:14:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=seltendoof.de header.i=@seltendoof.de header.b="k54U/7Dd"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="G80g2gHm"
 X-Original-To: netdev@vger.kernel.org
-Received: from server02.seltendoof.de (server02.seltendoof.de [168.119.48.163])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009DA1EBFED;
-	Sun,  2 Mar 2025 16:07:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.48.163
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C97971E9B1A;
+	Sun,  2 Mar 2025 16:14:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740931639; cv=none; b=Ef3982hmblbtJyAH7H6ef/j9Y1+IBeVhSXBDxZKxCvvE8OD/PgjUrZ9OCSk2Dl0x4wUdUqZ/tEyq7mI/tiAdDAbRm+DjNMxZmy0LyDRoGP5qhzRck2Q7DP6EpjlfE2rNpHNsdWU3yQ2WB75xmNcMmTr8oNieJnc4dF4chhOY5tM=
+	t=1740932059; cv=none; b=SG3pOfTgIIO9OygqGeRDJ9aEAIKFGfUgukEsm/BCSSk+Anb4aGBbENuyCwi/o6v0qsi3doPuduqnfHkGCaxPo98gEfnUZminKQmsSPtn0TruOlu2tcJ8XSE5BJlygBmiGUb7J/I2ibyoqgRmtATdi31S2BM0/iE+jddevNp5HOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740931639; c=relaxed/simple;
-	bh=RN76k8ewK6+gsyTcan9ooTB7HAoL+bwmZL7k3n+IX8Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AEzCQdliDIj9ktUJ5HtRkLR3imIwOwW8sZMGdyUFq7M4pGesLvi894T95E8bveyEwhzWi2A4F1Ss8cRy6ZvUol2Sxt880K5a7i3sDu1/p19yd3Rv8h+M1RUwokRFAtYiIbU2Yz5GWfatK9ptCpR1o6M/qCbm8lZOAQS58wvbHD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=seltendoof.de; spf=pass smtp.mailfrom=seltendoof.de; dkim=pass (2048-bit key) header.d=seltendoof.de header.i=@seltendoof.de header.b=k54U/7Dd; arc=none smtp.client-ip=168.119.48.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=seltendoof.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seltendoof.de
-From: =?UTF-8?q?Christian=20G=C3=B6ttsche?= <cgoettsche@seltendoof.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=seltendoof.de;
-	s=2023072701; t=1740931636;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fpiJeKuvGtt7uxh2hFS+dsziMi5lwoHgf9YFZ4de7gM=;
-	b=k54U/7DdT6xtoAVoeM2idgM1EIL6B5xU5Evn3d7IbnrfCB2uh2H/qmdz55n6qzYx70t3uH
-	0p35FZeateL7Ag1b3jOl59aFVU3uNUOoOaGtOoNKxNo3iH9LD7LNawzzrdlfxamMZoAHC1
-	T4vS4zw8LYD9l4XzCHBQ9dNgv8JAvXRo428TjONJUaI0xQTyFQMJX+VS52vdyUL23crlYb
-	+J4Sv/UqlrVYkluFgPUsjHozs8BE3AiLiM8Q1M8DmCmIduSNhFqN/T0n9qRtUf54yqrNCd
-	+sYwCjsV5cLzQ5txbqd95Gy8aMLJSbY4fHiroYyecsj9apwFsLeTUQqV7hOD+w==
-To: 
-Cc: =?UTF-8?q?Christian=20G=C3=B6ttsche?= <cgzones@googlemail.com>,
-	Serge Hallyn <serge@hallyn.com>,
-	Jan Kara <jack@suse.com>,
-	Julia Lawall <Julia.Lawall@inria.fr>,
-	Nicolas Palix <nicolas.palix@imag.fr>,
-	linux-kernel@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	cocci@inria.fr,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	Mina Almasry <almasrymina@google.com>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Christian Hopps <chopps@labn.net>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH v2 10/11] skbuff: reorder capability check last
-Date: Sun,  2 Mar 2025 17:06:46 +0100
-Message-ID: <20250302160657.127253-9-cgoettsche@seltendoof.de>
-In-Reply-To: <20250302160657.127253-1-cgoettsche@seltendoof.de>
-References: <20250302160657.127253-1-cgoettsche@seltendoof.de>
-Reply-To: cgzones@googlemail.com
+	s=arc-20240116; t=1740932059; c=relaxed/simple;
+	bh=oxdHfYnR3WT0kdh9JqWocNJzCnrGPK7WPN31unxi4Bc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RSCFA+2+emxMCzp6hBxLWAw6PNU8knECVcYXrtxoAau15wMY71lLkLcsHwWRgBVU/lMrfnZwCZWIi/rC9VOlvlEBJt0K/Cnp31+mwKsX0c7u5E0odFj+Ob945Cgv6fDuiEkIpgEaGItgaBT3yB/yYkecF+XC0ualDRwMiJb7Gkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=G80g2gHm; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=+EEHHNKC7qnukuM0E3MdN9IeORIinbgYYPYrhGC8Q5A=; b=G8
+	0g2gHmzJXHxsPgc/TCzQPVOUWge4g3qPw7PvPwmyqNelMNt9FhOURO2BwwBibYY6Wavd9NuOkrtBp
+	DtG4YrCNj8AHmn+aif6O+vE5o6eyJkMuM70UrN/dKSOr3eyearHbFhYPf+4ivFHcmmeybainm4KLH
+	lCgr3nj7jawHEkQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tolwp-001Y9j-WA; Sun, 02 Mar 2025 17:13:48 +0100
+Date: Sun, 2 Mar 2025 17:13:47 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
+Cc: Mark Pearson <mpearson-lenovo@squebb.ca>, anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [Intel-wired-lan] [PATCH] e1000e: Link flap workaround option
+ for false IRP events
+Message-ID: <698700ab-fd36-4a09-8457-a356d92f00ea@lunn.ch>
+References: <mpearson-lenovo@squebb.ca>
+ <20250226194422.1030419-1-mpearson-lenovo@squebb.ca>
+ <36ae9886-8696-4f8a-a1e4-b93a9bd47b2f@lunn.ch>
+ <50d86329-98b1-4579-9cf1-d974cf7a748d@app.fastmail.com>
+ <1a4ed373-9d27-4f4b-9e75-9434b4f5cad9@lunn.ch>
+ <9f460418-99c6-49f9-ac2c-7a957f781e17@app.fastmail.com>
+ <4b5b0f52-7ed8-7eef-2467-fa59ca5de937@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <4b5b0f52-7ed8-7eef-2467-fa59ca5de937@intel.com>
 
-From: Christian Göttsche <cgzones@googlemail.com>
+On Sun, Mar 02, 2025 at 03:09:35PM +0200, Lifshits, Vitaly wrote:
+> 
+> 
+> Hi Mark,
+> 
+> > Hi Andrew
+> > 
+> > On Thu, Feb 27, 2025, at 11:07 AM, Andrew Lunn wrote:
+> > > > > > +			e1e_rphy(hw, PHY_REG(772, 26), &phy_data);
+> > > > > 
+> > > > > Please add some #define for these magic numbers, so we have some idea
+> > > > > what PHY register you are actually reading. That in itself might help
+> > > > > explain how the workaround actually works.
+> > > > > 
+> > > > 
+> > > > I don't know what this register does I'm afraid - that's Intel knowledge and has not been shared.
+> > > 
+> > > What PHY is it? Often it is just a COTS PHY, and the datasheet might
+> > > be available.
+> > > 
+> > > Given your setup description, pause seems like the obvious thing to
+> > > check. When trying to debug this, did you look at pause settings?
+> > > Knowing what this register is might also point towards pause, or
+> > > something totally different.
+> > > 
+> > > 	Andrew
+> > 
+> > For the PHY - do you know a way of determining this easily? I can reach out to the platform team but that will take some time. I'm not seeing anything in the kernel logs, but if there's a recommended way of confirming that would be appreciated.
+> 
+> The PHY is I219 PHY.
+> The datasheet is indeed accessible to the public:
+> https://cdrdv2-public.intel.com/612523/ethernet-connection-i219-datasheet.pdf
 
-capable() calls refer to enabled LSMs whether to permit or deny the
-request.  This is relevant in connection with SELinux, where a
-capability check results in a policy decision and by default a denial
-message on insufficient permission is issued.
-It can lead to three undesired cases:
-  1. A denial message is generated, even in case the operation was an
-     unprivileged one and thus the syscall succeeded, creating noise.
-  2. To avoid the noise from 1. the policy writer adds a rule to ignore
-     those denial messages, hiding future syscalls, where the task
-     performs an actual privileged operation, leading to hidden limited
-     functionality of that task.
-  3. To avoid the noise from 1. the policy writer adds a rule to permit
-     the task the requested capability, while it does not need it,
-     violating the principle of least privilege.
+Thanks for the link.
 
-Signed-off-by: Christian Göttsche <cgzones@googlemail.com>
-Reviewed-by: Serge Hallyn <serge@hallyn.com>
----
- net/core/skbuff.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+So it is reading page 772, register 26. Page 772 is all about LPI. So
+we can have a #define for that. Register 26 is Memories Power. So we
+can also have an #define for that.
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index b1c81687e9d8..7ed538e15b56 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -1566,7 +1566,7 @@ int mm_account_pinned_pages(struct mmpin *mmp, size_t size)
- 	unsigned long max_pg, num_pg, new_pg, old_pg, rlim;
- 	struct user_struct *user;
- 
--	if (capable(CAP_IPC_LOCK) || !size)
-+	if (!size || capable(CAP_IPC_LOCK))
- 		return 0;
- 
- 	rlim = rlimit(RLIMIT_MEMLOCK);
--- 
-2.47.2
+However, that does not really help explain how this helps prevent an
+interrupt. I assume playing with EEE settings was also played
+with. Not that is register appears to have anything to do with EEE!
 
+> Reading this register was suggested for debug purposes to understand if
+> there is some misconfiguration. We did not find any misconfiguration.
+> The issue as we discovered was a link status change interrupt caused the
+> CSME to reset the adapter causing the link flap.
+> 
+> We were unable to determine what causes the link status change interrupt in
+> the first place. As stated in the comment, it was only ever observed on
+> Lenovo P5/P7systems and we couldn't ever reproduce on other systems. The
+> reproduction in our lab was on a P5 system as well.
+> 
+> 
+> Regarding the suggested workaround, there isn’t a clear understanding why it
+> works. We suspect that reading a PHY register is probably prevents the CSME
+> from resetting the PHY when it handles the LSC interrupt it gets. However,
+> it can also be a matter of slight timing variations.
+
+I don't follow what you are saying here. As far as i can see, the
+interrupt handler will triggers a read of the BMCR to determine the
+link status. It should not matter if there is a spurious interrupt,
+the BMCR should report the truth. So does BMCR actually indicate the
+link did go down? I also see there is the usual misunderstanding with
+how BMCR is latching. It should not be read twice, processed once, it
+should be processed each time, otherwise you miss quick link down/up
+events.
+
+> We communicated that this solution is not likely to be accepted to the
+> kernel as is, and the initial responses on the mailing list demonstrate the
+> pushback.
+
+What it has done is start a discussion towards an acceptable
+solution. Which is a good thing. But at the moment, the discussion
+does not have sufficient details.
+
+Please could somebody describe the chain of events which results in
+the link down, and subsequent link up. Is the interrupt spurious, or
+does BMCR really indicate the link went down and up again?
+
+> On a different topic, I suggest removing the part of the comment below:
+> * Intel unable to determine root cause.
+> The issue went through joint debug by Intel and Lenovo, and no obvious spec
+> violations by either party were found. There doesn’t seem to be value in
+> including this information in the comments of upstream code.
+
+I partially agree. Assuming the root cause is not found, and a
+workaround is used, i expect a commit message with a detailed
+description of the chain of events which results in the link
+flap. Then a statement that the root cause is unknown, and lastly the
+commit message should say the introduced change, for unknown reasons,
+solves the issue, and is considered safe because.... Ideally the
+workaround should be safe for everybody, and can be just enabled.
+
+	Andrew
 
