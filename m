@@ -1,75 +1,57 @@
-Return-Path: <netdev+bounces-171061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44314A4B4EE
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 22:34:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4C72A4B4F4
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 22:37:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C355188AC0B
-	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 21:34:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A57321890FCF
+	for <lists+netdev@lfdr.de>; Sun,  2 Mar 2025 21:38:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48D001EB9FF;
-	Sun,  2 Mar 2025 21:34:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B72EC1EDA3E;
+	Sun,  2 Mar 2025 21:37:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PYOvh62i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W2cSkjb2"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E7E713AF2;
-	Sun,  2 Mar 2025 21:34:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9621C3BE9;
+	Sun,  2 Mar 2025 21:37:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740951257; cv=none; b=Zp2xSsDZQKcn8bBQVp8M0UXswu8/aa8LRaHDDBieZ1n2M90xcJqKEiuz1NPk1WoI751CwqtsD1FrLuWiDqd3LRFh5ioqKRPBFX0HGfoi8LdNdo9azU/5JgR4BrytH7fAe93OHh+5C80azDleZx37/XMhptUQ6bbAT24DPbG7bJ4=
+	t=1740951471; cv=none; b=ZVftbys9YEMbndzTFWzCLSOgfsSaYNiKO8+NDUY9JRn/xCyV2rWINnbF4XjsCAOOJLqoocK6oARPvSwLWN2/rZWbJH8i1nLqBjsQef0Isnp2O+Ge4Z11Ol+MIu4u53KM5EfhCe486DRCJvybmL+KapymtcNpVLchvErOM3907gM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740951257; c=relaxed/simple;
-	bh=EcVTks8u1/lSKSH+VEHk4BTWhWV3/fcnwpliI9pwYyY=;
+	s=arc-20240116; t=1740951471; c=relaxed/simple;
+	bh=Wgxf63Ipcv8UPfI/p8lBtWriq28T9EuTCBgsysSB/ZQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uwp0JmdvOcXj4hYqXnz/dJvkeExS5YekndtHnw9BJ5fuB1KDknFlUtJHpNQCRyRd2zg1qjVl/JSQ9fgAf3aLodwayiljgaGIr79+6pQv6jNyZ6ODLLQaEd2+1Yad4zl87PHkRdkTVrS0reCNeePJh8iMHpQv8NbBstq6bBwwkLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PYOvh62i; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=f497gegEci+02syONskjbkNepSIjl7ZiAjck74yxeZk=; b=PYOvh62iH8Wk1BHYrPuQqWsakL
-	BXGaSwgTz525i0P6kUivxI0I4+9OeHzB1XSvY/GUocUuHTEQLSXA3FYtJeFB4oxFpUPG5b5B4xZ8/
-	S0899UtBtOHM6c27KSiMrXFzUin5bQ1w4qyvwbbgczHwOyewrd6xyXRGh7Cu5zMbIgWU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1toqwe-001bwG-0h; Sun, 02 Mar 2025 22:33:56 +0100
-Date: Sun, 2 Mar 2025 22:33:56 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Prabhakar <prabhakar.csengg@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH 2/3] dt-bindings: net: Document GBETH bindings for
- Renesas RZ/V2H(P) SoC
-Message-ID: <825379ce-f6dc-4c96-9a73-3562ffac79bc@lunn.ch>
-References: <20250302181808.728734-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250302181808.728734-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <a1dbb3e8-4a52-4cc2-8e7b-cf240f726d5e@lunn.ch>
- <Z8SxSU9lOgbNf0he@shell.armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=f+tbg9e7n2ENZAdX5D8pJUlUhBMqpqAqo39IYl5xS8cudLBFLVQK2gjlME/wcj7RC1jSMgdfM46d29lfVXyUvWGTRjQcwUqM8c+3LRJmYbXK5/IoaKLffO5N6dfdbp029uLJj9lsWG84EwDKSsfaIaNP8jImmQorlwyPDRQ7Jv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W2cSkjb2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14005C4CED6;
+	Sun,  2 Mar 2025 21:37:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740951471;
+	bh=Wgxf63Ipcv8UPfI/p8lBtWriq28T9EuTCBgsysSB/ZQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=W2cSkjb26U0ynFm1Gh9VzneNWevOT3h/eUGeEaXwPyA0aLkp1e+iH31VGJ2zS2f4p
+	 jj0EiThvfqTBzUIFGvgOVkn1LW6fzzbjEps5F8hNOBp10gvPCTdvjp+4eKFA7amN40
+	 oNbwaasmDgxWW91XAZLyDljn1d/nzu1D3inRXjhACzPyP0jxnjxLb9z8+vM9Ypf3EG
+	 sHdiCaWo1U+ZPei4AUitjTt65u0B/EKu74QZkEGr376e189FygCFQ5w24+IoQXDbRU
+	 1JlIcAqQrG2NUKkdc6ubVItxKLYsSkr3Vepn5P8ZAyHnjrs+Bcvp7cxejztuhddKuU
+	 eEavQscjhnPuQ==
+Date: Sun, 2 Mar 2025 13:37:42 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, David Howells <dhowells@redhat.com>,
+	Akinobu Mita <akinobu.mita@gmail.com>, Tejun Heo <htejun@gmail.com>
+Subject: Re: [PATCH v3 04/19] crypto: scatterwalk - add new functions for
+ copying data
+Message-ID: <20250302213742.GB2079@quark.localdomain>
+References: <20250219182341.43961-5-ebiggers@kernel.org>
+ <Z8P9eIGDlT3fs1gS@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,63 +60,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z8SxSU9lOgbNf0he@shell.armlinux.org.uk>
+In-Reply-To: <Z8P9eIGDlT3fs1gS@gondor.apana.org.au>
 
-On Sun, Mar 02, 2025 at 07:28:09PM +0000, Russell King (Oracle) wrote:
-> On Sun, Mar 02, 2025 at 08:10:26PM +0100, Andrew Lunn wrote:
-> > > +  interrupts:
-> > > +    items:
-> > > +      - description: Subsystem interrupt
-> > > +      - description: The interrupt to manage the remote wake-up packet detection
-> > > +      - description: The interrupt that occurs when Tx/Rx enters/exits the LPI state
-> > > +      - description: Per-channel transmission-0 completion interrupt
-> > > +      - description: Per-channel transmission-1 completion interrupt
-> > > +      - description: Per-channel transmission-2 completion interrupt
-> > > +      - description: Per-channel transmission-3 completion interrupt
-> > > +      - description: Per-channel receive-0 completion interrupt
-> > > +      - description: Per-channel receive-1 completion interrupt
-> > > +      - description: Per-channel receive-2 completion interrupt
-> > > +      - description: Per-channel receive-3 completion interrupt
-> > > +
-> > > +  interrupt-names:
-> > > +    items:
-> > > +      - const: macirq
-> > > +      - const: eth_wake_irq
-> > > +      - const: eth_lpi
-> > > +      - const: tx0
-> > > +      - const: tx1
-> > > +      - const: tx2
-> > > +      - const: tx3
-> > > +      - const: rx0
-> > > +      - const: rx1
-> > > +      - const: rx2
-> > > +      - const: rx3
+On Sun, Mar 02, 2025 at 02:40:56PM +0800, Herbert Xu wrote:
+> Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> > +void memcpy_from_sglist(void *buf, struct scatterlist *sg,
+> > +                       unsigned int start, unsigned int nbytes)
+> > {
+> >        struct scatter_walk walk;
+> > -       struct scatterlist tmp[2];
 > > 
-> > There has already been a discussion about trying to make the clock
-> > names more uniform. But what about interrupts? Which of these are in
-> > the IP databook? What names does the databook use for these
-> > interrupts?
+> > -       if (!nbytes)
+> > +       if (unlikely(nbytes == 0)) /* in case sg == NULL */
+> >                return;
+> > 
+> > -       sg = scatterwalk_ffwd(tmp, sg, start);
+> > +       scatterwalk_start_at_pos(&walk, sg, start);
+> > +       memcpy_from_scatterwalk(buf, &walk, nbytes);
+> > +}
+> > +EXPORT_SYMBOL_GPL(memcpy_from_sglist);
+> > +
+> > +void memcpy_to_sglist(struct scatterlist *sg, unsigned int start,
+> > +                     const void *buf, unsigned int nbytes)
 > 
-> >From a quick look, I haven't found anything that suggests the above
-> is possible, but it clearly is... so I'll look more tomorrow.
+> These functions duplicate sg_copy_buffer.  Of course scatterwalk
+> in general duplicates SG miter which came later IIRC.
+> 
+> What's your plan for eliminating this duplication?
+> 
+> Thanks,
 
-stmmac_platform.c:	stmmac_res->irq = platform_get_irq_byname(pdev, "macirq");
-stmmac_platform.c:		platform_get_irq_byname_optional(pdev, "eth_wake_irq");
-stmmac_platform.c:		platform_get_irq_byname_optional(pdev, "eth_lpi");
-stmmac_platform.c:		platform_get_irq_byname_optional(pdev, "sfty");
+The new functions are much better than the lib/scatterlist.c ones: they have a
+much better implementation that is faster and doesn't use atomic kmaps, and
+(like scatterwalk_map_and_copy() which they are replacing first) they don't
+require the unhelpful 'nents' parameter.  My tentative plan is to move them into
+lib/scatterlist.c, reimplement sg_copy_buffer() et al on top of them, then
+eventually update the callers to use the new functions directly.
 
-So it looks like these are already in common code. So there should be
-no need to name them in individual bindings, they can be named in the
-common binding, and the vendor binding then just needs to indicate
-they are required, or not.
+However, the 'nents' parameter that sg_copy_buffer() et al take will make the
+unification a bit difficult.  Currently those functions copy the minimum of
+'buflen' bytes and the first 'nents' scatterlist elements.  I'd like to remove
+the 'nents' parameter and just have 'buflen' (or rather 'nbytes'), like the
+crypto/scatterwalk.c functions.  I suspect that nearly all callers are passing
+in enough 'nents' to cover their 'buflen'.  But there may be some exceptions,
+which we'll need to check for.
 
-What i have not yet figure out is how the names tx0, .. tx3 in this
-binding are used. There is no code added in this patchset. Yet
-loongson_dwmac_msi_config() and the intel stmmac_config_multi_msi()
-are the only ones setting res->tx_irq[], neither of which are using
-DT? I must be missing something somewhere.
-
-    Andrew
-
-
+- Eric
 
