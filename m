@@ -1,104 +1,109 @@
-Return-Path: <netdev+bounces-171781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81D3AA4EB68
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:25:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92DC1A4EBD6
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:36:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 703F43BF88A
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:48:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0543F168275
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:32:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F7BD25FA14;
-	Tue,  4 Mar 2025 17:26:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 544C6205AC7;
+	Tue,  4 Mar 2025 18:23:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="VUOQXwyk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="swyEXDmw"
 X-Original-To: netdev@vger.kernel.org
-Received: from beeline1.cc.itu.edu.tr (beeline1.cc.itu.edu.tr [160.75.25.115])
+Received: from beeline3.cc.itu.edu.tr (beeline3.cc.itu.edu.tr [160.75.25.117])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB243259C8F
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:26:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=160.75.25.115
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88EB72E3371
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 18:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=160.75.25.117
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741109176; cv=pass; b=TkxYMd620yqzx4tKik3QtoGhQsj6x5cJVBbz46VuEjqaov5Wdzzlu8Z4kYn+li953XLO9hAuQZoLfqO5G1U3htsQ+bVM9Bzh0YF9p+6wodEoOrpanKn/Ki9mfI++KbKWgKUJkFFfM7RSt0oWZGstu+8dlLQFnvJA1/1t5EqKbYs=
+	t=1741112628; cv=pass; b=pNq9KlvmJwYSmgFMgdJn+MI7cczdMUKi1e4JvSzttfxNni/A7pEApCqPUgTWd2f6Jmj3ZXLg2VQhgghzcCoaVMOrCUnNM2Y4LjtpL9Dj13fMY+J1b+uwWPkWa0h/ovFXxUvEi9dne7uOLaZWcLrX0WEe+08C5UM5IwRVpTCHzfk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741109176; c=relaxed/simple;
-	bh=bK2QYxfhL69EA5hm+p1hxMIpBV4AYdVsRtMU8Btuowc=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=GnNrDkNuGqqL42pv4mIxk6UOFaHBFWRYosqYuB+Wxbhy6rafxX0TtAHh5JMzWeF+b/6RvFzQFnyLs+7Pn5BN4l00jnnujNVyAPS3ab0W3Y0euUUM6NeaUbHpkTUEs5D5QhhV01bIpj/Dgixu2IjXNYhUBxOTMkrUHFn0k79sN5g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=VUOQXwyk; arc=none smtp.client-ip=212.227.15.3; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; arc=pass smtp.client-ip=160.75.25.115
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+	s=arc-20240116; t=1741112628; c=relaxed/simple;
+	bh=o/Y21k3K8BAtGuRlqRGQ5WfAu2QMrDK4uLxkfdiPHqw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TeSqHX21dphDmZqXMqw3VFH/6lrt0y3qnDDvs9NSsG/sNVjKvmVtb9tPqNTGxFE/EDLSScGls14hprEjx0sw7NymLe44c3PTNhm8etlNuqbRn99bYu0GiihoM/9yyTbBLG7/a4Z9n5TwnTz5fc2EfAZOElbNAeAcvVRFa1lTPgw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=kernel.org; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=swyEXDmw; arc=none smtp.client-ip=10.30.226.201; arc=pass smtp.client-ip=160.75.25.117
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=cc.itu.edu.tr
 Received: from lesvatest1.cc.itu.edu.tr (unknown [10.146.128.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
 	(No client certificate requested)
-	by beeline1.cc.itu.edu.tr (Postfix) with ESMTPS id 5EC70408B645
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 20:26:13 +0300 (+03)
+	by beeline3.cc.itu.edu.tr (Postfix) with ESMTPS id C31EF40D1F5C
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 21:23:44 +0300 (+03)
 X-Envelope-From: <root@cc.itu.edu.tr>
 Authentication-Results: lesvatest1.cc.itu.edu.tr;
-	dkim=pass (2048-bit key, unprotected) header.d=web.de header.i=markus.elfring@web.de header.a=rsa-sha256 header.s=s29768273 header.b=VUOQXwyk
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20201202 header.b=swyEXDmw
 Received: from lesva1.cc.itu.edu.tr (unknown [160.75.70.79])
-	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6gLx0KXwzG1vn
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 18:58:01 +0300 (+03)
+	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6dnT5GNkzFxGd
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:47:25 +0300 (+03)
 Received: by le1 (Postfix, from userid 0)
-	id 3469C42727; Tue,  4 Mar 2025 18:57:54 +0300 (+03)
+	id 755C84271F; Tue,  4 Mar 2025 17:47:08 +0300 (+03)
 Authentication-Results: lesva1.cc.itu.edu.tr;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=VUOQXwyk
-X-Envelope-From: <linux-kernel+bounces-541758-bozkiru=itu.edu.tr@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=swyEXDmw
+X-Envelope-From: <linux-kernel+bounces-541768-bozkiru=itu.edu.tr@vger.kernel.org>
 Authentication-Results: lesva2.cc.itu.edu.tr;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=VUOQXwyk
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=swyEXDmw
 Received: from fgw2.itu.edu.tr (fgw2.itu.edu.tr [160.75.25.104])
-	by le2 (Postfix) with ESMTP id A492741AEC
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:06:13 +0300 (+03)
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by fgw2.itu.edu.tr (Postfix) with SMTP id 77F282DCE1
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:06:13 +0300 (+03)
+	by le2 (Postfix) with ESMTP id 3292E4205E
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:10:35 +0300 (+03)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by fgw2.itu.edu.tr (Postfix) with SMTP id 72E112DCDE
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:10:34 +0300 (+03)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CEB331894239
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:05:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8DDA7A3FF0
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:09:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2301212B3D;
-	Mon,  3 Mar 2025 13:04:52 +0000 (UTC)
-Received: from mout.web.de (mout.web.de [212.227.15.3])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ADA02116E7;
+	Mon,  3 Mar 2025 13:09:53 +0000 (UTC)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D1691E521B;
-	Mon,  3 Mar 2025 13:04:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 699F121128D;
+	Mon,  3 Mar 2025 13:09:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741007089; cv=none; b=cpMyCf+gUDsC6WBIGjZgyDZfN7UE7fdYAkATO83fODmPtbw0r43gUnPcwA3g7BsZZG4YpkXctPHmumkEp6IwfxH/a8y9XDOAlFwbZcSzeUaWilZZsmCfu33s2rdsM8XAcFxfkP+DA6kc+mh3poLYcd3J3yZA8FmsoqCoRHFj1lA=
+	t=1741007390; cv=none; b=FdJQf3C0V6z+/iJwkmai9q0EUpkpGnF1m2ZxTM1etBOl94WxqZl777yR/R9sL5atzBdVh3RVqXu90sVcdjcxdVN6ecQDpRS16lrD0gfWxfhs9yViKbruy4/qD7xjW0m7VSrvugKXVdP0+lWjyzXALv0FFGqta0ijY3O0j3N1Kvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741007089; c=relaxed/simple;
-	bh=bK2QYxfhL69EA5hm+p1hxMIpBV4AYdVsRtMU8Btuowc=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=dG1fwNcCz69IlVFD6gjYVU4A70DR9UEhlrKHVC4iNgWq54We9QdhddqVZazhr8MhEpa7Ncy6bfS31h1oWYgnXlWyWjGO7g1ndfLytl+MvUzBWakz6hHezOMyGfDz1lM+uWeJlsW9Zn1+JzXFBe4WjTWOO/JOJr4H7U01+9089ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=VUOQXwyk; arc=none smtp.client-ip=212.227.15.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1741007051; x=1741611851; i=markus.elfring@web.de;
-	bh=ZefGaaDikQnjs1LGtmcyi6zUvqK48gTikrVFialZuG8=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:From:To:
-	 Cc:References:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=VUOQXwykHDmRACVU8X33Rt1uW0UUPZiZAC3Wcg0Y4VnTpWz4BJHox8LC2q2aKGj3
-	 /mteEDNZVtYMlJSp50eLAIXVzEQLyajTwhoQZ8gMklF1Fbplz20+4rl9bh8voktCh
-	 7cEYgDwORv85DsKoYhyMiLyQD9/mtqoDk/a6zvi5VYslE9kHUVMJn5N9HurQ4F4tP
-	 5oVv4t8BOx3GfzzP/nkB85IB/UxtjUUx2/CoLb1UzVdyetd4DHwEikdRx3/L0wiJj
-	 21HPZDsF/vGDINJjIVvDtdhH8IrYJpCcLChljjeT/Ck9u+8UwVzVNcTsPuCaLYiBV
-	 I9OSbhrL7JEIcdruKw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.93.19]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1Mpl0r-1tTkt42vvR-00eFMs; Mon, 03
- Mar 2025 14:04:11 +0100
-Message-ID: <535ce5e9-9ad0-4a8e-9fc2-0e759417d1b5@web.de>
-Date: Mon, 3 Mar 2025 14:04:08 +0100
+	s=arc-20240116; t=1741007390; c=relaxed/simple;
+	bh=o/Y21k3K8BAtGuRlqRGQ5WfAu2QMrDK4uLxkfdiPHqw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mz7JZMWxnvOViyg8wVY04DyIRkeqKZ+oEu4ZRiyHuhsz5XHQAl4r+EPFNofGblR1kzaeuO1bDyHQYI3x3/kvs/Us9qzqx9ZKaSwV8FxRKnWiUukBuq2XVG0R+M+BLWgV2o04O848YMZn6SrWCeruRRF5vxKBVjOHVAwVhkNbQDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=swyEXDmw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4727C4CED6;
+	Mon,  3 Mar 2025 13:09:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741007389;
+	bh=o/Y21k3K8BAtGuRlqRGQ5WfAu2QMrDK4uLxkfdiPHqw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=swyEXDmw0R0g7ZRw44ogOiq1HHP3y2FeZWG29C850ReRwgC8lzNdttVBTaHFVe65o
+	 zVYLN/A4vGP8u73Ji/YrtcfHWGBO9pVsAXxaZDTIvI6w4WA5owD39ZYG+WPsqvtxtt
+	 6rfvzRPiOvRX9p4m3FK9k0hAmJI4VifjelwS3VIi+Qqzx89O2pq8cSMhGEWt4zeX5g
+	 /J7PQGlObpo+3VnrZr33tGBzuiHEkzryDdXAGsvjicCP+5GLyi2yw93+6o12fFMSVU
+	 ytDYWysry3KgQaYBbbyO5mF0BnaqsPZnYFKudU33iNwWvClH0C+6o57GuX/9dcgFSt
+	 U2WifXCRtyomg==
+Date: Mon, 3 Mar 2025 13:09:45 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jaakko Karrenpalo <jkarrenpalo@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lukasz Majewski <lukma@denx.de>,
+	MD Danish Anwar <danishanwar@ti.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Jaakko Karrenpalo <jaakko.karrenpalo@fi.abb.com>
+Subject: Re: [PATCH net-next v3 2/2] net: hsr: Add KUnit test for PRP
+Message-ID: <20250303130945.GS1615191@kernel.org>
+References: <20250227050923.10241-1-jkarrenpalo@gmail.com>
+ <20250227050923.10241-2-jkarrenpalo@gmail.com>
 Precedence: bulk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -106,121 +111,30 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH RESEND] iwlegacy: Adjust input parameter validation in
- il_set_ht_add_station()
-From: Markus Elfring <Markus.Elfring@web.de>
-To: kernel-janitors@vger.kernel.org, linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Johannes Berg <johannes.berg@intel.com>, Kalle Valo <kvalo@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Sriram R <quic_srirrama@quicinc.com>,
- Stanislaw Gruszka <stf_xl@wp.pl>
-Cc: cocci@inria.fr, LKML <linux-kernel@vger.kernel.org>,
- Simon Horman <horms@kernel.org>
-References: <40c60719-4bfe-b1a4-ead7-724b84637f55@web.de>
- <1a11455f-ab57-dce0-1677-6beb8492a257@web.de>
- <d90b8c11-7a40-eec4-007d-3640c0725a56@web.de>
-Content-Language: en-GB
-In-Reply-To: <d90b8c11-7a40-eec4-007d-3640c0725a56@web.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:jymu+Pr/1TM+UE1JmuPUEORIpf2+qiF1lVGAScvypt9vYK8bt5v
- idl/iM8PTR6GeLd8dQ/PV/NBe0QVMImhaGA/no3YROXP3+O/ZMOy4OehC8kK1NC2wLPrUvt
- mJEk30C10DOjyID6CK8aBMgsaNMkOjtScGq/Ry79uPBtaLQhcIZOOcMSxwHv5KgFjxKOoBL
- v2j/MsWi3yyovatcuxhRQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:uVOiMT9twh4=;NMDytpay6lIFj3dsqdE/Z4Yl4c/
- t592kNeaCLxQJXeAmgukVFmcI623zCrOqNmZIWtsJOfMWfm+KPzGUaD+bukKKNt9QupSsprUS
- eryIqHbO+P/CgFsCs1cljKSTsUodBNmNHfg77J9K9QBRh1hdQXs5hXrrQgcECr0ih/FdOLxp9
- 2fDlGbiCR7yzXHW+wCiZk3bhQRf5T4E3x+UwpNZ2rsn+jtnlk9EEAKZpv7gtmJjOtKZt1dB1p
- yQ8kYbxeBgbcZLAFMz6ospRvWCf2B3lWMZcCRiWipObsYtnM50kFRxxFFeEXih2S2+HWHG69w
- hnd0HWQW5MbxO96aDIAvpIFGWFcPGDY9DGArE8VvtUuOeRH/jk7A/AkqBpJ5CymTc22IvTRH9
- 8zdrwBZMhC4SDK8KWAbiALVy6j7y1nOQrNX89TgvE3oTACLW1/uAkP1+A2N3jPMtRyF9CZKtA
- jbLt6Fvk+0inAjpbIzXZyA05rNpP2SnBvm9cXlQGWe+/D5xoNx6cmX2vi3QNLxndGhhTWWIUO
- G2yu6Gp7Y5vZAllrjWB104TQ754TBOIZPJi7LmnCAJ3j9ej471RsuyRpHiI81YYff01NJva9d
- rsSTkuTeucTVezfTplviL/cLvGGGqIYzTqDWPhYaMPElMWJAyJEmFtpvfxceZYMA3t6nvDdEZ
- l+qWL5NbV0cdTRnnXXMCzpQztkXihe/fnS+sKq8DwJORqkMr18CUKj5t52cu4114jpS9E0d4r
- IhdFDt6gq9jRO7dADQtmHKsBAnMnjLcDK3VsJxUlaDYefXnQCGNdSrQmAEtUupKnKL0ESYJSM
- W+xqVwjbpQqGdyKGwi9xfI+wCpAxx5Sg/McPGYwVFJjKNhsv1TyDqwIZqt1JNvHQKvuTxAk5x
- FQ1LdHN7h+4+K31L9Uv/D0bjGxvNzAzkC9nXad5AZ8VZWc2+OS47kOkSeRbY9auS4jZfQCi9B
- 0K5eXCYA6BCFP+JwYOWe7B2dWfhx7rFft289lQFW2cuhThgcSJk/aD7KGMORPxbRqhMem2iNE
- /Aqj2uDhNAZvQOlK/zulc6hWf0Q4ckiBnN96Q704GV988t+wFWn54jXGUbHODCfM17hBs2Suv
- wrfLBztoieDegRtA6YBhegRCL/EG1WhaB1AkEbA4y+r07nC2JkJWBVvll11IyjtLdfIn7jCSz
- pvCsN5ZljvPq3QXxY9wQTCArITqU8afvoGTFGXQbgFDG4zTO9MKk7iauXDiMQXn9IXv3Aju3u
- etaLLjGHpdY1L6t7AvuuDo9XbPTuJy3wYJXWsYI1EZqrtwrWZnJZaIsGkuojCz88m4mGL9tJ6
- WTviBm2dVQrszANHsNdjCfWLuRyhDTiMmRiD5s9tvYImRQs87/tkZQ0E2XCfA3FcPoZ2JVx0Z
- Jzxe5c4toDudXb1oe93JEGuRP3EMfJjmXDLdg3e/p7uwvAOIwB5PwuInPuBnhLLYC2XgNNixo
- iVdIJYNXq3AFU7mVU129qBvfhyk4=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250227050923.10241-2-jkarrenpalo@gmail.com>
 X-ITU-Libra-ESVA-Information: Please contact Istanbul Teknik Universitesi for more information
-X-ITU-Libra-ESVA-ID: 4Z6gLx0KXwzG1vn
+X-ITU-Libra-ESVA-ID: 4Z6dnT5GNkzFxGd
 X-ITU-Libra-ESVA: No virus found
 X-ITU-Libra-ESVA-From: root@cc.itu.edu.tr
-X-ITU-Libra-ESVA-Watermark: 1741713861.54378@CQoivE6TBxg6wCO6SHKlPw
+X-ITU-Libra-ESVA-Watermark: 1741717319.35637@LpZ7G1Avqw/QNVkVZhi1eA
 X-ITU-MailScanner-SpamCheck: not spam
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Wed, 19 Apr 2023 18:35:55 +0200
+On Thu, Feb 27, 2025 at 07:09:23AM +0200, Jaakko Karrenpalo wrote:
+> Add unit tests for the PRP duplicate detection
+> 
+> Signed-off-by: Jaakko Karrenpalo <jkarrenpalo@gmail.com>
+> ---
+> Changes in v2:
+> - Changed KUnit tests to compile as built-in only
+> Changes in v3:
+> - Changed the KUnit tests to compile as a module
 
-The address of a data structure member was determined before
-a corresponding null pointer check in the implementation of
-the function =E2=80=9Cil_set_ht_add_station=E2=80=9D.
+Thanks, I see that this addresses Paolo's review of v2
+and overall looks good to me.
 
-Thus avoid the risk for undefined behaviour by moving the assignment
-for the variable =E2=80=9Csta_ht_inf=E2=80=9D behind the null pointer chec=
-k.
-
-This issue was detected by using the Coccinelle software.
-
-
-Delete also the jump target =E2=80=9Cdone=E2=80=9D by using return stateme=
-nts directly
-for two if branches.
-
-Fixes: 046d2e7c50e3 ("mac80211: prepare sta handling for MLO support")
-Fixes: e7392364fcd1 ("iwlegacy: indentions and whitespaces")
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-=2D--
- drivers/net/wireless/intel/iwlegacy/common.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/wireless/intel/iwlegacy/common.c b/drivers/net/wi=
-reless/intel/iwlegacy/common.c
-index 96002121bb8b..8f6fd17b02a8 100644
-=2D-- a/drivers/net/wireless/intel/iwlegacy/common.c
-+++ b/drivers/net/wireless/intel/iwlegacy/common.c
-@@ -1863,11 +1863,15 @@ EXPORT_SYMBOL(il_send_add_sta);
- static void
- il_set_ht_add_station(struct il_priv *il, u8 idx, struct ieee80211_sta *s=
-ta)
- {
--	struct ieee80211_sta_ht_cap *sta_ht_inf =3D &sta->deflink.ht_cap;
-+	struct ieee80211_sta_ht_cap *sta_ht_inf;
- 	__le32 sta_flags;
-
--	if (!sta || !sta_ht_inf->ht_supported)
--		goto done;
-+	if (!sta)
-+		return;
-+
-+	sta_ht_inf =3D &sta->deflink.ht_cap;
-+	if (!sta_ht_inf->ht_supported)
-+		return;
-
- 	D_ASSOC("spatial multiplexing power save mode: %s\n",
- 		(sta->deflink.smps_mode =3D=3D IEEE80211_SMPS_STATIC) ? "static" :
-@@ -1906,8 +1910,6 @@ il_set_ht_add_station(struct il_priv *il, u8 idx, st=
-ruct ieee80211_sta *sta)
- 		sta_flags &=3D ~STA_FLG_HT40_EN_MSK;
-
- 	il->stations[idx].sta.station_flags =3D sta_flags;
--done:
--	return;
- }
-
- /*
-=2D-
-2.40.0
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
 
