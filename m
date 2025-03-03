@@ -1,134 +1,250 @@
-Return-Path: <netdev+bounces-171258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0DA9A4C35E
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 15:31:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79900A4C3B6
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 15:45:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35A9C3A7B88
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 14:30:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67C7E1895A4B
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 14:45:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01CDA7DA93;
-	Mon,  3 Mar 2025 14:31:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CF811553AA;
+	Mon,  3 Mar 2025 14:45:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HlCcpGBE"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="cpHL34xq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E6B8CA5A
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 14:31:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B3341C6A
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 14:45:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741012262; cv=none; b=Vs2RlIDxFxEQ8CL+X4xNJ7nRtvQECkNIlaNYIp5eD6fLnTIz01PaEDis/GZeF2gfgNxQgbaeFO4uB7BVrobu1reQZ68LGMOXquXYONYfIDj5pK3QuZuaS5MVCzLg/r6CgW8R0kRj0gO1fcIakENjgQq4+ytuRNZVEbpbgwE7hZM=
+	t=1741013129; cv=none; b=obmrZJeu569jAybFZZTUJHGuYb8leD4GNkRpkKTn4nKafg5gZGSWb3m9QJ2w5m7xcHftqrR6TMKDTQFYQvCMjDU60zNqfMziAcUHNvZGEOy9FjIuOSvSv7/A5OzfZFyS93U7WFgguJbAfZmKn9q3+30hlItJC2VXNLoQ3UyJNls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741012262; c=relaxed/simple;
-	bh=ZJKhQGEooGq39rnfsvpaIWYHgRiDneuKaSTO0NdW6gc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GkXTRrsB8mjZFS5pbiyiGLxfrb6hTa/azmNNWkiiqLuJLLDefwbaubIB/AUH/EA89E5JTjgLlO7SsyWJUi8y98NChPmvKpoeJ38EcYx17lQGpRIJ3KfjjQKcO5mzvK0L4UYGraNczaAyw1DbMHJqTZnqaNG2d0bzTTY/nIdlGOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HlCcpGBE; arc=none smtp.client-ip=209.85.166.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-855a8c1ffe9so121623639f.1
-        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 06:31:01 -0800 (PST)
+	s=arc-20240116; t=1741013129; c=relaxed/simple;
+	bh=kxRrZd4Iu1g3Ar2HC6xOBpvwsjl7MXVzQnlV/fNUQEE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J6GkqapkvWJsjaemcN4F6iChAODW0r3/JYXKHgC6CYHjg8rLZYGrT93r42J9tJgp8qunZ66HQ6oerpHiHZi5XNMFabNgATHI6q+7GWbcvDoOYNgaxhkI9ANFi+lyyf9Ys7LYkLhvZhQB7z58FkKEjz39e6mtaSfE37Ajh7dofV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=cpHL34xq; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-aaf900cc7fbso809646866b.3
+        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 06:45:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741012260; x=1741617060; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZJKhQGEooGq39rnfsvpaIWYHgRiDneuKaSTO0NdW6gc=;
-        b=HlCcpGBE9B1GhRvqcKAjnfpVuFopbOYKTZ/XpYY/tq8V/sNPITY/4LE438ROt3jvuL
-         lSlMzXJsIwGeL/jrG935vrvzZWYCfczoPKWkhsKUIAROT/C3uV2trwYY3sDeU4XC3Rgd
-         JbxbrhJFGD0bgj3+JoEPCYzJegAF6ZmvPewbDB/8nCIIxG9PI/LrdEtW81hnlsXZnJaN
-         QzMTvD23WsFx44vdGmPfJ/muTxQgt7MUwCxSjFtunrZPN0G5pgO+nRkkQ6cthOHZWx7p
-         meOfr7haK8IYw4FIa3flS65ALrCMpF1DySEDfFIuZ/33gVEFwJP/69BEOJ3eUQ95akZ5
-         AXxQ==
+        d=openvpn.net; s=google; t=1741013125; x=1741617925; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=2BmXwqganJLn8jq8+b923KGArAolI7ifnS0mWRMdxaY=;
+        b=cpHL34xqxtndZQg5NgLZtyQYbjurB2qhzFdaFdG4Lv4VcOn+fbARQTfdmbXiP7CKUm
+         pObve5sucTeWJNIpMXn+RUyHqGYhCt8Bm5hEsCfynHjwusk33G+WExHDkQZYUk84f3ut
+         oXazGE4s/hHqQ0YZgKRmdSTsV4oqSyPKITvWds7ntd9fLAodp1cA9/U9O8RJOF6fXMHx
+         3zfBM5VIaCpilwS/ECddjTs5pMGNUn+NxBGzUCQ086oUp13lsoNsSQKzar/U/vz+H5UV
+         9s/BzbpBgsXg8Zyg2kuKuEzzaQcSxFcYYuNn3gFPWpxWyO4FHXzyBPYOETGiBocIl+OZ
+         tOfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741012260; x=1741617060;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZJKhQGEooGq39rnfsvpaIWYHgRiDneuKaSTO0NdW6gc=;
-        b=PD9VOw3ggIb/zmzF3i739X5KqLI0Ej5j6WP2dC+5SVz77r6Kch7F8UUUxuhzFgIgYI
-         UFa4AW02h6RpHLTC2HzdS6evup8hckvRPiV8MB0TyyFlEuhPlw5RGGODGX7J1gxtfhut
-         nz5opUBKUkUx3vznt785LH3674WESFFVEp+SJwaDS65ryl+DanFhldVg9WTv5yVHz++X
-         aEdtm5T9QW7BUyx+5j4RnY9BuilNKxxxQBvqi8TnvToMGWT124s6RY9JKCILNKKJp1Ij
-         DNhC8XA6t4YeH874ECHcSJGIKcduJEd6Y1xDmw3ME+NgO5YF9zIa+L/JRSiTqKbSOEES
-         VFaA==
-X-Forwarded-Encrypted: i=1; AJvYcCXGe/fLXosgt9cCrN8loQjyZbJSzeAcAXTCdvP4HGg0pdrxQYDVqgcE+k7J3Gq4xGWcwaVZcCw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyY0BB9yZ6wp+CfXQCRg2HZqj/HKFXTfFiud87qdTHv8uxn6kKu
-	VY5cwtxUp3Fzl6vMWjlx7RCzAuXuk0CYWGPST4P6tz0NUCU7C0yUzeqWuqDnZUlAAaPZDy+KJ4g
-	1bBiZsA0R1waKLWd+V1HXLx7r29Y=
-X-Gm-Gg: ASbGncuuM9nozI/Pgo6vUb9LA+oKC473fnoiJRgZhZb3PwJp6Vys8zsfHFbjkt03nxf
-	4n5bEcCt0LM3RJzLhd3ALlaP6tAGeRciMdX3yfPGnW0BopALyHNe84U4GUf3KFiWwOohfBwOwJQ
-	TOChWFRJV4t07V5CwUtgYlVHzeIg==
-X-Google-Smtp-Source: AGHT+IERy1dQr9CMHom5m2Ogbs+wm3IAjYpPApITUasj4RLHfGxFX5SJDUnkihQarDvtgCuP+lfMfhgvMfUujl3Uf1o=
-X-Received: by 2002:a05:6e02:1705:b0:3d3:fdb8:17a7 with SMTP id
- e9e14a558f8ab-3d3fdb81a82mr45809105ab.6.1741012258995; Mon, 03 Mar 2025
- 06:30:58 -0800 (PST)
+        d=1e100.net; s=20230601; t=1741013125; x=1741617925;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2BmXwqganJLn8jq8+b923KGArAolI7ifnS0mWRMdxaY=;
+        b=elHYO/VoTuRSFsc/kj1BdzAEmiDB+JVl96QlhkKEF9suWbXMJbk4jQDWpxn0nVuHRL
+         18BUi6u2L/evaMuV5NRf48d7ZooN5DDFRfW5KPgkzz6qWfSC2ujfQvwSVuve6Zi7/K3U
+         QWlayzDAHxeHue64rnb2GwJyKa/qBBgVeRWbu/8euTULO+mdV5SYFwEn5xjJ7BUdOGo8
+         qJocwwXahoStMMDXA1R2YoGEMuZQ7xw4TD3ePVJDfDtLXDfZ/fE3MURvVU/OlIHP7CWg
+         sVg6m3oWXSgjqIbpEn8mDta8sDKxIcgN8RRMPgGU9wOJ6cXomq8wE7IvZorSCRbuA6be
+         ulAg==
+X-Gm-Message-State: AOJu0YxpB1QDcqp0993O8hB/z7HHueJEI8I5G1xfPxhux0AZvznU5GOA
+	R+whqMsFEiz1TezvkOgyHvxnDO+boqHL42blrn7BmmC82cb24D2difVGaTe8AEI=
+X-Gm-Gg: ASbGncs2lU+X6vIUoi99U5l6nE1/zXxyu8i7DREC084kwidRsU3ccaisk9M8wDF4nBR
+	sQ24WxHYJEKNY2VjBWUIaX7p/5ohgb2v+H9xUwJcSnZh9spiNs4Tbk3CGr5ea8AfxI50qJjRVQS
+	p2kEadld8zwFJ9jUcogZo9lzk+H1/STmwH51Zs76PaEXUncSMLdasZyjhPJ996yJvIiZJbx9mhk
+	BswulqYviMexWHgAhoJYrSIm92XuKtot0oMyaIjy0h3D5wmaRJc5x2qLrujP7d6SktzUzAWMu51
+	5+fnq0Dqb0ZQBI210HQrupvfbtCvglW8FlHtLmstSlp98vG6rTKkz2alGfDB33062DoddCOEskI
+	cUL+LJxM=
+X-Google-Smtp-Source: AGHT+IHAVJy7KLpojW8TWmlql5y/dSIA4s5XaEQW3g8y6zIpGcUjWmntI7HZ8QA/Igg7m+fa6psmSA==
+X-Received: by 2002:a17:907:a810:b0:ac1:e881:89b1 with SMTP id a640c23a62f3a-ac1e8818cc1mr141191466b.30.1741013125157;
+        Mon, 03 Mar 2025 06:45:25 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:4d41:ca07:21a5:f110? ([2001:67c:2fbc:1:4d41:ca07:21a5:f110])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac1e1d620a8sm82187366b.108.2025.03.03.06.45.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Mar 2025 06:45:24 -0800 (PST)
+Message-ID: <2682e274-6be1-4366-a2f6-c870aa9e1252@openvpn.net>
+Date: Mon, 3 Mar 2025 15:45:23 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250228164904.47511-1-kerneljasonxing@gmail.com>
- <67c5111ae5754_170775294fe@willemb.c.googlers.com.notmuch>
- <CAL+tcoDg1mQ+7DtYNgYomum9o=gzwtrjedYf7VmHud54VfSynQ@mail.gmail.com> <67c5b3775ea69_1b832729461@willemb.c.googlers.com.notmuch>
-In-Reply-To: <67c5b3775ea69_1b832729461@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 3 Mar 2025 22:30:22 +0800
-X-Gm-Features: AQ5f1JoAV-tIOEzDcZsYNYq7oWBaN6nsqRhYVXKuAqdT2yCbE6u5JOCrElC8VXs
-Message-ID: <CAL+tcoCTddpJxx6uCo9b-7Qy=CpVW1YU=pO4S0pKniHsS9fSzg@mail.gmail.com>
-Subject: Re: [PATCH net-next] net-timestamp: support TCP GSO case for a few
- missing flags
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, ncardwell@google.com, kuniyu@amazon.com, 
-	dsahern@kernel.org, willemb@google.com, horms@kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v20 15/25] ovpn: implement multi-peer support
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+References: <20250227-b4-ovpn-v20-0-93f363310834@openvpn.net>
+ <20250227-b4-ovpn-v20-15-93f363310834@openvpn.net> <Z8WpxDpHYzG9pXNl@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <Z8WpxDpHYzG9pXNl@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 3, 2025 at 9:49=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Jason Xing wrote:
-> > On Mon, Mar 3, 2025 at 10:17=E2=80=AFAM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > Jason Xing wrote:
-> > > > When I read through the TSO codes, I found out that we probably
-> > > > miss initializing the tx_flags of last seg when TSO is turned
-> > > > off,
-> > >
-> > > When falling back onto TCP GSO. Good catch.
-> > >
-> > > This is a fix, so should target net?
-> >
-> > After seeing your comment below, I'm not sure if the next version
-> > targets the net branch because SKBTX_BPF flag is not in the net branch.
->
-> HWTSTAMP is sufficient reason
+On 03/03/2025 14:08, Sabrina Dubroca wrote:
+> Hello, a few minor coding style nits on this patch.
+> 
+> 2025-02-27, 02:21:40 +0100, Antonio Quartulli wrote:
+>> @@ -197,9 +254,16 @@ static int ovpn_netdev_notifier_call(struct notifier_block *nb,
+>>   		netif_carrier_off(dev);
+>>   		ovpn->registered = false;
+>>   
+>> -		if (ovpn->mode == OVPN_MODE_P2P)
+>> +		switch (ovpn->mode) {
+>> +		case OVPN_MODE_P2P:
+>>   			ovpn_peer_release_p2p(ovpn, NULL,
+>>   					      OVPN_DEL_PEER_REASON_TEARDOWN);
+>> +			break;
+>> +		case OVPN_MODE_MP:
+>> +			ovpn_peers_free(ovpn, NULL,
+>> +					OVPN_DEL_PEER_REASON_TEARDOWN);
+>> +			break;
+>> +		}
+> 
+> nit: maybe that switch could be done inside ovpn_peers_free, since
+> both places calling ovpn_peers_free do the same thing?
+> (it would also be more consistent with the rest of the peer-related
+> functions that are wrappers for the _mp/_p2p variant, rather than
+> pushing the switch down to the caller)
 
-Got it.
+Yeah, makes sense!
 
->
-> > If target net-net tree, I would add the following:
-> > Fixes: 6b98ec7e882af ("bpf: Add BPF_SOCK_OPS_TSTAMP_SCHED_CB callback")
-> > Fixes: 4ed2d765dfacc ("net-timestamp: TCP timestamping")
->
-> Please only add one Fixes tag. In this case 4ed2d765dfacc
+> 
+> 
+>> +void ovpn_peers_free(struct ovpn_priv *ovpn, struct sock *sk,
+>> +		     enum ovpn_del_peer_reason reason)
+>> +{
+>> +	struct ovpn_socket *ovpn_sock;
+>> +	LLIST_HEAD(release_list);
+>> +	struct ovpn_peer *peer;
+>> +	struct hlist_node *tmp;
+>> +	bool skip;
+>> +	int bkt;
+>> +
+>> +	spin_lock_bh(&ovpn->lock);
+>> +	hash_for_each_safe(ovpn->peers->by_id, bkt, tmp, peer, hash_entry_id) {
+>> +		/* if a socket was passed as argument, skip all peers except
+>> +		 * those using it
+>> +		 */
+>> +		if (sk) {
+>> +			skip = true;
+>> +
+>> +			rcu_read_lock();
+>> +			ovpn_sock = rcu_access_pointer(peer->sock);
+> 
+> rcu_dereference, since you're actually accessing ovpn_sock->sock
+> afterwards?
 
-Okay, I will do it as you said.
+Ouch, good catch.
 
-Sorry to ask one more thing: should I mention SKBTX_BPF in the commit
-message like "...SKBTX_BPF for now is only net-next material, but it
-can be fixed by this patch as well"? I'm not sure if it's allowed to
-say like that since we target the net branch.
+> 
+>> +			if (ovpn_sock && ovpn_sock->sock->sk == sk)
+>> +				skip = false;
+>> +			rcu_read_unlock();
+>> +
+>> +			if (skip)
+>> +				continue;
+> 
+> 
+> The skip/continue logic looks a tiny bit strange to me, maybe this:
 
-Thanks,
-Jason
+Hehe, it's like a double negation. I agree it can be improved.
+
+> 
+> 	hash_for_each_safe(ovpn->peers->by_id, bkt, tmp, peer, hash_entry_id) {
+> 		bool remove = true;
+
+does the netdev coding style allow to use locally scoped variables?
+Or should I declare everything at the beginning of the function?
+
+I had this rule in mind, but it may have been eliminated by now.
+
+> 
+> 		/* if a socket was passed as argument, skip all peers except
+> 		 * those using it
+> 		 */
+> 		if (sk) {
+> 			rcu_read_lock();
+> 			ovpn_sock = rcu_dereference(peer->sock);
+> 			remove = ovpn_sock && ovpn_sock->sock->sk == sk;
+> 			rcu_read_unlock();
+> 		}
+> 
+> 		if (remove)
+> 			ovpn_peer_remove(peer, reason, &release_list);
+> 	}
+> 
+> 
+> (only if you agree it looks better - if it's my opinion against yours,
+> ignore me since it's really just coding style/taste)
+
+Yours look simpler/cleaner. I'll go with it.
+
+Thanks!
+
+Cheers,
+
+> 
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
+
 
