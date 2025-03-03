@@ -1,94 +1,90 @@
-Return-Path: <netdev+bounces-171212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08913A4BFA8
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 13:00:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAE1BA4BFD8
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 13:07:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EB7616544B
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 12:00:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A8513A49A5
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 12:02:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77DD320E03C;
-	Mon,  3 Mar 2025 12:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B651B20E30C;
+	Mon,  3 Mar 2025 12:02:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aGOeW4Tm"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J+z8GQ6K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FB11CAA71;
-	Mon,  3 Mar 2025 12:00:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B6B520B819
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 12:02:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741003233; cv=none; b=Jd8ZRE137h4mbN0sHnIaOxpHts+QwjrmuroMzxtNB+a30mDmeiFr9OThiPHL5d4E8HZmlSjdTLk1w71IsJ3M+gzuGm+9f0TpsEAzmyxV2989Nz/FLR1Ij88WQOcb4YkiInQ36XZGlYQMn3/H4Xshg6wmfgJvJBvNTpKKPPb5aAA=
+	t=1741003340; cv=none; b=iOFAEo3y6XW31LQ/wMXghjNH1amX1ZEN64esnCQ6Lg0LqzGEjiVrDF00MamQ3YcInA9z9KVrmEsnAQmAONVre3/R9fDxtHkz3Ttzoq1RKaIgfTytdlWzZX8KUTFZ+kwT8q3ZMsV9XqxQd/Npe9Y/kU+FhUsf1exLnWwv09pZo0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741003233; c=relaxed/simple;
-	bh=VFeoSGzVzp2v1XgvCh7gFDPeObOphuG8s93CmdXo9RY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mJ5sUpzcUUm7mtP9WgzV2eKRTcC+st5pjxGn+Y+bufJc7QqQn6gU6sx9KHft+Ty3FbBON8caezwLtfIR2MwmvCIGHHs1SthlBQzNCC0fisikEL/hGYtyAIA6haeGwXLOdISA9aNmYDwnPBiORhR6vbmiAIUSIc61ioZQLWZ/Exo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aGOeW4Tm; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741003232; x=1772539232;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=VFeoSGzVzp2v1XgvCh7gFDPeObOphuG8s93CmdXo9RY=;
-  b=aGOeW4TmMjSQ7vIHU+tMK5I8R9Sv/enGvAliS/EcJqJ+bcpJfDw5IOY/
-   MR4VHWMHUVNRicmaw/IbwBY6oFkPoE6xXZme1J+quTyxWchhQwPHFaTEe
-   q2lYRg8gxYIrwITwZoQSH6nPpREZClGECbqzwnInAlYVjYz6SP/nNtxl/
-   LJkLZKofcQLW08Xl9ftSVm40Zn9naMUGUSMDu/dpcuFwCRU9x2hbIa802
-   30PJZXwmeTWEIsj+PUHhf8Dj6uEDUav/JgGCwgKTgIiFi4bmI5ZDO2aK7
-   ry/I9hZMuuFxuYl4F9BpG5IOLAYD7vzBMR+1oVjT+pkziJNDdPgr0K9Uf
-   A==;
-X-CSE-ConnectionGUID: 7TPp13B7RGi4+4/24wUZwA==
-X-CSE-MsgGUID: QU23Y/8RRmivgc9kWkx2mA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11361"; a="67244982"
-X-IronPort-AV: E=Sophos;i="6.13,329,1732608000"; 
-   d="scan'208";a="67244982"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 04:00:30 -0800
-X-CSE-ConnectionGUID: wKAJU+r/To2Xz12sBSBZQA==
-X-CSE-MsgGUID: iTim9FfQTmKv3dVha2I1OA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="117841138"
-Received: from smile.fi.intel.com ([10.237.72.58])
-  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 04:00:25 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1tp4T7-0000000GnzB-2gTb;
-	Mon, 03 Mar 2025 14:00:21 +0200
-Date: Mon, 3 Mar 2025 14:00:21 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Heikki Krogerus <heikki.krogerus@linux.intel.com>
-Cc: Matti Vaittinen <mazziesaccount@gmail.com>,
-	Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>,
-	Jonathan Cameron <jic23@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Daniel Scally <djrscally@gmail.com>,
-	Sakari Ailus <sakari.ailus@linux.intel.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1741003340; c=relaxed/simple;
+	bh=uWrqL7qwHJ1xRe81W1yZdqN0xrTeQwVstuEoqTp4vdM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=m5E96fS2FRd9LevXLr9tgv/yilCCvYKbdxA71cA68knxQiYx+k1WAJ8b7XSCqwVKBdS1v94SI6By/Rm1JbU29MVSOJZKLUNfQrZPPjiX7IDEw40AJR0iDxjCGIx885xDepTU26f8m/Zw/SZ9c1aPqyRccwfnd/6y8Wla+ewPxvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=J+z8GQ6K; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5dc89df7eccso7094645a12.3
+        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 04:02:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1741003336; x=1741608136; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FvjfazhXAUkX+q9ADQWctMmDsHuSAcb7Kglrffn5CF8=;
+        b=J+z8GQ6KzwxpWwpV3YGxkzqQikDOY63gQurQH/Y/cL8OWNZA0azkubadKmtksdtqYc
+         xU+gyI2iFllMV41ktZAsoFx6JyWM+JIlRLkVcyVsSNcwrfCqYXqikeJpr7XPutD6LMLW
+         HENRTHMLZF48To0S3r/rpJLovnqUzJLhiJzyv6140a+OaqK+E9lX9/2tEmys/W9gYAYX
+         wqFYDqbDkKSqk5stsLKfLF8p+o25nsxJxkcq6OBfHKa6Wc5jXQZnnjTJnjlhfK0XgbAG
+         jY9JcMXhq9BB2LjMMI7FUIrkqpnSVpHfR0L7z6q/GJICdSX24UnNlUG49pN+M7GrYq4p
+         o2Xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741003336; x=1741608136;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FvjfazhXAUkX+q9ADQWctMmDsHuSAcb7Kglrffn5CF8=;
+        b=O6o9qtEPX3x8VMlrG7VPWt7Gx0LbVJEy5vOOSe4vuzV7KeWTv3bt3jLXWhZBvRQVmg
+         T1SM8M1DJ6mhTMtwPU7KFVcj92wt6GEHrs1P3bbOO7r/FjwuePWYI+wEYm/9hlhK+4cy
+         c+I57LKuKIkeb71N57RMGngCejmGxJy5bcE1SqDaHD2WDGxvbcL++wfOyN2qR5a7lbps
+         BCnsp7QfyuhwEisHgj+ifp9cCJGKRRahyPNFd7nuBBLIdaUA/QwLCsB1kxD2T8Nlcofj
+         kTO8l9gBUvCnNKBFEUmROb8RJX2q5ybd6yleHWnjA8Mu8a+SCPz2vjJEtLyMr+b+SW1B
+         Bnag==
+X-Forwarded-Encrypted: i=1; AJvYcCVxfCxHEFokDy8LdNI7sKnkkQFD974VIAR4v08xNDYY92+HuiEQRPz5PNQqJPqHkzs7CvR7BzM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyUAKHOAfimadxvgtprNYjp62UDh+WkglwrPwswEfNO0lI4JGbb
+	WQfeM2AnfYZBCSDjI0tozoJI/hTjuSsC/kTh+THS+L4d/Xh1irqQBKvPeSaoV30=
+X-Gm-Gg: ASbGncsA4WxrIx6GBn1d11+Rde30o0BmJN009GJMJC1r8VS7nuQ0BTp5pgrMhx0vZu0
+	CWPisrHp0M/aYFVemVWH9/35DODyCvF8GHg5fCS+UW6Y94kp7oH/TSf4pFYiuU6eDEkyteMsR3h
+	dDDxw1ZKRBfQdBn1Nfw2MKkCEywJ7u0NVv1UMugHQGCDOaqN9OSN9cY2G4CJZfCke9/BRJeT5DI
+	JPkrlPfj9q7jSPJb+uO1kLmpTd5ouCAVP7Q0E4Fc0pRwW0lQ8W3vggk+c5uVr/I1IwCwmMGN3KZ
+	axhQ7DFDpfPcJwLph1J6f8Ow80Xqj0/duMNjMDDBoV6+tU0IJw==
+X-Google-Smtp-Source: AGHT+IEVLpvwi6O6OBs0WN+GyOzE3jpuGJmps4EUiNQjjGbXYoZLIY4WBBNb3SuJAGnkmtz62ElidA==
+X-Received: by 2002:a05:6402:5190:b0:5db:f26d:fff1 with SMTP id 4fb4d7f45d1cf-5e4d6b62c36mr13405841a12.21.1741003336577;
+        Mon, 03 Mar 2025 04:02:16 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id 4fb4d7f45d1cf-5e4c2f408cdsm6696931a12.0.2025.03.03.04.02.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Mar 2025 04:02:16 -0800 (PST)
+Date: Mon, 3 Mar 2025 15:02:12 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Ahmed Zaki <ahmed.zaki@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-iio@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v5 02/10] property: Add functions to count named child
- nodes
-Message-ID: <Z8WZ1dXN7GLBYKvb@smile.fi.intel.com>
-References: <cover.1740993491.git.mazziesaccount@gmail.com>
- <5e35f44db2b4ed43f75c4c53fd0576df9ad24ab2.1740993491.git.mazziesaccount@gmail.com>
- <Z8WXdf8lnivYKiks@kuha.fi.intel.com>
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH net-next] net: Prevent use after free in
+ netif_napi_set_irq_locked()
+Message-ID: <5a9c53a4-5487-4b8c-9ffa-d8e5343aaaaf@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,43 +93,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z8WXdf8lnivYKiks@kuha.fi.intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+X-Mailer: git-send-email haha only kidding
 
-On Mon, Mar 03, 2025 at 01:50:13PM +0200, Heikki Krogerus wrote:
+The cpu_rmap_put() will call kfree() when the last reference is dropped
+so it could result in a use after free when we dereference the same
+pointer the next line.  Move the cpu_rmap_put() after the dereference.
 
-...
+Fixes: bd7c00605ee0 ("net: move aRFS rmap management and CPU affinity to core")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+ net/core/dev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> > +unsigned int device_get_child_node_count_named(const struct device *dev,
-> > +					       const char *name)
-> > +{
-> > +	const struct fwnode_handle *fwnode = dev_fwnode(dev);
-> > +
-> > +	if (!fwnode)
-> > +		return -EINVAL;
-> > +
-> > +	if (IS_ERR(fwnode))
-> > +		return PTR_ERR(fwnode);
-> > +
-> > +	return fwnode_get_child_node_count_named(fwnode, name);
-> > +}
-> > +EXPORT_SYMBOL_GPL(device_get_child_node_count_named);
-> 
-> Sorry if I missed something in the v4 thread, but why not do all the
-> checks in fwnode_get_child_node_count_named(), and make this an inline
-> function?
-
-+1, or drop the checks and make it return 0 depending on the follow up use cases.
-
->         static inline unsigned int
->         device_get_child_node_count_named(const struct device *dev, const char *name)
->         {
->                 return fwnode_get_child_node_count_named(dev_fwnode(fwnode), name);
->         }
-
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 9189c4a048d7..c102349e04ee 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -7072,8 +7072,8 @@ void netif_napi_set_irq_locked(struct napi_struct *napi, int irq)
+ put_rmap:
+ #ifdef CONFIG_RFS_ACCEL
+ 	if (napi->dev->rx_cpu_rmap_auto) {
+-		cpu_rmap_put(napi->dev->rx_cpu_rmap);
+ 		napi->dev->rx_cpu_rmap->obj[napi->napi_rmap_idx] = NULL;
++		cpu_rmap_put(napi->dev->rx_cpu_rmap);
+ 		napi->napi_rmap_idx = -1;
+ 	}
+ #endif
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.47.2
 
 
