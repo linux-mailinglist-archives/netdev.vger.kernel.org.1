@@ -1,144 +1,91 @@
-Return-Path: <netdev+bounces-171322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2857DA4C899
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:04:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13384A4C880
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:01:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84FDE3B25C5
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 16:56:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA39A1673B2
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 16:57:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9B0F27CCE8;
-	Mon,  3 Mar 2025 16:32:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DAD0234990;
+	Mon,  3 Mar 2025 16:34:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ag8yve5r"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2rfDMlVP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B7927C167
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 16:32:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D56E61F2369;
+	Mon,  3 Mar 2025 16:34:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741019558; cv=none; b=HelJekk0xvH75UA7ayY0IYyC6ZU/qVvdqyhWKxhMAT59m8HqGbMFXquSX9dgQzikpxzuwYnaS5mm+q0lmCjVcQukqqhMAIz/FXQokWaZUHdSB0Oe3azM+j24wF0CpTJ6tWLxNeHXJbFVwQ5sO9fgw4y7pIeSXRpIB2lX0dLpwgQ=
+	t=1741019662; cv=none; b=d5UDxHbCoAeI0/4UvfJVIPO7s6VbT1Z+xK0/bVTbtQaGDd1npixy5KbTcSYifIS/R/qSXHjCTAKdOyumWi8V54tKBaXGd6Jm12lacHJ7EXmjNojIcYAvDqE+XBFY0/WQ+MChv5qp+9rYYdeQzS8M0ZMHr1fA3iHfhG1L+hmpshc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741019558; c=relaxed/simple;
-	bh=bWw2/6JZlD9vW2ZsnAAmWxo6GNqij5KLd6pwKV6TiVQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BBB/GSvSuEEcVLdUgmvLMaJat2eqpOze1oXoP2km1VjwSI56S0doRpqB8HulXZs4SxdHOjWqtv+Uhuy5V18oJh5TaT/KfzvpyzSRKhwm3GZVaCBHca/1P85JrHgld7hb/5ZpHKx1UrU/UWxIACVVYocb3NAnOKtrlypBnHeloRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ag8yve5r; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741019558; x=1772555558;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=bWw2/6JZlD9vW2ZsnAAmWxo6GNqij5KLd6pwKV6TiVQ=;
-  b=ag8yve5r1rB2ysAR1PsqdRyFfYt9BY+HmvKxBwKvCGSE0FiCAjtehQ9J
-   BYSyTV+s3FBzBKA7e4FuebDYIIdepc7fisLQvm/PcL5i7bKJs3rMgtIhK
-   DrpNeiU/v6djblKtm86w+0FSyQM8IXsHjOSpqAMxwTEJBAVI+8kOcfZqJ
-   vaii7IrmXXHuGCgfGzMeGe3/j/kyv+1EV+FOOKUMtIgUBhOnyJCPgmoJF
-   L1757wVc2bzRoARjtrz6GmVQv5vElmxHhXk4N1Fj2G4jbyTLSrFF/EJ4x
-   YkO0AJY2fXoFeVcSfTr2E6dpohMYt6pcTwHQmBAhduxbytiGY6q7Ahvm4
-   g==;
-X-CSE-ConnectionGUID: 86llPCp5Q8S2OdgSNrpOQA==
-X-CSE-MsgGUID: 3wwIInI/ThqdIYsdunXjag==
-X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="41815005"
-X-IronPort-AV: E=Sophos;i="6.13,330,1732608000"; 
-   d="scan'208";a="41815005"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 08:32:37 -0800
-X-CSE-ConnectionGUID: 92mCBtiZSJa9iZbrhP2Djw==
-X-CSE-MsgGUID: Yur+Ikr8Rk24f7/GN7K9yA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="148981684"
-Received: from mszapar-mobl1.ger.corp.intel.com (HELO [10.245.84.226]) ([10.245.84.226])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 08:32:35 -0800
-Message-ID: <e3fa9d6b-abb7-4b35-8467-7fae4581a981@linux.intel.com>
-Date: Mon, 3 Mar 2025 17:32:32 +0100
+	s=arc-20240116; t=1741019662; c=relaxed/simple;
+	bh=JEREDIx7cDVnisiJSln7PJ4q8Cuobkgpq9TFywWa9xw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DUaOXMaXDjZprGMBlCqGTMihg9jm5t6KehVDRWiEnclCCSjOE5fmvO1HgG3Sa5yShQX6MX2Rr/o7Yt9XAcsMC1GxYQvNUOdCc+3kWIeRjj5D2fltzQHoYLHN1IIFyDN13uYwxUfxnAJZEf7a8/GgW/a46AFOraUGl4zZgWBWVZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2rfDMlVP; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=tZrvmzOYhHd3Yc3bExSIoHQkrJFa5shgHlbx7+V1470=; b=2rfDMlVPuCxAb9KwnSLmbgQ2KS
+	GmWIPo5hXCrLAKfouYO9pv0nASWPd8JfDgKcgdJ9OVikYoqr3Jnjhash91mONdYJR9n+LzcJ8+8td
+	TtSrhdfptxivcLR4MkAjhxQtYeQfY79vWx6aY2YP2gVqEB4RSbfwaD1I3H0a0/BMUiz8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tp8jy-001rW6-Ui; Mon, 03 Mar 2025 17:34:02 +0100
+Date: Mon, 3 Mar 2025 17:34:02 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Cc: Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH 1/3] dt-bindings: net: dwmac: Increase 'maxItems' for
+ 'interrupts' and 'interrupt-names'
+Message-ID: <41eb620e-7cb7-4763-9fed-1f9fd2800795@lunn.ch>
+References: <20250302181808.728734-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250302181808.728734-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250303152628.GA1873145-robh@kernel.org>
+ <CA+V-a8ukVgx7OqDTP6EharPJxUnVw5wAohveJw+VCABvz7FSRA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [iwl-net v2 5/5] ice: fix using untrusted value of pkt_len in
- ice_vc_fdir_parse_raw()
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Simon Horman <horms@kernel.org>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-References: <20250225090847.513849-2-martyna.szapar-mudlaw@linux.intel.com>
- <20250225090847.513849-8-martyna.szapar-mudlaw@linux.intel.com>
- <20250228171753.GL1615191@kernel.org>
- <68c841b7-fb5b-4c52-bd55-b98c80ad8667@intel.com>
-Content-Language: en-US
-From: "Szapar-Mudlaw, Martyna" <martyna.szapar-mudlaw@linux.intel.com>
-In-Reply-To: <68c841b7-fb5b-4c52-bd55-b98c80ad8667@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+V-a8ukVgx7OqDTP6EharPJxUnVw5wAohveJw+VCABvz7FSRA@mail.gmail.com>
 
+> How do you want me to handle this case:
+> 1] Update vendors binding
+> 2] Duplicate snps,dwmac.yaml in vendors binding.
 
+Not the second. The stmmac driver is a mess because vendors do their
+own thing rather than try to be the same as all other
+vendors. Duplicating it will just make it worse.
 
-On 3/3/2025 11:00 AM, Przemek Kitszel wrote:
-> On 2/28/25 18:17, Simon Horman wrote:
->> On Tue, Feb 25, 2025 at 10:08:49AM +0100, Martyna Szapar-Mudlaw wrote:
->>> From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
->>>
->>> Fix using the untrusted value of proto->raw.pkt_len in function
->>> ice_vc_fdir_parse_raw() by verifying if it does not exceed the
->>> VIRTCHNL_MAX_SIZE_RAW_PACKET value.
->>>
->>> Fixes: 99f419df8a5c ("ice: enable FDIR filters from raw binary 
->>> patterns for VFs")
->>> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
->>> Signed-off-by: Martyna Szapar-Mudlaw <martyna.szapar- 
->>> mudlaw@linux.intel.com>
->>> ---
->>>   .../ethernet/intel/ice/ice_virtchnl_fdir.c    | 25 +++++++++++++------
->>>   1 file changed, 17 insertions(+), 8 deletions(-)
->>>
->>> diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c b/ 
->>> drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
->>> index 14e3f0f89c78..6250629ee8f9 100644
->>> --- a/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
->>> +++ b/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
->>> @@ -835,18 +835,27 @@ ice_vc_fdir_parse_raw(struct ice_vf *vf,
->>>       u8 *pkt_buf, *msk_buf __free(kfree);
->>>       struct ice_parser_result rslt;
->>>       struct ice_pf *pf = vf->pf;
->>> +    u16 pkt_len, udp_port = 0;
->>>       struct ice_parser *psr;
->>>       int status = -ENOMEM;
->>>       struct ice_hw *hw;
->>> -    u16 udp_port = 0;
->>> -    pkt_buf = kzalloc(proto->raw.pkt_len, GFP_KERNEL);
->>> -    msk_buf = kzalloc(proto->raw.pkt_len, GFP_KERNEL);
->>> +    if (!proto->raw.pkt_len)
->>> +        return -EINVAL;
->>
->> Hi Martyna,
->>
->> It seems to me that the use of __free() above will result in
->> kfree(msk_buf) being called here. But msk_buf is not initialised at this
->> point.
->>
->> My suggest would be to drop the use of __free().
->> But if not, I think that in order to be safe it would be best to do this
->> (completely untested;
->>
->>     u8 *pkt_buf, *msk_buf __free(kfree) = NULL;
-> 
-> Oh yeah!, thank you Simon for catching that.
-> 
-> I would say "naked __free()" was harmful here.
-> 
-
-Thank you for suggestions, will send fixed v3
-
+	Andrew
 
