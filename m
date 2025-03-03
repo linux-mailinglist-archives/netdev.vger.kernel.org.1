@@ -1,53 +1,49 @@
-Return-Path: <netdev+bounces-171346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DEE7A4C9E5
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:40:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA2A8A4C96A
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:28:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA9793A6CE8
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:20:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 508AA17AF4B
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:23:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC5E245023;
-	Mon,  3 Mar 2025 17:06:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315E12505CF;
+	Mon,  3 Mar 2025 17:10:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b="jiPhrG9p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lr+Ay+4t"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2266A228CBC;
-	Mon,  3 Mar 2025 17:05:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F092505BD;
+	Mon,  3 Mar 2025 17:10:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741021561; cv=none; b=vGfvmoo3W/KZfBnaauFl5I02vgRJ9YRsST6c+X/zfbyxMjDL5FmAig0pwG8Z4vJAUCkMIV9dB4TkMiHjPHdxbNG75mzqq133rFHXi15JaXh/XbJTsqWmdp3dZtL0xyhPPBUOe1aGEAeEQJ9OfIlxJ0SsSJ9+dm124yIfx2b/lrk=
+	t=1741021839; cv=none; b=d+8ogOv0wUbrFmsVbtPYzpd6swsFXEHcK4YrXMqwlyESZHNa7NkIGThGFJBsQno9CljPsQorogHbmYXkHbVa0aEL3FEbjJRjOFOc6ulpJB9AKyC8+vQGiGes6NkD5QP9Ly9MKJA+Pcejoc9mWnrTFP8mJRxXuaJRMH35fT7CZnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741021561; c=relaxed/simple;
-	bh=7ILFfTyvQcV4zf1p1E8Q0q3PCQe7v9wbKGH7Y/CHO9M=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=UCwUInrZ22yPTuwT6qrWjzAUTPl38vL2Mmph7pXZZBiEkrJD6C56LCI7el+AXHn3Y8rl3oTUsxQ2HiIpiW0IXqy3WG0jjYEYECf2vxoa8ac+jz9e+Vn9ZSmwLuOsnmOTFpHPl5XWTULS5iyXL8+LeAwkUcXkzxWPtgepHD/OVvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yoseli.org; spf=none smtp.mailfrom=yoseli.org; dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b=jiPhrG9p; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yoseli.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=yoseli.org
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3553C443A6;
-	Mon,  3 Mar 2025 17:05:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yoseli.org; s=gm1;
-	t=1741021558;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SU0pPaiQvb1lVqNhzStbJ9876YWD6FfGcppYqH8L4GI=;
-	b=jiPhrG9plV2tTXA+GGr8QRdrCjW6Kbgnr40ly4Zwyxb4HBc+aM94GwaF6MRSmVyDXGa4Ml
-	r2esdJwkbHVeJ7AfWVppNi/Q2m1HsZX5P6VMFuUpnTzi9XDaNRAw7UneuqX9sf9V8z/M5u
-	/PdARt2b0R6kojA3F1+b/GLpY7ZQtLwbcpana936+83FoArNThTM7KFoDSL//FO1NkmvAr
-	Xv0vOGsS5v28z9aWBlY5ocp0cyhb/NKTE7/asKsjIK4bpg5znHs4XtT6i+L6wsjKPO6TiN
-	OrVoDiRRX2hVC1ZS1W4YBYKxt+B/M1k0t3Adkc6DpoKoCNbY+Tw9sCCVuCYigQ==
-From: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
-Date: Mon, 03 Mar 2025 18:05:52 +0100
-Subject: [PATCH 2/2] net: phy: dp83826: Add support for straps reading
+	s=arc-20240116; t=1741021839; c=relaxed/simple;
+	bh=0Ma6qtuWXoQR5mDUqmgzEioSTKwb9JabDAkmPqXbGro=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=tkSSn4D1ALupOitXZ7JAAIruWzIx1dx2r2JToIdqxgWeYFuXmIBiMS1SqGqr7pDxwPEdlYmCmzKQf3DV9Lv0xDx/BODZ6eB3jfG6AG1vQ6aMlWOj1OGqRqY3LHbtL6h9pnF6wJKzgQ6UPAZ91gBM6EzzLURmB/xeERcvhicFF2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lr+Ay+4t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38184C4CEE9;
+	Mon,  3 Mar 2025 17:10:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741021838;
+	bh=0Ma6qtuWXoQR5mDUqmgzEioSTKwb9JabDAkmPqXbGro=;
+	h=From:Date:Subject:To:Cc:From;
+	b=lr+Ay+4tZ+db/l321NhdYmN/Bx44rkHv2eW+ZdMUE9rFVejQ7O5tx6Qm1+b509JuA
+	 tpTOcdJqQf+2YfAZpDK0dWdpx2rpwIV42LYR0AvVT6qz+PvUs4459aAuFnHeLMoakd
+	 ZGOLCeSVStuibTH8OXBXiurlxWCz6w1od1+8om+L0vIA+c5ja21kKaqzAG1EIhOEUh
+	 k/8M7uXCZHjsDbfKZOnbc6QQD2mnyVkJQORcRNIhp4upb99pGtkYL1wC3LgwoPSGb0
+	 FDK/K+rc5Tdsn/ZosaBhO3M3IsJA6FqMguJ5oTeawsXVjhI2NigE9zNUnh0tsdd7ur
+	 5F5JcwOzrb0iw==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Date: Mon, 03 Mar 2025 18:10:13 +0100
+Subject: [PATCH net] mptcp: fix 'scheduling while atomic' in
+ mptcp_pm_nl_append_new_local_addr
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,139 +52,169 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250303-dp83826-fixes-v1-2-6901a04f262d@yoseli.org>
-References: <20250303-dp83826-fixes-v1-0-6901a04f262d@yoseli.org>
-In-Reply-To: <20250303-dp83826-fixes-v1-0-6901a04f262d@yoseli.org>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Catalin Popescu <catalin.popescu@leica-geosystems.com>
+Message-Id: <20250303-net-mptcp-fix-sched-while-atomic-v1-1-f6a216c5a74c@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAHTixWcC/x2NQQqDMBBFryKz7kAaEaxXKV0kk7EZ0BiSoIJ49
+ w5dPvjvvwsqF+EKU3dB4V2qbEnh+eiAoktfRgnKYI0dTG96TNxwzY0yznJipcgBjygLo2vbKoT
+ ENDpv/cuPAfQmF9blP/EGteFz3z/daplxdwAAAA==
+X-Change-ID: 20250303-net-mptcp-fix-sched-while-atomic-cec8ab2b9b8d
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
+ Krister Johansen <kjlx@templeofstupid.com>, stable@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1741021554; l=2981;
- i=jeanmichel.hautbois@yoseli.org; s=20240925; h=from:subject:message-id;
- bh=7ILFfTyvQcV4zf1p1E8Q0q3PCQe7v9wbKGH7Y/CHO9M=;
- b=StMuknYAVahhQOr540Ve8TMbgMLZyLFdZWrJlrMNyOmE1mPr+vn01y11ml/FifQBReEpw6283
- FmxXU97cP3FC7A3sfl7XoGosD6SN6zUUJ+A9wG2wqt+Jw4nEb+w6L3Z
-X-Developer-Key: i=jeanmichel.hautbois@yoseli.org; a=ed25519;
- pk=MsMTVmoV69wLIlSkHlFoACIMVNQFyvJzvsJSQsn/kq4=
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdelleeijecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephfffufggtgfgkfhfjgfvvefosehtjeertdertdejnecuhfhrohhmpeflvggrnhdqofhitghhvghlucfjrghuthgsohhishcuoehjvggrnhhmihgthhgvlhdrhhgruhhtsghoihhsseihohhsvghlihdrohhrgheqnecuggftrfgrthhtvghrnhepffejhfdtlefhhfehveehueetgffhfeetleeuvdduhfeggeetiedttdeuhffhleetnecukfhppedvrgdtudemvgdtrgemudeileemjedugedtmegttgelmedvieelvdemrgehfhejmeejlegvtgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemvgdtrgemudeileemjedugedtmegttgelmedvieelvdemrgehfhejmeejlegvtgdphhgvlhhopeihohhsvghlihdqhihotghtohdrhihoshgvlhhirdhorhhgpdhmrghilhhfrhhomhepjhgvrghnmhhitghhvghlrdhhrghuthgsohhisheshihoshgvlhhirdhorhhgpdhnsggprhgtphhtthhopeduuddprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesv
- hhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehjvggrnhhmihgthhgvlhdrhhgruhhtsghoihhsseihohhsvghlihdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtoheptggrthgrlhhinhdrphhophgvshgtuheslhgvihgtrgdqghgvohhshihsthgvmhhsrdgtohhm
-X-GND-Sasl: jeanmichel.hautbois@yoseli.org
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6168; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=rI+xTjW/4Di7bik1jLTrX+13V8FWkx3oKnm1qjlifLk=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnxeKK0U7l7IEBnfq70QSMPIDEPTqChfSHmENaY
+ Wmwj+lJbz6JAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ8XiigAKCRD2t4JPQmmg
+ c8OsEADKOrBAMJdg2+WjVltI89o6n7LuiBcXel5yfXK1OHWldplLTPAu5+mhDblqqhL7ayb/5A7
+ BRj0wwJ3Fa79iMk931xbmQ+rnKRBIIfOexNlgvxjkj8If6ofZueI6WPBthi41y5vQGCfoA/JmX3
+ 1ET7nvS1SyEECNU+oLMpEVoWOEqR8+iebbWa65elJf/G9/1p59QExvg1KiF5K2YByd/uHV9NkWo
+ r1Ebx2CDRFbhoCY2QQB1wu1352LWIA8K76faHkk+3orIt09TFCnYOTeZdTdLgr1d6joTNTEITgC
+ r12PwQoxXTTKnR60C7rJkGm20V8fhP4vLstdMDgozyHlBX/BFwQIdxAsQuj9SfAQGDM/qtUj1Ky
+ nQwkaIRwp1zEYMLTq4+6VxYobOfC2e0Xmt/g5qKM/zt7vyBD4bedv8X/VioXi0EekrMWZVlTrYO
+ QBS5Id9AbY95+34TEpFEUBRyZdavEYZUyH96MoIdtf97x6iSk4DbBhCFXd7x5mHA0IbioCMNkfr
+ gNbheQ3vEGW6V/4NRNRQpnKuOAmvyR37TlyQjkxFYRj7XYSY4c/88Gr39h1ygg3+TClD8n/mRgA
+ 0NgNsXmWFHFBnFP2kM38V6Smkn0G0oe24gZaisgSDMTuM+FyxtaS/zRu1g+P4JTbYz8bAxaD309
+ 0dliG6NJCcXSvYg==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-When the DP83826 is probed, read the straps, and apply the default
-settings expected. The MDI-X is not yet supported, but still read the
-strap.
+From: Krister Johansen <kjlx@templeofstupid.com>
 
-Signed-off-by: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
+If multiple connection requests attempt to create an implicit mptcp
+endpoint in parallel, more than one caller may end up in
+mptcp_pm_nl_append_new_local_addr because none found the address in
+local_addr_list during their call to mptcp_pm_nl_get_local_id.  In this
+case, the concurrent new_local_addr calls may delete the address entry
+created by the previous caller.  These deletes use synchronize_rcu, but
+this is not permitted in some of the contexts where this function may be
+called.  During packet recv, the caller may be in a rcu read critical
+section and have preemption disabled.
+
+An example stack:
+
+   BUG: scheduling while atomic: swapper/2/0/0x00000302
+
+   Call Trace:
+   <IRQ>
+   dump_stack_lvl (lib/dump_stack.c:117 (discriminator 1))
+   dump_stack (lib/dump_stack.c:124)
+   __schedule_bug (kernel/sched/core.c:5943)
+   schedule_debug.constprop.0 (arch/x86/include/asm/preempt.h:33 kernel/sched/core.c:5970)
+   __schedule (arch/x86/include/asm/jump_label.h:27 include/linux/jump_label.h:207 kernel/sched/features.h:29 kernel/sched/core.c:6621)
+   schedule (arch/x86/include/asm/preempt.h:84 kernel/sched/core.c:6804 kernel/sched/core.c:6818)
+   schedule_timeout (kernel/time/timer.c:2160)
+   wait_for_completion (kernel/sched/completion.c:96 kernel/sched/completion.c:116 kernel/sched/completion.c:127 kernel/sched/completion.c:148)
+   __wait_rcu_gp (include/linux/rcupdate.h:311 kernel/rcu/update.c:444)
+   synchronize_rcu (kernel/rcu/tree.c:3609)
+   mptcp_pm_nl_append_new_local_addr (net/mptcp/pm_netlink.c:966 net/mptcp/pm_netlink.c:1061)
+   mptcp_pm_nl_get_local_id (net/mptcp/pm_netlink.c:1164)
+   mptcp_pm_get_local_id (net/mptcp/pm.c:420)
+   subflow_check_req (net/mptcp/subflow.c:98 net/mptcp/subflow.c:213)
+   subflow_v4_route_req (net/mptcp/subflow.c:305)
+   tcp_conn_request (net/ipv4/tcp_input.c:7216)
+   subflow_v4_conn_request (net/mptcp/subflow.c:651)
+   tcp_rcv_state_process (net/ipv4/tcp_input.c:6709)
+   tcp_v4_do_rcv (net/ipv4/tcp_ipv4.c:1934)
+   tcp_v4_rcv (net/ipv4/tcp_ipv4.c:2334)
+   ip_protocol_deliver_rcu (net/ipv4/ip_input.c:205 (discriminator 1))
+   ip_local_deliver_finish (include/linux/rcupdate.h:813 net/ipv4/ip_input.c:234)
+   ip_local_deliver (include/linux/netfilter.h:314 include/linux/netfilter.h:308 net/ipv4/ip_input.c:254)
+   ip_sublist_rcv_finish (include/net/dst.h:461 net/ipv4/ip_input.c:580)
+   ip_sublist_rcv (net/ipv4/ip_input.c:640)
+   ip_list_rcv (net/ipv4/ip_input.c:675)
+   __netif_receive_skb_list_core (net/core/dev.c:5583 net/core/dev.c:5631)
+   netif_receive_skb_list_internal (net/core/dev.c:5685 net/core/dev.c:5774)
+   napi_complete_done (include/linux/list.h:37 include/net/gro.h:449 include/net/gro.h:444 net/core/dev.c:6114)
+   igb_poll (drivers/net/ethernet/intel/igb/igb_main.c:8244) igb
+   __napi_poll (net/core/dev.c:6582)
+   net_rx_action (net/core/dev.c:6653 net/core/dev.c:6787)
+   handle_softirqs (kernel/softirq.c:553)
+   __irq_exit_rcu (kernel/softirq.c:588 kernel/softirq.c:427 kernel/softirq.c:636)
+   irq_exit_rcu (kernel/softirq.c:651)
+   common_interrupt (arch/x86/kernel/irq.c:247 (discriminator 14))
+   </IRQ>
+
+This problem seems particularly prevalent if the user advertises an
+endpoint that has a different external vs internal address.  In the case
+where the external address is advertised and multiple connections
+already exist, multiple subflow SYNs arrive in parallel which tends to
+trigger the race during creation of the first local_addr_list entries
+which have the internal address instead.
+
+Fix by skipping the replacement of an existing implicit local address if
+called via mptcp_pm_nl_get_local_id.
+
+Fixes: d045b9eb95a9 ("mptcp: introduce implicit endpoints")
+Cc: stable@vger.kernel.org
+Suggested-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Krister Johansen <kjlx@templeofstupid.com>
+Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- drivers/net/phy/dp83822.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 59 insertions(+)
+ net/mptcp/pm_netlink.c | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
-index 88c49e8fe13e20e97191cddcd0885a6e075ae326..5023f276b8818a5f7d9785fc53f77d59264ab4a4 100644
---- a/drivers/net/phy/dp83822.c
-+++ b/drivers/net/phy/dp83822.c
-@@ -197,6 +197,7 @@ struct dp83822_private {
- 	bool set_gpio2_clk_out;
- 	u32 gpio2_clk_out;
- 	bool led_pin_enable[DP83822_MAX_LED_PINS];
-+	int sor1;
- };
+diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
+index c0e47f4f7b1aa2fedf615c44ea595c1f9d2528f9..7868207c4e9d9d7d4855ca3fadc02506637708ba 100644
+--- a/net/mptcp/pm_netlink.c
++++ b/net/mptcp/pm_netlink.c
+@@ -977,7 +977,7 @@ static void __mptcp_pm_release_addr_entry(struct mptcp_pm_addr_entry *entry)
  
- static int dp83822_config_wol(struct phy_device *phydev,
-@@ -620,6 +621,7 @@ static int dp83822_config_init(struct phy_device *phydev)
- static int dp8382x_config_rmii_mode(struct phy_device *phydev)
+ static int mptcp_pm_nl_append_new_local_addr(struct pm_nl_pernet *pernet,
+ 					     struct mptcp_pm_addr_entry *entry,
+-					     bool needs_id)
++					     bool needs_id, bool replace)
  {
- 	struct device *dev = &phydev->mdio.dev;
-+	struct dp83822_private *dp83822 = phydev->priv;
- 	const char *of_val;
- 	int ret;
+ 	struct mptcp_pm_addr_entry *cur, *del_entry = NULL;
+ 	unsigned int addr_max;
+@@ -1017,6 +1017,17 @@ static int mptcp_pm_nl_append_new_local_addr(struct pm_nl_pernet *pernet,
+ 			if (entry->addr.id)
+ 				goto out;
  
-@@ -636,6 +638,17 @@ static int dp8382x_config_rmii_mode(struct phy_device *phydev)
- 			ret = -EINVAL;
++			/* allow callers that only need to look up the local
++			 * addr's id to skip replacement. This allows them to
++			 * avoid calling synchronize_rcu in the packet recv
++			 * path.
++			 */
++			if (!replace) {
++				kfree(entry);
++				ret = cur->addr.id;
++				goto out;
++			}
++
+ 			pernet->addrs--;
+ 			entry->addr.id = cur->addr.id;
+ 			list_del_rcu(&cur->list);
+@@ -1165,7 +1176,7 @@ int mptcp_pm_nl_get_local_id(struct mptcp_sock *msk, struct mptcp_addr_info *skc
+ 	entry->ifindex = 0;
+ 	entry->flags = MPTCP_PM_ADDR_FLAG_IMPLICIT;
+ 	entry->lsk = NULL;
+-	ret = mptcp_pm_nl_append_new_local_addr(pernet, entry, true);
++	ret = mptcp_pm_nl_append_new_local_addr(pernet, entry, true, false);
+ 	if (ret < 0)
+ 		kfree(entry);
+ 
+@@ -1433,7 +1444,8 @@ int mptcp_pm_nl_add_addr_doit(struct sk_buff *skb, struct genl_info *info)
  		}
- 
-+		if (ret)
-+			return ret;
-+	} else {
-+		if (dp83822->sor1 & BIT(5)) {
-+			ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND2, MII_DP83822_RCSR,
-+					       DP83822_RMII_MODE_SEL);
-+		} else {
-+			ret = phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2, MII_DP83822_RCSR,
-+						 DP83822_RMII_MODE_SEL);
-+		}
-+
- 		if (ret)
- 			return ret;
  	}
-@@ -888,6 +901,48 @@ static int dp83822_read_straps(struct phy_device *phydev)
- 	return 0;
- }
- 
-+static int dp83826_read_straps(struct phy_device *phydev)
-+{
-+	struct dp83822_private *dp83822 = phydev->priv;
-+	int val;
-+
-+	val = phy_read_mmd(phydev, MDIO_MMD_VEND2, MII_DP83822_SOR1);
-+	if (val < 0)
-+		return val;
-+
-+	phydev_dbg(phydev, "SOR1 strap register: 0x%04x\n", val);
-+
-+	/* Bit 10: MDIX mode */
-+	if (val & BIT(10))
-+		phydev_dbg(phydev, "MDIX mode enabled\n");
-+
-+	/* Bit 9: auto-MDIX disable */
-+	if (val & BIT(9))
-+		phydev_dbg(phydev, "Auto-MDIX disabled\n");
-+
-+	/* Bit 8: RMII */
-+	if (val & BIT(8)) {
-+		phydev_dbg(phydev, "RMII mode enabled\n");
-+		phydev->interface = PHY_INTERFACE_MODE_RMII;
-+	}
-+
-+	/* Bit 5: Slave mode */
-+	if (val & BIT(5))
-+		phydev_dbg(phydev, "RMII slave mode enabled\n");
-+
-+	/* Bit 0: autoneg disable */
-+	if (val & BIT(0)) {
-+		phydev_dbg(phydev, "Auto-negotiation disabled\n");
-+		phydev->autoneg = AUTONEG_DISABLE;
-+		phydev->speed = SPEED_100;
-+		phydev->duplex = DUPLEX_FULL;
-+	}
-+
-+	dp83822->sor1 = val;
-+
-+	return 0;
-+}
-+
- static int dp8382x_probe(struct phy_device *phydev)
- {
- 	struct dp83822_private *dp83822;
-@@ -935,6 +990,10 @@ static int dp83826_probe(struct phy_device *phydev)
- 	if (ret)
- 		return ret;
- 
-+	ret = dp83826_read_straps(phydev);
-+	if (ret)
-+		return ret;
-+
- 	dp83826_of_init(phydev);
- 
- 	return 0;
+ 	ret = mptcp_pm_nl_append_new_local_addr(pernet, entry,
+-						!mptcp_pm_has_addr_attr_id(attr, info));
++						!mptcp_pm_has_addr_attr_id(attr, info),
++						true);
+ 	if (ret < 0) {
+ 		GENL_SET_ERR_MSG_FMT(info, "too many addresses or duplicate one: %d", ret);
+ 		goto out_free;
 
+---
+base-commit: 64e6a754d33d31aa844b3ee66fb93ac84ca1565e
+change-id: 20250303-net-mptcp-fix-sched-while-atomic-cec8ab2b9b8d
+
+Best regards,
 -- 
-2.39.5
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
