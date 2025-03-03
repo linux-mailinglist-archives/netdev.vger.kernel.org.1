@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-171407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 646FDA4CE10
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 23:17:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94442A4CE2C
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 23:20:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EFB5172F51
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 22:17:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 402D93AD16F
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 22:20:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 442581EDA22;
-	Mon,  3 Mar 2025 22:17:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 408C022C325;
+	Mon,  3 Mar 2025 22:19:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iOYvBbfj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UvoPBHed"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2059C1DDA3C
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 22:17:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F631EFFBA;
+	Mon,  3 Mar 2025 22:19:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741040239; cv=none; b=QP+uqWi3xgY74nZBLHaPFFc5Mw1b1idQCHWj3b52tOUswaEerYJtRWboPP/D8Coa9zS30cHhoZaAEleUSHVUZP6AkSvWvFogvFKi1yQenYbohn9TKPQDaYrdKD9PUa7qC8Y0usrDVtsulAZtr7B4epB8umTsPBpMuL09HJjyTR4=
+	t=1741040390; cv=none; b=E55ABOlAR0SIq3xixhCe/d2oWsmeeSaVBl41+v8P57Usobot3e0nZuiwZtXz2EvZuezetDFA65PgG71YMAdd8xUsGhNdwXoSAC6s02vZZ0LzcqTWf+Wi2YKL5a4NGnskkpN6UM4AOnx/vk9cBZYCrH6n7GbSpX6NrLbOX+Eqk7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741040239; c=relaxed/simple;
-	bh=857rP6cCy3uLBXAeR6Y5n6qquX+BYF5VTV3f0WUcckQ=;
+	s=arc-20240116; t=1741040390; c=relaxed/simple;
+	bh=lhz6YjfSTKtzAmONbQMPFT2eHdU4hQ3fNb+tQ4kLtBI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Cx3DacMhSASZ01tuS5lwUuSoBAAW+t08zFbqhiLiicYaka1giq4JoLTlHk9m/I+umtfg20YdswISMjcZ+92bIYu+17ex8TAUyzazQLUldAIWtr6sqmjKdes8jLsYk9MHlZLWBhfLVj3uaYgNWBJVH1jZejP6NasyZV4YwIagthU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iOYvBbfj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CAB0C4CED6;
-	Mon,  3 Mar 2025 22:17:18 +0000 (UTC)
+	 MIME-Version:Content-Type; b=oJmrZ+SHJiCrAowQKJtKqg1nukY+aSW4iypIE8mRHyod3mMii7jCvIApCB/f/mCjBacWsKqY6GNMIZCcK0lTaU3wrx9jJwkaS70Sre02n3Vh/fjVTb3Zuj7CF4brPI0H+v+oMuUJAIVSBBCgW9jnMeL+rN9eP+cyvdKTxMPcpL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UvoPBHed; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EEFFC4CED6;
+	Mon,  3 Mar 2025 22:19:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741040238;
-	bh=857rP6cCy3uLBXAeR6Y5n6qquX+BYF5VTV3f0WUcckQ=;
+	s=k20201202; t=1741040389;
+	bh=lhz6YjfSTKtzAmONbQMPFT2eHdU4hQ3fNb+tQ4kLtBI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iOYvBbfjNwnqa+IWMxpkQTzu7iwlWVt4piFrm5NT52F5KpKVxVTv/zCjrCm3Q559D
-	 RVKg9+T5vIxn3H5SH51mcN6aLelY8WniF4GCb6oFWs/e0McQumHSZnSvRKkVyVOiOn
-	 8AtMp9xyqr7GBQ/2W26nx/5IBh0o23BURFOMNzzbYey5+JtBkO0OBQ8D2+TUCUgHiP
-	 heIg3M9SE4/58rfDCQymTyGbF2wdigt+AYyYrmsIwSTm6P98X+nNTHqneJaE+D7hdw
-	 UmkYDKepRZ5Om0pFblUvY8IxqPVCI+3J6i2BnxrGt1h7x65o+YVtnruNdM96KPRC21
-	 UE7BqiMrCIxwA==
-Date: Mon, 3 Mar 2025 14:17:17 -0800
+	b=UvoPBHedP90g0YpFicl7IKfoT1tdRFQD6k63Vjx1L59UfdvheV1y4EwUVIKFmuLcw
+	 q0iqMYlci5Kj6/7aq/2vDNUeU7bo/4CbHRKoFlDslsesbsCSvPBR1YLhOvZ6NCIAoj
+	 8dcfZaB1MewlbGBgR5GjPshSCRB0P22cADv4P9h8Gb+NudUQLTobuIxZQKjOX3+zEU
+	 DZCH7gqSGpynwCGKN1oKqGW79Jv/EqyuJPew2T4juZ0q95UpJXWCJXtvlo8Mh2mJJL
+	 ZpSMZXBGs0xROWiNVIJETIbkAW3zOQzRUesgLBSWiKki8x8YYkLbTbNFjKM1CmAgV4
+	 RoQxjes3twGnw==
+Date: Mon, 3 Mar 2025 14:19:48 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Gal Pressman <gal@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, netdev@vger.kernel.org, Andrew Lunn
- <andrew@lunn.ch>, Simon Horman <horms@kernel.org>, Joe Damato
- <jdamato@fastly.com>, Tariq Toukan <tariqt@nvidia.com>,
- ecree.xilinx@gmail.com
-Subject: Re: [PATCH net-next] net: ethtool: Don't check if RSS context
- exists in case of context 0
-Message-ID: <20250303141717.67f6d417@kernel.org>
-In-Reply-To: <f5bf9ab4-bc65-45fe-804d-9c84d8b7bf1f@nvidia.com>
-References: <20250225071348.509432-1-gal@nvidia.com>
-	<20250225170128.590baea1@kernel.org>
-	<8a53adaa-7870-46a9-9e67-b534a87a70ed@nvidia.com>
-	<20250226182717.0bead94b@kernel.org>
-	<f5bf9ab4-bc65-45fe-804d-9c84d8b7bf1f@nvidia.com>
+To: Shahar Shitrit <shshitrit@nvidia.com>
+Cc: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
+ <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Saeed Mahameed
+ <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>, Leon Romanovsky
+ <leonro@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Carolina Jubran <cjubran@nvidia.com>
+Subject: Re: [PATCH net-next 3/6] net/mlx5e: Enable lanes configuration when
+ auto-negotiation is off
+Message-ID: <20250303141948.53a5cee6@kernel.org>
+In-Reply-To: <c57977d0-5af6-44b7-80a4-00024f3e5e49@nvidia.com>
+References: <20250226114752.104838-1-tariqt@nvidia.com>
+	<20250226114752.104838-4-tariqt@nvidia.com>
+	<20250228145135.57cf1a73@kernel.org>
+	<c57977d0-5af6-44b7-80a4-00024f3e5e49@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,26 +68,18 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 2 Mar 2025 11:55:34 +0200 Gal Pressman wrote:
-> >> I can think of something like redirecting all TCP traffic to context 1,
-> >> and then a specific TCP 5-tuple to the default context.  
+On Sun, 2 Mar 2025 10:17:58 +0200 Shahar Shitrit wrote:
+> On 01/03/2025 0:51, Jakub Kicinski wrote:
+> > On Wed, 26 Feb 2025 13:47:49 +0200 Tariq Toukan wrote:  
+> >> +		if (table[i].speed == info->speed) {
+> >> +			if (!info->lanes || table[i].lanes == info->lanes)  
 > > 
-> > The ordering guarantees of ntuple filters are a bit unclear.
-> > My understanding was that first match terminates the search,
-> > actually, so your example wouldn't work :S  
-> 
-> The ordering should be done according to the rule location.
->  * @location: Location of rule in the table.  Locations must be
->  *	numbered such that a flow matching multiple rules will be
->  *	classified according to the first (lowest numbered) rule.
+> > Hm, on a quick look it seems like lane count was added in all tables,
+> > so not sure why the !info->lanes
+> >  
+> it's for the case only speed was passed from ethtool (then ethtool
+> passes 0 for lanes)
 
-I'm aware, Gal, but the question is whether every driver developer 
-is aware of this, not just me and perhaps you.
-
-> The cited patch is a regression from user's perspective. Surely, not an
-> intended one?
-
-I believe this message should already answer you questions:
-https://lore.kernel.org/all/20250226204503.77010912@kernel.org/
-Fix the commit message, add test, repost.
+Makes sense, I think I read the condition backwards TBH 
+(table[i] vs info).
 
