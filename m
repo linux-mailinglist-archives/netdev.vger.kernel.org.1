@@ -1,131 +1,184 @@
-Return-Path: <netdev+bounces-171167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E979A4BBC6
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 11:15:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1756FA4BC02
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 11:25:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32DD3188F310
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 10:15:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4E827A4493
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 10:24:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5141F153E;
-	Mon,  3 Mar 2025 10:15:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6644B1F0E3D;
+	Mon,  3 Mar 2025 10:25:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IA7/PVBT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HMVUByrH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17C4E1F237D;
-	Mon,  3 Mar 2025 10:15:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B997B1D63F7
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 10:25:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740996903; cv=none; b=sVCS8umDym94aHfVDXScZzS1MrLwZhSkiFVbGNT4but6AoqVDF88cGBAHYc9VW11PoIIpUQkkD7Mdv3o2H3NL02U7R0OzWBDhaSiFXZCZpx7Loxqywcb0sAQMCSC7tJf7SJlyYlmWe7giJ1okf29OOx/q+dxzbT/gbjiJ+gG+gk=
+	t=1740997535; cv=none; b=g8IxKjpaFNDMDcn7IPy98jX5vxYTJvejGEYzxWKN/lTl0rL6Qphl2ZmocnPh8PYvsOMOpOj2YN5cx11Qog+dn/uBKSpZocggTMi5FY7w7J7QpLNfCLtWCGu58sEW3RsRgX6pT1UHrBA/2APFhPP5aIzvnHaKIkWafrHZgpxyS60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740996903; c=relaxed/simple;
-	bh=X46IDPT5bSizjOglkihdx7CBx3PDon7yUUnAarb4YYo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HEEJhhA87Rm+QGY7iRJQdKoCy1i1lvj/epHUGo/uFOO+hnYHJGMF2GcMczh+4slE5IG8XePP8i4hbBqAIe46GYNClsiB5+lSHfzj1/U30DlD9pYNzRLm5MRTrQFEEzTAEtHWopf2SjLO3QYri/cKxUyJ97JxCLrEX7SaflZYmnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IA7/PVBT; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-390ddf037ffso2134323f8f.2;
-        Mon, 03 Mar 2025 02:15:01 -0800 (PST)
+	s=arc-20240116; t=1740997535; c=relaxed/simple;
+	bh=+jWFj+6c+tnA6viBFroBo8w6Ck4kM2IdVklx1ugRuaQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EQKH2eBkQMDCXs3urMqnXyx+I/avTuBUpaik6vy7twEfhnASTUjdmSwtZI+ew6sBq9/JIkw7NpPQUa+3+CUPjtlM2ZywHMQgTR0DLjR7PXORz2WhuEDSyTe4dPXgnuC9r+ru5TJYC84qAOn7StOcuZvi1uVcSUsjTMfOZsWvsy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HMVUByrH; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-471f4909650so38809231cf.2
+        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 02:25:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740996900; x=1741601700; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tol5LoF5YKxi3DYyeCcA+EZdRUNMW2s7Mp90wPpPTm4=;
-        b=IA7/PVBTA/OQSovCTfW+yqAerlpifuz2JpBU01HV/htsYVO+CEi2HyiwH/nOLHoD94
-         DL+/J0eg3St9uQjTd0HjuqMC4wXd5AXNwY/2jBsiqi9TZ44ofOrr1ILtFK7eULru0j/w
-         KKmTUdXj0XQQeRtyIwGNESStY8JooLX2czeKnSzMAC91oLQleQa8AHIT/eEqnAqX2hf6
-         /ojha8giytPuu6sBGesJMulkgux4OXhadReC0/y701qngF/RVgKgRsHPs04/9J+/Nj6Q
-         ogrssp5rgDbfHpL3xkfNxLlaVMY8qfRgSzSYxliXWNxxZZMdmN7biPr9YWpkEq0+gdrw
-         Zv4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740996900; x=1741601700;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1740997532; x=1741602332; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tol5LoF5YKxi3DYyeCcA+EZdRUNMW2s7Mp90wPpPTm4=;
-        b=T8oZ/GxzmFUS0zPu49i5ZYR4HFXOHCbL0q+sC3TMU7rd+EsBEGS1Mo1TR4MRDwkV9j
-         HH1sNwKzDJj2sXdKLUhookXV7OnlVz8LL2jbVP9HRUNech5yA8BP42p6RAsclgRrwKpC
-         QMZ+1qGEhjb5BKH6pX47FLMqO9ghvYFEOZU3AgiCVdomouwFdJxCDB7V2sfT8n8db/wY
-         sJ5IN4YNfR6Ym3V3rv2zpLuhBbxtJc804Nf6sfFgneMmocPhu71rOabyuz+WaGqGLhE3
-         orohHj/F1gfRRSclr7IICQZnvu+43O/jWedh+6lH6aTiywBgEnl36opDJTVUzo7TUEAh
-         XJyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVauk82RCeEDvJlswumSLk9WfQFCaxuz98J+0yqAWuXemfzVSv7gIhXpcWBH8xdEPFWWWg=@vger.kernel.org, AJvYcCVyUUSgGorplHJkmBfIv13tehPmufT20zJawo7cpeyRi0l9dsqHnukpLyJu/mGGxmrQJcjMVinz@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJB88ut6RUVkPJtev5A/WJ4EeEBy5+3Z7JaBsu2sA5fOrhZFa5
-	nFX4+yCM4HNUQ2YrlQQcnYbrtY1NBUuejiuyHgdMDxerq0qlQ2mT
-X-Gm-Gg: ASbGncsr/teIz2jQV6kfp1TL8KWWbBdYrvoEL6c9Q0HCq0o5rSB65tP2nwLkZALDAUI
-	wm2xt1oxzdChRt6jxAODOHIgOTLlXeCQA5XVtCBCSP0POI6M6cG+NJ4J2wyYQVOa8sIG6ZS8udH
-	Y3FGRBWikcFCDVgcEM7vqemWdSEKv8TK84YR4dMWjRE82g6KiMFTEnJLA7a5mVauqiYi93H4MIa
-	GBsGDH/BG+M9sMfMXhaLDhN8plkym9iIHe3EUQUwnOumvFVspYp9425Y1Aj2se4gNf/0m9ec7GR
-	67L29eWZAc0/t1nCgR1hBMw5UyoGePe0hmJTHkO1MqtaX/iIR2h087jChczqVvt1HnlVbr76UmN
-	1eL6+gfQ=
-X-Google-Smtp-Source: AGHT+IEwKfHIQwZGCKj/Q1qIH2G5QePVeGE+TFbByCIPzRFZ4PfkipJn3haaixhk/jO2Uen1J1Ydhw==
-X-Received: by 2002:a05:6000:1ac6:b0:391:ffc:2413 with SMTP id ffacd0b85a97d-3910ffc2673mr1264869f8f.40.1740996900107;
-        Mon, 03 Mar 2025 02:15:00 -0800 (PST)
-Received: from MTARDY-M-GJC6 (deskosmtp.auranext.com. [195.134.167.217])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390e4844abbsm13870804f8f.70.2025.03.03.02.14.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Mar 2025 02:14:59 -0800 (PST)
-Date: Mon, 3 Mar 2025 11:14:57 +0100
-From: Mahe Tardy <mahe.tardy@gmail.com>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: daniel@iogearbox.net, john.fastabend@gmail.com, ast@kernel.org,
-	andrii@kernel.org, jolsa@kernel.org, bpf@vger.kernel.org,
-	Network Development <netdev@vger.kernel.org>
-Subject: Re: [PATCH bpf-next 1/2] bpf: add get_netns_cookie helper to tracing
- programs
-Message-ID: <Z8WBIR72Zu5x50N9@MTARDY-M-GJC6>
-References: <20250227182830.90863-1-mahe.tardy@gmail.com>
- <96dbd7df-1fa7-4caa-a52c-372d696e0f38@linux.dev>
+        bh=6Q+yp4lkhMYow7B6SfNJoDIbgF7POgJDcW/uEms7wn4=;
+        b=HMVUByrHTI5esoiHo8cdz+qmfBMyCYge81PwzVa+zzsRF+tQuHzHUemWWr4629LhPk
+         xdZHtuJQaI52GnpuIpQSeKlzbcFgELesxsEGY0E9eyKDCnNozLcD0P0xNHhjaZreQAsE
+         JmB5NVH9IdWipnJZmQHcre0zGfG26qT3/VgTGkHtJd/YkSQ1DgO2jLBZUHYr1Kt1i5wm
+         v4bPD9ozLxKsvd7TR4dG/wkvPNyDgF8KbE36WYthdhLImHW3wI9yfSeCUMTtAPaiPWUv
+         xpgIc/zDB9yAw5BKaqOsmd3kfH3f5fzF5uZHLQ4tky6lP3LbabD0+r6vPUpK+NHVvuGr
+         Hu7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740997532; x=1741602332;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6Q+yp4lkhMYow7B6SfNJoDIbgF7POgJDcW/uEms7wn4=;
+        b=WB3WtRbeIB/gQ7gkHLEtO2zrwnperSLkHdTM4LWhCDAwOLeXAj1jRGL78J3k7JpbxU
+         SPddsps3sFowFG0M+kQV2FaJBoZ7uvDBighYdcatza4Mby4U97jwBHrfha1UcQ76BcHh
+         mZAuYy3BbgAtxudXttJnEssQAQvzSPpf9aoazvxrWUhw2+9QE6hTtYGTYo7FyQHV3C5q
+         drlXlxms5Fc51Ft0VH3pVfFuT3tQkAMOgBffKEtn+NyQXuRsv/g61t454BTP5qoNvYLP
+         VlsMyDE3SvTte3+7Q9BF9WL7tImgnlj6apKQzr012fJAbX6u2oXv4tyzzg8sX9e9pmrz
+         5AgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUYFJ7MeyxXMe0fIlNcGM77W/vnbhHL0KrHoVaUznoILQ00GSFjG6HFDkVfAPUEMTbektUs5qg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvGcQ1yrO1RGthv/WHLpqQVFNI8eTQif5a/3Pxsoc5avYK30An
+	apHeAXYMJbModSNM9P4gHXzEfTf8YWi21i1nV7aKSxMadxSToRqH53VHXe7SeHYNurCWN33wuaf
+	nklL4Rn+mwO4aHSPmr/+5zY3eJDvI/D2FuAJ0
+X-Gm-Gg: ASbGncuMv8+UiWjtOwCf3oAp2lWrry+RYe4KC2m84JFEGoLRPpDIBpGPuOgUqgqinVY
+	OMnM8lBYFg1y3QKZQAT3kUikT/s0f0Lim9Tnswr3TPPxYFrXduketWE6FYAAi3CvXUylrPLJ6Av
+	EwfcpIvE1TyF6inpkSwn5Jx1pI
+X-Google-Smtp-Source: AGHT+IFmXB7/xV9yKo4ib4wZlwm/dP579/VRVEVi5lBVpYgAXdK/mp2KpXjWJuoleiwLBUki8YFXUmPgBljWV+wbQLA=
+X-Received: by 2002:a05:622a:1352:b0:472:1225:bda4 with SMTP id
+ d75a77b69052e-474bc05180amr193715311cf.1.1740997532322; Mon, 03 Mar 2025
+ 02:25:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <96dbd7df-1fa7-4caa-a52c-372d696e0f38@linux.dev>
+References: <20250302124237.3913746-1-edumazet@google.com> <20250302124237.3913746-5-edumazet@google.com>
+ <CAL+tcoCOLBJO1PZdKPu2tM3ByQbu9DKcsHn1g6q33CbpHtx5Cw@mail.gmail.com>
+In-Reply-To: <CAL+tcoCOLBJO1PZdKPu2tM3ByQbu9DKcsHn1g6q33CbpHtx5Cw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 3 Mar 2025 11:25:21 +0100
+X-Gm-Features: AQ5f1JqjFULk-2bq7M-vvpw3HTcfC_N6nz6uzs43yK2guBWAX4lDwcSInfr9h9w
+Message-ID: <CANn89i+pAcJyB1hhOQYzXZKOeDoS1gz4xuDiMBQ3h4PqmVZAsA@mail.gmail.com>
+Subject: Re: [PATCH net-next 4/4] tcp: use RCU lookup in __inet_hash_connect()
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 27, 2025 at 12:32:43PM -0800, Martin KaFai Lau wrote:
-> On 2/27/25 10:28 AM, Mahe Tardy wrote:
-> > This is needed in the context of Cilium and Tetragon to retrieve netns
-> > cookie from hostns when traffic leaves Pod, so that we can correlate
-> > skb->sk's netns cookie.
-> > 
-> > Signed-off-by: Mahe Tardy <mahe.tardy@gmail.com>
-> > ---
-> > This is a follow-up of c221d3744ad3 ("bpf: add get_netns_cookie helper
-> > to cgroup_skb programs") and eb62f49de7ec ("bpf: add get_netns_cookie
-> > helper to tc programs"), adding this helper respectively to cgroup_skb
-> > and tcx programs.
-> > 
-> > I looked up a patch doing a similar thing c5dbb89fc2ac ("bpf: Expose
-> > bpf_get_socket_cookie to tracing programs") and there was an item about
-> > "sleepable context". It seems it indeed concerns tracing and LSM progs
-> > from reading 1e6c62a88215 ("bpf: Introduce sleepable BPF programs"). Is
-> > this needed here?
-> 
-> Regarding sleepable, I think the bpf_get_netns_cookie_sock is only reading,
-> should be fine.
+On Mon, Mar 3, 2025 at 2:08=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.co=
+m> wrote:
+>
+> On Sun, Mar 2, 2025 at 8:42=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
+ wrote:
+> >
+> > When __inet_hash_connect() has to try many 4-tuples before
+> > finding an available one, we see a high spinlock cost from
+> > the many spin_lock_bh(&head->lock) performed in its loop.
+> >
+> > This patch adds an RCU lookup to avoid the spinlock cost.
+> >
+> > check_established() gets a new @rcu_lookup argument.
+> > First reason is to not make any changes while head->lock
+> > is not held.
+> > Second reason is to not make this RCU lookup a second time
+> > after the spinlock has been acquired.
+> >
+> > Tested:
+> >
+> > Server:
+> >
+> > ulimit -n 40000; neper/tcp_crr -T 200 -F 30000 -6 --nolog
+> >
+> > Client:
+> >
+> > ulimit -n 40000; neper/tcp_crr -T 200 -F 30000 -6 --nolog -c -H server
+> >
+> > Before series:
+> >
+> >   utime_start=3D0.288582
+> >   utime_end=3D1.548707
+> >   stime_start=3D20.637138
+> >   stime_end=3D2002.489845
+> >   num_transactions=3D484453
+> >   latency_min=3D0.156279245
+> >   latency_max=3D20.922042756
+> >   latency_mean=3D1.546521274
+> >   latency_stddev=3D3.936005194
+> >   num_samples=3D312537
+> >   throughput=3D47426.00
+> >
+> > perf top on the client:
+> >
+> >  49.54%  [kernel]       [k] _raw_spin_lock
+> >  25.87%  [kernel]       [k] _raw_spin_lock_bh
+> >   5.97%  [kernel]       [k] queued_spin_lock_slowpath
+> >   5.67%  [kernel]       [k] __inet_hash_connect
+> >   3.53%  [kernel]       [k] __inet6_check_established
+> >   3.48%  [kernel]       [k] inet6_ehashfn
+> >   0.64%  [kernel]       [k] rcu_all_qs
+> >
+> > After this series:
+> >
+> >   utime_start=3D0.271607
+> >   utime_end=3D3.847111
+> >   stime_start=3D18.407684
+> >   stime_end=3D1997.485557
+> >   num_transactions=3D1350742
+> >   latency_min=3D0.014131929
+> >   latency_max=3D17.895073144
+> >   latency_mean=3D0.505675853  # Nice reduction of latency metrics
+> >   latency_stddev=3D2.125164772
+> >   num_samples=3D307884
+> >   throughput=3D139866.80      # 190 % increase
+> >
+> > perf top on client:
+> >
+> >  56.86%  [kernel]       [k] __inet6_check_established
+> >  17.96%  [kernel]       [k] __inet_hash_connect
+> >  13.88%  [kernel]       [k] inet6_ehashfn
+> >   2.52%  [kernel]       [k] rcu_all_qs
+> >   2.01%  [kernel]       [k] __cond_resched
+> >   0.41%  [kernel]       [k] _raw_spin_lock
+> >
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+>
+> Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+> Tested-by: Jason Xing <kerneljasonxing@gmail.com>
+>
+> I tested only on my virtual machine (with 64 cpus) and got an around
+> 100% performance increase which is really good. And I also noticed
+> that the spin lock hotspot has gone :)
+>
+> Thanks for working on this!!!
 
-Ok thank you.
+Hold your breath, I have two additional patches bringing the perf to :
 
-> The immediate question is whether sock_net(sk) must be non-NULL for tracing.
+local_throughput=3D353891          #   646 % improvement
 
-We discussed this offline with Daniel Borkmann and we think that it
-might not be the question. The get_netns_cookie(NULL) call allows us to
-compare against get_netns_cookie(sock) to see whether the sock's netns
-is equal to the init netns and thus dispatch different logic.
-
-Given we (in Tetragon) historically used tracing programs when no
-appropriate network hook was available on older kernels I can foresee
-how it can still be useful in such programs.
-
+I will wait for this first series to be merged before sending these.
 
