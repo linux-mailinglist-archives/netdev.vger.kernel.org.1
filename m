@@ -1,64 +1,65 @@
-Return-Path: <netdev+bounces-171251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DA7FA4C26C
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 14:52:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E701BA4C26E
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 14:52:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E66F188F044
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 13:52:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 303EC1890B4D
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 13:53:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E373211A0B;
-	Mon,  3 Mar 2025 13:52:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B4ED213244;
+	Mon,  3 Mar 2025 13:52:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="CiOyJp6K"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="hNt0OAjW"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
+Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B7F186347;
-	Mon,  3 Mar 2025 13:52:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48CC7212D97;
+	Mon,  3 Mar 2025 13:52:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741009954; cv=none; b=bdmacFf8OjkgSnPDxm97dQILBCgpFVDLiDvFvTiSxckoa/ZDUJae+8LPLjfQ+qF2p8T8lhz209GXhKt3OPe5OhReAQ557ICQj+DT0aCJ0XY9Hzlfm/5aRMjI8y6WFO/wbIZhelV6MwtptUCh/jGXeJb7ZfxwECdh4DFlAvgEZ4Q=
+	t=1741009957; cv=none; b=PXmzY5Vb0O6MMOrwuGIO6fDDzVoJMV3Qw5NyGDi4Dwb7JGst93ND3hFMhkpuc+8+5crbG/tC/9KROCAven3ELleWTQwqeI7jEH1gr/bgW9pawFUyYXi8QfPyvyhZYEK1NvaBsSf2asrFC4Mw6Wu6Oz73WxZPu5HbG3TD8XQ51x8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741009954; c=relaxed/simple;
-	bh=o8VoAt5dL3GJqO4ZL7G+9SXofDr7fMM3zttZuWylbZc=;
+	s=arc-20240116; t=1741009957; c=relaxed/simple;
+	bh=xdYWwjL+CDWXGilizwTlyWiiyQq/uWLihWYcwAU05EQ=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uYOmv5o/m2q/Bn01GtePilZmFRhqkAyvbWjmiyJaV6G1VwJxWiJFhOSNnVBazSx0NOOeKDs0XjezAyU+jg5Jr41Dv/wUxl3Ev7qxsBMJXcfrGntWOKpEhmYVw1ZPJ3aHE7TXm2kKCauTqnD1h/Z7zrvnqw/wLzxfJv17BHfQ8aM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=CiOyJp6K; arc=none smtp.client-ip=198.47.19.246
+	 MIME-Version:Content-Type; b=NEMr++KCBtqP0u4qwp5FsX5hyD3d9RnXVtg7PivlioQLlKxhSMzmw+gr6S2lza1sZPb2AcNtnUvc2/EV/cqD3se+B1WAUmbaRd2mk0nOvS4swzEaoOEdtr7GLvYZ9+r+ygpkrnhKGAjW0bsiDtd3UggeukZ6bJLp+1a15PtW9U8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=hNt0OAjW; arc=none smtp.client-ip=198.47.19.245
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 523DqFDJ3287675
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Mon, 3 Mar 2025 07:52:15 -0600
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 523DqIoH2695917
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 3 Mar 2025 07:52:18 -0600
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1741009935;
-	bh=Lz8EOBn9FUAA9PUMl7yDcfKigTwB7zLIEjA+CKP0ZPA=;
+	s=ti-com-17Q1; t=1741009938;
+	bh=xVFXwEHnmiutpUbmvWfualAABgQYgGxlamF2SY4e2Cw=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=CiOyJp6KRusPBdfZ7/h7j/VSlAOKo5ujK0iDwmb49mxCcMuBHL0SnSC/5PS1Dn9Kk
-	 wh7yeSTnFm4SwApy5PyypIn07tbNn0ZK4PmswvulqjnfiWXD9xWeQvVxk5CRmpp6O5
-	 qGthWuDvMINi7GC0q6nCFPK/LbOEiZMQIlzr+9/U=
-Received: from DLEE104.ent.ti.com (dlee104.ent.ti.com [157.170.170.34])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 523DqF79095313;
-	Mon, 3 Mar 2025 07:52:15 -0600
-Received: from DLEE112.ent.ti.com (157.170.170.23) by DLEE104.ent.ti.com
- (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
+	b=hNt0OAjWoriKvelpAiX+03kpq6Xz1/1BkUaH/o9Hb7JCFYKDW3WNW8KVJC2TrKs9g
+	 UY4RvXaAP3gxwK/GW//5W9EpBweYhkBQTX8v9cRY8VFyUITkaeIhbVwFVOvbIi7FQE
+	 0Wqwf5uJI3R1e85VwtAxz1tpAcq0Qk/c1FhSVk88=
+Received: from DFLE110.ent.ti.com (dfle110.ent.ti.com [10.64.6.31])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 523DqIJ7002485
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 3 Mar 2025 07:52:18 -0600
+Received: from DFLE104.ent.ti.com (10.64.6.25) by DFLE110.ent.ti.com
+ (10.64.6.31) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 3
- Mar 2025 07:52:14 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE112.ent.ti.com
- (157.170.170.23) with Microsoft SMTP Server (version=TLS1_2,
+ Mar 2025 07:52:18 -0600
+Received: from fllvsmtp8.itg.ti.com (10.64.41.158) by DFLE104.ent.ti.com
+ (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Mon, 3 Mar 2025 07:52:14 -0600
+ Frontend Transport; Mon, 3 Mar 2025 07:52:18 -0600
 Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 523DqEhA092412;
-	Mon, 3 Mar 2025 07:52:14 -0600
+	by fllvsmtp8.itg.ti.com (8.15.2/8.15.2) with ESMTP id 523DqIWQ026987;
+	Mon, 3 Mar 2025 07:52:18 -0600
 Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
-	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 523DqDP2018084;
-	Mon, 3 Mar 2025 07:52:14 -0600
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 523DqHdQ018094;
+	Mon, 3 Mar 2025 07:52:17 -0600
 From: Meghana Malladi <m-malladi@ti.com>
 To: <javier.carrasco.cruz@gmail.com>, <diogo.ivo@siemens.com>,
         <horms@kernel.org>, <jacob.e.keller@intel.com>, <m-malladi@ti.com>,
@@ -69,9 +70,9 @@ CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
         Vignesh Raghavendra
 	<vigneshr@ti.com>,
         Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-Subject: [PATCH net-next v3 1/2] net: ti: icss-iep: Add pwidth configuration for perout signal
-Date: Mon, 3 Mar 2025 19:21:23 +0530
-Message-ID: <20250303135124.632845-2-m-malladi@ti.com>
+Subject: [PATCH net-next v3 2/2] net: ti: icss-iep: Add phase offset configuration for perout signal
+Date: Mon, 3 Mar 2025 19:21:24 +0530
+Message-ID: <20250303135124.632845-3-m-malladi@ti.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250303135124.632845-1-m-malladi@ti.com>
 References: <20250303135124.632845-1-m-malladi@ti.com>
@@ -90,11 +91,11 @@ both pps and perout signals. When enabling pps, the application needs
 to only pass enable/disable argument, whereas for perout it supports
 different flags to configure the signal.
 
-But icss_iep_perout_enable_hw() function is missing to hook the
-configuration params passed by the app, causing perout to behave
-same a pps (except being able to configure the period). As duty cycle
-is also one feature which can configured for perout, incorporate this
-in the function to get the expected signal.
+In case the app passes a valid phase offset value, the signal should
+start toggling after that phase offset, else start immediately or
+as soon as possible. ICSS_IEP_SYNC_START_REG register take number of
+clock cycles to wait before starting the signal after activation time.
+Set appropriate value to this register to support phase offset.
 
 Signed-off-by: Meghana Malladi <m-malladi@ti.com>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
@@ -103,100 +104,73 @@ Changes from v2 (v3-v2):
 - Posted patch to net-next as feature addition
 - Collected RB tag from Jacob Keller <jacob.e.keller@intel.com>
 
- drivers/net/ethernet/ti/icssg/icss_iep.c | 49 ++++++++++++++++++++++--
- 1 file changed, 46 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/ti/icssg/icss_iep.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.c b/drivers/net/ethernet/ti/icssg/icss_iep.c
-index d59c1744840a..0411438a3b5d 100644
+index 0411438a3b5d..598dfb963db6 100644
 --- a/drivers/net/ethernet/ti/icssg/icss_iep.c
 +++ b/drivers/net/ethernet/ti/icssg/icss_iep.c
-@@ -406,9 +406,16 @@ static void icss_iep_update_to_next_boundary(struct icss_iep *iep, u64 start_ns)
- static int icss_iep_perout_enable_hw(struct icss_iep *iep,
+@@ -407,6 +407,7 @@ static int icss_iep_perout_enable_hw(struct icss_iep *iep,
  				     struct ptp_perout_request *req, int on)
  {
-+	struct timespec64 ts;
-+	u64 ns_width;
+ 	struct timespec64 ts;
++	u64 ns_start;
+ 	u64 ns_width;
  	int ret;
  	u64 cmp;
+@@ -416,6 +417,14 @@ static int icss_iep_perout_enable_hw(struct icss_iep *iep,
+ 	ts.tv_nsec = req->on.nsec;
+ 	ns_width = timespec64_to_ns(&ts);
  
-+	/* Calculate width of the signal for PPS/PEROUT handling */
-+	ts.tv_sec = req->on.sec;
-+	ts.tv_nsec = req->on.nsec;
-+	ns_width = timespec64_to_ns(&ts);
++	if (req->flags & PTP_PEROUT_PHASE) {
++		ts.tv_sec = req->phase.sec;
++		ts.tv_nsec = req->phase.nsec;
++		ns_start = timespec64_to_ns(&ts);
++	} else {
++		ns_start = 0;
++	}
 +
  	if (iep->ops && iep->ops->perout_enable) {
  		ret = iep->ops->perout_enable(iep->clockops_data, req, on, &cmp);
  		if (ret)
-@@ -419,8 +426,9 @@ static int icss_iep_perout_enable_hw(struct icss_iep *iep,
- 			regmap_write(iep->map, ICSS_IEP_CMP1_REG0, lower_32_bits(cmp));
- 			if (iep->plat_data->flags & ICSS_IEP_64BIT_COUNTER_SUPPORT)
- 				regmap_write(iep->map, ICSS_IEP_CMP1_REG1, upper_32_bits(cmp));
--			/* Configure SYNC, 1ms pulse width */
--			regmap_write(iep->map, ICSS_IEP_SYNC_PWIDTH_REG, 1000000);
-+			/* Configure SYNC, based on req on width */
-+			regmap_write(iep->map, ICSS_IEP_SYNC_PWIDTH_REG,
-+				     div_u64(ns_width, iep->def_inc));
+@@ -430,7 +439,8 @@ static int icss_iep_perout_enable_hw(struct icss_iep *iep,
+ 			regmap_write(iep->map, ICSS_IEP_SYNC_PWIDTH_REG,
+ 				     div_u64(ns_width, iep->def_inc));
  			regmap_write(iep->map, ICSS_IEP_SYNC0_PERIOD_REG, 0);
- 			regmap_write(iep->map, ICSS_IEP_SYNC_START_REG, 0);
+-			regmap_write(iep->map, ICSS_IEP_SYNC_START_REG, 0);
++			regmap_write(iep->map, ICSS_IEP_SYNC_START_REG,
++				     div_u64(ns_start, iep->def_inc));
  			regmap_write(iep->map, ICSS_IEP_SYNC_CTRL_REG, 0); /* one-shot mode */
-@@ -447,6 +455,8 @@ static int icss_iep_perout_enable_hw(struct icss_iep *iep,
- 				   + req->period.nsec;
- 			icss_iep_update_to_next_boundary(iep, start_ns);
+ 			/* Enable CMP 1 */
+ 			regmap_update_bits(iep->map, ICSS_IEP_CMP_CFG_REG,
+@@ -457,6 +467,8 @@ static int icss_iep_perout_enable_hw(struct icss_iep *iep,
  
-+			regmap_write(iep->map, ICSS_IEP_SYNC_PWIDTH_REG,
-+				     div_u64(ns_width, iep->def_inc));
+ 			regmap_write(iep->map, ICSS_IEP_SYNC_PWIDTH_REG,
+ 				     div_u64(ns_width, iep->def_inc));
++			regmap_write(iep->map, ICSS_IEP_SYNC_START_REG,
++				     div_u64(ns_start, iep->def_inc));
  			/* Enable Sync in single shot mode  */
  			regmap_write(iep->map, ICSS_IEP_SYNC_CTRL_REG,
  				     IEP_SYNC_CTRL_SYNC_N_EN(0) | IEP_SYNC_CTRL_SYNC_EN);
-@@ -474,7 +484,38 @@ static int icss_iep_perout_enable_hw(struct icss_iep *iep,
- static int icss_iep_perout_enable(struct icss_iep *iep,
- 				  struct ptp_perout_request *req, int on)
- {
--	return -EOPNOTSUPP;
-+	int ret = 0;
-+
-+	mutex_lock(&iep->ptp_clk_mutex);
-+
-+	/* Reject requests with unsupported flags */
-+	if (req->flags & ~PTP_PEROUT_DUTY_CYCLE) {
-+		ret = -EOPNOTSUPP;
-+		goto exit;
-+	}
-+
-+	if (iep->pps_enabled) {
-+		ret = -EBUSY;
-+		goto exit;
-+	}
-+
-+	if (iep->perout_enabled == !!on)
-+		goto exit;
-+
-+	/* Set default "on" time (1ms) for the signal if not passed by the app */
-+	if (!(req->flags & PTP_PEROUT_DUTY_CYCLE)) {
-+		req->on.sec = 0;
-+		req->on.nsec = NSEC_PER_MSEC;
-+	}
-+
-+	ret = icss_iep_perout_enable_hw(iep, req, on);
-+	if (!ret)
-+		iep->perout_enabled = !!on;
-+
-+exit:
-+	mutex_unlock(&iep->ptp_clk_mutex);
-+
-+	return ret;
- }
+@@ -489,7 +501,8 @@ static int icss_iep_perout_enable(struct icss_iep *iep,
+ 	mutex_lock(&iep->ptp_clk_mutex);
  
- static void icss_iep_cap_cmp_work(struct work_struct *work)
-@@ -553,6 +594,8 @@ static int icss_iep_pps_enable(struct icss_iep *iep, int on)
+ 	/* Reject requests with unsupported flags */
+-	if (req->flags & ~PTP_PEROUT_DUTY_CYCLE) {
++	if (req->flags & ~(PTP_PEROUT_DUTY_CYCLE |
++			  PTP_PEROUT_PHASE)) {
+ 		ret = -EOPNOTSUPP;
+ 		goto exit;
+ 	}
+@@ -590,6 +603,7 @@ static int icss_iep_pps_enable(struct icss_iep *iep, int on)
+ 	if (on) {
+ 		ns = icss_iep_gettime(iep, NULL);
+ 		ts = ns_to_timespec64(ns);
++		rq.perout.flags = 0;
+ 		rq.perout.period.sec = 1;
  		rq.perout.period.nsec = 0;
  		rq.perout.start.sec = ts.tv_sec + 2;
- 		rq.perout.start.nsec = 0;
-+		rq.perout.on.sec = 0;
-+		rq.perout.on.nsec = NSEC_PER_MSEC;
- 		ret = icss_iep_perout_enable_hw(iep, &rq.perout, on);
- 	} else {
- 		ret = icss_iep_perout_enable_hw(iep, &rq.perout, on);
 -- 
 2.43.0
 
