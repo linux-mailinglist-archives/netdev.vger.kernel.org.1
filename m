@@ -1,90 +1,90 @@
-Return-Path: <netdev+bounces-171103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0216A4B815
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 08:06:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17156A4B81E
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 08:08:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC37C189128D
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 07:06:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6ECD116D775
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 07:08:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E90F91D6DDC;
-	Mon,  3 Mar 2025 07:06:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 246671E9B12;
+	Mon,  3 Mar 2025 07:08:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Hw2OVqlo"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="T92x/fZT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F8C84A3C
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 07:06:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6329E1E98FF
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 07:08:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740985604; cv=none; b=oLcutLUcoK25PQ6K3xgj8eZNMBWiu+0sQCAnG0zajiX/+RF/+0/J+mSg0Uo6mwsCMPtcyQlvq0t0ku0qacwDhLJIcNT1IXNZthDcMEHYtO2ykrdb0ZUXJbNW9eWGPYH7ka82BqPPdHS9tBBaiDsbd07XqPmHk1Ok43NGLGoAo+k=
+	t=1740985722; cv=none; b=IFrBET78sRoy+eEQ8XM5UJ6ocC8t+cz7QPz5X14R3/W/7p0jIg8TteC0Cm+EFPlu/7nHga5fdBV0EdPzHOy93qewlT0l2JaI1CG4PM2kxUYLplwbrd4+ywDbiaX7FfnmV+bW8lpXhDcc3+whVJvXtd0l4julIXnv0sAjpCToLQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740985604; c=relaxed/simple;
-	bh=IRqAZ7CKtLmqGOJXFL7o7wvDwI8zrrkvfN8dH9XrUEw=;
+	s=arc-20240116; t=1740985722; c=relaxed/simple;
+	bh=hxHueSEf1h7DWhnfjvMAFcUeBNI7wz1SFWUHRZHSG3A=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=omSYH9Bqwd7mK4JOc0FG8KSu+hRK6at2FNdF8aNkOWWA7bKYfeJnGizzyqe/tYfXgxKAm8ZEqRuMqE3Kk/ImqEtwr864aRbu0GJSz9dIr0rKEIZipX5if26dY25SuaK2hIbB7TYL9y7dF79W7VChu5rwcruINm6Sj54x7FeaHDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Hw2OVqlo; arc=none smtp.client-ip=209.85.208.42
+	 To:Cc:Content-Type; b=YkUsay2s+XepIXpxDh6Ixq2y98zqBK19uD4HYKXSLri+2mDCZn8zELDzaxDKopqOqAVtAqz5yt2YYFcF2i8UwPeByL/EJA8XW7tD3X3oFNOSnXwkuEducWTMGP5+3th64wKWqGUNldqXIbkSdH73oPFQsp3cVWtq/+vXA9DmI6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=T92x/fZT; arc=none smtp.client-ip=209.85.208.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5e55ec94962so551124a12.3
-        for <netdev@vger.kernel.org>; Sun, 02 Mar 2025 23:06:42 -0800 (PST)
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5e53b3fa7daso1470747a12.2
+        for <netdev@vger.kernel.org>; Sun, 02 Mar 2025 23:08:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1740985601; x=1741590401; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1740985718; x=1741590518; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ydpPPAVVIbczNydhRAMrxedYE6w5x7xRraUtfZ6fRAw=;
-        b=Hw2OVqloacYbrSNwvQk4Y5c5CToPr5fhOL34XIVdfOjq1rhlg/18XDsh6L4I7u1Nct
-         G6kWbhbZL1a5VURx8whhmMRrqhNroTv+nw67aH4X9YpMKGwRsBCoAn03foY7r6fx2Bbq
-         4UQu/Zl97e4g6ewKs2jwRifv7WEn4hDdrzWRI=
+        bh=hxHueSEf1h7DWhnfjvMAFcUeBNI7wz1SFWUHRZHSG3A=;
+        b=T92x/fZTwO0xkQ9ROkHbWi+mo2Jc0Z5rGk6gH9z2fQJVZEFx5w2pfA5bnO9f/1C0y6
+         GbVBvX3LA+n9WNqbzSdGzwpb4kzlmLES9REPrXqNpl+8ME8LRS5ftZislPAihpIWQxw/
+         FXLPSbxRl86QWMpcQtZ5Un6HY6EYpaNtxZY9s=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740985601; x=1741590401;
+        d=1e100.net; s=20230601; t=1740985718; x=1741590518;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ydpPPAVVIbczNydhRAMrxedYE6w5x7xRraUtfZ6fRAw=;
-        b=Gmt3fohL5eN0FPFqRJPozxl+MdERRF1Npg2JFsVz18l57ijHg+KhDPaLTnOLyHJmyj
-         Bw3ueslq4Aj0vgfKo76p3gYpTSUgd+PX7iCTOgMKIuRqFP6kXdbtPuBfiJqq1nB2gjtK
-         BmaSnjWOgZFsOZhRZpKJ7fdNO2+l3vOU7cIOjuvH/As0EZjFAeCb4iP+rvWkOh8sqaqW
-         kfcOyg6Pdwoq7W39BbOZcbngIDtmLi36XNiHor3i8DHkFuEGSpt0Zfc3mVxErZ1n631B
-         17a3Ct/VLNXobiViwpCxr5DDCf/sz3jwgh0ffShZucmbrdt2QzmMfr6A1nyc2T6zlDvi
-         e0KA==
-X-Forwarded-Encrypted: i=1; AJvYcCWQQhFtJTRyGxpwBa88U76AZaJ4NM8YKQWGH1pQcTH6VDwU3uNURUGh5g+b0NxpyFd7SUWLjws=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCzfxTPAmq2jtB7xKHq793FvawD8+1yuyPSVgOUR57ZO7qHeQO
-	5AuHSOKx2YWsCJ3FMzLLa0/Rh1kQeu51X34zE+A9vkZN+ILqA/KAsmKYYC1PHCt47RD6qk+vtEg
-	u0uCPGmLoM4lYcFXDxPSt7AAlcSPmq6/8bJ+S
-X-Gm-Gg: ASbGncubf6MZhqNxsFzNPpDKUA0WmXfr/tRGprPEZ3Ggeh78AUnR821rAoHtMbhKi4T
-	PLIS87H+eF7hroMT6AegqmfGmwWwBeJM7LlfCAxEU2MyzCkeE8C/0QJLsUqNKkJ63FThIDNnAU8
-	bEjvQE9Gh4A6av97EY6slXCyRe
-X-Google-Smtp-Source: AGHT+IELLTH+Wp1wjlx3qfsnSySIvzFxr66L5+J3DyF/gnSko5enR1K7GDXG7uOkaDyX+HZw0YXPzBclBelGQDLU/z4=
-X-Received: by 2002:a05:6402:4603:b0:5e5:4807:5441 with SMTP id
- 4fb4d7f45d1cf-5e5480755bfmr2900068a12.30.1740985601425; Sun, 02 Mar 2025
- 23:06:41 -0800 (PST)
+        bh=hxHueSEf1h7DWhnfjvMAFcUeBNI7wz1SFWUHRZHSG3A=;
+        b=KMkmyIqGWOip1gRYRfj/SDThBwB80hSDWG/5EAs4wLbZCwaNFYTsh1fcP1sGWcwKrz
+         L8fuKR0IKAfPbyNH8H13J7Ztb/8a+yE7kkSNEMzwHwVVrNQWW/KvofVpEIXN/pnRuf+I
+         azor3Ll5cqv7zGIKd9hLba4fcq+EhXVCk/NvD32NLOZYk6OzHkvlDPkwWjTyvt/F85wQ
+         9qSHTmjMsS/H2IQkBYPtdZ2GdlzKw2qxSjUCbF9JMh0Jvzv8cTWRZfXH2R68GX5Bkfew
+         Wikpk9vfWv7gvkMkRx39WzhNo9lIPg9pwSE9bKeiWttMOdXi0ZX2v5fthOUuqAml2TxC
+         tzZA==
+X-Forwarded-Encrypted: i=1; AJvYcCVK6JFpy+3GeZgcG9sBlBn2lD4bpvjP4tgcu3fTWSShZJak/6MqBjoT2SXAUvXKjALwpmoEX6I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWZL2vwY5ojigCGfgjxl9V2j3lXQj6Ld/Q3qryQaZNJg7HIUd+
+	qhMUuNJYll9bwSnnZUmoVkoYMJNAHXVC+V/MRBm/k2bDkmy31CzIqwCPo0oA7ImVd+hOqEgs6Om
+	+S1GKr4uSfXH9FSqbdAdhGB2/dwC/LrZdp1M9
+X-Gm-Gg: ASbGncv0YvP1ZWHOKWkPi4P57W1zPIqbpX3Hz8/D0bjEjg9oD5JmWkr3AFn7+hDCBOp
+	vCv4UckXaJYTeqmQpIzH/LfLog13/o6igwfF4sc5oPAcLcAUsEKhm9d9H2OKoZaleVmWwHEXGvu
+	ms6dG6x8sJEUQ5kcjdn1GIVCoB
+X-Google-Smtp-Source: AGHT+IFCwBZSHhghBeD2u5RC498o+bHYl6FTcUG4WpHkgIGfYvwsk5DqEsPX14/wCzapMrZ3NvNtrvdN+UVQcX1kIO0=
+X-Received: by 2002:a05:6402:2692:b0:5e0:60ed:f355 with SMTP id
+ 4fb4d7f45d1cf-5e4d6b0df3amr12853108a12.18.1740985718648; Sun, 02 Mar 2025
+ 23:08:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250228012534.3460918-1-kuba@kernel.org> <20250228012534.3460918-8-kuba@kernel.org>
-In-Reply-To: <20250228012534.3460918-8-kuba@kernel.org>
+References: <20250228012534.3460918-1-kuba@kernel.org> <20250228012534.3460918-9-kuba@kernel.org>
+In-Reply-To: <20250228012534.3460918-9-kuba@kernel.org>
 From: Michael Chan <michael.chan@broadcom.com>
-Date: Sun, 2 Mar 2025 23:06:29 -0800
-X-Gm-Features: AQ5f1JprpnPcADyBZHf4-kkQ57YUCFlEcHxDctITwt4E0QizDFWlYnbci0JoZCY
-Message-ID: <CACKFLikUqFVOkALJXX+_Tx=-hu=82u+ng4rnm7qgSHwiLr=gFw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 7/9] eth: bnxt: maintain rx pkt/byte stats in SW
+Date: Sun, 2 Mar 2025 23:08:26 -0800
+X-Gm-Features: AQ5f1Jo-JxnDzo-7VUmIOUNbCgZOXstTvrv91oLPgjhcEAiiZREbaHbXIewE-KI
+Message-ID: <CACKFLimSmPkuckkOxi+N15DVWHwVEP5hr4qCF-su_uJEdidD-A@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 8/9] eth: bnxt: maintain tx pkt/byte stats in SW
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
 	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
 	pavan.chebbi@broadcom.com, przemyslaw.kitszel@intel.com
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000059ac96062f6accba"
+	boundary="0000000000005673d7062f6ad343"
 
---00000000000059ac96062f6accba
+--0000000000005673d7062f6ad343
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -95,26 +95,24 @@ ote:
 > the scale of 10s of msecs. Updating all HW stats at this rate is
 > both hard and wasteful of PCIe bandwidth.
 >
-> Maintain basic Rx pkt/byte counters in software. ethtool -S will still
+> Maintain basic Tx pkt/byte counters in software. ethtool -S will still
 > show the HW stats, but qstats and rtnl stats will show SW statistics.
 >
-> We need to take care of HW-GRO, XDP and VF representors. Per netdev
-> qstat definition Rx stats should reflect packets passed to XDP (if
-> active, otherwise to the stack). XDP and GRO do not interoperate
-> in bnxt, so we need to count the packets in a few places.
-> Add a helper and call it where needed.
+> We need to take care of TSO and VF representors, record relevant
+> state in tx_buf to avoid touching potentially cold skb. Use existing
+> holes in the struct (no size change). Note that according to TX_BD_HSIZE
+> max header size is 255, so u8 should be enough.
 >
-> Do not count VF representor traffic as traffic for the main netdev.
->
-> The stats are added towards the end of the struct since ethtool
-> code expects existing members to be first.
+> It's not obvious whether VF representor traffic should be counted,
+> on one hand it doesn't belong to the local interface. On the other
+> it does go thru normal queuing so Qdisc will show it. I opted to
+> _not_ count it.
 >
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-The byte counting looks correct except for VLAN packets with the VLAN
-tag stripped.  Do we want to count the 4 bytes for the VLAN tag?
+Same VLAN comment for TX.
 
---00000000000059ac96062f6accba
+--0000000000005673d7062f6ad343
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -185,14 +183,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIGgWWIY5gHjDF9EGXYzbhSATtOEcMrSz
-ogphv9QSR1ULMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDMw
-MzA3MDY0MVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIBnkXO0wMSfX1a6xWs/Wa6ss2WMcB+pH
+CIRi+XFqA0/7MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDMw
+MzA3MDgzOFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCXuLshMIF6dllSRXC5Vi3uj5qfmOPQOpOfjHrgZKMLr5fraloT
-EPi0xk9zrKF6DkuhdG5KUdg0G/Q96Xo0ix7lFomM55bHWQD2QkEYPxM7Llc+4+WI1OTnpI9rFiLk
-XhGhAiqskvpZrEhmseKHVkrV1s9PYePh2BrnqhaosOA5nAeQsok3YQhFHXdZ+T2lL+sPxs/gTn9y
-TwNhrocVsRYVH+lTGPKQ5Cz0gQG4kME+RXRpsxy7Y9Zt+s0pk1YY2fBmtNG6RE7J2u79PyeSu27+
-egf+zauOuV9gXKSjrpD/gzhi3zuNC1LHUjvrCFDDAtQKOYGfkI6xrB0xVPtshnNg
---00000000000059ac96062f6accba--
+ATANBgkqhkiG9w0BAQEFAASCAQBOg9NhyZQCDAGyvO1WWPnf2HhBh36AqexW47LNrHei99AfQCLB
+iu9LxUD6Iv4PxmvIMdmiC59S5S/RbHHvavzd1lgV8A+rAaw5aDfNYXj0z46JjxkszlreMNMHjW2l
+4v9vWpQYDeNRH9TabJ+WCoRlsSnRiUYRPD/3XQJ2d8kQ9M0XI9Nhb/iNN4+k6RkCZXNYbCbYnbkl
+WLCs/za2ne7wwpJFJXVVjibfolpBstMIQJP5VC2LDXcxkdQQe5l8TPI7pgFFuaT9KBMdca3mMZzS
+P1nC6O0m50rFmPdlc18ru48BwNNsFdY72suTsyl/EIczrJbOiR4iZ055Fw1Gxqo2
+--0000000000005673d7062f6ad343--
 
