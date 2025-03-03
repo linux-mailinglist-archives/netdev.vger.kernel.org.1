@@ -1,116 +1,200 @@
-Return-Path: <netdev+bounces-171351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0314A4C9C1
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:36:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84ED4A4CA67
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:53:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 271FC7ACBD1
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:34:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1460A3B90D0
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:38:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADDBE23CEF9;
-	Mon,  3 Mar 2025 17:25:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 540FA1DED5C;
+	Mon,  3 Mar 2025 17:30:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ZAR7MSwf"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="a+pTdUBl"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2065.outbound.protection.outlook.com [40.107.223.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E0D323C8D5;
-	Mon,  3 Mar 2025 17:25:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741022721; cv=none; b=SaOjEA0mElR4ejfOVysXOwSsT3exVWKURL92iek3YfAeWB3WzM8VH48hWGoKAF/lJ2cDLG28ek8sBjye7SOgx/Tnqu8uKBlf28r8DbNZ9Pl4pvhbALH9GVohAdttawqvqTFy+nTfEgNR7Q7F25N82gcpizgI2JOqieWJy0/nnew=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741022721; c=relaxed/simple;
-	bh=p3/tymDo4/JvLzlfxYKvIxPaUSvKEVDopzwI6qnnIMo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bI3QBUYxjF5ESTtGDK9rLLr9OJ4OhK9bQKW/NTGWNaCQvZeUbIhn54KcM5+SelbHhMYY9+Pl8dv7RJhsTMg1rPJrz4aheVR67ja/AK1dqZUbneyiovSyi56V6GKFmuInGezx5PGHmQGIW3xgOUCpOq2BIYGwP2qAajImWIknV/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ZAR7MSwf; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=jhgq5PPF3obuw7CCfJ705oQRORKEx0yZzOBNGPhbknw=; b=ZAR7MSwfpoEh2NsT5v6CjyfOwC
-	02LuzTTpEFDhXi3F0i4ztLwv6JKDYT0BRTqTdMWkPmbnOIXtj/iVdzLser5KS7SDD3/Ctw24ztkqG
-	cuCVjUUJaXafEDbjq/oFlYi8feip6Ad3bFsXzhSJjZFU2cZ7AhuxaOSonHMiTACJO+4vwTt2CvyVY
-	lDJX4rdbW5anIrpSXSt5SPoyDlBSYQQ5NHBdyC5R5ApLuOcXa+ubK0VI1bz0a7hJti4IpUN4XxGh+
-	eHkhUFyov1sHMOD1OfqdqN+HzATG+kn0Ps9EccIdDvCw4Kz2epfuhlu/Hx76O9Aw2A4oTyQPS24qQ
-	LKCfkrBg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33702)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tp9XU-00013W-0G;
-	Mon, 03 Mar 2025 17:25:12 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tp9XS-0003xa-0O;
-	Mon, 03 Mar 2025 17:25:10 +0000
-Date: Mon, 3 Mar 2025 17:25:09 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Catalin Popescu <catalin.popescu@leica-geosystems.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] net: phy: dp83826: Add support for straps reading
-Message-ID: <Z8Xl9blPRVXQiOSm@shell.armlinux.org.uk>
-References: <20250303-dp83826-fixes-v1-0-6901a04f262d@yoseli.org>
- <20250303-dp83826-fixes-v1-2-6901a04f262d@yoseli.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAAE020F07D;
+	Mon,  3 Mar 2025 17:29:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.65
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741023003; cv=fail; b=B/LS6MkSganSu4CoS0lPQE7/6TSqu3abMeWXgKwU5J29vLS3UWEBLZJj+9pXtb+Vs0EjVi60tBG+MBc+pITAUKkEQpROSw5aJydiu0JiZAJkYutyVjDOlOb+JU3ZyBL95xhZjPn9kEQmJZyAwyjACWkKLSICDoF+lJbqLkM4xuM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741023003; c=relaxed/simple;
+	bh=agGuzpxL35QNlR6JitQI3q/Fx4srL7G+r7ITqXEfdrc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=e4LOJ+DpBTLZ7P7/pOLo7tsh6MwQG70dCVeAmSId+gWBAtzLE7fB/VLeiY1o6AJwMAWCXN4V6fLhqBL2cfoxj8mfNQ0b7LuSuyFXnxxw8JTbTkgwKlD9DzNxNsYNH0Dt+SkoEcAdDzarLjUpINqUXuQYgkV0D1IzhLjjjtRSHiE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=a+pTdUBl; arc=fail smtp.client-ip=40.107.223.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=MD4Mo7/Ih12u0VSLpNddlu+UtjPAklJUu1SbasPQVjTyRFEgsWxJKTTWU04uAvekNX+iz/hOgZyJ5CBWKVPg30NC2eR8bVIdSNMzGO42dkcF0JeEm8ASMMNIitn5ncAp1sa3ruvW8DU1nXmccM4FiKoV9cv/VS2408z/m9RW3VygUAKNlGYwzUzJK8RiHKy3sQws3TZ5libBv9BcjdbF0EOClZRMmaijxLBcmr+FS0SaX1l4Iblmw5reD/Y8pcsJm6o5E7I0V9IkZ8s4dvyi4qJhrxrFGYAWzbnXOYUmTThI4i/DC+8il4O7UYe8B0poJI60lHM63f1GOsVDaIIqUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6G5zF2zUF0K+wjWyNjZEmUd3rDrw+03T5u29eO8WShI=;
+ b=H/dY135+UHc/pL4IQI5rNI4S3GKwsjCwbPCo5i+uSUwQh/C3LZLBI9C8wKIM1VQGDbjOfZY/XPkieIHqstq+EAjWKpYo/L+puOlXH3lJned+/lIcQrNMLnafftQ6sG7Sa5yFV1s0vpzaYJMqjpRht2gPuFgiPBlD2g9OV/Hhr/DiFbL3jHKX/xmTMyat52KGRJIPcZXpAjG21fvBNojf4G11QbLn7QWPOjZxrlu+DhxlOhRULmsaEsj0diVJYgmRuV72OnGd/biDVT3XuiE6ZDqKnbPW9i4iLHj/1fwmNdbDUH2OMPI2vyjPMpLh4E+CfX0ZnOJ96ErPDYlprDqe3w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6G5zF2zUF0K+wjWyNjZEmUd3rDrw+03T5u29eO8WShI=;
+ b=a+pTdUBlsrgivMChtypQO9HXAY+n/jQB2QvUS+/szsy1qNTl6kxLzs9spzLCPk4xF5zu/65HaKthKZdQeLUIo3+1O1hoDFX9c6EHzSAEHicilgeDD0t2oWhFxpmtl7s+nmAtKGnU+4YXVTJL2jz3lZlUlOsFC9U7PnNGAoQbM/+rJvsHsoABeHxH23xzXJ015QVHRBvZLYDwHsJSKYxF0oePwL8LCwBWmSyFT5ZgyFayegNcsygo37TBvp4srPRL7aP0PiO5TJWlLSjS5vGp+8Vh3hmY34TDSK09pselCEWpAd5BqNq3pzDWaoH9mAryGVzXyDBRGNN09VKAP7ThWA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by SN7PR12MB6670.namprd12.prod.outlook.com (2603:10b6:806:26e::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.25; Mon, 3 Mar
+ 2025 17:29:55 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.8489.025; Mon, 3 Mar 2025
+ 17:29:55 +0000
+Date: Mon, 3 Mar 2025 13:29:53 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Dave Jiang <dave.jiang@intel.com>
+Cc: Shannon Nelson <shannon.nelson@amd.com>, andrew.gospodarek@broadcom.com,
+	aron.silverton@oracle.com, dan.j.williams@intel.com,
+	daniel.vetter@ffwll.ch, dsahern@kernel.org,
+	gregkh@linuxfoundation.org, hch@infradead.org, itayavr@nvidia.com,
+	jiri@nvidia.com, Jonathan.Cameron@huawei.com, kuba@kernel.org,
+	lbloch@nvidia.com, leonro@nvidia.com, linux-cxl@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	saeedm@nvidia.com, brett.creeley@amd.com
+Subject: Re: [PATCH v2 4/6] pds_fwctl: initial driver framework
+Message-ID: <20250303172953.GC133783@nvidia.com>
+References: <20250301013554.49511-1-shannon.nelson@amd.com>
+ <20250301013554.49511-5-shannon.nelson@amd.com>
+ <01e4b8ad-82dd-43ac-92b9-3b3a030f86bc@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <01e4b8ad-82dd-43ac-92b9-3b3a030f86bc@intel.com>
+X-ClientProxiedBy: MN0PR03CA0003.namprd03.prod.outlook.com
+ (2603:10b6:208:52f::8) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250303-dp83826-fixes-v1-2-6901a04f262d@yoseli.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|SN7PR12MB6670:EE_
+X-MS-Office365-Filtering-Correlation-Id: 99c201d8-bffd-424d-181a-08dd5a79032b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?ib8JtarluyG6BdfGnLDPPKefhG9WqJSkf8K+n3eJ0l0nxgjYZS3Ez+AfJMlr?=
+ =?us-ascii?Q?dEdG+JW3rHs/JG7nnIfEybPQoI+v/bGiWBc3x/5h+Mq9Gj/6qrLtPRdErpEA?=
+ =?us-ascii?Q?bXoPgKwO8JlvA7Cqaq9wlijtV4KglFJ3hZL8hl+WBjwWRxMX0u6iej8342Tm?=
+ =?us-ascii?Q?8ueu/qwmNYqsSkNF2fPO0QVLJHTYEHRc3SLq0qTB+4d1LO+53XN+KxnuKwd9?=
+ =?us-ascii?Q?M4tch4AgkIOmRzxvSBvLxcyUzPSTujn1DODHlKIshsdfNlKXy/W+K+w6qkX7?=
+ =?us-ascii?Q?rCDPXlP1+42YU2GCqI5N+ioq9X19ESfqcoctoOiP1eRyZBMmjcXmYeCtMFFm?=
+ =?us-ascii?Q?8WZ/BO3EEsd+MbPek59lI+sufKqGjxGI7+cTVY/T/sr8PjlNR6wTBbIECoxB?=
+ =?us-ascii?Q?tJ3Kb//PLzK4tIMJEraebIwVVBf8bt8ugYSV/yjvprXEfrSPEWBCNSAySQN3?=
+ =?us-ascii?Q?sGbrjt12NVbeTefssF4+L4owgB584KZty3gxhaIfapwL3R7pJEcsArF+d4xQ?=
+ =?us-ascii?Q?zkDu8rDFkbnLL4GF/j0p6rTPfwLowaUAiJr2VYCvTUMcjOI8pX6WS1KR3k+r?=
+ =?us-ascii?Q?69sD+Yz31oEJMlxUtA+ezgo3rRE/Uv/D2rYpcJa+fj5v2SleMCPLqHfDdsXH?=
+ =?us-ascii?Q?YMZKAEmoMLyYIcPt3ckswuPwW/2aSy8WrhtHVVIw9PgXERXdjKy+pwCGJRey?=
+ =?us-ascii?Q?CxdD2bAOROmrZTeEmyFGLiGPeYcrllniiHayiandiFNFoLfudKXWAmHzAuKn?=
+ =?us-ascii?Q?YkWJWqbGb1yq+ht6Kh0c8Oj3BFYoCTw0rM5vLKzqH6GPqAgxsqN/Vhqzn4+A?=
+ =?us-ascii?Q?dr0qb3Ba31O8X/pgLnnexsXcixHvOGHCzx8al1RczEoHF+kv9FyDhx/v1Ye0?=
+ =?us-ascii?Q?bshbtmKY0dEhLWoecumTs+RPjHi0Ikcg6PZNrUB3NiC3UD94YAI83yuwdheY?=
+ =?us-ascii?Q?ns/VuH01ALjublP6TmZgTRe8YRa9ijWZ0KCUDshIxvPFouSATg0Vmj86qQhc?=
+ =?us-ascii?Q?jV9qEL0ghuObLtWb4sRg3cirbOByL0r7aNR3iSR3qw35VJ+S4NIuDfHiwlyz?=
+ =?us-ascii?Q?llVc22Pl60hPotsLkgNeC15zz7YXwFnFuD1uWcLp4+brOVTjILLjCcPTcv9u?=
+ =?us-ascii?Q?krpl8AzCAGuXJy1Eu/9UKpfLwdgq1nrwg4oAo3luHJSNXtNIRE6rK/mhdlWA?=
+ =?us-ascii?Q?+B4UZm+3Gwed6/sZuhOQxZv+YE5AkBkwnHyw7hG8vrSICGGgGLOAms6AVQ5c?=
+ =?us-ascii?Q?+J4EOsFQSlvr4EjwIPNuQCSbXG6LwSka7Y+U4IOx94bqbsm87YVX/aa9RKMz?=
+ =?us-ascii?Q?ihAICrYdpyucix2GpWSAcgTpSSAC+1temrmmLlA9q4G93ZCJUba4zX1fUmNN?=
+ =?us-ascii?Q?oHLX+YyPoB2Rcjm46a3RBUO8xemd?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?s4X58WZISkqUp5p9o7TLxhLIOdiLKZ9+cDHilJB8TC8dsVUTEMHDjzf8ct5p?=
+ =?us-ascii?Q?IQ8lt8yYf1377TLpIHhsRKEQMDIQSyNDrikde7Vxl5mxEzD+5/RZEoUvzTQN?=
+ =?us-ascii?Q?jsEsFN9uS0VJw5E6QTIVP0Pdu2Eq4O2p0kTQJr4TUrD2B2mY1y+kO9e1Xdph?=
+ =?us-ascii?Q?t/B3G5Z/sCpnO/XDvWWvOiOlGDlb8TvxGZ4Rkwx0gryxicAB1yuLAQqBfFbE?=
+ =?us-ascii?Q?liOVI/u8kFYpbG0Hw2vgwqcKZZ+3FxA/PmBGGqdaQAf0qEjNbbfAqmCJZ+V6?=
+ =?us-ascii?Q?51krsEldACcfI0fxQHPNDWfOxvAsMfmuXW+yA4U/41nNGfqdS6EV7EYyKu7z?=
+ =?us-ascii?Q?nGIPbt4fdWZ7/Ve6Vz3PEuisgL4C2BZgT/cXNVz93UMHlvdc21iJluk/8IQ3?=
+ =?us-ascii?Q?xV9/wRRHlZWFc6a1+sv2x2VsQprT7gbhNKGKPPxJ41hVmxPtXoGhgOyWFyO8?=
+ =?us-ascii?Q?3aDFZxolJBYci31Ty+x91AvxcVZsftiTH7HtsTpIJvKG3ib5qbqSHQBZtioX?=
+ =?us-ascii?Q?LYgaUHGFTjAY2Kel4lQxWmMB8Pw/8uFLWuRbMx5Dv10DTi7uhZI1gLjfwZCy?=
+ =?us-ascii?Q?uaKfGizmFoEi81cj+69wmJb7s9oYiJ/eJSm1cBAstE+zZRl5aR6CoitEoB/Q?=
+ =?us-ascii?Q?J+lm69JKQSt/DS6r48teyu2IKl3r8qFXmzcA1wCqodV0qDpQhMIruFM4V1En?=
+ =?us-ascii?Q?uRFsOEtS1mlihblxMPi7r0BC2yDkVbtpCVDo2MDyH8CiW/oX9ygr5CLfoQgJ?=
+ =?us-ascii?Q?shZ9s48h5cFiXQeW5tviuXGyQ5o5ODZ89Omg48svoMwhQB2rqNkrZUkriIS/?=
+ =?us-ascii?Q?zIJDN8eK4UDLBnl7LG4s/Q7AjTgARm2dBrySet2K+rOFpP9KDQr1FIucDz1K?=
+ =?us-ascii?Q?flTs2waMvILAmTTvDaw3qGJ5j1fMrY+sENUVV1v7qqSfGLfvPrhj9qkFMtqD?=
+ =?us-ascii?Q?g2eyWWe7NoVdNoWevmaP2dgDT48Llj8OUVena42Ih8GkVgvy/d3I5xHRdryK?=
+ =?us-ascii?Q?PG6GCeNvZsuz52lUE8UE5z8J6Ilat2zueAu1bE5zXuC/ndEcgI/VHlfS8ipG?=
+ =?us-ascii?Q?2G3kFIeIru+xl/nXjZRr9Pynl1r12Yz7EDbLF2iy2VFXsOh4eM+4vRgKnA6J?=
+ =?us-ascii?Q?GuDCpmeFgaZAktJGF3YfFSTT5DJJQEZFMoYbHMnXoqFxYejY/4ENRIuT1MZc?=
+ =?us-ascii?Q?E5DXjpj71iYw21h2DxPNKtp7D2IArlEcgrnaPYtFa9wDyAUMahpRvqUg+zAe?=
+ =?us-ascii?Q?X2NbjGlNGVovfDkHXK0mADYDdh8Aq78uE+CV7blLNrpX2baOAYZw819U9GvQ?=
+ =?us-ascii?Q?Fe30Xha6FYjQoGem0EqxggLVEGK8fCipYAuh0LHDjc5ijO8jW3OfUP+HqRjF?=
+ =?us-ascii?Q?G3MNuIYrQkcRIZRfNV5Y4lKbzB64tX+bAMn4r0PWujmSFAIJ+Oj8QIoxvNT0?=
+ =?us-ascii?Q?I00y2xAL1uXyGCuLRKX6rANaBpq83OzmyPwDoPVT5R/Ecfbm0nz/Wq3p67Hk?=
+ =?us-ascii?Q?ayLMj4GjPkubK/efHslwQsytuW/jEwKjLCdBGUtypkndvTunDztOgs0j2fld?=
+ =?us-ascii?Q?jEiUHiFSX+ycpAAhEOx3+IQ8sj/epRNyLjvjgupv?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 99c201d8-bffd-424d-181a-08dd5a79032b
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2025 17:29:54.9327
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DmQrIZGq14VZJ8BJlYEWUWC0bMXJVLZBgQWAlT2ezG/iji0UrG3BlGgrWR6IGRdM
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6670
 
-On Mon, Mar 03, 2025 at 06:05:52PM +0100, Jean-Michel Hautbois wrote:
-> +	/* Bit 10: MDIX mode */
-> +	if (val & BIT(10))
-> +		phydev_dbg(phydev, "MDIX mode enabled\n");
-> +
-> +	/* Bit 9: auto-MDIX disable */
-> +	if (val & BIT(9))
-> +		phydev_dbg(phydev, "Auto-MDIX disabled\n");
-> +
-> +	/* Bit 8: RMII */
-> +	if (val & BIT(8)) {
-> +		phydev_dbg(phydev, "RMII mode enabled\n");
-> +		phydev->interface = PHY_INTERFACE_MODE_RMII;
-> +	}
+On Mon, Mar 03, 2025 at 09:45:52AM -0700, Dave Jiang wrote:
+> > +static int pdsfc_probe(struct auxiliary_device *adev,
+> > +		       const struct auxiliary_device_id *id)
+> > +{
+> > +	struct pds_auxiliary_dev *padev =
+> > +			container_of(adev, struct pds_auxiliary_dev, aux_dev);
+> > +	struct pdsfc_dev *pdsfc __free(pdsfc_dev) =
+> > +			fwctl_alloc_device(&padev->vf_pdev->dev, &pdsfc_ops,
+> > +					   struct pdsfc_dev, fwctl);
+> > +	struct device *dev = &adev->dev;
+> > +	int err;
+> > +
+> 
+> It's ok to move the pdsfc declaration inline right before this check
+> below. That would help prevent any accidental usages of pdsfc before
+> the check. This is an exception to the coding style guidelines with
+> the introduction of cleanup mechanisms.
 
-Do all users of this PHY driver support having phydev->interface
-changed?
+Yeah.. I'm starting to feel negative about cleanup.h - there are too
+many special style notes that seem to only be known by hearsay :\
 
-> +
-> +	/* Bit 5: Slave mode */
-> +	if (val & BIT(5))
-> +		phydev_dbg(phydev, "RMII slave mode enabled\n");
-> +
-> +	/* Bit 0: autoneg disable */
-> +	if (val & BIT(0)) {
-> +		phydev_dbg(phydev, "Auto-negotiation disabled\n");
-> +		phydev->autoneg = AUTONEG_DISABLE;
-> +		phydev->speed = SPEED_100;
-> +		phydev->duplex = DUPLEX_FULL;
-> +	}
+> > +static void pdsfc_remove(struct auxiliary_device *adev)
+> > +{
+> > +	struct pdsfc_dev *pdsfc __free(pdsfc_dev) = auxiliary_get_drvdata(adev);
+> > +
+> > +	fwctl_unregister(&pdsfc->fwctl);
+> 
+> Missing fwctl_put(). See fwctl_unregister() header comments. Caller
+> must still call fwctl_put() to free the fwctl after calling
+> fwctl_unregister().
 
-This doesn't force phylib to disallow autoneg.
+The code is correct, the put is hidden in the __free
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+However I think we decided not to use __free in this context and open
+code the put as a style choice
+
+Thanks,
+Jason
 
