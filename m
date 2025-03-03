@@ -1,87 +1,86 @@
-Return-Path: <netdev+bounces-171379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE83EA4CC38
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 20:51:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8F10A4CC43
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 20:53:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 266D33A59E6
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 19:51:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2ACF63A8225
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 19:53:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68D8F233132;
-	Mon,  3 Mar 2025 19:51:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FCA72343AE;
+	Mon,  3 Mar 2025 19:53:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q3C7Fn64"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Een/v3HG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64E5D230BEB
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 19:51:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57B9A2343AB
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 19:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741031509; cv=none; b=AZTrnAUIRxKyO1XHkGtVaAX94Y6Z0yejOiEueXNYAJkS5vzfEtXYg41p7+mslGbGI8hJhEuKCdWKZVyAkGEXh9WrRm82mPQP5o42eMHaQGjBd8+wdZIPvugBxP/Dgiu2YuI2y/Yo4YEAICvN+UuoJPfAu3w33ZwLneE+3226ezg=
+	t=1741031603; cv=none; b=bIIxc/uG9f+yc97wH4qk4WjSOtt2o1sx/UcxYia+7M7d164VvzLyWKR0AAIK90FTedpiRhgVEJxrKMXFiNu8u1y2RhO9u8HGgcIL9ZtNeYuPV3RqP8a9vf7p67QM7Xkvskeh+akbPLjhkRtC/UOYXLKfz9k4qPqjzN2nrpPSMBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741031509; c=relaxed/simple;
-	bh=GsQ4AlMHXflwhjl3qlPbMr5mgvvbV1JUiFvFXS4uYGQ=;
+	s=arc-20240116; t=1741031603; c=relaxed/simple;
+	bh=QFTGZif/JgVgVDzzGQgZIl8WC/WC0ykZHCXDdOp8REw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HQKR7Y9L+6CdLUwhZwdh4+Ls0Jn+tXmDo99r72tZqGb7Kh69vs8X4SGd/IUjQzQ3OiWKnW2Djo8OfPuS/rhVL+OKIt+i3nkUBdVCqSoQQtXmNJC7gVGpptU2pS/UjUGalRWheAvG8Yv5r7+F7CLtDvjU1D1koc/pygo9zj4IFU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=q3C7Fn64; arc=none smtp.client-ip=209.85.167.46
+	 To:Cc:Content-Type; b=CkAad2LLNK4KcRP5E3w6Ys72EPgiYP+mmVcDwM+rugLULeYyCuu22iwPJpPW+ZxbGvQP0/w7C0JIRyfC3sVtT1MKHq+/hy77ywtNqGwYcfZiiJ5JWPf/nglfII4+3GEHGrZAHlT9XI6Eg9e9G73CvXnEQJYNd+mD57jr7lcjln4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Een/v3HG; arc=none smtp.client-ip=209.85.208.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5494bc8a526so4192154e87.0
-        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 11:51:47 -0800 (PST)
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-3072f8dc069so52728311fa.3
+        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 11:53:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741031505; x=1741636305; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1741031598; x=1741636398; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YOeEe/vKXmfGXFSe4NXDP7rT5PatmaYJmBeo1VUXgeM=;
-        b=q3C7Fn64y2JLH/pjzso65AhmdA9PZr8/Mnc2Rbg666gGcfMoD7MELHt7Q4vqPovuhY
-         3Ny89+/JGVfkJFUL0arRtdihgM1uqn9YUhr8Y9LLgx2Z2xK9IemRHM5BNt5sEh7CHxPA
-         0pE6mbQY2hpnA0sxMZnE1JbH1LPZIXEjyjo2ey0AHOD1RtlwojmWmiQSTPVlNQbotq5I
-         rfK+rGnb+D7uVMrGogozAimvBdxTPQZYTtvcZUj2eFO7DLCtnu5C8QFpaXJE1AtcECkl
-         M7npQKwglNKyz3cB5J5kdaxLxc2lM2dX+1CPCUWvos/8vyEp1jeCCzYIHof1KIKU8BAM
-         onfQ==
+        bh=QFTGZif/JgVgVDzzGQgZIl8WC/WC0ykZHCXDdOp8REw=;
+        b=Een/v3HGrIUsxKLvpK/7nPtnYTaacphMIjptWX0/VuJMJD3H070xA1XR6kTs0Mo0Qd
+         +NOCoa/Jo/5AUSoG0ChZRnnea9heys6gnguP8YjQSxml+Ytto9mkOmHzgxt8tqb8DhG/
+         7PdcgP5XH/C3n1+2dUCQXK/6Qtt3VvGfVnEwPsornhgflN7+XsagEBSyDbK9GSVqwKBd
+         ND2VFZW12cCMLJJEbLtbjYb6VZQwXVL+riMPhLNhS5Vw6moP6tA4UagIaUTgb8S/G21z
+         c4Q1bGIuFkKzstiXIIcrMMPupvCJy7BXLh8FWHajQnfvUTIxSTQBZ+2YUzsB0kyfS0wt
+         GH6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741031505; x=1741636305;
+        d=1e100.net; s=20230601; t=1741031598; x=1741636398;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YOeEe/vKXmfGXFSe4NXDP7rT5PatmaYJmBeo1VUXgeM=;
-        b=ne1CB1U3kYzxTrvel46BmUo3DovNH6CPbXPMbm7BbuFRS5c6Gi6P9B7ryzEk2L0Z4c
-         y+cgMp+YMf+m3x0OTQsxcjS+avUhahAQFtiSOSN/8F7VuRJxId+qrR8r6IFka9c7mb4H
-         IJN9ANnQFZrZNdSglMewWT+m+ZZQm1VMHT+z3ZTc5PdfLBrfczGEYoQDnRU7VIGzzcKP
-         YyDuH0rpStqRbjIjoyeU701kGSuVnVRgqhRBD3hUVDAaFuuQBhrom1jJTp2w8OypslRb
-         jKo+jQWK24aOsc5SXuraJtQcx1tjtk29ar2wfTPTJgYbgyUcSqQVpXRkbYF37KaFeWlm
-         fsOw==
-X-Forwarded-Encrypted: i=1; AJvYcCVGWIpBRnuB9A67gEi06jzk2xXp0kPfKNnY+DNkPCvuMZyOMH34p+yIO83jL82zCUjq1A8dJTU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+cuM3H5F6HhoARKgbhaHLhljoY6Wo1zwprGIicKXBfyAhlsc5
-	L3K+ZwKZzYO5O1KBoxGHjAjb6Q/2vWZcr3/cN0qeKnXdNKLAlkRuFs8vzKyTooPZVmbQINzLD8X
-	ohxLYiKbU7yPlvBIEJ3rc+a99XVVMj/UEp9T6Yg==
-X-Gm-Gg: ASbGncthd/RzYBT2XrTYrKeshrkE43yYyOVBHDDb09FSgVo6zdoGnbqV7GKh9DHr3g2
-	W37i+bb8q8uj6UwAoJNYbrUvYdZ8eIWbiGtp5sdOZr+W/RjYGHm6FFynpphTx/FIoU0Tg939VVR
-	Rc4q5zCFtD6UKRKUeVKOs/e8npMg==
-X-Google-Smtp-Source: AGHT+IFsGbvesnjWbfEk8+qcnhMhpwSK7rY1/+23lfk9h761ve12/onnm+C+Kg2oHwbcpQo6jWrgj2PsmOSffLjO+Lw=
-X-Received: by 2002:a05:6512:124b:b0:549:7145:5d25 with SMTP id
- 2adb3069b0e04-54971455f79mr1443819e87.34.1741031505444; Mon, 03 Mar 2025
- 11:51:45 -0800 (PST)
+        bh=QFTGZif/JgVgVDzzGQgZIl8WC/WC0ykZHCXDdOp8REw=;
+        b=XIBE/GBZVkj5j9Iu88wzEhdN/FckEGi5vrfR/kGTFAOGCILmZuIaONN4DwhxbroJCe
+         +4ECXYLZ69/qvhnxuiv/qYjY9Km0NQxKR7Q+sUQCPmUkLLMFWMyBiQ6j1yB+wo1LoijW
+         u0CGiaraD9pSju0fZIxdPjFaVXP5jM6VemtvkJ1Xh0pte9z9c3k4RNnaetvbcYWolqxl
+         1w+lqIhYQnEKlIwKrCghwCKUB1G8BBuxiz12XQAibHV9BtHO7juMWsc5ZkyAPVRcoemD
+         2X+oK52R9Ex4DG6YyjHupMeAPrmjW9skRXSigmOv5VPThWrVXIq8n8LOS0YrZbC6YM0n
+         Q9Ow==
+X-Forwarded-Encrypted: i=1; AJvYcCVt/h+HS1mC1ZvZZPOP0cEgq9vW4Hd1q5bf5XfYZF//gbfs/ofzsW/oaS83Sw1apn6YQxXCBCQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRjWhj8Ajv4ffK2Sld/FfNpWC0H4YovKt48+CqujKXVMOBZoCY
+	83Bvy0ZMSLIjeG/EUI5SBxUbzqTT/0JyGSIXIFh+vY2yve/W+1R89rj0PLoCfa7Olxx4XIJ34QE
+	eT3nZVPejsCS2vQtY5hLDrjiYl5kXuZXLQ3WVgw==
+X-Gm-Gg: ASbGncvA0hgLHvDtcYD7o0H3RhxNHc3xV5hENg75Yyb9qJnKzTEASUZhvoZHQZoDPnT
+	2VZqoja2zy+7SXZZQGbcZMOpiL7YmtzwBh+k9g0OyDHz2GPg0IKVgw8+RkJwX/jXM+sbmDtMkIS
+	1d3sLmgHRDuYuizkBOQc/67j5+cQ==
+X-Google-Smtp-Source: AGHT+IGAA1jTPTvt6x1HBPDHZpPdg7RIJLS5NDUt79SNfZEN5S213uxZfLpsDGTLhFe/KqTn7rcm59WJNzLGOylvX74=
+X-Received: by 2002:a05:651c:1a0a:b0:30b:badf:75f0 with SMTP id
+ 38308e7fff4ca-30bbadf7dc2mr20317411fa.2.1741031598367; Mon, 03 Mar 2025
+ 11:53:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250303164928.1466246-1-andriy.shevchenko@linux.intel.com> <20250303164928.1466246-2-andriy.shevchenko@linux.intel.com>
-In-Reply-To: <20250303164928.1466246-2-andriy.shevchenko@linux.intel.com>
+References: <20250303164928.1466246-1-andriy.shevchenko@linux.intel.com> <20250303164928.1466246-3-andriy.shevchenko@linux.intel.com>
+In-Reply-To: <20250303164928.1466246-3-andriy.shevchenko@linux.intel.com>
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Mon, 3 Mar 2025 20:51:34 +0100
-X-Gm-Features: AQ5f1Jr4_oqgGu33I-byOxU2dX3oyVoLqRbYUQ6KaoKwKXnjUNMYEaKqTtmoBw0
-Message-ID: <CACRpkdbm5RQ-YOAaU7Mu2dyEjM12v8mP7rTTmW9-V5EbOPTJPA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 1/3] ieee802154: ca8210: Use proper setter and
- getters for bitwise types
+Date: Mon, 3 Mar 2025 20:53:07 +0100
+X-Gm-Features: AQ5f1JrLhAM1wiHutYCTK7Ia19KZ1ZhoXNrkXyL4siFeXMeh8rxos64YMy1PhkM
+Message-ID: <CACRpkdbeTG_55VbH3GBVpB31D9uuLHTZpuzjA3PuxwTB+KEq8Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 2/3] ieee802154: ca8210: Get platform data via dev_get_platdata()
 To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
@@ -95,32 +94,9 @@ Content-Transfer-Encoding: quoted-printable
 On Mon, Mar 3, 2025 at 5:49=E2=80=AFPM Andy Shevchenko
 <andriy.shevchenko@linux.intel.com> wrote:
 
-> Sparse complains that the driver doesn't respect the bitwise types:
+> Access to platform data via dev_get_platdata() getter to make code cleane=
+r.
 >
-> drivers/net/ieee802154/ca8210.c:1796:27: warning: incorrect type in assig=
-nment (different base types)
-> drivers/net/ieee802154/ca8210.c:1796:27:    expected restricted __le16 [a=
-ddressable] [assigned] [usertype] pan_id
-> drivers/net/ieee802154/ca8210.c:1796:27:    got unsigned short [usertype]
-> drivers/net/ieee802154/ca8210.c:1801:25: warning: incorrect type in assig=
-nment (different base types)
-> drivers/net/ieee802154/ca8210.c:1801:25:    expected restricted __le16 [a=
-ddressable] [assigned] [usertype] pan_id
-> drivers/net/ieee802154/ca8210.c:1801:25:    got unsigned short [usertype]
-> drivers/net/ieee802154/ca8210.c:1928:28: warning: incorrect type in argum=
-ent 3 (different base types)
-> drivers/net/ieee802154/ca8210.c:1928:28:    expected unsigned short [user=
-type] dst_pan_id
-> drivers/net/ieee802154/ca8210.c:1928:28:    got restricted __le16 [addres=
-sable] [usertype] pan_id
->
-> Use proper setter and getters for bitwise types.
->
-> Note, in accordance with [1] the protocol is little endian.
->
-> Link: https://www.cascoda.com/wp-content/uploads/2018/11/CA-8210_datashee=
-t_0418.pdf [1]
-> Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
 > Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 
 Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
