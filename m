@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-171133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29150A4BA4A
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 10:07:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EAA9A4BA49
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 10:07:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3FA33B22BD
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 09:06:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6DAA18919F3
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 09:06:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAD1B1F4188;
-	Mon,  3 Mar 2025 09:03:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ED171F4616;
+	Mon,  3 Mar 2025 09:03:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="c4BMR0Ug"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="TM8k0GKz"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 327671F37C3;
-	Mon,  3 Mar 2025 09:03:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7125A1F3FC0;
+	Mon,  3 Mar 2025 09:03:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740992625; cv=none; b=OPX8fVt15T0SoHYPBFVnsOqqpVzZ7yiX0riNUtyrXPV5m3Ia4Js8EwpMJ1vQaUybZB4C/Y1LhpuquIxuHZAi5Hgf2AHEYPx9SdwnoWC5tllb0f9vhPDaeKmJMgEwxcqmfXAZnplmawpOK1GMPoNe1wCsAu2iUn+Qq4lRx2QcP60=
+	t=1740992626; cv=none; b=iZZbRXH1EbVBW6JBo6n3yuZQ91VOXSscHwzWncZu2xpw1G5956QDSSRyPenMkdztDYMdSuXMQzuuyWAdpU+63QGdG6xZ9K8U1RD1wm2H6hNBtDgESZri5dvOwwAtqfRFN3CwD0D25bFbRZUr0sauu6Ed43Qjs7bmiunZ1jl6Nww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740992625; c=relaxed/simple;
-	bh=F70e4oOLvEJZPucCJCixFkfOqMRXANwJ+zySIraaBiM=;
+	s=arc-20240116; t=1740992626; c=relaxed/simple;
+	bh=hy84rzjS7+8uPHR7m9CHhBOJhDLwxhKnLDhbfNxfkEY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Be/xbI+KWtJcLHOR/Y7qXs+d/eQxQ9cQa4SbSY3aJYQ2Qr6co2K1eeAAkgXm5dwuDgnzsLuJUWit48cdjcWgUn4yl2mzHTLjvpm3oJNyhI6x9KYW3zW2zpbgg/PwOIJPG4/ICFM3vVK3HaAXrO1z5XXTfF8gjhXzYZcWA8VrilI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=c4BMR0Ug; arc=none smtp.client-ip=217.70.183.196
+	 MIME-Version; b=nKKqguAwYdonHVQkvU1kGxsFBFqoFUkv6SIp5TLmVjmTnHjKCvsh0tmexC0wgMtLYYdykosqug/O9Ycog5fXdkt348Rviz+IeOOZfibfz2zTuIFA1IBnelfs4ArB3BfG4qboN1pDhbDVRPTPqMruFUQZZPniQzpN+rfNtXtI8NM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=TM8k0GKz; arc=none smtp.client-ip=217.70.183.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 7B4DF433D6;
-	Mon,  3 Mar 2025 09:03:40 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9C6A444530;
+	Mon,  3 Mar 2025 09:03:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1740992621;
+	t=1740992622;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=X3q9t7hUW9dj+IQ/bjnu77lPGmapVWfrJfeMDhh9PrY=;
-	b=c4BMR0UgYUX8MvQwejj7rkEZfyPxgyyjaS2ZW3EhWlrjlqKcwDDErg3lgvJIuBEyQsIU3i
-	4CrSEeQusFfe0o24pDN7ory/HBOSTHhCZqAG4WhE7lSeOW6M10ugKJVpV4WekpGCWvDSVn
-	YGHZgh5qJCk0PMYXImKzckVzIyuo5U1nadqCVHLaSqly6MePE/FO7GE7Q1NJlXmphpKFII
-	6zesx0e4N2IlJsKOXkUP20AVaclLjWDuQuWQExXNxQfg8DGx5kEZ6AuD6x/G2jTO81gONx
-	e27p8fqqZHyt+qMzpLeGmy7Acu0XEXTu3GQx0Mc9EglgO7SiexcpbIWacBIEfw==
+	bh=SohpPzuxeSg5EmDhX+WiEB/PtEK9LrVBuJuK+Acd2Qs=;
+	b=TM8k0GKzioHAV1TSikAQCfuMh58lWKMWVAs9geYrbieGjilZoRxObkYWIJg7sQFA6vzLLa
+	rWo/L4G1HrL+WexXozRDsi8KdFEkfeR/cXdTBayamiBzxGusEzVxGvB4mTDhexlsTyOYG5
+	hbKzEZNN/OrxHWC0WlMhKTBnjjnEFLqO68Be/iCCeqqsNkoIvfT0SjifIXt2v7yP+rKWxs
+	2gybj+xvCB9V52JjzKBSkPWQvHXqFz2E9dSaZ2u3bTwEGASpzbaC5rTacWmE7rOqPQQgFh
+	kB3e4/BewCQvvbMeBbyJa7m//NMBsjXbCfoCMvSEGwOStV1Bcavgdy8VjAJqjA==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -66,9 +66,9 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Oleksij Rempel <o.rempel@pengutronix.de>,
 	Simon Horman <horms@kernel.org>,
 	Romain Gantois <romain.gantois@bootlin.com>
-Subject: [PATCH net-next v4 12/13] net: phylink: Convert capabilities to linkmodes using phy_caps
-Date: Mon,  3 Mar 2025 10:03:18 +0100
-Message-ID: <20250303090321.805785-13-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next v4 13/13] net: phy: phy_caps: Allow getting an phy_interface's capabilities
+Date: Mon,  3 Mar 2025 10:03:19 +0100
+Message-ID: <20250303090321.805785-14-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250303090321.805785-1-maxime.chevallier@bootlin.com>
 References: <20250303090321.805785-1-maxime.chevallier@bootlin.com>
@@ -85,241 +85,263 @@ X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdelkeejudcutefuodetggdotef
  giivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhm
 X-GND-Sasl: maxime.chevallier@bootlin.com
 
-phylink_caps_to_linkmodes() is used to derive a list of linkmodes that
-can be conceivably exposed using a given set of speeds and duplex
-through phylink's MAC capabilities.
+Phylink has internal code to get the MAC capabilities of a given PHY
+interface (what are the supported speed and duplex).
 
-This list can be derived from the link_caps array in phy_caps, provided
-we convert the MAC capabilities into a LINK_CAPA bitmask first.
-
-Introduce an internal phylink helper phylink_caps_to_link_caps() to
-convert from MAC capabilities into phy_caps, then  phy_caps_linkmodes()
-to do the link_caps -> linkmodes conversion.
-
-This avoids having to update phylink for every new linkmode.
+Extract that into phy_caps, but use the link_capa for conversion. Add an
+internal phylink helper for the link caps -> mac caps conversion, and
+use this in phylink_caps_to_linkmodes().
 
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
 V4: No changes
 
- drivers/net/phy/phy-caps.h |   1 +
- drivers/net/phy/phy_caps.c |  14 ++++
- drivers/net/phy/phylink.c  | 155 +++++--------------------------------
- 3 files changed, 36 insertions(+), 134 deletions(-)
+ drivers/net/phy/phy-caps.h |  4 ++
+ drivers/net/phy/phy_caps.c | 92 ++++++++++++++++++++++++++++++++++++++
+ drivers/net/phy/phylink.c  | 90 ++++++-------------------------------
+ 3 files changed, 110 insertions(+), 76 deletions(-)
 
 diff --git a/drivers/net/phy/phy-caps.h b/drivers/net/phy/phy-caps.h
-index 8ae8dc42494f..db53f380392e 100644
+index db53f380392e..e1fe19d11e5f 100644
 --- a/drivers/net/phy/phy-caps.h
 +++ b/drivers/net/phy/phy-caps.h
-@@ -44,6 +44,7 @@ size_t phy_caps_speeds(unsigned int *speeds, size_t size,
- 		       unsigned long *linkmodes);
+@@ -8,6 +8,7 @@
+ #define __PHY_CAPS_H
+ 
+ #include <linux/ethtool.h>
++#include <linux/phy.h>
+ 
+ enum {
+ 	LINK_CAPA_10HD = 0,
+@@ -32,6 +33,8 @@ enum {
+ 	__LINK_CAPA_MAX,
+ };
+ 
++#define LINK_CAPA_ALL	GENMASK((__LINK_CAPA_MAX - 1), 0)
++
+ struct link_capabilities {
+ 	int speed;
+ 	unsigned int duplex;
+@@ -45,6 +48,7 @@ size_t phy_caps_speeds(unsigned int *speeds, size_t size,
  void phy_caps_linkmode_max_speed(u32 max_speed, unsigned long *linkmodes);
  bool phy_caps_valid(int speed, int duplex, const unsigned long *linkmodes);
-+void phy_caps_linkmodes(unsigned long caps, unsigned long *linkmodes);
+ void phy_caps_linkmodes(unsigned long caps, unsigned long *linkmodes);
++unsigned long phy_caps_from_interface(phy_interface_t interface);
  
  const struct link_capabilities *
  phy_caps_lookup_by_linkmode(const unsigned long *linkmodes);
 diff --git a/drivers/net/phy/phy_caps.c b/drivers/net/phy/phy_caps.c
-index 8b90fb6d6b15..0a64289a161b 100644
+index 0a64289a161b..555daaa41d52 100644
 --- a/drivers/net/phy/phy_caps.c
 +++ b/drivers/net/phy/phy_caps.c
-@@ -239,3 +239,17 @@ bool phy_caps_valid(int speed, int duplex, const unsigned long *linkmodes)
- 
- 	return linkmode_intersects(link_caps[capa].linkmodes, linkmodes);
+@@ -253,3 +253,95 @@ void phy_caps_linkmodes(unsigned long caps, unsigned long *linkmodes)
+ 		linkmode_or(linkmodes, linkmodes, link_caps[capa].linkmodes);
  }
+ EXPORT_SYMBOL_GPL(phy_caps_linkmodes);
 +
 +/**
-+ * phy_caps_linkmodes() - Convert a bitfield of capabilities into linkmodes
-+ * @caps: The list of caps, each bit corresponding to a LINK_CAPA value
-+ * @linkmodes: The set of linkmodes to fill. Must be previously initialized.
-+ */
-+void phy_caps_linkmodes(unsigned long caps, unsigned long *linkmodes)
-+{
-+	unsigned long capa;
-+
-+	for_each_set_bit(capa, &caps, __LINK_CAPA_MAX)
-+		linkmode_or(linkmodes, linkmodes, link_caps[capa].linkmodes);
-+}
-+EXPORT_SYMBOL_GPL(phy_caps_linkmodes);
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 9cb3beec9f47..30f0ecb084ef 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -317,6 +317,24 @@ static struct {
- 	{ MAC_10HD,     SPEED_10,     DUPLEX_HALF, BIT(LINK_CAPA_10HD) },
- };
- 
-+/**
-+ * phylink_caps_to_link_caps() - Convert a set of MAC capabilities LINK caps
-+ * @caps: A set of MAC capabilities
++ * phy_caps_from_interface() - Get the link capa from a given PHY interface
++ * @interface: The PHY interface we want to get the possible Speed/Duplex from
 + *
-+ * Returns: The corresponding set of LINK_CAPA as defined in phy-caps.h
++ * Returns: A bitmask of LINK_CAPA_xxx values that can be achieved with the
++ *          provided interface.
 + */
-+static unsigned long phylink_caps_to_link_caps(unsigned long caps)
++unsigned long phy_caps_from_interface(phy_interface_t interface)
 +{
 +	unsigned long link_caps = 0;
++
++	switch (interface) {
++	case PHY_INTERFACE_MODE_USXGMII:
++		link_caps |= BIT(LINK_CAPA_10000FD) | BIT(LINK_CAPA_5000FD);
++		fallthrough;
++
++	case PHY_INTERFACE_MODE_10G_QXGMII:
++		link_caps |= BIT(LINK_CAPA_2500FD);
++		fallthrough;
++
++	case PHY_INTERFACE_MODE_RGMII_TXID:
++	case PHY_INTERFACE_MODE_RGMII_RXID:
++	case PHY_INTERFACE_MODE_RGMII_ID:
++	case PHY_INTERFACE_MODE_RGMII:
++	case PHY_INTERFACE_MODE_PSGMII:
++	case PHY_INTERFACE_MODE_QSGMII:
++	case PHY_INTERFACE_MODE_QUSGMII:
++	case PHY_INTERFACE_MODE_SGMII:
++	case PHY_INTERFACE_MODE_GMII:
++		link_caps |= BIT(LINK_CAPA_1000HD) | BIT(LINK_CAPA_1000FD);
++		fallthrough;
++
++	case PHY_INTERFACE_MODE_REVRMII:
++	case PHY_INTERFACE_MODE_RMII:
++	case PHY_INTERFACE_MODE_SMII:
++	case PHY_INTERFACE_MODE_REVMII:
++	case PHY_INTERFACE_MODE_MII:
++		link_caps |= BIT(LINK_CAPA_10HD) | BIT(LINK_CAPA_10FD);
++		fallthrough;
++
++	case PHY_INTERFACE_MODE_100BASEX:
++		link_caps |= BIT(LINK_CAPA_100HD) | BIT(LINK_CAPA_100FD);
++		break;
++
++	case PHY_INTERFACE_MODE_TBI:
++	case PHY_INTERFACE_MODE_MOCA:
++	case PHY_INTERFACE_MODE_RTBI:
++	case PHY_INTERFACE_MODE_1000BASEX:
++		link_caps |= BIT(LINK_CAPA_1000HD);
++		fallthrough;
++	case PHY_INTERFACE_MODE_1000BASEKX:
++	case PHY_INTERFACE_MODE_TRGMII:
++		link_caps |= BIT(LINK_CAPA_1000FD);
++		break;
++
++	case PHY_INTERFACE_MODE_2500BASEX:
++		link_caps |= BIT(LINK_CAPA_2500FD);
++		break;
++
++	case PHY_INTERFACE_MODE_5GBASER:
++		link_caps |= BIT(LINK_CAPA_5000FD);
++		break;
++
++	case PHY_INTERFACE_MODE_XGMII:
++	case PHY_INTERFACE_MODE_RXAUI:
++	case PHY_INTERFACE_MODE_XAUI:
++	case PHY_INTERFACE_MODE_10GBASER:
++	case PHY_INTERFACE_MODE_10GKR:
++		link_caps |= BIT(LINK_CAPA_10000FD);
++		break;
++
++	case PHY_INTERFACE_MODE_25GBASER:
++		link_caps |= BIT(LINK_CAPA_25000FD);
++		break;
++
++	case PHY_INTERFACE_MODE_XLGMII:
++		link_caps |= BIT(LINK_CAPA_40000FD);
++		break;
++
++	case PHY_INTERFACE_MODE_INTERNAL:
++		link_caps |= LINK_CAPA_ALL;
++		break;
++
++	case PHY_INTERFACE_MODE_NA:
++	case PHY_INTERFACE_MODE_MAX:
++		break;
++	}
++
++	return link_caps;
++}
++EXPORT_SYMBOL_GPL(phy_caps_from_interface);
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 30f0ecb084ef..0162ce09f54d 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -335,6 +335,18 @@ static unsigned long phylink_caps_to_link_caps(unsigned long caps)
+ 	return link_caps;
+ }
+ 
++static unsigned long phylink_link_caps_to_mac_caps(unsigned long link_caps)
++{
++	unsigned long caps = 0;
 +	int i;
 +
 +	for (i = 0; i <  ARRAY_SIZE(phylink_caps_params); i++)
-+		if (caps & phylink_caps_params[i].mask)
-+			link_caps |= phylink_caps_params[i].caps_bit;
++		if (link_caps & phylink_caps_params[i].caps_bit)
++			caps |= phylink_caps_params[i].mask;
 +
-+	return link_caps;
++	return caps;
 +}
 +
  /**
   * phylink_caps_to_linkmodes() - Convert capabilities to ethtool link modes
   * @linkmodes: ethtool linkmode mask (must be already initialised)
-@@ -328,146 +346,15 @@ static struct {
- static void phylink_caps_to_linkmodes(unsigned long *linkmodes,
- 				      unsigned long caps)
+@@ -412,86 +424,12 @@ static unsigned long phylink_get_capabilities(phy_interface_t interface,
+ 					      unsigned long mac_capabilities,
+ 					      int rate_matching)
  {
-+	unsigned long link_caps = phylink_caps_to_link_caps(caps);
-+
- 	if (caps & MAC_SYM_PAUSE)
- 		__set_bit(ETHTOOL_LINK_MODE_Pause_BIT, linkmodes);
++	unsigned long link_caps = phy_caps_from_interface(interface);
+ 	int max_speed = phylink_interface_max_speed(interface);
+ 	unsigned long caps = MAC_SYM_PAUSE | MAC_ASYM_PAUSE;
+ 	unsigned long matched_caps = 0;
  
- 	if (caps & MAC_ASYM_PAUSE)
- 		__set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT, linkmodes);
+-	switch (interface) {
+-	case PHY_INTERFACE_MODE_USXGMII:
+-		caps |= MAC_10000FD | MAC_5000FD;
+-		fallthrough;
+-
+-	case PHY_INTERFACE_MODE_10G_QXGMII:
+-		caps |= MAC_2500FD;
+-		fallthrough;
+-
+-	case PHY_INTERFACE_MODE_RGMII_TXID:
+-	case PHY_INTERFACE_MODE_RGMII_RXID:
+-	case PHY_INTERFACE_MODE_RGMII_ID:
+-	case PHY_INTERFACE_MODE_RGMII:
+-	case PHY_INTERFACE_MODE_PSGMII:
+-	case PHY_INTERFACE_MODE_QSGMII:
+-	case PHY_INTERFACE_MODE_QUSGMII:
+-	case PHY_INTERFACE_MODE_SGMII:
+-	case PHY_INTERFACE_MODE_GMII:
+-		caps |= MAC_1000HD | MAC_1000FD;
+-		fallthrough;
+-
+-	case PHY_INTERFACE_MODE_REVRMII:
+-	case PHY_INTERFACE_MODE_RMII:
+-	case PHY_INTERFACE_MODE_SMII:
+-	case PHY_INTERFACE_MODE_REVMII:
+-	case PHY_INTERFACE_MODE_MII:
+-		caps |= MAC_10HD | MAC_10FD;
+-		fallthrough;
+-
+-	case PHY_INTERFACE_MODE_100BASEX:
+-		caps |= MAC_100HD | MAC_100FD;
+-		break;
+-
+-	case PHY_INTERFACE_MODE_TBI:
+-	case PHY_INTERFACE_MODE_MOCA:
+-	case PHY_INTERFACE_MODE_RTBI:
+-	case PHY_INTERFACE_MODE_1000BASEX:
+-		caps |= MAC_1000HD;
+-		fallthrough;
+-	case PHY_INTERFACE_MODE_1000BASEKX:
+-	case PHY_INTERFACE_MODE_TRGMII:
+-		caps |= MAC_1000FD;
+-		break;
+-
+-	case PHY_INTERFACE_MODE_2500BASEX:
+-		caps |= MAC_2500FD;
+-		break;
+-
+-	case PHY_INTERFACE_MODE_5GBASER:
+-		caps |= MAC_5000FD;
+-		break;
+-
+-	case PHY_INTERFACE_MODE_XGMII:
+-	case PHY_INTERFACE_MODE_RXAUI:
+-	case PHY_INTERFACE_MODE_XAUI:
+-	case PHY_INTERFACE_MODE_10GBASER:
+-	case PHY_INTERFACE_MODE_10GKR:
+-		caps |= MAC_10000FD;
+-		break;
+-
+-	case PHY_INTERFACE_MODE_25GBASER:
+-		caps |= MAC_25000FD;
+-		break;
+-
+-	case PHY_INTERFACE_MODE_XLGMII:
+-		caps |= MAC_40000FD;
+-		break;
+-
+-	case PHY_INTERFACE_MODE_INTERNAL:
+-		caps |= ~0;
+-		break;
+-
+-	case PHY_INTERFACE_MODE_NA:
+-	case PHY_INTERFACE_MODE_MAX:
+-		break;
+-	}
++	caps |= phylink_link_caps_to_mac_caps(link_caps);
  
--	if (caps & MAC_10HD) {
--		__set_bit(ETHTOOL_LINK_MODE_10baseT_Half_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10baseT1S_Half_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10baseT1S_P2MP_Half_BIT, linkmodes);
--	}
--
--	if (caps & MAC_10FD) {
--		__set_bit(ETHTOOL_LINK_MODE_10baseT_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10baseT1L_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10baseT1S_Full_BIT, linkmodes);
--	}
--
--	if (caps & MAC_100HD) {
--		__set_bit(ETHTOOL_LINK_MODE_100baseT_Half_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100baseFX_Half_BIT, linkmodes);
--	}
--
--	if (caps & MAC_100FD) {
--		__set_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100baseT1_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100baseFX_Full_BIT, linkmodes);
--	}
--
--	if (caps & MAC_1000HD)
--		__set_bit(ETHTOOL_LINK_MODE_1000baseT_Half_BIT, linkmodes);
--
--	if (caps & MAC_1000FD) {
--		__set_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_1000baseKX_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_1000baseX_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_1000baseT1_Full_BIT, linkmodes);
--	}
--
--	if (caps & MAC_2500FD) {
--		__set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_2500baseX_Full_BIT, linkmodes);
--	}
--
--	if (caps & MAC_5000FD)
--		__set_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT, linkmodes);
--
--	if (caps & MAC_10000FD) {
--		__set_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10000baseKX4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10000baseKR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10000baseR_FEC_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10000baseCR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10000baseSR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10000baseLR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10000baseLRM_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10000baseER_Full_BIT, linkmodes);
--	}
--
--	if (caps & MAC_25000FD) {
--		__set_bit(ETHTOOL_LINK_MODE_25000baseCR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_25000baseKR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_25000baseSR_Full_BIT, linkmodes);
--	}
--
--	if (caps & MAC_40000FD) {
--		__set_bit(ETHTOOL_LINK_MODE_40000baseKR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_40000baseCR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_40000baseSR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_40000baseLR4_Full_BIT, linkmodes);
--	}
--
--	if (caps & MAC_50000FD) {
--		__set_bit(ETHTOOL_LINK_MODE_50000baseCR2_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_50000baseKR2_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_50000baseSR2_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_50000baseKR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_50000baseSR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_50000baseCR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_50000baseLR_ER_FR_Full_BIT,
--			  linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_50000baseDR_Full_BIT, linkmodes);
--	}
--
--	if (caps & MAC_56000FD) {
--		__set_bit(ETHTOOL_LINK_MODE_56000baseKR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_56000baseCR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_56000baseSR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_56000baseLR4_Full_BIT, linkmodes);
--	}
--
--	if (caps & MAC_100000FD) {
--		__set_bit(ETHTOOL_LINK_MODE_100000baseKR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseSR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseCR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseLR4_ER4_Full_BIT,
--			  linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseKR2_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseSR2_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseCR2_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseLR2_ER2_FR2_Full_BIT,
--			  linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseDR2_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseKR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseSR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseLR_ER_FR_Full_BIT,
--			  linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseCR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseDR_Full_BIT, linkmodes);
--	}
--
--	if (caps & MAC_200000FD) {
--		__set_bit(ETHTOOL_LINK_MODE_200000baseKR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_200000baseSR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_200000baseLR4_ER4_FR4_Full_BIT,
--			  linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_200000baseDR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_200000baseCR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_200000baseKR2_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_200000baseSR2_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_200000baseLR2_ER2_FR2_Full_BIT,
--			  linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_200000baseDR2_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_200000baseCR2_Full_BIT, linkmodes);
--	}
--
--	if (caps & MAC_400000FD) {
--		__set_bit(ETHTOOL_LINK_MODE_400000baseKR8_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_400000baseSR8_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_400000baseLR8_ER8_FR8_Full_BIT,
--			  linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_400000baseDR8_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_400000baseCR8_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_400000baseKR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_400000baseSR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_400000baseLR4_ER4_FR4_Full_BIT,
--			  linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_400000baseDR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_400000baseCR4_Full_BIT, linkmodes);
--	}
-+	phy_caps_linkmodes(link_caps, linkmodes);
- }
- 
- /**
+ 	switch (rate_matching) {
+ 	case RATE_MATCH_OPEN_LOOP:
 -- 
 2.48.1
 
