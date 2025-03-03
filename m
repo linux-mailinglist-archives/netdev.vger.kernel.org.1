@@ -1,90 +1,133 @@
-Return-Path: <netdev+bounces-171400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3AE3A4CD61
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 22:18:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA21AA4CD90
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 22:35:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 644DF3ACAEA
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 21:17:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3DA616E680
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 21:35:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F1B11E5B6C;
-	Mon,  3 Mar 2025 21:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 979B9230277;
+	Mon,  3 Mar 2025 21:35:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KRiilDaJ"
+	dkim=pass (2048-bit key) header.d=online.de header.i=max.schulze@online.de header.b="T2ai1hFe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70788208A9;
-	Mon,  3 Mar 2025 21:17:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF0A1E9B3D
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 21:34:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741036677; cv=none; b=OJGezBG7IOEBgc8T8hrlXIYig4mbUQJYrbo4PQK+d/BNyEwBqGR6h5FQfeu02XrPautXDVh7zXPbvgGYx1raJiB9yCNEKWz0IjbafoyQaGZKkz+RVLrNgJxWAc8dEqkaKp7769GbVIc3JDkt7upnMcJ1bkmtagQq27JJrvSN77M=
+	t=1741037701; cv=none; b=UL4gKOP0FXEyYC73nZL2tkVb5kKJCX8jWNaj5YRxvy1di+ZXyuMtPy4CoC+i+9YIoECrF8X7CyMaVWcxzldWGnGcF0URCZIJNmfEKF5B/tLWvlZ/6zFm1qQgiztXphscsGlwQQQD/ROYhEAjj8cHkMNRGTFw1Bs5dBqSP1WIp3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741036677; c=relaxed/simple;
-	bh=AszVorE/EkhZ3+7Ol3HRuPVkQBoS4dyx8wSxtua6IrM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=Mss27iTELHRY3HhBAuopWvhrUNUMrIOjsZWlywwnlq1IbHeIn7Xf4zlwH8/lXKJ3dRNKA4wPhz66sd3Xo0xD3AoOtKBRt8yRTxjg3XFluRrLTuHvFugEIfhdxosb36GlFO370qM5YbrAjJTfPNmd3nMMSMPGM3IaxzYPdRKiNRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KRiilDaJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B23BDC4CEE5;
-	Mon,  3 Mar 2025 21:17:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741036676;
-	bh=AszVorE/EkhZ3+7Ol3HRuPVkQBoS4dyx8wSxtua6IrM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=KRiilDaJbPT1FK63z1QwEwQrmw9dooZeXCICmsN3P4teawCAbeZ1m711+i6p5X7QD
-	 eVJi8KTTCkxxqSNgC32BU3dotW/95ZM3Uo9eg8Cx9Bjj1yeh7vwHc9rT4z9ZeTjq9L
-	 lghRj06gPac1pEY6rmbMk4VvSnQE7Yw/cdSWOHqP530Cq2X+gTb1uL4jsZVcCXh+FU
-	 4+KNo/Zn4KyEZUiQb3fMgp/dgRrLY26v6+TKkCNu+Bzvp+8BLFmf8YM2v9A2noTjJ/
-	 xJGP2sRcqeIKzfPK5nfkBresmYKnWMVkrmPj0k5ha2vnpxd7ZdaCoitIIHQU1FlwId
-	 polAyf+ckX1Gg==
-Date: Mon, 3 Mar 2025 15:17:55 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-	linux-pci@vger.kernel.org, Ariel Almog <ariela@nvidia.com>,
-	Aditya Prabhune <aprabhune@nvidia.com>,
-	Hannes Reinecke <hare@suse.de>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Arun Easi <aeasi@marvell.com>, Jonathan Chocron <jonnyc@amazon.com>,
-	Bert Kenward <bkenward@solarflare.com>,
-	Matt Carlson <mcarlson@broadcom.com>,
-	Kai-Heng Feng <kai.heng.feng@canonical.com>,
-	Jean Delvare <jdelvare@suse.de>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>,
-	Stephen Hemminger <stephen@networkplumber.org>
-Subject: Re: [PATCH v4] PCI/sysfs: Change read permissions for VPD attributes
-Message-ID: <20250303211755.GA200634@bhelgaas>
+	s=arc-20240116; t=1741037701; c=relaxed/simple;
+	bh=D3uMHcIXTF2m+r73NVEXtNnrCFnvMfodCOCP8z6Cyjw=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=GzCfalvqhj4XEt2gWl2uG4hJAJJHYIeAp/wbqSjltjnxucjbv3R1wNX9h7toAM9jowlM87iSJrYuYXBRxBP2gMt41ssEqKQIzEfpscmjJyLekpnpRy2y6yN02y8x6jRhDLPyyhGui+HBy94d81FqjVvAwJ0AtekPRZaszsZcxRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=online.de; spf=pass smtp.mailfrom=online.de; dkim=pass (2048-bit key) header.d=online.de header.i=max.schulze@online.de header.b=T2ai1hFe; arc=none smtp.client-ip=212.227.17.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=online.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=online.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=online.de;
+	s=s42582890; t=1741037691; x=1741642491; i=max.schulze@online.de;
+	bh=GkMUYHTATf4WJITOjs7tmaL/Hc96qlrL/WFX84yJLmk=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:From:Subject:
+	 Content-Type:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=T2ai1hFeJKsRxEiB/xOYYb/mdI8ER9ypnbeyhUawMl5ADvCrih1khZL1D4sGfziw
+	 6+u4KoCwag1qIv6H+QCtsfsQvGxZElDqCyqA8PlZt5mipqOg99Oed+zBDzqZoWOmf
+	 E3Ety+l0zhlexa/IoHthJhycwqe8+1nY7E2e1g6I5GH2vRaUbOGJlqP3zc7WUH38B
+	 80+Ay7QLqlJuoeCd3uaPUwxFoRe/qswIKHI7XNZBLKcOuv/K1mdiiz4DOhH9h7B0D
+	 DIq/m0c9VDGM37ACLbvuJgECK/uiwDJaOPRbvJRV7p/E0TSlR5QsxKkBYbIRbwT7c
+	 Qlsa7WedVP9xbwEDEQ==
+X-UI-Sender-Class: 6003b46c-3fee-4677-9b8b-2b628d989298
+Received: from [192.168.151.48] ([84.160.55.49]) by mrelayeu.kundenserver.de
+ (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis) id
+ 1MCsLu-1ty33h3VFQ-00CfBO; Mon, 03 Mar 2025 22:29:37 +0100
+Message-ID: <5f649558-b6a0-4562-b8e5-713cb8138d9a@online.de>
+Date: Mon, 3 Mar 2025 22:29:37 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e9943382-8d53-4e28-b600-066ef470f889@app.fastmail.com>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: fujita.tomonori@gmail.com, hfdevel@gmx.net, netdev@vger.kernel.org
+From: Max Schulze <max.schulze@online.de>
+Subject: tn40xx / qt2025: cannot load firmware, error -2
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:s3Xo4JCpzgAAeVIPmoKwtOaJg5REIdDP7UMAV1yHk8dWz05LjRx
+ kRFHZs3ThL6r3U4v7uJgbyqmKOHEopRsAHTkz7u9lflKOx/YXf55EpO6ZTt/Xa4WDdXzDOf
+ Wd6LLUyRPiholIdrxuZ3Xr3QHBFH8XSfmagIAh7GbiaxIMvvJCqvfLOMNo9IknSjYalF2yd
+ X51nIT+EaRNAYHfNvYEKA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:S+koYXc3Q8o=;tzYqCGclzB5Z0RSj37CwuCpVPLZ
+ AH7g1ZabGeuASj1mRolXVp892hwcJZLRyq12Gl6cd3ZQ6mDsMmjxJGBxbTrTzSUTa+Tm6BRy9
+ IEJcwinms+JEGo6qwaXUWu7PhNPAIzPOiRrB3xGf0WkuZcZBTN4lTvB6dPvGs21a8C/RL8Vn0
+ oYRsyuIjKNwF9NNXF3UngRZ+KwsfBeR8px/LZZ7ctabkRB9zrfzS/LrynKZS6ivL8rH/F9Ixw
+ gDxY30w24uGeWIqu5W8BMvW0KwT+ZCA1HGunq9NFwGpXX1rQSHKNuY2vUBYtewzaugTQkzRR9
+ iUR4QsJ/p1ENevmBD7t6XEQgcjjZch+4lQq4BgnydOmGTQMWBjS4KfSvR4BCwOAd6b8sr3/H5
+ n6fERi9eHabR/nEYxqnzUWytawMcS8oDn1MtCVnFw4dq1AlC0h/T4RJDBriuAFW6lUlzJoBF3
+ mprJJd8DmlL+350BBoZFD5wCvhT7QWVad87xqKp0KyPsjD8Ey48YIOSJqvEJuv7OxtutP61XS
+ 7hdxUnCBTy2rX1iUBCbDrAx4P3d1b9dbqB669lznBOhKaaeMN2MiWvj4QLqL3rYiAMBr5UqBo
+ q4o1hPMEGzqee4RtquXbdll8gHyXW0RwjQQ04rdl0AoPxNq9djxwGQgbZZkpxL6IOJoh2LpYU
+ 2CL3EHOMIxCnc3cT5slcf+Flt08DRZwnMRM/vFWmxuYKTGKNDW5FTSx/LyXaFl8SdipkYC4Yp
+ MkAtbXhGqk0ti4XFsBpRjvIbUmujzJoCbW+ncF+tUhcD8cdj1JypZvA6Gog9xx5ZSgdgJ3kfK
+ ynyRngk1s3al485lyss+XhgNItvb9jHteyknaHYhxOpphAiRBETCeD6MK2TJRDyzh3FZspFoW
+ QuxfkEIKcP05MZlb30tbMeymP+5YV5k08SU828TLkpbIEx9Sb0U++bR0+UJUAnzuwJdw/4GTJ
+ XWAyXUWle0LtR+24mHh5GmPVl5PZlEdlQuaavhghXhQkrREwc2dJhX+V8bSGnVYIzNz49JVe3
+ tXniBnQDsu9Yn6mIqV1KOEikX6m3j0YMnus8i4Lo3cdtkgWLBd1/ngyRtbWUSCydRPB8khW4B
+ q7nn0uiFxER5qQC60+mIuUEIKk6mSoiavasEMvHxEPSKp4B4ZrH5czogQK9zw9Wuq2Ly92rHK
+ eZKKkkce+wh8C3KFjBI37QF9ZARbNnvYIG5Dy7j1d0gFoMvRa8N5lEWt4b5a+W+RTm+XRVul9
+ fuHBdXOduNECDS4SM2rNDlcDS/EsVL9fKO8CpdDzvzuR94YxKAnbAx3EEfy5stktIlPQ2mpSu
+ qmu0GOUhzxXtk+RHRGVHaFn+Slxr6TnElWpDC8sIgVrObVO4JqpOfnbJ5InIOk7TflV
 
-On Tue, Feb 25, 2025 at 10:05:49PM +0200, Leon Romanovsky wrote:
-> On Tue, Feb 25, 2025, at 20:59, Andrew Lunn wrote:
-> >> Chmod solution is something that I thought, but for now I'm looking
-> >> for the out of the box solution. Chmod still require from
-> >> administrator to run scripts with root permissions.
-> >
-> > It is more likely to be a udev rule. 
-> 
-> Udev rule is one of the ways to run such script.
-> 
-> > systemd already has lots of examples:
-> >
-> > /lib/udev/rules.d/50-udev-default.rules:KERNEL=="rfkill", MODE="0664"
+Hello,
 
-Where are we at with this?  Is a udev rule a feasible solution?
+I am needing help with this:
+
+> [    4.344358] QT2025 10Gpbs SFP+ tn40xx-0-300:01: Direct firmware load =
+for qt2025-2.0.3.3.fw failed with error -2
+> [    4.345075] QT2025 10Gpbs SFP+ tn40xx-0-300:01: probe with driver QT2=
+025 10Gpbs SFP+ failed with error -2
+
+
+I have built a mainline kernel 6.13.2 with rust support and have this card=
+:
+
+> 03:00.0 Ethernet controller [0200]: Tehuti Networks Ltd. TN9310 10GbE SF=
+P+ Ethernet Adapter [1fc9:4022]
+> 	Subsystem: Edimax Computer Co. 10 Gigabit Ethernet SFP+ PCI Express Ada=
+pter [1432:8103]
+
+
+I have put the firmware here:
+
+> $ sha256sum /lib/firmware/qt2025-2.0.3.3.fw
+> 95594ca080743e9c8e8a46743d6e413dd452152100ca9a3cd817617e5ac7187b  /lib/f=
+irmware/qt2025-2.0.3.3.fw
+
+
+
+Is there anything else I can do?
+
+What is error -2 ? Who generates it?
+
+( NB: You could mention the hash for the .fw file somewhere in sourcecode,=
+ until its in firmware.git (doesn't look like it ever will, huh? [1]), so =
+others can verify they have the same file as the driver authors...)
+
+
+Best,
+Max
+
+
+[1] https://lore.kernel.org/all/20240922102024.218191-1-fujita.tomonori@gm=
+ail.com/
 
