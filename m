@@ -1,167 +1,109 @@
-Return-Path: <netdev+bounces-171307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8EB1A4C72C
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:31:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F524A4C77A
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:38:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48957168E56
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 16:29:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CDD907A83EA
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 16:32:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39F20214A8B;
-	Mon,  3 Mar 2025 16:28:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A839C23496B;
+	Mon,  3 Mar 2025 16:30:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NmAkxmfI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EkzeRRH5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F112144B8;
-	Mon,  3 Mar 2025 16:28:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7849D2343C6;
+	Mon,  3 Mar 2025 16:30:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741019332; cv=none; b=nB2XG/Yx5PmhLYZDqSSC9mUgMebDCiDWvxCuG+BWeVL+KUU8I8RQEWqyyaI0sz8XWdhSNuhHIEfT4BA1cz9JRCV/ZynfcLaqPInMFfLG+LWpaEfLEc59M3m55UZtEOHw2ViT8/AbhzRunfidLtSzNewdY0h4r+mJIkAOdCkU+aQ=
+	t=1741019420; cv=none; b=BrJ5NweXg1COLseRDFrZ2CF4f5JgfOFqT2LG6jLO44zf5BTFVmQ2g9TRl60Lmtd4j5W21LQX90BOZdjvN+M/gm0cr59t6gHNweQCVgbRZl6dWfT8NkM58BgQGYNlT2EL6d2ZAUDgdg5tO9Z/VTDon4yqGjFqQxMkjqdDwUzQaQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741019332; c=relaxed/simple;
-	bh=6KHbEnd+dBa09GT4KuIxocFx6yEOp05FmWTZQDE5UrA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HYIYO42EpLd7YyfrZzaIjJvN19pboCuAb8aFeRqCEJXyCGfsB/H+VKKrrCs0GCmaHBVYtsv1iibylC/wfC7DvVi9qfil1Tz6Blo+Bo1grEu3nGKbS+AxP9y1Dfe4zqabttx8UI6DIwR6PkYuVl4JHn2PGXP5YykQzbNK/BpHM5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NmAkxmfI; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741019331; x=1772555331;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=6KHbEnd+dBa09GT4KuIxocFx6yEOp05FmWTZQDE5UrA=;
-  b=NmAkxmfIKkO1y919AanuzxcpvgG6kQgXhdbwpAinnOMDzNm3dX0d3TUa
-   sKcf8vApbr4DNsSvh/XC/+aiHSOWsGcFC0FbwlPrHhgP2kM9US7+6Sbsd
-   NNtBqWPB2vpz87z5fi7UN91YACBtDuj9JkrtLlMuZSYQDvKgbqug6RIso
-   JcSuRIgYDQFPxElyYBtR4AwENiIzB4pNqCQiG3eP3wr1YaHSjQvEnsfzt
-   hVlCqIPyMk452sjSw0FKjtqHeZTETgaKM87rQc9jB4KAPDHeEHkYHRPL0
-   tb9U6Bv3Wm6qvmwLH2+Qi32+X2gtlOSFaC4vi1NNL43KlffUC5ZiiUzSA
-   A==;
-X-CSE-ConnectionGUID: Rml07Lq3Q8CpfL1rQGh/yA==
-X-CSE-MsgGUID: Rnd7MM+/RU68YaHsTucEkA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="52880549"
-X-IronPort-AV: E=Sophos;i="6.13,330,1732608000"; 
-   d="scan'208";a="52880549"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 08:28:49 -0800
-X-CSE-ConnectionGUID: pCLQVKJQQwyQWYRlZgGZMg==
-X-CSE-MsgGUID: 0bfJ3ls4TVeDv9y4h6RXuw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,330,1732608000"; 
-   d="scan'208";a="118251585"
-Received: from smile.fi.intel.com ([10.237.72.58])
-  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 08:28:45 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1tp8en-0000000Grb1-2iJU;
-	Mon, 03 Mar 2025 18:28:41 +0200
-Date: Mon, 3 Mar 2025 18:28:41 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>
-Subject: Re: [PATCH net-next v1 2/2] ieee802154: ca8210: Switch to using
- gpiod API
-Message-ID: <Z8XYuY2idCVrAfdm@smile.fi.intel.com>
-References: <20250303150855.1294188-1-andriy.shevchenko@linux.intel.com>
- <20250303150855.1294188-3-andriy.shevchenko@linux.intel.com>
- <8734fu84r8.fsf@bootlin.com>
+	s=arc-20240116; t=1741019420; c=relaxed/simple;
+	bh=PQcdHR7xGldchHufFfkG93+0uiY9+gpl16eM5PJNtzI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=OkdjmoRWHbMpr3qHnHy22+3Pi8gSM27k8/DcuV5MNN0ifi4/16A/d1rd9MpOsHWrRbFNIMlq8co87aVWrROE+5jAyVpLKlqBvgU+leN7UM1hClNhI6KY0YCQeWhdpZnu+wzBfCSMFpuEOpF/Dl0T96hIBGwqnTuTTg6RI2hMtI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EkzeRRH5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C394AC4CEE6;
+	Mon,  3 Mar 2025 16:30:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741019420;
+	bh=PQcdHR7xGldchHufFfkG93+0uiY9+gpl16eM5PJNtzI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=EkzeRRH5nTsfiilyCqnvA+3r7iGONEkp0S4Lu2mC1mcee9AYfGTY49a0zGwQM/a45
+	 zRMrtrNBOzruAtm4TGTyPWyf27GRM0V/kFGOPH+3Iz+KZXBgwbugpOaS5N8hss9Txu
+	 YT9vaHIpGrOVbqpSl+O8xKPdZSURzPKB54AOFeAnVOraKBCY5XmOwoZfgTF38je4A0
+	 mXuaZxxrallFKaJE4zCc39NHiHK3cws6WXsdvn0FoMP9eDAUIg3WjvRFhItcDNdlav
+	 B0xYz16X2rij0UQ15RlLx7ArzPQ3J/DA3mpeIiOCNqPDDSMIQb74bXyvYFr+QBEYxt
+	 VJit8STcLaCjg==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	martineau@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	netdev@vger.kernel.org,
+	mptcp@lists.linux.dev
+Subject: [PATCH AUTOSEL 6.13 13/17] mptcp: safety check before fallback
+Date: Mon,  3 Mar 2025 11:29:45 -0500
+Message-Id: <20250303162951.3763346-13-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250303162951.3763346-1-sashal@kernel.org>
+References: <20250303162951.3763346-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8734fu84r8.fsf@bootlin.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.13.5
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 03, 2025 at 05:20:59PM +0100, Miquel Raynal wrote:
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
 
-...
+[ Upstream commit db75a16813aabae3b78c06b1b99f5e314c1f55d3 ]
 
-> > - * @gpio_reset:     gpio number of ca8210 reset line
-> > - * @gpio_irq:       gpio number of ca8210 interrupt line
-> > + * @reset_gpio:     GPIO of ca8210 reset line
-> 
-> What about "CA8210 Reset GPIO line"? Or Just "Reset GPIO line"? Or even
-> "Reset GPIO descriptor" (whatever).
-> 
-> > + * @irq_gpio:       GPIO of ca8210 interrupt line
-> 
-> Same
+Recently, some fallback have been initiated, while the connection was
+not supposed to fallback.
 
-Sure.
+Add a safety check with a warning to detect when an wrong attempt to
+fallback is being done. This should help detecting any future issues
+quicker.
 
-[...]
+Acked-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Link: https://patch.msgid.link/20250224-net-mptcp-misc-fixes-v1-3-f550f636b435@kernel.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/mptcp/protocol.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> > -	int ret;
-> > -	struct ca8210_platform_data *pdata = spi->dev.platform_data;
-> > +	struct device *dev = &spi->dev;
-> > +	struct ca8210_platform_data *pdata = dev_get_platdata(dev);
-> 
-> Can you either mention the additional cleanup that you do in the commit
-> log or split it in a separate commit? (splitting is probably not
-> necessary here given that most of the cleanup anyway is related to the
-> actual changes.
-
-Do you mean the platform_data accessors? I can actually split it to a separate
-change as I had done some of that in the past in other drivers.
-
-...
-
-> > -	ret = gpio_direction_output(pdata->gpio_reset, 1);
-> > -	if (ret < 0) {
-> > -		dev_crit(
-> > -			&spi->dev,
-> > -			"Reset GPIO %d did not set to output mode\n",
-> > -			pdata->gpio_reset
-> > -		);
-> > -	}
-> > -
-> > -	return ret;
-> > +	return PTR_ERR_OR_ZERO(pdata->reset_gpio);
-> 
-> This is not a strong request, but in general I think it is preferred to return
-> immediately, so this looks easier to understand:
-
-I used the same logic as in the original flow.
-
-> +	pdata->reset_gpio = devm_gpiod_get(dev, "reset", GPIOD_OUT_HIGH);
-> +	if (IS_ERR(pdata->reset_gpio)) {
-> +		dev_crit(dev, "Reset GPIO did not set to output mode\n");
-> +                return PTR_ERR(pdata->reset_pgio);
-> +       }
-> +
-> +       return 0;
-
-Sure I can do this in v2.
-
-...
-
-> Otherwise the rest lgtm.
-
-Thank you for the review!
-
+diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
+index b70a303e08287..7e2f70f22b05b 100644
+--- a/net/mptcp/protocol.h
++++ b/net/mptcp/protocol.h
+@@ -1194,6 +1194,8 @@ static inline void __mptcp_do_fallback(struct mptcp_sock *msk)
+ 		pr_debug("TCP fallback already done (msk=%p)\n", msk);
+ 		return;
+ 	}
++	if (WARN_ON_ONCE(!READ_ONCE(msk->allow_infinite_fallback)))
++		return;
+ 	set_bit(MPTCP_FALLBACK_DONE, &msk->flags);
+ }
+ 
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.39.5
 
 
