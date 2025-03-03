@@ -1,145 +1,134 @@
-Return-Path: <netdev+bounces-171257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65283A4C34F
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 15:24:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0DA9A4C35E
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 15:31:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E28583A2EB9
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 14:24:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35A9C3A7B88
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 14:30:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 892E32116F0;
-	Mon,  3 Mar 2025 14:24:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01CDA7DA93;
+	Mon,  3 Mar 2025 14:31:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qx4mJq2d"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HlCcpGBE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FB4E139579;
-	Mon,  3 Mar 2025 14:24:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E6B8CA5A
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 14:31:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741011865; cv=none; b=D3s4m7yFdO1hHASIY+u1SfKbJNoE4X7QMZQUDwwoI7J26zhUhh4wR8sjltahzWpFnUBnTIrmXWGEwBUn2qE67PkqsBxkQ2nypZQWiNWkLWv5t/FgmzbaFX2jyYpJF4FYMtFETnpxx/o8Oc7oTy5xaEC1fVFU4tp2j6LdPUblbyg=
+	t=1741012262; cv=none; b=Vs2RlIDxFxEQ8CL+X4xNJ7nRtvQECkNIlaNYIp5eD6fLnTIz01PaEDis/GZeF2gfgNxQgbaeFO4uB7BVrobu1reQZ68LGMOXquXYONYfIDj5pK3QuZuaS5MVCzLg/r6CgW8R0kRj0gO1fcIakENjgQq4+ytuRNZVEbpbgwE7hZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741011865; c=relaxed/simple;
-	bh=DrHNOzIsPRePDm/wjoDsR7p+0haWMn2qBTkIdsFQd2s=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D8YWT4v6DB0YsaTeZ1nTIqRjg19kD4WyEftXQ/+XCAYAlXyIOjbVCeZdUW3F6CkEdnKINPt7UorGofyMFtAIj7Qj0+vcr6stR9jP9BGMLOsXAjTBQc+3pbT3CZcfehke0EC8EbWOhhObUsj8rcRTyacLFSU9HM8H3fxG4g+srKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qx4mJq2d; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 523A2ubC005420;
-	Mon, 3 Mar 2025 14:24:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=5soQLA
-	3rzECWcYaHao77moD1krGP9rLVyf+EVXfymzk=; b=qx4mJq2dVUXJXiijYPonu9
-	8tEM12QLo1QZHhJLjXu7vzRDKgbvXGDtJ84eq5SZoltyS/H+lRR6TBmeZiNOR+lL
-	t0wuIzpuDd2h6GiUFO057bR2Z3wzZ0ABDLyvXJZvwgEBVXmbxnn03rMUi0Lcg0Um
-	d+0yieGItjbMX3A7EjIlp+0a8B59Eeeby9S0xdFhw3ebBRYk7mKzgwMXPY1lONid
-	jPK9r82nrVjEJr3oDlTPaXCJom1Ql66/wL7f4bxmkxWfZgad99f8HO32kjEcC4oF
-	b6m0aO8kk3duZ5unGBOSY2GsshHZDIcVJw79YnuYP2izl/bpM9i8nJvJhmRhh7yA
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 455aapsj7f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Mar 2025 14:24:18 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 523EMIem030395;
-	Mon, 3 Mar 2025 14:24:18 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 455aapsj6q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Mar 2025 14:24:18 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 523C3XIS013720;
-	Mon, 3 Mar 2025 14:24:17 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 454e2kfu7u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Mar 2025 14:24:16 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 523EODQt17498470
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 3 Mar 2025 14:24:13 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 13A8C2004D;
-	Mon,  3 Mar 2025 14:24:13 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4707620040;
-	Mon,  3 Mar 2025 14:24:12 +0000 (GMT)
-Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.171.68.89])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Mon,  3 Mar 2025 14:24:12 +0000 (GMT)
-Date: Mon, 3 Mar 2025 15:24:10 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, wenjia@linux.ibm.com, jaka@linux.ibm.com,
-        alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
-        guwen@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, horms@kernel.org, linux-rdma@vger.kernel.org,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Alexandra Winter <wintera@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH net] net/smc: use the correct ndev to find pnetid by
- pnetid table
-Message-ID: <20250303152410.31f5e3df.pasic@linux.ibm.com>
-In-Reply-To: <4eb38707-1a93-4c5c-aa65-14adfd595d14@linux.alibaba.com>
-References: <20241227040455.91854-1-guangguan.wang@linux.alibaba.com>
-	<1f4a721f-fa23-4f1d-97a9-1b27bdcd1e21@redhat.com>
-	<20250107203218.5787acb4.pasic@linux.ibm.com>
-	<908be351-b4f8-4c25-9171-4f033e11ffc4@linux.alibaba.com>
-	<20250109040429.350fdd60.pasic@linux.ibm.com>
-	<b1053a92-3a3f-4042-9be9-60b94b97747d@linux.alibaba.com>
-	<20250210145255.793e6639.pasic@linux.ibm.com>
-	<4eb38707-1a93-4c5c-aa65-14adfd595d14@linux.alibaba.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1741012262; c=relaxed/simple;
+	bh=ZJKhQGEooGq39rnfsvpaIWYHgRiDneuKaSTO0NdW6gc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GkXTRrsB8mjZFS5pbiyiGLxfrb6hTa/azmNNWkiiqLuJLLDefwbaubIB/AUH/EA89E5JTjgLlO7SsyWJUi8y98NChPmvKpoeJ38EcYx17lQGpRIJ3KfjjQKcO5mzvK0L4UYGraNczaAyw1DbMHJqTZnqaNG2d0bzTTY/nIdlGOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HlCcpGBE; arc=none smtp.client-ip=209.85.166.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-855a8c1ffe9so121623639f.1
+        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 06:31:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741012260; x=1741617060; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZJKhQGEooGq39rnfsvpaIWYHgRiDneuKaSTO0NdW6gc=;
+        b=HlCcpGBE9B1GhRvqcKAjnfpVuFopbOYKTZ/XpYY/tq8V/sNPITY/4LE438ROt3jvuL
+         lSlMzXJsIwGeL/jrG935vrvzZWYCfczoPKWkhsKUIAROT/C3uV2trwYY3sDeU4XC3Rgd
+         JbxbrhJFGD0bgj3+JoEPCYzJegAF6ZmvPewbDB/8nCIIxG9PI/LrdEtW81hnlsXZnJaN
+         QzMTvD23WsFx44vdGmPfJ/muTxQgt7MUwCxSjFtunrZPN0G5pgO+nRkkQ6cthOHZWx7p
+         meOfr7haK8IYw4FIa3flS65ALrCMpF1DySEDfFIuZ/33gVEFwJP/69BEOJ3eUQ95akZ5
+         AXxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741012260; x=1741617060;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZJKhQGEooGq39rnfsvpaIWYHgRiDneuKaSTO0NdW6gc=;
+        b=PD9VOw3ggIb/zmzF3i739X5KqLI0Ej5j6WP2dC+5SVz77r6Kch7F8UUUxuhzFgIgYI
+         UFa4AW02h6RpHLTC2HzdS6evup8hckvRPiV8MB0TyyFlEuhPlw5RGGODGX7J1gxtfhut
+         nz5opUBKUkUx3vznt785LH3674WESFFVEp+SJwaDS65ryl+DanFhldVg9WTv5yVHz++X
+         aEdtm5T9QW7BUyx+5j4RnY9BuilNKxxxQBvqi8TnvToMGWT124s6RY9JKCILNKKJp1Ij
+         DNhC8XA6t4YeH874ECHcSJGIKcduJEd6Y1xDmw3ME+NgO5YF9zIa+L/JRSiTqKbSOEES
+         VFaA==
+X-Forwarded-Encrypted: i=1; AJvYcCXGe/fLXosgt9cCrN8loQjyZbJSzeAcAXTCdvP4HGg0pdrxQYDVqgcE+k7J3Gq4xGWcwaVZcCw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyY0BB9yZ6wp+CfXQCRg2HZqj/HKFXTfFiud87qdTHv8uxn6kKu
+	VY5cwtxUp3Fzl6vMWjlx7RCzAuXuk0CYWGPST4P6tz0NUCU7C0yUzeqWuqDnZUlAAaPZDy+KJ4g
+	1bBiZsA0R1waKLWd+V1HXLx7r29Y=
+X-Gm-Gg: ASbGncuuM9nozI/Pgo6vUb9LA+oKC473fnoiJRgZhZb3PwJp6Vys8zsfHFbjkt03nxf
+	4n5bEcCt0LM3RJzLhd3ALlaP6tAGeRciMdX3yfPGnW0BopALyHNe84U4GUf3KFiWwOohfBwOwJQ
+	TOChWFRJV4t07V5CwUtgYlVHzeIg==
+X-Google-Smtp-Source: AGHT+IERy1dQr9CMHom5m2Ogbs+wm3IAjYpPApITUasj4RLHfGxFX5SJDUnkihQarDvtgCuP+lfMfhgvMfUujl3Uf1o=
+X-Received: by 2002:a05:6e02:1705:b0:3d3:fdb8:17a7 with SMTP id
+ e9e14a558f8ab-3d3fdb81a82mr45809105ab.6.1741012258995; Mon, 03 Mar 2025
+ 06:30:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: MnLozmkxJvNEnJJwCFY4BYBYX0s8lRLG
-X-Proofpoint-GUID: O9QXNJNcB1yAxDfIhxTSvMaTixZSEB9l
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-03_07,2025-03-03_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- mlxscore=0 lowpriorityscore=0 clxscore=1015 priorityscore=1501 bulkscore=0
- impostorscore=0 spamscore=0 mlxlogscore=995 malwarescore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2502100000
- definitions=main-2503030107
+References: <20250228164904.47511-1-kerneljasonxing@gmail.com>
+ <67c5111ae5754_170775294fe@willemb.c.googlers.com.notmuch>
+ <CAL+tcoDg1mQ+7DtYNgYomum9o=gzwtrjedYf7VmHud54VfSynQ@mail.gmail.com> <67c5b3775ea69_1b832729461@willemb.c.googlers.com.notmuch>
+In-Reply-To: <67c5b3775ea69_1b832729461@willemb.c.googlers.com.notmuch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 3 Mar 2025 22:30:22 +0800
+X-Gm-Features: AQ5f1JoAV-tIOEzDcZsYNYq7oWBaN6nsqRhYVXKuAqdT2yCbE6u5JOCrElC8VXs
+Message-ID: <CAL+tcoCTddpJxx6uCo9b-7Qy=CpVW1YU=pO4S0pKniHsS9fSzg@mail.gmail.com>
+Subject: Re: [PATCH net-next] net-timestamp: support TCP GSO case for a few
+ missing flags
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, ncardwell@google.com, kuniyu@amazon.com, 
+	dsahern@kernel.org, willemb@google.com, horms@kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 11 Feb 2025 11:44:32 +0800
-Guangguan Wang <guangguan.wang@linux.alibaba.com> wrote:
+On Mon, Mar 3, 2025 at 9:49=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jason Xing wrote:
+> > On Mon, Mar 3, 2025 at 10:17=E2=80=AFAM Willem de Bruijn
+> > <willemdebruijn.kernel@gmail.com> wrote:
+> > >
+> > > Jason Xing wrote:
+> > > > When I read through the TSO codes, I found out that we probably
+> > > > miss initializing the tx_flags of last seg when TSO is turned
+> > > > off,
+> > >
+> > > When falling back onto TCP GSO. Good catch.
+> > >
+> > > This is a fix, so should target net?
+> >
+> > After seeing your comment below, I'm not sure if the next version
+> > targets the net branch because SKBTX_BPF flag is not in the net branch.
+>
+> HWTSTAMP is sufficient reason
 
-> > Can you please help me reason about this? I'm unfortunately lacking
-> > Kubernetes skills here, and it is difficult for me to think along.  
-> 
-> Yes, it is also a problem that not being able to set eth0 (veth/POD)'s PNEDID from the host.
-> Even if the eth1(host) have hardware PNETID, the eth0 (veth/POD) can not search the hardware
-> PNETID. Because the eth0 (veth/POD) and eth1(host) are not in one netdev hierarchy.
-> But the two netdev hierarchies have relationship. Maybe search PNETID in all related netdev
-> hierarchies can help resolve this. For example when finding the base_ndev, if the base_ndev
-> is a netdev has relationship with other netdev(veth .etc) then jump to the related netdev
-> hierarchy through the relationship to iteratively find the base_ndev.
-> It is an idea now. I have not do any research about it yet and I am not sure if it is feasible.
+Got it.
 
-I did a fair amount of thinking and I've talked to Wenjia and Sandy as
-well, and now I'm fine with moving forward with a variant that
-prioritizes compatibility but makes the scenarios you have pointed out
-work by enabling taking the SW PNETID of the non-leaf netdev(s) if the
-base_dev has no PNETID (neither hw nor sw).
+>
+> > If target net-net tree, I would add the following:
+> > Fixes: 6b98ec7e882af ("bpf: Add BPF_SOCK_OPS_TSTAMP_SCHED_CB callback")
+> > Fixes: 4ed2d765dfacc ("net-timestamp: TCP timestamping")
+>
+> Please only add one Fixes tag. In this case 4ed2d765dfacc
 
-Regards,
-Halil
+Okay, I will do it as you said.
+
+Sorry to ask one more thing: should I mention SKBTX_BPF in the commit
+message like "...SKBTX_BPF for now is only net-next material, but it
+can be fixed by this patch as well"? I'm not sure if it's allowed to
+say like that since we target the net branch.
+
+Thanks,
+Jason
 
