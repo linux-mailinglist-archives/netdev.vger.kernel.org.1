@@ -1,66 +1,67 @@
-Return-Path: <netdev+bounces-171309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 859ACA4C76F
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:37:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6433A4C79B
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:41:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFB0F3ABADD
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 16:33:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85CF87AA919
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 16:33:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00276236A79;
-	Mon,  3 Mar 2025 16:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFB1E239068;
+	Mon,  3 Mar 2025 16:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iPodb99P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jMxruLLA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8130236450;
-	Mon,  3 Mar 2025 16:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4EC238D3A;
+	Mon,  3 Mar 2025 16:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741019425; cv=none; b=gk+wXGnuu6eP9kA28MKgvBjZ8opzDDYGhUWzYkXbzNLMQ4hSGxAvVCoUHwjjAk7frz+KHBaVbcPLwZN6kkzOomDCu+p5bxRTEY9t+3qhyqAifZD7pTRQD8OMRdpj2hecOh2GWPCD0Lvfax+0kf1015UoYBgsz5A+FxYMyjY4r4k=
+	t=1741019429; cv=none; b=D8kjkv0iYvWRB7+hx/0l8zMGfWpK0xhRTGD3soYNjqN6qDpkFxW2sYrxBquiliAF6DAO14ll/STIs0HDEuOwd98ByCwbkj/+w9x889VoLm4anUN5KsDD+2p9/6K2RChX/gHgxFNN7hyXEpObl5rQvMzrlf6AlX4FKCae1YDKEjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741019425; c=relaxed/simple;
-	bh=4BV+DfAitoOFS67rXvI7/vo+K9o3Nfm2wDbXPMUtLKI=;
+	s=arc-20240116; t=1741019429; c=relaxed/simple;
+	bh=VO4PNxXKaKhQhc8WyvjllaRN4o+RXV2Z6WojniXYwY4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tU/TelNg34Hqqzo6k1gpf3EncpPgcCcZx4Zwwc67SbSM2z7V70mwpuUS5wd1cu4gGRJ+aIx6b99yIvMeBsxtqdibb3X18VLtfwrusbW3y3KeWXn2PlN6O7xLaq9zQ29xXPCIDWjjGNLF29KKJ2HvFlOuVwoEdhKiIGy0Xjgu70M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iPodb99P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 981F5C4CEE4;
-	Mon,  3 Mar 2025 16:30:23 +0000 (UTC)
+	 MIME-Version; b=HFMI9NtFAOuGYCckRrrUkZatuvhGOcW5GELSTtHaEhdZzVNQjnUr4detUpCKHyVRSLZSq86kje8PxoXQauP3bMZ+NsolZYUnHr1vMdATAzpJCrD7i5u+P9rYsQ7bLPoaITSwbSfSNxx0ZqPBY6JVu4kbos4sOCRAv1yuD4Gu73c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jMxruLLA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43FD8C4CEE6;
+	Mon,  3 Mar 2025 16:30:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741019425;
-	bh=4BV+DfAitoOFS67rXvI7/vo+K9o3Nfm2wDbXPMUtLKI=;
+	s=k20201202; t=1741019429;
+	bh=VO4PNxXKaKhQhc8WyvjllaRN4o+RXV2Z6WojniXYwY4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iPodb99PkHYX9FFLRHxvqFg9XbhwLBCF6uU3Bl4gMe9h/do8tiqA8cdaBIYhmJccL
-	 hrjMiAWZYcY9KAv3FVXf4qPmWzKuphRgflaOJ4m75PqFLoK+HXQB+naMXZ8DADJ038
-	 zW3YKZ23INpE6meX+NxKb5waCtX0U9kAg2Th60E0JnAia+nWN8U1lT0YAYLNVNEKrY
-	 EMeeURYxJtC6FGaA5jumRcHcTymgF03ezqnTMGeVwui6MmgKsnDwaWXkUiBmxUEHif
-	 Fb97nc1ex9SDSyEGfjW+jXJsqScv+t+2OPdd290ys+apFAXOjZENzcAEDd8DM+AGBS
-	 4EJeJcU2AQaxw==
+	b=jMxruLLAzDKnwWuDlNzB5pcWPrmqSqhUBWFIKEDrnrtzMa2CpB7QstjVzp7jckw8I
+	 /tbIrLRYFeX1JtjGfh+OCDTmrhrYsn/ZV3Wvlkt7iDxHl2iKIRQrmfDTf69MbysbQS
+	 ZL619hGx/QjHPIRgBGerct529D39hPNILU/mUW+Siw7GHhs9YAwuH0KCXGMif51BRm
+	 nR8V4/BmVrPVbSlUGqwmH5ULf9BRiYV/qWN/noDe0ZtUibrm8/rSKN/A+z8kGqzBwF
+	 rc48C6H35xdOKpf17+wo/hCB0R5jsUU+xLKaR8yzS7HCd8CdMYKg+F4DWovaL/wx3U
+	 UYH4eYWDO3+jg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Frederic Weisbecker <frederic@kernel.org>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Francois Romieu <romieu@fr.zoreil.com>,
-	Breno Leitao <leitao@debian.org>,
-	Eric Dumazet <edumazet@google.com>,
+Cc: Keith Busch <kbusch@kernel.org>,
+	Mike Christie <michael.christie@oracle.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	kuniyu@amazon.com,
-	bigeasy@linutronix.de,
-	jdamato@fastly.com,
-	aleksander.lobakin@intel.com,
+	seanjc@google.com,
+	tglx@linutronix.de,
+	mingo@redhat.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	x86@kernel.org,
+	mst@redhat.com,
+	jasowang@redhat.com,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.13 15/17] net: Handle napi_schedule() calls from non-interrupt
-Date: Mon,  3 Mar 2025 11:29:47 -0500
-Message-Id: <20250303162951.3763346-15-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.13 17/17] vhost: return task creation error instead of NULL
+Date: Mon,  3 Mar 2025 11:29:49 -0500
+Message-Id: <20250303162951.3763346-17-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250303162951.3763346-1-sashal@kernel.org>
 References: <20250303162951.3763346-1-sashal@kernel.org>
@@ -75,107 +76,73 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.13.5
 Content-Transfer-Encoding: 8bit
 
-From: Frederic Weisbecker <frederic@kernel.org>
+From: Keith Busch <kbusch@kernel.org>
 
-[ Upstream commit 77e45145e3039a0fb212556ab3f8c87f54771757 ]
+[ Upstream commit cb380909ae3b1ebf14d6a455a4f92d7916d790cb ]
 
-napi_schedule() is expected to be called either:
+Lets callers distinguish why the vhost task creation failed. No one
+currently cares why it failed, so no real runtime change from this
+patch, but that will not be the case for long.
 
-* From an interrupt, where raised softirqs are handled on IRQ exit
-
-* From a softirq disabled section, where raised softirqs are handled on
-  the next call to local_bh_enable().
-
-* From a softirq handler, where raised softirqs are handled on the next
-  round in do_softirq(), or further deferred to a dedicated kthread.
-
-Other bare tasks context may end up ignoring the raised NET_RX vector
-until the next random softirq handling opportunity, which may not
-happen before a while if the CPU goes idle afterwards with the tick
-stopped.
-
-Such "misuses" have been detected on several places thanks to messages
-of the kind:
-
-	"NOHZ tick-stop error: local softirq work is pending, handler #08!!!"
-
-For example:
-
-       __raise_softirq_irqoff
-        __napi_schedule
-        rtl8152_runtime_resume.isra.0
-        rtl8152_resume
-        usb_resume_interface.isra.0
-        usb_resume_both
-        __rpm_callback
-        rpm_callback
-        rpm_resume
-        __pm_runtime_resume
-        usb_autoresume_device
-        usb_remote_wakeup
-        hub_event
-        process_one_work
-        worker_thread
-        kthread
-        ret_from_fork
-        ret_from_fork_asm
-
-And also:
-
-* drivers/net/usb/r8152.c::rtl_work_func_t
-* drivers/net/netdevsim/netdev.c::nsim_start_xmit
-
-There is a long history of issues of this kind:
-
-	019edd01d174 ("ath10k: sdio: Add missing BH locking around napi_schdule()")
-	330068589389 ("idpf: disable local BH when scheduling napi for marker packets")
-	e3d5d70cb483 ("net: lan78xx: fix "softirq work is pending" error")
-	e55c27ed9ccf ("mt76: mt7615: add missing bh-disable around rx napi schedule")
-	c0182aa98570 ("mt76: mt7915: add missing bh-disable around tx napi enable/schedule")
-	970be1dff26d ("mt76: disable BH around napi_schedule() calls")
-	019edd01d174 ("ath10k: sdio: Add missing BH locking around napi_schdule()")
-	30bfec4fec59 ("can: rx-offload: can_rx_offload_threaded_irq_finish(): add new  function to be called from threaded interrupt")
-	e63052a5dd3c ("mlx5e: add add missing BH locking around napi_schdule()")
-	83a0c6e58901 ("i40e: Invoke softirqs after napi_reschedule")
-	bd4ce941c8d5 ("mlx4: Invoke softirqs after napi_reschedule")
-	8cf699ec849f ("mlx4: do not call napi_schedule() without care")
-	ec13ee80145c ("virtio_net: invoke softirqs after __napi_schedule")
-
-This shows that relying on the caller to arrange a proper context for
-the softirqs to be handled while calling napi_schedule() is very fragile
-and error prone. Also fixing them can also prove challenging if the
-caller may be called from different kinds of contexts.
-
-Therefore fix this from napi_schedule() itself with waking up ksoftirqd
-when softirqs are raised from task contexts.
-
-Reported-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Reported-by: Jakub Kicinski <kuba@kernel.org>
-Reported-by: Francois Romieu <romieu@fr.zoreil.com>
-Closes: https://lore.kernel.org/lkml/354a2690-9bbf-4ccb-8769-fa94707a9340@molgen.mpg.de/
-Cc: Breno Leitao <leitao@debian.org>
-Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Link: https://patch.msgid.link/20250223221708.27130-1-frederic@kernel.org
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+Message-ID: <20250227230631.303431-2-kbusch@meta.com>
+Reviewed-by: Mike Christie <michael.christie@oracle.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/core/dev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/mmu/mmu.c | 2 +-
+ drivers/vhost/vhost.c  | 2 +-
+ kernel/vhost_task.c    | 4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 2b09714761c62..7f755270ff1ce 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -4610,7 +4610,7 @@ static inline void ____napi_schedule(struct softnet_data *sd,
- 	 * we have to raise NET_RX_SOFTIRQ.
- 	 */
- 	if (!sd->in_net_rx_action)
--		__raise_softirq_irqoff(NET_RX_SOFTIRQ);
-+		raise_softirq_irqoff(NET_RX_SOFTIRQ);
- }
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index e102505735a7b..0e6bf24093f75 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -7435,7 +7435,7 @@ static void kvm_mmu_start_lpage_recovery(struct once *once)
+ 				      kvm_nx_huge_page_recovery_worker_kill,
+ 				      kvm, "kvm-nx-lpage-recovery");
  
- #ifdef CONFIG_RPS
+-	if (!nx_thread)
++	if (IS_ERR(nx_thread))
+ 		return;
+ 
+ 	vhost_task_start(nx_thread);
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index 9ac25d08f473e..63612faeab727 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -666,7 +666,7 @@ static struct vhost_worker *vhost_worker_create(struct vhost_dev *dev)
+ 
+ 	vtsk = vhost_task_create(vhost_run_work_list, vhost_worker_killed,
+ 				 worker, name);
+-	if (!vtsk)
++	if (IS_ERR(vtsk))
+ 		goto free_worker;
+ 
+ 	mutex_init(&worker->mutex);
+diff --git a/kernel/vhost_task.c b/kernel/vhost_task.c
+index 8800f5acc0071..2ef2e1b800916 100644
+--- a/kernel/vhost_task.c
++++ b/kernel/vhost_task.c
+@@ -133,7 +133,7 @@ struct vhost_task *vhost_task_create(bool (*fn)(void *),
+ 
+ 	vtsk = kzalloc(sizeof(*vtsk), GFP_KERNEL);
+ 	if (!vtsk)
+-		return NULL;
++		return ERR_PTR(-ENOMEM);
+ 	init_completion(&vtsk->exited);
+ 	mutex_init(&vtsk->exit_mutex);
+ 	vtsk->data = arg;
+@@ -145,7 +145,7 @@ struct vhost_task *vhost_task_create(bool (*fn)(void *),
+ 	tsk = copy_process(NULL, 0, NUMA_NO_NODE, &args);
+ 	if (IS_ERR(tsk)) {
+ 		kfree(vtsk);
+-		return NULL;
++		return ERR_PTR(PTR_ERR(tsk));
+ 	}
+ 
+ 	vtsk->task = tsk;
 -- 
 2.39.5
 
