@@ -1,220 +1,258 @@
-Return-Path: <netdev+bounces-171347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA2A8A4C96A
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:28:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12085A4C985
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:31:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 508AA17AF4B
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:23:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 153D41888564
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:25:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315E12505CF;
-	Mon,  3 Mar 2025 17:10:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4E95253B75;
+	Mon,  3 Mar 2025 17:12:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lr+Ay+4t"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="WUIvJ4Hh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F092505BD;
-	Mon,  3 Mar 2025 17:10:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3888253B4E
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 17:11:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741021839; cv=none; b=d+8ogOv0wUbrFmsVbtPYzpd6swsFXEHcK4YrXMqwlyESZHNa7NkIGThGFJBsQno9CljPsQorogHbmYXkHbVa0aEL3FEbjJRjOFOc6ulpJB9AKyC8+vQGiGes6NkD5QP9Ly9MKJA+Pcejoc9mWnrTFP8mJRxXuaJRMH35fT7CZnQ=
+	t=1741021920; cv=none; b=N/Py2cG+H7aCYwVbhsFdaYPSS+eQFjvA/3OnRA1mw6RtFVwFCaf5SZ1QSnX2Wf/RjFZQktBk3nfiRIn3NtWG3pqO9z8Gv80C9cr6yZUNV/4W9/NuzTrKYcIl9MKzzrhHgaCYKlRPsHrq4CX7qhg1UFNRmULIDMWQ66TSA4Bm5BI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741021839; c=relaxed/simple;
-	bh=0Ma6qtuWXoQR5mDUqmgzEioSTKwb9JabDAkmPqXbGro=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=tkSSn4D1ALupOitXZ7JAAIruWzIx1dx2r2JToIdqxgWeYFuXmIBiMS1SqGqr7pDxwPEdlYmCmzKQf3DV9Lv0xDx/BODZ6eB3jfG6AG1vQ6aMlWOj1OGqRqY3LHbtL6h9pnF6wJKzgQ6UPAZ91gBM6EzzLURmB/xeERcvhicFF2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lr+Ay+4t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38184C4CEE9;
-	Mon,  3 Mar 2025 17:10:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741021838;
-	bh=0Ma6qtuWXoQR5mDUqmgzEioSTKwb9JabDAkmPqXbGro=;
-	h=From:Date:Subject:To:Cc:From;
-	b=lr+Ay+4tZ+db/l321NhdYmN/Bx44rkHv2eW+ZdMUE9rFVejQ7O5tx6Qm1+b509JuA
-	 tpTOcdJqQf+2YfAZpDK0dWdpx2rpwIV42LYR0AvVT6qz+PvUs4459aAuFnHeLMoakd
-	 ZGOLCeSVStuibTH8OXBXiurlxWCz6w1od1+8om+L0vIA+c5ja21kKaqzAG1EIhOEUh
-	 k/8M7uXCZHjsDbfKZOnbc6QQD2mnyVkJQORcRNIhp4upb99pGtkYL1wC3LgwoPSGb0
-	 FDK/K+rc5Tdsn/ZosaBhO3M3IsJA6FqMguJ5oTeawsXVjhI2NigE9zNUnh0tsdd7ur
-	 5F5JcwOzrb0iw==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Mon, 03 Mar 2025 18:10:13 +0100
-Subject: [PATCH net] mptcp: fix 'scheduling while atomic' in
- mptcp_pm_nl_append_new_local_addr
+	s=arc-20240116; t=1741021920; c=relaxed/simple;
+	bh=Le2FilUYAoivg17ksBrA7JuN+V2uxDsE6wrS06Qc4MY=;
+	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=vABVKh6tR7TI6yG0/Z4zxbjrpnbi6i6iBVFceZBOMeBJ2NN4Xqeo/OhPvo9tkABGNiUnt41PJJ99/dpQltQ8RodDAA50Ibb13bTBKFGpfPPFnFiC3h9OBVmqx7rrwezYh5KvYftusRXKnLHqDQKqdzSd8j15zUSqD7Odub6P/Mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=WUIvJ4Hh; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1741021919; x=1772557919;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version:subject;
+  bh=PeB2N+RN9P0VVtOYAgEPkMdfNHEVSn5URx03BPTkwS0=;
+  b=WUIvJ4HhNPTzEAl5LDlGMDNKgYK2mYvorBbxCgtPfcgTFmeVaKrinwVC
+   ai964LCHPQu3Ha5aQSbofO1CrQ7WGsrHF/lvvNCrmCA7qWMAXY3MuyQxx
+   imx5mEshKRhP6Amuu3rbmJXrIFCIsvng5fn03BMV1UDlfYbYpaeopo/S/
+   U=;
+X-IronPort-AV: E=Sophos;i="6.13,330,1732579200"; 
+   d="scan'208";a="471586205"
+Subject: RE: [PATCH net-next v9 2/6] net: ena: use napi's aRFS rmap notifers
+Thread-Topic: [PATCH net-next v9 2/6] net: ena: use napi's aRFS rmap notifers
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 17:11:55 +0000
+Received: from EX19MTAEUC002.ant.amazon.com [10.0.43.254:25226]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.1.85:2525] with esmtp (Farcaster)
+ id 36a646d8-0587-4d59-bad6-0468689d3928; Mon, 3 Mar 2025 17:11:54 +0000 (UTC)
+X-Farcaster-Flow-ID: 36a646d8-0587-4d59-bad6-0468689d3928
+Received: from EX19D028EUB002.ant.amazon.com (10.252.61.43) by
+ EX19MTAEUC002.ant.amazon.com (10.252.51.245) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 3 Mar 2025 17:11:53 +0000
+Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
+ EX19D028EUB002.ant.amazon.com (10.252.61.43) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 3 Mar 2025 17:11:53 +0000
+Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
+ EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
+ 15.02.1544.014; Mon, 3 Mar 2025 17:11:53 +0000
+From: "Arinzon, David" <darinzon@amazon.com>
+To: Ahmed Zaki <ahmed.zaki@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"horms@kernel.org" <horms@kernel.org>, "pabeni@redhat.com"
+	<pabeni@redhat.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"michael.chan@broadcom.com" <michael.chan@broadcom.com>, "tariqt@nvidia.com"
+	<tariqt@nvidia.com>, "anthony.l.nguyen@intel.com"
+	<anthony.l.nguyen@intel.com>, "przemyslaw.kitszel@intel.com"
+	<przemyslaw.kitszel@intel.com>, "jdamato@fastly.com" <jdamato@fastly.com>,
+	"shayd@nvidia.com" <shayd@nvidia.com>, "akpm@linux-foundation.org"
+	<akpm@linux-foundation.org>, "Allen, Neil" <shayagr@amazon.com>
+Thread-Index: AQHbhxMLfDMZMH1s/06uqJOU3cFvgbNhrjKw
+Date: Mon, 3 Mar 2025 17:11:53 +0000
+Message-ID: <c531f3a202e746e39faf27211b80aa69@amazon.com>
+References: <20250224232228.990783-1-ahmed.zaki@intel.com>
+ <20250224232228.990783-3-ahmed.zaki@intel.com>
+In-Reply-To: <20250224232228.990783-3-ahmed.zaki@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250303-net-mptcp-fix-sched-while-atomic-v1-1-f6a216c5a74c@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAHTixWcC/x2NQQqDMBBFryKz7kAaEaxXKV0kk7EZ0BiSoIJ49
- w5dPvjvvwsqF+EKU3dB4V2qbEnh+eiAoktfRgnKYI0dTG96TNxwzY0yznJipcgBjygLo2vbKoT
- ENDpv/cuPAfQmF9blP/EGteFz3z/daplxdwAAAA==
-X-Change-ID: 20250303-net-mptcp-fix-sched-while-atomic-cec8ab2b9b8d
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Krister Johansen <kjlx@templeofstupid.com>, stable@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6168; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=rI+xTjW/4Di7bik1jLTrX+13V8FWkx3oKnm1qjlifLk=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnxeKK0U7l7IEBnfq70QSMPIDEPTqChfSHmENaY
- Wmwj+lJbz6JAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ8XiigAKCRD2t4JPQmmg
- c8OsEADKOrBAMJdg2+WjVltI89o6n7LuiBcXel5yfXK1OHWldplLTPAu5+mhDblqqhL7ayb/5A7
- BRj0wwJ3Fa79iMk931xbmQ+rnKRBIIfOexNlgvxjkj8If6ofZueI6WPBthi41y5vQGCfoA/JmX3
- 1ET7nvS1SyEECNU+oLMpEVoWOEqR8+iebbWa65elJf/G9/1p59QExvg1KiF5K2YByd/uHV9NkWo
- r1Ebx2CDRFbhoCY2QQB1wu1352LWIA8K76faHkk+3orIt09TFCnYOTeZdTdLgr1d6joTNTEITgC
- r12PwQoxXTTKnR60C7rJkGm20V8fhP4vLstdMDgozyHlBX/BFwQIdxAsQuj9SfAQGDM/qtUj1Ky
- nQwkaIRwp1zEYMLTq4+6VxYobOfC2e0Xmt/g5qKM/zt7vyBD4bedv8X/VioXi0EekrMWZVlTrYO
- QBS5Id9AbY95+34TEpFEUBRyZdavEYZUyH96MoIdtf97x6iSk4DbBhCFXd7x5mHA0IbioCMNkfr
- gNbheQ3vEGW6V/4NRNRQpnKuOAmvyR37TlyQjkxFYRj7XYSY4c/88Gr39h1ygg3+TClD8n/mRgA
- 0NgNsXmWFHFBnFP2kM38V6Smkn0G0oe24gZaisgSDMTuM+FyxtaS/zRu1g+P4JTbYz8bAxaD309
- 0dliG6NJCcXSvYg==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-From: Krister Johansen <kjlx@templeofstupid.com>
+> Use the core's rmap notifiers and delete our own.
+>=20
+> Acked-by: David Arinzon <darinzon@amazon.com>
+> Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
+> ---
+>  drivers/net/ethernet/amazon/ena/ena_netdev.c | 43 +-------------------
+>  1 file changed, 1 insertion(+), 42 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c
+> b/drivers/net/ethernet/amazon/ena/ena_netdev.c
+> index c1295dfad0d0..6aab85a7c60a 100644
+> --- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
+> +++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
+> @@ -5,9 +5,6 @@
+>=20
+>  #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+>=20
+> -#ifdef CONFIG_RFS_ACCEL
+> -#include <linux/cpu_rmap.h>
+> -#endif /* CONFIG_RFS_ACCEL */
+>  #include <linux/ethtool.h>
+>  #include <linux/kernel.h>
+>  #include <linux/module.h>
+> @@ -162,30 +159,6 @@ int ena_xmit_common(struct ena_adapter
+> *adapter,
+>         return 0;
+>  }
+>=20
+> -static int ena_init_rx_cpu_rmap(struct ena_adapter *adapter) -{ -#ifdef
+> CONFIG_RFS_ACCEL
+> -       u32 i;
+> -       int rc;
+> -
+> -       adapter->netdev->rx_cpu_rmap =3D alloc_irq_cpu_rmap(adapter-
+> >num_io_queues);
+> -       if (!adapter->netdev->rx_cpu_rmap)
+> -               return -ENOMEM;
+> -       for (i =3D 0; i < adapter->num_io_queues; i++) {
+> -               int irq_idx =3D ENA_IO_IRQ_IDX(i);
+> -
+> -               rc =3D irq_cpu_rmap_add(adapter->netdev->rx_cpu_rmap,
+> -                                     pci_irq_vector(adapter->pdev, irq_i=
+dx));
+> -               if (rc) {
+> -                       free_irq_cpu_rmap(adapter->netdev->rx_cpu_rmap);
+> -                       adapter->netdev->rx_cpu_rmap =3D NULL;
+> -                       return rc;
+> -               }
+> -       }
+> -#endif /* CONFIG_RFS_ACCEL */
+> -       return 0;
+> -}
+> -
+>  static void ena_init_io_rings_common(struct ena_adapter *adapter,
+>                                      struct ena_ring *ring, u16 qid)  { @=
+@ -1596,7 +1569,7 @@
+> static int ena_enable_msix(struct ena_adapter *adapter)
+>                 adapter->num_io_queues =3D irq_cnt - ENA_ADMIN_MSIX_VEC;
+>         }
+>=20
+> -       if (ena_init_rx_cpu_rmap(adapter))
+> +       if (netif_enable_cpu_rmap(adapter->netdev,
+> + adapter->num_io_queues))
+>                 netif_warn(adapter, probe, adapter->netdev,
+>                            "Failed to map IRQs to CPUs\n");
+>=20
+> @@ -1742,13 +1715,6 @@ static void ena_free_io_irq(struct ena_adapter
+> *adapter)
+>         struct ena_irq *irq;
+>         int i;
+>=20
+> -#ifdef CONFIG_RFS_ACCEL
+> -       if (adapter->msix_vecs >=3D 1) {
+> -               free_irq_cpu_rmap(adapter->netdev->rx_cpu_rmap);
+> -               adapter->netdev->rx_cpu_rmap =3D NULL;
+> -       }
+> -#endif /* CONFIG_RFS_ACCEL */
+> -
+>         for (i =3D ENA_IO_IRQ_FIRST_IDX; i <
+> ENA_MAX_MSIX_VEC(io_queue_count); i++) {
+>                 irq =3D &adapter->irq_tbl[i];
+>                 irq_set_affinity_hint(irq->vector, NULL); @@ -4131,13 +40=
+97,6 @@
+> static void __ena_shutoff(struct pci_dev *pdev, bool shutdown)
+>         ena_dev =3D adapter->ena_dev;
+>         netdev =3D adapter->netdev;
+>=20
+> -#ifdef CONFIG_RFS_ACCEL
+> -       if ((adapter->msix_vecs >=3D 1) && (netdev->rx_cpu_rmap)) {
+> -               free_irq_cpu_rmap(netdev->rx_cpu_rmap);
+> -               netdev->rx_cpu_rmap =3D NULL;
+> -       }
+> -
+> -#endif /* CONFIG_RFS_ACCEL */
+>         /* Make sure timer and reset routine won't be called after
+>          * freeing device resources.
+>          */
+> --
+> 2.43.0
 
-If multiple connection requests attempt to create an implicit mptcp
-endpoint in parallel, more than one caller may end up in
-mptcp_pm_nl_append_new_local_addr because none found the address in
-local_addr_list during their call to mptcp_pm_nl_get_local_id.  In this
-case, the concurrent new_local_addr calls may delete the address entry
-created by the previous caller.  These deletes use synchronize_rcu, but
-this is not permitted in some of the contexts where this function may be
-called.  During packet recv, the caller may be in a rcu read critical
-section and have preemption disabled.
+Hi Ahmed,
 
-An example stack:
+After the merging of this patch, I see the below stack trace when the IRQs =
+are freed.
+It can be reproduced by unloading and loading the driver using `modprobe -r=
+ ena; modprobe ena` (happens during unload)
 
-   BUG: scheduling while atomic: swapper/2/0/0x00000302
+Based on the patchset and the changes to other drivers, I think there's a m=
+issing call to the function
+that releases the affinity notifier (The warn is in https://web.git.kernel.=
+org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/kernel/irq/manage.c#n=
+2031)
 
-   Call Trace:
-   <IRQ>
-   dump_stack_lvl (lib/dump_stack.c:117 (discriminator 1))
-   dump_stack (lib/dump_stack.c:124)
-   __schedule_bug (kernel/sched/core.c:5943)
-   schedule_debug.constprop.0 (arch/x86/include/asm/preempt.h:33 kernel/sched/core.c:5970)
-   __schedule (arch/x86/include/asm/jump_label.h:27 include/linux/jump_label.h:207 kernel/sched/features.h:29 kernel/sched/core.c:6621)
-   schedule (arch/x86/include/asm/preempt.h:84 kernel/sched/core.c:6804 kernel/sched/core.c:6818)
-   schedule_timeout (kernel/time/timer.c:2160)
-   wait_for_completion (kernel/sched/completion.c:96 kernel/sched/completion.c:116 kernel/sched/completion.c:127 kernel/sched/completion.c:148)
-   __wait_rcu_gp (include/linux/rcupdate.h:311 kernel/rcu/update.c:444)
-   synchronize_rcu (kernel/rcu/tree.c:3609)
-   mptcp_pm_nl_append_new_local_addr (net/mptcp/pm_netlink.c:966 net/mptcp/pm_netlink.c:1061)
-   mptcp_pm_nl_get_local_id (net/mptcp/pm_netlink.c:1164)
-   mptcp_pm_get_local_id (net/mptcp/pm.c:420)
-   subflow_check_req (net/mptcp/subflow.c:98 net/mptcp/subflow.c:213)
-   subflow_v4_route_req (net/mptcp/subflow.c:305)
-   tcp_conn_request (net/ipv4/tcp_input.c:7216)
-   subflow_v4_conn_request (net/mptcp/subflow.c:651)
-   tcp_rcv_state_process (net/ipv4/tcp_input.c:6709)
-   tcp_v4_do_rcv (net/ipv4/tcp_ipv4.c:1934)
-   tcp_v4_rcv (net/ipv4/tcp_ipv4.c:2334)
-   ip_protocol_deliver_rcu (net/ipv4/ip_input.c:205 (discriminator 1))
-   ip_local_deliver_finish (include/linux/rcupdate.h:813 net/ipv4/ip_input.c:234)
-   ip_local_deliver (include/linux/netfilter.h:314 include/linux/netfilter.h:308 net/ipv4/ip_input.c:254)
-   ip_sublist_rcv_finish (include/net/dst.h:461 net/ipv4/ip_input.c:580)
-   ip_sublist_rcv (net/ipv4/ip_input.c:640)
-   ip_list_rcv (net/ipv4/ip_input.c:675)
-   __netif_receive_skb_list_core (net/core/dev.c:5583 net/core/dev.c:5631)
-   netif_receive_skb_list_internal (net/core/dev.c:5685 net/core/dev.c:5774)
-   napi_complete_done (include/linux/list.h:37 include/net/gro.h:449 include/net/gro.h:444 net/core/dev.c:6114)
-   igb_poll (drivers/net/ethernet/intel/igb/igb_main.c:8244) igb
-   __napi_poll (net/core/dev.c:6582)
-   net_rx_action (net/core/dev.c:6653 net/core/dev.c:6787)
-   handle_softirqs (kernel/softirq.c:553)
-   __irq_exit_rcu (kernel/softirq.c:588 kernel/softirq.c:427 kernel/softirq.c:636)
-   irq_exit_rcu (kernel/softirq.c:651)
-   common_interrupt (arch/x86/kernel/irq.c:247 (discriminator 14))
-   </IRQ>
+I saw in the intel code in the patchset that ` netif_napi_set_irq(<napi>, -=
+1);` is added?
 
-This problem seems particularly prevalent if the user advertises an
-endpoint that has a different external vs internal address.  In the case
-where the external address is advertised and multiple connections
-already exist, multiple subflow SYNs arrive in parallel which tends to
-trigger the race during creation of the first local_addr_list entries
-which have the internal address instead.
+After adding the code snippet I don't see this anymore, but I want to under=
+stand whether it's the right call by design.
 
-Fix by skipping the replacement of an existing implicit local address if
-called via mptcp_pm_nl_get_local_id.
+@@ -1716,8 +1716,11 @@ static void ena_free_io_irq(struct ena_adapter *adap=
+ter)
+        int i;
 
-Fixes: d045b9eb95a9 ("mptcp: introduce implicit endpoints")
-Cc: stable@vger.kernel.org
-Suggested-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Krister Johansen <kjlx@templeofstupid.com>
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- net/mptcp/pm_netlink.c | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
-
-diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
-index c0e47f4f7b1aa2fedf615c44ea595c1f9d2528f9..7868207c4e9d9d7d4855ca3fadc02506637708ba 100644
---- a/net/mptcp/pm_netlink.c
-+++ b/net/mptcp/pm_netlink.c
-@@ -977,7 +977,7 @@ static void __mptcp_pm_release_addr_entry(struct mptcp_pm_addr_entry *entry)
- 
- static int mptcp_pm_nl_append_new_local_addr(struct pm_nl_pernet *pernet,
- 					     struct mptcp_pm_addr_entry *entry,
--					     bool needs_id)
-+					     bool needs_id, bool replace)
- {
- 	struct mptcp_pm_addr_entry *cur, *del_entry = NULL;
- 	unsigned int addr_max;
-@@ -1017,6 +1017,17 @@ static int mptcp_pm_nl_append_new_local_addr(struct pm_nl_pernet *pernet,
- 			if (entry->addr.id)
- 				goto out;
- 
-+			/* allow callers that only need to look up the local
-+			 * addr's id to skip replacement. This allows them to
-+			 * avoid calling synchronize_rcu in the packet recv
-+			 * path.
-+			 */
-+			if (!replace) {
-+				kfree(entry);
-+				ret = cur->addr.id;
-+				goto out;
-+			}
+        for (i =3D ENA_IO_IRQ_FIRST_IDX; i < ENA_MAX_MSIX_VEC(io_queue_coun=
+t); i++) {
++               struct ena_napi *ena_napi;
 +
- 			pernet->addrs--;
- 			entry->addr.id = cur->addr.id;
- 			list_del_rcu(&cur->list);
-@@ -1165,7 +1176,7 @@ int mptcp_pm_nl_get_local_id(struct mptcp_sock *msk, struct mptcp_addr_info *skc
- 	entry->ifindex = 0;
- 	entry->flags = MPTCP_PM_ADDR_FLAG_IMPLICIT;
- 	entry->lsk = NULL;
--	ret = mptcp_pm_nl_append_new_local_addr(pernet, entry, true);
-+	ret = mptcp_pm_nl_append_new_local_addr(pernet, entry, true, false);
- 	if (ret < 0)
- 		kfree(entry);
- 
-@@ -1433,7 +1444,8 @@ int mptcp_pm_nl_add_addr_doit(struct sk_buff *skb, struct genl_info *info)
- 		}
- 	}
- 	ret = mptcp_pm_nl_append_new_local_addr(pernet, entry,
--						!mptcp_pm_has_addr_attr_id(attr, info));
-+						!mptcp_pm_has_addr_attr_id(attr, info),
-+						true);
- 	if (ret < 0) {
- 		GENL_SET_ERR_MSG_FMT(info, "too many addresses or duplicate one: %d", ret);
- 		goto out_free;
+                irq =3D &adapter->irq_tbl[i];
+                irq_set_affinity_hint(irq->vector, NULL);
++               ena_napi =3D (struct ena_napi *)irq->data;
++               netif_napi_set_irq(&ena_napi->napi, -1);
+                free_irq(irq->vector, irq->data);
+        }
+ }
 
----
-base-commit: 64e6a754d33d31aa844b3ee66fb93ac84ca1565e
-change-id: 20250303-net-mptcp-fix-sched-while-atomic-cec8ab2b9b8d
+[  484.544586]  ? __warn+0x84/0x130
+[  484.544843]  ? free_irq+0x5c/0x70
+[  484.545105]  ? report_bug+0x18a/0x1a0
+[  484.545390]  ? handle_bug+0x53/0x90
+[  484.545664]  ? exc_invalid_op+0x14/0x70
+[  484.545959]  ? asm_exc_invalid_op+0x16/0x20
+[  484.546279]  ? free_irq+0x5c/0x70
+[  484.546545]  ? free_irq+0x10/0x70
+[  484.546807]  ena_free_io_irq+0x5f/0x70 [ena]
+[  484.547138]  ena_down+0x250/0x3e0 [ena]
+[  484.547435]  ena_destroy_device+0x118/0x150 [ena]
+[  484.547796]  __ena_shutoff+0x5a/0xe0 [ena]
+[  484.548110]  pci_device_remove+0x3b/0xb0
+[  484.548412]  device_release_driver_internal+0x193/0x200
+[  484.548804]  driver_detach+0x44/0x90
+[  484.549084]  bus_remove_driver+0x69/0xf0
+[  484.549386]  pci_unregister_driver+0x2a/0xb0
+[  484.549717]  ena_cleanup+0xc/0x130 [ena]
+[  484.550021]  __do_sys_delete_module.constprop.0+0x176/0x310
+[  484.550438]  ? syscall_trace_enter+0xfb/0x1c0
+[  484.550782]  do_syscall_64+0x5b/0x170
+[  484.551067]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-Best regards,
--- 
-Matthieu Baerts (NGI0) <matttbe@kernel.org>
-
+Thanks,
+David
 
