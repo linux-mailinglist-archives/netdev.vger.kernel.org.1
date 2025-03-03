@@ -1,109 +1,123 @@
-Return-Path: <netdev+bounces-171799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92DC1A4EBD6
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:36:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32A83A4E960
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:40:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0543F168275
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:32:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA4AD17D63C
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:35:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 544C6205AC7;
-	Tue,  4 Mar 2025 18:23:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 762DB2066F7;
+	Tue,  4 Mar 2025 17:08:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="swyEXDmw"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=ti.com header.i=@ti.com header.b="ZAQ4yBgK"
 X-Original-To: netdev@vger.kernel.org
-Received: from beeline3.cc.itu.edu.tr (beeline3.cc.itu.edu.tr [160.75.25.117])
+Received: from beeline1.cc.itu.edu.tr (beeline1.cc.itu.edu.tr [160.75.25.115])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88EB72E3371
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 18:23:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=160.75.25.117
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1162066EB
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:08:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=160.75.25.115
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741112628; cv=pass; b=pNq9KlvmJwYSmgFMgdJn+MI7cczdMUKi1e4JvSzttfxNni/A7pEApCqPUgTWd2f6Jmj3ZXLg2VQhgghzcCoaVMOrCUnNM2Y4LjtpL9Dj13fMY+J1b+uwWPkWa0h/ovFXxUvEi9dne7uOLaZWcLrX0WEe+08C5UM5IwRVpTCHzfk=
+	t=1741108119; cv=fail; b=V6I/BQz14e0cH7XnSiBZtAZkI8vYR6h4y/TxNRLETLcP2Cru4sM3lOo8GVU4bJStR1jubLWOBLW9oP52PKmMBKXbYGM0SLXXvNXN8sw98SPAFL2aLbbbx4ABtIMTbHWYmG2jLZdS05wBznduKthbunNxt3gFEDSBvejibPqI49U=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741112628; c=relaxed/simple;
-	bh=o/Y21k3K8BAtGuRlqRGQ5WfAu2QMrDK4uLxkfdiPHqw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TeSqHX21dphDmZqXMqw3VFH/6lrt0y3qnDDvs9NSsG/sNVjKvmVtb9tPqNTGxFE/EDLSScGls14hprEjx0sw7NymLe44c3PTNhm8etlNuqbRn99bYu0GiihoM/9yyTbBLG7/a4Z9n5TwnTz5fc2EfAZOElbNAeAcvVRFa1lTPgw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=kernel.org; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=swyEXDmw; arc=none smtp.client-ip=10.30.226.201; arc=pass smtp.client-ip=160.75.25.117
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=kernel.org
+	s=arc-20240116; t=1741108119; c=relaxed/simple;
+	bh=R8gIOfIp7hKULFNS5WiFUDEAMlTSU3MV4RQ95vTGb+w=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HxnkbKu+bzbJ/nT2/JOSkS+daNsVnzyiPZG9bFFLy5fRZ/1uccN1Xotgvz2VyitLMtDmeig5O+c9G2DV2N+0xxwTgiVn6DODeo5+u4RX4I5hgp38VhNeWzs6DtS1zPriFJ1KC0wPQ10ikNfj1nz3s/lLcwkoSyKLbaZkXBWPN7E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=ti.com; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=fail (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ZAQ4yBgK reason="signature verification failed"; arc=none smtp.client-ip=198.47.23.234; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; arc=fail smtp.client-ip=160.75.25.115
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=ti.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=cc.itu.edu.tr
 Received: from lesvatest1.cc.itu.edu.tr (unknown [10.146.128.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
 	(No client certificate requested)
-	by beeline3.cc.itu.edu.tr (Postfix) with ESMTPS id C31EF40D1F5C
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 21:23:44 +0300 (+03)
+	by beeline1.cc.itu.edu.tr (Postfix) with ESMTPS id 8EF6F40D977C
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 20:08:35 +0300 (+03)
 X-Envelope-From: <root@cc.itu.edu.tr>
-Authentication-Results: lesvatest1.cc.itu.edu.tr;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20201202 header.b=swyEXDmw
 Received: from lesva1.cc.itu.edu.tr (unknown [160.75.70.79])
-	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6dnT5GNkzFxGd
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:47:25 +0300 (+03)
+	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6dqG3X2NzFxZ8
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:48:58 +0300 (+03)
 Received: by le1 (Postfix, from userid 0)
-	id 755C84271F; Tue,  4 Mar 2025 17:47:08 +0300 (+03)
+	id 52E7E42728; Tue,  4 Mar 2025 17:48:50 +0300 (+03)
 Authentication-Results: lesva1.cc.itu.edu.tr;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=swyEXDmw
-X-Envelope-From: <linux-kernel+bounces-541768-bozkiru=itu.edu.tr@vger.kernel.org>
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ZAQ4yBgK
+X-Envelope-From: <linux-kernel+bounces-541856-bozkiru=itu.edu.tr@vger.kernel.org>
 Authentication-Results: lesva2.cc.itu.edu.tr;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=swyEXDmw
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ZAQ4yBgK
 Received: from fgw2.itu.edu.tr (fgw2.itu.edu.tr [160.75.25.104])
-	by le2 (Postfix) with ESMTP id 3292E4205E
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:10:35 +0300 (+03)
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by fgw2.itu.edu.tr (Postfix) with SMTP id 72E112DCDE
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:10:34 +0300 (+03)
+	by le2 (Postfix) with ESMTP id 3573241C84
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:54:00 +0300 (+03)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by fgw2.itu.edu.tr (Postfix) with SMTP id BCCFF2DCE1
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:53:59 +0300 (+03)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8DDA7A3FF0
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:09:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BE743A94AD
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:53:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ADA02116E7;
-	Mon,  3 Mar 2025 13:09:53 +0000 (UTC)
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03088212B0A;
+	Mon,  3 Mar 2025 13:52:42 +0000 (UTC)
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 699F121128D;
-	Mon,  3 Mar 2025 13:09:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAD582135B9;
+	Mon,  3 Mar 2025 13:52:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741007390; cv=none; b=FdJQf3C0V6z+/iJwkmai9q0EUpkpGnF1m2ZxTM1etBOl94WxqZl777yR/R9sL5atzBdVh3RVqXu90sVcdjcxdVN6ecQDpRS16lrD0gfWxfhs9yViKbruy4/qD7xjW0m7VSrvugKXVdP0+lWjyzXALv0FFGqta0ijY3O0j3N1Kvc=
+	t=1741009959; cv=none; b=DWHtBl1AZLaXgg5LOtDeDLfnBGaA1MwVZSOuc9xVgRjkXcp573MJejD1Mp6tcusv8ocjLo3NXk1cqyMWMOhRA321oYO8zyyPME4Hluv3Swz1OvQHwmkj8vzvGVGCTz8/Ck54IQfYz+drZR3b55yyG9U71vRr8ZFwjuipWuJMwcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741007390; c=relaxed/simple;
-	bh=o/Y21k3K8BAtGuRlqRGQ5WfAu2QMrDK4uLxkfdiPHqw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mz7JZMWxnvOViyg8wVY04DyIRkeqKZ+oEu4ZRiyHuhsz5XHQAl4r+EPFNofGblR1kzaeuO1bDyHQYI3x3/kvs/Us9qzqx9ZKaSwV8FxRKnWiUukBuq2XVG0R+M+BLWgV2o04O848YMZn6SrWCeruRRF5vxKBVjOHVAwVhkNbQDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=swyEXDmw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4727C4CED6;
-	Mon,  3 Mar 2025 13:09:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741007389;
-	bh=o/Y21k3K8BAtGuRlqRGQ5WfAu2QMrDK4uLxkfdiPHqw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=swyEXDmw0R0g7ZRw44ogOiq1HHP3y2FeZWG29C850ReRwgC8lzNdttVBTaHFVe65o
-	 zVYLN/A4vGP8u73Ji/YrtcfHWGBO9pVsAXxaZDTIvI6w4WA5owD39ZYG+WPsqvtxtt
-	 6rfvzRPiOvRX9p4m3FK9k0hAmJI4VifjelwS3VIi+Qqzx89O2pq8cSMhGEWt4zeX5g
-	 /J7PQGlObpo+3VnrZr33tGBzuiHEkzryDdXAGsvjicCP+5GLyi2yw93+6o12fFMSVU
-	 ytDYWysry3KgQaYBbbyO5mF0BnaqsPZnYFKudU33iNwWvClH0C+6o57GuX/9dcgFSt
-	 U2WifXCRtyomg==
-Date: Mon, 3 Mar 2025 13:09:45 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jaakko Karrenpalo <jkarrenpalo@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lukasz Majewski <lukma@denx.de>,
-	MD Danish Anwar <danishanwar@ti.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Jaakko Karrenpalo <jaakko.karrenpalo@fi.abb.com>
-Subject: Re: [PATCH net-next v3 2/2] net: hsr: Add KUnit test for PRP
-Message-ID: <20250303130945.GS1615191@kernel.org>
-References: <20250227050923.10241-1-jkarrenpalo@gmail.com>
- <20250227050923.10241-2-jkarrenpalo@gmail.com>
+	s=arc-20240116; t=1741009959; c=relaxed/simple;
+	bh=hzXQnKkQEKaBU/KLPLOtoh0ihbySNCk+e6ltpzYt4oo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=E0nubo1EcEXFzRytmA8YtEHZi63aigkjM/mY/QrSkDlUjdl62/7rTl9GsxVsgjG80lQo35WzcJQpo9YPdR36ZjzXGsLAcVvgF7HZWZnCAt/EBNhRFJvnPaMNM78d+1d2448MnL5sVj6x8Mw7nbUtKMJ9qXbWrw1uiARwjJwNlnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ZAQ4yBgK; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 523DqAQA2770688
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Mon, 3 Mar 2025 07:52:10 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1741009930;
+	bh=HKA6epoyG5k7PVVX2SWKSB8APlH9M5pg/2J3Q1G9Iqs=;
+	h=From:To:CC:Subject:Date;
+	b=ZAQ4yBgK/Lk91iqOLs9LBj877KPeCh+db+1G/l/eZs3N1BA7S8TLyRradc9EKO9iD
+	 KFSeneUZOYTm/b8C2J7PsAXFWdnfMDJOjOSWxDYmDf/VQOtHJSnWAXkYghrReMMZgF
+	 4QiK2UjlOwILg+EEK3P9qI3lYfXyBw/8nU2aqVMs=
+Received: from DFLE112.ent.ti.com (dfle112.ent.ti.com [10.64.6.33])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 523DqANo095277;
+	Mon, 3 Mar 2025 07:52:10 -0600
+Received: from DFLE114.ent.ti.com (10.64.6.35) by DFLE112.ent.ti.com
+ (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 3
+ Mar 2025 07:52:10 -0600
+Received: from fllvsmtp7.itg.ti.com (10.64.40.31) by DFLE114.ent.ti.com
+ (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 3 Mar 2025 07:52:09 -0600
+Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
+	by fllvsmtp7.itg.ti.com (8.15.2/8.15.2) with ESMTP id 523Dq9k0047060;
+	Mon, 3 Mar 2025 07:52:09 -0600
+Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 523Dq8NA018076;
+	Mon, 3 Mar 2025 07:52:09 -0600
+From: Meghana Malladi <m-malladi@ti.com>
+To: <javier.carrasco.cruz@gmail.com>, <diogo.ivo@siemens.com>,
+        <horms@kernel.org>, <jacob.e.keller@intel.com>, <m-malladi@ti.com>,
+        <richardcochran@gmail.com>, <pabeni@redhat.com>, <kuba@kernel.org>,
+        <edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>,
+        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
+Subject: [PATCH net-next v3 0/2] Add perout configuration support in IEP driver
+Date: Mon, 3 Mar 2025 19:21:22 +0530
+Message-ID: <20250303135124.632845-1-m-malladi@ti.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -111,30 +125,41 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250227050923.10241-2-jkarrenpalo@gmail.com>
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Transfer-Encoding: quoted-printable
 X-ITU-Libra-ESVA-Information: Please contact Istanbul Teknik Universitesi for more information
-X-ITU-Libra-ESVA-ID: 4Z6dnT5GNkzFxGd
+X-ITU-Libra-ESVA-ID: 4Z6dqG3X2NzFxZ8
 X-ITU-Libra-ESVA: No virus found
 X-ITU-Libra-ESVA-From: root@cc.itu.edu.tr
-X-ITU-Libra-ESVA-Watermark: 1741717319.35637@LpZ7G1Avqw/QNVkVZhi1eA
+X-ITU-Libra-ESVA-Watermark: 1741712815.34248@cQYmdH41DJo/+ESkMTurlQ
 X-ITU-MailScanner-SpamCheck: not spam
 
-On Thu, Feb 27, 2025 at 07:09:23AM +0200, Jaakko Karrenpalo wrote:
-> Add unit tests for the PRP duplicate detection
-> 
-> Signed-off-by: Jaakko Karrenpalo <jkarrenpalo@gmail.com>
-> ---
-> Changes in v2:
-> - Changed KUnit tests to compile as built-in only
-> Changes in v3:
-> - Changed the KUnit tests to compile as a module
+IEP driver supported both perout and pps signal generation
+but perout feature is faulty with half-cooked support
+due to some missing configuration. Hence perout feature is
+removed as a bug fix. This patch series adds back this feature
+which configures perout signal based on the arguments passed
+by the perout request.
 
-Thanks, I see that this addresses Paolo's review of v2
-and overall looks good to me.
+This patch series is continuation to the bug fix:=20
+https://lore.kernel.org/all/20250227092441.1848419-1-m-malladi@ti.com/
+as suggested by Jakub Kicinski and Jacob Keller:
+https://lore.kernel.org/all/20250220172410.025b96d6@kernel.org/
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+v2:https://lore.kernel.org/all/20250219062701.995955-1-m-malladi@ti.com/
+
+Meghana Malladi (2):
+  net: ti: icss-iep: Add pwidth configuration for perout signal
+  net: ti: icss-iep: Add phase offset configuration for perout signal
+
+ drivers/net/ethernet/ti/icssg/icss_iep.c | 65 ++++++++++++++++++++++--
+ 1 file changed, 61 insertions(+), 4 deletions(-)
+
+
+base-commit: f77f12010f67259bd0e1ad18877ed27c721b627a
+--=20
+2.43.0
 
 
 
