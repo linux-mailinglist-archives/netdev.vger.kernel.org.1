@@ -1,130 +1,156 @@
-Return-Path: <netdev+bounces-171296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25919A4C6D6
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:24:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AA5CA4C891
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:03:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82A641886F63
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 16:21:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F1691884D40
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 16:59:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F053214A9E;
-	Mon,  3 Mar 2025 16:12:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="frYhSB76"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5375A23BFBB;
+	Mon,  3 Mar 2025 16:37:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from dediextern.your-server.de (dediextern.your-server.de [85.10.215.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E1EB213227;
-	Mon,  3 Mar 2025 16:12:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5D8C215186;
+	Mon,  3 Mar 2025 16:37:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.10.215.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741018369; cv=none; b=Hc23F1NkB4ASJVuEoXbSCJZ58ppoWgyAa9Z7YU5saXzLJl5CFNDEaXbxakvUteuZYbzRGXUxl7AMxGSO3Gi9pogR3b+u8PbRckfTDrlN1OeZ6SV1suPwuV2DF10y2h33s0kOXQv+72hazuBnz15l0OCewtlUT9n39SlnsOKy4/U=
+	t=1741019858; cv=none; b=gsuWFcJ7oxlFK8ag7XUenFe3w+8b1VocJf8tvFf+YLsMd2ttA85TaT9Flzx2STe6DyjfDlKfdS3ugfCIJLHxEwFFLc1BOXbZ3rqjWRAPYapZLxpKt4Rlja1omJM2ZZUXO7uOIc8xxKJN7aKhi90R8hC01XYrlN6Ppzqsv5gm81g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741018369; c=relaxed/simple;
-	bh=/ghFgI/MaEP2uWJLGRydPD82IY9KviAq8ItyxZP3F3I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QwLU42WOgAx36hQMsGxiBJyUBrOOIA4gKa6EdoyAaYD9PotiFOvYsdw6pKe0hT68Ck2HOWWiRB7M8o47ePERG7ezKNT0UJCzLaHRZEWC2uhTBRZoLPTrOqgsFtkIfigaCAtmFGdFo5evuV0MUksy3CC9vVmT5H27LNGi/Q5JBxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=frYhSB76; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741018368; x=1772554368;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=/ghFgI/MaEP2uWJLGRydPD82IY9KviAq8ItyxZP3F3I=;
-  b=frYhSB76pyHrOeso6DSErgn2BK5IBWqfLXUoEm2Evyrif396SGYovTN4
-   9/g2maF7dYUW3rH+UselsWJl89Ozkg7SjcU3UzLBPFnvrbGmk0gTzBoYW
-   vFnQzozXPnaui+zOyGM2elLnHgM8JBySI83ri2NifrVnlUCZyQBDi5ZZ1
-   jN5Fu2FxxYzUfs4ibnG3NJEoco3haQ63NccS39YuJMPVKDoVA7OUzwQf9
-   vE4DSWFAYqXoSKmhtYcXQylvHKZoB9pjY0emTcVZ0xVaSIxu6Jsp5XbPN
-   TMVJqJrD1o/jf1occPLoHAKb8q5uYP7H5uq0ue5n1F3SebQrdvPqUKAs2
-   g==;
-X-CSE-ConnectionGUID: VQCwBHdKQWiBBrbLs8cvcA==
-X-CSE-MsgGUID: UluX1RN4QmWLkgsFIS+Ujw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="29487887"
-X-IronPort-AV: E=Sophos;i="6.13,330,1732608000"; 
-   d="scan'208";a="29487887"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 08:12:40 -0800
-X-CSE-ConnectionGUID: ti4rvz4KQDmph+7VX9bzAA==
-X-CSE-MsgGUID: KMs/TJwKR1qSrtq8RTCfCQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="155252358"
-Received: from smile.fi.intel.com ([10.237.72.58])
-  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 08:12:36 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1tp8PA-0000000GrNj-45Uh;
-	Mon, 03 Mar 2025 18:12:32 +0200
-Date: Mon, 3 Mar 2025 18:12:32 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>
-Subject: Re: [PATCH net-next v1 1/2] ieee802154: ca8210: Use proper setter
- and getters for bitwise types
-Message-ID: <Z8XU8Dh6Ks5Eao6d@smile.fi.intel.com>
-References: <20250303150855.1294188-1-andriy.shevchenko@linux.intel.com>
- <20250303150855.1294188-2-andriy.shevchenko@linux.intel.com>
- <87mse285fb.fsf@bootlin.com>
+	s=arc-20240116; t=1741019858; c=relaxed/simple;
+	bh=7cLK0c6/NN6Y78XzvU0YKuImm5q5qadvNye1FRGgIJE=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:Content-Type; b=jGpNVziW2T2pyC6I4qlEm3pGTSMP0al+aI+4qJq0oiZtOXQFK37blJ7UKLrDf4JwWjtw3I0oSK/VFzZ+R1tS8MijeBzw8LYHTwojMfKhFMrjsrFyQ5xcM4Y/zMRuuw8oGqoTjnvJ7hs9YR2nDplcdwGRR4oXiSLDzuTsquYSYI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de; spf=pass smtp.mailfrom=hetzner-cloud.de; arc=none smtp.client-ip=85.10.215.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hetzner-cloud.de
+Received: from sslproxy06.your-server.de ([78.46.172.3])
+	by dediextern.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
+	id 1tp8QD-000A7N-9R; Mon, 03 Mar 2025 17:13:37 +0100
+Received: from [2a01:599:740:99a0:dca3:a01b:3e4a:389f]
+	by sslproxy06.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
+	id 1tp8QC-000ICz-06;
+	Mon, 03 Mar 2025 17:13:37 +0100
+Message-ID: <4b69bd2b-a0ad-44f6-9f43-070241bd8089@hetzner-cloud.de>
+Date: Mon, 3 Mar 2025 17:13:34 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87mse285fb.fsf@bootlin.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: Mozilla Thunderbird
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, mykolal@fb.com,
+ shuah@kernel.org, hawk@kernel.org, Willem de Bruijn <willemb@google.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20250227142330.1605996-1-marcus.wichelmann@hetzner-cloud.de>
+ <20250227142330.1605996-3-marcus.wichelmann@hetzner-cloud.de>
+ <090ede76-0c9f-4297-9d5a-7b75aa20ca27@linux.dev>
+Content-Language: en-US
+From: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
+Autocrypt: addr=marcus.wichelmann@hetzner-cloud.de; keydata=
+ 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
+ wySmewx3h/yfMh0aFxHhvLPxrO2IEQ==
+Subject: Re: [PATCH bpf-next v4 2/6] net: tun: enable transfer of XDP metadata
+ to skb
+In-Reply-To: <090ede76-0c9f-4297-9d5a-7b75aa20ca27@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: marcus.wichelmann@hetzner-cloud.de
+X-Virus-Scanned: Clear (ClamAV 1.0.7/27566/Mon Mar  3 11:10:09 2025)
 
-On Mon, Mar 03, 2025 at 05:06:32PM +0100, Miquel Raynal wrote:
-> On 03/03/2025 at 17:07:39 +02, Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
+Am 28.02.25 um 20:49 schrieb Martin KaFai Lau:
+> On 2/27/25 6:23 AM, Marcus Wichelmann wrote:
+>> When the XDP metadata area was used, it is expected that the same
+>> metadata can also be accessed from TC, as can be read in the description
+>> of the bpf_xdp_adjust_meta helper function. In the tun driver, this was
+>> not yet implemented.
+>>
+>> To make this work, the skb that is being built on XDP_PASS should know
+>> of the current size of the metadata area. This is ensured by adding
+>> calls to skb_metadata_set. For the tun_xdp_one code path, an additional
+>> check is necessary to handle the case where the externally initialized
+>> xdp_buff has no metadata support (xdp->data_meta == xdp->data + 1).
+>>
+>> More information about this feature can be found in the commit message
+>> of commit de8f3a83b0a0 ("bpf: add meta pointer for direct access").
+>> > Signed-off-by: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
+>> Reviewed-by: Willem de Bruijn <willemb@google.com>
+>> Acked-by: Jason Wang <jasowang@redhat.com>
+>> ---
+>>   drivers/net/tun.c | 25 ++++++++++++++++++++++---
+>>   1 file changed, 22 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>> index 4ec8fbd93c8d..70208b3a2e93 100644
+>> --- a/drivers/net/tun.c
+>> +++ b/drivers/net/tun.c
 > 
-> > Sparse complains that the driver doesn't respect the bitwise types:
-> >
-> > drivers/net/ieee802154/ca8210.c:1796:27: warning: incorrect type in assignment (different base types)
-> > drivers/net/ieee802154/ca8210.c:1796:27:    expected restricted __le16 [addressable] [assigned] [usertype] pan_id
-> > drivers/net/ieee802154/ca8210.c:1796:27:    got unsigned short [usertype]
-> > drivers/net/ieee802154/ca8210.c:1801:25: warning: incorrect type in assignment (different base types)
-> > drivers/net/ieee802154/ca8210.c:1801:25:    expected restricted __le16 [addressable] [assigned] [usertype] pan_id
-> > drivers/net/ieee802154/ca8210.c:1801:25:    got unsigned short [usertype]
-> > drivers/net/ieee802154/ca8210.c:1928:28: warning: incorrect type in argument 3 (different base types)
-> > drivers/net/ieee802154/ca8210.c:1928:28:    expected unsigned short [usertype] dst_pan_id
-> > drivers/net/ieee802154/ca8210.c:1928:28:    got restricted __le16 [addressable] [usertype] pan_id
-> >
-> > Use proper setter and getters for bitwise types.
-> >
-> > Note, in accordance with [1] the protocol is little endian.
-> >
-> > Link: https://www.cascoda.com/wp-content/uploads/2018/11/CA-8210_datasheet_0418.pdf [1]
-> > Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> The changes have conflicts with the commit 2506251e81d1 ("tun: Decouple vnet handling").
 > 
-> Looks correct indeed,
+> It is better to rebase the works onto the bpf-next/net,
+> i.e. the "net" branch instead of the "master" branch.
 
-TBH, my guts feeling is that this driver was never tested on BE platforms...
+Alright, will do that. Should I send it as a v5 and still with "PATCH bpf-next"
+in the header or something else?
 
-> Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
-
-Thanks for review!
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+Thanks!
+Marcus
 
