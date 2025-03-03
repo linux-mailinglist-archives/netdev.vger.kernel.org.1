@@ -1,209 +1,126 @@
-Return-Path: <netdev+bounces-171369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17E6DA4CB07
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 19:33:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D336BA4CB17
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 19:39:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 064657A76E9
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:32:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7B421896449
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:39:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A88322F154;
-	Mon,  3 Mar 2025 18:33:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8124F20FA85;
+	Mon,  3 Mar 2025 18:39:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="hIW8xu80"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="M09gxUM3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC66822D4C8
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 18:33:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0558D20DD54
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 18:39:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741026797; cv=none; b=lezrulu3jHnJIz/iVEvsjAKficPCdeOKbxVZ2PYepMxsRgCKGd6O33C+JXryFPKwceWPc3M6wuEbal6uWe+xHNqdTmGJ5db067WlB6acR/61e10zhMaeiRxNUZNUcxlp75oyI/RPZm2zY0WfqN1Oz2usZ4SERMJvkMGABDGJ7SM=
+	t=1741027174; cv=none; b=n/jUwDSU0yulJEmkNVGMTOYojjITk4dd8IwOge/RJrF3+xKCAFhV4S4oeH1ciCTRcn3vJMo6U1b6O053ljvqtDGunFwYUxS+V/auzChKm5MFimLeKb6nIzxnTN7h3r+/NW92f9mBXbs9VtptEjL8DMO0JpxJVOsccleO4YjjuNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741026797; c=relaxed/simple;
-	bh=nLsZQWU52zNpjADgh0ICFnQQGW+rEKz5WdNIEuaOhHc=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KXkyL8Kb1gDT9kq54uF2+UjFX5i5cN4Wm4FpxVWSwlBFpIdNjD2CKSB47uG6FjzHlri0WziaAPtIjDx44cGSn3QxRrze9Kz6isTA/q7xjcoTTUX5Y5Y1QSq0Efp7sl7HFVd6MC/VfGy6MNiJhqeiYyOHSuzeBAwP3os9IqJivz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=hIW8xu80; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4720cfc35e9so77796771cf.2
-        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 10:33:14 -0800 (PST)
+	s=arc-20240116; t=1741027174; c=relaxed/simple;
+	bh=znGyjoh1i+0MiNkFFGxOWQzln4M09SO8G0cb84uYR2g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tHOCItqArvT1A47DVHaZbCuiNdR/5NDpzXEPOD1+CigqDLmg2Omiy15k2UtVbfbH3M74wvDtf3FcfTjQpvD4Qv/qw/82gCMj38B1ESPlBHFPoqySy+oIhAeh9hUBhbxnyxoWYLR3VfDV5hIXu9e3xwZJ1OKUy3IlRkgk9GpAm/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=M09gxUM3; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2235c5818a3so54105035ad.1
+        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 10:39:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1741026793; x=1741631593; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=eue7H577BiYj6J1iAvYYX1Oj2dBdZtr+Y46C5Co92Q0=;
-        b=hIW8xu80K46nAHjWLZS6ZdCCK+1hNH9zMOiOo8mbLRQ9+DggAri5K5OcNagElVmeLp
-         ISRhJEc7mpikwYJOOiVfqJYJMveR0DAUSVBkbWgnl+sLmItFOD1uDw9HA3Gb7aYDdVdK
-         ukOe2C0lJVykQUBlHTVosz+jqsdXc8bH32wKU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741026793; x=1741631593;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:to:from:date:x-gm-message-state
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1741027172; x=1741631972; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=eue7H577BiYj6J1iAvYYX1Oj2dBdZtr+Y46C5Co92Q0=;
-        b=nNvBKHdFhG6uPaCCGBP6AUbxfwXWf7+tsXE/8P+Yp1PBBJa8lezMXKZcLDYDIefTWU
-         uOrLkitYQEwqCI0EgTyhqrOH7fK+M1GyMeF9OYSMwvRE4OS0TiQmwml/Nxu8e35mbJUw
-         3mwZXWQDzIQ1pbPWXljjuT6396ijFej8x9LTKpOlBE5O/KV3gR10k743Du59Sq9LQe4E
-         XNdw/csmCWBCXcVYknLA9AGF10JAJXD8y2h91UXHYUfX0YB8g46MPJpYaXcGEa7nk86E
-         TGO71CFip54a9QMe9snfWlXybcntt8iV95XnAgnHYXZqeiiNL18iRv9xKCgdHx3ElLcW
-         JstQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUPbomdUwVX+R644jDJNLF6U8GI+FJSPL+cIHdSia6hUFGWu51Gst+5pdn633r2Qp+iZNT6mWY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2S3e0hYKmx1AeJ/AJN76drUJIpFewU9hW6B9vPqe3a5eslaP9
-	6jk96tOYiLlLGNcmG/LsAi3Z97DZmWHupeR0GHLZWOA6cwfgzZNzZalVfOT92W8=
-X-Gm-Gg: ASbGncu5dlQZ1j0r+kjPJlK1sO72EGo3ZSzerqtsuuwuICcS4J/NXfplbQJVvR6QgY9
-	98aeZNFhMJ3nlvVZGV0Xg1t4eW5d3Vj/aR0DPEz0ItfRjRWFBIdL3ZHdAfUOSiiv+zyZ38VaeSy
-	3wRKiXLiUqFKVR+5HG5l4/W8F1b31CFOabNc3CT+jmDbuNGEDQRbv8Xr0sBdmh7WGhPHp5bWVc7
-	hWI6OnYol4gBXPSjgr6v/YbuOm0ih+6hq0K0U23wUPk5A6N8+FYIi8IvoHQF7SgqFCN+BRlTefH
-	Uju5CO69MXCCvAQA1i4UCl2mrfBYSbp4OL8MXatcip98d82wjKr3UyNkrCA4TpmocgO8NTswmog
-	LEKnvV/o=
-X-Google-Smtp-Source: AGHT+IF6Vz0gCa5XLjA6WsMMc9U4S/ofS/vlbDvCV4hoA9DNJ2ex3Jp7A+0DKEqmWTWUFP8908I9Cw==
-X-Received: by 2002:a05:622a:1a9d:b0:471:f9e7:5042 with SMTP id d75a77b69052e-474bc083cc3mr236149171cf.14.1741026793293;
-        Mon, 03 Mar 2025 10:33:13 -0800 (PST)
-Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-474721bf582sm61201591cf.37.2025.03.03.10.33.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Mar 2025 10:33:12 -0800 (PST)
-Date: Mon, 3 Mar 2025 13:33:10 -0500
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	mkarsten@uwaterloo.ca, gerhard@engleder-embedded.com,
-	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, mst@redhat.com,
-	leiyang@redhat.com,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v5 3/4] virtio-net: Map NAPIs to queues
-Message-ID: <Z8X15hxz8t-vXpPU@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	mkarsten@uwaterloo.ca, gerhard@engleder-embedded.com,
-	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, mst@redhat.com,
-	leiyang@redhat.com,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20250227185017.206785-1-jdamato@fastly.com>
- <20250227185017.206785-4-jdamato@fastly.com>
- <20250228182759.74de5bec@kernel.org>
- <Z8Xc0muOV8jtHBkX@LQ3V64L9R2>
- <Z8XgGrToAD7Bak-I@LQ3V64L9R2>
+        bh=QWcQCnohAW1QZN6tiIPZA9hwMP/L8UyX6cpB0fsWP3M=;
+        b=M09gxUM3MgPWa5yM2/xQeGqb/vGevR4vFAIMGFWaj1wbVb/coFMpQLkSgfUH9hv/vN
+         89EpP5hNHuvYV2EW0P8VXqeMKcCmnV7L7bq/OIzkc7wN6krd27Q8oGQA6XGr7ISk9xSB
+         zmBCCvVg4oBgwbYNWSvCXlNJarMxEjjK9ihyfcHFy2ryh/eGZM4QHM3zBdOgDLIh86VG
+         BZl7FE4UH1e35HH1dby0Jk8FM1gAm/vyGSzNs2k1ZxS8zYdySsfpQQ4ntiuGPiV4Uaof
+         wbS6j0jBmFRMELJu54rYWazxgMEt4x4aYnT3yHtJqYc7SGMrURkgtOYVZ8QVwULs80oO
+         mEig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741027172; x=1741631972;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QWcQCnohAW1QZN6tiIPZA9hwMP/L8UyX6cpB0fsWP3M=;
+        b=kDkJUEnPrgljA2ut32s0yYdnBby7hYeUhx3olv1DzO/6Ia8VXklJMOZ/uK+T7Gi3Bh
+         1fcpl08tQ88U9WIEITx1P5J3iFJ8egc3qxPceptSdvGot0rxJudlQMTcoJtf8Vjc8Kxr
+         QTCbLvg9JllDq0sdJIcpEWIczaG+xPR34f1/yi2znAsEiNhbzJMqy+sh2yBvVEMiaYG4
+         Q8TMPXWezLhbncbysyAK2seJrQ9qEXo//+/R3UXdCxAN6IIqtTJEnl1lIOU9ISC8OISs
+         VGDq06xg4g8VfebNREJJT7tUPnw2mWPcBY5KL/gFS6gprl1f3U6c8T2ZVpcYAtGbCHlc
+         E3Zg==
+X-Forwarded-Encrypted: i=1; AJvYcCX3tgfZnEcil8LnvrbBzY0fWBLFGHk5ga35eKPSEv7ghiTmi7xDNQP/yCUxga5xmmRFzGlV/F4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnNfBOAtkc53h1Zva6G+WjrsV8QY0TuErRXMzOJrZOR+9xrgZF
+	p86yLqwygXM+Q9tlt+1JD4sMIeDY43Q61wNesA2Tf6UDmk9w9Wlimwfl1H5aXg==
+X-Gm-Gg: ASbGncueHGnDCiBKUOkvasXJoHV4O5R1XifsXNku7IbaGQb/mN5ABXOomOhJmUKnBPR
+	t5VxrXbxNKXE27A78Rxwp6ySrxYZxOZxYtoXhiDF32ymRBtkK0UCBIeuyhlXmd8vFcW1e/JrG1T
+	s1ClbbOHOBwiO52oPSy0u1U3PPE2Jh1hlLt7HoY80NLE9HXHJfykhPloVxEoc+yq3ZmVxl4hYqz
+	Tia2SBM2LoRauO7dZbEdXuRDm7TrCX3GE8xXBSyIdVywSB530SQ0Zrk+IPnJFiVFaGBuS/MD5te
+	5Jx4JBvq6UPyESkvBpFJJolrJIkub3cr7bsJnSkwYnIHOoQcOfFDtw==
+X-Google-Smtp-Source: AGHT+IHAF/uO1KySV0Rb1OWMO7D1BDS1ZIQc8t0w9Ov/CQAdYMus0dJWwt7u7esnAwV/azSFxg5TXw==
+X-Received: by 2002:a17:903:2b08:b0:220:e1e6:4472 with SMTP id d9443c01a7336-22368fbe982mr184758795ad.13.1741027172198;
+        Mon, 03 Mar 2025 10:39:32 -0800 (PST)
+Received: from [192.168.50.25] ([179.218.14.134])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-223501fb004sm81161115ad.64.2025.03.03.10.39.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Mar 2025 10:39:31 -0800 (PST)
+Message-ID: <a377cac9-7b86-4e13-95ff-eab470c07c8d@mojatatu.com>
+Date: Mon, 3 Mar 2025 15:39:29 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z8XgGrToAD7Bak-I@LQ3V64L9R2>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2 v3] tc: Fix rounding in tc_calc_xmittime and
+ tc_calc_xmitsize.
+To: patchwork-bot+netdevbpf@kernel.org,
+ Jonathan Lennox <jonathan.lennox42@gmail.com>
+Cc: dsahern@kernel.org, netdev@vger.kernel.org, stephen@networkplumber.org,
+ jonathan.lennox@8x8.com
+References: <20250226185321.3243593-1-jonathan.lennox@8x8.com>
+ <174075783051.2186059.10891118669888852628.git-patchwork-notify@kernel.org>
+Content-Language: en-US
+From: Pedro Tammela <pctammela@mojatatu.com>
+In-Reply-To: <174075783051.2186059.10891118669888852628.git-patchwork-notify@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 03, 2025 at 12:00:10PM -0500, Joe Damato wrote:
-> On Mon, Mar 03, 2025 at 11:46:10AM -0500, Joe Damato wrote:
-> > On Fri, Feb 28, 2025 at 06:27:59PM -0800, Jakub Kicinski wrote:
-> > > On Thu, 27 Feb 2025 18:50:13 +0000 Joe Damato wrote:
-> > > > @@ -2870,9 +2883,15 @@ static void refill_work(struct work_struct *work)
-> > > >  	for (i = 0; i < vi->curr_queue_pairs; i++) {
-> > > >  		struct receive_queue *rq = &vi->rq[i];
-> > > >  
-> > > > +		rtnl_lock();
-> > > >  		virtnet_napi_disable(rq);
-> > > > +		rtnl_unlock();
-> > > > +
-> > > >  		still_empty = !try_fill_recv(vi, rq, GFP_KERNEL);
-> > > > +
-> > > > +		rtnl_lock();
-> > > >  		virtnet_napi_enable(rq);
-> > > > +		rtnl_unlock();
-> > > 
-> > > Looks to me like refill_work is cancelled _sync while holding rtnl_lock
-> > > from the close path. I think this could deadlock?
-> > 
-> > Good catch, thank you!
-> > 
-> > It looks like this is also the case in the failure path on
-> > virtnet_open.
-> > 
-> > Jason: do you have any suggestions?
-> > 
-> > It looks like in both open and close disable_delayed_refill is
-> > called first, before the cancel_delayed_work_sync.
-> > 
-> > Would something like this solve the problem?
-> > 
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index 76dcd65ec0f2..457115300f05 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -2880,6 +2880,13 @@ static void refill_work(struct work_struct *work)
-> >         bool still_empty;
-> >         int i;
-> > 
-> > +       spin_lock(&vi->refill_lock);
-> > +       if (!vi->refill_enabled) {
-> > +               spin_unlock(&vi->refill_lock);
-> > +               return;
-> > +       }
-> > +       spin_unlock(&vi->refill_lock);
-> > +
-> >         for (i = 0; i < vi->curr_queue_pairs; i++) {
-> >                 struct receive_queue *rq = &vi->rq[i];
-> >
+On 28/02/2025 12:50, patchwork-bot+netdevbpf@kernel.org wrote:
+> Hello:
 > 
-> Err, I suppose this also doesn't work because:
+> This patch was applied to iproute2/iproute2-next.git (main)
+> by David Ahern <dsahern@kernel.org>:
 > 
-> CPU0                       CPU1
-> rtnl_lock                  (before CPU0 calls disable_delayed_refill) 
->   virtnet_close            refill_work
->                              rtnl_lock()
->   cancel_sync <= deadlock
+> On Wed, 26 Feb 2025 18:53:21 +0000 you wrote:
+>> Currently, tc_calc_xmittime and tc_calc_xmitsize round from double to
+>> int three times — once when they call tc_core_time2tick /
+>> tc_core_tick2time (whose argument is int), once when those functions
+>> return (their return value is int), and then finally when the tc_calc_*
+>> functions return.  This leads to extremely granular and inaccurate
+>> conversions.
+>>
+>> [...]
 > 
-> Need to give this a bit more thought.
+> Here is the summary with links:
+>    - [iproute2,v3] tc: Fix rounding in tc_calc_xmittime and tc_calc_xmitsize.
+>      https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=d947f365602b
+> 
+> You are awesome, thank you!
 
-How about we don't use the API at all from refill_work?
+Hi,
 
-Patch 4 adds consistent NAPI config state and refill_work isn't a
-queue resize maybe we don't need to call the netif_queue_set_napi at
-all since the NAPI IDs are persisted in the NAPI config state and
-refill_work shouldn't change that?
+This patch broke tdc:
+https://github.com/p4tc-dev/tc-executor/blob/storage/artifacts/17084/1-tdc-sh/stdout#L2323
 
-In which case, we could go back to what refill_work was doing
-before and avoid the problem entirely.
 
-What do you think ?
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 76dcd65ec0f2..d6c8fe670005 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -2883,15 +2883,9 @@ static void refill_work(struct work_struct *work)
-        for (i = 0; i < vi->curr_queue_pairs; i++) {
-                struct receive_queue *rq = &vi->rq[i];
-
--               rtnl_lock();
--               virtnet_napi_disable(rq);
--               rtnl_unlock();
--
-+               napi_disable(&rq->napi);
-                still_empty = !try_fill_recv(vi, rq, GFP_KERNEL);
--
--               rtnl_lock();
--               virtnet_napi_enable(rq);
--               rtnl_unlock();
-+               virtnet_napi_do_enable(rq->vq, &rq->napi);
-
-                /* In theory, this can happen: if we don't get any buffers in
-                 * we will *never* try to fill again.
 
