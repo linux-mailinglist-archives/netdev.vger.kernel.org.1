@@ -1,237 +1,204 @@
-Return-Path: <netdev+bounces-171207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5A59A4BF21
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 12:44:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA7D2A4BF4F
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 12:51:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4B2F1884720
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 11:45:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6447F188CF87
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 11:50:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84094202C3A;
-	Mon,  3 Mar 2025 11:44:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5625220CCDE;
+	Mon,  3 Mar 2025 11:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bULDkG29"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="ObLVyW93"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA6761FC7D7
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 11:44:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741002294; cv=fail; b=hFsGd9LidfJs6bm2VFlaLge+iwrx6r188LKNK9cCne9Vnwnt+ysCFiwDvz/j0tu8sVOvQNq+q2IYNhPtJWgqh6imi2IlgdVNJ/Ei2z4Ac5WRfEdd96fVrgGL4cZZrIwyNXLkBZhj9Aafo8ppQ4NhR8pe6cpCNacxlvRtN/jBR+8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741002294; c=relaxed/simple;
-	bh=nzv1zIUhOHBa7PrwhgtPrM4WoC8wWtkrVugmUkGl/44=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=XyWI0ZY4BmOX73B3W7hn1Oi8rYDSf0SULa40F0NYFZ8urH9fKcFTZOvLVcc2WeFUtE/kinTKoavuJRhNpBEWQCoByC7WOA2jfmNr2u4sQlu6Cr3Co3F1cXmfeyDY7QlRwAMTRJ2JJUzKpG3vk53gkuFTGg1m4jkLTbu4CnwWo8s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bULDkG29; arc=fail smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741002293; x=1772538293;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=nzv1zIUhOHBa7PrwhgtPrM4WoC8wWtkrVugmUkGl/44=;
-  b=bULDkG29mwTW8apN55wX//JnnAwXnaYwGE8iF3eqrtmNNX0lsd9OH19Z
-   /qFLBL95S5UIkCNwdBmCxtKGVFQuocPN4GtqoQIxDsewAt+MlsQxpWJIs
-   6hUYNHXwVrp7ESiTMgjxvxIMlLRWBuUmZ65Lh0RoiTRi0TI1ZyicmfZbq
-   cbql9qdTSEFuqFd+9UCE1Nr6GGyJvA5BVJHYimm3rgURs/Vd8TSSu/7aQ
-   tAJzpacpsx8VRKRz3FI36Q1kS+e6pxTS3ZQftpCJQPitJi/1dvYmGWaAe
-   Nc3KbuJV45lqXg9tCCy7jKr6IkwL6vSBxRy5R4pJjsfjlgIvQVeqz38RY
-   A==;
-X-CSE-ConnectionGUID: LdNRBswdRT6Ck3XeCe/DfA==
-X-CSE-MsgGUID: ciMgVFOQTZ+8MoVeRXVf2w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11361"; a="29459400"
-X-IronPort-AV: E=Sophos;i="6.13,329,1732608000"; 
-   d="scan'208";a="29459400"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 03:44:52 -0800
-X-CSE-ConnectionGUID: Up/ym8XrT7OqR2gaKZL2CQ==
-X-CSE-MsgGUID: E53e4B6YT9mq6eRVQ9JwzA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="148878419"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 03 Mar 2025 03:44:52 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Mon, 3 Mar 2025 03:44:51 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Mon, 3 Mar 2025 03:44:51 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.40) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Mon, 3 Mar 2025 03:44:51 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tSco3tvo7yHu20DeNkAGa/+XGZUGr+6wLA9i/8+hbntya7Kk5voCfi6kpLNj49z2ee10mahp41lUpFmAnz5hIxg0UFcNDHsryaglcF1+cmlgohbvUWeL5kOrCPju36BhiVK7/5+OzADw0d7nR8m6z7VnCzTT4oRKXt/OWdeExwTCprlIfYhtBCjfRO+y4mvlhBS4CVITQdRJ50W+/X1aULD63xfkAIKXpzR+V+YEm+c+HJE7S0mVKgQ/44eVYokwLjP5FZ1KGAF3g2ql6gvKFjq4Qg/gtJZrjDYOPVdLLuTEUw1IBqOW5icm7Tor6ge48MLD/w7ToskGiKGXKYuK+Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XPmd6sLX5/6YrsHHK3ZQwq09VV1nrYjFQJ9McMSNBBU=;
- b=yx/5CBIRN6Cm28H3dBaAMBKPUgq/RghimQh/nht+xY/GLicn4W6gHmxMt77E9Lgs30qfxe/4HvJRxRuQ7TmFOD1jM0v5l1e9rs6XEisLtqAiMDHC4+9f9k8w4QBj+ndj4Xsaz4grUObUHP+gik4v/318Atqi4vvJd1EfIZW9nK1Q+8SOhB7nod+WQ9IEyjDiuq1cY2p2/jJFm+JWOgZE4AIQf5ll48sFPXWwkQxJRlM1xvJuh+Zd+78M0hc+lIP6wmV9gGY/zPaDBSBeTjt0ARDhPqfzNT3C02ZOzIPpKyXQyp7WZ0DOCeAYWipdvl0moURi2cP8z5nnZ0TWq9SHdw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH8PR11MB7965.namprd11.prod.outlook.com (2603:10b6:510:25c::13)
- by PH7PR11MB6056.namprd11.prod.outlook.com (2603:10b6:510:1d4::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.25; Mon, 3 Mar
- 2025 11:44:34 +0000
-Received: from PH8PR11MB7965.namprd11.prod.outlook.com
- ([fe80::ad6c:cf56:3c3d:4739]) by PH8PR11MB7965.namprd11.prod.outlook.com
- ([fe80::ad6c:cf56:3c3d:4739%4]) with mapi id 15.20.8489.025; Mon, 3 Mar 2025
- 11:44:34 +0000
-From: "R, Bharath" <bharath.r@intel.com>
-To: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "horms@kernel.org" <horms@kernel.org>,
-	"jiri@nvidia.com" <jiri@nvidia.com>, "Mrozowicz, SlawomirX"
-	<slawomirx.mrozowicz@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Polchlopek, Mateusz"
-	<mateusz.polchlopek@intel.com>, "Kwapulinski, Piotr"
-	<piotr.kwapulinski@intel.com>, "Jagielski, Jedrzej"
-	<jedrzej.jagielski@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v5 05/15] ixgbe: add E610
- functions for acquiring flash data
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v5 05/15] ixgbe: add E610
- functions for acquiring flash data
-Thread-Index: AQHbhFj+weoiTa5xs0Sm9M11y1cIQrNhWmRA
-Date: Mon, 3 Mar 2025 11:44:34 +0000
-Message-ID: <PH8PR11MB796564DE600F7A5493DE2BA9F7C92@PH8PR11MB7965.namprd11.prod.outlook.com>
-References: <20250221115116.169158-1-jedrzej.jagielski@intel.com>
- <20250221115116.169158-6-jedrzej.jagielski@intel.com>
-In-Reply-To: <20250221115116.169158-6-jedrzej.jagielski@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH8PR11MB7965:EE_|PH7PR11MB6056:EE_
-x-ms-office365-filtering-correlation-id: bb694d47-555d-4a18-3b3f-08dd5a48c4c3
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018|7053199007;
-x-microsoft-antispam-message-info: =?us-ascii?Q?1KQfTrKlReTgvLYCrZ0Az8QDA0l6PSqHwk2Lwe8DLyU5/xuv9fGs4TnGCXN8?=
- =?us-ascii?Q?GknPj4K/9MhYe4SgOsiA+HeWKdcvcvuFpqXVtBZQza5gpA02zPIqa9KJ8o2K?=
- =?us-ascii?Q?iK/bbppJ9wud9zBgvCqievgoVP3nC7C75O8PgK32pES/ae0g+HXH1en+F0pc?=
- =?us-ascii?Q?ngWRwGNAnq6ixzPM24u+xb5hmLhp+Zziyp4wIpGxQCzjL9OplPfNKps+5rui?=
- =?us-ascii?Q?ZLvaRCjDCGknLrLzkjpVHZyqcndvEIyejogvilPCT6++fHbldAykuY9aAycR?=
- =?us-ascii?Q?mrnVZyBfdlu4PY1f0bfOLJs28kVihIo+a+P/Cah9UXVBhKN81J27Fs2u66Ex?=
- =?us-ascii?Q?SKc+48NmzdP25WnA8cw/QR/xtC5k+vqYDKhSBSBs+lE9DVtqeFU1lRjoy30e?=
- =?us-ascii?Q?s+4ASaThxzFF6huMwv1uhFx8XKO2185yubymJB6zvfwyRNQ/+xX0j5iPwxZL?=
- =?us-ascii?Q?EdxJfqb1Fl9VeuyeLXM25DXZcO/0qf6tD3pJpv+qw7YaPIG2m9lZoSApqgId?=
- =?us-ascii?Q?qXfuWVMEb7+6enKvsbsXM5N6zdoja+EHzdL68ulfkZ70rb0jxL5LR7SIEtjG?=
- =?us-ascii?Q?PIBr+ZsJDuW0xViSPA1nvppjKyJSuW3RoEFcTiPullXh/ZyLfhAdwnZHPhI5?=
- =?us-ascii?Q?5wOSkN6eQpJ474N0ZicrM2UWkkM881Nm+KY35JlzQ+jdtAAsyMRgZQnsr4pO?=
- =?us-ascii?Q?mBNuu1qibr+GB2I0MLcWEnEGn0XSGJI5Y+nWU0aNe8YfVHigpGUjubzS3M9b?=
- =?us-ascii?Q?2rZMWEODMQspSL0KARhLzsUbStZdnQmKIF5J+XKBY3qMjN5Yll+ToSkkx6ZC?=
- =?us-ascii?Q?IfGTo3C0GZkkdTJ3hkJUnb6C2Os73ggReDZUUySeFEibW+hogN2CXCHYwfee?=
- =?us-ascii?Q?z9GQQc+rRVdrvdu3O2INDOCfkAkHFHKBqXL1tbbkpA2RcPOe1lj/xNqqxRBd?=
- =?us-ascii?Q?gZGcjoIMx83bamFV8fg5wqhz/Zfs+hgfrcrb0q3oSKiAL9oZgEz5wDcjvUYR?=
- =?us-ascii?Q?EZjjlfLU+reWDs6pMp6Nzger6XhMpZLkold3to4eoczjsKyi+aAV+Q+p8QDj?=
- =?us-ascii?Q?pKfP7o9Kx6Ho5qpJ0/mfHNdU3SXsOX6MVNtWPDPK2MvzFC+aFnV9UD470PPU?=
- =?us-ascii?Q?zaU87zV7RooLGFFiUu17MeB32P3MWQjkV/MRSxyaOfS8MVyXhyQsDjaYZzp7?=
- =?us-ascii?Q?pb2k0qGPbN2pZAu8UmgDRQfn6PN9pg/slelOdV7hoZTkY5nehRFlVIDavTI3?=
- =?us-ascii?Q?5NE2tKtfjgIrbTuEvwyuJK3kN4kCiWtEnDMsinkoH6542Awm9wiMK5rKWnV3?=
- =?us-ascii?Q?edD4oC6qpaDuflJEES8B5wTLAURkJ8j91XVXdRkzivF88A4jADhwkynWQRmA?=
- =?us-ascii?Q?Z7+HX1cURwkAz9LdpsVxTIcfuAvtZXlQgYeCp6xGwxfOeZfZkuKHWZIsX7Fw?=
- =?us-ascii?Q?x4FkpNGdxbIxyW0AunswYdDcAiMcxPHJ?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB7965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018)(7053199007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?8ii7pfTlnRIBg10xRSzzwDfZJ5RpFnTRiU5IL1OnxNH8xCBhq0kr1J3FuZm8?=
- =?us-ascii?Q?spNbM8peoJFzLDXCDr3diVFD4PNMbedU5RT51BXwVTe2StcuJdL9Nga3Apq4?=
- =?us-ascii?Q?ubMpENpJwZw0eUM8cl25tTeRovpN0qprqOmwgsGs+/FDV6yAk7VNSe95R2Nn?=
- =?us-ascii?Q?5U8zbzV0hIAvYg9UcPcDC+FfjzF6roD4Y7X0W8vPEJzhdiVr1dP+gTTf6r42?=
- =?us-ascii?Q?lKG/uFzd13N7ki/BSPBwbpVZK9qn78f8qmnZV2hY2v/Oo/O8WjdbdIx4OQK9?=
- =?us-ascii?Q?KWeSz1d3KWeI+WgDs+i9aRLJKs4xspD/wLNGsZX+u6uFlfscIQMfTPJxjqNW?=
- =?us-ascii?Q?Jkb/nWfr0mThrt3OBUtVb+19V485MREjwug3PiPI1B4M0jOYSlCVKGramJe9?=
- =?us-ascii?Q?Q4gJ4IDgEXYOhV1uiKwscUUNFZnGJ/slKzDODFUnmz08UmUsn9rGsuWo6Qiw?=
- =?us-ascii?Q?osd6D/TKe4McHtcZ6IFeeLYbVKOnwp5YTjmSNzV2kWRtbuktMLkcbwMmtIQb?=
- =?us-ascii?Q?KRigeQW/wBX3sLzehB/lOe1vi2tLjzsePm+8EmwTYUykCCo9Xf7olT6O2T9R?=
- =?us-ascii?Q?rGn0ImO9JXas40QmnfWMNAmF1bET7LJn9UZaxxfNjYgkGRapifxeXKNS4+EN?=
- =?us-ascii?Q?dnsiTxXxgm7J3fp8Ys20iG2sSKgJ2LUUq39oVb9GyJcuydO8u5sqOlhCicaN?=
- =?us-ascii?Q?cIFclxK3rvXHcTMW23KCbPhQHBEc7JQUqgafj1ftakyApnh8xL7YuWwkh0e/?=
- =?us-ascii?Q?9WaaU6S7N85R/lCpS/Wt7+a+Irx9YCPCPs0fPkPhjamBc3IbaRkL7osN0GzD?=
- =?us-ascii?Q?f6h3M5Ir2IQbv/yrdNbYjH85v51QpgwTcdLFDwsnCYrdDVereALh8bLoYR5P?=
- =?us-ascii?Q?8EOY6UAq2EdLjzRpGnPtuZIebeXgE652DUqtWmU6DmCWM4q0Z6RgCFcbf3SA?=
- =?us-ascii?Q?jlUCHV+pWGL/HQYq/O3pCAFAqUE3eihev1bO8CvnzzLeUCiatSzhGoZDM0MO?=
- =?us-ascii?Q?ml7xvhotKyiU05XxW8ZXxMYjhYbwjdgXwSBM04BzwWV37gvcvRQSseYLNhOx?=
- =?us-ascii?Q?pHeYGXC/+mYP7gILsYiUAWHIcZ3HU4gQrjNhQX6zVG/ZXY/aj6lum71NjuSM?=
- =?us-ascii?Q?AucnLTXC3pgfD8tFG+MM9D8pSw9LXba4ex8yydS3kOeXW+W/K9mVwcsdygi9?=
- =?us-ascii?Q?sszekDQTFo/aCIPYCwlxlmXeKauk+ZA9M8b1hoAybID3XmAFlFyDoBaouv9i?=
- =?us-ascii?Q?UpprWhP91MD4Oue+GMDMRX5ThrLkLzvplZzAgzQZd6DK6V9CNxiM1gGY4bPy?=
- =?us-ascii?Q?ECpycBN+0f1sbtiFZyxdqTlvTA3MYpuJ8VSleT5cN7aU8r8hANYmbYMdcFQ6?=
- =?us-ascii?Q?6jcH+sf0nqkMq/+oBs+9BA8BUCuQwMMy1t8ni/j3lIbapc6EhNh+paYDnrUP?=
- =?us-ascii?Q?KITXSjjZqvvSP5X8o8fhf7gh+5/yKHLEjHlKY5DVJHMKgaIqQi0h6vg9nUfC?=
- =?us-ascii?Q?U03b/t1LGIekzort8vmM0BQnVUlrfpGmfzqgP2S+MC198/Tq4Ochff8yUaAu?=
- =?us-ascii?Q?MvMupKDfVRP6QK0003ZW+4ReC67HirhPk0QR+dPB?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A70420C028;
+	Mon,  3 Mar 2025 11:50:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741002625; cv=none; b=cnsm6e+EuXg6ltuvvEXL7uO48gX93wGFtX8/vzxPlklb2R48Z/NXYmL0ocVHJATBF/2tUg/xFW927amurRYgN6M2sbw0/KhKB0XfRTESKyfXqBwS7nWZ1owc7AkriIdkFbdP49g1tCRkiUH1n2SUUFmhLvzJQeG1nzIS4IsnQ/E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741002625; c=relaxed/simple;
+	bh=EIYFdXApveqnm4xf9rgkR4gC39U63SZZJHFclnE2ODQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Go1/xx/Wg97SrRyPIgiNE37qCax5sjPHH+J89EGKKxvrzw13LKtSyc0ZvBkAbH1tMHTndxJjeVfQ8EjpCQ97ACsCAcLwSGAWUa3atoj5FqMr2Us0mEQCxV7nHTUKoYvb7oCfF8nFXrlrxb5bFQvQt6E5DI7yJ2acmzJVh1Om5rg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ObLVyW93; arc=none smtp.client-ip=198.47.19.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 523BnaOA2672834
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 3 Mar 2025 05:49:36 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1741002576;
+	bh=LtLTcgj+wTfwtj7P3s1/LE4IyDDTgXqvwipyBUTOI18=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=ObLVyW93xulqoW6jAymFcaL01GbRW6yejSpjz1KmauRIAYoBh+4QLKrz7qVp+Uk1/
+	 KP7AZorNrO+VZDq2nlT9Pwx6j6rpJpKtxfpdbC8vI3snKumo//FkBEA8Woj0NRjqyO
+	 HVB++sLbrK15SZFx8qiV3E3OuMSu5BnunZSyAbCo=
+Received: from DLEE112.ent.ti.com (dlee112.ent.ti.com [157.170.170.23])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 523Bnaac119408
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 3 Mar 2025 05:49:36 -0600
+Received: from DLEE113.ent.ti.com (157.170.170.24) by DLEE112.ent.ti.com
+ (157.170.170.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 3
+ Mar 2025 05:49:36 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE113.ent.ti.com
+ (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 3 Mar 2025 05:49:36 -0600
+Received: from [172.24.21.156] (lt9560gk3.dhcp.ti.com [172.24.21.156])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 523BnTXH029594;
+	Mon, 3 Mar 2025 05:49:30 -0600
+Message-ID: <06d2b616-9f11-46ae-91f7-e97f86f9f24c@ti.com>
+Date: Mon, 3 Mar 2025 17:19:28 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB7965.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bb694d47-555d-4a18-3b3f-08dd5a48c4c3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Mar 2025 11:44:34.1486
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: yn8etl+63bLIPZY6waLGj/38HSMwj9S7iO5jm4aWvbZgBXTw/Bzkj6zX6v+B361ZrQ2s/BY+oCqhsILmzgYFew==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6056
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [EXTERNAL] Re: [PATCH net-next v3 2/3] net: ti: icssg-prueth:
+ introduce and use prueth_swdata struct for SWDATA
+To: Dan Carpenter <dan.carpenter@linaro.org>
+CC: <rogerq@kernel.org>, <danishanwar@ti.com>, <pabeni@redhat.com>,
+        <kuba@kernel.org>, <edumazet@google.com>, <davem@davemloft.net>,
+        <andrew+netdev@lunn.ch>, <bpf@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <u.kleine-koenig@baylibre.com>,
+        <matthias.schiffer@ew.tq-group.com>, <schnelle@linux.ibm.com>,
+        <diogo.ivo@siemens.com>, <glaroque@baylibre.com>, <macro@orcam.me.uk>,
+        <john.fastabend@gmail.com>, <hawk@kernel.org>, <daniel@iogearbox.net>,
+        <ast@kernel.org>, <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>
+References: <20250224110102.1528552-1-m-malladi@ti.com>
+ <20250224110102.1528552-3-m-malladi@ti.com>
+ <41fbeb70-bf49-4751-b4ba-6b122a45233d@stanley.mountain>
+Content-Language: en-US
+From: "Malladi, Meghana" <m-malladi@ti.com>
+In-Reply-To: <41fbeb70-bf49-4751-b4ba-6b122a45233d@stanley.mountain>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Jedrzej Jagielski
-> Sent: Friday, February 21, 2025 5:21 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>;
-> netdev@vger.kernel.org; horms@kernel.org; jiri@nvidia.com; Mrozowicz,
-> SlawomirX <slawomirx.mrozowicz@intel.com>; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; Polchlopek, Mateusz
-> <mateusz.polchlopek@intel.com>; Kwapulinski, Piotr
-> <piotr.kwapulinski@intel.com>; Jagielski, Jedrzej <jedrzej.jagielski@inte=
-l.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-next v5 05/15] ixgbe: add E610
-> functions for acquiring flash data
->=20
-> From: Slawomir Mrozowicz <slawomirx.mrozowicz@intel.com>
->=20
-> Read NVM related info from the flash.
->=20
-> Add several helper functions used to access the flash data, find memory
-> banks, calculate offsets, calculate the flash size.
->=20
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-> Signed-off-by: Slawomir Mrozowicz <slawomirx.mrozowicz@intel.com>
-> Co-developed-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-> Co-developed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> ---
->  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 509 +++++++++++++++++-
->  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |   1 +
->  drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |   4 +
->  .../ethernet/intel/ixgbe/ixgbe_type_e610.h    |  40 +-
->  4 files changed, 552 insertions(+), 2 deletions(-)
->=20
 
-Tested-by: Bharath R <bharath.r@intel.com>
+
+On 2/26/2025 3:59 PM, Dan Carpenter wrote:
+> On Mon, Feb 24, 2025 at 04: 31: 01PM +0530, Meghana Malladi wrote: > 
+> From: Roger Quadros <rogerq@ kernel. org> > > We have different cases 
+> for SWDATA (skb, page, cmd, etc) > so it is better to have a dedicated 
+> data structure for
+> ZjQcmQRYFpfptBannerStart
+> This message was sent from outside of Texas Instruments.
+> Do not click links or open attachments unless you recognize the source 
+> of this email and know the content is safe.
+> Report Suspicious
+> <https://us-phishalarm-ewt.proofpoint.com/EWT/v1/G3vK! 
+> uldqnT1FPMdbygXOdhMC_1iqujTzdK2ZTrOjiy9hZrrhggm_lCduTFVqMq5QnhhjXmDeSX6KQhxE9U6zpHeghHYcqYQiiHpSSbljHpY$>
+> ZjQcmQRYFpfptBannerEnd
+> 
+> On Mon, Feb 24, 2025 at 04:31:01PM +0530, Meghana Malladi wrote:
+>> From: Roger Quadros <rogerq@kernel.org>
+>> 
+>> We have different cases for SWDATA (skb, page, cmd, etc)
+>> so it is better to have a dedicated data structure for that.
+>> We can embed the type field inside the struct and use it
+>> to interpret the data in completion handlers.
+>> 
+>> Increase SWDATA size to 48 so we have some room to add
+>> more data if required.
+> 
+> What is the "SWDATA size"?  Where is that specified?  Is
+> that a variable or a define or the size of a struct or
+> what?
+> 
+
+Will be removing this line, since "increase SWDATA size" change is not 
+applicable anymore. It is a macro PRUETH_NAV_SW_DATA_SIZE used to define 
+the size held for swdata.
+
+>> 
+>> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
+>> ---
+>> Changes since v2 (v3-v2):
+>> - Fix leaking tx descriptor in emac_tx_complete_packets()
+>> - Free rx descriptor if swdata type is not page in emac_rx_packet()
+>> - Revert back the size of PRUETH_NAV_SW_DATA_SIZE
+>> - Use build time check for prueth_swdata size
+>> - re-write prueth_swdata to have enum type as first member in the struct
+>> and prueth_data union embedded in the struct
+>> 
+>> All the above changes have been suggested by Roger Quadros <rogerq@kernel.org>
+>> 
+>>  drivers/net/ethernet/ti/icssg/icssg_common.c  | 52 +++++++++++++------
+>>  drivers/net/ethernet/ti/icssg/icssg_prueth.c  |  3 ++
+>>  drivers/net/ethernet/ti/icssg/icssg_prueth.h  | 16 ++++++
+>>  .../net/ethernet/ti/icssg/icssg_prueth_sr1.c  |  4 +-
+>>  4 files changed, 57 insertions(+), 18 deletions(-)
+>> 
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
+>> index acbb79ad8b0c..01eeabe83eff 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_common.c
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
+>> @@ -136,12 +136,12 @@ int emac_tx_complete_packets(struct prueth_emac *emac, int chn,
+>>  	struct net_device *ndev = emac->ndev;
+>>  	struct cppi5_host_desc_t *desc_tx;
+>>  	struct netdev_queue *netif_txq;
+>> +	struct prueth_swdata *swdata;
+>>  	struct prueth_tx_chn *tx_chn;
+>>  	unsigned int total_bytes = 0;
+>>  	struct sk_buff *skb;
+>>  	dma_addr_t desc_dma;
+>>  	int res, num_tx = 0;
+>> -	void **swdata;
+>>  
+>>  	tx_chn = &emac->tx_chns[chn];
+>>  
+>> @@ -163,12 +163,19 @@ int emac_tx_complete_packets(struct prueth_emac *emac, int chn,
+>>  		swdata = cppi5_hdesc_get_swdata(desc_tx);
+>>  
+>>  		/* was this command's TX complete? */
+>> -		if (emac->is_sr1 && *(swdata) == emac->cmd_data) {
+>> +		if (emac->is_sr1 && (void *)(swdata) == emac->cmd_data) {
+> 
+> I don't think this conversion is correct.  You still need to say:
+> 
+> 		if (emac->is_sr1 && swdata->data.something == emac->cmd_data) {
+> 
+> Where something is probably "page".
+> 
+
+Yes you are right. This needs to be changes to:
+
+if (emac->is_sr1 && swdata->data.cmd== emac->cmd_data) {
+
+This issue can be addressed more cleanly with the fix Roger mentioned 
+here: 
+https://lore.kernel.org/all/3d3d180a-12b7-4bee-8172-700f0dae2439@kernel.org/
+
+> regards,
+> dan carpenter
+> 
+>>  			prueth_xmit_free(tx_chn, desc_tx);
+>>  			continue;
+>>  		}
+>>  
+>> -		skb = *(swdata);
+>> +		if (swdata->type != PRUETH_SWDATA_SKB) {
+>> +			netdev_err(ndev, "tx_complete: invalid swdata type %d\n", swdata->type);
+>> +			prueth_xmit_free(tx_chn, desc_tx);
+>> +			budget++;
+>> +			continue;
+>> +		}
+> 
+
 
