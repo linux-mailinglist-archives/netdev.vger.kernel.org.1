@@ -1,217 +1,258 @@
-Return-Path: <netdev+bounces-171165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18871A4BB7F
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 10:59:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B729EA4BB90
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 11:01:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CF523B2C49
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 09:58:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 788401892AE2
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 10:01:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 130C81F1523;
-	Mon,  3 Mar 2025 09:58:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64E591F1536;
+	Mon,  3 Mar 2025 10:00:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="uRvNzI5k"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O+n6psB2"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 188E51F12F6;
-	Mon,  3 Mar 2025 09:58:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740995924; cv=none; b=lNgLuh/W2/gZ9SYfijBVkzdFReGes2LByVTlxkUlbewst44N0AEuc1VSXv6s/9CAYosJnNLQA2V3ZfB2vUb2kf9v9QHvZxuKEp5bQITcSs/sOw3pY3ACm6p7jChyfBOgeUvuQRHwP3MiktARssPiMZjNBrOBOUfF4Rf3CVu3kYI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740995924; c=relaxed/simple;
-	bh=EVHnAT0Fj8UFfX1d1iKKikIPT6mE89O8IutiZ9wghW4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QUj/vg5+uC8w2Fn91lWY8nAANi9s5/p0vA6BasrRJYTVJh9cNJjpK4o3Q/uVUf+BS2SCJGk5I76o9mw8U3gNYILim2LVc4p/+zn5e5cxXfzs8orCTgVhwsiC7Wt0GTsPqNDwHB4FRXyb7TXrRr+6cq8Xz5e0WU9za6jyqXX54RI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=uRvNzI5k; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=vocGWq00dHieN/+oIHdRzKoBXygqv9MdZeGwUkedRe8=; b=uRvNzI5kU7RbApRJOXrYX2IOFF
-	5QfX0iCOo6Ens2pw8lKCUfsT18QpgBG3nwlYDqFwdxXv4hqE6jaEXDZG8HfvQxOXLEKsquGbP8NEE
-	OIB2Cgx3P68QPb8V73KpPrf2dsXurdE2IL/EIDuGzeBZzGWdJByIMa8+g5Z1cODYI5TUBw6hFZwC9
-	kaFBMnRyIrk7CkD+V6IwFdYPWRnpx28jtnOWXM9WYHhf2hIdfBc026F7qrR1feEzQMfL/s8S5mK3A
-	ZE5FrGOXdfv3BtB/Gj/8r7ls4V7bUSbI6eF1hOoelJKXwUS6BNNypgWBR1M5J9GGGgJrsCG6TPlBJ
-	a/95o4Pg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45396)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tp2Z4-00008X-2c;
-	Mon, 03 Mar 2025 09:58:22 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tp2Yy-0003hC-1p;
-	Mon, 03 Mar 2025 09:58:16 +0000
-Date: Mon, 3 Mar 2025 09:58:16 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH 3/3] net: stmmac: Add DWMAC glue layer for Renesas GBETH
-Message-ID: <Z8V9OC_1llF3leZd@shell.armlinux.org.uk>
-References: <20250302181808.728734-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250302181808.728734-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <Z8SydsdDsZfdrdbE@shell.armlinux.org.uk>
- <CA+V-a8vCB7nP=tsv4UkOwODSs-9hiG-PxN6cpihfvwjq2itAHg@mail.gmail.com>
- <CA+V-a8un7Oy9NtfDUfs0DSwRVAFn52-vWj1Os=u_1dqijJhbMw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 603C01EFF8E
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 10:00:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740996059; cv=fail; b=IsO5ulb1cWMg81CMSmuJ49eUpPdYQmHH4bXIXiK4+/MgZAX5xR51rg6mZbPrZCjmhdOQdsOqHGYQo63WuDQx/KACOB0b1wLViSc5RH3eru7ZdmIDPePH3L4dTNkuVSot4fv418L5R1TIEZcoIqGRlzBn7fqmAE4szlj4o3eRQdc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740996059; c=relaxed/simple;
+	bh=QBdp8bUK9dG0vlVTMyXP2rM5pi/Zy3X/TAKPc7ZcgPs=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=VzLs9SRAWe2gBNFtXyeCkWwUrxIsaJJkBivhTVhfzlfFBcSMyWWl4jal8yloz+qOxgVaBuxTxhox5Khe4Pbobzz/ocfKFSUwWAOqi/O0b2oyVEtBgX+BA11sI55QeQZjpXWnmPLax5qqMW/DR3M13S9F6qEjcD3+21pRmeN4/xA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O+n6psB2; arc=fail smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740996057; x=1772532057;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=QBdp8bUK9dG0vlVTMyXP2rM5pi/Zy3X/TAKPc7ZcgPs=;
+  b=O+n6psB2hSZ3wDND8f6TLTwdH6QiVfxbV4ROeiMn+ZTT2z7Hz8SRsRb3
+   5fCiFxECRPvsrfGVkePm1ssiNnM4brS6KqWBuHhv2e50vmc8+3sUtyfwR
+   /mXMPVYfXySHnPBUpchHfwVN8T9jXA8sr0L2m6IUxBM/kq9Wfb7EVzTNp
+   BzMc+pd+FhPrs7jR8SM2XwLUpwYrkmA7XpfyRLWGCJCyXluiQGq0m9fX4
+   lUZGic2F+gREiGZyr7JKjjAMkAIS4Uk7o3Vkw9yCzAQwGqqPyDqZ5ChZO
+   //W3Y/lucOLgtAQyHu2YewOHYxM40Xy5UNEoYuIqutgiCkyOIGnfreMT8
+   A==;
+X-CSE-ConnectionGUID: FRYqLkcnR/+wyGcOwo5Hiw==
+X-CSE-MsgGUID: 0/1MkUtGT3CUivyuSzvmrg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11361"; a="41750597"
+X-IronPort-AV: E=Sophos;i="6.13,329,1732608000"; 
+   d="scan'208";a="41750597"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 02:00:53 -0800
+X-CSE-ConnectionGUID: AWaiMi8iSOyhS/hMV64Hog==
+X-CSE-MsgGUID: wLNH8fjSTtqo1hQ86oS0Kg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,329,1732608000"; 
+   d="scan'208";a="118142751"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 02:00:44 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Mon, 3 Mar 2025 02:00:44 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Mon, 3 Mar 2025 02:00:44 -0800
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.44) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Mon, 3 Mar 2025 02:00:43 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=cSAd998bhdiu500J1V3E01gZ+Rt76480+C9Z8NqHNGTtjAWhl4onWHkONIKisZDszlMAv8QnFeC8GXqaKC+D3j9dHS4ZxFSvWvF9qkEybd55nN0o0ygxB7f4g/oS3AEVPKdo5B0LaZRfxg8ATybYrN9jR3aPgCXudqsmhuYT5Fcg85o582o1C1Afz8iLJpzX0x2AmgEnNoCaWgT2h21KozklGBxB7x7e3NzDd+DOSHZuRYg/IfrDsZHpvx+EPZ6nt3TqsufZI5JNFSaofF+jeAzPW/RVJi5s72VadgwDGBblSHeCijhygJleU9oxN6MT2wKWKdYMfLS6C8+g4wqmyg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aaiTR+oYY2X9w2FY3jCLhKPojX7p3R+jHetFTtlKF48=;
+ b=BICxpGQeKG+awndnZXUEXcHVE74gDTOuXr/AQ3cH4Qk9pqOzy9Q+fku/evLenACB6fDgpTzS5NE3H6YZK7S/ngAjgeMS8HjKd+zkQa+MbI0gprm4n9m36Hkwwk85paaz3vpOiHV1QIQzaGVtjhsiAiA8Wi6mDWNsL2sUV5rquW1gXOMWEiaAjluRT9HtkuB5/iLCuG+d6j579NYs0bY3pIjlucjp3g+zdG5NTKl//LhInKn/1OVHB4grQKxvseAS5hUZEX/D2Mw8C/QEDLxuKGbTIs5da+cWhSA8nVDyWLxUr+C4UCVgJiWRGvbdHsW+y5qqb8FZuOK5SaOVOz/5Sw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by SJ2PR11MB7475.namprd11.prod.outlook.com (2603:10b6:a03:4c9::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.26; Mon, 3 Mar
+ 2025 10:00:40 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.8489.025; Mon, 3 Mar 2025
+ 10:00:40 +0000
+Message-ID: <68c841b7-fb5b-4c52-bd55-b98c80ad8667@intel.com>
+Date: Mon, 3 Mar 2025 11:00:35 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [iwl-net v2 5/5] ice: fix using untrusted value of pkt_len in
+ ice_vc_fdir_parse_raw()
+To: Simon Horman <horms@kernel.org>, Martyna Szapar-Mudlaw
+	<martyna.szapar-mudlaw@linux.intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>, "Mateusz
+ Polchlopek" <mateusz.polchlopek@intel.com>
+References: <20250225090847.513849-2-martyna.szapar-mudlaw@linux.intel.com>
+ <20250225090847.513849-8-martyna.szapar-mudlaw@linux.intel.com>
+ <20250228171753.GL1615191@kernel.org>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <20250228171753.GL1615191@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VI1PR10CA0113.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:803:28::42) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+V-a8un7Oy9NtfDUfs0DSwRVAFn52-vWj1Os=u_1dqijJhbMw@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|SJ2PR11MB7475:EE_
+X-MS-Office365-Filtering-Correlation-Id: ccdab905-ec6d-4bf7-6792-08dd5a3a4142
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?S1JQNDlLRVpIVzdPRmduaE10eVVINFh2L2xTYTBqK3FlMjlkOVczWjZrckhY?=
+ =?utf-8?B?QlEwVnNkZXpLaXRoelZzQTVmOHlmZFpNVGNxTkJ0NWJrYTBTK3ZadDlmcUxZ?=
+ =?utf-8?B?Y01wR00zQ0V2Mjdhb2NZMVZWd1FjUEIwYjk4SU9TU1Z6M25vREEzT2NGZFNa?=
+ =?utf-8?B?ZEIwSFJiR3lGR1BtNUw2YXY1aitMQWRzWU9wc29tNi9rdjFLYnVHYkFYVi9Z?=
+ =?utf-8?B?cnd1T3NZMUhWVzBnVnBjbUwvYlJjR3I3NDhBaUZQYytOaE5KMDlXRG82Vmg2?=
+ =?utf-8?B?dWxFTkpnVXRKR00vUlNXQ1NQbVVkL20yK3hYR1JDZ3JsdlJTTHlKM3kzL200?=
+ =?utf-8?B?MmdsWjNJZng1R1g5UjlkSUhlU1NUdkdPNS9zNlhmam5OZXpjSnZUYW1ESVpl?=
+ =?utf-8?B?ejZ3L1FrUWJXVlcxMm5kekJZazNDNkJNOVlEU1VNZ3VkeG1FL3J6R285YUxI?=
+ =?utf-8?B?WVVlVjBmVGFuYVJnb1pTRmFnTzBDZHN4M3ZIQmhzZFNzVVpXeERJNC9TaXc2?=
+ =?utf-8?B?SW1tQms0THBsTThNcG9YeDJ3SGQzTkcxVWc1aXhPbWJCdTRaNzNWbm93UXlW?=
+ =?utf-8?B?ZVpBL0E1d3BQeVBhRHBDSUgzZzFXcWVZcGpydTBUUEpyclZRQWc1d01WRnpk?=
+ =?utf-8?B?UWhtU1BpUFd2Nlh5WFJsS3Fqblk1aFdTVmtIOGtWOWFXOWVRYUNib09mdWg2?=
+ =?utf-8?B?SVdNZ2t0Y2RldGNUMmwvRk13ckxiU0xVWTFCbHVjTkZLbENBREd3Z1BGQTc2?=
+ =?utf-8?B?aWRaajlBcG0yWCt4ckxWQlRHOXJzWWxZbnUyU0RFRERUVVZUVlZ1T0hKNEln?=
+ =?utf-8?B?SmQwWkFnN29PWXVYZVFKNmhDS0I5bFdCOGVYaXNWd1VuRWVreWpzSzNzMTBz?=
+ =?utf-8?B?NnBrQ2ZkUjBlRGxhNE9pL1ZiY3dHdWlCWkU3bmg2QWEvaFFOREJiYVNWQXo4?=
+ =?utf-8?B?T3pSakR6NGtCaGU4YXhteU1ER3pRTmk3cDNZR3hac3ZPejZOUWJQNURqUmNN?=
+ =?utf-8?B?Mjhxd29JQ0NhTXJ1RDVvd0FnMTZZVmZMM3k3RGRzRlNyYUJVUWttQ25zQUhi?=
+ =?utf-8?B?RkpkR1VHWjByb09qNDJNQXFnSkdLMW5NbEM5NldxUStjZU1NZkZvNC9NRWEz?=
+ =?utf-8?B?V0dRcnFlQnB0WjB4dkh5RTNrY0MvbCtqbWMxN0x5SWlUZXkzRGZuSWFPN25W?=
+ =?utf-8?B?Ujh0ZGRETHh6UWgrOFptN2lFL1hXTzJuOTdnbmlmUmw4R0IzOHFhMEozajhV?=
+ =?utf-8?B?Wk1EOUd4WWtFaGZiSm03ZlNjbEw3T0VwV1JmVHpyV3IyR0R1c1RiaWI0ZlR3?=
+ =?utf-8?B?UlhXeFVEMjFjMkdmQTU0ZC9tU1pUNTdUeTczemVGYUlXanNZWlVnRVdZdEZW?=
+ =?utf-8?B?QnpTZ2Njb0lRazhzSWVQNlJlRUFJMjVBMkNpYmNwTEFuNFVNVGc3UXhRQ1Bu?=
+ =?utf-8?B?ZCthVWxwbnlJM1duVEdGZm8vcjlYbjJydUlQWUZIN3g3TGQrNUFIeUFNdWRH?=
+ =?utf-8?B?Z1BGQ0ZvZ1M3UzBXM1hra0tQb3F2NE1oS2tRNlpyeEZnQmtRcTNVcStpOUR5?=
+ =?utf-8?B?Z01ZLzVIZ2d6dGI4M0VudSttVGZJSHlMaHF6OVl1QzJSNTJIaWdqdTJBUUl1?=
+ =?utf-8?B?c0ZUR0xkcTFvamNDMVV1enR5T1VJOTdJY1dXYVB0cE5QRFVDQ0ZFVUY1Mm8v?=
+ =?utf-8?B?TnJFdWYxczV0Y0tOY2gxLys4ZWVxV0dKUFEvMmV6d3pkODNVK1kvUzZoVXdC?=
+ =?utf-8?B?ajdwaU1oZjliL3g4R0d0MEpyY0tJVmthbzUwU2Y0SE5lUHRlcWNXSXlUKzZ6?=
+ =?utf-8?B?VGFFMXhpTFQrL2ZlaVFKTzBaeWdhU05Rei9hYnFZZ240eWJlYm1mY0lJOUky?=
+ =?utf-8?Q?4stLdTzpgcThj?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MzMycEczSldwZFV1NmxRcDg1T3RwbEpJVmd5bS80N1RVSUdyZENnSVAxYk13?=
+ =?utf-8?B?SUU0TElFSjdPMmg3MFVSbktZcWNDWVVxRGdJZEQray9FZThsZk9SSVNoQmZL?=
+ =?utf-8?B?RVNMRUpMTEM2NmV2NkdQNjJEcGNrRFdGMURoOUR0ejE1dit0czgyYlZjdFNR?=
+ =?utf-8?B?OGdOb2l4SjZmOVd6Q0NiMTVyaHFkeHBEWllGOUd4MENJRmdnYks1aDZrYnFW?=
+ =?utf-8?B?RjNUOHUrSlgzQllGN0ErczZsTWV1YlFzdW5BdzMzcjZZRW5qemZNVmNiU3pF?=
+ =?utf-8?B?bjdvM0xYd3VjUEJRSmoydU85NlV5bHB2TkJCUW5HTWtQRldlMWhIQm5JVkxM?=
+ =?utf-8?B?N3RiOTBUV2M4YllwR2IxdXlkRkYvVHBFc09yOTM0ZWZoekZleUdLRmVnZ2tI?=
+ =?utf-8?B?Mk9oYVpBVFFWczN5ZFdKUXltcmh4YmhyL21wV0x3L25zSEZFR2hDZ3B6Smt4?=
+ =?utf-8?B?UUNJV1gzNFZYdDBYTVR1UFRHK0R4UnVyMENEdlpRZzlwVHJJclFWeThsZUd4?=
+ =?utf-8?B?dUc5bSthbGEvZEIzSjg4eGNsSFkrTUR4Wm04cmQ2WlZxeHQvSmxLVG1QTGJx?=
+ =?utf-8?B?dEVkdzgySzRhRytoOFVmMEc1WEVpcHEwUGloTUt3RUR4dm1qTEozU1p6bUgy?=
+ =?utf-8?B?bEpoaSt0UFNSaXJkVllkb2ZtNjN1bHI3SEhWbXZuRnJMdUVNK1dhV0tNVWVl?=
+ =?utf-8?B?RVhmSTMzUFBnZncxb3p4Z0xuUGpWai9EZThYMENBM2FINm90SGFicHVSVDZL?=
+ =?utf-8?B?YlVZOU5YRVJzcU9JeWxYVU90b1hvTkh2YjcrVXFkUndHd01PdDY3YXVHNzhx?=
+ =?utf-8?B?eUh0NitBcXFyaUdJYnZoMG80YXJLSjZ3aTJXWFYzdzNIVVhHby9WZm5NcWtT?=
+ =?utf-8?B?Mk9HQlRZeWE4OFF1UmNqTTJoVEt5OGpLSXQzRWFHR0NrT3VjdTIxWkoyZDly?=
+ =?utf-8?B?dk1ZZ0ZUL1NnWXVaa2tsKzcrNHAwRjZ3YkdGcUg2YW9Vano5TkZaVVkyNkNx?=
+ =?utf-8?B?UFV2Qm80azhKY1J4UDU2VnZPQXlTeUtHdml3QnNZNTgwVWZGckNIU0xYa0Y3?=
+ =?utf-8?B?RWN6cWs3bC9pbU5HQ3lsSVFVL0V5RzgyRGJMSVpIaHBQOFdFUCtmaGlpcjZt?=
+ =?utf-8?B?bjJkdllGMWxnR2RSbkdKZ2xWQ084TkdKdDlWZFhQS1Jyb0p6eXN4VUxrT2xQ?=
+ =?utf-8?B?TFNBMnJUODlaT1MvREROZ2NQRXUyaG9zZW1YZWNaUjNtQTZQSlQ4UlhPREM4?=
+ =?utf-8?B?WDRhdi9NVW1UWmFWeDIwSHRldUtoM0JvUmJ4Z0FHQXNyQXZQUFpmYWhCKzhL?=
+ =?utf-8?B?SW9VV2JRcjJiNGkwYTE5a1Jzdnl3S2s5Zlh6TXh2L2x5UXVzMUNpSmcvZWRQ?=
+ =?utf-8?B?WGFia2hlcGhQeTEwcE9jTTlTOUN6RTB6ay84OVMyeFJjZFFoRG1MYUZRTWpy?=
+ =?utf-8?B?NVgzak8vcTdIQkxJOVBWaVEzT3EvY2hpRjJBcUN0N1F3WFlocmxsbW5zSDhL?=
+ =?utf-8?B?TGx0Kys0NzV6MVNvYzlqVzRhZlJKMmhNbHArMTlYcXpXc1FuNzZkQXZVLzVa?=
+ =?utf-8?B?WUZyMklXWlQxbEVSYkNkeHM2Qy9HOS9iUWMvMC84UXhEdmxVbHhuUE5jY1RR?=
+ =?utf-8?B?aUgzM294SnQwM05BbW96RnJHRnEyYm44V09LaENEeWtRMWxyUmJjSG52QVB1?=
+ =?utf-8?B?UkpHZkRDN3cyN2pobkRQdm1FV1I5RTdmdVFXanVPdlhKOCtwVHJCZzcyTldY?=
+ =?utf-8?B?Uzh0N2dLWTh1RGVTSWsyTTduNEs1U3BpRkxhTTJSeWRXZUZoalV2YjJoWEtO?=
+ =?utf-8?B?WkFYc0FzOUJLZU1XY0JTVHF6Zmk3eHVKdEFLUkFYOVFaeWYvZVJmTkJvdUJo?=
+ =?utf-8?B?ekozdWRqQzdCU2RwVCt6STN4VWxiUTNkVXJvTzhEcU92YlNKUVMwY08waUZZ?=
+ =?utf-8?B?VG8xOG1ORVpQaGZLUlF3L2lmaFgxSGhYaG9tUWdrd01rK3d1V3dKaExHK3hk?=
+ =?utf-8?B?Q2FnOUJQa0I1ejBCWnlIenRnM2x2VjM0WmcxSkZrSG5HbTcvdDV5cHMwRFdS?=
+ =?utf-8?B?S3ZEcXJLR1BKdlEvWldLeVgwNFRNMm5VWWRMbkovVDRjQW9MVjgzeE9MeEpp?=
+ =?utf-8?B?eVBYWThXcjdXUEI4S0FwZkczTE9tVVBVVGhhcnd1V1pqWW1sYjZRYk9NMDhZ?=
+ =?utf-8?B?V0E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ccdab905-ec6d-4bf7-6792-08dd5a3a4142
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2025 10:00:40.6898
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: hqw5CeIlDa3MdGvYjp7HIOXQmJ92kvPey98F2+tkJwMUiilZQaAzvd8YD0iCbqKgW13pUhiOOR7m1WVwrJaGADWqE6fKkQJPpsEp+k2tNXM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB7475
+X-OriginatorOrg: intel.com
 
-On Mon, Mar 03, 2025 at 09:41:13AM +0000, Lad, Prabhakar wrote:
-> Hi Russell,
+On 2/28/25 18:17, Simon Horman wrote:
+> On Tue, Feb 25, 2025 at 10:08:49AM +0100, Martyna Szapar-Mudlaw wrote:
+>> From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+>>
+>> Fix using the untrusted value of proto->raw.pkt_len in function
+>> ice_vc_fdir_parse_raw() by verifying if it does not exceed the
+>> VIRTCHNL_MAX_SIZE_RAW_PACKET value.
+>>
+>> Fixes: 99f419df8a5c ("ice: enable FDIR filters from raw binary patterns for VFs")
+>> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+>> Signed-off-by: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+>> ---
+>>   .../ethernet/intel/ice/ice_virtchnl_fdir.c    | 25 +++++++++++++------
+>>   1 file changed, 17 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c b/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
+>> index 14e3f0f89c78..6250629ee8f9 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
+>> +++ b/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
+>> @@ -835,18 +835,27 @@ ice_vc_fdir_parse_raw(struct ice_vf *vf,
+>>   	u8 *pkt_buf, *msk_buf __free(kfree);
+>>   	struct ice_parser_result rslt;
+>>   	struct ice_pf *pf = vf->pf;
+>> +	u16 pkt_len, udp_port = 0;
+>>   	struct ice_parser *psr;
+>>   	int status = -ENOMEM;
+>>   	struct ice_hw *hw;
+>> -	u16 udp_port = 0;
+>>   
+>> -	pkt_buf = kzalloc(proto->raw.pkt_len, GFP_KERNEL);
+>> -	msk_buf = kzalloc(proto->raw.pkt_len, GFP_KERNEL);
+>> +	if (!proto->raw.pkt_len)
+>> +		return -EINVAL;
 > 
-> On Sun, Mar 2, 2025 at 9:20 PM Lad, Prabhakar
-> <prabhakar.csengg@gmail.com> wrote:
-> >
-> > Hi Russell,
-> >
-> > On Sun, Mar 2, 2025 at 7:33 PM Russell King (Oracle)
-> > <linux@armlinux.org.uk> wrote:
-> > >
-> > > On Sun, Mar 02, 2025 at 06:18:08PM +0000, Prabhakar wrote:
-> > > > +     gbeth->dev = dev;
-> > > > +     gbeth->regs = stmmac_res.addr;
-> > > > +     plat_dat->bsp_priv = gbeth;
-> > > > +     plat_dat->set_clk_tx_rate = stmmac_set_clk_tx_rate;
-> > >
-> > > Thanks for using that!
-> > >
-> > Yep, it shortens the glue driver further.
-> >
-> > > > +     plat_dat->flags |= STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY |
-> > > > +                        STMMAC_FLAG_EN_TX_LPI_CLOCKGATING |
-> > >
-> > > I would like to know what value tx_clk_stop is in
-> > > stmmac_mac_enable_tx_lpi() for your setup. Ideally, stmmac should
-> > > use the capability report from the PHY to decide whether the
-> > > transmit clock can be gated, but sadly we haven't had any support
-> > > in phylib/phylink for that until recently, and I haven't modified
-> > > stmmac to allow use of that. However, it would be good to gain
-> > > knowledge in this area.
-> > >
-> > tx_clk_stop =1,
-> >
-> > root@rzv2h-evk-alpha:~# ifconfig eth0 up
-> > [  587.830436] renesas-gbeth 15c30000.ethernet eth0: Register
-> > MEM_TYPE_PAGE_POOL RxQ-0
-> > [  587.838636] renesas-gbeth 15c30000.ethernet eth0: Register
-> > MEM_TYPE_PAGE_POOL RxQ-1
-> > [  587.846792] renesas-gbeth 15c30000.ethernet eth0: Register
-> > MEM_TYPE_PAGE_POOL RxQ-2
-> > [  587.854734] renesas-gbeth 15c30000.ethernet eth0: Register
-> > MEM_TYPE_PAGE_POOL RxQ-3
-> > [  587.926860] renesas-gbeth 15c30000.ethernet eth0: PHY [stmmac-0:00]
-> > driver [Microchip KSZ9131 Gigabit PHY] (irq=POLL)
-> > [  587.949380] dwmac4: Master AXI performs fixed burst length
-> > [  587.954910] renesas-gbeth 15c30000.ethernet eth0: No Safety
-> > Features support found
-> > [  587.962556] renesas-gbeth 15c30000.ethernet eth0: IEEE 1588-2008
-> > Advanced Timestamp supported
-> > [  587.971420] renesas-gbeth 15c30000.ethernet eth0: registered PTP clock
-> > [  587.978004] renesas-gbeth 15c30000.ethernet eth0: configuring for
-> > phy/rgmii-id link mode
-> > root@rzv2h-evk-alpha:~# [  591.070448] renesas-gbeth 15c30000.ethernet
-> > eth0: tx_clk_stop=1
-> > [  591.076590] renesas-gbeth 15c30000.ethernet eth0: Link is Up -
-> > 1Gbps/Full - flow control rx/tx
-> >
-> > With the below diff:
-> >
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > index aec230353ac4..68f1954e6eea 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > @@ -1100,6 +1100,7 @@ static int stmmac_mac_enable_tx_lpi(struct
-> > phylink_config *config, u32 timer,
-> >         struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
-> >         int ret;
-> >
-> > +       netdev_err(priv->dev, "tx_clk_stop=%d\n", tx_clk_stop);
-> >         priv->tx_lpi_timer = timer;
-> >         priv->eee_active = true;
-> >
-> > > > +                        STMMAC_FLAG_RX_CLK_RUNS_IN_LPI |
-> > >
-> I got some feedback from the HW team, based on the feedback this flag
-> depends on the PHY device. I wonder if we should create a DT property
-> for this. Please share your thoughts.
+> Hi Martyna,
+> 
+> It seems to me that the use of __free() above will result in
+> kfree(msk_buf) being called here. But msk_buf is not initialised at this
+> point.
+> 
+> My suggest would be to drop the use of __free().
+> But if not, I think that in order to be safe it would be best to do this
+> (completely untested;
+> 
+> 	u8 *pkt_buf, *msk_buf __free(kfree) = NULL;
 
-Not sure exactly which flag you're referring to, because you first
-quote the code that you added to dump the _transmit_ clock stop,
-and then you named the _receive_ clock flag.
+Oh yeah!, thank you Simon for catching that.
 
-I assume you're referring to STMMAC_FLAG_EN_TX_LPI_CLOCKGATING, which
-is currently used by the driver because it didn't know any better to
-check the capabilities of the PHY - and phylib didn't expose an
-interface to do that.
-
-tx_clk_stop is basically the flag from the PHY indicating whether the
-MAC may be permitted to stop its transmit clock. Unfortunately, we
-can't just switch over to using that in stmmac because of it's dumb
-history as that may cause regressions. As we haven't used this flag
-from the PHY before, we have no idea whether it's reliable or not,
-and if it isn't reliable, then using it will cause regressions.
-
-I think that the way forward would be to introduce yet another flag
-(maybe STMMAC_FLAG_LPI_TX_CLK_PHY_CAP) and:
-
-	if (priv->plat->flags & STMMAC_FLAG_LPI_TX_CLK_PHY_CAP)
-		priv->tx_lpi_clk_stop = tx_clk_stop;
-	else
-		priv->tx_lpi_clk_stop = priv->plat->flags &
-					STMMAC_FLAG_EN_TX_LPI_CLOCKGATING;
-
-and then where STMMAC_FLAG_EN_TX_LPI_CLOCKGATING is checked, that
-becomes:
-
-	ret = stmmac_set_lpi_mode(priv, priv->hw, STMMAC_LPI_TIMER,
-				  priv->tx_lpi_clk_stop,
-				  priv->tx_lpi_timer);
-
-It's rather annoying to have to include a flag to say "use the 802.3
-standard behaviour" but given that we want to avoid regressions I don't
-see any other choice. It would've been nice to have had the driver
-using the PHY capability, but that horse has already bolted. We can now
-only try to encourage platform glue authors to try setting
-STMMAC_FLAG_LPI_TX_CLK_PHY_CAP with the above in place.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+I would say "naked __free()" was harmful here.
 
