@@ -1,121 +1,194 @@
-Return-Path: <netdev+bounces-171374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D49D1A4CBF4
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 20:29:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 155E8A4CC03
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 20:32:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED0F6173806
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 19:29:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08B561894BD7
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 19:33:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F0DA22DF95;
-	Mon,  3 Mar 2025 19:28:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11948214A93;
+	Mon,  3 Mar 2025 19:32:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GegXOxQO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Flt7mgPG"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40906226861
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 19:28:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7459A1C8604
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 19:32:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741030137; cv=none; b=n8BPUiPiLWBv1RDGR3/Aor1ohEw9MjqFudbgzWU68X1+4DL2UXHgA/E+w/WUub6XJvh+ZMIGA91Bek4NMZKVVM3ic++Ug9SIE1x+7zD01h12u4vv+ThB4503FbKexGLrGF4Ir6yTbuLX13JqfxyFVZEERNC4wHydEi8+pNzqipo=
+	t=1741030373; cv=none; b=Je9TBnt4kpwFv/OSFDdzFN1Gvm+cKuJLLXMRVdR4jKjloFhYWgm2DGkjc20mNy8XaOReTth0HV97WimReYOJqFqungOzR7QBI2pu39LNyGgI0IKlZ9f6A1SvPIS3A09ic1BN8J5HnWfKePwM5Gvwwp1MEeMe8BgmrOSMZjViCKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741030137; c=relaxed/simple;
-	bh=GrTUyx/IeJfdqo7iKYYR4uGFEkbDgD/G++8REVC7toM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n0rX6eiPxmLMWVpnnkqyW37vwGMSO32FnVGhEz8nksAcd6hE8csyFTSI96QNAo+sRxn5P0tzyrVIDERii+WT4fNdoQ5Pa/AMXOPjVCsGK1eOlwyCXo3Jz/I3vhug7t8Ln5Fbd66VhGo+OSWKtzv5U1mytRY2VTxnSwNfF55NhrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GegXOxQO; arc=none smtp.client-ip=95.215.58.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <eb6f77f2-3518-4fa4-bdb8-7438cd708ad1@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1741030133;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9U5IgeW+FuaLX038UuIvA2IE6lvvCpFaZI1MTKj94Hg=;
-	b=GegXOxQO0A+ZajvVObN4wZmpn4po8WAFAUeYPFu/cTv67xV8+Xi+YT9pnoOSYriC3RsOKP
-	gepGH3Uh5nhHzxOFe9t2zzCGy714V6APgsy3SYZflirByEWHsjfxmsEWSboIr3v1dIqRB/
-	fkuh4w6j/QVWFAXQ6mMs2btM1PdJ95A=
-Date: Mon, 3 Mar 2025 11:28:45 -0800
+	s=arc-20240116; t=1741030373; c=relaxed/simple;
+	bh=0VMSB2O0MJikZNSDjmXSMMAz2W/lpShULie4XwxTol4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gx/i9SbgmI3B0IF6x5dj4evnXlRgZexZMZ9lBoxKuFslKc0SUl8c/3JnmSmahD+ZNAwV99ppngLumU2iImONwWV/lf2+hxR9NniFIzxT5jPjuV6eKdKMKWS6QHQ30UkfZBhcSg+uBKNJPms7PAI/dIspy5MlokyNPuibpke+Z9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Flt7mgPG; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7be49f6b331so486683385a.1
+        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 11:32:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741030370; x=1741635170; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DZ5qkFVsY7VE+1m3ZWo7fB1WRrOqQu4migYvOb+yNUc=;
+        b=Flt7mgPGLMN1ENqvKTXjHyoczQWoU7LhKfd32a0ODnIMQDBLH6bS6PiisUmMsR5qWj
+         S3waw3rX85qu2i3EvLWrVdsB8BAkyohFAdHDWh7N2UkIBhIqAsMvPHyvCQ2TWV/OOwQz
+         IGcgVPVXr2OEO9jp/c2zCMR5w1XrieNaJfjQ1bfeZeXeFYxIoZYXkPh2S8habnLvPI9V
+         tXVVfVBFucQq8vxJnIq99XS6BT4G00IICp9KVgfBY89xADDMeHfX5cOmG0gRc1xxvolL
+         S4qMIvzNp/AuXs6bkTh5RMZM3uGXbthT2I0decpv1zWwMYDkuaerAlKbZIlrm7ASpa3c
+         6h7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741030370; x=1741635170;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DZ5qkFVsY7VE+1m3ZWo7fB1WRrOqQu4migYvOb+yNUc=;
+        b=XT9MfpXjROa5QK+IF56Zn9fePrf3Wk33gtHiabxZFuZ0AdTm216Zc3kpdciNb3k6BP
+         L3D5G6gb2+wOeSwO4YrU8SIZd4qyN8Y5ZX1EBa1myCCWxcJjbxOUfLFChBpf9j27lhsA
+         0Ls5abI4PZmhqWUmTJNcBdOI0Bp/Wi5pg8r5GttwqOe3xYPbyXr1lUsQTqbEHM/oOvbc
+         2GcYMowE72n6gcuxPx0p8GSAeAwOAHVP8mxCnSs7TGO2H3jcQXmD2NpFLehnjalmqhep
+         b/qe41TgXx0oMBou/hmZUAFJLfuQNdjLKgyvLxn7hOcIb0rxGW+lD2ec0lFnnRK1TJDm
+         pRdg==
+X-Gm-Message-State: AOJu0YxMR+k2WWpvhNg9KWLMVVCAzBSE3bBzAMV1UovjhCOb3wAn1kWH
+	+7GaAY9UcQ1BVNgv5u9pf71dhKkKW0KCJqZlJHQbzuc8pcriqXvFGtvMcC0H
+X-Gm-Gg: ASbGncvmbG1tXlFUZNgmFDSidsju2oDC3eS2zdHkJCy+utOMVjsYtlVJp00+Pv5P2by
+	pZhyxc6UB1GVFpZQbqA0ONNiYhTBcmcYHj7nXtp3774VBBEgjvS7PkahiCMm3iQ1U9ljepOMSNz
+	qQWVTI9N773JzsYny8RbwjmIJr1zJIphz3wYzjDD5DfJ8zgFhCPVZjgRqrPwvpdeqxyr/eiyrTM
+	bCCF3zP6W4Tkhd6m+3QIfy6QOoEjhYqq9umYuq0A8h9ysvAFae4pPYafz9bRv/rPEP90Cqpq8cl
+	Na6+Kxv/ceRCWn3SQs5AMaaVxAXof6rU6DltaBI+EvAqGBNTny2yd8gMgagE55DekPJ3zuC7sPl
+	gvJTAsuiS
+X-Google-Smtp-Source: AGHT+IGxnkv3yOl0mZGx4BpIs1bORrfb2mY0w9cJbtg06XKQ9JjdA/DOsL6kxVL1WScRprGqjM9r2A==
+X-Received: by 2002:a05:620a:244a:b0:7c0:c214:f2d with SMTP id af79cd13be357-7c39c4c70fbmr1991319085a.31.1741030370158;
+        Mon, 03 Mar 2025 11:32:50 -0800 (PST)
+Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c378db7091sm632580385a.115.2025.03.03.11.32.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Mar 2025 11:32:49 -0800 (PST)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	David Ahern <dsahern@gmail.com>,
+	stephen@networkplumber.org
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Andrea Claudi <aclaudi@redhat.com>,
+	Jan Tluka <jtluka@redhat.com>,
+	olichtne@redhat.com,
+	wenxu <wenxu@ucloud.cn>
+Subject: [PATCH iproute2-next] man: document tunnel options in ip-route.8.in
+Date: Mon,  3 Mar 2025 14:32:48 -0500
+Message-ID: <528cee6bcfd8ff5b4d294d5b59d5c1ccfec18e19.1741030368.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v4 2/6] net: tun: enable transfer of XDP metadata
- to skb
-To: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
-Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, mykolal@fb.com,
- shuah@kernel.org, hawk@kernel.org, Willem de Bruijn <willemb@google.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20250227142330.1605996-1-marcus.wichelmann@hetzner-cloud.de>
- <20250227142330.1605996-3-marcus.wichelmann@hetzner-cloud.de>
- <090ede76-0c9f-4297-9d5a-7b75aa20ca27@linux.dev>
- <4b69bd2b-a0ad-44f6-9f43-070241bd8089@hetzner-cloud.de>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <4b69bd2b-a0ad-44f6-9f43-070241bd8089@hetzner-cloud.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-On 3/3/25 8:13 AM, Marcus Wichelmann wrote:
-> Am 28.02.25 um 20:49 schrieb Martin KaFai Lau:
->> On 2/27/25 6:23 AM, Marcus Wichelmann wrote:
->>> When the XDP metadata area was used, it is expected that the same
->>> metadata can also be accessed from TC, as can be read in the description
->>> of the bpf_xdp_adjust_meta helper function. In the tun driver, this was
->>> not yet implemented.
->>>
->>> To make this work, the skb that is being built on XDP_PASS should know
->>> of the current size of the metadata area. This is ensured by adding
->>> calls to skb_metadata_set. For the tun_xdp_one code path, an additional
->>> check is necessary to handle the case where the externally initialized
->>> xdp_buff has no metadata support (xdp->data_meta == xdp->data + 1).
->>>
->>> More information about this feature can be found in the commit message
->>> of commit de8f3a83b0a0 ("bpf: add meta pointer for direct access").
->>>> Signed-off-by: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
->>> Reviewed-by: Willem de Bruijn <willemb@google.com>
->>> Acked-by: Jason Wang <jasowang@redhat.com>
->>> ---
->>>    drivers/net/tun.c | 25 ++++++++++++++++++++++---
->>>    1 file changed, 22 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
->>> index 4ec8fbd93c8d..70208b3a2e93 100644
->>> --- a/drivers/net/tun.c
->>> +++ b/drivers/net/tun.c
->>
->> The changes have conflicts with the commit 2506251e81d1 ("tun: Decouple vnet handling").
->>
->> It is better to rebase the works onto the bpf-next/net,
->> i.e. the "net" branch instead of the "master" branch.
-> 
-> Alright, will do that. Should I send it as a v5 and still with "PATCH bpf-next"
-> in the header or something else?
+Add missing tunnel options [GENEVE_OPTS | VXLAN_OPTS | ERSPAN_OPTS] and
+their descriptions to ip-route.8.in.
 
-That should do. The bpf CI should pick up the bpf-next/net if it fails to apply 
-to the bpf-next/master because of the conflict mentioned above.
+Additionally, document each parameter of the ip ENCAPHDR section, aligning
+it with the style used for other ENCAPHDR descriptions. Most of the
+content is adapted from tc-tunnel_key.8 for consistency.
 
-For patch 3, it should help to avoid the future merge conflict if the 
-open_tuntap() is added a few lines above in the network_helpers.h. For patch 6, 
-the "test_ns_" naming is not in bpf-next/net yet. Other tests in the same file 
-is doing netns_new. May be just do the same and cleanup all at once of this file 
-later.
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+---
+ man/man8/ip-route.8.in | 63 +++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 56 insertions(+), 7 deletions(-)
+
+diff --git a/man/man8/ip-route.8.in b/man/man8/ip-route.8.in
+index 69d445ef..ccad430b 100644
+--- a/man/man8/ip-route.8.in
++++ b/man/man8/ip-route.8.in
+@@ -216,7 +216,13 @@ throw " | " unreachable " | " prohibit " | " blackhole " | " nat " ]"
+ .B tos
+ .IR TOS " ] ["
+ .B  ttl
+-.IR TTL " ]"
++.IR TTL " ] ["
++.BR key " ] ["
++.BR csum " ] ["
++.BR seq " ] ["
++.IR GENEVE_OPTS " | "
++.IR VXLAN_OPTS " | "
++.IR ERSPAN_OPTS " ]"
+ 
+ .ti -8
+ .IR ENCAP_BPF " := "
+@@ -783,15 +789,58 @@ is a set of encapsulation attributes specific to the
+ .in +2
+ .B id
+ .I TUNNEL_ID
++- Tunnel ID (for example VNI in VXLAN tunnel)
++.sp
++
+ .B  dst
+-.IR REMOTE_IP " [ "
++.I REMOTE_IP
++- Outer header destination IP address (IPv4 or IPv6)
++.sp
++
+ .B src
+-.IR SRC " ] ["
++.I SRC
++- Outer header source IP address (IPv4 or IPv6)
++.sp
++
+ .B tos
+-.IR TOS " ] ["
+-.B  ttl
+-.IR TTL " ] [ "
+-.BR key " ] [ " csum " ] [ " seq " ] "
++.I TOS
++- Outer header TOS
++.sp
++
++.B ttl
++.I TTL
++- Outer header TTL
++.sp
++
++.B key
++- Outer header flags with key in GRE tunnel
++.sp
++
++.B csum
++- Outer header flags with csum in GRE tunnel
++.sp
++
++.B seq
++- Outer header flags with seq in GRE tunnel
++.sp
++
++.I GENEVE_OPTS
++- Pecified in the form CLASS:TYPE:DATA, where CLASS is represented as a
++16bit hexadecimal value, TYPE as an 8bit hexadecimal value and DATA as a
++variable length hexadecimal value. Additionally multiple options may be
++listed using a comma delimiter.
++.sp
++
++.I VXLAN_OPTS
++- Pecified in the form GBP, as a 32bit number. Multiple options is not
++supported.
++.sp
++
++.I ERSPAN_OPTS
++- Pecified in the form VERSION:INDEX:DIR:HWID, where VERSION is represented
++as a 8bit number, INDEX as an 32bit number, DIR and HWID as a 8bit number.
++Multiple options is not supported. Note INDEX is used when VERSION is 1,
++and DIR and HWID are used when VERSION is 2.
+ .in -2
+ .sp
+ 
+-- 
+2.47.1
 
 
