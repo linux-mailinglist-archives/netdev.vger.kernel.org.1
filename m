@@ -1,127 +1,96 @@
-Return-Path: <netdev+bounces-171079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94534A4B61C
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 03:28:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F2435A4B61D
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 03:30:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFF3B1696FB
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 02:28:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FCB41643CD
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 02:30:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2075D13B284;
-	Mon,  3 Mar 2025 02:27:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B5A16FF37;
+	Mon,  3 Mar 2025 02:30:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ng57cnXk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qgUAJaJN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50B7D14AD20
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 02:27:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 405C3155336;
+	Mon,  3 Mar 2025 02:30:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740968873; cv=none; b=SV4RCgTgec4/wEJdSimow7DxDpXdbWDRRo1pp5jBHz+OYuUZEqSLr/AjH4GXk41OnsLvCClyFNPqJiVGXEuYS0FIOBUPnIHq6w+Agb8lv4oz3q4Ep7l4969hKhIq98Pb/Kcd3YD7sdSU8P1eYtmn8PEU4bTGt8Z22r3QaeVA1/o=
+	t=1740969002; cv=none; b=J+4DSOCDbbN8HSX4Fk2LLaluEM8I2jthuJebwGUWaVct3WMYys7XiSPShmDevvwuQhVtEVy48+XDjbq0wf2jB2I14ldksk7yboAxcFI+O4KPysxz9sUCZv4MFVew7fnU/I418tArl990wOVKRiLBmcibxEJ907qlnlVojp6tdpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740968873; c=relaxed/simple;
-	bh=+yaRIRHwJhYD80ovU3oLHy/7gA+I7If+Tf09MlnOGsY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uOz7iE2D5Mt91FqHigXonhhfdFngGdPzyKbTCiKrYPehfe7MVuJbyH2c6Gf8Zdr34ZLGek2vjXFw5BmBmOSyduRcwkS6oHPOa5iGCpxe+r+qk+4jd20R94DqJEBh3sJbvHej+NXcZ7TXnDO6u+rmv6SR60wilfuugsGF9vdC6KY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ng57cnXk; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740968872; x=1772504872;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=+yaRIRHwJhYD80ovU3oLHy/7gA+I7If+Tf09MlnOGsY=;
-  b=Ng57cnXkWjd5OIHs5bdagTHvli0sv+pqFWkSDrn6B4t0lBzT8NJh/p9O
-   RMiQvG1sRxFawQdB5ublclZxXk39esnpOFtvmj/hpEQfRXv3E0DLeM3U3
-   hCS3YfWrCnca+6AT9TU92sh+fDI5ChtzZB+EC+BQodeVQzWVoIegsA9on
-   TnEAcgGH1NjYpmXzdF6KAg72XM4UDhZs2HxWzCQVhRChnkmt3UgspREAq
-   f5lJ/3Nv4LOLmUsibBAkIDK9Bkui5tsHWPYTo77bV/JHfeiL+lv/HtMpy
-   G852AlQjp0mRc67oC/McJTFBVBxbp3ThEs7DXlNvmVhxfUkaT4Yoq73n6
-   Q==;
-X-CSE-ConnectionGUID: jRJP7QjqQnqV7ozt/tpGjw==
-X-CSE-MsgGUID: DZ+DK+ngR6OP85dDx9YgLw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="42021536"
-X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="42021536"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2025 18:27:51 -0800
-X-CSE-ConnectionGUID: RH2BbcC4ScmT23C5Uvymig==
-X-CSE-MsgGUID: iW+f1ZttQMCM6AwXUt/Sqw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,328,1732608000"; 
-   d="scan'208";a="117871253"
-Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
-  by fmviesa007.fm.intel.com with ESMTP; 02 Mar 2025 18:27:48 -0800
-Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tovWz-000Hpj-23;
-	Mon, 03 Mar 2025 02:27:45 +0000
-Date: Mon, 3 Mar 2025 10:27:30 +0800
-From: kernel test robot <lkp@intel.com>
-To: Saeed Mahameed <saeed@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-	Vlad Dumitrescu <vdumitrescu@nvidia.com>
-Subject: Re: [PATCH net-next 04/14] net/mlx5: Implement devlink enable_sriov
- parameter
-Message-ID: <202503030926.KNBxmdVW-lkp@intel.com>
-References: <20250228021227.871993-5-saeed@kernel.org>
+	s=arc-20240116; t=1740969002; c=relaxed/simple;
+	bh=gYDv6VHFzCh/bELt4lBENpI5/5kEzpS/cYqmU/2T7Gg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=A2BJDSjfZ0ELKH9ohy/TJ6GAAdj1DvDaXArjfXRLVJRXSFgCL7DLN/R9sNdpckwSIp4jGXc9d4rlPS7R+AKVWnfTfuXdRNzuVQYdY9chlZMm0R/AKPdWVjB4pxHvsadY9D5QeeNndJnA2UTSm5MdIHUHQRflqEa7xlCGIPaz5zA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qgUAJaJN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3BA0C4CED6;
+	Mon,  3 Mar 2025 02:30:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740969001;
+	bh=gYDv6VHFzCh/bELt4lBENpI5/5kEzpS/cYqmU/2T7Gg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=qgUAJaJNYxz5Vn2foCmhoOsHyNp+LGTJtKZ/C73hUTd5b9Nx6K3RHg76SUIGweu9D
+	 x9TnKDz0V+1gWtMww2JsKQoqCBaktE0CquDY9sZKGKSfo7zZmnzS4g/bRZaokklzGa
+	 sblFLl7chmi71QK7nsl6/HyKqZEGPFLLD0OArN2BGtQwuO7CcvGAkf7NCCxTrsiwxL
+	 BWW/prisrc5YXBMd2VHyfF1Vgm6cLyv7L6HgRhfSNOsQDEFRM3NAEdy0jN3X+aXFOV
+	 Q5c/UMb4cA2hwOEAy9quOQEuLnrVjRAUn7ehz+qKy91eeBiD0rKLrYjvl3QX92h59P
+	 5TnWxYwO9DkEw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7175C380CFE8;
+	Mon,  3 Mar 2025 02:30:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250228021227.871993-5-saeed@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next] bpf: no longer acquire map_idr_lock in
+ bpf_map_inc_not_zero()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174096903429.3067520.8581639829502148937.git-patchwork-notify@kernel.org>
+Date: Mon, 03 Mar 2025 02:30:34 +0000
+References: <20250301191315.1532629-1-edumazet@google.com>
+In-Reply-To: <20250301191315.1532629-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: ast@kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com,
+ sdf@fomichev.me, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ eric.dumazet@gmail.com, kuifeng@meta.com, martin.lau@kernel.org
 
-Hi Saeed,
+Hello:
 
-kernel test robot noticed the following build warnings:
+This patch was applied to bpf/bpf-next.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
 
-[auto build test WARNING on net-next/main]
+On Sat,  1 Mar 2025 19:13:15 +0000 you wrote:
+> bpf_sk_storage_clone() is the only caller of bpf_map_inc_not_zero()
+> and is holding rcu_read_lock().
+> 
+> map_idr_lock does not add any protection, just remove the cost
+> for passive TCP flows.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Kui-Feng Lee <kuifeng@meta.com>
+> Cc: Martin KaFai Lau <martin.lau@kernel.org>
+> 
+> [...]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Saeed-Mahameed/devlink-define-enum-for-attr-types-of-dynamic-attributes/20250228-101818
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250228021227.871993-5-saeed%40kernel.org
-patch subject: [PATCH net-next 04/14] net/mlx5: Implement devlink enable_sriov parameter
-compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
+Here is the summary with links:
+  - [bpf-next] bpf: no longer acquire map_idr_lock in bpf_map_inc_not_zero()
+    https://git.kernel.org/bpf/bpf-next/c/17a82ed98f62
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202503030926.KNBxmdVW-lkp@intel.com/
-
-includecheck warnings: (new ones prefixed by >>)
->> drivers/net/ethernet/mellanox/mlx5/core/devlink.c: lib/nv_param.h is included more than once.
-
-vim +11 drivers/net/ethernet/mellanox/mlx5/core/devlink.c
-
-     5	
-     6	#include "mlx5_core.h"
-     7	#include "fw_reset.h"
-     8	#include "fs_core.h"
-     9	#include "eswitch.h"
-    10	#include "esw/qos.h"
-  > 11	#include "lib/nv_param.h"
-    12	#include "sf/dev/dev.h"
-    13	#include "sf/sf.h"
-  > 14	#include "lib/nv_param.h"
-    15	
-
+You are awesome, thank you!
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
