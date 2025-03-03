@@ -1,85 +1,62 @@
-Return-Path: <netdev+bounces-171290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B019A4C5F2
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:02:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7776EA4C5F5
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:02:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94F857A3845
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 16:01:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E260818941A0
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 16:02:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B04C91DB148;
-	Mon,  3 Mar 2025 16:01:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59D391DB148;
+	Mon,  3 Mar 2025 16:02:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="d1G142Qr"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ExXigSCm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C431784A3E
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 16:01:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B1D7080D;
+	Mon,  3 Mar 2025 16:02:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741017712; cv=none; b=hawV+NUG08tPZPUedooOq9JRafOuhy4U2xVHNj+OMYYLIAUxu9ARpnouABKG2p97+wc9kJ1e2uaH+jFM4huC5FCeV60ASgsg9w2qI0kJpg8VWwVMWSO7VZ/XJuD7IIChW7/Perxu1T8tkJxXQDjL7Z2LAEEoJavRsbAG7iX0aec=
+	t=1741017733; cv=none; b=PqDSYO5I0yO6ZTEVI/T3ZY7RZrHOXDRTm3nx19fWAyCUx+Ed1zmnZm62+EOXWQbMcLd4rKSVmfUXErs3/x7PXxixGl5kLaxJVd3mLvB3YCUc0i4cQdlz0bWwkHtJwtRZOvj11Zv2rNzyyv9XqAgMaWJlR5OHsXZUy79e8ga3aHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741017712; c=relaxed/simple;
-	bh=/nquOOHVbaRNBY7sb1R2HBNCjY/dAiq818J3FR+qi4A=;
+	s=arc-20240116; t=1741017733; c=relaxed/simple;
+	bh=IpXNXjNLYnJF1MNTJjYBmJJw52tvl+CUVwSYOJCI5aM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=otfU8/90P1qBzaS6McN0BkC5CXrEa2fOAGb72nQ8bvu9YnYirtasb9x9BMluDrsVY2/a4J8r7Hj0syK0Akz/Bh0Q4VBg2vEYAtI5H9UgMi21TXlj3ki5V0cmht/ctU09hDAPtu98/ABJMYkdxgf1Ob/0zED5GeKLqovRMHjfkjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=d1G142Qr; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4394a0c65fcso49858865e9.1
-        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 08:01:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1741017709; x=1741622509; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/nquOOHVbaRNBY7sb1R2HBNCjY/dAiq818J3FR+qi4A=;
-        b=d1G142Qrbhmo6/AqiIuDvTiRjntmuvKwGuKkAOYQ064Sjbg0pSZc523QaGjUBv7Ja+
-         Rv6EzbfIZdF9jzf8HlgM4F+HfZPxwykz2m1wM8TSBIUA1VUUa0S2/OOqf2Sqde0GhIAV
-         pg2NvUkk0vMEv+8C8qKpJeAx9uZ9lGB5cFeXPI9A76IHzIvr+R8q7qVX4hi7tlSD4NJq
-         QUYZfJfvs3hvRgXI79oXfabRAt9RjmKS0TfPJB2+3M+zGN5Lw/rNL2jqxQrDzW+nKpP/
-         MufK+Q9NpC/wV7CdM+yL2eoEvWdLvbAt3JmSGxVxhDwpm7NZfVxfhFa/8JeGjhuqlxne
-         eBaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741017709; x=1741622509;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/nquOOHVbaRNBY7sb1R2HBNCjY/dAiq818J3FR+qi4A=;
-        b=Zg2ADI9ZuaZ/7ZkUg3/wMUq2GVGqGB96XAXPpVSMf9P4qqKwmYZ3GsS2OdM0Viwcwc
-         hhN3m/S8eWC0MZMW2mjNoNZXIQqoWsII1YVK7x4gvyalMQFNzX/d9sG0phULPPbNxXSd
-         HGYVglWYJXdkCdYVaJXZi4DO+hUgcJOC9B1hVB7O8kUDTpFIVu9vV071l2TBDiQITbNH
-         GCttN3WUe0DWVAikqS4Cwq8Bewx7xawLTKhc8TnuWEinrKNJfmshjP8l4E+ApwNwIbAr
-         kaYbDwXqsPKUYMqzIU+MVrnnMSkxRylk0+fB5VHjmKkG4e0Xd0JeQ+I/Q2vsdVtbrEat
-         P6Rw==
-X-Gm-Message-State: AOJu0YzIBoaB+dy5BtdIm333pI3GYBQSjTAtzzXaWiEsupryOngGBTj5
-	UKTRAiwsbIY/s4WZGaa0lD24bTxsXX7FjfKF/DmiEaHo6F+ppF0irqV3R6hl67Q=
-X-Gm-Gg: ASbGncvoqcr1rVQmNOSJl+c7pTeaJ/YsWe1t0kv6a7fE+NroZi0m3fct3BalqzqpPkk
-	S7zqDx+Jaqg8023OIbq7OoNGKqqlWo8w/a8SPa8Mjd2F+1RkZ2Vo8IKbiklZjg053i+3ATKJPPf
-	VqxGupaK1rNn0VUmbUPXYu6MkvXGka820V3KpIU6vFHPzfW+mHB1YSU6M4NHBkQCFR3FqVRchoN
-	D+7xZ5B73K/E04xPraVMV5LHK0o4LfNcaWUojkDVLEr2Mu+D7fw/mvODSmeB/3PSOC6ibLJIfjf
-	7vNK7gKPp94C0GTnJ3aNGve2fpLh+JBtw6U7uCloPNNKLge6pylN/t4uGU8QvolD9umi+7oC
-X-Google-Smtp-Source: AGHT+IF7zG1fhLrMiY98tqlb6OjOZhbOMMGGOCnx5alEj3y7iLMnzFDqnL1HoeULrGBy4deeswRUxA==
-X-Received: by 2002:a05:600c:4f12:b0:43b:8198:f713 with SMTP id 5b1f17b1804b1-43ba66d9e7emr137744935e9.4.1741017707141;
-        Mon, 03 Mar 2025 08:01:47 -0800 (PST)
-Received: from jiri-mlt.client.nvidia.com ([140.209.217.212])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bbb15841dsm59677905e9.1.2025.03.03.08.01.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Mar 2025 08:01:46 -0800 (PST)
-Date: Mon, 3 Mar 2025 17:01:43 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Oscar Maes <oscmaes92@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, viro@zeniv.linux.org.uk, 
-	linux-kernel@vger.kernel.org, security@kernel.org, stable@kernel.org, idosch@idosch.org, 
-	syzbot+91161fe81857b396c8a0@syzkaller.appspotmail.com
-Subject: Re: [PATCH net v3] vlan: enforce underlying device type
-Message-ID: <5a37x4qwepq7scmbv3u7tndci22siahtdslg6x23nlcpapfiis@driggpbpidnl>
-References: <20250303155619.8918-1-oscmaes92@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=PGDbgVhaHSiVv5ARbKQTUMK4llUcuSECJA5etrWPIZa3PR+DOvY/45WH0pB6859zyv4nAaAFAx4vFTxxAHUrvFVDNJ00Sasclqf8X9aS5+hrcwxQlxLd9Hhw+DkEeRFy+L1dEnkbUGa7pUPilzRFJ+PcMN04wlG1xKjJpyxgqBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ExXigSCm; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ZL8DvrgJGyhse//wJYi0Bnf1Fs9Yqso9d1y3MPnnH/M=; b=ExXigSCmYFsqs/6TXyUTDrL5p0
+	nxS5N/V3nSJPdZdWTq0CRgfJs/2LEGPtwc9ATBOeeUyZSiAOMoT1bKDNnC7Rs9pJIF1La1TI6FZb4
+	JFAi8FgelvvARO+Pg4lAQ+XqpO0pnC5LhyBqF31/AdcbPz1avwpgmE0GmfFDrZ4IApws=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tp8Et-001qxX-Qc; Mon, 03 Mar 2025 17:01:55 +0100
+Date: Mon, 3 Mar 2025 17:01:55 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: dimitri.fedrau@liebherr.com
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Dimitri Fedrau <dima.fedrau@gmail.com>, Marek Vasut <marex@denx.de>,
+	Oleksij Rempel <o.rempel@pengutronix.de>
+Subject: Re: [PATCH 1/2] net: phy: tja11xx: add support for TJA1102S
+Message-ID: <6df6cfe9-c6f6-4a1e-ba24-ef4843e356c0@lunn.ch>
+References: <20250303-tja1102s-support-v1-0-180e945396e0@liebherr.com>
+ <20250303-tja1102s-support-v1-1-180e945396e0@liebherr.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,45 +65,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250303155619.8918-1-oscmaes92@gmail.com>
+In-Reply-To: <20250303-tja1102s-support-v1-1-180e945396e0@liebherr.com>
 
-Mon, Mar 03, 2025 at 04:56:19PM +0100, oscmaes92@gmail.com wrote:
->Currently, VLAN devices can be created on top of non-ethernet devices.
->
->Besides the fact that it doesn't make much sense, this also causes a
->bug which leaks the address of a kernel function to usermode.
->
->When creating a VLAN device, we initialize GARP (garp_init_applicant)
->and MRP (mrp_init_applicant) for the underlying device.
->
->As part of the initialization process, we add the multicast address of
->each applicant to the underlying device, by calling dev_mc_add.
->
->__dev_mc_add uses dev->addr_len to determine the length of the new
->multicast address.
->
->This causes an out-of-bounds read if dev->addr_len is greater than 6,
->since the multicast addresses provided by GARP and MRP are only 6
->bytes long.
->
->This behaviour can be reproduced using the following commands:
->
->ip tunnel add gretest mode ip6gre local ::1 remote ::2 dev lo
->ip l set up dev gretest
->ip link add link gretest name vlantest type vlan id 100
->
->Then, the following command will display the address of garp_pdu_rcv:
->
->ip maddr show | grep 01:80:c2:00:00:21
->
->Fix the bug by enforcing the type of the underlying device during VLAN
->device initialization.
->
->Fixes: 22bedad3ce11 ("net: convert multicast list to list_head")
->Reported-by: syzbot+91161fe81857b396c8a0@syzkaller.appspotmail.com
->Closes: https://lore.kernel.org/netdev/000000000000ca9a81061a01ec20@google.com/
->Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
+On Mon, Mar 03, 2025 at 04:14:36PM +0100, Dimitri Fedrau via B4 Relay wrote:
+> From: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+> 
+> NXPs TJA1102S is a single PHY version of the TJA1102 in which one of the
+> PHYs is disabled.
+> 
+> Signed-off-by: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+> ---
+>  drivers/net/phy/nxp-tja11xx.c | 27 +++++++++++++++++++++++++++
+>  1 file changed, 27 insertions(+)
+> 
+> diff --git a/drivers/net/phy/nxp-tja11xx.c b/drivers/net/phy/nxp-tja11xx.c
+> index ed7fa26bac8e83f43d6d656e2e2812e501111eb0..8f3bd27b023b5755c223b6769980aad0b76aad89 100644
+> --- a/drivers/net/phy/nxp-tja11xx.c
+> +++ b/drivers/net/phy/nxp-tja11xx.c
+> @@ -21,6 +21,7 @@
+>  #define PHY_ID_TJA1100			0x0180dc40
+>  #define PHY_ID_TJA1101			0x0180dd00
+>  #define PHY_ID_TJA1102			0x0180dc80
+> +#define PHY_ID_TJA1102S			0x0180dc90
+>  
+>  #define MII_ECTRL			17
+>  #define MII_ECTRL_LINK_CONTROL		BIT(15)
+> @@ -316,6 +317,8 @@ static int tja11xx_config_init(struct phy_device *phydev)
+>  		if (ret)
+>  			return ret;
+>  		break;
+> +	case PHY_ID_TJA1102S:
+> +		fallthrough;
+>  	case PHY_ID_TJA1101:
+
+You don't need the fallthrough when there are no statements in the
+case.
 
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+    Andrew
+
+---
+pw-bot: cr
 
