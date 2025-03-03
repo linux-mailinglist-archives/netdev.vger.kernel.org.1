@@ -1,139 +1,129 @@
-Return-Path: <netdev+bounces-171782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D44B5A4EA11
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:55:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4482AA4EBCA
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:35:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7BB01887FDF
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:49:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C831885A39
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:56:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4A08259C8A;
-	Tue,  4 Mar 2025 17:29:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F169C2BE7B8;
+	Tue,  4 Mar 2025 17:36:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="p3bK6d8D"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l/UAcHqw"
 X-Original-To: netdev@vger.kernel.org
-Received: from beeline1.cc.itu.edu.tr (beeline1.cc.itu.edu.tr [160.75.25.115])
+Received: from beeline2.cc.itu.edu.tr (beeline2.cc.itu.edu.tr [160.75.25.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45C11253347
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:29:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=160.75.25.115
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 514682BEC2F
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:36:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=160.75.25.116
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741109352; cv=pass; b=Pk7tQlpOp2MYwqvK4Uk5SoodYGn4d4H1aAlKFyJgUWyzHZ7KzTGqrXN+dOZljeVKSO0NiOwfRHET/kZLLEd/a9MJsVTsUGI00xvVA7G3fOikzwJRIuJ7Lc0ULQVFxcpB0pSRVGCNLNjIaj5VC8k7Dp6MeplNgwKLIM1pwovIzcU=
+	t=1741109813; cv=pass; b=RaHdyQd/wlwLICfjoopdfuG10jpzIxt7QUQiXAiLFxGNZAVfa9K9uIE5P8326q9uS7D/hGjPOsLhlzn1SyFuKUDcEa2h6gBJX7yHlJGP9vN4fqzOh1wrlyEKoQC6ac7GCkV41icRn/JETyX9NTCUaRe4HD9RzwodfgNRsDKOJaM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741109352; c=relaxed/simple;
-	bh=32Qik+C6Gy82VbaZ+W9H7pBMHl/CZaXxobg9NI2Xga4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G8tm3CoeUBxFudRilCkKQEkRy1/nGgwAB0kterogsL8J5gkjbD50BN9ORUUtND0PzBJrKmWEk5kBqqSLAl1p8/avYyoh+n/f7eOYoGKM6yq/cr1slgKf213bzwRXabSlQuIzOjnikaAsqxsRkvE2acQoDYEeaA+uiJ1hyrE9A6A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=p3bK6d8D; arc=none smtp.client-ip=209.85.221.48; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; arc=pass smtp.client-ip=160.75.25.115
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+	s=arc-20240116; t=1741109813; c=relaxed/simple;
+	bh=67zi3moPbtJ00/7I6KgI37WCfQcSyOl+ZoHddiamufc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ilVo0KhXJOvCwrokMaQ0lUmrWaZM3YqIPyDJ7IO2C0tvyclY+NucGXPMoEGFBR/p+d775XpDKRmgK+Gf8gXJ1cv54Jpmd+MvbbS0xghCFcirZIkWDlMvT2cEFyt8bOHIFEnA2D67PAw3oAG/zSlJSUGJw5sU/8Y365gTxJjgVgY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l/UAcHqw; arc=none smtp.client-ip=209.85.208.179; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; arc=pass smtp.client-ip=160.75.25.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=cc.itu.edu.tr
 Received: from lesvatest1.cc.itu.edu.tr (lesvatest1.cc.itu.edu.tr [10.146.128.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
 	(No client certificate requested)
-	by beeline1.cc.itu.edu.tr (Postfix) with ESMTPS id 768F2408B64E
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 20:29:08 +0300 (+03)
+	by beeline2.cc.itu.edu.tr (Postfix) with ESMTPS id 8C8ED40D0B9A
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 20:36:50 +0300 (+03)
 X-Envelope-From: <root@cc.itu.edu.tr>
 Authentication-Results: lesvatest1.cc.itu.edu.tr;
-	dkim=pass (2048-bit key, unprotected) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.a=rsa-sha256 header.s=20230601 header.b=p3bK6d8D
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20230601 header.b=l/UAcHqw
 Received: from lesva1.cc.itu.edu.tr (unknown [160.75.70.79])
-	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6dbM54RMzFxCh
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:38:39 +0300 (+03)
+	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6hPJ5WsdzG42t
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 19:45:08 +0300 (+03)
 Received: by le1 (Postfix, from userid 0)
-	id 16F654275B; Tue,  4 Mar 2025 17:38:32 +0300 (+03)
+	id 1C01942744; Tue,  4 Mar 2025 19:44:46 +0300 (+03)
 Authentication-Results: lesva1.cc.itu.edu.tr;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=p3bK6d8D
-X-Envelope-From: <linux-kernel+bounces-541609-bozkiru=itu.edu.tr@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l/UAcHqw
+X-Envelope-From: <linux-kernel+bounces-541679-bozkiru=itu.edu.tr@vger.kernel.org>
 Authentication-Results: lesva2.cc.itu.edu.tr;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=p3bK6d8D
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l/UAcHqw
 Received: from fgw1.itu.edu.tr (fgw1.itu.edu.tr [160.75.25.103])
-	by le2 (Postfix) with ESMTP id 2551E41E09
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 14:41:27 +0300 (+03)
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by fgw1.itu.edu.tr (Postfix) with SMTP id CAAF1305F789
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 14:41:26 +0300 (+03)
+	by le2 (Postfix) with ESMTP id EE65841E20
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 15:14:03 +0300 (+03)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by fgw1.itu.edu.tr (Postfix) with SMTP id C55283063EFE
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 15:14:03 +0300 (+03)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BCC2162C72
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 11:41:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F9D81892655
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 12:14:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51AD4202F65;
-	Mon,  3 Mar 2025 11:40:24 +0000 (UTC)
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0338820F088;
+	Mon,  3 Mar 2025 12:13:39 +0000 (UTC)
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43F920296C
-	for <linux-kernel@vger.kernel.org>; Mon,  3 Mar 2025 11:40:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC4F20DD4E;
+	Mon,  3 Mar 2025 12:13:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741002021; cv=none; b=Ch2ycr6idfAlIyRguf6XUiHCQMr4cHUOhbegOj8b0TMDNw0PSTIyaupPVHAIuQtsmCD9gtow+zaJHMIqU6TaouIBrs6ldCFMflrhNngtEXK6kFyb5cb5oxRaNH2KsILEi1+sWynL3ZZRT4fczgYqZ25a6vWdZv8w6zOzvgWt6Ug=
+	t=1741004016; cv=none; b=Q2XTAr5drXtnNIpkpRk6s0Dl8b/eXMOf2+PM/JJHaCtZM9HFexQlQFUp1688n7dDS5429Jonpciv6eMjVcT6DkJ3aBDhGIlZyaaMYW6IgMGrdVJBM0CGM+ahaFDwT60lvUo8ggNxG2V7+sFVPBBlOYmKg2SBhwGebkQ9Bjb6uhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741002021; c=relaxed/simple;
-	bh=32Qik+C6Gy82VbaZ+W9H7pBMHl/CZaXxobg9NI2Xga4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kjhAt4eIT/UH82nLxU/wWPzUqb23+l30FrVs2omLN0wkMgxJTd5yXc21OtRffyBVnbJfhwh83rpLFwDkI+edBQHjXbzVVLPVDNHhWja72YRIMuciHAm9UXCB2CdEmKOXFOeVUVHVnvl9zfSrpIuXIma0AyDKZJPfoJIEYRgVhNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=p3bK6d8D; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-390ec7c2d40so2724433f8f.1
-        for <linux-kernel@vger.kernel.org>; Mon, 03 Mar 2025 03:40:18 -0800 (PST)
+	s=arc-20240116; t=1741004016; c=relaxed/simple;
+	bh=67zi3moPbtJ00/7I6KgI37WCfQcSyOl+ZoHddiamufc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Uvg11cMp7DKwd5ysjkCsVFD6lypUqMXP7oYGCepqfTMCDcj+O6n2lyvxxIr02K09BFVtc3qGoDko/0LnsAlQa/nylAJOYUw6xUYsHNs0VdSsfhGd0kYORO8e6rwBZ1UXjNWtnnRN/JJBPHJwPWXggsO8BpQ8XDD8nCwJ9lEYjkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l/UAcHqw; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-30ba563a6d1so19299061fa.1;
+        Mon, 03 Mar 2025 04:13:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1741002017; x=1741606817; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4NtAA2UHYocmR2KbGMJPhzPhzOIPXF5Y+cD7gkzWW/A=;
-        b=p3bK6d8DrjrhK0/qO2+o0XXclKbDdJbPyaEJqebJFnj6UftGu/Wlp0g0z460UuK8eQ
-         jqP5dZiDvaf13EWZxYf429fumpQf+BuKXNtjjUA1NBj79GysscTVo0cg0j48fqmhX5NV
-         9efVLZPrgc0Lj4xKJGCHbJmoh8/VB/GderaMZxkIzlOfM8yT/xfitEr/NJBqrSttwzsv
-         D2S8SLnciUvPRACHbdtcIkpSchM5xwppp3eKPT9K2p2QOLfBtVwD7D66BHHzvMMQDhR3
-         p5TyUVouF6jIyBsh7KwZIVWxs5mF+hJOLYmeHoxXDNdBYVQ5ilopY0Vx1AvSDV4gvTVv
-         9zZA==
+        d=gmail.com; s=20230601; t=1741004013; x=1741608813; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4I10pqhpXBKjcK+lwxIKgzV5wGxXaBJXL3xG7GMPSLE=;
+        b=l/UAcHqwR/lD/xI9zlb9AX5ojh2Ti0kdrkOXAZriXC0+9AccFEvO0t0lGZxXPDFAb3
+         ftrux6HubrD2TDz+ECulNS6wG3oaLSX+VTC/R1mEcelm+695k2M2peXw/BlUUSmF7xED
+         /tJ141bpu8/dMqhgrwvewykHqYuCxd20UmMrTsJmoYovkUmhAWJpfYOrgmfNEs+gEmhr
+         1HE2JcBKY2zU0R2KqwVl9/solBwSneorHNzm8SvdZtN+LL1xGbu0zSO7ewOfBQPu28tZ
+         tjhG9xKsPoztMgb5KvLnZhkkWLZ0YvXGW6Itv+V5kgHG1Spi/9wudh9Jheke3mptMAcl
+         +pKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741002017; x=1741606817;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4NtAA2UHYocmR2KbGMJPhzPhzOIPXF5Y+cD7gkzWW/A=;
-        b=BBfrxdcDTkV7QihRYcOrSea0Jh+mved6IG3uOdLbUwtc7fpnfzjbIoT6ZkwH8RFjE7
-         8bV2KzpRqzGBTl3AqNOiEOrVQiLI/OZCLDM9nhH++o3bMC5ecRVsfZKjuFUQq/JclNY2
-         4cGZX47fJ3GFslIPQNIOeAkHh2vmtGqjNTHpNJxXkEpTkYvUTGxBzxKvR2jK+3MTbHw/
-         y/VPc+LQKrKXwmhzGb6ihCcM3jTrMX0kUf+p1Q6+AAzSHyMn/L1Z2P7/mXUYi2NcIxwA
-         O2LUEzmZKzIBikJ7K7jmQ+TycjEGgmc1GauyZcwSb38Cg+B/T8qAZDf3N6KlkwldAtTa
-         1kqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVnNYUjYkq5pTN9FR0FESnWz8s/18hfmlQ5OlUnAcdp4DbU7EksNv3GjIr0xXrL9hWX3VQVDNZLHJLcNiI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHSjWN3xuypSQPglmGS/dvGTbcZgWHgLtK6LzjHhz+GYq/EZ6L
-	Lkq9vOMWdFjFtUASMLN/mJmZFHKfUykPbuzPZH26nUttPa3dyNTdWkHhxaAa3pA=
-X-Gm-Gg: ASbGnctyBpKJOeAAjD6bN9BnoK83hFY//qH/j3vhyOAAqQLCdEFzESAZVov767oWVi/
-	2hRyiGM+o9GmUqqQRxReB14nUCSoR/FF5zncg9PpAW6b2rJVpb78148LLB0HOFILT2mAYCCU0AK
-	p1nqtm8gcoBR9DvtF/ZlO6g2EsYoNrir2uvTN9DSrKo7Wvv6PsJiRyCb7nRxCsUiYIkvUDLkx9P
-	yFpy/AA4kPxjgr6z6q889bXu1vSM5sEMJe93aoN1R9gvYTOGyEdASU28brbLh9M++W6CiZFR5ph
-	f6fL6M09HpX5AJFZKQilPBz+7o9jg18mfYugkJv9YYO5G5Jj9A/XQk8juovYj1vDrSvtZq0P
-X-Google-Smtp-Source: AGHT+IFz1lKrp8HJjVJu85QHKOfDHRDkxYAgfR/PMWyeJaGKL7qzodzH7XjGqSVE9eCdgx8AE4rhHQ==
-X-Received: by 2002:a05:6000:144c:b0:391:c3a:b8ae with SMTP id ffacd0b85a97d-3910c3aba7emr2411994f8f.23.1741002017110;
-        Mon, 03 Mar 2025 03:40:17 -0800 (PST)
-Received: from jiri-mlt.client.nvidia.com ([140.209.217.212])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390e479596dsm14212516f8f.7.2025.03.03.03.40.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Mar 2025 03:40:16 -0800 (PST)
-Date: Mon, 3 Mar 2025 12:40:13 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: longli@linuxonhyperv.com
-Cc: "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Shradha Gupta <shradhagupta@linux.microsoft.com>, Simon Horman <horms@kernel.org>, 
-	Konstantin Taranov <kotaranov@microsoft.com>, Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>, 
-	Erick Archer <erick.archer@outlook.com>, linux-hyperv@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, Long Li <longli@microsoft.com>
-Subject: Re: [PATCH] hv_netvsc: set device master/slave flags on bonding
-Message-ID: <52aig2mkbfggjyar6euotbihowm6erv3wxxg5crimveg3gfjr2@pmlx6omwx2n2>
-References: <1740781513-10090-1-git-send-email-longli@linuxonhyperv.com>
+        d=1e100.net; s=20230601; t=1741004013; x=1741608813;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4I10pqhpXBKjcK+lwxIKgzV5wGxXaBJXL3xG7GMPSLE=;
+        b=V/ZLlhlbFuFHxwd0VvmrttGT6u/oVz/dO6Id0FuN2GyQo22v8OWOQ2kBY70l1ILvjZ
+         ZYnakxEGx9IXRj8TpSgBbLq3vzX/18c7dXyXbOKwT8Nl6+FMJfh884ucC6SUzEEcGCde
+         lphVWNXoduv7X+H86+H2+Z0mNRHdaM56zxnk3mX7+Yt2a0F19uWjmh+8dZnlgPzqyFNQ
+         SIFmypQHGUx7lH4EEVp2oPgwBoOQO7eQR6rFaFqNauOCqzDktU1Gzp+W4vsAeLWLO/2d
+         2hcAjfBdLmDqtbYtGvH7kjxaFs6+OMnDad2i9sv7FqagBOVRwWU7kD1q6aSdYQoE/W2i
+         3DWw==
+X-Forwarded-Encrypted: i=1; AJvYcCWMSdIM9D/KhmU3M64QviVGyjqxZAMdhq0KVOU5LPjrHcsiT+TdWVigFXxEdpTG8Edpk6skN0tf@vger.kernel.org, AJvYcCXQ6XGhBnfub9CP5KmFAIIBjyH+9ie9f2fZlnQcdGY72522wNyOQYN2I/7ZZP2UxTSWkekHrxwWaVbJv6uu@vger.kernel.org, AJvYcCXlUQpdWRULDjI0dL4BPHdATy7t98Uz0Xvlon3ve1aGixH4iZR8xIYrRlBP5sq/GLLFiqsxQppPKbsJ@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUKMdhOkZaeaAZKZRD1SBCdpRFUI3uqFImN1IL+SIOBihpc3Gx
+	4bu1rlPDjfHq0oqRU0Rt0dTNP9WGcyp0htwqOxstJsnZXByzylOr
+X-Gm-Gg: ASbGncssOikvky6xxZA65SMd62I7CbY27uEV2Ln4XBkvRGE9OkhvpbS9NIkwOYojUBE
+	mJc9iD/rwnYUCSp/sd5EjuENHOqlfrwI11lx7vqEmeSBw6T2bkM7QyUF/+MvW/ApiQK761Jd6FB
+	XCqC0BE/dzlAJi6LZduY1F1Wgfts/1q5/DEMQQHhpyuNrJMKJoOMdF0jMpZY/A5EaouMh4OBsVQ
+	5Js1bTFEeBW3X5oqmPinlpv4gwxcQPbtuwLUD3vkTV+bUukfJLy5Spl28INAXlRjSwakdW9JvIe
+	P+KY7iWv+SkYGxNsaXRg3kVXSFEqrgJBj/weouxvh6GPWmPXbjq5/j+ePQDyk55DtWFfZf6HBUu
+	kkbcJbjfcqrJwMpnzY1Ou
+X-Google-Smtp-Source: AGHT+IHgUTPP7a3wfBba3HmV4E8EIQMEL1aA+9ZOmIbLBKKMxMzPxezWgUWnkJNajqEM38nxec+/Vw==
+X-Received: by 2002:a05:6512:e8b:b0:546:1fd8:3876 with SMTP id 2adb3069b0e04-549432de15dmr6348652e87.14.1741004012425;
+        Mon, 03 Mar 2025 04:13:32 -0800 (PST)
+Received: from [192.168.42.63] (mobile-access-2e8451-125.dhcp.inet.fi. [46.132.81.125])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5495d12b85bsm583134e87.234.2025.03.03.04.13.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Mar 2025 04:13:31 -0800 (PST)
+Message-ID: <aacffceb-e9e8-412a-a624-568e6b10d586@gmail.com>
+Date: Mon, 3 Mar 2025 14:13:30 +0200
 Precedence: bulk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -141,60 +131,59 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1740781513-10090-1-git-send-email-longli@linuxonhyperv.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next v5 10/10] net: gianfar: Use
+ device_get_child_node_count_named()
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>,
+ Jonathan Cameron <jic23@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>,
+ Rob Herring <robh@kernel.org>, Daniel Scally <djrscally@gmail.com>,
+ Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+ Sakari Ailus <sakari.ailus@linux.intel.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>,
+ Claudiu Manoil <claudiu.manoil@nxp.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-acpi@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <cover.1740993491.git.mazziesaccount@gmail.com>
+ <685cd1affabe50af45b767eeed9b9002d006b0fd.1740993491.git.mazziesaccount@gmail.com>
+ <Z8WXqgxgFQC8b8vC@smile.fi.intel.com>
+Content-Language: en-US, en-AU, en-GB, en-BW
+From: Matti Vaittinen <mazziesaccount@gmail.com>
+In-Reply-To: <Z8WXqgxgFQC8b8vC@smile.fi.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-ITU-Libra-ESVA-Information: Please contact Istanbul Teknik Universitesi for more information
-X-ITU-Libra-ESVA-ID: 4Z6dbM54RMzFxCh
+X-ITU-Libra-ESVA-ID: 4Z6hPJ5WsdzG42t
 X-ITU-Libra-ESVA: No virus found
 X-ITU-Libra-ESVA-From: root@cc.itu.edu.tr
-X-ITU-Libra-ESVA-Watermark: 1741714039.96396@RhF6I8x0kRplzHminTNfCg
+X-ITU-Libra-ESVA-Watermark: 1741714503.39129@m8cjRN2Avp0oiGQPqiOg4g
 X-ITU-MailScanner-SpamCheck: not spam
 
-Fri, Feb 28, 2025 at 11:25:13PM +0100, longli@linuxonhyperv.com wrote:
->From: Long Li <longli@microsoft.com>
->
->Currently netvsc only sets the SLAVE flag on VF netdev when it's bonded. It
->should also set the MASTER flag on itself and clear all those flags when
->the VF is unbonded.
+On 03/03/2025 13:51, Andy Shevchenko wrote:
+> On Mon, Mar 03, 2025 at 01:34:49PM +0200, Matti Vaittinen wrote:
 
-I don't understand why you need this. Who looks at these flags?
+> 
+> What about the second loop (in gfar_of_init)?
+> I mean perhaps we want to have fwnode_for_each_named_child_node()
+> and its device variant that may be also reused in the IIO code and here.
+> 
 
+I agree the fwnode_for_each_named_child_node() would be useful. I think 
+I said that already during the previous review rounds. There is plenty 
+of code which could be converted to use it.
 
->
->Signed-off-by: Long Li <longli@microsoft.com>
->---
-> drivers/net/hyperv/netvsc_drv.c | 6 ++++++
-> 1 file changed, 6 insertions(+)
->
->diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
->index d6c4abfc3a28..7ac18fede2f3 100644
->--- a/drivers/net/hyperv/netvsc_drv.c
->+++ b/drivers/net/hyperv/netvsc_drv.c
->@@ -2204,6 +2204,7 @@ static int netvsc_vf_join(struct net_device *vf_netdev,
-> 		goto rx_handler_failed;
-> 	}
-> 
->+	ndev->flags |= IFF_MASTER;
-> 	ret = netdev_master_upper_dev_link(vf_netdev, ndev,
-> 					   NULL, NULL, NULL);
-> 	if (ret != 0) {
->@@ -2484,7 +2485,12 @@ static int netvsc_unregister_vf(struct net_device *vf_netdev)
-> 
-> 	reinit_completion(&net_device_ctx->vf_add);
-> 	netdev_rx_handler_unregister(vf_netdev);
->+
->+	/* Unlink the slave device and clear flag */
->+	vf_netdev->flags &= ~IFF_SLAVE;
->+	ndev->flags &= ~IFF_MASTER;
-> 	netdev_upper_dev_unlink(vf_netdev, ndev);
->+
-> 	RCU_INIT_POINTER(net_device_ctx->vf_netdev, NULL);
-> 	dev_put(vf_netdev);
-> 
->-- 
->2.34.1
->
->
+This, however, is far more than I am willing to do in the context of a 
+simple IIO driver addition. The "BD79124 ADC suupport" is already now 10 
+patches, 2 of which are directly related to it.
+
+I propose adding the for_each_named_child_node() as a separate series 
+with bunch of users appended. That's be plenty of beans to count for 
+those who like following the statistics :)
+
+Yours,
+	-- Matti
 
 
