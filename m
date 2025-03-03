@@ -1,148 +1,215 @@
-Return-Path: <netdev+bounces-171109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66B7DA4B88B
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 08:50:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0197EA4B8A8
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 09:04:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCD5116B337
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 07:50:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E33A918928AC
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 08:04:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75F701E9B16;
-	Mon,  3 Mar 2025 07:50:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F6378635F;
+	Mon,  3 Mar 2025 08:04:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J1HPdinK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BGUsXnOg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA561EE03D;
-	Mon,  3 Mar 2025 07:50:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E54AEAD27
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 08:04:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740988211; cv=none; b=IQCPhjwz0kTcfBvoFS1hpOpl5Whi8VJo4kgLfEhmsT7MnpDbs7GNkATOI2l9r0e4zvXmbJXXDARu2L0ynFb8YVyBrU7InhDMb0r6HelWHAU4qz3im0J/wAADYGzJu9uWe9cueNGaWd9/JB+8CPpG8tL3qeAPZ65qHF7g+BwWJ0w=
+	t=1740989061; cv=none; b=tIiH7hVvQeKlCHr+tlpZXD+f2n9X6AmS/zrlW/eQe5fVO8fH1HbflI4eH3madup9xMstxVRCACvr8gN98kAOWjEnoFFksUjn+/tnqdVxcaUS9nUE7Iyb3tKb91AUJWY218mRVd0YEtkfIgBnwZN3zF6LMvywu0r7+ulNYZRhSHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740988211; c=relaxed/simple;
-	bh=4aoAkVkWJ9rE1k/obWZXGikyJB41caL0MMe9Y2MIi4Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VBtNB85Sw4WHQCCFloQtUBFZwUduLThz4/f8j2OGTLnprvV1lfZZYPYrBWyfOdlmhdAnKoe//R0Nh0uJJY9/XtFdDzhyWrXPl+MaoN7V8yaoFc+xPt6ZgNJKxmmJNpvwdeLxST/Z2FPAiZILqmzhCt7VsulGKldayMrST91EcWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J1HPdinK; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740988210; x=1772524210;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=4aoAkVkWJ9rE1k/obWZXGikyJB41caL0MMe9Y2MIi4Q=;
-  b=J1HPdinK/KHhwgQv/bWmTAhKcU/J6BvYcJoHelipf0r3WU49WMITlKHJ
-   FdWx1Vxm27zOYt8/7WFW3kE35CIjvAx/f2TYK5uGFBebI2Ow/Vbr38YFe
-   IgQy6sSqVYqGbQru/lInxN2PdqscsrlonqOAo39mepYr8FlliEhxkbmaO
-   G3lmxGw5CAebtk0fv8mfzGI+58cgvvVWLKH4eoIr6YEONXbq2zMHiODfN
-   m0sfKih4ovJSMndfK9ORG1aj5XISwMWeBmgNrVlU5JsFyQVE2E6eWDs6f
-   aczZIFCgYj7i0UUS+jEsPwjOnaGGSmaw0ETEI2DwuITULXkaAM/w2eaTv
-   Q==;
-X-CSE-ConnectionGUID: AXQRHB34QcOtqvi2QUpwsQ==
-X-CSE-MsgGUID: FAG3B9gWRW6NFITqEzXHLw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11361"; a="41974308"
-X-IronPort-AV: E=Sophos;i="6.13,329,1732608000"; 
-   d="scan'208";a="41974308"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2025 23:50:09 -0800
-X-CSE-ConnectionGUID: r4EkK5uLTOOHRZNDHcCvsQ==
-X-CSE-MsgGUID: oK5Me+PZRnKJQDwsK0W+pA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,329,1732608000"; 
-   d="scan'208";a="117733442"
-Received: from smile.fi.intel.com ([10.237.72.58])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2025 23:50:04 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1tp0Yr-0000000GkI5-1VwS;
-	Mon, 03 Mar 2025 09:50:01 +0200
-Date: Mon, 3 Mar 2025 09:50:01 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Richard Cochran <richardcochran@gmail.com>
-Cc: Arnd Bergmann <arnd@kernel.org>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>,
-	Arnd Bergmann <arnd@arndb.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Tianfei Zhang <tianfei.zhang@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Calvin Owens <calvin@wbinvd.org>,
-	Philipp Stanner <pstanner@redhat.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-fpga@vger.kernel.org
-Subject: Re: [PATCH] RFC: ptp: add comment about register access race
-Message-ID: <Z8VfKYMGEKhvluJV@smile.fi.intel.com>
-References: <20250227141749.3767032-1-arnd@kernel.org>
- <Z8CDhIN5vhcSm1ge@smile.fi.intel.com>
- <Z8TFrPv1oajA3H4V@hoboy.vegasvil.org>
+	s=arc-20240116; t=1740989061; c=relaxed/simple;
+	bh=yock02p8WzLQWzC+4PpwkfwqwMvxF9wQ+cYVg/GBdG4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kruRG/9daMPlo3cWZsZhZ5QJm4CJMMGcZmP8QdW2ggqKIwjlnNufpvg6lX/YaGQGk51g1Fs5XyHby8BB9eBgSsKhlBCZ935cDy0j5NFGjfgvCHZskVnEmmeTT9NyApe7v9mTlx3E6AMo3uZtmLQgbZCGtDKMyTAyDSXMIVUSnwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BGUsXnOg; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-223378e2b0dso57536005ad.0
+        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 00:04:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740989058; x=1741593858; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SbPG6Sncay2jVK/KcaB/R6wiyPWVfGtkuZj+mkez72k=;
+        b=BGUsXnOgOg3hFOA39RcxdDnAhCxnthjCGSyTkWTNp/eQr3XvuHc9NtS62n6fe/0Atb
+         ddE2Q55QPIE5DmevJSv/CfbRAtLL+UmlckkKJiJunRul69/yENt5XuXxydEJIpPkVHS0
+         TCftK95nrwopr9uEiYcB2fDTV5bNIhb2EoPqv/+ZyWizUwRRDI+BtKHYAKQ0vcox76X1
+         7kRMZzm1N6KsB8E24tV51eiDUQgYNS9GadWxO9hrZFWRD6Y+ArfO5WMsao2g3px1z2/b
+         +lIGXF++U7R8SOf+F2JkJjaUgkKt0+9Fpz7JdQUGK6lmNy1/CiTyX5ljVyKWWx2jCAuC
+         Tuhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740989058; x=1741593858;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SbPG6Sncay2jVK/KcaB/R6wiyPWVfGtkuZj+mkez72k=;
+        b=jqokQirEGtwWhPMPqcPpGK5UEgPbjEYLa6P8p5j8BEExTL8yZsoWlgYmxgMFtZfUX+
+         JfIZhWBMZWwhe+RCloMxKZUFFv/94oDJBZRS8UD9Ry9/eq4AqSnhIOqTqzi0qbhkJh1k
+         4zcQNVynV2bWo4ZSQXTt2q/gC0iOhdJQtidpU+EJIkUXZcPhpb2+/WeyJdJVf27UUuxl
+         mDljsV+fimzAKnXps8dDrntUPdYik+PgmSNIV9ffyY5L3rf/3FSXYYDNjK7vZJJmj/AG
+         AlsNNf8ntC2AoNQ7jor5wMMGvG31+qu2nu4sDqj6qkFBHpsHYSNzEa/SEucBWSd1qBAj
+         xtLQ==
+X-Gm-Message-State: AOJu0YxQTfHHJjeQ4VF0oWQq7O0VLI/DnmP/6sTKPpvDZKdgIyeUMPYI
+	EPjDmr5yX+FerqdUrAruJQvapjSwnOiAJvQdqAg0Tk/uDXjJ1lMZ
+X-Gm-Gg: ASbGncumg03h+XKlhEXnd21kA67zI466WVUCJmhXneb2WdRssK984dOjSnFpbwrUmCF
+	T2I7S0IfmZpi3ctP01Wql2OstTXB4O69VTAOie7Sjn4Mg26mFCfkRZv1+ngUsZzXWU9O/xDoq6N
+	fdaoAx4qeJMS6LG27xUeoIMA0WUdCKvbCTdhl8bNBBGlQAaeiytS/YyuvPZRbprHMmVcapNQd34
+	CIqrPTiZyfj4P3Ag/BFig3ADxfWVgs7oeHwW+tSFGNu5ZJlT/5p091/4EgR/tQOg2CX2JfYGHxE
+	qpUM05B2p6iSEWW28RUd5+BL/2BogDZb/FqzTwRcTZWMeBqKEJ0IMN+ybl1/KFa/eXk9Ql/ISSH
+	xwNFN8UbcfF57j4Qx
+X-Google-Smtp-Source: AGHT+IFs3pibu42YqWXnOeFbhWs38O57WBc+6EGrH/Kbg5bcRQHVpkebyhVUBWQ+UK34IK0HP3kOEA==
+X-Received: by 2002:a05:6a21:1518:b0:1ee:ced0:f0a4 with SMTP id adf61e73a8af0-1f2f4e45063mr23536638637.34.1740989058033;
+        Mon, 03 Mar 2025 00:04:18 -0800 (PST)
+Received: from KERNELXING-MB0.tencent.com ([43.132.141.20])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73648f97953sm2271741b3a.166.2025.03.03.00.04.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Mar 2025 00:04:17 -0800 (PST)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	willemdebruijn.kernel@gmail.com
+Cc: netdev@vger.kernel.org,
+	Jason Xing <kerneljasonxing@gmail.com>
+Subject: [PATCH net-next] selftests: txtimestamp: ignore the old skb from ERRQUEUE
+Date: Mon,  3 Mar 2025 16:04:04 +0800
+Message-Id: <20250303080404.70042-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z8TFrPv1oajA3H4V@hoboy.vegasvil.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On Sun, Mar 02, 2025 at 12:55:08PM -0800, Richard Cochran wrote:
-> On Thu, Feb 27, 2025 at 05:23:48PM +0200, Andy Shevchenko wrote:
-> > On Thu, Feb 27, 2025 at 03:17:27PM +0100, Arnd Bergmann wrote:
-> > > From: Arnd Bergmann <arnd@arndb.de>
-> > > 
-> > > While reviewing a patch to the ioread64_hi_lo() helpers, I noticed
-> > > that there are several PTP drivers that use multiple register reads
-> > > to access a 64-bit hardware register in a racy way.
-> > > 
-> > > There are usually safe ways of doing this, but at least these four
-> > > drivers do that.  A third register read obviously makes the hardware
-> > > access 50% slower. If the low word counds nanoseconds and a single
-> > > register read takes on the order of 1µs, the resulting value is
-> > > wrong in one of 4 million cases, which is pretty rare but common
-> > > enough that it would be observed in practice.
-> 
-> If the hardware does NOT latch the registers together, then the driver must do:
-> 
->   1. hi1 = read hi
->   2. low = read lo
->   3. hi2 = read h1
->   4. if (hi2 == hi1 return (hi1 << 32) | low;
->   5. goto step 1.
-> 
-> This for correctness, and correctness > performance.
+When I was playing with txtimestamp.c to see how kernel behaves,
+I saw the following error outputs if I adjusted the loopback mtu to
+1500 and then ran './txtimestamp -4 -L 127.0.0.1 -l 30000 -t 100000':
 
-Right.
+test SND
+    USR: 1740877371 s 488712 us (seq=0, len=0)
+    SND: 1740877371 s 489519 us (seq=29999, len=1106)  (USR +806 us)
+    USR: 1740877371 s 581251 us (seq=0, len=0)
+    SND: 1740877371 s 581970 us (seq=59999, len=8346)  (USR +719 us)
+    USR: 1740877371 s 673855 us (seq=0, len=0)
+    SND: 1740877371 s 674651 us (seq=89999, len=30000)  (USR +795 us)
+    USR: 1740877371 s 765715 us (seq=0, len=0)
+ERROR: key 89999, expected 119999
+ERROR: -12665 us expected between 0 and 100000
+    SND: 1740877371 s 753050 us (seq=89999, len=1106)  (USR +-12665 us)
+    SND: 1740877371 s 800783 us (seq=119999, len=30000)  (USR +35068 us)
+    USR-SND: count=5, avg=4945 us, min=-12665 us, max=35068 us
 
-> > > Sorry I hadn't sent this out as a proper patch so far. Any ideas
-> > > what we should do here?
-> 
-> Need to have driver authors check the data sheet because ...
-> 
-> > Actually this reminds me one of the discussion where it was some interesting
-> > HW design that latches the value on the first read of _low_ part (IIRC), but
-> > I might be mistaken with the details.
-> > 
-> > That said, it's from HW to HW, it might be race-less in some cases.
-> 
-> ... of this.
+Actually, the kernel behaved correctly after I did the analysis. The
+second skb carrying 1106 payload was generated due to tail loss probe,
+leading to the wrong estimation of tskey in this C program.
 
-Perhaps it's still good to have a comment, but rephrase it that the code is
-questionable depending on the HW behaviour that needs to be checked.
+This patch does:
+- Neglect the old tskey skb received from ERRQUEUE.
+- Add a new test to count how many valid skbs received to compare with
+cfg_num_pkts.
 
+Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
+---
+Willem, I'm not sure if it's worth reviewing this patch to handle this
+testcase. After all it's only a selftest. Well, adding a new test might
+be helpful. Please feel free to drop/ignore it if you don't like it.
+---
+ tools/testing/selftests/net/txtimestamp.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/tools/testing/selftests/net/txtimestamp.c b/tools/testing/selftests/net/txtimestamp.c
+index dae91eb97d69..c63af798a521 100644
+--- a/tools/testing/selftests/net/txtimestamp.c
++++ b/tools/testing/selftests/net/txtimestamp.c
+@@ -86,6 +86,7 @@ static struct timespec ts_usr;
+ 
+ static int saved_tskey = -1;
+ static int saved_tskey_type = -1;
++static int saved_num_pkts;
+ 
+ struct timing_event {
+ 	int64_t min;
+@@ -131,17 +132,20 @@ static void add_timing_event(struct timing_event *te,
+ 	te->total += ts_delta;
+ }
+ 
+-static void validate_key(int tskey, int tstype)
++static bool validate_key(int tskey, int tstype)
+ {
+ 	int stepsize;
+ 
++	if (tskey <= saved_tskey)
++		return false;
++
+ 	/* compare key for each subsequent request
+ 	 * must only test for one type, the first one requested
+ 	 */
+ 	if (saved_tskey == -1 || cfg_use_cmsg_opt_id)
+ 		saved_tskey_type = tstype;
+ 	else if (saved_tskey_type != tstype)
+-		return;
++		return true;
+ 
+ 	stepsize = cfg_proto == SOCK_STREAM ? cfg_payload_len : 1;
+ 	stepsize = cfg_use_cmsg_opt_id ? 0 : stepsize;
+@@ -152,6 +156,7 @@ static void validate_key(int tskey, int tstype)
+ 	}
+ 
+ 	saved_tskey = tskey;
++	return true;
+ }
+ 
+ static void validate_timestamp(struct timespec *cur, int min_delay)
+@@ -219,7 +224,8 @@ static void print_timestamp(struct scm_timestamping *tss, int tstype,
+ {
+ 	const char *tsname;
+ 
+-	validate_key(tskey, tstype);
++	if (!validate_key(tskey, tstype))
++		return;
+ 
+ 	switch (tstype) {
+ 	case SCM_TSTAMP_SCHED:
+@@ -242,6 +248,7 @@ static void print_timestamp(struct scm_timestamping *tss, int tstype,
+ 		tstype);
+ 	}
+ 	__print_timestamp(tsname, &tss->ts[0], tskey, payload_len);
++	saved_num_pkts++;
+ }
+ 
+ static void print_timing_event(char *name, struct timing_event *te)
+@@ -582,6 +589,7 @@ static void do_test(int family, unsigned int report_opt)
+ 		       (char *) &sock_opt, sizeof(sock_opt)))
+ 		error(1, 0, "setsockopt timestamping");
+ 
++	saved_num_pkts = 0;
+ 	for (i = 0; i < cfg_num_pkts; i++) {
+ 		memset(&msg, 0, sizeof(msg));
+ 		memset(buf, 'a' + i, total_len);
+@@ -673,6 +681,12 @@ static void do_test(int family, unsigned int report_opt)
+ 		while (!recv_errmsg(fd)) {}
+ 	}
+ 
++	if (cfg_num_pkts != saved_num_pkts) {
++		fprintf(stderr, "ERROR: num_pkts received %d, expected %d\n",
++				saved_num_pkts, cfg_num_pkts);
++		test_failed = true;
++	}
++
+ 	print_timing_event("USR-ENQ", &usr_enq);
+ 	print_timing_event("USR-SND", &usr_snd);
+ 	print_timing_event("USR-ACK", &usr_ack);
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.43.5
 
 
