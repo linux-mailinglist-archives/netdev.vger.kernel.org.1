@@ -1,124 +1,103 @@
-Return-Path: <netdev+bounces-171181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2756A4BC4E
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 11:32:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A9F0FA4BC8B
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 11:39:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFDF03B6201
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 10:30:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 371C13A29F0
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 10:39:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A47871F3D50;
-	Mon,  3 Mar 2025 10:28:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gp4f0Qjb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 867C61F1525;
+	Mon,  3 Mar 2025 10:39:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B8F1F2C34
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 10:28:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F17CB1E98FF
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 10:39:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740997738; cv=none; b=Ekuqyr9i/TtX5XWD7nzKv3pgFqJJidCkM9mItzrgAdqoHwPYpWBvDQhQDrBHTJGFm+cKR01G1OLi5xpXLRzFmN0HcV2lv/Tae6ruk4T8qUy2lBitV4IuSfg0vuqrGgLeEyr9pdNiGak3qwW3AAcLWLhDMegOZOx0m1nuqviLGh0=
+	t=1740998370; cv=none; b=YqYZsHkUdu2xIqPQQl0Omv5/sfcm91MV/XsKHz1skM/ULXyssDiiU3y25yqUEX7l+1lujdzYT3KFtvqf8hv7YeitnIJ8B8OZYVv8k7Nm6mOeAh1mBVtgRYPs7EGXzglbizYEQJgm7sxFPiS5x2+ZpGyKh2/ZUUO2QRV9Sxt/iVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740997738; c=relaxed/simple;
-	bh=srl1pIA+ThlTF11L33x8WkwY3Gi/4wZSgcLDLWp5Epw=;
-	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=oR0wJ6l0tPKXOmZPuzcwcXwwbR/S78apZfhD8tkYRb+BBwsqztIOvHZA2LnVMwjMj0z5FSXArWqxI+URApzSpyaykVWCxk4wgPh6yG6bVW1qHUsTcEa7qobIV7Y03ZCLwVSItzP/g/81NgqA81lyyZ4LXUU5C+zemG9YDfxITpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Gp4f0Qjb; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740997734;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=srl1pIA+ThlTF11L33x8WkwY3Gi/4wZSgcLDLWp5Epw=;
-	b=Gp4f0QjbIP1Wn4qm3jDcmmevsaB6So37hMAeZzwwOlWIgDWKta6z0KvKjAYkwcgENOmTHU
-	jKhmhF1wL+LUFvqgsE5f+I/CSjVOb0gm8+h+xVNJYaMTJMWsUosEzIV7KH0KeEG3pjvHzu
-	g1RJvYPmY7I72t0PHydJ1tkxE9RfHPw=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-655-xnkZGPchMS2KDJEQUh4A9g-1; Mon, 03 Mar 2025 05:28:43 -0500
-X-MC-Unique: xnkZGPchMS2KDJEQUh4A9g-1
-X-Mimecast-MFC-AGG-ID: xnkZGPchMS2KDJEQUh4A9g_1740997722
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-ac1dca8720cso58380566b.0
-        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 02:28:42 -0800 (PST)
+	s=arc-20240116; t=1740998370; c=relaxed/simple;
+	bh=5w6pA4eYiBnHNqpcmteMeSrZV2g2L1eyHkQ8+j6h8f4=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=dXP1ydEMyrD4mRoOe42tj/q/j4rUMpwRCxgVH7ePN9EnwWx5/IdyRhoKl3LgtOyF6vReBg3ekiHKQid7d3U87Fw0gZdhwQQbKPmM/MEWqUDP7SiTmkJKg3MVeq010fFqwy6cFF2TNX3548UMq6PZIa3vM16T6fSGE9JqzdpfrPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3d060cfe752so40705035ab.2
+        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 02:39:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740997722; x=1741602522;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:to:from:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=srl1pIA+ThlTF11L33x8WkwY3Gi/4wZSgcLDLWp5Epw=;
-        b=N7hjs3nkUF+Nlcit+38mCD655a+/Ns+145aJ3fr9456r3j8erN1j8uwOovMVlxzb7D
-         WrXQCYUxQdrYXfzk+s0QZ7X8E/lPJy+jw37owej/ouP5VKBGQBnbU387dkfyeiPf3tZJ
-         ti0CtD9dJQCSgcjKfsjb8g1BqhN/2YrIeVSq6xjrjHgtU1ygJsF/FVgaEOAz7Yu3wsmx
-         HLPh0HByG9v1KXmji+SjM/h7QNKq8LY+zf18loSU09TqrS/VBpy9HG1QnM2r6u8ul2yF
-         0B5RC62ithaRIdCkI3oz5yCrFIUeFxW4QTx2mfYmoQ8vbEAHrfytQrqToJ4soHZ8j84Q
-         konw==
-X-Forwarded-Encrypted: i=1; AJvYcCWs0CEayrt9UL1+DGMC3qwLvZ83R580SWvijh1KNesTeHfkPKxzSzKIH3V/stw8iL2211CDRQI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwfhodeOtcgvoy0DWDoth4rJX2+izY/acs+j6hsUWh6L4T4Mq8V
-	dUAYy9AbTyidxYOmYVNNpI7WZL9YoJo0ODqBHkga5Ap4or+O2tswmXi3pNOisUEKL3XbNSE4raS
-	0zETLqpR9Wz9imDdAG6+htIpFNNKG7uTrvjvqEkuUJK0ebzNAkN4C9Q==
-X-Gm-Gg: ASbGnctQvF/MXWHqLmirbnqF41yTBk5niCaSeX7rS5kUqh/et9PxQ03DNPpcSm5uT8N
-	g6mC0QCGgLjdnkaKfZwzqmeADA2PNWAqCA7CLalhWSfOEhnaedJteZAi4yd/jldh8hVxIr86q6M
-	f6GHw7feDsTQw1XXf0mCdOt4gMZeg2DK69PUu1oFUiSownXdc0F41OXyE3gonV+xskJ4RsrZWTO
-	6W+BBAlf/oDqvEM2Yh+WV4m2t87jFwxyWWuxaTGhj3FsqKADzo9JqBoT/HbmakJKlco7SJP42F8
-	mjZPVm8b08r2
-X-Received: by 2002:a17:907:6a0e:b0:abf:4ca9:55ff with SMTP id a640c23a62f3a-abf4ca9583dmr1015488066b.32.1740997721888;
-        Mon, 03 Mar 2025 02:28:41 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH7aUVBrdX1KlvAg+sycMlUbpc7AuA9RpLTN4rd3uI2Rj9vDiIS1Rku9nxqomui03mBJPMx3Q==
-X-Received: by 2002:a17:907:6a0e:b0:abf:4ca9:55ff with SMTP id a640c23a62f3a-abf4ca9583dmr1015485966b.32.1740997721466;
-        Mon, 03 Mar 2025 02:28:41 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac1debb25adsm77555966b.106.2025.03.03.02.28.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Mar 2025 02:28:40 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id B0A1F18B6F1E; Mon, 03 Mar 2025 11:28:39 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Qingfang Deng <dqfext@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Michal Ostrowski <mostrows@earthlink.net>, James
- Chapman <jchapman@katalix.com>, Simon Horman <horms@kernel.org>,
- linux-ppp@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] ppp: use IFF_NO_QUEUE in virtual interfaces
-In-Reply-To: <20250301135517.695809-1-dqfext@gmail.com>
-References: <20250301135517.695809-1-dqfext@gmail.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Mon, 03 Mar 2025 11:28:39 +0100
-Message-ID: <87mse2z9uw.fsf@toke.dk>
+        d=1e100.net; s=20230601; t=1740998368; x=1741603168;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=94B1AldC1Ra+VOi32bZczZH6eYO+XQiGIIy01bId2WI=;
+        b=ETur2N/N61nPp/MK/Hyuwh3msvw7FjkNxdFtePd//G+cgWprL8EAovcLZrbd9bKaUD
+         SACd8pL2uSSjUFjQShA2RyFcQWD2SPXhazzmLm+P4Exle8tHLOMsZ50ML3QOvrclqEDg
+         PkT/0nUeTmy8VpByx5+y96sSIrXqtnY3FKgDBJaVMOvjhr9zPpIAGqBMYTdbZFnqr/xD
+         ZJKq4oFzITZpId1P8vAJCT0RDgb24/yBOPBmMFC1DwmfGb+eJgW8XxZQzuQ1BzGmCBU6
+         j6xfZsBSzlPBAHkoIxFLMXwmZV8FHl4qrE5xOwrgNBu/kJst3+onJXojlBXUCx9kZrEE
+         buDg==
+X-Forwarded-Encrypted: i=1; AJvYcCWBXgojOOXmAH7E/JrxfvgesgfITFO4Pe/yLAzlDQ46PCfKvKkhBniTIf0YVnZZ4IAkhCtgLO0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsRacslOzDH2RzVeBvE2seo1hhNtDJ7NjKxTggzwxBcdmAtYx1
+	azj6Yw1uV2eLu6/mFJ8GLry9cjDkYlGHVIzw14zyn9vHJwbSVYqOaC9ppQosvSnfVaFLiX2Nt+9
+	jPybbSzpPnzxSuqQe+YnImRVb1wAT7g5poqME98kzlYROqSDQGgIfrH8=
+X-Google-Smtp-Source: AGHT+IHXGGfJycEVF1C0NA+tWbF57mYYWAfRa3uH7yonYPLILGd0Xs6oQjnQHhZiPUqQSby7mDcwV8F7CrVZ/77JAIhHK7ysIbjU
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-Received: by 2002:a05:6e02:3111:b0:3d3:ff5c:287 with SMTP id
+ e9e14a558f8ab-3d3ff5c06f9mr41959675ab.14.1740998368052; Mon, 03 Mar 2025
+ 02:39:28 -0800 (PST)
+Date: Mon, 03 Mar 2025 02:39:28 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67c586e0.050a0220.1dee4d.0124.GAE@google.com>
+Subject: [syzbot] Monthly batman report (Mar 2025)
+From: syzbot <syzbot+list0f38ff37debbbda9dc0b@syzkaller.appspotmail.com>
+To: a@unstable.cc, b.a.t.m.a.n@lists.open-mesh.org, 
+	linux-kernel@vger.kernel.org, mareklindner@neomailbox.ch, 
+	netdev@vger.kernel.org, sven@narfation.org, sw@simonwunderlich.de, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Qingfang Deng <dqfext@gmail.com> writes:
+Hello batman maintainers/developers,
 
-> For PPPoE, PPTP, and PPPoL2TP, the start_xmit() function directly
-> forwards packets to the underlying network stack and never returns
-> anything other than 1. So these interfaces do not require a qdisc,
-> and the IFF_NO_QUEUE flag should be set.
->
-> Introduces a direct_xmit flag in struct ppp_channel to indicate when
-> IFF_NO_QUEUE should be applied. The flag is set in ppp_connect_channel()
-> for relevant protocols.
->
-> While at it, remove the usused latency member from struct ppp_channel.
->
-> Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+This is a 31-day syzbot report for the batman subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/batman
 
-Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+During the period, 2 new issues were detected and 0 were fixed.
+In total, 6 issues are still open and 26 have already been fixed.
 
+Some of the still happening issues:
+
+Ref Crashes Repro Title
+<1> 555     Yes   INFO: rcu detected stall in batadv_nc_worker (3)
+                  https://syzkaller.appspot.com/bug?extid=69904c3b4a09e8fa2e1b
+<2> 136     No    INFO: rcu detected stall in sys_recvmmsg (3)
+                  https://syzkaller.appspot.com/bug?extid=b079dc0aa6e992859e7c
+<3> 14      Yes   INFO: rcu detected stall in rescuer_thread
+                  https://syzkaller.appspot.com/bug?extid=76e180c757e9d589a79d
+<4> 1       Yes   INFO: rcu detected stall in batadv_bla_periodic_work (2)
+                  https://syzkaller.appspot.com/bug?extid=fc38cf2d6e727d8415c7
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
