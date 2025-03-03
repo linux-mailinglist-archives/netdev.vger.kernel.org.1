@@ -1,122 +1,101 @@
-Return-Path: <netdev+bounces-171409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FBF5A4CE45
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 23:26:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 628A8A4CE4E
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 23:32:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD25B7A2B5C
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 22:25:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E581188C604
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 22:32:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DD541F1301;
-	Mon,  3 Mar 2025 22:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4314A1F130C;
+	Mon,  3 Mar 2025 22:32:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f+ibnLvJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C0pU+UZY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34AA611CA9;
-	Mon,  3 Mar 2025 22:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EE4B198A2F
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 22:32:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741040792; cv=none; b=EILe5wXf/CvcERPXJHIywyveCgJV8IaQkQkn8V+OU7wQbs9/MtmnD9ySAh/AKR/VAFRd7xtrXj2lTFkZ1hpW2/xgXnSVA2qzPqu0wYRoFZIlC0Z0L/hfPhi+1gZVjxfEhIsl8wk/P/QodYShWRaFaCvRdQxsui9N3j+FQso3P0w=
+	t=1741041136; cv=none; b=UogayfPIb5mnRQRebT0L/fLBKJQ809ALB0QHFILpnq4GksQnnZx6P3n3w0RmW4nRJ+3ewpRTAXLpuLiXARL2L3BL7HIEt+b794EDDLkLVZsZ6Wt9j5snYro0oDbmd82zAghiOTfScfRYEUHQBKld6kFU6RCHNNe2YA8ha75NXfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741040792; c=relaxed/simple;
-	bh=sKsO4dNLQ1E9U/qUtl2CADnzjPDNXl7y7zE7Zo3mB9Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QlUEoUOa5Uu7FxjAu8dU04nEzcDKdmXSIMivMGaY98ge25XhnNxU48a8E0N4HOTUFBm/ojMUzKUEKwKqXjyUyw5ONEHwCE6CrW0VHS0Dnk2949T406e/Ffx4dPjfy77BqUEtk9vb5VNrCExF56MJ0aBcgumO4zTPx1iA35z43h4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f+ibnLvJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6218FC4CED6;
-	Mon,  3 Mar 2025 22:26:30 +0000 (UTC)
+	s=arc-20240116; t=1741041136; c=relaxed/simple;
+	bh=c1cBdBqaDwBD00W4WhD2vFldfrgHvcYL/fC2/VNe7qs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J30RFPVTdB6FW+hAxzHM5oxMCJh3D5XquU7qlb94brZn6AmwsihVu0hP59lng7CL1O0PjNxCt0QDMdbJPiluShD+ivSfredTmEmieuhF/HL6pxWQdsr9mOAhalogGKTRTLJY7UAwpfZ33GdU9aTJzXv8iyTgGly/yFjAfiRC/LI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C0pU+UZY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F583C4CED6;
+	Mon,  3 Mar 2025 22:32:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741040792;
-	bh=sKsO4dNLQ1E9U/qUtl2CADnzjPDNXl7y7zE7Zo3mB9Y=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=f+ibnLvJeJdSqITmAtD7ZTQzbfIlw7udhfAPNZomwBr0qMlAT2DYQhXLdAV+k6O/K
-	 FVyIdiieTcBPKcOjf/Je3AB5ivuVQvwau8Q6AWKErV1sVfc0wEFngLb8NiakU1wu3P
-	 P+Htna4H05lPze5EM+oUVd0r24/ZoZ8vWQVbqtiltE/A0w3tW9twMq1PjE9aQAnNji
-	 S6xS3kYOSSqOyU1Cvvb26cwwRCKhXKZKnvFbbMNlnOBwone4PfOoTdba0yXeUEEsuz
-	 SK0nEwC7as5eMraMObpocHGKJqQNaWJVHIUq05D8W9SFTwK0PrgvH1bjeKiekT5acy
-	 YWVxxP55GamDQ==
-From: cel@kernel.org
-To: jlayton@kernel.org,
-	neilb@suse.de,
-	okorniev@redhat.com,
-	Dai.Ngo@oracle.com,
-	tom@talpey.com,
-	trondmy@kernel.org,
-	anna@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	Long Li <leo.lilong@huawei.com>
-Cc: Chuck Lever <chuck.lever@oracle.com>,
-	linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yi.zhang@huawei.com,
-	yangerkun@huawei.com,
-	lonuxli.64@gmail.com
-Subject: Re: [PATCH 0/2] sunrpc: Fix issues with cache_detail nextcheck updates
-Date: Mon,  3 Mar 2025 17:26:27 -0500
-Message-ID: <174104077139.32322.8702101289480612960.b4-ty@oracle.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20250301064836.3285906-1-leo.lilong@huawei.com>
-References: <20250301064836.3285906-1-leo.lilong@huawei.com>
+	s=k20201202; t=1741041135;
+	bh=c1cBdBqaDwBD00W4WhD2vFldfrgHvcYL/fC2/VNe7qs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=C0pU+UZYuAIO1ugeESlJUtZy9U6U4KcOEFdI5XzSQi9D7e147trhD9cmHcyQx3gHT
+	 xe/0Snf3mF6UoIfOI0vKjmv+/Qb0CvezadukyM/mH7qlM5wlovpbuYfnoMder6+Skc
+	 bmECsXVlgdT3yJcny0VQZCQdZByHK+DIkbgYyZaQDFr1Dn14Gb4oofvUxLPTAVJDeb
+	 T1wG5l7HRnEjmmeRJYtOXZ6f0jziPI6tDcxayCC32K8sT7J9Z2oHwAxbi3pKOzxpQH
+	 dtnXL7ttLFhdnOjYVyB3S2n3nhuVuz5jKqfzPu7VzPTlS/ObnPOqbGgXJxl3ao56dj
+	 rvZTBqlAMILMg==
+Date: Mon, 3 Mar 2025 14:32:14 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ pavan.chebbi@broadcom.com, przemyslaw.kitszel@intel.com
+Subject: Re: [PATCH net-next v2 7/9] eth: bnxt: maintain rx pkt/byte stats
+ in SW
+Message-ID: <20250303143214.7d6cd978@kernel.org>
+In-Reply-To: <CACKFLikUqFVOkALJXX+_Tx=-hu=82u+ng4rnm7qgSHwiLr=gFw@mail.gmail.com>
+References: <20250228012534.3460918-1-kuba@kernel.org>
+	<20250228012534.3460918-8-kuba@kernel.org>
+	<CACKFLikUqFVOkALJXX+_Tx=-hu=82u+ng4rnm7qgSHwiLr=gFw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Chuck Lever <chuck.lever@oracle.com>
+On Sun, 2 Mar 2025 23:06:29 -0800 Michael Chan wrote:
+> On Thu, Feb 27, 2025 at 5:25=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> >
+> > Some workloads want to be able to track bandwidth utilization on
+> > the scale of 10s of msecs. Updating all HW stats at this rate is
+> > both hard and wasteful of PCIe bandwidth.
+> >
+> > Maintain basic Rx pkt/byte counters in software. ethtool -S will still
+> > show the HW stats, but qstats and rtnl stats will show SW statistics.
+> >
+> > We need to take care of HW-GRO, XDP and VF representors. Per netdev
+> > qstat definition Rx stats should reflect packets passed to XDP (if
+> > active, otherwise to the stack). XDP and GRO do not interoperate
+> > in bnxt, so we need to count the packets in a few places.
+> > Add a helper and call it where needed.
+> >
+> > Do not count VF representor traffic as traffic for the main netdev.
+> >
+> > The stats are added towards the end of the struct since ethtool
+> > code expects existing members to be first.
+> >
+> > Signed-off-by: Jakub Kicinski <kuba@kernel.org> =20
+>=20
+> The byte counting looks correct except for VLAN packets with the VLAN
+> tag stripped.  Do we want to count the 4 bytes for the VLAN tag?
 
-On Sat, 01 Mar 2025 14:48:34 +0800, Long Li wrote:
-> During memory fault injection testing with nfsd restart, I encountered an
-> issue where NFS client threads would hang for around 1800 seconds. Analysis
-> showed that nfsd threads were blocked for approximately 1800 seconds with
-> the following scenario:
-> 
->   PID: 3941444  TASK: ffff0000cf170040  CPU: 0    COMMAND: "nfsd"
->    #0 [ffff80008d387120] __switch_to at ffffc4ef3c7a6af0
->    #1 [ffff80008d387170] __schedule at ffffc4ef3c7a73a4
->    #2 [ffff80008d3872c0] schedule at ffffc4ef3c7a8074
->    #3 [ffff80008d387300] schedule_timeout at ffffc4ef3c7b7b60
->    #4 [ffff80008d387470] wait_for_common at ffffc4ef3c7a944c
->    #5 [ffff80008d387560] wait_for_completion_interruptible_timeout at ffffc4ef3c7a9630
->    #6 [ffff80008d387570] cache_wait_req at ffffc4ef3c6804dc
->    #7 [ffff80008d3876f0] cache_check at ffffc4ef3c680740
->    #8 [ffff80008d3877d0] exp_find_key at ffffc4ef3b6e293c
->    #9 [ffff80008d387910] exp_find at ffffc4ef3b6e2ccc
->   #10 [ffff80008d387980] rqst_exp_find at ffffc4ef3b6e445c
->   #11 [ffff80008d3879e0] exp_pseudoroot at ffffc4ef3b6e4984
->   #12 [ffff80008d387a90] nfsd4_putrootfh at ffffc4ef3b6f8720
->   #13 [ffff80008d387ab0] nfsd4_proc_compound at ffffc4ef3b6fe4cc
->   #14 [ffff80008d387b70] nfsd_dispatch at ffffc4ef3b6cf428
->   #15 [ffff80008d387c30] svc_process_common at ffffc4ef3c66235c
->   #16 [ffff80008d387d20] svc_process at ffffc4ef3c6652f8
->   #17 [ffff80008d387d90] svc_recv at ffffc4ef3c68c5d0
->   #18 [ffff80008d387e10] nfsd at ffffc4ef3b6cb968
->   #19 [ffff80008d387e60] kthread at ffffc4ef3ad4aca4
-> 
-> [...]
+Not 100% clear to me. I looked at nfp and a couple of Intel drivers
+and if I read the code right they don't count VLAN tags if stripped.
+I suspect that's what most drivers which count in SW will do, simply
+because it's easier rather than intentional choice by their authors.
 
-Applied to nfsd-testing, thanks!
-
-[1/2] sunrpc: update nextcheck time when adding new cache entries
-      commit: c2689130933a68ee9d6bca39ca5c3c7741279ea3
-[2/2] sunrpc: fix race in cache cleanup causing stale nextcheck time
-      commit: 48a9b0e38470d7f16625dbf51f85d0fb7315b15b
-
---
-Chuck Lever
-
+Happy to change if you have a preference, but to spell it out my
+understanding is that not counting stripped tags was more comment=20
+and that's what I intended to implement here.
 
