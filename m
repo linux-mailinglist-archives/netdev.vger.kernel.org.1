@@ -1,184 +1,127 @@
-Return-Path: <netdev+bounces-171078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A71FA4B604
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 03:17:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94534A4B61C
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 03:28:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C597188B461
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 02:17:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFF3B1696FB
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 02:28:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BBF313C9D4;
-	Mon,  3 Mar 2025 02:17:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2075D13B284;
+	Mon,  3 Mar 2025 02:27:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MCF+StKA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ng57cnXk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC402E40E
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 02:17:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50B7D14AD20
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 02:27:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740968223; cv=none; b=c0hgs5CK5oGl/MojGO/qw1oBad3skC21/Q56SbHgQX7HqHyj2YtsoahFLoH6xcKqTqjpu7C30Zx93wx7dpsNHv4FC8S0i+pWMRG9umIXVHm/D2yTAWHA7/7GkvgrNhNsDOlg7csD1nz0/FNG9SavEEmSAD9ZxmP+pc5ss8lWnYE=
+	t=1740968873; cv=none; b=SV4RCgTgec4/wEJdSimow7DxDpXdbWDRRo1pp5jBHz+OYuUZEqSLr/AjH4GXk41OnsLvCClyFNPqJiVGXEuYS0FIOBUPnIHq6w+Agb8lv4oz3q4Ep7l4969hKhIq98Pb/Kcd3YD7sdSU8P1eYtmn8PEU4bTGt8Z22r3QaeVA1/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740968223; c=relaxed/simple;
-	bh=9TlSEQcNlyYnFinooHJbDdyQDU2xS1zOEsLKeQkcQkE=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=km60HjIBkNCxXIRpfizVqsRj3Gg8vzbLhy6NyLK/QqAtQ0qsUNrabq8++UW1vVi1s6XRlT1N3mRt9Js2roge5fRgiQWJLx3lJHt6rrvaHDIs68uQB2THE+sR+Q4nTWjVqJGkoRPdkipr4JVud1kW2Q9MElzoJ54RMv2Xnk79gio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MCF+StKA; arc=none smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6e8c3a0d468so6619626d6.0
-        for <netdev@vger.kernel.org>; Sun, 02 Mar 2025 18:17:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740968220; x=1741573020; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZAPmK0DZHwzaWqKN1Px77dSFNv0SWbdawOnekURekyc=;
-        b=MCF+StKArv0MfVOhKTAXt74uSyYtqoh0HYQOfZIVf1rtpf8vq19c+WzdoMmzTnKTQH
-         6uxrlxoFkl+/K0ym/aSJ25wT6EdwdRWBg8J9s5n81/mx3Z3Qs+wQPBJq7ajUC+D+va/+
-         ZoZ5pJyxv0Uj6LPMpHz26TlJ8h6DJI49hM0xyHJQgyMTqTarkdXixKmmCM/h8HGu064N
-         NvaxC1MNZ1JFwOaINJ7JJtesMUSE5+Bbjl3LwtMUGCV+mIPhxnTwgFNh/R00K1/d0Uet
-         sudbamDt8QkqtLKXJrxopY2g1i2+A1rQJSPlgibJYAQrdLlVats1On/cFh1DcqDPFvZq
-         SsHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740968220; x=1741573020;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ZAPmK0DZHwzaWqKN1Px77dSFNv0SWbdawOnekURekyc=;
-        b=dyf41mucd9rV66/hpop6WCQqvg3KSjZ21PcUvO5+8+amvr6A0p2MQijIG5nEuHpFRi
-         Rx1PNR8icyI6gFcYK4EnkHTuv3Oby4RZVG3DBre3Q50x80y3ugFe82ZMcbIkpEtxBhae
-         nBEFZ14l7cxhIxmiFxf9xgacxt98NlPBrGuWjGbI0cEIOi6ETrGah14ZWYVCm7IT+4uH
-         3eMDFm9lc+UcDSDW40l5Q3tYI07FobX+cbEe6uYcfxQ41Sv4P2JzOpfYE9TxzW2/RqdR
-         ZwBq/A0YHAR0gBS2XL8lK4UhTBe0nItGbifT6EWItJICbEPKkpLqWXGSjMBxwwV9fUTu
-         Tuew==
-X-Gm-Message-State: AOJu0Yw1DnNLh+wCLaij+DnMWG4889NFH3mvIm/3nQu0uJSbPfOekDUb
-	vYr13c8TM2iRqbg3qtvxqovL2zwlsDg+JXpkCF96yi3MsshKhy6a
-X-Gm-Gg: ASbGnctV4leBM8Bv7Pp871AygTwBage3vREIYQAsGE31qvU+1GV+KrLwICxc8BjBU3a
-	PCXMH0shm8iefyZrSvcK0fEMjOI1NmegR0ewblckTwBCUMwqlE8cVBrJrYMau7LxEP5Rg4ZG0Zv
-	Qa51gEpukSjpAFj3j0af7zFJNRpNObW1GCwVP4+N44nnjdg61SHdYkN6iE/77AEwA51ltdylyQ2
-	uaSwMBeJLhxJlVxMQLj7i3LvGJO1SNN9oxnjFMA2le0wCWyCuKq17YDixdXs/1XhpYYa2XCh9bw
-	qawjEHu2p7pe5bvwMeWO3grHRv4aPpd0O/1Y0lgKa/MbOpwM5cAG8C7CJsCcWADaeKEuKSYb3MI
-	1yMLhmf48wrDYSwbE5sftYw==
-X-Google-Smtp-Source: AGHT+IG/oTFW/l2XwsCqde2419EiMdhH+gjxx8sMm/WPFw94Wk6+UKCRPvkh+cQVqrjHdvt0LBwA6w==
-X-Received: by 2002:a05:6214:e67:b0:6e6:6b5b:e559 with SMTP id 6a1803df08f44-6e8a0d85e9fmr160400346d6.34.1740968220399;
-        Sun, 02 Mar 2025 18:17:00 -0800 (PST)
-Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-474691a11fdsm52930241cf.15.2025.03.02.18.16.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 02 Mar 2025 18:16:59 -0800 (PST)
-Date: Sun, 02 Mar 2025 21:16:58 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- ncardwell@google.com, 
- kuniyu@amazon.com, 
- dsahern@kernel.org, 
- willemb@google.com, 
- willemdebruijn.kernel@gmail.com, 
- horms@kernel.org
-Cc: netdev@vger.kernel.org, 
- Jason Xing <kerneljasonxing@gmail.com>
-Message-ID: <67c5111ae5754_170775294fe@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250228164904.47511-1-kerneljasonxing@gmail.com>
-References: <20250228164904.47511-1-kerneljasonxing@gmail.com>
-Subject: Re: [PATCH net-next] net-timestamp: support TCP GSO case for a few
- missing flags
+	s=arc-20240116; t=1740968873; c=relaxed/simple;
+	bh=+yaRIRHwJhYD80ovU3oLHy/7gA+I7If+Tf09MlnOGsY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uOz7iE2D5Mt91FqHigXonhhfdFngGdPzyKbTCiKrYPehfe7MVuJbyH2c6Gf8Zdr34ZLGek2vjXFw5BmBmOSyduRcwkS6oHPOa5iGCpxe+r+qk+4jd20R94DqJEBh3sJbvHej+NXcZ7TXnDO6u+rmv6SR60wilfuugsGF9vdC6KY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ng57cnXk; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740968872; x=1772504872;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=+yaRIRHwJhYD80ovU3oLHy/7gA+I7If+Tf09MlnOGsY=;
+  b=Ng57cnXkWjd5OIHs5bdagTHvli0sv+pqFWkSDrn6B4t0lBzT8NJh/p9O
+   RMiQvG1sRxFawQdB5ublclZxXk39esnpOFtvmj/hpEQfRXv3E0DLeM3U3
+   hCS3YfWrCnca+6AT9TU92sh+fDI5ChtzZB+EC+BQodeVQzWVoIegsA9on
+   TnEAcgGH1NjYpmXzdF6KAg72XM4UDhZs2HxWzCQVhRChnkmt3UgspREAq
+   f5lJ/3Nv4LOLmUsibBAkIDK9Bkui5tsHWPYTo77bV/JHfeiL+lv/HtMpy
+   G852AlQjp0mRc67oC/McJTFBVBxbp3ThEs7DXlNvmVhxfUkaT4Yoq73n6
+   Q==;
+X-CSE-ConnectionGUID: jRJP7QjqQnqV7ozt/tpGjw==
+X-CSE-MsgGUID: DZ+DK+ngR6OP85dDx9YgLw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="42021536"
+X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
+   d="scan'208";a="42021536"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2025 18:27:51 -0800
+X-CSE-ConnectionGUID: RH2BbcC4ScmT23C5Uvymig==
+X-CSE-MsgGUID: iW+f1ZttQMCM6AwXUt/Sqw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,328,1732608000"; 
+   d="scan'208";a="117871253"
+Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
+  by fmviesa007.fm.intel.com with ESMTP; 02 Mar 2025 18:27:48 -0800
+Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tovWz-000Hpj-23;
+	Mon, 03 Mar 2025 02:27:45 +0000
+Date: Mon, 3 Mar 2025 10:27:30 +0800
+From: kernel test robot <lkp@intel.com>
+To: Saeed Mahameed <saeed@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	Vlad Dumitrescu <vdumitrescu@nvidia.com>
+Subject: Re: [PATCH net-next 04/14] net/mlx5: Implement devlink enable_sriov
+ parameter
+Message-ID: <202503030926.KNBxmdVW-lkp@intel.com>
+References: <20250228021227.871993-5-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250228021227.871993-5-saeed@kernel.org>
 
-Jason Xing wrote:
-> When I read through the TSO codes, I found out that we probably
-> miss initializing the tx_flags of last seg when TSO is turned
-> off,
+Hi Saeed,
 
-When falling back onto TCP GSO. Good catch.
+kernel test robot noticed the following build warnings:
 
-This is a fix, so should target net?
+[auto build test WARNING on net-next/main]
 
-> which means at the following points no more timestamp
-> (for this last one) will be generated. There are three flags
-> to be handled in this patch:
-> 1. SKBTX_HW_TSTAMP
-> 2. SKBTX_HW_TSTAMP_USE_CYCLES
+url:    https://github.com/intel-lab-lkp/linux/commits/Saeed-Mahameed/devlink-define-enum-for-attr-types-of-dynamic-attributes/20250228-101818
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250228021227.871993-5-saeed%40kernel.org
+patch subject: [PATCH net-next 04/14] net/mlx5: Implement devlink enable_sriov parameter
+compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
 
-Nit: this no longer exists
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202503030926.KNBxmdVW-lkp@intel.com/
 
-(But it will affect the upcoming completion timestamp.)
+includecheck warnings: (new ones prefixed by >>)
+>> drivers/net/ethernet/mellanox/mlx5/core/devlink.c: lib/nv_param.h is included more than once.
 
-> 3. SKBTX_BPF
-> 
-> This patch initializes the tx_flags to SKBTX_ANY_TSTAMP like what
-> the UDP GSO does. But flag like SKBTX_SCHED_TSTAMP is not useful
-> and will not be used in the remaining path since the skb has already
-> passed the QDisc layer.
+vim +11 drivers/net/ethernet/mellanox/mlx5/core/devlink.c
 
-Unless multiple layers of qdiscs (e.g., bonding or tunneling) and
-GSO is applied on the first layer, and SKBTX_SW_TSTAMP is not
-requested. But SCHED without SW is an unlikely configuration
+     5	
+     6	#include "mlx5_core.h"
+     7	#include "fw_reset.h"
+     8	#include "fs_core.h"
+     9	#include "eswitch.h"
+    10	#include "esw/qos.h"
+  > 11	#include "lib/nv_param.h"
+    12	#include "sf/dev/dev.h"
+    13	#include "sf/sf.h"
+  > 14	#include "lib/nv_param.h"
+    15	
 
-Probably best to just drop this.
-
-> 
-> Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-> ---
->  net/ipv4/tcp_offload.c | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
-> index 2308665b51c5..886582002425 100644
-> --- a/net/ipv4/tcp_offload.c
-> +++ b/net/ipv4/tcp_offload.c
-> @@ -13,12 +13,15 @@
->  #include <net/tcp.h>
->  #include <net/protocol.h>
->  
-> -static void tcp_gso_tstamp(struct sk_buff *skb, unsigned int ts_seq,
-> +static void tcp_gso_tstamp(struct sk_buff *skb, struct sk_buff *gso_skb,
->  			   unsigned int seq, unsigned int mss)
->  {
-> +	u32 flags = skb_shinfo(gso_skb)->tx_flags & SKBTX_ANY_TSTAMP;
-> +	u32 ts_seq = skb_shinfo(gso_skb)->tskey;
-> +
->  	while (skb) {
->  		if (before(ts_seq, seq + mss)) {
-> -			skb_shinfo(skb)->tx_flags |= SKBTX_SW_TSTAMP;
-> +			skb_shinfo(skb)->tx_flags |= flags;
->  			skb_shinfo(skb)->tskey = ts_seq;
->  			return;
->  		}
-> @@ -193,8 +196,8 @@ struct sk_buff *tcp_gso_segment(struct sk_buff *skb,
->  	th = tcp_hdr(skb);
->  	seq = ntohl(th->seq);
->  
-> -	if (unlikely(skb_shinfo(gso_skb)->tx_flags & SKBTX_SW_TSTAMP))
-> -		tcp_gso_tstamp(segs, skb_shinfo(gso_skb)->tskey, seq, mss);
-> +	if (unlikely(skb_shinfo(gso_skb)->tx_flags & (SKBTX_ANY_TSTAMP)))
-
-no need for the extra parentheses
-
-> +		tcp_gso_tstamp(segs, gso_skb, seq, mss);
->  
->  	newcheck = ~csum_fold(csum_add(csum_unfold(th->check), delta));
->  
-> -- 
-> 2.43.5
-> 
-
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
