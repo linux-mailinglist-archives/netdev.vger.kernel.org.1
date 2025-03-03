@@ -1,172 +1,159 @@
-Return-Path: <netdev+bounces-171340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A91AA4C986
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:31:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E14AA4C969
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:28:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 861493AB9F6
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:16:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA1B23B25B1
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:18:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB23E2376FA;
-	Mon,  3 Mar 2025 17:00:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E40D22759C;
+	Mon,  3 Mar 2025 17:03:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="uo272dwA"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="J4SGNnw2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05EE32376E1
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 17:00:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E91EB214A80;
+	Mon,  3 Mar 2025 17:03:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741021216; cv=none; b=npz8699ZcmmIz5eit+kPCIPOwxZDmvzVPLprHTuWIiOOFfayCX7v/ODQlHF03Y6rnkOD7oOEuiHUqZPrgWUsPvTg8N9dd66zn2+tVtQ0dKhMEXGOymHPNng57YPZBlK0+7xF2zqQ1AoQ2NNeb1riR2ZiBaCIyHF4zU024s0J9es=
+	t=1741021410; cv=none; b=tKKiPgAJvmz75py+GMTCrRH22PMAMnURF6pdlXVH4JgZeemCrfeX5CnNnMecIxNUR7TvJwawYDzKh6UAimD3UnvY9D9fD8xqPXXTm5psBk1w4I61b7zwfgTVy6qbXVQ/HVvvQvj8/1v4MxkCz2Z46jwGozy5xdR4J6VMY1gLPJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741021216; c=relaxed/simple;
-	bh=PuyMo56E1J04N+xRFHQpuOme3py1aZX9AvRAkMmg0TQ=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kF1rSz86iJKjsOCWOYDdj4boY13OGzLVV8BlP0c192cJoelrrjXvP9ZZ7HuVTo2nu3bror8+OsaNYDXLNGrDk1yjVm8Ajmo917Oou6FsDhyn8rFO9edYOpAINet2YWEeJkUHozcO7HEAObQxR1621t4yftXnfFPMfTv/YVwrL9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=uo272dwA; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7c0ac2f439eso572609685a.0
-        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 09:00:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1741021213; x=1741626013; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=yL69mmP3AaHszBSiFbdb5IOP3AgAgn4Zq7i8mgBTtbc=;
-        b=uo272dwAOxyYV3wwlUSRK7y6qAgQ5HoJhHH5wUO+q4kQJ7MijoexJ0Ok4/8vSHvJKZ
-         V9CFjNFHIs4Vp9cd0PbwcSNDlgOZ+rPJCoAHTwr/dg1LJMpPFSCcMIhaofmFjMm4yxP8
-         OKDl+pH0oMLDZN76zD+cUfgAApjurwx4afWK8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741021213; x=1741626013;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yL69mmP3AaHszBSiFbdb5IOP3AgAgn4Zq7i8mgBTtbc=;
-        b=dRWblmASf0Qge40hkRB+5K0mZPl62wf/x6srwj+HjKKV3JyCpM8FsB08kYsK1unxV/
-         Uq63w7kRS27MeA00StdFM259L+koQhkQTYFu7S7gswPwwkk4SZsaPDMUjmKpcxyme+UX
-         pD4ngoE/xDxgFXL9ugFSCvcTcRfpcQKNFjD7CAS2JduYmuVvJn2FPKkHDMgW5uBmvWW2
-         2BhTgfyiJSdlBiq2D41NIlbAwljORGExF5Yn9sO2b00Hxs9ORTLTKw7j8hlmcg2mZPSA
-         cSRTN2DQ9iUHM/Khvk+rzYIRe/neXB7H6f6GIHboZepbaatHEO7d+t+n9cI4CrXOKjJu
-         fNqw==
-X-Forwarded-Encrypted: i=1; AJvYcCUY79lnu663fi9lMD7UwxMXkSFiHqWU6H0lKSRz+jo2R7psXUtimh4em+sp/Be51GgqYJoSQ34=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvztsRmD9udO7U3ie95uLotON7VzKywdnu39+AMjW4NMfSW9yJ
-	JXrAGGedgcLS4Etor0ifBgdYmNfeQZE7VaOpC90mWbraWD6fZpLdaF08kmJX0Yo=
-X-Gm-Gg: ASbGncvH+Vl6mY+fVibXR9UEJk8kJ2ZUZN22CTTcxB+ymkNh0G7UAD+N970pLnHT+FX
-	LpuGHKOpfa/Rn3IiOLeQm456Qx8nLVgGudpEOlUO1umc2ygcrVx4pqpxqMgXzK6gxedhzCC5vEk
-	lwkXL6Y3SfUvdbnR5bdqTF+Xgk6WDhhcnrk39dlQcjU+cZnS8uvmZ4xr2k4v7puDHZD9OOdzIC3
-	Sz5KuUYGRJvLogk6oow3proCNDTYHOcqSSaRwgU9ZfiepT74wlZca+tOA2f4PVTfxAKyWrGbMP/
-	y3QLYbXosBw10pLzs6relaadzlzn04chiEKSIZrzuoCSGQECoRxa4gGw8TMNmY1srUf9VdHjvPt
-	LppOpEAY=
-X-Google-Smtp-Source: AGHT+IHlpeyEa5ZH06VbJgoLcEMoTEGviZJYbrPAPhw4YUCksto74AOTT5BgLi6sgiQez9Vt7bG6ig==
-X-Received: by 2002:a05:620a:27c7:b0:7c3:bcb2:f44f with SMTP id af79cd13be357-7c3bcb3000emr677131585a.17.1741021212762;
-        Mon, 03 Mar 2025 09:00:12 -0800 (PST)
-Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c36ff0f3c0sm621367685a.56.2025.03.03.09.00.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Mar 2025 09:00:12 -0800 (PST)
-Date: Mon, 3 Mar 2025 12:00:10 -0500
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	mkarsten@uwaterloo.ca, gerhard@engleder-embedded.com,
-	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, mst@redhat.com,
-	leiyang@redhat.com,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v5 3/4] virtio-net: Map NAPIs to queues
-Message-ID: <Z8XgGrToAD7Bak-I@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	mkarsten@uwaterloo.ca, gerhard@engleder-embedded.com,
-	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, mst@redhat.com,
-	leiyang@redhat.com,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20250227185017.206785-1-jdamato@fastly.com>
- <20250227185017.206785-4-jdamato@fastly.com>
- <20250228182759.74de5bec@kernel.org>
- <Z8Xc0muOV8jtHBkX@LQ3V64L9R2>
+	s=arc-20240116; t=1741021410; c=relaxed/simple;
+	bh=Q8x9V52Wo07ayFgUjbDQy5gks+1d8BUCRccch+DGgHw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rgs8BqMPwqZcF6s+ToYk3FctIrJ/NkqevczGvCWqcVz7i4yNvPwmqyTo6fUV4V4OEdl1F1hBznEsLWU016iDGlesLLRCtM4EuCNhYDILwC1EXQ91YwpqnhrpvZWByamr34rtmkvc/rSuV16yLqcJ47SWK1VYx2ScXaugT0CBlq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=J4SGNnw2; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 3511144414;
+	Mon,  3 Mar 2025 17:03:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1741021406;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5YIhKVawvCB2Aqegf19Ipa1qkc8vmMbU4kU/Udk1Ums=;
+	b=J4SGNnw2hL8GLotOrJNM0lbYBpcpXS/bs7Kvr8hZDymHa7TZJ3ifXuKx5XVLzEwoQlVVCh
+	5vJvq54ZtBMsh8fz6pigCr0XkgTuiuwtjaZKIviRKgHPZ64ungq6FNszJft688orkFTL0K
+	dMC7GUKWgROnTIVAjzvFimWMc2b8N3BaUghCWsZ+vPxQC5kYdE6sFMZhXX4/i+CZgm1rS2
+	hZiErf1iB8WOhzo2sJO6I5Hb2ft5PauOiaIQ9kvy6NgK/EkPl0ETXnPaF1YFgZTn0M0oFd
+	Uvpt7P5V/ulKbRVXwmueZWFfvAG+EineFjX5iHF3a6W4huI9zZ0lXGMrqoKtpw==
+Date: Mon, 3 Mar 2025 18:03:23 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Meghana Malladi <m-malladi@ti.com>
+Cc: <javier.carrasco.cruz@gmail.com>, <diogo.ivo@siemens.com>,
+ <horms@kernel.org>, <jacob.e.keller@intel.com>, <richardcochran@gmail.com>,
+ <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
+ <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
+ <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>, Vignesh Raghavendra
+ <vigneshr@ti.com>, Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
+Subject: Re: [PATCH net-next v3 1/2] net: ti: icss-iep: Add pwidth
+ configuration for perout signal
+Message-ID: <20250303180323.1d9b51de@kmaincent-XPS-13-7390>
+In-Reply-To: <20250303135124.632845-2-m-malladi@ti.com>
+References: <20250303135124.632845-1-m-malladi@ti.com>
+	<20250303135124.632845-2-m-malladi@ti.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z8Xc0muOV8jtHBkX@LQ3V64L9R2>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdelleeijecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefguddtfeevtddugeevgfevtdfgvdfhtdeuleetffefffffhffgteekvdefudeiieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduledprhgtphhtthhopehmqdhmrghllhgrughisehtihdrtghomhdprhgtphhtthhopehjrghvihgvrhdrtggrrhhrrghstghordgtrhhuiiesghhmrghilhdrtghomhdprhgtphhtthhopeguihhoghhordhivhhosehsihgvmhgvnhhsrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrt
+ ghpthhtohepjhgrtghosgdrvgdrkhgvlhhlvghrsehinhhtvghlrdgtohhmpdhrtghpthhtoheprhhitghhrghruggtohgthhhrrghnsehgmhgrihhlrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Mon, Mar 03, 2025 at 11:46:10AM -0500, Joe Damato wrote:
-> On Fri, Feb 28, 2025 at 06:27:59PM -0800, Jakub Kicinski wrote:
-> > On Thu, 27 Feb 2025 18:50:13 +0000 Joe Damato wrote:
-> > > @@ -2870,9 +2883,15 @@ static void refill_work(struct work_struct *work)
-> > >  	for (i = 0; i < vi->curr_queue_pairs; i++) {
-> > >  		struct receive_queue *rq = &vi->rq[i];
-> > >  
-> > > +		rtnl_lock();
-> > >  		virtnet_napi_disable(rq);
-> > > +		rtnl_unlock();
-> > > +
-> > >  		still_empty = !try_fill_recv(vi, rq, GFP_KERNEL);
-> > > +
-> > > +		rtnl_lock();
-> > >  		virtnet_napi_enable(rq);
-> > > +		rtnl_unlock();
-> > 
-> > Looks to me like refill_work is cancelled _sync while holding rtnl_lock
-> > from the close path. I think this could deadlock?
-> 
-> Good catch, thank you!
-> 
-> It looks like this is also the case in the failure path on
-> virtnet_open.
-> 
-> Jason: do you have any suggestions?
-> 
-> It looks like in both open and close disable_delayed_refill is
-> called first, before the cancel_delayed_work_sync.
-> 
-> Would something like this solve the problem?
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 76dcd65ec0f2..457115300f05 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -2880,6 +2880,13 @@ static void refill_work(struct work_struct *work)
->         bool still_empty;
->         int i;
-> 
-> +       spin_lock(&vi->refill_lock);
-> +       if (!vi->refill_enabled) {
-> +               spin_unlock(&vi->refill_lock);
-> +               return;
-> +       }
-> +       spin_unlock(&vi->refill_lock);
+On Mon, 3 Mar 2025 19:21:23 +0530
+Meghana Malladi <m-malladi@ti.com> wrote:
+
+> icss_iep_perout_enable_hw() is a common function for generating
+> both pps and perout signals. When enabling pps, the application needs
+> to only pass enable/disable argument, whereas for perout it supports
+> different flags to configure the signal.
+>=20
+> But icss_iep_perout_enable_hw() function is missing to hook the
+> configuration params passed by the app, causing perout to behave
+> same a pps (except being able to configure the period). As duty cycle
+> is also one feature which can configured for perout, incorporate this
+> in the function to get the expected signal.
+
+...
+
+> IEP_SYNC_CTRL_SYNC_EN); @@ -474,7 +484,38 @@ static int
+> icss_iep_perout_enable_hw(struct icss_iep *iep, static int
+> icss_iep_perout_enable(struct icss_iep *iep, struct ptp_perout_request *r=
+eq,
+> int on) {
+> -	return -EOPNOTSUPP;
+> +	int ret =3D 0;
 > +
->         for (i = 0; i < vi->curr_queue_pairs; i++) {
->                 struct receive_queue *rq = &vi->rq[i];
->
+> +	mutex_lock(&iep->ptp_clk_mutex);
+> +
+> +	/* Reject requests with unsupported flags */
+> +	if (req->flags & ~PTP_PEROUT_DUTY_CYCLE) {
+> +		ret =3D -EOPNOTSUPP;
+> +		goto exit;
+> +	}
 
-Err, I suppose this also doesn't work because:
+The flags check does not need to be in the mutex lock.
+With this change:
+Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
 
-CPU0                       CPU1
-rtnl_lock                  (before CPU0 calls disable_delayed_refill) 
-  virtnet_close            refill_work
-                             rtnl_lock()
-  cancel_sync <= deadlock
+> +	if (iep->pps_enabled) {
+> +		ret =3D -EBUSY;
+> +		goto exit;
+> +	}
+> +
+> +	if (iep->perout_enabled =3D=3D !!on)
+> +		goto exit;
+> +
+> +	/* Set default "on" time (1ms) for the signal if not passed by the
+> app */
+> +	if (!(req->flags & PTP_PEROUT_DUTY_CYCLE)) {
+> +		req->on.sec =3D 0;
+> +		req->on.nsec =3D NSEC_PER_MSEC;
+> +	}
+> +
+> +	ret =3D icss_iep_perout_enable_hw(iep, req, on);
+> +	if (!ret)
+> +		iep->perout_enabled =3D !!on;
+> +
+> +exit:
+> +	mutex_unlock(&iep->ptp_clk_mutex);
+> +
+> +	return ret;
+>  }
+> =20
+>  static void icss_iep_cap_cmp_work(struct work_struct *work)
+> @@ -553,6 +594,8 @@ static int icss_iep_pps_enable(struct icss_iep *iep, =
+int
+> on) rq.perout.period.nsec =3D 0;
+>  		rq.perout.start.sec =3D ts.tv_sec + 2;
+>  		rq.perout.start.nsec =3D 0;
+> +		rq.perout.on.sec =3D 0;
+> +		rq.perout.on.nsec =3D NSEC_PER_MSEC;
+>  		ret =3D icss_iep_perout_enable_hw(iep, &rq.perout, on);
+>  	} else {
+>  		ret =3D icss_iep_perout_enable_hw(iep, &rq.perout, on);
 
-Need to give this a bit more thought.
+
+
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
