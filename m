@@ -1,133 +1,136 @@
-Return-Path: <netdev+bounces-171401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA21AA4CD90
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 22:35:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB805A4CD98
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 22:41:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3DA616E680
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 21:35:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E53871719E2
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 21:40:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 979B9230277;
-	Mon,  3 Mar 2025 21:35:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 666E52356B0;
+	Mon,  3 Mar 2025 21:40:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=online.de header.i=max.schulze@online.de header.b="T2ai1hFe"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NjTUyC4t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF0A1E9B3D
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 21:34:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7826230BE0
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 21:40:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741037701; cv=none; b=UL4gKOP0FXEyYC73nZL2tkVb5kKJCX8jWNaj5YRxvy1di+ZXyuMtPy4CoC+i+9YIoECrF8X7CyMaVWcxzldWGnGcF0URCZIJNmfEKF5B/tLWvlZ/6zFm1qQgiztXphscsGlwQQQD/ROYhEAjj8cHkMNRGTFw1Bs5dBqSP1WIp3o=
+	t=1741038056; cv=none; b=nYW/lvRHySaKnpSICVqbGCiKGXqV4wQBx7dINVnWtzzozNdIXE1flJq/PTL+PGxYyPxxYD/SmTGVmdzbOFkFXm5zeivMOUXXucMvCRu2dMdmcDlyOP79qVHhyo5+B9ErqZfoVPTQ3/Td97koFi4n8bbmCR+/DVQQ0QIDL5zbDZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741037701; c=relaxed/simple;
-	bh=D3uMHcIXTF2m+r73NVEXtNnrCFnvMfodCOCP8z6Cyjw=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=GzCfalvqhj4XEt2gWl2uG4hJAJJHYIeAp/wbqSjltjnxucjbv3R1wNX9h7toAM9jowlM87iSJrYuYXBRxBP2gMt41ssEqKQIzEfpscmjJyLekpnpRy2y6yN02y8x6jRhDLPyyhGui+HBy94d81FqjVvAwJ0AtekPRZaszsZcxRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=online.de; spf=pass smtp.mailfrom=online.de; dkim=pass (2048-bit key) header.d=online.de header.i=max.schulze@online.de header.b=T2ai1hFe; arc=none smtp.client-ip=212.227.17.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=online.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=online.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=online.de;
-	s=s42582890; t=1741037691; x=1741642491; i=max.schulze@online.de;
-	bh=GkMUYHTATf4WJITOjs7tmaL/Hc96qlrL/WFX84yJLmk=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:From:Subject:
-	 Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=T2ai1hFeJKsRxEiB/xOYYb/mdI8ER9ypnbeyhUawMl5ADvCrih1khZL1D4sGfziw
-	 6+u4KoCwag1qIv6H+QCtsfsQvGxZElDqCyqA8PlZt5mipqOg99Oed+zBDzqZoWOmf
-	 E3Ety+l0zhlexa/IoHthJhycwqe8+1nY7E2e1g6I5GH2vRaUbOGJlqP3zc7WUH38B
-	 80+Ay7QLqlJuoeCd3uaPUwxFoRe/qswIKHI7XNZBLKcOuv/K1mdiiz4DOhH9h7B0D
-	 DIq/m0c9VDGM37ACLbvuJgECK/uiwDJaOPRbvJRV7p/E0TSlR5QsxKkBYbIRbwT7c
-	 Qlsa7WedVP9xbwEDEQ==
-X-UI-Sender-Class: 6003b46c-3fee-4677-9b8b-2b628d989298
-Received: from [192.168.151.48] ([84.160.55.49]) by mrelayeu.kundenserver.de
- (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis) id
- 1MCsLu-1ty33h3VFQ-00CfBO; Mon, 03 Mar 2025 22:29:37 +0100
-Message-ID: <5f649558-b6a0-4562-b8e5-713cb8138d9a@online.de>
-Date: Mon, 3 Mar 2025 22:29:37 +0100
+	s=arc-20240116; t=1741038056; c=relaxed/simple;
+	bh=t48prv4ltqZBgmpiT8R/ZTVb9z8qZJulguu49one7U4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IE4NgKq36k9wfG2UUuLjMPev7mEFwxsT+Prfqs1hbD51p25K1/yUiSt2UJb0hbejrIpPZBXssLsmBvjdYWB8l/4NHJmVY1OCTR87EH+8Vj+DlJO3awrz3cLf+NNEVQM7e06thL8/TOi31Ov8q5XHKmsgvpYmTQjXp5NMnHqheG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NjTUyC4t; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2237a32c03aso15745ad.1
+        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 13:40:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741038054; x=1741642854; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=//CA4dP1gRO/1RNRixCqJrbqKaw0YXw5wU7J/MVaxKg=;
+        b=NjTUyC4tnMMbS2ZkzEQu+tumClDu5ho6F4m5Q+WN1K2Va0/uPSgzO5AEhDDBekPa6L
+         Dah8MBZnU/1mxnVqV0WmA7JTbWKPXkxxuMDFW7tVBm/Rv+0nTucILMzPqN4JE2iRI66r
+         +QfJWlBg/iWxfeOt9MT/kyRgayw+yR3ksBXyZ42ySyZmAx9NbTgZpxiDDqpcDfJrJBVU
+         wRyC6H1r76w+vpTCeIcOHPjg23ND8SxN8dqGGN/A4YGaHlmdZmPvi/BRk5Xk+u3sklBz
+         efiGFYH6bQMtDebloPlYoTJbhviL+fdn5Uoet5qVvEjdHuvAGQGiU4Bv74Py3P9tdmK8
+         XUmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741038054; x=1741642854;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=//CA4dP1gRO/1RNRixCqJrbqKaw0YXw5wU7J/MVaxKg=;
+        b=IGEdsULIvItvpf94XRW37saeEt8sRwRek7vYFMz7GUFXzVp1E3uIsQ0nQErtY5wuW6
+         xdEgiE5dPziZJXQu3fm6WLYE+FKaQ+wzWZF5wRWj/9P5TqB0tRmjWc+2LLRwHEqg3P/L
+         gvNxbOHhtEdV7ZnYfcAbBx7fDD0RmNNmrjOSsQWmzfteP40eHw9ynN/Knogg/NcccU/a
+         zjuiRFEtStzRMRijYcfJdsspUk9ztgeKZzWlMzdIJar9Gww2txZOsag1sXYUSMGbiLyQ
+         56yr3YAzQGSRSN7B+nvB528r5yMf2Ty43PYTPDpPqKhgmoIM3zpjcWRQXUy/gYdCuRu1
+         Xgwg==
+X-Forwarded-Encrypted: i=1; AJvYcCWvjFAAphEXGl0M0xe+D+yzhe/u/ArK1a7UVOqPhrw6vaLGGgUIq/ju3b2cd+jS7rmm3poKRQk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyF3Zlq0NFjzR9Cko6tXsjBz9ZSIex4/niVX77tERjj8bi9Dw7D
+	7CEJyTY6XxWpp/CD8nlenH5b/bujNUyMeF9ja3I32MxA3AnRXVmTBJIxzDUTJg==
+X-Gm-Gg: ASbGncs/6YpiSuK5hLswNTJLuPsOXYDW2PiMFTRMsnO3iZUb+N933VniMDWlCZeKsjq
+	QHnUKFoU97RtR6rmnReWqJCpV4eeeoqCh5WTmTCmGrfFdmBlwviky5Vn+w3k1I89UKUeTP+iLG3
+	pvKEl9VjXz8UGLHilccZb4pC5VzmGAYCHgTq0JmJPRQAGBov0bbxxi1ZxES+eg0QV0wVenXzJaD
+	qeMJYWZsCqBWJM+e67ZW9LclfWx685hlO4ctLPDcbIeACO3bbQpL8yH8XPkXu5VM2WJcgru3+E2
+	0QcFNiZnVSkXyeZzZ6hRLDFi3+hoC1q1K2PCr8I4kSUocNkmnTsrBpRQvrHyScnhXAi2dR5FdmD
+	oXUEzmFaNsBaZFPI=
+X-Google-Smtp-Source: AGHT+IEwj6zn3l1n1mEvrRIOd0S1KGWs/bgL/3cFaL+tQsr/6cABYrLinWLfgT7M2GWCtuDNAUdgLA==
+X-Received: by 2002:a17:903:2592:b0:223:2630:6b86 with SMTP id d9443c01a7336-223db3fdecdmr77895ad.7.1741038053846;
+        Mon, 03 Mar 2025 13:40:53 -0800 (PST)
+Received: from google.com (227.180.227.35.bc.googleusercontent.com. [35.227.180.227])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7349fe514besm9424721b3a.71.2025.03.03.13.40.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Mar 2025 13:40:53 -0800 (PST)
+Date: Mon, 3 Mar 2025 21:40:48 +0000
+From: Sami Tolvanen <samitolvanen@google.com>
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: peterz@infradead.org, rostedt@goodmis.org, mark.rutland@arm.com,
+	alexei.starovoitov@gmail.com, catalin.marinas@arm.com,
+	will@kernel.org, mhiramat@kernel.org, tglx@linutronix.de,
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, ast@kernel.org, daniel@iogearbox.net,
+	andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com,
+	yonghong.song@linux.dev, john.fastabend@gmail.com,
+	kpsingh@kernel.org, sdf@fomichev.me, jolsa@kernel.org,
+	davem@davemloft.net, dsahern@kernel.org,
+	mathieu.desnoyers@efficios.com, nathan@kernel.org,
+	nick.desaulniers+lkml@gmail.com, morbo@google.com, kees@kernel.org,
+	dongml2@chinatelecom.cn, akpm@linux-foundation.org,
+	riel@surriel.com, rppt@kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, llvm@lists.linux.dev
+Subject: Re: [PATCH v4 4/4] arm64: implement per-function metadata storage
+ for arm64
+Message-ID: <20250303214048.GA570570@google.com>
+References: <20250303132837.498938-1-dongml2@chinatelecom.cn>
+ <20250303132837.498938-5-dongml2@chinatelecom.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: fujita.tomonori@gmail.com, hfdevel@gmx.net, netdev@vger.kernel.org
-From: Max Schulze <max.schulze@online.de>
-Subject: tn40xx / qt2025: cannot load firmware, error -2
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:s3Xo4JCpzgAAeVIPmoKwtOaJg5REIdDP7UMAV1yHk8dWz05LjRx
- kRFHZs3ThL6r3U4v7uJgbyqmKOHEopRsAHTkz7u9lflKOx/YXf55EpO6ZTt/Xa4WDdXzDOf
- Wd6LLUyRPiholIdrxuZ3Xr3QHBFH8XSfmagIAh7GbiaxIMvvJCqvfLOMNo9IknSjYalF2yd
- X51nIT+EaRNAYHfNvYEKA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:S+koYXc3Q8o=;tzYqCGclzB5Z0RSj37CwuCpVPLZ
- AH7g1ZabGeuASj1mRolXVp892hwcJZLRyq12Gl6cd3ZQ6mDsMmjxJGBxbTrTzSUTa+Tm6BRy9
- IEJcwinms+JEGo6qwaXUWu7PhNPAIzPOiRrB3xGf0WkuZcZBTN4lTvB6dPvGs21a8C/RL8Vn0
- oYRsyuIjKNwF9NNXF3UngRZ+KwsfBeR8px/LZZ7ctabkRB9zrfzS/LrynKZS6ivL8rH/F9Ixw
- gDxY30w24uGeWIqu5W8BMvW0KwT+ZCA1HGunq9NFwGpXX1rQSHKNuY2vUBYtewzaugTQkzRR9
- iUR4QsJ/p1ENevmBD7t6XEQgcjjZch+4lQq4BgnydOmGTQMWBjS4KfSvR4BCwOAd6b8sr3/H5
- n6fERi9eHabR/nEYxqnzUWytawMcS8oDn1MtCVnFw4dq1AlC0h/T4RJDBriuAFW6lUlzJoBF3
- mprJJd8DmlL+350BBoZFD5wCvhT7QWVad87xqKp0KyPsjD8Ey48YIOSJqvEJuv7OxtutP61XS
- 7hdxUnCBTy2rX1iUBCbDrAx4P3d1b9dbqB669lznBOhKaaeMN2MiWvj4QLqL3rYiAMBr5UqBo
- q4o1hPMEGzqee4RtquXbdll8gHyXW0RwjQQ04rdl0AoPxNq9djxwGQgbZZkpxL6IOJoh2LpYU
- 2CL3EHOMIxCnc3cT5slcf+Flt08DRZwnMRM/vFWmxuYKTGKNDW5FTSx/LyXaFl8SdipkYC4Yp
- MkAtbXhGqk0ti4XFsBpRjvIbUmujzJoCbW+ncF+tUhcD8cdj1JypZvA6Gog9xx5ZSgdgJ3kfK
- ynyRngk1s3al485lyss+XhgNItvb9jHteyknaHYhxOpphAiRBETCeD6MK2TJRDyzh3FZspFoW
- QuxfkEIKcP05MZlb30tbMeymP+5YV5k08SU828TLkpbIEx9Sb0U++bR0+UJUAnzuwJdw/4GTJ
- XWAyXUWle0LtR+24mHh5GmPVl5PZlEdlQuaavhghXhQkrREwc2dJhX+V8bSGnVYIzNz49JVe3
- tXniBnQDsu9Yn6mIqV1KOEikX6m3j0YMnus8i4Lo3cdtkgWLBd1/ngyRtbWUSCydRPB8khW4B
- q7nn0uiFxER5qQC60+mIuUEIKk6mSoiavasEMvHxEPSKp4B4ZrH5czogQK9zw9Wuq2Ly92rHK
- eZKKkkce+wh8C3KFjBI37QF9ZARbNnvYIG5Dy7j1d0gFoMvRa8N5lEWt4b5a+W+RTm+XRVul9
- fuHBdXOduNECDS4SM2rNDlcDS/EsVL9fKO8CpdDzvzuR94YxKAnbAx3EEfy5stktIlPQ2mpSu
- qmu0GOUhzxXtk+RHRGVHaFn+Slxr6TnElWpDC8sIgVrObVO4JqpOfnbJ5InIOk7TflV
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250303132837.498938-5-dongml2@chinatelecom.cn>
 
-Hello,
+On Mon, Mar 03, 2025 at 09:28:37PM +0800, Menglong Dong wrote:
+> The per-function metadata storage is already used by ftrace if
+> CONFIG_DYNAMIC_FTRACE_WITH_CALL_OPS is enabled, and it store the pointer
+> of the callback directly to the function padding, which consume 8-bytes,
+> in the commit
+> baaf553d3bc3 ("arm64: Implement HAVE_DYNAMIC_FTRACE_WITH_CALL_OPS").
+> So we can directly store the index to the function padding too, without
+> a prepending. With CONFIG_DYNAMIC_FTRACE_WITH_CALL_OPS enabled, the
+> function is 8-bytes aligned, and we will compile the kernel with extra
+> 8-bytes (2 NOPS) padding space. Otherwise, the function is 4-bytes
+> aligned, and only extra 4-bytes (1 NOPS) is needed.
+> 
+> However, we have the same problem with Mark in the commit above: we can't
+> use the function padding together with CFI_CLANG, which can make the clang
+> compiles a wrong offset to the pre-function type hash. He said that he was
+> working with others on this problem 2 years ago. Hi Mark, is there any
+> progress on this problem?
 
-I am needing help with this:
+I don't think there's been much progress since the previous
+discussion a couple of years ago. The conclusion seemed to be
+that adding a section parameter to -fpatchable-function-entry
+would allow us to identify notrace functions while keeping a
+consistent layout for functions:
 
-> [    4.344358] QT2025 10Gpbs SFP+ tn40xx-0-300:01: Direct firmware load =
-for qt2025-2.0.3.3.fw failed with error -2
-> [    4.345075] QT2025 10Gpbs SFP+ tn40xx-0-300:01: probe with driver QT2=
-025 10Gpbs SFP+ failed with error -2
+https://lore.kernel.org/lkml/Y1QEzk%2FA41PKLEPe@hirez.programming.kicks-ass.net/
 
-
-I have built a mainline kernel 6.13.2 with rust support and have this card=
-:
-
-> 03:00.0 Ethernet controller [0200]: Tehuti Networks Ltd. TN9310 10GbE SF=
-P+ Ethernet Adapter [1fc9:4022]
-> 	Subsystem: Edimax Computer Co. 10 Gigabit Ethernet SFP+ PCI Express Ada=
-pter [1432:8103]
-
-
-I have put the firmware here:
-
-> $ sha256sum /lib/firmware/qt2025-2.0.3.3.fw
-> 95594ca080743e9c8e8a46743d6e413dd452152100ca9a3cd817617e5ac7187b  /lib/f=
-irmware/qt2025-2.0.3.3.fw
-
-
-
-Is there anything else I can do?
-
-What is error -2 ? Who generates it?
-
-( NB: You could mention the hash for the .fw file somewhere in sourcecode,=
- until its in firmware.git (doesn't look like it ever will, huh? [1]), so =
-others can verify they have the same file as the driver authors...)
-
-
-Best,
-Max
-
-
-[1] https://lore.kernel.org/all/20240922102024.218191-1-fujita.tomonori@gm=
-ail.com/
+Sami
 
