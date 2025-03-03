@@ -1,102 +1,175 @@
-Return-Path: <netdev+bounces-171714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA396A4E490
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 16:59:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36272A4E4A1
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:01:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23C4418815CE
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 15:50:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FECD425A1D
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 15:49:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFD5827D78B;
-	Tue,  4 Mar 2025 15:34:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA71125290A;
+	Tue,  4 Mar 2025 15:33:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="pMWhQSZ7"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SEfylcch"
 X-Original-To: netdev@vger.kernel.org
 Received: from beeline3.cc.itu.edu.tr (beeline3.cc.itu.edu.tr [160.75.25.117])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D24327D785
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 15:34:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=160.75.25.117
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C76A727BF81
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 15:33:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=160.75.25.117
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741102478; cv=pass; b=A1I6HqqtEw78mLXz4ckrHECKL358n3s5UanX56CMXSBfPiWKBhf1oHSFtysseHNqK1FvNPmuYv4MDj43QBniN7SdH9wtkyYa0xJgx20PSFqN0KG+UPFIo/OYv908kS3KNinJYMv+z0X6JhdYGX1OprIpom/0UgmChi4dmO41IkU=
+	t=1741102421; cv=fail; b=sPMYVC3GHPPQ4S8+ILRGlil2X0RrOmoeAiYqjfX3LjVeXPrF009xLd8h4lJI/6uyMfcOqdsqHYcw3Pv7aus6v8iK2LpEAgMvOcxlMu6ul1mOkzBPPaV+tvWhYuMGjb53CFIdkBQjVkSj6Lc3W9oj8DFgk4YhyroVwR+OUzT2HiI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741102478; c=relaxed/simple;
-	bh=jMjxzuU5ybybM0n8xvB9Cmcz8tDPN1BHkYcTdsgjICY=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=GqmMkco5hGRPI9+DFFbVlvJI6aTn1y1FP7AH2UaXQkGaFj9TWSqelgzgcPQOsdpg9kjemjjZnPF4mNpYXA69PnZc0agzqIl+w11D6nsmr67+J1/A2bY3G+RltDg5V7HTz4TlvwD2LeFBLd0w6iSjWj4TH1M4hjb2GCN2GU6eMvo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=pMWhQSZ7; arc=none smtp.client-ip=212.227.15.3; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; arc=pass smtp.client-ip=160.75.25.117
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+	s=arc-20240116; t=1741102421; c=relaxed/simple;
+	bh=xeeY3qHmkkgHuAK0Xah+SIncTNKAzWFk2oK/8a0t94Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=YfN8o1ygmBA29rPpS/XZRBM6wFqiG75fFaY1R77Nrfv3bnQiV+sTVG8IsZmkHfT71m6l5JdwWIyxBW846UGt3WCFfLxNlSj8clf92o8suXsZeHyS4kLQM+bA8vxOvNjb6C1dScTOgVoQULsNScMcH+DfKCmGo4Aswn/s6k0jb5w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=fail (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SEfylcch reason="signature verification failed"; arc=none smtp.client-ip=209.85.214.196; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; arc=fail smtp.client-ip=160.75.25.117
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=cc.itu.edu.tr
 Received: from lesvatest1.cc.itu.edu.tr (lesvatest1.cc.itu.edu.tr [10.146.128.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
 	(No client certificate requested)
-	by beeline3.cc.itu.edu.tr (Postfix) with ESMTPS id 9F88440CF4F1
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 18:34:35 +0300 (+03)
+	by beeline3.cc.itu.edu.tr (Postfix) with ESMTPS id 005F140CEC93
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 18:33:37 +0300 (+03)
 X-Envelope-From: <root@cc.itu.edu.tr>
+Authentication-Results: lesvatest1.cc.itu.edu.tr;
+	dkim=fail reason="signature verification failed" (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20230601 header.b=SEfylcch
 Received: from lesva1.cc.itu.edu.tr (unknown [160.75.70.79])
-	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6fpC5rrVzG0jv
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 18:33:07 +0300 (+03)
+	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6fm22MhvzG0dx
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 18:31:14 +0300 (+03)
 Received: by le1 (Postfix, from userid 0)
-	id 1325F4272C; Tue,  4 Mar 2025 18:32:56 +0300 (+03)
+	id 9DE1A4273C; Tue,  4 Mar 2025 18:30:53 +0300 (+03)
 Authentication-Results: lesva1.cc.itu.edu.tr;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=pMWhQSZ7
-X-Envelope-From: <linux-kernel+bounces-541781-bozkiru=itu.edu.tr@vger.kernel.org>
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SEfylcch
+X-Envelope-From: <linux-kernel+bounces-541814-bozkiru=itu.edu.tr@vger.kernel.org>
 Authentication-Results: lesva2.cc.itu.edu.tr;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=pMWhQSZ7
-Received: from fgw2.itu.edu.tr (fgw2.itu.edu.tr [160.75.25.104])
-	by le2 (Postfix) with ESMTP id 7BF6D41EF6
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:19:02 +0300 (+03)
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by fgw2.itu.edu.tr (Postfix) with SMTP id 4DF6A2DCE0
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:19:02 +0300 (+03)
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SEfylcch
+Received: from fgw1.itu.edu.tr (fgw1.itu.edu.tr [160.75.25.103])
+	by le2 (Postfix) with ESMTP id 78D20423D1
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:32:35 +0300 (+03)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by fgw1.itu.edu.tr (Postfix) with SMTP id 103A53063EFC
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:32:34 +0300 (+03)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2BB5188C8B8
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:19:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6E123AC164
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:31:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA57C212B1F;
-	Mon,  3 Mar 2025 13:18:28 +0000 (UTC)
-Received: from mout.web.de (mout.web.de [212.227.15.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B908213E6F;
+	Mon,  3 Mar 2025 13:30:43 +0000 (UTC)
+Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 575711F19A;
-	Mon,  3 Mar 2025 13:18:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D609212FBD;
+	Mon,  3 Mar 2025 13:30:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741007905; cv=none; b=UJJWiUWktX4xwiPojMYMvc8iZRAuk/7GoWfha53iwNqWs32mv1Exxwm81VhR4+UdYayJciREXYx96TXh9LEs9LM9FvnVnIjQO3jSgIGpSzUsWpZedgDVub1IM/Oq9t63+3GdSSYEzHrP4y8A2LCMtjzAV4IHupTF8De2cb3PPqo=
+	t=1741008639; cv=none; b=AWSbMRKrTqaYwk1ZZeN4fRlGNZExpuz31IBj34SUxAl2k/gfCAG7ABDA0IlrgmRudQPC/E2tfqnftQM2GBLvMU24mHGzAtMTUuxRsZGVuBxEs7d6xVik2zUyqv5XEvFYn8t/Bo6RBb7JdS88Ec8gA+AYMaFDV5WPwypmFoAtWT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741007905; c=relaxed/simple;
-	bh=jMjxzuU5ybybM0n8xvB9Cmcz8tDPN1BHkYcTdsgjICY=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=VmXFfhMjxRxTbx9v1w99aU5J5FoElwbkbkqKlMmD4c80H2RpiK/B46vgQre1bSVwul/ef7pIF4IkhcXTnE1jlXYVhy49+whZAEqZ8gNY30fqykIWnqBW9iY5FOAyxXYtqvKM6pYZe3Osg/2NqkQmWqe/EB6D0os17w+9SmZz1ZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=pMWhQSZ7; arc=none smtp.client-ip=212.227.15.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1741007901; x=1741612701; i=markus.elfring@web.de;
-	bh=haP3YnQ1hTaM4n45Pmancys67feBgEgblRKSuXDvr1A=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:From:To:
-	 Cc:References:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=pMWhQSZ7mmW6WnDrAnSZ/723yKkMZsWgqcHn2JYzn1A2XzjyBQm/ik2Ej2mC1NQH
-	 GS13QOP1KrUfaS9mzQLNqpYvcAXt+ZrVgZNDc8I985hG21SwlbBCjbbyuHewMB0j2
-	 RfUayrlNt2Wq4kVnJ7kkrs/JOnFoliDCRErARsIXSntPWj7AN7XGGIEdC//pfHwBe
-	 C65KCMh/qrJaLbD5iw/e5SYFHMqa8zoI5j6/qFfTybG52f5DLtpbv2CDqt02CG0fl
-	 5XvG3fzPCoxLs+DE5EQh32/D4va8BUxB+HX1cOrQEgmk5eC+PfTdnHTOkS0zaZd89
-	 eX2aliMELA8jm5EZnw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.93.19]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1N9LIO-1tAIuH18K4-00yGaQ; Mon, 03
- Mar 2025 14:18:21 +0100
-Message-ID: <22e24ec8-283f-49e9-b7b0-555e8113c250@web.de>
-Date: Mon, 3 Mar 2025 14:18:18 +0100
+	s=arc-20240116; t=1741008639; c=relaxed/simple;
+	bh=Jrm+7746S7K9yWA40dUMBKTAN0ud8hVu4FIcLZVjvE0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=d0Ds2jrVdx7L4s4xMmai1nt9ue5+X3d3E1LHowYJcThCCfw5RAm03/hKZuEiwuo/SJJfMEuTU91onreXP0ezh2ZthIZXx4uUR4jUoxn2S/VDjXYzyUnO5Tx9HloaoyNZjdabmSH70BztHKNYA6mBo407gboZd36EocwVOZlmq0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SEfylcch; arc=none smtp.client-ip=209.85.214.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-22382657540so32195485ad.2;
+        Mon, 03 Mar 2025 05:30:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741008637; x=1741613437; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4HoYAW6D8hO+aaE9DpE+f5d9KWUfqlQeSUmUL0RBP80=;
+        b=SEfylcchyw/AsFqZ/ZmtJOBYtRr/sV0ONWVuUVJBVI/pgrL2ixQJhqZnpZCCkmf+4T
+         gvWRtbCsLcRH7cVRshFHmkDyxGDJyfGg42kAlri0S4Sk2NfVTOUMNu4qKaLG58f12xr5
+         LfUQwMdFNyIKo7rnCglKXOwqD60X9Jp7cFvlhMEIMxtvDM2txe9GVbMEPr4TDnhy+jn0
+         ZHfoKKyyp7AgoIo/i1ALr9iUJgD1hgczPiq6aihl0rSmsVXCkwwuxTNw1TA2Z+cV/tjI
+         CueFCepWMLyEqGa2VH0doLyJkAbK2IgS3Cl5f9yiKbj0W+RbeTHxNPlJe8frFU4v7Hu9
+         XLEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741008637; x=1741613437;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4HoYAW6D8hO+aaE9DpE+f5d9KWUfqlQeSUmUL0RBP80=;
+        b=sudlHx5ktu+ipwUF/WPODvPa6CaoPDRUJNVyRO3EwL6858EM7IHdmMeeh61MJnTTA9
+         GZdv4sxLwnT5l7FtjZApusG2MbXgxiC9Tltvjm4LlX2MJG1V36nug6Rtolj+dHTtnvG1
+         hBf86auTXDhPpzAPRnao0B2RPN6DL5H41APueC0fe/NRXe3qB5Hjx3D43IvnN6VprKJB
+         K/F4QOoJ9wyiDV48EkW/ugw4/42HtcUiXH8VIIuyX45n19wQ/zp8E+FAzH6SPp3SZKTz
+         +ZMb1Kai9wJlG9ZFJQXWCMQPKZRjW0xrwRx19ukuely4EaGLKsrOQtuAz6m/xnpqfTmk
+         g2Tw==
+X-Forwarded-Encrypted: i=1; AJvYcCU/z4xUdFZi9xKRQRV4oiWwD6sUW1RSMcIrYxVNiT9M5pc9rlB/OPIpOg22QIZWUe+5BBDBcAOa1xfGGhMaowP7BCZc@vger.kernel.org, AJvYcCVLVqflwQEpe24hWK1lbOmzbh1qJK7+tn4ra0yBvwpjWbFX7EyOl5ynzl6UPBrAawqK9GMtUztef0g1kx8I@vger.kernel.org, AJvYcCVsRfQMiMuPj7KNaiIGVq3t7asm1TmRHYTEedHUAAi0edCg1HZAuJvtuQ1Vpf047klUzZ30MarC@vger.kernel.org, AJvYcCWYVf1VzNkN1SodqqE0quIJXy7DFDAobGTvniBZz4kWncoxU9h9r46aDx84rqZLGdKRF20=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIkq7Q2dZsz1ZoJ1dJ+LfoBlRXM0EKfcrSr/chvP0q501E7ay6
+	G6VhabWKOJq7N2ozW8UigveyxXFaJCOoQxFuna5XacYRbsdSzFm8
+X-Gm-Gg: ASbGncvY0ivwP4Hr6FZqHcg4npdetYn4hjMk3V7cU+1dO/LYFUW2+hz+Qd1w1/B3jEb
+	z1y4/8USATTXocQNLZ4aqrLrxwczmpVRfDANqMbBR3k3sSSuzF1ewdaTMbLyGUDN4ykfbzM5Z8M
+	8kRoxnKglk/IlJ9LzPEB624zbASbnhiRsQs3zlRJYIgJNJ/4Af3V0PD6q5Xcq4ybQNJFF5RHfAh
+	OiNgTuBuTD5y5mHamwQwzgM9hOHQGjEPJp/MLREJVSoFyjYlOoT1MB2NvWGaQJl5RzuFtvP29Fb
+	+8KXSSRXStCUKHyCEGep/R+CZiNgIXBxYjVFwZh2HFuO0xTk62FjAhjoIfFKUQ==
+X-Google-Smtp-Source: AGHT+IGA2mWJTfvekJWlfyFWg7JZnBJRMEmVPtYCpiX/IyOQcjy5rGPgwuYYTPg+xM28+Vd56S613A==
+X-Received: by 2002:a17:903:230c:b0:223:7006:4db2 with SMTP id d9443c01a7336-22370064ea3mr156649035ad.31.1741008636600;
+        Mon, 03 Mar 2025 05:30:36 -0800 (PST)
+Received: from localhost.localdomain ([43.129.244.20])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-223505359b8sm77297035ad.253.2025.03.03.05.30.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Mar 2025 05:30:36 -0800 (PST)
+From: Menglong Dong <menglong8.dong@gmail.com>
+X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
+To: peterz@infradead.org,
+	rostedt@goodmis.org,
+	mark.rutland@arm.com,
+	alexei.starovoitov@gmail.com
+Cc: catalin.marinas@arm.com,
+	will@kernel.org,
+	mhiramat@kernel.org,
+	tglx@linutronix.de,
+	mingo@redhat.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	x86@kernel.org,
+	hpa@zytor.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	yonghong.song@linux.dev,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@fomichev.me,
+	jolsa@kernel.org,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	mathieu.desnoyers@efficios.com,
+	nathan@kernel.org,
+	nick.desaulniers+lkml@gmail.com,
+	morbo@google.com,
+	samitolvanen@google.com,
+	kees@kernel.org,
+	dongml2@chinatelecom.cn,
+	akpm@linux-foundation.org,
+	riel@surriel.com,
+	rppt@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: [PATCH v4 1/4] x86/ibt: factor out cfi and fineibt offset
+Date: Mon,  3 Mar 2025 21:28:34 +0800
+Message-Id: <20250303132837.498938-2-dongml2@chinatelecom.cn>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250303132837.498938-1-dongml2@chinatelecom.cn>
+References: <20250303132837.498938-1-dongml2@chinatelecom.cn>
 Precedence: bulk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -104,111 +177,216 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH RESEND] iwlwifi: Adjust input parameter validation in
- iwl_sta_calc_ht_flags()
-From: Markus Elfring <Markus.Elfring@web.de>
-To: kernel-janitors@vger.kernel.org, linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org, Benjamin Berg <benjamin.berg@intel.com>,
- Gregory Greenman <gregory.greenman@intel.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Johannes Berg <johannes.berg@intel.com>,
- Kalle Valo <kvalo@kernel.org>,
- Miri Korenblit <miriam.rachel.korenblit@intel.com>,
- Paolo Abeni <pabeni@redhat.com>, Sriram R <quic_srirrama@quicinc.com>
-Cc: cocci@inria.fr, LKML <linux-kernel@vger.kernel.org>,
- Simon Horman <horms@kernel.org>
-References: <40c60719-4bfe-b1a4-ead7-724b84637f55@web.de>
- <1a11455f-ab57-dce0-1677-6beb8492a257@web.de>
- <9cb634c8-d6e6-32bc-5fd6-79bf6b274f96@web.de>
-Content-Language: en-GB
-In-Reply-To: <9cb634c8-d6e6-32bc-5fd6-79bf6b274f96@web.de>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:klaLpxqRowNpOLqo5TgPE5pwLuOQZxsO7wlnEJEJTMtovuceQzK
- 9j5rbUI7I/TUnJK5L4CF9gFQ/eXeg/hblRTs/rM+HoQQF+nLiHgvC/yTerLULFGe/c3bjBb
- MarWJxxg7QLtmxPmtF6LdNp6dF/otzHpWAAhCXfm4i7bDtKLPYB1jL9ij0B0MigrfUOTzCo
- MJ5lJiYrKHkil1c2EPwtA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:8hjet2llDHg=;XzADO0IesvNkdn8ez1GDiDig+Fz
- zTe+5Ine+8o3lhtscOx2xxi399ryECeYZas5pCUHajSWwa2tGmdwuInMoma4aFSTyAtiZPsT8
- Td3ElBtGnXvSZPt2JqexXGkv2th3KLL4Ksn6WUyuSs60H4HXN0PkhqDUMGBc3RB5t4JF7sQfT
- m1o7WJsk8vTAsrhDgRw1ZvFiCqEML2kYSTkJex2XIqjQ7lCXtgVEdfA14+qsl+FdpQOFHFT/0
- b6el7Rh3ECXRN/hJH96cfwNPbCIUxZNeVXegFDlQXhDnDNlIjz5iMEr8q/CX2O6m+X3x2yYFY
- v2amNEe2oyJROYUyGCzI9IHecp5McECXojybvKBRSdSrXxH1rT2B1GTvCNZGg3aqVC6GY9wQs
- YJjK1j4mQC7OdbxrjNQj05YszK8t98EsRL9YXExRvbylVnGj68YlKDuZmdRITkNUEB6NhOXrt
- 9ENDovRTtJiy67JzRlDE3pKxcPiMHfNPJeMuEO5DpxC2Ca0NPuuq6joFmFz6u1tny/f6gGFvF
- CwLnm6PYRtyXliEVUEn3UUSmDQTz8qyhLs1YDiBIlfeHeZxOaCMscP4YmSn09lyxFef31utby
- 9e/uuey3/Jb0I+EZMPUlcH+R23S6MB5gWQ3dFKyQa0f4IypJ389rcODASgUmiXOj5yJYd1u6h
- 18/XyDfamrCdIDiv8Licz9/xCiJNJ8IcJteTAMtttm7VFfDjpwlNTvnHVsyP+l+s4ArmONhUD
- XczPFTFaUcmcyFNmNE1+Jf4oEaB8JHXup56yNPoPdXUB6O5mvI/uRDflz8PPQDB3cDowMDC2K
- fJI5d8OkAD38Lr2Y7HnRdBtpy4YiG/JvLBoDMiMdwdwjku861gIE4yA9KZ5atkEG8iZsiVQNG
- Fp5RrdyblFAmPqP+tokyt0D02ZaqcVWwaXCJxBtF/bom3uKwkcFeZajNEHvzXJeRimFFxuRSx
- iTVGaRkdxNOJpP/dncIAe+YYdMSVbCcaPK8BtL5BgehI9VSW730Q+I8Geqoovlt5z0r5C3SyP
- Sg3sMcN6rbx4eRDJOjdxC7OxPDQ+wq98GAyjOCXUT5kRlB8+qBGyQ4xtCwdswHicA1amiAULB
- mb7YvyaJRDSVf6JNK115i3QuY5Btciqw5FVf4+X7UmnoDROerESuHj38PUsb1WoBhg9Z4hItd
- egqapByLzxK/qytebvoMt39/lcwCM9K6VqwRXThr3O/FQk5pmyrSkJsa96UD7aS19COdjUN3C
- 8vJyHRwOqwn4h0JhsvpgBpMZbA7Xobq7zhjU+IPlCtOJcCB6ycaFsFgxPk6Z/XVY8nh8gT89k
- cYx7F5B3JDlXk6E1236nBVcknM7JRLrPnkZ/LEGDzy9wvDplvGK301Ntv0TxPsf3//NbNRc3M
- q/WBsCJCPfXChuIyUY8QNUwh8NbKe56CRjUR3vHSvZctplmyU9Hat8/WJ2yOkA43RHGhLrvre
- NgFLOXuXjSyn+3kQuRcx4J6xC2XA=
 X-ITU-Libra-ESVA-Information: Please contact Istanbul Teknik Universitesi for more information
-X-ITU-Libra-ESVA-ID: 4Z6fpC5rrVzG0jv
+X-ITU-Libra-ESVA-ID: 4Z6fm22MhvzG0dx
 X-ITU-Libra-ESVA: No virus found
 X-ITU-Libra-ESVA-From: root@cc.itu.edu.tr
-X-ITU-Libra-ESVA-Watermark: 1741707195.77709@pyortOIQZ5XWElXnUMYVog
+X-ITU-Libra-ESVA-Watermark: 1741707140.65076@RB0FiuIVmF4AsdTtVr0x0Q
 X-ITU-MailScanner-SpamCheck: not spam
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Wed, 19 Apr 2023 19:19:34 +0200
+For now, the layout of cfi and fineibt is hard coded, and the padding is
+fixed on 16 bytes.
 
-The address of a data structure member was determined before
-a corresponding null pointer check in the implementation of
-the function =E2=80=9Ciwl_sta_calc_ht_flags=E2=80=9D.
+Factor out FINEIBT_INSN_OFFSET and CFI_INSN_OFFSET. CFI_INSN_OFFSET is
+the offset of cfi, which is the same as FUNCTION_ALIGNMENT when
+CALL_PADDING is enabled. And FINEIBT_INSN_OFFSET is the offset where we
+put the fineibt preamble on, which is 16 for now.
 
-Thus avoid the risk for undefined behaviour by moving the assignment
-for the variable =E2=80=9Csta_ht_inf=E2=80=9D behind the null pointer chec=
-k.
+When the FUNCTION_ALIGNMENT is bigger than 16, we place the fineibt
+preamble on the last 16 bytes of the padding for better performance, whic=
+h
+means the fineibt preamble don't use the space that cfi uses.
 
-This issue was detected by using the Coccinelle software.
+The FINEIBT_INSN_OFFSET is not used in fineibt_caller_start and
+fineibt_paranoid_start, as it is always "0x10". Note that we need to
+update the offset in fineibt_caller_start and fineibt_paranoid_start if
+FINEIBT_INSN_OFFSET changes.
 
-Fixes: 046d2e7c50e3 ("mac80211: prepare sta handling for MLO support")
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-=2D--
- drivers/net/wireless/intel/iwlwifi/dvm/sta.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+---
+v4:
+- rebase to the newest tip/x86/core, the fineibt has some updating
+---
+ arch/x86/include/asm/cfi.h    | 13 +++++++++----
+ arch/x86/kernel/alternative.c | 18 +++++++++++-------
+ arch/x86/net/bpf_jit_comp.c   | 22 +++++++++++-----------
+ 3 files changed, 31 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/net/wireless/intel/iwlwifi/dvm/sta.c b/drivers/net/wi=
-reless/intel/iwlwifi/dvm/sta.c
-index cef43cf80620..74814ce0155e 100644
-=2D-- a/drivers/net/wireless/intel/iwlwifi/dvm/sta.c
-+++ b/drivers/net/wireless/intel/iwlwifi/dvm/sta.c
-@@ -147,7 +147,7 @@ static void iwl_sta_calc_ht_flags(struct iwl_priv *pri=
-v,
- 				  struct iwl_rxon_context *ctx,
- 				  __le32 *flags, __le32 *mask)
- {
--	struct ieee80211_sta_ht_cap *sta_ht_inf =3D &sta->deflink.ht_cap;
-+	struct ieee80211_sta_ht_cap *sta_ht_inf;
-
- 	*mask =3D STA_FLG_RTS_MIMO_PROT_MSK |
- 		STA_FLG_MIMO_DIS_MSK |
-@@ -156,7 +156,11 @@ static void iwl_sta_calc_ht_flags(struct iwl_priv *pr=
-iv,
- 		STA_FLG_AGG_MPDU_DENSITY_MSK;
- 	*flags =3D 0;
-
--	if (!sta || !sta_ht_inf->ht_supported)
-+	if (!sta)
-+		return;
+diff --git a/arch/x86/include/asm/cfi.h b/arch/x86/include/asm/cfi.h
+index 2f6a01f098b5..04525f2f6bf2 100644
+--- a/arch/x86/include/asm/cfi.h
++++ b/arch/x86/include/asm/cfi.h
+@@ -108,6 +108,14 @@ extern bhi_thunk __bhi_args_end[];
+=20
+ struct pt_regs;
+=20
++#ifdef CONFIG_CALL_PADDING
++#define FINEIBT_INSN_OFFSET	16
++#define CFI_INSN_OFFSET		CONFIG_FUNCTION_ALIGNMENT
++#else
++#define FINEIBT_INSN_OFFSET	0
++#define CFI_INSN_OFFSET		5
++#endif
 +
-+	sta_ht_inf =3D &sta->deflink.ht_cap;
-+	if (!sta_ht_inf->ht_supported)
+ #ifdef CONFIG_CFI_CLANG
+ enum bug_trap_type handle_cfi_failure(struct pt_regs *regs);
+ #define __bpfcall
+@@ -118,11 +126,8 @@ static inline int cfi_get_offset(void)
+ {
+ 	switch (cfi_mode) {
+ 	case CFI_FINEIBT:
+-		return 16;
+ 	case CFI_KCFI:
+-		if (IS_ENABLED(CONFIG_CALL_PADDING))
+-			return 16;
+-		return 5;
++		return CFI_INSN_OFFSET;
+ 	default:
+ 		return 0;
+ 	}
+diff --git a/arch/x86/kernel/alternative.c b/arch/x86/kernel/alternative.=
+c
+index 32e4b801db99..0088d2313f33 100644
+--- a/arch/x86/kernel/alternative.c
++++ b/arch/x86/kernel/alternative.c
+@@ -917,7 +917,7 @@ void __init_or_module noinline apply_seal_endbr(s32 *=
+start, s32 *end)
+=20
+ 		poison_endbr(addr);
+ 		if (IS_ENABLED(CONFIG_FINEIBT))
+-			poison_cfi(addr - 16);
++			poison_cfi(addr);
+ 	}
+ }
+=20
+@@ -980,12 +980,13 @@ u32 cfi_get_func_hash(void *func)
+ {
+ 	u32 hash;
+=20
+-	func -=3D cfi_get_offset();
+ 	switch (cfi_mode) {
+ 	case CFI_FINEIBT:
++		func -=3D FINEIBT_INSN_OFFSET;
+ 		func +=3D 7;
+ 		break;
+ 	case CFI_KCFI:
++		func -=3D CFI_INSN_OFFSET;
+ 		func +=3D 1;
+ 		break;
+ 	default:
+@@ -1372,7 +1373,7 @@ static int cfi_rewrite_preamble(s32 *start, s32 *en=
+d)
+ 		 * have determined there are no indirect calls to it and we
+ 		 * don't need no CFI either.
+ 		 */
+-		if (!is_endbr(addr + 16))
++		if (!is_endbr(addr + CFI_INSN_OFFSET))
+ 			continue;
+=20
+ 		hash =3D decode_preamble_hash(addr, &arity);
+@@ -1380,6 +1381,7 @@ static int cfi_rewrite_preamble(s32 *start, s32 *en=
+d)
+ 			 addr, addr, 5, addr))
+ 			return -EINVAL;
+=20
++		addr +=3D (CFI_INSN_OFFSET - FINEIBT_INSN_OFFSET);
+ 		text_poke_early(addr, fineibt_preamble_start, fineibt_preamble_size);
+ 		WARN_ON(*(u32 *)(addr + fineibt_preamble_hash) !=3D 0x12345678);
+ 		text_poke_early(addr + fineibt_preamble_hash, &hash, 4);
+@@ -1402,10 +1404,10 @@ static void cfi_rewrite_endbr(s32 *start, s32 *en=
+d)
+ 	for (s =3D start; s < end; s++) {
+ 		void *addr =3D (void *)s + *s;
+=20
+-		if (!exact_endbr(addr + 16))
++		if (!exact_endbr(addr + CFI_INSN_OFFSET))
+ 			continue;
+=20
+-		poison_endbr(addr + 16);
++		poison_endbr(addr + CFI_INSN_OFFSET);
+ 	}
+ }
+=20
+@@ -1543,12 +1545,12 @@ static void __apply_fineibt(s32 *start_retpoline,=
+ s32 *end_retpoline,
  		return;
-
- 	IWL_DEBUG_INFO(priv, "STA %pM SM PS mode: %s\n",
-=2D-
-2.40.0
+=20
+ 	case CFI_FINEIBT:
+-		/* place the FineIBT preamble at func()-16 */
++		/* place the FineIBT preamble at func()-FINEIBT_INSN_OFFSET */
+ 		ret =3D cfi_rewrite_preamble(start_cfi, end_cfi);
+ 		if (ret)
+ 			goto err;
+=20
+-		/* rewrite the callers to target func()-16 */
++		/* rewrite the callers to target func()-FINEIBT_INSN_OFFSET */
+ 		ret =3D cfi_rewrite_callers(start_retpoline, end_retpoline);
+ 		if (ret)
+ 			goto err;
+@@ -1588,6 +1590,7 @@ static void poison_cfi(void *addr)
+ 	 */
+ 	switch (cfi_mode) {
+ 	case CFI_FINEIBT:
++		addr -=3D FINEIBT_INSN_OFFSET;
+ 		/*
+ 		 * FineIBT prefix should start with an ENDBR.
+ 		 */
+@@ -1607,6 +1610,7 @@ static void poison_cfi(void *addr)
+ 		break;
+=20
+ 	case CFI_KCFI:
++		addr -=3D CFI_INSN_OFFSET;
+ 		/*
+ 		 * kCFI prefix should start with a valid hash.
+ 		 */
+diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
+index 72776dcb75aa..ee86a5df5ffb 100644
+--- a/arch/x86/net/bpf_jit_comp.c
++++ b/arch/x86/net/bpf_jit_comp.c
+@@ -415,6 +415,12 @@ static int emit_call(u8 **prog, void *func, void *ip=
+);
+ static void emit_fineibt(u8 **pprog, u8 *ip, u32 hash, int arity)
+ {
+ 	u8 *prog =3D *pprog;
++#ifdef CONFIG_CALL_PADDING
++	int i;
++
++	for (i =3D 0; i < CFI_INSN_OFFSET - 16; i++)
++		EMIT1(0x90);
++#endif
+=20
+ 	EMIT_ENDBR();
+ 	EMIT3_off32(0x41, 0x81, 0xea, hash);		/* subl $hash, %r10d	*/
+@@ -432,20 +438,14 @@ static void emit_fineibt(u8 **pprog, u8 *ip, u32 ha=
+sh, int arity)
+ static void emit_kcfi(u8 **pprog, u32 hash)
+ {
+ 	u8 *prog =3D *pprog;
++#ifdef CONFIG_CALL_PADDING
++	int i;
++#endif
+=20
+ 	EMIT1_off32(0xb8, hash);			/* movl $hash, %eax	*/
+ #ifdef CONFIG_CALL_PADDING
+-	EMIT1(0x90);
+-	EMIT1(0x90);
+-	EMIT1(0x90);
+-	EMIT1(0x90);
+-	EMIT1(0x90);
+-	EMIT1(0x90);
+-	EMIT1(0x90);
+-	EMIT1(0x90);
+-	EMIT1(0x90);
+-	EMIT1(0x90);
+-	EMIT1(0x90);
++	for (i =3D 0; i < CFI_INSN_OFFSET - 5; i++)
++		EMIT1(0x90);
+ #endif
+ 	EMIT_ENDBR();
+=20
+--=20
+2.39.5
 
 
 
