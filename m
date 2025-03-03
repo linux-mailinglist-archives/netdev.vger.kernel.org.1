@@ -1,70 +1,64 @@
-Return-Path: <netdev+bounces-171310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6433A4C79B
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:41:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75028A4C7B0
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:42:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85CF87AA919
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 16:33:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2E1016A52F
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 16:42:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFB1E239068;
-	Mon,  3 Mar 2025 16:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91F8C2528E8;
+	Mon,  3 Mar 2025 16:31:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jMxruLLA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ErdBMfGe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4EC238D3A;
-	Mon,  3 Mar 2025 16:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F8562517BB;
+	Mon,  3 Mar 2025 16:31:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741019429; cv=none; b=D8kjkv0iYvWRB7+hx/0l8zMGfWpK0xhRTGD3soYNjqN6qDpkFxW2sYrxBquiliAF6DAO14ll/STIs0HDEuOwd98ByCwbkj/+w9x889VoLm4anUN5KsDD+2p9/6K2RChX/gHgxFNN7hyXEpObl5rQvMzrlf6AlX4FKCae1YDKEjw=
+	t=1741019460; cv=none; b=eCoWnhHGtztR0vONvUYH0REEhW0t0bO04bI+L+T6lGZ9+9uzq0zKTqCIG6rmDh5EAtYJP3rTTXcXmL/HzT/dJqZqBAthswlzm5rkLPj2sWg+6q4UkFtnovy532Az4/ti0jho1/seXXzXrddtjod/D1mdCs22nuIZpltCxxnprZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741019429; c=relaxed/simple;
-	bh=VO4PNxXKaKhQhc8WyvjllaRN4o+RXV2Z6WojniXYwY4=;
+	s=arc-20240116; t=1741019460; c=relaxed/simple;
+	bh=PQcdHR7xGldchHufFfkG93+0uiY9+gpl16eM5PJNtzI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HFMI9NtFAOuGYCckRrrUkZatuvhGOcW5GELSTtHaEhdZzVNQjnUr4detUpCKHyVRSLZSq86kje8PxoXQauP3bMZ+NsolZYUnHr1vMdATAzpJCrD7i5u+P9rYsQ7bLPoaITSwbSfSNxx0ZqPBY6JVu4kbos4sOCRAv1yuD4Gu73c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jMxruLLA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43FD8C4CEE6;
-	Mon,  3 Mar 2025 16:30:27 +0000 (UTC)
+	 MIME-Version; b=LeSzln+dUipCNQGKesr3tXGHN2EMT+TJve+gDxoT8DZnbKkT/M9q8phKk8Q3w4I70lUBu1Mb6dPDtTaIGkljz1T58nOtwC3puAIB9uFEmts+5tc6NNA2P7rOAe2wFebuYOJs+uF9qOhtN+i1OW+bH8MMVaedv/eAnq2T2emhd9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ErdBMfGe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85AFAC4CEE6;
+	Mon,  3 Mar 2025 16:30:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741019429;
-	bh=VO4PNxXKaKhQhc8WyvjllaRN4o+RXV2Z6WojniXYwY4=;
+	s=k20201202; t=1741019459;
+	bh=PQcdHR7xGldchHufFfkG93+0uiY9+gpl16eM5PJNtzI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jMxruLLAzDKnwWuDlNzB5pcWPrmqSqhUBWFIKEDrnrtzMa2CpB7QstjVzp7jckw8I
-	 /tbIrLRYFeX1JtjGfh+OCDTmrhrYsn/ZV3Wvlkt7iDxHl2iKIRQrmfDTf69MbysbQS
-	 ZL619hGx/QjHPIRgBGerct529D39hPNILU/mUW+Siw7GHhs9YAwuH0KCXGMif51BRm
-	 nR8V4/BmVrPVbSlUGqwmH5ULf9BRiYV/qWN/noDe0ZtUibrm8/rSKN/A+z8kGqzBwF
-	 rc48C6H35xdOKpf17+wo/hCB0R5jsUU+xLKaR8yzS7HCd8CdMYKg+F4DWovaL/wx3U
-	 UYH4eYWDO3+jg==
+	b=ErdBMfGe6mc0CmdOLIjWyZLb5U4S8HrTqG1dPdajp+fggUf207buPakKaIccgU2ps
+	 6c1v6UePJOsO2u4dT/pyl9nLN77/o+yJTEhL6lqq26sJ0A+c5D3/KclnriQ91nzWn2
+	 kFJbz1llYfOlSr1EnEzC11CMZYUNFxajeyT1XmdBIREfddSGCBFCuFaBKFa+0ENWY/
+	 XIyAhfFY2t1K+0PIf1dZNcaBcnZFXQW/jOBSvabY5wDivkb+VsVwkDY2rGiXOetr+y
+	 qAwLLDuNJYwV4opB1QcTSHRF0Fnh/7Xj9p9yBZ7dtSlZWHwyNhOYgJ2WTqdSxLl3JP
+	 FQxGKcUR9Pu9Q==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Keith Busch <kbusch@kernel.org>,
-	Mike Christie <michael.christie@oracle.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
+Cc: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	seanjc@google.com,
-	tglx@linutronix.de,
-	mingo@redhat.com,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	x86@kernel.org,
-	mst@redhat.com,
-	jasowang@redhat.com,
-	kvm@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.13 17/17] vhost: return task creation error instead of NULL
-Date: Mon,  3 Mar 2025 11:29:49 -0500
-Message-Id: <20250303162951.3763346-17-sashal@kernel.org>
+	martineau@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	netdev@vger.kernel.org,
+	mptcp@lists.linux.dev
+Subject: [PATCH AUTOSEL 6.12 13/17] mptcp: safety check before fallback
+Date: Mon,  3 Mar 2025 11:30:25 -0500
+Message-Id: <20250303163031.3763651-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250303162951.3763346-1-sashal@kernel.org>
-References: <20250303162951.3763346-1-sashal@kernel.org>
+In-Reply-To: <20250303163031.3763651-1-sashal@kernel.org>
+References: <20250303163031.3763651-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,76 +67,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.13.5
+X-stable-base: Linux 6.12.17
 Content-Transfer-Encoding: 8bit
 
-From: Keith Busch <kbusch@kernel.org>
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
 
-[ Upstream commit cb380909ae3b1ebf14d6a455a4f92d7916d790cb ]
+[ Upstream commit db75a16813aabae3b78c06b1b99f5e314c1f55d3 ]
 
-Lets callers distinguish why the vhost task creation failed. No one
-currently cares why it failed, so no real runtime change from this
-patch, but that will not be the case for long.
+Recently, some fallback have been initiated, while the connection was
+not supposed to fallback.
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
-Message-ID: <20250227230631.303431-2-kbusch@meta.com>
-Reviewed-by: Mike Christie <michael.christie@oracle.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Add a safety check with a warning to detect when an wrong attempt to
+fallback is being done. This should help detecting any future issues
+quicker.
+
+Acked-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Link: https://patch.msgid.link/20250224-net-mptcp-misc-fixes-v1-3-f550f636b435@kernel.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/x86/kvm/mmu/mmu.c | 2 +-
- drivers/vhost/vhost.c  | 2 +-
- kernel/vhost_task.c    | 4 ++--
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ net/mptcp/protocol.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index e102505735a7b..0e6bf24093f75 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -7435,7 +7435,7 @@ static void kvm_mmu_start_lpage_recovery(struct once *once)
- 				      kvm_nx_huge_page_recovery_worker_kill,
- 				      kvm, "kvm-nx-lpage-recovery");
- 
--	if (!nx_thread)
-+	if (IS_ERR(nx_thread))
+diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
+index b70a303e08287..7e2f70f22b05b 100644
+--- a/net/mptcp/protocol.h
++++ b/net/mptcp/protocol.h
+@@ -1194,6 +1194,8 @@ static inline void __mptcp_do_fallback(struct mptcp_sock *msk)
+ 		pr_debug("TCP fallback already done (msk=%p)\n", msk);
  		return;
- 
- 	vhost_task_start(nx_thread);
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index 9ac25d08f473e..63612faeab727 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -666,7 +666,7 @@ static struct vhost_worker *vhost_worker_create(struct vhost_dev *dev)
- 
- 	vtsk = vhost_task_create(vhost_run_work_list, vhost_worker_killed,
- 				 worker, name);
--	if (!vtsk)
-+	if (IS_ERR(vtsk))
- 		goto free_worker;
- 
- 	mutex_init(&worker->mutex);
-diff --git a/kernel/vhost_task.c b/kernel/vhost_task.c
-index 8800f5acc0071..2ef2e1b800916 100644
---- a/kernel/vhost_task.c
-+++ b/kernel/vhost_task.c
-@@ -133,7 +133,7 @@ struct vhost_task *vhost_task_create(bool (*fn)(void *),
- 
- 	vtsk = kzalloc(sizeof(*vtsk), GFP_KERNEL);
- 	if (!vtsk)
--		return NULL;
-+		return ERR_PTR(-ENOMEM);
- 	init_completion(&vtsk->exited);
- 	mutex_init(&vtsk->exit_mutex);
- 	vtsk->data = arg;
-@@ -145,7 +145,7 @@ struct vhost_task *vhost_task_create(bool (*fn)(void *),
- 	tsk = copy_process(NULL, 0, NUMA_NO_NODE, &args);
- 	if (IS_ERR(tsk)) {
- 		kfree(vtsk);
--		return NULL;
-+		return ERR_PTR(PTR_ERR(tsk));
  	}
++	if (WARN_ON_ONCE(!READ_ONCE(msk->allow_infinite_fallback)))
++		return;
+ 	set_bit(MPTCP_FALLBACK_DONE, &msk->flags);
+ }
  
- 	vtsk->task = tsk;
 -- 
 2.39.5
 
