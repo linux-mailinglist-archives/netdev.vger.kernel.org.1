@@ -1,152 +1,93 @@
-Return-Path: <netdev+bounces-171763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E0E1A4E8F8
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:33:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B1C72A4E9EF
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:52:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A31BD8863BA
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:09:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CF013BFD65
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:41:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84CAD25EFA8;
-	Tue,  4 Mar 2025 16:48:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ib8K1KKm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA56E29DB61;
+	Tue,  4 Mar 2025 17:17:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from beeline1.cc.itu.edu.tr (beeline1.cc.itu.edu.tr [160.75.25.115])
+Received: from beeline3.cc.itu.edu.tr (beeline3.cc.itu.edu.tr [160.75.25.117])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 881AD1FF1C1
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 16:48:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=160.75.25.115
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 431BB29B23E
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:17:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=160.75.25.117
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741106917; cv=fail; b=O2ljosuDjRb30zYRA2QaVW1iLfvXt5X+CGtwO+wqprkUdWVX1+t2SrS0rIUwZjky2YuWTRSfgjN04JB9yaEkNzkteNb01CXK4K/hRrk5PULDcTHT5s3939I31oK07/QSA3d3EEFpOj9lDDyJqvOKDt9+1TOLtz2iaQO1aIGu55w=
+	t=1741108631; cv=pass; b=pLSwWBHtFR85txM1OUd1nHl0eRulLVgFhkpT/yoqxQuCGrwrTMW4PcWjY2v4lp9tZWAbeSeily1to5EJgO02TPOzjA+Sum7RAwS1EMc3LOx6Zsq9W95/+/pLOBGZVBKOEj76AShB9lxog741uqqCTB5ayJdVehcBzH9xo8q9uf4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741106917; c=relaxed/simple;
-	bh=31dsmnPT6dM4lwcrRJT/5/1wZCTVJeKe9rO3DrwJZWw=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MZ96kLAKD086zySvOus3RCPaA1pD2+7fzl6piahiXDObuTiHTsVumX++9yQZF5fjjCYJdjTOJahWwMbZNzBLZvgHujVcwhsW7vdNqGgtQ1qzVVxjCv1w2UulU+VfjnQyXep5a/y9WwWWh6DFUd16XFetx/NsKAyrcinKoFosNpM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=fail (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ib8K1KKm reason="signature verification failed"; arc=none smtp.client-ip=198.175.65.9; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; arc=fail smtp.client-ip=160.75.25.115
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	s=arc-20240116; t=1741108631; c=relaxed/simple;
+	bh=5w6pA4eYiBnHNqpcmteMeSrZV2g2L1eyHkQ8+j6h8f4=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=UDp4uTrhlsBDNusGvcFbRetNYhi3fVuYQVvhrbGE22/MY/R4pxO8mhpNX6cE7aLS0l6zcnCatxVNw5flGRKsg1SFnB9z4EGjPcZ+Jw9l91dA6tQ5d/jrk5HpFQ9lETFt8xBT5F9qr5ZhS6sb4D7ag2RxoLV3b946Zm+ScEL33y8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=none smtp.mailfrom=cc.itu.edu.tr; arc=none smtp.client-ip=209.85.166.70; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=pass smtp.client-ip=160.75.25.117
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=cc.itu.edu.tr
-Received: from lesvatest1.cc.itu.edu.tr (lesvatest1.cc.itu.edu.tr [10.146.128.1])
+Received: from lesvatest1.cc.itu.edu.tr (unknown [10.146.128.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
 	(No client certificate requested)
-	by beeline1.cc.itu.edu.tr (Postfix) with ESMTPS id B618F40D976B
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 19:48:33 +0300 (+03)
+	by beeline3.cc.itu.edu.tr (Postfix) with ESMTPS id 80B8C40CECB3
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 20:17:08 +0300 (+03)
 X-Envelope-From: <root@cc.itu.edu.tr>
 Received: from lesva1.cc.itu.edu.tr (unknown [160.75.70.79])
-	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6hRj1zxKzG4GD
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 19:47:13 +0300 (+03)
+	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6dJK38HwzFwNk
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:25:37 +0300 (+03)
 Received: by le1 (Postfix, from userid 0)
-	id 6A69D4274E; Tue,  4 Mar 2025 19:46:52 +0300 (+03)
-Authentication-Results: lesva1.cc.itu.edu.tr;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ib8K1KKm
-X-Envelope-From: <linux-kernel+bounces-541373-bozkiru=itu.edu.tr@vger.kernel.org>
-Authentication-Results: lesva2.cc.itu.edu.tr;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ib8K1KKm
+	id CA9F842720; Tue,  4 Mar 2025 17:25:34 +0300 (+03)
+X-Envelope-From: <linux-kernel+bounces-541399-bozkiru=itu.edu.tr@vger.kernel.org>
 Received: from fgw1.itu.edu.tr (fgw1.itu.edu.tr [160.75.25.103])
-	by le2 (Postfix) with ESMTP id F1B434327A
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:31:50 +0300 (+03)
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by fgw1.itu.edu.tr (Postfix) with SMTP id 822DB3063EFC
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:31:50 +0300 (+03)
+	by le2 (Postfix) with ESMTP id 1093442D20
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:40:52 +0300 (+03)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by fgw1.itu.edu.tr (Postfix) with SMTP id 572873063EFF
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:40:51 +0300 (+03)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2FEC3B167E
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 10:30:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A73C7A70ED
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 10:38:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 054631F4612;
-	Mon,  3 Mar 2025 10:28:27 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FC6D1F3BBB;
+	Mon,  3 Mar 2025 10:39:32 +0000 (UTC)
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB3481F2380;
-	Mon,  3 Mar 2025 10:28:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F12E81D7E4C
+	for <linux-kernel@vger.kernel.org>; Mon,  3 Mar 2025 10:39:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740997704; cv=none; b=SrR5oDy9KEHZoRBJvfq3erxrZvzyjJOenzkrujxKhN1R8B2qJRImQmYwhhZuoQbm0Upkb+VKOjI+ATKQ76+DiGY+J4R//KOQygmHcA698KOwn7aphSEFBsAeO1BAiHzfTpoz/ha+Ywm6Fddb41XlzZ/Q1RPyZo7CzkmDPP2ydtg=
+	t=1740998370; cv=none; b=a6qD4pcx1QuLVf5xmEIcTQ0vJCi0H/qWzEtSR3pebye7BFrEzckCQMUjH89OyFy8YhJ7RnugMM4pMah0lNg3x1UU5Lob6F+DLemT+5ukdmz75hTsdsIo64sEoooFFs/VV3IjRL03ag4I3/IqyRXWaRdnjhD63vODS1Z61PmW0OQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740997704; c=relaxed/simple;
-	bh=naH9KspwalUC4SIxcxcdhcuCdSPyeBw7+LL7ZKcyavQ=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CtS+hN0Akl3QMHnlz9I/CEMWEQ5+MMeX+adDksvl4xOqW5CDuoE1hb+lQJX9BiNA7V329vaW2z8X8mtA3tZv4tW8LP6xbD2P8nUl6KzOnSnc6+hFTPOv3war/YbWAmkre+z5OhJrl9jhUOViTENdWGcVYVuyok59/V0EUm0zIhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ib8K1KKm; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740997703; x=1772533703;
-  h=from:to:subject:date:message-id:in-reply-to:references:
-   mime-version:content-transfer-encoding;
-  bh=naH9KspwalUC4SIxcxcdhcuCdSPyeBw7+LL7ZKcyavQ=;
-  b=ib8K1KKmZHBkCl8J4dcdi0vDFYoFdmwD7535Z8CoHYHgqiIaHknlLu1Z
-   jee3/IwNpgJStDmrf3kSQyCMuCGPhUBsh0LsTfO9UFejgIoySJvj3xMfV
-   cbSB6qqhtlP0nJBcF72JrFormj7WMhYgkGrsqIVcnCJcdeTEA4UW+SyKD
-   t9b5ZmY/s7RmBkdU8IZ4CvKZ4oTGWzmxLQ2+2yPTXyXLuE5/0JfbEOBwk
-   xby8NVA+LoZ0vGP+DkO30hWaUS/wJBmqVplMl69CdIDhRHKQ/c5SS3wql
-   EUMPHjz8tHSnJEwQIOVFe5KUurrj588ofCRvXc3aev8/3dAcGl6qwYLdV
-   w==;
-X-CSE-ConnectionGUID: GLlEkOCuSe2ShOnFc6/21A==
-X-CSE-MsgGUID: BsGU7BGyRH+fAJ/ZpVkN9g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11361"; a="64310253"
-X-IronPort-AV: E=Sophos;i="6.13,329,1732608000"; 
-   d="scan'208";a="64310253"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 02:28:23 -0800
-X-CSE-ConnectionGUID: w4pCy+ifSdmjYRxSLDAKCw==
-X-CSE-MsgGUID: WMXFEbW1SyugSAw2veHtzw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,329,1732608000"; 
-   d="scan'208";a="122569912"
-Received: from mohdfai2-ilbpg12-1.png.intel.com ([10.88.227.73])
-  by fmviesa005.fm.intel.com with ESMTP; 03 Mar 2025 02:28:15 -0800
-From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Furong Xu <0x1207@gmail.com>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Xiaolei Wang <xiaolei.wang@windriver.com>,
-	Suraj Jaiswal <quic_jsuraj@quicinc.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Jesper Nilsson <jesper.nilsson@axis.com>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	bpf@vger.kernel.org
-Subject: [PATCH iwl-next v7 7/9] igc: Block setting preemptible traffic class in taprio
-Date: Mon,  3 Mar 2025 05:26:56 -0500
-Message-Id: <20250303102658.3580232-8-faizal.abdul.rahim@linux.intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250303102658.3580232-1-faizal.abdul.rahim@linux.intel.com>
-References: <20250303102658.3580232-1-faizal.abdul.rahim@linux.intel.com>
+	s=arc-20240116; t=1740998370; c=relaxed/simple;
+	bh=5w6pA4eYiBnHNqpcmteMeSrZV2g2L1eyHkQ8+j6h8f4=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=dXP1ydEMyrD4mRoOe42tj/q/j4rUMpwRCxgVH7ePN9EnwWx5/IdyRhoKl3LgtOyF6vReBg3ekiHKQid7d3U87Fw0gZdhwQQbKPmM/MEWqUDP7SiTmkJKg3MVeq010fFqwy6cFF2TNX3548UMq6PZIa3vM16T6fSGE9JqzdpfrPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-85ae33109f8so34328839f.0
+        for <linux-kernel@vger.kernel.org>; Mon, 03 Mar 2025 02:39:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740998368; x=1741603168;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=94B1AldC1Ra+VOi32bZczZH6eYO+XQiGIIy01bId2WI=;
+        b=V7wOBcRUBkjivfmCcg5LPCuO/xHGIMPKvMjypOrkrtEn/mC9OgKyqWYAu+FjIfmkQ5
+         wF+bUENS2eT8kVqO1jWoxDFwpOThAdewzgklTBh2n6kmQhAhebaUfp/DnS6uymAeBfd0
+         0msHx6D58mqd5EJPVxyKVCQCpaYrjE7OUwAtPLjSiCmoWG8fFUG00+vyoEDHurjC6IdY
+         AlBNCMFTJqZsuWt8RoH5HZT+jK0zXBsMqpXgW1K7Ha4+ewdWLI4ruN1ODYEDC6QARMvn
+         ma7kTrW6scWyC1Hb+fvZi7uRuDqRLcArxweO6qLwMihLFOYe+oqOGT4HDWwiY+tyd/4L
+         LzXg==
+X-Forwarded-Encrypted: i=1; AJvYcCWxxWqKPCDuULxJk4KOnXoeOclmuacyDvf9e6lVloIgwH2lamW9Kcz2oP+PbJabwPnDDZTzUI34wH+cXPc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxwe6C9XMNPU33L0eay22k1x+0rXBJUHvl4wYTQmr3i1hzljIOo
+	5i3KQ+Y0QDiberm7/iFcmn9nDHmGd807zP/1gVHXyx47LlTH+7zQxoqHCtztXhcazFA0QLy3Ba/
+	orx3dKhGluSeFi9fLISZo5pe+6fPZYp3amuPhxDqq9USsniGSx10oQ1M=
+X-Google-Smtp-Source: AGHT+IHXGGfJycEVF1C0NA+tWbF57mYYWAfRa3uH7yonYPLILGd0Xs6oQjnQHhZiPUqQSby7mDcwV8F7CrVZ/77JAIhHK7ysIbjU
 Precedence: bulk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -154,41 +95,59 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+X-Received: by 2002:a05:6e02:3111:b0:3d3:ff5c:287 with SMTP id
+ e9e14a558f8ab-3d3ff5c06f9mr41959675ab.14.1740998368052; Mon, 03 Mar 2025
+ 02:39:28 -0800 (PST)
+Date: Mon, 03 Mar 2025 02:39:28 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67c586e0.050a0220.1dee4d.0124.GAE@google.com>
+Subject: [syzbot] Monthly batman report (Mar 2025)
+From: syzbot <syzbot+list0f38ff37debbbda9dc0b@syzkaller.appspotmail.com>
+To: a@unstable.cc, b.a.t.m.a.n@lists.open-mesh.org, 
+	linux-kernel@vger.kernel.org, mareklindner@neomailbox.ch, 
+	netdev@vger.kernel.org, sven@narfation.org, sw@simonwunderlich.de, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 X-ITU-Libra-ESVA-Information: Please contact Istanbul Teknik Universitesi for more information
-X-ITU-Libra-ESVA-ID: 4Z6hRj1zxKzG4GD
+X-ITU-Libra-ESVA-ID: 4Z6dJK38HwzFwNk
 X-ITU-Libra-ESVA: No virus found
 X-ITU-Libra-ESVA-From: root@cc.itu.edu.tr
-X-ITU-Libra-ESVA-Watermark: 1741711644.76003@zd0CpJXgHQd8MWeSv0ynBQ
+X-ITU-Libra-ESVA-Watermark: 1741713333.43951@PXJMsLMyGC9uaW8JczWNIA
 X-ITU-MailScanner-SpamCheck: not spam
 
-Since preemptible tc implementation is not ready yet, block it from being
-set in taprio. The existing code already blocks it in mqprio.
+Hello batman maintainers/developers,
 
-Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+This is a 31-day syzbot report for the batman subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/batman
+
+During the period, 2 new issues were detected and 0 were fixed.
+In total, 6 issues are still open and 26 have already been fixed.
+
+Some of the still happening issues:
+
+Ref Crashes Repro Title
+<1> 555     Yes   INFO: rcu detected stall in batadv_nc_worker (3)
+                  https://syzkaller.appspot.com/bug?extid=69904c3b4a09e8fa2e1b
+<2> 136     No    INFO: rcu detected stall in sys_recvmmsg (3)
+                  https://syzkaller.appspot.com/bug?extid=b079dc0aa6e992859e7c
+<3> 14      Yes   INFO: rcu detected stall in rescuer_thread
+                  https://syzkaller.appspot.com/bug?extid=76e180c757e9d589a79d
+<4> 1       Yes   INFO: rcu detected stall in batadv_bla_periodic_work (2)
+                  https://syzkaller.appspot.com/bug?extid=fc38cf2d6e727d8415c7
+
 ---
- drivers/net/ethernet/intel/igc/igc_main.c | 4 ++++
- 1 file changed, 4 insertions(+)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethe=
-rnet/intel/igc/igc_main.c
-index fc086919387c..319eeb5b0a54 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -6407,6 +6407,10 @@ static int igc_save_qbv_schedule(struct igc_adapte=
-r *adapter,
- 	if (!validate_schedule(adapter, qopt))
- 		return -EINVAL;
-=20
-+	/* preemptible isn't supported yet */
-+	if (qopt->mqprio.preemptible_tcs)
-+		return -EOPNOTSUPP;
-+
- 	igc_ptp_read(adapter, &now);
-=20
- 	if (igc_tsn_is_taprio_activated_by_user(adapter) &&
---=20
-2.34.1
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
 
