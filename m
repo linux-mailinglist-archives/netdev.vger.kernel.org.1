@@ -1,284 +1,384 @@
-Return-Path: <netdev+bounces-171195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CC74A4BE91
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 12:31:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDDE3A4BE5F
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 12:26:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 702773BB73C
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 11:21:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C934F1884E3C
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 11:24:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC6511F30BB;
-	Mon,  3 Mar 2025 11:19:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A0341F0E44;
+	Mon,  3 Mar 2025 11:23:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jlXphypx"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="syr7lVad"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF1E01F17E5;
-	Mon,  3 Mar 2025 11:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE52A31;
+	Mon,  3 Mar 2025 11:23:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741000766; cv=none; b=RGWwP3Ij0rioSuylauBfWLN5R7bc03bHOHrHRYeF1NP2kF+gxDv+INEGmIAiCR3rGEfG8JEcQShA65oCXDPEyUoyBawkVcA/4nQaedJXMTOhXfjyHjqdNIKuxXO8K9ADbPE5gRhzvSNQp3fHE0CBkm02MmuhKxPLVZVvKHfzse4=
+	t=1741001027; cv=none; b=qwMho/oJWGOIfW+XE/MeMvgruA+ntLvjbeBkGHJ6xMTMS7l12EtmzKEdKA2ViC8rWYN6A42PdlKStP1Buia70qSA3h1wFIMfHjbSFM8NtLnqDwSkGA56fTbYbfVEI00oDoxE+rCEoNQZzudbZVr5MCQWiPKpnzdsFpahlgl0FJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741000766; c=relaxed/simple;
-	bh=wY1JDGsr4w7EVb29Z+PN4ZWHoWt/+wmUL/8nCGk4qnE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YI8wGG4oyTJyhQS4mnmU2/Dlcdle5q+tKZdAfpZmTeSzBDPzmvJCIl0sCp1Zk12Rp8wg4UCdlafIMN9TJDU/1SpFTkeW6s9NKbCVmbUjwpamISMdEBhciED6C4Wq4w9fBLKJ9KEq9YUZpHBMfyMNUhSQV7fy1RFjvzNNzm5TBfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jlXphypx; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=pNmUy0/SbO1mJMTByohCme5W5UOaVrI5mCX9RycYTCY=; b=jlXphypx+tFIa7QN6nmZyOHchy
-	mAL4FzNXqAx7NBd4kdGVHZF7nbcDi/32cz13sz0Fj9y1/1JM/3A/Y76+s7kFKn3mGfijIUupTU74Q
-	7zeNEGxo0ivgglhHYr/u2LibpbTUcHkmikL6bkI8o7tdVXrpmDkjuz1Lax0XLLmeKI/E9XRS1ZUdj
-	/Ci1QrCRh5Qp2rL6TItEj0fLU0FtSgMv/HXPfEGd4/bdsg2+c0e9GA24LNjWfF4v0YxAyyfBNvjOM
-	Dht70pkuWXppULK3LhsHptnbWfEkJtUnlAkcrbjK9tZ0DEhiNEovwD25XXFPRxUWevS3WVcgAbYUN
-	EEBdOUqQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38926)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tp3pC-0000Ky-2H;
-	Mon, 03 Mar 2025 11:19:06 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tp3p7-0003kl-2o;
-	Mon, 03 Mar 2025 11:19:01 +0000
-Date: Mon, 3 Mar 2025 11:19:01 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH 3/3] net: stmmac: Add DWMAC glue layer for Renesas GBETH
-Message-ID: <Z8WQJQo5kW9QV-wV@shell.armlinux.org.uk>
-References: <20250302181808.728734-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250302181808.728734-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <Z8SydsdDsZfdrdbE@shell.armlinux.org.uk>
- <CA+V-a8vCB7nP=tsv4UkOwODSs-9hiG-PxN6cpihfvwjq2itAHg@mail.gmail.com>
- <Z8TRQX2eaNzXOzV0@shell.armlinux.org.uk>
- <CA+V-a8vykhxqP30iTwN6yrqDgT8YRVE_MadjiTFp653rHVqMNg@mail.gmail.com>
+	s=arc-20240116; t=1741001027; c=relaxed/simple;
+	bh=pM2l3bdhITG33VeNaE8y7SWnUeqKSe+coHYUXEHHDV0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=E7y4HnCbZHIF4foQChHRP5DvaFG9gxHWSoCvQKRyboBCGeAsSHlM1i2rC8ZjsaADyTVJsSwgH6xwILY9tl2x57IQESGUw/v6/3ootRxwJQ3TvKUkdbKlWRdoO7huQwoM6wQTJOHUpY6PRhrqQPaMygzTZ+kvyN1jBa/6KK6H1PE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=syr7lVad; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 523BNB6w2745496
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 3 Mar 2025 05:23:11 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1741000991;
+	bh=o89D8QcdGEg8aUlyzDT2N6E8USfZjtePyIVsA04Nffs=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=syr7lVadYrS81qgC6zWeFDrf0SMxqUnF78MXmLqweFN9kYCWoP7JyI7qONrY84ViY
+	 r5b5f6fr1KN3PnuKbD4xohUaTq7Alwr6poNDn+kTsVTsuwcNvq/lbc1uFf83GWf11s
+	 lY5eCWtu+0oo5mBEB4TQnjmTo0HJJyIQLtZHKNog=
+Received: from DLEE115.ent.ti.com (dlee115.ent.ti.com [157.170.170.26])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 523BNBrw106103
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 3 Mar 2025 05:23:11 -0600
+Received: from DLEE113.ent.ti.com (157.170.170.24) by DLEE115.ent.ti.com
+ (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 3
+ Mar 2025 05:23:11 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE113.ent.ti.com
+ (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 3 Mar 2025 05:23:11 -0600
+Received: from [172.24.21.156] (lt9560gk3.dhcp.ti.com [172.24.21.156])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 523BN4iK003466;
+	Mon, 3 Mar 2025 05:23:04 -0600
+Message-ID: <dbddfb0c-01f3-4a07-82b3-81929c3c4420@ti.com>
+Date: Mon, 3 Mar 2025 16:53:03 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+V-a8vykhxqP30iTwN6yrqDgT8YRVE_MadjiTFp653rHVqMNg@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 2/3] net: ti: icssg-prueth: introduce and use
+ prueth_swdata struct for SWDATA
+To: Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>,
+        <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
+        <davem@davemloft.net>, <andrew+netdev@lunn.ch>
+CC: <bpf@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <u.kleine-koenig@baylibre.com>, <matthias.schiffer@ew.tq-group.com>,
+        <dan.carpenter@linaro.org>, <schnelle@linux.ibm.com>,
+        <diogo.ivo@siemens.com>, <glaroque@baylibre.com>, <macro@orcam.me.uk>,
+        <john.fastabend@gmail.com>, <hawk@kernel.org>, <daniel@iogearbox.net>,
+        <ast@kernel.org>, <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>
+References: <20250224110102.1528552-1-m-malladi@ti.com>
+ <20250224110102.1528552-3-m-malladi@ti.com>
+ <3d3d180a-12b7-4bee-8172-700f0dae2439@kernel.org>
+Content-Language: en-US
+From: "Malladi, Meghana" <m-malladi@ti.com>
+In-Reply-To: <3d3d180a-12b7-4bee-8172-700f0dae2439@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Sun, Mar 02, 2025 at 10:02:15PM +0000, Lad, Prabhakar wrote:
-> Hi Russell,
+
+
+On 2/27/2025 5:57 PM, Roger Quadros wrote:
 > 
-> On Sun, Mar 2, 2025 at 9:44 PM Russell King (Oracle)
-> <linux@armlinux.org.uk> wrote:
-> >
-> > On Sun, Mar 02, 2025 at 09:20:49PM +0000, Lad, Prabhakar wrote:
-> > > Hi Russell,
-> > > > What is the reason for setting this flag? If it's because of suspend/
-> > > > resume failures, does my "net: stmmac: fix resume failures due to
-> > > > RX clock" series solve this for you without requiring this flag?
-> > > >
-> > > Ive set this flag based on the configuration supported by this IP.
-> > > Unfortunately the platform which I am working on doesn't support s2r
-> > > yet so I cannot test suspend/resume path yet. But I do see an issue
-> > > when I unload and load just the glue module the DMA reset fails.
-> >
-> > Thanks for that feedback - that's a scenario I hadn't considered.
-> >
-> > I was trying to avoid having to disable LPI RX clock-stop on suspend by
-> > ensuring that it was enabled at resume time. I think that's valid, but
-> > you've brought up another similar scenario:
-> >
-> > - device is brought up, configures RX clock stop
-> > - links with media, negotiates EEE
-> > - driver is unloaded, link doesn't go down, but due to no traffic goes
-> >   into idle, so RX clock is stopped
-> > - driver reloaded, RX clock still stopped, reset fails
-> >
-> > I would like to solve that so we can get the power savings from
-> > stopping the clock, but still have reset work when necessary.
-> >
-> I would be happy to test the patches ;)
 > 
-> > I'm guessing that the "DMA reset fails" refers to this path:
-> >
-> > stmmac_open() -> __stmmac_open() -> stmmac_hw_setup() ->
-> > stmmac_init_dma_engine() -> stmmac_reset() ?
-> >
-> Yes.
+> On 24/02/2025 13:01, Meghana Malladi wrote:
+>> From: Roger Quadros <rogerq@kernel.org>
+>>
+>> We have different cases for SWDATA (skb, page, cmd, etc)
+>> so it is better to have a dedicated data structure for that.
+>> We can embed the type field inside the struct and use it
+>> to interpret the data in completion handlers.
+>>
+>> Increase SWDATA size to 48 so we have some room to add
+>> more data if required.
+>>
+>> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
+>> ---
+>> Changes since v2 (v3-v2):
+>> - Fix leaking tx descriptor in emac_tx_complete_packets()
+>> - Free rx descriptor if swdata type is not page in emac_rx_packet()
+>> - Revert back the size of PRUETH_NAV_SW_DATA_SIZE
+>> - Use build time check for prueth_swdata size
+>> - re-write prueth_swdata to have enum type as first member in the struct
+>> and prueth_data union embedded in the struct
+>>
+>> All the above changes have been suggested by Roger Quadros <rogerq@kernel.org>
+>>
+>>   drivers/net/ethernet/ti/icssg/icssg_common.c  | 52 +++++++++++++------
+>>   drivers/net/ethernet/ti/icssg/icssg_prueth.c  |  3 ++
+>>   drivers/net/ethernet/ti/icssg/icssg_prueth.h  | 16 ++++++
+>>   .../net/ethernet/ti/icssg/icssg_prueth_sr1.c  |  4 +-
+>>   4 files changed, 57 insertions(+), 18 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
+>> index acbb79ad8b0c..01eeabe83eff 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_common.c
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
+>> @@ -136,12 +136,12 @@ int emac_tx_complete_packets(struct prueth_emac *emac, int chn,
+>>   	struct net_device *ndev = emac->ndev;
+>>   	struct cppi5_host_desc_t *desc_tx;
+>>   	struct netdev_queue *netif_txq;
+>> +	struct prueth_swdata *swdata;
+>>   	struct prueth_tx_chn *tx_chn;
+>>   	unsigned int total_bytes = 0;
+>>   	struct sk_buff *skb;
+>>   	dma_addr_t desc_dma;
+>>   	int res, num_tx = 0;
+>> -	void **swdata;
+>>   
+>>   	tx_chn = &emac->tx_chns[chn];
+>>   
+>> @@ -163,12 +163,19 @@ int emac_tx_complete_packets(struct prueth_emac *emac, int chn,
+>>   		swdata = cppi5_hdesc_get_swdata(desc_tx);
+>>   
+>>   		/* was this command's TX complete? */
+>> -		if (emac->is_sr1 && *(swdata) == emac->cmd_data) {
+>> +		if (emac->is_sr1 && (void *)(swdata) == emac->cmd_data) {
+>>   			prueth_xmit_free(tx_chn, desc_tx);
+>>   			continue;
+>>   		}
+>>   
+>> -		skb = *(swdata);
+>> +		if (swdata->type != PRUETH_SWDATA_SKB) {
+>> +			netdev_err(ndev, "tx_complete: invalid swdata type %d\n", swdata->type);
+>> +			prueth_xmit_free(tx_chn, desc_tx);
+>> +			budget++;
 > 
-> > In other words, when the device is being brought back up
-> > adminsitratively?
-> >
-> > What happens if you (replace $if):
-> >
-> > # ip li set dev $if down
-> > # ip li set dev $if up
-> >
-> > Does that also fail without STMMAC_FLAG_RX_CLK_RUNS_IN_LPI set?
-> >
-> Logs without STMMAC_FLAG_RX_CLK_RUNS_IN_LPI flag set:
-> --------------------------------------------------------------
-> root@rzv2h-evk-alpha:~# ip li set dev eth1 down
-> [   33.606549] renesas-gbeth 15c40000.ethernet eth1: Link is Down
-> root@rzv2h-evk-alpha:~#
-> root@rzv2h-evk-alpha:~# ip li set dev eth0 down
-> [   37.356992] renesas-gbeth 15c30000.ethernet eth0: Link is Down
-> root@rzv2h-evk-alpha:~#
-> root@rzv2h-evk-alpha:~# ip li set dev eth1 up
-> [   43.974803] renesas-gbeth 15c40000.ethernet eth1: Register
-> MEM_TYPE_PAGE_POOL RxQ-0
-> [   43.983189] renesas-gbeth 15c40000.ethernet eth1: Register
-> MEM_TYPE_PAGE_POOL RxQ-1
-> [   43.991155] renesas-gbeth 15c40000.ethernet eth1: Register
-> MEM_TYPE_PAGE_POOL RxQ-2
-> [   43.999128] renesas-gbeth 15c40000.ethernet eth1: Register
-> MEM_TYPE_PAGE_POOL RxQ-3
-> [   44.072079] renesas-gbeth 15c40000.ethernet eth1: PHY [stmmac-1:00]
-> driver [Microchip KSZ9131 Gigabit PHY] (irq=POLL)
-> [   44.094605] dwmac4: Master AXI performs fixed burst length
-> [   44.100138] renesas-gbeth 15c40000.ethernet eth1: No Safety
-> Features support found
-> [   44.107748] renesas-gbeth 15c40000.ethernet eth1: IEEE 1588-2008
-> Advanced Timestamp supported
-> [   44.116725] renesas-gbeth 15c40000.ethernet eth1: registered PTP clock
-> [   44.123352] renesas-gbeth 15c40000.ethernet eth1: configuring for
-> phy/rgmii-id link mode
-> root@rzv2h-evk-alpha:~#
-> root@rzv2h-evk-alpha:~# ip li set dev eth1[   47.207761] renesas-gbeth
-> 15c40000.ethernet eth1: Link is Up - 1Gbps/Full - flow control off
-> ^C
-> root@rzv2h-evk-alpha:~# ^C
-> root@rzv2h-evk-alpha:~# ip li set dev eth0 up
-> [   55.636722] renesas-gbeth 15c30000.ethernet eth0: Register
-> MEM_TYPE_PAGE_POOL RxQ-0
-> [   55.645139] renesas-gbeth 15c30000.ethernet eth0: Register
-> MEM_TYPE_PAGE_POOL RxQ-1
-> [   55.653111] renesas-gbeth 15c30000.ethernet eth0: Register
-> MEM_TYPE_PAGE_POOL RxQ-2
-> [   55.661073] renesas-gbeth 15c30000.ethernet eth0: Register
-> MEM_TYPE_PAGE_POOL RxQ-3
-> [   55.732087] renesas-gbeth 15c30000.ethernet eth0: PHY [stmmac-0:00]
-> driver [Microchip KSZ9131 Gigabit PHY] (irq=POLL)
-> [   55.754612] dwmac4: Master AXI performs fixed burst length
-> [   55.760143] renesas-gbeth 15c30000.ethernet eth0: No Safety
-> Features support found
-> [   55.767740] renesas-gbeth 15c30000.ethernet eth0: IEEE 1588-2008
-> Advanced Timestamp supported
-> [   55.776705] renesas-gbeth 15c30000.ethernet eth0: registered PTP clock
-> [   55.783333] renesas-gbeth 15c30000.ethernet eth0: configuring for
-> phy/rgmii-id link mode
-> root@rzv2h-evk-alpha:~#
-> root@rzv2h-evk-alpha:~# [   58.855844] renesas-gbeth 15c30000.ethernet
-> eth0: tx_clk_stop=1
-> [   58.861989] renesas-gbeth 15c30000.ethernet eth0: Link is Up -
-> 1Gbps/Full - flow control rx/tx
+> I don't recollect why we need to increase budget here.
 > 
-> root@rzv2h-evk-alpha:~#
-> root@rzv2h-evk-alpha:~#
+
+Probably because this packet hasn't been processed due to invalid swdata 
+we are increasing the budget to compensate the loss -> but sounds 
+counter intuitive to whole idea of using the budget. Will remove it.
+
+
+>> +			continue;
+>> +		}
+>> +
+>> +		skb = swdata->data.skb;
+>>   		prueth_xmit_free(tx_chn, desc_tx);
 > 
-> Logs with STMMAC_FLAG_RX_CLK_RUNS_IN_LPI flag set:
-> --------------------------------------------------------------
-> root@rzv2h-evk-alpha:~# ip li set dev eth1 down
-> [   30.053790] renesas-gbeth 15c40000.ethernet eth1: Link is Down
-> root@rzv2h-evk-alpha:~# ip li set dev eth0 down
-> [   35.366935] renesas-gbeth 15c30000.ethernet eth0: Link is Down
-> root@rzv2h-evk-alpha:~# ip li set dev eth1 up
-> [   40.448563] renesas-gbeth 15c40000.ethernet eth1: Register
-> MEM_TYPE_PAGE_POOL RxQ-0
-> [   40.456725] renesas-gbeth 15c40000.ethernet eth1: Register
-> MEM_TYPE_PAGE_POOL RxQ-1
-> [   40.464893] renesas-gbeth 15c40000.ethernet eth1: Register
-> MEM_TYPE_PAGE_POOL RxQ-2
-> [   40.472840] renesas-gbeth 15c40000.ethernet eth1: Register
-> MEM_TYPE_PAGE_POOL RxQ-3
-> [   40.543895] renesas-gbeth 15c40000.ethernet eth1: PHY [stmmac-1:00]
-> driver [Microchip KSZ9131 Gigabit PHY] (irq=POLL)
-> [   40.566419] dwmac4: Master AXI performs fixed burst length
-> [   40.571949] renesas-gbeth 15c40000.ethernet eth1: No Safety
-> Features support found
-> [   40.579550] renesas-gbeth 15c40000.ethernet eth1: IEEE 1588-2008
-> Advanced Timestamp supported
-> [   40.588505] renesas-gbeth 15c40000.ethernet eth1: registered PTP clock
-> [   40.595135] renesas-gbeth 15c40000.ethernet eth1: configuring for
-> phy/rgmii-id link mode
-> root@rzv2h-evk-alpha:~#
-> root@rzv2h-evk-alpha:~# [   43.687551] renesas-gbeth 15c40000.ethernet
-> eth1: Link is Up - 1Gbps/Full - flow control off
+> if we set swdata->type to PRUETH_SWDATA_CMD in emac_send_command_sr1() then we could
+> reduce all above code including both ifs to
 > 
-> root@rzv2h-evk-alpha:~# ip li set dev eth0 up
-> [   49.644479] renesas-gbeth 15c30000.ethernet eth0: Register
-> MEM_TYPE_PAGE_POOL RxQ-0
-> [   49.652719] renesas-gbeth 15c30000.ethernet eth0: Register
-> MEM_TYPE_PAGE_POOL RxQ-1
-> [   49.660681] renesas-gbeth 15c30000.ethernet eth0: Register
-> MEM_TYPE_PAGE_POOL RxQ-2
-> [   49.669059] renesas-gbeth 15c30000.ethernet eth0: Register
-> MEM_TYPE_PAGE_POOL RxQ-3
-> [   49.740011] renesas-gbeth 15c30000.ethernet eth0: PHY [stmmac-0:00]
-> driver [Microchip KSZ9131 Gigabit PHY] (irq=POLL)
-> [   49.762518] dwmac4: Master AXI performs fixed burst length
-> [   49.768057] renesas-gbeth 15c30000.ethernet eth0: No Safety
-> Features support found
-> [   49.775655] renesas-gbeth 15c30000.ethernet eth0: IEEE 1588-2008
-> Advanced Timestamp supported
-> [   49.784609] renesas-gbeth 15c30000.ethernet eth0: registered PTP clock
-> [   49.791236] renesas-gbeth 15c30000.ethernet eth0: configuring for
-> phy/rgmii-id link mode
-> root@rzv2h-evk-alpha:~#
-> root@rzv2h-evk-alpha:~# [   52.871635] renesas-gbeth 15c30000.ethernet
-> eth0: tx_clk_stop=1
-> [   52.877777] renesas-gbeth 15c30000.ethernet eth0: Link is Up -
-> 1Gbps/Full - flow control rx/tx
+> 		swdata = cppi5_hdesc_get_swdata(desc_tx);
+> 		prueth_xmit_free(tx_chn, desc_tx);
+> 		if (swdata->type != PRUETH_SWDATA_SKB)
+> 			continue;
+> 
+> 		skb = swdata->data.skb;
 
-I would like to get to the bottom of why this fails for module removal/
-insertion, but not for admistratively down/upping the interface.
+Yes this is a nice change. This also addresses the concern Dan pointed 
+out regarding SR1's emac->cmd_data check. I was also wondering the same 
+to use PRUETH_SWDATA_CMD for addressing Dan's comment. Thanks.
 
-Removal of your module will unregister the netdev, and part of that
-work will bring the netdev administratively down. When re-inserting
-the module, that will trigger various userspace events, and it will
-be userspace bringing the network interface(s) back up. This should
-be no different from administratively down/upping the interface but
-it seems you get different behaviour.
+> 
+>>   
+>>   		ndev = skb->dev;
+>> @@ -472,9 +479,9 @@ int prueth_dma_rx_push_mapped(struct prueth_emac *emac,
+>>   {
+>>   	struct net_device *ndev = emac->ndev;
+>>   	struct cppi5_host_desc_t *desc_rx;
+>> +	struct prueth_swdata *swdata;
+>>   	dma_addr_t desc_dma;
+>>   	dma_addr_t buf_dma;
+>> -	void **swdata;
+>>   
+>>   	buf_dma = page_pool_get_dma_addr(page) + PRUETH_HEADROOM;
+>>   	desc_rx = k3_cppi_desc_pool_alloc(rx_chn->desc_pool);
+>> @@ -490,7 +497,8 @@ int prueth_dma_rx_push_mapped(struct prueth_emac *emac,
+>>   	cppi5_hdesc_attach_buf(desc_rx, buf_dma, buf_len, buf_dma, buf_len);
+>>   
+>>   	swdata = cppi5_hdesc_get_swdata(desc_rx);
+>> -	*swdata = page;
+>> +	swdata->type = PRUETH_SWDATA_PAGE;
+>> +	swdata->data.page = page;
+>>   
+>>   	return k3_udma_glue_push_rx_chn(rx_chn->rx_chn, PRUETH_RX_FLOW_DATA,
+>>   					desc_rx, desc_dma);
+>> @@ -539,11 +547,11 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id)
+>>   	u32 buf_dma_len, pkt_len, port_id = 0;
+>>   	struct net_device *ndev = emac->ndev;
+>>   	struct cppi5_host_desc_t *desc_rx;
+>> +	struct prueth_swdata *swdata;
+>>   	dma_addr_t desc_dma, buf_dma;
+>>   	struct page *page, *new_page;
+>>   	struct page_pool *pool;
+>>   	struct sk_buff *skb;
+>> -	void **swdata;
+>>   	u32 *psdata;
+>>   	void *pa;
+>>   	int ret;
+>> @@ -561,7 +569,13 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id)
+>>   
+>>   	desc_rx = k3_cppi_desc_pool_dma2virt(rx_chn->desc_pool, desc_dma);
+>>   	swdata = cppi5_hdesc_get_swdata(desc_rx);
+>> -	page = *swdata;
+>> +	if (swdata->type != PRUETH_SWDATA_PAGE) {
+>> +		netdev_err(ndev, "rx_pkt: invalid swdata->type %d\n", swdata->type);
+>> +		k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
+>> +		return 0;
+>> +	}
+>> +
+>> +	page = swdata->data.page;
+>>   	page_pool_dma_sync_for_cpu(pool, page, 0, PAGE_SIZE);
+>>   	cppi5_hdesc_get_obuf(desc_rx, &buf_dma, &buf_dma_len);
+>>   	k3_udma_glue_rx_cppi5_to_dma_addr(rx_chn->rx_chn, &buf_dma);
+>> @@ -626,15 +640,18 @@ static void prueth_rx_cleanup(void *data, dma_addr_t desc_dma)
+>>   {
+>>   	struct prueth_rx_chn *rx_chn = data;
+>>   	struct cppi5_host_desc_t *desc_rx;
+>> +	struct prueth_swdata *swdata;
+>>   	struct page_pool *pool;
+>>   	struct page *page;
+>> -	void **swdata;
+>>   
+>>   	pool = rx_chn->pg_pool;
+>>   	desc_rx = k3_cppi_desc_pool_dma2virt(rx_chn->desc_pool, desc_dma);
+>>   	swdata = cppi5_hdesc_get_swdata(desc_rx);
+>> -	page = *swdata;
+>> -	page_pool_recycle_direct(pool, page);
+>> +	if (swdata->type == PRUETH_SWDATA_PAGE) {
+>> +		page = swdata->data.page;
+>> +		page_pool_recycle_direct(pool, page);
+>> +	}
+>> +
+>>   	k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
+>>   }
+>>   
+>> @@ -671,13 +688,13 @@ enum netdev_tx icssg_ndo_start_xmit(struct sk_buff *skb, struct net_device *ndev
+>>   	struct prueth_emac *emac = netdev_priv(ndev);
+>>   	struct prueth *prueth = emac->prueth;
+>>   	struct netdev_queue *netif_txq;
+>> +	struct prueth_swdata *swdata;
+>>   	struct prueth_tx_chn *tx_chn;
+>>   	dma_addr_t desc_dma, buf_dma;
+>>   	u32 pkt_len, dst_tag_id;
+>>   	int i, ret = 0, q_idx;
+>>   	bool in_tx_ts = 0;
+>>   	int tx_ts_cookie;
+>> -	void **swdata;
+>>   	u32 *epib;
+>>   
+>>   	pkt_len = skb_headlen(skb);
+>> @@ -739,7 +756,8 @@ enum netdev_tx icssg_ndo_start_xmit(struct sk_buff *skb, struct net_device *ndev
+>>   	k3_udma_glue_tx_dma_to_cppi5_addr(tx_chn->tx_chn, &buf_dma);
+>>   	cppi5_hdesc_attach_buf(first_desc, buf_dma, pkt_len, buf_dma, pkt_len);
+>>   	swdata = cppi5_hdesc_get_swdata(first_desc);
+>> -	*swdata = skb;
+>> +	swdata->type = PRUETH_SWDATA_SKB;
+>> +	swdata->data.skb = skb;
+>>   
+>>   	/* Handle the case where skb is fragmented in pages */
+>>   	cur_desc = first_desc;
+>> @@ -842,15 +860,17 @@ static void prueth_tx_cleanup(void *data, dma_addr_t desc_dma)
+>>   {
+>>   	struct prueth_tx_chn *tx_chn = data;
+>>   	struct cppi5_host_desc_t *desc_tx;
+>> +	struct prueth_swdata *swdata;
+>>   	struct sk_buff *skb;
+>> -	void **swdata;
+>>   
+>>   	desc_tx = k3_cppi_desc_pool_dma2virt(tx_chn->desc_pool, desc_dma);
+>>   	swdata = cppi5_hdesc_get_swdata(desc_tx);
+>> -	skb = *(swdata);
+>> -	prueth_xmit_free(tx_chn, desc_tx);
+>> +	if (swdata->type == PRUETH_SWDATA_SKB) {
+>> +		skb = swdata->data.skb;
+>> +		dev_kfree_skb_any(skb);
+>> +	}
+>>   
+>> -	dev_kfree_skb_any(skb);
+>> +	prueth_xmit_free(tx_chn, desc_tx);
+>>   }
+>>   
+>>   irqreturn_t prueth_rx_irq(int irq, void *dev_id)
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>> index 00ed97860547..3ff8c322f9d9 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>> @@ -1522,6 +1522,9 @@ static int prueth_probe(struct platform_device *pdev)
+>>   
+>>   	np = dev->of_node;
+>>   
+>> +	BUILD_BUG_ON_MSG((sizeof(struct prueth_swdata) > PRUETH_NAV_SW_DATA_SIZE),
+>> +			 "insufficient SW_DATA size");
+>> +
+>>   	prueth = devm_kzalloc(dev, sizeof(*prueth), GFP_KERNEL);
+>>   	if (!prueth)
+>>   		return -ENOMEM;
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>> index c7b906de18af..3bbabd007129 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>> @@ -136,6 +136,22 @@ struct prueth_rx_chn {
+>>   	struct page_pool *pg_pool;
+>>   };
+>>   
+>> +enum prueth_swdata_type {
+>> +	PRUETH_SWDATA_INVALID = 0,
+>> +	PRUETH_SWDATA_SKB,
+>> +	PRUETH_SWDATA_PAGE,
+>> +	PRUETH_SWDATA_CMD,
+> 
+> PRUETH_SWDATA_CMD is not beig used so let's use it in emac_send_command_sr1()
+> 
 
-I'd like to understand why that is, because at the moment I'm wondering
-whether my patches that address the suspend/resume need further work
-before I send them - but in order to assess that, I need to work out
-why your issue only seems to occur in the module removal/insertion
-and not down/up as well as I'd expect.
+Yes, will do that. This is actually a miss in my previous patches.
 
-Please could you investigate this?
+>> +};
+>> +
+>> +struct prueth_swdata {
+>> +	enum prueth_swdata_type type;
+>> +	union prueth_data {
+>> +		struct sk_buff *skb;
+>> +		struct page *page;
+>> +		u32 cmd;
+>> +	} data;
+>> +};
+>> +
+>>   /* There are 4 Tx DMA channels, but the highest priority is CH3 (thread 3)
+>>    * and lower three are lower priority channels or threads.
+>>    */
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c b/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
+>> index aeeb8a50376b..7bbe0808b3ec 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
+>> @@ -275,10 +275,10 @@ static struct sk_buff *prueth_process_rx_mgm(struct prueth_emac *emac,
+>>   	struct net_device *ndev = emac->ndev;
+>>   	struct cppi5_host_desc_t *desc_rx;
+>>   	struct page *page, *new_page;
+>> +	struct prueth_swdata *swdata;
+>>   	dma_addr_t desc_dma, buf_dma;
+>>   	u32 buf_dma_len, pkt_len;
+>>   	struct sk_buff *skb;
+>> -	void **swdata;
+>>   	void *pa;
+>>   	int ret;
+>>   
+>> @@ -301,7 +301,7 @@ static struct sk_buff *prueth_process_rx_mgm(struct prueth_emac *emac,
+>>   	}
+>>   
+>>   	swdata = cppi5_hdesc_get_swdata(desc_rx);
+>> -	page = *swdata;
+>> +	page = swdata->data.page;
+>>   	cppi5_hdesc_get_obuf(desc_rx, &buf_dma, &buf_dma_len);
+>>   	pkt_len = cppi5_hdesc_get_pktlen(desc_rx);
+>>   
+> 
 
-Thanks.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
