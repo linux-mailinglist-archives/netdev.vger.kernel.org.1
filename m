@@ -1,307 +1,186 @@
-Return-Path: <netdev+bounces-171101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2A82A4B807
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 07:57:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 22DC6A4B814
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 08:06:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE59F188F081
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 06:57:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D1831890F72
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 07:06:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A2A91E9B3A;
-	Mon,  3 Mar 2025 06:56:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A16141E3DCF;
+	Mon,  3 Mar 2025 07:06:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cGUEjYfT"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GEeCMz+R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57D81E9B25;
-	Mon,  3 Mar 2025 06:56:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F2994A3C
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 07:06:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740984975; cv=none; b=es9ALGMy1XDRAXAZhhctwht/s8Z/r98DbF7R3rvPVMRBUJsufNqnatRND0QTcX4YwK6nYIjmaymHUZfsZK1aW9NHKcukGRnptuhPVaShMVf6rfDq+F+47UEPpypF/dOVrQf2nWp8w00pxM8kJl99+D3Ij+gn62Jm2T7rBIWNb5I=
+	t=1740985576; cv=none; b=cTrs22eTv/MPk5x2lxmm2sbRhCxlCXenkC8x2QFcXl6aGbgX3cFHbQzkRmZkuvkBf+0wWDzdJDTGrsmEN7bkE48eibYDh+2QDFe9m0cfmeeuPiwtICXZT24Q4WA9NZlwZe1XhQd7ZGkRxX+SR7BQyq3+7bozZjSnInE/DQNY6Jc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740984975; c=relaxed/simple;
-	bh=8+jQ2LOFLvD8yNjmgsq7xpDv7f8F3syKUpRlLU8kRU0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JJ3P0Rd4yItYta6SlFK0zUJSHWSErFCamTftZFdn4KzlLXAYBU/Y53p97he4ciQtPGJt7Wp2tbYm3+fL8g8UPy9a0Mo7O8hR3X43V0LnktdA7CzvxncJVBszKfZWT0hMdgV+DKRkt1GK6Owot+eBlVN42MPZ1jvfR1mHHzxQ1fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cGUEjYfT; arc=none smtp.client-ip=209.85.214.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-2234e4b079cso71473705ad.1;
-        Sun, 02 Mar 2025 22:56:12 -0800 (PST)
+	s=arc-20240116; t=1740985576; c=relaxed/simple;
+	bh=Rka7/Rx/UAJwBcyQ1ctL/DACSoeBVpoGCkrLxyEqkDc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=asA7Vb+7BRTwcP0c5qyPZ6cDJOzd50lPTzkS0HEC7brcIpdi5p0jGoH9nJRrBOM13Ql5RSjZtLD/jd3vPdwWWvu7gYFlMPrs3giVgM+TnJS/84joBtkcEfFGlgtvZSy0QvOweYIsxCyMC4V4t1gFbDExWt8Pa4oj7faeKwZUxwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GEeCMz+R; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-abec8b750ebso709405466b.0
+        for <netdev@vger.kernel.org>; Sun, 02 Mar 2025 23:06:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740984972; x=1741589772; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KvSQXTXm2WJtvrSSulKAAYVeipdazZIwWA04KeDmP3s=;
-        b=cGUEjYfT88miiKVGNn/JCoptAo9F87JQHbzUoMe6ahICREMT55MSaAAKZX6k+qnQLz
-         3cxIweuKGuPJYVjc68XVCTR/8mSIpbBahs3GjEoODIB69JILDSP79h0kk3Jc/2rnWHEP
-         0DgN0TcOZ/yzoMlFvHZ0S72x7oTF3YdjD/EGjEcyL3Bz/t9C7g+FKXvPdMncuS1H7bNy
-         eWUR4ss9ZRiDJfLmpA/tBDkVXHvVj+lrrj6N3j93oVeW5AGaJl1ZONoShajwuMyijEwZ
-         S7iDXAzC3MWNy0eHmDXcNCaxGUKCzu2WxNnAfZqQHiGf8BCdpz0/Zan7yxwmZWEpIADX
-         Nthw==
+        d=linaro.org; s=google; t=1740985573; x=1741590373; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WvEeRk3M8QKrsU6ZWqi+zoW7rNpMcZv1dlxRGclyC7A=;
+        b=GEeCMz+Rbktm/9rhAQq1g8PSma7KjfiNJvvMwnLP1pFi9n8QkWm+/albMgNWB3AlP6
+         DFThGFL4+nSBc5dFQUTENCaY4znQaIK1/hWfh6GlbPIbTPsZ3Guh1LnKoHXPWpxCaFRg
+         Jy02Xebm3PwR6IF4RroGHJF/PonhugOQILhgNi2TokByTssbBcy/zyEjev/U7VnI2M7a
+         P6xslx2DU2R8JCWYIfylpdybKYlM0JKDPj4BAqChG6joApIPSWu5JU3xH30enl5Y6x5K
+         PsmptkjzDat1xLl6eyD9w/+JXOPej3J+LZ+Ikg7T/DSmiTvCM5xXCEWcOB8KEkZEaEWp
+         cl/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740984972; x=1741589772;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KvSQXTXm2WJtvrSSulKAAYVeipdazZIwWA04KeDmP3s=;
-        b=PA0fBMrRNh7rrjIa2K4J1UVCM5ZWI7Lbr9gXjWmnEfnoRkLkpSysPT5Qm7h7PvscVD
-         bopoMMt0DMEk8jNffjqLZgoLuFJMfkjwWjcdSCRq3lxb3p4ddqp4Y2js8lGog1kvj1Ch
-         takFIWKEGJ2mWDlXXyjAo9r8WrvpNWlLhv9eShWpJimHHzRAPiBZgu4nlwTN59/ITIgT
-         KrbsflT2AbLnKXOsVc+fHo5VxQO8JmzPbSAPGn+Z0HWWj0spMoTYAQTCL4o6x498vsg+
-         jQdxtDngxZ4+el7R8BOLt4gbwbmJxgaUEDbJzOhmEgFnHaGbxANzJK9U8v4NuOYhnUoC
-         fvrw==
-X-Forwarded-Encrypted: i=1; AJvYcCU6oZUmR9aiVatwNVUQPo75W2P+mWtdCD4N5K2HjQBQmEf8Pys/+2bJXT2S1aJwG+2o2NqMyJqxA3cNvU8V@vger.kernel.org, AJvYcCUnM9BX/QpQ77esQrIFPufogqvrtBR1TM5dQuMnZ5nXBptFTzgZ6bG0MFp5LVuaQKbQW2U=@vger.kernel.org, AJvYcCWQJbPMTc/oK8gexB6k1bz0ao7HLQ0Qc4sEfjkhFG+n1IS9MOmymBQzNlXfFmLdEBjmbm+ooKoQI5UAEMVFQqVYs6Bk@vger.kernel.org, AJvYcCWWVObil1JgWvEbolMA0DWYpflV6IazZyMtPiLsaRrjwXdcQDeKp5Bh6GPLrxC/cBguoH5IfJe5@vger.kernel.org
-X-Gm-Message-State: AOJu0YwezXGD0pVM9H1FE+FXws5HkBWptVBk6DXB99ND7fKinhGmRJN0
-	rUln9QgefTGOdW7rybJcrZlI1g1TSAFi0Dpgt28GZ1YkhwfwIlut
-X-Gm-Gg: ASbGncuaBv759bAGFrv5tshBn/sYLQMkwlMKve9M6uUg6OVUlupZ9NWn2o6kYXXNWuo
-	DwhYz5HKcYGP5q54g43G3bGk9hA6pjY3Y2TSTX+F1VsmHCKUFTsCE90tSn3U7h7uRIjW6iJXyRO
-	XWNmuR/BgU6hTgdbi4943+PIXGNu3PIYyDkwCltZF3cmgLI1zFdBB1OFmZudeg7n88Y7HiMtqAz
-	FonK6WAD8flfqhDm4iae65P9fFjWraZUlG+M9x3XRMDo2awFWf+IU0Ut1iz5d66w2JSErDIyNbP
-	xKqOkj9b4O2gFJJDDajRvw/tZhn7SizeS7DC1FYqF/mvv/wapqV40cQNazQ3hQ==
-X-Google-Smtp-Source: AGHT+IHD7TOQHXPnvhY3fUJExGRRx5jR57Vtr+fKvMEWMLLg1ZWvH9nc0mv2BX9j9PlmWnQhBjDbsg==
-X-Received: by 2002:a17:903:3b83:b0:21f:6c3:aefb with SMTP id d9443c01a7336-2236920c418mr195671705ad.35.1740984972122;
-        Sun, 02 Mar 2025 22:56:12 -0800 (PST)
-Received: from localhost.localdomain ([43.129.244.20])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fea6769ad2sm8139575a91.11.2025.03.02.22.56.04
+        d=1e100.net; s=20230601; t=1740985573; x=1741590373;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WvEeRk3M8QKrsU6ZWqi+zoW7rNpMcZv1dlxRGclyC7A=;
+        b=Hhz3BxrX3p12Fwf5c+y6aYv4S0EsuqgdyQiPkCVAyhf4A7YLmtASHMFBxIaCP0Hgon
+         3B029SNsGL5+sMOuAsWYjzS6M5XTyObv2Auztdw/Cd55TmGbbD7jRojRFQog8QA0PK+v
+         A1K6vCmzPfHpbQzqTXNUPTxn+b4V1n6KCGezHJ4g0HVMJigm8OoRhl8jOtQvVthCorNN
+         Ki88X8EiREalir7e5Xkh9k6kJ/l5X9HjUEocRzOQxAywWFizyZt05xKGQj0mX8/stZTQ
+         KW9VBBKGseN/uK1xZ+ugXlzozGld9AfBxF7rcwTocS1MqmIkSioUYyyuV1r/p2lB8oZz
+         x/XA==
+X-Forwarded-Encrypted: i=1; AJvYcCVQeBXpxfKSqh3HcgkRoO6PSFOE6vLmLlHvHM1eXIPcKEB9nyquyEhYf4WidRbkIQjvoBC13R0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKxcwmvjJuAzoMpnSL5TuCpWbzPG9aG2C+INUxsTaObqGNyjCi
+	le6tM5Fk9snPQ1v4m/Tsg0GgxYxIGh6X1QCS3j9s8DabPyYVL8AfUhz1jqM08z0=
+X-Gm-Gg: ASbGncta+/DLS9r7CQimJyMOOmu9qBmm5Si/wu3i//jxD0g3rQpSBFFOlAf8F29DZkO
+	oD9NTKgIafxp5KPAbpSa21TFMSJM/dkVfdLzAbpqhkxROOvgYnuL7I2OKfE8WqGZlUcp4S5S5Bn
+	9I/NN5aK1NNoJFEvOTRB0hoOMqaOAgjmPZcqLfihcFuS40zNOTPRNTe0Os0lB2TxgCBzUjHFztg
+	qa5A/fagNcTHiSlLf4BGW3hXBqBpSW6GnQhA654MLx7HKe8OS2fn5fcKkOtsRtZBwXSXA7Re8WD
+	2ah1KX6BfLGgFEZ0kuXTb1/el8M2hZHyb6xP8jDTKQPWRDUYcw==
+X-Google-Smtp-Source: AGHT+IE9RaG3JnTWQBOFC+cG5oJLPzGegDPF8j6pgIAxLmaI3dzluH6lmpvCgAJRjLW14fgB2O0LwQ==
+X-Received: by 2002:a17:907:9728:b0:abe:e814:ecb4 with SMTP id a640c23a62f3a-abf25f8dd35mr1474577666b.4.1740985572603;
+        Sun, 02 Mar 2025 23:06:12 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-abf0c0b9cbfsm769454866b.14.2025.03.02.23.06.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 02 Mar 2025 22:56:11 -0800 (PST)
-From: Menglong Dong <menglong8.dong@gmail.com>
-X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
-To: peterz@infradead.org,
-	rostedt@goodmis.org,
-	mark.rutland@arm.com,
-	alexei.starovoitov@gmail.com
-Cc: catalin.marinas@arm.com,
-	will@kernel.org,
-	mhiramat@kernel.org,
-	tglx@linutronix.de,
-	mingo@redhat.com,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	x86@kernel.org,
-	hpa@zytor.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	jolsa@kernel.org,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	mathieu.desnoyers@efficios.com,
-	nathan@kernel.org,
-	nick.desaulniers+lkml@gmail.com,
-	morbo@google.com,
-	samitolvanen@google.com,
-	kees@kernel.org,
-	dongml2@chinatelecom.cn,
-	akpm@linux-foundation.org,
-	riel@surriel.com,
-	rppt@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: [PATCH bpf-next v3 4/4] arm64: implement per-function metadata storage for arm64
-Date: Mon,  3 Mar 2025 14:53:45 +0800
-Message-Id: <20250303065345.229298-5-dongml2@chinatelecom.cn>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250303065345.229298-1-dongml2@chinatelecom.cn>
-References: <20250303065345.229298-1-dongml2@chinatelecom.cn>
+        Sun, 02 Mar 2025 23:06:12 -0800 (PST)
+Date: Mon, 3 Mar 2025 10:06:08 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: oe-kbuild@lists.linux.dev, Saeed Mahameed <saeed@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>
+Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net-next 12/14] devlink: Throw extack messages on param
+ value validation error
+Message-ID: <838b1bb7-776f-481a-bda0-015368012040@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250228021227.871993-13-saeed@kernel.org>
 
-The per-function metadata storage is already used by ftrace if
-CONFIG_DYNAMIC_FTRACE_WITH_CALL_OPS is enabled, and it store the pointer
-of the callback directly to the function padding, which consume 8-bytes,
-in the commit
-baaf553d3bc3 ("arm64: Implement HAVE_DYNAMIC_FTRACE_WITH_CALL_OPS").
-So we can directly store the index to the function padding too, without
-a prepending. With CONFIG_DYNAMIC_FTRACE_WITH_CALL_OPS enabled, the
-function is 8-bytes aligned, and we will compile the kernel with extra
-8-bytes (2 NOPS) padding space. Otherwise, the function is 4-bytes
-aligned, and only extra 4-bytes (1 NOPS) is needed.
+Hi Saeed,
 
-However, we have the same problem with Mark in the commit above: we can't
-use the function padding together with CFI_CLANG, which can make the clang
-compiles a wrong offset to the pre-function type hash. He said that he was
-working with others on this problem 2 years ago. Hi Mark, is there any
-progress on this problem?
+kernel test robot noticed the following build warnings:
 
-Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
----
- arch/arm64/Kconfig              | 15 +++++++++++++++
- arch/arm64/Makefile             | 23 ++++++++++++++++++++--
- arch/arm64/include/asm/ftrace.h | 34 +++++++++++++++++++++++++++++++++
- arch/arm64/kernel/ftrace.c      | 13 +++++++++++--
- 4 files changed, 81 insertions(+), 4 deletions(-)
+url:    https://github.com/intel-lab-lkp/linux/commits/Saeed-Mahameed/devlink-define-enum-for-attr-types-of-dynamic-attributes/20250228-101818
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250228021227.871993-13-saeed%40kernel.org
+patch subject: [PATCH net-next 12/14] devlink: Throw extack messages on param value validation error
+config: sparc-randconfig-r071-20250302 (https://download.01.org/0day-ci/archive/20250302/202503022006.eOu80RMF-lkp@intel.com/config)
+compiler: sparc-linux-gcc (GCC) 14.2.0
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 940343beb3d4..7ed80f5eb267 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -1536,6 +1536,21 @@ config NODES_SHIFT
- 	  Specify the maximum number of NUMA Nodes available on the target
- 	  system.  Increases memory reserved to accommodate various tables.
- 
-+config FUNCTION_METADATA
-+	bool "Per-function metadata storage support"
-+	default y
-+	select HAVE_DYNAMIC_FTRACE_NO_PATCHABLE if !FTRACE_MCOUNT_USE_PATCHABLE_FUNCTION_ENTRY
-+	depends on !CFI_CLANG
-+	help
-+	  Support per-function metadata storage for kernel functions, and
-+	  get the metadata of the function by its address with almost no
-+	  overhead.
-+
-+	  The index of the metadata will be stored in the function padding,
-+	  which will consume 4-bytes. If FUNCTION_ALIGNMENT_8B is enabled,
-+	  extra 8-bytes function padding will be reserved during compiling.
-+	  Otherwise, only extra 4-bytes function padding is needed.
-+
- source "kernel/Kconfig.hz"
- 
- config ARCH_SPARSEMEM_ENABLE
-diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
-index 2b25d671365f..2df2b0f4dd90 100644
---- a/arch/arm64/Makefile
-+++ b/arch/arm64/Makefile
-@@ -144,12 +144,31 @@ endif
- 
- CHECKFLAGS	+= -D__aarch64__
- 
-+ifeq ($(CONFIG_FUNCTION_METADATA),y)
-+  ifeq ($(CONFIG_FUNCTION_ALIGNMENT_8B),y)
-+  __padding_nops := 2
-+  else
-+  __padding_nops := 1
-+  endif
-+else
-+  __padding_nops := 0
-+endif
-+
- ifeq ($(CONFIG_DYNAMIC_FTRACE_WITH_CALL_OPS),y)
-+  __padding_nops  := $(shell echo $(__padding_nops) + 2 | bc)
-   KBUILD_CPPFLAGS += -DCC_USING_PATCHABLE_FUNCTION_ENTRY
--  CC_FLAGS_FTRACE := -fpatchable-function-entry=4,2
-+  CC_FLAGS_FTRACE := -fpatchable-function-entry=$(shell echo $(__padding_nops) + 2 | bc),$(__padding_nops)
- else ifeq ($(CONFIG_DYNAMIC_FTRACE_WITH_ARGS),y)
-+  CC_FLAGS_FTRACE := -fpatchable-function-entry=$(shell echo $(__padding_nops) + 2 | bc),$(__padding_nops)
-   KBUILD_CPPFLAGS += -DCC_USING_PATCHABLE_FUNCTION_ENTRY
--  CC_FLAGS_FTRACE := -fpatchable-function-entry=2
-+else ifeq ($(CONFIG_FUNCTION_METADATA),y)
-+  CC_FLAGS_FTRACE += -fpatchable-function-entry=$(__padding_nops),$(__padding_nops)
-+  ifneq ($(CONFIG_FUNCTION_TRACER),y)
-+    KBUILD_CFLAGS += $(CC_FLAGS_FTRACE)
-+    # some file need to remove this cflag when CONFIG_FUNCTION_TRACER
-+    # is not enabled, so we need to export it here
-+    export CC_FLAGS_FTRACE
-+  endif
- endif
- 
- ifeq ($(CONFIG_KASAN_SW_TAGS), y)
-diff --git a/arch/arm64/include/asm/ftrace.h b/arch/arm64/include/asm/ftrace.h
-index bfe3ce9df197..aa3eaa91bf82 100644
---- a/arch/arm64/include/asm/ftrace.h
-+++ b/arch/arm64/include/asm/ftrace.h
-@@ -24,6 +24,16 @@
- #define FTRACE_PLT_IDX		0
- #define NR_FTRACE_PLTS		1
- 
-+#ifdef CONFIG_FUNCTION_METADATA
-+#ifdef CONFIG_DYNAMIC_FTRACE_WITH_CALL_OPS
-+#define KFUNC_MD_DATA_OFFSET	(AARCH64_INSN_SIZE * 3)
-+#else
-+#define KFUNC_MD_DATA_OFFSET	AARCH64_INSN_SIZE
-+#endif
-+#define KFUNC_MD_INSN_SIZE	AARCH64_INSN_SIZE
-+#define KFUNC_MD_INSN_OFFSET	KFUNC_MD_DATA_OFFSET
-+#endif
-+
- /*
-  * Currently, gcc tends to save the link register after the local variables
-  * on the stack. This causes the max stack tracer to report the function
-@@ -216,6 +226,30 @@ static inline bool arch_syscall_match_sym_name(const char *sym,
- 	 */
- 	return !strcmp(sym + 8, name);
- }
-+
-+#ifdef CONFIG_FUNCTION_METADATA
-+#include <asm/text-patching.h>
-+
-+static inline bool kfunc_md_arch_exist(void *ip)
-+{
-+	return !aarch64_insn_is_nop(*(u32 *)(ip - KFUNC_MD_INSN_OFFSET));
-+}
-+
-+static inline void kfunc_md_arch_pretend(u8 *insn, u32 index)
-+{
-+	*(u32 *)insn = index;
-+}
-+
-+static inline void kfunc_md_arch_nops(u8 *insn)
-+{
-+	*(u32 *)insn = aarch64_insn_gen_nop();
-+}
-+
-+static inline int kfunc_md_arch_poke(void *ip, u8 *insn)
-+{
-+	return aarch64_insn_patch_text_nosync(ip, *(u32 *)insn);
-+}
-+#endif
- #endif /* ifndef __ASSEMBLY__ */
- 
- #ifndef __ASSEMBLY__
-diff --git a/arch/arm64/kernel/ftrace.c b/arch/arm64/kernel/ftrace.c
-index d7c0d023dfe5..4191ff0037f5 100644
---- a/arch/arm64/kernel/ftrace.c
-+++ b/arch/arm64/kernel/ftrace.c
-@@ -88,8 +88,10 @@ unsigned long ftrace_call_adjust(unsigned long addr)
- 	 * to `BL <caller>`, which is at `addr + 4` bytes in either case.
- 	 *
- 	 */
--	if (!IS_ENABLED(CONFIG_DYNAMIC_FTRACE_WITH_CALL_OPS))
--		return addr + AARCH64_INSN_SIZE;
-+	if (!IS_ENABLED(CONFIG_DYNAMIC_FTRACE_WITH_CALL_OPS)) {
-+		addr += AARCH64_INSN_SIZE;
-+		goto out;
-+	}
- 
- 	/*
- 	 * When using patchable-function-entry with pre-function NOPs, addr is
-@@ -139,6 +141,13 @@ unsigned long ftrace_call_adjust(unsigned long addr)
- 
- 	/* Skip the first NOP after function entry */
- 	addr += AARCH64_INSN_SIZE;
-+out:
-+	if (IS_ENABLED(CONFIG_FUNCTION_METADATA)) {
-+		if (IS_ENABLED(CONFIG_FUNCTION_ALIGNMENT_8B))
-+			addr += 2 * AARCH64_INSN_SIZE;
-+		else
-+			addr += AARCH64_INSN_SIZE;
-+	}
- 
- 	return addr;
- }
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+| Closes: https://lore.kernel.org/r/202503022006.eOu80RMF-lkp@intel.com/
+
+smatch warnings:
+net/devlink/param.c:498 devlink_param_value_validate() error: we previously assumed 'param_data' could be null (see line 475)
+
+vim +/param_data +498 net/devlink/param.c
+
+ca557d9df319fed Saeed Mahameed 2025-02-27  461  static int
+ca557d9df319fed Saeed Mahameed 2025-02-27  462  devlink_param_value_validate(struct genl_info *info,
+ca557d9df319fed Saeed Mahameed 2025-02-27  463  			     enum devlink_param_type type)
+ca557d9df319fed Saeed Mahameed 2025-02-27  464  {
+ca557d9df319fed Saeed Mahameed 2025-02-27  465  	struct netlink_ext_ack *extack = info->extack;
+ca557d9df319fed Saeed Mahameed 2025-02-27  466  	struct nlattr *param_data;
+ca557d9df319fed Saeed Mahameed 2025-02-27  467  	int len = 0;
+ca557d9df319fed Saeed Mahameed 2025-02-27  468  
+ca557d9df319fed Saeed Mahameed 2025-02-27  469  	if (type != DEVLINK_PARAM_TYPE_BOOL &&
+ca557d9df319fed Saeed Mahameed 2025-02-27  470  	    GENL_REQ_ATTR_CHECK(info, DEVLINK_ATTR_PARAM_VALUE_DATA))
+ca557d9df319fed Saeed Mahameed 2025-02-27  471  		return -EINVAL;
+ca557d9df319fed Saeed Mahameed 2025-02-27  472  
+ca557d9df319fed Saeed Mahameed 2025-02-27  473  	param_data = info->attrs[DEVLINK_ATTR_PARAM_VALUE_DATA];
+ca557d9df319fed Saeed Mahameed 2025-02-27  474  
+ca557d9df319fed Saeed Mahameed 2025-02-27 @475  	if (param_data)
+
+This assumes param_data can be NULL
+
+ca557d9df319fed Saeed Mahameed 2025-02-27  476  		len = nla_len(param_data);
+ca557d9df319fed Saeed Mahameed 2025-02-27  477  
+ca557d9df319fed Saeed Mahameed 2025-02-27  478  	switch (type) {
+ca557d9df319fed Saeed Mahameed 2025-02-27  479  	case DEVLINK_PARAM_TYPE_U8:
+ca557d9df319fed Saeed Mahameed 2025-02-27  480  		if (len == sizeof(u8))
+ca557d9df319fed Saeed Mahameed 2025-02-27  481  			return 0;
+ca557d9df319fed Saeed Mahameed 2025-02-27  482  		NL_SET_ERR_MSG_FMT_MOD(extack,
+ca557d9df319fed Saeed Mahameed 2025-02-27  483  				       "Expected uint8, got %d bytes", len);
+ca557d9df319fed Saeed Mahameed 2025-02-27  484  		break;
+ca557d9df319fed Saeed Mahameed 2025-02-27  485  	case DEVLINK_PARAM_TYPE_U16:
+ca557d9df319fed Saeed Mahameed 2025-02-27  486  		if (len == sizeof(u16))
+ca557d9df319fed Saeed Mahameed 2025-02-27  487  			return 0;
+ca557d9df319fed Saeed Mahameed 2025-02-27  488  		NL_SET_ERR_MSG_FMT_MOD(extack,
+ca557d9df319fed Saeed Mahameed 2025-02-27  489  				       "Expected uint16, got %d bytes", len);
+ca557d9df319fed Saeed Mahameed 2025-02-27  490  		break;
+ca557d9df319fed Saeed Mahameed 2025-02-27  491  	case DEVLINK_PARAM_TYPE_U32:
+ca557d9df319fed Saeed Mahameed 2025-02-27  492  		if (len == sizeof(u32))
+ca557d9df319fed Saeed Mahameed 2025-02-27  493  			return 0;
+ca557d9df319fed Saeed Mahameed 2025-02-27  494  		NL_SET_ERR_MSG_FMT_MOD(extack,
+ca557d9df319fed Saeed Mahameed 2025-02-27  495  				       "Expected uint32, got %d bytes", len);
+ca557d9df319fed Saeed Mahameed 2025-02-27  496  		break;
+ca557d9df319fed Saeed Mahameed 2025-02-27  497  	case DEVLINK_PARAM_TYPE_STRING:
+ca557d9df319fed Saeed Mahameed 2025-02-27 @498  		len = strnlen(nla_data(param_data), nla_len(param_data));
+                                                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Unchecked dereferences
+
+ca557d9df319fed Saeed Mahameed 2025-02-27  499  
+ca557d9df319fed Saeed Mahameed 2025-02-27  500  		if (len < nla_len(param_data) &&
+ca557d9df319fed Saeed Mahameed 2025-02-27  501  		    len < __DEVLINK_PARAM_MAX_STRING_VALUE)
+ca557d9df319fed Saeed Mahameed 2025-02-27  502  			return 0;
+ca557d9df319fed Saeed Mahameed 2025-02-27  503  		NL_SET_ERR_MSG_MOD(extack, "String too long");
+ca557d9df319fed Saeed Mahameed 2025-02-27  504  		break;
+ca557d9df319fed Saeed Mahameed 2025-02-27  505  	case DEVLINK_PARAM_TYPE_BOOL:
+ca557d9df319fed Saeed Mahameed 2025-02-27  506  		if (!len)
+ca557d9df319fed Saeed Mahameed 2025-02-27  507  			return 0;
+ca557d9df319fed Saeed Mahameed 2025-02-27  508  		NL_SET_ERR_MSG_MOD(extack, "Expected flag, got data");
+ca557d9df319fed Saeed Mahameed 2025-02-27  509  		break;
+ca557d9df319fed Saeed Mahameed 2025-02-27  510  	default:
+ca557d9df319fed Saeed Mahameed 2025-02-27  511  		NL_SET_ERR_MSG_FMT_MOD(extack,
+ca557d9df319fed Saeed Mahameed 2025-02-27  512  				       "Not supported value type %d", type);
+ca557d9df319fed Saeed Mahameed 2025-02-27  513  		break;
+ca557d9df319fed Saeed Mahameed 2025-02-27  514  	}
+ca557d9df319fed Saeed Mahameed 2025-02-27  515  	return -EINVAL;
+ca557d9df319fed Saeed Mahameed 2025-02-27  516  }
+
 -- 
-2.39.5
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
 
