@@ -1,177 +1,189 @@
-Return-Path: <netdev+bounces-171385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75619A4CC6D
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 21:03:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90E5BA4CC7D
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 21:12:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4A1518967BA
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 20:03:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2493174813
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 20:12:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0C18238D49;
-	Mon,  3 Mar 2025 20:02:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 428C3235360;
+	Mon,  3 Mar 2025 20:12:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="RRFK5+IW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dew8SKHJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB5C2376EC
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 20:02:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84815225390;
+	Mon,  3 Mar 2025 20:12:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741032154; cv=none; b=RFcUjfQmDCLuU/kv91jlwcFV8E3xvBLuQcvfQ0QcuncaAGc4XiGPVZfhKCKujlnzWrO6Ue3RKQA52qA7jSbNcoiTs8tdxlBMf7IdtJSZ5BBMOt/C5mOGZSMAzNNNMPBFfgxi2Yq9T8hn4AZ2Qb7TBj4ufp32sZf6uci3QIJl+yg=
+	t=1741032722; cv=none; b=L7vRC/kb39fQGPPqSIKv4o1QtYytccy/w6RmPHmTjmFT2B/mGOKNFieF3uMS6xMgOPjm+u1VGrR095UJB/PZt3rw6dvhdH1uOsmYHt/UfwuoNFogz4+tq08f8wlaHSq7P1coP0UxSnueUqfGYhYG0WTB2kzcTznPwMlNxp0Udxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741032154; c=relaxed/simple;
-	bh=VFQeuhQrmXgZOY+JfXBPbjeF37rWPb4GdeTObDb2Rf8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QlN9hc+iMsChXO7tgyZzy2xJr3V6IuQfXMSlTq2Y/DnWVoX4Iv0Mwo0/KaH0/D51VHRCPTnn5FJcWU7E+ks8O6hVrYSz/sutpXoUTuGXsMeqcqtImXCx8800Wg+d8GZVozok6csmcKyTdgRcULimMSOg8lZOrSGTn3Brdb8b0zk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=RRFK5+IW; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2238d965199so35667575ad.2
-        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 12:02:33 -0800 (PST)
+	s=arc-20240116; t=1741032722; c=relaxed/simple;
+	bh=LazGdWrj8vtVKdJudr76WaxvRjZ4i8agEN2wOJCbIFw=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=EY8ViQlbXnlobBqlXM6YJGgQ5k8Gkb1sG0yB3nTJpCUW844LA9Fqf2e3H8Q0+A3McjgdKOo2aW4wnKQJ1pdTRIbKdbSvxeTvUcR8ZiQC7PjbKG/UlQUPKDxkYaawN79Lc42c8PzoVFJupD7Qssg2Xkjm1zno/k7VaNdt9zrUHaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dew8SKHJ; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-43bc4b1603fso7900325e9.0;
+        Mon, 03 Mar 2025 12:12:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1741032152; x=1741636952; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Bqs6enPVx21oxb5GivnZU1DWbwEExp/3gOjrVfmP78c=;
-        b=RRFK5+IWJQs3c2TMeNytKYerVfuXWNDsh/vWTzYJFLyt5xnIaTtm9JinCt1oMOMKpY
-         LdvKYI+FXd2jgoq9fGh0x06Jgre6UYIS2yUiep0+mMa1+V3bkeq9CNo4qEghokE2hK2D
-         N7r4Ctpe2UhwMS/kNzfVlJcqsKs1X8aOa13uo=
+        d=gmail.com; s=20230601; t=1741032719; x=1741637519; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=uWxfPZ9Q9PKdspux27aAUMfhltwVPuv3Rq9ADQuniAM=;
+        b=Dew8SKHJUuitO+tiEH3iX+WNgwuJKeqsOc3wgeSKYwOioT/SnL+HB86Dp5NynUKu0B
+         aaxVMMPSnvZgMbVW35WDZ5Atc57J+RUMkBbmMF0UkO1aK7q+AE1dpEmUS1vq23UK+WX9
+         SLyeYve6tUpQpqzihp9aVeGhhhxwDaGkiumj9Q5Pv5tN0zKjTjg1ShTKRzrYVlrV7Zx/
+         PS7njeMI0ojyAQTw3IhIAaB03IjOsjPu/y3yfPmPrnAmTmKy/LxQNK3QK6icejoxVJbp
+         O/q2IAnoXJpIulPbtuWnImz1FbbeJbyasO9LedGbCzr0A8B4z0FqE73k0zyQ+adV+pty
+         1iVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741032152; x=1741636952;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Bqs6enPVx21oxb5GivnZU1DWbwEExp/3gOjrVfmP78c=;
-        b=uYzkV3PwBveAbJ5eZjTggLUEpbU1NlKlpxQXZ+WO0L3fJh044NXY4e8QwufSYNoNzG
-         i2I3RsojSSkdcndqPOT64+4GAzccfnYKZuCVZ+jFT2O+OOxpoAPJ5Qxob3l6YIF20pP/
-         4L1LHSxCcIaAJp+YrUq4xRPUxrfkYDmy36VExlAegpuuJCk5HIw0Kvtq9/8LrLKXfPvu
-         pcdbSOHJKLYC8k0+Q9m7+VUp+MTkNDW1en3vSkoCWryFEncW/gNAgUJal+lXR4IyXPTr
-         17Eeul+9IPrfWiU9VzQkpClXvO4kV7XK6QY+EWIQz1uUxE82649xEbr3Z1Gb1GKOa6IP
-         QmPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVxrHmTkMzhF0x1vgKFTi7lEtCn0uVC9v6wXRESX9zhXDjZ2oCdxUZRIlhCLDf1K5bvWiZ3HV4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8YR0XqljJCPkrHLF8+sZv6mMzbNKiFb1RDFlFigBFh13rM7b6
-	wEHdP/sg4TckDC3xBaPJfnm0D7dqPhmGMqcfhgsiNfQhgCkgaaNKC3ibcWF15A==
-X-Gm-Gg: ASbGncsJNvZgz66qAzqGUPSeloaeCYuHu2r6gep02ckG+r74M/3gcWsHgSQEiTQrbYv
-	TKBV7BSus6NDh6KsNOgGpX3LsWXeynm5Y7UhIE06PMgQxKnFe29CDKZokOYl8Dyp8/UbX/DmJBC
-	IywfMqTB2IFrPINzlnhCBdnWvubmkVp1XfsJwqSE05ngjssCPFL+mYnprq3ClloSeEDtqZF/Q1G
-	UymsRV8NY9z/d4cfmedeUluHTX/vxrh+vd0T/OM9PJH5yNPFA+xdVeVkbHhL/OYNYvuXYneGbqH
-	rVri8t6jzkUf2kjBhZtafbby/5SxBSetHaogi0d8H+oFIRsIDXG3QmYh8XQD43feiWe2NTt5ZEc
-	RC28mU/aL73LlEZL9qJpnG2mUWf5tjHE=
-X-Google-Smtp-Source: AGHT+IHEpC0wzYC9qpTOKYzyBCFKX1RplbM8mEpi5mu7LaJ5QXKsMTUayHNtXumG2Q6HyHXT6kFqmQ==
-X-Received: by 2002:a17:903:198e:b0:21f:988d:5758 with SMTP id d9443c01a7336-2236924e748mr224147945ad.35.1741032152431;
-        Mon, 03 Mar 2025 12:02:32 -0800 (PST)
-Received: from li-cloudtop.c.googlers.com.com (4.198.125.34.bc.googleusercontent.com. [34.125.198.4])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-223504dc4b4sm81233875ad.171.2025.03.03.12.02.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Mar 2025 12:02:31 -0800 (PST)
-From: Li Li <dualli@chromium.org>
-To: dualli@google.com,
-	corbet@lwn.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	donald.hunter@gmail.com,
-	gregkh@linuxfoundation.org,
-	arve@android.com,
-	tkjos@android.com,
-	maco@android.com,
-	joel@joelfernandes.org,
-	brauner@kernel.org,
-	cmllamas@google.com,
-	surenb@google.com,
-	omosnace@redhat.com,
-	shuah@kernel.org,
-	arnd@arndb.de,
-	masahiroy@kernel.org,
-	bagasdotme@gmail.com,
-	horms@kernel.org,
-	tweek@google.com,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	netdev@vger.kernel.org,
-	selinux@vger.kernel.org,
-	hridya@google.com
-Cc: smoreland@google.com,
-	ynaffit@google.com,
-	kernel-team@android.com
-Subject: [PATCH v16 3/3] binder: generic netlink binder_features flag
-Date: Mon,  3 Mar 2025 12:02:12 -0800
-Message-ID: <20250303200212.3294679-4-dualli@chromium.org>
-X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-In-Reply-To: <20250303200212.3294679-1-dualli@chromium.org>
-References: <20250303200212.3294679-1-dualli@chromium.org>
+        d=1e100.net; s=20230601; t=1741032719; x=1741637519;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uWxfPZ9Q9PKdspux27aAUMfhltwVPuv3Rq9ADQuniAM=;
+        b=S3a2wcLIMRwHnZmhpJONUwBtqyejS0Qlo+NXgW54yPyA6hyJxYDCO2OyjldWSvQuEb
+         qSKP3/S8heYlWTCUDlrLD4hDqjiING9bHsvoViqpEj9TXoGHYVlha7glU8NuKBXbEaor
+         99gfoI+haXy7fDsaMj14ndQqAAsUWx41sf5zONqW31dncNLxXF5WiTWrnnl1j7FceRn1
+         u4RSWag1hGADW6YaLj997hdBB0yjnq0K89FWCxIE4WiVuNawT2AvxItBhz0vvtVoW/op
+         NKFzr290b+q+2gMXRb5fJjihcRyyztAoAaR24BusWvyobuIvvomZF9ZhzMD8jCGDhUG0
+         0zYA==
+X-Forwarded-Encrypted: i=1; AJvYcCVRPX+spPoqRk/OiIGpglEiXO35uCYczKsKGl3EJ8Y3o1swshkVGNEFFeRAxwN5OgKoE16t/eZfNneAC7rl@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVWxkCJPa8F/d42IKFJlvzUAE+nTXaKf8KhdhXIzaWQJRo53O2
+	hACBRXw9EeaKQmTBwWTWNx90XXp4C+2KLDelvJCZgMQ9Mx3FYWIC
+X-Gm-Gg: ASbGncuH88pqL1U9iUmi07z6URj+9q0wCtztg53YR8T394qamWyWeGcfyoBPxeYAhup
+	vEC68d/amhg8Elk7xCFsRwviMCGb+EIx7Oj4M9kR1ReDKBKb25u8GiVNm7qy/en6MYyPdOLObL7
+	7Na+WV8yy8FE+6LeO46WphVnMNM+6n+CgS3NbesnJijvxqtApM8RDW6zB2Ml68ILD4cN34vMdgj
+	WV9yuGqLcJpEudRGlyFljmvOKr+tJcWo/ZfKiOXtIt3YnXkNlmbEOgfF93rON/fbV+1oji6oqXW
+	Ug4IwobYTAinVb/TpZ+H3Ys1Wip7dJDmyNM12rqqoWCL77xANbZfn6L6TExMEEdZH4bp+bjl+DH
+	MyLvfar4ExIj6vmTzz7TG3JmGZs0Qd/cRQF5d3KJI6RPE43+CkLRont+jTwSsvfiomJpwcnoelw
+	KFXUPbMIbT+SYNxWpdfilJv4lS8oC/uFx46V8x
+X-Google-Smtp-Source: AGHT+IGrliRmZWsiNQ1SKtuhzNkpQ2g/Wj6wuMuWur5bf49+A4+rdLUGngy6KWs9s/OHdhPuU7bzng==
+X-Received: by 2002:a05:6000:18ac:b0:391:454:5eb8 with SMTP id ffacd0b85a97d-3910454634cmr6485950f8f.48.1741032718374;
+        Mon, 03 Mar 2025 12:11:58 -0800 (PST)
+Received: from ?IPV6:2a02:3100:af60:7000:f08c:4f29:ab35:752a? (dynamic-2a02-3100-af60-7000-f08c-4f29-ab35-752a.310.pool.telefonica.de. [2a02:3100:af60:7000:f08c:4f29:ab35:752a])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-43b736f75c6sm169721715e9.1.2025.03.03.12.11.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Mar 2025 12:11:57 -0800 (PST)
+Message-ID: <5c5e60b3-0378-4960-8cf0-07ce0e219c68@gmail.com>
+Date: Mon, 3 Mar 2025 21:13:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next v3 0/8] net: phy: move PHY package code to its own
+ source file
+To: Andrew Lunn <andrew@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Daniel Golle <daniel@makrotopia.org>, Qingfang Deng <dqfext@gmail.com>,
+ SkyLake Huang <SkyLake.Huang@mediatek.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Richard Cochran <richardcochran@gmail.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, linux-mediatek@lists.infradead.org,
+ linux-arm-msm@vger.kernel.org, Robert Marko <robimarko@gmail.com>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ Rosen Penev <rosenp@gmail.com>
+Content-Language: en-US
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
+ sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
+ MVE4yNwdS+UsPeCF/6CQQTzHc+n7DomE7fjJD5J1hOJjqz2XWe71fTvYXzxCFLwXXbBiqDC9
+ dNqOe5odPsa4TsWZ09T33g5n2nzTJs4Zw8fCy8rLqix/raVsqr8fw5qM66MVtdmEljFaJ9N8
+ /W56qGCp+H8Igk/F7CjlbWXiOlKHA25mPTmbVp7VlFsvsmMokr/imQr+0nXtmvYVaKEUwY2g
+ 86IU6RAOuA8E0J5bD/BeyZdMyVEtX1kT404UJZekFytJZrDZetwxM/cAH+1fMx4z751WJmxQ
+ J7mIXSPuDfeJhRDt9sGM6aRVfXbZt+wBogxyXepmnlv9K4A13z9DVLdKLrYUiu9/5QEl6fgI
+ kPaXlAZmJsQfoKbmPqCHVRYj1lpQtDM/2/BO6gHASflWUHzwmBVZbS/XRs64uJO8CB3+V3fa
+ cIivllReueGCMsHh6/8wgPAyopXOWOxbLsZ291fmZqIR0L5Y6b2HvdFN1Xhc+YrQ8TKK+Z4R
+ mJRDh0wNQ8Gm89g92/YkHji4jIWlp2fwzCcx5+lZCQ1XdqAiHQARAQABzSZIZWluZXIgS2Fs
+ bHdlaXQgPGhrYWxsd2VpdDFAZ21haWwuY29tPsLBjgQTAQgAOBYhBGxfqY/yOyXjyjJehXLe
+ ig9U8DoMBQJf9GRVAhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJEHLeig9U8DoMSycQ
+ AJbfg8HZEK0ljV4M8nvdaiNixWAufrcZ+SD8zhbxl8GispK4F3Yo+20Y3UoZ7FcIidJWUUJL
+ axAOkpI/70YNhlqAPMsuudlAieeYZKjIv1WV5ucNZ3VJ7dC+dlVqQdAr1iD869FZXvy91KhJ
+ wYulyCf+s4T9YgmLC6jLMBZghKIf1uhSd0NzjyCqYWbk2ZxByZHgunEShOhHPHswu3Am0ftt
+ ePaYIHgZs+Vzwfjs8I7EuW/5/f5G9w1vibXxtGY/GXwgGGHRDjFM7RSprGOv4F5eMGh+NFUJ
+ TU9N96PQYMwXVxnQfRXl8O6ffSVmFx4H9rovxWPKobLmqQL0WKLLVvA/aOHCcMKgfyKRcLah
+ 57vGC50Ga8oT2K1g0AhKGkyJo7lGXkMu5yEs0m9O+btqAB261/E3DRxfI1P/tvDZpLJKtq35
+ dXsj6sjvhgX7VxXhY1wE54uqLLHY3UZQlmH3QF5t80MS7/KhxB1pO1Cpcmkt9hgyzH8+5org
+ +9wWxGUtJWNP7CppY+qvv3SZtKJMKsxqk5coBGwNkMms56z4qfJm2PUtJQGjA65XWdzQACib
+ 2iaDQoBqGZfXRdPT0tC1H5kUJuOX4ll1hI/HBMEFCcO8++Bl2wcrUsAxLzGvhINVJX2DAQaF
+ aNetToazkCnzubKfBOyiTqFJ0b63c5dqziAgzsFNBF/0ZFUBEADF8UEZmKDl1w/UxvjeyAeX
+ kghYkY3bkK6gcIYXdLRfJw12GbvMioSguvVzASVHG8h7NbNjk1yur6AONfbUpXKSNZ0skV8V
+ fG+ppbaY+zQofsSMoj5gP0amwbwvPzVqZCYJai81VobefTX2MZM2Mg/ThBVtGyzV3NeCpnBa
+ 8AX3s9rrX2XUoCibYotbbxx9afZYUFyflOc7kEpc9uJXIdaxS2Z6MnYLHsyVjiU6tzKCiVOU
+ KJevqvzPXJmy0xaOVf7mhFSNQyJTrZpLa+tvB1DQRS08CqYtIMxRrVtC0t0LFeQGly6bOngr
+ ircurWJiJKbSXVstLHgWYiq3/GmCSx/82ObeLO3PftklpRj8d+kFbrvrqBgjWtMH4WtK5uN5
+ 1WJ71hWJfNchKRlaJ3GWy8KolCAoGsQMovn/ZEXxrGs1ndafu47yXOpuDAozoHTBGvuSXSZo
+ ythk/0EAuz5IkwkhYBT1MGIAvNSn9ivE5aRnBazugy0rTRkVggHvt3/7flFHlGVGpBHxFUwb
+ /a4UjJBPtIwa4tWR8B1Ma36S8Jk456k2n1id7M0LQ+eqstmp6Y+UB+pt9NX6t0Slw1NCdYTW
+ gJezWTVKF7pmTdXszXGxlc9kTrVUz04PqPjnYbv5UWuDd2eyzGjrrFOsJEi8OK2d2j4FfF++
+ AzOMdW09JVqejQARAQABwsF2BBgBCAAgFiEEbF+pj/I7JePKMl6Fct6KD1TwOgwFAl/0ZFUC
+ GwwACgkQct6KD1TwOgxUfg//eAoYc0Vm4NrxymfcY30UjHVD0LgSvU8kUmXxil3qhFPS7KA+
+ y7tgcKLHOkZkXMX5MLFcS9+SmrAjSBBV8omKoHNo+kfFx/dUAtz0lot8wNGmWb+NcHeKM1eb
+ nwUMOEa1uDdfZeKef/U/2uHBceY7Gc6zPZPWgXghEyQMTH2UhLgeam8yglyO+A6RXCh+s6ak
+ Wje7Vo1wGK4eYxp6pwMPJXLMsI0ii/2k3YPEJPv+yJf90MbYyQSbkTwZhrsokjQEaIfjrIk3
+ rQRjTve/J62WIO28IbY/mENuGgWehRlTAbhC4BLTZ5uYS0YMQCR7v9UGMWdNWXFyrOB6PjSu
+ Trn9MsPoUc8qI72mVpxEXQDLlrd2ijEWm7Nrf52YMD7hL6rXXuis7R6zY8WnnBhW0uCfhajx
+ q+KuARXC0sDLztcjaS3ayXonpoCPZep2Bd5xqE4Ln8/COCslP7E92W1uf1EcdXXIrx1acg21
+ H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
+ lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
+ OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Li Li <dualli@google.com>
+This series contributes to cleaning up phylib by moving PHY package
+related code to its own source file.
 
-Add a flag to binder_features to indicate that the generic netlink
-feature is available.
+v2:
+- rename the getters
+- add a new header file phylib.h, which is used by PHY drivers only
+v3:
+- include phylib.h in bcm54140.c
 
-Signed-off-by: Li Li <dualli@google.com>
----
- drivers/android/binderfs.c                                | 8 ++++++++
- .../selftests/filesystems/binderfs/binderfs_test.c        | 1 +
- 2 files changed, 9 insertions(+)
+Heiner Kallweit (8):
+  net: phy: move PHY package code from phy_device.c to own source file
+  net: phy: add getters for public members in struct phy_package_shared
+  net: phy: qca807x: use new phy_package_shared getters
+  net: phy: micrel: use new phy_package_shared getters
+  net: phy: mediatek: use new phy_package_shared getters
+  net: phy: mscc: use new phy_package_shared getters
+  net: phy: move PHY package related code from phy.h to phy_package.c
+  net: phy: remove remaining PHY package related definitions from phy.h
 
-diff --git a/drivers/android/binderfs.c b/drivers/android/binderfs.c
-index 94c6446604fc..b3d21ccd81f2 100644
---- a/drivers/android/binderfs.c
-+++ b/drivers/android/binderfs.c
-@@ -59,6 +59,7 @@ struct binder_features {
- 	bool oneway_spam_detection;
- 	bool extended_error;
- 	bool freeze_notification;
-+	bool generic_netlink;
- };
- 
- static const struct constant_table binderfs_param_stats[] = {
-@@ -76,6 +77,7 @@ static struct binder_features binder_features = {
- 	.oneway_spam_detection = true,
- 	.extended_error = true,
- 	.freeze_notification = true,
-+	.generic_netlink = true,
- };
- 
- static inline struct binderfs_info *BINDERFS_SB(const struct super_block *sb)
-@@ -619,6 +621,12 @@ static int init_binder_features(struct super_block *sb)
- 	if (IS_ERR(dentry))
- 		return PTR_ERR(dentry);
- 
-+	dentry = binderfs_create_file(dir, "generic_netlink",
-+				      &binder_features_fops,
-+				      &binder_features.generic_netlink);
-+	if (IS_ERR(dentry))
-+		return PTR_ERR(dentry);
-+
- 	return 0;
- }
- 
-diff --git a/tools/testing/selftests/filesystems/binderfs/binderfs_test.c b/tools/testing/selftests/filesystems/binderfs/binderfs_test.c
-index 81db85a5cc16..96e64ebf910f 100644
---- a/tools/testing/selftests/filesystems/binderfs/binderfs_test.c
-+++ b/tools/testing/selftests/filesystems/binderfs/binderfs_test.c
-@@ -65,6 +65,7 @@ static int __do_binderfs_test(struct __test_metadata *_metadata)
- 		"oneway_spam_detection",
- 		"extended_error",
- 		"freeze_notification",
-+		"generic_netlink",
- 	};
- 
- 	change_mountns(_metadata);
+ drivers/net/phy/Makefile              |   3 +-
+ drivers/net/phy/bcm54140.c            |   1 +
+ drivers/net/phy/mediatek/mtk-ge-soc.c |   7 +-
+ drivers/net/phy/micrel.c              |   9 +-
+ drivers/net/phy/mscc/mscc_main.c      |   2 +
+ drivers/net/phy/mscc/mscc_ptp.c       |  14 +-
+ drivers/net/phy/phy-core.c            |   1 +
+ drivers/net/phy/phy_device.c          | 237 -----------------
+ drivers/net/phy/phy_package.c         | 350 ++++++++++++++++++++++++++
+ drivers/net/phy/phylib-internal.h     |   2 +
+ drivers/net/phy/phylib.h              |  28 +++
+ drivers/net/phy/qcom/qca807x.c        |  16 +-
+ include/linux/phy.h                   | 124 ---------
+ 13 files changed, 410 insertions(+), 384 deletions(-)
+ create mode 100644 drivers/net/phy/phy_package.c
+ create mode 100644 drivers/net/phy/phylib.h
+
 -- 
-2.48.1.711.g2feabab25a-goog
+2.48.1
 
 
