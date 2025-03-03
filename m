@@ -1,72 +1,69 @@
-Return-Path: <netdev+bounces-171183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 156C1A4BC8F
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 11:40:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32F16A4BC94
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 11:41:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D32616FC14
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 10:40:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4DBD7A559E
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 10:39:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F7DE1E5701;
-	Mon,  3 Mar 2025 10:40:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EvjfvYiX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E2351F30B2;
+	Mon,  3 Mar 2025 10:40:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com [209.85.222.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7DB31D7E4C
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 10:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 200F31D7E4C;
+	Mon,  3 Mar 2025 10:40:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740998430; cv=none; b=tRTgTXvWBf/5xg2h2Amv5grBnK1MU5aieXy6jpoYpfyOjl3TvNY5yNVeSUDI9XDAl4Bg5IUTfJBgjsdRjUBrDMn4wFS1RITg2thg31LXPpHoU+hv7FPo0e2tndzSZN3ibkycxy6cES747UTSBZJDmh1W84vqmsrUWJiR7n6QhUs=
+	t=1740998434; cv=none; b=sxuAHBEdAodfmPL8uFAOBYuZHNeuMgZvhzQMMoHgQUwp6nZONZqhgemB7x37cyoNZkSLU4klQ9kyckGTzRtLiIBLUqIJOk+Flpm5htsN0HyuLuhcUS4jawSZ5tPFebahnSY4AYIHTXczhuG19c0FVodwTYcRxR2p7iZ/4M1MsuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740998430; c=relaxed/simple;
-	bh=l+OMvRTVaYDVCnnuSAQ1Niz3Zh8MEqg0yHaCg5zNSPY=;
+	s=arc-20240116; t=1740998434; c=relaxed/simple;
+	bh=GpiZMOoa9Dd0lVa5mQxYvhJCA3PozAweI+AolilGiy4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RrZ95zy2L2jkRB2O9s2PIhFYRSax0OW2pdFsL6E4uRItXFPYzwHaOXG07LoA69y95SRBps3jftTu13EAGwI/cYfUXVRrSwsS/pIOO/8ggclbiXCFaz8trvoX4HS43tMpA47REXTyaiARxkLTpQzspOJOAkPWRN7Sz3fbVcQsDRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EvjfvYiX; arc=none smtp.client-ip=209.85.166.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	 To:Cc:Content-Type; b=QfTeT2Iirj9ofdomy8nBDZ9vcnutFBKTUGCTEiT52jqReSK2sfYjP5FMZ/O2pm1lBVctNJdwcyMOIcUoY64SLPd11veGf12wnAEVTSVBvqLyDDqbX1CjhlolQMBbEFFgl/SxLpnba1ZNKgwG49th4nmX0utSgCBl6v1WBWhjDGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3cda56e1dffso13423405ab.1
-        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 02:40:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740998428; x=1741603228; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KK4D1tBnKdC6vTjtgAV+68KXKX+DyJbeTVN0K4fU0Wk=;
-        b=EvjfvYiX9UluXJO743oRgfzCRuiXjJyFxl2E4FfH9zYTSfJReADxNlivSEexPnB2lj
-         QwbHBDTZRyGPDCL1PeBrkbEtzkgSWnuChE4A28iI4ls+Rcf45vn+T3bKz+Q+ChimPeEV
-         NnOejZvugN4ihYIlRMUopl/qfEOgI+MT2Apfs5teZI3p309Z8m1RuV5bpAIsHzlj+Eov
-         qGYceGVq9c7DfstwcgCuzvfGfPHlGFuufJPyjqaEL4Yl2JciKvTXarEzkH5pvMrAqVvl
-         wBKEcYyT9WbtHg37bKLnEZZ8igA6OVbyb2ldyemEdqB3bhK1AcG4DktK8g/u+wwD/ubR
-         gjLA==
+Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-86b3ed5fde5so3631980241.0;
+        Mon, 03 Mar 2025 02:40:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740998428; x=1741603228;
+        d=1e100.net; s=20230601; t=1740998429; x=1741603229;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KK4D1tBnKdC6vTjtgAV+68KXKX+DyJbeTVN0K4fU0Wk=;
-        b=LHOo55MsGdozHEvrGNPBYuR5R1+VeXcY0sCzlrWRw8P2BC4U9F0s+wfhuj+VpP9/oR
-         RyWAMUqZIzrhQ+s0zs65fesEdaxIWO2V5v5wTjT2A1Nq/GnP46ucHJyptCYuX6b0sQ56
-         MLVnOzRSLmtbG2Hfadft2Tf3IeidLimu+jjvUOj/T6sdjyCQUp+oa8GZ3ma8Cy+OV+mg
-         1Zdxsz9OEG0TK1HxcJsgNHCzt3L9eD4Vf9XS30yEAaNw/MHgBXt+cq+6LlbZbiLLLahX
-         nOejE1rf8/OBnIltBd8aT5IsYjaWZ8xOrFiZ+Db9j4wvitXkWwPsQdujWR5yq4AAOAIA
-         EFWg==
-X-Forwarded-Encrypted: i=1; AJvYcCX+uLa4Wf3S4zbIWj74opJqtLWyYkZY64QVUiV+Ue//qrcxPzvULNTSCa1OG0WQhGYLXyFoIl4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOdXXac+2XCiO//BS1uxFS7IIstCu6p/JIf2PBIH9LyLgYGcmG
-	Yun/RctDLeWqMPz0bDEWjqeOoKm1Pilosw8WxZav3LGTbn8tPQDkPpBAhCHN2MjdiMA44qHg4Ed
-	zF1WbGLU+TgfhI/m//szTE0JuH4w=
-X-Gm-Gg: ASbGncvnnmJTouI70+9j7esbkkCdFNcNsHR5eO+xqHiC72Q2nDB9XlpkrOuSaC611KY
-	J6+JmCss776Ywmp18pChgKmLJOb0wjbN4x1iL3LzXy3SIQB5dDP+4dSO2dPvTK4YTtSfxqcvZdb
-	u1yovGgWWWhCGi3fPLZDNP+3AmiA==
-X-Google-Smtp-Source: AGHT+IHzq1J4JVyR7MrqVT5hb7wWJAipFUlP5uTR6n/DWspppnNOEiR8zjyNqlJwVWVTBTjp+Zxm5rxUr2f8+QhpcpE=
-X-Received: by 2002:a05:6e02:1a0b:b0:3d2:bac3:b45f with SMTP id
- e9e14a558f8ab-3d3e6e46267mr125959555ab.4.1740998427416; Mon, 03 Mar 2025
+        bh=j7nppDH0wEnn0k1LbQlYHcxjcCY12F5sq67FKUOJ3Wk=;
+        b=rEaU6PylpvNHHpdKiJEKrmy8MaMBSvzNnXk90qka5PgM0cb3/ERyMyZFdidj2PVG4P
+         98w1X+BXNeJvfSTodPEjYdWZFZeQzbM2dtyFRUZFOscPBCKKy/wpmfR43exzR+HiJigp
+         rh4/V12+jv6/88sACfbDEruPRyaZBCUP9EhpbU9jWB/j+4DNIeTgxmC///qPciuvHcI/
+         OpgPmCYvv8TqVc4fiQ+JWc63VaHShMPHCd6NDkNtqnSWKtDrdv5l9JiEOswU8ff9ChjG
+         MY14GrzblGyq/7GsjJCstLJBN1fdBlJ2Zf5zMv4BJdjbqQyGzrizbj9jFJSyRPQmULpt
+         8C+g==
+X-Forwarded-Encrypted: i=1; AJvYcCV8U6MfKFyLEBt8FnCKv3HiUJqI0J2XCdz7iz6ol9xm2AQld5uyny8sgnJTJcpz0yumJcY27KCo82YQ@vger.kernel.org, AJvYcCVfIxa+jDve/e7ktzSTHYBtvGBxDB16NzcpvMJxdCSsvsqicfVXEYzY614h3418Mkv98H1eLtAqBMkiPJORy2D9dh0=@vger.kernel.org, AJvYcCVlGEZfUqYvj2QJ6kEoctNR5xnWRpz3acJ0eUtRG+qOCHJwf1UHcNbkV8n9fXRxq7FMySsXPFzyq2EaOvLT@vger.kernel.org, AJvYcCWTlIj7ynjXLN8qsZuJNIq3eK+rmFnDNFHgYHZlmSGPF1f61qdzzxYuRedQHud2R7tEoQNlVaCV@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4ysIml5Mk3B3PXTCGetjlhBHKhIbnGcwA58Z9XC1EhCC5pEIS
+	LwMPcymBCcQIHCb/vmuMT8xpE9aKE8mii1KasfGBb8VdCVnK0l+WOePPZBbR
+X-Gm-Gg: ASbGncsMWJblpi7D7uL4SqIM6BDi47OralO621+RTPijCN+pYLXtXXL1if1nFM2ISw1
+	5T2CwfbuQzKbLDKSEQ9qtcYrFzPnVZQZJHQIuMWBh9xwcbp7OOzANg/edBuMY7exQw8wgMCYZRD
+	FqeLa6YRha4L6b2oxOIavm2uGL/URavYLZbugH2Ea4Ka28iOtejk+u5BWQXjvLsBy9OPWs872of
+	pOlhXc6qIjaRbbiFrUnNnyblyuJ9AfpyXG9KCcQrrEADj/nwKRuuun9Jl8SysCa3mI7JqEsMXXM
+	iYNnDC+sLUIpugFspEsZn+6hr/vkmaG0oxtDR90sN0Q7tz082D7gXkO92Nz+XRNO8QG9Qzgndyc
+	LnK/lCMM=
+X-Google-Smtp-Source: AGHT+IFwwEwdoibEPNyIJoSsMOSEcyoA3IYhqXdgxg8vWiKueAMO9jJvFjxo2atT96bygP6CrBdCMg==
+X-Received: by 2002:a05:6102:3a65:b0:4c1:9ecd:b250 with SMTP id ada2fe7eead31-4c19ecdcb1cmr813504137.5.1740998428785;
+        Mon, 03 Mar 2025 02:40:28 -0800 (PST)
+Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com. [209.85.222.41])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4c17e90cf5csm1082975137.3.2025.03.03.02.40.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Mar 2025 02:40:27 -0800 (PST)
+Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-86718541914so4406771241.1;
+        Mon, 03 Mar 2025 02:40:27 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUZTYS7ipsmaPBuDels12ewpHS4+ZWfkP/lO4OSvDUm8dc0LNBg5iG7zVIlVpim6WJPLDgfEr9Hfap45BXE@vger.kernel.org, AJvYcCVIAinCCltIbPZimzTR0OSncfBvxdaVX5fYj9n2QkWWAhPSinc6UC4glZ+LtsklswP+n4k390S+@vger.kernel.org, AJvYcCWniliZqvo+Ihj2NEtAwuqSq3rR7cmXPT9LdKpCjhGxdPh5RGt4XRrbQGasP8RJiojXezgBETCTIjEWAgEfNpNXwdw=@vger.kernel.org, AJvYcCWyQth0XikRHX3bWhrX7DNiClaq9TroMFyRQbYTF/+XZSvwwd5tEhfbE6ycW3nuLbLHqytgwSivDt1O@vger.kernel.org
+X-Received: by 2002:a05:6102:2a42:b0:4c0:435b:5dd2 with SMTP id
+ ada2fe7eead31-4c0435b5ebdmr6337617137.1.1740998427518; Mon, 03 Mar 2025
  02:40:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,120 +71,88 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250302124237.3913746-1-edumazet@google.com> <20250302124237.3913746-5-edumazet@google.com>
- <CAL+tcoCOLBJO1PZdKPu2tM3ByQbu9DKcsHn1g6q33CbpHtx5Cw@mail.gmail.com> <CANn89i+pAcJyB1hhOQYzXZKOeDoS1gz4xuDiMBQ3h4PqmVZAsA@mail.gmail.com>
-In-Reply-To: <CANn89i+pAcJyB1hhOQYzXZKOeDoS1gz4xuDiMBQ3h4PqmVZAsA@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 3 Mar 2025 18:39:51 +0800
-X-Gm-Features: AQ5f1Jp8b797ccwqPjpekK58wUVcPn0Rh-kbwh81Y9TIDZ8DkTH-4Sa2UFdCb0w
-Message-ID: <CAL+tcoBUBe110JtBtinrcoUZhgJZW7j8JROntpm4AwVv6_TSeA@mail.gmail.com>
-Subject: Re: [PATCH net-next 4/4] tcp: use RCU lookup in __inet_hash_connect()
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
+References: <20250302181808.728734-1-prabhakar.mahadev-lad.rj@bp.renesas.com> <20250302181808.728734-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
+In-Reply-To: <20250302181808.728734-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Mon, 3 Mar 2025 11:40:15 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdV8GqnhsJg7J7keGvT=Dvj_w0hZOiuZqCa=tiUgLE8Vtg@mail.gmail.com>
+X-Gm-Features: AQ5f1Jpv15ql5krxTjLeAExxOGaKNBovwnzhgUjXQ5dDEMa9JTfxXPA61zZ_Iv0
+Message-ID: <CAMuHMdV8GqnhsJg7J7keGvT=Dvj_w0hZOiuZqCa=tiUgLE8Vtg@mail.gmail.com>
+Subject: Re: [PATCH 3/3] net: stmmac: Add DWMAC glue layer for Renesas GBETH
+To: Prabhakar <prabhakar.csengg@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
+	Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 3, 2025 at 6:25=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> On Mon, Mar 3, 2025 at 2:08=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
-> >
-> > On Sun, Mar 2, 2025 at 8:42=E2=80=AFPM Eric Dumazet <edumazet@google.co=
-m> wrote:
-> > >
-> > > When __inet_hash_connect() has to try many 4-tuples before
-> > > finding an available one, we see a high spinlock cost from
-> > > the many spin_lock_bh(&head->lock) performed in its loop.
-> > >
-> > > This patch adds an RCU lookup to avoid the spinlock cost.
-> > >
-> > > check_established() gets a new @rcu_lookup argument.
-> > > First reason is to not make any changes while head->lock
-> > > is not held.
-> > > Second reason is to not make this RCU lookup a second time
-> > > after the spinlock has been acquired.
-> > >
-> > > Tested:
-> > >
-> > > Server:
-> > >
-> > > ulimit -n 40000; neper/tcp_crr -T 200 -F 30000 -6 --nolog
-> > >
-> > > Client:
-> > >
-> > > ulimit -n 40000; neper/tcp_crr -T 200 -F 30000 -6 --nolog -c -H serve=
-r
-> > >
-> > > Before series:
-> > >
-> > >   utime_start=3D0.288582
-> > >   utime_end=3D1.548707
-> > >   stime_start=3D20.637138
-> > >   stime_end=3D2002.489845
-> > >   num_transactions=3D484453
-> > >   latency_min=3D0.156279245
-> > >   latency_max=3D20.922042756
-> > >   latency_mean=3D1.546521274
-> > >   latency_stddev=3D3.936005194
-> > >   num_samples=3D312537
-> > >   throughput=3D47426.00
-> > >
-> > > perf top on the client:
-> > >
-> > >  49.54%  [kernel]       [k] _raw_spin_lock
-> > >  25.87%  [kernel]       [k] _raw_spin_lock_bh
-> > >   5.97%  [kernel]       [k] queued_spin_lock_slowpath
-> > >   5.67%  [kernel]       [k] __inet_hash_connect
-> > >   3.53%  [kernel]       [k] __inet6_check_established
-> > >   3.48%  [kernel]       [k] inet6_ehashfn
-> > >   0.64%  [kernel]       [k] rcu_all_qs
-> > >
-> > > After this series:
-> > >
-> > >   utime_start=3D0.271607
-> > >   utime_end=3D3.847111
-> > >   stime_start=3D18.407684
-> > >   stime_end=3D1997.485557
-> > >   num_transactions=3D1350742
-> > >   latency_min=3D0.014131929
-> > >   latency_max=3D17.895073144
-> > >   latency_mean=3D0.505675853  # Nice reduction of latency metrics
-> > >   latency_stddev=3D2.125164772
-> > >   num_samples=3D307884
-> > >   throughput=3D139866.80      # 190 % increase
-> > >
-> > > perf top on client:
-> > >
-> > >  56.86%  [kernel]       [k] __inet6_check_established
-> > >  17.96%  [kernel]       [k] __inet_hash_connect
-> > >  13.88%  [kernel]       [k] inet6_ehashfn
-> > >   2.52%  [kernel]       [k] rcu_all_qs
-> > >   2.01%  [kernel]       [k] __cond_resched
-> > >   0.41%  [kernel]       [k] _raw_spin_lock
-> > >
-> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> >
-> > Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
-> > Tested-by: Jason Xing <kerneljasonxing@gmail.com>
-> >
-> > I tested only on my virtual machine (with 64 cpus) and got an around
-> > 100% performance increase which is really good. And I also noticed
-> > that the spin lock hotspot has gone :)
-> >
-> > Thanks for working on this!!!
->
-> Hold your breath, I have two additional patches bringing the perf to :
->
-> local_throughput=3D353891          #   646 % improvement
->
-> I will wait for this first series to be merged before sending these.
+Hi Prabhakar,
 
-OMG, I'm really shocked... It would be super cool :D
+On Sun, 2 Mar 2025 at 19:18, Prabhakar <prabhakar.csengg@gmail.com> wrote:
+> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+>
+> Renesas RZ/V2H(P) SoC is equipped with Synopsys DesignWare Ethernet
+> Quality-of-Service IP block version 5.20. This commit adds DWMAC glue
+> layer for the Renesas GBETH found on the RZ/V2H(P) SoC.
+>
+> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-Thanks,
-Jason
+Thanks for your patch!
+
+> --- /dev/null
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
+
+> +static int renesas_gbeth_probe(struct platform_device *pdev)
+> +{
+> +       struct plat_stmmacenet_data *plat_dat;
+> +       struct stmmac_resources stmmac_res;
+> +       struct device *dev =3D &pdev->dev;
+> +       struct renesas_gbeth *gbeth;
+> +       struct reset_control *rstc;
+> +       unsigned int i;
+> +       int err;
+> +
+> +       err =3D stmmac_get_platform_resources(pdev, &stmmac_res);
+> +       if (err)
+> +               return dev_err_probe(dev, err,
+> +                                    "failed to get resources\n");
+> +
+> +       plat_dat =3D devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
+> +       if (IS_ERR(plat_dat))
+> +               return dev_err_probe(dev, PTR_ERR(plat_dat),
+> +                                    "dt configuration failed\n");
+> +
+> +       gbeth =3D devm_kzalloc(dev, sizeof(*gbeth), GFP_KERNEL);
+> +       if (!gbeth)
+> +               return -ENOMEM;
+> +
+> +       plat_dat->clk_tx_i =3D devm_clk_get_enabled(dev, "tx");
+
+drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c:52:17:
+error: =E2=80=98struct plat_stmmacenet_data=E2=80=99 has no member named =
+=E2=80=98clk_tx_i=E2=80=99
+
+Also not in next-20250228.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
