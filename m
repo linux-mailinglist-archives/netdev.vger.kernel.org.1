@@ -1,85 +1,122 @@
-Return-Path: <netdev+bounces-171408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94442A4CE2C
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 23:20:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FBF5A4CE45
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 23:26:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 402D93AD16F
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 22:20:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD25B7A2B5C
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 22:25:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 408C022C325;
-	Mon,  3 Mar 2025 22:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DD541F1301;
+	Mon,  3 Mar 2025 22:26:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UvoPBHed"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f+ibnLvJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F631EFFBA;
-	Mon,  3 Mar 2025 22:19:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34AA611CA9;
+	Mon,  3 Mar 2025 22:26:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741040390; cv=none; b=E55ABOlAR0SIq3xixhCe/d2oWsmeeSaVBl41+v8P57Usobot3e0nZuiwZtXz2EvZuezetDFA65PgG71YMAdd8xUsGhNdwXoSAC6s02vZZ0LzcqTWf+Wi2YKL5a4NGnskkpN6UM4AOnx/vk9cBZYCrH6n7GbSpX6NrLbOX+Eqk7Y=
+	t=1741040792; cv=none; b=EILe5wXf/CvcERPXJHIywyveCgJV8IaQkQkn8V+OU7wQbs9/MtmnD9ySAh/AKR/VAFRd7xtrXj2lTFkZ1hpW2/xgXnSVA2qzPqu0wYRoFZIlC0Z0L/hfPhi+1gZVjxfEhIsl8wk/P/QodYShWRaFaCvRdQxsui9N3j+FQso3P0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741040390; c=relaxed/simple;
-	bh=lhz6YjfSTKtzAmONbQMPFT2eHdU4hQ3fNb+tQ4kLtBI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oJmrZ+SHJiCrAowQKJtKqg1nukY+aSW4iypIE8mRHyod3mMii7jCvIApCB/f/mCjBacWsKqY6GNMIZCcK0lTaU3wrx9jJwkaS70Sre02n3Vh/fjVTb3Zuj7CF4brPI0H+v+oMuUJAIVSBBCgW9jnMeL+rN9eP+cyvdKTxMPcpL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UvoPBHed; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EEFFC4CED6;
-	Mon,  3 Mar 2025 22:19:49 +0000 (UTC)
+	s=arc-20240116; t=1741040792; c=relaxed/simple;
+	bh=sKsO4dNLQ1E9U/qUtl2CADnzjPDNXl7y7zE7Zo3mB9Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QlUEoUOa5Uu7FxjAu8dU04nEzcDKdmXSIMivMGaY98ge25XhnNxU48a8E0N4HOTUFBm/ojMUzKUEKwKqXjyUyw5ONEHwCE6CrW0VHS0Dnk2949T406e/Ffx4dPjfy77BqUEtk9vb5VNrCExF56MJ0aBcgumO4zTPx1iA35z43h4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f+ibnLvJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6218FC4CED6;
+	Mon,  3 Mar 2025 22:26:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741040389;
-	bh=lhz6YjfSTKtzAmONbQMPFT2eHdU4hQ3fNb+tQ4kLtBI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UvoPBHedP90g0YpFicl7IKfoT1tdRFQD6k63Vjx1L59UfdvheV1y4EwUVIKFmuLcw
-	 q0iqMYlci5Kj6/7aq/2vDNUeU7bo/4CbHRKoFlDslsesbsCSvPBR1YLhOvZ6NCIAoj
-	 8dcfZaB1MewlbGBgR5GjPshSCRB0P22cADv4P9h8Gb+NudUQLTobuIxZQKjOX3+zEU
-	 DZCH7gqSGpynwCGKN1oKqGW79Jv/EqyuJPew2T4juZ0q95UpJXWCJXtvlo8Mh2mJJL
-	 ZpSMZXBGs0xROWiNVIJETIbkAW3zOQzRUesgLBSWiKki8x8YYkLbTbNFjKM1CmAgV4
-	 RoQxjes3twGnw==
-Date: Mon, 3 Mar 2025 14:19:48 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Shahar Shitrit <shshitrit@nvidia.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
- <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Saeed Mahameed
- <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>, Leon Romanovsky
- <leonro@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, Carolina Jubran <cjubran@nvidia.com>
-Subject: Re: [PATCH net-next 3/6] net/mlx5e: Enable lanes configuration when
- auto-negotiation is off
-Message-ID: <20250303141948.53a5cee6@kernel.org>
-In-Reply-To: <c57977d0-5af6-44b7-80a4-00024f3e5e49@nvidia.com>
-References: <20250226114752.104838-1-tariqt@nvidia.com>
-	<20250226114752.104838-4-tariqt@nvidia.com>
-	<20250228145135.57cf1a73@kernel.org>
-	<c57977d0-5af6-44b7-80a4-00024f3e5e49@nvidia.com>
+	s=k20201202; t=1741040792;
+	bh=sKsO4dNLQ1E9U/qUtl2CADnzjPDNXl7y7zE7Zo3mB9Y=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=f+ibnLvJeJdSqITmAtD7ZTQzbfIlw7udhfAPNZomwBr0qMlAT2DYQhXLdAV+k6O/K
+	 FVyIdiieTcBPKcOjf/Je3AB5ivuVQvwau8Q6AWKErV1sVfc0wEFngLb8NiakU1wu3P
+	 P+Htna4H05lPze5EM+oUVd0r24/ZoZ8vWQVbqtiltE/A0w3tW9twMq1PjE9aQAnNji
+	 S6xS3kYOSSqOyU1Cvvb26cwwRCKhXKZKnvFbbMNlnOBwone4PfOoTdba0yXeUEEsuz
+	 SK0nEwC7as5eMraMObpocHGKJqQNaWJVHIUq05D8W9SFTwK0PrgvH1bjeKiekT5acy
+	 YWVxxP55GamDQ==
+From: cel@kernel.org
+To: jlayton@kernel.org,
+	neilb@suse.de,
+	okorniev@redhat.com,
+	Dai.Ngo@oracle.com,
+	tom@talpey.com,
+	trondmy@kernel.org,
+	anna@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	Long Li <leo.lilong@huawei.com>
+Cc: Chuck Lever <chuck.lever@oracle.com>,
+	linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	yi.zhang@huawei.com,
+	yangerkun@huawei.com,
+	lonuxli.64@gmail.com
+Subject: Re: [PATCH 0/2] sunrpc: Fix issues with cache_detail nextcheck updates
+Date: Mon,  3 Mar 2025 17:26:27 -0500
+Message-ID: <174104077139.32322.8702101289480612960.b4-ty@oracle.com>
+X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20250301064836.3285906-1-leo.lilong@huawei.com>
+References: <20250301064836.3285906-1-leo.lilong@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Sun, 2 Mar 2025 10:17:58 +0200 Shahar Shitrit wrote:
-> On 01/03/2025 0:51, Jakub Kicinski wrote:
-> > On Wed, 26 Feb 2025 13:47:49 +0200 Tariq Toukan wrote:  
-> >> +		if (table[i].speed == info->speed) {
-> >> +			if (!info->lanes || table[i].lanes == info->lanes)  
-> > 
-> > Hm, on a quick look it seems like lane count was added in all tables,
-> > so not sure why the !info->lanes
-> >  
-> it's for the case only speed was passed from ethtool (then ethtool
-> passes 0 for lanes)
+From: Chuck Lever <chuck.lever@oracle.com>
 
-Makes sense, I think I read the condition backwards TBH 
-(table[i] vs info).
+On Sat, 01 Mar 2025 14:48:34 +0800, Long Li wrote:
+> During memory fault injection testing with nfsd restart, I encountered an
+> issue where NFS client threads would hang for around 1800 seconds. Analysis
+> showed that nfsd threads were blocked for approximately 1800 seconds with
+> the following scenario:
+> 
+>   PID: 3941444  TASK: ffff0000cf170040  CPU: 0    COMMAND: "nfsd"
+>    #0 [ffff80008d387120] __switch_to at ffffc4ef3c7a6af0
+>    #1 [ffff80008d387170] __schedule at ffffc4ef3c7a73a4
+>    #2 [ffff80008d3872c0] schedule at ffffc4ef3c7a8074
+>    #3 [ffff80008d387300] schedule_timeout at ffffc4ef3c7b7b60
+>    #4 [ffff80008d387470] wait_for_common at ffffc4ef3c7a944c
+>    #5 [ffff80008d387560] wait_for_completion_interruptible_timeout at ffffc4ef3c7a9630
+>    #6 [ffff80008d387570] cache_wait_req at ffffc4ef3c6804dc
+>    #7 [ffff80008d3876f0] cache_check at ffffc4ef3c680740
+>    #8 [ffff80008d3877d0] exp_find_key at ffffc4ef3b6e293c
+>    #9 [ffff80008d387910] exp_find at ffffc4ef3b6e2ccc
+>   #10 [ffff80008d387980] rqst_exp_find at ffffc4ef3b6e445c
+>   #11 [ffff80008d3879e0] exp_pseudoroot at ffffc4ef3b6e4984
+>   #12 [ffff80008d387a90] nfsd4_putrootfh at ffffc4ef3b6f8720
+>   #13 [ffff80008d387ab0] nfsd4_proc_compound at ffffc4ef3b6fe4cc
+>   #14 [ffff80008d387b70] nfsd_dispatch at ffffc4ef3b6cf428
+>   #15 [ffff80008d387c30] svc_process_common at ffffc4ef3c66235c
+>   #16 [ffff80008d387d20] svc_process at ffffc4ef3c6652f8
+>   #17 [ffff80008d387d90] svc_recv at ffffc4ef3c68c5d0
+>   #18 [ffff80008d387e10] nfsd at ffffc4ef3b6cb968
+>   #19 [ffff80008d387e60] kthread at ffffc4ef3ad4aca4
+> 
+> [...]
+
+Applied to nfsd-testing, thanks!
+
+[1/2] sunrpc: update nextcheck time when adding new cache entries
+      commit: c2689130933a68ee9d6bca39ca5c3c7741279ea3
+[2/2] sunrpc: fix race in cache cleanup causing stale nextcheck time
+      commit: 48a9b0e38470d7f16625dbf51f85d0fb7315b15b
+
+--
+Chuck Lever
+
 
