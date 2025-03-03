@@ -1,124 +1,122 @@
-Return-Path: <netdev+bounces-171723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB1BDA4E5BF
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:25:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 95154A4E27C
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 16:11:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64B6C42050F
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 16:18:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5101421ABC
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 15:01:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB74255257;
-	Tue,  4 Mar 2025 15:59:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B9DE27D774;
+	Tue,  4 Mar 2025 14:57:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="c4BMR0Ug"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="snAJ488r"
 X-Original-To: netdev@vger.kernel.org
-Received: from beeline3.cc.itu.edu.tr (beeline3.cc.itu.edu.tr [160.75.25.117])
+Received: from beeline1.cc.itu.edu.tr (beeline1.cc.itu.edu.tr [160.75.25.115])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACB9125523D
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 15:59:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=160.75.25.117
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91BA827EC6E
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 14:57:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=160.75.25.115
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741103961; cv=fail; b=KjxZ3226KvKzabmi7XwTpv8tefoq9kZDsTeJgVbo5HHQwkFD6sQFPJ2LasZb4WL3MEOXY2NgWXN5im+9lq7yeTqg/rGVeQDFkCN5ZKBmW9c6ZFlOYEmti19IYtX+13tKXAim+5p7cHK5j3z4VNo4GmH4Byjfn45r42MxnbBRWK4=
+	t=1741100259; cv=pass; b=HxL3Y+0HXMvUQpcvdpkWuTIwRI8kMWNxjYITZgQ+8Nun0XCKIEtHGgWLjlql3X1izN5cZ3ZY5Ypwx9nfui3ya32upwuKMRfq70eal2e1PxTSAUQTYj7a+J1+1TRXsJUh9j8FwS8j3aLlWnayQO6APEgI+632hQl7n3cURQGsTf4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741103961; c=relaxed/simple;
-	bh=Qy2ar1iL0/8IYyHtE/Ygg9Pz+VRzp9Ux2QyBq4RCjGU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=d5T2fIYrMrBgdY5WnB6U4XeS/b34upWALx7nhfPONELx4SHfB/9HbI8bIMHjKF0BWQIPz5wYSG9dG4ZqEKukjsz4ql5NALBzfl+6cUrNndj9Nkkk01pNuBQ5WHPxW8I28jF3bmJjrJytyWougUsMUVyN2wI2kXu6DrZn/gEQiR0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=bootlin.com; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=fail (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=c4BMR0Ug reason="signature verification failed"; arc=none smtp.client-ip=217.70.183.196; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; arc=fail smtp.client-ip=160.75.25.117
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=bootlin.com
+	s=arc-20240116; t=1741100259; c=relaxed/simple;
+	bh=Ve5w4wBza/LR9gEhfks2GNQsd1BGH+h8LS5mlA9F7SA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pfHPwKetu9mgeRJrIzKzpvlY9EzIlLMuyUvdYzcQY5XPwajEuvYGVesXAQB2Y1QBsr/wYBL/tVyBAz8AviE/fTruyx1dL0oSZIiUMuRVjxng791kxqVy3m1L5V2UCZ2lvMdoTzGONZcbAgzSwEdgEA6BbPLM5swTZDYrebGVp4c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=snAJ488r; arc=none smtp.client-ip=90.155.50.34; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; arc=pass smtp.client-ip=160.75.25.115
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=cc.itu.edu.tr
-Received: from lesvatest1.cc.itu.edu.tr (unknown [10.146.128.1])
+Received: from lesvatest1.cc.itu.edu.tr (lesvatest1.cc.itu.edu.tr [10.146.128.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
 	(No client certificate requested)
-	by beeline3.cc.itu.edu.tr (Postfix) with ESMTPS id E2EA040CEC86
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 18:59:16 +0300 (+03)
+	by beeline1.cc.itu.edu.tr (Postfix) with ESMTPS id DD0AF40D4DFD
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:57:35 +0300 (+03)
 X-Envelope-From: <root@cc.itu.edu.tr>
 Received: from lesva1.cc.itu.edu.tr (unknown [160.75.70.79])
-	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6gMT18RfzG1g6
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 18:58:29 +0300 (+03)
+	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6dzd2v1SzFxfD
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:56:13 +0300 (+03)
 Received: by le1 (Postfix, from userid 0)
-	id D001542721; Tue,  4 Mar 2025 18:58:19 +0300 (+03)
+	id 6AB8642728; Tue,  4 Mar 2025 17:55:58 +0300 (+03)
 Authentication-Results: lesva1.cc.itu.edu.tr;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=c4BMR0Ug
-X-Envelope-From: <linux-kernel+bounces-541232-bozkiru=itu.edu.tr@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=snAJ488r
+X-Envelope-From: <linux-kernel+bounces-541259-bozkiru=itu.edu.tr@vger.kernel.org>
 Authentication-Results: lesva2.cc.itu.edu.tr;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=c4BMR0Ug
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=snAJ488r
 Received: from fgw2.itu.edu.tr (fgw2.itu.edu.tr [160.75.25.104])
-	by le2 (Postfix) with ESMTP id A540C426CB
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 12:07:52 +0300 (+03)
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by fgw2.itu.edu.tr (Postfix) with SMTP id 73F5E2DCE3
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 12:07:52 +0300 (+03)
+	by le2 (Postfix) with ESMTP id 40D9642899
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 12:19:15 +0300 (+03)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by fgw2.itu.edu.tr (Postfix) with SMTP id CC3D92DCE0
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 12:19:14 +0300 (+03)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 699D3189409C
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 09:07:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DC373AF21A
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 09:18:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6064F1F4C85;
-	Mon,  3 Mar 2025 09:03:50 +0000 (UTC)
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D622E1F12EA;
+	Mon,  3 Mar 2025 09:18:45 +0000 (UTC)
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 327671F37C3;
-	Mon,  3 Mar 2025 09:03:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8722AD27;
+	Mon,  3 Mar 2025 09:18:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740992625; cv=none; b=OPX8fVt15T0SoHYPBFVnsOqqpVzZ7yiX0riNUtyrXPV5m3Ia4Js8EwpMJ1vQaUybZB4C/Y1LhpuquIxuHZAi5Hgf2AHEYPx9SdwnoWC5tllb0f9vhPDaeKmJMgEwxcqmfXAZnplmawpOK1GMPoNe1wCsAu2iUn+Qq4lRx2QcP60=
+	t=1740993523; cv=none; b=eM6oqolG4myHsKW/FXi3/iP9lDXlt9QViMzNoqiSX7sah4EZ+dZFxHqUAynLEcryPivLB3tmdGVhRWlhpe0qPIvWVqTnY/1GC6qS3JpVqxoZNqfFait5OcEAu9a+BgyhgUnpE167JKYuVffzjwrq56F4cc4CTJlCgqCJKZOV9V4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740992625; c=relaxed/simple;
-	bh=F70e4oOLvEJZPucCJCixFkfOqMRXANwJ+zySIraaBiM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Be/xbI+KWtJcLHOR/Y7qXs+d/eQxQ9cQa4SbSY3aJYQ2Qr6co2K1eeAAkgXm5dwuDgnzsLuJUWit48cdjcWgUn4yl2mzHTLjvpm3oJNyhI6x9KYW3zW2zpbgg/PwOIJPG4/ICFM3vVK3HaAXrO1z5XXTfF8gjhXzYZcWA8VrilI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=c4BMR0Ug; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 7B4DF433D6;
-	Mon,  3 Mar 2025 09:03:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1740992621;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=X3q9t7hUW9dj+IQ/bjnu77lPGmapVWfrJfeMDhh9PrY=;
-	b=c4BMR0UgYUX8MvQwejj7rkEZfyPxgyyjaS2ZW3EhWlrjlqKcwDDErg3lgvJIuBEyQsIU3i
-	4CrSEeQusFfe0o24pDN7ory/HBOSTHhCZqAG4WhE7lSeOW6M10ugKJVpV4WekpGCWvDSVn
-	YGHZgh5qJCk0PMYXImKzckVzIyuo5U1nadqCVHLaSqly6MePE/FO7GE7Q1NJlXmphpKFII
-	6zesx0e4N2IlJsKOXkUP20AVaclLjWDuQuWQExXNxQfg8DGx5kEZ6AuD6x/G2jTO81gONx
-	e27p8fqqZHyt+qMzpLeGmy7Acu0XEXTu3GQx0Mc9EglgO7SiexcpbIWacBIEfw==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Simon Horman <horms@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>
-Subject: [PATCH net-next v4 12/13] net: phylink: Convert capabilities to linkmodes using phy_caps
-Date: Mon,  3 Mar 2025 10:03:18 +0100
-Message-ID: <20250303090321.805785-13-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250303090321.805785-1-maxime.chevallier@bootlin.com>
-References: <20250303090321.805785-1-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1740993523; c=relaxed/simple;
+	bh=Ve5w4wBza/LR9gEhfks2GNQsd1BGH+h8LS5mlA9F7SA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UqKXyGtJNRz1eN/m5toBrP+H0LG6UpZqMHxlmqZGtTkdnoTbBNBMxBjVD44tWPiySRUlwRX40x9OXoEWyalFGHZ5jfbF6HyGSpFsihysDBYn3WZrkerIcsxXopJ9qweGLJh/B8ni13v8TDbDCLh84uDWlLo58NmmJNyu2Bd6woE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=snAJ488r; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=1eCtu+hvRhYstMo2vG0z14zLR3g9gohNHmA5ExvpV9Y=; b=snAJ488rsQoq3hN1Z4FaRaQlQH
+	9so+l3wlu5qJyjQKPK8rZIvWFrAiMCWsMVPirTbkAjAwy8KrNZ+PwvGMWz1dS6hh+eqcfMrNpEgYf
+	yynraGfpogGIpEsCt74e2Zy1LrJYqjIRw74qWxaCNR4BikDoF52TN5wAe+PgIeHRpZCjkdquHdAm0
+	mFMYGA1uwetI3N7IK/WIdZyNOmKr/fSFLOpHijzNTU+/3Z+CQKEh6ksGC9KIGKoHLh1JeC6QxOgHZ
+	YL4PwFqb7dsxlsoSUc1CwOwL0YwuDz+NV41FSuuZwjc9FynHG9JVe1DWed11QXALcV2Nh3pHslyBl
+	ifQrqumA==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1tp1wB-0000000BOR4-35ew;
+	Mon, 03 Mar 2025 09:18:11 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 5935F30049D; Mon,  3 Mar 2025 10:18:11 +0100 (CET)
+Date: Mon, 3 Mar 2025 10:18:11 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: rostedt@goodmis.org, mark.rutland@arm.com, alexei.starovoitov@gmail.com,
+	catalin.marinas@arm.com, will@kernel.org, mhiramat@kernel.org,
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+	martin.lau@linux.dev, eddyz87@gmail.com, yonghong.song@linux.dev,
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+	jolsa@kernel.org, davem@davemloft.net, dsahern@kernel.org,
+	mathieu.desnoyers@efficios.com, nathan@kernel.org,
+	nick.desaulniers+lkml@gmail.com, morbo@google.com,
+	samitolvanen@google.com, kees@kernel.org, dongml2@chinatelecom.cn,
+	akpm@linux-foundation.org, riel@surriel.com, rppt@kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, llvm@lists.linux.dev
+Subject: Re: [PATCH bpf-next v3 1/4] x86/ibt: factor out cfi and fineibt
+ offset
+Message-ID: <20250303091811.GH5880@noisy.programming.kicks-ass.net>
+References: <20250303065345.229298-1-dongml2@chinatelecom.cn>
+ <20250303065345.229298-2-dongml2@chinatelecom.cn>
 Precedence: bulk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -126,264 +124,29 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdelkeejudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeevgedtffelffelveeuleelgfejfeevvdejhfehgeefgfffvdefteegvedutefftdenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpeduudenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgdphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvddtpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmr
- giivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhm
-X-GND-Sasl: maxime.chevallier@bootlin.com
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250303065345.229298-2-dongml2@chinatelecom.cn>
 X-ITU-Libra-ESVA-Information: Please contact Istanbul Teknik Universitesi for more information
-X-ITU-Libra-ESVA-ID: 4Z6gMT18RfzG1g6
+X-ITU-Libra-ESVA-ID: 4Z6dzd2v1SzFxfD
 X-ITU-Libra-ESVA: No virus found
 X-ITU-Libra-ESVA-From: root@cc.itu.edu.tr
-X-ITU-Libra-ESVA-Watermark: 1741708717.39933@GqWkROBtUXT6EQkEn9BuvQ
+X-ITU-Libra-ESVA-Watermark: 1741704980.41854@dYvzO7qjKday+H6yC2Q/QA
 X-ITU-MailScanner-SpamCheck: not spam
 
-phylink_caps_to_linkmodes() is used to derive a list of linkmodes that
-can be conceivably exposed using a given set of speeds and duplex
-through phylink's MAC capabilities.
+On Mon, Mar 03, 2025 at 02:53:42PM +0800, Menglong Dong wrote:
+> index c71b575bf229..ad050d09cb2b 100644
+> --- a/arch/x86/kernel/alternative.c
+> +++ b/arch/x86/kernel/alternative.c
+> @@ -908,7 +908,7 @@ void __init_or_module noinline apply_seal_endbr(s32 *start, s32 *end, struct mod
+>  
+>  		poison_endbr(addr, wr_addr, true);
+>  		if (IS_ENABLED(CONFIG_FINEIBT))
+> -			poison_cfi(addr - 16, wr_addr - 16);
+> +			poison_cfi(addr, wr_addr);
+>  	}
+>  }
 
-This list can be derived from the link_caps array in phy_caps, provided
-we convert the MAC capabilities into a LINK_CAPA bitmask first.
-
-Introduce an internal phylink helper phylink_caps_to_link_caps() to
-convert from MAC capabilities into phy_caps, then  phy_caps_linkmodes()
-to do the link_caps -> linkmodes conversion.
-
-This avoids having to update phylink for every new linkmode.
-
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
-V4: No changes
-
- drivers/net/phy/phy-caps.h |   1 +
- drivers/net/phy/phy_caps.c |  14 ++++
- drivers/net/phy/phylink.c  | 155 +++++--------------------------------
- 3 files changed, 36 insertions(+), 134 deletions(-)
-
-diff --git a/drivers/net/phy/phy-caps.h b/drivers/net/phy/phy-caps.h
-index 8ae8dc42494f..db53f380392e 100644
---- a/drivers/net/phy/phy-caps.h
-+++ b/drivers/net/phy/phy-caps.h
-@@ -44,6 +44,7 @@ size_t phy_caps_speeds(unsigned int *speeds, size_t siz=
-e,
- 		       unsigned long *linkmodes);
- void phy_caps_linkmode_max_speed(u32 max_speed, unsigned long *linkmodes=
-);
- bool phy_caps_valid(int speed, int duplex, const unsigned long *linkmode=
-s);
-+void phy_caps_linkmodes(unsigned long caps, unsigned long *linkmodes);
-=20
- const struct link_capabilities *
- phy_caps_lookup_by_linkmode(const unsigned long *linkmodes);
-diff --git a/drivers/net/phy/phy_caps.c b/drivers/net/phy/phy_caps.c
-index 8b90fb6d6b15..0a64289a161b 100644
---- a/drivers/net/phy/phy_caps.c
-+++ b/drivers/net/phy/phy_caps.c
-@@ -239,3 +239,17 @@ bool phy_caps_valid(int speed, int duplex, const uns=
-igned long *linkmodes)
-=20
- 	return linkmode_intersects(link_caps[capa].linkmodes, linkmodes);
- }
-+
-+/**
-+ * phy_caps_linkmodes() - Convert a bitfield of capabilities into linkmo=
-des
-+ * @caps: The list of caps, each bit corresponding to a LINK_CAPA value
-+ * @linkmodes: The set of linkmodes to fill. Must be previously initiali=
-zed.
-+ */
-+void phy_caps_linkmodes(unsigned long caps, unsigned long *linkmodes)
-+{
-+	unsigned long capa;
-+
-+	for_each_set_bit(capa, &caps, __LINK_CAPA_MAX)
-+		linkmode_or(linkmodes, linkmodes, link_caps[capa].linkmodes);
-+}
-+EXPORT_SYMBOL_GPL(phy_caps_linkmodes);
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 9cb3beec9f47..30f0ecb084ef 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -317,6 +317,24 @@ static struct {
- 	{ MAC_10HD,     SPEED_10,     DUPLEX_HALF, BIT(LINK_CAPA_10HD) },
- };
-=20
-+/**
-+ * phylink_caps_to_link_caps() - Convert a set of MAC capabilities LINK =
-caps
-+ * @caps: A set of MAC capabilities
-+ *
-+ * Returns: The corresponding set of LINK_CAPA as defined in phy-caps.h
-+ */
-+static unsigned long phylink_caps_to_link_caps(unsigned long caps)
-+{
-+	unsigned long link_caps =3D 0;
-+	int i;
-+
-+	for (i =3D 0; i <  ARRAY_SIZE(phylink_caps_params); i++)
-+		if (caps & phylink_caps_params[i].mask)
-+			link_caps |=3D phylink_caps_params[i].caps_bit;
-+
-+	return link_caps;
-+}
-+
- /**
-  * phylink_caps_to_linkmodes() - Convert capabilities to ethtool link mo=
-des
-  * @linkmodes: ethtool linkmode mask (must be already initialised)
-@@ -328,146 +346,15 @@ static struct {
- static void phylink_caps_to_linkmodes(unsigned long *linkmodes,
- 				      unsigned long caps)
- {
-+	unsigned long link_caps =3D phylink_caps_to_link_caps(caps);
-+
- 	if (caps & MAC_SYM_PAUSE)
- 		__set_bit(ETHTOOL_LINK_MODE_Pause_BIT, linkmodes);
-=20
- 	if (caps & MAC_ASYM_PAUSE)
- 		__set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT, linkmodes);
-=20
--	if (caps & MAC_10HD) {
--		__set_bit(ETHTOOL_LINK_MODE_10baseT_Half_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10baseT1S_Half_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10baseT1S_P2MP_Half_BIT, linkmodes);
--	}
--
--	if (caps & MAC_10FD) {
--		__set_bit(ETHTOOL_LINK_MODE_10baseT_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10baseT1L_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10baseT1S_Full_BIT, linkmodes);
--	}
--
--	if (caps & MAC_100HD) {
--		__set_bit(ETHTOOL_LINK_MODE_100baseT_Half_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100baseFX_Half_BIT, linkmodes);
--	}
--
--	if (caps & MAC_100FD) {
--		__set_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100baseT1_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100baseFX_Full_BIT, linkmodes);
--	}
--
--	if (caps & MAC_1000HD)
--		__set_bit(ETHTOOL_LINK_MODE_1000baseT_Half_BIT, linkmodes);
--
--	if (caps & MAC_1000FD) {
--		__set_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_1000baseKX_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_1000baseX_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_1000baseT1_Full_BIT, linkmodes);
--	}
--
--	if (caps & MAC_2500FD) {
--		__set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_2500baseX_Full_BIT, linkmodes);
--	}
--
--	if (caps & MAC_5000FD)
--		__set_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT, linkmodes);
--
--	if (caps & MAC_10000FD) {
--		__set_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10000baseKX4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10000baseKR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10000baseR_FEC_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10000baseCR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10000baseSR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10000baseLR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10000baseLRM_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_10000baseER_Full_BIT, linkmodes);
--	}
--
--	if (caps & MAC_25000FD) {
--		__set_bit(ETHTOOL_LINK_MODE_25000baseCR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_25000baseKR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_25000baseSR_Full_BIT, linkmodes);
--	}
--
--	if (caps & MAC_40000FD) {
--		__set_bit(ETHTOOL_LINK_MODE_40000baseKR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_40000baseCR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_40000baseSR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_40000baseLR4_Full_BIT, linkmodes);
--	}
--
--	if (caps & MAC_50000FD) {
--		__set_bit(ETHTOOL_LINK_MODE_50000baseCR2_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_50000baseKR2_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_50000baseSR2_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_50000baseKR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_50000baseSR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_50000baseCR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_50000baseLR_ER_FR_Full_BIT,
--			  linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_50000baseDR_Full_BIT, linkmodes);
--	}
--
--	if (caps & MAC_56000FD) {
--		__set_bit(ETHTOOL_LINK_MODE_56000baseKR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_56000baseCR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_56000baseSR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_56000baseLR4_Full_BIT, linkmodes);
--	}
--
--	if (caps & MAC_100000FD) {
--		__set_bit(ETHTOOL_LINK_MODE_100000baseKR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseSR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseCR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseLR4_ER4_Full_BIT,
--			  linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseKR2_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseSR2_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseCR2_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseLR2_ER2_FR2_Full_BIT,
--			  linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseDR2_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseKR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseSR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseLR_ER_FR_Full_BIT,
--			  linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseCR_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_100000baseDR_Full_BIT, linkmodes);
--	}
--
--	if (caps & MAC_200000FD) {
--		__set_bit(ETHTOOL_LINK_MODE_200000baseKR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_200000baseSR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_200000baseLR4_ER4_FR4_Full_BIT,
--			  linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_200000baseDR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_200000baseCR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_200000baseKR2_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_200000baseSR2_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_200000baseLR2_ER2_FR2_Full_BIT,
--			  linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_200000baseDR2_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_200000baseCR2_Full_BIT, linkmodes);
--	}
--
--	if (caps & MAC_400000FD) {
--		__set_bit(ETHTOOL_LINK_MODE_400000baseKR8_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_400000baseSR8_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_400000baseLR8_ER8_FR8_Full_BIT,
--			  linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_400000baseDR8_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_400000baseCR8_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_400000baseKR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_400000baseSR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_400000baseLR4_ER4_FR4_Full_BIT,
--			  linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_400000baseDR4_Full_BIT, linkmodes);
--		__set_bit(ETHTOOL_LINK_MODE_400000baseCR4_Full_BIT, linkmodes);
--	}
-+	phy_caps_linkmodes(link_caps, linkmodes);
- }
-=20
- /**
---=20
-2.48.1
-
+If you're touching this code, please use tip/x86/core or tip/master.
 
 
