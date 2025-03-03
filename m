@@ -1,97 +1,104 @@
-Return-Path: <netdev+bounces-171261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 221C8A4C418
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 16:01:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA73EA4C455
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 16:10:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 894A33A8133
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 15:00:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E8ED171A2B
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 15:10:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F2CD18858A;
-	Mon,  3 Mar 2025 15:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C481A2144CC;
+	Mon,  3 Mar 2025 15:10:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="liqBqqHr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OR6VtSZn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 391F21482F2
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 15:00:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21249214201;
+	Mon,  3 Mar 2025 15:10:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741014021; cv=none; b=brh5rrmY+Z6hHWt07jkvJ/LsdB9HcDlwwyYYASFYIKu5hIfvbbKY/psEogwp4MM1L4qSTESbqYHle6G5C717PfNZaTT9AU1LPWUw8mRSuIwWzTvsneq5tPyUG5/6pAe8yZnQMCsF8LE4EcK4or0VT/d3TlUKdR4emOstEZwZN5M=
+	t=1741014606; cv=none; b=bwo3zroGM5m0mbluj2TYIrT5kSWPQ3wt3ASSQSHzJvQybNa9ywIB8zZ1IuSf1iWRbpv/EUHGAQsgK45dX6Uubkp1nnv7zvaDa5ndggHfqottc9kj9qpzuX+RALn3qYDEVRLGUVycBW0OrnGo2/xkwYla+JBAIOEz04QqfR/36Q8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741014021; c=relaxed/simple;
-	bh=uM5pu9BkqV4anLLPtclfY9025i+5//1fdfMZrWP2JAY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iaOR3OJOYw3KZMpv3Gd8WHPgV7XK90AJAVoAsHU7UQsNELBINnhxMrBj4hiauneaGPDM/ce4U6zEX9GjE0N8aGqGaXSglAwi/iKp03ajZuyre5ucm6lKvXRtQp5w0H55QS0ikt0cdjctAO9M2uQXp5lOsxhi4FPq78P5Vh+Msg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=liqBqqHr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1461BC4CED6;
-	Mon,  3 Mar 2025 15:00:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741014020;
-	bh=uM5pu9BkqV4anLLPtclfY9025i+5//1fdfMZrWP2JAY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=liqBqqHr0nCrCWsQ4M77Pu+ENRFsORnAFsH+WT55wMguvJptMOmGhLh9B/GVk3mKf
-	 eOci2AhNAQrIywuBVwk3jo+zOY3MV6nzPmZvtyNy9thvjzaB7TJ3MJb2lKzzR9A2ac
-	 //JfdSFjMm8y3IJRZTZhK+hbSY9VeKrd9WDNoH/HAcOjsExtKLa4WuSDd4xdpX9kzW
-	 IOVbrM+NXB0IuXbmiLlet4OmykMQ6OxGlDxGne5hFyMQ5HIFV6RShL2CMA0FXmX8Pb
-	 5A3EF2zGsGc/pQVxAKS8j6/WIJDHwBjiNO3g2fxomMRzUuETmCAPRkp714N/5PFFYN
-	 fKsQytXE4pU4Q==
-Date: Mon, 3 Mar 2025 17:00:15 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: David Arinzon <darinzon@amazon.com>, David Miller <davem@davemloft.net>,
-	netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	"Woodhouse, David" <dwmw@amazon.com>,
-	"Machulsky, Zorik" <zorik@amazon.com>,
-	"Matushevsky, Alexander" <matua@amazon.com>,
-	Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>,
-	"Liguori, Anthony" <aliguori@amazon.com>,
-	"Bshara, Nafea" <nafea@amazon.com>,
-	"Schmeilin, Evgeny" <evgenys@amazon.com>,
-	"Belgazal, Netanel" <netanel@amazon.com>,
-	"Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>,
-	"Kiyanovski, Arthur" <akiyano@amazon.com>,
-	"Dagan, Noam" <ndagan@amazon.com>,
-	"Bernstein, Amit" <amitbern@amazon.com>,
-	"Agroskin, Shay" <shayagr@amazon.com>,
-	"Abboud, Osama" <osamaabb@amazon.com>,
-	"Ostrovsky, Evgeny" <evostrov@amazon.com>,
-	"Tabachnik, Ofir" <ofirt@amazon.com>,
-	"Machnikowski, Maciek" <maciek@machnikowski.net>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: Re: [PATCH v7 net-next 3/5] net: ena: PHC enable through sysfs
-Message-ID: <20250303150015.GA1926949@unreal>
-References: <20250218183948.757-1-darinzon@amazon.com>
- <20250218183948.757-4-darinzon@amazon.com>
+	s=arc-20240116; t=1741014606; c=relaxed/simple;
+	bh=YcGUKagKGbtwNKLU0xV9Ao0yx82+59o5WiA+tFSfjOc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qqfNXe0FrmkqZkMVpjuqBOKA78v0s6vu8MPg9DZ6ez25PwPgHBjzpKC+IMwwCm5b2oY6BWCIwajzy7WklUCszZRiJqLtwx3X4pfhUFDpRRUmDlfUyniwybxq8o1POtp0a4K6nJUlKqznnOdqs5ZmcyKMsV7p4cZGZ9cC1+r32yU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OR6VtSZn; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741014605; x=1772550605;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=YcGUKagKGbtwNKLU0xV9Ao0yx82+59o5WiA+tFSfjOc=;
+  b=OR6VtSZnEBINRpuNhbNwftbLr5bNjTE6EM+v8EGu1NkNYMjUGrd9Qg2A
+   1vA0WDtVpnVobwmk/1EDgPF3OzaBWtkEnNWbN3MHwMo6nsbMpZAnkUIbF
+   r0XnhWrNCqbzwmWQH9+Mh5Dn1vUH2C/F3a77KPfKoqSH8jnLQZVXjIdMK
+   T2UpMgzrCmVd7BFjEyNgnRDK/Y+kKyPa8BLCzQOIXM4QIMmK4PDXAnqZc
+   1dvpl9icUulwr/PVtMKKdtkyXYe8EArOZEYnwVeWNkRxYPowUAmCR+7MC
+   NNFvtVhargyn1SdiL4Vj/0lTwhNCEsNE1EqQBlwUlT4G7cHyve20QnwTA
+   g==;
+X-CSE-ConnectionGUID: 0ryKn/LBTgCB+/J//grrpQ==
+X-CSE-MsgGUID: Tdlh0taoQB+qXmIUaXmRdQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="52099500"
+X-IronPort-AV: E=Sophos;i="6.13,330,1732608000"; 
+   d="scan'208";a="52099500"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 07:09:01 -0800
+X-CSE-ConnectionGUID: Zql8hNh0QV+HxwD6L7F8Rg==
+X-CSE-MsgGUID: G8h/nVpxSd2GXngWvwwojQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,330,1732608000"; 
+   d="scan'208";a="118739575"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by fmviesa009.fm.intel.com with ESMTP; 03 Mar 2025 07:08:57 -0800
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+	id 71D94125; Mon, 03 Mar 2025 17:08:56 +0200 (EET)
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>
+Subject: [PATCH net-next v1 0/2] ieee802154: ca8210: Sparse fix and GPIOd conversion
+Date: Mon,  3 Mar 2025 17:07:38 +0200
+Message-ID: <20250303150855.1294188-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250218183948.757-4-darinzon@amazon.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 18, 2025 at 08:39:46PM +0200, David Arinzon wrote:
-> This patch allows controlling PHC feature enablement
-> through sysfs.
+The main part is the patch 2 that converts the driver to GPIO descriptor APIs,
+the first one is just an ad-hoc fix WRT sparse complains on the bitwise
+types misuse.
 
-Jakub,
+Andy Shevchenko (2):
+  ieee802154: ca8210: Use proper setter and getters for bitwise types
+  ieee802154: ca8210: Switch to using gpiod API
 
-Does it mean that from now on everyone can add new specific to him
-sysfs entries and long-standing netdev policy of not adding new sysfs
-entries is cease to exit?
+ drivers/net/ieee802154/ca8210.c | 72 ++++++++++++---------------------
+ 1 file changed, 26 insertions(+), 46 deletions(-)
 
-Thanks
+-- 
+2.47.2
+
 
