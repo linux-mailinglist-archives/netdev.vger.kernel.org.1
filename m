@@ -1,428 +1,778 @@
-Return-Path: <netdev+bounces-171202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 105DEA4BEDE
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 12:37:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 156CBA4BEE5
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 12:38:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6A8D161B92
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 11:36:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F00D161E37
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 11:37:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A84121FDA6D;
-	Mon,  3 Mar 2025 11:36:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEC451FF611;
+	Mon,  3 Mar 2025 11:37:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="VjkIT1BI"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="v7/e5EMC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 981E91FCFEF
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 11:36:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2533D1FF5FE;
+	Mon,  3 Mar 2025 11:37:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741001769; cv=none; b=ZSYyJVphWJaty6w81yTOiQ2N/11BtBA21OSq0evNxxX/u2kPl7QOw/30FOMPvTWDyB70V3awuQzIhIQmyPH+Z/XbE9wYZZ6sZsRS6w91/RJMnA0QyHBt+7+GS2ZWKIb+NyhNatYbgYxKuDvLsVysVbtKK8xiGKv+9Mr3D3XRB38=
+	t=1741001858; cv=none; b=VoGrom0LhmgnEu+/NMvfp7emRa+qt/b1ThBjP4VtiYxR9nbbW22yYMZK8eCIz41acZwGW+CNLm4oV6O40mJGZO3n2oVtHmxTJXP89BBs1Y4m43uvZTmJ7uP8GckK68N6aOtXLlVNkVWQVmhBNThi3YqEgp169mG31m/up/JjXdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741001769; c=relaxed/simple;
-	bh=v/i/yAJZPSbkYheYcRkLCTkookUbJO9oGReVgLLmlxE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E/8wYkCfZafxXnlLULLOIsrHn56SMN7yYZq+o+LHM1WhkZMwZN/wClEr6fx837uOsyWUxnX8uaTf4LtRG62ne0co3oJJ3DVpyPmr6pk4Nl8WL3JEBtJvmG/78M+uEFPZ5WKnBdkNHrfbBve1ve1FpEc0nMaB6CjUxMG3fS96f/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=VjkIT1BI; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-43995b907cfso27043205e9.3
-        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 03:36:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1741001764; x=1741606564; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XYj+XMA2X0CCXrbw92wRouGeHLHtc5Wkez0sIulwOJw=;
-        b=VjkIT1BIpP9qRt2ymyiHw4wbDPjD5ARj94cMXMEOA6oS4rEdznxlc3+67VEF6RnTwv
-         NES1tEg00yGWydA8ZBIt8eeGzYlBK4XoywlFl27QLNKny3ik97Ws+MB+deitGKAN5Jfl
-         kljBvtwnAQ1tvEcDVhqL/biT/UflZf/eNe0/xAM0HEx33yi69DK4i68zk90FTayzADsP
-         cTaXtQgjhm/P6Zz66g1ITnLWOLgUaFnxFO7AUw1r3ADKM2rNzCLPw/RlT50/v5E1PCzg
-         LURpXEN/MQByiHUz4UX0Au53/Teb8y5guw5Y0o6Aa6M+y+2tCHDyDPo1w0IHJraO8y0I
-         esFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741001764; x=1741606564;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XYj+XMA2X0CCXrbw92wRouGeHLHtc5Wkez0sIulwOJw=;
-        b=sy1MOhxsXfeQhIX75Z+m2Q/1i+I5UlzNyAthk2grLUclWEIFYVgDqV2452ek14v1JJ
-         D/OxGGFq8ze41xSD5ccTeETopEI1Qn1Mft6cOsoYkhgtlxit/pbYrwKiQOH6ZknID830
-         zhalmkx3AHT2C0GFI4eYfR8z1LBWJ3v1nxI91LS46HsgYd0ynuuJvjjRtiSk8U+gLtB5
-         SC1crxt/g6ug79ivPb07j2tFmWZV2HpBvP6Si8vACbRosYsJmsVYRgf9kH9aQ/XslRbp
-         EMdgmap/lzI0LGpKLM30HK7IPXYR24Iw5x4PmhNVM/DyPvUhh+2Ouh4MfN67WKHgpFX9
-         gtow==
-X-Forwarded-Encrypted: i=1; AJvYcCUEeKmvf47Arnw3cb6lnRr3eHgWr9xn6cX9FcqYkFXWEDcB8u0nFhjLpqPbfZoq+f1GpnOwje0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8AMdkjWHpwhmiPboq0mLZ4V1KXx2v7UU9hBozosiXz/E5ZFbK
-	eAzj2ABxXVR2rUJrtlZdn4MA/Nc2fx8O7kXCTXWkdlpTPLKy5I1AnImj5014waI=
-X-Gm-Gg: ASbGncs24NA+bOAdhQJJj4fwvXqBFpjCOCftriyIRJ0mKN9TkF3vmNnEB1nndLJr76d
-	Vecqyg3pW77OvqurnAcF6aG+Ds4ihrVUtXj2qPNyYHmSXSrA58Qt+UByGdiOYeo/C2cCkE085Bg
-	UdB69F9UsSaG1kFhlK/jOAbNisdH1tHEJLD3bOZWZ6rpgjX2TyDqLuvwN3oukLV9JT1rn3ubRH/
-	xY89BKP0sC/4+4hSow8PIDU4e7gJA3+tKohqKnP/xUYp96y5yV4NEePhnh7vjtGTxnnce2LLiZU
-	pX0t/CGJpPYsquItLTpX7JpAPHB2uPROK9R4uI4/z48o1uNue6uMjKCXmD71vzrDrFQQZkHW
-X-Google-Smtp-Source: AGHT+IFbmonfp95mk0pK8BlmDWKQuBZywxV3tva2JKvY2LBz/7SePo0cYRULl1ywb/r3fuJF7yYosQ==
-X-Received: by 2002:a05:600c:1d20:b0:439:84ba:5773 with SMTP id 5b1f17b1804b1-43baec9c2c1mr71347305e9.31.1741001763597;
-        Mon, 03 Mar 2025 03:36:03 -0800 (PST)
-Received: from jiri-mlt.client.nvidia.com ([140.209.217.212])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43aba532b0dsm183952365e9.13.2025.03.03.03.36.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Mar 2025 03:36:03 -0800 (PST)
-Date: Mon, 3 Mar 2025 12:35:59 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Saeed Mahameed <saeedm@nvidia.com>
-Cc: Saeed Mahameed <saeed@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, 
-	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, 
-	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, 
-	Vlad Dumitrescu <vdumitrescu@nvidia.com>
-Subject: Re: [PATCH net-next 04/14] net/mlx5: Implement devlink enable_sriov
- parameter
-Message-ID: <fnr2d2i7paakjime2mnqhz4u6pa5zfpmog4jiymuopctjhe6zk@cyn54xvkrtmr>
-References: <20250228021227.871993-1-saeed@kernel.org>
- <20250228021227.871993-5-saeed@kernel.org>
- <uovifydwz7vbhbjzy4g4x4lkrq7htepoktekqidqxytkqi6ra6@2xfhgel6h7sz>
- <Z8H-JyRRkknKj0Di@x130>
+	s=arc-20240116; t=1741001858; c=relaxed/simple;
+	bh=Q5BdiIVI2W83Mnf4pwETQwnHYIpchq9U/ZtwBJ63jaM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=jQD+eklAUrgPMTiYi89NjaKxM2xbSxXTFgtz168llZ8NoA+JJtf0sbuulgKGAHEGRp16PECRuCjMhAMgXbMxWzFoK70Jp60mU2rDhLAgGfikUvr0Why8vQCVvy90Vy3z4ZPEoo76egqSbhyexYs9NaeFl4rcF/FTphioVnccHvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=v7/e5EMC; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 523BatwM2747332
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 3 Mar 2025 05:36:55 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1741001815;
+	bh=89N1ZJohVbwL5OkHHW7QzL8dMgKQ/ETvbhKKBN0tPdE=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=v7/e5EMCxQl1G1mS40j7XRn+xy7BuEgQNABo1ymtD9G0obUcVAEkfKb8/mLB6uvPH
+	 wvpj4PdvTVPXd1e2nGD9aeub7Yzvr1WZbgzjAVL02iRP/9KeKOQ9TOAD0lwUBd8p7m
+	 IBZK5MEHU2s2HJaPjgHgDqDjv722SgnOal+QZpc4=
+Received: from DLEE110.ent.ti.com (dlee110.ent.ti.com [157.170.170.21])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 523BatOO031919
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 3 Mar 2025 05:36:55 -0600
+Received: from DLEE100.ent.ti.com (157.170.170.30) by DLEE110.ent.ti.com
+ (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 3
+ Mar 2025 05:36:55 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE100.ent.ti.com
+ (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 3 Mar 2025 05:36:55 -0600
+Received: from [172.24.21.156] (lt9560gk3.dhcp.ti.com [172.24.21.156])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 523BamMS017833;
+	Mon, 3 Mar 2025 05:36:49 -0600
+Message-ID: <12576ce1-9db0-4136-9f84-3c6a72a07127@ti.com>
+Date: Mon, 3 Mar 2025 17:06:48 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z8H-JyRRkknKj0Di@x130>
-
-Fri, Feb 28, 2025 at 07:19:19PM +0100, saeedm@nvidia.com wrote:
->On 28 Feb 13:46, Jiri Pirko wrote:
->> Fri, Feb 28, 2025 at 03:12:17AM +0100, saeed@kernel.org wrote:
->> > From: Vlad Dumitrescu <vdumitrescu@nvidia.com>
->> > 
->> > Example usage:
->> >  devlink dev param set pci/0000:01:00.0 name enable_sriov value {true, false} cmode permanent
->> >  devlink dev reload pci/0000:01:00.0 action fw_activate
->> >  echo 1 >/sys/bus/pci/devices/0000:01:00.0/remove
->> >  echo 1 >/sys/bus/pci/rescan
->> >  grep ^ /sys/bus/pci/devices/0000:01:00.0/sriov_*
->> > 
->> > Signed-off-by: Vlad Dumitrescu <vdumitrescu@nvidia.com>
->> > Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
->> > ---
->> > Documentation/networking/devlink/mlx5.rst     |  14 +-
->> > .../net/ethernet/mellanox/mlx5/core/devlink.c |   1 +
->> > .../mellanox/mlx5/core/lib/nv_param.c         | 184 ++++++++++++++++++
->> > 3 files changed, 196 insertions(+), 3 deletions(-)
->> > 
->> > diff --git a/Documentation/networking/devlink/mlx5.rst b/Documentation/networking/devlink/mlx5.rst
->> > index 417e5cdcd35d..587e0200c1cd 100644
->> > --- a/Documentation/networking/devlink/mlx5.rst
->> > +++ b/Documentation/networking/devlink/mlx5.rst
->> > @@ -15,23 +15,31 @@ Parameters
->> >    * - Name
->> >      - Mode
->> >      - Validation
->> > +     - Notes
->> >    * - ``enable_roce``
->> >      - driverinit
->> > -     - Type: Boolean
->> > -
->> > -       If the device supports RoCE disablement, RoCE enablement state controls
->> > +     - Boolean
->> > +     - If the device supports RoCE disablement, RoCE enablement state controls
->> >        device support for RoCE capability. Otherwise, the control occurs in the
->> >        driver stack. When RoCE is disabled at the driver level, only raw
->> >        ethernet QPs are supported.
->> >    * - ``io_eq_size``
->> >      - driverinit
->> >      - The range is between 64 and 4096.
->> > +     -
->> >    * - ``event_eq_size``
->> >      - driverinit
->> >      - The range is between 64 and 4096.
->> > +     -
->> >    * - ``max_macs``
->> >      - driverinit
->> >      - The range is between 1 and 2^31. Only power of 2 values are supported.
->> > +     -
->> > +   * - ``enable_sriov``
->> > +     - permanent
->> > +     - Boolean
->> > +     - Applies to each physical function (PF) independently, if the device
->> > +       supports it. Otherwise, it applies symmetrically to all PFs.
->> > 
->> > The ``mlx5`` driver also implements the following driver-specific
->> > parameters.
->> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/devlink.c b/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
->> > index 1f764ae4f4aa..7a702d84f19a 100644
->> > --- a/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
->> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
->> > @@ -8,6 +8,7 @@
->> > #include "fs_core.h"
->> > #include "eswitch.h"
->> > #include "esw/qos.h"
->> > +#include "lib/nv_param.h"
->> > #include "sf/dev/dev.h"
->> > #include "sf/sf.h"
->> > #include "lib/nv_param.h"
->> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
->> > index 5ab37a88c260..6b63fc110e2d 100644
->> > --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
->> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
->> > @@ -5,7 +5,11 @@
->> > #include "mlx5_core.h"
->> > 
->> > enum {
->> > +	MLX5_CLASS_0_CTRL_ID_NV_GLOBAL_PCI_CONF               = 0x80,
->> > +	MLX5_CLASS_0_CTRL_ID_NV_GLOBAL_PCI_CAP                = 0x81,
->> > 	MLX5_CLASS_0_CTRL_ID_NV_SW_OFFLOAD_CONFIG             = 0x10a,
->> > +
->> > +	MLX5_CLASS_3_CTRL_ID_NV_PF_PCI_CONF                   = 0x80,
->> > };
->> > 
->> > struct mlx5_ifc_configuration_item_type_class_global_bits {
->> > @@ -13,9 +17,18 @@ struct mlx5_ifc_configuration_item_type_class_global_bits {
->> > 	u8         parameter_index[0x18];
->> > };
->> > 
->> > +struct mlx5_ifc_configuration_item_type_class_per_host_pf_bits {
->> > +	u8         type_class[0x8];
->> > +	u8         pf_index[0x6];
->> > +	u8         pci_bus_index[0x8];
->> > +	u8         parameter_index[0xa];
->> > +};
->> > +
->> > union mlx5_ifc_config_item_type_auto_bits {
->> > 	struct mlx5_ifc_configuration_item_type_class_global_bits
->> > 				configuration_item_type_class_global;
->> > +	struct mlx5_ifc_configuration_item_type_class_per_host_pf_bits
->> > +				configuration_item_type_class_per_host_pf;
->> > 	u8 reserved_at_0[0x20];
->> > };
->> > 
->> > @@ -45,6 +58,45 @@ struct mlx5_ifc_mnvda_reg_bits {
->> > 	u8         configuration_item_data[64][0x20];
->> > };
->> > 
->> > +struct mlx5_ifc_nv_global_pci_conf_bits {
->> > +	u8         sriov_valid[0x1];
->> > +	u8         reserved_at_1[0x10];
->> > +	u8         per_pf_total_vf[0x1];
->> > +	u8         reserved_at_12[0xe];
->> > +
->> > +	u8         sriov_en[0x1];
->> > +	u8         reserved_at_21[0xf];
->> > +	u8         total_vfs[0x10];
->> > +
->> > +	u8         reserved_at_40[0x20];
->> > +};
->> > +
->> > +struct mlx5_ifc_nv_global_pci_cap_bits {
->> > +	u8         max_vfs_per_pf_valid[0x1];
->> > +	u8         reserved_at_1[0x13];
->> > +	u8         per_pf_total_vf_supported[0x1];
->> > +	u8         reserved_at_15[0xb];
->> > +
->> > +	u8         sriov_support[0x1];
->> > +	u8         reserved_at_21[0xf];
->> > +	u8         max_vfs_per_pf[0x10];
->> > +
->> > +	u8         reserved_at_40[0x60];
->> > +};
->> > +
->> > +struct mlx5_ifc_nv_pf_pci_conf_bits {
->> > +	u8         reserved_at_0[0x9];
->> > +	u8         pf_total_vf_en[0x1];
->> > +	u8         reserved_at_a[0x16];
->> > +
->> > +	u8         reserved_at_20[0x20];
->> > +
->> > +	u8         reserved_at_40[0x10];
->> > +	u8         total_vf[0x10];
->> > +
->> > +	u8         reserved_at_60[0x20];
->> > +};
->> > +
->> > struct mlx5_ifc_nv_sw_offload_conf_bits {
->> > 	u8         ip_over_vxlan_port[0x10];
->> > 	u8         tunnel_ecn_copy_offload_disable[0x1];
->> > @@ -206,7 +258,139 @@ static int mlx5_nv_param_devlink_cqe_compress_set(struct devlink *devlink, u32 i
->> > 	return mlx5_nv_param_write(dev, mnvda, sizeof(mnvda));
->> > }
->> > 
->> > +static int
->> > +mlx5_nv_param_read_global_pci_conf(struct mlx5_core_dev *dev, void *mnvda, size_t len)
->> > +{
->> > +	MLX5_SET_CONFIG_ITEM_TYPE(global, mnvda, type_class, 0);
->> > +	MLX5_SET_CONFIG_ITEM_TYPE(global, mnvda, parameter_index,
->> > +				  MLX5_CLASS_0_CTRL_ID_NV_GLOBAL_PCI_CONF);
->> > +	MLX5_SET_CONFIG_HDR_LEN(mnvda, nv_global_pci_conf);
->> > +
->> > +	return mlx5_nv_param_read(dev, mnvda, len);
->> > +}
->> > +
->> > +static int
->> > +mlx5_nv_param_read_global_pci_cap(struct mlx5_core_dev *dev, void *mnvda, size_t len)
->> > +{
->> > +	MLX5_SET_CONFIG_ITEM_TYPE(global, mnvda, type_class, 0);
->> > +	MLX5_SET_CONFIG_ITEM_TYPE(global, mnvda, parameter_index,
->> > +				  MLX5_CLASS_0_CTRL_ID_NV_GLOBAL_PCI_CAP);
->> > +	MLX5_SET_CONFIG_HDR_LEN(mnvda, nv_global_pci_cap);
->> > +
->> > +	return mlx5_nv_param_read(dev, mnvda, len);
->> > +}
->> > +
->> > +static int
->> > +mlx5_nv_param_read_per_host_pf_conf(struct mlx5_core_dev *dev, void *mnvda, size_t len)
->> > +{
->> > +	MLX5_SET_CONFIG_ITEM_TYPE(per_host_pf, mnvda, type_class, 3);
->> > +	MLX5_SET_CONFIG_ITEM_TYPE(per_host_pf, mnvda, parameter_index,
->> > +				  MLX5_CLASS_3_CTRL_ID_NV_PF_PCI_CONF);
->> > +	MLX5_SET_CONFIG_HDR_LEN(mnvda, nv_pf_pci_conf);
->> > +
->> > +	return mlx5_nv_param_read(dev, mnvda, len);
->> > +}
->> > +
->> > +static int mlx5_devlink_enable_sriov_get(struct devlink *devlink, u32 id,
->> > +					 struct devlink_param_gset_ctx *ctx)
->> > +{
->> > +	struct mlx5_core_dev *dev = devlink_priv(devlink);
->> > +	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
->> > +	void *data;
->> > +	int err;
->> > +
->> > +	err = mlx5_nv_param_read_global_pci_cap(dev, mnvda, sizeof(mnvda));
->> > +	if (err)
->> > +		return err;
->> > +
->> > +	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
->> > +	if (!MLX5_GET(nv_global_pci_cap, data, sriov_support)) {
->> > +		ctx->val.vbool = false;
->> > +		return 0;
->> > +	}
->> > +
->> > +	memset(mnvda, 0, sizeof(mnvda));
->> > +	err = mlx5_nv_param_read_global_pci_conf(dev, mnvda, sizeof(mnvda));
->> > +	if (err)
->> > +		return err;
->> > +
->> > +	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
->> > +	if (!MLX5_GET(nv_global_pci_conf, data, per_pf_total_vf)) {
->> > +		ctx->val.vbool = MLX5_GET(nv_global_pci_conf, data, sriov_en);
->> > +		return 0;
->> > +	}
->> > +
->> > +	/* SRIOV is per PF */
->> > +	memset(mnvda, 0, sizeof(mnvda));
->> > +	err = mlx5_nv_param_read_per_host_pf_conf(dev, mnvda, sizeof(mnvda));
->> > +	if (err)
->> > +		return err;
->> > +
->> > +	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
->> > +	ctx->val.vbool = MLX5_GET(nv_pf_pci_conf, data, pf_total_vf_en);
->> > +	return 0;
->> > +}
->> > +
->> > +static int mlx5_devlink_enable_sriov_set(struct devlink *devlink, u32 id,
->> > +					 struct devlink_param_gset_ctx *ctx,
->> > +					 struct netlink_ext_ack *extack)
->> > +{
->> > +	struct mlx5_core_dev *dev = devlink_priv(devlink);
->> > +	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
->> > +	bool per_pf_support;
->> > +	void *cap, *data;
->> > +	int err;
->> > +
->> > +	err = mlx5_nv_param_read_global_pci_cap(dev, mnvda, sizeof(mnvda));
->> > +	if (err) {
->> > +		NL_SET_ERR_MSG_MOD(extack, "Failed to read global PCI capability");
->> > +		return err;
->> > +	}
->> > +
->> > +	cap = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
->> > +	per_pf_support = MLX5_GET(nv_global_pci_cap, cap, per_pf_total_vf_supported);
->> > +
->> > +	if (!MLX5_GET(nv_global_pci_cap, cap, sriov_support)) {
->> > +		NL_SET_ERR_MSG_MOD(extack, "Not configurable on this device");
->> > +		return -EOPNOTSUPP;
->> > +	}
->> > +
->> > +	memset(mnvda, 0, sizeof(mnvda));
->> > +	err = mlx5_nv_param_read_global_pci_conf(dev, mnvda, sizeof(mnvda));
->> > +	if (err) {
->> > +		NL_SET_ERR_MSG_MOD(extack, "Unable to read global PCI configuration");
->> > +		return err;
->> > +	}
->> > +
->> > +	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
->> > +	MLX5_SET(nv_global_pci_conf, data, sriov_valid, 1);
->> > +	MLX5_SET(nv_global_pci_conf, data, sriov_en, ctx->val.vbool);
->> > +	MLX5_SET(nv_global_pci_conf, data, per_pf_total_vf, per_pf_support);
->> > +
->> > +	err = mlx5_nv_param_write(dev, mnvda, sizeof(mnvda));
->> > +	if (err) {
->> > +		NL_SET_ERR_MSG_MOD(extack, "Unable to write global PCI configuration");
->> > +		return err;
->> > +	}
->> > +
->> > +	if (!per_pf_support)
->> 
->> 
->> Hmm, given the discussion we have in parallel about some shared-PF
->> devlink instance, perhaps it would be good idea to allow only per-pf
->> configuration here for now and let the "global" per-device configuration
->> knob to be attached on the shared-PF devlink, when/if it lands. What do
->> you think?
->
->Do we have an RFC? can you point me to it?
-
-https://lore.kernel.org/all/20250219164410.35665-2-przemyslaw.kitszel@intel.com/
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 3/3] net: ti: icssg-prueth: Add XDP support
+To: Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>,
+        <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
+        <davem@davemloft.net>, <andrew+netdev@lunn.ch>
+CC: <bpf@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <u.kleine-koenig@baylibre.com>, <matthias.schiffer@ew.tq-group.com>,
+        <dan.carpenter@linaro.org>, <schnelle@linux.ibm.com>,
+        <diogo.ivo@siemens.com>, <glaroque@baylibre.com>, <macro@orcam.me.uk>,
+        <john.fastabend@gmail.com>, <hawk@kernel.org>, <daniel@iogearbox.net>,
+        <ast@kernel.org>, <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>
+References: <20250224110102.1528552-1-m-malladi@ti.com>
+ <20250224110102.1528552-4-m-malladi@ti.com>
+ <8f93a9a0-5d0c-47d6-9db6-af93acebf008@kernel.org>
+Content-Language: en-US
+From: "Malladi, Meghana" <m-malladi@ti.com>
+In-Reply-To: <8f93a9a0-5d0c-47d6-9db6-af93acebf008@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
 
->
->I am just worried about the conflicts between per-pf and global configs
->this will introduce, currently it is driver best effort, after that we
->might want to pick one direction, global vs per-pf if it will be separate
->knobs, and we probably will go with per-pf. Most CX devices support both
->modes and it is up to the driver to chose. So why do both global and
->per-pf when you can almost always do per-pf?
 
-I was thinking that is device supports per-pf, only per-pf knob will be
-present. And if not, only "global" know will be present on the shared
-devlink instance.
+On 2/27/2025 9:07 PM, Roger Quadros wrote:
+> 
+> 
+> On 24/02/2025 13:01, Meghana Malladi wrote:
+>> From: Roger Quadros <rogerq@kernel.org>
+>>
+>> Add native XDP support. We do not support zero copy yet.
+>>
+>> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
+>> ---
+>> Changes since v2 (v3-v2):
+>> - Use page_pool contained in the page instead of using passing page_pool
+>> (rx_chn) as part of swdata
+>> - dev_sw_netstats_tx_add() instead of incrementing the stats directly
+>> - Add missing ndev->stats.tx_dropped++ wherever applicable
+>> - Move k3_cppi_desc_pool_alloc() before the DMA mapping for easier cleanup
+>> on failure
+>> - Replace rxp->napi_id with emac->napi_rx.napi_id in prueth_create_xdp_rxqs()
+>>
+>> All the above changes have been suggested by Roger Quadros <rogerq@kernel.org>
+>>
+>>   drivers/net/ethernet/ti/icssg/icssg_common.c | 219 +++++++++++++++++--
+>>   drivers/net/ethernet/ti/icssg/icssg_prueth.c | 125 ++++++++++-
+>>   drivers/net/ethernet/ti/icssg/icssg_prueth.h |  17 ++
+>>   3 files changed, 346 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
+>> index 01eeabe83eff..4716e24ea05d 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_common.c
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
+>> @@ -98,11 +98,19 @@ void prueth_xmit_free(struct prueth_tx_chn *tx_chn,
+>>   {
+>>   	struct cppi5_host_desc_t *first_desc, *next_desc;
+>>   	dma_addr_t buf_dma, next_desc_dma;
+>> +	struct prueth_swdata *swdata;
+>>   	u32 buf_dma_len;
+>>   
+>>   	first_desc = desc;
+>>   	next_desc = first_desc;
+>>   
+>> +	swdata = cppi5_hdesc_get_swdata(desc);
+>> +	if (swdata->type == PRUETH_SWDATA_PAGE) {
+>> +		page_pool_recycle_direct(swdata->data.page->pp,
+>> +					 swdata->data.page);
+>> +		goto free_desc;
+>> +	}
+>> +
+>>   	cppi5_hdesc_get_obuf(first_desc, &buf_dma, &buf_dma_len);
+>>   	k3_udma_glue_tx_cppi5_to_dma_addr(tx_chn->tx_chn, &buf_dma);
+>>   
+>> @@ -126,6 +134,7 @@ void prueth_xmit_free(struct prueth_tx_chn *tx_chn,
+>>   		k3_cppi_desc_pool_free(tx_chn->desc_pool, next_desc);
+>>   	}
+>>   
+>> +free_desc:
+>>   	k3_cppi_desc_pool_free(tx_chn->desc_pool, first_desc);
+>>   }
+>>   EXPORT_SYMBOL_GPL(prueth_xmit_free);
+>> @@ -139,6 +148,7 @@ int emac_tx_complete_packets(struct prueth_emac *emac, int chn,
+>>   	struct prueth_swdata *swdata;
+>>   	struct prueth_tx_chn *tx_chn;
+>>   	unsigned int total_bytes = 0;
+>> +	struct xdp_frame *xdpf;
+>>   	struct sk_buff *skb;
+>>   	dma_addr_t desc_dma;
+>>   	int res, num_tx = 0;
+>> @@ -168,21 +178,28 @@ int emac_tx_complete_packets(struct prueth_emac *emac, int chn,
+>>   			continue;
+>>   		}
+>>   
+>> -		if (swdata->type != PRUETH_SWDATA_SKB) {
+>> +		switch (swdata->type) {
+>> +		case PRUETH_SWDATA_SKB:
+>> +			skb = swdata->data.skb;
+>> +			dev_sw_netstats_tx_add(skb->dev, 1, skb->len);
+>> +			total_bytes += skb->len;
+>> +			napi_consume_skb(skb, budget);
+>> +			break;
+>> +		case PRUETH_SWDATA_XDPF:
+>> +			xdpf = swdata->data.xdpf;
+>> +			dev_sw_netstats_tx_add(ndev, 1, xdpf->len);
+>> +			total_bytes += xdpf->len;
+>> +			xdp_return_frame(xdpf);
+>> +			break;
+>> +		default:
+>>   			netdev_err(ndev, "tx_complete: invalid swdata type %d\n", swdata->type);
+>>   			prueth_xmit_free(tx_chn, desc_tx);
+>> +			ndev->stats.tx_dropped++;
+>>   			budget++;
+>>   			continue;
+>>   		}
+>>   
+>> -		skb = swdata->data.skb;
+>>   		prueth_xmit_free(tx_chn, desc_tx);
+>> -
+>> -		ndev = skb->dev;
+>> -		ndev->stats.tx_packets++;
+>> -		ndev->stats.tx_bytes += skb->len;
+>> -		total_bytes += skb->len;
+>> -		napi_consume_skb(skb, budget);
+>>   		num_tx++;
+>>   	}
+>>   
+>> @@ -541,7 +558,153 @@ void emac_rx_timestamp(struct prueth_emac *emac,
+>>   	ssh->hwtstamp = ns_to_ktime(ns);
+>>   }
+>>   
+>> -static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id)
+>> +/**
+>> + * emac_xmit_xdp_frame - transmits an XDP frame
+>> + * @emac: emac device
+>> + * @xdpf: data to transmit
+>> + * @page: page from page pool if already DMA mapped
+>> + * @q_idx: queue id
+>> + *
+>> + * Return: XDP state
+>> + */
+>> +int emac_xmit_xdp_frame(struct prueth_emac *emac,
+>> +			struct xdp_frame *xdpf,
+>> +			struct page *page,
+>> +			unsigned int q_idx)
+>> +{
+>> +	struct cppi5_host_desc_t *first_desc;
+>> +	struct net_device *ndev = emac->ndev;
+>> +	struct prueth_tx_chn *tx_chn;
+>> +	dma_addr_t desc_dma, buf_dma;
+>> +	struct prueth_swdata *swdata;
+>> +	u32 *epib;
+>> +	int ret;
+>> +
+> drop new line and arrange below declarations in reverse xmas tree order.
+> 
 
-Okay. So let's implement per-pf only now. And if the global is needed in
-the future for older devices and we'll have a devlink instance to hang
-in on, let's add it later. Makes sense?
+As suggested by Dan, will drop these variabled and directly use them.
 
->
->> 
->> 
->> > +		return 0;
->> > +
->> > +	/* SRIOV is per PF */
->> > +	memset(mnvda, 0, sizeof(mnvda));
->> > +	err = mlx5_nv_param_read_per_host_pf_conf(dev, mnvda, sizeof(mnvda));
->> > +	if (err) {
->> > +		NL_SET_ERR_MSG_MOD(extack, "Unable to read per host PF configuration");
->> > +		return err;
->> > +	}
->> > +	MLX5_SET(nv_pf_pci_conf, data, pf_total_vf_en, ctx->val.vbool);
->> > +	return mlx5_nv_param_write(dev, mnvda, sizeof(mnvda));
->> > +}
->> > +
->> > static const struct devlink_param mlx5_nv_param_devlink_params[] = {
->> > +	DEVLINK_PARAM_GENERIC(ENABLE_SRIOV, BIT(DEVLINK_PARAM_CMODE_PERMANENT),
->> > +			      mlx5_devlink_enable_sriov_get,
->> > +			      mlx5_devlink_enable_sriov_set, NULL),
->> > 	DEVLINK_PARAM_DRIVER(MLX5_DEVLINK_PARAM_ID_CQE_COMPRESSION_TYPE,
->> > 			     "cqe_compress_type", DEVLINK_PARAM_TYPE_STRING,
->> > 			     BIT(DEVLINK_PARAM_CMODE_PERMANENT),
->> > --
->> > 2.48.1
->> > 
->> > 
+>> +	void *data = xdpf->data;
+>> +	u32 pkt_len = xdpf->len;
+>> +
+>> +	if (q_idx >= PRUETH_MAX_TX_QUEUES) {
+>> +		netdev_err(ndev, "xdp tx: invalid q_id %d\n", q_idx);
+>> +		return ICSSG_XDP_CONSUMED;	/* drop */
+>> +	}
+>> +
+>> +	tx_chn = &emac->tx_chns[q_idx];
+>> +
+>> +	first_desc = k3_cppi_desc_pool_alloc(tx_chn->desc_pool);
+>> +	if (!first_desc) {
+>> +		netdev_dbg(ndev, "xdp tx: failed to allocate descriptor\n");
+>> +		goto drop_free_descs;	/* drop */
+>> +	}
+>> +
+>> +	if (page) { /* already DMA mapped by page_pool */
+>> +		buf_dma = page_pool_get_dma_addr(page);
+>> +		buf_dma += xdpf->headroom + sizeof(struct xdp_frame);
+>> +	} else { /* Map the linear buffer */
+>> +		buf_dma = dma_map_single(tx_chn->dma_dev, data, pkt_len, DMA_TO_DEVICE);
+>> +		if (dma_mapping_error(tx_chn->dma_dev, buf_dma)) {
+>> +			netdev_err(ndev, "xdp tx: failed to map data buffer\n");
+>> +			goto drop_free_descs;	/* drop */
+>> +		}
+>> +	}
+>> +
+>> +	cppi5_hdesc_init(first_desc, CPPI5_INFO0_HDESC_EPIB_PRESENT,
+>> +			 PRUETH_NAV_PS_DATA_SIZE);
+>> +	cppi5_hdesc_set_pkttype(first_desc, 0);
+>> +	epib = first_desc->epib;
+>> +	epib[0] = 0;
+>> +	epib[1] = 0;
+>> +
+>> +	/* set dst tag to indicate internal qid at the firmware which is at
+>> +	 * bit8..bit15. bit0..bit7 indicates port num for directed
+>> +	 * packets in case of switch mode operation
+>> +	 */
+>> +	cppi5_desc_set_tags_ids(&first_desc->hdr, 0, (emac->port_id | (q_idx << 8)));
+>> +	k3_udma_glue_tx_dma_to_cppi5_addr(tx_chn->tx_chn, &buf_dma);
+>> +	cppi5_hdesc_attach_buf(first_desc, buf_dma, pkt_len, buf_dma, pkt_len);
+>> +	swdata = cppi5_hdesc_get_swdata(first_desc);
+>> +	if (page) {
+>> +		swdata->type = PRUETH_SWDATA_PAGE;
+>> +		swdata->data.page = page;
+>> +	} else {
+>> +		swdata->type = PRUETH_SWDATA_XDPF;
+>> +		swdata->data.xdpf = xdpf;
+>> +	}
+>> +
+>> +	cppi5_hdesc_set_pktlen(first_desc, pkt_len);
+>> +	desc_dma = k3_cppi_desc_pool_virt2dma(tx_chn->desc_pool, first_desc);
+>> +
+>> +	ret = k3_udma_glue_push_tx_chn(tx_chn->tx_chn, first_desc, desc_dma);
+>> +	if (ret) {
+>> +		netdev_err(ndev, "xdp tx: push failed: %d\n", ret);
+>> +		goto drop_free_descs;
+>> +	}
+>> +
+>> +	return ICSSG_XDP_TX;
+>> +
+>> +drop_free_descs:
+>> +	prueth_xmit_free(tx_chn, first_desc);
+>> +	return ICSSG_XDP_CONSUMED;
+>> +}
+>> +EXPORT_SYMBOL_GPL(emac_xmit_xdp_frame);
+>> +
+>> +/**
+>> + * emac_run_xdp - run an XDP program
+>> + * @emac: emac device
+>> + * @xdp: XDP buffer containing the frame
+>> + * @page: page with RX data if already DMA mapped
+>> + *
+>> + * Return: XDP state
+>> + */
+>> +static int emac_run_xdp(struct prueth_emac *emac, struct xdp_buff *xdp,
+>> +			struct page *page)
+>> +{
+>> +	struct net_device *ndev = emac->ndev;
+>> +	int err, result = ICSSG_XDP_PASS;
+> 
+> you could avoid initialization of result. see below.
+> 
+>> +	struct bpf_prog *xdp_prog;
+>> +	struct xdp_frame *xdpf;
+>> +	int q_idx;
+>> +	u32 act;
+>> +
+>> +	xdp_prog = READ_ONCE(emac->xdp_prog);
+>> +	act = bpf_prog_run_xdp(xdp_prog, xdp);
+>> +	switch (act) {
+>> +	case XDP_PASS:
+>> +		break;
+> instead of break how about?
+> 		return ICSSG_XDP_PASS;
+> 
+
+I looked into CPSW XDP implementation and its same as what you suggested 
+here. Will update this functon with your suggestions.
+
+>> +	case XDP_TX:
+>> +		/* Send packet to TX ring for immediate transmission */
+>> +		xdpf = xdp_convert_buff_to_frame(xdp);
+>> +		if (unlikely(!xdpf))
+> 
+> TX is dropped so here you need to
+> 			ndev->stats.tx_dropped++;
+
+Yes added it.
+
+>> +			goto drop;
+>> +
+>> +		q_idx = smp_processor_id() % emac->tx_ch_num;
+>> +		result = emac_xmit_xdp_frame(emac, xdpf, page, q_idx);
+>> +		if (result == ICSSG_XDP_CONSUMED)
+>> +			goto drop;
+> 
+> need to increment rx stats as we received the packet successfully?
+> 
+
+Yes I will do that.
+
+>> +		break;
+> instead,
+> 		return ICSSG_XDP_TX;
+> 
+
+returning result here as it depends on what emac_xmit_xdp_frame() returns
+
+>> +	case XDP_REDIRECT:
+>> +		err = xdp_do_redirect(emac->ndev, xdp, xdp_prog);
+>> +		if (err)
+>> +			goto drop;
+>> +		result = ICSSG_XDP_REDIR;
+>> +		break;
+> 
+> replace above 2 by
+> 		return ICSSG_XDP_REDIR;
+
+I suppose you meant "replace above to by?" I have updated it.
+
+>> +	default:
+>> +		bpf_warn_invalid_xdp_action(emac->ndev, xdp_prog, act);
+>> +		fallthrough;
+>> +	case XDP_ABORTED:
+>> +drop:
+>> +		trace_xdp_exception(emac->ndev, xdp_prog, act);
+>> +		fallthrough; /* handle aborts by dropping packet */
+>> +	case XDP_DROP:
+>> +		ndev->stats.tx_dropped++;
+> 
+> shouldn't this be
+> 		ndev->stats.rx_dropped++;
+> 
+
+Yes correct. Thanks for finding this. Fixed it.
+
+>> +		result = ICSSG_XDP_CONSUMED;
+> 
+> not required if we directly return this value below.
+> 
+>> +		page_pool_recycle_direct(emac->rx_chns.pg_pool, page);
+>> +		break;
+> 		return ICSSG_XDP_CONSUMED;
+>> +	}
+>> +
+>> +	return result;
+> 
+> drop this
+
+Done.
+> 
+>> +}
+>> +
+>> +static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id, int *xdp_state)
+>>   {
+>>   	struct prueth_rx_chn *rx_chn = &emac->rx_chns;
+>>   	u32 buf_dma_len, pkt_len, port_id = 0;
+>> @@ -552,10 +715,12 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id)
+>>   	struct page *page, *new_page;
+>>   	struct page_pool *pool;
+>>   	struct sk_buff *skb;
+>> +	struct xdp_buff xdp;
+>>   	u32 *psdata;
+>>   	void *pa;
+>>   	int ret;
+>>   
+>> +	*xdp_state = 0;
+>>   	pool = rx_chn->pg_pool;
+>>   	ret = k3_udma_glue_pop_rx_chn(rx_chn->rx_chn, flow_id, &desc_dma);
+>>   	if (ret) {
+>> @@ -596,9 +761,21 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id)
+>>   		goto requeue;
+>>   	}
+>>   
+>> -	/* prepare skb and send to n/w stack */
+>>   	pa = page_address(page);
+>> -	skb = napi_build_skb(pa, PAGE_SIZE);
+> 
+> We are running the xdp program after allocating the new page.
+> How about running the xdp program first? if the packet has to be dropped
+> then it is pointless to allocate a new page. We could just reuse the old page
+> and save CPU cycles.
+> 
+
+What if the packet need not be dropped (it has been processed by XDP) 
+Then we go to requeue, where new page is needed to map it to the next 
+upcoming packet descriptor. Hence running XDP needs new_page.
+
+>> +	if (emac->xdp_prog) {
+>> +		xdp_init_buff(&xdp, PAGE_SIZE, &rx_chn->xdp_rxq);
+>> +		xdp_prepare_buff(&xdp, pa, PRUETH_HEADROOM, pkt_len, false);
+>> +
+>> +		*xdp_state = emac_run_xdp(emac, &xdp, page);
+>> +		if (*xdp_state == ICSSG_XDP_PASS)
+>> +			skb = xdp_build_skb_from_buff(&xdp);
+>> +		else
+>> +			goto requeue;
+>> +	} else {
+>> +		/* prepare skb and send to n/w stack */
+>> +		skb = napi_build_skb(pa, PAGE_SIZE);
+>> +	}
+>> +
+>>   	if (!skb) {
+>>   		ndev->stats.rx_dropped++;
+>>   		page_pool_recycle_direct(pool, page);
+> 
+> instead of recycling the old page just reuse it
+> 		new_page = page;
+> 
+
+With the above explanation I think allocating new_page is inevitable.
+
+>> 		goto requeue;
+>> 	}
+> 
+> here you can allocate the new page cause now we're sure old page
+> has to be sent to user space.
+> 
+
+likewise to the above comment.
+
+>> @@ -861,13 +1038,23 @@ static void prueth_tx_cleanup(void *data, dma_addr_t desc_dma)
+>>   	struct prueth_tx_chn *tx_chn = data;
+>>   	struct cppi5_host_desc_t *desc_tx;
+>>   	struct prueth_swdata *swdata;
+>> +	struct xdp_frame *xdpf;
+>>   	struct sk_buff *skb;
+>>   
+>>   	desc_tx = k3_cppi_desc_pool_dma2virt(tx_chn->desc_pool, desc_dma);
+>>   	swdata = cppi5_hdesc_get_swdata(desc_tx);
+>> -	if (swdata->type == PRUETH_SWDATA_SKB) {
+>> +
+>> +	switch (swdata->type) {
+>> +	case PRUETH_SWDATA_SKB:
+>>   		skb = swdata->data.skb;
+>>   		dev_kfree_skb_any(skb);
+>> +		break;
+>> +	case PRUETH_SWDATA_XDPF:
+>> +		xdpf = swdata->data.xdpf;
+>> +		xdp_return_frame(xdpf);
+>> +		break;
+>> +	default:
+>> +		break;
+>>   	}
+>>   
+>>   	prueth_xmit_free(tx_chn, desc_tx);
+>> @@ -904,15 +1091,18 @@ int icssg_napi_rx_poll(struct napi_struct *napi_rx, int budget)
+>>   		PRUETH_RX_FLOW_DATA_SR1 : PRUETH_RX_FLOW_DATA;
+>>   	int flow = emac->is_sr1 ?
+>>   		PRUETH_MAX_RX_FLOWS_SR1 : PRUETH_MAX_RX_FLOWS;
+>> +	int xdp_state_or = 0;
+>>   	int num_rx = 0;
+>>   	int cur_budget;
+>> +	int xdp_state;
+>>   	int ret;
+>>   
+>>   	while (flow--) {
+>>   		cur_budget = budget - num_rx;
+>>   
+>>   		while (cur_budget--) {
+>> -			ret = emac_rx_packet(emac, flow);
+>> +			ret = emac_rx_packet(emac, flow, &xdp_state);
+>> +			xdp_state_or |= xdp_state;
+>>   			if (ret)
+>>   				break;
+>>   			num_rx++;
+>> @@ -922,6 +1112,9 @@ int icssg_napi_rx_poll(struct napi_struct *napi_rx, int budget)
+>>   			break;
+>>   	}
+>>   
+>> +	if (xdp_state_or & ICSSG_XDP_REDIR)
+>> +		xdp_do_flush();
+>> +
+>>   	if (num_rx < budget && napi_complete_done(napi_rx, num_rx)) {
+>>   		if (unlikely(emac->rx_pace_timeout_ns)) {
+>>   			hrtimer_start(&emac->rx_hrtimer,
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>> index 3ff8c322f9d9..1acbf9e1bade 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>> @@ -559,6 +559,33 @@ const struct icss_iep_clockops prueth_iep_clockops = {
+>>   	.perout_enable = prueth_perout_enable,
+>>   };
+>>   
+>> +static int prueth_create_xdp_rxqs(struct prueth_emac *emac)
+>> +{
+>> +	struct xdp_rxq_info *rxq = &emac->rx_chns.xdp_rxq;
+>> +	struct page_pool *pool = emac->rx_chns.pg_pool;
+>> +	int ret;
+>> +
+>> +	ret = xdp_rxq_info_reg(rxq, emac->ndev, 0, emac->napi_rx.napi_id);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>> +	ret = xdp_rxq_info_reg_mem_model(rxq, MEM_TYPE_PAGE_POOL, pool);
+>> +	if (ret)
+>> +		xdp_rxq_info_unreg(rxq);
+>> +
+>> +	return ret;
+>> +}
+>> +
+>> +static void prueth_destroy_xdp_rxqs(struct prueth_emac *emac)
+>> +{
+>> +	struct xdp_rxq_info *rxq = &emac->rx_chns.xdp_rxq;
+>> +
+>> +	if (!xdp_rxq_info_is_reg(rxq))
+>> +		return;
+>> +
+>> +	xdp_rxq_info_unreg(rxq);
+>> +}
+>> +
+>>   static int icssg_prueth_add_mcast(struct net_device *ndev, const u8 *addr)
+>>   {
+>>   	struct net_device *real_dev;
+>> @@ -780,10 +807,14 @@ static int emac_ndo_open(struct net_device *ndev)
+>>   	if (ret)
+>>   		goto free_tx_ts_irq;
+>>   
+>> -	ret = k3_udma_glue_enable_rx_chn(emac->rx_chns.rx_chn);
+>> +	ret = prueth_create_xdp_rxqs(emac);
+>>   	if (ret)
+>>   		goto reset_rx_chn;
+>>   
+>> +	ret = k3_udma_glue_enable_rx_chn(emac->rx_chns.rx_chn);
+>> +	if (ret)
+>> +		goto destroy_xdp_rxqs;
+>> +
+>>   	for (i = 0; i < emac->tx_ch_num; i++) {
+>>   		ret = k3_udma_glue_enable_tx_chn(emac->tx_chns[i].tx_chn);
+>>   		if (ret)
+>> @@ -809,6 +840,8 @@ static int emac_ndo_open(struct net_device *ndev)
+>>   	 * any SKB for completion. So set false to free_skb
+>>   	 */
+>>   	prueth_reset_tx_chan(emac, i, false);
+>> +destroy_xdp_rxqs:
+>> +	prueth_destroy_xdp_rxqs(emac);
+>>   reset_rx_chn:
+>>   	prueth_reset_rx_chan(&emac->rx_chns, max_rx_flows, false);
+>>   free_tx_ts_irq:
+>> @@ -879,7 +912,7 @@ static int emac_ndo_stop(struct net_device *ndev)
+>>   	k3_udma_glue_tdown_rx_chn(emac->rx_chns.rx_chn, true);
+>>   
+>>   	prueth_reset_rx_chan(&emac->rx_chns, max_rx_flows, true);
+>> -
+>> +	prueth_destroy_xdp_rxqs(emac);
+>>   	napi_disable(&emac->napi_rx);
+>>   	hrtimer_cancel(&emac->rx_hrtimer);
+>>   
+>> @@ -1024,6 +1057,90 @@ static int emac_ndo_vlan_rx_del_vid(struct net_device *ndev,
+>>   	return 0;
+>>   }
+>>   
+>> +/**
+>> + * emac_xdp_xmit - Implements ndo_xdp_xmit
+>> + * @dev: netdev
+>> + * @n: number of frames
+>> + * @frames: array of XDP buffer pointers
+>> + * @flags: XDP extra info
+>> + *
+>> + * Return: number of frames successfully sent. Failed frames
+>> + * will be free'ed by XDP core.
+>> + *
+>> + * For error cases, a negative errno code is returned and no-frames
+>> + * are transmitted (caller must handle freeing frames).
+>> + **/
+>> +static int emac_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
+>> +			 u32 flags)
+>> +{
+>> +	struct prueth_emac *emac = netdev_priv(dev);
+>> +	unsigned int q_idx;
+>> +	int nxmit = 0;
+>> +	int i;
+>> +
+>> +	q_idx = smp_processor_id() % emac->tx_ch_num;
+>> +
+>> +	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
+>> +		return -EINVAL;
+>> +
+>> +	for (i = 0; i < n; i++) {
+>> +		struct xdp_frame *xdpf = frames[i];
+>> +		int err;
+>> +
+>> +		err = emac_xmit_xdp_frame(emac, xdpf, NULL, q_idx);
+>> +		if (err != ICSSG_XDP_TX)
+>> +			break;
+>> +		nxmit++;
+>> +	}
+>> +
+>> +	return nxmit;
+>> +}
+>> +
+>> +/**
+>> + * emac_xdp_setup - add/remove an XDP program
+>> + * @emac: emac device
+>> + * @bpf: XDP program
+>> + *
+>> + * Return: Always 0 (Success)
+>> + **/
+>> +static int emac_xdp_setup(struct prueth_emac *emac, struct netdev_bpf *bpf)
+>> +{
+>> +	struct bpf_prog *prog = bpf->prog;
+>> +	xdp_features_t val;
+>> +
+>> +	val = NETDEV_XDP_ACT_BASIC | NETDEV_XDP_ACT_REDIRECT |
+>> +	      NETDEV_XDP_ACT_NDO_XMIT;
+>> +	xdp_set_features_flag(emac->ndev, val);
+>> +
+>> +	if (!emac->xdpi.prog && !prog)
+>> +		return 0;
+>> +
+>> +	WRITE_ONCE(emac->xdp_prog, prog);
+>> +
+>> +	xdp_attachment_setup(&emac->xdpi, bpf);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +/**
+>> + * emac_ndo_bpf - implements ndo_bpf for icssg_prueth
+>> + * @ndev: network adapter device
+>> + * @bpf: XDP program
+>> + *
+>> + * Return: 0 on success, error code on failure.
+>> + **/
+>> +static int emac_ndo_bpf(struct net_device *ndev, struct netdev_bpf *bpf)
+>> +{
+>> +	struct prueth_emac *emac = netdev_priv(ndev);
+>> +
+>> +	switch (bpf->command) {
+>> +	case XDP_SETUP_PROG:
+>> +		return emac_xdp_setup(emac, bpf);
+>> +	default:
+>> +		return -EINVAL;
+>> +	}
+>> +}
+>> +
+>>   static const struct net_device_ops emac_netdev_ops = {
+>>   	.ndo_open = emac_ndo_open,
+>>   	.ndo_stop = emac_ndo_stop,
+>> @@ -1038,6 +1155,8 @@ static const struct net_device_ops emac_netdev_ops = {
+>>   	.ndo_fix_features = emac_ndo_fix_features,
+>>   	.ndo_vlan_rx_add_vid = emac_ndo_vlan_rx_add_vid,
+>>   	.ndo_vlan_rx_kill_vid = emac_ndo_vlan_rx_del_vid,
+>> +	.ndo_bpf = emac_ndo_bpf,
+>> +	.ndo_xdp_xmit = emac_xdp_xmit,
+>>   };
+>>   
+>>   static int prueth_netdev_init(struct prueth *prueth,
+>> @@ -1066,6 +1185,8 @@ static int prueth_netdev_init(struct prueth *prueth,
+>>   	emac->prueth = prueth;
+>>   	emac->ndev = ndev;
+>>   	emac->port_id = port;
+>> +	emac->xdp_prog = NULL;
+>> +	emac->ndev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
+>>   	emac->cmd_wq = create_singlethread_workqueue("icssg_cmd_wq");
+>>   	if (!emac->cmd_wq) {
+>>   		ret = -ENOMEM;
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>> index 3bbabd007129..0675919beb94 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>> @@ -8,6 +8,8 @@
+>>   #ifndef __NET_TI_ICSSG_PRUETH_H
+>>   #define __NET_TI_ICSSG_PRUETH_H
+>>   
+>> +#include <linux/bpf.h>
+>> +#include <linux/bpf_trace.h>
+>>   #include <linux/etherdevice.h>
+>>   #include <linux/genalloc.h>
+>>   #include <linux/if_vlan.h>
+>> @@ -134,6 +136,7 @@ struct prueth_rx_chn {
+>>   	unsigned int irq[ICSSG_MAX_RFLOWS];	/* separate irq per flow */
+>>   	char name[32];
+>>   	struct page_pool *pg_pool;
+>> +	struct xdp_rxq_info xdp_rxq;
+>>   };
+>>   
+>>   enum prueth_swdata_type {
+>> @@ -141,6 +144,7 @@ enum prueth_swdata_type {
+>>   	PRUETH_SWDATA_SKB,
+>>   	PRUETH_SWDATA_PAGE,
+>>   	PRUETH_SWDATA_CMD,
+>> +	PRUETH_SWDATA_XDPF,
+>>   };
+>>   
+>>   struct prueth_swdata {
+>> @@ -149,6 +153,7 @@ struct prueth_swdata {
+>>   		struct sk_buff *skb;
+>>   		struct page *page;
+>>   		u32 cmd;
+>> +		struct xdp_frame *xdpf;
+>>   	} data;
+>>   };
+>>   
+>> @@ -159,6 +164,12 @@ struct prueth_swdata {
+>>   
+>>   #define PRUETH_MAX_TX_TS_REQUESTS	50 /* Max simultaneous TX_TS requests */
+>>   
+>> +/* XDP BPF state */
+>> +#define ICSSG_XDP_PASS           0
+>> +#define ICSSG_XDP_CONSUMED       BIT(0)
+>> +#define ICSSG_XDP_TX             BIT(1)
+>> +#define ICSSG_XDP_REDIR          BIT(2)
+>> +
+>>   /* Minimum coalesce time in usecs for both Tx and Rx */
+>>   #define ICSSG_MIN_COALESCE_USECS 20
+>>   
+>> @@ -227,6 +238,8 @@ struct prueth_emac {
+>>   	unsigned long rx_pace_timeout_ns;
+>>   
+>>   	struct netdev_hw_addr_list vlan_mcast_list[MAX_VLAN_ID];
+>> +	struct bpf_prog *xdp_prog;
+>> +	struct xdp_attachment_info xdpi;
+>>   };
+>>   
+>>   /* The buf includes headroom compatible with both skb and xdpf */
+>> @@ -465,5 +478,9 @@ void prueth_put_cores(struct prueth *prueth, int slice);
+>>   
+>>   /* Revision specific helper */
+>>   u64 icssg_ts_to_ns(u32 hi_sw, u32 hi, u32 lo, u32 cycle_time_ns);
+>> +int emac_xmit_xdp_frame(struct prueth_emac *emac,
+>> +			struct xdp_frame *xdpf,
+>> +			struct page *page,
+>> +			unsigned int q_idx);
+>>   
+>>   #endif /* __NET_TI_ICSSG_PRUETH_H */
+> 
+
 
