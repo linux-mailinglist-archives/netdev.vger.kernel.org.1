@@ -1,91 +1,161 @@
-Return-Path: <netdev+bounces-171323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13384A4C880
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:01:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 652CFA4C8A6
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:05:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA39A1673B2
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 16:57:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 732DF3A7AF3
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 16:57:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DAD0234990;
-	Mon,  3 Mar 2025 16:34:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3699216E35;
+	Mon,  3 Mar 2025 16:36:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2rfDMlVP"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="azrHG4+U"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D56E61F2369;
-	Mon,  3 Mar 2025 16:34:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565C8215191;
+	Mon,  3 Mar 2025 16:36:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741019662; cv=none; b=d5UDxHbCoAeI0/4UvfJVIPO7s6VbT1Z+xK0/bVTbtQaGDd1npixy5KbTcSYifIS/R/qSXHjCTAKdOyumWi8V54tKBaXGd6Jm12lacHJ7EXmjNojIcYAvDqE+XBFY0/WQ+MChv5qp+9rYYdeQzS8M0ZMHr1fA3iHfhG1L+hmpshc=
+	t=1741019789; cv=none; b=PJX8ENmzZW0Zu5TH3/azRfRRx5ygeycbWnvR2v8ZHjKv5ZqRDNPZILQ3oUV2jaA0AY0AkzzcM+e24K+U4ZijMesyKlIKjxaak4pYq+h0qMTg2nvNzeK05ETiVLhb10Ow7nStWNTq7PqtPrJuFgkj3AQ+G/mOsqo6pBQuYBz93kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741019662; c=relaxed/simple;
-	bh=JEREDIx7cDVnisiJSln7PJ4q8Cuobkgpq9TFywWa9xw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DUaOXMaXDjZprGMBlCqGTMihg9jm5t6KehVDRWiEnclCCSjOE5fmvO1HgG3Sa5yShQX6MX2Rr/o7Yt9XAcsMC1GxYQvNUOdCc+3kWIeRjj5D2fltzQHoYLHN1IIFyDN13uYwxUfxnAJZEf7a8/GgW/a46AFOraUGl4zZgWBWVZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2rfDMlVP; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=tZrvmzOYhHd3Yc3bExSIoHQkrJFa5shgHlbx7+V1470=; b=2rfDMlVPuCxAb9KwnSLmbgQ2KS
-	GmWIPo5hXCrLAKfouYO9pv0nASWPd8JfDgKcgdJ9OVikYoqr3Jnjhash91mONdYJR9n+LzcJ8+8td
-	TtSrhdfptxivcLR4MkAjhxQtYeQfY79vWx6aY2YP2gVqEB4RSbfwaD1I3H0a0/BMUiz8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tp8jy-001rW6-Ui; Mon, 03 Mar 2025 17:34:02 +0100
-Date: Mon, 3 Mar 2025 17:34:02 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Cc: Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH 1/3] dt-bindings: net: dwmac: Increase 'maxItems' for
- 'interrupts' and 'interrupt-names'
-Message-ID: <41eb620e-7cb7-4763-9fed-1f9fd2800795@lunn.ch>
-References: <20250302181808.728734-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250302181808.728734-2-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250303152628.GA1873145-robh@kernel.org>
- <CA+V-a8ukVgx7OqDTP6EharPJxUnVw5wAohveJw+VCABvz7FSRA@mail.gmail.com>
+	s=arc-20240116; t=1741019789; c=relaxed/simple;
+	bh=xaN0Z9STeRU3x7d05JOsDuCx42/1AlGaaAsdDktb1YY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=XttWGI2nRPdaZ4yX7SSjyihVTA1D8Lr8pGs4omIeHJ05EdG9csoTAMz0sWcQzXkraF8kesr2wns4ZoUBCgMDUk4Bu29P8BhHNbQgZS+gxMir5pCL7UXdJq5FZ0iNEkqsp18gbDpZtsAMAfpZK+hLP+E2Gf59U70saw6gtJYb1fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=azrHG4+U; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 306E9204D3;
+	Mon,  3 Mar 2025 16:36:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1741019780;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S6RTe4/EaQ9JN6jTa2Zt6y/07I+0OzAWBVKZO29P9Yo=;
+	b=azrHG4+U+TrJfwpTjCXkZMz/cp4WTInac2QQvtNhQ+BZbolsf6qfTaM5RvnLo/Onhzek9o
+	HZ6D5t1doWHHvswS2t1x1ZByie19oLGvM9YbeB8xNweq2GolI/vDP77cpYaHUuh67J4rQL
+	fl7zIqVMIE+8ocfJoo7NLNAN+23bdsiSfmDTo9SQ0I7uP6G/WgIFyXT5At1Le3jOkP7ei0
+	vVwshgAS8nLgRjqoSrz5X4vNufYdjsey7H++GaitLcLsj+jBP+zYHJk4jCfzWaNa15H+Fs
+	+xbvG6wJZqqhLqhIKF/aMhJKarlmV4VfYzMcqUtBoa6dTK0JhVqvKk6MdzEDnw==
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: linux-wpan@vger.kernel.org,  netdev@vger.kernel.org,
+  linux-kernel@vger.kernel.org,  linux-gpio@vger.kernel.org,  Alexander
+ Aring <alex.aring@gmail.com>,  Stefan Schmidt <stefan@datenfreihafen.org>,
+  Andrew Lunn <andrew+netdev@lunn.ch>,  "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Linus
+ Walleij <linus.walleij@linaro.org>,  Bartosz Golaszewski <brgl@bgdev.pl>
+Subject: Re: [PATCH net-next v1 2/2] ieee802154: ca8210: Switch to using
+ gpiod API
+In-Reply-To: <Z8XYuY2idCVrAfdm@smile.fi.intel.com> (Andy Shevchenko's message
+	of "Mon, 3 Mar 2025 18:28:41 +0200")
+References: <20250303150855.1294188-1-andriy.shevchenko@linux.intel.com>
+	<20250303150855.1294188-3-andriy.shevchenko@linux.intel.com>
+	<8734fu84r8.fsf@bootlin.com> <Z8XYuY2idCVrAfdm@smile.fi.intel.com>
+User-Agent: mu4e 1.12.7; emacs 29.4
+Date: Mon, 03 Mar 2025 17:36:18 +0100
+Message-ID: <87v7sq5awt.fsf@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+V-a8ukVgx7OqDTP6EharPJxUnVw5wAohveJw+VCABvz7FSRA@mail.gmail.com>
+Content-Type: text/plain
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdelleeivdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefujghffgffkfggtgesthdtredttdertdenucfhrhhomhepofhiqhhuvghlucftrgihnhgrlhcuoehmihhquhgvlhdrrhgrhihnrghlsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefhleekvdevffeluefhiefgvdevhffgjefggffhieetgeetiedugeeftdejheekfeenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghloheplhhotggrlhhhohhsthdpmhgrihhlfhhrohhmpehmihhquhgvlhdrrhgrhihnrghlsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedugedprhgtphhtthhopegrnhgurhhihidrshhhvghvtghhvghnkhhosehlihhnuhigrdhinhhtvghlrdgtohhmpdhrtghpthhtoheplhhinhhugidqfihprghnsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhin
+ hhugidqghhpihhosehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghlvgigrdgrrhhinhhgsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhtvghfrghnsegurghtvghnfhhrvghihhgrfhgvnhdrohhrghdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghh
+X-GND-Sasl: miquel.raynal@bootlin.com
 
-> How do you want me to handle this case:
-> 1] Update vendors binding
-> 2] Duplicate snps,dwmac.yaml in vendors binding.
+On 03/03/2025 at 18:28:41 +02, Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
 
-Not the second. The stmmac driver is a mess because vendors do their
-own thing rather than try to be the same as all other
-vendors. Duplicating it will just make it worse.
+> On Mon, Mar 03, 2025 at 05:20:59PM +0100, Miquel Raynal wrote:
+>
+> ...
+>
+>> > - * @gpio_reset:     gpio number of ca8210 reset line
+>> > - * @gpio_irq:       gpio number of ca8210 interrupt line
+>> > + * @reset_gpio:     GPIO of ca8210 reset line
+>> 
+>> What about "CA8210 Reset GPIO line"? Or Just "Reset GPIO line"? Or even
+>> "Reset GPIO descriptor" (whatever).
+>> 
+>> > + * @irq_gpio:       GPIO of ca8210 interrupt line
+>> 
+>> Same
+>
+> Sure.
+>
+> [...]
+>
+>> > -	int ret;
+>> > -	struct ca8210_platform_data *pdata = spi->dev.platform_data;
+>> > +	struct device *dev = &spi->dev;
+>> > +	struct ca8210_platform_data *pdata = dev_get_platdata(dev);
+>> 
+>> Can you either mention the additional cleanup that you do in the commit
+>> log or split it in a separate commit? (splitting is probably not
+>> necessary here given that most of the cleanup anyway is related to the
+>> actual changes.
+>
+> Do you mean the platform_data accessors?
 
-	Andrew
+Yes.
+
+> I can actually split it to a separate
+> change as I had done some of that in the past in other drivers.
+
+Up to you, either way, as long as it is mentioned in the commit log, I'm
+happy.
+
+>
+> ...
+>
+>> > -	ret = gpio_direction_output(pdata->gpio_reset, 1);
+>> > -	if (ret < 0) {
+>> > -		dev_crit(
+>> > -			&spi->dev,
+>> > -			"Reset GPIO %d did not set to output mode\n",
+>> > -			pdata->gpio_reset
+>> > -		);
+>> > -	}
+>> > -
+>> > -	return ret;
+>> > +	return PTR_ERR_OR_ZERO(pdata->reset_gpio);
+>> 
+>> This is not a strong request, but in general I think it is preferred to return
+>> immediately, so this looks easier to understand:
+>
+> I used the same logic as in the original flow.
+
+That's true, and I understand your choice in the first place. But given
+that you're also doing a bit of cleanup, one more misc change feels okay.
+
+>
+>> +	pdata->reset_gpio = devm_gpiod_get(dev, "reset", GPIOD_OUT_HIGH);
+>> +	if (IS_ERR(pdata->reset_gpio)) {
+>> +		dev_crit(dev, "Reset GPIO did not set to output mode\n");
+>> +                return PTR_ERR(pdata->reset_pgio);
+>> +       }
+>> +
+>> +       return 0;
+>
+> Sure I can do this in v2.
+
+Great!
+
+> ...
+>
+>> Otherwise the rest lgtm.
+>
+> Thank you for the review!
 
