@@ -1,156 +1,218 @@
-Return-Path: <netdev+bounces-171326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AA5CA4C891
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:03:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA38BA4C6D4
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:23:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F1691884D40
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 16:59:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E84403A8335
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 16:22:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5375A23BFBB;
-	Mon,  3 Mar 2025 16:37:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3632321B9CF;
+	Mon,  3 Mar 2025 16:14:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="eBDYHjPb"
 X-Original-To: netdev@vger.kernel.org
-Received: from dediextern.your-server.de (dediextern.your-server.de [85.10.215.232])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2059.outbound.protection.outlook.com [40.107.93.59])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5D8C215186;
-	Mon,  3 Mar 2025 16:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.10.215.232
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741019858; cv=none; b=gsuWFcJ7oxlFK8ag7XUenFe3w+8b1VocJf8tvFf+YLsMd2ttA85TaT9Flzx2STe6DyjfDlKfdS3ugfCIJLHxEwFFLc1BOXbZ3rqjWRAPYapZLxpKt4Rlja1omJM2ZZUXO7uOIc8xxKJN7aKhi90R8hC01XYrlN6Ppzqsv5gm81g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741019858; c=relaxed/simple;
-	bh=7cLK0c6/NN6Y78XzvU0YKuImm5q5qadvNye1FRGgIJE=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:Content-Type; b=jGpNVziW2T2pyC6I4qlEm3pGTSMP0al+aI+4qJq0oiZtOXQFK37blJ7UKLrDf4JwWjtw3I0oSK/VFzZ+R1tS8MijeBzw8LYHTwojMfKhFMrjsrFyQ5xcM4Y/zMRuuw8oGqoTjnvJ7hs9YR2nDplcdwGRR4oXiSLDzuTsquYSYI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de; spf=pass smtp.mailfrom=hetzner-cloud.de; arc=none smtp.client-ip=85.10.215.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hetzner-cloud.de
-Received: from sslproxy06.your-server.de ([78.46.172.3])
-	by dediextern.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
-	id 1tp8QD-000A7N-9R; Mon, 03 Mar 2025 17:13:37 +0100
-Received: from [2a01:599:740:99a0:dca3:a01b:3e4a:389f]
-	by sslproxy06.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
-	id 1tp8QC-000ICz-06;
-	Mon, 03 Mar 2025 17:13:37 +0100
-Message-ID: <4b69bd2b-a0ad-44f6-9f43-070241bd8089@hetzner-cloud.de>
-Date: Mon, 3 Mar 2025 17:13:34 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8473421B8E7
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 16:13:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.59
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741018440; cv=fail; b=aWWEImJFFdj3c/ghTK7wu1cYhlOGsqpW400t6/kZJD8do0x63Vj8E6MSXB2QCQTDX27PClNOdpUK06WRvLzthOt/LxoWPn4DKpAhG4lnwOYSd50NajdMBpSOL/LYz9vzRPk/5Np860O+6BvZMna3BNa5jDkSUhNxSDnKHQ+zWeQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741018440; c=relaxed/simple;
+	bh=DTPl2dJ2wBWMueSkrijklUjeqntGI7bLNAIs5W6J/Rc=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=FS/pr/at9uIiNjWLtmgCPp3D/ohD8rGVA6JB1JVwly3Oxy8g0LsGdyqmjSEATK2IcotTD3BwZfWhdrps2QwVCrWZALmGnX+sCAmTYeqv1P2EY738/LPlKRUfGY0l4ON2BqIcD+iDEOXMCUpi2XoWXHl170FO5oJaAhhbBL+u4Js=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=eBDYHjPb; arc=fail smtp.client-ip=40.107.93.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bOwWtVm0f/s5G9VQli5GITBdISlzGt5CSSy4i5+CswwuWhDyG2Bap7Gu8kYoJ6gpaAP9L5qh6RailDArMAG2hI3tlIgC7NhGT6hq97H09yksMpLjcw6GoXTq6bBCOOP1G/gV64lUDIbf9A+zEgBHvd7gyaJVc9dOtMGFrMtciykS5ohaAiHreKO3PFFtMmBPNGurXCFV1WbDTXV0ODIscj0AStk3gwSQYBDK8vRLKyyRHKQTqcLEXGTKyb7WGejyeGOrmUP2c57qa9gv7v+1QVHlyPi4Oyr0IAUW279qEV1+/OK0I6Pew+zMHhZfGX0DiWx19ZG3crbHYGTFpeOs7Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UBy8zsDnVaK4Z82b0FZZs/DgrQeZWCNUfvEphtp/+gM=;
+ b=y48C6hacAF0obVSyibaXN7xQukgUtsPGytApD1ynrBNGURCbQJ1wGPfjVFP0tAPIlJKsRD72FwvXVHwrXEdnXqTTqSe36fqk49omtU0kK1OWx7KnS9EFAfCxzbaIeezn84g/YtXh8YtU4OOynE2nywKoMJuPnIZKU4rKV4QM6bNtvcvN3bQGtzIIWd3A7GvT3NeoCGxNifc4BWCr6HESob4x6AnDdHzTZO22ek3NCuirIkcNBlhADh9xXkmLGQ10h6e54Es9oi5Zz1XGUKqHkSN76ke7GmqHk0GWJaHcAg59gebz9QWXK5fjPb1cJW21N5a2b6lCm+ueJODm4HBPOg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UBy8zsDnVaK4Z82b0FZZs/DgrQeZWCNUfvEphtp/+gM=;
+ b=eBDYHjPbkqFV8cHuBP5ZuH4flg7l51wBhOKK1XR3ltMR9XpQQn/kmyVwN035jnodOlWc1DQrTII2+qfaV3pYoUeK/4eWoKu1DiW40lzc6UNMFO0uHpvVsRjTS62I7dqD1ba6cF1xHk1u8h0Za5Ww/askxO5Qaj2g0mBj0j6WKMzM2nhHOFVQ2LDfQWEJvdKywUkU4/c+CP3Y5PDU/BWLS4OMuINMNlfU8pAnBuj2nxRiOjhKDVWrxMbi013B2EHdJIhoAyCp8aF3jHTYzfuDwbRVnroyo5C5KdoxW7ySuz0Se/2O5+ZjArTCLjij0OdlXR15r/ws9ufi2x2Wb5ZCsA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DM4PR12MB8558.namprd12.prod.outlook.com (2603:10b6:8:187::22)
+ by MN2PR12MB4094.namprd12.prod.outlook.com (2603:10b6:208:15f::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.25; Mon, 3 Mar
+ 2025 16:13:49 +0000
+Received: from DM4PR12MB8558.namprd12.prod.outlook.com
+ ([fe80::5ce:264f:c63c:2703]) by DM4PR12MB8558.namprd12.prod.outlook.com
+ ([fe80::5ce:264f:c63c:2703%5]) with mapi id 15.20.8489.025; Mon, 3 Mar 2025
+ 16:13:48 +0000
+From: Wojtek Wasko <wwasko@nvidia.com>
+To: netdev@vger.kernel.org
+Cc: richardcochran@gmail.com,
+	vadim.fedorenko@linux.dev,
+	kuba@kernel.org,
+	horms@kernel.org,
+	anna-maria@linutronix.de,
+	frederic@kernel.org,
+	pabeni@redhat.com,
+	tglx@linutronix.de
+Subject: [PATCH net-next v4 0/3] Permission checks for dynamic POSIX clocks
+Date: Mon,  3 Mar 2025 18:13:42 +0200
+Message-ID: <20250303161345.3053496-1-wwasko@nvidia.com>
+X-Mailer: git-send-email 2.47.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: LO2P265CA0257.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:8a::29) To DM4PR12MB8558.namprd12.prod.outlook.com
+ (2603:10b6:8:187::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, mykolal@fb.com,
- shuah@kernel.org, hawk@kernel.org, Willem de Bruijn <willemb@google.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20250227142330.1605996-1-marcus.wichelmann@hetzner-cloud.de>
- <20250227142330.1605996-3-marcus.wichelmann@hetzner-cloud.de>
- <090ede76-0c9f-4297-9d5a-7b75aa20ca27@linux.dev>
-Content-Language: en-US
-From: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
-Autocrypt: addr=marcus.wichelmann@hetzner-cloud.de; keydata=
- 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
- wySmewx3h/yfMh0aFxHhvLPxrO2IEQ==
-Subject: Re: [PATCH bpf-next v4 2/6] net: tun: enable transfer of XDP metadata
- to skb
-In-Reply-To: <090ede76-0c9f-4297-9d5a-7b75aa20ca27@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: marcus.wichelmann@hetzner-cloud.de
-X-Virus-Scanned: Clear (ClamAV 1.0.7/27566/Mon Mar  3 11:10:09 2025)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB8558:EE_|MN2PR12MB4094:EE_
+X-MS-Office365-Filtering-Correlation-Id: c3301e05-3275-4c74-99b4-08dd5a6e619b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?bXhZZXNtZDRNZ1JSY0tVMHF2bk9xeWN4blIzaVlya1IxMXVOdHgxUHVzRkU1?=
+ =?utf-8?B?Uk92VHlQTCtrVTJJOFlXV0dHdG54Y2lTNHdZZHJDM2REWFJERnNmYThFYU9I?=
+ =?utf-8?B?OEw0WkU3N1k0Si9mU0ZGQzhRUHVwd2pHa0VkZ1ZIRkd2TzJxekl2WDVWSUox?=
+ =?utf-8?B?NmlNZUNzckUyQjRJMGVnN2JyQTBlYzZTQk9Md01IdDZBaGJIaXRwNlZ6QTBh?=
+ =?utf-8?B?dzg1bkdZWURqNTBLakNwK2Y0VVh2TW5XMkFCejNBbHY5aVAwQmQ3SkpTS0o5?=
+ =?utf-8?B?M1JGdWNRMEUrOC8zd1RhU1dhbXlzYWVZem1RYnlxeEtvaWwvWWYvdGFsNnFP?=
+ =?utf-8?B?Ry80cC9jeVZWN2YrRmNMVlViTHpEUFZpeTJtVHRSaWZlajRCeVJ4SE1PZFdF?=
+ =?utf-8?B?bjhWK25HaDhHS0ZOMUU1VGd4dEVYZG54S1kvSE1YUW5QY2h4Q2FlZ3lPUHdB?=
+ =?utf-8?B?Y1kwSWk1NTh0d1JQTUdJWit1anYzaEJoOVBqT3NVNTIxc25ObFMxNmR0Q2hm?=
+ =?utf-8?B?ZExML1d0OHVBY2F1WWVrRzV0QUxMaHFyZVZFR3J0UjR4OVhjYXFaUmMwaWtE?=
+ =?utf-8?B?Rm5WcHgzc1kxNmNpNWNLTG9vdTAySFlyNW1HTnBEMWF3TVlVOWVkMVFsbDYx?=
+ =?utf-8?B?ZUNYRGxob0VRY1orZVVQeDhpYnlaRWhObVUydElsY0xCVHh5THI3dEd2V3Mr?=
+ =?utf-8?B?WTA5eHRKVTlFR09sd3FwZ3hDK1gxQ1FkYkY2RDBKVTNraUtCTlVtMXZVek1r?=
+ =?utf-8?B?NUsrMUNKbUFHTjQxdEEzREpPVE5DYkdleitHZFB2MG1EUEtNdVgyQkxHUGhP?=
+ =?utf-8?B?TFJ1Qkc5N1FPWTBHVk1KU20wRnJPNkFtZnpkT2ZUbUJXRk9YMHY5c1NTMy9C?=
+ =?utf-8?B?OHZEU3FYb0xJMHVjbXVaTE1FY0lBa3E1QkZMMXB1cWNjREFTbDJsUzE2eldt?=
+ =?utf-8?B?WDVDaEUxMzRaRG81NGVqVzdnZGZQdG5GLzIyQjRVVHRJVXhYbk9MVmJNMk9k?=
+ =?utf-8?B?ZE1aNndiUTVkVWFhQnJ6Rk02aW0wOUFzcUNEVnlxMTR3WVU3U2ZoWmtoQ3Q4?=
+ =?utf-8?B?L015WTFJdnZSa2tWa3MyMWNkaGw3ZDBweXhVc0VtTEV6bVJQMCtTYi9aRFJh?=
+ =?utf-8?B?UVVQelJWMEk5cXNlY3E2d3hvT2FSOFFoZlF0SDNDZ1lNSGxqc0lyTzhKNllO?=
+ =?utf-8?B?VG14c1hxZXhEbG5qRUE2UjlXakFrVnFLUUlQQVFqSStQd2hFek11WEpiVXN0?=
+ =?utf-8?B?ZWJSNnpKMW92b0tiM2lraWwrN3NiNU5NYnQ4SmdreE1vbFFtTnJCbnh0b1Np?=
+ =?utf-8?B?RlN4TnYvdUdYR09OM1pyVGRHb1ZUVVdoVmhHSU0vWlVBQUhPeG5oODlOVWF6?=
+ =?utf-8?B?RGtoK1VIMkZrRWFRckxmcFVtVzNsT2hndHFFUTBYSTNCZXJueXFLSkE2MWlx?=
+ =?utf-8?B?Z0REc3pCQzZKT09sajlkODVVTTJxOGFja1NjckdwWmt2WG4rUXk5d2NpSU43?=
+ =?utf-8?B?RmNwWjU5clZFQUN3c0gvUHBFTUJNbVBja3dSWlBBdTlNMjJDc2VINUtRR0tp?=
+ =?utf-8?B?TkRNRGx2RVROZmtHSjNyTC8vdGZnZXdFekNCM2ppYS8wNnRwM1NNTDFZWE5E?=
+ =?utf-8?B?bjdkUmtqMkFJeWVvaWc5QzQyZHdYTVVhU0VXemNTSTB4dkw5RnNmWlc4YXBU?=
+ =?utf-8?B?dHQzY2NpclU0ajJlUCswWTRJZ09OTTVUV3hIeXNqejFmckhGQWFBanhPSG9G?=
+ =?utf-8?B?ZDVVYlpqQlVSWDAxRDFvTDV1L0grWEswU0l2ZTM3WmRwN3lxMUdJc3k1UFF5?=
+ =?utf-8?B?Z21zWC9WSm1FUDN0aVBuVHRuUlhyN256Q09WY1hRQ3pIaEo0ZkVNdXdCSkpH?=
+ =?utf-8?Q?8BrmnggBEoSCU?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB8558.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Y1JaWTVZdUFtVmtLWDN5UXZpVFhZbExYZkJGRVk5SXZFcHp5WWlKZmxQQmsw?=
+ =?utf-8?B?elVNUWM3RDJvZml1Zm9tNm83SDFVdEFBc0FaK3ZuVDF6UUhsRnE5ZmMvZFlz?=
+ =?utf-8?B?VDc5cEJ5eVBTN3NRZndaZ2xyVjVFMTNITFhsRWdKcUNCWFgvRytwRW5CUjU3?=
+ =?utf-8?B?cTFJeTBxZEZkRnVtQmc3WnpsNkhNSmtscUI2QnFBU3BxZGlYTjdqSkJ3SzR2?=
+ =?utf-8?B?MnZ4RFJhanJYcjR3VjhXb0ZXUG8zMldTYWFVa1RmdklCVGJhYTF1LytTSlh6?=
+ =?utf-8?B?WmZJWWpDVjV3SnVZMW1NNnViVUlVbEt5eXdiak92K0NJRjhsWmVNQitVT3Nt?=
+ =?utf-8?B?OGFnT2Q0MURpa1Z1M1drMHJDZFp5Q0xWV0gvWjhwb0hFS1FCUWRWWlBxLy9O?=
+ =?utf-8?B?cm9LL2Voa3ZpOXpUL3dLTVZQTlRFNlp3RFozbkhLSVI1THBMeFl3WVpoTU43?=
+ =?utf-8?B?dXVTMnBZdldhZTUvZDdDMnpxcEZyQkFyN0pxZmh6L0sxaXNaQ3pYdmNzbFdG?=
+ =?utf-8?B?N3VMMFZqeXY1UVQwVzVFTGtXb2VhMUIyekRhOEcvS2Y2d3hjVFRyYzdxd3Y3?=
+ =?utf-8?B?NzNaekxGcFM0OFg4VDhzZnY5UWg4cGp1eThNVE0vQURtd2NWTS9GbFV2bE5S?=
+ =?utf-8?B?eWk0RU4xTXF1Y2dYbkNQZFhGQTBsUytRVEIxckZhRGhUNWxQZXZiYXc2VHR1?=
+ =?utf-8?B?QWVaYjlPNTRKRnZCQXV0SCtmdExxS0FZRnBNbGZrcjlXWjFqZEo1UXF2dnM3?=
+ =?utf-8?B?RlR0OVZuZzByR0k5YlhFOVl2NWpuMVlFR1A5ZGJBcTlrMFdtaXZCQWVVZ0ZT?=
+ =?utf-8?B?RDh1cDJJL1hRU3BzVEdkTjE0TXBMUG1Ua1R1ZGthUytwRGI1QmRSblFkMUxi?=
+ =?utf-8?B?cFlzd242ZzNZYWNxUmEwWTdJRDNaNDZFb0NpclBLVjkvNEtkbS9DK093VjJn?=
+ =?utf-8?B?OHN5NS8wRXV0dmk1UUN3S2lGRDc2U2o5NnByd0xEZElNc296TnBLVnFMWGMr?=
+ =?utf-8?B?K056dlZBSVdnZ0hNR2sxcUxlSXJlZnVxK240Q2gza2U2cU9FbWhzeE5SRU14?=
+ =?utf-8?B?bGRMVk1vQ0xTTk1VYWxtWUJvNFdTYk5jSjlSc01Rd2xLdXdHRDRIM3ZZNkd4?=
+ =?utf-8?B?SGF1SjMzaFhDY2JVQ0QxZUZTSE15SEFlNEJickFMYmxXeGNBZlhXRS80K2dI?=
+ =?utf-8?B?UjVEdXZ4eHVsdVhIU09yMXFFWXY4VnVWU3hKYUdiTWpLZjRRZGtJV1hRajBR?=
+ =?utf-8?B?THNTN2lxVGR4SktXVUMwbFFseUUweWdTVHNjRi84QnF5L0toVm1hZEttdXhv?=
+ =?utf-8?B?K014R29SdEJmcmhwZStnM3U0WlBvYXZIRS9ZWUI4VE1sM3hlVlJRUG9kd21L?=
+ =?utf-8?B?a1RvcG5QT0wrRS85YTNCZWxEMmJWY0h5VnhKZnM2NzdzTHJ5U2RSZlRDTkhu?=
+ =?utf-8?B?dGtpMzh0QzRaUmRpMG5zWDlkeXpYSTJWOTRJSUkzVWJsMHpVTXNvL21INi8z?=
+ =?utf-8?B?a09Ba2lZenQ5WFZhYUsrZ0xINzN5SWp0KzV1OFVzTHhsdFpQSXB1UlQ3NGxU?=
+ =?utf-8?B?ZVlqU3FzT1JvZ0ZzT01uRlZpUisvdHVHclkrcWRNZ0I5ZXArZ1A1S0d5ZmVx?=
+ =?utf-8?B?Yk5Fcy82c1krUFl4UnMxQnA0SGg1NHI3SzZzOFg4VlYwK1Nwa3BDWEtkVjhB?=
+ =?utf-8?B?Nnl4NG9zb3BLVFQ2ajYzOWVxdWJiODVEcXlDTVNJV05uRENEY3BoZTNUanE0?=
+ =?utf-8?B?OUE5YWlpWXY3NzN1UjRJbjRLM21oRnF6bFdFNGhZakpSVUlRTFltcGdNQmJL?=
+ =?utf-8?B?RFdXUkthcjQ4eTg2MWt4a09COHNva1pMR2JzZ2NUZWtNbkFoYlYyK0ZITWhN?=
+ =?utf-8?B?RjVEbXRzQUgvelhyS0lUWW9LcUcwWWN4bkpsOE1nNU1pUmYwcmF0bHpQdG5F?=
+ =?utf-8?B?ckJES0I0RkpKZ0F3WDRGV2hsK0cyVWd1akxvTStidHdTd0Jib1BsUEJrL09U?=
+ =?utf-8?B?VUJUQ3RFTjB4UkNqeVlHSzRQQTROQWZYZ2JzQjc5WHVlOWhkd3FzV0ZvMlQ5?=
+ =?utf-8?B?dHoxYjgxclIyc2tBNitYbnExSXBuNmFKZHZDUHdma0pPRFdpYm56TkxaTVdk?=
+ =?utf-8?Q?0vrsb4qIr1c7ut0e5icn6s7er?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c3301e05-3275-4c74-99b4-08dd5a6e619b
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB8558.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2025 16:13:48.8836
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZWMjAzGQ5xro2hzk54LxLb/5S+Gyz8ftW9EFahtp4m63MVRHOknysol5PpJdOTi9NrLkHGLEOMnJ8adZqa794g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4094
 
-Am 28.02.25 um 20:49 schrieb Martin KaFai Lau:
-> On 2/27/25 6:23 AM, Marcus Wichelmann wrote:
->> When the XDP metadata area was used, it is expected that the same
->> metadata can also be accessed from TC, as can be read in the description
->> of the bpf_xdp_adjust_meta helper function. In the tun driver, this was
->> not yet implemented.
->>
->> To make this work, the skb that is being built on XDP_PASS should know
->> of the current size of the metadata area. This is ensured by adding
->> calls to skb_metadata_set. For the tun_xdp_one code path, an additional
->> check is necessary to handle the case where the externally initialized
->> xdp_buff has no metadata support (xdp->data_meta == xdp->data + 1).
->>
->> More information about this feature can be found in the commit message
->> of commit de8f3a83b0a0 ("bpf: add meta pointer for direct access").
->> > Signed-off-by: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
->> Reviewed-by: Willem de Bruijn <willemb@google.com>
->> Acked-by: Jason Wang <jasowang@redhat.com>
->> ---
->>   drivers/net/tun.c | 25 ++++++++++++++++++++++---
->>   1 file changed, 22 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
->> index 4ec8fbd93c8d..70208b3a2e93 100644
->> --- a/drivers/net/tun.c
->> +++ b/drivers/net/tun.c
-> 
-> The changes have conflicts with the commit 2506251e81d1 ("tun: Decouple vnet handling").
-> 
-> It is better to rebase the works onto the bpf-next/net,
-> i.e. the "net" branch instead of the "master" branch.
+Dynamic clocks - such as PTP clocks - extend beyond the standard POSIX
+clock API by using ioctl calls. While file permissions are enforced for
+standard POSIX operations, they are not implemented for ioctl calls,
+since the POSIX layer cannot differentiate between calls which modify
+the clock's state (like enabling PPS output generation) and those that
+don't (such as retrieving the clock's PPS capabilities).
 
-Alright, will do that. Should I send it as a v5 and still with "PATCH bpf-next"
-in the header or something else?
+On the other hand, drivers implementing the dynamic clocks lack the
+necessary information context to enforce permission checks themselves.
 
-Thanks!
-Marcus
+Additionally, POSIX clock layer requires the WRITE permission even for
+readonly adjtime() operations before invoking the callback.
+
+Add a struct file pointer to the POSIX clock context and use it to
+implement the appropriate permission checks on PTP chardevs. Permit
+readonly adjtime() for dynamic clocks. Add a readonly option to testptp.
+
+Changes in v4:
+- Allow readonly adjtime() for dynamic clocks, as suggested by Thomas
+
+Changes in v3:
+- Reword the log message for commit against posix-clock and fix
+  documentation of struct posix_clock_context, as suggested by Thomas
+
+Changes in v2:
+- Store file pointer in POSIX clock context rather than fmode in the PTP
+  clock's private data, as suggested by Richard.
+- Move testptp.c changes into separate patch.
+
+Wojtek Wasko (3):
+  posix-clock: Store file pointer in struct posix_clock_context
+  ptp: Add PHC file mode checks. Allow RO adjtime() without FMODE_WRITE.
+  testptp: Add option to open PHC in readonly mode
+
+ drivers/ptp/ptp_chardev.c             | 16 ++++++++++++
+ include/linux/posix-clock.h           |  6 ++++-
+ kernel/time/posix-clock.c             |  3 ++-
+ tools/testing/selftests/ptp/testptp.c | 37 +++++++++++++++++----------
+ 4 files changed, 46 insertions(+), 16 deletions(-)
+
+-- 
+2.43.5
+
 
