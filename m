@@ -1,203 +1,132 @@
-Return-Path: <netdev+bounces-171117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 505D8A4B9AC
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 09:45:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52B40A4B9F9
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 09:56:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E3AA188FA64
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 08:45:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D70E5188D895
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 08:56:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3BD318FC6B;
-	Mon,  3 Mar 2025 08:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D831F3BB5;
+	Mon,  3 Mar 2025 08:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MuP6dChA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LHKMulb8"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441D31E5701
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 08:45:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B9041F3BAF
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 08:52:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740991527; cv=none; b=cVYx04zb0ghYaVJiGr77iHJoIF9R5cWLtPrW7xF8W7+n77F4sXEW5Wcs/EYQOm/4/5mVFif6OzANCY9/vWHzk2TOIFEdqic8ft+MEYW2UaqNWsw/lHNBSMSRM0+0IXtx2ko/I0WxPopKPPV754vWg/6VeXnhpXC2rt0JRLyp318=
+	t=1740991976; cv=none; b=NNjLrC083B4/mWIr3JRCtK0vgbCpKErk8SbSeBrIgs51yKyCrB4n42FEf8aSAz+qtSEOt4TGr0xbTqFtwWQzhD72QcT94lXX+1StTMVDg+qAs41Maaq+mrPnlO9EqWBHAtucA88jQOw8ADmlIkhgUYVBiWhUq3esZvma8cxjXuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740991527; c=relaxed/simple;
-	bh=bUWqoIF0RSWTyZWSv8LwMFKJPtmJiM+TMfHwuR+g940=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=kImFh8WP3xRicd5m2TNeUulQD3LE/6X2OawOSAqRe2cWVv0PUJMk5JAj3UKcHrcKQ0G2v1I0lku8Jy+7oudyF79izdjOrqRxPOlEva5JtvbiEK/wBITxQiOhzZ55hbFswuaY0KXQggFEiXo7QF5kQm6QbVQTWEfeUAZ7z+BUam0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MuP6dChA; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1740991976; c=relaxed/simple;
+	bh=7BJ75VnqDYEbE9e13G+MCHppvDrRT82moH7VLX3ZmAQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YT2nI/fqiXPfVzSEYaDriYPeYMvz6q69O+jZUqS+lzOS6Rvu+5OzMVvQ92rX//QdmyLS72D1dXbq+2NPpnJHYAqzRfBEnyVwCEAKdY5jLOSQnMu47aTFuoiDtB9232mCAZhGzLsNT37ptsokalFkG53UrT25KEEy7HxNWpTtuD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LHKMulb8; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740991525;
+	s=mimecast20190719; t=1740991973;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=Mzc0zyxynm1zLc8lCgBdxcnpn7S2dpYemCwQOpKEfuk=;
-	b=MuP6dChAXC9JPcJhaOCG4Ky/9EoatC+5PbxbWu3FbSsOfAJrFIdOyzRgzY/wf+Bwz3jAZA
-	B7C2mlH8n15f6uOWs6RCCAirOoLMDwXY5ws3U1X5Qj8dJ7kcin3TK8JWSVxaACblFl0qu3
-	zfp1RDVD2lRTDbUi7mxwDPszqqaTuMM=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-306-7wrT26BSMJ6P7gbEEUKlQA-1; Mon,
- 03 Mar 2025 03:45:00 -0500
-X-MC-Unique: 7wrT26BSMJ6P7gbEEUKlQA-1
-X-Mimecast-MFC-AGG-ID: 7wrT26BSMJ6P7gbEEUKlQA_1740991498
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1D019180087C;
-	Mon,  3 Mar 2025 08:44:57 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.44.32.200])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E569819560AA;
-	Mon,  3 Mar 2025 08:44:50 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-cc: David Howells <dhowells@redhat.com>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Jakub Kicinski <kuba@kernel.org>,
-    "David S.
- Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-    Simon Horman <horms@kernel.org>,
-    Trond Myklebust <trond.myklebust@hammerspace.com>,
-    Chuck Lever <chuck.lever@oracle.com>,
-    Eric Biggers <ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
-    linux-crypto@vger.kernel.org, linux-afs@lists.infradead.org,
-    linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
-    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [GIT PULL v2] crypto: Add Kerberos crypto lib
+	bh=x5f0Ge/u6HApn0cHLmrjeezLoP0KdtHv+tljpLM2u/w=;
+	b=LHKMulb8ZRkrmLqS/nzF41xVyQdCfyYpmDB4eIRz9CbJEpcpSPkr1PoJbaI9W+3NPEbxcH
+	4rjwIQRCgpJcaL4S+HyoyeOhvlrIDD4IUSPqdWE8n5/nZtg53UAxPSRs1IZd+gDUhOPBbS
+	UAjcviCqTpkkZfpy1TcopL0VJXUGOy8=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-601-Lpd4yDGmMeaovyFBEL2Y7g-1; Mon, 03 Mar 2025 03:52:47 -0500
+X-MC-Unique: Lpd4yDGmMeaovyFBEL2Y7g-1
+X-Mimecast-MFC-AGG-ID: Lpd4yDGmMeaovyFBEL2Y7g_1740991966
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5e4c5225b64so3959746a12.2
+        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 00:52:47 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740991966; x=1741596766;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=x5f0Ge/u6HApn0cHLmrjeezLoP0KdtHv+tljpLM2u/w=;
+        b=NKhiQ0IXSmHz0J2vHRmVAY3x/eCldX2yrBLTMKKNKyvD8mPIL42ZcYkpTuMUMh2xB7
+         KYMVZPuunGVpBVxrCIZSSZs8LYLFLel/4qb+auU3uuU6PgtynyhEZICqI9C1PI8exyD+
+         MnY45aolA3gMtUcCz6eiNnNMxEBFR4xRlG3gb31OvcKvvKP0dKsDVAT8T4+ElM7BF74M
+         GcnGseH+C3i57bzoPlD6uEvX6fbqQYUof85K209wR14ecq57pOCjqhy3hBmXSrX/oh8j
+         jZxiuwBRI+colkJJYXMDewHRAeDf/QYI33HIrVctKozn9vQkcaYumRHYSjJ+DWkJBe+P
+         DUOA==
+X-Forwarded-Encrypted: i=1; AJvYcCXTznntCt6mvOOMLhrFzqM0O9/pzfodXvwx4+bfTu8mA3KcOqllEeuquncVLoLRQwGBJBrF7uQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8z1zUG0gQoJkZXLddU8c13dWhxDFv4eeyh6DIBJM7jesTOVgb
+	XcalKwQ7sRCyAXMA1BAYWUor3zA9XRHg8bmX6KJKKEDDZrwSZs6kIFjKWL3YShmu0/HDuXiht77
+	/KkqBpw8w6sETUGxhJjDB8sXqsdLJwVaIFQAGZG3xIaoPLw8NUYkW6w==
+X-Gm-Gg: ASbGncv1b4IYdW+Md1OvEkletoBANNljy2t52IhGd56oaV3lxR1/yuJbfRk+4gZdZHn
+	Y/a6OLxwW3b5Tp/FOmz2+nrl6HE9zzmMfgs7EyBOKSCLb1sATw7qr2jNSvKuIJbiu0TOk2peuOK
+	PbvM51i9LA8ixl+ndbUlNCe32OIGMvVuNG2O0aDbdoRRH2HhTs5v9UW+ET/1Vcjue7sKhQIjzrc
+	tBCni3wxkLXrdG3Su58XpIkce47dCZCNFBH6sq0cq1A4yFe0mLzvWjRXmcNoFQCdk7pFImoKYak
+	zZPtMiV9os4lSW8c40QdgQkW/iG6QG022Cxotl4HB6ISp52H9WlC1P43hAaS7Q9phJra5SHD
+X-Received: by 2002:a05:6402:270d:b0:5de:5263:ae79 with SMTP id 4fb4d7f45d1cf-5e4d6adec08mr13660766a12.12.1740991965899;
+        Mon, 03 Mar 2025 00:52:45 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHo44UCmf/nhSiQ3s6omsM4aVzpmAfPARCDmTuHp0dZeSeSv2Z6WHtZA+hKBPUeIaCokWugDw==
+X-Received: by 2002:a05:6402:270d:b0:5de:5263:ae79 with SMTP id 4fb4d7f45d1cf-5e4d6adec08mr13660741a12.12.1740991965384;
+        Mon, 03 Mar 2025 00:52:45 -0800 (PST)
+Received: from localhost.localdomain (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e4c3fb5927sm6466076a12.53.2025.03.03.00.52.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Mar 2025 00:52:43 -0800 (PST)
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: virtualization@lists.linux.dev
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	kvm@vger.kernel.org,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>
+Subject: [PATCH] vhost: fix VHOST_*_OWNER documentation
+Date: Mon,  3 Mar 2025 09:52:37 +0100
+Message-ID: <20250303085237.19990-1-sgarzare@redhat.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3709377.1740991489.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 03 Mar 2025 08:44:49 +0000
-Message-ID: <3709378.1740991489@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Transfer-Encoding: 8bit
 
-Hi Herbert,
+VHOST_OWNER_SET and VHOST_OWNER_RESET are used in the documentation
+instead of VHOST_SET_OWNER and VHOST_RESET_OWNER respectively.
 
-Could you pull this into the crypto tree please?  v2 is just a rebase onto
-your cryptodev/master branch.  It does a couple of things:
+To avoid confusion, let's use the right names in the documentation.
+No change to the API, only the documentation is involved.
 
- (1) Provide an AEAD crypto driver, krb5enc, that mirrors the authenc
-     driver, but that hashes the plaintext, not the ciphertext.  This was
-     made a separate module rather than just being a part of the authenc
-     driver because it has to do all of the constituent operations in the
-     opposite order - which impacts the async op handling.
-
-     Testmgr data is provided for AES+SHA2 and Camellia combinations of
-     authenc and krb5enc used by the krb5 library.  AES+SHA1 is not
-     provided as the RFCs don't contain usable test vectors.
-
- (2) Provide a Kerberos 5 crypto library.  This is an extract from the
-     sunrpc driver as that code can be shared between sunrpc/nfs and
-     rxrpc/afs.  This provides encryption, decryption, get MIC and verify
-     MIC routines that use and wrap the crypto functions, along with some
-     functions to provide layout management.
-
-     This supports AES+SHA1, AES+SHA2 and Camellia encryption types.
-
-     Self-testing is provided that goes further than is possible with
-     testmgr, doing subkey derivation as well.
-
-The patches were previously posted here:
-
-    https://lore.kernel.org/r/20250203142343.248839-1-dhowells@redhat.com/
-
-as part of a larger series, but the networking guys would prefer these to
-go through the crypto tree.  If you want them reposting independently, I
-can do that.
-
-David
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
-The following changes since commit 17ec3e71ba797cdb62164fea9532c81b60f4716=
-7:
+ include/uapi/linux/vhost.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-  crypto: lib/Kconfig - Hide arch options from user (2025-03-02 15:21:47 +=
-0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags=
-/crypto-krb5-20250303
-
-for you to fetch changes up to fc0cf10c04f49ddba1925b630467f49ea993569e:
-
-  crypto/krb5: Implement crypto self-testing (2025-03-02 21:56:47 +0000)
-
-----------------------------------------------------------------
-crypto: Add Kerberos crypto lib
-
-----------------------------------------------------------------
-David Howells (17):
-      crypto/krb5: Add API Documentation
-      crypto/krb5: Add some constants out of sunrpc headers
-      crypto: Add 'krb5enc' hash and cipher AEAD algorithm
-      crypto/krb5: Test manager data
-      crypto/krb5: Implement Kerberos crypto core
-      crypto/krb5: Add an API to query the layout of the crypto section
-      crypto/krb5: Add an API to alloc and prepare a crypto object
-      crypto/krb5: Add an API to perform requests
-      crypto/krb5: Provide infrastructure and key derivation
-      crypto/krb5: Implement the Kerberos5 rfc3961 key derivation
-      crypto/krb5: Provide RFC3961 setkey packaging functions
-      crypto/krb5: Implement the Kerberos5 rfc3961 encrypt and decrypt fun=
-ctions
-      crypto/krb5: Implement the Kerberos5 rfc3961 get_mic and verify_mic
-      crypto/krb5: Implement the AES enctypes from rfc3962
-      crypto/krb5: Implement the AES enctypes from rfc8009
-      crypto/krb5: Implement the Camellia enctypes from rfc6803
-      crypto/krb5: Implement crypto self-testing
-
- Documentation/crypto/index.rst   |   1 +
- Documentation/crypto/krb5.rst    | 262 +++++++++++++
- crypto/Kconfig                   |  13 +
- crypto/Makefile                  |   3 +
- crypto/krb5/Kconfig              |  26 ++
- crypto/krb5/Makefile             |  18 +
- crypto/krb5/internal.h           | 247 ++++++++++++
- crypto/krb5/krb5_api.c           | 452 ++++++++++++++++++++++
- crypto/krb5/krb5_kdf.c           | 145 +++++++
- crypto/krb5/rfc3961_simplified.c | 797 ++++++++++++++++++++++++++++++++++=
-+++++
- crypto/krb5/rfc3962_aes.c        | 115 ++++++
- crypto/krb5/rfc6803_camellia.c   | 237 ++++++++++++
- crypto/krb5/rfc8009_aes2.c       | 362 ++++++++++++++++++
- crypto/krb5/selftest.c           | 544 ++++++++++++++++++++++++++
- crypto/krb5/selftest_data.c      | 291 ++++++++++++++
- crypto/krb5enc.c                 | 504 +++++++++++++++++++++++++
- crypto/testmgr.c                 |  16 +
- crypto/testmgr.h                 | 351 +++++++++++++++++
- include/crypto/authenc.h         |   2 +
- include/crypto/krb5.h            | 160 ++++++++
- 20 files changed, 4546 insertions(+)
- create mode 100644 Documentation/crypto/krb5.rst
- create mode 100644 crypto/krb5/Kconfig
- create mode 100644 crypto/krb5/Makefile
- create mode 100644 crypto/krb5/internal.h
- create mode 100644 crypto/krb5/krb5_api.c
- create mode 100644 crypto/krb5/krb5_kdf.c
- create mode 100644 crypto/krb5/rfc3961_simplified.c
- create mode 100644 crypto/krb5/rfc3962_aes.c
- create mode 100644 crypto/krb5/rfc6803_camellia.c
- create mode 100644 crypto/krb5/rfc8009_aes2.c
- create mode 100644 crypto/krb5/selftest.c
- create mode 100644 crypto/krb5/selftest_data.c
- create mode 100644 crypto/krb5enc.c
- create mode 100644 include/crypto/krb5.h
+diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+index b95dd84eef2d..d4b3e2ae1314 100644
+--- a/include/uapi/linux/vhost.h
++++ b/include/uapi/linux/vhost.h
+@@ -28,10 +28,10 @@
+ 
+ /* Set current process as the (exclusive) owner of this file descriptor.  This
+  * must be called before any other vhost command.  Further calls to
+- * VHOST_OWNER_SET fail until VHOST_OWNER_RESET is called. */
++ * VHOST_SET_OWNER fail until VHOST_RESET_OWNER is called. */
+ #define VHOST_SET_OWNER _IO(VHOST_VIRTIO, 0x01)
+ /* Give up ownership, and reset the device to default values.
+- * Allows subsequent call to VHOST_OWNER_SET to succeed. */
++ * Allows subsequent call to VHOST_SET_OWNER to succeed. */
+ #define VHOST_RESET_OWNER _IO(VHOST_VIRTIO, 0x02)
+ 
+ /* Set up/modify memory layout */
+-- 
+2.48.1
 
 
