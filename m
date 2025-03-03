@@ -1,126 +1,145 @@
-Return-Path: <netdev+bounces-171769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9079A4E8E0
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:32:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AF0DA4EBFC
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:40:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E56DA8C5DE5
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:21:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44FCE16E089
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:35:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DA942C1534;
-	Tue,  4 Mar 2025 16:59:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B72FB2620FA;
+	Tue,  4 Mar 2025 18:27:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="TM8k0GKz"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SXHkb+uR"
 X-Original-To: netdev@vger.kernel.org
-Received: from beeline2.cc.itu.edu.tr (beeline2.cc.itu.edu.tr [160.75.25.116])
+Received: from beeline3.cc.itu.edu.tr (beeline3.cc.itu.edu.tr [160.75.25.117])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A735285408
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 16:59:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=160.75.25.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 151002356DC
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 18:27:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=160.75.25.117
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741107548; cv=fail; b=Mg7rQm16HfOBWCgdRTwq78bXxXelhcTePl+U5ogu2U5BxDaSBokT6l2cudVAwuLoEIQyfNzff9Oubuen7HT68BUXNh1k3Qv9YIB29IkBUjC9ahwW7YOjIhCTGvAj6nQFDOwlq46fXcKpdD14aUJ1y1kqelBhgssLKYKfz1mnH+o=
+	t=1741112854; cv=fail; b=ku5FHELL9X/VdC6AnbrKX31gc1HYNZgRK7/RAgid2eTJdGmCtFbae5AbnOR9tBp1fd93U5ChWDzF1r1hwVvS3w0JEoPjafscfwqlNF2jPtrf0oUH0A3CrzqUJMBcr79ape/04ZbtViFuZQvpPbEz9LjvXVDYL2/UUce9a79mT+I=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741107548; c=relaxed/simple;
-	bh=8XIOvLD11TGBw1/Mon/eb6FiRiDAUJpIyuWR+1Z0s8c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WR4I5lFAXrbH6iHNwiZWWnX+xij6Zz+x5PcMcvD0AHWLcwU1Kq8vaoK4D+W3zYpOMtaCruMFb7USHmOv0rsdoPJvxeONC9Ot5hDz66ihgldnkpRgJKKiDCKFVrK/KJsEA09S3UpQ+itolJ7Q95JDeL8SpW9Ts7I3UDs8YIPzIFE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=bootlin.com; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=fail (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=TM8k0GKz reason="signature verification failed"; arc=none smtp.client-ip=217.70.183.196; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; arc=fail smtp.client-ip=160.75.25.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=bootlin.com
+	s=arc-20240116; t=1741112854; c=relaxed/simple;
+	bh=M4g7n3ODeuEM8yGzDWn8A5b27SsQGxaNLeo5kU8HNWk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r76b1Yz6B4Js3QsKANE7lMNzwy/pfZ3UIZuHu3cJSJGJ6eE+ek3U9WeSsi4UQsfVnSpwtiKBqAHwXTFx2i8PsnFOvvpRaBfe6a29RNkgbrKiwI3vLjswBWyqY7EPUob22OWV982z2+lfXxV39nq88oy7KaquvO2Ofh8N7GlY4ok=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=fail (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SXHkb+uR reason="signature verification failed"; arc=none smtp.client-ip=170.10.129.124; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; arc=fail smtp.client-ip=160.75.25.117
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=cc.itu.edu.tr
-Received: from lesvatest1.cc.itu.edu.tr (lesvatest1.cc.itu.edu.tr [10.146.128.1])
+Received: from lesvatest1.cc.itu.edu.tr (unknown [10.146.128.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
 	(No client certificate requested)
-	by beeline2.cc.itu.edu.tr (Postfix) with ESMTPS id 194DC408B65C
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 19:59:05 +0300 (+03)
+	by beeline3.cc.itu.edu.tr (Postfix) with ESMTPS id 4089A40CFB88
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 21:27:30 +0300 (+03)
 X-Envelope-From: <root@cc.itu.edu.tr>
 Authentication-Results: lesvatest1.cc.itu.edu.tr;
-	dkim=fail reason="signature verification failed" (2048-bit key, unprotected) header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=gm1 header.b=TM8k0GKz
+	dkim=fail reason="signature verification failed" (1024-bit key, unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=SXHkb+uR
 Received: from lesva1.cc.itu.edu.tr (unknown [160.75.70.79])
-	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6gcK0fPjzG2MD
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 19:09:37 +0300 (+03)
+	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6dQr44tszFwsm
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:31:16 +0300 (+03)
 Received: by le1 (Postfix, from userid 0)
-	id 9FAF842723; Tue,  4 Mar 2025 19:09:17 +0300 (+03)
+	id 2FEAC4273C; Tue,  4 Mar 2025 17:31:05 +0300 (+03)
 Authentication-Results: lesva1.cc.itu.edu.tr;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=TM8k0GKz
-X-Envelope-From: <linux-kernel+bounces-541233-bozkiru=itu.edu.tr@vger.kernel.org>
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SXHkb+uR
+X-Envelope-From: <linux-kernel+bounces-541247-bozkiru=itu.edu.tr@vger.kernel.org>
 Authentication-Results: lesva2.cc.itu.edu.tr;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=TM8k0GKz
-Received: from fgw2.itu.edu.tr (fgw2.itu.edu.tr [160.75.25.104])
-	by le2 (Postfix) with ESMTP id B717B4268E
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 12:08:27 +0300 (+03)
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by fgw2.itu.edu.tr (Postfix) with SMTP id 571542DCE4
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 12:08:27 +0300 (+03)
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SXHkb+uR
+Received: from fgw1.itu.edu.tr (fgw1.itu.edu.tr [160.75.25.103])
+	by le2 (Postfix) with ESMTP id 1999D42859
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 12:12:31 +0300 (+03)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by fgw1.itu.edu.tr (Postfix) with SMTP id E76E13063EFC
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 12:12:30 +0300 (+03)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 740FD17174F
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 09:07:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C783B1890775
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 09:12:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DFD41F03FF;
-	Mon,  3 Mar 2025 09:03:51 +0000 (UTC)
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F19D1F0E24;
+	Mon,  3 Mar 2025 09:12:20 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7125A1F3FC0;
-	Mon,  3 Mar 2025 09:03:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6172A1EF096
+	for <linux-kernel@vger.kernel.org>; Mon,  3 Mar 2025 09:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740992626; cv=none; b=iZZbRXH1EbVBW6JBo6n3yuZQ91VOXSscHwzWncZu2xpw1G5956QDSSRyPenMkdztDYMdSuXMQzuuyWAdpU+63QGdG6xZ9K8U1RD1wm2H6hNBtDgESZri5dvOwwAtqfRFN3CwD0D25bFbRZUr0sauu6Ed43Qjs7bmiunZ1jl6Nww=
+	t=1740993137; cv=none; b=ATFM1Udi36g/hwL2L5AHS5Ju+lkrkPL803XVuGDYKM1W8BhpX6dalXK2RyV6/XOX6SIGW1oqcbZvFARgzsFrqBKSgcJLNZy1tL2IBwzMsy6pOVWxZYBarydve7U5VROJUOAoVOlhROrDwZi3PPzNVy9ui2U9NlyfvYM5rYVUvSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740992626; c=relaxed/simple;
-	bh=hy84rzjS7+8uPHR7m9CHhBOJhDLwxhKnLDhbfNxfkEY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nKKqguAwYdonHVQkvU1kGxsFBFqoFUkv6SIp5TLmVjmTnHjKCvsh0tmexC0wgMtLYYdykosqug/O9Ycog5fXdkt348Rviz+IeOOZfibfz2zTuIFA1IBnelfs4ArB3BfG4qboN1pDhbDVRPTPqMruFUQZZPniQzpN+rfNtXtI8NM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=TM8k0GKz; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 9C6A444530;
-	Mon,  3 Mar 2025 09:03:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1740992622;
+	s=arc-20240116; t=1740993137; c=relaxed/simple;
+	bh=geG++AXD09rWCrdjxBMlqbjlj7UuYkL2iv00OIpXTMo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pP7ftx4B+7fqgehUBoDihe8anBDEfGdetEcTmqNX7coNWefa99pbTaif/CNwKkh9cp0ldJP9APCKtVuk8trEz8uyYJ4Iwnn0600dF63EAjYRYGna0qrucORrqhJE2knIcDlfODgP3JtjXfB+X5tRdaeIg0J/iC7GbXFX6je+He8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SXHkb+uR; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740993134;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=SohpPzuxeSg5EmDhX+WiEB/PtEK9LrVBuJuK+Acd2Qs=;
-	b=TM8k0GKzioHAV1TSikAQCfuMh58lWKMWVAs9geYrbieGjilZoRxObkYWIJg7sQFA6vzLLa
-	rWo/L4G1HrL+WexXozRDsi8KdFEkfeR/cXdTBayamiBzxGusEzVxGvB4mTDhexlsTyOYG5
-	hbKzEZNN/OrxHWC0WlMhKTBnjjnEFLqO68Be/iCCeqqsNkoIvfT0SjifIXt2v7yP+rKWxs
-	2gybj+xvCB9V52JjzKBSkPWQvHXqFz2E9dSaZ2u3bTwEGASpzbaC5rTacWmE7rOqPQQgFh
-	kB3e4/BewCQvvbMeBbyJa7m//NMBsjXbCfoCMvSEGwOStV1Bcavgdy8VjAJqjA==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Simon Horman <horms@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>
-Subject: [PATCH net-next v4 13/13] net: phy: phy_caps: Allow getting an phy_interface's capabilities
-Date: Mon,  3 Mar 2025 10:03:19 +0100
-Message-ID: <20250303090321.805785-14-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250303090321.805785-1-maxime.chevallier@bootlin.com>
-References: <20250303090321.805785-1-maxime.chevallier@bootlin.com>
+	bh=YjVRjv35fHjv7RLlPVFkOhvXHHHtnF0rtq1Tf6M4yK4=;
+	b=SXHkb+uR6dPoaye8FAbMHGiKgPSsD9M0i+mCKsnwVP23UjVM6CXx5dg5esxKRd1j2OoI3N
+	qJuKSDbb7JNWthMBnOUhwlEnYk6L1nHR8jq3emOHWjQaRkIaGo7EUACk6YgAjSAWkvPvK5
+	9vbNHyCrJyyluYojtNA7lKns6XgcFsk=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-505-7-InO9mrPIezYmrw-ZsBUA-1; Mon, 03 Mar 2025 04:12:13 -0500
+X-MC-Unique: 7-InO9mrPIezYmrw-ZsBUA-1
+X-Mimecast-MFC-AGG-ID: 7-InO9mrPIezYmrw-ZsBUA_1740993132
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5e073b9cf96so3902422a12.0
+        for <linux-kernel@vger.kernel.org>; Mon, 03 Mar 2025 01:12:13 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740993132; x=1741597932;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YjVRjv35fHjv7RLlPVFkOhvXHHHtnF0rtq1Tf6M4yK4=;
+        b=LgJHS9zQPL2EJ1aCMw/uIzpbrYdeSmNmSPF8GAQPMOe28++bpjgt7sHc46B0tbqeSA
+         H5uaoFebXaR0G13DNzWPxLfJY7Nkk6d493aJFD9wseoY0ni1D+Isu/Qsm3RKFp8akWC3
+         v4fWnlRCqbW/dwUq86ruafCCVX+Ra/bcl6eC4z9Wi7PKSTsAqZbHYEnlNpWXhc3pp5Ly
+         XUDL294c1uowNjUhSNgCPypGzRXF7TmmFYxKrm756Z3XlWTGyFEtvrtpg4U0zEj7sVaX
+         cnWfL9N6LQy5xUAYV3QGJMTf35pBIuO8E30DhvtOVBTSxB7ZXRrZEWATWhDqL2sHVgHu
+         qI1g==
+X-Forwarded-Encrypted: i=1; AJvYcCWZy0JSP6baycgLouqvVQevPgrxCXOAsF/t1NHQeiTSE33X+9rZs6sU91N4CYk3ponSMt/2wETEW2qFR3c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIvx92ztou+SoJzkvK2zyS44sswot+gOtOAajSKnDwQvuVRMlS
+	uhPD9Xe8q9wp92mf9fPZu/zVWROt1FLP5qTDZaZUzzE5gpV11InB+dVOzRC6Gh81NlA5ixKqFK7
+	cjmGs5qkRK5/jVetlLyQUmzAlhGaJJ9IyX3Mm/c4Irnl2CtvTh8F99W4tXp7lgA==
+X-Gm-Gg: ASbGncvuGwjmMMST5EmAAumRiD8NDRsyVTeGbt1mROYV9lH1mKwHOMTr5NN4Uruttc6
+	+EIv3w64PPM0t9WQffm0IFkaRaAmnzG3Fw9PiTUG17gbCMkNafT7pILdSjJZrYpCTL6l4tNGuGn
+	6cUU3+tlZMfA45RqwkzSH3cKuepzTv9xH48+VJBxwv9Egk9dVo32zv9jCi1niA7+Uw/v3HGWjd1
+	AfVrj0P6AfnrUZHrg9rk8a+sxIu9rWifAynWwdKCEgRDP/Qou06uuax9TNHUAQr6b1LpKauTI39
+	/1ElNPw0+3j3HMI+YqeUwyXFrN3ifTU65YI2i5FGwYpIP4KlXpLbkdpYQ06iQYha
+X-Received: by 2002:a17:907:da2:b0:abf:777d:fb7a with SMTP id a640c23a62f3a-abf777dfd1amr339932966b.46.1740993131903;
+        Mon, 03 Mar 2025 01:12:11 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGtqN1qqtRWL94TvBz+1bpSPX8FaHG0oLP1oFMSS8+5uidcrPRyW31eyU/Z3YzkjO4tPcIZtw==
+X-Received: by 2002:a17:907:da2:b0:abf:777d:fb7a with SMTP id a640c23a62f3a-abf777dfd1amr339929466b.46.1740993131263;
+        Mon, 03 Mar 2025 01:12:11 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abf78023d7esm172842966b.34.2025.03.03.01.12.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Mar 2025 01:12:10 -0800 (PST)
+Date: Mon, 3 Mar 2025 10:12:06 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Cindy Lu <lulu@redhat.com>, mst@redhat.com, 
+	michael.christie@oracle.com, linux-kernel@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v7 8/8] vhost: Add a KConfig knob to enable IOCTL
+ VHOST_FORK_FROM_OWNER
+Message-ID: <svi5ui3ea55mor5cav7jirrttd6lkv4xkjnjj57tnjdyiwmr5c@p2hhfwuokyv5>
+References: <20250302143259.1221569-1-lulu@redhat.com>
+ <20250302143259.1221569-9-lulu@redhat.com>
+ <CACGkMEv7WdOds0D+QtfMSW86TNMAbjcdKvO1x623sLANkE5jig@mail.gmail.com>
 Precedence: bulk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -128,289 +147,123 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdelkeejudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeevgedtffelffelveeuleelgfejfeevvdejhfehgeefgfffvdefteegvedutefftdenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpeduudenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgdphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvddtpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmr
- giivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhm
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CACGkMEv7WdOds0D+QtfMSW86TNMAbjcdKvO1x623sLANkE5jig@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
 X-ITU-Libra-ESVA-Information: Please contact Istanbul Teknik Universitesi for more information
-X-ITU-Libra-ESVA-ID: 4Z6gcK0fPjzG2MD
+X-ITU-Libra-ESVA-ID: 4Z6dQr44tszFwsm
 X-ITU-Libra-ESVA: No virus found
 X-ITU-Libra-ESVA-From: root@cc.itu.edu.tr
-X-ITU-Libra-ESVA-Watermark: 1741712233.89247@4KOBYaHlAcgFEQBJZgZu1Q
+X-ITU-Libra-ESVA-Watermark: 1741717545.77302@Fpfh+0KGJwKaN3lifycfPQ
 X-ITU-MailScanner-SpamCheck: not spam
 
-Phylink has internal code to get the MAC capabilities of a given PHY
-interface (what are the supported speed and duplex).
+On Mon, Mar 03, 2025 at 01:52:06PM +0800, Jason Wang wrote:
+>On Sun, Mar 2, 2025 at 10:34=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote=
+:
+>>
+>> Introduce a new config knob `CONFIG_VHOST_ENABLE_FORK_OWNER_IOCTL`,
+>> to control the availability of the `VHOST_FORK_FROM_OWNER` ioctl.
+>> When CONFIG_VHOST_ENABLE_FORK_OWNER_IOCTL is set to n, the ioctl
+>> is disabled, and any attempt to use it will result in failure.
+>>
+>> Signed-off-by: Cindy Lu <lulu@redhat.com>
+>> ---
+>>  drivers/vhost/Kconfig | 15 +++++++++++++++
+>>  drivers/vhost/vhost.c | 11 +++++++++++
+>>  2 files changed, 26 insertions(+)
+>>
+>> diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+>> index b455d9ab6f3d..e5b9dcbf31b6 100644
+>> --- a/drivers/vhost/Kconfig
+>> +++ b/drivers/vhost/Kconfig
+>> @@ -95,3 +95,18 @@ config VHOST_CROSS_ENDIAN_LEGACY
+>>           If unsure, say "N".
+>>
+>>  endif
+>> +
+>> +config VHOST_ENABLE_FORK_OWNER_IOCTL
+>> +       bool "Enable IOCTL VHOST_FORK_FROM_OWNER"
+>> +       default n
+>> +       help
+>> +         This option enables the IOCTL VHOST_FORK_FROM_OWNER, which a=
+llows
+>> +         userspace applications to modify the thread mode for vhost d=
+evices.
+>> +
+>> +          By default, `CONFIG_VHOST_ENABLE_FORK_OWNER_IOCTL` is set t=
+o `n`,
+>> +          meaning the ioctl is disabled and any operation using this =
+ioctl
+>> +          will fail.
+>> +          When the configuration is enabled (y), the ioctl becomes
+>> +          available, allowing users to set the mode if needed.
+>> +
+>> +         If unsure, say "N".
+>> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+>> index fb0c7fb43f78..09e5e44dc516 100644
+>> --- a/drivers/vhost/vhost.c
+>> +++ b/drivers/vhost/vhost.c
+>> @@ -2294,6 +2294,8 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsign=
+ed int ioctl, void __user *argp)
+>>                 r =3D vhost_dev_set_owner(d);
+>>                 goto done;
+>>         }
+>> +
+>> +#ifdef CONFIG_VHOST_ENABLE_FORK_OWNER_IOCTL
+>>         if (ioctl =3D=3D VHOST_FORK_FROM_OWNER) {
+>>                 u8 inherit_owner;
+>>                 /*inherit_owner can only be modified before owner is s=
+et*/
+>> @@ -2313,6 +2315,15 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsig=
+ned int ioctl, void __user *argp)
+>>                 r =3D 0;
+>>                 goto done;
+>>         }
+>> +
 
-Extract that into phy_caps, but use the link_capa for conversion. Add an
-internal phylink helper for the link caps -> mac caps conversion, and
-use this in phylink_caps_to_linkmodes().
+nit: this empyt line is not needed
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
-V4: No changes
+>> +#else
+>> +       if (ioctl =3D=3D VHOST_FORK_FROM_OWNER) {
+>> +               /* When CONFIG_VHOST_ENABLE_FORK_OWNER_IOCTL is 'n', r=
+eturn error */
+>> +               r =3D -ENOTTY;
+>> +               goto done;
+>> +       }
+>> +#endif
+>> +
+>>         /* You must be the owner to do anything else */
+>>         r =3D vhost_dev_check_owner(d);
+>>         if (r)
+>> --
+>> 2.45.0
+>
+>Do we need to change the default value of the inhert_owner? For example:
+>
+>#ifdef CONFIG_VHOST_ENABLE_FORK_OWNER_IOCTL
+>inherit_owner =3D false;
+>#else
+>inherit_onwer =3D true;
+>#endif
+>
+>?
 
- drivers/net/phy/phy-caps.h |  4 ++
- drivers/net/phy/phy_caps.c | 92 ++++++++++++++++++++++++++++++++++++++
- drivers/net/phy/phylink.c  | 90 ++++++-------------------------------
- 3 files changed, 110 insertions(+), 76 deletions(-)
+I'm not sure about this honestly, the user space has no way to figure=20
+out the default value and still has to do the IOCTL.
+So IMHO better to have a default value that is independent of the kernel=20
+configuration and consistent with the current behavior.
 
-diff --git a/drivers/net/phy/phy-caps.h b/drivers/net/phy/phy-caps.h
-index db53f380392e..e1fe19d11e5f 100644
---- a/drivers/net/phy/phy-caps.h
-+++ b/drivers/net/phy/phy-caps.h
-@@ -8,6 +8,7 @@
- #define __PHY_CAPS_H
-=20
- #include <linux/ethtool.h>
-+#include <linux/phy.h>
-=20
- enum {
- 	LINK_CAPA_10HD =3D 0,
-@@ -32,6 +33,8 @@ enum {
- 	__LINK_CAPA_MAX,
- };
-=20
-+#define LINK_CAPA_ALL	GENMASK((__LINK_CAPA_MAX - 1), 0)
-+
- struct link_capabilities {
- 	int speed;
- 	unsigned int duplex;
-@@ -45,6 +48,7 @@ size_t phy_caps_speeds(unsigned int *speeds, size_t siz=
-e,
- void phy_caps_linkmode_max_speed(u32 max_speed, unsigned long *linkmodes=
-);
- bool phy_caps_valid(int speed, int duplex, const unsigned long *linkmode=
-s);
- void phy_caps_linkmodes(unsigned long caps, unsigned long *linkmodes);
-+unsigned long phy_caps_from_interface(phy_interface_t interface);
-=20
- const struct link_capabilities *
- phy_caps_lookup_by_linkmode(const unsigned long *linkmodes);
-diff --git a/drivers/net/phy/phy_caps.c b/drivers/net/phy/phy_caps.c
-index 0a64289a161b..555daaa41d52 100644
---- a/drivers/net/phy/phy_caps.c
-+++ b/drivers/net/phy/phy_caps.c
-@@ -253,3 +253,95 @@ void phy_caps_linkmodes(unsigned long caps, unsigned=
- long *linkmodes)
- 		linkmode_or(linkmodes, linkmodes, link_caps[capa].linkmodes);
- }
- EXPORT_SYMBOL_GPL(phy_caps_linkmodes);
-+
-+/**
-+ * phy_caps_from_interface() - Get the link capa from a given PHY interf=
-ace
-+ * @interface: The PHY interface we want to get the possible Speed/Duple=
-x from
-+ *
-+ * Returns: A bitmask of LINK_CAPA_xxx values that can be achieved with =
-the
-+ *          provided interface.
-+ */
-+unsigned long phy_caps_from_interface(phy_interface_t interface)
-+{
-+	unsigned long link_caps =3D 0;
-+
-+	switch (interface) {
-+	case PHY_INTERFACE_MODE_USXGMII:
-+		link_caps |=3D BIT(LINK_CAPA_10000FD) | BIT(LINK_CAPA_5000FD);
-+		fallthrough;
-+
-+	case PHY_INTERFACE_MODE_10G_QXGMII:
-+		link_caps |=3D BIT(LINK_CAPA_2500FD);
-+		fallthrough;
-+
-+	case PHY_INTERFACE_MODE_RGMII_TXID:
-+	case PHY_INTERFACE_MODE_RGMII_RXID:
-+	case PHY_INTERFACE_MODE_RGMII_ID:
-+	case PHY_INTERFACE_MODE_RGMII:
-+	case PHY_INTERFACE_MODE_PSGMII:
-+	case PHY_INTERFACE_MODE_QSGMII:
-+	case PHY_INTERFACE_MODE_QUSGMII:
-+	case PHY_INTERFACE_MODE_SGMII:
-+	case PHY_INTERFACE_MODE_GMII:
-+		link_caps |=3D BIT(LINK_CAPA_1000HD) | BIT(LINK_CAPA_1000FD);
-+		fallthrough;
-+
-+	case PHY_INTERFACE_MODE_REVRMII:
-+	case PHY_INTERFACE_MODE_RMII:
-+	case PHY_INTERFACE_MODE_SMII:
-+	case PHY_INTERFACE_MODE_REVMII:
-+	case PHY_INTERFACE_MODE_MII:
-+		link_caps |=3D BIT(LINK_CAPA_10HD) | BIT(LINK_CAPA_10FD);
-+		fallthrough;
-+
-+	case PHY_INTERFACE_MODE_100BASEX:
-+		link_caps |=3D BIT(LINK_CAPA_100HD) | BIT(LINK_CAPA_100FD);
-+		break;
-+
-+	case PHY_INTERFACE_MODE_TBI:
-+	case PHY_INTERFACE_MODE_MOCA:
-+	case PHY_INTERFACE_MODE_RTBI:
-+	case PHY_INTERFACE_MODE_1000BASEX:
-+		link_caps |=3D BIT(LINK_CAPA_1000HD);
-+		fallthrough;
-+	case PHY_INTERFACE_MODE_1000BASEKX:
-+	case PHY_INTERFACE_MODE_TRGMII:
-+		link_caps |=3D BIT(LINK_CAPA_1000FD);
-+		break;
-+
-+	case PHY_INTERFACE_MODE_2500BASEX:
-+		link_caps |=3D BIT(LINK_CAPA_2500FD);
-+		break;
-+
-+	case PHY_INTERFACE_MODE_5GBASER:
-+		link_caps |=3D BIT(LINK_CAPA_5000FD);
-+		break;
-+
-+	case PHY_INTERFACE_MODE_XGMII:
-+	case PHY_INTERFACE_MODE_RXAUI:
-+	case PHY_INTERFACE_MODE_XAUI:
-+	case PHY_INTERFACE_MODE_10GBASER:
-+	case PHY_INTERFACE_MODE_10GKR:
-+		link_caps |=3D BIT(LINK_CAPA_10000FD);
-+		break;
-+
-+	case PHY_INTERFACE_MODE_25GBASER:
-+		link_caps |=3D BIT(LINK_CAPA_25000FD);
-+		break;
-+
-+	case PHY_INTERFACE_MODE_XLGMII:
-+		link_caps |=3D BIT(LINK_CAPA_40000FD);
-+		break;
-+
-+	case PHY_INTERFACE_MODE_INTERNAL:
-+		link_caps |=3D LINK_CAPA_ALL;
-+		break;
-+
-+	case PHY_INTERFACE_MODE_NA:
-+	case PHY_INTERFACE_MODE_MAX:
-+		break;
-+	}
-+
-+	return link_caps;
-+}
-+EXPORT_SYMBOL_GPL(phy_caps_from_interface);
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 30f0ecb084ef..0162ce09f54d 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -335,6 +335,18 @@ static unsigned long phylink_caps_to_link_caps(unsig=
-ned long caps)
- 	return link_caps;
- }
-=20
-+static unsigned long phylink_link_caps_to_mac_caps(unsigned long link_ca=
-ps)
-+{
-+	unsigned long caps =3D 0;
-+	int i;
-+
-+	for (i =3D 0; i <  ARRAY_SIZE(phylink_caps_params); i++)
-+		if (link_caps & phylink_caps_params[i].caps_bit)
-+			caps |=3D phylink_caps_params[i].mask;
-+
-+	return caps;
-+}
-+
- /**
-  * phylink_caps_to_linkmodes() - Convert capabilities to ethtool link mo=
-des
-  * @linkmodes: ethtool linkmode mask (must be already initialised)
-@@ -412,86 +424,12 @@ static unsigned long phylink_get_capabilities(phy_i=
-nterface_t interface,
- 					      unsigned long mac_capabilities,
- 					      int rate_matching)
- {
-+	unsigned long link_caps =3D phy_caps_from_interface(interface);
- 	int max_speed =3D phylink_interface_max_speed(interface);
- 	unsigned long caps =3D MAC_SYM_PAUSE | MAC_ASYM_PAUSE;
- 	unsigned long matched_caps =3D 0;
-=20
--	switch (interface) {
--	case PHY_INTERFACE_MODE_USXGMII:
--		caps |=3D MAC_10000FD | MAC_5000FD;
--		fallthrough;
--
--	case PHY_INTERFACE_MODE_10G_QXGMII:
--		caps |=3D MAC_2500FD;
--		fallthrough;
--
--	case PHY_INTERFACE_MODE_RGMII_TXID:
--	case PHY_INTERFACE_MODE_RGMII_RXID:
--	case PHY_INTERFACE_MODE_RGMII_ID:
--	case PHY_INTERFACE_MODE_RGMII:
--	case PHY_INTERFACE_MODE_PSGMII:
--	case PHY_INTERFACE_MODE_QSGMII:
--	case PHY_INTERFACE_MODE_QUSGMII:
--	case PHY_INTERFACE_MODE_SGMII:
--	case PHY_INTERFACE_MODE_GMII:
--		caps |=3D MAC_1000HD | MAC_1000FD;
--		fallthrough;
--
--	case PHY_INTERFACE_MODE_REVRMII:
--	case PHY_INTERFACE_MODE_RMII:
--	case PHY_INTERFACE_MODE_SMII:
--	case PHY_INTERFACE_MODE_REVMII:
--	case PHY_INTERFACE_MODE_MII:
--		caps |=3D MAC_10HD | MAC_10FD;
--		fallthrough;
--
--	case PHY_INTERFACE_MODE_100BASEX:
--		caps |=3D MAC_100HD | MAC_100FD;
--		break;
--
--	case PHY_INTERFACE_MODE_TBI:
--	case PHY_INTERFACE_MODE_MOCA:
--	case PHY_INTERFACE_MODE_RTBI:
--	case PHY_INTERFACE_MODE_1000BASEX:
--		caps |=3D MAC_1000HD;
--		fallthrough;
--	case PHY_INTERFACE_MODE_1000BASEKX:
--	case PHY_INTERFACE_MODE_TRGMII:
--		caps |=3D MAC_1000FD;
--		break;
--
--	case PHY_INTERFACE_MODE_2500BASEX:
--		caps |=3D MAC_2500FD;
--		break;
--
--	case PHY_INTERFACE_MODE_5GBASER:
--		caps |=3D MAC_5000FD;
--		break;
--
--	case PHY_INTERFACE_MODE_XGMII:
--	case PHY_INTERFACE_MODE_RXAUI:
--	case PHY_INTERFACE_MODE_XAUI:
--	case PHY_INTERFACE_MODE_10GBASER:
--	case PHY_INTERFACE_MODE_10GKR:
--		caps |=3D MAC_10000FD;
--		break;
--
--	case PHY_INTERFACE_MODE_25GBASER:
--		caps |=3D MAC_25000FD;
--		break;
--
--	case PHY_INTERFACE_MODE_XLGMII:
--		caps |=3D MAC_40000FD;
--		break;
--
--	case PHY_INTERFACE_MODE_INTERNAL:
--		caps |=3D ~0;
--		break;
--
--	case PHY_INTERFACE_MODE_NA:
--	case PHY_INTERFACE_MODE_MAX:
--		break;
--	}
-+	caps |=3D phylink_link_caps_to_mac_caps(link_caps);
-=20
- 	switch (rate_matching) {
- 	case RATE_MATCH_OPEN_LOOP:
---=20
-2.48.1
+Thanks,
+Stefano
+
+>
+>Other patches look good to me.
+>
+>Thanks
+>
+>>
+>
 
 
 
