@@ -1,198 +1,198 @@
-Return-Path: <netdev+bounces-171232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 034BFA4C149
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 14:08:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 89112A4C153
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 14:10:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6AA4188CBED
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 13:08:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F109189385F
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 13:09:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9480E210F59;
-	Mon,  3 Mar 2025 13:08:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6530921147A;
+	Mon,  3 Mar 2025 13:09:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="RuhhD5gJ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="iTZKGEif"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f/MnuYWp"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D3713FEE;
-	Mon,  3 Mar 2025 13:08:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D461210F6A;
+	Mon,  3 Mar 2025 13:09:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741007308; cv=none; b=bQE4Kxnf/xz2YxMqQ4mA2kmWv89cuSAcuBcf43GIJWtv+x24iuLAdSEge12TZVem+9nrOt0QnWjT+23+4suiU/TboaK/+QxfEtC88QyFv42JErTJvetqOdinr2Osa2kkGAC7B7lrdluHq1Rk2tacHGhW/kq+sNAan5LrR95uMUo=
+	t=1741007369; cv=none; b=bDUJmr8fvVgzGnKbytPUxyxdnwUsVMtwV/H1Di4q5hUllms9fVpZh99ihTtu1uWCrQXIrSKBW3O1/hBBaQq2LyW5aR9VRSXcoNlcHwcjw2mP40dzqpkp3/LAtCWvl4+Tn8r3VqV9IdhcuJ3kyLg2dTj+zFD5hNPRegzIjG/v7vY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741007308; c=relaxed/simple;
-	bh=3e4pvZJ6qOzThieTh25YKoc1BBXfGNGYvfQoI44YxU8=;
+	s=arc-20240116; t=1741007369; c=relaxed/simple;
+	bh=JbSwGZ/wELTrXO7XKmcWatlS3Iq75TQfCfzGJlDgLmQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qt/ENZTLcMmS50YUFVAKlKgItomTrzMjQRpm9A88RBRLyK+CNYyEuZUartsywgLN9BHxGmMZSBJvw5r07lGgP62svJLDeWXDQ9erAwS/E+teNIOBA7oHImAoIhHOqNKaHHtX7kBoY2hKal3b+G0eM92j1yGS5QV3b6Utoe+xbVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=RuhhD5gJ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=iTZKGEif; arc=none smtp.client-ip=202.12.124.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
-	by mailfout.stl.internal (Postfix) with ESMTP id DE8E01140097;
-	Mon,  3 Mar 2025 08:08:23 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-08.internal (MEProxy); Mon, 03 Mar 2025 08:08:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1741007303; x=
-	1741093703; bh=qTD6lTVa1BXKH6rdLuvrwcm57PH71xGunbA3RUF0JyE=; b=R
-	uhhD5gJ3/HbwJQkKy9TghXOO0wiCyiqDgMZxnALutwuJjKdsft0z3XQ4LQd40/t7
-	kIs0rL/EozpuTwqrX/FyfaX5SRFtqr35/ebWtm4C92qMH5qKGXUvHsOFiGSSMsj1
-	/nV0CIswrusOD4fJfi+lie0Ug10x7gqWxLnWqiNV1YqzY9bPuB1ChR3itvQTAQWM
-	JI0p2IocMWLtgaeAqOQAA7509Ky9CCrtgjstknU89hzaVk1MEXu86Zf341oIFg6b
-	It2JxbK/iOXlwR4DBiKR4RUr2EtKYn18FDXQ/Did6nWTzl6RLtsu1A8qohVxV0OJ
-	Lh74zjOUSPi1dd/mDquUw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1741007303; x=1741093703; bh=qTD6lTVa1BXKH6rdLuvrwcm57PH71xGunbA
-	3RUF0JyE=; b=iTZKGEifaNjV4yqaE43/doCqqjkP2xYDmQnopDaMeiM31YGwBMi
-	6SDxCC8EO67cD/8YL0VD7J6zlbOOshCB9jR5SFiTI9Ch8KJXt6xmPvL/M/xVOCDY
-	zJUYdfVCcl3wH+8vFiLk6AMDX0Derqd4SJkL7qaHeBTGpOisOAYl36LaHETlEv9g
-	o7fgsRId1oSExqWCLlPkm6XoXWGC2BM9RTbUpaE6CJv/f6NzT7TtxfinrJpkXsBD
-	OArK300FWNLWvK/4l7IWn+59+628juI/1p0hS5e6o5g8xB/e2QTiaVSWWbwFjx8P
-	FBnsrJ/7zJbsLHKwjOKPboM93HzqkZ3ruWw==
-X-ME-Sender: <xms:x6nFZ_Jx9yS9_qD3ChbuXgO58uf8DYKzvRAXKAXvGoM6pcNdYj-VzA>
-    <xme:x6nFZzIMyTxlPNQBo21T4WdMmKU6Kjy6K584TarO34tNPCzPr7QEyUUHeTI8mvXK3
-    8My1LgxTNLV0sJSXqQ>
-X-ME-Received: <xmr:x6nFZ3t1BxQ51QXmU6CY-FFvCiM1jrghT2MCYYGQ5vjA9ejU36GHpILs7bdT>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdelledvudcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdej
-    necuhfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnh
-    grihhlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefh
-    keegteehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurf
-    grrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgs
-    pghrtghpthhtohepudefpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhhtoh
-    hnihhosehophgvnhhvphhnrdhnvghtpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdr
-    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtg
-    homhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgr
-    sggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvg
-    hrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhg
-    pdhrtghpthhtoheprhihrgiirghnohhvrdhsrdgrsehgmhgrihhlrdgtohhmpdhrtghpth
-    htoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthh
-X-ME-Proxy: <xmx:x6nFZ4bzAHdtU6slJYL2h7yBKStosCfZd_KmKP2tmJHKsssU2Ji6ew>
-    <xmx:x6nFZ2bY_XU4d3PRFq90RvT-X_DZjRVsfjnUkk7sBbf1MCby0ipWsQ>
-    <xmx:x6nFZ8Bjb8C6TdoDJxGRvRxLdZxeP4dR7TJG_NlOmPonDurhF6rbqw>
-    <xmx:x6nFZ0aKqeq9InOuYX8bU-1RJ3IEy9LFB6MskumrkH2ST_EoO3KJoA>
-    <xmx:x6nFZ-pqHUmyqDjVpfqpysG892uyY8pn2nsJLTRnLyvAf-aNDEOe5pOE>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 3 Mar 2025 08:08:22 -0500 (EST)
-Date: Mon, 3 Mar 2025 14:08:20 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=IUtjTSqB9FWPBEiS4zFl0avWunwnzYQ2c4e/VsWV2z1eXlTOKWkhIUl5fQZscFQWBK4T+5N1Po6KxReAKlMCo9NGuIsHsURt6l9lfkecV935FHWBQquw0S/KCBNgDuBh52hn8tRZMvCeSE8bbLCNO5qnoLzjEHjpuPy0kzjYUVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f/MnuYWp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79B9FC4CED6;
+	Mon,  3 Mar 2025 13:09:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741007368;
+	bh=JbSwGZ/wELTrXO7XKmcWatlS3Iq75TQfCfzGJlDgLmQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=f/MnuYWpZ+jM1e70sWmYC/TkbpFgpBP1KGu5+3x1ycK8eDZoU2nZf2ExnpbfvAzRf
+	 5huGJlm7ZLITepdCS/G4XWoSqRFmMJCxNJzjiCSZueggl08czx6hFMDykLNHYHDsUz
+	 yYCU9libF4wbdEWCfXnIUfKZQlqAQk3sdWP4OEkt5biqIAQMr/SDqbLKklor55o2uQ
+	 gqs6BLB4shIfApD3HJEoOkRv27Jfw43/bpcD4PffCq9EUvn0CXLvI8AfNSwedtOLlT
+	 ZGuDECMoxNcZHVOa8KnNL4k528OBzwr0k8EdmnTspvAcUt2jHu3kVQA/T7ahQZtsGL
+	 0FeqcqQ117A5A==
+Date: Mon, 3 Mar 2025 13:09:24 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jaakko Karrenpalo <jkarrenpalo@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-Subject: Re: [PATCH net-next v20 15/25] ovpn: implement multi-peer support
-Message-ID: <Z8WpxDpHYzG9pXNl@hog>
-References: <20250227-b4-ovpn-v20-0-93f363310834@openvpn.net>
- <20250227-b4-ovpn-v20-15-93f363310834@openvpn.net>
+	Lukasz Majewski <lukma@denx.de>,
+	MD Danish Anwar <danishanwar@ti.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Jaakko Karrenpalo <jaakko.karrenpalo@fi.abb.com>
+Subject: Re: [PATCH net-next v3 1/2] net: hsr: Fix PRP duplicate detection
+Message-ID: <20250303130924.GR1615191@kernel.org>
+References: <20250227050923.10241-1-jkarrenpalo@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250227-b4-ovpn-v20-15-93f363310834@openvpn.net>
+In-Reply-To: <20250227050923.10241-1-jkarrenpalo@gmail.com>
 
-Hello, a few minor coding style nits on this patch.
+On Thu, Feb 27, 2025 at 07:09:22AM +0200, Jaakko Karrenpalo wrote:
+> Add PRP specific function for handling duplicate
+> packets. This is needed because of potential
+> L2 802.1p prioritization done by network switches.
+> 
+> The L2 prioritization can re-order the PRP packets
+> from a node causing the existing implementation to
+> discard the frame(s) that have been received 'late'
+> because the sequence number is before the previous
+> received packet. This can happen if the node is
+> sending multiple frames back-to-back with different
+> priority.
+> 
+> Signed-off-by: Jaakko Karrenpalo <jkarrenpalo@gmail.com>
+> ---
+> Changes in v3:
+> - Fixed indentation
+> - Renamed local variables
 
-2025-02-27, 02:21:40 +0100, Antonio Quartulli wrote:
-> @@ -197,9 +254,16 @@ static int ovpn_netdev_notifier_call(struct notifier_block *nb,
->  		netif_carrier_off(dev);
->  		ovpn->registered = false;
->  
-> -		if (ovpn->mode == OVPN_MODE_P2P)
-> +		switch (ovpn->mode) {
-> +		case OVPN_MODE_P2P:
->  			ovpn_peer_release_p2p(ovpn, NULL,
->  					      OVPN_DEL_PEER_REASON_TEARDOWN);
-> +			break;
-> +		case OVPN_MODE_MP:
-> +			ovpn_peers_free(ovpn, NULL,
-> +					OVPN_DEL_PEER_REASON_TEARDOWN);
-> +			break;
-> +		}
+Thanks, I see that this addresses Paolo's review of v2
+and overall looks good to me.
 
-nit: maybe that switch could be done inside ovpn_peers_free, since
-both places calling ovpn_peers_free do the same thing?
-(it would also be more consistent with the rest of the peer-related
-functions that are wrappers for the _mp/_p2p variant, rather than
-pushing the switch down to the caller)
+Reviewed-by: Simon Horman <horms@kernel.org>
 
+Please find below two minor nits.
+I don't think you need to respin because of them.
+But do consider addressing them if there is a new
+revision for some other reason.
 
-> +void ovpn_peers_free(struct ovpn_priv *ovpn, struct sock *sk,
-> +		     enum ovpn_del_peer_reason reason)
+...
+
+> diff --git a/net/hsr/hsr_framereg.c b/net/hsr/hsr_framereg.c
+
+...
+
+> +/* Adaptation of the PRP duplicate discard algorithm described in wireshark
+> + * wiki (https://wiki.wireshark.org/PRP)
+> + *
+> + * A drop window is maintained for both LANs with start sequence set to the
+> + * first sequence accepted on the LAN that has not been seen on the other LAN,
+> + * and expected sequence set to the latest received sequence number plus one.
+> + *
+> + * When a frame is received on either LAN it is compared against the received
+> + * frames on the other LAN. If it is outside the drop window of the other LAN
+> + * the frame is accepted and the drop window is updated.
+> + * The drop window for the other LAN is reset.
+> + *
+> + * 'port' is the outgoing interface
+> + * 'frame' is the frame to be sent
+> + *
+> + * Return:
+> + *	 1 if frame can be shown to have been sent recently on this interface,
+> + *	 0 otherwise
+> + */
+> +int prp_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame)
 > +{
-> +	struct ovpn_socket *ovpn_sock;
-> +	LLIST_HEAD(release_list);
-> +	struct ovpn_peer *peer;
-> +	struct hlist_node *tmp;
-> +	bool skip;
-> +	int bkt;
+> +	enum hsr_port_type other_port;
+> +	enum hsr_port_type rcv_port;
+> +	struct hsr_node *node;
+> +	u16 sequence_diff;
+> +	u16 sequence_exp;
+> +	u16 sequence_nr;
 > +
-> +	spin_lock_bh(&ovpn->lock);
-> +	hash_for_each_safe(ovpn->peers->by_id, bkt, tmp, peer, hash_entry_id) {
-> +		/* if a socket was passed as argument, skip all peers except
-> +		 * those using it
+> +	/* out-going frames are always in order
+> +	 *and can be checked the same way as for HSR
+
+nit: space between '*' and 'and'.
+
+> +	 */
+> +	if (frame->port_rcv->type == HSR_PT_MASTER)
+> +		return hsr_register_frame_out(port, frame);
+> +
+> +	/* for PRP we should only forward frames from the slave ports
+> +	 * to the master port
+> +	 */
+> +	if (port->type != HSR_PT_MASTER)
+> +		return 1;
+> +
+> +	node = frame->node_src;
+> +	sequence_nr = frame->sequence_nr;
+> +	sequence_exp = sequence_nr + 1;
+> +	rcv_port = frame->port_rcv->type;
+> +	other_port =
+> +		rcv_port == HSR_PT_SLAVE_A ? HSR_PT_SLAVE_B : HSR_PT_SLAVE_A;
+> +
+> +	spin_lock_bh(&node->seq_out_lock);
+> +	if (time_is_before_jiffies(node->time_out[port->type] +
+> +	    msecs_to_jiffies(HSR_ENTRY_FORGET_TIME)) ||
+> +	    (node->seq_start[rcv_port] == node->seq_expected[rcv_port] &&
+> +	    node->seq_start[other_port] == node->seq_expected[other_port])) {
+
+nit: the line above should be indented to align with the inside of the
+     parentheses on the preceding line.
+
+	    (node->seq_start[rcv_port] == node->seq_expected[rcv_port] &&
+	     node->seq_start[other_port] == node->seq_expected[other_port])) {
+
+> +		/* the node hasn't been sending for a while
+> +		 * or both drop windows are empty, forward the frame
 > +		 */
-> +		if (sk) {
-> +			skip = true;
+> +		node->seq_start[rcv_port] = sequence_nr;
+> +	} else if (seq_nr_before(sequence_nr, node->seq_expected[other_port]) &&
+> +		   seq_nr_before_or_eq(node->seq_start[other_port], sequence_nr)) {
+> +		/* drop the frame, update the drop window for the other port
+> +		 * and reset our drop window
+> +		 */
+> +		node->seq_start[other_port] = sequence_exp;
+> +		node->seq_expected[rcv_port] = sequence_exp;
+> +		node->seq_start[rcv_port] = node->seq_expected[rcv_port];
+> +		spin_unlock_bh(&node->seq_out_lock);
+> +		return 1;
+> +	}
 > +
-> +			rcu_read_lock();
-> +			ovpn_sock = rcu_access_pointer(peer->sock);
-
-rcu_dereference, since you're actually accessing ovpn_sock->sock
-afterwards?
-
-> +			if (ovpn_sock && ovpn_sock->sock->sk == sk)
-> +				skip = false;
-> +			rcu_read_unlock();
+> +	/* update the drop window for the port where this frame was received
+> +	 * and clear the drop window for the other port
+> +	 */
+> +	node->seq_start[other_port] = node->seq_expected[other_port];
+> +	node->seq_expected[rcv_port] = sequence_exp;
+> +	sequence_diff = sequence_exp - node->seq_start[rcv_port];
+> +	if (sequence_diff > PRP_DROP_WINDOW_LEN)
+> +		node->seq_start[rcv_port] = sequence_exp - PRP_DROP_WINDOW_LEN;
 > +
-> +			if (skip)
-> +				continue;
-
-
-The skip/continue logic looks a tiny bit strange to me, maybe this:
-
-	hash_for_each_safe(ovpn->peers->by_id, bkt, tmp, peer, hash_entry_id) {
-		bool remove = true;
-
-		/* if a socket was passed as argument, skip all peers except
-		 * those using it
-		 */
-		if (sk) {
-			rcu_read_lock();
-			ovpn_sock = rcu_dereference(peer->sock);
-			remove = ovpn_sock && ovpn_sock->sock->sk == sk;
-			rcu_read_unlock();
-		}
-
-		if (remove)
-			ovpn_peer_remove(peer, reason, &release_list);
-	}
-
-
-(only if you agree it looks better - if it's my opinion against yours,
-ignore me since it's really just coding style/taste)
-
--- 
-Sabrina
+> +	node->time_out[port->type] = jiffies;
+> +	node->seq_out[port->type] = sequence_nr;
+> +	spin_unlock_bh(&node->seq_out_lock);
+> +	return 0;
+> +}
+> +
+>  static struct hsr_port *get_late_port(struct hsr_priv *hsr,
+>  				      struct hsr_node *node)
+>  {
 
