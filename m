@@ -1,133 +1,124 @@
-Return-Path: <netdev+bounces-171762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EF82A4E841
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:17:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A760A4EC08
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:41:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 473174211BC
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:07:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCF6A1889F48
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:37:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40C7727814A;
-	Tue,  4 Mar 2025 16:45:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEDC6279350;
+	Tue,  4 Mar 2025 18:31:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="GpzD4opl"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="A6svpFLx"
 X-Original-To: netdev@vger.kernel.org
-Received: from beeline2.cc.itu.edu.tr (beeline2.cc.itu.edu.tr [160.75.25.116])
+Received: from beeline1.cc.itu.edu.tr (beeline1.cc.itu.edu.tr [160.75.25.115])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E319C27C852
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 16:45:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=160.75.25.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 474E1278118
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 18:31:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=160.75.25.115
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741106757; cv=pass; b=OpWNOBEZdcsTrwggo8eaUYNwXGFWLcItM3k9TBvuf5e2M1CReAMsJSjODBccnLTkeK4TIPJigb1rXRGs+zlmeg3y1YIjwBt7HRvdQSv/XALvWBflxa4KFkEYkWGGLWnJd2bU/D1X1JEOTEY0IPtsywyz0XuGUPEqCQGQWKWBl7Y=
+	t=1741113083; cv=fail; b=eVG4fM/GBmrHin+URB5m5PN3fDFcz9NkuNSfJ+AKJEGuBMrjhHAfp4qSRgMAg/5epV8GlMtQ5iUrieFCmM2DxTJnfi3EbZzgDlVLpA5EChCEmJ6wmxt2QpzMbCvR+dgMu/7vTQXDeZP8xUFqN9iRfE5W0O2LI4rN1TrzXLNAufA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741106757; c=relaxed/simple;
-	bh=MuXhWb8I/WgZF55jUWmYmeYlpzilT+5kGD3/bEfg+Qs=;
+	s=arc-20240116; t=1741113083; c=relaxed/simple;
+	bh=xgkOjTGBuPWiC/vGa3GGgTxvoOaTjkFNA5ftkaM32co=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G3jjz4xRRh0dss7dYEvs1Rs4Oc9DOrS2PH7nrGmBTTHB+5tAugU3Xmyxe9jw9LUosTViNV9/7b5RnrP3zju73sDc+aycljXdjZi/QK/4eSrTcQNUBEBzrfMROAUb+pPiOZKlp9C42qq6fk7x1RZ0UCuL6iWfqvTfMiz/8ZMfX6g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=fail (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=GpzD4opl reason="signature verification failed"; arc=none smtp.client-ip=78.32.30.218; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; arc=pass smtp.client-ip=160.75.25.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=armlinux.org.uk
+	 Content-Type:Content-Disposition:In-Reply-To; b=XgwwllDh0QEPmJCj3FarpYbQnSGzQqfcu7mxmLI1jbl3Qf6sCF5SjuSbqNTFdvMYiWCWfO5tTxerkjbx7mLWYGp+vpjr4qebEsqdyzI88LfKyrx4bKe4RuoqKX5b15aeLXNuIn5NXLDd9pMzTf8+B5DGjlwLhcOISv9w3Q9exbo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=fail (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=A6svpFLx reason="signature verification failed"; arc=none smtp.client-ip=90.155.50.34; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; arc=fail smtp.client-ip=160.75.25.115
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=cc.itu.edu.tr
 Received: from lesvatest1.cc.itu.edu.tr (lesvatest1.cc.itu.edu.tr [10.146.128.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
 	(No client certificate requested)
-	by beeline2.cc.itu.edu.tr (Postfix) with ESMTPS id 6436840894F2
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 19:45:52 +0300 (+03)
+	by beeline1.cc.itu.edu.tr (Postfix) with ESMTPS id 8BC0B408B5E6
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 21:31:20 +0300 (+03)
 X-Envelope-From: <root@cc.itu.edu.tr>
 Received: from lesva1.cc.itu.edu.tr (unknown [160.75.70.79])
-	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6hNf6bFXzG47F
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 19:44:34 +0300 (+03)
+	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6fmp1jX1zG0hH
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 18:31:54 +0300 (+03)
 Received: by le1 (Postfix, from userid 0)
-	id E97864272B; Tue,  4 Mar 2025 19:44:21 +0300 (+03)
+	id 562C342729; Tue,  4 Mar 2025 18:31:41 +0300 (+03)
 Authentication-Results: lesva1.cc.itu.edu.tr;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=GpzD4opl
-X-Envelope-From: <linux-kernel+bounces-541467-bozkiru=itu.edu.tr@vger.kernel.org>
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=A6svpFLx
+X-Envelope-From: <linux-kernel+bounces-541573-bozkiru=itu.edu.tr@vger.kernel.org>
 Authentication-Results: lesva2.cc.itu.edu.tr;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=GpzD4opl
-Received: from fgw2.itu.edu.tr (fgw2.itu.edu.tr [160.75.25.104])
-	by le2 (Postfix) with ESMTP id ED87E42EF2
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 14:04:00 +0300 (+03)
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by fgw2.itu.edu.tr (Postfix) with SMTP id 7FD6E2DCDE
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 14:04:00 +0300 (+03)
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=A6svpFLx
+Received: from fgw1.itu.edu.tr (fgw1.itu.edu.tr [160.75.25.103])
+	by le2 (Postfix) with ESMTP id 7A079423C8
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 14:27:44 +0300 (+03)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by fgw1.itu.edu.tr (Postfix) with SMTP id 5191F305F789
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 14:27:44 +0300 (+03)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F5AD3AD5E2
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 10:59:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 710D8188BC47
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 11:25:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F7961F4181;
-	Mon,  3 Mar 2025 10:58:34 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F2331F4171;
+	Mon,  3 Mar 2025 11:25:13 +0000 (UTC)
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B211F3B9D;
-	Mon,  3 Mar 2025 10:58:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C890D1EEA5F;
+	Mon,  3 Mar 2025 11:25:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740999510; cv=none; b=LQ//U+brAMF1U7oEN9/sTDeECfUhQfxIZ+wA7bQQC+ISjZJ8NU6yF+BnfPgx5ogup4kMC8QQQCOC6iAVnvOWi7sd7kms3fkrpUtHeW36M+DPskM+XZy5cM7i5U7WX1S7juo3RTWS3PJLEnBdfUbaj41S2MJlcw4Si6ENXvgAUTM=
+	t=1741001110; cv=none; b=aKSlEvlHoes7mmsf4FdEt5D3OXzlcTeSaYvhwxCubXEMUAeIfJ1yqNZZKG+2Xf5BBfDLZHQSLU4nhod8Ia5si1iyFk4DfBvTAuz9ymTXOV3J4u4RoWlElW1gCtXMjn8JviIuE1Q0ijxY+tt2cogOt63NppqDS25OO9bv1tMJPG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740999510; c=relaxed/simple;
-	bh=MuXhWb8I/WgZF55jUWmYmeYlpzilT+5kGD3/bEfg+Qs=;
+	s=arc-20240116; t=1741001110; c=relaxed/simple;
+	bh=gHkoVUKKkI/RUOL3nlWslvI3CJujVU9I3eG0j1qBMvw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HJLERoLLDMppbmfYGAqAWVuURV2Uzm3YqFimALW2BPptwzVUdWMjc0jsd523WN9jMix96Hb1EtvCAe70/bK/d9YTYrLgNe4k0VtQ26dGjynVEBdYWP0Bo4Wkvzk3Ah+yceNXxbb3Mz1x7blcsBEF7pEpodJcDGgCYe1kIHrag9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=GpzD4opl; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+	 Content-Type:Content-Disposition:In-Reply-To; b=cv7nzy8t5q6LCrCnnPDZTd47Q9kvjhVgOjBrsS64CykE4qUtKMOnpB+xHQHEsz+UZseB+DSBb02W4svMFWY8MSIBVHij8YXVluP0YCDwN24qZA3hgkorIVf9gQTkkJg4J9/g3lRBXdwjBYW6sfBEHtN5/aazTsWcs0K7gX8Y4WQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=A6svpFLx; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=zVOQIBvyGVn9misUYWwRCx37wyzZpBfrC8j7hiAI1TM=; b=GpzD4oplECLJoIzVb4BmodHX/E
-	HhO9eVfSr6xJOTEPWMFSpCtOCnbJgBDGPBlsi9s24PYSYbEtYdJbuKeJ90gOHwN72N3VFv2tA4ijP
-	ktNFCW8NIj8dOK1PWBiXjElXVkn/I65LiZ3Jril76QkgLTI/Bnvsh9LUnolgPtzxMncnRRS1jbzfk
-	Mf68n13ZrtowQkmA9pykzMPrzOELtoU4+W53NiOnhT51uYTt9GTkkQr24A+1gHtF+RJ8i0gFK42hw
-	Xnk1ZRi257P5e4QnPZ1N3y3+oTNKfpAvwTCfMxvBckdopN7kMcQyEAO6DPlRfSpb/wcQTrMVUSo53
-	RtZSUNuA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56642)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tp3Uz-0000I9-14;
-	Mon, 03 Mar 2025 10:58:13 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tp3Uw-0003jb-2J;
-	Mon, 03 Mar 2025 10:58:10 +0000
-Date: Mon, 3 Mar 2025 10:58:10 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH 3/3] net: stmmac: Add DWMAC glue layer for Renesas GBETH
-Message-ID: <Z8WLQrmsi3ZbiQf1@shell.armlinux.org.uk>
-References: <20250302181808.728734-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250302181808.728734-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <Z8SydsdDsZfdrdbE@shell.armlinux.org.uk>
- <CA+V-a8vCB7nP=tsv4UkOwODSs-9hiG-PxN6cpihfvwjq2itAHg@mail.gmail.com>
- <CA+V-a8un7Oy9NtfDUfs0DSwRVAFn52-vWj1Os=u_1dqijJhbMw@mail.gmail.com>
- <Z8V9OC_1llF3leZd@shell.armlinux.org.uk>
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=z6iQmFx3kUgte9Kb2AwgmkALnfbli8g8jvKzg5SWVmE=; b=A6svpFLx+pNLGKW0tQeTqsPM61
+	1sm+BtaqdI70N/rG9pstcBbdXlHScuTkqQnDqfdrYnfnmHc9BvSWs6YCfM9mtpWuVljrgeOdkC0Mf
+	b284F5lp92X7GTV3DQYSjf+23RGk+32PSJDejGnbDytInBeqTNlBuArnjtB1UYjD16srlrNS3TI5Z
+	ElkOaUwZxJiCGlzU8HJuBDVHNM8Aze3yU9ran6C78MVRLOpvw8aO5ZgS02CujS7InNxCFfYJ0nErI
+	5Ipj4oT8pK0hYd62nQyVqTc/QrCYNI2Wm7/8Mlz6f54WLv1e42wgVY6XMTmAKjaIYUKLdtnxSRnpL
+	Si5MMx6Q==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1tp3uj-0000000BXXv-1WAU;
+	Mon, 03 Mar 2025 11:24:49 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id B6C223002C7; Mon,  3 Mar 2025 12:24:48 +0100 (CET)
+Date: Mon, 3 Mar 2025 12:24:48 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: rostedt@goodmis.org, mark.rutland@arm.com, alexei.starovoitov@gmail.com,
+	catalin.marinas@arm.com, will@kernel.org, mhiramat@kernel.org,
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+	martin.lau@linux.dev, eddyz87@gmail.com, yonghong.song@linux.dev,
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+	jolsa@kernel.org, davem@davemloft.net, dsahern@kernel.org,
+	mathieu.desnoyers@efficios.com, nathan@kernel.org,
+	nick.desaulniers+lkml@gmail.com, morbo@google.com,
+	samitolvanen@google.com, kees@kernel.org, dongml2@chinatelecom.cn,
+	akpm@linux-foundation.org, riel@surriel.com, rppt@kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, llvm@lists.linux.dev
+Subject: Re: [PATCH bpf-next v3 1/4] x86/ibt: factor out cfi and fineibt
+ offset
+Message-ID: <20250303112448.GZ11590@noisy.programming.kicks-ass.net>
+References: <20250303065345.229298-1-dongml2@chinatelecom.cn>
+ <20250303065345.229298-2-dongml2@chinatelecom.cn>
+ <20250303091811.GH5880@noisy.programming.kicks-ass.net>
+ <CADxym3as+KdeBMUigq4xq302g2U7UG-7Gm+vKiYGnSjHouq=bg@mail.gmail.com>
 Precedence: bulk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -135,111 +126,42 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Z8V9OC_1llF3leZd@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <CADxym3as+KdeBMUigq4xq302g2U7UG-7Gm+vKiYGnSjHouq=bg@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
 X-ITU-Libra-ESVA-Information: Please contact Istanbul Teknik Universitesi for more information
-X-ITU-Libra-ESVA-ID: 4Z6hNf6bFXzG47F
+X-ITU-Libra-ESVA-ID: 4Z6fmp1jX1zG0hH
 X-ITU-Libra-ESVA: No virus found
 X-ITU-Libra-ESVA-From: root@cc.itu.edu.tr
-X-ITU-Libra-ESVA-Watermark: 1741711488.35481@ZEAS6f8U+RrUs4mJdGfMuw
+X-ITU-Libra-ESVA-Watermark: 1741717785.13839@ao3SHwALn+mff/61cKlrrA
 X-ITU-MailScanner-SpamCheck: not spam
 
-On Mon, Mar 03, 2025 at 09:58:16AM +0000, Russell King (Oracle) wrote:
-> I think that the way forward would be to introduce yet another flag
-> (maybe STMMAC_FLAG_LPI_TX_CLK_PHY_CAP) and:
-> 
-> 	if (priv->plat->flags & STMMAC_FLAG_LPI_TX_CLK_PHY_CAP)
-> 		priv->tx_lpi_clk_stop = tx_clk_stop;
-> 	else
-> 		priv->tx_lpi_clk_stop = priv->plat->flags &
-> 					STMMAC_FLAG_EN_TX_LPI_CLOCKGATING;
-> 
-> and then where STMMAC_FLAG_EN_TX_LPI_CLOCKGATING is checked, that
-> becomes:
-> 
-> 	ret = stmmac_set_lpi_mode(priv, priv->hw, STMMAC_LPI_TIMER,
-> 				  priv->tx_lpi_clk_stop,
-> 				  priv->tx_lpi_timer);
+On Mon, Mar 03, 2025 at 06:51:41PM +0800, Menglong Dong wrote:
+> On Mon, Mar 3, 2025 at 5:18=E2=80=AFPM Peter Zijlstra <peterz@infradead=
+.org> wrote:
+> >
+> > On Mon, Mar 03, 2025 at 02:53:42PM +0800, Menglong Dong wrote:
+> > > index c71b575bf229..ad050d09cb2b 100644
+> > > --- a/arch/x86/kernel/alternative.c
+> > > +++ b/arch/x86/kernel/alternative.c
+> > > @@ -908,7 +908,7 @@ void __init_or_module noinline apply_seal_endbr=
+(s32 *start, s32 *end, struct mod
+> > >
+> > >               poison_endbr(addr, wr_addr, true);
+> > >               if (IS_ENABLED(CONFIG_FINEIBT))
+> > > -                     poison_cfi(addr - 16, wr_addr - 16);
+> > > +                     poison_cfi(addr, wr_addr);
+> > >       }
+> > >  }
+> >
+> > If you're touching this code, please use tip/x86/core or tip/master.
+>=20
+> Thank you for reminding me that, I were using the linux-next, and
 
-I'm thinking something like the following:
+That must've been an very old -next, because that wr_addr crap has been
+gone a while now.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-index 3a00a988cb36..04197496ee87 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-@@ -307,6 +307,7 @@ struct stmmac_priv {
- 	struct timer_list eee_ctrl_timer;
- 	int lpi_irq;
- 	u32 tx_lpi_timer;
-+	bool tx_lpi_clk_stop;
- 	bool eee_enabled;
- 	bool eee_active;
- 	bool eee_sw_timer_en;
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 7d10e58e009e..7709d431e950 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -461,8 +461,7 @@ static void stmmac_try_to_start_sw_lpi(struct stmmac_priv *priv)
- 	/* Check and enter in LPI mode */
- 	if (!priv->tx_path_in_lpi_mode)
- 		stmmac_set_lpi_mode(priv, priv->hw, STMMAC_LPI_FORCED,
--			priv->plat->flags & STMMAC_FLAG_EN_TX_LPI_CLOCKGATING,
--			0);
-+				    priv->tx_lpi_clk_stop, 0);
- }
- 
- /**
-@@ -1110,13 +1109,18 @@ static int stmmac_mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
- 
- 	priv->eee_enabled = true;
- 
-+	/* Update the transmit clock stop according to PHY capability if
-+	 * the platform allows
-+	 */
-+	if (priv->plat->flags & STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP)
-+		priv->tx_lpi_clk_stop = tx_clk_stop;
-+
- 	stmmac_set_eee_timer(priv, priv->hw, STMMAC_DEFAULT_LIT_LS,
- 			     STMMAC_DEFAULT_TWT_LS);
- 
- 	/* Try to cnfigure the hardware timer. */
- 	ret = stmmac_set_lpi_mode(priv, priv->hw, STMMAC_LPI_TIMER,
--				  priv->plat->flags & STMMAC_FLAG_EN_TX_LPI_CLOCKGATING,
--				  priv->tx_lpi_timer);
-+				  priv->tx_lpi_clk_stop, priv->tx_lpi_timer);
- 
- 	if (ret) {
- 		/* Hardware timer mode not supported, or value out of range.
-@@ -1262,6 +1266,10 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
- 	if (!(priv->plat->flags & STMMAC_FLAG_RX_CLK_RUNS_IN_LPI))
- 		priv->phylink_config.eee_rx_clk_stop_enable = true;
- 
-+	/* Set the default transmit clock stop bit based on the platform glue */
-+	priv->tx_lpi_clk_stop = priv->plat->flags &
-+				STMMAC_FLAG_EN_TX_LPI_CLOCKGATING;
-+
- 	mdio_bus_data = priv->plat->mdio_bus_data;
- 	if (mdio_bus_data)
- 		priv->phylink_config.default_an_inband =
-diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-index cd0d1383df87..102de1aeac17 100644
---- a/include/linux/stmmac.h
-+++ b/include/linux/stmmac.h
-@@ -183,7 +183,8 @@ struct dwmac4_addrs {
- #define STMMAC_FLAG_INT_SNAPSHOT_EN		BIT(9)
- #define STMMAC_FLAG_RX_CLK_RUNS_IN_LPI		BIT(10)
- #define STMMAC_FLAG_EN_TX_LPI_CLOCKGATING	BIT(11)
--#define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY	BIT(12)
-+#define STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP	BIT(12)
-+#define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY	BIT(13)
- 
- struct plat_stmmacenet_data {
- 	int bus_id;
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Anyway, thanks for moving to a newer tree!
 
 
