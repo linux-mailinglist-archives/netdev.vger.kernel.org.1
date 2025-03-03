@@ -1,136 +1,126 @@
-Return-Path: <netdev+bounces-171668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4F74A4E16B
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 15:43:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BE33A4E1AD
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 15:49:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7FEC3BDDCC
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 14:37:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD7CD882074
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 14:40:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA3D926463A;
-	Tue,  4 Mar 2025 14:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45E8320A5D6;
+	Tue,  4 Mar 2025 14:38:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J1HPdinK"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ozlcNGP/"
 X-Original-To: netdev@vger.kernel.org
-Received: from beeline1.cc.itu.edu.tr (beeline1.cc.itu.edu.tr [160.75.25.115])
+Received: from beeline3.cc.itu.edu.tr (beeline3.cc.itu.edu.tr [160.75.25.117])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EEAA264A87
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 14:34:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=160.75.25.115
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 736C5253F2F
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 14:38:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=160.75.25.117
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741098893; cv=fail; b=AIznloMQQznt931ZOMng9SnSFe+eVXTPUeqjqmBWhqNg4dGAzY+FD1og5wxzDwcHFTqbu5J7z4cb5J2Y1Yv5NxjQ1pqWTM+zspZpv8Bd9kfZey1Fgmdl3EdNQrtDOhB5kWJME9hpNMgUJ+QNXHTTKtY7CpoRDvw9kMCeHqICe7o=
+	t=1741099085; cv=fail; b=ZzghnNkt8myfzbnXdfShnivjhkLP8gESKTnsWjDyMIXcpIWm6UqTQWCLzsXP4WAHwrep9boRjLOZvTfZejlmae0JZU/+PT5aPCyvR02AZmXV5FUin8ZFeEluozkwrA/FcwLE5YXTxbuFxnDVpWIN8ZAidqeISjg5EzpEKY6Qf4E=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741098893; c=relaxed/simple;
-	bh=MRsuqGKDkpM+V3F9xTGFLKoSRBfvbpgCRGM3wSNsO4U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X/vz76x+VCQcbZj/AoDmKoAu+6meTGRTuJlnWNqxBEDizzzAMD8zTL8Yt/atvwFFJI8Rx3+bb9czcblbhOZNsH7MuMdVaMrmzHBozympeIhO3p3yQVYYTcyRxhKXtYouS690CSxAtLKEQIilu7/O7h83SV+0hjA8c6LqRZVGR0A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=fail (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J1HPdinK reason="signature verification failed"; arc=none smtp.client-ip=192.198.163.15; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; arc=fail smtp.client-ip=160.75.25.115
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	s=arc-20240116; t=1741099085; c=relaxed/simple;
+	bh=9RqzNHECwJsMZn/eeVcH9WuUClLs28XFDnadDq93Rl8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=T5EnYTOikbSgCR/kcOJb9YqyOXLcHgaUHqfMShRQJxD6ZQlNHYK4KCCivhewaxcvjWjCpFFQbPK86aziWPJGXsa8EnppwjH2uLIi2+zieYPOSXrjVzX3lNlrxqUp1AgAAcwK47P9OhKJKeGUieGk9Br1Yv9mJwrv8/YYBsUwJlg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=bootlin.com; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=fail (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ozlcNGP/ reason="signature verification failed"; arc=none smtp.client-ip=217.70.183.196; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; arc=fail smtp.client-ip=160.75.25.117
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=cc.itu.edu.tr
 Received: from lesvatest1.cc.itu.edu.tr (lesvatest1.cc.itu.edu.tr [10.146.128.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
 	(No client certificate requested)
-	by beeline1.cc.itu.edu.tr (Postfix) with ESMTPS id 6F34A40D0479
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:34:50 +0300 (+03)
+	by beeline3.cc.itu.edu.tr (Postfix) with ESMTPS id BB5BB40CF130
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:38:01 +0300 (+03)
 X-Envelope-From: <root@cc.itu.edu.tr>
+Authentication-Results: lesvatest1.cc.itu.edu.tr;
+	dkim=fail reason="signature verification failed" (2048-bit key, unprotected) header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=gm1 header.b=ozlcNGP/
 Received: from lesva1.cc.itu.edu.tr (unknown [160.75.70.79])
-	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6dS959vSzFwTJ
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:32:25 +0300 (+03)
+	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6dYt5pc5zFx2m
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:37:22 +0300 (+03)
 Received: by le1 (Postfix, from userid 0)
-	id 1E4A94272D; Tue,  4 Mar 2025 17:32:20 +0300 (+03)
+	id A71A742735; Tue,  4 Mar 2025 17:37:10 +0300 (+03)
 Authentication-Results: lesva1.cc.itu.edu.tr;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J1HPdinK
-X-Envelope-From: <linux-kernel+bounces-541107-bozkiru=itu.edu.tr@vger.kernel.org>
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ozlcNGP/
+X-Envelope-From: <linux-kernel+bounces-541222-bozkiru=itu.edu.tr@vger.kernel.org>
 Authentication-Results: lesva2.cc.itu.edu.tr;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J1HPdinK
-Received: from fgw2.itu.edu.tr (fgw2.itu.edu.tr [160.75.25.104])
-	by le2 (Postfix) with ESMTP id 1BCA441CBE
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 10:50:41 +0300 (+03)
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by fgw2.itu.edu.tr (Postfix) with SMTP id E6EFF2DCE5
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 10:50:40 +0300 (+03)
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ozlcNGP/
+Received: from fgw1.itu.edu.tr (fgw1.itu.edu.tr [160.75.25.103])
+	by le2 (Postfix) with ESMTP id 22ED442E50
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 12:05:51 +0300 (+03)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by fgw1.itu.edu.tr (Postfix) with SMTP id AF7253063EFC
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 12:05:50 +0300 (+03)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7197B1892085
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 07:50:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC0FD3B19B7
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 09:04:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C8161EEA49;
-	Mon,  3 Mar 2025 07:50:14 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B405B1F2C45;
+	Mon,  3 Mar 2025 09:03:42 +0000 (UTC)
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA561EE03D;
-	Mon,  3 Mar 2025 07:50:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73EA61EFF9A;
+	Mon,  3 Mar 2025 09:03:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740988211; cv=none; b=IQCPhjwz0kTcfBvoFS1hpOpl5Whi8VJo4kgLfEhmsT7MnpDbs7GNkATOI2l9r0e4zvXmbJXXDARu2L0ynFb8YVyBrU7InhDMb0r6HelWHAU4qz3im0J/wAADYGzJu9uWe9cueNGaWd9/JB+8CPpG8tL3qeAPZ65qHF7g+BwWJ0w=
+	t=1740992618; cv=none; b=SOkpcr4y7lxUuNXwCuPgsEjlSgv2raoLDbBregClsMZV7Ojq5MQm41K5+nw080jIU+Lsr62hscZZU5PBJlFeoHV+YMRkB7xkCEMLtVYGC7W41jz8DXn+MKAvpAGPcAWmxkUnjK2npm8ig7d8KElFwW38vv4ngkKFi+Ct+08K+e8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740988211; c=relaxed/simple;
-	bh=4aoAkVkWJ9rE1k/obWZXGikyJB41caL0MMe9Y2MIi4Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VBtNB85Sw4WHQCCFloQtUBFZwUduLThz4/f8j2OGTLnprvV1lfZZYPYrBWyfOdlmhdAnKoe//R0Nh0uJJY9/XtFdDzhyWrXPl+MaoN7V8yaoFc+xPt6ZgNJKxmmJNpvwdeLxST/Z2FPAiZILqmzhCt7VsulGKldayMrST91EcWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J1HPdinK; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740988210; x=1772524210;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=4aoAkVkWJ9rE1k/obWZXGikyJB41caL0MMe9Y2MIi4Q=;
-  b=J1HPdinK/KHhwgQv/bWmTAhKcU/J6BvYcJoHelipf0r3WU49WMITlKHJ
-   FdWx1Vxm27zOYt8/7WFW3kE35CIjvAx/f2TYK5uGFBebI2Ow/Vbr38YFe
-   IgQy6sSqVYqGbQru/lInxN2PdqscsrlonqOAo39mepYr8FlliEhxkbmaO
-   G3lmxGw5CAebtk0fv8mfzGI+58cgvvVWLKH4eoIr6YEONXbq2zMHiODfN
-   m0sfKih4ovJSMndfK9ORG1aj5XISwMWeBmgNrVlU5JsFyQVE2E6eWDs6f
-   aczZIFCgYj7i0UUS+jEsPwjOnaGGSmaw0ETEI2DwuITULXkaAM/w2eaTv
-   Q==;
-X-CSE-ConnectionGUID: AXQRHB34QcOtqvi2QUpwsQ==
-X-CSE-MsgGUID: FAG3B9gWRW6NFITqEzXHLw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11361"; a="41974308"
-X-IronPort-AV: E=Sophos;i="6.13,329,1732608000"; 
-   d="scan'208";a="41974308"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2025 23:50:09 -0800
-X-CSE-ConnectionGUID: r4EkK5uLTOOHRZNDHcCvsQ==
-X-CSE-MsgGUID: oK5Me+PZRnKJQDwsK0W+pA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,329,1732608000"; 
-   d="scan'208";a="117733442"
-Received: from smile.fi.intel.com ([10.237.72.58])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Mar 2025 23:50:04 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1tp0Yr-0000000GkI5-1VwS;
-	Mon, 03 Mar 2025 09:50:01 +0200
-Date: Mon, 3 Mar 2025 09:50:01 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Richard Cochran <richardcochran@gmail.com>
-Cc: Arnd Bergmann <arnd@kernel.org>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>,
-	Arnd Bergmann <arnd@arndb.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1740992618; c=relaxed/simple;
+	bh=Xe5DtVc36aoeujGluGgUU94BaG2yMQDfaeDrNMgGBWw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=UT2rlCNYxxguFvKDFszGsq3w0GqUxYv2JMUcKXGpN6viuggevIXftADvmf9FKOXVBJMN8SQyPIB58xMEEVPwzSC6InBqr0aJ3IZiywIK3hETDVbjQhJ7gZqETjNru4gNS8GhCoHdG/+w7sXAq3Alzro9ZLAWR2Wxqi85Agd1elI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ozlcNGP/; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4ED1D4453C;
+	Mon,  3 Mar 2025 09:03:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1740992609;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2nlXSi0W8T18XrNdXk/bylgWWVWE2JtetZpcNhMntQE=;
+	b=ozlcNGP/ouUJ80B1R0MMogN2wGV50zUXMaU8OrDadyUhu++dPmXg70/tg5Xt7FYC8h1ewO
+	6K9fq1WNu/ViMbEaaYYueha60K1Lu90czfwgxvUUVHl0e6BXaHgEzpM+eBQOxxiySwovKo
+	h9IWRD7fucQ0e+YHkV+62qliZn2ScyIkBCYIEV8m/pDZsPi2cHtjq34G6O9f7NUf5wOHDz
+	GmhmESN4fD9/Fu2XX9RDSxARDzQcHzOLL+TWDKfOTJ5BVzkeWeZPNPh+tLJnQbQ2CJiXvK
+	x4dN3DQdoHvBd8w92cdw8wsBUZ5L5jG2jyjXatxqySfyXhekwDshy3kdJxURtA==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Tianfei Zhang <tianfei.zhang@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-	Calvin Owens <calvin@wbinvd.org>,
-	Philipp Stanner <pstanner@redhat.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-fpga@vger.kernel.org
-Subject: Re: [PATCH] RFC: ptp: add comment about register access race
-Message-ID: <Z8VfKYMGEKhvluJV@smile.fi.intel.com>
-References: <20250227141749.3767032-1-arnd@kernel.org>
- <Z8CDhIN5vhcSm1ge@smile.fi.intel.com>
- <Z8TFrPv1oajA3H4V@hoboy.vegasvil.org>
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Simon Horman <horms@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>
+Subject: [PATCH net-next v4 01/13] net: ethtool: Export the link_mode_params definitions
+Date: Mon,  3 Mar 2025 10:03:07 +0100
+Message-ID: <20250303090321.805785-2-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250303090321.805785-1-maxime.chevallier@bootlin.com>
+References: <20250303090321.805785-1-maxime.chevallier@bootlin.com>
 Precedence: bulk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -138,71 +128,96 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <Z8TFrPv1oajA3H4V@hoboy.vegasvil.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdelkeejudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeevgedtffelffelveeuleelgfejfeevvdejhfehgeefgfffvdefteegvedutefftdenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvtddprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgri
+ igvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomh
+X-GND-Sasl: maxime.chevallier@bootlin.com
 Content-Transfer-Encoding: quoted-printable
 X-ITU-Libra-ESVA-Information: Please contact Istanbul Teknik Universitesi for more information
-X-ITU-Libra-ESVA-ID: 4Z6dS959vSzFwTJ
+X-ITU-Libra-ESVA-ID: 4Z6dYt5pc5zFx2m
 X-ITU-Libra-ESVA: No virus found
 X-ITU-Libra-ESVA-From: root@cc.itu.edu.tr
-X-ITU-Libra-ESVA-Watermark: 1741703610.01176@HjQavom5Vcmprccs6pUmJQ
+X-ITU-Libra-ESVA-Watermark: 1741703844.72825@pjV5k6Y8o7rVe1gsp5k3DA
 X-ITU-MailScanner-SpamCheck: not spam
 
-On Sun, Mar 02, 2025 at 12:55:08PM -0800, Richard Cochran wrote:
-> On Thu, Feb 27, 2025 at 05:23:48PM +0200, Andy Shevchenko wrote:
-> > On Thu, Feb 27, 2025 at 03:17:27PM +0100, Arnd Bergmann wrote:
-> > > From: Arnd Bergmann <arnd@arndb.de>
-> > >=20
-> > > While reviewing a patch to the ioread64_hi_lo() helpers, I noticed
-> > > that there are several PTP drivers that use multiple register reads
-> > > to access a 64-bit hardware register in a racy way.
-> > >=20
-> > > There are usually safe ways of doing this, but at least these four
-> > > drivers do that.  A third register read obviously makes the hardwar=
-e
-> > > access 50% slower. If the low word counds nanoseconds and a single
-> > > register read takes on the order of 1=B5s, the resulting value is
-> > > wrong in one of 4 million cases, which is pretty rare but common
-> > > enough that it would be observed in practice.
->=20
-> If the hardware does NOT latch the registers together, then the driver =
-must do:
->=20
->   1. hi1 =3D read hi
->   2. low =3D read lo
->   3. hi2 =3D read h1
->   4. if (hi2 =3D=3D hi1 return (hi1 << 32) | low;
->   5. goto step 1.
->=20
-> This for correctness, and correctness > performance.
+link_mode_params contains a lookup table of all 802.3 link modes that
+are currently supported with structured data about each mode's speed,
+duplex, number of lanes and mediums.
 
-Right.
+As a preparation for a port representation, export that table for the
+rest of the net stack to use.
 
-> > > Sorry I hadn't sent this out as a proper patch so far. Any ideas
-> > > what we should do here?
->=20
-> Need to have driver authors check the data sheet because ...
->=20
-> > Actually this reminds me one of the discussion where it was some inte=
-resting
-> > HW design that latches the value on the first read of _low_ part (IIR=
-C), but
-> > I might be mistaken with the details.
-> >=20
-> > That said, it's from HW to HW, it might be race-less in some cases.
->=20
-> ... of this.
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
+V4: No changes
 
-Perhaps it's still good to have a comment, but rephrase it that the code =
-is
-questionable depending on the HW behaviour that needs to be checked.
+ include/linux/ethtool.h | 8 ++++++++
+ net/ethtool/common.c    | 1 +
+ net/ethtool/common.h    | 7 -------
+ 3 files changed, 9 insertions(+), 7 deletions(-)
 
+diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+index 7f222dccc7d1..8210ece94fa6 100644
+--- a/include/linux/ethtool.h
++++ b/include/linux/ethtool.h
+@@ -210,6 +210,14 @@ static inline u8 *ethtool_rxfh_context_key(struct et=
+htool_rxfh_context *ctx)
+=20
+ void ethtool_rxfh_context_lost(struct net_device *dev, u32 context_id);
+=20
++struct link_mode_info {
++	int                             speed;
++	u8                              lanes;
++	u8                              duplex;
++};
++
++extern const struct link_mode_info link_mode_params[];
++
+ /* declare a link mode bitmap */
+ #define __ETHTOOL_DECLARE_LINK_MODE_MASK(name)		\
+ 	DECLARE_BITMAP(name, __ETHTOOL_LINK_MODE_MASK_NBITS)
+diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+index ac8b6107863e..c9d6302e88c9 100644
+--- a/net/ethtool/common.c
++++ b/net/ethtool/common.c
+@@ -423,6 +423,7 @@ const struct link_mode_info link_mode_params[] =3D {
+ 	__DEFINE_LINK_MODE_PARAMS(800000, VR4, Full),
+ };
+ static_assert(ARRAY_SIZE(link_mode_params) =3D=3D __ETHTOOL_LINK_MODE_MA=
+SK_NBITS);
++EXPORT_SYMBOL_GPL(link_mode_params);
+=20
+ const char netif_msg_class_names[][ETH_GSTRING_LEN] =3D {
+ 	[NETIF_MSG_DRV_BIT]		=3D "drv",
+diff --git a/net/ethtool/common.h b/net/ethtool/common.h
+index a1088c2441d0..b4683d286a5a 100644
+--- a/net/ethtool/common.h
++++ b/net/ethtool/common.h
+@@ -15,12 +15,6 @@
+ #define __SOF_TIMESTAMPING_CNT (const_ilog2(SOF_TIMESTAMPING_LAST) + 1)
+ #define __HWTSTAMP_FLAG_CNT (const_ilog2(HWTSTAMP_FLAG_LAST) + 1)
+=20
+-struct link_mode_info {
+-	int				speed;
+-	u8				lanes;
+-	u8				duplex;
+-};
+-
+ struct genl_info;
+ struct hwtstamp_provider_desc;
+=20
+@@ -33,7 +27,6 @@ tunable_strings[__ETHTOOL_TUNABLE_COUNT][ETH_GSTRING_LE=
+N];
+ extern const char
+ phy_tunable_strings[__ETHTOOL_PHY_TUNABLE_COUNT][ETH_GSTRING_LEN];
+ extern const char link_mode_names[][ETH_GSTRING_LEN];
+-extern const struct link_mode_info link_mode_params[];
+ extern const char netif_msg_class_names[][ETH_GSTRING_LEN];
+ extern const char wol_mode_names[][ETH_GSTRING_LEN];
+ extern const char sof_timestamping_names[][ETH_GSTRING_LEN];
 --=20
-With Best Regards,
-Andy Shevchenko
-
+2.48.1
 
 
 
