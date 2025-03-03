@@ -1,74 +1,104 @@
-Return-Path: <netdev+bounces-171339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71793A4C923
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:21:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A91AA4C986
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:31:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B4783B9BB0
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:13:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 861493AB9F6
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:16:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08EBE26462C;
-	Mon,  3 Mar 2025 16:55:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB23E2376FA;
+	Mon,  3 Mar 2025 17:00:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dpP3ry4w"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="uo272dwA"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 905C723024D;
-	Mon,  3 Mar 2025 16:55:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05EE32376E1
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 17:00:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741020929; cv=none; b=KZiZUeMtt0+enw+0G9md+8pEF3wgS99boaqcmzd4eVcN3t33nePj9RssjU700/FJf10rCT5a/q6EJYkYL4jww7/64ZO5o8OTWh4L6qrqMYJwS8scc7NQg7E8/tf4v81P722A6KL7VF6RVNff+RDCVIBLD8WVNRtCkfNZi6L+MrI=
+	t=1741021216; cv=none; b=npz8699ZcmmIz5eit+kPCIPOwxZDmvzVPLprHTuWIiOOFfayCX7v/ODQlHF03Y6rnkOD7oOEuiHUqZPrgWUsPvTg8N9dd66zn2+tVtQ0dKhMEXGOymHPNng57YPZBlK0+7xF2zqQ1AoQ2NNeb1riR2ZiBaCIyHF4zU024s0J9es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741020929; c=relaxed/simple;
-	bh=s8s99X4A9mICenge2Kot4pYIpEf6LooeZfPPPPswBWI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sBzbBQx0w8K8EZhEbNfwkA3PuC3UoPU4nz4TRHJvMJSLCueZRnsI3EP5lOXTq5YZlimRDXSo7Q4ylbxi3KTTd4hKoczUG/GhIUre7hg1IdKBYZToFaFDkJYivsVUPC8WI6pNo/SuycBbEH3SMcGq49gd/SN2DNmGsoHKHGQZLCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=dpP3ry4w; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=meSp1W4kNHGyd+88qlhZAmQUNLTT11sQ5+3aYaCOj4Q=; b=dpP3ry4wKDt94DgihnFO+YYQXP
-	D4M9HLwKMcZ1dh8OJ465lh8hjlZIC4hPnM0yu+Bo48hJ25+geFXfhb2yh1JjsYv2G86e6y8Q9aA08
-	EjLGlZwFQIXS8MWxtg4rTznMRQuyEvPa+WNLe2pvD+BteV4xvApnMYQJAC79Lfq83FC8K1mS128bN
-	k9Syjw9M9tEsm1AZBCOn/Wwb3KXYOS3EzdY6uhs54+r5jAjfBJfy5gMkcPRofiRiBUAg2x+X/xWLJ
-	kVME0QXIFcySMe3OdN/xZXFu4nYKpWhju6aKjV+25lMMlQM+XB+vJn3aeblxRU6/Kea/FDiBN5mio
-	eEfj0fJA==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tp94B-00000004aZY-0HlI;
-	Mon, 03 Mar 2025 16:54:55 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 38C6E3006C0; Mon,  3 Mar 2025 17:54:54 +0100 (CET)
-Date: Mon, 3 Mar 2025 17:54:54 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Menglong Dong <menglong8.dong@gmail.com>
-Cc: rostedt@goodmis.org, mark.rutland@arm.com, alexei.starovoitov@gmail.com,
-	catalin.marinas@arm.com, will@kernel.org, mhiramat@kernel.org,
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
-	martin.lau@linux.dev, eddyz87@gmail.com, yonghong.song@linux.dev,
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
-	jolsa@kernel.org, davem@davemloft.net, dsahern@kernel.org,
-	mathieu.desnoyers@efficios.com, nathan@kernel.org,
-	nick.desaulniers+lkml@gmail.com, morbo@google.com,
-	samitolvanen@google.com, kees@kernel.org, dongml2@chinatelecom.cn,
-	akpm@linux-foundation.org, riel@surriel.com, rppt@kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH v4 1/4] x86/ibt: factor out cfi and fineibt offset
-Message-ID: <20250303165454.GB11590@noisy.programming.kicks-ass.net>
-References: <20250303132837.498938-1-dongml2@chinatelecom.cn>
- <20250303132837.498938-2-dongml2@chinatelecom.cn>
+	s=arc-20240116; t=1741021216; c=relaxed/simple;
+	bh=PuyMo56E1J04N+xRFHQpuOme3py1aZX9AvRAkMmg0TQ=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kF1rSz86iJKjsOCWOYDdj4boY13OGzLVV8BlP0c192cJoelrrjXvP9ZZ7HuVTo2nu3bror8+OsaNYDXLNGrDk1yjVm8Ajmo917Oou6FsDhyn8rFO9edYOpAINet2YWEeJkUHozcO7HEAObQxR1621t4yftXnfFPMfTv/YVwrL9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=uo272dwA; arc=none smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7c0ac2f439eso572609685a.0
+        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 09:00:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1741021213; x=1741626013; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=yL69mmP3AaHszBSiFbdb5IOP3AgAgn4Zq7i8mgBTtbc=;
+        b=uo272dwAOxyYV3wwlUSRK7y6qAgQ5HoJhHH5wUO+q4kQJ7MijoexJ0Ok4/8vSHvJKZ
+         V9CFjNFHIs4Vp9cd0PbwcSNDlgOZ+rPJCoAHTwr/dg1LJMpPFSCcMIhaofmFjMm4yxP8
+         OKDl+pH0oMLDZN76zD+cUfgAApjurwx4afWK8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741021213; x=1741626013;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yL69mmP3AaHszBSiFbdb5IOP3AgAgn4Zq7i8mgBTtbc=;
+        b=dRWblmASf0Qge40hkRB+5K0mZPl62wf/x6srwj+HjKKV3JyCpM8FsB08kYsK1unxV/
+         Uq63w7kRS27MeA00StdFM259L+koQhkQTYFu7S7gswPwwkk4SZsaPDMUjmKpcxyme+UX
+         pD4ngoE/xDxgFXL9ugFSCvcTcRfpcQKNFjD7CAS2JduYmuVvJn2FPKkHDMgW5uBmvWW2
+         2BhTgfyiJSdlBiq2D41NIlbAwljORGExF5Yn9sO2b00Hxs9ORTLTKw7j8hlmcg2mZPSA
+         cSRTN2DQ9iUHM/Khvk+rzYIRe/neXB7H6f6GIHboZepbaatHEO7d+t+n9cI4CrXOKjJu
+         fNqw==
+X-Forwarded-Encrypted: i=1; AJvYcCUY79lnu663fi9lMD7UwxMXkSFiHqWU6H0lKSRz+jo2R7psXUtimh4em+sp/Be51GgqYJoSQ34=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvztsRmD9udO7U3ie95uLotON7VzKywdnu39+AMjW4NMfSW9yJ
+	JXrAGGedgcLS4Etor0ifBgdYmNfeQZE7VaOpC90mWbraWD6fZpLdaF08kmJX0Yo=
+X-Gm-Gg: ASbGncvH+Vl6mY+fVibXR9UEJk8kJ2ZUZN22CTTcxB+ymkNh0G7UAD+N970pLnHT+FX
+	LpuGHKOpfa/Rn3IiOLeQm456Qx8nLVgGudpEOlUO1umc2ygcrVx4pqpxqMgXzK6gxedhzCC5vEk
+	lwkXL6Y3SfUvdbnR5bdqTF+Xgk6WDhhcnrk39dlQcjU+cZnS8uvmZ4xr2k4v7puDHZD9OOdzIC3
+	Sz5KuUYGRJvLogk6oow3proCNDTYHOcqSSaRwgU9ZfiepT74wlZca+tOA2f4PVTfxAKyWrGbMP/
+	y3QLYbXosBw10pLzs6relaadzlzn04chiEKSIZrzuoCSGQECoRxa4gGw8TMNmY1srUf9VdHjvPt
+	LppOpEAY=
+X-Google-Smtp-Source: AGHT+IHlpeyEa5ZH06VbJgoLcEMoTEGviZJYbrPAPhw4YUCksto74AOTT5BgLi6sgiQez9Vt7bG6ig==
+X-Received: by 2002:a05:620a:27c7:b0:7c3:bcb2:f44f with SMTP id af79cd13be357-7c3bcb3000emr677131585a.17.1741021212762;
+        Mon, 03 Mar 2025 09:00:12 -0800 (PST)
+Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c36ff0f3c0sm621367685a.56.2025.03.03.09.00.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Mar 2025 09:00:12 -0800 (PST)
+Date: Mon, 3 Mar 2025 12:00:10 -0500
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	mkarsten@uwaterloo.ca, gerhard@engleder-embedded.com,
+	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, mst@redhat.com,
+	leiyang@redhat.com,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v5 3/4] virtio-net: Map NAPIs to queues
+Message-ID: <Z8XgGrToAD7Bak-I@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	mkarsten@uwaterloo.ca, gerhard@engleder-embedded.com,
+	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, mst@redhat.com,
+	leiyang@redhat.com,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
+	open list <linux-kernel@vger.kernel.org>
+References: <20250227185017.206785-1-jdamato@fastly.com>
+ <20250227185017.206785-4-jdamato@fastly.com>
+ <20250228182759.74de5bec@kernel.org>
+ <Z8Xc0muOV8jtHBkX@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,63 +107,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250303132837.498938-2-dongml2@chinatelecom.cn>
+In-Reply-To: <Z8Xc0muOV8jtHBkX@LQ3V64L9R2>
 
-On Mon, Mar 03, 2025 at 09:28:34PM +0800, Menglong Dong wrote:
-> For now, the layout of cfi and fineibt is hard coded, and the padding is
-> fixed on 16 bytes.
+On Mon, Mar 03, 2025 at 11:46:10AM -0500, Joe Damato wrote:
+> On Fri, Feb 28, 2025 at 06:27:59PM -0800, Jakub Kicinski wrote:
+> > On Thu, 27 Feb 2025 18:50:13 +0000 Joe Damato wrote:
+> > > @@ -2870,9 +2883,15 @@ static void refill_work(struct work_struct *work)
+> > >  	for (i = 0; i < vi->curr_queue_pairs; i++) {
+> > >  		struct receive_queue *rq = &vi->rq[i];
+> > >  
+> > > +		rtnl_lock();
+> > >  		virtnet_napi_disable(rq);
+> > > +		rtnl_unlock();
+> > > +
+> > >  		still_empty = !try_fill_recv(vi, rq, GFP_KERNEL);
+> > > +
+> > > +		rtnl_lock();
+> > >  		virtnet_napi_enable(rq);
+> > > +		rtnl_unlock();
+> > 
+> > Looks to me like refill_work is cancelled _sync while holding rtnl_lock
+> > from the close path. I think this could deadlock?
 > 
-> Factor out FINEIBT_INSN_OFFSET and CFI_INSN_OFFSET. CFI_INSN_OFFSET is
-> the offset of cfi, which is the same as FUNCTION_ALIGNMENT when
-> CALL_PADDING is enabled. And FINEIBT_INSN_OFFSET is the offset where we
-> put the fineibt preamble on, which is 16 for now.
+> Good catch, thank you!
 > 
-> When the FUNCTION_ALIGNMENT is bigger than 16, we place the fineibt
-> preamble on the last 16 bytes of the padding for better performance, which
-> means the fineibt preamble don't use the space that cfi uses.
+> It looks like this is also the case in the failure path on
+> virtnet_open.
 > 
-> The FINEIBT_INSN_OFFSET is not used in fineibt_caller_start and
-> fineibt_paranoid_start, as it is always "0x10". Note that we need to
-> update the offset in fineibt_caller_start and fineibt_paranoid_start if
-> FINEIBT_INSN_OFFSET changes.
+> Jason: do you have any suggestions?
 > 
-> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> It looks like in both open and close disable_delayed_refill is
+> called first, before the cancel_delayed_work_sync.
+> 
+> Would something like this solve the problem?
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 76dcd65ec0f2..457115300f05 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -2880,6 +2880,13 @@ static void refill_work(struct work_struct *work)
+>         bool still_empty;
+>         int i;
+> 
+> +       spin_lock(&vi->refill_lock);
+> +       if (!vi->refill_enabled) {
+> +               spin_unlock(&vi->refill_lock);
+> +               return;
+> +       }
+> +       spin_unlock(&vi->refill_lock);
+> +
+>         for (i = 0; i < vi->curr_queue_pairs; i++) {
+>                 struct receive_queue *rq = &vi->rq[i];
+>
 
-I'm confused as to what exactly you mean.
+Err, I suppose this also doesn't work because:
 
-Preamble will have __cfi symbol and some number of NOPs right before
-actual symbol like:
+CPU0                       CPU1
+rtnl_lock                  (before CPU0 calls disable_delayed_refill) 
+  virtnet_close            refill_work
+                             rtnl_lock()
+  cancel_sync <= deadlock
 
-__cfi_foo:
-  mov $0x12345678, %reg
-  nop
-  nop
-  nop
-  ...
-foo:
-
-FineIBT must be at foo-16, has nothing to do with performance. This 16
-can also be spelled: fineibt_preamble_size.
-
-The total size of the preamble is FUNCTION_PADDING_BYTES + CFI_CLANG*5.
-
-If you increase FUNCTION_PADDING_BYTES by another 5, which is what you
-want I think, then we'll have total preamble of 21 bytes; 5 bytes kCFI,
-16 bytes nop.
-
-Then kCFI expects hash to be at -20, while FineIBT must be at -16.
-
-This then means there is no unambiguous hole for you to stick your
-meta-data thing (whatever that is).
-
-There are two options: make meta data location depend on cfi_mode, or
-have __apply_fineibt() rewrite kCFI to also be at -16, so that you can
-have -21 for your 5 bytes.
-
-I think I prefer latter.
-
-In any case, I don't think we need *_INSN_OFFSET. At most we need
-PREAMBLE_SIZE.
-
-Hmm?
+Need to give this a bit more thought.
 
