@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-171299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DA51A4C6E3
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:24:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0780A4C6E5
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:25:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5518D171688
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 16:22:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CBF617193D
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 16:22:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D225A22DFBE;
-	Mon,  3 Mar 2025 16:14:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D69222E412;
+	Mon,  3 Mar 2025 16:14:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ZMMJwDgo"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="kBQy8Ggp"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2059.outbound.protection.outlook.com [40.107.93.59])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2040.outbound.protection.outlook.com [40.107.223.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C772215065
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5FB422E3E9
 	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 16:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.59
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.40
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741018443; cv=fail; b=VUZfS0PQy2TiTmzfUgYIzSHBTmMZx53DsDczcyxrLJegwKNOD6wUPMNXfUAH6TIgm5va9cCtHzvkn7m2UlT4SDYCvl11+3qmlHDQJXalqaDn+q2IF2Ahq90FGYKuXjVwYlYw3EGzv7rHFo4vdCv68QuvJ3h68RynCHVRx2BXV74=
+	t=1741018444; cv=fail; b=O/r15Iy2CyasUuODr/Gm30BTr2feG+EZivoNz7FairUsLxuIXGl15jR3r4WluphAhI6IhURZbv9breAB3Bpfvvrs+bODyMRracfc4hrloyIoiH30S7zDwNCaCDzMs8eZ+aNeLU2VPoRs5/odDnY8/KCknh8Zl+BWNfOE/hGNxgw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741018443; c=relaxed/simple;
-	bh=fliqJnpAyL80wqzXGSanK9wToGVWK6SPNqNE3RzN4sU=;
+	s=arc-20240116; t=1741018444; c=relaxed/simple;
+	bh=jI7Z0RPIUDZZQcW+odQqrXsyoPz8dfGXLL7pTAAds5w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=us1Bw5xteWjULwUEZB38gkJ9zb1U35r3Rx3bB+I8Zum/ii4j1ve57UJcm0Wd9iPfK+8Rn5VIpQJefM6Ko5/1qeGydtuw3pxdRe2t3lj5aM9kkEMF3QuZi3JMaaFh3qrS2lNLDVTh/UQ6ElV94NoDRME34raqbW4E4RSZH7fE95A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ZMMJwDgo; arc=fail smtp.client-ip=40.107.93.59
+	 Content-Type:MIME-Version; b=Gxs6jWpFosj9uGh2ySEakkPUd33xL4/708H/HHHKKh8ObHPLtDnllgKm8bE+5C0HyR8gVRSnd1PNVVdrCiEj4ADGIJFdlELZLQ8qPvZz2xrqwe43FpEqcKZXje69MjpenJPhuQBO+5dL8eP+umZMyOwsgtIrhg2zac6MuD5qq7k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=kBQy8Ggp; arc=fail smtp.client-ip=40.107.223.40
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bW+/e0nc906Of7kRkSLtNVznjx494tOJ9iS7mVpUcZIsXq77hkXpXqp++hVIWj8/LhR4UiDAFDtNx7wXIUg7v+RD/kRzZm8jepD4IVgKNanEEfPOeytmIx+Ix4x3rS5KrYElK77XB/oN5xHX/qCZ7U3QB+bG+QhCksfVonbTeFtOmJUYYmdZyDCvePy+pEZD1ji7xj2DPCRbsCqrFTIARaHYLqrRHbkeqC/cDEuF6ojWHIGd9c3DNso14xm90oAiem14S3Uw1wpc8b/3EJIX2VQBOqWVWy3JUj6wQ9NgWUzhYgC1eV/u/8+QcY5CJGUx8tAMAbxIzRelfp+BYCwtTw==
+ b=ID+jfqCm/aaa3j8wXeVc++EQAmLtaUcUmzOyvpXRZbDxkHeoRR01BuHA0G0hVUm0/rp3LirtQVaJp1SbLmxdmkeYuRc9Nt1Pt72kyjNy76WlKI/vog0bY7XeVdPrf4D6qADA6Veggk8MZXI2SQyteXBAD81PXT8wF+SiBhfq6cTq9HdyQ6qhxKr8G8suhcE+e5EL1iVCY6nT22qd1a3DMJtBnQbTypJdzkcdG2CyW3Uo4cQtzm5fP1I3fX4jenGDgdxelvArMto63HJdbSZAqhhP4jDmJ8yHjmN/Xs3kA5ou/oPDuzf8K4zG+6kK87s86hhsTgGV6wEJpZe5Ds33fA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1u3sienot18OR3i0pvYADTXqEf7ONtbNtaS96ExKp4w=;
- b=lRlUgaZ3g7V+A5jjRCpjtRBR+JDDByZO+JiM5YvWB4ObbrgwPjeDuM15PSJ2wS1HhpFAVRh2V1mmIaNBv63Ki/X1iSggBume/L4unrP/0Dm0z4sqE5j2Fi3zHkDZ75GjQ8Dz0cGreiiB8TK6IzZdydIvm4SL/9mLQ2HHNDrWknaHFk8KJ1ohFeHeJMml7qtWIR9PdwizFCOLz/JDB2zTAj95gZHWwkwMobNObpJH9Qzhtbo7TKViJDp6M25y0tCXpFwULL/YIiJv+ViOZBYqT8ex3OlEiSy4AA4zbFyBSb8ZuSuAV0VvWIfUqPJWk4H0FBbUMzXE/Nbmo037pHkhwA==
+ bh=5bGEbL8UsDW/lntfljG1L4K6eomaTCMikWWfqVL6UdE=;
+ b=USibllHTvAzplOL1feoKLDr8O5xIVnd1PwAMV3HvZRRRnJBr2nH2GikUcYv7UVYhGDYVqbPOSTaIUEOiALG72G1fNeM6bX5zqcZBeKo5ooH9hVB77pgmitDODEbWdyn7KOTN6WULsmFdkuwj9S02XVHkC/ite4EVRXx3EaBQOmJj3KBrV1n/Fk+d4vOqQ8jAxqHXL79mxYoL8keAZ3obVy4cO3Sg+QamxZgWze+h+Ep+OI8A7MLhMxbnbcVfLhHdINV060PzhZO5m2K0f4fdKc+2oB2L/jwUmRPO+j35BeFPm8OTgRownrzvleYpR/D93yIv6HFgAlxzDoWWFSrJZw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1u3sienot18OR3i0pvYADTXqEf7ONtbNtaS96ExKp4w=;
- b=ZMMJwDgoALbWLwcEUGI3OGpRQZzswEMxgOiXZRvD5vUZXRbyIMCd09/k4V0ERP7Vtjry5UNqbRoNhYaORP5//eiRDqh0rgrc/BEL/fRFG2asPyjtF4u8kDnWw/1lQTDqmPVHRUPsG9pn4Fb0Us4uKKIBQ8ZXtD8rVrOpgWJTzcdmQCNAO3ckv+GXAXHi5gVBcWRQ49WVLCOaDUD51cJUm8mCHiGm6pZKQwgd8is+HZnxr7wxBH9caU0vNp7r/NC7SWZp+EYgeC4I/hq79k3H53hT0m3doIIeWXwuep0TQsT0jp+tS8yjK5XiO9IyxYbIMxlhcDKadCTnvTIgTK370g==
+ bh=5bGEbL8UsDW/lntfljG1L4K6eomaTCMikWWfqVL6UdE=;
+ b=kBQy8Ggp9aQ8C2s6el594WpMr+oIFiM4BbZBQYaIh0Jo8PQ09HF57rJ9ta0QFqbaycCSmAphB7hkXiLYWIgM/1/ORGS9POxSWbX5CQ6k9NoWeno5AB/8Xllt1p8uUoK+zd2jbDTQ8v+Bn9+tdEcBaIJbmpDToBz77f1XR2ThIgSE6OK+ulkd7HGoyygOvNr16TdOZ/yISNYr+uhLEAFzMx/T3fVcFCY1oFoMpY58HfbKSeDykueBOponzzTUww4NVkQ3+9EgjXO4Nk64FoYuOANVbsaOMEYOoncTqLZCj1SmomY/dAZbWKeA5pDbydg3ReTm5ysEc2eXPDlp9ivKTw==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from DM4PR12MB8558.namprd12.prod.outlook.com (2603:10b6:8:187::22)
- by MN2PR12MB4094.namprd12.prod.outlook.com (2603:10b6:208:15f::23) with
+ by IA0PPF1D04084C7.namprd12.prod.outlook.com (2603:10b6:20f:fc04::bca) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.25; Mon, 3 Mar
- 2025 16:13:56 +0000
+ 2025 16:14:00 +0000
 Received: from DM4PR12MB8558.namprd12.prod.outlook.com
  ([fe80::5ce:264f:c63c:2703]) by DM4PR12MB8558.namprd12.prod.outlook.com
  ([fe80::5ce:264f:c63c:2703%5]) with mapi id 15.20.8489.025; Mon, 3 Mar 2025
- 16:13:56 +0000
+ 16:14:00 +0000
 From: Wojtek Wasko <wwasko@nvidia.com>
 To: netdev@vger.kernel.org
 Cc: richardcochran@gmail.com,
@@ -67,16 +67,16 @@ Cc: richardcochran@gmail.com,
 	frederic@kernel.org,
 	pabeni@redhat.com,
 	tglx@linutronix.de
-Subject: [PATCH net-next v4 2/3] ptp: Add PHC file mode checks. Allow RO adjtime() without FMODE_WRITE.
-Date: Mon,  3 Mar 2025 18:13:44 +0200
-Message-ID: <20250303161345.3053496-3-wwasko@nvidia.com>
+Subject: [PATCH net-next v4 3/3] testptp: Add option to open PHC in readonly mode
+Date: Mon,  3 Mar 2025 18:13:45 +0200
+Message-ID: <20250303161345.3053496-4-wwasko@nvidia.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20250303161345.3053496-1-wwasko@nvidia.com>
 References: <20250303161345.3053496-1-wwasko@nvidia.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: LNXP123CA0011.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:d2::23) To DM4PR12MB8558.namprd12.prod.outlook.com
+X-ClientProxiedBy: LO4P123CA0123.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:192::20) To DM4PR12MB8558.namprd12.prod.outlook.com
  (2603:10b6:8:187::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -85,192 +85,202 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB8558:EE_|MN2PR12MB4094:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8566cfe5-1eb0-46a8-4722-08dd5a6e660b
+X-MS-TrafficTypeDiagnostic: DM4PR12MB8558:EE_|IA0PPF1D04084C7:EE_
+X-MS-Office365-Filtering-Correlation-Id: 03a6cf41-0a60-4f94-927f-08dd5a6e683c
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?S3JHM3Qxc1RGMkdQSy9VOC9TMVhvamxUZTVSMG1zWUVaR2xrajZ2RHlReEw1?=
- =?utf-8?B?OVNYV1FYeGZBa3V3c09ORzIwdDZCWDdzSFJOL28yM0RBTUZhcjdHaGE1U3lL?=
- =?utf-8?B?VThrVTlRVWhnejFHQUlhL01LUHJIc1NSVE0xYUw2QmRleTV3YlJpQW1vR1k2?=
- =?utf-8?B?Y0R1c1RsWm5xSEsyZkVkYnE2alJoc240N3hSMGZHeW8wNHY3azJZalhLS3Qv?=
- =?utf-8?B?UVliYmRaR0FoRVhBNW9NN1FHOHk0LzJxZUgwVG15cjR4aWU4VDZ2LzBTOWtn?=
- =?utf-8?B?MUZsTS9Ld01udnNTQTJLNnF2TFBnd2YwRTJKa3F4K213a1c4eFBXWWF5TkNM?=
- =?utf-8?B?NGwxWWRSQ3ozbU1KRUlrRUp5ejNHSHFxWjU4UUw3T1IydUNoNGZxdXJmUklj?=
- =?utf-8?B?U3ZBN1BxQldtSEFpb1Jrc2ZsOHZweUZETEQxM1RmYVVTc1JyNU1VbFMxbzFW?=
- =?utf-8?B?RFBTZDdOOE9ZbEFhZG5DeHlNbjhTdE9ZdjNLNmJTSDJvNStyR2swUWdHNWhU?=
- =?utf-8?B?bkRlTytYOWJ5cHJQWXlkYUE3dEEvMG5ZREx4Yng0UVJDUUlKaGsrWGdZUDdu?=
- =?utf-8?B?ejZUTWFwYXhCSW9uQWlteERLSEYrbkxOQnYwOXExS0tvanU2UDNvellPdThr?=
- =?utf-8?B?UlRHU1RqY09hVEk1ZnQ2NkI2a3RtZFRlTVpNWWNEMFQ4MWRVNk95MzN1WkhB?=
- =?utf-8?B?dWx6VXQ3Z290NnpRTDdqbDhYMzl5dE9QMHN3Zys1Nkg1QlQ5VG1vN3JLWVps?=
- =?utf-8?B?bXhQVVBtMGdPOXh5R01MTjF4ZXpEVE1nek9Say90S0ppK3hMN2tHek1oR3FU?=
- =?utf-8?B?UWlLYVlCY0NKQ2RPUmtGZGlXZ1FNUTVYbUtsKzhjRFcyVklxdVFvWGs1dStV?=
- =?utf-8?B?ck1UTVVnZXdONzliZW1JbCtDU0g3ZVkvSkhkUEtqSytrOC82ZUlJTHJPenpD?=
- =?utf-8?B?YkxQOUFzZU1ZZFY5R2JxQnd1NXlDdUNnVGdjZjBCbmRuR0cxYW14Yzc1Yzcx?=
- =?utf-8?B?cXFzSVNDaCt5WUJJRE9wYjZaTXFsQ3J1SzB6WTlJZTZ5WkJuaFRWVVQwR0tJ?=
- =?utf-8?B?cnRURS9MV0JDVmkrSnI3eHRVY1VpV2VqbWdIZVFPWEZMQ1pRcG5XWjZzbCtO?=
- =?utf-8?B?ZGpxck40b2V2aU8wMjdjdm5pZHg2SWNRMFZIMUwreEMzOHFRTlBMaEpYR0Jz?=
- =?utf-8?B?cHMyNjF5SUhzd1lpb0Jrd2JTZ29ZMTUwR2JzRFl3T1JoMmphUEdvNmwwSEdZ?=
- =?utf-8?B?cWE4WWdTazhocXZFRGtvTjlxUDFSOEl3ajZXWGhZOUU4eGJiazJzRlZFbWJY?=
- =?utf-8?B?SnBsTWlYNDk0cmRZYXRnQVpCclVkL3k0Tk94eWFteFY3UWUrQXNQaVhaODZ6?=
- =?utf-8?B?R2xTQ1orK3J1RUFiaGZoVUJpWnhGNWVRbmhnaXVPVmN0Nmd1dExvbEhEODFY?=
- =?utf-8?B?ckJUa0l5N3JlQVRkRHJnV0YvZWpsckVSTkJQeTAxYS9LSEJJSDMwam81Tm1H?=
- =?utf-8?B?VUx0QTlSRElYNHYyZ0p5bGpQeEhHdDExcXdtcHlTWE1aMnBaR0NCVEYwdmNl?=
- =?utf-8?B?cnpaUWZ3TmxxdWc0YXBRS085WnBtUlAxMU9pVWR1UUJtM2NNMGYvUmJ1Z0cz?=
- =?utf-8?B?WHRPa2VxQWsyM1lsOGdFQUhRV2JVQW1TOWlrdkdUSi9mUWRYNDV3TVhRM2Jk?=
- =?utf-8?B?OU1DeVNLQ0p2RDJyN2ZwemRaMnV1VmZJcG9JS1RMNThNa1JnQ0ZEbmFDaUF6?=
- =?utf-8?B?R0NDZWNkRndEalArN1VJUDBUVzZxbm5GU2NLaExLMk1nTkM2ZVhueXNJZUgr?=
- =?utf-8?B?NmhCVlVZWE9lZWRIMGFxSExoWml4eDAwbzBKRWdJcUROcm8wU3EvZ2NPOFFi?=
- =?utf-8?Q?kBOrevDNZih59?=
+	=?utf-8?B?OTYwSDFUQUFxRGRzcm54Tk1UdXVPelNJLzYxSXlvOVJCQkRubWVIWVRVSVc5?=
+ =?utf-8?B?M29LQ25xdzhRU1Q1WlFUeEx1VjlnRGdLTjd4dlpqZjE1c1p2ZkE3NGQxUGJL?=
+ =?utf-8?B?SFhvdlY2STk0QWM0QzNRRjcwckxlY0llUmJDclVGZUswRnhCTGdMSUp0TTZr?=
+ =?utf-8?B?ZUNrT2ZiZDN1dXFLK25DcDhySThYeGhEc0ptMyt0V2ZYOWNoeWF0bVdMUjJ3?=
+ =?utf-8?B?RlFQS3czOGVRaGZ4YmVFTHBCSHVqMm1GQ2I1NTlzS0s5UjJUaHVpTk50VERX?=
+ =?utf-8?B?eDR6S3RVTXg0Z3BNeTN5UkpERGI5ZjRwSlZrWWRiZkVaYUtuMlAvVkY4ckVu?=
+ =?utf-8?B?TjFyTitJNXBXMzZBSHRSYVZSc2hBUzd6bHpMbzFPUGM3d20rZm9Ja0RNZ0Rr?=
+ =?utf-8?B?TTRGeldPMDYrNTZoNlhPSEpNV0dZWXpKMDlIZGVONG9VVEhSWVprVDZlVW9s?=
+ =?utf-8?B?aFlMOS95SEhGbnBISnlaM3NuekxYNXlMUUFmWnlPclF4K1oyMXc1OVhJSitG?=
+ =?utf-8?B?Y2d3UW8xTmZWRG1xZW92QWlGUXAwOHhoUTNvRWlwS3BaY0ZrbzNPTVlYN0xt?=
+ =?utf-8?B?Z1p1ZmFYbDczRGNTcXZla2FQOTlwZkxaUWVqNTJVTVN5RHdkMGEwUjdMU25w?=
+ =?utf-8?B?V1Z5ZzRMdzhnS0U3WG83V2J6VlVremJ0RWMxazh2dmJJTk9DOGNXMG5LYktG?=
+ =?utf-8?B?cGhSWEpZM2pkekdOL1BSL2JRM2NCQ2hLbHhLVW4xdmVPN2VPVCtUYktLd3Jw?=
+ =?utf-8?B?YUt1M1BKQWF3ZkR5YTY0VkZwdStjbVdCYUM2SjVuNWhmelBSY0RtUXVIL29O?=
+ =?utf-8?B?N01SYnN6ajRwZkErYlJpNjlMYWI0OWdkcXVjS2tIRTkveCtTTDhGMGVXdjkv?=
+ =?utf-8?B?dHlvcG45ZTJ2amVUaGR2T09TUVJ5NWlnbXlReThSMVhHSzU0MG9abTZ4MGJT?=
+ =?utf-8?B?S2kvV05qMzFYKzEwUnRQWGlQeko3VjBoOGhEczlZNzJtMFNQZTVEZzNFNXpy?=
+ =?utf-8?B?eU1hVkhVSWRQanVRL280OFJXc015MWEva0VqeHFYSGNRczNtejd5cEZOTUZU?=
+ =?utf-8?B?blRZcFU1ZnlWeUNnbmoxa2lGNTJEcXpQb250MnRDd3BFSHNXVXVnblg4NWZB?=
+ =?utf-8?B?alVtYUNFNHpkUzRURnpNU1V2dUFZamgzczlSc1VNWDBQVXcwcTJKOGRMWFQ3?=
+ =?utf-8?B?NHpOVkFEYWtPNXNLenc1TjNOVnlkdDlZTkFIbW02eWxRSjE2dnpvanVzckJ6?=
+ =?utf-8?B?MzUwcExPY0pkSVdqTU8zUFRkSjFPMXJKN0RFT3I1clpTOUdsR2VTOUl2WHNX?=
+ =?utf-8?B?eU1QZ3JsYittOGVGUGNPbklZUjRVVCswd1NFdWh4NHhENUUyUXJ2S1ByN1Rw?=
+ =?utf-8?B?NlFkenpzUHZVdTBuZ1ZLNjIvZTdPbTBwUFFPaXdUTlc2Z2JXOVNFYmNUbnJK?=
+ =?utf-8?B?ZUUxYXRFa091ajdmcE1nRjVvdUZMT0pEMktnYldJWDZFRmJwK1pXQU03d0Nn?=
+ =?utf-8?B?NUhYazFvaGdoWWJrN3VRbUp6TWo3TFhZTGcvUlArV0k2ZmpXOW9TZkdaTE9w?=
+ =?utf-8?B?YjZXNEJjU0t3SVl3UStQbFQ0RW9XNXFmYTZ5bXJ4MzZZMWtYNTVTSDBwNG51?=
+ =?utf-8?B?N1hlVFRlbW9CSkpiMTJnM2dkcTBCaTV1cWh5UHFwYlJoY25mSnhQZjRaQzlu?=
+ =?utf-8?B?TTdiaVdWb2MzMXFzWHlsSVlGYlZHSnBlaHFRTU54VUVuK3hLNEV1S0E1NmJv?=
+ =?utf-8?B?aHZaREZxNHU4Qi8zVUtDbjNRalF2TjdoYzUzYitFWmdLeGs4dThRRWNHSjR4?=
+ =?utf-8?B?YXIvUUpOUVZ6YlljWXZjYTAyY1Bod3h0bis5TWhzd0h2eGx5dDJ5NmwvRkpF?=
+ =?utf-8?Q?Z699XdDwhmVZY?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB8558.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB8558.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RThPNUJjeHpEa3Q3eE5nSkNjeDhuSEpsZmFqTFhFT0hDeERrTlBQVUlXZFVy?=
- =?utf-8?B?Zjhyd3dYZmNzNGF3VGxtWFB6ME1IK3RwRjJWbFpwVDdmeE1TeVJaOGdiSGVE?=
- =?utf-8?B?M05hRlRrZGdQaGRBYVRQVDV4MjRZWHhiUzFnWVZZcVJTdm01dElSRXNwekN2?=
- =?utf-8?B?Q1VMQStzbVAyN1lmZm1mcGlwL0VFK05uQitMVFhTSllWbndxZFdsV2ZOZ1lk?=
- =?utf-8?B?WU1KNW90OFB5UElZUG1ENnBVS2w4ZUZ2NW5YaGkwUHNFQ2F6OUp3NHl4SnZr?=
- =?utf-8?B?Q0NCaDI0TWhzV0ZTdXI2N2RETVQ4NmdYSVE1NWs4LzdiWUpZSldFSzRjZ1ZL?=
- =?utf-8?B?VVFFN3dFNkFSTHRzWUUrT0ZhTml1UTY4dk1nNzdCQkw0b0Q1R2Fsd0dYRVhG?=
- =?utf-8?B?dk03Rm5lQS9KN3NmdTFSY1lHTTZMTk1Bd2gzR1lBdVBMUVZTcEZIUlF6enk2?=
- =?utf-8?B?ektjU1poTUs3NSs0QWdROTdEOEpKWnZOV0lPR3RxbGwwK3RjNVY2bTNFRkhP?=
- =?utf-8?B?NVFHekEwdUNtU1MrZzkrdnF5YzRpVmpqYWQ2S3pTRkQ0c2JzaDFkNUFKYzhs?=
- =?utf-8?B?QlRXaUcxVklSdzhlM3VGWmt0OXZ3VElIVHJhWVcxU2Z4Q1l5a2tBNnNkK3BQ?=
- =?utf-8?B?YWVEdWF6VlNpR0xoQm5SSlFkUVlySGRQUnN5QjJicmlUdHFaWmFpZFZuRUtD?=
- =?utf-8?B?ZUFzaU1abGhSK0l2bTUvaklobmtwQjB0TmZ0RkQvM2ZzL2I4aEdpUm5ERE5O?=
- =?utf-8?B?MkoxQXpNaHV6ZllhcGF5OExTNVJ2SGQ1NXBtWjUyam9EbEpxNjNsTGRBbUpJ?=
- =?utf-8?B?Mm5mWC81N095UmJZK0NqOVFqT3JCRVFtWGFza0FESzhnclFOaUx1R3Fndm45?=
- =?utf-8?B?NXNuMGRtRHhsUHdVVVRxTk5XcVpRYXNpbUZkVFptMWwzbWViODZ4RExobkFt?=
- =?utf-8?B?L3NiOEp2a0JHK2I0YUFXSHJmYk1jMmMzNHpObyswMWVNWmVSOEZxRFlPT3Vo?=
- =?utf-8?B?azFFeFQwTmorWHNjZjdwcUlPYjFFUDJtZ1V3QjFQYjNmbU4wZ3c2YXRiUTdL?=
- =?utf-8?B?dnpFUGZBUUZmYjRGRVRlOUd0WkR3TmE0UlI2Q3pZWFN2WUZONkRrUi96MHVP?=
- =?utf-8?B?YkZMdm1CNVYyRGRiMElMeHptZ2NreWdqenBVdkYyc01wQkd5SmpJOWFvNEF6?=
- =?utf-8?B?MG4zSTlwRDF3ZnpuOFlQSjJBbld5emQvTHVTaXRXTVg3c0Y3UlJ0VXFEZldx?=
- =?utf-8?B?aTVIU2JvSEtrOFBYZG41Zk9hdjlGOWpGaTRxd0haN2F0TURuNWtBRUpRVlRh?=
- =?utf-8?B?d0pmckJZRjJTQVdGZnArV0JTRThrdXpsTUZSQWppWUpDcm5xMkNIVUszb1U2?=
- =?utf-8?B?c0sxdGR1WGtjSXJmVzJmRFBWTXFlR3ZzZ0paTFhtZzlTOHdsOThSa1lVb09m?=
- =?utf-8?B?VXNIaWVKOTNQQUVGcUk4L3VXaVNObkJ2MmVma2Q0Z3F3SW9rL2dYdDQvYndF?=
- =?utf-8?B?NjIxRlpWL2lXenNsV2crL0ZOdmZtV3lOS1pVdG1QZmw0WlBKWjlJRGQweDZ3?=
- =?utf-8?B?RFNkSmNiWFNkTUVhdGoyM1MvQi9iRXRGQ1owRHJMRzdZOGN5bDNET2tEbmxl?=
- =?utf-8?B?Vk1LWUF3S2EvN1hHdS85d211WG5HbDdkSnZGUCtWeWRCZERzZ1NTempyM2cx?=
- =?utf-8?B?MlMvczNTTFRzT0tWNXJHVkdQOXZYOFc5R3lVQWZyalFkdW1MaUdxemFmNkox?=
- =?utf-8?B?Z0YzL2ZOZWtrNklwSjJXcDdzNlFFQzV3OVM0U296eTRSYTliS0hJUWdEbEdu?=
- =?utf-8?B?MEZmd0ZENHVEc0FhWGJOZXEwczFVZEc3NGxERWYrYWZBdnRIUzUwdnVHWlBJ?=
- =?utf-8?B?N2xJSFZHSjNJVVU5bXd0S3pVeDdlaktzUjlTaUl5NGFOZHYrbFJFU2paL241?=
- =?utf-8?B?YVB4V2pyTWw0NU1sZWZ6cVdLQVg5bWxHSExFRzlvd053MHZMOWtkY1FWS2hB?=
- =?utf-8?B?SFNhdm55SnZiVWltTGcrcWExc3hGb2NBZjdqc3hjWXFHQkg0N2JTVW9OY2FL?=
- =?utf-8?B?endVZjRTZDNZd3BGVmNBQWtxUXA5SzBMeHNTK3BmR3o3SVNoYm0yaUhFZExv?=
- =?utf-8?Q?Erlqx7MyWv5pOaPNkI4ZEp83P?=
+	=?utf-8?B?UUYwNXo1ekt3ZzcyVGZPazJjMG5FeDdxY0NKNjNiVUhZUVZVcGhKSU9rR0hO?=
+ =?utf-8?B?L0hiL3ZEMDRJQjhUUUE1NFRKcFArNXNMR211cXo1Mnc3R09vNnc5WTBmYVBE?=
+ =?utf-8?B?UC8vT3dPY3o0WWUza3RvMzFqRDZ2eUhaMnFRSENaTUhRMERoU1R2VXVxNUh0?=
+ =?utf-8?B?QjQ4V2QyTEFTL1lsMi83QllMMlRBZHRVRDlTOGdzTWV0V2d0Ung4Qi9mMWxv?=
+ =?utf-8?B?WGpsNDU0Uk9RWlRScTdOc2lqb1pVL1g3d1dpSzNyWC9ocGZEWW1sSExyUy80?=
+ =?utf-8?B?ZVQ1RFduUGNjSnBySXFPeEZya201OVptQjBsMnZvSnBlcDVsTStURVpkbnE2?=
+ =?utf-8?B?Z0JSVTVwV1VNSDUybllGait6emVFSyttWHBGbFcyejhtd3lDNThUanVsT3Jv?=
+ =?utf-8?B?STFkdUVHOUNWWUlHMWI4V2t4QlpiTkhocHhrVEc0N3ljZHpXZGNQNHJSaHFy?=
+ =?utf-8?B?ZFFjMW81S2MrNm5VTEZicExYbFZuT0oxV2dCdkl4RzI5aG54aGhIcWMvQk9W?=
+ =?utf-8?B?eE9SWlpQcDhUV0I5Q3RucHJqY21TS2xtZnBJTDV0ZStnU0NPQTVzTHZ4c3FY?=
+ =?utf-8?B?WE1CTFl0UndUbG9NdUpCOGR5NnRFdDlDUEc0bUJxaFJoM0t4WWdKTWRDWUx1?=
+ =?utf-8?B?RzV1WHUvOExBY3dZTm53Y1pYV0tHVjNQdjZ3V2NmVTZSNlZiL0hlZmJKc3l1?=
+ =?utf-8?B?MDZFMlIxY2RMbVgwMDEwOG9CemNJWmE0a0VHbW9Ub0ZHK2tKR1RwNHRBUm9G?=
+ =?utf-8?B?ZmZ6S3p2eU9uRUcyRC9pZ2JqU3FzZnEwdXBrdmpVWnVlU1d5MnhleGRQb3Ba?=
+ =?utf-8?B?QUtMdXI1QzE3dEl1eHJ5d3ladGltT2M2R05SNXMvbFE4WXYrc0hsZEFHT0hy?=
+ =?utf-8?B?UVNvWFYwaW9FWjNLRlhNbnBYdUVqalY0dGg4WWlvQjhnTXQ4NEFySWlDYUpP?=
+ =?utf-8?B?Zy9Mc1A4c0MvMFpIMEFyaGFXR1VXdXdnZ1pJeCtZRVNhQ2UvNklKVHI1NnBr?=
+ =?utf-8?B?M0VVZUZkMWU0bHVLMVZORXVwS2VCOTFXMHIyQytJZ05JVGtNZjNjLzhHZTBk?=
+ =?utf-8?B?N1p5ZWRMa0M0NEJmNjBWNU1maUROenB6YjI3Wm1BekppMXE5dTRGYThrcG0w?=
+ =?utf-8?B?bzQ5UG5VUlM2MWFYbnFIRGt1YU5WTjJxTHIxRUVKMDkraFJmZXAvSUhFMXVt?=
+ =?utf-8?B?eVJEMFJjMW96Rks3WGl0NHRPRUdLSDlCdzJrTTNTNHZsMlgwc2dNblg3bXdt?=
+ =?utf-8?B?eVQyVUpQNmVYT29YODdJeWo2WWJleklmRElWNUl2SEUvdFFmWG9idnY1VTRu?=
+ =?utf-8?B?Yzc1T0luTjhaVWdpWWtNSzJWc0FYbm95dExpSFYyRTFwRTg5eDB3MDNXT0Zo?=
+ =?utf-8?B?SHRxUExIWjJOaXZySWZUNkpnL3ZQZllrK0N5VjZ1OG9ONi9HeEM2VWJ5Q05V?=
+ =?utf-8?B?dDVGeHc1a2V2dlloRy91M1pzejBVL0ROTDZPSHlQTkJ4ZnBjRnhNZGoySUxt?=
+ =?utf-8?B?K1drL1dyM1Jib1MyaFRkV25JdkUrVE5aeVlmc1F6dVNBbW1LMjhIVVZvS0VY?=
+ =?utf-8?B?Ny9QazhrMWlCcTc0R0RhNFlFaytoT2VLT0twc01zVWdsVEFuTitsOGR1ZjRp?=
+ =?utf-8?B?M1hFa2ttZ2lZRmNSL0IyVTR0NXd4c0kraHoydElVWkNTK2VOUkdKQWlFeWdl?=
+ =?utf-8?B?WXlmTkd2ZzBKZFYycDJiYUxmQ0ZrOGNZWGxHUWR5aGFqZVJVaGVrdVc2dmEx?=
+ =?utf-8?B?SmZHWjY5U1ROVFBLY3RtMWFnVHpFVmlzK2dCQkowQ2dteEJiWmx2R0xuZnlI?=
+ =?utf-8?B?U1EwdVgrMW1DK0tQc3JYYTVINFVCL0VUOXIvRE83UWFVai9EVXlPYk5waHRW?=
+ =?utf-8?B?MFpyTUVudGNSTlI5ejYzTlg3MTFLMlRyT1BxQWgwd0IxRHVtZHVWS2h4MjlY?=
+ =?utf-8?B?UFdEMFJlRGpmc3k5SVJEOTdqVUplRTVXbDZQemVXN0hxTkV0SVBFZjNteGVa?=
+ =?utf-8?B?SWZzcG8rUGdFbDZ6T3JCb2dLWm5BNzF6Rk10K2gxZ1diRXZnSERRUVpvcUJL?=
+ =?utf-8?B?U0xpVytBQ2dXU3J0bXFlcTE0MTNjMFhySWVHTkxCalE4MEJ5cE0wa3lmditI?=
+ =?utf-8?Q?Jbc6cpet/j4AutLENXu4GCsVe?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8566cfe5-1eb0-46a8-4722-08dd5a6e660b
+X-MS-Exchange-CrossTenant-Network-Message-Id: 03a6cf41-0a60-4f94-927f-08dd5a6e683c
 X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB8558.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2025 16:13:56.4014
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2025 16:14:00.0092
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YWiU+SSGdORjYcAvx/nyCVYcwi7EtYc6O+2FI3B5T0See+Kb4A9ryeyN366+yOU0BGSrSQCt68ymzoJGx1aKhA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4094
+X-MS-Exchange-CrossTenant-UserPrincipalName: yT3wxUg36zBFRlOriBL0S/mGSwOhzjrfvvSbyJTcWEyZUajiTBV46IsIe150chFYY2KPATijHZpnAnf//739dw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PPF1D04084C7
 
-Many devices implement highly accurate clocks, which the kernel manages
-as PTP Hardware Clocks (PHCs). Userspace applications rely on these
-clocks to timestamp events, trace workload execution, correlate
-timescales across devices, and keep various clocks in sync.
+PTP Hardware Clocks no longer require WRITE permission to perform
+readonly operations, such as listing device capabilities or listening to
+EXTTS events once they have been enabled by a process with WRITE
+permissions.
 
-The kernel’s current implementation of PTP clocks does not enforce file
-permissions checks for most device operations except for POSIX clock
-operations, where file mode is verified in the POSIX layer before
-forwarding the call to the PTP subsystem. Consequently, it is common
-practice to not give unprivileged userspace applications any access to
-PTP clocks whatsoever by giving the PTP chardevs 600 permissions. An
-example of users running into this limitation is documented in [1].
-Additionally, POSIX layer requires WRITE permission even for readonly
-adjtime() calls which are used in PTP layer to return current frequency
-offset applied to the PHC.
-
-Add permission checks for functions that modify the state of a PTP
-device. Continue enforcing permission checks for POSIX clock operations
-(settime, adjtime) in the POSIX layer. Only require WRITE access for
-dynamic clocks adjtime() if any flags are set in the modes field.
-
-[1] https://lists.nwtime.org/sympa/arc/linuxptp-users/2024-01/msg00036.html
-
-Changes in v4:
-- Require FMODE_WRITE in ajtime() only for calls modifying the clock in
-  any way.
+Add '-r' option to testptp to open the PHC in readonly mode instead of
+the default read-write mode. Skip enabling EXTTS if readonly mode is
+requested.
 
 Acked-by: Richard Cochran <richardcochran@gmail.com>
 Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 Signed-off-by: Wojtek Wasko <wwasko@nvidia.com>
 ---
- drivers/ptp/ptp_chardev.c | 16 ++++++++++++++++
- kernel/time/posix-clock.c |  2 +-
- 2 files changed, 17 insertions(+), 1 deletion(-)
+ tools/testing/selftests/ptp/testptp.c | 37 +++++++++++++++++----------
+ 1 file changed, 23 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
-index bf6468c56419..4380e6ddb849 100644
---- a/drivers/ptp/ptp_chardev.c
-+++ b/drivers/ptp/ptp_chardev.c
-@@ -205,6 +205,10 @@ long ptp_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
+diff --git a/tools/testing/selftests/ptp/testptp.c b/tools/testing/selftests/ptp/testptp.c
+index 58064151f2c8..edc08a4433fd 100644
+--- a/tools/testing/selftests/ptp/testptp.c
++++ b/tools/testing/selftests/ptp/testptp.c
+@@ -140,6 +140,7 @@ static void usage(char *progname)
+ 		" -H val     set output phase to 'val' nanoseconds (requires -p)\n"
+ 		" -w val     set output pulse width to 'val' nanoseconds (requires -p)\n"
+ 		" -P val     enable or disable (val=1|0) the system clock PPS\n"
++		" -r         open the ptp clock in readonly mode\n"
+ 		" -s         set the ptp clock time from the system time\n"
+ 		" -S         set the system time from the ptp clock time\n"
+ 		" -t val     shift the ptp clock time by 'val' seconds\n"
+@@ -188,6 +189,7 @@ int main(int argc, char *argv[])
+ 	int pin_index = -1, pin_func;
+ 	int pps = -1;
+ 	int seconds = 0;
++	int readonly = 0;
+ 	int settime = 0;
+ 	int channel = -1;
+ 	clockid_t ext_clockid = CLOCK_REALTIME;
+@@ -200,7 +202,7 @@ int main(int argc, char *argv[])
  
- 	case PTP_EXTTS_REQUEST:
- 	case PTP_EXTTS_REQUEST2:
-+		if ((pccontext->fp->f_mode & FMODE_WRITE) == 0) {
-+			err = -EACCES;
-+			break;
-+		}
- 		memset(&req, 0, sizeof(req));
- 
- 		if (copy_from_user(&req.extts, (void __user *)arg,
-@@ -246,6 +250,10 @@ long ptp_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
- 
- 	case PTP_PEROUT_REQUEST:
- 	case PTP_PEROUT_REQUEST2:
-+		if ((pccontext->fp->f_mode & FMODE_WRITE) == 0) {
-+			err = -EACCES;
-+			break;
-+		}
- 		memset(&req, 0, sizeof(req));
- 
- 		if (copy_from_user(&req.perout, (void __user *)arg,
-@@ -314,6 +322,10 @@ long ptp_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
- 
- 	case PTP_ENABLE_PPS:
- 	case PTP_ENABLE_PPS2:
-+		if ((pccontext->fp->f_mode & FMODE_WRITE) == 0) {
-+			err = -EACCES;
-+			break;
-+		}
- 		memset(&req, 0, sizeof(req));
- 
- 		if (!capable(CAP_SYS_TIME))
-@@ -456,6 +468,10 @@ long ptp_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
- 
- 	case PTP_PIN_SETFUNC:
- 	case PTP_PIN_SETFUNC2:
-+		if ((pccontext->fp->f_mode & FMODE_WRITE) == 0) {
-+			err = -EACCES;
-+			break;
-+		}
- 		if (copy_from_user(&pd, (void __user *)arg, sizeof(pd))) {
- 			err = -EFAULT;
+ 	progname = strrchr(argv[0], '/');
+ 	progname = progname ? 1+progname : argv[0];
+-	while (EOF != (c = getopt(argc, argv, "cd:e:f:F:ghH:i:k:lL:n:o:p:P:sSt:T:w:x:Xy:z"))) {
++	while (EOF != (c = getopt(argc, argv, "cd:e:f:F:ghH:i:k:lL:n:o:p:P:rsSt:T:w:x:Xy:z"))) {
+ 		switch (c) {
+ 		case 'c':
+ 			capabilities = 1;
+@@ -252,6 +254,9 @@ int main(int argc, char *argv[])
+ 		case 'P':
+ 			pps = atoi(optarg);
  			break;
-diff --git a/kernel/time/posix-clock.c b/kernel/time/posix-clock.c
-index 4e114e34a6e0..fe963384d5c2 100644
---- a/kernel/time/posix-clock.c
-+++ b/kernel/time/posix-clock.c
-@@ -252,7 +252,7 @@ static int pc_clock_adjtime(clockid_t id, struct __kernel_timex *tx)
- 	if (err)
- 		return err;
- 
--	if ((cd.fp->f_mode & FMODE_WRITE) == 0) {
-+	if (tx->modes && (cd.fp->f_mode & FMODE_WRITE) == 0) {
- 		err = -EACCES;
- 		goto out;
++		case 'r':
++			readonly = 1;
++			break;
+ 		case 's':
+ 			settime = 1;
+ 			break;
+@@ -308,7 +313,7 @@ int main(int argc, char *argv[])
+ 		}
  	}
+ 
+-	fd = open(device, O_RDWR);
++	fd = open(device, readonly ? O_RDONLY : O_RDWR);
+ 	if (fd < 0) {
+ 		fprintf(stderr, "opening %s: %s\n", device, strerror(errno));
+ 		return -1;
+@@ -436,14 +441,16 @@ int main(int argc, char *argv[])
+ 	}
+ 
+ 	if (extts) {
+-		memset(&extts_request, 0, sizeof(extts_request));
+-		extts_request.index = index;
+-		extts_request.flags = PTP_ENABLE_FEATURE;
+-		if (ioctl(fd, PTP_EXTTS_REQUEST, &extts_request)) {
+-			perror("PTP_EXTTS_REQUEST");
+-			extts = 0;
+-		} else {
+-			puts("external time stamp request okay");
++		if (!readonly) {
++			memset(&extts_request, 0, sizeof(extts_request));
++			extts_request.index = index;
++			extts_request.flags = PTP_ENABLE_FEATURE;
++			if (ioctl(fd, PTP_EXTTS_REQUEST, &extts_request)) {
++				perror("PTP_EXTTS_REQUEST");
++				extts = 0;
++			} else {
++				puts("external time stamp request okay");
++			}
+ 		}
+ 		for (; extts; extts--) {
+ 			cnt = read(fd, &event, sizeof(event));
+@@ -455,10 +462,12 @@ int main(int argc, char *argv[])
+ 			       event.t.sec, event.t.nsec);
+ 			fflush(stdout);
+ 		}
+-		/* Disable the feature again. */
+-		extts_request.flags = 0;
+-		if (ioctl(fd, PTP_EXTTS_REQUEST, &extts_request)) {
+-			perror("PTP_EXTTS_REQUEST");
++		if (!readonly) {
++			/* Disable the feature again. */
++			extts_request.flags = 0;
++			if (ioctl(fd, PTP_EXTTS_REQUEST, &extts_request)) {
++				perror("PTP_EXTTS_REQUEST");
++			}
+ 		}
+ 	}
+ 
 -- 
 2.43.5
 
