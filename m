@@ -1,240 +1,162 @@
-Return-Path: <netdev+bounces-171085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF2B3A4B662
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 04:05:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 498C7A4B67D
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 04:27:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73D533AE0B5
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 03:05:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D188D18907A5
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 03:27:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CE564120B;
-	Mon,  3 Mar 2025 03:05:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E4DD1C84A0;
+	Mon,  3 Mar 2025 03:27:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=squebb.ca header.i=@squebb.ca header.b="YV5qZcu3";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="AYxtOy6f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gLzbaJZn"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D81973C3C;
-	Mon,  3 Mar 2025 03:05:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 142B919D084;
+	Mon,  3 Mar 2025 03:27:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740971145; cv=none; b=piCSN7wY4D9xv4EddBGvKreJ6Ruxv2fxsCGQEXEUte53KKMRyVp/UhJe5dQGA4NASGjqd6QmgJ2lCzMB2EhOyZS+HEDBTKU8BttMhHLC/GwJ3Weyr8mbf/BcKPzcvIJVqIQTgvxiDrieAvjkp/9EiWD7xCj/p69jOaq162ixJXQ=
+	t=1740972431; cv=none; b=AKa/oGSTq4yengYFO562zduwB8w11c0yyYMRLwoOxCV6OxlaNkTLUiYNtracsapszWDMk1R+24W0V6Emmh3pEgafpgvPU9z3V9nQMd1Ab2RcfZYs9cAxjGs4ANCtQ9RL2uxkJMaEfSLauvWqQb+NgK8FQpYVr2xsDHiyEnZVr2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740971145; c=relaxed/simple;
-	bh=ijqRe3FoeguBXic06ZVu9GpNzUVfAF6KQAi5sws2rqk=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=OJHoOTxFIuWngPqtChYMMI6Q2ELLmB3dtTsKUq09yzF3K9fblTLsC98ypyLMTQSWdxq2gSlOU+Jxcs6BV+UpUDf3y4/GZjVTkFjFYrVmfLt4YAFj0/uvbsdFoCJt+Cgx2Gca8npYQhYkO18FZ4GpgUP3aoTSKmN4F4mmhHp/sDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=squebb.ca; spf=pass smtp.mailfrom=squebb.ca; dkim=pass (2048-bit key) header.d=squebb.ca header.i=@squebb.ca header.b=YV5qZcu3; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=AYxtOy6f; arc=none smtp.client-ip=103.168.172.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=squebb.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=squebb.ca
-Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
-	by mailfout.phl.internal (Postfix) with ESMTP id BE9AD138113D;
-	Sun,  2 Mar 2025 22:05:41 -0500 (EST)
-Received: from phl-imap-10 ([10.202.2.85])
-  by phl-compute-06.internal (MEProxy); Sun, 02 Mar 2025 22:05:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=squebb.ca; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1740971141;
-	 x=1741057541; bh=iUaStrziO9Bkt9RaZInHU8giBomnwVHdGsgmyVuTGy4=; b=
-	YV5qZcu3irfgq8ZdXuOVHoFboZR8iHfpQsDy5VrpN+QC/AP29daKaddGESccJcB9
-	LxjS9pditf8rWwGYnSdkuTkDLwv8uhc7AoM1+mcHERq1rNJT0/Y3O7TeyXCb8va9
-	JlpYHGUGw7WKabnr8ooYLsfeF4hqXJ7UPhcQe1TEATOU0sy5Jugw04gjty7h7Noy
-	aEYsR8Xg8CV3Eqcbdf3XD1zqqPUFwapM6AKm9de6VTIgPfwLvL8BRMYGlgIh37jO
-	NdnYr7Vk1apsvXWKtYN1TAP1vhw/RX3PxDzhKDluTFmIcZF20HaQjdPR+LISYDVI
-	cerALL0FZa/qTloeOfMu4g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1740971141; x=
-	1741057541; bh=iUaStrziO9Bkt9RaZInHU8giBomnwVHdGsgmyVuTGy4=; b=A
-	YxtOy6f8WNfNbW+dkggvmYJgWjavTXQe9wfcTy4LaqklMpNfI6CAB4hWRmDZhRdz
-	dc3R3v0V81gGrgVuAcBq6c0lbvBSF+Xz0Y5EV//6m27TTnetUhbaDCBnD+axVg03
-	apfKHlrXUKn1YFpADYmQBwxIC9C5dWXhm1DrA+CpDKgHYI7rPB42AQqPCsy2g6ip
-	ixelY7rWRqoPK+DBy5klc1Fpw7t0/45GDpNMTGPU5owKZz7G1rEa7STrNobARncZ
-	X2OpGpDTsTX5+EZHQMoPsjxXENXBuNTXXBH6ZYJS0i4Y/BgShhOy+UlJDlnJqLOh
-	uwg0XcvGXDbasJ9Tcvl4A==
-X-ME-Sender: <xms:hBzFZya1IC7GI1oIIUbIj4CQ0WZWu8Rb_0Au3fF_Ab9AbPBkEqNbFQ>
-    <xme:hBzFZ1Zhq0Hjex1eqdsuN-ltd9hLYq1HFi6fOBHTJh_Zk9dE1L8pkqn62D_jloEtZ
-    eheD6nNCNOkdY80IOE>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeljeellecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpefoggffhffvvefkjghfufgtgfesthhqredtredt
-    jeenucfhrhhomhepfdforghrkhcurfgvrghrshhonhdfuceomhhpvggrrhhsohhnqdhlvg
-    hnohhvohesshhquhgvsggsrdgtrgeqnecuggftrfgrthhtvghrnhepudeltdevfedufeff
-    gfeggeehtdeigefghedugefhleetvdfggffghfehhfefteffnecuffhomhgrihhnpehinh
-    htvghlrdgtohhmnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhf
-    rhhomhepmhhpvggrrhhsohhnqdhlvghnohhvohesshhquhgvsggsrdgtrgdpnhgspghrtg
-    hpthhtohepuddvpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegurghvvghmsegu
-    rghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvg
-    drtghomhdprhgtphhtthhopegrnhhthhhonhihrdhlrdhnghhuhigvnhesihhnthgvlhdr
-    tghomhdprhgtphhtthhopehprhiivghmhihslhgrfidrkhhithhsiigvlhesihhnthgvlh
-    drtghomhdprhgtphhtthhopehvihhtrghlhidrlhhifhhshhhithhssehinhhtvghlrdgt
-    ohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehinh
-    htvghlqdifihhrvgguqdhlrghnsehlihhsthhsrdhoshhuohhslhdrohhrghdprhgtphht
-    thhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtoheprghnug
-    hrvgifsehluhhnnhdrtghh
-X-ME-Proxy: <xmx:hBzFZ88NFDZBWj76Oz6PqUJwF10clnDNsclilRcBK01_CVPaM9leDQ>
-    <xmx:hBzFZ0pHqYwliC_V37pK5Ys8ihlExHkz492fKmikX9kdoa6ZF-AQqQ>
-    <xmx:hBzFZ9qamxoTSD59lADvDGks-Sre8xZ1_almfZBUzhu3UTenzYsu3w>
-    <xmx:hBzFZyRnP28z2UYIDf-TGicFjmbhMxC0HQ1Bb0AnI3ulrTYou31xHA>
-    <xmx:hRzFZ-SKzTgnPwX1jlokv590cXxLhK1yVBmH6hQyuZLqlBKcDlOFUCYH>
-Feedback-ID: ibe194615:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 7D0FE3C0066; Sun,  2 Mar 2025 22:05:40 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1740972431; c=relaxed/simple;
+	bh=9ZAXy6AUqP921WUMDzjxlfgaSS6IuoPpOF8lbu80TOE=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=hiioxCeR6sYbLTgWEZKnR9c+RhX9Xl8kY5A+tLKdk8K9e5QHyUKL5PCcFIakNmJ66wyNvGD2RPUZzpTUy1V6ZGmdSd26uDrHSmX4AzY8lWUCIpBxfvMrE14woQIjU98D/8unk+Kyw8Fr2uobj58q7lyAcY4fqw3NPMnb6Vazohg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gLzbaJZn; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-223a7065ff8so16206035ad.0;
+        Sun, 02 Mar 2025 19:27:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740972429; x=1741577229; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=iLl+VFTECyB9okUESCJcsmH0bg8HduocbulJuY9eevk=;
+        b=gLzbaJZnfCrtVklXE5WSB8lggm5ky4QELKSHCDGEXzOnMGTajxYPUo0mOYiJPuDej/
+         rrVOqUJowhVkxrfJXcCtiMDo3BxBCX4cII54+2dwWh31y6mz1alaxvdjOkpqPpAfiYlx
+         vrNnlaSrRQH9RMzjLC/sRHIp4GnUJeJLxt3RBfFJVQh9XcCaz1mlDHyKWpCGO9mgFYT5
+         z16qOWqrQJOD5EErKathuSbnpl0NSCIPPFRYRUo1oO6PphABGwcWFJdaaXBL0lgky6Xg
+         25rNNuWlPW4+IaUtWOQYL8mPKb/5OelwHR1x6Ap3/bCzojxlHvPjYb21HqXV9uZIBPMY
+         UgKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740972429; x=1741577229;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iLl+VFTECyB9okUESCJcsmH0bg8HduocbulJuY9eevk=;
+        b=ea9/cPzAxUnmzg3gpIiBggxTikke697qkKnwEW/TkTdcXp8X+CLKvktggz9EH9jl25
+         doS5N3ynUFbC2b3W/C1qG54Bxz5sqt7QpFByslpT49DNn8/663gKkaV+YUl17FwM28CO
+         o4SX8SkmSWxty9Vy+v23B79P7cLcERysQxbFt7WzdotjKMrSrhzM/ZvostacbAwBs/kp
+         r2YnbtGqk7c4iJK8iV8r8vx+e3XIRBysEt0RUcz6joW/HUDp5AzEvQXCygtCkxWgEFWu
+         GCz5x0TXEiJwTRQA54eQzdYTa+mj8xdfx9uCu08YSV9TyHXieE9wSr2+E3P1zRw/+JOl
+         pB5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU9fGFIIia+OMcAxhQwMaxgWvmofdWoSWFm83wZqlH03sVaK20U7Cbmvyh7TvWyGcLscV8wta+P@vger.kernel.org, AJvYcCVMGo1Yvqk13ye+d0jakjtK06B94zPPwCgQqiOevAiO5qFB+D1xvVoYTwMZBb1Vw8odsRjRd4tOIUh7@vger.kernel.org, AJvYcCXjVD0sV1bO4Ux0UcqCDJW+nitlVb7cnEdFPARzPlwx0kohWlqyr7i03Zzq/pSaisuNgTmtYzMnD2jiZms=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOqPejJZR5anL9iqXIPwb9ur65QAny4icAeWsRP6x2aznYjv1g
+	xoNDiWU+D7UZy54cSRocE7SRoTinJEQJKoKF/ePx17sHUmtJBkcc
+X-Gm-Gg: ASbGncuODZ2tStthC7K2sDoFxqnaOI82frwvN6ufk3zVkBSah6/L5reAIali59AdnIL
+	YMlIfCQMAwbzlNY/tEmjiOxssgu1uaFGLMrPFqN28m9WCi3mYRayLqxb9IFIdx5RyGIF2EUfiLp
+	YcfOD/DmczKjQW60g8BN2B5JNXPTGh5Bq0GXoTmxXfg2HbccRCEkws92KL8BM6yZ/lUmV+qTOR1
+	9DgDNWDlzscTM7Ck0xg/1IcgwPudr2JJx/3Hvr0Jn6a6cTdNUFQAzQkKiI+u5HvPG6G0qncjrky
+	tQBud7elQYZxL6uqUm92r3qLUSjK6XfoPCWrSg==
+X-Google-Smtp-Source: AGHT+IFG8Kg6cBX3r+CuPKUwiMLw5nuGIBQIuJOUDHB/YSC+ivGfUfyyIum8E0KDjDN86+UtXPI1oQ==
+X-Received: by 2002:aa7:88c1:0:b0:736:46b4:bef2 with SMTP id d2e1a72fcca58-73646b56f99mr4672802b3a.6.1740972429220;
+        Sun, 02 Mar 2025 19:27:09 -0800 (PST)
+Received: from gmail.com ([116.237.135.88])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73632e76e1dsm3768873b3a.89.2025.03.02.19.27.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 02 Mar 2025 19:27:08 -0800 (PST)
+From: Qingfang Deng <dqfext@gmail.com>
+To: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Michal Ostrowski <mostrows@earthlink.net>,
+	linux-ppp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH net-next 1/3] ppp: convert ppp->rlock to rwlock to improve RX
+Date: Mon,  3 Mar 2025 11:27:00 +0800
+Message-ID: <20250303032704.2299737-1-dqfext@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Sun, 02 Mar 2025 22:05:19 -0500
-From: "Mark Pearson" <mpearson-lenovo@squebb.ca>
-To: "Vitaly Lifshits" <vitaly.lifshits@intel.com>,
- "Andrew Lunn" <andrew@lunn.ch>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <77d8cbfa-93a2-4d49-b061-b8c59b767241@app.fastmail.com>
-In-Reply-To: <4b5b0f52-7ed8-7eef-2467-fa59ca5de937@intel.com>
-References: <mpearson-lenovo@squebb.ca>
- <20250226194422.1030419-1-mpearson-lenovo@squebb.ca>
- <36ae9886-8696-4f8a-a1e4-b93a9bd47b2f@lunn.ch>
- <50d86329-98b1-4579-9cf1-d974cf7a748d@app.fastmail.com>
- <1a4ed373-9d27-4f4b-9e75-9434b4f5cad9@lunn.ch>
- <9f460418-99c6-49f9-ac2c-7a957f781e17@app.fastmail.com>
- <4b5b0f52-7ed8-7eef-2467-fa59ca5de937@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH] e1000e: Link flap workaround option for false
- IRP events
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Vitaly,
+The rlock spinlock in struct ppp protects the receive path, but it is
+frequently used in a read-mostly manner. Converting it to an rwlock_t
+allows multiple CPU to enter the receive path and improve its
+performance.
 
-On Sun, Mar 2, 2025, at 8:09 AM, Lifshits, Vitaly wrote:
-> Hi Mark,
->
->> Hi Andrew
->>=20
->> On Thu, Feb 27, 2025, at 11:07 AM, Andrew Lunn wrote:
->>>>>> +			e1e_rphy(hw, PHY_REG(772, 26), &phy_data);
->>>>>
->>>>> Please add some #define for these magic numbers, so we have some i=
-dea
->>>>> what PHY register you are actually reading. That in itself might h=
-elp
->>>>> explain how the workaround actually works.
->>>>>
->>>>
->>>> I don't know what this register does I'm afraid - that's Intel know=
-ledge and has not been shared.
->>>
->>> What PHY is it? Often it is just a COTS PHY, and the datasheet might
->>> be available.
->>>
->>> Given your setup description, pause seems like the obvious thing to
->>> check. When trying to debug this, did you look at pause settings?
->>> Knowing what this register is might also point towards pause, or
->>> something totally different.
->>>
->>> 	Andrew
->>=20
->> For the PHY - do you know a way of determining this easily? I can rea=
-ch out to the platform team but that will take some time. I'm not seeing=
- anything in the kernel logs, but if there's a recommended way of confir=
-ming that would be appreciated.
->
-> The PHY is I219 PHY.
-> The datasheet is indeed accessible to the public:=20
-> https://cdrdv2-public.intel.com/612523/ethernet-connection-i219-datash=
-eet.pdf
->
->>=20
->> We did look at at the pause pieces - which I agree seems like an obvi=
-ous candidate given the speed mismatch on the network.
->> Experts on the Intel networking team did reproduce the issue in their=
- lab and looked at this for many weeks without determining root cause. I=
- wish it was as obvious as pause control configuration :)
->>=20
->> Thanks
->> Mark
->>=20
->
-> Reading this register was suggested for debug purposes to understand i=
-f=20
-> there is some misconfiguration. We did not find any misconfiguration.
-> The issue as we discovered was a link status change interrupt caused t=
-he=20
-> CSME to reset the adapter causing the link flap.
->
-> We were unable to determine what causes the link status change interru=
-pt=20
-> in the first place. As stated in the comment, it was only ever observe=
-d=20
-> on Lenovo P5/P7systems and we couldn't ever reproduce on other systems=
-.=20
-> The reproduction in our lab was on a P5 system as well.
->
->
-> Regarding the suggested workaround, there isn=E2=80=99t a clear unders=
-tanding=20
-> why it works. We suspect that reading a PHY register is probably=20
-> prevents the CSME from resetting the PHY when it handles the LSC=20
-> interrupt it gets. However, it can also be a matter of slight timing=20
-> variations.
-> We communicated that this solution is not likely to be accepted to the=20
-> kernel as is, and the initial responses on the mailing list demonstrat=
-e=20
-> the pushback. We do understand the frustration of end-users that may=20
-> experience the problem. A couple of suggestions that can make it look=20
-> less =E2=80=9Cout-of-the-blue=E2=80=9D are: try a short delay instead =
-of the register=20
-> read, or read a more common register like PHY STATUS instead.
-> On a different topic, I suggest removing the part of the comment below:
-> * Intel unable to determine root cause.
+Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+---
+ drivers/net/ppp/ppp_generic.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-Thank you for the details.
+diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
+index 6220866258fc..15e270e9bf36 100644
+--- a/drivers/net/ppp/ppp_generic.c
++++ b/drivers/net/ppp/ppp_generic.c
+@@ -118,7 +118,7 @@ struct ppp {
+ 	struct file	*owner;		/* file that owns this unit 48 */
+ 	struct list_head channels;	/* list of attached channels 4c */
+ 	int		n_channels;	/* how many channels are attached 54 */
+-	spinlock_t	rlock;		/* lock for receive side 58 */
++	rwlock_t	rlock;		/* lock for receive side 58 */
+ 	spinlock_t	wlock;		/* lock for transmit side 5c */
+ 	int __percpu	*xmit_recursion; /* xmit recursion detect */
+ 	int		mru;		/* max receive unit 60 */
+@@ -372,12 +372,14 @@ static const int npindex_to_ethertype[NUM_NP] = {
+  */
+ #define ppp_xmit_lock(ppp)	spin_lock_bh(&(ppp)->wlock)
+ #define ppp_xmit_unlock(ppp)	spin_unlock_bh(&(ppp)->wlock)
+-#define ppp_recv_lock(ppp)	spin_lock_bh(&(ppp)->rlock)
+-#define ppp_recv_unlock(ppp)	spin_unlock_bh(&(ppp)->rlock)
++#define ppp_recv_lock(ppp)	write_lock_bh(&(ppp)->rlock)
++#define ppp_recv_unlock(ppp)	write_unlock_bh(&(ppp)->rlock)
+ #define ppp_lock(ppp)		do { ppp_xmit_lock(ppp); \
+ 				     ppp_recv_lock(ppp); } while (0)
+ #define ppp_unlock(ppp)		do { ppp_recv_unlock(ppp); \
+ 				     ppp_xmit_unlock(ppp); } while (0)
++#define ppp_recv_read_lock(ppp)		read_lock_bh(&(ppp)->rlock)
++#define ppp_recv_read_unlock(ppp)	read_unlock_bh(&(ppp)->rlock)
+ 
+ /*
+  * /dev/ppp device routines.
+@@ -1252,7 +1254,7 @@ static int ppp_dev_configure(struct net *src_net, struct net_device *dev,
+ 	for (indx = 0; indx < NUM_NP; ++indx)
+ 		ppp->npmode[indx] = NPMODE_PASS;
+ 	INIT_LIST_HEAD(&ppp->channels);
+-	spin_lock_init(&ppp->rlock);
++	rwlock_init(&ppp->rlock);
+ 	spin_lock_init(&ppp->wlock);
+ 
+ 	ppp->xmit_recursion = alloc_percpu(int);
+@@ -2210,12 +2212,12 @@ struct ppp_mp_skb_parm {
+ static inline void
+ ppp_do_recv(struct ppp *ppp, struct sk_buff *skb, struct channel *pch)
+ {
+-	ppp_recv_lock(ppp);
++	ppp_recv_read_lock(ppp);
+ 	if (!ppp->closing)
+ 		ppp_receive_frame(ppp, skb, pch);
+ 	else
+ 		kfree_skb(skb);
+-	ppp_recv_unlock(ppp);
++	ppp_recv_read_unlock(ppp);
+ }
+ 
+ /**
+-- 
+2.43.0
 
-I agree that the Intel networking team communicated to us that the solut=
-ion provided to us was not suitable for upstream (just adding in the rea=
-d directly) - I agreed with that and add the part about it being a modul=
-e option to make it, hopefully, more palatable.
-=20
-The problem is that Intel have stated to us, in writing, that they would=
- not investigate further and would not work on an upstream appropriate s=
-olution (a requirement for us - out of tree patches are not suitable as =
-I'm sure we all agree).
-=20
-I'm not going to go into the internal communication details/escalations/=
-etc here - but this is the only reason I'm doing this patch. I would muc=
-h rather Intel had continued the debug exercise.
-
-> The issue went through joint debug by Intel and Lenovo, and no obvious=20
-> spec violations by either party were found. There doesn=E2=80=99t seem=
- to be=20
-> value in including this information in the comments of upstream code.
-
-I'm OK to remove that statement, but I do want to highlight that it is f=
-actually correct.
-My intent with this patch was not to dump on Intel or cause offence, but=
- to provide context as to why a Lenovo employee is doing a somewhat pecu=
-liar workaround for an Intel networking device :)
-
-I was planning on updating the commit message so I will look to make it =
-less inflammatory.
-
-Thanks for chiming in and providing the details. I'm treading very caref=
-ully in what is an extremely awkward position to be put.=20
-
-Mark
 
