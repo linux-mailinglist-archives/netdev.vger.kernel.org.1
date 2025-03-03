@@ -1,127 +1,170 @@
-Return-Path: <netdev+bounces-171244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2770EA4C211
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 14:35:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54184A4C21B
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 14:37:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42F591894DB0
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 13:34:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11DDE162B42
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 13:37:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2042C211A01;
-	Mon,  3 Mar 2025 13:32:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8773D212B2F;
+	Mon,  3 Mar 2025 13:37:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="hOVzupQt"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="AThAQGHZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF3B211491
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 13:32:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 380B7212F83;
+	Mon,  3 Mar 2025 13:37:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741008732; cv=none; b=H3DsaldvHLrKbwmqzM5qaVeLZLXP7/l+kFdFY2F6xU39sjqh1+fMcThMuazwl0lw5xyomQ+O/rt3LyxVYqyh3P/kzDDUmT03NVFAkDXS0DrrjrceIRPbc8/I6TUCpvsFqh3+EwH2p5ZmsYZao32CvSmxZ8Z/rBfxpMnrM0cmRWY=
+	t=1741009029; cv=none; b=RcAlzUABSD+qCd44KsxxjlOCt6CQw6R2c5RGGUhutFVwJ71LKBSDrlM/49LsI4a7iSLtpOz8q40lkb7G3ywguMYV2Em48OWdPrHUKbCAiNzoewGg5XRvk0vSFqJNfLoZDN4rBz/dPdhkIbG+LLJ/zN0uwalLMJYNvF0xtw+AMao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741008732; c=relaxed/simple;
-	bh=f4KgbabNGjONHwG30Wm13XBFWuB0JIZbPNxYH+LA8x8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lN7KIY0+tY8FrPfuNgoK6CVdS9yCcopsAwa4hwLnzQGxnTEOZ6u77QszVgWpRRUe95h7R13Pc397dRv7PWFXx9fI4a2dTrKYz4YKy9isAWflcD49kauKLXUM64186mLPDncZ20e2odHsgkR4bpn0jloFrwuvJHc+8Dj8T/RltOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=hOVzupQt; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-439846bc7eeso28137945e9.3
-        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 05:32:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1741008728; x=1741613528; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WH+w/1iCTIf8vLffwkm/FsumvuklpQmEB01Cn2pDW1I=;
-        b=hOVzupQthk+mphoQM4nVklhJ91eQDpadbTuNulnt8B/ZD1iAmNzKbE7Ri6/D4DcbSb
-         avht7TVuisugbgbH+6/ZwOE52Rid+3j3GP1xJYocITcVFz/0gQ46VbKw6XKGUfDY+0BZ
-         tQzlXgYUeAmSJLZzofRXFoMcqGi++0iFnsKSRt59046qzGJxz4Ky9jm6nZvHNddOWoo0
-         UgfcxPb4lcSRX6p1fJYesI17Y8xbq1kkPucGUqORW248OeNcZaNEXUGo4m8mB3oFYudA
-         AXQUlM92dY8ILOkiSPfY1deKmqQNcBqJjGhsJh96yfw7uzvkoIfc2MzYqIgVQ8FxqVaQ
-         0qqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741008728; x=1741613528;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WH+w/1iCTIf8vLffwkm/FsumvuklpQmEB01Cn2pDW1I=;
-        b=pxTMZsr3VBRd7xCIHXF5vwSe7jy9zTZh0+6Kai4DKb767tnoToeh+lEC2/0K0YZC3Q
-         YOq/VLAIi4o4PlguUrVQLqMJ8wswFcTXl7B4Cz1WJSm28HyUxA3ZfGyeH2xewpUKKT/G
-         44thmwb/yHPR829rOx10x4DaWqn+f7fjDgF4nTfgfZ4kKfypPZ2YdmTjus5Cx3aZZMLO
-         x0vIJkL8GlWpPCGIpXHhIXe5rfesL16qNeVHunlcqHe/puIeCfz1e9kAKIHxmkAKVhQC
-         jB6wlaNsAyFVHdvZYcEIg/srLNf7XCGtWRAsSMCHTrk4W/4ejmx6+oyPCcgrK4cRpywO
-         G+0Q==
-X-Gm-Message-State: AOJu0YxjoVqX/744Knkr4tASJghw9iZFS6c64lNCw00zTiHOdRRxvnis
-	n6sk/oGw24rWhJ1XYw09wQiU08KRQYeCqxfsiRtbz2P5GMHJ7L+wyKn9MA8Yywq5r5hM4W/n0Fb
-	w
-X-Gm-Gg: ASbGncsnLgwdrhAFaIaT7am8dLGYM7T34eme8rguisybUfA9bVZVeV7Q0ucz0XLuNQS
-	ucmAHZh07bG1pZ6FRn1vUCBofjy7F7cfo5s4ELf8Dqko/hk9MTRP8c9bCMcD7CVhRA6lDrSVdh1
-	sRJaAp/MOFx2XcSuCB0GnHyBqLQ8iDWy14oU1ZuZCu4cLJkVYZ4UA5MvzL1pVdosrrDpLY6BY5i
-	Ib5oxBUgfPE+6yx3iKJBigzG33eZK8tiY4gqFiH9CFBKZ5ca2+jPAKX1oW1ncqwjtYozeLr3Xsr
-	ZSySrmhzwjDvtJN9u1gWYdkxbbu15Ql0Ctg5Jf4=
-X-Google-Smtp-Source: AGHT+IGIOD3MhIhuLqeDw05pYJAP/cSfl0SLTgWIv/TVjoRpzgP0UsNXqT8dBsqWJRosJMPudWrmhw==
-X-Received: by 2002:a05:600c:1c93:b0:439:8a8c:d3ca with SMTP id 5b1f17b1804b1-43ba675afd9mr115322575e9.29.1741008727600;
-        Mon, 03 Mar 2025 05:32:07 -0800 (PST)
-Received: from localhost ([140.209.217.212])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43b7370372dsm157836365e9.11.2025.03.03.05.32.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Mar 2025 05:32:07 -0800 (PST)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	saeedm@nvidia.com,
-	leon@kernel.org,
-	tariqt@nvidia.com,
-	andrew+netdev@lunn.ch
-Subject: [PATCH net] net/mlx5: Fill out devlink dev info only for PFs
-Date: Mon,  3 Mar 2025 14:32:00 +0100
-Message-ID: <20250303133200.1505-1-jiri@resnulli.us>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1741009029; c=relaxed/simple;
+	bh=Xn1k7B4WleaLurRItO3p71bGSf1i/m3KCkUgXG8UOWA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=G+JHW47s+grGTjYvWpLxr9AYBn6lUH9guaq9jKyb8SSd/qCNLwWQaXCBNUmSYl6oacP+gdx7alN0B9vdZDE8Z5GANFubKTPpYbrT8AVPuUEpbfMxtRP7GGJu3y5ZQjso7BcN1WdkBiQO5Fuvgf43FLrNNCjZhxrJo8aRJ9j12U8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=AThAQGHZ; arc=none smtp.client-ip=198.47.19.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 523DaFOx2693754
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Mon, 3 Mar 2025 07:36:15 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1741008975;
+	bh=YsrLgmhopKk68gcwDTV/NQFgsX6Svsgvrj64ryk9wwg=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=AThAQGHZNeEI4KCqBCVdeJJtIRwBAEZYQVgkKje9cHHogVrGS+9oqS4lW9ujZYEKM
+	 tlCNdOtsVejDrivOD6u9N4titcuS2lPfiSiAc9ZeD4fZ5e1D8Tp8oq0gh0NwvSqM42
+	 bCyGzWrzn8Yu3jsljDGwILtjFXOmOMjoqb6uS81o=
+Received: from DLEE110.ent.ti.com (dlee110.ent.ti.com [157.170.170.21])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 523DaFPo086963;
+	Mon, 3 Mar 2025 07:36:15 -0600
+Received: from DLEE107.ent.ti.com (157.170.170.37) by DLEE110.ent.ti.com
+ (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 3
+ Mar 2025 07:36:15 -0600
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 3 Mar 2025 07:36:15 -0600
+Received: from [172.24.21.156] (lt9560gk3.dhcp.ti.com [172.24.21.156])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 523Da8cj073172;
+	Mon, 3 Mar 2025 07:36:09 -0600
+Message-ID: <40ce8ed3-b36c-4d5f-b75a-7e0409beb713@ti.com>
+Date: Mon, 3 Mar 2025 19:06:07 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [EXTERNAL] Re: [PATCH net-next v3 3/3] net: ti: icssg-prueth: Add
+ XDP support
+To: Dan Carpenter <dan.carpenter@linaro.org>
+CC: <rogerq@kernel.org>, <danishanwar@ti.com>, <pabeni@redhat.com>,
+        <kuba@kernel.org>, <edumazet@google.com>, <davem@davemloft.net>,
+        <andrew+netdev@lunn.ch>, <bpf@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <u.kleine-koenig@baylibre.com>,
+        <matthias.schiffer@ew.tq-group.com>, <schnelle@linux.ibm.com>,
+        <diogo.ivo@siemens.com>, <glaroque@baylibre.com>, <macro@orcam.me.uk>,
+        <john.fastabend@gmail.com>, <hawk@kernel.org>, <daniel@iogearbox.net>,
+        <ast@kernel.org>, <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>
+References: <20250224110102.1528552-1-m-malladi@ti.com>
+ <20250224110102.1528552-4-m-malladi@ti.com>
+ <d362a527-88cf-4cd5-a22f-7eeb938d4469@stanley.mountain>
+ <21f21dfb-264b-4e01-9cb3-8d0133b5b31b@ti.com>
+ <2c0c1a4f-95d4-40c9-9ede-6f92b173f05d@stanley.mountain>
+Content-Language: en-US
+From: "Malladi, Meghana" <m-malladi@ti.com>
+In-Reply-To: <2c0c1a4f-95d4-40c9-9ede-6f92b173f05d@stanley.mountain>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-From: Jiri Pirko <jiri@nvidia.com>
 
-Firmware version query is supported on the PFs. Due to this
-following kernel warning log is observed:
 
-[  188.590344] mlx5_core 0000:08:00.2: mlx5_fw_version_query:816:(pid 1453): fw query isn't supported by the FW
+On 3/3/2025 6:01 PM, Dan Carpenter wrote:
+> On Mon, Mar 03, 2025 at 05: 36: 41PM +0530, Malladi, Meghana wrote: > > 
+>  > +static int emac_run_xdp(struct prueth_emac *emac, struct xdp_buff 
+> *xdp, > > > + struct page *page) > > > +{ > > > + struct net_device
+> ZjQcmQRYFpfptBannerStart
+> This message was sent from outside of Texas Instruments.
+> Do not click links or open attachments unless you recognize the source 
+> of this email and know the content is safe.
+> Report Suspicious
+> <https://us-phishalarm-ewt.proofpoint.com/EWT/v1/G3vK! 
+> uldqV3eFFkc7oMXFHHkDX4AFLVsE3ldskf6bPMMFmxDOsNtMfZjUscGelUkBFpAeybNre38L_c2LiiUb7AZxLvAeqSk9ifgbPE1AYFU$>
+> ZjQcmQRYFpfptBannerEnd
+> 
+> On Mon, Mar 03, 2025 at 05:36:41PM +0530, Malladi, Meghana wrote:
+>> > > +static int emac_run_xdp(struct prueth_emac *emac, struct xdp_buff *xdp,
+>> > > +			struct page *page)
+>> > > +{
+>> > > +	struct net_device *ndev = emac->ndev;
+>> > > +	int err, result = ICSSG_XDP_PASS;
+>> > > +	struct bpf_prog *xdp_prog;
+>> > > +	struct xdp_frame *xdpf;
+>> > > +	int q_idx;
+>> > > +	u32 act;
+>> > > +
+>> > > +	xdp_prog = READ_ONCE(emac->xdp_prog);
+>> > > +	act = bpf_prog_run_xdp(xdp_prog, xdp);
+>> > > +	switch (act) {
+>> > > +	case XDP_PASS:
+>> > > +		break;
+>> > > +	case XDP_TX:
+>> > > +		/* Send packet to TX ring for immediate transmission */
+>> > > +		xdpf = xdp_convert_buff_to_frame(xdp);
+>> > > +		if (unlikely(!xdpf))
+>> > 
+>> > This is the second unlikely() macro which is added in this patchset.
+>> > The rule with likely/unlikely() is that it should only be added if it
+>> > likely makes a difference in benchmarking.  Quite often the compiler
+>> > is able to predict that valid pointers are more likely than NULL
+>> > pointers so often these types of annotations don't make any difference
+>> > at all to the compiled code.  But it depends on the compiler and the -O2
+>> > options.
+>> > 
+>> 
+>> Do correct me if I am wrong, but from my understanding, XDP feature depends
+>> alot of performance and benchmarking and having unlikely does make a
+>> difference. Atleast in all the other drivers I see this being used for XDP.
+>> 
+> 
+> Which compiler are you on when you say that "having unlikely does make a
+> difference"?
 
-Fix it by restricting the query and devlink info to the PF.
+I'm on gcc version 10.3.1.
 
-Fixes: 8338d9378895 ("net/mlx5: Added devlink info callback")
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/devlink.c | 3 +++
- 1 file changed, 3 insertions(+)
+> 
+> I'm on gcc version 14.2.0 (Debian 14.2.0-16) and it doesn't make a
+> difference to the compiled code.  This matches what one would expect from
+> a compiler.  Valid pointers are fast path and NULL pointers are slow path.
+> 
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/devlink.c b/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
-index 98d4306929f3..a2cf3e79693d 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
-@@ -46,6 +46,9 @@ mlx5_devlink_info_get(struct devlink *devlink, struct devlink_info_req *req,
- 	u32 running_fw, stored_fw;
- 	int err;
- 
-+	if (!mlx5_core_is_pf(dev))
-+		return 0;
-+
- 	err = devlink_info_version_fixed_put(req, "fw.psid", dev->board_id);
- 	if (err)
- 		return err;
--- 
-2.48.1
+Can you tell me how did you verify this? I actually don't know what 
+level of optimization to expect from a compiler. I said so, because I 
+have checked with other drivers which implemented XDP and everywhere 
+unlikely is used. But now I understand its not the driver but the 
+compiler that plays the major role in defining the optimization.
+
+> Adding an unlikely() is a micro optimization.  There are so many other
+> things you can do to speed up the code.  I wouldn't start with that.
+>
+
+Ok, if you believe that unlikely is doing more harm than good, I am ok 
+with dropping them off.
+
+> regards,
+> dan
+> 
 
 
