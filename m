@@ -1,91 +1,90 @@
-Return-Path: <netdev+bounces-171399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8DFAA4CD15
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 21:57:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3AE3A4CD61
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 22:18:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3198173E35
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 20:57:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 644DF3ACAEA
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 21:17:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04A2B2343AB;
-	Mon,  3 Mar 2025 20:57:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F1B11E5B6C;
+	Mon,  3 Mar 2025 21:17:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="WFd+7kVM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KRiilDaJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EA3A11CA9;
-	Mon,  3 Mar 2025 20:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70788208A9;
+	Mon,  3 Mar 2025 21:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741035426; cv=none; b=jeYpJ0liGmJ1vE4D5caevM3EhV/8OGY8pUMPITOb5hRDGKCVGl6YwZpj4iqJTbe3sB0+vT5G2SFBdnyw9NLRF+rC0xjOZvav6a0r9ir/gc/aUpyIpGOODCxzYOZklZSXifHG1Fs4OkKAhafCoBF5k5hvhGZbd/AxcKi9SKaoBi0=
+	t=1741036677; cv=none; b=OJGezBG7IOEBgc8T8hrlXIYig4mbUQJYrbo4PQK+d/BNyEwBqGR6h5FQfeu02XrPautXDVh7zXPbvgGYx1raJiB9yCNEKWz0IjbafoyQaGZKkz+RVLrNgJxWAc8dEqkaKp7769GbVIc3JDkt7upnMcJ1bkmtagQq27JJrvSN77M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741035426; c=relaxed/simple;
-	bh=wkPrI5PI4gOi80WWVhId6dzA8Q9owv5JCghvbzkIVPM=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=n3JG0wtFH7R04RvBbbe2Lan+zeQvGgYpxE6cf61o7ycytzdSj80DvaQNBGewJLGpDbW5Ai8XJpHgedJ29J+KA+kDstjKoza3UENdFAuXvnEXN9Ozapd4lZSc67ZngS6Uh1WwN026hXZX+QNTRSA5bhmBfmTrswRnrjjiUhGldrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=WFd+7kVM; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [192.168.35.166] (c-24-22-154-137.hsd1.wa.comcast.net [24.22.154.137])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 860C12110483;
-	Mon,  3 Mar 2025 12:57:04 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 860C12110483
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1741035424;
-	bh=3qh+61wOXo3xnM/WVr1EaxpXDMg9Qc5SkS1wS9/KCaA=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=WFd+7kVMwb8m/yRhGu82uGV6e/HKaH3YScqYDNg3VqULYlWwhYN1W/EwkQ+KpHk2M
-	 B+UrWMeoRFcHhvu9/IkXdfvLFS9RIsO/J8jsCs0ntQiYwMGh95feOKPx7lgiJPPiC7
-	 /EfD2TyFRiTmU900qpo0PnuB9Rpe0/+ft8U6VJfk=
-Message-ID: <f0fa9bc3-159a-413f-a957-0298a55cf728@linux.microsoft.com>
-Date: Mon, 3 Mar 2025 12:57:09 -0800
+	s=arc-20240116; t=1741036677; c=relaxed/simple;
+	bh=AszVorE/EkhZ3+7Ol3HRuPVkQBoS4dyx8wSxtua6IrM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=Mss27iTELHRY3HhBAuopWvhrUNUMrIOjsZWlywwnlq1IbHeIn7Xf4zlwH8/lXKJ3dRNKA4wPhz66sd3Xo0xD3AoOtKBRt8yRTxjg3XFluRrLTuHvFugEIfhdxosb36GlFO370qM5YbrAjJTfPNmd3nMMSMPGM3IaxzYPdRKiNRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KRiilDaJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B23BDC4CEE5;
+	Mon,  3 Mar 2025 21:17:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741036676;
+	bh=AszVorE/EkhZ3+7Ol3HRuPVkQBoS4dyx8wSxtua6IrM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=KRiilDaJbPT1FK63z1QwEwQrmw9dooZeXCICmsN3P4teawCAbeZ1m711+i6p5X7QD
+	 eVJi8KTTCkxxqSNgC32BU3dotW/95ZM3Uo9eg8Cx9Bjj1yeh7vwHc9rT4z9ZeTjq9L
+	 lghRj06gPac1pEY6rmbMk4VvSnQE7Yw/cdSWOHqP530Cq2X+gTb1uL4jsZVcCXh+FU
+	 4+KNo/Zn4KyEZUiQb3fMgp/dgRrLY26v6+TKkCNu+Bzvp+8BLFmf8YM2v9A2noTjJ/
+	 xJGP2sRcqeIKzfPK5nfkBresmYKnWMVkrmPj0k5ha2vnpxd7ZdaCoitIIHQU1FlwId
+	 polAyf+ckX1Gg==
+Date: Mon, 3 Mar 2025 15:17:55 -0600
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+	linux-pci@vger.kernel.org, Ariel Almog <ariela@nvidia.com>,
+	Aditya Prabhune <aprabhune@nvidia.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Arun Easi <aeasi@marvell.com>, Jonathan Chocron <jonnyc@amazon.com>,
+	Bert Kenward <bkenward@solarflare.com>,
+	Matt Carlson <mcarlson@broadcom.com>,
+	Kai-Heng Feng <kai.heng.feng@canonical.com>,
+	Jean Delvare <jdelvare@suse.de>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+	Stephen Hemminger <stephen@networkplumber.org>
+Subject: Re: [PATCH v4] PCI/sysfs: Change read permissions for VPD attributes
+Message-ID: <20250303211755.GA200634@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: eahariha@linux.microsoft.com, Wenjia Zhang <wenjia@linux.ibm.com>,
- Jan Karcher <jaka@linux.ibm.com>, "D. Wythe" <alibuda@linux.alibaba.com>,
- Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>, David Ahern <dsahern@kernel.org>,
- linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH net-next 0/3] Converge on using secs_to_jiffies() part two
-To: Jakub Kicinski <kuba@kernel.org>
-References: <20250219-netdev-secs-to-jiffies-part-2-v1-0-c484cc63611b@linux.microsoft.com>
- <20250221162107.409ae333@kernel.org>
-From: Easwar Hariharan <eahariha@linux.microsoft.com>
-Content-Language: en-US
-In-Reply-To: <20250221162107.409ae333@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e9943382-8d53-4e28-b600-066ef470f889@app.fastmail.com>
 
-On 2/21/2025 4:21 PM, Jakub Kicinski wrote:
-> On Wed, 19 Feb 2025 20:30:35 +0000 Easwar Hariharan wrote:
->> The conversion is made with Coccinelle with the secs_to_jiffies() script
->> in scripts/coccinelle/misc. Attention is paid to what the best change
->> can be rather than restricting to what the tool provides.
->>
->> The non-netdev patches that include the update to secs_to_jiffies.cocci to address
->> expressions are here: https://lore.kernel.org/all/20250203-converge-secs-to-jiffies-part-two-v2-0-d7058a01fd0e@linux.microsoft.com
+On Tue, Feb 25, 2025 at 10:05:49PM +0200, Leon Romanovsky wrote:
+> On Tue, Feb 25, 2025, at 20:59, Andrew Lunn wrote:
+> >> Chmod solution is something that I thought, but for now I'm looking
+> >> for the out of the box solution. Chmod still require from
+> >> administrator to run scripts with root permissions.
+> >
+> > It is more likely to be a udev rule. 
 > 
-> Can the secs_to_jiffies cocci check script finally run in report mode?
+> Udev rule is one of the ways to run such script.
 > 
-> I think that needs to be fixed first, before we start "cleaning up"
-> existing code under net.
+> > systemd already has lots of examples:
+> >
+> > /lib/udev/rules.d/50-udev-default.rules:KERNEL=="rfkill", MODE="0664"
 
-It does not, yet. I'm not ignoring this feedback, it's just taking a bit
-of wall clock time between commercial commitments. :) 
-
-Thanks,
-Easwar (he/him)
+Where are we at with this?  Is a udev rule a feasible solution?
 
