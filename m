@@ -1,134 +1,111 @@
-Return-Path: <netdev+bounces-171250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6453CA4C25F
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 14:49:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC964A4C273
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 14:53:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65FF17AA202
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 13:48:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A2FB3AAC76
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 13:52:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55BC3211A05;
-	Mon,  3 Mar 2025 13:49:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79D6F2139BC;
+	Mon,  3 Mar 2025 13:52:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bT3dqUjb"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="ZAQ4yBgK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA2B7211A11
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 13:49:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAD582135B9;
+	Mon,  3 Mar 2025 13:52:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741009787; cv=none; b=GW5pgxDd5BJE618yJoG5wk+2wRGfvBZvEDSqK1gK62d3PwWqfN5BYpKyNBhPRNB373IY521fSi5dRJe9hlhxcZ+s1AAz3lam1XbqJTmlP6sMthIrSqXewXfGzWnND4UUW3mCdSY+VMZtIgWrk8xMSQJLRVOQjsyhgyhrylei8+Y=
+	t=1741009959; cv=none; b=DWHtBl1AZLaXgg5LOtDeDLfnBGaA1MwVZSOuc9xVgRjkXcp573MJejD1Mp6tcusv8ocjLo3NXk1cqyMWMOhRA321oYO8zyyPME4Hluv3Swz1OvQHwmkj8vzvGVGCTz8/Ck54IQfYz+drZR3b55yyG9U71vRr8ZFwjuipWuJMwcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741009787; c=relaxed/simple;
-	bh=lgAbImJ18uS+0pEgdg6lJJUqs3C7WgEX7SaJ5zshD0w=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=BWQG2FWa/ofWIwXeIhmmDxiV6DwTtIZl5nxAs+uuqDOxbwivkMhVQhp/r+JdNfSXsdZlNx1ZcNrPS2itCHncNEHn2O8pFSZVV51vMbEw6lSDWvOjHSwHatAMMCjc/1axkqslkpWlNQD4CMp0K3BaJR0SN/xpvbkPaEBNyUm+Rso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bT3dqUjb; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6e897847086so33252886d6.3
-        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 05:49:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741009784; x=1741614584; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lgAbImJ18uS+0pEgdg6lJJUqs3C7WgEX7SaJ5zshD0w=;
-        b=bT3dqUjbHNIPgdpu4AlPhNMKZEAMn6RnqiqerVdhmOaArb0hHAX+/AxkHvA8tsnad8
-         kA5nwQgCoQkEvRtH/r1dvt/5F7liud500+gRz685kLpYfbGI8rUHG9nxy76s7swa11Fz
-         gocMTUf2T9wadfnYs9MpCKMhO1bwlo15basu6PYrpJxH2yrbO4vtqNNECcMX8LeGn5RJ
-         SqN4ZERvUvXC5zi7LiKNSzxq18jxnHZJT3qw9n+7bMzEQX1bxL3nghWFElquDDMxibgE
-         /IfrTdBejXdI1hW7XBt1xE5JrjpoA0Woo+K3mH3JnuyrorTt99c8Yo9j/8pbZp8xWyXw
-         oNCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741009784; x=1741614584;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=lgAbImJ18uS+0pEgdg6lJJUqs3C7WgEX7SaJ5zshD0w=;
-        b=XCNyx8FU8pyEdSaxAsca+YrKa0GqkR2Zv5DikmpaewGynS0gXwUwntWYlMoQjxkBaX
-         8fNO3NURwSwbRHbwNHS6vw1/dSjouJPUTv5YEs/rts42fod1cm1DtH4aIFXrg9r5//Og
-         /NyOEK/QJBSzLdrjnpwkM96lILZbGwSvMwZ4oqmGDqoGMv13myYQEIwrGKurbEOUqcvG
-         FFiwcyqhoQXWel1B0kNd0f66/bSWkjDzxoxw7CBs5xBR4yUGVGIUTFI7PDOpQMs8vCkP
-         R23psAZUSiSVpCNtkxtyrbYKteQO/c+X7gvpPNopJcEDHijqAGevkzSpCl9qN6HnBa1b
-         8SLw==
-X-Forwarded-Encrypted: i=1; AJvYcCXmHJuVAy/GRkcUzjfy9UdfZd7io6KRnuMudcVX0462HWgnVsvSO+PclF0Hf3yaGyl7wbyZ/3k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywj8twGaXbUTnRnjC2INV0B4emROo9fDDSf73vosr4Gx5JoDH7I
-	JU8hY4GUTAzZs3rOnUopva2UmMxtbHpBH++UqkVxQZjchV/sBXXW
-X-Gm-Gg: ASbGncv08SZKlxrjPdZMxSU/VxIJvcfqL8jsrQGUihD3MzNYhhjWA3K+oOhTsikxK25
-	3aCtZ4A2/ORx7QYyP1hUGJYsUgGCEwqK/HVEGZNlTvw2etdRlWqFq03p7/2NaAnO1UsxmZ5XlYb
-	gvx98skJIf3V1VHbAQnSBi18q+pkBo8jk5SBHb4KLt/uuYjCqt93YXt9ZKqGTbOAIdhg6oro7D7
-	IznMDIVc1Mm48aiK8vJ1S4A/+816/ug2Ac07nCWXegER+k3k4PFS0sO4GWN9yGjBmONNTQtS2Iz
-	lPBSKEVDogrGsJ3wn6JVauRPXX4NDeF1eLdvtmc7LdVI74twsy1QUPdhKH/A7fiDaroNnPYBQmq
-	N9C4wZLUUVDPsNv2XDzUF7w==
-X-Google-Smtp-Source: AGHT+IFnq9P5+lqpoIWAR5TcUB+pzezVF/ro/UoQh1HYcSfh+67XDz28NFX8HRkfViqnVLRoWe+EvA==
-X-Received: by 2002:a05:6214:2462:b0:6e4:4331:aae6 with SMTP id 6a1803df08f44-6e8a0d9990emr204909266d6.39.1741009784347;
-        Mon, 03 Mar 2025 05:49:44 -0800 (PST)
-Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e8976534cbsm53155846d6.31.2025.03.03.05.49.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Mar 2025 05:49:43 -0800 (PST)
-Date: Mon, 03 Mar 2025 08:49:43 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- ncardwell@google.com, 
- kuniyu@amazon.com, 
- dsahern@kernel.org, 
- willemb@google.com, 
- horms@kernel.org, 
- netdev@vger.kernel.org
-Message-ID: <67c5b3775ea69_1b832729461@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CAL+tcoDg1mQ+7DtYNgYomum9o=gzwtrjedYf7VmHud54VfSynQ@mail.gmail.com>
-References: <20250228164904.47511-1-kerneljasonxing@gmail.com>
- <67c5111ae5754_170775294fe@willemb.c.googlers.com.notmuch>
- <CAL+tcoDg1mQ+7DtYNgYomum9o=gzwtrjedYf7VmHud54VfSynQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] net-timestamp: support TCP GSO case for a few
- missing flags
+	s=arc-20240116; t=1741009959; c=relaxed/simple;
+	bh=hzXQnKkQEKaBU/KLPLOtoh0ihbySNCk+e6ltpzYt4oo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=E0nubo1EcEXFzRytmA8YtEHZi63aigkjM/mY/QrSkDlUjdl62/7rTl9GsxVsgjG80lQo35WzcJQpo9YPdR36ZjzXGsLAcVvgF7HZWZnCAt/EBNhRFJvnPaMNM78d+1d2448MnL5sVj6x8Mw7nbUtKMJ9qXbWrw1uiARwjJwNlnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ZAQ4yBgK; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 523DqAQA2770688
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Mon, 3 Mar 2025 07:52:10 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1741009930;
+	bh=HKA6epoyG5k7PVVX2SWKSB8APlH9M5pg/2J3Q1G9Iqs=;
+	h=From:To:CC:Subject:Date;
+	b=ZAQ4yBgK/Lk91iqOLs9LBj877KPeCh+db+1G/l/eZs3N1BA7S8TLyRradc9EKO9iD
+	 KFSeneUZOYTm/b8C2J7PsAXFWdnfMDJOjOSWxDYmDf/VQOtHJSnWAXkYghrReMMZgF
+	 4QiK2UjlOwILg+EEK3P9qI3lYfXyBw/8nU2aqVMs=
+Received: from DFLE112.ent.ti.com (dfle112.ent.ti.com [10.64.6.33])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 523DqANo095277;
+	Mon, 3 Mar 2025 07:52:10 -0600
+Received: from DFLE114.ent.ti.com (10.64.6.35) by DFLE112.ent.ti.com
+ (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 3
+ Mar 2025 07:52:10 -0600
+Received: from fllvsmtp7.itg.ti.com (10.64.40.31) by DFLE114.ent.ti.com
+ (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 3 Mar 2025 07:52:09 -0600
+Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
+	by fllvsmtp7.itg.ti.com (8.15.2/8.15.2) with ESMTP id 523Dq9k0047060;
+	Mon, 3 Mar 2025 07:52:09 -0600
+Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 523Dq8NA018076;
+	Mon, 3 Mar 2025 07:52:09 -0600
+From: Meghana Malladi <m-malladi@ti.com>
+To: <javier.carrasco.cruz@gmail.com>, <diogo.ivo@siemens.com>,
+        <horms@kernel.org>, <jacob.e.keller@intel.com>, <m-malladi@ti.com>,
+        <richardcochran@gmail.com>, <pabeni@redhat.com>, <kuba@kernel.org>,
+        <edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>,
+        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
+Subject: [PATCH net-next v3 0/2] Add perout configuration support in IEP driver
+Date: Mon, 3 Mar 2025 19:21:22 +0530
+Message-ID: <20250303135124.632845-1-m-malladi@ti.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Jason Xing wrote:
-> On Mon, Mar 3, 2025 at 10:17=E2=80=AFAM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Jason Xing wrote:
-> > > When I read through the TSO codes, I found out that we probably
-> > > miss initializing the tx_flags of last seg when TSO is turned
-> > > off,
-> >
-> > When falling back onto TCP GSO. Good catch.
-> >
-> > This is a fix, so should target net?
-> =
+IEP driver supported both perout and pps signal generation
+but perout feature is faulty with half-cooked support
+due to some missing configuration. Hence perout feature is
+removed as a bug fix. This patch series adds back this feature
+which configures perout signal based on the arguments passed
+by the perout request.
 
-> After seeing your comment below, I'm not sure if the next version
-> targets the net branch because SKBTX_BPF flag is not in the net branch.=
+This patch series is continuation to the bug fix: 
+https://lore.kernel.org/all/20250227092441.1848419-1-m-malladi@ti.com/
+as suggested by Jakub Kicinski and Jacob Keller:
+https://lore.kernel.org/all/20250220172410.025b96d6@kernel.org/
+
+v2:https://lore.kernel.org/all/20250219062701.995955-1-m-malladi@ti.com/
+
+Meghana Malladi (2):
+  net: ti: icss-iep: Add pwidth configuration for perout signal
+  net: ti: icss-iep: Add phase offset configuration for perout signal
+
+ drivers/net/ethernet/ti/icssg/icss_iep.c | 65 ++++++++++++++++++++++--
+ 1 file changed, 61 insertions(+), 4 deletions(-)
 
 
-HWTSTAMP is sufficient reason
- =
+base-commit: f77f12010f67259bd0e1ad18877ed27c721b627a
+-- 
+2.43.0
 
-> If target net-net tree, I would add the following:
-> Fixes: 6b98ec7e882af ("bpf: Add BPF_SOCK_OPS_TSTAMP_SCHED_CB callback")=
-
-> Fixes: 4ed2d765dfacc ("net-timestamp: TCP timestamping")
-
-Please only add one Fixes tag. In this case 4ed2d765dfacc
 
