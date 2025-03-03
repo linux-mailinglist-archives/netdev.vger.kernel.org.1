@@ -1,154 +1,113 @@
-Return-Path: <netdev+bounces-171682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40665A4E1F2
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 15:57:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F2EDA4E22C
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 16:03:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EAA116F638
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 14:50:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 352E37A8A04
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 15:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39907276D23;
-	Tue,  4 Mar 2025 14:48:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5B7425FA0D;
+	Tue,  4 Mar 2025 14:57:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c/cUNq7O"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="syr7lVad"
 X-Original-To: netdev@vger.kernel.org
 Received: from beeline3.cc.itu.edu.tr (beeline3.cc.itu.edu.tr [160.75.25.117])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33A192063E1
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 14:48:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=160.75.25.117
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4FE20A5D9
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 14:57:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=160.75.25.117
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741099714; cv=fail; b=h5j88iAPfzuhZANuv/fnO8DMx0AmRYY34MqsFh7lr0D9W1McnHXrLGdcrkpyiCPaOiyBL8s3q6xj+QuJlfZ4jfZyub0ebwIWVU2Q+kfQIe/s+8CDFOr7oWSF0IDABl4gPlxhkGlRx3/o5mvA/Uf89ewllA5/fZd1VKmYUl5+R34=
+	t=1741100268; cv=pass; b=pCFxANS9Uvms/ADUo6y3PBxIBy6Jc212nCICAsbZVZ6t1G2JM9j1BzsDupZVIn6LYhdpAfc+B3lbURbZc639WjsS9reoKRPCDv9gnfXpCNEgjV6wHdroL40QUjDzdvN1vOn61Dlz6tWm25ngDEzrhRYzdXCQqYG6ZNWessyAYZc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741099714; c=relaxed/simple;
-	bh=CGEcvGW5UxIBOBlHpmZcGgsIR6pcCHCtB6h3nxJt264=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UOq8iXdbk7JEcSjPDPWlqIuCSLwA8uAk6XtyvlY39XkIpiuDjysr2t3NUIpqiCLd8BauXULaoHeuaExg/gxjS5AgjmUiTIcp/nclpmi6bqYVuWbnpjc4yI+1+Tj1S52DAY2NwHf7a8mGVbI4yBOJFPNjL3dXGCzu8o80Ivk6bQ0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=fail (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c/cUNq7O reason="signature verification failed"; arc=none smtp.client-ip=198.175.65.9; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; arc=fail smtp.client-ip=160.75.25.117
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	s=arc-20240116; t=1741100268; c=relaxed/simple;
+	bh=pM2l3bdhITG33VeNaE8y7SWnUeqKSe+coHYUXEHHDV0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=RqL9Ku60LylDGm2Eh2KNtI/MzqJev6j325+Es9T7GysdCP7Hwx1CMgOc/NJaQP56xQIhZC/JlG/tQqXcHVW79R3BApqISpIrW2xmR77AFB3ln2hPb0y7A86iw6mXY/1oV9iKpgvOrbyr3fSGiMZUm3gzDTMFe6ogdm2PPnMkwoY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=syr7lVad; arc=none smtp.client-ip=198.47.23.234; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; arc=pass smtp.client-ip=160.75.25.117
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=cc.itu.edu.tr
 Received: from lesvatest1.cc.itu.edu.tr (unknown [10.146.128.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
 	(No client certificate requested)
-	by beeline3.cc.itu.edu.tr (Postfix) with ESMTPS id 5B67240CF12A
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:48:30 +0300 (+03)
+	by beeline3.cc.itu.edu.tr (Postfix) with ESMTPS id 3788840CEC84
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:57:45 +0300 (+03)
 X-Envelope-From: <root@cc.itu.edu.tr>
 Authentication-Results: lesvatest1.cc.itu.edu.tr;
-	dkim=fail reason="signature verification failed" (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=c/cUNq7O
+	dkim=pass (1024-bit key, unprotected) header.d=ti.com header.i=@ti.com header.a=rsa-sha256 header.s=ti-com-17Q1 header.b=syr7lVad
 Received: from lesva1.cc.itu.edu.tr (unknown [160.75.70.79])
-	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6dnr5CH2zFxg6
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:47:44 +0300 (+03)
+	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6dxc4Hv5zFxy3
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:54:28 +0300 (+03)
 Received: by le1 (Postfix, from userid 0)
-	id 12AC842720; Tue,  4 Mar 2025 17:47:34 +0300 (+03)
+	id 3ECC442722; Tue,  4 Mar 2025 17:54:11 +0300 (+03)
 Authentication-Results: lesva1.cc.itu.edu.tr;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c/cUNq7O
-X-Envelope-From: <linux-kernel+bounces-541374-bozkiru=itu.edu.tr@vger.kernel.org>
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=syr7lVad
+X-Envelope-From: <linux-kernel+bounces-541571-bozkiru=itu.edu.tr@vger.kernel.org>
 Authentication-Results: lesva2.cc.itu.edu.tr;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c/cUNq7O
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=syr7lVad
 Received: from fgw2.itu.edu.tr (fgw2.itu.edu.tr [160.75.25.104])
-	by le2 (Postfix) with ESMTP id 3349B43668
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:30:58 +0300 (+03)
+	by le2 (Postfix) with ESMTP id 3E0F5421F5
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 14:28:21 +0300 (+03)
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by fgw2.itu.edu.tr (Postfix) with SMTP id DF36F2DCE4
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:30:57 +0300 (+03)
+	by fgw2.itu.edu.tr (Postfix) with SMTP id C7F632DCE0
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 14:28:20 +0300 (+03)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4504170220
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 10:30:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F15A116FA5D
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 11:24:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F64F1F4735;
-	Mon,  3 Mar 2025 10:28:35 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10BD21F417A;
+	Mon,  3 Mar 2025 11:23:52 +0000 (UTC)
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC6A1F2380;
-	Mon,  3 Mar 2025 10:28:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE52A31;
+	Mon,  3 Mar 2025 11:23:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740997712; cv=none; b=tXdatXpvgAzxuMj0Ls8wcG5NuhvwLJwwArOKLASURJe/MVwmWKXMR6p7DguSp45aptrbOVRXPtdZ4lTU1fSmZqS+9fQny9usow3Zpc528MqT8ls8nFMbBa2OIJlY83GvKIeCi4Kz5o4omX3hbm7evpWur66VS31UWaxmMoSx4m8=
+	t=1741001027; cv=none; b=qwMho/oJWGOIfW+XE/MeMvgruA+ntLvjbeBkGHJ6xMTMS7l12EtmzKEdKA2ViC8rWYN6A42PdlKStP1Buia70qSA3h1wFIMfHjbSFM8NtLnqDwSkGA56fTbYbfVEI00oDoxE+rCEoNQZzudbZVr5MCQWiPKpnzdsFpahlgl0FJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740997712; c=relaxed/simple;
-	bh=P6ccI5F2+0bACe0n0NkpiYH116w0AVZ4cwwt/aKfPE0=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=paO1VDeRtUeXcEQWW3vOsI4o3nzhuXkfNG2VC+HTMIW0kQZDF9ecIxg4cGf4tUkyb/UC7zkCfdot1ak5WYSpTkQ9j+T7Zh0ZddcAJ9n5INXixkJLZaem4PvDbNbLJnfZQO737GEqEHpy2s3xRoOs2h+uvEyXfshFKDco2X+dCgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c/cUNq7O; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740997711; x=1772533711;
-  h=from:to:subject:date:message-id:in-reply-to:references:
-   mime-version:content-transfer-encoding;
-  bh=P6ccI5F2+0bACe0n0NkpiYH116w0AVZ4cwwt/aKfPE0=;
-  b=c/cUNq7OYD6Grb58TR65YS8XR/qxDeaaWaoo/F70P+bKUEDcbc/lmL6E
-   4SKT8oGd+hsYGRmmbXV+z4iFoyoOCrwIjSUJLtSt7HxxCuWzSPYfHbH5S
-   mnhAO4n2booLNAQ/henIX3LSxMYwZL4dioPG+3o+6QkxyxVcXy5Uskpfv
-   mzczzdjDNfe/CeBE775zA7VH9d8thAYSb7Cb+QFYopIVg8fWRhGx9L4vi
-   IfFDtYR3EwvDV43GD7lSLZ8eIcEjSqZP/pLzn7Rim2++OEBphbgUDE2cc
-   Nu3AC6Ak+WOz8Jd31bNBQrDeyBx5Nx7eDWvsRLvc87qrr9DtDJd7Q9hUC
-   g==;
-X-CSE-ConnectionGUID: /zaUF2XsSKiqJeKsU3+GcA==
-X-CSE-MsgGUID: 7HpBJq95SaW2RR+4zH2ZiA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11361"; a="64310294"
-X-IronPort-AV: E=Sophos;i="6.13,329,1732608000"; 
-   d="scan'208";a="64310294"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 02:28:30 -0800
-X-CSE-ConnectionGUID: IJ+J0UlmS3KRsMbMevFqAA==
-X-CSE-MsgGUID: cS//+fnETaSB4iJW+tt0zQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,329,1732608000"; 
-   d="scan'208";a="122569920"
-Received: from mohdfai2-ilbpg12-1.png.intel.com ([10.88.227.73])
-  by fmviesa005.fm.intel.com with ESMTP; 03 Mar 2025 02:28:23 -0800
-From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Furong Xu <0x1207@gmail.com>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Xiaolei Wang <xiaolei.wang@windriver.com>,
-	Suraj Jaiswal <quic_jsuraj@quicinc.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Jesper Nilsson <jesper.nilsson@axis.com>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	bpf@vger.kernel.org
-Subject: [PATCH iwl-next v7 8/9] igc: Add support to get MAC Merge data via ethtool
-Date: Mon,  3 Mar 2025 05:26:57 -0500
-Message-Id: <20250303102658.3580232-9-faizal.abdul.rahim@linux.intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250303102658.3580232-1-faizal.abdul.rahim@linux.intel.com>
-References: <20250303102658.3580232-1-faizal.abdul.rahim@linux.intel.com>
+	s=arc-20240116; t=1741001027; c=relaxed/simple;
+	bh=pM2l3bdhITG33VeNaE8y7SWnUeqKSe+coHYUXEHHDV0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=E7y4HnCbZHIF4foQChHRP5DvaFG9gxHWSoCvQKRyboBCGeAsSHlM1i2rC8ZjsaADyTVJsSwgH6xwILY9tl2x57IQESGUw/v6/3ootRxwJQ3TvKUkdbKlWRdoO7huQwoM6wQTJOHUpY6PRhrqQPaMygzTZ+kvyN1jBa/6KK6H1PE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=syr7lVad; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 523BNB6w2745496
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 3 Mar 2025 05:23:11 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1741000991;
+	bh=o89D8QcdGEg8aUlyzDT2N6E8USfZjtePyIVsA04Nffs=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=syr7lVadYrS81qgC6zWeFDrf0SMxqUnF78MXmLqweFN9kYCWoP7JyI7qONrY84ViY
+	 r5b5f6fr1KN3PnuKbD4xohUaTq7Alwr6poNDn+kTsVTsuwcNvq/lbc1uFf83GWf11s
+	 lY5eCWtu+0oo5mBEB4TQnjmTo0HJJyIQLtZHKNog=
+Received: from DLEE115.ent.ti.com (dlee115.ent.ti.com [157.170.170.26])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 523BNBrw106103
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 3 Mar 2025 05:23:11 -0600
+Received: from DLEE113.ent.ti.com (157.170.170.24) by DLEE115.ent.ti.com
+ (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 3
+ Mar 2025 05:23:11 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE113.ent.ti.com
+ (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 3 Mar 2025 05:23:11 -0600
+Received: from [172.24.21.156] (lt9560gk3.dhcp.ti.com [172.24.21.156])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 523BN4iK003466;
+	Mon, 3 Mar 2025 05:23:04 -0600
+Message-ID: <dbddfb0c-01f3-4a07-82b3-81929c3c4420@ti.com>
+Date: Mon, 3 Mar 2025 16:53:03 +0530
 Precedence: bulk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -156,87 +115,327 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 2/3] net: ti: icssg-prueth: introduce and use
+ prueth_swdata struct for SWDATA
+To: Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>,
+        <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
+        <davem@davemloft.net>, <andrew+netdev@lunn.ch>
+CC: <bpf@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <u.kleine-koenig@baylibre.com>, <matthias.schiffer@ew.tq-group.com>,
+        <dan.carpenter@linaro.org>, <schnelle@linux.ibm.com>,
+        <diogo.ivo@siemens.com>, <glaroque@baylibre.com>, <macro@orcam.me.uk>,
+        <john.fastabend@gmail.com>, <hawk@kernel.org>, <daniel@iogearbox.net>,
+        <ast@kernel.org>, <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>
+References: <20250224110102.1528552-1-m-malladi@ti.com>
+ <20250224110102.1528552-3-m-malladi@ti.com>
+ <3d3d180a-12b7-4bee-8172-700f0dae2439@kernel.org>
+Content-Language: en-US
+From: "Malladi, Meghana" <m-malladi@ti.com>
+In-Reply-To: <3d3d180a-12b7-4bee-8172-700f0dae2439@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 X-ITU-Libra-ESVA-Information: Please contact Istanbul Teknik Universitesi for more information
-X-ITU-Libra-ESVA-ID: 4Z6dnr5CH2zFxg6
+X-ITU-Libra-ESVA-ID: 4Z6dxc4Hv5zFxy3
 X-ITU-Libra-ESVA: No virus found
 X-ITU-Libra-ESVA-From: root@cc.itu.edu.tr
-X-ITU-Libra-ESVA-Watermark: 1741704466.92588@5QcBUP0wixRxo+YC5KDUGQ
+X-ITU-Libra-ESVA-Watermark: 1741704952.89235@e3ltmjf1rChanHL7kewIBw
 X-ITU-MailScanner-SpamCheck: not spam
 
-Implement "ethtool --show-mm" callback for IGC.
 
-Tested with command:
-$ ethtool --show-mm enp1s0.
-  MAC Merge layer state for enp1s0:
-  pMAC enabled: on
-  TX enabled: on
-  TX active: on
-  TX minimum fragment size: 64
-  RX minimum fragment size: 60
-  Verify enabled: on
-  Verify time: 128
-  Max verify time: 128
-  Verification status: SUCCEEDED
 
-Verified that the fields value are retrieved correctly.
+On 2/27/2025 5:57 PM, Roger Quadros wrote:
+> 
+> 
+> On 24/02/2025 13:01, Meghana Malladi wrote:
+>> From: Roger Quadros <rogerq@kernel.org>
+>>
+>> We have different cases for SWDATA (skb, page, cmd, etc)
+>> so it is better to have a dedicated data structure for that.
+>> We can embed the type field inside the struct and use it
+>> to interpret the data in completion handlers.
+>>
+>> Increase SWDATA size to 48 so we have some room to add
+>> more data if required.
+>>
+>> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
+>> ---
+>> Changes since v2 (v3-v2):
+>> - Fix leaking tx descriptor in emac_tx_complete_packets()
+>> - Free rx descriptor if swdata type is not page in emac_rx_packet()
+>> - Revert back the size of PRUETH_NAV_SW_DATA_SIZE
+>> - Use build time check for prueth_swdata size
+>> - re-write prueth_swdata to have enum type as first member in the struct
+>> and prueth_data union embedded in the struct
+>>
+>> All the above changes have been suggested by Roger Quadros <rogerq@kernel.org>
+>>
+>>   drivers/net/ethernet/ti/icssg/icssg_common.c  | 52 +++++++++++++------
+>>   drivers/net/ethernet/ti/icssg/icssg_prueth.c  |  3 ++
+>>   drivers/net/ethernet/ti/icssg/icssg_prueth.h  | 16 ++++++
+>>   .../net/ethernet/ti/icssg/icssg_prueth_sr1.c  |  4 +-
+>>   4 files changed, 57 insertions(+), 18 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
+>> index acbb79ad8b0c..01eeabe83eff 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_common.c
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
+>> @@ -136,12 +136,12 @@ int emac_tx_complete_packets(struct prueth_emac *emac, int chn,
+>>   	struct net_device *ndev = emac->ndev;
+>>   	struct cppi5_host_desc_t *desc_tx;
+>>   	struct netdev_queue *netif_txq;
+>> +	struct prueth_swdata *swdata;
+>>   	struct prueth_tx_chn *tx_chn;
+>>   	unsigned int total_bytes = 0;
+>>   	struct sk_buff *skb;
+>>   	dma_addr_t desc_dma;
+>>   	int res, num_tx = 0;
+>> -	void **swdata;
+>>   
+>>   	tx_chn = &emac->tx_chns[chn];
+>>   
+>> @@ -163,12 +163,19 @@ int emac_tx_complete_packets(struct prueth_emac *emac, int chn,
+>>   		swdata = cppi5_hdesc_get_swdata(desc_tx);
+>>   
+>>   		/* was this command's TX complete? */
+>> -		if (emac->is_sr1 && *(swdata) == emac->cmd_data) {
+>> +		if (emac->is_sr1 && (void *)(swdata) == emac->cmd_data) {
+>>   			prueth_xmit_free(tx_chn, desc_tx);
+>>   			continue;
+>>   		}
+>>   
+>> -		skb = *(swdata);
+>> +		if (swdata->type != PRUETH_SWDATA_SKB) {
+>> +			netdev_err(ndev, "tx_complete: invalid swdata type %d\n", swdata->type);
+>> +			prueth_xmit_free(tx_chn, desc_tx);
+>> +			budget++;
+> 
+> I don't recollect why we need to increase budget here.
+> 
 
-Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
----
- drivers/net/ethernet/intel/igc/igc_ethtool.c | 14 ++++++++++++++
- drivers/net/ethernet/intel/igc/igc_tsn.h     |  1 +
- 2 files changed, 15 insertions(+)
+Probably because this packet hasn't been processed due to invalid swdata 
+we are increasing the budget to compensate the loss -> but sounds 
+counter intuitive to whole idea of using the budget. Will remove it.
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/e=
-thernet/intel/igc/igc_ethtool.c
-index 529654ccd83f..fd4b4b332309 100644
---- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-@@ -1782,6 +1782,19 @@ static int igc_ethtool_set_eee(struct net_device *=
-netdev,
- 	return 0;
- }
-=20
-+static int igc_ethtool_get_mm(struct net_device *netdev,
-+			      struct ethtool_mm_state *cmd)
-+{
-+	struct igc_adapter *adapter =3D netdev_priv(netdev);
-+	struct igc_fpe_t *fpe =3D &adapter->fpe;
-+
-+	ethtool_mmsv_get_mm(&fpe->mmsv, cmd);
-+	cmd->tx_min_frag_size =3D fpe->tx_min_frag_size;
-+	cmd->rx_min_frag_size =3D IGC_RX_MIN_FRAG_SIZE;
-+
-+	return 0;
-+}
-+
- static int igc_ethtool_set_mm(struct net_device *netdev,
- 			      struct ethtool_mm_cfg *cmd,
- 			      struct netlink_ext_ack *extack)
-@@ -2101,6 +2114,7 @@ static const struct ethtool_ops igc_ethtool_ops =3D=
- {
- 	.get_link_ksettings	=3D igc_ethtool_get_link_ksettings,
- 	.set_link_ksettings	=3D igc_ethtool_set_link_ksettings,
- 	.self_test		=3D igc_ethtool_diag_test,
-+	.get_mm			=3D igc_ethtool_get_mm,
- 	.set_mm			=3D igc_ethtool_set_mm,
- };
-=20
-diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.h b/drivers/net/ether=
-net/intel/igc/igc_tsn.h
-index 6b48e0ed4341..a00dc1d80e12 100644
---- a/drivers/net/ethernet/intel/igc/igc_tsn.h
-+++ b/drivers/net/ethernet/intel/igc/igc_tsn.h
-@@ -4,6 +4,7 @@
- #ifndef _IGC_TSN_H_
- #define _IGC_TSN_H_
-=20
-+#define IGC_RX_MIN_FRAG_SIZE		60
- #define SMD_FRAME_SIZE			60
-=20
- enum igc_txd_popts_type {
---=20
-2.34.1
+
+>> +			continue;
+>> +		}
+>> +
+>> +		skb = swdata->data.skb;
+>>   		prueth_xmit_free(tx_chn, desc_tx);
+> 
+> if we set swdata->type to PRUETH_SWDATA_CMD in emac_send_command_sr1() then we could
+> reduce all above code including both ifs to
+> 
+> 		swdata = cppi5_hdesc_get_swdata(desc_tx);
+> 		prueth_xmit_free(tx_chn, desc_tx);
+> 		if (swdata->type != PRUETH_SWDATA_SKB)
+> 			continue;
+> 
+> 		skb = swdata->data.skb;
+
+Yes this is a nice change. This also addresses the concern Dan pointed 
+out regarding SR1's emac->cmd_data check. I was also wondering the same 
+to use PRUETH_SWDATA_CMD for addressing Dan's comment. Thanks.
+
+> 
+>>   
+>>   		ndev = skb->dev;
+>> @@ -472,9 +479,9 @@ int prueth_dma_rx_push_mapped(struct prueth_emac *emac,
+>>   {
+>>   	struct net_device *ndev = emac->ndev;
+>>   	struct cppi5_host_desc_t *desc_rx;
+>> +	struct prueth_swdata *swdata;
+>>   	dma_addr_t desc_dma;
+>>   	dma_addr_t buf_dma;
+>> -	void **swdata;
+>>   
+>>   	buf_dma = page_pool_get_dma_addr(page) + PRUETH_HEADROOM;
+>>   	desc_rx = k3_cppi_desc_pool_alloc(rx_chn->desc_pool);
+>> @@ -490,7 +497,8 @@ int prueth_dma_rx_push_mapped(struct prueth_emac *emac,
+>>   	cppi5_hdesc_attach_buf(desc_rx, buf_dma, buf_len, buf_dma, buf_len);
+>>   
+>>   	swdata = cppi5_hdesc_get_swdata(desc_rx);
+>> -	*swdata = page;
+>> +	swdata->type = PRUETH_SWDATA_PAGE;
+>> +	swdata->data.page = page;
+>>   
+>>   	return k3_udma_glue_push_rx_chn(rx_chn->rx_chn, PRUETH_RX_FLOW_DATA,
+>>   					desc_rx, desc_dma);
+>> @@ -539,11 +547,11 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id)
+>>   	u32 buf_dma_len, pkt_len, port_id = 0;
+>>   	struct net_device *ndev = emac->ndev;
+>>   	struct cppi5_host_desc_t *desc_rx;
+>> +	struct prueth_swdata *swdata;
+>>   	dma_addr_t desc_dma, buf_dma;
+>>   	struct page *page, *new_page;
+>>   	struct page_pool *pool;
+>>   	struct sk_buff *skb;
+>> -	void **swdata;
+>>   	u32 *psdata;
+>>   	void *pa;
+>>   	int ret;
+>> @@ -561,7 +569,13 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id)
+>>   
+>>   	desc_rx = k3_cppi_desc_pool_dma2virt(rx_chn->desc_pool, desc_dma);
+>>   	swdata = cppi5_hdesc_get_swdata(desc_rx);
+>> -	page = *swdata;
+>> +	if (swdata->type != PRUETH_SWDATA_PAGE) {
+>> +		netdev_err(ndev, "rx_pkt: invalid swdata->type %d\n", swdata->type);
+>> +		k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
+>> +		return 0;
+>> +	}
+>> +
+>> +	page = swdata->data.page;
+>>   	page_pool_dma_sync_for_cpu(pool, page, 0, PAGE_SIZE);
+>>   	cppi5_hdesc_get_obuf(desc_rx, &buf_dma, &buf_dma_len);
+>>   	k3_udma_glue_rx_cppi5_to_dma_addr(rx_chn->rx_chn, &buf_dma);
+>> @@ -626,15 +640,18 @@ static void prueth_rx_cleanup(void *data, dma_addr_t desc_dma)
+>>   {
+>>   	struct prueth_rx_chn *rx_chn = data;
+>>   	struct cppi5_host_desc_t *desc_rx;
+>> +	struct prueth_swdata *swdata;
+>>   	struct page_pool *pool;
+>>   	struct page *page;
+>> -	void **swdata;
+>>   
+>>   	pool = rx_chn->pg_pool;
+>>   	desc_rx = k3_cppi_desc_pool_dma2virt(rx_chn->desc_pool, desc_dma);
+>>   	swdata = cppi5_hdesc_get_swdata(desc_rx);
+>> -	page = *swdata;
+>> -	page_pool_recycle_direct(pool, page);
+>> +	if (swdata->type == PRUETH_SWDATA_PAGE) {
+>> +		page = swdata->data.page;
+>> +		page_pool_recycle_direct(pool, page);
+>> +	}
+>> +
+>>   	k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
+>>   }
+>>   
+>> @@ -671,13 +688,13 @@ enum netdev_tx icssg_ndo_start_xmit(struct sk_buff *skb, struct net_device *ndev
+>>   	struct prueth_emac *emac = netdev_priv(ndev);
+>>   	struct prueth *prueth = emac->prueth;
+>>   	struct netdev_queue *netif_txq;
+>> +	struct prueth_swdata *swdata;
+>>   	struct prueth_tx_chn *tx_chn;
+>>   	dma_addr_t desc_dma, buf_dma;
+>>   	u32 pkt_len, dst_tag_id;
+>>   	int i, ret = 0, q_idx;
+>>   	bool in_tx_ts = 0;
+>>   	int tx_ts_cookie;
+>> -	void **swdata;
+>>   	u32 *epib;
+>>   
+>>   	pkt_len = skb_headlen(skb);
+>> @@ -739,7 +756,8 @@ enum netdev_tx icssg_ndo_start_xmit(struct sk_buff *skb, struct net_device *ndev
+>>   	k3_udma_glue_tx_dma_to_cppi5_addr(tx_chn->tx_chn, &buf_dma);
+>>   	cppi5_hdesc_attach_buf(first_desc, buf_dma, pkt_len, buf_dma, pkt_len);
+>>   	swdata = cppi5_hdesc_get_swdata(first_desc);
+>> -	*swdata = skb;
+>> +	swdata->type = PRUETH_SWDATA_SKB;
+>> +	swdata->data.skb = skb;
+>>   
+>>   	/* Handle the case where skb is fragmented in pages */
+>>   	cur_desc = first_desc;
+>> @@ -842,15 +860,17 @@ static void prueth_tx_cleanup(void *data, dma_addr_t desc_dma)
+>>   {
+>>   	struct prueth_tx_chn *tx_chn = data;
+>>   	struct cppi5_host_desc_t *desc_tx;
+>> +	struct prueth_swdata *swdata;
+>>   	struct sk_buff *skb;
+>> -	void **swdata;
+>>   
+>>   	desc_tx = k3_cppi_desc_pool_dma2virt(tx_chn->desc_pool, desc_dma);
+>>   	swdata = cppi5_hdesc_get_swdata(desc_tx);
+>> -	skb = *(swdata);
+>> -	prueth_xmit_free(tx_chn, desc_tx);
+>> +	if (swdata->type == PRUETH_SWDATA_SKB) {
+>> +		skb = swdata->data.skb;
+>> +		dev_kfree_skb_any(skb);
+>> +	}
+>>   
+>> -	dev_kfree_skb_any(skb);
+>> +	prueth_xmit_free(tx_chn, desc_tx);
+>>   }
+>>   
+>>   irqreturn_t prueth_rx_irq(int irq, void *dev_id)
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>> index 00ed97860547..3ff8c322f9d9 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>> @@ -1522,6 +1522,9 @@ static int prueth_probe(struct platform_device *pdev)
+>>   
+>>   	np = dev->of_node;
+>>   
+>> +	BUILD_BUG_ON_MSG((sizeof(struct prueth_swdata) > PRUETH_NAV_SW_DATA_SIZE),
+>> +			 "insufficient SW_DATA size");
+>> +
+>>   	prueth = devm_kzalloc(dev, sizeof(*prueth), GFP_KERNEL);
+>>   	if (!prueth)
+>>   		return -ENOMEM;
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>> index c7b906de18af..3bbabd007129 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>> @@ -136,6 +136,22 @@ struct prueth_rx_chn {
+>>   	struct page_pool *pg_pool;
+>>   };
+>>   
+>> +enum prueth_swdata_type {
+>> +	PRUETH_SWDATA_INVALID = 0,
+>> +	PRUETH_SWDATA_SKB,
+>> +	PRUETH_SWDATA_PAGE,
+>> +	PRUETH_SWDATA_CMD,
+> 
+> PRUETH_SWDATA_CMD is not beig used so let's use it in emac_send_command_sr1()
+> 
+
+Yes, will do that. This is actually a miss in my previous patches.
+
+>> +};
+>> +
+>> +struct prueth_swdata {
+>> +	enum prueth_swdata_type type;
+>> +	union prueth_data {
+>> +		struct sk_buff *skb;
+>> +		struct page *page;
+>> +		u32 cmd;
+>> +	} data;
+>> +};
+>> +
+>>   /* There are 4 Tx DMA channels, but the highest priority is CH3 (thread 3)
+>>    * and lower three are lower priority channels or threads.
+>>    */
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c b/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
+>> index aeeb8a50376b..7bbe0808b3ec 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
+>> @@ -275,10 +275,10 @@ static struct sk_buff *prueth_process_rx_mgm(struct prueth_emac *emac,
+>>   	struct net_device *ndev = emac->ndev;
+>>   	struct cppi5_host_desc_t *desc_rx;
+>>   	struct page *page, *new_page;
+>> +	struct prueth_swdata *swdata;
+>>   	dma_addr_t desc_dma, buf_dma;
+>>   	u32 buf_dma_len, pkt_len;
+>>   	struct sk_buff *skb;
+>> -	void **swdata;
+>>   	void *pa;
+>>   	int ret;
+>>   
+>> @@ -301,7 +301,7 @@ static struct sk_buff *prueth_process_rx_mgm(struct prueth_emac *emac,
+>>   	}
+>>   
+>>   	swdata = cppi5_hdesc_get_swdata(desc_rx);
+>> -	page = *swdata;
+>> +	page = swdata->data.page;
+>>   	cppi5_hdesc_get_obuf(desc_rx, &buf_dma, &buf_dma_len);
+>>   	pkt_len = cppi5_hdesc_get_pktlen(desc_rx);
+>>   
+> 
 
 
 
