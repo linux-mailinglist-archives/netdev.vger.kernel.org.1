@@ -1,93 +1,113 @@
-Return-Path: <netdev+bounces-171775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1C72A4E9EF
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:52:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E38EEA4EBE6
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:37:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CF013BFD65
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:41:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 204867AC73F
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:34:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA56E29DB61;
-	Tue,  4 Mar 2025 17:17:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 502172356B2;
+	Tue,  4 Mar 2025 18:27:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from beeline3.cc.itu.edu.tr (beeline3.cc.itu.edu.tr [160.75.25.117])
+Received: from beeline1.cc.itu.edu.tr (beeline1.cc.itu.edu.tr [160.75.25.115])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 431BB29B23E
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:17:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=160.75.25.117
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1232E337C
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 18:27:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=160.75.25.115
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741108631; cv=pass; b=pLSwWBHtFR85txM1OUd1nHl0eRulLVgFhkpT/yoqxQuCGrwrTMW4PcWjY2v4lp9tZWAbeSeily1to5EJgO02TPOzjA+Sum7RAwS1EMc3LOx6Zsq9W95/+/pLOBGZVBKOEj76AShB9lxog741uqqCTB5ayJdVehcBzH9xo8q9uf4=
+	t=1741112869; cv=pass; b=YA2Bs791jvr9TpiGGU72p27SNM7SbKl7pUyRrgp1s8jfW9DgghZWzjxfqN/MRytEMylPfxMa7/TFrlz44i2DAmVKAa+q1B/RKUzJYr87sQ6gXBPQTt5MNI7LHnFjpRg54oayDz37jKIMiheldAGgdVVL2Nb3UpyoIRVXLqevWkw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741108631; c=relaxed/simple;
-	bh=5w6pA4eYiBnHNqpcmteMeSrZV2g2L1eyHkQ8+j6h8f4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=UDp4uTrhlsBDNusGvcFbRetNYhi3fVuYQVvhrbGE22/MY/R4pxO8mhpNX6cE7aLS0l6zcnCatxVNw5flGRKsg1SFnB9z4EGjPcZ+Jw9l91dA6tQ5d/jrk5HpFQ9lETFt8xBT5F9qr5ZhS6sb4D7ag2RxoLV3b946Zm+ScEL33y8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=none smtp.mailfrom=cc.itu.edu.tr; arc=none smtp.client-ip=209.85.166.70; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=pass smtp.client-ip=160.75.25.117
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+	s=arc-20240116; t=1741112869; c=relaxed/simple;
+	bh=GpiZMOoa9Dd0lVa5mQxYvhJCA3PozAweI+AolilGiy4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lBOtGHJkDbse2I8FPzq3VhdumqoVgSKkUpEGZSPDZRVlsbLPZARmqGLtTWZ9D2JLbg1xJVfVIT/b2TZDUIC+aeHVntNOLy8dbtDIwcIx4QPw31MO8YN/1NJ+WL+criCPe/5KOgxjjZpGSBmreR5IBsnnVdjNM3Qp2akLkrTg3EY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=cc.itu.edu.tr; arc=none smtp.client-ip=209.85.222.54; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=pass smtp.client-ip=160.75.25.115
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=cc.itu.edu.tr
 Received: from lesvatest1.cc.itu.edu.tr (unknown [10.146.128.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
 	(No client certificate requested)
-	by beeline3.cc.itu.edu.tr (Postfix) with ESMTPS id 80B8C40CECB3
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 20:17:08 +0300 (+03)
+	by beeline1.cc.itu.edu.tr (Postfix) with ESMTPS id 563E740D5713
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 21:27:45 +0300 (+03)
 X-Envelope-From: <root@cc.itu.edu.tr>
 Received: from lesva1.cc.itu.edu.tr (unknown [160.75.70.79])
-	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6dJK38HwzFwNk
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:25:37 +0300 (+03)
+	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6frH1FJWzG0Yt
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 18:34:55 +0300 (+03)
 Received: by le1 (Postfix, from userid 0)
-	id CA9F842720; Tue,  4 Mar 2025 17:25:34 +0300 (+03)
-X-Envelope-From: <linux-kernel+bounces-541399-bozkiru=itu.edu.tr@vger.kernel.org>
-Received: from fgw1.itu.edu.tr (fgw1.itu.edu.tr [160.75.25.103])
-	by le2 (Postfix) with ESMTP id 1093442D20
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:40:52 +0300 (+03)
+	id 9EC0442731; Tue,  4 Mar 2025 18:34:39 +0300 (+03)
+X-Envelope-From: <linux-kernel+bounces-541401-bozkiru=itu.edu.tr@vger.kernel.org>
+Received: from fgw2.itu.edu.tr (fgw2.itu.edu.tr [160.75.25.104])
+	by le2 (Postfix) with ESMTP id 7EEE74339A
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:41:30 +0300 (+03)
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by fgw1.itu.edu.tr (Postfix) with SMTP id 572873063EFF
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:40:51 +0300 (+03)
+	by fgw2.itu.edu.tr (Postfix) with SMTP id C38772DCDE
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:41:29 +0300 (+03)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A73C7A70ED
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 10:38:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 672677A83A3
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 10:39:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FC6D1F3BBB;
-	Mon,  3 Mar 2025 10:39:32 +0000 (UTC)
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F7791EB5D7;
+	Mon,  3 Mar 2025 10:40:36 +0000 (UTC)
+Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com [209.85.222.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F12E81D7E4C
-	for <linux-kernel@vger.kernel.org>; Mon,  3 Mar 2025 10:39:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 200F31D7E4C;
+	Mon,  3 Mar 2025 10:40:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740998370; cv=none; b=a6qD4pcx1QuLVf5xmEIcTQ0vJCi0H/qWzEtSR3pebye7BFrEzckCQMUjH89OyFy8YhJ7RnugMM4pMah0lNg3x1UU5Lob6F+DLemT+5ukdmz75hTsdsIo64sEoooFFs/VV3IjRL03ag4I3/IqyRXWaRdnjhD63vODS1Z61PmW0OQ=
+	t=1740998434; cv=none; b=sxuAHBEdAodfmPL8uFAOBYuZHNeuMgZvhzQMMoHgQUwp6nZONZqhgemB7x37cyoNZkSLU4klQ9kyckGTzRtLiIBLUqIJOk+Flpm5htsN0HyuLuhcUS4jawSZ5tPFebahnSY4AYIHTXczhuG19c0FVodwTYcRxR2p7iZ/4M1MsuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740998370; c=relaxed/simple;
-	bh=5w6pA4eYiBnHNqpcmteMeSrZV2g2L1eyHkQ8+j6h8f4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=dXP1ydEMyrD4mRoOe42tj/q/j4rUMpwRCxgVH7ePN9EnwWx5/IdyRhoKl3LgtOyF6vReBg3ekiHKQid7d3U87Fw0gZdhwQQbKPmM/MEWqUDP7SiTmkJKg3MVeq010fFqwy6cFF2TNX3548UMq6PZIa3vM16T6fSGE9JqzdpfrPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-85ae33109f8so34328839f.0
-        for <linux-kernel@vger.kernel.org>; Mon, 03 Mar 2025 02:39:28 -0800 (PST)
+	s=arc-20240116; t=1740998434; c=relaxed/simple;
+	bh=GpiZMOoa9Dd0lVa5mQxYvhJCA3PozAweI+AolilGiy4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QfTeT2Iirj9ofdomy8nBDZ9vcnutFBKTUGCTEiT52jqReSK2sfYjP5FMZ/O2pm1lBVctNJdwcyMOIcUoY64SLPd11veGf12wnAEVTSVBvqLyDDqbX1CjhlolQMBbEFFgl/SxLpnba1ZNKgwG49th4nmX0utSgCBl6v1WBWhjDGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-86b3ed5fde5so3631980241.0;
+        Mon, 03 Mar 2025 02:40:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740998368; x=1741603168;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=94B1AldC1Ra+VOi32bZczZH6eYO+XQiGIIy01bId2WI=;
-        b=V7wOBcRUBkjivfmCcg5LPCuO/xHGIMPKvMjypOrkrtEn/mC9OgKyqWYAu+FjIfmkQ5
-         wF+bUENS2eT8kVqO1jWoxDFwpOThAdewzgklTBh2n6kmQhAhebaUfp/DnS6uymAeBfd0
-         0msHx6D58mqd5EJPVxyKVCQCpaYrjE7OUwAtPLjSiCmoWG8fFUG00+vyoEDHurjC6IdY
-         AlBNCMFTJqZsuWt8RoH5HZT+jK0zXBsMqpXgW1K7Ha4+ewdWLI4ruN1ODYEDC6QARMvn
-         ma7kTrW6scWyC1Hb+fvZi7uRuDqRLcArxweO6qLwMihLFOYe+oqOGT4HDWwiY+tyd/4L
-         LzXg==
-X-Forwarded-Encrypted: i=1; AJvYcCWxxWqKPCDuULxJk4KOnXoeOclmuacyDvf9e6lVloIgwH2lamW9Kcz2oP+PbJabwPnDDZTzUI34wH+cXPc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxwe6C9XMNPU33L0eay22k1x+0rXBJUHvl4wYTQmr3i1hzljIOo
-	5i3KQ+Y0QDiberm7/iFcmn9nDHmGd807zP/1gVHXyx47LlTH+7zQxoqHCtztXhcazFA0QLy3Ba/
-	orx3dKhGluSeFi9fLISZo5pe+6fPZYp3amuPhxDqq9USsniGSx10oQ1M=
-X-Google-Smtp-Source: AGHT+IHXGGfJycEVF1C0NA+tWbF57mYYWAfRa3uH7yonYPLILGd0Xs6oQjnQHhZiPUqQSby7mDcwV8F7CrVZ/77JAIhHK7ysIbjU
+        d=1e100.net; s=20230601; t=1740998429; x=1741603229;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=j7nppDH0wEnn0k1LbQlYHcxjcCY12F5sq67FKUOJ3Wk=;
+        b=rEaU6PylpvNHHpdKiJEKrmy8MaMBSvzNnXk90qka5PgM0cb3/ERyMyZFdidj2PVG4P
+         98w1X+BXNeJvfSTodPEjYdWZFZeQzbM2dtyFRUZFOscPBCKKy/wpmfR43exzR+HiJigp
+         rh4/V12+jv6/88sACfbDEruPRyaZBCUP9EhpbU9jWB/j+4DNIeTgxmC///qPciuvHcI/
+         OpgPmCYvv8TqVc4fiQ+JWc63VaHShMPHCd6NDkNtqnSWKtDrdv5l9JiEOswU8ff9ChjG
+         MY14GrzblGyq/7GsjJCstLJBN1fdBlJ2Zf5zMv4BJdjbqQyGzrizbj9jFJSyRPQmULpt
+         8C+g==
+X-Forwarded-Encrypted: i=1; AJvYcCV8U6MfKFyLEBt8FnCKv3HiUJqI0J2XCdz7iz6ol9xm2AQld5uyny8sgnJTJcpz0yumJcY27KCo82YQ@vger.kernel.org, AJvYcCVfIxa+jDve/e7ktzSTHYBtvGBxDB16NzcpvMJxdCSsvsqicfVXEYzY614h3418Mkv98H1eLtAqBMkiPJORy2D9dh0=@vger.kernel.org, AJvYcCVlGEZfUqYvj2QJ6kEoctNR5xnWRpz3acJ0eUtRG+qOCHJwf1UHcNbkV8n9fXRxq7FMySsXPFzyq2EaOvLT@vger.kernel.org, AJvYcCWTlIj7ynjXLN8qsZuJNIq3eK+rmFnDNFHgYHZlmSGPF1f61qdzzxYuRedQHud2R7tEoQNlVaCV@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4ysIml5Mk3B3PXTCGetjlhBHKhIbnGcwA58Z9XC1EhCC5pEIS
+	LwMPcymBCcQIHCb/vmuMT8xpE9aKE8mii1KasfGBb8VdCVnK0l+WOePPZBbR
+X-Gm-Gg: ASbGncsMWJblpi7D7uL4SqIM6BDi47OralO621+RTPijCN+pYLXtXXL1if1nFM2ISw1
+	5T2CwfbuQzKbLDKSEQ9qtcYrFzPnVZQZJHQIuMWBh9xwcbp7OOzANg/edBuMY7exQw8wgMCYZRD
+	FqeLa6YRha4L6b2oxOIavm2uGL/URavYLZbugH2Ea4Ka28iOtejk+u5BWQXjvLsBy9OPWs872of
+	pOlhXc6qIjaRbbiFrUnNnyblyuJ9AfpyXG9KCcQrrEADj/nwKRuuun9Jl8SysCa3mI7JqEsMXXM
+	iYNnDC+sLUIpugFspEsZn+6hr/vkmaG0oxtDR90sN0Q7tz082D7gXkO92Nz+XRNO8QG9Qzgndyc
+	LnK/lCMM=
+X-Google-Smtp-Source: AGHT+IFwwEwdoibEPNyIJoSsMOSEcyoA3IYhqXdgxg8vWiKueAMO9jJvFjxo2atT96bygP6CrBdCMg==
+X-Received: by 2002:a05:6102:3a65:b0:4c1:9ecd:b250 with SMTP id ada2fe7eead31-4c19ecdcb1cmr813504137.5.1740998428785;
+        Mon, 03 Mar 2025 02:40:28 -0800 (PST)
+Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com. [209.85.222.41])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4c17e90cf5csm1082975137.3.2025.03.03.02.40.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Mar 2025 02:40:27 -0800 (PST)
+Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-86718541914so4406771241.1;
+        Mon, 03 Mar 2025 02:40:27 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUZTYS7ipsmaPBuDels12ewpHS4+ZWfkP/lO4OSvDUm8dc0LNBg5iG7zVIlVpim6WJPLDgfEr9Hfap45BXE@vger.kernel.org, AJvYcCVIAinCCltIbPZimzTR0OSncfBvxdaVX5fYj9n2QkWWAhPSinc6UC4glZ+LtsklswP+n4k390S+@vger.kernel.org, AJvYcCWniliZqvo+Ihj2NEtAwuqSq3rR7cmXPT9LdKpCjhGxdPh5RGt4XRrbQGasP8RJiojXezgBETCTIjEWAgEfNpNXwdw=@vger.kernel.org, AJvYcCWyQth0XikRHX3bWhrX7DNiClaq9TroMFyRQbYTF/+XZSvwwd5tEhfbE6ycW3nuLbLHqytgwSivDt1O@vger.kernel.org
+X-Received: by 2002:a05:6102:2a42:b0:4c0:435b:5dd2 with SMTP id
+ ada2fe7eead31-4c0435b5ebdmr6337617137.1.1740998427518; Mon, 03 Mar 2025
+ 02:40:27 -0800 (PST)
 Precedence: bulk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -95,59 +115,95 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3111:b0:3d3:ff5c:287 with SMTP id
- e9e14a558f8ab-3d3ff5c06f9mr41959675ab.14.1740998368052; Mon, 03 Mar 2025
- 02:39:28 -0800 (PST)
-Date: Mon, 03 Mar 2025 02:39:28 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67c586e0.050a0220.1dee4d.0124.GAE@google.com>
-Subject: [syzbot] Monthly batman report (Mar 2025)
-From: syzbot <syzbot+list0f38ff37debbbda9dc0b@syzkaller.appspotmail.com>
-To: a@unstable.cc, b.a.t.m.a.n@lists.open-mesh.org, 
-	linux-kernel@vger.kernel.org, mareklindner@neomailbox.ch, 
-	netdev@vger.kernel.org, sven@narfation.org, sw@simonwunderlich.de, 
-	syzkaller-bugs@googlegroups.com
+References: <20250302181808.728734-1-prabhakar.mahadev-lad.rj@bp.renesas.com> <20250302181808.728734-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
+In-Reply-To: <20250302181808.728734-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Mon, 3 Mar 2025 11:40:15 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdV8GqnhsJg7J7keGvT=Dvj_w0hZOiuZqCa=tiUgLE8Vtg@mail.gmail.com>
+X-Gm-Features: AQ5f1Jpv15ql5krxTjLeAExxOGaKNBovwnzhgUjXQ5dDEMa9JTfxXPA61zZ_Iv0
+Message-ID: <CAMuHMdV8GqnhsJg7J7keGvT=Dvj_w0hZOiuZqCa=tiUgLE8Vtg@mail.gmail.com>
+Subject: Re: [PATCH 3/3] net: stmmac: Add DWMAC glue layer for Renesas GBETH
+To: Prabhakar <prabhakar.csengg@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
+	Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-ITU-Libra-ESVA-Information: Please contact Istanbul Teknik Universitesi for more information
-X-ITU-Libra-ESVA-ID: 4Z6dJK38HwzFwNk
+X-ITU-Libra-ESVA-ID: 4Z6frH1FJWzG0Yt
 X-ITU-Libra-ESVA: No virus found
 X-ITU-Libra-ESVA-From: root@cc.itu.edu.tr
-X-ITU-Libra-ESVA-Watermark: 1741713333.43951@PXJMsLMyGC9uaW8JczWNIA
+X-ITU-Libra-ESVA-Watermark: 1741717541.49604@/ud/6VsJAZhWgsWjhqqEoQ
 X-ITU-MailScanner-SpamCheck: not spam
 
-Hello batman maintainers/developers,
+Hi Prabhakar,
 
-This is a 31-day syzbot report for the batman subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/batman
+On Sun, 2 Mar 2025 at 19:18, Prabhakar <prabhakar.csengg@gmail.com> wrote:
+> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+>
+> Renesas RZ/V2H(P) SoC is equipped with Synopsys DesignWare Ethernet
+> Quality-of-Service IP block version 5.20. This commit adds DWMAC glue
+> layer for the Renesas GBETH found on the RZ/V2H(P) SoC.
+>
+> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-During the period, 2 new issues were detected and 0 were fixed.
-In total, 6 issues are still open and 26 have already been fixed.
+Thanks for your patch!
 
-Some of the still happening issues:
+> --- /dev/null
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
 
-Ref Crashes Repro Title
-<1> 555     Yes   INFO: rcu detected stall in batadv_nc_worker (3)
-                  https://syzkaller.appspot.com/bug?extid=69904c3b4a09e8fa2e1b
-<2> 136     No    INFO: rcu detected stall in sys_recvmmsg (3)
-                  https://syzkaller.appspot.com/bug?extid=b079dc0aa6e992859e7c
-<3> 14      Yes   INFO: rcu detected stall in rescuer_thread
-                  https://syzkaller.appspot.com/bug?extid=76e180c757e9d589a79d
-<4> 1       Yes   INFO: rcu detected stall in batadv_bla_periodic_work (2)
-                  https://syzkaller.appspot.com/bug?extid=fc38cf2d6e727d8415c7
+> +static int renesas_gbeth_probe(struct platform_device *pdev)
+> +{
+> +       struct plat_stmmacenet_data *plat_dat;
+> +       struct stmmac_resources stmmac_res;
+> +       struct device *dev =3D &pdev->dev;
+> +       struct renesas_gbeth *gbeth;
+> +       struct reset_control *rstc;
+> +       unsigned int i;
+> +       int err;
+> +
+> +       err =3D stmmac_get_platform_resources(pdev, &stmmac_res);
+> +       if (err)
+> +               return dev_err_probe(dev, err,
+> +                                    "failed to get resources\n");
+> +
+> +       plat_dat =3D devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
+> +       if (IS_ERR(plat_dat))
+> +               return dev_err_probe(dev, PTR_ERR(plat_dat),
+> +                                    "dt configuration failed\n");
+> +
+> +       gbeth =3D devm_kzalloc(dev, sizeof(*gbeth), GFP_KERNEL);
+> +       if (!gbeth)
+> +               return -ENOMEM;
+> +
+> +       plat_dat->clk_tx_i =3D devm_clk_get_enabled(dev, "tx");
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c:52:17:
+error: =E2=80=98struct plat_stmmacenet_data=E2=80=99 has no member named =
+=E2=80=98clk_tx_i=E2=80=99
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+Also not in next-20250228.
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+Gr{oetje,eeting}s,
 
-You may send multiple commands in a single email message.
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
 
