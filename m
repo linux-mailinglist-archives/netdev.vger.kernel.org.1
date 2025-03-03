@@ -1,599 +1,186 @@
-Return-Path: <netdev+bounces-171353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FDD0A4CA4B
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:51:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 617C6A4CA8A
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:58:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D2BB179114
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:39:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2548D3B833B
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:40:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93D6A250C0C;
-	Mon,  3 Mar 2025 17:31:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA3BA2147F3;
+	Mon,  3 Mar 2025 17:31:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="niGdRC8q"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="XjTdVrgd"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2059.outbound.protection.outlook.com [40.107.244.59])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15AA1214A8E;
-	Mon,  3 Mar 2025 17:31:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.59
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741023075; cv=fail; b=M6BE+0gISDXJcRAqWq9Wl8HDx0kEsgrlHYsmZMM/wlZYqYhjXymqc6pehO1dVHtxCWf4iulxw6zx5NltwGNvVoMHf29wnfKd2Aga/Y4xYscU5E7KiiQ9we5qtIGLwJBOGLanH68EVM9B/4N2LRIzWhTE8MRMoDI3qjVLfRtC2mk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741023075; c=relaxed/simple;
-	bh=L2fTQblg4bKklhiCXp5DflGq+HOsm/eEVCJo9z2mZtw=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=otqNZOklal8SBljcwB4oRoIQUfDl4XWfM6ZKQgIzkNVlh12F5opq0wlPaZp53s8XA6FSueqaszzmDttf9/zGqkHvrF5bJvU5tuN+Hb4wUnemJGjdGA2cA9pQOM9o+p15v1Hv/zI1LDjt5T0wYfEOStIp3/ybSgNnlJ9W0O6/ihk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=niGdRC8q; arc=fail smtp.client-ip=40.107.244.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DPewnmPRDHUSwYKkoCfHndSTE6P7hANzUk1qrv/WkkgN0NnZhOffU9HtCMZ1P5Qb14ixDZhbhCTEeKAAkoz18/p5ecHtAoNcSzQ+aQ1vyKkWTuh8yfUD8RbWvalZCSkfTyd7JH0NZJJaR00ZDcFtWRpa3eFEML7NjQGqOpYVIWAVvZDRybx0M39pOZp4vhug0idh8znnKhwlSJKzZXIIwe+qzB020cJ17zJZRgGFe2e82NhqqRX5low5oVe3KOgcJ/ZkJ8mvZPfoO6DapjAXD3+iEiHn67Ti7PqeTovC28DZKj1J5MtfOmAEce482DwwcnF/aMiDEWwAxaNfPy+1gQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=37lQA3FbG5mw4ExJB2pCC4RKc6vrosNTuxokZL4xwAY=;
- b=Dq7sx3EfmVgsOtuIrOz8x52Tk6XMUIjuXM8SFzoch0/0JTwFW+q8BncMW01znT/SzKuc+v1oUIRmG15BdTGjiNoQlFzGH9aREpaIcGLPczXlu6PYyIcJOSH8iqn9/WG5jzMVW6sXUrHMb3e4AyfivVc3Xqx2iT8E6RWsvK1OK8tIiVAvMAbUc8Imyj0iNxzZJq6FEpDCLzcbO9GxuVUTAWDbOJIOyBtSMwz13NJoUEWI38GH4eJ5+lmWnk1uC0lTlYcXxjWuGBUu3Domxd6+DhgibvUrAmXiEYbyXnH5fzmoYIrfTCVXxg2l5ZcWa2UOoBSGvaU0jd1tYUpnpbW5UQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=37lQA3FbG5mw4ExJB2pCC4RKc6vrosNTuxokZL4xwAY=;
- b=niGdRC8qex4+nALM/99ePNDouSuIwljE4WB28K2VWwvnpumuniEu4tH0Xb80OD5601nIuYmpzZFdtmLepYiXjYtzl0SlzDmae29QgqQbbBZlzysjCeM20XTndqMDUXJLvdx1CnrA19cwMgoUKZVKPRybtnH01pFrf0653BbPboM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
- PH7PR12MB8427.namprd12.prod.outlook.com (2603:10b6:510:242::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8489.25; Mon, 3 Mar 2025 17:31:10 +0000
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::c8a9:4b0d:e1c7:aecb]) by DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::c8a9:4b0d:e1c7:aecb%5]) with mapi id 15.20.8489.025; Mon, 3 Mar 2025
- 17:31:08 +0000
-Message-ID: <3a77a28e-6d66-4315-90c5-d6802c256700@amd.com>
-Date: Mon, 3 Mar 2025 09:31:06 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 4/6] pds_fwctl: initial driver framework
-To: Dave Jiang <dave.jiang@intel.com>, jgg@nvidia.com,
- andrew.gospodarek@broadcom.com, aron.silverton@oracle.com,
- dan.j.williams@intel.com, daniel.vetter@ffwll.ch, dsahern@kernel.org,
- gregkh@linuxfoundation.org, hch@infradead.org, itayavr@nvidia.com,
- jiri@nvidia.com, Jonathan.Cameron@huawei.com, kuba@kernel.org,
- lbloch@nvidia.com, leonro@nvidia.com, linux-cxl@vger.kernel.org,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org, saeedm@nvidia.com
-Cc: brett.creeley@amd.com
-References: <20250301013554.49511-1-shannon.nelson@amd.com>
- <20250301013554.49511-5-shannon.nelson@amd.com>
- <01e4b8ad-82dd-43ac-92b9-3b3a030f86bc@intel.com>
-Content-Language: en-US
-From: "Nelson, Shannon" <shannon.nelson@amd.com>
-In-Reply-To: <01e4b8ad-82dd-43ac-92b9-3b3a030f86bc@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BYAPR06CA0056.namprd06.prod.outlook.com
- (2603:10b6:a03:14b::33) To DS0PR12MB6583.namprd12.prod.outlook.com
- (2603:10b6:8:d1::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D91145348
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 17:31:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741023119; cv=none; b=Ha8EyweEEdsRegD/FcvREpWQBobOp5bxeUjpWA9zSXxu/KUPKcMJyp9W8uXVzY1mLNDAafQvR0zbv+dbDLHZESA11KqYTlC7nqWo2IFC6Zrzt/ul0vcfGp+YbN9uJiILq96DxYwhQcO+Q0LwBCdz0xWhUYdt+ynnLWkXxdfEaIQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741023119; c=relaxed/simple;
+	bh=Z/0uNM5wfNlWPr0F4t7yF/Vw5j/YZ9iPN7jjEaeTOgA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WR8e9Lrte3OOwEnNOloynfTRTaoURqwMb1QrtFamdeytqVgiw0xN50AsEWfUL9ZZlNdTzD882LeUw//lVacjaZaN+akwdGqOfl/I0rcEkigs32nGs4TFd1NnMI2zoF+aAlqNAjL1EFLPfei2NvtBVcWm1dcXVXBe+zCjuVpsHXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=XjTdVrgd; arc=none smtp.client-ip=209.85.210.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-7275bc6638bso1054345a34.2
+        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 09:31:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1741023117; x=1741627917; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=nTrDH9dCjURnCVBXkhTO9mDjd4L5zR9fFc2sSiL5T7Y=;
+        b=XjTdVrgdBty6R3MR7JNsEZhD14J6p8Yi7Q3R/cMwQvkG1kgzRZs7TKHm8fWEhBhplv
+         T2zp29qlmWIvngkfsJkjVUr9U/DQT2BOwn/6K8glDP1HTwzvrF6mlf62pRxUnT37+dD8
+         f/ieWr5SqPlLEp91MQb1S7W4bMJaTnlYr5h9o=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741023117; x=1741627917;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nTrDH9dCjURnCVBXkhTO9mDjd4L5zR9fFc2sSiL5T7Y=;
+        b=grXAM9Sd4iNKIem4BDzfdpq28XKBBOYtp1Vl2pWHwdcCgqJO/B19xAeKcjEUHbhQ0A
+         LnI7VC+GqO5KkmATGhloa4NDxAqWIlTkwNh1T90HiZn6Dzt7nsYgecU6oWIrfc4SsH0A
+         eG/W9RSa9ochFw/BJ0uZwoD6jNTJGM3o/a38qxTgS4GTjWbyIP9Sj9/6+JylD/479ZKn
+         dca3cqZ/T6h3gGZvijEdIRGSJqbeIMUsa2GCRNhEtVyBfRAMK3/kDTVXfi5dzXviXttM
+         cGqGN20fHj6v86rO6e+XL43EwlgqhRrHg+Yxq10GlVU9Coo4e+rmhcfehIPLB5huVpmg
+         c75g==
+X-Forwarded-Encrypted: i=1; AJvYcCXgJro1Cn7Ob6C1llfohGIU8QGHwoGSogi2a8t3T1zO6p2/CSy0y7Fqobu6Y7s85JoLycW+dOI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMSijQ9SpmZcyQ37yFos5ptyNfAlUkhXWM9sZQtt58zAMaidKY
+	+UTWLpcNzP+22pq/V1wa6pS43v3I/W79ZraEnDRDUYRTOpJe1UkkKq/aXxAqFA==
+X-Gm-Gg: ASbGnctEiucvgYavQrf7klLzb5ahSFWIV9NNUb4J+0GZwWywmbsL2dbmxfo28ftv6DV
+	Y4tSmBWYH2k1o5k/bZP+0U6kM3ilx2k9vh5I9nBeV5srStBsrlSXFVx3lLBJ0kcePd5gfQBals3
+	+PXeX4LsfgKwC2HuojjjRozLND59ZydbQRZTxFyXBq0Eu4GydxZERHLA1VGgoWoHR2hthKnx8u0
+	OG5tdmyvqQ+OjH3cWIQuNbZ3SFQOkRc5UK3WC+R0nB6Z9Px2tRj6uKR3PWyPBhjI6a7zpo9o2Fy
+	6+DxmhmCQ6tLKU8J5WmWO7f5BehWoJ/vOK06JCgwlQdhTGGWtiek8sNSetdP9szKG6h2Un9+wJx
+	0IAUDRriH
+X-Google-Smtp-Source: AGHT+IFwH4hVBl3B1BGg2Jjd3tKLrSGpuJi/TdPLC4hGVyrG6NfKGx/agRALfhjJqAEXg0S25toi4Q==
+X-Received: by 2002:a05:6830:63cd:b0:727:36a0:a2ae with SMTP id 46e09a7af769-728b829e715mr9439145a34.14.1741023116929;
+        Mon, 03 Mar 2025 09:31:56 -0800 (PST)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2c15c3d0082sm1953785fac.37.2025.03.03.09.31.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Mar 2025 09:31:55 -0800 (PST)
+Message-ID: <e2fdd2c1-7701-4c67-9a07-f3623ed03d88@broadcom.com>
+Date: Mon, 3 Mar 2025 09:31:52 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|PH7PR12MB8427:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3b687503-bff7-427c-14a8-08dd5a792f31
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|376014|7416014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?SE9MUkpIUlFURTAzaFB6c3Z4QnlIWkQzVEpubjBPRWxGM1lFR245WFdZK0lu?=
- =?utf-8?B?clZCNmhLTVVydUVQR0lLUVFGUnRiY0ZoQnpGWHk4OFRKc0IvVU9wTytkeDlk?=
- =?utf-8?B?YjdXNHJicTVrZWd1Ym9ONjJEa3VyOTBWYVhTbUlYaG9mRE9WNmphK0V2UzVm?=
- =?utf-8?B?OUkxQTIyZktHdUZpTkdSMkxKVXAzY05xOTJ0djUxL0M3azJjeXN0d1RGWUZ1?=
- =?utf-8?B?Y2hyL2NDWUVheVdzQm4xQThkS2VqSXdxWENSYTlVOW04ZUthS2VWMU0rdmFj?=
- =?utf-8?B?VnFrSUhlaytCUWJ2R2lHWlRaRGxrT1NMU1J0aWtaWjJGcmw5eCtXZGVUNTVo?=
- =?utf-8?B?N0NpUzdEYXBWV2tmYTZRQlM0ckQ3S1ZtQVVUZ0wzTmFwcDRxWkkyRjUrSWhS?=
- =?utf-8?B?NWFVTkFFaThYcFF1M3JDam9nTTQwa1JLQ0xrV3Jwc3JkUFk4aFQ4MndicEpx?=
- =?utf-8?B?MGN0Vy9NOFpwMWVRRVNJT1lzd3pKY2F5Yzgxc2E1NTgyaVRIUHlkeGJocHNM?=
- =?utf-8?B?OVg1R2FpUjZYYU5QNFlwczVSUXVuYURSVlZrMzR0cWNLKy9KMnBOTlJnTzFt?=
- =?utf-8?B?NU5QNldrZmRqYllwbUpibUZhNHdjclZZQ2FINkRENFM1T3hJbFB6OTJwQWdq?=
- =?utf-8?B?T3NreWFlQmtEMHkrNnNmUkpvRG1LKzJvZ2M1UzRhWVlnYWZ0RnhwaGtjM2dX?=
- =?utf-8?B?YTUwc2lzbUFadEplN1IzaE1VdHl0ZUlwbTVBMW0zVGh2dVhmbHdvczhOTGFJ?=
- =?utf-8?B?ZnhKbzV0TFNIeUx4VFVkMkFjWUVKcjBiNHBOS2JncW5MMEVhWjVyWjFEQUoy?=
- =?utf-8?B?OVIvN3VsUmVJR1ZGRnRpYnNOeDJ5elFRY1VPaE5UVXYwMm1QSU9TaTFUR0dY?=
- =?utf-8?B?L3RSWTVJTFQycC9jZjlMcVZBY3ZZUnlvZHE2Ym84NnkzY1ZaaTlnVFBjejIx?=
- =?utf-8?B?WXpqRCtHSG1xdlFMOVM1ZEpVTFZRM2ZKYmlISUhDZG84aUlLUFVQSFdXdjZy?=
- =?utf-8?B?cGs0aW1vWmFydTUvallVMGNBUVpybXdBZTBvaFB4NmVKMVNZa3lYU0VZc2ZU?=
- =?utf-8?B?TUZLeXR4OXIzT094T3ZVSGdXUjhXWmpjMDUzbzRoWG82ZjMrckNVaEg0R3ZQ?=
- =?utf-8?B?RnN1VDFoMFlSbE9xbDV4WVJrb2NNcS9sbyt1S0tHb3U4VTNYVGZHc1pLeHZq?=
- =?utf-8?B?ZVFXWkNKRXBXckNpYTRGaU9oZDRYZFB2SzVlZmpRemZQWElwQ0tQYWlKTWdS?=
- =?utf-8?B?Uld4T0VSOUg3YlI5aTRpZkJVZlRpODNOSEVMbWx0b01UM21BUEZDUDhaSXha?=
- =?utf-8?B?NUZEV1UvK1VGMG1WVVFoS2RrbkpoUm5qYmk1Tk0wYlR2OU9SSGdvVUpWWms3?=
- =?utf-8?B?UWgrM21OQ2RGWFJaeWU2OGNON0tCaEQ5eUFCSW85VmN6a1ZVYTI2cGdKWEo5?=
- =?utf-8?B?S1N0M0poRlA1bFN3S3B1Zy9DbzFJVDdKclJ5ZUZvL0JYdVlZbWlmZnhVSDF5?=
- =?utf-8?B?TXhtWFhHTDdvdG53S2Qya0hJV3AwTXZBYjM2ZjFicFJURklNQVJBYVFrSm90?=
- =?utf-8?B?TXcycXRyL3pWamZzNTFHVEk1cWg3L3lhY3AwdDRtWVRxUUxUalZCOG1CVXlu?=
- =?utf-8?B?MnJJOVhLamNWLzdZSThhdkZnZy9xY3NKSm9KKzFjY1YxUFhET0svbERQKzhx?=
- =?utf-8?B?dTZzQkx0bi9sYStYNG91c1FhZENKYm9aRS9WdDNGRlRtUFMxM2RHN09uVDQy?=
- =?utf-8?B?YkRHaFRQWkpURDE5WXVZaEFLT3ZwZS9PVTBvQytjY1I5NUVGbWthRCtvOGxn?=
- =?utf-8?B?Y2YzdnhBeEpOSzNnUmpQdnRhVitrVVJMb29rUXJFOVU1WEk4a1M2WGZkWnFT?=
- =?utf-8?B?eGd0bUZVUlVsN3h2cUxBS3ZZdndITUhRZkJnQUtvMHdMVFVMb052TTdReWkv?=
- =?utf-8?Q?A6Q5viy/y4M=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?eW9id25pYjZEdTAxTXBiZTkvbFM2N2QreFNoaEZMWEJsYW5FcVZwaTlLQk5s?=
- =?utf-8?B?enBMblFLcmgvQSthNDBFbHVBSzQ0aDdwdllsYTRwODI4dGpkOWsxVFR4OSs5?=
- =?utf-8?B?Ui9PWVh6T2s4Wnc2TTlrZmkvRWRtS0UxcHhKU1VzcGpRTGpNRnl5b3FGRU9Z?=
- =?utf-8?B?bTdVellMVGFxdUpIOGRYbjIwYnBUSGdrZGxqKzhUbVBNZlNWSWRkbThyN0xh?=
- =?utf-8?B?NHFmZ0k5SFh0SGFJVU9pMWttSkM4QWxuQ1BLaGdUWVloZ2N6QjY0NnBNOGdo?=
- =?utf-8?B?bmtyZkhuVEVOL2hxb2RJVXlTam1EWmZVYnZ0VzB3WklJNWRRa1F6QktKVlBC?=
- =?utf-8?B?SGViaFMrV1lUQWxKVFpHSW5KZndjb2tITTdRdmhBMXNRWjU4RVFsYVFoeHda?=
- =?utf-8?B?Z3JpdGJWdmZVRCswSEw1amR0eDN1MW90eHVhMlNIOGxieTMxUjlVSm1hU2Jv?=
- =?utf-8?B?MWlPQUpQWUlIalJKUUo1UmdRTDg0VnZnME5WK2NwMzQ4UE1GZWo2bU8rT1Nj?=
- =?utf-8?B?RzVpcDgySkJTOGJtNXJzdjRJVDR6UlFyN2NvWGJBZXVvOHBLaHl2OXBqcm84?=
- =?utf-8?B?aW1WUUllb0t0dnJEejMwWGwwbEdTNEdVN3lJa1BoQWdIcFEvRmRwMHFPdzFr?=
- =?utf-8?B?R0g5MXJhWWFGMTQzTzBWZVZkMmRuZzNWRlpWOVYxSk1MZU5ZbHFWM3JQdkZx?=
- =?utf-8?B?NS93Z0xzaE1nbE9lNlpWVDMxS1VSZkdYVlhTVi81dGFVMTEwa0d5OXhEejBS?=
- =?utf-8?B?VVFnc2VYQitXQlQ5Zko0UTloY3RzTWlybXpKNUVGV0FHSG5jTXYrTHBoay9E?=
- =?utf-8?B?UzRPVWJNM0EvVzd1VTBJWVNJeHIvV2Z6NHBmK0RlYjc1QXJ6QkRQckJpc1dl?=
- =?utf-8?B?YWQxNEFWc2lJdDdlc0YvWGc2d0VEbEdlREVtdUtmbVhQNkw5b08rdW1mQUxJ?=
- =?utf-8?B?VTNBWUpuQlpHbXVLZlhPSXBFcWFTSlJsTzhlRWRDQnZtNENFMStVV2NPVm56?=
- =?utf-8?B?azZCclZDQzdhb2dGZ3k1MFBQREpTNmV6TFJySElmamFCY0JneW9icTdmdHB4?=
- =?utf-8?B?dHh3T1hsemdFZHVwckRjSm11SVJxS21CY2Qvd25saDgzMWtOWUtXTFBEdmZX?=
- =?utf-8?B?dGhqUnIxUXZMaG5iT2RNeDgrRkZXMmtJby9HYXFzM2wyVm9uWGRvZzF5V1Ru?=
- =?utf-8?B?Q2h6R0JpaG9waHFkaFJueTgzbCtOdHNuSlZQSTJoRk92OTBrbXBwbG5UK1JJ?=
- =?utf-8?B?OGFJdHFZQlB5QmFPYUFXWWFLa3lvRHFxZ2phWWZvWDZyK3o4OWxlSjZHNnY2?=
- =?utf-8?B?MkVORU1DdGZUSGh0eGV2VkRRcDZpdUlhekloVWtTb1BRd25WcjQ4a1B6bFJZ?=
- =?utf-8?B?cUVLTzlwRFNwTVQxSUx1dUhNSzJnNzRFbktxTzk3Z1RIaHBvV2lJdnJ5Q25V?=
- =?utf-8?B?NG1QZC81cGdONFkzL0kwOVZ1U3JxNEZLd2RsTWIrYWtZTFViTkZWc01wYktm?=
- =?utf-8?B?TmZBaTQyVXJSZTltQWgxVWFrSjF6VURSL2NTaVYxQS9YYlNUOWJQSWl0Y2Jx?=
- =?utf-8?B?V0NTZGpKS1hITW8wQiswS21ETitBYVdlYW9yR0Zzd2ptQjk3VXQ4eDhEYVd6?=
- =?utf-8?B?S3VUNkhnbU1CMHYyajhwN2xRL2RxL0VGRVdYOHNCaC9rQ1JJVWZEdHRUTHZn?=
- =?utf-8?B?ZmROMGZwbjBacjV5MWxkaU4rSXlaVUNJQnFud3FibkMrVm9Sd0d5YmR2UGtp?=
- =?utf-8?B?YkNrcUFOMm1mcVBYQUlBWk9rMktSb1pLNElhY3hjKzc3VmNCeWdkSmxJam95?=
- =?utf-8?B?QXlheTBTY3R4akxzYTlpdTRrNWpiODlDSTVIaFNTNVFjdUlJVU96YUhKOUpT?=
- =?utf-8?B?Yi9uV1RoNi9qZkdpZ0FCSm4wSnBxZXlTSjF1VWVjQXc0cGdvSDVlNkRlVm9k?=
- =?utf-8?B?WGd2WlpTem16d05UR1BoMmdpWm5qMFBUdWlwaEF2ellPOVhRY3oweFZTZ1Vk?=
- =?utf-8?B?aGtmRGhDWmdkSmhRV2RacXFRVVYxdFFaRVFHVVo1OUNoZ05Rbm1QWTRWdEtP?=
- =?utf-8?B?TGFhQ1huTkpjYjlwellkNjVrOEhDaFhsYXVheVFlZ1NadlMwa2RlTm5xVzlJ?=
- =?utf-8?Q?P6lk8RFS+IhWa4OvoWdrgOu6s?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3b687503-bff7-427c-14a8-08dd5a792f31
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2025 17:31:08.7297
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LRUWQhYmOHU5CS2Edvm2YN0LTh3y07yECH5FqjhOfbDtBZ0vXFBlAbDuYaYqgrO4bI66yMsf4DNNnqDlfRftiw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8427
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net] net: phy: allow MDIO bus PM ops to start/stop
+ state machine for phylink-controlled PHY
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Wei Fang <wei.fang@nxp.com>
+References: <20250225153156.3589072-1-vladimir.oltean@nxp.com>
+Content-Language: en-US
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <20250225153156.3589072-1-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 3/3/2025 8:45 AM, Dave Jiang wrote:
+On 2/25/25 07:31, Vladimir Oltean wrote:
+> DSA has 2 kinds of drivers:
 > 
-> On 2/28/25 6:35 PM, Shannon Nelson wrote:
->> Initial files for adding a new fwctl driver for the AMD/Pensando PDS
->> devices.  This sets up a simple auxiliary_bus driver that registers
->> with fwctl subsystem.  It expects that a pds_core device has set up
->> the auxiliary_device pds_core.fwctl
->>
->> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
->> ---
->>   MAINTAINERS                    |   7 ++
->>   drivers/fwctl/Kconfig          |  10 ++
->>   drivers/fwctl/Makefile         |   1 +
->>   drivers/fwctl/pds/Makefile     |   4 +
->>   drivers/fwctl/pds/main.c       | 169 +++++++++++++++++++++++++++++++++
->>   include/linux/pds/pds_adminq.h |  77 +++++++++++++++
->>   include/uapi/fwctl/fwctl.h     |   1 +
->>   include/uapi/fwctl/pds.h       |  27 ++++++
->>   8 files changed, 296 insertions(+)
->>   create mode 100644 drivers/fwctl/pds/Makefile
->>   create mode 100644 drivers/fwctl/pds/main.c
->>   create mode 100644 include/uapi/fwctl/pds.h
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 7d2700d1ba0f..a396726feb6f 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -9601,6 +9601,13 @@ T:     git git://linuxtv.org/media.git
->>   F:   Documentation/devicetree/bindings/media/i2c/galaxycore,gc2145.yaml
->>   F:   drivers/media/i2c/gc2145.c
->>
->> +FWCTL PDS DRIVER
->> +M:   Brett Creeley <brett.creeley@amd.com>
->> +R:   Shannon Nelson <shannon.nelson@amd.com>
->> +L:   linux-kernel@vger.kernel.org
->> +S:   Maintained
->> +F:   drivers/fwctl/pds/
->> +
->>   GATEWORKS SYSTEM CONTROLLER (GSC) DRIVER
->>   M:   Tim Harvey <tharvey@gateworks.com>
->>   S:   Maintained
->> diff --git a/drivers/fwctl/Kconfig b/drivers/fwctl/Kconfig
->> index 0a542a247303..df87ce5bd8aa 100644
->> --- a/drivers/fwctl/Kconfig
->> +++ b/drivers/fwctl/Kconfig
->> @@ -28,5 +28,15 @@ config FWCTL_MLX5
->>          This will allow configuration and debug tools to work out of the box on
->>          mainstream kernel.
->>
->> +       If you don't know what to do here, say N.
->> +
->> +config FWCTL_PDS
->> +     tristate "AMD/Pensando pds fwctl driver"
->> +     depends on PDS_CORE
->> +     help
->> +       The pds_fwctl driver provides an fwctl interface for a user process
->> +       to access the debug and configuration information of the AMD/Pensando
->> +       DSC hardware family.
->> +
->>          If you don't know what to do here, say N.
->>   endif
->> diff --git a/drivers/fwctl/Makefile b/drivers/fwctl/Makefile
->> index 5fb289243286..692e4b8d7beb 100644
->> --- a/drivers/fwctl/Makefile
->> +++ b/drivers/fwctl/Makefile
->> @@ -2,4 +2,5 @@
->>   obj-$(CONFIG_FWCTL) += fwctl.o
->>   obj-$(CONFIG_FWCTL_MLX5) += mlx5/
->> +obj-$(CONFIG_FWCTL_PDS) += pds/
->>
->>   fwctl-y += main.o
->> diff --git a/drivers/fwctl/pds/Makefile b/drivers/fwctl/pds/Makefile
->> new file mode 100644
->> index 000000000000..c14cba128e3b
->> --- /dev/null
->> +++ b/drivers/fwctl/pds/Makefile
->> @@ -0,0 +1,4 @@
->> +# SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
->> +obj-$(CONFIG_FWCTL_PDS) += pds_fwctl.o
->> +
->> +pds_fwctl-y += main.o
->> diff --git a/drivers/fwctl/pds/main.c b/drivers/fwctl/pds/main.c
->> new file mode 100644
->> index 000000000000..afc7dc283ad5
->> --- /dev/null
->> +++ b/drivers/fwctl/pds/main.c
->> @@ -0,0 +1,169 @@
->> +// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
->> +/* Copyright(c) Advanced Micro Devices, Inc */
->> +
->> +#include <linux/module.h>
->> +#include <linux/auxiliary_bus.h>
->> +#include <linux/pci.h>
->> +#include <linux/vmalloc.h>
->> +
->> +#include <uapi/fwctl/fwctl.h>
->> +#include <uapi/fwctl/pds.h>
->> +#include <linux/fwctl.h>
->> +
->> +#include <linux/pds/pds_common.h>
->> +#include <linux/pds/pds_core_if.h>
->> +#include <linux/pds/pds_adminq.h>
->> +#include <linux/pds/pds_auxbus.h>
->> +
->> +struct pdsfc_uctx {
->> +     struct fwctl_uctx uctx;
->> +     u32 uctx_caps;
->> +     u32 uctx_uid;
->> +};
->> +
->> +struct pdsfc_dev {
->> +     struct fwctl_device fwctl;
->> +     struct pds_auxiliary_dev *padev;
->> +     struct pdsc *pdsc;
->> +     u32 caps;
->> +     struct pds_fwctl_ident ident;
->> +};
->> +DEFINE_FREE(pdsfc_dev, struct pdsfc_dev *, if (_T) fwctl_put(&_T->fwctl));
->> +
->> +static int pdsfc_open_uctx(struct fwctl_uctx *uctx)
->> +{
->> +     struct pdsfc_dev *pdsfc = container_of(uctx->fwctl, struct pdsfc_dev, fwctl);
->> +     struct pdsfc_uctx *pdsfc_uctx = container_of(uctx, struct pdsfc_uctx, uctx);
->> +
->> +     pdsfc_uctx->uctx_caps = pdsfc->caps;
->> +
->> +     return 0;
->> +}
->> +
->> +static void pdsfc_close_uctx(struct fwctl_uctx *uctx)
->> +{
->> +}
->> +
->> +static void *pdsfc_info(struct fwctl_uctx *uctx, size_t *length)
->> +{
->> +     struct pdsfc_uctx *pdsfc_uctx = container_of(uctx, struct pdsfc_uctx, uctx);
->> +     struct fwctl_info_pds *info;
->> +
->> +     info = kzalloc(sizeof(*info), GFP_KERNEL);
->> +     if (!info)
->> +             return ERR_PTR(-ENOMEM);
->> +
->> +     info->uctx_caps = pdsfc_uctx->uctx_caps;
->> +
->> +     return info;
->> +}
->> +
->> +static int pdsfc_identify(struct pdsfc_dev *pdsfc)
->> +{
->> +     struct device *dev = &pdsfc->fwctl.dev;
->> +     union pds_core_adminq_comp comp = {0};
->> +     union pds_core_adminq_cmd cmd;
->> +     struct pds_fwctl_ident *ident;
->> +     dma_addr_t ident_pa;
->> +     int err = 0;
->> +
->> +     ident = dma_alloc_coherent(dev->parent, sizeof(*ident), &ident_pa, GFP_KERNEL);
->> +     err = dma_mapping_error(dev->parent, ident_pa);
->> +     if (err) {
->> +             dev_err(dev, "Failed to map ident buffer\n");
->> +             return err;
->> +     }
->> +
->> +     cmd = (union pds_core_adminq_cmd) {
->> +             .fwctl_ident = {
->> +                     .opcode = PDS_FWCTL_CMD_IDENT,
->> +                     .version = 0,
->> +                     .len = cpu_to_le32(sizeof(*ident)),
->> +                     .ident_pa = cpu_to_le64(ident_pa),
->> +             }
->> +     };
->> +
->> +     err = pds_client_adminq_cmd(pdsfc->padev, &cmd, sizeof(cmd), &comp, 0);
->> +     if (err)
->> +             dev_err(dev, "Failed to send adminq cmd opcode: %u err: %d\n",
->> +                     cmd.fwctl_ident.opcode, err);
->> +     else
->> +             pdsfc->ident = *ident;
->> +
->> +     dma_free_coherent(dev->parent, sizeof(*ident), ident, ident_pa);
->> +
->> +     return 0;
->> +}
->> +
->> +static void *pdsfc_fw_rpc(struct fwctl_uctx *uctx, enum fwctl_rpc_scope scope,
->> +                       void *in, size_t in_len, size_t *out_len)
->> +{
->> +     return NULL;
->> +}
->> +
->> +static const struct fwctl_ops pdsfc_ops = {
->> +     .device_type = FWCTL_DEVICE_TYPE_PDS,
->> +     .uctx_size = sizeof(struct pdsfc_uctx),
->> +     .open_uctx = pdsfc_open_uctx,
->> +     .close_uctx = pdsfc_close_uctx,
->> +     .info = pdsfc_info,
->> +     .fw_rpc = pdsfc_fw_rpc,
->> +};
->> +
->> +static int pdsfc_probe(struct auxiliary_device *adev,
->> +                    const struct auxiliary_device_id *id)
->> +{
->> +     struct pds_auxiliary_dev *padev =
->> +                     container_of(adev, struct pds_auxiliary_dev, aux_dev);
->> +     struct pdsfc_dev *pdsfc __free(pdsfc_dev) =
->> +                     fwctl_alloc_device(&padev->vf_pdev->dev, &pdsfc_ops,
->> +                                        struct pdsfc_dev, fwctl);
->> +     struct device *dev = &adev->dev;
->> +     int err;
->> +
+> 1. Those who call dsa_switch_suspend() and dsa_switch_resume() from
+>     their device PM ops: qca8k-8xxx, bcm_sf2, microchip ksz
+> 2. Those who don't: all others. The above methods should be optional.
 > 
-> It's ok to move the pdsfc declaration inline right before this check below. That would help prevent any accidental usages of pdsfc before the check. This is an exception to the coding style guidelines with the introduction of cleanup mechanisms.
-
-
-
-
->> +     if (!pdsfc) {
->> +             dev_err(dev, "Failed to allocate fwctl device struct\n");
->> +             return -ENOMEM;
->> +     }
->> +     pdsfc->padev = padev;
->> +
->> +     err = pdsfc_identify(pdsfc);
->> +     if (err)
->> +             return dev_err_probe(dev, err, "Failed to identify device\n");
->> +
->> +     err = fwctl_register(&pdsfc->fwctl);
->> +     if (err)
->> +             return dev_err_probe(dev, err, "Failed to register device\n");
->> +
->> +     auxiliary_set_drvdata(adev, no_free_ptr(pdsfc));
->> +
->> +     return 0;
->> +}
->> +
->> +static void pdsfc_remove(struct auxiliary_device *adev)
->> +{
->> +     struct pdsfc_dev *pdsfc __free(pdsfc_dev) = auxiliary_get_drvdata(adev);
->> +
->> +     fwctl_unregister(&pdsfc->fwctl);
+> For type 1, dsa_switch_suspend() calls dsa_user_suspend() -> phylink_stop(),
+> and dsa_switch_resume() calls dsa_user_resume() -> phylink_start().
+> These seem good candidates for setting mac_managed_pm = true because
+> that is essentially its definition, but that does not seem to be the
+> biggest problem for now, and is not what this change focuses on.
 > 
-> Missing fwctl_put(). See fwctl_unregister() header comments. Caller must still call fwctl_put() to free the fwctl after calling fwctl_unregister().
-
-Is this not covered by the pdsfc_dev cleanup we defined earlier?
-sln
-
+> Talking strictly about the 2nd category of drivers here, I have noticed
+> that these also trigger the
 > 
-> DJ
+> 	WARN_ON(phydev->state != PHY_HALTED && phydev->state != PHY_READY &&
+> 		phydev->state != PHY_UP);
 > 
->> +}
->> +
->> +static const struct auxiliary_device_id pdsfc_id_table[] = {
->> +     {.name = PDS_CORE_DRV_NAME "." PDS_DEV_TYPE_FWCTL_STR },
->> +     {}
->> +};
->> +MODULE_DEVICE_TABLE(auxiliary, pdsfc_id_table);
->> +
->> +static struct auxiliary_driver pdsfc_driver = {
->> +     .name = "pds_fwctl",
->> +     .probe = pdsfc_probe,
->> +     .remove = pdsfc_remove,
->> +     .id_table = pdsfc_id_table,
->> +};
->> +
->> +module_auxiliary_driver(pdsfc_driver);
->> +
->> +MODULE_IMPORT_NS("FWCTL");
->> +MODULE_DESCRIPTION("pds fwctl driver");
->> +MODULE_AUTHOR("Shannon Nelson <shannon.nelson@amd.com>");
->> +MODULE_AUTHOR("Brett Creeley <brett.creeley@amd.com>");
->> +MODULE_LICENSE("Dual BSD/GPL");
->> diff --git a/include/linux/pds/pds_adminq.h b/include/linux/pds/pds_adminq.h
->> index 4b4e9a98b37b..ae6886ebc841 100644
->> --- a/include/linux/pds/pds_adminq.h
->> +++ b/include/linux/pds/pds_adminq.h
->> @@ -1179,6 +1179,78 @@ struct pds_lm_host_vf_status_cmd {
->>        u8     status;
->>   };
->>
->> +enum pds_fwctl_cmd_opcode {
->> +     PDS_FWCTL_CMD_IDENT = 70,
->> +};
->> +
->> +/**
->> + * struct pds_fwctl_cmd - Firmware control command structure
->> + * @opcode: Opcode
->> + * @rsvd:   Word boundary padding
->> + * @ep:     Endpoint identifier.
->> + * @op:     Operation identifier.
->> + */
->> +struct pds_fwctl_cmd {
->> +     u8     opcode;
->> +     u8     rsvd[3];
->> +     __le32 ep;
->> +     __le32 op;
->> +} __packed;
->> +
->> +/**
->> + * struct pds_fwctl_comp - Firmware control completion structure
->> + * @status:     Status of the firmware control operation
->> + * @rsvd:       Word boundary padding
->> + * @comp_index: Completion index in little-endian format
->> + * @rsvd2:      Word boundary padding
->> + * @color:      Color bit indicating the state of the completion
->> + */
->> +struct pds_fwctl_comp {
->> +     u8     status;
->> +     u8     rsvd;
->> +     __le16 comp_index;
->> +     u8     rsvd2[11];
->> +     u8     color;
->> +} __packed;
->> +
->> +/**
->> + * struct pds_fwctl_ident_cmd - Firmware control identification command structure
->> + * @opcode:   Operation code for the command
->> + * @rsvd:     Word boundary padding
->> + * @version:  Interface version
->> + * @rsvd2:    Word boundary padding
->> + * @len:      Length of the identification data
->> + * @ident_pa: Physical address of the identification data
->> + */
->> +struct pds_fwctl_ident_cmd {
->> +     u8     opcode;
->> +     u8     rsvd;
->> +     u8     version;
->> +     u8     rsvd2;
->> +     __le32 len;
->> +     __le64 ident_pa;
->> +} __packed;
->> +
->> +/**
->> + * struct pds_fwctl_ident - Firmware control identification structure
->> + * @features:    Supported features
->> + * @version:     Interface version
->> + * @rsvd:        Word boundary padding
->> + * @max_req_sz:  Maximum request size
->> + * @max_resp_sz: Maximum response size
->> + * @max_req_sg_elems:  Maximum number of request SGs
->> + * @max_resp_sg_elems: Maximum number of response SGs
->> + */
->> +struct pds_fwctl_ident {
->> +     __le64 features;
->> +     u8     version;
->> +     u8     rsvd[3];
->> +     __le32 max_req_sz;
->> +     __le32 max_resp_sz;
->> +     u8     max_req_sg_elems;
->> +     u8     max_resp_sg_elems;
->> +} __packed;
->> +
->>   union pds_core_adminq_cmd {
->>        u8     opcode;
->>        u8     bytes[64];
->> @@ -1216,6 +1288,9 @@ union pds_core_adminq_cmd {
->>        struct pds_lm_dirty_enable_cmd    lm_dirty_enable;
->>        struct pds_lm_dirty_disable_cmd   lm_dirty_disable;
->>        struct pds_lm_dirty_seq_ack_cmd   lm_dirty_seq_ack;
->> +
->> +     struct pds_fwctl_cmd              fwctl;
->> +     struct pds_fwctl_ident_cmd        fwctl_ident;
->>   };
->>
->>   union pds_core_adminq_comp {
->> @@ -1243,6 +1318,8 @@ union pds_core_adminq_comp {
->>
->>        struct pds_lm_state_size_comp     lm_state_size;
->>        struct pds_lm_dirty_status_comp   lm_dirty_status;
->> +
->> +     struct pds_fwctl_comp             fwctl;
->>   };
->>
->>   #ifndef __CHECKER__
->> diff --git a/include/uapi/fwctl/fwctl.h b/include/uapi/fwctl/fwctl.h
->> index 518f054f02d2..a884e9f6dc2c 100644
->> --- a/include/uapi/fwctl/fwctl.h
->> +++ b/include/uapi/fwctl/fwctl.h
->> @@ -44,5 +44,6 @@ enum fwctl_device_type {
->>        FWCTL_DEVICE_TYPE_ERROR = 0,
->>        FWCTL_DEVICE_TYPE_MLX5 = 1,
->> +     FWCTL_DEVICE_TYPE_PDS = 4,
->>   };
->>
->>   /**
->> diff --git a/include/uapi/fwctl/pds.h b/include/uapi/fwctl/pds.h
->> new file mode 100644
->> index 000000000000..a01b032cbdb1
->> --- /dev/null
->> +++ b/include/uapi/fwctl/pds.h
->> @@ -0,0 +1,27 @@
->> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
->> +/* Copyright(c) Advanced Micro Devices, Inc */
->> +
->> +/*
->> + * fwctl interface info for pds_fwctl
->> + */
->> +
->> +#ifndef _UAPI_FWCTL_PDS_H_
->> +#define _UAPI_FWCTL_PDS_H_
->> +
->> +#include <linux/types.h>
->> +
->> +/*
->> + * struct fwctl_info_pds
->> + *
->> + * Return basic information about the FW interface available.
->> + */
->> +struct fwctl_info_pds {
->> +     __u32 uid;
->> +     __u32 uctx_caps;
->> +};
->> +
->> +enum pds_fwctl_capabilities {
->> +     PDS_FWCTL_QUERY_CAP = 0,
->> +     PDS_FWCTL_SEND_CAP,
->> +};
->> +#endif /* _UAPI_FWCTL_PDS_H_ */
+> from mdio_bus_phy_resume(), because the PHY state machine is running.
 > 
+> It's running as a result of a previous dsa_user_open() -> ... ->
+> phylink_start() -> phy_start(), and AFAICS, mdio_bus_phy_suspend() was
+> supposed to have called phy_stop_machine(), but it didn't. So this is
+> why the PHY is in state PHY_NOLINK by the time mdio_bus_phy_resume()
+> runs.
+> 
+> mdio_bus_phy_suspend() did not call phy_stop_machine() because for
+> phylink, the phydev->adjust_link function pointer is NULL. This seems a
+> technicality introduced by commit fddd91016d16 ("phylib: fix PAL state
+> machine restart on resume"). That commit was written before phylink
+> existed, and was intended to avoid crashing with consumer drivers which
+> don't use the PHY state machine - phylink does.
+> 
+> Make the conditions dependent on the PHY device having a
+> phydev->phy_link_change() implementation equal to the default
+> phy_link_change() provided by phylib. Otherwise, just check that the
+> custom phydev->phy_link_change() has been provided and is non-NULL.
+> Phylink provides phylink_phy_change().
+> 
+> Thus, we will stop the state machine even for phylink-controlled PHYs
+> when using the MDIO bus PM ops.
+> 
+> Reported-by: Wei Fang <wei.fang@nxp.com>
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
+Sorry for the lag in reviewing, this looks reasonable to me, though I 
+don't have a device to reason about whether that will be a problem or not.
+
+As you say though, some drivers should switch to mac_managed_pm, let me 
+try to set some cycles aside to make that change for bcm_sf2.c at the 
+very least.
+
+Thanks!
+-- 
+Florian
 
