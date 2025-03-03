@@ -1,149 +1,293 @@
-Return-Path: <netdev+bounces-171381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8707EA4CC5A
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 21:01:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B68CCA4CC62
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 21:02:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FBAB189660B
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 20:01:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D25EB174872
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 20:02:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44089230277;
-	Mon,  3 Mar 2025 20:00:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5865E231CB0;
+	Mon,  3 Mar 2025 20:02:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wgesB6zs"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="gIQZ5G2C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 478701F0E44
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 20:00:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C85B215040
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 20:02:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741032054; cv=none; b=n3GwOFD4PKH4NbRN3z/VScVLyBNYCP7cXW8HdbYxuvcVheYWte7SJ1lLS7GciVW0mb+9IyRi1OYMeGWLSILYldEJYUj+e4bEJmYp4eRtmAkjR9wE4GJbAD5IkL++nDZMi8UAANVr1Qp6eDlw3HhcAFMxDTS6+oiFuDTtdqXcniQ=
+	t=1741032148; cv=none; b=ALBsQfiHQs+7QJ+S6Dp5jwIIZDkf9zVvLZqOYoivENRQ2ld3TCkHLNiPhJhws2NDnEBjAKgXHsCtJuK2+UF1FThlHIPd1aWjg8XJJ2zuT2RZ/kAcIaQiSxM2XDCSw1l/x0ciOQH2J8Qy3z0YoHPioBtDPksQVIju+jqv+V0Xh+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741032054; c=relaxed/simple;
-	bh=XbbJ8meiSGyYH6OwHoQ3kYQ9Z6S5UvDDWGLBxmPvAmE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=idjooaA/7onc3yKyOffIt+09zSabOByv6zeMGWEHXGZ4G3tcHgeLpDicjXHh0qfesog28hqjuNYq8EzHUBOiEVYiB8pLzkR1vev8mLIPAc81rnXZyXlCT1lO6q0tUIshXokGNfPqP3fBeqf9mysn1G3RuQhRxM+eTOhlsHBp2Ms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=wgesB6zs; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-30ba563a6d1so24482071fa.1
-        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 12:00:51 -0800 (PST)
+	s=arc-20240116; t=1741032148; c=relaxed/simple;
+	bh=HS8qbPdZ3txQONolaHUQSyEJbMIIaTI6ycaSNatcZ8o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=r/QDduej7WjQnK4th2ELecbNUUT3kYOlsZ5PduT2jD70zHtOIiJAfNVitIb8eSzuHiGsy7H43Sh5iUpXsdNvp66wprz6qXRIyAjm3Ux0tTtKauXXsNvT4kJm43FMU1li4GlRBofWrlgAMIE8x7KRUPgU84UTnBLIG64S3s5Yv8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=gIQZ5G2C; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-22113560c57so92914395ad.2
+        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 12:02:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741032050; x=1741636850; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SIobnHJoMiJmgICmS6BIagkd52MyMq9ZRNlSypEhZx0=;
-        b=wgesB6zsl2c/nwp8YgLBRW5EjpfK/i+/RPYBkc+A+ql8EZ5Ey60K3jXEUFjSGRB6Ly
-         E3rbk4Ge7WK+ZPWogj2I1uaZMQyLPMhY5rukyPNsq/k3Cq7skj9fuBSCok2sxNLTpBg/
-         gqPN7FvyK6oB74ac/Ve/iyerB69btpnLFgaLE0DwXMC45DlmuazcljMwukgd/Ungqd5O
-         gTms5km3lurkHibIQjsEaVIyIN5QCxGJgfEHpzB2NiqJfUElYXoDH0ctpytY8Vm4UYqj
-         iWbsZhdhuuW2LSvkuftVKTKtrWL4arKr1eVIt8Jy+ueeCnfPDLv6D4/NzHSMtAbs2ii6
-         hPIQ==
+        d=chromium.org; s=google; t=1741032146; x=1741636946; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=l1AzSJHrYGN68SQgkcRg2RepLPfek9ChyYynDWZ7nZg=;
+        b=gIQZ5G2CGDDMYhsLnode1GJV0H/KDTpRKFaP81HB/R10Lpaolg7aqJADPaU0gadRZy
+         haRP7vSDFn4X9Ed747FFV6FWbSbZiXkpQr7hdBG3cV3OXsMgISpVQHSu1BxcpmR0G//t
+         ZrWE/qZsUPbDHbRDejRhhfFS4fIBV03o+BkMk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741032050; x=1741636850;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SIobnHJoMiJmgICmS6BIagkd52MyMq9ZRNlSypEhZx0=;
-        b=DSYrAJiRhqy65FDJ78UrMBzKS+kWlVOjC36fD4iA08wz0mEZKgHI/K5jz46X2S8vkp
-         fx/qfHrTAbA0JUF8T7xpgs6zJ0xVYYzY1ee6N0bHMxScMsnRK6X3VkJGPgdiCRJml6Cn
-         uKFtP77HGJy69W856GPMIRGnMsiDoK5AA9EuCscFzzzXwqSS44zVg0LF9eRnqM25XYLr
-         fEVz5KHsQ6ZwXPOp6g0STkE3Wp8FvFZe+GsgQJROs5f+tzvEZEWQDGfgXL9RSpVQS+4g
-         45rwChepOwOctR0d/CFP68JvF9EVcl6pART86nGrSrSX82ImPo3Iyj29GDSbwaBfUCHr
-         bQHg==
-X-Forwarded-Encrypted: i=1; AJvYcCXyb5W56DaeweGTkXKAlYpklUaU0T9L3SG6dI6wWhDeApbjbWlSsH2bfSacHZ/BJRnuX+yNdqA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzd3wPoR14NibVh+rb2awSnIvOT9uBGvuDgfgN5KVZE4McWE625
-	bbx+I2kCiTjLLzMEXJbtHqjREzTJNyUlPz7gmMmBGwfzwFb+S1yTb28/a3F+KW5sB2V2/+pIT/s
-	WTpY6oZDEQUffE/nM5l/wOaj4KPXtyhUMWdnovw==
-X-Gm-Gg: ASbGncughSRB2/W0aP2wrWgz5UpnHx+YjDM1OlNNOSg+F5ChexWh2GGYaG2wZoGshKr
-	cnEwwAuSMD8rgQ7/sbD0P1BJMFRa5IKPyIcH+Xy5cHUX0wt5XyLY+M5kcAMXY0IHPn3gTTJ2g9K
-	NbYV5tPqN0tYfWnazfk/WnYiGYlw==
-X-Google-Smtp-Source: AGHT+IEHC8551GBjOPpUxphatF0L4EWvTZV1kdNfG9x3/0VKhOjGpHpEdRbBRyV3NGrevE8NCqhrlfkAk7EBNemkkKU=
-X-Received: by 2002:a05:6512:31c6:b0:549:39d8:51e1 with SMTP id
- 2adb3069b0e04-549756e259cmr181874e87.16.1741032050322; Mon, 03 Mar 2025
- 12:00:50 -0800 (PST)
+        d=1e100.net; s=20230601; t=1741032146; x=1741636946;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=l1AzSJHrYGN68SQgkcRg2RepLPfek9ChyYynDWZ7nZg=;
+        b=kKsFJHqp8TPahePDtUFTHp7eKY9B2qW63jV4zudb/7NdEFmxqQD7U4/Gt7WY21Q/D0
+         VzOcMvAddIY7UbciFbhPQfI4eo3bgs+CyRBLyhReXDMV99tlKYFIYBUp9r2i4fzrc95M
+         mbKsMzzlUSO/JHq6X+RQII2i1MG6eWINauY/NTTh8xW0jpYTs97X02R52R/nHzQnf75O
+         WEZ3O9Jq74GWwHeHzRzR7eacEiSmjhDRnhD/D5bU0RhEQmF9w0Ga+5X5F0aDIbGC16By
+         Es1my1jgdxl2OLSC4a/JhVoo2L+rCaciO9VQpJtjfv+IU1tcEJqbDk3RWh4l0hx5cjSo
+         rMuw==
+X-Forwarded-Encrypted: i=1; AJvYcCV5wf20WqfX1pbzEe29QMiNUJyv81ddsQtuq+3gX/qyGRt5QqD/jXYYFnDlKzqI5nnx2YPWnNI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLfOIhsxG274uH9NiPgzuVSFdaiXiA+Gag36SfwwWUSaPIH5dz
+	trXcKxvkn2HNqoDZI9D/TZJVrA/Cl5XlBVyxztbthzcITCnmgSpnpdAK19Gbmg==
+X-Gm-Gg: ASbGncuakpacR+ibLn6Oj7oCEsi7+RLuETk3dnIrHTotvYkgSnzqDYXJwQJBgOW522S
+	4Qm46eco4StXQOlnlACZ6nncUilyI4E90q437g/vaP6+zkspma3L3wbUvmRQEyej/0xTTlrZ863
+	8Ugwfypmav/I/KA5HgohncMfboa/9W9ZPfAb6q1bMm1+deeeqcalsjNnUSzMJb+0+oW4r3Urn5x
+	NQYp3dZJ5Yeaqh9EHmi1A/ZvBiF4R0ZQdCLjz4PGmALcY83Y7bxT1LQSekegfvD11dhviG7ubbN
+	eZi6bii9IwYl1+FX7bBH3ji5fsuMhDQ2W4t64QDWWxiCq4PzA/5qUbaLy9doJGOTdHSLJbFRKTz
+	YRHxlDtc6/y5kZEkshSRvE8gtyeTC1jM=
+X-Google-Smtp-Source: AGHT+IFwNA+jAUYX79VX/F+XDj+R3GLFUz//u5O9AkU12o2xY1dYtBKx03LDr+z8+FMJ/HrFInPKRA==
+X-Received: by 2002:a17:903:2346:b0:223:635d:3e38 with SMTP id d9443c01a7336-22368fa24bemr229111545ad.15.1741032145613;
+        Mon, 03 Mar 2025 12:02:25 -0800 (PST)
+Received: from li-cloudtop.c.googlers.com.com (4.198.125.34.bc.googleusercontent.com. [34.125.198.4])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-223504dc4b4sm81233875ad.171.2025.03.03.12.02.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Mar 2025 12:02:24 -0800 (PST)
+From: Li Li <dualli@chromium.org>
+To: dualli@google.com,
+	corbet@lwn.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	donald.hunter@gmail.com,
+	gregkh@linuxfoundation.org,
+	arve@android.com,
+	tkjos@android.com,
+	maco@android.com,
+	joel@joelfernandes.org,
+	brauner@kernel.org,
+	cmllamas@google.com,
+	surenb@google.com,
+	omosnace@redhat.com,
+	shuah@kernel.org,
+	arnd@arndb.de,
+	masahiroy@kernel.org,
+	bagasdotme@gmail.com,
+	horms@kernel.org,
+	tweek@google.com,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	netdev@vger.kernel.org,
+	selinux@vger.kernel.org,
+	hridya@google.com
+Cc: smoreland@google.com,
+	ynaffit@google.com,
+	kernel-team@android.com
+Subject: [PATCH v16 0/3] binder: report txn errors via generic netlink
+Date: Mon,  3 Mar 2025 12:02:09 -0800
+Message-ID: <20250303200212.3294679-1-dualli@chromium.org>
+X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250303164928.1466246-1-andriy.shevchenko@linux.intel.com> <20250303164928.1466246-4-andriy.shevchenko@linux.intel.com>
-In-Reply-To: <20250303164928.1466246-4-andriy.shevchenko@linux.intel.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Mon, 3 Mar 2025 21:00:39 +0100
-X-Gm-Features: AQ5f1JqhI495QPwjnNSA_U0-FZLtnDrmj_TbAAs84iyjJp_ZDYFgar6ptgKX_Fk
-Message-ID: <CACRpkdbCfhqRGOGrCgP-e3AnK_tmHX+eUpZKjitbfemzAXCcWg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 3/3] ieee802154: ca8210: Switch to using gpiod API
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, 
-	Miquel Raynal <miquel.raynal@bootlin.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bartosz Golaszewski <brgl@bgdev.pl>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 3, 2025 at 5:49=E2=80=AFPM Andy Shevchenko
-<andriy.shevchenko@linux.intel.com> wrote:
+From: Li Li <dualli@google.com>
 
-> This updates the driver to gpiod API, and removes yet another use of
-> of_get_named_gpio().
->
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+It's a known issue that neither the frozen processes nor the system
+administration process of the OS can correctly deal with failed binder
+transactions. The reason is that there's no reliable way for the user
+space administration process to fetch the binder errors from the kernel
+binder driver.
 
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+Android is such an OS suffering from this issue. Since cgroup freezer
+was used to freeze user applications to save battery, innocent frozen
+apps have to be killed when they receive sync binder transactions or
+when their async binder buffer is running out.
 
-But note:
+This patch introduces the Linux generic netlink messages into the binder
+driver so that the Linux/Android system administration process can
+listen to important events and take corresponding actions, like stopping
+a broken app from attacking the OS by sending huge amount of spamming
+binder transactiions.
 
-> @@ -632,10 +630,10 @@ static void ca8210_reset_send(struct spi_device *sp=
-i, unsigned int ms)
->         struct ca8210_priv *priv =3D spi_get_drvdata(spi);
->         long status;
->
-> -       gpio_set_value(pdata->gpio_reset, 0);
-> +       gpiod_set_value(pdata->reset_gpio, 0);
->         reinit_completion(&priv->ca8210_is_awake);
->         msleep(ms);
-> -       gpio_set_value(pdata->gpio_reset, 1);
-> +       gpiod_set_value(pdata->reset_gpio, 1);
+The 1st version uses a global generic netlink for all binder contexts,
+raising potential security concerns. There were a few other feedbacks
+like request to kernel docs and test code. The thread can be found at
+https://lore.kernel.org/lkml/20240812211844.4107494-1-dualli@chromium.org/
 
-This drives the GPIO low to assert reset, meaning it is something
-that should have GPIO_ACTIVE_LOW set in the device tree,
-and it might even have, so let's check what we can check:
+The 2nd version fixes those issues and has been tested on the latest
+version of AOSP. See https://r.android.com/3305462 for how userspace is
+going to use this feature and the test code. It can be found at
+https://lore.kernel.org/lkml/20241011064427.1565287-1-dualli@chromium.org/
 
-git grep cascoda,ca8210
-Documentation/devicetree/bindings/net/ieee802154/ca8210.txt:    -
-compatible:           Should be "cascoda,ca8210"
-Documentation/devicetree/bindings/net/ieee802154/ca8210.txt:
- compatible =3D "cascoda,ca8210";
-drivers/net/ieee802154/ca8210.c:        {.compatible =3D "cascoda,ca8210", =
-},
+The 3rd version replaces the handcrafted netlink source code with the
+netlink protocal specs in YAML. It also fixes the documentation issues.
+https://lore.kernel.org/lkml/20241021182821.1259487-1-dualli@chromium.org/
 
-well ain't that typical, all users are out of tree. The example
-in the bindings file is wrong, setting ACTIVE_HIGH. Sigh, let's
-assume all those DTS files somewhere are wrong and they
-didn't set GPIO_ACTIVE_LOW in them...
+The 4th version just containsi trivial fixes, making the subject of the
+patch aligned with the subject of the cover letter.
+https://lore.kernel.org/lkml/20241021191233.1334897-1-dualli@chromium.org/
 
-Maybe add a comment in the code that this is wrong and the
-driver and DTS files should be fixed.
+The 5th version incorporates the suggested fixes to the kernel doc and
+the init function. It also removes the unsupported uapi-header in YAML
+that contains "/" for subdirectory.
+https://lore.kernel.org/lkml/20241025075102.1785960-1-dualli@chromium.org/
 
-Alternatively patch Documentation/devicetree/bindings/net/ieee802154/ca8210=
-.txt
-to set GPIO_ACTIVE_LOW and fix the code to invert it both
-here and when getting the GPIO, but it could cause problems
-for outoftree users.
+The 6th version has some trivial kernel doc fixes, without modifying
+any other source code.
+https://lore.kernel.org/lkml/20241028101952.775731-1-dualli@chromium.org/
 
-Either way, this is good progress:
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+The 7th version breaks the binary struct netlink message into individual
+attributes to better support automatic error checking. Thanks Jakub for
+improving ynl-gen.
+https://lore.kernel.org/all/20241031092504.840708-1-dualli@chromium.org/
 
-Yours,
-Linus Walleij
+The 8th version solves the multi-genl-family issue by demuxing the
+messages based on a new context attribute. It also improves the YAML
+spec to be consistent with netlink tradition. A Huge 'Thank You' to
+Jakub who taught me a lot about the netlink protocol!
+https://lore.kernel.org/all/20241113193239.2113577-1-dualli@chromium.org/
+
+The 9th version only contains a few trivial fixes, removing a redundant
+pr_err and unnecessary payload check. The ynl-gen patch to allow uapi
+header in sub-dirs has been merged so it's no longer included in this
+patch set.
+https://lore.kernel.org/all/20241209192247.3371436-1-dualli@chromium.org/
+
+The 10th version renames binder genl to binder netlink, improves the
+readability of the kernel doc and uses more descriptive variable names.
+The function binder_add_device() is moved out to a new commit per request.
+It also fixes a warning about newline used in NL_SET_ERR_MSG.
+Thanks Carlos for his valuable suggestions!
+https://lore.kernel.org/all/20241212224114.888373-1-dualli@chromium.org/
+
+The 11th version simplifies the yaml filename to avoid redundant words in
+variable names. This also makes binder netlink yaml more aligned with
+other existing netlink specs. Another trivial change is to use reverse
+xmas tree for function variables.
+https://lore.kernel.org/all/20241218203740.4081865-1-dualli@chromium.org/
+
+The 12th version makes Documentation/admin-guide/binder_netlink.rst aligned
+with the binder netlink yaml change introduced in the 11th revision. It
+doesn't change any source code.
+https://lore.kernel.org/all/20241218212935.4162907-1-dualli@chromium.org/
+
+The 13th version removes the unnecessary dependency to binder file ops.
+Now the netlink configuration is reset using sock_priv_destroy. It also
+requires CAP_NET_ADMIN to send commands to the driver. One of the
+patches ("binderfs: add new binder devices to binder_devices") has been
+merged to linux-next. To avoid conflict, switch to linux-next master
+branch and remove the merged one. Adding sock_priv into netlink spec
+results in CFI failure, which is fixed by the new trampoline patches.
+https://lore.kernel.org/all/20250115102950.563615-1-dualli@chromium.org/
+
+The 14th version fix the code style issue by wrapping the sock priv
+in a separate struct, as suggested by Jakub. The other 2 patches are
+no longer included in this patchset as the equvilent fix has already
+been merged to upstream linux master branch, as well as net & net-next.
+This version has already been rebased to TOT of linux-next.
+https://lore.kernel.org/all/20250118080939.2835687-1-dualli@chromium.org/
+
+The 15th version switches from unicast to multicast per feedback and
+feature requriements from binder users. With this change, multiple user
+space processes can listen to the binder reports from the kernel driver
+at the same time. To receive the multicast messages, those user space
+processs should query the mcast group id and join the mcast group. In
+the previous unicast solution, a portid is saved in the kernel driver to
+prevent unauthorized process to send commands to the kernel driver. In
+this multicast solution, this is replaced by a new "setup_report"
+permission in the "binder" class. Meanwhile, the sock_priv_destroy
+callback and CAP_NET_ADMIN restriction are no longer required in favor
+of the multicast solution and the new "setup_report" permission.
+https://lore.kernel.org/all/20250226192047.734627-1-dualli@chromium.org/
+
+The 16th version fixes the build error when CONFIG_SECURITY is disabled.
+There's no other changes. Thank you, kernel test robot <lkp@intel.com>!
+
+v1: add a global binder genl socket for all contexts
+v2: change to per-context binder genl for security reason
+    replace the new ioctl with a netlink command
+    add corresponding doc Documentation/admin-guide/binder_genl.rst
+    add user space test code in AOSP
+v3: use YNL spec (./tools/net/ynl/ynl-regen.sh)
+    fix documentation index
+v4: change the subject of the patch and remove unsed #if 0
+v5: improve the kernel doc and the init function
+    remove unsupported uapi-header in YAML
+v6: fix some trivial kernel doc issues
+v7: break the binary struct binder_report into individual attributes
+v8: use multiplex netlink message in a unified netlink family
+    improve the YAML spec to be consistent with netlink tradition
+v9: remove unnecessary check to netlink flags and message payloads
+v10: improve the readability of kernel doc and variable names
+v11: rename binder_netlinnk.yaml to binder.yaml
+     use reverse xmas tree for function variables
+v12: make kernel doc aligned with source code
+v13: use sock_priv_destroy to cleanup netlink
+     require CAP_NET_ADMIN to send netlink commands
+     add trampolines in ynl-gen to fix CFI failure
+v14: wrap the sock priv in a separate struct
+v15: switch from unicast to multicast netlink message
+     add a "setup_report" permission in the "binder" class
+     add generic_netlink to binder_features
+v16: fix build error with CONFIG_SECURITY disabled
+
+Li Li (2):
+  binder: report txn errors via generic netlink
+  binder: generic netlink binder_features flag
+
+Thiébaud Weksteen (1):
+  lsm, selinux: Add setup_report permission to binder
+
+ Documentation/admin-guide/binder_netlink.rst  | 108 +++++++++
+ Documentation/admin-guide/index.rst           |   1 +
+ Documentation/netlink/specs/binder.yaml       | 116 +++++++++
+ drivers/android/Kconfig                       |   1 +
+ drivers/android/Makefile                      |   2 +-
+ drivers/android/binder.c                      | 229 +++++++++++++++++-
+ drivers/android/binder_internal.h             |  16 ++
+ drivers/android/binder_netlink.c              |  46 ++++
+ drivers/android/binder_netlink.h              |  23 ++
+ drivers/android/binder_trace.h                |  35 +++
+ drivers/android/binderfs.c                    |   8 +
+ include/linux/lsm_hook_defs.h                 |   1 +
+ include/linux/security.h                      |   6 +
+ include/uapi/linux/android/binder_netlink.h   |  57 +++++
+ security/security.c                           |  13 +
+ security/selinux/hooks.c                      |   7 +
+ security/selinux/include/classmap.h           |   3 +-
+ .../filesystems/binderfs/binderfs_test.c      |   1 +
+ 18 files changed, 668 insertions(+), 5 deletions(-)
+ create mode 100644 Documentation/admin-guide/binder_netlink.rst
+ create mode 100644 Documentation/netlink/specs/binder.yaml
+ create mode 100644 drivers/android/binder_netlink.c
+ create mode 100644 drivers/android/binder_netlink.h
+ create mode 100644 include/uapi/linux/android/binder_netlink.h
+
+
+base-commit: cd3215bbcb9d4321def93fea6cfad4d5b42b9d1d
+-- 
+2.48.1.711.g2feabab25a-goog
+
 
