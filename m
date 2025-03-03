@@ -1,173 +1,109 @@
-Return-Path: <netdev+bounces-171805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CC7BA4EC10
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:42:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34B2AA4EA63
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:03:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C5C31882F1B
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:37:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEC458C76C0
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:14:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A657D27D77E;
-	Tue,  4 Mar 2025 18:31:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6DE729617D;
+	Tue,  4 Mar 2025 16:52:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kdI1CMsm"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b="CYcVlL/P"
 X-Original-To: netdev@vger.kernel.org
-Received: from beeline1.cc.itu.edu.tr (beeline1.cc.itu.edu.tr [160.75.25.115])
+Received: from beeline3.cc.itu.edu.tr (beeline3.cc.itu.edu.tr [160.75.25.117])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCB5327CCFD
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 18:31:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=160.75.25.115
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D52284B5F
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 16:52:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=160.75.25.117
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741113103; cv=fail; b=C0aRZJJL2IpTjuDrfWFDesNZtOdhWeUXz1qfkjVJFMskVBFQQrdvJFSb0Q+AQJcS6EQ28f3wpgbv014kPCX4iMJ9oqkGPIpH9aEMbEp2jvVTtH7WU5vDtBmZfCTZKPKZ0uRTunS2XTT5BCXInHCMgm0trKjzKBuzf0MDiZeObfs=
+	t=1741107158; cv=fail; b=Uoi84oDmMX2FyyuTkHdSFem7N1zgctNUht9cykmzNGSwNmgSu93ZnWo83nqaRAeQZFTC+IFDQtqQPew2nMEyFMW7HwX6nXoNjpcNgBkmDhZXVQ7Q03FJ+vWF0knXtsKOFXzWi3ufW4FhIcu5o/wWYRlmeqN2VhNjHEEx58vq4y8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741113103; c=relaxed/simple;
-	bh=AXnk7lLgH2/5lgOLQ215kKh4iSCtSaXd5JSjyKhdwI8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tG7nfs5h4o3ne1fCAKugMGsUSASW+Z9UN6VOxZTPIoeyeX/lYfM52N9Ch3MUX4FfqWccrDSMf5W89PJ4hmaMlwmGPKXb8+5tsNvo8EiRhhb2u0TveEGYr0QerxLJ8F9k/4xvI7/7ddJKShb6oJ3KDNSglZ8RpvxMe/iwSbrk/6Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=fail (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kdI1CMsm reason="signature verification failed"; arc=none smtp.client-ip=209.85.216.67; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; arc=fail smtp.client-ip=160.75.25.115
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1741107158; c=relaxed/simple;
+	bh=Bw4mDZD4c08//3HY8Hc0y6Y1tAw+C3RLp34KKdro+XU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gJMU8/3wCh79QP/vf8y0HvXQZ42CN1VGhohgxAu41/0ycy4JvWRE/QEPWVUlG3CeflfaoqnBaRFmfXLRvSWs8xC1prveP+sehBj4Rwu/4hij6UkSIwBlwyVBO1gftE54MrKoKLnH+N3Jr77GnxQjzU3WAcfGf9FKx80pSDiu7DE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=siemens.com; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=fail (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b=CYcVlL/P reason="signature verification failed"; arc=none smtp.client-ip=185.136.64.227; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; arc=fail smtp.client-ip=160.75.25.117
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=siemens.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=cc.itu.edu.tr
 Received: from lesvatest1.cc.itu.edu.tr (lesvatest1.cc.itu.edu.tr [10.146.128.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
 	(No client certificate requested)
-	by beeline1.cc.itu.edu.tr (Postfix) with ESMTPS id EDEEE40CFB4C
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 21:31:39 +0300 (+03)
+	by beeline3.cc.itu.edu.tr (Postfix) with ESMTPS id B1EB440D1F40
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 19:52:33 +0300 (+03)
 X-Envelope-From: <root@cc.itu.edu.tr>
 Received: from lesva1.cc.itu.edu.tr (unknown [160.75.70.79])
-	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6dcK2qGTzFxHK
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:39:29 +0300 (+03)
+	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6hL81w11zG3jH
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 19:42:24 +0300 (+03)
 Received: by le1 (Postfix, from userid 0)
-	id B040141898; Tue,  4 Mar 2025 17:39:13 +0300 (+03)
+	id 09D0242736; Tue,  4 Mar 2025 19:42:06 +0300 (+03)
 Authentication-Results: lesva1.cc.itu.edu.tr;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kdI1CMsm
-X-Envelope-From: <linux-kernel+bounces-541067-bozkiru=itu.edu.tr@vger.kernel.org>
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b=CYcVlL/P
+X-Envelope-From: <linux-kernel+bounces-541102-bozkiru=itu.edu.tr@vger.kernel.org>
 Authentication-Results: lesva2.cc.itu.edu.tr;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kdI1CMsm
-Received: from fgw1.itu.edu.tr (fgw1.itu.edu.tr [160.75.25.103])
-	by le2 (Postfix) with ESMTP id 261D441A5E
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 09:57:20 +0300 (+03)
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by fgw1.itu.edu.tr (Postfix) with SMTP id D897D3063EFE
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 09:57:19 +0300 (+03)
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b=CYcVlL/P
+Received: from fgw2.itu.edu.tr (fgw2.itu.edu.tr [160.75.25.104])
+	by le2 (Postfix) with ESMTP id EA17641C3C
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 10:47:38 +0300 (+03)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by fgw2.itu.edu.tr (Postfix) with SMTP id C40032DCDE
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 10:47:38 +0300 (+03)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C02D16D61B
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 06:57:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06DB71891C46
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 07:47:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D6481EEA27;
-	Mon,  3 Mar 2025 06:56:10 +0000 (UTC)
-Received: from mail-pj1-f67.google.com (mail-pj1-f67.google.com [209.85.216.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E28A1EE019;
+	Mon,  3 Mar 2025 07:47:21 +0000 (UTC)
+Received: from mta-64-227.siemens.flowmailer.net (mta-64-227.siemens.flowmailer.net [185.136.64.227])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5679B1E990E;
-	Mon,  3 Mar 2025 06:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 228441E9B1B
+	for <linux-kernel@vger.kernel.org>; Mon,  3 Mar 2025 07:47:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740984966; cv=none; b=NNBNThPn3JgjuM5Oux+OCBivLr/QgTB9iFkzq4jMionXQQI5R8IPltKigR93EOussqQ3pU+PKXlCTO8rxTqsKkJmpZ26MxsvlkqfC63qs1W9F8Mkq2kMnvD97s17StJ27VYPjm/csftzjabYsxOeSEJRtyEbqeV+aM+pDj7R8Lc=
+	t=1740988038; cv=none; b=iV7h2Vu+BuZRM4jft5wB2J6Ta7/0Kd9WwhlHKJPPxR3k/pMM4pZXZzeqGUkGXI8FkbLUxOr9mSITAhPr/1NcQXz4i8iHthM2p8EFyq7k3hmXkwlR0IHFFwfTrlR1KWWbJSg8HKArFYGsLTDpbBE6FYuNndmqJKHPr2J+gNOvGeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740984966; c=relaxed/simple;
-	bh=r1n1Uafjg9Tb7hAw9aZTOW4QZemIa+WVQ6XY0cn91Fo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AVv+LB20bW0XqYva+Z2tkgWlXz6baMT8T8KyF6AMn6WIpUIjxB/zxzCA0I9RzaNJYty+vIEUe8E6bfJbTuyft+W6QeprXdicgw8qYW2V+n/EDDSEmYu+BbeAFp8ZRN4xd118oyvoU9UQQCdrFtKzxWeESmHTQwStLEdffAJrqUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kdI1CMsm; arc=none smtp.client-ip=209.85.216.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f67.google.com with SMTP id 98e67ed59e1d1-2feb1d7a68fso6904604a91.1;
-        Sun, 02 Mar 2025 22:56:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740984964; x=1741589764; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DMU16H6izdRqPTzQSvNq/kwALVMPh8dWr5JstZVUeSQ=;
-        b=kdI1CMsm+eYdqtJF2xiIN+YGJiENl+/zDMtKCNX1P85MHnzPtpWbQSvvIlYPY5bBUg
-         SbqZ+h5Yug+j8BbUJVdbztqpzLWAuzaFgby3KAx/mcXW2F8q3dKX+xwzI52fgdDpkJ8g
-         pLskVHUsKfE46pN3gjY+/SmUPeJbDyr9nt6zq0WQvYDiRvNYbzjhOGEoLZdj0xKX5vXL
-         rYYLlFFUEKMrsGimr0C6lw/WOAZGRwGPgsOw4or6jwdMDp6bqb5KUpcBfUEX142hKHsi
-         usFMs8rGt8SY01utQLtMfUufksmKsv+zk3SM9ca8IOC24cXgxDhKd8LO8WS7sETTPNlz
-         BtzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740984964; x=1741589764;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DMU16H6izdRqPTzQSvNq/kwALVMPh8dWr5JstZVUeSQ=;
-        b=Vu5fYokXqREgChPs43E4dXiX30rg428dRvFT6OpLA3AUp/jrChKrzr0bsmmQo0LUIF
-         TUuHL/bjJ5QbwPpNdqOp4WGLTe+XhcJ5D5eqzKpkizhkXTeQ4+X0gFKot2nnQ6GhUjNA
-         Ybee003/ikPQHtjCOfDKBTo9fAmV46br16+VMGGDIUxwUYIL4i7paKuC8RxEnTqUp62U
-         QBNj7fWdr12RNZ9a7xfegiYRLCkM+DnJ/tVBhqvo/l1a4q7e/vB4RABtq/oQlWV6bvnM
-         Ek4MBH1VuQCwr3+gk7M+H3jV7uMTubohBbiZLjWlGcrs64xzPNRicuarNxsYOeIzb2Zb
-         ZLgw==
-X-Forwarded-Encrypted: i=1; AJvYcCU+I6Yc8ND2d+iGz+a4ZbEKIHx0OUrOTOABULCaCG+avhzhwhRq4FJDshTdgRNMk4q7O4Nl/kjA@vger.kernel.org, AJvYcCVZgoPGvYXnbsEpi8iuXNPbUf8bepag0YcKQW32UCxYYY9ns4fdEnd4rpfHuOqsgIs7J+o=@vger.kernel.org, AJvYcCXn8CpcngO90mZua7c/hQY9O8KZFSOc0aKN6+DGQa/6Vx2V5HvADYc1gVNaluUGHIGMOyjYliD0bZC6kWz/@vger.kernel.org, AJvYcCXrG0NDnIekdLBqsQ86SixsfUiQneEDaPj4isj7DJGEdyMmMLpr4t7cUFLZpE85ZcmNqHXLeYI+YrlyBm0ibIf16fsx@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCqSpjFFAGonO4fO2qnWEt2OPtcHAw2qQ+iBSMdRjt+0Pa9OGF
-	ESbNcY4PTzk35yLpXO1NlWEhLnKPwoahcVRi158X4ijFw9eTl9OK
-X-Gm-Gg: ASbGncv+t/1KiLruVf39lWOSHJvJhF9ysrKbujCyJ7TVRngay56xrVFLzUPM/L9gQ+O
-	Ko1BuWsMJMrHRg0O6PPoqBfvJn/dWZENfgeZl1aHvSIuRRPoWfaWArf6wSXh+GCaqnTLt1cvsFs
-	8N7+LqpvZM8ZONPpwWz4ZRLqdsCjyV7f7yj6FJSGDzu+bChSJAGsyzjS9siQ2brIL55suRpQ+Q0
-	6PbtTKSHQLE04PqoDkNX7ugvxNhA6IB6LMqnGy2HcL7ISfcOdHW/MiG4fK/DxnNlSOXBJ5zN8oO
-	VvAzPesalGBC9uu/84aIktQpqB6AyT9I0bodaH0ZzKO59Z54wimKE9pQBUE40g==
-X-Google-Smtp-Source: AGHT+IGyBy5lAIgE9/BJFGPHKWL9IGQJbSt/AMZr+VvaZ6EhLBWcU/x/8umKGWf6iOEq1B7Odhyfkg==
-X-Received: by 2002:a17:90b:1845:b0:2ee:d193:f3d5 with SMTP id 98e67ed59e1d1-2febab2ecbfmr20898385a91.7.1740984964540;
-        Sun, 02 Mar 2025 22:56:04 -0800 (PST)
-Received: from localhost.localdomain ([43.129.244.20])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fea6769ad2sm8139575a91.11.2025.03.02.22.55.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 02 Mar 2025 22:56:04 -0800 (PST)
-From: Menglong Dong <menglong8.dong@gmail.com>
-X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
-To: peterz@infradead.org,
-	rostedt@goodmis.org,
-	mark.rutland@arm.com,
-	alexei.starovoitov@gmail.com
-Cc: catalin.marinas@arm.com,
-	will@kernel.org,
-	mhiramat@kernel.org,
-	tglx@linutronix.de,
-	mingo@redhat.com,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	x86@kernel.org,
-	hpa@zytor.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	jolsa@kernel.org,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	mathieu.desnoyers@efficios.com,
-	nathan@kernel.org,
-	nick.desaulniers+lkml@gmail.com,
-	morbo@google.com,
-	samitolvanen@google.com,
-	kees@kernel.org,
-	dongml2@chinatelecom.cn,
-	akpm@linux-foundation.org,
-	riel@surriel.com,
-	rppt@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
+	s=arc-20240116; t=1740988038; c=relaxed/simple;
+	bh=dZjutVIqRkydhliHBlHKI06qmvIDPbtRY2hMGF3LUjc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XfUf2VQO2CXzcoZ2Rz/09WfIC+1Qq7POx1BGOe0vPZKnbYBhG9wHcpunH3r9pbLmAiBFyGyhgqpWtXsue0P8xDlhJWHOO9JcJM2YGTo7YEVi+gSej6FvwJ5DC1CZr9metFH7FzhP0zF1eqKf8jafWb2gD2Ho1wrsPqNRXnMsGdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b=CYcVlL/P; arc=none smtp.client-ip=185.136.64.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
+Received: by mta-64-227.siemens.flowmailer.net with ESMTPSA id 20250303074707015f5e560fc291725f
+        for <linux-kernel@vger.kernel.org>;
+        Mon, 03 Mar 2025 08:47:07 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
+ d=siemens.com; i=alexander.sverdlin@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
+ bh=zrUY1LdFYD+ZIm9007t+7YM/d7JBcqpKOI6aIegZ2eU=;
+ b=CYcVlL/PjL68bJNlRASUCQFR3d/gIjvM8s4AWiorZd6ei35cbjWVNs6MczurZckPUN1Rcs
+ iHZ5t/HOJYIxhnroa7iKaNK1OChsV3p0HcM/IK+AJlqz/Bh0kPTHIBJ69rCl3Fe5g7U4F2JF
+ pIXIbZVy081/oEQpulGIusFY+b7+6j+EuKJfie3f2YKeQCiyaScowPbnyR6APxUWfNP7ES0z
+ MQuc2WdhLii8ZsqxFztRSOL+PjlwH2s2r6+Pcf4FCquunpcwJydjFZ+MhpDWQD2yNesOcYzP
+ ZTikariIq1dGzkrS1XGfgIM1tAB3A+rsx4vlwGVyua8NZ0jD3tVlUg0w==;
+From: "A. Sverdlin" <alexander.sverdlin@siemens.com>
+To: Roger Quadros <rogerq@kernel.org>,
+	netdev@vger.kernel.org
+Cc: Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-omap@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: [PATCH bpf-next v3 3/4] x86: implement per-function metadata storage for x86
-Date: Mon,  3 Mar 2025 14:53:44 +0800
-Message-Id: <20250303065345.229298-4-dongml2@chinatelecom.cn>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250303065345.229298-1-dongml2@chinatelecom.cn>
-References: <20250303065345.229298-1-dongml2@chinatelecom.cn>
+	Andrew Lunn <andrew@lunn.ch>
+Subject: [PATCH net-next v2] net: ethernet: ti: cpsw_new: populate netdev of_node
+Date: Mon,  3 Mar 2025 08:46:57 +0100
+Message-ID: <20250303074703.1758297-1-alexander.sverdlin@siemens.com>
 Precedence: bulk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -175,191 +111,48 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-456497:519-21489:flowmailer
 Content-Transfer-Encoding: quoted-printable
 X-ITU-Libra-ESVA-Information: Please contact Istanbul Teknik Universitesi for more information
-X-ITU-Libra-ESVA-ID: 4Z6dcK2qGTzFxHK
+X-ITU-Libra-ESVA-ID: 4Z6hL81w11zG3jH
 X-ITU-Libra-ESVA: No virus found
 X-ITU-Libra-ESVA-From: root@cc.itu.edu.tr
-X-ITU-Libra-ESVA-Watermark: 1741717778.90764@ae7Trq0G6CRAkHq/sip+iQ
+X-ITU-Libra-ESVA-Watermark: 1741711828.42369@PFUf2fu9N4l1zLjgpDKBHA
 X-ITU-MailScanner-SpamCheck: not spam
 
-With CONFIG_CALL_PADDING enabled, there will be 16-bytes padding space
-before all the kernel functions. And some kernel features can use it,
-such as MITIGATION_CALL_DEPTH_TRACKING, CFI_CLANG, FINEIBT, etc.
+From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
 
-In my research, MITIGATION_CALL_DEPTH_TRACKING will consume the tail
-9-bytes in the function padding, CFI_CLANG will consume the head 5-bytes,
-and FINEIBT will consume all the 16 bytes if it is enabled. So there will
-be no space for us if MITIGATION_CALL_DEPTH_TRACKING and CFI_CLANG are
-both enabled, or FINEIBT is enabled.
+So that of_find_net_device_by_node() can find CPSW ports and other DSA
+switches can be stacked downstream. Tested in conjunction with KSZ8873.
 
-In x86, we need 5-bytes to prepend a "mov %eax xxx" insn, which can hold
-a 4-bytes index. So we have following logic:
-
-1. use the head 5-bytes if CFI_CLANG is not enabled
-2. use the tail 5-bytes if MITIGATION_CALL_DEPTH_TRACKING and FINEIBT are
-   not enabled
-3. compile the kernel with FUNCTION_ALIGNMENT_32B otherwise
-
-In the third case, we make the kernel function 32 bytes aligned, and ther=
+Reviewed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+---
+Changelog:
+v2: cpsw-nuss (am6x or K3 naming) -> CPSW (am33x naming) in commit messag=
 e
-will be 32 bytes padding before the functions. According to my testing,
-the text size didn't increase on this case, which is weird.
 
-With 16-bytes padding:
+ drivers/net/ethernet/ti/cpsw_new.c | 1 +
+ 1 file changed, 1 insertion(+)
 
--rwxr-xr-x 1 401190688  x86-dev/vmlinux*
--rw-r--r-- 1    251068  x86-dev/vmlinux.a
--rw-r--r-- 1 851892992  x86-dev/vmlinux.o
--rw-r--r-- 1  12395008  x86-dev/arch/x86/boot/bzImage
-
-With 32-bytes padding:
-
--rwxr-xr-x 1 401318128 x86-dev/vmlinux*
--rw-r--r-- 1    251154 x86-dev/vmlinux.a
--rw-r--r-- 1 853636704 x86-dev/vmlinux.o
--rw-r--r-- 1  12509696 x86-dev/arch/x86/boot/bzImage
-
-The way I tested should be right, and this is a good news for us. On the
-third case, the layout of the padding space will be like this if fineibt
-is enabled:
-
-__cfi_func:
-	mov	--	5	-- cfi, not used anymore
-	nop
-	nop
-	nop
-	mov	--	5	-- function metadata
-	nop
-	nop
-	nop
-	fineibt	--	16	-- fineibt
-func:
-	nopw	--	4
-	......
-
-I tested the fineibt with "cfi=3Dfineibt" cmdline, and it works well
-together with FUNCTION_METADATA enabled. And I also tested the
-performance of this function by setting metadata for all the kernel
-function, and it consumes 0.7s for 70k+ functions, not bad :/
-
-I can't find a machine that support IBT, so I didn't test the IBT. I'd
-appreciate it if someone can do this testing for me :/
-
-Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
----
-v3:
-- select FUNCTION_ALIGNMENT_32B on case3, instead of extra 5-bytes
----
- arch/x86/Kconfig              | 18 ++++++++++++
- arch/x86/include/asm/ftrace.h | 54 +++++++++++++++++++++++++++++++++++
- 2 files changed, 72 insertions(+)
-
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index be2c311f5118..fe5a98401135 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -2509,6 +2509,24 @@ config PREFIX_SYMBOLS
- 	def_bool y
- 	depends on CALL_PADDING && !CFI_CLANG
+diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/ti=
+/cpsw_new.c
+index cec0a90659d94..66713bc931741 100644
+--- a/drivers/net/ethernet/ti/cpsw_new.c
++++ b/drivers/net/ethernet/ti/cpsw_new.c
+@@ -1418,6 +1418,7 @@ static int cpsw_create_ports(struct cpsw_common *cp=
+sw)
+ 		ndev->netdev_ops =3D &cpsw_netdev_ops;
+ 		ndev->ethtool_ops =3D &cpsw_ethtool_ops;
+ 		SET_NETDEV_DEV(ndev, dev);
++		ndev->dev.of_node =3D slave_data->slave_node;
 =20
-+config FUNCTION_METADATA
-+	bool "Per-function metadata storage support"
-+	default y
-+	depends on CC_HAS_ENTRY_PADDING && OBJTOOL
-+	select CALL_PADDING
-+	select FUNCTION_ALIGNMENT_32B if ((CFI_CLANG && CALL_THUNKS) || FINEIBT=
-)
-+	help
-+	  Support per-function metadata storage for kernel functions, and
-+	  get the metadata of the function by its address with almost no
-+	  overhead.
-+
-+	  The index of the metadata will be stored in the function padding
-+	  and consumes 5-bytes. FUNCTION_ALIGNMENT_32B will be selected if
-+	  "(CFI_CLANG && CALL_THUNKS) || FINEIBT" to make sure there is
-+	  enough available padding space for this function. However, it
-+	  seems that the text size almost don't change, compare with
-+	  FUNCTION_ALIGNMENT_16B.
-+
- menuconfig CPU_MITIGATIONS
- 	bool "Mitigations for CPU vulnerabilities"
- 	default y
-diff --git a/arch/x86/include/asm/ftrace.h b/arch/x86/include/asm/ftrace.=
-h
-index f9cb4d07df58..d5cbb8e18fd7 100644
---- a/arch/x86/include/asm/ftrace.h
-+++ b/arch/x86/include/asm/ftrace.h
-@@ -4,6 +4,28 @@
-=20
- #include <asm/ptrace.h>
-=20
-+#ifdef CONFIG_FUNCTION_METADATA
-+#if (defined(CONFIG_CFI_CLANG) && defined(CONFIG_CALL_THUNKS)) || (defin=
-ed(CONFIG_FINEIBT))
-+  /* the CONFIG_FUNCTION_PADDING_BYTES is 32 in this case, use the
-+   * range: [align + 8, align + 13].
-+   */
-+  #define KFUNC_MD_INSN_OFFSET		(CONFIG_FUNCTION_PADDING_BYTES - 8)
-+  #define KFUNC_MD_DATA_OFFSET		(CONFIG_FUNCTION_PADDING_BYTES - 9)
-+#else
-+  #ifdef CONFIG_CFI_CLANG
-+    /* use the space that CALL_THUNKS suppose to use */
-+    #define KFUNC_MD_INSN_OFFSET	(5)
-+    #define KFUNC_MD_DATA_OFFSET	(4)
-+  #else
-+    /* use the space that CFI_CLANG suppose to use */
-+    #define KFUNC_MD_INSN_OFFSET	(CONFIG_FUNCTION_PADDING_BYTES)
-+    #define KFUNC_MD_DATA_OFFSET	(CONFIG_FUNCTION_PADDING_BYTES - 1)
-+  #endif
-+#endif
-+
-+#define KFUNC_MD_INSN_SIZE		(5)
-+#endif
-+
- #ifdef CONFIG_FUNCTION_TRACER
- #ifndef CC_USING_FENTRY
- # error Compiler does not support fentry?
-@@ -168,4 +190,36 @@ static inline bool arch_trace_is_compat_syscall(stru=
-ct pt_regs *regs)
- #endif /* !COMPILE_OFFSETS */
- #endif /* !__ASSEMBLY__ */
-=20
-+#if !defined(__ASSEMBLY__) && defined(CONFIG_FUNCTION_METADATA)
-+#include <asm/text-patching.h>
-+
-+static inline bool kfunc_md_arch_exist(void *ip)
-+{
-+	return *(u8 *)(ip - KFUNC_MD_INSN_OFFSET) =3D=3D 0xB8;
-+}
-+
-+static inline void kfunc_md_arch_pretend(u8 *insn, u32 index)
-+{
-+	*insn =3D 0xB8;
-+	*(u32 *)(insn + 1) =3D index;
-+}
-+
-+static inline void kfunc_md_arch_nops(u8 *insn)
-+{
-+	*(insn++) =3D BYTES_NOP1;
-+	*(insn++) =3D BYTES_NOP1;
-+	*(insn++) =3D BYTES_NOP1;
-+	*(insn++) =3D BYTES_NOP1;
-+	*(insn++) =3D BYTES_NOP1;
-+}
-+
-+static inline int kfunc_md_arch_poke(void *ip, u8 *insn)
-+{
-+	text_poke(ip, insn, KFUNC_MD_INSN_SIZE);
-+	text_poke_sync();
-+	return 0;
-+}
-+
-+#endif
-+
- #endif /* _ASM_X86_FTRACE_H */
+ 		if (!napi_ndev) {
+ 			/* CPSW Host port CPDMA interface is shared between
 --=20
-2.39.5
+2.48.1
 
 
 
