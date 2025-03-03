@@ -1,287 +1,221 @@
-Return-Path: <netdev+bounces-171141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA7E3A4BB1D
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 10:46:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C278A4BB2B
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 10:49:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA08D1893CFD
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 09:46:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 140421893CFD
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 09:49:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7DFA1F150F;
-	Mon,  3 Mar 2025 09:46:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07BE41F12F6;
+	Mon,  3 Mar 2025 09:49:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=siemens.com header.i=@siemens.com header.b="nXLgl7bl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c8HUMDRE"
 X-Original-To: netdev@vger.kernel.org
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11013002.outbound.protection.outlook.com [52.101.67.2])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98BDB1F1510;
-	Mon,  3 Mar 2025 09:46:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.67.2
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740995190; cv=fail; b=sat12+eegrV5h2dlEWB6c+W7GZCY9Y2aX0FE0o6Ex5AGgNkOSkYpZb1Ra0GYZ0hynNJ2mxfmjFc6aspFYIeTa5KbdTPfMk8jFPLkBQ0GZ6H6Q9W4CqmpuvU8aSjsGjCKxdD8gzJ+ih7+TLQC7VQWqsKFpo1Gg4aXeyoyiG9AzN4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740995190; c=relaxed/simple;
-	bh=1/6x4XtHpS5fH31S5PmBIbN8HiXcLNh/iX1mfXMVuNs=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=kKcHAyJ3Vgj4calTlh38sQARSdhoR06dsB1BcguM3IebzMU/ygXnXpfSGqqn9SfvQMM6BK0wpRo6pryBBWg0It2C8livRhv6TirM0KcFGaxGBWoD8EvEdel/vxl+QRcMab1GkQKYuvV6kdqsbQXwCKmU80Db4e8bzyGt+TH5ZFo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=@siemens.com header.b=nXLgl7bl; arc=fail smtp.client-ip=52.101.67.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=siemens.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=OZPN9YDuJYU5aajYn+d8mG2ke0ZHdcym0IxcHYl9fLKWbKueIDY8vtlUNZfK3TG1gafm+QH1PfEisLdof4HSHuPvVMeCAN3uN9PUhaac4sebk3zUVimBqC7a9JYI8EJMtXMpolc9yEyoYVKjHK6X81wdwmmH3HaYUof7ktMgW4sBPUli2Ttpf6my0ITA+pTCeyo/C0Sjr3n0qilbaKi7vAAdbhpa7qk1oxnWn7eKpTAXrfHitaHpqwvbMy0AcQaN00CFU9WiR0kAYwsEjRzNkJ3tPD2HNCJ+KntJGH24E6OOXPxdJzStGFVLJFvxQoTiSQzlxtohjr2jV01VKjwyNA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1/6x4XtHpS5fH31S5PmBIbN8HiXcLNh/iX1mfXMVuNs=;
- b=L580WDEgzQ2R+ODXJPHQOmdN43A0PlGJVcnV5Q/pB6lCAoJmhx4VhkZvdMKPa4Zo9ZcFCgfeSb8lrBaawV/Np7FWhZa5wBBjmZzYs62SQB5sZZ1AVA1bjHq579sO3xDCMzpfAEZRv/T74iuOsizSitP9Og/NE8ByCyK1y2HN+4UV4uuTuQUZTiMOz7Rs7WFIEja5GoeOnByY3iBLJCkcwL8oSyuIXBbPjQVWpbI0smsgH35UPy5mqAB9YdCPoprUQfGeqycMZKeRoqgVoNcDd8pJyZ74KAeH9W7H1inTNo5JMrTkvhDzTOts7QboBEmADz7XZZFfyjKilTvNShSS7g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=siemens.com; dmarc=pass action=none header.from=siemens.com;
- dkim=pass header.d=siemens.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=siemens.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1/6x4XtHpS5fH31S5PmBIbN8HiXcLNh/iX1mfXMVuNs=;
- b=nXLgl7blIdYhnNEx0BKgGIWk8qhBTtoi1i3DBDMDkE8EHBSNGvWzmSiIB3xGi1R6ENjvyeZ+Uwx6c0BduK2VStIsSqeG68amh2oIOTtc8yWxVOlGH2gaNVIlg5iE/9xK32KaLvC4LIJx4RbLKxQm085z6yP4+pxi+XDpd/9taBUMY7p8kjwucBklhsqSlmjhLNn/5BGJhIRUi6oF0ViamKD+2WIdWewlpwMO7wi9MqZf2Sezo0YQuh5DxDTUi9P0kYMtVInXcTocNU83JCQQtG0oRAp9HJtaRuhW4T/LefrZ1cjW99EVbGxUjaCTceIruDgOx+QUTo3u1OH5nBQ/yg==
-Received: from DU0PR10MB6828.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:10:47f::13)
- by AS5PR10MB8079.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:673::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.28; Mon, 3 Mar
- 2025 09:46:23 +0000
-Received: from DU0PR10MB6828.EURPRD10.PROD.OUTLOOK.COM
- ([fe80::8198:b4e0:8d12:3dfe]) by DU0PR10MB6828.EURPRD10.PROD.OUTLOOK.COM
- ([fe80::8198:b4e0:8d12:3dfe%7]) with mapi id 15.20.8489.025; Mon, 3 Mar 2025
- 09:46:23 +0000
-From: "MOESSBAUER, Felix" <felix.moessbauer@siemens.com>
-To: "pmenzel@molgen.mpg.de" <pmenzel@molgen.mpg.de>, "davem@davemloft.net"
-	<davem@davemloft.net>, "jdamato@fastly.com" <jdamato@fastly.com>,
-	"romieu@fr.zoreil.com" <romieu@fr.zoreil.com>, "frederic@kernel.org"
-	<frederic@kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "kuba@kernel.org" <kuba@kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>, "leitao@debian.org"
-	<leitao@debian.org>, "pabeni@redhat.com" <pabeni@redhat.com>
-CC: "Bezdeka, Florian" <florian.bezdeka@siemens.com>, "Kiszka, Jan"
-	<jan.kiszka@siemens.com>, "bigeasy@linutronix.de" <bigeasy@linutronix.de>
-Subject: Re: [PATCH] net: Handle napi_schedule() calls from non-interrupt
-Thread-Topic: [PATCH] net: Handle napi_schedule() calls from non-interrupt
-Thread-Index: AQHbjB+LWYyGAH4uCkODOR8MYQhfOLNR/HEAgABGtoCADubXAA==
-Date: Mon, 3 Mar 2025 09:46:23 +0000
-Message-ID: <52beb53fc2bec333f9e36775413eac1ee8fb080c.camel@siemens.com>
-References: <20250221173009.21742-1-frederic@kernel.org>
-	 <Z7i-_p_115kr8aj1@LQ3V64L9R2> <Z7j6Tzav6u6Z0A8B@pavilion.home>
-In-Reply-To: <Z7j6Tzav6u6Z0A8B@pavilion.home>
-Accept-Language: de-DE, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.55.2-1 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=siemens.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DU0PR10MB6828:EE_|AS5PR10MB8079:EE_
-x-ms-office365-filtering-correlation-id: c28ea37c-583f-42ff-e2f8-08dd5a384243
-x-ms-exchange-atpmessageproperties: SA
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|376014|7416014|38070700018|921020|13003099007;
-x-microsoft-antispam-message-info:
- =?utf-8?B?WjJudkFyNXFNc0s5L2oxYVBITG4ydEJrd05KTDUvVzY5ZzlpQUtMZDduSGpZ?=
- =?utf-8?B?Ymg5T1NzRWVxWEZzNFQ2R1RvOHliR3BxNVhQSXBhdS9PSjVhRXFma2pIZU9C?=
- =?utf-8?B?YkVWbzNsM056ano5cTAyYkNHTzA0ZWJUK0Jkb0NCZnpJR0t3OWxyUWhQVnN1?=
- =?utf-8?B?VkluUjNmeEhQNHpoWS9jTkhMb2NXT3JqZG1QcEN0WXVndHZNSnFKdTlCME1T?=
- =?utf-8?B?SE51UktQUkM5ZTgzQXE2eWRxbWUxblB5V0xZZk9zazVyY0wvQTA4dkRBVmRK?=
- =?utf-8?B?aGo4WGFpeWI2SUFmVzdZbUw4RE8xa2NRQlNmaHN6WUVrS0tiZUJITUNudFkv?=
- =?utf-8?B?bjkvaWRYNUhrT2doRDJhTmFib3dXYW9BMHB5c1FLZ2sxeTRQc3huaWZ6ZXRv?=
- =?utf-8?B?QiswN2p4UGJGai90REVhaHRWWWs5VmM4OGNaK3p5R2J2T1lYeGRpaUVOSVdh?=
- =?utf-8?B?OWdLWERUb2JkeTgwdkNCemNWNmxUVVM0MGU3eENyRzg1UGtXQnp4SmM4aTlW?=
- =?utf-8?B?WnZWaEsvdURiVEJBQTlYYVJTQytrVFhycVRianpGNi92SVd3U3RVbmlUNExJ?=
- =?utf-8?B?ZzdkeUkvbTA5RURrWWhiRDhZbkFuRlUzaVlZNWZ6ZW0ydUJ3Y0JwNWp6Ulo0?=
- =?utf-8?B?TzNsNzlvbVkxZFZ1R3ljN3l1M3ZTOWVTOVhscGZjNVFzRzMyaW1PTW52aFlx?=
- =?utf-8?B?TE9aZmlMTzlraVJjU2dSbi92YTVVelVNWmFVSWRrZmxZZGIvUlo0dUhyb2Zj?=
- =?utf-8?B?S3NUS3hVN1FFeDgybmFDNjhYMW1HbUZLYk5vTUJQWTlZdmZOTUd3RDErUzBQ?=
- =?utf-8?B?eEUxV0NOYnM1Y291UEhnOUltMGJ0UjNIVkNpT05xdlh4ZGpHajc1L2g3eURW?=
- =?utf-8?B?bXVGU0cxcHMyVVpFK2Q5a1BPZjM2bHF4ME12NEJnYWdoMXcxU2dIRDdHZTgy?=
- =?utf-8?B?OVVhV1BtNjNPeDFhSmQyK1czNThTRDJvQUJ1b1BXMk1vRmg5eEN3R1FCQ1Zu?=
- =?utf-8?B?OVVuNGs2a25YUGNRSU53Z0NvRWphcGcvZnp1WVkwRkJXYWx1VGtBR1hDdXhL?=
- =?utf-8?B?eWJ5emdrSU5WVHFQVENWSTBaUEszektaa0pXNVgvNzNqQWtqdEF3QzFIeGFv?=
- =?utf-8?B?ZG9vR0JSQ1loOEtJZnpidk10b3lCOExkUWNBa3lCNVExWFR2TUMvcEtscTRE?=
- =?utf-8?B?ZlRXUkdKQ0YxajlETnFRM2xBN1ZDb0lVN1FrckI0eUo4S3hFdHhhQTVIR2JN?=
- =?utf-8?B?SEtyOGtPWEgvUEVXS1lCeEpwK0daeUxmenU2MFpQN1BEMkd5LzJ6cFZXUTRJ?=
- =?utf-8?B?STJOak10ZGNyM2dpZlMrclFMSkVRaUJHbnFLTE5NdnNiTVpPSDBZUjlnUG1M?=
- =?utf-8?B?Mk03WElMd29mYzVZR2JXMUZGa1hyQm43QnlQY1hmVUkwbVBTNXM1OTFWcldS?=
- =?utf-8?B?TE9HQlhYRW9ROEtMck9FZVFrQ3NOZDNsWUYxLzJBN0Rlelpvc0FaOEJ1bDBT?=
- =?utf-8?B?MlI1QVk4WjN1d3JXaWd0VmNGa3BVa01SWFk1VzFOdkZyYmMvYmgyQjVuVmNW?=
- =?utf-8?B?Tm8yczVHVHNCZkNYaWY2aFBMek5NNXZUbERNZWQ5b2ZvQWdHWGZTM05ZQlVj?=
- =?utf-8?B?VHA1MlpXNWdITmxBdHJHSFk5SkFQNUZwdkdvWTFNeUtGa2pIWDZ0UUYvalNl?=
- =?utf-8?B?QUNqU0xoVTdrV29XS1ZidTQ0QnVSOVhGbm5ERnRMTGRZaUFuVVhjVHZ1WUIr?=
- =?utf-8?B?eHZJSlN5K2d2dmM3cHhOWG51NGRvZjRyUXBmZFdpNlVtMjRGOXozOGxKcmtE?=
- =?utf-8?B?eGYzZ0h4UDhydDc0eEc3WFlFcFpVMys0UWZ4eG1PeW56cUlpRFpSSkhMbWps?=
- =?utf-8?B?aXExamFYd01rNTJQazJaVEtySUdsSUgyR2lZVTdyb0NnYXc9PQ==?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR10MB6828.EURPRD10.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(38070700018)(921020)(13003099007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?YW5YTGY3eWQ2WUM0MWRKVFZjZ28xTGtNNUE3THY3Y1gwaVV1R1lLK21UT1Vo?=
- =?utf-8?B?cGt1RHZIL1M1VkFFeTNHbkNNTVJnNnFBdEg4QlU3T0tiUG9kTGNMV2JvWFY2?=
- =?utf-8?B?QzVqU0JOcUdqT2xRVWtSMW1Waktzbm9mNTZZQjJ3NzJNNW5WUjVhMXl4R3I4?=
- =?utf-8?B?ZlFUQ1dkZTYzY3RFTHRMWXEvZW1vMzMzQjhsUU9ZZHA3eU5GN0FTdVpIZVlO?=
- =?utf-8?B?QjdrNkkxcm12Q0E0c3NGZ0ZQbmVkbFd6UVNNRXVOQkdRVWxudVAzeUNiaXB1?=
- =?utf-8?B?OE0yNW9FeUZicElIZ0trbmp2VEp6cDBGU0YxWm5ZMFBkTC9HdGFOUVdtUTQw?=
- =?utf-8?B?SEJuRk8rdkI4bklkN0pBS2hkSjkzRFNaNExrSDFndGFFbDZRdDlIL1ZyNEww?=
- =?utf-8?B?ZC9sM2hqaThyOENQMFlBRTJEbnU3MmQ2dzE4THJ3c1hYRlo5Uy85aHZFNUIw?=
- =?utf-8?B?QkZoenROTWhnSG84dzcweHQ3dHR5Q0xoSlRGSXdlTURXY2tzWWpKS25EMnpn?=
- =?utf-8?B?Wnhlekp5Z0xyZ1REVFpBU1pFSkxyTDdydFJKa1JIK2JlYjh4eVdqMVV3cWtN?=
- =?utf-8?B?eWV1N2lUajdxNmpGaDlTSlFnMUsvOGUycmh1R2NNdUQvS0U1cmxEcmovZGpM?=
- =?utf-8?B?eUZDZnFBNVZ4UVZtWU9tZHBMaXMreUl6UmpiQUd1UTVSMkNUYy83TWtEMm1z?=
- =?utf-8?B?bEErSjh6d1JkTjRwRTlQL2gyMDRyZzdFZWlVWnZLaWg0MDJVdXBjM0puTUdI?=
- =?utf-8?B?WGRQTDNaT3RBdHd0ZDM2WmJhYmxDenN2N3ZEV09zbzhwWXFIcGR1eFlvK2NK?=
- =?utf-8?B?dXZnbldFUWZnM2RiSlpsemg0T2xJbFNWUGcvS3hidFYzYjVyaUNja05oOTVU?=
- =?utf-8?B?M3JnaEY4Q3g0VmdMTlM5d1REMVQ3alVYUlVwY1ZQb0I4WjJOUklWZ0xucG5B?=
- =?utf-8?B?VjNDUFI2NHAxYVFCTXdEN0ZSam9NcE1MK21CSzMxRkFsaHJrY0R5NXRrWEs3?=
- =?utf-8?B?amovM2tpUDBKeGlQWHRrY0wzZ3BRODA1V3Q0cy9GSDdESXNybjFVUzhpc1A4?=
- =?utf-8?B?VDVuNUpKMVRVcDdEL2VNUWhiRElqMWtRNG9ZVStCb2E3RXNTb2RGbkpNaGI5?=
- =?utf-8?B?b2VJTmUyNDRQdGdtMG1HWTVXWkNIajFvMFZydEJqd3hPcTBvdk5YZGtlQ1c5?=
- =?utf-8?B?aC9ldG1zbk5hemlPYW5rbVMxZjk5NWZMcDF0WjU2bGFJQXVGYXY2bTI4SjFY?=
- =?utf-8?B?bFpocUdwUi8zZk1uK2hndEZGMEtBV01ZZUluTEpoUG5oNThRZUlwcFVzZVU3?=
- =?utf-8?B?YmxNbGFtUXJsZGtLandFRVVHLzRyYm1OMEFrRHhkRkJXV29TOFFVVFhmUjQx?=
- =?utf-8?B?Qkg3dVBMSjQwTXY0VWJoZzdPbDNRdit0b3FFV2JDakV4K29rNENsWVh0QVFt?=
- =?utf-8?B?b0hmR0IxQ1RNeURPQ0ZRYk9RQU9tY05xQ1VjeUZma1c1b0lXTWNRSmczRHpC?=
- =?utf-8?B?TDNnU2Z5ekVQWElzVGdNeTBSR0tlS2JraDdGOXVhQk13b1FqZUdkcEtzZStF?=
- =?utf-8?B?TXZPVWczbHBJeWMrVkk0eDRHOWNuYUpMR3pYRGFUMUpzdStFUENtRmtzVEFL?=
- =?utf-8?B?MEZ6aHlGVGQ4VGdRZGQ2Ly9mdlA4NjYyYjduSkFDdk01VXRrRmJOK05pL3Vy?=
- =?utf-8?B?U05CZzA2MnNyK2RNMmZCdlh2TFkwS3ZndlhVMHJnUTJmVHYzVFdzZ2I3UVdo?=
- =?utf-8?B?RUNBemRYQXc0dGtEMnhzc1orR1VDL1pkelBTTW16SEcyWGovekhCWVA0eHpF?=
- =?utf-8?B?am5xU1NPbTd5ZldrU0lwU3BYZm1hYnpiRUJZNGFQS2ExNElzOC81eXo2V2Qv?=
- =?utf-8?B?eFYrdDZZZWc5NXhHK003NGtMa2ZQWFlMRjl2a01XNXZ0c2lmQWxYeEp0Slhi?=
- =?utf-8?B?QkNPWHpJMmE2aGJVcXl1OVRTUjlxL3B0NkRpcWNieU1TZE9rVGVjNHF5bUZB?=
- =?utf-8?B?SEdJcnVsSGE3K1IrMlJlMU82VUVuWUtHR1RqcDFxRkxYeWN6eGNxb29IejJI?=
- =?utf-8?B?UUNwbWFuL2hkMGpDTXhDOFczUmdhdndiY1Q3Zi9sd1pYUlZkWW5ocVNXbW82?=
- =?utf-8?B?VVpPWkY3WHNsNlU1ODFFd1pCb0k2S01BVmRGTFUxaEhhdzlGWU15OURBc2xL?=
- =?utf-8?Q?m3CIaTOmepPYW7zWlmpDVh8=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6ADA41A52F7E27478DD44F3103CFA976@EURPRD10.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 045421F0E51
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 09:49:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740995375; cv=none; b=j7TFpPkq4/Do6MouwGHTI92rEUooIcKD9BmJUb33WpW8PrmEBJ1IxGeBPUupGm3H7i0YcW6brO5dxkr8O6A6cvQckXaIrx02DXIvppMcbk668Q3Jk6jtIsq9ZTqe+IVjmxIxdjnVfG3eKOIFHv5xA7dVdlDPGQ5llpW34kp12X0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740995375; c=relaxed/simple;
+	bh=aciRXAPVFSFR+GMkrx+q4evyMV3weqQVuOA3GHiwpvA=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=BCX5VGylvdLDFWMgF+gAVvIrZMsJWCC/4rYyshe37Xj11Bm4A4nExztO91TntwrGxuUu1LE004uClROg5AeLNPOYNg5qLix2ltc1qje56HpXGa0rnOCQAflmEsDghh4QAw8xdC1fSJmckncACZgKtFe1NDFbBBHW+RiqjHcoRHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c8HUMDRE; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740995372;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=lgxwgajyq4P6106FWVM5wzEqLIj/uo0VoFw3+ApJOac=;
+	b=c8HUMDREDY2Qg1dHUGKhHr/L2twQIrpAnhL5d5IoyLVl32NTFdig2P4DrdQEHpIZ9kuLGk
+	HY0E9Xapwhpmax5uwn2OhD/tNTR67cGhq0V7FdJ4JACvlJIeGQvwFtyzmPDfWccXl/LdSu
+	EMyoF5/5bsPSwwv9/lgODNuvZrUXfKc=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-86-PH4J_WTxON2cY-VhhY_7dQ-1; Mon,
+ 03 Mar 2025 04:49:18 -0500
+X-MC-Unique: PH4J_WTxON2cY-VhhY_7dQ-1
+X-Mimecast-MFC-AGG-ID: PH4J_WTxON2cY-VhhY_7dQ_1740995357
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ED58A190ECDF;
+	Mon,  3 Mar 2025 09:49:16 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.32.200])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B6AD319560AA;
+	Mon,  3 Mar 2025 09:49:11 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <brauner@kernel.org>
+cc: David Howells <dhowells@redhat.com>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Jakub Kicinski <kuba@kernel.org>,
+    "David S.
+ Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+    linux-afs@lists.infradead.org, linux-fsdevel@lists.infradead.org,
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [GIT PULL v3] afs, rxrpc: Clean up refcounting on afs_cell and afs_server records
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: siemens.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DU0PR10MB6828.EURPRD10.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: c28ea37c-583f-42ff-e2f8-08dd5a384243
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Mar 2025 09:46:23.2700
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 38ae3bcd-9579-4fd4-adda-b42e1495d55a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: n9KbqeSQe+qgL3hKxByzn6HLE5XfM2N0CYZTsnYLyiKEanCV55816kD+cx1gla7t5lh119vGicLpErVu3RBm27rdVYRv6ALGEunTFQDfj0c=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS5PR10MB8079
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3761343.1740995350.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 03 Mar 2025 09:49:10 +0000
+Message-ID: <3761344.1740995350@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-T24gRnJpLCAyMDI1LTAyLTIxIGF0IDIzOjEyICswMTAwLCBGcmVkZXJpYyBXZWlzYmVja2VyIHdy
-b3RlOg0KPiBMZSBGcmksIEZlYiAyMSwgMjAyNSBhdCAxMjo1OToyNlBNIC0wNTAwLCBKb2UgRGFt
-YXRvIGEgw6ljcml0IDoNCj4gPiBPbiBGcmksIEZlYiAyMSwgMjAyNSBhdCAwNjozMDowOVBNICsw
-MTAwLCBGcmVkZXJpYyBXZWlzYmVja2VyDQo+ID4gd3JvdGU6DQo+ID4gPiBuYXBpX3NjaGVkdWxl
-KCkgaXMgZXhwZWN0ZWQgdG8gYmUgY2FsbGVkIGVpdGhlcjoNCj4gPiA+IA0KPiA+ID4gKiBGcm9t
-IGFuIGludGVycnVwdCwgd2hlcmUgcmFpc2VkIHNvZnRpcnFzIGFyZSBoYW5kbGVkIG9uIElSUQ0K
-PiA+ID4gZXhpdA0KPiA+ID4gDQo+ID4gPiAqIEZyb20gYSBzb2Z0aXJxIGRpc2FibGVkIHNlY3Rp
-b24sIHdoZXJlIHJhaXNlZCBzb2Z0aXJxcyBhcmUNCj4gPiA+IGhhbmRsZWQgb24NCj4gPiA+IMKg
-IHRoZSBuZXh0IGNhbGwgdG8gbG9jYWxfYmhfZW5hYmxlKCkuDQo+ID4gPiANCj4gPiA+ICogRnJv
-bSBhIHNvZnRpcnEgaGFuZGxlciwgd2hlcmUgcmFpc2VkIHNvZnRpcnFzIGFyZSBoYW5kbGVkIG9u
-DQo+ID4gPiB0aGUgbmV4dA0KPiA+ID4gwqAgcm91bmQgaW4gZG9fc29mdGlycSgpLCBvciBmdXJ0
-aGVyIGRlZmVycmVkIHRvIGEgZGVkaWNhdGVkDQo+ID4gPiBrdGhyZWFkLg0KPiA+ID4gDQo+ID4g
-PiBPdGhlciBiYXJlIHRhc2tzIGNvbnRleHQgbWF5IGVuZCB1cCBpZ25vcmluZyB0aGUgcmFpc2Vk
-IE5FVF9SWA0KPiA+ID4gdmVjdG9yDQo+ID4gPiB1bnRpbCB0aGUgbmV4dCByYW5kb20gc29mdGly
-cSBoYW5kbGluZyBvcHBvcnR1bml0eSwgd2hpY2ggbWF5IG5vdA0KPiA+ID4gaGFwcGVuIGJlZm9y
-ZSBhIHdoaWxlIGlmIHRoZSBDUFUgZ29lcyBpZGxlIGFmdGVyd2FyZHMgd2l0aCB0aGUNCj4gPiA+
-IHRpY2sNCj4gPiA+IHN0b3BwZWQuDQo+ID4gPiANCj4gPiA+IFN1Y2ggIm1pc3VzZXMiIGhhdmUg
-YmVlbiBkZXRlY3RlZCBvbiBzZXZlcmFsIHBsYWNlcyB0aGFua3MgdG8NCj4gPiA+IG1lc3NhZ2Vz
-DQo+ID4gPiBvZiB0aGUga2luZDoNCj4gPiA+IA0KPiA+ID4gCSJOT0haIHRpY2stc3RvcCBlcnJv
-cjogbG9jYWwgc29mdGlycSB3b3JrIGlzIHBlbmRpbmcsDQo+ID4gPiBoYW5kbGVyICMwOCEhISIN
-Cj4gPiANCj4gPiBNaWdodCBiZSBoZWxwZnVsIHRvIGluY2x1ZGUgdGhlIHN0YWNrIHRyYWNlIG9m
-IHRoZSBvZmZlbmRlciB5b3UgZGlkDQo+ID4gZmluZCB3aGljaCBsZWQgdG8gdGhpcyBjaGFuZ2U/
-DQo+IA0KPiBUaGVyZSBhcmUgc2V2ZXJhbCBvZiB0aGVtLiBIZXJlIGlzIG9uZSBleGFtcGxlOg0K
-PiANCj4gCV9fcmFpc2Vfc29mdGlycV9pcnFvZmYNCj4gCV9fbmFwaV9zY2hlZHVsZQ0KPiAJcnRs
-ODE1Ml9ydW50aW1lX3Jlc3VtZS5pc3JhLjANCj4gCXJ0bDgxNTJfcmVzdW1lDQo+IAl1c2JfcmVz
-dW1lX2ludGVyZmFjZS5pc3JhLjANCj4gCXVzYl9yZXN1bWVfYm90aA0KPiAJX19ycG1fY2FsbGJh
-Y2sNCj4gCXJwbV9jYWxsYmFjaw0KPiAJcnBtX3Jlc3VtZQ0KPiAJX19wbV9ydW50aW1lX3Jlc3Vt
-ZQ0KPiAJdXNiX2F1dG9yZXN1bWVfZGV2aWNlDQo+IAl1c2JfcmVtb3RlX3dha2V1cA0KPiAJaHVi
-X2V2ZW50DQo+IAlwcm9jZXNzX29uZV93b3JrDQo+IAl3b3JrZXJfdGhyZWFkDQo+IAlrdGhyZWFk
-DQo+IAlyZXRfZnJvbV9mb3JrDQo+IAlyZXRfZnJvbV9mb3JrX2FzbQ0KPiANCj4gVGhlcmUgaXMg
-YWxzbyBkcml2ZXJzL25ldC91c2IvcjgxNTIuYzo6cnRsX3dvcmtfZnVuY190DQo+IA0KPiBBbmQg
-YWxzbyBuZXRkZXZzaW06DQo+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL25ldGRldi8yMDI1MDIx
-OS1uZXRkZXZzaW0tdjMtMS04MTFlMmI4YWJjNGNAZGViaWFuLm9yZy8NCj4gDQo+IEFuZCBwcm9i
-YWJseSBvdGhlcnMuLi4NCg0KSGksIHRoYW5rcyBmb3IgYnJpbmdpbmcgdGhpcyB1cC4gVGhpcyB0
-b3BpYyBpcyBjdXJyZW50bHkgYWxzbyBkaXNjdXNzZWQNCm9uIHRoZSBsaW51eC1ydC11c2VycyBs
-aXN0LiArQ0MgU2ViYXN0aWFuLg0KDQpodHRwczovL3d3dy5zcGluaWNzLm5ldC9saXN0cy9saW51
-eC1ydC11c2Vycy9tc2cyODMxNy5odG1sDQoNCg0KPiANCj4gSSBwcm9wb3NlZCBhIHJ1bnRpbWUg
-ZGV0ZWN0aW9uIGhlcmU6DQo+IA0KPiDCoA0KPiBodHRwczovL2xvcmUua2VybmVsLm9yZy9sa21s
-LzIwMjUwMjEyMTc0MzI5LjUzNzkzLTItZnJlZGVyaWNAa2VybmVsLm9yZy8NCg0KSXQgd291bGQg
-YmUgcHJldHR5IGhlbHBmdWwgdG8gaGF2ZSBhIHRyYWNlcG9pbnQgdGhlcmUgdG8gZWFzaWx5IGdl
-dA0KY2FsbHN0YWNrcyBpbiBjYXNlIHRoZSB3YXJuaW5nIGhhcHBlbnMuIEN1cnJlbnRseSB3ZSBh
-cmUgdHJhY2luZyB0aGlzDQpieSBhZGRpbmcgYSBmaWx0ZXIgb24gdGhlIHByaW50ayBtZXNzYWdl
-Lg0KDQo+IA0KPiBCdXQgSSBwbGFuIHRvIGFjdHVhbGx5IGludHJvZHVjZSBhIG1vcmUgZ2VuZXJp
-YyBkZXRlY3Rpb24gaW4NCj4gX19yYWlzZV9zb2Z0aXJxX2lycXNvZmYoKSBpdHNlbGYgaW5zdGVh
-ZC4NCj4gwqANCj4gPiBCYXNlZCBvbiB0aGUgc2NvcGUgb2YgdGhlIHByb2JsZW0gaXQgbWlnaHQg
-YmUgYmV0dGVyIHRvIGZpeCB0aGUNCj4gPiBrbm93biBvZmZlbmRlcnMgYW5kIGFkZCBhIFdBUk5f
-T05fT05DRSBvciBzb21ldGhpbmcgaW5zdGVhZCBvZiB0aGUNCj4gPiBwcm9wb3NlZCBjaGFuZ2U/
-IE5vdCBzdXJlLCBidXQgaGF2aW5nIG1vcmUgaW5mb3JtYXRpb24gbWlnaHQgaGVscA0KPiA+IG1h
-a2UgdGhhdCBkZXRlcm1pbmF0aW9uLg0KPiANCj4gV2VsbCwgYmFzZWQgb24gdGhlIGZpeCBwcm9w
-b3NhbCBJIHNlZSBoZXJlOg0KPiBodHRwczovL2xvcmUua2VybmVsLm9yZy9uZXRkZXYvMjAyNTAy
-MTktbmV0ZGV2c2ltLXYzLTEtODExZTJiOGFiYzRjQGRlYmlhbi5vcmcvDQo+IA0KPiBJIHRoaW5r
-IHRoYXQgZml4aW5nIHRoaXMgb24gdGhlIGNhbGxlciBsZXZlbCBjYW4gYmUgdmVyeSBlcnJvciBw
-cm9uZQ0KPiBhbmQgaW52b2x2ZSBuYXN0eSB3b3JrYXJvdW5kcy4NCj4gDQo+IE9oIHlvdSBqdXN0
-IG1hZGUgbWUgbG9vayBhdCB0aGUgcGFzdDoNCj4gDQo+IMKgIDAxOWVkZDAxZDE3NCAoImF0aDEw
-azogc2RpbzogQWRkIG1pc3NpbmcgQkggbG9ja2luZyBhcm91bmQNCj4gbmFwaV9zY2hkdWxlKCki
-KQ0KPiDCoCAzMzAwNjg1ODkzODkgKCJpZHBmOiBkaXNhYmxlIGxvY2FsIEJIIHdoZW4gc2NoZWR1
-bGluZyBuYXBpIGZvcg0KPiBtYXJrZXIgcGFja2V0cyIpDQo+IMKgIGUzZDVkNzBjYjQ4MyAoIm5l
-dDogbGFuNzh4eDogZml4ICJzb2Z0aXJxIHdvcmsgaXMgcGVuZGluZyIgZXJyb3IiKQ0KPiDCoCBl
-NTVjMjdlZDljY2YgKCJtdDc2OiBtdDc2MTU6IGFkZCBtaXNzaW5nIGJoLWRpc2FibGUgYXJvdW5k
-IHJ4IG5hcGkNCj4gc2NoZWR1bGUiKQ0KPiDCoCBjMDE4MmFhOTg1NzAgKCJtdDc2OiBtdDc5MTU6
-IGFkZCBtaXNzaW5nIGJoLWRpc2FibGUgYXJvdW5kIHR4IG5hcGkNCj4gZW5hYmxlL3NjaGVkdWxl
-IikNCj4gwqAgOTcwYmUxZGZmMjZkICgibXQ3NjogZGlzYWJsZSBCSCBhcm91bmQgbmFwaV9zY2hl
-ZHVsZSgpIGNhbGxzIikNCj4gwqAgMDE5ZWRkMDFkMTc0ICgiYXRoMTBrOiBzZGlvOiBBZGQgbWlz
-c2luZyBCSCBsb2NraW5nIGFyb3VuZA0KPiBuYXBpX3NjaGR1bGUoKSIpDQo+IMKgIDMwYmZlYzRm
-ZWM1OSAoImNhbjogcngtb2ZmbG9hZDoNCj4gY2FuX3J4X29mZmxvYWRfdGhyZWFkZWRfaXJxX2Zp
-bmlzaCgpOiBhZGQgbmV3wqAgZnVuY3Rpb24gdG8gYmUgY2FsbGVkDQo+IGZyb20gdGhyZWFkZWQg
-aW50ZXJydXB0IikNCj4gwqAgZTYzMDUyYTVkZDNjICgibWx4NWU6IGFkZCBhZGQgbWlzc2luZyBC
-SCBsb2NraW5nIGFyb3VuZA0KPiBuYXBpX3NjaGR1bGUoKSIpDQo+IMKgIDgzYTBjNmU1ODkwMSAo
-Imk0MGU6IEludm9rZSBzb2Z0aXJxcyBhZnRlciBuYXBpX3Jlc2NoZWR1bGUiKQ0KPiDCoCBiZDRj
-ZTk0MWM4ZDUgKCJtbHg0OiBJbnZva2Ugc29mdGlycXMgYWZ0ZXIgbmFwaV9yZXNjaGVkdWxlIikN
-Cj4gwqAgOGNmNjk5ZWM4NDlmICgibWx4NDogZG8gbm90IGNhbGwgbmFwaV9zY2hlZHVsZSgpIHdp
-dGhvdXQgY2FyZSIpDQo+IMKgIGVjMTNlZTgwMTQ1YyAoInZpcnRpb19uZXQ6IGludm9rZSBzb2Z0
-aXJxcyBhZnRlciBfX25hcGlfc2NoZWR1bGUiKQ0KPiANCj4gSSB0aGluayB0aGlzIGp1c3Qgc2hv
-d3MgaG93IHN1Y2Nlc3NmdWwgaXQgaGFzIGJlZW4gdG8gbGVhdmUgdGhlDQo+IHJlc3BvbnNpYmls
-aXR5IHRvIHRoZQ0KPiBjYWxsZXIgc28gZmFyLg0KPiANCj4gQW5kIGFsc28gbm90ZSB0aGF0IHRo
-ZXNlIGlzc3VlcyBhcmUgcmVwb3J0ZWQgZm9yIHllYXJzIHNvbWV0aW1lcw0KPiBmaXJzdGhhbmQg
-dG8gdXMNCj4gaW4gdGhlIHRpbWVyIHN1YnN5c3RlbSBiZWNhdXNlIHRoaXMgaXMgdGhlIHBsYWNl
-IHdoZXJlIHdlIGRldGVjdA0KPiBlbnRlcmluZyBpbiBpZGxlDQo+IHdpdGggc29mdGlycXMgcGVu
-ZGluZy4NCj4gDQo+ID4gDQo+ID4gPiBUaGVyZWZvcmUgZml4IHRoaXMgZnJvbSBuYXBpX3NjaGVk
-dWxlKCkgaXRzZWxmIHdpdGggd2FraW5nIHVwDQo+ID4gPiBrc29mdGlycWQNCj4gPiA+IHdoZW4g
-c29mdGlycXMgYXJlIHJhaXNlZCBmcm9tIHRhc2sgY29udGV4dHMuDQo+ID4gPiANCj4gPiA+IFJl
-cG9ydGVkLWJ5OiBQYXVsIE1lbnplbCA8cG1lbnplbEBtb2xnZW4ubXBnLmRlPg0KPiA+ID4gQ2xv
-c2VzOiAzNTRhMjY5MC05YmJmLTRjY2ItODc2OS1mYTk0NzA3YTkzNDBAbW9sZ2VuLm1wZy5kZQ0K
-PiA+IA0KPiA+IEFGQUlVLCBDbG9zZXMgdGFncyBzaG91bGQgcG9pbnQgdG8gVVJMcyBub3QgbWVz
-c2FnZSBJRHMuDQo+IA0KPiBHb29kIHBvaW50IQ0KPiANCj4gPiANCj4gPiBJZiB0aGlzIGlzIGEg
-Zml4LCB0aGUgc3ViamVjdCBsaW5lIHNob3VsZCBiZToNCj4gPiDCoMKgIFtQQVRDSCBuZXRdDQo+
-IA0KPiBPay4NCj4gDQo+ID4gDQo+ID4gQW5kIHRoZXJlIHNob3VsZCBiZSBhIEZpeGVzIHRhZyBy
-ZWZlcmVuY2luZyB0aGUgU0hBIHdoaWNoIGNhdXNlZA0KPiA+IHRoZQ0KPiA+IGlzc3VlIGFuZCB0
-aGUgcGF0Y2ggc2hvdWxkIENDIHN0YWJsZS4NCj4gDQo+IEF0IGxlYXN0IHNpbmNlIGJlYTMzNDhl
-ZWYyNyAoIltORVRdOiBNYWtlIE5BUEkgcG9sbGluZyBpbmRlcGVuZGVudCBvZg0KPiBzdHJ1Y3QN
-Cj4gbmV0X2RldmljZSBvYmplY3RzLiIpLiBJdCdzIGhhcmQgZm9yIG1lIHRvIGJlIHN1cmUgaXQn
-cyBub3Qgb2xkZXIuDQoNCldlIHNhdyB0aGlzIG1lc3NhZ2UgYXQgbGVhc3Qgb24gdGhlIGZvbGxv
-d2luZyBrZXJuZWwgdmVyc2lvbnMgYXMgd2VsbDoNCg0KLSB2Ni4xLjkwLXJ0IChEZWJpYW4gLXJ0
-IGtlcm5lbCkNCi0gdjYuMS4xMjAtcnQgKERlYmlhbiAtcnQga2VybmVsKQ0KLSB2Ni4xLjExOS1y
-dDQ1IChTbyB5ZXMsIHRoaXMgaXMgYWxzbyBhZmZlY3RlZCkNCi0gdjYuMS4xMjAtcnQ0Nw0KDQpG
-ZWxpeA0KDQo+IA0KPiANCj4gPiANCj4gPiBTZWU6DQo+ID4gDQo+ID4gaHR0cHM6Ly93d3cua2Vy
-bmVsLm9yZy9kb2MvaHRtbC92Ni4xMy9wcm9jZXNzL21haW50YWluZXItbmV0ZGV2Lmh0bWwjbmV0
-ZGV2LWZhcQ0KPiANCj4gVGhhbmtzLg0KDQotLSANClNpZW1lbnMgQUcNCkxpbnV4IEV4cGVydCBD
-ZW50ZXINCkZyaWVkcmljaC1MdWR3aWctQmF1ZXItU3RyLiAzDQo4NTc0OCBHYXJjaGluZywgR2Vy
-bWFueQ0KDQoNCg==
+Hi Christian,
+
+Could you pull this into the VFS tree onto a stable branch, replacing the
+earlier pull?  The patches were previously posted here as part of a longer
+series:
+
+  https://lore.kernel.org/r/20250224234154.2014840-1-dhowells@redhat.com/
+
+This fixes an occasional hang that's only really encountered when rmmod'in=
+g
+the kafs module, one of the reasons why I'm proposing it for the next merg=
+e
+window rather than immediate upstreaming.  The changes include:
+
+ (1) Remove the "-o autocell" mount option.  This is obsolete with the
+     dynamic root and removing it makes the next patch slightly easier.
+
+ (2) Change how the dynamic root mount is constructed.  Currently, the roo=
+t
+     directory is (de)populated when it is (un)mounted if there are cells
+     already configured and, further, pairs of automount points have to be
+     created/removed each time a cell is added/deleted.
+
+     This is changed so that readdir on the root dir lists all the known
+     cell automount pairs plus the @cell symlinks and the inodes and
+     dentries are constructed by lookup on demand.  This simplifies the
+     cell management code.
+
+ (3) A few improvements to the afs_volume tracepoint.
+
+ (4) A few improvements to the afs_server tracepoint.
+
+ (5) Pass trace info into the afs_lookup_cell() function to allow the trac=
+e
+     log to indicate the purpose of the lookup.
+
+ (6) Remove the 'net' parameter from afs_unuse_cell() as it's superfluous.
+
+ (7) In rxrpc, allow a kernel app (such as kafs) to store a word of
+     information on rxrpc_peer records.
+
+ (8) Use the information stored on the rxrpc_peer record to point to the
+     afs_server record.  This allows the server address lookup to be done
+     away with.
+
+ (9) Simplify the afs_server ref/activity accounting to make each one
+     self-contained and not garbage collected from the cell management wor=
+k
+     item.
+
+(10) Simplify the afs_cell ref/activity accounting to make each one of
+     these also self-contained and not driven by a central management work
+     item.
+
+     The current code was intended to make it such that a single timer for
+     the namespace and one work item per cell could do all the work
+     required to maintain these records.  This, however, made for some
+     sequencing problems when cleaning up these records.  Further, the
+     attempt to pass refs along with timers and work items made getting it
+     right rather tricky when the timer or work item already had a ref
+     attached and now a ref had to be got rid of.
+
+Thanks,
+David
+
+Changes
+=3D=3D=3D=3D=3D=3D=3D
+ver #3)
+ - Fix the fix for an error check of the form "unsigned value < 0".
+
+ver #2)
+ - Fix an error check of the form "unsigned value < 0".
+
+Link: https://lore.kernel.org/r//3190716.1740733119@warthog.procyon.org.uk=
+/ # v1
+Link: https://lore.kernel.org/r//3399677.1740754398@warthog.procyon.org.uk=
+/ # v2
+
+---
+The following changes since commit 1e15510b71c99c6e49134d756df91069f7d1814=
+1:
+
+  Merge tag 'net-6.14-rc5' of git://git.kernel.org/pub/scm/linux/kernel/gi=
+t/netdev/net (2025-02-27 09:32:42 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags=
+/afs-next-20250303
+
+for you to fetch changes up to 73f77882c18d849cc8a26e5f06af5e6116169aba:
+
+  afs: Simplify cell record handling (2025-03-03 09:44:36 +0000)
+
+----------------------------------------------------------------
+afs: Fix ref leak in rmmod
+
+----------------------------------------------------------------
+David Howells (10):
+      afs: Remove the "autocell" mount option
+      afs: Change dynroot to create contents on demand
+      afs: Improve afs_volume tracing to display a debug ID
+      afs: Improve server refcount/active count tracing
+      afs: Make afs_lookup_cell() take a trace note
+      afs: Drop the net parameter from afs_unuse_cell()
+      rxrpc: Allow the app to store private data on peer structs
+      afs: Use the per-peer app data provided by rxrpc
+      afs: Fix afs_server ref accounting
+      afs: Simplify cell record handling
+
+ fs/afs/addr_list.c         |  50 ++++
+ fs/afs/cell.c              | 437 ++++++++++++++------------------
+ fs/afs/cmservice.c         |  82 +------
+ fs/afs/dir.c               |   5 +-
+ fs/afs/dynroot.c           | 484 +++++++++++++++---------------------
+ fs/afs/fs_probe.c          |  32 ++-
+ fs/afs/fsclient.c          |   4 +-
+ fs/afs/internal.h          |  98 ++++----
+ fs/afs/main.c              |  16 +-
+ fs/afs/mntpt.c             |   5 +-
+ fs/afs/proc.c              |  15 +-
+ fs/afs/rxrpc.c             |   8 +-
+ fs/afs/server.c            | 601 +++++++++++++++++++---------------------=
+-----
+ fs/afs/server_list.c       |   6 +-
+ fs/afs/super.c             |  25 +-
+ fs/afs/vl_alias.c          |   7 +-
+ fs/afs/vl_rotate.c         |   2 +-
+ fs/afs/volume.c            |  15 +-
+ include/net/af_rxrpc.h     |   2 +
+ include/trace/events/afs.h |  83 ++++---
+ net/rxrpc/ar-internal.h    |   1 +
+ net/rxrpc/peer_object.c    |  30 ++-
+ 22 files changed, 904 insertions(+), 1104 deletions(-)
+
 
