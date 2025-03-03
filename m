@@ -1,365 +1,497 @@
-Return-Path: <netdev+bounces-171329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D1CFA4C8B9
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:06:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F396A4C8BE
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:07:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD7FB18843CE
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:02:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6C3C189D83D
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:03:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6B8A24BCE8;
-	Mon,  3 Mar 2025 16:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3DF4214A80;
+	Mon,  3 Mar 2025 16:45:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M35Hv3gc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jjr2KC02"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5880222597
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 16:43:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36CAA2139BF;
+	Mon,  3 Mar 2025 16:45:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741020192; cv=none; b=RvTLKkEVo16AA4Mcx6qBsOYwyS7MQYemQPp2KTZHyai0pantvaQeHPkVD+1JaFONHTdAFIxtzumgbdFcYDEhzMhCtFCPF60q/ve1OfTt5k/dDpiB8SVT9G/OIEzvlwJGm8u/mku7uJi+OnakUr5tbs3Urp27zcFugYbQuGsYFTM=
+	t=1741020359; cv=none; b=u9c5YQPatkD3ccd2I4IYpq2x/oF9o5wmIrjNwmVoa5eYxRfbAmHRt8rvb+k+fhFE/TN8NFYrj+1PDUgUIDgkxgOQisnzE7uywvVT2poeBtTzF20XVrGfymrBGpiL/pDDDqLqrNrDAWBeV8IU3HEKGx9ofTm0ONOmTNZ9rbGnqyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741020192; c=relaxed/simple;
-	bh=Ldfa3ICsZqK1MEnOb39e6i3BC9nu1psOSb7s+tzC2hQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=craYlkgOs57Uuy9lE124bHwJ+QNqzE6u1kJop9Blgt8qJ5YEE8CxO7lonRWg1BmzJWLjt7YAP0qmmki4CL0fg++Xn0jWgDvWiBFEXS3c61f63umVFiFgPZR46aKRz9ducxBbt0zCWL/XDoaIHr0KhyE5jHfu8K6KgxYIcxl9zpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M35Hv3gc; arc=none smtp.client-ip=209.85.222.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-86b5515dd5fso1075490241.1
-        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 08:43:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741020190; x=1741624990; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cpiT7OrQ9p1acOYuuauaz9/VW19FEFR2NpErgZa/KJ0=;
-        b=M35Hv3gc5bn22rjD5l5KZAmK2dU+FlaO3fZHzkxZE3Ou84pJLXZ3U8vASK6/QeRvLZ
-         cVd0nhUtmtWLNOXTHGOX2IQGdZtiHMnO67xlIr1NAXyt4SFGmQEYhSjyHyM8yUdknOkO
-         DVm/swB1TfXO/kF2B8k/eZYvPSZ4yC6/eWP3WbwymDr5GkbB99eHXjzfqOH2c+oFl8bj
-         p7x7qNf1e70myJ9UfieZT0B4D1sfWUYEVVZCljx3da3Ubxcv5zrwq/IjPPZNAzxcQV10
-         zi8sFOjmu3nMfY+HT4pxfW8vBz3I7Cv3YhJ5sFm+QuvPr4zjhBeytChjf+Wfmwl4GYm/
-         wnNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741020190; x=1741624990;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cpiT7OrQ9p1acOYuuauaz9/VW19FEFR2NpErgZa/KJ0=;
-        b=Ldumz+vWv033Bo6baNQeNsO0hZeNA7da8RZtKVoi4cZsSLgDTzgbly8jZ0NFf9itAB
-         K825lNvpABxPY2W+gv1Wb7wavncdVGemerDyT2CGxYdsrt2RYOGfAgHSriMV9Z3hgfRx
-         arIGlSeVwmR/hnhHRCberuH4H3tRXsdfLJY2eayXF38TLy7y2a3yQuOBoc1U4JFsVBTU
-         mHn/gefWP5Qc6N4GBUV+PoQrChbpdtMU7XKuaJKcyCOOuMO7DUt1WWC03LYk2/b3rmnY
-         DblU4WRhkzgdjiI1Q3d6IbLtSnegd9GRFgmAem/4YFix5rhpkE7BBV6mAOpFGHhZLsUs
-         lWFg==
-X-Gm-Message-State: AOJu0Ywlgf6oysBR1gSe6R+QadE7UXBBy2PHzhX0PINJy+qsRz2DANiE
-	KSuwb1lIwjB3/YNA6+Wvnr+Ydi++9WLn39FAKHtppKvF8Ph7OmOCsLFyRx80l42Kz1NExEv/dKY
-	vdvjW8Z2Y3AV/U6ho9w9Ux0gh1RY=
-X-Gm-Gg: ASbGncsL2fFBKrVHourzJrROt8zOouXCkx0Ace60niL0VUcubh7QZx59lwoa3vtR0WO
-	3397A2KtJMDTD9Ub762SmqS8/0Wo1CLBN+GXZHDbIp1CIlv5X4fCPvM+1zpeM3/55YFPh0UFJQJ
-	7sQHtdKLGykb9G22YWC+xQWyVO
-X-Google-Smtp-Source: AGHT+IFJorKCVWiV59srdPl8LGFyUvQsCPfBm57auwC9Y6f8Na27LBlNhR2v/YPJ3ODlXK0DBnBb7VrM/628YEnyuWQ=
-X-Received: by 2002:a05:6102:c10:b0:4bb:e8c5:b172 with SMTP id
- ada2fe7eead31-4c044945333mr9393121137.8.1741020189617; Mon, 03 Mar 2025
- 08:43:09 -0800 (PST)
+	s=arc-20240116; t=1741020359; c=relaxed/simple;
+	bh=YLTJ+B+cOSpqopBANQSE0+6yHazV+qbiqFfX4wXOAeY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nsiX1N8O2zluWjLBqsgLqn3mkyeF70wnVJmj64d0cQjtmTzhkpEmxluH4rHUqV1yo5PfLoh6SuL69tiYnJgDuxVWFaB5TIN/spovlejDxPipCYHPJdLeJNmUijCfGpffNFLAeD8NOycYPb+wLtBl2Z4tzIv7yGp5HPUCU8I6j00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jjr2KC02; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741020358; x=1772556358;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=YLTJ+B+cOSpqopBANQSE0+6yHazV+qbiqFfX4wXOAeY=;
+  b=jjr2KC02e25XEg1Pw4AJAyQ9voxlNXZDuhNv4/HQkYojHtcJesnnpq0E
+   t9/ouJ1GsnhASLmivrN/ErBJdhFYkFZ0tXCvoU2xfrhMjijwG4YqFwAHE
+   doIkNkilt+RTNpSyovxdAX/a2OQCMEHbc8Xf66VZnV7KzTSLpXPt552Ug
+   U0AuvriAE1ixLWAbTQbD6sqzofvo4DTHMFcGwVp++37hzVZOlN9L6limr
+   Rz+c0WbRuzalTbNNwMm2rN9rpsRe5Vj3nZsERszkxgP0aFmHd/MJXZBju
+   MXkM7ZHIqJw4Bj066gALczyLleBhgsp776Zxl9psUeMrhCKqAcZDD93s6
+   w==;
+X-CSE-ConnectionGUID: +tCVrWHHSpGcnzHPgpW0pg==
+X-CSE-MsgGUID: Dz8Qj0PmS5S/Nu8mcOmV9A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="52883393"
+X-IronPort-AV: E=Sophos;i="6.13,330,1732608000"; 
+   d="scan'208";a="52883393"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 08:45:57 -0800
+X-CSE-ConnectionGUID: 94NgsdwCTtG0LEH2vyK0og==
+X-CSE-MsgGUID: l4Tug+E7SOmlJ8JHGeOlYg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="123321790"
+Received: from kcaccard-desk.amr.corp.intel.com (HELO [10.125.109.29]) ([10.125.109.29])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 08:45:55 -0800
+Message-ID: <01e4b8ad-82dd-43ac-92b9-3b3a030f86bc@intel.com>
+Date: Mon, 3 Mar 2025 09:45:52 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <6b9347d5c1a0b364e88d900b29a616c3f8e5b1ca.1723483073.git.lucien.xin@gmail.com>
- <2ee4d016-5e57-4d86-9dca-e4685cb183bb@nvidia.com> <CADvbK_ft=B310a9dcwgnwDrPKsxhicKJ4v9wAdgPSHhG+gPjLw@mail.gmail.com>
- <5ab59f2d-1c22-4602-95ab-a247b5bf048e@nvidia.com> <CADvbK_draP9X9OWXEYTKrP0_ekjgNu9PYPp6GUkvu-3L24SRYg@mail.gmail.com>
- <CADvbK_cungrr_D5VAiL8C+FSJEoLFYtMxV5foU0XA9E4zrcegA@mail.gmail.com> <7061a416-56cb-4751-8576-8071c2205d70@nvidia.com>
-In-Reply-To: <7061a416-56cb-4751-8576-8071c2205d70@nvidia.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Mon, 3 Mar 2025 11:42:57 -0500
-X-Gm-Features: AQ5f1JpZiFIlT7li9G4na9VfWCEO71AopRs8naFPmrOJcOK8WzC6Kg2LohvhwFI
-Message-ID: <CADvbK_faagwC4q0vNEeW7Eu7SZbXuVjULXo3kg7JS16cF+cmig@mail.gmail.com>
-Subject: Re: [PATCHv2 net-next] openvswitch: switch to per-action label
- counting in conntrack
-To: Jianbo Liu <jianbol@nvidia.com>
-Cc: network dev <netdev@vger.kernel.org>, dev@openvswitch.org, ovs-dev@openvswitch.org, 
-	davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Pravin B Shelar <pshelar@ovn.org>, Ilya Maximets <i.maximets@ovn.org>, 
-	Aaron Conole <aconole@redhat.com>, Florian Westphal <fw@strlen.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 4/6] pds_fwctl: initial driver framework
+To: Shannon Nelson <shannon.nelson@amd.com>, jgg@nvidia.com,
+ andrew.gospodarek@broadcom.com, aron.silverton@oracle.com,
+ dan.j.williams@intel.com, daniel.vetter@ffwll.ch, dsahern@kernel.org,
+ gregkh@linuxfoundation.org, hch@infradead.org, itayavr@nvidia.com,
+ jiri@nvidia.com, Jonathan.Cameron@huawei.com, kuba@kernel.org,
+ lbloch@nvidia.com, leonro@nvidia.com, linux-cxl@vger.kernel.org,
+ linux-rdma@vger.kernel.org, netdev@vger.kernel.org, saeedm@nvidia.com
+Cc: brett.creeley@amd.com
+References: <20250301013554.49511-1-shannon.nelson@amd.com>
+ <20250301013554.49511-5-shannon.nelson@amd.com>
+Content-Language: en-US
+From: Dave Jiang <dave.jiang@intel.com>
+In-Reply-To: <20250301013554.49511-5-shannon.nelson@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Mar 2, 2025 at 9:14=E2=80=AFPM Jianbo Liu <jianbol@nvidia.com> wrot=
-e:
->
->
->
-> On 3/3/2025 2:22 AM, Xin Long wrote:
-> > On Tue, Feb 25, 2025 at 9:57=E2=80=AFAM Xin Long <lucien.xin@gmail.com>=
- wrote:
-> >>
-> >> On Mon, Feb 24, 2025 at 8:38=E2=80=AFPM Jianbo Liu <jianbol@nvidia.com=
-> wrote:
-> >>>
-> >>>
-> >>>
-> >>> On 2/25/2025 3:55 AM, Xin Long wrote:
-> >>>> On Mon, Feb 24, 2025 at 4:01=E2=80=AFAM Jianbo Liu <jianbol@nvidia.c=
-om> wrote:
-> >>>>>
-> >>>>>
-> >>>>>
-> >>>>> On 8/13/2024 1:17 AM, Xin Long wrote:
-> >>>>>> Similar to commit 70f06c115bcc ("sched: act_ct: switch to per-acti=
-on
-> >>>>>> label counting"), we should also switch to per-action label counti=
-ng
-> >>>>>> in openvswitch conntrack, as Florian suggested.
-> >>>>>>
-> >>>>>> The difference is that nf_connlabels_get() is called unconditional=
-ly
-> >>>>>> when creating an ct action in ovs_ct_copy_action(). As with these
-> >>>>>> flows:
-> >>>>>>
-> >>>>>>      table=3D0,ip,actions=3Dct(commit,table=3D1)
-> >>>>>>      table=3D1,ip,actions=3Dct(commit,exec(set_field:0xac->ct_labe=
-l),table=3D2)
-> >>>>>>
-> >>>>>> it needs to make sure the label ext is created in the 1st flow bef=
-ore
-> >>>>>> the ct is committed in ovs_ct_commit(). Otherwise, the warning in
-> >>>>>> nf_ct_ext_add() when creating the label ext in the 2nd flow will
-> >>>>>> be triggered:
-> >>>>>>
-> >>>>>>       WARN_ON(nf_ct_is_confirmed(ct));
-> >>>>>>
-> >>>>>
-> >>>>> Hi Xin Long,
-> >>>>>
-> >>>>> The ct can be committed before openvswitch handles packets with CT
-> >>>>> actions. And we can trigger the warning by creating VF and running =
-ping
-> >>>>> over it with the following configurations:
-> >>>>>
-> >>>>> ovs-vsctl add-br br
-> >>>>> ovs-vsctl add-port br eth2
-> >>>>> ovs-vsctl add-port br eth4
-> >>>>> ovs-ofctl add-flow br "table=3D0, in_port=3Deth4,ip,ct_state=3D-trk
-> >>>>> actions=3Dct(table=3D1)"
-> >>>>> ovs-ofctl add-flow br "table=3D1, in_port=3Deth4,ip,ct_state=3D+trk=
-+new
-> >>>>> actions=3Dct(exec(set_field:0xef7d->ct_label), commit), output:eth2=
-"
-> >>>>> ovs-ofctl add-flow br "table=3D1, in_port=3Deth4,ip,ct_label=3D0xef=
-7d,
-> >>>>> ct_state=3D+trk+est actions=3Doutput:eth2"
-> >>>>>
-> >>>>> The eth2 is PF, and eth4 is VF's representor.
-> >>>>> Would you like to fix it?
-> >>>> Hi, Jianbo,
-> >>>>
-> >>>> Sure, we have to attach a new ct to the skb in __ovs_ct_lookup() for
-> >>>> this case, and even delete the one created before ovs_ct.
-> >>>>
-> >>>> Can you check if this works on your env?
-> >>>
-> >>> Yes, it works.
-> >>> Could you please submit the formal patch? Thanks!
-> >> Great, I will post after running some of my local tests.
-> >>
-> > Hi Jianbo,
-> >
-> > I recently ran some tests and observed that the current approach cannot
-> > completely avoid the warning. If an skb enters __ovs_ct_lookup() withou=
-t
-> > an attached connection tracking (ct) entry, it may still acquire an
-> > existing ct created outside of OVS (possibly by netfilter) through
-> > nf_conntrack_in(). This will trigger the warning in ovs_ct_set_labels()=
-.
-> >
-> > Deleting a ct created outside OVS and creating a new one within
-> > __ovs_ct_lookup() doesn't seem reasonable and would be difficult to
->
-> Yes, I'm also skeptical of your temporary fix, and waiting for your
-> formal one.
-Cool.
 
->
-> > implement. However, since OVS is not supposed to use ct entries created
-> > externally, I believe ct zones can be used to prevent this issue.
-> > In your case, the following flows should work:
-> >
-> > ovs-ofctl add-flow br "table=3D0, in_port=3Deth4,ip,ct_state=3D-trk
-> > actions=3Dct(table=3D1,zone=3D1)"
-> > ovs-ofctl add-flow br "table=3D1,
-> > in_port=3Deth4,ip,ct_state=3D+trk+new,ct_zone=3D1
-> > actions=3Dct(exec(set_field:0xef7d->ct_label),commit,zone=3D1),
-> > output:eth2"
-> > ovs-ofctl add-flow br "table=3D1,
-> > in_port=3Deth4,ip,ct_label=3D0xef7d,ct_state=3D+trk+est,ct_zone=3D1
-> > actions=3Doutput:eth2"
-> >
-> > Regarding the warning triggered by externally created ct entries, I pla=
-n
-> > to remove the ovs_ct_get_conn_labels() call from ovs_ct_set_labels() an=
-d
-> > I'll let nf_connlabels_replace() return an error in such cases, similar
-> > to how tcf_ct_act_set_labels() handles this scenario in tc act_ct.
-> >
->
-> It's a good idea to be consistent with act_ct implementation. But, would
-> you like to revert first if it takes long time to work on the fix?
-Sorry, revert which one?
-If you mean the fix in skb_nfct_cached(), it hasn't been posted and
-will not be posted.
 
-Thanks.
->
-> Thanks!
->
-> > Thanks.
-> >>>
-> >>>>
-> >>>> diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntrack=
-.c
-> >>>> index 3bb4810234aa..c599ee013dfe 100644
-> >>>> --- a/net/openvswitch/conntrack.c
-> >>>> +++ b/net/openvswitch/conntrack.c
-> >>>> @@ -595,6 +595,11 @@ static bool skb_nfct_cached(struct net *net,
-> >>>>                rcu_dereference(timeout_ext->timeout))
-> >>>>                return false;
-> >>>>        }
-> >>>> +    if (IS_ENABLED(CONFIG_NF_CONNTRACK_LABELS) && !nf_ct_labels_fin=
-d(ct)) {
-> >>>> +        if (nf_ct_is_confirmed(ct))
-> >>>> +            nf_ct_delete(ct, 0, 0);
-> >>>> +        return false;
-> >>>> +    }
-> >>>>
-> >>>> Thanks.
-> >>>>
-> >>>>>
-> >>>>> Thanks!
-> >>>>> Jianbo
-> >>>>>
-> >>>>>> Signed-off-by: Xin Long <lucien.xin@gmail.com>
-> >>>>>> ---
-> >>>>>> v2: move ovs_net into #if in ovs_ct_exit() as Jakub noticed.
-> >>>>>> ---
-> >>>>>>     net/openvswitch/conntrack.c | 30 ++++++++++++-----------------=
--
-> >>>>>>     net/openvswitch/datapath.h  |  3 ---
-> >>>>>>     2 files changed, 12 insertions(+), 21 deletions(-)
-> >>>>>>
-> >>>>>> diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntra=
-ck.c
-> >>>>>> index 8eb1d644b741..a3da5ee34f92 100644
-> >>>>>> --- a/net/openvswitch/conntrack.c
-> >>>>>> +++ b/net/openvswitch/conntrack.c
-> >>>>>> @@ -1368,11 +1368,8 @@ bool ovs_ct_verify(struct net *net, enum ov=
-s_key_attr attr)
-> >>>>>>             attr =3D=3D OVS_KEY_ATTR_CT_MARK)
-> >>>>>>                 return true;
-> >>>>>>         if (IS_ENABLED(CONFIG_NF_CONNTRACK_LABELS) &&
-> >>>>>> -         attr =3D=3D OVS_KEY_ATTR_CT_LABELS) {
-> >>>>>> -             struct ovs_net *ovs_net =3D net_generic(net, ovs_net=
-_id);
-> >>>>>> -
-> >>>>>> -             return ovs_net->xt_label;
-> >>>>>> -     }
-> >>>>>> +         attr =3D=3D OVS_KEY_ATTR_CT_LABELS)
-> >>>>>> +             return true;
-> >>>>>>
-> >>>>>>         return false;
-> >>>>>>     }
-> >>>>>> @@ -1381,6 +1378,7 @@ int ovs_ct_copy_action(struct net *net, cons=
-t struct nlattr *attr,
-> >>>>>>                        const struct sw_flow_key *key,
-> >>>>>>                        struct sw_flow_actions **sfa,  bool log)
-> >>>>>>     {
-> >>>>>> +     unsigned int n_bits =3D sizeof(struct ovs_key_ct_labels) * B=
-ITS_PER_BYTE;
-> >>>>>>         struct ovs_conntrack_info ct_info;
-> >>>>>>         const char *helper =3D NULL;
-> >>>>>>         u16 family;
-> >>>>>> @@ -1409,6 +1407,12 @@ int ovs_ct_copy_action(struct net *net, con=
-st struct nlattr *attr,
-> >>>>>>                 return -ENOMEM;
-> >>>>>>         }
-> >>>>>>
-> >>>>>> +     if (nf_connlabels_get(net, n_bits - 1)) {
-> >>>>>> +             nf_ct_tmpl_free(ct_info.ct);
-> >>>>>> +             OVS_NLERR(log, "Failed to set connlabel length");
-> >>>>>> +             return -EOPNOTSUPP;
-> >>>>>> +     }
-> >>>>>> +
-> >>>>>>         if (ct_info.timeout[0]) {
-> >>>>>>                 if (nf_ct_set_timeout(net, ct_info.ct, family, key=
-->ip.proto,
-> >>>>>>                                       ct_info.timeout))
-> >>>>>> @@ -1577,6 +1581,7 @@ static void __ovs_ct_free_action(struct ovs_=
-conntrack_info *ct_info)
-> >>>>>>         if (ct_info->ct) {
-> >>>>>>                 if (ct_info->timeout[0])
-> >>>>>>                         nf_ct_destroy_timeout(ct_info->ct);
-> >>>>>> +             nf_connlabels_put(nf_ct_net(ct_info->ct));
-> >>>>>>                 nf_ct_tmpl_free(ct_info->ct);
-> >>>>>>         }
-> >>>>>>     }
-> >>>>>> @@ -2002,17 +2007,9 @@ struct genl_family dp_ct_limit_genl_family =
-__ro_after_init =3D {
-> >>>>>>
-> >>>>>>     int ovs_ct_init(struct net *net)
-> >>>>>>     {
-> >>>>>> -     unsigned int n_bits =3D sizeof(struct ovs_key_ct_labels) * B=
-ITS_PER_BYTE;
-> >>>>>> +#if  IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
-> >>>>>>         struct ovs_net *ovs_net =3D net_generic(net, ovs_net_id);
-> >>>>>>
-> >>>>>> -     if (nf_connlabels_get(net, n_bits - 1)) {
-> >>>>>> -             ovs_net->xt_label =3D false;
-> >>>>>> -             OVS_NLERR(true, "Failed to set connlabel length");
-> >>>>>> -     } else {
-> >>>>>> -             ovs_net->xt_label =3D true;
-> >>>>>> -     }
-> >>>>>> -
-> >>>>>> -#if  IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
-> >>>>>>         return ovs_ct_limit_init(net, ovs_net);
-> >>>>>>     #else
-> >>>>>>         return 0;
-> >>>>>> @@ -2021,12 +2018,9 @@ int ovs_ct_init(struct net *net)
-> >>>>>>
-> >>>>>>     void ovs_ct_exit(struct net *net)
-> >>>>>>     {
-> >>>>>> +#if  IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
-> >>>>>>         struct ovs_net *ovs_net =3D net_generic(net, ovs_net_id);
-> >>>>>>
-> >>>>>> -#if  IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
-> >>>>>>         ovs_ct_limit_exit(net, ovs_net);
-> >>>>>>     #endif
-> >>>>>> -
-> >>>>>> -     if (ovs_net->xt_label)
-> >>>>>> -             nf_connlabels_put(net);
-> >>>>>>     }
-> >>>>>> diff --git a/net/openvswitch/datapath.h b/net/openvswitch/datapath=
-.h
-> >>>>>> index 9ca6231ea647..365b9bb7f546 100644
-> >>>>>> --- a/net/openvswitch/datapath.h
-> >>>>>> +++ b/net/openvswitch/datapath.h
-> >>>>>> @@ -160,9 +160,6 @@ struct ovs_net {
-> >>>>>>     #if IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
-> >>>>>>         struct ovs_ct_limit_info *ct_limit_info;
-> >>>>>>     #endif
-> >>>>>> -
-> >>>>>> -     /* Module reference for configuring conntrack. */
-> >>>>>> -     bool xt_label;
-> >>>>>>     };
-> >>>>>>
-> >>>>>>     /**
-> >>>>>
-> >>>
->
+On 2/28/25 6:35 PM, Shannon Nelson wrote:
+> Initial files for adding a new fwctl driver for the AMD/Pensando PDS
+> devices.  This sets up a simple auxiliary_bus driver that registers
+> with fwctl subsystem.  It expects that a pds_core device has set up
+> the auxiliary_device pds_core.fwctl
+> 
+> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+> ---
+>  MAINTAINERS                    |   7 ++
+>  drivers/fwctl/Kconfig          |  10 ++
+>  drivers/fwctl/Makefile         |   1 +
+>  drivers/fwctl/pds/Makefile     |   4 +
+>  drivers/fwctl/pds/main.c       | 169 +++++++++++++++++++++++++++++++++
+>  include/linux/pds/pds_adminq.h |  77 +++++++++++++++
+>  include/uapi/fwctl/fwctl.h     |   1 +
+>  include/uapi/fwctl/pds.h       |  27 ++++++
+>  8 files changed, 296 insertions(+)
+>  create mode 100644 drivers/fwctl/pds/Makefile
+>  create mode 100644 drivers/fwctl/pds/main.c
+>  create mode 100644 include/uapi/fwctl/pds.h
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 7d2700d1ba0f..a396726feb6f 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -9601,6 +9601,13 @@ T:	git git://linuxtv.org/media.git
+>  F:	Documentation/devicetree/bindings/media/i2c/galaxycore,gc2145.yaml
+>  F:	drivers/media/i2c/gc2145.c
+>  
+> +FWCTL PDS DRIVER
+> +M:	Brett Creeley <brett.creeley@amd.com>
+> +R:	Shannon Nelson <shannon.nelson@amd.com>
+> +L:	linux-kernel@vger.kernel.org
+> +S:	Maintained
+> +F:	drivers/fwctl/pds/
+> +
+>  GATEWORKS SYSTEM CONTROLLER (GSC) DRIVER
+>  M:	Tim Harvey <tharvey@gateworks.com>
+>  S:	Maintained
+> diff --git a/drivers/fwctl/Kconfig b/drivers/fwctl/Kconfig
+> index 0a542a247303..df87ce5bd8aa 100644
+> --- a/drivers/fwctl/Kconfig
+> +++ b/drivers/fwctl/Kconfig
+> @@ -28,5 +28,15 @@ config FWCTL_MLX5
+>  	  This will allow configuration and debug tools to work out of the box on
+>  	  mainstream kernel.
+>  
+> +	  If you don't know what to do here, say N.
+> +
+> +config FWCTL_PDS
+> +	tristate "AMD/Pensando pds fwctl driver"
+> +	depends on PDS_CORE
+> +	help
+> +	  The pds_fwctl driver provides an fwctl interface for a user process
+> +	  to access the debug and configuration information of the AMD/Pensando
+> +	  DSC hardware family.
+> +
+>  	  If you don't know what to do here, say N.
+>  endif
+> diff --git a/drivers/fwctl/Makefile b/drivers/fwctl/Makefile
+> index 5fb289243286..692e4b8d7beb 100644
+> --- a/drivers/fwctl/Makefile
+> +++ b/drivers/fwctl/Makefile
+> @@ -2,4 +2,5 @@
+>  obj-$(CONFIG_FWCTL) += fwctl.o
+>  obj-$(CONFIG_FWCTL_MLX5) += mlx5/
+> +obj-$(CONFIG_FWCTL_PDS) += pds/
+>  
+>  fwctl-y += main.o
+> diff --git a/drivers/fwctl/pds/Makefile b/drivers/fwctl/pds/Makefile
+> new file mode 100644
+> index 000000000000..c14cba128e3b
+> --- /dev/null
+> +++ b/drivers/fwctl/pds/Makefile
+> @@ -0,0 +1,4 @@
+> +# SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
+> +obj-$(CONFIG_FWCTL_PDS) += pds_fwctl.o
+> +
+> +pds_fwctl-y += main.o
+> diff --git a/drivers/fwctl/pds/main.c b/drivers/fwctl/pds/main.c
+> new file mode 100644
+> index 000000000000..afc7dc283ad5
+> --- /dev/null
+> +++ b/drivers/fwctl/pds/main.c
+> @@ -0,0 +1,169 @@
+> +// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
+> +/* Copyright(c) Advanced Micro Devices, Inc */
+> +
+> +#include <linux/module.h>
+> +#include <linux/auxiliary_bus.h>
+> +#include <linux/pci.h>
+> +#include <linux/vmalloc.h>
+> +
+> +#include <uapi/fwctl/fwctl.h>
+> +#include <uapi/fwctl/pds.h>
+> +#include <linux/fwctl.h>
+> +
+> +#include <linux/pds/pds_common.h>
+> +#include <linux/pds/pds_core_if.h>
+> +#include <linux/pds/pds_adminq.h>
+> +#include <linux/pds/pds_auxbus.h>
+> +
+> +struct pdsfc_uctx {
+> +	struct fwctl_uctx uctx;
+> +	u32 uctx_caps;
+> +	u32 uctx_uid;
+> +};
+> +
+> +struct pdsfc_dev {
+> +	struct fwctl_device fwctl;
+> +	struct pds_auxiliary_dev *padev;
+> +	struct pdsc *pdsc;
+> +	u32 caps;
+> +	struct pds_fwctl_ident ident;
+> +};
+> +DEFINE_FREE(pdsfc_dev, struct pdsfc_dev *, if (_T) fwctl_put(&_T->fwctl));
+> +
+> +static int pdsfc_open_uctx(struct fwctl_uctx *uctx)
+> +{
+> +	struct pdsfc_dev *pdsfc = container_of(uctx->fwctl, struct pdsfc_dev, fwctl);
+> +	struct pdsfc_uctx *pdsfc_uctx = container_of(uctx, struct pdsfc_uctx, uctx);
+> +
+> +	pdsfc_uctx->uctx_caps = pdsfc->caps;
+> +
+> +	return 0;
+> +}
+> +
+> +static void pdsfc_close_uctx(struct fwctl_uctx *uctx)
+> +{
+> +}
+> +
+> +static void *pdsfc_info(struct fwctl_uctx *uctx, size_t *length)
+> +{
+> +	struct pdsfc_uctx *pdsfc_uctx = container_of(uctx, struct pdsfc_uctx, uctx);
+> +	struct fwctl_info_pds *info;
+> +
+> +	info = kzalloc(sizeof(*info), GFP_KERNEL);
+> +	if (!info)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	info->uctx_caps = pdsfc_uctx->uctx_caps;
+> +
+> +	return info;
+> +}
+> +
+> +static int pdsfc_identify(struct pdsfc_dev *pdsfc)
+> +{
+> +	struct device *dev = &pdsfc->fwctl.dev;
+> +	union pds_core_adminq_comp comp = {0};
+> +	union pds_core_adminq_cmd cmd;
+> +	struct pds_fwctl_ident *ident;
+> +	dma_addr_t ident_pa;
+> +	int err = 0;
+> +
+> +	ident = dma_alloc_coherent(dev->parent, sizeof(*ident), &ident_pa, GFP_KERNEL);
+> +	err = dma_mapping_error(dev->parent, ident_pa);
+> +	if (err) {
+> +		dev_err(dev, "Failed to map ident buffer\n");
+> +		return err;
+> +	}
+> +
+> +	cmd = (union pds_core_adminq_cmd) {
+> +		.fwctl_ident = {
+> +			.opcode = PDS_FWCTL_CMD_IDENT,
+> +			.version = 0,
+> +			.len = cpu_to_le32(sizeof(*ident)),
+> +			.ident_pa = cpu_to_le64(ident_pa),
+> +		}
+> +	};
+> +
+> +	err = pds_client_adminq_cmd(pdsfc->padev, &cmd, sizeof(cmd), &comp, 0);
+> +	if (err)
+> +		dev_err(dev, "Failed to send adminq cmd opcode: %u err: %d\n",
+> +			cmd.fwctl_ident.opcode, err);
+> +	else
+> +		pdsfc->ident = *ident;
+> +
+> +	dma_free_coherent(dev->parent, sizeof(*ident), ident, ident_pa);
+> +
+> +	return 0;
+> +}
+> +
+> +static void *pdsfc_fw_rpc(struct fwctl_uctx *uctx, enum fwctl_rpc_scope scope,
+> +			  void *in, size_t in_len, size_t *out_len)
+> +{
+> +	return NULL;
+> +}
+> +
+> +static const struct fwctl_ops pdsfc_ops = {
+> +	.device_type = FWCTL_DEVICE_TYPE_PDS,
+> +	.uctx_size = sizeof(struct pdsfc_uctx),
+> +	.open_uctx = pdsfc_open_uctx,
+> +	.close_uctx = pdsfc_close_uctx,
+> +	.info = pdsfc_info,
+> +	.fw_rpc = pdsfc_fw_rpc,
+> +};
+> +
+> +static int pdsfc_probe(struct auxiliary_device *adev,
+> +		       const struct auxiliary_device_id *id)
+> +{
+> +	struct pds_auxiliary_dev *padev =
+> +			container_of(adev, struct pds_auxiliary_dev, aux_dev);
+> +	struct pdsfc_dev *pdsfc __free(pdsfc_dev) =
+> +			fwctl_alloc_device(&padev->vf_pdev->dev, &pdsfc_ops,
+> +					   struct pdsfc_dev, fwctl);
+> +	struct device *dev = &adev->dev;
+> +	int err;
+> +
+
+It's ok to move the pdsfc declaration inline right before this check below. That would help prevent any accidental usages of pdsfc before the check. This is an exception to the coding style guidelines with the introduction of cleanup mechanisms. 
+> +	if (!pdsfc) {
+> +		dev_err(dev, "Failed to allocate fwctl device struct\n");
+> +		return -ENOMEM;
+> +	}
+> +	pdsfc->padev = padev;
+> +
+> +	err = pdsfc_identify(pdsfc);
+> +	if (err)
+> +		return dev_err_probe(dev, err, "Failed to identify device\n");
+> +
+> +	err = fwctl_register(&pdsfc->fwctl);
+> +	if (err)
+> +		return dev_err_probe(dev, err, "Failed to register device\n");
+> +
+> +	auxiliary_set_drvdata(adev, no_free_ptr(pdsfc));
+> +
+> +	return 0;
+> +}
+> +
+> +static void pdsfc_remove(struct auxiliary_device *adev)
+> +{
+> +	struct pdsfc_dev *pdsfc __free(pdsfc_dev) = auxiliary_get_drvdata(adev);
+> +
+> +	fwctl_unregister(&pdsfc->fwctl);
+
+Missing fwctl_put(). See fwctl_unregister() header comments. Caller must still call fwctl_put() to free the fwctl after calling fwctl_unregister().
+
+DJ
+ 
+> +}
+> +
+> +static const struct auxiliary_device_id pdsfc_id_table[] = {
+> +	{.name = PDS_CORE_DRV_NAME "." PDS_DEV_TYPE_FWCTL_STR },
+> +	{}
+> +};
+> +MODULE_DEVICE_TABLE(auxiliary, pdsfc_id_table);
+> +
+> +static struct auxiliary_driver pdsfc_driver = {
+> +	.name = "pds_fwctl",
+> +	.probe = pdsfc_probe,
+> +	.remove = pdsfc_remove,
+> +	.id_table = pdsfc_id_table,
+> +};
+> +
+> +module_auxiliary_driver(pdsfc_driver);
+> +
+> +MODULE_IMPORT_NS("FWCTL");
+> +MODULE_DESCRIPTION("pds fwctl driver");
+> +MODULE_AUTHOR("Shannon Nelson <shannon.nelson@amd.com>");
+> +MODULE_AUTHOR("Brett Creeley <brett.creeley@amd.com>");
+> +MODULE_LICENSE("Dual BSD/GPL");
+> diff --git a/include/linux/pds/pds_adminq.h b/include/linux/pds/pds_adminq.h
+> index 4b4e9a98b37b..ae6886ebc841 100644
+> --- a/include/linux/pds/pds_adminq.h
+> +++ b/include/linux/pds/pds_adminq.h
+> @@ -1179,6 +1179,78 @@ struct pds_lm_host_vf_status_cmd {
+>  	u8     status;
+>  };
+>  
+> +enum pds_fwctl_cmd_opcode {
+> +	PDS_FWCTL_CMD_IDENT = 70,
+> +};
+> +
+> +/**
+> + * struct pds_fwctl_cmd - Firmware control command structure
+> + * @opcode: Opcode
+> + * @rsvd:   Word boundary padding
+> + * @ep:     Endpoint identifier.
+> + * @op:     Operation identifier.
+> + */
+> +struct pds_fwctl_cmd {
+> +	u8     opcode;
+> +	u8     rsvd[3];
+> +	__le32 ep;
+> +	__le32 op;
+> +} __packed;
+> +
+> +/**
+> + * struct pds_fwctl_comp - Firmware control completion structure
+> + * @status:     Status of the firmware control operation
+> + * @rsvd:       Word boundary padding
+> + * @comp_index: Completion index in little-endian format
+> + * @rsvd2:      Word boundary padding
+> + * @color:      Color bit indicating the state of the completion
+> + */
+> +struct pds_fwctl_comp {
+> +	u8     status;
+> +	u8     rsvd;
+> +	__le16 comp_index;
+> +	u8     rsvd2[11];
+> +	u8     color;
+> +} __packed;
+> +
+> +/**
+> + * struct pds_fwctl_ident_cmd - Firmware control identification command structure
+> + * @opcode:   Operation code for the command
+> + * @rsvd:     Word boundary padding
+> + * @version:  Interface version
+> + * @rsvd2:    Word boundary padding
+> + * @len:      Length of the identification data
+> + * @ident_pa: Physical address of the identification data
+> + */
+> +struct pds_fwctl_ident_cmd {
+> +	u8     opcode;
+> +	u8     rsvd;
+> +	u8     version;
+> +	u8     rsvd2;
+> +	__le32 len;
+> +	__le64 ident_pa;
+> +} __packed;
+> +
+> +/**
+> + * struct pds_fwctl_ident - Firmware control identification structure
+> + * @features:    Supported features
+> + * @version:     Interface version
+> + * @rsvd:        Word boundary padding
+> + * @max_req_sz:  Maximum request size
+> + * @max_resp_sz: Maximum response size
+> + * @max_req_sg_elems:  Maximum number of request SGs
+> + * @max_resp_sg_elems: Maximum number of response SGs
+> + */
+> +struct pds_fwctl_ident {
+> +	__le64 features;
+> +	u8     version;
+> +	u8     rsvd[3];
+> +	__le32 max_req_sz;
+> +	__le32 max_resp_sz;
+> +	u8     max_req_sg_elems;
+> +	u8     max_resp_sg_elems;
+> +} __packed;
+> +
+>  union pds_core_adminq_cmd {
+>  	u8     opcode;
+>  	u8     bytes[64];
+> @@ -1216,6 +1288,9 @@ union pds_core_adminq_cmd {
+>  	struct pds_lm_dirty_enable_cmd	  lm_dirty_enable;
+>  	struct pds_lm_dirty_disable_cmd	  lm_dirty_disable;
+>  	struct pds_lm_dirty_seq_ack_cmd	  lm_dirty_seq_ack;
+> +
+> +	struct pds_fwctl_cmd		  fwctl;
+> +	struct pds_fwctl_ident_cmd	  fwctl_ident;
+>  };
+>  
+>  union pds_core_adminq_comp {
+> @@ -1243,6 +1318,8 @@ union pds_core_adminq_comp {
+>  
+>  	struct pds_lm_state_size_comp	  lm_state_size;
+>  	struct pds_lm_dirty_status_comp	  lm_dirty_status;
+> +
+> +	struct pds_fwctl_comp		  fwctl;
+>  };
+>  
+>  #ifndef __CHECKER__
+> diff --git a/include/uapi/fwctl/fwctl.h b/include/uapi/fwctl/fwctl.h
+> index 518f054f02d2..a884e9f6dc2c 100644
+> --- a/include/uapi/fwctl/fwctl.h
+> +++ b/include/uapi/fwctl/fwctl.h
+> @@ -44,5 +44,6 @@ enum fwctl_device_type {
+>  	FWCTL_DEVICE_TYPE_ERROR = 0,
+>  	FWCTL_DEVICE_TYPE_MLX5 = 1,
+> +	FWCTL_DEVICE_TYPE_PDS = 4,
+>  };
+>  
+>  /**
+> diff --git a/include/uapi/fwctl/pds.h b/include/uapi/fwctl/pds.h
+> new file mode 100644
+> index 000000000000..a01b032cbdb1
+> --- /dev/null
+> +++ b/include/uapi/fwctl/pds.h
+> @@ -0,0 +1,27 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +/* Copyright(c) Advanced Micro Devices, Inc */
+> +
+> +/*
+> + * fwctl interface info for pds_fwctl
+> + */
+> +
+> +#ifndef _UAPI_FWCTL_PDS_H_
+> +#define _UAPI_FWCTL_PDS_H_
+> +
+> +#include <linux/types.h>
+> +
+> +/*
+> + * struct fwctl_info_pds
+> + *
+> + * Return basic information about the FW interface available.
+> + */
+> +struct fwctl_info_pds {
+> +	__u32 uid;
+> +	__u32 uctx_caps;
+> +};
+> +
+> +enum pds_fwctl_capabilities {
+> +	PDS_FWCTL_QUERY_CAP = 0,
+> +	PDS_FWCTL_SEND_CAP,
+> +};
+> +#endif /* _UAPI_FWCTL_PDS_H_ */
+
 
