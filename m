@@ -1,226 +1,144 @@
-Return-Path: <netdev+bounces-171335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B28BDA4C8DB
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:12:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4DF7A4C8F2
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 18:14:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E39B18854C0
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:07:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A44A179F18
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 17:08:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8232B255E51;
-	Mon,  3 Mar 2025 16:49:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E093822CBF6;
+	Mon,  3 Mar 2025 16:49:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eAGyMiWx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UBZY2tHV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C58E2253F38;
-	Mon,  3 Mar 2025 16:49:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 569C725BAAB
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 16:49:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741020578; cv=none; b=tNBN08suWEMg8msEJKWw1LtC8y6lOCUbx6I9gpbBVkm+u/AjHOnD1R3uQFyuBcv791dzZ4ejOyeAcZw+79J0WRf6TXWDUY4UIs+FdjWiieKW/lvFZ9lLjPhw2W2xNxhlPHRZ0bHdWCVUhfnG/CR1UMGt0aC0WbH8Z0zIrrxnKKs=
+	t=1741020589; cv=none; b=kP/CB21QYO3ER5yfKEmI6LGVWlwka6JB8oZyUm8klPhxJ97vnNvb5Ew4l+cVJaEvF30TFfKKpGo2k945GZ/NEPuGHWyYotC3Ojk9jRJeNVvIBP+rXPo18s3hVBwtT3SPxidhu/mYK5tqe2stx1aD/RntzTwxjZzaY4qB/c044sk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741020578; c=relaxed/simple;
-	bh=QxMI96pUH6DNsqjiw2kEM8KCz4+ZICG+5dYAmxd/380=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fb+tl1eehUd4iKx+dxd0Mr/vAEDPhgc44aHoU2jP0/6FWo7oBRHcZPnWDH4cFpG+vZg0yZh17qjyvmLRYa+rjc30myyyFpiWZGytnIGzHS12I+BH8Tp8NF1Ql6h3VTBNZZBc/lOzxQsh91CA/7NhjafG3rSFsY4SqUgRN+qGPL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eAGyMiWx; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741020577; x=1772556577;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=QxMI96pUH6DNsqjiw2kEM8KCz4+ZICG+5dYAmxd/380=;
-  b=eAGyMiWxRk2fuRd1dnfGlkrvFlvQ/lDPiEq4LAfeya4QrVKH9Zh4sDS5
-   bUsKpf3vSQkeyq568F1DREl3F8Gj7pb5Nf3aARgX3nkt6Z1PeKWHQRK4P
-   J4pCRUyLFScd9zE9aUgePowiDLv4Cp6FZjkqN6LhOy0H9RIwxOtbChfZb
-   FB6J6iGvzSTZaok0ZKVgWJlCVtDEUDU9n/COz2kG6hlY+V2bJb3Q5EKHk
-   cPJRcDdd6i3BLlgkie5EteXYE3dEtbYEqtCLwxj8Iy/X5DGTXvnJ5p+46
-   M1yTpqkahQRwycxu9MAoDll3qTUY8vHGSnXTn4C3PWVV+HVgBKyJ4nrZS
-   g==;
-X-CSE-ConnectionGUID: CpEFYVGGQoG0Xslk7rnq1Q==
-X-CSE-MsgGUID: Vh/r83EmQhmIOlb9oePvPw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="41761409"
-X-IronPort-AV: E=Sophos;i="6.13,330,1732608000"; 
-   d="scan'208";a="41761409"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 08:49:34 -0800
-X-CSE-ConnectionGUID: kYMzaWX1S2++c4ZMe1Brmw==
-X-CSE-MsgGUID: /PwV6x5QQmCoUuLOgySURw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,330,1732608000"; 
-   d="scan'208";a="123212198"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by fmviesa004.fm.intel.com with ESMTP; 03 Mar 2025 08:49:30 -0800
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id BC5BE1FF; Mon, 03 Mar 2025 18:49:29 +0200 (EET)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>
-Subject: [PATCH net-next v2 3/3] ieee802154: ca8210: Switch to using gpiod API
-Date: Mon,  3 Mar 2025 18:49:10 +0200
-Message-ID: <20250303164928.1466246-4-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <20250303164928.1466246-1-andriy.shevchenko@linux.intel.com>
-References: <20250303164928.1466246-1-andriy.shevchenko@linux.intel.com>
+	s=arc-20240116; t=1741020589; c=relaxed/simple;
+	bh=Sj/9n5yaDww5LsxV++b4jRZ/RCn196tGutCKBqXJ5p0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RAEaxO3m+kLXg1YZA9mnyFGRUPjL7OC4OBa2wwGz2EvV4P+sU/cd5n4bJh5mj342z/5hB69t0861nzPw50De55HecZaR6n/dCRurbdAPje75M08Uh0cSqDBbn/yYwxn52CZok3HdUqdPasSzmHyjxlaeunYg7+uPjNxKEQtV9u8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UBZY2tHV; arc=none smtp.client-ip=209.85.166.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3d191bfeafbso18739675ab.0
+        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 08:49:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741020587; x=1741625387; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X1JM3jch4378qUNKnoRBygByBvzeQq9d+/vev+wxynQ=;
+        b=UBZY2tHVbLLzWukafq0O5Ao7AITZg69ZJD3QihKvWIAnSLqisgp7GgJlOEhpIlgoFU
+         vNf9bzg0fQZJiT1ysRLJDX7LWnOJEFVaFoYZ2o3DMzXQxRhNT+6wDFgfR4DF+qivoTDx
+         h/C2mHtarUqbsgPEs0ljvh2MYbKvtPUJ/F0CHA5l0Lk8Fcv1MVjI7TfySPuhkZoEjtzx
+         REoJOOlp/LHRIwnmXvgZ4e3aSN0K3DNC157WpkNPoR5+CLnR3L0u4/mOQ+ZyMGIGpkaX
+         dAirad7KpBVPWi1kJ+UsD8538AKdVMouF9NVOC4eQqzXwqv4TcYR1bp0KcMbPwWLgp8w
+         myeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741020587; x=1741625387;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X1JM3jch4378qUNKnoRBygByBvzeQq9d+/vev+wxynQ=;
+        b=P4ChgtD1q7oplTH0U2mDwx2oxEbnqnOVZFGH9Bv3EOpGDkUMw11NOOmXH2aXESlffW
+         LPhrGe/eOkbv+axOha4hfbPJCbJL1y2vdW+DF9NeDQswSveWwJ1KdLofAeeK2zIkpD0y
+         LXOY8DKa/4jXhHoRx1I4Ssq4/I3sYcG0DnduHpJojXTwo2KIokMxx0PCuqA0fQiE4W9C
+         lpzYluEdqNsft+OMybKSF6vpScfoapQHu57LTriIQzzMqZdMFfziYplOpNm4QVe3MHJt
+         OxMxGN7weYi4w9GlzWg830ko8RPdEh3IUnp86tF9C5Se5tjDlFWPEKO2VR24TIeqgD4k
+         mx+w==
+X-Forwarded-Encrypted: i=1; AJvYcCWrEm5PjoWXBRkZSjttdUyDE2tuoWvcA/F0Xfv6hWHp+65sMmR4H8xv+nVp/G4DT5xhwL0YWGY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzVEbTOYV97iBIYYNj5RY+dvr4ziQla7b5XwSVRmeK20WX8t9R
+	XdiiH4CtN2wIRm01DVUnTVOJfQfy5sv/1HOwA5QfClgTIiK3FjXbTQhW+9uVgBphxpIFAKeOnKk
+	klzwwC/9xSoo7P80l48knEHOidKQ=
+X-Gm-Gg: ASbGnctR0ux1CHbpj0E7aiG8sM/1MJ2/R33F7RZ+ksVeiKjgReAmwrMnkq1BsG71sg+
+	6Jq96BZGXdaaIohn3S9SNk0n/mVIlwS0yK9kRzJ9p3jbwmSHpEkmyUTzcTOx4oqqmpBsdEgbZmT
+	HHq90tZMmz5oXI9sya1IUPICAU
+X-Google-Smtp-Source: AGHT+IF+o+ma8+T3pJgOeA06yMJTxOH3F3z00RFIHs7rACJYU1Ye0+3nUJqcE3YljUBJ5TYk2oejUZ9xAlQFQL4cxaY=
+X-Received: by 2002:a05:6e02:180d:b0:3d0:4e57:bbda with SMTP id
+ e9e14a558f8ab-3d3e6e45cf7mr114601265ab.1.1741020587306; Mon, 03 Mar 2025
+ 08:49:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250303080404.70042-1-kerneljasonxing@gmail.com>
+ <20250303074105.0b562205@kernel.org> <CAL+tcoCV-SbnMuJetKVuMpAhf_zuD5_+eHC_HLhdq-Jfp3H_+w@mail.gmail.com>
+In-Reply-To: <CAL+tcoCV-SbnMuJetKVuMpAhf_zuD5_+eHC_HLhdq-Jfp3H_+w@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 4 Mar 2025 00:49:10 +0800
+X-Gm-Features: AQ5f1Joqjd9GSsN3A5AsOQSiBYCpkea53UuxKp0_OFBxQ9CYBfNch2XcH-QpwzY
+Message-ID: <CAL+tcoBogEc-pn_Z050wCWreVA86HEpjZQhhzie7_tnNU=TKpA@mail.gmail.com>
+Subject: Re: [PATCH net-next] selftests: txtimestamp: ignore the old skb from ERRQUEUE
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	horms@kernel.org, willemdebruijn.kernel@gmail.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This updates the driver to gpiod API, and removes yet another use of
-of_get_named_gpio().
+On Tue, Mar 4, 2025 at 12:31=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> On Mon, Mar 3, 2025 at 11:41=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> >
+> > On Mon,  3 Mar 2025 16:04:04 +0800 Jason Xing wrote:
+> > > When I was playing with txtimestamp.c to see how kernel behaves,
+> > > I saw the following error outputs if I adjusted the loopback mtu to
+> > > 1500 and then ran './txtimestamp -4 -L 127.0.0.1 -l 30000 -t 100000':
+> > >
+> > > test SND
+> > >     USR: 1740877371 s 488712 us (seq=3D0, len=3D0)
+> > >     SND: 1740877371 s 489519 us (seq=3D29999, len=3D1106)  (USR +806 =
+us)
+> > >     USR: 1740877371 s 581251 us (seq=3D0, len=3D0)
+> > >     SND: 1740877371 s 581970 us (seq=3D59999, len=3D8346)  (USR +719 =
+us)
+> > >     USR: 1740877371 s 673855 us (seq=3D0, len=3D0)
+> > >     SND: 1740877371 s 674651 us (seq=3D89999, len=3D30000)  (USR +795=
+ us)
+> > >     USR: 1740877371 s 765715 us (seq=3D0, len=3D0)
+> > > ERROR: key 89999, expected 119999
+> > > ERROR: -12665 us expected between 0 and 100000
+> > >     SND: 1740877371 s 753050 us (seq=3D89999, len=3D1106)  (USR +-126=
+65 us)
+> > >     SND: 1740877371 s 800783 us (seq=3D119999, len=3D30000)  (USR +35=
+068 us)
+> > >     USR-SND: count=3D5, avg=3D4945 us, min=3D-12665 us, max=3D35068 u=
+s
+> > >
+> > > Actually, the kernel behaved correctly after I did the analysis. The
+> > > second skb carrying 1106 payload was generated due to tail loss probe=
+,
+> > > leading to the wrong estimation of tskey in this C program.
+> > >
+> > > This patch does:
+> > > - Neglect the old tskey skb received from ERRQUEUE.
+> > > - Add a new test to count how many valid skbs received to compare wit=
+h
+> > > cfg_num_pkts.
+> >
+> > This appears to break some UDP test cases when running in the CI:
+> >
+> > https://netdev-3.bots.linux.dev/vmksft-net/results/16721/41-txtimestamp=
+-sh/stdout
+>
+> Thanks for catching this. I did break this testcase: run_test_v4v6
+> ${args} -u -o 42.
+>
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- drivers/net/ieee802154/ca8210.c | 57 +++++++++++----------------------
- 1 file changed, 19 insertions(+), 38 deletions(-)
-
-diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index 65f042c8734b..d4c1f00d29fe 100644
---- a/drivers/net/ieee802154/ca8210.c
-+++ b/drivers/net/ieee802154/ca8210.c
-@@ -52,12 +52,10 @@
- #include <linux/debugfs.h>
- #include <linux/delay.h>
- #include <linux/gpio/consumer.h>
--#include <linux/gpio.h>
- #include <linux/ieee802154.h>
- #include <linux/io.h>
- #include <linux/kfifo.h>
- #include <linux/of.h>
--#include <linux/of_gpio.h>
- #include <linux/module.h>
- #include <linux/mutex.h>
- #include <linux/poll.h>
-@@ -350,8 +348,8 @@ struct work_priv_container {
-  * @extclockenable: true if the external clock is to be enabled
-  * @extclockfreq:   frequency of the external clock
-  * @extclockgpio:   ca8210 output gpio of the external clock
-- * @gpio_reset:     gpio number of ca8210 reset line
-- * @gpio_irq:       gpio number of ca8210 interrupt line
-+ * @reset_gpio:     ca8210 reset GPIO descriptor
-+ * @irq_gpio:       ca8210 interrupt GPIO descriptor
-  * @irq_id:         identifier for the ca8210 irq
-  *
-  */
-@@ -359,8 +357,8 @@ struct ca8210_platform_data {
- 	bool extclockenable;
- 	unsigned int extclockfreq;
- 	unsigned int extclockgpio;
--	int gpio_reset;
--	int gpio_irq;
-+	struct gpio_desc *reset_gpio;
-+	struct gpio_desc *irq_gpio;
- 	int irq_id;
- };
- 
-@@ -632,10 +630,10 @@ static void ca8210_reset_send(struct spi_device *spi, unsigned int ms)
- 	struct ca8210_priv *priv = spi_get_drvdata(spi);
- 	long status;
- 
--	gpio_set_value(pdata->gpio_reset, 0);
-+	gpiod_set_value(pdata->reset_gpio, 0);
- 	reinit_completion(&priv->ca8210_is_awake);
- 	msleep(ms);
--	gpio_set_value(pdata->gpio_reset, 1);
-+	gpiod_set_value(pdata->reset_gpio, 1);
- 	priv->promiscuous = false;
- 
- 	/* Wait until wakeup indication seen */
-@@ -2788,24 +2786,14 @@ static int ca8210_reset_init(struct spi_device *spi)
- {
- 	struct device *dev = &spi->dev;
- 	struct ca8210_platform_data *pdata = dev_get_platdata(dev);
--	int ret;
- 
--	pdata->gpio_reset = of_get_named_gpio(
--		spi->dev.of_node,
--		"reset-gpio",
--		0
--	);
--
--	ret = gpio_direction_output(pdata->gpio_reset, 1);
--	if (ret < 0) {
--		dev_crit(
--			&spi->dev,
--			"Reset GPIO %d did not set to output mode\n",
--			pdata->gpio_reset
--		);
-+	pdata->reset_gpio = devm_gpiod_get(dev, "reset", GPIOD_OUT_HIGH);
-+	if (IS_ERR(pdata->reset_gpio)) {
-+		dev_crit(dev, "Reset GPIO did not set to output mode\n");
-+		return PTR_ERR(pdata->reset_gpio);
- 	}
- 
--	return ret;
-+	return 0;
- }
- 
- /**
-@@ -2820,20 +2808,15 @@ static int ca8210_interrupt_init(struct spi_device *spi)
- 	struct ca8210_platform_data *pdata = dev_get_platdata(dev);
- 	int ret;
- 
--	pdata->gpio_irq = of_get_named_gpio(
--		spi->dev.of_node,
--		"irq-gpio",
--		0
--	);
-+	pdata->irq_gpio = devm_gpiod_get(dev, "irq", GPIOD_IN);
-+	if (IS_ERR(pdata->irq_gpio)) {
-+		dev_crit(dev, "Could not retrieve IRQ GPIO\n");
-+		return PTR_ERR(pdata->irq_gpio);
-+	}
- 
--	pdata->irq_id = gpio_to_irq(pdata->gpio_irq);
-+	pdata->irq_id = gpiod_to_irq(pdata->irq_gpio);
- 	if (pdata->irq_id < 0) {
--		dev_crit(
--			&spi->dev,
--			"Could not get irq for gpio pin %d\n",
--			pdata->gpio_irq
--		);
--		gpio_free(pdata->gpio_irq);
-+		dev_crit(dev, "Could not get irq for IRQ GPIO\n");
- 		return pdata->irq_id;
- 	}
- 
-@@ -2844,10 +2827,8 @@ static int ca8210_interrupt_init(struct spi_device *spi)
- 		"ca8210-irq",
- 		spi_get_drvdata(spi)
- 	);
--	if (ret) {
-+	if (ret)
- 		dev_crit(&spi->dev, "request_irq %d failed\n", pdata->irq_id);
--		gpio_free(pdata->gpio_irq);
--	}
- 
- 	return ret;
- }
--- 
-2.47.2
-
+To handle this particular case, I broke more than that, so I'll drop
+this patch. Sorry for the inconvenience :( I must be out of mind.
 
