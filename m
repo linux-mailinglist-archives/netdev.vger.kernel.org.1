@@ -1,143 +1,126 @@
-Return-Path: <netdev+bounces-171687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7F9DA4E26D
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 16:09:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D23BA4E6E7
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:53:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14CCE882161
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 14:58:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D4F288768B
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 16:36:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A09125D53E;
-	Tue,  4 Mar 2025 14:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BA42283CA0;
+	Tue,  4 Mar 2025 16:14:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NH/GiVt4"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hZ7LUrL2"
 X-Original-To: netdev@vger.kernel.org
-Received: from beeline2.cc.itu.edu.tr (beeline2.cc.itu.edu.tr [160.75.25.116])
+Received: from beeline1.cc.itu.edu.tr (beeline1.cc.itu.edu.tr [160.75.25.115])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCB39253B5E
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 14:55:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=160.75.25.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90D32853FB
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 16:14:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=160.75.25.115
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741100125; cv=pass; b=tsk2YJDkdXtLevq92Y2bfChHRGHuMs4QRNzidSGcIOWDtzKKxwR4BzMskmx5IF+t5WN1Fxngu05aE5+CShckJ4Ffg8yg8eChH7GVAFS1jw+RwaoyvmsYTKLuJKnAnuMH7pRSfGkVwNefu0ClDaG6GgzrwuNaoaGmRJ9AXSnfnEo=
+	t=1741104895; cv=fail; b=hdt20dH4J8NK2WqgwCOOYn+reKgBm1a6pCqBr8XKz3/Fd7pkBBAMgYcWqlMN/JFGwjceHXCVFkcbEsW8WRUsnZ2HAQr2Hqhwb5Q2zXPQ+iqovrq4CXI2hE25G9huUViw52qJ8oE1556Dcn76FgD6FtmXt9+z2AwuRfY3Nn64cdE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741100125; c=relaxed/simple;
-	bh=trItDQ5V/mkIx/cKE4ZUDuGgE8kApBhRlmDdGwNOul0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jwj70lG1RO71sqfo4truLFQqwquoLDmkHCcgMtMUNMYCzJAlt5XlOurK9OGNQhFX+17qjRT+AzNwKS+R3GUfVvs1rk/kTgSvNyfO+5YVBQzzCpC/LdeWt67qzfSyg35suW7S9UWq+3vBBdGuXOje0YGtTFZTDvKLhSCVfNbstts=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NH/GiVt4; arc=none smtp.client-ip=170.10.129.124; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; arc=pass smtp.client-ip=160.75.25.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+	s=arc-20240116; t=1741104895; c=relaxed/simple;
+	bh=jmY+PFMVG6qjLpGNmRvqP7w/rKd/4RLaTS2snE4vhBw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=RXR/c5uMvdIVCC775N8Zx1SiLb+z4S9nWkM93ugZ1KMFslcRtbkEQNhtxvSN7x3BBXTUaVh0jSFiGDNbk+jTRefW6NE1eIrV3yOm4B/h4rFhTkwt5l+dlL2WB+1zFcJwGVa1MdAbadb3KWIkl4Fq8kz0h5GxlT37RIg6yw17INg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=bootlin.com; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=fail (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hZ7LUrL2 reason="signature verification failed"; arc=none smtp.client-ip=217.70.183.196; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; arc=fail smtp.client-ip=160.75.25.115
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=cc.itu.edu.tr
 Received: from lesvatest1.cc.itu.edu.tr (lesvatest1.cc.itu.edu.tr [10.146.128.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
 	(No client certificate requested)
-	by beeline2.cc.itu.edu.tr (Postfix) with ESMTPS id 166E640F1CE0
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:55:22 +0300 (+03)
+	by beeline1.cc.itu.edu.tr (Postfix) with ESMTPS id 2B71840D974F
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 19:14:52 +0300 (+03)
 X-Envelope-From: <root@cc.itu.edu.tr>
 Authentication-Results: lesvatest1.cc.itu.edu.tr;
-	dkim=pass (1024-bit key, unprotected) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=NH/GiVt4
+	dkim=fail reason="signature verification failed" (2048-bit key, unprotected) header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=gm1 header.b=hZ7LUrL2
 Received: from lesva1.cc.itu.edu.tr (unknown [160.75.70.79])
-	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6dv56xSNzFxqH
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:52:17 +0300 (+03)
+	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6ghS3bRWzG2YG
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 19:13:12 +0300 (+03)
 Received: by le1 (Postfix, from userid 0)
-	id 5DFEA4273F; Tue,  4 Mar 2025 17:52:11 +0300 (+03)
+	id 7A9944274B; Tue,  4 Mar 2025 19:12:58 +0300 (+03)
 Authentication-Results: lesva1.cc.itu.edu.tr;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NH/GiVt4
-X-Envelope-From: <linux-kernel+bounces-541215-bozkiru=itu.edu.tr@vger.kernel.org>
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hZ7LUrL2
+X-Envelope-From: <linux-kernel+bounces-541231-bozkiru=itu.edu.tr@vger.kernel.org>
 Authentication-Results: lesva2.cc.itu.edu.tr;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NH/GiVt4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hZ7LUrL2
 Received: from fgw1.itu.edu.tr (fgw1.itu.edu.tr [160.75.25.103])
-	by le2 (Postfix) with ESMTP id 3B4A9427A4
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 12:00:33 +0300 (+03)
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by fgw1.itu.edu.tr (Postfix) with SMTP id 84D263064C0E
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 12:00:32 +0300 (+03)
+	by le2 (Postfix) with ESMTP id BCF7942E9F
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 12:08:09 +0300 (+03)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by fgw1.itu.edu.tr (Postfix) with SMTP id 7349F3064C0C
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 12:08:09 +0300 (+03)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5B817A5588
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 08:58:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AECB917068A
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 09:06:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C64451F03D9;
-	Mon,  3 Mar 2025 08:58:46 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2332F1F03EA;
+	Mon,  3 Mar 2025 09:03:48 +0000 (UTC)
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41DF51EEA57
-	for <linux-kernel@vger.kernel.org>; Mon,  3 Mar 2025 08:58:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F12BD1F1911;
+	Mon,  3 Mar 2025 09:03:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740992323; cv=none; b=qYspHAjTPNg7eShtfd0niTGjTlQyggQmlFkP7hXQyv+LpR5b6sDxWEIUOskqAsHQDQxW533pSXmW2vu84xKbKG6Vwvj9bw+6U0ZlXiZwB3PjnPsuVnGqsXamiwg+WZ+bV/tbCOUF2UDMvCddXTdjbRiphYSyZ/GJmM15xkquJ28=
+	t=1740992624; cv=none; b=nHbgcPLl822sq6PeiGJYhjtS7WvIE2/scMqK86xhOrIASane8smHVwOw7CdJfdJDlzZ9uGS2aKyzV8q0aV6wMNZqL3mJtRWHUkpy5+U6QqRjHkYKiGXxFF/gpryCrMHs+QaGVGWb3h+8CKSsTnvgaTXp8AHC/jqoKF0Bv7JRqWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740992323; c=relaxed/simple;
-	bh=trItDQ5V/mkIx/cKE4ZUDuGgE8kApBhRlmDdGwNOul0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ATNN3IDfY2yAM3VWf7EnIGpdoyuIAS2yY3tuDirdLz1Jzt5LMWoffryewCkknxJsXWAT18n8bl6oD9noo7BfhYFUU1GRFBmSkhWh7rxNqs+9yTpO2uAD5g1ZSckywTIykSRaWyVjVkLp5cjkEolkB7MH3++C+mFFo3PQDdug3Rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NH/GiVt4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1740992321;
+	s=arc-20240116; t=1740992624; c=relaxed/simple;
+	bh=4o2l2/m6ECwcVOsXIRv4XW3evUKC472hxDj0NUnJcOM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=nSk83TfFpVBhFOigN/v9NaWfyutTEJoWXUsSpFXr78Da/2+6gc9b/ighkPgBIi+uELLjONvRBc4XItrIF04hN+CKl9N8NRwt5sXz8DQJOKcXt8zHQh5/zem1ACsbrIz8yFZh8dCupda6Z+U5I0L48x+ZIroQDWnXxeCieGrqfrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hZ7LUrL2; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 6C83744536;
+	Mon,  3 Mar 2025 09:03:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1740992620;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=z5mIvbymr+I4BfYQ2lCWwQkjM6pyai+CS0CDOiZ31Js=;
-	b=NH/GiVt4stUX+i9o6Tv46wPDV1iL5LR+J0xeykOpdgFTaWDEIijVA6KmfzDDJ+LZJY/teq
-	bkEYoig/4owOa1B28khCdU8GRrQBiGVx6mN9mFCbR6cGxpyu5vdbEi3Kx7ekIvOhz6/yRI
-	zpn8tQADcFM7JoZVudGMpVg977bxSlQ=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-561-3bvvSQnmO0KZu4Rpp0oZ4Q-1; Mon, 03 Mar 2025 03:58:34 -0500
-X-MC-Unique: 3bvvSQnmO0KZu4Rpp0oZ4Q-1
-X-Mimecast-MFC-AGG-ID: 3bvvSQnmO0KZu4Rpp0oZ4Q_1740992314
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-5e4cf414a6fso3360963a12.1
-        for <linux-kernel@vger.kernel.org>; Mon, 03 Mar 2025 00:58:34 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740992314; x=1741597114;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z5mIvbymr+I4BfYQ2lCWwQkjM6pyai+CS0CDOiZ31Js=;
-        b=Yme/P0v7yb5DgHx7rI6yYwDmAv2O1p4lMvkIyUvI4grTS3N4XT07KyanZouKlLdk9H
-         KdCGsqM9b6l3+gnhe+lu9K+5/r7HcFCaMPf1RyKpQfHC3EYVL5rfmCApHHAdCJfpK3na
-         U9X2MLCoF7m9fhdRjxWIRMhbPr/kzGKGHHziXkQFim/tTpoAJQ1EvckcW4s1GOGnDgjc
-         vLDIQoD1X7/HkI6q1xJTMKe9imI56C34oPVUg1mqANhyh7XmkQfWxSLYUonjO1IDK6BX
-         mU4Ruc3eqFdLD7QVNATbQqFDuYP89f5Paj0Id6MHbXJ/oRPcf6B+VfFymHNkwovSeZix
-         wRSg==
-X-Forwarded-Encrypted: i=1; AJvYcCXOm+oNExxZz6dNN/ppDwcBVUJMVEXN7MPOe14qGXAmEx7WAM9k6SjwM34RXm7yhUaWbrEECyHEFXtBWNY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywjr3IdHwruxwSjkb1saDisY6nlqdyR4xCSpWMbwnTuAaM+V9cn
-	HMRrboHRZe9r+ZK8RhFfTZttaPnoXiWdrg5DSLsjMVFzBVBJc3BaIHYnEl/CMTvFVUoVMXVT5V7
-	4xcmFLWIVP9ZH5ETPnXJbQcMXTHgZSw1Po1cnoyaQcA/AiFZbaHURIacJkFaWFw==
-X-Gm-Gg: ASbGncsJ/Y0D90Svl7Y5/uxupjisLm/PZ+cQ+U5dg7L3F1A4IGNEgHdyInb9SznW9Pg
-	swfzLk2v33gGdIObeo1u8j4V9XdOLJCbC6l0w9iV+ixRCgZ5IHYonxEBhARi9cVedJ9WCKqQmoM
-	i4wWtwRUs7NSBanoRuV47bRlJSdL5ZvxHgbTrL4Cflb5XaHGBQKA3I0fbVPUHALYBh2qKGi8Avi
-	+E2nBHG+MjoDswLzPHNNHVp9rM13m7lDDeuZfii+ilVZ1VhRils1hyWuHFSyxWKKFSXDwy7BGgD
-	MRX6jUw37XaOKlc1CrHK3BMhyI225NNzIgXXsJ27PtTTg3bWsQZD8524dIZ6e1y/
-X-Received: by 2002:a05:6402:13ca:b0:5dc:cc02:5d25 with SMTP id 4fb4d7f45d1cf-5e4d6ae3bd8mr12016396a12.11.1740992313678;
-        Mon, 03 Mar 2025 00:58:33 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF1UBws0o6Q6N8Or0I9EH2txIiXNDRTiXCawz1Rn521pIsbUD0YYXL9ZstVZ1QxNwfhidyhMw==
-X-Received: by 2002:a05:6402:13ca:b0:5dc:cc02:5d25 with SMTP id 4fb4d7f45d1cf-5e4d6ae3bd8mr12016357a12.11.1740992313071;
-        Mon, 03 Mar 2025 00:58:33 -0800 (PST)
-Received: from sgarzare-redhat (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e4c3fb51e1sm6716034a12.61.2025.03.03.00.58.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Mar 2025 00:58:31 -0800 (PST)
-Date: Mon, 3 Mar 2025 09:58:26 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Cindy Lu <lulu@redhat.com>
-Cc: jasowang@redhat.com, mst@redhat.com, michael.christie@oracle.com, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v7 6/8] vhost: uapi to control task mode (owner vs
- kthread)
-Message-ID: <4rcrc4prhmca5xnmgmyumxj6oh7buewyx5a2iap7rztvuy32z6@c6v63ysjxctx>
-References: <20250302143259.1221569-1-lulu@redhat.com>
- <20250302143259.1221569-7-lulu@redhat.com>
+	bh=QYsR2ibsJb972uOv9b0xyVcdCGgk/tt+2DbI9Bn3NdA=;
+	b=hZ7LUrL2pU3+jhTvJI0tlIkKzoZUESl/oHomtFhGQnLUPqTo0sp8J9/UxknhXAelOyXXe4
+	TIYony2Se/yZliHtSz/SY4RzSWrNGFN8fu3T96BZx67Vo8O58mWAA4it+MpO+Q6M0Jfy0f
+	MjhHXNhKpACG+pK0Nkw+FbFAz60r/yIhH/QjAm/bLNpdvjHJUYt4eL+OUFfVyTVEYDaPoc
+	H5Oh7koEnZjqvjsA2Npf0e/dS/395sFvCCtvC+TwBeWuAwsOXKoGaXoePZUFixVShO30dc
+	50Fob5Svr0nobkIYYv3b15y5AiUcTls76X+lhwXv/goFWq/0mO6NYOrg7YE3mA==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Simon Horman <horms@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>
+Subject: [PATCH net-next v4 11/13] net: phylink: Add a mapping between MAC_CAPS and LINK_CAPS
+Date: Mon,  3 Mar 2025 10:03:17 +0100
+Message-ID: <20250303090321.805785-12-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250303090321.805785-1-maxime.chevallier@bootlin.com>
+References: <20250303090321.805785-1-maxime.chevallier@bootlin.com>
 Precedence: bulk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -145,102 +128,108 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250302143259.1221569-7-lulu@redhat.com>
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdelkeejudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeevgedtffelffelveeuleelgfejfeevvdejhfehgeefgfffvdefteegvedutefftdenucfkphepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgenucevlhhushhtvghrufhiiigvpeeinecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvtddprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgri
+ igvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomh
+X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Transfer-Encoding: quoted-printable
 X-ITU-Libra-ESVA-Information: Please contact Istanbul Teknik Universitesi for more information
-X-ITU-Libra-ESVA-ID: 4Z6dv56xSNzFxqH
+X-ITU-Libra-ESVA-ID: 4Z6ghS3bRWzG2YG
 X-ITU-Libra-ESVA: No virus found
 X-ITU-Libra-ESVA-From: root@cc.itu.edu.tr
-X-ITU-Libra-ESVA-Watermark: 1741704798.2521@nJ9P6NXHlW1tPiC5ZjcKZA
+X-ITU-Libra-ESVA-Watermark: 1741709592.80629@RhKowP1hG+y74M7xyRC5Wg
 X-ITU-MailScanner-SpamCheck: not spam
 
-On Sun, Mar 02, 2025 at 10:32:08PM +0800, Cindy Lu wrote:
->Add a new UAPI to configure the vhost device to use the kthread mode
->The userspace application can use IOCTL VHOST_FORK_FROM_OWNER
->to choose between owner and kthread mode if necessary
->This setting must be applied before VHOST_SET_OWNER, as the worker
->will be created in the VHOST_SET_OWNER function
->
->Signed-off-by: Cindy Lu <lulu@redhat.com>
->---
-> drivers/vhost/vhost.c      | 22 ++++++++++++++++++++--
-> include/uapi/linux/vhost.h | 15 +++++++++++++++
-> 2 files changed, 35 insertions(+), 2 deletions(-)
->
->diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
->index be97028a8baf..ff930c2e5b78 100644
->--- a/drivers/vhost/vhost.c
->+++ b/drivers/vhost/vhost.c
->@@ -1134,7 +1134,7 @@ void vhost_dev_reset_owner(struct vhost_dev *dev, struct vhost_iotlb *umem)
-> 	int i;
->
-> 	vhost_dev_cleanup(dev);
->-
->+	dev->inherit_owner = true;
-> 	dev->umem = umem;
-> 	/* We don't need VQ locks below since vhost_dev_cleanup makes sure
-> 	 * VQs aren't running.
->@@ -2287,7 +2287,25 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *argp)
-> 		r = vhost_dev_set_owner(d);
-> 		goto done;
-> 	}
->-
->+	if (ioctl == VHOST_FORK_FROM_OWNER) {
->+		u8 inherit_owner;
->+		/*inherit_owner can only be modified before owner is set*/
->+		if (vhost_dev_has_owner(d)) {
->+			r = -EBUSY;
->+			goto done;
->+		}
->+		if (copy_from_user(&inherit_owner, argp, sizeof(u8))) {
->+			r = -EFAULT;
->+			goto done;
->+		}
->+		if (inherit_owner > 1) {
->+			r = -EINVAL;
->+			goto done;
->+		}
->+		d->inherit_owner = (bool)inherit_owner;
->+		r = 0;
->+		goto done;
->+	}
-> 	/* You must be the owner to do anything else */
-> 	r = vhost_dev_check_owner(d);
-> 	if (r)
->diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
->index b95dd84eef2d..547b4fa4c3bd 100644
->--- a/include/uapi/linux/vhost.h
->+++ b/include/uapi/linux/vhost.h
->@@ -235,4 +235,19 @@
->  */
-> #define VHOST_VDPA_GET_VRING_SIZE	_IOWR(VHOST_VIRTIO, 0x82,	\
-> 					      struct vhost_vring_state)
->+
->+/**
->+ * VHOST_FORK_FROM_OWNER - Set the inherit_owner flag for the vhost device
+phylink allows MAC drivers to report the capabilities in terms of speed,
+duplex and pause support. This is done through a dedicated set of enum
+values in the form of the MAC_ capabilities. They are very close to what
+the LINK_CAPA_xxx can express, with the difference that LINK_CAPA don't
+have any information about Pause/Asym Pause support.
 
-Should we mention that this IOCTL must be called before VHOST_SET_OWNER?
+To prepare converting phylink to using the phy_caps, add the mapping
+between MAC capabilities and phy_caps. While doing so, we move the
+phylink_caps_params array up a bit to simplify future commits.
 
->+ *
->+ * @param inherit_owner: An 8-bit value that determines the vhost thread mode
->+ *
->+ * When inherit_owner is set to 1(default value):
->+ *   - Vhost will create tasks similar to processes forked from the owner,
->+ *     inheriting all of the owner's attributes..
-                                                   ^
-nit: there 2 points here
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
+V4: No changes
 
->+ *
->+ * When inherit_owner is set to 0:
->+ *   - Vhost will create tasks as kernel thread
->+ */
->+#define VHOST_FORK_FROM_OWNER _IOW(VHOST_VIRTIO, 0x83, __u8)
->+
-> #endif
->-- 
->2.45.0
->
+ drivers/net/phy/phylink.c | 49 ++++++++++++++++++++-------------------
+ 1 file changed, 25 insertions(+), 24 deletions(-)
+
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 0b9585cb508e..9cb3beec9f47 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -292,6 +292,31 @@ static int phylink_interface_max_speed(phy_interface=
+_t interface)
+ 	return SPEED_UNKNOWN;
+ }
+=20
++static struct {
++	unsigned long mask;
++	int speed;
++	unsigned int duplex;
++	unsigned int caps_bit;
++} phylink_caps_params[] =3D {
++	{ MAC_400000FD, SPEED_400000, DUPLEX_FULL, BIT(LINK_CAPA_400000FD) },
++	{ MAC_200000FD, SPEED_200000, DUPLEX_FULL, BIT(LINK_CAPA_200000FD) },
++	{ MAC_100000FD, SPEED_100000, DUPLEX_FULL, BIT(LINK_CAPA_100000FD) },
++	{ MAC_56000FD,  SPEED_56000,  DUPLEX_FULL, BIT(LINK_CAPA_56000FD) },
++	{ MAC_50000FD,  SPEED_50000,  DUPLEX_FULL, BIT(LINK_CAPA_50000FD) },
++	{ MAC_40000FD,  SPEED_40000,  DUPLEX_FULL, BIT(LINK_CAPA_40000FD) },
++	{ MAC_25000FD,  SPEED_25000,  DUPLEX_FULL, BIT(LINK_CAPA_25000FD) },
++	{ MAC_20000FD,  SPEED_20000,  DUPLEX_FULL, BIT(LINK_CAPA_20000FD) },
++	{ MAC_10000FD,  SPEED_10000,  DUPLEX_FULL, BIT(LINK_CAPA_10000FD) },
++	{ MAC_5000FD,   SPEED_5000,   DUPLEX_FULL, BIT(LINK_CAPA_5000FD) },
++	{ MAC_2500FD,   SPEED_2500,   DUPLEX_FULL, BIT(LINK_CAPA_2500FD) },
++	{ MAC_1000FD,   SPEED_1000,   DUPLEX_FULL, BIT(LINK_CAPA_1000FD) },
++	{ MAC_1000HD,   SPEED_1000,   DUPLEX_HALF, BIT(LINK_CAPA_1000HD) },
++	{ MAC_100FD,    SPEED_100,    DUPLEX_FULL, BIT(LINK_CAPA_100FD) },
++	{ MAC_100HD,    SPEED_100,    DUPLEX_HALF, BIT(LINK_CAPA_100HD) },
++	{ MAC_10FD,     SPEED_10,     DUPLEX_FULL, BIT(LINK_CAPA_10FD) },
++	{ MAC_10HD,     SPEED_10,     DUPLEX_HALF, BIT(LINK_CAPA_10HD) },
++};
++
+ /**
+  * phylink_caps_to_linkmodes() - Convert capabilities to ethtool link mo=
+des
+  * @linkmodes: ethtool linkmode mask (must be already initialised)
+@@ -445,30 +470,6 @@ static void phylink_caps_to_linkmodes(unsigned long =
+*linkmodes,
+ 	}
+ }
+=20
+-static struct {
+-	unsigned long mask;
+-	int speed;
+-	unsigned int duplex;
+-} phylink_caps_params[] =3D {
+-	{ MAC_400000FD, SPEED_400000, DUPLEX_FULL },
+-	{ MAC_200000FD, SPEED_200000, DUPLEX_FULL },
+-	{ MAC_100000FD, SPEED_100000, DUPLEX_FULL },
+-	{ MAC_56000FD,  SPEED_56000,  DUPLEX_FULL },
+-	{ MAC_50000FD,  SPEED_50000,  DUPLEX_FULL },
+-	{ MAC_40000FD,  SPEED_40000,  DUPLEX_FULL },
+-	{ MAC_25000FD,  SPEED_25000,  DUPLEX_FULL },
+-	{ MAC_20000FD,  SPEED_20000,  DUPLEX_FULL },
+-	{ MAC_10000FD,  SPEED_10000,  DUPLEX_FULL },
+-	{ MAC_5000FD,   SPEED_5000,   DUPLEX_FULL },
+-	{ MAC_2500FD,   SPEED_2500,   DUPLEX_FULL },
+-	{ MAC_1000FD,   SPEED_1000,   DUPLEX_FULL },
+-	{ MAC_1000HD,   SPEED_1000,   DUPLEX_HALF },
+-	{ MAC_100FD,    SPEED_100,    DUPLEX_FULL },
+-	{ MAC_100HD,    SPEED_100,    DUPLEX_HALF },
+-	{ MAC_10FD,     SPEED_10,     DUPLEX_FULL },
+-	{ MAC_10HD,     SPEED_10,     DUPLEX_HALF },
+-};
+-
+ /**
+  * phylink_limit_mac_speed - limit the phylink_config to a maximum speed
+  * @config: pointer to a &struct phylink_config
+--=20
+2.48.1
 
 
 
