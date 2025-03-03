@@ -1,212 +1,315 @@
-Return-Path: <netdev+bounces-171283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB6C8A4C57C
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 16:43:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51BC4A4C59C
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 16:49:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D53FD164683
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 15:43:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFF443A6C4E
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 15:48:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1086E2147EE;
-	Mon,  3 Mar 2025 15:43:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38D3F214A6C;
+	Mon,  3 Mar 2025 15:48:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MSW77dWK"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="anCV8BAS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605842139AF;
-	Mon,  3 Mar 2025 15:43:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 449272135BB
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 15:48:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741016612; cv=none; b=dkwE+/hO3qoN2tnhMdZbHk6ZBABzyH1FzRGiPG/mnJQZtO9YbVBJZVTimuw8aLDItw67YYQh77y/TtT63FTpL/4at0Fi5OLN34uFEAPJBDZPvESGnNgLqXyrTJ8UaNvcjUmwJVVq8OPs4V3RTEeOAHuBbSvQGUFNLbcEmVuXf+s=
+	t=1741016912; cv=none; b=NSjZpHLln8gSMH3n4X/LzLhgeU3m5r9oA8BWyoQG6slc8s4J8Dk1NbI03USmImWPSPW/cipuhCO8UMeUHWjftyI1lRpdsu6p+jplZkpAv/ztWHU0EiHy5EMX3NzfqLneLK+MwTtAOaqP4FmTadlHjT3kN8cCYNaVfzxBAnDCFYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741016612; c=relaxed/simple;
-	bh=e7sJsPxftEmqUF7aflD0iSt9xRNb7hVvNLp83A2uWUU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ExVFCEk3QObOG23CBGVE9CQ+dIXpODx875OUJ69brDh88WtbHsDemGJT3JscIT4YgPGcT7i33IzCNzVeG2LXl38mXx48IHgkpBkS4ZmE2bS5EqIlAUOVGyyFnCX+pw3J6e30mguxNf5xAWaXekArCQ4YKcb3HDHlSBQXcP60ihw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MSW77dWK; arc=none smtp.client-ip=209.85.219.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-e573136107bso3977622276.3;
-        Mon, 03 Mar 2025 07:43:31 -0800 (PST)
+	s=arc-20240116; t=1741016912; c=relaxed/simple;
+	bh=GvBQXDAExHhIoaeNDYf7g2nDwnhSBt0QXSTd6c1GJxI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DHRJYROtp1wgoRposVHyhLmQw4IWjyIkMiChuYqVTKElS/LrENxwVwZAKJRFxzTEtCf3rI/DNDLZlEcBXoIafi5VfRJ3Tr2zjZMoVMjGH1AVmPdgVFFkZ6wLDIKjYky7nIajlxXWvJCXLnjPJFwy2/ib7zXInl/lcwNREuB8CEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=anCV8BAS; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-abf518748cbso375988866b.2
+        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 07:48:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741016610; x=1741621410; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1bze7IhHFHWNKOAl2fnuzVpo5poDDbwUFQZHYPw6zzY=;
-        b=MSW77dWKKqQYBCIuYbBldZvCWQBURrH6RSVrIpNFTXQSNAP7HH5YYJrPx+oEZsrdal
-         AJJ/Dp6pSCBg5xQAmfjt8AbIB/Ru2EHASncEWqc+mDp2tBsoZEsvdspUoiXTr6dbLQw3
-         Zx/BWpGkWqYOyn5zaSBTQPmh5p6QHYu38ngl7XR5DplVvGJ59jjKjx5DLqH1FEhvtpAY
-         C64s2i6WEX0OwGpDMoRa1IdwAY6m11d+l0BvuO37W5Zh/1Azd4BaV0xD+BHwh7gAEySw
-         unppoE5n41e4q8VzquI4rsEbHpLcALTV8QSy6fPgQYrvY8VL4EMhaS0OsYu6qicd9998
-         PKFQ==
+        d=openvpn.net; s=google; t=1741016907; x=1741621707; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZOMakgKQx0eH+GJzwtnG1x0Qnn1CoGhsn97/jTx5QWQ=;
+        b=anCV8BASAUopfYD4nTXTC6gmnSyFVZEg08ELqLg+p1CI2r1zZEFROqw40eB9LswwCK
+         ZiY5aJ9SQEG8jaN0a4zMi1YdbNDFKVDC5CzakH5mZ+apSMrThvPv51PQDG+FP6k50K7R
+         ogaQeyysmB7rLUZt54TZU3NKi/b2QOHKdjt940LHEX7jCnC68YmlWwcPE9MYH9AwJBEJ
+         Uab+3jFraQviOXnLKmbQqeAjI+znrt1FFJYEHWqJXhEHrBQSQKJcikTnU1NDjmBe0TVP
+         JqSxUauppnJe14EuwBk8L3L8Pz/GaS7E6Roqy2o36KjALChGGJ3ZCMiB5ZAkI7quNNmF
+         IVWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741016610; x=1741621410;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1741016907; x=1741621707;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1bze7IhHFHWNKOAl2fnuzVpo5poDDbwUFQZHYPw6zzY=;
-        b=EiUtULyDpYRQ+yfdIBJfNTeqnI0bBvc5V1w0ZgIowNt9JGpHwusoFifqDDQJ/XiQBN
-         43brz++vRCbEklJMo0K02zsqg93YNfD3aLkCvTzr65rHTzUVwlq4nNPYQiGTR9g+oY6Q
-         J06V5D4elFSTqLoCRiqk70miDfX6gPL6TiCDU0UpPyc6PChH4G1sLBjWa76TQQwEyvgQ
-         sB9QEvv25Ds2xm0w6QiXq/AOm7erpa/e/LASrmPwGCO3mIflD3rB7NGUI+sVX5hPXer0
-         XMAzMLyXlfUTGUnprzVzc760duAh3P0ezANQwlNAIHds7p+d0WbZns2lFG3CibumdWXx
-         CDSg==
-X-Forwarded-Encrypted: i=1; AJvYcCUk0EY4SyY+CBSnHkpMue+TW7MR6YurwPNARyZPugnTJ703/lk+qdlXeoRDi9b154cN4NTb9fKBBfvSxaev@vger.kernel.org, AJvYcCUufWErN3Gf00htD+wfNx9QI9cawDBSnrSoCjxOcqvxWh6ktM+UxaqYV7HY/9Jn0cihRWj0SYbejtQ1AQI=@vger.kernel.org, AJvYcCV/+iOOOuu0W9J+kT3Cs3tvrtFo47/1e5iFESbpxTcrHJPKr6XWA78G25EWs91vxFfK6VpwrKZJFVot92VF@vger.kernel.org, AJvYcCVwXglx0EYn6ych4MDvm+FVjj+GP6U7yr5Gczp3p9dOe59l24rXIazxaFl4ZccKVqaLMEE=@vger.kernel.org, AJvYcCVzsCt6v/AmeVJEFvrZ8np9z9XTKcM6tIbiiHxhTPvkWNoEna9kjiAqmzJVsa7VxV0C8KgS7iQq@vger.kernel.org, AJvYcCWf2jjqoAAp6NwYStaHivhIRe9Wf/N5wJgTgM8/iMUgTkZK9D07Oeh4AdC8dGMSv/t1n33CCD+DaUqKl/w=@vger.kernel.org, AJvYcCWp9r2FNMe/rI1ykDlUp1KmUrHGzr0Yc47cUQ46MEROr0H588FWgOnw7DOL3vSZk3wyvwrhRfBku7AZxmzO54c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUn2XbWOJQXhaNQCWR4qFUNUmpoVGpbUCPlMPEO9/HVTOzoszU
-	ScZmqg9yFDIeuAoctMssqO9YeU+FgJo/ewPtAMp1YyYGbuZsCxbS
-X-Gm-Gg: ASbGnctxP0Saxc6TV060unwXbNIKhKfp5hTYXxNYSphjEFdWzW0L5wjh1WJ7/dkhFal
-	y8hUSXoh7LtRD2uHgVn/YGKaakCZBAv9UMrwkjz07A1pU/JLgSrwzR0FKqMW+NS+s4bz8zmgI4s
-	DpJ/6rR9Rt0XN3pkXWrqye7wo4rCuUyCB8IWBFP+eCdEfz9rQY9/7xPpgbm8yitJ/l4G3nq9eW+
-	Mnd+n5IAliOCRz3nu8J92//c6myisor7K8umsunF0BNYBcg7xSfVCrofIAqUkxHNIMeWtdZKKdd
-	YK2vOa8Hu7aOO3qLeDLYtnnP7Ji6oetnuDQYCk/SQROBOLhOUvaWGESjX3AgBVSQ167r9MstDwA
-	JT/Ep
-X-Google-Smtp-Source: AGHT+IG89LZIvDJlj/3HacLk9/vOGUR8YR6jlY63nvw+Gy77ela/IFHbq/QbvXbn9Hpv7+y9TBQguw==
-X-Received: by 2002:a05:6902:2748:b0:e5d:dda6:d25 with SMTP id 3f1490d57ef6-e60b2f5f1d5mr16067385276.45.1741016609877;
-        Mon, 03 Mar 2025 07:43:29 -0800 (PST)
-Received: from localhost (c-73-224-175-84.hsd1.fl.comcast.net. [73.224.175.84])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e60a3a20448sm3017480276.3.2025.03.03.07.43.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Mar 2025 07:43:29 -0800 (PST)
-Date: Mon, 3 Mar 2025 10:43:28 -0500
-From: Yury Norov <yury.norov@gmail.com>
-To: Kuan-Wei Chiu <visitorckw@gmail.com>
-Cc: David Laight <david.laight.linux@gmail.com>, tglx@linutronix.de,
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-	x86@kernel.org, jk@ozlabs.org, joel@jms.id.au,
-	eajames@linux.ibm.com, andrzej.hajda@intel.com,
-	neil.armstrong@linaro.org, rfoss@kernel.org,
-	maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-	tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
-	dmitry.torokhov@gmail.com, mchehab@kernel.org,
-	awalls@md.metrocast.net, hverkuil@xs4all.nl,
-	miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
-	louis.peens@corigine.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	parthiban.veerasooran@microchip.com, arend.vanspriel@broadcom.com,
-	johannes@sipsolutions.net, gregkh@linuxfoundation.org,
-	jirislaby@kernel.org, akpm@linux-foundation.org, hpa@zytor.com,
-	alistair@popple.id.au, linux@rasmusvillemoes.dk,
-	Laurent.pinchart@ideasonboard.com, jonas@kwiboo.se,
-	jernej.skrabec@gmail.com, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, linux-fsi@lists.ozlabs.org,
-	dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
-	oss-drivers@corigine.com, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev,
-	brcm80211-dev-list.pdl@broadcom.com, linux-serial@vger.kernel.org,
-	bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw,
-	andrew.cooper3@citrix.com, Yu-Chun Lin <eleanor15x@gmail.com>
-Subject: Re: [PATCH v2 01/18] lib/parity: Add __builtin_parity() fallback
- implementations
-Message-ID: <Z8XOF2DMMRKqam6R@thinkpad>
-References: <20250301142409.2513835-1-visitorckw@gmail.com>
- <20250301142409.2513835-2-visitorckw@gmail.com>
- <Z8PMHLYHOkCZJpOh@thinkpad>
- <Z8QUsgpCB0m2qKJR@visitorckw-System-Product-Name>
- <Z8SBBM_81wyHfvC0@thinkpad>
- <Z8SVb4xD4tTiMEpL@visitorckw-System-Product-Name>
- <20250302190954.2d7e068f@pumpkin>
- <Z8UYOD2tyjS25gIc@visitorckw-System-Product-Name>
+        bh=ZOMakgKQx0eH+GJzwtnG1x0Qnn1CoGhsn97/jTx5QWQ=;
+        b=hTW9zndxFIBw/d14EW2uM75tlbtYweZkGv2Xi9KW94e1HtnW8JcSThkbcxwySBW03k
+         Y1mpZZUt1gZrOKwhrQpqxEJcjqq7DHv5tMjf36cL4Roa35wW6qOyIAynZ5JRBIhC4DY9
+         oOFEHEL3WZcx5O+AdjcjX11bhT0hg7om0O/kBrYA8sCpNpFN21bn4bQ0G7toImHVXrSQ
+         /4orkfrOG1U++oLCkaMLnTMttAoQjC4mdiv8STDGcFzhFLzk6TKMOdhQMAUsZdb5xy2M
+         08tYeCxGghLAILowEC2Oze+wAa2PybmB0G/P2uJ2K555ksF/hPcoKtXg0Nrsx4y4oVAD
+         OfgQ==
+X-Gm-Message-State: AOJu0YxrgweWUaZWwmeYB0yDQ1+CC+35kLj8Ne5X9ZHtKkSur31SmoSn
+	Qj5y9q6Vj8RJdsTn5/dumk5sXCp4oYKqFF39BQs6dz9mI9ET76u2OFOH0FStahMgQ8jX//HzVh8
+	m
+X-Gm-Gg: ASbGncsW+rAQIFmHdD6lOdNRYm89HEC9sIijR91blVt/y4oOMu/a/qmcuL9bmOP/d70
+	bqyAWaDDysNHummc8PJbmtqN7YPfZfFyhDRJnlQmlN9oJeYSujYi479xLdsKXy4iSYiUQlXxqqv
+	L9SoRBz9Q9Baoe1Tini6kbFvOqWqCoG/Fgx4PS1IDJOfJo02tGrvLDeaB8WvT67Pz4rdMH6lGK0
+	sEHies6E3n6WuLcmV1QYtmEhtoDZjJqUoW1KfF2D5BB2q1oG48SjxrI2UoV1Ohq5/vvY6UJaH4F
+	BghRlhJ7eXn8MgplU6XcpS7Zb64Lz/flvrP6emdZA31Iaj+RcLcLbbSPng3cjVq76bufatT27Og
+	1VveIJDg=
+X-Google-Smtp-Source: AGHT+IFh+oc/+WAkYigvqvS40UJ1I+acg+Km1DM/dYuXAp2oKan5OP1S1MtzddnzXF/eE3J9sAa74w==
+X-Received: by 2002:a17:907:3f9a:b0:abe:dc99:7086 with SMTP id a640c23a62f3a-abf26824d36mr1816293566b.55.1741016907491;
+        Mon, 03 Mar 2025 07:48:27 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:4d41:ca07:21a5:f110? ([2001:67c:2fbc:1:4d41:ca07:21a5:f110])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abf795ba15esm205268766b.131.2025.03.03.07.48.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Mar 2025 07:48:27 -0800 (PST)
+Message-ID: <c5c4e113-e86c-42ef-861b-3a6bc9d8ad19@openvpn.net>
+Date: Mon, 3 Mar 2025 16:48:25 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z8UYOD2tyjS25gIc@visitorckw-System-Product-Name>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v20 12/25] ovpn: implement TCP transport
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>,
+ David Ahern <dsahern@kernel.org>
+References: <20250227-b4-ovpn-v20-0-93f363310834@openvpn.net>
+ <20250227-b4-ovpn-v20-12-93f363310834@openvpn.net> <Z8XF06vDCNreOL4E@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ xsFNBFN3k+ABEADEvXdJZVUfqxGOKByfkExNpKzFzAwHYjhOb3MTlzSLlVKLRIHxe/Etj13I
+ X6tcViNYiIiJxmeHAH7FUj/yAISW56lynAEt7OdkGpZf3HGXRQz1Xi0PWuUINa4QW+ipaKmv
+ voR4b1wZQ9cZ787KLmu10VF1duHW/IewDx9GUQIzChqQVI3lSHRCo90Z/NQ75ZL/rbR3UHB+
+ EWLIh8Lz1cdE47VaVyX6f0yr3Itx0ZuyIWPrctlHwV5bUdA4JnyY3QvJh4yJPYh9I69HZWsj
+ qplU2WxEfM6+OlaM9iKOUhVxjpkFXheD57EGdVkuG0YhizVF4p9MKGB42D70pfS3EiYdTaKf
+ WzbiFUunOHLJ4hyAi75d4ugxU02DsUjw/0t0kfHtj2V0x1169Hp/NTW1jkqgPWtIsjn+dkde
+ dG9mXk5QrvbpihgpcmNbtloSdkRZ02lsxkUzpG8U64X8WK6LuRz7BZ7p5t/WzaR/hCdOiQCG
+ RNup2UTNDrZpWxpwadXMnJsyJcVX4BAKaWGsm5IQyXXBUdguHVa7To/JIBlhjlKackKWoBnI
+ Ojl8VQhVLcD551iJ61w4aQH6bHxdTjz65MT2OrW/mFZbtIwWSeif6axrYpVCyERIDEKrX5AV
+ rOmGEaUGsCd16FueoaM2Hf96BH3SI3/q2w+g058RedLOZVZtyQARAQABzSdBbnRvbmlvIFF1
+ YXJ0dWxsaSA8YW50b25pb0BvcGVudnBuLm5ldD7Cwa0EEwEIAFcCGwMFCwkIBwMFFQoJCAsF
+ FgIDAQACHgECF4AFCRWQ2TIWIQTKvaEoIBfCZyGYhcdI8My2j1nRTAUCYRUquBgYaGtwczov
+ L2tleXMub3BlbnBncC5vcmcACgkQSPDMto9Z0UzmcxAAjzLeD47We0R4A/14oDKlZxXO0mKL
+ fCzaWFsdhQCDhZkgxoHkYRektK2cEOh4Vd+CnfDcPs/iZ1i2+Zl+va79s4fcUhRReuwi7VCg
+ 7nHiYSNC7qZo84Wzjz3RoGYyJ6MKLRn3zqAxUtFECoS074/JX1sLG0Z3hi19MBmJ/teM84GY
+ IbSvRwZu+VkJgIvZonFZjbwF7XyoSIiEJWQC+AKvwtEBNoVOMuH0tZsgqcgMqGs6lLn66RK4
+ tMV1aNeX6R+dGSiu11i+9pm7sw8tAmsfu3kQpyk4SB3AJ0jtXrQRESFa1+iemJtt+RaSE5LK
+ 5sGLAO+oN+DlE0mRNDQowS6q/GBhPCjjbTMcMfRoWPCpHZZfKpv5iefXnZ/xVj7ugYdV2T7z
+ r6VL2BRPNvvkgbLZgIlkWyfxRnGh683h4vTqRqTb1wka5pmyBNAv7vCgqrwfvaV1m7J9O4B5
+ PuRjYRelmCygQBTXFeJAVJvuh2efFknMh41R01PP2ulXAQuVYEztq3t3Ycw6+HeqjbeqTF8C
+ DboqYeIM18HgkOqRrn3VuwnKFNdzyBmgYh/zZx/dJ3yWQi/kfhR6TawAwz6GdbQGiu5fsx5t
+ u14WBxmzNf9tXK7hnXcI24Z1z6e5jG6U2Swtmi8sGSh6fqV4dBKmhobEoS7Xl496JN2NKuaX
+ jeWsF2rOwE0EZmhJFwEIAOAWiIj1EYkbikxXSSP3AazkI+Y/ICzdFDmiXXrYnf/mYEzORB0K
+ vqNRQOdLyjbLKPQwSjYEt1uqwKaD1LRLbA7FpktAShDK4yIljkxhvDI8semfQ5WE/1Jj/I/Q
+ U+4VXhkd6UvvpyQt/LiWvyAfvExPEvhiMnsg2zkQbBQ/M4Ns7ck0zQ4BTAVzW/GqoT2z03mg
+ p1FhxkfzHMKPQ6ImEpuY5cZTQwrBUgWif6HzCtQJL7Ipa2fFnDaIHQeiJG0RXl/g9x3YlwWG
+ sxOFrpWWsh6GI0Mo2W2nkinEIts48+wNDBCMcMlOaMYpyAI7fT5ziDuG2CBA060ZT7qqdl6b
+ aXUAEQEAAcLBfAQYAQgAJhYhBMq9oSggF8JnIZiFx0jwzLaPWdFMBQJmaEkXAhsMBQkB4TOA
+ AAoJEEjwzLaPWdFMbRUP/0t5FrjF8KY6uCU4Tx029NYKDN9zJr0CVwSGsNfC8WWonKs66QE1
+ pd6xBVoBzu5InFRWa2ed6d6vBw2BaJHC0aMg3iwwBbEgPn4Jx89QfczFMJvFm+MNc2DLDrqN
+ zaQSqBzQ5SvUjxh8lQ+iqAhi0MPv4e2YbXD0ROyO+ITRgQVZBVXoPm4IJGYWgmVmxP34oUQh
+ BM7ipfCVbcOFU5OPhd9/jn1BCHzir+/i0fY2Z/aexMYHwXUMha/itvsBHGcIEYKk7PL9FEfs
+ wlbq+vWoCtUTUc0AjDgB76AcUVxxJtxxpyvES9aFxWD7Qc+dnGJnfxVJI0zbN2b37fX138Bf
+ 27NuKpokv0sBnNEtsD7TY4gBz4QhvRNSBli0E5bGUbkM31rh4Iz21Qk0cCwR9D/vwQVsgPvG
+ ioRqhvFWtLsEt/xKolOmUWA/jP0p8wnQ+3jY6a/DJ+o5LnVFzFqbK3fSojKbfr3bY33iZTSj
+ DX9A4BcohRyqhnpNYyHL36gaOnNnOc+uXFCdoQkI531hXjzIsVs2OlfRufuDrWwAv+em2uOT
+ BnRX9nFx9kPSO42TkFK55Dr5EDeBO3v33recscuB8VVN5xvh0GV57Qre+9sJrEq7Es9W609a
+ +M0yRJWJEjFnMa/jsGZ+QyLD5QTL6SGuZ9gKI3W1SfFZOzV7hHsxPTZ6
+Organization: OpenVPN Inc.
+In-Reply-To: <Z8XF06vDCNreOL4E@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 03, 2025 at 10:47:20AM +0800, Kuan-Wei Chiu wrote:
-> > > #define parity(val)					\
-> > > ({							\
-> > > 	__auto_type __v = (val);			\
-> > > 	bool __ret;					\
-> > > 	switch (BITS_PER_TYPE(val)) {			\
-> > > 	case 64:					\
-> > > 		__v ^= __v >> 16 >> 16;			\
-> > > 		fallthrough;				\
-> > > 	case 32:					\
-> > > 		__v ^= __v >> 16;			\
-> > > 		fallthrough;				\
-> > > 	case 16:					\
-> > > 		__v ^= __v >> 8;			\
-> > > 		fallthrough;				\
-> > > 	case 8:						\
-> > > 		__v ^= __v >> 4;			\
-> > > 		__ret =  (0x6996 >> (__v & 0xf)) & 1;	\
-> > > 		break;					\
-> > > 	default:					\
-> > > 		BUILD_BUG();				\
-> > > 	}						\
-> > > 	__ret;						\
-> > > })
-> > 
-> > I'm seeing double-register shifts for 64bit values on 32bit systems.
-> > And gcc is doing 64bit double-register maths all the way down.
-> > 
-> > That is fixed by changing the top of the define to
-> > #define parity(val)					\
-> > ({							\
-> > 	unsigned int __v = (val);			\
-> > 	bool __ret;					\
-> > 	switch (BITS_PER_TYPE(val)) {			\
-> > 	case 64:					\
-> > 		__v ^= val >> 16 >> 16;			\
-> > 		fallthrough;				\
-> > 
-> > But it's need changing to only expand 'val' once.
-> > Perhaps:
-> > 	auto_type _val = (val);
-> > 	u32 __ret = val;
-> > and (mostly) s/__v/__ret/g
-> >
-> I'm happy to make this change, though I'm a bit confused about how much
-> we care about the code generated by gcc. So this is the macro expected
-> in v3:
+On 03/03/2025 16:08, Sabrina Dubroca wrote:
+> 2025-02-27, 02:21:37 +0100, Antonio Quartulli wrote:
+>> @@ -94,11 +96,23 @@ void ovpn_socket_release(struct ovpn_peer *peer)
+>>   	 * detached before it can be picked by a concurrent reader.
+>>   	 */
+>>   	lock_sock(sock->sock->sk);
+>> -	ovpn_socket_put(peer, sock);
+>> +	released = ovpn_socket_put(peer, sock);
+>>   	release_sock(sock->sock->sk);
+>>   
+>>   	/* align all readers with sk_user_data being NULL */
+>>   	synchronize_rcu();
+>> +
+>> +	/* following cleanup should happen with lock released */
+>> +	if (released) {
+>> +		if (sock->sock->sk->sk_protocol == IPPROTO_UDP) {
+>> +			netdev_put(sock->ovpn->dev, &sock->dev_tracker);
+>> +		} else if (sock->sock->sk->sk_protocol == IPPROTO_TCP) {
+>> +			/* wait for TCP jobs to terminate */
+>> +			ovpn_tcp_socket_wait_finish(sock);
+>> +			ovpn_peer_put(sock->peer);
+>> +		}
+>> +		kfree_rcu(sock, rcu);
+> 
+> kfree_rcu after synchronize_rcu is a bit unexpected. Do we still need
+> to wait before we free sock, now that we have synchronize_rcu before?
 
-We do care about code generated by any compiler. But we don't spread
-hacks here and there just to make GCC happy. This is entirely broken
-strategy. Things should work the other way: compiler people should
-collect real-life examples and learn from them.
+Ah good point. Waiting one RCU period is what kfree_rcu() is there for, 
+hence we could just call kfree() at this point.
 
-I'm not happy even with this 'v >> 16 >> 16' hack, I just think that
-disabling Wshift-count-overflow is the worse option. Hacking the macro
-to optimize parity64() on 32-bit arch case doesn't worth it entirely.
+> 
+>> +	}
+>>   }
+>>   
+> 
+> 
+> 
+>> +static int ovpn_tcp_parse(struct strparser *strp, struct sk_buff *skb)
+>> +{
+>> +	struct strp_msg *rxm = strp_msg(skb);
+>> +	__be16 blen;
+>> +	u16 len;
+>> +	int err;
+>> +
+>> +	/* when packets are written to the TCP stream, they are prepended with
+>> +	 * two bytes indicating the actual packet size.
+>> +	 * Here we read those two bytes and move the skb data pointer to the
+>> +	 * beginning of the packet
+> 
+> There's no update to skb->data being done in ovpn_tcp_parse AFAICT.
 
-In your patchset, you have only 3 drivers using parity64(). For each
-of them, please in the commit message refer that calling generic
-parity() with 64-bit argument may lead to sub-optimal code generation
-with a certain compiler against 32-bit arches. If you'll get a
-feedback that it's a real problem for somebody, we'll think about
-mitigating it. 
- 
-> #define parity(val)					\
-> ({							\
-> 	__auto_type __v = (val);			\
-> 	u32 __ret = val;				\
-> 	switch (BITS_PER_TYPE(val)) {			\
-> 	case 64:					\
->                 __ret ^= __v >> 16 >> 16;		\
-> 		fallthrough;				\
-> 	case 32:					\
-> 		__ret ^= __ret >> 16;			\
-> 		fallthrough;				\
-> 	case 16:					\
-> 		__ret ^= __ret >> 8;			\
-> 		fallthrough;				\
-> 	case 8:						\
-> 		__ret ^= __ret >> 4;			\
-> 		__ret = (0x6996 >> (__ret & 0xf)) & 1;	\
-> 		break;					\
-> 	default:					\
-> 		BUILD_BUG();				\
-> 	}						\
-> 	__ret;						\
-> })
+I concur :)
+
+> 
+> [...]
+>> +static void ovpn_tcp_rcv(struct strparser *strp, struct sk_buff *skb)
+>> +{
+>> +	struct ovpn_peer *peer = container_of(strp, struct ovpn_peer, tcp.strp);
+>> +	struct strp_msg *msg = strp_msg(skb);
+>> +	size_t pkt_len = msg->full_len - 2;
+>> +	size_t off = msg->offset + 2;
+>> +	u8 opcode;
+>> +
+>> +	/* ensure skb->data points to the beginning of the openvpn packet */
+>> +	if (!pskb_pull(skb, off)) {
+> 
+> Is that the one you mean in the previous comment?
+
+Yes. The comment was probably placed there in a previous 
+version/prototype and never moved.
+
+I'll fix that.
+
+> 
+>> +		net_warn_ratelimited("%s: packet too small for peer %u\n",
+>> +				     netdev_name(peer->ovpn->dev), peer->id);
+>> +		goto err;
+>> +	}
+> [some checks]
+>> +	/* DATA_V2 packets are handled in kernel, the rest goes to user space */
+>> +	opcode = ovpn_opcode_from_skb(skb, 0);
+>> +	if (unlikely(opcode != OVPN_DATA_V2)) {
+>> +		if (opcode == OVPN_DATA_V1) {
+>> +			net_warn_ratelimited("%s: DATA_V1 detected on the TCP stream\n",
+>> +					     netdev_name(peer->ovpn->dev));
+>> +			goto err;
+> 
+> In TCP encap, receiving OVPN_DATA_V1 packets is going to kill the peer:
+> 
+>> +err:
+>> +	dev_core_stats_rx_dropped_inc(peer->ovpn->dev);
+>> +	kfree_skb(skb);
+>> +	ovpn_peer_del(peer, OVPN_DEL_PEER_REASON_TRANSPORT_ERROR);
+>> +}
+>> +
+> 
+> but that's not the case with the UDP encap (ovpn_udp_encap_recv simply
+> drops those packets). Should the TCP/UDP behavior be consistent?
+
+Ideally a UDP DATA_V1 could be just a replayed/spoofed packet, so 
+killing the peer doesn't sound good. It'd be a very easy attack.
+
+Doing the same in TCP is much much harder (if practical at all) and in 
+that case it'd be impossible to understand what's happening on the 
+stream, so we just abort.
+
+I think any TCP connection (without TCP-MD5) that gets messed up this 
+way will abort.
+
+
+> 
+> 
+> 
+> 
+>> +void ovpn_tcp_send_skb(struct ovpn_peer *peer, struct socket *sock,
+>> +		       struct sk_buff *skb)
+>> +{
+>> +	u16 len = skb->len;
+>> +
+>> +	*(__be16 *)__skb_push(skb, sizeof(u16)) = htons(len);
+>> +
+>> +	spin_lock_nested(&sock->sk->sk_lock.slock, OVPN_TCP_DEPTH_NESTING);
+> 
+> With this, lockdep is still going to complain in the unlikely case
+> that ovpn-TCP traffic is carried over another ovpn-TCP socket, right?
+> (probably fine to leave it like that)
+
+Yeah.
+I am not sure how much complexity we'd need to workaround that.
+I also assume it's fine to keep it this way (this is also what L2TP does).
+
+> 
+> 
+> [...]
+>> +static int ovpn_tcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+>> +{
+>> +	struct ovpn_socket *sock;
+>> +	int ret, linear = PAGE_SIZE;
+>> +	struct ovpn_peer *peer;
+>> +	struct sk_buff *skb;
+>> +
+>> +	lock_sock(sk);
+>> +	rcu_read_lock();
+>> +	sock = rcu_dereference_sk_user_data(sk);
+>> +	if (unlikely(!sock || !sock->peer || !ovpn_peer_hold(sock->peer))) {
+>> +		rcu_read_unlock();
+>> +		release_sock(sk);
+>> +		return -EIO;
+>> +	}
+>> +	rcu_read_unlock();
+>> +	peer = sock->peer;
+> 
+> This used to be done under RCU in previous versions of the series. Why
+> is it after rcu_read_unlock now? (likely safe since we're under
+> lock_sock so detach can't happen)
+
+Yeah, while restructuring I assumed it could be taken out of the RCU 
+read section and so I kept it out.
+
+> 
+>> +
+>> +	if (msg->msg_flags & ~MSG_DONTWAIT) {
+>> +		ret = -EOPNOTSUPP;
+>> +		goto peer_free;
+>> +	}
+> 
+> 
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
+
 
