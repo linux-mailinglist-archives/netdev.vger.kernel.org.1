@@ -1,109 +1,128 @@
-Return-Path: <netdev+bounces-171188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43B9DA4BCE2
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 11:50:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 139EDA4BCE7
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 11:53:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EA8A1886528
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 10:50:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38EEB16F93A
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 10:53:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E4FB1EB192;
-	Mon,  3 Mar 2025 10:50:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F59F1F2B82;
+	Mon,  3 Mar 2025 10:53:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dQQwPxps"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fAEzjpCj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+Received: from mail-yw1-f196.google.com (mail-yw1-f196.google.com [209.85.128.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C7241E376C
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 10:50:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14C531D86DC;
+	Mon,  3 Mar 2025 10:53:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740999025; cv=none; b=N4UIrVS1nY4f6ZD0ItyskeXHUN3AdI0ALUwqySof0jIhfFxR9MAqY3hX1LkRshktgGt7pqotsFnQz35BlXo6QCjqOTQKc1s/J5VxC1ZusMF05XcWsfKZp9gl+PUA+EoIqmV2zfoUB15kDwYtu+dX+AGCKcNWMH8JtKSetaUfXBQ=
+	t=1740999198; cv=none; b=SmBi4JU0Br4KEBa8dR+82D5P3IDHHhlDSD5oJdWlGZFwBFr6v5AWDTn4LjsZZ9n5y8WWyqT+06JA+FKeWIvtEStE3hA+TG1we87wXsqrHfYseqGmpje9VEeHq33znKnSPfxnAwHaVltW5jAi+vEqbaCgxWWZes+vfr9eZR+g8Yo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740999025; c=relaxed/simple;
-	bh=1NAQ11QPR8QFSoBVQ5tKsmm65Ls0z2T4J5Vj+n5q2XI=;
+	s=arc-20240116; t=1740999198; c=relaxed/simple;
+	bh=t/g0xd3Ux115LiKLycQFMagbToxXU2ApMLqVpDJxUaI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uvo351ns1rCXne3nBPMcspRFa4FoLjhF5bgfDDp0hx5NjKv/SQcRss+sj0fObsBHhIW2jpvDQ2XSRuNNySWxp+fBeDbZlDcSs4ZgFv2C2KhV17xR/ilwDQ6rOSQ6NG2iywFliQ8KIzlIwAi+SpgMquUt3OxlKJrmK4xPIviRUzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dQQwPxps; arc=none smtp.client-ip=209.85.166.173
+	 To:Cc:Content-Type; b=I8sJ1NooKgbzVdOxy3lmdPvPnjRBp0BD3eefm/UmuaZoF3kNG5Dn6Klz7+cADeTi77Bebo6Ue4la+t/9Fi4mwGVWOYSO2dme6dHLUWvaBmGpgMAdmkTRyBAeH2gZcCwulxjqhYTKhI/0f6xOME9g4ShnVLm+71SGID6wudWEqyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fAEzjpCj; arc=none smtp.client-ip=209.85.128.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3d2acdea3acso12780355ab.0
-        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 02:50:23 -0800 (PST)
+Received: by mail-yw1-f196.google.com with SMTP id 00721157ae682-6f4bc408e49so37593257b3.1;
+        Mon, 03 Mar 2025 02:53:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1740999023; x=1741603823; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1740999196; x=1741603996; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1NAQ11QPR8QFSoBVQ5tKsmm65Ls0z2T4J5Vj+n5q2XI=;
-        b=dQQwPxpsa0MlazHh8UaxYYOv842LiAimp2pMoIwUzTgry0pE3ie/82um67n+4eGY7W
-         cuzESrG5RQ6FSUjKt1GSkndd5GHf4ckPwyLVwm06ZlrY3p4gx3PBc/YwcxEKZdeyVei9
-         xruvYSu+Wxh8JvAGcnkd955ZvpdzTH4zBaGtbtqyNEukydP9Nml+j5Iy5FoIk178J5SD
-         NL4GAprdwbBXLAXSdCT6uUDPSzbkm4rsNOAZyg02oACxhQmKhLwol6TUhQqvAifwsLhT
-         5VtqE4IZQlatGMs9ehRCZKe0fsCI05X1rceHBEhel9WuB/4bEZHVIkWM2wkhT8IVy1GA
-         RL6g==
+        bh=uqcchcl0H3MHX0plBBglpw5tZdbp+fJLEBNYpMMUwBs=;
+        b=fAEzjpCj4/f0zaMekcT2KyNbJU3fg+KaZHA9bCIk1iA1r6f1TpSY6qIq4MH14xa8pi
+         /UrTwhKwQfvbYkXncpu/gZ1XSaZXAAFrM3UJqZ7yMfQiednG2PfPfeWgaYt8cinCpRiQ
+         oHbKlD7HcDSDtUGSUE/CnJNElijfUnckWp9K7fpwxsuTeA3bQ+86FMGmzjjnc14IIr/h
+         vX4G1kyG1trTxR+DPy3fikZyjuLkAY3+NsVeITmkuGVdru0WlpQ1CRDjAUwDiYIcTA7E
+         AmE3ngWeWgcFVyh/OFu34lksIuf1KJOou3rjMbZUzTiHTgfdDD/np1M/xQHhiDxJoRJb
+         KdTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740999023; x=1741603823;
+        d=1e100.net; s=20230601; t=1740999196; x=1741603996;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=1NAQ11QPR8QFSoBVQ5tKsmm65Ls0z2T4J5Vj+n5q2XI=;
-        b=iSixIJCchl6/fhkZSOBzKrXdbGubdYJC8e5w9532bIX/XocU4QzkKFvnHfIeQ0wgn5
-         r51WFxhn3H9bl/+18RRoDr20hPPzeie3JhELUIsmm+DMKj2bs987aWhRLHlfROBph0k6
-         fniaucpRS2eqGEbmFQKCWRQ6z3ium/4WMCA/qf56xucUbnnLkgbVFFoEdf2LhIja6tDU
-         8sPN5vHa1F+lzPHnsGuRzoS/AhZ9q4u50/dapL8hHXJpnvNUvHP06btrYq6UBOW7ktD6
-         eD0xPNQP76u0pxTslXTzEkc7ZaYajSVpZqd+dRPmw/HiL7aeZwVFuM1R0bkLgvYoEhZu
-         JZ/g==
-X-Forwarded-Encrypted: i=1; AJvYcCXKFa5ObsIPe2rFmxR/8U+JDxQql52Kyz8MSbR/t/gLGXrh4HL5Y69/DGclTEZ6SXKhU1xcOdo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBJGQoCof3QTbYRG8q5qFp1C+Q34NoHc7WgPh6Zl5kEirSGiAL
-	0gklIKBH5/XXQtY9vDo+pTWFTnh8kGN0UrQDTSgGzNQWQEaqYNOsG89OjZBbe42eARflGAbus3y
-	PvYrrRcpdVeW8xWsoh4bPe5u1PZI=
-X-Gm-Gg: ASbGnct9YCe3YPaHe9o3SCiYGkfdTVXAQtoSEtzjzwxMKxNbvvFvOsq/uJCHWIMV2gu
-	g3PrS0z6KgYM6MPfct8IVYOMlL1ZFJ+qDoG7bvjrCkV8g6Xfd+msksxPJFhksShaOzfnHjijt8C
-	WsCEjT4shpfXA5yTi0FjMw7+OZNQ==
-X-Google-Smtp-Source: AGHT+IEWDBei9XqPO9VcD3g4oPdPjOOm2A993Cd5mQaCs0NbX/6v5oXLjpZFkGAKIwc0yCfQ2p3310dEqiJZLowvSFs=
-X-Received: by 2002:a05:6e02:1ca8:b0:3cf:f844:68eb with SMTP id
- e9e14a558f8ab-3d3e6e21084mr109377615ab.4.1740999023063; Mon, 03 Mar 2025
- 02:50:23 -0800 (PST)
+        bh=uqcchcl0H3MHX0plBBglpw5tZdbp+fJLEBNYpMMUwBs=;
+        b=sMBPnW8KKDKXauJZC6pa2LuFUUggQQKRww4N4jKi8oKq0TQUxpfQvGcpAhYBnhRNQe
+         gznvq+z8ApDRSUZM3HAroosgH/hzIY0QafuGS0hfrQaN/h4qkpHhNya1CcQjpqr1YMiu
+         g4J+phuFt57JJtxAnI9TkB1xtIL+qHzYlcqaYDc+8DJ2cWDJRHTFfKF4WSLgSkWrIXxJ
+         SXQoqS365eLePw1DQ7HmgA5e3f0ohTsxodtgWzwH+1tajxZXOT2gi6NAFsk3HQtmW7FX
+         YOJ1aX42AQih9dmPH35fc/oYksxgp4QKtQ7oiU788sx6Qo61A3AWlMhFNyxNxSOnSoL+
+         Pz3A==
+X-Forwarded-Encrypted: i=1; AJvYcCV3d0IdGKeY3Wv+WPpZ9Ts0IDdkX2zFYCkfpRWJieio3M8qTU4xXMrlAJUtoh32viHPiJo=@vger.kernel.org, AJvYcCVWx8EVHq7JhM2A5Dl/sl/oCA/WPND3MFQ2KTHM2XCVKlokfnPuI/NVwlYJ7LaNbyC55+qfaniVqcueLfw5t6ME07rG@vger.kernel.org, AJvYcCWDcABtb0+xZslY0PO669sIMEUXq/S+PILTtByt7l8TZnt9h3MQAChCoci5sHxEeLnSylqm3tAD@vger.kernel.org, AJvYcCWs9KYuIUTBCHzAuQam/RHTGm51g+yFsTlD6+iWZK9XuXhnY48LFk0jy+SlT7u1rDr44GZXOrgCc9plPW/J@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVKs4bh4j8HIMnt2H5KnuTDtyFtg5QtakEW6qbQDgz2TlAFQlP
+	CuLnSLOJR1Q5VkxZBv831ntlJhh5IhOeMgXojarGAtpMPUL9CaypaMcyc8WorTQD2EUzPWyYHkg
+	/neROTnAz5FN9V4GQ+tFLZbnMmGc=
+X-Gm-Gg: ASbGncsuS+OSbVQ4jPiB2HPeBrgG7kZ4keSpAzlZ0L9lE6rD2dRcVSzwj4KcDX/IVFE
+	+F/geXtpVwqEEvo28GSxonTpA73yZrF+ZisVuT/SosrAFUxcp4nGCBbLf8Kgu03k/WV9aV1w7Mk
+	Q77tozpTFwKK+H/55m0CCoiqnY6g==
+X-Google-Smtp-Source: AGHT+IGPFg7vyGunvepCrP71hctzW/wiFhK2mnTSkLrkuSsp6X2qPRH18XUJIiB5Y7juu2x6EocYr5DNocerNm2QyWM=
+X-Received: by 2002:a05:690c:4802:b0:6fd:2f47:f4f9 with SMTP id
+ 00721157ae682-6fd4a0bad92mr160996667b3.9.1740999195914; Mon, 03 Mar 2025
+ 02:53:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250301201424.2046477-1-edumazet@google.com> <20250301201424.2046477-6-edumazet@google.com>
-In-Reply-To: <20250301201424.2046477-6-edumazet@google.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 3 Mar 2025 18:49:46 +0800
-X-Gm-Features: AQ5f1Joy67mT1NkPh6Xk05u5pHKvCOnxj4KCNQ2vpSgGcO8bMse3T81v2frU_EY
-Message-ID: <CAL+tcoBnY9Ss=DiAPJOuGaGtX8-Yq_ANyqAWNOf_qNp0ZbJe-w@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 5/6] tcp: remove READ_ONCE(req->ts_recent)
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Wang Hai <wanghai38@huawei.com>
+References: <20250303065345.229298-1-dongml2@chinatelecom.cn>
+ <20250303065345.229298-2-dongml2@chinatelecom.cn> <20250303091811.GH5880@noisy.programming.kicks-ass.net>
+In-Reply-To: <20250303091811.GH5880@noisy.programming.kicks-ass.net>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Mon, 3 Mar 2025 18:51:41 +0800
+X-Gm-Features: AQ5f1JolBjCiOEE9gVLsf6wdPN2zmwGfmSm6JtRrhu885EwwD4hwEQ1WHKYNmyc
+Message-ID: <CADxym3as+KdeBMUigq4xq302g2U7UG-7Gm+vKiYGnSjHouq=bg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 1/4] x86/ibt: factor out cfi and fineibt offset
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: rostedt@goodmis.org, mark.rutland@arm.com, alexei.starovoitov@gmail.com, 
+	catalin.marinas@arm.com, will@kernel.org, mhiramat@kernel.org, 
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	eddyz87@gmail.com, yonghong.song@linux.dev, john.fastabend@gmail.com, 
+	kpsingh@kernel.org, sdf@fomichev.me, jolsa@kernel.org, davem@davemloft.net, 
+	dsahern@kernel.org, mathieu.desnoyers@efficios.com, nathan@kernel.org, 
+	nick.desaulniers+lkml@gmail.com, morbo@google.com, samitolvanen@google.com, 
+	kees@kernel.org, dongml2@chinatelecom.cn, akpm@linux-foundation.org, 
+	riel@surriel.com, rppt@kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, llvm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Mar 2, 2025 at 4:15=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
-rote:
+On Mon, Mar 3, 2025 at 5:18=E2=80=AFPM Peter Zijlstra <peterz@infradead.org=
+> wrote:
 >
-> After commit 8d52da23b6c6 ("tcp: Defer ts_recent changes
-> until req is owned"), req->ts_recent is not changed anymore.
+> On Mon, Mar 03, 2025 at 02:53:42PM +0800, Menglong Dong wrote:
+> > index c71b575bf229..ad050d09cb2b 100644
+> > --- a/arch/x86/kernel/alternative.c
+> > +++ b/arch/x86/kernel/alternative.c
+> > @@ -908,7 +908,7 @@ void __init_or_module noinline apply_seal_endbr(s32=
+ *start, s32 *end, struct mod
+> >
+> >               poison_endbr(addr, wr_addr, true);
+> >               if (IS_ENABLED(CONFIG_FINEIBT))
+> > -                     poison_cfi(addr - 16, wr_addr - 16);
+> > +                     poison_cfi(addr, wr_addr);
+> >       }
+> >  }
 >
-> It is set once in tcp_openreq_init(), bpf_sk_assign_tcp_reqsk()
-> or cookie_tcp_reqsk_alloc() before the req can be seen by other
-> cpus/threads.
->
-> This completes the revert of eba20811f326 ("tcp: annotate
-> data-races around tcp_rsk(req)->ts_recent").
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Wang Hai <wanghai38@huawei.com>
+> If you're touching this code, please use tip/x86/core or tip/master.
 
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+Thank you for reminding me that, I were using the linux-next, and
+I notice that you just did some optimization to the FINEIBT :/
+
+I'll send a V4 later, based on the tip/x86/core.
+
+Thanks!
+Menglong Dong
 
