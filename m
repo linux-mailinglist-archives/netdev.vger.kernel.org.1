@@ -1,129 +1,104 @@
-Return-Path: <netdev+bounces-171785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4482AA4EBCA
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:35:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 81D3AA4EB68
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:25:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C831885A39
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:56:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 703F43BF88A
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:48:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F169C2BE7B8;
-	Tue,  4 Mar 2025 17:36:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F7BD25FA14;
+	Tue,  4 Mar 2025 17:26:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l/UAcHqw"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="VUOQXwyk"
 X-Original-To: netdev@vger.kernel.org
-Received: from beeline2.cc.itu.edu.tr (beeline2.cc.itu.edu.tr [160.75.25.116])
+Received: from beeline1.cc.itu.edu.tr (beeline1.cc.itu.edu.tr [160.75.25.115])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 514682BEC2F
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:36:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=160.75.25.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB243259C8F
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:26:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=160.75.25.115
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741109813; cv=pass; b=RaHdyQd/wlwLICfjoopdfuG10jpzIxt7QUQiXAiLFxGNZAVfa9K9uIE5P8326q9uS7D/hGjPOsLhlzn1SyFuKUDcEa2h6gBJX7yHlJGP9vN4fqzOh1wrlyEKoQC6ac7GCkV41icRn/JETyX9NTCUaRe4HD9RzwodfgNRsDKOJaM=
+	t=1741109176; cv=pass; b=TkxYMd620yqzx4tKik3QtoGhQsj6x5cJVBbz46VuEjqaov5Wdzzlu8Z4kYn+li953XLO9hAuQZoLfqO5G1U3htsQ+bVM9Bzh0YF9p+6wodEoOrpanKn/Ki9mfI++KbKWgKUJkFFfM7RSt0oWZGstu+8dlLQFnvJA1/1t5EqKbYs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741109813; c=relaxed/simple;
-	bh=67zi3moPbtJ00/7I6KgI37WCfQcSyOl+ZoHddiamufc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ilVo0KhXJOvCwrokMaQ0lUmrWaZM3YqIPyDJ7IO2C0tvyclY+NucGXPMoEGFBR/p+d775XpDKRmgK+Gf8gXJ1cv54Jpmd+MvbbS0xghCFcirZIkWDlMvT2cEFyt8bOHIFEnA2D67PAw3oAG/zSlJSUGJw5sU/8Y365gTxJjgVgY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l/UAcHqw; arc=none smtp.client-ip=209.85.208.179; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; arc=pass smtp.client-ip=160.75.25.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1741109176; c=relaxed/simple;
+	bh=bK2QYxfhL69EA5hm+p1hxMIpBV4AYdVsRtMU8Btuowc=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=GnNrDkNuGqqL42pv4mIxk6UOFaHBFWRYosqYuB+Wxbhy6rafxX0TtAHh5JMzWeF+b/6RvFzQFnyLs+7Pn5BN4l00jnnujNVyAPS3ab0W3Y0euUUM6NeaUbHpkTUEs5D5QhhV01bIpj/Dgixu2IjXNYhUBxOTMkrUHFn0k79sN5g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=VUOQXwyk; arc=none smtp.client-ip=212.227.15.3; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; arc=pass smtp.client-ip=160.75.25.115
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=cc.itu.edu.tr
-Received: from lesvatest1.cc.itu.edu.tr (lesvatest1.cc.itu.edu.tr [10.146.128.1])
+Received: from lesvatest1.cc.itu.edu.tr (unknown [10.146.128.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
 	(No client certificate requested)
-	by beeline2.cc.itu.edu.tr (Postfix) with ESMTPS id 8C8ED40D0B9A
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 20:36:50 +0300 (+03)
+	by beeline1.cc.itu.edu.tr (Postfix) with ESMTPS id 5EC70408B645
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 20:26:13 +0300 (+03)
 X-Envelope-From: <root@cc.itu.edu.tr>
 Authentication-Results: lesvatest1.cc.itu.edu.tr;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20230601 header.b=l/UAcHqw
+	dkim=pass (2048-bit key, unprotected) header.d=web.de header.i=markus.elfring@web.de header.a=rsa-sha256 header.s=s29768273 header.b=VUOQXwyk
 Received: from lesva1.cc.itu.edu.tr (unknown [160.75.70.79])
-	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6hPJ5WsdzG42t
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 19:45:08 +0300 (+03)
+	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6gLx0KXwzG1vn
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 18:58:01 +0300 (+03)
 Received: by le1 (Postfix, from userid 0)
-	id 1C01942744; Tue,  4 Mar 2025 19:44:46 +0300 (+03)
+	id 3469C42727; Tue,  4 Mar 2025 18:57:54 +0300 (+03)
 Authentication-Results: lesva1.cc.itu.edu.tr;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l/UAcHqw
-X-Envelope-From: <linux-kernel+bounces-541679-bozkiru=itu.edu.tr@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=VUOQXwyk
+X-Envelope-From: <linux-kernel+bounces-541758-bozkiru=itu.edu.tr@vger.kernel.org>
 Authentication-Results: lesva2.cc.itu.edu.tr;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l/UAcHqw
-Received: from fgw1.itu.edu.tr (fgw1.itu.edu.tr [160.75.25.103])
-	by le2 (Postfix) with ESMTP id EE65841E20
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 15:14:03 +0300 (+03)
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=VUOQXwyk
+Received: from fgw2.itu.edu.tr (fgw2.itu.edu.tr [160.75.25.104])
+	by le2 (Postfix) with ESMTP id A492741AEC
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:06:13 +0300 (+03)
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by fgw1.itu.edu.tr (Postfix) with SMTP id C55283063EFE
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 15:14:03 +0300 (+03)
+	by fgw2.itu.edu.tr (Postfix) with SMTP id 77F282DCE1
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:06:13 +0300 (+03)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F9D81892655
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 12:14:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CEB331894239
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:05:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0338820F088;
-	Mon,  3 Mar 2025 12:13:39 +0000 (UTC)
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2301212B3D;
+	Mon,  3 Mar 2025 13:04:52 +0000 (UTC)
+Received: from mout.web.de (mout.web.de [212.227.15.3])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC4F20DD4E;
-	Mon,  3 Mar 2025 12:13:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D1691E521B;
+	Mon,  3 Mar 2025 13:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741004016; cv=none; b=Q2XTAr5drXtnNIpkpRk6s0Dl8b/eXMOf2+PM/JJHaCtZM9HFexQlQFUp1688n7dDS5429Jonpciv6eMjVcT6DkJ3aBDhGIlZyaaMYW6IgMGrdVJBM0CGM+ahaFDwT60lvUo8ggNxG2V7+sFVPBBlOYmKg2SBhwGebkQ9Bjb6uhY=
+	t=1741007089; cv=none; b=cpMyCf+gUDsC6WBIGjZgyDZfN7UE7fdYAkATO83fODmPtbw0r43gUnPcwA3g7BsZZG4YpkXctPHmumkEp6IwfxH/a8y9XDOAlFwbZcSzeUaWilZZsmCfu33s2rdsM8XAcFxfkP+DA6kc+mh3poLYcd3J3yZA8FmsoqCoRHFj1lA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741004016; c=relaxed/simple;
-	bh=67zi3moPbtJ00/7I6KgI37WCfQcSyOl+ZoHddiamufc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Uvg11cMp7DKwd5ysjkCsVFD6lypUqMXP7oYGCepqfTMCDcj+O6n2lyvxxIr02K09BFVtc3qGoDko/0LnsAlQa/nylAJOYUw6xUYsHNs0VdSsfhGd0kYORO8e6rwBZ1UXjNWtnnRN/JJBPHJwPWXggsO8BpQ8XDD8nCwJ9lEYjkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l/UAcHqw; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-30ba563a6d1so19299061fa.1;
-        Mon, 03 Mar 2025 04:13:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741004013; x=1741608813; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4I10pqhpXBKjcK+lwxIKgzV5wGxXaBJXL3xG7GMPSLE=;
-        b=l/UAcHqwR/lD/xI9zlb9AX5ojh2Ti0kdrkOXAZriXC0+9AccFEvO0t0lGZxXPDFAb3
-         ftrux6HubrD2TDz+ECulNS6wG3oaLSX+VTC/R1mEcelm+695k2M2peXw/BlUUSmF7xED
-         /tJ141bpu8/dMqhgrwvewykHqYuCxd20UmMrTsJmoYovkUmhAWJpfYOrgmfNEs+gEmhr
-         1HE2JcBKY2zU0R2KqwVl9/solBwSneorHNzm8SvdZtN+LL1xGbu0zSO7ewOfBQPu28tZ
-         tjhG9xKsPoztMgb5KvLnZhkkWLZ0YvXGW6Itv+V5kgHG1Spi/9wudh9Jheke3mptMAcl
-         +pKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741004013; x=1741608813;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4I10pqhpXBKjcK+lwxIKgzV5wGxXaBJXL3xG7GMPSLE=;
-        b=V/ZLlhlbFuFHxwd0VvmrttGT6u/oVz/dO6Id0FuN2GyQo22v8OWOQ2kBY70l1ILvjZ
-         ZYnakxEGx9IXRj8TpSgBbLq3vzX/18c7dXyXbOKwT8Nl6+FMJfh884ucC6SUzEEcGCde
-         lphVWNXoduv7X+H86+H2+Z0mNRHdaM56zxnk3mX7+Yt2a0F19uWjmh+8dZnlgPzqyFNQ
-         SIFmypQHGUx7lH4EEVp2oPgwBoOQO7eQR6rFaFqNauOCqzDktU1Gzp+W4vsAeLWLO/2d
-         2hcAjfBdLmDqtbYtGvH7kjxaFs6+OMnDad2i9sv7FqagBOVRwWU7kD1q6aSdYQoE/W2i
-         3DWw==
-X-Forwarded-Encrypted: i=1; AJvYcCWMSdIM9D/KhmU3M64QviVGyjqxZAMdhq0KVOU5LPjrHcsiT+TdWVigFXxEdpTG8Edpk6skN0tf@vger.kernel.org, AJvYcCXQ6XGhBnfub9CP5KmFAIIBjyH+9ie9f2fZlnQcdGY72522wNyOQYN2I/7ZZP2UxTSWkekHrxwWaVbJv6uu@vger.kernel.org, AJvYcCXlUQpdWRULDjI0dL4BPHdATy7t98Uz0Xvlon3ve1aGixH4iZR8xIYrRlBP5sq/GLLFiqsxQppPKbsJ@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUKMdhOkZaeaAZKZRD1SBCdpRFUI3uqFImN1IL+SIOBihpc3Gx
-	4bu1rlPDjfHq0oqRU0Rt0dTNP9WGcyp0htwqOxstJsnZXByzylOr
-X-Gm-Gg: ASbGncssOikvky6xxZA65SMd62I7CbY27uEV2Ln4XBkvRGE9OkhvpbS9NIkwOYojUBE
-	mJc9iD/rwnYUCSp/sd5EjuENHOqlfrwI11lx7vqEmeSBw6T2bkM7QyUF/+MvW/ApiQK761Jd6FB
-	XCqC0BE/dzlAJi6LZduY1F1Wgfts/1q5/DEMQQHhpyuNrJMKJoOMdF0jMpZY/A5EaouMh4OBsVQ
-	5Js1bTFEeBW3X5oqmPinlpv4gwxcQPbtuwLUD3vkTV+bUukfJLy5Spl28INAXlRjSwakdW9JvIe
-	P+KY7iWv+SkYGxNsaXRg3kVXSFEqrgJBj/weouxvh6GPWmPXbjq5/j+ePQDyk55DtWFfZf6HBUu
-	kkbcJbjfcqrJwMpnzY1Ou
-X-Google-Smtp-Source: AGHT+IHgUTPP7a3wfBba3HmV4E8EIQMEL1aA+9ZOmIbLBKKMxMzPxezWgUWnkJNajqEM38nxec+/Vw==
-X-Received: by 2002:a05:6512:e8b:b0:546:1fd8:3876 with SMTP id 2adb3069b0e04-549432de15dmr6348652e87.14.1741004012425;
-        Mon, 03 Mar 2025 04:13:32 -0800 (PST)
-Received: from [192.168.42.63] (mobile-access-2e8451-125.dhcp.inet.fi. [46.132.81.125])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5495d12b85bsm583134e87.234.2025.03.03.04.13.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Mar 2025 04:13:31 -0800 (PST)
-Message-ID: <aacffceb-e9e8-412a-a624-568e6b10d586@gmail.com>
-Date: Mon, 3 Mar 2025 14:13:30 +0200
+	s=arc-20240116; t=1741007089; c=relaxed/simple;
+	bh=bK2QYxfhL69EA5hm+p1hxMIpBV4AYdVsRtMU8Btuowc=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=dG1fwNcCz69IlVFD6gjYVU4A70DR9UEhlrKHVC4iNgWq54We9QdhddqVZazhr8MhEpa7Ncy6bfS31h1oWYgnXlWyWjGO7g1ndfLytl+MvUzBWakz6hHezOMyGfDz1lM+uWeJlsW9Zn1+JzXFBe4WjTWOO/JOJr4H7U01+9089ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=VUOQXwyk; arc=none smtp.client-ip=212.227.15.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1741007051; x=1741611851; i=markus.elfring@web.de;
+	bh=ZefGaaDikQnjs1LGtmcyi6zUvqK48gTikrVFialZuG8=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:From:To:
+	 Cc:References:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=VUOQXwykHDmRACVU8X33Rt1uW0UUPZiZAC3Wcg0Y4VnTpWz4BJHox8LC2q2aKGj3
+	 /mteEDNZVtYMlJSp50eLAIXVzEQLyajTwhoQZ8gMklF1Fbplz20+4rl9bh8voktCh
+	 7cEYgDwORv85DsKoYhyMiLyQD9/mtqoDk/a6zvi5VYslE9kHUVMJn5N9HurQ4F4tP
+	 5oVv4t8BOx3GfzzP/nkB85IB/UxtjUUx2/CoLb1UzVdyetd4DHwEikdRx3/L0wiJj
+	 21HPZDsF/vGDINJjIVvDtdhH8IrYJpCcLChljjeT/Ck9u+8UwVzVNcTsPuCaLYiBV
+	 I9OSbhrL7JEIcdruKw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.93.19]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1Mpl0r-1tTkt42vvR-00eFMs; Mon, 03
+ Mar 2025 14:04:11 +0100
+Message-ID: <535ce5e9-9ad0-4a8e-9fc2-0e759417d1b5@web.de>
+Date: Mon, 3 Mar 2025 14:04:08 +0100
 Precedence: bulk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -132,58 +107,120 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net-next v5 10/10] net: gianfar: Use
- device_get_child_node_count_named()
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>,
- Jonathan Cameron <jic23@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>,
- Rob Herring <robh@kernel.org>, Daniel Scally <djrscally@gmail.com>,
- Heikki Krogerus <heikki.krogerus@linux.intel.com>,
- Sakari Ailus <sakari.ailus@linux.intel.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>,
- Claudiu Manoil <claudiu.manoil@nxp.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+Subject: [PATCH RESEND] iwlegacy: Adjust input parameter validation in
+ il_set_ht_add_station()
+From: Markus Elfring <Markus.Elfring@web.de>
+To: kernel-janitors@vger.kernel.org, linux-wireless@vger.kernel.org,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, linux-acpi@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <cover.1740993491.git.mazziesaccount@gmail.com>
- <685cd1affabe50af45b767eeed9b9002d006b0fd.1740993491.git.mazziesaccount@gmail.com>
- <Z8WXqgxgFQC8b8vC@smile.fi.intel.com>
-Content-Language: en-US, en-AU, en-GB, en-BW
-From: Matti Vaittinen <mazziesaccount@gmail.com>
-In-Reply-To: <Z8WXqgxgFQC8b8vC@smile.fi.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+ Johannes Berg <johannes.berg@intel.com>, Kalle Valo <kvalo@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Sriram R <quic_srirrama@quicinc.com>,
+ Stanislaw Gruszka <stf_xl@wp.pl>
+Cc: cocci@inria.fr, LKML <linux-kernel@vger.kernel.org>,
+ Simon Horman <horms@kernel.org>
+References: <40c60719-4bfe-b1a4-ead7-724b84637f55@web.de>
+ <1a11455f-ab57-dce0-1677-6beb8492a257@web.de>
+ <d90b8c11-7a40-eec4-007d-3640c0725a56@web.de>
+Content-Language: en-GB
+In-Reply-To: <d90b8c11-7a40-eec4-007d-3640c0725a56@web.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:jymu+Pr/1TM+UE1JmuPUEORIpf2+qiF1lVGAScvypt9vYK8bt5v
+ idl/iM8PTR6GeLd8dQ/PV/NBe0QVMImhaGA/no3YROXP3+O/ZMOy4OehC8kK1NC2wLPrUvt
+ mJEk30C10DOjyID6CK8aBMgsaNMkOjtScGq/Ry79uPBtaLQhcIZOOcMSxwHv5KgFjxKOoBL
+ v2j/MsWi3yyovatcuxhRQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:uVOiMT9twh4=;NMDytpay6lIFj3dsqdE/Z4Yl4c/
+ t592kNeaCLxQJXeAmgukVFmcI623zCrOqNmZIWtsJOfMWfm+KPzGUaD+bukKKNt9QupSsprUS
+ eryIqHbO+P/CgFsCs1cljKSTsUodBNmNHfg77J9K9QBRh1hdQXs5hXrrQgcECr0ih/FdOLxp9
+ 2fDlGbiCR7yzXHW+wCiZk3bhQRf5T4E3x+UwpNZ2rsn+jtnlk9EEAKZpv7gtmJjOtKZt1dB1p
+ yQ8kYbxeBgbcZLAFMz6ospRvWCf2B3lWMZcCRiWipObsYtnM50kFRxxFFeEXih2S2+HWHG69w
+ hnd0HWQW5MbxO96aDIAvpIFGWFcPGDY9DGArE8VvtUuOeRH/jk7A/AkqBpJ5CymTc22IvTRH9
+ 8zdrwBZMhC4SDK8KWAbiALVy6j7y1nOQrNX89TgvE3oTACLW1/uAkP1+A2N3jPMtRyF9CZKtA
+ jbLt6Fvk+0inAjpbIzXZyA05rNpP2SnBvm9cXlQGWe+/D5xoNx6cmX2vi3QNLxndGhhTWWIUO
+ G2yu6Gp7Y5vZAllrjWB104TQ754TBOIZPJi7LmnCAJ3j9ej471RsuyRpHiI81YYff01NJva9d
+ rsSTkuTeucTVezfTplviL/cLvGGGqIYzTqDWPhYaMPElMWJAyJEmFtpvfxceZYMA3t6nvDdEZ
+ l+qWL5NbV0cdTRnnXXMCzpQztkXihe/fnS+sKq8DwJORqkMr18CUKj5t52cu4114jpS9E0d4r
+ IhdFDt6gq9jRO7dADQtmHKsBAnMnjLcDK3VsJxUlaDYefXnQCGNdSrQmAEtUupKnKL0ESYJSM
+ W+xqVwjbpQqGdyKGwi9xfI+wCpAxx5Sg/McPGYwVFJjKNhsv1TyDqwIZqt1JNvHQKvuTxAk5x
+ FQ1LdHN7h+4+K31L9Uv/D0bjGxvNzAzkC9nXad5AZ8VZWc2+OS47kOkSeRbY9auS4jZfQCi9B
+ 0K5eXCYA6BCFP+JwYOWe7B2dWfhx7rFft289lQFW2cuhThgcSJk/aD7KGMORPxbRqhMem2iNE
+ /Aqj2uDhNAZvQOlK/zulc6hWf0Q4ckiBnN96Q704GV988t+wFWn54jXGUbHODCfM17hBs2Suv
+ wrfLBztoieDegRtA6YBhegRCL/EG1WhaB1AkEbA4y+r07nC2JkJWBVvll11IyjtLdfIn7jCSz
+ pvCsN5ZljvPq3QXxY9wQTCArITqU8afvoGTFGXQbgFDG4zTO9MKk7iauXDiMQXn9IXv3Aju3u
+ etaLLjGHpdY1L6t7AvuuDo9XbPTuJy3wYJXWsYI1EZqrtwrWZnJZaIsGkuojCz88m4mGL9tJ6
+ WTviBm2dVQrszANHsNdjCfWLuRyhDTiMmRiD5s9tvYImRQs87/tkZQ0E2XCfA3FcPoZ2JVx0Z
+ Jzxe5c4toDudXb1oe93JEGuRP3EMfJjmXDLdg3e/p7uwvAOIwB5PwuInPuBnhLLYC2XgNNixo
+ iVdIJYNXq3AFU7mVU129qBvfhyk4=
 X-ITU-Libra-ESVA-Information: Please contact Istanbul Teknik Universitesi for more information
-X-ITU-Libra-ESVA-ID: 4Z6hPJ5WsdzG42t
+X-ITU-Libra-ESVA-ID: 4Z6gLx0KXwzG1vn
 X-ITU-Libra-ESVA: No virus found
 X-ITU-Libra-ESVA-From: root@cc.itu.edu.tr
-X-ITU-Libra-ESVA-Watermark: 1741714503.39129@m8cjRN2Avp0oiGQPqiOg4g
+X-ITU-Libra-ESVA-Watermark: 1741713861.54378@CQoivE6TBxg6wCO6SHKlPw
 X-ITU-MailScanner-SpamCheck: not spam
 
-On 03/03/2025 13:51, Andy Shevchenko wrote:
-> On Mon, Mar 03, 2025 at 01:34:49PM +0200, Matti Vaittinen wrote:
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Wed, 19 Apr 2023 18:35:55 +0200
 
-> 
-> What about the second loop (in gfar_of_init)?
-> I mean perhaps we want to have fwnode_for_each_named_child_node()
-> and its device variant that may be also reused in the IIO code and here.
-> 
+The address of a data structure member was determined before
+a corresponding null pointer check in the implementation of
+the function =E2=80=9Cil_set_ht_add_station=E2=80=9D.
 
-I agree the fwnode_for_each_named_child_node() would be useful. I think 
-I said that already during the previous review rounds. There is plenty 
-of code which could be converted to use it.
+Thus avoid the risk for undefined behaviour by moving the assignment
+for the variable =E2=80=9Csta_ht_inf=E2=80=9D behind the null pointer chec=
+k.
 
-This, however, is far more than I am willing to do in the context of a 
-simple IIO driver addition. The "BD79124 ADC suupport" is already now 10 
-patches, 2 of which are directly related to it.
+This issue was detected by using the Coccinelle software.
 
-I propose adding the for_each_named_child_node() as a separate series 
-with bunch of users appended. That's be plenty of beans to count for 
-those who like following the statistics :)
 
-Yours,
-	-- Matti
+Delete also the jump target =E2=80=9Cdone=E2=80=9D by using return stateme=
+nts directly
+for two if branches.
+
+Fixes: 046d2e7c50e3 ("mac80211: prepare sta handling for MLO support")
+Fixes: e7392364fcd1 ("iwlegacy: indentions and whitespaces")
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+=2D--
+ drivers/net/wireless/intel/iwlegacy/common.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/wireless/intel/iwlegacy/common.c b/drivers/net/wi=
+reless/intel/iwlegacy/common.c
+index 96002121bb8b..8f6fd17b02a8 100644
+=2D-- a/drivers/net/wireless/intel/iwlegacy/common.c
++++ b/drivers/net/wireless/intel/iwlegacy/common.c
+@@ -1863,11 +1863,15 @@ EXPORT_SYMBOL(il_send_add_sta);
+ static void
+ il_set_ht_add_station(struct il_priv *il, u8 idx, struct ieee80211_sta *s=
+ta)
+ {
+-	struct ieee80211_sta_ht_cap *sta_ht_inf =3D &sta->deflink.ht_cap;
++	struct ieee80211_sta_ht_cap *sta_ht_inf;
+ 	__le32 sta_flags;
+
+-	if (!sta || !sta_ht_inf->ht_supported)
+-		goto done;
++	if (!sta)
++		return;
++
++	sta_ht_inf =3D &sta->deflink.ht_cap;
++	if (!sta_ht_inf->ht_supported)
++		return;
+
+ 	D_ASSOC("spatial multiplexing power save mode: %s\n",
+ 		(sta->deflink.smps_mode =3D=3D IEEE80211_SMPS_STATIC) ? "static" :
+@@ -1906,8 +1910,6 @@ il_set_ht_add_station(struct il_priv *il, u8 idx, st=
+ruct ieee80211_sta *sta)
+ 		sta_flags &=3D ~STA_FLG_HT40_EN_MSK;
+
+ 	il->stations[idx].sta.station_flags =3D sta_flags;
+-done:
+-	return;
+ }
+
+ /*
+=2D-
+2.40.0
+
 
 
