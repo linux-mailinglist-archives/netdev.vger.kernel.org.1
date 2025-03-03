@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-171121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EFE2A4BA2F
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 10:03:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F56DA4BA32
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 10:04:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9E751884229
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 09:03:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4E5418904C8
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 09:03:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E2E91EFFB0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2C711F03FF;
 	Mon,  3 Mar 2025 09:03:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Xth63yyV"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="dYpWUpQc"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC921EF099;
-	Mon,  3 Mar 2025 09:03:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73E161EF376;
+	Mon,  3 Mar 2025 09:03:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740992618; cv=none; b=Eng/JlSCfC2UvGaLmMTfv8J9XJneEOCbtO2gQw6vgde77NKw+PjFoLq8S7JwoDw4cGpsyCSNThDZlH5EWzlOmkJv6IykehvT07s2wkuW8P22avx+Q9+Flnlnlcvr+0AQA1uaoYBoaUj0NXsTsjZVDzY7IpydYwmW+ukutdHCTdg=
+	t=1740992618; cv=none; b=ATmMA/VTZg95kPkuSTRGVUUL6Pc0YDrXyahKYA3JDpHSxb/edG3DMn4CLxovuk8anF8keeQ2+4EFFWFRPasl+w3Im6L4FB2M8VLc3B2rhC7/+q+Bs1ZO+wsIjhEF8ODs1P6fDzepgIV4Ci2p3TQXBJkvX+9KuoC3JsjsqtEnp3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1740992618; c=relaxed/simple;
-	bh=Atf+N797ReonutHfaP/NEiyZsTvsa7qMERZI0s74rlI=;
+	bh=007c1HzORWeBW1+Unljk6A61fsRxfjDsejdgDv3YYj0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=omQRzKYsUCo3kfYBIqbWEfBxBdoBM1XXZPpdlHL61jRyndyldSTf2tE+Bt/7txfiaRU9565w1fzbvsSHRRNYtBvP1SK3B9ZZbsCwpNrXPzcnSaN07VjtxIlRE9BMs3nTm1BXsTI622pEd+HcZ04ABMIHrZ/gVA5rVga2iOpT5CU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Xth63yyV; arc=none smtp.client-ip=217.70.183.196
+	 MIME-Version; b=TzZ4Gf2KvwxFIfRlHp3hj4t/Khznqkb17/g4+9+gvbDUs0eV+YFHi0wOwb0BM1VRkMc7stayPbX5k8J8ZQKdoIQhJuNwYH4bwBo47x8B1wuP4xRonvOpM4FRdDRB+CwE3qbmxhptox3cQuAG1Brb2GH0ypIyumeTkkgPMJ+dhsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dYpWUpQc; arc=none smtp.client-ip=217.70.183.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id CB4FF433D6;
-	Mon,  3 Mar 2025 09:03:32 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id DFCD944540;
+	Mon,  3 Mar 2025 09:03:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1740992613;
+	t=1740992614;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=srKaH+dUPNcj7myLBF3rWvtWswbd4aKF0FGqhtNPS/A=;
-	b=Xth63yyVKef/3QCJn/XXggPX9L2ePfszv42r5rzFuDUcWBvJtzlCnfsrHYL5Pdv650CCjx
-	E4I7BsxEhNCdBHSzAGiUwVm9QNILcyE8XBvDwsNH809XDY5xewyGQFCmgtvqzBWcLNqRtm
-	x8wKmQ6N1CGA7vYceLZ7GrJbVfzVWyqzvZLg6b0QIdqqDpc9f5pA2bUNxvnVizHy4qrXdU
-	+41Zt+fgTBIXyyYsJY2IEY9Ez57niUgCwxc1aAXzSVtZy8eDoIkHwKFDsgjsE12Gi5VdwJ
-	GFpRRQFVoE19X7lKYZohG3TLKNYezvYflrz7VmdcTnN4CkNn/Dzmd+Kqfe739g==
+	bh=D9+W74DUYTC9EfYFTkYyfAzz2dcJpVGh5swL3t37v84=;
+	b=dYpWUpQcQbXhxYZXqHSney46LQjb3looF3QUI9Why+kbYKfNrXZgZHbB5PX46KpK9KCHw+
+	eljD5p3mazauYJ14Em0EE/R5fH9tIg5XWtHva6tsz0oSYCldHQ7cGzGZJCvfhniL1B40+6
+	lp2YmWsuNmccB+hsnoVEp9T67U/CB+FDU00U0kaqkRBkx2yRaRoBjxhpdp5YGaHWvzLno+
+	h33s2ZfiaqEJqEM3ZDfVIAlpipW4rSNXvFCCQhpusFDX0mDW2xl6nqVx/bWREIB4RqRohv
+	KZxP2r2oYhj5z7pyfKr29pDryN9+wlHHVp3X+R33Z8xGRmW1fJQ9ZAGxTJR2VA==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -66,9 +66,9 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Oleksij Rempel <o.rempel@pengutronix.de>,
 	Simon Horman <horms@kernel.org>,
 	Romain Gantois <romain.gantois@bootlin.com>
-Subject: [PATCH net-next v4 05/13] net: phy: phy_caps: Introduce phy_caps_valid
-Date: Mon,  3 Mar 2025 10:03:11 +0100
-Message-ID: <20250303090321.805785-6-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next v4 06/13] net: phy: phy_caps: Implement link_capabilities lookup by linkmode
+Date: Mon,  3 Mar 2025 10:03:12 +0100
+Message-ID: <20250303090321.805785-7-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250303090321.805785-1-maxime.chevallier@bootlin.com>
 References: <20250303090321.805785-1-maxime.chevallier@bootlin.com>
@@ -85,71 +85,167 @@ X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdelkeejudcutefuodetggdotef
  igvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomh
 X-GND-Sasl: maxime.chevallier@bootlin.com
 
-With the link_capabilities array, it's trivial to validate a given mask
-againts a <speed, duplex> tuple. Create a helper for that purpose, and
-use it to replace a phy_settings lookup in phy_check_valid();
+In several occasions, phylib needs to lookup a set of matching speed and
+duplex against a given linkmode set. Instead of relying on the
+phy_settings array and thus iterate over the whole linkmodes list, use
+the link_capabilities array to lookup these matches, as we aren't
+interested in the actual link setting that matches but rather the speed
+and duplex for that setting.
 
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
-V4: No changes
+V4: Switch to macro iterators for better readability (Russell)
 
- drivers/net/phy/phy-caps.h |  1 +
- drivers/net/phy/phy.c      |  2 +-
- drivers/net/phy/phy_caps.c | 19 +++++++++++++++++++
- 3 files changed, 21 insertions(+), 1 deletion(-)
+ drivers/net/phy/phy-caps.h |  5 +++++
+ drivers/net/phy/phy-core.c | 36 +++++++++++++-----------------
+ drivers/net/phy/phy_caps.c | 45 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 65 insertions(+), 21 deletions(-)
 
 diff --git a/drivers/net/phy/phy-caps.h b/drivers/net/phy/phy-caps.h
-index a44d983eaed8..f35ede4e557d 100644
+index f35ede4e557d..7103cf508d7e 100644
 --- a/drivers/net/phy/phy-caps.h
 +++ b/drivers/net/phy/phy-caps.h
-@@ -43,6 +43,7 @@ void phy_caps_init(void);
- size_t phy_caps_speeds(unsigned int *speeds, size_t size,
- 		       unsigned long *linkmodes);
+@@ -45,5 +45,10 @@ size_t phy_caps_speeds(unsigned int *speeds, size_t size,
  void phy_caps_linkmode_max_speed(u32 max_speed, unsigned long *linkmodes);
-+bool phy_caps_valid(int speed, int duplex, const unsigned long *linkmodes);
+ bool phy_caps_valid(int speed, int duplex, const unsigned long *linkmodes);
  
++const struct link_capabilities *
++phy_caps_lookup_by_linkmode(const unsigned long *linkmodes);
++
++const struct link_capabilities *
++phy_caps_lookup_by_linkmode_rev(const unsigned long *linkmodes, bool fdx_only);
  
  #endif /* __PHY_CAPS_H */
-diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-index 3128df03feda..8df37d221fba 100644
---- a/drivers/net/phy/phy.c
-+++ b/drivers/net/phy/phy.c
-@@ -260,7 +260,7 @@ unsigned int phy_supported_speeds(struct phy_device *phy,
-  */
- bool phy_check_valid(int speed, int duplex, unsigned long *features)
+diff --git a/drivers/net/phy/phy-core.c b/drivers/net/phy/phy-core.c
+index f62bc1be67b2..6cb8f857a7f1 100644
+--- a/drivers/net/phy/phy-core.c
++++ b/drivers/net/phy/phy-core.c
+@@ -468,16 +468,15 @@ EXPORT_SYMBOL_GPL(phy_resolve_aneg_pause);
+ void phy_resolve_aneg_linkmode(struct phy_device *phydev)
  {
--	return !!phy_lookup_setting(speed, duplex, features, true);
-+	return phy_caps_valid(speed, duplex, features);
- }
- EXPORT_SYMBOL(phy_check_valid);
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(common);
+-	int i;
++	const struct link_capabilities *c;
  
+ 	linkmode_and(common, phydev->lp_advertising, phydev->advertising);
+ 
+-	for (i = 0; i < ARRAY_SIZE(settings); i++)
+-		if (test_bit(settings[i].bit, common)) {
+-			phydev->speed = settings[i].speed;
+-			phydev->duplex = settings[i].duplex;
+-			break;
+-		}
++	c = phy_caps_lookup_by_linkmode(common);
++	if (c) {
++		phydev->speed = c->speed;
++		phydev->duplex = c->duplex;
++	}
+ 
+ 	phy_resolve_aneg_pause(phydev);
+ }
+@@ -495,7 +494,8 @@ EXPORT_SYMBOL_GPL(phy_resolve_aneg_linkmode);
+ void phy_check_downshift(struct phy_device *phydev)
+ {
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(common);
+-	int i, speed = SPEED_UNKNOWN;
++	const struct link_capabilities *c;
++	int speed = SPEED_UNKNOWN;
+ 
+ 	phydev->downshifted_rate = 0;
+ 
+@@ -505,11 +505,9 @@ void phy_check_downshift(struct phy_device *phydev)
+ 
+ 	linkmode_and(common, phydev->lp_advertising, phydev->advertising);
+ 
+-	for (i = 0; i < ARRAY_SIZE(settings); i++)
+-		if (test_bit(settings[i].bit, common)) {
+-			speed = settings[i].speed;
+-			break;
+-		}
++	c = phy_caps_lookup_by_linkmode(common);
++	if (c)
++		speed = c->speed;
+ 
+ 	if (speed == SPEED_UNKNOWN || phydev->speed >= speed)
+ 		return;
+@@ -523,17 +521,13 @@ void phy_check_downshift(struct phy_device *phydev)
+ static int phy_resolve_min_speed(struct phy_device *phydev, bool fdx_only)
+ {
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(common);
+-	int i = ARRAY_SIZE(settings);
++	const struct link_capabilities *c;
+ 
+ 	linkmode_and(common, phydev->lp_advertising, phydev->advertising);
+ 
+-	while (--i >= 0) {
+-		if (test_bit(settings[i].bit, common)) {
+-			if (fdx_only && settings[i].duplex != DUPLEX_FULL)
+-				continue;
+-			return settings[i].speed;
+-		}
+-	}
++	c = phy_caps_lookup_by_linkmode_rev(common, fdx_only);
++	if (c)
++		return c->speed;
+ 
+ 	return SPEED_UNKNOWN;
+ }
 diff --git a/drivers/net/phy/phy_caps.c b/drivers/net/phy/phy_caps.c
-index 132758d2eb8d..8ce7dca1acd0 100644
+index 8ce7dca1acd0..8160cb53b5ae 100644
 --- a/drivers/net/phy/phy_caps.c
 +++ b/drivers/net/phy/phy_caps.c
-@@ -128,3 +128,22 @@ void phy_caps_linkmode_max_speed(u32 max_speed, unsigned long *linkmodes)
- 		else
- 			break;
+@@ -113,6 +113,51 @@ size_t phy_caps_speeds(unsigned int *speeds, size_t size,
+ 	return count;
  }
+ 
++/**
++ * phy_caps_lookup_by_linkmode() - Lookup the fastest matching link_capabilities
++ * @linkmodes: Linkmodes to match against
++ *
++ * Returns: The highest-speed link_capabilities that intersects the given
++ *	    linkmodes. In case several DUPLEX_ options exist at that speed,
++ *	    DUPLEX_FULL is matched first. NULL is returned if no match.
++ */
++const struct link_capabilities *
++phy_caps_lookup_by_linkmode(const unsigned long *linkmodes)
++{
++	struct link_capabilities *lcap;
++
++	for_each_link_caps_desc_speed(lcap)
++		if (linkmode_intersects(lcap->linkmodes, linkmodes))
++			return lcap;
++
++	return NULL;
++}
 +
 +/**
-+ * phy_caps_valid() - Validate a linkmodes set agains given speed and duplex
-+ * @speed: input speed to validate
-+ * @duplex: input duplex to validate. Passing DUPLEX_UNKNOWN is always not valid
-+ * @linkmodes: The linkmodes to validate
++ * phy_caps_lookup_by_linkmode_rev() - Lookup the slowest matching link_capabilities
++ * @linkmodes: Linkmodes to match against
++ * @fdx_only: Full duplex match only when set
 + *
-+ * Returns: True if at least one of the linkmodes in @linkmodes can function at
-+ *          the given speed and duplex, false otherwise.
++ * Returns: The lowest-speed link_capabilities that intersects the given
++ *	    linkmodes. When set, fdx_only will ignore half-duplex matches.
++ *	    NULL is returned if no match.
 + */
-+bool phy_caps_valid(int speed, int duplex, const unsigned long *linkmodes)
++const struct link_capabilities *
++phy_caps_lookup_by_linkmode_rev(const unsigned long *linkmodes, bool fdx_only)
 +{
-+	int capa = speed_duplex_to_capa(speed, duplex);
++	struct link_capabilities *lcap;
 +
-+	if (capa < 0)
-+		return false;
++	for_each_link_caps_asc_speed(lcap) {
++		if (fdx_only && lcap->duplex != DUPLEX_FULL)
++			continue;
 +
-+	return linkmode_intersects(link_caps[capa].linkmodes, linkmodes);
++		if (linkmode_intersects(lcap->linkmodes, linkmodes))
++			return lcap;
++	}
++
++	return NULL;
 +}
++
+ /**
+  * phy_caps_linkmode_max_speed() - Clamp a linkmodes set to a max speed
+  * @max_speed: Speed limit for the linkmode set
 -- 
 2.48.1
 
