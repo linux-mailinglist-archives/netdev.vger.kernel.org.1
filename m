@@ -1,271 +1,136 @@
-Return-Path: <netdev+bounces-171138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0244A4BAB2
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 10:22:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54592A4BAC7
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 10:29:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6124D7A1DCA
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 09:21:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 428781889581
+	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 09:29:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 675F11F0E38;
-	Mon,  3 Mar 2025 09:22:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 792931F0E3A;
+	Mon,  3 Mar 2025 09:29:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mTV+LJ4p"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bdhlIxQ+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A83951F0E42
-	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 09:22:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D376A1F03C0
+	for <netdev@vger.kernel.org>; Mon,  3 Mar 2025 09:29:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740993750; cv=none; b=h40rp7YCnam+hLRSZhnffRAGsmrJByhIcF4rToGib84fo+WatRpmhT/7q2aGXiyL9R/VYWKJp+BxUvzD5eaRdFb9SaXGSMsqU1vgfa0HPVeUy9C1Oi2SgOdynjOVdgBcF4UcZcKzRLrJvTx+6dhQZBFtSpfiglrVXKXSEryhUkQ=
+	t=1740994177; cv=none; b=pmxvk+arnf9WJ2Be70MHzfvqAw8d52nYoLs9NE2BT/yhPMTnBVZrd8n/Tz5oedUYAzy/nen/1dK6Pa9TvKdYkC45rY5EzAEpN5Kk40lHTWK+QvlM9ivCFJ9MAHWFqF8cuPwAOaWDu/nIFPt3ANLygka9eFJp5fSG/YbanD7/7YY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740993750; c=relaxed/simple;
-	bh=pppXMI4hHDgpi3qDF2fKugtygurSGS2UQzTWIfgipHc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LzQR1gi8POWroITLkHS0tukt2eTo5RF2tGBV7CGxSgj+MYjbsV8xlCMo4zhDh6yVn5mX8GRJ9syiAXdknngqZ0ZiOB7uolyf6BC33g5Ru5cuI5fxuaiU1PNQXHeogB8DpjTd0ZZE2J+gIG/xXl+rqW3xJs0GbQ8duUm03lovzPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mTV+LJ4p; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740993749; x=1772529749;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=pppXMI4hHDgpi3qDF2fKugtygurSGS2UQzTWIfgipHc=;
-  b=mTV+LJ4p/H34NaF58g7yKV9ukaeRvJixZyOiRh+KrzVdtt8RSSOLzRU4
-   dRmW1B1SlcNa0Ib6bcAvj+omMwjjJ1wDd7dFgHeUB8ckSzO2LUHQ/97p5
-   qbnDU9fk/VHN3pW3Z559pSc2JI8UU4ZyZCVI3UTHRg7WNJFpMiZPuaohT
-   hk8f4+p467vDI7JmVm1ngkplCNu+QnUjbCZELdwxbdsczAJAuVXRpJNBx
-   X4VXnpKpHiRRd6B40R5Pw20HN3L49YtqjiNerXjara5L7/nhoEFLcLftT
-   PTV3ISY1uRcInWwNTRHtxcGGg+uzWAnIORcf2bWGVZBBtk6kFRNf05bgI
-   w==;
-X-CSE-ConnectionGUID: FJyLWpAtSxO6ltMQS4aXgQ==
-X-CSE-MsgGUID: 2uVe7UVdTtSa2cns9o0mJQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11361"; a="64306903"
-X-IronPort-AV: E=Sophos;i="6.13,329,1732608000"; 
-   d="scan'208";a="64306903"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 01:22:28 -0800
-X-CSE-ConnectionGUID: g5erRMBJRyaKUCgQMdR9/g==
-X-CSE-MsgGUID: Yk64ODLyTRmWNllaxZhWBw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,329,1732608000"; 
-   d="scan'208";a="117751711"
-Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.77.104]) ([10.247.77.104])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 01:22:25 -0800
-Message-ID: <aaf184a1-1431-4720-898e-16122d81022d@linux.intel.com>
-Date: Mon, 3 Mar 2025 17:22:22 +0800
+	s=arc-20240116; t=1740994177; c=relaxed/simple;
+	bh=hO/1w0WIreFcCNOGOIiuvQHBGfGmx0RKyWkuiZ5OENQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=O/9rldAhKnRgUZKPedmtdETE4op8oXQ808cnwP54/sKHi04gMISqCfYJ/BwRFIxkmxWZuLNFEgfMfPAUVjfreEBaWGa4jZe65xMuj0B96w4rq5LDU8y+wOzJSv0nOB9qamIb1KgN4IW1yyPJ3PxDyEs6u3OIC/Ji040c1IjA4KI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bdhlIxQ+; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740994174;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dm+Ad9vtaxKH6b/jFWjk7lOEkc1nxwN4lmuVSAb6Ah0=;
+	b=bdhlIxQ+fjll9LbqpU7NQS6QgIISeDczyHOHsERwPUYy7zo6FFCQpmIX++GEa6bFte5IzC
+	990mvIFsNyaD6fhBfuSrP01LH11fp6XVNPFaxP4Rvv8iC0QPKDY3qascTVltloejJodAZq
+	e/v2kLme4sp5TiOG/FBR0/J/pJSv50o=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-8-O6JS6H1pMEWogYSTpdpHuw-1; Mon, 03 Mar 2025 04:29:16 -0500
+X-MC-Unique: O6JS6H1pMEWogYSTpdpHuw-1
+X-Mimecast-MFC-AGG-ID: O6JS6H1pMEWogYSTpdpHuw_1740994155
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-22367f4e9b9so53172905ad.0
+        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 01:29:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740994155; x=1741598955;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dm+Ad9vtaxKH6b/jFWjk7lOEkc1nxwN4lmuVSAb6Ah0=;
+        b=wT6P+dUKrRV7UQVcDGV84cWaOwpVSqRCiYx5xNUGO2pplsntBjpWwumTwlmJoUe3f8
+         RSR1lrsu3I3E/4GGTpcOHhiZxcTK54AgIRqJw50nReLKk1cpSbS5toScGyI6aH7FASVL
+         HsVsctDEFeghATNkRTWtrs37m9xeuEvivQnLA9+zoDJ6Ty5m2e/97gZ6sf3GZ7/T+aok
+         jR9c3YRdAdS+49w5OwxmdkQo+ooi4V5B64QeEmG3DhWaxcZx2fQ0MxrW3rg+0vvvRnfL
+         yj3VCw+xk5geLL83uE3PfxqIYoIbbH36zmoaJs//qKYFVXFpNLHYvkv9nc1RF2DTu7MD
+         1ovQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVuZm9OU7eJN4XQjVLbI6/bNBqmMY4SZy+JSqDVeghVzoHgtOrtHKcu8umDm+KBE2jY9zZLh/s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdTx9lo4AwppIaoHsK2aigqE2FMd7EVBAWpzkf8f+hk+Hp42MW
+	0jGRt/YHgI3DMh5ffN7l/tgWv0mQXI/tfiTeb3PaqCAW8GqERtWKzZk9z6I0QQrq0pRTSJoesmR
+	RnBScrs8LH4gan2C6wKjX9gaDYUg9kIvgwve6Bo6xYrjYnJ6NCPQ1XWiwqD53EJzr40zsIDX2Qc
+	4fcFC0VtXDynFLalFkrLmqA3IyaX7pZKoB0DGe84M=
+X-Gm-Gg: ASbGnctoaKrlxXcUAg1RlVK4spl0nB8vNZ5lLqnIJYOmm/A4nAMvKoBh1LLYA72MyDL
+	X0zXSoZh2pfd4xN/IzpL+WU+2O4Syc++24S5UiGOIxN7MVHYMaYRnaALhOsif2FzpkrK4T3g=
+X-Received: by 2002:a17:902:f547:b0:220:f7bb:842 with SMTP id d9443c01a7336-22369255811mr196196085ad.42.1740994154028;
+        Mon, 03 Mar 2025 01:29:14 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEeh8T/Isef6u47m5QPpp9NHgJMkJl3dnUE8Ylea44Ny6EY1sjUVU9fZMYGnxlnkM9rFe7Jpp6zS4k5VEsVFKw=
+X-Received: by 2002:a17:902:f547:b0:220:f7bb:842 with SMTP id
+ d9443c01a7336-22369255811mr196195835ad.42.1740994153774; Mon, 03 Mar 2025
+ 01:29:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next v3] igc: Change Tx mode for MQPRIO offloading
-To: Kurt Kanzenbach <kurt@linutronix.de>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-References: <20250303-igc_mqprio_tx_mode-v3-1-0efce85e6ae0@linutronix.de>
-Content-Language: en-US
-From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
-In-Reply-To: <20250303-igc_mqprio_tx_mode-v3-1-0efce85e6ae0@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250303085237.19990-1-sgarzare@redhat.com>
+In-Reply-To: <20250303085237.19990-1-sgarzare@redhat.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Mon, 3 Mar 2025 10:28:37 +0100
+X-Gm-Features: AQ5f1JpYz8RUYj9eXvkfBI5yoVaRYAPygFZFSo69WGk-H92b36v2eBIN9Cg-xmM
+Message-ID: <CAJaqyWfNieVxJu0pGCcjRc++wRnRpyHqfkuYpAqnKCLUjbW6Xw@mail.gmail.com>
+Subject: Re: [PATCH] vhost: fix VHOST_*_OWNER documentation
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Mar 3, 2025 at 9:52=E2=80=AFAM Stefano Garzarella <sgarzare@redhat.=
+com> wrote:
+>
+> VHOST_OWNER_SET and VHOST_OWNER_RESET are used in the documentation
+> instead of VHOST_SET_OWNER and VHOST_RESET_OWNER respectively.
+>
+> To avoid confusion, let's use the right names in the documentation.
+> No change to the API, only the documentation is involved.
+>
 
+Reviewed-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
 
-On 3/3/2025 5:16 pm, Kurt Kanzenbach wrote:
-> The current MQPRIO offload implementation uses the legacy TSN Tx mode. In
-> this mode the hardware uses four packet buffers and considers queue
-> priorities.
-> 
-> In order to harmonize the TAPRIO implementation with MQPRIO, switch to the
-> regular TSN Tx mode. This mode also uses four packet buffers and considers
-> queue priorities. In addition to the legacy mode, transmission is always
-> coupled to Qbv. The driver already has mechanisms to use a dummy schedule
-> of 1 second with all gates open for ETF. Simply use this for MQPRIO too.
-> 
-> This reduces code and makes it easier to add support for frame preemption
-> later.
-> 
-> While at it limit the netdev_tc calls to MQPRIO only.
-> 
-> Tested on i225 with real time application using high priority queue, iperf3
-> using low priority queue and network TAP device.
-> 
-> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 > ---
-> Changes in v3:
-> - Commit message (Paul)
-> - Link to v2: https://lore.kernel.org/r/20250224-igc_mqprio_tx_mode-v2-1-9666da13c8d8@linutronix.de
-> 
-> Changes in v2:
-> - Add comma to commit message (Faizal)
-> - Simplify if condition (Faizal)
-> - Link to v1: https://lore.kernel.org/r/20250217-igc_mqprio_tx_mode-v1-1-3a402fe1f326@linutronix.de
-> ---
->   drivers/net/ethernet/intel/igc/igc.h      |  4 +---
->   drivers/net/ethernet/intel/igc/igc_main.c | 18 +++++++++++++-
->   drivers/net/ethernet/intel/igc/igc_tsn.c  | 40 ++-----------------------------
->   3 files changed, 20 insertions(+), 42 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
-> index cd1d7b6c1782352094f6867a31b6958c929bbbf4..16d85bdf55a7e9c412c47acf727bca6bc7154c61 100644
-> --- a/drivers/net/ethernet/intel/igc/igc.h
-> +++ b/drivers/net/ethernet/intel/igc/igc.h
-> @@ -388,11 +388,9 @@ extern char igc_driver_name[];
->   #define IGC_FLAG_RX_LEGACY		BIT(16)
->   #define IGC_FLAG_TSN_QBV_ENABLED	BIT(17)
->   #define IGC_FLAG_TSN_QAV_ENABLED	BIT(18)
-> -#define IGC_FLAG_TSN_LEGACY_ENABLED	BIT(19)
->   
->   #define IGC_FLAG_TSN_ANY_ENABLED				\
-> -	(IGC_FLAG_TSN_QBV_ENABLED | IGC_FLAG_TSN_QAV_ENABLED |	\
-> -	 IGC_FLAG_TSN_LEGACY_ENABLED)
-> +	(IGC_FLAG_TSN_QBV_ENABLED | IGC_FLAG_TSN_QAV_ENABLED)
->   
->   #define IGC_FLAG_RSS_FIELD_IPV4_UDP	BIT(6)
->   #define IGC_FLAG_RSS_FIELD_IPV6_UDP	BIT(7)
-> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-> index 472f009630c98e60c7166ceb8d05cb094f6c837b..240b6075197fb1e61077a736ddf8f9e67c1ed5cd 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_main.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
-> @@ -6679,13 +6679,14 @@ static int igc_tsn_enable_mqprio(struct igc_adapter *adapter,
->   				 struct tc_mqprio_qopt_offload *mqprio)
->   {
->   	struct igc_hw *hw = &adapter->hw;
-> -	int i;
-> +	int err, i;
->   
->   	if (hw->mac.type != igc_i225)
->   		return -EOPNOTSUPP;
->   
->   	if (!mqprio->qopt.num_tc) {
->   		adapter->strict_priority_enable = false;
-> +		netdev_reset_tc(adapter->netdev);
->   		goto apply;
->   	}
->   
-> @@ -6716,6 +6717,21 @@ static int igc_tsn_enable_mqprio(struct igc_adapter *adapter,
->   	igc_save_mqprio_params(adapter, mqprio->qopt.num_tc,
->   			       mqprio->qopt.offset);
->   
-> +	err = netdev_set_num_tc(adapter->netdev, adapter->num_tc);
-> +	if (err)
-> +		return err;
-> +
-> +	for (i = 0; i < adapter->num_tc; i++) {
-> +		err = netdev_set_tc_queue(adapter->netdev, i, 1,
-> +					  adapter->queue_per_tc[i]);
-> +		if (err)
-> +			return err;
-> +	}
-> +
-> +	/* In case the card is configured with less than four queues. */
-> +	for (; i < IGC_MAX_TX_QUEUES; i++)
-> +		adapter->queue_per_tc[i] = i;
-> +
->   	mqprio->qopt.hw = TC_MQPRIO_HW_OFFLOAD_TCS;
->   
->   apply:
-> diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
-> index 1e44374ca1ffbb86e9893266c590f318984ef574..7c28f3e7bb576f0e6a21c883e934ede4d53096f4 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_tsn.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
-> @@ -37,18 +37,13 @@ static unsigned int igc_tsn_new_flags(struct igc_adapter *adapter)
->   {
->   	unsigned int new_flags = adapter->flags & ~IGC_FLAG_TSN_ANY_ENABLED;
->   
-> -	if (adapter->taprio_offload_enable)
-> -		new_flags |= IGC_FLAG_TSN_QBV_ENABLED;
-> -
-> -	if (is_any_launchtime(adapter))
-> +	if (adapter->taprio_offload_enable || is_any_launchtime(adapter) ||
-> +	    adapter->strict_priority_enable)
->   		new_flags |= IGC_FLAG_TSN_QBV_ENABLED;
->   
->   	if (is_cbs_enabled(adapter))
->   		new_flags |= IGC_FLAG_TSN_QAV_ENABLED;
->   
-> -	if (adapter->strict_priority_enable)
-> -		new_flags |= IGC_FLAG_TSN_LEGACY_ENABLED;
-> -
->   	return new_flags;
->   }
->   
-> @@ -157,16 +152,12 @@ static int igc_tsn_disable_offload(struct igc_adapter *adapter)
->   	wr32(IGC_QBVCYCLET_S, 0);
->   	wr32(IGC_QBVCYCLET, NSEC_PER_SEC);
->   
-> -	/* Reset mqprio TC configuration. */
-> -	netdev_reset_tc(adapter->netdev);
-> -
->   	/* Restore the default Tx arbitration: Priority 0 has the highest
->   	 * priority and is assigned to queue 0 and so on and so forth.
->   	 */
->   	igc_tsn_tx_arb(adapter, queue_per_tc);
->   
->   	adapter->flags &= ~IGC_FLAG_TSN_QBV_ENABLED;
-> -	adapter->flags &= ~IGC_FLAG_TSN_LEGACY_ENABLED;
->   
->   	return 0;
->   }
-> @@ -206,37 +197,10 @@ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
->   		igc_tsn_set_retx_qbvfullthreshold(adapter);
->   
->   	if (adapter->strict_priority_enable) {
-> -		int err;
-> -
-> -		err = netdev_set_num_tc(adapter->netdev, adapter->num_tc);
-> -		if (err)
-> -			return err;
-> -
-> -		for (i = 0; i < adapter->num_tc; i++) {
-> -			err = netdev_set_tc_queue(adapter->netdev, i, 1,
-> -						  adapter->queue_per_tc[i]);
-> -			if (err)
-> -				return err;
-> -		}
-> -
-> -		/* In case the card is configured with less than four queues. */
-> -		for (; i < IGC_MAX_TX_QUEUES; i++)
-> -			adapter->queue_per_tc[i] = i;
-> -
->   		/* Configure queue priorities according to the user provided
->   		 * mapping.
->   		 */
->   		igc_tsn_tx_arb(adapter, adapter->queue_per_tc);
-> -
-> -		/* Enable legacy TSN mode which will do strict priority without
-> -		 * any other TSN features.
-> -		 */
-> -		tqavctrl = rd32(IGC_TQAVCTRL);
-> -		tqavctrl |= IGC_TQAVCTRL_TRANSMIT_MODE_TSN;
-> -		tqavctrl &= ~IGC_TQAVCTRL_ENHANCED_QAV;
-> -		wr32(IGC_TQAVCTRL, tqavctrl);
-> -
-> -		return 0;
->   	}
->   
->   	for (i = 0; i < adapter->num_tx_queues; i++) {
-> 
-> ---
-> base-commit: f77f12010f67259bd0e1ad18877ed27c721b627a
-> change-id: 20250214-igc_mqprio_tx_mode-22c19c564605
-> 
-> Best regards,
-
-Acked-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+>  include/uapi/linux/vhost.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+> index b95dd84eef2d..d4b3e2ae1314 100644
+> --- a/include/uapi/linux/vhost.h
+> +++ b/include/uapi/linux/vhost.h
+> @@ -28,10 +28,10 @@
+>
+>  /* Set current process as the (exclusive) owner of this file descriptor.=
+  This
+>   * must be called before any other vhost command.  Further calls to
+> - * VHOST_OWNER_SET fail until VHOST_OWNER_RESET is called. */
+> + * VHOST_SET_OWNER fail until VHOST_RESET_OWNER is called. */
+>  #define VHOST_SET_OWNER _IO(VHOST_VIRTIO, 0x01)
+>  /* Give up ownership, and reset the device to default values.
+> - * Allows subsequent call to VHOST_OWNER_SET to succeed. */
+> + * Allows subsequent call to VHOST_SET_OWNER to succeed. */
+>  #define VHOST_RESET_OWNER _IO(VHOST_VIRTIO, 0x02)
+>
+>  /* Set up/modify memory layout */
+> --
+> 2.48.1
+>
 
 
