@@ -1,191 +1,168 @@
-Return-Path: <netdev+bounces-171486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF60FA4D1DE
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 04:02:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CDCDA4D1E8
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 04:08:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBD6D17391D
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 03:02:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 075D83AC5BB
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 03:08:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A87BD1487FA;
-	Tue,  4 Mar 2025 03:02:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BA8D190477;
+	Tue,  4 Mar 2025 03:08:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="r0VeZ6e7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N8d4hQDi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f195.google.com (mail-yw1-f195.google.com [209.85.128.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E6115CD46;
-	Tue,  4 Mar 2025 03:02:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C17F013792B;
+	Tue,  4 Mar 2025 03:08:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741057350; cv=none; b=JXXKYpOG83AkLtFYlmNQwtIb4X7dBlRzX3nI2QDRQFymsfZq/foGW+nZk5icxUe0ZHlrevGQspmT1ZpRrwdwKsXAYO+g7eUDGwU+jBs26m9aoregHhefn7LJy14/SYFJVjzJN/k+BqFdMI7XgCfEbKt1pOz3y66uGWLdVDtE/wo=
+	t=1741057714; cv=none; b=B+g72xpk2g3E76XBxI/gUuIZ0KTWW0RMVEtvuGNzBKUHkYyACmQApgwcP9OnPDRJl2NtDyoccZ2semlBZpxc1Hr5rLFg2YKuRrsLakW1/NlLS57Kmq9DVuMjFX7hepizKYfVhqr6wenHIc9AVXFxsY5kTuERR+JxQjkAzfPD6U4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741057350; c=relaxed/simple;
-	bh=jhtUwae5t31G2OBfai1QRLwyF8+nzgoh14a+TSS25dY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XfUquJWuthzoJJ+RZiDTvMmnojE41jhR/jCIZRYzfGZbd+8xDbjviqdjyHzpTgtmfxfUFboV8y3UgOtkd2Uh7CL9g/rL2Z+2AMktLQy937wf21W69QRoKsBIdypfLhDfygeZ8UTX924F4DjAU1utTvHPNyFR4uRWSIi48M+KFJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=r0VeZ6e7; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1741057714; c=relaxed/simple;
+	bh=zd2kXp2LW9rFB0BwWOdHQwKVUln9e8unlctAyne2dUE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jGuR6jm3ocsXTyJi58xxSVkDKB1Ld2Y5glZDdhgGv4u3oK3SSF7QYSBa9qjrO//9NvzrdJXX1fPwr2R0XSoFHMUw3p37v6BEFgdD+tl7p6e0WwAsJJ/sjuhdvrI6F8X+9Szh7UtNF6L3T03bWRfbeSdsJGG3x1wJE5NhHNSrf2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N8d4hQDi; arc=none smtp.client-ip=209.85.128.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f195.google.com with SMTP id 00721157ae682-6fd2587d059so31426207b3.3;
+        Mon, 03 Mar 2025 19:08:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1741057349; x=1772593349;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=/OEAcRSkJZfV4Q28pUHxvrsDryz1R9qQDAfgB1t/ZTg=;
-  b=r0VeZ6e7Ju6HvVTRa5NHI44J9nOwT1gVEZ9KTjk3C3W1B2yC3aPIaVed
-   THGz0LHA48hbJRCrq3UUrBiMFUFXf0uQe8YuD63GnBRPx3dWinxtFbzR1
-   /tCAYYgF1WzgaY5m1Aqq49AbVFo4FnN4wSbXTXq/2JSJU3tZr4uNBCLHh
-   A=;
-X-IronPort-AV: E=Sophos;i="6.13,331,1732579200"; 
-   d="scan'208";a="471729838"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 03:02:25 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:24866]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.52.238:2525] with esmtp (Farcaster)
- id 203de75f-fc09-432f-a81b-2a0dbf886bfe; Tue, 4 Mar 2025 03:02:11 +0000 (UTC)
-X-Farcaster-Flow-ID: 203de75f-fc09-432f-a81b-2a0dbf886bfe
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 4 Mar 2025 03:02:10 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.106.101.38) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 4 Mar 2025 03:02:08 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Sasha Levin
-	<sashal@kernel.org>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <stable@vger.kernel.org>, <netdev@vger.kernel.org>,
-	"Lei Lu" <llfamsec@gmail.com>
-Subject: [PATCH stable 5.15/6.1/6.6] af_unix: Clear oob_skb in scan_inflight().
-Date: Mon, 3 Mar 2025 19:01:49 -0800
-Message-ID: <20250304030149.82265-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+        d=gmail.com; s=20230601; t=1741057711; x=1741662511; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iJdTuc12hE8xNboldJDtY0tNQVyNe2iG7pRWAnla1E8=;
+        b=N8d4hQDi5m5CspWv5kmBWUdEx5Ys0U1utbMH6QixtMF91nRIxLqIuoYfnBgPUe8uqI
+         7kJ6+XVVCd7Zm1l/Bcx8vfgRVZ4XzPragdTP4sqMff2h56DfUrhj34pvLfYtQxdrfwyR
+         gNOBu26FcL6rbrZc099Onkrzz7lO+ASm31U+VTEttLcF+lxoxmdJlKx3oS4snth89naO
+         wbaEmjA89QffnoIzwg9eQDh6Di2+bjAZh6B9giilt5sJpH9FODFNi+xJCQ//oQJ5vCu4
+         2Sbeyh4RBlyK/AglK4vFv+3EfMFs7hcvBzWeGCCaRTRU3D/2CWEdWh57cxYzXWTct892
+         9AYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741057711; x=1741662511;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iJdTuc12hE8xNboldJDtY0tNQVyNe2iG7pRWAnla1E8=;
+        b=af7lo7If/DiFrz59f6SuHbzAoD2KAKfo92E8HC54Gw/BvhKxZMUKVjkqxQ4gm8zLCf
+         zGdxvVCNTWpytpUxEM9vWcZxdUMpIhRJ76RzsbAQAzeCIRYpyESdebo9WCQ7SF2VvJfK
+         QW1AHsmPeFeRdt8RbhlK7HWT6ztPVm+9ptXfJQNPpTLnWqZQUjW81XEKBJXRj8mgybW/
+         h7KGU1J02yMGJiabLDEx0p/YE8dcAiSe2EfQQlJAlON0bTPXN3+33/v8bA7pzVNHDnnH
+         uHz1BsbJLLoVBf09gbJ10G0QjaN4jg46N3TPwKkY/7irgwn+Ms91LUuMJeicCpJ4O8vH
+         L+PQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVpi+Fp8/vSw2K3af+qWf+td42aZux6h4PnNXXPPJV3RsnGL+VjXO993RC/xsG5F/Y3+YRu5LEygUYsc+fa@vger.kernel.org, AJvYcCWaIwWzC30o3byCbLOzALLQuH+9HlrfeMfMT69ZjPELTA+/dnOyqVocIjTWzyqC/FUghw+eBP51@vger.kernel.org, AJvYcCX1gfFzUvvc9RM5ScMv21VjJ9TRMlZF0QiVWckbxbcQVo9zRd1PEHCeSAspoNM8ZB6To1s=@vger.kernel.org, AJvYcCXNA/UEstwg7qRetXLK9dl4zbomJjC610e3zdIMCsssjj3m6eUksjYtPj2/T1WUHiphq3EvdeDf9hmp22n0gPeCkWiK@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOjw00bNAii2sd1ThLraJOg81y7QfWmEJwO4OaK2/VuE22svmY
+	GzKLKux6VWuEXLQrd9GOlEVK1ikkOopUbR9GJHmrxcPo9YRfa4kkBQyueALNeMNoSvOwjYt2+oC
+	0GtYw+7qA39eTp5JX5LDyjQQDkB0=
+X-Gm-Gg: ASbGncsAReIxP2ZaWslADapeEpdHls8AhY/LD0IWmpMxXPs+bD6pqf83vz2zSY9k7mA
+	J36w7ZbIeXwoY7Rjt8cHDJsHPbaWJG0WZG8zuk46WCvLywCBuyKrPOprSwqTfuTPSTlULE0Ag3r
+	nnvsAhUaUOlskoz64EtJz0h2lFDQ==
+X-Google-Smtp-Source: AGHT+IGjpE37/D8VFUXwtx1+vTlIBKGMhPsHyscBlEpff0BYVERCrQfJXRrs4afpX4s/+1NgBA8mJU+Be8nzIuYC69Q=
+X-Received: by 2002:a05:690c:3708:b0:6f9:447d:d1a2 with SMTP id
+ 00721157ae682-6fd4a1b56d0mr207861007b3.29.1741057711592; Mon, 03 Mar 2025
+ 19:08:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWB002.ant.amazon.com (10.13.139.185) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+References: <20250303065345.229298-1-dongml2@chinatelecom.cn>
+ <20250303065345.229298-4-dongml2@chinatelecom.cn> <20250303110559.5a584602@gandalf.local.home>
+ <CADxym3ZJf3TEMwCy4JVT1gs9GP=U1n1qss3ycnuMZVyp9TfDdw@mail.gmail.com>
+In-Reply-To: <CADxym3ZJf3TEMwCy4JVT1gs9GP=U1n1qss3ycnuMZVyp9TfDdw@mail.gmail.com>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Tue, 4 Mar 2025 11:06:55 +0800
+X-Gm-Features: AQ5f1JrQ2Vfag3gyvkNKHuCTcxmUnHFiO3c2filqEDv803CK-Q1LsulYa_DCrkw
+Message-ID: <CADxym3bNxGb-FPtkbjiLfEXBRnVT7HBM8nbQBWvcHoLhYrKKgw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 3/4] x86: implement per-function metadata
+ storage for x86
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: peterz@infradead.org, mark.rutland@arm.com, alexei.starovoitov@gmail.com, 
+	catalin.marinas@arm.com, will@kernel.org, mhiramat@kernel.org, 
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	eddyz87@gmail.com, yonghong.song@linux.dev, john.fastabend@gmail.com, 
+	kpsingh@kernel.org, sdf@fomichev.me, jolsa@kernel.org, davem@davemloft.net, 
+	dsahern@kernel.org, mathieu.desnoyers@efficios.com, nathan@kernel.org, 
+	nick.desaulniers+lkml@gmail.com, morbo@google.com, samitolvanen@google.com, 
+	kees@kernel.org, dongml2@chinatelecom.cn, akpm@linux-foundation.org, 
+	riel@surriel.com, rppt@kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Embryo socket is not queued in gc_candidates, so we can't drop
-a reference held by its oob_skb.
+On Tue, Mar 4, 2025 at 10:07=E2=80=AFAM Menglong Dong <menglong8.dong@gmail=
+.com> wrote:
+>
+> On Tue, Mar 4, 2025 at 12:05=E2=80=AFAM Steven Rostedt <rostedt@goodmis.o=
+rg> wrote:
+> >
+> > On Mon,  3 Mar 2025 14:53:44 +0800
+> > Menglong Dong <menglong8.dong@gmail.com> wrote:
+> >
+> > > In the third case, we make the kernel function 32 bytes aligned, and =
+there
+> > > will be 32 bytes padding before the functions. According to my testin=
+g,
+> > > the text size didn't increase on this case, which is weird.
+> > >
+> > > With 16-bytes padding:
+> > >
+> > > -rwxr-xr-x 1 401190688  x86-dev/vmlinux*
+> > > -rw-r--r-- 1    251068  x86-dev/vmlinux.a
+> > > -rw-r--r-- 1 851892992  x86-dev/vmlinux.o
+> > > -rw-r--r-- 1  12395008  x86-dev/arch/x86/boot/bzImage
+> > >
+> > > With 32-bytes padding:
+> > >
+> > > -rwxr-xr-x 1 401318128 x86-dev/vmlinux*
+> > > -rw-r--r-- 1    251154 x86-dev/vmlinux.a
+> > > -rw-r--r-- 1 853636704 x86-dev/vmlinux.o
+> > > -rw-r--r-- 1  12509696 x86-dev/arch/x86/boot/bzImage
+> >
+> > Use the "size" command to see the differences in sizes and not the file=
+ size.
+> >
+> > $ size vmlinux
+> >    text    data     bss     dec     hex filename
+> > 36892658        9798658 16982016        63673332        3cb93f4 vmlinux
+>
+> Great! It seems that the way I tested has something wrong. I'll
+> compare the text size with "size" command later.
 
-Let's say we create listener and embryo sockets, send the
-listener's fd to the embryo as OOB data, and close() them
-without recv()ing the OOB data.
+With the size command, the text size with 32-bytes padding is:
 
-There is a self-reference cycle like
+  text    data     bss     dec     hex filename
+48299471        14776173        18345936        81421580
+4da650c x86-dev/vmlinux
 
-  listener -> embryo.oob_skb -> listener
+And with 16-bytes padding is:
 
-, so this must be cleaned up by GC.  Otherwise, the listener's
-refcnt is not released and sockets are leaked:
+  text    data     bss     dec     hex filename
+46620640        14772017        18458396        79851053
+4c26e2d x86-dev/vmlinux
 
-  # unshare -n
-  # cat /proc/net/protocols | grep UNIX-STREAM
-  UNIX-STREAM 1024      0      -1   NI       0   yes  kernel ...
+It increases about 3%, which I think is acceptable in this case.
 
-  # python3
-  >>> from array import array
-  >>> from socket import *
-  >>>
-  >>> s = socket(AF_UNIX, SOCK_STREAM)
-  >>> s.bind('\0test\0')
-  >>> s.listen()
-  >>>
-  >>> c = socket(AF_UNIX, SOCK_STREAM)
-  >>> c.connect(s.getsockname())
-  >>> c.sendmsg([b'x'], [(SOL_SOCKET, SCM_RIGHTS, array('i', [s.fileno()]))], MSG_OOB)
-  1
-  >>> quit()
+I'll post the message in the commit log of the next version.
 
-  # cat /proc/net/protocols | grep UNIX-STREAM
-  UNIX-STREAM 1024      3      -1   NI       0   yes  kernel ...
-                        ^^^
-                        3 sockets still in use after FDs are close()d
+Thanks!
+Menglong Dong
 
-Let's drop the embryo socket's oob_skb ref in scan_inflight().
-
-This also fixes a racy access to oob_skb that commit 9841991a446c
-("af_unix: Update unix_sk(sk)->oob_skb under sk_receive_queue
-lock.") fixed for the new Tarjan's algo-based GC.
-
-Fixes: 314001f0bf92 ("af_unix: Add OOB support")
-Reported-by: Lei Lu <llfamsec@gmail.com>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
-This has no upstream commit because I replaced the entire GC in
-6.10 and the new GC does not have this bug, and this fix is only
-applicable to the old GC (<= 6.9), thus for 5.15/6.1/6.6.
----
----
- net/unix/garbage.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
-
-diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-index 2a758531e102..b3fbdf129944 100644
---- a/net/unix/garbage.c
-+++ b/net/unix/garbage.c
-@@ -102,13 +102,14 @@ static void scan_inflight(struct sock *x, void (*func)(struct unix_sock *),
- 			/* Process the descriptors of this socket */
- 			int nfd = UNIXCB(skb).fp->count;
- 			struct file **fp = UNIXCB(skb).fp->fp;
-+			struct unix_sock *u;
- 
- 			while (nfd--) {
- 				/* Get the socket the fd matches if it indeed does so */
- 				struct sock *sk = unix_get_socket(*fp++);
- 
- 				if (sk) {
--					struct unix_sock *u = unix_sk(sk);
-+					u = unix_sk(sk);
- 
- 					/* Ignore non-candidates, they could
- 					 * have been added to the queues after
-@@ -122,6 +123,13 @@ static void scan_inflight(struct sock *x, void (*func)(struct unix_sock *),
- 				}
- 			}
- 			if (hit && hitlist != NULL) {
-+#if IS_ENABLED(CONFIG_AF_UNIX_OOB)
-+				u = unix_sk(x);
-+				if (u->oob_skb) {
-+					WARN_ON_ONCE(skb_unref(u->oob_skb));
-+					u->oob_skb = NULL;
-+				}
-+#endif
- 				__skb_unlink(skb, &x->sk_receive_queue);
- 				__skb_queue_tail(hitlist, skb);
- 			}
-@@ -299,17 +307,9 @@ void unix_gc(void)
- 	 * which are creating the cycle(s).
- 	 */
- 	skb_queue_head_init(&hitlist);
--	list_for_each_entry(u, &gc_candidates, link) {
-+	list_for_each_entry(u, &gc_candidates, link)
- 		scan_children(&u->sk, inc_inflight, &hitlist);
- 
--#if IS_ENABLED(CONFIG_AF_UNIX_OOB)
--		if (u->oob_skb) {
--			kfree_skb(u->oob_skb);
--			u->oob_skb = NULL;
--		}
--#endif
--	}
--
- 	/* not_cycle_list contains those sockets which do not make up a
- 	 * cycle.  Restore these to the inflight list.
- 	 */
--- 
-2.39.5 (Apple Git-154)
-
+>
+> Thanks!
+> Menglong Dong
+>
+> >
+> > -- Steve
 
