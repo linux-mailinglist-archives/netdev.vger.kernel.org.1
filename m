@@ -1,310 +1,172 @@
-Return-Path: <netdev+bounces-171761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C732A4E7FF
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:13:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61B65A4E815
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:15:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BEB619C4F8E
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:07:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C52107A129C
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E20F9294F2B;
-	Tue,  4 Mar 2025 16:45:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC4D5298CB0;
+	Tue,  4 Mar 2025 16:50:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZJZCeL1G"
+	dkim=pass (2048-bit key) header.d=riscstar-com.20230601.gappssmtp.com header.i=@riscstar-com.20230601.gappssmtp.com header.b="UKXAJCR1"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 134C0294F1D
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 16:45:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C189C298CA1
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 16:50:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741106723; cv=none; b=RwUY01VwF6RJ2Pwfz3QDYXK8bVS9qmv/6h4Gm+yJBS/d91eXWKZ4BXPU9g+yFOJ3Z+TKqBXUSDWJY2hWDEJ0Pg/ZNC2kLfYmwBYEFviwT/66ovAN151IXWBzMAmc03GfYObqofwNqlOXF2C2on9E0hkcohzXrbctH/RLftnxxJY=
+	t=1741107008; cv=none; b=lIfdnbGhpnrmSxCngmvC4L15BlZXQMnNO26cvgYAHST5u/bNuyxJOwzQSfqIST4xl+SaDzfwz86kuL9IrAnB/d+HEFxyUODDC08aG/GqC1MRg/T2BfVu4N3cT05qckVfK3mVimiEBLGUez0dIDmazGn2acnRocvGNsAALXiBqqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741106723; c=relaxed/simple;
-	bh=STwjzrTgOmkz3q+YXMf2wIG/uUDUMBV2NRbFzBNJoEA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tcAm73xxCpCZr1wy5+XEeEuysQ3RsqPlG3h+mft+0zlyivED4Lyh++x0DJPHoUtjpyLxNKOEPkBN86iOFDihBmkYNCtlXz4DE83Za1sRFt4rCEOHTBLSnx7RuC3mH/gZGNo0L0ATZjn3Nt13XqOAy6QDhWPFkLyWMu5/F6NZmEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZJZCeL1G; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741106721;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OvS9YQcWBhXVqQRfK8auIhsAnxdyeQfcszoy4AGwoFs=;
-	b=ZJZCeL1GqYU+pEespjp2t3jYrM834KSj8Sh5RW5WU64NIrmaKHWbwmAsKe6HWWtzejAI7/
-	k+RN4HeKrLNjJzvVGw6GAiVrYlFR6EDfhUTfrWcush78LmocBn1P7JmniU06jzeJWF3+JD
-	KBWzqWUaBK5C6KhTJ59dJUuEF0SEaL4=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-623-Th399BzXPlallBuGQFhQfw-1; Tue, 04 Mar 2025 11:45:15 -0500
-X-MC-Unique: Th399BzXPlallBuGQFhQfw-1
-X-Mimecast-MFC-AGG-ID: Th399BzXPlallBuGQFhQfw_1741106713
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6e8c58184e9so46651226d6.0
-        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 08:45:13 -0800 (PST)
+	s=arc-20240116; t=1741107008; c=relaxed/simple;
+	bh=L8HHTMU8DmC+6N2WJp3kjc3+BlXX6m9YnXOf1KwXSx8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AOP8OXb/ED6zGvuKrfRGo8QRyFedE6pjL0lT6vOaBas0mptqBnTxXWUuaOHF+c7Z1c1hROr08MVXXWHYFkH/3yzKtmc1/K057uFVEi633H/hpWMWyqBMS58l5gDrfdA+d0XBgvKr/sEM5/3vXq7X9Uy0gVDOebOI+jfFCSSSxRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=riscstar.com; spf=pass smtp.mailfrom=riscstar.com; dkim=pass (2048-bit key) header.d=riscstar-com.20230601.gappssmtp.com header.i=@riscstar-com.20230601.gappssmtp.com header.b=UKXAJCR1; arc=none smtp.client-ip=209.85.161.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=riscstar.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=riscstar.com
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-60010601291so445385eaf.3
+        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 08:50:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=riscstar-com.20230601.gappssmtp.com; s=20230601; t=1741107006; x=1741711806; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FFC/0VaDOfAur/tgnlAkpmmS5lpWwryf/b8rBN6y4bk=;
+        b=UKXAJCR1/tTwsmoZ4x9nqIHt3iJiOx3wg33jD7tZPm4GLZj0FXhiwRnDlQRI/UFsRM
+         tHKZcH9BJP8yWCXszhuuYxWjUZOvTT6tVJxqCkm4gBKbN+ayHH9Q9A14mcBlJfzYH6PC
+         8PToCT73Xt0d8SlldeLUsM5g/ZQBOPRrDY1dsJBF3XQJs9Nev83VvY/mB4RaklGM2N0E
+         0SSdfPRgLIwVPAFR0kEDKq8cSUXXMgV/5m3hRWmcxM//NO5gfr9sld21ztQXusoRUeMf
+         AaFS1gA5FrXeKYYzznxCqHaquThoDbNg6ESjB/hsD8NmTsb0E0iWBLdj89MfdQZRrNKU
+         D/KQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741106713; x=1741711513;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OvS9YQcWBhXVqQRfK8auIhsAnxdyeQfcszoy4AGwoFs=;
-        b=JaFyfN7O5eP/wx6tG7aX4WVl9CehPGUeqa7FsshPdy9zDmUkNffgviVWpW+IgXPWT+
-         nTo/2WHy/Kwqc5PUOj5/fPSb0g7JDi2wlk5K9dCjYGj23Md6UVhCa6KpltSqnuo02tI5
-         7KzAy1eHbZrdPGDQn+yv9IKyDNf/XLtnmGQd63a8T0c275DF7PvwthUwDI4h/CCd/syF
-         yaawfDwwy3WSKw3NjAe1t8pdlHWfmWAKHRMDk13cvmdxOxqUBWkofrXGXK7NQWhvJFTO
-         0ZLrFBJzBYvwcNqObXwpmYSfoAIZsjSY7x3LuTaDFnziUgtQxp7rZI8IQMsFeuXKOqL8
-         MW3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXdhbM7kJB6C1y3bX1uXnnlrK4h8h+I1Up5XXPyLfJyQX4MOhkqH3AB8aQAJZngvqdkglRFjoI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysrcKXSa2QDEyG+BOFPKP2GvJWNHKo1097oXsmHO/qpidc73z2
-	Z+iojkIxrPS92DIvcHSM+dHJZ0COMbI6HynRyTmcmudoY4Y6XcCecz5yE32ZcohzV/8rmJQ9RXB
-	wahTP1oucYgEVk+4yBjnO04aUn0iDFbnOL8oETR5lddwgdt9+kZmvsw==
-X-Gm-Gg: ASbGncsydenZevPAcJtCKJL/G8kI4+cOhgvtwnA9TxO0mvV65AJalm0nGtxArW2bda8
-	1skEHZp3j/zZiJT+5ZE1dnCIW96KNHG+x3sET12gWqUnlRIjLicmEhs3XHA6xf/ZVlJOF+VjCtU
-	3wpoPQYhFR74Xuo49hBV1io3yl+bhhMJjtl4MVo608U2uRCSBFe7I1MIh9ISxg/TyHdZREkuASy
-	rbnRCk6J9z5MIssMaEooc8/DSEYYZ41cTjoj4xrP94rjkbkm+W/zFVia5yUxCebkOdEIKJHnBJC
-	RAAlrq4q
-X-Received: by 2002:a05:6214:2462:b0:6e4:4331:aae6 with SMTP id 6a1803df08f44-6e8a0d9990emr268698416d6.39.1741106713349;
-        Tue, 04 Mar 2025 08:45:13 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGEk+zP+A1jr1+KTsTFUqLIMhe1LB9YfFixdl2fISFfd3uRPaiW8ogdptdnCA2jd9/TIR++YQ==
-X-Received: by 2002:a05:6214:2462:b0:6e4:4331:aae6 with SMTP id 6a1803df08f44-6e8a0d9990emr268697946d6.39.1741106712941;
-        Tue, 04 Mar 2025 08:45:12 -0800 (PST)
-Received: from fedora-x1 ([142.126.89.169])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e8976cc891sm69856836d6.81.2025.03.04.08.45.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Mar 2025 08:45:12 -0800 (PST)
-Date: Tue, 4 Mar 2025 11:45:01 -0500
-From: Kamal Heib <kheib@redhat.com>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-	Vlad Dumitrescu <vdumitrescu@nvidia.com>
-Subject: Re: [PATCH net-next 05/14] net/mlx5: Implement devlink total_vfs
- parameter
-Message-ID: <Z8cuDVYOczIwo1Mw@fedora-x1>
-References: <20250228021227.871993-1-saeed@kernel.org>
- <20250228021227.871993-6-saeed@kernel.org>
+        d=1e100.net; s=20230601; t=1741107006; x=1741711806;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FFC/0VaDOfAur/tgnlAkpmmS5lpWwryf/b8rBN6y4bk=;
+        b=NdlkpliKas+WTMNBk+ETC2o+pd7pq44WFgekGWOTgoA/+e5cHr/VBvvuztWURPcvCM
+         2JYiUpQFFa+KaQQ+cqoJTTI7v2IvSrCBDTy1eb0+4fZaEPPXgyVkNyOeArXQ5ZjnzmRe
+         FmhBuUPg24QoShUXuqf1J7qZIMAfGlCPuHXD0cDmpXscrh1GUHW1wGEMgaIU1bvVlB2t
+         OF+AiKuo79bnQZYxL1faVXLR6sC/D4ZK4zd7rQ53W3Sy6pAQEhgVA19gSlzwZQj7MUPL
+         ySUvQazDPk8OShbWQnLSDpk4FvsNNa822kptnslKwfjQP6CV8QYZSmIeB6rrFtpT1EnE
+         GHiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWojUMmm8XfzKAa+PXDJskyi/yaLQG6i2o4O8lvi1/2XzjvDtl8zDwVRkKzTCop7j091Hs9upo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxepNEpx7H/MG0HCBLna0kWstjTPWuYpRJcPaoVvJZVpyYcPMuU
+	FVGP7JHqMDCX+ZWYEUtKkx25W1QOnMowU2NdilEbIXg03Hcg6txVNwViA2TTtHk=
+X-Gm-Gg: ASbGnctWYOPS6dbictVm8Ga6DrIZ8vqfQCAHEk9f7tRiTV7Y4F5wtvDLKoBzJI8x+mJ
+	B72cl7BbqoJy40T5qwJf7edBeNk7rNkT0OSKV0Su/3wDnvZgH9QWjWntNCYadrkMpu6QugFHtlt
+	P8MvzRmgX+npCJnzicZbrlGRjciRlmsjrwuNr8yf8VWuknS0b+3Z1nyMMqdphN3mm0x9PeQrRIw
+	9vQAZ/8oLbEnCtzfq1OVYaw15mBUixet8okeyUmRaaX/lX0a0i2jM4DeobECGhV2WhY6+QyScbl
+	l41DyjPyXv0YEgdOIYmmoJrxcKS69Lvw/hb7qrqKEDkqns+clYyLo5Q914NjYfqxSUqlnO6ux1/
+	/GzCbqV3o
+X-Google-Smtp-Source: AGHT+IENf5TzZy2paUOp2+yHiImyvpIf605z0YIuqY3weTYHuWBj9XQYDXLVtnPEtkn/E/5Jk+cT9w==
+X-Received: by 2002:a05:6871:53c9:b0:29d:c5e8:e41f with SMTP id 586e51a60fabf-2c1782c5bb3mr11456642fac.5.1741107005688;
+        Tue, 04 Mar 2025 08:50:05 -0800 (PST)
+Received: from [172.22.22.28] (c-73-228-159-35.hsd1.mn.comcast.net. [73.228.159.35])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2c15c45e81bsm2333459fac.50.2025.03.04.08.50.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Mar 2025 08:50:05 -0800 (PST)
+Message-ID: <f8a6aea3-fa69-4c59-bccc-ae6e5021d5f3@riscstar.com>
+Date: Tue, 4 Mar 2025 10:50:03 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250228021227.871993-6-saeed@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] net: ipa: Fix v4.7 resource group names
+To: Luca Weiss <luca.weiss@fairphone.com>, Alex Elder <elder@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250227-ipa-v4-7-fixes-v1-0-a88dd8249d8a@fairphone.com>
+ <20250227-ipa-v4-7-fixes-v1-1-a88dd8249d8a@fairphone.com>
+Content-Language: en-US
+From: Alex Elder <elder@riscstar.com>
+In-Reply-To: <20250227-ipa-v4-7-fixes-v1-1-a88dd8249d8a@fairphone.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 27, 2025 at 06:12:18PM -0800, Saeed Mahameed wrote:
-> From: Vlad Dumitrescu <vdumitrescu@nvidia.com>
+On 2/27/25 4:33 AM, Luca Weiss wrote:
+> In the downstream IPA driver there's only one group defined for source
+> and destination, and the destination group doesn't have a _DPL suffix.
 > 
-> Some devices support both symmetric (same value for all PFs) and
-> asymmetric, while others only support symmetric configuration. This
-> implementation prefers asymmetric, since it is closer to the devlink
-> model (per function settings), but falls back to symmetric when needed.
-> 
-> Example usage:
->   devlink dev param set pci/0000:01:00.0 name total_vfs value <u16> cmode permanent
->   devlink dev reload pci/0000:01:00.0 action fw_activate
->   echo 1 >/sys/bus/pci/devices/0000:01:00.0/remove
->   echo 1 >/sys/bus/pci/rescan
->   cat /sys/bus/pci/devices/0000:01:00.0/sriov_totalvfs
-> 
-> Signed-off-by: Vlad Dumitrescu <vdumitrescu@nvidia.com>
-> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
-> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+> Fixes: b310de784bac ("net: ipa: add IPA v4.7 support")
+> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
 
-Tested-by: Kamal Heib <kheib@redhat.com>
+FYI, I used this to check what you're saying:
+  
+https://git.codelinaro.org/clo/la/platform/vendor/opensource/dataipa/-/blob/clo/main/drivers/platform/msm/ipa/ipa_v3/ipa_utils.c
+
+This looks good, thanks a lot for the patch.
+
+Reviewed-by: Alex Elder <elder@riscstar.com>
 
 > ---
->  Documentation/networking/devlink/mlx5.rst     |  22 +++
->  .../mellanox/mlx5/core/lib/nv_param.c         | 125 ++++++++++++++++++
->  2 files changed, 147 insertions(+)
+>   drivers/net/ipa/data/ipa_data-v4.7.c | 12 +++++-------
+>   1 file changed, 5 insertions(+), 7 deletions(-)
 > 
-> diff --git a/Documentation/networking/devlink/mlx5.rst b/Documentation/networking/devlink/mlx5.rst
-> index 587e0200c1cd..00a43324dec2 100644
-> --- a/Documentation/networking/devlink/mlx5.rst
-> +++ b/Documentation/networking/devlink/mlx5.rst
-> @@ -40,6 +40,28 @@ Parameters
->       - Boolean
->       - Applies to each physical function (PF) independently, if the device
->         supports it. Otherwise, it applies symmetrically to all PFs.
-> +   * - ``total_vfs``
-> +     - permanent
-> +     - The range is between 1 and a device-specific max.
-> +     - Applies to each physical function (PF) independently, if the device
-> +       supports it. Otherwise, it applies symmetrically to all PFs.
-> +
-> +Note: permanent parameters such as ``enable_sriov`` and ``total_vfs`` require FW reset to take effect
-> +
-> +.. code-block:: bash
-> +
-> +   # setup parameters
-> +   devlink dev param set pci/0000:01:00.0 name enable_sriov value true cmode permanent
-> +   devlink dev param set pci/0000:01:00.0 name total_vfs value 8 cmode permanent
-> +
-> +   # Fw reset
-> +   devlink dev reload pci/0000:01:00.0 action fw_activate
-> +
-> +   # for PCI related config such as sriov PCI reset/rescan is required:
-> +   echo 1 >/sys/bus/pci/devices/0000:01:00.0/remove
-> +   echo 1 >/sys/bus/pci/rescan
-> +   grep ^ /sys/bus/pci/devices/0000:01:00.0/sriov_*
-> +
->  
->  The ``mlx5`` driver also implements the following driver-specific
->  parameters.
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
-> index 6b63fc110e2d..97d74d890582 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
-> @@ -387,10 +387,135 @@ static int mlx5_devlink_enable_sriov_set(struct devlink *devlink, u32 id,
->  	return mlx5_nv_param_write(dev, mnvda, sizeof(mnvda));
->  }
->  
-> +static int mlx5_devlink_total_vfs_get(struct devlink *devlink, u32 id,
-> +				      struct devlink_param_gset_ctx *ctx)
-> +{
-> +	struct mlx5_core_dev *dev = devlink_priv(devlink);
-> +	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
-> +	void *data;
-> +	int err;
-> +
-> +	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-> +
-> +	err = mlx5_nv_param_read_global_pci_cap(dev, mnvda, sizeof(mnvda));
-> +	if (err)
-> +		return err;
-> +
-> +	if (!MLX5_GET(nv_global_pci_cap, data, sriov_support)) {
-> +		ctx->val.vu32 = 0;
-> +		return 0;
-> +	}
-> +
-> +	memset(mnvda, 0, sizeof(mnvda));
-> +	err = mlx5_nv_param_read_global_pci_conf(dev, mnvda, sizeof(mnvda));
-> +	if (err)
-> +		return err;
-> +
-> +	if (!MLX5_GET(nv_global_pci_conf, data, per_pf_total_vf)) {
-> +		ctx->val.vu32 = MLX5_GET(nv_global_pci_conf, data, total_vfs);
-> +		return 0;
-> +	}
-> +
-> +	/* SRIOV is per PF */
-> +	memset(mnvda, 0, sizeof(mnvda));
-> +	err = mlx5_nv_param_read_per_host_pf_conf(dev, mnvda, sizeof(mnvda));
-> +	if (err)
-> +		return err;
-> +
-> +	ctx->val.vu32 = MLX5_GET(nv_pf_pci_conf, data, total_vf);
-> +
-> +	return 0;
-> +}
-> +
-> +static int mlx5_devlink_total_vfs_set(struct devlink *devlink, u32 id,
-> +				      struct devlink_param_gset_ctx *ctx,
-> +				      struct netlink_ext_ack *extack)
-> +{
-> +	struct mlx5_core_dev *dev = devlink_priv(devlink);
-> +	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)];
-> +	bool per_pf_support;
-> +	void *data;
-> +	int err;
-> +
-> +	err = mlx5_nv_param_read_global_pci_cap(dev, mnvda, sizeof(mnvda));
-> +	if (err) {
-> +		NL_SET_ERR_MSG_MOD(extack, "Failed to read global pci cap");
-> +		return err;
-> +	}
-> +
-> +	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-> +	if (!MLX5_GET(nv_global_pci_cap, data, sriov_support)) {
-> +		NL_SET_ERR_MSG_MOD(extack, "Not configurable on this device");
-> +		return -EOPNOTSUPP;
-> +	}
-> +
-> +	per_pf_support = MLX5_GET(nv_global_pci_cap, data, per_pf_total_vf_supported);
-> +	memset(mnvda, 0, sizeof(mnvda));
-> +
-> +	err = mlx5_nv_param_read_global_pci_conf(dev, mnvda, sizeof(mnvda));
-> +	if (err)
-> +		return err;
-> +
-> +	MLX5_SET(nv_global_pci_conf, data, sriov_valid, 1);
-> +	MLX5_SET(nv_global_pci_conf, data, per_pf_total_vf, per_pf_support);
-> +
-> +	if (!per_pf_support) {
-> +		MLX5_SET(nv_global_pci_conf, data, total_vfs, ctx->val.vu32);
-> +		return mlx5_nv_param_write(dev, mnvda, sizeof(mnvda));
-> +	}
-> +
-> +	/* SRIOV is per PF */
-> +	err = mlx5_nv_param_write(dev, mnvda, sizeof(mnvda));
-> +	if (err)
-> +		return err;
-> +
-> +	memset(mnvda, 0, sizeof(mnvda));
-> +	err = mlx5_nv_param_read_per_host_pf_conf(dev, mnvda, sizeof(mnvda));
-> +	if (err)
-> +		return err;
-> +
-> +	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-> +	MLX5_SET(nv_pf_pci_conf, data, pf_total_vf_en, 1);
-> +	MLX5_SET(nv_pf_pci_conf, data, total_vf, ctx->val.vu32);
-> +	return mlx5_nv_param_write(dev, mnvda, sizeof(mnvda));
-> +}
-> +
-> +static int mlx5_devlink_total_vfs_validate(struct devlink *devlink, u32 id,
-> +					   union devlink_param_value val,
-> +					   struct netlink_ext_ack *extack)
-> +{
-> +	struct mlx5_core_dev *dev = devlink_priv(devlink);
-> +	u32 cap[MLX5_ST_SZ_DW(mnvda_reg)];
-> +	void *data;
-> +	u16 max;
-> +	int err;
-> +
-> +	data = MLX5_ADDR_OF(mnvda_reg, cap, configuration_item_data);
-> +
-> +	err = mlx5_nv_param_read_global_pci_cap(dev, cap, sizeof(cap));
-> +	if (err)
-> +		return err;
-> +
-> +	if (!MLX5_GET(nv_global_pci_cap, data, max_vfs_per_pf_valid))
-> +		return 0; /* optimistic, but set might fail later */
-> +
-> +	max = MLX5_GET(nv_global_pci_cap, data, max_vfs_per_pf);
-> +	if (val.vu16 > max) {
-> +		NL_SET_ERR_MSG_FMT_MOD(extack,
-> +				       "Max allowed by device is %u", max);
-> +		return -EINVAL;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static const struct devlink_param mlx5_nv_param_devlink_params[] = {
->  	DEVLINK_PARAM_GENERIC(ENABLE_SRIOV, BIT(DEVLINK_PARAM_CMODE_PERMANENT),
->  			      mlx5_devlink_enable_sriov_get,
->  			      mlx5_devlink_enable_sriov_set, NULL),
-> +	DEVLINK_PARAM_GENERIC(TOTAL_VFS, BIT(DEVLINK_PARAM_CMODE_PERMANENT),
-> +			      mlx5_devlink_total_vfs_get, mlx5_devlink_total_vfs_set,
-> +			      mlx5_devlink_total_vfs_validate),
->  	DEVLINK_PARAM_DRIVER(MLX5_DEVLINK_PARAM_ID_CQE_COMPRESSION_TYPE,
->  			     "cqe_compress_type", DEVLINK_PARAM_TYPE_STRING,
->  			     BIT(DEVLINK_PARAM_CMODE_PERMANENT),
-> -- 
-> 2.48.1
-> 
+> diff --git a/drivers/net/ipa/data/ipa_data-v4.7.c b/drivers/net/ipa/data/ipa_data-v4.7.c
+> index c8c23d9be961b1b818e8a1592a7f7dd76cdd5468..7e315779e66480c2a3f2473a068278ab5e513a3d 100644
+> --- a/drivers/net/ipa/data/ipa_data-v4.7.c
+> +++ b/drivers/net/ipa/data/ipa_data-v4.7.c
+> @@ -28,12 +28,10 @@ enum ipa_resource_type {
+>   enum ipa_rsrc_group_id {
+>   	/* Source resource group identifiers */
+>   	IPA_RSRC_GROUP_SRC_UL_DL			= 0,
+> -	IPA_RSRC_GROUP_SRC_UC_RX_Q,
+>   	IPA_RSRC_GROUP_SRC_COUNT,	/* Last in set; not a source group */
+>   
+>   	/* Destination resource group identifiers */
+> -	IPA_RSRC_GROUP_DST_UL_DL_DPL			= 0,
+> -	IPA_RSRC_GROUP_DST_UNUSED_1,
+> +	IPA_RSRC_GROUP_DST_UL_DL			= 0,
+>   	IPA_RSRC_GROUP_DST_COUNT,	/* Last; not a destination group */
+>   };
+>   
+> @@ -81,7 +79,7 @@ static const struct ipa_gsi_endpoint_data ipa_gsi_endpoint_data[] = {
+>   		},
+>   		.endpoint = {
+>   			.config = {
+> -				.resource_group	= IPA_RSRC_GROUP_DST_UL_DL_DPL,
+> +				.resource_group	= IPA_RSRC_GROUP_DST_UL_DL,
+>   				.aggregation	= true,
+>   				.status_enable	= true,
+>   				.rx = {
+> @@ -128,7 +126,7 @@ static const struct ipa_gsi_endpoint_data ipa_gsi_endpoint_data[] = {
+>   		},
+>   		.endpoint = {
+>   			.config = {
+> -				.resource_group	= IPA_RSRC_GROUP_DST_UL_DL_DPL,
+> +				.resource_group	= IPA_RSRC_GROUP_DST_UL_DL,
+>   				.qmap		= true,
+>   				.aggregation	= true,
+>   				.rx = {
+> @@ -197,12 +195,12 @@ static const struct ipa_resource ipa_resource_src[] = {
+>   /* Destination resource configuration data for an SoC having IPA v4.7 */
+>   static const struct ipa_resource ipa_resource_dst[] = {
+>   	[IPA_RESOURCE_TYPE_DST_DATA_SECTORS] = {
+> -		.limits[IPA_RSRC_GROUP_DST_UL_DL_DPL] = {
+> +		.limits[IPA_RSRC_GROUP_DST_UL_DL] = {
+>   			.min = 7,	.max = 7,
+>   		},
+>   	},
+>   	[IPA_RESOURCE_TYPE_DST_DPS_DMARS] = {
+> -		.limits[IPA_RSRC_GROUP_DST_UL_DL_DPL] = {
+> +		.limits[IPA_RSRC_GROUP_DST_UL_DL] = {
+>   			.min = 2,	.max = 2,
+>   		},
+>   	},
 > 
 
 
