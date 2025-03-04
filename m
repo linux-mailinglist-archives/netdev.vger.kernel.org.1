@@ -1,168 +1,133 @@
-Return-Path: <netdev+bounces-171814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80CA7A4EC9A
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 20:02:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A28E3A4ECE7
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 20:13:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A48C2166AEF
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:02:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E4058C3AD3
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:15:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA0C0253347;
-	Tue,  4 Mar 2025 19:02:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B45C2923AA;
+	Tue,  4 Mar 2025 17:59:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="lHabd9vs";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Ev+jCEBw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c8KYe4Jp"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C4924EABA;
-	Tue,  4 Mar 2025 19:02:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF17207DE6;
+	Tue,  4 Mar 2025 17:59:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741114946; cv=none; b=p4LDFqCnIw1Bj2I9IcDuoeRAwX3BH+XjXDzQBybDvgJ8jfcw6bCjNKws0W2pXhGHnmEuVgYp/2cZP58fSiFczyv9wgTZlYEKZgSoJ41IfQ6PmBPW3uOvOWsvL9AUyFPDfHtyFxHBYVEIVVUUzw4pe+fDSJKUEAXQhiP3rUvdR5U=
+	t=1741111179; cv=none; b=QroyOMlQlEiD3nTzgrcP3wuCZMrDw+8vE9qYRfZWHPWQUfQw8MMJy4zAs1xHi4LUGqE/ZXV+FEW/2QcEVFaZLXhxmfUGlpz4CIw1FIubkz1595srISCPg2dWMBCrpkLGHOUSml0UEILqBg/fVaUDAilXWvQan0WKntwPOkXiidQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741114946; c=relaxed/simple;
-	bh=oeO3k+fQ2uc2xW3PAoVoZusaYb/VRHAyBWTKFEnt+OA=;
+	s=arc-20240116; t=1741111179; c=relaxed/simple;
+	bh=YVZdnIYU5dWmx6KvKoMzGZLeD/aY3dyAs8KrL9Pjvxs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZRSGT5oL5sB2CNhYJo9iuFlg1LIUYVDybs/VidzSmBUHpsFXyHeAmOyY04/bRof3XPkfWkdSg2cPjtCd28Ukc0EJ6ZQfGMdkgPGPXHzw99AjKMON184eg9KAsLdX6PP6+NfVX4hzyzYopjEFAEEm05h1NKvgPVyXIPzQnUsC4S4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=lHabd9vs; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Ev+jCEBw; arc=none smtp.client-ip=103.168.172.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 294C61140109;
-	Tue,  4 Mar 2025 14:02:22 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-02.internal (MEProxy); Tue, 04 Mar 2025 14:02:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1741114942; x=
-	1741201342; bh=Pgi+DunqwLwq74Jly3YwOvG4Ta4hOiz0xroRVd15Urw=; b=l
-	Habd9vs30fdL28oTItRbA1XW+04wrHPY5ODRttgyEguacL3rY/m+PJS+sEbwU233
-	BmqT6V8s4lQa8kNge/9sGtF5D7dnNi2cBFAWNLFDNKdZW0GE4/macfFpiaTBd3kR
-	m8cC98Lp6mJI2907ZezUlvLGsEr64b7j2aJoQBcIHv5HjriqJkBY259yw4VrY7IA
-	qMycTjQIVNntwRVftQTX/vk+a80/0zqz95iMtL48C/D+e0cTW8c+F2+p8i7PsNev
-	oFzu+u6rmgRex+JDBuWQAynOsN/uFB21ZGIDh5LEle873yrTNFcvExg/IE//mffE
-	NoCvEDi7btr1jEsbz4Z+A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1741114942; x=1741201342; bh=Pgi+DunqwLwq74Jly3YwOvG4Ta4hOiz0xro
-	RVd15Urw=; b=Ev+jCEBwgjl+CCT5iDqMekTBNCU2vL9lY5sYtgpide4sM81W/C2
-	PKXxDqa7n7NfdSjuF/wcKHL0pSJTAbCsbggHy4G7BsZv3J97QfY9wzbXOQgd9U/h
-	AJy6WZJzMEmwrRBAt7x+uehZDsPX87DfLdlO1t/v+msZ1ijaNiof7S6GlAOnV0oQ
-	kbE2AbEOKNzNIiqOfVwOF7ynglupW33s+SP6l5u9YYcK/gxy3OwwMvyLpIEB9LeW
-	3E9+HcMLCO/YvFzSSAHWe3XdcK5aoZaOHfwptvLku/USF9zExk2b/9DqtXqeMW6O
-	ffJW2JyXTynfTyFiSmR/1QMvoBnWWRthPuw==
-X-ME-Sender: <xms:PU7HZ5YJaYoe3gBUiQdMtZcL_S6evoKtVMTWuwWHHU5YeORy_N4fBg>
-    <xme:PU7HZwb1k3_T_U657_1x1p1uIO3jMzzSao1wnpWGuPq9UzeaPMtdDllWu6VWS8j77
-    x0TNFwF8RDqlpLD9Y0>
-X-ME-Received: <xmr:PU7HZ78PC01jiQHPUtrAFZmiTb83BAwkRqA84QWLADDTOsCXnBy8fDwTAvKz>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddutddvkeefucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
-    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
-    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdef
-    hfekgeetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhn
-    sggprhgtphhtthhopedufedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnth
-    honhhiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghr
-    rdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrd
-    gtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehp
-    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepughonhgrlhgurdhhuhhnth
-    gvrhesghhmrghilhdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhr
-    ghdprhgtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdprhgtph
-    htthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghh
-X-ME-Proxy: <xmx:PU7HZ3q60ijFSyPaYi875yQA9SYT06ZrmrAYtnVXUQL68g_0y2bIoA>
-    <xmx:PU7HZ0rG_qUw2z0DBkJzZ5BM2pME_11XtYPZHfex2tqLuQrVJGQWeQ>
-    <xmx:PU7HZ9SFvwxCDmVEKjsZBn3bBnBBY7O9tT4DT0qIsX1ygk8uRR3kCw>
-    <xmx:PU7HZ8oE1ilRcAHF2QGVk_qNg9JJdf2ZhITX2riumaUzfezeucodng>
-    <xmx:Pk7HZx4ileAH-OCVIQb-UsPWKcNc6GMp4HwKKCsZ29BOdn4DiYjRa1dJ>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 4 Mar 2025 14:02:20 -0500 (EST)
-Date: Tue, 4 Mar 2025 20:02:19 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-Subject: Re: [PATCH v21 09/24] ovpn: implement packet processing
-Message-ID: <Z8dOOy9tSpJ1UCiR@hog>
-References: <20250304-b4-ovpn-tmp-v21-0-d3cbb74bb581@openvpn.net>
- <20250304-b4-ovpn-tmp-v21-9-d3cbb74bb581@openvpn.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=YxuEgp/AmI0anlBX1R3/e5jUEmtvfoFWX7bbqY0OIorLEJa2C5c/Ho7hj30cgb38hjICD5XMxP9l6FdNqGL51m52FXO5nB/6/vhEkCSf9CmQrC6fFATYdQVvGjmbdorcJ1YMACkXpm1RIBzXhgtaweZQ+5ztQ3FBPTFIJYm4biU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c8KYe4Jp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0C6CC4CEE5;
+	Tue,  4 Mar 2025 17:59:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741111178;
+	bh=YVZdnIYU5dWmx6KvKoMzGZLeD/aY3dyAs8KrL9Pjvxs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=c8KYe4Jp6/Sx/x93RVneDKiT6giUhpqeUWQgkD8WFbqlLUzv1XqnMaZiVVmmwoU56
+	 pA8rTblZCA/GJXZIZuQ3isx7eYAcyx19c4QKfUEVLdvCkgJCKvm45VsSHhNUexFOeU
+	 iGMqChatgjFhlkSj1SGzU319VYsGUxLdu+Dz8srAIhmDJcsSY2yZJ5T0QH10+loH3N
+	 WBQuOkrTCINa9nJI1H9P+/eXuc3Bv9Cz5VNk3UMZHtHv3UaV/BQxr/yMYiwjcFNINq
+	 O8J+W1MxvESlz3Y44Cm9zgoFWUH3086IZxU0N58cx5WN9v0VXLaL+vXF/WW0l7chxu
+	 IP/PNUHcFlKyA==
+Date: Tue, 4 Mar 2025 09:59:37 -0800
+From: Saeed Mahameed <saeed@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Daniel Vetter <daniel.vetter@ffwll.ch>,
+	Dave Jiang <dave.jiang@intel.com>, David Ahern <dsahern@kernel.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Itay Avraham <itayavr@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Leonid Bloch <lbloch@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	"Nelson, Shannon" <shannon.nelson@amd.com>
+Subject: Re: [PATCH v5 0/8] Introduce fwctl subystem
+Message-ID: <Z8c_iRE-XWuv5mrD@x130>
+References: <0-v5-642aa0c94070+4447f-fwctl_jgg@nvidia.com>
+ <20250303175358.4e9e0f78@kernel.org>
+ <20250304140036.GK133783@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20250304-b4-ovpn-tmp-v21-9-d3cbb74bb581@openvpn.net>
+In-Reply-To: <20250304140036.GK133783@nvidia.com>
 
-2025-03-04, 01:33:39 +0100, Antonio Quartulli wrote:
-> +struct crypto_aead *ovpn_aead_init(const char *title, const char *alg_name,
-> +				   const unsigned char *key,
-> +				   unsigned int keylen)
+On 04 Mar 10:00, Jason Gunthorpe wrote:
+>On Mon, Mar 03, 2025 at 05:53:58PM -0800, Jakub Kicinski wrote:
+>> On Thu, 27 Feb 2025 20:26:28 -0400 Jason Gunthorpe wrote:
+>> > v5:
+>> >  - Move hunks between patches to make more sense
+>> >  - Rename ucmd_buffer to fwctl_ucmd_buffer
+>> >  - Update comments and commit messages
+>> >  - Copyright to 2025
+>> >  - Drop bxnt WIP patches
+>> >  - Allow a NULL ops->info
+>> >  - Decode more op codes for mlx5 and the sub-operation for
+>> >    MLX5_CMD_OP_ACCESS_REG/_USER
+>>
+>> Did you address my feedback? I asked for the mlx5 support to only be
+>> enabled in RDMA is in use. Saeed who wrote the mlx5 parts of this
+>> patchset clearly admitted on v4:
 
-nit: static? I don't see it used outside this file.
+When I said fwctl is not needed for netdev, I meant that it will not be used
+for netdev object configuration and as I said before FW will block that
+anyways. fwctl in mlx5 is not only for RDMA, So I don't know how to address
+your comment. 
 
+Not to mention that fwctl is a very great tool to debug netdev problems.
 
-[...]
-> +static inline struct ovpn_crypto_key_slot *
-> +ovpn_crypto_key_id_to_slot(const struct ovpn_crypto_state *cs, u8 key_id)
-> +{
-> +	struct ovpn_crypto_key_slot *ks;
-> +	u8 idx;
-> +
-> +	if (unlikely(!cs))
-> +		return NULL;
-> +
-> +	rcu_read_lock();
-> +	idx = cs->primary_idx;
+>
+>I never agreed to that formulation. I suggested that perhaps runtime
+>configurations where netdev is the only driver using the HW could be
+>disabled (ie a netdev exclusion, not a rdma inclusion).
+>
+>However, there is not agreement on this from Saeed who is responsible
+>for mlx5:
+>
+> https://lore.kernel.org/all/Z7z0ADkimCkhr7Xz@x130/
+>
+>I also surveyed other stakeholders on a netdev-exclusion proposal and
+>did not hear support. You need to convince people this is a good idea.
+>
+>However, I would agree fwctl should not accept any fwctl drivers for
+>simple networking devices. However, "smart nics" and RDMA capable
+>devices are in-scope.
+>
 
-I'd go with slots[0] and slots[1], since it doesn't really matter
-whether we check the primary or secondary first. It would avoid a
-possible reload of cs->primary_idx (which might be updated
-concurrently by a key swap and cause us to look into the same slot
-twice) -- a READ_ONCE would also prevent that.
-
-> +	ks = rcu_dereference(cs->slots[idx]);
-> +	if (ks && ks->key_id == key_id) {
-> +		if (unlikely(!ovpn_crypto_key_slot_hold(ks)))
-> +			ks = NULL;
-> +		goto out;
-> +	}
-> +
-> +	ks = rcu_dereference(cs->slots[!idx]);
-> +	if (ks && ks->key_id == key_id) {
-> +		if (unlikely(!ovpn_crypto_key_slot_hold(ks)))
-> +			ks = NULL;
-> +		goto out;
-> +	}
-> +
-> +	/* when both key slots are occupied but no matching key ID is found, ks
-> +	 * has to be reset to NULL to avoid carrying a stale pointer
-> +	 */
-> +	ks = NULL;
-> +out:
-> +	rcu_read_unlock();
-> +
-> +	return ks;
-> +}
-
--- 
-Sabrina
+>I could also probably agree to using kconfig to disable fwctl drivers
+>on kernels that statically compile out rdma, vdpa, nvme and related,
+>though I agree with Saeed that it seems to lack technical merit.
+>
+>> Greg, I've been asking for this interface to be scoped to when RDMA
+>> (/CXL/storage) is in enabled on these NICs since pretty much the first
+>> RFC.
+>
+>You only started asking for this more limited approach in v4. All your
+>previous arguments were that fwctl should be entirely killed for any
+>networking HW.
+>
+>Jason
+>
 
