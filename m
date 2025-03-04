@@ -1,243 +1,117 @@
-Return-Path: <netdev+bounces-171465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBDD8A4D08B
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 02:11:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9CE4A4D095
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 02:13:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50F363A2921
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 01:11:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D74183A49E7
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 01:12:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54D7A42AB0;
-	Tue,  4 Mar 2025 01:11:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4EBA42AB0;
+	Tue,  4 Mar 2025 01:12:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sd/ckAhE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sRTUUvqA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f195.google.com (mail-yw1-f195.google.com [209.85.128.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B349BE5E;
-	Tue,  4 Mar 2025 01:11:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7262118D;
+	Tue,  4 Mar 2025 01:12:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741050712; cv=none; b=Qy2e7F+jc/xQD2ywpWsnFv6U4jTk59TiVfHPDTfAmiLyI3tWFeXvuRcmSL5+v4j0DjLk7SD0yJvhwCKDWZUqcHWaVQSUVgmUDyl6OOyfRPBHA3PQIxWDOZQcePF3VZvZPQFuaqMOJbBxfWGGJ6Wxef5GQ8C6lG6jHOvy3OMgnVo=
+	t=1741050748; cv=none; b=QR/U/dHPaNXMtekJHMWqIg/W2SLPQjVA/CrUSSNSFRI1zluJ6wHPKnZ2/aZ4M7HT7Hf/PCvpU/hKGvMytSpBXx+oxExvcXEa9SxWhMEPZ5mZTahoJBYjCTuw5OcILbZp7dCIlwOAVeirYyrH08V5rDoQMEMszpfEyuGKW2t0xWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741050712; c=relaxed/simple;
-	bh=22ZUGvsm1MOkILYiYuUiikpT/81djVg4T133ITjQ2KI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aBeaqeFm87XvutRzjX20HJvWJnAToYsPjN+mHCMw8UbSzCcOmYVMNF/2mahsE0N5I+jDRFCXKsHL94ITlNKB1TxjZoWmnIK0wVkcosbp8w5a2J5lCNmgONoG33dkn9XxnQoUsCWkURQF0cSCnPdKZsTHPeha9L9GVrNOAxHBotM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sd/ckAhE; arc=none smtp.client-ip=209.85.128.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f195.google.com with SMTP id 00721157ae682-6f4bc408e49so45537807b3.1;
-        Mon, 03 Mar 2025 17:11:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741050709; x=1741655509; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vluR2PPVFCeXo4Pv8qn9Rh/dHaN7yGoTkb474FlFpf8=;
-        b=Sd/ckAhE8Vj0xCjVUtnD2mPVlpss5ouJrCl2aHHb22DbPyaOaC4D3wafA2Jd6XxsWA
-         Aoy1lTNf1TIRdkGO6zF4iKnEOkSq0gjjpIaqxorqCWLTJWWExejvmZb9WsBUfidtwYG7
-         LElJ5eln9t3XIBecv5o7DSKv9ydv70v8AmV1T0UiRZ8Lq6KLnXfC6SFw8P69lMX6rqTq
-         /nIT/2kEU9atoNeK6c/QrErPPQUQVAdD04amY5CQw62KVWC7vN3CmOqdLbpoqITnrcHX
-         hwyiKW9shmHvPJSflmLFOr7RRQ7e3mWg8pvsjEP8HU1HxWzAsnSnkWch4ZHMahWFrRwJ
-         laNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741050709; x=1741655509;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vluR2PPVFCeXo4Pv8qn9Rh/dHaN7yGoTkb474FlFpf8=;
-        b=k4wNTj4+6PEWyKprT6nRV+bx9SnXhD35aeXrSAfeZwlcjdbjwDBt7QaiKDxuP4d2LI
-         kwW61t9A/5ANpwOmznqypSNthzM7DHGkyvmg8rsjC6Xo2oNY3Wu8szfmSyfwRWwS6ufB
-         ZgkB0cr7uUEobPsuiqsvKGH1r2NA4eNAuvrS37y3aWqxvJj7hxuQDFgdNQzfcKTxCB7a
-         TnmVt1L4NPxfFT8bpX/e2k42f6RTl3wY8xWf8vvMsl1l5N0Hx5h3Z8gGMByGufJtN8xq
-         Mc3LjLKW/Wy5O25Hrg6FNByeSb4gKmeWOHb+lxJrLZnb22dAx10/FKkb8yc/hr32dNQR
-         fxpQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVWkvoRPAHpslZhPzj9Qgb6kK3P0GeF9MTXEywue5y8wWONYMxl9Ptrfefn1USF7VO2tbjthO+Z@vger.kernel.org, AJvYcCX7a8b/+IheQ+XstPIdiHY00YjFZMJJtGnzQIWZfIObsNQvcSvBIhAF0hpqVxPOQdTuvDPSVQLkWULDVskd@vger.kernel.org, AJvYcCXGt6vIo7OyrXlmSH4Xey/UovdIg5NOBqKyCMatQiQVHGJsxFs4Mhimhwz95EEo5PzgfAJ4Z99NkLXFAaF6uoXoDDLl@vger.kernel.org, AJvYcCXWDMVwNBsRBjHcuKaLZEbfxMZZKOapRVkVGLlWcpoCsZ88z01WpfaNP+obJGotBKo6tsA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBjMjilQ9dWlsM6EPrXoL4DhGbwkUvNGRpg56FphHkjFfAQBP2
-	a5ZCk+2uSy5QOzAoLIcmcfrExW05EI7c/PEPG+fK6lN6WX3/yPGBpe4wgikH7i4XDika5yzOomK
-	Ow9EVCEHCFJyWyWEjG9AVs3b0DkI=
-X-Gm-Gg: ASbGncuoCsayyIfS71Izmg2ZrwUZ6dUBB1KTn/SbmWyukXD/LLGcab1wFZmF35GLGTk
-	3cXmL6RFCkCIxMOo1OB0LspNjbUlwZ5xwmluEmnlJduJ8OBczVvrbwD1McU6KYVtxPXQzxojTIL
-	zV8kA4pE8BSJiDVw/1mcP7PnRNBg==
-X-Google-Smtp-Source: AGHT+IEqUJezS4KkYf0hWTwJ3JT9iuB+Kta0och/jWyl/2qKN2Gk9IsJypM5kJk2wrbNcnQ46yEh3gTwcTGIDUZLWQo=
-X-Received: by 2002:a05:690c:3808:b0:6f9:78c0:3a5f with SMTP id
- 00721157ae682-6fd4a10ff41mr214699267b3.19.1741050709491; Mon, 03 Mar 2025
- 17:11:49 -0800 (PST)
+	s=arc-20240116; t=1741050748; c=relaxed/simple;
+	bh=fK13RTG60oM901lJvnBTBZkzA80AD4Iv7WCKf0MnMS0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sRzAp1j01HsRua8tcK6JxtAkb6EeUfmnkA26iauHaovqWpms31Z2v2KF5pT0KwiPD8+UQ3Wcc9POxqxCUS/sWWVEfkJGqNgK9fpG4fu/hnQbrjWszPXhViLtes5aheU7l10IsCHixqQSA+U3QsvVCJMTrq1wqta/A32bNfXq0mY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sRTUUvqA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 309D2C4CEE8;
+	Tue,  4 Mar 2025 01:12:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741050747;
+	bh=fK13RTG60oM901lJvnBTBZkzA80AD4Iv7WCKf0MnMS0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=sRTUUvqA1l8IpLboZkNJjdTiZy0XVlD/1AXeO2mpKzKOBBvAiXJbwG2wexUJJ1GYW
+	 Ax0ipHfrkQTZVySvEzdWfsWYu/bsbmSUYaXc0IeT+0CLrJbyqsct+O6R353hngfHje
+	 GiYFWqDtzAgMtdByEMSs9MUBv+dS8Kv5WYuJJoVA1grqoI1Q/Kq/qXHDuEgAXL4bBu
+	 32sYjsxfKIQU90pGBRaa0dAOTrJqVpqm6ETwGmE8rkAS5pVNhY0MTsntQHOQGDQM93
+	 cPqmDkjAJE3bJNBbHr6d4tHPD2qVg7HUmnjAZEutt/UG+z1wwEjvcRBOdaza3FdyXc
+	 90rDlnH+7nK5w==
+Date: Mon, 3 Mar 2025 17:12:26 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
+ <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>, Rob Herring
+ <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman
+ <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor
+ Dooley <conor+dt@kernel.org>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
+ Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, Maxime
+ Chevallier <maxime.chevallier@bootlin.com>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 06/12] net: pse-pd: Add support for budget
+ evaluation strategies
+Message-ID: <20250303171226.4fb78c99@kernel.org>
+In-Reply-To: <20250303144051.2503fb43@kmaincent-XPS-13-7390>
+References: <20250224134522.1cc36aa3@kernel.org>
+	<20250225102558.2cf3d8a5@kmaincent-XPS-13-7390>
+	<20250225174752.5dbf65e2@kernel.org>
+	<Z76t0VotFL7ji41M@pengutronix.de>
+	<Z76vfyv5XoMKmyH_@pengutronix.de>
+	<20250226184257.7d2187aa@kernel.org>
+	<Z8AW6S2xmzGZ0y9B@pengutronix.de>
+	<20250227155727.7bdc069f@kmaincent-XPS-13-7390>
+	<Z8CVimyMj261wc7w@pengutronix.de>
+	<20250227192640.20df155d@kmaincent-XPS-13-7390>
+	<Z8ME-90Xg46-pNhA@pengutronix.de>
+	<20250303144051.2503fb43@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250303132837.498938-1-dongml2@chinatelecom.cn>
- <20250303132837.498938-2-dongml2@chinatelecom.cn> <20250303165454.GB11590@noisy.programming.kicks-ass.net>
-In-Reply-To: <20250303165454.GB11590@noisy.programming.kicks-ass.net>
-From: Menglong Dong <menglong8.dong@gmail.com>
-Date: Tue, 4 Mar 2025 09:10:12 +0800
-X-Gm-Features: AQ5f1JpFMtKlVjq9NnfZ6GpKN1o8CsUv-3k7tk0XiqG3kcbonZw3mKyWyXRBiyA
-Message-ID: <CADxym3aVtKx_mh7aZyZfk27gEiA_TX6VSAvtK+YDNBtuk_HigA@mail.gmail.com>
-Subject: Re: [PATCH v4 1/4] x86/ibt: factor out cfi and fineibt offset
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: rostedt@goodmis.org, mark.rutland@arm.com, alexei.starovoitov@gmail.com, 
-	catalin.marinas@arm.com, will@kernel.org, mhiramat@kernel.org, 
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
-	eddyz87@gmail.com, yonghong.song@linux.dev, john.fastabend@gmail.com, 
-	kpsingh@kernel.org, sdf@fomichev.me, jolsa@kernel.org, davem@davemloft.net, 
-	dsahern@kernel.org, mathieu.desnoyers@efficios.com, nathan@kernel.org, 
-	nick.desaulniers+lkml@gmail.com, morbo@google.com, samitolvanen@google.com, 
-	kees@kernel.org, dongml2@chinatelecom.cn, akpm@linux-foundation.org, 
-	riel@surriel.com, rppt@kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 4, 2025 at 12:55=E2=80=AFAM Peter Zijlstra <peterz@infradead.or=
-g> wrote:
->
-> On Mon, Mar 03, 2025 at 09:28:34PM +0800, Menglong Dong wrote:
-> > For now, the layout of cfi and fineibt is hard coded, and the padding i=
-s
-> > fixed on 16 bytes.
-> >
-> > Factor out FINEIBT_INSN_OFFSET and CFI_INSN_OFFSET. CFI_INSN_OFFSET is
-> > the offset of cfi, which is the same as FUNCTION_ALIGNMENT when
-> > CALL_PADDING is enabled. And FINEIBT_INSN_OFFSET is the offset where we
-> > put the fineibt preamble on, which is 16 for now.
-> >
-> > When the FUNCTION_ALIGNMENT is bigger than 16, we place the fineibt
-> > preamble on the last 16 bytes of the padding for better performance, wh=
-ich
-> > means the fineibt preamble don't use the space that cfi uses.
-> >
-> > The FINEIBT_INSN_OFFSET is not used in fineibt_caller_start and
-> > fineibt_paranoid_start, as it is always "0x10". Note that we need to
-> > update the offset in fineibt_caller_start and fineibt_paranoid_start if
-> > FINEIBT_INSN_OFFSET changes.
-> >
-> > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
->
-> I'm confused as to what exactly you mean.
->
-> Preamble will have __cfi symbol and some number of NOPs right before
-> actual symbol like:
->
-> __cfi_foo:
->   mov $0x12345678, %reg
->   nop
->   nop
->   nop
->   ...
-> foo:
->
-> FineIBT must be at foo-16, has nothing to do with performance. This 16
-> can also be spelled: fineibt_preamble_size.
->
-> The total size of the preamble is FUNCTION_PADDING_BYTES + CFI_CLANG*5.
->
-> If you increase FUNCTION_PADDING_BYTES by another 5, which is what you
-> want I think, then we'll have total preamble of 21 bytes; 5 bytes kCFI,
-> 16 bytes nop.
+On Mon, 3 Mar 2025 14:40:51 +0100 Kory Maincent wrote:
+> > Ok, I assume we are talking about different things. I mean - not port
+> > specific configurations and diagnostic, will have different interface.
+> >=20
+> > BUDGET_EVAL_STRAT is port specific. HP and Cisco implement it as port
+> > specific. PD692x0 Protocol manual describe it as port specific too:
+> > 3.3.6 Set BT Port Parameters
+> >  Bits [3..0]=E2=80=94BT port PM mode
+> >   0x0: The port power that is used for power management purposes is
+> >        dynamic (Iport x Vmain).
+> >   0x1: The port power that is used for power management purposes is port
+> >        TPPL_BT.
+> >   0x2: The port power that is used for power management purposes is
+> >        dynamic for non LLDP/CDP/Autoclass ports and TPPL_BT for
+> > LLDP/CDP/Autoclass ports. 0xF: Do not change settings. =20
+>=20
+> I don't really understand how that can be port specific when the power bu=
+dget is
+> per PD69208 manager. Maybe I am missing information here.
 
-Hello, sorry that I forgot to add something to the changelog. In fact,
-I don't add extra 5-bytes anymore, which you can see in the 3rd patch.
++1
 
-The thing is that we can't add extra 5-bytes if CFI is enabled. Without
-CFI, we can make the padding space any value, such as 5-bytes, and
-the layout will be like this:
+> > So, I assume, critical components are missing anyway. =20
+>=20
+> As we are not supporting the budget method configured by the user in this
+> series, I agreed we should not add any uAPI related to it that could be b=
+roken
+> or confusing later.
+>=20
+> I will remove it and send v6.
 
-__align:
-  nop
-  nop
-  nop
-  nop
-  nop
-foo: -- __align +5
-
-However, the CFI will always make the cfi insn 16-bytes aligned. When
-we set the FUNCTION_PADDING_BYTES to (11 + 5), the layout will be
-like this:
-
-__cfi_foo:
-  nop (11)
-  mov $0x12345678, %reg
-  nop (16)
-foo:
-
-and the padding space is 32-bytes actually. So, we can just select
-FUNCTION_ALIGNMENT_32B instead, which makes the padding
-space 32-bytes too, and have the following layout:
-
-__cfi_foo:
-  mov $0x12345678, %reg
-  nop (27)
-foo:
-
-And the layout will be like this if fineibt and function metadata is both
-used:
-
-__cfi_foo:
-        mov     --      5       -- cfi, not used anymore if fineibt is used
-        nop
-        nop
-        nop
-        mov     --      5       -- function metadata
-        nop
-        nop
-        nop
-        fineibt --      16      -- fineibt
-foo:
-        nopw    --      4
-        ......
-
-The things that I make in this commit is to make sure that
-the code in arch/x86/kernel/alternative.c can find the location
-of cfi hash and fineibt depends on the FUNCTION_ALIGNMENT.
-the offset of cfi and fineibt is different now, so we need to do
-some adjustment here.
-
-In the beginning, I thought to make the layout like this to ensure
-that the offset of cfi and fineibt the same:
-
-__cfi_foo:
-        fineibt  --   16  --  fineibt
-        mov    --    5    -- function metadata
-        nop(11)
-foo:
-        nopw    --      4
-        ......
-
-The adjustment will be easier in this mode. However, it may have
-impact on the performance. That way I say it doesn't impact the
-performance in this commit.
-
-Sorry that I didn't describe it clearly in the commit log, and I'll
-add the things above to the commit log too in the next version.
-
-Thanks!
-Menglong Dong
-
->
-> Then kCFI expects hash to be at -20, while FineIBT must be at -16.
->
-> This then means there is no unambiguous hole for you to stick your
-> meta-data thing (whatever that is).
->
-> There are two options: make meta data location depend on cfi_mode, or
-> have __apply_fineibt() rewrite kCFI to also be at -16, so that you can
-> have -21 for your 5 bytes.
->
-> I think I prefer latter.
->
-> In any case, I don't think we need *_INSN_OFFSET. At most we need
-> PREAMBLE_SIZE.
->
-> Hmm?
+v6 sounds like a good idea.
 
