@@ -1,140 +1,132 @@
-Return-Path: <netdev+bounces-171633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E25DA4DEA1
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 14:05:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85978A4DEEF
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 14:13:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39647189274D
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 13:05:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F7777A4C1E
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 13:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76C702036FE;
-	Tue,  4 Mar 2025 13:05:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFC3A202F68;
+	Tue,  4 Mar 2025 13:11:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DTJCMPui"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OlUsRcar"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DB9D1FBC83;
-	Tue,  4 Mar 2025 13:05:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 419AD1FECDB;
+	Tue,  4 Mar 2025 13:11:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741093538; cv=none; b=oCPE4N1MTF9xMQYPt0LBGAHOOP49O6hzNCE74DklCJbTcEtcEe0t731v8Qv6aHqsfTHbut+KEWZzKmaZVOCNzdlqebnwJj13Av/qN1/JSGLp7e9nY2WiB/H57JuMsqrJpk9STEwSkw3nEoNazJx8i8hl8aXC7RNNgvpNSTcmRWU=
+	t=1741093894; cv=none; b=I/ULNbRPsWMgnn2/iNzQWj650gi1GJfFw3LVzfLtJC/NF0vMigl3y8FIyFTUxNear9De6rwd5ckI6MbKli58I3SN1myd6w67r+kwjZmeB2h1JGLTQ+XFThuT2RsD2lj86alv5NXkbrh7l97u9ca7qTLVWnafWryIZzEU6rVReQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741093538; c=relaxed/simple;
-	bh=kId64MTN2SwW88P18+0OurZ0XEpuA7JeJv0/MwjsJj4=;
-	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=tmJdvsMgsfKn9G78Oy9b5f4WldcewzY8lj7BZicfH8j8sqLhvwsbzMvPsAbt6JvikoTz8m8857eFyB8JWaftHCecOHtGOugIuw//2PVxkwt+Yg3hme4g1euygDD4bz3+AoKngkT1AY1TkM2IofWkpd9KAGnBP4hd7Ruar9UVZrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DTJCMPui; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741093536; x=1772629536;
-  h=from:date:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=kId64MTN2SwW88P18+0OurZ0XEpuA7JeJv0/MwjsJj4=;
-  b=DTJCMPuipPj8i6qG95Q5UnX43JqWvowBcTfkiuj5lfZzebn6Lcujv9f7
-   MRteT0eYcmC/a76AIQ8HLxcq+ADXadE4iox8JP02sP2lPjRJjJkLOvsEX
-   HZQyq+BYDSoCi/G+0wL2VhyPf0rPNlbX6OjQUkKFs6fJ/uJK0ORd9F0fX
-   akzzaV0co8oDe2sC4M+yFooaFsihlW4SKLgGZIc2+JVLNIE09Xur5cdle
-   r9rDbMnGykUWwE9yHyDBl/4oUAsom6O6U2flgO/w2BqJvxDrk3MSjUVne
-   tBhJlSKoaI6baBr207oZ/dO6MpGXtNYb6M0a/a5M0UOlOPwHHJutwIqa9
-   A==;
-X-CSE-ConnectionGUID: FYYHDh0ZSReB0kZB5cSE7w==
-X-CSE-MsgGUID: 9DN7PhtOTMy3KL7UzqjY8w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="41187713"
-X-IronPort-AV: E=Sophos;i="6.13,331,1732608000"; 
-   d="scan'208";a="41187713"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 05:05:35 -0800
-X-CSE-ConnectionGUID: bmwojJy2R9y2fe7aUkBKJw==
-X-CSE-MsgGUID: LIenP46HT/eSa0i+DPjIHA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="123563998"
-Received: from ijarvine-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.220])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 05:05:27 -0800
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Date: Tue, 4 Mar 2025 15:05:24 +0200 (EET)
-To: Paolo Abeni <pabeni@redhat.com>
-cc: Hans de Goede <hdegoede@redhat.com>, x86@kernel.org, 
-    LKML <linux-kernel@vger.kernel.org>, Netdev <netdev@vger.kernel.org>, 
-    platform-driver-x86@vger.kernel.org, 
-    linux-stm32@st-md-mailman.stormreply.com, 
-    linux-arm-kernel@lists.infradead.org, 
-    Choong Yong Liang <yong.liang.choong@linux.intel.com>, 
-    Simon Horman <horms@kernel.org>, Jose Abreu <joabreu@synopsys.com>, 
-    Jose Abreu <Jose.Abreu@synopsys.com>, 
-    David E Box <david.e.box@linux.intel.com>, 
-    Thomas Gleixner <tglx@linutronix.de>, 
-    Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>, 
-    Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-    Dave Hansen <dave.hansen@linux.intel.com>, 
-    "H . Peter Anvin" <hpa@zytor.com>, David E Box <david.e.box@intel.com>, 
-    Andrew Lunn <andrew+netdev@lunn.ch>, 
-    "David S . Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Heiner Kallweit <hkallweit1@gmail.com>, 
-    Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-    Richard Cochran <richardcochran@gmail.com>, 
-    Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-    Jiawen Wu <jiawenwu@trustnetic.com>, 
-    Mengyuan Lou <mengyuanlou@net-swift.com>, 
-    Russell King <linux@armlinux.org.uk>, 
-    Serge Semin <fancer.lancer@gmail.com>
-Subject: Re: [PATCH net-next v9 3/6] arch: x86: add IPC mailbox accessor
- function and add SoC register access
-In-Reply-To: <48885074-b590-41e6-9794-49ec12713cce@redhat.com>
-Message-ID: <d8e04cf2-afb9-dead-f7c2-297c66969081@linux.intel.com>
-References: <20250227121522.1802832-1-yong.liang.choong@linux.intel.com> <20250227121522.1802832-4-yong.liang.choong@linux.intel.com> <48885074-b590-41e6-9794-49ec12713cce@redhat.com>
+	s=arc-20240116; t=1741093894; c=relaxed/simple;
+	bh=rZSB8ttJc33k4p7Ftc2PQRAgzsvuJBhIKVv79k++F8U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cHK5uZ6w/PcL0SGdfdB2WJc1FBUITT3dVeTj2JcfwuKkbJ10HNl5z0nCQWpxTRIKuYSNsUFwMUmDoJSt66mmHrmDYTbqVJdpcaM9ViecYVB4bJBjpBMOnKruq8xI9vvVQdoX0bRa2UKR66B0z+6yokpxpk5HJR8hhpShIEjjp90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OlUsRcar; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-22337bc9ac3so104926585ad.1;
+        Tue, 04 Mar 2025 05:11:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741093892; x=1741698692; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=uoBQMXTscKMSBK7mXc73SSB9UbMhqYi1iTf6fQEcMsQ=;
+        b=OlUsRcar27PSEQ1qreMtXJCQiaLyBmQGi/cA2ccE187sNJ9F0/irXW+v8Y1gHjtnWJ
+         9RsD5bHYasw4zOpPu97hLhCA0IIAkj03wvgUQ50l4/6twCDqNFryIZh29uX2dI1yQ/SL
+         ELwOzVOFsMEcbcesT+wEUpEmsQXKaCLITvZz26Z0dxzFaZScduIz1GME+mnMJfMxbz7W
+         muwu3LUh6o0XY3qIOql80lVHkpSt76WcLFqPCGt+YdkaZVCagrPD0YKi+4u6OFGywbHe
+         oa/x2bVXJMUWTaMpWk2i5fm0wCp7ytbYDAFgHbs+epNmvPyGEKCrqseGSplsHQoIavW7
+         hrhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741093892; x=1741698692;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uoBQMXTscKMSBK7mXc73SSB9UbMhqYi1iTf6fQEcMsQ=;
+        b=F/g1DUFVQnX1BU14G/YT2A0bzK9Wefn+2lA/OHgAAgtsKfd9H4GJTC0t+wT4N572Wb
+         kAy4qWSzo/8eE8OwkUPW+T3TZ3bqVyW3bTKRlhkAUyPcQtlZhDbJO2W9NsrWfaXekBF9
+         cBZTK/VmTbvrUyLUlLSJjxF0y7pWcMZL5tHcsM/1RAraGHlS7szxSsUkDysvEWSSNJCw
+         vB4g8t4WKqVOFggUkpimQfgXnRGejH5xHlgZTRiU2SZ4n+6+kXMtXx29YSINq28uvvYW
+         kbCMq8lkMB0VwkgEbdchakyOphC21ebDFmgd4Ft1XUBqewU3k3nWoKFsqljDxqiC0ukU
+         07Fg==
+X-Forwarded-Encrypted: i=1; AJvYcCVPS8nAsgZHJ5UrUeKTT/NOAYX/hfAcPiUZ7fR9aTIc8VKBhrIZ4FbaDXPFjUgpouzSA7zTbdl+AnrwYYnr8WAQ@vger.kernel.org, AJvYcCWHKaf43IioxeDBe9PZmEsEgtgV648RfJQnU7ZHZTmIYwG5kQtCQkV4RZ2SNE6lAV/m7DWi2KgudLn965c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwN7WXACygzgGdv1EBFBM0mNY6vmx6nJb+fHppjfQgK5mObtFRM
+	qEmunVoSb7la9T2KfzHM/BsYOq3uSvVmRuLKPWtyxmjYFmBZbB7kJuv6du3e5r/lIg==
+X-Gm-Gg: ASbGncuQxJi55C5Zp2QQ7dEJWQ7eBtr+VGfp65yA16q7+prrdAxEzM6F7QxDxTzS1T9
+	xiT8uW3EEiv73m2tzDViWq2DVRAROZydbVfI/7pfKo2NvPoanyTXTvAZM+Xa7SkTNyj6qIhws2e
+	tJ5fW0hK9VgaRpHdzZmPld+NXtgnf6Rs6cxynBMohhB+2kXVl46XEX31Hah7asdKpDG6h1Pks+O
+	ozUCf4/q70yr371LepW+ySfGU/9+BsvpIKzpsRaMY9REjyDh8QoBZfKRVca9Qxum6fQ3CEXAWm+
+	lfaxKxFqarXIlnQNLbg/YknPopU0vdpgcE2OEHfOeAc/XNo7brJIrmV+wjNXEinL
+X-Google-Smtp-Source: AGHT+IEfsnSbzTHyDxFsr+hqkwQxcQYjceyAHDwsu2spopC0Uu00vPNa4OOk9Ujk6+K2F17feBA/Yg==
+X-Received: by 2002:a17:902:d2cb:b0:220:dff2:18ee with SMTP id d9443c01a7336-22368f819abmr268409195ad.14.1741093892134;
+        Tue, 04 Mar 2025 05:11:32 -0800 (PST)
+Received: from fedora.dns.podman ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7349fe2a668sm10824199b3a.30.2025.03.04.05.11.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Mar 2025 05:11:31 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Jianbo Liu <jianbol@nvidia.com>,
+	Jarod Wilson <jarod@redhat.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Cosmin Ratiu <cratiu@nvidia.com>,
+	Petr Machata <petrm@nvidia.com>,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv4 net 0/3] bond: fix xfrm offload issues
+Date: Tue,  4 Mar 2025 13:11:17 +0000
+Message-ID: <20250304131120.31135-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8323328-97556846-1741093524=:931"
+Content-Transfer-Encoding: 8bit
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+The first patch fixes the incorrect locks using in bond driver.
+The second patch fixes the xfrm offload feature during setup active-backup
+mode. The third patch add a ipsec offload testing.
 
---8323328-97556846-1741093524=:931
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+v4: hold xs->lock for bond_ipsec_{del, add}_sa_all (Cosmin Ratiu)
+    use the defer helpers in lib.sh for selftest (Petr Machata)
+v3: move the ipsec deletion to bond_ipsec_free_sa (Cosmin Ratiu)
+v2: do not turn carrier on if bond change link failed (Nikolay Aleksandrov)
+    move the mutex lock to a work queue (Cosmin Ratiu)
 
-On Tue, 4 Mar 2025, Paolo Abeni wrote:
+Hangbin Liu (3):
+  bonding: move IPsec deletion to bond_ipsec_free_sa
+  bonding: fix xfrm offload feature setup on active-backup mode
+  selftests: bonding: add ipsec offload test
 
-> On 2/27/25 1:15 PM, Choong Yong Liang wrote:
-> > From: "David E. Box" <david.e.box@linux.intel.com>
-> >=20
-> > - Exports intel_pmc_ipc() for host access to the PMC IPC mailbox
-> > - Enables the host to access specific SoC registers through the PMC
-> > firmware using IPC commands. This access method is necessary for
-> > registers that are not available through direct Memory-Mapped I/O (MMIO=
-),
-> > which is used for other accessible parts of the PMC.
-> >=20
-> > Signed-off-by: David E. Box <david.e.box@linux.intel.com>
-> > Signed-off-by: Chao Qin <chao.qin@intel.com>
-> > Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
->=20
-> Hans, Ilpo, are you ok with this patch going through the netdev/net-next
-> tree?
+ drivers/net/bonding/bond_main.c               |  55 +++++--
+ drivers/net/bonding/bond_netlink.c            |  16 +-
+ include/net/bonding.h                         |   1 +
+ .../selftests/drivers/net/bonding/Makefile    |   3 +-
+ .../drivers/net/bonding/bond_ipsec_offload.sh | 154 ++++++++++++++++++
+ .../selftests/drivers/net/bonding/config      |   4 +
+ 6 files changed, 208 insertions(+), 25 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/bonding/bond_ipsec_offload.sh
 
-Yes, it you can merge it through netdev trees.
+-- 
+2.46.0
 
-The function added into the header is a bit large on footprint front but=20
-there are not that many callers so I guess it's okay.
-
-Acked-by: Ilpo J=C3=A4rvinen <ilpo.jarvinen@linux.intel.com>
-
-
---=20
- i.
-
---8323328-97556846-1741093524=:931--
 
