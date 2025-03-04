@@ -1,146 +1,121 @@
-Return-Path: <netdev+bounces-171469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D24BA4D0B1
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 02:22:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60B55A4D0C4
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 02:26:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DD8E3AA2C5
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 01:22:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 674CF3ADBDA
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 01:26:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D710278F4A;
-	Tue,  4 Mar 2025 01:22:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B260F137923;
+	Tue,  4 Mar 2025 01:25:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WBl1S94a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iie1xK3Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f193.google.com (mail-yw1-f193.google.com [209.85.128.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38C14524B0;
-	Tue,  4 Mar 2025 01:22:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88170126C1E;
+	Tue,  4 Mar 2025 01:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741051374; cv=none; b=CZ41YDSCeN1v2cZ2WXrsHHST2dEQ5boY/BJzZb67uvs6PveIrzCclkJhrLFw9Y/Wxwd+av9XsG/Gsqes4rRKbo5KwfqQWbrUP7nudbgjVmr6lUQP3RjiARtUsaSYbWQ6QUtUNiqGME5K8kEKcDGTu2g/lC3alVjSKBLNwFN1QpY=
+	t=1741051545; cv=none; b=J6rgjrckYV7+gsDcZrPgxPTAQctRFyfMQQnn6GO+Ll9DGAE0F22QWBhV5pqIH8EHk12PdN3226iKWLa6pUtMMwCApN0RyV3J1TsQxtIeJIZy1eOhxlHodpoWXLQpjTjwb3ferIJwH+WbRrbcOiMhO4JswmfGH0FdMZEzrxLqI9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741051374; c=relaxed/simple;
-	bh=sj01G89WSKsFpjf/wy7aY/kOlbTksiMMzEm1e033JpE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P87NHfm2nSTb6lX11lpVl5pbrUdVRUBM6zb1zRfiVhjwJ2XwXIUWu9yE90ksnIxjo7Mru4aBFbfwg9rN1snM9+OIIGqB8TCJhpcFhLiFWc5ic4XcB+C2fGERTC83sYpVxDD/gdTpv2gnyyDDwuRtROALe9m1T54egTi1XygfNx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WBl1S94a; arc=none smtp.client-ip=209.85.128.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f193.google.com with SMTP id 00721157ae682-6fd6f7f8df9so16510637b3.1;
-        Mon, 03 Mar 2025 17:22:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741051372; x=1741656172; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sj01G89WSKsFpjf/wy7aY/kOlbTksiMMzEm1e033JpE=;
-        b=WBl1S94aUZlMnMpmbZBTghTGHozbnyoDSpF7Y+dt/Urh+TbZ8cV3Sjjs/mZCEMUSHQ
-         F2LFEpMsF87oLgzo7IK6tPES4whx+7alaHiFAhnd8HkuYkCKryQvHUOMa+cvnKSRb/uy
-         TF7iOlcJYScFMGGbLHz4Nu0IVKz4wtBgIP9etF4Cq3foNY5RP1Bd+Id88Kh3gDx4aHmT
-         5UNx9k1CsEwXMHDq8oEOy6tUwflZjUx4chHnukS8xVRPNIGe/TOJG67tyhTaK5V4n+1c
-         VXKoGlGtIEmgzhLM20cRQjughXORQelxmAC6Ex8f7MWP0XGNiviSo2+3x226Bnp+09fW
-         RQIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741051372; x=1741656172;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sj01G89WSKsFpjf/wy7aY/kOlbTksiMMzEm1e033JpE=;
-        b=Td9h7J/a9yJMoJEzhwXOUq0pJtohenP+Aqy68ApufDGFNQIMZ8ZDoP9wHpmQ3k2tex
-         ctmc0o9UUi8fOOP49wswunCrG3xtG0aBlAyS+Lbf1FAjmkQMURwrKagKs8TgQeB4DzO3
-         xHUrZ82MumAJdhI8b/9J0Md4ViRKkBzwd7aUDUouqfh0bg0bb3DOyH28shp888NvmeKP
-         H9dHvWS5OJGiX2J//30pNL7rDVhfgXMIHZNHu9gy4hkiVw3OEgM6XPLqLE8y9Mlf+oIj
-         KqzWehrt4EUGKrcOOXzqLhq3e0yowFjtu/u5MoPw38WCrUKoW21JbbY/njeNyKptA3Fz
-         /bCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUxH/lkEGc28u7PIGZqbOsmox4Pq9kMzrGM45qduQ7/cgQTv9Mjlm6/m5uAb0yLuhGJ+VSvj2pE@vger.kernel.org, AJvYcCVoq8CLEP8ZoZcPj17zBxRKqQkC8KcvEXnAI2BBNdqaclgy/S7zWWF6TR4p+D+ukq3G7MEPKsXE/1fgcCkt@vger.kernel.org, AJvYcCWg4xQZb2ApGwLU8oMM+pTM7bsmcfKzetmRULOXObt29h66j1Edwgqs7eaOJ2UKBIq7SV6b/r2LxA4nrHwkJnx4Itg7@vger.kernel.org, AJvYcCXmQyzP5sPIroQanLn79JNfbVQiRUs7ZDTlRUUENf+Jgjgr2AynuBgplHRoRrudIY6GpBs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTtWWBNL7tffOdTtUAtYNGt00TB08QQn6NEvbs/h7EB7bYsbzU
-	/hrXy3O0KzktQGK1TeDU6Qy0q6u2ReGZP0fFiv0paf+q4DhOIn7vV6hNNzkpu+T4ZZvYG7LkNIY
-	yWhWDnf+0//Waci1ReHByXgBAA9Y=
-X-Gm-Gg: ASbGnctpm2m+AZ8NNotPO2hzLUy8PX0Gks/l9ivGBHAeqSyVHto5MEJTCJi6TOyZfAt
-	LsvIQMcsZC6qmiUVXt91SJRMhq6x2pbiBKl90MGqg6Ndfnpzn3qCUPzgcZUDdZDYzaXUkApW6qn
-	On2pozPgQzBvTRR7mee9QvQrKV8A==
-X-Google-Smtp-Source: AGHT+IElMAk21PoBw46zmvLTxOIKzrTm436wI79ItKGnS7B37hL1mh91tHN7JBEL3hC27FIUVigt3qCLJ8UVxsKzHIY=
-X-Received: by 2002:a05:690c:802:b0:6f9:5552:6b20 with SMTP id
- 00721157ae682-6fd93fe85c0mr16592127b3.0.1741051372144; Mon, 03 Mar 2025
- 17:22:52 -0800 (PST)
+	s=arc-20240116; t=1741051545; c=relaxed/simple;
+	bh=V+AR8dH+t6wF0pag9HBom6C8kvjl0abK03bDTDbhgus=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WAgy3CHWnQvfyDFBd+YvANtTCo7Ggv74lo1IZIf+R1dmeKbxCKothgS8AAVbRzK7D2yj7r1h2Dp0j6wTDnRXtXD3mcvtUs5tesI6gQLZhRliMzkKbj1hDDNKN0V9TvdhpwBf1ERi6QRaAo6Em2xbDFrdl+VwRPp9qmClp3HFc1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iie1xK3Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A250C4CEE4;
+	Tue,  4 Mar 2025 01:25:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741051545;
+	bh=V+AR8dH+t6wF0pag9HBom6C8kvjl0abK03bDTDbhgus=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Iie1xK3ZssJi2y780Ojr9j8a6wVbrQsYpN1DUXNwRXsqH+k5jAeLV42Vryi1kOEG+
+	 hB/ncQZa656pbfQXYLnjBjrOw29+2BIpnQ/htvg0p6VqeEe9rK6vtY3uEIyrM1wEJy
+	 6ZIHsvV66Qq998PaXNlkAgS1uFstqSki0f7Ni48+uteJr1L/t0FYSFjoxRqR4WFKWm
+	 H9OQvIFNNrr9gBvuXEuiEj+I4GKi9fjUoi4OcG0UhURgqD4ipA8ld/AyT6eQtahLxb
+	 GUhVTdMp9sO8sjBSOrkWOB6V22aKZNHrimZklojiEkwzlvOh7fUozPVoG/7ilw/c8/
+	 49yyaym+R/2TQ==
+Date: Mon, 3 Mar 2025 17:25:43 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: MD Danish Anwar <danishanwar@ti.com>
+Cc: Meghana Malladi <m-malladi@ti.com>, Diogo Ivo <diogo.ivo@siemens.com>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "David
+ S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>, Vignesh Raghavendra
+ <vigneshr@ti.com>, Roger Quadros <rogerq@kernel.org>
+Subject: Re: [PATCH net-next] net: ti: icssg-prueth: Add ICSSG FW Stats
+Message-ID: <20250303172543.249a4fc2@kernel.org>
+In-Reply-To: <20250227093712.2130561-1-danishanwar@ti.com>
+References: <20250227093712.2130561-1-danishanwar@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250303132837.498938-1-dongml2@chinatelecom.cn>
- <20250303132837.498938-5-dongml2@chinatelecom.cn> <20250303214048.GA570570@google.com>
-In-Reply-To: <20250303214048.GA570570@google.com>
-From: Menglong Dong <menglong8.dong@gmail.com>
-Date: Tue, 4 Mar 2025 09:21:15 +0800
-X-Gm-Features: AQ5f1JpZvyop7dLuEaHSyJ9xfDPdFhBsxp1mwPgCCs2RQqwOnwzgm0G2X_76n64
-Message-ID: <CADxym3Z76bm9wXPjX=9c95eZtWjODwz70xN1KUR92NuC6vzrwg@mail.gmail.com>
-Subject: Re: [PATCH v4 4/4] arm64: implement per-function metadata storage for arm64
-To: Sami Tolvanen <samitolvanen@google.com>
-Cc: peterz@infradead.org, rostedt@goodmis.org, mark.rutland@arm.com, 
-	alexei.starovoitov@gmail.com, catalin.marinas@arm.com, will@kernel.org, 
-	mhiramat@kernel.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
-	eddyz87@gmail.com, yonghong.song@linux.dev, john.fastabend@gmail.com, 
-	kpsingh@kernel.org, sdf@fomichev.me, jolsa@kernel.org, davem@davemloft.net, 
-	dsahern@kernel.org, mathieu.desnoyers@efficios.com, nathan@kernel.org, 
-	nick.desaulniers+lkml@gmail.com, morbo@google.com, kees@kernel.org, 
-	dongml2@chinatelecom.cn, akpm@linux-foundation.org, riel@surriel.com, 
-	rppt@kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, llvm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 4, 2025 at 5:40=E2=80=AFAM Sami Tolvanen <samitolvanen@google.c=
-om> wrote:
->
-> On Mon, Mar 03, 2025 at 09:28:37PM +0800, Menglong Dong wrote:
-> > The per-function metadata storage is already used by ftrace if
-> > CONFIG_DYNAMIC_FTRACE_WITH_CALL_OPS is enabled, and it store the pointe=
-r
-> > of the callback directly to the function padding, which consume 8-bytes=
-,
-> > in the commit
-> > baaf553d3bc3 ("arm64: Implement HAVE_DYNAMIC_FTRACE_WITH_CALL_OPS").
-> > So we can directly store the index to the function padding too, without
-> > a prepending. With CONFIG_DYNAMIC_FTRACE_WITH_CALL_OPS enabled, the
-> > function is 8-bytes aligned, and we will compile the kernel with extra
-> > 8-bytes (2 NOPS) padding space. Otherwise, the function is 4-bytes
-> > aligned, and only extra 4-bytes (1 NOPS) is needed.
-> >
-> > However, we have the same problem with Mark in the commit above: we can=
-'t
-> > use the function padding together with CFI_CLANG, which can make the cl=
-ang
-> > compiles a wrong offset to the pre-function type hash. He said that he =
-was
-> > working with others on this problem 2 years ago. Hi Mark, is there any
-> > progress on this problem?
->
-> I don't think there's been much progress since the previous
-> discussion a couple of years ago. The conclusion seemed to be
-> that adding a section parameter to -fpatchable-function-entry
-> would allow us to identify notrace functions while keeping a
-> consistent layout for functions:
->
-> https://lore.kernel.org/lkml/Y1QEzk%2FA41PKLEPe@hirez.programming.kicks-a=
-ss.net/
+On Thu, 27 Feb 2025 15:07:12 +0530 MD Danish Anwar wrote:
+> +	ICSSG_PA_STATS(FW_PREEMPT_BAD_FRAG),
+> +	ICSSG_PA_STATS(FW_PREEMPT_ASSEMBLY_ERR),
+> +	ICSSG_PA_STATS(FW_PREEMPT_FRAG_CNT_TX),
+> +	ICSSG_PA_STATS(FW_PREEMPT_ASSEMBLY_OK),
+> +	ICSSG_PA_STATS(FW_PREEMPT_FRAG_CNT_RX),
 
-Thank you for your information, which helps me a lot.
-I'll dig deeper to find a way to keep CFI working together
-with this function.
+I presume frame preemption is implemented in silicon? If yes -
+what makes these "FW statistics"? Does the FW collect them from 
+the device or the frames are for FW? 
 
-Thanks!
-Menglong Dong
+> +	ICSSG_PA_STATS(FW_RX_EOF_SHORT_FRMERR),
+> +	ICSSG_PA_STATS(FW_RX_B0_DROP_EARLY_EOF),
+> +	ICSSG_PA_STATS(FW_TX_JUMBO_FRM_CUTOFF),
+> +	ICSSG_PA_STATS(FW_RX_EXP_FRAG_Q_DROP),
+> +	ICSSG_PA_STATS(FW_RX_FIFO_OVERRUN),
+> +	ICSSG_PA_STATS(FW_CUT_THR_PKT),
+> +	ICSSG_PA_STATS(FW_HOST_RX_PKT_CNT),
+> +	ICSSG_PA_STATS(FW_HOST_TX_PKT_CNT),
+> +	ICSSG_PA_STATS(FW_HOST_EGRESS_Q_PRE_OVERFLOW),
+> +	ICSSG_PA_STATS(FW_HOST_EGRESS_Q_EXP_OVERFLOW),
+>  };
+>  
+>  #endif /* __NET_TI_ICSSG_STATS_H */
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_switch_map.h b/drivers/net/ethernet/ti/icssg/icssg_switch_map.h
+> index 424a7e945ea8..d30203a0978c 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_switch_map.h
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_switch_map.h
+> @@ -231,4 +231,109 @@
+>  /* Start of 32 bits PA_STAT counters */
+>  #define PA_STAT_32b_START_OFFSET                           0x0080
+>  
+> +/* Diagnostic error counter which increments when RTU drops a locally injected
+> + * packet due to port disabled or rule violation.
+> + */
+> +#define FW_RTU_PKT_DROP		0x0088
+> +
+> +/* Tx Queue Overflow Counters */
+> +#define FW_Q0_OVERFLOW		0x0090
+> +#define FW_Q1_OVERFLOW		0x0098
+> +#define FW_Q2_OVERFLOW		0x00A0
+> +#define FW_Q3_OVERFLOW		0x00A8
+> +#define FW_Q4_OVERFLOW		0x00B0
+> +#define FW_Q5_OVERFLOW		0x00B8
+> +#define FW_Q6_OVERFLOW		0x00C0
+> +#define FW_Q7_OVERFLOW		0x00C8
+> +
+> +/* Incremented if a packet is dropped at PRU because of a rule violation */
+> +#define FW_DROPPED_PKT		0x00F8
 
->
-> Sami
+Instead of adding comments here please add a file under
+Documentation/networking/device_drivers/ with the explanations.
+That's far more likely to be discovered by users, no?
+-- 
+pw-bot: cr
 
