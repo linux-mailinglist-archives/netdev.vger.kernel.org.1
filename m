@@ -1,137 +1,176 @@
-Return-Path: <netdev+bounces-171625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6F9EA4DE25
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 13:42:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AF95BA4DE27
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 13:43:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 427253A954A
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 12:42:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18F013AD5DF
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 12:43:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E15C1EA7CE;
-	Tue,  4 Mar 2025 12:42:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2080D202976;
+	Tue,  4 Mar 2025 12:43:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y4mfxV4p"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="BYi1lU9i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6511FECDB
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 12:42:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91B981FDE05;
+	Tue,  4 Mar 2025 12:43:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741092149; cv=none; b=WzwTMXrUwIWvsM5yso2aa6HvHwGdi8dM/AD33suQ6jbDDzUOb/pazGraRZUmTc3xYlzUhz5n46gb0Hbui2jgua6jfJ1yBHcJT4FwUan9lw345zs2tVqKneLdxFydBYk91+l5qVvYxzhdIYHdvbHM3Yu03uw5YzGFkHiFROe4hfw=
+	t=1741092205; cv=none; b=WnivOzIyawbjXQoPCrMA7Dlh+Ybwlc8oXJtbMPvhMlLe3MR4ybtyDlY2JD2HkTib6OuTGNHiFMviARjxH5GvGe+Mp4lYwq+5ty9gJBET+sguPDrjk3cTRWrxH5N4CrIkwyv3FZFwurZnTZzbt0OC+eO2Joe931A/DY33WQN5ao4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741092149; c=relaxed/simple;
-	bh=R1yKiQQ1c7+xSe+5Gmsq6GzTgGJKuur3QfO4dR4grYo=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=mOmxinv4kkNNNFNL7Z2hCoZ2EkuEj88YJg/SoEP0ucdAODbFnvGUr1X9cE+TT+9awt3Rd/qM3RWlijPF2Bg4rg2//yMQfxgfP/JONkPr5iAs5Zrdu3GTHPFJbNxXR5w8GIuWrPo5Q4CgNTYGZkawWQZK2gPQaLLSGq3oACL/JfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y4mfxV4p; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2234daaf269so81719295ad.3
-        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 04:42:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741092147; x=1741696947; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ttkzG28zrYQgwXcLa6fUzsqm7B6aclx92tJj9HpjdRE=;
-        b=Y4mfxV4pAsmlm4PN/IFFsrBXaF9y8R407G7S8kYa/i7sT6JcFMnaj0AuzSl+jHtWra
-         zp7GYElHQ4C/o5ALw/zY62F/loLjgDf1P/fBLY8J7ftTEQMWo56ll9o9BDOKaAuUcJC3
-         s0vMWSAuREAlJKKzmzdf1wKG/GsxxRYfPnmYOkaU6poNgmKFyqaO5qSer832xD18hBef
-         BF88ujPZm7hkJjn6ldjUWoEWKJyUlN4znTk0/QlxSyVUg2C//gC3qFefRptZ2zu+uNJU
-         a8/Rc1p+dgA1RMKrRYuYx/CABPuzkQIrpsCzPRGcnh9XxO4IVkHpXnh/xLn1cATU1+B0
-         7kiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741092147; x=1741696947;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ttkzG28zrYQgwXcLa6fUzsqm7B6aclx92tJj9HpjdRE=;
-        b=YrbtxOBJ5F07XD7uJrnSIgdKEFBc4HFxjGvDDbobO0S0yt53ZVBamHUwxJ5xxmYE2f
-         lR0wuL8BPMYj+QComj8iMvFHn2uYzCw2hLhxpXhndC6F/kbjyrh1YNnobdExR0XxZA14
-         dSBWPmePRzh8ZQeqCK94oT8H4HkFrfGaM0TBK5UXJFj51l1pUs8ufSt/GuUvSTjRvxi9
-         hDLIhH84Z0YSRYq8gv7RxVAlENxOnADZHtGVSoJapWU5JnRmJN7SpDKvBeEJyL0jT5rL
-         pmukC/3ZhJUBQUnRnGsT+HWek4l/mLa5RtYGREb4+nyGLeI7oZJClgXqmgnGfrIgeEs5
-         7++A==
-X-Forwarded-Encrypted: i=1; AJvYcCUn2qYfYSijTAtcnCUjesE1iG0MBnricVGlfjhXPdbP2xxs22xbV4vGI+0fvf9W1pVU1P1ZNkA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGo73QreuHnW1LCxjzEKxm8hJ12mUvGMZoroZryfdB214C4zuc
-	bxGhBIEkY9rSe+4sOps/TN0ddtJIQubTYo+hvSqQbi8GpEh8ljEN
-X-Gm-Gg: ASbGncuBO4ju71VDJ7ljNwYOOLmk4fF2VDqLi0mHzYmxbF8er5JZBIUmv2q/PmuIBw6
-	WPgm18WBN1CEyAmvgdui6kylnYmHyrYeMgU2mDX2747+js+NWmKsDlWfJeXvXshQRgkPn/565l7
-	IS9Y8fKxr198/1U3c0l+OjJBtkkGBB/zqit8hs+KpOOW/w9lM+62oCVVDrD9usaWiM5hXN8t9sX
-	49sTE0fBGxMB9/PDFY4jddtyYGqp1YIITJruleOA3nlWGuYVAi18u71088iL/o6uXWrqnM4FQTL
-	ncbaQXgsJnSbADmlxEGkQAm/rKY3tBjTWCBOSuvQagDNupfofu6MbExaj5DSZR6GSXQxCDLvMrL
-	fwyL3TEVgwpVi7K/md7d+RPJ/L9Q=
-X-Google-Smtp-Source: AGHT+IEODZt44IIc+stAr+BoCWgP+Xf0nl7JFdtNm9Jz6YtuuQoRJUbw54XEvioY1ltfsF+mUD03gg==
-X-Received: by 2002:a17:903:2410:b0:220:d81d:f521 with SMTP id d9443c01a7336-2236926f07fmr244141775ad.51.1741092146802;
-        Tue, 04 Mar 2025 04:42:26 -0800 (PST)
-Received: from localhost (p4204131-ipxg22701hodogaya.kanagawa.ocn.ne.jp. [153.160.176.131])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-223501f9da1sm94228445ad.68.2025.03.04.04.42.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Mar 2025 04:42:26 -0800 (PST)
-Date: Tue, 04 Mar 2025 21:42:23 +0900 (JST)
-Message-Id: <20250304.214223.562994455289524982.fujita.tomonori@gmail.com>
-To: max.schulze@online.de
-Cc: fujita.tomonori@gmail.com, hfdevel@gmx.net, netdev@vger.kernel.org
-Subject: Re: tn40xx / qt2025: cannot load firmware, error -2
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <5f649558-b6a0-4562-b8e5-713cb8138d9a@online.de>
-References: <5f649558-b6a0-4562-b8e5-713cb8138d9a@online.de>
+	s=arc-20240116; t=1741092205; c=relaxed/simple;
+	bh=xHheJxk9MPOwMJe3gJyARK3kWzh1maczaHnY4ttiy6U=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=c/iw2bmRk0Tmzis9pB9uKQCGVEq9tX8Vyfhf3gsxyqfo1c0FhRJrWBJkHWEqMMjy4w/tk+YIyHntuM5cDVcpTh4RDwWajD5T8hogJx+umaS5xwQ7+WVH1YGrH1uu1HHSzSRlUcPktddSYi4zFPQ0Q5iH3PkpyDEeTYsOTbBTliA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=BYi1lU9i; arc=none smtp.client-ip=115.124.30.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1741092191; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=kIBxrLXVX5Go0KqRs9bm+++JgxHYhnl8q+HXTDClonc=;
+	b=BYi1lU9iZu9280PYF4WK0v/v0S8CulVv4Q5A6aCjlJhwhpYCavtYlkcoYY9seLeXtq2qcc4uAjWg4kxOY+mEM05tZoA6MwB6cykMUM7TXuGSVDjex9w60QbNWU78MgtI2L0aLGgqlmOkxIVw3xMBbetEe1W0HHFXB4OPYRF4Fd8=
+Received: from localhost.localdomain(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0WQiJ44j_1741092189 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 04 Mar 2025 20:43:10 +0800
+From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+To: wenjia@linux.ibm.com,
+	pasic@linux.ibm.com,
+	jaka@linux.ibm.com,
+	alibuda@linux.alibaba.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2] net/smc: use the correct ndev to find pnetid by pnetid table
+Date: Tue,  4 Mar 2025 20:43:04 +0800
+Message-Id: <20250304124304.13732-1-guangguan.wang@linux.alibaba.com>
+X-Mailer: git-send-email 2.24.3 (Apple Git-128)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Mon, 3 Mar 2025 22:29:37 +0100
-Max Schulze <max.schulze@online.de> wrote:
+When using smc_pnet in SMC, it will only search the pnetid in the
+base_ndev of the netdev hierarchy(both HW PNETID and User-defined
+sw pnetid). This may not work for some scenarios when using SMC in
+container on cloud environment.
+In container, there have choices of different container network,
+such as directly using host network, virtual network IPVLAN, veth,
+etc. Different choices of container network have different netdev
+hierarchy. Examples of netdev hierarchy show below. (eth0 and eth1
+in host below is the netdev directly related to the physical device).
+            _______________________________
+           |   _________________           |
+           |  |POD              |          |
+           |  |                 |          |
+           |  | eth0_________   |          |
+           |  |____|         |__|          |
+           |       |         |             |
+           |       |         |             |
+           |   eth1|base_ndev| eth0_______ |
+           |       |         |    | RDMA  ||
+           | host  |_________|    |_______||
+           ---------------------------------
+     netdev hierarchy if directly using host network
+           ________________________________
+           |   _________________           |
+           |  |POD  __________  |          |
+           |  |    |upper_ndev| |          |
+           |  |eth0|__________| |          |
+           |  |_______|_________|          |
+           |          |lower netdev        |
+           |        __|______              |
+           |   eth1|         | eth0_______ |
+           |       |base_ndev|    | RDMA  ||
+           | host  |_________|    |_______||
+           ---------------------------------
+            netdev hierarchy if using IPVLAN
+            _______________________________
+           |   _____________________       |
+           |  |POD        _________ |      |
+           |  |          |base_ndev||      |
+           |  |eth0(veth)|_________||      |
+           |  |____________|________|      |
+           |               |pairs          |
+           |        _______|_              |
+           |       |         | eth0_______ |
+           |   veth|base_ndev|    | RDMA  ||
+           |       |_________|    |_______||
+           |        _________              |
+           |   eth1|base_ndev|             |
+           | host  |_________|             |
+           ---------------------------------
+             netdev hierarchy if using veth
+Due to some reasons, the eth1 in host is not RDMA attached netdevice,
+pnetid is needed to map the eth1(in host) with RDMA device so that POD
+can do SMC-R. Because the eth1(in host) is managed by CNI plugin(such
+as Terway, network management plugin in container environment), and in
+cloud environment the eth(in host) can dynamically be inserted by CNI
+when POD create and dynamically be removed by CNI when POD destroy and
+no POD related to the eth(in host) anymore. It is hard to config the
+pnetid to the eth1(in host). But it is easy to config the pnetid to the
+netdevice which can be seen in POD. When do SMC-R, both the container
+directly using host network and the container using veth network can
+successfully match the RDMA device, because the configured pnetid netdev
+is a base_ndev. But the container using IPVLAN can not successfully
+match the RDMA device and 0x03030000 fallback happens, because the
+configured pnetid netdev is not a base_ndev. Additionally, if config
+pnetid to the eth1(in host) also can not work for matching RDMA device
+when using veth network and doing SMC-R in POD.
 
-> Hello,
-> 
-> I am needing help with this:
-> 
->> [    4.344358] QT2025 10Gpbs SFP+ tn40xx-0-300:01: Direct firmware load for qt2025-2.0.3.3.fw failed with error -2
->> [    4.345075] QT2025 10Gpbs SFP+ tn40xx-0-300:01: probe with driver QT2025 10Gpbs SFP+ failed with error -2
-> 
-> 
-> I have built a mainline kernel 6.13.2 with rust support and have this card:
-> 
->> 03:00.0 Ethernet controller [0200]: Tehuti Networks Ltd. TN9310 10GbE SFP+ Ethernet Adapter [1fc9:4022]
->> 	Subsystem: Edimax Computer Co. 10 Gigabit Ethernet SFP+ PCI Express Adapter [1432:8103]
-> 
-> 
-> I have put the firmware here:
-> 
->> $ sha256sum /lib/firmware/qt2025-2.0.3.3.fw
->> 95594ca080743e9c8e8a46743d6e413dd452152100ca9a3cd817617e5ac7187b  /lib/firmware/qt2025-2.0.3.3.fw
+To resolve the problems list above, this patch extends to search user
+-defined sw pnetid in the clc handshake ndev when no pnetid can be found
+in the base_ndev, and the base_ndev take precedence over ndev for backward
+compatibility. This patch also can unify the pnetid setup of different
+network choices list above in container(Config user-defined sw pnetid in
+the netdevice can be seen in POD).
 
-The checksum is good.
+Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+---
+ net/smc/smc_pnet.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-> Is there anything else I can do?
-> 
-> What is error -2 ? Who generates it?
+diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
+index 716808f374a8..b391c2ef463f 100644
+--- a/net/smc/smc_pnet.c
++++ b/net/smc/smc_pnet.c
+@@ -1079,14 +1079,16 @@ static void smc_pnet_find_roce_by_pnetid(struct net_device *ndev,
+ 					 struct smc_init_info *ini)
+ {
+ 	u8 ndev_pnetid[SMC_MAX_PNETID_LEN];
++	struct net_device *base_ndev;
+ 	struct net *net;
+ 
+-	ndev = pnet_find_base_ndev(ndev);
++	base_ndev = pnet_find_base_ndev(ndev);
+ 	net = dev_net(ndev);
+-	if (smc_pnetid_by_dev_port(ndev->dev.parent, ndev->dev_port,
++	if (smc_pnetid_by_dev_port(base_ndev->dev.parent, base_ndev->dev_port,
+ 				   ndev_pnetid) &&
++	    smc_pnet_find_ndev_pnetid_by_table(base_ndev, ndev_pnetid) &&
+ 	    smc_pnet_find_ndev_pnetid_by_table(ndev, ndev_pnetid)) {
+-		smc_pnet_find_rdma_dev(ndev, ini);
++		smc_pnet_find_rdma_dev(base_ndev, ini);
+ 		return; /* pnetid could not be determined */
+ 	}
+ 	_smc_pnet_find_roce_by_pnetid(ndev_pnetid, ini, NULL, net);
+-- 
+2.24.3 (Apple Git-128)
 
-The Rust drivers use the same error codes as the C drivers. So it's
-ENOENT. FW_LOADER subsystem returns it; can't find the firmware file,
-I think.
-
-It's weird because looks like the firmware file is stored on your file
-system.
-
-You hit the error during boot? In that case, the firmware file might
-not be included in the initramfs.
-
-> ( NB: You could mention the hash for the .fw file somewhere in
-> sourcecode, until its in firmware.git (doesn't look like it ever
-> will, huh? [1]), so others can verify they have the same file as the
-> driver authors...)
-
-Yeah, I'll mention it somewhere.
 
