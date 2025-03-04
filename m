@@ -1,124 +1,117 @@
-Return-Path: <netdev+bounces-171495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA5B2A4D310
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 06:39:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC95BA4D316
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 06:40:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30FDB3AE0F4
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 05:39:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECA231894002
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 05:40:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A37AE1F4299;
-	Tue,  4 Mar 2025 05:39:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="KI4+xIvh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AA391F427D;
+	Tue,  4 Mar 2025 05:40:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E8771DDA1E;
-	Tue,  4 Mar 2025 05:39:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 938DD1F4720
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 05:40:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741066762; cv=none; b=W2ir8RstyfNKdvFsdddKhV162vFhSwtRpBYR7IJbpHB9BeDStTb5kseXK24N6aOgwHwLEGD1I+46QKAwMmMk96iy1t3+8oMGKb3Co88iSoQO80geHzy7Sr4+0dqytZ1E0t9GhEzvTzEiNtdWeC9OoK5Oe2ckoct7yFqvhzirHlk=
+	t=1741066840; cv=none; b=WWmi6IxcVIMG2t/m69YG9RhQBhZzxWPRmSXQwAB3DySAkOzJARc1HK2oa39G7Tuqj60h/fLF8o20aHcBiLqOj59nTTRceyWedL0MYc/FAGrwonxAFFN5D14Ur5fPOsHNsR9ncLm1OeSENTtMys9qXCUSEYV/xjIXgamG9OqIfGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741066762; c=relaxed/simple;
-	bh=2vz+NB5tMxF1OWCpg7OqhukUuWLyPzvtudHFIO52pkY=;
+	s=arc-20240116; t=1741066840; c=relaxed/simple;
+	bh=RzWWlN24um2t0bNwaHA7G4LpVlumrLRY5pALD22MJlg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZUhzUVB/qcI3u9lp4y1iVdu1oMeWDoke3gEmo+fphn9zHcQ3zAbHl0O1ZPIv4d+qcelmO+ZLNlob+t+oLIJWeILeIRvVb42YWD7aXo9EKA62dNx15c3HpzBlOpQV49R/OA2GXDWpEXd2y50vceZ6x5iCkHHm+ry9U+PH0x8btTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=KI4+xIvh; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=asZ89NjLYjHfpBcFWEra+PaQAUWjYIbeIoGtB844wqU=; b=KI4+xIvhaN+WFJ+4I3OIv62vvW
-	vvKgZwD3kEbvhNNJATfeF6I4m7fCegtkQTp8i3I5SFGvEv22YX6iMKoMOWHX5z3Unsddyi1zYtIjs
-	VqpSz/ZPd87FpUk6SIFQNqJ17zkZY/z6aRtPQD0GG1Fo97OC0zO6ggAu9bWDyvwuYlb/MswaYJMTF
-	hdy+/BECalKSARmBXTkt402mzuu0FtAnoEx1A/bGYuEz3ASzKn+7niILzVlIGB7at291z8Vl2OGOA
-	C+RP/g7y2QM60NNY2k5KwYcSh7hX3SKzJTGqbTPDUlVToDMf/ozWe2RfhMAe2wJAemg8eg3+xq7gh
-	OLKQnWFA==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tpKzZ-00000000FmI-2xOE;
-	Tue, 04 Mar 2025 05:38:57 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 8ED6630049D; Tue,  4 Mar 2025 06:38:53 +0100 (CET)
-Date: Tue, 4 Mar 2025 06:38:53 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Menglong Dong <menglong8.dong@gmail.com>
-Cc: rostedt@goodmis.org, mark.rutland@arm.com, alexei.starovoitov@gmail.com,
-	catalin.marinas@arm.com, will@kernel.org, mhiramat@kernel.org,
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
-	martin.lau@linux.dev, eddyz87@gmail.com, yonghong.song@linux.dev,
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
-	jolsa@kernel.org, davem@davemloft.net, dsahern@kernel.org,
-	mathieu.desnoyers@efficios.com, nathan@kernel.org,
-	nick.desaulniers+lkml@gmail.com, morbo@google.com,
-	samitolvanen@google.com, kees@kernel.org, dongml2@chinatelecom.cn,
-	akpm@linux-foundation.org, riel@surriel.com, rppt@kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH v4 1/4] x86/ibt: factor out cfi and fineibt offset
-Message-ID: <20250304053853.GA7099@noisy.programming.kicks-ass.net>
-References: <20250303132837.498938-1-dongml2@chinatelecom.cn>
- <20250303132837.498938-2-dongml2@chinatelecom.cn>
- <20250303165454.GB11590@noisy.programming.kicks-ass.net>
- <CADxym3aVtKx_mh7aZyZfk27gEiA_TX6VSAvtK+YDNBtuk_HigA@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Li8Vh0wv9gB6L5V2FBL+0MorJhGiWcuh7LbtRikDbCAy0FyQfOp9fQz5IcchdjxepFPP8CobeMWLdteZkLjR/l2Nas9m+GNA20Y6/B8YR7SftNyZiALqRguER6zMAHlvz6l4OVuUkolHcAVUfUusMslWv2gf1hzeCjJjJz2tpxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tpL0x-0008Q4-46; Tue, 04 Mar 2025 06:40:23 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tpL0v-003vB4-24;
+	Tue, 04 Mar 2025 06:40:21 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tpL0v-00CTZn-1c;
+	Tue, 04 Mar 2025 06:40:21 +0100
+Date: Tue, 4 Mar 2025 06:40:21 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Mark Brown <broonie@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, Andrew Lunn <andrew@lunn.ch>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
+	Phil Elwell <phil@raspberrypi.org>
+Subject: Re: [PATCH net-next v2 06/10] net: usb: lan78xx: Improve error
+ handling in EEPROM and OTP operations
+Message-ID: <Z8aSRbyOwRv8FS9Z@pengutronix.de>
+References: <20241204084142.1152696-1-o.rempel@pengutronix.de>
+ <20241204084142.1152696-7-o.rempel@pengutronix.de>
+ <ac965de8-f320-430f-80f6-b16f4e1ba06d@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CADxym3aVtKx_mh7aZyZfk27gEiA_TX6VSAvtK+YDNBtuk_HigA@mail.gmail.com>
+In-Reply-To: <ac965de8-f320-430f-80f6-b16f4e1ba06d@sirena.org.uk>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, Mar 04, 2025 at 09:10:12AM +0800, Menglong Dong wrote:
-> Hello, sorry that I forgot to add something to the changelog. In fact,
-> I don't add extra 5-bytes anymore, which you can see in the 3rd patch.
+On Mon, Mar 03, 2025 at 06:02:23PM +0000, Mark Brown wrote:
+> On Wed, Dec 04, 2024 at 09:41:38AM +0100, Oleksij Rempel wrote:
+> > Refine error handling in EEPROM and OTP read/write functions by:
+> > - Return error values immediately upon detection.
+> > - Avoid overwriting correct error codes with `-EIO`.
+> > - Preserve initial error codes as they were appropriate for specific
+> >   failures.
+> > - Use `-ETIMEDOUT` for timeout conditions instead of `-EIO`.
 > 
-> The thing is that we can't add extra 5-bytes if CFI is enabled. Without
-> CFI, we can make the padding space any value, such as 5-bytes, and
-> the layout will be like this:
+> This patch (which is in Linus' tree) appears to break booting with a NFS
+> root filesystem on Raspberry Pi 3B+.  There appears to be at least no
+> incoming traffic seen on the device, I've not checked if there's
+> anything outgoing:
 > 
-> __align:
->   nop
->   nop
->   nop
->   nop
->   nop
-> foo: -- __align +5
+> [   19.234086] usb 1-1.1.1: new high-speed USB device number 6 using dwc2
+> [   19.394134] brcmfmac: brcmf_sdio_htclk: HT Avail timeout (1000000): clkctl 0x50
+> [   19.710839] lan78xx 1-1.1.1:1.0 enxb827ebea22ac: renamed from eth0
+> Device /sys/class/net/enxb827ebea22ac found
+> done.
+> Begin: Waiting up to 180 secs for any network device to become available ... done.
+> IP-Config: enxb827ebea22ac hardware address b8:27:eb:ea:22:ac mt[   20.663606] lan78xx 1-1.1.1:1.0 enxb827ebea22ac: Link is Down
+> u 1500 DHCP
+> [   22.708103] lan78xx 1-1.1.1:1.0 enxb827ebea22ac: Link is Up - 1Gbps/Full - flow control off
+> IP-Config: no response after 2 secs - giving up
 > 
-> However, the CFI will always make the cfi insn 16-bytes aligned. When
-> we set the FUNCTION_PADDING_BYTES to (11 + 5), the layout will be
-> like this:
+> The link did look like it was up on the switch.  Full log:
 > 
-> __cfi_foo:
->   nop (11)
->   mov $0x12345678, %reg
->   nop (16)
-> foo:
-> 
-> and the padding space is 32-bytes actually. So, we can just select
-> FUNCTION_ALIGNMENT_32B instead, which makes the padding
-> space 32-bytes too, and have the following layout:
-> 
-> __cfi_foo:
->   mov $0x12345678, %reg
->   nop (27)
-> foo:
+>    https://lava.sirena.org.uk/scheduler/job/1158809#L965
 
-*blink*, wtf is clang smoking.
-
-I mean, you're right, this is what it is doing, but that is somewhat
-unexpected. Let me go look at clang source, this is insane.
-
+Thank you! I'm investigating it.
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
