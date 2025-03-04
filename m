@@ -1,68 +1,83 @@
-Return-Path: <netdev+bounces-171643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DAB6A4DF79
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 14:41:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B77DA4DF7B
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 14:41:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8C217A9A49
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 13:40:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5515E189C896
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 13:41:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7535C20469E;
-	Tue,  4 Mar 2025 13:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FF97204873;
+	Tue,  4 Mar 2025 13:41:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="i48j2a7i"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nFK7dlAJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CF14204697;
-	Tue,  4 Mar 2025 13:41:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54CF22040A7;
+	Tue,  4 Mar 2025 13:41:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741095686; cv=none; b=s3CzTE2oQT1onJ4mysU8HEXP61sEHwtEI/CJbSXj0WricanU+3/2M2PsQNSg7P4gKYIg48KyKgMypqS/IksFNLXo1L8Hgfme2F950JVfzhx4JH96Ym+p5kDa3RTlyAob/6bWTid8caDgSiyW0IkMnq1FFvxrT6mNaKFm3FxRH2Y=
+	t=1741095688; cv=none; b=M5C6DSb9tV+80A+BZyERGSC9KcY4psib8bwcUssWZOp8Ol+pby0sWW58uRGklogJvYgalSSqI0vItxf5lHWpBhT3ggloCtVb4z0R4tc/DTu088J48K1q+wIsTJyc4nru47rQOkcj9EpgtIaA2Gtex/jo9HpszfRq5OaRmU8yPXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741095686; c=relaxed/simple;
-	bh=G6IU9EP7KNz6G5yw3RpSAZ9Q7pyx+yKosTGBE2+ghpY=;
+	s=arc-20240116; t=1741095688; c=relaxed/simple;
+	bh=wc1UNrJsxGJ6+Qe6X4SKbbXboJB4eQoAwk0XLhcY4D8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M202O9GIPVfwmRHVPknRSJAzLO39lPU0NnNICludKMHdVZ3gXcBeVB1pUSdMLe63tdwHf1wL9aSk2Bl9wL5z/2hC0HH69fLQYFhnzTHLcEaxwdkstHd3XJyl2HrzqRCp7ieGTFve5AsGFIKvj8pF6JQRWVZ2Rs7H77Og8gja/lQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=i48j2a7i; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=mIe1g7wRJzTWHrk0KluZ5semFFoVlRkgZaZgEsIxn80=; b=i48j2a7ixm9NaBiLJryYlHBRnM
-	jUGOl1OOd492N8Fo/cSNPhcyQeGYeG+YL5I45hF5RcNXTASeL649g0g0ksSsvZBQUdRktwKrtrDSk
-	Xd5kzAOvOZf44ChXAKwnSOdIHq2Rs72fkKZWArFriaHiykyFAIklVfhF5KYNhRXywq8Q=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tpSW9-0029IZ-Jd; Tue, 04 Mar 2025 14:41:05 +0100
-Date: Tue, 4 Mar 2025 14:41:05 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
-Cc: Mark Pearson <mpearson-lenovo@squebb.ca>, anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [Intel-wired-lan] [PATCH] e1000e: Link flap workaround option
- for false IRP events
-Message-ID: <fbee86b8-fbdd-42ac-a7f9-efc934d59672@lunn.ch>
-References: <mpearson-lenovo@squebb.ca>
- <20250226194422.1030419-1-mpearson-lenovo@squebb.ca>
- <36ae9886-8696-4f8a-a1e4-b93a9bd47b2f@lunn.ch>
- <50d86329-98b1-4579-9cf1-d974cf7a748d@app.fastmail.com>
- <1a4ed373-9d27-4f4b-9e75-9434b4f5cad9@lunn.ch>
- <9f460418-99c6-49f9-ac2c-7a957f781e17@app.fastmail.com>
- <4b5b0f52-7ed8-7eef-2467-fa59ca5de937@intel.com>
- <698700ab-fd36-4a09-8457-a356d92f00ea@lunn.ch>
- <24740a7d-cc50-44af-99e2-21cb838e17e5@app.fastmail.com>
- <316a020a-aa49-700e-3735-f5f810adaaed@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=h5NsZnNI1Saqnj/3j0GrgfQYlSVJymPNHJDgY7T6do6vCm2x+QR749vQUHS0WiUnexUB/PEDcZhnG4y4NM5dcB4qce/0yhjWw2Dc0erSjbEP9CkPCEkJjyfClwasGILtDIFr4MJeFXwED5g3yXzx4DM+ssxzxRExD7lOESLH480=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nFK7dlAJ; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741095686; x=1772631686;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=wc1UNrJsxGJ6+Qe6X4SKbbXboJB4eQoAwk0XLhcY4D8=;
+  b=nFK7dlAJwKWoMckdYkjs8ELDaulB2uXoqIkpqDLtfgHMYIY6t3lt556q
+   92KaRpbKe4SIOwp3gi1zJ4lsisBT65Wauy0B/2TM6KkPGiJeCKbAM/TZ5
+   zsIDR52bk8tmuBsdCxgnNS2NzkcUQhQMr66jeHxeYN6wJIh+uosheNMpF
+   5gW2yfAM10eVkwC6Rtgl4ZJLGfXmv003ChYr/bEGoDwLfPBsXMn5Y8gGj
+   48ZAp1iHA8eRWZw07aZJVCjts9Qquwbogw8TpG8C/pq/ZMjnbYXsHrl9O
+   rkl2OZhu7kwm2U5K2eTBxU4jrBx/+aX8LpGFPWgQTvyCRS8PE3MDs7I9s
+   A==;
+X-CSE-ConnectionGUID: 1E2yZxjuQnSmdKNcdU6V0w==
+X-CSE-MsgGUID: Rb9KHYqOTpKws14zfvVDIQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="59561880"
+X-IronPort-AV: E=Sophos;i="6.14,220,1736841600"; 
+   d="scan'208";a="59561880"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 05:41:25 -0800
+X-CSE-ConnectionGUID: splVJdNjS5iU0bheBNU5xA==
+X-CSE-MsgGUID: leBTF+YQQAG4vlUBpHMb/g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="118897735"
+Received: from smile.fi.intel.com ([10.237.72.58])
+  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 05:41:23 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.98)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1tpSWN-0000000H8XD-2zrL;
+	Tue, 04 Mar 2025 15:41:19 +0200
+Date: Tue, 4 Mar 2025 15:41:19 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Paolo Abeni <pabeni@redhat.com>, Christoph Hellwig <hch@lst.de>,
+	Marek Szyprowski <m.szyprowski@samsung.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Rasesh Mody <rmody@marvell.com>,
+	GR-Linux-NIC-Dev@marvell.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net v1 1/1] bnx2: Fix unused data compilation warning
+Message-ID: <Z8cC_xMScZ9rq47q@smile.fi.intel.com>
+References: <20250228100538.32029-1-andriy.shevchenko@linux.intel.com>
+ <20250303172114.6004ef32@kernel.org>
+ <Z8bcaR9MS7dk8Q0p@smile.fi.intel.com>
+ <5ec0a2cc-e5f6-42dd-992c-79b1a0c1b9f5@redhat.com>
+ <Z8bq6XJGJNbycmJ9@smile.fi.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,59 +86,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <316a020a-aa49-700e-3735-f5f810adaaed@intel.com>
+In-Reply-To: <Z8bq6XJGJNbycmJ9@smile.fi.intel.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-> > > However, that does not really help explain how this helps prevent an
-> > > interrupt. I assume playing with EEE settings was also played
-> > > with. Not that is register appears to have anything to do with EEE!
-> > > 
-> > I don't think we did tried those - it was never suggested that I can recall (the original debug started 6 months+ ago). I don't know fully what testing Intel did in their lab once the issue was reproduced there.
-> > 
-> > If you have any particular recommendations we can try that - with a note that we have to run a soak for ~1 week to have confidence if a change made a difference (the issue can reproduce between 1 to 2 days).
+On Tue, Mar 04, 2025 at 01:58:33PM +0200, Andy Shevchenko wrote:
+> + Marek/Christoph (for the clarification/commenting on the below)
 > 
-> Personally I doubt that it is related to EEE since there was no real link
-> flap.
-
-I tend to agree. Despite the group of registers being called LPI, it
-appears this one has nothing to do with LPI? It would probably been
-better to have it in page 776, General Registers, but that region is
-full.
-
-> > > I don't follow what you are saying here. As far as i can see, the
-> > > interrupt handler will triggers a read of the BMCR to determine the
-> > > link status. It should not matter if there is a spurious interrupt,
-> > > the BMCR should report the truth. So does BMCR actually indicate the
-> > > link did go down? I also see there is the usual misunderstanding with
-> > > how BMCR is latching. It should not be read twice, processed once, it
-> > > should be processed each time, otherwise you miss quick link down/up
-> > > events.
+> On Tue, Mar 04, 2025 at 12:39:40PM +0100, Paolo Abeni wrote:
+> > On 3/4/25 11:56 AM, Andy Shevchenko wrote:
+> > > On Mon, Mar 03, 2025 at 05:21:14PM -0800, Jakub Kicinski wrote:
+> > >> On Fri, 28 Feb 2025 12:05:37 +0200 Andy Shevchenko wrote:
+> > >>> In some configuration, compilation raises warnings related to unused
+> > >>> data. Indeed, depending on configuration, those data can be unused.
+> > >>>
+> > >>> Mark those data as __maybe_unused to avoid compilation warnings.
+> > >>
+> > >> Will making dma_unmap_addr access the first argument instead of
+> > >> pre-processing down to nothing not work?
 > > > 
-> > > > We communicated that this solution is not likely to be accepted to the
-> > > > kernel as is, and the initial responses on the mailing list demonstrate the
-> > > > pushback.
-> > > 
-> > > What it has done is start a discussion towards an acceptable
-> > > solution. Which is a good thing. But at the moment, the discussion
-> > > does not have sufficient details.
-> > > 
-> > > Please could somebody describe the chain of events which results in
-> > > the link down, and subsequent link up. Is the interrupt spurious, or
-> > > does BMCR really indicate the link went down and up again?
-> > > 
-> > 
-> > I'm fairly certain there is no actual link bounce but I don't know the reason for the interrupt or why it was triggered.
-> > 
-> > Vitaly, do you have a way of getting these answers from the Intel team that worked on this? I don't think I'll be able to get any answers, unfortunately.
+> > > I looked at the implementation of those macros and I have no clue
+> > > how to do that in a least intrusive way. Otherwise it sounds to me
+> > > quite far from the scope of the small compilation error fix that
+> > > I presented here.
 > 
-> You are correct, from what we saw there was no real link flap there. Only a
-> false link status change interrupt.
- 
-So if BMCR shows no state change, why is the driver doing anything?
+> > I *think* Jakub is suggesting something alike:
+> 
+> I see. Perhpas we need Marek's/Christoph's opinion on this...
+> 
+> > ---
+> > diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
+> > index b79925b1c433..927884f10b0f 100644
+> > --- a/include/linux/dma-mapping.h
+> > +++ b/include/linux/dma-mapping.h
+> > @@ -629,7 +629,7 @@ static inline int dma_mmap_wc(struct device *dev,
+> >  #else
+> >  #define DEFINE_DMA_UNMAP_ADDR(ADDR_NAME)
+> >  #define DEFINE_DMA_UNMAP_LEN(LEN_NAME)
+> > -#define dma_unmap_addr(PTR, ADDR_NAME)           (0)
+> > +#define dma_unmap_addr(PTR, ADDR_NAME)           (((PTR)->ADDR_NAME), 0)
+> >  #define dma_unmap_addr_set(PTR, ADDR_NAME, VAL)  do { } while (0)
+> >  #define dma_unmap_len(PTR, LEN_NAME)             (0)
+> >  #define dma_unmap_len_set(PTR, LEN_NAME, VAL)    do { } while (0)
+> > ---
+> > 
+> > Would that work?
 
-I really would like to understand the chain of events. Once we
-understand the chain of events, we can probably come up with a change
-somewhere in the chain to break it, so the spurious interrupt is
-ignored.
+Actually it won't work because the variable is under the same ifdeffery.
+What will work is to spreading the ifdeffery to the users, but it doesn't any
+better than __maybe_unsused, which is compact hack (yes, I admit that it is not
+the nicest solution, but it's spread enough in the kernel).
 
-	Andrew
+> I do not know. Not my area of expertise.
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
 
