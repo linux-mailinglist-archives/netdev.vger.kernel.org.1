@@ -1,60 +1,59 @@
-Return-Path: <netdev+bounces-171640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 609ECA4DF11
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 14:20:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6E6FA4DF13
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 14:21:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BB0E177DEB
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 13:20:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DC343A7225
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 13:21:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 116A620409F;
-	Tue,  4 Mar 2025 13:20:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3967204090;
+	Tue,  4 Mar 2025 13:21:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LOlTOkGR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hoxhjnMx"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BD5F202F68
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 13:20:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE569202F68
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 13:21:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741094419; cv=none; b=NlB5ezWu4OnORneBfBP7Hz2FuPRvYJM7sBfUWFaLpzgPoQTPp17EF2lnNTKk1ZIeZrz6Zh5PeuhL7biehHoGsSqCUvepzB/mdFCuafnosFff9OD6gqX2NA1LFjLkiURDfi4/1LcMM3tOiMYUquV+8zAPEW3Xh12GRUbLfnu6rJc=
+	t=1741094511; cv=none; b=bzjSXRkok9N6x3zTl5WA3Mdn4Bx0MauPe2LjBDgoYIbpaCOhpg0TZt9rS4BFG3ViIquVO/tMlUiKUWvAzLucRJVLoRHjbQ2QniEvjzXaVcHKasJTpghsrEy3p0JsmqQ2HRu7pWLz0l63+KF6UtCw57h3EglGXdeVF6A0kvRM7KQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741094419; c=relaxed/simple;
-	bh=ePGDKsJQDSGLxx8D6n9vsqq7mbrqfgMDpdpCd/Tvl08=;
+	s=arc-20240116; t=1741094511; c=relaxed/simple;
+	bh=rGEYTpGgu0Hg/tX9juvTLm7Uxi9KwIEaxfrcFp96pNA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DSxJXYpnskfv386joQw+FdVQf5T8PNeFp4/OsOtrSjzKvMJfn1Ao9rq8Bf3Hkf4tDdDUIgssqQUZoU7hV5IEDQ7e76ehWr2ThT2bsYeoyB/xsvgsTHMyPlOGC8LjxnCQzpR+4Uv0fz1U9fIyHpBXlye+wgyroaEge7UvkHFasXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LOlTOkGR; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=P6eW9J+velEDMHdy8wcj+gbiAHZOqtUjrnLcOSMSrYc=; b=LOlTOkGRKf92hlxi9AV4gmRMaV
-	aAMYLVCLGgJ5BpJItmtuQtbon8oSwDpyozFcXt6Z6WySQ858znhFKsvoBj/GVjNCmVJP/2jofUg/h
-	KWk5iQm6bdg+88kVcV+OX2aWdIWG5veMN8/B2KgCKpft1UWdvqtZt54Q7F8c2hxangeQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tpSBm-00292F-Lv; Tue, 04 Mar 2025 14:20:02 +0100
-Date: Tue, 4 Mar 2025 14:20:02 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Gerhard Engleder <gerhard@engleder-embedded.com>, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, netdev@vger.kernel.org, ltrager@meta.com,
-	Jijie Shao <shaojijie@huawei.com>
-Subject: Re: [PATCH net-next v9 2/8] net: phy: Support speed selection for
- PHY loopback
-Message-ID: <3d98db01-e949-4dd7-8724-3efcc2e319d9@lunn.ch>
-References: <20250227203138.60420-1-gerhard@engleder-embedded.com>
- <20250227203138.60420-3-gerhard@engleder-embedded.com>
- <20250303173500.431b298e@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pzF+b78wKxuHTE213GVKorQG77Q1UX/2KrdPKtawGVtCGQzkcXBtSd4DJU1w06d6q2NFfTiVOg7tVTrYFlGpdDGCiLikI0bUFR8wBa7/7lktY6NY7BkTEMeqPgVh5n07ZL7vLOODec/B2/G+qR6OHeN7u77ZmbVHcWsfX7rbLTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hoxhjnMx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0FA3C4CEE5;
+	Tue,  4 Mar 2025 13:21:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741094511;
+	bh=rGEYTpGgu0Hg/tX9juvTLm7Uxi9KwIEaxfrcFp96pNA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hoxhjnMx+KQE0cUceRAf6JawLNOMswvf2wan5MYgOXSJhjQNnn++gbrYuKotXrSyt
+	 9gpb4t025h87EkE2UeLAriyokm3ygnpOTOrCbjhs62pSJ9IGuqHv4vQ05o3TO4OntR
+	 zYspkjJSqJKeLh8DHlOsBbH5ele9w1t8tu/idWVAIep7vJqToyIT999urSjnMOi/ed
+	 YsSjUu35NCyShbCGOL7dyyNfVFEsFkvx+T58T58VynsDO/9PeOi+Q3w6EH/qJDfB/x
+	 5eYgTTwJbtghtD+jVHlNQKGOi660Mzle2esILQH3RUel2/R8rJBaLL142ZkWumogCX
+	 Ji9cZn/94Ojrg==
+Date: Tue, 4 Mar 2025 13:21:45 +0000
+From: Simon Horman <horms@kernel.org>
+To: Xin Tian <tianx@yunsilicon.com>
+Cc: netdev@vger.kernel.org, leon@kernel.org, andrew+netdev@lunn.ch,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	davem@davemloft.net, jeff.johnson@oss.qualcomm.com,
+	przemyslaw.kitszel@intel.com, weihg@yunsilicon.com,
+	wanry@yunsilicon.com, jacky@yunsilicon.com,
+	parthiban.veerasooran@microchip.com, masahiroy@kernel.org
+Subject: Re: [PATCH net-next v7 02/14] xsc: Enable command queue
+Message-ID: <20250304132145.GD3666230@kernel.org>
+References: <20250228154122.216053-1-tianx@yunsilicon.com>
+ <20250228154125.216053-3-tianx@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,51 +62,302 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250303173500.431b298e@kernel.org>
+In-Reply-To: <20250228154125.216053-3-tianx@yunsilicon.com>
 
-On Mon, Mar 03, 2025 at 05:35:00PM -0800, Jakub Kicinski wrote:
-> On Thu, 27 Feb 2025 21:31:32 +0100 Gerhard Engleder wrote:
-> > phy_loopback() leaves it to the PHY driver to select the speed of the
-> > loopback mode. Thus, the speed of the loopback mode depends on the PHY
-> > driver in use.
-> > 
-> > Add support for speed selection to phy_loopback() to enable loopback
-> > with defined speeds. Ensure that link up is signaled if speed changes
-> > as speed is not allowed to change during link up. Link down and up is
-> > necessary for a new speed.
+On Fri, Feb 28, 2025 at 11:41:26PM +0800, Xin Tian wrote:
+> The command queue is a hardware channel for sending
+> commands between the driver and the firmware.
+> xsc_cmd.h defines the command protocol structures.
+> The logic for command allocation, sending,
+> completion handling, and error handling is implemented
+> in cmdq.c.
 > 
-> Hi Andrew, does this one look good to you? I see your review tags 
-> on other patches :)
+> Co-developed-by: Honggang Wei <weihg@yunsilicon.com>
+> Signed-off-by: Honggang Wei <weihg@yunsilicon.com>
+> Co-developed-by: Lei Yan <jacky@yunsilicon.com>
+> Signed-off-by: Lei Yan <jacky@yunsilicon.com>
+> Signed-off-by: Xin Tian <tianx@yunsilicon.com>
 
-Sorry, dropped the ball on this patchset.
+Hi Xin Tian, all,
 
-I actually think there needs to be a step back and look at the
-requirements and what others are doing in the area.
+Some minor nits from my side.
 
-Jijie Shao is doing similar things:
-https://lore.kernel.org/lkml/20250213035529.2402283-3-shaojijie@huawei.com/
+...
 
-Both run into the same limitations of the current code, being able to
-compose tests from what we currently have.
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/cmdq.c b/drivers/net/ethernet/yunsilicon/xsc/pci/cmdq.c
 
-And then there is what Lee Trager is doing:
-https://netdevconf.info/0x19/sessions/talk/open-source-tooling-for-phy-management-and-testing.html
+...
 
-There is some overlap with the work Lee is doing, i assume he will
-need to configure the link mode the PCS is using, which is the
-scalability issue you raised with previous versions of this patchset.
-And configuring the PRBS in the PCS is not so different to configuring
-the packet generators we have in net/core/selftest.c.
+> +/*  Notes:
+> + *    1. Callback functions may not sleep
+> + *    2. page queue commands do not support asynchrous completion
+> + */
+> +static int xsc_cmd_invoke(struct xsc_core_device *xdev, struct xsc_cmd_msg *in,
+> +			  struct xsc_rsp_msg *out, u8 *status)
+> +{
+> +	struct xsc_cmd *cmd = &xdev->cmd;
+> +	struct xsc_cmd_work_ent *ent;
+> +	struct xsc_cmd_stats *stats;
+> +	ktime_t t1, t2, delta;
+> +	struct semaphore *sem;
+> +	int err = 0;
+> +	s64 ds;
+> +	u16 op;
+> +
+> +	ent = xsc_alloc_cmd(cmd, in, out);
+> +	if (IS_ERR(ent))
+> +		return PTR_ERR(ent);
+> +
+> +	init_completion(&ent->done);
+> +	INIT_WORK(&ent->work, cmd_work_handler);
+> +	if (!queue_work(cmd->wq, &ent->work)) {
+> +		pci_err(xdev->pdev, "failed to queue work\n");
+> +		err = -ENOMEM;
+> +		goto out_free;
+> +	}
+> +
+> +	err = xsc_wait_func(xdev, ent);
+> +	if (err == -ETIMEDOUT)
+> +		goto out;
+> +	t1 = timespec64_to_ktime(ent->ts1);
+> +	t2 = timespec64_to_ktime(ent->ts2);
+> +	delta = ktime_sub(t2, t1);
+> +	ds = ktime_to_ns(delta);
+> +	op = be16_to_cpu(((struct xsc_inbox_hdr *)in->first.data)->opcode);
+> +	if (op < ARRAY_SIZE(cmd->stats)) {
+> +		stats = &cmd->stats[op];
+> +		spin_lock(&stats->lock);
+> +		stats->sum += ds;
+> +		++stats->n;
+> +		spin_unlock(&stats->lock);
+> +	}
+> +	*status = ent->status;
+> +	xsc_free_cmd(ent);
+> +
+> +	return err;
+> +
+> +out:
 
-The current IOCTL interface is definitely too limiting for what Lee
-will need. So there is a netlink API coming soon. Should Gerhard and
-Jijie try to shoehorn what they want into the current IOCTL handler,
-or help design the netlink API? How can selftest.c be taken apart and
-put back together to make it more useful? And should the high level
-API for PRBS be exported through it, making it easier to use for any
-netdev?
+Maybe err_sem_up would be a better name for this label.
+Likewise for other cases where out or our_* is used
+for paths only used for unwinding in the case of error.
 
-	Andrew
+> +	sem = &cmd->sem;
+> +	up(sem);
+> +out_free:
 
+And err_free would be a better name for this label.
 
+Also, in this patch (set) sometimes labels are named err_something,
+and sometimes they are called something_err. It would be nice
+to make that consistent (personally, I would go for err_somthing).
+
+> +	xsc_free_cmd(ent);
+> +	return err;
+> +}
+> +
+> +static int xsc_copy_to_cmd_msg(struct xsc_cmd_msg *to, void *from, int size)
+> +{
+> +	struct xsc_cmd_prot_block *block;
+> +	struct xsc_cmd_mailbox *next;
+> +	int copy;
+> +
+> +	if (!to || !from)
+> +		return -ENOMEM;
+> +
+> +	copy = min_t(int, size, sizeof(to->first.data));
+> +	memcpy(to->first.data, from, copy);
+> +	size -= copy;
+> +	from += copy;
+> +
+> +	next = to->next;
+> +	while (size) {
+> +		if (!next) {
+> +			/* this is a BUG */
+
+Maybe WARN_ONCE() or similar would be appropriate here?
+
+> +			return -ENOMEM;
+> +		}
+> +
+> +		copy = min_t(int, size, XSC_CMD_DATA_BLOCK_SIZE);
+> +		block = next->buf;
+> +		memcpy(block->data, from, copy);
+> +		block->owner_status = 0;
+> +		from += copy;
+> +		size -= copy;
+> +		next = next->next;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int xsc_copy_from_rsp_msg(void *to, struct xsc_rsp_msg *from, int size)
+> +{
+> +	struct xsc_cmd_prot_block *block;
+> +	struct xsc_cmd_mailbox *next;
+> +	int copy;
+> +
+> +	if (!to || !from)
+> +		return -ENOMEM;
+> +
+> +	copy = min_t(int, size, sizeof(from->first.data));
+> +	memcpy(to, from->first.data, copy);
+> +	size -= copy;
+> +	to += copy;
+> +
+> +	next = from->next;
+> +	while (size) {
+> +		if (!next) {
+> +			/* this is a BUG */
+
+Ditto.
+
+> +			return -ENOMEM;
+> +		}
+> +
+> +		copy = min_t(int, size, XSC_CMD_DATA_BLOCK_SIZE);
+> +		block = next->buf;
+> +		if (!block->owner_status)
+> +			pr_err("block ownership check failed\n");
+> +
+> +		memcpy(to, block->data, copy);
+> +		to += copy;
+> +		size -= copy;
+> +		next = next->next;
+> +	}
+> +
+> +	return 0;
+> +}
+
+...
+
+> +static int xsc_request_pid_cid_mismatch_restore(struct xsc_core_device *xdev)
+> +{
+> +	struct xsc_cmd *cmd = &xdev->cmd;
+> +	u16 req_pid, req_cid;
+> +	u16 gap;
+> +
+> +	int err;
+> +
+> +	req_pid = readl(XSC_REG_ADDR(xdev, cmd->reg.req_pid_addr));
+> +	req_cid = readl(XSC_REG_ADDR(xdev, cmd->reg.req_cid_addr));
+> +	if (req_pid >= (1 << cmd->log_sz) || req_cid >= (1 << cmd->log_sz)) {
+> +		pci_err(xdev->pdev,
+> +			"req_pid %d, req_cid %d, out of normal range!!! max value is %d\n",
+> +			req_pid, req_cid, (1 << cmd->log_sz));
+> +		return -1;
+> +	}
+> +
+> +	if (req_pid == req_cid)
+> +		return 0;
+> +
+> +	gap = (req_pid > req_cid) ? (req_pid - req_cid)
+> +	      : ((1 << cmd->log_sz) + req_pid - req_cid);
+> +
+> +	err = xsc_send_dummy_cmd(xdev, gap, req_cid);
+> +	if (err) {
+> +		pci_err(xdev->pdev, "Send dummy cmd failed\n");
+> +		goto send_dummy_fail;
+
+I think that it would be nicer to simply return err here
+and drop the send_dummy_fail label here as no unwind is occurring.
+Likewise for other similar cases in this patch (set).
+
+> +	}
+> +
+> +send_dummy_fail:
+> +	return err;
+> +}
+
+...
+
+> +static int xsc_cmd_cq_polling(void *data)
+> +{
+> +	struct xsc_core_device *xdev = data;
+> +	struct xsc_cmd *cmd = &xdev->cmd;
+> +	struct xsc_rsp_layout *rsp;
+> +	u32 cq_pid;
+> +
+> +	while (!kthread_should_stop()) {
+> +		if (need_resched())
+> +			schedule();
+> +		cq_pid = readl(XSC_REG_ADDR(xdev, cmd->reg.rsp_pid_addr));
+> +		if (cmd->cq_cid == cq_pid) {
+> +			mdelay(3);
+> +			continue;
+> +		}
+> +
+> +		rsp = xsc_get_cq_inst(cmd, cmd->cq_cid);
+> +		if (!cmd->ownerbit_learned) {
+> +			cmd->ownerbit_learned = 1;
+> +			cmd->owner_bit = rsp->owner_bit;
+> +		}
+> +		if (cmd->owner_bit != rsp->owner_bit) {
+> +			pci_err(xdev->pdev, "hw update cq doorbell but buf not ready %u %u\n",
+> +				cmd->cq_cid, cq_pid);
+> +			continue;
+> +		}
+> +
+> +		xsc_cmd_comp_handler(xdev, rsp->idx, rsp);
+> +
+> +		cmd->cq_cid = (cmd->cq_cid + 1) % (1 << cmd->log_sz);
+> +
+> +		writel(cmd->cq_cid, XSC_REG_ADDR(xdev, cmd->reg.rsp_cid_addr));
+> +		if (cmd->cq_cid == 0)
+> +			cmd->owner_bit = !cmd->owner_bit;
+> +	}
+
+super nit: blank line here please
+
+> +	return 0;
+> +}
+
+...
+
+> +static int xsc_load(struct xsc_core_device *xdev)
+> +{
+> +	int err = 0;
+> +
+> +	mutex_lock(&xdev->intf_state_mutex);
+> +	if (test_bit(XSC_INTERFACE_STATE_UP, &xdev->intf_state))
+> +		goto out;
+> +
+> +	err = xsc_hw_setup(xdev);
+> +	if (err) {
+> +		pci_err(xdev->pdev, "xsc_hw_setup failed %d\n", err);
+> +		goto out;
+> +	}
+> +
+> +	set_bit(XSC_INTERFACE_STATE_UP, &xdev->intf_state);
+> +	mutex_unlock(&xdev->intf_state_mutex);
+> +
+> +	return 0;
+> +out:
+> +	mutex_unlock(&xdev->intf_state_mutex);
+> +	return err;
+> +}
+> +
+> +static int xsc_unload(struct xsc_core_device *xdev)
+> +{
+> +	mutex_lock(&xdev->intf_state_mutex);
+> +	if (!test_bit(XSC_INTERFACE_STATE_UP, &xdev->intf_state)) {
+> +		xsc_hw_cleanup(xdev);
+> +		goto out;
+> +	}
+> +
+> +	clear_bit(XSC_INTERFACE_STATE_UP, &xdev->intf_state);
+> +
+> +	xsc_hw_cleanup(xdev);
+> +
+> +out:
+> +	mutex_unlock(&xdev->intf_state_mutex);
+
+super nit: maybe no blank line here.
+
+> +
+> +	return 0;
+> +}
+
+...
 
