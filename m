@@ -1,153 +1,109 @@
-Return-Path: <netdev+bounces-171572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1AEDA4DA3F
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 11:25:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78075A4DA05
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 11:20:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 75C7D177032
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 10:24:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35AFF7A6D11
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 10:19:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB12F20408E;
-	Tue,  4 Mar 2025 10:21:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 836631FDE08;
+	Tue,  4 Mar 2025 10:19:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="QQEZSaYR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LZhF1WPB"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 416F6202C4F;
-	Tue,  4 Mar 2025 10:20:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 554B01FCFC2;
+	Tue,  4 Mar 2025 10:19:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741083660; cv=none; b=tHQZqERsuehgg1xUs9p0sTKyuhI7IRyV7zjEtljmvQUFjCpko75NNXZsbTxmN86FL+RpbzvMyh/WIh9SYX2NvQTQO+Bc0rYXxhYt90T4lHNZz9TYHBcizCOKoyrr3ZI/JEshl5sp+vvGQq6t1r2qxddAXiNjH53HODiAiPrMxSw=
+	t=1741083599; cv=none; b=sFsYSyIgABNMf7F6k7qH4ZoY7h1tBR8+PrkpUdGlOxsJU1uBnP6hopAuS43/mFOFsjDH1QVoOs5OJ6hqSW0/fw9tU8qHNsUDuozhXwxI1P05vAYJFpTMHVbWm1Gt338l4qXsViKwOeY7Xxunb+6b/mjDMemamt5wK6fj07LmX3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741083660; c=relaxed/simple;
-	bh=3QSQiiEkpInCqAJZ0oopQLokNfbrFQltP45H1BxJNtk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=YNxIMBl3Ileyal37qMXBWpUvebqklLz6GelCTW6AWqEzc3AzB1fB0YiE41aL6f8FkcmkxPtYqmTQ/aOdSxVPJPNnSqht9RkKA3paoz+DrToKSSBCzs+3rY3W6Yk0h2g9WWFPPkRZ/zG+PznGPX1ze6s231GDjxXPtFY/BpZ990g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=QQEZSaYR; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 4ED8D432BD;
-	Tue,  4 Mar 2025 10:20:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1741083656;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=v03atscDreRB9AJDvXothgKRiTD19mycZa+MJCNJB5I=;
-	b=QQEZSaYRWFZrr9y4nDiCY8rrQ02gKRcBZbDM+ga1qdvkH6owUtP9TqYDpB82wEVeLxaOiA
-	08kqfGGH0zsR+/TQi47tCA/Ys/4X7zaUb8K4fnDtyVs1wAJbuwmrrJPDm854+AUdcoA8nt
-	42T9tj6hXFTlQB5s6RgdtpbfZO0466De1xm5HZAdQGFofoeIjKShm22l5SKkjo4PQz/nNs
-	YhpoHh+5p7RsF+MjwIzjvBIFcVNLFN0Stih8mjBfTelYLQh2VWC4yly+X643sO8Nf2jMhq
-	TNfvdIj7Cx+CQBggaiw/B64GTwKWcIZCTmIuWH5maU/QdA9zan+88V0gx4mXMg==
-From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Tue, 04 Mar 2025 11:19:01 +0100
-Subject: [PATCH net-next v6 12/12] dt-bindings: net: pse-pd: ti,tps23881:
- Add interrupt description
+	s=arc-20240116; t=1741083599; c=relaxed/simple;
+	bh=UE2pwi8o/Z6BXeK0+hDRapUdyRJJHQ7+IiwgluOIIFI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=QWyPexJxdMwHNm/TJRDR16ri4HVEH9csJeS1FY3Fx8pgRBLN6Z80JIPzFRvPvhPsaKQFv6wRlNtVbXKS2tosw30NMDQzzTcqUQZhf0avRVuPnid8UzjXTZt+mRGQ/aGXpzu7Jg2wW8PkV0sEt+DbFHNgYYXZeFzgmxMUuvcLhQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LZhF1WPB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2CD8C4CEE5;
+	Tue,  4 Mar 2025 10:19:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741083598;
+	bh=UE2pwi8o/Z6BXeK0+hDRapUdyRJJHQ7+IiwgluOIIFI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=LZhF1WPB4LBHqfQOf+1gkgrKlLZOsLHq+WMzJd7ROiJutjZsisrSAAG3pZEwC9XAM
+	 cde5XRgx34j4iEfYy0wAvMetxGi8E00m2i3FTrdw8hVvcrvF09I08/cqk124inF9Al
+	 cmm7GQSrQM3JYgEo5f98vxB0H2C5Hu/shLX/I/ulqh2gXhsBZXYloommIQS5F9U8uq
+	 ZH6bRSbgRD9SNgzc6r5KPYo66euMpUtAPeoXS0Aawk6F7XliEG4+pVLFvNHdIUlJQ8
+	 LXRkQJvcYqjcyZE4aUKLco113W4bw+MvGktwBbRMYh89jc08pamnGS2sS/xDKSjQ7b
+	 SK+uhGrO11v+A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE113380AA7F;
+	Tue,  4 Mar 2025 10:20:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250304-feature_poe_port_prio-v6-12-3dc0c5ebaf32@bootlin.com>
-References: <20250304-feature_poe_port_prio-v6-0-3dc0c5ebaf32@bootlin.com>
-In-Reply-To: <20250304-feature_poe_port_prio-v6-0-3dc0c5ebaf32@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Jonathan Corbet <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>, 
- Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- Simon Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>
-Cc: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
- linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, 
- Dent Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>, 
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-X-Mailer: b4 0.15-dev-8cb71
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddutddujeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhfffugggtgffkfhgjvfevofesthejredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeevgfdvgfektefgfefggeekudfggffhtdfffedtueetheejtddvledvvdelhedtveenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpeelnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghloheplgduvdejrddtrddurddungdpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvkedprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhrtghpthhtoheptghorhgsvghtsehlfihnrdhnvghtpdhrtghpthhtoheplhhgihhrugifohhougesghhmrghilhdrtghomhdprhgtphhtthhopeguvghnthhprhhojhgvtghtsehlihhnuhigf
- hhouhhnuggrthhiohhnrdhorhhgpdhrtghpthhtohepkhhriihkodgutheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhriiihshiithhofhdrkhhoiihlohifshhkiheslhhinhgrrhhordhorhhgpdhrtghpthhtohepkhgvrhhnvghlsehpvghnghhuthhrohhnihigrdguvg
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v8 0/8] Some pktgen fixes/improvments (part II)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174108363151.83393.7758476435815986527.git-patchwork-notify@kernel.org>
+Date: Tue, 04 Mar 2025 10:20:31 +0000
+References: <20250227135604.40024-1-ps.report@gmx.net>
+In-Reply-To: <20250227135604.40024-1-ps.report@gmx.net>
+To: Peter Seiderer <ps.report@gmx.net>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
+ pchelkin@ispras.ru, arnd@arndb.de, namcao@linutronix.de
 
-From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+Hello:
 
-Add an interrupt property to the device tree bindings for the TI TPS23881
-PSE controller. The interrupt is primarily used to detect classification
-and disconnection events, which are essential for managing the PSE
-controller in compliance with the PoE standard.
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Interrupt support is essential for the proper functioning of the TPS23881
-controller. Without it, after a power-on (PWON), the controller will
-no longer perform detection and classification. This could lead to
-potential hazards, such as connecting a non-PoE device after a PoE device,
-which might result in magic smoke.
+On Thu, 27 Feb 2025 14:55:56 +0100 you wrote:
+> While taking a look at '[PATCH net] pktgen: Avoid out-of-range in
+> get_imix_entries' ([1]) and '[PATCH net v2] pktgen: Avoid out-of-bounds
+> access in get_imix_entries' ([2], [3]) and doing some tests and code review
+> I detected that the /proc/net/pktgen/... parsing logic does not honour the
+> user given buffer bounds (resulting in out-of-bounds access).
+> 
+> This can be observed e.g. by the following simple test (sometimes the
+> old/'longer' previous value is re-read from the buffer):
+> 
+> [...]
 
-Signed-off-by: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
----
+Here is the summary with links:
+  - [net-next,v8,1/8] net: pktgen: fix mix of int/long
+    https://git.kernel.org/netdev/net-next/c/90b856ae3528
+  - [net-next,v8,2/8] net: pktgen: remove extra tmp variable (re-use len instead)
+    https://git.kernel.org/netdev/net-next/c/7d39e01803bd
+  - [net-next,v8,3/8] net: pktgen: remove some superfluous variable initializing
+    https://git.kernel.org/netdev/net-next/c/80f6c198dfd5
+  - [net-next,v8,4/8] net: pktgen: fix mpls maximum labels list parsing
+    https://git.kernel.org/netdev/net-next/c/2b15a0693f70
+  - [net-next,v8,5/8] net: pktgen: fix access outside of user given buffer in pktgen_if_write()
+    https://git.kernel.org/netdev/net-next/c/c5cdbf23b84c
+  - [net-next,v8,6/8] net: pktgen: fix mpls reset parsing
+    https://git.kernel.org/netdev/net-next/c/4bedafa7474e
+  - [net-next,v8,7/8] net: pktgen: remove all superfluous index assignements
+    https://git.kernel.org/netdev/net-next/c/21d0d99aebbd
+  - [net-next,v8,8/8] selftest: net: add proc_net_pktgen
+    https://git.kernel.org/netdev/net-next/c/03544faad761
 
-Change in v5:
-- Use standard interrupt flag in the example.
-
-Change in v3:
-- New patch
----
- Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml b/Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml
-index d08abcb012113..3a5f960d8489a 100644
---- a/Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml
-+++ b/Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml
-@@ -20,6 +20,9 @@ properties:
-   reg:
-     maxItems: 1
- 
-+  interrupts:
-+    maxItems: 1
-+
-   '#pse-cells':
-     const: 1
- 
-@@ -62,9 +65,12 @@ unevaluatedProperties: false
- required:
-   - compatible
-   - reg
-+  - interrupts
- 
- examples:
-   - |
-+    #include <dt-bindings/interrupt-controller/irq.h>
-+
-     i2c {
-       #address-cells = <1>;
-       #size-cells = <0>;
-@@ -72,6 +78,8 @@ examples:
-       ethernet-pse@20 {
-         compatible = "ti,tps23881";
-         reg = <0x20>;
-+        interrupts = <8 IRQ_TYPE_LEVEL_HIGH>;
-+        interrupt-parent = <&gpiog>;
- 
-         channels {
-           #address-cells = <1>;
-
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
