@@ -1,240 +1,241 @@
-Return-Path: <netdev+bounces-171822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2214A4ED94
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 20:39:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 97B1EA4ED96
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 20:40:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC28418932B0
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:40:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBC181893411
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:40:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DB8C24EAB7;
-	Tue,  4 Mar 2025 19:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFA3225F7AC;
+	Tue,  4 Mar 2025 19:40:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="anqvoSfE";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1n2KVnn/";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="anqvoSfE";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1n2KVnn/"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="DJfVWoMF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2068.outbound.protection.outlook.com [40.107.94.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E949203704
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 19:39:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741117195; cv=none; b=cVUjnLNkS8/xEWD4MyO8oJMuJV9CcgAJd39yOnhgQ6yCht71QAbw7bpdDg/3NOkbEWubVm8I4r7nWMQ1e4BQnXPXijKaZHrzwh73Ak+pkgQ7MXlanuCggh/2pcAC8ciqen9SddhBWo3AnyfTgjhIs0pVo+ZDLAt14TB+PCmykY0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741117195; c=relaxed/simple;
-	bh=D6K0kCjdccWNxvUY3exNRraZxpidvHALFNoVgD6GD94=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=odlXDyX31t0zuilCGJyHgfpjY67mrQCNQPFLzztrlB7UcgbDm0Jx5sWQKiPrZ+eaO4bm5TCeQ6x6wqvFdcayPz6W68uPZ28QrXPmQRtf2/QcknhNdrpafm+xQgmqpaajH3oqmNzydblXB+8E7xYPObNkSUkJ8hmc+PJKwgDVjnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=anqvoSfE; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1n2KVnn/; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=anqvoSfE; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1n2KVnn/; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 62357211A0;
-	Tue,  4 Mar 2025 19:39:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1741117191; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6iIFedqhWb3N9WUw+rahWwqAHHg+Q/R9dVRr6Mkc640=;
-	b=anqvoSfEOnhz0IPcWTGSRgdqJIPeXdhfg9TnG3YDma3lIYyfUwj+9kbSwphyLo0wokxO2W
-	44BapP+OKcrPnYG5WMwrnbfXCRrCsAGwH6dTzAAEo/LhVYUv9vfk12KvLS72Ke9+xQzrI/
-	38r33aZD1jqZ4zWMcEUlbkBECsdsLJU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1741117191;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6iIFedqhWb3N9WUw+rahWwqAHHg+Q/R9dVRr6Mkc640=;
-	b=1n2KVnn/CFICXg6pLnHAAW61irz5COL/8/knYOnEvhO2iEPqeDULGN3X3MyCIHu3ACYBy6
-	s+mldAt+ufwI+NAw==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=anqvoSfE;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="1n2KVnn/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1741117191; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6iIFedqhWb3N9WUw+rahWwqAHHg+Q/R9dVRr6Mkc640=;
-	b=anqvoSfEOnhz0IPcWTGSRgdqJIPeXdhfg9TnG3YDma3lIYyfUwj+9kbSwphyLo0wokxO2W
-	44BapP+OKcrPnYG5WMwrnbfXCRrCsAGwH6dTzAAEo/LhVYUv9vfk12KvLS72Ke9+xQzrI/
-	38r33aZD1jqZ4zWMcEUlbkBECsdsLJU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1741117191;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6iIFedqhWb3N9WUw+rahWwqAHHg+Q/R9dVRr6Mkc640=;
-	b=1n2KVnn/CFICXg6pLnHAAW61irz5COL/8/knYOnEvhO2iEPqeDULGN3X3MyCIHu3ACYBy6
-	s+mldAt+ufwI+NAw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id F08E313967;
-	Tue,  4 Mar 2025 19:39:50 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id VWpROAZXx2cgEgAAD6G6ig
-	(envelope-from <hare@suse.de>); Tue, 04 Mar 2025 19:39:50 +0000
-Message-ID: <d9f4b78e-01d7-4d1d-8302-ed18d22754e4@suse.de>
-Date: Tue, 4 Mar 2025 20:39:50 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CD0A203704;
+	Tue,  4 Mar 2025 19:39:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.68
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741117201; cv=fail; b=idndVDwQy0+K6H4Vzhvkg5Dt4TO5E6Z90NOQpTYNbdgQvh+yrxKeaw/rI+y12+D6sv0DlUj0LJ7U4oqNP15kqiUfuJOd+ckmWdwkYoTtGLVrPYBrGMX3Y8K/D1ywsobibW3/Gc70noVFOLg4EtzB/YX048fbVd5AJ3Tvue8cvls=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741117201; c=relaxed/simple;
+	bh=XdZCwUxdkGp38VVBPnffzte6EalsEOUATNMg7qaymZ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=dwpOu0G4JAZaOqL/C1xbIM8aQF2J8/vBmOMqQpc8oHWJ4ZbHc3u8wF3D07drAXH54/uwmqe1Yp8bHeNDfwdemK70L3Dok5WGtTCzqJu7i2bZR5FXe3NdTrziBikhSxyNVR4ed+jQIG8ZyKpgES1+oAqIg0lNqX5zQeIKf+v5oyE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=DJfVWoMF; arc=fail smtp.client-ip=40.107.94.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BBSqaWDRwCx4AfvDC2oKT1JuE7XNbW+Dc26gY9NuL626BByaUgBQ8mnZhzDndQOCooja0TahRhpvb57h0Qa62IuH7uEhvwrmQRFVAEmtFldLzIreQOK78gUB9MeaBw95Pg4UdYfHa8zAhKuzuQxNUzHl1a8uGtygLvUkU6iOOh1RDClgFjlEgqKptmAa4H5MsXHuVEKXgKNY7WNMbDKqxF8vjc1drWGEP0fo+BrUr4vhXAAGT8jzoyMXuHBq2vP4KaO9bOcBba/c0pi+NOLsh8ZNunH5aeS8bj3WkbS4imxZssM5GSGBItk6+gZXamb9/JyU7Ae0DIlJ+wH1FDzlSQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=79Em+/HRy7HdU7T4umrfn3H/WkUQK9thc3ut0LuZYWM=;
+ b=wysd4d4RscDwf6x7+e47nOSQ1n35iqCUlA+4rKrVXhviR9VqG2qW3DF0f/xyIwjDFSeV7N7u9FKH0joi4JDYMyu2OYiVZDVyFAgrNhrpXBak75OIxTvsNjEbx34qn1OKEG6wFHd2EjdfP/5LolU6meYTqsm5cP8fP0RpJ3/ujFx/RMt1AMIfDqwBKTxiukkw/c20lAIKbKu/H3BSdEu2B815x/e4bKoWEr343r4gf9YNjiSfAkrEN2o/Vm3XIWadWGZxXsBEAiYDmkwrcBDZj+oTczG1I+fX35qcZntVuOCDKD4A/VDEW9CRAZdf+pRZxHEwATvdAxfan4oNrsX+aQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=79Em+/HRy7HdU7T4umrfn3H/WkUQK9thc3ut0LuZYWM=;
+ b=DJfVWoMFrNHPu1v7q/oKstuJRRHoDNrASgAFHuFkZWOltEsE31YfIPI9zK8Ku7+b7nhHAsQR+Jb9HW5nCogqWxq5YZiXaqJ1PvNb2PZJC757QpYVwVj5M4sLJyDR2IBviMwiPzSH2tlJwOHfPEPmOzwhtEteDxfBRXejjSViMBeu+sjJ+58Sw04oUYrjqLVpY2czHFPfQRVVse6NjkXcdBTxka/8mMwpKlKHKplUL0TSZOw2Km9s0ciEyNQHakclysENEqAPwE29vMMqb1aHBOfaHJ/7R6Tu8AmOcTtCszQFv/p1+VZ6fpxjj6k8xRBzqZMxB6pSkd5FZ/lbvbY8cg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com (2603:10b6:610:17c::13)
+ by CH2PR12MB4038.namprd12.prod.outlook.com (2603:10b6:610:7b::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.17; Tue, 4 Mar
+ 2025 19:39:56 +0000
+Received: from CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732]) by CH3PR12MB8659.namprd12.prod.outlook.com
+ ([fe80::6eb6:7d37:7b4b:1732%4]) with mapi id 15.20.8489.025; Tue, 4 Mar 2025
+ 19:39:56 +0000
+Date: Tue, 4 Mar 2025 15:39:54 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Shannon Nelson <shannon.nelson@amd.com>
+Cc: andrew.gospodarek@broadcom.com, aron.silverton@oracle.com,
+	dan.j.williams@intel.com, daniel.vetter@ffwll.ch,
+	dave.jiang@intel.com, dsahern@kernel.org,
+	gregkh@linuxfoundation.org, hch@infradead.org, itayavr@nvidia.com,
+	jiri@nvidia.com, Jonathan.Cameron@huawei.com, kuba@kernel.org,
+	lbloch@nvidia.com, leonro@nvidia.com, linux-cxl@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	saeedm@nvidia.com, brett.creeley@amd.com
+Subject: Re: [PATCH v2 4/6] pds_fwctl: initial driver framework
+Message-ID: <20250304193954.GT133783@nvidia.com>
+References: <20250301013554.49511-1-shannon.nelson@amd.com>
+ <20250301013554.49511-5-shannon.nelson@amd.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250301013554.49511-5-shannon.nelson@amd.com>
+X-ClientProxiedBy: BN9PR03CA0431.namprd03.prod.outlook.com
+ (2603:10b6:408:113::16) To CH3PR12MB8659.namprd12.prod.outlook.com
+ (2603:10b6:610:17c::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Kernel oops with 6.14 when enabling TLS
-To: Matthew Wilcox <willy@infradead.org>, Hannes Reinecke <hare@suse.com>
-Cc: Vlastimil Babka <vbabka@suse.cz>, Boris Pismenny <borisp@nvidia.com>,
- John Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- Sagi Grimberg <sagi@grimberg.me>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- linux-mm@kvack.org, Harry Yoo <harry.yoo@oracle.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <Z8XPYNw4BSAWPAWT@casper.infradead.org>
- <edf65d4e-90f0-4b12-b04f-35e97974a36f@suse.cz>
- <95b0b93b-3b27-4482-8965-01963cc8beb8@suse.cz>
- <fcfa11c6-2738-4a2e-baa8-09fa8f79cbf3@suse.de>
- <a466b577-6156-4501-9756-1e9960aa4891@suse.cz>
- <6877dfb1-9f44-4023-bb6d-e7530d03e33c@suse.com>
- <db1a4681-1882-4e0a-b96f-a793e8fffb56@suse.cz>
- <Z8cm5bVJsbskj4kC@casper.infradead.org>
- <a4bbf5a7-c931-4e22-bb47-3783e4adcd23@suse.com>
- <Z8cv9VKka2KBnBKV@casper.infradead.org>
- <Z8dA8l1NR-xmFWyq@casper.infradead.org>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <Z8dA8l1NR-xmFWyq@casper.infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 62357211A0
-X-Spam-Level: 
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[suse.cz,nvidia.com,gmail.com,kernel.org,grimberg.me,lists.infradead.org,vger.kernel.org,kvack.org,oracle.com];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:dkim,suse.de:mid]
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -3.01
-X-Spam-Flag: NO
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8659:EE_|CH2PR12MB4038:EE_
+X-MS-Office365-Filtering-Correlation-Id: 47dd888c-bfb7-4f85-ea9d-08dd5b545754
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?KkqlX3oad2tp+6g5036diETpXRx9hJdpaAW9/QPlFiV1AVgqwuhyuGgQq4pm?=
+ =?us-ascii?Q?sxtHvwBfMKrNqrAzJTD30G+Xw7ax3g1+W6qHFDaC4t2FgE5CiW19ByGtRqOv?=
+ =?us-ascii?Q?0w2PmFTy7CNhGgoGcfZx/+Z92qASWJKPpmLUhvv+BoRy5T/DCXgwC4Ak4n1g?=
+ =?us-ascii?Q?nn/Qim6D8b2zsNV81KwRDvpQA8EzAf0zq//3QScA2989c0sUIZdgoSDBWVs0?=
+ =?us-ascii?Q?NdNbg+LFsODyjuG8HUgZ3JvYpF6eRfYPVX0B+TrMjAsi+9+ChKzxj/ShqTcA?=
+ =?us-ascii?Q?xvINw9p6LiU6dubdbZCk3PZ5prku+QCa7UigIOUQ7iicI1bDHIg/zp4AKBJ6?=
+ =?us-ascii?Q?8roXWoaw60WAkaPXMVus3qkE60jjLsdwF4M2BgtT78TDtl5ASRwdEKFJgcR2?=
+ =?us-ascii?Q?im1BIoSjL/7cQZXqChv6uo22CGu5XFU5MkeXc75+/OTZWu2VmH4EsvCulvIV?=
+ =?us-ascii?Q?L8DsSoYoX0sPQtVGgp1QMoIp1oepn1rL09UAWX1SOeRPWF6UcbeHVyqKu2RJ?=
+ =?us-ascii?Q?O2zVN2xkDPzDx48qSWveVY7iWsavNMN/AyUa2jAr1O46/ayiFvM8wxsyZWEv?=
+ =?us-ascii?Q?BIzG4BYwq2mmFq15F9JTI24POk7XSzx0VE4LZ1EXR7pehQ4CpGKC2nd6m3yp?=
+ =?us-ascii?Q?duXUjdGy9fjJYTXzHRoa0ZNk7XkG5C1Os06QapSA9efuZEWeG6GueQRSMdjo?=
+ =?us-ascii?Q?bnRZGhF92dvfaKF2CA8XnPa7LGM41NIeWVnhYAYUslNaCA/BXbAOdUHpY2DV?=
+ =?us-ascii?Q?RWN9ifPmGcxgrQ1SZoYLPEkElf0bzWuF+dJX2Z759wR5vvUw8aRLq61w+tvv?=
+ =?us-ascii?Q?/5dSWGkJJucusiR+g+AolIO++C6XfLemiIUc+Eh9QGb2T/3sIPODg9U7fRku?=
+ =?us-ascii?Q?sqhkHAb+uxZq76NR/h/3VAooz4SJHKgbpSpbS8JXuoz2yu09gpq/ZLBDvtM2?=
+ =?us-ascii?Q?MW3HbgAXDg856uEfwOO4IgvGzECVzJUITKFvJNpY7yR9nbX3roVptjtHcJPy?=
+ =?us-ascii?Q?TidqYXCuLvLA+ms6QxebULvZTZvh/2g6hWz2wbwvMwsBZsIZ6LRQSXtKF/gW?=
+ =?us-ascii?Q?qexyCtDIu7lffbJRgPcTPdMGeluk/pQOOVHNU+Zy0K7T1NSRpWVrldqN8PzM?=
+ =?us-ascii?Q?ZijXvHnD0e67RD7DIPQNV/BJ16p+JcBdQcq1eL7FGbpoh2DdUUgz5yN20XhI?=
+ =?us-ascii?Q?28SLadOz0GRuWS+l2SNHF3Nnusnt4J2UjylhE5eEHflZ4PLn+rWZinpPA7gT?=
+ =?us-ascii?Q?+825ES8PJi1youbonxqk8+Vii8wpy5278toRdRN2Qs4lGwfzDdkXX9jWN68b?=
+ =?us-ascii?Q?xXnaH9/kKH3hd+PM/LXqsgpPB/J+r2OpI7sBvNWAkgzEfsFYsD/9sxomUn98?=
+ =?us-ascii?Q?iy9ifPBD+xUZnHLCSQ4UtsDu5Xg5?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?Sk2hDxAE37IbFrFenR1lUn3N626XT2XsmhXv/O8mZkvg1CRMvBVGXgqiC6jx?=
+ =?us-ascii?Q?0MvGamWF16jSAB87kzdBQMsc9GxghQYFlXyVjFi0wwCU3hxXBm4zWM8GLxRD?=
+ =?us-ascii?Q?gsY8/+1fJchIvJLvOpclDngRwrpmgRpNaPXt9EZQTh3qad2cy7++E4XSj5WT?=
+ =?us-ascii?Q?cUET+yqoO2TmbSiD27oHuLDgQlTrQnGSJq4aSclQp/cXPzEefAwKkIa5SN+k?=
+ =?us-ascii?Q?xfYwhc+7iwX/z3E+Ldq9SMqDqRF+bLMYzFLpvbq27FqhexCXBLaEmvr1xM2z?=
+ =?us-ascii?Q?sy96EKfiwibJPwHpQWHeULd52MVwcCKJhJANus+yWAZzYzCSpbhjXQnVfAwI?=
+ =?us-ascii?Q?xy/8w2hoKMD5d56xD4aBkAptPnadxjRGNUpdvRbpB5Gdyw3MsiXHN35t8yFh?=
+ =?us-ascii?Q?UeJV7kWL1Xc1TvZa2RAIX9f5H1ytiH2P5fNARhD7Ry/ZS+jaGxrMWsKQNYEN?=
+ =?us-ascii?Q?ArcEDOshz8YbGeKJSgm6/liV4aMMU0k1j2up7WP5KrWCK9Y7+5f+fWlydxJX?=
+ =?us-ascii?Q?+XpVDvAmYG/4xpUqTzz1QPAwK2frRdnV2675OdKQP5fd7WjeT0YaMpm+kvQU?=
+ =?us-ascii?Q?iIvdxRRS7OE6bIzd5iDtvVJisy3VXGqJosw43Wjpaf/W9OMR1lzW9Gc5rpKZ?=
+ =?us-ascii?Q?79FFPVgpFStE7ZbLkWaeVki4pCJjrM0Lj3WNXDouSJ5INGP9yhZtPdxTneSA?=
+ =?us-ascii?Q?yvXvLMc7GZnyRt9mQjYNrFPd1m5rV9rPtoajqClYKWGjsZjbpPIuERrSJ9/p?=
+ =?us-ascii?Q?xNby7wIK/VsrvTHSHs8Dl9rJtn34ZDbEX7vQ+5I8Lkd7nnFrbnY27fiYsBE6?=
+ =?us-ascii?Q?9OPnj9GaX9zrGJp/pwUj0n0mV5yLJB8fiaqmBZV8c3C4ZNMpHznzzLBHk7Dn?=
+ =?us-ascii?Q?Z5KMGwAuzSmly19ITO6xPc/TBk4325MO965UFFHPVhejOe5+mux3U8cFkrLc?=
+ =?us-ascii?Q?0tQGYNwh0mvmzfwmQcu0EaL/trKzqHroNnD3TdD/UIks1RvoZpow7PPhVPDo?=
+ =?us-ascii?Q?R2O9iMJC3p9YGMtuBP9IUd/X8N8tnfkI2NB52VkelguWGQPUa2rr0tIWPb0W?=
+ =?us-ascii?Q?KuhMCdbkN2esNh4IC9NSi3dhnQglBx4uR2uA0Jd9p03I9o09OkaPw0gHH/dd?=
+ =?us-ascii?Q?BoiekCVw01EYMdQ5oQz0UCpgDEQW+QJ6QhLvhohXE4wZGatvsz9u80BZzynd?=
+ =?us-ascii?Q?cXeEdqk4+5ZMJLSK8jY7A3hEJmj0GFtjmOWAU50EswGoz3mLEkDdepVzJJ2a?=
+ =?us-ascii?Q?0q7cnFaI1Ah60HFZik+aOSD8MZSTnVba9gPVSCqHtr3y6xOGp6GThx8sy3Sq?=
+ =?us-ascii?Q?FON3Juz1+BnPK75foxEJD9zF3/tpgUu0PZ3VvCSXiFZ68RerpC7n/nEHhEgo?=
+ =?us-ascii?Q?z64pET+VyACZKhEBQ+RiycjAVYRszlxS3DsTHAVrhOXZPlExUX4UaTgW8EjC?=
+ =?us-ascii?Q?TjGFRjYNdsmoTL1705GcgA+ySTyVdyH5jF1nzsY0qmgH23Bu+JBz/ClmnqD7?=
+ =?us-ascii?Q?zbO4JJMHFJ3aSaAP/iB6m0gL7oRL6U3vURJ0hOL6N/TGde7D1M6DZkjKIDis?=
+ =?us-ascii?Q?CRPrEk8RTAQuaucHiaBrqlVi334jLhBvklkPGR+k?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 47dd888c-bfb7-4f85-ea9d-08dd5b545754
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8659.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2025 19:39:55.9118
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: e/ZvBU8Plmc104gqA9bF18sJZxevfmGl2YaPH35CBrLznVLNakZGYmM+CLQ0sHzU
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4038
 
-On 3/4/25 19:05, Matthew Wilcox wrote:
-> On Tue, Mar 04, 2025 at 04:53:09PM +0000, Matthew Wilcox wrote:
->> Right, that's what happened in the block layer.  We mark the bio with
->> BIO_PAGE_PINNED if the pincount needs to be dropped.  As a transitional
->> period, we had BIO_PAGE_REFFED which indicated that the page refcount
->> needed to be dropped.  Perhaps there's something similar that network
->> could be doing.
-> 
-> Until that time ... how does this look as a quick hack to avoid
-> reverting the slab change?
-> 
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index d6fed25243c3..ca08a923ac6d 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -1520,7 +1520,10 @@ static inline void folio_get(struct folio *folio)
->   
->   static inline void get_page(struct page *page)
->   {
-> -	folio_get(page_folio(page));
-> +	struct folio *folio = page_folio(page);
-> +	if (WARN_ON_ONCE(folio_test_slab(folio)))
-> +		return;
-> +	folio_get(folio);
->   }
->   
->   static inline __must_check bool try_get_page(struct page *page)
-> @@ -1614,6 +1617,8 @@ static inline void put_page(struct page *page)
->   {
->   	struct folio *folio = page_folio(page);
->   
-> +	if (folio_test_slab(folio))
-> +		return;
->   	folio_put(folio);
->   }
->   
-> diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-> index 65f550cb5081..8c7fdb7d8c8f 100644
-> --- a/lib/iov_iter.c
-> +++ b/lib/iov_iter.c
-> @@ -1190,8 +1190,12 @@ static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
->   		if (!n)
->   			return -ENOMEM;
->   		p = *pages;
-> -		for (int k = 0; k < n; k++)
-> -			get_page(p[k] = page + k);
-> +		for (int k = 0; k < n; k++) {
-> +			struct folio *folio = page_folio(page);
-> +			p[k] = page + k;
-> +			if (!folio_test_slab(folio))
-> +				folio_get(folio);
+On Fri, Feb 28, 2025 at 05:35:52PM -0800, Shannon Nelson wrote:
+> +static int pdsfc_identify(struct pdsfc_dev *pdsfc)
+> +{
+> +	struct device *dev = &pdsfc->fwctl.dev;
+> +	union pds_core_adminq_comp comp = {0};
+> +	union pds_core_adminq_cmd cmd;
+> +	struct pds_fwctl_ident *ident;
+> +	dma_addr_t ident_pa;
+> +	int err = 0;
+> +
+> +	ident = dma_alloc_coherent(dev->parent, sizeof(*ident), &ident_pa, GFP_KERNEL);
+> +	err = dma_mapping_error(dev->parent, ident_pa);
+> +	if (err) {
+> +		dev_err(dev, "Failed to map ident buffer\n");
+> +		return err;
+> +	}
+> +
+> +	cmd = (union pds_core_adminq_cmd) {
+> +		.fwctl_ident = {
+> +			.opcode = PDS_FWCTL_CMD_IDENT,
+> +			.version = 0,
+> +			.len = cpu_to_le32(sizeof(*ident)),
+> +			.ident_pa = cpu_to_le64(ident_pa),
 > +		}
->   		maxsize = min_t(size_t, maxsize, n * PAGE_SIZE - *start);
->   		i->count -= maxsize;
->   		i->iov_offset += maxsize;
-> 
+> +	};
+> +
+> +	err = pds_client_adminq_cmd(pdsfc->padev, &cmd, sizeof(cmd), &comp, 0);
+> +	if (err)
+> +		dev_err(dev, "Failed to send adminq cmd opcode: %u err: %d\n",
+> +			cmd.fwctl_ident.opcode, err);
+> +	else
+> +		pdsfc->ident = *ident;
+> +
+> +	dma_free_coherent(dev->parent, sizeof(*ident), ident, ident_pa);
+> +
+> +	return 0;
 
-Good news and bad news ...
-Good news: TLS works again!
-Bad news: no errors.
+Is it intential to loose the pds_client_adminq_cmd err? Maybe needs a
+comment if so
 
-Question to the wise: this is not the only place in iov_iter.c where we 
-do a 'get_page()'. Do we leave them and wait for others to report 
-regressions, knowing fully well that the current code _has_ issues?
-Or shouldn't we rather clean them up?
+> +/**
+> + * struct pds_fwctl_cmd - Firmware control command structure
+> + * @opcode: Opcode
+> + * @rsvd:   Word boundary padding
+> + * @ep:     Endpoint identifier.
+> + * @op:     Operation identifier.
+> + */
+> +struct pds_fwctl_cmd {
+> +	u8     opcode;
+> +	u8     rsvd[3];
+> +	__le32 ep;
+> +	__le32 op;
+> +} __packed;
 
-I guess the real fix would be to fiddle with the 'bio_add_page()' logic;
-we are always adding a 'page' reference to the bio, completely ignoring
-whether this page is a slab page or a normal one.
+What's your plan for the scope indication? Right now this would be
+restricted to the most restricted FWCTL_RPC_CONFIGURATION scope in FW.
 
-Discussion at LSF, maybe?
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +/* Copyright(c) Advanced Micro Devices, Inc */
+> +
+> +/*
+> + * fwctl interface info for pds_fwctl
+> + */
+> +
+> +#ifndef _UAPI_FWCTL_PDS_H_
+> +#define _UAPI_FWCTL_PDS_H_
+> +
+> +#include <linux/types.h>
+> +
+> +/*
+> + * struct fwctl_info_pds
+> + *
+> + * Return basic information about the FW interface available.
+> + */
+> +struct fwctl_info_pds {
+> +	__u32 uid;
 
-Cheers,
+I think Jonathon remarked, the uid should go since it isn't used.
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+Jason
 
