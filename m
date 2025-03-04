@@ -1,49 +1,50 @@
-Return-Path: <netdev+bounces-171659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3200FA4E0BB
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 15:25:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1D13A4E0C1
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 15:25:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BA1B16FAA6
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 14:21:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB4BE1887AF2
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 14:22:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0425205503;
-	Tue,  4 Mar 2025 14:21:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66CBF205E0E;
+	Tue,  4 Mar 2025 14:21:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LeQ1PgBE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LAUrCuhy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C3A21FF1C1
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 14:21:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 420E8205ACF
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 14:21:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741098096; cv=none; b=kR68ausBdi1zbWysgbtftDZWb06nNmiuv5ohy52WUiYgKG1SR5SHCgHarLqlgrQLfuN+1cwGGxD4O7taXxJiertvRpLr9KG1znWvlaCbxh/IBV+D07dhzw9tWRNYV1Cp/z4olgpGl9rWjernkPHHilIkfpmads2J9H7Q0AwYeKY=
+	t=1741098099; cv=none; b=tcGHyyKUFVY+iDhDiEsUpCeGqh8KfI/UhFcOFOKNRHEWKyhNZR+fSf/rTOZhrNIDIL/FHdegX1A4zpfYnUIHv0+ItYkUUF/mtz6uF/8JrKtmeUSN2Yp5u2prNNNbvgcem/xhLvCUxj3SFoVPSWL9zEPIYs6rA1EqhFJOCFRl/3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741098096; c=relaxed/simple;
-	bh=u7HmFuC3l1TWxIoD2Bd4ha3xLceZC9S30IdbjbSx0Ec=;
+	s=arc-20240116; t=1741098099; c=relaxed/simple;
+	bh=8phL8Z0nowV8iC+G+2BB6CchiuuX38+hPnWOvYuLRO4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=I84jrk4D4Iz1ymmeklPzVgc6phu1bIB/iXlZbagS/iQyq9pRK+oJtmxxUE5BWDV/qeH0/pgGead5K/v3b5B4D0/Jg7QiahgncqBcItExF08uHUyLkLDXIypDcH7ZEjOA2T5o+9312UJHx1gnW72p863zXAAmk11p8+MwHzZ8VWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LeQ1PgBE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0386C4CEE5;
-	Tue,  4 Mar 2025 14:21:35 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=hU4s9PzVq5EJN0zK/mbX0SL+cpD1nFR97ek7W9LAsc9YJ5WGrDKNfMDcCDmTLZveCZqXPZrUyijKArr0hl59zOIKACFP6bXm66yZonq51JzqXxZBeD3RCKondJ2+tjTrNwhfHK7kRVkaLa6WaQ08ZjYyleUAv+wfWEw+3N6lato=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LAUrCuhy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61E8EC4CEE5;
+	Tue,  4 Mar 2025 14:21:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741098096;
-	bh=u7HmFuC3l1TWxIoD2Bd4ha3xLceZC9S30IdbjbSx0Ec=;
+	s=k20201202; t=1741098098;
+	bh=8phL8Z0nowV8iC+G+2BB6CchiuuX38+hPnWOvYuLRO4=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=LeQ1PgBE4DOvSQzt6oXdBLR7+RHUw0IOf1jXs8vs/cDTRJiNSIvl0I/bgfHSl9iT2
-	 J2hcOivzVtuballDWp2NNr6el8aychMEml2/D6NhijRa+QqL4XFiyUzu5W/ISgBGiF
-	 stW+TBcruDSwvT9zOvUMjuArBi7e9TIyQFFEbonEVUk5pJT7CWXbdUe2z8Z2aW+u/9
-	 3AeCB3VlZk19Cz/Yc7l6U7Hf9SaSIYWTl1SYNJQvyYs+lNhcu82K7TmHGFZeByhAPK
-	 WH2dVby/nL1yZ3eXg2/r+3+UiGjkbnmLbzJKeE+VzHmY56Su57NaUX+OyuPB/29fDy
-	 hLQkcSa3xXoiw==
+	b=LAUrCuhy9HGxh4EhJuBs74lB+Lok8y8Al1hbL2/QEkc0iJXqEKrzoz8xWuodIrkxk
+	 OJXZ0bEcVFRrEm376VIKEXHWNXY1lQ+ZhiSSLBCox6gYcn99aIEB4AJRRmrg3uej3g
+	 u93B3wQAyjoexnEROMADpXqHVZ5N8c0kutmbShy45/1ABSeQsP6KoXPWhKEKzXRnMW
+	 McZxHNnpdyW22tiSBVHrW7NzlsxdEcGCbjZVdDaSXVYfICTvhME+ge9IJ2nUdfsGw+
+	 ATLY6FcNj7U0dZKHBzTKWfXTIpGXRd9hk9eXgbzntYDZsJMJVuxfKgFSSi9Hc26ok7
+	 ONRr8Bfsi0n0w==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Tue, 04 Mar 2025 15:21:09 +0100
-Subject: [PATCH net-next 2/4] net: airoha: Enable Rx Scatter-Gather
+Date: Tue, 04 Mar 2025 15:21:10 +0100
+Subject: [PATCH net-next 3/4] net: airoha: Introduce airoha_dev_change_mtu
+ callback
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250304-airoha-eth-rx-sg-v1-2-283ebc61120e@kernel.org>
+Message-Id: <20250304-airoha-eth-rx-sg-v1-3-283ebc61120e@kernel.org>
 References: <20250304-airoha-eth-rx-sg-v1-0-283ebc61120e@kernel.org>
 In-Reply-To: <20250304-airoha-eth-rx-sg-v1-0-283ebc61120e@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -61,174 +62,47 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
 Cc: netdev@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>
 X-Mailer: b4 0.14.2
 
-EN7581 SoC can receive 9k frames. Enable the reception of Scatter-Gather
-(SG) frames.
+Add airoha_dev_change_mtu callback to update the MTU of a running
+device.
 
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- drivers/net/ethernet/airoha/airoha_eth.c  | 68 +++++++++++++++++++------------
- drivers/net/ethernet/airoha/airoha_eth.h  |  1 +
- drivers/net/ethernet/airoha/airoha_regs.h |  5 +++
- 3 files changed, 48 insertions(+), 26 deletions(-)
+ drivers/net/ethernet/airoha/airoha_eth.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
 diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index a9ed3fc2b5195f6b1868e65e1b8c0e5ef99e920f..54a239ab10aaac4a7bfc52977589415936207962 100644
+index 54a239ab10aaac4a7bfc52977589415936207962..f3a61879e284a7ea12d0ebde2b993f2247cd35d9 100644
 --- a/drivers/net/ethernet/airoha/airoha_eth.c
 +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -615,10 +615,10 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
- 		struct airoha_qdma_desc *desc = &q->desc[q->tail];
- 		u32 hash, reason, msg1 = le32_to_cpu(desc->msg1);
- 		dma_addr_t dma_addr = le32_to_cpu(desc->addr);
-+		struct page *page = virt_to_head_page(e->buf);
- 		u32 desc_ctrl = le32_to_cpu(desc->ctrl);
- 		struct airoha_gdm_port *port;
--		struct sk_buff *skb;
--		int len, p;
-+		int data_len, len, p;
+@@ -1705,6 +1705,20 @@ static void airoha_dev_get_stats64(struct net_device *dev,
+ 	} while (u64_stats_fetch_retry(&port->stats.syncp, start));
+ }
  
- 		if (!(desc_ctrl & QDMA_DESC_DONE_MASK))
- 			break;
-@@ -636,30 +636,41 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
- 		dma_sync_single_for_cpu(eth->dev, dma_addr,
- 					SKB_WITH_OVERHEAD(q->buf_size), dir);
- 
-+		data_len = q->skb ? q->buf_size
-+				  : SKB_WITH_OVERHEAD(q->buf_size);
-+		if (data_len < len)
-+			goto free_frag;
++static int airoha_dev_change_mtu(struct net_device *dev, int mtu)
++{
++	struct airoha_gdm_port *port = netdev_priv(dev);
++	struct airoha_eth *eth = port->qdma->eth;
++	u32 len = ETH_HLEN + mtu + ETH_FCS_LEN;
 +
- 		p = airoha_qdma_get_gdm_port(eth, desc);
--		if (p < 0 || !eth->ports[p]) {
--			page_pool_put_full_page(q->page_pool,
--						virt_to_head_page(e->buf),
--						true);
--			continue;
--		}
-+		if (p < 0 || !eth->ports[p])
-+			goto free_frag;
- 
- 		port = eth->ports[p];
--		skb = napi_build_skb(e->buf, q->buf_size);
--		if (!skb) {
--			page_pool_put_full_page(q->page_pool,
--						virt_to_head_page(e->buf),
--						true);
--			break;
-+		if (!q->skb) { /* first buffer */
-+			q->skb = napi_build_skb(e->buf, q->buf_size);
-+			if (!q->skb)
-+				goto free_frag;
++	airoha_fe_rmw(eth, REG_GDM_LEN_CFG(port->id),
++		      GDM_LONG_LEN_MASK,
++		      FIELD_PREP(GDM_LONG_LEN_MASK, len));
++	WRITE_ONCE(dev->mtu, mtu);
 +
-+			__skb_put(q->skb, len);
-+			skb_mark_for_recycle(q->skb);
-+			q->skb->dev = port->dev;
-+			q->skb->protocol = eth_type_trans(q->skb, port->dev);
-+			q->skb->ip_summed = CHECKSUM_UNNECESSARY;
-+			skb_record_rx_queue(q->skb, qid);
-+		} else { /* scattered frame */
-+			struct skb_shared_info *shinfo = skb_shinfo(q->skb);
-+			int nr_frags = shinfo->nr_frags;
++	return 0;
++}
 +
-+			if (nr_frags >= ARRAY_SIZE(shinfo->frags))
-+				goto free_frag;
-+
-+			skb_add_rx_frag(q->skb, nr_frags, page,
-+					e->buf - page_address(page), len,
-+					q->buf_size);
- 		}
- 
--		skb_reserve(skb, 2);
--		__skb_put(skb, len);
--		skb_mark_for_recycle(skb);
--		skb->dev = port->dev;
--		skb->protocol = eth_type_trans(skb, skb->dev);
--		skb->ip_summed = CHECKSUM_UNNECESSARY;
--		skb_record_rx_queue(skb, qid);
-+		if (FIELD_GET(QDMA_DESC_MORE_MASK, desc_ctrl))
-+			continue;
- 
- 		if (netdev_uses_dsa(port->dev)) {
- 			/* PPE module requires untagged packets to work
-@@ -672,22 +683,27 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
- 
- 			if (sptag < ARRAY_SIZE(port->dsa_meta) &&
- 			    port->dsa_meta[sptag])
--				skb_dst_set_noref(skb,
-+				skb_dst_set_noref(q->skb,
- 						  &port->dsa_meta[sptag]->dst);
- 		}
- 
- 		hash = FIELD_GET(AIROHA_RXD4_FOE_ENTRY, msg1);
- 		if (hash != AIROHA_RXD4_FOE_ENTRY)
--			skb_set_hash(skb, jhash_1word(hash, 0),
-+			skb_set_hash(q->skb, jhash_1word(hash, 0),
- 				     PKT_HASH_TYPE_L4);
- 
- 		reason = FIELD_GET(AIROHA_RXD4_PPE_CPU_REASON, msg1);
- 		if (reason == PPE_CPU_REASON_HIT_UNBIND_RATE_REACHED)
- 			airoha_ppe_check_skb(eth->ppe, hash);
- 
--		napi_gro_receive(&q->napi, skb);
--
- 		done++;
-+		napi_gro_receive(&q->napi, q->skb);
-+		q->skb = NULL;
-+		continue;
-+free_frag:
-+		page_pool_put_full_page(q->page_pool, page, true);
-+		dev_kfree_skb(q->skb);
-+		q->skb = NULL;
- 	}
- 	airoha_qdma_fill_rx_queue(q);
- 
-@@ -762,6 +778,7 @@ static int airoha_qdma_init_rx_queue(struct airoha_queue *q,
- 			FIELD_PREP(RX_RING_THR_MASK, thr));
- 	airoha_qdma_rmw(qdma, REG_RX_DMA_IDX(qid), RX_RING_DMA_IDX_MASK,
- 			FIELD_PREP(RX_RING_DMA_IDX_MASK, q->head));
-+	airoha_qdma_set(qdma, REG_RX_SCATTER_CFG(qid), RX_RING_SG_EN_MASK);
- 
- 	airoha_qdma_fill_rx_queue(q);
- 
-@@ -1161,7 +1178,6 @@ static int airoha_qdma_hw_init(struct airoha_qdma *qdma)
- 	}
- 
- 	airoha_qdma_wr(qdma, REG_QDMA_GLOBAL_CFG,
--		       GLOBAL_CFG_RX_2B_OFFSET_MASK |
- 		       FIELD_PREP(GLOBAL_CFG_DMA_PREFERENCE_MASK, 3) |
- 		       GLOBAL_CFG_CPU_TXR_RR_MASK |
- 		       GLOBAL_CFG_PAYLOAD_BYTE_SWAP_MASK |
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
-index b7a3bd7a76b7be3125a2f244582e5bceab48bd47..dca96f1df67ee971e5442b0acfac211554accc89 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.h
-+++ b/drivers/net/ethernet/airoha/airoha_eth.h
-@@ -176,6 +176,7 @@ struct airoha_queue {
- 
- 	struct napi_struct napi;
- 	struct page_pool *page_pool;
-+	struct sk_buff *skb;
- };
- 
- struct airoha_tx_irq_queue {
-diff --git a/drivers/net/ethernet/airoha/airoha_regs.h b/drivers/net/ethernet/airoha/airoha_regs.h
-index 1aa06cdffe2320375e8710d58f2bbb056a330dfd..8146cde4e8ba370e79b9b1bd87bb66a2caf7649a 100644
---- a/drivers/net/ethernet/airoha/airoha_regs.h
-+++ b/drivers/net/ethernet/airoha/airoha_regs.h
-@@ -626,10 +626,15 @@
- #define REG_RX_DELAY_INT_IDX(_n)	\
- 	(((_n) < 16) ? 0x0210 + ((_n) << 5) : 0x0e10 + (((_n) - 16) << 5))
- 
-+#define REG_RX_SCATTER_CFG(_n)	\
-+	(((_n) < 16) ? 0x0214 + ((_n) << 5) : 0x0e14 + (((_n) - 16) << 5))
-+
- #define RX_DELAY_INT_MASK		GENMASK(15, 0)
- 
- #define RX_RING_DMA_IDX_MASK		GENMASK(15, 0)
- 
-+#define RX_RING_SG_EN_MASK		BIT(0)
-+
- #define REG_INGRESS_TRTCM_CFG		0x0070
- #define INGRESS_TRTCM_EN_MASK		BIT(31)
- #define INGRESS_TRTCM_MODE_MASK		BIT(30)
+ static u16 airoha_dev_select_queue(struct net_device *dev, struct sk_buff *skb,
+ 				   struct net_device *sb_dev)
+ {
+@@ -2400,6 +2414,7 @@ static const struct net_device_ops airoha_netdev_ops = {
+ 	.ndo_init		= airoha_dev_init,
+ 	.ndo_open		= airoha_dev_open,
+ 	.ndo_stop		= airoha_dev_stop,
++	.ndo_change_mtu		= airoha_dev_change_mtu,
+ 	.ndo_select_queue	= airoha_dev_select_queue,
+ 	.ndo_start_xmit		= airoha_dev_xmit,
+ 	.ndo_get_stats64        = airoha_dev_get_stats64,
 
 -- 
 2.48.1
