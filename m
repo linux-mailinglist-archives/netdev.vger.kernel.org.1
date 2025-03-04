@@ -1,152 +1,81 @@
-Return-Path: <netdev+bounces-171609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4026CA4DCDC
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 12:46:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99E7EA4DCDD
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 12:46:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58247176468
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 11:46:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A67A7A5D05
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 11:45:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE6FE1F193D;
-	Tue,  4 Mar 2025 11:45:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62F1C1FBC9B;
+	Tue,  4 Mar 2025 11:46:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MrOL5429"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j415LynE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7483D561
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 11:45:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A7C1F193D;
+	Tue,  4 Mar 2025 11:46:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741088759; cv=none; b=jkYUZVOpIRs0ibzlXlMngoCNMdxaIf6glJwgJc5RlIqfTmjChrpfa2LqvqHo9N22awTVIdxtswoLUE2mg7EhmRrdah04+0UNz+ESfwHAnMa/IgYLv/UTxZKZFx0G3UdfDS2ioTMdqgGMrYSSHWnew0fzuTjM/DOEA6gQtE3xyDM=
+	t=1741088772; cv=none; b=gqlofmdoPYxDS6lBbXXIww6EPBqP4cxReNOrvciqL2OTvPb04bs7UDHj+jSIJ2nv4MzIEXxVJ/DnV+bD3L5Kh96Sv5euwQ1H1lbauLWKgHo9bcXNd3yqE0XWgT30YNLDuBRFYU2aH6BK5a9RaBr/Xbq81xZlEybrW++6OlAFdEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741088759; c=relaxed/simple;
-	bh=4soIBXAhLCkxO3sab6sFxXzD1R3x08j+wWGiid82z2U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G/UCv3JidPdc4/6v2NCYo6Q3QDRIuQpLG/OVQC6lg2Ux3hB4PZ0x+9FkGxqbpQHltkoum2Nu5YK4VAB1jWFoXYzfXMAafSCkBa4gZd7uqYyM4swdwYWKyngq7JZNCyHn3x9F9JyQblbH1N/BTivXgUK3kMFaUK5OFX0n1Kwz6WQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MrOL5429; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741088759; x=1772624759;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=4soIBXAhLCkxO3sab6sFxXzD1R3x08j+wWGiid82z2U=;
-  b=MrOL5429SHySuNA0xzb7e1FLrUnZ/NXsGhLHzGf8wABrOh/a2MNqIx0X
-   hQR8hZNlIjZquqF9Npay+5t7fNHdhiPXidTfXIsoqMynuMb0e7r1FEzzb
-   l/Q+IbjuTNhRnz2Se4lQ1A274vQu7KwnbS7bD5cIecWZjjqtDj0orYoXP
-   u22eKZhMMhJdsFA1+JQGjdUXh0OhOoi3lMNEO7QRT0pGH05ynkGyPSbE+
-   S/7r+FZzfDwWG6APgcEI9CI5Bf7TLYd0oRzGXDTrVwewyR9z9MZvRkmVI
-   JJb0EV/jUOpeSqp/PITwS4P7qQ64y0rD0125IBSB51838B5KojVdIKvta
-   A==;
-X-CSE-ConnectionGUID: w0uLXTvPR1+7SBSboJ89pQ==
-X-CSE-MsgGUID: lv3YhJooSU2sGCH/yz4Izw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="59414277"
-X-IronPort-AV: E=Sophos;i="6.13,331,1732608000"; 
-   d="scan'208";a="59414277"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 03:45:58 -0800
-X-CSE-ConnectionGUID: 1mi39+9bRoa3gjvfekyv4g==
-X-CSE-MsgGUID: g39yr5FXSJSr6oNj+6TxMA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,331,1732608000"; 
-   d="scan'208";a="123472296"
-Received: from mszapar-mobl1.ger.corp.intel.com (HELO [10.245.99.188]) ([10.245.99.188])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 03:45:56 -0800
-Message-ID: <00a160e5-c9b2-4b91-9823-dee37fdc5d25@linux.intel.com>
-Date: Tue, 4 Mar 2025 12:45:53 +0100
+	s=arc-20240116; t=1741088772; c=relaxed/simple;
+	bh=5y3AT23ebdCmJk0btj891bMWItHXaFcvxFbbOso/Wek=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d18hHEKqhmZ6Gytos+euzwPovev7bVumvmAMLde4liy+QXfcBvn+n60yfyC97uArlu1sZqkp4kJW6An4CwkglBJpX+Q42si5A86ZqxQI8jhfPgioKfzlavSYYdON9HS1MoB0MdzNTQ1TYsUUw2fEZitq4AdJ0n9zskkAORB8pLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j415LynE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD207C4CEE5;
+	Tue,  4 Mar 2025 11:46:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741088771;
+	bh=5y3AT23ebdCmJk0btj891bMWItHXaFcvxFbbOso/Wek=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=j415LynE3XvROLsaZHycED6qlb6CjtjfZbQWx4BtYMVBJ0oVwD3EsSzIxTPN6Ei/9
+	 yux6g7RAqXrY4NL0hMC+BqxQpFGvqGrWh6P9qa+bJTsl/3kHkWQ9q5+n/Ec82VLe3t
+	 1F9hS4L0pHgFu6g6nxtZRN3+bKAfqM5xCffSAXDSOypLMagG0aQu4E0qSEQS7Pbc9t
+	 Vqkhv0cyQUqcBXTChTopwP4J++mb+MOdvkuyhplOHlp7lKWLNF7RgMl72EvoSgNVNv
+	 vcVYUzmiCGPlbKa70NIqKxvdxUloQ4PEwgufvZsklGzwMl6a1JwXMOPhufi08vSM5m
+	 M1UBJardsUmkA==
+Date: Tue, 4 Mar 2025 11:46:06 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, shenjian15@huawei.com,
+	wangpeiyang1@huawei.com, liuyonglong@huawei.com,
+	chenhao418@huawei.com, jonathan.cameron@huawei.com,
+	shameerali.kolothum.thodi@huawei.com, salil.mehta@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: hns3: make sure ptp clock is unregister and
+ freed if hclge_ptp_get_cycle returns an error
+Message-ID: <20250304114606.GA3666230@kernel.org>
+References: <20250228105258.1243461-1-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [iwl-net v3 1/5] virtchnl: make proto and
- filter action count unsigned
-To: Paul Menzel <pmenzel@molgen.mpg.de>, Jan Glaza <jan.glaza@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
- Simon Horman <horms@kernel.org>
-References: <20250304110833.95997-2-martyna.szapar-mudlaw@linux.intel.com>
- <20250304110833.95997-4-martyna.szapar-mudlaw@linux.intel.com>
- <9f6b830f-d2ee-4fde-a131-a956a6e84df7@molgen.mpg.de>
-Content-Language: en-US
-From: "Szapar-Mudlaw, Martyna" <martyna.szapar-mudlaw@linux.intel.com>
-In-Reply-To: <9f6b830f-d2ee-4fde-a131-a956a6e84df7@molgen.mpg.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250228105258.1243461-1-shaojijie@huawei.com>
 
+On Fri, Feb 28, 2025 at 06:52:58PM +0800, Jijie Shao wrote:
+> From: Peiyang Wang <wangpeiyang1@huawei.com>
+> 
+> During the initialization of ptp, hclge_ptp_get_cycle might return an error
+> and returned directly without unregister clock and free it. To avoid that,
+> call hclge_ptp_destroy_clock to unregist and free clock if
+> hclge_ptp_get_cycle failed.
+> 
+> Fixes: 8373cd38a888 ("net: hns3: change the method of obtaining default ptp cycle")
+> Signed-off-by: Peiyang Wang <wangpeiyang1@huawei.com>
+> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 
-
-On 3/4/2025 12:15 PM, Paul Menzel wrote:
-> Dear Jan, dear Martina,
-> 
-> 
-> Thank you for the patch.
-> 
-> Am 04.03.25 um 12:08 schrieb Martyna Szapar-Mudlaw:
->> From: Jan Glaza <jan.glaza@intel.com>
->>
->> The count field in virtchnl_proto_hdrs and virtchnl_filter_action_set
->> should never be negative while still being valid. Changing it from
->> int to u32 ensures proper handling of values in virtchnl messages in
->> driverrs and prevents unintended behavior.
->> In its current signed form, a negative count does not trigger
->> an error in ice driver but instead results in it being treated as 0.
->> This can lead to unexpected outcomes when processing messages.
->> By using u32, any invalid values will correctly trigger -EINVAL,
->> making error detection more robust.
->>
->> Fixes: 1f7ea1cd6a374 ("ice: Enable FDIR Configure for AVF")
->> Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
->> Reviewed-by: Simon Horman <horms@kernel.org>
->> Signed-off-by: Jan Glaza <jan.glaza@intel.com>
->> Signed-off-by: Martyna Szapar-Mudlaw <martyna.szapar- 
->> mudlaw@linux.intel.com>
->> ---
->>   include/linux/avf/virtchnl.h | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/include/linux/avf/virtchnl.h b/include/linux/avf/virtchnl.h
->> index 4811b9a14604..cf0afa60e4a7 100644
->> --- a/include/linux/avf/virtchnl.h
->> +++ b/include/linux/avf/virtchnl.h
->> @@ -1343,7 +1343,7 @@ struct virtchnl_proto_hdrs {
->>        * 2 - from the second inner layer
->>        * ....
->>        **/
->> -    int count; /* the proto layers must < VIRTCHNL_MAX_NUM_PROTO_HDRS */
->> +    u32 count; /* the proto layers must < VIRTCHNL_MAX_NUM_PROTO_HDRS */
-> 
-> Why limit the length, and not use unsigned int?
-> 
-
-u32 range is completely sufficient for number of proto hdrs (as said: 
-"the proto layers must < VIRTCHNL_MAX_NUM_PROTO_HDRS") and I believe it 
-is recommended to use fixed sized variables where possible
-
->>       union {
->>           struct virtchnl_proto_hdr
->>               proto_hdr[VIRTCHNL_MAX_NUM_PROTO_HDRS];
->> @@ -1395,7 +1395,7 @@ VIRTCHNL_CHECK_STRUCT_LEN(36, 
->> virtchnl_filter_action);
->>   struct virtchnl_filter_action_set {
->>       /* action number must be less then VIRTCHNL_MAX_NUM_ACTIONS */
->> -    int count;
->> +    u32 count;
->>       struct virtchnl_filter_action actions[VIRTCHNL_MAX_NUM_ACTIONS];
->>   };
-> 
-> 
-> Kind regards,
-> 
-> Paul
-> 
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
