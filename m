@@ -1,119 +1,155 @@
-Return-Path: <netdev+bounces-171599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79D8CA4DC57
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 12:21:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE887A4DC43
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 12:19:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C79B71889948
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 11:19:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A7C27AA2ED
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 11:18:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37E53201019;
-	Tue,  4 Mar 2025 11:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6836020298B;
+	Tue,  4 Mar 2025 11:17:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="kUMu1Lta"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 482961FF1DE
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 11:16:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791D820296C;
+	Tue,  4 Mar 2025 11:17:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741086998; cv=none; b=o6bTcZZ+UvyI9zpw88aAwpdP4S8ddYNa0X3O58cxJqRh+pzY/6cEefm/llBLAz5Pc9rL0ZNS1PeTSkL4Q7kyzPhiZztSI626UqrR/ZlLuaMrz4ajw/8wGnD1ssBJZG56oyfQ3+JvDPo43MlSqPqUdIzbeduSZTxyu/l2R4VgQrE=
+	t=1741087040; cv=none; b=Mbj+lE3pp5RXPiN/goUdpXSnDp7Sf2V0TCviThKd6LIV0v9GGQZPQy0YyVm/eC8EAGtxf0ID8fyMi7qHj3XS0ffy4yio9rdBoQDciERjKPDEMYc7/RcRHwROKY2fwN/Ewh7pk2gJHBGD00k7ZsfFXOaiXcw+s72/ru78JgSqsjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741086998; c=relaxed/simple;
-	bh=SwlsRYrllrlhCOgySq+sgp5w+qo2bhhZUxTpP6TOFqw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DmQrh2GAlxsa0Dxr1CnoD0V3Vsd21p0PF2J3UqEHYag6vszXSTHibnlqAOkAsCGvbmofylzQEpPVh1Dgw7gxvOcDTVVQQvpjF/vNmm7/XcefLynFGpjJ9FUuTgKzE1GJHztEfhiTTa0uvNjZsh4zaV+5zCnB5McGhkGfmvD2sKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 1F3FE61E6478F;
-	Tue, 04 Mar 2025 12:15:58 +0100 (CET)
-Message-ID: <9f6b830f-d2ee-4fde-a131-a956a6e84df7@molgen.mpg.de>
-Date: Tue, 4 Mar 2025 12:15:57 +0100
+	s=arc-20240116; t=1741087040; c=relaxed/simple;
+	bh=QE9f9U6qBLX5qQnRNb/K2veaOv9T9oPGSSr2c+2t69o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uOUTBQTv2HApPZvlsUEP9NvLA9K6U2Dd+W9SUWF1yD6FuUSIcJ1iJhojAU5V3yJadf+7d6SKZXkVomO9zE7rjQM3qtCy6O1DX9B2/eoaqOnwDFOmEtMZ9c1IfWRaOCK8Ygfh+J3zA52AuBO6GuhQDGYXsCwI1UrkOzkW3LuQyMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=kUMu1Lta; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=s8QP+PcdkEe8qBX7uaK17qVTpMvKKoLatmaqsWLrObc=; b=kUMu1LtaST727sBsLR9Z+xv+pT
+	VTEA9V17eS0Mm3AATaXIxZ36sX83I1ISqlP8bw+XbbJXh01HNPecswM08cQXZ2ZW3UjTO22N44ff3
+	f/1jk55vMSQXGkHnSPcEeprdM2BYF94IZj3ZlwHp1Ecpi8Dl0z/6upf/E60x00ieSlkSvIIY4HsEj
+	in3binWX42cjNNGEKN4gkVbhXrqCaP4HJS36MR7jzEHKWsEI/MIVfkZGJ1PssmeEaobMSimhFXMcj
+	BFMLuMuYOUA4z2Z/S+zzzXKN13y29cUcsbHMGmXGMI6rp4+Ep+jf9AWn+OITzaoBlsa1zxLLUfEgC
+	sOA//5rQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33082)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tpQGh-0002Xw-2u;
+	Tue, 04 Mar 2025 11:17:00 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tpQGc-0004kQ-1S;
+	Tue, 04 Mar 2025 11:16:54 +0000
+Date: Tue, 4 Mar 2025 11:16:54 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Biju Das <biju.das.jz@bp.renesas.com>
+Cc: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH 3/3] net: stmmac: Add DWMAC glue layer for Renesas GBETH
+Message-ID: <Z8bhJkxUbG_HjXVf@shell.armlinux.org.uk>
+References: <20250302181808.728734-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250302181808.728734-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <Z8SydsdDsZfdrdbE@shell.armlinux.org.uk>
+ <CA+V-a8vCB7nP=tsv4UkOwODSs-9hiG-PxN6cpihfvwjq2itAHg@mail.gmail.com>
+ <Z8TRQX2eaNzXOzV0@shell.armlinux.org.uk>
+ <CA+V-a8vykhxqP30iTwN6yrqDgT8YRVE_MadjiTFp653rHVqMNg@mail.gmail.com>
+ <Z8WQJQo5kW9QV-wV@shell.armlinux.org.uk>
+ <TY3PR01MB113468803E298C5FA6FB6712886C82@TY3PR01MB11346.jpnprd01.prod.outlook.com>
+ <Z8bPPaT4Vsob4FHH@shell.armlinux.org.uk>
+ <TY3PR01MB1134624A76189BF079F1CE82186C82@TY3PR01MB11346.jpnprd01.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [iwl-net v3 1/5] virtchnl: make proto and
- filter action count unsigned
-To: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>,
- Jan Glaza <jan.glaza@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
- Simon Horman <horms@kernel.org>
-References: <20250304110833.95997-2-martyna.szapar-mudlaw@linux.intel.com>
- <20250304110833.95997-4-martyna.szapar-mudlaw@linux.intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250304110833.95997-4-martyna.szapar-mudlaw@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <TY3PR01MB1134624A76189BF079F1CE82186C82@TY3PR01MB11346.jpnprd01.prod.outlook.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Dear Jan, dear Martina,
-
-
-Thank you for the patch.
-
-Am 04.03.25 um 12:08 schrieb Martyna Szapar-Mudlaw:
-> From: Jan Glaza <jan.glaza@intel.com>
+On Tue, Mar 04, 2025 at 10:56:39AM +0000, Biju Das wrote:
+> > For the failure to happen, you need to check whether EEE is being used:
+> > 
+> > # ethtool --show-eee ethX
+> > 
+> > and check whether it states that EEE is enabled and active, and Tx LPI also shows the timer value.
+> > 
+> > You need a PHY that does stop it's receive clock when the link enters low-power mode. PHYs are not
+> > required to have this ability implemented, and there's no way for software to know whether it is or
+> > not.
+> > 
+> > Then, you need to be certain that your link partner does actually support EEE and signals LPI from its
+> > side, rather than just advertising EEE. Lastly, you need to ensure that there is no traffic over the
+> > cable when you're resuming for the period of the reset timeout for the failure to occur. If the link
+> > wakes up, the clock will be started and reset will complete.
+> > 
+> > One can rule out some of the above by checking the LPI status bits, either in the DWMAC or PHY which
+> > indicates whether transmit and/or receive seeing LPI signalled.
+> > 
+> > If the link doesn't enter low power, then the receive clock won't be stopped, and reset will complete.
+> > If the link wakes up during reset, then the clock will be restarted, and reset will complete before
+> > the timeout expires.
+> > 
+> > So, the possibility for a successful test is quite high.
 > 
-> The count field in virtchnl_proto_hdrs and virtchnl_filter_action_set
-> should never be negative while still being valid. Changing it from
-> int to u32 ensures proper handling of values in virtchnl messages in
-> driverrs and prevents unintended behavior.
-> In its current signed form, a negative count does not trigger
-> an error in ice driver but instead results in it being treated as 0.
-> This can lead to unexpected outcomes when processing messages.
-> By using u32, any invalid values will correctly trigger -EINVAL,
-> making error detection more robust.
 > 
-> Fixes: 1f7ea1cd6a374 ("ice: Enable FDIR Configure for AVF")
-> Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Jan Glaza <jan.glaza@intel.com>
-> Signed-off-by: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
-> ---
->   include/linux/avf/virtchnl.h | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+> This what I get on next. It is showing enabled , but inactive.
 > 
-> diff --git a/include/linux/avf/virtchnl.h b/include/linux/avf/virtchnl.h
-> index 4811b9a14604..cf0afa60e4a7 100644
-> --- a/include/linux/avf/virtchnl.h
-> +++ b/include/linux/avf/virtchnl.h
-> @@ -1343,7 +1343,7 @@ struct virtchnl_proto_hdrs {
->   	 * 2 - from the second inner layer
->   	 * ....
->   	 **/
-> -	int count; /* the proto layers must < VIRTCHNL_MAX_NUM_PROTO_HDRS */
-> +	u32 count; /* the proto layers must < VIRTCHNL_MAX_NUM_PROTO_HDRS */
+> root@smarc-rzg3e:~# ethtool --show-eee eth0
+> EEE settings for eth0:
+>         EEE status: enabled - inactive
+>         Tx LPI: 1000000 (us)
+>         Supported EEE link modes:  100baseT/Full
+>                                    1000baseT/Full
+>         Advertised EEE link modes:  100baseT/Full
+>                                     1000baseT/Full
+>         Link partner advertised EEE link modes:  Not reported
 
-Why limit the length, and not use unsigned int?
+That means your link partner doesn't support EEE (or has EEE disabled)
+so the issue we're discussing in this thread doesn't occur for your
+setup.
 
->   	union {
->   		struct virtchnl_proto_hdr
->   			proto_hdr[VIRTCHNL_MAX_NUM_PROTO_HDRS];
-> @@ -1395,7 +1395,7 @@ VIRTCHNL_CHECK_STRUCT_LEN(36, virtchnl_filter_action);
->   
->   struct virtchnl_filter_action_set {
->   	/* action number must be less then VIRTCHNL_MAX_NUM_ACTIONS */
-> -	int count;
-> +	u32 count;
->   	struct virtchnl_filter_action actions[VIRTCHNL_MAX_NUM_ACTIONS];
->   };
+In order to do a valid test for the issue in this thread, you need a
+link partner that supports EEE and has EEE enabled.
 
+Note that also with an EEE capable setup, with the LPI timer set to
+one second, you need to have not transmitted any packets for one
+second before the transmit path enters LPI. Although this is the
+default for stmmac, it seems to me to be an excessively long default,
+and may even be masking some problems.
 
-Kind regards,
-
-Paul
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
