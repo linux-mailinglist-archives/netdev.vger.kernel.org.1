@@ -1,238 +1,247 @@
-Return-Path: <netdev+bounces-171537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1357A4D668
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 09:31:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68ADCA4D6D4
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 09:43:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DBB067AB30B
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 08:30:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E693A1740E7
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 08:43:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 275341FBEA8;
-	Tue,  4 Mar 2025 08:31:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1141D1FC105;
+	Tue,  4 Mar 2025 08:43:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nC6DstLD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AIDGOeLq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f194.google.com (mail-yw1-f194.google.com [209.85.128.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2981FBEA2
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 08:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741077074; cv=fail; b=gMLRdwx65NH54JBdoZC8HJZ7EsYCY1xSb+aT+Xjy7t+JKyL0dZdwlKS6M06OYAZSvZES9xM+Kdwff5Xwi3lqMS+NDXlzwGqB4f2VqwGp77xiCO3bzVZRsHTUn6XTRfBBvS62YGWuzxuWiJNsTB4mBPSzNhFP8h3mphx+cHCIR2s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741077074; c=relaxed/simple;
-	bh=mNTcnQ0TF2dCj5pyaGC+TZLHh1vw/f+5ndkPIzRkmdM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=kyuzcZywa1uJj1v7GJBwlh47tG5h+41pZt6SyuPeyuj58xDtvMdvxXGd/QwMqMLUH5paiSB9deqPRTH5VuCHeMUeS1jaih8MVb8XEdUAJd0Fb6SwTwh0YEykMlVVnfznvfYytOnZP1njkI9hmK6ZDq6v9w+Iuk8MdkRMF3bd5OI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nC6DstLD; arc=fail smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741077072; x=1772613072;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=mNTcnQ0TF2dCj5pyaGC+TZLHh1vw/f+5ndkPIzRkmdM=;
-  b=nC6DstLD5WPX+ZQhRBnnhJ8ShaWA4tEGAoFeFEW4T2j1gN9Ztq49upg/
-   y6nuskJiXnKkz0K/ZFuN89Kie0KAGowjIiWIu7+n/E+3Po9MmkmHy2rmw
-   PKxIISIfs4lrthZHApC1j8Wh5k/2p4UVLverSdP3rp7YG0vMXT5u21fxP
-   EU4lOFu0U3vfZF4m1ouoloDMtcNxDd8T+dKTcGFPvDxxXL5ixo/2gBUp4
-   HOv2S8DOn4XGDH3UY2VTLqw83BS/65grZEc0aVAu8cw6yYQ4HC5I6Wl3M
-   F2FdKelr7VUpt1xLu+IYmKBorDwScj1JEjHj+kj6Rn12D1Sk8/exYKVq7
-   g==;
-X-CSE-ConnectionGUID: 7fiNw6x9TDun5qkWRqbk+w==
-X-CSE-MsgGUID: 9bajZ2UXQsi0lNph4HDyVA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="42232696"
-X-IronPort-AV: E=Sophos;i="6.13,331,1732608000"; 
-   d="scan'208";a="42232696"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 00:31:11 -0800
-X-CSE-ConnectionGUID: BXCibxHuSbaZLkeHOGrKCA==
-X-CSE-MsgGUID: OibFVT02QOOoKqeukIXAnQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,331,1732608000"; 
-   d="scan'208";a="123320834"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 00:31:11 -0800
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.14; Tue, 4 Mar 2025 00:31:10 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Tue, 4 Mar 2025 00:31:10 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.176)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Tue, 4 Mar 2025 00:31:09 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CACFet6Si6FAqWpFuOjs7iilf/ekcocBorEi1o17V8ZzyOvouY7Nj+aKMJzTjAr2VRTlfmgwj8llUWSqV9oip0M4O/XtAkifuxQx9vzOXIyzZwWoKUo2XRfbZdx9geZMsN9pUBny6Pkqf6QTy6+vrgGPXpbiv1LT81ApNwBnVMgvcBCJFiXYVhvJ6jG5pmVJwA5ln0alfERGxzkmLLz/tgANuvIZmKqxEQc+ZVyvOQH3+MoccPnonoh10jFuC0dApQWtnUYECsxEko60HJSbGH5ehKU/7KkbgfQqzX4uI2QGqqlmPGFixZBBhB2NN4e6V8XpwtYHpXF5c+rTXya9sA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Du9Pjokg6nKhnOtolx8+6YxZU200aHoOhDBC1eOe6wU=;
- b=E/WrBLH6iy3vMYkDuBut3CTlHU2GQUx1hWlfheBGwtD1GaO6SkT5Sjovc1J/rsMxBf72TnE35YIMNlS1xJTTpG6S+OccggBnqfeTxuxEOkygPfVRHPGdchlXkf4M6FyJMeNckvUak591cu+Pmo0AtLEJGyXu84LW/63ZS8giRQOPcs+TSZFYtXPkfe2NZ5mxERdKebp69LnamQr0pIrR+Yu6+aKSdIliYMRD2EMg6WkTPTnYa0FagIQ9uWRwGuMj5wyotbHsvxTri2hTpw20rOssZW2MEcBtkyuXS/tdhQqs99O4T/ovsYfvJp+9F+BOraFnh4vXX0DMANstiqDptw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH8PR11MB7965.namprd11.prod.outlook.com (2603:10b6:510:25c::13)
- by DS0PR11MB7766.namprd11.prod.outlook.com (2603:10b6:8:138::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.29; Tue, 4 Mar
- 2025 08:31:05 +0000
-Received: from PH8PR11MB7965.namprd11.prod.outlook.com
- ([fe80::ad6c:cf56:3c3d:4739]) by PH8PR11MB7965.namprd11.prod.outlook.com
- ([fe80::ad6c:cf56:3c3d:4739%4]) with mapi id 15.20.8489.025; Tue, 4 Mar 2025
- 08:31:05 +0000
-From: "R, Bharath" <bharath.r@intel.com>
-To: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "horms@kernel.org" <horms@kernel.org>,
-	"jiri@nvidia.com" <jiri@nvidia.com>, "Jagielski, Jedrzej"
-	<jedrzej.jagielski@intel.com>, "Polchlopek, Mateusz"
-	<mateusz.polchlopek@intel.com>, "Wegrzyn, Stefan" <stefan.wegrzyn@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v5 09/15] ixgbe: add E610
- functions getting PBA and FW ver info
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v5 09/15] ixgbe: add E610
- functions getting PBA and FW ver info
-Thread-Index: AQHbhFj61jSz8PgMSEeUPv2Jvdd/uLNitpFg
-Date: Tue, 4 Mar 2025 08:31:04 +0000
-Message-ID: <PH8PR11MB7965B324FBB9804AC1F35B86F7C82@PH8PR11MB7965.namprd11.prod.outlook.com>
-References: <20250221115116.169158-1-jedrzej.jagielski@intel.com>
- <20250221115116.169158-10-jedrzej.jagielski@intel.com>
-In-Reply-To: <20250221115116.169158-10-jedrzej.jagielski@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH8PR11MB7965:EE_|DS0PR11MB7766:EE_
-x-ms-office365-filtering-correlation-id: 96839ef5-3e1d-4aa0-80b2-08dd5af6e794
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7053199007|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?173DmUHREWMV63bvpaCXR+RjPT2ZqB/IdoEMDhYzKOpyvIOuyXiVbZvtkS2I?=
- =?us-ascii?Q?tSTXvPtLswGv4Zu3rARhy709bplsIE1Ztry8nqtoUnbIxBE2zT3Q5y7LIsJV?=
- =?us-ascii?Q?UdnDJ/kzzTwkbxdEoEM9soPaucA0Ylnsy74JSM53HrKkZowYgM+kOsfAbJB1?=
- =?us-ascii?Q?jBqymAekhSq7diQYcb8gFnKoMhYgp564RtCXKok4PkD8ZHvtdt89pC2MtWCT?=
- =?us-ascii?Q?YnhNLHPkGPksqnKDlP0vIJ0+4QxBMUeJoowI32TuIzDIcTX0N0CSj2xhhXHo?=
- =?us-ascii?Q?WydnARzEBqNA/nSX6IIeOB2TBGJliDgtR180INF2vzNgoIP/vsFTuagCFPmm?=
- =?us-ascii?Q?jrF5SAokmBUJCrAUepRnGRDUm0JTmop4LM79SXU35Ps9dtL5yU3rC6GCzYuY?=
- =?us-ascii?Q?fYllK/MSD4FVxXJt/CLBfNHpuVLoj0uK4mF2l5+Xku8DjFuk9V5Q/N6HN5Ev?=
- =?us-ascii?Q?4CNuokAdpgmTjtBqv5+peUKRVZm9349GAutV2fo/0P7VPoBNG+HMzqu0bGc5?=
- =?us-ascii?Q?YV4vDsmJxCteQqF/tjVKetoF5BtzsXEz38esE1rj6Mny+AsOLNwnWV2gnGfr?=
- =?us-ascii?Q?/JqwH2+22baDNlnJy5mpGol6/B7bRppftgrgkSZzk8qgpthSlitAoU8b8ttF?=
- =?us-ascii?Q?sZvRlryFI1+03RcFQF6SGqTZqqKvCBjypP8eMwLiZ4tStRybtKJlUKqZMIil?=
- =?us-ascii?Q?QJi9hHenfXGph9j75LL3vlmZBI5cmvUYvr36R8LGJp1qAa5U7rP9yWVyc9PW?=
- =?us-ascii?Q?S+SVLbLQIABfT9L6/cL82uOoz1+BZelIJ2/jspgY/EUYPt/Keh24sEJ4qYTa?=
- =?us-ascii?Q?qknBFNUDNKwY14f6jbwGW+6s2L/9BG2qG91lVhyvSIBaorZxt99X884ziqVW?=
- =?us-ascii?Q?wyGS+++qovF6ChtwfE7TT/deGmlwr7YPbrmFLCD827KIrTKQ8O3L5z7U80sD?=
- =?us-ascii?Q?EYVW61UakgdIgAZ9xU7dYXCohuQSjmeveVsU+oRwpajGmZLOmhEi7auBrruE?=
- =?us-ascii?Q?3P+QNi7kyZbDjlg+W/rDWDxnHkNgsnLwIp5xOEscZyWDl7TyoBkO1F7Yal5Z?=
- =?us-ascii?Q?FTA0rvZn4fQXvmDCBUZihrSGCQ/E4ioGaQkDY0q8tT+R/6FK/APvsQHC7U0D?=
- =?us-ascii?Q?H/Rkai+1xtoIZKJXxY/h1lSanHEV5WlFekQlIkoLzkwE1F7/p6a6uAQ9uVnN?=
- =?us-ascii?Q?wez/4IGVpnt2x1XMjHk6mtIHXTnlbFWswQesiCRR/B8NYCxK/u/62sWxB2KZ?=
- =?us-ascii?Q?Ho5TML2RiH4PX3C+p4/AHTy9XA5F9Kt1VdJ+d926vz6VzDdDZ2LbEeIrZD3J?=
- =?us-ascii?Q?qyy3EOwUUDL+32en0KZ98kqmo3OdVV8Tk6g5eMeI0qqd072UK909vGR4u1UB?=
- =?us-ascii?Q?XK87EmmRwizvpMShWms80WbfJWxlbQUZ6GCqonRkTmdB+EEjPcS9leHUopbj?=
- =?us-ascii?Q?d/OADq3RvBt3v9IgFyte0JRg6N7JzfqK?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB7965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7053199007)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?RP8UC2sAuL7zCak+AoznnU+KtxqueE/cqOkbn2Bw2YWSmA+V0AHgNsA5WlAW?=
- =?us-ascii?Q?GJCu1XyLJwzrE7SgU6xk/OZiMLVEnOz+lZ28PNhlUscCDqDPqKRzt9OPtwiZ?=
- =?us-ascii?Q?xxOtwTblYAg9InQXUtrDQwC7vNYecjyW9gG/hdRMr3d45UrLfq8Xw4CkJBfQ?=
- =?us-ascii?Q?7QjuVVkUwiSOeBuca01o79TKEyl6ZMkvpnIcZ7olak/S4jXoMSQwxijMxvcM?=
- =?us-ascii?Q?hrfghB4zrOMpG6Mu8aV94Z2Nvtm3JjN0g8qlQO7t7QdI4Kc84aLmv1hKyf96?=
- =?us-ascii?Q?9+zw7UUgt/6xqUCMyx7/0Nj0l1JHW34kZrjTZcLFadA/t5eIeTMLnZlPIRnt?=
- =?us-ascii?Q?kQJMXUVrKUPUwahwmisNBqKXvzkp2Emys0c7l8qsM+k2O6L+Y9nrTKP/Ovl/?=
- =?us-ascii?Q?KCiyvVYwlYSLNqqMRGLD/q+0H1gJfYLqBOh2K+x4cwszupwpClnZq7buebjo?=
- =?us-ascii?Q?3Al4iGharVxJACCAIEAbXrt3PNdKOSjYbjcmY1Ex+QKu7WQM0pUe/yohbysn?=
- =?us-ascii?Q?S/LLVA60K43d7EImYkNctrXZGqBnqm+Q58rI8/ZDlLbRTx4p3E11VbeCipLp?=
- =?us-ascii?Q?yjkef+GQ63D+VetQQSD5rzvyQCUI/YwTgow086khyg87ammCb5qZO28dADCz?=
- =?us-ascii?Q?ZLgXyJyUNN/rQcSpzNUoBV4K5r9XjnR4R/EOqqFtxcXuHYwQNW0xc6FvwbVa?=
- =?us-ascii?Q?wZPA33wMRJtVHNEV2lHW10CRQrS+fWnZkqZLb8GxI7ugpraXYnzxwrDBhPah?=
- =?us-ascii?Q?PEOXyHnx4TVNnF6GxA2bqHWnOyWUkCqlqxM4JGm1x13rHO1jIpxDyDlFVChC?=
- =?us-ascii?Q?qRru/1oknbuJxWAdMmWZA4gmyZ0Oi7pdlILWQii+U7GZXleRR/EuWJKxtmkE?=
- =?us-ascii?Q?i9oELqIZT+cic4lx5tMRlfuUQ4HV853y50pJtwaoOjOSJajFSiBhWBKcVX9l?=
- =?us-ascii?Q?m7qeQnxcL7fUQ1n0Pje1XrXGEJHlUaMXPcGF5coemSdwzCZAFHrb8vD5Ips5?=
- =?us-ascii?Q?MxSYlsPtR1zaO5oFD9QG8VLAhe4kwsOsbu5xvuBi3HpZwuIpjeT1XD2Q+NmT?=
- =?us-ascii?Q?izJ+Mkpy6Sc7wCNN/Tf00wRJd+H3tfoa7y3QrYPh/lJa7MBhI3XSHbz6IdWl?=
- =?us-ascii?Q?R664l+Z6x/M64Vx6O4mjL1gjlP9Kv8GEcxpEzc4wHIx426ElOMNInQZm6y58?=
- =?us-ascii?Q?pucQUQhvMDSOv+i4TvBUJ8KifpRPap0mHs65r3lGbPTUa9NZY1YDKNYvLX2L?=
- =?us-ascii?Q?IbDWVmpIyd2RtvkducBOsXPvKU54AeOodDVhveMm5hh+hZXdkTq6OOpxGNrY?=
- =?us-ascii?Q?qb0fVSYBpGqfGltlNUOboQp0IDnIrJ67m7ozihbXHd4J+JAIjiF7LtKPwXR8?=
- =?us-ascii?Q?zbwOJij5CDKhFh5ua7jicFJyGdHl3v8ZEa+Dgo/X9iwc0W48gYJC+saHQxn6?=
- =?us-ascii?Q?6QnuLn5bbpMSiizJwX6oXgoNK73nMKI/f6PM9uBAf2rFtA+mZfdpNWAd96CD?=
- =?us-ascii?Q?5OUG1cAAMNS6gZsdFA0lOckoZ8jHLjhJ2NUwlskEBSPnY2X2FKBNuQqdsAXq?=
- =?us-ascii?Q?3SIfq404ai1011JPJGE=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 447011FBEB1;
+	Tue,  4 Mar 2025 08:43:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.194
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741077789; cv=none; b=rX8DGwKuE7qhVJLP0JWrNuqu408C+JugkihxNyouluUnkRQKXiJd3j9zD8T93oWrKpdwixhv2NtPHRYO7JTBEktDlO0dob+pXSzXgRqmojqaSuIbIXhSgR88I1HbJPuyIV8CL9Z47h9qCLeRedr+cUCeRXNvjs61u5UZJhwysZo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741077789; c=relaxed/simple;
+	bh=dTtL6Jur3atffX/frcpKEb7wF2vN7b/LS2OXFn6lV18=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hXGmOE7nPabjxpT1Y/cLH9X/dS6RdOICbc9ZrNG3dzB+h7kE3uwn3Iv/XS30KiPQHfBzeyOcDVvz4cz1y54vUULtzS+ger8frHOwDW2fyRSmeDTiPXXER2BgxF/4oHF9yikWpLXQo6gUcvf+8GOdCEimi12Z2s1XEtqB9Ut/Zms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AIDGOeLq; arc=none smtp.client-ip=209.85.128.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f194.google.com with SMTP id 00721157ae682-6f7031ea11cso53378687b3.2;
+        Tue, 04 Mar 2025 00:43:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741077786; x=1741682586; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H7DJBIx3iIusUVOEMB5nnJFYTmd3nur6e8lzlUxwqLk=;
+        b=AIDGOeLqtovb2yr+ZgA+DOQLDoBpM+VLZLQ6LqQLe7ezhAUiIt/zM/qgq/qYacwoAp
+         3Q8m8Hd3RboRGSrhWp5Ufsoci465g9q+/8E2trcnxrB/Ci9ZDAoITORfXJVTIhrtOvco
+         Kia003XJ9G0Ok5Nmsc7q4ugPMFfbT9cPGRXmmvKr6YqFvpg1WIIQzRJ0EbTvpOA0ehOr
+         4xXIo5CPzSshvoHiQ5gaj+5D/scYU7jNGESw+ovghUL+PC2etQ4yFaB4TeTVDKAfbHGq
+         PubAT+Aprwx/B6J4lmT0JpPKwv+IkOzdxKbuEWUMsOmt8veB2ID7uQGfElkNhV2Q0xUM
+         WA9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741077786; x=1741682586;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=H7DJBIx3iIusUVOEMB5nnJFYTmd3nur6e8lzlUxwqLk=;
+        b=n+U0UZ+EaIa8Sb27vgIcfGz7ReXhnBprW6X3ld2ZDVFpkBWWfOlSC41oiy0KE2y1Ae
+         EGaF9KT6mk6gid/UPF1Gp2A4QZuYWN2kmKYsJxelCUTynJG+sZ/3ln3Sh2pu930eu6lz
+         R/QWpDRRuhu/khajEtOTAXP3CjkIURGRg1lshCazzWJAFM/Hj9dKYv6QjDBJhNg4Vv81
+         s3XJT6J7XxdNNx4lv6fTXsHKgwTwMQ5PG2l9nw3IlcFnzT5NXuY/IONlinOuh3X99jUp
+         CQjeqQQij2hSBjVT51SsZKfBXwuMUZhi2CbM5o4IpZ/tIaCp58oKwBcxVJDkkKTMOSgS
+         NJPA==
+X-Forwarded-Encrypted: i=1; AJvYcCUEQVo23PidUQfh6JFWad3O8S4RzhMF/jlZcCJ/pUT+Y1Z7yx0GRiUP6kayTU3YeFa6Nh0=@vger.kernel.org, AJvYcCUmmj2VOOPZDRCVLXHgQq2oWipJ+Qcp4Wowv61q7Q94RV3E/wriIREPebbzx1W4lVZANgB1/y6HPuUTuuusI7NgYNVb@vger.kernel.org, AJvYcCWtbmerjTOG9ZlHCzx17spZfbkyFbnmeWDb10E963AlnC8/xaQlG94aWnbNxltv3c35c+5kZSDETyFLg/J5@vger.kernel.org, AJvYcCXfODhJq3pDxbor7egvnuhh7w81C/s4tSYweG0ffzqvWcqUPIcx4u+Z1BBZtV9PIB73BOgXg4CJ@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxmefm+1N1fDeAWJhmlOETXER/fGGV6NporMvSKsWdlX80J8eeZ
+	kaHc4dWpp4UmhKwWe1PGvXTto4IxifGJhpaHCDwsr77a9Ufgk2cxRxzfr55deMMRHGZQXREqvaj
+	7QJYQLRvP7VpE8t4bkfk5RdpWhvc=
+X-Gm-Gg: ASbGnctJeFSUghaZsn1bZ8wUQsn0YP60p91M0+a6EBKtu4qQR2S8jxY2Cq5p98q7Wgf
+	3fuK4ydWBITqBG+xiCi+BC60JFgjZSzPdokyYDIps+u5kgnV90yPOdyKyB5jxNnOgNCHF1+PygX
+	I16nNOly15Nb9uFvjGkgmLqm4s/A==
+X-Google-Smtp-Source: AGHT+IFwKhleghfxmR4fo46mZcDQS529bArSvfkTfmrf2+HZom9bVtkcaUWWW29c+BaFyOYjznUloBGTXBdQLw3Z1i8=
+X-Received: by 2002:a05:690c:6303:b0:6fd:3f88:e0a9 with SMTP id
+ 00721157ae682-6fd49e2a409mr227818067b3.0.1741077786117; Tue, 04 Mar 2025
+ 00:43:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB7965.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 96839ef5-3e1d-4aa0-80b2-08dd5af6e794
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Mar 2025 08:31:04.9800
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: XInzihtWBz8Kd8Vbc2oFMAnxg+cehQ/cWPRzcMVHD3LWEY6FqrsYoHkTGczo8fHx3dQ5bmQhampV2OrBmTmjaw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7766
-X-OriginatorOrg: intel.com
+References: <20250303132837.498938-1-dongml2@chinatelecom.cn>
+ <20250303132837.498938-2-dongml2@chinatelecom.cn> <20250303165454.GB11590@noisy.programming.kicks-ass.net>
+ <CADxym3aVtKx_mh7aZyZfk27gEiA_TX6VSAvtK+YDNBtuk_HigA@mail.gmail.com>
+ <20250304053853.GA7099@noisy.programming.kicks-ass.net> <20250304061635.GA29480@noisy.programming.kicks-ass.net>
+ <CADxym3bS_6jpGC3vLAAyD20GsR+QZofQw0_GgKT8nN3c-HqG-g@mail.gmail.com>
+In-Reply-To: <CADxym3bS_6jpGC3vLAAyD20GsR+QZofQw0_GgKT8nN3c-HqG-g@mail.gmail.com>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Tue, 4 Mar 2025 16:41:29 +0800
+X-Gm-Features: AQ5f1Jq2_mS0v23bn6W1X-IWDb9MW8dDTnlwz6_dNKl9ybY4p55hAFXAjC92mhs
+Message-ID: <CADxym3bS6XdGFhKeEm5TKD-_ubEQB+yTrd=7_L_CDn4xthe-Vg@mail.gmail.com>
+Subject: Re: [PATCH v4 1/4] x86/ibt: factor out cfi and fineibt offset
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: rostedt@goodmis.org, mark.rutland@arm.com, alexei.starovoitov@gmail.com, 
+	catalin.marinas@arm.com, will@kernel.org, mhiramat@kernel.org, 
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	eddyz87@gmail.com, yonghong.song@linux.dev, john.fastabend@gmail.com, 
+	kpsingh@kernel.org, sdf@fomichev.me, jolsa@kernel.org, davem@davemloft.net, 
+	dsahern@kernel.org, mathieu.desnoyers@efficios.com, nathan@kernel.org, 
+	nick.desaulniers+lkml@gmail.com, morbo@google.com, samitolvanen@google.com, 
+	kees@kernel.org, dongml2@chinatelecom.cn, akpm@linux-foundation.org, 
+	riel@surriel.com, rppt@kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Jedrzej Jagielski
-> Sent: Friday, February 21, 2025 5:21 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>;
-> netdev@vger.kernel.org; horms@kernel.org; jiri@nvidia.com; Jagielski, Jed=
-rzej
-> <jedrzej.jagielski@intel.com>; Polchlopek, Mateusz
-> <mateusz.polchlopek@intel.com>; Wegrzyn, Stefan
-> <stefan.wegrzyn@intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-next v5 09/15] ixgbe: add E610
-> functions getting PBA and FW ver info
->=20
-> Introduce 2 E610 specific callbacks implementations:
-> -ixgbe_start_hw_e610() which expands the regular .start_hw callback with
-> getting FW version information
-> -ixgbe_read_pba_string_e610() which gets Product Board Assembly string
->=20
-> Extend EEPROM ops with new .read_pba_string in order to distinguish gener=
-ic
-> one and the E610 one.
->=20
-> Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-> Co-developed-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
-> Signed-off-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
-> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> ---
->  .../ethernet/intel/ixgbe/devlink/devlink.c    |   5 +-
->  .../net/ethernet/intel/ixgbe/ixgbe_82598.c    |   1 +
->  .../net/ethernet/intel/ixgbe/ixgbe_82599.c    |   1 +
->  .../net/ethernet/intel/ixgbe/ixgbe_common.c   |   1 +
->  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 181 +++++++++++++++++-
->  drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |   2 +-
->  drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |   2 +
->  .../ethernet/intel/ixgbe/ixgbe_type_e610.h    |   1 +
->  drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c |   1 +
->  drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c |   1 +
->  10 files changed, 190 insertions(+), 6 deletions(-)
->=20
+On Tue, Mar 4, 2025 at 3:47=E2=80=AFPM Menglong Dong <menglong8.dong@gmail.=
+com> wrote:
+>
+> On Tue, Mar 4, 2025 at 2:16=E2=80=AFPM Peter Zijlstra <peterz@infradead.o=
+rg> wrote:
+> >
+> > On Tue, Mar 04, 2025 at 06:38:53AM +0100, Peter Zijlstra wrote:
+> > > On Tue, Mar 04, 2025 at 09:10:12AM +0800, Menglong Dong wrote:
+> > > > Hello, sorry that I forgot to add something to the changelog. In fa=
+ct,
+> > > > I don't add extra 5-bytes anymore, which you can see in the 3rd pat=
+ch.
+> > > >
+> > > > The thing is that we can't add extra 5-bytes if CFI is enabled. Wit=
+hout
+> > > > CFI, we can make the padding space any value, such as 5-bytes, and
+> > > > the layout will be like this:
+> > > >
+> > > > __align:
+> > > >   nop
+> > > >   nop
+> > > >   nop
+> > > >   nop
+> > > >   nop
+> > > > foo: -- __align +5
+> > > >
+> > > > However, the CFI will always make the cfi insn 16-bytes aligned. Wh=
+en
+> > > > we set the FUNCTION_PADDING_BYTES to (11 + 5), the layout will be
+> > > > like this:
+> > > >
+> > > > __cfi_foo:
+> > > >   nop (11)
+> > > >   mov $0x12345678, %reg
+> > > >   nop (16)
+> > > > foo:
+> > > >
+> > > > and the padding space is 32-bytes actually. So, we can just select
+> > > > FUNCTION_ALIGNMENT_32B instead, which makes the padding
+> > > > space 32-bytes too, and have the following layout:
+> > > >
+> > > > __cfi_foo:
+> > > >   mov $0x12345678, %reg
+> > > >   nop (27)
+> > > > foo:
+> > >
+> > > *blink*, wtf is clang smoking.
+> > >
+> > > I mean, you're right, this is what it is doing, but that is somewhat
+> > > unexpected. Let me go look at clang source, this is insane.
+> >
+> > Bah, this is because assemblers are stupid :/
+> >
+> > There is no way to tell them to have foo aligned such that there are at
+> > least N bytes free before it.
+> >
+> > So what kCFI ends up having to do is align the __cfi symbol to the
+> > function alignment, and then stuff enough nops in to make the real
+> > symbol meet alignment.
+> >
+> > And the end result is utter insanity.
+> >
+> > I mean, look at this:
+> >
+> >       50:       2e e9 00 00 00 00       cs jmp 56 <__traceiter_initcall=
+_level+0x46>     52: R_X86_64_PLT32      __x86_return_thunk-0x4
+> >       56:       66 2e 0f 1f 84 00 00 00 00 00   cs nopw 0x0(%rax,%rax,1=
+)
+> >
+> > 0000000000000060 <__cfi___probestub_initcall_level>:
+> >       60:       90                      nop
+> >       61:       90                      nop
+> >       62:       90                      nop
+> >       63:       90                      nop
+> >       64:       90                      nop
+> >       65:       90                      nop
+> >       66:       90                      nop
+> >       67:       90                      nop
+> >       68:       90                      nop
+> >       69:       90                      nop
+> >       6a:       90                      nop
+> >       6b:       b8 b1 fd 66 f9          mov    $0xf966fdb1,%eax
+> >
+> > 0000000000000070 <__probestub_initcall_level>:
+> >       70:       2e e9 00 00 00 00       cs jmp 76 <__probestub_initcall=
+_level+0x6>      72: R_X86_64_PLT32      __x86_return_thunk-0x4
+> >
+> >
+> > That's 21 bytes wasted, for no reason other than that asm doesn't have =
+a
+> > directive to say: get me a place that is M before N alignment.
+> >
+> > Because ideally the whole above thing would look like:
+> >
+> >       50:       2e e9 00 00 00 00       cs jmp 56 <__traceiter_initcall=
+_level+0x46>     52: R_X86_64_PLT32      __x86_return_thunk-0x4
+> >       56:       66 2e 0f 1f 84          cs nopw (%rax,%rax,1)
+> >
+> > 000000000000005b <__cfi___probestub_initcall_level>:
+> >       5b:       b8 b1 fd 66 f9          mov    $0xf966fdb1,%eax
+> >
+> > 0000000000000060 <__probestub_initcall_level>:
+> >       60:       2e e9 00 00 00 00       cs jmp 76 <__probestub_initcall=
+_level+0x6>      72: R_X86_64_PLT32      __x86_return_thunk-0x4
+>
+> Hi, peter. Thank you for the testing, which is quite helpful
+> to understand the whole thing.
+>
+> I was surprised at this too. Without CALL_PADDING, the cfi is
+> nop(11) + mov; with CALL_PADDING, the cfi is mov + nop(11),
+> which is weird, as it seems that we can select CALL_PADDING if
+> CFI_CLANG to make things consistent. And I  thought that it is
+> designed to be this for some reasons :/
+>
+> Hmm......so what should we do now? Accept and bear it,
+> or do something different?
+>
+> I'm good at clang, so the solution that I can think of is how to
 
-Tested-by: Bharath R <bharath.r@intel.com>
+*not good at*
+
+> bear it :/
+>
+> According to my testing, the text size will increase:
+>
+> ~2.2% if we make FUNCTION_PADDING_BYTES 27 and select
+> FUNCTION_ALIGNMENT_16B.
+>
+> ~3.5% if we make FUNCTION_PADDING_BYTES 27 and select
+> FUNCTION_ALIGNMENT_32B.
+>
+> We don't have to select FUNCTION_ALIGNMENT_32B, so the
+> worst case is to increase ~2.2%.
+>
+> What do you think?
+>
+> Thanks!
+> Menglong Dong
+>
+> >
+> >
+> >
 
