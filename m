@@ -1,63 +1,52 @@
-Return-Path: <netdev+bounces-171500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DC4BA4D3A3
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 07:18:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4C1DA4D3F3
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 07:37:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C98316D990
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 06:18:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 420F93AE670
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 06:37:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7A131F4264;
-	Tue,  4 Mar 2025 06:18:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4762F1F461A;
+	Tue,  4 Mar 2025 06:37:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="EKt6CdS/"
+	dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b="jllluqPF"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 904AF152E02;
-	Tue,  4 Mar 2025 06:18:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 337F01F150D;
+	Tue,  4 Mar 2025 06:37:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741069093; cv=none; b=K8It7uIk3+KKTXIMKZh9BAZkEruGqgqAG/4RMbmOYL57ONfvr+ZT4b+oBVA3ONXyoH8EgoTxR877P5YpRliPO8gPu03J5WtmmpHaPlWj8R+ks257sahbkivtBUaoPsT4zxWOU3foMaDuap3UOIYoKaJZLIFK4HDvez1AoHUT68c=
+	t=1741070227; cv=none; b=soJUwcZGIdeUcBJ6isyiXSu5E49IlQtZz1u2yc2Qt2NA/RHQkojXFD7TV48i9obAIaOXz0aykP9VRefrND4I3zcOyY42FZ4ar+nHUrSTz1HUrIMtIwdIbM71HEenTE8KsGsGSe6DBSHCAQOYMydOBLZDB9Nx+8pFawWc6MJ24sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741069093; c=relaxed/simple;
-	bh=QQOkh+3wVSJzLYJ7viJ3y47huTC98CGWMWaPdnjnjYM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=h8AxEa8yunKQ6cyDuUSW1nrp+iTg16uQ1mosRyBsbpkV8M4CZ/LnJ2L9v/M0edKcAsUnCVILcoO29m4UomEwg9SVjgUJXexIoX7SIHduwz85hu1KzmntyIBkDO6jZvVVAPVK9FJBNHI+qe6+SzR0IhF3iCJELrZtYt2Dua0Og+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=EKt6CdS/; arc=none smtp.client-ip=198.47.19.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 5246HgYw3517465
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Tue, 4 Mar 2025 00:17:42 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1741069062;
-	bh=N9Y4JwuClarjXzxVWt1JrUj/6OJyXCE1bCRokMfQHlc=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=EKt6CdS/C6CBn25rAj78txKmE0D06kNV72m3EPZ0rkROu3/m+3MS2njKqxjDcCxFp
-	 3BAEkq6O2IUL85Ul1fEM0yqTwL8R0voELQIKt5j+5y6awTG3jQA3Qge4sKuIkF6eKj
-	 TU2XwMcBgqIWPYlYb/6W/O8bDqKjv9Suamshx1PA=
-Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 5246HgB8028403;
-	Tue, 4 Mar 2025 00:17:42 -0600
-Received: from DLEE113.ent.ti.com (157.170.170.24) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 4
- Mar 2025 00:17:42 -0600
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE113.ent.ti.com
- (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 4 Mar 2025 00:17:42 -0600
-Received: from [172.24.31.59] (lt9560gk3.dhcp.ti.com [172.24.31.59])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 5246HZvQ106977;
-	Tue, 4 Mar 2025 00:17:36 -0600
-Message-ID: <5cad21ef-a97b-4412-a399-7ace69b85356@ti.com>
-Date: Tue, 4 Mar 2025 11:47:35 +0530
+	s=arc-20240116; t=1741070227; c=relaxed/simple;
+	bh=Pof+IzNFFSwumliPuC0y0GUgCeiXKgFaH2lhS0EXipQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h8EHaWWwQCbaUmPxtzsPnItkP9RcGN5sbdu9EeFeDx5stl5sxFB2wk9r/vh1nATkp0hx+OeTEAanZ3wKwipUzYSnUM+O3idB5y0hEaPKyQl4Uep5XHeV5sZLfEXuIRGTq5N36Uq74xVO7LfUIsPR975jSDTTSFtphv3zHwJ5YA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yoseli.org; spf=none smtp.mailfrom=yoseli.org; dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b=jllluqPF; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yoseli.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=yoseli.org
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 85FB544312;
+	Tue,  4 Mar 2025 06:37:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yoseli.org; s=gm1;
+	t=1741070223;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tpUcGbb9YZkLLOOR+VEMMuMvQQVcm/kEbmlQs/v60T4=;
+	b=jllluqPF5OIY/FIHof76m6a2aw7KVkPhiF/vYRQNHOqMffUfeXGKqd+zJSblY4zhdsEnU4
+	aNYnN2GFqc5e3cMvjEQzHeS651pm72/NonBxvfITlBik+Ro/zf5LKbg+L60OqoYiCj8z+c
+	IDMJBodOr47dmAAE3cr1450IUMqtVzCUY4R3WzPe8dKhbsOwfT1+XKrIJjpEB+ZUcXo8c2
+	SenhXEu2afneXDK+ArM8Yh2xZfTu2lJnDa4Wsv0oQpJGUqMjyVs/irYpKEj8SgEcS5phmW
+	EcB0V/S1VsSNw9b81yB/lD6ZENXDVDnIFIVqHwgPXjpLkOOlwB6u9N0FskLjPw==
+Message-ID: <a545c67f-de26-4224-8d20-c8abdbd6a9c7@yoseli.org>
+Date: Tue, 4 Mar 2025 07:37:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,126 +54,63 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [EXTERNAL] Re: [PATCH net-next v3 1/2] net: ti: icss-iep: Add
- pwidth configuration for perout signal
-To: Kory Maincent <kory.maincent@bootlin.com>
-CC: <javier.carrasco.cruz@gmail.com>, <diogo.ivo@siemens.com>,
-        <horms@kernel.org>, <jacob.e.keller@intel.com>,
-        <richardcochran@gmail.com>, <pabeni@redhat.com>, <kuba@kernel.org>,
-        <edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-References: <20250303135124.632845-1-m-malladi@ti.com>
- <20250303135124.632845-2-m-malladi@ti.com>
- <20250303180323.1d9b51de@kmaincent-XPS-13-7390>
+Subject: Re: [PATCH 2/2] net: phy: dp83826: Add support for straps reading
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Catalin Popescu <catalin.popescu@leica-geosystems.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250303-dp83826-fixes-v1-0-6901a04f262d@yoseli.org>
+ <20250303-dp83826-fixes-v1-2-6901a04f262d@yoseli.org>
+ <fcc25495-5453-4b15-aece-b01bca3a00ba@lunn.ch>
+ <7cd18e37-2d68-4825-bcc4-fc2ac6b9a461@yoseli.org>
+ <bf0228a7-032d-4d8c-b5e1-1be4830404f7@lunn.ch>
 Content-Language: en-US
-From: "Malladi, Meghana" <m-malladi@ti.com>
-In-Reply-To: <20250303180323.1d9b51de@kmaincent-XPS-13-7390>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+From: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
+In-Reply-To: <bf0228a7-032d-4d8c-b5e1-1be4830404f7@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddutddufeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkffggfgfuvfevfhfhjggtgfesthejredttddvjeenucfhrhhomheplfgvrghnqdfoihgthhgvlhcujfgruhhtsghoihhsuceojhgvrghnmhhitghhvghlrdhhrghuthgsohhisheshihoshgvlhhirdhorhhgqeenucggtffrrghtthgvrhhnpeefieetgeehvdeggffgffetheehhfetkeefhefhgeeuheetueffueeikefgffffteenucfkphepledurdduieehrdduieehrdduleejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledurdduieehrdduieehrdduleejpdhhvghloheplgduledvrdduieekrddurdeingdpmhgrihhlfhhrohhmpehjvggrnhhmihgthhgvlhdrhhgruhhtsghoihhsseihohhsvghlihdrohhrghdpnhgspghrtghpthhtohepuddtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhog
+ hhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegtrghtrghlihhnrdhpohhpvghstghusehlvghitggrqdhgvghoshihshhtvghmshdrtghomh
+X-GND-Sasl: jeanmichel.hautbois@yoseli.org
 
+Hello Andrew,
 
+On 03/03/2025 18:50, Andrew Lunn wrote:
+> On Mon, Mar 03, 2025 at 06:37:28PM +0100, Jean-Michel Hautbois wrote:
+>> Hi Andrew,
+>>
+>> On 03/03/2025 18:20, Andrew Lunn wrote:
+>>> On Mon, Mar 03, 2025 at 06:05:52PM +0100, Jean-Michel Hautbois wrote:
+>>>> When the DP83826 is probed, read the straps, and apply the default
+>>>> settings expected. The MDI-X is not yet supported, but still read the
+>>>> strap.
+>>>
+>>> What about backwards compatibility? I expect this changes the
+>>> behaviour of the device, potentially introducing regressions?  Please
+>>> add an explanation of why this is safe.
+>>
+>> I am not certain it is safe. As far as I know that if straps are used on the
+>> hardware, then it should be used, and if the behavior has to be different,
+>> then userspace can change it (or any other way). Am I wrong ?
+> 
+> First off, what does the datasheet say about these straps?
+> 
+> Straps generally configure the hardware, without software being
+> involved. It seems odd you need software to read the straps and apply
+> them.
+> 
+> Why do you need this? What is your use case. As you said, user space
+> can configure all this, so why are you not doing that?
 
-On 3/3/2025 10:33 PM, Kory Maincent wrote:
-> On Mon, 3 Mar 2025 19: 21: 23 +0530 Meghana Malladi <m-malladi@ ti. com> 
-> wrote: > icss_iep_perout_enable_hw() is a common function for generating 
->  > both pps and perout signals. When enabling pps, the application needs 
->  > to only pass
-> ZjQcmQRYFpfptBannerStart
-> This message was sent from outside of Texas Instruments.
-> Do not click links or open attachments unless you recognize the source 
-> of this email and know the content is safe.
-> Report Suspicious
-> <https://us-phishalarm-ewt.proofpoint.com/EWT/v1/G3vK! 
-> uVdqXRfP1m17KmZFPNPjnPB9kIuFmkbGwUjWeOt4PhpPuyUdhbWQXCWjPIg3CE7zH4vA7aR5lJOdoby6lh8SIqLqdFhb$>
-> ZjQcmQRYFpfptBannerEnd
-> 
-> On Mon, 3 Mar 2025 19:21:23 +0530
-> Meghana Malladi <m-malladi@ti.com> wrote:
-> 
->> icss_iep_perout_enable_hw() is a common function for generating
->> both pps and perout signals. When enabling pps, the application needs
->> to only pass enable/disable argument, whereas for perout it supports
->> different flags to configure the signal.
->> 
->> But icss_iep_perout_enable_hw() function is missing to hook the
->> configuration params passed by the app, causing perout to behave
->> same a pps (except being able to configure the period). As duty cycle
->> is also one feature which can configured for perout, incorporate this
->> in the function to get the expected signal.
-> 
-> ...
-> 
->> IEP_SYNC_CTRL_SYNC_EN); @@ -474,7 +484,38 @@ static int
->> icss_iep_perout_enable_hw(struct icss_iep *iep, static int
->> icss_iep_perout_enable(struct icss_iep *iep, struct ptp_perout_request *req,
->> int on) {
->> -	return -EOPNOTSUPP;
->> +	int ret = 0;
->> +
->> +	mutex_lock(&iep->ptp_clk_mutex);
->> +
->> +	/* Reject requests with unsupported flags */
->> +	if (req->flags & ~PTP_PEROUT_DUTY_CYCLE) {
->> +		ret = -EOPNOTSUPP;
->> +		goto exit;
->> +	}
-> 
-> The flags check does not need to be in the mutex lock.
-> With this change:
-> Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
-> 
+Thanks you for your remarks, indeed, ip link set + ethtool -s works fine 
+to force the link mode wanted. Event the master/slave can be specified, 
+so there is no need for this patch 2/2.
 
-Yes agreed, will move it outside the mutex lock. Thanks.
-
->> +	if (iep->pps_enabled) {
->> +		ret = -EBUSY;
->> +		goto exit;
->> +	}
->> +
->> +	if (iep->perout_enabled == !!on)
->> +		goto exit;
->> +
->> +	/* Set default "on" time (1ms) for the signal if not passed by the
->> app */
->> +	if (!(req->flags & PTP_PEROUT_DUTY_CYCLE)) {
->> +		req->on.sec = 0;
->> +		req->on.nsec = NSEC_PER_MSEC;
->> +	}
->> +
->> +	ret = icss_iep_perout_enable_hw(iep, req, on);
->> +	if (!ret)
->> +		iep->perout_enabled = !!on;
->> +
->> +exit:
->> +	mutex_unlock(&iep->ptp_clk_mutex);
->> +
->> +	return ret;
->>  }
->>  
->>  static void icss_iep_cap_cmp_work(struct work_struct *work)
->> @@ -553,6 +594,8 @@ static int icss_iep_pps_enable(struct icss_iep *iep, int
->> on) rq.perout.period.nsec = 0;
->>  		rq.perout.start.sec = ts.tv_sec + 2;
->>  		rq.perout.start.nsec = 0;
->> +		rq.perout.on.sec = 0;
->> +		rq.perout.on.nsec = NSEC_PER_MSEC;
->>  		ret = icss_iep_perout_enable_hw(iep, &rq.perout, on);
->>  	} else {
->>  		ret = icss_iep_perout_enable_hw(iep, &rq.perout, on);
-> 
-> 
-> 
-> -- 
-> Köry Maincent, Bootlin
-> Embedded Linux and kernel engineering
-> https://urldefense.com/v3/__https://bootlin.com__;!!G3vK! 
-> TJ19I0FAUivlehxg6fb4ka96Q2RiJDOZNyHXmEeRdYIPu4Cthp- 
-> iiGCHOwcUnPvn8Ek_htiuIef9PMEWGUfBEA$ <https://urldefense.com/v3/__https://bootlin.com__;!!G3vK!TJ19I0FAUivlehxg6fb4ka96Q2RiJDOZNyHXmEeRdYIPu4Cthp-iiGCHOwcUnPvn8Ek_htiuIef9PMEWGUfBEA$>
-> 
-
+Thanks !
+JM
 
