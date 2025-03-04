@@ -1,129 +1,161 @@
-Return-Path: <netdev+bounces-171648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F06BA4E01A
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 15:04:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C7C9A4E023
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 15:05:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 003B63B5D72
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 14:01:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B83047A23C9
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 14:04:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99315204C3E;
-	Tue,  4 Mar 2025 14:01:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DJG5nJwK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A1A9204695;
+	Tue,  4 Mar 2025 14:05:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04FBB204C0C
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 14:01:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32221FC7C9;
+	Tue,  4 Mar 2025 14:05:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741096882; cv=none; b=cZ/iIWPXQ0doJ5ciqjverTZvX13Tw+Yl+9iRmLjbM3kJNbAPGCu3YhCP2tfZq0WU43Sn06W0M6ccF9n1U0HWlfWu3pqTa4ix7vgfn37hUmI0t5YfjrY+V5PjC1PxFOek2ig9E/z8f+0pN1Fw7Ps6bxz9VuqoXUrTab9mq4xs6Gs=
+	t=1741097104; cv=none; b=iiTaXEvajUfivbSoWwISIBuUdsLqcjEYkFgvlRCjJ/CsYFnFEJlxdteQlgbhJqN0WPTuuzsC/0IJbyRyTLDhbE9GEIk1siRGaXjykOGmjSesXO29d7E1M/yYFrr2OKaeLB2wWUqgL1NwNMCq4BI4dc4SDUUwMyy1Oy68areSBkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741096882; c=relaxed/simple;
-	bh=9NQGeMwR5A9/4elkuu9RJ907hf3CjOSJnXsk/XQhrmw=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=nCTHije26g8jJSgdcs8aEtk+gcw+e0TwkxrIcYMK/Dg/mS01kWXzEkKyLnpW9Z6BH59pgXkydE2aY3SPEBOzHVPY3uFP5ep+gy6HYJxsMRKrCMqAmflQwNZqaLUsVqVLXwRLlxkZDtnKO0jINjRY2jbNJxfk2gyFfnUd3himRE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DJG5nJwK; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1741097104; c=relaxed/simple;
+	bh=1eoIIC4qiHRnKRLjedXcJ5O9iur+JZ4LV8C6XUhe3qc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CuevJAlDf7VaTcrZoMg1ElXaKN/IvQ4jRm5U/cPH1jVulYXkH5y5aweBtqNjLs6Wn+R+abKbEeqR7tYyYTqgj50iZI4h/yfgdwCHXb92dkjuMsnLNL7g2bQSk8XZRVwN0dJBaogmbQwD9UEJT/QehIC3POiwSJkvt9MFci/P/eA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6e8a8d6c38fso54160476d6.3
-        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 06:01:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741096880; x=1741701680; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iRqKPWbN6Di6SXasp0m2NK29g0tl4PDm82lImNNtiys=;
-        b=DJG5nJwK/wLv+2RdGGO4uHUyl8JGE81/nFwEM4LcjdfoF3GJ6O/8nUcZRyhSvMgEf0
-         DOQu5wmUUDkxZm1EC4MwKllfQMMBU6K9QxmM6Mjlbmmq4r7u44QPQwoJyon83QpjkvsI
-         0p1Wh3CibGS7utKrBTTdhuriML8Z0J4aHdJxbAtBZsUJhTdTZ5gfXq3PUV3iYqGiPidC
-         5WoqslR9WoJyH4ZWTIP7LXEMjUUSG/VPkMUU3ujzoi4ZxBYppTt/Wk7PgU98jcEq09+5
-         E1PlsE/WtLaW360UuC5Ygi2dztK1nhkwtTtqrKLoW8OHzpV0V3inssg8aBOvUrjsSJvd
-         ww1g==
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7c3b533a683so243580985a.2;
+        Tue, 04 Mar 2025 06:05:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741096880; x=1741701680;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=iRqKPWbN6Di6SXasp0m2NK29g0tl4PDm82lImNNtiys=;
-        b=HOhUGTkXTDi5J7IsYd4NBEDAgim+qlbD8K91Ax2h6soxfEL/7912T5gcMpBBXS4m1V
-         MHMZN2KiT5+M4cjatpoBbVdS9AY/R3okjHxoTKcL0t/1BhOLy63hpLqULTe60NaW/Phi
-         TQ0LwU+iQqzVYlcpAD6WPAyLSGRcjqBUTO3IVNegAZFhqliMF8E1WgKWpmqDIcZEtkM4
-         EMQEXm/xx30Z6ed8KoAFUWV3/lQbjZ/hsM+9z6sDQpgV35RQWqDP9fFzuvKgU1euAQQQ
-         sJVvo+UFRbyr84HbHA+fS0MH9mrk7Av6M8X/RnUjEK8ucZFz5oymvtdduqnYJeZMikui
-         J5/A==
-X-Gm-Message-State: AOJu0YwhptURFKfrYqipuhXoyAADzhSWI0xC2NpypRnSoSRoRyenrS9l
-	TEsZJiwKj6b0LTw3SrUjEYUWRVTvTO5z+Uxdp3Ez/3rqmsm/1GBb
-X-Gm-Gg: ASbGncs+p2gYjnmvQuc7xhSHKtZNloyZAklBsjbD1ggFZKgxMLYVolgrUVoO6/ZsSLC
-	3vcbpOmnz5uYxFtZEe1mgrm8jBP9w/ZLJz39jsRtMk8zAKXoMgYGOKIjx/E8cq4Ragko3NcXGz5
-	NeVDMoM+v6wDpwgKAUOuJ88SHKiN+mdpuwTOWAHd2pgdamNPOACeXvP/IhB0S3lxRX6tZA4DAeJ
-	96bGJkJvp9cXVVnnsUNbi7Ks4cHr9U+vX5cY4hpkGe0iP93fmbeNmiYiX+pPC+Fuk8ZzmJgPBpQ
-	Rdj+uL2NgHU0IMvTs2xffoWvVIIUx88sc4UkFS15uG2ZnXWchH0UptPIXs4nrpD8DkVwFfSe7Us
-	SiI852F90eZPgjLAMByTEWw==
-X-Google-Smtp-Source: AGHT+IGblZ8q0XFmKg6vnCXT1MjdRtc5Er2+pz0qs7D/vwKFtY2OL4kwN6wDeLTn5p84+sQ0TnJhBQ==
-X-Received: by 2002:a05:6214:252b:b0:6dd:d513:6124 with SMTP id 6a1803df08f44-6e8a0d5188emr268062886d6.35.1741096879534;
-        Tue, 04 Mar 2025 06:01:19 -0800 (PST)
-Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e8976534a3sm66790256d6.39.2025.03.04.06.01.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Mar 2025 06:01:18 -0800 (PST)
-Date: Tue, 04 Mar 2025 09:01:18 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- ncardwell@google.com, 
- kuniyu@amazon.com, 
- dsahern@kernel.org, 
- willemb@google.com, 
- willemdebruijn.kernel@gmail.com, 
- horms@kernel.org
-Cc: netdev@vger.kernel.org, 
- Jason Xing <kerneljasonxing@gmail.com>
-Message-ID: <67c707ae56c92_257ad9294e6@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250304004429.71477-1-kerneljasonxing@gmail.com>
-References: <20250304004429.71477-1-kerneljasonxing@gmail.com>
-Subject: Re: [PATCH net v2] net-timestamp: support TCP GSO case for a few
- missing flags
+        d=1e100.net; s=20230601; t=1741097101; x=1741701901;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wEGRTygTyU6cymLHKZseFJhmsuIezHZQHssj+Olk7dA=;
+        b=oOsKP2EtuHAiJzsKQi3Xjm34nzzq0tlBwOyeYJg2xzAhZIKzINZy339df/TMIcLM3V
+         mU1JKcoTLSLB/z7Z/iky372RLBLwZc+IGWr1XepxhPmS3rpWOiZ+KoUMfXfqnhaxm+by
+         Q8WHCqpe0f5UIHmmxiMMcF4CC1kXIuA2XDfMjNFYb97q2BY809vQeXx+NBbPUxixI7ps
+         Uxb5SsXp0Gqmo7wPU1fQKVPNnMOjwpJjSGfGZBnvPeuk2a8vxgXG7jg8EzPFG7vOB0uv
+         mQE4dq7Dq1iTZzG6rr+KNoCK3lNYtjKsW38DNH9XEJ5SSjw0M/7XvSYIflXiLIvH1hBx
+         2ZiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU5J2JyTtRgoYdZueHCW3D4XBjQqF/oT2ulBiyOvfw1mKcqEJ2Gmkj4/xgMmkVyRNnrX7km+k5taqZaxWXr@vger.kernel.org, AJvYcCUoa5KnKP9KKAjCP7XRUTrj3sQjT0K5k68s/ERxI6puTaqE7tc3IRGjVurzGW+6hXt12MK9rRnrbIdXmSmIQCiyO1s=@vger.kernel.org, AJvYcCV9L7EyFH2rl28/gTrIGumLj1OHEDMXpPBxT11qMfcdpUjKI//6EyyJOKDAxzhL5Czo7G/bSDQm@vger.kernel.org, AJvYcCWBOGagp1egzs4ihQY4vIf8K5IqnXwzT+GHn3VdSYRR4IH0rlqWgLWHrDAcvtzkb6Ms5TwWXBlOHz4g@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKQ/xAZeeWqFjSOAovnEzA45kSWYbErSUSo38qYa8/65K1ahTv
+	ltVPod5QNjdRKcEzcuvBoDUh5WewBgR6mp6l8XUXPtqWEqvAYgBaJYGcuIfu
+X-Gm-Gg: ASbGncsEt83bXHlolzm6ekHY0leFM0XYb1GRMM9X2kDyzO8DlkshjcUm5+Ko20INCpg
+	/8FbZG4ZRGCo4WDutH283okyhZGY6pnifz21QFw9lnB4cR8kcnJZcEtVvcylKdaFF0bpxYoiw3P
+	6GJ5T2z2ro3Q92uab5RhmhkKH15cq1/Xzt12yX7l8T915vNliswMDzXknEtWPYyI9yW+rQ1TRTm
+	YbDMfEZ8ArEtmeVHJ+Hz4W5yBuaEGjDRjeLd7vlhsLr5uqMpFoE2WqrH6OdxPD8ddNUD/Gr6mIz
+	4waTLS/CcIDwWamnNJdRckmvXfPvRHpDcPpBuyA6Bbz0Q1W2zJy7DuU1i28oWgSN1mf+UPOBftd
+	eB6q13sI=
+X-Google-Smtp-Source: AGHT+IE2N8f8hUagKLqg+WW0SX5zS2E+TiqiD9xESm5aR7zJzYlyjIWpNTeS1f6CZd3NHj8CEiawww==
+X-Received: by 2002:a05:620a:26a7:b0:7c3:d3a1:6f43 with SMTP id af79cd13be357-7c3d3a17071mr174218585a.57.1741097100956;
+        Tue, 04 Mar 2025 06:05:00 -0800 (PST)
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com. [209.85.219.54])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c3b53ce7a6sm322668285a.31.2025.03.04.06.04.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Mar 2025 06:04:59 -0800 (PST)
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6e88983cedaso43141756d6.1;
+        Tue, 04 Mar 2025 06:04:59 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUOSmxwrOqyDqku76a94/WWmtz1pA64t7uJWEGottWGbSsATILfz4aZ1LBlxlUJNZBDOmWdP7IfjHodPeem@vger.kernel.org, AJvYcCVktdYIZriim03kjfud4VwPDbrwe9ztsi4T3WggTkF+6Jm0nQUTOeIHMCDqdqsrPdf4JpU5OzuqjVzg@vger.kernel.org, AJvYcCW3gFLL1eK2c+VVADAINAdnA0hhMxvzykcz3pK2Gc0dAbXkAgmXcMAQaRiILgZzeNFfuHzNWeifaInXpThtY/G3/Hs=@vger.kernel.org, AJvYcCW88syuJ+YNOxeSuZTUMzT+Bw3L/4uHdXwHgTZugvglUtDRWj0HpetljevJ3s8u0dnzdPfdNOUB@vger.kernel.org
+X-Received: by 2002:a05:6214:21e7:b0:6e6:5aa2:4e4f with SMTP id
+ 6a1803df08f44-6e8a0d80ce8mr261405046d6.32.1741097099661; Tue, 04 Mar 2025
+ 06:04:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20250302181808.728734-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250302181808.728734-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <Z8SydsdDsZfdrdbE@shell.armlinux.org.uk> <CA+V-a8vCB7nP=tsv4UkOwODSs-9hiG-PxN6cpihfvwjq2itAHg@mail.gmail.com>
+ <Z8TRQX2eaNzXOzV0@shell.armlinux.org.uk> <CA+V-a8vykhxqP30iTwN6yrqDgT8YRVE_MadjiTFp653rHVqMNg@mail.gmail.com>
+ <Z8WQJQo5kW9QV-wV@shell.armlinux.org.uk> <TY3PR01MB113468803E298C5FA6FB6712886C82@TY3PR01MB11346.jpnprd01.prod.outlook.com>
+ <Z8bPPaT4Vsob4FHH@shell.armlinux.org.uk>
+In-Reply-To: <Z8bPPaT4Vsob4FHH@shell.armlinux.org.uk>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 4 Mar 2025 15:04:47 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdVQkzDhJmkpGah7omE7UqTgM3GSpVVDE-1mh9wW7O8vBA@mail.gmail.com>
+X-Gm-Features: AQ5f1JqGYJsTOdNI9PAwDvGf850hGSzvpOQrNGjb6j2I3wF8GT8UjrisfucgoQw
+Message-ID: <CAMuHMdVQkzDhJmkpGah7omE7UqTgM3GSpVVDE-1mh9wW7O8vBA@mail.gmail.com>
+Subject: Re: [PATCH 3/3] net: stmmac: Add DWMAC glue layer for Renesas GBETH
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Biju Das <biju.das.jz@bp.renesas.com>, 
+	"Lad, Prabhakar" <prabhakar.csengg@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>, 
+	Emil Renner Berthing <kernel@esmil.dk>
+Content-Type: text/plain; charset="UTF-8"
 
-Jason Xing wrote:
-> When I read through the TSO codes, I found out that we probably
-> miss initializing the tx_flags of last seg when TSO is turned
-> off, which means at the following points no more timestamp
-> (for this last one) will be generated. There are three flags
-> to be handled in this patch:
-> 1. SKBTX_HW_TSTAMP
-> 2. SKBTX_BPF
-> 3. SKBTX_SCHED_TSTAMP
-> Note that SKBTX_BPF[1] was added in 6.14.0-rc2 by commit
-> 6b98ec7e882af ("bpf: Add BPF_SOCK_OPS_TSTAMP_SCHED_CB callback")
-> and only belongs to net-next branch material for now. The common
-> issue of the above three flags can be fixed by this single patch.
-> 
-> This patch initializes the tx_flags to SKBTX_ANY_TSTAMP like what
-> the UDP GSO does to make the newly segmented last skb inherit the
-> tx_flags so that requested timestamp will be generated in each
-> certain layer, or else that last one has zero value of tx_flags
-> which leads to no timestamp at all.
-> 
-> Fixes: 4ed2d765dfacc ("net-timestamp: TCP timestamping")
-> Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
+Hi Russell,
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+On Tue, 4 Mar 2025 at 11:00, Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+> For the failure to happen, you need to check whether EEE is being used:
+>
+> # ethtool --show-eee ethX
+
+Doh, that's also not supported on Starlight (BeagleV beta).
+
+I tried unbind/rebind regardless, and it works (sort of),
+using the old Beagle V Fedora rootfs on microSD:
+
+[root@fedora-starfive starfive-dwmac]# echo 10020000.ethernet > unbind
+starfive-dwmac 10020000.ethernet eth0: stmmac_dvr_remove: removing driver
+starfive-dwmac 10020000.ethernet eth0: Link is Down
+[root@fedora-starfive starfive-dwmac]# echo 10020000.ethernet > bind
+starfive-dwmac 10020000.ethernet: IRQ eth_lpi not found
+starfive-dwmac 10020000.ethernet: IRQ sfty not found
+starfive-dwmac 10020000.ethernet: Hash table entries set to unexpected value 32
+starfive-dwmac 10020000.ethernet: User ID: 0x59, Synopsys ID: 0x37
+starfive-dwmac 10020000.ethernet:        DWMAC1000
+starfive-dwmac 10020000.ethernet: DMA HW capability register supported
+starfive-dwmac 10020000.ethernet: RX Checksum Offload Engine supported
+starfive-dwmac 10020000.ethernet: COE Type 2
+starfive-dwmac 10020000.ethernet: Wake-Up On Lan supported
+starfive-dwmac 10020000.ethernet: Enhanced/Alternate descriptors
+starfive-dwmac 10020000.ethernet: Enabled extended descriptors
+starfive-dwmac 10020000.ethernet: Chain mode enabled
+starfive-dwmac 10020000.ethernet: Enable RX Mitigation via HW Watchdog Timer
+starfive-dwmac 10020000.ethernet: device MAC address fa:58:39:0a:37:37
+libphy: get_phy_c22_id: mii_bus stmmac phy_id = 0x00221622
+starfive-dwmac 10020000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-0
+starfive-dwmac 10020000.ethernet eth0: PHY [stmmac-0:07] driver
+[Micrel KSZ9031 Gigabit PHY] (irq=POLL)
+dwmac1000: Master AXI performs fixed burst length
+starfive-dwmac 10020000.ethernet eth0: No Safety Features support found
+starfive-dwmac 10020000.ethernet eth0: No MAC Management Counters available
+starfive-dwmac 10020000.ethernet eth0: IEEE 1588-2008 Advanced
+Timestamp supported
+starfive-dwmac 10020000.ethernet eth0: configuring for phy/rgmii-id link mode
+starfive-dwmac 10020000.ethernet eth0: Link is Up - 1Gbps/Full - flow
+control off
+
+Apparently the MAC address has changed, so the board got a different
+IP address from my DHCP server :-(
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
