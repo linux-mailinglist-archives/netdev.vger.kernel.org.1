@@ -1,111 +1,176 @@
-Return-Path: <netdev+bounces-171498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0C14A4D334
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 07:00:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8E7FA4D3A0
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 07:17:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6A081891F3F
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 06:00:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 186D33AC484
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 06:16:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11F851EEA2A;
-	Tue,  4 Mar 2025 06:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F7301F4717;
+	Tue,  4 Mar 2025 06:16:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="AYdk7cxr"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="N2WovOai"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 123F6152E02
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 06:00:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D94811F427D;
+	Tue,  4 Mar 2025 06:16:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741068010; cv=none; b=RMf50rxmKysR7tVxF3/jaSMDoEFFMC6/TMb+xwigEzN6G8kPJzI/h82pSmkY8foRiQdp7b7NbUiX1vgZ3OKjq+z+BOKbVCFr2fih8TuwW7cId3loKPWMyzyAjEFJYCUfNPR05qVHv1Yl6OjILPzYmfWJrT7cTTJL+t+/6JUp8qE=
+	t=1741069017; cv=none; b=ZNcF4cl4vG6pebP0M3XuWudUgyhrUwJc1qIRDzQJKTUwinchNX+dQbCWrk7Jvy5KrCmIfXypLjkF/KS90hguWgRRuLgn57mrfY3w8U/DC0DfuO8PvMDi5AzAKFrXWVqx+Z4u+8oJajxOBTysSLBgoKtTe+oMHbNOX8rbUZn3uZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741068010; c=relaxed/simple;
-	bh=0lSZcaqAymyTvpIRmHyn/3fJctfboRQNXpaUDipXxEU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=QYVqAoaQiYoxcQDMtUjEEpzA3RgXboIGssmixxcZnEjSo7pTQr29k2GtdPo3WtHDZYJMqTXZyBUcbp41H4gWWXLxVJgj2liS25g5n5yk6zgsWZsleAtYDp4/WAvmNgYaAsMjYhWh3Aj8cGGWc0Xdk6QnA7HweMEUCfDrGTIrQgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=AYdk7cxr; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1741068000;
-	bh=kLfrUUpsWJK5zzf923w/o5tEIsrmWJ9IBb2BIM4b6yY=;
-	h=From:Date:Subject:To:Cc;
-	b=AYdk7cxrFSbmiJPyTYRMJwn16sQZyoLcufNLsLg45dukiHCPINjO7qq4YDSGWxQ5u
-	 kRwjxQvyTV5mH+GoJi+iNo8Dhk1ryq+CcILdDamvzRwPgnhPrjdYF4TgbLhBn+l2FL
-	 WOwvvvw2I/e1azpvt4UGEFBMmt3nhpIj+fWzZxZ7EpeTOMSacq6XBxLZ+HlLKCcsza
-	 JbZmGTUBzGxxm5IumNMRoHaPXtm8Fs7TgnZJdePTYTqIk24F+RZQpj8eOYSFvpfWuo
-	 JeoYiDwP5+SErEg5eedPgAWUBUKY20J+rxA2gNb3fyXQQFir51r4UfCOyuZXGV/sur
-	 7cqQpt+nJgb+g==
-Received: by codeconstruct.com.au (Postfix, from userid 10001)
-	id 3CE55784E3; Tue,  4 Mar 2025 14:00:00 +0800 (AWST)
-From: Matt Johnston <matt@codeconstruct.com.au>
-Date: Tue, 04 Mar 2025 13:59:51 +0800
-Subject: [PATCH net] mctp i3c: handle NULL header address
+	s=arc-20240116; t=1741069017; c=relaxed/simple;
+	bh=tPctZgjEhRRZal12UASbRN2RbchFHhep/cFENeVUq9Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hly9+YtTwU40SwQimGKwXTh5SNJDS4/owSpny4igpLcaRG5zc9DeTN/QJflHifW+RnQKg2MDUnOy3MwxEpGSVr8Gs29DDWFuqG34aYuXFIZL/bvqUJ1s27wOZz5QJ6i/cYY2I8W9h18nlBCmfGEJgnVkTkyuOJaECEvxzhzD6DY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=N2WovOai; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=wv+PIGwL4Os+6UQr8shBumtmGLDADHsIVKfUG7p0oac=; b=N2WovOaitXsb/19o9wZCWBmkbx
+	X6nG7aGP7e9xXTHfVKszHjHGCjHvP1s+unrd0sDaHVZPKiJKHowe9rCsl6nu1rGadL/60ARvewN3e
+	ZAPsFep2gcveMkAMNvaShUynEhWKqrFc0bxjw+7cUptYPV2Ug91W/HRfS/0b1SL5xoTedaR6OSfTl
+	F/5dr9LwADjHja4YomDwE3U3zdmH4SQF8wYmzJUr+lVJ/mcBBG53xFWkW2J/xpv842f8FpEz0sTV5
+	6VJCazUVPutTp+RWfJgFrN7jb0UGwOsQZTD9Ik7ZOdKhY2PJM6Euq67lJgTL1Ysy6PVWKJW1Ixzrd
+	SOuZMAag==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1tpLa3-00000000I7p-07aa;
+	Tue, 04 Mar 2025 06:16:39 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 7544D30049D; Tue,  4 Mar 2025 07:16:35 +0100 (CET)
+Date: Tue, 4 Mar 2025 07:16:35 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: rostedt@goodmis.org, mark.rutland@arm.com, alexei.starovoitov@gmail.com,
+	catalin.marinas@arm.com, will@kernel.org, mhiramat@kernel.org,
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+	martin.lau@linux.dev, eddyz87@gmail.com, yonghong.song@linux.dev,
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+	jolsa@kernel.org, davem@davemloft.net, dsahern@kernel.org,
+	mathieu.desnoyers@efficios.com, nathan@kernel.org,
+	nick.desaulniers+lkml@gmail.com, morbo@google.com,
+	samitolvanen@google.com, kees@kernel.org, dongml2@chinatelecom.cn,
+	akpm@linux-foundation.org, riel@surriel.com, rppt@kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, llvm@lists.linux.dev
+Subject: Re: [PATCH v4 1/4] x86/ibt: factor out cfi and fineibt offset
+Message-ID: <20250304061635.GA29480@noisy.programming.kicks-ass.net>
+References: <20250303132837.498938-1-dongml2@chinatelecom.cn>
+ <20250303132837.498938-2-dongml2@chinatelecom.cn>
+ <20250303165454.GB11590@noisy.programming.kicks-ass.net>
+ <CADxym3aVtKx_mh7aZyZfk27gEiA_TX6VSAvtK+YDNBtuk_HigA@mail.gmail.com>
+ <20250304053853.GA7099@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250304-mctp-i3c-null-v1-1-4416bbd56540@codeconstruct.com.au>
-X-B4-Tracking: v=1; b=H4sIANaWxmcC/x3MQQ5AMBBA0as0szZJVQmuIha0g0koaUsk4u4ay
- 7f4/4FAnilAKx7wdHHg3SXkmQCzDG4mZJsMSqpSFlLjZuKBXBh057rioEdZl9qqpiJIzeFp4vv
- /deAoQv++H3UHBsFkAAAA
-X-Change-ID: 20250304-mctp-i3c-null-a4b0854d296e
-To: Jeremy Kerr <jk@codeconstruct.com.au>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, Matt Johnston <matt@codeconstruct.com.au>
-X-Mailer: b4 0.15-dev-cbbb4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1741067999; l=1155;
- i=matt@codeconstruct.com.au; s=20241018; h=from:subject:message-id;
- bh=0lSZcaqAymyTvpIRmHyn/3fJctfboRQNXpaUDipXxEU=;
- b=MvIwqQIfIb4EGsNvCWj7QKgwsXYrtE4Z3tcqdF0X0P6mGxHFjuPDla0dDNDeOSqsYAzvnbk0N
- Ntm8SIhHuu4BxnvEDCG/KbKjggjHUCzo7RjCRn5TASwbomYYZ5x0D5z
-X-Developer-Key: i=matt@codeconstruct.com.au; a=ed25519;
- pk=exersTcCYD/pEBOzXGO6HkLd6kKXRuWxHhj+LXn3DYE=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250304053853.GA7099@noisy.programming.kicks-ass.net>
 
-daddr can be NULL if there is no neighbour table entry present,
-in that case the tx packet should be dropped.
+On Tue, Mar 04, 2025 at 06:38:53AM +0100, Peter Zijlstra wrote:
+> On Tue, Mar 04, 2025 at 09:10:12AM +0800, Menglong Dong wrote:
+> > Hello, sorry that I forgot to add something to the changelog. In fact,
+> > I don't add extra 5-bytes anymore, which you can see in the 3rd patch.
+> > 
+> > The thing is that we can't add extra 5-bytes if CFI is enabled. Without
+> > CFI, we can make the padding space any value, such as 5-bytes, and
+> > the layout will be like this:
+> > 
+> > __align:
+> >   nop
+> >   nop
+> >   nop
+> >   nop
+> >   nop
+> > foo: -- __align +5
+> > 
+> > However, the CFI will always make the cfi insn 16-bytes aligned. When
+> > we set the FUNCTION_PADDING_BYTES to (11 + 5), the layout will be
+> > like this:
+> > 
+> > __cfi_foo:
+> >   nop (11)
+> >   mov $0x12345678, %reg
+> >   nop (16)
+> > foo:
+> > 
+> > and the padding space is 32-bytes actually. So, we can just select
+> > FUNCTION_ALIGNMENT_32B instead, which makes the padding
+> > space 32-bytes too, and have the following layout:
+> > 
+> > __cfi_foo:
+> >   mov $0x12345678, %reg
+> >   nop (27)
+> > foo:
+> 
+> *blink*, wtf is clang smoking.
+> 
+> I mean, you're right, this is what it is doing, but that is somewhat
+> unexpected. Let me go look at clang source, this is insane.
 
-saddr will usually be set by MCTP core, but check for NULL in case a
-packet is transmitted by a different protocol.
+Bah, this is because assemblers are stupid :/
 
-Signed-off-by: Matt Johnston <matt@codeconstruct.com.au>
-Fixes: c8755b29b58e ("mctp i3c: MCTP I3C driver")
----
- drivers/net/mctp/mctp-i3c.c | 3 +++
- 1 file changed, 3 insertions(+)
+There is no way to tell them to have foo aligned such that there are at
+least N bytes free before it.
 
-diff --git a/drivers/net/mctp/mctp-i3c.c b/drivers/net/mctp/mctp-i3c.c
-index d247fe483c588594c0dc92aa8e9c3c798d910d6b..c1e72253063b54a9c2ff9e45e6202347b8c962a7 100644
---- a/drivers/net/mctp/mctp-i3c.c
-+++ b/drivers/net/mctp/mctp-i3c.c
-@@ -507,6 +507,9 @@ static int mctp_i3c_header_create(struct sk_buff *skb, struct net_device *dev,
- {
- 	struct mctp_i3c_internal_hdr *ihdr;
- 
-+	if (!daddr || !saddr)
-+		return -EINVAL;
-+
- 	skb_push(skb, sizeof(struct mctp_i3c_internal_hdr));
- 	skb_reset_mac_header(skb);
- 	ihdr = (void *)skb_mac_header(skb);
+So what kCFI ends up having to do is align the __cfi symbol to the
+function alignment, and then stuff enough nops in to make the real
+symbol meet alignment.
 
----
-base-commit: 64e6a754d33d31aa844b3ee66fb93ac84ca1565e
-change-id: 20250304-mctp-i3c-null-a4b0854d296e
+And the end result is utter insanity.
 
-Best regards,
--- 
-Matt Johnston <matt@codeconstruct.com.au>
+I mean, look at this:
+
+      50:       2e e9 00 00 00 00       cs jmp 56 <__traceiter_initcall_level+0x46>     52: R_X86_64_PLT32      __x86_return_thunk-0x4
+      56:       66 2e 0f 1f 84 00 00 00 00 00   cs nopw 0x0(%rax,%rax,1)
+
+0000000000000060 <__cfi___probestub_initcall_level>:
+      60:       90                      nop
+      61:       90                      nop
+      62:       90                      nop
+      63:       90                      nop
+      64:       90                      nop
+      65:       90                      nop
+      66:       90                      nop
+      67:       90                      nop
+      68:       90                      nop
+      69:       90                      nop
+      6a:       90                      nop
+      6b:       b8 b1 fd 66 f9          mov    $0xf966fdb1,%eax
+
+0000000000000070 <__probestub_initcall_level>:
+      70:       2e e9 00 00 00 00       cs jmp 76 <__probestub_initcall_level+0x6>      72: R_X86_64_PLT32      __x86_return_thunk-0x4
+
+
+That's 21 bytes wasted, for no reason other than that asm doesn't have a
+directive to say: get me a place that is M before N alignment.
+
+Because ideally the whole above thing would look like:
+
+      50:       2e e9 00 00 00 00       cs jmp 56 <__traceiter_initcall_level+0x46>     52: R_X86_64_PLT32      __x86_return_thunk-0x4
+      56:       66 2e 0f 1f 84 		cs nopw (%rax,%rax,1)
+
+000000000000005b <__cfi___probestub_initcall_level>:
+      5b:       b8 b1 fd 66 f9          mov    $0xf966fdb1,%eax
+
+0000000000000060 <__probestub_initcall_level>:
+      60:       2e e9 00 00 00 00       cs jmp 76 <__probestub_initcall_level+0x6>      72: R_X86_64_PLT32      __x86_return_thunk-0x4
+
+
 
 
