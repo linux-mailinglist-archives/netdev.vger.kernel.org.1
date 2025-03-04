@@ -1,257 +1,530 @@
-Return-Path: <netdev+bounces-171730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D2A5A4E81D
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:15:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 10758A4E862
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:21:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C6FF8C4585
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 16:25:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47B493BFBC9
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 16:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D3492980BF;
-	Tue,  4 Mar 2025 16:06:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 427E429C357;
+	Tue,  4 Mar 2025 16:07:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="CQivGvNt"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="q5cMVrxD"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2081.outbound.protection.outlook.com [40.107.21.81])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2088.outbound.protection.outlook.com [40.107.220.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1982980A8;
-	Tue,  4 Mar 2025 16:06:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 109EE2BF3DF;
+	Tue,  4 Mar 2025 16:07:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.88
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741104409; cv=fail; b=LbNqYf8xR+ijcaZZqK5mAdh1I1dHzwmWU+NOkE/5jTFuQg/9yOMugUNlmytDzrwpdTx5QistfvfQ2i4/95MPoaPEF7mXfneJq/fW/1ceVR0MC79M3eJNfboBfsKrM032N8Lh9dxhrWc7WCZ/2zl4ar8iJOLmwxoaRou/7vPuSLI=
+	t=1741104449; cv=fail; b=PnVxu4mjDOSbvl9zTT6hfpIhOw8Ory8DfIdXVJjrKdpRmLur0NqqkSHhWkg1IVLjhEEE9IYGyYgxi1ylbA8s9FckKcAYl2vWebdr5tIDTRLKvh8Ui1f7g0AA3KgbtLbONjtCdwYW9+MKpjygGqX4pPoTAFIdrhZen7xyOkGARqE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741104409; c=relaxed/simple;
-	bh=bDoScIKbNzqH7B4Cv3wsUY4ON/3OslGA8q81wW25eQY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=XEhJj1FSeI8UGhZr9lQIc9Z8O/34L7oYhqVzqsWIYaGalLdTzeNfhO52XWFPcgUce5DDrAVEqlh4S59CqOcsA3hRPNrgxFpAiPU8+CFsEU24AaVkioS5tfJSImY/HhOXu1li8U5fuYpvZPh/ETIeBZdvyHo4Wwjpy4QuVZUcZoo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=CQivGvNt; arc=fail smtp.client-ip=40.107.21.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
+	s=arc-20240116; t=1741104449; c=relaxed/simple;
+	bh=b5TljARlgB4aG9FTVbwU16NKo+5b+PmMBWRhDRZwJe4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iKkVN8dH4zOqplFIrFT9f5QYA1FKRtEYGj9HxdAqyVArElEQDn6JWs8eKqCLFL/CaRG1HKzYmUEqmz0zHRDdoWMsdxMzVoKnEEXDEAH+52b0Kqf+r3tqfiGmZuIj4n2wGynJcKFKCABeTkz53KkivCKA4IaRKhbpc9rYue2c5U8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=q5cMVrxD; arc=fail smtp.client-ip=40.107.220.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=uLG0EDpS93mlIzVHSpaFZJ5voquQ/bvKs8Ma1TVtHGq+TV/HoSry1F5q4uHSgywiS8LQn7Fpr0FvFSj31uFQlYlupMVFKeSCXGoQxclRWgIXR3Pdk5OfZNEWWybAJI21iUUc/hlTC7sHXfT2WyeWvGpNPP6RLjKkv9DZ3buIBlTUkvylXM4ATVC7EJ1164cTWlQPjExbbDIflT+0kWq+wMsN0sMtDo/4BdpKSfcHJkrpbkctogGJ7M8pF5CMu9TjmvCHMM4LyXVVA9a9D9ZW+FanBj3rhLpSq1bWmK+psRx1X0YCy+zuw1Qx/Cu/hBjGEi7v6hblAllikMPQiPNbEw==
+ b=sZFz1KA7T20rXePdhPakdO5CmNLg/x4YF6EwYYPBgnbRYWq7tIK3Nyznikrvk7Ns9ptUV6kvxrUcDoA+jhDuOKA4tokb3vp8RpKT3jELE4CUNzNxL0sDe7b0IeBa/CH5HJQryNFHOxfNwjOWnwbLHwR2LP1yB5ebTBnhaolNZWT0KT7QzA7kZDq9I1kEUW4kv159DMSbidZHo0g6QKOwE15sH5i2yCLdN6vfjCRhQV6j3uFPw78d3y8OFZxMUJJzK8Q593h8mUrIDiPq/pFTaC2rAnb4J3KPM5cPRCPGd9/7DjaG/iGNK/NHH+gP2HplFdyLHvOewQFh3wl/91tzbQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OPrFxUbhueuROFLOJ2NgMrOK7Orah0jo/s6Llivwl5M=;
- b=oRvaheOf6mww0Nh4Yc8Fv/2AVUxa+PwOrQlkLnlqxK5qiBWByk+M94NefkwdgL5+g+IWMGZVtQk8B1CCoMkSm7uy9xwer+lz/GsGjjBix7gSrdFtvZLcN6iuclWsFfAIPq2Edy7THujYi/EnhOLANJ0SDgL5TBuJgN5IbrR7wNqj7HqzvcNjcEV/3iZ4ArVtpcI07qnB+zjWSbytWzvGCqw+P6jw0r0J/5aoxOMnpp65QGTiIBXOe5xKIQnJOZn9SOMDEPvwloiDqoMDvQ/QTwzgudaOGBUnkhZC7p12G3OaqNDK5VQieJyq88JSUOsAyka33/FGilatt9wfUYyu2Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector1-NXP1-onmicrosoft-com;
+ bh=v+tLqbZ+q+PbYml70iFJwWVIoR8CfJ07QwFAuES/oJE=;
+ b=KfUyj7vt5Rz3gMs4w9s18YYr+f5KZ0tcNAhL7sZUkQNnE8HnFEnZBl/qy3Nqv5McR/VDUd6a/i9MXtGweVxRafG3lmr8WBvXutBeM1m3J3TsorlCxiyIesHP18uKmaRN75vXwVvTKJnrmVzU/8sw6QMc2Eq+Jl7Ejr7xUqPMyv/sqY7M2Qv6tsT32Nk7uSIhYhSG1X260sOXbpEMkoqyMxvBNLPdeQu69mrlimLH2MXjrXp6GqnQ0FCWzRf+V3F6zzUvgRsC2gDMxl3698ppAFeiCcXpN1LEFNLE+rgGGnQbySURQ/I4RlgaSbza3/pW4cIHiMaMpSyfDd19sNjtqg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OPrFxUbhueuROFLOJ2NgMrOK7Orah0jo/s6Llivwl5M=;
- b=CQivGvNt/JyEJL9aMJtNrci/McxvrY/alDaFHiAsGf8TiWlcFRgE0jHoCOhPOOF+DyTTtL0hYhUYzj5oBAipesgVYOY4kg5Qp10JKeUfRI1ct3ERit34jjC+XnsRIKD/zxyose5S8aYhZxGOBOCR+lnE1fnzT4DisV99eUMLRH51VTlKPDdW7+44jVqJCC/fnVA7V8mKRCMpkiMtTZlc/+Ns63eIgpWStA/Ney75EB3TesgwgpnSV0ZC0Yt913rpL0qMtjnkFQ3WtUheTTmjdGGrSirxLpF0DzOkY42niKOufat2vYlv13muCfDGeA4mTH9s09mvs6qwWPlViUrkAw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=oss.nxp.com;
-Received: from AS8PR04MB8216.eurprd04.prod.outlook.com (2603:10a6:20b:3f2::22)
- by GVXPR04MB10304.eurprd04.prod.outlook.com (2603:10a6:150:1e9::19) with
+ bh=v+tLqbZ+q+PbYml70iFJwWVIoR8CfJ07QwFAuES/oJE=;
+ b=q5cMVrxDdAohcC01i5hiaL3K8s+xQRYajJzC/kfTaYslMPdwCNgW4kFUDG7mx+bo0h+FCUbdvI9G3iTYygIb6O35vNiYOBjIQ0AMOWqU+feP6bIG7YRcU523O1HSzPINWk/bEV1I43+kqwf4vgr0Y3zUKxjvONoW/L480Up1O7pls/1Acvbidppf37yEe0FMyJCFRVcnIAJrmXBwXBsvZQWEdqnwWIfgYrPgTIIUFxnW/VsDTy85CxceqRVgVIu+JedGv8Z2z8FtJACWGfThAy3Ngk4yAHs/nPhrWm+hXvKJmKaBRdMTbqNsfYEduVTyHirMrahaWZj0XVMfrncKrw==
+Received: from SN6PR04CA0106.namprd04.prod.outlook.com (2603:10b6:805:f2::47)
+ by DS0PR12MB7772.namprd12.prod.outlook.com (2603:10b6:8:138::9) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.25; Tue, 4 Mar
- 2025 16:06:45 +0000
-Received: from AS8PR04MB8216.eurprd04.prod.outlook.com
- ([fe80::f1:514e:3f1e:4e4a]) by AS8PR04MB8216.eurprd04.prod.outlook.com
- ([fe80::f1:514e:3f1e:4e4a%5]) with mapi id 15.20.8489.025; Tue, 4 Mar 2025
- 16:06:45 +0000
-From: Andrei Botila <andrei.botila@oss.nxp.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	s32@nxp.com,
-	Christophe Lizzi <clizzi@redhat.com>,
-	Alberto Ruiz <aruizrui@redhat.com>,
-	Enric Balletbo <eballetb@redhat.com>,
-	Andrei Botila <andrei.botila@oss.nxp.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net v2 2/2] net: phy: nxp-c45-tja11xx: add TJA112XB SGMII PCS restart errata
-Date: Tue,  4 Mar 2025 18:06:14 +0200
-Message-ID: <20250304160619.181046-3-andrei.botila@oss.nxp.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250304160619.181046-1-andrei.botila@oss.nxp.com>
-References: <20250304160619.181046-1-andrei.botila@oss.nxp.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM0PR02CA0166.eurprd02.prod.outlook.com
- (2603:10a6:20b:28d::33) To AS8PR04MB8216.eurprd04.prod.outlook.com
- (2603:10a6:20b:3f2::22)
+ 2025 16:07:19 +0000
+Received: from SN1PEPF000252A0.namprd05.prod.outlook.com
+ (2603:10b6:805:f2:cafe::3d) by SN6PR04CA0106.outlook.office365.com
+ (2603:10b6:805:f2::47) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8489.28 via Frontend Transport; Tue,
+ 4 Mar 2025 16:07:19 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SN1PEPF000252A0.mail.protection.outlook.com (10.167.242.7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8511.15 via Frontend Transport; Tue, 4 Mar 2025 16:07:18 +0000
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 4 Mar 2025
+ 08:07:01 -0800
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail202.nvidia.com
+ (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 4 Mar
+ 2025 08:07:01 -0800
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Tue, 4 Mar
+ 2025 08:06:58 -0800
+From: Tariq Toukan <tariqt@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>
+CC: Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>, "Leon
+ Romanovsky" <leonro@nvidia.com>, Michal Swiatkowski
+	<michal.swiatkowski@linux.intel.com>, Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>, <netdev@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next V2 5/6] net/mlx5e: Separate address related variables to be in struct
+Date: Tue, 4 Mar 2025 18:06:19 +0200
+Message-ID: <20250304160620.417580-6-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.45.0
+In-Reply-To: <20250304160620.417580-1-tariqt@nvidia.com>
+References: <20250304160620.417580-1-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8PR04MB8216:EE_|GVXPR04MB10304:EE_
-X-MS-Office365-Filtering-Correlation-Id: e2024dff-fa72-4abe-cf55-08dd5b368fbc
-X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
+X-MS-TrafficTypeDiagnostic: SN1PEPF000252A0:EE_|DS0PR12MB7772:EE_
+X-MS-Office365-Filtering-Correlation-Id: 977dbf45-c9e1-405e-8b1e-08dd5b36a3b1
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|82310400026|376014|1800799024|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?M056MXBLM0tUZ054Q2g4bHJ2WUNGSzdIU1dYQnNsOUc2VDAxUkFBWGtIc1dF?=
- =?utf-8?B?ajJDSjZ5d20yd21GWkF4bkJqOVFweTdwK3RDekl2UHRscmNnVVYwblFyOHg4?=
- =?utf-8?B?c3J4Ym1KVjU0b0dEUVdWNnNKUHEwOWJhcnh0VVk2M1AyeVQrSEtOUFBNTUc3?=
- =?utf-8?B?T1lYRDdmQjY3WjJwUWNNNGROOFVnYzhkejhHZHZWT0VEaVJQNzBKbHh4eWQw?=
- =?utf-8?B?MndUTUx5bEdvZFF6cyszWW51d0NvOGIwTm9qNVdGblV3Y0tmUmpuU214c3Bx?=
- =?utf-8?B?eTYzYThjdFJsbVJaVE5KT0Q3bkV4VGtPRCs3MG1jZEk4WE9tNk1nQ0MyR0NQ?=
- =?utf-8?B?V09GWHhWU1oyWjNWV1NFVWtMUzEvQ3k5VmhHc3dvUjdHanJIU1FHMCthck9p?=
- =?utf-8?B?dVErbUoydXk4Mm15a056bGJEVG1idHJzenMyNU90RVZtaW96QU5zQVhmZmlE?=
- =?utf-8?B?VDVtcEdrZVk0d0hJRmdTc2lKcFFQOGdJVFpkTmZFb3FIT2JQV3FIV1VVbGV2?=
- =?utf-8?B?YXdIci9vd2RubXdtN092OEd5YU5aM1R4c2VJUEFjNVMzZW56dHN1Tmd2MTJX?=
- =?utf-8?B?Q3FDWjJVUkluclVuY1Ftb1BhWWN5OEc4TkVwOG5HZmZVUzRQUEEwb1RvNEhR?=
- =?utf-8?B?Zkh5Kzd3RGVCdlcxbUR1Z0JDMjZSWXQvUnQrTnhEdzJhNVNsa0JJOHpaaThV?=
- =?utf-8?B?WGk5MWdMVExUVGdUTUlNU2hSZUpSSVYzNCttUzdSOFFOUjZJRVBGTEhOTDZi?=
- =?utf-8?B?Zy9ucC9RekFBR3AwVUI2UEhXOVY4ZDJWN2M3cW5FM09yNjBmYnMrZkFhVEJm?=
- =?utf-8?B?ZW1OMlpBRXFMVHp0eGt6SzgvcjdvVm9BSUwxRDI2Mk1PRS90YjFqSFZTUTkw?=
- =?utf-8?B?ZjdYbjVFMFhDU0FDU2M1Qm9NK00xaFFvTzRqOG8zMFVsYzZmanNHbG04bkN2?=
- =?utf-8?B?bnU5dmRmZGJTcUxnMkQzbnVPNER2QTRQcGlkR2ZzVjA2ZWxQVXFhZ2pTLytS?=
- =?utf-8?B?OGtYSTNMa2wvREJZei9Pb1JyM2NWbE9sWEF0YWNEQlJyZHNiT1BZVVQ5eHFt?=
- =?utf-8?B?eHlEWGFpOU1ZajhjYnR4clFVOW81UXVJamxhTVlMUWpFSndOYm9mSUdvOE1M?=
- =?utf-8?B?YWJMdjNPQ3JWWEFvNHozSmVtdGJhQUJ1NE1qWGtvWG9EVEo5di9iTW1STG1h?=
- =?utf-8?B?Q3IzcnBObXd0TWNQbmw3dnR3MHVvNGF3cXFjN05xRGZuWE9ZWkh5a0tqK0VV?=
- =?utf-8?B?ZlgyakJndDVoYnJYRksrNlpyRG9FT0F6UGhrT2hHWGNjTStGSGtjbTV3dkJG?=
- =?utf-8?B?Z1dxYmVtZnIzdXZVNjBOVnVsdS9yTkFTcnY2ZHpWV1U0cE5QenFVSTZaVld0?=
- =?utf-8?B?ZjA1Nk0vWlRhV3QxUkc0TmQ3ZEJzdnMyRk83aWxHVG9rSlljSjV3MGJDdGdZ?=
- =?utf-8?B?OWROcnIrb21IMk8xbzFFL2ZYMDZXcE5LOTM2RGdSUVlwNHg0YnU3VC8yT0JF?=
- =?utf-8?B?YXFBaFFQWVpTMEFadVBFNFhjeU02YnhWeGxuckhDRVd3RDhob2trYnpwV2dI?=
- =?utf-8?B?L1lRWmlJV0NPZmxQeG13bkUzWVo5N2ozNVdtam9LOWxXcnFyZUE0NVBNT1Nt?=
- =?utf-8?B?RXExSnpGTzdLbmt3N3g1dUFDYTYyVnRWbGdhb1hHTncyaWNkWVJEQkJkZnJW?=
- =?utf-8?B?VHRYSVVBS3c0aHRhbmdrY3dTWXFnUzFZMUdBMm9MdFcrdUNuc202Zmp4amNM?=
- =?utf-8?B?NFBSYTRKTm52TzJHd2pyV3loRUVoMjZib0NFbnFPRkRQaUEvWm9mdUd1eTE5?=
- =?utf-8?B?ZUF5a2xIeHhSSnpGRU50NmZCQzgrWG5LUmxHVlUxMFgrdlRiVzkxSW5ZWXR4?=
- =?utf-8?Q?a2+PQvdXvV6yR?=
+	=?us-ascii?Q?jMfjtl9Z5CRMU9FAgPXonNb4M+LM6WHTINcobCTKFaqkHvbZT8C26YUZeg1i?=
+ =?us-ascii?Q?8U1ZpIUrQ3oXFmV9/fuXTElub0NK6HxuzfktbfGG/COiipqhn+RRdXmHUuOD?=
+ =?us-ascii?Q?Ir6pi4VWKKec6TZcfcG21k4i/Yf9UzYNz39IjZyBLFsurzX3FAgzJzk6CJLE?=
+ =?us-ascii?Q?oqsDP9JAPOammuB9DD4iGTe8zdmnaEBRPqo8Cea3WvSVBaFn4Nv9Z+6E9EFo?=
+ =?us-ascii?Q?PGn6aiFyDNxoGIvSYteBNQMqK7AeRbVjLejTAOHG6g4oNUqPC4sz3gP/BJu/?=
+ =?us-ascii?Q?bnQkeBO0jWgTpjVrBjpSse6DpbsWBg9hAF2rRX5TqZBWs8A2V9eTkMVGKBMW?=
+ =?us-ascii?Q?XsJ0lyRgZkfz23B5MQc1lS3R5B6E3UxdJbdvbdKy4JQkiBfs6RFdq8Kp/xJ6?=
+ =?us-ascii?Q?wJdQTEZfssH+McWC7DPciI75jVmaQfKX+WGF5Z0fRA2tmaDL83lbrwbQ1vsV?=
+ =?us-ascii?Q?wLibuxZflVLsdNAHfBO+m+mTGK0qmB0r71IfLlKXnQijtbdPcAYjLZyy5YhW?=
+ =?us-ascii?Q?Pqv9K6ZDh3MgC6LkcEUBx/HSmZsRVQcwS80yrJrEZjnw0S35FHUMrwmvYMji?=
+ =?us-ascii?Q?78oIPRrw5K79p9pkU0CGi/UqGcgSFcR+0GvxC4FF1aIAukCKrj52Sjwqmy47?=
+ =?us-ascii?Q?8GLf6Cfw0HFhB+AY/XHnfJhLTdlo/stkCEoCrKbrKZiwtuSWzdpc/yMEXWnW?=
+ =?us-ascii?Q?b6h82bQxlpOrz3p2g6iedjiycRUrk0owvFi8htdTP9bxtizuTpBdMss4PUth?=
+ =?us-ascii?Q?pMMFXT4gmCsEJdqybYDnMSRZzprD0zfiGzPJVvTzsu8B/nZbcZVVhF0xv5n2?=
+ =?us-ascii?Q?5kKbyIb+tjDmRYrHP/fOXCLaVmsl4xS5gsnCiInlNOzWZ8xZ575d4MWcN+ln?=
+ =?us-ascii?Q?F3Msa3yngP/QefNR54pN2tLoa810NGmr4351/+x9mU4Sr1jAi0SexOtNhrCl?=
+ =?us-ascii?Q?dWjo3dKGZPPZhUWfcCdgROIvr9a1MciL2+taVdLlLg/s0sIxrJeBLeG3Nqzz?=
+ =?us-ascii?Q?k+hh14k7OyqFey2k5/VAzpCxF0FAzvCc8BaLyhXkRIBT/NBZRI3D/ALQOuXb?=
+ =?us-ascii?Q?x8L6Au39gXiY0Oynsv1ONOaf3sTQKQfd1/HklPyiEx5f3jYDgiZLZNYSGFRn?=
+ =?us-ascii?Q?Jl307VfV/eXw/mCwD3hUjr4y0QqgfaKRZS1l/PVtemMy3plRBi4lKMQc6Y73?=
+ =?us-ascii?Q?hDnNbsRpelDkMl2K4vxq8y/cHxebSMrCeeIM5fPhwA1rpPT3Ye/guODGf6C1?=
+ =?us-ascii?Q?J6OLSEkTVcTUIDdwpgEsaUVQHh7wR/F64QtPRFZpL7FcjhtI4Yq3X/VZFO2X?=
+ =?us-ascii?Q?rg4303YgmKj+TtMQLM34H+zj3lkOOjZI8L9UOwjYLuZaae4qeR36CIQx1lFS?=
+ =?us-ascii?Q?sGLo6uesbOnQNTIRMJnKyGrkrDMTKGFwJfKuz3zYYRjl/zYUt4roOGw+wWK8?=
+ =?us-ascii?Q?08KAmMRqryM9AxvsVmXP2bPntkSMJqDZWMSfbYvrprYDk/oyFy9GeM6r3rGS?=
+ =?us-ascii?Q?obMcxsms8Qkprbk=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8216.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?M1MyYS93TU5uTUY1TDgxSVBJR0ZrUnhiMlQyYXRjL05EdFQ2TEw4TmgwZlB5?=
- =?utf-8?B?bDdERStzbnprMFQrVlhZelVJNEVwc3dNNkgrNjJKc0EvQ29PdnpPOGoxczJ0?=
- =?utf-8?B?RFYxNktlbWRZYnBDMGdGLzAyZHI1ZGNuUWx2VGxNV1BkbkcvcDNxc3FoR2JH?=
- =?utf-8?B?cFUzVk84cGQ1VU9iVCtiVlovemUzWCt0U3BJMFI5Z1l6ZS9MZ3hmQ21BUDVo?=
- =?utf-8?B?aW43eVljNXhQRXdTUjEzVUlzUnJEOE1IMy9qM3NSazdZQVBqdm9VdXp5bnB0?=
- =?utf-8?B?T2pnUXdlU1RCZTk2ZmpzdVBLeFBVSXhBYzVvNGxLUWY3YVFDTmcyR0N1NkJq?=
- =?utf-8?B?R041Y25jeTAra0c3RFZLNHV3U0R3Sngzb1Znd25JYzFRaGlZS3pQYzJOWkZo?=
- =?utf-8?B?LzZ1QTJOUDUyY2lKT01EdjFyclpYZmVYcFNUVkZyVEtBMFdiczRiQXRycHRO?=
- =?utf-8?B?d3F2RUFSeEV0THlNZEdqSDFYdUF2azhyQlZ0cFU5MjFjUTRDdkVvV1pTTURC?=
- =?utf-8?B?YzhndkJIb3Arb2sxWFZORWNHOGhKNUZpUFM1dTNoSnhtMktvdU1ycVk0OVc2?=
- =?utf-8?B?SDRscHNDWXpiUjQ5bERYTHZWRm1yYWZvaG5SUUdiOEVLaDRZeUdYUkxQa2Fp?=
- =?utf-8?B?dVhoMHdyL215TUdWVjZlTmNZbExnMUN4emFrVGVuZ0RLWVFmQld6TFBTVHdJ?=
- =?utf-8?B?YUwvOHZidklqQm85RStDeXRVdDdFbWVmdTZtL1VoWjhZRy9HTCt2ZUVLZVNM?=
- =?utf-8?B?ZXNuZ3cwYTZSbzdWNzNvQzVQaEo1WGcyQVZqc0IwSVIzZ2RnYzMyR2NuRXNl?=
- =?utf-8?B?YzhrQTBScnFXVHJBR0F0QytMZWdyd1lRV1d6ZUhRTVkzeS92Y0RLVGUzN3Nj?=
- =?utf-8?B?cTFac0l5VmdkK3J4cHgweGVkL1FIZ0xKVXBWRDlVbXFCaVVDUUdMYlBSdEdB?=
- =?utf-8?B?eUVCZ0hxZTFpL1UzT2E5dTU0OTBCTjhib3RVVm9PTXFjOHh4Z3padi9HLzVJ?=
- =?utf-8?B?MkI4MTVDZm5wdk5UeTNBTXJGa2EydnNtNFo5RFpUc0JLSElwWkhMZWFEc3li?=
- =?utf-8?B?b2J0UXFCcWpnbWI1M3htRUhvL2QydGFQaHl0eDVMYS9ia3l2VFYyWVl3L1dH?=
- =?utf-8?B?NC9pOFFSUkJnc2g5M25ZN1R6aExrenlDL0NrQ2JCM2M4blB4NnUrcUtjNjdI?=
- =?utf-8?B?aHdocTVMY3FaQUtqMU5wcm0rWHJIMDZjZEFJUXVVdytFRWFTTGc0UjRCU3Zq?=
- =?utf-8?B?dGNvN0dINWlGcUtYZDAzSXZ5bS81cnpRb3h1RThsL1BiakxQazdOek9KM0tR?=
- =?utf-8?B?eFM2L1Q3V1Z5Qll1c2NMa0kvbGM2ZDJ2U2pyVlJmdGZzazBZT2dSMkxDdmU3?=
- =?utf-8?B?a1ZJaFZmMXZSd1pDSGVKclpwejBKWG9OOUVJOTk2ZmM0UkhyWkdOQnpNNGY5?=
- =?utf-8?B?dDFFcGl0M1p3eTU1bHRobnp2ajcvdVhpVUltZE8zK2xNL2xHcXRTQnNrcnEw?=
- =?utf-8?B?TGd0SlkxNUJBdVN6djRFSEFaekY0T2dKd0I3NnlYWCthbjVYQnRWK1ZzRmdt?=
- =?utf-8?B?SFgrbmFuTldBWjE2VWZJU3lOdDlBY21ObHA5b3RsbWV2YnI0c0pKMzcwUUJ3?=
- =?utf-8?B?ZDR5eGJtZTZDcjhNN2tYMlFZVVA4ZlBSelRFZi9SVGdUQXlxV0dDdTRtUUZE?=
- =?utf-8?B?UVQwK0NtbzRJTHUrem9IRGNQeUVGSlJxeHdnaTR1YzlwamNrMFh5N3JPTzU5?=
- =?utf-8?B?Q2ppN0tLUmwwK2hFRFhVZ25WaVJ2c0xhN1lXeU5kZ3lzR2FGd01haVZkY21Z?=
- =?utf-8?B?eXlRSDdXRkE5VjlYdTNjQWswR3dYckNteldEaFZmbUNwOU5sRUJ5VWc2OXRK?=
- =?utf-8?B?MmhnRXNNV0JwWXVYaGN1YTJRcWFad2tlT0tMSGRhak1DaTMzWUVMK1hxNXBI?=
- =?utf-8?B?Z2wxVnZSTU53TEFML0xrT0N0MjBEZ2t2WFZyY08wdnU5dXRsZUgwblZpaFlD?=
- =?utf-8?B?b3lpd2phQzFkMTNVTGx0QnZwWkJYYkVXdnp5aFdvb3o1UE1ERXRrMUxycDZF?=
- =?utf-8?B?cVpPYkFTbElBd05vcmFydVQvREpCRnFhNVM5cnlqbXJtaEhMeVowZEhtbFg1?=
- =?utf-8?Q?vgXSsyg7jVX2YI7vmXCS5kT6w?=
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e2024dff-fa72-4abe-cf55-08dd5b368fbc
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8216.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2025 16:06:45.6184
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(82310400026)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2025 16:07:18.7755
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: m1ufGB/6dvm+koAqE2pIzX/srVIuPi4NZ1vTiR+v4vkSMNQJjY0Fgg4CwkThslfQcKo0RSxldf1Ndx64XEsyZw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB10304
+X-MS-Exchange-CrossTenant-Network-Message-Id: 977dbf45-c9e1-405e-8b1e-08dd5b36a3b1
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF000252A0.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7772
 
-TJA1120B/TJA1121B can achieve a stable operation of SGMII after
-a startup event by putting the SGMII PCS into power down mode and
-restart afterwards.
+From: Leon Romanovsky <leonro@nvidia.com>
 
-It is necessary to put the SGMII PCS into power down mode and back up.
+Prepare the code to addition of prefix handling logic which is needed
+to support matching logic based on source and/or destination network
+prefixes.
 
-Cc: stable@vger.kernel.org
-Fixes: f1fe5dff2b8a ("net: phy: nxp-c45-tja11xx: add TJA1120 support")
-Signed-off-by: Andrei Botila <andrei.botila@oss.nxp.com>
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 ---
- drivers/net/phy/nxp-c45-tja11xx.c | 20 ++++++++++++++++++--
- 1 file changed, 18 insertions(+), 2 deletions(-)
+ .../mellanox/mlx5/core/en_accel/ipsec.c       | 32 ++++----
+ .../mellanox/mlx5/core/en_accel/ipsec.h       | 26 +++----
+ .../mellanox/mlx5/core/en_accel/ipsec_fs.c    | 75 +++++++++++--------
+ 3 files changed, 68 insertions(+), 65 deletions(-)
 
-diff --git a/drivers/net/phy/nxp-c45-tja11xx.c b/drivers/net/phy/nxp-c45-tja11xx.c
-index 709d6c9f7cba..e9fc54517449 100644
---- a/drivers/net/phy/nxp-c45-tja11xx.c
-+++ b/drivers/net/phy/nxp-c45-tja11xx.c
-@@ -114,6 +114,9 @@
- #define MII_BASIC_CONFIG_RMII		0x5
- #define MII_BASIC_CONFIG_MII		0x4
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+index 501709ac310f..beb7275d721a 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+@@ -277,12 +277,12 @@ static void mlx5e_ipsec_init_macs(struct mlx5e_ipsec_sa_entry *sa_entry,
+ 	case XFRM_DEV_OFFLOAD_IN:
+ 		src = attrs->dmac;
+ 		dst = attrs->smac;
+-		pkey = &attrs->saddr.a4;
++		pkey = &attrs->addrs.saddr.a4;
+ 		break;
+ 	case XFRM_DEV_OFFLOAD_OUT:
+ 		src = attrs->smac;
+ 		dst = attrs->dmac;
+-		pkey = &attrs->daddr.a4;
++		pkey = &attrs->addrs.daddr.a4;
+ 		break;
+ 	default:
+ 		return;
+@@ -374,9 +374,10 @@ void mlx5e_ipsec_build_accel_xfrm_attrs(struct mlx5e_ipsec_sa_entry *sa_entry,
+ 	attrs->spi = be32_to_cpu(x->id.spi);
  
-+#define VEND1_SGMII_BASIC_CONTROL	0xB000
-+#define SGMII_LPM			BIT(11)
-+
- #define VEND1_SYMBOL_ERROR_CNT_XTD	0x8351
- #define EXTENDED_CNT_EN			BIT(15)
- #define VEND1_MONITOR_STATUS		0xAC80
-@@ -1598,11 +1601,11 @@ static int nxp_c45_set_phy_mode(struct phy_device *phydev)
- 	return 0;
+ 	/* source , destination ips */
+-	memcpy(&attrs->saddr, x->props.saddr.a6, sizeof(attrs->saddr));
+-	memcpy(&attrs->daddr, x->id.daddr.a6, sizeof(attrs->daddr));
+-	attrs->family = x->props.family;
++	memcpy(&attrs->addrs.saddr, x->props.saddr.a6,
++	       sizeof(attrs->addrs.saddr));
++	memcpy(&attrs->addrs.daddr, x->id.daddr.a6, sizeof(attrs->addrs.daddr));
++	attrs->addrs.family = x->props.family;
+ 	attrs->type = x->xso.type;
+ 	attrs->reqid = x->props.reqid;
+ 	attrs->upspec.dport = ntohs(x->sel.dport);
+@@ -428,7 +429,8 @@ static int mlx5e_xfrm_validate_state(struct mlx5_core_dev *mdev,
+ 	}
+ 	if (x->encap) {
+ 		if (!(mlx5_ipsec_device_caps(mdev) & MLX5_IPSEC_CAP_ESPINUDP)) {
+-			NL_SET_ERR_MSG_MOD(extack, "Encapsulation is not supported");
++			NL_SET_ERR_MSG_MOD(extack,
++					   "Encapsulation is not supported");
+ 			return -EINVAL;
+ 		}
+ 
+@@ -853,13 +855,13 @@ static int mlx5e_ipsec_netevent_event(struct notifier_block *nb,
+ 	xa_for_each_marked(&ipsec->sadb, idx, sa_entry, MLX5E_IPSEC_TUNNEL_SA) {
+ 		attrs = &sa_entry->attrs;
+ 
+-		if (attrs->family == AF_INET) {
+-			if (!neigh_key_eq32(n, &attrs->saddr.a4) &&
+-			    !neigh_key_eq32(n, &attrs->daddr.a4))
++		if (attrs->addrs.family == AF_INET) {
++			if (!neigh_key_eq32(n, &attrs->addrs.saddr.a4) &&
++			    !neigh_key_eq32(n, &attrs->addrs.daddr.a4))
+ 				continue;
+ 		} else {
+-			if (!neigh_key_eq128(n, &attrs->saddr.a4) &&
+-			    !neigh_key_eq128(n, &attrs->daddr.a4))
++			if (!neigh_key_eq128(n, &attrs->addrs.saddr.a4) &&
++			    !neigh_key_eq128(n, &attrs->addrs.daddr.a4))
+ 				continue;
+ 		}
+ 
+@@ -1035,7 +1037,7 @@ static void mlx5e_xfrm_update_stats(struct xfrm_state *x)
+ 	 * by removing always available headers.
+ 	 */
+ 	headers = sizeof(struct ethhdr);
+-	if (sa_entry->attrs.family == AF_INET)
++	if (sa_entry->attrs.addrs.family == AF_INET)
+ 		headers += sizeof(struct iphdr);
+ 	else
+ 		headers += sizeof(struct ipv6hdr);
+@@ -1116,9 +1118,9 @@ mlx5e_ipsec_build_accel_pol_attrs(struct mlx5e_ipsec_pol_entry *pol_entry,
+ 	sel = &x->selector;
+ 	memset(attrs, 0, sizeof(*attrs));
+ 
+-	memcpy(&attrs->saddr, sel->saddr.a6, sizeof(attrs->saddr));
+-	memcpy(&attrs->daddr, sel->daddr.a6, sizeof(attrs->daddr));
+-	attrs->family = sel->family;
++	memcpy(&attrs->addrs.saddr, sel->saddr.a6, sizeof(attrs->addrs.saddr));
++	memcpy(&attrs->addrs.daddr, sel->daddr.a6, sizeof(attrs->addrs.daddr));
++	attrs->addrs.family = sel->family;
+ 	attrs->dir = x->xdo.dir;
+ 	attrs->action = x->action;
+ 	attrs->type = XFRM_DEV_OFFLOAD_PACKET;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.h b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.h
+index ad8db9e1fd1d..37ef1e331135 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.h
+@@ -76,11 +76,7 @@ struct mlx5_replay_esn {
+ 	u8 trigger : 1;
+ };
+ 
+-struct mlx5_accel_esp_xfrm_attrs {
+-	u32   spi;
+-	u32   mode;
+-	struct aes_gcm_keymat aes_gcm;
+-
++struct mlx5e_ipsec_addr {
+ 	union {
+ 		__be32 a4;
+ 		__be32 a6[4];
+@@ -90,13 +86,19 @@ struct mlx5_accel_esp_xfrm_attrs {
+ 		__be32 a4;
+ 		__be32 a6[4];
+ 	} daddr;
++	u8 family;
++};
+ 
++struct mlx5_accel_esp_xfrm_attrs {
++	u32   spi;
++	u32   mode;
++	struct aes_gcm_keymat aes_gcm;
++	struct mlx5e_ipsec_addr addrs;
+ 	struct upspec upspec;
+ 	u8 dir : 2;
+ 	u8 type : 2;
+ 	u8 drop : 1;
+ 	u8 encap : 1;
+-	u8 family;
+ 	struct mlx5_replay_esn replay_esn;
+ 	u32 authsize;
+ 	u32 reqid;
+@@ -279,18 +281,8 @@ struct mlx5e_ipsec_sa_entry {
+ };
+ 
+ struct mlx5_accel_pol_xfrm_attrs {
+-	union {
+-		__be32 a4;
+-		__be32 a6[4];
+-	} saddr;
+-
+-	union {
+-		__be32 a4;
+-		__be32 a6[4];
+-	} daddr;
+-
++	struct mlx5e_ipsec_addr addrs;
+ 	struct upspec upspec;
+-	u8 family;
+ 	u8 action;
+ 	u8 type : 2;
+ 	u8 dir : 2;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c
+index d51ace739637..23b63dea2f7f 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_fs.c
+@@ -1484,9 +1484,12 @@ static void tx_ft_put_policy(struct mlx5e_ipsec *ipsec, u32 prio, int type)
+ 	mutex_unlock(&tx->ft.mutex);
  }
  
--/* Errata: ES_TJA1120 and ES_TJA1121 Rev. 1.0 — 28 November 2024 Section 3.1 */
-+/* Errata: ES_TJA1120 and ES_TJA1121 Rev. 1.0 — 28 November 2024 Section 3.1 & 3.2 */
- static void nxp_c45_tja1120_errata(struct phy_device *phydev)
+-static void setup_fte_addr4(struct mlx5_flow_spec *spec, __be32 *saddr,
+-			    __be32 *daddr)
++static void setup_fte_addr4(struct mlx5_flow_spec *spec,
++			    struct mlx5e_ipsec_addr *addrs)
  {
-+	bool macsec_ability, sgmii_ability;
- 	int silicon_version, sample_type;
--	bool macsec_ability;
- 	int phy_abilities;
- 	int ret = 0;
- 
-@@ -1619,6 +1622,7 @@ static void nxp_c45_tja1120_errata(struct phy_device *phydev)
- 	phy_abilities = phy_read_mmd(phydev, MDIO_MMD_VEND1,
- 				     VEND1_PORT_ABILITIES);
- 	macsec_ability = !!(phy_abilities & MACSEC_ABILITY);
-+	sgmii_ability = !!(phy_abilities & SGMII_ABILITY);
- 	if ((!macsec_ability && silicon_version == 2) ||
- 	    (macsec_ability && silicon_version == 1)) {
- 		/* TJA1120/TJA1121 PHY configuration errata workaround.
-@@ -1639,6 +1643,18 @@ static void nxp_c45_tja1120_errata(struct phy_device *phydev)
- 
- 		phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x01F8, 0x0);
- 		phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x01F9, 0x0);
++	__be32 *saddr = &addrs->saddr.a4;
++	__be32 *daddr = &addrs->daddr.a4;
 +
-+		if (sgmii_ability) {
-+			/* TJA1120B/TJA1121B SGMII PCS restart errata workaround.
-+			 * Put SGMII PCS into power down mode and back up.
-+			 */
-+			phy_set_bits_mmd(phydev, MDIO_MMD_VEND1,
-+					 VEND1_SGMII_BASIC_CONTROL,
-+					 SGMII_LPM);
-+			phy_clear_bits_mmd(phydev, MDIO_MMD_VEND1,
-+					   VEND1_SGMII_BASIC_CONTROL,
-+					   SGMII_LPM);
-+		}
+ 	if (!*saddr && !*daddr)
+ 		return;
+ 
+@@ -1510,9 +1513,12 @@ static void setup_fte_addr4(struct mlx5_flow_spec *spec, __be32 *saddr,
  	}
  }
  
+-static void setup_fte_addr6(struct mlx5_flow_spec *spec, __be32 *saddr,
+-			    __be32 *daddr)
++static void setup_fte_addr6(struct mlx5_flow_spec *spec,
++			    struct mlx5e_ipsec_addr *addrs)
+ {
++	__be32 *saddr = addrs->saddr.a6;
++	__be32 *daddr = addrs->daddr.a6;
++
+ 	if (addr6_all_zero(saddr) && addr6_all_zero(daddr))
+ 		return;
+ 
+@@ -1722,7 +1728,7 @@ setup_pkt_tunnel_reformat(struct mlx5_core_dev *mdev,
+ 	if (attrs->dir == XFRM_DEV_OFFLOAD_OUT) {
+ 		bfflen += sizeof(*esp_hdr) + 8;
+ 
+-		switch (attrs->family) {
++		switch (attrs->addrs.family) {
+ 		case AF_INET:
+ 			bfflen += sizeof(*iphdr);
+ 			break;
+@@ -1739,7 +1745,7 @@ setup_pkt_tunnel_reformat(struct mlx5_core_dev *mdev,
+ 		return -ENOMEM;
+ 
+ 	eth_hdr = (struct ethhdr *)reformatbf;
+-	switch (attrs->family) {
++	switch (attrs->addrs.family) {
+ 	case AF_INET:
+ 		eth_hdr->h_proto = htons(ETH_P_IP);
+ 		break;
+@@ -1762,11 +1768,11 @@ setup_pkt_tunnel_reformat(struct mlx5_core_dev *mdev,
+ 		reformat_params->param_0 = attrs->authsize;
+ 
+ 		hdr = reformatbf + sizeof(*eth_hdr);
+-		switch (attrs->family) {
++		switch (attrs->addrs.family) {
+ 		case AF_INET:
+ 			iphdr = (struct iphdr *)hdr;
+-			memcpy(&iphdr->saddr, &attrs->saddr.a4, 4);
+-			memcpy(&iphdr->daddr, &attrs->daddr.a4, 4);
++			memcpy(&iphdr->saddr, &attrs->addrs.saddr.a4, 4);
++			memcpy(&iphdr->daddr, &attrs->addrs.daddr.a4, 4);
+ 			iphdr->version = 4;
+ 			iphdr->ihl = 5;
+ 			iphdr->ttl = IPSEC_TUNNEL_DEFAULT_TTL;
+@@ -1775,8 +1781,8 @@ setup_pkt_tunnel_reformat(struct mlx5_core_dev *mdev,
+ 			break;
+ 		case AF_INET6:
+ 			ipv6hdr = (struct ipv6hdr *)hdr;
+-			memcpy(&ipv6hdr->saddr, &attrs->saddr.a6, 16);
+-			memcpy(&ipv6hdr->daddr, &attrs->daddr.a6, 16);
++			memcpy(&ipv6hdr->saddr, &attrs->addrs.saddr.a6, 16);
++			memcpy(&ipv6hdr->daddr, &attrs->addrs.daddr.a6, 16);
+ 			ipv6hdr->nexthdr = IPPROTO_ESP;
+ 			ipv6hdr->version = 6;
+ 			ipv6hdr->hop_limit = IPSEC_TUNNEL_DEFAULT_TTL;
+@@ -1810,7 +1816,7 @@ static int get_reformat_type(struct mlx5_accel_esp_xfrm_attrs *attrs)
+ 			return MLX5_REFORMAT_TYPE_DEL_ESP_TRANSPORT_OVER_UDP;
+ 		return MLX5_REFORMAT_TYPE_DEL_ESP_TRANSPORT;
+ 	case XFRM_DEV_OFFLOAD_OUT:
+-		if (attrs->family == AF_INET) {
++		if (attrs->addrs.family == AF_INET) {
+ 			if (attrs->encap)
+ 				return MLX5_REFORMAT_TYPE_ADD_ESP_TRANSPORT_OVER_UDPV4;
+ 			return MLX5_REFORMAT_TYPE_ADD_ESP_TRANSPORT_OVER_IPV4;
+@@ -2003,7 +2009,7 @@ static int rx_add_rule(struct mlx5e_ipsec_sa_entry *sa_entry)
+ 	struct mlx5_fc *counter;
+ 	int err = 0;
+ 
+-	rx = rx_ft_get(mdev, ipsec, attrs->family, attrs->type);
++	rx = rx_ft_get(mdev, ipsec, attrs->addrs.family, attrs->type);
+ 	if (IS_ERR(rx))
+ 		return PTR_ERR(rx);
+ 
+@@ -2013,10 +2019,10 @@ static int rx_add_rule(struct mlx5e_ipsec_sa_entry *sa_entry)
+ 		goto err_alloc;
+ 	}
+ 
+-	if (attrs->family == AF_INET)
+-		setup_fte_addr4(spec, &attrs->saddr.a4, &attrs->daddr.a4);
++	if (attrs->addrs.family == AF_INET)
++		setup_fte_addr4(spec, &attrs->addrs);
+ 	else
+-		setup_fte_addr6(spec, attrs->saddr.a6, attrs->daddr.a6);
++		setup_fte_addr6(spec, &attrs->addrs);
+ 
+ 	setup_fte_spi(spec, attrs->spi, attrs->encap);
+ 	if (!attrs->encap)
+@@ -2116,7 +2122,7 @@ static int rx_add_rule(struct mlx5e_ipsec_sa_entry *sa_entry)
+ err_mod_header:
+ 	kvfree(spec);
+ err_alloc:
+-	rx_ft_put(ipsec, attrs->family, attrs->type);
++	rx_ft_put(ipsec, attrs->addrs.family, attrs->type);
+ 	return err;
+ }
+ 
+@@ -2148,10 +2154,10 @@ static int tx_add_rule(struct mlx5e_ipsec_sa_entry *sa_entry)
+ 
+ 	switch (attrs->type) {
+ 	case XFRM_DEV_OFFLOAD_CRYPTO:
+-		if (attrs->family == AF_INET)
+-			setup_fte_addr4(spec, &attrs->saddr.a4, &attrs->daddr.a4);
++		if (attrs->addrs.family == AF_INET)
++			setup_fte_addr4(spec, &attrs->addrs);
+ 		else
+-			setup_fte_addr6(spec, attrs->saddr.a6, attrs->daddr.a6);
++			setup_fte_addr6(spec, &attrs->addrs);
+ 		setup_fte_spi(spec, attrs->spi, false);
+ 		setup_fte_esp(spec);
+ 		setup_fte_reg_a(spec);
+@@ -2235,10 +2241,10 @@ static int tx_add_policy(struct mlx5e_ipsec_pol_entry *pol_entry)
+ 	}
+ 
+ 	tx = ipsec_tx(ipsec, attrs->type);
+-	if (attrs->family == AF_INET)
+-		setup_fte_addr4(spec, &attrs->saddr.a4, &attrs->daddr.a4);
++	if (attrs->addrs.family == AF_INET)
++		setup_fte_addr4(spec, &attrs->addrs);
+ 	else
+-		setup_fte_addr6(spec, attrs->saddr.a6, attrs->daddr.a6);
++		setup_fte_addr6(spec, &attrs->addrs);
+ 
+ 	setup_fte_no_frags(spec);
+ 	setup_fte_upper_proto_match(spec, &attrs->upspec);
+@@ -2308,12 +2314,12 @@ static int rx_add_policy(struct mlx5e_ipsec_pol_entry *pol_entry)
+ 	struct mlx5e_ipsec_rx *rx;
+ 	int err, dstn = 0;
+ 
+-	ft = rx_ft_get_policy(mdev, pol_entry->ipsec, attrs->family, attrs->prio,
+-			      attrs->type);
++	ft = rx_ft_get_policy(mdev, pol_entry->ipsec, attrs->addrs.family,
++			      attrs->prio, attrs->type);
+ 	if (IS_ERR(ft))
+ 		return PTR_ERR(ft);
+ 
+-	rx = ipsec_rx(pol_entry->ipsec, attrs->family, attrs->type);
++	rx = ipsec_rx(pol_entry->ipsec, attrs->addrs.family, attrs->type);
+ 
+ 	spec = kvzalloc(sizeof(*spec), GFP_KERNEL);
+ 	if (!spec) {
+@@ -2321,10 +2327,10 @@ static int rx_add_policy(struct mlx5e_ipsec_pol_entry *pol_entry)
+ 		goto err_alloc;
+ 	}
+ 
+-	if (attrs->family == AF_INET)
+-		setup_fte_addr4(spec, &attrs->saddr.a4, &attrs->daddr.a4);
++	if (attrs->addrs.family == AF_INET)
++		setup_fte_addr4(spec, &attrs->addrs);
+ 	else
+-		setup_fte_addr6(spec, attrs->saddr.a6, attrs->daddr.a6);
++		setup_fte_addr6(spec, &attrs->addrs);
+ 
+ 	setup_fte_no_frags(spec);
+ 	setup_fte_upper_proto_match(spec, &attrs->upspec);
+@@ -2364,7 +2370,8 @@ static int rx_add_policy(struct mlx5e_ipsec_pol_entry *pol_entry)
+ err_action:
+ 	kvfree(spec);
+ err_alloc:
+-	rx_ft_put_policy(pol_entry->ipsec, attrs->family, attrs->prio, attrs->type);
++	rx_ft_put_policy(pol_entry->ipsec, attrs->addrs.family, attrs->prio,
++			 attrs->type);
+ 	return err;
+ }
+ 
+@@ -2638,7 +2645,8 @@ void mlx5e_accel_ipsec_fs_del_rule(struct mlx5e_ipsec_sa_entry *sa_entry)
+ 		mlx5_fc_destroy(mdev, ipsec_rule->replay.fc);
+ 	}
+ 	mlx5_esw_ipsec_rx_id_mapping_remove(sa_entry);
+-	rx_ft_put(sa_entry->ipsec, sa_entry->attrs.family, sa_entry->attrs.type);
++	rx_ft_put(sa_entry->ipsec, sa_entry->attrs.addrs.family,
++		  sa_entry->attrs.type);
+ }
+ 
+ int mlx5e_accel_ipsec_fs_add_pol(struct mlx5e_ipsec_pol_entry *pol_entry)
+@@ -2674,7 +2682,8 @@ void mlx5e_accel_ipsec_fs_del_pol(struct mlx5e_ipsec_pol_entry *pol_entry)
+ 	mlx5e_ipsec_unblock_tc_offload(pol_entry->ipsec->mdev);
+ 
+ 	if (pol_entry->attrs.dir == XFRM_DEV_OFFLOAD_IN) {
+-		rx_ft_put_policy(pol_entry->ipsec, pol_entry->attrs.family,
++		rx_ft_put_policy(pol_entry->ipsec,
++				 pol_entry->attrs.addrs.family,
+ 				 pol_entry->attrs.prio, pol_entry->attrs.type);
+ 		return;
+ 	}
+@@ -2814,7 +2823,7 @@ bool mlx5e_ipsec_fs_tunnel_enabled(struct mlx5e_ipsec_sa_entry *sa_entry)
+ 	struct mlx5e_ipsec_rx *rx;
+ 	struct mlx5e_ipsec_tx *tx;
+ 
+-	rx = ipsec_rx(sa_entry->ipsec, attrs->family, attrs->type);
++	rx = ipsec_rx(sa_entry->ipsec, attrs->addrs.family, attrs->type);
+ 	tx = ipsec_tx(sa_entry->ipsec, attrs->type);
+ 	if (sa_entry->attrs.dir == XFRM_DEV_OFFLOAD_OUT)
+ 		return tx->allow_tunnel_mode;
 -- 
-2.48.1
+2.45.0
 
 
