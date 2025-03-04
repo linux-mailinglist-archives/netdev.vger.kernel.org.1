@@ -1,139 +1,96 @@
-Return-Path: <netdev+bounces-171615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9DCEA4DD46
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 13:00:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A082A4DD45
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 13:00:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8166F18886F2
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 11:58:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F02D917720D
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 12:00:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66B0F1FFC68;
-	Tue,  4 Mar 2025 11:58:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 109D320013D;
+	Tue,  4 Mar 2025 12:00:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Jrhw20Qy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gbV2yebA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745461F150D;
-	Tue,  4 Mar 2025 11:58:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB5D6200B9F;
+	Tue,  4 Mar 2025 11:59:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741089524; cv=none; b=pu/XRv1QvMcEgIe+wa5cBmsMx7DKZwmwRDybVA+gQgA6OJRpEb8BKe3++4hToTo+zc+GRS5UKb3MvFN/vNxJLd1MB67zvUWU5eAaGWSkp8WXCl8ppd5WCgqaA8zGIW0a7iF5cUaG7IsFpDoAW2hHutCaHqtRnqUfZp5p+RPEOeA=
+	t=1741089600; cv=none; b=b4ZKUDCevOptJ7Cqk+7fTZNnaCFMHdItjGZXMnJknqWtM2BP6O2eAbb5NEf0hh6fw/3lr0F9p2vosjLUzZCd3GN9j6n3c6Xtu5zv4otwZiDNddFpijP1x084E2AlYFywtadzuBB8TVfe4kFGCpJ+XrEsGXdKYYee/y1BIhjwcE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741089524; c=relaxed/simple;
-	bh=zJsKIqxmW/ciJ/CGeURsPQPLty/XONLIcsf/+xtesFI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BPlCsvjUJrpoU4hLQkVLj3uB74ItFyqUF5LrLPIOlrf/73aOvHOsp/juZE6LUTC6QH8vrLI2BZ3ybOgDTrPtvedIdWi2zX5dmcgOJX2FsJK5lqIIhDpvf/RZ7hckkmSVhfI4e5rir+n5f838f8UmvQamn9qbyIF78lhr5/KgeCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Jrhw20Qy; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741089522; x=1772625522;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=zJsKIqxmW/ciJ/CGeURsPQPLty/XONLIcsf/+xtesFI=;
-  b=Jrhw20Qy4jy418BWFX8mP0aq1zoIX8nWn0ukKhs1lOtWfEiZlcE7NMKI
-   z6wKyj0zQpo0L1ozffD0aR9569KksYgUiI3mQSgxXrkbcDqFdouK2ibYk
-   3gxS7s/CmYeJ0Thlmx4t8kG1usunLc9gZTpMAVWT0/GYGyHzu2NiPVkYJ
-   X+IWf4tMhf6i5d3g3jtDkOKbkXYbw3rd/ckIA4rDpd5hEIeJtvTuqz07P
-   wj2+UkuiRX1Q9+gpPLguDHK6mMKSzsJJeIBjqa5r2KSwbRRcWRPbDYPpy
-   cNd9RL3eW58fxHyMaYOFfWiyn0lA0cWGiC5Aeehbu1SHKS8RrZTjnde2p
-   g==;
-X-CSE-ConnectionGUID: VZZiqB0KR4S+u4MVTh25jQ==
-X-CSE-MsgGUID: SV2uDMq7Q96PHy5w+WBMHQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="67371840"
-X-IronPort-AV: E=Sophos;i="6.13,331,1732608000"; 
-   d="scan'208";a="67371840"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 03:58:39 -0800
-X-CSE-ConnectionGUID: 42inDFCaQcmVRHWLz/Mh0w==
-X-CSE-MsgGUID: W8on7+kbS2mKhC1BWiOwHA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="149285886"
-Received: from smile.fi.intel.com ([10.237.72.58])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 03:58:36 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1tpQuv-0000000H7B4-2FWl;
-	Tue, 04 Mar 2025 13:58:33 +0200
-Date: Tue, 4 Mar 2025 13:58:33 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Paolo Abeni <pabeni@redhat.com>, Christoph Hellwig <hch@lst.de>,
-	Marek Szyprowski <m.szyprowski@samsung.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Rasesh Mody <rmody@marvell.com>,
-	GR-Linux-NIC-Dev@marvell.com, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net v1 1/1] bnx2: Fix unused data compilation warning
-Message-ID: <Z8bq6XJGJNbycmJ9@smile.fi.intel.com>
-References: <20250228100538.32029-1-andriy.shevchenko@linux.intel.com>
- <20250303172114.6004ef32@kernel.org>
- <Z8bcaR9MS7dk8Q0p@smile.fi.intel.com>
- <5ec0a2cc-e5f6-42dd-992c-79b1a0c1b9f5@redhat.com>
+	s=arc-20240116; t=1741089600; c=relaxed/simple;
+	bh=E08SB6Z1syo3up7Ty9PycPv45+p3/R0MzAJU2jZucfw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=sFrB1gJiq0JD2dcwPuABqUMWNKqD8KH1zigxVangHXeLpvmlerx96iwXl/aLROsEhHy6e1zbxXl3dRInjsA/IKAIbsj0ATNdBqEt4C2h825OAmfGCIbWiFy22z0YGKJv0Ghspos2YIQxOrpW5ZMZxLblv7u9y5Z+z+D1G+xC/7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gbV2yebA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63AA9C4CEE5;
+	Tue,  4 Mar 2025 11:59:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741089599;
+	bh=E08SB6Z1syo3up7Ty9PycPv45+p3/R0MzAJU2jZucfw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=gbV2yebAA3pFFb9zE6BpbIMHN2CfXiVrp7DiVEOWUK0SyX2/3ur5Up++4ycn73XdL
+	 OfwQLTUmMw8Kxy/AuU6l72TFo2I37wEJZ4edFL2wELJcWknWeb9Q50HdLkNlhqNxWf
+	 8EbACsuCBAtXDAJlDBv1JRkvgx5nA1Ji5BotEnRhnT5gQiorfGLP5CuWx8APSBKDui
+	 +dF0LuXq4sLgpfxrgYbPa2XzlmmBPk/v0PsMnW8uUtgwhZ5vylV/XA0Leo5Bh9UvOx
+	 FQ2n/OJZEI+7L6uNPQEvjGnfDqbvqEJLpPNy7J4DG2qsKcLxMgrG3ecqWrENwIA9d0
+	 Zi84gcNjbLxyw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 713E4380AA7F;
+	Tue,  4 Mar 2025 12:00:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5ec0a2cc-e5f6-42dd-992c-79b1a0c1b9f5@redhat.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: hns3: make sure ptp clock is unregister and freed if
+ hclge_ptp_get_cycle returns an error
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174108963218.113455.4268912693343662541.git-patchwork-notify@kernel.org>
+Date: Tue, 04 Mar 2025 12:00:32 +0000
+References: <20250228105258.1243461-1-shaojijie@huawei.com>
+In-Reply-To: <20250228105258.1243461-1-shaojijie@huawei.com>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ shenjian15@huawei.com, wangpeiyang1@huawei.com, liuyonglong@huawei.com,
+ chenhao418@huawei.com, jonathan.cameron@huawei.com,
+ shameerali.kolothum.thodi@huawei.com, salil.mehta@huawei.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-+ Marek/Christoph (for the clarification/commenting on the below)
+Hello:
 
-On Tue, Mar 04, 2025 at 12:39:40PM +0100, Paolo Abeni wrote:
-> On 3/4/25 11:56 AM, Andy Shevchenko wrote:
-> > On Mon, Mar 03, 2025 at 05:21:14PM -0800, Jakub Kicinski wrote:
-> >> On Fri, 28 Feb 2025 12:05:37 +0200 Andy Shevchenko wrote:
-> >>> In some configuration, compilation raises warnings related to unused
-> >>> data. Indeed, depending on configuration, those data can be unused.
-> >>>
-> >>> Mark those data as __maybe_unused to avoid compilation warnings.
-> >>
-> >> Will making dma_unmap_addr access the first argument instead of
-> >> pre-processing down to nothing not work?
-> > 
-> > I looked at the implementation of those macros and I have no clue
-> > how to do that in a least intrusive way. Otherwise it sounds to me
-> > quite far from the scope of the small compilation error fix that
-> > I presented here.
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-> I *think* Jakub is suggesting something alike:
-
-I see. Perhpas we need Marek's/Christoph's opinion on this...
-
-> ---
-> diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
-> index b79925b1c433..927884f10b0f 100644
-> --- a/include/linux/dma-mapping.h
-> +++ b/include/linux/dma-mapping.h
-> @@ -629,7 +629,7 @@ static inline int dma_mmap_wc(struct device *dev,
->  #else
->  #define DEFINE_DMA_UNMAP_ADDR(ADDR_NAME)
->  #define DEFINE_DMA_UNMAP_LEN(LEN_NAME)
-> -#define dma_unmap_addr(PTR, ADDR_NAME)           (0)
-> +#define dma_unmap_addr(PTR, ADDR_NAME)           (((PTR)->ADDR_NAME), 0)
->  #define dma_unmap_addr_set(PTR, ADDR_NAME, VAL)  do { } while (0)
->  #define dma_unmap_len(PTR, LEN_NAME)             (0)
->  #define dma_unmap_len_set(PTR, LEN_NAME, VAL)    do { } while (0)
-> ---
+On Fri, 28 Feb 2025 18:52:58 +0800 you wrote:
+> From: Peiyang Wang <wangpeiyang1@huawei.com>
 > 
-> Would that work?
+> During the initialization of ptp, hclge_ptp_get_cycle might return an error
+> and returned directly without unregister clock and free it. To avoid that,
+> call hclge_ptp_destroy_clock to unregist and free clock if
+> hclge_ptp_get_cycle failed.
+> 
+> [...]
 
-I do not know. Not my area of expertise.
+Here is the summary with links:
+  - [net] net: hns3: make sure ptp clock is unregister and freed if hclge_ptp_get_cycle returns an error
+    https://git.kernel.org/netdev/net/c/b7365eab3983
 
+You are awesome, thank you!
 -- 
-With Best Regards,
-Andy Shevchenko
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
