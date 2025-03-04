@@ -1,159 +1,137 @@
-Return-Path: <netdev+bounces-171621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81F63A4DDD6
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 13:25:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A355DA4DDEA
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 13:30:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5902817838F
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 12:25:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 105B83A4CB3
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 12:29:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 602E1202994;
-	Tue,  4 Mar 2025 12:25:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A26520299D;
+	Tue,  4 Mar 2025 12:30:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TMo2Q3Ep"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073D8202989;
-	Tue,  4 Mar 2025 12:25:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624B8202976;
+	Tue,  4 Mar 2025 12:30:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741091133; cv=none; b=p6Nr5xzYFqgKIL+GUPTUQ5IlutGY2vEBM+cnbdzH+gnQzhgEdp5MziiGwj6UL0TnWAMz9tWodYJZZEWwwJ2Mt7wUm1fvkhWHQ4IEoIlFZUkOjKvRhV10qY/5Etc8C9rgXsyov7Ebp0u3QgP9SuxqB7HOIHP3UN6cIODVAVI6eag=
+	t=1741091402; cv=none; b=sVRIdalGHjNMkcG/alsyn3eeamGZh4Jq76Zkb2RYylft/fxmyiVbkVx440yXtA6mgT42F4+As+LaphwGvyjLXP0vt9ecUxsId42StPkX1kpiFV8LeaBi6G4SGItIIePmbriXbxyaB6cr9DqPtDbFUvmuBIa974/rjVxIQ8Bu5jU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741091133; c=relaxed/simple;
-	bh=MB1CADvdS6O0JIq3O56tt7iMaZRBTkfdTpP8VouXJEE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=G3RwJkubQOqZwrCiG2qoNn/hs9nJc7IUiy4Z7Ewe29oa2aKt5Cc+bq8gHzlRq8M5ppPkyjULoTluwhUr4mkTw384oEk3uplPFGKKu0yf6LrqgmFN5LxN4Gh5cDiAlApI4nm198/GVpTeMDrtgiN9Sp/p4XWY4ot0G6uNqcVEbX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Z6ZYg3PJYzCs78;
-	Tue,  4 Mar 2025 20:21:59 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id C9BB4140156;
-	Tue,  4 Mar 2025 20:25:28 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 4 Mar 2025 20:25:28 +0800
-Message-ID: <b67798cf-17e0-444d-be9f-00071c3e32b4@huawei.com>
-Date: Tue, 4 Mar 2025 20:25:28 +0800
+	s=arc-20240116; t=1741091402; c=relaxed/simple;
+	bh=rJKGNfM/s8QAQjXFzZnxlWs2DFKcY9YmiOImWJPI/GQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=UJ2wSjl8qFpqVUcl+Wl/l2fsO+/9Bw5Nq+fiknjvz8FJcp8QkQ9/0Ur1b9HKiG2xGpOGFsNkQGyMmAq1g7ULVTHxIYN9S20ncXzLZSw7vQzEpie3nTV+wA+lwmyKPj2UL/CQwGNVFBkm+KC7ZwsNYBhtsEbvPC3MZQWHguZOZ1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TMo2Q3Ep; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3EC3C4CEE5;
+	Tue,  4 Mar 2025 12:30:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741091401;
+	bh=rJKGNfM/s8QAQjXFzZnxlWs2DFKcY9YmiOImWJPI/GQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=TMo2Q3EpOctKaoJW9GG7S6AMYjIDFGNjCQj4bJsSZCI9aqh/qYV4ejHAlDb9RLKnP
+	 M1csSwvOvpyYuoLzNbdiOSskin8i1N64VgsfpIBdZmAAbz5+TRZLfil0G9953jUhUh
+	 IFBtS/SB89C0+avIAkVA0DnGt0g5t9Bsk0D0NsgrRUIV2lK5TuG7+WKG7B7fyHSfcl
+	 9n8w8hSOw7iZiEvXgMHZmcmUgNFVj73T4Zci4/koyKbeOkbKt4nDC/VRHbkEgdelGK
+	 10XmL2sNZ9QGlY4ENh2ChRmU+IHBOqKWhqvmeYlTGseMDIoQQAwGaAdyzoqN/AOD5c
+	 ewoyaowLH8P+w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE2D380AA7F;
+	Tue,  4 Mar 2025 12:30:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10 3/4] page_pool: support unlimited number of
- inflight pages
-To: Simon Horman <horms@kernel.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<zhangkun09@huawei.com>, <liuyonglong@huawei.com>, <fanghaiqing@huawei.com>,
-	Robin Murphy <robin.murphy@arm.com>, Alexander Duyck
-	<alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>, Eric Dumazet
-	<edumazet@google.com>, Donald Hunter <donald.hunter@gmail.com>, Jesper
- Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
-	<ilias.apalodimas@linaro.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20250226110340.2671366-1-linyunsheng@huawei.com>
- <20250226110340.2671366-4-linyunsheng@huawei.com>
- <20250303175940.GW1615191@kernel.org>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <20250303175940.GW1615191@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v8 00/15] Introduce flowtable hw offloading in
+ airoha_eth driver
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174109143450.124302.2708662777154071510.git-patchwork-notify@kernel.org>
+Date: Tue, 04 Mar 2025 12:30:34 +0000
+References: <20250228-airoha-en7581-flowtable-offload-v8-0-01dc1653f46e@kernel.org>
+In-Reply-To: <20250228-airoha-en7581-flowtable-offload-v8-0-01dc1653f46e@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, nbd@nbd.name, sean.wang@mediatek.com,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ p.zabel@pengutronix.de, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, chester.a.unal@arinc9.com, daniel@makrotopia.org,
+ dqfext@gmail.com, andrew@lunn.ch, olteanv@gmail.com, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ devicetree@vger.kernel.org, upstream@airoha.com, sayantan.nandy@airoha.com,
+ ansuelsmth@gmail.com, krzysztof.kozlowski@linaro.org
 
-On 2025/3/4 1:59, Simon Horman wrote:
-> On Wed, Feb 26, 2025 at 07:03:38PM +0800, Yunsheng Lin wrote:
->> Currently a fixed size of pre-allocated memory is used to
->> keep track of the inflight pages, in order to use the DMA
->> API correctly.
->>
->> As mentioned [1], the number of inflight pages can be up to
->> 73203 depending on the use cases. Allocate memory dynamically
->> to keep track of the inflight pages when pre-allocated memory
->> runs out.
->>
->> The overhead of using dynamic memory allocation is about 10ns~
->> 20ns, which causes 5%~10% performance degradation for the test
->> case of time_bench_page_pool03_slow() in [2].
->>
->> 1. https://lore.kernel.org/all/b8b7818a-e44b-45f5-91c2-d5eceaa5dd5b@kernel.org/
->> 2. https://github.com/netoptimizer/prototype-kernel
->> CC: Robin Murphy <robin.murphy@arm.com>
->> CC: Alexander Duyck <alexander.duyck@gmail.com>
->> CC: IOMMU <iommu@lists.linux.dev>
->> Fixes: f71fec47c2df ("page_pool: make sure struct device is stable")
->> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
->> ---
->>  Documentation/netlink/specs/netdev.yaml | 16 +++++
->>  include/net/page_pool/types.h           | 10 ++++
->>  include/uapi/linux/netdev.h             |  2 +
->>  net/core/page_pool.c                    | 79 ++++++++++++++++++++++++-
->>  net/core/page_pool_priv.h               |  2 +
->>  net/core/page_pool_user.c               | 39 ++++++++++--
->>  tools/net/ynl/samples/page-pool.c       | 11 ++++
->>  7 files changed, 154 insertions(+), 5 deletions(-)
-> 
-> Hi,
-> 
-> It looks like the header changes in this patch don't quite
-> correspond to the spec changes.
-> 
-> But if so, perhaps the spec update needs to change,
-> because adding values to an enum, other than at the end,
-> feels like UAPI breakage to me.
-> 
-> I see this:
-> 
-> $ ./tools/net/ynl/ynl-regen.sh -f
+Hello:
 
-Yes, It seems I only tested the tools/net/ynl/samples/page-pool, which
-doesn't seems to catch the above problem.
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Will update the spec changes to the the header changes and update
-tools/include/uapi/linux/netdev.h accordingly too.
-
-Thanks for the reporting.
-
-> $ git diff
-> diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-> index 9309cbfeb8d2..9e02f6190b07 100644
-> --- a/include/uapi/linux/netdev.h
-> +++ b/include/uapi/linux/netdev.h
-> @@ -100,11 +100,11 @@ enum {
->  	NETDEV_A_PAGE_POOL_NAPI_ID,
->  	NETDEV_A_PAGE_POOL_INFLIGHT,
->  	NETDEV_A_PAGE_POOL_INFLIGHT_MEM,
-> +	NETDEV_A_PAGE_POOL_ITEM_MEM_RESIDENT,
-> +	NETDEV_A_PAGE_POOL_ITEM_MEM_USED,
->  	NETDEV_A_PAGE_POOL_DETACH_TIME,
->  	NETDEV_A_PAGE_POOL_DMABUF,
->  	NETDEV_A_PAGE_POOL_IO_URING,
-> -	NETDEV_A_PAGE_POOL_ITEM_MEM_RESIDENT,
-> -	NETDEV_A_PAGE_POOL_ITEM_MEM_USED,
->  
->  	__NETDEV_A_PAGE_POOL_MAX,
->  	NETDEV_A_PAGE_POOL_MAX = (__NETDEV_A_PAGE_POOL_MAX - 1)
-> diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
-> index 7600bf62dbdf..9e02f6190b07 100644
-> --- a/tools/include/uapi/linux/netdev.h
-> +++ b/tools/include/uapi/linux/netdev.h
-> @@ -100,6 +100,8 @@ enum {
->  	NETDEV_A_PAGE_POOL_NAPI_ID,
->  	NETDEV_A_PAGE_POOL_INFLIGHT,
->  	NETDEV_A_PAGE_POOL_INFLIGHT_MEM,
-> +	NETDEV_A_PAGE_POOL_ITEM_MEM_RESIDENT,
-> +	NETDEV_A_PAGE_POOL_ITEM_MEM_USED,
->  	NETDEV_A_PAGE_POOL_DETACH_TIME,
->  	NETDEV_A_PAGE_POOL_DMABUF,
->  	NETDEV_A_PAGE_POOL_IO_URING,
+On Fri, 28 Feb 2025 11:54:08 +0100 you wrote:
+> Introduce netfilter flowtable integration in airoha_eth driver to
+> offload 5-tuple flower rules learned by the PPE module if the user
+> accelerates them using a nft configuration similar to the one reported
+> below:
 > 
+> table inet filter {
+> 	flowtable ft {
+> 		hook ingress priority filter
+> 		devices = { lan1, lan2, lan3, lan4, eth1 }
+> 		flags offload;
+> 	}
+> 	chain forward {
+> 		type filter hook forward priority filter; policy accept;
+> 		meta l4proto { tcp, udp } flow add @ft
+> 	}
+> }
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v8,01/15] net: airoha: Move airoha_eth driver in a dedicated folder
+    https://git.kernel.org/netdev/net-next/c/fb3dda82fd38
+  - [net-next,v8,02/15] net: airoha: Move definitions in airoha_eth.h
+    https://git.kernel.org/netdev/net-next/c/b38f4ff0ceac
+  - [net-next,v8,03/15] net: airoha: Move reg/write utility routines in airoha_eth.h
+    https://git.kernel.org/netdev/net-next/c/e0758a8694fb
+  - [net-next,v8,04/15] net: airoha: Move register definitions in airoha_regs.h
+    https://git.kernel.org/netdev/net-next/c/ec663d9a82bf
+  - [net-next,v8,05/15] net: airoha: Move DSA tag in DMA descriptor
+    https://git.kernel.org/netdev/net-next/c/af3cf757d5c9
+  - [net-next,v8,06/15] net: dsa: mt7530: Enable Rx sptag for EN7581 SoC
+    https://git.kernel.org/netdev/net-next/c/ab667db1e601
+  - [net-next,v8,07/15] net: airoha: Enable support for multiple net_devices
+    https://git.kernel.org/netdev/net-next/c/80369686737f
+  - [net-next,v8,08/15] net: airoha: Move REG_GDM_FWD_CFG() initialization in airoha_dev_init()
+    https://git.kernel.org/netdev/net-next/c/67fde5d58cd4
+  - [net-next,v8,09/15] net: airoha: Rename airoha_set_gdm_port_fwd_cfg() in airoha_set_vip_for_gdm_port()
+    https://git.kernel.org/netdev/net-next/c/c28b8375f6d0
+  - [net-next,v8,10/15] dt-bindings: net: airoha: Add the NPU node for EN7581 SoC
+    https://git.kernel.org/netdev/net-next/c/266f7a0f81c0
+  - [net-next,v8,11/15] dt-bindings: net: airoha: Add airoha,npu phandle property
+    https://git.kernel.org/netdev/net-next/c/9b1a0b72264c
+  - [net-next,v8,12/15] net: airoha: Introduce Airoha NPU support
+    https://git.kernel.org/netdev/net-next/c/23290c7bc190
+  - [net-next,v8,13/15] net: airoha: Introduce flowtable offload support
+    https://git.kernel.org/netdev/net-next/c/00a7678310fe
+  - [net-next,v8,14/15] net: airoha: Add loopback support for GDM2
+    https://git.kernel.org/netdev/net-next/c/9cd451d414f6
+  - [net-next,v8,15/15] net: airoha: Introduce PPE debugfs support
+    https://git.kernel.org/netdev/net-next/c/3fe15c640f38
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
