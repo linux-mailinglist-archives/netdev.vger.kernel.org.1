@@ -1,137 +1,125 @@
-Return-Path: <netdev+bounces-171809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BE92A4EC47
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:47:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B6B5A4EC6E
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:51:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26F0C7AF965
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:42:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C40DF7A6173
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:49:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B386726388D;
-	Tue,  4 Mar 2025 18:37:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3236208997;
+	Tue,  4 Mar 2025 18:50:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EcVQphO3"
+	dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b="eOfA0JzF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ixit.cz (ip-89-177-23-149.bb.vodafone.cz [89.177.23.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B90025FA14;
-	Tue,  4 Mar 2025 18:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C11F204C22;
+	Tue,  4 Mar 2025 18:50:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.177.23.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741113450; cv=none; b=SaesmcG+Q07S8ybZlqIQbC20maLvlKwZSI6CtkDuHkikVVmBlTAsE0k2vDX7y5oVp5nitXmIeqLo8YoFmbf32+rvx3GzU4Vm/9QB4msUtB5jjwk5ni7RPSi4x/9RRGxiNlnsUT8c24pqHCNaBY7IQFH6+TIqvm+n6J34Kb9F29k=
+	t=1741114205; cv=none; b=cha1/cIZWDkVFIYEmrwScQeVqna/DQsghX0HaNNDkuF7JyFMSmEzo2i8Hg/xqj6ZwZzNA0h/wUFTCyP8lIKzFPTEA3+guj/NCBZZ1MWMLDsH0m9N8YueOlubiyS4NceB+F9G8ha+PZRHy1CE8aI98JxafuXK594ps7rKYpaYfsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741113450; c=relaxed/simple;
-	bh=vJ7q3UiEIm0cEXoZ+oIW1aIvNSJiLjWq2Fl9mkg2krA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=c8ZikqwB7RGY3uMVpKBWJt2T05hkfkOT0a7v4mQho/rNZQ0eG/UPBJavnVcv8OeXJwoq/KeurwRhkw7Xr1+gsydXXS9kNcqS8YED1HsGaqWe4R8mXvHA0hwKDVt4ugcGjiE8UypdFFAunrubXM/QsP//j0cTA3hMXzEbn/xbkVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EcVQphO3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1123BC4CEEB;
-	Tue,  4 Mar 2025 18:37:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741113450;
-	bh=vJ7q3UiEIm0cEXoZ+oIW1aIvNSJiLjWq2Fl9mkg2krA=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=EcVQphO3OOyuJET2B138Q3e6IQonTRk3y6q/FOQmZFn1i1jhYh+ndj8ViXNjCgEl7
-	 qv7GOI4buZu2rRW9Ru8j1M8/ec4GtPqtOEbIXZT6+FjyGZoTFbM24psf842Ve3j8HA
-	 VuB8QnshDMV6sDKZHChevs5Hhbu0doxPar5D8RPn074CdYuGcvm4ZGagkjY14HyC68
-	 qNI1H2lT2tnScBN7e3Vbu4Y2syB7ZTJ93TNx+Ls/WlwPrMfbAXAZDEfObJv49Njzao
-	 vQEMNSMqeoucNVCRlI7Y9ikhlipDR0UtYbPahQIuV3aiPJpeCx5WgJnaLUSmMRHvp5
-	 L0w5MmlIOxllw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0654DC282D9;
-	Tue,  4 Mar 2025 18:37:30 +0000 (UTC)
-From: Dimitri Fedrau via B4 Relay <devnull+dimitri.fedrau.liebherr.com@kernel.org>
-Date: Tue, 04 Mar 2025 19:37:27 +0100
-Subject: [PATCH net-next v2 2/2] net: phy: tja11xx: enable PHY in sleep
- mode for TJA1102S
+	s=arc-20240116; t=1741114205; c=relaxed/simple;
+	bh=0CAx1mQ5RZ6zsMxOMxa0QiY+PZp3mnFBFPc/jCZGve4=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=gD65AjMsW2qowNxYbCpX+DC6a2HYNjBjIOPHXLNEE52ewoEbVogEB4iktdWI5XlTZNBY/edQQpOsxhiCD3k4Vzkvpt6lb2XDp20P9cuDUyINrfFXcqnqJ0BCrMfGPP7jUSKnmuF3Pjml+2ilJrC+2ZAEQK5eiANQZESw8j+mZbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ixit.cz; spf=pass smtp.mailfrom=ixit.cz; dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b=eOfA0JzF; arc=none smtp.client-ip=89.177.23.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ixit.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ixit.cz
+Received: from [10.0.0.228] (unknown [10.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by ixit.cz (Postfix) with ESMTPSA id 7EBF116508E;
+	Tue,  4 Mar 2025 19:43:44 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ixit.cz; s=dkim;
+	t=1741113824; h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=0CAx1mQ5RZ6zsMxOMxa0QiY+PZp3mnFBFPc/jCZGve4=;
+	b=eOfA0JzF8XO4Oy6q9bZSu45oTn4TozB4eK33nfrsSbKtCx+rx41ZQu1V1gPmoRtQpXQjKB
+	DsRj8bLeu3L+0pqe3cRvqhvh8iQQYXrK+DIDVuwndJ2foTeVswZ0oJI4O0AQrKhqHfRira
+	0mP8EMEAVCTWwhcUauIHqB/wbvg+pjc=
+Message-ID: <b796bfee-b753-479a-a8d6-ba1fe3ee6222@ixit.cz>
+Date: Tue, 4 Mar 2025 19:43:44 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird Beta
+To: amit.pundir@linaro.org
+Cc: ath10k@lists.infradead.org, bjorn.andersson@linaro.org,
+ davem@davemloft.net, devicetree@vger.kernel.org, jeffrey.l.hugo@gmail.com,
+ john.stultz@linaro.org, konradybcio@gmail.com, kuba@kernel.org,
+ kvalo@codeaurora.org, linux-kernel@vger.kernel.org,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org, robh@kernel.org,
+ sumit.semwal@linaro.org
+References: <CAMi1Hd2g68U8LVng2+RmhD+zFLqW8vcHS54FvaKxNF+BMs_tZg@mail.gmail.com>
+Subject: Re: [PATCH] ath10k: Introduce a devicetree quirk to skip host cap QMI
+ requests
+Content-Language: en-US
+Reply-To: CAMi1Hd2g68U8LVng2+RmhD+zFLqW8vcHS54FvaKxNF+BMs_tZg@mail.gmail.com
+From: David Heidelberg <david@ixit.cz>
+Autocrypt: addr=david@ixit.cz; keydata=
+ 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
+In-Reply-To: <CAMi1Hd2g68U8LVng2+RmhD+zFLqW8vcHS54FvaKxNF+BMs_tZg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250304-tja1102s-support-v2-2-cd3e61ab920f@liebherr.com>
-References: <20250304-tja1102s-support-v2-0-cd3e61ab920f@liebherr.com>
-In-Reply-To: <20250304-tja1102s-support-v2-0-cd3e61ab920f@liebherr.com>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>, 
- Dimitri Fedrau <dima.fedrau@gmail.com>, Marek Vasut <marex@denx.de>, 
- Oleksij Rempel <o.rempel@pengutronix.de>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1741113448; l=1700;
- i=dimitri.fedrau@liebherr.com; s=20241202; h=from:subject:message-id;
- bh=DWnLX8up0ewgoQK/chnywysY6pNuZir0wY9kYTPFSC8=;
- b=Pe8Mg7UQFFHMEDej+r44aZcmqA5f+skjcS/S5M6mcZnkLLmh1yvcNMQd66xMM9h+9lMwZ8B4i
- aJ7cBieHtiMDdKw9SYpsrW+6oxvhxJhXJnzKhwhYuD0GKZucyKs9eXU
-X-Developer-Key: i=dimitri.fedrau@liebherr.com; a=ed25519;
- pk=rT653x09JSQvotxIqQl4/XiI4AOiBZrdOGvxDUbb5m8=
-X-Endpoint-Received: by B4 Relay for dimitri.fedrau@liebherr.com/20241202
- with auth_id=290
-X-Original-From: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Reply-To: dimitri.fedrau@liebherr.com
 
-From: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Kind reminder.
 
-Due to pin strapping the PHY maybe disabled per default. TJA1102 devices
-can be enabled by setting the PHY_EN bit. Support is provided for TJA1102S
-devices but can be easily added for TJA1102 too.
+This workaround is still used by sdm845 downstream.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
----
- drivers/net/phy/nxp-tja11xx.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/drivers/net/phy/nxp-tja11xx.c b/drivers/net/phy/nxp-tja11xx.c
-index 9cf5e6d32fab88cae5cd556623a9ffa285227ab6..601094fe24ca8273a845512b111ccdd9d2785758 100644
---- a/drivers/net/phy/nxp-tja11xx.c
-+++ b/drivers/net/phy/nxp-tja11xx.c
-@@ -28,6 +28,7 @@
- #define MII_ECTRL_POWER_MODE_MASK	GENMASK(14, 11)
- #define MII_ECTRL_POWER_MODE_NO_CHANGE	(0x0 << 11)
- #define MII_ECTRL_POWER_MODE_NORMAL	(0x3 << 11)
-+#define MII_ECTRL_POWER_MODE_SLEEP	(0xa << 11)
- #define MII_ECTRL_POWER_MODE_STANDBY	(0xc << 11)
- #define MII_ECTRL_CABLE_TEST		BIT(5)
- #define MII_ECTRL_CONFIG_EN		BIT(2)
-@@ -79,6 +80,9 @@
- #define MII_COMMCFG			27
- #define MII_COMMCFG_AUTO_OP		BIT(15)
- 
-+#define MII_CFG3			28
-+#define MII_CFG3_PHY_EN			BIT(0)
-+
- /* Configure REF_CLK as input in RMII mode */
- #define TJA110X_RMII_MODE_REFCLK_IN       BIT(0)
- 
-@@ -180,6 +184,14 @@ static int tja11xx_wakeup(struct phy_device *phydev)
- 			return ret;
- 
- 		return tja11xx_enable_link_control(phydev);
-+	case MII_ECTRL_POWER_MODE_SLEEP:
-+		switch (phydev->phy_id & PHY_ID_MASK) {
-+		case PHY_ID_TJA1102S:
-+			/* Enable PHY, maybe it is disabled due to pin strapping */
-+			return phy_set_bits(phydev, MII_CFG3, MII_CFG3_PHY_EN);
-+		default:
-+			return 0;
-+		}
- 	default:
- 		break;
- 	}
-
--- 
-2.39.5
-
-
+Thank you
+David
 
