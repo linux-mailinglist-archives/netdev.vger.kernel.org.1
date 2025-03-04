@@ -1,89 +1,89 @@
-Return-Path: <netdev+bounces-171849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03D6DA4F191
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 00:36:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5336A4F1C3
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 00:49:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4307718832DF
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 23:36:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E52416E0EF
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 23:49:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1A5A1FE469;
-	Tue,  4 Mar 2025 23:36:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE80425F989;
+	Tue,  4 Mar 2025 23:49:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="es1E7TGt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QTgb9PC3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D37327BF61
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 23:36:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39069BA2D
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 23:49:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741131377; cv=none; b=uoj0dwIs7ARNL4de3eO40xpnS0c9hiEdvyrSoDCXG9ZFl+eG4GSjVT3Rzqs2gRrcLnVRUa5z+26S+e1HgoZv4EtKIEE33+GjnmX2qVcu7/fd2WVPKFNg/neuQ0w1TF5FsifDRS5IgRoJsuVYbBEluBJTdNlkidd+Cl5n+5alD2Y=
+	t=1741132143; cv=none; b=hbNhzH1hq4Qav4OMReBmT+DHkhaIXEntecWTmz8sUvN2wW67eALb5NDHdEC27xnQepoUvRVN5ewz/NUJJUDF2g7d9mdG8PecOXddp1SeUnta6KJ3B7I8ZFaQf9iN06DG1v62eVtqgPKrFDKCKaFePek6EYVQY2vhlnwLZtOIk+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741131377; c=relaxed/simple;
-	bh=4Rf8c4vACXegGnwP8fMe2FHVvKFhgehnfRjxlP3pwZQ=;
+	s=arc-20240116; t=1741132143; c=relaxed/simple;
+	bh=YXBMkszQ7C83c5TFoLX8+jcjKCyATW78hihkaIPTueY=;
 	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=ruH/HKf6C6RQnnJEv9lBF+X68TLsCGLvoLdFNti5GHzj4EDJkC7SbVRCizKiPbwBRdt3SIT62I9WyeFPCFXEKhopSrtFHD19uxILXQfKigugEz/wq2+x1woaOYcsYJggKB9nFKzLbdAhkBIFCDMGpRHWnw+tiEKKlXvfwD4tV78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=es1E7TGt; arc=none smtp.client-ip=209.85.214.172
+	 Mime-Version:Content-Type; b=caKs8CHIIqJ6VxzKxPKz2pWfk4BCZ4pGNxZ9QxzaojX5ywt7k2TT0KI+xBXbuZNiMs96zF9X960DN1bEK7kJ8/FbVY0ohKqHAIBsYrZLy70hlbKBPM1Bp2MFzz4IDDscLOa6xGS+gbjRTstClP1iiRBRRxoDs29bWQx8FJCLVmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QTgb9PC3; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2239f8646f6so62961345ad.2
-        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 15:36:15 -0800 (PST)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2238e884f72so61100795ad.3
+        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 15:49:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741131375; x=1741736175; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1741132141; x=1741736941; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to:from
          :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=xOaLsUFNMKX9yNmjDC6l9SSU8pNGtLAoq8bDkRDFR78=;
-        b=es1E7TGt9HtzUkAcKCuy4dAFjmY8cfMGyDjeLar+pzipmT3JBzbvbq/sbE4Ws/gheO
-         h/rWVGxfJswP8j2d1W8F9xIN7zy7Ldd4+I2H/jKGGmoFufjKqh1w8xo8HEBRwAnbFUAd
-         65xd70MLku3c16HB7zwgeCtdfDDLP127HheXd5jOv/JlDDwOmID1KuwP72ikcdzsL1Kr
-         Tnk4+gXS4jfpLTOSTZYlc1SgjOTDYdOqKIlcl9qujRAZvD7AV9kLY315xh7bRC6pp7xg
-         WvIY1lsCnHeT9t25zeB0zb9E7yTuJ9O3dho95thVjjF78wPDfyB1Q428mk9tm2qoUzVs
-         Flrg==
+        bh=xZelafsoo73W1qWibYPDu/+VMAlSbg3CdrtFX3D1U58=;
+        b=QTgb9PC3XvkdxxFuN/2NAf3iSMkGauaCHy7xFREA7G4WokzU++OL7moKxTVOptdTDv
+         yNuM9Wyx9RY/SBZ99ja5LTzzGjdWggVf3Dlz7gJzIlQ8lussmmVA5QfnZHr/kiFLTB+X
+         1S7Tty7wagQyFMYB2hQPxu1SKJm95w1pJNlQ40vB56bVJZ2ZTRGNt53PJIhkKMDs7ri3
+         y8+bGfgWCLvL7fNU0MEIrtPIVIppA34JQOGEmuDz63KsIhz4AMaBHq7OmfvvW5QuIFyR
+         N89/2jR1oUnD3hGmSAUFOPZZ2meLfdZHMMa4QiT4XHCWKK3Rw40FQQLhTKQLWIHsxp9h
+         /syw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741131375; x=1741736175;
+        d=1e100.net; s=20230601; t=1741132141; x=1741736941;
         h=content-transfer-encoding:mime-version:references:in-reply-to:from
          :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=xOaLsUFNMKX9yNmjDC6l9SSU8pNGtLAoq8bDkRDFR78=;
-        b=V6dL7WwA3JUEYn6Dxpdad6Iy6X/GnQVPmd7uZ4DNGFfiSavuzNt44sBy2BZpdo1RvE
-         GTzw/NycWH/wH1WH9RzPjYSTMoGEgyhK50yXH3iVlRNxJegRsx/8yi9QPClpL4UV/vkX
-         HzJqCEiqMbK91Q9jbT59MVK1zeGBNXUvSFP5RnUkvJId4Gtq2GZPVVpIiu4SvFXg5b5b
-         h7KV/zwFyhgwDVZvip+/JPthTkJ9SExDuGm/tjCMsMAEHfHxFp50l+8Z9P+vt7Qb/gYv
-         sbBJUrp9Strxf3LxKouaQvAGxsHO8fiRl5JQ6rvw4eNzUXxGO6iMXdSGnX2tQ5Qx385z
-         TBgA==
-X-Forwarded-Encrypted: i=1; AJvYcCVR/ebJsgv4oKI9wj6CU4NLvYX19PL3iy/OYPO5BlJMuPlBXeHfIH6D3LR4h4n8MugF4DpNefE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvBpJ/iiMXeUtgxvLmV4rpb5dtklNGerN+c3r+i2479koIP/hk
-	4HWGL9NWMZ2IlXiK+XKUoZDPqkc2GyyILKqeIgAHAOd92I8rX8O4
-X-Gm-Gg: ASbGncvmyswpscaq/Lzj5dAI9F3CNfiym6zfuvnMBJXOwp+DJOPeX92Ncn+YOQOKrys
-	INwR/4yJMnImM8jPc3LweCl4VS3fTyWw83W2UrPqkLbp89zdrHlaeL9ROTThx7fPmoSXMyEOZHA
-	xvfOQm+vlvS3Obwc5rPXu2tilK+9TyaDH3l+jy7jfvbAPoPk8A1wgqk5Y0X6hic+NvtuSmorw6o
-	UT9gNOuELmXXX5U3h/1vuLZGTZecSy63AQBeFDb4Dr8D75CKlg/WCl/78VsGw72lxdVrpsVs7De
-	R/O1Rl8GplxR9cE0hRpQNtMkeChwxGkcXwRiazxwPGUXz0tS+wqDLj+2Uy632KcueiUl+7eRzNE
-	7O4brWctCCytA9rAm50oMD0nsSkA=
-X-Google-Smtp-Source: AGHT+IEb305EP+HI8rLyyOuovd4k3XMn978nCWB+726aL3uukAe9rlirZnb9hT6+Be10LEtgtuNp1A==
-X-Received: by 2002:a05:6a00:2303:b0:730:75b1:7219 with SMTP id d2e1a72fcca58-73682bea834mr1232923b3a.12.1741131374761;
-        Tue, 04 Mar 2025 15:36:14 -0800 (PST)
+        bh=xZelafsoo73W1qWibYPDu/+VMAlSbg3CdrtFX3D1U58=;
+        b=iLd5hGHerHjk8oX+HdeRFSAMMHz9ATwbRCYPYdp3UMxKZPOv9swLVDYPpjJLksrAA2
+         4h41/2LQN0ZxaGAEnzfMDOOvsmyiJPnsccM88NCt028tSVQEIrDljG3bF5hyacstcOiN
+         UpRhXQCJttg60UTeg5xmSrvtqNx6kz03zGE0AZYwh/oZ8ByB6OP8/kXCah+b8+qPtgG1
+         mLGabjrtSiFuQPZRt8jp7aoYEHvBi1ZwysgzMjyq4zTH26Pfka4KIHJy5LMb9Bn+PO4f
+         w/Pf8tQWlHMFZw7v1nw54pCy0XQbZvVvHGQs0awnVWKUAjDi41sjcMFWdXTPCL67ZSWv
+         LChA==
+X-Forwarded-Encrypted: i=1; AJvYcCUYBfKaPYL6XO8uaN1J4Nliy6jEWdsXZXwMC1DfosJ0h98ILtBu5Ifs6FG5VMG44+t92xxGDi0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiJ4RYciYxbQ3+VhP6bCpUVhzUEY8w8sKtWUCQ4bC+A63lEbhg
+	5inKt4xxVe0ilcjr/CaF2S/XXqcms1rYeHwLouB+5qaCE0EDU3GyCAdhwQ==
+X-Gm-Gg: ASbGnctqFQ+SwlApLy1YtIFZoKQmb3AnVx2yzr8vS8n52+4zVSXmhlnR0cixiApDO1D
+	raiE+gZdDDj8Ck3JqN5JZwuOK38sYJmZz/1PR4/TzEXyxjSNCTvK7jv4lOion1vTdcz9UORWHzI
+	x/DSeeISGFHxC8Xg4U4AyCskGBhWidHNEBx8DV1WoC4mDetyMQJno11ihmhLWy4vtEntNawBuAJ
+	7ldKJHR6XgGVE+GVYz34OiH0mnj0bNb+BI/7SuU7grwagI/78BpuZd+fCO++BGrMyi209ixjtuf
+	y6O8CvyehlagxpbbJEN0X6aCxIPp2S2qfAfzH6WWH0xu/uq4DDGrHxkFn+DWdrH409nZRrmX/UY
+	HcBBDZWAKOKPWUVdp+tyFybPVVT0=
+X-Google-Smtp-Source: AGHT+IF2P/MDRwRKN4QLP0GfNR2l3HYguj+E/lyVuvXgSRZiJN1wUuo1EMH9hM+sWQ3GzyZkrSk/1A==
+X-Received: by 2002:a05:6a00:92a7:b0:730:8386:6078 with SMTP id d2e1a72fcca58-736829cf1aemr1385804b3a.0.1741132141405;
+        Tue, 04 Mar 2025 15:49:01 -0800 (PST)
 Received: from localhost (p4204131-ipxg22701hodogaya.kanagawa.ocn.ne.jp. [153.160.176.131])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-734d444a9fasm9590420b3a.60.2025.03.04.15.36.13
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7364c9541a2sm5428488b3a.21.2025.03.04.15.48.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Mar 2025 15:36:14 -0800 (PST)
-Date: Wed, 05 Mar 2025 08:36:11 +0900 (JST)
-Message-Id: <20250305.083611.17262540520569099.fujita.tomonori@gmail.com>
+        Tue, 04 Mar 2025 15:49:01 -0800 (PST)
+Date: Wed, 05 Mar 2025 08:48:58 +0900 (JST)
+Message-Id: <20250305.084858.1138848711250818607.fujita.tomonori@gmail.com>
 To: andrew@lunn.ch
-Cc: fujita.tomonori@gmail.com, max.schulze@online.de, hfdevel@gmx.net,
+Cc: max.schulze@online.de, fujita.tomonori@gmail.com, hfdevel@gmx.net,
  netdev@vger.kernel.org
 Subject: Re: tn40xx / qt2025: cannot load firmware, error -2
 From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <89515e61-6aeb-4063-bc47-52a9ea982a26@lunn.ch>
-References: <5f649558-b6a0-4562-b8e5-713cb8138d9a@online.de>
-	<20250304.214223.562994455289524982.fujita.tomonori@gmail.com>
-	<89515e61-6aeb-4063-bc47-52a9ea982a26@lunn.ch>
+In-Reply-To: <9aede328-4050-4505-83a5-c0eeb67d1fc5@lunn.ch>
+References: <89515e61-6aeb-4063-bc47-52a9ea982a26@lunn.ch>
+	<b2296450-74bb-4812-ac1a-6939ef869741@online.de>
+	<9aede328-4050-4505-83a5-c0eeb67d1fc5@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,23 +93,34 @@ Mime-Version: 1.0
 Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 
-On Tue, 4 Mar 2025 17:21:20 +0100
+On Tue, 4 Mar 2025 18:55:02 +0100
 Andrew Lunn <andrew@lunn.ch> wrote:
 
->> You hit the error during boot? In that case, the firmware file might
->> not be included in the initramfs.
+>> Does it really only support 10GBe, and not 1GBe or 100BaseSX ?
+>> > $ sudo ethtool enp3s0
+>> > Settings for enp3s0:
+>> > 	Supported ports: [  ]
+>> > 	Supported link modes:   10000baseSR/Full
+>> > 	Supported pause frame use: No
+>> > 	Supports auto-negotiation: No
+>> > 	Supported FEC modes: Not reported
+>> > 	Advertised link modes:  10000baseSR/Full
+>> > 	Advertised pause frame use: No
+>> > 	Advertised auto-negotiation: No
+>> > 	Advertised FEC modes: Not reported
+>> > 	Speed: 10000Mb/s
+>> > 	Duplex: Full
+>> > 	Auto-negotiation: off
+>> > 	Port: Twisted Pair
+>> > 	PHYAD: 1
+>> > 	Transceiver: external
+>> > 	MDI-X: Unknown
+>> > 	Link detected: yes
 > 
-> With a C driver, you would add a MODULE_FIRMWARE() macro indicating
-> the firmware filename. The tools building the initramfs should then be
-> able to pull the firmware in. I see you have:
-> 
-> kernel::module_phy_driver! {
->     drivers: [PhyQT2025],
->     ...
->     firmware: ["qt2025-2.0.3.3.fw"],
-> }
-> 
-> Does this last line do the equivalent of MODULE_FIRMWARE()?
+> From my reading of the PHY datasheet, it can do 1000Base-KX, but there
+> is no mention of 100BaseSX. There is also limited access to the i2c
+> eeprom in the SFP, so ethtool -m could be implemented.
 
-Yes, it should do.
+Yeah, I have not yet found a way to implement the ethtool operation
+that accesses the SFP and returns the appropriate information.
 
