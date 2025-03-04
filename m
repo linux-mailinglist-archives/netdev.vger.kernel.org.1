@@ -1,148 +1,101 @@
-Return-Path: <netdev+bounces-171549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7BA9A4D8C5
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 10:40:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D57A1A4D931
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 10:50:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BDB03B00DE
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 09:36:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E80783B3D22
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 09:43:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41DBC200126;
-	Tue,  4 Mar 2025 09:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93DBF1FDA90;
+	Tue,  4 Mar 2025 09:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H+IKMAdH"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sAD73dR4"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22BE41FFC7D
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 09:31:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486011FCFDA;
+	Tue,  4 Mar 2025 09:42:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741080669; cv=none; b=ULGlTFJS9TxVoF3lHfONjVVaYpecS0B0wDkppDH/HYu+rDyLWsYewc8BUPGnWC6730mydRv9xzoDwDGhXOyL6jKxhlVq3rRB1zclXah8GrccYrBc0D6wChYCXDr7G/3Bj5nal4mdOjGZrdgrWQKvISL1iW1S4u7gVxAYh8zWqi0=
+	t=1741081373; cv=none; b=CEX0z2xoDl2Yxq6EnJgWdEJanYF0noaiarHx7CUDhQg6WMVUAywLN9dHevVscYPzsGsJQxdBPCB4mzcmBCHCUp0wCOtvM73rhLk8Y//NHWADrEyXHJ/IKuJITAQ9XugzzJ6vzseGKJmOwANZwUAsxbrRF4YN3ZFT9KxMxm0trqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741080669; c=relaxed/simple;
-	bh=KfgdtkUe9Ld3YiFZ+5uLKSPVI/DPDNsZowoXD930AZ0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IYVmwsPnkdBEwFTFfbQly45AZZCP3VOW5MrKg1sTDDl44nzG9w0C9++Vu6BMlVVB6PTBXOAivIGLrJrfY5z38QjbhpIQb9/Sr+Z0W1SrlQM6OHtaDvqBca3Y7VBop7y7R/ZgTHXVl2KbzvKsg2Mw5xImz7i+Oi4j86hfKN+O0cQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H+IKMAdH; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741080665;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0ZMdD5x7r0Q82/d4L8C6y43uagkDVSSt8m6qokozWb4=;
-	b=H+IKMAdH95gl/c63I5ZvBGfCUC4Zu0ZrqGKippzOnewb3YPyV8vEihToE0alZJ7O5m14ot
-	9mPPnOwLwj+47AhFDXzEz709lj2WHLBTca+0mtwE/BSzYVJeIGcy54qn6hj8XrO+TYi0eI
-	lnwZv+8SlRConInxIfSsPA6xfMZck4A=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-607-Q_j5cdG8O2uhEXwY8x24Dw-1; Tue, 04 Mar 2025 04:30:48 -0500
-X-MC-Unique: Q_j5cdG8O2uhEXwY8x24Dw-1
-X-Mimecast-MFC-AGG-ID: Q_j5cdG8O2uhEXwY8x24Dw_1741080648
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43bc1aa0673so9139625e9.2
-        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 01:30:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741080647; x=1741685447;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0ZMdD5x7r0Q82/d4L8C6y43uagkDVSSt8m6qokozWb4=;
-        b=oTyeJ+F4Bk9Qg4jio7o9dnfsZ8ZYK2Mjw0rDsc8n2XGVJuj6K797Y1kahR5427mduS
-         vPOnyIUAo+VInLr7qWKQpLEeL5CnhZ+brgVNJahk79xu834rhKFelmgGlVJ9eVLgT4tH
-         wlK0a6acGXCcFDOBH9JWWdzX5TqBeWBcJAMdmTJIzKw3v5pxemWjY/ebfN4IKSfwchZC
-         f+RWLVhb1nxWVtjYoJRlrxFNXzG/gP2sf/WUKI00l2PgnL37eRsck98GRDFueE5bw+CI
-         RDhWvvMes6BQ006tktw7qKxyTXSoOVKbHDs0VcqQZ27w/V2vh1CSx2tfYg9CMgB/AEn0
-         BKEA==
-X-Forwarded-Encrypted: i=1; AJvYcCV+8Ey4zjN5I2gXC6lmJgtshezuprPkvgAr7U8OdAOnXtqRUBoguI9pxNbesf7/PM1tlrdovLg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1Xf0bDxtiWmm2gM9egyf8r6cKL2qJTw7PEzzCROSMSq5nu0k0
-	9e4GMsz8JPWtEblps0RVyhPyH5HKp+ZmD59qjUdO1KUQqt0QWf1ifSJksC/7GiGAY0SeFf5EstC
-	3H8sNhG2ahPIjnof48Tp63VLDPH0kRMd2mkqM6md0PIWn9hMVaXZz2A==
-X-Gm-Gg: ASbGncsc7jMtZOj7o3VHgS4nMg4qOdE5ntIBCRDL5nZp+M+zNsGYPZob3HNMMzlh3OF
-	59jtRewLrTO1U8eL+1KhRLmJfiAHV5FYsJI4t4Z5MZDnTqz7rrAods3TUByvjPWfcR4UA6QDcgw
-	TTIeex5B6YqCn03hba82JgAbNbuMgfd2jlR5LzmacFR584XuTxkl0wd98HjArXHUbw8Q+CvnqAl
-	+kDi2HKFAQOhU95dAGffjeh9h/pD+rtPb8o0RRuVI/Cvv2ediBTIkx5R94yDxFxgWXVYiJaCrWV
-	jO98lONBMpJFRhfpsR2b1k8NHQKf2oN6VMmEDDHoRPU9kw==
-X-Received: by 2002:a05:600c:1c95:b0:43b:cad1:46a0 with SMTP id 5b1f17b1804b1-43bcad14869mr20550935e9.14.1741080647552;
-        Tue, 04 Mar 2025 01:30:47 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFwVGJhG3LClhBH2gAIqvGg6sSkPzRuS7dTplCKfBFEiuEd9NOsvF6NXcj7TUVWOSoUqn5vfw==
-X-Received: by 2002:a05:600c:1c95:b0:43b:cad1:46a0 with SMTP id 5b1f17b1804b1-43bcad14869mr20550575e9.14.1741080647161;
-        Tue, 04 Mar 2025 01:30:47 -0800 (PST)
-Received: from [192.168.88.253] (146-241-81-153.dyn.eolo.it. [146.241.81.153])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bcc732b6bsm13453975e9.21.2025.03.04.01.30.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Mar 2025 01:30:46 -0800 (PST)
-Message-ID: <7759fdfb-1aee-4a62-a2fb-33a22150ca9b@redhat.com>
-Date: Tue, 4 Mar 2025 10:30:45 +0100
+	s=arc-20240116; t=1741081373; c=relaxed/simple;
+	bh=XwmCxjrXcMahsJEKEkslTcjHfUp6QZXWnoexz7Mrfjs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FDfqLcRouFy9MPPQA5EvRbrh9AhyOjuHj3JQ97JuAMuYqw2rnDQoWWJaySugKAX29mu2+HHNysbqaihRqQTshwfcS06jyuZx8dMSfQYLoGuwloCVgoDJ18kMnbJsQ7syPmD+0Ln8YlGjuspwCQyhiSB/DH/g0YM4YHMRiTecsxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=sAD73dR4; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=JV3pZtApgs6TqusViUPy5JRin7FrjXxYFUIaUJ+B9XQ=; b=sAD73dR4uuNhAcshhcuRcesBx+
+	eJ/C3bmv3pIIe/mG1mLKwsxL767vF9XoYK+XuLoxcB4ZcWd01zg+ESguKuTlE8fSe3DBCudwCK4QH
+	tUYunxwMMarMT59PtDZe7o+MBlfFzUHHgWTAWR/HFTAFBcE2XGKUZOY9ifY73IjijaOidM6spsxSE
+	TFf3w0Ou4GRQUfvuK5g12RRqcEKAkz1yfN6u5AVhvvF8TmSgpmxj7ZOfmMqoCfnW2dmEM2XmvjPlQ
+	vWR3ZzKEgCa2Xwz1NeUER743p8ylHJVVYcWFyw0T6x121cHcZEOlLl6WIzyfEXcfnVEJRzfC1fAmf
+	rCLuWuRQ==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1tpOn8-00000000YOw-0yQv;
+	Tue, 04 Mar 2025 09:42:22 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 5C1F230049D; Tue,  4 Mar 2025 10:42:20 +0100 (CET)
+Date: Tue, 4 Mar 2025 10:42:20 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: rostedt@goodmis.org, mark.rutland@arm.com, alexei.starovoitov@gmail.com,
+	catalin.marinas@arm.com, will@kernel.org, mhiramat@kernel.org,
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+	martin.lau@linux.dev, eddyz87@gmail.com, yonghong.song@linux.dev,
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+	jolsa@kernel.org, davem@davemloft.net, dsahern@kernel.org,
+	mathieu.desnoyers@efficios.com, nathan@kernel.org,
+	nick.desaulniers+lkml@gmail.com, morbo@google.com,
+	samitolvanen@google.com, kees@kernel.org, dongml2@chinatelecom.cn,
+	akpm@linux-foundation.org, riel@surriel.com, rppt@kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, llvm@lists.linux.dev
+Subject: Re: [PATCH v4 1/4] x86/ibt: factor out cfi and fineibt offset
+Message-ID: <20250304094220.GC11590@noisy.programming.kicks-ass.net>
+References: <20250303132837.498938-1-dongml2@chinatelecom.cn>
+ <20250303132837.498938-2-dongml2@chinatelecom.cn>
+ <20250303165454.GB11590@noisy.programming.kicks-ass.net>
+ <CADxym3aVtKx_mh7aZyZfk27gEiA_TX6VSAvtK+YDNBtuk_HigA@mail.gmail.com>
+ <20250304053853.GA7099@noisy.programming.kicks-ass.net>
+ <20250304061635.GA29480@noisy.programming.kicks-ass.net>
+ <CADxym3bS_6jpGC3vLAAyD20GsR+QZofQw0_GgKT8nN3c-HqG-g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 1/2] net: hsr: Fix PRP duplicate detection
-To: Jaakko Karrenpalo <jkarrenpalo@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- Lukasz Majewski <lukma@denx.de>, MD Danish Anwar <danishanwar@ti.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- Jaakko Karrenpalo <jaakko.karrenpalo@fi.abb.com>
-References: <20250227050923.10241-1-jkarrenpalo@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250227050923.10241-1-jkarrenpalo@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CADxym3bS_6jpGC3vLAAyD20GsR+QZofQw0_GgKT8nN3c-HqG-g@mail.gmail.com>
 
-On 2/27/25 6:09 AM, Jaakko Karrenpalo wrote:
-> +int prp_register_frame_out(struct hsr_port *port, struct hsr_frame_info *frame)
-> +{
-> +	enum hsr_port_type other_port;
-> +	enum hsr_port_type rcv_port;
-> +	struct hsr_node *node;
-> +	u16 sequence_diff;
-> +	u16 sequence_exp;
-> +	u16 sequence_nr;
-> +
-> +	/* out-going frames are always in order
-> +	 *and can be checked the same way as for HSR
-> +	 */
-> +	if (frame->port_rcv->type == HSR_PT_MASTER)
-> +		return hsr_register_frame_out(port, frame);
-> +
-> +	/* for PRP we should only forward frames from the slave ports
-> +	 * to the master port
-> +	 */
-> +	if (port->type != HSR_PT_MASTER)
-> +		return 1;
-> +
-> +	node = frame->node_src;
-> +	sequence_nr = frame->sequence_nr;
-> +	sequence_exp = sequence_nr + 1;
-> +	rcv_port = frame->port_rcv->type;
-> +	other_port =
-> +		rcv_port == HSR_PT_SLAVE_A ? HSR_PT_SLAVE_B : HSR_PT_SLAVE_A;
+On Tue, Mar 04, 2025 at 03:47:45PM +0800, Menglong Dong wrote:
+> We don't have to select FUNCTION_ALIGNMENT_32B, so the
+> worst case is to increase ~2.2%.
+> 
+> What do you think?
 
-I'm again surprised checkpatch did not complain WRT the above. Please
-reformat it as:
+Well, since I don't understand what you need this for at all, I'm firmly
+on the side of not doing this.
 
-	other_port = rcv_port == HSR_PT_SLAVE_A ? HSR_PT_SLAVE_B :
-						  HSR_PT_SLAVE_A;
+What actual problem is being solved with this meta data nonsense? Why is
+it worth blowing up our I$ footprint over.
 
-Also, please address the other things mentioned by Simon.
-
-Note: you can retain Simon's tag in next iteration.
-
-Thanks,
-
-Paolo
-
+Also note, that if you're going to be explaining this, start from
+scratch, as I have absolutely 0 clues about BPF and such.
 
