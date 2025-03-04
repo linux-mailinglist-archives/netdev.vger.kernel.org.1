@@ -1,216 +1,403 @@
-Return-Path: <netdev+bounces-171709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7135DA4E429
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 16:49:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43B67A4E3D6
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 16:41:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F7F88A2824
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 15:24:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BC8B19C4F3B
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 15:33:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E544290BCA;
-	Tue,  4 Mar 2025 15:16:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B097C25F962;
+	Tue,  4 Mar 2025 15:21:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="pSILdxQK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SXWiw0E+"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2044.outbound.protection.outlook.com [40.107.241.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F99290BAB;
-	Tue,  4 Mar 2025 15:16:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.241.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741101390; cv=fail; b=jsznK4BG8GXuhHx5vk1dCLy/ya18P7n4z6BoXMikKHwtvuOVZJg1IVx2t/Ex5PCnTDZ77xspQ7HOnzrn4LRZ+N7ToU5nYQSxxuJdzhbRQ793dX1kEHYfp9drF8JnNJIXS1Fv5XVIJ3Ttx8MZqIVZ9D4/N1eJURMlwLDQpOn264w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741101390; c=relaxed/simple;
-	bh=3RdkqonsChfPG7hBRM7hh41Onpxs6JOlUNvjb73ogq4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FShlyv3Gj7NnEblc1gXnmYuOsYdlcA7NJM1pcgWfgEyYh6x1z4QSjdB2XXmWMGahBOS6P0zm8yCyqZIk+xOUvs5Gb436y53j+EBioA3uQ5gGHP6rbbj9B7grZdz8ccgbXECsACZXA18zCop5aJJSuQmqmUg9LCLFXfCMBu+wRn4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=pSILdxQK; arc=fail smtp.client-ip=40.107.241.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nCBkfnoFdUno92ZoO/2pr9WSviUc56XigZ1jR5ka2lA5WLaA+L1d5Ls57gkDsDJFI4sIXmZqvQyowoDUXfbQfo5p3R2/r/lewKQdZ4dbwyDERF55pQMhcGeU/mA09sqk5KUUz3raumNFjlLzWp7REaeoytjM+7j0L1/iC9H33QYR2xdOubMnTnaKqgk5ZTSHo+Cq8wcrf8pbb57cpb6lNvrP9R2Dz/d93ZAhSXT9WmpzpOpYSH9geMqVbVgo7n234ST1nuijYYDcf8sTBeyR46cqD867enYXT2pMbepewYYtgIDEK/l5x5oqkDfkrGd72TqxLigGybpgByXo2aUtOg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wKrlzno0YCh/lOjvTyktTr1XKxpY+DGvH39/XNQmcYc=;
- b=ROz9JaYFkGRTzaE1TzeKU8oIWdNNJHdQUS+cw9eEHG/FXnMD+I9Rlshd7LCqtH0Rzuk+afX4GgQWNtnC5+hTeHeDOT7SoCZoF7PY1zDt0fZUWvMisCJjC5jWcMRcF5Lsib5VCqa2ouFH4hrPl0qsiBVHD7rr7/wShoBsVGVl8gXSaZK2PniW+NV91TTPw8JT79IKExG3NUNCKfRd/mMxD58EOIR1KnmlsmHNGXQRxWpbtNF5YVMTwVoPqJkZuieltn3zzc4RcYbQlJmP45hWSPRpTFi5cgTiJYOqW3RNJz6JAom42zp/nnpr3u0EmiEwxTOh2OQFqULVEUsUsA4ONg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 131.228.2.29) smtp.rcpttodomain=amazon.com smtp.mailfrom=nokia-bell-labs.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none
- header.from=nokia-bell-labs.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wKrlzno0YCh/lOjvTyktTr1XKxpY+DGvH39/XNQmcYc=;
- b=pSILdxQK8S7/xZrWOu0BU+wQ/3+KoTSOnnOFhSJUQgNi20gpXUoP8+55BNBTPvZ65ryBZ9MzEJ+tTbgOQxnuNR/EsmqYENNEwn80KYi52vWdfqnj6j8kJ9VqzYdaYNaMzSDcxK9t3TZJuPuo1fR5gGpoKnW/5mgJ+Is8FEvKUV25kRimQdIDk5413Uk8o2R8yIf2dpLIK2j/BHrfxITo1FY/vP75797y1amZ5r4VydLjkMszt6kcBwzdt+MqjlHVVmkLqGFS5gIwEr0DbwtY6voc0YT4Z4IqrQ7vCeCDg/DzTM50OI9qSxwhQNS4hx3CFLHy6VZeCgj8XageMcWz5A==
-Received: from AS4P195CA0038.EURP195.PROD.OUTLOOK.COM (2603:10a6:20b:65a::21)
- by VI1PR07MB6510.eurprd07.prod.outlook.com (2603:10a6:800:18a::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.23; Tue, 4 Mar
- 2025 15:16:24 +0000
-Received: from AM3PEPF0000A79C.eurprd04.prod.outlook.com
- (2603:10a6:20b:65a:cafe::2) by AS4P195CA0038.outlook.office365.com
- (2603:10a6:20b:65a::21) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8489.28 via Frontend Transport; Tue,
- 4 Mar 2025 15:16:23 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 131.228.2.29)
- smtp.mailfrom=nokia-bell-labs.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nokia-bell-labs.com;
-Received-SPF: Pass (protection.outlook.com: domain of nokia-bell-labs.com
- designates 131.228.2.29 as permitted sender) receiver=protection.outlook.com;
- client-ip=131.228.2.29; helo=fihe3nok0735.emea.nsn-net.net; pr=C
-Received: from fihe3nok0735.emea.nsn-net.net (131.228.2.29) by
- AM3PEPF0000A79C.mail.protection.outlook.com (10.167.16.107) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.8511.15
- via Frontend Transport; Tue, 4 Mar 2025 15:16:23 +0000
-Received: from sarah.nbl.nsn-rdnet.net (sarah.nbl.nsn-rdnet.net [10.0.73.150])
-	by fihe3nok0735.emea.nsn-net.net (Postfix) with ESMTP id E29FF24FD2;
-	Tue,  4 Mar 2025 17:16:21 +0200 (EET)
-From: chia-yu.chang@nokia-bell-labs.com
-To: netdev@vger.kernel.org,
-	dsahern@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	dsahern@kernel.org,
-	pabeni@redhat.com,
-	joel.granados@kernel.org,
-	kuba@kernel.org,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	pablo@netfilter.org,
-	kadlec@netfilter.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	kory.maincent@bootlin.com,
-	bpf@vger.kernel.org,
-	kuniyu@amazon.com,
-	andrew@lunn.ch,
-	ij@kernel.org,
-	ncardwell@google.com,
-	koen.de_schepper@nokia-bell-labs.com,
-	g.white@CableLabs.com,
-	ingemar.s.johansson@ericsson.com,
-	mirja.kuehlewind@ericsson.com,
-	cheshire@apple.com,
-	rs.ietf@gmx.at,
-	Jason_Livingood@comcast.com,
-	vidhi_goel@apple.com
-Cc: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-Subject: [PATCH v7 net-next 09/12] gro: prevent ACE field corruption & better AccECN handling
-Date: Tue,  4 Mar 2025 16:16:07 +0100
-Message-Id: <20250304151607.77950-10-chia-yu.chang@nokia-bell-labs.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250304151607.77950-1-chia-yu.chang@nokia-bell-labs.com>
-References: <20250304151607.77950-1-chia-yu.chang@nokia-bell-labs.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4313251784
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 15:21:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741101703; cv=none; b=IqJdOaRdbXQgQfihWzdKF4RoPrI7RISle79E6bUk9wMZP+mha2n2XzXv6lzeQtOt09wJbKSuT9c89GWu9hGvDSvMeboO3nNO5KtkbkUqzV30GOaazsGjFGUQ40ND31QL75tpXk1LxZ7XVKXV/h5iSLeQpCN7eZQ0awKNGfhJ0a4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741101703; c=relaxed/simple;
+	bh=c84Zw+KpGycFFIhHDfDVgr2Tw8mkDW7xlGOoou4h344=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jL8t2I5f4GH/4+wCsl8DQdizXoHSmDoXiJeeVRcS8fNv+u/HgivKuVOMZycxXXXPaluuNVLFAGpnvmYFIMD+u8OMOD1gnD9WHls+KbQt9Q1e52y7LctJTI1+D8aScF/57qtHa2UpNmh0JHAlrdDbCAh2p6eyne0dnn4r5nTW9n4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SXWiw0E+; arc=none smtp.client-ip=209.85.166.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3d2f5a932f5so18974935ab.1
+        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 07:21:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741101701; x=1741706501; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kyYDK/oJykG5Rj9gJ7abwrRHjh6AkbCtxzXLcp55dhM=;
+        b=SXWiw0E+ef2uhtG9umyp0139XYSI/r+B/l4YHkE2lB55VswA/+gSQsoOH+Uvm9PPXZ
+         fNSAsrWWAfKiv/MF24X7gIThaiNJ3pJsBAf4T7vFredgZOMt58CAThY24QNcQu/y4E+C
+         x/1AV9/SqjCP4GERYpyXC0yGFbkJ4dyMLqyVjXjGLEmjMoo1wQVoSzPF4GmwyUDnoRQ9
+         aWR802SlNkdA9ZjWH734m/BTnLmG31t9QXduEOC8icfT3xZPQU/bBrwJU85zJcLIZeR3
+         RYx5Lu73V2nSAeT8Eizw8Byd6sivWNKMHpiWwnmaj8UEjqIXMevFYHxjuTRVt5HMqwdZ
+         5ICg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741101701; x=1741706501;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kyYDK/oJykG5Rj9gJ7abwrRHjh6AkbCtxzXLcp55dhM=;
+        b=p9WtvY7bcV/TdD1C0ZNNXwKMD4Zvz5P7H9U3Irq+h2OrYKsAtuOdHcw9a5GUyFA4mC
+         T2ayjLvedR//ZGcdIlVo4NfxJf/pKAM1Afn+PiEVSEv3/knr6Zwo2K4FLNWfeCHn2Rwq
+         5ptRalpD3qnUG1GZHJ2B+j+wxLJy+3dQ7x6BMl5MuQw+j0K6HPqHLmglEov7XdUijDuI
+         l37FIiB075keILVgh9arlsKZgZYig1WN90bMeguRknntSss/MbDbW9gBsqTJjSwagFd1
+         6HQ72I1/pIyNd0jQ+FYn9d+Eu/6mRhGK2v+dYmMWfcQ6CbhOPxkAVMrzYuRGzIrIkmNC
+         Qfiw==
+X-Forwarded-Encrypted: i=1; AJvYcCWFLF5mkRDdstEi0XH3sJUlb9gRdeXbIhz3/2bDrFJs6NQeoQpsFOhgmTglXR4HL4jUHu53AjU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZF+FBEjt7MTp/OyxK5oobt14uK+FOriEv15sTQ0r3illhcmPX
+	XTgqHlozGGoVjKZdREd/IuoFdZ9ltc5iuCZcoQuQJoIfSi2XebtCetCx5V+1mr6SvBpUb1p6lKj
+	pnPGH+TV1smdFa2ZfgcGzovdYCKI=
+X-Gm-Gg: ASbGncsS1LUWAPKLrJC9aREyIwFPbhgzGPnqYc1V3OlUgm7Lm7bulqQyndPot2iR/wq
+	TmFxBU+TQ7wLKTPLebgqy/Gc6NhcSReoMtMFevn9uyf9PCXXXf53VLSK8yB9iR+aaakMNg0Gdcz
+	x5Fnrp8I133k9uKBx8xNRGGAqh/hLS5VKpEskV0LWw4DnCGtOtoOo8F8SjGtg=
+X-Google-Smtp-Source: AGHT+IHj2DldmYNb+vFMuI0UItML9Rr7T4axXKJKfQdE4N+2H70KPJRbgYybnHQLMj/yV95+Q/agTtbnr2AEdJfGkfc=
+X-Received: by 2002:a05:6e02:184a:b0:3d3:dd32:73d5 with SMTP id
+ e9e14a558f8ab-3d3e6e23403mr186276425ab.4.1741101698784; Tue, 04 Mar 2025
+ 07:21:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM3PEPF0000A79C:EE_|VI1PR07MB6510:EE_
-X-MS-Office365-Filtering-Correlation-Id: b08c362e-7611-42e0-a09d-08dd5b2f8691
-X-LD-Processed: 5d471751-9675-428d-917b-70f44f9630b0,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
- BCL:0;ARA:13230040|1800799024|36860700013|82310400026|7416014|376014|921020;
-X-Microsoft-Antispam-Message-Info:
- =?utf-8?B?alFJV1JESk51NCtjYUhUQWorcDY1N0JOUVk1cXVkWWdXekMvUkEvOC9GQ3J2?=
- =?utf-8?B?bzdmVDVndnhCOHhmcnZrQ2NkRW94NERKZWg1clE2TFJpVm05L0RzZmM1RlEz?=
- =?utf-8?B?SVhvVE5oOFNnc3hTRjNkcklEVmQzZXNOcllYWW5aeWxpTFNrTXE5aGRXNjly?=
- =?utf-8?B?RmlOeVZPYVpxVGFHYy9LV0NNN3ZCRldmekgyWng2OG1ueUIvVzJhWTlHNFQy?=
- =?utf-8?B?b3l1cWZTQWQ2MjZpVmVYd3FRaUN2dC9hRTh5eVQyMWFYMnV2VWtJVkpSNmdN?=
- =?utf-8?B?QnNqQWVMUmFhNU1hcGlBR0toVDhlZ2lVOFpHd2kvSzE0WU1TWjk2d0pTcjBY?=
- =?utf-8?B?dE55bWRhUW5YRUhkVkI2NVNRZzFpczYzc09zeEQ3QVNrMWFRb2FoeGRhYXJC?=
- =?utf-8?B?TCtydC9jQkVzYktUT3IzUDA3UFZTTWFXZGpYQTlqQjNqeDFhVWs1NzdNRE12?=
- =?utf-8?B?bmdUWW5WbFlldmFRTk80cTlsN1VvakNzMWNFMG1pdnJpTTk2RlhrR1RBZGRF?=
- =?utf-8?B?d0IwT0c2amREOU45YUR0dFQrQzBaWlovekVRWHFlV3ByL0xodUVaKzVQUDVV?=
- =?utf-8?B?QnZFY3hMbWFaeGJyV3hyZFRlb3BObEdWY1doZ2N4Wk9aQ2lKSnlYQlZ4QkZj?=
- =?utf-8?B?c1ZtWXVQUnlNcnFDQ0w3ODZjb2ZzZWRhdytjL1RWdDhtbSswQzN5YkRmMjAv?=
- =?utf-8?B?VCtZa21nMnovK2xrU3JIQzQ1NmRlVzMxcTFtbXZTQzZ4Sjl2QkkyZERSd1ZO?=
- =?utf-8?B?bmMvNnp3QmZNZGI3dE5CMUtFSjV1Ty9wUWQ4UGZoaWJ6UmZ0aGQvbWRyd0Fo?=
- =?utf-8?B?b3NmYlIxLzJFRnFyZVlBcUhBeExUMGhqcDNhcThGdTJXRW4xNHZpRm9lYVVm?=
- =?utf-8?B?UjcyTmZ5amFkaDJVcUJraEJzNDUxekN1T2hnWEdVR0NQR25BSGVUdlpNS3VW?=
- =?utf-8?B?WWlqQnE1MDNncFJzYTZzdXFkdzl2REdxWjdvTlVZMk15WFVHa1dkMjJUMkxp?=
- =?utf-8?B?cmZ2L25mT3VYM2dDSGZwTVllM20waWNjbDZkN2tVWEVDUGV2cXFjUzJpbzV2?=
- =?utf-8?B?OUd2WE5JMnpWc1Zra1FxalRTSFZEQ01FVEN4YUZXeHNSaXlBTnovTndQM0dw?=
- =?utf-8?B?MVFaVytKSmVBR3ZMLy9DeXVkQytBWldLNDEvY2JRcjFXK0tRbERGak16Nlpj?=
- =?utf-8?B?UWJrUnNOcithcEhYK0E4NE9scW9EbnU2VTZwRWRXV3pYQkkwK0pCVWNNY3Rl?=
- =?utf-8?B?dVRFKzhjLzIrOGduK2Jqd3lkQ2NNWlZVVzd0RFplQkdrY2RyZFliWU0rWFUy?=
- =?utf-8?B?b3VlWXVBRCswR1FZNWs3UXZVMG02WVZNV3RKRHdOdkdESmk0L1FJaWFhSUkz?=
- =?utf-8?B?SHdEdktENU52S0dNMFYvc0k3dURmSmlEcmNMTS9MaWsrQUdTZUVkSVF3Z0Q2?=
- =?utf-8?B?bzE0VU5kM3Y0b0wvb1NtbUt5UGtCT1I2T0tzMHJaV0NjenhwVmRvbTg1TFNo?=
- =?utf-8?B?VEh4K0ZRcEtDdElYVloyQTM3cXRVdTVHN2JCZDJzdVFxbG9Lck0xaWVoSDdM?=
- =?utf-8?B?UXJiNStyZFFPUkYyLzh0TXRFcnV2R0drelVNMFM2SnBMNHFxVlV3YnZkYnlW?=
- =?utf-8?B?ZFY3ZTFwOWt0aW1kVlFLQ2l1SmVJeWp1VDlwTnpueTJpMFhHYXZDQ2lQMkVt?=
- =?utf-8?B?bXNGSWFhTGl1TGVXL2dRUXZla0xvWmNPY0pMOEFXK0lOWnMycU5sbGV6UE81?=
- =?utf-8?B?L3JjYzdldU02alk0UllONVNtaFBVYTV6M0dFYk51MnRXZHdQNHlEeHVZNSt6?=
- =?utf-8?B?VjJkMXFEcFM0Y0ZVc2lLUkF6dWpIL2NHOTllZ0xBTkRmdjBQV215cjBUSEVT?=
- =?utf-8?B?SzJjdzJKcFpMcWVQT2QrUTNyUzlBNTkxTmcrRXlXNk43QlljNDFXbi9HOU5j?=
- =?utf-8?B?ZVpBMmhBbzNvbU4vY2JlcWVsSUpiYzB6YlFpS0JvMnlocHRicUdxY3hMZlll?=
- =?utf-8?B?NWVXc0ppdDU4ck1qZDFMeWdrTDZ2RW44Y3duaytFbS90bXgyb0pyZ2JNWkhB?=
- =?utf-8?Q?LjEt0x?=
-X-Forefront-Antispam-Report:
- CIP:131.228.2.29;CTRY:FI;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:fihe3nok0735.emea.nsn-net.net;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(7416014)(376014)(921020);DIR:OUT;SFP:1101;
-X-OriginatorOrg: nokia-bell-labs.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2025 15:16:23.4978
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b08c362e-7611-42e0-a09d-08dd5b2f8691
-X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5d471751-9675-428d-917b-70f44f9630b0;Ip=[131.228.2.29];Helo=[fihe3nok0735.emea.nsn-net.net]
-X-MS-Exchange-CrossTenant-AuthSource: AM3PEPF0000A79C.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR07MB6510
+References: <6b9347d5c1a0b364e88d900b29a616c3f8e5b1ca.1723483073.git.lucien.xin@gmail.com>
+ <2ee4d016-5e57-4d86-9dca-e4685cb183bb@nvidia.com> <CADvbK_ft=B310a9dcwgnwDrPKsxhicKJ4v9wAdgPSHhG+gPjLw@mail.gmail.com>
+ <5ab59f2d-1c22-4602-95ab-a247b5bf048e@nvidia.com> <CADvbK_draP9X9OWXEYTKrP0_ekjgNu9PYPp6GUkvu-3L24SRYg@mail.gmail.com>
+ <CADvbK_cungrr_D5VAiL8C+FSJEoLFYtMxV5foU0XA9E4zrcegA@mail.gmail.com>
+ <2400a58c-5f1d-4fe1-a2db-4c7207613b39@ovn.org> <CADvbK_d+XrwV_mSQCgGE+vrrOmt373Gx6QN+uZOf_CbafVOyuA@mail.gmail.com>
+ <f8b413f3-8f7c-41f8-867e-b72ecfa99429@ovn.org>
+In-Reply-To: <f8b413f3-8f7c-41f8-867e-b72ecfa99429@ovn.org>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Tue, 4 Mar 2025 10:21:26 -0500
+X-Gm-Features: AQ5f1JqaA7BFGFHOWK8X-G25lQWhld31jpPHjZzcUycp9f7tgG--g9hu9tU13dY
+Message-ID: <CADvbK_fAkoMcMaLys-ks+4_vtSzhrp+50TJYTiCVf2oEh021zw@mail.gmail.com>
+Subject: Re: [PATCHv2 net-next] openvswitch: switch to per-action label
+ counting in conntrack
+To: Ilya Maximets <i.maximets@ovn.org>
+Cc: Jianbo Liu <jianbol@nvidia.com>, network dev <netdev@vger.kernel.org>, dev@openvswitch.org, 
+	ovs-dev@openvswitch.org, davem@davemloft.net, kuba@kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Pravin B Shelar <pshelar@ovn.org>, Aaron Conole <aconole@redhat.com>, Florian Westphal <fw@strlen.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Ilpo Järvinen <ij@kernel.org>
+On Tue, Mar 4, 2025 at 8:23=E2=80=AFAM Ilya Maximets <i.maximets@ovn.org> w=
+rote:
+>
+> On 3/3/25 17:38, Xin Long wrote:
+> > On Mon, Mar 3, 2025 at 5:56=E2=80=AFAM Ilya Maximets <i.maximets@ovn.or=
+g> wrote:
+> >>
+> >> On 3/2/25 19:22, Xin Long wrote:
+> >>> On Tue, Feb 25, 2025 at 9:57=E2=80=AFAM Xin Long <lucien.xin@gmail.co=
+m> wrote:
+> >>>>
+> >>>> On Mon, Feb 24, 2025 at 8:38=E2=80=AFPM Jianbo Liu <jianbol@nvidia.c=
+om> wrote:
+> >>>>>
+> >>>>>
+> >>>>>
+> >>>>> On 2/25/2025 3:55 AM, Xin Long wrote:
+> >>>>>> On Mon, Feb 24, 2025 at 4:01=E2=80=AFAM Jianbo Liu <jianbol@nvidia=
+.com> wrote:
+> >>>>>>>
+> >>>>>>>
+> >>>>>>>
+> >>>>>>> On 8/13/2024 1:17 AM, Xin Long wrote:
+> >>>>>>>> Similar to commit 70f06c115bcc ("sched: act_ct: switch to per-ac=
+tion
+> >>>>>>>> label counting"), we should also switch to per-action label coun=
+ting
+> >>>>>>>> in openvswitch conntrack, as Florian suggested.
+> >>>>>>>>
+> >>>>>>>> The difference is that nf_connlabels_get() is called uncondition=
+ally
+> >>>>>>>> when creating an ct action in ovs_ct_copy_action(). As with thes=
+e
+> >>>>>>>> flows:
+> >>>>>>>>
+> >>>>>>>>     table=3D0,ip,actions=3Dct(commit,table=3D1)
+> >>>>>>>>     table=3D1,ip,actions=3Dct(commit,exec(set_field:0xac->ct_lab=
+el),table=3D2)
+> >>>>>>>>
+> >>>>>>>> it needs to make sure the label ext is created in the 1st flow b=
+efore
+> >>>>>>>> the ct is committed in ovs_ct_commit(). Otherwise, the warning i=
+n
+> >>>>>>>> nf_ct_ext_add() when creating the label ext in the 2nd flow will
+> >>>>>>>> be triggered:
+> >>>>>>>>
+> >>>>>>>>      WARN_ON(nf_ct_is_confirmed(ct));
+> >>>>>>>>
+> >>>>>>>
+> >>>>>>> Hi Xin Long,
+> >>>>>>>
+> >>>>>>> The ct can be committed before openvswitch handles packets with C=
+T
+> >>>>>>> actions. And we can trigger the warning by creating VF and runnin=
+g ping
+> >>>>>>> over it with the following configurations:
+> >>>>>>>
+> >>>>>>> ovs-vsctl add-br br
+> >>>>>>> ovs-vsctl add-port br eth2
+> >>>>>>> ovs-vsctl add-port br eth4
+> >>>>>>> ovs-ofctl add-flow br "table=3D0, in_port=3Deth4,ip,ct_state=3D-t=
+rk
+> >>>>>>> actions=3Dct(table=3D1)"
+> >>>>>>> ovs-ofctl add-flow br "table=3D1, in_port=3Deth4,ip,ct_state=3D+t=
+rk+new
+> >>>>>>> actions=3Dct(exec(set_field:0xef7d->ct_label), commit), output:et=
+h2"
+> >>>>>>> ovs-ofctl add-flow br "table=3D1, in_port=3Deth4,ip,ct_label=3D0x=
+ef7d,
+> >>>>>>> ct_state=3D+trk+est actions=3Doutput:eth2"
+> >>>>>>>
+> >>>>>>> The eth2 is PF, and eth4 is VF's representor.
+> >>>>>>> Would you like to fix it?
+> >>>>>> Hi, Jianbo,
+> >>>>>>
+> >>>>>> Sure, we have to attach a new ct to the skb in __ovs_ct_lookup() f=
+or
+> >>>>>> this case, and even delete the one created before ovs_ct.
+> >>>>>>
+> >>>>>> Can you check if this works on your env?
+> >>>>>
+> >>>>> Yes, it works.
+> >>>>> Could you please submit the formal patch? Thanks!
+> >>>> Great, I will post after running some of my local tests.
+> >>>>
+> >>> Hi Jianbo,
+> >>>
+> >>> I recently ran some tests and observed that the current approach cann=
+ot
+> >>> completely avoid the warning. If an skb enters __ovs_ct_lookup() with=
+out
+> >>> an attached connection tracking (ct) entry, it may still acquire an
+> >>> existing ct created outside of OVS (possibly by netfilter) through
+> >>> nf_conntrack_in(). This will trigger the warning in ovs_ct_set_labels=
+().
+> >>>
+> >>> Deleting a ct created outside OVS and creating a new one within
+> >>> __ovs_ct_lookup() doesn't seem reasonable and would be difficult to
+> >>> implement. However, since OVS is not supposed to use ct entries creat=
+ed
+> >>> externally,
+> >>
+> >> I'm not fully following this conversation, but this statement doesn't
+> >> seem right.  OVS should be able to use ct entries created externally.
+> >> i.e. if the packet already has some ct entry attached while entering
+> >> OVS datapth, OVS should be able to match on the content of that entry.
+> >>
+> > Hi Ilya,
+> >
+> > Thank you for your comment.
+> >
+> > If OVS should use conntrack (ct) entries created externally, features
+> > relying on NF_CT_EXT_XXX may not work on such entries. The NF_CT_EXT_LA=
+BELS
+> > extension discussed in this thread is one example. Other extensions lik=
+e
+> > NF_CT_EXT_HELPER, NF_CT_EXT_ECACHE, and NF_CT_EXT_TIMEOUT may also be
+> > affected.
+> >
+> > If the ct entry already exists before the OVS flow with ct actions is
+> > created, the entry might not have the required NF_CT_EXT extension as
+> > it was not created with the tmpl set by OVS, even though the OVS flow
+> > requests it.
+>
+> You're right about extensions and it makes sense that they are not actual=
+ly
+> available, since the data inside labels, for example, is specific for the
+> application.  However, there are use cases for matching on the externally
+> obtained ct state, which is available.  IIRC, we have a few tests in the
+> main OVS system test suite that cover such scenarios.
+>
+Got it, thank you for the explanation.
 
-There are important differences in how the CWR field behaves
-in RFC3168 and AccECN. With AccECN, CWR flag is part of the
-ACE counter and its changes are important so adjust the flags
-changed mask accordingly.
-
-Also, if CWR is there, set the Accurate ECN GSO flag to avoid
-corrupting CWR flag somewhere.
-
-Signed-off-by: Ilpo Järvinen <ij@kernel.org>
-Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
----
- net/ipv4/tcp_offload.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
-index a4cea85288ff..ef12aee5deb4 100644
---- a/net/ipv4/tcp_offload.c
-+++ b/net/ipv4/tcp_offload.c
-@@ -329,7 +329,7 @@ struct sk_buff *tcp_gro_receive(struct list_head *head, struct sk_buff *skb,
- 	th2 = tcp_hdr(p);
- 	flush = (__force int)(flags & TCP_FLAG_CWR);
- 	flush |= (__force int)((flags ^ tcp_flag_word(th2)) &
--		  ~(TCP_FLAG_CWR | TCP_FLAG_FIN | TCP_FLAG_PSH));
-+		  ~(TCP_FLAG_FIN | TCP_FLAG_PSH));
- 	flush |= (__force int)(th->ack_seq ^ th2->ack_seq);
- 	for (i = sizeof(*th); i < thlen; i += 4)
- 		flush |= *(u32 *)((u8 *)th + i) ^
-@@ -405,7 +405,7 @@ void tcp_gro_complete(struct sk_buff *skb)
- 	shinfo->gso_segs = NAPI_GRO_CB(skb)->count;
- 
- 	if (th->cwr)
--		shinfo->gso_type |= SKB_GSO_TCP_ECN;
-+		shinfo->gso_type |= SKB_GSO_TCP_ACCECN;
- }
- EXPORT_SYMBOL(tcp_gro_complete);
- 
--- 
-2.34.1
-
+> >
+> > As far as I know, using a separate conntrack zone to avoid reusing the
+> > existing ct entry can work around this issue.
+> >
+> > Let me know if I missed something, or do you have any better solutions?
+> >
+> > Thanks.
+> >
+> >>> I believe ct zones can be used to prevent this issue.
+> >>> In your case, the following flows should work:
+> >>>
+> >>> ovs-ofctl add-flow br "table=3D0, in_port=3Deth4,ip,ct_state=3D-trk
+> >>> actions=3Dct(table=3D1,zone=3D1)"
+> >>> ovs-ofctl add-flow br "table=3D1,
+> >>> in_port=3Deth4,ip,ct_state=3D+trk+new,ct_zone=3D1
+> >>> actions=3Dct(exec(set_field:0xef7d->ct_label),commit,zone=3D1),
+> >>> output:eth2"
+> >>> ovs-ofctl add-flow br "table=3D1,
+> >>> in_port=3Deth4,ip,ct_label=3D0xef7d,ct_state=3D+trk+est,ct_zone=3D1
+> >>> actions=3Doutput:eth2"
+> >>>
+> >>> Regarding the warning triggered by externally created ct entries, I p=
+lan
+> >>> to remove the ovs_ct_get_conn_labels() call from ovs_ct_set_labels() =
+and
+> >>> I'll let nf_connlabels_replace() return an error in such cases, simil=
+ar
+> >>> to how tcf_ct_act_set_labels() handles this scenario in tc act_ct.
+> >>>
+> >>> Thanks.
+> >>>>>
+> >>>>>>
+> >>>>>> diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntra=
+ck.c
+> >>>>>> index 3bb4810234aa..c599ee013dfe 100644
+> >>>>>> --- a/net/openvswitch/conntrack.c
+> >>>>>> +++ b/net/openvswitch/conntrack.c
+> >>>>>> @@ -595,6 +595,11 @@ static bool skb_nfct_cached(struct net *net,
+> >>>>>>               rcu_dereference(timeout_ext->timeout))
+> >>>>>>               return false;
+> >>>>>>       }
+> >>>>>> +    if (IS_ENABLED(CONFIG_NF_CONNTRACK_LABELS) && !nf_ct_labels_f=
+ind(ct)) {
+> >>>>>> +        if (nf_ct_is_confirmed(ct))
+> >>>>>> +            nf_ct_delete(ct, 0, 0);
+> >>>>>> +        return false;
+> >>>>>> +    }
+> >>>>>>
+> >>>>>> Thanks.
+> >>>>>>
+> >>>>>>>
+> >>>>>>> Thanks!
+> >>>>>>> Jianbo
+> >>>>>>>
+> >>>>>>>> Signed-off-by: Xin Long <lucien.xin@gmail.com>
+> >>>>>>>> ---
+> >>>>>>>> v2: move ovs_net into #if in ovs_ct_exit() as Jakub noticed.
+> >>>>>>>> ---
+> >>>>>>>>    net/openvswitch/conntrack.c | 30 ++++++++++++----------------=
+--
+> >>>>>>>>    net/openvswitch/datapath.h  |  3 ---
+> >>>>>>>>    2 files changed, 12 insertions(+), 21 deletions(-)
+> >>>>>>>>
+> >>>>>>>> diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/connt=
+rack.c
+> >>>>>>>> index 8eb1d644b741..a3da5ee34f92 100644
+> >>>>>>>> --- a/net/openvswitch/conntrack.c
+> >>>>>>>> +++ b/net/openvswitch/conntrack.c
+> >>>>>>>> @@ -1368,11 +1368,8 @@ bool ovs_ct_verify(struct net *net, enum =
+ovs_key_attr attr)
+> >>>>>>>>            attr =3D=3D OVS_KEY_ATTR_CT_MARK)
+> >>>>>>>>                return true;
+> >>>>>>>>        if (IS_ENABLED(CONFIG_NF_CONNTRACK_LABELS) &&
+> >>>>>>>> -         attr =3D=3D OVS_KEY_ATTR_CT_LABELS) {
+> >>>>>>>> -             struct ovs_net *ovs_net =3D net_generic(net, ovs_n=
+et_id);
+> >>>>>>>> -
+> >>>>>>>> -             return ovs_net->xt_label;
+> >>>>>>>> -     }
+> >>>>>>>> +         attr =3D=3D OVS_KEY_ATTR_CT_LABELS)
+> >>>>>>>> +             return true;
+> >>>>>>>>
+> >>>>>>>>        return false;
+> >>>>>>>>    }
+> >>>>>>>> @@ -1381,6 +1378,7 @@ int ovs_ct_copy_action(struct net *net, co=
+nst struct nlattr *attr,
+> >>>>>>>>                       const struct sw_flow_key *key,
+> >>>>>>>>                       struct sw_flow_actions **sfa,  bool log)
+> >>>>>>>>    {
+> >>>>>>>> +     unsigned int n_bits =3D sizeof(struct ovs_key_ct_labels) *=
+ BITS_PER_BYTE;
+> >>>>>>>>        struct ovs_conntrack_info ct_info;
+> >>>>>>>>        const char *helper =3D NULL;
+> >>>>>>>>        u16 family;
+> >>>>>>>> @@ -1409,6 +1407,12 @@ int ovs_ct_copy_action(struct net *net, c=
+onst struct nlattr *attr,
+> >>>>>>>>                return -ENOMEM;
+> >>>>>>>>        }
+> >>>>>>>>
+> >>>>>>>> +     if (nf_connlabels_get(net, n_bits - 1)) {
+> >>>>>>>> +             nf_ct_tmpl_free(ct_info.ct);
+> >>>>>>>> +             OVS_NLERR(log, "Failed to set connlabel length");
+> >>>>>>>> +             return -EOPNOTSUPP;
+> >>>>>>>> +     }
+> >>>>>>>> +
+> >>>>>>>>        if (ct_info.timeout[0]) {
+> >>>>>>>>                if (nf_ct_set_timeout(net, ct_info.ct, family, ke=
+y->ip.proto,
+> >>>>>>>>                                      ct_info.timeout))
+> >>>>>>>> @@ -1577,6 +1581,7 @@ static void __ovs_ct_free_action(struct ov=
+s_conntrack_info *ct_info)
+> >>>>>>>>        if (ct_info->ct) {
+> >>>>>>>>                if (ct_info->timeout[0])
+> >>>>>>>>                        nf_ct_destroy_timeout(ct_info->ct);
+> >>>>>>>> +             nf_connlabels_put(nf_ct_net(ct_info->ct));
+> >>>>>>>>                nf_ct_tmpl_free(ct_info->ct);
+> >>>>>>>>        }
+> >>>>>>>>    }
+> >>>>>>>> @@ -2002,17 +2007,9 @@ struct genl_family dp_ct_limit_genl_famil=
+y __ro_after_init =3D {
+> >>>>>>>>
+> >>>>>>>>    int ovs_ct_init(struct net *net)
+> >>>>>>>>    {
+> >>>>>>>> -     unsigned int n_bits =3D sizeof(struct ovs_key_ct_labels) *=
+ BITS_PER_BYTE;
+> >>>>>>>> +#if  IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+> >>>>>>>>        struct ovs_net *ovs_net =3D net_generic(net, ovs_net_id);
+> >>>>>>>>
+> >>>>>>>> -     if (nf_connlabels_get(net, n_bits - 1)) {
+> >>>>>>>> -             ovs_net->xt_label =3D false;
+> >>>>>>>> -             OVS_NLERR(true, "Failed to set connlabel length");
+> >>>>>>>> -     } else {
+> >>>>>>>> -             ovs_net->xt_label =3D true;
+> >>>>>>>> -     }
+> >>>>>>>> -
+> >>>>>>>> -#if  IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+> >>>>>>>>        return ovs_ct_limit_init(net, ovs_net);
+> >>>>>>>>    #else
+> >>>>>>>>        return 0;
+> >>>>>>>> @@ -2021,12 +2018,9 @@ int ovs_ct_init(struct net *net)
+> >>>>>>>>
+> >>>>>>>>    void ovs_ct_exit(struct net *net)
+> >>>>>>>>    {
+> >>>>>>>> +#if  IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+> >>>>>>>>        struct ovs_net *ovs_net =3D net_generic(net, ovs_net_id);
+> >>>>>>>>
+> >>>>>>>> -#if  IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+> >>>>>>>>        ovs_ct_limit_exit(net, ovs_net);
+> >>>>>>>>    #endif
+> >>>>>>>> -
+> >>>>>>>> -     if (ovs_net->xt_label)
+> >>>>>>>> -             nf_connlabels_put(net);
+> >>>>>>>>    }
+> >>>>>>>> diff --git a/net/openvswitch/datapath.h b/net/openvswitch/datapa=
+th.h
+> >>>>>>>> index 9ca6231ea647..365b9bb7f546 100644
+> >>>>>>>> --- a/net/openvswitch/datapath.h
+> >>>>>>>> +++ b/net/openvswitch/datapath.h
+> >>>>>>>> @@ -160,9 +160,6 @@ struct ovs_net {
+> >>>>>>>>    #if IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+> >>>>>>>>        struct ovs_ct_limit_info *ct_limit_info;
+> >>>>>>>>    #endif
+> >>>>>>>> -
+> >>>>>>>> -     /* Module reference for configuring conntrack. */
+> >>>>>>>> -     bool xt_label;
+> >>>>>>>>    };
+> >>>>>>>>
+> >>>>>>>>    /**
+> >>>>>>>
+> >>>>>
+> >>
+>
 
