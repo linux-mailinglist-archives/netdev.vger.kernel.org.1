@@ -1,162 +1,193 @@
-Return-Path: <netdev+bounces-171491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30143A4D230
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 04:54:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E14FA4D25C
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 05:10:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79FC4189315F
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 03:54:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A0321897DE7
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 04:10:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CEDC1F1506;
-	Tue,  4 Mar 2025 03:53:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C2761F461A;
+	Tue,  4 Mar 2025 04:09:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Zeha4UDL"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Y9HkSWsL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED6301F03FA
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 03:53:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 106C81F418E
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 04:09:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741060439; cv=none; b=lTYl2w2TgrJtrULSL77MMHLjMATva6YLKRmLKRRouEZXyF/o956BGI/AXjlkTKpF4TeW2k6y3VuuzGKoykqxV5Kk5fD8V+btmD5Xrp1vFl2EQAnC8YM5oedVKq9Gy4NZWVMzNXCxmc6XvmUfkifTusOenXe/VPf5pz3C1t3A5jU=
+	t=1741061363; cv=none; b=ReX7lp4N6zyJWIcBOvASSvNFfGS2glh1HtAmByIrFmrKVtBcYNwTC1LkzLtpAC06bH1nhMu60z9vc3WkO1HHPSAEnsgduWEabNbjU+Yj80k+8ENSlA96y2giwsnfDfmjj7nWFDMKUnt9fxhA/I0rPy55PTuXaaMlINfkosyIuVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741060439; c=relaxed/simple;
-	bh=v4ZIW03tXTq33ylUh9Hi3kvpmNUOTXtibE59mai2iZ8=;
+	s=arc-20240116; t=1741061363; c=relaxed/simple;
+	bh=R9xsAKoqRJQ4HJyB7ajSbitGSIDG3nLpVb6IrzZpzrQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OdZTQN2kIdJ3Pfz68slzJegLijaC8xu4gFgB+l9BD8qg6T20QMiK05jXCUgO03MLrs94FreZkhHYxfXuv7BXiguETd7YeBSfXz33B+MERT5Tp8PtITwE/FwFOCrEsY0FeTy/NC0PhfMZutjyn7RIrybTv4pHZP8sOTP43NyhBYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Zeha4UDL; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-22342c56242so97255ad.0
-        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 19:53:57 -0800 (PST)
+	 To:Cc:Content-Type; b=NL1Vsx15+aA1hluQWCfpl+w1QEG/yCr8Yk3wM8CLbfGubHFtHwPk6CA/xmZBEd/AYGOZAhXdccConWqR051qZuuOZBWII7IeqcohGDwcbzcYfMdODcQm+R2TX4NijVUxZqW+Z03yjz40pscP/LHS0VKRNRRWMhNamt0CFMI8O8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Y9HkSWsL; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2234e5347e2so104208485ad.1
+        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 20:09:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741060437; x=1741665237; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hSFEb6cmbj6TrSKHrJmKO1hlYsPUC+0FUI58pDz1vl8=;
-        b=Zeha4UDL+PUCz5e9lJQdQ12LAT7HMzDhQtuPE6EzaQxiOITpXFceZVvMq1+a2pKt0J
-         y7za/dpejvEOzlvhE5g4JKZlZiTf2yr2hlGqc7LT/WGncgsyCnfOvk/sucC927Rr4ddm
-         bUkywf/hRsJuweRVxy6NpyUhiY/0nyvBDrmiOEZ6IP4Mw2LUgvP6Cm/yxYbJAGyXIUX7
-         JZUByRUTGpZisw9jgUXQVUHCipDQonZKeoCX66hEDsV+OEwk67XglZbZ8Bsx4gIXtx46
-         wka3oEIwuZ1I8yNNu92/Oq7D9CxIeqXofDA3kyHn7TLGFqrYqQbZXiQQlcvBRE90saRt
-         6a4Q==
+        d=broadcom.com; s=google; t=1741061361; x=1741666161; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=1jmayaQ0IiD+XlMfms4R1IPn71opiEmKmKvZKOcA7Cs=;
+        b=Y9HkSWsLRy5HXIFu7OGc8voai8TjsT4bfiFrc9rznMOLCYBkrvzz27N5YfFxToWpED
+         CVuPi7Pj+L3BXAsMs4uXsuoMR5TC9UOkltcK+WKmqhPXOcWx6DcHAKS9l/jKEXV3IP+C
+         h0nkzK5HNb5g9LWyKvGpE/2pJO8SuDBSr9Ph8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741060437; x=1741665237;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hSFEb6cmbj6TrSKHrJmKO1hlYsPUC+0FUI58pDz1vl8=;
-        b=w0Pt+BXS9SZqv+Nw6f6/9+Bs1teGIj4TH1Lyyd+76UQEYvoRIs5zsge80lDzyyfR4S
-         IW//J1xKI/MR9PxYfzym/fVU3a+SDbcZpgevTtSqgGWsIzzjvKNzNKkHlHsgOeYPmPE9
-         jF4DiNOx2ZhF+KgC9PGsmLmq4N1oZbdYemvTpB9SdeoeRGbdrySrxKJLyl7pybUScTnN
-         86t+fXNfYcPj73Zy2Y0Nf/OREgEq3deosR+j+B6A2gkmbVFeGE2/ZlptwtC18NBmAOq1
-         jfX89KOjxpA+dP3LcP1FO3cnoKbJrfPmClcHMf7HZwl1kSkES6iZUcSCyjCIm8LSFs3x
-         wYrQ==
-X-Gm-Message-State: AOJu0Ywa8ik8Bn6D21mlDUnB/XQuO4FsdrqSJkHsMUBQJlDSR1Tz2vXe
-	xB24xR6o0Nwn0z70XIdkhKrhw1D8ibgk8nJ/UxgxUQrMtZY0uMvJbutYavSWXHlmLJaa7sPFYFJ
-	RRGHFP/gagxYszrq9phQe4o6lJGzFMxK9g/Pu
-X-Gm-Gg: ASbGnctXIqtHPP/FcR71g26DRmiOligdVl691d1BEmLO8Ys3eSKVtijvgakgxhTodKs
-	lgoA4MI7nJtZiTsRSi9AOgHJNaLQPwzJzZWYCnGj3fNkRoU/DvTxxzwJesQ4377VGCM9XG473U4
-	HJyrBmYU1rS1vR+B5TQev/hRdfeg==
-X-Google-Smtp-Source: AGHT+IHSpmXymQz0Hg2Nfi/UMM95jLNI0Agz8LxyDxK7J1nuQGrVPSq5ZOQpmxKAyc8gv2/Tg1AhK763Ctub08I/iBk=
-X-Received: by 2002:a17:902:e892:b0:217:8612:b690 with SMTP id
- d9443c01a7336-223d9e008f0mr1582615ad.8.1741060436769; Mon, 03 Mar 2025
- 19:53:56 -0800 (PST)
+        d=1e100.net; s=20230601; t=1741061361; x=1741666161;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1jmayaQ0IiD+XlMfms4R1IPn71opiEmKmKvZKOcA7Cs=;
+        b=Wgj6YGAakraJHwXMOe98yRkHv0G0TPGEKXpizm1p8AQHI6lRh0iIbH9OvCZ9Eoql+7
+         Gi3kPmi0Vxz9hx3fQj9x03I43UjRzcQGA9M5pF95VdryEZ/H3Aj9cPRjdEupY6+6fhXl
+         jUCX8iGhi5TV5f5qTUu+Vs7/hdjr74pcexuRVTeUSyzhgGtkIfnMJ/7GxwXCXc223tej
+         R2gAC83rdegJ1+TeTWVCDU2IPNXO1AgJRR9RpWb18W4CZnOI7RSLAAULl/xffOHGnJtr
+         Y+ydDmlc8W1u3Yh6VVeby0nQ9PIVdNBghOoq/MGQcCD8SWQYVYytVlg5zvHyJLAj78y2
+         X2vQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXSp6GQ5Gub3n5Aen80CrQwFyoAIzFffkHGuxL0+xu9XjValsrCvuglcneDS/6pCGKewYNU61E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YztbrnqcUY8AXH0LU4uKd9IUE7r//Gf7Mym6Nn9S4VbmJCVIWMF
+	YtWfLTJUYb2W5qfvVTOCYW1INEnO0+RINBpdwalsa0gv9k9R7X42Ok6cLFUxj1hBJJS1sILb0Kd
+	chWV4ww1XGAL084yrBxoJF2qXMDeO8OO1LB+U
+X-Gm-Gg: ASbGncvoYN1X02mHrHe/4tWeP8slxvotZNYQMI8UEaEiEFyU2gmNS5MD+HmCQz/f4/I
+	F2DWuaJp8HmpmiKDVMzYrC0XKLuZzFb7fJWhDBozwCO4bL99Emys+OAleQBnVXn3MXIeF8mNmUG
+	K5MxuY3g8xGz+ep9BCOzpeaK1WngM=
+X-Google-Smtp-Source: AGHT+IHcNAQsOxbzkZGxJnhIcK7u+onVFDJnK6m9kuGARZDWfbmSJhhiwsuxmC981I1RSjRF2l0oOGA9H8OYf0Dx1Nc=
+X-Received: by 2002:a17:903:17c6:b0:223:669f:ca2d with SMTP id
+ d9443c01a7336-223691f8e93mr270196835ad.35.1741061361328; Mon, 03 Mar 2025
+ 20:09:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250227041209.2031104-1-almasrymina@google.com>
- <20250227041209.2031104-8-almasrymina@google.com> <20250228164301.07af6753@kernel.org>
- <CAHS8izO-N4maVtjhgH7CFv5D-QEtjQaYKSrHUrth=aJje4NZgg@mail.gmail.com> <20250303162901.7fa57cd0@kernel.org>
-In-Reply-To: <20250303162901.7fa57cd0@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 3 Mar 2025 19:53:44 -0800
-X-Gm-Features: AQ5f1JrYu9C4BjqccschILEVQXZn6ayr_hbqMYvwnSubi9nhcByOZkaDeGtsjTs
-Message-ID: <CAHS8izOJfSCM+qZ=npPOK3kwuA1pyGHrPo73brRq2VXg8G450g@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 7/8] net: check for driver support in netmem TX
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
-	Donald Hunter <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
+References: <20250301013554.49511-1-shannon.nelson@amd.com> <20250301013554.49511-2-shannon.nelson@amd.com>
+In-Reply-To: <20250301013554.49511-2-shannon.nelson@amd.com>
+From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
+Date: Tue, 4 Mar 2025 09:39:09 +0530
+X-Gm-Features: AQ5f1Jra6vvO4sHKI1wUhLk8TXEUUc3XxLUkj3q7dfMKoz-YcJjIAJpY7FpGqCk
+Message-ID: <CAH-L+nOOBWksbbPedFdJz+4_t7vfDajCXvdp6gxiXHbvKedEdA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/6] pds_core: make pdsc_auxbus_dev_del() void
+To: Shannon Nelson <shannon.nelson@amd.com>
+Cc: jgg@nvidia.com, andrew.gospodarek@broadcom.com, aron.silverton@oracle.com, 
+	dan.j.williams@intel.com, daniel.vetter@ffwll.ch, dave.jiang@intel.com, 
+	dsahern@kernel.org, gregkh@linuxfoundation.org, hch@infradead.org, 
+	itayavr@nvidia.com, jiri@nvidia.com, Jonathan.Cameron@huawei.com, 
+	kuba@kernel.org, lbloch@nvidia.com, leonro@nvidia.com, 
+	linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
+	saeedm@nvidia.com, brett.creeley@amd.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000fdad91062f7c6fd9"
+
+--000000000000fdad91062f7c6fd9
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 3, 2025 at 4:29=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
+On Sat, Mar 1, 2025 at 7:07=E2=80=AFAM Shannon Nelson <shannon.nelson@amd.c=
+om> wrote:
 >
-> On Fri, 28 Feb 2025 17:53:24 -0800 Mina Almasry wrote:
-> > On Fri, Feb 28, 2025 at 4:43=E2=80=AFPM Jakub Kicinski <kuba@kernel.org=
-> wrote:
-> > > On Thu, 27 Feb 2025 04:12:08 +0000 Mina Almasry wrote:
-> > > > +     if (!skb_frags_readable(skb) && !dev->netmem_tx)
-> > >
-> > > How do you know it's for _this_ device tho?
-> >
-> > Maybe a noob question, but how do we end up here with an skb that is
-> > not targeted for the 'dev' device? We are checking in
-> > tcp_sendmsg_locked that we're targeting the appropriate device before
-> > creating the skb. Is this about a packet arriving on a dmabuf bound to
-> > a device and then being forwarded through another device that doesn't
-> > own the mapping, bypassing the check?
+> Since there really is no useful return, advertising a return value
+> is rather misleading.  Make pdsc_auxbus_dev_del() a void function.
 >
-> Forwarded or just redirected by nft/bpf/tc
->
-> > > The driver doesn't seem to check the DMA mapping belongs to it either=
-.
-> > >
-> > > Remind me, how do we prevent the unreadable skbs from getting into th=
-e
-> > > Tx path today?
-> >
-> > I'm not sure if this is about forwarding, or if there is some other
-> > way for unreadable skbs to end up in the XT path that you have in
-> > mind. At some point in this thread[1] we had talked about preventing
-> > MP bound devices from being lower devices at all to side step this
-> > entirely but you mentioned that may not be enough, and we ended up
-> > sidestepping only XDP entirely.
-> >
-> > [1] https://lore.kernel.org/bpf/20240821153049.7dc983db@kernel.org/
->
-> Upper devices and BPF access is covered I think, by the skbuff checks.
-> But I think we missed adding a check in validate_xmit_skb() to protect
-> the xmit paths of HW|virt drivers. You can try to add a TC rule which
-> forwards all traffic from your devmem flow back out to the device and
-> see if it crashes on net-next ?
+> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 
-No crash, but by adding debug logs I'm detecting that we're passing
-unreadable netmem dma-addresses to the dma_unmap_*() APIs, which is
-known to be unsafe. I just can't reproduce an issue because my
-platform has the IOMMU disabled.
+LGTM,
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
-I guess I do need to send the hunk from validate_xmit_skb() as a fix
-to net and CC stable.
 
-Another thing I'm worried about is ip_forward() inserting an
-unreadable skb into the tx path somewhere higher up the stack which
-calls more code that isn't expecting unreadable skbs? Specifically
-worried about skb_frag_ref/unref. Does this sound like a concern as
-well? Or is it a similar code path to tc?
+--=20
+Regards,
+Kalesh AP
 
---
-Thanks,
-Mina
+--000000000000fdad91062f7c6fd9
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
+BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
+hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
+JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
+aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
+FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
+T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
+o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
+aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
+YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
+cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
+ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
+HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
+Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
+LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
+zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
+4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
+cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
+u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
+a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
+x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
+VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
+bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
+AQkEMSIEIFNDFvW/lt+zCVIPMc685lsdky82/JdtrUsxZ2jzgxm8MBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDMwNDA0MDkyMVowaQYJKoZIhvcNAQkPMVwwWjAL
+BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQB3Ey/v8FYL
+CFUjcge+1Fvs2QIxJrzp3KUysjOc9GJHjkI5B+WjrIvNWhxou+KMxNMjNcx4PEtLLHumkLnrijdm
+N2J+Gg8roQMwNn5E1WukzRnlfAJhBOsmv0MePi5Oq1cWN8KCHrkJ/LpNA5BPiv5Hp2bY2RleS5Xw
+yD8DzY+aGIMtM/6i6F+az8K9cYwEovBkwqWJfRlmKJZ79yNXPsjFV+yEfLA4vMxbFMyK5O2DmAPB
+6QQD2YoRW6ziIe5PEiVLQREJI38IodukUeaT0R6iRiXswaY7SA3iNCjp9XPX6nMWxDagESdgDbwI
+ZVyv6DHr4bLnlPGAitA6SX3AAaNq
+--000000000000fdad91062f7c6fd9--
 
