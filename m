@@ -1,143 +1,126 @@
-Return-Path: <netdev+bounces-171766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25D73A4E82A
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:16:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 592DAA4E860
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:20:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F011F7A7429
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:11:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CA42189ADFB
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:15:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 253002BEC4F;
-	Tue,  4 Mar 2025 16:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47AEA2BE7AC;
+	Tue,  4 Mar 2025 16:53:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="Vm/wzv76"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="wRFv1js6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29F26298CB8
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 16:50:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B408125DCEC;
+	Tue,  4 Mar 2025 16:53:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741107023; cv=none; b=IY05dYLRJvB3Tf4wDJ0ansKxz9r3NXlKgUY7qkiWaGbPi60rs2WH8rNz4e8WcLA05+mpHTELqEkKhRdzmDJ2UoaeTZqmyhfdpWvb68WcB5Zxpw8XVA97fFQGOLufx3BxDDz51Ig9WgCc+wledOdgj2GHxX2HV1MQNsvc97gwY6A=
+	t=1741107198; cv=none; b=H2/WnEMq1pDaVspn/PTQrqahBSZURtYfwUAJffOI7Jxx+Zm3+y/Lh7ty0Qz9LwKEo4YFJV5cgj3+CJv3nAMKfWfvWCtuz1Lc95jB7M2jWaVi5V7zgsoId1I0PK3s/qmnj8MNlp4IZDMMI0I65zz+OLMWMTfZ5j1jzuhnknWHjX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741107023; c=relaxed/simple;
-	bh=zrUZ2K6obbHVLkq6hfv8AXP8IsKmoHtrwEOg1loa8q0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uegOyHWA6OMpkCX3E+2Xl6qdpnAR7jyv/t8LhG5xJg2sN8JuRQBUFJOEBKkX091N5zFeYx06QayNuLSQsS+rmOa5kCoZWRxtC0zD9li06Q6iMDtzfol6IbJZgZYwYDgMlW01vqlu+HJBKeLcpmARMyIPMHzvrj8wTB/QV7htDPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org; spf=pass smtp.mailfrom=ieee.org; dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b=Vm/wzv76; arc=none smtp.client-ip=209.85.167.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ieee.org
-Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3f674752049so863102b6e.0
-        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 08:50:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ieee.org; s=google; t=1741107019; x=1741711819; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7tkrL+e+a2YbJa4w+KDK4bewexCr454QdQiczaO5JMc=;
-        b=Vm/wzv76ieaZX2hnFuV+tlHt5eOHLM7h2glXcGiJNmS61bTW0SrTX3IjGuHlADB0vj
-         ASs7BlP5mpkZO8Lg3dM0nY8YGHRk+j3vg26a8KkmME0hMZlx9liGM96dhIvjAtn9w2m8
-         2+lEbD3u2sGg72n0q3/WoX2HawQJ5JXBKZ2QM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741107019; x=1741711819;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7tkrL+e+a2YbJa4w+KDK4bewexCr454QdQiczaO5JMc=;
-        b=pZ0hJlPksyElW+Z7OqtxSYwQkFQzjMVedNfco3i1CVOXFdiRH1sptow6KF6bBQkvTc
-         t8nYfh3RudI7+e7CjWDrVIqpAJVplHThROUw35QhaZQ83/ScRccX0uay7vU2AiasG2Jr
-         9cQappUpZn7QOk+fYdhm25N5+7fNnzh5ng4BKuWQ/FQPX3FEv3/YOz+GrQ87EFIxr8AE
-         ssNuBl+uh5KjKue7RT1T4KQ56w8JTAWFSXSeqN4UICo+mL/knVF6WG8Yrkjwa/J6UFmi
-         VpmHMhvzILas0pEHBDC+a0MJGzIQxoMsSfA2EmpxsoUSqKzxroGoQ7bXZoSWbwWjcsJ+
-         FhDg==
-X-Forwarded-Encrypted: i=1; AJvYcCXhOVd3O5Bjh2ALeQnsMU5FKolmg4RiFwO6JuXd6wvTNXsOZ0l5RxdESqxUw/7kC4WoS4HJYhY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpXu/Dzeeot1g1q5lDVa59F9rtvsNR6rHEqTSMmLqU2MNBscKS
-	fe4Kf05r15Wo2Qol2AV1ZoZhYnnNQPju1lB3qK894Jy207A2HKsG/tULkhA5gw==
-X-Gm-Gg: ASbGncukC4MukxTa5sMuRXBuwYoUBLyQe4wZY/P5eLMeZ1pyzlJ0KgJTPB290amSswk
-	ZpbfQN5PNVQ97dmM8FHKT9tsANugPksNZfNYfoPaaNoelY+DY0CiJUuZcydB/cWEr3IHh5NbvmO
-	ptRaBRf4DcxGFwL6YgzvXQSXuZszsrPrEbrB+Hs+Wy6b9mXzNz6lmdm0CB2oqbKD2NEWBED/+8/
-	FyrKjGHw2ppfoHv8XRF4PKb7te0sSG0Yjodm7IXXGc9DkV8ak11mWJHOAUbEckOP/+beQlB3vgv
-	TgbxWnb85RebhP7y4XpVYzIOmgoYXz/AyWUPJo9AQu2XOEAX8RArfbsZd4/pq5Y6jxi+Jzu7IiB
-	uYh4=
-X-Google-Smtp-Source: AGHT+IFWGzlfKIJoQMdZwPV2HzDzwdowvDtxXCUhLVhv6U+fgKXlNTeZeV9ExhknYcVynokP8VXzFA==
-X-Received: by 2002:a05:6808:23ca:b0:3f4:cf:5d5c with SMTP id 5614622812f47-3f678f4ed49mr2747867b6e.10.1741107019054;
-        Tue, 04 Mar 2025 08:50:19 -0800 (PST)
-Received: from [172.22.22.28] (c-73-228-159-35.hsd1.mn.comcast.net. [73.228.159.35])
-        by smtp.googlemail.com with ESMTPSA id 5614622812f47-3f5506a0b92sm2255999b6e.6.2025.03.04.08.50.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Mar 2025 08:50:17 -0800 (PST)
-Message-ID: <2246f041-3e42-4534-bf89-3630ca2426d1@ieee.org>
-Date: Tue, 4 Mar 2025 10:50:15 -0600
+	s=arc-20240116; t=1741107198; c=relaxed/simple;
+	bh=Fl/v7qLy82ZL3HpIHCv0KzmgjAvnTeFEYEQJIM5ngmY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pd3bV3NH8wHYHLpzFQPGT93C2SWQ1omiIM8kHoIJAS1toW4zb/arNSy8/3POLmVsUTexmHB8wXe2gPUfg3+4WWEvudAAP0Fn2DMgU6Er1Fqn7xz//7vDZCLRgTF+JTBUsdWWPXKaIlqZMEBtDcTEXK61k6KfSnEn3ZhH4Zwexq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=wRFv1js6; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=cRHPazYps1wq7KJ5C8fXLniBimphIu0da+uuMFbtb3s=; b=wRFv1js6bmgBAOVXTa8oSiVAP+
+	4BZzmc0J9YF/co2jTAPij/WtgiOPXAF+05gWyH9g3EOeFWOooEAigwevLkNAbGCwJTcQYKi7OooWG
+	MHkv9erbQPJxNPA6bKkBDyPT0HNl6Lj+YwIT7PFP0I5NZ+t7wGjPJ6IgVGjYSrIvLGUp0Lh9gTRu9
+	Im4d9aIIE+DtMjKu+ll2pYnm9Rik1RGD7oAhEXe3nr4HZbbOtwxNMrTDn1gVyxXjT6C40tcckihZb
+	MhTLCdITMBU+yOqheRkwVs9T+H2yjWs7/abkwVF3kE5GI8w8AlGi4zwK18cWM7M0xSNmF4rVrdH0G
+	1RHwCWkg==;
+Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tpVW2-000000029No-3nl4;
+	Tue, 04 Mar 2025 16:53:10 +0000
+Date: Tue, 4 Mar 2025 16:53:09 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Hannes Reinecke <hare@suse.com>
+Cc: Vlastimil Babka <vbabka@suse.cz>, Boris Pismenny <borisp@nvidia.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	linux-mm@kvack.org, Harry Yoo <harry.yoo@oracle.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: Kernel oops with 6.14 when enabling TLS
+Message-ID: <Z8cv9VKka2KBnBKV@casper.infradead.org>
+References: <15be2446-f096-45b9-aaf3-b371a694049d@suse.com>
+ <Z8XPYNw4BSAWPAWT@casper.infradead.org>
+ <edf65d4e-90f0-4b12-b04f-35e97974a36f@suse.cz>
+ <95b0b93b-3b27-4482-8965-01963cc8beb8@suse.cz>
+ <fcfa11c6-2738-4a2e-baa8-09fa8f79cbf3@suse.de>
+ <a466b577-6156-4501-9756-1e9960aa4891@suse.cz>
+ <6877dfb1-9f44-4023-bb6d-e7530d03e33c@suse.com>
+ <db1a4681-1882-4e0a-b96f-a793e8fffb56@suse.cz>
+ <Z8cm5bVJsbskj4kC@casper.infradead.org>
+ <a4bbf5a7-c931-4e22-bb47-3783e4adcd23@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] net: ipa: Enable checksum for
- IPA_ENDPOINT_AP_MODEM_{RX,TX} for v4.7
-To: Luca Weiss <luca.weiss@fairphone.com>, Alex Elder <elder@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250227-ipa-v4-7-fixes-v1-0-a88dd8249d8a@fairphone.com>
- <20250227-ipa-v4-7-fixes-v1-3-a88dd8249d8a@fairphone.com>
-Content-Language: en-US
-From: Alex Elder <elder@ieee.org>
-In-Reply-To: <20250227-ipa-v4-7-fixes-v1-3-a88dd8249d8a@fairphone.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a4bbf5a7-c931-4e22-bb47-3783e4adcd23@suse.com>
 
-On 2/27/25 4:33 AM, Luca Weiss wrote:
-> Enable the checksum option for these two endpoints in order to allow
-> mobile data to actually work. Without this, no packets seem to make it
-> through the IPA.
+On Tue, Mar 04, 2025 at 05:32:32PM +0100, Hannes Reinecke wrote:
+> On 3/4/25 17:14, Matthew Wilcox wrote:
+> > I thought we'd done all the work needed to get rid of these pointless
+> > refcount bumps.  Turns out that's only on the block side (eg commit
+> > e4cc64657bec).  So what does networking need in order to understand
+> > that some iovecs do not need to mess with the refcount?
 > 
-> Fixes: b310de784bac ("net: ipa: add IPA v4.7 support")
-> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
-
-This makes sense.  The checksum option affects how outgoing
-packets are formatted and incoming packets are interpreted
-by the IPA hardware.  So with this being wrong, I suppose
-packets (one way and/or the other) might just be getting
-dropped as invalid.
-
-This looks good to me.  I'm really pleased you were able to
-get this working.
-
-Reviewed-by: Alex Elder <elder@riscstar.com>
-
-> ---
->   drivers/net/ipa/data/ipa_data-v4.7.c | 2 ++
->   1 file changed, 2 insertions(+)
+> The network stack needs to get hold of the page while transmission is
+> ongoing, as there is potentially rather deep queueing involved,
+> requiring several calls to sendmsg() and friends before the page is finally
+> transmitted. And maybe some post-processing (checksums,
+> digests, you name it), too, all of which require the page to be there.
 > 
-> diff --git a/drivers/net/ipa/data/ipa_data-v4.7.c b/drivers/net/ipa/data/ipa_data-v4.7.c
-> index e63dcf8d45567b0851393c2cea7a0d630afa20cd..41f212209993f10fee338e28027739a7402d5089 100644
-> --- a/drivers/net/ipa/data/ipa_data-v4.7.c
-> +++ b/drivers/net/ipa/data/ipa_data-v4.7.c
-> @@ -104,6 +104,7 @@ static const struct ipa_gsi_endpoint_data ipa_gsi_endpoint_data[] = {
->   			.filter_support	= true,
->   			.config = {
->   				.resource_group	= IPA_RSRC_GROUP_SRC_UL_DL,
-> +				.checksum       = true,
->   				.qmap		= true,
->   				.status_enable	= true,
->   				.tx = {
-> @@ -127,6 +128,7 @@ static const struct ipa_gsi_endpoint_data ipa_gsi_endpoint_data[] = {
->   		.endpoint = {
->   			.config = {
->   				.resource_group	= IPA_RSRC_GROUP_DST_UL_DL,
-> +				.checksum       = true,
->   				.qmap		= true,
->   				.aggregation	= true,
->   				.rx = {
+> It's all so jumbled up ... personally, I would _love_ to do away with
+> __iov_iter_get_pages_alloc(). Allocating a page array? Seriously?
 > 
+> And the problem with that is that it's always takes a page(!) reference,
+> completely oblivious to the fact whether you even _can_ take a page
+> reference (eg for tail pages); we've hit this problem several times now
+> (check for sendpage_ok() ...).
 
+Calling get_page() / put_page() on a tail page is fine -- that just
+redirects to the head page.  But calling it on a slab never made any
+sense; at best it gets you the equivalent of TYPESAFE_BY_RCU -- that is,
+the object can be freed and reallocated, but the underlying slab will
+not be reallocated to some other purpose.
+
+> But that's not the real issue; real issue is that the page reference is
+> taken down in the very bowels of __iov_iter_get_pages_alloc(), but needs
+> to be undone by the _caller_. Who might (or might not) have an idea
+> that he needs to drop the reference here.
+> That's why there is no straightforward conversion; you need to audit
+> each and every caller and try to find out where the page reference (if any)
+> is dropped.
+> Bah.
+> 
+> Can't we (at the very least) leave it to the caller of
+> __iov_iter_get_pages() to get a page reference (he has access to the page
+> array, after all ...)? That would make the interface slightly
+> better, and it'll be far more obvious to the caller what needs
+> to be done.
+
+Right, that's what happened in the block layer.  We mark the bio with
+BIO_PAGE_PINNED if the pincount needs to be dropped.  As a transitional
+period, we had BIO_PAGE_REFFED which indicated that the page refcount
+needed to be dropped.  Perhaps there's something similar that network
+could be doing.
 
