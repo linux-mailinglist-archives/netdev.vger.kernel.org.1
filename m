@@ -1,71 +1,98 @@
-Return-Path: <netdev+bounces-171742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C63E4A4E83F
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:17:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CBD2A4E7A5
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:08:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF75888586C
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 16:36:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E49AC7A40C9
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:03:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA4F6259C96;
-	Tue,  4 Mar 2025 16:15:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB1B325FA36;
+	Tue,  4 Mar 2025 16:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ioDwsSDp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T16fqhd1"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 602E5259C89;
-	Tue,  4 Mar 2025 16:15:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32D29281522
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 16:42:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741104924; cv=none; b=OyS9l8vkagoB4xgdIoBIzRVidBc+pH0Aba0DIwzZWijhWlb1969mvgQqgBTaDt7XSr6ewsPMYNQ2Md04YzV7Xy9Fukzz1X4cNWxT/Z3cpkPaz1wSVnFD97uf5eTYuWLr+g72pt5hI6yeAd58xRxwBkS0z2AKIV+MBDmV9/kah9g=
+	t=1741106573; cv=none; b=b4pHLoWCdOt+5jL7Qjz6RJoSztuqDkE3NXE6MnX7KClYO9ja2UqVLYJ98o1Ogi2a6BNoqEZ4VUVSedTG4vdUsGkdOUx0h/aTDoeAj5xmPGxGh9+hVlGSGM8wx+hyW5pkcDuM05YINL1XVELPYniixqEc54Bu47xPloGA9zPTutg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741104924; c=relaxed/simple;
-	bh=lQ4+10D0t0Q8TuYC/AyuEbU8Fo9fE1QT4c/FV1EckiE=;
+	s=arc-20240116; t=1741106573; c=relaxed/simple;
+	bh=5UVxCkDZ8kO0WdIGN4l3YmIwJxfc54njR/FGmzU/SBw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i0kGjniu55SQYu5ilQrzQZLCsBaxfykJPoODR9V1VbnQ6mY/Ug3PQyhe0uEYetQ/5UUpFpfyPZAlJth2TaLro/h7c3V1P/8VMBCCaQUnggieLiWPHSOSdX3ejvJnrJ+fkMIQiZ4VDeh7OI6E57KS/6b+Px8fjSrCZAg7tb7QgfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ioDwsSDp; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=pL43Quyb0ICgUXShUhHF7YtI0r/6haqOAOyn/xgv5nc=; b=ioDwsSDpQ9ByKM98PVFr7qaGNi
-	ST5mF0gVx3oPZQTPM8RRnZZYPYhFxl3wf4Hgbb74Siu4a4vSM6QrDDYg5hbNVVvD2YUhnjQHQSRjU
-	+qBTBt6+RTbgRd2HTeeiOB526g0wagPsMbvr30E5ehADsnEgtxqK4aS0jx0QnL0fbQbHDPaiwe/cH
-	5Q5mo2PH0cYQTIpj0ZUi1FjKqsiz4qD0TC9lxltij7tHfMbcPlXDV/5q1xyAoMaiSlB3KsT5qAHrW
-	4TBYXuHmZxYTU57sjC3Cz2/z4B4u6ZQA5New8VCPd9h6mAWZsRGe7ihZ46UaHmXsuQXzo+DTAa2xp
-	PvQJsBeQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tpUub-00000001h5s-2rJd;
-	Tue, 04 Mar 2025 16:14:30 +0000
-Date: Tue, 4 Mar 2025 16:14:29 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: Hannes Reinecke <hare@suse.com>, Boris Pismenny <borisp@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	linux-mm@kvack.org, Harry Yoo <harry.yoo@oracle.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: Kernel oops with 6.14 when enabling TLS
-Message-ID: <Z8cm5bVJsbskj4kC@casper.infradead.org>
-References: <Z8W8OtJYFzr9OQac@casper.infradead.org>
- <Z8W_1l7lCFqMiwXV@casper.infradead.org>
- <15be2446-f096-45b9-aaf3-b371a694049d@suse.com>
- <Z8XPYNw4BSAWPAWT@casper.infradead.org>
- <edf65d4e-90f0-4b12-b04f-35e97974a36f@suse.cz>
- <95b0b93b-3b27-4482-8965-01963cc8beb8@suse.cz>
- <fcfa11c6-2738-4a2e-baa8-09fa8f79cbf3@suse.de>
- <a466b577-6156-4501-9756-1e9960aa4891@suse.cz>
- <6877dfb1-9f44-4023-bb6d-e7530d03e33c@suse.com>
- <db1a4681-1882-4e0a-b96f-a793e8fffb56@suse.cz>
+	 Content-Type:Content-Disposition:In-Reply-To; b=p8YKIJ5yc7UprPp4PrVKmkl7S5koakWRVEP9mv7nCoMh7iJBEodGiC3F414bb2ETEtd4mfUg4w5/h5NhoybrPdVVqjs/4/ogItOLtHJLC0iFATcHDr3J2YUQlTi3JgHMHf0CVxDYJwvLsgNyPbNNtyOSO4aqlb+D0rI1teelH2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T16fqhd1; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741106571;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=irwE7UbkTJ9sd9IPUMpAepIHZ3K24G0lYRCeT1RBeVE=;
+	b=T16fqhd1n14J/dqUr4OhsSUE6NrVQ69F942xDg1OM4Suw2auxjnufylmq5idwgxPL22+/Z
+	W/oJaeE7uMSHzQZ/jec6vyrOyXFiVSUJC5iDBh6nIJ5s5kBNVtJ/bcgY1H1VmSKdC60n87
+	2FuR2xMilpIW6vYcLosA1bEruogZceM=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-584-LMlOLCbmM4aj_pyoVseOeg-1; Tue, 04 Mar 2025 11:42:49 -0500
+X-MC-Unique: LMlOLCbmM4aj_pyoVseOeg-1
+X-Mimecast-MFC-AGG-ID: LMlOLCbmM4aj_pyoVseOeg_1741106569
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-6e6bb677312so106628496d6.3
+        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 08:42:49 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741106569; x=1741711369;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=irwE7UbkTJ9sd9IPUMpAepIHZ3K24G0lYRCeT1RBeVE=;
+        b=TMtdNwYDYISnLUGaQJD9DbYWWbRW4TZhWaPMR6r3v6skWxSE797f0xLlAK2BNifwLx
+         7mPg4KoQqAwq9ZpOi8XQ7wt34fPMOuOEv0bbeVTvMqfQAsNG15IUdyGFhFMS864D7pm1
+         ax4cWGorPKwbualT8xtYzFXaua4Cld6b4WBCQaNUzIyNJiJ79uv5wot6vVxzqzjpk69K
+         o/z0FS0j48zahNp/D/g1nGCJAZamiEYTBkUDMreLWsyXtS5Wfy0LHgOLiGvag2RvGIQW
+         wRyB+D7k7btgINTHYKS9YZJjB00UPHzJrjRSeCgujOX3QEG8WfPJq0U0eU+jAFx+6fuu
+         fRHw==
+X-Forwarded-Encrypted: i=1; AJvYcCWzoli3mniCifR84vSuAdlFidV2eAVgs3gzCofEzB7EmorIoVYZghXsuBZf+UQf+WIMsKgQh1Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSLR4+QjzS8wT6n7jasrX6bPIyT9ZyHLVinyCHzv8r9Y0Kwyxr
+	iMk6i5tu4Gj13KJGNNQBovJJzY/Zv5KNuA4Cj6c52p6e1u0QbxpUlSUtAL6HO+jCSRkW9jSL4HE
+	Tz9134um9G+gab+mSZNkC9zBxnqIbHiRvfFigg0ZjUTrphBiKzS/qFQ==
+X-Gm-Gg: ASbGncvUJkNQlOKQgYKQi2FbmYAPve2seRihuCJ2jkDktvi9Wkp0ZvhP2oNg7Dj01Ok
+	So2CTARddX+JDdn91bd/O1QcF2z4lejuCkRQssX+rWNKFmePhiOLco/RpXXwOVCJmkOVPPEiyJq
+	s+thUIwxQeywU3Y9W+/w7Imu6eaEAV9UdM9law/9cf/o6FbTesYX6vaHzieGyiLOEFwMnW3KxL+
+	mq3zVRbl5YcaMaevq1LPlU8feJAqL8m9pwlf7d3mDLJcIZwz8IAESzvXEN87MVmgIbT/O9fUGfe
+	1Klbx9/V
+X-Received: by 2002:a05:6214:20aa:b0:6e8:916b:8c49 with SMTP id 6a1803df08f44-6e8a0d70112mr295550796d6.31.1741106569247;
+        Tue, 04 Mar 2025 08:42:49 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEX5ng0/gzjf07ZxLghdOiyfeivk23lbOTEm0x8eqXcyer5cXGbRjEi1aQ8MlIa0yV155gJFQ==
+X-Received: by 2002:a05:6214:20aa:b0:6e8:916b:8c49 with SMTP id 6a1803df08f44-6e8a0d70112mr295550436d6.31.1741106568919;
+        Tue, 04 Mar 2025 08:42:48 -0800 (PST)
+Received: from fedora-x1 ([142.126.89.169])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4750a4cdc78sm554471cf.15.2025.03.04.08.42.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Mar 2025 08:42:48 -0800 (PST)
+Date: Tue, 4 Mar 2025 11:42:37 -0500
+From: Kamal Heib <kheib@redhat.com>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	Vlad Dumitrescu <vdumitrescu@nvidia.com>
+Subject: Re: [PATCH net-next 02/14] devlink: Add 'total_vfs' generic device
+ param
+Message-ID: <Z8ctfY0RQ6IFm-G5@fedora-x1>
+References: <20250228021227.871993-1-saeed@kernel.org>
+ <20250228021227.871993-3-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,84 +101,80 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <db1a4681-1882-4e0a-b96f-a793e8fffb56@suse.cz>
+In-Reply-To: <20250228021227.871993-3-saeed@kernel.org>
 
-On Tue, Mar 04, 2025 at 11:26:07AM +0100, Vlastimil Babka wrote:
-> +Cc NETWORKING [TLS] maintainers and netdev for input, thanks.
+On Thu, Feb 27, 2025 at 06:12:15PM -0800, Saeed Mahameed wrote:
+> From: Vlad Dumitrescu <vdumitrescu@nvidia.com>
 > 
-> The full error is here:
-> https://lore.kernel.org/all/fcfa11c6-2738-4a2e-baa8-09fa8f79cbf3@suse.de/
+> NICs are typically configured with total_vfs=0, forcing users to rely
+> on external tools to enable SR-IOV (a widely used and essential feature).
 > 
-> On 3/4/25 11:20, Hannes Reinecke wrote:
-> > On 3/4/25 09:18, Vlastimil Babka wrote:
-> >> On 3/4/25 08:58, Hannes Reinecke wrote:
-> >>> On 3/3/25 23:02, Vlastimil Babka wrote:
-> >>>> Also make sure you have CONFIG_DEBUG_VM please.
-> >>>>
-> >>> Here you go:
-> >>>
-> >>> [  134.506802] page: refcount:0 mapcount:0 mapping:0000000000000000
-> >>> index:0x0 pfn:0x101ef8
-> >>> [  134.509253] head: order:3 mapcount:0 entire_mapcount:0
-> >>> nr_pages_mapped:0 pincount:0
-> >>> [  134.511594] flags:
-> >>> 0x17ffffc0000040(head|node=0|zone=2|lastcpupid=0x1fffff)
-> >>> [  134.513556] page_type: f5(slab)
-> >>> [  134.513563] raw: 0017ffffc0000040 ffff888100041b00 ffffea0004a90810
-> >>> ffff8881000402f0
-> >>> [  134.513568] raw: 0000000000000000 00000000000a000a 00000000f5000000
-> >>> 0000000000000000
-> >>> [  134.513572] head: 0017ffffc0000040 ffff888100041b00 ffffea0004a90810
-> >>> ffff8881000402f0
-> >>> [  134.513575] head: 0000000000000000 00000000000a000a 00000000f5000000
-> >>> 0000000000000000
-> >>> [  134.513579] head: 0017ffffc0000003 ffffea000407be01 ffffffffffffffff
-> >>> 0000000000000000
-> >>> [  134.513583] head: 0000000000000008 0000000000000000 00000000ffffffff
-> >>> 0000000000000000
-> >>> [  134.513585] page dumped because: VM_BUG_ON_FOLIO(((unsigned int)
-> >>> folio_ref_count(folio) + 127u <= 127u))
-> >>> [  134.513615] ------------[ cut here ]------------
-> >>> [  134.529822] kernel BUG at ./include/linux/mm.h:1455!
-> >> 
-> >> Yeah, just as I suspected, folio_get() says the refcount is 0.
+> Add total_vfs parameter to devlink for SR-IOV max VF configurability.
+> Enables standard kernel tools to manage SR-IOV, addressing the need for
+> flexible VF configuration.
+> 
+> Signed-off-by: Vlad Dumitrescu <vdumitrescu@nvidia.com>
+> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 
-... and it has a page_type of f5 (slab)
+Tested-by: Kamal Heib <kheib@redhat.com>
+> ---
+>  Documentation/networking/devlink/devlink-params.rst | 3 +++
+>  include/net/devlink.h                               | 4 ++++
+>  net/devlink/param.c                                 | 5 +++++
+>  3 files changed, 12 insertions(+)
+> 
+> diff --git a/Documentation/networking/devlink/devlink-params.rst b/Documentation/networking/devlink/devlink-params.rst
+> index 4e01dc32bc08..f266da05ab0d 100644
+> --- a/Documentation/networking/devlink/devlink-params.rst
+> +++ b/Documentation/networking/devlink/devlink-params.rst
+> @@ -137,3 +137,6 @@ own name.
+>     * - ``event_eq_size``
+>       - u32
+>       - Control the size of asynchronous control events EQ.
+> +   * - ``total_vfs``
+> +     - u32
+> +     - The total number of Virtual Functions (VFs) supported by the PF.
+> diff --git a/include/net/devlink.h b/include/net/devlink.h
+> index b8783126c1ed..eed1e4507d17 100644
+> --- a/include/net/devlink.h
+> +++ b/include/net/devlink.h
+> @@ -520,6 +520,7 @@ enum devlink_param_generic_id {
+>  	DEVLINK_PARAM_GENERIC_ID_ENABLE_IWARP,
+>  	DEVLINK_PARAM_GENERIC_ID_IO_EQ_SIZE,
+>  	DEVLINK_PARAM_GENERIC_ID_EVENT_EQ_SIZE,
+> +	DEVLINK_PARAM_GENERIC_ID_TOTAL_VFS,
+>  
+>  	/* add new param generic ids above here*/
+>  	__DEVLINK_PARAM_GENERIC_ID_MAX,
+> @@ -578,6 +579,9 @@ enum devlink_param_generic_id {
+>  #define DEVLINK_PARAM_GENERIC_EVENT_EQ_SIZE_NAME "event_eq_size"
+>  #define DEVLINK_PARAM_GENERIC_EVENT_EQ_SIZE_TYPE DEVLINK_PARAM_TYPE_U32
+>  
+> +#define DEVLINK_PARAM_GENERIC_TOTAL_VFS_NAME "total_vfs"
+> +#define DEVLINK_PARAM_GENERIC_TOTAL_VFS_TYPE DEVLINK_PARAM_TYPE_U32
+> +
+>  #define DEVLINK_PARAM_GENERIC(_id, _cmodes, _get, _set, _validate)	\
+>  {									\
+>  	.id = DEVLINK_PARAM_GENERIC_ID_##_id,				\
+> diff --git a/net/devlink/param.c b/net/devlink/param.c
+> index e19d978dffa6..d163afbadab9 100644
+> --- a/net/devlink/param.c
+> +++ b/net/devlink/param.c
+> @@ -92,6 +92,11 @@ static const struct devlink_param devlink_param_generic[] = {
+>  		.name = DEVLINK_PARAM_GENERIC_EVENT_EQ_SIZE_NAME,
+>  		.type = DEVLINK_PARAM_GENERIC_EVENT_EQ_SIZE_TYPE,
+>  	},
+> +	{
+> +		.id = DEVLINK_PARAM_GENERIC_ID_TOTAL_VFS,
+> +		.name = DEVLINK_PARAM_GENERIC_TOTAL_VFS_NAME,
+> +		.type = DEVLINK_PARAM_GENERIC_TOTAL_VFS_TYPE,
+> +	},
+>  };
+>  
+>  static int devlink_param_generic_verify(const struct devlink_param *param)
+> -- 
+> 2.48.1
+> 
+> 
 
-> >>> [  134.554509] Call Trace:
-> >>> [  134.580282]  iov_iter_get_pages2+0x19/0x30
-> >> 
-> >> Presumably that's __iov_iter_get_pages_alloc() doing get_page() either in
-> >> the " if (iov_iter_is_bvec(i)) " branch or via iter_folioq_get_pages()?
-
-It's the bvec path:
-
-                iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, len);
-
-> >> Which doesn't work for a sub-size kmalloc() from a slab folio, which after
-> >> the frozen refcount conversion no longer supports get_page().
-> >> 
-> >> The question is if this is a mistake specific for this path that's easy to
-> >> fix or there are more paths that do this. At the very least the pinning of
-> >> page through a kmalloc() allocation from it is useless - the object itself
-> >> has to be kfree()'d and that would never happen through a put_page()
-> >> reaching zero.
-> >> 
-> > Looks like a specific mistake.
-> > tls_sw is the only user of sk_msg_zerocopy_from_iter()
-> > (which is calling into __iov_iter_get_pages_alloc()).
-> > 
-> > And, more to the point, tls_sw messes up iov pacing coming in from
-> > the upper layers.
-> > So even if the upper layers send individual iovs (where each iov might
-> > contain different allocation types), tls_sw is packing them together 
-> > into full records. So it might end up with iovs having _different_ 
-> > allocations.
-> > Which would explain why we only see it with TLS, but not with normal
-> > connections.
-
-I thought we'd done all the work needed to get rid of these pointless
-refcount bumps.  Turns out that's only on the block side (eg commit
-e4cc64657bec).  So what does networking need in order to understand
-that some iovecs do not need to mess with the refcount?
 
