@@ -1,268 +1,164 @@
-Return-Path: <netdev+bounces-171779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC08DA4E9F7
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:52:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9905A4E7C2
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:09:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9B8D19C0D56
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:47:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A6358A2A8E
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 16:20:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CD9C2803E9;
-	Tue,  4 Mar 2025 17:24:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7867928F924;
+	Tue,  4 Mar 2025 16:00:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=ti.com header.i=@ti.com header.b="CiOyJp6K"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CRD59RSF"
 X-Original-To: netdev@vger.kernel.org
-Received: from beeline3.cc.itu.edu.tr (beeline3.cc.itu.edu.tr [160.75.25.117])
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CA2126463A
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:24:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=160.75.25.117
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741109054; cv=fail; b=PKpczwDEmuyxMLUEl+ty39wkVgnDP4ms5NcLNCt7Otn2NJAg055FsE5LJ51MSmyM9Do8DKkUE6gqsQb6Cwe+tmUrC9SLr7cQZ5DEn0VYHkJ6TxAQXEgv0Pdl8X3uyUAiWe1RjO7yBOb5zbuS+uyQxnveHLHpNRqBT29lzDSHIZE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741109054; c=relaxed/simple;
-	bh=3/U4N4tgGFJtWbh0luYzhlKljAqRjBSDk2gNKgdhMlE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Y6aanRJ2Awzt7ckfYbmXmYMGs13o4A3KgWPvvaYyhhqYzkFuitF47RoMUakquAglD+WCCGRY65ve9hEZdm5rTBqGmBDY+diooBwzIw04iA52+2KoouQfI+TBJGniSPPC/5JKde333/040RQYqO/lgZyDiTBz6gexpM28u2vt2Tw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=ti.com; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=fail (1024-bit key) header.d=ti.com header.i=@ti.com header.b=CiOyJp6K reason="signature verification failed"; arc=none smtp.client-ip=198.47.19.246; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; arc=fail smtp.client-ip=160.75.25.117
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=cc.itu.edu.tr
-Received: from lesvatest1.cc.itu.edu.tr (lesvatest1.cc.itu.edu.tr [10.146.128.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
-	(No client certificate requested)
-	by beeline3.cc.itu.edu.tr (Postfix) with ESMTPS id 8503640D1F56
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 20:24:10 +0300 (+03)
-X-Envelope-From: <root@cc.itu.edu.tr>
-Authentication-Results: lesvatest1.cc.itu.edu.tr;
-	dkim=fail reason="signature verification failed" (1024-bit key, unprotected) header.d=ti.com header.i=@ti.com header.a=rsa-sha256 header.s=ti-com-17Q1 header.b=CiOyJp6K
-Received: from lesva1.cc.itu.edu.tr (unknown [160.75.70.79])
-	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6g5C4W9ZzG1B0
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 18:46:07 +0300 (+03)
-Received: by le1 (Postfix, from userid 0)
-	id 8CD1542720; Tue,  4 Mar 2025 18:45:43 +0300 (+03)
-Authentication-Results: lesva1.cc.itu.edu.tr;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=ti.com header.i=@ti.com header.b=CiOyJp6K
-X-Envelope-From: <linux-kernel+bounces-541854-bozkiru=itu.edu.tr@vger.kernel.org>
-Authentication-Results: lesva2.cc.itu.edu.tr;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=ti.com header.i=@ti.com header.b=CiOyJp6K
-Received: from fgw1.itu.edu.tr (fgw1.itu.edu.tr [160.75.25.103])
-	by le2 (Postfix) with ESMTP id 90F4D41ED5
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:53:13 +0300 (+03)
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by fgw1.itu.edu.tr (Postfix) with SMTP id 28BF3305F789
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 16:53:12 +0300 (+03)
-Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C1B73AB050
-	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 13:52:47 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 978982135AD;
-	Mon,  3 Mar 2025 13:52:37 +0000 (UTC)
-Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B7F186347;
-	Mon,  3 Mar 2025 13:52:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D14F28D06E;
+	Tue,  4 Mar 2025 16:00:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741009954; cv=none; b=bdmacFf8OjkgSnPDxm97dQILBCgpFVDLiDvFvTiSxckoa/ZDUJae+8LPLjfQ+qF2p8T8lhz209GXhKt3OPe5OhReAQ557ICQj+DT0aCJ0XY9Hzlfm/5aRMjI8y6WFO/wbIZhelV6MwtptUCh/jGXeJb7ZfxwECdh4DFlAvgEZ4Q=
+	t=1741104059; cv=none; b=bopsjqtIx1sESkmOKuaqbjLOeMDzHD/ZQM0U6FxMp7idfNN677v2geBMGH4TbzbnS5lCiOwP84rH+82W45ulQbUMO8/rsuZcBo6GT5hpUYLKacQqIWCuQr5RkRjD4Ogk49pKZLu14Auo99DIwB+rVnpYqZicn40CJ0LZdA3c998=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741009954; c=relaxed/simple;
-	bh=o8VoAt5dL3GJqO4ZL7G+9SXofDr7fMM3zttZuWylbZc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uYOmv5o/m2q/Bn01GtePilZmFRhqkAyvbWjmiyJaV6G1VwJxWiJFhOSNnVBazSx0NOOeKDs0XjezAyU+jg5Jr41Dv/wUxl3Ev7qxsBMJXcfrGntWOKpEhmYVw1ZPJ3aHE7TXm2kKCauTqnD1h/Z7zrvnqw/wLzxfJv17BHfQ8aM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=CiOyJp6K; arc=none smtp.client-ip=198.47.19.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 523DqFDJ3287675
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Mon, 3 Mar 2025 07:52:15 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1741009935;
-	bh=Lz8EOBn9FUAA9PUMl7yDcfKigTwB7zLIEjA+CKP0ZPA=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=CiOyJp6KRusPBdfZ7/h7j/VSlAOKo5ujK0iDwmb49mxCcMuBHL0SnSC/5PS1Dn9Kk
-	 wh7yeSTnFm4SwApy5PyypIn07tbNn0ZK4PmswvulqjnfiWXD9xWeQvVxk5CRmpp6O5
-	 qGthWuDvMINi7GC0q6nCFPK/LbOEiZMQIlzr+9/U=
-Received: from DLEE104.ent.ti.com (dlee104.ent.ti.com [157.170.170.34])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 523DqF79095313;
-	Mon, 3 Mar 2025 07:52:15 -0600
-Received: from DLEE112.ent.ti.com (157.170.170.23) by DLEE104.ent.ti.com
- (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 3
- Mar 2025 07:52:14 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE112.ent.ti.com
- (157.170.170.23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Mon, 3 Mar 2025 07:52:14 -0600
-Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 523DqEhA092412;
-	Mon, 3 Mar 2025 07:52:14 -0600
-Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
-	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 523DqDP2018084;
-	Mon, 3 Mar 2025 07:52:14 -0600
-From: Meghana Malladi <m-malladi@ti.com>
-To: <javier.carrasco.cruz@gmail.com>, <diogo.ivo@siemens.com>,
-        <horms@kernel.org>, <jacob.e.keller@intel.com>, <m-malladi@ti.com>,
-        <richardcochran@gmail.com>, <pabeni@redhat.com>, <kuba@kernel.org>,
-        <edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-Subject: [PATCH net-next v3 1/2] net: ti: icss-iep: Add pwidth configuration for perout signal
-Date: Mon, 3 Mar 2025 19:21:23 +0530
-Message-ID: <20250303135124.632845-2-m-malladi@ti.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250303135124.632845-1-m-malladi@ti.com>
-References: <20250303135124.632845-1-m-malladi@ti.com>
-Precedence: bulk
+	s=arc-20240116; t=1741104059; c=relaxed/simple;
+	bh=pPjIO747FKL6jAHmMKeBPAAnLzptVY1ZNkFDQcUSYTM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JtCZb76chQiEC+VPtKyH1RxxscMvlUj9FhR0DGyi3D3rH6n8ng8Vhs8pH3z9Lp6s/ISphYIviE+VUDveJ/n/TsfKBoSznV49Q+hNTt2WI7vzp3SCDjmU0rYMbLYoXy2Yzgp03xCMibwv0bq/aamll/UeabYDbySY/sxkuwVcvXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CRD59RSF; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 7457944333;
+	Tue,  4 Mar 2025 16:00:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1741104055;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RUl0n/50RU5tg+1nlfKABzZ6a5bn6YeoemF/OpOiw6s=;
+	b=CRD59RSFJibwTubuGWUQH+rVsIbGqXDyu51P/eZhUt9/BJxv4rqmXrkswy+ZozaZ7jbPhR
+	ih8ctUWP+aojNtJO5UQjydr7NFcaGbB3qpQ6id1jpQ7eZpo+HTvINN/r3RREvuzQKk50CW
+	twW8YtQfgnmMZ3UCEi0WtzEQwWlH5BxwpFGO3h/m48VpuRrPkhORZa2QB8m0OQ3+UGVBPh
+	A8Zhw4yrKhwwMoxwAKHsmLJLHKLr14gnJf4o80Z4Tmxdrg5AokJzlP2Yg5p81q8bUmp/sW
+	vSIhsihKHDwUfHADuuY9YtIK0JpRLJ92wVqH/uAVDB90UPMnYo9SDG0GzD6vzQ==
+Date: Tue, 4 Mar 2025 17:00:51 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina
+ <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, Oleksij Rempel <o.rempel@pengutronix.de>, Simon
+ Horman <horms@kernel.org>, Romain Gantois <romain.gantois@bootlin.com>,
+ Piergiorgio Beruto <piergiorgio.beruto@gmail.com>
+Subject: Re: [PATCH net] net: ethtool: Set the req_info->dev on DUMP
+ requests for each dev
+Message-ID: <20250304170051.607097e9@kmaincent-XPS-13-7390>
+In-Reply-To: <20250302162137.698092-1-maxime.chevallier@bootlin.com>
+References: <20250302162137.698092-1-maxime.chevallier@bootlin.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-ITU-Libra-ESVA-Information: Please contact Istanbul Teknik Universitesi for more information
-X-ITU-Libra-ESVA-ID: 4Z6g5C4W9ZzG1B0
-X-ITU-Libra-ESVA: No virus found
-X-ITU-Libra-ESVA-From: root@cc.itu.edu.tr
-X-ITU-Libra-ESVA-Watermark: 1741713744.49768@4W0LqIbnM0Oh+Yt0WF1R0w
-X-ITU-MailScanner-SpamCheck: not spam
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddutddvgeeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvddupdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhop
+ egvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-GND-Sasl: kory.maincent@bootlin.com
 
-icss_iep_perout_enable_hw() is a common function for generating
-both pps and perout signals. When enabling pps, the application needs
-to only pass enable/disable argument, whereas for perout it supports
-different flags to configure the signal.
+On Sun,  2 Mar 2025 17:21:36 +0100
+Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
 
-But icss_iep_perout_enable_hw() function is missing to hook the
-configuration params passed by the app, causing perout to behave
-same a pps (except being able to configure the period). As duty cycle
-is also one feature which can configured for perout, incorporate this
-in the function to get the expected signal.
+> There are a few netlink commands that rely on the req_info->dev field
+> being populated by ethnl in their ->prepare_data() and ->fill_reply().
+>=20
+> For a regular GET request, this will be set by ethnl_default_parse(),
+> which calls ethnl_parse_header_dev_get().
+>=20
+> In the case of a DUMP request, the ->prepare_data() and ->fill_reply()
+> callbacks will be called with the req_info->dev being NULL, which can
+> cause discrepancies in the behaviour between GET and DUMP results.
+>=20
+> The main impact is that ethnl_req_get_phydev() will not find any
+> phy_device, impacting :
+>  - plca
+>  - pse-pd
+>  - stats
+>=20
+> Some other commands rely on req_info->dev, namely :
+>  - coalesce in ->fill_reply to look for an irq_moder
+>=20
+> Although cable_test and tunnels also rely on req_info->dev being set,
+> that's not a problem for these commands as :
+>  - cable_test doesn't support DUMP
+>  - tunnels rolls its own ->dumpit (and sets dev in the req_info).
+>  - phy also has its own ->dumpit
+>=20
+> All other commands use reply_data->dev (probably the correct way of
+> doing things) and aren't facing this issue.
+>=20
+> Simply set the dev in the req_info context when iterating to dump each
+> dev.
+>=20
+> Fixes: c15e065b46dc ("net: ethtool: Allow passing a phy index for some
+> commands") Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.co=
+m>
+> ---
+>=20
+> Fixes tag targets the phy-index commit, as it introduced a change in
+> behaviour for PLCA. From what I can tell, coalesce never correctly
+> detected irq_moder in DUMP requests.
+>=20
+> We could also consider fixing all individual commands that use
+> req_info->dev, however I'm not actually sure it's incorrect to do so,
+> feel free to correct me though.
+>=20
+> Maxime
+>=20
+>  net/ethtool/netlink.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
+> index b4c45207fa32..de967961d8fe 100644
+> --- a/net/ethtool/netlink.c
+> +++ b/net/ethtool/netlink.c
+> @@ -582,6 +582,7 @@ static int ethnl_default_dumpit(struct sk_buff *skb,
+>  		dev_hold(dev);
+>  		rcu_read_unlock();
+> =20
+> +		ctx->req_info->dev =3D dev;
 
-Signed-off-by: Meghana Malladi <m-malladi@ti.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
----
-Changes from v2 (v3-v2):
-- Posted patch to net-next as feature addition
-- Collected RB tag from Jacob Keller <jacob.e.keller@intel.com>
+I would rather put it in ethnl_default_dump_one() before
+ethnl_init_reply_data() call.
 
- drivers/net/ethernet/ti/icssg/icss_iep.c | 49 ++++++++++++++++++++++--
- 1 file changed, 46 insertions(+), 3 deletions(-)
+With this change:
+Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
+Tested-by: Kory Maincent <kory.maincent@bootlin.com>
 
-diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.c b/drivers/net/ether=
-net/ti/icssg/icss_iep.c
-index d59c1744840a..0411438a3b5d 100644
---- a/drivers/net/ethernet/ti/icssg/icss_iep.c
-+++ b/drivers/net/ethernet/ti/icssg/icss_iep.c
-@@ -406,9 +406,16 @@ static void icss_iep_update_to_next_boundary(struct =
-icss_iep *iep, u64 start_ns)
- static int icss_iep_perout_enable_hw(struct icss_iep *iep,
- 				     struct ptp_perout_request *req, int on)
- {
-+	struct timespec64 ts;
-+	u64 ns_width;
- 	int ret;
- 	u64 cmp;
-=20
-+	/* Calculate width of the signal for PPS/PEROUT handling */
-+	ts.tv_sec =3D req->on.sec;
-+	ts.tv_nsec =3D req->on.nsec;
-+	ns_width =3D timespec64_to_ns(&ts);
-+
- 	if (iep->ops && iep->ops->perout_enable) {
- 		ret =3D iep->ops->perout_enable(iep->clockops_data, req, on, &cmp);
- 		if (ret)
-@@ -419,8 +426,9 @@ static int icss_iep_perout_enable_hw(struct icss_iep =
-*iep,
- 			regmap_write(iep->map, ICSS_IEP_CMP1_REG0, lower_32_bits(cmp));
- 			if (iep->plat_data->flags & ICSS_IEP_64BIT_COUNTER_SUPPORT)
- 				regmap_write(iep->map, ICSS_IEP_CMP1_REG1, upper_32_bits(cmp));
--			/* Configure SYNC, 1ms pulse width */
--			regmap_write(iep->map, ICSS_IEP_SYNC_PWIDTH_REG, 1000000);
-+			/* Configure SYNC, based on req on width */
-+			regmap_write(iep->map, ICSS_IEP_SYNC_PWIDTH_REG,
-+				     div_u64(ns_width, iep->def_inc));
- 			regmap_write(iep->map, ICSS_IEP_SYNC0_PERIOD_REG, 0);
- 			regmap_write(iep->map, ICSS_IEP_SYNC_START_REG, 0);
- 			regmap_write(iep->map, ICSS_IEP_SYNC_CTRL_REG, 0); /* one-shot mode *=
-/
-@@ -447,6 +455,8 @@ static int icss_iep_perout_enable_hw(struct icss_iep =
-*iep,
- 				   + req->period.nsec;
- 			icss_iep_update_to_next_boundary(iep, start_ns);
-=20
-+			regmap_write(iep->map, ICSS_IEP_SYNC_PWIDTH_REG,
-+				     div_u64(ns_width, iep->def_inc));
- 			/* Enable Sync in single shot mode  */
- 			regmap_write(iep->map, ICSS_IEP_SYNC_CTRL_REG,
- 				     IEP_SYNC_CTRL_SYNC_N_EN(0) | IEP_SYNC_CTRL_SYNC_EN);
-@@ -474,7 +484,38 @@ static int icss_iep_perout_enable_hw(struct icss_iep=
- *iep,
- static int icss_iep_perout_enable(struct icss_iep *iep,
- 				  struct ptp_perout_request *req, int on)
- {
--	return -EOPNOTSUPP;
-+	int ret =3D 0;
-+
-+	mutex_lock(&iep->ptp_clk_mutex);
-+
-+	/* Reject requests with unsupported flags */
-+	if (req->flags & ~PTP_PEROUT_DUTY_CYCLE) {
-+		ret =3D -EOPNOTSUPP;
-+		goto exit;
-+	}
-+
-+	if (iep->pps_enabled) {
-+		ret =3D -EBUSY;
-+		goto exit;
-+	}
-+
-+	if (iep->perout_enabled =3D=3D !!on)
-+		goto exit;
-+
-+	/* Set default "on" time (1ms) for the signal if not passed by the app =
-*/
-+	if (!(req->flags & PTP_PEROUT_DUTY_CYCLE)) {
-+		req->on.sec =3D 0;
-+		req->on.nsec =3D NSEC_PER_MSEC;
-+	}
-+
-+	ret =3D icss_iep_perout_enable_hw(iep, req, on);
-+	if (!ret)
-+		iep->perout_enabled =3D !!on;
-+
-+exit:
-+	mutex_unlock(&iep->ptp_clk_mutex);
-+
-+	return ret;
- }
-=20
- static void icss_iep_cap_cmp_work(struct work_struct *work)
-@@ -553,6 +594,8 @@ static int icss_iep_pps_enable(struct icss_iep *iep, =
-int on)
- 		rq.perout.period.nsec =3D 0;
- 		rq.perout.start.sec =3D ts.tv_sec + 2;
- 		rq.perout.start.nsec =3D 0;
-+		rq.perout.on.sec =3D 0;
-+		rq.perout.on.nsec =3D NSEC_PER_MSEC;
- 		ret =3D icss_iep_perout_enable_hw(iep, &rq.perout, on);
- 	} else {
- 		ret =3D icss_iep_perout_enable_hw(iep, &rq.perout, on);
+Thank you!
+
+>  		ret =3D ethnl_default_dump_one(skb, dev, ctx,
+> genl_info_dump(cb));=20
+>  		rcu_read_lock();
+
+
+
 --=20
-2.43.0
-
-
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
