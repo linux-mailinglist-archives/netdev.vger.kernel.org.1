@@ -1,404 +1,140 @@
-Return-Path: <netdev+bounces-171773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E006AA4E952
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:38:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65F12A4EBFB
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:40:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B425E7AAFB2
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:36:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E30308E6016
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:40:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 890EF27C146;
-	Tue,  4 Mar 2025 17:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 016F729CB2A;
+	Tue,  4 Mar 2025 17:15:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gRixXU1/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ML8tCO9d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989ED255243
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:10:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E0E25EFA1
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:15:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741108229; cv=none; b=E9FzU5oXSKtcHzHG/zsvEMhOKPl3JypSzjNb4w45S68GgIVkzQtak3B7iE/Ld0gSrWgxpQmiQv7CAc8/q+iYj3Hi0e9FUq6PikKTX/iRsp6QF5mGSmskaNy9v5wNY0jgUtAUZ9IAq4HXxg8kc6QpqrNQ7XHZISHixY9sXniwA3A=
+	t=1741108511; cv=none; b=J92/UFBFec1TUh9zxrJSOt9ncjvRuHcrjoS3dtv5MTyPl1zZ6458kecsplCAhYVyFxjLqTQZZGtp2IKvkYSs4e5u9jhuUqnd9JWDp52T3V7aQFwd/Dsj6POhXt1Fz9OoLzIG85STk8JI2KTgmFHnnouAHWb1DaguyhZ2ZvBRmjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741108229; c=relaxed/simple;
-	bh=R3427OOZ2fFUlJGNoUdRJzRLdAqXp0I9NlKQQsZWKGo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GmGfJqhGjEYSeiMbWBkaX9RzrK/YIW2Sp1RBxCd5eByCxBZcsRxiHDV+kgzTz9U2aSC2hR/pbf5d0oYfGCQwwcuUa0h/Kt/KH+nDdAvomM0osblYGtDTSGIS2NbIzShx7rSq5OV0vOYkG8uJ5oJ5c8dW5GXRy6jM+RyXwUe0fsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gRixXU1/; arc=none smtp.client-ip=209.85.166.171
+	s=arc-20240116; t=1741108511; c=relaxed/simple;
+	bh=FRGJgtODLKIa6y5uhDrtlfv6ygNIu+BarxE51kKOkhQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n7p6BrVcUtOpHykErmTFmn2UWlfbcw/OhcdHZGgFX+hLIq0tLOynbCWg1PMCObz/cgFsg6+23K2hfTaRNDpP1Bvmb3i8VZ5kiygsXrVWBeQKYVH5CqWHVW5xn+zt4tcty2OJ98LUC2pEhm08ce8E4Tw6FegnqMITZpljNLUmijg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ML8tCO9d; arc=none smtp.client-ip=209.85.219.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3d3db37f4e6so55345155ab.3
-        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 09:10:27 -0800 (PST)
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6e8a8d6c38fso56710146d6.3
+        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 09:15:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741108226; x=1741713026; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jIYNyICcOhif3SQAOVlZwXAxK4sjlYDzZBCEzWBpYCE=;
-        b=gRixXU1/6tIj67aS8xM6eUWX3J1n7n2pqcKya9KqGT34CZAqmmAgPmAC2pmGZknp2n
-         2ivY9WtUwK5+Is75HHeevnyF+yTpSLAUCivvQLgauaBCbwfB7Q+oWO3sMzBtovl58Uk7
-         sOHfR/brP8zF5xWqVItfy3b49Nw2k1JQISq4dQTtXINJwOzyLUBGCThyAkq5N5soJ/dr
-         MPRXoUXLBiehTlDhGDFPGsWRKpO0x8Ms9S/zWUzOWU+YoKMUae7yhH2rFCgNJTShDHSf
-         VMQ7EsKQhtO+WT83jssJcFJ5BUV67otd/Ug9lN62ciGOsmMNNHQUJGqg/QgwydmG/ISj
-         qOwg==
+        d=gmail.com; s=20230601; t=1741108509; x=1741713309; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UyKVwYN3BbDjMx0ocjwFU79MtM8sT+naACzplnS8NRE=;
+        b=ML8tCO9d5HYVT80/5gQb8mv2no8ViY3U4FuIQozpENNk/TK3X6wEHDCwDSReIEwAVJ
+         fr5OddLuuIDBbwvbiZFhzSgGE2hrP8k9d20aIwjJs7Ft0Za6SZj6ysPyiVZmqTQyVScH
+         pwU9fxBoLgHycpRQAkQazWuK8p4Yc5J6vJCxMlKm1Szw+qXve//qP6SZDfoRyTeAIxc8
+         /7zmKdlTaBkT6r3SoPmVEU3sW6/w7Wt/TpxmxyzFXEmwJqkfagOw2Lm0DcyllG/Kqnsm
+         JAEdHQiof2vxj9A0j7JHTUCC5M7GA+xKkCcwae8A3WMdi0cN2fVZiCca87h/xvAguCEe
+         1Obw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741108226; x=1741713026;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jIYNyICcOhif3SQAOVlZwXAxK4sjlYDzZBCEzWBpYCE=;
-        b=u2Xhne6+4H8gB0MIRL5gFEsEQHZsQ84lzANk317aSM7AFPLqeVZ/qBL1n/+akW9fEj
-         ZNg/HlKGg+oobaay/a4DrPdfLmLAgycw14xn1PqhKIl9wWxSit3UaeF7H8b/EC4dVf7w
-         +R2go8cWUvnAVYLipufjebGA7MUM3k3muSU5FMMmwyZ9k54Ek/Qhulaq2FBeXvf/bBPW
-         k5HG69RMywSi8DSfv1z0soI9bS8KlrXfBaF0novN+lGZ2czKZrU13xkPUqQkeHu8eMCU
-         0eLmhU234odWJWJaI8dWZ/ryONIhgyqg7F9RjCPNyg1WNplQXLV1HljEik5vKI1joyAF
-         S1qw==
-X-Gm-Message-State: AOJu0YzRlsmlNlvRzJJovLN4cKITE2+BCgXr8gJYOsi84bVj7LpB7Wpd
-	ges742ZU81m6saHB8+1GXtJj6veipatnVPOsaVFwvLHasDUeikLx9yRw2z+YTCcbiWoTlNbRwP2
-	HjQq8wddyAOgcTXws3vhR9s03Y4k=
-X-Gm-Gg: ASbGncsXb562fuvZDKqMOEjTHaKMPBzQddi6cciaSATUmdIZjYL7uhB11f76CDUrcUf
-	Z48jjEw6hdFdEn4mmtrHyaNDj0jLZ939Sb4QVHrywiEK8M1UPg2QZ5rPu0nv1VgiIkANCVoSJ4e
-	baMiOKOo8wNpRWk3dUczxD2s3xBVowuLLOIR03Dp2tTmdLyMjs1dFiLYUtf3U=
-X-Google-Smtp-Source: AGHT+IGrTWjvYy3Uycg+ckGKOKlIzhmGjL1eJuZM/GrzmGtg2qDhE2AEZCfowCDarNC9u2NfBWQyCMSRHBcE2tnxoIg=
-X-Received: by 2002:a05:6e02:2608:b0:3ce:8ed9:ca94 with SMTP id
- e9e14a558f8ab-3d3e6f99245mr175363335ab.14.1741108226444; Tue, 04 Mar 2025
- 09:10:26 -0800 (PST)
+        d=1e100.net; s=20230601; t=1741108509; x=1741713309;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UyKVwYN3BbDjMx0ocjwFU79MtM8sT+naACzplnS8NRE=;
+        b=s2+5gKzgfbfwSIDeVFADvVdgBf18t/bOqXge4opKrqQ28ExoaPsKbu8x2m+4CPJ1Y/
+         RdDkKpoeiuaxEddAcWKJORu40yfKS6Qm8+wDWkTcxHxbT7UZoM7NQJx6tQUe6E5RGr+A
+         79/Y3gEWefqy82+H+7rjOexPVwXpoTh4oTOLen/i78nmUOvh2h2ogsnNcBjHhAHIc92n
+         jVW5fgf7aMspEwwchFdNESgt7azsBqEKhaf2LZDzN0NgygNIKdSJZVVdGRhdLXq8udwF
+         OQpHYLP49LoLe5zWVymDI1G4a5f0uTUIyJeYV/0v56Qw3JvOsjjM8JwGqa2bTES0kJt6
+         tEjQ==
+X-Gm-Message-State: AOJu0Yx4Qho/IUfroZhmHvtXkhY25kiP9yjybkCJCl7XLpdS2ufg6vFb
+	3L0EbMNvy/qJxhWkY+VFZ+qXiEhoE+JiMr5U75Aza4NLSwAY2xsBQoS6i0dp
+X-Gm-Gg: ASbGncvEpMVc7yW/X31EqvZZfWT/vHjbEyWpDlv2QZdvtCAG1XMtBT2NlfL465mL1cu
+	QG9azMjeEv5tv2Rw4AAUHziwnQJESOld4l9Qj2UdIC1A2QpTn92Iyr0hBYWgqAukI6Nk9OiRVAk
+	8aopt/J8+08grxNFNhmVP3qYkMsW734qochi8NdM0tDR8xBnQdGnkjPQ/uljj/DsBn/+wcD4Sz0
+	oIe6AFyfXqqNXMPR/fTHc3UsDSJvuEWBGWlzjQTQ4d907y1WpKGXK+ma8v36t4bZpx++joNFZfy
+	1yZCwYDC9FuQl182GjALennxVuVdM3OjuDwPqqva4hq/smYzKlf43BZJV7ekYxy8WGR+pfPBBAF
+	gu8n1dxuq
+X-Google-Smtp-Source: AGHT+IH21KYlYJEdOmi/QBxB9500XuTsIV6c4gnHDn+uNV1PmAG3Wh0GcJ8Sens1Er6A34xpxtrLdg==
+X-Received: by 2002:ad4:5cc5:0:b0:6e6:656f:3c34 with SMTP id 6a1803df08f44-6e8e6cd1c6emr1128096d6.12.1741108509061;
+        Tue, 04 Mar 2025 09:15:09 -0800 (PST)
+Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e89766166esm68766396d6.61.2025.03.04.09.15.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Mar 2025 09:15:08 -0800 (PST)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	dev@openvswitch.org,
+	ovs-dev@openvswitch.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pravin B Shelar <pshelar@ovn.org>,
+	Ilya Maximets <i.maximets@ovn.org>,
+	Aaron Conole <aconole@redhat.com>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Jianbo Liu <jianbol@nvidia.com>,
+	Florian Westphal <fw@strlen.de>
+Subject: [PATCH net] openvswitch: avoid allocating labels_ext in ovs_ct_set_labels
+Date: Tue,  4 Mar 2025 12:15:08 -0500
+Message-ID: <b7c05496f8ead33582eb561b55d3e2fcf25bcf36.1741108507.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <6b9347d5c1a0b364e88d900b29a616c3f8e5b1ca.1723483073.git.lucien.xin@gmail.com>
- <2ee4d016-5e57-4d86-9dca-e4685cb183bb@nvidia.com> <CADvbK_ft=B310a9dcwgnwDrPKsxhicKJ4v9wAdgPSHhG+gPjLw@mail.gmail.com>
- <5ab59f2d-1c22-4602-95ab-a247b5bf048e@nvidia.com> <CADvbK_draP9X9OWXEYTKrP0_ekjgNu9PYPp6GUkvu-3L24SRYg@mail.gmail.com>
- <CADvbK_cungrr_D5VAiL8C+FSJEoLFYtMxV5foU0XA9E4zrcegA@mail.gmail.com>
- <7061a416-56cb-4751-8576-8071c2205d70@nvidia.com> <CADvbK_faagwC4q0vNEeW7Eu7SZbXuVjULXo3kg7JS16cF+cmig@mail.gmail.com>
- <c986ed18-750f-46bc-9f52-5860d834162e@nvidia.com>
-In-Reply-To: <c986ed18-750f-46bc-9f52-5860d834162e@nvidia.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Tue, 4 Mar 2025 12:10:14 -0500
-X-Gm-Features: AQ5f1JrlJucEhWyieGJ3uptnozw9e0-0fPW087kgzDnVKfwaGkVbR1dGFA_Eyhw
-Message-ID: <CADvbK_fyWvEH2vPmS5nkwpGBmr+pT3anLM5EkwLr7KLpjuk0qQ@mail.gmail.com>
-Subject: Re: [PATCHv2 net-next] openvswitch: switch to per-action label
- counting in conntrack
-To: Jianbo Liu <jianbol@nvidia.com>
-Cc: network dev <netdev@vger.kernel.org>, dev@openvswitch.org, ovs-dev@openvswitch.org, 
-	davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Pravin B Shelar <pshelar@ovn.org>, Ilya Maximets <i.maximets@ovn.org>, 
-	Aaron Conole <aconole@redhat.com>, Florian Westphal <fw@strlen.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 3, 2025 at 8:20=E2=80=AFPM Jianbo Liu <jianbol@nvidia.com> wrot=
-e:
->
->
->
-> On 3/4/2025 12:42 AM, Xin Long wrote:
-> > On Sun, Mar 2, 2025 at 9:14=E2=80=AFPM Jianbo Liu <jianbol@nvidia.com> =
-wrote:
-> >>
-> >>
-> >>
-> >> On 3/3/2025 2:22 AM, Xin Long wrote:
-> >>> On Tue, Feb 25, 2025 at 9:57=E2=80=AFAM Xin Long <lucien.xin@gmail.co=
-m> wrote:
-> >>>>
-> >>>> On Mon, Feb 24, 2025 at 8:38=E2=80=AFPM Jianbo Liu <jianbol@nvidia.c=
-om> wrote:
-> >>>>>
-> >>>>>
-> >>>>>
-> >>>>> On 2/25/2025 3:55 AM, Xin Long wrote:
-> >>>>>> On Mon, Feb 24, 2025 at 4:01=E2=80=AFAM Jianbo Liu <jianbol@nvidia=
-.com> wrote:
-> >>>>>>>
-> >>>>>>>
-> >>>>>>>
-> >>>>>>> On 8/13/2024 1:17 AM, Xin Long wrote:
-> >>>>>>>> Similar to commit 70f06c115bcc ("sched: act_ct: switch to per-ac=
-tion
-> >>>>>>>> label counting"), we should also switch to per-action label coun=
-ting
-> >>>>>>>> in openvswitch conntrack, as Florian suggested.
-> >>>>>>>>
-> >>>>>>>> The difference is that nf_connlabels_get() is called uncondition=
-ally
-> >>>>>>>> when creating an ct action in ovs_ct_copy_action(). As with thes=
-e
-> >>>>>>>> flows:
-> >>>>>>>>
-> >>>>>>>>       table=3D0,ip,actions=3Dct(commit,table=3D1)
-> >>>>>>>>       table=3D1,ip,actions=3Dct(commit,exec(set_field:0xac->ct_l=
-abel),table=3D2)
-> >>>>>>>>
-> >>>>>>>> it needs to make sure the label ext is created in the 1st flow b=
-efore
-> >>>>>>>> the ct is committed in ovs_ct_commit(). Otherwise, the warning i=
-n
-> >>>>>>>> nf_ct_ext_add() when creating the label ext in the 2nd flow will
-> >>>>>>>> be triggered:
-> >>>>>>>>
-> >>>>>>>>        WARN_ON(nf_ct_is_confirmed(ct));
-> >>>>>>>>
-> >>>>>>>
-> >>>>>>> Hi Xin Long,
-> >>>>>>>
-> >>>>>>> The ct can be committed before openvswitch handles packets with C=
-T
-> >>>>>>> actions. And we can trigger the warning by creating VF and runnin=
-g ping
-> >>>>>>> over it with the following configurations:
-> >>>>>>>
-> >>>>>>> ovs-vsctl add-br br
-> >>>>>>> ovs-vsctl add-port br eth2
-> >>>>>>> ovs-vsctl add-port br eth4
-> >>>>>>> ovs-ofctl add-flow br "table=3D0, in_port=3Deth4,ip,ct_state=3D-t=
-rk
-> >>>>>>> actions=3Dct(table=3D1)"
-> >>>>>>> ovs-ofctl add-flow br "table=3D1, in_port=3Deth4,ip,ct_state=3D+t=
-rk+new
-> >>>>>>> actions=3Dct(exec(set_field:0xef7d->ct_label), commit), output:et=
-h2"
-> >>>>>>> ovs-ofctl add-flow br "table=3D1, in_port=3Deth4,ip,ct_label=3D0x=
-ef7d,
-> >>>>>>> ct_state=3D+trk+est actions=3Doutput:eth2"
-> >>>>>>>
-> >>>>>>> The eth2 is PF, and eth4 is VF's representor.
-> >>>>>>> Would you like to fix it?
-> >>>>>> Hi, Jianbo,
-> >>>>>>
-> >>>>>> Sure, we have to attach a new ct to the skb in __ovs_ct_lookup() f=
-or
-> >>>>>> this case, and even delete the one created before ovs_ct.
-> >>>>>>
-> >>>>>> Can you check if this works on your env?
-> >>>>>
-> >>>>> Yes, it works.
-> >>>>> Could you please submit the formal patch? Thanks!
-> >>>> Great, I will post after running some of my local tests.
-> >>>>
-> >>> Hi Jianbo,
-> >>>
-> >>> I recently ran some tests and observed that the current approach cann=
-ot
-> >>> completely avoid the warning. If an skb enters __ovs_ct_lookup() with=
-out
-> >>> an attached connection tracking (ct) entry, it may still acquire an
-> >>> existing ct created outside of OVS (possibly by netfilter) through
-> >>> nf_conntrack_in(). This will trigger the warning in ovs_ct_set_labels=
-().
-> >>>
-> >>> Deleting a ct created outside OVS and creating a new one within
-> >>> __ovs_ct_lookup() doesn't seem reasonable and would be difficult to
-> >>
-> >> Yes, I'm also skeptical of your temporary fix, and waiting for your
-> >> formal one.
-> > Cool.
-> >
-> >>
-> >>> implement. However, since OVS is not supposed to use ct entries creat=
-ed
-> >>> externally, I believe ct zones can be used to prevent this issue.
-> >>> In your case, the following flows should work:
-> >>>
-> >>> ovs-ofctl add-flow br "table=3D0, in_port=3Deth4,ip,ct_state=3D-trk
-> >>> actions=3Dct(table=3D1,zone=3D1)"
-> >>> ovs-ofctl add-flow br "table=3D1,
-> >>> in_port=3Deth4,ip,ct_state=3D+trk+new,ct_zone=3D1
-> >>> actions=3Dct(exec(set_field:0xef7d->ct_label),commit,zone=3D1),
-> >>> output:eth2"
-> >>> ovs-ofctl add-flow br "table=3D1,
-> >>> in_port=3Deth4,ip,ct_label=3D0xef7d,ct_state=3D+trk+est,ct_zone=3D1
-> >>> actions=3Doutput:eth2"
-> >>>
-> >>> Regarding the warning triggered by externally created ct entries, I p=
-lan
-> >>> to remove the ovs_ct_get_conn_labels() call from ovs_ct_set_labels() =
-and
-> >>> I'll let nf_connlabels_replace() return an error in such cases, simil=
-ar
-> >>> to how tcf_ct_act_set_labels() handles this scenario in tc act_ct.
-> >>>
-> >>
-> >> It's a good idea to be consistent with act_ct implementation. But, wou=
-ld
-> >> you like to revert first if it takes long time to work on the fix?
-> > Sorry, revert which one?
->
-> Of course the one we are currently replying to - "openvswitch: switch to
-> per-action label counting in conntrack".
->
-It's true the commit "openvswitch: switch to per-action label counting
-in conntrack"
-makes the issue more likely to occur.
+Currently, ovs_ct_set_labels() is only called for *confirmed* conntrack
+entries (ct) within ovs_ct_commit(). However, if the conntrack entry
+does not have the labels_ext extension, attempting to allocate it in
+ovs_ct_get_conn_labels() for a confirmed entry triggers a warning in
+nf_ct_ext_add():
 
-However, I've reproduced the warning in local tests even without the
-commit, so the root cause appears to be independent of this change.
+  WARN_ON(nf_ct_is_confirmed(ct));
 
-I will post the fix later today.
+This happens when the conntrack entry is created externally before OVS
+increases net->ct.labels_used. The issue has become more likely since
+commit fcb1aa5163b1 ("openvswitch: switch to per-action label counting
+in conntrack"), which switched to per-action label counting.
 
-Thank you for your report!
+To prevent this warning, this patch modifies ovs_ct_set_labels() to
+call nf_ct_labels_find() instead of ovs_ct_get_conn_labels() where
+it allocates the labels_ext if it does not exist, aligning its
+behavior with tcf_ct_act_set_labels().
 
-> > If you mean the fix in skb_nfct_cached(), it hasn't been posted and
-> > will not be posted.
->
-> No. I think we both know this is just a temporary fix, and it can help
-> you to understand the issue.
->
-> >
-> > Thanks.
-> >>
-> >> Thanks!
-> >>
-> >>> Thanks.
-> >>>>>
-> >>>>>>
-> >>>>>> diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntra=
-ck.c
-> >>>>>> index 3bb4810234aa..c599ee013dfe 100644
-> >>>>>> --- a/net/openvswitch/conntrack.c
-> >>>>>> +++ b/net/openvswitch/conntrack.c
-> >>>>>> @@ -595,6 +595,11 @@ static bool skb_nfct_cached(struct net *net,
-> >>>>>>                 rcu_dereference(timeout_ext->timeout))
-> >>>>>>                 return false;
-> >>>>>>         }
-> >>>>>> +    if (IS_ENABLED(CONFIG_NF_CONNTRACK_LABELS) && !nf_ct_labels_f=
-ind(ct)) {
-> >>>>>> +        if (nf_ct_is_confirmed(ct))
-> >>>>>> +            nf_ct_delete(ct, 0, 0);
-> >>>>>> +        return false;
-> >>>>>> +    }
-> >>>>>>
-> >>>>>> Thanks.
-> >>>>>>
-> >>>>>>>
-> >>>>>>> Thanks!
-> >>>>>>> Jianbo
-> >>>>>>>
-> >>>>>>>> Signed-off-by: Xin Long <lucien.xin@gmail.com>
-> >>>>>>>> ---
-> >>>>>>>> v2: move ovs_net into #if in ovs_ct_exit() as Jakub noticed.
-> >>>>>>>> ---
-> >>>>>>>>      net/openvswitch/conntrack.c | 30 ++++++++++++--------------=
-----
-> >>>>>>>>      net/openvswitch/datapath.h  |  3 ---
-> >>>>>>>>      2 files changed, 12 insertions(+), 21 deletions(-)
-> >>>>>>>>
-> >>>>>>>> diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/connt=
-rack.c
-> >>>>>>>> index 8eb1d644b741..a3da5ee34f92 100644
-> >>>>>>>> --- a/net/openvswitch/conntrack.c
-> >>>>>>>> +++ b/net/openvswitch/conntrack.c
-> >>>>>>>> @@ -1368,11 +1368,8 @@ bool ovs_ct_verify(struct net *net, enum =
-ovs_key_attr attr)
-> >>>>>>>>              attr =3D=3D OVS_KEY_ATTR_CT_MARK)
-> >>>>>>>>                  return true;
-> >>>>>>>>          if (IS_ENABLED(CONFIG_NF_CONNTRACK_LABELS) &&
-> >>>>>>>> -         attr =3D=3D OVS_KEY_ATTR_CT_LABELS) {
-> >>>>>>>> -             struct ovs_net *ovs_net =3D net_generic(net, ovs_n=
-et_id);
-> >>>>>>>> -
-> >>>>>>>> -             return ovs_net->xt_label;
-> >>>>>>>> -     }
-> >>>>>>>> +         attr =3D=3D OVS_KEY_ATTR_CT_LABELS)
-> >>>>>>>> +             return true;
-> >>>>>>>>
-> >>>>>>>>          return false;
-> >>>>>>>>      }
-> >>>>>>>> @@ -1381,6 +1378,7 @@ int ovs_ct_copy_action(struct net *net, co=
-nst struct nlattr *attr,
-> >>>>>>>>                         const struct sw_flow_key *key,
-> >>>>>>>>                         struct sw_flow_actions **sfa,  bool log)
-> >>>>>>>>      {
-> >>>>>>>> +     unsigned int n_bits =3D sizeof(struct ovs_key_ct_labels) *=
- BITS_PER_BYTE;
-> >>>>>>>>          struct ovs_conntrack_info ct_info;
-> >>>>>>>>          const char *helper =3D NULL;
-> >>>>>>>>          u16 family;
-> >>>>>>>> @@ -1409,6 +1407,12 @@ int ovs_ct_copy_action(struct net *net, c=
-onst struct nlattr *attr,
-> >>>>>>>>                  return -ENOMEM;
-> >>>>>>>>          }
-> >>>>>>>>
-> >>>>>>>> +     if (nf_connlabels_get(net, n_bits - 1)) {
-> >>>>>>>> +             nf_ct_tmpl_free(ct_info.ct);
-> >>>>>>>> +             OVS_NLERR(log, "Failed to set connlabel length");
-> >>>>>>>> +             return -EOPNOTSUPP;
-> >>>>>>>> +     }
-> >>>>>>>> +
-> >>>>>>>>          if (ct_info.timeout[0]) {
-> >>>>>>>>                  if (nf_ct_set_timeout(net, ct_info.ct, family, =
-key->ip.proto,
-> >>>>>>>>                                        ct_info.timeout))
-> >>>>>>>> @@ -1577,6 +1581,7 @@ static void __ovs_ct_free_action(struct ov=
-s_conntrack_info *ct_info)
-> >>>>>>>>          if (ct_info->ct) {
-> >>>>>>>>                  if (ct_info->timeout[0])
-> >>>>>>>>                          nf_ct_destroy_timeout(ct_info->ct);
-> >>>>>>>> +             nf_connlabels_put(nf_ct_net(ct_info->ct));
-> >>>>>>>>                  nf_ct_tmpl_free(ct_info->ct);
-> >>>>>>>>          }
-> >>>>>>>>      }
-> >>>>>>>> @@ -2002,17 +2007,9 @@ struct genl_family dp_ct_limit_genl_famil=
-y __ro_after_init =3D {
-> >>>>>>>>
-> >>>>>>>>      int ovs_ct_init(struct net *net)
-> >>>>>>>>      {
-> >>>>>>>> -     unsigned int n_bits =3D sizeof(struct ovs_key_ct_labels) *=
- BITS_PER_BYTE;
-> >>>>>>>> +#if  IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
-> >>>>>>>>          struct ovs_net *ovs_net =3D net_generic(net, ovs_net_id=
-);
-> >>>>>>>>
-> >>>>>>>> -     if (nf_connlabels_get(net, n_bits - 1)) {
-> >>>>>>>> -             ovs_net->xt_label =3D false;
-> >>>>>>>> -             OVS_NLERR(true, "Failed to set connlabel length");
-> >>>>>>>> -     } else {
-> >>>>>>>> -             ovs_net->xt_label =3D true;
-> >>>>>>>> -     }
-> >>>>>>>> -
-> >>>>>>>> -#if  IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
-> >>>>>>>>          return ovs_ct_limit_init(net, ovs_net);
-> >>>>>>>>      #else
-> >>>>>>>>          return 0;
-> >>>>>>>> @@ -2021,12 +2018,9 @@ int ovs_ct_init(struct net *net)
-> >>>>>>>>
-> >>>>>>>>      void ovs_ct_exit(struct net *net)
-> >>>>>>>>      {
-> >>>>>>>> +#if  IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
-> >>>>>>>>          struct ovs_net *ovs_net =3D net_generic(net, ovs_net_id=
-);
-> >>>>>>>>
-> >>>>>>>> -#if  IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
-> >>>>>>>>          ovs_ct_limit_exit(net, ovs_net);
-> >>>>>>>>      #endif
-> >>>>>>>> -
-> >>>>>>>> -     if (ovs_net->xt_label)
-> >>>>>>>> -             nf_connlabels_put(net);
-> >>>>>>>>      }
-> >>>>>>>> diff --git a/net/openvswitch/datapath.h b/net/openvswitch/datapa=
-th.h
-> >>>>>>>> index 9ca6231ea647..365b9bb7f546 100644
-> >>>>>>>> --- a/net/openvswitch/datapath.h
-> >>>>>>>> +++ b/net/openvswitch/datapath.h
-> >>>>>>>> @@ -160,9 +160,6 @@ struct ovs_net {
-> >>>>>>>>      #if IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
-> >>>>>>>>          struct ovs_ct_limit_info *ct_limit_info;
-> >>>>>>>>      #endif
-> >>>>>>>> -
-> >>>>>>>> -     /* Module reference for configuring conntrack. */
-> >>>>>>>> -     bool xt_label;
-> >>>>>>>>      };
-> >>>>>>>>
-> >>>>>>>>      /**
-> >>>>>>>
-> >>>>>
-> >>
->
+Fixes: fcb1aa5163b1 ("openvswitch: switch to per-action label counting in conntrack")
+Reported-by: Jianbo Liu <jianbol@nvidia.com>
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+---
+ net/openvswitch/conntrack.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntrack.c
+index 3bb4810234aa..f13fbab4c942 100644
+--- a/net/openvswitch/conntrack.c
++++ b/net/openvswitch/conntrack.c
+@@ -426,7 +426,7 @@ static int ovs_ct_set_labels(struct nf_conn *ct, struct sw_flow_key *key,
+ 	struct nf_conn_labels *cl;
+ 	int err;
+ 
+-	cl = ovs_ct_get_conn_labels(ct);
++	cl = nf_ct_labels_find(ct);
+ 	if (!cl)
+ 		return -ENOSPC;
+ 
+-- 
+2.47.1
+
 
