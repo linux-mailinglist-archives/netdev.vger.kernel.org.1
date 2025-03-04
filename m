@@ -1,161 +1,184 @@
-Return-Path: <netdev+bounces-171649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C7C9A4E023
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 15:05:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E7DDA4E05F
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 15:13:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B83047A23C9
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 14:04:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82A973AB846
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 14:08:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A1A9204695;
-	Tue,  4 Mar 2025 14:05:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47319204C11;
+	Tue,  4 Mar 2025 14:06:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BOHXvAn/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32221FC7C9;
-	Tue,  4 Mar 2025 14:05:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 786D02054F7;
+	Tue,  4 Mar 2025 14:06:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741097104; cv=none; b=iiTaXEvajUfivbSoWwISIBuUdsLqcjEYkFgvlRCjJ/CsYFnFEJlxdteQlgbhJqN0WPTuuzsC/0IJbyRyTLDhbE9GEIk1siRGaXjykOGmjSesXO29d7E1M/yYFrr2OKaeLB2wWUqgL1NwNMCq4BI4dc4SDUUwMyy1Oy68areSBkQ=
+	t=1741097219; cv=none; b=Tb+JHhua23oS6PWngYEfhtgki/GfLov62vKTCaj7fxVYi9RSQHNyEGeLDqHf+IsKxEVyWU9bCABrlU+w73FJvKfewaYvTMcxnuWTN64bLscCeJckk8NAqyTJaM/ANZpPJic/tV0llHxlQfRrenIn7hzPOLjd6vtkcyQ+Fz5lMNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741097104; c=relaxed/simple;
-	bh=1eoIIC4qiHRnKRLjedXcJ5O9iur+JZ4LV8C6XUhe3qc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CuevJAlDf7VaTcrZoMg1ElXaKN/IvQ4jRm5U/cPH1jVulYXkH5y5aweBtqNjLs6Wn+R+abKbEeqR7tYyYTqgj50iZI4h/yfgdwCHXb92dkjuMsnLNL7g2bQSk8XZRVwN0dJBaogmbQwD9UEJT/QehIC3POiwSJkvt9MFci/P/eA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+	s=arc-20240116; t=1741097219; c=relaxed/simple;
+	bh=JrdF0vtV0pwL5L590faoWin/GHpdb7YheXDBmCQex+0=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=TEMebxWFdPEFT506AK9f0xCrE46WdORHpnWDSj7C6mJLE/yuZ+A8q6UhV5QWQ3pbXxEtU6rN4t1RLZr7beklladon7VQ8FYzq4SBQeTB+4w+0dmlKqsj4kjQVYiL1RH18CQbH8GI2DtyWq2BV/azb6CDE65bWOBzoxxwxAY4k9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BOHXvAn/; arc=none smtp.client-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7c3b533a683so243580985a.2;
-        Tue, 04 Mar 2025 06:05:02 -0800 (PST)
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7c2303a56d6so603774485a.3;
+        Tue, 04 Mar 2025 06:06:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741097216; x=1741702016; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I1Muupcpy+OM9bjik9PXq7Ryx61fO0zb5gU8UKxppt8=;
+        b=BOHXvAn/wgFYzHF/EoT8ifAF9R/Ce8Qgd/cIRx566dT1BBmrCjQeoCRPOS/J67Coh3
+         IAoDmwUw2JJoe55mzplzGcIKZrFSCrK+/uPwoS+0JBToJdGLak7UdvwC1jWtRjd1T2Xd
+         s64sHL67ztLTqjiAQCY5Eg5F9x76ddJMO6yFb/IOqC6SMKagaBixdt2za6KfptJgN0HE
+         aYZu/RwB+TF1dQ+IVAheoPRJ6KBn9oDloeYuRLmG8Q6YxPreptcsN8ffNCjZrIrmVYD9
+         tdYgrpFAQWKEz3QPIHODjiBJkgWkK7PwwU7gcM/cD5Z5wxI2j7VPt5jK9ZsXWeGfHGFk
+         aniw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741097101; x=1741701901;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wEGRTygTyU6cymLHKZseFJhmsuIezHZQHssj+Olk7dA=;
-        b=oOsKP2EtuHAiJzsKQi3Xjm34nzzq0tlBwOyeYJg2xzAhZIKzINZy339df/TMIcLM3V
-         mU1JKcoTLSLB/z7Z/iky372RLBLwZc+IGWr1XepxhPmS3rpWOiZ+KoUMfXfqnhaxm+by
-         Q8WHCqpe0f5UIHmmxiMMcF4CC1kXIuA2XDfMjNFYb97q2BY809vQeXx+NBbPUxixI7ps
-         Uxb5SsXp0Gqmo7wPU1fQKVPNnMOjwpJjSGfGZBnvPeuk2a8vxgXG7jg8EzPFG7vOB0uv
-         mQE4dq7Dq1iTZzG6rr+KNoCK3lNYtjKsW38DNH9XEJ5SSjw0M/7XvSYIflXiLIvH1hBx
-         2ZiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU5J2JyTtRgoYdZueHCW3D4XBjQqF/oT2ulBiyOvfw1mKcqEJ2Gmkj4/xgMmkVyRNnrX7km+k5taqZaxWXr@vger.kernel.org, AJvYcCUoa5KnKP9KKAjCP7XRUTrj3sQjT0K5k68s/ERxI6puTaqE7tc3IRGjVurzGW+6hXt12MK9rRnrbIdXmSmIQCiyO1s=@vger.kernel.org, AJvYcCV9L7EyFH2rl28/gTrIGumLj1OHEDMXpPBxT11qMfcdpUjKI//6EyyJOKDAxzhL5Czo7G/bSDQm@vger.kernel.org, AJvYcCWBOGagp1egzs4ihQY4vIf8K5IqnXwzT+GHn3VdSYRR4IH0rlqWgLWHrDAcvtzkb6Ms5TwWXBlOHz4g@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKQ/xAZeeWqFjSOAovnEzA45kSWYbErSUSo38qYa8/65K1ahTv
-	ltVPod5QNjdRKcEzcuvBoDUh5WewBgR6mp6l8XUXPtqWEqvAYgBaJYGcuIfu
-X-Gm-Gg: ASbGncsEt83bXHlolzm6ekHY0leFM0XYb1GRMM9X2kDyzO8DlkshjcUm5+Ko20INCpg
-	/8FbZG4ZRGCo4WDutH283okyhZGY6pnifz21QFw9lnB4cR8kcnJZcEtVvcylKdaFF0bpxYoiw3P
-	6GJ5T2z2ro3Q92uab5RhmhkKH15cq1/Xzt12yX7l8T915vNliswMDzXknEtWPYyI9yW+rQ1TRTm
-	YbDMfEZ8ArEtmeVHJ+Hz4W5yBuaEGjDRjeLd7vlhsLr5uqMpFoE2WqrH6OdxPD8ddNUD/Gr6mIz
-	4waTLS/CcIDwWamnNJdRckmvXfPvRHpDcPpBuyA6Bbz0Q1W2zJy7DuU1i28oWgSN1mf+UPOBftd
-	eB6q13sI=
-X-Google-Smtp-Source: AGHT+IE2N8f8hUagKLqg+WW0SX5zS2E+TiqiD9xESm5aR7zJzYlyjIWpNTeS1f6CZd3NHj8CEiawww==
-X-Received: by 2002:a05:620a:26a7:b0:7c3:d3a1:6f43 with SMTP id af79cd13be357-7c3d3a17071mr174218585a.57.1741097100956;
-        Tue, 04 Mar 2025 06:05:00 -0800 (PST)
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com. [209.85.219.54])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c3b53ce7a6sm322668285a.31.2025.03.04.06.04.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Mar 2025 06:04:59 -0800 (PST)
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6e88983cedaso43141756d6.1;
-        Tue, 04 Mar 2025 06:04:59 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUOSmxwrOqyDqku76a94/WWmtz1pA64t7uJWEGottWGbSsATILfz4aZ1LBlxlUJNZBDOmWdP7IfjHodPeem@vger.kernel.org, AJvYcCVktdYIZriim03kjfud4VwPDbrwe9ztsi4T3WggTkF+6Jm0nQUTOeIHMCDqdqsrPdf4JpU5OzuqjVzg@vger.kernel.org, AJvYcCW3gFLL1eK2c+VVADAINAdnA0hhMxvzykcz3pK2Gc0dAbXkAgmXcMAQaRiILgZzeNFfuHzNWeifaInXpThtY/G3/Hs=@vger.kernel.org, AJvYcCW88syuJ+YNOxeSuZTUMzT+Bw3L/4uHdXwHgTZugvglUtDRWj0HpetljevJ3s8u0dnzdPfdNOUB@vger.kernel.org
-X-Received: by 2002:a05:6214:21e7:b0:6e6:5aa2:4e4f with SMTP id
- 6a1803df08f44-6e8a0d80ce8mr261405046d6.32.1741097099661; Tue, 04 Mar 2025
- 06:04:59 -0800 (PST)
+        d=1e100.net; s=20230601; t=1741097216; x=1741702016;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=I1Muupcpy+OM9bjik9PXq7Ryx61fO0zb5gU8UKxppt8=;
+        b=geO1JbCHLz65KWHpHGpqJKlArzDJZ5WYoqKpgOB42RWrnf54vcT3pxnDJvTouKEXHM
+         nhLI/fttR+xLRgbr07y5ehmtq6P3RqrtrzBv6nBZo15NlLWzYZ3kkiF7FPqgx6F/AZri
+         bUAmcYsXujuSxY4ytUOf/WWfNMVyOKQY8o2Td1iOlxh75chIeT+fBjX8MrZ2SxkgUZR1
+         mLpUVtEqZEneGXYkJBT89J2QdPuXaNTdJ7jJVGZhT250mE1qMlQqRdaxSVzlmKUy6xZ2
+         lVSBopZBF2hCbBKa1tsZSEh3xu7wRyPlrmw04KhVJZ8LW5FkLUMHiyRdi7sQE5Cdw3Kh
+         KoMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUsi7dhd3jyjprwl3oyRyrH3Xy3NTVCAyN8tT4onX5vy+AAyvN3kRFWewEQfaTjPRlyS5K4ZYlx@vger.kernel.org, AJvYcCWCQaAfRGTG9uffXl+ViRRNaYu7wr7dU44aJhQV4FlvAkVqqBqvjs22NaOca0M0yLVenJGKn5UO5Xu4RJ/U91v5HLY5yWq1@vger.kernel.org, AJvYcCXucF26VwCuatPgQMDhOZSgymjF3pgfOfIc9PBGkLwmMWC+syEvliXm7SnwUfLpPlzGkMa3CVAhmeiSoEU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyf5jHMVKKaIjtIe8OEzuk6CTm3jhLi0KRGc9/TzaN9vLHS3Okr
+	CZwtdJRfZGT8ov9QMhTRUik2Zvr9AI3JSae/xgaaviljAcs10wlQ
+X-Gm-Gg: ASbGncsYUi0PIEQ+3mabcWAEjUYIIeJz1aqoGiaerwuhFROrzU9QIwkqyLgyWBmyRMt
+	2t365XU224SyMB8lIvfYEdDyeGa0ubxTOH2BYeG45/JJbAH7jaq2wia8zF3365R9YyVe7uCu95W
+	CVsrED3TLX8Y8yZVGWjvZpVanUYA0lkQGnKc2WF7kgFSfdjxjwi0jD6HtZJY5FNZK75LdNCxF0l
+	EmdxJPJj76JK/mOSeqlguLbs7WX9eooIa1epW1UID8ddt9oq/rdvsXJnGJ7rvLDo4DxlTE3zksP
+	id1gmIq1ecf+EUq2wA0VbJcqyYQrcTRisgY74QM2nrpkbsL8PYvxJ+OSzc607T9C/dNrbRFYVnG
+	gKw1IjdhmiW2jev7HJCijqw==
+X-Google-Smtp-Source: AGHT+IGApDbbAFIVP4UAhuK4gruOfc1K42rEtfDe0QgRcGiarlFw8FydgN2j9mXLeJC52LhY80Pv6w==
+X-Received: by 2002:a05:620a:424e:b0:7c0:c1d0:d0b4 with SMTP id af79cd13be357-7c39c60ea81mr2948041985a.40.1741097216179;
+        Tue, 04 Mar 2025 06:06:56 -0800 (PST)
+Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e8976cca94sm66581446d6.77.2025.03.04.06.06.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Mar 2025 06:06:55 -0800 (PST)
+Date: Tue, 04 Mar 2025 09:06:55 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: =?UTF-8?B?Q2hyaXN0aWFuIEfDtnR0c2NoZQ==?= <cgoettsche@seltendoof.de>
+Cc: =?UTF-8?B?Q2hyaXN0aWFuIEfDtnR0c2NoZQ==?= <cgzones@googlemail.com>, 
+ Serge Hallyn <serge@hallyn.com>, 
+ Jan Kara <jack@suse.com>, 
+ Julia Lawall <Julia.Lawall@inria.fr>, 
+ Nicolas Palix <nicolas.palix@imag.fr>, 
+ linux-kernel@vger.kernel.org, 
+ linux-security-module@vger.kernel.org, 
+ cocci@inria.fr, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Mina Almasry <almasrymina@google.com>, 
+ Pavel Begunkov <asml.silence@gmail.com>, 
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+ Christian Hopps <chopps@labn.net>, 
+ Alexander Lobakin <aleksander.lobakin@intel.com>, 
+ netdev@vger.kernel.org
+Message-ID: <67c708ff63eac_257ad92942d@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250302160657.127253-9-cgoettsche@seltendoof.de>
+References: <20250302160657.127253-1-cgoettsche@seltendoof.de>
+ <20250302160657.127253-9-cgoettsche@seltendoof.de>
+Subject: Re: [PATCH v2 10/11] skbuff: reorder capability check last
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250302181808.728734-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250302181808.728734-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <Z8SydsdDsZfdrdbE@shell.armlinux.org.uk> <CA+V-a8vCB7nP=tsv4UkOwODSs-9hiG-PxN6cpihfvwjq2itAHg@mail.gmail.com>
- <Z8TRQX2eaNzXOzV0@shell.armlinux.org.uk> <CA+V-a8vykhxqP30iTwN6yrqDgT8YRVE_MadjiTFp653rHVqMNg@mail.gmail.com>
- <Z8WQJQo5kW9QV-wV@shell.armlinux.org.uk> <TY3PR01MB113468803E298C5FA6FB6712886C82@TY3PR01MB11346.jpnprd01.prod.outlook.com>
- <Z8bPPaT4Vsob4FHH@shell.armlinux.org.uk>
-In-Reply-To: <Z8bPPaT4Vsob4FHH@shell.armlinux.org.uk>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 4 Mar 2025 15:04:47 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdVQkzDhJmkpGah7omE7UqTgM3GSpVVDE-1mh9wW7O8vBA@mail.gmail.com>
-X-Gm-Features: AQ5f1JqGYJsTOdNI9PAwDvGf850hGSzvpOQrNGjb6j2I3wF8GT8UjrisfucgoQw
-Message-ID: <CAMuHMdVQkzDhJmkpGah7omE7UqTgM3GSpVVDE-1mh9wW7O8vBA@mail.gmail.com>
-Subject: Re: [PATCH 3/3] net: stmmac: Add DWMAC glue layer for Renesas GBETH
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Biju Das <biju.das.jz@bp.renesas.com>, 
-	"Lad, Prabhakar" <prabhakar.csengg@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Philipp Zabel <p.zabel@pengutronix.de>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>, 
-	Emil Renner Berthing <kernel@esmil.dk>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Russell,
+Christian G=C3=B6ttsche wrote:
+> From: Christian G=C3=B6ttsche <cgzones@googlemail.com>
+> =
 
-On Tue, 4 Mar 2025 at 11:00, Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
-> For the failure to happen, you need to check whether EEE is being used:
->
-> # ethtool --show-eee ethX
+> capable() calls refer to enabled LSMs whether to permit or deny the
+> request.  This is relevant in connection with SELinux, where a
+> capability check results in a policy decision and by default a denial
+> message on insufficient permission is issued.
+> It can lead to three undesired cases:
+>   1. A denial message is generated, even in case the operation was an
+>      unprivileged one and thus the syscall succeeded, creating noise.
+>   2. To avoid the noise from 1. the policy writer adds a rule to ignore=
 
-Doh, that's also not supported on Starlight (BeagleV beta).
+>      those denial messages, hiding future syscalls, where the task
+>      performs an actual privileged operation, leading to hidden limited=
 
-I tried unbind/rebind regardless, and it works (sort of),
-using the old Beagle V Fedora rootfs on microSD:
+>      functionality of that task.
+>   3. To avoid the noise from 1. the policy writer adds a rule to permit=
 
-[root@fedora-starfive starfive-dwmac]# echo 10020000.ethernet > unbind
-starfive-dwmac 10020000.ethernet eth0: stmmac_dvr_remove: removing driver
-starfive-dwmac 10020000.ethernet eth0: Link is Down
-[root@fedora-starfive starfive-dwmac]# echo 10020000.ethernet > bind
-starfive-dwmac 10020000.ethernet: IRQ eth_lpi not found
-starfive-dwmac 10020000.ethernet: IRQ sfty not found
-starfive-dwmac 10020000.ethernet: Hash table entries set to unexpected value 32
-starfive-dwmac 10020000.ethernet: User ID: 0x59, Synopsys ID: 0x37
-starfive-dwmac 10020000.ethernet:        DWMAC1000
-starfive-dwmac 10020000.ethernet: DMA HW capability register supported
-starfive-dwmac 10020000.ethernet: RX Checksum Offload Engine supported
-starfive-dwmac 10020000.ethernet: COE Type 2
-starfive-dwmac 10020000.ethernet: Wake-Up On Lan supported
-starfive-dwmac 10020000.ethernet: Enhanced/Alternate descriptors
-starfive-dwmac 10020000.ethernet: Enabled extended descriptors
-starfive-dwmac 10020000.ethernet: Chain mode enabled
-starfive-dwmac 10020000.ethernet: Enable RX Mitigation via HW Watchdog Timer
-starfive-dwmac 10020000.ethernet: device MAC address fa:58:39:0a:37:37
-libphy: get_phy_c22_id: mii_bus stmmac phy_id = 0x00221622
-starfive-dwmac 10020000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-0
-starfive-dwmac 10020000.ethernet eth0: PHY [stmmac-0:07] driver
-[Micrel KSZ9031 Gigabit PHY] (irq=POLL)
-dwmac1000: Master AXI performs fixed burst length
-starfive-dwmac 10020000.ethernet eth0: No Safety Features support found
-starfive-dwmac 10020000.ethernet eth0: No MAC Management Counters available
-starfive-dwmac 10020000.ethernet eth0: IEEE 1588-2008 Advanced
-Timestamp supported
-starfive-dwmac 10020000.ethernet eth0: configuring for phy/rgmii-id link mode
-starfive-dwmac 10020000.ethernet eth0: Link is Up - 1Gbps/Full - flow
-control off
+>      the task the requested capability, while it does not need it,
+>      violating the principle of least privilege.
+> =
 
-Apparently the MAC address has changed, so the board got a different
-IP address from my DHCP server :-(
+> Signed-off-by: Christian G=C3=B6ttsche <cgzones@googlemail.com>
+> Reviewed-by: Serge Hallyn <serge@hallyn.com>
 
-Gr{oetje,eeting}s,
+Similar to Paolo's response to patch 7: these networking patches
+should probably go through net-next.
 
-                        Geert
+> ---
+>  net/core/skbuff.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> =
 
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index b1c81687e9d8..7ed538e15b56 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -1566,7 +1566,7 @@ int mm_account_pinned_pages(struct mmpin *mmp, si=
+ze_t size)
+>  	unsigned long max_pg, num_pg, new_pg, old_pg, rlim;
+>  	struct user_struct *user;
+>  =
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+> -	if (capable(CAP_IPC_LOCK) || !size)
+> +	if (!size || capable(CAP_IPC_LOCK))
+>  		return 0;
+
+Not sure that this case is relevant:
+
+Unlike most other capable checks, this does not protect a privileged
+operation and returns with error for unprivileged users.
+
+It offers a shortcut to privileged users to avoid memory accounting,
+but continues in the comon case that the user is not privileged.
+
+So the common case here is to generate denial messages when LSMs are
+enabled. size 0 is not likely, so swapping the order is unlikely to
+significantly change the number of denial messages.
+
+>  =
+
+>  	rlim =3D rlimit(RLIMIT_MEMLOCK);
+> -- =
+
+> 2.47.2
+> =
+
+
+
 
