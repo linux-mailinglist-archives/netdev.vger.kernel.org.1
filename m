@@ -1,58 +1,71 @@
-Return-Path: <netdev+bounces-171792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60C99A4EC98
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 20:02:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CA7DA4EB22
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:20:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E77A68E5949
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:13:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15AA47ABFBE
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:19:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8171E23A9AE;
-	Tue,  4 Mar 2025 17:55:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F8A0283CBE;
+	Tue,  4 Mar 2025 18:06:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rHGP8AcQ"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lFoQptTx"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761351EDA1F
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:55:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 846A8205E20;
+	Tue,  4 Mar 2025 18:06:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741110908; cv=none; b=aKrwatzPPEIfHU9myfkf5jThykAEagqg98T85m+9ZmBAqOk8sJa2z4GwHRcsAcm6rnXHLjhe6blok5x0KY5LmY9XbhJ522Eu6osZ1MKrU15GhF8Wv2xxIq7pbQceOi+YHSKVmaXfKqutRMXyKnJDq6g706aTOiiszPypCq/qnMA=
+	t=1741111603; cv=none; b=QmvpCzn0lloWio8IO18Ydk0ACI563HwwwrvBJn0/hiu7VClAchMihXK7uYo5ZNnreYoZuJ9h+GLQ29cSKsXXUFTZKl9qfqoIQ1uuKY/aFytQelcgK0cMTy21d9wDP5N+6msabE2U66zsRQLXxuMc4+vSwKMBaFK+uBPTd24aPpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741110908; c=relaxed/simple;
-	bh=NgDm4NxUNuE897VJ4AT9FDgBqi+ZeWV07xVHrY8yzxg=;
+	s=arc-20240116; t=1741111603; c=relaxed/simple;
+	bh=hXzXG6ZNf6YAuMm3Istj9wi4E+AFhRDdb61kKOYV0FI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PgVP/hDHVQV0nNhBNO0UyEV1b+uGfJlXAPNhPuWJnwewrFHwpwiDc0L5at/RmDOC4GMTqzMlza/TcfRSk1pXczqtIPzlov5kNEWs96I/MHduLW6csVkG7L0ngwPeMDGbMnQgYxDeyr6QaNpEDrLNzJ7SxnYnUf6XtXhBkjBfqRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rHGP8AcQ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=VnChm/5rDEpIFBvHJjQaqI3SSXHc3Ggh87mPlEmLtDs=; b=rHGP8AcQAF0tkRS5DLM02BTYEF
-	LQ/FWmLWlLnQnd4VHnScgP3U85HbUzYGB92+dhuMsI6h6Oe/Lt/8ZHW8K5FA/bn145nzGIx2a7/r2
-	9hFeQ3aMVqEEnq3wnTfOzF2ADZ1pA1DVxaqYhTFyhHKL+QfwnRhS2CN3WwrqXD6jj3uk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tpWTu-002DcL-Ky; Tue, 04 Mar 2025 18:55:02 +0100
-Date: Tue, 4 Mar 2025 18:55:02 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Max Schulze <max.schulze@online.de>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, hfdevel@gmx.net,
-	netdev@vger.kernel.org
-Subject: Re: tn40xx / qt2025: cannot load firmware, error -2
-Message-ID: <9aede328-4050-4505-83a5-c0eeb67d1fc5@lunn.ch>
-References: <5f649558-b6a0-4562-b8e5-713cb8138d9a@online.de>
- <20250304.214223.562994455289524982.fujita.tomonori@gmail.com>
- <89515e61-6aeb-4063-bc47-52a9ea982a26@lunn.ch>
- <b2296450-74bb-4812-ac1a-6939ef869741@online.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ceTlXaBwEbdrHFQ9XYRWHtxaj0c/LDAW+GrP/ErxW2XR7yz6083ya4c6FhgIbhlPNzXGKoeYIREIndVOPZJ0J+6MrxMAiGWS0tOAE5NVwArrbj7vEaU5rjS4PXVvC9V3Ko1NOQBd9WFjLVRqXBbRw2z14EKRSwuj4dFaRdZ5Z4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=lFoQptTx; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=0oDWL9MqCLrBHhvluseel4yAvZkVftMTuSIpYrKtT5U=; b=lFoQptTxFgvn2eDMe9RbVEMjHy
+	bVVWUfCw27Rz8+6Vz9Pfs5Qms1vQk2tYgDHqnjK26Wj+5L+vcRKbLEqg8Er6WzIBfh81P7jRO1I1C
+	S5amhajrZ2oT5+vUYjI2Zt+UJB45R7DD0cGnhtNujyBXgLM2rJpYmxVfAv1BUnHwBVEd3NG014M9V
+	+WEbi3C00dMo3EwKzxqFH3F6vYB64aX382NuxQeD/au7NsDFJm42CPTl1hGqdVMIn9sh7EXtjKOd9
+	hqLXRwfcddIr7ZnpduODpJ00ZKAdNPJ8DGCmUjnyxYe1BfhQwdXTt+ACr3t2zHqx8bobuxqwbTB+j
+	oc+BD3dQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1tpWeA-00000002cln-3T7m;
+	Tue, 04 Mar 2025 18:05:43 +0000
+Date: Tue, 4 Mar 2025 18:05:38 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Hannes Reinecke <hare@suse.com>
+Cc: Vlastimil Babka <vbabka@suse.cz>, Boris Pismenny <borisp@nvidia.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	linux-mm@kvack.org, Harry Yoo <harry.yoo@oracle.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: Kernel oops with 6.14 when enabling TLS
+Message-ID: <Z8dA8l1NR-xmFWyq@casper.infradead.org>
+References: <Z8XPYNw4BSAWPAWT@casper.infradead.org>
+ <edf65d4e-90f0-4b12-b04f-35e97974a36f@suse.cz>
+ <95b0b93b-3b27-4482-8965-01963cc8beb8@suse.cz>
+ <fcfa11c6-2738-4a2e-baa8-09fa8f79cbf3@suse.de>
+ <a466b577-6156-4501-9756-1e9960aa4891@suse.cz>
+ <6877dfb1-9f44-4023-bb6d-e7530d03e33c@suse.com>
+ <db1a4681-1882-4e0a-b96f-a793e8fffb56@suse.cz>
+ <Z8cm5bVJsbskj4kC@casper.infradead.org>
+ <a4bbf5a7-c931-4e22-bb47-3783e4adcd23@suse.com>
+ <Z8cv9VKka2KBnBKV@casper.infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,40 +74,60 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b2296450-74bb-4812-ac1a-6939ef869741@online.de>
+In-Reply-To: <Z8cv9VKka2KBnBKV@casper.infradead.org>
 
-> Shouldn't ethtool -m report something?
+On Tue, Mar 04, 2025 at 04:53:09PM +0000, Matthew Wilcox wrote:
+> Right, that's what happened in the block layer.  We mark the bio with
+> BIO_PAGE_PINNED if the pincount needs to be dropped.  As a transitional
+> period, we had BIO_PAGE_REFFED which indicated that the page refcount
+> needed to be dropped.  Perhaps there's something similar that network
+> could be doing.
 
-> > $ sudo ethtool -m enp3s0
-> > netlink error: Operation not supported
+Until that time ... how does this look as a quick hack to avoid
+reverting the slab change?
 
-That ethtool op is missing, along with a lot more, in order to get
-full support of the hardware. 
-
-> Does it really only support 10GBe, and not 1GBe or 100BaseSX ?
-> > $ sudo ethtool enp3s0
-> > Settings for enp3s0:
-> > 	Supported ports: [  ]
-> > 	Supported link modes:   10000baseSR/Full
-> > 	Supported pause frame use: No
-> > 	Supports auto-negotiation: No
-> > 	Supported FEC modes: Not reported
-> > 	Advertised link modes:  10000baseSR/Full
-> > 	Advertised pause frame use: No
-> > 	Advertised auto-negotiation: No
-> > 	Advertised FEC modes: Not reported
-> > 	Speed: 10000Mb/s
-> > 	Duplex: Full
-> > 	Auto-negotiation: off
-> > 	Port: Twisted Pair
-> > 	PHYAD: 1
-> > 	Transceiver: external
-> > 	MDI-X: Unknown
-> > 	Link detected: yes
-
-From my reading of the PHY datasheet, it can do 1000Base-KX, but there
-is no mention of 100BaseSX. There is also limited access to the i2c
-eeprom in the SFP, so ethtool -m could be implemented.
-
-       Andrew
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index d6fed25243c3..ca08a923ac6d 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -1520,7 +1520,10 @@ static inline void folio_get(struct folio *folio)
+ 
+ static inline void get_page(struct page *page)
+ {
+-	folio_get(page_folio(page));
++	struct folio *folio = page_folio(page);
++	if (WARN_ON_ONCE(folio_test_slab(folio)))
++		return;
++	folio_get(folio);
+ }
+ 
+ static inline __must_check bool try_get_page(struct page *page)
+@@ -1614,6 +1617,8 @@ static inline void put_page(struct page *page)
+ {
+ 	struct folio *folio = page_folio(page);
+ 
++	if (folio_test_slab(folio))
++		return;
+ 	folio_put(folio);
+ }
+ 
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index 65f550cb5081..8c7fdb7d8c8f 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -1190,8 +1190,12 @@ static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
+ 		if (!n)
+ 			return -ENOMEM;
+ 		p = *pages;
+-		for (int k = 0; k < n; k++)
+-			get_page(p[k] = page + k);
++		for (int k = 0; k < n; k++) {
++			struct folio *folio = page_folio(page);
++			p[k] = page + k;
++			if (!folio_test_slab(folio))
++				folio_get(folio);
++		}
+ 		maxsize = min_t(size_t, maxsize, n * PAGE_SIZE - *start);
+ 		i->count -= maxsize;
+ 		i->iov_offset += maxsize;
 
