@@ -1,282 +1,213 @@
-Return-Path: <netdev+bounces-171784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EA5BA4EA5A
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:02:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69AABA4EABA
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:11:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8AD85901628
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:56:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D392170104
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:05:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBEC129C351;
-	Tue,  4 Mar 2025 17:36:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A34DD292F9B;
+	Tue,  4 Mar 2025 17:45:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="Ffqve2YV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iGsrPmrU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77D63299B33;
-	Tue,  4 Mar 2025 17:36:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D6C280A39
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 17:45:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741109801; cv=none; b=HrE0aUYPGU+IUGU69HZLSXovnmqo3WLKUruemyGs9x/pzW0UFNJiOR3jqU9+88B0cDiE43ufQI2q84bGK7JTowKr/lrTqs81HzKWKuupF0U++Z2YlaKokAQJ/ur53wnPZy78UEf82pLNZ5MO8xWGbWq57Q8ba/oVD5r+sd7uSbA=
+	t=1741110316; cv=none; b=DRZc/WLmT70qUAi9UBcn+wO2HutvbRpikC+/fI5zK8ThLSEeF3sRVIlj/pspT2i10+c+je9RX/ccgKUUUXbdK0PdWrL2lbG4rVXRBZo09ACD3f8sdr2+WwtyajtgVP0p/B5szaH3k80cPx2AQPECN8ILJLYcmXaw9AMnaTBfeVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741109801; c=relaxed/simple;
-	bh=l7cKm5QZLU6R25tTG/0tIfzhDXOfRW59cJPuyeFzGE8=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=H4ExYcyajAVzAjDauG8FBGDxjqrhkTNkfaeb4CyM61ibmmoj47xy7vQlQjkf//FuHAUtNTBxQbTqDgJutiKpPHVYNgrTyerGVyX0qZCLA3NCbtyQpVvuPoxN6cpcgpm7uORyAFBpsHwLzvgt1eas8t+WQm2eLywp4O0dhQyXBjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b=Ffqve2YV; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-30797730cbdso57268111fa.3;
-        Tue, 04 Mar 2025 09:36:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=umich.edu; s=google-2016-06-03; t=1741109797; x=1741714597; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=eRclD48cPdeeU9cvhbBNfEemRhdo5oK7aSrP9o7VlCI=;
-        b=Ffqve2YVFBt48sSv7j7+qo5pXNFIeeVCRNeCAV6+/8Y1bIh46xW3NnAA6MsrBNdEOu
-         LHJU29ScoQtaJDAXmFxhfcnfuYr/l74N83b59wAS8oE0Lljy4BjzD4cVsJiZQ/BGqyb2
-         T0Rf1YpmgGutGK8Q4fcIYjaS2C7vqfIu1Sg8amlGtNJCwMvjxG7oT6/YGlWStajymIl+
-         p+gjgNRB79Juk7aCcYErJ8JWif1I8QZC00I2RHNy6G1bY3P8Ji6ta7/eWXj+ugRlzfkq
-         Ksz5nw8pLqMUTBLK1kcA11+ryPvQWyCZtZETh4oPu1o8YibHw8QRDeD4UUzbWJjPsRCp
-         LrFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741109797; x=1741714597;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eRclD48cPdeeU9cvhbBNfEemRhdo5oK7aSrP9o7VlCI=;
-        b=qVZpylQJGAWFh8eUPpR35jX+Mej7swtVqqqwYBor5qG7I4V1FqfrjKLJbk02vBFxF0
-         VmRswm//IlpyPDWQaUgbnMPlGpckTXcAbtGodx6usSems2e9lD92JvL87tqG+LcFi2S0
-         LTY3gARszd9986N3tFju9ryZZI8qSf9iJ+Jaoxp9M3I6Hoh4JviVe6hS4QdyqlHHJilo
-         dE/eOHaEMPg00Zh2cn71GIqJLc/hGGB0NJ3PhWWEug6iUpWE9hU6ssfC0SzxTSEKB9Hy
-         H2gkIA5K4skUQ4HBRXhoI2xZfFxD0FMLjilNVUr/hNYoMTS3B8hE7oTdnRoezkBPBBSi
-         um6w==
-X-Forwarded-Encrypted: i=1; AJvYcCUjyPzxMsvj61xJLOm7Hh+Iq5gsy1oTYaqBP4//Dx2GXxUcrxMK88O515uEly3YSo1GngE6UTRF@vger.kernel.org, AJvYcCVzMVUbJOlIktOXRQSoLui1IsIatht+VU0hGV6Fc+uCYWjngiWJXWiA80gb7W0wwyC5GCJEa7NOSok=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyyXQwav9rUXCJljnFBgaePMkAtPn8mi/P+Ru5Kox618DEwZB8x
-	rwINlYnLIw8UlYDKq8KD88Pyc8tvx9ayz6Xlc5Y1lhWGcRlIntl5nbdENsxj2lMjeE1v+ODTPrv
-	NOpDRQSsNjMI9wZycQLlAj+wK+mY=
-X-Gm-Gg: ASbGncuU/t4rDJWZE+ayjq0+7mNQx5ZtMjh0gF2hiDOxycegnliP8N/INPOZzfreoX4
-	KHWlE44ph8WcsagMyroaY0N75rY8Zm1Pl7AdNhLfNECc1cwHHEgHcXy+1QlON1Lxrt/rwD3pST8
-	lxrjOf6eQpuNvRHW5fLTWZGvspO/PFKv5s7AOSI/It6cP9BPraoYOwnCMOs4A=
-X-Google-Smtp-Source: AGHT+IFuRWgeOOoG6p8UUyYBbRw9jv0DcCJRNYDuUoL6JSkkfGoPkFknvC6RsU4WBcPvh4C6lt+klAbq38Jionjah4U=
-X-Received: by 2002:a2e:be91:0:b0:30b:badf:75ee with SMTP id
- 38308e7fff4ca-30bd7a1e168mr118851fa.7.1741109797044; Tue, 04 Mar 2025
- 09:36:37 -0800 (PST)
+	s=arc-20240116; t=1741110316; c=relaxed/simple;
+	bh=/XYaCM7ffLPvBmOKEewqpIBZvsk+7sQeQ/ouoLNmb3A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bp6qrSwvHbhm7CWJDQlggUeQNw+bvMWQwUfHEE5AN2msdn8HgGXPbyE8cdG9ts3Ri0Kli8+QSyzvIJ/fw4qnkxKn9FvHNeEzZpRoRgggZ+qJ6cbobLkCRuzXKzoHyMoj08xQnzuGUIDpr/kBUW2ajRGXhB/Gdi3QnjJSeThu9B4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iGsrPmrU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 697E0C4CEE5;
+	Tue,  4 Mar 2025 17:45:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741110315;
+	bh=/XYaCM7ffLPvBmOKEewqpIBZvsk+7sQeQ/ouoLNmb3A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iGsrPmrUNKRPdh6/tPUlX0DZdO3u6G1v8Z7IsvxUh0PTFWtmzC1luyNhUg54gtQsz
+	 hLBHBzARalamTAD5aPs4A0PHkO4gqajIhWvYUj4l+gRx0LG4mrT5S6rasBKofCfv20
+	 uobPfLhnY0b1eoLdz1/CkS62UAKNVzGsLyyJg89Cshk/aiw3YiYO4RdDCAVBu6ofUI
+	 YCUrz+qKrzzMkJtTwHG9EUWsd6S+6vqfSPeVPuZ2Y/CEoEwUyQIAip//uRrEFeV6fI
+	 Ly70iWwN1Bzdk7YWcT9NzZOC/jJOf8+cbIK5Way9ARjAsmre6xLdELbapWyJC1H/Ch
+	 PbxEKKV3bEQ4Q==
+Date: Tue, 4 Mar 2025 17:45:10 +0000
+From: Simon Horman <horms@kernel.org>
+To: Aurelien Aptel <aaptel@nvidia.com>
+Cc: linux-nvme@lists.infradead.org, netdev@vger.kernel.org,
+	sagi@grimberg.me, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
+	chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org,
+	aurelien.aptel@gmail.com, smalin@nvidia.com, malin1024@gmail.com,
+	ogerlitz@nvidia.com, yorayz@nvidia.com, borisp@nvidia.com,
+	galshalom@nvidia.com, mgurtovoy@nvidia.com, tariqt@nvidia.com
+Subject: Re: [PATCH v27 15/20] net/mlx5e: NVMEoTCP, use KLM UMRs for buffer
+ registration
+Message-ID: <20250304174510.GI3666230@kernel.org>
+References: <20250303095304.1534-1-aaptel@nvidia.com>
+ <20250303095304.1534-16-aaptel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Olga Kornievskaia <aglo@umich.edu>
-Date: Tue, 4 Mar 2025 12:36:24 -0500
-X-Gm-Features: AQ5f1JpeEgd2RMwRvcshBa7yvYEI1u_-riZrhzTEfpQLpoG_zAPRLHN0XYd2TeU
-Message-ID: <CAN-5tyEsGNTgJkkG4aiTSZqn3QvTQu7hSNg2+5u7Z9Ycvk3GUA@mail.gmail.com>
-Subject: circular locking between memory management and network layer (from nfs)
-To: Andrew Morton <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>
-Cc: linux-mm@kvack.org, netdev@vger.kernel.org, 
-	linux-nfs <linux-nfs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250303095304.1534-16-aaptel@nvidia.com>
 
-Hello memory management and networking gurus,
+On Mon, Mar 03, 2025 at 09:52:59AM +0000, Aurelien Aptel wrote:
+> From: Ben Ben-Ishay <benishay@nvidia.com>
+> 
+> NVMEoTCP offload uses buffer registration for ddp operation.
+> Every request comprises from SG list that might consist from elements
+> with multiple combination sizes, thus the appropriate way to perform
+> buffer registration is with KLM UMRs.
+> 
+> UMR stands for user-mode memory registration, it is a mechanism to alter
+> address translation properties of MKEY by posting WorkQueueElement
+> aka WQE on send queue.
+> 
+> MKEY stands for memory key, MKEY are used to describe a region in memory
+> that can be later used by HW.
+> 
+> KLM stands for {Key, Length, MemVa}, KLM_MKEY is indirect MKEY that
+> enables to map multiple memory spaces with different sizes in unified MKEY.
+> KLM UMR is a UMR that use to update a KLM_MKEY.
+> 
+> Nothing needs to be done on memory registration completion and this
+> notification is expensive so we add a wrapper to be able to ring the
+> doorbell without generating any.
+> 
+> Signed-off-by: Ben Ben-Ishay <benishay@nvidia.com>
+> Signed-off-by: Boris Pismenny <borisp@nvidia.com>
+> Signed-off-by: Or Gerlitz <ogerlitz@nvidia.com>
+> Signed-off-by: Yoray Zack <yorayz@nvidia.com>
+> Signed-off-by: Aurelien Aptel <aaptel@nvidia.com>
+> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 
-While doing NFS testing, we've encountered the following lockdep
-warning (included below). While hit in NFS it might be problematic to
-other network filesystems. The warning suggests that one mmap thread
-acquired a lock doing page fault and calling into NFS which will do a
-network call which will grab a socket lock. Elsewhere, there might be
-a process trying to send data on a socket and thus holding a socket
-lock and then needs to copy userland data which would require
-mmap_lock.
+...
 
-Any ideas how this should be resolved/handled?
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nvmeotcp.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/nvmeotcp.c
 
-Thank you.
+...
 
-[ 2720.332903] ======================================================
-[ 2720.333945] WARNING: possible circular locking dependency detected
-[ 2720.334990] 6.14.0-rc5+ #10 Not tainted
-[ 2720.335667] ------------------------------------------------------
-[ 2720.336711] xfs_io/48526 is trying to acquire lock:
-[ 2720.337553] ffff88817231b778 (sk_lock-AF_INET-RPC){+.+.}-{0:0}, at:
-tcp_sock_set_cork+0x17/0x70
-[ 2720.339031]
-[ 2720.339031] but task is already holding lock:
-[ 2720.340013] ffff888111658200 (&mm->mmap_lock){++++}-{4:4}, at:
-vm_mmap_pgoff+0x141/0x330
-[ 2720.341358]
-[ 2720.341358] which lock already depends on the new lock.
-[ 2720.341358]
-[ 2720.342703]
-[ 2720.342703] the existing dependency chain (in reverse order) is:
-[ 2720.343944]
-[ 2720.343944] -> #1 (&mm->mmap_lock){++++}-{4:4}:
-[ 2720.344973]        __lock_acquire+0xcff/0x1fc0
-[ 2720.345754]        lock_acquire.part.0+0x11b/0x360
-[ 2720.346579]        __might_fault+0xbd/0x120
-[ 2720.347311]        _copy_from_iter+0xdf/0x1500
-[ 2720.348082]        skb_do_copy_data_nocache+0x160/0x240
-[ 2720.348968]        tcp_sendmsg_locked+0x903/0x3920
-[ 2720.349796]        tcp_sendmsg+0x2b/0x40
-[ 2720.350491]        ____sys_sendmsg+0x8e1/0xc60
-[ 2720.351262]        ___sys_sendmsg+0xfd/0x180
-[ 2720.352004]        __sys_sendmsg+0x122/0x1b0
-[ 2720.352747]        do_syscall_64+0x92/0x180
-[ 2720.353475]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[ 2720.354416]
-[ 2720.354416] -> #0 (sk_lock-AF_INET-RPC){+.+.}-{0:0}:
-[ 2720.355490]        check_prev_add+0x1b7/0x23e0
-[ 2720.356258]        validate_chain+0xa8a/0xf00
-[ 2720.357013]        __lock_acquire+0xcff/0x1fc0
-[ 2720.357777]        lock_acquire.part.0+0x11b/0x360
-[ 2720.358600]        lock_sock_nested+0x3b/0xe0
-[ 2720.359359]        tcp_sock_set_cork+0x17/0x70
-[ 2720.360129]        xs_tcp_send_request+0x29e/0xaa0 [sunrpc]
-[ 2720.361333]        xprt_request_transmit.isra.0+0x23d/0x810 [sunrpc]
-[ 2720.362481]        xprt_transmit+0x19a/0x2b0 [sunrpc]
-[ 2720.363438]        call_transmit+0x1c7/0x240 [sunrpc]
-[ 2720.364386]        __rpc_execute+0x2bb/0xc50 [sunrpc]
-[ 2720.365357]        rpc_execute+0xb4/0x110 [sunrpc]
-[ 2720.366288]        rpc_run_task+0x363/0x500 [sunrpc]
-[ 2720.367224]        rpc_call_sync+0xad/0x150 [sunrpc]
-[ 2720.368161]        nfs3_rpc_wrapper+0x46/0x140 [nfsv3]
-[ 2720.369041]        nfs3_proc_getattr+0x13d/0x1f0 [nfsv3]
-[ 2720.369933]        __nfs_revalidate_inode+0x25e/0x710 [nfs]
-[ 2720.371063]        nfs_revalidate_mapping+0xde/0x160 [nfs]
-[ 2720.372047]        __mmap_new_vma+0x39c/0x1050
-[ 2720.372806]        __mmap_region+0x76a/0xff0
-[ 2720.373545]        mmap_region+0x22f/0x300
-[ 2720.374258]        do_mmap+0x9d9/0x1020
-[ 2720.374925]        vm_mmap_pgoff+0x1b1/0x330
-[ 2720.375671]        ksys_mmap_pgoff+0x2ec/0x440
-[ 2720.376438]        do_syscall_64+0x92/0x180
-[ 2720.377162]        entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[ 2720.378097]
-[ 2720.378097] other info that might help us debug this:
-[ 2720.378097]
-[ 2720.379402]  Possible unsafe locking scenario:
-[ 2720.379402]
-[ 2720.380399]        CPU0                    CPU1
-[ 2720.381187]        ----                    ----
-[ 2720.381966]   lock(&mm->mmap_lock);
-[ 2720.382597]                                lock(sk_lock-AF_INET-RPC);
-[ 2720.383667]                                lock(&mm->mmap_lock);
-[ 2720.384675]   lock(sk_lock-AF_INET-RPC);
-[ 2720.385367]
-[ 2720.385367]  *** DEADLOCK ***
-[ 2720.385367]
-[ 2720.386352] 1 lock held by xfs_io/48526:
-[ 2720.387032]  #0: ffff888111658200 (&mm->mmap_lock){++++}-{4:4}, at:
-vm_mmap_pgoff+0x141/0x330
-[ 2720.388426]
-[ 2720.388426] stack backtrace:
-[ 2720.389184] CPU: 0 UID: 0 PID: 48526 Comm: xfs_io Not tainted 6.14.0-rc5+ #10
-[ 2720.389189] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009),
-BIOS 1.16.3-2.fc40 04/01/2014
-[ 2720.389196] Call Trace:
-[ 2720.389202]  <TASK>
-[ 2720.389211]  dump_stack_lvl+0x6f/0xb0
-[ 2720.389222]  print_circular_bug.cold+0x38/0x48
-[ 2720.389229]  check_noncircular+0x308/0x3f0
-[ 2720.389233]  ? rcu_is_watching+0x15/0xb0
-[ 2720.389239]  ? __pfx_check_noncircular+0x10/0x10
-[ 2720.389243]  ? lock_release+0x288/0x350
-[ 2720.389255]  check_prev_add+0x1b7/0x23e0
-[ 2720.389260]  ? is_bpf_text_address+0x64/0x100
-[ 2720.389264]  ? rcu_is_watching+0x15/0xb0
-[ 2720.389270]  validate_chain+0xa8a/0xf00
-[ 2720.389277]  ? __pfx_validate_chain+0x10/0x10
-[ 2720.389281]  ? mark_lock+0x78/0x860
-[ 2720.389288]  __lock_acquire+0xcff/0x1fc0
-[ 2720.389298]  lock_acquire.part.0+0x11b/0x360
-[ 2720.389302]  ? tcp_sock_set_cork+0x17/0x70
-[ 2720.389310]  ? __pfx_lock_acquire.part.0+0x10/0x10
-[ 2720.389313]  ? add_lock_to_list+0x18b/0x370
-[ 2720.389319]  ? mark_lock+0x78/0x860
-[ 2720.389323]  ? rcu_is_watching+0x15/0xb0
-[ 2720.389327]  ? lock_acquire+0x234/0x2f0
-[ 2720.389333]  lock_sock_nested+0x3b/0xe0
-[ 2720.389339]  ? tcp_sock_set_cork+0x17/0x70
-[ 2720.389344]  tcp_sock_set_cork+0x17/0x70
-[ 2720.389348]  xs_tcp_send_request+0x29e/0xaa0 [sunrpc]
-[ 2720.389454]  ? mark_lock+0x78/0x860
-[ 2720.389464]  ? __pfx_xs_tcp_send_request+0x10/0x10 [sunrpc]
-[ 2720.389567]  ? find_held_lock+0x34/0x120
-[ 2720.389572]  ? kvm_sched_clock_read+0x11/0x20
-[ 2720.389576]  ? local_clock_noinstr+0xd/0xe0
-[ 2720.389581]  ? __lock_release.isra.0+0x4ba/0x9f0
-[ 2720.389586]  ? __pfx___lock_release.isra.0+0x10/0x10
-[ 2720.389592]  ? rcu_is_watching+0x15/0xb0
-[ 2720.389599]  xprt_request_transmit.isra.0+0x23d/0x810 [sunrpc]
-[ 2720.389697]  xprt_transmit+0x19a/0x2b0 [sunrpc]
-[ 2720.389796]  ? __pfx_call_transmit+0x10/0x10 [sunrpc]
-[ 2720.389887]  call_transmit+0x1c7/0x240 [sunrpc]
-[ 2720.389986]  __rpc_execute+0x2bb/0xc50 [sunrpc]
-[ 2720.390105]  rpc_execute+0xb4/0x110 [sunrpc]
-[ 2720.390218]  rpc_run_task+0x363/0x500 [sunrpc]
-[ 2720.390312]  rpc_call_sync+0xad/0x150 [sunrpc]
-[ 2720.390406]  ? __pfx_rpc_call_sync+0x10/0x10 [sunrpc]
-[ 2720.390506]  nfs3_rpc_wrapper+0x46/0x140 [nfsv3]
-[ 2720.390518]  nfs3_proc_getattr+0x13d/0x1f0 [nfsv3]
-[ 2720.390528]  ? __pfx_nfs3_proc_getattr+0x10/0x10 [nfsv3]
-[ 2720.390539]  ? kasan_save_track+0x14/0x30
-[ 2720.390543]  ? __kasan_kmalloc+0x8f/0xa0
-[ 2720.390550]  __nfs_revalidate_inode+0x25e/0x710 [nfs]
-[ 2720.390622]  nfs_revalidate_mapping+0xde/0x160 [nfs]
-[ 2720.390692]  __mmap_new_vma+0x39c/0x1050
-[ 2720.390701]  __mmap_region+0x76a/0xff0
-[ 2720.390706]  ? __pfx___mmap_region+0x10/0x10
-[ 2720.390722]  ? __pfx_unmapped_area_topdown+0x10/0x10
-[ 2720.390726]  ? __pfx_lock_acquire.part.0+0x10/0x10
-[ 2720.390752]  mmap_region+0x22f/0x300
-[ 2720.390758]  do_mmap+0x9d9/0x1020
-[ 2720.390765]  ? vm_mmap_pgoff+0x141/0x330
-[ 2720.390770]  ? __pfx_do_mmap+0x10/0x10
-[ 2720.390776]  ? __pfx_down_write_killable+0x10/0x10
-[ 2720.390785]  vm_mmap_pgoff+0x1b1/0x330
-[ 2720.390792]  ? __pfx_vm_mmap_pgoff+0x10/0x10
-[ 2720.390797]  ? __fget_files+0x1a4/0x2e0
-[ 2720.390803]  ? __fget_files+0x1ae/0x2e0
-[ 2720.390809]  ksys_mmap_pgoff+0x2ec/0x440
-[ 2720.390815]  do_syscall_64+0x92/0x180
-[ 2720.390820]  ? mark_lock+0x78/0x860
-[ 2720.390826]  ? __lock_acquire+0xcff/0x1fc0
-[ 2720.390834]  ? find_held_lock+0x34/0x120
-[ 2720.390838]  ? kvm_sched_clock_read+0x11/0x20
-[ 2720.390842]  ? local_clock_noinstr+0xd/0xe0
-[ 2720.390846]  ? __lock_release.isra.0+0x4ba/0x9f0
-[ 2720.390851]  ? __pfx___lock_release.isra.0+0x10/0x10
-[ 2720.390857]  ? __pfx_do_raw_spin_trylock+0x10/0x10
-[ 2720.390864]  ? _raw_spin_unlock_irq+0x28/0x50
-[ 2720.390869]  ? lockdep_hardirqs_on+0x78/0x100
-[ 2720.390873]  ? _raw_spin_unlock_irq+0x33/0x50
-[ 2720.390877]  ? __x64_sys_rt_sigprocmask+0x230/0x390
-[ 2720.390883]  ? __pfx___x64_sys_rt_sigprocmask+0x10/0x10
-[ 2720.390888]  ? ktime_get_coarse_real_ts64+0x12a/0x190
-[ 2720.390895]  ? rcu_is_watching+0x15/0xb0
-[ 2720.390900]  ? lockdep_hardirqs_on_prepare+0x171/0x400
-[ 2720.390904]  ? do_syscall_64+0x9e/0x180
-[ 2720.390908]  ? lockdep_hardirqs_on+0x78/0x100
-[ 2720.390912]  ? do_syscall_64+0x9e/0x180
-[ 2720.390917]  ? rcu_is_watching+0x15/0xb0
-[ 2720.390922]  ? clear_bhb_loop+0x25/0x80
-[ 2720.390927]  ? clear_bhb_loop+0x25/0x80
-[ 2720.390932]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[ 2720.390937] RIP: 0033:0x7f61aa0a8b36
-[ 2720.390948] Code: 00 00 00 90 f3 0f 1e fa 41 f7 c1 ff 0f 00 00 75
-2b 55 89 cd 53 48 89 fb 48 85 ff 74 37 41 89 ea 48 89 df b8 09 00 00
-00 0f 05 <48> 3d 00 f0 ff ff 77 72 5b 5d c3 0f 1f 80 00 00 00 00 48 8b
-05 a1
-[ 2720.390954] RSP: 002b:00007ffffc0efa68 EFLAGS: 00000246 ORIG_RAX:
-0000000000000009
-[ 2720.390963] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f61aa0a8b36
-[ 2720.390966] RDX: 0000000000000002 RSI: 0000000000100000 RDI: 0000000000000000
-[ 2720.390969] RBP: 0000000000000001 R08: 0000000000000003 R09: 000000001ec00000
-[ 2720.390971] R10: 0000000000000001 R11: 0000000000000246 R12: 0000000000000002
-[ 2720.390980] R13: 000000001ec00000 R14: 0000000000000000 R15: 000055844a355ac0
-[ 2720.390991]  </TASK>
+> @@ -19,6 +20,120 @@ static const struct rhashtable_params rhash_queues = {
+>  	.max_size = MAX_NUM_NVMEOTCP_QUEUES,
+>  };
+>  
+> +static void
+> +fill_nvmeotcp_klm_wqe(struct mlx5e_nvmeotcp_queue *queue, struct mlx5e_umr_wqe *wqe, u16 ccid,
+> +		      u32 klm_entries, u16 klm_offset)
+> +{
+> +	struct scatterlist *sgl_mkey;
+> +	u32 lkey, i;
+> +
+> +	lkey = queue->priv->mdev->mlx5e_res.hw_objs.mkey;
+> +	for (i = 0; i < klm_entries; i++) {
+> +		sgl_mkey = &queue->ccid_table[ccid].sgl[i + klm_offset];
+> +		wqe->inline_klms[i].bcount = cpu_to_be32(sg_dma_len(sgl_mkey));
+> +		wqe->inline_klms[i].key = cpu_to_be32(lkey);
+> +		wqe->inline_klms[i].va = cpu_to_be64(sgl_mkey->dma_address);
+> +	}
+> +
+> +	for (; i < ALIGN(klm_entries, MLX5_UMR_KLM_NUM_ENTRIES_ALIGNMENT); i++) {
+> +		wqe->inline_klms[i].bcount = 0;
+> +		wqe->inline_klms[i].key = 0;
+> +		wqe->inline_klms[i].va = 0;
+> +	}
+> +}
+> +
+> +static void
+> +build_nvmeotcp_klm_umr(struct mlx5e_nvmeotcp_queue *queue, struct mlx5e_umr_wqe *wqe,
+> +		       u16 ccid, int klm_entries, u32 klm_offset, u32 len,
+> +		       enum wqe_type klm_type)
+> +{
+> +	u32 id = (klm_type == KLM_UMR) ? queue->ccid_table[ccid].klm_mkey :
+> +		 (mlx5e_tir_get_tirn(&queue->tir) << MLX5_WQE_CTRL_TIR_TIS_INDEX_SHIFT);
+> +	u8 opc_mod = (klm_type == KLM_UMR) ? MLX5_CTRL_SEGMENT_OPC_MOD_UMR_UMR :
+> +		MLX5_OPC_MOD_TRANSPORT_TIR_STATIC_PARAMS;
+> +	u32 ds_cnt = MLX5E_KLM_UMR_DS_CNT(ALIGN(klm_entries, MLX5_UMR_KLM_NUM_ENTRIES_ALIGNMENT));
+> +	struct mlx5_wqe_umr_ctrl_seg *ucseg = &wqe->uctrl;
+> +	struct mlx5_wqe_ctrl_seg *cseg = &wqe->ctrl;
+> +	struct mlx5_mkey_seg *mkc = &wqe->mkc;
+
+Hi Aurelien, all,
+
+I think that the lines above...
+
+> +	u32 sqn = queue->sq.sqn;
+> +	u16 pc = queue->sq.pc;
+> +
+> +	cseg->opmod_idx_opcode = cpu_to_be32((pc << MLX5_WQE_CTRL_WQE_INDEX_SHIFT) |
+> +					     MLX5_OPCODE_UMR | (opc_mod) << 24);
+> +	cseg->qpn_ds = cpu_to_be32((sqn << MLX5_WQE_CTRL_QPN_SHIFT) | ds_cnt);
+> +	cseg->general_id = cpu_to_be32(id);
+> +
+> +	if (klm_type == KLM_UMR && !klm_offset) {
+> +		ucseg->mkey_mask = cpu_to_be64(MLX5_MKEY_MASK_XLT_OCT_SIZE |
+> +					       MLX5_MKEY_MASK_LEN | MLX5_MKEY_MASK_FREE);
+> +		mkc->xlt_oct_size = cpu_to_be32(ALIGN(len, MLX5_UMR_KLM_NUM_ENTRIES_ALIGNMENT));
+> +		mkc->len = cpu_to_be64(queue->ccid_table[ccid].size);
+> +	}
+> +
+> +	ucseg->flags = MLX5_UMR_INLINE | MLX5_UMR_TRANSLATION_OFFSET_EN;
+> +	ucseg->xlt_octowords = cpu_to_be16(ALIGN(klm_entries, MLX5_UMR_KLM_NUM_ENTRIES_ALIGNMENT));
+> +	ucseg->xlt_offset = cpu_to_be16(klm_offset);
+> +	fill_nvmeotcp_klm_wqe(queue, wqe, ccid, klm_entries, klm_offset);
+> +}
+> +
+> +static void
+> +mlx5e_nvmeotcp_fill_wi(struct mlx5e_icosq *sq, u32 wqebbs, u16 pi)
+> +{
+> +	struct mlx5e_icosq_wqe_info *wi = &sq->db.wqe_info[pi];
+> +
+> +	memset(wi, 0, sizeof(*wi));
+> +
+> +	wi->num_wqebbs = wqebbs;
+> +	wi->wqe_type = MLX5E_ICOSQ_WQE_UMR_NVMEOTCP;
+> +}
+> +
+> +static u32
+> +post_klm_wqe(struct mlx5e_nvmeotcp_queue *queue,
+> +	     enum wqe_type wqe_type,
+> +	     u16 ccid,
+> +	     u32 klm_length,
+> +	     u32 klm_offset)
+> +{
+> +	struct mlx5e_icosq *sq = &queue->sq;
+> +	u32 wqebbs, cur_klm_entries;
+> +	struct mlx5e_umr_wqe *wqe;
+> +	u16 pi, wqe_sz;
+> +
+> +	cur_klm_entries = min_t(int, queue->max_klms_per_wqe, klm_length - klm_offset);
+> +	wqe_sz = MLX5E_KLM_UMR_WQE_SZ(ALIGN(cur_klm_entries, MLX5_UMR_KLM_NUM_ENTRIES_ALIGNMENT));
+> +	wqebbs = DIV_ROUND_UP(wqe_sz, MLX5_SEND_WQE_BB);
+> +	pi = mlx5e_icosq_get_next_pi(sq, wqebbs);
+> +	wqe = MLX5E_NVMEOTCP_FETCH_KLM_WQE(sq, pi);
+> +	mlx5e_nvmeotcp_fill_wi(sq, wqebbs, pi);
+> +	build_nvmeotcp_klm_umr(queue, wqe, ccid, cur_klm_entries, klm_offset,
+> +			       klm_length, wqe_type);
+> +	sq->pc += wqebbs;
+> +	sq->doorbell_cseg = &wqe->ctrl;
+
+... and this one need (at least) to be updated for the following commit
+which is now present in net-next:
+
+bf08fd32cc55 ("net/mlx5e: Avoid a hundred -Wflex-array-member-not-at-end warnings")
+
+> +	return cur_klm_entries;
+> +}
+> +
+
+...
 
