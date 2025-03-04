@@ -1,199 +1,318 @@
-Return-Path: <netdev+bounces-171836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1733A4EF7D
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 22:42:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 843D0A4F016
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 23:22:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D106172B97
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 21:42:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1973E7A905A
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 22:21:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2421A277028;
-	Tue,  4 Mar 2025 21:42:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64B96251788;
+	Tue,  4 Mar 2025 22:21:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="FvjEFl00"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="nz2OKGDz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR03-VI1-obe.outbound.protection.outlook.com (mail-vi1eur03on2054.outbound.protection.outlook.com [40.107.103.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAB2C24C06A
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 21:42:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741124537; cv=none; b=AqOUv9YKjQRxGswncKUTlqjy922+5H8zMIooP4Te2rxj98KmoZCR+mpeRh1l/ijOxkIKInmYekL9POxnOvenygASRs/qJlmZopqEVXGC/jVBxaMNLLUruO7AX5qVjtDvizjKm0wEWZWyYOKIQUVQ0EO5DMmHRiBDOSy/K+vTMgU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741124537; c=relaxed/simple;
-	bh=4CRSOAJ0gTn/7mjqwmYQXOsQ3hSz83eHPlTTQZL7/Zk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i881PO56NKEEjGBUK9e1Znpam5gAzZPrBxFkfGEMqcDOpxPNmnERVcvB+CYIq33uWIJNupbHLGscnNWW5LzaDLql3aReMCU5q4ysXh9mRAZAJDjDtmD2Eq99mLqhxgfsZy0As3hyQPM+2G7aSZvIDQCs89mh93WALZeZo4cY50Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=FvjEFl00; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5e4ad1d67bdso9702516a12.2
-        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 13:42:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1741124532; x=1741729332; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=+JNQBuyB9+ss+3yPkCUqp7xWY3oo2h8qm9la8wSwFco=;
-        b=FvjEFl00PT1pEiM/7I7cISibRq6nroTG9Gh4j236Ge64jWBXg72uQ7WAnTSSNzvikk
-         UHpSN7B+cjyesVCnfy4wjbCj5dtcP07aKAx9lfM4pdtK9pTH7TdoM7aC/BZl1gzkupPD
-         7TUn8Maj1z1kcamzB4WvO818NEYA/DMP0JBhFqmHbKuCsridNlnUt4kX4+pr2liju6xw
-         GaZVSK2zV8BpvWtkeXfLz7mD2cuOoWEruwLnf1UFoGHe4AVaLqFWiwkWFaOZ8fhxi8En
-         XqAHFRjUvrOtbLgjIv6PNXLHqXCTFT6Av+9t7ZfmI5PHjUCSnkjGeOm3CEvgxh5fUl1w
-         r7nA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741124532; x=1741729332;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+JNQBuyB9+ss+3yPkCUqp7xWY3oo2h8qm9la8wSwFco=;
-        b=q58PY8hJVPEGGbRqM0oBxRNWBf/R3OEDwduo9d2Wg+L12KAUR46FghD0Waca9x/D2B
-         RSH5FEk/VFuEj7FJnd2aYzbgmGjfK2qkNfrobucy3mdQ+2s7TdAWkWakln9ExJIa8kOm
-         8W92CncZvaSQeb9OBWg1KiAGrAWvqCcjdkhSEKQigg1OAD/RF1UG0Vb9apJN+aI4W4av
-         YhhWc3Xig0+bsKYTHL38JmPy9zE6BzolOzSC+OJuzJL1DO7o8eJs4jR/O2XUoy7UcAd+
-         CAfDz4a8defcqWea3uJ08o5BD3Z2ciNM80CTxERn+9/tNWXWXyf9AYwtc86V9mPmRuOp
-         b8EQ==
-X-Gm-Message-State: AOJu0Yz6ZVlJl77iM9+yoBeXmCSm2WyRN5OXa1Nhex1qkJ5u+483eUJp
-	pSVSOIbBzspeaXa8b2UOCGB1zP74szVpj3TuWnkS80wJvid1J68kZYlFBDyL8O2M0fo05KhZgO1
-	+
-X-Gm-Gg: ASbGncu2v/xG+TgZ5TVf4B2RIVVs4zUWz8D+pmsFEFkMHbm0E/pkED4WwHWVnyNt0yw
-	Zn7zPbL66oq8mkxb7V2f/z30IGJB1Nl8F7wFLkDAEnnxZ0efZWrv9XsGofWd+6vlTd/IZvGQCio
-	GQK56gAEGJGOZ55CDECxEMOYPVMKzspRyyCaCHCCYoKXiJNgMiTGCTdHAWfpvzcq9jkRDa+bd3M
-	r18j/ON5Uc9CWqqOyFpnh4jdiAX59nTvzali+IX0s4TYk74UZK3oKdz8Vz7czno0wUNGY6vfR+V
-	TUbSuIzoBlot+uAVpqHBdaKIbT//v2OIWVMjVNReD5tg/dCV1jCFOavxwfZEfYB95rPKfC+UmRl
-	dGRvXOC4=
-X-Google-Smtp-Source: AGHT+IFyJS9WlYqoKoL9AhIu0Jh0V3BWo+f0XG6mWUONLmq4b1Lqj3zqrGGEIRlwppC5DAbGooky7A==
-X-Received: by 2002:a17:907:940b:b0:abf:457e:cef1 with SMTP id a640c23a62f3a-ac20da94c53mr73309666b.40.1741124532015;
-        Tue, 04 Mar 2025 13:42:12 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:2107:3d4f:958a:fa5f? ([2001:67c:2fbc:1:2107:3d4f:958a:fa5f])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac1e9576fb3sm234172066b.48.2025.03.04.13.42.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Mar 2025 13:42:11 -0800 (PST)
-Message-ID: <202f2906-a5d5-4bac-aab0-25223bfa7051@openvpn.net>
-Date: Tue, 4 Mar 2025 22:42:10 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA471FC103;
+	Tue,  4 Mar 2025 22:21:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.103.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741126905; cv=fail; b=XbaFzMol/jMARof1i8g98m7PWiWg/cjQyAUbE3N9KtpHWxDJZiRUvyAiizTdqCraY4srHj64vYuvM2pWbn1X8Uv4GDCKGmyUX7Vg6wwO5MTQbRC7orMuVbwwvIgVGKPhvkULnNv1bGBbfprEKVV+JdAKKyG94NndOLFJWpdXvtA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741126905; c=relaxed/simple;
+	bh=7nl+Z7XhO6ODE+DpzdByO9PygNj6KaUrYfgcL2P1qFs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=KB4YCVArTypev2F8BfEJ3FaCKx9W6AEaCQgQzM3DhFnH08thURa4nUS78k0M7schPzZcYBXuQ7UIMkUuNWX/O6TP89dT2mkqQqkb+GqRWfDw6Y0HtaVhjKOgV2zLh1zgZ8HNpHVI1cU3xZ425dHV8VpDyhzxmrBWQZYoVFoQiOg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=nz2OKGDz; arc=fail smtp.client-ip=40.107.103.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xlv8phTpSndoCVhWC+iP3CtC9e+MeUBv/FYtoaL3cY8qymhYNWUIbjrKQjVjtoZm3eJZGaUAO2Ru/PAFloOXIxwetk+MW7/NHruxXxGCIOqT/s+WRcQZI4VLeNEikP/jR6dp3ryb52LYAGO+KkEegsKs1snMpGbYebu8w1XhTY5g6WRIPJJkKQkKpoIfER803Up/ttgoIJPz3a9538JQDJ2eVGAAE5ERAXfo85qpi1YL2ekq/F1IkxRF+0iXDVRvvRF9yuxBryKXoJylH80vH3O8xeWlspEBeuilYckncGGOEVVWXxuoTvI5mDWfQFrP4OoBfm+9EyvBVLoUlwbEPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=w3xBByBRQj/ZIftPN0FMSdUzrOisbK7+nb9lekmNlXs=;
+ b=Y3nGwoTZAt4vP1zb7WHvNvMxusHywxZKWfmTeh7XsZBIxrU7hoaHK7rBaDwLJF/OwZU9CJV1Wu3TyBgyajJQvK1lcaiA6n51SGp3taTZxiWa9BsEhAuu8rxf2OSmn9Gp3wrACB+WrMce3alGpFwMJ5yISgWKsPsYqXKlIdZ4gSeS+g4zNFPVCi8l6VLTTXOGMbDvEFVMxbrwyRT7tHBx8ItXDKjlEQb5VDqkIXvh3NSGNdTva3k6K/p50b6up469FRQNdZt8+7omszpDSr0ko3NJrlLOA3F6jCi2Rusop/fg+VXWdcCfT8cRb4D4jQCsft2uCD38blRoAJbhDKdF6w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=w3xBByBRQj/ZIftPN0FMSdUzrOisbK7+nb9lekmNlXs=;
+ b=nz2OKGDzH3qdO15yqPLktPETbrl7EnJoGglho60q1VRmdB0pB+AdLg5FnZZoLjmR9/y/RhqTZVegqYpdecfyMQaZk8Imy3Ph8eU6GXYWm7t6hco62z1BQAegdhDsfTLt2jM4or9HTa4EMXJEbHwK+hRfxEGCe585SPFz8zVhfPj0b12Igk72fyR3V0X4Z3QFpvSKPW4XgogrA7Jyw+FSmQBohrti2Zy5eVeKz9/Ca4PvYIki0jqQ7ZkFbPiZgjUZHM3cykCDP5JtIxLqo1QDLd+hHPo6LKFWnHJYluBZxWcjlJ4AKwsjUms42PzsEtcK7QlYoBuzQkIvKrBpriKwCg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
+ by GVXPR04MB9927.eurprd04.prod.outlook.com (2603:10a6:150:118::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.28; Tue, 4 Mar
+ 2025 22:21:27 +0000
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2%6]) with mapi id 15.20.8489.025; Tue, 4 Mar 2025
+ 22:21:27 +0000
+Date: Wed, 5 Mar 2025 00:21:22 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Furong Xu <0x1207@gmail.com>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Xiaolei Wang <xiaolei.wang@windriver.com>,
+	Suraj Jaiswal <quic_jsuraj@quicinc.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Gal Pressman <gal@nvidia.com>,
+	Jesper Nilsson <jesper.nilsson@axis.com>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org
+Subject: Re: [PATCH iwl-next v7 1/9] net: ethtool: mm: extract stmmac
+ verification logic into common library
+Message-ID: <20250304222122.67bjes6jzbiveqfk@skbuf>
+References: <20250303102658.3580232-1-faizal.abdul.rahim@linux.intel.com>
+ <20250303102658.3580232-2-faizal.abdul.rahim@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250303102658.3580232-2-faizal.abdul.rahim@linux.intel.com>
+X-ClientProxiedBy: VI1PR06CA0101.eurprd06.prod.outlook.com
+ (2603:10a6:803:8c::30) To AM8PR04MB7779.eurprd04.prod.outlook.com
+ (2603:10a6:20b:24b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v21 19/24] ovpn: implement peer add/get/dump/delete via
- netlink
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-References: <20250304-b4-ovpn-tmp-v21-0-d3cbb74bb581@openvpn.net>
- <20250304-b4-ovpn-tmp-v21-19-d3cbb74bb581@openvpn.net> <Z8cPrYs0TuQfLlKX@hog>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <Z8cPrYs0TuQfLlKX@hog>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|GVXPR04MB9927:EE_
+X-MS-Office365-Filtering-Correlation-Id: 13f48dd7-1890-400a-2b27-08dd5b6ae7c8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?xYVSqn6YC3ZhCVcGTnG8jgw2PIqGBm1grr2/dOvtSJvXJPmKfQ4V+MeQS26s?=
+ =?us-ascii?Q?BDoDKG9mndqrHWNqhWURO8utgR+ukXqwLjRJke6y1BEuWxbvAeAyjta3MqeB?=
+ =?us-ascii?Q?VfPpR4sJYObmM0SBZQ4lvLJCNjAfGq3vCgjaqZNTAlnB9kAFOK1bSRtxK2Yl?=
+ =?us-ascii?Q?y3bU8VxyxDU9KPmYcUQV+pkXYrcjiVFHat51/3jGx4D3elBIyfaJckPbbYr7?=
+ =?us-ascii?Q?n7gpUCObzsUXmkDBXgrixtPyvreFgAfrf3zo082yvYXGCc5oIcSokPeuewgF?=
+ =?us-ascii?Q?161DOyOaw1sdpvQkg8TncOCCyjOT4qL4z55jDjdvDaH6PN6zzZgc7GHmPgl7?=
+ =?us-ascii?Q?ZMsevLqumS7Qybo9e6SGeUo7jyk4al2aT5prtLmejxZ6jUBg4ic8pvpx70Z2?=
+ =?us-ascii?Q?cRWE26z2RJgFU18B7m5qnZsWuzx1lrchWyY74bsvvR8Yv2eGMe7edp05HQ9A?=
+ =?us-ascii?Q?W2IuA2kQBXfnwOcRcMkt4Z2E3Ly04PLaAGZoJKv24nXVc6v+TA7eb0W7gUjT?=
+ =?us-ascii?Q?IBcmQDLWke3mwy2711L4QjUo5Oqf4ihGWZ+xYiti6R46YFWDXZA2uUO927tx?=
+ =?us-ascii?Q?qyyFYjJFXfYHPHe46xIbZODTIETKHsKYDfSYcrHacSCh6H9ywKJO+B970Asy?=
+ =?us-ascii?Q?WSd1NJJPYeQO8Gs0jc53e7jKD7AgmyX6mPYz+9rqH2a1rcygTNnaLA4KoeC+?=
+ =?us-ascii?Q?ATf9arSNGNYbz+enBhLynWSIlh94i4k4YsYmfC9QAn2YBoqevLTIEdMdjXEM?=
+ =?us-ascii?Q?V4HZkc1cUbBgq7/tBvpIGpJUk2+YdXzs5CjgkxqlSlhmHVALN31RcCdMtcXH?=
+ =?us-ascii?Q?4TBiqDGRP02pWUktQwzPgwGRN4qrRXShK0eDmJPu7trINYEF70HoUcbvr9ne?=
+ =?us-ascii?Q?xQD8kfPA627X77RrO8+Z8nPuIQm8X+DkSrlor2GXxDyLLkmDoTCe7jHJiqXx?=
+ =?us-ascii?Q?W2Zghqa9sGm4To0w2Lf4VNCdgKEcqXT0UXsJOSDy2RBA2R1BH7wxUYcTqErp?=
+ =?us-ascii?Q?isHlBEJjZuJFAfhAFEqQecExFJDZ4ZFynZxbTm4Y8n1IjDEh93CagvTRsw2V?=
+ =?us-ascii?Q?mqVNE9JSuXRYIj9tzqwPJE+KKSJtAMedsdCmd6K1T5rDfvnnq5pvW07vhwfN?=
+ =?us-ascii?Q?kZhdqQoAnIHRafHWEpEWlL3tOFC/agMeC+KtjLQJMcNqwlYJztGE1lcT0gtZ?=
+ =?us-ascii?Q?055HKCACBsFgGlfnKm+pZxgnLS5qNsO0Bu77J6w+icFO7EPXViOkJlLXA22E?=
+ =?us-ascii?Q?SxrHA9ywoyPHAYaQhW7P3qpPv9R0LIsonz8I5qQhwaCabwDnoIu+agtdRSck?=
+ =?us-ascii?Q?pu4xbe/M2oNuTC1SiDKNIdSDT2xQYzn4TIlYJgk+hQHXjdscm1IVP2SysvjD?=
+ =?us-ascii?Q?KX43lrmay7zWfPuhVpYtyuexTRdi?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?sGnHZ05owoly0t+Gtud7nzh0V+Bs1jimrc8F4iHbH2Qs3dpyGuqbbdDlUQb2?=
+ =?us-ascii?Q?hHibm3TOA9U57wOkOFHtT5hHmGAxmKxnqdrP3VUKWzN7EYlDKLH4jeZNKOUr?=
+ =?us-ascii?Q?lsVZ/+gH0YGo1OMab4JQ3cJ9gY7jbsohIk3457sSwS+Ne+7U9jZe01K7cYHJ?=
+ =?us-ascii?Q?quOvNw+c5AbS4pZIMhnHQuFrI6UZ08Q4vm6heyCRHtQh+Pmtxsn0JVNW2cEH?=
+ =?us-ascii?Q?bjBdZ6BF7ox0GXCzS3z2Kl+FKbNC7GEq0UyaS0aWweKHDLdq2nGru6j3VcbS?=
+ =?us-ascii?Q?JGe93glwPBHtnp1SNOn+gWsx9uRIsmxTCOBYR4omF8nrt2FsE7NjkHXQDnX4?=
+ =?us-ascii?Q?NqPCCK/wr4csSeUEI33cht6sDeHWqlCdMPQ8WVMtY6gUiVgapFHCW27EUzE0?=
+ =?us-ascii?Q?JC9Jvh128G+N0CM5zkU7NhcKaxbCzlQ+l/CB8PHjTtWcUXiCH4ACobLb0jx/?=
+ =?us-ascii?Q?ucN9bHG+jY2/9AiSDRpM79jsTfloVBeYUsjBw/ux9HUJujes2GwwMVGb93IH?=
+ =?us-ascii?Q?thviJXNO7q70p48TkxbeimgvPa97YiZPLFgcHHQdupL5P+ipSesAhiejdhSA?=
+ =?us-ascii?Q?qq9SLyOcz+l3NrUlAH8J0CjWaCIg8qsamnocS10QmjQr6KAGmWNTNDef7aVF?=
+ =?us-ascii?Q?JPtNG98fGwYM5WcI0/8B0dudwr5tnTosfQ53nuLuXC18spg03JwnPEr8d9Sn?=
+ =?us-ascii?Q?AIXFnV+oOpzdZIf4BrQPS9wZ9ROihfcxbcMc1iXAuHFQiaOr6uhva8ddWXvG?=
+ =?us-ascii?Q?Cb5NwfKfiA8fZLEg7HTbFx3OUn2tAPOJq7nYPOOsJxPdNOa6Ld1zB2SFsHUJ?=
+ =?us-ascii?Q?BPRkvO4hOapqQPpQK2X06E873NCwB5r3pGi1ZhnTVSJfJ7jnPnOcAAh+t+2q?=
+ =?us-ascii?Q?f9VT7zLfgGFazJr7e0o3peBnZw0e5ti+ObdS1poAgmeAoRs8U7Hop8qJ1HIA?=
+ =?us-ascii?Q?4ZCIM5sdXCgOg0VjVeByawXnH18gT6yGBcNHg+tIRTT/rCYX6oCk7bDaYMS7?=
+ =?us-ascii?Q?Q+JwZrL4FpefioVx4TMMOde3xuNG/ca8+ePvy8CynvFqIMZJ+AfeEFteBAG0?=
+ =?us-ascii?Q?byZ8VxwZ6CU13TScPG7Ld8BZlQHZUbjjEBECfaJWZN8NeRXe0qnIxtXJ8EW2?=
+ =?us-ascii?Q?+uJy6vz90TwLyKMIpece2bfYl7KTwCig94Ns6fHco/T0BttbF/ThCVPurhob?=
+ =?us-ascii?Q?IhAo21TgkLj+Yh4koSWYX3miiWZJqIQspCTpvCqBzPtMh47QlDK3x91/f6IF?=
+ =?us-ascii?Q?ODVAZyIPlHImNtNeTnMI/RnXsOZp0a9bltNcJUWU+ZA5Otxka4w/zliyH1TZ?=
+ =?us-ascii?Q?/IULpdP+eGoFw3UT4fCdDqPvMfwI9VLR9gv6p45ah5IbxVtnYKXs3EBcJM3F?=
+ =?us-ascii?Q?PWcTjIaYOxyB4UtoP9suoH2/Np86nExu7MBAa2ydW+fCRwzfyrfYWdW6XujP?=
+ =?us-ascii?Q?k0IarELcnHbY+sxZRNRkDP6z3z8BC0TKT8eyzl1VYxRoaPAE4QNwnaE4MTU0?=
+ =?us-ascii?Q?be3sLOB6Z3KBi8ZNuJchy8kOafO2IJOC+hyHQU+N/pi4sPuIAStTBoX3Ft2j?=
+ =?us-ascii?Q?fjBBP1ReLdUgHNlTxmRPerYNYpETxd5rxwAfBRf0hgKgl3XtgUIvpxec+UiQ?=
+ =?us-ascii?Q?fg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 13f48dd7-1890-400a-2b27-08dd5b6ae7c8
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2025 22:21:27.1745
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uIDN80nZm015n7UyXEgqJ29349z/snF7/XiepI2jyo/QfZ3Rufa+Q7tK6uo30x5euQiyWZyN96ND+oSZjJjpLQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB9927
 
-On 04/03/2025 15:35, Sabrina Dubroca wrote:
-> 2025-03-04, 01:33:49 +0100, Antonio Quartulli wrote:
->> @@ -1317,11 +1336,16 @@ void ovpn_peer_keepalive_work(struct work_struct *work)
->>   
->>   	/* prevent rearming if the interface is being destroyed */
->>   	if (next_run > 0 && ovpn->registered) {
->> +		time64_t delta = next_run - now;
->> +
->>   		netdev_dbg(ovpn->dev,
->>   			   "scheduling keepalive work: now=%llu next_run=%llu delta=%llu\n",
->> -			   next_run, now, next_run - now);
->> +			   next_run, now, delta > 0 ? delta : 0);
->> +		/* due to the waiting above, the next_run deadline may have
->> +		 * passed: in this case we reschedule the worker immediately
->> +		 */
-> 
-> I don't understand this bit. I don't see what waiting you're refering
-> to (in particular within this patch), and I don't see how we could get
-> next_run < now based on how next_run is computed in
-> ovpn_peer_keepalive_work_single (next_run1/next_run2 is always set to
-> now + X or something that we just tested to be > now).
-> 
-> Am I missing something?
+On Mon, Mar 03, 2025 at 05:26:50AM -0500, Faizal Rahim wrote:
+> +/**
+> + * ethtool_mmsv_link_state_handle() - Inform MAC Merge Software Verification
+> + *				      of link state changes
+> + * @mmsv: MAC Merge Software Verification state
+> + * @up: True if device carrier is up and able to pass verification packets
+> + *
+> + * Calling context is expected to be from a task, interrupts enabled.
+> + */
+> +void ethtool_mmsv_link_state_handle(struct ethtool_mmsv *mmsv, bool up)
+> +{
+> +	unsigned long flags;
+> +
+> +	ethtool_mmsv_stop(mmsv);
+> +
+> +	spin_lock_irqsave(&mmsv->lock, flags);
+> +
+> +	if (up && mmsv->pmac_enabled) {
+> +		/* VERIFY process requires pMAC enabled when NIC comes up */
+> +		ethtool_mmsv_configure_pmac(mmsv, true);
+> +
+> +		/* New link => maybe new partner => new verification process */
+> +		ethtool_mmsv_apply(mmsv);
+> +	} else {
+> +		/* Reset the reported verification state while the link is down */
+> +		if (mmsv->verify_enabled)
+> +			mmsv->status = ETHTOOL_MM_VERIFY_STATUS_INITIAL;
 
-Sorry - this is just noise.
-Before getting to this final solution, I went for an intermediate 
-implementation where I was calling wait_for_completion() on a list of 
-removed peers (this is "the waiting above" the comment refers to).
+As requested in v5, please make this a separate patch. It represents a
+functional change for stmmac, and I don't want somebody who bisects it
+to find a code movement commit and search for a needle through a haystack.
 
-Since I had no clue how long I waited, I had to update 'now'.
-But at that point there was a chance that we had passed the deadline for 
-the next run, hence ending up with a negative delta.
+> +
+> +		/* No link or pMAC not enabled */
+> +		ethtool_mmsv_configure_pmac(mmsv, false);
+> +		ethtool_mmsv_configure_tx(mmsv, false);
+> +	}
+> +
+> +	spin_unlock_irqrestore(&mmsv->lock, flags);
+> +}
+> +EXPORT_SYMBOL_GPL(ethtool_mmsv_link_state_handle);
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> index 918a32f8fda8..25533d6a3175 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> @@ -1210,37 +1210,17 @@ static int stmmac_get_mm(struct net_device *ndev,
+>  			 struct ethtool_mm_state *state)
+>  {
+>  	struct stmmac_priv *priv = netdev_priv(ndev);
+> -	unsigned long flags;
+>  	u32 frag_size;
+>  
+>  	if (!stmmac_fpe_supported(priv))
+>  		return -EOPNOTSUPP;
+>  
+> -	spin_lock_irqsave(&priv->fpe_cfg.lock, flags);
+> +	ethtool_mmsv_get_mm(&priv->fpe_cfg.mmsv, state);
+>  
+> -	state->max_verify_time = STMMAC_FPE_MM_MAX_VERIFY_TIME_MS;
+> -	state->verify_enabled = priv->fpe_cfg.verify_enabled;
+> -	state->pmac_enabled = priv->fpe_cfg.pmac_enabled;
+> -	state->verify_time = priv->fpe_cfg.verify_time;
+> -	state->tx_enabled = priv->fpe_cfg.tx_enabled;
+> -	state->verify_status = priv->fpe_cfg.status;
+>  	state->rx_min_frag_size = ETH_ZLEN;
+> -
+> -	/* FPE active if common tx_enabled and
+> -	 * (verification success or disabled(forced))
+> -	 */
+> -	if (state->tx_enabled &&
+> -	    (state->verify_status == ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED ||
+> -	     state->verify_status == ETHTOOL_MM_VERIFY_STATUS_DISABLED))
+> -		state->tx_active = true;
+> -	else
+> -		state->tx_active = false;
+> -
+>  	frag_size = stmmac_fpe_get_add_frag_size(priv);
+>  	state->tx_min_frag_size = ethtool_mm_frag_size_add_to_min(frag_size);
+>  
+> -	spin_unlock_irqrestore(&priv->fpe_cfg.lock, flags);
+> -
+>  	return 0;
+>  }
+>  
+> @@ -1248,8 +1228,6 @@ static int stmmac_set_mm(struct net_device *ndev, struct ethtool_mm_cfg *cfg,
+>  			 struct netlink_ext_ack *extack)
+>  {
+>  	struct stmmac_priv *priv = netdev_priv(ndev);
+> -	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
+> -	unsigned long flags;
+>  	u32 frag_size;
+>  	int err;
+>  
+> @@ -1258,23 +1236,8 @@ static int stmmac_set_mm(struct net_device *ndev, struct ethtool_mm_cfg *cfg,
+>  	if (err)
+>  		return err;
+>  
+> -	/* Wait for the verification that's currently in progress to finish */
+> -	timer_shutdown_sync(&fpe_cfg->verify_timer);
+> -
+> -	spin_lock_irqsave(&fpe_cfg->lock, flags);
+> -
+> -	fpe_cfg->verify_enabled = cfg->verify_enabled;
+> -	fpe_cfg->pmac_enabled = cfg->pmac_enabled;
+> -	fpe_cfg->verify_time = cfg->verify_time;
+> -	fpe_cfg->tx_enabled = cfg->tx_enabled;
+> -
+> -	if (!cfg->verify_enabled)
+> -		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_DISABLED;
+> -
+>  	stmmac_fpe_set_add_frag_size(priv, frag_size);
 
-This said, all this logic was thrown away, but I accidentally kept the 
-check on delta (that I even argued about in a previous email when you 
-saw the bogus ternary-op)
+This is another change in behavior which unfortunately I am noticing
+only now: stmmac_fpe_set_add_frag_size() and stmmac_fpe_get_add_frag_size()
+used to execute under &fpe_cfg->lock, and now run outside of what
+eventually became the mmsv->lock (but still under rtnl_lock() protection).
 
-so yeah, the ternary-op can go away.
+I am not seeing a need for the additional fragment size to be covered
+by the mmsv->lock (the mmsv has no business with this parameter), and
+rtnl_lock() should be sufficient to serialize stmmac_get_mm() with
+stmmac_set_mm(). So I guess I am ok with the code structure, but again,
+please move stmmac_fpe_set_add_frag_size() and stmmac_fpe_get_add_frag_size()
+outside of the spin_lock_irqsave(&fpe_cfg->lock) context (essentially to
+their current positions) as a preliminary separate patch. Again, it is
+best for a "git blame" caused by a behavior change here to not point to
+a commit that moves code from one file to another.
 
-Thanks for double/triple checking with me.
-
-Cheers,
-
-> 
->>   		schedule_delayed_work(&ovpn->keepalive_work,
->> -				      (next_run - now) * HZ);
->> +				      delta * HZ > 0 ? delta * HZ : 0);
->>   	}
->>   	unlock_ovpn(ovpn, &release_list);
->>   }
-> 
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
-
+> -	stmmac_fpe_apply(priv);
+> -
+> -	spin_unlock_irqrestore(&fpe_cfg->lock, flags);
+> +	ethtool_mmsv_set_mm(&priv->fpe_cfg.mmsv, cfg);
+>  
+>  	return 0;
+>  }
 
