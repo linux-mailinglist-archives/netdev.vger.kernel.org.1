@@ -1,100 +1,139 @@
-Return-Path: <netdev+bounces-171551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 015A6A4D90B
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 10:45:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C29CA4D95D
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 10:55:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F3981885A42
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 09:46:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69E123B7025
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 09:47:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 729C71FCF72;
-	Tue,  4 Mar 2025 09:45:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D78B1FC7DF;
+	Tue,  4 Mar 2025 09:47:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XcROd9i+"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="O3QbHPIr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bactrian.tulip.relay.mailchannels.net (bactrian.tulip.relay.mailchannels.net [23.83.218.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35BCE1F4E38;
-	Tue,  4 Mar 2025 09:45:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741081546; cv=none; b=PytNjDHuYEi/VfdqR1GOKgw01zKY/i7utghtTj6vkI2//eu2ftmk3tc7ZdFk8yCLeXOIODIBeczT7lPhkgKFid/vCs4z/aelLzb99JO+tx7v9qTLZPIgDeyh+xW17reI8w7OaBEOk68v1fi0gt5m8b9qHdYUKPOk3hALs3enxNc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741081546; c=relaxed/simple;
-	bh=Zx8aHL8TjK/0JadzMPfxpvzacvveR7z9R5dYYUGLCOs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k+4PGWGhdR/th1UV7LjEelqVtqtTk7QSe3+Ga2RkD3OwnuezoOyk6V++MRVzRfG9evzGKAfD4XVXLT3ovLNDeMm1X43Mhj9t82is3G+QIVZYyLv85GOyCy/F5lYcMGvCeQEPo0F1jAaW9a92M+5wdT/o5OlibZxEvTf8o0q21/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XcROd9i+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C474C4CEE5;
-	Tue,  4 Mar 2025 09:45:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741081545;
-	bh=Zx8aHL8TjK/0JadzMPfxpvzacvveR7z9R5dYYUGLCOs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XcROd9i+64hjCn50JTFmCZOYijO1ihYFHQEPqSF4puOuuXVsIPnf7TQHVj3qJyC/w
-	 xYPDgYxaNUQJKVdEnr4EjlA8DM2g7yN5QmrP7njexaxch2IjtWPCaEPWTDnLCMTlLU
-	 MZ/46w88BVaINh0t+2YCRKigcJvYvEZvoMuvNyUMJbhCNVncK8DpnRfC1KZmxz1C0m
-	 yqwkxESK434RJxkVP2/FPmcUnvRAIentc5dEb61RGhx2ZLPaUcDeqtDpqmq0P6RyOf
-	 COflYQRvfcZFx9fh5nc3RDhijliiUCTvGWbj7I5qKoDMKi0XrogxIBKChhTQYLtc1V
-	 SwW388ceLWQIA==
-From: Christian Brauner <brauner@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <brauner@kernel.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-afs@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [GIT PULL v3] afs, rxrpc: Clean up refcounting on afs_cell and afs_server records
-Date: Tue,  4 Mar 2025 10:45:21 +0100
-Message-ID: <20250304-fuhrpark-neuwagen-b66b75fd45e6@brauner>
-X-Mailer: git-send-email 2.47.2
-In-Reply-To: <3761344.1740995350@warthog.procyon.org.uk>
-References: <3761344.1740995350@warthog.procyon.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA646481C4
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 09:46:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.218.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741081620; cv=pass; b=t573y/Ca71pdPoA7wgyc6jb/IbuVf8ndF+i9lymUlQ75oSicDrRvnjNVbkE1yBYmrWGN/5QBcY1BU2+4XuyJSqd6AQqtz21JbsT3I5x1Ie3bATV+fD+QvW2Cg/8PrU2zXtD6EZ1q78URFtEbm6ID9NMR4dBScQfr+KhzT8A7cBQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741081620; c=relaxed/simple;
+	bh=+r8TFsquWm3u90sZ2XVyWKCsWfP3h3k6rMBbkAsqNi8=;
+	h=Message-ID:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:Date; b=E+7hq5o2JfFsINfpg+e38l+KLci7P1uZtXvcbsNlVaGwBEclFrp1/m1lPA5rksvE4LJIjobsNfb5AXsM34Lu0b6YNGeZ4wZE2EAqR8FJZC54wDtrWOmazigS8JL5LB79EntK/rBsNXgTmXFQmU4eg1bJxTJny+mXF4apnNUFYzM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=O3QbHPIr; arc=pass smtp.client-ip=23.83.218.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+X-Sender-Id: hostingeremail|x-authuser|chester.a.unal@arinc9.com
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id 1B9A78C3E29;
+	Tue,  4 Mar 2025 09:46:57 +0000 (UTC)
+Received: from nl-srv-smtpout1.hostinger.io (trex-8.trex.outbound.svc.cluster.local [100.101.191.136])
+	(Authenticated sender: hostingeremail)
+	by relay.mailchannels.net (Postfix) with ESMTPA id E7C588C3ACC;
+	Tue,  4 Mar 2025 09:46:53 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1741081616; a=rsa-sha256;
+	cv=none;
+	b=af7eV8eu4Ky/VzUdDADBUxjgxKKKs7u3q1Ev7az2ONYZp4OxvPhkZo6tgrdIRJd2itYF0h
+	zrPfYU4JGa9mxZneKMiCPXRlWWtEowsV6wH5Si0VGLw+oZi3ot6njAU15PiHufC0VB3FtT
+	CGaPVd/WJS6koZnsxf/xUIASrxiJf/+dWTK8OaQtu7mR6vx7DM9wfO2KfZDoYvH1v4A3Up
+	/9oMWljF+mmEFKPrTA+ApQHX9ORnLDQDRBWMhjGdM/Nj91Oe6hFssniYCG6IjYPwnGraWb
+	itnZqmA1/OyXlms4EQfS2aBktOWTzdwlWvDmeBLyMy2OllmPfIHM7p1uTLbjlg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1741081616;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:dkim-signature;
+	bh=D5t4LO5iZc4495dyi2ppzMU1jd7cqzfUiUSRCJpWlCU=;
+	b=GiAtfS43kFwoJr/tRcZ9Zn8Pz6XjVCRaYleWaTx2nTh0ioce/VASeJBkMXIWwtcNX9c1tF
+	vl8L1WEnDQuedsCyjqTv9cInWgcUbOI8k+jkuJaxabNhxKBOKUtDHWFu5SN3a1LzORLcVS
+	3B5Rpu8xmYavOQmb2Hhq1dXqdjHebCJHaDedcM0rDOgNK8FIfU+2bVB2fJ81Uz2wcGHbY2
+	MOz/fWFXHp9eFhvmv5khRrJBUNhIziGHOwk86F2ewRbT2okKv3aQAlrPOVNBHHEguDeh9A
+	kliPmYOC9yQKc2Yiuxe4I2mjciRPRxjwV0z25+ZNMb0M5ouB5a7gM7qjadpMjg==
+ARC-Authentication-Results: i=1;
+	rspamd-58748c789d-w6rjb;
+	auth=pass smtp.auth=hostingeremail smtp.mailfrom=chester.a.unal@arinc9.com
+X-Sender-Id: hostingeremail|x-authuser|chester.a.unal@arinc9.com
+X-MC-Relay: Bad
+X-MailChannels-SenderId: hostingeremail|x-authuser|chester.a.unal@arinc9.com
+X-MailChannels-Auth-Id: hostingeremail
+X-Slimy-Shoe: 19d76dbe66a13cec_1741081616908_3888167419
+X-MC-Loop-Signature: 1741081616908:8098079
+X-MC-Ingress-Time: 1741081616908
+Received: from nl-srv-smtpout1.hostinger.io (nl-srv-smtpout1.hostinger.io
+ [145.14.150.87])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+	by 100.101.191.136 (trex/7.0.2);
+	Tue, 04 Mar 2025 09:46:56 +0000
+Received: from [10.9.32.97] (unknown [185.182.236.36])
+	(Authenticated sender: chester.a.unal@arinc9.com)
+	by smtp.hostinger.com (smtp.hostinger.com) with ESMTPSA id 4Z6W6D2wtsz35BH3;
+	Tue, 04 Mar 2025 09:46:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com;
+	s=hostingermail-a; t=1741081590;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=D5t4LO5iZc4495dyi2ppzMU1jd7cqzfUiUSRCJpWlCU=;
+	b=O3QbHPIru7AnlxKZ0j2JcvM0aDko5YyybmfATwJ7W6Uyy0cYcrQ0Ay3i69qGkiy1nlWaYc
+	1hWpE1a3EaybroRWRfsrOnJnL6kBJ6z5gCnUTJHTMxKVrs9DSkj0iBLAG6y/MkrZuhftMJ
+	R++VBdvY03avb4Esfcfg4EWVS0Nn2MnBWTT9KcJruUXjzKOwRs6863OXMnuPxIeELxq0J0
+	ZuyG6OlYYkt8NLFn3abG5liwj1OZXhB6AGl2oZgaPbYXoVwpo8/YhNSXLrv/Fg1wtRf7pP
+	V8vuI1Pvaxpb3sOMYi/9mm1f2h85PsbKQa10PHLAk6fSnYDG31414GFXiFez+w==
+Message-ID: <b63fcbaa-ef27-48a9-885c-7962bd92a8b9@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1146; i=brauner@kernel.org; h=from:subject:message-id; bh=Zx8aHL8TjK/0JadzMPfxpvzacvveR7z9R5dYYUGLCOs=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaQfO30oLpSlyf3B6levC+bs6xU49PXO0u9WMR02tuen/ XtSV6LN01HKwiDGxSArpsji0G4SLrecp2KzUaYGzBxWJpAhDFycAjCRAw6MDIfj3+2YIcHye5tr V6y4QQnLO8saRZX4oq+71XZ6HDnsWcPI8GBnnI2meaHc/Y+3v+qqhLDon5ussmnC4c+egq0lj6p t2QE=
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: dsa: mt7530: Fix traffic flooding for MMIO
+ devices
+To: Lorenzo Bianconi <lorenzo@kernel.org>,
+ Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20250304-mt7988-flooding-fix-v1-1-905523ae83e9@kernel.org>
+Content-Language: en-US
+From: "Chester A. Unal" <chester.a.unal@arinc9.com>
+In-Reply-To: <20250304-mt7988-flooding-fix-v1-1-905523ae83e9@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Tue, 04 Mar 2025 09:46:28 +0000 (UTC)
+X-CM-Envelope: MS4xfAak46EaWbKlaQAOOnK1fi3wYW/2+4l5aFepSvjx8uGgOA14qId//toYZLzeR8I+fViXYRlIlNrSjhVYMS07D3LEvzQpZSwyrxo5G9Gty/xvDUy3QReb 81z8mlUhj8RTJim8GAvhYmM6/pF4WuB98DsIwesDXLY0yHpEm/E4voVX2sYx/kRelHjE5ZBFitzVbCH6SbiW/rCQx6pIvy7WNTLecRcB4gK5PUnSvp6bgpI5 Vp8PZG773xMy9cwJSctfC0mHiuA7qSvV+toWfGyhQLx+BXpppAfLFYedocznA8KwlosasXFjoGihBHj2golKcOv0nfcU2dXferx/0xfaoGPlOcIKt7iabktN iA1sFATs9WZO9x3kSxeA8u0HpQbsPUk8JwvXAz/4qP7BTX5Kr6VPd7QoCEyK4d4jZfNG0kpgp9o9ch5t7YboX4IuSr2wCc7FVXkHFFM9wOnRdkfCqygd7Nes qmYirDGRadJL+OcTKysDx4Lkurf/dh8sR6T8eOa4D+633H0+QKjbxlbzKZyIzmaupWPgrbUydGKr3k0sgbv3j5wXbcJRhsyLqW/MOEHYH9wtACwUpPEkJCzM 0lOjmmauEwkKUWVjJhNGMxlojrEdw/Ov4DaRFHwbM0JHZmROfNaKWCZGkZae/Ku8PGSFRroLVy2cTdn+llFe4d+Ok3ttmbSFd85rV+z4OsljPg==
+X-CM-Analysis: v=2.4 cv=F4sFdbhN c=1 sm=1 tr=0 ts=67c6cbf6 a=jLKKKTx0pIsUXH9Z8yxYVg==:117 a=jLKKKTx0pIsUXH9Z8yxYVg==:17 a=IkcTkHD0fZMA:10 a=VwQbUJbxAAAA:8 a=GvHEsTVZAAAA:8 a=oMYzIxOzatuwx5kPrsYA:9 a=QEXdDO2ut3YA:10 a=aajZ2D0djhd3YR65f-bR:22
+X-AuthUser: chester.a.unal@arinc9.com
 
-On Mon, 03 Mar 2025 09:49:10 +0000, David Howells wrote:
-> Could you pull this into the VFS tree onto a stable branch, replacing the
-> earlier pull?  The patches were previously posted here as part of a longer
-> series:
+On 04/03/2025 08:50, Lorenzo Bianconi wrote:
+> On MMIO devices (e.g. MT7988 or EN7581) unicast traffic received on lanX
+> port is flooded on all other user ports if the DSA switch is configured
+> without VLAN support since PORT_MATRIX in PCR regs contains all user
+> ports. Similar to MDIO devices (e.g. MT7530 and MT7531) fix the issue
+> defining default VLAN-ID 0 for MT7530 MMIO devices.
 > 
->   https://lore.kernel.org/r/20250224234154.2014840-1-dhowells@redhat.com/
-> 
-> This fixes an occasional hang that's only really encountered when rmmod'ing
-> the kafs module, one of the reasons why I'm proposing it for the next merge
-> window rather than immediate upstreaming.  The changes include:
-> 
-> [...]
+> Fixes: 110c18bfed414 ("net: dsa: mt7530: introduce driver for MT7988 built-in switch")
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 
-Pulled into the vfs-6.15.shared.afs branch of the vfs/vfs.git tree.
-Patches in the vfs-6.15.shared.afs branch should appear in linux-next soon.
+I was suspecting of this for a while. Thanks for addressing it.
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series or pull request allowing us to
-drop it.
+Reviewed-by: Chester A. Unal <chester.a.unal@arinc9.com>
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs-6.15.shared.afs
-
-https://git.kernel.org/vfs/vfs/c/acf689e88306
+Chester A.
 
