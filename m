@@ -1,102 +1,119 @@
-Return-Path: <netdev+bounces-171598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52C84A4DC47
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 12:19:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79D8CA4DC57
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 12:21:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 639EB179B44
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 11:17:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C79B71889948
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 11:19:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8982A2036F4;
-	Tue,  4 Mar 2025 11:13:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37E53201019;
+	Tue,  4 Mar 2025 11:16:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D50211FF7B0;
-	Tue,  4 Mar 2025 11:13:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 482961FF1DE
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 11:16:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741086827; cv=none; b=VCfRT8jeaUlqG2TW6tBCyyWR3RYCUm8eDIQsai8KBaBTCRURMCt2imoYi4h7A7TdHJxlx4kkJdoWtzui4bwUu1ORBeB4fK9o3Oxz/1YQPaGTkpvU5rwSXWBvG5eNE4djAOs/pJjFyV8JpVWjjJSaq3VjDTVjs6QQG9jWYoIaM7U=
+	t=1741086998; cv=none; b=o6bTcZZ+UvyI9zpw88aAwpdP4S8ddYNa0X3O58cxJqRh+pzY/6cEefm/llBLAz5Pc9rL0ZNS1PeTSkL4Q7kyzPhiZztSI626UqrR/ZlLuaMrz4ajw/8wGnD1ssBJZG56oyfQ3+JvDPo43MlSqPqUdIzbeduSZTxyu/l2R4VgQrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741086827; c=relaxed/simple;
-	bh=1XrR23gtRCCWnn8HjV8+1EZ/Y4XWuQSeZP4DSP6Nyjs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kapT5Zbf48LDHxp+PNmv7ObuSjOTP+MP4yR9+O+F69nn3iNhJIYCXDnXVT56/pVTqAwXiwq1l3RnP1QcujLDdFeSRuxkIEfhVvKPMTf5B3ANKy0jh3i5UW5Q0oPAtIIswNTX+t9+1Mii+YPNlg35h6D95PyGEQwcb6TcXVTGMOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=fail smtp.mailfrom=gmail.com; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=gmail.com
-X-CSE-ConnectionGUID: /X2zx7coRQ60GdqhuuFsLQ==
-X-CSE-MsgGUID: NVgJkUvlRv2sF66I1jpSFQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="44806818"
-X-IronPort-AV: E=Sophos;i="6.13,331,1732608000"; 
-   d="scan'208";a="44806818"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 03:13:43 -0800
-X-CSE-ConnectionGUID: 8kpm7LFaQ0KZUprkU+NvXA==
-X-CSE-MsgGUID: rcobdrylR/qFJ27MTu/dpQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,331,1732608000"; 
-   d="scan'208";a="119033059"
-Received: from smile.fi.intel.com ([10.237.72.58])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 03:13:39 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andy.shevchenko@gmail.com>)
-	id 1tpQDQ-0000000H6My-19Lz;
-	Tue, 04 Mar 2025 13:13:36 +0200
-Date: Tue, 4 Mar 2025 13:13:36 +0200
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Bartosz Golaszewski <brgl@bgdev.pl>
-Subject: Re: [PATCH net-next v2 3/3] ieee802154: ca8210: Switch to using
- gpiod API
-Message-ID: <Z8bgYFUds3UU96Mo@smile.fi.intel.com>
-References: <20250303164928.1466246-1-andriy.shevchenko@linux.intel.com>
- <20250303164928.1466246-4-andriy.shevchenko@linux.intel.com>
- <CACRpkdbCfhqRGOGrCgP-e3AnK_tmHX+eUpZKjitbfemzAXCcWg@mail.gmail.com>
- <Z8YThNku95-oPPNB@surfacebook.localdomain>
- <CACRpkdbqYoY1vYGii1SyPL1mkULGXYX7vFwu+U9u2w9--EYAsQ@mail.gmail.com>
+	s=arc-20240116; t=1741086998; c=relaxed/simple;
+	bh=SwlsRYrllrlhCOgySq+sgp5w+qo2bhhZUxTpP6TOFqw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DmQrh2GAlxsa0Dxr1CnoD0V3Vsd21p0PF2J3UqEHYag6vszXSTHibnlqAOkAsCGvbmofylzQEpPVh1Dgw7gxvOcDTVVQQvpjF/vNmm7/XcefLynFGpjJ9FUuTgKzE1GJHztEfhiTTa0uvNjZsh4zaV+5zCnB5McGhkGfmvD2sKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 1F3FE61E6478F;
+	Tue, 04 Mar 2025 12:15:58 +0100 (CET)
+Message-ID: <9f6b830f-d2ee-4fde-a131-a956a6e84df7@molgen.mpg.de>
+Date: Tue, 4 Mar 2025 12:15:57 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACRpkdbqYoY1vYGii1SyPL1mkULGXYX7vFwu+U9u2w9--EYAsQ@mail.gmail.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [iwl-net v3 1/5] virtchnl: make proto and
+ filter action count unsigned
+To: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>,
+ Jan Glaza <jan.glaza@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+ Simon Horman <horms@kernel.org>
+References: <20250304110833.95997-2-martyna.szapar-mudlaw@linux.intel.com>
+ <20250304110833.95997-4-martyna.szapar-mudlaw@linux.intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250304110833.95997-4-martyna.szapar-mudlaw@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 04, 2025 at 01:03:41AM +0100, Linus Walleij wrote:
-> On Mon, Mar 3, 2025 at 9:39 PM Andy Shevchenko
-> <andy.shevchenko@gmail.com> wrote:
+Dear Jan, dear Martina,
+
+
+Thank you for the patch.
+
+Am 04.03.25 um 12:08 schrieb Martyna Szapar-Mudlaw:
+> From: Jan Glaza <jan.glaza@intel.com>
 > 
-> > > Maybe add a comment in the code that this is wrong and the
-> > > driver and DTS files should be fixed.
-> >
-> > Or maybe fix in the driver and schema and add a quirk to gpiolib-of.c?
+> The count field in virtchnl_proto_hdrs and virtchnl_filter_action_set
+> should never be negative while still being valid. Changing it from
+> int to u32 ensures proper handling of values in virtchnl messages in
+> driverrs and prevents unintended behavior.
+> In its current signed form, a negative count does not trigger
+> an error in ice driver but instead results in it being treated as 0.
+> This can lead to unexpected outcomes when processing messages.
+> By using u32, any invalid values will correctly trigger -EINVAL,
+> making error detection more robust.
 > 
-> Even better!
+> Fixes: 1f7ea1cd6a374 ("ice: Enable FDIR Configure for AVF")
+> Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Signed-off-by: Jan Glaza <jan.glaza@intel.com>
+> Signed-off-by: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+> ---
+>   include/linux/avf/virtchnl.h | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/linux/avf/virtchnl.h b/include/linux/avf/virtchnl.h
+> index 4811b9a14604..cf0afa60e4a7 100644
+> --- a/include/linux/avf/virtchnl.h
+> +++ b/include/linux/avf/virtchnl.h
+> @@ -1343,7 +1343,7 @@ struct virtchnl_proto_hdrs {
+>   	 * 2 - from the second inner layer
+>   	 * ....
+>   	 **/
+> -	int count; /* the proto layers must < VIRTCHNL_MAX_NUM_PROTO_HDRS */
+> +	u32 count; /* the proto layers must < VIRTCHNL_MAX_NUM_PROTO_HDRS */
 
-I am about to send a v3, I'm going to leave your tag despite a few changes as
-discussed. I hope this is okay with you.
+Why limit the length, and not use unsigned int?
 
--- 
-With Best Regards,
-Andy Shevchenko
+>   	union {
+>   		struct virtchnl_proto_hdr
+>   			proto_hdr[VIRTCHNL_MAX_NUM_PROTO_HDRS];
+> @@ -1395,7 +1395,7 @@ VIRTCHNL_CHECK_STRUCT_LEN(36, virtchnl_filter_action);
+>   
+>   struct virtchnl_filter_action_set {
+>   	/* action number must be less then VIRTCHNL_MAX_NUM_ACTIONS */
+> -	int count;
+> +	u32 count;
+>   	struct virtchnl_filter_action actions[VIRTCHNL_MAX_NUM_ACTIONS];
+>   };
 
 
+Kind regards,
+
+Paul
 
