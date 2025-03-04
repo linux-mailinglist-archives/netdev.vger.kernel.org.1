@@ -1,175 +1,224 @@
-Return-Path: <netdev+bounces-171695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 271E3A4E3DE
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 16:42:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 10FC3A4E3A9
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 16:37:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A94A088767B
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 15:15:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 664AE881CF0
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 15:18:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF8DC27D79C;
-	Tue,  4 Mar 2025 15:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E87AE27933B;
+	Tue,  4 Mar 2025 15:11:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="oOiusnYk"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FtdXr/sb";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="O9OuXOL5";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="FtdXr/sb";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="O9OuXOL5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 035B127E1A4
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 15:08:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A39E24C08B
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 15:11:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741100941; cv=none; b=UGc/Rx6EvTIefNFgGlxJuqV6tp5374qDPxaOzeGzhDOkchQz7ANRG3ZZ/MRqgMOCQ+D7O9pB8uTkGYPJMJsaFYkl6YwQsI3TIuyZYA5TTufJXTz9PSFcSiGnqzqIlLwCLlxWbceN2S6e/2BowMQZSg0Pxjg4fSVeNAsrOoRxj7Q=
+	t=1741101065; cv=none; b=M0kWt8cRt5sxH96/G/O6FQmjgLbuNC2J47D27bpB+kbOVJo4wm80kN0/K6hxi8aYCNNM3hArCMZM2PV+WB8mtU0OipOdLUQdmpwmGK56h9QDNtH6rIcrwVhGlP593JIDUsu1TZvJ5MmXRQhrKSnc4QU61d1ngh+71UoYrafF5oo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741100941; c=relaxed/simple;
-	bh=8PdHR+go0LZyaSvswv9QdAwopu5SDegpWFTZMMMm+JI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UJ55BdPTVD7R+qKctJSUnzxq1h5mxSFmjitFUELEwL+ZgQrGtHzlt3ZXAcx4s9WFuhDVw5nf6lJtef6UkxzGad7kARPNRhWnbK/csSavtg/dX9Fj7kyAvKmwhLKC5cxwyRKpEQf324u90f9Bixlyit7sxAFQ7/CjL0c7CqVF49Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=oOiusnYk; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-47208e35f9cso66579551cf.3
-        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 07:08:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1741100939; x=1741705739; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BAJF5oZvK4kDimU1hi8HyGe8Ni5obiEempBFfdSb2no=;
-        b=oOiusnYkJFatMYLUxEEfu7QYLKGgXcHIeicVtgcE1iF54yQBvdzLx658h06ePrcjee
-         ueonzdyDtbrpkCQncf/aMhXwAS2amZKJQ6S4zcSw35cc8Agz2AkFMzEaIfP6MNHsu7Ct
-         /pw7Zuj85EUvw2UfpQt4ct7rFWQ0aV66XawYc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741100939; x=1741705739;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BAJF5oZvK4kDimU1hi8HyGe8Ni5obiEempBFfdSb2no=;
-        b=nLVSScSLp1xI1WgJ6jqVszuaHH0y6Q4mZe5AunhvIsMaUUxJ++h/lqVqnaNPmLs/vP
-         6VG2hGgihqC7RU8w+LLA9ZuM6HlHrOM0HdDegW+E+ZJajIVwdoFUzmZu+PoNW9PJzJ9t
-         Vff/ENp1imaSwrtOoD90nMJjm4lIbDplOo5S0s5kYDcBQo3U8yCtXkMvw71bj3fWcSFT
-         A6674g/qXpMDJiVEEkMky1hmG6BaMUjivmCHlrDaT9gWQhvpHFb3fJH2V1N+/i87C4Jj
-         cV92zDPgmbyL2f4P3AYcx7j0oTSxGOQB1ao0rWrpPSrYqCBc9dvlI7DzhdR4rHMqzoEv
-         dHeg==
-X-Gm-Message-State: AOJu0YzsbMyzD5ei7/u7oa+48ur11jA2gKBvyXqQNSJbalcI+oixO42F
-	JJl1/QFXDIpakAUlXLsA6MrJM4w39IidYAGig0AkvXuQCTzL38rCm+1YujaJ5NQ=
-X-Gm-Gg: ASbGnct6j9BqARxD77wy4fTVmMlkWWjw1I0g9UNWAgOc8p/CFgcEdTTTvg43wMP00hA
-	EfH2SYZXkzw4NKdZ8VgRg2W/WEKxWBUGz7r4rzhA3QkAIh3+4qVOmkn7ppihnKStRgUaIOhguye
-	djJLQ4i6kQCf7ibpxuqRctx69YMW7JXCST4sMhXcJItoyXD7JGGGH3fTvPg2Tj0sd7PXKloUfIX
-	6zm/9zydTpN27pEsS9V9ZoxSXI1TQ6q37EzJpVfDbJoK0FXiLWbU1dWWNqIgjcqAErAy5AIgK88
-	BOFveTu0siaezCd6sE0GM5yrZ/qP0BBR7o8m6YURL97Uo9YnlfWZdQ8/VxrmqiCuN7ufi/d/JrV
-	sB/+QVd8=
-X-Google-Smtp-Source: AGHT+IFN7StRwj2Ft1J/Us75lrKPTPd2o+N24d4I6qj5+wKxsZNxpj1S/cF2hLsjZ4/ip/QBD/Wuaw==
-X-Received: by 2002:ac8:5a49:0:b0:471:bcb7:7897 with SMTP id d75a77b69052e-474bc066ee2mr231531011cf.1.1741100938725;
-        Tue, 04 Mar 2025 07:08:58 -0800 (PST)
-Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-474721bf582sm74153761cf.37.2025.03.04.07.08.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Mar 2025 07:08:58 -0800 (PST)
-Date: Tue, 4 Mar 2025 10:08:55 -0500
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca,
-	gerhard@engleder-embedded.com, jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com, mst@redhat.com, leiyang@redhat.com,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v5 3/4] virtio-net: Map NAPIs to queues
-Message-ID: <Z8cXh43GJq2lolxE@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	mkarsten@uwaterloo.ca, gerhard@engleder-embedded.com,
-	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, mst@redhat.com,
-	leiyang@redhat.com,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20250227185017.206785-1-jdamato@fastly.com>
- <20250227185017.206785-4-jdamato@fastly.com>
- <20250228182759.74de5bec@kernel.org>
- <Z8Xc0muOV8jtHBkX@LQ3V64L9R2>
- <Z8XgGrToAD7Bak-I@LQ3V64L9R2>
- <Z8X15hxz8t-vXpPU@LQ3V64L9R2>
- <20250303160355.5f8d82d8@kernel.org>
+	s=arc-20240116; t=1741101065; c=relaxed/simple;
+	bh=Hs3V4ubHAzDfljGxE34608dwdKKF1J7BMBFRN7k5x9k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cXd+wWdIeXTg5NHlMSrel3rH+YSRljGNImo8yr6AhyXuWtVeh7OKcBArCfCQGi5dVRHOY6whHfZaJXYjrOf7CzDON6ciCNVN7O7+M6VSGc+lVeVUlDXk8rTz2uMKXsvE5rn3tW9qWmCG5OHVfiMkydeyU9bIhoqBYhntQlscalo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FtdXr/sb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=O9OuXOL5; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=FtdXr/sb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=O9OuXOL5; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 46F5C1F745;
+	Tue,  4 Mar 2025 15:11:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1741101062; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cX6k9psTnQCcVskkQ80w3Ui6nPJZVH+Jx2TP5xA1oDo=;
+	b=FtdXr/sbgTevIT7kLTiK2NqosX3i1oi7WsvBkLuBm9F4T0zoBRDP1oaV8SQQYN8ocOD0MJ
+	FA5Dpuzm2GR0/ZCpoOfivGWieCOmC3FDj6ZXSx6s2SBLzlHvPdB5WcA2s4m5jD0qAfwrA6
+	dCLLgQ0DAlPOuhAH1fx/RpnEP9cRWUg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1741101062;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cX6k9psTnQCcVskkQ80w3Ui6nPJZVH+Jx2TP5xA1oDo=;
+	b=O9OuXOL506gxbwAPJXlyJuzp3cqCXrhd2a580OA85f0RTsUnzcmJXek/pOnMGjpsQfz8Ha
+	0OJ9qlGJh6wOnQAA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1741101062; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cX6k9psTnQCcVskkQ80w3Ui6nPJZVH+Jx2TP5xA1oDo=;
+	b=FtdXr/sbgTevIT7kLTiK2NqosX3i1oi7WsvBkLuBm9F4T0zoBRDP1oaV8SQQYN8ocOD0MJ
+	FA5Dpuzm2GR0/ZCpoOfivGWieCOmC3FDj6ZXSx6s2SBLzlHvPdB5WcA2s4m5jD0qAfwrA6
+	dCLLgQ0DAlPOuhAH1fx/RpnEP9cRWUg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1741101062;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cX6k9psTnQCcVskkQ80w3Ui6nPJZVH+Jx2TP5xA1oDo=;
+	b=O9OuXOL506gxbwAPJXlyJuzp3cqCXrhd2a580OA85f0RTsUnzcmJXek/pOnMGjpsQfz8Ha
+	0OJ9qlGJh6wOnQAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 269B313967;
+	Tue,  4 Mar 2025 15:11:02 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id T8QBCQYYx2c8PwAAD6G6ig
+	(envelope-from <hare@suse.de>); Tue, 04 Mar 2025 15:11:02 +0000
+Message-ID: <24870f73-97f9-496d-a1ca-787b54c222e4@suse.de>
+Date: Tue, 4 Mar 2025 16:11:01 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250303160355.5f8d82d8@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: Kernel oops with 6.14 when enabling TLS
+To: Vlastimil Babka <vbabka@suse.cz>, Hannes Reinecke <hare@suse.com>,
+ Matthew Wilcox <willy@infradead.org>, Boris Pismenny <borisp@nvidia.com>,
+ John Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Sagi Grimberg <sagi@grimberg.me>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ linux-mm@kvack.org, Harry Yoo <harry.yoo@oracle.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <08c29e4b-2f71-4b6d-8046-27e407214d8c@suse.com>
+ <509dd4d3-85e9-40b2-a967-8c937909a1bf@suse.com>
+ <Z8W8OtJYFzr9OQac@casper.infradead.org>
+ <Z8W_1l7lCFqMiwXV@casper.infradead.org>
+ <15be2446-f096-45b9-aaf3-b371a694049d@suse.com>
+ <Z8XPYNw4BSAWPAWT@casper.infradead.org>
+ <edf65d4e-90f0-4b12-b04f-35e97974a36f@suse.cz>
+ <95b0b93b-3b27-4482-8965-01963cc8beb8@suse.cz>
+ <fcfa11c6-2738-4a2e-baa8-09fa8f79cbf3@suse.de>
+ <a466b577-6156-4501-9756-1e9960aa4891@suse.cz>
+ <6877dfb1-9f44-4023-bb6d-e7530d03e33c@suse.com>
+ <db1a4681-1882-4e0a-b96f-a793e8fffb56@suse.cz>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <db1a4681-1882-4e0a-b96f-a793e8fffb56@suse.cz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TAGGED_RCPT(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	FREEMAIL_TO(0.00)[suse.cz,suse.com,infradead.org,nvidia.com,gmail.com,kernel.org];
+	MID_RHS_MATCH_FROM(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:mid]
+X-Spam-Score: -2.80
+X-Spam-Flag: NO
 
-On Mon, Mar 03, 2025 at 04:03:55PM -0800, Jakub Kicinski wrote:
-> On Mon, 3 Mar 2025 13:33:10 -0500 Joe Damato wrote:
-> > > > @@ -2880,6 +2880,13 @@ static void refill_work(struct work_struct *work)
-> > > >         bool still_empty;
-> > > >         int i;
-> > > > 
-> > > > +       spin_lock(&vi->refill_lock);
-> > > > +       if (!vi->refill_enabled) {
-> > > > +               spin_unlock(&vi->refill_lock);
-> > > > +               return;
-> > > > +       }
-> > > > +       spin_unlock(&vi->refill_lock);
-> > > > +
-> > > >         for (i = 0; i < vi->curr_queue_pairs; i++) {
-> > > >                 struct receive_queue *rq = &vi->rq[i];
-> > > >  
-> > > 
-> > > Err, I suppose this also doesn't work because:
-> > > 
-> > > CPU0                       CPU1
-> > > rtnl_lock                  (before CPU0 calls disable_delayed_refill) 
-> > >   virtnet_close            refill_work
-> > >                              rtnl_lock()
-> > >   cancel_sync <= deadlock
-> > > 
-> > > Need to give this a bit more thought.  
-> > 
-> > How about we don't use the API at all from refill_work?
-> > 
-> > Patch 4 adds consistent NAPI config state and refill_work isn't a
-> > queue resize maybe we don't need to call the netif_queue_set_napi at
-> > all since the NAPI IDs are persisted in the NAPI config state and
-> > refill_work shouldn't change that?
-> > 
-> > In which case, we could go back to what refill_work was doing
-> > before and avoid the problem entirely.
-> > 
-> > What do you think ?
-> 
-> Should work, I think. Tho, I suspect someone will want to add queue API
-> support to virtio sooner or later, and they will run into the same
-> problem with the netdev instance lock, as all of ndo_close() will then
-> be covered with netdev->lock.
-> 
-> More thorough and idiomatic way to solve the problem would be to cancel
-> the work non-sync in ndo_close, add cancel with _sync after netdev is
-> unregistered (in virtnet_remove()) when the lock is no longer held, then
-> wrap the entire work with a relevant lock and check if netif_running()
-> to return early in case of a race.
+On 3/4/25 11:26, Vlastimil Babka wrote:
+> On 3/4/25 11:20, Hannes Reinecke wrote:
 
-Thanks for the guidance. I am happy to make an attempt at
-implementing this in a future, separate series that follows this
-one (probably after netdev conf in a few weeks :).
+[ .. ]
+>> So I'd be happy with an 'easy' fix for now. Obviously :-)
+>>
 
-> Middle ground would be to do what you suggested above and just leave 
-> a well worded comment somewhere that will show up in diffs adding queue
-> API support?
+With this patch:
 
-Jason, Michael, et. al.:  what do you think ? I don't want to spin
-up a v6 if you are opposed to proceeding this way. Please let me
-know.
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index 65f550cb5081..b035a9928cdd 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -1190,8 +1190,14 @@ static ssize_t __iov_iter_get_pages_alloc(struct 
+iov_iter *i,
+                 if (!n)
+                         return -ENOMEM;
+                 p = *pages;
+-               for (int k = 0; k < n; k++)
+-                       get_page(p[k] = page + k);
++               for (int k = 0; k < n; k++) {
++                       if (!get_page_unless_zero(p[k] = page + k)) {
++                               pr_warn("%s: frozen page %d of %d\n",
++                                       __func__, k, n);
++                               return -ENOMEM;
++                       }
++               }
++
+                 maxsize = min_t(size_t, maxsize, n * PAGE_SIZE - *start);
+                 i->count -= maxsize;
+                 i->iov_offset += maxsize;
+
+
+the system doesn't crash anymore:
+[   51.520949] __iov_iter_get_pages_alloc: frozen page 0 of 1
+[   51.536393] nvme nvme0: creating 4 I/O queues.
+[   51.968897] nvme nvme0: mapped 4/0/0 default/read/poll queues.
+[   51.972207] __iov_iter_get_pages_alloc: frozen page 0 of 1
+[   51.974528] __iov_iter_get_pages_alloc: frozen page 0 of 1
+[   51.976928] __iov_iter_get_pages_alloc: frozen page 0 of 1
+[   51.978980] __iov_iter_get_pages_alloc: frozen page 0 of 1
+[   51.981236] nvme nvme0: new ctrl: NQN "nqn.blktests-subsystem-1", 
+addr 10.161.9.19:4420, hostnqn: 
+nqn.2014-08.org.nvmexpress:uuid:027a49dc-b554-40e5-b0f9-0a9ea03ec30c
+
+and the allocation in question is coming from
+drivers/nvme/host/fabrics.c:nvmf_connect_data_prep(), which
+coincidentally _is_ a kmalloc()ed buffer.
+
+But TLS doesn't work, either:
+
+[   58.886754] nvme nvme0: I/O tag 1 (3001) type 4 opcode 0x18 (Keep 
+Alive) QID 0 timeout
+[   58.889112] nvme nvme0: starting error recovery
+[   58.892176] nvme nvme0: failed nvme_keep_alive_end_io error=10
+[   58.892282] nvme nvme0: reading non-mdts-limits failed: -4
+[   58.902490] nvme nvme0: Reconnecting in 10 seconds...
+
+(probably not surprising seeing that an error is returned ..)
+
+So yeah, looks like TLS has issues with kmalloced data.
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
