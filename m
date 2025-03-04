@@ -1,134 +1,109 @@
-Return-Path: <netdev+bounces-171475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2E23A4D13B
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 02:51:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26F4BA4D13E
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 02:53:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A0FC16F5F4
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 01:51:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9677C3AD1CD
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 01:53:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 835E242A9E;
-	Tue,  4 Mar 2025 01:50:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3513713AA3E;
+	Tue,  4 Mar 2025 01:53:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="qHoI4P66"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 211AE13AC1;
-	Tue,  4 Mar 2025 01:50:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4094E13AC1
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 01:53:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741053054; cv=none; b=lfAOxIz4jc7lUr82u8X9m3T/OhnKTxlGxduM1QbY7pWI82pOLiwdxRZwuVTeqIJOaXE1NUM0Nn3h0hUyAHnLlyUrOMkhSBrHCjUa3VR3f5fWShbQ9yQYGySQJJvzWFbkkOun4WKONFeu99gLSonrCSXJxuzKKHg6vwa6KVSpGyc=
+	t=1741053194; cv=none; b=HYeGTi3lzdII7Vv0NYtCBYrWbgLZAgJj+SJMzBJcw2WoNrm7Onj0/fiea2L+ERN62ELqPFOkGbwsxospYBUJjvlU+GWk5yEp5hIU54BON361LweltImb2hGKLdXLwmAM0jR3Q/oNakqfYO43aFAcn9fziWu7viFrd/xdxEAyEaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741053054; c=relaxed/simple;
-	bh=foHluOjMO2S5JSWS7MTJ5i+yZjFTAJmbmE7OaK0J38g=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ENno0Kx5Yjw2gYXy02y1iLbvo/rp3kzrRxJS2Hl+V3nLZI7IvZo9Mc2VrXobwUq9grMAx44GYHCebbJFJQRbGcjbzesakWk9Cye73xLiLuTX+HwMIyC28WbGUbQI0OuKdMVIpeKvofqrrUgxaEJPWZTR3iMv/P7/8XMiZCZLybQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Z6JV139QZz6M4RK;
-	Tue,  4 Mar 2025 09:47:53 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 7CFB01402C7;
-	Tue,  4 Mar 2025 09:50:48 +0800 (CST)
-Received: from localhost (10.96.237.92) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 4 Mar
- 2025 02:50:42 +0100
-Date: Tue, 4 Mar 2025 09:50:36 +0800
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-CC: Dave Jiang <dave.jiang@intel.com>, Shannon Nelson
-	<shannon.nelson@amd.com>, <andrew.gospodarek@broadcom.com>,
-	<aron.silverton@oracle.com>, <dan.j.williams@intel.com>,
-	<daniel.vetter@ffwll.ch>, <dsahern@kernel.org>, <gregkh@linuxfoundation.org>,
-	<hch@infradead.org>, <itayavr@nvidia.com>, <jiri@nvidia.com>,
-	<kuba@kernel.org>, <lbloch@nvidia.com>, <leonro@nvidia.com>,
-	<linux-cxl@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <saeedm@nvidia.com>, <brett.creeley@amd.com>
-Subject: Re: [PATCH v2 4/6] pds_fwctl: initial driver framework
-Message-ID: <20250304095036.00000edf@huawei.com>
-In-Reply-To: <20250303172953.GC133783@nvidia.com>
-References: <20250301013554.49511-1-shannon.nelson@amd.com>
-	<20250301013554.49511-5-shannon.nelson@amd.com>
-	<01e4b8ad-82dd-43ac-92b9-3b3a030f86bc@intel.com>
-	<20250303172953.GC133783@nvidia.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1741053194; c=relaxed/simple;
+	bh=/ZguSDY3nlHQc3sfkxqyJohvWfUs1zsj8ApDONhyQig=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DwkD7i2DHnqSvKLbtr55HgYLuVmYNApGgATDQwxktfKTdiFCJcYLX2SNKOxnsJ51LGGYkl0a1HuX9kCl7FrB9fwSKOODcjkvGyY0DKx+o2WrRGJbawRPV6KId3HYk/lk1Ci2cZteUoIDmU0rQk701TYkQtJnQ1t+U4BwcTONnvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=qHoI4P66; arc=none smtp.client-ip=202.36.163.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
+Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 94E672C09DD;
+	Tue,  4 Mar 2025 14:53:02 +1300 (NZDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
+	s=mail181024; t=1741053182;
+	bh=9cVdqmAxnsQrsbWJCU2FebU0qpancQ5/MUf6RxqYKME=;
+	h=From:To:Cc:Subject:Date:From;
+	b=qHoI4P66Z88aeUL5NkPgJDeYObGy35oRS5udDiOQY0s1ut8rA+/96rwnQuG+EiYd9
+	 ySavj6+emKOQXt6Q/p4Xjo6vCsu85dY4q3D6CePeKR3wwghCeN3Y04/Je5hAwzU6M8
+	 F9bdBa5X6qTPadSveU2BggJg7spFuWgjtdKCKcUaoGdii0ACRAjoQDQqGOG14TCoLl
+	 6/oRnxKBCVGkldBvI/1fzuU3pwlj4kdukVXl54FkZVsnvdVeSBG4kAMAYN3PVTXtL/
+	 85Mm4HE4EEccNorm3DXjyZVt1VK92+nK7J/f439cSLZL+eDXnP3lG5F1u+wnwibAZa
+	 7w+ushQob2u5Q==
+Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
+	id <B67c65cfe0000>; Tue, 04 Mar 2025 14:53:02 +1300
+Received: from chrisp-dl.ws.atlnz.lc (chrisp-dl.ws.atlnz.lc [10.33.22.30])
+	by pat.atlnz.lc (Postfix) with ESMTP id 691E013EE4B;
+	Tue,  4 Mar 2025 14:53:02 +1300 (NZDT)
+Received: by chrisp-dl.ws.atlnz.lc (Postfix, from userid 1030)
+	id 68E002803F8; Tue,  4 Mar 2025 14:53:02 +1300 (NZDT)
+From: Chris Packham <chris.packham@alliedtelesis.co.nz>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	sander@svanheule.net,
+	markus.stockhausen@gmx.de
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Chris Packham <chris.packham@alliedtelesis.co.nz>
+Subject: [RESEND PATCH net-next v8 0/1] RTL9300 MDIO driver
+Date: Tue,  4 Mar 2025 14:52:57 +1300
+Message-ID: <20250304015258.386485-1-chris.packham@alliedtelesis.co.nz>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100009.china.huawei.com (7.191.174.83) To
- frapeml500008.china.huawei.com (7.182.85.71)
+Content-Transfer-Encoding: quoted-printable
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=ccpxrWDM c=1 sm=1 tr=0 ts=67c65cfe a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=Vs1iUdzkB0EA:10 a=H2aqgZpJBgBZoEMRn60A:9 a=3ZKOabzyN94A:10 a=zZCYzV9kfG8A:10
+X-SEG-SpamProfiler-Score: 0
+x-atlnz-ls: pat
 
-On Mon, 3 Mar 2025 13:29:53 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+This series adds a driver for the MDIO controller on the RTL9300 family
+of devices. The controller is a little unique in that we can't access the=
+ SMI
+interfaces directly. This means we need to use the hardware description f=
+rom
+the DTS to compute a mapping of switch port to mdio bus/address.
 
-> On Mon, Mar 03, 2025 at 09:45:52AM -0700, Dave Jiang wrote:
-> > > +static int pdsfc_probe(struct auxiliary_device *adev,
-> > > +		       const struct auxiliary_device_id *id)
-> > > +{
-> > > +	struct pds_auxiliary_dev *padev =
-> > > +			container_of(adev, struct pds_auxiliary_dev, aux_dev);
-> > > +	struct pdsfc_dev *pdsfc __free(pdsfc_dev) =
-> > > +			fwctl_alloc_device(&padev->vf_pdev->dev, &pdsfc_ops,
-> > > +					   struct pdsfc_dev, fwctl);
-> > > +	struct device *dev = &adev->dev;
-> > > +	int err;
-> > > +  
-> > 
-> > It's ok to move the pdsfc declaration inline right before this check
-> > below. That would help prevent any accidental usages of pdsfc before
-> > the check. This is an exception to the coding style guidelines with
-> > the introduction of cleanup mechanisms.  
-> 
-> Yeah.. I'm starting to feel negative about cleanup.h - there are too
-> many special style notes that seem to only be known by hearsay :\
+The dt-bindings have been applied to net-next.
 
-I think this one is more about the classic risk of undefined
-behavior meaning the compiler removes the check.  So if we had a
-bob = pdsfc->fred;
+I've dropped the linux-mips patches at Jakub's request so this can go int=
+o
+net-next indpendently.
 
-but didn't use bob before the check on pdsfc != NULL then
-the compiler is allowed to remove the check on pdsfc existing
-as the dereferencce can be assume to mean pdsfc is always
-!= NULL.
+Chris Packham (1):
+  net: mdio: Add RTL9300 MDIO driver
 
-So not really a cleanup.h related issue at all (and not in my
-view suitable for adding to the nice help Dan put in that file).
+ drivers/net/mdio/Kconfig                |   7 +
+ drivers/net/mdio/Makefile               |   1 +
+ drivers/net/mdio/mdio-realtek-rtl9300.c | 475 ++++++++++++++++++++++++
+ 4 files changed, 516 insertions(+)
+ create mode 100644 drivers/net/mdio/mdio-realtek-rtl9300.c
 
-Doesn't matter too much though.  Personally I'm kind of content
-now with cleanup.h usage but it was a bit of time to teach
-myself the new way of thinking about things.
-
-Jonathan
-
-
-> 
-> > > +static void pdsfc_remove(struct auxiliary_device *adev)
-> > > +{
-> > > +	struct pdsfc_dev *pdsfc __free(pdsfc_dev) = auxiliary_get_drvdata(adev);
-> > > +
-> > > +	fwctl_unregister(&pdsfc->fwctl);  
-> > 
-> > Missing fwctl_put(). See fwctl_unregister() header comments. Caller
-> > must still call fwctl_put() to free the fwctl after calling
-> > fwctl_unregister().  
-> 
-> The code is correct, the put is hidden in the __free
-> 
-> However I think we decided not to use __free in this context and open
-> code the put as a style choice
-> 
-> Thanks,
-> Jason
+--=20
+2.48.1
 
 
