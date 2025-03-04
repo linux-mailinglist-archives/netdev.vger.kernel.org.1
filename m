@@ -1,251 +1,321 @@
-Return-Path: <netdev+bounces-171678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3B9FA4E23B
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 16:05:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 715C4A4E235
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 16:04:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAA56883E9A
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 14:46:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 337EC3ACBC5
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 14:47:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D073253F2A;
-	Tue,  4 Mar 2025 14:46:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F6B7260374;
+	Tue,  4 Mar 2025 14:47:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ngACkfLc"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="HuKM1jww"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2067.outbound.protection.outlook.com [40.107.220.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D7462376E4;
-	Tue,  4 Mar 2025 14:46:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 967C626A0DE;
+	Tue,  4 Mar 2025 14:46:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.67
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741099581; cv=fail; b=l5njJT41h8G9xG80U5Lqmuz3ZHLe9GZUNqNx/1UC8gEL8cWeI4wA9S9Ipkzmn61+o6/2bRgNGVPDL4zdNfO90BCZHbXzmdMYO9R9ZtiowzTGTuzocshclMVX6tx3pZZLm9kbLC+2zvMhvkqQxgFZmInHGQTKtWQgi2RE5cwooVQ=
+	t=1741099621; cv=fail; b=S0fwZ5JYJ2Tc1Hv6voBF4lGmFQ0OELV9PiIZDNvtQPqwfqRA1frOaSUHF5hQmqCSKORjOSFsECPC/hGXSSvk2FsQD0AiHKmFaN4L9sMtvzq65ChN/bUjPG0EYTAfeuKzL5/sTh0I9j5gNHEzJN1MTQdFPuwHkx2iZONFpqDdGDI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741099581; c=relaxed/simple;
-	bh=zf2zkjPMafePLOsy3+xVmDqQaOgrKrtxU5iRonzIXRk=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=dStrutDpi8RH9Nx1X9iejjbT2HieyIGG3WaZhB24FLSRfdpljNudJO+cWSzFsKUJZCB5y0jAwKGfff4jwoNN5Gr1jDqHJS82jTa23yrzO2AWKhiKL9rdYpKO3P909F8hdfKODDTjcpno6dW2LHvitZCptaIg0+fDoI80yVxmN9g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ngACkfLc; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741099580; x=1772635580;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=zf2zkjPMafePLOsy3+xVmDqQaOgrKrtxU5iRonzIXRk=;
-  b=ngACkfLcLNGy41xf+Ls0bcUsmd95VBEbd5IynyYf05KChNnKPCNtpPGe
-   lGjvSDea0o1YlFMEfDSwdfHL9fiFyeILKbITb4Mv38wByDDOp8dL6JAoJ
-   TsHWRsAirrhjedB1D1lh5Bm2ubZSC0RQYEQX0D9uBTROLgF+35U6fH9dE
-   yaPkIbLpPU7aFiItRWe3nFT4hEvQ5kIUHOVlE0nmfTWDcjkSg9BozZZz+
-   f+H/308Cg2AGj6qCbGvzphFCOdPefMAvMo6kw2o3gT3nOzz4VQBTK2Lq9
-   Re+VV6OTTMt2xspFce0mG/ATcEvMZKB+QT9HjP9k1O9QtLoeBcMkajBfy
-   Q==;
-X-CSE-ConnectionGUID: a/d6lFgqSFG3FRYbYB39/w==
-X-CSE-MsgGUID: C++jY/aMRK67yylT/oFaiw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="53414148"
-X-IronPort-AV: E=Sophos;i="6.14,220,1736841600"; 
-   d="scan'208";a="53414148"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 06:46:19 -0800
-X-CSE-ConnectionGUID: /mOqnWiOTSO4HB0dmBKrcg==
-X-CSE-MsgGUID: berR0WHrToKp96mP1GHoeQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,220,1736841600"; 
-   d="scan'208";a="119073515"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Mar 2025 06:46:18 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Tue, 4 Mar 2025 06:46:17 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Tue, 4 Mar 2025 06:46:17 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.44) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Tue, 4 Mar 2025 06:46:17 -0800
+	s=arc-20240116; t=1741099621; c=relaxed/simple;
+	bh=tfGWtadPK8LMvP+WRH55EPqWutKekk91WqJRI4aZBU8=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uMSmSX2xc41WqGbRZHKdRT3FCmkaSb3odkUvQ4UyEAx3iW+yZrtld8gf2CuiclzgqUNuBnt89itO1UB4XIMv1ntbEq5GNFBrjPaE/ehLnNusLoeb4572oBCNyZkyTBH6lGknrXukurH9xrdJw0R4CUahUWU6s652Adikp6JfJnE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=HuKM1jww; arc=fail smtp.client-ip=40.107.220.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rUqKVtSBkanb6Je+ANP6DNOJYOelQS/WlZlndDc5yDrhZMv8521j7QkQNu1B8oOOEw3JUmPcDyR8WzU66jcI1YVi0t5hg0RLQeYvxeO8DrSBfANNfDikvaFLIcL+nXi8A7kg3PZ0ZWnQDcj/SomMjQrEA8v4nETSu51X2iEbUG1n2j9gfN9UY5pime0bFEYAV6P0NxKPXBpqugxwd802gPeaY05zlGG3nr0ivtZKSBRY/6iemRhl6j5dXmmDyObf9pPKO6GOBrrIEJ70xYs/aZwjVoA+9PAgtxCkF8wBK1MCWMv+R/nZuY7s1H4MWzwAEB/zPQKGj1Y+oEFl5AArkA==
+ b=SOqRmG1NLD7Drfvkxxrmr0HX8D3RDZmopJe9Bwug3L3qP5IMUUB4U3Xy5bVDsxs1qsskAfV+iCKJe2CcBGw9NTIjbaX/ABUvnONyhjjWyY5p4KVJtOoiDVyGrGfNmLCbDgVoPq/UOM4m6lBVfUOMSpbW0nUJ5Skh3E5wtkehN9G/XWv4pCqYtDPmQzoGE5WD3DibP+6Akn5q8GthwnHfRcOS7hzjWR6XRjG1fZOZQwnaqEB6hc4cLemN1jMCsPWU1aeF9iVAiV9X9dcOK9JmK7JpIncvPonQjdr/MEAqZ74ij1TXYWrfvk6CV9He+FXNutHSS8iu872CYtjl+3qvJQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0fT4C3iOSYykc4ga9NUgo1nH2Eme3JaGDXpMJKH4G3s=;
- b=jJAcwolnNeCCX4d07oI3iU0bq9vuu6b0l6YQ0SCks17pQPKo6WYBNmMOw5pKOYgo0oVJb9P2ELhdXsqPZFVm27Sorbi++2nogNjO1OH0qGB56NwF5jkDgD9jDND4EXr7SLahX8oXchx2Le0lVfw83d/0Mv75E8S6HYCX/n7BnR6m5IGp9Mq7gk3LY6fMaDkDUnsUcGxAMHKHQkBgFk+Wabm6DKNW74SW9aSxKE0Jtn4qMyQOmqhu6ZhvoPm2zF5XGt9b4IMdz3wx97k9UgaKVjuqLbQJgDBkSgCYGFAgVzieHu1Ng8/ugGgqGWxz/hRDRHZ4Q3xyenJzx9Px7I+58Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7420.namprd11.prod.outlook.com (2603:10b6:806:328::20)
- by PH7PR11MB7449.namprd11.prod.outlook.com (2603:10b6:510:27a::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.16; Tue, 4 Mar
- 2025 14:46:14 +0000
-Received: from SN7PR11MB7420.namprd11.prod.outlook.com
- ([fe80::b8ba:be35:3903:118f]) by SN7PR11MB7420.namprd11.prod.outlook.com
- ([fe80::b8ba:be35:3903:118f%5]) with mapi id 15.20.8489.028; Tue, 4 Mar 2025
- 14:46:14 +0000
-Message-ID: <ea04dcab-e399-4c96-a5cd-db921a1bbb42@intel.com>
-Date: Tue, 4 Mar 2025 07:46:06 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next] net: Silence use after free static checker
- warning
-To: Dan Carpenter <dan.carpenter@linaro.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Kuniyuki Iwashima
-	<kuniyu@amazon.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kernel-janitors@vger.kernel.org>
-References: <Z8alMHz89jH3uPJ9@stanley.mountain>
-Content-Language: en-US
-From: Ahmed Zaki <ahmed.zaki@intel.com>
-In-Reply-To: <Z8alMHz89jH3uPJ9@stanley.mountain>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4P220CA0028.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:303:115::33) To SN7PR11MB7420.namprd11.prod.outlook.com
- (2603:10b6:806:328::20)
+ bh=Y7vCV7+OsUltXOkyJyEX4OaAL2krjryTS02ZFkLTxZE=;
+ b=VwssP2uojk/BisnLav5M/x88Hp9ybXgOvUMB5lKdlsWODjSkIah985VnLprJu6sGq2Np7iJcNgkRJCc2Tpgr4XvI/aQXDdGd4tAdjodaaRyoV1iewDB18w2WNI51N5DIkIEFFQ3I8J0AIeDSX5Eq4FNjVWBx9CFwucMkrjDOjB4g0TdBXJHNLYoulT0eKcee84ltpvtumeS3+3bXhahJjj1KKgjrN3nKyIttQiy7WK97xRXd/A5S7+Mz+bykiIK+jtyLerGyP8qzvWelOVI6TTgcBXgoB5Y27+vKKkuZUx1wI2k0Rx/eYBiB5BZFvSWR1hHUC+JZ/vlyYNLJoiuEEw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Y7vCV7+OsUltXOkyJyEX4OaAL2krjryTS02ZFkLTxZE=;
+ b=HuKM1jwwu+i0F4p0xPRMZVrBNwDUr+RkgnK87sQEqplkVMbfNHAH6j46cSJtY8+j9tGfnhGh+/WmwU67YrpSpiupngx5qTqid4SiqnO7a4IfVmKWBVsvrT0UUJxyY1FRdzgzzB3yqKaf4MJRqc5/4WFaVWEvSe2GuXDwE88wGLN5Bwgz7k54qwsO0KsVa7JDNlO7iuBhvxJuwp5O5MMpc+xIw8N5xiG7jvRVydtFgkd0zxOgp5ZGhlhlymrQHmKpbS9POxoxtULXjb2xFlF+ixDBGeaf8NDMxciW/ZotdvezHqUgUJAE/oHm6SZPaasQquQ4sYqg5h/UftIqcTh/+Q==
+Received: from DM6PR06CA0076.namprd06.prod.outlook.com (2603:10b6:5:336::9) by
+ BL3PR12MB6619.namprd12.prod.outlook.com (2603:10b6:208:38e::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8511.17; Tue, 4 Mar 2025 14:46:52 +0000
+Received: from DS2PEPF00003448.namprd04.prod.outlook.com
+ (2603:10b6:5:336:cafe::5c) by DM6PR06CA0076.outlook.office365.com
+ (2603:10b6:5:336::9) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8511.16 via Frontend Transport; Tue,
+ 4 Mar 2025 14:46:52 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ DS2PEPF00003448.mail.protection.outlook.com (10.167.17.75) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8511.15 via Frontend Transport; Tue, 4 Mar 2025 14:46:51 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 4 Mar 2025
+ 06:46:43 -0800
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Tue, 4 Mar 2025 06:46:42 -0800
+Received: from vdi.nvidia.com (10.127.8.11) by mail.nvidia.com
+ (10.126.190.181) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
+ Transport; Tue, 4 Mar 2025 06:46:40 -0800
+From: Patrisious Haddad <phaddad@nvidia.com>
+To: <leon@kernel.org>, <dsahern@gmail.com>, <stephen@networkplumber.org>
+CC: Patrisious Haddad <phaddad@nvidia.com>, <netdev@vger.kernel.org>,
+	<jgg@nvidia.com>, <linux-rdma@vger.kernel.org>, Mark Bloch
+	<mbloch@nvidia.com>
+Subject: [RFC iproute2-next 2/2] rdma: Add optional-counter option to rdma stat bind commands
+Date: Tue, 4 Mar 2025 16:46:16 +0200
+Message-ID: <20250304144621.207187-3-phaddad@nvidia.com>
+X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20250304144621.207187-1-phaddad@nvidia.com>
+References: <20250304144621.207187-1-phaddad@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7420:EE_|PH7PR11MB7449:EE_
-X-MS-Office365-Filtering-Correlation-Id: e034b915-1de8-466b-d678-08dd5b2b502c
+X-MS-TrafficTypeDiagnostic: DS2PEPF00003448:EE_|BL3PR12MB6619:EE_
+X-MS-Office365-Filtering-Correlation-Id: e2e6b603-17e4-40a3-8c49-08dd5b2b6699
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?dy8xV0xBbHBWK3phZ0FJUUJQYVFxcjNPMXNpTnV3U2ZIM0JvbW41eHBsUmhw?=
- =?utf-8?B?ektMajhsNEJNVFdZazRhaFBOSW00MHM1QkZBY0xyNGlsSzFVQ1VrUmhjUFRM?=
- =?utf-8?B?WSt5WnpSOExJa1dkNFFtWVR2eUUwZFFUY25RYkMzZElZcmpyVFdyZmx3UXFH?=
- =?utf-8?B?dkoyVmNzbkRoM3JoV0tDc21LVm9oZjEranBkL3RJTGdzSlZPN0V3dHhyQjlC?=
- =?utf-8?B?U2FjdkhsN0tjaFcyVzVnTUh4akk4akJIWC9VTVZoT3FGdVllVHFrcllGa2xC?=
- =?utf-8?B?V0VYenhncTVkSklQVS9XTGZFU2cvR0lhQTh1S21MaHlEMmJVUnFQaUp4Wktv?=
- =?utf-8?B?SEtxak1tVG1PUFV3NXZUVFBZVElaSkoxTlVESUxUM2o0TG91VFh2RUhUWFF2?=
- =?utf-8?B?U0J1KzE4MlJaSW0vNEU0MkJrRW5Yc2s2K2FNK3hGYytYZUF1aUZqMTNOeTZK?=
- =?utf-8?B?MFJLVzYzTjhPa3lHUkJ2Z3pGVmhUUEZwUTlmeUJrMlBUbWcyS2p1Z2VpdzNT?=
- =?utf-8?B?a3ZHaFlMQ0wxYUtwMkk5R1BLY1M1NmQ4NzlUeVIrRHBqVG1uSThPZ2MzcFBL?=
- =?utf-8?B?MFhwRGZSYmNsWGdZUXdycmE1V3FHQ0cyZnBpVlIvQTVjckREdTdhMkF5dGJ4?=
- =?utf-8?B?V1d6Rlg1clZQTFpWOGpzWVB0QzBuMkVwVGtUQVB5bTBGcUNvM2Q0cktnMElr?=
- =?utf-8?B?TWd6c3RtVDRrMWlHaFFIREduS0dCNktRSWwySXlsWlFjSTFnOW1hTGFaR0oy?=
- =?utf-8?B?ajEvaGJzQmpHNnZ5UllxT2V1azFnWE0xeXBkd2JlNHFSejFHeDk4TjZSSXh1?=
- =?utf-8?B?aGdEQXBxVEtMSXhaWU5TYWZsNHJYWXFYdkxHYWFVNi8vcVlhU2VNMnBmZENM?=
- =?utf-8?B?ZExDam9BRGdKdkJXZHNHNnBadlBiRHRad3RvOVBBTmpoZnFoZjltc2FZYUc1?=
- =?utf-8?B?elhaUWM1Wlk1Wkl3dysxaFZZWFI2L3ZxTTAxSXlYbjFTNWdRaXNHU3VDTnVq?=
- =?utf-8?B?MDFoanNWTCtUMDRuK2tNZU1yZDJXeTRyYTR0Sm15NGc5S2d2TEk3SGhLUE1P?=
- =?utf-8?B?TmowZGNaY2JuVjJxdnlGSkgxbFp3Y2xFV1haNHd5OEtZODFnNEFyMlZMeENR?=
- =?utf-8?B?QVBveWhUMVZkOVF0TzBIdnFjZ3FKSWkxc3dNSmhzYlpTbkxVZEh0ek1Jbllk?=
- =?utf-8?B?L1pOdHdUemNWc3dYS1AvNmhyNTUvLzR1ZmkvRG5DNW5EV2N6ZCtNcGZucDdN?=
- =?utf-8?B?YnBaSTVWTzFCcEh3Q25LMUk4ZnV0ZGVwa2wwcDJjQ1JZTGNEaE5jYjZKSFlm?=
- =?utf-8?B?RDlKYWY2Zng3VWJxb3dXdUJiTjY0Yk13QmdFUjhGdWN6SzZNZ3JPOUpCSE5w?=
- =?utf-8?B?TlFZZnJDRGxObmFtS2hmTjM1N0xwMS9oLzJucDM1clRqWFJiRHdZUHRXWm1G?=
- =?utf-8?B?bnNEcHNpV1MzTGVQTGlrcUVmSlNRSmQwSUV6SDVON25jT3Z3eWhLUzVqdUpv?=
- =?utf-8?B?ZWlZYng1UFEvWjdERWY0YllTOU5BajFxQ2t5K2ptbkc0L3l4bkh6OXFENlpC?=
- =?utf-8?B?M1VKMlV6SmhlaE50ZlQvcCtXejBqK3BicXlFM3h3T0Z4WVNkUTZsTnFqdXFz?=
- =?utf-8?B?RnVDZ1ZVa1ZWT0ZWaTZGUTkwbWZDOUozcHdMN1FYMXVaMHU3RXNJSkp0MEZE?=
- =?utf-8?B?bkVJekFUVnVjaUdYYnJ3VWx4Q2o0bWViYUltMDRkbDJLOUs4L1YwYUZZSEZk?=
- =?utf-8?B?R3NMaGtLVmZLZHJ3YXZUOHdpQVR0YVJWSzJiMm1lY0ZaNFlTSkFCZGlQQkox?=
- =?utf-8?B?K0pGNjVvM3lPYkJQbnR0RVZqMWxqUFk1czVLRG4yZ2xLNXZSSm5mVFc3N013?=
- =?utf-8?Q?fxWf/r4tssnJO?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7420.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bWVMLzVJekM0TU90N1FxaXZSZUVOYXA5NXBYTU9KNitmUzRkVERzZzFpc3lS?=
- =?utf-8?B?NmtzMmsyTlZyN1FHRXNqeXF0b3daSzNzaXFmTVBaN3ovTGI1Rjd4dDBuRDRk?=
- =?utf-8?B?M0JnRWdyMzVTRVdsUHdZNjFlbUdmRENLYXc0cC8wWm1PNFVISUFSQVoyVjdp?=
- =?utf-8?B?aytSZUxBUjR0SjlKUC9YYmZpMFhwcGc5UnQ3Wm1Oa0FHQ0c0dGdINWlZUXRV?=
- =?utf-8?B?VkgxSGVmcUg3dThxbDFIVXVDcENlMXIwRXVoVVB1aGJzV0hFT1h2UHBEcWhx?=
- =?utf-8?B?Zmpmc3NBSklFQ0pPZDBIZjV5SC9WVW9VbkozYzNqZHpFWGxRSFo1dmhmZHJm?=
- =?utf-8?B?d3ZiOERCL1JhMlZWU29rZzkweEU2K1p5QXo5QWdiLytXMk5CeHdPQW1tSDVz?=
- =?utf-8?B?cVJxeHYram9VbVdSbVJtV0l1b3pBd1ovbStRNlMyWDluSkl1ZjNzTlBvalVL?=
- =?utf-8?B?ZGE0SCtCa0wzZjRobldJdWszcGZxd0Vic2wxOWw5a1ZNSVpJaVpuaXJER2d3?=
- =?utf-8?B?ak5vaVNwRUI5M1pJWFFib0xER08vc2IwZ3FIK3dRWFc3RXI0czUyeXAvUmla?=
- =?utf-8?B?RjVhRksvZExudXNjQkl6Z0pvVzdWVCsyTWh3SDdaeTZXSzRkZmhKSThTMmZI?=
- =?utf-8?B?aGppMnh1bHlTdW8zbUNrNFY2NENhOERUUzZKRDRVSDhJOUt2R0dqRXROeENt?=
- =?utf-8?B?OVdRQVRjTlgveVp2dG4rTndTQk84YmdDN1JKOUNZMlVnR0RHS1ZSUmFKOFRB?=
- =?utf-8?B?OVBwMkUybE9SV2VYMlVCS0pZL01iVzdBNTJ5ZlJJY3NtcWs1ZGNTQzVXaG5h?=
- =?utf-8?B?UjVKVkRhcFp6UkEyVkdhMzdsSUxkYjBLWU83L2VhVjc0WVFITmxGYXY4Sy94?=
- =?utf-8?B?VEZoRHRRbUJveGRTcFU3clA4UEpsaHEybFhINTlydW9vSHRWNkVGVjRkZHR1?=
- =?utf-8?B?R2IxNUl2OHJzMENsZzdqeDdKZlBRQkFXSkNWc0E1T040NFJGYjBCUWRTY3ZS?=
- =?utf-8?B?UFBoOGFRa0Z6NnExK1ZmTTRteStHbnZUQnNoeW9sNkg5Y3lnbWZaYlBxSmlF?=
- =?utf-8?B?dGVjTUNmbEVOSkJjLzZqL1BkbjBGRkRTVDlTNGZMb3dsZ3ZLWFoxdmxwakkv?=
- =?utf-8?B?RFBuQjBxcy9GWG9IZ0dXRW9HWUpzQkVhUksxV1V1eTFzRFhWZG1neXQvUjM4?=
- =?utf-8?B?dEs5QndtdTlTZ01ENENmd25sY1M4bUNRRmtjVGhvZ1QxSUVYQXZOY2RmQUNZ?=
- =?utf-8?B?MlRUYlpjQklyUmk3UXNBcWljUEZTcXEvQVRMdDA3QXkzMDdOWW9yK215M213?=
- =?utf-8?B?Wm9URmNaZmQxZ3Byc2F4N2xyN0dOdDNqbWxFeHd4VXhtSUFlaHZFWWFXQUtn?=
- =?utf-8?B?OGIvZDdRMGNoL2M5MmEyamdUODl4TS8vd0ZjZldSN3hWWkpHRXAzNnJ6dzlv?=
- =?utf-8?B?Mm5jUkVPcThIUEhuMlRBNVdyZGJ1bDhFa1lDYlNnYzNJeTh5QU9TVjFUVnNj?=
- =?utf-8?B?cGpyUlZEOGlQelhBVHFxT2p3azQ1UE0yb1BWd0taclJMQ1Y0d1lIb1E3Yk0z?=
- =?utf-8?B?MEpnclQzdFFTMk5WVyttZmYzOTJyOCtabXRuS09FUzlQYjlhUHorby9rQVZk?=
- =?utf-8?B?M1FtZ1hkRE9GK0cyeEx0VVE1MCtzQk5JTFNuMytrUHluMmV4USt0NnhQbEdn?=
- =?utf-8?B?WTFERklENTE0TzE2Kzh2cHdnbVFZRkh1VDZWZE44dllPUE9iZHNuWXN0RDNv?=
- =?utf-8?B?QnV4RVFjMGMxMEh3K0dlVklTRTVET0JaZ2w0bWFqcFhtK0dKQmZQOEc4UDdH?=
- =?utf-8?B?Z2YyWENPL1E1Ti8zbWhaT05EQTMxbFlZUFR0RkhabmkyWTU0cVNhRE1SKzhV?=
- =?utf-8?B?TnEvbGNoOFdLeFJCaFZDYnI1Y283MDg0UEptWnF6UkVtMzBLUXAwcWp2RUFJ?=
- =?utf-8?B?Q1NxeUJoMEMxcWprRi9OYUFZdlJnY0tkaDVhZmE3Wm1rMEc1aDZUNENmUlJB?=
- =?utf-8?B?U0liYnB3WmhOcDJ2NWQyMmYxajFyUXJCNGdzNVkwRWVFZ0FZeWhvVlF1L1BO?=
- =?utf-8?B?QlgySDhVbHVsOW5SRnJMNFQxNzFsNGV0M2x6bitoVGdsTVZabnVlbkp4WGhv?=
- =?utf-8?Q?upaeWjWrsxRU1HERhWfFXAAA2?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e034b915-1de8-466b-d678-08dd5b2b502c
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7420.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2025 14:46:14.5267
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|376014|82310400026|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?KsitoqliHKqhgGqars94MSQeHdnDzHYrQJmVj5kJ4UxVxWIxTFvDUi48Yodr?=
+ =?us-ascii?Q?zL+pb8USsmuDlYqAGc+66JZPayp9p3AA3cBnnfwZvqlBOGFwFBHw12GA2jJS?=
+ =?us-ascii?Q?pp4vzO4UIntVSyG5Tv2qbWnHFle42VDDgZds9+pTi2qguZ82s1/tLNJYH6Xl?=
+ =?us-ascii?Q?T3/+SrXYF2gFu1npRNvAhTP4LQNGH9TKB+8Yl6EbrAObMPj24lvq5q+21gmN?=
+ =?us-ascii?Q?kxX7gWey4tju3+decjIYvurl38TLPJv5cIi9fahV7t38Wpa254WfvC/BhH3c?=
+ =?us-ascii?Q?jO8Zb3bZwQq/MFPT8zALxIPQAw7Q1WpITaYzrpi67Q5n+UJJI29p6CeQfMwF?=
+ =?us-ascii?Q?505MJht32NclF1bcthBa0Ua83pZ9uPci3uoZMPhC0yKgAU57lw/rAyIEIbZF?=
+ =?us-ascii?Q?QepGzQ7modMwxenoCfYs0/q4L/sEKEiGuLURhqaeyZ7wfOjUuWqfCSbRXcTa?=
+ =?us-ascii?Q?K81UMgOBa9/kQ1iUchn5Jz/FJUpbx83gqaRzImnSvLbfp67ghInSG10r214d?=
+ =?us-ascii?Q?ptTarc9szbK3x3gaud/c9Rnp+RB1gBDwjfdJadJg74O4K0jZXK52SDnGyhPl?=
+ =?us-ascii?Q?F0QgWp5sObrwGQew50ij3qrf0D7PkcUlD8MACDprR74jXbGJve8zqmiWtmef?=
+ =?us-ascii?Q?kIGVGXzRqjX28HYXCNpjXbx7hB2yR0w1I4cA6yx+DyU9k5edP3yHtDaDrNCe?=
+ =?us-ascii?Q?wvzvIBAA8UTt7PVupziNcG+PSPGfP+743tb8syYVmLO35xZqwvgRHGthdBxf?=
+ =?us-ascii?Q?abPg3A1V8Jxh8hbh6O5tSIPwMXV49frL4GpXv80d3rBVToie8GMhooCCYt9K?=
+ =?us-ascii?Q?QdzKg4zcE+6Eqtnh0PNO8hICxlE/rCnYN2+CFHcPMvYvxUElY7OSMR8odfS2?=
+ =?us-ascii?Q?n/sLsGZ7K3xAnnft9xQBZvb1RddncJrBKYIqwPK5Ljn1OoMF9izvVLINBakp?=
+ =?us-ascii?Q?9Pf3JnODoapv0UMsUUGtCxotO9jF0qE2Neu/MrdyCGdiCMCSuUcynJZCmzeN?=
+ =?us-ascii?Q?8P/4ig8Nv1/AzBsGkIYW6oXEOzNLafcZGa14SfXBNOGbPT/bEtCyavddXEUs?=
+ =?us-ascii?Q?zCsyNXE8F4O7TxBrJwv6rZc7orO88weZpD751y843UHFuG911z6+vCh+Yg1e?=
+ =?us-ascii?Q?i/0Z1m0NvzfDMP2PeILt/OrySwh3IaJT2f/pgk8JiPfy9b0/8DxgZZsk60MW?=
+ =?us-ascii?Q?+9D4RCbIrPxz3xFYKp2Q1+CuFDkShSNLQe67lxtv2t2mEOokG7mgGkom5Uoj?=
+ =?us-ascii?Q?IuAA4vTNHF+x2U6sft5RYGXSbH5RU1VTRm8mnmvJ7gNkLYO29ltKJPv/4qeu?=
+ =?us-ascii?Q?ki+cXbik9uvemC20J9P4mahrzKTaRvvYyXCWNc3v40ncqrgE9zCQMB2/u0uT?=
+ =?us-ascii?Q?rBXgk6t9DNgN1pZ0HSBcWld0au+cQWWVbbhvM478gje5JShEdYrpKN8Y45C6?=
+ =?us-ascii?Q?pWHlwcUG9MTdIkj1rR5X3k5mSzy/014Vel7sFVEXmflm81/D/MwBQmRPqla/?=
+ =?us-ascii?Q?2DGlBH8MEedAdxY=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Mar 2025 14:46:51.8288
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GyGe4+kGuof5SVzJCx+1BOyMASlXCB7tbrf6S25Ag5PGlJlRo+jVv7AgeKAn9/0x8OO15G9VgCa7d2UygV83Bw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7449
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e2e6b603-17e4-40a3-8c49-08dd5b2b6699
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS2PEPF00003448.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6619
 
+Add a new optional filter named optional-counter to commands:
+rdma stat qp set link [link_name] auto
 
+The new filter value can be either on or off and it must be the last
+provided filter in the command, not providing it would be the same as off.
 
-On 2025-03-04 12:01 a.m., Dan Carpenter wrote:
-> The cpu_rmap_put() will call kfree() when the last reference is dropped.
-> 
-> Fortunately, this is not the the last reference so it won't free it
-> here.  Unfortunately, static checkers are not clever enough and they
-> still warn that this could lead to a use after free on the next line.
-> Flip these two statements around to silence the static checker false
-> positve.
+It indicates that when binding counters to a QP we also want the
+currently enabled optional-counters on the link to be bound as well.
 
-nit: *positive.
+In addition Adjust rdma statistic man page to reflect the new
+optional-counter changes.
 
-Beside that:
+Signed-off-by: Patrisious Haddad <phaddad@nvidia.com>
+Reviewed-by: Mark Bloch <mbloch@nvidia.com>
+---
+ man/man8/rdma-statistic.8 |  6 +++++
+ rdma/stat.c               | 50 +++++++++++++++++++++++++++++++++++++--
+ rdma/utils.c              |  1 +
+ 3 files changed, 55 insertions(+), 2 deletions(-)
 
-Reviewed-by: Ahmed Zaki <ahmed.zaki@intel.com>
-
-Thanks.
-
-
-
-> 
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
->   net/core/dev.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 9189c4a048d7..c102349e04ee 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -7072,8 +7072,8 @@ void netif_napi_set_irq_locked(struct napi_struct *napi, int irq)
->   put_rmap:
->   #ifdef CONFIG_RFS_ACCEL
->   	if (napi->dev->rx_cpu_rmap_auto) {
-> -		cpu_rmap_put(napi->dev->rx_cpu_rmap);
->   		napi->dev->rx_cpu_rmap->obj[napi->napi_rmap_idx] = NULL;
-> +		cpu_rmap_put(napi->dev->rx_cpu_rmap);
->   		napi->napi_rmap_idx = -1;
->   	}
->   #endif
+diff --git a/man/man8/rdma-statistic.8 b/man/man8/rdma-statistic.8
+index 7dd2b02c..337e31ef 100644
+--- a/man/man8/rdma-statistic.8
++++ b/man/man8/rdma-statistic.8
+@@ -39,6 +39,7 @@ rdma-statistic \- RDMA statistic counter configuration
+ .B auto
+ .RI "{ " CRITERIA " | "
+ .BR off " }"
++.B [ optional-counters | on/off ]
+ 
+ .ti -8
+ .B rdma statistic
+@@ -180,6 +181,11 @@ rdma statistic qp set link mlx5_2/1 auto type on
+ On device mlx5_2 port 1, for each new user QP bind it with a counter automatically. Per counter for QPs with same qp type.
+ .RE
+ .PP
++rdma statistic qp set link mlx5_2/1 auto type on optional-counters on
++.RS 4
++On device mlx5_2 port 1, for each new user QP bind it with a counter automatically. Per counter for QPs with same qp type. Whilst also binding the currently enabled optional-counters.
++.RE
++.PP
+ rdma statistic qp set link mlx5_2/1 auto pid on
+ .RS 4
+ On device mlx5_2 port 1, for each new user QP bind it with a counter automatically. Per counter for QPs with same pid.
+diff --git a/rdma/stat.c b/rdma/stat.c
+index bf78f7cc..2c1bf68e 100644
+--- a/rdma/stat.c
++++ b/rdma/stat.c
+@@ -7,6 +7,7 @@
+ #include "rdma.h"
+ #include "res.h"
+ #include "stat.h"
++#include "utils.h"
+ #include <inttypes.h>
+ 
+ static int stat_help(struct rd *rd)
+@@ -62,7 +63,8 @@ static struct counter_param auto_params[] = {
+ 	{ NULL },
+ };
+ 
+-static int prepare_auto_mode_str(uint32_t mask, char *output, int len)
++static int prepare_auto_mode_str(uint32_t mask, bool opcnt, char *output,
++				 int len)
+ {
+ 	char s[] = "qp auto";
+ 	int i, outlen = strlen(s);
+@@ -90,6 +92,10 @@ static int prepare_auto_mode_str(uint32_t mask, char *output, int len)
+ 		if (outlen + strlen(" on") >= len)
+ 			return -EINVAL;
+ 		strcat(output, " on");
++
++		strcat(output, " optional-counters ");
++		strcat(output, (opcnt) ? "on" : "off");
++
+ 	} else {
+ 		if (outlen + strlen(" off") >= len)
+ 			return -EINVAL;
+@@ -104,6 +110,7 @@ static int qp_link_get_mode_parse_cb(const struct nlmsghdr *nlh, void *data)
+ 	struct nlattr *tb[RDMA_NLDEV_ATTR_MAX] = {};
+ 	uint32_t mode = 0, mask = 0;
+ 	char output[128] = {};
++	bool opcnt = false;
+ 	uint32_t idx, port;
+ 	const char *name;
+ 
+@@ -126,7 +133,10 @@ static int qp_link_get_mode_parse_cb(const struct nlmsghdr *nlh, void *data)
+ 		if (!tb[RDMA_NLDEV_ATTR_STAT_AUTO_MODE_MASK])
+ 			return MNL_CB_ERROR;
+ 		mask = mnl_attr_get_u32(tb[RDMA_NLDEV_ATTR_STAT_AUTO_MODE_MASK]);
+-		prepare_auto_mode_str(mask, output, sizeof(output));
++		if (tb[RDMA_NLDEV_ATTR_STAT_OPCOUNTER_ENABLED])
++			opcnt = mnl_attr_get_u8(
++				tb[RDMA_NLDEV_ATTR_STAT_OPCOUNTER_ENABLED]);
++		prepare_auto_mode_str(mask, opcnt, output, sizeof(output));
+ 	} else {
+ 		snprintf(output, sizeof(output), "qp auto off");
+ 	}
+@@ -351,6 +361,7 @@ static const struct filters stat_valid_filters[MAX_NUMBER_OF_FILTERS] = {
+ 	{ .name = "lqpn", .is_number = true },
+ 	{ .name = "pid", .is_number = true },
+ 	{ .name = "qp-type", .is_number = false },
++	{ .name = "optional-counters", .is_number = false },
+ };
+ 
+ static int stat_qp_show_one_link(struct rd *rd)
+@@ -395,9 +406,37 @@ static int stat_qp_show(struct rd *rd)
+ 	return rd_exec_cmd(rd, cmds, "parameter");
+ }
+ 
++static bool stat_get_on_off(struct rd *rd, const char *arg, int *ret)
++{
++	bool value = false;
++
++	if (strcmpx(rd_argv(rd), arg) != 0) {
++		*ret = -EINVAL;
++		return false;
++	}
++
++	rd_arg_inc(rd);
++
++	if (rd_is_multiarg(rd)) {
++		pr_err("The parameter %s shouldn't include range\n", arg);
++		*ret = EINVAL;
++		return false;
++	}
++
++	value = parse_on_off(arg, rd_argv(rd), ret);
++	if (*ret)
++		return false;
++
++	rd_arg_inc(rd);
++
++	return value;
++}
++
+ static int stat_qp_set_link_auto_sendmsg(struct rd *rd, uint32_t mask)
+ {
+ 	uint32_t seq;
++	bool opcnt;
++	int ret;
+ 
+ 	rd_prepare_msg(rd, RDMA_NLDEV_CMD_STAT_SET,
+ 		       &seq, (NLM_F_REQUEST | NLM_F_ACK));
+@@ -408,6 +447,13 @@ static int stat_qp_set_link_auto_sendmsg(struct rd *rd, uint32_t mask)
+ 	mnl_attr_put_u32(rd->nlh, RDMA_NLDEV_ATTR_STAT_MODE,
+ 			 RDMA_COUNTER_MODE_AUTO);
+ 	mnl_attr_put_u32(rd->nlh, RDMA_NLDEV_ATTR_STAT_AUTO_MODE_MASK, mask);
++	if (rd_argc(rd)) {
++		opcnt = stat_get_on_off(rd, "optional-counters", &ret);
++		if (ret)
++			return ret;
++		mnl_attr_put_u8(rd->nlh, RDMA_NLDEV_ATTR_STAT_OPCOUNTER_ENABLED,
++				opcnt);
++	}
+ 
+ 	return rd_sendrecv_msg(rd, seq);
+ }
+diff --git a/rdma/utils.c b/rdma/utils.c
+index 07cb0224..87003b2c 100644
+--- a/rdma/utils.c
++++ b/rdma/utils.c
+@@ -479,6 +479,7 @@ static const enum mnl_attr_data_type nldev_policy[RDMA_NLDEV_ATTR_MAX] = {
+ 	[RDMA_NLDEV_ATTR_PARENT_NAME] = MNL_TYPE_STRING,
+ 	[RDMA_NLDEV_ATTR_EVENT_TYPE] = MNL_TYPE_U8,
+ 	[RDMA_NLDEV_SYS_ATTR_MONITOR_MODE] = MNL_TYPE_U8,
++	[RDMA_NLDEV_ATTR_STAT_OPCOUNTER_ENABLED] = MNL_TYPE_U8,
+ };
+ 
+ static int rd_attr_check(const struct nlattr *attr, int *typep)
+-- 
+2.47.0
 
 
