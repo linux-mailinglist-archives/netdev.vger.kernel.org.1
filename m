@@ -1,120 +1,144 @@
-Return-Path: <netdev+bounces-171828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F5C3A4EE00
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 21:00:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6647A4EE0A
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 21:05:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8EB93AA4D3
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 20:00:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E40CD188E5F5
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 20:05:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B801F63D6;
-	Tue,  4 Mar 2025 20:00:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD2491F8BCC;
+	Tue,  4 Mar 2025 20:05:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="rCPitnJa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TmqCb+uX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx25lb.world4you.com (mx25lb.world4you.com [81.19.149.135])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A166C1FA243
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 20:00:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.135
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C601F37C3
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 20:05:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741118442; cv=none; b=oJUfQl49WR41tMsqC8QJUF1TUo+9t8RI/L0JrJAFScNi7K5N1OZmSz5ASDfs7ll9XV9QDOI5XuVH6Em6Mwyp02j8ucfKoICtHNFTi3LWcM+Mwl4z4LQ3rirzofqfDnTyReuJ+lDqQaTwuMp/nJ8z0KYCdITYDiBH7F7NwsAWy4M=
+	t=1741118736; cv=none; b=mb23yLk33d65erSnP3UTQDBXsPBdnYOHpenAZiO6cqy+of4RGu9K2rpY3AhXnaOHmiN7jEbFS3ngw1CZ/3mkll+tmkY8SHism/ibUPkumfGRJhnTbk6Bc+ffDsAdpqb/FL8hFkoZmhLh2L7ydiEuOWjHGy5Pq6jsJ+kwRA8Wo90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741118442; c=relaxed/simple;
-	bh=CX39I5OeaX9sp2H2PEK3tF0kltrytxZjf4cYDJGYg6c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=igmwVquhImpP+E3lZj4I3IIdJZSFLVjMZvvTI4XTZAJRwCR4QAv5iuMmA3RL0NC5qsEY6dPDGm7k4vFJcUv8ljWvxlf/uU5/hCnC9dMHyCTPeGVRr3k1QX9SMPUESfRIZvq193nri08uDyDrpGqyWohl4JmoisS7Pr4XlE2TSa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=rCPitnJa; arc=none smtp.client-ip=81.19.149.135
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=7dM1cYlCKaPVj012wBMKZgOzWHvXw147ReawTFwiLZ8=; b=rCPitnJaUdLtddn+0ug4SMGHnO
-	/N9LRIfGo4gnDB7Brau3rYr/CSXPYI6jKo7Kq9q0/Fch8zE4yxCM2gjKZ+6zN8nSNARWAWGKtzaPf
-	+ZYyk49Dp3A991XDyoz1aqO2BhsHgcQIC4iqSPlbzn81YYp5UwxsZNWr8Ei6Lz7bnYls=;
-Received: from [80.121.79.4] (helo=[10.0.0.160])
-	by mx25lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.97.1)
-	(envelope-from <gerhard@engleder-embedded.com>)
-	id 1tpYRM-000000007cl-0kmJ;
-	Tue, 04 Mar 2025 21:00:32 +0100
-Message-ID: <1d56eaf3-4d8c-40da-8a10-a287f09553e6@engleder-embedded.com>
-Date: Tue, 4 Mar 2025 21:00:30 +0100
+	s=arc-20240116; t=1741118736; c=relaxed/simple;
+	bh=Yc5o8AAM03gqcwMaZIMFUJWm5niH57hleRgR8LPA2IQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eNoHsUsWFXNGpxBFBBf2wYo0j4guIgBC5FGd1edLvXNohVPRviLLChXrGMK/sAO9I563px+yG0AvPRhMvD3iELcgLrD+XlvctoevYgk1ZuEHbz5goL2/AZ9S5rlQF5Y1QF0ipbrTrr6I6zZiwdOgWXbGasat6GFd0BKZl4vFkiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TmqCb+uX; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-223378e2b0dso88852205ad.0
+        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 12:05:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741118734; x=1741723534; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wa+0jqJt7RxZyWEnNlIeijPawv98xKd/6at7dqq5OEU=;
+        b=TmqCb+uX7sWaiS4XmfBV1DOv36dOg6W3108o/g9t201VQX++Iw98DUp2iNze2yzfHo
+         k4f0Vic8Af0xknyoyzFtyL57C8cnlqIn1l7oKEE7oRxGFmx89nGPI+tE/Jgsgy2zuubV
+         3kQ0C+82/TVfEa53k6L4j2IZBHLlTs5cHtGx8cmY1UBwar21CP/banQ+sZfPrG7fCEhN
+         Aeh8bnc3kBuvcMHSlObPElhNHpBrQFdpugzKqHhSECR9NXTLBlxOUYQLtNrTSAbyo3gk
+         DEHvqxVKEsrnpakvH+NqXhIojQFwN/KucoDUerY1ja2HEknVgEPB/3/akvXmUsDuK3T3
+         mYGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741118734; x=1741723534;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wa+0jqJt7RxZyWEnNlIeijPawv98xKd/6at7dqq5OEU=;
+        b=MqSnVBampw9CUfkM1iJ0HUnpENEAJSDp+2SumYZ/lhsyNi/Al9E5Q+JGaH/KAepG0V
+         Lr7mqONu7Z/VycpjR1hHmc+6K5+0CwUZV2jH6ow+USSzHiw3VyQK0yuwO/72bygA3mM9
+         Z/3H8BMD1SXz9vEaHAz+3It7zG6mlY2KamXY/pmfxrvHG7CIJde5D1yUT4IwYfVB4f+R
+         B0Ay+7YTZYknMQON/OsVhlCrv2j7a5EAb4mwVJMU1eZjQKpEPzQ6MJly6r86Nnil1+AM
+         n828rhSrYZz9jXG21mLG0PiYEmUV63avyl/mCLv7EsmfVBgLpVxChjgEGe6HuUbCLwF1
+         7D+A==
+X-Gm-Message-State: AOJu0Yx/iSR2XgfeG0UirJnAq7AXvfj8fOPpLgh9cHiJnzXAUQVKSX5R
+	5Kk2wYAzxg5OeFdFBE78OjAeqQOuiltZ+iyC6ToOhSh+NSXFgjq3
+X-Gm-Gg: ASbGncuCKsWvlxVXyN0r6zML1dj9KF7rsk4osm5zyV+S4XvX75RptBgtkwucZPUpvYF
+	J129v4h7++8X3vyM2dmvP1Tl0MGdAreED1nehRqi+Jrs4GAlI+FdAGXclpvPohzV/LW6eU+L4Dn
+	v/ZXPip0Z4XtFWkt7uRre18E7N9z2K0fIuaUzIhl4MvpfsupSOAKJoiL2x+Ck6JGBMupJVtEoCC
+	SpWnV4zrTRu69QoIn4Bdwa5X/8Ws2Bw4IaPVXdcLmvY6t33EX4xvpT1UGMzXeukUVpc9XCrN1N7
+	tChxnJ3B1NDPEsp806XKgoGpqHdvt5c2erthVgk0Tr03IcTy
+X-Google-Smtp-Source: AGHT+IHVOmK8ob84EWFaaF/1pTIbrCtNQCsuHHy++ID7CmBElKeFrrUUESoyh8WvTi7IM2ufOAU6Fg==
+X-Received: by 2002:a05:6a00:10c8:b0:736:57cb:f2b6 with SMTP id d2e1a72fcca58-73682be66fbmr325371b3a.12.1741118734422;
+        Tue, 04 Mar 2025 12:05:34 -0800 (PST)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-735e66ef952sm9029325b3a.98.2025.03.04.12.05.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Mar 2025 12:05:33 -0800 (PST)
+Date: Tue, 4 Mar 2025 12:05:33 -0800
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: kwqcheii <juny24602@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH] sched: address a potential NULL pointer dereference in
+ the GRED scheduler.
+Message-ID: <Z8ddDSvJZSLtHCGi@pop-os.localdomain>
+References: <20250227160419.3065643-1-juny24602@gmail.com>
+ <20250304141858.3392957-2-juny24602@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 2/8] net: phy: Support speed selection for PHY
- loopback
-To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Jijie Shao <shaojijie@huawei.com>
-Cc: hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, netdev@vger.kernel.org, ltrager@meta.com,
- linux@armlinux.org.uk
-References: <20250227203138.60420-1-gerhard@engleder-embedded.com>
- <20250227203138.60420-3-gerhard@engleder-embedded.com>
- <20250303173500.431b298e@kernel.org>
- <3d98db01-e949-4dd7-8724-3efcc2e319d9@lunn.ch>
- <20250304081502.7f670381@kernel.org>
-Content-Language: en-US
-From: Gerhard Engleder <gerhard@engleder-embedded.com>
-In-Reply-To: <20250304081502.7f670381@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AV-Do-Run: Yes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250304141858.3392957-2-juny24602@gmail.com>
 
-On 04.03.25 17:15, Jakub Kicinski wrote:
-> On Tue, 4 Mar 2025 14:20:02 +0100 Andrew Lunn wrote:
->> The current IOCTL interface is definitely too limiting for what Lee
->> will need. So there is a netlink API coming soon. Should Gerhard and
->> Jijie try to shoehorn what they want into the current IOCTL handler,
->> or help design the netlink API? How can selftest.c be taken apart and
->> put back together to make it more useful? And should the high level
->> API for PRBS be exported through it, making it easier to use for any
->> netdev?
+On Tue, Mar 04, 2025 at 10:18:59PM +0800, kwqcheii wrote:
+> If kzalloc in gred_init returns a NULL pointer, the code follows the error handling path,
+> invoking gred_destroy. This, in turn, calls gred_offload, where memset could receive
+> a NULL pointer as input, potentially leading to a kernel crash.
 > 
-> As we think about this let's keep in mind that selftests are generic,
-> not PHY-centric. Even if we can pass all link settings in there are
-> other innumerable params people may want in the future.
+> Signed-off-by: kwqcheii <juny24602@gmail.com>
 
-My patchset can be divided into two parts:
-1) Extend phy_loopback() to select a defined speed
-2) Extend tsnep selftests to get some in-kernel test coverage for the
-    phy_loopback() extension
+Please use your real name for Signed-off-by.
 
-This discussion is related to the selftest rework of the second part.
-Would it be ok to put the first part into a separate patchset, as this
-changes make sense and work even without the selftests?
+> ---
+>  net/sched/sch_gred.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/sched/sch_gred.c b/net/sched/sch_gred.c
+> index ab6234b4fcd5..fa643e5709bd 100644
+> --- a/net/sched/sch_gred.c
+> +++ b/net/sched/sch_gred.c
+> @@ -317,10 +317,12 @@ static void gred_offload(struct Qdisc *sch, enum tc_gred_command command)
+>  	if (!tc_can_offload(dev) || !dev->netdev_ops->ndo_setup_tc)
+>  		return;
+>  
+> -	memset(opt, 0, sizeof(*opt));
+> -	opt->command = command;
+> -	opt->handle = sch->handle;
+> -	opt->parent = sch->parent;
+> +	if (opt) {
+> +		memset(opt, 0, sizeof(*opt));
+> +		opt->command = command;
+> +		opt->handle = sch->handle;
+> +		opt->parent = sch->parent;
+> +	}
 
-For the selftests IMO Jijie Shao and me should try to extend
-net/core/selftests in a generic way for both drivers. There shall not be
-multiple "send, receive and check skb" implementations in various
-drivers. Andrew suggested to make the selftests generic enough to let
-others benefit. To prove that, Jijie Shao needs to be able to use the
-new selftest sets.
+I think the whole gred_offload() should be skipped when table->opt ==
+NULL, espeically the last call of ->ndo_setup_tc(). Something like:
 
-For me it is ok to keep back these selftests until a new netlink API is
-available. I feel not comfortable to design a new netlink API as I have
-no need to make the selftests configurable by user space like Lee
-Trager.
+diff --git a/net/sched/sch_gred.c b/net/sched/sch_gred.c
+index ab6234b4fcd5..532fde548b88 100644
+--- a/net/sched/sch_gred.c
++++ b/net/sched/sch_gred.c
+@@ -913,7 +913,8 @@ static void gred_destroy(struct Qdisc *sch)
+        for (i = 0; i < table->DPs; i++)
+                gred_destroy_vq(table->tab[i]);
 
-So what to do with these selftests?
-Hold back until new netlink API?
-Rework them to only support the "send, receive and check skb" case
-without any PHY stuff and use it in tsnep and hibmcge?
-Keep them as they are as new test sets and parameters can be added
-in the future if needed?
+-       gred_offload(sch, TC_GRED_DESTROY);
++       if (table->opt)
++               gred_offload(sch, TC_GRED_DESTROY);
+        kfree(table->opt);
+ }
 
-Gerhard
+What do you think?
+
+Thanks.
 
