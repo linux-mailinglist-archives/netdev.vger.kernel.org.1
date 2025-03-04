@@ -1,229 +1,177 @@
-Return-Path: <netdev+bounces-171820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DC0CA4ECC3
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 20:07:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79665A4ED8E
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 20:38:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DDD327A6FF2
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:06:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96E1E171A89
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:38:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2BC42641DB;
-	Tue,  4 Mar 2025 19:05:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B505204F62;
+	Tue,  4 Mar 2025 19:38:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="bsAFW2Lc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L9YRT8Yb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F8925523D
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 19:05:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3B692E3371
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 19:38:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741115155; cv=none; b=BmKEn2LGQiz1Gj2mDCQdwS2COfLrbNUif/kE1jzyBmiiNDfLXh8cZ2E5uZBYT6a8MckoQzSl1BCVtnYHXU1j10NmUW6wdK/8lJ5F9zUGXaDWwWagFd+t4ojNCnxODwaAm/hJBQFogZQRwceeKB0DpfGUNcOfAhSZxn4tJG8Hy68=
+	t=1741117118; cv=none; b=m31/GRYH6dNIARBoIqiU5LtwkZoVM1pSM/oCw3xZ4NBLDmw7r7R1hOquqFLwark0F13djCt5ehIVn7P6B8MUcMARf4J1SJo2nQaBA2mcBsX5/F7+okgvBGAm2fAdD6xAyq9DLOC8sL3NLvIY1bIx3h/d2fBug6McvXh40pUKXxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741115155; c=relaxed/simple;
-	bh=a4Jr15M8dtafmzyeZDsGBMlM+DQJ4K8lBD8M8v2cUFg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q7DpXsrcH9TiHktej7H/6laIN2lNYPBVJxjDzejGE0St8kmyMF4pYOgvO2mu8Wk/snmnhowH4TZbVHDmAmpbhggsVIZLKEbJ695tQ2IA6xU1kuSl9QMFnIJcSIqs/YuzH426fdyNDq4MImlGd2leSvdjqWR1BN4x5WBXzYDA4yQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=bsAFW2Lc; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1741117118; c=relaxed/simple;
+	bh=OeBVVoQdgwgqTCurG+p/NAuJSEvlBBrYzIDwKbAyOqQ=;
+	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tKtz/klucsn0tadQNLgGmZ36fJwwARK7Gfjh1Vc52I67oyHbXXd0nsVm7929tlXOJd3TggaxGFsHYteWqPXyMfn6k6JBy7rB6uBN1P7+utAHN3TwyTdMRSAtfyWbF0sEMpVZxmB7Z/eb3PgZ6z2ETvpRWbUKJFsU/RfDga6tV5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L9YRT8Yb; arc=none smtp.client-ip=209.85.216.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2ff087762bbso4175428a91.3
+        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 11:38:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1741115154; x=1772651154;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=yiNQ61dCH69G7yxmYLb8iVzZwRIE1QdYWxBdn7nqPeM=;
-  b=bsAFW2LcegSuMmC758aYfpuzD+Rm+WQrNBWZvy22+8G+HbbwJ9a/p8YH
-   z8My06oS0qwVokw83bZn9sZoIo2oMPLe0JdM6hzsnjtERTYo3OlnQY8rK
-   CmTDjLmGFwp8nJWtH02H2L9MJ4IIQcZBGoUqQFXp+ngJ/SB/c7WAXSxqc
-   U=;
-X-IronPort-AV: E=Sophos;i="6.14,220,1736812800"; 
-   d="scan'208";a="723784124"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 19:05:51 +0000
-Received: from EX19MTAUEA001.ant.amazon.com [10.0.29.78:19406]
- by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.49.99:2525] with esmtp (Farcaster)
- id 1c09af11-92d8-4d2b-9c87-4d8a8e472d9a; Tue, 4 Mar 2025 19:05:50 +0000 (UTC)
-X-Farcaster-Flow-ID: 1c09af11-92d8-4d2b-9c87-4d8a8e472d9a
-Received: from EX19D008UEA001.ant.amazon.com (10.252.134.62) by
- EX19MTAUEA001.ant.amazon.com (10.252.134.203) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 4 Mar 2025 19:05:50 +0000
-Received: from EX19MTAUEC001.ant.amazon.com (10.252.135.222) by
- EX19D008UEA001.ant.amazon.com (10.252.134.62) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 4 Mar 2025 19:05:50 +0000
-Received: from email-imr-corp-prod-iad-all-1a-93a35fb4.us-east-1.amazon.com
- (10.43.8.6) by mail-relay.amazon.com (10.252.135.200) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1544.14 via Frontend Transport; Tue, 4 Mar 2025 19:05:50 +0000
-Received: from HFA15-G9FV5D3.amazon.com (unknown [10.85.143.178])
-	by email-imr-corp-prod-iad-all-1a-93a35fb4.us-east-1.amazon.com (Postfix) with ESMTP id 705F740477;
-	Tue,  4 Mar 2025 19:05:45 +0000 (UTC)
-From: David Arinzon <darinzon@amazon.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	<netdev@vger.kernel.org>
-CC: David Arinzon <darinzon@amazon.com>, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, "Richard
- Cochran" <richardcochran@gmail.com>, "Woodhouse, David" <dwmw@amazon.com>,
-	"Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander"
-	<matua@amazon.com>, Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt"
-	<msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
-	<nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal,
- Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
-	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit"
-	<amitbern@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, "Ostrovsky,
- Evgeny" <evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>,
-	"Machnikowski, Maciek" <maciek@machnikowski.net>, Rahul Rameshbabu
-	<rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>, Vadim Fedorenko
-	<vadim.fedorenko@linux.dev>
-Subject: [PATCH v8 net-next 5/5] net: ena: Add PHC documentation
-Date: Tue, 4 Mar 2025 21:05:04 +0200
-Message-ID: <20250304190504.3743-6-darinzon@amazon.com>
+        d=gmail.com; s=20230601; t=1741117116; x=1741721916; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0ARCC8+pv4wzG5T0BXnIx4KnRpChyalfiBSEMCBZ3N0=;
+        b=L9YRT8Yb3LOnVZW30lPPLGfTINemJ9xRlfgjhfSII0q/GIw+twKxWwht8PFywQD3SA
+         InuBehx/cYIziifNoT/api7LQwuunrdbpmsgiATqErWrODZSHG3DIY8NwwJNPd9hcF3S
+         1HMddHpPJd/a3zu9jLX04mn74Vdw/x85WF/1zgX3kRHB+CA8cIBjPpw66pzYJ7UkMdnL
+         A2jhMynkzOWTr7W9rGQ/hm7xseC5H+vdc+QpgjL9m8obC8TmMDDL2d43szQQivPzkggZ
+         goObE6oLcH4eAlP328oew32574CxLdv2O49TFuHYzATfsqRxCcoAqSU+klRcSgbtmWY7
+         ipdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741117116; x=1741721916;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0ARCC8+pv4wzG5T0BXnIx4KnRpChyalfiBSEMCBZ3N0=;
+        b=OuKT98lR12jdGxVBMEFMD/3UBIlKFoAdYkaAB4YIK2o4pXBzeAy4h7cfoUj57ECfdx
+         LmBi6U+KpTxre13Yh4U9G9aIvOvlPPeKcu0YRiodNJlE/RqPnPjqJs/uulLzDDGE0wAj
+         nZVIkwyiZP4FdG4cdW8y/CRqMLRTbl4t+zXKoP0TgOiebrxkmcCD/A9G8NqehpKhjJjW
+         34FppiCeKGu2jwG3KyZTKmOVqqnsnhfbKx3SbpgG6qnSydPADGxKp2ItlVa9qNq1Y0AG
+         56ymUbiFN0BO3krpQ7EnLCesvum3Co9OLkM1rapAegeRmiymLk9gz2ohf4dMzxiS+XPd
+         ITUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXwPldWBNjs0pRdAxTIYZMWwGQNqpjwO3lfUL+Coq1Lfhc+Nem3gDdEL9loLviswTpnt0NW3yI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJPKAtARnE4abUH2pIFMfgf5we+8AZ7HmYP+F58FRhlbyTTeM/
+	r1ZMxjjCsRPu8J15ArBYJBd+lOh070ij0RxM3fCHslPd7vbGXHLP
+X-Gm-Gg: ASbGnctJcpZDERKJK3MAj6cxISmz5uKOtjp9KSAGopzeDcKhlLLJl32f8TAH/fZE9AO
+	b784Kqsiqn+Vpb0OxbFwYVw8/rf3rpaZcVkMEUzWELh3Vw7F/tFuWzLHfMGwqWcYetz+GDlrHUi
+	MlkbkJ+rqKmZgi7abRczCSDJw52ZtuXtIdYdrHgKbKxrggYQJACqnUQVKMtYz0CW9UKcp0xI/zy
+	Vq2Ds4CdpQqMs+6Rk2QQN6PDUDFZ14HlL8sfZxwMQFaaXobqLeqK72Lr/3Z0vXvA2I+yvk52Or1
+	7NQsbTJarEBMuVYlNySW7RiNn5qJ5c6OCMAsviIdNchpNAKa2Tt2BgaMSGOurDoQRbujv8Y=
+X-Google-Smtp-Source: AGHT+IGz9nTR8lsUflPJb+wPqUaw2XZYHqDgTZqNEr65gwk6uSWBqSi08DWxM1C0YoOgNeM36NRjUg==
+X-Received: by 2002:a17:90b:5112:b0:2ee:c9b6:4c42 with SMTP id 98e67ed59e1d1-2ff49790657mr915172a91.16.1741117115973;
+        Tue, 04 Mar 2025 11:38:35 -0800 (PST)
+Received: from jlennox2.jitsi.com ([129.146.236.57])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fea6753137sm11505994a91.6.2025.03.04.11.38.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Mar 2025 11:38:35 -0800 (PST)
+From: Jonathan Lennox <jonathan.lennox42@gmail.com>
+X-Google-Original-From: Jonathan Lennox <jonathan.lennox@8x8.com>
+To: Jonathan Lennox <jonathan.lennox@8x8.com>,
+	Jonathan Lennox <jonathan.lennox42@gmail.com>,
+	David Ahern <dsahern@kernel.org>,
+	netdev@vger.kernel.org,
+	Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATCH net-next] tc-tests: Update tc police action tests for tc buffer size rounding fixes.
+Date: Tue,  4 Mar 2025 19:38:13 +0000
+Message-Id: <20250304193813.3225343-1-jonathan.lennox@8x8.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250304190504.3743-1-darinzon@amazon.com>
-References: <20250304190504.3743-1-darinzon@amazon.com>
+In-Reply-To: <2d8adcbe-c379-45c3-9ca9-4f50dbe6a6da@mojatatu.com>
+References: <2d8adcbe-c379-45c3-9ca9-4f50dbe6a6da@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="------------2.34.1"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 
-Provide the relevant information and guidelines
-about the feature support in the ENA driver.
+This is a multi-part message in MIME format.
+--------------2.34.1
+Content-Type: text/plain; charset=UTF-8; format=fixed
+Content-Transfer-Encoding: 8bit
 
-Signed-off-by: Amit Bernstein <amitbern@amazon.com>
-Signed-off-by: David Arinzon <darinzon@amazon.com>
+
+Before tc's recent change to fix rounding errors, several tests which
+specified a burst size of "1m" would translate back to being 1048574
+bytes (2b less than 1Mb).  sprint_size prints this as "1024Kb".
+
+With the tc fix, the burst size is instead correctly reported as
+1048576 bytes (precisely 1Mb), which sprint_size prints as "1Mb".
+
+This updates the expected output in the tests' matchPattern values
+accordingly.
+
+Signed-off-by: Jonathan Lennox <jonathan.lennox@8x8.com>
 ---
- .../device_drivers/ethernet/amazon/ena.rst    | 96 +++++++++++++++++++
- 1 file changed, 96 insertions(+)
+ .../selftests/tc-testing/tc-tests/actions/police.json  | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/networking/device_drivers/ethernet/amazon/ena.rst b/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
-index 4561e8ab..158d7100 100644
---- a/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
-+++ b/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
-@@ -53,9 +53,11 @@ ena_eth_io_defs.h   Definition of ENA data path interface.
- ena_common_defs.h   Common definitions for ena_com layer.
- ena_regs_defs.h     Definition of ENA PCI memory-mapped (MMIO) registers.
- ena_netdev.[ch]     Main Linux kernel driver.
-+ena_sysfs.[ch]      Sysfs files.
- ena_ethtool.c       ethtool callbacks.
- ena_xdp.[ch]        XDP files
- ena_pci_id_tbl.h    Supported device IDs.
-+ena_phc.[ch]        PTP hardware clock infrastructure (see `PHC`_ for more info)
- =================   ======================================================
- 
- Management Interface:
-@@ -221,6 +223,100 @@ descriptor it was received on would be recycled. When a packet smaller
- than RX copybreak bytes is received, it is copied into a new memory
- buffer and the RX descriptor is returned to HW.
- 
-+.. _`PHC`:
-+
-+PTP Hardware Clock (PHC)
-+========================
-+.. _`ptp-userspace-api`: https://docs.kernel.org/driver-api/ptp.html#ptp-hardware-clock-user-space-api
-+.. _`testptp`: https://elixir.bootlin.com/linux/latest/source/tools/testing/selftests/ptp/testptp.c
-+
-+ENA Linux driver supports PTP hardware clock providing timestamp reference to achieve nanosecond resolution.
-+
-+**PHC support**
-+
-+PHC depends on the PTP module, which needs to be either loaded as a module or compiled into the kernel.
-+
-+Verify if the PTP module is present:
-+
-+.. code-block:: shell
-+
-+  grep -w '^CONFIG_PTP_1588_CLOCK=[ym]' /boot/config-`uname -r`
-+
-+- If no output is provided, the ENA driver cannot be loaded with PHC support.
-+
-+- ``CONFIG_PTP_1588_CLOCK=y``: the PTP module is already compiled and loaded inside the kernel binary file.
-+
-+- ``CONFIG_PTP_1588_CLOCK=m``: the PTP module needs to be loaded prior to loading the ENA driver:
-+
-+Load PTP module:
-+
-+.. code-block:: shell
-+
-+  sudo modprobe ptp
-+
-+**PHC activation**
-+
-+The feature is turned off by default, in order to turn the feature on,
-+please use the following:
-+
-+- sysfs (during runtime):
-+
-+.. code-block:: shell
-+
-+  echo 1 > /sys/bus/pci/devices/<domain:bus:slot.function>/phc_enable
-+
-+All available PTP clock sources can be tracked here:
-+
-+.. code-block:: shell
-+
-+  ls /sys/class/ptp
-+
-+PHC support and capabilities can be verified using ethtool:
-+
-+.. code-block:: shell
-+
-+  ethtool -T <interface>
-+
-+**PHC timestamp**
-+
-+To retrieve PHC timestamp, use `ptp-userspace-api`_, usage example using `testptp`_:
-+
-+.. code-block:: shell
-+
-+  testptp -d /dev/ptp$(ethtool -T <interface> | awk '/PTP Hardware Clock:/ {print $NF}') -k 1
-+
-+PHC get time requests should be within reasonable bounds,
-+avoid excessive utilization to ensure optimal performance and efficiency.
-+The ENA device restricts the frequency of PHC get time requests to a maximum
-+of 125 requests per second. If this limit is surpassed, the get time request
-+will fail, leading to an increment in the phc_err statistic.
-+
-+**PHC statistics**
-+
-+PHC counters can be monitored using the following:
-+
-+sysfs:
-+
-+.. code-block:: shell
-+
-+  cat /sys/bus/pci/devices/<domain:bus:slot.function>/phc_stats/<stat_name>
-+
-+=================   ======================================================
-+**phc_cnt**         Number of successful retrieved timestamps (below expire timeout).
-+**phc_exp**         Number of expired retrieved timestamps (above expire timeout).
-+**phc_skp**         Number of skipped get time attempts (during block period).
-+**phc_err**         Number of failed get time attempts (entering into block state).
-+=================   ======================================================
-+
-+PHC timeouts:
-+
-+=================   ======================================================
-+**expire**          Max time for a valid timestamp retrieval, passing this threshold will fail
-+                    the get time request and block new requests until block timeout.
-+**block**           Blocking period starts once get time request expires or fails, all get time
-+                    requests during block period will be skipped.
-+=================   ======================================================
-+
- Statistics
- ==========
- 
--- 
-2.47.1
+
+--------------2.34.1
+Content-Type: text/x-patch; name="0001-tc-tests-Update-tc-police-action-tests-for-tc-buffer.patch"
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline; filename="0001-tc-tests-Update-tc-police-action-tests-for-tc-buffer.patch"
+
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/actions/police.json b/tools/testing/selftests/tc-testing/tc-tests/actions/police.json
+index dd8109768f8f..ae31dbeb45d8 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/actions/police.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/actions/police.json
+@@ -689,7 +689,7 @@
+         "cmdUnderTest": "$TC actions add action police rate 7mbit burst 1m continue index 1",
+         "expExitCode": "0",
+         "verifyCmd": "$TC actions get action police index 1",
+-        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst 1024Kb mtu 2Kb action continue",
++        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst 1Mb mtu 2Kb action continue",
+         "matchCount": "1",
+         "teardown": [
+             "$TC actions flush action police"
+@@ -716,7 +716,7 @@
+         "cmdUnderTest": "$TC actions add action police rate 7mbit burst 1m drop index 1",
+         "expExitCode": "0",
+         "verifyCmd": "$TC actions ls action police",
+-        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst 1024Kb mtu 2Kb action drop",
++        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst 1Mb mtu 2Kb action drop",
+         "matchCount": "1",
+         "teardown": [
+             "$TC actions flush action police"
+@@ -743,7 +743,7 @@
+         "cmdUnderTest": "$TC actions add action police rate 7mbit burst 1m ok index 1",
+         "expExitCode": "0",
+         "verifyCmd": "$TC actions ls action police",
+-        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst 1024Kb mtu 2Kb action pass",
++        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst 1Mb mtu 2Kb action pass",
+         "matchCount": "1",
+         "teardown": [
+             "$TC actions flush action police"
+@@ -770,7 +770,7 @@
+         "cmdUnderTest": "$TC actions add action police rate 7mbit burst 1m reclassify index 1",
+         "expExitCode": "0",
+         "verifyCmd": "$TC actions get action police index 1",
+-        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst 1024Kb mtu 2Kb action reclassify",
++        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst 1Mb mtu 2Kb action reclassify",
+         "matchCount": "1",
+         "teardown": [
+             "$TC actions flush action police"
+@@ -797,7 +797,7 @@
+         "cmdUnderTest": "$TC actions add action police rate 7mbit burst 1m pipe index 1",
+         "expExitCode": "0",
+         "verifyCmd": "$TC actions ls action police",
+-        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst 1024Kb mtu 2Kb action pipe",
++        "matchPattern": "action order [0-9]*:  police 0x1 rate 7Mbit burst 1Mb mtu 2Kb action pipe",
+         "matchCount": "1",
+         "teardown": [
+             "$TC actions flush action police"
+
+--------------2.34.1--
+
 
 
