@@ -1,99 +1,135 @@
-Return-Path: <netdev+bounces-171611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86884A4DCF8
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 12:50:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A54DA4DD15
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 12:55:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 292D83B1884
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 11:50:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37AAC169E2B
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 11:55:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E76E201018;
-	Tue,  4 Mar 2025 11:49:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bnipqefL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A6BB202989;
+	Tue,  4 Mar 2025 11:52:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A5913D561
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 11:49:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8339E1FF611
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 11:52:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741088997; cv=none; b=gAeqqbQgHDeQaz11iMXHK1qWUHHdzuxmJe9CWwRitnvi2uqhDl7mXFjBN8BcRJ2YZolcPwKSbibkVy6uxJvOD6ctSRGyVw1VNL5V4uCSAVErbUJx/IJobXMW0q2gF/+30pOSULkL7aKMgbIdxKhrPsTP98+YwVFo3nLTQ3IsI18=
+	t=1741089144; cv=none; b=ktu/wJigvTB96qlEGCUCH7sGTzsHO9zeRSC7sU1mUyYthPkngy+oilnPSMFHM6sfGuu45ca84iqKUtMu3Juc/ILpJ8AKW9lNy6wV8Ib+e2Ab61bx20PNkLUZZ3ClFEVh+7W4JTAXlRXm1Vg1oyZdawX+FkoenZxLj5+YdYJMmbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741088997; c=relaxed/simple;
-	bh=FEy8wb0Vfp2rft+m+EKevy1bDol8G0fpS42NKf4iXx4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FeokgxZMZoBmyY1FnfrowCmcjme+UBzBXcJ00ciqdgUrKBg6pzzO5MRMww/gSFI4JwjAlC/Nw7/yYM3bClV0P3NH5UeIVF9mP+mcIrVK45cA+xVTzUbFf5Wpjq2qi7TK3AZHtRLyypfTPllC2nguuh7/s4roX13amaCv9Awi/Xc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bnipqefL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D00F0C4CEE5;
-	Tue,  4 Mar 2025 11:49:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741088996;
-	bh=FEy8wb0Vfp2rft+m+EKevy1bDol8G0fpS42NKf4iXx4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bnipqefLWEfuG3fe5vzqev8V1BvnpArMo9SM2pSvCR1G8d8ueXMQMKz8eEttKpQch
-	 oYJf4MStOSN+/UqiTGsvxx6oYDQanfdtc8IDYh9+pFwFsh32tv0z1LArYVWl3Ge18L
-	 Qzh+LmNVH9MC+H3Ag8sHnPBp1V1Vh06C8IvrIHopRLAzceeqGlfSLWlq6Bi/aKDd6f
-	 HAZni0waic34p334gG4orgpZu1dF7f6Cj6gg/HKrh/SY6VOv9Bk3sebvOvoI1Sa0gS
-	 cbiVIeKn9KwZe65/La2qj6OqilJdgN9jYdJxu+OatAwNPlbqRCTrKwB0kz4STon+Er
-	 vWcbSlDSxJ6ug==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD5A380AA7F;
-	Tue,  4 Mar 2025 11:50:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1741089144; c=relaxed/simple;
+	bh=dvDG7NRGyP+YznlZz5HDNV5xXXkrTLabFuBacVNczI8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lbGy1s/Z7VzflZbNJktYSDo3En8HJx4/VWhB659TNHQWHs01/WXdVsZ7IyPFdItO8NfDg4LYJfpFWaje6AsFehHsBBBSZ192IWOWouis4pEBFCB57s1wIBPca+biUH/1wP3TU+v6mxbwQjNgsBILBT3FDzqHdATdP91abZIcCiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 09D8061E64795;
+	Tue, 04 Mar 2025 12:51:52 +0100 (CET)
+Message-ID: <832cc2a5-0c15-42d1-924b-a14674db6391@molgen.mpg.de>
+Date: Tue, 4 Mar 2025 12:51:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [iwl-net v3 1/5] virtchnl: make proto and
+ filter action count unsigned
+To: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>,
+ Jan Glaza <jan.glaza@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+ Simon Horman <horms@kernel.org>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>
+References: <20250304110833.95997-2-martyna.szapar-mudlaw@linux.intel.com>
+ <20250304110833.95997-4-martyna.szapar-mudlaw@linux.intel.com>
+ <9f6b830f-d2ee-4fde-a131-a956a6e84df7@molgen.mpg.de>
+ <00a160e5-c9b2-4b91-9823-dee37fdc5d25@linux.intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <00a160e5-c9b2-4b91-9823-dee37fdc5d25@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v6 0/3] net: notify users when an iface cannot change
- its netns
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174108902974.110360.3257129140639138427.git-patchwork-notify@kernel.org>
-Date: Tue, 04 Mar 2025 11:50:29 +0000
-References: <20250228102144.154802-1-nicolas.dichtel@6wind.com>
-In-Reply-To: <20250228102144.154802-1-nicolas.dichtel@6wind.com>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, aleksander.lobakin@intel.com, idosch@idosch.org,
- andrew@lunn.ch, kuniyu@amazon.com, netdev@vger.kernel.org
 
-Hello:
+Dear Martyna,
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
 
-On Fri, 28 Feb 2025 11:20:55 +0100 you wrote:
-> This series adds a way to see if an interface cannot be moved to another netns.
+Thank you for your quick reply.
+
+Am 04.03.25 um 12:45 schrieb Szapar-Mudlaw, Martyna:
+
+> On 3/4/2025 12:15 PM, Paul Menzel wrote:
+
+>> Am 04.03.25 um 12:08 schrieb Martyna Szapar-Mudlaw:
+>>> From: Jan Glaza <jan.glaza@intel.com>
+>>>
+>>> The count field in virtchnl_proto_hdrs and virtchnl_filter_action_set
+>>> should never be negative while still being valid. Changing it from
+>>> int to u32 ensures proper handling of values in virtchnl messages in
+>>> driverrs and prevents unintended behavior.
+>>> In its current signed form, a negative count does not trigger
+>>> an error in ice driver but instead results in it being treated as 0.
+>>> This can lead to unexpected outcomes when processing messages.
+>>> By using u32, any invalid values will correctly trigger -EINVAL,
+>>> making error detection more robust.
+>>>
+>>> Fixes: 1f7ea1cd6a374 ("ice: Enable FDIR Configure for AVF")
+>>> Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+>>> Reviewed-by: Simon Horman <horms@kernel.org>
+>>> Signed-off-by: Jan Glaza <jan.glaza@intel.com>
+>>> Signed-off-by: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+>>> ---
+>>>   include/linux/avf/virtchnl.h | 4 ++--
+>>>   1 file changed, 2 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/include/linux/avf/virtchnl.h b/include/linux/avf/virtchnl.h
+>>> index 4811b9a14604..cf0afa60e4a7 100644
+>>> --- a/include/linux/avf/virtchnl.h
+>>> +++ b/include/linux/avf/virtchnl.h
+>>> @@ -1343,7 +1343,7 @@ struct virtchnl_proto_hdrs {
+>>>        * 2 - from the second inner layer
+>>>        * ....
+>>>        **/
+>>> -    int count; /* the proto layers must < VIRTCHNL_MAX_NUM_PROTO_HDRS */
+>>> +    u32 count; /* the proto layers must < VIRTCHNL_MAX_NUM_PROTO_HDRS */
+>>
+>> Why limit the length, and not use unsigned int?
 > 
-> v5 -> v6:
->  - reword a nl ack comment in patch #1 (add "in the target netns")
->  - add { } in the netdev_for_each_altname() loop in patch #1
-> 
-> v4 -> v5:
->  - rebase on top of net-next
-> 
-> [...]
+> u32 range is completely sufficient for number of proto hdrs (as said: 
+> "the proto layers must < VIRTCHNL_MAX_NUM_PROTO_HDRS") and I believe it 
+> is recommended to use fixed sized variables where possible
 
-Here is the summary with links:
-  - [net-next,v6,1/3] net: rename netns_local to netns_immutable
-    https://git.kernel.org/netdev/net-next/c/0c493da86374
-  - [net-next,v6,2/3] net: advertise netns_immutable property via netlink
-    https://git.kernel.org/netdev/net-next/c/4754affe0b57
-  - [net-next,v6,3/3] net: plumb extack in __dev_change_net_namespace()
-    https://git.kernel.org/netdev/net-next/c/12b6f7069ba5
+Do you have a pointer to the recommendation? I heard the opposite, that 
+fixed length is only useful for register writes. Otherwise, you should 
+use the “generic” types [1].
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+>>>       union {
+>>>           struct virtchnl_proto_hdr
+>>>               proto_hdr[VIRTCHNL_MAX_NUM_PROTO_HDRS];
+>>> @@ -1395,7 +1395,7 @@ VIRTCHNL_CHECK_STRUCT_LEN(36, virtchnl_filter_action);
+>>>   struct virtchnl_filter_action_set {
+>>>       /* action number must be less then VIRTCHNL_MAX_NUM_ACTIONS */
+>>> -    int count;
+>>> +    u32 count;
+>>>       struct virtchnl_filter_action actions[VIRTCHNL_MAX_NUM_ACTIONS];
+>>>   };
+
+Kind regards,
+
+Paul
 
 
+[1]: https://notabs.org/coding/smallIntsBigPenalty.htm
 
