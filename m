@@ -1,95 +1,109 @@
-Return-Path: <netdev+bounces-171424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EEC5A4CF5A
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 00:38:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87A8DA4CF99
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 01:04:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B027D16DCAF
-	for <lists+netdev@lfdr.de>; Mon,  3 Mar 2025 23:38:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03C303AABEF
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 00:03:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 340B724C67B;
-	Mon,  3 Mar 2025 23:35:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B7C73234;
+	Tue,  4 Mar 2025 00:03:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SS3K0QuZ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EqdAS/SX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08C9524C668;
-	Mon,  3 Mar 2025 23:35:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAD9D29A9
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 00:03:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741044942; cv=none; b=kugSFCbO5a0mKAEY7R1YuOBnf/6Bzaj/+Qf4Cpab5n6MalRmATgOdme5DRDoZJQGjRZRZeOxALmv3TYQqdg4IJMUseZw4KMU0sr4fG7jO6LxGiY+Ek9T0Lj68CnG0fPNHqiJ2K6NKQ8b0iX88BhqeyTsoibY2hqAyl7L2eO0d1s=
+	t=1741046636; cv=none; b=T5FAByO1yYpi8I1+wHiYKYoe5vscM1+YH1L3mPO9Ldl2AtW8eetEQLKhHAZRavxD3rjg1xg8pcRBfWKPxgOte5TqQLEozNYd57OJz3jCdFVntt6X4QO3VWP9ERW11lUL+wbKjTldxs6ZP/J8E3j43MY6a9inCGtMazKK8fDFBBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741044942; c=relaxed/simple;
-	bh=RR4M7xc3WlgqOwAqXXCfJiCy9xxS4WWhMj1eJu+K6z8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=R4/pWbf5rSWlOcuYT2ykBVELuatf1GNg41w8xk1SQTezJWc/Rbi10PSj9EBrE7eSAtXR4ba8drNQMYKR7vn6PD4bNnz67iFoLgH0W5oeVKfXyIHushITSAUUjNbQ7oHLbuH2csIc4q47OL93J4BsQQaEERnxN3B3cDWKEsVR2fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SS3K0QuZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70792C4CEE8;
-	Mon,  3 Mar 2025 23:35:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741044941;
-	bh=RR4M7xc3WlgqOwAqXXCfJiCy9xxS4WWhMj1eJu+K6z8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=SS3K0QuZFwY9t8tMQX4XP0gbsvX177wi3niUjOgMv7AtayFtYGoAT9r2Bcs9Z2qzt
-	 3CQC4fC1ytMPCfFxfSqfF7Y6VnL9L4KkADYfwADuooZ0OQ3+P5PzZQJiW+yKM1+7Lq
-	 8NIiMrg9EGq+Gl0hMoo/UuK5UTVj0UmxstHKptauknc4tW7VVZMLvjnYIekAtK1lZS
-	 Mw7JUewXLvnFA8iGOH4sH0Cz6aQ+Gj3KrIiE7l1KvMlacbTHYxZRIDrjqPEoIHqDeO
-	 fMbxPZa6ApdQ5UVhgW/EUGc0tsIQ8WruD3aDj1v9JJiT6ea8+VvFHS114U0dUORLek
-	 C8sNhoILvoOXg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CE73809A8F;
-	Mon,  3 Mar 2025 23:36:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1741046636; c=relaxed/simple;
+	bh=C/LfSpekGkcQBqzcVBoT+8ef+/NIGmgDTXMdDSp2KH0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kZEybC0fujh8I1zmTJxOFi28aNp2DVrJrMJkY3L4OrEVYxmOrxvvws3oztYh8Zuj4wXoXHW5kHmHx6WawNIyDoqQuujMdfJL4k7a2d2qoIlLGyBJBmrTMBGqSRk/Vqy2A/EZe7wyyl72yWt7skEDSgDWDfHAccdbFGHx1bPfDgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=EqdAS/SX; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-30bb75492e4so17602261fa.1
+        for <netdev@vger.kernel.org>; Mon, 03 Mar 2025 16:03:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1741046633; x=1741651433; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C/LfSpekGkcQBqzcVBoT+8ef+/NIGmgDTXMdDSp2KH0=;
+        b=EqdAS/SX1cNZTPEopGRn/ftTbaYzlpkYYur946VDRWoj00RW3RDDO8j/ft3yZdOdth
+         fwKkbezcExtBYnOFIGVBOnMpIdFg6pvId4WvJpni43+cy/ieXkBk7HZ7mUO/GKJzeacV
+         3ilD14W0in27CViA/3KtXcrWyRxCa3IJ3CnWQ7z8Ln+HPa/UUxlXT4iU0ldPZ9gqdzE4
+         kBdvGA5OkZcNmK77gZFYzyrSu8KDlMuX0Y0PZPdDG295qR4uS9LTPIUOjlO1jDVJO/4t
+         2nHIv/3zuQjN1hLi/I6VDIte/+82buQbCgfGEofT4f6F8nOE1zw4pZOIAU4W9Or4i/kL
+         Aw7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741046633; x=1741651433;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=C/LfSpekGkcQBqzcVBoT+8ef+/NIGmgDTXMdDSp2KH0=;
+        b=Qwl4/jqkMi094dV8NFE0ekbcgguWQPQdTQx5PQshatSbhw5hl/ViuHd30o1AEUwOvH
+         fKTidOiF75huXGrrRXy5/sU9PfGHHZJTPtLAds4FJm3dppchawlI1pUlukv6Ge+JKotQ
+         5P+PIzxxKfFtNUtCskYafG+fCd3HWQDpgJCdwjenWmFjbl+E5bAjTPDsvSKmHO8Naoa5
+         rglw/0FKKUpf3P+MhHOqE5vvZIMEcTzpx/XR+fmbyNBwCswvnqjfsNjMJGbHKtRjR60V
+         T+TqLjdzWq+tYR45EZdcirVvv8QSAOk4mps/0cjWPMeWFj9Zl1xtW9kI22NY4/NPjjYQ
+         g5jQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVWZFbqeOQbPf6TYi+TkovP0H2DSxuvqRsh727/o/DesuN4LLY7txZKD96F91pm8oKgH887B3I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTbjll8GSzITVBCP1TC5JWpI3iY36th8o29CUsDW5vcT+wIKjH
+	cY426lknb64cNk3URGB7NP7z4RFQZVVhj/X7b4QqxoHLh+kMPaWUpw+yLNbyaKoDnyswMRJfFJk
+	4sKr79faWk7TIgLr4huf7pRyp2W53uKkawkwu2Q==
+X-Gm-Gg: ASbGncvMjOFlZGYj70lAN1yyt/xJBv3uQkXfT0HdfSewtiXbHle/tCl0p3Ra/9scpfK
+	BKGoAuPdLX47ZcjUbRMB5E9WnYCYdxgFl+NE1bvTX/17u1lZMNMo2PCruaOz6//5nyVkqtgRw6e
+	3OIYngFqnOZWAA9MacNoZJRKGnpg==
+X-Google-Smtp-Source: AGHT+IGrydCSg/lI1uzAKwGHugbQGvBBzjG9s3mdXfZC6EYIplaWRQ795GqrXmFtWsW5Su7ME7vIhfLoaVp40Qd8SR4=
+X-Received: by 2002:a2e:be03:0:b0:309:1d7b:f027 with SMTP id
+ 38308e7fff4ca-30b9320f37bmr66066201fa.9.1741046632848; Mon, 03 Mar 2025
+ 16:03:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftests: net: report output format as TAP 13 in
- Python tests
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174104497399.3745415.4226155545795108010.git-patchwork-notify@kernel.org>
-Date: Mon, 03 Mar 2025 23:36:13 +0000
-References: <20250228180007.83325-1-kuba@kernel.org>
-In-Reply-To: <20250228180007.83325-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
- petrm@nvidia.com, matttbe@kernel.org, willemb@google.com,
- linux-kselftest@vger.kernel.org
+References: <20250303164928.1466246-1-andriy.shevchenko@linux.intel.com>
+ <20250303164928.1466246-4-andriy.shevchenko@linux.intel.com>
+ <CACRpkdbCfhqRGOGrCgP-e3AnK_tmHX+eUpZKjitbfemzAXCcWg@mail.gmail.com> <Z8YThNku95-oPPNB@surfacebook.localdomain>
+In-Reply-To: <Z8YThNku95-oPPNB@surfacebook.localdomain>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Tue, 4 Mar 2025 01:03:41 +0100
+X-Gm-Features: AQ5f1Jpd0GEUB6MlVioV71j1v6rfMl3pu_k3_4FUFebcVwfwl0boXwZuTwUA1vQ
+Message-ID: <CACRpkdbqYoY1vYGii1SyPL1mkULGXYX7vFwu+U9u2w9--EYAsQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 3/3] ieee802154: ca8210: Switch to using gpiod API
+To: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, linux-wpan@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>, 
+	Stefan Schmidt <stefan@datenfreihafen.org>, Miquel Raynal <miquel.raynal@bootlin.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Mon, Mar 3, 2025 at 9:39=E2=80=AFPM Andy Shevchenko
+<andy.shevchenko@gmail.com> wrote:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+> > Maybe add a comment in the code that this is wrong and the
+> > driver and DTS files should be fixed.
+>
+> Or maybe fix in the driver and schema and add a quirk to gpiolib-of.c?
 
-On Fri, 28 Feb 2025 10:00:07 -0800 you wrote:
-> The Python lib based tests report that they are producing
-> "KTAP version 1", but really we aren't making use of any
-> KTAP features, like subtests. Our output is plain TAP.
-> 
-> Report TAP 13 instead of KTAP 1, this is what mptcp tests do,
-> and what NIPA knows how to parse best. For HW testing we need
-> precise subtest result tracking.
-> 
-> [...]
+Even better!
 
-Here is the summary with links:
-  - [net-next] selftests: net: report output format as TAP 13 in Python tests
-    https://git.kernel.org/netdev/net-next/c/d110dbf1490b
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Yours,
+Linus Walleij
 
