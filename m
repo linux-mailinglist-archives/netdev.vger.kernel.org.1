@@ -1,65 +1,48 @@
-Return-Path: <netdev+bounces-171798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C030A4EB7F
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:27:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34421A4EC6B
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:51:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F26D7189443D
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:22:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7353318848A6
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:47:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F89E284B3D;
-	Tue,  4 Mar 2025 18:11:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BE9C1F4276;
+	Tue,  4 Mar 2025 18:46:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="arpc7dBF"
+	dkim=pass (1024-bit key) header.d=aq0.de header.i=@aq0.de header.b="UBnMvt9n"
 X-Original-To: netdev@vger.kernel.org
-Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+Received: from mail.aq0.de (mail.aq0.de [168.119.229.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A386B25DD1C
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 18:11:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5F142E337A
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 18:46:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.229.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741111870; cv=none; b=JVxoVGIMA/jeC3N8zTu9XlbofsFnvCXaz7eqKd89wU7ZCIgVLncKzvUzSW10bfvXa9D69m0cAAIfhoRKAMwOg+fDqQMs9ga0Oftv5EHRldjPMXF2/j6nqNXOqAa9TwoQdxCpzzccNjRcrAzLUw3Z6JKJOSAPCzqcILXWDheIz1A=
+	t=1741114015; cv=none; b=KaIBV6lCCKBKy+apzXfPwYyi6vXUXOt0fY7GoCAqXuZjLoVxCUAFgikgLP/v4LYkvSNT5Wa/WGH5MD4LTsSs2RKJO/0BUakKbEVkDMKmLICNy61b1xkbTHu8P0HzyLpjzJJtkM65rYuEjvn9LY3hHhPDxsu3Gxbn7k+uTq2XNoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741111870; c=relaxed/simple;
-	bh=y0GFLUvmbxQf1BFQE3mFqlimIr8vaymziBplCMgs3SI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uLtntugZtOWDvLDptiRc9K5BeKtFZYSYPZqJdjiz6YkoUA2GW+1vvd/qxV2v5DuwzdpO3nmz3CO/cIwZDyGrlVvwxFgjkJbOguIrxHEShGPtCJWdmqNQi+GGfx6VPLx+hd0tdeQ13GskwUx9Fvt5XEVml7aOe/2wbhFLH4D47J0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=arpc7dBF; arc=none smtp.client-ip=139.165.32.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
-Received: from localhost.localdomain (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id B2440200DBA8;
-	Tue,  4 Mar 2025 19:10:59 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be B2440200DBA8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1741111859;
-	bh=10bdmBy7NDmePVUGJsOuwjZ57iVBrVsC6NRGfwO9qIA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=arpc7dBFK7RoYWUMSZ0ww8NjA42vPHczfDEhushyCkOsIxwnNeoZWkOyFS1/q7G9+
-	 RuaypIP2i4CCt3KeE+7S+q9KR4jV2KwWQkenlY39q9d/xlSi/pMVnDaAY9ChTfiNar
-	 4FPTyz+yo3qHze2JU48u9Eb3A/svvxzataiwpKEC4oTJF5eLBrVJY0AoJV15XY3121
-	 l/p3XUfZpLFfY5EexIvrCrPz4xakXILFBkHdZ9F++wAbWE1Ir82baGWcpVZrTrFtcV
-	 f4EBQUJ4oNdzTfRopFDGmc1tl2Ej//cSJ8SIyrz24eKm9HN/2yatjnUiU1HmP97KX8
-	 Kc1iU+V+a3Yyg==
-From: Justin Iurman <justin.iurman@uliege.be>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	justin.iurman@uliege.be,
-	Tom Herbert <tom@herbertland.com>
-Subject: [PATCH net] net: ipv6: fix dst ref loop in ila lwtunnel
-Date: Tue,  4 Mar 2025 19:10:39 +0100
-Message-Id: <20250304181039.35951-1-justin.iurman@uliege.be>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1741114015; c=relaxed/simple;
+	bh=zrQG6fY1dBLYUEBrDOSXu7MOjtnt9HcLcA++oYQbleA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FrddmBddTZ93xo2B/WHQvPoCX0oPf7r0Y/d0jaiLR2xGpXiUIUNx7AxP7VNXqNLrJ4nyEOki4ecyxEvwYdiZyWEcBkJW4xUAGlzP9325zZM61rAMETUwzqND1csKcenuSX9tLtrPy0wVc0qS1zlgdWc2OYbN/+++D72MusN0s78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=aq0.de; spf=pass smtp.mailfrom=aq0.de; dkim=pass (1024-bit key) header.d=aq0.de header.i=@aq0.de header.b=UBnMvt9n; arc=none smtp.client-ip=168.119.229.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=aq0.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aq0.de
+From: Janik Haag <janik@aq0.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aq0.de; s=mail;
+	t=1741113511; bh=9FZ7c8b5hBpGryEYuH8OUYr9oR18zEee7tad0kegjK4=;
+	h=From:To:Cc:Subject:Date;
+	b=UBnMvt9neTCtg/IZpzWCwm1Jiljbq5nrEX3JjCEyW56fbGHkof3EHmW049JmceogE
+	 ud2BYMk5vOGi6ktpXmHsOuz2X++k/fT7WlmBKEUFkJbOn5D1c41kThnbgJFpmAKnKX
+	 VrqT47JH6Ayi6grEOhGZGhjRLnynynZaIYgo4/Uk=
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	Janik Haag <janik@aq0.de>
+Subject: [PATCH] net: liquidio: fix typo
+Date: Tue,  4 Mar 2025 19:16:52 +0100
+Message-ID: <20250304181651.1123778-2-janik@aq0.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,33 +51,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch follows commit 92191dd10730 ("net: ipv6: fix dst ref loops in
-rpl, seg6 and ioam6 lwtunnels") and, on a second thought, the same patch
-is also needed for ila (even though the config that triggered the issue
-was pathological, but still, we don't want that to happen).
+Dear Linux maintainers, this is my first patch, hope everything is
+correct.
 
-Fixes: 79ff2fc31e0f ("ila: Cache a route to translated address")
-Cc: Tom Herbert <tom@herbertland.com>
-Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
+While reading through some pcie realted code I notice this small
+spelling mistake of doorbell registers.
+I added Dave in the TO field since they signed-off on by far the most
+commits touching this file.
+
+With kind regards,
+Janik Haag
+
+Signed-off-by: Janik Haag <janik@aq0.de>
 ---
- net/ipv6/ila/ila_lwt.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/ipv6/ila/ila_lwt.c b/net/ipv6/ila/ila_lwt.c
-index ff7e734e335b..ac4bcc623603 100644
---- a/net/ipv6/ila/ila_lwt.c
-+++ b/net/ipv6/ila/ila_lwt.c
-@@ -88,7 +88,8 @@ static int ila_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 			goto drop;
- 		}
+diff --git a/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.c b/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.c
+index 9ad49aea2673..5f3d39e2ceca 100644
+--- a/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.c
++++ b/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.c
+@@ -373,7 +373,7 @@ static void cn23xx_pf_setup_global_output_regs(struct octeon_device *oct)
+ 	/** Setting the water mark level for pko back pressure **/
+ 	writeq(0x40, (u8 *)oct->mmio[0].hw_addr + CN23XX_SLI_OQ_WMARK);
  
--		if (ilwt->connected) {
-+		/* cache only if we don't create a dst reference loop */
-+		if (ilwt->connected && orig_dst->lwtstate != dst->lwtstate) {
- 			local_bh_disable();
- 			dst_cache_set_ip6(&ilwt->dst_cache, dst, &fl6.saddr);
- 			local_bh_enable();
+-	/** Disabling setting OQs in reset when ring has no dorebells
++	/** Disabling setting OQs in reset when ring has no doorbells
+ 	 * enabling this will cause of head of line blocking
+ 	 */
+ 	/* Do it only for pass1.1. and pass1.2 */
+
+base-commit: 99fa936e8e4f117d62f229003c9799686f74cebc
 -- 
-2.34.1
+2.48.1
 
 
