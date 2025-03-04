@@ -1,66 +1,67 @@
-Return-Path: <netdev+bounces-171426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B85FA4CF9D
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 01:04:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1266DA4CFBC
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 01:10:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FD241896778
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 00:04:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DDDC170D57
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 00:10:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D35D42111;
-	Tue,  4 Mar 2025 00:03:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80E723234;
+	Tue,  4 Mar 2025 00:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u5+2RKW2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hSNxcxjQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4C8CC2D1;
-	Tue,  4 Mar 2025 00:03:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 564762905;
+	Tue,  4 Mar 2025 00:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741046637; cv=none; b=rEbdaBNMQasaxJudbWmFeaorLrhuaAN8tUPegRSaB3c3JfhlErM6XBvh91BbhZg/XiDcjfYrJTTX/Z1ab6qThmyaxlgnCB+q/HUtJuoSoOWTKTZDCeayzV6WVj9zywqlGzaJwEibCe8umKL/vkT2HU4o1rInoFgC2kwlFRm0EtY=
+	t=1741047026; cv=none; b=uAoBB1qTJ9EfWra3VeyxUbI+lgumOn/eXvu8khVPZvDDRp3y3Y6THolOMUpduZbXJ+AUYp3Z56sU3JyIKwsyIZ7p73+IXBBfz6SCLEWMMNuOqNNe5CkVzKZTiOfIG4Kgo35PsLb+d04sn0e1kFLzVndUGKeGPbJY2SFlySe1DIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741046637; c=relaxed/simple;
-	bh=PodGSYAN2PRqPznGy1o8bGNv8tT3sasFzN7rH8DbDzw=;
+	s=arc-20240116; t=1741047026; c=relaxed/simple;
+	bh=mhb0R+JmZbuqZb2vKrLLB9HfKDaCWuI1Q6s/9+i/gkc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M8+kggRpZLg53aLg2vGhWOlMwRZhrphgp/3G9m1cRcS9SAOVaFAG7ru1IIxUKzKy/gig9OzPDwNZQAq7dklv+voS6RNJ+54fNHDmMhk658XRJ2/LWdWxlET8ZXuS4i73ccQO81pDEWj0mgUMSoh1KBN2iy1wpm6fO09cELKfn74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u5+2RKW2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BD89C4CEE4;
-	Tue,  4 Mar 2025 00:03:56 +0000 (UTC)
+	 MIME-Version:Content-Type; b=qpYY3lhvxZop5JRXoJ1CfXWPk4GXZWRzBOUy7Qv02VBqq7R3BbjikkXxwHLYvnM1WuRDboUODnkFsWow7kkp1IJ4oAAgpmnDmf8qX9cyYl7AR7GxG1L68ZIO0+3V1MMsN4Jfz1DS7U2mIffS+Z6X3OiPg+YmHtnFhGa1zCZm+nA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hSNxcxjQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B3C1C4CEE4;
+	Tue,  4 Mar 2025 00:10:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741046636;
-	bh=PodGSYAN2PRqPznGy1o8bGNv8tT3sasFzN7rH8DbDzw=;
+	s=k20201202; t=1741047026;
+	bh=mhb0R+JmZbuqZb2vKrLLB9HfKDaCWuI1Q6s/9+i/gkc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=u5+2RKW275a+1qk3Btczy9vu4F6fSXqzr0EAFRS1d7exuLigQNzYleSDbBi/IXbsT
-	 L1HsXBng2OdDAYfXnknoWHQgp5zahNu96V1MlqGXbhGnKQAtMMqqfThugjTtnF8Bhn
-	 zAdJP9NATi+KyhcNlReKbCeqL78HRE6lb4Ak/mOlgMzRPQl/yOvUsX2BNcjCEtJMxn
-	 3EW07GrYaEXAmlxAiMuGQ6xExLHdAsqZSc47J5qDfNJRtgYwxkmSxm0MAdXICruF3Z
-	 rZkl3h3Ip+j0sfViQ714aKMyI/QQnV1ddrfxvPawVaJiKcbAS+3TL2pviJ1oWuIBx5
-	 Ooy619yCHvFNA==
-Date: Mon, 3 Mar 2025 16:03:55 -0800
+	b=hSNxcxjQZv/RKSYZQNum16KV0wryu2LL8z+zTyog6YdTtK1gF1VttJ/xPPcbtjVHU
+	 JZmil/BGqLpE9YLTHHzWIun8yrHJm+/uxcu/ucV3NF2apROYk68N6E6TFTzyEOSopS
+	 Jty+DVMyr4zLFToJtTEvwTqvv8X+DC7+joSl3XW/C6igqAT6n6pUTWDTg91XHvJTEA
+	 0WomYPJlQ6vQqWI2DjEtdX8BSwLWMZeK8AfhRVB1sbDI4T1aAiJ8xamF+Jv6J/tJ5w
+	 3/yHvoE8D8dHNXXPhhPIcJdlAxr6SsqcrsyMxOIxvGr956jKnaxA93cLPHpNqQuYHZ
+	 sskj05VhvjrOA==
+Date: Mon, 3 Mar 2025 16:10:24 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca,
- gerhard@engleder-embedded.com, jasowang@redhat.com,
- xuanzhuo@linux.alibaba.com, mst@redhat.com, leiyang@redhat.com, Eugenio
- =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "open
- list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>, open
- list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v5 3/4] virtio-net: Map NAPIs to queues
-Message-ID: <20250303160355.5f8d82d8@kernel.org>
-In-Reply-To: <Z8X15hxz8t-vXpPU@LQ3V64L9R2>
-References: <20250227185017.206785-1-jdamato@fastly.com>
-	<20250227185017.206785-4-jdamato@fastly.com>
-	<20250228182759.74de5bec@kernel.org>
-	<Z8Xc0muOV8jtHBkX@LQ3V64L9R2>
-	<Z8XgGrToAD7Bak-I@LQ3V64L9R2>
-	<Z8X15hxz8t-vXpPU@LQ3V64L9R2>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Parthiban Veerasooran
+ <parthiban.veerasooran@microchip.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
+ <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Simon Horman <horms@kernel.org>, Romain Gantois
+ <romain.gantois@bootlin.com>, Piergiorgio Beruto
+ <piergiorgio.beruto@gmail.com>
+Subject: Re: [PATCH net v2] net: ethtool: netlink: Allow NULL nlattrs when
+ getting a phy_device
+Message-ID: <20250303161024.43969294@kernel.org>
+In-Reply-To: <20250301141114.97204-1-maxime.chevallier@bootlin.com>
+References: <20250301141114.97204-1-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,56 +71,45 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 3 Mar 2025 13:33:10 -0500 Joe Damato wrote:
-> > > @@ -2880,6 +2880,13 @@ static void refill_work(struct work_struct *work)
-> > >         bool still_empty;
-> > >         int i;
-> > > 
-> > > +       spin_lock(&vi->refill_lock);
-> > > +       if (!vi->refill_enabled) {
-> > > +               spin_unlock(&vi->refill_lock);
-> > > +               return;
-> > > +       }
-> > > +       spin_unlock(&vi->refill_lock);
-> > > +
-> > >         for (i = 0; i < vi->curr_queue_pairs; i++) {
-> > >                 struct receive_queue *rq = &vi->rq[i];
-> > >  
-> > 
-> > Err, I suppose this also doesn't work because:
-> > 
-> > CPU0                       CPU1
-> > rtnl_lock                  (before CPU0 calls disable_delayed_refill) 
-> >   virtnet_close            refill_work
-> >                              rtnl_lock()
-> >   cancel_sync <= deadlock
-> > 
-> > Need to give this a bit more thought.  
+On Sat,  1 Mar 2025 15:11:13 +0100 Maxime Chevallier wrote:
+> ethnl_req_get_phydev() is used to lookup a phy_device, in the case an
+> ethtool netlink command targets a specific phydev within a netdev's
+> topology.
 > 
-> How about we don't use the API at all from refill_work?
+> It takes as a parameter a const struct nlattr *header that's used for
+> error handling :
 > 
-> Patch 4 adds consistent NAPI config state and refill_work isn't a
-> queue resize maybe we don't need to call the netif_queue_set_napi at
-> all since the NAPI IDs are persisted in the NAPI config state and
-> refill_work shouldn't change that?
+>        if (!phydev) {
+>                NL_SET_ERR_MSG_ATTR(extack, header,
+>                                    "no phy matching phyindex");
+>                return ERR_PTR(-ENODEV);
+>        }
 > 
-> In which case, we could go back to what refill_work was doing
-> before and avoid the problem entirely.
+> In the notify path after a ->set operation however, there's no request
+> attributes available.
 > 
-> What do you think ?
+> The typical callsite for the above function looks like:
+> 
+> 	phydev = ethnl_req_get_phydev(req_base, tb[ETHTOOL_A_XXX_HEADER],
+> 				      info->extack);
+> 
+> So, when tb is NULL (such as in the ethnl notify path), we have a nice
+> crash.
+> 
+> It turns out that there's only the PLCA command that is in that case, as
+> the other phydev-specific commands don't have a notification.
+> 
+> This commit fixes the crash by passing the cmd index and the nlattr
+> array separately, allowing NULL-checking it directly inside the helper.
+> 
+> Fixes: c15e065b46dc ("net: ethtool: Allow passing a phy index for some commands")
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-Should work, I think. Tho, I suspect someone will want to add queue API
-support to virtio sooner or later, and they will run into the same
-problem with the netdev instance lock, as all of ndo_close() will then
-be covered with netdev->lock.
+Well, this alone doesn't look too bad.. :) Hopefully we can address
+adding more suitable handlers for phy ops in net-next.
 
-More thorough and idiomatic way to solve the problem would be to cancel
-the work non-sync in ndo_close, add cancel with _sync after netdev is
-unregistered (in virtnet_remove()) when the lock is no longer held, then
-wrap the entire work with a relevant lock and check if netif_running()
-to return early in case of a race.
-
-Middle ground would be to do what you suggested above and just leave 
-a well worded comment somewhere that will show up in diffs adding queue
-API support?
+Didn't someone report this, tho? I vaguely remember seeing an email,
+unless they said they don't want to be credited maybe we should add
+a Reported-by tag? You can post it in reply, no need to repost 
+the patch.
 
