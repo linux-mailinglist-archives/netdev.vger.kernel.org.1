@@ -1,139 +1,144 @@
-Return-Path: <netdev+bounces-171552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C29CA4D95D
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 10:55:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 11677A4D9A4
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 11:00:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69E123B7025
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 09:47:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2443D3AAA74
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 09:55:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D78B1FC7DF;
-	Tue,  4 Mar 2025 09:47:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C0171FCFE5;
+	Tue,  4 Mar 2025 09:56:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="O3QbHPIr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ps19xneF"
 X-Original-To: netdev@vger.kernel.org
-Received: from bactrian.tulip.relay.mailchannels.net (bactrian.tulip.relay.mailchannels.net [23.83.218.9])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA646481C4
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 09:46:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.218.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741081620; cv=pass; b=t573y/Ca71pdPoA7wgyc6jb/IbuVf8ndF+i9lymUlQ75oSicDrRvnjNVbkE1yBYmrWGN/5QBcY1BU2+4XuyJSqd6AQqtz21JbsT3I5x1Ie3bATV+fD+QvW2Cg/8PrU2zXtD6EZ1q78URFtEbm6ID9NMR4dBScQfr+KhzT8A7cBQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741081620; c=relaxed/simple;
-	bh=+r8TFsquWm3u90sZ2XVyWKCsWfP3h3k6rMBbkAsqNi8=;
-	h=Message-ID:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:Date; b=E+7hq5o2JfFsINfpg+e38l+KLci7P1uZtXvcbsNlVaGwBEclFrp1/m1lPA5rksvE4LJIjobsNfb5AXsM34Lu0b6YNGeZ4wZE2EAqR8FJZC54wDtrWOmazigS8JL5LB79EntK/rBsNXgTmXFQmU4eg1bJxTJny+mXF4apnNUFYzM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=O3QbHPIr; arc=pass smtp.client-ip=23.83.218.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-X-Sender-Id: hostingeremail|x-authuser|chester.a.unal@arinc9.com
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id 1B9A78C3E29;
-	Tue,  4 Mar 2025 09:46:57 +0000 (UTC)
-Received: from nl-srv-smtpout1.hostinger.io (trex-8.trex.outbound.svc.cluster.local [100.101.191.136])
-	(Authenticated sender: hostingeremail)
-	by relay.mailchannels.net (Postfix) with ESMTPA id E7C588C3ACC;
-	Tue,  4 Mar 2025 09:46:53 +0000 (UTC)
-ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1741081616; a=rsa-sha256;
-	cv=none;
-	b=af7eV8eu4Ky/VzUdDADBUxjgxKKKs7u3q1Ev7az2ONYZp4OxvPhkZo6tgrdIRJd2itYF0h
-	zrPfYU4JGa9mxZneKMiCPXRlWWtEowsV6wH5Si0VGLw+oZi3ot6njAU15PiHufC0VB3FtT
-	CGaPVd/WJS6koZnsxf/xUIASrxiJf/+dWTK8OaQtu7mR6vx7DM9wfO2KfZDoYvH1v4A3Up
-	/9oMWljF+mmEFKPrTA+ApQHX9ORnLDQDRBWMhjGdM/Nj91Oe6hFssniYCG6IjYPwnGraWb
-	itnZqmA1/OyXlms4EQfS2aBktOWTzdwlWvDmeBLyMy2OllmPfIHM7p1uTLbjlg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-	s=arc-2022; t=1741081616;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:dkim-signature;
-	bh=D5t4LO5iZc4495dyi2ppzMU1jd7cqzfUiUSRCJpWlCU=;
-	b=GiAtfS43kFwoJr/tRcZ9Zn8Pz6XjVCRaYleWaTx2nTh0ioce/VASeJBkMXIWwtcNX9c1tF
-	vl8L1WEnDQuedsCyjqTv9cInWgcUbOI8k+jkuJaxabNhxKBOKUtDHWFu5SN3a1LzORLcVS
-	3B5Rpu8xmYavOQmb2Hhq1dXqdjHebCJHaDedcM0rDOgNK8FIfU+2bVB2fJ81Uz2wcGHbY2
-	MOz/fWFXHp9eFhvmv5khRrJBUNhIziGHOwk86F2ewRbT2okKv3aQAlrPOVNBHHEguDeh9A
-	kliPmYOC9yQKc2Yiuxe4I2mjciRPRxjwV0z25+ZNMb0M5ouB5a7gM7qjadpMjg==
-ARC-Authentication-Results: i=1;
-	rspamd-58748c789d-w6rjb;
-	auth=pass smtp.auth=hostingeremail smtp.mailfrom=chester.a.unal@arinc9.com
-X-Sender-Id: hostingeremail|x-authuser|chester.a.unal@arinc9.com
-X-MC-Relay: Bad
-X-MailChannels-SenderId: hostingeremail|x-authuser|chester.a.unal@arinc9.com
-X-MailChannels-Auth-Id: hostingeremail
-X-Slimy-Shoe: 19d76dbe66a13cec_1741081616908_3888167419
-X-MC-Loop-Signature: 1741081616908:8098079
-X-MC-Ingress-Time: 1741081616908
-Received: from nl-srv-smtpout1.hostinger.io (nl-srv-smtpout1.hostinger.io
- [145.14.150.87])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.101.191.136 (trex/7.0.2);
-	Tue, 04 Mar 2025 09:46:56 +0000
-Received: from [10.9.32.97] (unknown [185.182.236.36])
-	(Authenticated sender: chester.a.unal@arinc9.com)
-	by smtp.hostinger.com (smtp.hostinger.com) with ESMTPSA id 4Z6W6D2wtsz35BH3;
-	Tue, 04 Mar 2025 09:46:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com;
-	s=hostingermail-a; t=1741081590;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=D5t4LO5iZc4495dyi2ppzMU1jd7cqzfUiUSRCJpWlCU=;
-	b=O3QbHPIru7AnlxKZ0j2JcvM0aDko5YyybmfATwJ7W6Uyy0cYcrQ0Ay3i69qGkiy1nlWaYc
-	1hWpE1a3EaybroRWRfsrOnJnL6kBJ6z5gCnUTJHTMxKVrs9DSkj0iBLAG6y/MkrZuhftMJ
-	R++VBdvY03avb4Esfcfg4EWVS0Nn2MnBWTT9KcJruUXjzKOwRs6863OXMnuPxIeELxq0J0
-	ZuyG6OlYYkt8NLFn3abG5liwj1OZXhB6AGl2oZgaPbYXoVwpo8/YhNSXLrv/Fg1wtRf7pP
-	V8vuI1Pvaxpb3sOMYi/9mm1f2h85PsbKQa10PHLAk6fSnYDG31414GFXiFez+w==
-Message-ID: <b63fcbaa-ef27-48a9-885c-7962bd92a8b9@arinc9.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE92A1FCFCC;
+	Tue,  4 Mar 2025 09:56:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741082163; cv=none; b=iklqVengusQBaCe3m+vOcLg9YkfCoUT2E80OrYnJ2aP3Lg8qFn2BVslNOIa+bnwrgPViETlMnawTcX4bFmvZLCbYpyYbVBNZvZ6jheQTQ7IqD5g4U/Y03bK0ihHga4+eSZnADfAom7vruRlVvFa0EfrywA35vES25EBd3gd3xXE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741082163; c=relaxed/simple;
+	bh=o51jYiIjJ7Hl+a6ZtvtnyQKJHKFVcGivr4VSA+BfR1A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X9zhnNNVz+ndTDef9LeVdLu42W2s+1YiszfFc/BzbQvFIo2yaJrcYUY/Cyf5vjNm24PNE1EsMGlaJ66zXwDQ5SETZ5hmX0GTLZtmCgts67coIHT8p6CQ6Jhn2qj/R5grOC2nS5xLqEwJ5/jYzQnkh3XIDajkJAw6hK+10ZvAkJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ps19xneF; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741082162; x=1772618162;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=o51jYiIjJ7Hl+a6ZtvtnyQKJHKFVcGivr4VSA+BfR1A=;
+  b=Ps19xneF4D3M6cdUHBwSS+SYYl53IciSEvEWKQXVYu3aCDUh3RLnS8QY
+   0pe0O5CRMl3UV8eHpPzEUhUu+tfJeALFgFxJIGaoTeuWQtmLBmAE4dhnD
+   DYqvCPd0wuXC71RAsfZ9RWeRos8j2IyewvAZSweg/kUCI7UzQeFzIJzio
+   qPfHnqhypzE3B5BAFB4A6igpEiOAWw3+eeH+M3toUZLrJAA9dpPsAKE2y
+   QyqH+RB4PuBa1LCF90TyZdk9ThVDvY+W3LiEZaWmBDtyM0yylMxsKTsJf
+   APiifh0mzdbtmMuVdy92jM8v3vq9Ymy07dHgRmD6J8I36w9YbjsNlBEvh
+   A==;
+X-CSE-ConnectionGUID: 7pgFDQdxTzmqFAFM+f8FkA==
+X-CSE-MsgGUID: FlAd9TfXS0m4fU0rJSW1lQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="45767245"
+X-IronPort-AV: E=Sophos;i="6.13,331,1732608000"; 
+   d="scan'208";a="45767245"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 01:56:02 -0800
+X-CSE-ConnectionGUID: 9/id7rMqQ4+3Zhh40VmpKg==
+X-CSE-MsgGUID: ljCGWTOARy6fccCifDPeXg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="118840957"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 01:55:58 -0800
+Date: Tue, 4 Mar 2025 10:51:57 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Leon Romanovsky <leonro@nvidia.com>
+Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 6/6] net/mlx5e: Properly match IPsec subnet
+ addresses
+Message-ID: <Z8bNPRtzOBZ7LdGJ@mev-dev.igk.intel.com>
+References: <20250226114752.104838-1-tariqt@nvidia.com>
+ <20250226114752.104838-7-tariqt@nvidia.com>
+ <Z8aw1gn5iFNiSxd3@mev-dev.igk.intel.com>
+ <20250304080543.GD1955273@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: dsa: mt7530: Fix traffic flooding for MMIO
- devices
-To: Lorenzo Bianconi <lorenzo@kernel.org>,
- Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20250304-mt7988-flooding-fix-v1-1-905523ae83e9@kernel.org>
-Content-Language: en-US
-From: "Chester A. Unal" <chester.a.unal@arinc9.com>
-In-Reply-To: <20250304-mt7988-flooding-fix-v1-1-905523ae83e9@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Tue, 04 Mar 2025 09:46:28 +0000 (UTC)
-X-CM-Envelope: MS4xfAak46EaWbKlaQAOOnK1fi3wYW/2+4l5aFepSvjx8uGgOA14qId//toYZLzeR8I+fViXYRlIlNrSjhVYMS07D3LEvzQpZSwyrxo5G9Gty/xvDUy3QReb 81z8mlUhj8RTJim8GAvhYmM6/pF4WuB98DsIwesDXLY0yHpEm/E4voVX2sYx/kRelHjE5ZBFitzVbCH6SbiW/rCQx6pIvy7WNTLecRcB4gK5PUnSvp6bgpI5 Vp8PZG773xMy9cwJSctfC0mHiuA7qSvV+toWfGyhQLx+BXpppAfLFYedocznA8KwlosasXFjoGihBHj2golKcOv0nfcU2dXferx/0xfaoGPlOcIKt7iabktN iA1sFATs9WZO9x3kSxeA8u0HpQbsPUk8JwvXAz/4qP7BTX5Kr6VPd7QoCEyK4d4jZfNG0kpgp9o9ch5t7YboX4IuSr2wCc7FVXkHFFM9wOnRdkfCqygd7Nes qmYirDGRadJL+OcTKysDx4Lkurf/dh8sR6T8eOa4D+633H0+QKjbxlbzKZyIzmaupWPgrbUydGKr3k0sgbv3j5wXbcJRhsyLqW/MOEHYH9wtACwUpPEkJCzM 0lOjmmauEwkKUWVjJhNGMxlojrEdw/Ov4DaRFHwbM0JHZmROfNaKWCZGkZae/Ku8PGSFRroLVy2cTdn+llFe4d+Ok3ttmbSFd85rV+z4OsljPg==
-X-CM-Analysis: v=2.4 cv=F4sFdbhN c=1 sm=1 tr=0 ts=67c6cbf6 a=jLKKKTx0pIsUXH9Z8yxYVg==:117 a=jLKKKTx0pIsUXH9Z8yxYVg==:17 a=IkcTkHD0fZMA:10 a=VwQbUJbxAAAA:8 a=GvHEsTVZAAAA:8 a=oMYzIxOzatuwx5kPrsYA:9 a=QEXdDO2ut3YA:10 a=aajZ2D0djhd3YR65f-bR:22
-X-AuthUser: chester.a.unal@arinc9.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250304080543.GD1955273@unreal>
 
-On 04/03/2025 08:50, Lorenzo Bianconi wrote:
-> On MMIO devices (e.g. MT7988 or EN7581) unicast traffic received on lanX
-> port is flooded on all other user ports if the DSA switch is configured
-> without VLAN support since PORT_MATRIX in PCR regs contains all user
-> ports. Similar to MDIO devices (e.g. MT7530 and MT7531) fix the issue
-> defining default VLAN-ID 0 for MT7530 MMIO devices.
+On Tue, Mar 04, 2025 at 10:05:43AM +0200, Leon Romanovsky wrote:
+> On Tue, Mar 04, 2025 at 08:50:46AM +0100, Michal Swiatkowski wrote:
+> > On Wed, Feb 26, 2025 at 01:47:52PM +0200, Tariq Toukan wrote:
+> > > From: Leon Romanovsky <leonro@nvidia.com>
+> > > 
+> > > Existing match criteria didn't allow to match whole subnet and
+> > > only by specific addresses only. This caused to tunnel mode do not
+> > > forward such traffic through relevant SA.
+> > > 
+> > > In tunnel mode, policies look like this:
+> > > src 192.169.0.0/16 dst 192.169.0.0/16
+> > >         dir out priority 383615 ptype main
+> > >         tmpl src 192.169.101.2 dst 192.169.101.1
+> > >                 proto esp spi 0xc5141c18 reqid 1 mode tunnel
+> > >         crypto offload parameters: dev eth2 mode packet
+> > > 
+> > > In this case, the XFRM core code handled all subnet calculations and
+> > > forwarded network address to the drivers e.g. 192.169.0.0.
+> > > 
+> > > For mlx5 devices, there is a need to set relevant prefix e.g. 0xFFFF00
+> > > to perform flow steering match operation.
+> > > 
+> > > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > > Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> > > ---
+> > >  .../mellanox/mlx5/core/en_accel/ipsec.c       | 49 +++++++++++++++++++
+> > >  .../mellanox/mlx5/core/en_accel/ipsec.h       |  9 +++-
+> > >  .../mellanox/mlx5/core/en_accel/ipsec_fs.c    | 20 +++++---
+> > >  3 files changed, 69 insertions(+), 9 deletions(-)
+> > > 
+> > 
+> > [...]
+> > 
+> > >  
+> > > +static __be32 word_to_mask(int prefix)
+> > > +{
+> > > +	if (prefix < 0)
+> > > +		return 0;
+> > > +
+> > > +	if (!prefix || prefix > 31)
+> > > +		return cpu_to_be32(0xFFFFFFFF);
+> > > +
+> > > +	return cpu_to_be32(((1U << prefix) - 1) << (32 - prefix));
+> > 
+> > Isn't it GENMASK(31, 32 - prefix)? I don't know if it is preferable to
+> > use this macro in such place.
 > 
-> Fixes: 110c18bfed414 ("net: dsa: mt7530: introduce driver for MT7988 built-in switch")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> GENMASK(a, b) expects "b" to be const type, see
+> #define GENMASK_INPUT_CHECK(h, l) BUILD_BUG_ON_ZERO(const_true((l) > (h)))
+> 
 
-I was suspecting of this for a while. Thanks for addressing it.
+Sorry, I didn't know that, thanks.
 
-Reviewed-by: Chester A. Unal <chester.a.unal@arinc9.com>
-
-Chester A.
+> Thanks
 
