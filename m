@@ -1,46 +1,81 @@
-Return-Path: <netdev+bounces-171619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB3C5A4DD86
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 13:09:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F8F2A4DD92
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 13:11:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF9EC189601A
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 12:09:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 948D63AEBB0
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 12:11:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 460CE2010F2;
-	Tue,  4 Mar 2025 12:09:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC03520124F;
+	Tue,  4 Mar 2025 12:11:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="AefD7he3"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB561FF601;
-	Tue,  4 Mar 2025 12:09:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 766261FC7E5
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 12:11:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741090182; cv=none; b=RSoKzq8IZ6xkbm4EjSDHCHWPUikvMJed6hIlfg7F5wWMVrgdvlw//asHOkjdWkongHt6+Um56kBF0gZt/R2H8Fu03TU3/t1Wsb7tHtDHM/PDCldUDOy1O91t2uZREouPfsr4KTelxmsxZQ8JNrukQqLE8QLSVc0W9IerCXYpmbc=
+	t=1741090294; cv=none; b=npMQvOQ6BoWgWdCXBJdObsXVTzpHHmb7OERgIJx2K1vV2FidtLtHy7o7aRitaiaW3+WGx7vwAZeJgLiYptDLWfMaIROmMO3wnIkcrvS/M3sljr8WH4v22DL7U4dDcrmvWgQ9yTNJPliEqXa1Hv0C/THm+dw8axyPP07sxmE6/Qk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741090182; c=relaxed/simple;
-	bh=4S8tqaK0XJCLIv/7Rv3hJVe8rj1mH8s+KkdKMp6uzeo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=DaXZqM0wD0MrA8Ot0rtwhQJD1l3t48U+XdoRWzCJZd2X9Xux6zoGaUno/KUm39M88Xu/y2sNlX4ZXXSKUlMCUSKXd6C4qLPVELtoZ5XYRJjeUDkDf9qmRSBzCjgNW0EI9btFvx1GPYZL8vOjBrFtOeDDynft8NV7oVub34d4d8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Z6ZBX3494z2DkHc;
-	Tue,  4 Mar 2025 20:05:24 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id D7E721A016C;
-	Tue,  4 Mar 2025 20:09:35 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 4 Mar 2025 20:09:35 +0800
-Message-ID: <91fcdfca-3e7b-417c-ab26-7d5e37853431@huawei.com>
-Date: Tue, 4 Mar 2025 20:09:35 +0800
+	s=arc-20240116; t=1741090294; c=relaxed/simple;
+	bh=F1HSgeocvL7cgCLSczCAVmooQVqdM72CViOzL2cxWb4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UXwMzFAwk4iQ2+U5KLbrEtIEFW6G12p3a/+A1DxCoHU4KYZoSBPxBXNO/a3F9kL8zTwroatQK7kOj+Y4XBioFXllCOvBYSk/qhaaH5D70TLmmNxoHukIBAZGowZQR04t9psOkd5+4KeTjo7Cf0NQpPDwutJzQu7cAyPQTUyn3gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=AefD7he3; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5dca468c5e4so9972687a12.1
+        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 04:11:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1741090291; x=1741695091; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=5dj6tuMenxEInNwjhKSB4G2hItvryPwRVb3VHzYL9l8=;
+        b=AefD7he3tZxwk0KbLm7yYQnBZNP74Grq/lZwPdR0418QMAAhqSSwsQ3Il1i7L3S2Ht
+         LNZhsaPWRJcHs4wpHxs6as9ohweUG9pYgFrWo3zo7gwjDrpB1x+uCLgVJ1XVNdyQlhV+
+         n7OvxkJ4nR64YLKLom6jHoP9tzTngMYMuD3Z1Q51IWGRNvYKVMUI9DibaNqt9iTH9g8k
+         FLO10/d1KqklItgfZSxNsOfaxWtZeH4aPaNjo6xZFvxbLBOh81cD2AM4X3RM5VJEZlvJ
+         5+U8Lt4ahU4uo8qJozT2ySC/a5Nh/OYy5jOKs5umbrEI/dGQdE1V2Ks+3FHjviTxnCEg
+         ztxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741090291; x=1741695091;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5dj6tuMenxEInNwjhKSB4G2hItvryPwRVb3VHzYL9l8=;
+        b=eGf1SRWffRgJAHO4+suL8RGEwpyVGgYwOq2mNGlq9n5HjjeBz6KZgsjgJ5xzn10nhc
+         tSaiKgbZC/MFBwln8hJlds4C5LY1YR7yZ5rVfxtADqloZ3p/FynBZgeAMlmROYBZ74NT
+         fyd7oMOCw2A72itq2NMyXX2X1XErAfurKJrDrxOF61COy1yHjZ29fcZZeDOJiehYKTfB
+         34qTfcr64DpYqksn7qna5AELVKKOsnLb95LEM6PRae2WZbw9gh7Gd1TB3jjQom7geb15
+         dTPyx8TwHZ+y7XKkp2XvmjY6BmpSeRx6mx+hOcHVrR2jRf13mnuF+AOFeVJYHiyCINV4
+         iJyg==
+X-Gm-Message-State: AOJu0Yz6PZoV1JDqPRmT9/XjoJ2zL0KiMWfKs9LGo8tK2jWX1qPiR+jq
+	cePGRN7l5lUGVzdguI5PWraTd6UHMsXkslLtjI2zaOWc3AggNPi22wrp3KzB1QK3prqLykJREBH
+	0
+X-Gm-Gg: ASbGnctZ7PZpayRUoOrS/PmacPmCxq236U2Z5CmHRMI/CGt+VrgllMRDRHjZqGG1Cvy
+	YWpL0p0mS2FkBvIAZ+q244U6/ZtfWM0/ey6jzVCXqcijUMtPhjfRLOF5KDoUA3DOGpqK3SXwR/Z
+	7k4a2bM+RbaYHPm8o6Ndw7jydHUfkfwRYIJYe7tup8mHruLqeuIPehpEHhu8FEV9XkmUw7egKBK
+	FfLA1D/vZbim3BSbawZ28nY5c//9Oqf/6mX+3QT5eFNcZffd8pZAvlpgYZTTXjX2BjKP+tvFKw1
+	fWk1NsyjBLHV53QpOycXoVjlX+FX4gne/m5Nx9j2jRUwDW5+Er6NolptnftS95ZKXjQJyaZLFNV
+	CrXMAlyM=
+X-Google-Smtp-Source: AGHT+IEQlP8El5800n3Q00KKuHEtQbRABoEEoJNKwPKADVFTcGjJ/751pJSBpyu1Gwn2UebxhRGzbg==
+X-Received: by 2002:a05:6402:50d0:b0:5e5:3610:8b7a with SMTP id 4fb4d7f45d1cf-5e5361091f8mr11636907a12.17.1741090290621;
+        Tue, 04 Mar 2025 04:11:30 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:6495:6412:acd9:5225? ([2001:67c:2fbc:1:6495:6412:acd9:5225])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e4c3b6d279sm8232896a12.23.2025.03.04.04.11.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Mar 2025 04:11:30 -0800 (PST)
+Message-ID: <07c73e1d-3c9c-46c7-92cd-28d728929d18@openvpn.net>
+Date: Tue, 4 Mar 2025 13:11:28 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,175 +83,164 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] mm: alloc_pages_bulk: remove assumption of populating
- only NULL elements
-To: Dave Chinner <david@fromorbit.com>
-CC: Yishai Hadas <yishaih@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>, Shameer
- Kolothum <shameerali.kolothum.thodi@huawei.com>, Kevin Tian
-	<kevin.tian@intel.com>, Alex Williamson <alex.williamson@redhat.com>, Chris
- Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, David Sterba
-	<dsterba@suse.com>, Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
-	Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep
- Dhavale <dhavale@google.com>, Carlos Maiolino <cem@kernel.org>, "Darrick J.
- Wong" <djwong@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Jesper
- Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
-	<ilias.apalodimas@linaro.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Trond Myklebust
-	<trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, Chuck Lever
-	<chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown
-	<neilb@suse.de>, Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo
-	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Luiz Capitulino
-	<luizcap@redhat.com>, Mel Gorman <mgorman@techsingularity.net>,
-	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, <linux-btrfs@vger.kernel.org>,
-	<linux-erofs@lists.ozlabs.org>, <linux-xfs@vger.kernel.org>,
-	<linux-mm@kvack.org>, <netdev@vger.kernel.org>, <linux-nfs@vger.kernel.org>
-References: <20250228094424.757465-1-linyunsheng@huawei.com>
- <Z8a3WSOrlY4n5_37@dread.disaster.area>
+Subject: Re: [PATCH v21 20/24] ovpn: implement key add/get/del/swap via
+ netlink
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+References: <20250304-b4-ovpn-tmp-v21-0-d3cbb74bb581@openvpn.net>
+ <20250304-b4-ovpn-tmp-v21-20-d3cbb74bb581@openvpn.net> <Z8braoc3yeBY7lcE@hog>
 Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <Z8a3WSOrlY4n5_37@dread.disaster.area>
-Content-Type: text/plain; charset="UTF-8"
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <Z8braoc3yeBY7lcE@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemf200006.china.huawei.com (7.185.36.61)
 
-On 2025/3/4 16:18, Dave Chinner wrote:
+On 04/03/2025 13:00, Sabrina Dubroca wrote:
+> 2025-03-04, 01:33:50 +0100, Antonio Quartulli wrote:
+>>   int ovpn_nl_key_new_doit(struct sk_buff *skb, struct genl_info *info)
+>>   {
+> ...
+>> +	pkr.slot = nla_get_u8(attrs[OVPN_A_KEYCONF_SLOT]);
+>> +	pkr.key.key_id = nla_get_u16(attrs[OVPN_A_KEYCONF_KEY_ID]);
+>> +	pkr.key.cipher_alg = nla_get_u16(attrs[OVPN_A_KEYCONF_CIPHER_ALG]);
+> 
+> 
+> [...]
+>> +static int ovpn_nl_send_key(struct sk_buff *skb, const struct genl_info *info,
+>> +			    u32 peer_id, enum ovpn_key_slot slot,
+>> +			    const struct ovpn_key_config *keyconf)
+>> +{
+> ...
+>> +	if (nla_put_u32(skb, OVPN_A_KEYCONF_SLOT, slot) ||
+>> +	    nla_put_u32(skb, OVPN_A_KEYCONF_KEY_ID, keyconf->key_id) ||
+>> +	    nla_put_u32(skb, OVPN_A_KEYCONF_CIPHER_ALG, keyconf->cipher_alg))
+> 
+> That's a bit inconsistent. nla_put_u32 matches the generated policy,
+> but the nla_get_u{8,16} don't (and nla_get_u16 also doesn't match "u8
+> key_id" it's getting stored into).
+> 
+> [also kind of curious that the policy/spec uses U32 with max values of 1/2/7]
 
-...
+ From 
+https://www.kernel.org/doc/html/next/userspace-api/netlink/specs.html#fix-width-integer-types
+
+"Note that types smaller than 32 bit should be avoided as using them 
+does not save any memory in Netlink messages (due to alignment)."
+
+Hence I went for u32 attributes, although values stored into them are 
+much smaller.
 
 > 
->>
->> 1. https://lore.kernel.org/all/bd8c2f5c-464d-44ab-b607-390a87ea4cd5@huawei.com/
->> 2. https://lore.kernel.org/all/20250212092552.1779679-1-linyunsheng@huawei.com/
->> CC: Jesper Dangaard Brouer <hawk@kernel.org>
->> CC: Luiz Capitulino <luizcap@redhat.com>
->> CC: Mel Gorman <mgorman@techsingularity.net>
->> CC: Dave Chinner <david@fromorbit.com>
->> CC: Chuck Lever <chuck.lever@oracle.com>
->> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
->> Acked-by: Jeff Layton <jlayton@kernel.org>
->> ---
->> V2:
->> 1. Drop RFC tag and rebased on latest linux-next.
->> 2. Fix a compile error for xfs.
 > 
-> And you still haven't tested the code changes to XFS, because
-> this patch is also broken.
+> 
+>>   int ovpn_nl_key_get_doit(struct sk_buff *skb, struct genl_info *info)
+>>   {
+> ...
+>> +	slot = nla_get_u32(attrs[OVPN_A_KEYCONF_SLOT]);
+> 
+> 
+> 
+>>   int ovpn_nl_key_del_doit(struct sk_buff *skb, struct genl_info *info)
+>>   {
+> ...
+>> +	slot = nla_get_u8(attrs[OVPN_A_KEYCONF_SLOT]);
 
-I tested XFS using the below cmd and testcase, testing seems
-to be working fine, or am I missing something obvious here
-as I am not realy familiar with fs subsystem yet:
+Right. Since actual values are smaller I sometimes used the smaller macro.
 
-Step to setup the xfs:
-dd if=/dev/zero of=xfs_image bs=1M count=1024
-losetup -f xfs_image
-losetup -a
-./mkfs.xfs /dev/loop0
-mkdir xfs_test
-mount /dev/loop0 xfs_test/
-
-Test shell file:
-#!/bin/bash
-
-# Configuration parameters
-DIR="/home/xfs_test"              # Directory to perform file operations
-FILE_COUNT=100              # Maximum number of files to create in each loop
-MAX_FILE_SIZE=1024          # Maximum file size in KB
-MIN_FILE_SIZE=10            # Minimum file size in KB
-OPERATIONS=10               # Number of create/delete operations per loop
-TOTAL_RUNS=10000               # Total number of loops to run
-
-# Check if the directory exists
-if [ ! -d "$DIR" ]; then
-    echo "Directory $DIR does not exist. Please create the directory first!"
-    exit 1
-fi
-
-echo "Starting file system test on: $DIR"
-
-for ((run=1; run<=TOTAL_RUNS; run++)); do
-    echo "Run $run of $TOTAL_RUNS"
-
-    # Randomly create files
-    for ((i=1; i<=OPERATIONS; i++)); do
-        # Generate a random file size between MIN_FILE_SIZE and MAX_FILE_SIZE (in KB)
-        FILE_SIZE=$((RANDOM % (MAX_FILE_SIZE - MIN_FILE_SIZE + 1) + MIN_FILE_SIZE))
-        # Generate a unique file name using timestamp and random number
-        FILE_NAME="$DIR/file_$(date +%s)_$RANDOM"
-        # Create a file with random content
-        dd if=/dev/urandom of="$FILE_NAME" bs=1K count=$FILE_SIZE &>/dev/null
-        echo "Created file: $FILE_NAME, Size: $FILE_SIZE KB"
-    done
-
-    # Randomly delete files
-    for ((i=1; i<=OPERATIONS; i++)); do
-        # List all files in the directory
-        FILE_LIST=($(ls $DIR))
-        # Check if there are any files to delete
-        if [ ${#FILE_LIST[@]} -gt 0 ]; then
-            # Randomly select a file to delete
-            RANDOM_FILE=${FILE_LIST[$RANDOM % ${#FILE_LIST[@]}]}
-            rm -f "$DIR/$RANDOM_FILE"
-            echo "Deleted file: $DIR/$RANDOM_FILE"
-        fi
-    done
-
-    echo "Completed run $run"
-done
-
-echo "Test completed!"
-
+I guess I better convert them all to u32.
 
 > 
->> diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
->> index 5d560e9073f4..b4e95b2dd0f0 100644
->> --- a/fs/xfs/xfs_buf.c
->> +++ b/fs/xfs/xfs_buf.c
->> @@ -319,16 +319,17 @@ xfs_buf_alloc_pages(
->>  	 * least one extra page.
->>  	 */
->>  	for (;;) {
->> -		long	last = filled;
->> +		long	alloc;
->>  
->> -		filled = alloc_pages_bulk(gfp_mask, bp->b_page_count,
->> -					  bp->b_pages);
->> +		alloc = alloc_pages_bulk(gfp_mask, bp->b_page_count - filled,
->> +					 bp->b_pages + filled);
->> +		filled += alloc;
->>  		if (filled == bp->b_page_count) {
->>  			XFS_STATS_INC(bp->b_mount, xb_page_found);
->>  			break;
->>  		}
->>  
->> -		if (filled != last)
->> +		if (alloc)
->>  			continue;
 > 
-> alloc_pages_bulk() now returns the number of pages allocated in the
-> array. So if we ask for 4 pages, then get 2, filled is now 2. Then
-> we loop, ask for another 2 pages, get those two pages and it returns
-> 4. Now filled is 6, and we continue.
+> 
+> A few more inconsistencies:
+> 
+> * OVPN_A_IFNAME is defined in the uapi but never used (I guess
+>    leftover from genl link creation)
 
-It will be returning 2 instead of 4 for the second loop if I understand
-it correctly as 'bp->b_pages + filled' and 'bp->b_page_count - filled'
-is passing to alloc_pages_bulk() API now.
+Ouch, I guess you're right about it being a leftover.
 
 > 
-> Now we ask alloc_pages_bulk() for -2 pages, which returns 4 pages...
+> * OVPN_A_PEER_DEL_REASON (u32 vs u8)
+> drivers/net/ovpn/netlink-gen.c:52:      [OVPN_A_PEER_DEL_REASON] = NLA_POLICY_MAX(NLA_U32, 4),
+> drivers/net/ovpn/netlink.c:1131:        if (nla_put_u8(msg, OVPN_A_PEER_DEL_REASON, peer->delete_reason))
+
+Like above, probably better to convert them all to u32.
+
 > 
-> Worse behaviour: second time around, no page allocation succeeds
-> so it returns 2 pages. Filled is now 4, which is the number of pages
-> we need, so we break out of the loop with only 2 pages allocated.
-> There's about to be kernel crashes occur.....
+> * OVPN_A_PEER_LINK_TX_PACKETS/OVPN_A_PEER_LINK_RX_PACKETS (uint vs u32):
+> drivers/net/ovpn/netlink-gen.c-57-      [OVPN_A_PEER_LINK_RX_BYTES] = { .type = NLA_UINT, },
+> drivers/net/ovpn/netlink-gen.c-58-      [OVPN_A_PEER_LINK_TX_BYTES] = { .type = NLA_UINT, },
+> drivers/net/ovpn/netlink-gen.c-59-      [OVPN_A_PEER_LINK_RX_PACKETS] = { .type = NLA_U32, },
+> drivers/net/ovpn/netlink-gen.c:60:      [OVPN_A_PEER_LINK_TX_PACKETS] = { .type = NLA_U32, },
+> --
+> drivers/net/ovpn/netlink.c-618-     /* link RX stats */
+> drivers/net/ovpn/netlink.c-619-     nla_put_uint(skb, OVPN_A_PEER_LINK_RX_BYTES,
+> drivers/net/ovpn/netlink.c-620-                  atomic64_read(&peer->link_stats.rx.bytes)) ||
+> drivers/net/ovpn/netlink.c-621-     nla_put_uint(skb, OVPN_A_PEER_LINK_RX_PACKETS,
+> drivers/net/ovpn/netlink.c-622-                  atomic64_read(&peer->link_stats.rx.packets)) ||
+> drivers/net/ovpn/netlink.c-623-     /* link TX stats */
+> drivers/net/ovpn/netlink.c-624-     nla_put_uint(skb, OVPN_A_PEER_LINK_TX_BYTES,
+> drivers/net/ovpn/netlink.c-625-                  atomic64_read(&peer->link_stats.tx.bytes)) ||
+> drivers/net/ovpn/netlink.c:626:     nla_put_uint(skb, OVPN_A_PEER_LINK_TX_PACKETS,
+> drivers/net/ovpn/netlink.c-627-                  atomic64_read(&peer->link_stats.tx.packets)))
 > 
-> Once is a mistake, twice is compeltely unacceptable.  When XFS stops
-> using alloc_pages_bulk (probably 6.15) I won't care anymore. But
-> until then, please stop trying to change this code.
-> 
-> NACK.
-> 
-> -Dave.
+> I guess all the stats should be UINT.
+
+u32 should be enough for packets - but yeah, going UINT is better as I 
+don't need to care if it really fits 4B or not.
+
+Will do.
+
+Thanks!
+
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
+
 
