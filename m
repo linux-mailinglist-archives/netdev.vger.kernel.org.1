@@ -1,80 +1,77 @@
-Return-Path: <netdev+bounces-171765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CC3EA4E84C
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:18:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25D73A4E82A
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:16:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2C3D460896
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:12:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F011F7A7429
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 17:11:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6ED929614D;
-	Tue,  4 Mar 2025 16:50:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 253002BEC4F;
+	Tue,  4 Mar 2025 16:50:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=riscstar-com.20230601.gappssmtp.com header.i=@riscstar-com.20230601.gappssmtp.com header.b="La5b50ao"
+	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="Vm/wzv76"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
+Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B7302BEC29
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 16:50:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29F26298CB8
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 16:50:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741107014; cv=none; b=e40RJqSbXTjDNTFCduWHZC2jZEDGmxijZw0aoFHnMvO8FmIir8SJWux8my5RUcrjySW9pNIKIV57lD6R2mexzM/T34kmiX2tI+qNzO7isaQBThTWjWjnj+oUw3sXb7yTZzVJh17aWz8F6PmwkdiE1xcUR0MnnLzKr70YbnR2w6M=
+	t=1741107023; cv=none; b=IY05dYLRJvB3Tf4wDJ0ansKxz9r3NXlKgUY7qkiWaGbPi60rs2WH8rNz4e8WcLA05+mpHTELqEkKhRdzmDJ2UoaeTZqmyhfdpWvb68WcB5Zxpw8XVA97fFQGOLufx3BxDDz51Ig9WgCc+wledOdgj2GHxX2HV1MQNsvc97gwY6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741107014; c=relaxed/simple;
-	bh=ERL98+XMhCBq0WKMSdxbiVgqP55a8peNWRl1nrEYVgM=;
+	s=arc-20240116; t=1741107023; c=relaxed/simple;
+	bh=zrUZ2K6obbHVLkq6hfv8AXP8IsKmoHtrwEOg1loa8q0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BM9nekkACVobnbSDDgpIrjQKP1hwJF5f40xDnpM3Sq+NaCN0dNCCyHvIrgk4irUxQBjzLmWzx+ndcaKftGuzr2qUsVuevrxPoT+Y6Fq4K74ctOawjRquFz5BauHAd0wIc36m8z2IJCu6yxUqOUN8B488HJh3umQPGtv7grIBWhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=riscstar.com; spf=pass smtp.mailfrom=riscstar.com; dkim=pass (2048-bit key) header.d=riscstar-com.20230601.gappssmtp.com header.i=@riscstar-com.20230601.gappssmtp.com header.b=La5b50ao; arc=none smtp.client-ip=209.85.160.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=riscstar.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=riscstar.com
-Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-2bcca6aae0bso3988364fac.1
-        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 08:50:12 -0800 (PST)
+	 In-Reply-To:Content-Type; b=uegOyHWA6OMpkCX3E+2Xl6qdpnAR7jyv/t8LhG5xJg2sN8JuRQBUFJOEBKkX091N5zFeYx06QayNuLSQsS+rmOa5kCoZWRxtC0zD9li06Q6iMDtzfol6IbJZgZYwYDgMlW01vqlu+HJBKeLcpmARMyIPMHzvrj8wTB/QV7htDPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org; spf=pass smtp.mailfrom=ieee.org; dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b=Vm/wzv76; arc=none smtp.client-ip=209.85.167.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ieee.org
+Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3f674752049so863102b6e.0
+        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 08:50:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=riscstar-com.20230601.gappssmtp.com; s=20230601; t=1741107012; x=1741711812; darn=vger.kernel.org;
+        d=ieee.org; s=google; t=1741107019; x=1741711819; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=nlIbklXNCmcjeQcgQte8OZAzddo1rgx7AgL8en5NgHA=;
-        b=La5b50aoPH0xeWXwkyTSX4jKTnUS8QRDAk3Xc0L8YlVHQXHuUkjUcw6xBqeqm9/XaF
-         3wbiTi8gzZaGZg9cHkPqCLTZohyOP+XQiXCrWhPwUHl3kuaBd9EtstOSunb7uDs7WVaH
-         meQRugRn0gK1Ml79b7Cp6kFNf9MXoHIPynA1FRb7346+qUfMiPtil5GXtElIsOKqJcxS
-         y1ylzT4kbhhUBEIJAKKzaPIefIJPZXiEqa4lKKT1TYXZoAi8zHQYmuOsbaGFi2lCzWTS
-         a5g9xN/Z5eqE29hXg65HGF6FSznRLxUWYgjzh/vo5NSoQhNRXNaaBOL4DBnrimWXL4L3
-         pOKQ==
+        bh=7tkrL+e+a2YbJa4w+KDK4bewexCr454QdQiczaO5JMc=;
+        b=Vm/wzv76ieaZX2hnFuV+tlHt5eOHLM7h2glXcGiJNmS61bTW0SrTX3IjGuHlADB0vj
+         ASs7BlP5mpkZO8Lg3dM0nY8YGHRk+j3vg26a8KkmME0hMZlx9liGM96dhIvjAtn9w2m8
+         2+lEbD3u2sGg72n0q3/WoX2HawQJ5JXBKZ2QM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741107012; x=1741711812;
+        d=1e100.net; s=20230601; t=1741107019; x=1741711819;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nlIbklXNCmcjeQcgQte8OZAzddo1rgx7AgL8en5NgHA=;
-        b=Ouom5HqWbF0zZIv4y+wJj2IiYMhCK9FLFEJ3yzt3V00fVxizYdJic9DIp6dbvKkXSB
-         LJkBbTjYyv59bfG5AIR6gYCdYay7Lb85wHUmyOV92AMO3bDqfNE4oCWm5aXi0uygHelE
-         ARgMk+u2TGVmccZ00yfIxU0EF/Dxgwm65kfWQaQlA0GFmpslgnNYVkP3XMXykP5rJ+Np
-         7aQmVlgbxucSOHNj9GRpYP87D6THaTtFRmGsRq1rQjw8QOjq12RE0DZ81dxO905+h13n
-         tQBbHGYmYkbMtrd4qt2DQxomhZgh2Z15LwrGX+IJ7cTZJyAyX/+ferP7oCV5mv/mXScK
-         DfHw==
-X-Forwarded-Encrypted: i=1; AJvYcCXZbiAYo/0PJQ6JuZLn0gNTDkp1+Ttml9Q9g80rcfwtMWgoM9DIkD+Wcgtjk7V01ml/C6MMTsA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsnIuUuz35vtWClSYmnEWzfXTCfsxrGx0MOXg90KsZoi4oAJUh
-	GwOtunUHylds8Gc1fnQCmu7o3+JZ1i+XjNXCOc70U4htZM4LDN6zLdvzWMZDFu8=
-X-Gm-Gg: ASbGncvR8HGzJgB+DIsnSnXM+l3+e5vxSX/pgtfIjbCyQd+gzcxtS1PWoOvhCmot48t
-	qBip6+PpfyypkxNhBZyvJ9OufwZX4+zFrFkNtqq7Q4GLrX7B2LBqEtSx2BgeIrEA24wbrg0SJyc
-	Zdxfxx3MPnOgqYnaHKVPsHfY7Lq54GZPoR4Gc5pgkMTDa8OpGdI+U4AkFvgYV/HtsV8xqqP1wCE
-	YgtmuYEbKGvy+2nbpzaINLtk6J4yNUqLY74S2uoCRFY6LKDezzeyhHkwUbf7L875uhDKtV7g9dt
-	SrKd7Ho+tfSdOvaayCVfLc3275JQpy/mJ9qfGFwJravzb7hb3tDuXk4RHFcMCvSsr8VBPYSbMbi
-	YQwgznMZP
-X-Google-Smtp-Source: AGHT+IF132mZL/5S2H3HBYE9POUMpakPzvAs82bnnnaYSOVaRfL5Z+1wdFvEGSjxOOUrEK5Dp2GhIg==
-X-Received: by 2002:a05:6871:d10d:b0:296:a1fc:91b5 with SMTP id 586e51a60fabf-2c178341172mr10264433fac.8.1741107012166;
-        Tue, 04 Mar 2025 08:50:12 -0800 (PST)
+        bh=7tkrL+e+a2YbJa4w+KDK4bewexCr454QdQiczaO5JMc=;
+        b=pZ0hJlPksyElW+Z7OqtxSYwQkFQzjMVedNfco3i1CVOXFdiRH1sptow6KF6bBQkvTc
+         t8nYfh3RudI7+e7CjWDrVIqpAJVplHThROUw35QhaZQ83/ScRccX0uay7vU2AiasG2Jr
+         9cQappUpZn7QOk+fYdhm25N5+7fNnzh5ng4BKuWQ/FQPX3FEv3/YOz+GrQ87EFIxr8AE
+         ssNuBl+uh5KjKue7RT1T4KQ56w8JTAWFSXSeqN4UICo+mL/knVF6WG8Yrkjwa/J6UFmi
+         VpmHMhvzILas0pEHBDC+a0MJGzIQxoMsSfA2EmpxsoUSqKzxroGoQ7bXZoSWbwWjcsJ+
+         FhDg==
+X-Forwarded-Encrypted: i=1; AJvYcCXhOVd3O5Bjh2ALeQnsMU5FKolmg4RiFwO6JuXd6wvTNXsOZ0l5RxdESqxUw/7kC4WoS4HJYhY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpXu/Dzeeot1g1q5lDVa59F9rtvsNR6rHEqTSMmLqU2MNBscKS
+	fe4Kf05r15Wo2Qol2AV1ZoZhYnnNQPju1lB3qK894Jy207A2HKsG/tULkhA5gw==
+X-Gm-Gg: ASbGncukC4MukxTa5sMuRXBuwYoUBLyQe4wZY/P5eLMeZ1pyzlJ0KgJTPB290amSswk
+	ZpbfQN5PNVQ97dmM8FHKT9tsANugPksNZfNYfoPaaNoelY+DY0CiJUuZcydB/cWEr3IHh5NbvmO
+	ptRaBRf4DcxGFwL6YgzvXQSXuZszsrPrEbrB+Hs+Wy6b9mXzNz6lmdm0CB2oqbKD2NEWBED/+8/
+	FyrKjGHw2ppfoHv8XRF4PKb7te0sSG0Yjodm7IXXGc9DkV8ak11mWJHOAUbEckOP/+beQlB3vgv
+	TgbxWnb85RebhP7y4XpVYzIOmgoYXz/AyWUPJo9AQu2XOEAX8RArfbsZd4/pq5Y6jxi+Jzu7IiB
+	uYh4=
+X-Google-Smtp-Source: AGHT+IFWGzlfKIJoQMdZwPV2HzDzwdowvDtxXCUhLVhv6U+fgKXlNTeZeV9ExhknYcVynokP8VXzFA==
+X-Received: by 2002:a05:6808:23ca:b0:3f4:cf:5d5c with SMTP id 5614622812f47-3f678f4ed49mr2747867b6e.10.1741107019054;
+        Tue, 04 Mar 2025 08:50:19 -0800 (PST)
 Received: from [172.22.22.28] (c-73-228-159-35.hsd1.mn.comcast.net. [73.228.159.35])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2c15c45e81bsm2333459fac.50.2025.03.04.08.50.10
+        by smtp.googlemail.com with ESMTPSA id 5614622812f47-3f5506a0b92sm2255999b6e.6.2025.03.04.08.50.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Mar 2025 08:50:11 -0800 (PST)
-Message-ID: <5b2c08d1-47fc-43f2-abcb-f5f54fad84e1@riscstar.com>
-Date: Tue, 4 Mar 2025 10:50:10 -0600
+        Tue, 04 Mar 2025 08:50:17 -0800 (PST)
+Message-ID: <2246f041-3e42-4534-bf89-3630ca2426d1@ieee.org>
+Date: Tue, 4 Mar 2025 10:50:15 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,7 +79,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] net: ipa: Fix QSB data for v4.7
+Subject: Re: [PATCH 3/3] net: ipa: Enable checksum for
+ IPA_ENDPOINT_AP_MODEM_{RX,TX} for v4.7
 To: Luca Weiss <luca.weiss@fairphone.com>, Alex Elder <elder@kernel.org>,
  Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
@@ -90,43 +88,56 @@ To: Luca Weiss <luca.weiss@fairphone.com>, Alex Elder <elder@kernel.org>,
 Cc: ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
  netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20250227-ipa-v4-7-fixes-v1-0-a88dd8249d8a@fairphone.com>
- <20250227-ipa-v4-7-fixes-v1-2-a88dd8249d8a@fairphone.com>
+ <20250227-ipa-v4-7-fixes-v1-3-a88dd8249d8a@fairphone.com>
 Content-Language: en-US
-From: Alex Elder <elder@riscstar.com>
-In-Reply-To: <20250227-ipa-v4-7-fixes-v1-2-a88dd8249d8a@fairphone.com>
+From: Alex Elder <elder@ieee.org>
+In-Reply-To: <20250227-ipa-v4-7-fixes-v1-3-a88dd8249d8a@fairphone.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 2/27/25 4:33 AM, Luca Weiss wrote:
-> As per downstream reference, max_writes should be 12 and max_reads
-> should be 13.
+> Enable the checksum option for these two endpoints in order to allow
+> mobile data to actually work. Without this, no packets seem to make it
+> through the IPA.
 > 
 > Fixes: b310de784bac ("net: ipa: add IPA v4.7 support")
 > Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
 
-Looks good.
+This makes sense.  The checksum option affects how outgoing
+packets are formatted and incoming packets are interpreted
+by the IPA hardware.  So with this being wrong, I suppose
+packets (one way and/or the other) might just be getting
+dropped as invalid.
+
+This looks good to me.  I'm really pleased you were able to
+get this working.
 
 Reviewed-by: Alex Elder <elder@riscstar.com>
 
 > ---
->   drivers/net/ipa/data/ipa_data-v4.7.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+>   drivers/net/ipa/data/ipa_data-v4.7.c | 2 ++
+>   1 file changed, 2 insertions(+)
 > 
 > diff --git a/drivers/net/ipa/data/ipa_data-v4.7.c b/drivers/net/ipa/data/ipa_data-v4.7.c
-> index 7e315779e66480c2a3f2473a068278ab5e513a3d..e63dcf8d45567b0851393c2cea7a0d630afa20cd 100644
+> index e63dcf8d45567b0851393c2cea7a0d630afa20cd..41f212209993f10fee338e28027739a7402d5089 100644
 > --- a/drivers/net/ipa/data/ipa_data-v4.7.c
 > +++ b/drivers/net/ipa/data/ipa_data-v4.7.c
-> @@ -38,8 +38,8 @@ enum ipa_rsrc_group_id {
->   /* QSB configuration data for an SoC having IPA v4.7 */
->   static const struct ipa_qsb_data ipa_qsb_data[] = {
->   	[IPA_QSB_MASTER_DDR] = {
-> -		.max_writes		= 8,
-> -		.max_reads		= 0,	/* no limit (hardware max) */
-> +		.max_writes		= 12,
-> +		.max_reads		= 13,
->   		.max_reads_beats	= 120,
->   	},
->   };
+> @@ -104,6 +104,7 @@ static const struct ipa_gsi_endpoint_data ipa_gsi_endpoint_data[] = {
+>   			.filter_support	= true,
+>   			.config = {
+>   				.resource_group	= IPA_RSRC_GROUP_SRC_UL_DL,
+> +				.checksum       = true,
+>   				.qmap		= true,
+>   				.status_enable	= true,
+>   				.tx = {
+> @@ -127,6 +128,7 @@ static const struct ipa_gsi_endpoint_data ipa_gsi_endpoint_data[] = {
+>   		.endpoint = {
+>   			.config = {
+>   				.resource_group	= IPA_RSRC_GROUP_DST_UL_DL,
+> +				.checksum       = true,
+>   				.qmap		= true,
+>   				.aggregation	= true,
+>   				.rx = {
 > 
 
 
