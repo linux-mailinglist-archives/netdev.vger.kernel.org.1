@@ -1,116 +1,153 @@
-Return-Path: <netdev+bounces-171501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4C1DA4D3F3
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 07:37:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07F42A4D3FA
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 07:40:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 420F93AE670
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 06:37:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 350E6188E9EF
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 06:40:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4762F1F461A;
-	Tue,  4 Mar 2025 06:37:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 276CD1F462C;
+	Tue,  4 Mar 2025 06:40:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b="jllluqPF"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="ShSP2F4X"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 337F01F150D;
-	Tue,  4 Mar 2025 06:37:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B5FE1EF390;
+	Tue,  4 Mar 2025 06:40:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741070227; cv=none; b=soJUwcZGIdeUcBJ6isyiXSu5E49IlQtZz1u2yc2Qt2NA/RHQkojXFD7TV48i9obAIaOXz0aykP9VRefrND4I3zcOyY42FZ4ar+nHUrSTz1HUrIMtIwdIbM71HEenTE8KsGsGSe6DBSHCAQOYMydOBLZDB9Nx+8pFawWc6MJ24sw=
+	t=1741070404; cv=none; b=Jxh4DbnNDgtIN/P9DrtGMaGr7l706/IpVE/bHDTjeXyGaTet9jiOcgEIEk/k9/x3HlRyIAOdShXMGqo37UQPC/PoQ2DvV3zBfWTM8iH9MwFcddaUW5M5QhTvZinsES9jPe1uUihx+XrxtN23wU+Rfm3B88er0LhFZWn5ekqX6Ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741070227; c=relaxed/simple;
-	bh=Pof+IzNFFSwumliPuC0y0GUgCeiXKgFaH2lhS0EXipQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h8EHaWWwQCbaUmPxtzsPnItkP9RcGN5sbdu9EeFeDx5stl5sxFB2wk9r/vh1nATkp0hx+OeTEAanZ3wKwipUzYSnUM+O3idB5y0hEaPKyQl4Uep5XHeV5sZLfEXuIRGTq5N36Uq74xVO7LfUIsPR975jSDTTSFtphv3zHwJ5YA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yoseli.org; spf=none smtp.mailfrom=yoseli.org; dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b=jllluqPF; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yoseli.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=yoseli.org
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 85FB544312;
-	Tue,  4 Mar 2025 06:37:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yoseli.org; s=gm1;
-	t=1741070223;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tpUcGbb9YZkLLOOR+VEMMuMvQQVcm/kEbmlQs/v60T4=;
-	b=jllluqPF5OIY/FIHof76m6a2aw7KVkPhiF/vYRQNHOqMffUfeXGKqd+zJSblY4zhdsEnU4
-	aNYnN2GFqc5e3cMvjEQzHeS651pm72/NonBxvfITlBik+Ro/zf5LKbg+L60OqoYiCj8z+c
-	IDMJBodOr47dmAAE3cr1450IUMqtVzCUY4R3WzPe8dKhbsOwfT1+XKrIJjpEB+ZUcXo8c2
-	SenhXEu2afneXDK+ArM8Yh2xZfTu2lJnDa4Wsv0oQpJGUqMjyVs/irYpKEj8SgEcS5phmW
-	EcB0V/S1VsSNw9b81yB/lD6ZENXDVDnIFIVqHwgPXjpLkOOlwB6u9N0FskLjPw==
-Message-ID: <a545c67f-de26-4224-8d20-c8abdbd6a9c7@yoseli.org>
-Date: Tue, 4 Mar 2025 07:37:00 +0100
+	s=arc-20240116; t=1741070404; c=relaxed/simple;
+	bh=L6Kn7/pcyX4sixRSMwjPYfWPrrukaks09cKCzVtg2Ko=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oS2xMXRETjDVsmxC0KsHXKZnId+YfcWLOghFYe12Yufuj24wxqm7LNzzogCOR5DUgb4DmwxvGe8qp5jeOXtvjXvpFjU98fF+u8fOZ5B+cdo3Tamd6FWpD4g48Wb4zH99tWKVQiXkDcgd3W1HTOkabWB21F5v4b+KUU/6S6FkpTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=ShSP2F4X; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 523MkFcv014013;
+	Mon, 3 Mar 2025 22:39:47 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=IN6vN4UD4bD2YhMl6yv2TFyow
+	tG7VQ1DGZOuXkEAjjU=; b=ShSP2F4XfOkh487S+Hmq8lcGVdoa8yjC2EMxoZFJJ
+	OVCFNeTUrL6RrZ7azqzNHctZUNBtgfK9YH60x1UCYsWPFYP1WS4v2GvY+hv3TthA
+	xFlGiNB0HgilTFwgLFlrdgDctYdh1vn2chEIWu78i6XHhBxM0xQ58zu3nSiynXZ+
+	He5qaARmyLiHcGWU0xMMQCU9k//L7sUpKZ3KgiRfUQIP4TKn8sJpMy+17uD0IIl8
+	70CuRvWhWF1A8MK2Wo+P6gBr06EvbctFmIypXfwYwW2Et4cq6g0QLjpFkEM8zHrD
+	RvnMbfTj4jZwlrSTydkIRiNjuwTPU3IgVXlJ1c3EG/M6g==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 454qcfc89y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 03 Mar 2025 22:39:47 -0800 (PST)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 3 Mar 2025 22:39:45 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 3 Mar 2025 22:39:45 -0800
+Received: from maili.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id 042693F707B;
+	Mon,  3 Mar 2025 22:39:41 -0800 (PST)
+Date: Tue, 4 Mar 2025 12:09:40 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <longli@linuxonhyperv.com>
+CC: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+        Konstantin Taranov <kotaranov@microsoft.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, <linux-rdma@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-hyperv@vger.kernel.org>, Long Li
+	<longli@microsoft.com>
+Subject: Re: [Patch rdma-next] RDMA/mana_ib: handle net event for pointing to
+ the current netdev
+Message-ID: <20250304063940.GA2702870@maili.marvell.com>
+References: <1740782519-13485-1-git-send-email-longli@linuxonhyperv.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] net: phy: dp83826: Add support for straps reading
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Catalin Popescu <catalin.popescu@leica-geosystems.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250303-dp83826-fixes-v1-0-6901a04f262d@yoseli.org>
- <20250303-dp83826-fixes-v1-2-6901a04f262d@yoseli.org>
- <fcc25495-5453-4b15-aece-b01bca3a00ba@lunn.ch>
- <7cd18e37-2d68-4825-bcc4-fc2ac6b9a461@yoseli.org>
- <bf0228a7-032d-4d8c-b5e1-1be4830404f7@lunn.ch>
-Content-Language: en-US
-From: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
-In-Reply-To: <bf0228a7-032d-4d8c-b5e1-1be4830404f7@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddutddufeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkffggfgfuvfevfhfhjggtgfesthejredttddvjeenucfhrhhomheplfgvrghnqdfoihgthhgvlhcujfgruhhtsghoihhsuceojhgvrghnmhhitghhvghlrdhhrghuthgsohhisheshihoshgvlhhirdhorhhgqeenucggtffrrghtthgvrhhnpeefieetgeehvdeggffgffetheehhfetkeefhefhgeeuheetueffueeikefgffffteenucfkphepledurdduieehrdduieehrdduleejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledurdduieehrdduieehrdduleejpdhhvghloheplgduledvrdduieekrddurdeingdpmhgrihhlfhhrohhmpehjvggrnhhmihgthhgvlhdrhhgruhhtsghoihhsseihohhsvghlihdrohhrghdpnhgspghrtghpthhtohepuddtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhog
- hhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegtrghtrghlihhnrdhpohhpvghstghusehlvghitggrqdhgvghoshihshhtvghmshdrtghomh
-X-GND-Sasl: jeanmichel.hautbois@yoseli.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1740782519-13485-1-git-send-email-longli@linuxonhyperv.com>
+X-Authority-Analysis: v=2.4 cv=VaMNPEp9 c=1 sm=1 tr=0 ts=67c6a033 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=KPitI-3vFcalBia9:21 a=kj9zAlcOel0A:10 a=Vs1iUdzkB0EA:10 a=Odnh0R2cAAAA:8 a=yMhMjlubAAAA:8 a=WLnx8VTwFErqAH7yV0kA:9
+ a=CjuIK1q_8ugA:10 a=lNAA6UHySJB7qmBR1x20:22
+X-Proofpoint-ORIG-GUID: TP3-lmfRf75I-umk3i7iCl3RY8Wv3Jv6
+X-Proofpoint-GUID: TP3-lmfRf75I-umk3i7iCl3RY8Wv3Jv6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-04_03,2025-03-03_04,2024-11-22_01
 
-Hello Andrew,
-
-On 03/03/2025 18:50, Andrew Lunn wrote:
-> On Mon, Mar 03, 2025 at 06:37:28PM +0100, Jean-Michel Hautbois wrote:
->> Hi Andrew,
->>
->> On 03/03/2025 18:20, Andrew Lunn wrote:
->>> On Mon, Mar 03, 2025 at 06:05:52PM +0100, Jean-Michel Hautbois wrote:
->>>> When the DP83826 is probed, read the straps, and apply the default
->>>> settings expected. The MDI-X is not yet supported, but still read the
->>>> strap.
->>>
->>> What about backwards compatibility? I expect this changes the
->>> behaviour of the device, potentially introducing regressions?  Please
->>> add an explanation of why this is safe.
->>
->> I am not certain it is safe. As far as I know that if straps are used on the
->> hardware, then it should be used, and if the behavior has to be different,
->> then userspace can change it (or any other way). Am I wrong ?
-> 
-> First off, what does the datasheet say about these straps?
-> 
-> Straps generally configure the hardware, without software being
-> involved. It seems odd you need software to read the straps and apply
-> them.
-> 
-> Why do you need this? What is your use case. As you said, user space
-> can configure all this, so why are you not doing that?
-
-Thanks you for your remarks, indeed, ip link set + ethtool -s works fine 
-to force the link mode wanted. Event the master/slave can be specified, 
-so there is no need for this patch 2/2.
-
-Thanks !
-JM
+On 2025-03-01 at 04:11:59, longli@linuxonhyperv.com (longli@linuxonhyperv.com) wrote:
+> From: Long Li <longli@microsoft.com>
+>
+> When running under Hyper-V, the master device to the RDMA device is always
+> bonded to this RDMA device if it's present in the kernel. This is not
+> user-configurable.
+>
+> The master device can be unbind/bind from the kernel. During those events,
+> the RDMA device should set to the current netdev to relect the change of
+> master device from those events.
+>
+> Signed-off-by: Long Li <longli@microsoft.com>
+> ---
+>  drivers/infiniband/hw/mana/device.c  | 35 ++++++++++++++++++++++++++++
+>  drivers/infiniband/hw/mana/mana_ib.h |  1 +
+>  2 files changed, 36 insertions(+)
+>
+> diff --git a/drivers/infiniband/hw/mana/device.c b/drivers/infiniband/hw/mana/device.c
+> index 3416a85f8738..3e4f069c2258 100644
+> --- a/drivers/infiniband/hw/mana/device.c
+> +++ b/drivers/infiniband/hw/mana/device.c
+> @@ -51,6 +51,37 @@ static const struct ib_device_ops mana_ib_dev_ops = {
+>  			   ib_ind_table),
+>  };
+>
+> +static int mana_ib_netdev_event(struct notifier_block *this,
+> +				unsigned long event, void *ptr)
+> +{
+> +	struct mana_ib_dev *dev = container_of(this, struct mana_ib_dev, nb);
+> +	struct net_device *event_dev = netdev_notifier_info_to_dev(ptr);
+> +	struct gdma_context *gc = dev->gdma_dev->gdma_context;
+> +	struct mana_context *mc = gc->mana.driver_data;
+> +	struct net_device *ndev;
+> +
+> +	if (event_dev != mc->ports[0])
+> +		return NOTIFY_DONE;
+> +
+> +	switch (event) {
+> +	case NETDEV_CHANGEUPPER:
+> +		rcu_read_lock();
+> +		ndev = mana_get_primary_netdev_rcu(mc, 0);
+> +		rcu_read_unlock();
+...
+> +
+> +		/*
+> +		 * RDMA core will setup GID based on updated netdev.
+> +		 * It's not possible to race with the core as rtnl lock is being
+> +		 * held.
+> +		 */
+> +		ib_device_set_netdev(&dev->ib_dev, ndev, 1);
+rcu_read_unlock() should be here, right ?
+> +
+> +		return NOTIFY_OK;
+> +	default:
+> +		return NOTIFY_DONE;
+> +	}
+> +}
+> +
+>
 
