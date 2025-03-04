@@ -1,101 +1,100 @@
-Return-Path: <netdev+bounces-171550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D57A1A4D931
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 10:50:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 015A6A4D90B
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 10:45:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E80783B3D22
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 09:43:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F3981885A42
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 09:46:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93DBF1FDA90;
-	Tue,  4 Mar 2025 09:42:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 729C71FCF72;
+	Tue,  4 Mar 2025 09:45:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sAD73dR4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XcROd9i+"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486011FCFDA;
-	Tue,  4 Mar 2025 09:42:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35BCE1F4E38;
+	Tue,  4 Mar 2025 09:45:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741081373; cv=none; b=CEX0z2xoDl2Yxq6EnJgWdEJanYF0noaiarHx7CUDhQg6WMVUAywLN9dHevVscYPzsGsJQxdBPCB4mzcmBCHCUp0wCOtvM73rhLk8Y//NHWADrEyXHJ/IKuJITAQ9XugzzJ6vzseGKJmOwANZwUAsxbrRF4YN3ZFT9KxMxm0trqQ=
+	t=1741081546; cv=none; b=PytNjDHuYEi/VfdqR1GOKgw01zKY/i7utghtTj6vkI2//eu2ftmk3tc7ZdFk8yCLeXOIODIBeczT7lPhkgKFid/vCs4z/aelLzb99JO+tx7v9qTLZPIgDeyh+xW17reI8w7OaBEOk68v1fi0gt5m8b9qHdYUKPOk3hALs3enxNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741081373; c=relaxed/simple;
-	bh=XwmCxjrXcMahsJEKEkslTcjHfUp6QZXWnoexz7Mrfjs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FDfqLcRouFy9MPPQA5EvRbrh9AhyOjuHj3JQ97JuAMuYqw2rnDQoWWJaySugKAX29mu2+HHNysbqaihRqQTshwfcS06jyuZx8dMSfQYLoGuwloCVgoDJ18kMnbJsQ7syPmD+0Ln8YlGjuspwCQyhiSB/DH/g0YM4YHMRiTecsxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=sAD73dR4; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=JV3pZtApgs6TqusViUPy5JRin7FrjXxYFUIaUJ+B9XQ=; b=sAD73dR4uuNhAcshhcuRcesBx+
-	eJ/C3bmv3pIIe/mG1mLKwsxL767vF9XoYK+XuLoxcB4ZcWd01zg+ESguKuTlE8fSe3DBCudwCK4QH
-	tUYunxwMMarMT59PtDZe7o+MBlfFzUHHgWTAWR/HFTAFBcE2XGKUZOY9ifY73IjijaOidM6spsxSE
-	TFf3w0Ou4GRQUfvuK5g12RRqcEKAkz1yfN6u5AVhvvF8TmSgpmxj7ZOfmMqoCfnW2dmEM2XmvjPlQ
-	vWR3ZzKEgCa2Xwz1NeUER743p8ylHJVVYcWFyw0T6x121cHcZEOlLl6WIzyfEXcfnVEJRzfC1fAmf
-	rCLuWuRQ==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tpOn8-00000000YOw-0yQv;
-	Tue, 04 Mar 2025 09:42:22 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 5C1F230049D; Tue,  4 Mar 2025 10:42:20 +0100 (CET)
-Date: Tue, 4 Mar 2025 10:42:20 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Menglong Dong <menglong8.dong@gmail.com>
-Cc: rostedt@goodmis.org, mark.rutland@arm.com, alexei.starovoitov@gmail.com,
-	catalin.marinas@arm.com, will@kernel.org, mhiramat@kernel.org,
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
-	martin.lau@linux.dev, eddyz87@gmail.com, yonghong.song@linux.dev,
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
-	jolsa@kernel.org, davem@davemloft.net, dsahern@kernel.org,
-	mathieu.desnoyers@efficios.com, nathan@kernel.org,
-	nick.desaulniers+lkml@gmail.com, morbo@google.com,
-	samitolvanen@google.com, kees@kernel.org, dongml2@chinatelecom.cn,
-	akpm@linux-foundation.org, riel@surriel.com, rppt@kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH v4 1/4] x86/ibt: factor out cfi and fineibt offset
-Message-ID: <20250304094220.GC11590@noisy.programming.kicks-ass.net>
-References: <20250303132837.498938-1-dongml2@chinatelecom.cn>
- <20250303132837.498938-2-dongml2@chinatelecom.cn>
- <20250303165454.GB11590@noisy.programming.kicks-ass.net>
- <CADxym3aVtKx_mh7aZyZfk27gEiA_TX6VSAvtK+YDNBtuk_HigA@mail.gmail.com>
- <20250304053853.GA7099@noisy.programming.kicks-ass.net>
- <20250304061635.GA29480@noisy.programming.kicks-ass.net>
- <CADxym3bS_6jpGC3vLAAyD20GsR+QZofQw0_GgKT8nN3c-HqG-g@mail.gmail.com>
+	s=arc-20240116; t=1741081546; c=relaxed/simple;
+	bh=Zx8aHL8TjK/0JadzMPfxpvzacvveR7z9R5dYYUGLCOs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=k+4PGWGhdR/th1UV7LjEelqVtqtTk7QSe3+Ga2RkD3OwnuezoOyk6V++MRVzRfG9evzGKAfD4XVXLT3ovLNDeMm1X43Mhj9t82is3G+QIVZYyLv85GOyCy/F5lYcMGvCeQEPo0F1jAaW9a92M+5wdT/o5OlibZxEvTf8o0q21/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XcROd9i+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C474C4CEE5;
+	Tue,  4 Mar 2025 09:45:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741081545;
+	bh=Zx8aHL8TjK/0JadzMPfxpvzacvveR7z9R5dYYUGLCOs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=XcROd9i+64hjCn50JTFmCZOYijO1ihYFHQEPqSF4puOuuXVsIPnf7TQHVj3qJyC/w
+	 xYPDgYxaNUQJKVdEnr4EjlA8DM2g7yN5QmrP7njexaxch2IjtWPCaEPWTDnLCMTlLU
+	 MZ/46w88BVaINh0t+2YCRKigcJvYvEZvoMuvNyUMJbhCNVncK8DpnRfC1KZmxz1C0m
+	 yqwkxESK434RJxkVP2/FPmcUnvRAIentc5dEb61RGhx2ZLPaUcDeqtDpqmq0P6RyOf
+	 COflYQRvfcZFx9fh5nc3RDhijliiUCTvGWbj7I5qKoDMKi0XrogxIBKChhTQYLtc1V
+	 SwW388ceLWQIA==
+From: Christian Brauner <brauner@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <brauner@kernel.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-afs@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [GIT PULL v3] afs, rxrpc: Clean up refcounting on afs_cell and afs_server records
+Date: Tue,  4 Mar 2025 10:45:21 +0100
+Message-ID: <20250304-fuhrpark-neuwagen-b66b75fd45e6@brauner>
+X-Mailer: git-send-email 2.47.2
+In-Reply-To: <3761344.1740995350@warthog.procyon.org.uk>
+References: <3761344.1740995350@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CADxym3bS_6jpGC3vLAAyD20GsR+QZofQw0_GgKT8nN3c-HqG-g@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1146; i=brauner@kernel.org; h=from:subject:message-id; bh=Zx8aHL8TjK/0JadzMPfxpvzacvveR7z9R5dYYUGLCOs=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaQfO30oLpSlyf3B6levC+bs6xU49PXO0u9WMR02tuen/ XtSV6LN01HKwiDGxSArpsji0G4SLrecp2KzUaYGzBxWJpAhDFycAjCRAw6MDIfj3+2YIcHye5tr V6y4QQnLO8saRZX4oq+71XZ6HDnsWcPI8GBnnI2meaHc/Y+3v+qqhLDon5ussmnC4c+egq0lj6p t2QE=
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 04, 2025 at 03:47:45PM +0800, Menglong Dong wrote:
-> We don't have to select FUNCTION_ALIGNMENT_32B, so the
-> worst case is to increase ~2.2%.
+On Mon, 03 Mar 2025 09:49:10 +0000, David Howells wrote:
+> Could you pull this into the VFS tree onto a stable branch, replacing the
+> earlier pull?  The patches were previously posted here as part of a longer
+> series:
 > 
-> What do you think?
+>   https://lore.kernel.org/r/20250224234154.2014840-1-dhowells@redhat.com/
+> 
+> This fixes an occasional hang that's only really encountered when rmmod'ing
+> the kafs module, one of the reasons why I'm proposing it for the next merge
+> window rather than immediate upstreaming.  The changes include:
+> 
+> [...]
 
-Well, since I don't understand what you need this for at all, I'm firmly
-on the side of not doing this.
+Pulled into the vfs-6.15.shared.afs branch of the vfs/vfs.git tree.
+Patches in the vfs-6.15.shared.afs branch should appear in linux-next soon.
 
-What actual problem is being solved with this meta data nonsense? Why is
-it worth blowing up our I$ footprint over.
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series or pull request allowing us to
+drop it.
 
-Also note, that if you're going to be explaining this, start from
-scratch, as I have absolutely 0 clues about BPF and such.
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs-6.15.shared.afs
+
+https://git.kernel.org/vfs/vfs/c/acf689e88306
 
