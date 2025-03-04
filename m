@@ -1,59 +1,62 @@
-Return-Path: <netdev+bounces-171610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99E7EA4DCDD
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 12:46:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDCBDA4DCFA
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 12:50:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A67A7A5D05
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 11:45:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8E461888762
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 11:50:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62F1C1FBC9B;
-	Tue,  4 Mar 2025 11:46:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6693200BBD;
+	Tue,  4 Mar 2025 11:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j415LynE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D20TNwTK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A7C1F193D;
-	Tue,  4 Mar 2025 11:46:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 961861FFC68;
+	Tue,  4 Mar 2025 11:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741088772; cv=none; b=gqlofmdoPYxDS6lBbXXIww6EPBqP4cxReNOrvciqL2OTvPb04bs7UDHj+jSIJ2nv4MzIEXxVJ/DnV+bD3L5Kh96Sv5euwQ1H1lbauLWKgHo9bcXNd3yqE0XWgT30YNLDuBRFYU2aH6BK5a9RaBr/Xbq81xZlEybrW++6OlAFdEA=
+	t=1741089028; cv=none; b=sE6260TrivJEn3cxD6ZTbssXYXYV/W1qxINZhb9ZxwfPhsdEEUqIb2KWQ4YrW+qRQ2OUXjGl7tw0Hoc74swhQivjrwG8kZGXXWJghY0y6eQvHwUxI7mwZGoomzplCiVRHPK7rgmN0FjTha+bnUbsnE+VGcO554A4OTrkTqm4Ydc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741088772; c=relaxed/simple;
-	bh=5y3AT23ebdCmJk0btj891bMWItHXaFcvxFbbOso/Wek=;
+	s=arc-20240116; t=1741089028; c=relaxed/simple;
+	bh=kmomjaiI3c2VGNM7oWwROpYWTIS/k9TkBJGFHrTSAeQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d18hHEKqhmZ6Gytos+euzwPovev7bVumvmAMLde4liy+QXfcBvn+n60yfyC97uArlu1sZqkp4kJW6An4CwkglBJpX+Q42si5A86ZqxQI8jhfPgioKfzlavSYYdON9HS1MoB0MdzNTQ1TYsUUw2fEZitq4AdJ0n9zskkAORB8pLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j415LynE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD207C4CEE5;
-	Tue,  4 Mar 2025 11:46:08 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=kKMm/amFbSqF4JTL+HNXr8GZCkWiEttbad0MWtnDzo+G/zDV171raQ570tDedKJlDrxMgrR6nhU3gMg2XajipXA7GJk4a3LV20JY35/ASS1DmR2ekOKLFyN31M8Sl/ROQBsMoehRNaJA4VRYt95cCnJ1ketMLVnX6+i/iNLqvwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D20TNwTK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2918C4CEE5;
+	Tue,  4 Mar 2025 11:50:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741088771;
-	bh=5y3AT23ebdCmJk0btj891bMWItHXaFcvxFbbOso/Wek=;
+	s=k20201202; t=1741089028;
+	bh=kmomjaiI3c2VGNM7oWwROpYWTIS/k9TkBJGFHrTSAeQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=j415LynE3XvROLsaZHycED6qlb6CjtjfZbQWx4BtYMVBJ0oVwD3EsSzIxTPN6Ei/9
-	 yux6g7RAqXrY4NL0hMC+BqxQpFGvqGrWh6P9qa+bJTsl/3kHkWQ9q5+n/Ec82VLe3t
-	 1F9hS4L0pHgFu6g6nxtZRN3+bKAfqM5xCffSAXDSOypLMagG0aQu4E0qSEQS7Pbc9t
-	 Vqkhv0cyQUqcBXTChTopwP4J++mb+MOdvkuyhplOHlp7lKWLNF7RgMl72EvoSgNVNv
-	 vcVYUzmiCGPlbKa70NIqKxvdxUloQ4PEwgufvZsklGzwMl6a1JwXMOPhufi08vSM5m
-	 M1UBJardsUmkA==
-Date: Tue, 4 Mar 2025 11:46:06 +0000
+	b=D20TNwTK7KVFhQq1NmArBDPe4rQlX8/WvrpJFFgqMR0rG1pyCZibVccsp83IIzacO
+	 RstbbvOSgYHkKA68NOPU8/tqoSuceilz9wLwtZuYWNnMFrgDg5LdHkUka8M7hkyhZQ
+	 NNHND9WXIvgl6C5ouNJEwgQ2+zMulJHbIHDWLGBuWXhvWTFtV3oMuDqNao0YVT+Mue
+	 xE6Q5y/Gy1j1U9uCHuq6cusMFA3bzv+0P5F9XY2WtcRJo/Fh9FiLxEOoDi/7B+BbSc
+	 lAD0eFmwI7JFA4zgCG0LDVf1+FRPWJjBSA5GtdCmAlpyFCNmYKJY47kPLfn9zsgLxe
+	 PTtZ0XI2l4bLA==
+Date: Tue, 4 Mar 2025 11:50:23 +0000
 From: Simon Horman <horms@kernel.org>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, shenjian15@huawei.com,
-	wangpeiyang1@huawei.com, liuyonglong@huawei.com,
-	chenhao418@huawei.com, jonathan.cameron@huawei.com,
-	shameerali.kolothum.thodi@huawei.com, salil.mehta@huawei.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: hns3: make sure ptp clock is unregister and
- freed if hclge_ptp_get_cycle returns an error
-Message-ID: <20250304114606.GA3666230@kernel.org>
-References: <20250228105258.1243461-1-shaojijie@huawei.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	kernel-team@meta.com
+Subject: Re: [PATCH net-next v2 2/8] netconsole: Make boolean comparison
+ consistent
+Message-ID: <20250304115023.GB3666230@kernel.org>
+References: <20250228-netcons_current-v2-0-f53ff79a0db2@debian.org>
+ <20250228-netcons_current-v2-2-f53ff79a0db2@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,20 +65,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250228105258.1243461-1-shaojijie@huawei.com>
+In-Reply-To: <20250228-netcons_current-v2-2-f53ff79a0db2@debian.org>
 
-On Fri, Feb 28, 2025 at 06:52:58PM +0800, Jijie Shao wrote:
-> From: Peiyang Wang <wangpeiyang1@huawei.com>
+On Fri, Feb 28, 2025 at 04:50:18AM -0800, Breno Leitao wrote:
+> Convert the current state assignment to use explicit boolean conversion,
+> making the code more robust and easier to read. This change adds a
+> double-negation operator to ensure consistent boolean conversion as
+> suggested by Paolo[1].
 > 
-> During the initialization of ptp, hclge_ptp_get_cycle might return an error
-> and returned directly without unregister clock and free it. To avoid that,
-> call hclge_ptp_destroy_clock to unregist and free clock if
-> hclge_ptp_get_cycle failed.
+> This approach aligns with the existing pattern used in
+> sysdata_cpu_nr_enabled_show().
 > 
-> Fixes: 8373cd38a888 ("net: hns3: change the method of obtaining default ptp cycle")
-> Signed-off-by: Peiyang Wang <wangpeiyang1@huawei.com>
-> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> Link: https://lore.kernel.org/all/7309e760-63b0-4b58-ad33-2fb8db361141@redhat.com/ [1]
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+
+Thanks Breno,
+
+FWIIW, I 100% agree with this change.
 
 Reviewed-by: Simon Horman <horms@kernel.org>
-
 
