@@ -1,133 +1,150 @@
-Return-Path: <netdev+bounces-171795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CA7DA4EB22
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:20:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FEF3A4EB63
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 19:25:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15AA47ABFBE
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:19:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F07C171C47
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 18:20:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F8A0283CBE;
-	Tue,  4 Mar 2025 18:06:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BA6C291F96;
+	Tue,  4 Mar 2025 18:06:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lFoQptTx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rgV18Yza"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 846A8205E20;
-	Tue,  4 Mar 2025 18:06:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3029B285402;
+	Tue,  4 Mar 2025 18:06:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741111603; cv=none; b=QmvpCzn0lloWio8IO18Ydk0ACI563HwwwrvBJn0/hiu7VClAchMihXK7uYo5ZNnreYoZuJ9h+GLQ29cSKsXXUFTZKl9qfqoIQ1uuKY/aFytQelcgK0cMTy21d9wDP5N+6msabE2U66zsRQLXxuMc4+vSwKMBaFK+uBPTd24aPpI=
+	t=1741111578; cv=none; b=TkBwejujiAr6Tz+a04Vc1ve8ISFAhQG92fxaeCVyiEiR+v3AseGpQ3gx6VArrpJBpMvLancROCeMiCP/4lC1OaqJvE98oCzjPR9N5JA/n3G+pgWlTy/1f7dI/748fsE1C/xJbMEWO18xjEx+ijg7/b84BOF9A7FJZf/pPvlVeNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741111603; c=relaxed/simple;
-	bh=hXzXG6ZNf6YAuMm3Istj9wi4E+AFhRDdb61kKOYV0FI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ceTlXaBwEbdrHFQ9XYRWHtxaj0c/LDAW+GrP/ErxW2XR7yz6083ya4c6FhgIbhlPNzXGKoeYIREIndVOPZJ0J+6MrxMAiGWS0tOAE5NVwArrbj7vEaU5rjS4PXVvC9V3Ko1NOQBd9WFjLVRqXBbRw2z14EKRSwuj4dFaRdZ5Z4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=lFoQptTx; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=0oDWL9MqCLrBHhvluseel4yAvZkVftMTuSIpYrKtT5U=; b=lFoQptTxFgvn2eDMe9RbVEMjHy
-	bVVWUfCw27Rz8+6Vz9Pfs5Qms1vQk2tYgDHqnjK26Wj+5L+vcRKbLEqg8Er6WzIBfh81P7jRO1I1C
-	S5amhajrZ2oT5+vUYjI2Zt+UJB45R7DD0cGnhtNujyBXgLM2rJpYmxVfAv1BUnHwBVEd3NG014M9V
-	+WEbi3C00dMo3EwKzxqFH3F6vYB64aX382NuxQeD/au7NsDFJm42CPTl1hGqdVMIn9sh7EXtjKOd9
-	hqLXRwfcddIr7ZnpduODpJ00ZKAdNPJ8DGCmUjnyxYe1BfhQwdXTt+ACr3t2zHqx8bobuxqwbTB+j
-	oc+BD3dQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tpWeA-00000002cln-3T7m;
-	Tue, 04 Mar 2025 18:05:43 +0000
-Date: Tue, 4 Mar 2025 18:05:38 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Hannes Reinecke <hare@suse.com>
-Cc: Vlastimil Babka <vbabka@suse.cz>, Boris Pismenny <borisp@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	linux-mm@kvack.org, Harry Yoo <harry.yoo@oracle.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: Kernel oops with 6.14 when enabling TLS
-Message-ID: <Z8dA8l1NR-xmFWyq@casper.infradead.org>
-References: <Z8XPYNw4BSAWPAWT@casper.infradead.org>
- <edf65d4e-90f0-4b12-b04f-35e97974a36f@suse.cz>
- <95b0b93b-3b27-4482-8965-01963cc8beb8@suse.cz>
- <fcfa11c6-2738-4a2e-baa8-09fa8f79cbf3@suse.de>
- <a466b577-6156-4501-9756-1e9960aa4891@suse.cz>
- <6877dfb1-9f44-4023-bb6d-e7530d03e33c@suse.com>
- <db1a4681-1882-4e0a-b96f-a793e8fffb56@suse.cz>
- <Z8cm5bVJsbskj4kC@casper.infradead.org>
- <a4bbf5a7-c931-4e22-bb47-3783e4adcd23@suse.com>
- <Z8cv9VKka2KBnBKV@casper.infradead.org>
+	s=arc-20240116; t=1741111578; c=relaxed/simple;
+	bh=/mHrneXC+FDFR+ulcKLKzYeJxuL6kACz3C5Ak/ky3F0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Snrf9Ssx56Lv+OegfTvzxVrcjmUgg3ahwppFzAErlkUl/TMRabUdHIDJVHip82vDxL9cysQuMSTHlX7OET14bl66Anmq9J75EBAf7rGMxdHTX7uGKDTc7C/oFlYLo5ksv2HiAuFdYcCN8kbcPbqQ4nFnHEiQBskCipG7+xX7NDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rgV18Yza; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BEF1C4CEE7;
+	Tue,  4 Mar 2025 18:06:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741111577;
+	bh=/mHrneXC+FDFR+ulcKLKzYeJxuL6kACz3C5Ak/ky3F0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=rgV18Yzagv9cverj+FZNtx0115Jef9e5DyRMVPT0V3pN3e2KVaQUCtEsoAs+bLdFa
+	 wUzBBow+vrMYDxc9ReyxGohY7QY9s7hJc3W9Lae0cbsG5AtiQS/2/f8xd8SVAoqr1v
+	 37YJqjKCD46nns86s330YOVZf9V2GGOk0FOY72JPfVi6VvoCzcYrFe/K+y6zzUV4Lg
+	 qqw7jSd33lSRyims26GfPgX7RjZzaGR41Oy4mVapn+BEe8EkIZGcBkRyRZjJVqju6r
+	 QLKq8K/2/C0rtMZ0ul0OFHjTqGATWujILMljQd3iiyJbebQcFdt/7sRUIOpgpBqcPJ
+	 mXREknW0ADuIA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	shuah@kernel.org,
+	pshelar@ovn.org,
+	aconole@redhat.com,
+	amorenoz@redhat.com,
+	linux-kselftest@vger.kernel.org,
+	dev@openvswitch.org
+Subject: [PATCH net-next] selftests: openvswitch: don't hardcode the drop reason subsys
+Date: Tue,  4 Mar 2025 10:06:15 -0800
+Message-ID: <20250304180615.945945-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z8cv9VKka2KBnBKV@casper.infradead.org>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 04, 2025 at 04:53:09PM +0000, Matthew Wilcox wrote:
-> Right, that's what happened in the block layer.  We mark the bio with
-> BIO_PAGE_PINNED if the pincount needs to be dropped.  As a transitional
-> period, we had BIO_PAGE_REFFED which indicated that the page refcount
-> needed to be dropped.  Perhaps there's something similar that network
-> could be doing.
+WiFi removed one of their subsys entries from drop reasons, in
+commit 286e69677065 ("wifi: mac80211: Drop cooked monitor support")
+SKB_DROP_REASON_SUBSYS_OPENVSWITCH is now 2 not 3.
+The drop reasons are not uAPI, read the correct value
+from debug info.
 
-Until that time ... how does this look as a quick hack to avoid
-reverting the slab change?
+We need to enable vmlinux BTF, otherwise pahole needs
+a few GB of memory to decode the enum name.
 
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index d6fed25243c3..ca08a923ac6d 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -1520,7 +1520,10 @@ static inline void folio_get(struct folio *folio)
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: shuah@kernel.org
+CC: pshelar@ovn.org
+CC: aconole@redhat.com
+CC: amorenoz@redhat.com
+CC: linux-kselftest@vger.kernel.org
+CC: dev@openvswitch.org
+---
+ tools/testing/selftests/net/config                    |  2 ++
+ .../testing/selftests/net/openvswitch/openvswitch.sh  | 11 ++++++++---
+ 2 files changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
+index 5b9baf708950..3365bcc35304 100644
+--- a/tools/testing/selftests/net/config
++++ b/tools/testing/selftests/net/config
+@@ -18,6 +18,8 @@ CONFIG_DUMMY=y
+ CONFIG_BRIDGE_VLAN_FILTERING=y
+ CONFIG_BRIDGE=y
+ CONFIG_CRYPTO_CHACHA20POLY1305=m
++CONFIG_DEBUG_INFO_BTF=y
++CONFIG_DEBUG_INFO_BTF_MODULES=n
+ CONFIG_VLAN_8021Q=y
+ CONFIG_GENEVE=m
+ CONFIG_IFB=y
+diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+index 960e1ab4dd04..3c8d3455d8e7 100755
+--- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
++++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+@@ -330,6 +330,11 @@ test_psample() {
+ # - drop packets and verify the right drop reason is reported
+ test_drop_reason() {
+ 	which perf >/dev/null 2>&1 || return $ksft_skip
++	which pahole >/dev/null 2>&1 || return $ksft_skip
++
++	ovs_drop_subsys=$(pahole -C skb_drop_reason_subsys |
++			      awk '/OPENVSWITCH/ { print $3; }' |
++			      tr -d ,)
  
- static inline void get_page(struct page *page)
- {
--	folio_get(page_folio(page));
-+	struct folio *folio = page_folio(page);
-+	if (WARN_ON_ONCE(folio_test_slab(folio)))
-+		return;
-+	folio_get(folio);
- }
+ 	sbx_add "test_drop_reason" || return $?
  
- static inline __must_check bool try_get_page(struct page *page)
-@@ -1614,6 +1617,8 @@ static inline void put_page(struct page *page)
- {
- 	struct folio *folio = page_folio(page);
+@@ -373,7 +378,7 @@ test_drop_reason() {
+ 		"in_port(2),eth(),eth_type(0x0800),ipv4(src=172.31.110.20,proto=1),icmp()" 'drop'
  
-+	if (folio_test_slab(folio))
-+		return;
- 	folio_put(folio);
- }
+ 	ovs_drop_record_and_run "test_drop_reason" ip netns exec client ping -c 2 172.31.110.20
+-	ovs_drop_reason_count 0x30001 # OVS_DROP_FLOW_ACTION
++	ovs_drop_reason_count 0x${ovs_drop_subsys}0001 # OVS_DROP_FLOW_ACTION
+ 	if [[ "$?" -ne "2" ]]; then
+ 		info "Did not detect expected drops: $?"
+ 		return 1
+@@ -390,7 +395,7 @@ test_drop_reason() {
  
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 65f550cb5081..8c7fdb7d8c8f 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -1190,8 +1190,12 @@ static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
- 		if (!n)
- 			return -ENOMEM;
- 		p = *pages;
--		for (int k = 0; k < n; k++)
--			get_page(p[k] = page + k);
-+		for (int k = 0; k < n; k++) {
-+			struct folio *folio = page_folio(page);
-+			p[k] = page + k;
-+			if (!folio_test_slab(folio))
-+				folio_get(folio);
-+		}
- 		maxsize = min_t(size_t, maxsize, n * PAGE_SIZE - *start);
- 		i->count -= maxsize;
- 		i->iov_offset += maxsize;
+ 	ovs_drop_record_and_run \
+             "test_drop_reason" ip netns exec client nc -i 1 -zuv 172.31.110.20 6000
+-	ovs_drop_reason_count 0x30004 # OVS_DROP_EXPLICIT_ACTION_ERROR
++	ovs_drop_reason_count 0x${ovs_drop_subsys}0004 # OVS_DROP_EXPLICIT_ACTION_ERROR
+ 	if [[ "$?" -ne "1" ]]; then
+ 		info "Did not detect expected explicit error drops: $?"
+ 		return 1
+@@ -398,7 +403,7 @@ test_drop_reason() {
+ 
+ 	ovs_drop_record_and_run \
+             "test_drop_reason" ip netns exec client nc -i 1 -zuv 172.31.110.20 7000
+-	ovs_drop_reason_count 0x30003 # OVS_DROP_EXPLICIT_ACTION
++	ovs_drop_reason_count 0x${ovs_drop_subsys}0003 # OVS_DROP_EXPLICIT_ACTION
+ 	if [[ "$?" -ne "1" ]]; then
+ 		info "Did not detect expected explicit drops: $?"
+ 		return 1
+-- 
+2.48.1
+
 
