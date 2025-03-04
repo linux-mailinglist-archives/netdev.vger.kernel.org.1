@@ -1,74 +1,73 @@
-Return-Path: <netdev+bounces-171593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C411A4DBED
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 12:10:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE0F7A4DBEE
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 12:10:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E515A16FBCF
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 11:09:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F5EE18951D0
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 11:10:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6113200BA9;
-	Tue,  4 Mar 2025 11:09:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E6201FF617;
+	Tue,  4 Mar 2025 11:09:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aBdW0/m0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kXYGKyM/"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CFE51FF5EF
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 11:09:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 905601FF601
+	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 11:09:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741086553; cv=none; b=UHRSpd9kmm64z2J38x/iYQdwH0IZX2zL0chjiTNoKU5oml2amEGSFi2EHH2qF7DqCV42nDNpD9dw/0Vnnsnn07C1euRYniHBlnMa0XXz0x1Q1niPMhKt3gTpVWDzUKRTqzB+o2f0c8LwmUGlW0/lMzH2MObh5XPtfQJLnAzdpuM=
+	t=1741086559; cv=none; b=cgye7kO7ss6EN3KstuL1pr/M7XuLLnzekOyZLcmtVBQcC4Kykcvynf8+BHTlHsEbnY4eeIYRz0y/btVYTIMzRqiFIus/gvZ3llXGXMMVuYP9D8aGO8y21jaoaErDMctWLGGzxfZ/Rqtxqq+7FDDK141wJDM/f01WymcDkIDBCeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741086553; c=relaxed/simple;
-	bh=+FokbEjIo6EWGZsc1hJnWYHHvZiQYXYkKTV6GBaOM3Q=;
+	s=arc-20240116; t=1741086559; c=relaxed/simple;
+	bh=3GlyvXMisaidBEam8T+nDgJqMed2mKAfCnPGZWzpKdY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I8U3Tx93zjJ6XPFPbZzj3iOLBvcngan2EQytv/qXSYUTr/kzk8FCXrgs3959LEn5ZGgiRItBMs86Sy2n8QIBmdVAKir4Uc2Grs2cMZoyQyj3MtAjhsfsK08cZRduZggxZ+L6QggV7xqDnhjGZCxwjYNVgbuvkuuG0AiwH3qqM48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aBdW0/m0; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=hyQylxrxOBVGOjJQt/PxFanmcsg87dy2a117sXkwMAAtUQkTrZB7rTVVmkrl0/V8hGQweqhxX0mWabqunRTpBSQzPLyL3XCdS2v9O67RreuZ8uTeEExmsDc7dLPM1FhUk/w301r5W9lbCYkI8hn0ORcM8lmFt6d4A7Ke+hnCzvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kXYGKyM/; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741086552; x=1772622552;
+  t=1741086557; x=1772622557;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=+FokbEjIo6EWGZsc1hJnWYHHvZiQYXYkKTV6GBaOM3Q=;
-  b=aBdW0/m0aRDup57f6GAMxOKMtCuWdOtuo9GQ0AAtMMIWstw3cupE8q3X
-   oBz+eFdQdL1l7732s7acC+k9j8yFql51dcx4gHpnvNYpDy5I9KCpi2rbB
-   dRC/cMWgGilPboGKcX/ZFElZIvPfYgguS6tAqRwvO9naRTwLNJGe4MVs2
-   /EEudtdEL527DmBuoAbcnk+Q8nwXNN5ymkALcs5D/6kayVz+LHUddIWB1
-   EYGkcEmRp5Jj43Btz05Ye9uStOBEFBuN+PpfBBm91ZcPM28dK6+coI7xf
-   6qfMBLzIr+qTWEL92+Bf+kACPB7QNR/TzMJgHM0UZ6X4oloKFa7S4tnR0
-   w==;
-X-CSE-ConnectionGUID: cWdz94lWRMCjpUYeskuI/Q==
-X-CSE-MsgGUID: za6rgR36RaWHTSlRWhmMNA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="41247017"
+  bh=3GlyvXMisaidBEam8T+nDgJqMed2mKAfCnPGZWzpKdY=;
+  b=kXYGKyM/F7UMqxlC9aDqlkkDmiO+dJXwMeQntbZkKyyDzaXOf3XEkT/6
+   xWCF8zcyVe1YGRMXs6+/GsS3LJZMMCyuE4uakrv5W9CzDKFXPnbTIDKQ+
+   rCdm44CGa70uOK5pc+NW3jh1o7UavRg64+rsjt9YV09q5CybpTO82AkIn
+   H76ngj/UVl//NvLQwBlo/5WkW9RiomnKhJgqP2NQHLltn0owi6twMnubl
+   NvdHZZy8aJcppqydX7hipKoAobmqnk1mNEhzMbUZ6ZHi/3ZxUTFPHZqrz
+   7iMukNgRECKRocr+TDKeRURAn2QmNh5T6ohSaAWeA7S1hawsf2U+N5bH9
+   A==;
+X-CSE-ConnectionGUID: Wf5jyIGoQFy7+xpSoChepg==
+X-CSE-MsgGUID: MmLMZObjSOmTh7YwNyMrUQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="41247024"
 X-IronPort-AV: E=Sophos;i="6.13,331,1732608000"; 
-   d="scan'208";a="41247017"
+   d="scan'208";a="41247024"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 03:09:12 -0800
-X-CSE-ConnectionGUID: r6hfVo9aSf6a9e7Hsj5xvg==
-X-CSE-MsgGUID: fneyscdOQKWxJnR366XkAg==
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 03:09:15 -0800
+X-CSE-ConnectionGUID: TU/6t8OCSyaVmiPD9I2TgA==
+X-CSE-MsgGUID: fnxn7LeyQnmxskOdkQpT8A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,331,1732608000"; 
-   d="scan'208";a="118341352"
+   d="scan'208";a="118341376"
 Received: from enterprise.igk.intel.com ([10.102.20.175])
-  by fmviesa007.fm.intel.com with ESMTP; 04 Mar 2025 03:09:10 -0800
+  by fmviesa007.fm.intel.com with ESMTP; 04 Mar 2025 03:09:13 -0800
 From: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
 	Jan Glaza <jan.glaza@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
 	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
 	Simon Horman <horms@kernel.org>,
 	Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
-Subject: [iwl-net v3 2/5] ice: stop truncating queue ids when checking
-Date: Tue,  4 Mar 2025 12:08:32 +0100
-Message-ID: <20250304110833.95997-5-martyna.szapar-mudlaw@linux.intel.com>
+Subject: [iwl-net v3 3/5] ice: validate queue quanta parameters to prevent OOB access
+Date: Tue,  4 Mar 2025 12:08:33 +0100
+Message-ID: <20250304110833.95997-6-martyna.szapar-mudlaw@linux.intel.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20250304110833.95997-2-martyna.szapar-mudlaw@linux.intel.com>
 References: <20250304110833.95997-2-martyna.szapar-mudlaw@linux.intel.com>
@@ -82,32 +81,62 @@ Content-Transfer-Encoding: 8bit
 
 From: Jan Glaza <jan.glaza@intel.com>
 
-Queue IDs can be up to 4096, fix invalid check to stop
-truncating IDs to 8 bits.
+Add queue wraparound prevention in quanta configuration.
+Ensure end_qid does not overflow by validating start_qid and num_queues.
 
-Fixes: bf93bf791cec8 ("ice: introduce ice_virtchnl.c and ice_virtchnl.h")
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Fixes: 015307754a19 ("ice: Support VF queue rate limit and quanta size configuration")
 Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Jan Glaza <jan.glaza@intel.com>
 Signed-off-by: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_virtchnl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-index b6285433307c..343f2b4b0dc5 100644
+index 343f2b4b0dc5..adb1bf12542f 100644
 --- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
 +++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-@@ -565,7 +565,7 @@ bool ice_vc_isvalid_vsi_id(struct ice_vf *vf, u16 vsi_id)
-  *
-  * check for the valid queue ID
+@@ -1903,13 +1903,21 @@ static int ice_vc_cfg_q_bw(struct ice_vf *vf, u8 *msg)
   */
--static bool ice_vc_isvalid_q_id(struct ice_vsi *vsi, u8 qid)
-+static bool ice_vc_isvalid_q_id(struct ice_vsi *vsi, u16 qid)
+ static int ice_vc_cfg_q_quanta(struct ice_vf *vf, u8 *msg)
  {
- 	/* allocated Tx and Rx queues should be always equal for VF VSI */
- 	return qid < vsi->alloc_txq;
++	u16 quanta_prof_id, quanta_size, start_qid, num_queues, end_qid, i;
+ 	enum virtchnl_status_code v_ret = VIRTCHNL_STATUS_SUCCESS;
+-	u16 quanta_prof_id, quanta_size, start_qid, end_qid, i;
+ 	struct virtchnl_quanta_cfg *qquanta =
+ 		(struct virtchnl_quanta_cfg *)msg;
+ 	struct ice_vsi *vsi;
+ 	int ret;
+ 
++	start_qid = qquanta->queue_select.start_queue_id;
++	num_queues = qquanta->queue_select.num_queues;
++
++	if (check_add_overflow(start_qid, num_queues, &end_qid)) {
++		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
++		goto err;
++	}
++
+ 	if (!test_bit(ICE_VF_STATE_ACTIVE, vf->vf_states)) {
+ 		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
+ 		goto err;
+@@ -1921,8 +1929,6 @@ static int ice_vc_cfg_q_quanta(struct ice_vf *vf, u8 *msg)
+ 		goto err;
+ 	}
+ 
+-	end_qid = qquanta->queue_select.start_queue_id +
+-		  qquanta->queue_select.num_queues;
+ 	if (end_qid > ICE_MAX_RSS_QS_PER_VF ||
+ 	    end_qid > min_t(u16, vsi->alloc_txq, vsi->alloc_rxq)) {
+ 		dev_err(ice_pf_to_dev(vf->pf), "VF-%d trying to configure more than allocated number of queues: %d\n",
+@@ -1951,7 +1957,6 @@ static int ice_vc_cfg_q_quanta(struct ice_vf *vf, u8 *msg)
+ 		goto err;
+ 	}
+ 
+-	start_qid = qquanta->queue_select.start_queue_id;
+ 	for (i = start_qid; i < end_qid; i++)
+ 		vsi->tx_rings[i]->quanta_prof_id = quanta_prof_id;
+ 
 -- 
 2.47.0
 
