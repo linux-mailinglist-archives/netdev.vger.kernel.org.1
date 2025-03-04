@@ -1,224 +1,144 @@
-Return-Path: <netdev+bounces-171533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49A12A4D60F
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 09:19:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDA7EA4D63A
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 09:25:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF649188D375
-	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 08:19:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09631173F4F
+	for <lists+netdev@lfdr.de>; Tue,  4 Mar 2025 08:25:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F6A71FC0E9;
-	Tue,  4 Mar 2025 08:18:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E80B21FBC99;
+	Tue,  4 Mar 2025 08:25:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="PKq+Px3F"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="NUq8Bkte";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="xl53Kcz7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED391F5829
-	for <netdev@vger.kernel.org>; Tue,  4 Mar 2025 08:18:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE5A1F7580;
+	Tue,  4 Mar 2025 08:24:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741076320; cv=none; b=YBk004fHSQs7TP9zdXC/Pc/uJrJK9Rx+MG/RACp/696yClNjaakVoVh3P3zmdAusZmJ1zie0h7cYJvkZP/N67+1tFF85upwsw2SbWTkpXP65MUwZWKOaYQGPDju+jQ2k16ImznS5tdlXM0dO32DhAByrApIBqUcBQUWlKYDL/Wc=
+	t=1741076701; cv=none; b=GW/JBEnYu/76g5hSWIxsP0RVC4SOVEruSlOVihPQqZB/Dq2UUHsZWGG0bGtJHl8r1XJpj3MQewtdzsQsOO4dEv1UpoojYR8HEl3ZpWAa5+nOfQ34VeXE45+ze1H9O/9L7SMyGbz+XkP/5iL2IvSmTs0426Z6xk8e2ahbw+Bh2Pg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741076320; c=relaxed/simple;
-	bh=MZcygyW82kCp7u9tCYmO6hhj2Hxe6B9gWadL8462is8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gapBpDvKHrMmf7pm6MvlX2CXotsXQZGMqAmboddfMOFFf7VzCt4pU/kg+vsLIzKfMU2vGOEoj8dsDGK5gI4d1pIqWOQcLzWyC9ICHzkq6iQlPE1sGz1WCQY+EboAfpWTaZuAGlHUpkE6Pato52EE2lJs/b1cAoOmfd0sQ5EKBiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=PKq+Px3F; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2fe98d173daso8500747a91.1
-        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 00:18:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1741076317; x=1741681117; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Gc0xsYnTUQhvWodmw2ejFo3Ab0lc47BeE7G2ofWx65Q=;
-        b=PKq+Px3FNLwRkTOBwFJY58aZWZvV11Sn6sMDKdm902vRcOmgS4qetFZAK02QlQa3yV
-         +JNfVNuFSME4LwW0sUrTrp2lheqfsnWRgA8iuM1buaYkBtG1J+1OksVXyPAJFvMuc7gy
-         mhr0Gj6k5sxAHYB6uHOCGqIdHB8j7qatdlwcLlZZE3sKBIStbUh1k+yuCn+HQTygdmgN
-         8YWUsL/BoOUWRqBFPJIsEtwaDpaKGKwD1qRYQ1nuamuKVtE4vaB2RmOnMMGTxOtZTG4T
-         XwiUNNz2S8+P2Ny7RcqXuUj6clfZ5d6+x2GjeEKpZucDaA2eessGC7AXn5o8BubjFZys
-         c+zg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741076317; x=1741681117;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Gc0xsYnTUQhvWodmw2ejFo3Ab0lc47BeE7G2ofWx65Q=;
-        b=Evjizv9Qr/KhO3UUYQfHtYb6qcbpzNyd/nwGLMfROBl0DjGMGIOkdXkFao0EyeFJBm
-         kCRLN+BxWLefRPXOyfzfM6K2UU0oCLJJLx9mFi+FAvLZ3lTVZEQaeJM7PJM3DqaCyQjN
-         SWAAhNO9VkQ8YnExaW0JpHh7CLTNTqDMJkSG+4d8/BoboN2j8gY2IjiY2WUffuhV7o/V
-         DVKXOawDDHPAlopHaBw2MpdrpkhccpkjVoN4QT8yA+IR0hey9Rp5ypkL004Qu8wDwgre
-         JjxgOTDUGYkiYETAWsGj1tsU5vOu2srMd2mZIoO0NoPVmB56S8TF8YsUrNy99BEgthKv
-         CgZg==
-X-Forwarded-Encrypted: i=1; AJvYcCWxjaostuzxYn9vfOImQD7Ir+nsxW2U6yF/TNJocF4PTlYWYcM3qbHZyTmLdgw/74JKjL4iH3g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwozeHQdkiT1CwvaPJA+NaMDGkRY0c7K0jvWv3Y+fwjPNYMhP1V
-	JLpLtBBwip7+wNbQSw0+pj9g2evtal0QOdPAYM0OUH2VYSh2fE/NB5HBc+9fCGw=
-X-Gm-Gg: ASbGncvnNdGygy+mn0d0IlSII9Y4EC8G8YXilJ/soVB188yTDUYXYPUEhLWaCZYnbhi
-	Irvshrqk36yBYQ7R3/LMPvOTUdno3o+H3hA9y7S1uyZ+xF9OTA6rTXAWu5W1vom4+03m09RsGIn
-	c2V367cKqhnHZUKz3qv8WIwMMp7J/l2+wyL6b5dppM68nEig6l+1VUHlk2+v5HHuqEh7xzTyglA
-	2xZewGcdw0FZ9cZL4gq20lflMxc4kbH9qFJOT59IAiVzBNtVnPAwRw+uWX8ayOUiTFkVtYm/tq0
-	wypSBB/raSXgiwVV206TYO15ZCDVm9IyLamgFGv7r9v5MhSsVYxS1d20GHyoR4INqgkx55tOYdV
-	c9LXPKrumhN5H2yqd0qaI
-X-Google-Smtp-Source: AGHT+IFtDzCgImtuz8L9+GYRCY4LVCLrXbK0Bo8kgf88DL3yFokQ0qmw0lddBixblhsY0xBrKZj7tQ==
-X-Received: by 2002:a05:6a20:734a:b0:1ee:c390:58ad with SMTP id adf61e73a8af0-1f2f4e014f9mr29817034637.34.1741076317276;
-        Tue, 04 Mar 2025 00:18:37 -0800 (PST)
-Received: from dread.disaster.area (pa49-186-89-135.pa.vic.optusnet.com.au. [49.186.89.135])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-aee7de19d3fsm9497416a12.18.2025.03.04.00.18.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Mar 2025 00:18:36 -0800 (PST)
-Received: from dave by dread.disaster.area with local (Exim 4.98)
-	(envelope-from <david@fromorbit.com>)
-	id 1tpNU1-00000008fSI-4AHP;
-	Tue, 04 Mar 2025 19:18:34 +1100
-Date: Tue, 4 Mar 2025 19:18:33 +1100
-From: Dave Chinner <david@fromorbit.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Yishai Hadas <yishaih@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-	David Sterba <dsterba@suse.com>, Gao Xiang <xiang@kernel.org>,
-	Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>,
-	Jeffle Xu <jefflexu@linux.alibaba.com>,
-	Sandeep Dhavale <dhavale@google.com>,
-	Carlos Maiolino <cem@kernel.org>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <okorniev@redhat.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
-	Luiz Capitulino <luizcap@redhat.com>,
-	Mel Gorman <mgorman@techsingularity.net>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-	linux-xfs@vger.kernel.org, linux-mm@kvack.org,
-	netdev@vger.kernel.org, linux-nfs@vger.kernel.org
-Subject: Re: [PATCH v2] mm: alloc_pages_bulk: remove assumption of populating
- only NULL elements
-Message-ID: <Z8a3WSOrlY4n5_37@dread.disaster.area>
-References: <20250228094424.757465-1-linyunsheng@huawei.com>
+	s=arc-20240116; t=1741076701; c=relaxed/simple;
+	bh=Y27aUZUPxKEH7unyFscw2X5BcFy8avKpTq7I1tRtmds=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=EHy1ay+x3+qGHY8obkU41y7UJFZl/aAhwnjOGRZd6p18yB76Azw8K7LFqTa1gioZL7th2JC3yxfN1fpsOnnQBLK/tDA0eMX9Xnxp3JKrA1pTvMBqffJaV0T8FKaI8TL8unNl2X5FhXBi1UTR56a+IUdXxsNk3laD9ffZH9pGEB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=NUq8Bkte; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=xl53Kcz7; arc=none smtp.client-ip=103.168.172.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
+	by mailfout.phl.internal (Postfix) with ESMTP id 3755A138271B;
+	Tue,  4 Mar 2025 03:24:57 -0500 (EST)
+Received: from phl-imap-11 ([10.202.2.101])
+  by phl-compute-09.internal (MEProxy); Tue, 04 Mar 2025 03:24:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1741076697;
+	 x=1741163097; bh=zM8W7tdbTUdh4T3yYERRBHG5NlNdx6XcKTrnIct3zRg=; b=
+	NUq8BkteQO6SDuLIORjsSkvajlvhU0vmiYacEBWhSW03bgh650C3v0bWKr5s46Td
+	riWSiSr0oA8W18I3RoDBz8CPAHAkyUy7yEMDGasexuzv+Ycky3MnIBGB+k33c1nw
+	nmkQ01VFlBTOfAlWhJh1IkurVsumBzOLe9LnvC/tIqix95bQBamre4ja7OdKnq9N
+	mIqKikbutblaiAgDLTuPNF2dAKHScNfnbLaa1or3d9xnbhc8ZSUoVvcbiLlo7kIb
+	mnHXXJDYdaRhl83XYWEpHjLaLTTOZj7be4UzShhBuHYlrk6PSbJXGkQBS9sB+VQv
+	FQABJrie9F0CutJk+bTR0w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1741076697; x=
+	1741163097; bh=zM8W7tdbTUdh4T3yYERRBHG5NlNdx6XcKTrnIct3zRg=; b=x
+	l53Kcz7eoJFaWQ3J80H/MML1fxGTcZZVNXX6xkWLLDQc4Lmaw3N/mxQiO5vG2xRQ
+	AbF3v6GkKXcrfDs07L9QY0QfXUS86yTwVu1iy7Vvj3co519RCBsudtCAMG7xfDS1
+	yesQIgiG8Al68a3NzBAgB+1doLcgKSEv9c4wPesA5Eq7xP2bTr2iFY7NUEyz4rJt
+	iq1tp4C6z9uOiAz3DVYvdjMaAc91lceHrhRVnrHq8kRICJ2RONPEns4d8j1nlj1G
+	1dzhrvF0+U1RqlIaDU2klIdiTpFKpmE/YrgcWrpNQ12evxJ27xAZ3bD+IJRJJgKC
+	a9QtpDfwr7r6LSlqU1TVA==
+X-ME-Sender: <xms:2LjGZ2lX9OfR4lGZuLLRFZg7KDUv9_hRnViHfTziVrX3m07gNPsP3w>
+    <xme:2LjGZ92pUzSj-Ya5NUmKCsML3ldN90dsm3icq5Enp85JAb8Dgo4O-K726OPeQ6jtq
+    3R6P0iV0_XP-4Pexr0>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddutdduheegucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtjeertder
+    tddtnecuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnug
+    gsrdguvgeqnecuggftrfgrthhtvghrnhephfdthfdvtdefhedukeetgefggffhjeeggeet
+    fefggfevudegudevledvkefhvdeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
+    hmpehmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohep
+    udelpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegurghvvghmsegurghvvghmlh
+    hofhhtrdhnvghtpdhrtghpthhtohepjhhonhgrthhhrghnrdhlvghmohhnsehgmhgrihhl
+    rdgtohhmpdhrtghpthhtoheprhhitghhrghruggtohgthhhrrghnsehgmhgrihhlrdgtoh
+    hmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthho
+    pehtihgrnhhfvghirdiihhgrnhhgsehinhhtvghlrdgtohhmpdhrtghpthhtoheprghrnh
+    gusehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
+    pdhrtghpthhtohepthhhohhmrghsrdifvghishhsshgthhhuhheslhhinhhuthhrohhnih
+    igrdguvgdprhgtphhtthhopehvrgguihhmrdhfvgguohhrvghnkhhosehlihhnuhigrdgu
+    vghv
+X-ME-Proxy: <xmx:2LjGZ0o5WKeDUjYeoVcADYBT1YDKDZrZMuwPclwev2XUMqDqG5_C7Q>
+    <xmx:2LjGZ6lMJMUzvr9YtGi3OE6Aoen1JeNiEGUZ6pWqfW6_9uNCsWxcHA>
+    <xmx:2LjGZ00-ZAOpXYzNNzMAdFkk56eWG7NSDp5nwVwHwh6ujX7mxIxZNw>
+    <xmx:2LjGZxtRijeuEEYADWPTTa007tr36CMAFgbpXtJ4ipsNvinR8QLJwg>
+    <xmx:2bjGZ7uvsRHe2_21oQ-V2KHV9q2qGTbCMXAvb9jx2m2DyDUA8JruI20p>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 29A7C2220072; Tue,  4 Mar 2025 03:24:56 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250228094424.757465-1-linyunsheng@huawei.com>
+Date: Tue, 04 Mar 2025 09:24:35 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Richard Cochran" <richardcochran@gmail.com>,
+ "Andy Shevchenko" <andriy.shevchenko@linux.intel.com>
+Cc: "Arnd Bergmann" <arnd@kernel.org>,
+ =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
+ "Andrew Lunn" <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Tianfei Zhang" <tianfei.zhang@intel.com>,
+ "Jonathan Lemon" <jonathan.lemon@gmail.com>,
+ "Vadim Fedorenko" <vadim.fedorenko@linux.dev>,
+ "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+ "Calvin Owens" <calvin@wbinvd.org>, "Philipp Stanner" <pstanner@redhat.com>,
+ Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
+ linux-fpga@vger.kernel.org
+Message-Id: <7fd3c712-4c31-435c-80c1-1e042c9b5999@app.fastmail.com>
+In-Reply-To: <Z8Z87mkuRqE6VOTy@hoboy.vegasvil.org>
+References: <20250227141749.3767032-1-arnd@kernel.org>
+ <Z8CDhIN5vhcSm1ge@smile.fi.intel.com> <Z8TFrPv1oajA3H4V@hoboy.vegasvil.org>
+ <Z8VfKYMGEKhvluJV@smile.fi.intel.com> <Z8Z87mkuRqE6VOTy@hoboy.vegasvil.org>
+Subject: Re: [PATCH] RFC: ptp: add comment about register access race
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 28, 2025 at 05:44:20PM +0800, Yunsheng Lin wrote:
-> As mentioned in [1], it seems odd to check NULL elements in
-> the middle of page bulk allocating, and it seems caller can
-> do a better job of bulk allocating pages into a whole array
-> sequentially without checking NULL elements first before
-> doing the page bulk allocation for most of existing users.
-> 
-> Through analyzing of bulk allocation API used in fs, it
-> seems that the callers are depending on the assumption of
-> populating only NULL elements in fs/btrfs/extent_io.c and
-> net/sunrpc/svc_xprt.c while erofs and btrfs don't, see:
-> commit 91d6ac1d62c3 ("btrfs: allocate page arrays using bulk page allocator")
-> commit d6db47e571dc ("erofs: do not use pagepool in z_erofs_gbuf_growsize()")
-> commit c9fa563072e1 ("xfs: use alloc_pages_bulk_array() for buffers")
-> commit f6e70aab9dfe ("SUNRPC: refresh rq_pages using a bulk page allocator")
-> 
-> Change SUNRPC and btrfs to not depend on the assumption.
-> Other existing callers seems to be passing all NULL elements
-> via memset, kzalloc, etc.
-> 
-> Remove assumption of populating only NULL elements and treat
-> page_array as output parameter like kmem_cache_alloc_bulk().
-> Remove the above assumption also enable the caller to not
-> zero the array before calling the page bulk allocating API,
-> which has about 1~2 ns performance improvement for the test
-> case of time_bench_page_pool03_slow() for page_pool in a
-> x86 vm system, this reduces some performance impact of
-> fixing the DMA API misuse problem in [2], performance
-> improves from 87.886 ns to 86.429 ns.
+On Tue, Mar 4, 2025, at 05:09, Richard Cochran wrote:
+> On Mon, Mar 03, 2025 at 09:50:01AM +0200, Andy Shevchenko wrote:
+>> Perhaps it's still good to have a comment, but rephrase it that the code is
+>> questionable depending on the HW behaviour that needs to be checked.
+>
+> IIRC both ixp4xx and the PCH are the same design and latch high reg on
+> read of low.
 
-How much slower did you make btrfs and sunrpc by adding all the
-defragmenting code there?
+Ok, if that's a common thing, let's assume that the drivers are
+all correct for the respective hardware and discard my patch.
 
-> 
-> 1. https://lore.kernel.org/all/bd8c2f5c-464d-44ab-b607-390a87ea4cd5@huawei.com/
-> 2. https://lore.kernel.org/all/20250212092552.1779679-1-linyunsheng@huawei.com/
-> CC: Jesper Dangaard Brouer <hawk@kernel.org>
-> CC: Luiz Capitulino <luizcap@redhat.com>
-> CC: Mel Gorman <mgorman@techsingularity.net>
-> CC: Dave Chinner <david@fromorbit.com>
-> CC: Chuck Lever <chuck.lever@oracle.com>
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> Acked-by: Jeff Layton <jlayton@kernel.org>
-> ---
-> V2:
-> 1. Drop RFC tag and rebased on latest linux-next.
-> 2. Fix a compile error for xfs.
+With the patch I have queued up in the asm-generic tree, the
+behavior changes so ioread64_lo_hi() no longer gets turned
+into a single 64-bit access, and that is then more likely to
+be correct for both 32-bit and 64-bit architectures in case the
+device doesn't actually implement 64-bit transactions but does
+correctly latch the contents.
 
-And you still haven't tested the code changes to XFS, because
-this patch is also broken.
-
-> diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
-> index 5d560e9073f4..b4e95b2dd0f0 100644
-> --- a/fs/xfs/xfs_buf.c
-> +++ b/fs/xfs/xfs_buf.c
-> @@ -319,16 +319,17 @@ xfs_buf_alloc_pages(
->  	 * least one extra page.
->  	 */
->  	for (;;) {
-> -		long	last = filled;
-> +		long	alloc;
->  
-> -		filled = alloc_pages_bulk(gfp_mask, bp->b_page_count,
-> -					  bp->b_pages);
-> +		alloc = alloc_pages_bulk(gfp_mask, bp->b_page_count - filled,
-> +					 bp->b_pages + filled);
-> +		filled += alloc;
->  		if (filled == bp->b_page_count) {
->  			XFS_STATS_INC(bp->b_mount, xb_page_found);
->  			break;
->  		}
->  
-> -		if (filled != last)
-> +		if (alloc)
->  			continue;
-
-alloc_pages_bulk() now returns the number of pages allocated in the
-array. So if we ask for 4 pages, then get 2, filled is now 2. Then
-we loop, ask for another 2 pages, get those two pages and it returns
-4. Now filled is 6, and we continue.
-
-Now we ask alloc_pages_bulk() for -2 pages, which returns 4 pages...
-
-Worse behaviour: second time around, no page allocation succeeds
-so it returns 2 pages. Filled is now 4, which is the number of pages
-we need, so we break out of the loop with only 2 pages allocated.
-There's about to be kernel crashes occur.....
-
-Once is a mistake, twice is compeltely unacceptable.  When XFS stops
-using alloc_pages_bulk (probably 6.15) I won't care anymore. But
-until then, please stop trying to change this code.
-
-NACK.
-
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+      Arnd
 
