@@ -1,99 +1,70 @@
-Return-Path: <netdev+bounces-171903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CA32A4F3FA
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 02:40:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA86DA4F409
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 02:47:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADA0516B937
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 01:40:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D62C3A960F
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 01:47:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 993AE14A09A;
-	Wed,  5 Mar 2025 01:40:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E6A341C85;
+	Wed,  5 Mar 2025 01:47:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="opu1XT/+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IOvnW7HT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 679D51465AD;
-	Wed,  5 Mar 2025 01:40:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23AEE3594C;
+	Wed,  5 Mar 2025 01:47:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741138801; cv=none; b=HptR0/XoMc7Fo2POM7RtAZ36iPFhAsNwnAj3NzmvVD/9BEmcpgE5kNng1qCM2+wiola4EgQPGbbM+l4OVFMBR6r4GoC+PC9SWmyVfgw+ue6nPtCB2bDJPAhE6R/Bq58NNMdFq8aWQmB+kWQYzRF0CV5zvS/ZsYx7iMtK+nJA73I=
+	t=1741139254; cv=none; b=UFCgp59s7MPLLKkEcteKOlymu5nO4dIfXSgJBJldZiuYwDCRz7rMd4tFH2Y1HBYYHlE4gjBvRDxeuRQinL1Cqww/w2/eg1jLfVBQJBDs490RUobj+umwIWnf4J2TkuLUzEOrXEJ4sq9JWPdI8B3XLHGoYlJyoxqEMherFAuvTXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741138801; c=relaxed/simple;
-	bh=oOvMUUvzPlSI6Esbr6v90IW10CKv7Um1KVExyPBcoiA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kQW9vS+JmxlmO3HrNChlVWEKfLlqJCJGTJokyGT43io4/6oOzQzIZOAT0P9H14LbTUsEIUV6x7rn4fCm5uao7aGddj/QHKBDpANuCudNZNNeqQ4V+S7BFwA3VeKOhrYItegP+mIcr9uHTOhhE7bPDzjDoW73zBdKc8Lwj1pKM10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=opu1XT/+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7568C4CEE5;
-	Wed,  5 Mar 2025 01:40:00 +0000 (UTC)
+	s=arc-20240116; t=1741139254; c=relaxed/simple;
+	bh=3yFoL/csQodidWtcQ5/tM5P80uMXE7Fz4xKze/NWXfk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Mppo02ORhGgGvOe5lsIK7xjKWD11uLlXEQYcCSb6Czy62Yj3wEI24q2YubTbZu1lVKnXrpC7TwUgBOmbPhQETeuPXC16gcy/3L2mIPRhs2WD0l8cSmHKQRKpgFluEO1rqxxUFqiBbZWeQc4Sw0M8ncCia4OCrwgSX9/o9E2j1lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IOvnW7HT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2114BC4CEE5;
+	Wed,  5 Mar 2025 01:47:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741138800;
-	bh=oOvMUUvzPlSI6Esbr6v90IW10CKv7Um1KVExyPBcoiA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=opu1XT/+NNdWPD3XQjRKQLHAPbK/5ZrqNDJb/KqwDGlC6wf1KUZJm/4FqL58wjBAj
-	 p2ECPfhCEbd36cOrF8JGfY5hU1XLuSXFEYvDX/1TkpN7kZiFG18zlz41jfWWswyGJZ
-	 IY3ZB0XMoSFPU5TYofiBd9Ytpn/S2mqlHr0luqfQKSdAAyGd7xLrTl+KakhpYgWQtV
-	 WOhxxusGUWhj+WvSPEnIR+uH+Oo7Zwg2McMdg/XKN0rsOGAtRg/btZL8iWZ3kmd8ni
-	 p6RE6gKJi2OUpx40lBoacblDdMIroL7wBhqBvyeqW+Mx3+6JHRIvdE+SVIXEb3GnYq
-	 7WxXLjkVOFsoA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB152380CFEB;
-	Wed,  5 Mar 2025 01:40:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1741139253;
+	bh=3yFoL/csQodidWtcQ5/tM5P80uMXE7Fz4xKze/NWXfk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IOvnW7HTYJfKmE29cF1O4f2QGKUXuktN0S+uq9Mjq88OG2Y74IVrawIBgqNQGLIBt
+	 2WUGFWJ30QqD5arGpjiSS2zWAueL2U+afZ/Nftkx0LumwEbt6k7PU+MmIRtOJE7otE
+	 qUDQvIiJ16fILmo2ol4MXUlz/Vh7KFjj1LKeYf2ERFnfDqT/9R/icgvWTjxDn1UlQB
+	 x0F4Lpmucye3tuRwRM3MlcMpV/riaglWTl6ujmWMY7MSPpv0jnrfv0oyhUu0n4uHdj
+	 RJ73Jd8lf9hBQegiGalvgWc3qIg32MlOiWS9e+gxbkQjGP5iWZZ/l4D4rDk0o3T4Kg
+	 tyr0BwMbFPkrA==
+Date: Tue, 4 Mar 2025 17:47:32 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Amerigo Wang <amwang@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-team@meta.com
+Subject: Re: [PATCH net] netpoll: guard __netpoll_send_skb() with RCU read
+ lock
+Message-ID: <20250304174732.2a1f2cb5@kernel.org>
+In-Reply-To: <20250303-netpoll_rcu_v2-v1-1-6b34d8a01fa2@debian.org>
+References: <20250303-netpoll_rcu_v2-v1-1-6b34d8a01fa2@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] mptcp: fix 'scheduling while atomic' in
- mptcp_pm_nl_append_new_local_addr
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174113883377.363569.807347823586416499.git-patchwork-notify@kernel.org>
-Date: Wed, 05 Mar 2025 01:40:33 +0000
-References: <20250303-net-mptcp-fix-sched-while-atomic-v1-1-f6a216c5a74c@kernel.org>
-In-Reply-To: <20250303-net-mptcp-fix-sched-while-atomic-v1-1-f6a216c5a74c@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- kjlx@templeofstupid.com, stable@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon, 03 Mar 2025 03:44:12 -0800 Breno Leitao wrote:
+> +	guard(rcu)();
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 03 Mar 2025 18:10:13 +0100 you wrote:
-> From: Krister Johansen <kjlx@templeofstupid.com>
-> 
-> If multiple connection requests attempt to create an implicit mptcp
-> endpoint in parallel, more than one caller may end up in
-> mptcp_pm_nl_append_new_local_addr because none found the address in
-> local_addr_list during their call to mptcp_pm_nl_get_local_id.  In this
-> case, the concurrent new_local_addr calls may delete the address entry
-> created by the previous caller.  These deletes use synchronize_rcu, but
-> this is not permitted in some of the contexts where this function may be
-> called.  During packet recv, the caller may be in a rcu read critical
-> section and have preemption disabled.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net] mptcp: fix 'scheduling while atomic' in mptcp_pm_nl_append_new_local_addr
-    https://git.kernel.org/netdev/net/c/022bfe24aad8
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Scoped guards if you have to.
+Preferably just lock/unlock like a normal person..
 
