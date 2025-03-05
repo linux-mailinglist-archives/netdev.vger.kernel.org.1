@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-172014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92834A4FE7D
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 13:18:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A07B0A4FE81
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 13:19:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A35197A939A
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 12:17:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA8D81881B10
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 12:19:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B60624418F;
-	Wed,  5 Mar 2025 12:18:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96BAA243955;
+	Wed,  5 Mar 2025 12:19:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AF6124060E;
-	Wed,  5 Mar 2025 12:18:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53A77201270;
+	Wed,  5 Mar 2025 12:19:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741177087; cv=none; b=c1bs5X++ttFZ/kLWfx+WW214F97aNWDYjr+QABetDrvpk1KtUYchlnSv0sh/DHSEBCJjnc5vr7IcKS4RI8NFcYidjzAlS3RbV/9t2H08C6+eGHuUy19sFmhNT9XG5itRZz3xZNp/61+8SIjP+gPwWV70limnnuFFgSZqd1duxA4=
+	t=1741177183; cv=none; b=pY+hor4Em5yMKTy1v4zR7hiqT57qBy/jIQcvrhuk0qg8PvbsC3vGcyQ1q7G7PvOWRfeSZypXlNPA78SBuyQ8lonbYkTgBwn0e95zOABlYJjEcvdwkbZo0a7CZXcnQHy0uQ58nuNtOgyt1WfYnAwLqk0poyZl5kcfns5Jt1DeDTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741177087; c=relaxed/simple;
-	bh=2l5BK6BIIKBvzAzekAB/HIgAAJ8CjsnHPnqO0JmxTPU=;
+	s=arc-20240116; t=1741177183; c=relaxed/simple;
+	bh=vlhpyamIfu0B4jVYp73PoZHZAQox5ZrifYWqOBNLXog=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=mneCjGiyBBkRT4YXOP7GgmqH1CyK2BOGPAozwoqv2Ev+bifhrZnymFbpeetyv9KzOjz8VZcz+ib70nf2IoiKSxC0IjY7Q5ynr/x6pwsL0RVPjmwip8dNttQxvfn9Q15AWHLpckiYpDZrUNlLhSJE0muGgUzdZq8Z5dxvs9kV2es=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+	 In-Reply-To:Content-Type; b=XIxLXgyXQTAhKYSHsGUs5gv3moGmAXLGkSXz/ZnwtmZNbDVg19NDLnN0NUYAh8PHquUjSUYFdhNs4JK0M8lQbG+J79QsLMpG0YahL6JIGBlUq2z8PQ1saWPoLYwyjl5uRs8UhrPxjNB1atj+qwSWkhJceiNdeDwTTl+hTK6a3a4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Z7BJz4R0yzwWy8;
-	Wed,  5 Mar 2025 20:13:07 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Z7BNm3kTtz9w7R;
+	Wed,  5 Mar 2025 20:16:24 +0800 (CST)
 Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2AA2318009E;
-	Wed,  5 Mar 2025 20:18:02 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 85DB3140360;
+	Wed,  5 Mar 2025 20:19:32 +0800 (CST)
 Received: from [10.67.120.129] (10.67.120.129) by
  dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 5 Mar 2025 20:17:59 +0800
-Message-ID: <18c68e7a-88c9-49d1-8ff8-17c63bcc44f4@huawei.com>
-Date: Wed, 5 Mar 2025 20:17:59 +0800
+ 15.2.1544.11; Wed, 5 Mar 2025 20:19:32 +0800
+Message-ID: <04c85f03-d3b3-4299-90d8-1d8432925993@huawei.com>
+Date: Wed, 5 Mar 2025 20:19:31 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,173 +48,160 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] mm: alloc_pages_bulk: remove assumption of populating
- only NULL elements
-To: Qu Wenruo <wqu@suse.com>, Yishai Hadas <yishaih@nvidia.com>, Jason
- Gunthorpe <jgg@ziepe.ca>, Shameer Kolothum
-	<shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>, Chris Mason <clm@fb.com>, Josef
- Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>, Gao Xiang
-	<xiang@kernel.org>, Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>,
-	Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep Dhavale <dhavale@google.com>,
-	Carlos Maiolino <cem@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>, Jesper Dangaard Brouer
-	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker
-	<anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, Jeff Layton
-	<jlayton@kernel.org>, Neil Brown <neilb@suse.de>, Olga Kornievskaia
-	<okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
-	<tom@talpey.com>
-CC: Luiz Capitulino <luizcap@redhat.com>, Mel Gorman
-	<mgorman@techsingularity.net>, Dave Chinner <david@fromorbit.com>,
-	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, <linux-btrfs@vger.kernel.org>,
-	<linux-erofs@lists.ozlabs.org>, <linux-xfs@vger.kernel.org>,
-	<linux-mm@kvack.org>, <netdev@vger.kernel.org>, <linux-nfs@vger.kernel.org>
-References: <20250228094424.757465-1-linyunsheng@huawei.com>
- <6f4017dc-2b3d-4b1a-b819-423acb42d999@suse.com>
+Subject: Re: [PATCH net-next v10 3/4] page_pool: support unlimited number of
+ inflight pages
+To: Jesper Dangaard Brouer <hawk@kernel.org>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+CC: <zhangkun09@huawei.com>, <liuyonglong@huawei.com>,
+	<fanghaiqing@huawei.com>, Robin Murphy <robin.murphy@arm.com>, Alexander
+ Duyck <alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>, Eric
+ Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, Donald Hunter
+	<donald.hunter@gmail.com>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, kernel-team <kernel-team@cloudflare.com>, Yan
+ Zhai <yan@cloudflare.com>
+References: <20250226110340.2671366-1-linyunsheng@huawei.com>
+ <20250226110340.2671366-4-linyunsheng@huawei.com>
+ <d3c7d421-566f-4007-b272-650294edd019@kernel.org>
 Content-Language: en-US
 From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <6f4017dc-2b3d-4b1a-b819-423acb42d999@suse.com>
+In-Reply-To: <d3c7d421-566f-4007-b272-650294edd019@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
  dggpemf200006.china.huawei.com (7.185.36.61)
 
-On 2025/3/4 17:17, Qu Wenruo wrote:
-> 
-> 
-> 在 2025/2/28 20:14, Yunsheng Lin 写道:
->> As mentioned in [1], it seems odd to check NULL elements in
->> the middle of page bulk allocating, and it seems caller can
->> do a better job of bulk allocating pages into a whole array
->> sequentially without checking NULL elements first before
->> doing the page bulk allocation for most of existing users.
->>
->> Through analyzing of bulk allocation API used in fs, it
->> seems that the callers are depending on the assumption of
->> populating only NULL elements in fs/btrfs/extent_io.c and
->> net/sunrpc/svc_xprt.c while erofs and btrfs don't, see:
+On 2025/3/4 17:25, Jesper Dangaard Brouer wrote:
 
-I should have said 'while erofs and xfs don't depend on the
-assumption of populating only NULL elements'.
 
->> commit 91d6ac1d62c3 ("btrfs: allocate page arrays using bulk page allocator")
-> 
-> If you want to change the btrfs part, please run full fstests with SCRATCH_DEV_POOL populated at least.
-
-The above is a helpful suggestion/comment to someone like me, who
-is not very familiar with fs yet, thanks for the suggestion.
-
-But I am not sure about some of the other comments below.
-
-> 
-> [...]
->> diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
->> index f0a1da40d641..ef52cedd9873 100644
->> --- a/fs/btrfs/extent_io.c
->> +++ b/fs/btrfs/extent_io.c
->> @@ -623,13 +623,26 @@ int btrfs_alloc_page_array(unsigned int nr_pages, struct page **page_array,
->>                  bool nofail)
->>   {
->>       const gfp_t gfp = nofail ? (GFP_NOFS | __GFP_NOFAIL) : GFP_NOFS;
->> -    unsigned int allocated;
->> +    unsigned int allocated, ret;
->>   -    for (allocated = 0; allocated < nr_pages;) {
->> -        unsigned int last = allocated;
->> +    /* Defragment page_array so pages can be bulk allocated into remaining
->> +     * NULL elements sequentially.
->> +     */
->> +    for (allocated = 0, ret = 0; ret < nr_pages; ret++) {
->> +        if (page_array[ret]) {
-> 
-> You just prove how bad the design is.
-> 
-
-Below is the reason you think the design is bad? If not, it would be
-good to be more specific about why it is a bad design.
-
-> All the callers have their page array members to initialized to NULL, or do not care and just want alloc_pages_bulk() to overwrite the uninitialized values.
-
-Actually there are two use cases here as mentioned in the commit log:
-1. Allocating an array of pages sequentially by providing an array as
-   output parameter.
-2. Refilling pages to NULL elements in an array by providing an array
-   as both input and output parameter.
-
-Most of users calling the bulk alloc API is allocating an array of pages
-sequentially except btrfs and sunrpc, the current page bulk alloc API
-implementation is not only doing the unnecessay NULL checking for most
-users, but also require most of its callers to pass all NULL array via
-memset, kzalloc, etc, which is also unnecessary overhead.
-
-That means there is some space for improvement from performance and
-easy-to-use perspective for most existing use cases here, this patch
-just change alloc_pages_bulk() API to treat the page_array as only
-the output parameter by mirroring kmem_cache_alloc_bulk() API.
-
-For the existing btrfs and sunrpc case, I am agreed that there
-might be valid use cases too, we just need to discuss how to
-meet the requirements of different use cases using simpler, more
-unified and effective APIs.
-
-> 
-> The best example here is btrfs_encoded_read_regular().
-> Now your code will just crash encoded read.
-
-It would be good to be more specific about the 'crash' here,
-as simple testing mentioned in below seems fine for btrfs fs
-too, but I will do more testing by running full fstests with
-SCRATCH_DEV_POOL populated after I learn how to use the fstests.
-
-https://lore.kernel.org/all/91fcdfca-3e7b-417c-ab26-7d5e37853431@huawei.com/
-
-> 
-> Read the context before doing stupid things.
-> 
-> I find it unacceptable that you just change the code, without any testing, nor even just check all the involved callers.
-
-What exactly is the above 'context' is referring to? If it is a good advice,
-I think I will take it seriously.
-
-May I suggest that it might be better to be more humble and discuss
-more before jumpping to conclusion here as it seems hard for one
-person to be familiar with all the subsystem in the kernel?
-
-> 
->> +            page_array[allocated] = page_array[ret];
->> +            if (ret != allocated)
->> +                page_array[ret] = NULL;
+>>   }
+>> @@ -514,10 +518,42 @@ static struct page_pool_item *page_pool_fast_item_alloc(struct page_pool *pool)
+>>       return llist_entry(first, struct page_pool_item, lentry);
+>>   }
+>>   +static struct page_pool_item *page_pool_slow_item_alloc(struct page_pool *pool)
+>> +{
+>> +    if (unlikely(!pool->slow_items.block ||
+>> +             pool->slow_items.next_to_use >= ITEMS_PER_PAGE)) {
+>> +        struct page_pool_item_block *block;
+>> +        struct page *page;
 >> +
->> +            allocated++;
+>> +        page = alloc_pages_node(pool->p.nid, GFP_ATOMIC | __GFP_NOWARN |
+>> +                    __GFP_ZERO, 0);
+>> +        if (!page) {
+>> +            alloc_stat_inc(pool, item_slow_failed);
+>> +            return NULL;
 >> +        }
+> 
+> I'm missing a counter that I can use to monitor the rate of page
+> allocations for these "item" block's.
+> In production want to have a metric that shows me a sudden influx of
+> that cause code to hit this "item_slow_alloc" case (inflight_slow_alloc)
+
+It seems the 'item_fast_empty' stat added in patch 2 is the metric you
+mention above? as we use those slow_items sequentially, the pages allocated
+for slow_items can be calculated by 'item_fast_empty' / ITEMS_PER_PAGE.
+
+> 
+> BTW should this be called "inflight_block" instead of "item_block"?
+> 
+> 
+>> +
+>> +        block = page_address(page);
+>> +        block->pp = pool;
+>> +        block->flags |= PAGE_POOL_SLOW_ITEM_BLOCK_BIT;
+>> +        refcount_set(&block->ref, ITEMS_PER_PAGE);
+>> +        pool->slow_items.block = block;
+>> +        pool->slow_items.next_to_use = 0;
+>> +
+>> +        spin_lock_bh(&pool->item_lock);
+>> +        list_add(&block->list, &pool->item_blocks);
+>> +        spin_unlock_bh(&pool->item_lock);
 >> +    }
->>   -        allocated = alloc_pages_bulk(gfp, nr_pages, page_array);
->> -        if (unlikely(allocated == last)) {
->> +    while (allocated < nr_pages) {
->> +        ret = alloc_pages_bulk(gfp, nr_pages - allocated,
->> +                       page_array + allocated);
-> 
-> I see the new interface way worse than the existing one.
-> 
-> All btrfs usage only wants a simple retry-until-all-fulfilled behavior.
+>> +
+>> +    return &pool->slow_items.block->items[pool->slow_items.next_to_use++];
+>> +}
 
-As above, I am agreed that the above might be what btrfs usage want, so
-let's discuss how to meet the requirements of different use cases using
-simpler, more unified and effective API, like introducing a function like
-alloc_pages_refill_array() to meet the above requirement as mentioned in
-below?
-https://lore.kernel.org/all/74827bc7-ec6e-4e3a-9d19-61c4a9ba6b2c@huawei.com/
+...
+
+>>   +static void __page_pool_slow_item_free(struct page_pool *pool,
+>> +                       struct page_pool_item_block *block)
+>> +{
+>> +    spin_lock_bh(&pool->item_lock);
+>> +    list_del(&block->list);
+>> +    spin_unlock_bh(&pool->item_lock);
+>> +
+>> +    put_page(virt_to_page(block));
+> 
+> Here again I'm missing a counter that I can use to monitor the rate of
+> page free events.
+> 
+> In production I want a metric (e.g inflight_slow_free_block) that
+> together with "item_slow_alloc" (perhaps named
+> inflight_slow_alloc_block), show me if this code path is creating churn,
+> that I can correlate/explain some other influx event on the system.
+> 
+> BTW subtracting these (alloc - free) counters gives us the memory used.
+
+If I understand it correctly, the 'item_fast_empty' is something like
+the 'alloc' mentioned above, let's discuss the 'free' below.
 
 > 
-> NACK for btrfs part, and I find you very unresponsible not even bother running any testsuit and just submit such a mess.
+>> +}
+>> +
+
+...
+
+>>   }
+>>   +static int page_pool_nl_fill_item_mem_info(struct page_pool *pool,
+>> +                       struct sk_buff *rsp)
+>> +{
+>> +    struct page_pool_item_block *block;
+>> +    size_t resident = 0, used = 0;
+>> +    int err;
+>> +
+>> +    spin_lock_bh(&pool->item_lock);
+>> +
+>> +    list_for_each_entry(block, &pool->item_blocks, list) {
+>> +        resident += PAGE_SIZE;
+>> +
+>> +        if (block->flags & PAGE_POOL_SLOW_ITEM_BLOCK_BIT)
+>> +            used += (PAGE_SIZE - sizeof(struct page_pool_item) *
+>> +                 refcount_read(&block->ref));
+>> +        else
+>> +            used += PAGE_SIZE;
+>> +    }
+>> +
+>> +    spin_unlock_bh(&pool->item_lock);
 > 
-> Just stop this, no one will ever take you serious anymore.
+> Holding a BH spin_lock can easily create production issues.
+
+The above is not only give us the total pages used for page_pool_item,
+but also give us the fragmentation info for those pages too.
+So it seems the BH spin_lock is needed if we want the fragmentation info?
+
+And the 'free' memtioned above can be calculated by 'memory used' - 'alloc'.
+
+> I worry how long time it will take to traverse these lists.
+
+I wouldn't worry about that as it is not supposed to be a lot of pages
+in those list, if it is, it seems it is something we should be fixing
+by increasing the size of fast_item or by defragmenting the slow_item
+pages.
+
 > 
-> Thanks,
-> Qu
+> We (Cc Yan) are currently hunting down a number of real production issue
+> due to different cases of control-path code querying the kernel that
+> takes a _bh lock to read data, hurting the data-path processing.
+
+I am not sure if the above is the control-path here, I would rather
+treat it as the debug-path?
+
+> 
+> If we had the stats counters, then this would be less work, right?
+
+It depends on if we want the fragmentation info or not as mentioned
+above.
+
 > 
 > 
 
