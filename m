@@ -1,204 +1,157 @@
-Return-Path: <netdev+bounces-171964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCE87A4FAEF
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 11:00:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C4C0A4FB30
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 11:07:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F6297A204D
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 09:59:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 594603A4F8F
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 10:06:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25CED205E34;
-	Wed,  5 Mar 2025 10:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A052B205508;
+	Wed,  5 Mar 2025 10:06:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E0T2bHOT"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="hJpocj7v";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="u/NHKT/Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from fhigh-b3-smtp.messagingengine.com (fhigh-b3-smtp.messagingengine.com [202.12.124.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C58C20551F;
-	Wed,  5 Mar 2025 10:00:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4148F1F3D30;
+	Wed,  5 Mar 2025 10:06:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741168811; cv=none; b=HUxyAW5E5z2czEayCh6xU6IaULQR3AJrd8onLx2iVX5ztgfDK8otFbIClsZykvKz/HIj6F1XnTTGHp9PaQ3tBsVxx5GUK+PjQ9ABdugzwpkniWl7MS+W2GEv18nbB5dY7kfskTBrzJY283j8BLfSGwzw8xQJ7CUrMcQ4MyDGd4Q=
+	t=1741169213; cv=none; b=b+Z46M0y7ABTWQfbCXYgepex/lMonMvCwGse1QPmDHUqNzqsj/eESJbosZGVo3Y2qYGLNhdLki5SqXN/NEqS3jt3SVsXQPqSsKGhjhMLs+SfJHLcxSZyimdqiZOUfBOgMOqJVzSDMx1FUqL0h3o3zzOv5mzobCBB830n6BIgGnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741168811; c=relaxed/simple;
-	bh=9AKHIt39EdqvkjHlj2wT3ud7NdHaZNclpnxb3Ax38TM=;
+	s=arc-20240116; t=1741169213; c=relaxed/simple;
+	bh=POFkgzO8rm1oQNp6ytUtiiNRXbGm7AOdYqXhxPgh4sc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HtQpvJAmsHLJLIGOk2Gve8M7D60cE94rlvI1n5g+odcFwEbi4AhHbsrRwRA4CWWpJ8aM4WF06A4BNXcmG20mQL5/ZlhjkyTmzzWLJLZrpTe3Qbvj4iK6jTNBbI/VWbHPNLrXGbkawa7UOX8aRNMt6gZ6xld2RyhT5JeqScRW9ns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E0T2bHOT; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741168808; x=1772704808;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=9AKHIt39EdqvkjHlj2wT3ud7NdHaZNclpnxb3Ax38TM=;
-  b=E0T2bHOTbWFa53QoXpyr/d4swQ8g+C9o1qD+EXgs0HPfpe4QVlagA90l
-   NUIX0vah+QoRqhpKRYPgcEzeIVa7diwD2BGbBSxYZYdQsE+vS7SM0Q82f
-   zNtAQFxfMj9RE2pCaZhI1ib2ARIgIYltceBqkyAiTu7yvWh5Z6sa5dpKt
-   JQ2+EGRadvui+ovtTOgojy3TYy/IYH9ugt8sMUI63kVS5NWpfdEZF3WGj
-   OMJKJ4MFjVJ/5QboOpY770Sb7iDfxzsNnJo9RWmp2Akhs/GMD1Z0Htqwy
-   g4nwmRn1VUmtyEcTXU07Vfn5VdSlALZ3ZNdqKMtrEarVlAsa16aUIqKid
-   g==;
-X-CSE-ConnectionGUID: UhpzxuUITBOApBptkub1cQ==
-X-CSE-MsgGUID: UtbwXEMuRbe4sf8A8DugCw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="44932341"
-X-IronPort-AV: E=Sophos;i="6.14,222,1736841600"; 
-   d="scan'208";a="44932341"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 02:00:07 -0800
-X-CSE-ConnectionGUID: BeuCliEWR0Ofj/db2Rg7rA==
-X-CSE-MsgGUID: sE7nJ2EQRDW8J61KQiHmkA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,222,1736841600"; 
-   d="scan'208";a="119133426"
-Received: from smile.fi.intel.com ([10.237.72.58])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 02:00:05 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1tplXm-0000000HNNt-09xm;
-	Wed, 05 Mar 2025 12:00:02 +0200
-Date: Wed, 5 Mar 2025 12:00:01 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, Christoph Hellwig <hch@lst.de>,
-	Marek Szyprowski <m.szyprowski@samsung.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Rasesh Mody <rmody@marvell.com>,
-	GR-Linux-NIC-Dev@marvell.com, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net v1 1/1] bnx2: Fix unused data compilation warning
-Message-ID: <Z8ggoUoKpSPPcs5S@smile.fi.intel.com>
-References: <20250228100538.32029-1-andriy.shevchenko@linux.intel.com>
- <20250303172114.6004ef32@kernel.org>
- <Z8bcaR9MS7dk8Q0p@smile.fi.intel.com>
- <5ec0a2cc-e5f6-42dd-992c-79b1a0c1b9f5@redhat.com>
- <Z8bq6XJGJNbycmJ9@smile.fi.intel.com>
- <Z8cC_xMScZ9rq47q@smile.fi.intel.com>
- <20250304083524.3fe2ced4@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=R8olgLNdYNl3XCAPUdKGnx0EiDEIPYB9vMsqnrNQPQi4m937oyZFQ7Ft9bl2xI6Vo9VVUH6bYMpJ4BXOaBcdhqFgo+32glCdx2HGKwi3qWcCGFXHqm5PMq0qrByPiuJ9Tl6JcwMYpeCs28qxndG+K6vNlx4kGhOcdlq4Ksfn8Rg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=hJpocj7v; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=u/NHKT/Z; arc=none smtp.client-ip=202.12.124.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id C036025401EA;
+	Wed,  5 Mar 2025 05:06:48 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-04.internal (MEProxy); Wed, 05 Mar 2025 05:06:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1741169208; x=
+	1741255608; bh=OV22lrFV3DQBTGcw06CXISDEH3SxqJT8NlQedF2+oH8=; b=h
+	Jpocj7vtNqNLdr/VV90HwI4omf9lvjbPmLOfpwnKOH6B7DiFJld7FF9oKKoHZTbN
+	l+ELUcNjW7/sa3MguXc5X2c6axxaNzrMAzSF5o9uP5haAgGogOvVHA8M9CLxcWoH
+	xIQSt0GkHsqaxorzOMT9UF3cIN2by8apiQd4df5JzJALX35BqlHw5CTDROBuHwrA
+	l3JW8pngLevn7peJbN/2cob+O4Jdfk8PQNzaH4550AvAiE0K6+P+cq/czxcgXeno
+	oFYBW4OXOln3ARE6Aw6zctlNOchroRZPJ9L/gq+LJzORNuq0PqbNg8FabrQhipxR
+	+0UBXkK3JQbq3/CjHT92w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1741169208; x=1741255608; bh=OV22lrFV3DQBTGcw06CXISDEH3SxqJT8NlQ
+	edF2+oH8=; b=u/NHKT/ZQpVgl5aBzzP59XVl/aCDb4nvJ2ZY5LWWM5PurauNq6/
+	W8Q91FenyD/jdrEEVIlO59jQG5OzxQ6fBt4kBfX9rYkggrEAFPcHs6cZrcd/R+Vy
+	wynEPhKFHqHtBn3e5cZwXvs68QC+l3K8BpacUCE3Y+JjsHK9rkAxZg3VaEwxyVoe
+	YJBBrdCgLrxBsg+IrdufdIPyE+UCZrmi9dYzrvSL8yd0Ud2sbxoSPVNv+5JoZQlv
+	cb1p/prCwrzwJAXESNJTtvT0g5Q6je/eBK4bPq0rHhQe9hu3SuqUUeYhYDLaUtIH
+	2/Dl/Q8rqBhG1/aqMI8lfltciwE3+kXzfaA==
+X-ME-Sender: <xms:NyLIZ-MYNr-jPlNECyHoRQo8x3eET31MTCVcp3Rnoky1eaWR5NZ7fg>
+    <xme:NyLIZ8-mnhcmeDFjLUUAi0Z4pIECapTlB-TrXy8ob69K4qxPPDl-UGtB3mJyJ7yaG
+    -Gp1zhI4uwsqUFZXII>
+X-ME-Received: <xmr:NyLIZ1RYn9jL2cyfIOWhBijdan2Z6qfoQXWZTpuZaopB8o5cedW7mJ1cuUDS>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddutdegheefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
+    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
+    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdef
+    hfekgeetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenuc
+    frrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhn
+    sggprhgtphhtthhopedufedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnth
+    honhhiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghr
+    rdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrd
+    gtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehp
+    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepughonhgrlhgurdhhuhhnth
+    gvrhesghhmrghilhdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhr
+    ghdprhgtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdprhgtph
+    htthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghh
+X-ME-Proxy: <xmx:OCLIZ-t_h-9lFtez33rBhZBpt-3v6dALYDF2d7_Mm2mxSQStfF_VIQ>
+    <xmx:OCLIZ2ddhqzYJbEY-MnrzkuBFVDrL0gqPjro7dOdCFxIkUAsNiWHZA>
+    <xmx:OCLIZy3r-hp_mMMb_0tAGapuBE-PDYZpWp3zLlhaRBsXQZ26wqAPDQ>
+    <xmx:OCLIZ68hOjID9-T7dJuLvtMLrY3Q_NZdNAHaBMdpLPtlsggfh8RPMQ>
+    <xmx:OCLIZ98PVQUB5BNVcHQeXGESQtEWdNuRxrhAlZyFDCv3qG5U9wEl9KON>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 5 Mar 2025 05:06:47 -0500 (EST)
+Date: Wed, 5 Mar 2025 11:06:45 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+Subject: Re: [PATCH v21 09/24] ovpn: implement packet processing
+Message-ID: <Z8giNYKBWzQEtZJu@hog>
+References: <20250304-b4-ovpn-tmp-v21-0-d3cbb74bb581@openvpn.net>
+ <20250304-b4-ovpn-tmp-v21-9-d3cbb74bb581@openvpn.net>
+ <Z8dOOy9tSpJ1UCiR@hog>
+ <8abd4290-cef5-4ea3-bdfc-b872c16efb8a@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250304083524.3fe2ced4@kernel.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+In-Reply-To: <8abd4290-cef5-4ea3-bdfc-b872c16efb8a@openvpn.net>
 
-On Tue, Mar 04, 2025 at 08:35:24AM -0800, Jakub Kicinski wrote:
-> On Tue, 4 Mar 2025 15:41:19 +0200 Andy Shevchenko wrote:
-
-...
-
-> > > > Would that work?  
+2025-03-05, 00:35:09 +0100, Antonio Quartulli wrote:
+> On 04/03/2025 20:02, Sabrina Dubroca wrote:
+> > 2025-03-04, 01:33:39 +0100, Antonio Quartulli wrote:
+> > [...]
+> > > +static inline struct ovpn_crypto_key_slot *
+> > > +ovpn_crypto_key_id_to_slot(const struct ovpn_crypto_state *cs, u8 key_id)
+> > > +{
+> > > +	struct ovpn_crypto_key_slot *ks;
+> > > +	u8 idx;
+> > > +
+> > > +	if (unlikely(!cs))
+> > > +		return NULL;
+> > > +
+> > > +	rcu_read_lock();
+> > > +	idx = cs->primary_idx;
 > > 
-> > Actually it won't work because the variable is under the same ifdeffery.
-> > What will work is to spreading the ifdeffery to the users, but it doesn't any
-> > better than __maybe_unsused, which is compact hack (yes, I admit that it is not
-> > the nicest solution, but it's spread enough in the kernel).
+> > I'd go with slots[0] and slots[1], since it doesn't really matter
+> > whether we check the primary or secondary first. It would avoid a
+> > possible reload of cs->primary_idx (which might be updated
+> > concurrently by a key swap and cause us to look into the same slot
+> > twice) -- a READ_ONCE would also prevent that.
 > 
-> I meant something more like (untested):
-
-We are starving for the comment from the DMA mapping people.
-
-> diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
-> index b79925b1c433..a7ebcede43f6 100644
-> --- a/include/linux/dma-mapping.h
-> +++ b/include/linux/dma-mapping.h
-> @@ -629,10 +629,10 @@ static inline int dma_mmap_wc(struct device *dev,
->  #else
->  #define DEFINE_DMA_UNMAP_ADDR(ADDR_NAME)
->  #define DEFINE_DMA_UNMAP_LEN(LEN_NAME)
-> -#define dma_unmap_addr(PTR, ADDR_NAME)           (0)
-> -#define dma_unmap_addr_set(PTR, ADDR_NAME, VAL)  do { } while (0)
-> -#define dma_unmap_len(PTR, LEN_NAME)             (0)
-> -#define dma_unmap_len_set(PTR, LEN_NAME, VAL)    do { } while (0)
-> +#define dma_unmap_addr(PTR, ADDR_NAME)           ({ typeof(PTR) __p __maybe_unused = PTR; 0; )}
-> +#define dma_unmap_addr_set(PTR, ADDR_NAME, VAL)  do { typeof(PTR) __p __maybe_unused = PTR; } while (0)
-> +#define dma_unmap_len(PTR, LEN_NAME)             ({ typeof(PTR) __p __maybe_unused = PTR; 0; )}
-> +#define dma_unmap_len_set(PTR, LEN_NAME, VAL)    do { typeof(PTR) __p __maybe_unused = PTR; } while (0)
->  #endif
->  
->  #endif /* _LINUX_DMA_MAPPING_H */
+> Reason for looking into primary first is that we will most likely need the
+> primary key to decrypt the incoming traffic.
 > 
-> I just don't know how much code out there depends on PTR not
-> existing if !CONFIG_NEED_DMA_MAP_STATE
+> Secondary is used only during a small (if at all) time window where we moved
+> to a new key, but our peer was still sending traffic encrypted with the old
+> (secondary) key.
+> 
+> Therefore optimizing for primary-first may make a non-negligible difference
+> under heavy load.
+> 
+> Code doesn't get more complex due to this logic, therefore I'd keep this
+> version (with READ_ONCE(cs->primary_idx)), unless there is a strong argument
+> against it.
 
-Brief checking shows that only drivers/net/ethernet/chelsio/* comes
-with ifdeffery, the rest most likely will fail in the same way
-(note, overwhelming majority of the users is under the network realm):
-
-$ git grep -lw dma_unmap_[al][de].*
-
-drivers/infiniband/hw/cxgb4/cq.c
-drivers/infiniband/hw/cxgb4/qp.c
-drivers/infiniband/hw/mthca/mthca_allocator.c
-drivers/infiniband/hw/mthca/mthca_eq.c
-drivers/net/ethernet/alacritech/slicoss.c
-drivers/net/ethernet/alteon/acenic.c
-drivers/net/ethernet/amazon/ena/ena_netdev.c
-drivers/net/ethernet/arc/emac_main.c
-drivers/net/ethernet/atheros/alx/main.c
-drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-drivers/net/ethernet/broadcom/bcmsysport.c
-drivers/net/ethernet/broadcom/bnx2.c
-drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
-drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h
-drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
-drivers/net/ethernet/broadcom/bnxt/bnxt.c
-drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-drivers/net/ethernet/broadcom/genet/bcmgenet.c
-drivers/net/ethernet/broadcom/tg3.c
-drivers/net/ethernet/brocade/bna/bnad.c
-drivers/net/ethernet/chelsio/cxgb/sge.c
-drivers/net/ethernet/chelsio/cxgb3/sge.c
-drivers/net/ethernet/emulex/benet/be_main.c
-drivers/net/ethernet/engleder/tsnep_main.c
-drivers/net/ethernet/google/gve/gve_tx.c
-drivers/net/ethernet/google/gve/gve_tx_dqo.c
-drivers/net/ethernet/intel/fm10k/fm10k_main.c
-drivers/net/ethernet/intel/fm10k/fm10k_netdev.c
-drivers/net/ethernet/intel/i40e/i40e_main.c
-drivers/net/ethernet/intel/i40e/i40e_txrx.c
-drivers/net/ethernet/intel/i40e/i40e_xsk.c
-drivers/net/ethernet/intel/iavf/iavf_txrx.c
-drivers/net/ethernet/intel/ice/ice_txrx.c
-drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-drivers/net/ethernet/intel/idpf/idpf_txrx.c
-drivers/net/ethernet/intel/igb/igb_ethtool.c
-drivers/net/ethernet/intel/igb/igb_main.c
-drivers/net/ethernet/intel/igc/igc_dump.c
-drivers/net/ethernet/intel/igc/igc_main.c
-drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-drivers/net/ethernet/marvell/skge.c
-drivers/net/ethernet/marvell/sky2.c
-drivers/net/ethernet/mediatek/mtk_eth_soc.c
-drivers/net/ethernet/mscc/ocelot_fdma.c
-drivers/net/ethernet/myricom/myri10ge/myri10ge.c
-drivers/net/ethernet/qlogic/qla3xxx.c
-drivers/net/ethernet/rocker/rocker_main.c
-drivers/net/ethernet/wangxun/libwx/wx_lib.c
-drivers/net/wireless/intel/iwlegacy/3945-mac.c
-drivers/net/wireless/intel/iwlegacy/3945.c
-drivers/net/wireless/intel/iwlegacy/4965-mac.c
-drivers/net/wireless/intel/iwlegacy/common.c
-drivers/net/wireless/marvell/mwl8k.c
-
-include/net/libeth/tx.h
+Ok, sounds reasonable.
 
 -- 
-With Best Regards,
-Andy Shevchenko
-
-
+Sabrina
 
