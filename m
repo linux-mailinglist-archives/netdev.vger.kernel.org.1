@@ -1,105 +1,121 @@
-Return-Path: <netdev+bounces-172051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FCDDA5014C
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 15:05:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66D19A50173
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 15:09:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E88B3AD5DC
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 14:04:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1D801729C0
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 14:08:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A01DE24A06B;
-	Wed,  5 Mar 2025 14:04:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A24F924A077;
+	Wed,  5 Mar 2025 14:08:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="T/3BuNe3"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="cDBrB/5B"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73C9624889C;
-	Wed,  5 Mar 2025 14:04:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78FAE24A075;
+	Wed,  5 Mar 2025 14:08:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741183460; cv=none; b=nUV+2R0Zw0qX8W7xVVeqIX2YTwfoSOwUu81BUCpVQWJ3y4Uj2wa0FQ0RXw41pSZMqRdz8bSbCjVtou5fPef6Cb0jghwpgNGIKAcafMn9h0qUOMUwI3XVT15ZQ7hkRDP4AvTVAFcf359OYChHGO3M0zgQszr27KX0JvJ5qxuCN+0=
+	t=1741183709; cv=none; b=DI0f7/BwedMRo6aL/OPDKAyJWv3ZXe435wBZWz7mG44rvSImAB1xwNNtA96zlJyux4D3x4SU/KLPO7/dg2s5y63Ubu27sEBgN6AsLzTIrIgdPGzxNfLIlvixdzyYUNet/9MZEquSDOd2xDR1ibWhUv4UydGFWz8/hlN5TnPQidQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741183460; c=relaxed/simple;
-	bh=3vEK90u5yUilFjfu9msqGo89fE4x6gZyF1UTb9v8fVo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Pg+UWQqlsoJq3be2Ng5tUacphe6uSQmhdq02V99xXOvJt8ll0DcMFZdYNTZxP+rOz5AqE4grc1CsIHDca+grLrIUkolfnFJ0lEMH6AowpLRGY+jF8KmtYnV7I8xO2E3ZF5/rGPZswWNK9JTviGEdLFxZUo6Yg7lZyV3SdktVeAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=T/3BuNe3; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A2C22442DD;
-	Wed,  5 Mar 2025 14:04:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1741183455;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=G1CdmG3QbGEUiwGjNNacH2rJi6jSe8rrnhlrR1kFHds=;
-	b=T/3BuNe3Ae0+SSYulj6cTe1Ijv9VaB4HvtB5e/jGZzdImJ8u6lmS9Jqo6497a82ObEQXlH
-	lSfc92qglGAR8BUoQc0km9Ky5+juGPsJihdkcx+n+j0uzf2pkLIOTwpaF8r1qb0NqeUKNy
-	txC4eZaNYo+N/eOF90agkSiOqPotPdHV6pj3EIDofWYIKAQJdCkDD7UtIRJz9m5J/lRVO4
-	kICjy3koPVuwOM61lKVrm6Q13DNkE2+jkG8WkOPhxdAzEprOHv9ZJgwNqgXxlWjE7eDbQS
-	1XzuwWsJCbwTNanmMmzeEhIySEZ+FaSWHFlJSb5CyJbspYTE/lMz3uHJ+dmRfg==
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Kory Maincent <kory.maincent@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net] net: ethtool: tsinfo: Fix dump command
-Date: Wed,  5 Mar 2025 15:03:52 +0100
-Message-Id: <20250305140352.1624543-1-kory.maincent@bootlin.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1741183709; c=relaxed/simple;
+	bh=3+GR7BVtAhPX5hvMW1vQnMXqYLElXQwwk1OW9oK0rFc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PoRAdwrewv6j8VwUCMe/oc+e79QsOBbi5Rn8ve0tXUja4ZEjo347JbbpTWpCVsY/UyNeniipel1x47gsgJQlKUrWTde5Wl1VdAdQF008pMNhUnUvc1zEpFYxn5xm3mHaTnzSoQ6zQkGI+YY3S61yTDWic970iTOWunxCp4Fj6kk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=cDBrB/5B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 876A8C4CED1;
+	Wed,  5 Mar 2025 14:08:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1741183708;
+	bh=3+GR7BVtAhPX5hvMW1vQnMXqYLElXQwwk1OW9oK0rFc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cDBrB/5BKZp4XaMi6WEfw+FrIJ8rpM51n1dV/6MpDCP0anlp5ZzAlclI2oofX9M9r
+	 SkPQqU32ve2yv/VhrUakVTz4cIUeuv8x13VNaIHbwvHs6BFD7s9Oc1ybB/bodIzYI1
+	 KrWrIk36QzglptukJR/7M1cJv7oGoK1vhieieeQ8=
+Date: Wed, 5 Mar 2025 15:08:26 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: Sasha Levin <sashal@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+	stable@vger.kernel.org, netdev@vger.kernel.org,
+	Lei Lu <llfamsec@gmail.com>
+Subject: Re: [PATCH stable 5.15/6.1/6.6] af_unix: Clear oob_skb in
+ scan_inflight().
+Message-ID: <2025030543-banker-impale-9c08@gregkh>
+References: <20250304030149.82265-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddutdehtdduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgedugedvkeelhfehfeeuieeigeetgeetuedugeetuddvveffieekgfejkefgudeknecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtrddrpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepuddtpdhrtghpthhtohepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmr
- ghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhm
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250304030149.82265-1-kuniyu@amazon.com>
 
-Fix missing initialization of ts_info->phc_index in the dump command,
-which could cause a netdev interface to incorrectly display a PTP provider
-at index 0 instead of "none".
-Fix it by initializing the phc_index to -1.
+On Mon, Mar 03, 2025 at 07:01:49PM -0800, Kuniyuki Iwashima wrote:
+> Embryo socket is not queued in gc_candidates, so we can't drop
+> a reference held by its oob_skb.
+> 
+> Let's say we create listener and embryo sockets, send the
+> listener's fd to the embryo as OOB data, and close() them
+> without recv()ing the OOB data.
+> 
+> There is a self-reference cycle like
+> 
+>   listener -> embryo.oob_skb -> listener
+> 
+> , so this must be cleaned up by GC.  Otherwise, the listener's
+> refcnt is not released and sockets are leaked:
+> 
+>   # unshare -n
+>   # cat /proc/net/protocols | grep UNIX-STREAM
+>   UNIX-STREAM 1024      0      -1   NI       0   yes  kernel ...
+> 
+>   # python3
+>   >>> from array import array
+>   >>> from socket import *
+>   >>>
+>   >>> s = socket(AF_UNIX, SOCK_STREAM)
+>   >>> s.bind('\0test\0')
+>   >>> s.listen()
+>   >>>
+>   >>> c = socket(AF_UNIX, SOCK_STREAM)
+>   >>> c.connect(s.getsockname())
+>   >>> c.sendmsg([b'x'], [(SOL_SOCKET, SCM_RIGHTS, array('i', [s.fileno()]))], MSG_OOB)
+>   1
+>   >>> quit()
+> 
+>   # cat /proc/net/protocols | grep UNIX-STREAM
+>   UNIX-STREAM 1024      3      -1   NI       0   yes  kernel ...
+>                         ^^^
+>                         3 sockets still in use after FDs are close()d
+> 
+> Let's drop the embryo socket's oob_skb ref in scan_inflight().
+> 
+> This also fixes a racy access to oob_skb that commit 9841991a446c
+> ("af_unix: Update unix_sk(sk)->oob_skb under sk_receive_queue
+> lock.") fixed for the new Tarjan's algo-based GC.
+> 
+> Fixes: 314001f0bf92 ("af_unix: Add OOB support")
+> Reported-by: Lei Lu <llfamsec@gmail.com>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+> This has no upstream commit because I replaced the entire GC in
+> 6.10 and the new GC does not have this bug, and this fix is only
+> applicable to the old GC (<= 6.9), thus for 5.15/6.1/6.6.
 
-In the same time, restore missing initialization of ts_info.cmd for the
-IOCTL case, as it was before the transition from ethnl_default_dumpit to
-custom ethnl_tsinfo_dumpit.
+You need to get the networking maintainers to review and agree that this
+is ok for us to take, as we really don't want to take "custom" stuff
+like thi s at all.  Why not just take the commits that are in newer
+kernels instead?
 
-Fixes: b9e3f7dc9ed95 ("net: ethtool: tsinfo: Enhance tsinfo to support several hwtstamp by net topology")
-Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
----
- net/ethtool/tsinfo.c | 2 ++
- 1 file changed, 2 insertions(+)
+thanks,
 
-diff --git a/net/ethtool/tsinfo.c b/net/ethtool/tsinfo.c
-index 691be6c445b38..9edc5dc30de88 100644
---- a/net/ethtool/tsinfo.c
-+++ b/net/ethtool/tsinfo.c
-@@ -291,6 +291,8 @@ static void *ethnl_tsinfo_prepare_dump(struct sk_buff *skb,
- 	memset(reply_data, 0, sizeof(*reply_data));
- 	reply_data->base.dev = dev;
- 	memset(&reply_data->ts_info, 0, sizeof(reply_data->ts_info));
-+	reply_data->ts_info.cmd = ETHTOOL_GET_TS_INFO;
-+	reply_data->ts_info.phc_index = -1;
- 
- 	return ehdr;
- }
--- 
-2.34.1
-
+greg k-h
 
