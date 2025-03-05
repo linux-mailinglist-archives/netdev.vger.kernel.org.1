@@ -1,120 +1,182 @@
-Return-Path: <netdev+bounces-171966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0557A4FB53
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 11:10:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E1C7A4FB5F
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 11:11:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D5C816AEC6
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 10:10:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 308CD16AFF8
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 10:11:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1970205AB0;
-	Wed,  5 Mar 2025 10:10:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2BE8205AB0;
+	Wed,  5 Mar 2025 10:11:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="VEtUkFYf"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="f4PMkdPd";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="W+pTjfBM"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0EB586340;
-	Wed,  5 Mar 2025 10:10:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
+Received: from fout-b2-smtp.messagingengine.com (fout-b2-smtp.messagingengine.com [202.12.124.145])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4EC71E2847;
+	Wed,  5 Mar 2025 10:11:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741169444; cv=none; b=PGBO+J4eD2BypOl9uYOc1GKi/tioCDHQCOF18aW5nQHPi7aWF7c2/WQPMC5ClPusTgl7IlZKuyr1m9XNggH6excohLx2sq/nek9iWn3Y+Dhiovqu0p36h/FWgKIB7HVfGaROhgCstHvJD5Ks1f0QUmUAWcYchVeDZZpnDNd/kgE=
+	t=1741169506; cv=none; b=PxDWLI/TFcky9lRNyLB4AUFFZXKTXUNAVx45EVl0W9ZqEERr7gWykTNGbx3kzl1F4NvMUXmBrwhuUbmrVCxpR7ATVrjJ1T5OwUqgLML5HZnLqxbdGXJDpk1kK2ELCs4dPwYfgc+lwn/evBmYpEJLT3u8vUXpgfRGtHvVURW9j3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741169444; c=relaxed/simple;
-	bh=p7qCmbn7qh8IoaNpypSjjh8REnQqe2JM+GRz9TM9Dek=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BP66su3c7m497yNxhsS8L3OLWkW/yKBFJ491sCkoiqNgaGzfKguCb/W/+NGfxsstkHLQcEDa3/ML1tcsjBwzjc6NVxgYK8rcTlmivrly4jUoXQoFV9rf69iFHt9ajZ2GNqzt5clyOpDqCMRFbRF+1CfwEV3ZCqdTTPaejEdX/d8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=VEtUkFYf; arc=none smtp.client-ip=117.135.210.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=luJmq
-	zW3D/PHhjjmaO84ghpqEdiImWkNJgLVp6gRUTA=; b=VEtUkFYffxFzvHLt+hcDo
-	JGgjbhLHIJPu+hpxz4JaEO4TjYLKnwk+mjovJMGdNoqnwVqrMoQarfq5PS1BGanC
-	ZJm0VVD/CPvAsNz/nFKXBI8ZD3928rjiLIqfQ8IAqHMkIGm/cYW+CO5ySgCcK06T
-	gG0As/Wn6zwyWZPmFX8SNM=
-Received: from icess-ProLiant-DL380-Gen10.. (unknown [])
-	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wCXviTwIshncgV_Qg--.37440S4;
-	Wed, 05 Mar 2025 18:09:53 +0800 (CST)
-From: Haoxiang Li <haoxiang_li2024@163.com>
-To: shshaikh@marvell.com,
-	manishc@marvell.com,
-	GR-Linux-NIC-Dev@marvell.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	rajesh.borundia@qlogic.com,
-	sucheta.chakraborty@qlogic.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Haoxiang Li <haoxiang_li2024@163.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v2] qlcnic: fix a memory leak in qlcnic_sriov_set_guest_vlan_mode()
-Date: Wed,  5 Mar 2025 18:09:50 +0800
-Message-Id: <20250305100950.4001113-1-haoxiang_li2024@163.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1741169506; c=relaxed/simple;
+	bh=u8nSbs0xTwX5BtGNGGk1U4xJg451vP+0nM368luQfKs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tj/HLeiRDTNYJ7HnIHyXj6pFMbsVN1cMsneRTCIHmGPlIBaTJoUX78nYwy0c9EKYM7XTKDsU9mmHwP0kB7vOA8vz2eg3O+iA6UiFoyB4a+Ormrse4eFCbtTbKMQ09g/i3KMbzbEBmhjhQzKbCWGs+7PLkh0Vhi/DjIpshXNGf40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=f4PMkdPd; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=W+pTjfBM; arc=none smtp.client-ip=202.12.124.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
+	by mailfout.stl.internal (Postfix) with ESMTP id ABD2011400C7;
+	Wed,  5 Mar 2025 05:11:43 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-04.internal (MEProxy); Wed, 05 Mar 2025 05:11:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1741169503; x=
+	1741255903; bh=FgqevE7dp9jIfFGQb8KyY7Usp35oeBUE8Vi5Z6q1pgo=; b=f
+	4PMkdPdzhOAgVvNaujf/h2UbyV/FUe0m26HKbbJl0/sQYut7W1336g8bsGMM6UbS
+	LGQOowu62xtfd7P1aNtmKsR4G7PMHr9p/7lbQxUxouzQt7UtARkWx5dGK5xsjsMO
+	Q0/iDzlkMTqdQX1G4/jIWmxxJb7D2mJTRfPPcG7uN3P6Bwew7sxtI3tZnUOGc0MC
+	7TKX9ZKMjZBFYUfyhF9Qc2Pg4dPqYudHS2MYjWxd+f5DcJjWj0wjACUqU8k0nJFT
+	vOZDquu+pbrKYmrnmSlLeMob2DT7clhOj8dIfREzVY6SFKJYPuHwLqnj55Zq8WsU
+	+q/ykWUEl7pj25bLW0+gg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1741169503; x=1741255903; bh=FgqevE7dp9jIfFGQb8KyY7Usp35oeBUE8Vi
+	5Z6q1pgo=; b=W+pTjfBMAKYVc5L3Ldg6L+dO1hz2jiJ/AZWtyPf9BJHRWNDdkIm
+	5E+svGGsu0CdiU2OSYVeMBHWvGl6C6Sq9aeFsYVHLLmZ7oyXJF7Ocdaw3SKkeIM3
+	oa0x+42YCpA61Bg+j/ItbjuN+Brrz0YrcehV3JYwOK36jpPMJIMEjCGAtDZPsvpq
+	suLw1AiaNua7nVzVy8osPm6BRcfti/cqf46w6heqfJnMC3SjebG/O/mfA4ZJ/WLM
+	hY3ZU5R6XIxtrbpwT0qhopsHfq1+VObXNLLzYYknpHePAd9luRrA7EX+eoTM7yiR
+	lZ9qKhoJozyo9wbTsNjCsbLOlG5g7wwAzdQ==
+X-ME-Sender: <xms:XyPIZ-m5w2fvBjED8u53ZLNp-yxFM5lfPSP_Nuh9uIAB8k7ikIq0-g>
+    <xme:XyPIZ12aH8BJIAKCBSbS1TMM_mmD3axiaYG9UdPrRVJUGPLnTVdo02J4LJTz6U_a0
+    Yc0F5v5Fzmk_-fy0bo>
+X-ME-Received: <xmr:XyPIZ8qfQB1PHBpRr9PMQvOYGihyBbOGsECUwMkc6kyoWP2o6Q4E_ohvvuyJ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddutdegheegucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
+    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
+    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhepgefhffdtvedugfekffejvdeiieel
+    hfetffeffefghedvvefhjeejvdekfeelgefgnecuffhomhgrihhnpehkvghrnhgvlhdroh
+    hrghenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehs
+    ugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepudefpdhmohguvg
+    epshhmthhpohhuthdprhgtphhtthhopegrnhhtohhnihhosehophgvnhhvphhnrdhnvght
+    pdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpth
+    htohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrges
+    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
+    dprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgtohhmpdhrtghp
+    thhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprhihrgiirghnoh
+    hvrdhsrdgrsehgmhgrihhlrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggv
+    vheslhhunhhnrdgthh
+X-ME-Proxy: <xmx:XyPIZynxLkMwU1dS3B3gmluF7RqutfIl5jCYp0RrBR1x7m6hISL4QQ>
+    <xmx:XyPIZ81It-Om4u5CkzG0BdXTKUlku7sSKcocsG7yXMXm0flW67P2sQ>
+    <xmx:XyPIZ5vJVAS0zyQppNYiSCfRVbkxT74JW-hz9C2d8lNyi7QM-Nyltg>
+    <xmx:XyPIZ4WqvLyEr6N5ubGlWp_GA70lVuB6lHKoYGHdw6b2-tMDbItinA>
+    <xmx:XyPIZ32a6YS_g4zYcQrOEzp-A-FWLjUNpRMSLH4ACUe-ECxL99PgSUUW>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 5 Mar 2025 05:11:42 -0500 (EST)
+Date: Wed, 5 Mar 2025 11:11:40 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+Subject: Re: [PATCH v21 20/24] ovpn: implement key add/get/del/swap via
+ netlink
+Message-ID: <Z8gjXLepPcRByLTZ@hog>
+References: <20250304-b4-ovpn-tmp-v21-0-d3cbb74bb581@openvpn.net>
+ <20250304-b4-ovpn-tmp-v21-20-d3cbb74bb581@openvpn.net>
+ <Z8braoc3yeBY7lcE@hog>
+ <07c73e1d-3c9c-46c7-92cd-28d728929d18@openvpn.net>
+ <Z8eIJH1LtTtfljSj@hog>
+ <71c1db26-f147-4578-89ae-c5b95da0ec9a@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wCXviTwIshncgV_Qg--.37440S4
-X-Coremail-Antispam: 1Uf129KBjvJXoW7CFW8uF48Ww13Jw1DCr4kZwb_yoW8WFykpF
-	47ZFyUWr95JF4jkws5Zwn2yrZ8C39Fy3sruF9xW393u34Utr4xGw1DArnIgrn0yr95GFW8
-	tr1DZ3W5XFn8A3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pimhF7UUUUU=
-X-CM-SenderInfo: xkdr5xpdqjszblsqjki6rwjhhfrp/xtbB0hQHbmfIHmJ4MQAAs1
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <71c1db26-f147-4578-89ae-c5b95da0ec9a@openvpn.net>
 
-Add qlcnic_sriov_free_vlans() to free the memory allocated by
-qlcnic_sriov_alloc_vlans() if qlcnic_sriov_alloc_vlans() fails
-or "sriov->allowed_vlans" fails to be allocated.
+2025-03-05, 02:00:21 +0100, Antonio Quartulli wrote:
+> On 05/03/2025 00:09, Sabrina Dubroca wrote:
+> > 2025-03-04, 13:11:28 +0100, Antonio Quartulli wrote:
+> > > On 04/03/2025 13:00, Sabrina Dubroca wrote:
+> > > > 2025-03-04, 01:33:50 +0100, Antonio Quartulli wrote:
+> > > > >    int ovpn_nl_key_new_doit(struct sk_buff *skb, struct genl_info *info)
+> > > > >    {
+> > > > ...
+> > > > > +	pkr.slot = nla_get_u8(attrs[OVPN_A_KEYCONF_SLOT]);
+> > > > > +	pkr.key.key_id = nla_get_u16(attrs[OVPN_A_KEYCONF_KEY_ID]);
+> > > > > +	pkr.key.cipher_alg = nla_get_u16(attrs[OVPN_A_KEYCONF_CIPHER_ALG]);
+> > > > 
+> > > > 
+> > > > [...]
+> > > > > +static int ovpn_nl_send_key(struct sk_buff *skb, const struct genl_info *info,
+> > > > > +			    u32 peer_id, enum ovpn_key_slot slot,
+> > > > > +			    const struct ovpn_key_config *keyconf)
+> > > > > +{
+> > > > ...
+> > > > > +	if (nla_put_u32(skb, OVPN_A_KEYCONF_SLOT, slot) ||
+> > > > > +	    nla_put_u32(skb, OVPN_A_KEYCONF_KEY_ID, keyconf->key_id) ||
+> > > > > +	    nla_put_u32(skb, OVPN_A_KEYCONF_CIPHER_ALG, keyconf->cipher_alg))
+> > > > 
+> > > > That's a bit inconsistent. nla_put_u32 matches the generated policy,
+> > > > but the nla_get_u{8,16} don't (and nla_get_u16 also doesn't match "u8
+> > > > key_id" it's getting stored into).
+> > > > 
+> > > > [also kind of curious that the policy/spec uses U32 with max values of 1/2/7]
+> > > 
+> > >  From https://www.kernel.org/doc/html/next/userspace-api/netlink/specs.html#fix-width-integer-types
+> > > 
+> > > "Note that types smaller than 32 bit should be avoided as using them does
+> > > not save any memory in Netlink messages (due to alignment)."
+> > > 
+> > > Hence I went for u32 attributes, although values stored into them are much
+> > > smaller.
+> > 
+> > Right.
+> 
+> What's wrong with key_id being u8 tough?
 
-Fixes: 91b7282b613d ("qlcnic: Support VLAN id config.")
-Cc: stable@vger.kernel.org
-Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
----
-Changes in v2:
-- Add qlcnic_sriov_free_vlans() if qlcnic_sriov_alloc_vlans() fails.
-- Modify the patch description.
-vf_info was allocated by kcalloc, no need to do more checks cause
-kfree(NULL) is safe. Thanks, Paolo! 
----
- drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Nothing. It would make a little bit more sense to use nla_get_u16 if
+key_id was u16 (even with OVPN_A_KEYCONF_KEY_ID defined as U32), or to
+use nla_get_u8 for u8, but here it was just 3 different int sizes and
+that triggered my "uh? what?" :)
 
-diff --git a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c
-index f9dd50152b1e..0dd9d7cb1de9 100644
---- a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c
-+++ b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c
-@@ -446,16 +446,20 @@ static int qlcnic_sriov_set_guest_vlan_mode(struct qlcnic_adapter *adapter,
- 		 sriov->num_allowed_vlans);
- 
- 	ret = qlcnic_sriov_alloc_vlans(adapter);
--	if (ret)
-+	if (ret) {
-+		qlcnic_sriov_free_vlans(adapter);
- 		return ret;
-+	}
- 
- 	if (!sriov->any_vlan)
- 		return 0;
- 
- 	num_vlans = sriov->num_allowed_vlans;
- 	sriov->allowed_vlans = kcalloc(num_vlans, sizeof(u16), GFP_KERNEL);
--	if (!sriov->allowed_vlans)
-+	if (!sriov->allowed_vlans) {
-+		qlcnic_sriov_free_vlans(adapter);
- 		return -ENOMEM;
-+	}
- 
- 	vlans = (u16 *)&cmd->rsp.arg[3];
- 	for (i = 0; i < num_vlans; i++)
+> I am a bit reluctant to change all key_id fields/variables to u32, just
+> because the netlink APIs prefers using u32 instead of u8.
+> 
+> Keeping variables/fields u8 allows to understand what values we're going to
+> store internally.
+
+Sure.
+
+> And thanks to the netlink policy we know that no larger value will be
+> attempted to be saved, even if the field is actually u32.
+
+Yes.
+
 -- 
-2.25.1
-
+Sabrina
 
