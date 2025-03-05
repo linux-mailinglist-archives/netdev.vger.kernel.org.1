@@ -1,119 +1,108 @@
-Return-Path: <netdev+bounces-172179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AE39A50993
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 19:21:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3ADFA509CA
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 19:24:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28CD07A8B11
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 18:19:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A49E3176112
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 18:23:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 078B32512C9;
-	Wed,  5 Mar 2025 18:17:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4725252900;
+	Wed,  5 Mar 2025 18:22:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U6zIwFjV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="By4bmiw+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1F4E253344;
-	Wed,  5 Mar 2025 18:17:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686F2199E89
+	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 18:22:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741198641; cv=none; b=e1mnLNcoJxhDv1xLoJm3lbQuYiCRUKx393Bpe1krPn2MbBFpbXkP2FEkRxz8WHTB5AGpzW8gd/4eJQkgFQrde35bBgHko8VB6zVvZ1Oc4tfPU3doFzxGNNzS7lXFl3alIEASaGZuhGDQWW5LNkQsHQrURMKKpnXt03+xm+xcb30=
+	t=1741198941; cv=none; b=IJZRT7jd88kJbXNbHo5NVNcYZn/u1UodkwZx3AD5gMEOR1Mv8gWk6lFP5IL4Qd8cgqObOBgu8y1ZVoLZ7WwZlvLei2z1WSNUFdnPQjd3sx47RR6jJ0OPjnX/3ECvEdfr/Xuly9Px3HpnwW/It94emh3jmXzX/qbPgzxGBV8KSYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741198641; c=relaxed/simple;
-	bh=GPQLv6kstfDvBboWvitF+UykNqX7q2xOlqE2DA/uovQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dCL4DP6ZQ+3ZPcgGvZQF540HT/u/dupkgHro4MkNp864bI1p0zJqVQxVmxgCMFZq7lDcaMdrB+0x+4vCRlYRubNChnSgna9ulHz7uukHoZT0eNnR2vuG2OjYz5iCR/CritsHZ3bSgaG7FMxHFdFiF80YytuLEbn15SLYZLbR8EA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U6zIwFjV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA041C4CED1;
-	Wed,  5 Mar 2025 18:17:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741198641;
-	bh=GPQLv6kstfDvBboWvitF+UykNqX7q2xOlqE2DA/uovQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=U6zIwFjV5wqtixzdkKTpofFlbyP4Wj/W5GyYH3vn6Uh5c9DxDzrOl/AUy5WGi9KpZ
-	 GXB51LqG/zPrfGGexpxHjQNgOej69OcOLaeKONElxEBadn+wnFkTsSXUh05t9+ni5p
-	 K+kPIUONnYLKUl9cpwyVLfznGBUYgmPhG3P8k30nSAHYSj5b2tORNaCOumZkDbAeHf
-	 xovtvCTARGEAK2MeOJTtj/lDATryLC2tpWQo5QDkuShAKybwootirwCnRYy1y2vHXB
-	 hlS2Cz2HnBVVC+zMprgNaNYw+UgkESQR5ojk3DQTwG0cfikMY96Dsx14+7dFn/OwgP
-	 C98mI27Gt5iww==
-Message-ID: <bcafcf60-47a8-4faf-bea3-19cf0cbc4e08@kernel.org>
-Date: Wed, 5 Mar 2025 11:17:19 -0700
+	s=arc-20240116; t=1741198941; c=relaxed/simple;
+	bh=mpZIyg2ls78pAGAM2oyC/4XdVm/qWQwX7Lg+iFM87wQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IkKJB7hJPd0B2cHiAWmnMvoUzlIRAt3VnvO+mKopx7ZrOsSMLWQaMdpOf0S9w4UlxPrujPd6BgEprMeHdtiUgODrz4HdW9tKmEK5peBrWRMl5WPFJY/tFyod3QpB0IaOylbpDt8levVzje4zItqG1DDZA5A2GSgfAnepBTAgcgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=By4bmiw+; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-22401f4d35aso12899435ad.2
+        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 10:22:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741198939; x=1741803739; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EGV6LoTeydm+N3uiBcUotDKF/jSGMFjxSbiHEfl/+/I=;
+        b=By4bmiw+UHIfuk3CKFRqFkdXTCdgIDBOYebFvIqdpdLU1CS9GwPJWLCdA8MKKzhUJs
+         218yya/zMTQRKv4kNZdjoSTIQ1sGF8k49cRa+qQNgneCdmVMvMVp1IddeTA46E24PaD4
+         MdkmLx2Ne/HMZeiDuN2obMQaTvbeDwX4CUZYwK19s2+W5wOWmJUs+ems/foZUQc8svqJ
+         2Q6jJajn8GI9zN/EAauBmNIZ36jcU4+qtW14Jqf+oXnOO6PE+1N/xQfvt6QPq8ZBmK2A
+         tecT/s6/bVgaqgVbYsmLHLdL6AjfXI5Ytofg4Ob4vku6K/F1Vk6/Gr3qpnjK4VJvcYyD
+         8j9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741198939; x=1741803739;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EGV6LoTeydm+N3uiBcUotDKF/jSGMFjxSbiHEfl/+/I=;
+        b=LbGHlSsQixLqXaw/WrcAjs+tLcWM2sbUyQAnJUsV5C634Rl54LV+wyFGdQwMJz8dbC
+         y/AuyFt/9g4qI5V/TLtLCadvQwhZUYyVx+fU+0k6qrztK3X6MgqMzoxYIUhPpRJ8HGsE
+         Fmjc+PZAEGgqMtcPH9dEuPQHSsw3PyAzmSwUH3XXAbPJh8VQ6ew7YieLE75AbYlNiaLW
+         HaLIKLH3Kw0paLuBvdDO1hiBPbdRsyQp03qz9l6QvJ8N7mR3q29Ax/hnSgyhrWavgzhs
+         yYNdmBtfKUo5y98ntc+e+oKycAo4V5EcXHC7ghZVQTmP8sgEzJhw3NfwdLD2GIEkHt1k
+         mllw==
+X-Gm-Message-State: AOJu0YwgPx6sCLdcqsaVzOf1eawULuPqrnxGaEixTLNmI9o6YmfVyoY9
+	kZbug6PXnnp4jV8p1dPbX4uZVPiO7kH/hGx4O20e89vSqoob0QrDPAxDdA==
+X-Gm-Gg: ASbGnctT1nDkWPpVeUo7qgzZE1zwit9flZmDGXebkynDXug/R/v6rNPiSJ+dD7ALEr5
+	urjeBvw3QWasocCRwAEVaVEGhRHxBroJebnEAl+udp7EPZfXw5zlMBy153mkn/8XwTlg+umUnZ7
+	s4TufMUs36LSSuKkjlB1KPXJRkfNQ6f7Fe9OsuVYkrZiMmfLspahEjW242znbWC0jepRnpkWllK
+	bg8aHEj8A2n3FJsmJ1wo/Xa5umj+j4imUnkmv50TKyvarvCfaAvx1kaBnWZwwJZfImNo2kqJuNB
+	slAlZnJmTwOcURPt/C1jtHkv/ImZ6wBil2ni3hOAmdzfCSsg
+X-Google-Smtp-Source: AGHT+IGU3H1TcEJgITvFddLNA+vJBKU21YRkIyCVt4d9D4l1HIszEO7eHOtubmKH1SMnH+MsYNZqxw==
+X-Received: by 2002:a17:902:d50f:b0:223:5e76:637a with SMTP id d9443c01a7336-223f1c97445mr51850335ad.23.1741198939498;
+        Wed, 05 Mar 2025 10:22:19 -0800 (PST)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2240229ef56sm6509035ad.40.2025.03.05.10.22.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Mar 2025 10:22:18 -0800 (PST)
+Date: Wed, 5 Mar 2025 10:22:17 -0800
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Jun Yang <juny24602@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH] sched: address a potential NULL pointer dereference in
+ the GRED scheduler.
+Message-ID: <Z8iWWQS3PJi6HcrZ@pop-os.localdomain>
+References: <Z8ddDSvJZSLtHCGi@pop-os.localdomain>
+ <20250305154410.3505642-1-juny24602@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 0/8] Introduce fwctl subystem
-Content-Language: en-US
-To: Jiri Pirko <jiri@resnulli.us>, Jason Gunthorpe <jgg@nvidia.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>,
- Aron Silverton <aron.silverton@oracle.com>,
- Dan Williams <dan.j.williams@intel.com>,
- Daniel Vetter <daniel.vetter@ffwll.ch>, Dave Jiang <dave.jiang@intel.com>,
- Christoph Hellwig <hch@infradead.org>, Itay Avraham <itayavr@nvidia.com>,
- Jiri Pirko <jiri@nvidia.com>, Jonathan Cameron
- <Jonathan.Cameron@huawei.com>, Leonid Bloch <lbloch@nvidia.com>,
- Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
- Saeed Mahameed <saeedm@nvidia.com>, "Nelson, Shannon"
- <shannon.nelson@amd.com>
-References: <0-v5-642aa0c94070+4447f-fwctl_jgg@nvidia.com>
- <20250303175358.4e9e0f78@kernel.org> <20250304140036.GK133783@nvidia.com>
- <20250304164203.38418211@kernel.org> <20250305133254.GV133783@nvidia.com>
- <mxw4ngjokr3vumdy5fp2wzxpocjkitputelmpaqo7ungxnhnxp@j4yn5tdz3ief>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <mxw4ngjokr3vumdy5fp2wzxpocjkitputelmpaqo7ungxnhnxp@j4yn5tdz3ief>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250305154410.3505642-1-juny24602@gmail.com>
 
-On 3/5/25 8:08 AM, Jiri Pirko wrote:
-> Wed, Mar 05, 2025 at 02:32:54PM +0100, jgg@nvidia.com wrote:
->> On Tue, Mar 04, 2025 at 04:42:03PM -0800, Jakub Kicinski wrote:
->>> I thought you were arguing that me opposing the addition was
->>> "maintainer overreach". As in me telling other parts of the kernel
->>> what is and isn't allowed. Do I not get a say what gets merged under
->>> drivers/net/ now?
->>
->> The PCI core drivers are a shared resource jointly maintained by all
->> the subsytems that use them. They are maintained by their respective
->> maintainers. Saeed/etc in this case.
->>
->> It would be inappropriate for your preferences to supersede Saeed's
->> when he is a maintainer of the mlx5_core driver and fwctl. Please try
->> and get Saeed on board with your plan.
->>
->> If the placement under drivers/net makes this confusing then we can
->> certainly change the directory names.
+On Wed, Mar 05, 2025 at 11:44:10PM +0800, Jun Yang wrote:
+> If kzalloc in gred_init returns a NULL pointer, the code follows the
+> error handling path, invoking gred_destroy. This, in turn, calls
+> gred_offload, where memset could receive a NULL pointer as input,
+> potentially leading to a kernel crash.
 > 
-> According to how mlx5 driver is structured, and the rest of the advanced
-> drivers in the same area are becoming as well, it would make sense to me
-> to have mlx5 core in separate core directory, maintained directly by driver
-> maintainer:
-> drivers/core/mlx5/
-> then each of the protocol auxiliary device lands in appropriate
-> subsystem directory.
+> Signed-off-by: Jun Yang <juny24602@gmail.com>
 
-+1
+When table->opt is NULL in gred_init(), gred_change_table_def() is not
+called yet, so it is not necessary to call ->ndo_setup_tc() in
+gred_offload().
 
-This is how I have structured our drivers -- core driver for owning the
-PCI device and hosting the APIs to communicate with hardware, an aux bus
-and then smaller subsystem focused drivers for the aux devices that make
-the device usable from different contexts.
+Fixes: f25c0515c521 ("net: sched: gred: dynamically allocate tc_gred_qopt_offload")
+Reviewed-by: Cong Wang <xiyou.wangcong@gmail.com>
 
-I think we are ready to start upstreaming, but I am waiting to see how
-this falls out - to see if our core driver can land in a non-subsystem
-specific location (e.g., drivers/core) or if it needs to go with fwctl
-as a generic location.
-
-
-
+Thanks!
 
