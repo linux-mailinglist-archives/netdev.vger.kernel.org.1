@@ -1,157 +1,122 @@
-Return-Path: <netdev+bounces-171954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2961EA4F9D5
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 10:23:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5FCFA4F9ED
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 10:26:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41FA518867EB
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 09:23:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 083347A28DB
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 09:25:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C35F2045AC;
-	Wed,  5 Mar 2025 09:23:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15BEA2045AC;
+	Wed,  5 Mar 2025 09:26:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H6hwbWbJ"
+	dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b="H1PWocbi"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from ksmg01.maxima.ru (ksmg01.maxima.ru [81.200.124.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F17202969
-	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 09:23:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05455204694;
+	Wed,  5 Mar 2025 09:26:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.200.124.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741166600; cv=none; b=eZKnaLqzpGV7P51SncOTh4Qmbwpj9MopLX0LQSiCXYlJi79NmxM5zO2XtVz8SEVDRw0/lrZiL2D/sseSIpkuRSn7gZqjovxKu7nAhQqma+9u2ImQtXy9qjQTkv6L32E21kHhytYs5bcZtH2fI1A3QtZFPzuDrgiJ7sUu4JI4+6M=
+	t=1741166801; cv=none; b=bf+cPxugXo5E+Qjv3SycjGi9StS7iY9nwf5jp/iBYkLrLb+VrFlUubvLoga2Yw1hVGvySrZ0hISk0U4x+sk0GUz1715TfTS0+McHD0jznJBPW9rR20tfYxxAZNHv0Kn804QNstkrXCrGZcBjMNM+Gbaa52KCdLi4CumHYR/FgYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741166600; c=relaxed/simple;
-	bh=+QfPm6bqrG0OcdOxhTC1BYzGGpBGfOp64hZJsZUGa8o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P8WpnX44E3LYw1SK8X/lQ1+6thDGVVRTsvptpduMUOZPpiaHjMbhKyyoQktEEOfEjeGXrXx+Io5RkxbcG6UYssGHuDwFR4pXeVnc/yX0SE2ldGVMa2A/JY75isIPORRVp574Kd1dylgTaxWFk1a04Sv+E3kEASOYFHWuoUV5YC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H6hwbWbJ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741166597;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7Fz/47DT/bcZQibct8BTl8FGEvkFXwI/p/JU2LZO+88=;
-	b=H6hwbWbJvRc76HNKQr1ncFfLpM5roA6dEbbpRKWURLBSpKbzmqw3SLtXU96DX24QKcZ/UI
-	S6I2+iyPatIuPtlA6XD1T3bcVeEP7BV3P667UPleGxaqk1M9HXAbti1hR2jDEhlKvhKHGh
-	IMZ0jQ1GJbQb7399rZmvqvxFdX1t6R8=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-481-mzbjl25TMguDrHG1-2aJCg-1; Wed, 05 Mar 2025 04:23:16 -0500
-X-MC-Unique: mzbjl25TMguDrHG1-2aJCg-1
-X-Mimecast-MFC-AGG-ID: mzbjl25TMguDrHG1-2aJCg_1741166595
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-5e54bade36dso3765881a12.2
-        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 01:23:15 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741166595; x=1741771395;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7Fz/47DT/bcZQibct8BTl8FGEvkFXwI/p/JU2LZO+88=;
-        b=v4gEsjjZ5mxxEiMdkCWHN4sKCv4nM10YAhGbfo5Y5IJUWqVCao7uiXmNe0T2d0b/Kf
-         zVF3Xv1TV9TjslaBmMm3CfKeDFrbI8HD305yQoXeHpFWGWghyDfSbHQJdsVaZ7BpfkGx
-         mLBhVY7AJ8SIKOhyZvPZHhIUYRA4/2ea0BtZEQAb+GGS1o1bG0gkcdnv+Tp0tJGquNaR
-         NGoyEaDwiYgL6OaB5AFnoleYeLL4mh4Omo4bVDTR/AbvrX1QGfa7Wm2nnsOFy3awC/uu
-         JQsLTOv6My5mG8cLq5fG1WR0B/L0OQXBCoR5S/hj/7aOzWW+uGsyNHFO3ypfiuDv0wHS
-         5u9A==
-X-Forwarded-Encrypted: i=1; AJvYcCUgAzkdQNWR8yDWVXD0hLrR2Lgfel+BXBaJw6Y+dbw4vQ23uuPmdvhfC54LxtnWvnB3q7Ib0es=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwysZldjdwjM6xdl+C8LEUl7dTRjTqc1jTXHCWMxz98YFTtNX44
-	8vv6c9pNDpr6NC0qWJ78DqJzhQbxEWj0xg0yp4JKpFx1uLqEZVwzwO2GwMtWoAHij5aoHxfAveX
-	e1lY1YLkm/MVq+BaeIlCX+QStsD6YwL3aJX8al0ya5wSNTO5lwGEIHQ==
-X-Gm-Gg: ASbGncsOdVJqVhgzYdKgVjlu5OZsyvKPxolWzNp3z2Yp28LhVoW0NpzZ9Ia/c5vAjWC
-	GUnozpn0+KaQOSzdJy2exhzEsjx9xny1sqv20jAViXj1qcK9qtmH9p+ER4gtqUo5PUOkFKFED9i
-	UzmQahfYakLVHem1bxF4etK2iVLh9uGgpFp5MQpPkZyx2XciWorYL5sgthaV200IYAmad6Sx/2a
-	kvDAGxv+IK1r7p6Iu38JCNhy7pBGgyvqb6Ag9epUuq4da4V7mRA1+iZGiyvtmh5W5dCvSS8AzIY
-	U2PobGVVwWpaHYijUM8g70ffBYmYt45IfKOlc7M1dKvvPMaIF++a0m+lRoM2VnTh
-X-Received: by 2002:a05:6402:5214:b0:5dc:8ed9:6bc3 with SMTP id 4fb4d7f45d1cf-5e59f467cd0mr2334229a12.26.1741166594695;
-        Wed, 05 Mar 2025 01:23:14 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFrT/jfbwSVjoA3FYJOR2RrQw1bBL1x20n/7XdsK3C0UVX0BQZe2DpbudtEjt/UHC5wEkkQDw==
-X-Received: by 2002:a05:6402:5214:b0:5dc:8ed9:6bc3 with SMTP id 4fb4d7f45d1cf-5e59f467cd0mr2334183a12.26.1741166593907;
-        Wed, 05 Mar 2025 01:23:13 -0800 (PST)
-Received: from sgarzare-redhat (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e4c3b4aa46sm9297702a12.1.2025.03.05.01.23.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Mar 2025 01:23:13 -0800 (PST)
-Date: Wed, 5 Mar 2025 10:23:08 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Jorgen Hansen <jhansen@vmware.com>, 
-	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>, 
-	virtualization@lists.linux-foundation.org, linux-hyperv@vger.kernel.org, Dexuan Cui <decui@microsoft.com>, 
-	Bobby Eshleman <bobbyeshleman@gmail.com>
-Subject: Re: [PATCH net-next 1/3] vsock: add network namespace support
-Message-ID: <CAGxU2F5C1kTN+z2XLwATvs9pGq0HAvXhKp6NUULos7O3uarjCA@mail.gmail.com>
-References: <20200116172428.311437-1-sgarzare@redhat.com>
- <20200116172428.311437-2-sgarzare@redhat.com>
- <20250305022900-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1741166801; c=relaxed/simple;
+	bh=oOiwk0+ykDG0cH/sIcmhEhO1SWlT49rvZjer1o8JnGE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QmuZjF/krGpYvprNrW+znYMREh0bkH5gMJGdyS1qNiiOHNOJxefLFdCHsZZYuToXQ89Yw/UrbdrZqTwysoPRDZmc56Kq0hMYGcAs1kltohXyD05i9zIA3t6HWVD/ooM3JYPXZsLYnsZUjFDJACDxIebgVjSrDoPoiNzP1EwMOjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru; spf=pass smtp.mailfrom=mt-integration.ru; dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b=H1PWocbi; arc=none smtp.client-ip=81.200.124.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mt-integration.ru
+Received: from ksmg01.maxima.ru (localhost [127.0.0.1])
+	by ksmg01.maxima.ru (Postfix) with ESMTP id B9955C001B;
+	Wed,  5 Mar 2025 12:26:32 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ksmg01.maxima.ru B9955C001B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mt-integration.ru;
+	s=sl; t=1741166792; bh=plkR5jfwB7LHjAkxN83kzZE2Wkvvi98b7PWXv06ISCI=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=H1PWocbi+IZnor92m38acVn1zi6V/rAiJ138FmswIl92hlJ3MUT93y/wk14KFYl9T
+	 M+3aVeZw+54viHF4y2drkfjRo0qRe6zB5PGusoCJOh5cL/NAzyJ3toywYu84sa/r2i
+	 m8CZqoh/xYKLUhNhPSNL4JUGh0yQzgXHm3racZlEWxKLK8yVZ3gvfA1CTrrHHxK4Px
+	 gN1DRr2Afm6oNOuU/Oza9mRbyiad8FpyfVGbE8nVvgpKVFteKuHqX6B0yJbiAZnBqE
+	 9GzlnuaBYHTqZXpFqIIS5sEePjE9ovkf5J2L0WCNhrEUbgMPcQvAOmmZ+c6OjJOwkW
+	 8CZdW9Kzi5yhg==
+Received: from ksmg01.maxima.ru (autodiscover.maxima.ru [81.200.124.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client CN "*.maxima.ru", Issuer "GlobalSign GCC R3 DV TLS CA 2020" (verified OK))
+	by ksmg01.maxima.ru (Postfix) with ESMTPS;
+	Wed,  5 Mar 2025 12:26:32 +0300 (MSK)
+Received: from saturerate.maximatelecom.ru (10.0.247.123) by
+ mmail-p-exch01.mt.ru (81.200.124.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1544.4; Wed, 5 Mar 2025 12:26:30 +0300
+From: Ivan Abramov <i.abramov@mt-integration.ru>
+To: Richard Cochran <richardcochran@gmail.com>
+CC: Ivan Abramov <i.abramov@mt-integration.ru>, Jonathan Lemon
+	<jonathan.lemon@gmail.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
+Subject: [PATCH] ptp: ocp: Remove redundant check in _signal_summary_show
+Date: Wed, 5 Mar 2025 12:25:20 +0300
+Message-ID: <20250305092520.25817-1-i.abramov@mt-integration.ru>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250305022900-mutt-send-email-mst@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: mt-exch-01.mt.ru (91.220.120.210) To mmail-p-exch01.mt.ru
+ (81.200.124.61)
+X-KSMG-AntiPhishing: NotDetected
+X-KSMG-AntiSpam-Auth: dmarc=none header.from=mt-integration.ru;spf=none smtp.mailfrom=mt-integration.ru;dkim=none
+X-KSMG-AntiSpam-Envelope-From: i.abramov@mt-integration.ru
+X-KSMG-AntiSpam-Info: LuaCore: 51 0.3.51 68896fb0083a027476849bf400a331a2d5d94398, {rep_avail}, {Tracking_from_domain_doesnt_match_to}, ksmg01.maxima.ru:7.1.1;81.200.124.61:7.1.2;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;mt-integration.ru:7.1.1, FromAlignment: s, ApMailHostAddress: 81.200.124.61
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiSpam-Lua-Profiles: 191497 [Mar 05 2025]
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Version: 6.1.1.11
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/03/05 06:08:00 #27609135
+X-KSMG-AntiVirus-Status: NotDetected, skipped
+X-KSMG-LinksScanning: NotDetected
+X-KSMG-Message-Action: skipped
+X-KSMG-Rule-ID: 7
 
-On Wed, 5 Mar 2025 at 08:32, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Thu, Jan 16, 2020 at 06:24:26PM +0100, Stefano Garzarella wrote:
-> > This patch adds a check of the "net" assigned to a socket during
-> > the vsock_find_bound_socket() and vsock_find_connected_socket()
-> > to support network namespace, allowing to share the same address
-> > (cid, port) across different network namespaces.
-> >
-> > This patch adds 'netns' module param to enable this new feature
-> > (disabled by default), because it changes vsock's behavior with
-> > network namespaces and could break existing applications.
-> > G2H transports will use the default network namepsace (init_net).
-> > H2G transports can use different network namespace for different
-> > VMs.
->
->
-> I'm not sure I understand the usecase. Can you explain a bit more,
-> please?
+In the function _signal_summary_show(), there is a NULL-check for
+&bp->signal[nr], which cannot actually be NULL.
 
-It's been five years, but I'm trying!
-We are tracking this RFE here [1].
+Therefore, this redundant check can be removed.
 
-I also add Jakub in the thread with who I discussed last year a possible 
-restart of this effort, he could add more use cases.
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-The problem with vsock, host-side, currently is that if you launch a VM 
-with a virtio-vsock device (using vhost) inside a container (e.g., 
-Kata), so inside a network namespace, it is reachable from any other 
-container, whereas they would like some isolation. Also the CID is 
-shared among all, while they would like to reuse the same CID in 
-different namespaces.
+Signed-off-by: Ivan Abramov <i.abramov@mt-integration.ru>
+---
+ drivers/ptp/ptp_ocp.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-This has been partially solved with vhost-user-vsock, but it is 
-inconvenient to use sometimes because of the hybrid-vsock problem 
-(host-side vsock is remapped to AF_UNIX).
-
-Something from the cover letter of the series [2]:
-
-  As we partially discussed in the multi-transport proposal, it could
-  be nice to support network namespace in vsock to reach the following
-  goals:
-  - isolate host applications from guest applications using the same ports
-    with CID_ANY
-  - assign the same CID of VMs running in different network namespaces
-  - partition VMs between VMMs or at finer granularity
-
-Thanks,
-Stefano
-
-[1] https://gitlab.com/vsock/vsock/-/issues/2
-[2] https://lore.kernel.org/virtualization/20200116172428.311437-1-sgarzare@redhat.com/
+diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+index b651087f426f..34c616bd0a02 100644
+--- a/drivers/ptp/ptp_ocp.c
++++ b/drivers/ptp/ptp_ocp.c
+@@ -3959,9 +3959,6 @@ _signal_summary_show(struct seq_file *s, struct ptp_ocp *bp, int nr)
+ 	bool on;
+ 	u32 val;
+ 
+-	if (!signal)
+-		return;
+-
+ 	on = signal->running;
+ 	sprintf(label, "GEN%d", nr + 1);
+ 	seq_printf(s, "%7s: %s, period:%llu duty:%d%% phase:%llu pol:%d",
+-- 
+2.48.1
 
 
