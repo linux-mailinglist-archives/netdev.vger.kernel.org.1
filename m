@@ -1,137 +1,119 @@
-Return-Path: <netdev+bounces-172178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82D4EA508FB
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 19:13:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AE39A50993
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 19:21:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1804D3A557E
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 18:12:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28CD07A8B11
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 18:19:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F1132517A0;
-	Wed,  5 Mar 2025 18:12:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 078B32512C9;
+	Wed,  5 Mar 2025 18:17:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dE7/sBHi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U6zIwFjV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00DD819C542;
-	Wed,  5 Mar 2025 18:12:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1F4E253344;
+	Wed,  5 Mar 2025 18:17:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741198367; cv=none; b=Zl24zFa5qe83ebPj7Yj+v6fjYCCc0mXP9jv/JhCyGFVI0H4Uh0kAk1uv6EAPjCJEg0QALJk3r9f1yFjeGYb2KOLdzTxFggSIF17Y0EyET6REJ88Z0FCtu3ZQTybRi8m8VnZ53S20L9aCF2ep7QacQB76Zg8zi1Zr2YxyZc0WY4U=
+	t=1741198641; cv=none; b=e1mnLNcoJxhDv1xLoJm3lbQuYiCRUKx393Bpe1krPn2MbBFpbXkP2FEkRxz8WHTB5AGpzW8gd/4eJQkgFQrde35bBgHko8VB6zVvZ1Oc4tfPU3doFzxGNNzS7lXFl3alIEASaGZuhGDQWW5LNkQsHQrURMKKpnXt03+xm+xcb30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741198367; c=relaxed/simple;
-	bh=hLSosc8ZGSMqBJmpjG+Zcp45IeQYgadpHS+5+HJNY54=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o4djamZfJ8W+wPldakfznybSSFRjCAPCBcQWiqaKMrmGN+UPSD64MAyJ1ijyPU3LFDueV+S9RyyD8albazvtehY8hU9IeFHelfeFHyEt9k1B1R2OXFZd2J3nOYGU3KJ3dY+2Rr9K5LVJXXJ8wY1IJ/RG5W2QtKRX/e2RNkEYzz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dE7/sBHi; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2febaaf175fso9552679a91.3;
-        Wed, 05 Mar 2025 10:12:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741198365; x=1741803165; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rxfu5Pa3zywwY6F0O+b5hEcYgMdoVIsyRsVhe+haQdo=;
-        b=dE7/sBHiEOhROs28aVyiqQ/Bkc+CYQ5iZpyaYwf0FsErG7OXIzh142qsreacY56GUo
-         zbhY6wz+GJktsAzNpzwbunZljAsSc3AjBL0Epfd2Qkcf0zv5cDx9zVfTKvjgJb74v5PM
-         XfZ4BuFLrWIw2ouS5C2JTQB8ERGUlcqsDAa6e/k98k0Tl6wODsFVFq7gfTq4CudbnTkm
-         uEQ8ZBRNzvFSD3JKvHcTPn0TvOZG6NC1jH4TLwnnx9zrVQ3+nw8fXBc68EDFLuIDrM/d
-         4sn/Om3Y2ASThlekFQ0J1w1fpNcXqrj8LzZ+CYudQMskvg9tN6o2fAn62DxTKml4ULse
-         QUcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741198365; x=1741803165;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rxfu5Pa3zywwY6F0O+b5hEcYgMdoVIsyRsVhe+haQdo=;
-        b=oo6o/JagPaC0Z4eoI9DLFd3Cr4Qsya0ftUkoZHMQUgFxE7HTrKzQMMyAXc0xz4rz3s
-         d4/OfDF0yuW8vTAZAl86HXoYV9y278fT2pP6DiquoBJTqHsC/Qhy+vMn35LBA9EE/h2t
-         YsssyTFnVn1ODkR+x0BXGJOjPVL5eYgbnMCuxSfIMM/GolxXFfxwaV+xjoPPhDOnNHQb
-         THzvkMpyZFxizRrD52qQ2+IBo72ZgeBWrtVJ2MJtFQ7/Jojgg2mKwInW0e+BWg2olcCl
-         jSILkU3E9COebKBxEIRmtnJtds8L4028EO/d36zCfvbh5xDH+Q2/uI/s7VP9kidCPJ82
-         bpTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUVOjGVSUPKt5vR/Zs9/crm3q/Aoh2xidwFizyBSjV+Sd1JzTS/4tpJFSccna66xyn9kNK1dxV+@vger.kernel.org, AJvYcCWE1NEXM5xC3z4hdROVuzP8SBnVHyEx7x29GZmQ/na4s2io9V+OHChGceXZphpyk0H6PUI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCGO3CuGcEz++BQaCNdqSf2rrIZ4JweVem10GlvJ8wZ1hDqcBw
-	0OunBA/Ltccd5/C2U7YK6p/Zio9gbsjUjsAiP4iWSgGxGPJ7nTk1
-X-Gm-Gg: ASbGncvu1jRSWo5/gx+KGE0q4msfZen+HDVeSVeD377K/6LzKrvxW6YYV7EQfJq6RdO
-	2hlrBGZblVknYYeXtBsNbTYHZ9VDK6IaXRN4eOzgDuqBm8PalMqgk0qE2Eb+Qzemb6bxYmxToWM
-	8Rn6bEMplJh6d689QT4VZ4ADiXfkozimcpFLnUQQndXbKebDVRHB55krpo9TMu/142ZleXt8W2P
-	ip8LvP4dBaqfnS/iRWwbUzD6HbxiRqPGOmX/EyqI3j1mwJJ8NT2J7lSrDidUhp51c04ew/490C7
-	OQoSkZrMx+wOupFrIhgsHhxpxM8bRyUWKU2BRWdZnniduOBl
-X-Google-Smtp-Source: AGHT+IFQZfgQX0YU6/unP7FdjSfq4UkGfCIq09eCJhs2cmYHBhhx/wUthBK9Wcx33K3kaI5ub8EJ2w==
-X-Received: by 2002:a05:6a20:734e:b0:1f3:2a1e:f6d3 with SMTP id adf61e73a8af0-1f3495c2795mr7695535637.41.1741198365159;
-        Wed, 05 Mar 2025 10:12:45 -0800 (PST)
-Received: from localhost ([129.210.115.104])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-aee7ddf29f4sm12166147a12.11.2025.03.05.10.12.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Mar 2025 10:12:44 -0800 (PST)
-Date: Wed, 5 Mar 2025 10:12:43 -0800
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Dong Chenchen <dongchenchen2@huawei.com>
-Cc: edumazet@google.com, kuniyu@amazon.com, pabeni@redhat.com,
-	willemb@google.com, john.fastabend@gmail.com, jakub@cloudflare.com,
-	davem@davemloft.net, kuba@kernel.org, horms@kernel.org,
-	daniel@iogearbox.net, netdev@vger.kernel.org, bpf@vger.kernel.org,
-	zhangchangzhong@huawei.com, weiyongjun1@huawei.com
-Subject: Re: [PATCH net] bpf, sockmap: Restore sk_prot ops when psock is
- removed from sockmap
-Message-ID: <Z8iUG8aTF9Kww09z@pop-os.localdomain>
-References: <20250305140234.2082644-1-dongchenchen2@huawei.com>
+	s=arc-20240116; t=1741198641; c=relaxed/simple;
+	bh=GPQLv6kstfDvBboWvitF+UykNqX7q2xOlqE2DA/uovQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dCL4DP6ZQ+3ZPcgGvZQF540HT/u/dupkgHro4MkNp864bI1p0zJqVQxVmxgCMFZq7lDcaMdrB+0x+4vCRlYRubNChnSgna9ulHz7uukHoZT0eNnR2vuG2OjYz5iCR/CritsHZ3bSgaG7FMxHFdFiF80YytuLEbn15SLYZLbR8EA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U6zIwFjV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA041C4CED1;
+	Wed,  5 Mar 2025 18:17:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741198641;
+	bh=GPQLv6kstfDvBboWvitF+UykNqX7q2xOlqE2DA/uovQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=U6zIwFjV5wqtixzdkKTpofFlbyP4Wj/W5GyYH3vn6Uh5c9DxDzrOl/AUy5WGi9KpZ
+	 GXB51LqG/zPrfGGexpxHjQNgOej69OcOLaeKONElxEBadn+wnFkTsSXUh05t9+ni5p
+	 K+kPIUONnYLKUl9cpwyVLfznGBUYgmPhG3P8k30nSAHYSj5b2tORNaCOumZkDbAeHf
+	 xovtvCTARGEAK2MeOJTtj/lDATryLC2tpWQo5QDkuShAKybwootirwCnRYy1y2vHXB
+	 hlS2Cz2HnBVVC+zMprgNaNYw+UgkESQR5ojk3DQTwG0cfikMY96Dsx14+7dFn/OwgP
+	 C98mI27Gt5iww==
+Message-ID: <bcafcf60-47a8-4faf-bea3-19cf0cbc4e08@kernel.org>
+Date: Wed, 5 Mar 2025 11:17:19 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250305140234.2082644-1-dongchenchen2@huawei.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 0/8] Introduce fwctl subystem
+Content-Language: en-US
+To: Jiri Pirko <jiri@resnulli.us>, Jason Gunthorpe <jgg@nvidia.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+ Aron Silverton <aron.silverton@oracle.com>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Daniel Vetter <daniel.vetter@ffwll.ch>, Dave Jiang <dave.jiang@intel.com>,
+ Christoph Hellwig <hch@infradead.org>, Itay Avraham <itayavr@nvidia.com>,
+ Jiri Pirko <jiri@nvidia.com>, Jonathan Cameron
+ <Jonathan.Cameron@huawei.com>, Leonid Bloch <lbloch@nvidia.com>,
+ Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org,
+ linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+ Saeed Mahameed <saeedm@nvidia.com>, "Nelson, Shannon"
+ <shannon.nelson@amd.com>
+References: <0-v5-642aa0c94070+4447f-fwctl_jgg@nvidia.com>
+ <20250303175358.4e9e0f78@kernel.org> <20250304140036.GK133783@nvidia.com>
+ <20250304164203.38418211@kernel.org> <20250305133254.GV133783@nvidia.com>
+ <mxw4ngjokr3vumdy5fp2wzxpocjkitputelmpaqo7ungxnhnxp@j4yn5tdz3ief>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <mxw4ngjokr3vumdy5fp2wzxpocjkitputelmpaqo7ungxnhnxp@j4yn5tdz3ief>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 05, 2025 at 10:02:34PM +0800, Dong Chenchen wrote:
-> WARNING: CPU: 0 PID: 6558 at net/core/sock_map.c:1703 sock_map_close+0x3c4/0x480
-> Modules linked in:
-> CPU: 0 UID: 0 PID: 6558 Comm: syz-executor.14 Not tainted 6.14.0-rc5+ #238
-> RIP: 0010:sock_map_close+0x3c4/0x480
-> Call Trace:
->  <TASK>
->  inet_release+0x144/0x280
->  __sock_release+0xb8/0x270
->  sock_close+0x1e/0x30
->  __fput+0x3c6/0xb30
->  __fput_sync+0x7b/0x90
->  __x64_sys_close+0x90/0x120
->  do_syscall_64+0x5d/0x170
->  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+On 3/5/25 8:08 AM, Jiri Pirko wrote:
+> Wed, Mar 05, 2025 at 02:32:54PM +0100, jgg@nvidia.com wrote:
+>> On Tue, Mar 04, 2025 at 04:42:03PM -0800, Jakub Kicinski wrote:
+>>> I thought you were arguing that me opposing the addition was
+>>> "maintainer overreach". As in me telling other parts of the kernel
+>>> what is and isn't allowed. Do I not get a say what gets merged under
+>>> drivers/net/ now?
+>>
+>> The PCI core drivers are a shared resource jointly maintained by all
+>> the subsytems that use them. They are maintained by their respective
+>> maintainers. Saeed/etc in this case.
+>>
+>> It would be inappropriate for your preferences to supersede Saeed's
+>> when he is a maintainer of the mlx5_core driver and fwctl. Please try
+>> and get Saeed on board with your plan.
+>>
+>> If the placement under drivers/net makes this confusing then we can
+>> certainly change the directory names.
 > 
-> The root cause is:
-> sock_hash_update_common
->   sock_map_unref
->     sock_map_del_link
->       psock->psock_update_sk_prot(sk, psock, false);
-> 	//false won't restore proto
->     sk_psock_put
->        rcu_assign_sk_user_data(sk, NULL);
-> inet_release
->   sk->sk_prot->close
->     sock_map_close
->       WARN(sk->sk_prot->close == sock_map_close)
-> 
-> When psock is removed from sockmap, sock_map_del_link() still set
-> sk->sk_prot to bpf proto instead of restore it (for incorrect restore
-> value). sock release will triger warning of sock_map_close() for
-> recurse after psock drop.
+> According to how mlx5 driver is structured, and the rest of the advanced
+> drivers in the same area are becoming as well, it would make sense to me
+> to have mlx5 core in separate core directory, maintained directly by driver
+> maintainer:
+> drivers/core/mlx5/
+> then each of the protocol auxiliary device lands in appropriate
+> subsystem directory.
 
-But sk_psock_drop() restores it with sk_psock_restore_proto() after the
-psock reference count goes to zero. So how could the above happen?
++1
 
-By the way, it would be perfect if you could add a test case for it 
-together with this patch (a followup patch is fine too).
+This is how I have structured our drivers -- core driver for owning the
+PCI device and hosting the APIs to communicate with hardware, an aux bus
+and then smaller subsystem focused drivers for the aux devices that make
+the device usable from different contexts.
 
-Thanks!
+I think we are ready to start upstreaming, but I am waiting to see how
+this falls out - to see if our core driver can land in a non-subsystem
+specific location (e.g., drivers/core) or if it needs to go with fwctl
+as a generic location.
+
+
+
 
