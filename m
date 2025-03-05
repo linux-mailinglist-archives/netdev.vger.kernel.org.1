@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-171915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A41CA4F590
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 04:46:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40FD6A4F591
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 04:46:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8176016FFB9
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 03:46:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDC10189102D
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 03:46:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 283EF190063;
-	Wed,  5 Mar 2025 03:45:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBC9E19258E;
+	Wed,  5 Mar 2025 03:45:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2CiTJhM2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mqI9yCxZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5773718EFD4
-	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 03:45:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D80D718FC9F
+	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 03:45:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741146355; cv=none; b=puxzO5FAKURbFKxO0uuJCwprWyQWKVrDsFYojopmjkg9rEAt2APDMkr48+pHO5V14q4ZmcDPvSnGSEspK1Wicd0DaglWs27WPFqMSE7QTTPQP/t5kR5F1jbr6jOgDajGMHDtYDRDOXyWorh3hlmzreIqEGwU16XH0GkqnxYBjWc=
+	t=1741146357; cv=none; b=W5gR9i7frCAKZra2somNxNRu5Hy9VnM1erxyJYsrf2J2cDsvaFEqTNFPb3FE0PkI4yynM1onPqofvMWaa2uJS5m5WY/oO6ELgwlMU0SN6PB2amQLJwnYk+VXrarfHci3qJOKxbU6F3JCJBsekk5SB3+qJVMfjJ8B2hDSwCc25lU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741146355; c=relaxed/simple;
-	bh=G/fvg+jx3iR7EcHQaE+sOeqvUjV4kr3Cq7sLo8jEKDI=;
+	s=arc-20240116; t=1741146357; c=relaxed/simple;
+	bh=l2ALbw/Or/KY0igBNPyMfBtcrtyq4dnMWZKF8SomG3g=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=EAdQ8Rne1Aw7xYPN++poSDSYHrACNzIfugsyaS6AGU4DDX7wb9+Bl9/sUic+1iBI6POjzzLbtQOmithqOr8GMFJfL+lghugFrxUsMkzYTft0HdDUw1sDlCeVATsW+zMRaloUWqaxsdnMaAQY2OlzoPsYvUJTTwFNRYUqbmVAYDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2CiTJhM2; arc=none smtp.client-ip=209.85.222.201
+	 To:Cc:Content-Type; b=T3XmFbkGZn8o7KYULNuRD6NkGqUDhV9lI4ywUjKCAnoQKU36i9K3dwOQCsX+L18dc8iyj9goIhXrDiOElqG5sPTnxEhgphJKK+AT22H+W5yOLApcHU6p8V1xLyKHDRJgy0L4ht1CGb8Y+V7stvQMT/Zq5D/VHN5aQz9f7+GGy2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mqI9yCxZ; arc=none smtp.client-ip=209.85.160.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7c09f73873fso1112594385a.1
-        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 19:45:53 -0800 (PST)
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-474ed10ad03so76725581cf.0
+        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 19:45:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741146353; x=1741751153; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1741146355; x=1741751155; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QlBu93t4Ta6KhR4Wp2+D8xZ6ttgHwoEr3gVrWDzyRc0=;
-        b=2CiTJhM2yD6Oi3yN8fQSNLBJjPwNE2TtXvC6i6M6tapDGQoSmTfvW2FJXV4YAMlJCj
-         pRunoekMevtQPaDgiudlOOdAncNDZ+tsRMnW+OcTlEMCuDi/KKLY65/5YgQCW5DBxa1l
-         I00QXSaJwAeoibl0y1yUACanVyy+n1aFyvfWxw89XqqV8fJtvklxhlBgNMvB9OcjnM9T
-         +wIOmQqnGlWf50HibdM+7nrrBra271QW2fOuXCMs9vuULKz2C4d+bPIX3e2x3aBgnPA2
-         Vu1LIEVRUUMbryFUFarv5SPMSjbgVekFXxk/DHz/mXlJHo5ZSQEjp1Spd6MW+ldL3bOx
-         k1Kw==
+        bh=aAwfzrqo0H5kRu+loR/5btYKLkYrZEQx1BjtZvK+xj4=;
+        b=mqI9yCxZz9Tjh6Svg0echBXSvD15YCOwXtKS3uIB6S56HF4VlwTwA2njJqJpC/uT+g
+         5JFyH/9Vf5XG9fmRdD9/8IYAcnTNIN9+rDQAzrCXakXhRkY4OyQvTiyv4Drkf8eljGQE
+         NV1xeQAEHvaoaPlFwK8Ih1Q+KH/DQu6TVCJdeYw0xhzJNcn8AfQLAYq9IRodz+p5mPiC
+         iWt7CmFNmDJ0DqPvfXEgu6oPoTdZqLeMvYVw5qezNBMzBBEe6VHNA5sFAC6Y6vsqsyn6
+         TX77iTPK5mFrJyBM5wKQxIn5DFT+80EhUcaiqY+BYbtmwCeK9oWQOi5pIqp7JwQ40rb+
+         qjlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741146353; x=1741751153;
+        d=1e100.net; s=20230601; t=1741146355; x=1741751155;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QlBu93t4Ta6KhR4Wp2+D8xZ6ttgHwoEr3gVrWDzyRc0=;
-        b=JJHmneaVKl5G+i86wQPa74yrXQyZ/gKzUSz5a6py6jZtAWvXKs7sEH3jSmGxAK+Re1
-         wiFu+3jkg7ZyrpazyuSHfEZ43GMlt4esUytnaX3VLhC8mmWJv9f7Y3db9YQRCcaCq96o
-         CeekJGnj0S2gcNj7XsPv+wJdIaTBcejpqbHkDKl5bblBG/Hj09BSZvZ6JyWC4nWhEQ+M
-         ZESz9painpnpTlJa0XaeGf/yipOrcIQFZAmKhKlMd6wfgKYP6hAcuwZ5GA3EJ3DyyrRZ
-         Urmy5XyJuFj3CMoR4cd7i1WVMgyzN/noOGyL7WP3kptPnTVTb5xcPb9haP4ztQZIqNVA
-         OXHA==
-X-Forwarded-Encrypted: i=1; AJvYcCXda4vFmo3PxXFnATnDKOPqNwXetWv4IlZmYJthwUCxYfoq9aYSk2+6Ewdhs2HUCJ+YqYABSoo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwY0f+YaPI8oU2fsbYugywusJRTyzHSDQ+pTzx7z1zQWzc63fZb
-	4Ck8F+NYbjxDY0B6B6tUF+xy4uEhMRcJaSeNDaM3x7desFmc1aHolXs9I6KV4XSYueu5eLDXQQk
-	r8+OHIS6rFg==
-X-Google-Smtp-Source: AGHT+IEIdCRJFhk92tY0z1kvUT8q0ou97CEZVYO/DSjaZTpRsSQo0IRAO68fyhe9C2h4aBGVTXFxkGktpXI2fA==
-X-Received: from qknov3.prod.google.com ([2002:a05:620a:6283:b0:7c3:d5c7:6372])
+        bh=aAwfzrqo0H5kRu+loR/5btYKLkYrZEQx1BjtZvK+xj4=;
+        b=iv76OLQwOsIvDdAmTLg3Fe4hRm7fHZHyT5tKC+02Fuo09XHy3awx1kHRFDU+d2YacZ
+         ZaUtHqw+7M5lbUott6TcSekxYgRp52iHuK+ACHB3dzfjv+CxqsxkvtCo9YvrXzoZDCpF
+         wjivWE556Bg6MlURxs3yyGHHcLRTCmxMNn4+aaajz/UkxAuNSbELU9uituEUya0qNDOb
+         5l4Xzpjz9ZywiFpEiNC9i+NgHnH3FM/cm9UtO5K+NWYIdeL1Cot6YXaudacAm7SG4ISZ
+         HmLkJuEQlU0gOw05CgfTXsIRt85iXJ7wgskg9/PRmTeFjNdRdAvm/WyvowKtOgx2sme5
+         YxfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUVCocOEkGYZKLB7fwkTaG4t22FyYBvsia5Vx9cxF4ehm/Wyk0KP3t8gJXsZmx7kpq2aEtfLmQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFylaU+fpR/r7zq136i9lHKo2kmNtoB3et1N/91d2o9qTaH1QG
+	nUg1KA7yV15K6/L+Ut/6nfAxBO5cFP/s7kenON6vhk6zVqE/LNB2YZajarRo+sLirmTTCCOQrhE
+	MAcPH6Sd5Dg==
+X-Google-Smtp-Source: AGHT+IGG02qEea9RzA69wAtyN6NMx737uKpO+cCZNuZOSE+CUCGY8Gf+H/NYd9Y2KlLE3zu17fJ/Ndg+65RNZw==
+X-Received: from qtbfh3.prod.google.com ([2002:a05:622a:5883:b0:467:518e:d31b])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:1a03:b0:7c3:dc4c:7789 with SMTP id af79cd13be357-7c3dc4c7a6fmr21901885a.42.1741146353174;
- Tue, 04 Mar 2025 19:45:53 -0800 (PST)
-Date: Wed,  5 Mar 2025 03:45:49 +0000
+ 2002:a05:622a:11c8:b0:475:999:21b4 with SMTP id d75a77b69052e-4750b4c94c1mr23026981cf.37.1741146354647;
+ Tue, 04 Mar 2025 19:45:54 -0800 (PST)
+Date: Wed,  5 Mar 2025 03:45:50 +0000
 In-Reply-To: <20250305034550.879255-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,9 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250305034550.879255-1-edumazet@google.com>
 X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <20250305034550.879255-2-edumazet@google.com>
-Subject: [PATCH net-next 1/2] inet: change lport contribution to
- inet_ehashfn() and inet6_ehashfn()
+Message-ID: <20250305034550.879255-3-edumazet@google.com>
+Subject: [PATCH net-next 2/2] inet: call inet6_ehashfn() once from inet6_hash_connect()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -85,25 +84,17 @@ Cc: Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-In order to speedup __inet_hash_connect(), we want to ensure hash values
-for <source address, port X, destination address, destination port>
-are not randomly spread, but monotonically increasing.
+inet6_ehashfn() being called from __inet6_check_established()
+has a big impact on performance, as shown in the Tested section.
 
-Goal is to allow __inet_hash_connect() to derive the hash value
-of a candidate 4-tuple with a single addition in the following
-patch in the series.
+After prior patch, we can compute the hash for port 0
+from inet6_hash_connect(), and derive each hash in
+__inet_hash_connect() from this initial hash:
 
-Given :
-  hash_0 = inet_ehashfn(saddr, 0, daddr, dport)
-  hash_sport = inet_ehashfn(saddr, sport, daddr, dport)
+hash(saddr, lport, daddr, dport) == hash(saddr, 0, daddr, dport) + lport
 
-Then (hash_sport == hash_0 + sport) for all sport values.
-
-As far as I know, there is no security implication with this change.
-
-After this patch, when __inet_hash_connect() has to try XXXX candidates,
-the hash table buckets are contiguous and packed, allowing
-a better use of cpu caches and hardware prefetchers.
+Apply the same principle for __inet_check_established(),
+although inet_ehashfn() has a smaller cost.
 
 Tested:
 
@@ -111,29 +102,6 @@ Server: ulimit -n 40000; neper/tcp_crr -T 200 -F 30000 -6 --nolog
 Client: ulimit -n 40000; neper/tcp_crr -T 200 -F 30000 -6 --nolog -c -H server
 
 Before this patch:
-
-  utime_start=0.271607
-  utime_end=3.847111
-  stime_start=18.407684
-  stime_end=1997.485557
-  num_transactions=1350742
-  latency_min=0.014131929
-  latency_max=17.895073144
-  latency_mean=0.505675853
-  latency_stddev=2.125164772
-  num_samples=307884
-  throughput=139866.80
-
-perf top on client:
-
- 56.86%  [kernel]       [k] __inet6_check_established
- 17.96%  [kernel]       [k] __inet_hash_connect
- 13.88%  [kernel]       [k] inet6_ehashfn
-  2.52%  [kernel]       [k] rcu_all_qs
-  2.01%  [kernel]       [k] __cond_resched
-  0.41%  [kernel]       [k] _raw_spin_lock
-
-After this patch:
 
   utime_start=0.286131
   utime_end=4.378886
@@ -158,44 +126,200 @@ perf top:
   0.34%  [kernel]       [k] sched_balance_trigger
   0.24%  [kernel]       [k] queued_spin_lock_slowpath
 
-There is indeed an increase of throughput and reduction of latency.
+After this patch:
+
+  utime_start=0.315047
+  utime_end=9.257617
+  stime_start=7.041489
+  stime_end=1923.688387
+  num_transactions=3057968
+  latency_min=0.003041375
+  latency_max=7.056589232
+  latency_mean=0.141075048    # Better latency metrics
+  latency_stddev=0.526900516
+  num_samples=312996
+  throughput=320677.21        # 111 % increase, and 229 % for the series
+
+perf top: inet6_ehashfn is no longer seen.
+
+ 39.67%  [kernel]       [k] __inet_hash_connect
+ 37.06%  [kernel]       [k] __inet6_check_established
+  4.79%  [kernel]       [k] rcu_all_qs
+  3.82%  [kernel]       [k] __cond_resched
+  1.76%  [kernel]       [k] sched_balance_domains
+  0.82%  [kernel]       [k] _raw_spin_lock
+  0.81%  [kernel]       [k] sched_balance_rq
+  0.81%  [kernel]       [k] sched_balance_trigger
+  0.76%  [kernel]       [k] queued_spin_lock_slowpath
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/ipv4/inet_hashtables.c  | 4 ++--
- net/ipv6/inet6_hashtables.c | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ include/net/inet_hashtables.h |  4 +++-
+ include/net/ip.h              |  2 +-
+ net/ipv4/inet_hashtables.c    | 26 ++++++++++++++++++--------
+ net/ipv6/inet6_hashtables.c   | 15 +++++++++++----
+ 4 files changed, 33 insertions(+), 14 deletions(-)
 
+diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables.h
+index f447d61d95982090aac492b31e4199534970c4fb..949641e925398f741f2d4dda5898efc683b305dc 100644
+--- a/include/net/inet_hashtables.h
++++ b/include/net/inet_hashtables.h
+@@ -527,10 +527,12 @@ static inline void sk_rcv_saddr_set(struct sock *sk, __be32 addr)
+ 
+ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
+ 			struct sock *sk, u64 port_offset,
++			u32 hash_port0,
+ 			int (*check_established)(struct inet_timewait_death_row *,
+ 						 struct sock *, __u16,
+ 						 struct inet_timewait_sock **,
+-						 bool rcu_lookup));
++						 bool rcu_lookup,
++						 u32 hash));
+ 
+ int inet_hash_connect(struct inet_timewait_death_row *death_row,
+ 		      struct sock *sk);
+diff --git a/include/net/ip.h b/include/net/ip.h
+index ce5e59957dd553697536ddf111bb1406d9d99408..8a48ade24620b4c8e2ebb4726f27a69aac7138b0 100644
+--- a/include/net/ip.h
++++ b/include/net/ip.h
+@@ -357,7 +357,7 @@ static inline void inet_get_local_port_range(const struct net *net, int *low, in
+ bool inet_sk_get_local_port_range(const struct sock *sk, int *low, int *high);
+ 
+ #ifdef CONFIG_SYSCTL
+-static inline bool inet_is_local_reserved_port(struct net *net, unsigned short port)
++static inline bool inet_is_local_reserved_port(const struct net *net, unsigned short port)
+ {
+ 	if (!net->ipv4.sysctl_local_reserved_ports)
+ 		return false;
 diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index d1b5f45ee718410fdf3e78c113c7ebd4a1ddba40..3025d2b708852acd9744709a897fca17564523d5 100644
+index 3025d2b708852acd9744709a897fca17564523d5..1e3a9573c19834cc96d0b4cbf816f86433134450 100644
 --- a/net/ipv4/inet_hashtables.c
 +++ b/net/ipv4/inet_hashtables.c
-@@ -35,8 +35,8 @@ u32 inet_ehashfn(const struct net *net, const __be32 laddr,
+@@ -538,7 +538,8 @@ EXPORT_SYMBOL_GPL(__inet_lookup_established);
+ static int __inet_check_established(struct inet_timewait_death_row *death_row,
+ 				    struct sock *sk, __u16 lport,
+ 				    struct inet_timewait_sock **twp,
+-				    bool rcu_lookup)
++				    bool rcu_lookup,
++				    u32 hash)
  {
- 	net_get_random_once(&inet_ehash_secret, sizeof(inet_ehash_secret));
+ 	struct inet_hashinfo *hinfo = death_row->hashinfo;
+ 	struct inet_sock *inet = inet_sk(sk);
+@@ -549,8 +550,6 @@ static int __inet_check_established(struct inet_timewait_death_row *death_row,
+ 	int sdif = l3mdev_master_ifindex_by_index(net, dif);
+ 	INET_ADDR_COOKIE(acookie, saddr, daddr);
+ 	const __portpair ports = INET_COMBINED_PORTS(inet->inet_dport, lport);
+-	unsigned int hash = inet_ehashfn(net, daddr, lport,
+-					 saddr, inet->inet_dport);
+ 	struct inet_ehash_bucket *head = inet_ehash_bucket(hinfo, hash);
+ 	struct inet_timewait_sock *tw = NULL;
+ 	const struct hlist_nulls_node *node;
+@@ -1007,9 +1006,10 @@ static u32 *table_perturb;
  
--	return __inet_ehashfn(laddr, lport, faddr, fport,
--			      inet_ehash_secret + net_hash_mix(net));
-+	return lport + __inet_ehashfn(laddr, 0, faddr, fport,
-+				      inet_ehash_secret + net_hash_mix(net));
+ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
+ 		struct sock *sk, u64 port_offset,
++		u32 hash_port0,
+ 		int (*check_established)(struct inet_timewait_death_row *,
+ 			struct sock *, __u16, struct inet_timewait_sock **,
+-			bool rcu_lookup))
++			bool rcu_lookup, u32 hash))
+ {
+ 	struct inet_hashinfo *hinfo = death_row->hashinfo;
+ 	struct inet_bind_hashbucket *head, *head2;
+@@ -1027,7 +1027,8 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
+ 
+ 	if (port) {
+ 		local_bh_disable();
+-		ret = check_established(death_row, sk, port, NULL, false);
++		ret = check_established(death_row, sk, port, NULL, false,
++					hash_port0 + port);
+ 		local_bh_enable();
+ 		return ret;
+ 	}
+@@ -1071,7 +1072,8 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
+ 				rcu_read_unlock();
+ 				goto next_port;
+ 			}
+-			if (!check_established(death_row, sk, port, &tw, true))
++			if (!check_established(death_row, sk, port, &tw, true,
++					       hash_port0 + port))
+ 				break;
+ 			rcu_read_unlock();
+ 			goto next_port;
+@@ -1090,7 +1092,8 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
+ 					goto next_port_unlock;
+ 				WARN_ON(hlist_empty(&tb->bhash2));
+ 				if (!check_established(death_row, sk,
+-						       port, &tw, false))
++						       port, &tw, false,
++						       hash_port0 + port))
+ 					goto ok;
+ 				goto next_port_unlock;
+ 			}
+@@ -1197,11 +1200,18 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
+ int inet_hash_connect(struct inet_timewait_death_row *death_row,
+ 		      struct sock *sk)
+ {
++	const struct inet_sock *inet = inet_sk(sk);
++	const struct net *net = sock_net(sk);
+ 	u64 port_offset = 0;
++	u32 hash_port0;
+ 
+ 	if (!inet_sk(sk)->inet_num)
+ 		port_offset = inet_sk_port_offset(sk);
+-	return __inet_hash_connect(death_row, sk, port_offset,
++
++	hash_port0 = inet_ehashfn(net, inet->inet_rcv_saddr, 0,
++				  inet->inet_daddr, inet->inet_dport);
++
++	return __inet_hash_connect(death_row, sk, port_offset, hash_port0,
+ 				   __inet_check_established);
  }
- EXPORT_SYMBOL_GPL(inet_ehashfn);
- 
+ EXPORT_SYMBOL_GPL(inet_hash_connect);
 diff --git a/net/ipv6/inet6_hashtables.c b/net/ipv6/inet6_hashtables.c
-index 9be315496459fcb391123a07ac887e2f59d27360..3d95f1e75a118ff8027d4ec0f33910d23b6af832 100644
+index 3d95f1e75a118ff8027d4ec0f33910d23b6af832..76ee521189eb77c48845eeeac9d50b3a93a250a6 100644
 --- a/net/ipv6/inet6_hashtables.c
 +++ b/net/ipv6/inet6_hashtables.c
-@@ -35,8 +35,8 @@ u32 inet6_ehashfn(const struct net *net,
- 	lhash = (__force u32)laddr->s6_addr32[3];
- 	fhash = __ipv6_addr_jhash(faddr, tcp_ipv6_hash_secret);
+@@ -264,7 +264,8 @@ EXPORT_SYMBOL_GPL(inet6_lookup);
+ static int __inet6_check_established(struct inet_timewait_death_row *death_row,
+ 				     struct sock *sk, const __u16 lport,
+ 				     struct inet_timewait_sock **twp,
+-				     bool rcu_lookup)
++				     bool rcu_lookup,
++				     u32 hash)
+ {
+ 	struct inet_hashinfo *hinfo = death_row->hashinfo;
+ 	struct inet_sock *inet = inet_sk(sk);
+@@ -274,8 +275,6 @@ static int __inet6_check_established(struct inet_timewait_death_row *death_row,
+ 	struct net *net = sock_net(sk);
+ 	const int sdif = l3mdev_master_ifindex_by_index(net, dif);
+ 	const __portpair ports = INET_COMBINED_PORTS(inet->inet_dport, lport);
+-	const unsigned int hash = inet6_ehashfn(net, daddr, lport, saddr,
+-						inet->inet_dport);
+ 	struct inet_ehash_bucket *head = inet_ehash_bucket(hinfo, hash);
+ 	struct inet_timewait_sock *tw = NULL;
+ 	const struct hlist_nulls_node *node;
+@@ -354,11 +353,19 @@ static u64 inet6_sk_port_offset(const struct sock *sk)
+ int inet6_hash_connect(struct inet_timewait_death_row *death_row,
+ 		       struct sock *sk)
+ {
++	const struct in6_addr *daddr = &sk->sk_v6_rcv_saddr;
++	const struct in6_addr *saddr = &sk->sk_v6_daddr;
++	const struct inet_sock *inet = inet_sk(sk);
++	const struct net *net = sock_net(sk);
+ 	u64 port_offset = 0;
++	u32 hash_port0;
  
--	return __inet6_ehashfn(lhash, lport, fhash, fport,
--			       inet6_ehash_secret + net_hash_mix(net));
-+	return lport + __inet6_ehashfn(lhash, 0, fhash, fport,
-+				       inet6_ehash_secret + net_hash_mix(net));
+ 	if (!inet_sk(sk)->inet_num)
+ 		port_offset = inet6_sk_port_offset(sk);
+-	return __inet_hash_connect(death_row, sk, port_offset,
++
++	hash_port0 = inet6_ehashfn(net, daddr, 0, saddr, inet->inet_dport);
++
++	return __inet_hash_connect(death_row, sk, port_offset, hash_port0,
+ 				   __inet6_check_established);
  }
- EXPORT_SYMBOL_GPL(inet6_ehashfn);
- 
+ EXPORT_SYMBOL_GPL(inet6_hash_connect);
 -- 
 2.48.1.711.g2feabab25a-goog
 
