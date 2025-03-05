@@ -1,84 +1,53 @@
-Return-Path: <netdev+bounces-172180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3ADFA509CA
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 19:24:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDCECA509F6
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 19:27:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A49E3176112
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 18:23:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA4E31884116
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 18:27:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4725252900;
-	Wed,  5 Mar 2025 18:22:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27DA92505BD;
+	Wed,  5 Mar 2025 18:26:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="By4bmiw+"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="eTAv9JB6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686F2199E89
-	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 18:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0102A1C863D;
+	Wed,  5 Mar 2025 18:26:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741198941; cv=none; b=IJZRT7jd88kJbXNbHo5NVNcYZn/u1UodkwZx3AD5gMEOR1Mv8gWk6lFP5IL4Qd8cgqObOBgu8y1ZVoLZ7WwZlvLei2z1WSNUFdnPQjd3sx47RR6jJ0OPjnX/3ECvEdfr/Xuly9Px3HpnwW/It94emh3jmXzX/qbPgzxGBV8KSYw=
+	t=1741199197; cv=none; b=R5WCI5EFXzW3le+1bXGaa6RQju6lwUY0BCex5GTEwjlUsskOtZtRf0GjSM9bJDJpKeaL/FXGWB04s6tD8aH5yVmu/zoDx75KJnNHB90tSzdPAD717Re9q9Zuu/uT7YlHRi4+d5Y2FJ9L6hyWpfXcTuclL6kO6elVMZS2KVAKNtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741198941; c=relaxed/simple;
-	bh=mpZIyg2ls78pAGAM2oyC/4XdVm/qWQwX7Lg+iFM87wQ=;
+	s=arc-20240116; t=1741199197; c=relaxed/simple;
+	bh=cjZzUA/41ixgEf8cjgnXTpFrNQUJKjT9kMH9ovjM4AE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IkKJB7hJPd0B2cHiAWmnMvoUzlIRAt3VnvO+mKopx7ZrOsSMLWQaMdpOf0S9w4UlxPrujPd6BgEprMeHdtiUgODrz4HdW9tKmEK5peBrWRMl5WPFJY/tFyod3QpB0IaOylbpDt8levVzje4zItqG1DDZA5A2GSgfAnepBTAgcgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=By4bmiw+; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-22401f4d35aso12899435ad.2
-        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 10:22:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741198939; x=1741803739; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EGV6LoTeydm+N3uiBcUotDKF/jSGMFjxSbiHEfl/+/I=;
-        b=By4bmiw+UHIfuk3CKFRqFkdXTCdgIDBOYebFvIqdpdLU1CS9GwPJWLCdA8MKKzhUJs
-         218yya/zMTQRKv4kNZdjoSTIQ1sGF8k49cRa+qQNgneCdmVMvMVp1IddeTA46E24PaD4
-         MdkmLx2Ne/HMZeiDuN2obMQaTvbeDwX4CUZYwK19s2+W5wOWmJUs+ems/foZUQc8svqJ
-         2Q6jJajn8GI9zN/EAauBmNIZ36jcU4+qtW14Jqf+oXnOO6PE+1N/xQfvt6QPq8ZBmK2A
-         tecT/s6/bVgaqgVbYsmLHLdL6AjfXI5Ytofg4Ob4vku6K/F1Vk6/Gr3qpnjK4VJvcYyD
-         8j9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741198939; x=1741803739;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EGV6LoTeydm+N3uiBcUotDKF/jSGMFjxSbiHEfl/+/I=;
-        b=LbGHlSsQixLqXaw/WrcAjs+tLcWM2sbUyQAnJUsV5C634Rl54LV+wyFGdQwMJz8dbC
-         y/AuyFt/9g4qI5V/TLtLCadvQwhZUYyVx+fU+0k6qrztK3X6MgqMzoxYIUhPpRJ8HGsE
-         Fmjc+PZAEGgqMtcPH9dEuPQHSsw3PyAzmSwUH3XXAbPJh8VQ6ew7YieLE75AbYlNiaLW
-         HaLIKLH3Kw0paLuBvdDO1hiBPbdRsyQp03qz9l6QvJ8N7mR3q29Ax/hnSgyhrWavgzhs
-         yYNdmBtfKUo5y98ntc+e+oKycAo4V5EcXHC7ghZVQTmP8sgEzJhw3NfwdLD2GIEkHt1k
-         mllw==
-X-Gm-Message-State: AOJu0YwgPx6sCLdcqsaVzOf1eawULuPqrnxGaEixTLNmI9o6YmfVyoY9
-	kZbug6PXnnp4jV8p1dPbX4uZVPiO7kH/hGx4O20e89vSqoob0QrDPAxDdA==
-X-Gm-Gg: ASbGnctT1nDkWPpVeUo7qgzZE1zwit9flZmDGXebkynDXug/R/v6rNPiSJ+dD7ALEr5
-	urjeBvw3QWasocCRwAEVaVEGhRHxBroJebnEAl+udp7EPZfXw5zlMBy153mkn/8XwTlg+umUnZ7
-	s4TufMUs36LSSuKkjlB1KPXJRkfNQ6f7Fe9OsuVYkrZiMmfLspahEjW242znbWC0jepRnpkWllK
-	bg8aHEj8A2n3FJsmJ1wo/Xa5umj+j4imUnkmv50TKyvarvCfaAvx1kaBnWZwwJZfImNo2kqJuNB
-	slAlZnJmTwOcURPt/C1jtHkv/ImZ6wBil2ni3hOAmdzfCSsg
-X-Google-Smtp-Source: AGHT+IGU3H1TcEJgITvFddLNA+vJBKU21YRkIyCVt4d9D4l1HIszEO7eHOtubmKH1SMnH+MsYNZqxw==
-X-Received: by 2002:a17:902:d50f:b0:223:5e76:637a with SMTP id d9443c01a7336-223f1c97445mr51850335ad.23.1741198939498;
-        Wed, 05 Mar 2025 10:22:19 -0800 (PST)
-Received: from localhost ([129.210.115.104])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2240229ef56sm6509035ad.40.2025.03.05.10.22.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Mar 2025 10:22:18 -0800 (PST)
-Date: Wed, 5 Mar 2025 10:22:17 -0800
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Jun Yang <juny24602@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH] sched: address a potential NULL pointer dereference in
- the GRED scheduler.
-Message-ID: <Z8iWWQS3PJi6HcrZ@pop-os.localdomain>
-References: <Z8ddDSvJZSLtHCGi@pop-os.localdomain>
- <20250305154410.3505642-1-juny24602@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ci5TeeClwXkLXRf+pTmzYIMGEecWUnhNnwJMXHJDYvgCP3KII5bjeqnEWks3S3ntcrRcY3CowHYtPjgUe2ai1/dIdcwaUI/HlNrP03slNKzi0DjtmiIfKK8sDwnkYdeYhcOyCndX0i1lKcDls+MwdvJos68oFUCoxXrbkggMMVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=eTAv9JB6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06F9BC4CED1;
+	Wed,  5 Mar 2025 18:26:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1741199196;
+	bh=cjZzUA/41ixgEf8cjgnXTpFrNQUJKjT9kMH9ovjM4AE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eTAv9JB6YrxQ63TqHhOVF1LkVp1ffdvswKCZS+EScUgCV5w67oezPSF4QTZw6Q4pt
+	 zggZ+XzTAAObSVnHQjCdYh+hFexAVYGsW04FenhzAH7srsBR659lau/Fxn98C77J6L
+	 xBx2RM3otqxZlHZVraX4tb+08SCPYp6RZUPEJntQ=
+Date: Wed, 5 Mar 2025 19:22:29 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, kuni1840@gmail.com, llfamsec@gmail.com,
+	netdev@vger.kernel.org, sashal@kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH stable 5.15/6.1/6.6] af_unix: Clear oob_skb in
+ scan_inflight().
+Message-ID: <2025030533-craving-hunk-afa3@gregkh>
+References: <2025030543-banker-impale-9c08@gregkh>
+ <20250305181050.17199-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,22 +56,110 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250305154410.3505642-1-juny24602@gmail.com>
+In-Reply-To: <20250305181050.17199-1-kuniyu@amazon.com>
 
-On Wed, Mar 05, 2025 at 11:44:10PM +0800, Jun Yang wrote:
-> If kzalloc in gred_init returns a NULL pointer, the code follows the
-> error handling path, invoking gred_destroy. This, in turn, calls
-> gred_offload, where memset could receive a NULL pointer as input,
-> potentially leading to a kernel crash.
+On Wed, Mar 05, 2025 at 10:10:41AM -0800, Kuniyuki Iwashima wrote:
+> +Paolo
 > 
-> Signed-off-by: Jun Yang <juny24602@gmail.com>
+> From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Date: Wed, 5 Mar 2025 15:08:26 +0100
+> > On Mon, Mar 03, 2025 at 07:01:49PM -0800, Kuniyuki Iwashima wrote:
+> > > Embryo socket is not queued in gc_candidates, so we can't drop
+> > > a reference held by its oob_skb.
+> > > 
+> > > Let's say we create listener and embryo sockets, send the
+> > > listener's fd to the embryo as OOB data, and close() them
+> > > without recv()ing the OOB data.
+> > > 
+> > > There is a self-reference cycle like
+> > > 
+> > >   listener -> embryo.oob_skb -> listener
+> > > 
+> > > , so this must be cleaned up by GC.  Otherwise, the listener's
+> > > refcnt is not released and sockets are leaked:
+> > > 
+> > >   # unshare -n
+> > >   # cat /proc/net/protocols | grep UNIX-STREAM
+> > >   UNIX-STREAM 1024      0      -1   NI       0   yes  kernel ...
+> > > 
+> > >   # python3
+> > >   >>> from array import array
+> > >   >>> from socket import *
+> > >   >>>
+> > >   >>> s = socket(AF_UNIX, SOCK_STREAM)
+> > >   >>> s.bind('\0test\0')
+> > >   >>> s.listen()
+> > >   >>>
+> > >   >>> c = socket(AF_UNIX, SOCK_STREAM)
+> > >   >>> c.connect(s.getsockname())
+> > >   >>> c.sendmsg([b'x'], [(SOL_SOCKET, SCM_RIGHTS, array('i', [s.fileno()]))], MSG_OOB)
+> > >   1
+> > >   >>> quit()
+> > > 
+> > >   # cat /proc/net/protocols | grep UNIX-STREAM
+> > >   UNIX-STREAM 1024      3      -1   NI       0   yes  kernel ...
+> > >                         ^^^
+> > >                         3 sockets still in use after FDs are close()d
+> > > 
+> > > Let's drop the embryo socket's oob_skb ref in scan_inflight().
+> > > 
+> > > This also fixes a racy access to oob_skb that commit 9841991a446c
+> > > ("af_unix: Update unix_sk(sk)->oob_skb under sk_receive_queue
+> > > lock.") fixed for the new Tarjan's algo-based GC.
+> > > 
+> > > Fixes: 314001f0bf92 ("af_unix: Add OOB support")
+> > > Reported-by: Lei Lu <llfamsec@gmail.com>
+> > > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > > ---
+> > > This has no upstream commit because I replaced the entire GC in
+> > > 6.10 and the new GC does not have this bug, and this fix is only
+> > > applicable to the old GC (<= 6.9), thus for 5.15/6.1/6.6.
+> > 
+> > You need to get the networking maintainers to review and agree that this
+> > is ok for us to take, as we really don't want to take "custom" stuff
+> > like thi s at all.
+> 
+> Paolo, could you take a look at this patch ?
+> https://lore.kernel.org/netdev/20250304030149.82265-1-kuniyu@amazon.com/
+> 
+> 
+> > Why not just take the commits that are in newer
+> > kernels instead?
+> 
+> That will be about 20 patches that rewrite the most lines of
+> net/unix/garbage.c and cannot be applied cleanly.
+> 
+> I think backporting these commits is overkill to fix a small
+> bug that can be fixed with a much smaller diff.
+> 
+> 927fa5b3e4f5 af_unix: Fix uninit-value in __unix_walk_scc()
+> 041933a1ec7b af_unix: Fix garbage collection of embryos carrying OOB with SCM_RIGHTS
+> 7172dc93d621 af_unix: Add dead flag to struct scm_fp_list.
+> 1af2dface5d2 af_unix: Don't access successor in unix_del_edges() during GC.
+> fd86344823b5 af_unix: Try not to hold unix_gc_lock during accept().
+> 118f457da9ed af_unix: Remove lock dance in unix_peek_fds().
+> 4090fa373f0e af_unix: Replace garbage collection algorithm.
+> a15702d8b3aa af_unix: Detect dead SCC.
+> bfdb01283ee8 af_unix: Assign a unique index to SCC.
+> ad081928a8b0 af_unix: Avoid Tarjan's algorithm if unnecessary.
+> 77e5593aebba af_unix: Skip GC if no cycle exists.
+> ba31b4a4e101 af_unix: Save O(n) setup of Tarjan's algo.
+> dcf70df2048d af_unix: Fix up unix_edge.successor for embryo socket.
+> 3484f063172d af_unix: Detect Strongly Connected Components.
+> 6ba76fd2848e af_unix: Iterate all vertices by DFS.
+> 22c3c0c52d32 af_unix: Bulk update unix_tot_inflight/unix_inflight when queuing skb.
+> 42f298c06b30 af_unix: Link struct unix_edge when queuing skb.
+> 29b64e354029 af_unix: Allocate struct unix_edge for each inflight AF_UNIX fd.
+> 1fbfdfaa5902 af_unix: Allocate struct unix_vertex for each inflight AF_UNIX fd.
 
-When table->opt is NULL in gred_init(), gred_change_table_def() is not
-called yet, so it is not necessary to call ->ndo_setup_tc() in
-gred_offload().
+Sure, but now all fixes made upstream after these changes will not apply
+to older kernels at all, making supporting this old one-off change
+harder and harder over time.
 
-Fixes: f25c0515c521 ("net: sched: gred: dynamically allocate tc_gred_qopt_offload")
-Reviewed-by: Cong Wang <xiyou.wangcong@gmail.com>
+But I'll defer to the maintainers here as to what they want.  Taking 20+
+patches in a stable tree is trivial for us, not a problem at all.
 
-Thanks!
+thanks,
+
+greg k-h
 
