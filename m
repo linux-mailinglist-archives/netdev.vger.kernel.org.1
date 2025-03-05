@@ -1,128 +1,131 @@
-Return-Path: <netdev+bounces-171944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88326A4F8BC
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 09:25:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 693F2A4F8CB
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 09:29:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B899316FF44
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 08:25:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC9CF3A3218
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 08:29:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C37B21F8677;
-	Wed,  5 Mar 2025 08:25:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77EF11F8736;
+	Wed,  5 Mar 2025 08:29:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HLBoavu4"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="C/AInHnP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDB31EF0BC;
-	Wed,  5 Mar 2025 08:25:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF6D91EF0BC
+	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 08:29:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741163117; cv=none; b=Du0cGG39zs7I4brl/YyyuRKpCroOjuKJVZV6rgtcO7blFQgcScNRnUmv2EOheOx2qSc5nCvKvlCDCrsZ3OjO/gH77UVucx9Eo7dSGci7Ba0uDBUUHVJdOYl3zlI8ixMyuVB+ClDj9muvZRvtE3fg2zdU5P7zBuiMQLizySiH+3o=
+	t=1741163380; cv=none; b=nGUo1u6SYkBPJ2UxgFWV5RnNZkmv1E9eSr53SMsUnbnE2eYnvYfUwG2CHGlqPmsBtaM3Ket8FecjrApZe7L/281hXLvfWNz2RNP5/9VMt1V1om0FmkGYiQfQFCc9sCS1YeTVam2brzQHK1jYbwtGy9bn+NMK6zjOeAQQlqjQaDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741163117; c=relaxed/simple;
-	bh=xjCV87QS9rWKgqppFDXKt0vI9eyLO6QuERActP80ONM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T+E/kRQmZIxUdSkgXn8dSzDYuPgtSRdkF3ttSXSJvDhatEFLkx0gBBkTKqWi0NhkBltby+sJ3sZx7Yy6hSDJFmWd4ND4Moi0MlzzAWxLzS8gBhgkKvxNTttdsCAvGgYNHiOynUK2u9UjsHqvQhyDA02sYUT6pZPlW7/NtnsZdMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HLBoavu4; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-223959039f4so74390495ad.3;
-        Wed, 05 Mar 2025 00:25:15 -0800 (PST)
+	s=arc-20240116; t=1741163380; c=relaxed/simple;
+	bh=BIb8PPjZHUval8yQxPaR2VI3OQirSDX4w545WCXSCig=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aNEh3aIMRTTjN8Md70w0zfDv9cRhPD9lOykS8oOxZ96d0fmVNpqH2+7yU6HlDrTsBYRhV6FsN+N+9/pmJJLq1myh3Oh8j9CaCwVOfQxgNjVCKXrfqPD+RWZSIa9dna9Nko4xPfGuEeOuFHRPfsuvUZGM8bztZTO9eImjHz03d/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=C/AInHnP; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-aaecf50578eso1251186266b.2
+        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 00:29:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741163114; x=1741767914; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OAy0yRAMT7Smqg+BRU5KQgKll8wiYK//bScug3inKX8=;
-        b=HLBoavu4sl8NWzMf+ZVvTaSfzND2IIqwVvNqZYS5+GRhwEsY2UgnWWyHjfrAEG16wY
-         BsfbIpyTda6MBoOOyi8uF8kJSAq04idBaZM+RRlmWfbzBhvYEqh1/IXDDHx/rRl+cwlt
-         3crdcuHTkTHQ7gAv0M5ZDo1//gdQxu7jeOsRAAl8Q2uHXJ2gkhMxxr4IRICq/Zh7Dkgj
-         rbqindMSOfMOviheTYxftKV5Ux+zWVm9Ty8VF1YMEkvIDECYKpda70ozyMXymZs66Zcp
-         Oa4PFjZhG1YhSeeLEX3QraD3JhzZDnMySwfJhEG3reflH3cnEgdznhoESR0UmMyXttBG
-         Fqpg==
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1741163377; x=1741768177; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iS635IvOc12Hbl5A1UFbpTyLqQYfDtGYrejudL0pBtc=;
+        b=C/AInHnPu6QEjteXzTU/Y+8cXSDnlwTkiooAJDKunOxZzuyXInimEwnJpecJbpBo3o
+         S0UwivWB0GwvIyxeMHaN7kHTe8v9oWO8YEWbnI+3h9H+r6sM9huilXAF30fpcyuJxNry
+         vQHWkiNk5GpMBotSLwAx8VmIyzmnw31+gj2/wYmyQ9aohqYul/YubmdUtV1YULJ3ueUf
+         FZSqkMhgWVa4aibkSIeJZkFHujC/3ywr1mpvpJ70ptJ9X3Voog5WLOfvXh2hdfwIEPpk
+         cvKKZhVCj0ZGtNxECF8jjfftN1S7xScxZbWrwuJLw1Zf9y0aK/TKDnTgPwJSsBEVb3Ez
+         mWAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741163114; x=1741767914;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OAy0yRAMT7Smqg+BRU5KQgKll8wiYK//bScug3inKX8=;
-        b=FzRwD9SxQW47HZv2OHA9fTPNeP78psWM+tM/zquUGPIso4W6jzRmW6JNsvDJWoSaHz
-         osXp2D5GPtmDDtIRQzsjVSZI9FxS4kdLiDyeCl/XuJA2i/UMWBDOMkh1vdGNOZH6+aj/
-         +HJQ4fNSj457OZDw0Ot7pyKC/Is+4lpyAjshvl6E1LrFY1KIcwfQK46TlELhcBOVFGud
-         36Byn9Hoi7HiUptfJX2SsIDLczAVYTZXLUPl6AGaqYmeMWWlZVv8xW7/yY1pGDDNEaIH
-         gurG4ScrphYME5VSrRTXXeHJn2blRn14FZ482zNzLXpAhE0rfWmIcYJQqhpoqyjJKShs
-         wz6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUIC7e9g0f9IDPA/vU6QDAHtZlJNaZ5VT/jLcZJtL3uXzb/6h8350TdKQW40mi7A8+CiRegsMQpS5UWaIlEScHe@vger.kernel.org, AJvYcCWmOG07egnlLPe3D290aQruJv3BQsAJHFN5+7eNs5hghUs/tUQRqFw7wAfiAfCYn+FzLrFaIbEO@vger.kernel.org, AJvYcCXvcE6D6v6L0LqNooDvgp255LB8JGbwYFPigra1LN/ILlveM5I2dKZTOL1DHKtrYhL762N8QhRuA8Jl3is=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRJSL2UD9fkBKy+bfHaLxwVt5ySt12wDeVxYmE88whHfpwqrE+
-	l3p76+O7X7KFJa4Cd3EQMAfhO5pxEOqbEYGx7JP2ktkGqPWg/Xn8
-X-Gm-Gg: ASbGnctvnuiOxBxqTIAXwMEEVrfqhKyXbFjw8RqOTFI4e69LwHKuvcdf3SYZqybeEeN
-	8LcaFdmfOYaQ+Y5KyxwdvbQy+cDfAu37rYnzu0gqxDiDE2GMQYhAXUtAt3tNyx/wu7l2sjIe9NC
-	a4KnZAcl4xGysInyZgjjZ1J5LruGBGQMP9X59HlnnxuHY3tiI70ZthiSu8LTMO6Czpmzzo71oOf
-	WK42gyNUKDCpSwEz7+Q1uAn+xa3jjH2bXI9L0Kj7wK8K/PKGxBHrRhPDQ6reVdKedsMn6uWt6vL
-	olpRD1uSnfRDfUeDLxHPbdaVh089ykWdrRFUjDECLbPvoJuIMQ==
-X-Google-Smtp-Source: AGHT+IEut6J9FI4nbFHnxEVhs0CR48OzGreX689CQaBRcgMg7yHEPcx5k0ExcEptJCVyddHSOWAMVA==
-X-Received: by 2002:a17:902:d482:b0:221:7e04:d791 with SMTP id d9443c01a7336-223f1c9b5d4mr29996435ad.31.1741163114516;
-        Wed, 05 Mar 2025 00:25:14 -0800 (PST)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-223501d5247sm107558115ad.26.2025.03.05.00.25.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Mar 2025 00:25:13 -0800 (PST)
-Date: Wed, 5 Mar 2025 08:25:07 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Simon Horman <horms@kernel.org>, Jianbo Liu <jianbol@nvidia.com>,
-	Boris Pismenny <borisp@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>, Shuah Khan <shuah@kernel.org>,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCHv3 net 0/2] bonding: fix incorrect mac address setting
-Message-ID: <Z8gKYzpJw_DoYEMx@fedora>
-References: <20250207092920.543458-1-liuhangbin@gmail.com>
+        d=1e100.net; s=20230601; t=1741163377; x=1741768177;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iS635IvOc12Hbl5A1UFbpTyLqQYfDtGYrejudL0pBtc=;
+        b=VgXOQ+W0dp6CmWg++7u54UHzH6NKdtOM8a4RHUMsqg1LshBxQdmDAsVOaDx6VjEBEi
+         z1fv1CAfQR9uDss3NZyeqBBVvepvom6q6/LNliZTESN+3yyfjuKPs7XoNQ78VXlwIffB
+         HYHi8ZIolKDe+CVuCzEIiVYcV89nBez53lKpzbdJ9Vpnjo0NFYrD8nnQ3iqL0lV3YcW9
+         c2b1uVuy4YNceQzfk70FJor/kzAoXP/rqWiI/84TmQEXcJV/XkSw6fvRnZ/EscnWpFEB
+         3mtE6JqJ9EYX6Yly95BcRq7YBwmnEt/Sa7CmoB54anKp1I1aNw258SoEQO7Vtp4yNcxB
+         7N2Q==
+X-Gm-Message-State: AOJu0Yxms416Fi4nY2U+FeaSY393vYI/XJFYWFY9RtPZLCc8rj3fBFQV
+	9yyc2p8GGB+QgifqTYBmnIG4cLFwVK3iQxkhuz6/f+hf+yDxscSQ0GJQZgrouUk=
+X-Gm-Gg: ASbGncvfrBc9wLRmeQAUeX8oYbpwmCDcWWjGhS6tPfps/xtyOMKhQGrku+m9cJ5tGy8
+	quESzqQF2VULb20Zl2GS/D7RczWrT3JXEgckWW5MfuWKuRV48WIFFI4tgR9vUK5BQSE8l+CdqDQ
+	xY3gBycrsLHIvGBqlZ0R3eqDHSxMMXKuilfQ1P8becM4XM4OHHg9VbBnkgZWfgHk3TrbIJG13dk
+	EJIlA0i9tkTGRIZymYE0LjIHPMVQL9Ef6XVNcANNKdM1CwnR74lCeK+I4bnsD+tufz+V48Xs9oA
+	XYMOkKMFp4VYV8tVWXKItYwwLVrqggv1FLcR8K0/lxeTBwImidYt5FQPWKAaEMofg9/TTzh4p4c
+	r
+X-Google-Smtp-Source: AGHT+IEjj5zOJcj1/OsRfe5VF46uWo7cJGLTZaHw0tlhP7T8cxub/kFHcc4MiHV1iodJ3D5MAmAOeQ==
+X-Received: by 2002:a17:907:9446:b0:ac2:b73:db3d with SMTP id a640c23a62f3a-ac20da4c87fmr226467166b.4.1741163376857;
+        Wed, 05 Mar 2025 00:29:36 -0800 (PST)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abfa393dd6dsm453290666b.96.2025.03.05.00.29.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Mar 2025 00:29:36 -0800 (PST)
+Message-ID: <1975f2a1-9461-400d-8b3f-f40e8b94be80@blackwall.org>
+Date: Wed, 5 Mar 2025 10:29:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250207092920.543458-1-liuhangbin@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 net-next 15/15] netfilter: nft_flow_offload: Add
+ bridgeflow to nft_flow_offload_eval()
+To: Eric Woudstra <ericwouds@gmail.com>,
+ Michal Ostrowski <mostrows@earthlink.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Jiri Pirko <jiri@resnulli.us>,
+ Ivan Vecera <ivecera@redhat.com>, Roopa Prabhu <roopa@nvidia.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Ahmed Zaki <ahmed.zaki@intel.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Vladimir Oltean <olteanv@gmail.com>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Daniel Golle <daniel@makrotopia.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ bridge@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, linux-hardening@vger.kernel.org,
+ Kees Cook <kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>
+References: <20250228201533.23836-1-ericwouds@gmail.com>
+ <20250228201533.23836-16-ericwouds@gmail.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20250228201533.23836-16-ericwouds@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi David,
+On 2/28/25 22:15, Eric Woudstra wrote:
+> Edit nft_flow_offload_eval() to make it possible to handle a flowtable of
+> the nft bridge family.
+> 
+> Use nft_flow_offload_bridge_init() to fill the flow tuples. It uses
+> nft_dev_fill_bridge_path() in each direction.
+> 
+> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+> ---
+>  net/netfilter/nft_flow_offload.c | 142 +++++++++++++++++++++++++++++--
+>  1 file changed, 137 insertions(+), 5 deletions(-)
+> 
 
-This patch set was marked as "Changes Requested" due to my initial reply.
-The series has now been approved by Jay and Nikolay.
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 
-Could you help process it, or should I re-post it?
-
-Thanks
-Hangbin
-
-On Fri, Feb 07, 2025 at 09:29:18AM +0000, Hangbin Liu wrote:
-> The mac address on backup slave should be convert from Solicited-Node
-> Multicast address, not from bonding unicast target address.
-> 
-> v3: also fix the mac setting for slave_set_ns_maddr. (Jay)
->     Add function description for slave_set_ns_maddr/slave_set_ns_maddrs (Jay)
-> v2: fix patch 01's subject
-> 
-> Hangbin Liu (2):
->   bonding: fix incorrect MAC address setting to receive NS messages
->   selftests: bonding: fix incorrect mac address
-> 
->  drivers/net/bonding/bond_options.c            | 55 ++++++++++++++++---
->  .../drivers/net/bonding/bond_options.sh       |  4 +-
->  2 files changed, 49 insertions(+), 10 deletions(-)
-> 
-> -- 
-> 2.46.0
-> 
 
