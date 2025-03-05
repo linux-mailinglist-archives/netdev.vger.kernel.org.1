@@ -1,368 +1,121 @@
-Return-Path: <netdev+bounces-172049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC5D9A5013F
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 15:01:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB3A7A50141
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 15:02:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6DDA16C99C
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 14:01:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC20216C8CE
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 14:02:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA8B2459FC;
-	Wed,  5 Mar 2025 14:01:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LWOFQY0U"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11D7B153808;
+	Wed,  5 Mar 2025 14:02:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F338ADF60
-	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 14:01:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741183294; cv=fail; b=uNvqI9boh0ggfjybEaLJQqPmrU+L6ZIeQjFe+ba6ecX8ab1BaXfAzsO66eWwoHzd5fNxLeIGl+iZGEJJmuu70V7+7KvfLsG0mCPXIT9Vee9ik9rgEXSZ9bIbevNEdIbeTE/1BjHGT/e8twwiDQj9zM0+dGdVAkK7HSCrx0WAAb8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741183294; c=relaxed/simple;
-	bh=1YRH1D4PGL8uLGNnAkmuVGvhf0gRd6EL+kbR4249mjs=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=kE9l15NHG9r7dYaXWjW/tF5H0CekIF1I+ZPNBuLoWQ0GMT8TRmcGFs210uF/8UmrZdxg+qFaQsH4RVlwMc2lnPbAZVROuscKkgxDBbA6jMtjPcrKB1x/ElyRBI3gh6GLGNA09gRiN3eO1fGxgHTLw58FoXvLIQBrCGl7PmFWvds=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LWOFQY0U; arc=fail smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741183293; x=1772719293;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=1YRH1D4PGL8uLGNnAkmuVGvhf0gRd6EL+kbR4249mjs=;
-  b=LWOFQY0UgYw1XOZlyD5UU8jNDjdddU80osB/ar01gOyfNrvGpTjxGxQ/
-   /HzzyZsV5FmwPiwDsGBb6jTe4xLGx5RtIBT4PUfH2qOcQiblfACSK7yVC
-   mCPnVhcgBvmbntFMkl2wR0tVNVVwoHEgtvEMFWtTr2DtmkxgzdUHm1fad
-   L7L2tW+hu5TSDGuWf6oBlA7GhpdQtAVZwRte/CVFgykMza0LxbFxMyO6H
-   0Qpf5KNe8W2VTho/h2UtPbRdbvzMhu6XVE+NI2j3A8uaPTyyN+bZJiHgt
-   rtWFe0jbfoPG2NyhI8nJqEl0OvKie9lY7XS30UfR/nrN+Jn084xs1iKRW
-   Q==;
-X-CSE-ConnectionGUID: IZtscoEFQNex1LuPElhxPA==
-X-CSE-MsgGUID: S4oJFB/2RHyLEocdEeX1eQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="42009872"
-X-IronPort-AV: E=Sophos;i="6.14,223,1736841600"; 
-   d="scan'208";a="42009872"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 06:01:32 -0800
-X-CSE-ConnectionGUID: /lUzbpryR9GWKOCU/lWoYQ==
-X-CSE-MsgGUID: Uf4ZfGgcRUaLKcUZBNaVUA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,223,1736841600"; 
-   d="scan'208";a="118714812"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Mar 2025 06:01:30 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Wed, 5 Mar 2025 06:01:30 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B769E2E3396;
+	Wed,  5 Mar 2025 14:02:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741183376; cv=none; b=B++t/eIVI/gtre+c9TZyznknBARy3znmCY/1WU8Nrj8vTmjaZRa0SHOwQjhxNOrLrwWJnbl88ARKhgHQgOVas92fdpBUiFVCmD6B2qPJtnT87SzI2mIrjoSYXXLy5lVxiA/mmrw/apbGqcRzcaBGtDOzLJnPn+yzsc8kNizQbDY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741183376; c=relaxed/simple;
+	bh=AY+NuMNR5CWph1/BQWdAvt2+Lc3CjLK2QGXJEeGaN+s=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YyKx73vW7FaP/H6wFY3JzINF50AM4sIfC+LqlWQyGh+AiPxGYEwLGahXrz0EKuwPMGmoaUaGf2bSX85Sd/J7PiOCHc5BxgqyAR3NKPm9qZrHDcEfh/5wEBXldQn2SlcCHLssu37ki4R9bP/7PPhAlsS5tqDco5HI65821tiJY/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Z7Djh2ryhzpbV3;
+	Wed,  5 Mar 2025 22:01:12 +0800 (CST)
+Received: from kwepemd100023.china.huawei.com (unknown [7.221.188.33])
+	by mail.maildlp.com (Postfix) with ESMTPS id 041C318009E;
+	Wed,  5 Mar 2025 22:02:43 +0800 (CST)
+Received: from localhost.localdomain (10.175.104.82) by
+ kwepemd100023.china.huawei.com (7.221.188.33) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Wed, 5 Mar 2025 06:01:30 -0800
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.177)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Wed, 5 Mar 2025 06:01:28 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=k81kb6/iZzimM/BeK0NdEzAcBHPyjvv90jEiPZuTx2DjDCoY7ybHBlO2SqFD+6M1igorhF3ye10FaR1fPec1f/bB8xkZ1tNwwb9OZqKxCKFdP7x8jSZByTt4Iu5nXn0W1+ja1mtTDqP4cPd29SffUpAz9j2X4BBQc/BBYK8z+3boM9BVG6oqewnfzng+4kfrqZgbHBIQiP6LNT9/9igMY5bjG6yo+Dy7/SqwCAyVUxXFMcTClNy1Vya6qwpfWKPK8tIJKziP0Xfp6eTzb0wbPzSbj91XbIAgcxhJCtOdEJJ0HbXrgAZsVYm/iEP5qHSxP0kFVTtPwB/xEH7T69XOog==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sQ1O3S2/AlYirH45PzylTiUdZHfAohgBqPPNkhYXa78=;
- b=c3/+yyD5AV3klsdlLtEJiV97n+0UFgo5EIqArDv8Yt5lScaSzolXH7PiJSTkH252u5tIWNEziz9fyQeRDYrV6AariB2tqR+W9nOi1Yergp8mM/lH2XZtmxcKw/5xlIBCjKZji3TNy68kQtlxUda6AB13wS+IjxjnreC/UTtXGe6Fg489X5T8vmvjh6eYwKO2BobX+CXSAIr+q5gmt4e66UyjcxIfB/fdGjEQ4a/E6CCYxW1Tgd47Fe6iIxFnwqBj0+JLmmFieRGRZSE/6KvQAtPc2UYKkuWU9gL3tXjNleFEDNknE3MzArzDdMAb+jZBMFG8bv/coBgTTpSA+DNp1w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7420.namprd11.prod.outlook.com (2603:10b6:806:328::20)
- by BL3PR11MB6436.namprd11.prod.outlook.com (2603:10b6:208:3bc::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.18; Wed, 5 Mar
- 2025 14:00:54 +0000
-Received: from SN7PR11MB7420.namprd11.prod.outlook.com
- ([fe80::b8ba:be35:3903:118f]) by SN7PR11MB7420.namprd11.prod.outlook.com
- ([fe80::b8ba:be35:3903:118f%5]) with mapi id 15.20.8489.028; Wed, 5 Mar 2025
- 14:00:54 +0000
-Message-ID: <1536b866-debe-4861-9c7b-082682bc966c@intel.com>
-Date: Wed, 5 Mar 2025 07:00:44 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net-next v9 2/6] net: ena: use napi's
- aRFS rmap notifers
-To: "Arinzon, David" <darinzon@amazon.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "jdamato@fastly.com" <jdamato@fastly.com>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"horms@kernel.org" <horms@kernel.org>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, "davem@davemloft.net" <davem@davemloft.net>,
-	"michael.chan@broadcom.com" <michael.chan@broadcom.com>, "tariqt@nvidia.com"
-	<tariqt@nvidia.com>, "anthony.l.nguyen@intel.com"
-	<anthony.l.nguyen@intel.com>, "przemyslaw.kitszel@intel.com"
-	<przemyslaw.kitszel@intel.com>, "shayd@nvidia.com" <shayd@nvidia.com>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "Allen, Neil"
-	<shayagr@amazon.com>
-References: <20250224232228.990783-1-ahmed.zaki@intel.com>
- <20250224232228.990783-3-ahmed.zaki@intel.com>
- <c531f3a202e746e39faf27211b80aa69@amazon.com>
- <54f50b81-7361-4140-8b88-acd765fd8f49@intel.com>
- <abc6a4b765f84eb09efd7b10a62c4391@amazon.com>
-Content-Language: en-US
-From: Ahmed Zaki <ahmed.zaki@intel.com>
-In-Reply-To: <abc6a4b765f84eb09efd7b10a62c4391@amazon.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4P222CA0019.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:303:114::24) To SN7PR11MB7420.namprd11.prod.outlook.com
- (2603:10b6:806:328::20)
+ 15.2.1544.11; Wed, 5 Mar 2025 22:02:41 +0800
+From: Dong Chenchen <dongchenchen2@huawei.com>
+To: <edumazet@google.com>, <kuniyu@amazon.com>, <pabeni@redhat.com>,
+	<willemb@google.com>, <john.fastabend@gmail.com>, <jakub@cloudflare.com>,
+	<davem@davemloft.net>, <kuba@kernel.org>, <horms@kernel.org>,
+	<daniel@iogearbox.net>
+CC: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>,
+	<zhangchangzhong@huawei.com>, <weiyongjun1@huawei.com>, Dong Chenchen
+	<dongchenchen2@huawei.com>
+Subject: [PATCH net] bpf, sockmap: Restore sk_prot ops when psock is removed from sockmap
+Date: Wed, 5 Mar 2025 22:02:34 +0800
+Message-ID: <20250305140234.2082644-1-dongchenchen2@huawei.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7420:EE_|BL3PR11MB6436:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0635dece-dd0d-436f-2627-08dd5bee250b
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?Qzg1REFVQWsxVmdUVitpOVpMTDRQWTFJN3paYnRtcGU4V2dCWG1BRGdjUXBt?=
- =?utf-8?B?WU1LRlArbWJ0eXNoU1NtbnpJOE1Qdnd4dlhpUCtkdGVvRythQTl1WVRKeHVQ?=
- =?utf-8?B?R1dNeXQyZEVZZ1d4QTQ3NjJTbmZhaXdseVJGZ0dMcFAvdGxXR2hNS3A3WlRn?=
- =?utf-8?B?cldoWkRyRXZMM1B3N0JvNXFFQXZNNitxRTl5Qk9HOC8ySkNML3FNd3lEWTN2?=
- =?utf-8?B?d1ROaHh2QURtZXY2eU15T09rL0tNVDVjZVl1RXdRQlFDWjg0TmlkN09pb0x6?=
- =?utf-8?B?SG1xaWZzUmVzQ3oyallzS3c0ak9DMEJNOHJKa0tiaXJ2WGJMaU9FRGFrNjAx?=
- =?utf-8?B?R00xdW1HQkhnS0JNM2RlNkdyLzRaMC9SajJ0b2l6ZWw5cldoUlJJVHhtUlM0?=
- =?utf-8?B?U1VnYWFXUWliYXBVOVpuWm9yMUFJRVFEZVZvZysxbHVMRmZLNzByOHZWZTRz?=
- =?utf-8?B?ejhpTVRRM2JaQXNFWldlYmJDRjcwM2FHNXpJdzNuc2lzMUZZd2Fmb1crT21H?=
- =?utf-8?B?ZkM0cnhVMEdqc0hIUkpCdjBVWkRzajI1V0hNVzJ0cE1ZNWQwb0FONnNxM2dJ?=
- =?utf-8?B?bEdQbHRDMm1qdlltZ1BxbmI0elJVRUNZWFV1TTY3TFZOVEQzOU01UlVYTmZO?=
- =?utf-8?B?RVhCQ3BibHpZczVUZjVwcE83Ry9aQkJKbXVJOTUvOUpFbnVGOU1HdzBxeWZq?=
- =?utf-8?B?b2l1c1ZHcW0xWTBmaFI2OFJidWRXV2YzVFEwVzg4eXlGVVBPTk1heUhhZ3lr?=
- =?utf-8?B?cmhkWHV1VG1iTTZibmpKT0VSY0xXOVRja3laQ3hobnIrVys3RVg4ak4rT2k0?=
- =?utf-8?B?b2xaRjIwTVA4clRzWmFwL1J1Y3BVeDRjRkpYYkdTdmJmOWlFaHhaeExkWndY?=
- =?utf-8?B?RGJvb2ZhTHY1YjMxSktXbnJJbE8xTW5LVDlaNEJ3aUMzdStTY0lzK1NPakdG?=
- =?utf-8?B?NW42NmV6M3puam9yZjFTS3grcURwaERCbVNoL3ljdDRoYnczSmRhUHM2cGRQ?=
- =?utf-8?B?Sjh0K1ovd043UVFTMjFsSlNLT2xLRnNGMnl4cFlDWWJWUUFkbkdhemgraDA0?=
- =?utf-8?B?QTJXMng0M0V2alZnL3JObnZpZzByQjV2U0hlZUlrYVlXZWFrSDBxZ3FjN2lO?=
- =?utf-8?B?T1JvUXpGVHA0WU9UUWRISDJ1dmdoc3E3eVo0RmtPbTlzaDNqVlFLWEpVbG45?=
- =?utf-8?B?NUwxVTY5WUc4aGpVcit6WWd3Qk9Hd2gxcEVwT3BHZWtXNGRPd1ArUUk4RWlK?=
- =?utf-8?B?U0wvQTZJRkJmOGpJRXdIOURYT08yL2ROeEF6Z3I3dU11ZUZkWUUzMXZVSHc2?=
- =?utf-8?B?RHNYNmxUYS9lWjZIVWpWRm5xR1B3bHRheGJQQnFLWDRJcEo3d3FtUEx6R0gr?=
- =?utf-8?B?azNOeWRUOVFSTFJUQ0FhVnJtMktjSWlpbGppdlFYYWozU2d1NVhYd3JOUVVy?=
- =?utf-8?B?RDhKQXZBYTNYcWdKTFBnbUdTRkFKallJbEZ2QVdLTktYSTVxa3QyRFRPeFkz?=
- =?utf-8?B?bkVnR2s5Nzd0WnQvWkMxTmtwOUlGRmt1RURJaGZEaTlTRUhsVFc2WkFzUnVk?=
- =?utf-8?B?dnhMZXBaSDNJcyt5ZmgrTVA5STlUWEZYUnlNMXBadUIzLzM1SkE3OFFFdCtF?=
- =?utf-8?B?Y09ZbE1SYXBOSUQ4ZTFWSnlFOFpOODNVa0ZLYVJyZkFUbCswd2tlQU5kRDVL?=
- =?utf-8?B?ME8rZ24zSlFaUmVObFZ1aTBDbkU4RTRPSklnczVnZk1YVmJZV2RJWEFwUjBl?=
- =?utf-8?B?dUJjdW1nbFF6em9JMU9BZlluRllBNE8vTVUyR1hwdHl1UWpqY1hIbGJCOC9w?=
- =?utf-8?B?enh2YWowZTRRQ3Z2ODZjcXJ5djR3N1JSNVh2clduaFVGNFZSWWJwaU5ldEFK?=
- =?utf-8?Q?JrYcD0Vc6iaLv?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7420.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?anliTjYrSzVJM25qYi9kOVBvK1g1YzA2WnVSSHliZTNvRTFMZ0JacDQwblc3?=
- =?utf-8?B?MFdteU9YYklYdWN2TFNTaU5CaXJUbmpyV2xyckVSdStYMFIvRGgvKzNnVXdN?=
- =?utf-8?B?cHR3ckYvTnhYRGM3eEVsa0dIb3RrWGlXK3pNNUJsMWttTzJiNlA4VlRhcVFH?=
- =?utf-8?B?WlVjZnppZUFyeGxCUTV3RGlQVTBUdm5zZi9TVVdicE9FZVBQQ1RWZ1ErUkdK?=
- =?utf-8?B?QVlSaTdNcFBlcmdkRFhUdWRvSkdvd2daWlZHWlExOTQ5bnpnZlVUUi9IUCtD?=
- =?utf-8?B?bnBidkUwa085ZTJGOHJETERMTEgvUFhoWFlDanJPcHFXcndRM3NtNThiWW1a?=
- =?utf-8?B?c2VSYy9JL0QwOXA3cFVuWkNnaG5MVGNFLy9rS0hUeHVBTkhLZ1VzcjVDZzNK?=
- =?utf-8?B?YWxIZ0NQVTg4bWRaNEhmN2puZlJUZ2s4dXFJQksvVUtBWEswMkdFZnUxMlQ5?=
- =?utf-8?B?a1RjZXpUcEY0bVQzL0labiszZGdrSzdOeUpXS1NSQWxkaGE3RTI1THAzVlFB?=
- =?utf-8?B?SFBQUG9NNkdKaTdWU0hUajREeWZKaVNXb3FPYktWYk1uRzFMZzFTZFRiSGhF?=
- =?utf-8?B?TUl6TWNpOFdlem1MQWlvZDhFQzNCdkVGOHQyNEd0eVpNY25kRnoycEw0eW1O?=
- =?utf-8?B?NVdlalo1RTdKaVZ1eUpyN2FRR0VPNnhkakthNlB2QkdjejEyb2lqVTdYa3l1?=
- =?utf-8?B?UzJxWENvVXFUUEVZVkxpNnE3UHlpMlhOemZZMTdGeHEwYVRPeUtUcXVKWTd3?=
- =?utf-8?B?RjZDNG9KS1d4RGtSQjhXVGdWUFJvczcyN3FlcUcwSVJNRDliS2haU3A2ckxQ?=
- =?utf-8?B?K3RqblQ0d1V6S1NPZkhvTm1KS3laMk5zM3ZLdS9oL2tQQ1ZuYi9lTndTYkhs?=
- =?utf-8?B?QzVVTFZ1aXZJTS9obzU0SEFQeUovY0o4V214RmQ0MjR2Z1Rva1A2a2h5ajIx?=
- =?utf-8?B?amVBKzJ5dlpBL29NUnA5bVpEWVpVd2cwNGRmK0o5LzVIRWlseVpWVFVPaFlk?=
- =?utf-8?B?SlJEMG1JZE9QY1E5MEozSXhSeWwvTHhkSzFhWlBRc1lTUDA3ZWJybTVhMmFE?=
- =?utf-8?B?T1NOcmRWSVBEWTFmNWVVTUl2Y0RCcFFRc3M1MXAwWnlaQm5GWGRBQ0Z5eHo5?=
- =?utf-8?B?cXM5Q2dOMnFJVmRHdjFEQ1pkZWhWUHdQbzBuMW1kcHdxY2hRVUlCd0kyMGpN?=
- =?utf-8?B?OWtCbDV4Q1hCWHphTWdKZFhWWjR3cmVnRVY5SXBucnBjb1U0WmFpT0huUFRX?=
- =?utf-8?B?MGFzVkE5OC9ycXpIRU4rYlBpeVN6NjcyajhJM3RRNWVxc3BxVmhha29LN25k?=
- =?utf-8?B?Um1rNmdLOWc4Mll3WTZGRENjM1ZGRllxQmMyQVhzNkJUYnZDMW9SVjhTRHRJ?=
- =?utf-8?B?NUNuZW9Na2UxZUdkY0ZOUXc0ZmRzaEg3bjV3NFBLdXVxUEFrNkQ1clhGc2pJ?=
- =?utf-8?B?RC9oZTZ2REk2bGdzekYvcEVtVCtIVHdGTjlBeUE2OHBpUURxMFloMHFFcVo4?=
- =?utf-8?B?Q0wvWkJTRUxLeGZveUgxQ0pSdmhwM0hPOXdpKytoS2FHMWp4UVNYR2Q1cXdI?=
- =?utf-8?B?OTJMakc0ZlkvdStTZHlSZHZNZWFCOXRnNXY3WHd2ckJqKytNcUZHaXNMYmky?=
- =?utf-8?B?UmFqdlJiTE05U2ZmOWJRYmc3QzQwLyt0UWdnc1RVMkpqc01KaVhXTW5hV1Mr?=
- =?utf-8?B?U3VQcEVSczJUdVNUTEFQQjhNNUU0aFNWeWVmaDZoUjU3UjliY0pRT0tLQytN?=
- =?utf-8?B?Yy8yR0N0TGdzMHgxVGdRR2dlMGhMcFZiVlJITTJSZEIwN3pVbW1Vemp4T0U1?=
- =?utf-8?B?SFpCcW5Lbm4zeDVOZzJpNVcrazhzcDRJVkJINGRRMVNzN0FkaU8xWlpJQzA3?=
- =?utf-8?B?ZGxrN044V2dMUmZsaUovenVpWFd2TjBUQ290SjVicE9LWDdGM1J5ZjI2RHhM?=
- =?utf-8?B?ZGw0S3VMWXJyUXB3RWtYcXhscmZYVC9OUEF3SnFXMU15ekJxRkJUM0gwZFoz?=
- =?utf-8?B?VUpudW54WUJTODlKcHordGRFNGdWbW9qaEVhS2J2WW1JeDZuN2Ird0JyVzU3?=
- =?utf-8?B?NjkrRlJpWEQ0NUszalJJSGxZNzRaeG1OUm1iZ3hqU2tjMW1xM1ZKUE1vRFAr?=
- =?utf-8?Q?1kbN6yIiMXoPxoyfWmPRZMyec?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0635dece-dd0d-436f-2627-08dd5bee250b
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7420.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2025 14:00:54.0782
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Ln3eYHwUMjwIkjZqvglWJGB7aG1lkMHrw5TYLgYYrKxw8Jl0C65aDoYiDDZUHL+Q6yocpjCwQ98Ki+fU+zVN4A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR11MB6436
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemd100023.china.huawei.com (7.221.188.33)
 
+WARNING: CPU: 0 PID: 6558 at net/core/sock_map.c:1703 sock_map_close+0x3c4/0x480
+Modules linked in:
+CPU: 0 UID: 0 PID: 6558 Comm: syz-executor.14 Not tainted 6.14.0-rc5+ #238
+RIP: 0010:sock_map_close+0x3c4/0x480
+Call Trace:
+ <TASK>
+ inet_release+0x144/0x280
+ __sock_release+0xb8/0x270
+ sock_close+0x1e/0x30
+ __fput+0x3c6/0xb30
+ __fput_sync+0x7b/0x90
+ __x64_sys_close+0x90/0x120
+ do_syscall_64+0x5d/0x170
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
+The root cause is:
+sock_hash_update_common
+  sock_map_unref
+    sock_map_del_link
+      psock->psock_update_sk_prot(sk, psock, false);
+	//false won't restore proto
+    sk_psock_put
+       rcu_assign_sk_user_data(sk, NULL);
+inet_release
+  sk->sk_prot->close
+    sock_map_close
+      WARN(sk->sk_prot->close == sock_map_close)
 
-On 2025-03-04 11:33 p.m., Arinzon, David wrote:
->> [RE-SEND] I just realized I sent this only to iwl, sorry for spamming.
->>
->>
->> On 2025-03-03 10:11 a.m., Arinzon, David wrote:
->>>> Use the core's rmap notifiers and delete our own.
->>>>
->>>> Acked-by: David Arinzon <darinzon@amazon.com>
->>>> Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
->>>> ---
->>>>    drivers/net/ethernet/amazon/ena/ena_netdev.c | 43 +-------------------
->>>>    1 file changed, 1 insertion(+), 42 deletions(-)
->>>>
->>>> diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c
->>>> b/drivers/net/ethernet/amazon/ena/ena_netdev.c
->>>> index c1295dfad0d0..6aab85a7c60a 100644
->>>> --- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
->>>> +++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
->>>> @@ -5,9 +5,6 @@
->>>>
->>>>    #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
->>>>
->>>> -#ifdef CONFIG_RFS_ACCEL
->>>> -#include <linux/cpu_rmap.h>
->>>> -#endif /* CONFIG_RFS_ACCEL */
->>>>    #include <linux/ethtool.h>
->>>>    #include <linux/kernel.h>
->>>>    #include <linux/module.h>
->>>> @@ -162,30 +159,6 @@ int ena_xmit_common(struct ena_adapter
->> *adapter,
->>>>           return 0;
->>>>    }
->>>>
->>>> -static int ena_init_rx_cpu_rmap(struct ena_adapter *adapter) -{
->>>> -#ifdef CONFIG_RFS_ACCEL
->>>> -       u32 i;
->>>> -       int rc;
->>>> -
->>>> -       adapter->netdev->rx_cpu_rmap = alloc_irq_cpu_rmap(adapter-
->>>>> num_io_queues);
->>>> -       if (!adapter->netdev->rx_cpu_rmap)
->>>> -               return -ENOMEM;
->>>> -       for (i = 0; i < adapter->num_io_queues; i++) {
->>>> -               int irq_idx = ENA_IO_IRQ_IDX(i);
->>>> -
->>>> -               rc = irq_cpu_rmap_add(adapter->netdev->rx_cpu_rmap,
->>>> -                                     pci_irq_vector(adapter->pdev, irq_idx));
->>>> -               if (rc) {
->>>> -                       free_irq_cpu_rmap(adapter->netdev->rx_cpu_rmap);
->>>> -                       adapter->netdev->rx_cpu_rmap = NULL;
->>>> -                       return rc;
->>>> -               }
->>>> -       }
->>>> -#endif /* CONFIG_RFS_ACCEL */
->>>> -       return 0;
->>>> -}
->>>> -
->>>>    static void ena_init_io_rings_common(struct ena_adapter *adapter,
->>>>                                        struct ena_ring *ring, u16 qid)
->>>> { @@ -1596,7 +1569,7 @@ static int ena_enable_msix(struct ena_adapter
->> *adapter)
->>>>                   adapter->num_io_queues = irq_cnt - ENA_ADMIN_MSIX_VEC;
->>>>           }
->>>>
->>>> -       if (ena_init_rx_cpu_rmap(adapter))
->>>> +       if (netif_enable_cpu_rmap(adapter->netdev,
->>>> + adapter->num_io_queues))
->>>>                   netif_warn(adapter, probe, adapter->netdev,
->>>>                              "Failed to map IRQs to CPUs\n");
->>>>
->>>> @@ -1742,13 +1715,6 @@ static void ena_free_io_irq(struct ena_adapter
->>>> *adapter)
->>>>           struct ena_irq *irq;
->>>>           int i;
->>>>
->>>> -#ifdef CONFIG_RFS_ACCEL
->>>> -       if (adapter->msix_vecs >= 1) {
->>>> -               free_irq_cpu_rmap(adapter->netdev->rx_cpu_rmap);
->>>> -               adapter->netdev->rx_cpu_rmap = NULL;
->>>> -       }
->>>> -#endif /* CONFIG_RFS_ACCEL */
->>>> -
->>>>           for (i = ENA_IO_IRQ_FIRST_IDX; i <
->>>> ENA_MAX_MSIX_VEC(io_queue_count); i++) {
->>>>                   irq = &adapter->irq_tbl[i];
->>>>                   irq_set_affinity_hint(irq->vector, NULL); @@
->>>> -4131,13 +4097,6 @@ static void __ena_shutoff(struct pci_dev *pdev,
->> bool shutdown)
->>>>           ena_dev = adapter->ena_dev;
->>>>           netdev = adapter->netdev;
->>>>
->>>> -#ifdef CONFIG_RFS_ACCEL
->>>> -       if ((adapter->msix_vecs >= 1) && (netdev->rx_cpu_rmap)) {
->>>> -               free_irq_cpu_rmap(netdev->rx_cpu_rmap);
->>>> -               netdev->rx_cpu_rmap = NULL;
->>>> -       }
->>>> -
->>>> -#endif /* CONFIG_RFS_ACCEL */
->>>>           /* Make sure timer and reset routine won't be called after
->>>>            * freeing device resources.
->>>>            */
->>>> --
->>>> 2.43.0
->>>
->>> Hi Ahmed,
->>>
->>> After the merging of this patch, I see the below stack trace when the IRQs
->> are freed.
->>> It can be reproduced by unloading and loading the driver using
->>> `modprobe -r ena; modprobe ena` (happens during unload)
->>>
->>> Based on the patchset and the changes to other drivers, I think
->>> there's a missing call to the function that releases the affinity
->>> notifier (The warn is in
->>> https://web.git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.gi
->>> t/tree/kernel/irq/manage.c#n2031)
->>>
->>> I saw in the intel code in the patchset that ` netif_napi_set_irq(<napi>, -1);`
->> is added?
->>>
->>> After adding the code snippet I don't see this anymore, but I want to
->> understand whether it's the right call by design.
->>
->> Yes, in ena_down() the IRQs are freed before napis are deleted (where IRQ
->> notifiers are released). The code below is fine (and is better IMO) but you
->> can also delete napis then free IRQs.
->>
->>
-> 
-> Thanks for the clarification. Some book-keeping, as this change fixes the issue.
-> The need to use `netif_napi_set_irq` was introduced in https://lore.kernel.org/netdev/20241002001331.65444-2-jdamato@fastly.com/,
-> But, technically, there was not need to use the call with the -1 until the introduction of this patch.
-> Is my understanding correct?
+When psock is removed from sockmap, sock_map_del_link() still set
+sk->sk_prot to bpf proto instead of restore it (for incorrect restore
+value). sock release will triger warning of sock_map_close() for
+recurse after psock drop.
 
-Correct. The new patch attaches resources (IRQ notifieres) to the napi 
-instance that should be released before freeing IRQs.
+Set restore param of psock_update_sk_prot to true to fix the problem.
 
-> 
-> If it's correct, then the fix is for this patch.
-> 
-> (Also adding Joe who authored the mentioned patch)
-> 
+Fixes: c0d95d3380ee ("bpf, sockmap: Re-evaluate proto ops when psock is removed from sockmap")
+Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
+---
+ net/core/sock_map.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I guess so since there was no need to call set_irq(-1) previoulsy.
-
+diff --git a/net/core/sock_map.c b/net/core/sock_map.c
+index 82a14f131d00..10bc185ef103 100644
+--- a/net/core/sock_map.c
++++ b/net/core/sock_map.c
+@@ -171,7 +171,7 @@ static void sock_map_del_link(struct sock *sk,
+ 			sk_psock_stop_verdict(sk, psock);
+ 
+ 		if (psock->psock_update_sk_prot)
+-			psock->psock_update_sk_prot(sk, psock, false);
++			psock->psock_update_sk_prot(sk, psock, true);
+ 		write_unlock_bh(&sk->sk_callback_lock);
+ 	}
+ }
+-- 
+2.25.1
 
 
