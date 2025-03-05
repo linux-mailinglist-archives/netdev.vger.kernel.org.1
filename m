@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-172186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98EEEA50A60
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 19:55:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57690A50B2A
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 20:12:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF4F118829DF
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 18:55:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8F8B1885FDF
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 19:12:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A2972512ED;
-	Wed,  5 Mar 2025 18:55:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DFE21D8E01;
+	Wed,  5 Mar 2025 19:12:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OPrOZII1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A6skyESF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 586F01A5BB7
-	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 18:55:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F5F16426;
+	Wed,  5 Mar 2025 19:12:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741200923; cv=none; b=GQfHkiYmzQqdq8Q95qw9xvqi93RUEpXR5aNl5UJIAgx+Jyi0iei/bWfcDVX0QQtwpweClFLqvofGKNl3aRFm+itCx/F8SvB2f1+wT+Y9pToI1ubx73a/Q3giIkKJs6ZDU8OFnW5b7aQoR1uNzsgVnvH3cKXhJQMTnLX5h2+Sg+8=
+	t=1741201949; cv=none; b=Jvr8NOuhCUwzEWZupTacP9Fvui3QEa81HAY+Ie3GYMF/NxKKdEiGl8c7m/p9nWvB22rxrYcppWIrP7Z9KKz+OcKgc1FiCj5z5HuKdGWKMpLaDITq3Ej5PUFMq+hbypMZI9FnSH+5fPmvOpV7h2+glMUSapI0IdueOO2ub03ZXAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741200923; c=relaxed/simple;
-	bh=nwwW/QeW1eHgxcud62duI7ohY+tVqcIWeARHosTrE58=;
+	s=arc-20240116; t=1741201949; c=relaxed/simple;
+	bh=OQIS71VY7d37k6PpXEg25jjEYN9BsKp+QOVUVeBB7os=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=af9dbf27z8ylL9D09Aurb3Z958veWkozZIQBsrbSkQIpuac6rFx3TRl54JNxDRMOVWHB0T9vItyA1cP6R9H2dAJg8prsocZu8xbap+B1B1U1HALdJ3eGO3JBbKBMVvBHhP4ZQ0ANPXpQkKVC7avJGo7hG+EHtMe+nbV7iL/lBD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OPrOZII1; arc=none smtp.client-ip=209.85.221.54
+	 In-Reply-To:Content-Type; b=GoKnkkYoUDojmVN8vJX6kkX7HtnBQvLtCY0sp4PA2F1ATixaitoylRCyQQllNUFlYcaDlO9D12LujphR5E8uEWTCrS6QlssquqMen37+5cmGGZZhXetO9XX5zTEqGEO1+Tj38k59BesCKEGm4kXLTxjE4JK9B7YOwfQHiic4oKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A6skyESF; arc=none smtp.client-ip=209.85.221.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-39129fc51f8so39656f8f.0
-        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 10:55:20 -0800 (PST)
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3910f525165so2859811f8f.1;
+        Wed, 05 Mar 2025 11:12:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741200919; x=1741805719; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1741201946; x=1741806746; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=zqdujPzjEoggBMoGjM1zPVAuTiDGq8HjdDHoaMJWW2M=;
-        b=OPrOZII1RZTyogWZwvsStcaoaaIXDWM+Kj6+Is8HyjGjgFIXFYf/H2uzR+LHadzKcy
-         tUKTa5Ds7smn34y9b5h+xReuAEe6VJcrvmL/rlets9MmvKqH02tia54vaBxTF7JqXaiR
-         n5BdJjkq19p9IEdRK66CZ9z99knANn1mnEAIFbCBCSVgH/0LlnqRCTK+HsEaKINCXH5y
-         CUIxIUWrLXxmiu436M86ZULxPnoZE6PFNb8aynQQUhqSy1fXHi1zPB965jmpj4NYoEdf
-         av6Kr7noVA8OjLnWR9taRFvfokC2oVEUTA5JUkKUD0TU88ri5PaAzvXDnd1Weich2ZWo
-         2fzQ==
+        bh=2UAtTDNi9A6LaL+tM+1TUxbX2g8gujKdVZLYK4r9TuM=;
+        b=A6skyESFXR8PPJugQcUEcQ+qY6rbbW6fWETITaQ0eyyshwcezqFkBIQwR1bFhoRxTl
+         m7U2Vg+s0zp8llRDdb5eFRA1OwjYaFe2oa1uxJqCDR5FposIE5l2zHW3evYH9+ncM/rl
+         Siz5Ydr2iFW0ETjTvWN6NR9spxSd1iih8pagKxt+qIjERlfBPf+NDbsXaImRmum/hazj
+         2jRW11Vol6h72QaDOIv57szM7VE89pIgwMAQdmkIsvb0bRTE4uJjqDqj1aB6pIJNZ859
+         bYk5j5Up92UFhRnjS7QBG0hnlwvEzwWGdFLPlqsK/76dc76uO9i5q4JTp34o6GWzB9KJ
+         4vTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741200919; x=1741805719;
+        d=1e100.net; s=20230601; t=1741201946; x=1741806746;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zqdujPzjEoggBMoGjM1zPVAuTiDGq8HjdDHoaMJWW2M=;
-        b=LUOnQyoqbGro3ZfCII5cj7pwf40x6rspiQG+uzJ+B3yV+Qk8GSwkl0gR5XT2R9EdkT
-         F4N3vn/KEoA87yg9vnM4jKtUlEiepIoIzeNREiHxiGj/Sb9rnBJ6w4ZXLW1CyItAsbRf
-         DXksTdE3gDe2okGIfY1+bw8B8WdwdM4xqMpDYH3XV81pVyxWCGJJ8J59z5YatkOo220U
-         myqe2KmrFPwscQb6rQaRWjTKJ6C99WPcK0g9Rl6hvCIjoiFD7PPJw+ZdetRy274rHDye
-         OePakaVs2+dw2moC7rzbI4idZEkQ3e1gR9LbgHrotNp/DSSHoY6HLC4tXEqWGIBkaFiN
-         1Kmw==
-X-Forwarded-Encrypted: i=1; AJvYcCU2CMDXhbd6Bym9X2Q8HcVS8SQBpRyw2FZ9fHYh6SLniAkUCxjv6xb+dLIqltpkhYYgTKVdXbU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywry6+3AMtuTdlGPnji9A4VZlR1g2y62WCwSs64i+bn71lFFvtS
-	bRCZtTqS4cmF9tN+42oArI4kh4Zc8Rde6ODdH4tc6jQpG1j4q3d/
-X-Gm-Gg: ASbGncsXldx80Hh502uIROnZrte6Y6pbMI8Jyx9EuKu9lfBBTpAAlKFJBMoYhjj6kLv
-	ylOXaVnKBaC1ut7w087ftPF+oJQib1wUTorEaBpHNq2OqQ0CCcdXhSoTKrdllPtGhwGbcKSPqN7
-	cOQ+ZTY5f/AqLHDQmpKm3ZC9FuGGcFNdoFwOBu9arYwrLceyp9VcdYS32pIvbeKeyXXpkT4e3dK
-	ib4sJ+hz7mRnWD6NnycFEtlb9uJXc4avdMhveiCq1aTnUn2ENPM50ErgIywTyWyUlmZX3TbSoj6
-	++4SOaHga+sLALpYYk6TjVWqEfpDbzXoFRkCwObEP09+vbKS3YN6wBks+XdbpHMKbA==
-X-Google-Smtp-Source: AGHT+IHAo0Hxu6wpXRvbEjPPIbCo24sMvGPV4AFI7OGhkyc7fyyqXnOD2oQm4hIfSJ9vFwikSGOSFg==
-X-Received: by 2002:a5d:59a5:0:b0:390:f1c1:d399 with SMTP id ffacd0b85a97d-3911f7bb9b8mr3754983f8f.41.1741200919032;
-        Wed, 05 Mar 2025 10:55:19 -0800 (PST)
+        bh=2UAtTDNi9A6LaL+tM+1TUxbX2g8gujKdVZLYK4r9TuM=;
+        b=EGiK9dgEVR/4/lEJR/t8lgG6e1Wkw3G1ZbdDtqyel3w4jkWgvGgebVz4e9ZRRaYBUi
+         D26u86cA4OZnGJ/7B158hWqV1l2IN0o6wGdj6EL2vTZPtW6ApQeh/7RmJcjVVhhZxVf2
+         i0p9c6cG+oPJEKmh7xjl70Fk4MvWCiD7sxta5/6QYk1XF9k+du2dNGEpQ/ud4+Jo3TRR
+         uMbY7mLIjqbHnMUqMgkkOoL0Ztys+HGinCyIcaD55i30Ho8KG/rOT14plSULGj2tHJGs
+         Pr+dQzSYVyoU1MX4xjdcjaWM4ROewFMHiXMoLlkC5RZ7h6FeJYdFp7tbzqRAJGrEq66G
+         1JvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU88r3r6+43GtLVuXItqOk7b2aZK72d4Ly/76Yx1i2QpIwDX63XP3POEi4Awm6q8AVdX7fWBCCpUq+6sjU=@vger.kernel.org, AJvYcCXFWhY7FvfZAFLRQpZPoY542X+P5fdZ2h7K4L/LWzl4iLSv05FttQ/bhkUfe2jWsIx2ZhjfU1SqhPHFGA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyUbyjhY8FlePMNYEkKzuZmpYjBUduUvMu8LfTXJuXXnOJ3X/VT
+	2y04YNqmLDWbnQgu9rSO8OjLoGxdXlQdDMhPPyTH7iKInx47wHx5
+X-Gm-Gg: ASbGncvVAe9JacLvy6wAotjMmxjX1JMCcJxLEztUOawN+SydPPLiTZ/PJKOZZqxfBjr
+	qx8wKMHUrQog+dYA7YVxmBHkcbeYiPo2LZhbr+v06bNsGcP4MAZN+tpTSNV5TXuiP5oDBM6Ny+D
+	Mt9jp1kIdJFINvpslTx/QzYvroRYlxLMEfUcq6u/k2RKCcP9PEzX5Pl24/8S8GM918zscXh1EyN
+	BV4Kf5KNq5trYrV7aQdAXj5jXczhodF/lHxwzjzsxxDht1bFPHB/JR79P4KHZ97sEM3IDGXapiU
+	iuG1tWdx42izBqd/CC1iexXG3mEwaTeOYojW4zECbpBhs55VxNQMbunsL3nUvd8QDg==
+X-Google-Smtp-Source: AGHT+IE9Jfcw1QTaD71UiMWcIV4F62fCIiDaj/lP77sDS7GkTItX4uePhMNdB6mev257s1kfrn+nAw==
+X-Received: by 2002:a05:6000:4025:b0:390:f6aa:4e6f with SMTP id ffacd0b85a97d-3911f714de9mr4298289f8f.10.1741201945611;
+        Wed, 05 Mar 2025 11:12:25 -0800 (PST)
 Received: from [172.27.49.130] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bd42e6c4esm25387335e9.30.2025.03.05.10.55.17
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390e4844a38sm22061124f8f.75.2025.03.05.11.12.24
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Mar 2025 10:55:18 -0800 (PST)
-Message-ID: <53c284be-f435-4945-a8eb-58278bf499ad@gmail.com>
-Date: Wed, 5 Mar 2025 20:55:15 +0200
+        Wed, 05 Mar 2025 11:12:25 -0800 (PST)
+Message-ID: <49df4e60-695a-4562-aa27-f946e7acd485@gmail.com>
+Date: Wed, 5 Mar 2025 21:12:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,52 +81,56 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/mlx5: Fill out devlink dev info only for PFs
-To: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
- andrew+netdev@lunn.ch
-References: <20250303133200.1505-1-jiri@resnulli.us>
+Subject: Re: [PATCH] net/mlx5: handle errors in mlx5_chains_create_table()
+To: Wentao Liang <vulab@iscas.ac.cn>, saeedm@nvidia.com, leon@kernel.org,
+ tariqt@nvidia.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250304080323.2237-1-vulab@iscas.ac.cn>
 Content-Language: en-US
 From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20250303133200.1505-1-jiri@resnulli.us>
+In-Reply-To: <20250304080323.2237-1-vulab@iscas.ac.cn>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
-On 03/03/2025 15:32, Jiri Pirko wrote:
-> From: Jiri Pirko <jiri@nvidia.com>
+On 04/03/2025 10:03, Wentao Liang wrote:
+> Add error handling for mlx5_get_fdb_sub_ns() and
+> mlx5_get_flow_namespace() failures in mlx5_chains_create_table().
+> Log error message with  mlx5_core_warn() to prevent silent failures
+
+nit: double spaces before mlx5_core_warn.
+
+> and return immediately to prevent null pointer dereference of ns.
 > 
-> Firmware version query is supported on the PFs. Due to this
-> following kernel warning log is observed:
-> 
-> [  188.590344] mlx5_core 0000:08:00.2: mlx5_fw_version_query:816:(pid 1453): fw query isn't supported by the FW
-> 
-> Fix it by restricting the query and devlink info to the PF.
-> 
-> Fixes: 8338d9378895 ("net/mlx5: Added devlink info callback")
-> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+
+Please add Fixes tag and target the patch to net.
+
 > ---
->   drivers/net/ethernet/mellanox/mlx5/core/devlink.c | 3 +++
->   1 file changed, 3 insertions(+)
+>   drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c | 5 +++++
+>   1 file changed, 5 insertions(+)
 > 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/devlink.c b/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
-> index 98d4306929f3..a2cf3e79693d 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
-> @@ -46,6 +46,9 @@ mlx5_devlink_info_get(struct devlink *devlink, struct devlink_info_req *req,
->   	u32 running_fw, stored_fw;
->   	int err;
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
+> index a80ecb672f33..e808531cc6f5 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
+> @@ -196,6 +196,11 @@ mlx5_chains_create_table(struct mlx5_fs_chains *chains,
+>   		ns = mlx5_get_flow_namespace(chains->dev, chains->ns);
+>   	}
 >   
-> +	if (!mlx5_core_is_pf(dev))
-> +		return 0;
+> +	if (!ns) {
+> +		mlx5_core_warn(chains->dev, "Failed to get flow namespace\n");
+> +		return NULL;
+
+Callers expect error, not NULL.
+
+> +	}
 > +
->   	err = devlink_info_version_fixed_put(req, "fw.psid", dev->board_id);
->   	if (err)
->   		return err;
+>   	ft_attr.autogroup.num_reserved_entries = 2;
+>   	ft_attr.autogroup.max_num_groups = chains->group_num;
+>   	ft = mlx5_create_auto_grouped_flow_table(ns, &ft_attr);
 
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
-
-Thanks.
 
