@@ -1,104 +1,161 @@
-Return-Path: <netdev+bounces-172214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A3BCA50E75
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 23:20:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DCCCAA50E7D
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 23:22:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55E0B3A8525
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 22:20:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 252763A4957
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 22:22:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 809B225D21F;
-	Wed,  5 Mar 2025 22:20:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E64FA266577;
+	Wed,  5 Mar 2025 22:22:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M2c5paas"
+	dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b="CsZWzDKf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095C3256C63
-	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 22:20:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B662146588;
+	Wed,  5 Mar 2025 22:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741213242; cv=none; b=aTzEgo/4NK0ZqcjABS67VcbhlDwHA3aJZv4SI1Nq2yKKRfrnBndt4LC6FgZKH9nU8SpBU0KdFmfetwUWb9HCfiBJiUQMtwASeTBTLGnD1xmX5l6LjV7baZybQ27yYD/57VwLfiBUOO5GMVcrb9zapwr4EVLWfFQLgI94tEKIvo8=
+	t=1741213374; cv=none; b=l4B4EhdEonP4qsa/evMfBWPy6xR768uk97EnL/dJletK5XWk3PrkZvmOPU8Is/sKf1TGp47SL04vppjkGD2KPWMS59FQ3BNrS0W7NmRGAsp8wam2ffC3fw9ntBm6XzK+yumeP3fjQbkIcD5+IAWMl8mjadZ9jR2zy5tdqLijLoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741213242; c=relaxed/simple;
-	bh=SwBo80FKLyq+BcCV+n1X7WaLjv9nbUN/6nmJUrvI2h8=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=ZkHRsqqdSRyXKWfPTXZvQtlpwQjdxqa9jgKAD7tR0dhbHvPvJ050Veu7pI60XBgMZjqkqV78nB6cIHnocoW7hZANagIPtEW9v+o7Ogrdisc20/Iimdq9OBwXx8rpQOTGkCOKqffVTISK6bFUUDFbiX3YvOk/z+mX2DXka2miz20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M2c5paas; arc=none smtp.client-ip=209.85.210.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-72a145521d6so1870164a34.3
-        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 14:20:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741213240; x=1741818040; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=SwBo80FKLyq+BcCV+n1X7WaLjv9nbUN/6nmJUrvI2h8=;
-        b=M2c5paastDGVgBMYggRxvaqkoNOOp07g6RGh33V0BBvRRZSIYgu1n6N8Fu2PImZB7i
-         /xmsvLjnBB1toaDJ/5a3/48Th8VleCUTqale1y1eEzAECldADnF3G2xIdeH72e1dV9ma
-         yOBQLXk10yHrOopN1KZSULnT1E81bhMAuoAw1I8snXNxZHvC2ZqS2ldxVtrDQO4rCsKV
-         i5vbI/DQVfQhD9hkPBKFf9ewsh7dgq8rV0H3sYSfbbQ8mAAcPKLN1bqbV4PVfOtaluYY
-         Y98PJwvcC+uIEzz682CLbCL8zBfWBJNsXzfGRRZZ78rJaD3t8CjThjjrlI1h0gOlo0nw
-         8oWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741213240; x=1741818040;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SwBo80FKLyq+BcCV+n1X7WaLjv9nbUN/6nmJUrvI2h8=;
-        b=GUJpQk0+/he1CZ2VQqNpVps/GeJz3E7THbEv6HUiXVBtE8oaNdL3cZDeqJj2cVxecG
-         uiKXGJgyfHQmqwSWlGR+vKj44SOiwI7IxCreVKd2hWMK4z4qExSmO/aj/noBSN58M+Yn
-         KfYvfNfwDt9zgw9o6deKp3cn+xOjMZ1sPfpH52/NAhtrbld4ggiTfkxodeH5ggaOEkUT
-         pLHHawtTYTP9oeXEc8FXHYmX1CrSe13kB1nWgy7vPSg3F7ykBuV9vvs2BvVu05wAuRkk
-         DwYEAf7lXolbKiP0DOvvpIE2Q4bcHAjS0N/UGNpDFIGyfmJGyHLCc23niq156IygRC1r
-         1j2A==
-X-Gm-Message-State: AOJu0YwVK0pW+39ZHtgXVckilrifJqeiv5zdPtVUhmm2ERaNh43+RQyh
-	aocg0NMcGgOxVnqXP6PqemreYbWfuF6dkM89h6YcJdd3Xgq7jYgcXEd4LxgO3MStybs/c8aBkJd
-	PtOvPQQ+xYTfBuY8TEe3GgvuJ6DAU9A1yWkM=
-X-Gm-Gg: ASbGncutZvN2SS+9d+KVpOh7E7focUjDJAkkf/tyqKWBSmOtdiIZfQoWUQw6FzHtXx8
-	suvzsVRb3C8k2/eAmNAbe5Nh3q6M001G5SfIIrI32bTrSNw93cxHwjCyIsBWJh0DrhG1g+AG6ew
-	ZBtuU/4CXPaQ8lPtnfvqVnfpJ8rUA=
-X-Google-Smtp-Source: AGHT+IGdlEWN/VWRck93UjAEYOlLcIJynpMn1yvJyEgxF+yLITMDd5kM5y3LJhMcyuhJfTrfE0TV9tF4h0gZFLpjfPU=
-X-Received: by 2002:a05:6830:3709:b0:726:fe71:5371 with SMTP id
- 46e09a7af769-72a1faddb32mr2757381a34.6.1741213240005; Wed, 05 Mar 2025
- 14:20:40 -0800 (PST)
+	s=arc-20240116; t=1741213374; c=relaxed/simple;
+	bh=0o4weJ+KgysiO9Mt1rap+L4SV9i8KLmCIvOPJMjt5Ww=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=NR/GW5EvP4cAOhuKz5R9nNwCMBDcloVpgXJL5rHG6sxCfBzh3+yMUsWRhcVNnU98jFJEEzBMP92JyKfls4BvCw1lq9U+eSTicowJbph0NRLHtPXLiNhmfQ4zmC8fcKkE6iD37aL1IKa9Dvj9V/nKjj54yByJZcpgyGeMfumltu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxonhyperv.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b=CsZWzDKf; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxonhyperv.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1202)
+	id AE8DD210EAE9; Wed,  5 Mar 2025 14:22:52 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com AE8DD210EAE9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
+	s=default; t=1741213372;
+	bh=RspJRdagYaj1rzMO5hoDvU2sJmUeCTW8jfbzZOY0F2Y=;
+	h=From:To:Cc:Subject:Date:From;
+	b=CsZWzDKfMEcmrtCScboHHLJ99xkVNZs5LGbbRLcz3M3GvXM3kNnUQdHUenXcPhbOd
+	 38yg/ix01irQ8Fi5+pUDDPFARc1X5x3GEd6HLh5JAPYx5eY2xmSxAEa017BYUjq0hy
+	 OUGoPH2/jRv8t0V9wtrag1HRwAeyrYtI4mJrUx+Q=
+From: longli@linuxonhyperv.com
+To: Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	Long Li <longli@microsoft.com>
+Subject: [patch rdma-next v4 1/2] net: mana: Change the function signature of mana_get_primary_netdev_rcu
+Date: Wed,  5 Mar 2025 14:22:39 -0800
+Message-Id: <1741213360-14567-1-git-send-email-longli@linuxonhyperv.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: Sergey Melnikov <melnikov.sergey.v@gmail.com>
-Date: Thu, 6 Mar 2025 01:20:28 +0300
-X-Gm-Features: AQ5f1Jp1mI1Q4wZQzLsKBldl9q3XvNL5P8vaVvtIVtTv_cTy7hEXw4Sfr_FVspk
-Message-ID: <CAD_cgaze+bbuMsY8BRuYksJEGKWjt2RsJVBhV_psMWxb84Fzaw@mail.gmail.com>
-Subject: Heavy tcp_send_ack in recvfrom syscall
-To: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+From: Long Li <longli@microsoft.com>
 
-I'm digging one issue(not sure if it's an issue and not sure how to
-fix this) with linux tcp stack. Our application receives a big number
-of small packets. Total network utilization isn't really big (dozens
-of Mbit/s). Platform: ubuntu 24, ENA-enabled AWS VM.
+Change mana_get_primary_netdev_rcu() to mana_get_primary_netdev(), and
+return the ndev with refcount held. The caller is responsible for dropping
+the refcount.
 
-I observe tcp_send_ack takes half of the whole 'recvfrom' cpu time
-(with callstacks to AWS ENA driver). Total recvfrom syscall takes
-approx 8.8% and tcp_send_ack is about 5% of the whole profile.
+Also drop the check for IFF_SLAVE as it is not necessary if the upper
+device is present.
 
-I tried to extend the sockets buffer with proper sysctl's
-(net.ipv4.tcp_wmem/net.ipv4.tcp_rmem) and got some improvements.
-Nevertheless, I still can't understand how to send ACKs less
-frequently and reduce CPU consumption and latency here.
+Signed-off-by: Long Li <longli@microsoft.com>
+---
+Changes
+v4: use netdev_hold()/netdev_put() and remove the check for IFF_SLAVE
 
-I've found the TCP_QUICKACK socket flag. According to man pages,
-disabling this flag will do exactly I need. Will it fix my issue with
-manu ACKs?
+ drivers/infiniband/hw/mana/device.c           |  7 +++----
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 20 +++++++++++--------
+ include/net/mana/mana.h                       |  2 +-
+ 3 files changed, 16 insertions(+), 13 deletions(-)
 
-Is there any ideas or advice on what to do and how to fix such an issue?
+diff --git a/drivers/infiniband/hw/mana/device.c b/drivers/infiniband/hw/mana/device.c
+index 3416a85f8738..2b4dd34a41ba 100644
+--- a/drivers/infiniband/hw/mana/device.c
++++ b/drivers/infiniband/hw/mana/device.c
+@@ -84,10 +84,8 @@ static int mana_ib_probe(struct auxiliary_device *adev,
+ 	dev->ib_dev.num_comp_vectors = mdev->gdma_context->max_num_queues;
+ 	dev->ib_dev.dev.parent = mdev->gdma_context->dev;
+ 
+-	rcu_read_lock(); /* required to get primary netdev */
+-	ndev = mana_get_primary_netdev_rcu(mc, 0);
++	ndev = mana_get_primary_netdev(mc, 0);
+ 	if (!ndev) {
+-		rcu_read_unlock();
+ 		ret = -ENODEV;
+ 		ibdev_err(&dev->ib_dev, "Failed to get netdev for IB port 1");
+ 		goto free_ib_device;
+@@ -95,7 +93,8 @@ static int mana_ib_probe(struct auxiliary_device *adev,
+ 	ether_addr_copy(mac_addr, ndev->dev_addr);
+ 	addrconf_addr_eui48((u8 *)&dev->ib_dev.node_guid, ndev->dev_addr);
+ 	ret = ib_device_set_netdev(&dev->ib_dev, ndev, 1);
+-	rcu_read_unlock();
++	/* mana_get_primary_netdev() returns ndev with refcount held */
++	netdev_put(ndev, NULL);
+ 	if (ret) {
+ 		ibdev_err(&dev->ib_dev, "Failed to set ib netdev, ret %d", ret);
+ 		goto free_ib_device;
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index aa1e47233fe5..a8e7f030c11b 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -3131,21 +3131,25 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+ 	kfree(ac);
+ }
+ 
+-struct net_device *mana_get_primary_netdev_rcu(struct mana_context *ac, u32 port_index)
++struct net_device *mana_get_primary_netdev(struct mana_context *ac, u32 port_index)
+ {
+ 	struct net_device *ndev;
+ 
+-	RCU_LOCKDEP_WARN(!rcu_read_lock_held(),
+-			 "Taking primary netdev without holding the RCU read lock");
+ 	if (port_index >= ac->num_ports)
+ 		return NULL;
+ 
+-	/* When mana is used in netvsc, the upper netdevice should be returned. */
+-	if (ac->ports[port_index]->flags & IFF_SLAVE)
+-		ndev = netdev_master_upper_dev_get_rcu(ac->ports[port_index]);
+-	else
++	rcu_read_lock();
++
++	/* If mana is used in netvsc, the upper netdevice should be returned. */
++	ndev = netdev_master_upper_dev_get_rcu(ac->ports[port_index]);
++
++	/* If there is no upper device, use the parent Ethernet device */
++	if (!ndev)
+ 		ndev = ac->ports[port_index];
+ 
++	netdev_hold(ndev, NULL, GFP_ATOMIC);
++	rcu_read_unlock();
++
+ 	return ndev;
+ }
+-EXPORT_SYMBOL_NS(mana_get_primary_netdev_rcu, "NET_MANA");
++EXPORT_SYMBOL_NS(mana_get_primary_netdev, "NET_MANA");
+diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+index 0d00b24eacaf..770359ce7d3b 100644
+--- a/include/net/mana/mana.h
++++ b/include/net/mana/mana.h
+@@ -827,5 +827,5 @@ int mana_cfg_vport(struct mana_port_context *apc, u32 protection_dom_id,
+ 		   u32 doorbell_pg_id);
+ void mana_uncfg_vport(struct mana_port_context *apc);
+ 
+-struct net_device *mana_get_primary_netdev_rcu(struct mana_context *ac, u32 port_index);
++struct net_device *mana_get_primary_netdev(struct mana_context *ac, u32 port_index);
+ #endif /* _MANA_H */
+-- 
+2.34.1
 
---Sergey
 
