@@ -1,79 +1,80 @@
-Return-Path: <netdev+bounces-171940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A492BA4F896
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 09:20:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 204E9A4F89A
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 09:21:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA0903A035B
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 08:20:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 620EE3A10BE
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 08:20:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34F451F4611;
-	Wed,  5 Mar 2025 08:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 591B91F4282;
+	Wed,  5 Mar 2025 08:21:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="EBExajNi"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Px+B9JqB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749EC1E5B9E
-	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 08:20:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ACD51DE8A5
+	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 08:20:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741162825; cv=none; b=sZx/N1vbnOq/QAHcpz8vp3o3872yhqZ+2cDJJasbtRxY6mi1T1gutth5plG7LGnNT9Inncc4Z2rhkTr0pCPS9K2hNOuHLdgFVp38BxBDzxdDbyIsqr1o99EGnSF5r1uymk9k8CdO/S38+4s1ndImFD5VYIgKlRdXu/SBWnCWs7k=
+	t=1741162860; cv=none; b=rHAC6SRcJSAjA0XdQ5Eo43TNy65pqogLBzhHnWAz23/YYix8mJza1rSq/lYan6PUnCRxAitdZeyleu5Y9V0IY7VkBNes/Zs18V21B0iQqQ+upHMp/8j4/1/CpC4sGAiuIY5dglBZx/CTCjke6X1fdYbJXzJ/tu9jBX0zWT0t97Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741162825; c=relaxed/simple;
-	bh=RWpWc+faJ0YZsTPx4jkXwG1vJYFHTnCeCj6HQ2ZWZ8Q=;
+	s=arc-20240116; t=1741162860; c=relaxed/simple;
+	bh=az709ctz3dT0WPp2vTzv787H0juge6K89/xhC/fTUCE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SiVO7ONyc+vniUsl668B534jSRB1+Ul385S0NgsBvdJMIiJoXObW40ONaK6E2ap7rIkpj7fycKzsCZXrGaYsvwM7O/pV1ehR2hWaK2fsy/xZZbOqgoS0Vz6BactflOjJGrOGOytvcIYzYoILFlWU15UxsisO7i3WjsBi1F07dco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=EBExajNi; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-abfe7b5fbe8so423939466b.0
-        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 00:20:23 -0800 (PST)
+	 In-Reply-To:Content-Type; b=f5n5dZy3oqVFfBccNSv/XkskUzQCr7Wfb6+5eTTixpBTaFw4ZbU54eM+Gh0Niem29Ymd2a6F1pICw+mmVQe37gAxnHLA+QIaLDdTJecHHwdgmGIZS5FiBGT4Cc8ZbhGJlJYZDMf255qBNZvPgDbFXjB2HNNLKhSv+e7agMR96HM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Px+B9JqB; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3910e101d0fso1982617f8f.2
+        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 00:20:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1741162822; x=1741767622; darn=vger.kernel.org;
+        d=suse.com; s=google; t=1741162856; x=1741767656; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=DZ9TMmWBCnKwhuUOANBJp50uacRGJFZ/d6Ba0SS8K6o=;
-        b=EBExajNiIM+RE21rykwHM8Hsryx+hZ2qs2w+FIHm/MFasRGdr1njjv4vx3ODuWMYVO
-         vvU5DVeUATrMUTl9K+fQqZayCq1QOjmmsuxXeTrFaSj2oc1zF5ytNjPfYkyZOCXDTzr/
-         do9YvSsbGQtq6r+sd+rfUPdK6vT+sPFZSriu8dZJZH6NlbGd4MhQah8y+/fDwp+iX0ye
-         ZAKPvazoHzAm7ZUmPdEAfG2gkd0ou5z8VXAtrlehL8/CKUxW/wV1fcd4Okw6swonSdkJ
-         /GKzzEADKyen3YR8wGmLDf0IWhG609nWsNx6kJEJobP4maE7jxqxnwGHWTCMLv2zr+b5
-         FPrw==
+        bh=WstflJwOKcHhDHAGRoeZWYR9qd28A8X/ITaM3cnKcLU=;
+        b=Px+B9JqBPzuiczU7hMBkKIINjhcmwR21t2u3lVTsMov1Q0BI+6IjPlAOK5I9FJ2y35
+         qEMRyJybv9xhzFynMfAU96T5Ey8QBNlexIYPUTY1ORRbHmpsXELsC3Uf1NPR9ZMADhc6
+         BSHa1ixZIRQ4Kb2VC5Hxmp9lWbm3VQ56e+m2ly5VPhB+YyuNr9fCstL4UiXrHVeFPGUy
+         o9zat2OcKcHbg7SfNfPz/IlSM2eYl0hxHzET0BFSIQ0iXKOLbLVFR6u5srZMgcXHJL3N
+         U1VlZuEyIJpbrhoKzKOK1WOM1PU9JajdPArWxswN/yz+mT+1UJ1jI7tBQHS9YNJzmnVd
+         L8EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741162822; x=1741767622;
+        d=1e100.net; s=20230601; t=1741162856; x=1741767656;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DZ9TMmWBCnKwhuUOANBJp50uacRGJFZ/d6Ba0SS8K6o=;
-        b=d4r1BGC6CHfhzhwOEDnqx/iai3p/nwdqTY8kYYWztAmB8+UepIAQf/TEjwRwLYeSjI
-         Bh26H6tdHCHcynZx93DbheFdVW+GCJEXyAHZf4dFOBwjWXUASQe0rj3OWJSlLEc+MdZm
-         5WEsxFLYAxRF9pdnRiXUBTwzpUfYF/cBMfn02vMUOM44jQ495WIBCZefCJ+uPhUd1b1L
-         MJdnC/iNI7tiKcJ2tJvtxIZc4hInIvn2O3NEEaPTOYCjbLQstZrjig8krdXslT4Y/Mni
-         YNz7e/m3f1Q+RXdrlFOOKsjVT4eG4ZWQj0WtnGuFZ/OYt36izK4la8jheHdZfFrAhYXa
-         ZIBA==
-X-Gm-Message-State: AOJu0YxNnd3ucRFMRanmBag8ginGKVdqIU6Fl2zA2L/WlLm1EA2c6h/W
-	93HietFb4LjZ+7VyIM+OrGUH3JNH4pmYrCWZEcfMcLXDJUhSl/g4Pb0kZEiNpZU=
-X-Gm-Gg: ASbGncsfwvuBY5+3MTQRgc64NNSXFtIx2yNBEz3fnvzVDMr3nsKpMvlmhga0GpJwlNK
-	UMyE80j04jy77BOjoRwt+E2mOX9U+E0rzocKJm53+CNq2RXTVBvHteV/DpDvLwoysE6LvQxuatM
-	7kij5kEzbiB5dpTeHfldSvRwxrDH2f9ZJ4HgDvfKL9wdt29e72OcTWAdjgjbc+5W8WCjDceu8N6
-	RxE6a+hjO39Hj2P66YZuXqyFksqLWpPr/dOI+As+J/iwTFgDtxAdSpDQ1NUSfttXuxxdF9a+TH+
-	uRE61XbtJG/onivALJsYO8bKFZYfZnzKER+WoP3+y+kUHMS82Wo7/iNyo4dH5CJzEJhKcJO91L3
-	R
-X-Google-Smtp-Source: AGHT+IG3uX4osOFdkeIE8BVoOkaHQ2eM06ismAlJEsM6OrJRVb5spjiMCAH7SqlSZ6VKBFc01zjVCQ==
-X-Received: by 2002:a05:6402:2714:b0:5dc:6e27:e6e8 with SMTP id 4fb4d7f45d1cf-5e59f47ced8mr4078134a12.24.1741162821234;
-        Wed, 05 Mar 2025 00:20:21 -0800 (PST)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abf3f3bbfb3sm845989066b.77.2025.03.05.00.20.19
+        bh=WstflJwOKcHhDHAGRoeZWYR9qd28A8X/ITaM3cnKcLU=;
+        b=koxLtdHvnOLyQEmBs3u0v1E6P5qiXF22VzPRFhB4STiczr7K2LQ256kFSIhNZdfody
+         Hk7XwoMxbbPrI/gN3lJSED6twPGP1qPLyd6ywzMwoNREQw5D/qiKehRPw0Iz+qh7NwhN
+         jwhqBUQ5/0/RwY6rYQLFbjikSI5BYWnvB1MVbK9R1YWei74CftcY7gNuS4SDMDHqkhYP
+         yHPIDmBu9/qRZtHnmLC9KRyktB0oUbhUU3nTMxsta8uPozKxFTGCz4vNUVXNz8twn09K
+         v7O7/ql2HAV6NGLme5+jd+7C6NEOGCB1xo+JPwKgefZBIUcfNwgws8ddSAUI1GVkiL87
+         GRTg==
+X-Forwarded-Encrypted: i=1; AJvYcCVPYQy/Y+1wCXEQUJ4pRfk2D8+JQGI6VQZIksso94D5SpiIO5OkrgcqwMSIwvDywlaIkAKuO6Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymuLbQG2zb9eFmPRuM8uH9+W0ClMhXT+2YyUoe9cedWNjOOdIA
+	CcNBnafZhFCpgbcF94UpJQMJ9cUgNdR6CDQszAVAEiFgGBw+BVEc/QbzZDWJDPg=
+X-Gm-Gg: ASbGnctysD0KJ4u9jxoaZdHGoukJoWAlfqEBTkF8a8Qqj+j+UO5ZrLYELTLaHxn3paq
+	5vqMQm/2ku511h2p8frYRrNThUBfBeQ3wIay1XvGkQ80kamjExL/r0evklO6Snr6O7KLhrZq3WF
+	AC/CvvIF/AdptaXRKi1QJmWdI5z2mDNEghW5oXWmEdPz9liFB+R/MQYpl37oCbnEubyDft1FKIv
+	MvRL9fXemTLgifBNgvlSWoVMUDfBqA5p4SmaxDFnG1vsBYaXw9jQcqbR5bTxYJItAnYFO9Raamr
+	5mAv0oOkjNxh3SGag7epkELB6Q5FnwPIq9B8JqfBMHzntf03+4Z+tbhSrPP25xhvWA+orDiL/qQ
+	qKvSwv+DuuA==
+X-Google-Smtp-Source: AGHT+IEAkj4nFKh5XmT6XTDGea5rdD5iNWGSoZ6uQmLsfSiyS4yVckbQm32RaOrZ0zLDfWxwkT/AOQ==
+X-Received: by 2002:a5d:6d06:0:b0:391:122c:8ab with SMTP id ffacd0b85a97d-3911f756724mr1275068f8f.22.1741162856237;
+        Wed, 05 Mar 2025 00:20:56 -0800 (PST)
+Received: from [192.168.178.47] (aftr-62-216-202-7.dynamic.mnet-online.de. [62.216.202.7])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390e4844adfsm20346370f8f.62.2025.03.05.00.20.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Mar 2025 00:20:20 -0800 (PST)
-Message-ID: <2690fc33-0646-4aff-aacf-2760706139e1@blackwall.org>
-Date: Wed, 5 Mar 2025 10:20:18 +0200
+        Wed, 05 Mar 2025 00:20:55 -0800 (PST)
+Message-ID: <f53b1403-3afd-43ff-a784-bdd22e3d24f8@suse.com>
+Date: Wed, 5 Mar 2025 09:20:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,48 +82,148 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 net-next 04/15] netfilter: bridge: Add conntrack double
- vlan and pppoe
-To: Eric Woudstra <ericwouds@gmail.com>,
- Michal Ostrowski <mostrows@earthlink.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>, Jiri Pirko <jiri@resnulli.us>,
- Ivan Vecera <ivecera@redhat.com>, Roopa Prabhu <roopa@nvidia.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Kuniyuki Iwashima <kuniyu@amazon.com>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Ahmed Zaki <ahmed.zaki@intel.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Vladimir Oltean <olteanv@gmail.com>,
- Frank Wunderlich <frank-w@public-files.de>,
- Daniel Golle <daniel@makrotopia.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- bridge@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, linux-hardening@vger.kernel.org,
- Kees Cook <kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>
-References: <20250228201533.23836-1-ericwouds@gmail.com>
- <20250228201533.23836-5-ericwouds@gmail.com>
+Subject: Re: Kernel oops with 6.14 when enabling TLS
+To: Vlastimil Babka <vbabka@suse.cz>, Hannes Reinecke <hare@suse.de>,
+ Matthew Wilcox <willy@infradead.org>
+Cc: Boris Pismenny <borisp@nvidia.com>,
+ John Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>,
+ "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+ "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+ linux-mm@kvack.org, Harry Yoo <harry.yoo@oracle.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <Z8XPYNw4BSAWPAWT@casper.infradead.org>
+ <edf65d4e-90f0-4b12-b04f-35e97974a36f@suse.cz>
+ <95b0b93b-3b27-4482-8965-01963cc8beb8@suse.cz>
+ <fcfa11c6-2738-4a2e-baa8-09fa8f79cbf3@suse.de>
+ <a466b577-6156-4501-9756-1e9960aa4891@suse.cz>
+ <6877dfb1-9f44-4023-bb6d-e7530d03e33c@suse.com>
+ <db1a4681-1882-4e0a-b96f-a793e8fffb56@suse.cz>
+ <Z8cm5bVJsbskj4kC@casper.infradead.org>
+ <a4bbf5a7-c931-4e22-bb47-3783e4adcd23@suse.com>
+ <Z8cv9VKka2KBnBKV@casper.infradead.org>
+ <Z8dA8l1NR-xmFWyq@casper.infradead.org>
+ <d9f4b78e-01d7-4d1d-8302-ed18d22754e4@suse.de>
+ <27111897-0b36-4d8c-8be9-4f8bdbae88b7@suse.cz>
 Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250228201533.23836-5-ericwouds@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Hannes Reinecke <hare@suse.com>
+In-Reply-To: <27111897-0b36-4d8c-8be9-4f8bdbae88b7@suse.cz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 2/28/25 22:15, Eric Woudstra wrote:
-> This adds the capability to conntrack 802.1ad, QinQ, PPPoE and PPPoE-in-Q
-> packets that are passing a bridge.
+On 3/4/25 20:44, Vlastimil Babka wrote:
+> On 3/4/25 20:39, Hannes Reinecke wrote:
+[ .. ]
+>>
+>> Good news and bad news ...
+>> Good news: TLS works again!
+>> Bad news: no errors.
 > 
-> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
-> ---
->  net/bridge/netfilter/nf_conntrack_bridge.c | 83 ++++++++++++++++++----
->  1 file changed, 71 insertions(+), 12 deletions(-)
->
+> Wait, did you add a WARN_ON_ONCE() to the put_page() as I suggested? If yes
+> and there was no error, it would have to be leaking the page. Or the path
+> uses folio_put() and we'd need to put the warning there.
+> 
+That triggers:
+[   42.364339] page dumped because: VM_WARN_ON_FOLIO(folio_test_slab(folio))
+[   42.364379] ------------[ cut here ]------------
+[   42.375500] WARNING: CPU: 0 PID: 236 at ./include/linux/mm.h:1564 
+sk_msg_free_elem+0x157/0x180
+[   42.375642] Modules linked in: tls(E) nvme_tcp(E) af_packet(E) 
+iscsi_ibft(E) iscsi_boot_sysfs(E) xfs(E) nls_iso8859_1(E) nls_cp437(E) 
+vfat(E) fat(E) iTCO_wdt(E) intel_pmc_bxt(E) intel_rapl_msr(E) 
+iTCO_vendor_support(E) intel_rapl_common(E) i2c_i801(E) bnxt_en(E) 
+i2c_mux(E) lpc_ich(E) mfd_core(E) i2c_smbus(E) virtio_balloon(E) 
+joydev(E) button(E) nvme_fabrics(E) nvme_keyring(E) nvme_core(E) fuse(E) 
+nvme_auth(E) efi_pstore(E) configfs(E) dmi_sysfs(E) ip_tables(E) 
+x_tables(E) hid_generic(E) usbhid(E) ahci(E) libahci(E) libata(E) 
+virtio_scsi(E) sd_mod(E) scsi_dh_emc(E) scsi_dh_rdac(E) scsi_dh_alua(E) 
+qxl(E) sg(E) ghash_clmulni_intel(E) xhci_pci(E) drm_client_lib(E) 
+drm_exec(E) drm_ttm_helper(E) sha512_ssse3(E) xhci_hcd(E) ttm(E) 
+sha256_ssse3(E) drm_kms_helper(E) scsi_mod(E) sha1_ssse3(E) usbcore(E) 
+scsi_common(E) drm(E) serio_raw(E) btrfs(E) blake2b_generic(E) xor(E) 
+raid6_pq(E) efivarfs(E) qemu_fw_cfg(E) virtio_rng(E) aesni_intel(E) 
+crypto_simd(E) cryptd(E)
+[   42.393292] CPU: 0 UID: 0 PID: 236 Comm: kworker/0:1H Kdump: loaded 
+Tainted: G            E      6.14.0-rc4-default+ #316 
+cadaa81909a6170d00e1f47f3fc0db03c6a03650
+[   42.393303] Tainted: [E]=UNSIGNED_MODULE
+[   42.393305] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 
+0.0.0 02/06/2015
+[   42.393310] Workqueue: nvme_tcp_wq nvme_tcp_io_work [nvme_tcp]
+[   42.393323] RIP: 0010:sk_msg_free_elem+0x157/0x180
+[   42.393331] Code: ff 48 c7 c6 d0 42 4f 82 48 89 ef e8 b3 63 8a ff 0f 
+0b 48 8d 6a ff e9 6c ff ff ff 48 c7 c6 a0 42 4f 82 48 89 ef e8 99 63 8a 
+ff <0f> 0b e9 c7 fe ff ff 2b 87 78 01 00 00 8b 97 c0 00 00 00 29 d0 ba
+[   42.393336] RSP: 0018:ffffc9000040b798 EFLAGS: 00010282
+[   42.393341] RAX: 000000000000003d RBX: ffff888110ab0858 RCX: 
+0000000000000027
+[   42.393344] RDX: 0000000000000000 RSI: 0000000000000002 RDI: 
+ffff88817f423748
+[   42.393347] RBP: ffffea0004295e00 R08: 0000000000000000 R09: 
+0000000000000001
+[   42.393350] R10: ffffc9000040b780 R11: ffffc9000040b4e0 R12: 
+0000000000000400
+[   42.393353] R13: ffff888110ab0818 R14: 0000000000000002 R15: 
+ffff88810fa669d8
+[   42.393361] FS:  0000000000000000(0000) GS:ffff88817f400000(0000) 
+knlGS:0000000000000000
+[   42.393365] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   42.393369] CR2: 00007f56a6ea6da4 CR3: 000000011bfc0000 CR4: 
+0000000000350ef0
+[   42.416071] Call Trace:
+[   42.416078]  <TASK>
+[   42.416084]  ? __warn+0x85/0x130
+[   42.416095]  ? sk_msg_free_elem+0x157/0x180
+[   42.418893]  ? report_bug+0xf8/0x1e0
+[   42.418904]  ? handle_bug+0x50/0xa0
+[   42.418910]  ? exc_invalid_op+0x13/0x60
+[   42.418916]  ? asm_exc_invalid_op+0x16/0x20
+[   42.418935]  ? sk_msg_free_elem+0x157/0x180
+[   42.423206]  ? sk_msg_free_elem+0x157/0x180
+[   42.423215]  __sk_msg_free+0x4f/0x100
+[   42.423224]  tls_tx_records+0x118/0x190 [tls 
+80cce2d02933ba636eb5845a829121ac309b44ed]
+[   42.426506]  bpf_exec_tx_verdict+0x249/0x5e0 [tls 
+80cce2d02933ba636eb5845a829121ac309b44ed]
+[   42.426519]  ? srso_return_thunk+0x5/0x5f
+[   42.426526]  ? __pfx_stack_trace_consume_entry+0x10/0x10
+[   42.426572]  tls_sw_sendmsg+0x72f/0x9f0 [tls 
+80cce2d02933ba636eb5845a829121ac309b44ed]
+[   42.432016]  __sock_sendmsg+0x98/0xc0
+[   42.432025]  sock_sendmsg+0x5c/0xa0
+[   42.432030]  ? srso_return_thunk+0x5/0x5f
+[   42.432034]  ? __sock_sendmsg+0x98/0xc0
+[   42.432040]  ? srso_return_thunk+0x5/0x5f
+[   42.436134]  ? sock_sendmsg+0x5c/0xa0
+[   42.436146]  nvme_tcp_try_send_data+0x13f/0x410 [nvme_tcp 
+9f4f1c84141d3edfcd3e478eb7c2fb638b4a92b3]
+[   42.436159]  ? srso_return_thunk+0x5/0x5f
+[   42.439452]  ? sched_balance_newidle+0x2f6/0x400
+[   42.439468]  nvme_tcp_try_send+0x299/0x330 [nvme_tcp 
+9f4f1c84141d3edfcd3e478eb7c2fb638b4a92b3]
+[   42.439479]  nvme_tcp_io_work+0x37/0xb0 [nvme_tcp 
+9f4f1c84141d3edfcd3e478eb7c2fb638b4a92b3]
+[   42.443603]  process_scheduled_works+0x97/0x400
+[   42.443614]  ? __pfx_worker_thread+0x10/0x10
+[   42.443619]  worker_thread+0x105/0x240
+[   42.443625]  ? __pfx_worker_thread+0x10/0x10
+[   42.443630]  kthread+0xec/0x200
+[   42.443639]  ? __pfx_kthread+0x10/0x10
+[   42.443646]  ret_from_fork+0x30/0x50
+[   42.443652]  ? __pfx_kthread+0x10/0x10
+[   42.443658]  ret_from_fork_asm+0x1a/0x30
+[   42.451127]  </TASK>
+[   42.451131] ---[ end trace 0000000000000000 ]---
 
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+Not surprisingly, though, as the original code did a get_page(), so
+there had to be a corresponding put_page() somewhere.
 
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.com                               +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
