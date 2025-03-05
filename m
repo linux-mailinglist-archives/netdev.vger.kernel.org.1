@@ -1,176 +1,264 @@
-Return-Path: <netdev+bounces-171962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A2BCA4FA78
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 10:43:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CEA3A4FA90
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 10:46:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4541B1891A90
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 09:43:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F42D3A95CF
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 09:46:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA480205ACB;
-	Wed,  5 Mar 2025 09:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94EA4202F99;
+	Wed,  5 Mar 2025 09:46:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sm84WtU1"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="jAP8dNVQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF8D205504
-	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 09:43:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC77F1F3D30;
+	Wed,  5 Mar 2025 09:46:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741167792; cv=none; b=a7ewKlBu6B8kQNVSLTIpRTPJ34gETVnrSIzvV6VxMeGDaZwnSqxi0Q2rTalomlfh0tGqW0OA6OzFDhBFo3Fi/c4qbGI5871bR8eXykE4WiUyS/rYdnSQsdr/LAOqHxw/MlLTudiWCGYUXjlPOPnyXaNN+rRimN0IpgMcYo2AQ7k=
+	t=1741168007; cv=none; b=DublnFlQfRieOtmwmupFQ9TlU5C+ucUVdfoml62B+d9H1s1ESsW5regxuIoDkFVYxJJ3pyl8oo54wWr+lCWITZh4Wj2JqMXHR/MeSs2/YJlz+MDW+TDpplF89mx3W9KRLNQLNBt4cT+VmbeWaruFZuNsF3wuLMPk+fJypgi6L58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741167792; c=relaxed/simple;
-	bh=imtuAnpaAXGOP6kzkiTdpwhJ9L3ewSs/OCqwVl5NK7E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dyL7rEL0M5Kc1l3wYHhaN5pLTJX8LhGVjZrAG/s7GA75qXo+pEEicOPsx2x8w4bfmrvSAqkHxe+Of08Y+Yp+kVOhCUQwLXPaRDB4Cb6532bW9mdkhFKmAgecLUe7s7lieaNOei3AonT6jdWcZ+AiC6Jvp+bjHt7Kkju+BXQwlPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sm84WtU1; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741167789;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vq2Dveu3Lu0iWioX9TM10BGhlOQ2RzAuJnxk7fM0ty0=;
-	b=Sm84WtU1vfKMjtm3CF5PkcE9qg/2rw7tKVCzLNP4uzI+Ka9b7gu1ZPYV/jtmICr0wVdWNE
-	b1JbnPO+YBt70wIeiz8H6EyD8du/jcmCQ4sALA2dAFlAzL7p4KodBU08kqTvBDKFOlrXCJ
-	/11AuQsawn+UoAnAtOzjK5DoLyraJ0c=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-199-NzjCE7R9OFanvqvA7pD0BA-1; Wed, 05 Mar 2025 04:43:05 -0500
-X-MC-Unique: NzjCE7R9OFanvqvA7pD0BA-1
-X-Mimecast-MFC-AGG-ID: NzjCE7R9OFanvqvA7pD0BA_1741167784
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-abb9b2831b7so71706066b.1
-        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 01:43:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741167783; x=1741772583;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vq2Dveu3Lu0iWioX9TM10BGhlOQ2RzAuJnxk7fM0ty0=;
-        b=QwrcM+ytvppqUs7rMozkIaI3dpAfrL9KLx2h8R8+1sQcwG7VsDYuhoqgvkGg8ogChj
-         lH82h4O3mXb0m9euiGfYbPg3RfC1KaVI1EWPVWJZb49oOUyxMILENbJHa2EF6l7SdiNv
-         KmnM1ljqPwDaUMpnAAFFIByX1MaJHAkACv/lhElpHFSjGlsg55IGopZgoLKSxyMU2RO7
-         XfKHDi/H1n99vPiQeMq5g8K8x17GqAJwmzEEbHhwOcgYhvjBqUyRmsX7eNECLOGsSkX5
-         3JkQc7SvnOTE2x1KS7SQ3Cuu7A93AXLNbRghTyg68H8K1QHQW5heBxXHf/HOFmlmKpLP
-         ySOA==
-X-Forwarded-Encrypted: i=1; AJvYcCWdrQuA+/vdQ0uk5EeU8TPaE9ZG7WIFw9qLcje2o9ZZE/NfnHkcgMdo9xtKMrfM4rMhfrw+wJI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyI1SkjjMNs00lgOgumCc4g60Pif93ZWVlUk2S7+7l8emHl0cs4
-	fhPHbLXH+JOZernnKb4Z7vuo0bqZG78Q5Mo/i0Lk6tVFp09xXlPiLtiDfXqUUHVlv5O7azm6KHd
-	6DNrrHgJdoqDFQv0xgUmlyolHlhfFktmUgHyaa6e7man79TNUEnI2//YuzBooQg==
-X-Gm-Gg: ASbGncsf8R5k8A8JbuZsBuHooYnxnClT4T/I8u8GEZPtnyuuh+BVR1hzehq9CRqBdE9
-	vLt1H+einJzwvMFqyxGxC66OocuoCZUbzgxU4DjDmuwnjHwtFWhLV7P0StfbSI/+QwcAHegHibX
-	f8b62DqorCSxPutorXS9jAxafjfMytPebI2Ok5oSCMYh2wb9GQaUWSsoYWb6Pi0HNYw9vTfftmY
-	Qilbpo9mIASeHqynoOexwKl0cxJjmdNsKErW5IGBY6zuU5HzBdDNzPWhI2HGTZ9mgH8V27nTuB6
-	vBR8V3pL2znEMKD+2NV9u7gfQSoQ8VN8rj25U8BLr1Lox+qMwG34h/0RFHOAaa4A
-X-Received: by 2002:a17:906:c148:b0:ac1:f247:69f5 with SMTP id a640c23a62f3a-ac20f0139aemr209685466b.28.1741167783281;
-        Wed, 05 Mar 2025 01:43:03 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG5B6S50i1HDHEaJU/jj+bI1k8KZTn2nF4k4C13v/0HHoQCH0wJ+1c900aMe64d5Ks6YGak+w==
-X-Received: by 2002:a17:906:c148:b0:ac1:f247:69f5 with SMTP id a640c23a62f3a-ac20f0139aemr209681866b.28.1741167782581;
-        Wed, 05 Mar 2025 01:43:02 -0800 (PST)
-Received: from sgarzare-redhat (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac21dd2c297sm28756566b.110.2025.03.05.01.43.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Mar 2025 01:43:02 -0800 (PST)
-Date: Wed, 5 Mar 2025 10:42:58 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Jorgen Hansen <jhansen@vmware.com>, 
-	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>, 
-	virtualization@lists.linux-foundation.org, linux-hyperv@vger.kernel.org, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Dexuan Cui <decui@microsoft.com>, 
-	Jakub Kicinski <kuba@kernel.org>
-Subject: Re: [PATCH net-next 0/3] vsock: support network namespace
-Message-ID: <cmkkkyzyo34pspkewbuthotojte4fcjrzqivjxxgi4agpw7bck@ddofpz3g77z7>
-References: <20200116172428.311437-1-sgarzare@redhat.com>
- <Z8eVanBR7r90FK7m@devvm6277.cco0.facebook.com>
+	s=arc-20240116; t=1741168007; c=relaxed/simple;
+	bh=FXfioV8CaRb4Kj7KM42BiGBBy9+db0YNett6CYn56Fs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ezNCdvOBBXyJ8PygjoFhMvTuStiyge3r0brHIIXB5D3UkrrudnWlOK7quYRYMPMbEYcfsfYIgGP1r0mq/EruRAvqQkbgHY6eJ+GZeVf1yvfj6/B13fA1haxgIUebCr4kCcg8CJ8vAbifyezHvxpBk6XyqHnsWvlVJhryVomMU+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=jAP8dNVQ; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5253vexe028541;
+	Wed, 5 Mar 2025 01:46:33 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=4XnuYIJ9q/vf3IyjBHXgo0K
+	gvgu4V7P4DYMXtFG23GI=; b=jAP8dNVQ8OE4R4LGlU1l9pue0RxBYMfNf1Svwu7
+	hCLb8aGBJDI+K7DHSqo/xqCFxNHMNDwSlvRvGcUG9NmJub0//rBb5fR+8B15PoRZ
+	YvL3Q0+wwuKoU5+ZpDvceVMbWz8gZreV0L0Wz5xQQKWhffCI4htOhJrCK01YGUYX
+	A/QxtyIkRdMDx1FwKn9qGTjXHnQkHJcbF1JCJHjJicilwhIFeLSrNxLW18fj0SR2
+	pRfyIMFMLAA1ua+VpZtvRhzQrRX5EoDxEEWRevz28zE54qH453RePHaRel8X5y/4
+	F83uhdNopvLNvnIo/tVIoaE5366QwrTp7ohfoE3lEJUXbzg==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 456f5tgk7x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Mar 2025 01:46:32 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Wed, 5 Mar 2025 01:46:31 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Wed, 5 Mar 2025 01:46:31 -0800
+Received: from hyd1425.marvell.com (unknown [10.29.37.152])
+	by maili.marvell.com (Postfix) with ESMTP id 2414B3F705C;
+	Wed,  5 Mar 2025 01:46:24 -0800 (PST)
+From: Sai Krishna <saikrishnag@marvell.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <sgoutham@marvell.com>,
+        <gakula@marvell.com>, <lcherian@marvell.com>, <jerinj@marvell.com>,
+        <hkelam@marvell.com>, <sbhatta@marvell.com>, <andrew+netdev@lunn.ch>,
+        <bbhushan2@marvell.com>, <nathan@kernel.org>,
+        <ndesaulniers@google.com>, <morbo@google.com>,
+        <justinstitt@google.com>, <llvm@lists.linux.dev>
+CC: Sai Krishna <saikrishnag@marvell.com>, kernel test robot <lkp@intel.com>
+Subject: [net-next PATCH v2] octeontx2-af: fix build warnings flagged by clang, sparse ,kernel test robot
+Date: Wed, 5 Mar 2025 15:16:23 +0530
+Message-ID: <20250305094623.2819994-1-saikrishnag@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <Z8eVanBR7r90FK7m@devvm6277.cco0.facebook.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: 6jqXsFNlzlCDwlEM9sofaMbTmMtiDIKX
+X-Authority-Analysis: v=2.4 cv=JtULrN4C c=1 sm=1 tr=0 ts=67c81d78 cx=c_pps a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17 a=Vs1iUdzkB0EA:10 a=VwQbUJbxAAAA:8 a=QyXUC8HyAAAA:8 a=M5GUcnROAAAA:8 a=mOT8R8ziQExDnPD9evEA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: 6jqXsFNlzlCDwlEM9sofaMbTmMtiDIKX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-05_03,2025-03-05_01,2024-11-22_01
 
-On Tue, Mar 04, 2025 at 04:06:02PM -0800, Bobby Eshleman wrote:
->On Thu, Jan 16, 2020 at 06:24:25PM +0100, Stefano Garzarella wrote:
->> RFC -> v1:
->>  * added 'netns' module param to vsock.ko to enable the
->>    network namespace support (disabled by default)
->>  * added 'vsock_net_eq()' to check the "net" assigned to a socket
->>    only when 'netns' support is enabled
->>
->> RFC: https://patchwork.ozlabs.org/cover/1202235/
->>
->> Now that we have multi-transport upstream, I started to take a look to
->> support network namespace in vsock.
->>
->> As we partially discussed in the multi-transport proposal [1], it could
->> be nice to support network namespace in vsock to reach the following
->> goals:
->> - isolate host applications from guest applications using the same ports
->>   with CID_ANY
->> - assign the same CID of VMs running in different network namespaces
->> - partition VMs between VMMs or at finer granularity
->>
->> This new feature is disabled by default, because it changes vsock's
->> behavior with network namespaces and could break existing applications.
->> It can be enabled with the new 'netns' module parameter of vsock.ko.
->>
->> This implementation provides the following behavior:
->> - packets received from the host (received by G2H transports) are
->>   assigned to the default netns (init_net)
->> - packets received from the guest (received by H2G - vhost-vsock) are
->>   assigned to the netns of the process that opens /dev/vhost-vsock
->>   (usually the VMM, qemu in my tests, opens the /dev/vhost-vsock)
->>     - for vmci I need some suggestions, because I don't know how to do
->>       and test the same in the vmci driver, for now vmci uses the
->>       init_net
->> - loopback packets are exchanged only in the same netns
->
->
->Hey Stefano,
->
->I recently picked up this series and am hoping to help update it / get
->it merged to address a known use case. I have some questions and
->thoughts (in other parts of this thread) and would love some
->suggestions!
+This cleanup patch avoids build warnings flagged by clang,
+sparse, kernel test robot.
 
-Great!
+Warning reported by clang:
+drivers/net/ethernet/marvell/octeontx2/af/rvu.c:2993:47:
+warning: arithmetic between different enumeration types
+('enum rvu_af_int_vec_e' and 'enum rvu_pf_int_vec_e')
+[-Wenum-enum-conversion]
+ 2993 | return (pfvf->msix.max >= RVU_AF_INT_VEC_CNT +
+RVU_PF_INT_VEC_CNT) &&
 
->
->I already have a local branch with this updated with skbs and using
->/dev/vhost-vsock-netns to opt-in the VM as per the discussion in this
->thread.
->
->One question: what is the behavior we expect from guest namespaces?  In
->v2, you mentioned prototyping a /dev/vsock ioctl() to define the
->namespace for the virtio-vsock device. This would mean only one
->namespace could use vsock in the guest? Do we want to make sure that our
->design makes it possible to support multiple namespaces in the future if
->the use case arrives?
+Reported-by: kernel test robot <lkp@intel.com>
+Closes:
+https://lore.kernel.org/oe-kbuild-all/202410221614.07o9QVjo-lkp@intel.com/
+Signed-off-by: Sai Krishna <saikrishnag@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/af/common.h |  2 +-
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.c    | 14 ++++++++------
+ .../ethernet/marvell/octeontx2/nic/otx2_common.c   | 10 +++++-----
+ .../net/ethernet/marvell/octeontx2/nic/otx2_pf.c   |  9 ++++-----
+ 4 files changed, 18 insertions(+), 17 deletions(-)
 
-Yes, I guess it makes sense that multiple namespaces can communicate 
-with the host and then use the virtio-vsock device!
-
-IIRC, the main use case here was also nested VMs. So a netns could be 
-used to isolate a nested VM in L1 and it may not need to talk to L0, so 
-the software in the L1 netns can use vsock, but only to talk to L2.
-
->
->More questions/comments in other parts of this thread.
-
-Sure, I'm happy to help with this effort with discussions/reviews!
-
-Stefano
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/common.h b/drivers/net/ethernet/marvell/octeontx2/af/common.h
+index 406c59100a35..8a08bebf08c2 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/common.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/common.h
+@@ -39,7 +39,7 @@ struct qmem {
+ 	void            *base;
+ 	dma_addr_t	iova;
+ 	int		alloc_sz;
+-	u16		entry_sz;
++	u32		entry_sz;
+ 	u8		align;
+ 	u32		qsize;
+ };
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+index cd0d7b7774f1..c850ea5d1960 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
+@@ -591,7 +591,7 @@ static void rvu_check_min_msix_vec(struct rvu *rvu, int nvecs, int pf, int vf)
+ 
+ check_pf:
+ 	if (pf == 0)
+-		min_vecs = RVU_AF_INT_VEC_CNT + RVU_PF_INT_VEC_CNT;
++		min_vecs = (int)RVU_AF_INT_VEC_CNT + (int)RVU_PF_INT_VEC_CNT;
+ 	else
+ 		min_vecs = RVU_PF_INT_VEC_CNT;
+ 
+@@ -819,13 +819,14 @@ static int rvu_fwdata_init(struct rvu *rvu)
+ 		goto fail;
+ 
+ 	BUILD_BUG_ON(offsetof(struct rvu_fwdata, cgx_fw_data) > FWDATA_CGX_LMAC_OFFSET);
+-	rvu->fwdata = ioremap_wc(fwdbase, sizeof(struct rvu_fwdata));
++	rvu->fwdata = (__force struct rvu_fwdata *)
++		ioremap_wc(fwdbase, sizeof(struct rvu_fwdata));
+ 	if (!rvu->fwdata)
+ 		goto fail;
+ 	if (!is_rvu_fwdata_valid(rvu)) {
+ 		dev_err(rvu->dev,
+ 			"Mismatch in 'fwdata' struct btw kernel and firmware\n");
+-		iounmap(rvu->fwdata);
++		iounmap((void __iomem *)rvu->fwdata);
+ 		rvu->fwdata = NULL;
+ 		return -EINVAL;
+ 	}
+@@ -838,7 +839,7 @@ static int rvu_fwdata_init(struct rvu *rvu)
+ static void rvu_fwdata_exit(struct rvu *rvu)
+ {
+ 	if (rvu->fwdata)
+-		iounmap(rvu->fwdata);
++		iounmap((void __iomem *)rvu->fwdata);
+ }
+ 
+ static int rvu_setup_nix_hw_resource(struct rvu *rvu, int blkaddr)
+@@ -2384,7 +2385,8 @@ static int rvu_get_mbox_regions(struct rvu *rvu, void **mbox_addr,
+ 				bar4 = rvupf_read64(rvu, RVU_PF_VF_BAR4_ADDR);
+ 				bar4 += region * MBOX_SIZE;
+ 			}
+-			mbox_addr[region] = (void *)ioremap_wc(bar4, MBOX_SIZE);
++			mbox_addr[region] = (__force void *)
++				ioremap_wc(bar4, MBOX_SIZE);
+ 			if (!mbox_addr[region])
+ 				goto error;
+ 		}
+@@ -2407,7 +2409,7 @@ static int rvu_get_mbox_regions(struct rvu *rvu, void **mbox_addr,
+ 					  RVU_AF_PF_BAR4_ADDR);
+ 			bar4 += region * MBOX_SIZE;
+ 		}
+-		mbox_addr[region] = (void *)ioremap_wc(bar4, MBOX_SIZE);
++		mbox_addr[region] = (__force void *)ioremap_wc(bar4, MBOX_SIZE);
+ 		if (!mbox_addr[region])
+ 			goto error;
+ 	}
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+index 2b49bfec7869..e0e592fd02f7 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+@@ -29,10 +29,10 @@ static void otx2_nix_rq_op_stats(struct queue_stats *stats,
+ 	u64 incr = (u64)qidx << 32;
+ 	u64 *ptr;
+ 
+-	ptr = (u64 *)otx2_get_regaddr(pfvf, NIX_LF_RQ_OP_OCTS);
++	ptr = (__force u64 *)otx2_get_regaddr(pfvf, NIX_LF_RQ_OP_OCTS);
+ 	stats->bytes = otx2_atomic64_add(incr, ptr);
+ 
+-	ptr = (u64 *)otx2_get_regaddr(pfvf, NIX_LF_RQ_OP_PKTS);
++	ptr = (__force u64 *)otx2_get_regaddr(pfvf, NIX_LF_RQ_OP_PKTS);
+ 	stats->pkts = otx2_atomic64_add(incr, ptr);
+ }
+ 
+@@ -42,10 +42,10 @@ static void otx2_nix_sq_op_stats(struct queue_stats *stats,
+ 	u64 incr = (u64)qidx << 32;
+ 	u64 *ptr;
+ 
+-	ptr = (u64 *)otx2_get_regaddr(pfvf, NIX_LF_SQ_OP_OCTS);
++	ptr = (__force u64 *)otx2_get_regaddr(pfvf, NIX_LF_SQ_OP_OCTS);
+ 	stats->bytes = otx2_atomic64_add(incr, ptr);
+ 
+-	ptr = (u64 *)otx2_get_regaddr(pfvf, NIX_LF_SQ_OP_PKTS);
++	ptr = (__force u64 *)otx2_get_regaddr(pfvf, NIX_LF_SQ_OP_PKTS);
+ 	stats->pkts = otx2_atomic64_add(incr, ptr);
+ }
+ 
+@@ -853,7 +853,7 @@ void otx2_sqb_flush(struct otx2_nic *pfvf)
+ 	struct otx2_snd_queue *sq;
+ 	u64 incr, *ptr, val;
+ 
+-	ptr = (u64 *)otx2_get_regaddr(pfvf, NIX_LF_SQ_OP_STATUS);
++	ptr = (__force u64 *)otx2_get_regaddr(pfvf, NIX_LF_SQ_OP_STATUS);
+ 	for (qidx = 0; qidx < otx2_get_total_tx_queues(pfvf); qidx++) {
+ 		sq = &pfvf->qset.sq[qidx];
+ 		if (!sq->sqb_ptrs)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index e1dde93e8af8..6c23d64e81f8 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -595,8 +595,7 @@ static int otx2_pfvf_mbox_init(struct otx2_nic *pf, int numvfs)
+ 		base = pci_resource_start(pf->pdev, PCI_MBOX_BAR_NUM) +
+ 		       MBOX_SIZE;
+ 	else
+-		base = readq((void __iomem *)((u64)pf->reg_base +
+-					      RVU_PF_VF_BAR4_ADDR));
++		base = readq(pf->reg_base + RVU_PF_VF_BAR4_ADDR);
+ 
+ 	hwbase = ioremap_wc(base, MBOX_SIZE * pf->total_vfs);
+ 	if (!hwbase) {
+@@ -645,7 +644,7 @@ static void otx2_pfvf_mbox_destroy(struct otx2_nic *pf)
+ 	}
+ 
+ 	if (mbox->mbox.hwbase)
+-		iounmap(mbox->mbox.hwbase);
++		iounmap((void __iomem *)mbox->mbox.hwbase);
+ 
+ 	otx2_mbox_destroy(&mbox->mbox);
+ }
+@@ -1309,7 +1308,7 @@ static irqreturn_t otx2_q_intr_handler(int irq, void *data)
+ 
+ 	/* CQ */
+ 	for (qidx = 0; qidx < pf->qset.cq_cnt; qidx++) {
+-		ptr = otx2_get_regaddr(pf, NIX_LF_CQ_OP_INT);
++		ptr = (__force u64 *)otx2_get_regaddr(pf, NIX_LF_CQ_OP_INT);
+ 		val = otx2_atomic64_add((qidx << 44), ptr);
+ 
+ 		otx2_write64(pf, NIX_LF_CQ_OP_INT, (qidx << 44) |
+@@ -1348,7 +1347,7 @@ static irqreturn_t otx2_q_intr_handler(int irq, void *data)
+ 		 * these are fatal errors.
+ 		 */
+ 
+-		ptr = otx2_get_regaddr(pf, NIX_LF_SQ_OP_INT);
++		ptr = (__force u64 *)otx2_get_regaddr(pf, NIX_LF_SQ_OP_INT);
+ 		val = otx2_atomic64_add((qidx << 44), ptr);
+ 		otx2_write64(pf, NIX_LF_SQ_OP_INT, (qidx << 44) |
+ 			     (val & NIX_SQINT_BITS));
+-- 
+2.25.1
 
 
