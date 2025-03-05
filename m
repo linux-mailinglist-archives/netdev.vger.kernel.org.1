@@ -1,179 +1,157 @@
-Return-Path: <netdev+bounces-171955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BBA3A4F9DE
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 10:24:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2961EA4F9D5
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 10:23:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5B7F16DAE2
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 09:24:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41FA518867EB
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 09:23:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15A3C20468E;
-	Wed,  5 Mar 2025 09:24:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C35F2045AC;
+	Wed,  5 Mar 2025 09:23:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="IdH9WHlI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H6hwbWbJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C15202969;
-	Wed,  5 Mar 2025 09:24:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F17202969
+	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 09:23:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741166645; cv=none; b=gqkguHY0iSZN3ETSPUCusyasuQB3+hAjLsDr8BBoMP1wYDyFm8fqQJggLdxzkCMih6XPwGxZwPNW1200OD4PigFIEcHSx0doy5E3ef1t/XBj3tbXMTr4X2otYC/oJ4qGDr/XishURLYCLOx5psZwFWbJee59K0ZKg6oA4UxhaVI=
+	t=1741166600; cv=none; b=eZKnaLqzpGV7P51SncOTh4Qmbwpj9MopLX0LQSiCXYlJi79NmxM5zO2XtVz8SEVDRw0/lrZiL2D/sseSIpkuRSn7gZqjovxKu7nAhQqma+9u2ImQtXy9qjQTkv6L32E21kHhytYs5bcZtH2fI1A3QtZFPzuDrgiJ7sUu4JI4+6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741166645; c=relaxed/simple;
-	bh=e9IpE0SGBvr7XdB1PmYTB+n+O/yPUsQGkJTr/yP4p20=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=NKj2Wun1gVzv3qMVxekwcSoNZ0ol35oJw+vL0MFfAm7KgvbSm/lsd7SeMfHwQx0IgzEy9NTmY2vEhBEojRlp4yfj5MmRzgc+ayCqdyhdCnNwJSRsWPZgua8Bu8f5JBcw1Lwu5hFSfYYCxlpNFeNoBti9Neap4f5n1k9UnNkCROY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=IdH9WHlI; arc=none smtp.client-ip=198.47.19.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 5259NFLA3262869
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 5 Mar 2025 03:23:15 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1741166595;
-	bh=Z5/W8wdKEN5TGq6ACfVJI7RQYE+f+XWAUXgCuHkULso=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=IdH9WHlIAXAT3d1R8hRkJzkWi8CWZL2syf2CHxChgi8SfA7NLD8s/AdPEfIXn3XHl
-	 jZKg9wPMq4FKO/RT6gpiLY8pcd1tjfW+pAfWyZq/Q+JAT+yEssjTQF7lyX+lR5fbDQ
-	 JhL4jrsqYPcdbeqpXT6n0b9p7fCiufEri48wcNbc=
-Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 5259NF0R048075
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 5 Mar 2025 03:23:15 -0600
-Received: from DLEE110.ent.ti.com (157.170.170.21) by DLEE113.ent.ti.com
- (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 5
- Mar 2025 03:23:14 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE110.ent.ti.com
- (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 5 Mar 2025 03:23:14 -0600
-Received: from [172.24.31.59] (lt9560gk3.dhcp.ti.com [172.24.31.59])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 5259N7TW044885;
-	Wed, 5 Mar 2025 03:23:08 -0600
-Message-ID: <fd989751-e7f6-40bb-a0bf-058c752cc7bc@ti.com>
-Date: Wed, 5 Mar 2025 14:53:07 +0530
+	s=arc-20240116; t=1741166600; c=relaxed/simple;
+	bh=+QfPm6bqrG0OcdOxhTC1BYzGGpBGfOp64hZJsZUGa8o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P8WpnX44E3LYw1SK8X/lQ1+6thDGVVRTsvptpduMUOZPpiaHjMbhKyyoQktEEOfEjeGXrXx+Io5RkxbcG6UYssGHuDwFR4pXeVnc/yX0SE2ldGVMa2A/JY75isIPORRVp574Kd1dylgTaxWFk1a04Sv+E3kEASOYFHWuoUV5YC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H6hwbWbJ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741166597;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7Fz/47DT/bcZQibct8BTl8FGEvkFXwI/p/JU2LZO+88=;
+	b=H6hwbWbJvRc76HNKQr1ncFfLpM5roA6dEbbpRKWURLBSpKbzmqw3SLtXU96DX24QKcZ/UI
+	S6I2+iyPatIuPtlA6XD1T3bcVeEP7BV3P667UPleGxaqk1M9HXAbti1hR2jDEhlKvhKHGh
+	IMZ0jQ1GJbQb7399rZmvqvxFdX1t6R8=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-481-mzbjl25TMguDrHG1-2aJCg-1; Wed, 05 Mar 2025 04:23:16 -0500
+X-MC-Unique: mzbjl25TMguDrHG1-2aJCg-1
+X-Mimecast-MFC-AGG-ID: mzbjl25TMguDrHG1-2aJCg_1741166595
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-5e54bade36dso3765881a12.2
+        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 01:23:15 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741166595; x=1741771395;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7Fz/47DT/bcZQibct8BTl8FGEvkFXwI/p/JU2LZO+88=;
+        b=v4gEsjjZ5mxxEiMdkCWHN4sKCv4nM10YAhGbfo5Y5IJUWqVCao7uiXmNe0T2d0b/Kf
+         zVF3Xv1TV9TjslaBmMm3CfKeDFrbI8HD305yQoXeHpFWGWghyDfSbHQJdsVaZ7BpfkGx
+         mLBhVY7AJ8SIKOhyZvPZHhIUYRA4/2ea0BtZEQAb+GGS1o1bG0gkcdnv+Tp0tJGquNaR
+         NGoyEaDwiYgL6OaB5AFnoleYeLL4mh4Omo4bVDTR/AbvrX1QGfa7Wm2nnsOFy3awC/uu
+         JQsLTOv6My5mG8cLq5fG1WR0B/L0OQXBCoR5S/hj/7aOzWW+uGsyNHFO3ypfiuDv0wHS
+         5u9A==
+X-Forwarded-Encrypted: i=1; AJvYcCUgAzkdQNWR8yDWVXD0hLrR2Lgfel+BXBaJw6Y+dbw4vQ23uuPmdvhfC54LxtnWvnB3q7Ib0es=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwysZldjdwjM6xdl+C8LEUl7dTRjTqc1jTXHCWMxz98YFTtNX44
+	8vv6c9pNDpr6NC0qWJ78DqJzhQbxEWj0xg0yp4JKpFx1uLqEZVwzwO2GwMtWoAHij5aoHxfAveX
+	e1lY1YLkm/MVq+BaeIlCX+QStsD6YwL3aJX8al0ya5wSNTO5lwGEIHQ==
+X-Gm-Gg: ASbGncsOdVJqVhgzYdKgVjlu5OZsyvKPxolWzNp3z2Yp28LhVoW0NpzZ9Ia/c5vAjWC
+	GUnozpn0+KaQOSzdJy2exhzEsjx9xny1sqv20jAViXj1qcK9qtmH9p+ER4gtqUo5PUOkFKFED9i
+	UzmQahfYakLVHem1bxF4etK2iVLh9uGgpFp5MQpPkZyx2XciWorYL5sgthaV200IYAmad6Sx/2a
+	kvDAGxv+IK1r7p6Iu38JCNhy7pBGgyvqb6Ag9epUuq4da4V7mRA1+iZGiyvtmh5W5dCvSS8AzIY
+	U2PobGVVwWpaHYijUM8g70ffBYmYt45IfKOlc7M1dKvvPMaIF++a0m+lRoM2VnTh
+X-Received: by 2002:a05:6402:5214:b0:5dc:8ed9:6bc3 with SMTP id 4fb4d7f45d1cf-5e59f467cd0mr2334229a12.26.1741166594695;
+        Wed, 05 Mar 2025 01:23:14 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFrT/jfbwSVjoA3FYJOR2RrQw1bBL1x20n/7XdsK3C0UVX0BQZe2DpbudtEjt/UHC5wEkkQDw==
+X-Received: by 2002:a05:6402:5214:b0:5dc:8ed9:6bc3 with SMTP id 4fb4d7f45d1cf-5e59f467cd0mr2334183a12.26.1741166593907;
+        Wed, 05 Mar 2025 01:23:13 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e4c3b4aa46sm9297702a12.1.2025.03.05.01.23.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Mar 2025 01:23:13 -0800 (PST)
+Date: Wed, 5 Mar 2025 10:23:08 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Jorgen Hansen <jhansen@vmware.com>, 
+	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>, 
+	virtualization@lists.linux-foundation.org, linux-hyperv@vger.kernel.org, Dexuan Cui <decui@microsoft.com>, 
+	Bobby Eshleman <bobbyeshleman@gmail.com>
+Subject: Re: [PATCH net-next 1/3] vsock: add network namespace support
+Message-ID: <CAGxU2F5C1kTN+z2XLwATvs9pGq0HAvXhKp6NUULos7O3uarjCA@mail.gmail.com>
+References: <20200116172428.311437-1-sgarzare@redhat.com>
+ <20200116172428.311437-2-sgarzare@redhat.com>
+ <20250305022900-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [EXTERNAL] Re: [PATCH net-next v3 3/3] net: ti: icssg-prueth: Add
- XDP support
-To: Dan Carpenter <dan.carpenter@linaro.org>
-CC: <rogerq@kernel.org>, <danishanwar@ti.com>, <pabeni@redhat.com>,
-        <kuba@kernel.org>, <edumazet@google.com>, <davem@davemloft.net>,
-        <andrew+netdev@lunn.ch>, <bpf@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <u.kleine-koenig@baylibre.com>,
-        <matthias.schiffer@ew.tq-group.com>, <schnelle@linux.ibm.com>,
-        <diogo.ivo@siemens.com>, <glaroque@baylibre.com>, <macro@orcam.me.uk>,
-        <john.fastabend@gmail.com>, <hawk@kernel.org>, <daniel@iogearbox.net>,
-        <ast@kernel.org>, <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>
-References: <20250224110102.1528552-1-m-malladi@ti.com>
- <20250224110102.1528552-4-m-malladi@ti.com>
- <d362a527-88cf-4cd5-a22f-7eeb938d4469@stanley.mountain>
- <21f21dfb-264b-4e01-9cb3-8d0133b5b31b@ti.com>
- <2c0c1a4f-95d4-40c9-9ede-6f92b173f05d@stanley.mountain>
- <40ce8ed3-b36c-4d5f-b75a-7e0409beb713@ti.com>
- <61117a07-35b5-48c0-93d9-f97db8e15503@stanley.mountain>
-Content-Language: en-US
-From: "Malladi, Meghana" <m-malladi@ti.com>
-In-Reply-To: <61117a07-35b5-48c0-93d9-f97db8e15503@stanley.mountain>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250305022900-mutt-send-email-mst@kernel.org>
 
-Hi Dan,
+On Wed, 5 Mar 2025 at 08:32, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Thu, Jan 16, 2020 at 06:24:26PM +0100, Stefano Garzarella wrote:
+> > This patch adds a check of the "net" assigned to a socket during
+> > the vsock_find_bound_socket() and vsock_find_connected_socket()
+> > to support network namespace, allowing to share the same address
+> > (cid, port) across different network namespaces.
+> >
+> > This patch adds 'netns' module param to enable this new feature
+> > (disabled by default), because it changes vsock's behavior with
+> > network namespaces and could break existing applications.
+> > G2H transports will use the default network namepsace (init_net).
+> > H2G transports can use different network namespace for different
+> > VMs.
+>
+>
+> I'm not sure I understand the usecase. Can you explain a bit more,
+> please?
 
-On 3/3/2025 7:38 PM, Dan Carpenter wrote:
-> What I mean is just compile the .o file with and without the unlikely(). 
-> $ md5sum drivers/net/ethernet/ti/icssg/icssg_common. o* 
-> 2de875935222b9ecd8483e61848c4fc9 drivers/net/ethernet/ti/icssg/ 
-> icssg_common. o. annotation 2de875935222b9ecd8483e61848c4fc9
-> ZjQcmQRYFpfptBannerStart
-> This message was sent from outside of Texas Instruments.
-> Do not click links or open attachments unless you recognize the source 
-> of this email and know the content is safe.
-> Report Suspicious
-> <https://us-phishalarm-ewt.proofpoint.com/EWT/v1/G3vK! 
-> uldq3TevVoc7KuXEXHnDf- 
-> TXtuZ0bON9iO0jTE7PyIS1jjfs_CzpvIiMi93PVt0MVDzjHGQSK__vY_-6rO7q86rFmBMGW4SSqK5pvNE$>
-> ZjQcmQRYFpfptBannerEnd
-> 
-> What I mean is just compile the .o file with and without the unlikely().
-> 
-> $ md5sum drivers/net/ethernet/ti/icssg/icssg_common.o*
-> 2de875935222b9ecd8483e61848c4fc9  drivers/net/ethernet/ti/icssg/icssg_common.o.annotation
-> 2de875935222b9ecd8483e61848c4fc9  drivers/net/ethernet/ti/icssg/icssg_common.o.no_anotation
-> 
-> Generally the rule is that you should leave likely/unlikely() annotations
-> out unless it's going to make a difference on a benchmark.  I'm not going
-> to jump down people's throat about this, and if you want to leave it,
-> it's fine.  But it just struct me as weird so that's why I commented on
-> it.
-> 
+It's been five years, but I'm trying!
+We are tracking this RFE here [1].
 
-I have done some performance tests to see if unlikely() is gonna make 
-any impact and I see around ~9000 pps and 6Mbps drop without unlikely() 
-for small packet sizes (60 Bytes)
+I also add Jakub in the thread with who I discussed last year a possible 
+restart of this effort, he could add more use cases.
 
-You can see summary of the tests here:
+The problem with vsock, host-side, currently is that if you launch a VM 
+with a virtio-vsock device (using vhost) inside a container (e.g., 
+Kata), so inside a network namespace, it is reachable from any other 
+container, whereas they would like some isolation. Also the CID is 
+shared among all, while they would like to reuse the same CID in 
+different namespaces.
 
-packet size   with unlikely(pps)  without unlikely(pps)   regression
+This has been partially solved with vhost-user-vsock, but it is 
+inconvenient to use sometimes because of the hybrid-vsock problem 
+(host-side vsock is remapped to AF_UNIX).
 
-       60        462377                453251                 9126
+Something from the cover letter of the series [2]:
 
-       80        403020                399372                 3648
+  As we partially discussed in the multi-transport proposal, it could
+  be nice to support network namespace in vsock to reach the following
+  goals:
+  - isolate host applications from guest applications using the same ports
+    with CID_ANY
+  - assign the same CID of VMs running in different network namespaces
+  - partition VMs between VMMs or at finer granularity
 
-       96        402059                396881                 5178
+Thanks,
+Stefano
 
-      120        392725                391312                 4413
-
-      140        327706                327099                 607
-
-packet size  with unlikely(Mbps)  without unlikely(Mbps)  regression
-
-      60         311                   305                    6
-
-      80         335                   332                    3
-
-      96         386                   381                    5
-
-      120        456                   451                    5
-
-      140        430                   429                    1
-
-For more details on the logs, please 
-refer:https://gist.github.com/MeghanaMalladiTI/cc6cc7709791376cb486eb1222de67be
-
-Regards,
-Meghana Malladi
-
-> regards,
-> dan carpenter
-> 
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
-> index 34d16e00c2ec..3db5bae44e61 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_common.c
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
-> @@ -672,7 +672,7 @@ static int emac_run_xdp(struct prueth_emac *emac, struct xdp_buff *xdp,
->   	case XDP_TX:
->   		/* Send packet to TX ring for immediate transmission */
->   		xdpf = xdp_convert_buff_to_frame(xdp);
-> -		if (unlikely(!xdpf))
-> +		if (!xdpf)
->   			goto drop;
->   
->   		q_idx = smp_processor_id() % emac->tx_ch_num;
-> 
+[1] https://gitlab.com/vsock/vsock/-/issues/2
+[2] https://lore.kernel.org/virtualization/20200116172428.311437-1-sgarzare@redhat.com/
 
 
