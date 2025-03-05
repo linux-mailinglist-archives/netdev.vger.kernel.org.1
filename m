@@ -1,156 +1,123 @@
-Return-Path: <netdev+bounces-172097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF003A50354
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 16:20:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81395A50359
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 16:23:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 183BE1659F9
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 15:20:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2994166324
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 15:23:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 557C024C668;
-	Wed,  5 Mar 2025 15:20:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BF382505BE;
+	Wed,  5 Mar 2025 15:22:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IzsGd4Um"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bxeMFU4x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEFAC24E005
-	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 15:20:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F6642505A7;
+	Wed,  5 Mar 2025 15:22:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741188050; cv=none; b=XIj67I77GKZqAk3+CxAPFz3YjBu1mPIvAU0y4kVJN3WKvuLmuRWFr12va2l2mF7Ltj8WLrC8iL9adx6eIAQdGJUlK8ODvdbVYPW0AvR2X278FjkxIkncJjs8LoM1KLVIIWODbcI6R9rwpA0CyErwhMA6kE0QCsYVyuTQ44bwHe0=
+	t=1741188171; cv=none; b=NSdSlryfri260iO/XyJhQ/n4yv9G1UuzkTZ83DmdBRfrYOIq7lA6+yIjzSaNL5Arw6E30VNgufd+Takb6ONVgb+JoOhAILsBkbwzXhP5y/alQAiAN3hrY2gqmgmxNVM/AhVRsPs8868hGfHatrJ4wTVQqEZDk7vaqTF54mk/3YY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741188050; c=relaxed/simple;
-	bh=OjjGO0yF/bVtFNrT/Leb1l19nlu7tpgmSaMDjQfq1G0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jCa80hVRLA4pllcilGKIYmszTq+phfgzSqDtO2d3XhcxPtHc9CCQBiOMvpMFoHJxDNbP7GFwoYbCw7C6qwB3/h78hR55CKbIwFxDu5xj1yyTScZ1zkPxtwRFj72pTf8u9GkRxqqv+aQtyYJCR7dLiGAvuxRwWuEa59Ox5gmijOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IzsGd4Um; arc=none smtp.client-ip=209.85.166.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-85517db52a2so121733739f.3
-        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 07:20:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741188048; x=1741792848; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jvK275tSXvHPQiLNK/xBGRs3h81JlRdlz9efQRemggA=;
-        b=IzsGd4UmlzFqGqJ9C2DkWEEBC8qWhluZM4gW9y+y3DVA5ZhZG8CLK9mhIVZxyZrfrr
-         fVhj27LoRR3fexUby3PSY4SB+lqo5W3lXqdRtN+xSe+6zYqsz7UFz7sIqfvWR2armjqd
-         uJvZt2SGJlvb2A3lhtb92ptweiq9hzV6FFtJ48jSsw5fRKtoJHfO2PmmTi33aOPy5M1X
-         kfhz00W6c/ZybaOsYS4/VIp9hyMehcLMIDUD5UG8ioENaZYKMwmcf8ZDzWgzYsCfGf2N
-         EDSEbuhH7eMEppdWStYNdKuKFYFvRsiBQtQMV31EjOuoojw1hjz7b4DpAA+PFB4ZN435
-         uvzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741188048; x=1741792848;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jvK275tSXvHPQiLNK/xBGRs3h81JlRdlz9efQRemggA=;
-        b=QB8kyxCle14aQRTpnfackAffnFgkV4NtrqrZoS9EK+TqGh2uF0KDuUs7g29QJwBqp5
-         4yBL4lefrH5cgWZlNWdtZrjq3RRiUPCxLhDRaLoVPsM3z4Lx3UZBsZv4fhbGJAQ5Qsdx
-         0N3kXTt6ZrpUVbnb6WWp5e3wihSDrq2SAdXj5GdS35E7cwXCRW0Gw21yitrQWrmu6nPX
-         hi8CV1uRGVBBDUhx5WEsJsjj9gcK/GNMo0NUlolIWLZ1E7xTPASQ9gx582fSNtfxu0r2
-         ion1V+XRaHDdE3ui0QrD8rZ1uJ/TsAMNgZo6e6/lqYE8xfozraIkW55miU7KAJ1UMxYi
-         R3BA==
-X-Gm-Message-State: AOJu0Yws6LuC8a95Pl8VywFsBjjgoXECk8n9jDy/0E+4eDwnnJa/2+8O
-	mfYyfnHaTOacCUFaZE69I+HSd4ADpy0nZDs7R7onDHUX7aOF5F96HAF1WYcbDQ/zrGYM2xSl21f
-	GjiGufCy4UFrUwyHkw6DzI0ovRxw=
-X-Gm-Gg: ASbGncsIGXsCSnWqOJXvyA3pSFFCjKX+t6l5zlt9lU7wqPBuBdf5Lsr6/P7lHw1xLW3
-	EktelvZ3RXREnJ32zSMaNcHlMIf7UkXgSS0TYsULtY6cLsNduq7vznpU5fxNY2XJPEwsh2rtsfq
-	6UrI/BWHkJ3aZ7jrSBPz9nA8lJNp27G3RK3zlVdm50+DhQ6YoVtEnHEyBULA==
-X-Google-Smtp-Source: AGHT+IHDfwG5mFdn4XwSs2pXmKCMUHKBKdrIgA+GVaKmhjqWUm9xb1+da0LC/1s7qe1EW+zlVMJq0r6uNKh0QL7UBj8=
-X-Received: by 2002:a05:6e02:1c89:b0:3d4:2305:a1bd with SMTP id
- e9e14a558f8ab-3d42b97561dmr39536725ab.15.1741188047659; Wed, 05 Mar 2025
- 07:20:47 -0800 (PST)
+	s=arc-20240116; t=1741188171; c=relaxed/simple;
+	bh=7ARoV0mOCny+qdLm8BP8VvPVb1WxjpYf0oKN/uahM7Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y+yHdA8UWHlBVRRGfy8yu65Cv1ct7mnxjYNPf7CWycY8e2wjAA+wOuxATLKG+66CT44TpQCyRNnEj5ftNQ4ibgKjb8+mbKldVGQgL/hnc+JPePND7SWeSygEon0PejzEI6nqsPmNa+RFcXyFm4ruzn58LI86sW20hV7LB9fUu54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bxeMFU4x; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEE6CC4CEE0;
+	Wed,  5 Mar 2025 15:22:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741188171;
+	bh=7ARoV0mOCny+qdLm8BP8VvPVb1WxjpYf0oKN/uahM7Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bxeMFU4xFAOlzjrDRB/Xevvr9QvieQ2JV6G3raREZIa1LHwkgPqxyqHJTEKtd7UOA
+	 rDDwRzyxVCmtcsZwbvLca1BtTPz/54mLxfRJ1bnLS30ASy+CsKeDgkrVOPickaaTat
+	 lRqL/9nyJR4VoAI13CBcgADARnNnxf4IKWL1v8bNQBiabzhHEq3IoMcdB0NXZ9QIGJ
+	 LU2Rs4R0VpIKVAtZstN7MP7BDhSazSCh80orIwtExq5vKkVPACPPgDrQSTB9aaKMuM
+	 DQcmur7tekh2kXncfJOjSz4f8y7vo+Y6cmjZWOxPJ+O9Jc4TJd7twd5SHfwtxUZujJ
+	 pKPcVipxmCkqg==
+Date: Wed, 5 Mar 2025 17:22:46 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
+	Aron Silverton <aron.silverton@oracle.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Daniel Vetter <daniel.vetter@ffwll.ch>,
+	Dave Jiang <dave.jiang@intel.com>, David Ahern <dsahern@kernel.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Itay Avraham <itayavr@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Leonid Bloch <lbloch@nvidia.com>, linux-cxl@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	"Nelson, Shannon" <shannon.nelson@amd.com>
+Subject: Re: [PATCH v5 0/8] Introduce fwctl subystem
+Message-ID: <20250305152246.GM1955273@unreal>
+References: <0-v5-642aa0c94070+4447f-fwctl_jgg@nvidia.com>
+ <20250303175358.4e9e0f78@kernel.org>
+ <20250304140036.GK133783@nvidia.com>
+ <20250304164203.38418211@kernel.org>
+ <20250305133254.GV133783@nvidia.com>
+ <mxw4ngjokr3vumdy5fp2wzxpocjkitputelmpaqo7ungxnhnxp@j4yn5tdz3ief>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <b7c05496f8ead33582eb561b55d3e2fcf25bcf36.1741108507.git.lucien.xin@gmail.com>
- <f7teczc70m1.fsf@redhat.com>
-In-Reply-To: <f7teczc70m1.fsf@redhat.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Wed, 5 Mar 2025 10:20:36 -0500
-X-Gm-Features: AQ5f1JpTHl8XUB74OVDSTrI0t1vF6D41I44nfMEskvUQfozGvmJKXQR82VXCUtE
-Message-ID: <CADvbK_c32VgdixBdCzVSpD5sptcoRzuD4NbxdxChLebWLiN85w@mail.gmail.com>
-Subject: Re: [ovs-dev] [PATCH net] openvswitch: avoid allocating labels_ext in ovs_ct_set_labels
-To: Aaron Conole <aconole@redhat.com>
-Cc: network dev <netdev@vger.kernel.org>, dev@openvswitch.org, ovs-dev@openvswitch.org, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Jianbo Liu <jianbol@nvidia.com>, 
-	Florian Westphal <fw@strlen.de>, Ilya Maximets <i.maximets@ovn.org>, Eric Dumazet <edumazet@google.com>, 
-	kuba@kernel.org, Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <mxw4ngjokr3vumdy5fp2wzxpocjkitputelmpaqo7ungxnhnxp@j4yn5tdz3ief>
 
-On Tue, Mar 4, 2025 at 8:00=E2=80=AFPM Aaron Conole <aconole@redhat.com> wr=
-ote:
->
-> Xin Long <lucien.xin@gmail.com> writes:
->
-> > Currently, ovs_ct_set_labels() is only called for *confirmed* conntrack
-> > entries (ct) within ovs_ct_commit(). However, if the conntrack entry
-> > does not have the labels_ext extension, attempting to allocate it in
-> > ovs_ct_get_conn_labels() for a confirmed entry triggers a warning in
-> > nf_ct_ext_add():
+On Wed, Mar 05, 2025 at 04:08:19PM +0100, Jiri Pirko wrote:
+> Wed, Mar 05, 2025 at 02:32:54PM +0100, jgg@nvidia.com wrote:
+> >On Tue, Mar 04, 2025 at 04:42:03PM -0800, Jakub Kicinski wrote:
+> >> On Tue, 4 Mar 2025 10:00:36 -0400 Jason Gunthorpe wrote:
+> >> > I never agreed to that formulation. I suggested that perhaps runtime
+> >> > configurations where netdev is the only driver using the HW could be
+> >> > disabled (ie a netdev exclusion, not a rdma inclusion).
+> >> 
+> >> I thought you were arguing that me opposing the addition was
+> >> "maintainer overreach". As in me telling other parts of the kernel
+> >> what is and isn't allowed. Do I not get a say what gets merged under
+> >> drivers/net/ now?
 > >
-> >   WARN_ON(nf_ct_is_confirmed(ct));
+> >The PCI core drivers are a shared resource jointly maintained by all
+> >the subsytems that use them. They are maintained by their respective
+> >maintainers. Saeed/etc in this case.
 > >
-> > This happens when the conntrack entry is created externally before OVS
-> > increases net->ct.labels_used. The issue has become more likely since
-> > commit fcb1aa5163b1 ("openvswitch: switch to per-action label counting
-> > in conntrack"), which switched to per-action label counting.
+> >It would be inappropriate for your preferences to supersede Saeed's
+> >when he is a maintainer of the mlx5_core driver and fwctl. Please try
+> >and get Saeed on board with your plan.
 > >
-> > To prevent this warning, this patch modifies ovs_ct_set_labels() to
-> > call nf_ct_labels_find() instead of ovs_ct_get_conn_labels() where
-> > it allocates the labels_ext if it does not exist, aligning its
-> > behavior with tcf_ct_act_set_labels().
-> >
-> > Fixes: fcb1aa5163b1 ("openvswitch: switch to per-action label counting =
-in conntrack")
-> > Reported-by: Jianbo Liu <jianbol@nvidia.com>
-> > Signed-off-by: Xin Long <lucien.xin@gmail.com>
-> > ---
->
-> Just a nit, but after this change, the only user of the
-> ovs_ct_get_conn_labels function is in the init path.  I think it might
-> make sense to also rename it to something like 'ovs_ct_init_labels_ext'.
-> Then hopefully it would be clear not to use it outside of the
-> initialization path.
-Right. If you're okay with it, I'd like to delete this function and
-directly use the following code in ovs_ct_init_labels():
+> >If the placement under drivers/net makes this confusing then we can
+> >certainly change the directory names.
+> 
+> According to how mlx5 driver is structured, and the rest of the advanced
+> drivers in the same area are becoming as well, it would make sense to me
+> to have mlx5 core in separate core directory, maintained directly by driver
+> maintainer:
+> drivers/core/mlx5/
+> then each of the protocol auxiliary device lands in appropriate
+> subsystem directory.
 
-cl =3D nf_ct_labels_find(ct);
-if (!cl) {
-        nf_ct_labels_ext_add(ct);
-        cl =3D nf_ct_labels_find(ct);
-}
+In my vision, the write access to that drivers/core/ will be given to all
+relevant subsystem maintainers, so it will operate like shared branch, but
+foe everyone.
 
-since the function was originally introduced for only those two places.
+It means that series for netdev that changes mlx5_core and netdev code
+will be sent to netdev and applied by netdev maintainers. In similar
+way, series which targets RDMA will be handled by RDMA crew.
 
-Thanks.
->
-> >  net/openvswitch/conntrack.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntrack.c
-> > index 3bb4810234aa..f13fbab4c942 100644
-> > --- a/net/openvswitch/conntrack.c
-> > +++ b/net/openvswitch/conntrack.c
-> > @@ -426,7 +426,7 @@ static int ovs_ct_set_labels(struct nf_conn *ct, st=
-ruct sw_flow_key *key,
-> >       struct nf_conn_labels *cl;
-> >       int err;
-> >
-> > -     cl =3D ovs_ct_get_conn_labels(ct);
-> > +     cl =3D nf_ct_labels_find(ct);
-> >       if (!cl)
-> >               return -ENOSPC;
->
+It will allow us to make sure that every piece of code in shared
+repository is actually used.
+
+Thanks
 
