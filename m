@@ -1,72 +1,88 @@
-Return-Path: <netdev+bounces-172177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF99CA508EF
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 19:13:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82D4EA508FB
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 19:13:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4011F1896F93
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 18:11:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1804D3A557E
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 18:12:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57D46250C1F;
-	Wed,  5 Mar 2025 18:11:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F1132517A0;
+	Wed,  5 Mar 2025 18:12:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="IgSfPWUc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dE7/sBHi"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DBE51A5BB7;
-	Wed,  5 Mar 2025 18:11:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00DD819C542;
+	Wed,  5 Mar 2025 18:12:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741198291; cv=none; b=LDycA0KUALhzwcKOMzdXM71xxJ1yaMSBC0ygR/clmb4RtDtq/aS9JqmhbPZI+gtsUekhQprCEW92vwF01C9nlulr5xV96AXNcFaF1ipveIrqeqcMYc1fVGdNuIcV+IpENNMT/VsdCvtS98fnA2tXqQmWpR1U/iFn/gbQD0SOQK0=
+	t=1741198367; cv=none; b=Zl24zFa5qe83ebPj7Yj+v6fjYCCc0mXP9jv/JhCyGFVI0H4Uh0kAk1uv6EAPjCJEg0QALJk3r9f1yFjeGYb2KOLdzTxFggSIF17Y0EyET6REJ88Z0FCtu3ZQTybRi8m8VnZ53S20L9aCF2ep7QacQB76Zg8zi1Zr2YxyZc0WY4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741198291; c=relaxed/simple;
-	bh=UjuZLI/CRuzq8axOLFU8jtZRJlqW6/cs+40UdtoOgro=;
+	s=arc-20240116; t=1741198367; c=relaxed/simple;
+	bh=hLSosc8ZGSMqBJmpjG+Zcp45IeQYgadpHS+5+HJNY54=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kvI5UJnnd5FBi1UM1oOSPlxRWba0xqd5frKQSRfqzpnhtciLVDK0hL1wcuKzC8HJex0v8ykd1aEsltq79NVC2T288ZgfOycODpADcrvey6EnNbzLPjOv3eGEQmJK9ZHQnlHiv0ykJQgN/LYomdEndJHz/4hYs1PRmQcuNuXNW8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=IgSfPWUc; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=F7TU3bjLM7Kk9wjHsOCNvuPzJqYTbP5q9iK8ewQzVcQ=; b=IgSfPWUcfV/nOKNGVnqs2/fVCy
-	s7dYvyuf7GrdM2LlrzACrgBe5KNPB0fXPHNxfHP0C+aKXPzRgZrSLvZGb7ueo/dfMa1fmPivOHie2
-	BRv5fC4REUKx0FFNE8GSVKE4gp9p/YMJQ6eO0QvaDhWredhqa7ZdDFjWmq+8EY+XmFsLg1VOfHtmC
-	sZMRS6Dt1ySdNKExAzX/DaNZupo6eUwej0n5v41ErZfsi5D9Y8BaBRT5H2P8rlqzf4jRnMnLgtush
-	fws/3jWYDIvOSn10BXc5Gbrc5fsaw8TYiI51R1FV1Y5ulwZoho820CotEXb0nQ3ClR62JhBoWsDMr
-	UUZLX4eg==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1tptDI-00000005zFf-1Ztk;
-	Wed, 05 Mar 2025 18:11:24 +0000
-Date: Wed, 5 Mar 2025 18:11:24 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Vlastimil Babka <vbabka@suse.cz>, Hannes Reinecke <hare@suse.com>,
-	Boris Pismenny <borisp@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	linux-mm@kvack.org, Harry Yoo <harry.yoo@oracle.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Networking people smell funny and make poor life choices
-Message-ID: <Z8iTzPRieLB7Ee-9@casper.infradead.org>
-References: <db1a4681-1882-4e0a-b96f-a793e8fffb56@suse.cz>
- <Z8cm5bVJsbskj4kC@casper.infradead.org>
- <a4bbf5a7-c931-4e22-bb47-3783e4adcd23@suse.com>
- <Z8cv9VKka2KBnBKV@casper.infradead.org>
- <Z8dA8l1NR-xmFWyq@casper.infradead.org>
- <d9f4b78e-01d7-4d1d-8302-ed18d22754e4@suse.de>
- <27111897-0b36-4d8c-8be9-4f8bdbae88b7@suse.cz>
- <f53b1403-3afd-43ff-a784-bdd22e3d24f8@suse.com>
- <d6e65c4c-a575-4389-a801-2ba40e1d25e1@suse.cz>
- <7439cb2f-6a97-494b-aa10-e9bebb218b58@suse.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=o4djamZfJ8W+wPldakfznybSSFRjCAPCBcQWiqaKMrmGN+UPSD64MAyJ1ijyPU3LFDueV+S9RyyD8albazvtehY8hU9IeFHelfeFHyEt9k1B1R2OXFZd2J3nOYGU3KJ3dY+2Rr9K5LVJXXJ8wY1IJ/RG5W2QtKRX/e2RNkEYzz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dE7/sBHi; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2febaaf175fso9552679a91.3;
+        Wed, 05 Mar 2025 10:12:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741198365; x=1741803165; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rxfu5Pa3zywwY6F0O+b5hEcYgMdoVIsyRsVhe+haQdo=;
+        b=dE7/sBHiEOhROs28aVyiqQ/Bkc+CYQ5iZpyaYwf0FsErG7OXIzh142qsreacY56GUo
+         zbhY6wz+GJktsAzNpzwbunZljAsSc3AjBL0Epfd2Qkcf0zv5cDx9zVfTKvjgJb74v5PM
+         XfZ4BuFLrWIw2ouS5C2JTQB8ERGUlcqsDAa6e/k98k0Tl6wODsFVFq7gfTq4CudbnTkm
+         uEQ8ZBRNzvFSD3JKvHcTPn0TvOZG6NC1jH4TLwnnx9zrVQ3+nw8fXBc68EDFLuIDrM/d
+         4sn/Om3Y2ASThlekFQ0J1w1fpNcXqrj8LzZ+CYudQMskvg9tN6o2fAn62DxTKml4ULse
+         QUcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741198365; x=1741803165;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rxfu5Pa3zywwY6F0O+b5hEcYgMdoVIsyRsVhe+haQdo=;
+        b=oo6o/JagPaC0Z4eoI9DLFd3Cr4Qsya0ftUkoZHMQUgFxE7HTrKzQMMyAXc0xz4rz3s
+         d4/OfDF0yuW8vTAZAl86HXoYV9y278fT2pP6DiquoBJTqHsC/Qhy+vMn35LBA9EE/h2t
+         YsssyTFnVn1ODkR+x0BXGJOjPVL5eYgbnMCuxSfIMM/GolxXFfxwaV+xjoPPhDOnNHQb
+         THzvkMpyZFxizRrD52qQ2+IBo72ZgeBWrtVJ2MJtFQ7/Jojgg2mKwInW0e+BWg2olcCl
+         jSILkU3E9COebKBxEIRmtnJtds8L4028EO/d36zCfvbh5xDH+Q2/uI/s7VP9kidCPJ82
+         bpTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUVOjGVSUPKt5vR/Zs9/crm3q/Aoh2xidwFizyBSjV+Sd1JzTS/4tpJFSccna66xyn9kNK1dxV+@vger.kernel.org, AJvYcCWE1NEXM5xC3z4hdROVuzP8SBnVHyEx7x29GZmQ/na4s2io9V+OHChGceXZphpyk0H6PUI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCGO3CuGcEz++BQaCNdqSf2rrIZ4JweVem10GlvJ8wZ1hDqcBw
+	0OunBA/Ltccd5/C2U7YK6p/Zio9gbsjUjsAiP4iWSgGxGPJ7nTk1
+X-Gm-Gg: ASbGncvu1jRSWo5/gx+KGE0q4msfZen+HDVeSVeD377K/6LzKrvxW6YYV7EQfJq6RdO
+	2hlrBGZblVknYYeXtBsNbTYHZ9VDK6IaXRN4eOzgDuqBm8PalMqgk0qE2Eb+Qzemb6bxYmxToWM
+	8Rn6bEMplJh6d689QT4VZ4ADiXfkozimcpFLnUQQndXbKebDVRHB55krpo9TMu/142ZleXt8W2P
+	ip8LvP4dBaqfnS/iRWwbUzD6HbxiRqPGOmX/EyqI3j1mwJJ8NT2J7lSrDidUhp51c04ew/490C7
+	OQoSkZrMx+wOupFrIhgsHhxpxM8bRyUWKU2BRWdZnniduOBl
+X-Google-Smtp-Source: AGHT+IFQZfgQX0YU6/unP7FdjSfq4UkGfCIq09eCJhs2cmYHBhhx/wUthBK9Wcx33K3kaI5ub8EJ2w==
+X-Received: by 2002:a05:6a20:734e:b0:1f3:2a1e:f6d3 with SMTP id adf61e73a8af0-1f3495c2795mr7695535637.41.1741198365159;
+        Wed, 05 Mar 2025 10:12:45 -0800 (PST)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-aee7ddf29f4sm12166147a12.11.2025.03.05.10.12.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Mar 2025 10:12:44 -0800 (PST)
+Date: Wed, 5 Mar 2025 10:12:43 -0800
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Dong Chenchen <dongchenchen2@huawei.com>
+Cc: edumazet@google.com, kuniyu@amazon.com, pabeni@redhat.com,
+	willemb@google.com, john.fastabend@gmail.com, jakub@cloudflare.com,
+	davem@davemloft.net, kuba@kernel.org, horms@kernel.org,
+	daniel@iogearbox.net, netdev@vger.kernel.org, bpf@vger.kernel.org,
+	zhangchangzhong@huawei.com, weiyongjun1@huawei.com
+Subject: Re: [PATCH net] bpf, sockmap: Restore sk_prot ops when psock is
+ removed from sockmap
+Message-ID: <Z8iUG8aTF9Kww09z@pop-os.localdomain>
+References: <20250305140234.2082644-1-dongchenchen2@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,30 +91,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7439cb2f-6a97-494b-aa10-e9bebb218b58@suse.de>
+In-Reply-To: <20250305140234.2082644-1-dongchenchen2@huawei.com>
 
-On Wed, Mar 05, 2025 at 12:43:02PM +0100, Hannes Reinecke wrote:
-> Oh, sure. But what annoys me: why do we have to care?
+On Wed, Mar 05, 2025 at 10:02:34PM +0800, Dong Chenchen wrote:
+> WARNING: CPU: 0 PID: 6558 at net/core/sock_map.c:1703 sock_map_close+0x3c4/0x480
+> Modules linked in:
+> CPU: 0 UID: 0 PID: 6558 Comm: syz-executor.14 Not tainted 6.14.0-rc5+ #238
+> RIP: 0010:sock_map_close+0x3c4/0x480
+> Call Trace:
+>  <TASK>
+>  inet_release+0x144/0x280
+>  __sock_release+0xb8/0x270
+>  sock_close+0x1e/0x30
+>  __fput+0x3c6/0xb30
+>  __fput_sync+0x7b/0x90
+>  __x64_sys_close+0x90/0x120
+>  do_syscall_64+0x5d/0x170
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
 > 
-> When doing I/O _all_ data is stuffed into bvecs via
-> bio_add_page(), and after that information about the
-> origin is lost; any iteration on the bio will be a bvec
-> iteration.
-> Previously we could just do a bvec iteration, get a reference
-> for each page, and start processing.
-> Now suddenly the caller has to check if it's a slab page and don't
-> get a reference for that. Not only that, he also has to remember
-> to _not_ drop the reference when he's done.
-> And, of course, tracing get_page() and the corresponding put_page()
-> calls through all the layers.
+> The root cause is:
+> sock_hash_update_common
+>   sock_map_unref
+>     sock_map_del_link
+>       psock->psock_update_sk_prot(sk, psock, false);
+> 	//false won't restore proto
+>     sk_psock_put
+>        rcu_assign_sk_user_data(sk, NULL);
+> inet_release
+>   sk->sk_prot->close
+>     sock_map_close
+>       WARN(sk->sk_prot->close == sock_map_close)
+> 
+> When psock is removed from sockmap, sock_map_del_link() still set
+> sk->sk_prot to bpf proto instead of restore it (for incorrect restore
+> value). sock release will triger warning of sock_map_close() for
+> recurse after psock drop.
 
-Networking needs to follow block's lead and STOP GETTING REFCOUNTS ON
-PAGES.  That will speed up networking (eliminates two atomic operations per
-page).  And of course, it will eliminate this hack in the MM.  I think
-we do need to put this hack into the MM for now, but it needs to go away
-again as quickly as possible.
+But sk_psock_drop() restores it with sk_psock_restore_proto() after the
+psock reference count goes to zero. So how could the above happen?
 
-What worries me is that nobody in networking has replied to this thread
-yet.  Do they not care?  Let's see if a subject line change will help
-with that.
+By the way, it would be perfect if you could add a test case for it 
+together with this patch (a followup patch is fine too).
+
+Thanks!
 
