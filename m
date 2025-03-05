@@ -1,55 +1,63 @@
-Return-Path: <netdev+bounces-172050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB3A7A50141
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 15:02:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FCDDA5014C
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 15:05:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC20216C8CE
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 14:02:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E88B3AD5DC
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 14:04:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11D7B153808;
-	Wed,  5 Mar 2025 14:02:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A01DE24A06B;
+	Wed,  5 Mar 2025 14:04:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="T/3BuNe3"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B769E2E3396;
-	Wed,  5 Mar 2025 14:02:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73C9624889C;
+	Wed,  5 Mar 2025 14:04:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741183376; cv=none; b=B++t/eIVI/gtre+c9TZyznknBARy3znmCY/1WU8Nrj8vTmjaZRa0SHOwQjhxNOrLrwWJnbl88ARKhgHQgOVas92fdpBUiFVCmD6B2qPJtnT87SzI2mIrjoSYXXLy5lVxiA/mmrw/apbGqcRzcaBGtDOzLJnPn+yzsc8kNizQbDY=
+	t=1741183460; cv=none; b=nUV+2R0Zw0qX8W7xVVeqIX2YTwfoSOwUu81BUCpVQWJ3y4Uj2wa0FQ0RXw41pSZMqRdz8bSbCjVtou5fPef6Cb0jghwpgNGIKAcafMn9h0qUOMUwI3XVT15ZQ7hkRDP4AvTVAFcf359OYChHGO3M0zgQszr27KX0JvJ5qxuCN+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741183376; c=relaxed/simple;
-	bh=AY+NuMNR5CWph1/BQWdAvt2+Lc3CjLK2QGXJEeGaN+s=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YyKx73vW7FaP/H6wFY3JzINF50AM4sIfC+LqlWQyGh+AiPxGYEwLGahXrz0EKuwPMGmoaUaGf2bSX85Sd/J7PiOCHc5BxgqyAR3NKPm9qZrHDcEfh/5wEBXldQn2SlcCHLssu37ki4R9bP/7PPhAlsS5tqDco5HI65821tiJY/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Z7Djh2ryhzpbV3;
-	Wed,  5 Mar 2025 22:01:12 +0800 (CST)
-Received: from kwepemd100023.china.huawei.com (unknown [7.221.188.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id 041C318009E;
-	Wed,  5 Mar 2025 22:02:43 +0800 (CST)
-Received: from localhost.localdomain (10.175.104.82) by
- kwepemd100023.china.huawei.com (7.221.188.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 5 Mar 2025 22:02:41 +0800
-From: Dong Chenchen <dongchenchen2@huawei.com>
-To: <edumazet@google.com>, <kuniyu@amazon.com>, <pabeni@redhat.com>,
-	<willemb@google.com>, <john.fastabend@gmail.com>, <jakub@cloudflare.com>,
-	<davem@davemloft.net>, <kuba@kernel.org>, <horms@kernel.org>,
-	<daniel@iogearbox.net>
-CC: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>,
-	<zhangchangzhong@huawei.com>, <weiyongjun1@huawei.com>, Dong Chenchen
-	<dongchenchen2@huawei.com>
-Subject: [PATCH net] bpf, sockmap: Restore sk_prot ops when psock is removed from sockmap
-Date: Wed, 5 Mar 2025 22:02:34 +0800
-Message-ID: <20250305140234.2082644-1-dongchenchen2@huawei.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1741183460; c=relaxed/simple;
+	bh=3vEK90u5yUilFjfu9msqGo89fE4x6gZyF1UTb9v8fVo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Pg+UWQqlsoJq3be2Ng5tUacphe6uSQmhdq02V99xXOvJt8ll0DcMFZdYNTZxP+rOz5AqE4grc1CsIHDca+grLrIUkolfnFJ0lEMH6AowpLRGY+jF8KmtYnV7I8xO2E3ZF5/rGPZswWNK9JTviGEdLFxZUo6Yg7lZyV3SdktVeAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=T/3BuNe3; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A2C22442DD;
+	Wed,  5 Mar 2025 14:04:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1741183455;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=G1CdmG3QbGEUiwGjNNacH2rJi6jSe8rrnhlrR1kFHds=;
+	b=T/3BuNe3Ae0+SSYulj6cTe1Ijv9VaB4HvtB5e/jGZzdImJ8u6lmS9Jqo6497a82ObEQXlH
+	lSfc92qglGAR8BUoQc0km9Ky5+juGPsJihdkcx+n+j0uzf2pkLIOTwpaF8r1qb0NqeUKNy
+	txC4eZaNYo+N/eOF90agkSiOqPotPdHV6pj3EIDofWYIKAQJdCkDD7UtIRJz9m5J/lRVO4
+	kICjy3koPVuwOM61lKVrm6Q13DNkE2+jkG8WkOPhxdAzEprOHv9ZJgwNqgXxlWjE7eDbQS
+	1XzuwWsJCbwTNanmMmzeEhIySEZ+FaSWHFlJSb5CyJbspYTE/lMz3uHJ+dmRfg==
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Kory Maincent <kory.maincent@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH net] net: ethtool: tsinfo: Fix dump command
+Date: Wed,  5 Mar 2025 15:03:52 +0100
+Message-Id: <20250305140352.1624543-1-kory.maincent@bootlin.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,65 +65,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemd100023.china.huawei.com (7.221.188.33)
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddutdehtdduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgedugedvkeelhfehfeeuieeigeetgeetuedugeetuddvveffieekgfejkefgudeknecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtrddrpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepuddtpdhrtghpthhtohepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmr
+ ghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhm
+X-GND-Sasl: kory.maincent@bootlin.com
 
-WARNING: CPU: 0 PID: 6558 at net/core/sock_map.c:1703 sock_map_close+0x3c4/0x480
-Modules linked in:
-CPU: 0 UID: 0 PID: 6558 Comm: syz-executor.14 Not tainted 6.14.0-rc5+ #238
-RIP: 0010:sock_map_close+0x3c4/0x480
-Call Trace:
- <TASK>
- inet_release+0x144/0x280
- __sock_release+0xb8/0x270
- sock_close+0x1e/0x30
- __fput+0x3c6/0xb30
- __fput_sync+0x7b/0x90
- __x64_sys_close+0x90/0x120
- do_syscall_64+0x5d/0x170
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
+Fix missing initialization of ts_info->phc_index in the dump command,
+which could cause a netdev interface to incorrectly display a PTP provider
+at index 0 instead of "none".
+Fix it by initializing the phc_index to -1.
 
-The root cause is:
-sock_hash_update_common
-  sock_map_unref
-    sock_map_del_link
-      psock->psock_update_sk_prot(sk, psock, false);
-	//false won't restore proto
-    sk_psock_put
-       rcu_assign_sk_user_data(sk, NULL);
-inet_release
-  sk->sk_prot->close
-    sock_map_close
-      WARN(sk->sk_prot->close == sock_map_close)
+In the same time, restore missing initialization of ts_info.cmd for the
+IOCTL case, as it was before the transition from ethnl_default_dumpit to
+custom ethnl_tsinfo_dumpit.
 
-When psock is removed from sockmap, sock_map_del_link() still set
-sk->sk_prot to bpf proto instead of restore it (for incorrect restore
-value). sock release will triger warning of sock_map_close() for
-recurse after psock drop.
-
-Set restore param of psock_update_sk_prot to true to fix the problem.
-
-Fixes: c0d95d3380ee ("bpf, sockmap: Re-evaluate proto ops when psock is removed from sockmap")
-Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
+Fixes: b9e3f7dc9ed95 ("net: ethtool: tsinfo: Enhance tsinfo to support several hwtstamp by net topology")
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
- net/core/sock_map.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/ethtool/tsinfo.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/core/sock_map.c b/net/core/sock_map.c
-index 82a14f131d00..10bc185ef103 100644
---- a/net/core/sock_map.c
-+++ b/net/core/sock_map.c
-@@ -171,7 +171,7 @@ static void sock_map_del_link(struct sock *sk,
- 			sk_psock_stop_verdict(sk, psock);
+diff --git a/net/ethtool/tsinfo.c b/net/ethtool/tsinfo.c
+index 691be6c445b38..9edc5dc30de88 100644
+--- a/net/ethtool/tsinfo.c
++++ b/net/ethtool/tsinfo.c
+@@ -291,6 +291,8 @@ static void *ethnl_tsinfo_prepare_dump(struct sk_buff *skb,
+ 	memset(reply_data, 0, sizeof(*reply_data));
+ 	reply_data->base.dev = dev;
+ 	memset(&reply_data->ts_info, 0, sizeof(reply_data->ts_info));
++	reply_data->ts_info.cmd = ETHTOOL_GET_TS_INFO;
++	reply_data->ts_info.phc_index = -1;
  
- 		if (psock->psock_update_sk_prot)
--			psock->psock_update_sk_prot(sk, psock, false);
-+			psock->psock_update_sk_prot(sk, psock, true);
- 		write_unlock_bh(&sk->sk_callback_lock);
- 	}
+ 	return ehdr;
  }
 -- 
-2.25.1
+2.34.1
 
 
