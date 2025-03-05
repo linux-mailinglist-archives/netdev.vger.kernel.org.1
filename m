@@ -1,242 +1,295 @@
-Return-Path: <netdev+bounces-172151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15525A505C7
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 17:56:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C6F5A505E2
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 18:03:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E303516883B
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 16:56:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 06DB07A2702
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 17:01:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F06B1A5BBF;
-	Wed,  5 Mar 2025 16:56:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C12641FCF4F;
+	Wed,  5 Mar 2025 17:02:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Yzct7SQR";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="dR6TGgq+"
+	dkim=pass (2048-bit key) header.d=arthurfabre.com header.i=@arthurfabre.com header.b="JPw8WTR9";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="SfllN+YQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
+Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B2A719F121;
-	Wed,  5 Mar 2025 16:56:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E02CB1ACEC6;
+	Wed,  5 Mar 2025 17:02:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741193778; cv=none; b=lGJU9khOsmbCHB40JxmWMEywycsINmknZv/LxVBeRiBvnwkDN2cEDpy71PHPbQhs2LTzLDEhPkHNQIEVDyINgxdr6KT2q1myPuB24rpWdWnVnp8k26/yaQOl5N8Nzh9bQ/fy8n2Td0oF8VwoTcgiCDUNWNHUjFiZz3Opq2zQr34=
+	t=1741194131; cv=none; b=pKH7hhmLvKiBJ26nGmusB1MDR6Rt/hIzfUyFTpZsa+pw/zpAISB7tUKx3QJMt47BAGx8EHebvhT59SIn53ZhJMw7S8c981GQ8FFWj6KdW+M6Yy1rJTM47aD3a41F6SGRLVgr81uQRFl1E1gsLL81mpKtxkS167Zp035RCLjh4G8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741193778; c=relaxed/simple;
-	bh=pFjGlaUijoqPn1Kmc47+HhxkWegOEgp2VbTb7ZtNzVg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BbLX4PhWsQfGPXD1l3eZl1lUUllsxRfvr2O2z1ay4wbuzMdVqNfZ3HRvrSF6XuopOs7XAPNi23wfxWwlm9bX6pRoKKnbnpY6/wVNZOXWwVk/ILscVK+ynt4fa8p8GIZEDRq8kCHV8+F1EQtHTmChIZwi03H1DSLBWbomRFxZRzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Yzct7SQR; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=dR6TGgq+; arc=none smtp.client-ip=103.168.172.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
-	by mailfout.phl.internal (Postfix) with ESMTP id 608601382772;
-	Wed,  5 Mar 2025 11:56:13 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Wed, 05 Mar 2025 11:56:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1741193773; x=
-	1741280173; bh=dvRtmvDZ8uVLZFz1wO6ModhsZOqhq2/vvtE8LfNaqVw=; b=Y
-	zct7SQRhPYK9aUCRlSXWyM3ay/lThP1Fqjbgz4RFWWGBtgv3hSD0o1gwS4pPTg/K
-	8CeQ9PIOFBrMPBeE0ADg2cIWseM8Jk3I/YZg7C8SZ/hLAw9D7FlSIZ2MW2xNTL43
-	0IYtolECdYCfzHS7hA2we0jztsRrSGLaIAkQIyTtZtcpaEjfR0zLGv5t2hrMoip3
-	WNppa2WrBB0Xo7x5ID0/bd9p88QqXt+EYlVVo+Ift3H1GnU4CeV4OdDFNcdLkQOY
-	b6Zh1KYr2pNbSaVJ9nRq6Q8j7B8Hw5KtNeobocFpbygR5nPdjpYVKd97y3W5OeLE
-	IBwvBYBRXhYbHuxUXdm0Q==
+	s=arc-20240116; t=1741194131; c=relaxed/simple;
+	bh=xxTUT3hdMOyAGgiz5DA93BGgJAJirNzILMlaS1W1R3U=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=PL6N3LyHlcGB5VMDq8+EjYWKbGYMIciQHa34yWCUx3cCK5e+Rw8iQpadxGwcNUfT8pJtD4rnA0rcQ9Ir8NiOlUJ5hXrvb3sJfjFzMPT3sJNoIn8X0BQEYvDwDACnUVHe/r7yjYioKDPC1Xl5QlKO61XEWIFCGDT4MzbaHwzD1o0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arthurfabre.com; spf=pass smtp.mailfrom=arthurfabre.com; dkim=pass (2048-bit key) header.d=arthurfabre.com header.i=@arthurfabre.com header.b=JPw8WTR9; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=SfllN+YQ; arc=none smtp.client-ip=103.168.172.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arthurfabre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arthurfabre.com
+Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id D5B4E11401D9;
+	Wed,  5 Mar 2025 12:02:07 -0500 (EST)
+Received: from phl-imap-13 ([10.202.2.103])
+  by phl-compute-09.internal (MEProxy); Wed, 05 Mar 2025 12:02:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arthurfabre.com;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm3;
+	 t=1741194127; x=1741280527; bh=g8axi8rrbBC3EqxPS9kqsfgotXviAvz6
+	BbePmttxIBQ=; b=JPw8WTR94I3C1QaZHJL4bH4ZhJQrgtznvILvT9t+WwWwxwFh
+	fM7d5GdKCtT5+K2kGzQK9MPHjAz+qLU7bBqvMTMx6dB2rnU1Ep5JlScN9QNrwyzn
+	bxdEBRix+tXGSHeQPwQ/f2XceK1UtN7ykIhsi2csW4TdmPnxDp24W4b/Ey65oNh8
+	d+aPSCqyLbCLyaikrANComgIJX7ZiNROwxqLQbQyPvrvZMJEMF5T9I+L+2vytoXa
+	8OZY8M8tUIT7slXfpPQAtoh86K/Ne1sT2vWkraeX2VkAOP1hKIea+eyD6+enNdal
+	fVLKQgsQplZeW8kG7J9n2smYeDYvwv3FAeJEvw==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1741193773; x=1741280173; bh=dvRtmvDZ8uVLZFz1wO6ModhsZOqhq2/vvtE
-	8LfNaqVw=; b=dR6TGgq+uuIK13VRZVMmd1mJUEmg8aeIky/FpOx4AJVEZ3N5Nfu
-	AdU0JAjYH+2PV39pq3/ryDcKkzWbWmdh8vQKNfhulMQv8laxccDK+UGJ7vL6aACj
-	BKC9td/RRNnQ2eqZZhnfCVMVM6ULADrm672TkAIYJXVDXC1D7UT2YlA4Dlpt6kf4
-	rzMIurOHObveQI7Ju9IQMGqbAnPdgUELQ1yj/x/gGTxEtcHGynboChAHdvUXM6Sw
-	S3RqKN5COP8+kNBBC3QBk18divbzcL1h0j5S2BwIQdBQGHHznbnzn6SV4G/vJ7xO
-	ekVPHoI9hHpRVKA4ctNavTgNrfXRt3Dbs3w==
-X-ME-Sender: <xms:LILIZ2BIkp7Yv9wO9eSFfv7ocOOXmzuSTNVx0Hb-aktPS0oPT1do4g>
-    <xme:LILIZwgtxTEyjGbgHZefffO6qC6Acw4WKW8HoJhO6llG2Azoei51o2Qgndrvar7NH
-    ThgAXxvljkLQlAL2cY>
-X-ME-Received: <xmr:LILIZ5m0KcJUqxcb-Nszp31M7t49qYxLl16vecy5djlXziCcS_rbEAFEcAds>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddutdehfeeiucetufdoteggodetrf
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1741194127; x=
+	1741280527; bh=g8axi8rrbBC3EqxPS9kqsfgotXviAvz6BbePmttxIBQ=; b=S
+	fllN+YQ7ADeVZBHBXAF6tALWxeromUav8EiXdn5pMWET8VdDVDWYrfw6awF8eO/F
+	+w+XnrfbOdgY2YJgemhXLWeU34esc1jj4tIATi7lk7AAVfmqJhLSkTYVMoPjyg1Q
+	uWLzvXeq+pGCYgQpKbIoOP+scwWfM4sCS8nOR/ZvQ2LsDQV+3mVFHK0n88xsaI61
+	VvH7shHLPnf+wR/YgCc1OY9cWhhDoIcixW9qLjKsWJBj426Y2SI44djCU4g6cFLo
+	BUle2sDQLRusoiKggnZlXocblPWU+CogxU/oGF5j0Z6c0MlwBRoiI6cWjSy/bZ8N
+	DlGufTYJANoxGfYUJKAjg==
+X-ME-Sender: <xms:j4PIZ5wHKTFPhT04kagaxSpnbSfgaWg8V2_ZKlYakCIETePFgdVdHg>
+    <xme:j4PIZ5SBFF-dFTUUPaBZrAEZr37ctDAT0vxgM7sH4BjYYcZ-teXX0WU6BIJKev-9C
+    M7v9bALaXOlgAGUtlk>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddutdehfeekucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
     pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
-    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
-    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdef
-    hfekgeetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhn
-    sggprhgtphhtthhopedufedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnth
-    honhhiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghr
-    rdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrd
-    gtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehp
-    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepughonhgrlhgurdhhuhhnth
-    gvrhesghhmrghilhdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhr
-    ghdprhgtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdprhgtph
-    htthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghh
-X-ME-Proxy: <xmx:LYLIZ0zH8pM7HJtjgVCz1eJ4hljheABm4oJSzAHXJD6seq-fBsTIug>
-    <xmx:LYLIZ7TnwPvNvDYOTwRVrMxU6hK1CJaNXsd3iYF-cLRHyiw9HTDU6g>
-    <xmx:LYLIZ_b7JLRBPbn_dYpfXbdtwIA8Y-X9AJOfHHYAQbWTBHVOyZEFZA>
-    <xmx:LYLIZ0Tdg_v5BDTiK3O9DIlqyAbDNh0DMHJYpA8a_PTPxhxUAmCVqg>
-    <xmx:LYLIZ5DKeQIBdV-8gXN2Osc-r9wGkOq42FupaBwE8C445zVIsN1lMNS->
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 5 Mar 2025 11:56:12 -0500 (EST)
-Date: Wed, 5 Mar 2025 17:56:10 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-Subject: Re: [PATCH v21 18/24] ovpn: add support for peer floating
-Message-ID: <Z8iCKvIfFaskshlz@hog>
-References: <20250304-b4-ovpn-tmp-v21-0-d3cbb74bb581@openvpn.net>
- <20250304-b4-ovpn-tmp-v21-18-d3cbb74bb581@openvpn.net>
- <Z8dIXjwZ3QmiEcd-@hog>
- <9c919407-fb91-48d7-bf2d-8437c2f3f4da@openvpn.net>
- <Z8gzbz6YjdeGPqgu@hog>
- <cd9df084-8633-49f0-a851-ed2b1c9946d3@openvpn.net>
+    gvnhhtshculddquddttddmnecujfgurhepofgggfgtfffkvefuhffvofhfjgesthhqredt
+    redtjeenucfhrhhomhepfdetrhhthhhurhcuhfgrsghrvgdfuceorghrthhhuhhrsegrrh
+    hthhhurhhfrggsrhgvrdgtohhmqeenucggtffrrghtthgvrhhnpefhfeejgefhhffhveel
+    teehhfffheffvdettdelgfeltefhteelveeuffetfffgjeenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhthhhurhesrghrthhhuhhrfhgr
+    sghrvgdrtghomhdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhpohhuthdprh
+    gtphhtthhopegrfhgrsghrvgestghlohhuughflhgrrhgvrdgtohhmpdhrtghpthhtohep
+    jhgrkhhusgestghlohhuughflhgrrhgvrdgtohhmpdhrtghpthhtohepjhgsrhgrnhguvg
+    gsuhhrghestghlohhuughflhgrrhgvrdgtohhmpdhrtghpthhtohephigrnhestghlohhu
+    ughflhgrrhgvrdgtohhmpdhrtghpthhtoheprghlvghkshgrnhguvghrrdhlohgsrghkih
+    hnsehinhhtvghlrdgtohhmpdhrtghpthhtohephhgrfihksehkvghrnhgvlhdrohhrghdp
+    rhgtphhtthhopehlsghirghntghonhesrhgvughhrghtrdgtohhmpdhrtghpthhtohepth
+    hhohhilhgrnhgusehrvgguhhgrthdrtghomhdprhgtphhtthhopegsphhfsehvghgvrhdr
+    khgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:j4PIZzV89qtzO87Bz9enGTCvmjFG1aic1mMl705fiJp15DPTTpPqJA>
+    <xmx:j4PIZ7jsSWckxGOPvbtxPbBE2psqHbFhB1SA2lRprCxG4rgRp0EkKA>
+    <xmx:j4PIZ7DeCmvrEdPvZXOk9JimkUnxW63U1dlz3bBwjweClklC2K3jYQ>
+    <xmx:j4PIZ0KN2cL3gMqKKenFSP6hCcX6gP7_nh4eOkPnNILvESok4UJbDg>
+    <xmx:j4PIZ3urEy5ldaKfhmlcEL2uwTA3ZSIdEevHAtZrU31isxFmkwZ0FI7Q>
+Feedback-ID: i9179493c:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 34AB61F00083; Wed,  5 Mar 2025 12:02:07 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <cd9df084-8633-49f0-a851-ed2b1c9946d3@openvpn.net>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 05 Mar 2025 18:02:06 +0100
+Message-Id: <D88HSZ3GZZNN.160YSWHX1HIO2@arthurfabre.com>
+Cc: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>, <jakub@cloudflare.com>,
+ <hawk@kernel.org>, <yan@cloudflare.com>, <jbrandeburg@cloudflare.com>,
+ <thoiland@redhat.com>, <lbiancon@redhat.com>, "Arthur Fabre"
+ <afabre@cloudflare.com>
+Subject: Re: [PATCH RFC bpf-next 07/20] xdp: Track if metadata is supported
+ in xdp_frame <> xdp_buff conversions
+From: "Arthur Fabre" <arthur@arthurfabre.com>
+To: "Alexander Lobakin" <aleksander.lobakin@intel.com>
+X-Mailer: aerc 0.17.0
+References: <20250305-afabre-traits-010-rfc2-v1-0-d0ecfb869797@cloudflare.com> <20250305-afabre-traits-010-rfc2-v1-7-d0ecfb869797@cloudflare.com> <bc356c91-5bff-454a-8f87-7415cb7e82b4@intel.com>
+In-Reply-To: <bc356c91-5bff-454a-8f87-7415cb7e82b4@intel.com>
 
-2025-03-05, 14:14:36 +0100, Antonio Quartulli wrote:
-> On 05/03/2025 12:20, Sabrina Dubroca wrote:
-> > 2025-03-05, 00:19:32 +0100, Antonio Quartulli wrote:
-> > > On 04/03/2025 19:37, Sabrina Dubroca wrote:
-> > > > 2025-03-04, 01:33:48 +0100, Antonio Quartulli wrote:
-> > > > > A peer connected via UDP may change its IP address without reconnecting
-> > > > > (float).
-> > > > 
-> > > > Should that trigger a reset of the peer->dst_cache? And same when
-> > > > userspace updates the remote address? Otherwise it seems we could be
-> > > > stuck with a cached dst that cannot reach the peer.
-> > > 
-> > > Yeah, that make sense, otherwise ovpn_udpX_output would just try over and
-> > > over to re-use the cached source address (unless it becomes unavailable).
-> > 
-> > Not just the source address, the routing entry too. I'm more concerned
-> > about that: trying to reuse a a cached routing entry that was good for
-> > the previous remote address, but not for the new one.
-> > 
-> > 
-> > [adding your next email]
-> > > I spent some more time thinking about this.
-> > > It makes sense to reset the dst cache when the local address changes, but
-> > > not in case of float (remote address changed).
-> > > 
-> > > That's because we always want to first attempt sending packets using the
-> > > address where the remote peer sent the traffic to.
-> > > Should that not work (quite rare), then we have code in ovpn_udpX_output
-> > > that will reset the cache and attempt a different address.
-> > 
-> > I don't think the code in ovpn_udpX_output will reset the cache unless
-> > it was made invalid by a system-wide routing table update (see
-> > dst_cache_per_cpu_get).
-> > 
-> > 	rt = dst_cache_get_ip4(cache, &fl.saddr);
-> > 	if (rt)
-> > 		goto transmit;
-> > ...
-> > transmit:
-> > 	udp_tunnel_xmit_skb(rt, sk, skb, fl.saddr, fl.daddr, 0,
-> > 			    ip4_dst_hoplimit(&rt->dst), 0, fl.fl4_sport,
-> > 			    fl.fl4_dport, false, sk->sk_no_check_tx);
-> > 
-> > 
-> > So it seems that as long as dst_cache_get_ip4 gets us a dst (which
-> > AFAIU will happen, unless we did a dst_cache_reset or something else
-> > made the cached dst invalid -- and ovpn's floating/endpoint update
-> > doesn't do that), we'll just use it.
-> 
-> Mh yeah, you're right.
-> Then I'll reset the cache also when a float is detected.
-
-Ok, thanks.
-
-> > 
-> > 
-> > > > > +void ovpn_peer_endpoints_update(struct ovpn_peer *peer, struct sk_buff *skb)
-> > > > > +{
-> > > > > +	struct hlist_nulls_head *nhead;
-> > > > > +	struct sockaddr_storage ss;
-> > > > > +	const u8 *local_ip = NULL;
-> > > > > +	struct sockaddr_in6 *sa6;
-> > > > > +	struct sockaddr_in *sa;
-> > > > > +	struct ovpn_bind *bind;
-> > > > > +	size_t salen = 0;
-> > > > > +
-> > > > > +	spin_lock_bh(&peer->lock);
-> > > > > +	bind = rcu_dereference_protected(peer->bind,
-> > > > > +					 lockdep_is_held(&peer->lock));
-> > > > > +	if (unlikely(!bind))
-> > > > > +		goto unlock;
-> > > > > +
-> > > > > +	switch (skb->protocol) {
-> > > > > +	case htons(ETH_P_IP):
-> > > > > +		/* float check */
-> > > > > +		if (unlikely(!ovpn_bind_skb_src_match(bind, skb))) {
-> > > > > +			if (bind->remote.in4.sin_family == AF_INET)
-> > > > > +				local_ip = (u8 *)&bind->local;
-> > > > 
-> > > > If I'm reading this correctly, we always reuse the existing local
-> > > > address when we have to re-create the bind, even if it doesn't match
-> > > > the skb? The "local endpoint update" chunk below is doing that, but
-> > > > only if we're keeping the same remote? It'll get updated the next time
-> > > > we receive a packet and call ovpn_peer_endpoints_update.
-> > > > 
-> > > > That might irritate the RPF check on the other side, if we still use
-> > > > our "old" source to talk to the new dest?
-> > > > 
-> > > > > +			sa = (struct sockaddr_in *)&ss;
-> > > > > +			sa->sin_family = AF_INET;
-> > > > > +			sa->sin_addr.s_addr = ip_hdr(skb)->saddr;
-> > > > > +			sa->sin_port = udp_hdr(skb)->source;
-> > > > > +			salen = sizeof(*sa);
-> > > > > +			break;
-> > > 
-> > > I think the issue is simply this 'break' above - by removing it, everything
-> > > should work as expected.
-> > 
-> > Only if the bind was of the correct family? Checking an IPv4 local
-> > address (in the bind) against an IPv6 source address in the packet (or
-> > the other way around) isn't going to work well.
-> 
-> Ah I understand what you mean.
-> 
-> The purpose of "local_ip" is to provide a working local endpoint to be used
-> with the new remote address.
-> However, if the float is switching family we can't re-use the same old local
-> endpoint (hence the check).
-> In this case we'll learn the "new" local address later.
+On Wed Mar 5, 2025 at 4:24 PM CET, Alexander Lobakin wrote:
+> From: Arthur <arthur@arthurfabre.com>
+> Date: Wed, 05 Mar 2025 15:32:04 +0100
 >
-> Does it make sense?
+> > From: Arthur Fabre <afabre@cloudflare.com>
+> >=20
+> > xdp_buff stores whether metadata is supported by a NIC by setting
+> > data_meta to be greater than data.
+> >=20
+> > But xdp_frame only stores the metadata size (as metasize), so convertin=
+g
+> > between xdp_frame and xdp_buff is lossy.
+> >=20
+> > Steal an unused bit in xdp_frame to track whether metadata is supported
+> > or not.
+> >=20
+> > This will lets us have "generic" functions for setting skb fields from
+> > either xdp_frame or xdp_buff from drivers.
+> >=20
+> > Signed-off-by: Arthur Fabre <afabre@cloudflare.com>
+> > ---
+> >  include/net/xdp.h | 10 +++++++++-
+> >  1 file changed, 9 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/include/net/xdp.h b/include/net/xdp.h
+> > index 58019fa299b56dbd45c104fdfa807f73af6e4fa4..84afe07d09efdb2ab0cb78b=
+904f02cb74f9a56b6 100644
+> > --- a/include/net/xdp.h
+> > +++ b/include/net/xdp.h
+> > @@ -116,6 +116,9 @@ static __always_inline void xdp_buff_set_frag_pfmem=
+alloc(struct xdp_buff *xdp)
+> >  	xdp->flags |=3D XDP_FLAGS_FRAGS_PF_MEMALLOC;
+> >  }
+> > =20
+> > +static bool xdp_data_meta_unsupported(const struct xdp_buff *xdp);
+> > +static void xdp_set_data_meta_invalid(struct xdp_buff *xdp);
+> > +
+> >  static __always_inline void *xdp_buff_traits(const struct xdp_buff *xd=
+p)
+> >  {
+> >  	return xdp->data_hard_start + _XDP_FRAME_SIZE;
+> > @@ -270,7 +273,9 @@ struct xdp_frame {
+> >  	void *data;
+> >  	u32 len;
+> >  	u32 headroom;
+> > -	u32 metasize; /* uses lower 8-bits */
+> > +	u32	:23, /* unused */
+> > +		meta_unsupported:1,
+> > +		metasize:8;
+>
+> See the history of this structure how we got rid of using bitfields here
+> and why.
+>
+> ...because of performance.
+>
+> Even though metasize uses only 8 bits, 1-byte access is slower than
+> 32-byte access.
 
-Sure, but we could have learned it immediately from the packet we just
-got, whether we're changing family or not. No need to wait for the
-next RX packet to also learn the new local address.
+Interesting, thanks!
 
-But if we now do a dst_cache_reset with the peer float,
-ovpn_udp*_output will have to do a new route/local address lookup and
-I guess that should clean up the local address stored in the bind, and
-then update the dst_cache with the local address we just found.
+> I was going to write "you can use the fact that metasize is always a
+> multiple of 4 or that it's never > 252, for example, you could reuse LSB
+> as a flag indicating that meta is not supported", but first of all
+>
+> Do we still have drivers which don't support metadata?
+> Why don't they do that? It's not HW-specific or even driver-specific.
+> They don't reserve headroom? Then they're invalid, at least XDP_REDIRECT
+> won't work.
+>
+> So maybe we need to fix those drivers first, if there are any.
 
--- 
-Sabrina
+Most drivers don't support metadata unfortunately:
+
+> rg -U "xdp_prepare_buff\([^)]*false\);" drivers/net/
+drivers/net/tun.c
+1712:		xdp_prepare_buff(&xdp, buf, pad, len, false);
+
+drivers/net/ethernet/microsoft/mana/mana_bpf.c
+94:	xdp_prepare_buff(xdp, buf_va, XDP_PACKET_HEADROOM, pkt_len, false);
+
+drivers/net/ethernet/marvell/mvneta.c
+2344:	xdp_prepare_buff(xdp, data, pp->rx_offset_correction + MVNETA_MH_SIZE=
+,
+2345:			 data_len, false);
+
+drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+1436:	xdp_prepare_buff(&xdp, hard_start, OTX2_HEAD_ROOM,
+1437:			 cqe->sg.seg_size, false);
+
+drivers/net/ethernet/socionext/netsec.c
+1021:		xdp_prepare_buff(&xdp, desc->addr, NETSEC_RXBUF_HEADROOM,
+1022:				 pkt_len, false);
+
+drivers/net/ethernet/google/gve/gve_rx.c
+740:	xdp_prepare_buff(&new, frame, headroom, len, false);
+859:		xdp_prepare_buff(&xdp, page_info->page_address +
+860:				 page_info->page_offset, GVE_RX_PAD,
+861:				 len, false);
+
+drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+3984:			xdp_prepare_buff(&xdp, data,
+3985:					 MVPP2_MH_SIZE + MVPP2_SKB_HEADROOM,
+3986:					 rx_bytes, false);
+
+drivers/net/ethernet/aquantia/atlantic/aq_ring.c
+794:		xdp_prepare_buff(&xdp, hard_start, rx_ring->page_offset,
+795:				 buff->len, false);
+
+drivers/net/ethernet/cavium/thunder/nicvf_main.c
+554:	xdp_prepare_buff(&xdp, hard_start, data - hard_start, len, false);
+
+drivers/net/ethernet/ti/cpsw_new.c
+348:		xdp_prepare_buff(&xdp, pa, headroom, size, false);
+
+drivers/net/ethernet/freescale/enetc/enetc.c
+1710:	xdp_prepare_buff(xdp_buff, hard_start - rx_ring->buffer_offset,
+1711:			 rx_ring->buffer_offset, size, false);
+
+drivers/net/ethernet/ti/am65-cpsw-nuss.c
+1335:		xdp_prepare_buff(&xdp, page_addr, AM65_CPSW_HEADROOM,
+1336:				 pkt_len, false);
+
+drivers/net/ethernet/ti/cpsw.c
+403:		xdp_prepare_buff(&xdp, pa, headroom, size, false);
+
+drivers/net/ethernet/sfc/rx.c
+289:	xdp_prepare_buff(&xdp, *ehp - EFX_XDP_HEADROOM, EFX_XDP_HEADROOM,
+290:			 rx_buf->len, false);
+
+drivers/net/ethernet/mediatek/mtk_eth_soc.c
+2097:			xdp_prepare_buff(&xdp, data, MTK_PP_HEADROOM, pktlen,
+2098:					 false);
+
+drivers/net/ethernet/sfc/siena/rx.c
+291:	xdp_prepare_buff(&xdp, *ehp - EFX_XDP_HEADROOM, EFX_XDP_HEADROOM,
+292:			 rx_buf->len, false)
+
+I don't know if it's just because no one has added calls to
+skb_metadata_set() in yet, or if there's a more fundamental reason.
+
+I think they all reserve some amount of headroom, but not always the
+full XDP_PACKET_HEADROOM. Eg sfc:
+
+drivers/net/ethernet/sfc/net_driver.h:
+/* Non-standard XDP_PACKET_HEADROOM and tailroom to satisfy XDP_REDIRECT an=
+d
+ * still fit two standard MTU size packets into a single 4K page.
+ */
+#define EFX_XDP_HEADROOM	128
+
+If it's just because skb_metadata_set() is missing, I can take the
+patches from this series that adds a "generic" XDP -> skb hook ("trait:
+Propagate presence of traits to sk_buff"), have it call
+skb_metadata_set(), and try to add it to all the drivers in a separate
+series.
+
+> >  	/* Lifetime of xdp_rxq_info is limited to NAPI/enqueue time,
+> >  	 * while mem_type is valid on remote CPU.
+> >  	 */
+> > @@ -369,6 +374,8 @@ void xdp_convert_frame_to_buff(const struct xdp_fra=
+me *frame,
+> >  	xdp->data =3D frame->data;
+> >  	xdp->data_end =3D frame->data + frame->len;
+> >  	xdp->data_meta =3D frame->data - frame->metasize;
+> > +	if (frame->meta_unsupported)
+> > +		xdp_set_data_meta_invalid(xdp);
+> >  	xdp->frame_sz =3D frame->frame_sz;
+> >  	xdp->flags =3D frame->flags;
+> >  }
+> > @@ -396,6 +403,7 @@ int xdp_update_frame_from_buff(const struct xdp_buf=
+f *xdp,
+> >  	xdp_frame->len  =3D xdp->data_end - xdp->data;
+> >  	xdp_frame->headroom =3D headroom - sizeof(*xdp_frame);
+> >  	xdp_frame->metasize =3D metasize;
+> > +	xdp_frame->meta_unsupported =3D xdp_data_meta_unsupported(xdp);
+> >  	xdp_frame->frame_sz =3D xdp->frame_sz;
+> >  	xdp_frame->flags =3D xdp->flags;
+>
+> Thanks,
+> Olek
 
