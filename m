@@ -1,174 +1,134 @@
-Return-Path: <netdev+bounces-172251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 460F0A53E97
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 00:41:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3BA0A53EAD
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 00:53:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C7463A5A31
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 23:41:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D98F116DC2B
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 23:53:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E141207A22;
-	Wed,  5 Mar 2025 23:41:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD22E207A3F;
+	Wed,  5 Mar 2025 23:53:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YjCN5sm0";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="SeO+07Dw";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YjCN5sm0";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="SeO+07Dw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q3lE4eoG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4981206F3B
-	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 23:41:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C315207A2A;
+	Wed,  5 Mar 2025 23:53:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741218110; cv=none; b=dzGV23ocrqpl3+ZFLaB//z9pbZKiBJl7EuYqqQbtzOtVArqw7roA1oYA8rSqQ8OLzWmUe/nAJh3BGWYmDmmy7DThNycW3PTzqFgERgFL+3ltifRDLU71ekcz/7LP+SHdnPk5qk78xq1DqZ2CP/nJ1gwJNrOCLf21YDL3nQtkElU=
+	t=1741218830; cv=none; b=L0K1Sc0veAe8tLCqWcLU5/cFaH+SNqWwTe2kAMzYG0nEq3uDG6OUEzYVVLjjYszClfQQCyqi+NsNrjySNOerlLQ25ssU87al+hiEWLmR1gwtzjI3XSdod1+Z9QZOW84YU7013VJyJ84cGqQUcANEqWQnSfiRXANORGrhmv7QNts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741218110; c=relaxed/simple;
-	bh=79A9Xcxf22LN1wRxVN/wCq4MVv4De/k36OytnK/R+PU=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=aygVdK5QXbob8KaoIdybqtphyw2a8wqGccj2t9njJi7rzQcs8AOtv2kgFyebSqnPO7K1PIDvoxe0jH/Jc7k1wnzTooFTNC+jrR9za/z3xXh4QITfH3MIIcTBo/xcE3uEbEMCR/MfV+65Br4sj1V8psgtGdfS7wcwjl6aSAWbPD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YjCN5sm0; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=SeO+07Dw; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YjCN5sm0; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=SeO+07Dw; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id B7C171F385;
-	Wed,  5 Mar 2025 23:41:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1741218106; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=evnk/GxliDTjNMMgAFyfCNZGfvqVt47nI9LnubvMvxc=;
-	b=YjCN5sm09/Vik1hnIVgY/KAn9Bl+M9/Qo0xPTOFQNF8Y/8QdKDvee6BGLO7x9pn9iJ9kyi
-	n5vDga3YY2IqVkMq8j71+tXA/lQqxgbYINFt4chYC7lsJ2wAc09oTXOcOZ0cfwMxqE/8JT
-	f5K7ko5CR+elv4J6T28XRXDqa8DqvvY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1741218106;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=evnk/GxliDTjNMMgAFyfCNZGfvqVt47nI9LnubvMvxc=;
-	b=SeO+07DwVmMuxGIdJ6uBjWre+ET8YmfEvWdD+64YO1xDmbJOxMvVwYwNFQ+y51t6511CM8
-	Xk9d1WRKq6le82BQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1741218106; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=evnk/GxliDTjNMMgAFyfCNZGfvqVt47nI9LnubvMvxc=;
-	b=YjCN5sm09/Vik1hnIVgY/KAn9Bl+M9/Qo0xPTOFQNF8Y/8QdKDvee6BGLO7x9pn9iJ9kyi
-	n5vDga3YY2IqVkMq8j71+tXA/lQqxgbYINFt4chYC7lsJ2wAc09oTXOcOZ0cfwMxqE/8JT
-	f5K7ko5CR+elv4J6T28XRXDqa8DqvvY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1741218106;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=evnk/GxliDTjNMMgAFyfCNZGfvqVt47nI9LnubvMvxc=;
-	b=SeO+07DwVmMuxGIdJ6uBjWre+ET8YmfEvWdD+64YO1xDmbJOxMvVwYwNFQ+y51t6511CM8
-	Xk9d1WRKq6le82BQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E44A013939;
-	Wed,  5 Mar 2025 23:41:32 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id zc4kJSzhyGdbdAAAD6G6ig
-	(envelope-from <neilb@suse.de>); Wed, 05 Mar 2025 23:41:32 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+	s=arc-20240116; t=1741218830; c=relaxed/simple;
+	bh=9kNx/Y9dmyuYaa9jYYDv0MT4hUIbvIKYUHEGwb0744M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DppKr2kHMo9a2eBrP6F76FJxMcvlT3614G/Ls9ncXPF7iSdv3AV3keSxBfo6NQ/DFSXoY0BsM8wIfN4lLkr942NPkZXzBA5umUgm1UuEMysD4cUMZXSOPD5YvnxxbBbghcwSffDbStqlVAPikcNXkSmBRpUJThP+olFi/Fej/BY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q3lE4eoG; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-438a39e659cso36755e9.2;
+        Wed, 05 Mar 2025 15:53:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741218827; x=1741823627; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=sr8OyA99gxEcrXQuYqZWkpenxbkE9mbapOFjkmx5LG4=;
+        b=Q3lE4eoGR+hXXJXlpdZ2Q+BtXLnNr26Wf9t5cIf1xd2b5pAJCDLvEUclQSvpoYsxQz
+         rbZqryFyp/D3e/bczh85GLp3Rx76SYGhPKTD5N8/eF82pOqfIRl8dKoK1ACX0FXo7Kys
+         ncThP0QoKImyqDPpmzeWANEWQyHnKZ6HOHhVuAj9rgk3qjg2ZrMLefXjOEPJrKPRt/f+
+         FYVCFai9pUVd3cdg7M8FHsBnAN4dQlq6w/FJdu1rHLgfqeC5tO+69ch/LivdpXD70Tpk
+         1lxm0eWMSotKixnJJqMioahKrQEJrehee7NRIwsKESB4g4r7i89OHIZSdOQq7/nWFkA6
+         1Tjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741218827; x=1741823627;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sr8OyA99gxEcrXQuYqZWkpenxbkE9mbapOFjkmx5LG4=;
+        b=mkQ4nLe/3d758f1BS9/eULToAvGEJtGA8mLVR3Er5KTBYGPHEhQ/UdfposhpDPQlFw
+         J/kQzwJ+3NoI9FTYyTNYf3j6qFHf+LpfKnkk6PL6wdc1e795u+Gtit8yqOIDK014KU7z
+         2sWtaoTW1pmxZ6r0boIY3bX7zhKhU5Hf6pVbCw49fycn+L//fyRFvEUyiJRDt9L3ga4n
+         /1el5yPv8YtSYLE07S1PVQNdgxTk3NIvB9vjBnndFOQusdz0NMqr7qpqfyyu1Qw780Np
+         YqoHglNIAGvptfvy1uU/WeyMIDRcqjGLnMkYRp/sH1/H1gFBXhBh7wH1X8mOz73LRY7F
+         f7lw==
+X-Forwarded-Encrypted: i=1; AJvYcCWN3f/szNLFMqTuEE8dFbnjBWX4o5wp1/8+btWORG5QNXTaCiSpBe68sYWSo6gz5ZWYbfONWRk/Ph760n0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzY8Li63zRKOtdcophRxJ4tf0q4LN46S9Wx7nNvt+tT/aj1gIff
+	6VrmMxPGIkCL5HDN+rzdT6HoNPwVVchK3iZxzhQ9XcqvL+ugGsy2
+X-Gm-Gg: ASbGncsU2E7Hc8RiZTFbVje5z4k4/zRgT0DcRIyJKuVzXZMNnES3YtYSLcbvNnGa+IX
+	4lf/AQj5+MA1XrN4Q98SodID/7vc3PvwhBMVKX/FIhvbqtckz8fP63n1kVFXsvhctW8CepBLrIX
+	GYpgpa2xwQOCBrhudOiRM7VcEvB6+gtythRL96S4S8zr1OHDyjroCdzAT8fD0w2FkrwIwx9TTwN
+	y5dY3J3Qi6J92oKQ4dXzas58OLYleW69zw1CUbSTLQqd+HYpyzg55Zljrt3xQ742xOcpHVnlRuq
+	qey9J+ATy96UwOu97OOiazW4+ANWYzvRHMomNqt+BYfCrA==
+X-Google-Smtp-Source: AGHT+IGOCvVjVaI+2/pVJM7+aGb9FA5XuNO7nYXA3tNg7UvAjXnWkdmyPPruP4fBCgqg3QlGtZTR1g==
+X-Received: by 2002:a05:600c:5119:b0:43b:c390:b773 with SMTP id 5b1f17b1804b1-43bd29b41f8mr36153235e9.24.1741218826863;
+        Wed, 05 Mar 2025 15:53:46 -0800 (PST)
+Received: from qasdev.Home ([2a02:c7c:6696:8300:e538:5de4:1d6b:3509])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bd42badefsm31861715e9.18.2025.03.05.15.53.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Mar 2025 15:53:46 -0800 (PST)
+From: Qasim Ijaz <qasdev00@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	atenart@kernel.org,
+	jdamato@fastly.com,
+	aleksander.lobakin@intel.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net-sysfs: fix NULL pointer dereference
+Date: Wed,  5 Mar 2025 23:53:07 +0000
+Message-Id: <20250305235307.14829-1-qasdev00@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "NeilBrown" <neilb@suse.de>
-To: "Yunsheng Lin" <linyunsheng@huawei.com>
-Cc: "Qu Wenruo" <wqu@suse.com>, "Yishai Hadas" <yishaih@nvidia.com>,
- "Jason Gunthorpe" <jgg@ziepe.ca>,
- "Shameer Kolothum" <shameerali.kolothum.thodi@huawei.com>,
- "Kevin Tian" <kevin.tian@intel.com>,
- "Alex Williamson" <alex.williamson@redhat.com>, "Chris Mason" <clm@fb.com>,
- "Josef Bacik" <josef@toxicpanda.com>, "David Sterba" <dsterba@suse.com>,
- "Gao Xiang" <xiang@kernel.org>, "Chao Yu" <chao@kernel.org>,
- "Yue Hu" <zbestahu@gmail.com>, "Jeffle Xu" <jefflexu@linux.alibaba.com>,
- "Sandeep Dhavale" <dhavale@google.com>, "Carlos Maiolino" <cem@kernel.org>,
- "Darrick J. Wong" <djwong@kernel.org>,
- "Andrew Morton" <akpm@linux-foundation.org>,
- "Jesper Dangaard Brouer" <hawk@kernel.org>,
- "Ilias Apalodimas" <ilias.apalodimas@linaro.org>,
- "David S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Simon Horman" <horms@kernel.org>, "Trond Myklebust" <trondmy@kernel.org>,
- "Anna Schumaker" <anna@kernel.org>, "Chuck Lever" <chuck.lever@oracle.com>,
- "Jeff Layton" <jlayton@kernel.org>, "Olga Kornievskaia" <okorniev@redhat.com>,
- "Dai Ngo" <Dai.Ngo@oracle.com>, "Tom Talpey" <tom@talpey.com>,
- "Luiz Capitulino" <luizcap@redhat.com>,
- "Mel Gorman" <mgorman@techsingularity.net>,
- "Dave Chinner" <david@fromorbit.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
- linux-btrfs@vger.kernel.org, linux-erofs@lists.ozlabs.org,
- linux-xfs@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org,
- linux-nfs@vger.kernel.org
-Subject: Re: [PATCH v2] mm: alloc_pages_bulk: remove assumption of populating
- only NULL elements
-In-reply-to: <18c68e7a-88c9-49d1-8ff8-17c63bcc44f4@huawei.com>
-References: <>, <18c68e7a-88c9-49d1-8ff8-17c63bcc44f4@huawei.com>
-Date: Thu, 06 Mar 2025 10:41:24 +1100
-Message-id: <174121808436.33508.1242845473359255682@noble.neil.brown.name>
-X-Spam-Score: -4.30
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.998];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[44];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[suse.com,nvidia.com,ziepe.ca,huawei.com,intel.com,redhat.com,fb.com,toxicpanda.com,kernel.org,gmail.com,linux.alibaba.com,google.com,linux-foundation.org,linaro.org,davemloft.net,oracle.com,talpey.com,techsingularity.net,fromorbit.com,vger.kernel.org,lists.linux.dev,lists.ozlabs.org,kvack.org];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	R_RATELIMIT(0.00)[from(RLewrxuus8mos16izbn),to_ip_from(RL4q5k5kyydt8nhc3xa4shdp4c)]
-X-Spam-Flag: NO
-X-Spam-Level: 
+Content-Transfer-Encoding: 8bit
 
-On Wed, 05 Mar 2025, Yunsheng Lin wrote:
-> 
-> For the existing btrfs and sunrpc case, I am agreed that there
-> might be valid use cases too, we just need to discuss how to
-> meet the requirements of different use cases using simpler, more
-> unified and effective APIs.
+Commit <79c61899b5ee> introduces a potential NULL pointer dereference 
+in the sysfs_rtnl_lock() function when initialising kn:
 
-We don't need "more unified".
+	kn = sysfs_break_active_protection(kobj, attr);
+	
+The commit overlooks the fact that sysfs_break_active_protection can 
+return NULL if kernfs_find_and_get() fails to find and get the kernfs_node 
+with the given name. 
 
-If there are genuinely two different use cases with clearly different
-needs - even if only slightly different - then it is acceptable to have
-two different interfaces.  Be sure to choose names which emphasise the
-differences.
+Later on the code calls sysfs_unbreak_active_protection(kn) 
+unconditionally, which could lead to a NULL pointer dereference.
 
-Thanks,
-NeilBrown
+Resolve this bug by introducing a NULL check before using kn
+in the sysfs_unbreak_active_protection() call.
+
+Signed-off-by: Qasim Ijaz <qasdev00@gmail.com>
+Fixes: 79c61899b5ee ("net-sysfs: remove rtnl_trylock from device attributes")
+---
+ net/core/net-sysfs.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index 8d9dc048a548..c5085588e536 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -117,7 +117,8 @@ static int sysfs_rtnl_lock(struct kobject *kobj, struct attribute *attr,
+ 	 * the rtnl lock.
+ 	 */
+ unbreak:
+-	sysfs_unbreak_active_protection(kn);
++	if (kn)
++		sysfs_unbreak_active_protection(kn);
+ 	dev_put(ndev);
+ 
+ 	return ret;
+-- 
+2.39.5
+
 
