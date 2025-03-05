@@ -1,157 +1,120 @@
-Return-Path: <netdev+bounces-171965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C4C0A4FB30
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 11:07:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0557A4FB53
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 11:10:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 594603A4F8F
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 10:06:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D5C816AEC6
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 10:10:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A052B205508;
-	Wed,  5 Mar 2025 10:06:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1970205AB0;
+	Wed,  5 Mar 2025 10:10:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="hJpocj7v";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="u/NHKT/Z"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="VEtUkFYf"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b3-smtp.messagingengine.com (fhigh-b3-smtp.messagingengine.com [202.12.124.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4148F1F3D30;
-	Wed,  5 Mar 2025 10:06:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.154
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0EB586340;
+	Wed,  5 Mar 2025 10:10:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741169213; cv=none; b=b+Z46M0y7ABTWQfbCXYgepex/lMonMvCwGse1QPmDHUqNzqsj/eESJbosZGVo3Y2qYGLNhdLki5SqXN/NEqS3jt3SVsXQPqSsKGhjhMLs+SfJHLcxSZyimdqiZOUfBOgMOqJVzSDMx1FUqL0h3o3zzOv5mzobCBB830n6BIgGnI=
+	t=1741169444; cv=none; b=PGBO+J4eD2BypOl9uYOc1GKi/tioCDHQCOF18aW5nQHPi7aWF7c2/WQPMC5ClPusTgl7IlZKuyr1m9XNggH6excohLx2sq/nek9iWn3Y+Dhiovqu0p36h/FWgKIB7HVfGaROhgCstHvJD5Ks1f0QUmUAWcYchVeDZZpnDNd/kgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741169213; c=relaxed/simple;
-	bh=POFkgzO8rm1oQNp6ytUtiiNRXbGm7AOdYqXhxPgh4sc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R8olgLNdYNl3XCAPUdKGnx0EiDEIPYB9vMsqnrNQPQi4m937oyZFQ7Ft9bl2xI6Vo9VVUH6bYMpJ4BXOaBcdhqFgo+32glCdx2HGKwi3qWcCGFXHqm5PMq0qrByPiuJ9Tl6JcwMYpeCs28qxndG+K6vNlx4kGhOcdlq4Ksfn8Rg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=hJpocj7v; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=u/NHKT/Z; arc=none smtp.client-ip=202.12.124.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id C036025401EA;
-	Wed,  5 Mar 2025 05:06:48 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-04.internal (MEProxy); Wed, 05 Mar 2025 05:06:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1741169208; x=
-	1741255608; bh=OV22lrFV3DQBTGcw06CXISDEH3SxqJT8NlQedF2+oH8=; b=h
-	Jpocj7vtNqNLdr/VV90HwI4omf9lvjbPmLOfpwnKOH6B7DiFJld7FF9oKKoHZTbN
-	l+ELUcNjW7/sa3MguXc5X2c6axxaNzrMAzSF5o9uP5haAgGogOvVHA8M9CLxcWoH
-	xIQSt0GkHsqaxorzOMT9UF3cIN2by8apiQd4df5JzJALX35BqlHw5CTDROBuHwrA
-	l3JW8pngLevn7peJbN/2cob+O4Jdfk8PQNzaH4550AvAiE0K6+P+cq/czxcgXeno
-	oFYBW4OXOln3ARE6Aw6zctlNOchroRZPJ9L/gq+LJzORNuq0PqbNg8FabrQhipxR
-	+0UBXkK3JQbq3/CjHT92w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1741169208; x=1741255608; bh=OV22lrFV3DQBTGcw06CXISDEH3SxqJT8NlQ
-	edF2+oH8=; b=u/NHKT/ZQpVgl5aBzzP59XVl/aCDb4nvJ2ZY5LWWM5PurauNq6/
-	W8Q91FenyD/jdrEEVIlO59jQG5OzxQ6fBt4kBfX9rYkggrEAFPcHs6cZrcd/R+Vy
-	wynEPhKFHqHtBn3e5cZwXvs68QC+l3K8BpacUCE3Y+JjsHK9rkAxZg3VaEwxyVoe
-	YJBBrdCgLrxBsg+IrdufdIPyE+UCZrmi9dYzrvSL8yd0Ud2sbxoSPVNv+5JoZQlv
-	cb1p/prCwrzwJAXESNJTtvT0g5Q6je/eBK4bPq0rHhQe9hu3SuqUUeYhYDLaUtIH
-	2/Dl/Q8rqBhG1/aqMI8lfltciwE3+kXzfaA==
-X-ME-Sender: <xms:NyLIZ-MYNr-jPlNECyHoRQo8x3eET31MTCVcp3Rnoky1eaWR5NZ7fg>
-    <xme:NyLIZ8-mnhcmeDFjLUUAi0Z4pIECapTlB-TrXy8ob69K4qxPPDl-UGtB3mJyJ7yaG
-    -Gp1zhI4uwsqUFZXII>
-X-ME-Received: <xmr:NyLIZ1RYn9jL2cyfIOWhBijdan2Z6qfoQXWZTpuZaopB8o5cedW7mJ1cuUDS>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddutdegheefucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
-    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
-    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdef
-    hfekgeetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhn
-    sggprhgtphhtthhopedufedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnth
-    honhhiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghr
-    rdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrd
-    gtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehp
-    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepughonhgrlhgurdhhuhhnth
-    gvrhesghhmrghilhdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhr
-    ghdprhgtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdprhgtph
-    htthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghh
-X-ME-Proxy: <xmx:OCLIZ-t_h-9lFtez33rBhZBpt-3v6dALYDF2d7_Mm2mxSQStfF_VIQ>
-    <xmx:OCLIZ2ddhqzYJbEY-MnrzkuBFVDrL0gqPjro7dOdCFxIkUAsNiWHZA>
-    <xmx:OCLIZy3r-hp_mMMb_0tAGapuBE-PDYZpWp3zLlhaRBsXQZ26wqAPDQ>
-    <xmx:OCLIZ68hOjID9-T7dJuLvtMLrY3Q_NZdNAHaBMdpLPtlsggfh8RPMQ>
-    <xmx:OCLIZ98PVQUB5BNVcHQeXGESQtEWdNuRxrhAlZyFDCv3qG5U9wEl9KON>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 5 Mar 2025 05:06:47 -0500 (EST)
-Date: Wed, 5 Mar 2025 11:06:45 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-Subject: Re: [PATCH v21 09/24] ovpn: implement packet processing
-Message-ID: <Z8giNYKBWzQEtZJu@hog>
-References: <20250304-b4-ovpn-tmp-v21-0-d3cbb74bb581@openvpn.net>
- <20250304-b4-ovpn-tmp-v21-9-d3cbb74bb581@openvpn.net>
- <Z8dOOy9tSpJ1UCiR@hog>
- <8abd4290-cef5-4ea3-bdfc-b872c16efb8a@openvpn.net>
+	s=arc-20240116; t=1741169444; c=relaxed/simple;
+	bh=p7qCmbn7qh8IoaNpypSjjh8REnQqe2JM+GRz9TM9Dek=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BP66su3c7m497yNxhsS8L3OLWkW/yKBFJ491sCkoiqNgaGzfKguCb/W/+NGfxsstkHLQcEDa3/ML1tcsjBwzjc6NVxgYK8rcTlmivrly4jUoXQoFV9rf69iFHt9ajZ2GNqzt5clyOpDqCMRFbRF+1CfwEV3ZCqdTTPaejEdX/d8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=VEtUkFYf; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=luJmq
+	zW3D/PHhjjmaO84ghpqEdiImWkNJgLVp6gRUTA=; b=VEtUkFYffxFzvHLt+hcDo
+	JGgjbhLHIJPu+hpxz4JaEO4TjYLKnwk+mjovJMGdNoqnwVqrMoQarfq5PS1BGanC
+	ZJm0VVD/CPvAsNz/nFKXBI8ZD3928rjiLIqfQ8IAqHMkIGm/cYW+CO5ySgCcK06T
+	gG0As/Wn6zwyWZPmFX8SNM=
+Received: from icess-ProLiant-DL380-Gen10.. (unknown [])
+	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wCXviTwIshncgV_Qg--.37440S4;
+	Wed, 05 Mar 2025 18:09:53 +0800 (CST)
+From: Haoxiang Li <haoxiang_li2024@163.com>
+To: shshaikh@marvell.com,
+	manishc@marvell.com,
+	GR-Linux-NIC-Dev@marvell.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	rajesh.borundia@qlogic.com,
+	sucheta.chakraborty@qlogic.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Haoxiang Li <haoxiang_li2024@163.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] qlcnic: fix a memory leak in qlcnic_sriov_set_guest_vlan_mode()
+Date: Wed,  5 Mar 2025 18:09:50 +0800
+Message-Id: <20250305100950.4001113-1-haoxiang_li2024@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <8abd4290-cef5-4ea3-bdfc-b872c16efb8a@openvpn.net>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wCXviTwIshncgV_Qg--.37440S4
+X-Coremail-Antispam: 1Uf129KBjvJXoW7CFW8uF48Ww13Jw1DCr4kZwb_yoW8WFykpF
+	47ZFyUWr95JF4jkws5Zwn2yrZ8C39Fy3sruF9xW393u34Utr4xGw1DArnIgrn0yr95GFW8
+	tr1DZ3W5XFn8A3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pimhF7UUUUU=
+X-CM-SenderInfo: xkdr5xpdqjszblsqjki6rwjhhfrp/xtbB0hQHbmfIHmJ4MQAAs1
 
-2025-03-05, 00:35:09 +0100, Antonio Quartulli wrote:
-> On 04/03/2025 20:02, Sabrina Dubroca wrote:
-> > 2025-03-04, 01:33:39 +0100, Antonio Quartulli wrote:
-> > [...]
-> > > +static inline struct ovpn_crypto_key_slot *
-> > > +ovpn_crypto_key_id_to_slot(const struct ovpn_crypto_state *cs, u8 key_id)
-> > > +{
-> > > +	struct ovpn_crypto_key_slot *ks;
-> > > +	u8 idx;
-> > > +
-> > > +	if (unlikely(!cs))
-> > > +		return NULL;
-> > > +
-> > > +	rcu_read_lock();
-> > > +	idx = cs->primary_idx;
-> > 
-> > I'd go with slots[0] and slots[1], since it doesn't really matter
-> > whether we check the primary or secondary first. It would avoid a
-> > possible reload of cs->primary_idx (which might be updated
-> > concurrently by a key swap and cause us to look into the same slot
-> > twice) -- a READ_ONCE would also prevent that.
-> 
-> Reason for looking into primary first is that we will most likely need the
-> primary key to decrypt the incoming traffic.
-> 
-> Secondary is used only during a small (if at all) time window where we moved
-> to a new key, but our peer was still sending traffic encrypted with the old
-> (secondary) key.
-> 
-> Therefore optimizing for primary-first may make a non-negligible difference
-> under heavy load.
-> 
-> Code doesn't get more complex due to this logic, therefore I'd keep this
-> version (with READ_ONCE(cs->primary_idx)), unless there is a strong argument
-> against it.
+Add qlcnic_sriov_free_vlans() to free the memory allocated by
+qlcnic_sriov_alloc_vlans() if qlcnic_sriov_alloc_vlans() fails
+or "sriov->allowed_vlans" fails to be allocated.
 
-Ok, sounds reasonable.
+Fixes: 91b7282b613d ("qlcnic: Support VLAN id config.")
+Cc: stable@vger.kernel.org
+Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
+---
+Changes in v2:
+- Add qlcnic_sriov_free_vlans() if qlcnic_sriov_alloc_vlans() fails.
+- Modify the patch description.
+vf_info was allocated by kcalloc, no need to do more checks cause
+kfree(NULL) is safe. Thanks, Paolo! 
+---
+ drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c
+index f9dd50152b1e..0dd9d7cb1de9 100644
+--- a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c
++++ b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_sriov_common.c
+@@ -446,16 +446,20 @@ static int qlcnic_sriov_set_guest_vlan_mode(struct qlcnic_adapter *adapter,
+ 		 sriov->num_allowed_vlans);
+ 
+ 	ret = qlcnic_sriov_alloc_vlans(adapter);
+-	if (ret)
++	if (ret) {
++		qlcnic_sriov_free_vlans(adapter);
+ 		return ret;
++	}
+ 
+ 	if (!sriov->any_vlan)
+ 		return 0;
+ 
+ 	num_vlans = sriov->num_allowed_vlans;
+ 	sriov->allowed_vlans = kcalloc(num_vlans, sizeof(u16), GFP_KERNEL);
+-	if (!sriov->allowed_vlans)
++	if (!sriov->allowed_vlans) {
++		qlcnic_sriov_free_vlans(adapter);
+ 		return -ENOMEM;
++	}
+ 
+ 	vlans = (u16 *)&cmd->rsp.arg[3];
+ 	for (i = 0; i < num_vlans; i++)
 -- 
-Sabrina
+2.25.1
+
 
