@@ -1,175 +1,133 @@
-Return-Path: <netdev+bounces-172212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70D27A50E3E
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 22:58:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D709A50E72
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 23:20:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 435FB18916A0
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 21:58:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9654B188BA4D
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 22:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7023265CC6;
-	Wed,  5 Mar 2025 21:58:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34F87266561;
+	Wed,  5 Mar 2025 22:20:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E+D6LeRh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uvx3hYwq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D9D9265635;
-	Wed,  5 Mar 2025 21:58:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 066DB2586C3;
+	Wed,  5 Mar 2025 22:20:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741211890; cv=none; b=QyymlcdDPGVeKFf/vzHOKUqHgC0xSY6Up2fAwN+bVw8GrQIrmotwR1ZZ5sWEBwV90pp4D8Jm20CCnDgnUE7OEcA80CGrXuMvOdyKEKcslJi0htBK9+FIeIBTX8NHmmGFloHCi7DiGJ0D3/FOVtHQl/DlqYVTu2azqGCtIISjmRo=
+	t=1741213219; cv=none; b=fGfScRJkqQvWZlwi6CPnsX5u/B3nAQxUPL4DaQSPnqCfXmBHNRfKO2uEffk4ZXbRAUxVzhSzDCXa+Fc0Mo0RSrz4FWt/uX0G1kZGuJsoYXZ9MKcb8cWUGePR3UXFeaG0k6nr6Ulm9XgauGE0oPecIpjXYB8PQCKE6abBzV0XRNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741211890; c=relaxed/simple;
-	bh=YtN9hyJWflxYKrfouDqhZZNXrLwx9v59K9kMzD86Tus=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Frov9PCA/owRLnmtSLEFX5Nmi529DZZ98HDNNWQYtaEQoixg3NyXw6KTqwD1n6Xq+Ik+NORv6824+TPH4h0aijIFFmaV3cnsFbSCHVmYeE5nFWaPIciBacKZ0m4VhuqImZxfrtBlR8K1EDSbcxpM2NBMwq8b7MgjiEZ8+dHm568=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E+D6LeRh; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741211889; x=1772747889;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=YtN9hyJWflxYKrfouDqhZZNXrLwx9v59K9kMzD86Tus=;
-  b=E+D6LeRhqfchuMemmktdumQ6MpESVVfemMCy4LB6bwNr5OhRNX651x6p
-   f43QhX1RgXC05HZw26WKOxrAWbUbSwEiRrY2TP4lprhdQ5TSQ9NRiXxs1
-   1iD1ItiKNkRtmExxP/119z5UmYvrsD4O7aZAk5Cw0rMGcMLPcWwyO6EDZ
-   EUGZAzGyHR+rko37Hasfx6lOCBDeaYV+PJL1Ojw5gv3MM3y3ZxwLATN6W
-   uKDkooLehHbBp2khnQH4kpdaxDKqbky4FA+tUydbqixyeRUQSkVtaiKSH
-   9XU3Hu8VdzHORvkI7ikx0p2jghsnB5OWNWJ4wae/Ctbs6E+KOwJvE/CV4
-   w==;
-X-CSE-ConnectionGUID: odLQBIjbRpuhP59/RQl29w==
-X-CSE-MsgGUID: q/6KS7jOTZSiKZABEIeMaQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="29782163"
-X-IronPort-AV: E=Sophos;i="6.14,224,1736841600"; 
-   d="scan'208";a="29782163"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 13:58:06 -0800
-X-CSE-ConnectionGUID: DnUSyhtPStmb9SoVIl7lKA==
-X-CSE-MsgGUID: BRvv+jA1RmuTNW/R1SpHOg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="118741664"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa010.jf.intel.com with ESMTP; 05 Mar 2025 13:58:05 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
+	s=arc-20240116; t=1741213219; c=relaxed/simple;
+	bh=9Vd3NTCGG6rS4oIOqn+qZLQzZjw8AOh8blq9HS/31Pk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=TNjOMIjC2oQuNWpqSA3gLUKtzWYlUWidxxSWJUr+R2EqipfbQ/h/DSOyURJ0ajmJTgB86ynfuz63Ia9DN6vaoZnv7ut9mdX23LuWgq/PgMLpG3hjBCr1663mh36X9M+hUzqz5bDd/1Ctm3c0HQ4QINFm9265l4l1LVoY5eXLO2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uvx3hYwq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8DE3C4CED1;
+	Wed,  5 Mar 2025 22:20:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741213218;
+	bh=9Vd3NTCGG6rS4oIOqn+qZLQzZjw8AOh8blq9HS/31Pk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=uvx3hYwq0hayfCBHEqvi0Iwc3QIe/dEAiwkM80O8sW72vN0IhEDXgLpkQA1L7fXGg
+	 9aVNqPh/AFDO/Agc3YHs58DTMxC5davA3bxAWN7s57A512AedS3rayx97Na1rP3KAq
+	 ex7zDoV7i6cGJbNsuz1HN1dqZe0SnmaWxFyJeaVfmjMhKBRTMgW5KvLpADWtNH4rqL
+	 7yfViBzT13i6mXjwYNwBzOvzBBYofZRllNDaY3+3sz/1ZW8FmvT/yGsLyi6EjMgG6n
+	 QWbRI5hDCbBW8qGlfFjbhs4iIzfG4CYr8atyeGTHMBKMnMqwGxx/Z8TZ6T/fzmc2Js
+	 B0dhiHPqSTIoQ==
+Date: Wed, 5 Mar 2025 16:20:16 -0600
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: hans.zhang@cixtech.com
+Cc: bhelgaas@google.com, cix-kernel-upstream@cixtech.com,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Peter Chen <peter.chen@cixtech.com>, ChunHao Lin <hau@realtek.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com,
 	netdev@vger.kernel.org
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	anthony.l.nguyen@intel.com,
-	jacob.e.keller@intel.com,
-	tatyana.e.nikolova@intel.com,
-	leon@kernel.org,
-	jgg@ziepe.ca,
-	linux-rdma@vger.kernel.org,
-	Marcin Szycik <marcin.szycik@linux.intel.com>
-Subject: [PATCH net-next 2/2] irdma: free iwdev->rf after removing MSI-X
-Date: Wed,  5 Mar 2025 13:57:53 -0800
-Message-ID: <20250305215756.1519390-3-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250305215756.1519390-1-anthony.l.nguyen@intel.com>
-References: <20250305215756.1519390-1-anthony.l.nguyen@intel.com>
+Subject: Re: [PATCH] PCI: Add PCI quirk to disable L0s ASPM state for RTL8125
+ 2.5GbE Controller
+Message-ID: <20250305222016.GA316198@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250305063035.415717-1-hans.zhang@cixtech.com>
 
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+[+cc r8169 maintainers, since upstream r8169 claims device 0x8125]
 
-Currently iwdev->rf is allocated in irdma_probe(), but free in
-irdma_ib_dealloc_device(). It can be misleading. Move the free to
-irdma_remove() to be more obvious.
+On Wed, Mar 05, 2025 at 02:30:35PM +0800, hans.zhang@cixtech.com wrote:
+> From: Hans Zhang <hans.zhang@cixtech.com>
+> 
+> This patch is intended to disable L0s ASPM link state for RTL8125 2.5GbE
+> Controller due to the fact that it is possible to corrupt TX data when
+> coming back out of L0s on some systems. This quirk uses the ASPM api to
+> prevent the ASPM subsystem from re-enabling the L0s state.
 
-Freeing in irdma_ib_dealloc_device() leads to KASAN use-after-free
-issue. Which can also lead to NULL pointer dereference. Fix this.
+Sounds like this should be a documented erratum.  Realtek folks?  Or
+maybe an erratum on the other end of the link, which looks like a CIX
+Root Port:
 
-irdma_deinit_interrupts() can't be moved before freeing iwdef->rf,
-because in this case deinit interrupts will be done before freeing irqs.
-The simplest solution is to move kfree(iwdev->rf) to irdma_remove().
+  https://admin.pci-ids.ucw.cz/read/PC/1f6c/0001
 
-Reproducer:
-  sudo rmmod irdma
+If it's a CIX Root Port defect, it could affect devices other than
+RTL8125.
 
-Minified splat(s):
-  BUG: KASAN: use-after-free in irdma_remove+0x257/0x2d0 [irdma]
-  Call Trace:
-   <TASK>
-   ? __pfx__raw_spin_lock_irqsave+0x10/0x10
-   ? kfree+0x253/0x450
-   ? irdma_remove+0x257/0x2d0 [irdma]
-   kasan_report+0xed/0x120
-   ? irdma_remove+0x257/0x2d0 [irdma]
-   irdma_remove+0x257/0x2d0 [irdma]
-   auxiliary_bus_remove+0x56/0x80
-   device_release_driver_internal+0x371/0x530
-   ? kernfs_put.part.0+0x147/0x310
-   driver_detach+0xbf/0x180
-   bus_remove_driver+0x11b/0x2a0
-   auxiliary_driver_unregister+0x1a/0x50
-   irdma_exit_module+0x40/0x4c [irdma]
+> And it causes the following AER errors:
+>   pcieport 0003:30:00.0: AER: Multiple Corrected error received: 0003:31:00.0
+>   pcieport 0003:30:00.0: PCIe Bus Error: severity=Corrected, type=Data Link Layer, (Transmitter ID)
+>   pcieport 0003:30:00.0:   device [1f6c:0001] error status/mask=00001000/0000e000
+>   pcieport 0003:30:00.0:    [12] Timeout
+>   r8125 0003:31:00.0: PCIe Bus Error: severity=Corrected, type=Data Link Layer, (Transmitter ID)
+>   r8125 0003:31:00.0:   device [10ec:8125] error status/mask=00001000/0000e000
+>   r8125 0003:31:00.0:    [12] Timeout
+>   r8125 0003:31:00.0: AER:   Error of this Agent is reported first
 
-  Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN NOPTI
-  KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-  RIP: 0010:ice_free_rdma_qvector+0x2a/0xa0 [ice]
-  Call Trace:
-   ? ice_free_rdma_qvector+0x2a/0xa0 [ice]
-   irdma_remove+0x179/0x2d0 [irdma]
-   auxiliary_bus_remove+0x56/0x80
-   device_release_driver_internal+0x371/0x530
-   ? kobject_put+0x61/0x4b0
-   driver_detach+0xbf/0x180
-   bus_remove_driver+0x11b/0x2a0
-   auxiliary_driver_unregister+0x1a/0x50
-   irdma_exit_module+0x40/0x4c [irdma]
+Looks like a driver name of "r8125", but I don't see that upstream.
+Is this an out-of-tree driver?
 
-Reported-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-Closes: https://lore.kernel.org/netdev/8e533834-4564-472f-b29b-4f1cb7730053@linux.intel.com/
-Fixes: 3e0d3cb3fbe0 ("ice, irdma: move interrupts code to irdma")
-Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/infiniband/hw/irdma/main.c  | 2 ++
- drivers/infiniband/hw/irdma/verbs.c | 1 -
- 2 files changed, 2 insertions(+), 1 deletion(-)
+> And the RTL8125 website does not say that it supports L0s. It only supports
+> L1 and L1ss.
+> 
+> RTL8125 website: https://www.realtek.com/Product/Index?id=3962
 
-diff --git a/drivers/infiniband/hw/irdma/main.c b/drivers/infiniband/hw/irdma/main.c
-index 5fc081ca8905..7599e31b5743 100644
---- a/drivers/infiniband/hw/irdma/main.c
-+++ b/drivers/infiniband/hw/irdma/main.c
-@@ -255,6 +255,8 @@ static void irdma_remove(struct auxiliary_device *aux_dev)
- 	ice_rdma_update_vsi_filter(pf, iwdev->vsi_num, false);
- 	irdma_deinit_interrupts(iwdev->rf, pf);
- 
-+	kfree(iwdev->rf);
-+
- 	pr_debug("INIT: Gen2 PF[%d] device remove success\n", PCI_FUNC(pf->pdev->devfn));
- }
- 
-diff --git a/drivers/infiniband/hw/irdma/verbs.c b/drivers/infiniband/hw/irdma/verbs.c
-index eeb932e58730..1e8c92826de2 100644
---- a/drivers/infiniband/hw/irdma/verbs.c
-+++ b/drivers/infiniband/hw/irdma/verbs.c
-@@ -4871,5 +4871,4 @@ void irdma_ib_dealloc_device(struct ib_device *ibdev)
- 
- 	irdma_rt_deinit_hw(iwdev);
- 	irdma_ctrl_deinit_hw(iwdev->rf);
--	kfree(iwdev->rf);
- }
--- 
-2.47.1
+I don't think it matters what the web site says.  Apparently the
+device advertises L0s support via Link Capabilities.
 
+> Signed-off-by: Hans Zhang <hans.zhang@cixtech.com>
+> Reviewed-by: Peter Chen <peter.chen@cixtech.com>
+> ---
+>  drivers/pci/quirks.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
+> index 82b21e34c545..5f69bb5ee3ff 100644
+> --- a/drivers/pci/quirks.c
+> +++ b/drivers/pci/quirks.c
+> @@ -2514,6 +2514,12 @@ DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_INTEL, 0x10f1, quirk_disable_aspm_l0s);
+>  DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_INTEL, 0x10f4, quirk_disable_aspm_l0s);
+>  DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_INTEL, 0x1508, quirk_disable_aspm_l0s);
+>  
+> +/*
+> + * The RTL8125 may experience data corruption issues when transitioning out
+> + * of L0S. To prevent this we need to disable L0S on the PCIe link.
+> + */
+> +DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_REALTEK, 0x8125, quirk_disable_aspm_l0s);
+> +
+>  static void quirk_disable_aspm_l0s_l1(struct pci_dev *dev)
+>  {
+>  	pci_info(dev, "Disabling ASPM L0s/L1\n");
+> 
+> base-commit: 99fa936e8e4f117d62f229003c9799686f74cebc
+> -- 
+> 2.47.1
+> 
 
