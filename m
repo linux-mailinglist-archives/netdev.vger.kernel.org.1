@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-172206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 184C0A50DBA
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 22:39:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD952A50DC7
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 22:40:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CED761635B7
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 21:38:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB5763B12F8
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 21:38:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CF3825C6E5;
-	Wed,  5 Mar 2025 21:36:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C94CB25C707;
+	Wed,  5 Mar 2025 21:36:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="azQMfHjX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SBD2S2yd"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BAD925743D
-	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 21:36:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A5F25BAD7
+	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 21:36:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741210564; cv=none; b=RVUNtzU4YP0XQW18fCqztlB6QizBL4cvYsV7y7efsAaJOG0So+qZvVslmymb7AEom1+STo0Ee+7IOgbfQjaSf63ubLNg+9epWJKXVsDYY3j047NHO8k3ZhN8K22GnLRem3kTBYV0kCr+OhP0L2I8rGJ3aKdfR3g9xh8sOwTfR+k=
+	t=1741210565; cv=none; b=KfWS/8NC/+Yd1uD8Q0yIxy4Y2GDNlb6j6i3J5r5vUTxaseQWdZB0riNSl0HLwPRxt2MM/kUr80Hit51yL1cuFk2jAROdgf4PyWkoQd7Nl8I2VUBS5Y2zLzuNzKBiBW8zmKED5yCGTcCRhN6wqx7eZhH5l4Y7NCr/llYH9PLPLB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741210564; c=relaxed/simple;
-	bh=GuwR3mhZuYCpbs97AgybkQQLFzvRbxU8C1+NMIk78bE=;
+	s=arc-20240116; t=1741210565; c=relaxed/simple;
+	bh=uNRKKVqID7kZB9OgAHMn4nS931Qj79b5NBPgV2Wo9fY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qspp+z/Qy9kZSJPKRC6biVIn0Xw8Er2cc0A5tx91ilHCWGHkiTn12aCuTANk2NOMNJC/PA0KHCv4oOc6P7uU98XpAb3Clky/aSn1XK/plMVun3+wM+njykJnTplu5uAvHPgzus/WkkBK4JSghAL9z8q9thIJEQfcnXvgD4h5B2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=azQMfHjX; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=iqr30iwudkegsveUbFXLl+Q/fNSOZ36JG5sbDKYoF/7bRn9SYNjwVXIbC+0Wt4XojJgILE6HGZdkalpGT7E1zXjKyOl/Vu46HELajS1wOoG1+yRWTdXWrXgNIiWydUhXB8ODW48mswPtfk010pt+K81f6VBZ6J7amfSA+QluFhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SBD2S2yd; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741210562; x=1772746562;
+  t=1741210564; x=1772746564;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=GuwR3mhZuYCpbs97AgybkQQLFzvRbxU8C1+NMIk78bE=;
-  b=azQMfHjXyWVuxJXh7IxWs+o8v4xevsiFyEqbSxG4lmmDxfsVKJu//btd
-   q8GQfmJku1wTvKNPk5gBHtxz7mHy3MYEbG6C/O1RRY+dPB3Gdc4qj0DSF
-   SO88jvL1gZw/J8zFm6GWFtvlZNJaLZMaAL8La0QRNZrfrIim31qMi4STa
-   J1LlXX2ScVgGWvKFaZBJaI6DtThQp4qAdMSj7w0IQdJGM5b7wfa1vLh8L
-   zjdgVGWQiL984n8amoMvWh1uAuVfRjIO/9ldAq8rSBvS7MWnG2ZRKCpUE
-   Uurn3BAdGGC0iZV3LNlfsPN8qrmsrbvFxF9sFiwAYLwBIUEKIGMTpifu/
+  bh=uNRKKVqID7kZB9OgAHMn4nS931Qj79b5NBPgV2Wo9fY=;
+  b=SBD2S2ydO1SiCN8r2ilvgKkyHYMDKUAUqlE3gXoPegaO+jgeK3fCUI9j
+   ClQ5fOPBADtr+i7tucoNJvuQpYg8yc6yd/bBxbQrPOU5Z/ukd+qEZiVC9
+   ncAxU4bIOvaX+0TBFdPnbyXydJG34uvVT40FXydqC/D69mEROeMQanSvV
+   U+9Te6gdO9AygBA/sHjdGm4H+t5GN/21De9V1kcFZ/Iu2Ytf4z5Qn2b5k
+   7eSU0uuaVNYvTltLi14JBZu8aaExU3XJGu4ZIJoUg+Vt8ZpcLk9oOyXu3
+   u+Fsw6bRuwjlovdsYaqsd7l1KWZ4tNvR3HnN89I8xyaSEc7HoSceg4M0O
    Q==;
-X-CSE-ConnectionGUID: gnLZwB+YRimqdJK4CUTPjQ==
-X-CSE-MsgGUID: Pf1LNsq/QOCnpMfgupGBAg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="53606486"
+X-CSE-ConnectionGUID: lAFSCCvqR8KgK0D4/WmWQA==
+X-CSE-MsgGUID: aR3dfUkbQ0io9UcQPAAcdw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="53606497"
 X-IronPort-AV: E=Sophos;i="6.14,224,1736841600"; 
-   d="scan'208";a="53606486"
+   d="scan'208";a="53606497"
 Received: from orviesa004.jf.intel.com ([10.64.159.144])
   by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 13:35:58 -0800
-X-CSE-ConnectionGUID: npqG6Qf4Q7Szb3WKbwhW8A==
-X-CSE-MsgGUID: yBTuF3EUThCSE/rMIeI8GQ==
+X-CSE-ConnectionGUID: Ga2Be8GyRtm+JnoU0n3NSQ==
+X-CSE-MsgGUID: 1+NjlbOpRnW7fmldOVb1iw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.14,224,1736841600"; 
-   d="scan'208";a="123828479"
+   d="scan'208";a="123828483"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa004.jf.intel.com with ESMTP; 05 Mar 2025 13:35:55 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -65,15 +65,14 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
+Cc: Grzegorz Nitka <grzegorz.nitka@intel.com>,
 	anthony.l.nguyen@intel.com,
-	michal.swiatkowski@linux.intel.com,
-	przemyslaw.kitszel@intel.com,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
 	Simon Horman <horms@kernel.org>,
-	Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
-Subject: [PATCH net 1/4] ice: do not configure destination override for switchdev
-Date: Wed,  5 Mar 2025 13:35:43 -0800
-Message-ID: <20250305213549.1514274-2-anthony.l.nguyen@intel.com>
+	Rinitha S <sx.rinitha@intel.com>
+Subject: [PATCH net 2/4] ice: fix memory leak in aRFS after reset
+Date: Wed,  5 Mar 2025 13:35:44 -0800
+Message-ID: <20250305213549.1514274-3-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250305213549.1514274-1-anthony.l.nguyen@intel.com>
 References: <20250305213549.1514274-1-anthony.l.nguyen@intel.com>
@@ -85,114 +84,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Larysa Zaremba <larysa.zaremba@intel.com>
+From: Grzegorz Nitka <grzegorz.nitka@intel.com>
 
-After switchdev is enabled and disabled later, LLDP packets sending stops,
-despite working perfectly fine before and during switchdev state.
-To reproduce (creating/destroying VF is what triggers the reconfiguration):
+Fix aRFS (accelerated Receive Flow Steering) structures memory leak by
+adding a checker to verify if aRFS memory is already allocated while
+configuring VSI. aRFS objects are allocated in two cases:
+- as part of VSI initialization (at probe), and
+- as part of reset handling
 
-devlink dev eswitch set pci/<address> mode switchdev
-echo '2' > /sys/class/net/<ifname>/device/sriov_numvfs
-echo '0' > /sys/class/net/<ifname>/device/sriov_numvfs
+However, VSI reconfiguration executed during reset involves memory
+allocation one more time, without prior releasing already allocated
+resources. This led to the memory leak with the following signature:
 
-This happens because LLDP relies on the destination override functionality.
-It needs to 1) set a flag in the descriptor, 2) set the VSI permission to
-make it valid. The permissions are set when the PF VSI is first configured,
-but switchdev then enables it for the uplink VSI (which is always the PF)
-once more when configured and disables when deconfigured, which leads to
-software-generated LLDP packets being blocked.
+[root@os-delivery ~]# cat /sys/kernel/debug/kmemleak
+unreferenced object 0xff3c1ca7252e6000 (size 8192):
+  comm "kworker/0:0", pid 8, jiffies 4296833052
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc 0):
+    [<ffffffff991ec485>] __kmalloc_cache_noprof+0x275/0x340
+    [<ffffffffc0a6e06a>] ice_init_arfs+0x3a/0xe0 [ice]
+    [<ffffffffc09f1027>] ice_vsi_cfg_def+0x607/0x850 [ice]
+    [<ffffffffc09f244b>] ice_vsi_setup+0x5b/0x130 [ice]
+    [<ffffffffc09c2131>] ice_init+0x1c1/0x460 [ice]
+    [<ffffffffc09c64af>] ice_probe+0x2af/0x520 [ice]
+    [<ffffffff994fbcd3>] local_pci_probe+0x43/0xa0
+    [<ffffffff98f07103>] work_for_cpu_fn+0x13/0x20
+    [<ffffffff98f0b6d9>] process_one_work+0x179/0x390
+    [<ffffffff98f0c1e9>] worker_thread+0x239/0x340
+    [<ffffffff98f14abc>] kthread+0xcc/0x100
+    [<ffffffff98e45a6d>] ret_from_fork+0x2d/0x50
+    [<ffffffff98e083ba>] ret_from_fork_asm+0x1a/0x30
+    ...
 
-Do not modify the destination override permissions when configuring
-switchdev, as the enabled state is the default configuration that is never
-modified.
-
-Fixes: 1a1c40df2e80 ("ice: set and release switchdev environment")
+Fixes: 28bf26724fdb ("ice: Implement aRFS")
 Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
+Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_eswitch.c |  6 ------
- drivers/net/ethernet/intel/ice/ice_lib.c     | 18 ------------------
- drivers/net/ethernet/intel/ice/ice_lib.h     |  4 ----
- 3 files changed, 28 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_arfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-index d649c197cf67..ed21d7f55ac1 100644
---- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
-+++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-@@ -49,9 +49,6 @@ static int ice_eswitch_setup_env(struct ice_pf *pf)
- 	if (vlan_ops->dis_rx_filtering(uplink_vsi))
- 		goto err_vlan_filtering;
+diff --git a/drivers/net/ethernet/intel/ice/ice_arfs.c b/drivers/net/ethernet/intel/ice/ice_arfs.c
+index 7cee365cc7d1..405ddd17de1b 100644
+--- a/drivers/net/ethernet/intel/ice/ice_arfs.c
++++ b/drivers/net/ethernet/intel/ice/ice_arfs.c
+@@ -511,7 +511,7 @@ void ice_init_arfs(struct ice_vsi *vsi)
+ 	struct hlist_head *arfs_fltr_list;
+ 	unsigned int i;
  
--	if (ice_vsi_update_security(uplink_vsi, ice_vsi_ctx_set_allow_override))
--		goto err_override_uplink;
--
- 	if (ice_vsi_update_local_lb(uplink_vsi, true))
- 		goto err_override_local_lb;
+-	if (!vsi || vsi->type != ICE_VSI_PF)
++	if (!vsi || vsi->type != ICE_VSI_PF || ice_is_arfs_active(vsi))
+ 		return;
  
-@@ -63,8 +60,6 @@ static int ice_eswitch_setup_env(struct ice_pf *pf)
- err_up:
- 	ice_vsi_update_local_lb(uplink_vsi, false);
- err_override_local_lb:
--	ice_vsi_update_security(uplink_vsi, ice_vsi_ctx_clear_allow_override);
--err_override_uplink:
- 	vlan_ops->ena_rx_filtering(uplink_vsi);
- err_vlan_filtering:
- 	ice_cfg_dflt_vsi(uplink_vsi->port_info, uplink_vsi->idx, false,
-@@ -275,7 +270,6 @@ static void ice_eswitch_release_env(struct ice_pf *pf)
- 	vlan_ops = ice_get_compat_vsi_vlan_ops(uplink_vsi);
- 
- 	ice_vsi_update_local_lb(uplink_vsi, false);
--	ice_vsi_update_security(uplink_vsi, ice_vsi_ctx_clear_allow_override);
- 	vlan_ops->ena_rx_filtering(uplink_vsi);
- 	ice_cfg_dflt_vsi(uplink_vsi->port_info, uplink_vsi->idx, false,
- 			 ICE_FLTR_TX);
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index 38a1c8372180..d0faa087793d 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -3936,24 +3936,6 @@ void ice_vsi_ctx_clear_antispoof(struct ice_vsi_ctx *ctx)
- 				 ICE_AQ_VSI_SEC_TX_PRUNE_ENA_S);
- }
- 
--/**
-- * ice_vsi_ctx_set_allow_override - allow destination override on VSI
-- * @ctx: pointer to VSI ctx structure
-- */
--void ice_vsi_ctx_set_allow_override(struct ice_vsi_ctx *ctx)
--{
--	ctx->info.sec_flags |= ICE_AQ_VSI_SEC_FLAG_ALLOW_DEST_OVRD;
--}
--
--/**
-- * ice_vsi_ctx_clear_allow_override - turn off destination override on VSI
-- * @ctx: pointer to VSI ctx structure
-- */
--void ice_vsi_ctx_clear_allow_override(struct ice_vsi_ctx *ctx)
--{
--	ctx->info.sec_flags &= ~ICE_AQ_VSI_SEC_FLAG_ALLOW_DEST_OVRD;
--}
--
- /**
-  * ice_vsi_update_local_lb - update sw block in VSI with local loopback bit
-  * @vsi: pointer to VSI structure
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.h b/drivers/net/ethernet/intel/ice/ice_lib.h
-index eabb35834a24..b4c9cb28a016 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.h
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.h
-@@ -105,10 +105,6 @@ ice_vsi_update_security(struct ice_vsi *vsi, void (*fill)(struct ice_vsi_ctx *))
- void ice_vsi_ctx_set_antispoof(struct ice_vsi_ctx *ctx);
- 
- void ice_vsi_ctx_clear_antispoof(struct ice_vsi_ctx *ctx);
--
--void ice_vsi_ctx_set_allow_override(struct ice_vsi_ctx *ctx);
--
--void ice_vsi_ctx_clear_allow_override(struct ice_vsi_ctx *ctx);
- int ice_vsi_update_local_lb(struct ice_vsi *vsi, bool set);
- int ice_vsi_add_vlan_zero(struct ice_vsi *vsi);
- int ice_vsi_del_vlan_zero(struct ice_vsi *vsi);
+ 	arfs_fltr_list = kcalloc(ICE_MAX_ARFS_LIST, sizeof(*arfs_fltr_list),
 -- 
 2.47.1
 
