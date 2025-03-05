@@ -1,139 +1,119 @@
-Return-Path: <netdev+bounces-172016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93E1BA4FEA7
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 13:34:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A842AA4FEB4
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 13:35:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C52F0169CCA
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 12:34:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D24D16AAEC
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 12:35:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BAE324418F;
-	Wed,  5 Mar 2025 12:34:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE2302451F3;
+	Wed,  5 Mar 2025 12:34:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bLrVVClc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mot1R8g0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F073133987;
-	Wed,  5 Mar 2025 12:34:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2F7320551D;
+	Wed,  5 Mar 2025 12:34:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741178047; cv=none; b=d8Cz9fsUcTCaWtTkQayrOFTbJrzL2MfkNwh+b8hP9XvrPb6RFQapIVgcuvASjjoLryAVmwb6T4XqIXY07EvgMRVT2buNmnmQzPB+lSYQseX4Ue4LJKxj7nfsnCyk9m9OAwR7VxCh7Kv4y4FHsNN+X7H2+KKUyj+6Ksu8VuNhn+8=
+	t=1741178069; cv=none; b=jKKMIcjV70lFZaLqKPjrt5Uz0KV+q9sCAgZxWdXJDhFDwG0KUZDNDurd8ftMrhJp0JGYi4gg/rJQgqNJBKkIbDJ18nGse8hsHPLZ5POjB7qfkYFWJLrAXlzixiI7DAM8gvgqjEUttYvgzhKrt3DbShT2d43019qnDqts2tQLLWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741178047; c=relaxed/simple;
-	bh=KXz7qN+UCvg/zXe/kDPAg/cy+msMPeJPVH/lqPdGHTo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fQ55wi2Gm/t4nrSDsS78f2AdvWH+HoXQ5QRsh8xUt5Ly0Ynrrrw3N4xSWDzfdrKU/WbPfh2W1H4aVd8tSgpznRhZ9EN6oaNS6ZicjP7Zi7ivmEcpNjEbU9YyOhDQDwtZlTKbxe4b9BFwYeHhhVS0sIzTeypupJFvH7vBh0p9Pj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bLrVVClc; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741178046; x=1772714046;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=KXz7qN+UCvg/zXe/kDPAg/cy+msMPeJPVH/lqPdGHTo=;
-  b=bLrVVClcoy9z6vn3AvQfNDWHz6TlGLBX5Xi02/RIsj93kC7Cg80ZdtMJ
-   QRCRahzkmZ6E5sPNioVeJZNMh+cNyOeC4YPmmICGwlxXTK30a4xxBFdP0
-   Hvc6N6mnIgtvEKU2Z/IvPCaLkxc+jJhBFNVkfNk23eSG1XzwiagLpFGWe
-   EVCucO21LIypBMlGLFqXy/mS7SpcJGnX1ESYaznf9Lk74j0s0xYdzhpjr
-   cKEEyTMffiqUek0wrRx0bd9oog4yRd/AyxBN1L0g2Ez1pPepPH36EVSwC
-   cq8Q6+QsO2nQlJmeHGebnpTz29eBGBotOPB/2x9eTJLWLnDD/kBjXOwo4
-   w==;
-X-CSE-ConnectionGUID: GP1ghgVVSB6dFWu866pgpw==
-X-CSE-MsgGUID: THJlhIFHRze8D5E+f6Kgvw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="46064865"
-X-IronPort-AV: E=Sophos;i="6.14,223,1736841600"; 
-   d="scan'208";a="46064865"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 04:34:05 -0800
-X-CSE-ConnectionGUID: N7Xoy4TzQJysW2kMb1XEUQ==
-X-CSE-MsgGUID: eBSnBMUbTKa2RR8mn5mMOA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,223,1736841600"; 
-   d="scan'208";a="118829798"
-Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.123.55]) ([10.247.123.55])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 04:33:58 -0800
-Message-ID: <4882bd5b-1a64-4ac7-ba51-66143d029e8a@linux.intel.com>
-Date: Wed, 5 Mar 2025 20:33:55 +0800
+	s=arc-20240116; t=1741178069; c=relaxed/simple;
+	bh=cOl0I3/cH0eRw0BhDrssA5OJL4SDNbydbLyFqtxZWgA=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=pQ9cFBG5zSxjQcbMo0XljphzUhIDtVg93NwVuViWo8k+1M+yqBx3KLL7ipvNQ7vyKSaSf0tC+/fgbX1pfiO2/V7gMdFgLbnuV+PtvcNrW98S0QZ8XlWLWbIno65Tig76h/R51ymY3gclfub6yj8NCiBKkAqbVb1iIMV0emYQn/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mot1R8g0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 191E2C4CEE2;
+	Wed,  5 Mar 2025 12:34:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741178069;
+	bh=cOl0I3/cH0eRw0BhDrssA5OJL4SDNbydbLyFqtxZWgA=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=mot1R8g0Bq6HJHmLbShpe0RIfR7Oq6SFDLlA1K5ZsnCqe7w7gZhwJJgjFaucGGqo6
+	 RI+s7zzzmGQJBSCLytJmqFBDtY6I/H0Nn+G01GcLNyuUb9m54opc2Z5XcEaGn8QfdE
+	 0tXaPadHffc6pTRkmtX1aVKJkoodcPU+krgK5PDT+90A8dDB51h6+iCoXp7I9DppN7
+	 1sDzCE2dcf43i3axrQVvq86FSHfdaH02p/vwQGzglACHaqtNnisi57HQNFL2Gi6DIF
+	 KGq7Qa91S3hT5/04dgmI4AG1qw/zqu+K6wh9NmA83CEw1w3c1QrqzVPA0JjzDnvIKe
+	 7MVwx7ZxQ3CSQ==
+Date: Wed, 05 Mar 2025 06:34:27 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next v7 5/9] igc: Add support for frame preemption
- verification
-To: Vladimir Oltean <vladimir.oltean@nxp.com>, ",chwee.lin.choong"@intel.com
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Furong Xu <0x1207@gmail.com>,
- Russell King <rmk+kernel@armlinux.org.uk>,
- Serge Semin <fancer.lancer@gmail.com>,
- Xiaolei Wang <xiaolei.wang@windriver.com>,
- Suraj Jaiswal <quic_jsuraj@quicinc.com>,
- Kory Maincent <kory.maincent@bootlin.com>, Gal Pressman <gal@nvidia.com>,
- Jesper Nilsson <jesper.nilsson@axis.com>,
- Andrew Halaney <ahalaney@redhat.com>,
- Choong Yong Liang <yong.liang.choong@linux.intel.com>,
- Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
- Vinicius Costa Gomes <vinicius.gomes@intel.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org
-References: <20250303102658.3580232-1-faizal.abdul.rahim@linux.intel.com>
- <20250303102658.3580232-6-faizal.abdul.rahim@linux.intel.com>
- <20250304152644.y7j7eshr4qxhmxq2@skbuf>
-Content-Language: en-US
-From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
-In-Reply-To: <20250304152644.y7j7eshr4qxhmxq2@skbuf>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Woojung Huh <woojung.huh@microchip.com>, Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ devicetree@vger.kernel.org, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Conor Dooley <conor+dt@kernel.org>, kernel@pengutronix.de, 
+ netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+In-Reply-To: <20250305102103.1194277-2-o.rempel@pengutronix.de>
+References: <20250305102103.1194277-1-o.rempel@pengutronix.de>
+ <20250305102103.1194277-2-o.rempel@pengutronix.de>
+Message-Id: <174117806721.1245382.8322491579922154490.robh@kernel.org>
+Subject: Re: [PATCH v4 1/4] dt-bindings: sound: convert ICS-43432 binding
+ to YAML
 
 
-
-On 4/3/2025 11:26 pm, Vladimir Oltean wrote:
-> On Mon, Mar 03, 2025 at 05:26:54AM -0500, Faizal Rahim wrote:
->> +static inline bool igc_fpe_is_verify_or_response(union igc_adv_rx_desc *rx_desc,
->> +						 unsigned int size)
->> +{
->> +	u32 status_error = le32_to_cpu(rx_desc->wb.upper.status_error);
->> +	int smd;
->> +
->> +	smd = FIELD_GET(IGC_RXDADV_STAT_SMD_TYPE_MASK, status_error);
->> +
->> +	return (smd == IGC_RXD_STAT_SMD_TYPE_V || smd == IGC_RXD_STAT_SMD_TYPE_R) &&
->> +		size == SMD_FRAME_SIZE;
->> +}
+On Wed, 05 Mar 2025 11:21:00 +0100, Oleksij Rempel wrote:
+> Convert the ICS-43432 MEMS microphone device tree binding from text format
+> to YAML.
 > 
-> The NIC should explicitly not respond to frames which have an SMD-V but
-> are not "verify" mPackets (7 octets of 0x55 + 1 octet SMD-V + 60 octets
-> of 0x00 + mCRC - as per 802.3 definitions). Similarly, it should only
-> treat SMD-R frames which contain 7 octets of 0x55 + 1 octet SMD-R + 60
-> octets of 0x00 + mCRC as "respond" mPackets, and only advance its
-> verification state machine based on those.
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+> ---
+> changes v4:
+> - add Reviewed-by: Rob...
+> changes v3:
+> - add maintainer
+> - remove '|' after 'description:'
+> changes v2:
+> - use "enum" instead "oneOf + const"
+> ---
+>  .../devicetree/bindings/sound/ics43432.txt    | 19 -------
+>  .../bindings/sound/invensense,ics43432.yaml   | 51 +++++++++++++++++++
+>  2 files changed, 51 insertions(+), 19 deletions(-)
+>  delete mode 100644 Documentation/devicetree/bindings/sound/ics43432.txt
+>  create mode 100644 Documentation/devicetree/bindings/sound/invensense,ics43432.yaml
 > 
-> Specifically, it doesn't look like you are ensuring the packet payload
-> contains 60 octets of zeroes. Is this something that the hardware
-> already does for you, or is it something that needs further validation
-> and differentiation in software?
 
-The hardware doesn’t handle this, so the igc driver have to do it manually. 
-I missed this handling, and Chwee Lin also noticed the issue while testing 
-this patch series—it wasn’t rejecting SMD-V and SMD-R with a non-zero 
-payload. I’ll update this patch to include the fix that Chwee Lin 
-implemented and tested. Thanks.
+My bot found errors running 'make dt_binding_check' on your patch:
+
+yamllint warnings/errors:
+
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/sound/invensense,ics43432.yaml: maintainers:0: 'N/A' does not match '@'
+	from schema $id: http://devicetree.org/meta-schemas/base.yaml#
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250305102103.1194277-2-o.rempel@pengutronix.de
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
