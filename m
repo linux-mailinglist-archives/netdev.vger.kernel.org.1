@@ -1,99 +1,155 @@
-Return-Path: <netdev+bounces-172174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE51DA507F0
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 19:02:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4ABEA508AF
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 19:10:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC7A4169D00
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 18:02:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 267531888B99
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 18:09:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B743C24C07D;
-	Wed,  5 Mar 2025 18:02:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68462528E0;
+	Wed,  5 Mar 2025 18:09:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Xxgr9JR3"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="kuN8C7Vb"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E53314B075;
-	Wed,  5 Mar 2025 18:02:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A18D2517AE
+	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 18:09:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741197725; cv=none; b=ebHmx80TVjuaXEyr+5oFww3/TdKBdGES/rGlJJKTuVSMOAcBRrMveKlXgli7ejBaYXrwUkn2ucanpHkJKNWVequrZ48C9qAb3PYH1cPDfuC00cxOhBGv9y/TZvxYF4ShJGNXCtCGzt1bGdRsEmQXyXx1769Ge6qtIobzwLCm+Hc=
+	t=1741198152; cv=none; b=WAvmFR5OArW1tKAaBKSynM4mGG7IGF0ZQL+xj6AO1+8lPnrD3V5NXuYfMtgFh+VHLJtOIW7pKZSBswVRiCoWs7GcXmJbhsTYZAuLfCUmiVRLdxsEH2eVHta8UoQQbky10+oEFHxO/IgvaS9+eNyrXn3nMEdiK/h1eJCNE96IE8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741197725; c=relaxed/simple;
-	bh=H8X/rbddfoXk+B+Ss5wXZbqRMEFAeXjuauUmhgb2EUw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f/ybL6wSkLDQCPZir1kmffcxXS1tK28fDa2fRkc1GmSebR1O7/y7bkFK6y0RkPAWL3pjoV+yzjdayxU0mvIeW9trRHRqqW7g2Tt0rOUpg9APzYL+TyOuilyN9HqMsWqCaf0kw6LkwLTciCSOM6v+PCGFzJQtRsVMiql0Wen7E74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Xxgr9JR3; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=talyWretgQjIWUP+Ebdm16KqFAKvyAHhwVwnzdoNc4Q=; b=Xxgr9JR3sAQSIEBgp+OuOx5sGW
-	JJvnu6sq7cByIBbMhkRj3SVUnGmxaXy896PzUEWRJYyeVDYx6N/ht8Lmnd4US0unk7hwUxYDEiDlE
-	UDA6vVOFVbIurF7PGOwMyLAE8sSADRYHhGSmaoS1S2E+0KkE4S4hS9Xg6ND7ykTXEHdE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tpt3y-002YQA-Mp; Wed, 05 Mar 2025 19:01:46 +0100
-Date: Wed, 5 Mar 2025 19:01:46 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Joseph Huang <joseph.huang.2024@gmail.com>
-Cc: Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org,
-	Vladimir Oltean <olteanv@gmail.com>,
+	s=arc-20240116; t=1741198152; c=relaxed/simple;
+	bh=TMYJJlrCKSQZCcdMd1zXdYIHHKwYt61VvQSuzMKoqkY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OTqFr7iX73Y1fq3toZNdvWddVpxpdhdUy4Jim+iLvJBkKcWlisTi7gR+AXSc9dZKsFejQJdDbb1wOqs45VBXiUSUYQ4ObQcUgKoH+wMoplH0vBndZO6xny/sogRVnAAOTZcMvU/q4Uj+Z57paC6hrMPdwRerTPaLSUuh9s+7iJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=kuN8C7Vb; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2239aa5da08so70262445ad.3
+        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 10:09:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1741198150; x=1741802950; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/JDOLyKKadEy+ulLyQr89yMyXan48P03nG7aI65rkLw=;
+        b=kuN8C7VbJx+sE3kTFmgofOOZWfbslO5TMFe+od6O4DH3D+BUmyKhUGyxB+FmXGkifT
+         QBjmFW2U2+BEaTVFoGJuGlO3cSY6vsagyHm1HBF6HoHXvv1tPt/4o1RZN5GOEg83QiKL
+         n2zE+Y09Hx/Ngpk4z83H+4jVnjMIY+C1mcPX0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741198150; x=1741802950;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/JDOLyKKadEy+ulLyQr89yMyXan48P03nG7aI65rkLw=;
+        b=w8bavTuAB162TJYXxqgrujI8Lekzsp2Sv6rgdP0UWmDlcgAf8168BOlI7pYp2lFOE+
+         eFoo0yDvV3j2ikjOy7cSO0pKKUFkeTdYt6OdEUt9jI23eXJwJe3LaukF217ZscN0gz2Q
+         6oyld+XoTh5iJLf2YwoO+1mdLOzHkm9htRCQ22bVz//Fj0Dg8cS084BJmSnQ2B20LFiu
+         JZh2jm7VWoO9S23Tt63g6xl8/xTGdRdpKHoyziEWqj+0JkOKyzKfBspVsY7kDqLw8Yi6
+         LSC+spPKwftXKysPXta/c0dRez65y4k3c5p0vQOoYk67YhkiOCOU4sY5aXM8YKnlYlOl
+         8cUw==
+X-Gm-Message-State: AOJu0YzkzeHKgYouwjtHnkC7hIHKV4yiE71of49CR6sdAuEwFARW+qs5
+	y9dLisTd8fTP3VtIq97HTQtplHZYDP91fRFKBMbWVVkdw6zRRa4N2aLmH3dDjveA3yCJO0hzxrJ
+	NAs6dUPupZ5SZX8YzUL6jfNWXS1LequiVA4+6yV+j2UDI8vHJEN1GbdTOk9yLa/68JK6fzpfiAX
+	TmWzImO+ElqWedvnjT6l4XEYR7hP2fa0C/O2BSDg==
+X-Gm-Gg: ASbGncuCIJKWtGYqd9T7K0Xn01prn7h24gFssw23uIjHQPsFyHtUeGUvrFsw3Wi9v62
+	bbMmPLHrSZfUnb4/MJu8B837Rh7len/ODCHPqtisGiinEAcJ/SBR3PTdy00vdFhIGlHbilw7rlT
+	/aT5+Bj8PnOuBPfDN8Mnob9ycMjsCdNboYNO211QdIlNyB4DGMQmAgcVNNUt0+k5LRJDMQ1BwGc
+	HYDkKBZgKdry9IahSg+mRnU9kGUHn4MYYEEaItK5FpJUVKURYzAqAoOyPHSmUh5dxxDtsbB1+33
+	klWdxVgAs0yP8JrlKNseKmRW8V/tafuZJlp66LtHb08zKRHrofvn
+X-Google-Smtp-Source: AGHT+IHHP9qQRDNcIJ6SYkbk3gQTYwbtsOWJYWum8dEqxwJMevmC/aplCxv04Fpb3qqFTQ3JZrfYzA==
+X-Received: by 2002:a17:902:ec89:b0:224:76f:9e59 with SMTP id d9443c01a7336-224076fa0damr12749675ad.10.1741198149933;
+        Wed, 05 Mar 2025 10:09:09 -0800 (PST)
+Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-223504db77fsm115568055ad.162.2025.03.05.10.09.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Mar 2025 10:09:09 -0800 (PST)
+From: Joe Damato <jdamato@fastly.com>
+To: netdev@vger.kernel.org
+Cc: vitaly.lifshits@intel.com,
+	avigailx.dahan@intel.com,
+	anthony.l.nguyen@intel.com,
+	Joe Damato <jdamato@fastly.com>,
+	stable@vger.kernel.org,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
 	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Guenter Roeck <linux@roeck-us.net>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: dsa: mv88e6xxx: Verify after ATU Load ops
-Message-ID: <d3175821-1d1a-4ca3-b9ba-5e33eac08da2@lunn.ch>
-References: <20250304235352.3259613-1-Joseph.Huang@garmin.com>
- <2ea7cde2-2aa1-4ef4-a3ea-9991c1928d68@lunn.ch>
- <669d9f33-e861-482a-8fd1-849fc3d22cd2@gmail.com>
+	Paolo Abeni <pabeni@redhat.com>,
+	bpf@vger.kernel.org (open list:XDP (eXpress Data Path)),
+	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH iwl-net] igc: Fix XSK queue NAPI ID mapping
+Date: Wed,  5 Mar 2025 18:09:00 +0000
+Message-ID: <20250305180901.128286-1-jdamato@fastly.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <669d9f33-e861-482a-8fd1-849fc3d22cd2@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Mar 05, 2025 at 12:44:54PM -0500, Joseph Huang wrote:
-> On 3/5/2025 10:14 AM, Andrew Lunn wrote:
-> > On Tue, Mar 04, 2025 at 06:53:51PM -0500, Joseph Huang wrote:
-> > > ATU Load operations could fail silently if there's not enough space
-> > > on the device to hold the new entry.
-> > > 
-> > > Do a Read-After-Write verification after each fdb/mdb add operation
-> > > to make sure that the operation was really successful, and return
-> > > -ENOSPC otherwise.
-> > 
-> > Please could you add a description of what the user sees when the ATU
-> > is full. What makes this a bug which needs fixing? I would of thought
-> > at least for unicast addresses, the switch has no entry for the
-> > destination, so sends the packet to the CPU. The CPU will then
-> > software bridge it out the correct port. Reporting ENOSPC will not
-> > change that.
-> 
-> Hi Andrew,
-> 
-> What the user will see when the ATU table is full depends on the unknown
-> flood setting. If a user has unknown multicast flood disabled, what the user
-> will see is that multicast packets are dropped when the ATU table is full.
-> In other words, IGMP snooping is broken when the ATU Load operation fails
-> silently.
+In commit b65969856d4f ("igc: Link queues to NAPI instances"), the XSK
+queues were incorrectly unmapped from their NAPI instances. After
+discussion on the mailing list and the introduction of a test to codify
+the expected behavior, we can see that the unmapping causes the
+check_xsk test to fail:
 
-Please add this to the commit message. This describes the real problem
-being fixed, which is what somebody reading the commit message wants
-to know.
+NETIF=enp86s0 ./tools/testing/selftests/drivers/net/queues.py
 
-   Andrew
+[...]
+  # Check|     ksft_eq(q.get('xsk', None), {},
+  # Check failed None != {} xsk attr on queue we configured
+  not ok 4 queues.check_xsk
+
+After this commit, the test passes:
+
+  ok 4 queues.check_xsk
+
+Note that the test itself is only in net-next, so I tested this change
+by applying it to my local net-next tree, booting, and running the test.
+
+Cc: stable@vger.kernel.org
+Fixes: b65969856d4f ("igc: Link queues to NAPI instances")
+Signed-off-by: Joe Damato <jdamato@fastly.com>
+---
+ drivers/net/ethernet/intel/igc/igc_xdp.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/igc/igc_xdp.c b/drivers/net/ethernet/intel/igc/igc_xdp.c
+index 13bbd3346e01..869815f48ac1 100644
+--- a/drivers/net/ethernet/intel/igc/igc_xdp.c
++++ b/drivers/net/ethernet/intel/igc/igc_xdp.c
+@@ -86,7 +86,6 @@ static int igc_xdp_enable_pool(struct igc_adapter *adapter,
+ 		napi_disable(napi);
+ 	}
+ 
+-	igc_set_queue_napi(adapter, queue_id, NULL);
+ 	set_bit(IGC_RING_FLAG_AF_XDP_ZC, &rx_ring->flags);
+ 	set_bit(IGC_RING_FLAG_AF_XDP_ZC, &tx_ring->flags);
+ 
+@@ -136,7 +135,6 @@ static int igc_xdp_disable_pool(struct igc_adapter *adapter, u16 queue_id)
+ 	xsk_pool_dma_unmap(pool, IGC_RX_DMA_ATTR);
+ 	clear_bit(IGC_RING_FLAG_AF_XDP_ZC, &rx_ring->flags);
+ 	clear_bit(IGC_RING_FLAG_AF_XDP_ZC, &tx_ring->flags);
+-	igc_set_queue_napi(adapter, queue_id, napi);
+ 
+ 	if (needs_reset) {
+ 		napi_enable(napi);
+
+base-commit: 3c9231ea6497dfc50ac0ef69fff484da27d0df66
+-- 
+2.34.1
+
 
