@@ -1,115 +1,260 @@
-Return-Path: <netdev+bounces-172061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E1DFA501BB
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 15:22:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D122A5020C
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 15:33:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97D623B1030
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 14:21:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91C343A718D
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 14:33:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA2562505B2;
-	Wed,  5 Mar 2025 14:19:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7219424BC17;
+	Wed,  5 Mar 2025 14:33:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ceW9uAAo"
+	dkim=pass (2048-bit key) header.d=arthurfabre.com header.i=@arthurfabre.com header.b="FgtRPZ6y";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="P9gF4BIw"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E7724EF7B;
-	Wed,  5 Mar 2025 14:19:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E190A156C74;
+	Wed,  5 Mar 2025 14:33:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741184393; cv=none; b=pU++0bUspAOO0v/xU/Aa+RDjYjHf0XHmpG6+jOziFiO4rphHJ+iiB7Rpsp00UV/qmMqYO5AeMOQ2Ad/Rbu/n3ONzjQNfV2tZCqQx8XgoQnqW4rJelyFy3Em3i20EAHjo3LnGqA1Eo+3FsHWoTGQ9ZMCooRA6cv7CaQOsGmlQT3Y=
+	t=1741185201; cv=none; b=j+zP2xeo9s1HyUUVnehBCsI7cj2xTOJ/EOPIxlw19D4q2ykH25ExAdb3XBo4XLov+uyg8OBkTx2zXh4CNl3x/R+vcOARSMDATiP9oLG+ZNUeRwPW7awVrOGFrf6pownRXiQIN9Qu/t+hIL50hRRHWQPYqlcn2+1DJclNtyKa+Xo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741184393; c=relaxed/simple;
-	bh=udQBNyydv6hqI+IwyVZvKVCN02JGzll5LRN2wPlmOpY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VIXrUv5BCGkceC1gyz70R36q7hvU2S9Rko6dEiRZoxeQN/PiSuCVG2r4+4yWju4AIH1FRG9KefQ0Uuu9FTywqlHKvPA/fIFr+v8HVjObaav9Ltk5IIl7usFQy2PDnz6hwKjeK0Uu1tDBz+wWwzjN+jCXE/I58VlqW74zM8w2hEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ceW9uAAo; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 2094744140;
-	Wed,  5 Mar 2025 14:19:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1741184390;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lqhVF62lXxp4ehI9VcV/C1HiZcbumD+HxLx7oV5CC5s=;
-	b=ceW9uAAo4G9bXVuI4ZERHZyb/kah8I5x/RmDD3jQstKr4v1Uea10lH0vRJ5MnV/mRG1IAC
-	0axyedojTiTmRYXsyZ0w4Q2vj/ayCy1hUYkisREnON9sioxjuF1Fg+MXQ+atkL0HJLYl4N
-	2ru30DHgRuSo5xcNNt7ve938uNjidbytT8b+LIg9gbjOXWEGQ+Iife9M93b+RDHsOHMQvA
-	VQ9iO4gCbJmw6MewUMZzlsoezgJBT4KE+mt2i72DWJFtYuj2ULb0FCxAUTLendA9H7/94R
-	aZ4ekHPX02VtIpZXem78gVpdKMznuHsUK8T0uk7KrtNrtGp6CkKy40rHAUy0CQ==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Simon Horman <horms@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>
-Subject: [PATCH net-next 7/7] net: ethtool: pse-pd: Use per-PHY DUMP operations
-Date: Wed,  5 Mar 2025 15:19:37 +0100
-Message-ID: <20250305141938.319282-8-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250305141938.319282-1-maxime.chevallier@bootlin.com>
-References: <20250305141938.319282-1-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1741185201; c=relaxed/simple;
+	bh=2z2RNrHb6qG9W3qLpjkGuOq8UXcTOmhPl1pDRLwIRy0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=TT1GXkHmMQm5SyVFQe/UOF4PkdgQRHZKqZwQi7OuBh+vK7asFhGN3KvjX+Sbm3DchMa8UzpUt327BE0p1xC4H8W5+POsxXrK89BuYGxIw383MKa9m2ecLTTJ41tlD6fIRrEeMkhoa65tDOuVv0V2q0khnxN/rKCsyMZILMXZ/q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arthurfabre.com; spf=pass smtp.mailfrom=arthurfabre.com; dkim=pass (2048-bit key) header.d=arthurfabre.com header.i=@arthurfabre.com header.b=FgtRPZ6y; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=P9gF4BIw; arc=none smtp.client-ip=103.168.172.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arthurfabre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arthurfabre.com
+Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
+	by mailfout.phl.internal (Postfix) with ESMTP id AED1013814CE;
+	Wed,  5 Mar 2025 09:33:17 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-04.internal (MEProxy); Wed, 05 Mar 2025 09:33:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arthurfabre.com;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:message-id:mime-version
+	:reply-to:subject:subject:to:to; s=fm3; t=1741185197; x=
+	1741271597; bh=wTjzfegKSik2sCBY6FbFyMGcYgR4HS7Jn7B4D35Q+gQ=; b=F
+	gtRPZ6yjpbqTToExXKX3XkVIlr/eUrg6gSq1ONdtNwOcFPSOkEAsnimonA3APzh3
+	MtHnKzv481weii5/C5rFZc0DoEY6ECNm1+WSQONhl5v7XvC657rDhWXfTk7jPVf/
+	9X3DRLTfG+rppdb71VQGTjpd+C4EHjmUvqEOBhb1TalbsUmyxZOqN+f78xnALEsv
+	RtrdhhoPUbCKx4yyMTlWAuA6E4sscioIVDdKJ4N9e9/VWfY1EyX+Keo9MeGxH88X
+	vT3iADewH9a+HUTufwMrcaaNAYGlDGB1h0Cs9aF+iAS4TANqtWBCPYO+x5ob8pam
+	kJnR/n1YMp7mxN+7k/kVg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
+	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm1; t=1741185197; x=1741271597; bh=wTjzfegKSik2sCBY6FbFyMGcYgR4
+	HS7Jn7B4D35Q+gQ=; b=P9gF4BIwpNCmnFW104OBLdVy5G1jEySKS+x/8j1Umb1/
+	snUPf2Acv4bJMOD5lasL9HK1q0vLhf1MTnKZKTrNEiCTp5zONsEDaLz5+a3LC0A2
+	CCdbWhHoWf9+tuAsk5/Zpa86nEZh0RjzBdHir5B//aHrnGAcrxRK7edwcbM/E86S
+	vZnIz+0STcDoEj/DQCpuOh4WVZjPXPY+X+TKwqMHarj+Ei4OsBQpDO1/6zmtFl19
+	lbefDpF7MfsRSIPY2USB/W4fk3ciJ9gEUePPB17G8QXGFWpLfGPLU9aQBHn3LBzK
+	xXj/KL/OxgftoB2PMfr7PJ+QxvmXIWrAZAA7UkMRWQ==
+X-ME-Sender: <xms:rWDIZ4novZLh6_CLluJGLFREECKHT75fOf5s-QwzMbTwSs6xNSuajQ>
+    <xme:rWDIZ300CY4wrKv1yM2i_Wsp2WzoAkm7Nfits79zIz8lwwUH7DU3eoxFynzODLf3b
+    C0YnvIYZVXfaZ3pOs4>
+X-ME-Received: <xmr:rWDIZ2r_r38nvEJry67JfW_86vtZ9XNzBCwDs_PzvUJkyJkFwJBCfJOpzl8sG8q-I4Ca81SyXBDNWeSpJSg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddutdehtdekucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhephffufffkgggtgffvvefosehtjeertdertdej
+    necuhfhrohhmpegrrhhthhhurhesrghrthhhuhhrfhgrsghrvgdrtghomhenucggtffrrg
+    htthgvrhhnpedttddukedtueejtdffleegteffffeuvedtgfetteelfeeijeetjedtffdt
+    gfduffenucffohhmrghinheplhhptgdrvghvvghnthhsnecuvehluhhsthgvrhfuihiivg
+    eptdenucfrrghrrghmpehmrghilhhfrhhomheprghrthhhuhhrsegrrhhthhhurhhfrggs
+    rhgvrdgtohhmpdhnsggprhgtphhtthhopeelpdhmohguvgepshhmthhpohhuthdprhgtph
+    htthhopehthhhoihhlrghnugesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhgsihgr
+    nhgtohhnsehrvgguhhgrthdrtghomhdprhgtphhtthhopehhrgifkheskhgvrhhnvghlrd
+    horhhgpdhrtghpthhtohepsghpfhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphht
+    thhopegrfhgrsghrvgestghlohhuughflhgrrhgvrdgtohhmpdhrtghpthhtohepjhgrkh
+    husgestghlohhuughflhgrrhgvrdgtohhmpdhrtghpthhtohephigrnhestghlohhuughf
+    lhgrrhgvrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrd
+    horhhgpdhrtghpthhtohepjhgsrhgrnhguvggsuhhrghestghlohhuughflhgrrhgvrdgt
+    ohhm
+X-ME-Proxy: <xmx:rWDIZ0loBCQRJhfZVESdeZztipBuVnBIhm_Wj6Zilp4gLWOf_6DtXg>
+    <xmx:rWDIZ23BIfnHrk4OgfY04a5tvcDotV-Eyu8sO5tTsamc7vunXjfVVg>
+    <xmx:rWDIZ7vlib4WtLpibRRuTrr8iP7Oa660VcapF2jvoj9MxFgE1GZhvQ>
+    <xmx:rWDIZyVkHmoGOZDGcFfNip4e2qcCMAg7JjWgiFLkLnQbliyV4BYhbQ>
+    <xmx:rWDIZ0wtGOwn6xRCg_k8755V8RgDJRJ2KEM3qo_oSAly-xWG2fuhlivV>
+Feedback-ID: i25f1493c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 5 Mar 2025 09:33:15 -0500 (EST)
+From: arthur@arthurfabre.com
+Subject: [PATCH RFC bpf-next 00/20] traits: Per packet metadata KV store
+Date: Wed, 05 Mar 2025 15:31:57 +0100
+Message-Id: <20250305-afabre-traits-010-rfc2-v1-0-d0ecfb869797@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddutdehtdegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepveegtdffleffleevueellefgjeefvedvjefhheegfefgffdvfeetgeevudetffdtnecukfhppedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvnecuvehluhhsthgvrhfuihiivgepvdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgdphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvddupdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmr
- giivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAF1gyGcC/x3MMQrDMAxA0asYzRUobgJt1kAP0LV0kB250eIE2
+ ZRAyN1rOr7h/wOKmEqB0R1g8tWia27oLg7iwvkjqHMzePIDXWlAThxMsBprLUgdoaXokW/Sz0K
+ xv1OAFm8mSff/+AXPx+TCljDLXuF9nj+qpN6HdgAAAA==
+X-Change-ID: 20250305-afabre-traits-010-rfc2-a8e4de0c490b
+To: netdev@vger.kernel.org, bpf@vger.kernel.org
+Cc: jakub@cloudflare.com, hawk@kernel.org, yan@cloudflare.com, 
+ jbrandeburg@cloudflare.com, thoiland@redhat.com, lbiancon@redhat.com, 
+ Arthur Fabre <afabre@cloudflare.com>
+X-Mailer: b4 0.14.2
 
-Leverage the per-phy ethnl DUMP helpers in case we have more that one
-PSE PHY on the link.
+Currently, the only way to attach information to a sk_buff that travels 
+through the network stack is by using the mark field. This 32-bit field
+is highly versatile - it can be read in firewall rules, drive routing 
+decisions, and be accessed by BPF programs.
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+However, its limited capacity creates competition for bits, restricting 
+its practical use.
+
+To remedy this, we propose using part of the packet headroom to store 
+metadata. This would allow:
+- Tracing packets through the network stack and across the kernel-user
+  space boundary, by assigning them a unique ID.
+- Metadata-driven packet redirection, routing, and socket steering with
+  early classification in XDP.
+- Extracting information from encapsulation headers and sharing it with
+  user space or vice versa.
+- Exposing XDP RX Metadata, like the timestamp, to the rest of the 
+  network stack.
+
+We originally proposed extending XDP metadata - binary blob
+storage also in the headroom - to expose it throughout the network 
+stack. However based on feedback at LPC 2024 [1]:
+- sharing a binary blob amongst different applications is hard.
+- exposing a binary blob to userspace is awkward.
+we've shifted to a limited KV store in the headroom.
+
+To differentiate this from the overloaded "metadata" term, it's 
+tentatively called "packet traits".
+
+A get() / set() / delete() API is exposed to BPF to store and 
+retrieve traits. 
+
+Initial benchmarks in XDP are promising, with get() / set() comparable
+to an indirect function call. See patch 6: "trait: Replace memmove calls
+with inline move" for full results.
+
+We imagine adding first class support for this in netfilter (setting 
+/ checking traits in rules) and routing (selecting routing tables 
+based on traits) in follow up work.
+We also envisage a first class userspace API for storing and
+retrieving traits in the future.
+
+To co-exist with the existing XDP metadata area, traits are stored at
+the start of the headroom:
+
+| xdp_frame | traits | headroom | XDP metadata | data / packet |
+
+Traits and XDP metadata are not allowed to overlap.
+
+Like XDP metadata, this relies on there being sufficient headroom
+available. Piggy backing on top of that work, traits are currently
+only supported:
+- On ingress.
+- By NIC drivers that support XDP metadata.
+- When an XDP program is attached.
+This limits the applicability of traits. But future work 
+guaranteeing sufficient headroom through other means should allow
+these restrictions to be lifted.
+
+There are still a number of open questions:
+- What sizes of values should be allowed? See patch 1 "trait: limited KV
+  store for packet metadata".
+- How should we handle skb clones? See patch 16 "trait: Support sk_buffs".
+- How should trait keys be allocated? See patch 18 "trait: registration
+  API".
+- How should traits work with GRO? Could an API let us specify policies 
+  for how traits should be merged? See patch 18 "trait: registration
+  API".
+
+[1] https://lpc.events/event/18/contributions/1935/
+
+Cc: jakub@cloudflare.com
+Cc: hawk@kernel.org
+Cc: yan@cloudflare.com
+Cc: jbrandeburg@cloudflare.com
+Cc: thoiland@redhat.com
+Cc: lbiancon@redhat.com
+
+To: netdev@vger.kernel.org
+To: bpf@vger.kernel.org
+
+Signed-off-by: Arthur Fabre <afabre@cloudflare.com>
 ---
- net/ethtool/pse-pd.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Arthur Fabre (19):
+      trait: limited KV store for packet metadata
+      trait: XDP support
+      trait: basic XDP selftest
+      trait: basic XDP benchmark
+      trait: Replace memcpy calls with inline copies
+      trait: Replace memmove calls with inline move
+      xdp: Track if metadata is supported in xdp_frame <> xdp_buff conversions
+      trait: Propagate presence of traits to sk_buff
+      bnxt: Propagate trait presence to skb
+      ice: Propagate trait presence to skb
+      veth: Propagate trait presence to skb
+      virtio_net: Propagate trait presence to skb
+      mlx5: Propagate trait presence to skb
+      xdp generic: Propagate trait presence to skb
+      trait: Support sk_buffs
+      trait: Allow socket filters to access traits
+      trait: registration API
+      trait: Sync linux/bpf.h to tools/ for trait registration
+      trait: register traits in benchmarks and tests
 
-diff --git a/net/ethtool/pse-pd.c b/net/ethtool/pse-pd.c
-index 4f6b99eab2a6..f3d14be8bdd9 100644
---- a/net/ethtool/pse-pd.c
-+++ b/net/ethtool/pse-pd.c
-@@ -314,4 +314,10 @@ const struct ethnl_request_ops ethnl_pse_request_ops = {
- 
- 	.set			= ethnl_set_pse,
- 	/* PSE has no notification */
-+
-+	.dump_start		= ethnl_dump_start_perphy,
-+	.dump_one_dev		= ethnl_dump_one_dev_perphy,
-+	.dump_done		= ethnl_dump_done_perphy,
-+
-+	.allow_pernetdev_dump	= true,
- };
+Jesper Dangaard Brouer (1):
+      mlx5: move xdp_buff scope one level up
+
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c          |   4 +
+ drivers/net/ethernet/intel/ice/ice_txrx.c          |   4 +
+ drivers/net/ethernet/intel/ice/ice_xsk.c           |   2 +
+ drivers/net/ethernet/mellanox/mlx5/core/en.h       |   6 +-
+ .../net/ethernet/mellanox/mlx5/core/en/xsk/rx.c    |   6 +-
+ .../net/ethernet/mellanox/mlx5/core/en/xsk/rx.h    |   6 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_rx.c    | 114 ++++----
+ drivers/net/veth.c                                 |   4 +
+ drivers/net/virtio_net.c                           |   8 +-
+ include/linux/bpf-netns.h                          |  12 +
+ include/linux/skbuff.h                             |  33 ++-
+ include/net/net_namespace.h                        |   6 +
+ include/net/netns/trait.h                          |  22 ++
+ include/net/trait.h                                | 288 +++++++++++++++++++++
+ include/net/xdp.h                                  |  42 ++-
+ include/uapi/linux/bpf.h                           |  26 ++
+ kernel/bpf/net_namespace.c                         |  54 ++++
+ kernel/bpf/syscall.c                               |  26 ++
+ kernel/bpf/verifier.c                              |  39 ++-
+ net/core/dev.c                                     |   1 +
+ net/core/filter.c                                  |  43 ++-
+ net/core/skbuff.c                                  |  25 +-
+ net/core/xdp.c                                     |  50 ++++
+ tools/include/uapi/linux/bpf.h                     |  26 ++
+ tools/testing/selftests/bpf/Makefile               |   2 +
+ tools/testing/selftests/bpf/bench.c                |  11 +
+ tools/testing/selftests/bpf/bench.h                |   1 +
+ .../selftests/bpf/benchs/bench_xdp_traits.c        | 191 ++++++++++++++
+ .../testing/selftests/bpf/prog_tests/xdp_traits.c  |  51 ++++
+ .../testing/selftests/bpf/progs/bench_xdp_traits.c | 131 ++++++++++
+ .../testing/selftests/bpf/progs/test_xdp_traits.c  |  94 +++++++
+ 31 files changed, 1259 insertions(+), 69 deletions(-)
+---
+base-commit: 42ba8a49d085e0c2ad50fb9a8ec954c9762b6e01
+change-id: 20250305-afabre-traits-010-rfc2-a8e4de0c490b
+
+Best regards,
 -- 
-2.48.1
+Arthur Fabre <afabre@cloudflare.com>
 
 
