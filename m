@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-172239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74A6BA50F1E
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 23:53:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52328A50F1D
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 23:52:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EEFB189307A
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 22:53:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F35316BDA8
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 22:52:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14017266B57;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EA4F266EEA;
 	Wed,  5 Mar 2025 22:52:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qKJJyHlK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aT3OOD8j"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4EF326659A
-	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 22:52:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B5ED266B6E
+	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 22:52:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741215155; cv=none; b=F7PiZUoQiizBkrGda77wD5KVjCSifZbBpHKpEmE98hmrRPg5WkJpK1DJmLBrflZa+sD0/brhGT9tRRVkEK6Eq7r812AWLRFWN45LMDHY10LLftNxhDq/719nbyP5ouNsXMr8Y6NOUYWBRZcjD4iKdthpLM3Dm//a47Z52OAsi24=
+	t=1741215155; cv=none; b=OGpJxpXd487V935y6u5eKduyS2QG4eskZaMDhlsR5jHKHeT93irZ0QD8m4B/rjs4Ya7Snq/3TWUmwDFKBpeS5Wutey4KyALg2pUAQ/3QsHsufW4y0GpymaDCQNGZq+GheEpk3Dcq8c1sgA1QBDx/+qqTSfdXyWouCrFLnd5X+M0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1741215155; c=relaxed/simple;
-	bh=jO7kihAP+Sb7V3Z6IYHTsg0B4M7LBa82xyGfMD578qU=;
+	bh=IY20lfkY+UNYlWGCZFCHdOtNVnxbujeCAbHCmOJ+44E=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I35tJLg70uFoaQ0tup1NtlXFalpQxqctFcH/1FjaRsjlRHCnnYfmjSx49BfozXaHSHyo2xbgB/yYB3KfyyFMI2BBmXkr2ZsQLgOcn4tSyYINOYMloRTk9KnjL79QI2U03LGyGcs60oyihkBV2D6oqHocHU2rxMCO7ETic0g26/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qKJJyHlK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E397C4CEE9;
+	 MIME-Version; b=qaDzABKLNAr6OhLCsm7srB6Fuo0Od6nIP3u66AcY3XkyDEVpwZxLTzVVeaxgwOYg02UQ6zEbVjxOriHKhFPbxoKlUGmKq/KJMFTMmxvLyWJFMKfFRSE3RgkWPuzXG2OvY8cLhmqpyZRwWZUXC63UpjJNvH/O++DRyrth3pnB9DU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aT3OOD8j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB0FFC4CEEA;
 	Wed,  5 Mar 2025 22:52:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741215154;
-	bh=jO7kihAP+Sb7V3Z6IYHTsg0B4M7LBa82xyGfMD578qU=;
+	s=k20201202; t=1741215155;
+	bh=IY20lfkY+UNYlWGCZFCHdOtNVnxbujeCAbHCmOJ+44E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qKJJyHlKzHXfEfb0IoIR4awyzU3FFHwSsLHCaeIkE8OzlVmJMOoQvN8kLFxMZiqly
-	 9ukwKfMBXhcn26C9bh5zyxPmX7dbx372tSgaXeqtkN0nfLGsj3+SW2nFYKxQ3vS3aJ
-	 wmjMwNOIho75B/K4RnmPQHKGUjqdRstswGROaW/QlvvZupJdP5hBdY9x23d3gP5/UB
-	 XVv3r8feqvOUVsOomcnGp/dDHma97zlcvrrz8+2oTypsKB6PyV1cr66YR2cHfWSZTQ
-	 mLV4F/pbBXqMapK5aeNEyjbqmjZT8r1g9veaHU2ssUhRf8Auueq6Jrcu4JStagC/h5
-	 0dQhHYUcqHJ4A==
+	b=aT3OOD8jKI7VdY+OAGk9+sE31vGyy32v0A1KgSyS4+mM7yY7A+gNF6MxNqN/SclhA
+	 3LSA9kVlXOm5UrSvoe7pJ0dOc7vvWaVuTJunEZHpOtBTbKFirk9+kVg/jenvPODuuF
+	 jjIRJkrYVEM1EB0pQG0jBO3hff66RmvHTaCHb8p3Gv8bTu6fV6eo3q1EMcO975iHBS
+	 fZkOGA01CivkytgNc0E6I8JeMLd6jT9gIkB54XRMnMTj1YDmMkvoA4KDh7Oou5anFN
+	 ztYTZpVShdMqy0qDDzXyC42Tzv4MwRIHijkhSk2+pTlc+TMoY3tezzwUkzhtxYVIKD
+	 tBHWceMf1xAFQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -52,9 +52,9 @@ Cc: netdev@vger.kernel.org,
 	pavan.chebbi@broadcom.com,
 	przemyslaw.kitszel@intel.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v3 06/10] eth: bnxt: consolidate the GRO-but-not-really paths in bnxt_gro_skb()
-Date: Wed,  5 Mar 2025 14:52:11 -0800
-Message-ID: <20250305225215.1567043-7-kuba@kernel.org>
+Subject: [PATCH net-next v3 07/10] eth: bnxt: extract VLAN info early on
+Date: Wed,  5 Mar 2025 14:52:12 -0800
+Message-ID: <20250305225215.1567043-8-kuba@kernel.org>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250305225215.1567043-1-kuba@kernel.org>
 References: <20250305225215.1567043-1-kuba@kernel.org>
@@ -66,71 +66,109 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-bnxt_tpa_end() skips calling bnxt_gro_skb() if it determines that GRO
-should not be performed. For ease of packet counting pass the gro bool
-into bnxt_gro_skb(), this way we have a single point thru which all
-packets coming out of bnxt_tpa_end() should pass.
+Michael would like the SW stats to include VLAN bytes, perhaps
+uniquely among ethernet drivers. To do this we need to extract
+the VLAN info before we call XDP, so before skb is allocated.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-v3:
- - flatten it harder, so we can reuse on normal Rx
-v2: https://lore.kernel.org/20250228012534.3460918-7-kuba@kernel.org
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 42 ++++++++++-------------
+ 1 file changed, 18 insertions(+), 24 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index d8a24a8bcfe8..dba4779f0925 100644
+index dba4779f0925..b0a9e3c6b377 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -1735,6 +1735,7 @@ static struct sk_buff *bnxt_gro_func_5730x(struct bnxt_tpa_info *tpa_info,
+@@ -1966,45 +1966,36 @@ static bool bnxt_rx_ts_valid(struct bnxt *bp, u32 flags,
+ 	return true;
  }
  
- static inline struct sk_buff *bnxt_gro_skb(struct bnxt *bp,
-+					   bool gro,
- 					   struct bnxt_tpa_info *tpa_info,
- 					   struct rx_tpa_end_cmp *tpa_end,
- 					   struct rx_tpa_end_cmp_ext *tpa_end1,
-@@ -1743,9 +1744,9 @@ static inline struct sk_buff *bnxt_gro_skb(struct bnxt *bp,
- 	int payload_off;
- 	u16 segs;
+-static struct sk_buff *bnxt_rx_vlan(struct sk_buff *skb, u8 cmp_type,
+-				    struct rx_cmp *rxcmp,
+-				    struct rx_cmp_ext *rxcmp1)
++static u32
++bnxt_rx_vlan(u8 cmp_type, struct rx_cmp *rxcmp, struct rx_cmp_ext *rxcmp1)
+ {
+-	__be16 vlan_proto;
+-	u16 vtag;
++	u16 vlan_proto = 0, vtag = 0;
  
--	segs = TPA_END_TPA_SEGS(tpa_end);
-+	segs = gro ? TPA_END_TPA_SEGS(tpa_end) : 1;
- 	if (segs == 1 || !IS_ENABLED(CONFIG_INET))
--		return skb;
-+		goto non_gro;
+ 	if (cmp_type == CMP_TYPE_RX_L2_CMP) {
+ 		__le32 flags2 = rxcmp1->rx_cmp_flags2;
+ 		u32 meta_data;
  
- 	NAPI_GRO_CB(skb)->count = segs;
- 	skb_shinfo(skb)->gso_size =
-@@ -1756,8 +1757,12 @@ static inline struct sk_buff *bnxt_gro_skb(struct bnxt *bp,
- 	else
- 		payload_off = TPA_END_PAYLOAD_OFF(tpa_end);
- 	skb = bp->gro_func(tpa_info, payload_off, TPA_END_GRO_TS(tpa_end), skb);
--	if (likely(skb))
--		tcp_gro_complete(skb);
-+	if (!skb)
-+		goto non_gro;
-+
-+	tcp_gro_complete(skb);
-+
-+non_gro: /* note: skb may be null! */
- 	return skb;
- }
+ 		if (!(flags2 & cpu_to_le32(RX_CMP_FLAGS2_META_FORMAT_VLAN)))
+-			return skb;
++			return 0;
  
-@@ -1917,10 +1922,7 @@ static inline struct sk_buff *bnxt_tpa_end(struct bnxt *bp,
- 			(tpa_info->flags2 & RX_CMP_FLAGS2_T_L4_CS_CALC) >> 3;
+ 		meta_data = le32_to_cpu(rxcmp1->rx_cmp_meta_data);
+ 		vtag = meta_data & RX_CMP_FLAGS2_METADATA_TCI_MASK;
+-		vlan_proto = htons(meta_data >> RX_CMP_FLAGS2_METADATA_TPID_SFT);
+-		if (eth_type_vlan(vlan_proto))
+-			__vlan_hwaccel_put_tag(skb, vlan_proto, vtag);
+-		else
+-			goto vlan_err;
++		vlan_proto = meta_data >> RX_CMP_FLAGS2_METADATA_TPID_SFT;
+ 	} else if (cmp_type == CMP_TYPE_RX_L2_V3_CMP) {
+ 		if (RX_CMP_VLAN_VALID(rxcmp)) {
+ 			u32 tpid_sel = RX_CMP_VLAN_TPID_SEL(rxcmp);
+ 
+ 			if (tpid_sel == RX_CMP_METADATA1_TPID_8021Q)
+-				vlan_proto = htons(ETH_P_8021Q);
++				vlan_proto = ETH_P_8021Q;
+ 			else if (tpid_sel == RX_CMP_METADATA1_TPID_8021AD)
+-				vlan_proto = htons(ETH_P_8021AD);
++				vlan_proto = ETH_P_8021AD;
+ 			else
+-				goto vlan_err;
++				vlan_proto = 0xffff;
+ 			vtag = RX_CMP_METADATA0_TCI(rxcmp1);
+-			__vlan_hwaccel_put_tag(skb, vlan_proto, vtag);
+ 		}
  	}
- 
--	if (gro)
--		skb = bnxt_gro_skb(bp, tpa_info, tpa_end, tpa_end1, skb);
--
 -	return skb;
-+	return bnxt_gro_skb(bp, gro, tpa_info, tpa_end, tpa_end1, skb);
+-vlan_err:
+-	dev_kfree_skb(skb);
+-	return NULL;
++
++	return (u32)vlan_proto << 16 | vtag;
  }
  
- static void bnxt_tpa_agg(struct bnxt *bp, struct bnxt_rx_ring_info *rxr,
+ static enum pkt_hash_types bnxt_rss_ext_op(struct bnxt *bp,
+@@ -2049,6 +2040,7 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
+ 	struct sk_buff *skb;
+ 	struct xdp_buff xdp;
+ 	u32 flags, misc;
++	u32 vlan_info;
+ 	u32 cmpl_ts;
+ 	void *data;
+ 	int rc = 0;
+@@ -2163,6 +2155,10 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
+ 	if (cmp_type == CMP_TYPE_RX_L2_CMP)
+ 		dev = bnxt_get_pkt_dev(bp, RX_CMP_CFA_CODE(rxcmp1));
+ 
++	vlan_info = bnxt_rx_vlan(cmp_type, rxcmp, rxcmp1);
++	if (vlan_info && !eth_type_vlan(htons(vlan_info >> 16)))
++		goto next_rx;
++
+ 	if (bnxt_xdp_attached(bp, rxr)) {
+ 		bnxt_xdp_buff_init(bp, rxr, cons, data_ptr, len, &xdp);
+ 		if (agg_bufs) {
+@@ -2246,11 +2242,9 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
+ 
+ 	skb->protocol = eth_type_trans(skb, dev);
+ 
+-	if (skb->dev->features & BNXT_HW_FEATURE_VLAN_ALL_RX) {
+-		skb = bnxt_rx_vlan(skb, cmp_type, rxcmp, rxcmp1);
+-		if (!skb)
+-			goto next_rx;
+-	}
++	if (vlan_info && skb->dev->features & BNXT_HW_FEATURE_VLAN_ALL_RX)
++		__vlan_hwaccel_put_tag(skb, htons(vlan_info >> 16),
++				       vlan_info & 0xffff);
+ 
+ 	skb_checksum_none_assert(skb);
+ 	if (RX_CMP_L4_CS_OK(rxcmp1)) {
 -- 
 2.48.1
 
