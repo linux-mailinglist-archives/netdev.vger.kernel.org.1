@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-172144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 926CBA50520
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 17:38:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B814FA5051A
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 17:38:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ADC537A7450
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 16:37:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D1BF1883481
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 16:38:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91E3F19F489;
-	Wed,  5 Mar 2025 16:37:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8C841A5BB7;
+	Wed,  5 Mar 2025 16:37:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90B015199F
-	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 16:37:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F7391A5B84
+	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 16:37:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741192666; cv=none; b=NGgb31l6uxbkViR0szhKpM4kwjENEk41G1mGCSmtTBa49CECnuOmyqa4xtxXURod8EoR0RwX37jVKStMEzKfxYdKsrZZkBQpJmx6rMJgxb5PsBl9rEVQrjh+huD4L1vkcC2pC/01LmNNQF8RT4qKqTBrNk57XV6Dv0iZtx0XwqQ=
+	t=1741192667; cv=none; b=tC9s3ndXrMD7jCd/EQQ+5LN6bY84WEtKWwFJ2gNt0d2eEVUuPUFrv2b9MqryzCRE9dKme/jOw96ke2u0AjNzTgT87Hxm7iOlBDYEnWOA4sD3vsqi7c9Xxo5W3n7a6aC8IUK2pVEFFsW3+FrO/eHR9SEFuh7MtXMT2lPMXWy2itA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741192666; c=relaxed/simple;
-	bh=6QDEm6JRUXKybjueQeqhWyQJEzWKbuDoG6Q5waKypzk=;
+	s=arc-20240116; t=1741192667; c=relaxed/simple;
+	bh=muhzBXZ4cbs9n00yKNWrE9dq+3va7dNrvwETAAcDZHY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MAw2skh1T7HkGVpJWOTGc56JsofRUB/L+m3OFE28jsjQpXfAelP87A30LsmP5lLKGofWFCgmcGq/3gtnfcc4IxE+rUNgvsTFdCcTC9aRL8yImgO31X9H1wnfIjR7OuH849AQHRZcwKrXgAOLB3HQqXx6BqQ/mf0hyZyo+mE1G4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.45
+	 MIME-Version; b=Rh/3eHXGZLxqPIyjsSAGXtaGzBpb8RpzoxkT9wSaOJF4z3KG59haJmjAsXoqzugTSimalyDA1KaO7JTj6eXMbbggX+9rvdyVTktc7x9QQRz+COr44n/ryeqFtStO0a6QTE+iZuxj5juXYpK/tnAZ6aYHSNYIvXZmCeMICQyQV4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2fe848040b1so14535655a91.3
-        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 08:37:44 -0800 (PST)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-223959039f4so86898365ad.3
+        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 08:37:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741192664; x=1741797464;
+        d=1e100.net; s=20230601; t=1741192665; x=1741797465;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZHIZuQ05HfsN3Trg+XUvwlEUZF3QqJzmXwQzRGak5sU=;
-        b=w9YOeElvD8pfZJ1nY+licJ8LMQg52KQVhRl+6QAiw8jZ5Vt2EgE+FDpAltKorEhlPT
-         eH7Gt1A27s6T4SfTfH7kBQAU5cZSVlxWTupgsODSjFgMiyzjoFONm8QsYBz+QNT8rsIy
-         I1xWxDbdX43OWHEwLGuvUo5KrmDLXT2vymOHS4JtbJlozAuWnFJEHVoV2aHmprampZpI
-         02gxIdcT0Ar3hXV0kxOjow9FzvsxKwHUIrNnKE2zTmSIMSRVPj0JLHNpxuWjJYZ8dhtv
-         9yuCBfYklvEkC2Cc2O1SrtQH1KiBHp6XNYOMSq7yyQVLCJTz4d8HtaiIKhIl5uHSlk9O
-         FqNw==
-X-Gm-Message-State: AOJu0Yx1p7rvfoDTq+ZMcqICYRhA51tkQXEVBA6Zkw4FckM4rFgvq6+N
-	pHHPnVoACZ58t22TwJkKXc3WZBuEHlLOcIVKlz9sloBfI4JqrppbAMEt
-X-Gm-Gg: ASbGnctAVXWYU4EugBNm1uXbbTI8tqFbxRABoeriX3+bmGTH3YG15chqIRGORJnBvfx
-	Dmh1hwesK7Klv6cZUxIN3jFD+DV7ZRLnWgCtMX2P1SL1x2PzenYDejBT+se7rQemQt18Gbolnas
-	OF2BuuRrru7s9DSYXP86S9KfQHMJA50KpKDOHAqpM7iPHKOLARS9oA9HATBl+iY+cuxLg/j8O+K
-	2jsEt/Y5Bd9l/zWZjFDRrnuDAy+i9DcmqVE91rz/h8Ls0thI5E37vMHSXXXQOBTvSwkLaZHCfYU
-	pHPmgIRg9D27JJbWg2jeaN63W0bLV+n8e79h8CQ4vCrT
-X-Google-Smtp-Source: AGHT+IG8veOu9L+yZefpkM/qdNbVB7nF8u9GJYks3VQS71SG30zPA9gkiqOJ1N95Al7rP3XAY0Ikcg==
-X-Received: by 2002:a05:6a21:9998:b0:1f3:2bef:64c2 with SMTP id adf61e73a8af0-1f349454e19mr5402239637.1.1741192663800;
-        Wed, 05 Mar 2025 08:37:43 -0800 (PST)
+        bh=39USaMyvIxaBDm4XXvid+nR/AvELpk8a9xvvS0A+rno=;
+        b=nRn+NmwWy7DB7HR7/gXL3ie+5sk2N/ywGfv4GlVysgQrL5xkk5X8TPvmI1LDP8yFJN
+         ukrWqDOYr4bhD+xRzCXUYvhdDeZMbZTUOC5uUpJibrYB/4pH5FRJFqLIztP3UNu45YTv
+         lROadc68n/ZGNgTRsx09WlSKnBHm5NWhOWdTxkQw3VkqiK5tDmRKamWEyM0kxPUzu8AJ
+         sOpRk36ZZsmu1QBP+wBvi7ztj2+KxTlScWbSz8jbYlcA1YddIuCVPw+Pr/Tfc7GGiMy1
+         Hnwx1bVdxGz5Mu9HyrEEDSELV9QGcX90ac3YCqgVvkonVKReuYEFb/FUJ5sQgRvODIlb
+         /Zug==
+X-Gm-Message-State: AOJu0YyjaA7MSTUyUtporKH13lPK7ZLrZazh5Vf7VUEODMkds5DqPhfW
+	AMzMQSA8JnlyfZ7QB4F7QYN3wUGQUTg+ZKzRWok1u5upJYFe0bzJXx9f
+X-Gm-Gg: ASbGnctWDKEUfIDhyypg+qTPMJ+DYFgMiv6mCQpl96A7u4SzDsvRR7qG+B0KPbilkaP
+	W4E9gkOpFEF/NGWLVqOw4ZSpSjhv07P1BnqVS1YvWtLAq6TOc3vMuA8cPH4CME5hcWQyXVctcG/
+	Y0YgqUa43y154sSb45OADol+r9EGK3DPRkXhaPMB4qYYgVL2SUV/XAxT0VnYLIGy24Ap3U5/x3U
+	H0VXZ5lTadYIiigUnwG++mEGVIVrXwerv9MyVWB4uLKtY1fOGiAIicu1KRewkaxwfkiGLn1DtIW
+	VIflWlrJ6TuY/Z5aojrv4FMejkdoD2xpl/6pIh/8oqFC
+X-Google-Smtp-Source: AGHT+IFqpfJNifTbamgtOIIO/MS2bNJz9AMyuulEFuxOhtSVfwsZUlH589vy/XYoZ0I1jfgtKdrggg==
+X-Received: by 2002:a17:902:f54b:b0:21f:85af:4bbf with SMTP id d9443c01a7336-223f1c8064amr53868305ad.20.1741192665018;
+        Wed, 05 Mar 2025 08:37:45 -0800 (PST)
 Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
-        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-aee7dede704sm12156946a12.66.2025.03.05.08.37.43
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-223f952432bsm12927735ad.212.2025.03.05.08.37.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Mar 2025 08:37:43 -0800 (PST)
+        Wed, 05 Mar 2025 08:37:44 -0800 (PST)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -64,9 +64,9 @@ Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	Saeed Mahameed <saeed@kernel.org>
-Subject: [PATCH net-next v10 08/14] net: hold netdev instance lock during sysfs operations
-Date: Wed,  5 Mar 2025 08:37:26 -0800
-Message-ID: <20250305163732.2766420-9-sdf@fomichev.me>
+Subject: [PATCH net-next v10 09/14] net: hold netdev instance lock during ndo_bpf
+Date: Wed,  5 Mar 2025 08:37:27 -0800
+Message-ID: <20250305163732.2766420-10-sdf@fomichev.me>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250305163732.2766420-1-sdf@fomichev.me>
 References: <20250305163732.2766420-1-sdf@fomichev.me>
@@ -78,282 +78,196 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Most of them are already covered by the converted dev_xxx APIs.
-Add the locking wrappers for the remaining ones.
+Cover the paths that come via bpf system call and XSK bind.
 
 Cc: Saeed Mahameed <saeed@kernel.org>
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- drivers/net/bonding/bond_main.c |  7 +++-
- include/linux/netdevice.h       |  4 ++
- net/core/dev.c                  | 58 ++++++-----------------------
- net/core/dev_api.c              | 65 +++++++++++++++++++++++++++++++++
- net/core/net-sysfs.c            |  2 +
- 5 files changed, 88 insertions(+), 48 deletions(-)
+ include/linux/netdevice.h |  1 +
+ kernel/bpf/offload.c      |  6 ++++--
+ net/core/dev.c            | 13 +++++++++++--
+ net/core/dev_api.c        | 12 ++++++++++++
+ net/xdp/xsk.c             |  3 +++
+ net/xdp/xsk_buff_pool.c   |  2 ++
+ 6 files changed, 33 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index cd4afeb9ad42..cf0b02720dd8 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -2644,10 +2644,13 @@ static int __bond_release_one(struct net_device *bond_dev,
- 		dev_set_mac_address(slave_dev, (struct sockaddr *)&ss, NULL);
- 	}
- 
--	if (unregister)
-+	if (unregister) {
-+		netdev_lock_ops(slave_dev);
- 		__dev_set_mtu(slave_dev, slave->original_mtu);
--	else
-+		netdev_unlock_ops(slave_dev);
-+	} else {
- 		dev_set_mtu(slave_dev, slave->original_mtu);
-+	}
- 
- 	if (!netif_is_bond_master(slave_dev))
- 		slave_dev->priv_flags &= ~IFF_BONDING;
 diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 8d243c0ec39d..c61b12809588 100644
+index c61b12809588..ca9c09dab14e 100644
 --- a/include/linux/netdevice.h
 +++ b/include/linux/netdevice.h
-@@ -3382,6 +3382,7 @@ void dev_close(struct net_device *dev);
- void dev_close_many(struct list_head *head, bool unlink);
- int dev_setup_tc(struct net_device *dev, enum tc_setup_type type,
- 		 void *type_data);
-+void netif_disable_lro(struct net_device *dev);
- void dev_disable_lro(struct net_device *dev);
- int dev_loopback_xmit(struct net *net, struct sock *sk, struct sk_buff *newskb);
- u16 dev_pick_tx_zero(struct net_device *dev, struct sk_buff *skb,
-@@ -4257,6 +4258,8 @@ int netif_set_mtu(struct net_device *dev, int new_mtu);
- int dev_set_mtu(struct net_device *, int);
- int dev_pre_changeaddr_notify(struct net_device *dev, const char *addr,
- 			      struct netlink_ext_ack *extack);
-+int netif_set_mac_address(struct net_device *dev, struct sockaddr *sa,
-+			  struct netlink_ext_ack *extack);
- int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
- 			struct netlink_ext_ack *extack);
- int netif_set_mac_address_user(struct net_device *dev, struct sockaddr *sa,
-@@ -5016,6 +5019,7 @@ static inline void __dev_mc_unsync(struct net_device *dev,
- /* Functions used for secondary unicast and multicast support */
- void dev_set_rx_mode(struct net_device *dev);
- int dev_set_promiscuity(struct net_device *dev, int inc);
-+int netif_set_allmulti(struct net_device *dev, int inc, bool notify);
- int dev_set_allmulti(struct net_device *dev, int inc);
- void netdev_state_change(struct net_device *dev);
- void __netdev_notify_peers(struct net_device *dev);
+@@ -4277,6 +4277,7 @@ struct sk_buff *dev_hard_start_xmit(struct sk_buff *skb, struct net_device *dev,
+ 
+ int bpf_xdp_link_attach(const union bpf_attr *attr, struct bpf_prog *prog);
+ u8 dev_xdp_prog_count(struct net_device *dev);
++int netif_xdp_propagate(struct net_device *dev, struct netdev_bpf *bpf);
+ int dev_xdp_propagate(struct net_device *dev, struct netdev_bpf *bpf);
+ u8 dev_xdp_sb_prog_count(struct net_device *dev);
+ u32 dev_xdp_prog_id(struct net_device *dev, enum bpf_xdp_mode mode);
+diff --git a/kernel/bpf/offload.c b/kernel/bpf/offload.c
+index 1a4fec330eaa..a10153c3be2d 100644
+--- a/kernel/bpf/offload.c
++++ b/kernel/bpf/offload.c
+@@ -528,10 +528,10 @@ struct bpf_map *bpf_map_offload_map_alloc(union bpf_attr *attr)
+ 		return ERR_PTR(-ENOMEM);
+ 
+ 	bpf_map_init_from_attr(&offmap->map, attr);
+-
+ 	rtnl_lock();
+-	down_write(&bpf_devs_lock);
+ 	offmap->netdev = __dev_get_by_index(net, attr->map_ifindex);
++	netdev_lock_ops(offmap->netdev);
++	down_write(&bpf_devs_lock);
+ 	err = bpf_dev_offload_check(offmap->netdev);
+ 	if (err)
+ 		goto err_unlock;
+@@ -548,12 +548,14 @@ struct bpf_map *bpf_map_offload_map_alloc(union bpf_attr *attr)
+ 
+ 	list_add_tail(&offmap->offloads, &ondev->maps);
+ 	up_write(&bpf_devs_lock);
++	netdev_unlock_ops(offmap->netdev);
+ 	rtnl_unlock();
+ 
+ 	return &offmap->map;
+ 
+ err_unlock:
+ 	up_write(&bpf_devs_lock);
++	netdev_unlock_ops(offmap->netdev);
+ 	rtnl_unlock();
+ 	bpf_map_area_free(offmap);
+ 	return ERR_PTR(err);
 diff --git a/net/core/dev.c b/net/core/dev.c
-index 97a4fc0889d3..121c0449f87f 100644
+index 121c0449f87f..404047d4d943 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -1757,15 +1757,7 @@ int dev_setup_tc(struct net_device *dev, enum tc_setup_type type,
+@@ -9852,7 +9852,7 @@ u8 dev_xdp_sb_prog_count(struct net_device *dev)
+ 	return count;
  }
- EXPORT_SYMBOL(dev_setup_tc);
  
--/**
-- *	dev_disable_lro - disable Large Receive Offload on a device
-- *	@dev: device
-- *
-- *	Disable Large Receive Offload (LRO) on a net device.  Must be
-- *	called under RTNL.  This is needed if received packets may be
-- *	forwarded to another interface.
-- */
--void dev_disable_lro(struct net_device *dev)
-+void netif_disable_lro(struct net_device *dev)
+-int dev_xdp_propagate(struct net_device *dev, struct netdev_bpf *bpf)
++int netif_xdp_propagate(struct net_device *dev, struct netdev_bpf *bpf)
  {
- 	struct net_device *lower_dev;
- 	struct list_head *iter;
-@@ -1776,10 +1768,12 @@ void dev_disable_lro(struct net_device *dev)
- 	if (unlikely(dev->features & NETIF_F_LRO))
- 		netdev_WARN(dev, "failed to disable LRO!\n");
+ 	if (!dev->netdev_ops->ndo_bpf)
+ 		return -EOPNOTSUPP;
+@@ -9872,7 +9872,6 @@ int dev_xdp_propagate(struct net_device *dev, struct netdev_bpf *bpf)
  
--	netdev_for_each_lower_dev(dev, lower_dev, iter)
--		dev_disable_lro(lower_dev);
-+	netdev_for_each_lower_dev(dev, lower_dev, iter) {
-+		netdev_lock_ops(lower_dev);
-+		netif_disable_lro(lower_dev);
-+		netdev_unlock_ops(lower_dev);
-+	}
+ 	return dev->netdev_ops->ndo_bpf(dev, bpf);
  }
--EXPORT_SYMBOL(dev_disable_lro);
+-EXPORT_SYMBOL_GPL(dev_xdp_propagate);
  
- /**
-  *	dev_disable_gro_hw - disable HW Generic Receive Offload on a device
-@@ -6038,7 +6032,7 @@ static int generic_xdp_install(struct net_device *dev, struct netdev_bpf *xdp)
- 			static_branch_dec(&generic_xdp_needed_key);
- 		} else if (new && !old) {
- 			static_branch_inc(&generic_xdp_needed_key);
--			dev_disable_lro(dev);
-+			netif_disable_lro(dev);
- 			dev_disable_gro_hw(dev);
- 		}
- 		break;
-@@ -9210,7 +9204,7 @@ int dev_set_promiscuity(struct net_device *dev, int inc)
- }
- EXPORT_SYMBOL(dev_set_promiscuity);
- 
--static int __dev_set_allmulti(struct net_device *dev, int inc, bool notify)
-+int netif_set_allmulti(struct net_device *dev, int inc, bool notify)
+ u32 dev_xdp_prog_id(struct net_device *dev, enum bpf_xdp_mode mode)
  {
- 	unsigned int old_flags = dev->flags, old_gflags = dev->gflags;
- 	unsigned int allmulti, flags;
-@@ -9245,25 +9239,6 @@ static int __dev_set_allmulti(struct net_device *dev, int inc, bool notify)
- 	return 0;
- }
+@@ -9902,6 +9901,8 @@ static int dev_xdp_install(struct net_device *dev, enum bpf_xdp_mode mode,
+ 	struct netdev_bpf xdp;
+ 	int err;
  
--/**
-- *	dev_set_allmulti	- update allmulti count on a device
-- *	@dev: device
-- *	@inc: modifier
-- *
-- *	Add or remove reception of all multicast frames to a device. While the
-- *	count in the device remains above zero the interface remains listening
-- *	to all interfaces. Once it hits zero the device reverts back to normal
-- *	filtering operation. A negative @inc value is used to drop the counter
-- *	when releasing a resource needing all multicasts.
-- *	Return 0 if successful or a negative errno code on error.
-- */
--
--int dev_set_allmulti(struct net_device *dev, int inc)
--{
--	return __dev_set_allmulti(dev, inc, true);
--}
--EXPORT_SYMBOL(dev_set_allmulti);
--
- /*
-  *	Upload unicast and multicast address lists to device and
-  *	configure RX filtering. When the device doesn't support unicast
-@@ -9396,7 +9371,7 @@ int __dev_change_flags(struct net_device *dev, unsigned int flags,
- 		int inc = (flags & IFF_ALLMULTI) ? 1 : -1;
- 
- 		dev->gflags ^= IFF_ALLMULTI;
--		__dev_set_allmulti(dev, inc, false);
-+		netif_set_allmulti(dev, inc, false);
++	netdev_ops_assert_locked(dev);
++
+ 	if (dev->cfg->hds_config == ETHTOOL_TCP_DATA_SPLIT_ENABLED &&
+ 	    prog && !prog->aux->xdp_has_frags) {
+ 		NL_SET_ERR_MSG(extack, "unable to install XDP to device using tcp-data-split");
+@@ -10134,7 +10135,9 @@ static void bpf_xdp_link_release(struct bpf_link *link)
+ 	 * already NULL, in which case link was already auto-detached
+ 	 */
+ 	if (xdp_link->dev) {
++		netdev_lock_ops(xdp_link->dev);
+ 		WARN_ON(dev_xdp_detach_link(xdp_link->dev, NULL, xdp_link));
++		netdev_unlock_ops(xdp_link->dev);
+ 		xdp_link->dev = NULL;
  	}
  
- 	return ret;
-@@ -9588,16 +9563,8 @@ int dev_pre_changeaddr_notify(struct net_device *dev, const char *addr,
- }
- EXPORT_SYMBOL(dev_pre_changeaddr_notify);
+@@ -10216,10 +10219,12 @@ static int bpf_xdp_link_update(struct bpf_link *link, struct bpf_prog *new_prog,
+ 		goto out_unlock;
+ 	}
  
--/**
-- *	dev_set_mac_address - Change Media Access Control Address
-- *	@dev: device
-- *	@sa: new address
-- *	@extack: netlink extended ack
-- *
-- *	Change the hardware (MAC) address of the device
-- */
--int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
--			struct netlink_ext_ack *extack)
-+int netif_set_mac_address(struct net_device *dev, struct sockaddr *sa,
-+			  struct netlink_ext_ack *extack)
- {
- 	const struct net_device_ops *ops = dev->netdev_ops;
- 	int err;
-@@ -9621,7 +9588,6 @@ int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
- 	add_device_randomness(dev->dev_addr, dev->addr_len);
- 	return 0;
- }
--EXPORT_SYMBOL(dev_set_mac_address);
++	netdev_lock_ops(xdp_link->dev);
+ 	mode = dev_xdp_mode(xdp_link->dev, xdp_link->flags);
+ 	bpf_op = dev_xdp_bpf_op(xdp_link->dev, mode);
+ 	err = dev_xdp_install(xdp_link->dev, mode, bpf_op, NULL,
+ 			      xdp_link->flags, new_prog);
++	netdev_unlock_ops(xdp_link->dev);
+ 	if (err)
+ 		goto out_unlock;
  
- DECLARE_RWSEM(dev_addr_sem);
+@@ -11005,7 +11010,9 @@ int register_netdevice(struct net_device *dev)
+ 	if (ret)
+ 		goto err_uninit_notify;
  
-@@ -9631,7 +9597,7 @@ int netif_set_mac_address_user(struct net_device *dev, struct sockaddr *sa,
- 	int ret;
++	netdev_lock_ops(dev);
+ 	__netdev_update_features(dev);
++	netdev_unlock_ops(dev);
  
- 	down_write(&dev_addr_sem);
--	ret = dev_set_mac_address(dev, sa, extack);
-+	ret = netif_set_mac_address(dev, sa, extack);
- 	up_write(&dev_addr_sem);
- 	return ret;
- }
+ 	/*
+ 	 *	Default initial state at registry is that the
+@@ -11945,7 +11952,9 @@ void unregister_netdevice_many_notify(struct list_head *head,
+ 		/* Shutdown queueing discipline. */
+ 		dev_shutdown(dev);
+ 		dev_tcx_uninstall(dev);
++		netdev_lock_ops(dev);
+ 		dev_xdp_uninstall(dev);
++		netdev_unlock_ops(dev);
+ 		bpf_dev_bound_netdev_unregister(dev);
+ 		dev_memory_provider_uninstall(dev);
+ 
 diff --git a/net/core/dev_api.c b/net/core/dev_api.c
-index 059413d9ef9d..7bd667b34b80 100644
+index 7bd667b34b80..98db990ce21c 100644
 --- a/net/core/dev_api.c
 +++ b/net/core/dev_api.c
-@@ -252,3 +252,68 @@ int dev_set_mtu(struct net_device *dev, int new_mtu)
+@@ -317,3 +317,15 @@ int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
  	return ret;
  }
- EXPORT_SYMBOL(dev_set_mtu);
+ EXPORT_SYMBOL(dev_set_mac_address);
 +
-+/**
-+ * dev_disable_lro() - disable Large Receive Offload on a device
-+ * @dev: device
-+ *
-+ * Disable Large Receive Offload (LRO) on a net device.  Must be
-+ * called under RTNL.  This is needed if received packets may be
-+ * forwarded to another interface.
-+ */
-+void dev_disable_lro(struct net_device *dev)
-+{
-+	netdev_lock_ops(dev);
-+	netif_disable_lro(dev);
-+	netdev_unlock_ops(dev);
-+}
-+EXPORT_SYMBOL(dev_disable_lro);
-+
-+/**
-+ * dev_set_allmulti() - update allmulti count on a device
-+ * @dev: device
-+ * @inc: modifier
-+ *
-+ * Add or remove reception of all multicast frames to a device. While the
-+ * count in the device remains above zero the interface remains listening
-+ * to all interfaces. Once it hits zero the device reverts back to normal
-+ * filtering operation. A negative @inc value is used to drop the counter
-+ * when releasing a resource needing all multicasts.
-+ *
-+ * Return: 0 on success, -errno on failure.
-+ */
-+
-+int dev_set_allmulti(struct net_device *dev, int inc)
++int dev_xdp_propagate(struct net_device *dev, struct netdev_bpf *bpf)
 +{
 +	int ret;
 +
 +	netdev_lock_ops(dev);
-+	ret = netif_set_allmulti(dev, inc, true);
++	ret = netif_xdp_propagate(dev, bpf);
 +	netdev_unlock_ops(dev);
 +
 +	return ret;
 +}
-+EXPORT_SYMBOL(dev_set_allmulti);
-+
-+/**
-+ * dev_set_mac_address() - change Media Access Control Address
-+ * @dev: device
-+ * @sa: new address
-+ * @extack: netlink extended ack
-+ *
-+ * Change the hardware (MAC) address of the device
-+ *
-+ * Return: 0 on success, -errno on failure.
-+ */
-+int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
-+			struct netlink_ext_ack *extack)
-+{
-+	int ret;
-+
-+	netdev_lock_ops(dev);
-+	ret = netif_set_mac_address(dev, sa, extack);
-+	netdev_unlock_ops(dev);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL(dev_set_mac_address);
-diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index 8d9dc048a548..27eea34d1b41 100644
---- a/net/core/net-sysfs.c
-+++ b/net/core/net-sysfs.c
-@@ -1483,8 +1483,10 @@ static ssize_t tx_maxrate_store(struct kobject *kobj, struct attribute *attr,
- 		return err;
++EXPORT_SYMBOL_GPL(dev_xdp_propagate);
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index 84bf9f1d4bf2..f864e5d70b40 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -1181,6 +1181,8 @@ static int xsk_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
+ 		goto out_release;
+ 	}
  
- 	err = -EOPNOTSUPP;
 +	netdev_lock_ops(dev);
- 	if (dev->netdev_ops->ndo_set_tx_maxrate)
- 		err = dev->netdev_ops->ndo_set_tx_maxrate(dev, index, rate);
++
+ 	if (!xs->rx && !xs->tx) {
+ 		err = -EINVAL;
+ 		goto out_unlock;
+@@ -1315,6 +1317,7 @@ static int xsk_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
+ 		smp_wmb();
+ 		WRITE_ONCE(xs->state, XSK_BOUND);
+ 	}
 +	netdev_unlock_ops(dev);
+ out_release:
+ 	mutex_unlock(&xs->mutex);
+ 	rtnl_unlock();
+diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
+index c263fb7a68dc..0e6ca568fdee 100644
+--- a/net/xdp/xsk_buff_pool.c
++++ b/net/xdp/xsk_buff_pool.c
+@@ -1,5 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0
  
- 	if (!err) {
- 		queue->tx_maxrate = rate;
++#include <linux/netdevice.h>
+ #include <net/xsk_buff_pool.h>
+ #include <net/xdp_sock.h>
+ #include <net/xdp_sock_drv.h>
+@@ -219,6 +220,7 @@ int xp_assign_dev(struct xsk_buff_pool *pool,
+ 	bpf.xsk.pool = pool;
+ 	bpf.xsk.queue_id = queue_id;
+ 
++	netdev_ops_assert_locked(netdev);
+ 	err = netdev->netdev_ops->ndo_bpf(netdev, &bpf);
+ 	if (err)
+ 		goto err_unreg_pool;
 -- 
 2.48.1
 
