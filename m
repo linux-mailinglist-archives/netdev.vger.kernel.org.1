@@ -1,212 +1,100 @@
-Return-Path: <netdev+bounces-172084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD0FBA50278
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 15:44:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C315A5029E
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 15:49:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78DC818919C0
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 14:41:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5A72188B88C
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 14:45:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A99B24CEED;
-	Wed,  5 Mar 2025 14:41:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3CA22505B6;
+	Wed,  5 Mar 2025 14:44:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="se24ZEZr"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jW9wJ7/p"
 X-Original-To: netdev@vger.kernel.org
-Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01olkn2046.outbound.protection.outlook.com [40.92.107.46])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C389124113C;
-	Wed,  5 Mar 2025 14:41:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.107.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741185676; cv=fail; b=IN9TaEzkAc+9QGGz39OP0BNwpQ3lJmHQzhCNteN1uwp00RSiELV0fEQWya4UZDbP8fcdEBLUa2O3irFRieCmgc1kF9AifhyDMmmLQ6/Z4k/MwSSMZGi8te52jBkDI3hUOUTycEICx1g2bniGlpU8WLBXPziidfPQnAOSajPn2GQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741185676; c=relaxed/simple;
-	bh=0mmiaeepogOCssgfcF4/Iblqgr3xmjLIA1iRjbC4MrE=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=QPqMxNXk5XGzpJ7G9/CPEzZYO/FQj6tQFN0781hapkA6lXZd4+nAm353vhWqQS+/IOTUNgfIFwfkRn257jMfFHI55UEBrSLFVt5xm9aRRjzoZv8l+H0NxClGjoH61m8JMKYPnaVikubeyZ09J2BqLpMEhKcOLHWYiAStDQYKlwc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=se24ZEZr; arc=fail smtp.client-ip=40.92.107.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Cn6F6XglrgDmN1DkAsH2o1SnM4an5rikiYQgq0KP3XyiOA5EPMexxilsBMBkzlQjNky8o10AUJRsllExI8OGLHWB8HebL3SoIC0QCo7MllF5ieAfaqj9AHgMbKFIbmCu+X3uKvMFxSqHW8hcz2r1KHIJ5Q4o2jErgVsHVo5VG/PrkNNOoHGoBZTBaCCYJc+0wcbq3moIAGd0yXiyD/sl3zIhJQaU4UaMGpsiF8vNLVAOlD+SZmhyAG7nE4aK6LCtQ6lU6y8eQXcDxEL3A2df2a+JQfw5iNLa+OR1hMCLdcH+q7CQbcDnGK77boCuXS2wrzNZcfIWzxisqkv+V8skYQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3MtEgRtV+K+fvxLInrRkANPOBFJhE3mizTO3erIZG74=;
- b=eE856ppfU/79xJJlUJsJ3XM3c/ss+0Mu5ogPAcwJ2ux5HPIASyvQyRsxAf3eLY8o/kf1C/wGDCTVYZDsAvYkEyS1zCjG09nP4zv8+CfCBDh6YqBGbFUBWzdgW+daGaNM1410TsOd9qwhA6Rog0GeUQVh0Ub5VTJ/jS5N8I74m5q3mYqR/2gEaGkK0+urRehC7k0lw/9O2pbp6g/XX6mAHHkMwzk9ZIrYKg93r2CjYBIkSwA7dTTm9jECWtG3QUt1wjC1V8gQZJLDjNTV19I0OUWS5O3LDSukM/nv+Nus0ILTFYhxUytaXCituy2ACdwsw1FC/g0b4nTrjpdmW7BD7Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3MtEgRtV+K+fvxLInrRkANPOBFJhE3mizTO3erIZG74=;
- b=se24ZEZrp9wADtcvKQiV2x+uepXSe4VhriPiu0H0iN+UKOZIKutB53Rs1xbDEDloUG46m9vQ5TB3UraVLOUhvh7mzrZWnAF1LS8nymsO0t1A85y1HFyQ3s2sP6zsY5f1FS+XZ4AOA5ufDpwijT61fQ0k+W1MzcpayeqdQtvQPW2+Ek+qgtlkQjdiJ4+d6oWHd0awbFZ+xESYL6PRZ2WlbFFbQNRr6ypsxN9Pf2XFLlAw+VgeV7Nx9/JTsVu17h1jeh9tyQdkxvlkJRjtPt2G2jXgKZ2CDb2Lz1p3eXNpOzZqAAafUANA1d5pf938l452RlMLSNmEMdyovx4bhPGTBw==
-Received: from TYZPR01MB5556.apcprd01.prod.exchangelabs.com
- (2603:1096:400:363::9) by SEZPR01MB6077.apcprd01.prod.exchangelabs.com
- (2603:1096:101:21e::9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.25; Wed, 5 Mar
- 2025 14:41:07 +0000
-Received: from TYZPR01MB5556.apcprd01.prod.exchangelabs.com
- ([fe80::3641:305b:41e2:6094]) by TYZPR01MB5556.apcprd01.prod.exchangelabs.com
- ([fe80::3641:305b:41e2:6094%5]) with mapi id 15.20.8489.025; Wed, 5 Mar 2025
- 14:41:07 +0000
-Message-ID:
- <TYZPR01MB5556CB47BC21C5015F698CA4C9CB2@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
-Date: Wed, 5 Mar 2025 22:41:00 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] dt-bindings: net: dsa: qca8k: add internal-PHY-to-PHY
- CPU link example
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "olteanv@gmail.com" <olteanv@gmail.com>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "robh@kernel.org" <robh@kernel.org>,
- "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
- "conor+dt@kernel.org" <conor+dt@kernel.org>,
- "rmk+kernel@armlinux.org.uk" <rmk+kernel@armlinux.org.uk>,
- "javier.carrasco.cruz@gmail.com" <javier.carrasco.cruz@gmail.com>,
- "john@phrozen.org" <john@phrozen.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <TYZPR01MB555632DC209AA69996309B58C9C92@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
- <TYZPR01MB5556D90A3778BDF7AB9A7030C9C92@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
- <ae329902-c940-4fd3-a857-c6689fa35680@lunn.ch>
- <TYZPR01MB5556C13F2BE2042DDE466C95C9C92@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
- <55a2e7d3-f201-48d7-be4e-5d1307e52f56@lunn.ch>
- <dbd0e376-d7c3-4ba9-886b-ba9529a2ec4e@outlook.com>
- <f7ac97f4-7677-402d-99f1-ae82709a3549@lunn.ch>
-From: Ziyang Huang <hzyitc@outlook.com>
-In-Reply-To: <f7ac97f4-7677-402d-99f1-ae82709a3549@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SI1PR02CA0060.apcprd02.prod.outlook.com
- (2603:1096:4:1f5::17) To TYZPR01MB5556.apcprd01.prod.exchangelabs.com
- (2603:1096:400:363::9)
-X-Microsoft-Original-Message-ID:
- <2235ab04-79fd-4e27-a4f1-5d70e9ae2361@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC792505A3;
+	Wed,  5 Mar 2025 14:44:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741185858; cv=none; b=shF5yICROgrAKPAJ1ypI6j6ydme4bu+FJAIvMO13YqAwRrHXjzwNd9qIqHcTL2LqfyZGnimqwIUcrW9XorDjXnPwRE+MRtmWd+oP49Y7Dc84p+oYMIZ9MHh4Fz2lktZ0Gw8H9ZV87ze9rhzY9zZBVTCpjE+iMcm31Jqc3Qgeeqs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741185858; c=relaxed/simple;
+	bh=HDAKKlonGba8rX1tjbow73YK4MXTBgC+sezxw2K7eec=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Oh4kob52hejA/1PIIsGJBVJ/RQLskKkGqluc4eZAzfvjkVU+J7Ld5+AFgv/nPlqVAWo6rMVYdvXCyJIh4HNVktimp9zcQekq9eZL+e2cgGV0h6GBijEO6P0gq6q32AwBfWGdMFAgXlwS2LWQ+aNCzyJwrds8cXbyGcclEpS2GJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jW9wJ7/p; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ezfHGj2cBWaEtzI2GUJQGGe0pXWbLGhCMJSGAb0XXr4=; b=jW9wJ7/ppvRin+Y4JUSWXTLaM1
+	yehJW1Smm4DGYwEuwb5ZvnlCk/wtdsusMLbKAZjT74M3C2oeSJFjV1z67c8sepbl0eBldOJOSZQdq
+	JShkPG3qy+eEoQwya185JoDQGas0okfzmC29Q6E+26u5/JB4hlyr6S5VfDe9Ch25F8I4Prf86oI2G
+	T7OAdYOsXBDpahK2sJya6ri14yku28ZMfZ2PIEqjK0tfSFMvKSDAUdxE3d3nqbI9oi+Qg8e/SAtY2
+	pS8pI8x/yJhA8HBfvyDWjao6InfAmpX3NHEWmFtK97D06F3vJMQd+CAkQPfOy5VeVYS6rNCf6tRCg
+	0A+NQqJw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45016)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tppyZ-0004Sc-2H;
+	Wed, 05 Mar 2025 14:43:59 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tppyS-0005rB-2p;
+	Wed, 05 Mar 2025 14:43:52 +0000
+Date: Wed, 5 Mar 2025 14:43:52 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Swathi K S <swathi.ks@samsung.com>
+Cc: krzk+dt@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	robh@kernel.org, conor+dt@kernel.org, richardcochran@gmail.com,
+	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	pankaj.dubey@samsung.com, ravi.patel@samsung.com,
+	gost.dev@samsung.com
+Subject: Re: [PATCH v8 2/2] net: stmmac: dwc-qos: Add FSD EQoS support
+Message-ID: <Z8hjKI1ZqU19nrTP@shell.armlinux.org.uk>
+References: <20250305091246.106626-1-swathi.ks@samsung.com>
+ <CGME20250305091856epcas5p4228c09989c7acfe45a99541eef01fbcd@epcas5p4.samsung.com>
+ <20250305091246.106626-3-swathi.ks@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: TYZPR01MB5556:EE_|SEZPR01MB6077:EE_
-X-MS-Office365-Filtering-Correlation-Id: b9c4d4ae-caf7-441b-6913-08dd5bf3c366
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|461199028|15080799006|8060799006|6090799003|19110799003|5072599009|3412199025|440099028;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?dy9McFZBN0crTDFTTEVvdy9yamJrWDJxK3RNUm1RaTZCRjVFeUVwZlhzODBl?=
- =?utf-8?B?QmtmK3lPNWd3bVBvOHBuQURrb0dBaGhYcS9wVEgybXgrOVRpRHhLMS9la3pC?=
- =?utf-8?B?cFhJSWM4blBnQzBCclRvcUJ4bHMyazBqbTRBWkl5ZHBFbVhOS2h2R3R2UWJr?=
- =?utf-8?B?N0pldE1vQ1BHZlorMWxvNGc0ZTVyOXFBK0VLUEMwRHpjYk1RZEdyZFZMUlhZ?=
- =?utf-8?B?RjdtSXpLTWFmL0ViOVptUHhzVkt6dFQrNlpOZVdVeTlQTU9udFpiTiszSjYw?=
- =?utf-8?B?d3lKLytzajdhdjhWWldsOUhudnE5djdsSDNXWjA3eTRIVVNIZ0xZZHJNZWUy?=
- =?utf-8?B?Unh0OE9HMmFKUzZjNXF6ajBEUkltYmpuSlY3eC9SNE1QMEpXQ1lLQVlNZkF2?=
- =?utf-8?B?Wk8rN1YvZDh2Y0lPNklpdm83Rkt3SkRYMEhXVndWajBNc2NZdGkyVGY0TkVh?=
- =?utf-8?B?aUJ5VnFVSStkaW1QeXZSUEtmbklHQkcrTHZXV0ZybGI0VzZ0NmJhSzFKTGdl?=
- =?utf-8?B?RFpkWTc2S0JJbEpQR0ZDK0hPM3htTFdPcE5YODY2RDc3SmkvZVZZazRqT1U1?=
- =?utf-8?B?cWVVaXNaaGJzWkhCd2FDdHpwUnBqV1cwd1RucUVYL1ZGSHhpeWkzQUo2UGQ5?=
- =?utf-8?B?aDY0ME15VVN1NmVwMGlwL045aW9FL21Xb0NsYThQaGNoY2k0bWgxMFpKYlBK?=
- =?utf-8?B?ekFmMEFXSWJBTjJpSlArUVcxUTluTytLczZFUlBmbTJKbS9odzQrSGtPOFpM?=
- =?utf-8?B?emg2K1g3VEZWQzRRQkw0N1ZrY2Y3c3cyclc2QlBNNjdQZ2UybVVOTjRNeGNq?=
- =?utf-8?B?VE5QRzN3Y2U3RkVtaTVtSytNUUZDcDRhZ2tuTWltV0JsbC9laVVacmliSkdr?=
- =?utf-8?B?dGVma0JqVWt2UStUcDJqY3lOd3ZRd0FsREVvNmkybFJQa3hZajZYQW12RThO?=
- =?utf-8?B?Qmlicmo1eEhpeFpxWVoxaUNPMEx6SUFvS0F0MWFMTm9FN05Ob3B3RGtjSnE1?=
- =?utf-8?B?MGlSWlRWaVNPRWRJZC9OdGJENUJhVHBzSkdLVnlUd2l4YjJyWGVsRTNUN2wr?=
- =?utf-8?B?My9TZVE4N0lqeTZrbWZVUzZxZ3V0UDhlVDhmRHFhOGpTNGJYMUJ5blV2Ympm?=
- =?utf-8?B?eWhiZnZqR2xya3BoUGtTSEl2MWhONUFzL3hOd25oUVUxR3h3Y3VrK0cyRUxi?=
- =?utf-8?B?aklTK1RKYUJpZGNVZkQweUZiMGxuZEtEckhnaFRCTGZlenZiWGY3Q01qRWpr?=
- =?utf-8?B?M3dId2Q2Y1FRWG82QTVVeEhScWlCNHpFYjYrYlZJcVNoYWVZTS8zbFlKQ1Rt?=
- =?utf-8?B?VVg5M1M1QTlBeGNpeSthZ3h5V2hFTmQzaEtNYWFnc1FLbE9PL0ZRWjVyZGFI?=
- =?utf-8?B?UHplNDlmWWNWajc5M0FGNjJ6NDFOMCt0dHZDNGxqVVN4bjFYNmh0NnNCVkE5?=
- =?utf-8?B?SWFpTEZVaHlFaGllTzhMa0p4TVVYWjM4V3NKSHRRPT0=?=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?c04wTEU4ZTljNENYdlBKaXJWOWU3VkJibE0wK1RnT3Bwa1hKNkZJUHkvWURH?=
- =?utf-8?B?eUtVQ1NpN3BUUW5mTzFqOURFV0dQeUg5U200UlhJMDcwcVI1L1MrWHZKOUVa?=
- =?utf-8?B?Mnk1WEpKc1F5SE1pQ0V2MXN2ci91by9BL0JZM3RwaEdvV1ZZOHZXM1BFNW9k?=
- =?utf-8?B?VGYrNThpZEpMQURVb2I5bE5lWHlsT0p0UjBBMks4QXU3eU1RVTVCeVVoZVA5?=
- =?utf-8?B?ZmhNZGVLZDZTWlkyOWpQYThZUzJtd213OGRZT1o4Z1NiQXllU0p0Y3lVa2dm?=
- =?utf-8?B?MWdFclNyQ0tRak5lNnprQ1kxSm9id1dqRmd2N1JmVGt2OCtpOE56RTQ2WmJV?=
- =?utf-8?B?ajJOeUhQZWp1YnlGbytHSGpsVEFBcXFNOUFXTVV6L2pZUjhWZFJrWDdJcXA5?=
- =?utf-8?B?Vy9CekFBV05GeFpsb2V2OXpWbHVVZXY5RVYzOHoyWm8zVkp6cU01NlVMNWtQ?=
- =?utf-8?B?TDNrY29SWEMyTS9mL0ZiSzA0TlFpOC8rNjhxQnNRbXhQNlQ0cnNaY3VUNnFq?=
- =?utf-8?B?R2h6cnhnRWZzRnZWSnp6R3RXM3BId1Zzb01oTUozRDlJM2hZTjFUQnhGZFhN?=
- =?utf-8?B?NUVEWm9QUno1NXdneSt4WkNZOFZReXViV3FqSVZCUXRTU3AyNmNFblZKZ1kz?=
- =?utf-8?B?eFd3cHhDYTFtL2hYVS8va1hxb1orRGpnMzg5OWxRMnAwSjYwNWRqM0gzRy9h?=
- =?utf-8?B?OVMrWXpwc1l0T1UraTJrZ0lHN3ltajFGNFZQLzEwQUxnU1NGVmRMUndJeSt0?=
- =?utf-8?B?YzZnaVRqRTUzcDduOUxicC95V2FFdThyUDFjeUdSQW9ucSt0MDF6OUhlSllS?=
- =?utf-8?B?T3pGQm8wL1VMdWtyMUhySzhCTk1TV296Ym9UT3BmNjBKY0pCMzJnTEdGbk00?=
- =?utf-8?B?T2NOcytPTnZBM3N3KzRTV2lHekZHMjBiYTRKNG5odlQ0TzhFRDN6YXh2MHdD?=
- =?utf-8?B?QTgrL1JwL2NucXRsR0p3amFZb2dWVzJyL2xoRHREVldZS1dydGJVSGltK3hZ?=
- =?utf-8?B?ZWJrc0o0QnFTNjhoMlUzSHpycVNOY0d5MVVIYnpvdHRTUkM2Y01MMEluMmJI?=
- =?utf-8?B?b0dpOTZoMVhYL1d2aEJtdjZxUDZ5OTlaOXVQRHAzVXlBUHNlYVRCQjRDUTlI?=
- =?utf-8?B?NUFveWw3Q2dmSnVsUUEvQmxoSTF6bm56VE5MeGNKSzVDY1VpL1NNbFBXRElt?=
- =?utf-8?B?VUt6RkEyTC9FbWoxYkxHY2dnbHA4YllFWFRQUFhzTGU3eGdsSVdiNHlOc3lO?=
- =?utf-8?B?djFicVRDOTF6MzVMSFphbnRZaTFQT3UvMGNnaG5lS0RqK1dLRTNwM25pWFBy?=
- =?utf-8?B?bm5TWmVvUFIvblQ0RW9aYlhERFN0SS9nQUcvY3R2VWJybWorTUIzbER6M3hH?=
- =?utf-8?B?TWhJNERwTUNuY2RtM1pYbXJuaXF5Y3pqMDc2bkRhdjdkU1RsWXNScXRYbytS?=
- =?utf-8?B?R0oyQ2x2QllJQUJ1OU9TR01wSG5kamI4NTRBU1BJVEtCOXRyYUdYV3Q1dkZ0?=
- =?utf-8?B?eEttTStqVnZGMVJFeEZwRTZ5dVkwdXVrUGNVNnVaWGxiN2lHZDFiT05vNC9D?=
- =?utf-8?B?aEE0aU9jdHk1YTIvaloySTQzQ2xJTUhadytkc21wWVhvRzRSRjNQcUZuV0Vr?=
- =?utf-8?Q?BgjMOH5+Oz+OLLyn1ErJn4lLhtvGI+KJ6DKoD+RyzwPg=3D?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b9c4d4ae-caf7-441b-6913-08dd5bf3c366
-X-MS-Exchange-CrossTenant-AuthSource: TYZPR01MB5556.apcprd01.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Mar 2025 14:41:07.3082
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR01MB6077
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250305091246.106626-3-swathi.ks@samsung.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-在 2025/3/4 22:11, Andrew Lunn 写道:
->> (Port0 and Port6). Could I just keep this or should I need to add a new
->> case ?
+On Wed, Mar 05, 2025 at 02:42:46PM +0530, Swathi K S wrote:
+> The FSD SoC contains two instance of the Synopsys DWC ethernet QOS IP core.
+> The binding that it uses is slightly different from existing ones because
+> of the integration (clocks, resets).
 > 
-> The existing examples are probably sufficient. Just check the text to
-> make sure it does not limit it to ports 0 and 6.
-> 
->>> So is this actually internally? Or do you have a IPQ50xx SoC connected
->>> to a qca8337 switch, with copper traces on a PCB? If so, it is not
->>> internal.
->>
->> The "internal" is used to describe the localcation of PHY not the link.
->> In current code, qca8k has supported to use a external PHY to do a
->> PHY-to-PHY link (Port0 and Port6). This patch make the internal PHYs
->> support it too (Port1-5).
->>
->> The followiing topology is existed in most IPQ50xx-based router:
->>      _______________________         _______________________
->>     |        IPQ5018        |       |        QCA8337        |
->>     | +------+   +--------+ |       | +--------+   +------+ |
->>     | | MAC0 |---| GE Phy |-+--MDI--+-|  Phy4  |---| MAC5 | |
->>     | +------+   +--------+ |       | +--------+   +------+ |
->>     | +------+   +--------+ |       | +--------+   +------+ |
->>     | | MAC1 |---| Uniphy |-+-SGMII-+-| SerDes |---| MAC0 | |
->>     | +------+   +--------+ |       | +--------+   +------+ |
->>     |_______________________|       |_______________________|
-> 
-> So logically, it does not matter if the PHY is internal or
-> external. The patch would be the same. I've even see setups where the
-> SGMII link would have a PHY, then a connection to a daughter board,
-> and then a PHY back to SGMII before connecting to the switch. Running
-> Ethernet over the connector is easier than SERDES lines.
-> 
-> So i would probably drop the word internal from this discussion,
-> unless it is really relevant.
-> 
-> 	Andrew
+> Signed-off-by: Swathi K S <swathi.ks@samsung.com>
 
-Ok, will remove the word in next patch
+This looks much better!
+
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+
+Thanks!
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
