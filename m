@@ -1,52 +1,53 @@
-Return-Path: <netdev+bounces-171882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8412A4F312
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 01:55:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 21CC2A4F313
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 01:55:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA824188C498
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 00:55:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52307188FB84
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 00:55:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D98A154BE5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EFC3154C1D;
 	Wed,  5 Mar 2025 00:54:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BVzLtR64"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m+4FerY2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CB108632B;
-	Wed,  5 Mar 2025 00:54:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D30286330;
+	Wed,  5 Mar 2025 00:54:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741136049; cv=none; b=uKuhUKr4JYH7rAlXAAQiinMsIi4a5QrMnexNvCdylT8utZ7PoA976x03kRqaAbcUg0zN5sNFWtM5eU1f6XTNiKXu/6cVRRkdMK83uWves0lzXi4D+x8FQkiJLh+rNMzq+F3dQdlwozL9E2iq2YPFCQ46oQGU8Gd2ab0B2dIELNs=
+	t=1741136049; cv=none; b=Spis4RyWQyxuywe281RhC2ln6FR9cYCGEhso2JjHrT+JK8JCTcqsiG4Ien5ODMr0egL42ILJNt4ded96sJiGB45to0hqqaKHudHNvfI14TAojc8vrHfoaTL8xClcDPrSYM7ip3pygISJL4b5u+nEuB3QQHy27cYol8ed2gQ0aqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1741136049; c=relaxed/simple;
-	bh=XR4PI1LN4kdyU5wqIxlgJic4+Ln46gfPI8gNjamQjQU=;
+	bh=XNb5Sx3xQlIxmfxdW3R3wrJR+hhgDU6+wt7JwOVQXM0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=sbUqy15j7MuDAejQCihnEXuCpBOHMtI7VU5zMORDwKLg4uf7tQl2O41S7Cw1XH3uvwXd3yI6dH2K1+B1Q8Iid8EuvkMvOIiWUJte+tyULNXj8XZNbSacBB3iU2wpqjnDEkV73Vi4x1PjROwiN3YWhaql/fTnvEsqprFTX6PMJ6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BVzLtR64; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A5C48C4CEEE;
+	 In-Reply-To:To:Cc; b=gVDTbmMAUuxApc9qBJDrX6eWCmUw58Cwg7sXDE1reKSKPiif6BIy4H5Ju5eaZ2lqq5kVUJS/ISBI1z9LH9aDixkcF2Zi+bJRaU74yjv/ZDnWN05lHb5N0F9eTvTfLEcUC6gLLcI5j+3aCRvsZXwRPsIFMCm3YkYgDmW3Er2tmhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m+4FerY2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B3B78C4CEED;
 	Wed,  5 Mar 2025 00:54:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1741136048;
-	bh=XR4PI1LN4kdyU5wqIxlgJic4+Ln46gfPI8gNjamQjQU=;
+	bh=XNb5Sx3xQlIxmfxdW3R3wrJR+hhgDU6+wt7JwOVQXM0=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=BVzLtR64AYEeV4tRZetm6S+LpRw17yX5/Du//S84meBNVfDNTURcb0glT6A2yC62T
-	 w55Wrd7U85R8x0KfSLjYVRyDY0olvjrbE31Slj6TJ8HZLpI2nq0RaF2KAYdoXQPrPp
-	 sUUNMjEHhFWYnA2u8ishc15uvmdx3xPrvOhsDgqzq+f+WZTLBcvI60GrvLZ6dSki9n
-	 ntErabFVXmAu72360IHgZ+2wOKNfwvmMJdQcQJoA1v2wVusYwySo3IBRxzkUg/NlgL
-	 6LU5Xzd9m5NR9sFgNojm6pQZyGzIw+PcThpxPpE5O3B54gVBkUaFieZR8O8wHBR9s3
-	 mT5LA0Xz5o0lw==
+	b=m+4FerY2dgXcUIvlTGXbp9YG/8lS95WPeDf22XP68JglH4HeBLzvLZByocjuHRc6j
+	 Of9RoMe3TkXJpbrF8MSutYfAulmdgziidjOESGhTJSqM7Q6YxccfDiTwoSTLnWM1Lq
+	 SCSWzsj/s7IX+nTOtnAft4HBdLfBnfa3Ud9fIfykhECXsflVnAPMBxVGJrva+gynTZ
+	 McTEmH/dYstzEB9ChkxKQgPz/XglS2UrBBObX1tlGhs0ZI0qrGnUddie4lSc6oOz8f
+	 JUNde3mtv9Tk4oecFswDAwPmE5iDoSepjNrszNCx+mR0BFN1MUCTDhqm8/a3GGOjKC
+	 EbHKWnaes+aLA==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C365C282D0;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAF08C282DC;
 	Wed,  5 Mar 2025 00:54:08 +0000 (UTC)
 From: Satish Kharat via B4 Relay <devnull+satishkh.cisco.com@kernel.org>
-Date: Tue, 04 Mar 2025 19:56:40 -0500
-Subject: [PATCH net-next v2 4/8] enic: enable rq extended cq support
+Date: Tue, 04 Mar 2025 19:56:41 -0500
+Subject: [PATCH net-next v2 5/8] enic : remove unused function
+ cq_enet_wq_desc_dec
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,7 +56,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250304-enic_cleanup_and_ext_cq-v2-4-85804263dad8@cisco.com>
+Message-Id: <20250304-enic_cleanup_and_ext_cq-v2-5-85804263dad8@cisco.com>
 References: <20250304-enic_cleanup_and_ext_cq-v2-0-85804263dad8@cisco.com>
 In-Reply-To: <20250304-enic_cleanup_and_ext_cq-v2-0-85804263dad8@cisco.com>
 To: Christian Benvenuti <benve@cisco.com>, 
@@ -66,11 +67,11 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  Satish Kharat <satishkh@cisco.com>, Nelson Escobar <neescoba@cisco.com>, 
  John Daley <johndale@cisco.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1741136202; l=12808;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1741136202; l=1103;
  i=satishkh@cisco.com; s=20250226; h=from:subject:message-id;
- bh=4QdHHiaBhEaGz+aozi+RNm0r9jFQ8UxgwC9RRxuvcdU=;
- b=dgB028ZgSQPNStT4/reCGrIpy7xp1n7lNIOjOs9CFYIyxeskNFaySdeCTQWnJegCxpLt+XO7W
- QiiDiK9FZHUCpEITOhuQDE1tJ9e+OHS/rEr53GzFyr7VJ9JrRf+Pyzb
+ bh=+dPGv5N9MWqWyMEvqnn1fc2Fu6Bu+7Wi7gCqqsYQK6M=;
+ b=VUI8+9j9uSWTnuX0XkDjSnpylJM3UmNKFGC2BgFkqo51jBGh6s0MF6lZxQGvgwP0oNuEo9ecf
+ BkoPODpIiujDxscGTYHs3kaauq7nDlkK+AocADPC2p3vnVManRBN2vq
 X-Developer-Key: i=satishkh@cisco.com; a=ed25519;
  pk=lkxzORFYn5ejiy0kzcsfkpGoXZDcnHMc4n3YK7jJnJo=
 X-Endpoint-Received: by B4 Relay for satishkh@cisco.com/20250226 with
@@ -80,8 +81,7 @@ Reply-To: satishkh@cisco.com
 
 From: Satish Kharat <satishkh@cisco.com>
 
-Enables getting from hw all the supported rq cq sizes and
-uses the highest supported cq size.
+Removes cq_enet_wq_desc_dec, not needed anymore.
 
 Co-developed-by: Nelson Escobar <neescoba@cisco.com>
 Signed-off-by: Nelson Escobar <neescoba@cisco.com>
@@ -89,345 +89,27 @@ Co-developed-by: John Daley <johndale@cisco.com>
 Signed-off-by: John Daley <johndale@cisco.com>
 Signed-off-by: Satish Kharat <satishkh@cisco.com>
 ---
- drivers/net/ethernet/cisco/enic/cq_desc.h   |   3 +
- drivers/net/ethernet/cisco/enic/enic.h      |   9 +++
- drivers/net/ethernet/cisco/enic/enic_main.c |   4 ++
- drivers/net/ethernet/cisco/enic/enic_res.c  |  58 ++++++++++++++-
- drivers/net/ethernet/cisco/enic/enic_rq.c   | 105 +++++++++++++++++++++-------
- 5 files changed, 150 insertions(+), 29 deletions(-)
+ drivers/net/ethernet/cisco/enic/cq_enet_desc.h | 7 -------
+ 1 file changed, 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/cisco/enic/cq_desc.h b/drivers/net/ethernet/cisco/enic/cq_desc.h
-index 462c5435a206b4cc93b3734fdc96a2192b53a235..8fc313b6ed0434bd55b8e10bf3086ef848acbdf1 100644
---- a/drivers/net/ethernet/cisco/enic/cq_desc.h
-+++ b/drivers/net/ethernet/cisco/enic/cq_desc.h
-@@ -40,6 +40,9 @@ struct cq_desc {
- #define CQ_DESC_COMP_NDX_BITS    12
- #define CQ_DESC_COMP_NDX_MASK    ((1 << CQ_DESC_COMP_NDX_BITS) - 1)
- 
-+#define CQ_DESC_32_FI_MASK (BIT(0) | BIT(1))
-+#define CQ_DESC_64_FI_MASK (BIT(0) | BIT(1))
-+
- static inline void cq_desc_dec(const struct cq_desc *desc_arg,
- 	u8 *type, u8 *color, u16 *q_number, u16 *completed_index)
- {
-diff --git a/drivers/net/ethernet/cisco/enic/enic.h b/drivers/net/ethernet/cisco/enic/enic.h
-index 305ed12aa0311ca6cc53bfbffcc300182a8011a7..d60e55accafd0e4f83728524da4f167a474d6213 100644
---- a/drivers/net/ethernet/cisco/enic/enic.h
-+++ b/drivers/net/ethernet/cisco/enic/enic.h
-@@ -31,6 +31,13 @@
- 
- #define ENIC_AIC_LARGE_PKT_DIFF	3
- 
-+enum ext_cq {
-+	ENIC_RQ_CQ_ENTRY_SIZE_16,
-+	ENIC_RQ_CQ_ENTRY_SIZE_32,
-+	ENIC_RQ_CQ_ENTRY_SIZE_64,
-+	ENIC_RQ_CQ_ENTRY_SIZE_MAX,
-+};
-+
- struct enic_msix_entry {
- 	int requested;
- 	char devname[IFNAMSIZ + 8];
-@@ -228,6 +235,7 @@ struct enic {
- 	struct enic_rfs_flw_tbl rfs_h;
- 	u8 rss_key[ENIC_RSS_LEN];
- 	struct vnic_gen_stats gen_stats;
-+	enum ext_cq ext_cq;
+diff --git a/drivers/net/ethernet/cisco/enic/cq_enet_desc.h b/drivers/net/ethernet/cisco/enic/cq_enet_desc.h
+index 809a3f30b87f78285414990a2a42c9a30a8662c6..50787cff29db0cc9041093521385781cf557e4cc 100644
+--- a/drivers/net/ethernet/cisco/enic/cq_enet_desc.h
++++ b/drivers/net/ethernet/cisco/enic/cq_enet_desc.h
+@@ -17,13 +17,6 @@ struct cq_enet_wq_desc {
+ 	u8 type_color;
  };
  
- static inline struct net_device *vnic_get_netdev(struct vnic_dev *vdev)
-@@ -349,5 +357,6 @@ int enic_is_valid_vf(struct enic *enic, int vf);
- int enic_is_dynamic(struct enic *enic);
- void enic_set_ethtool_ops(struct net_device *netdev);
- int __enic_set_rsskey(struct enic *enic);
-+void enic_ext_cq(struct enic *enic);
- 
- #endif /* _ENIC_H_ */
-diff --git a/drivers/net/ethernet/cisco/enic/enic_main.c b/drivers/net/ethernet/cisco/enic/enic_main.c
-index 080234ef4c2bb53c19e26601ca9bb38d26a738b7..d716514366dfc56b4e08260d18d78fddd23f6253 100644
---- a/drivers/net/ethernet/cisco/enic/enic_main.c
-+++ b/drivers/net/ethernet/cisco/enic/enic_main.c
-@@ -2192,6 +2192,7 @@ static void enic_reset(struct work_struct *work)
- 	enic_init_vnic_resources(enic);
- 	enic_set_rss_nic_cfg(enic);
- 	enic_dev_set_ig_vlan_rewrite_mode(enic);
-+	enic_ext_cq(enic);
- 	enic_open(enic->netdev);
- 
- 	/* Allow infiniband to fiddle with the device again */
-@@ -2218,6 +2219,7 @@ static void enic_tx_hang_reset(struct work_struct *work)
- 	enic_init_vnic_resources(enic);
- 	enic_set_rss_nic_cfg(enic);
- 	enic_dev_set_ig_vlan_rewrite_mode(enic);
-+	enic_ext_cq(enic);
- 	enic_open(enic->netdev);
- 
- 	/* Allow infiniband to fiddle with the device again */
-@@ -2592,6 +2594,8 @@ static int enic_dev_init(struct enic *enic)
- 
- 	enic_get_res_counts(enic);
- 
-+	enic_ext_cq(enic);
-+
- 	err = enic_alloc_enic_resources(enic);
- 	if (err) {
- 		dev_err(dev, "Failed to allocate enic resources\n");
-diff --git a/drivers/net/ethernet/cisco/enic/enic_res.c b/drivers/net/ethernet/cisco/enic/enic_res.c
-index 1261251998330c8b8363c4dd2db1ccc25847476c..a7179cc4b5296cfbce137c54a9e17e6b358a19ae 100644
---- a/drivers/net/ethernet/cisco/enic/enic_res.c
-+++ b/drivers/net/ethernet/cisco/enic/enic_res.c
-@@ -312,6 +312,7 @@ void enic_init_vnic_resources(struct enic *enic)
- int enic_alloc_vnic_resources(struct enic *enic)
- {
- 	enum vnic_dev_intr_mode intr_mode;
-+	int rq_cq_desc_size;
- 	unsigned int i;
- 	int err;
- 
-@@ -326,6 +327,24 @@ int enic_alloc_vnic_resources(struct enic *enic)
- 		intr_mode == VNIC_DEV_INTR_MODE_MSIX ? "MSI-X" :
- 		"unknown");
- 
-+	switch (enic->ext_cq) {
-+	case ENIC_RQ_CQ_ENTRY_SIZE_16:
-+		rq_cq_desc_size = 16;
-+		break;
-+	case ENIC_RQ_CQ_ENTRY_SIZE_32:
-+		rq_cq_desc_size = 32;
-+		break;
-+	case ENIC_RQ_CQ_ENTRY_SIZE_64:
-+		rq_cq_desc_size = 64;
-+		break;
-+	default:
-+		dev_err(enic_get_dev(enic),
-+			"Unable to determine rq cq desc size: %d",
-+			enic->ext_cq);
-+		err = -ENODEV;
-+		goto err_out;
-+	}
-+
- 	/* Allocate queue resources
- 	 */
- 
-@@ -348,8 +367,8 @@ int enic_alloc_vnic_resources(struct enic *enic)
- 	for (i = 0; i < enic->cq_count; i++) {
- 		if (i < enic->rq_count)
- 			err = vnic_cq_alloc(enic->vdev, &enic->cq[i], i,
--				enic->config.rq_desc_count,
--				sizeof(struct cq_enet_rq_desc));
-+					enic->config.rq_desc_count,
-+					rq_cq_desc_size);
- 		else
- 			err = vnic_cq_alloc(enic->vdev, &enic->cq[i], i,
- 				enic->config.wq_desc_count,
-@@ -380,6 +399,39 @@ int enic_alloc_vnic_resources(struct enic *enic)
- 
- err_out_cleanup:
- 	enic_free_vnic_resources(enic);
+-static inline void cq_enet_wq_desc_dec(struct cq_enet_wq_desc *desc,
+-	u8 *type, u8 *color, u16 *q_number, u16 *completed_index)
+-{
+-	cq_desc_dec((struct cq_desc *)desc, type,
+-		color, q_number, completed_index);
+-}
 -
-+err_out:
- 	return err;
- }
-+
-+/*
-+ * CMD_CQ_ENTRY_SIZE_SET can fail on older hw generations that don't support
-+ * that command
-+ */
-+void enic_ext_cq(struct enic *enic)
-+{
-+	u64 a0 = CMD_CQ_ENTRY_SIZE_SET, a1 = 0;
-+	int wait = 1000;
-+	int ret;
-+
-+	spin_lock_bh(&enic->devcmd_lock);
-+	ret = vnic_dev_cmd(enic->vdev, CMD_CAPABILITY, &a0, &a1, wait);
-+	if (ret || a0) {
-+		dev_info(&enic->pdev->dev,
-+			 "CMD_CQ_ENTRY_SIZE_SET not supported.");
-+		enic->ext_cq = ENIC_RQ_CQ_ENTRY_SIZE_16;
-+		goto out;
-+	}
-+	a1 &= VNIC_RQ_CQ_ENTRY_SIZE_ALL_BIT;
-+	enic->ext_cq = fls(a1) - 1;
-+	a0 = VNIC_RQ_ALL;
-+	a1 = enic->ext_cq;
-+	ret = vnic_dev_cmd(enic->vdev, CMD_CQ_ENTRY_SIZE_SET, &a0, &a1, wait);
-+	if (ret) {
-+		dev_info(&enic->pdev->dev, "CMD_CQ_ENTRY_SIZE_SET failed.");
-+		enic->ext_cq = ENIC_RQ_CQ_ENTRY_SIZE_16;
-+	}
-+out:
-+	spin_unlock_bh(&enic->devcmd_lock);
-+	dev_info(&enic->pdev->dev, "CQ entry size set to %d bytes",
-+		 16 << enic->ext_cq);
-+}
-diff --git a/drivers/net/ethernet/cisco/enic/enic_rq.c b/drivers/net/ethernet/cisco/enic/enic_rq.c
-index 842b273c2e2a59e81a7c1423449b023d646f5e81..ccbf5c9a21d0ffe33c7c74042d5425497ea0f9dc 100644
---- a/drivers/net/ethernet/cisco/enic/enic_rq.c
-+++ b/drivers/net/ethernet/cisco/enic/enic_rq.c
-@@ -21,24 +21,76 @@ static void enic_intr_update_pkt_size(struct vnic_rx_bytes_counter *pkt_size,
- 		pkt_size->small_pkt_bytes_cnt += pkt_len;
- }
- 
--static void enic_rq_cq_desc_dec(struct cq_enet_rq_desc *desc, u8 *type,
-+static void enic_rq_cq_desc_dec(void *cq_desc, u8 cq_desc_size, u8 *type,
- 				u8 *color, u16 *q_number, u16 *completed_index)
- {
- 	/* type_color is the last field for all cq structs */
--	u8 type_color = desc->type_color;
-+	u8 type_color;
-+
-+	switch (cq_desc_size) {
-+	case VNIC_RQ_CQ_ENTRY_SIZE_16: {
-+		struct cq_enet_rq_desc *desc =
-+			(struct cq_enet_rq_desc *)cq_desc;
-+		type_color = desc->type_color;
-+
-+		/* Make sure color bit is read from desc *before* other fields
-+		 * are read from desc.  Hardware guarantees color bit is last
-+		 * bit (byte) written.  Adding the rmb() prevents the compiler
-+		 * and/or CPU from reordering the reads which would potentially
-+		 * result in reading stale values.
-+		 */
-+		rmb();
- 
--	/* Make sure color bit is read from desc *before* other fields
--	 * are read from desc.  Hardware guarantees color bit is last
--	 * bit (byte) written.  Adding the rmb() prevents the compiler
--	 * and/or CPU from reordering the reads which would potentially
--	 * result in reading stale values.
--	 */
--	rmb();
-+		*q_number = le16_to_cpu(desc->q_number_rss_type_flags) &
-+			    CQ_DESC_Q_NUM_MASK;
-+		*completed_index = le16_to_cpu(desc->completed_index_flags) &
-+				   CQ_DESC_COMP_NDX_MASK;
-+		break;
-+	}
-+	case VNIC_RQ_CQ_ENTRY_SIZE_32: {
-+		struct cq_enet_rq_desc_32 *desc =
-+			(struct cq_enet_rq_desc_32 *)cq_desc;
-+		type_color = desc->type_color;
-+
-+		/* Make sure color bit is read from desc *before* other fields
-+		 * are read from desc.  Hardware guarantees color bit is last
-+		 * bit (byte) written.  Adding the rmb() prevents the compiler
-+		 * and/or CPU from reordering the reads which would potentially
-+		 * result in reading stale values.
-+		 */
-+		rmb();
-+
-+		*q_number = le16_to_cpu(desc->q_number_rss_type_flags) &
-+			    CQ_DESC_Q_NUM_MASK;
-+		*completed_index = le16_to_cpu(desc->completed_index_flags) &
-+				   CQ_DESC_COMP_NDX_MASK;
-+		*completed_index |= (desc->fetch_index_flags & CQ_DESC_32_FI_MASK) <<
-+				CQ_DESC_COMP_NDX_BITS;
-+		break;
-+	}
-+	case VNIC_RQ_CQ_ENTRY_SIZE_64: {
-+		struct cq_enet_rq_desc_64 *desc =
-+			(struct cq_enet_rq_desc_64 *)cq_desc;
-+		type_color = desc->type_color;
-+
-+		/* Make sure color bit is read from desc *before* other fields
-+		 * are read from desc.  Hardware guarantees color bit is last
-+		 * bit (byte) written.  Adding the rmb() prevents the compiler
-+		 * and/or CPU from reordering the reads which would potentially
-+		 * result in reading stale values.
-+		 */
-+		rmb();
-+
-+		*q_number = le16_to_cpu(desc->q_number_rss_type_flags) &
-+			    CQ_DESC_Q_NUM_MASK;
-+		*completed_index = le16_to_cpu(desc->completed_index_flags) &
-+				   CQ_DESC_COMP_NDX_MASK;
-+		*completed_index |= (desc->fetch_index_flags & CQ_DESC_64_FI_MASK) <<
-+				CQ_DESC_COMP_NDX_BITS;
-+		break;
-+	}
-+	}
- 
--	*q_number = le16_to_cpu(desc->q_number_rss_type_flags) &
--		CQ_DESC_Q_NUM_MASK;
--	*completed_index = le16_to_cpu(desc->completed_index_flags) &
--	CQ_DESC_COMP_NDX_MASK;
- 	*color = (type_color >> CQ_DESC_COLOR_SHIFT) & CQ_DESC_COLOR_MASK;
- 	*type = type_color & CQ_DESC_TYPE_MASK;
- }
-@@ -113,6 +165,10 @@ static void enic_rq_set_skb_flags(struct vnic_rq *vrq, u8 type, u32 rss_hash,
- 	}
- }
- 
-+/*
-+ * cq_enet_rq_desc accesses section uses only the 1st 15 bytes of the cq which
-+ * is identical for all type (16,32 and 64 byte) of cqs.
-+ */
- static void cq_enet_rq_desc_dec(struct cq_enet_rq_desc *desc, u8 *ingress_port,
- 				u8 *fcoe, u8 *eop, u8 *sop, u8 *rss_type,
- 				u8 *csum_not_calc, u32 *rss_hash,
-@@ -258,9 +314,8 @@ void enic_free_rq_buf(struct vnic_rq *rq, struct vnic_rq_buf *buf)
- }
- 
- static void enic_rq_indicate_buf(struct enic *enic, struct vnic_rq *rq,
--				 struct vnic_rq_buf *buf,
--				 struct cq_enet_rq_desc *cq_desc, u8 type,
--				 u16 q_number, u16 completed_index)
-+				 struct vnic_rq_buf *buf, void *cq_desc,
-+				 u8 type, u16 q_number, u16 completed_index)
- {
- 	struct sk_buff *skb;
- 	struct vnic_cq *cq = &enic->cq[enic_cq_rq(enic, rq->index)];
-@@ -277,7 +332,7 @@ static void enic_rq_indicate_buf(struct enic *enic, struct vnic_rq *rq,
- 
- 	rqstats->packets++;
- 
--	cq_enet_rq_desc_dec(cq_desc, &ingress_port,
-+	cq_enet_rq_desc_dec((struct cq_enet_rq_desc *)cq_desc, &ingress_port,
- 			    &fcoe, &eop, &sop, &rss_type, &csum_not_calc,
- 			    &rss_hash, &bytes_written, &packet_error,
- 			    &vlan_stripped, &vlan_tci, &checksum, &fcoe_sof,
-@@ -329,8 +384,8 @@ static void enic_rq_indicate_buf(struct enic *enic, struct vnic_rq *rq,
- 	}
- }
- 
--static void enic_rq_service(struct enic *enic, struct cq_enet_rq_desc *cq_desc,
--			    u8 type, u16 q_number, u16 completed_index)
-+static void enic_rq_service(struct enic *enic, void *cq_desc, u8 type,
-+			    u16 q_number, u16 completed_index)
- {
- 	struct enic_rq_stats *rqstats = &enic->rq[q_number].stats;
- 	struct vnic_rq *vrq = &enic->rq[q_number].vrq;
-@@ -357,14 +412,12 @@ unsigned int enic_rq_cq_service(struct enic *enic, unsigned int cq_index,
- 				unsigned int work_to_do)
- {
- 	struct vnic_cq *cq = &enic->cq[cq_index];
--	struct cq_enet_rq_desc *cq_desc;
-+	void *cq_desc = vnic_cq_to_clean(cq);
- 	u16 q_number, completed_index;
- 	unsigned int work_done = 0;
- 	u8 type, color;
- 
--	cq_desc = (struct cq_enet_rq_desc *)vnic_cq_to_clean(cq);
--
--	enic_rq_cq_desc_dec(cq_desc,  &type, &color, &q_number,
-+	enic_rq_cq_desc_dec(cq_desc, enic->ext_cq, &type, &color, &q_number,
- 			    &completed_index);
- 
- 	while (color != cq->last_color) {
-@@ -374,9 +427,9 @@ unsigned int enic_rq_cq_service(struct enic *enic, unsigned int cq_index,
- 		if (++work_done >= work_to_do)
- 			break;
- 
--		cq_desc = (struct cq_enet_rq_desc *)vnic_cq_to_clean(cq);
--		enic_rq_cq_desc_dec(cq_desc, &type, &color, &q_number,
--				    &completed_index);
-+		cq_desc = vnic_cq_to_clean(cq);
-+		enic_rq_cq_desc_dec(cq_desc, enic->ext_cq, &type, &color,
-+				    &q_number, &completed_index);
- 	}
- 
- 	return work_done;
+ /*
+  * Defines and Capabilities for CMD_CQ_ENTRY_SIZE_SET
+  */
 
 -- 
 2.48.1
