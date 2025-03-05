@@ -1,146 +1,120 @@
-Return-Path: <netdev+bounces-172103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D2B6A503B2
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 16:42:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C868A503BE
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 16:45:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21E117A13EF
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 15:41:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8B627A155E
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 15:44:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88ECC2505B4;
-	Wed,  5 Mar 2025 15:42:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADE792505B2;
+	Wed,  5 Mar 2025 15:45:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LVz40yei"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hw1451Bx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D5D62505A0;
-	Wed,  5 Mar 2025 15:42:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E34D205511
+	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 15:45:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741189348; cv=none; b=B1juNPBL9uF66YiwFbWVAWf3BfQTCEYpzr13lzrtum+Ed2xUyK/L4T5XCOWIKioiejxIgBN7yEDiNY7BGNA7VGmVDESeYh9632np2wDKF0t3vtkVlqNH2ssuMYiT1Mra8nuVVJ8J5emE1RnAvWdkNVelSrR06SwA+8WSOKafbJ0=
+	t=1741189507; cv=none; b=rBKPdQXLXsoykQCNpUXfdYLWPRjFVG3ijnn1WWgKd8vxbIgpLf9oZkLVP29f/PCZDmKdjSacFTpo2Ky0yMiy38hkTVPhx0q8bwBPfK8OEzgWm87R3fpWrRMaFjTw+y6l2ehPAIOFynix1H+cGv83au6f5T7ygvRbYl/DkVa6GYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741189348; c=relaxed/simple;
-	bh=yagdOSnXnjo1SpjZgTWz3AJT2AK15uo4DTy3HxHN1EQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=exsmnnaVjJyhdMv3Ds0WQ0sW/DQ18CrDctl/uGL4fNy75k9m+/c+9V6Go2vuclYcaow+mZbrUt6+sEGEuLYgvyoHwlPXILDCPs6l/++TQO2WycfLh6ZsIFsup5Wo6+PgV8oqspY7LKt2TC77bJFKOlLY8k6BfEuLcHUiw9jol2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LVz40yei; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F1E9C4CED1;
-	Wed,  5 Mar 2025 15:42:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741189347;
-	bh=yagdOSnXnjo1SpjZgTWz3AJT2AK15uo4DTy3HxHN1EQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=LVz40yeiR0bZrtsWnB8XQANTdCgNnRIOEMt0Iyapb18wdGI00WqUvgIGZ9DAxQlZ9
-	 jPAP5ZZWLuAaXRjS0z7iiOP9BCT4Un1O6lybi/a/sQY2c8DYzx6VWK4NFYnXkP3lHG
-	 agNmAei/lHIs5GJvq88BxPFOny2slLx8P9+rpT6oGeSM3qxeQ2EJ/S17w6LtSy+Ne4
-	 453pBEIyyWbMhBtqUe0u6K7V29rVdgOZBQ5aHWygqA2LLXY0hMpboLr9mXW7hMrUXX
-	 MnxCxOhjw13/zM5hYiYGC83l7Ajv6d/HWx5H1pis518cw1AuaIatMxZPf0cVdPL9GX
-	 7UKD4vWks8Lkg==
-Message-ID: <89dcfb2a-d093-48f9-b6d7-af99b383a1bc@kernel.org>
-Date: Wed, 5 Mar 2025 16:42:19 +0100
+	s=arc-20240116; t=1741189507; c=relaxed/simple;
+	bh=n7Mn7LdR8aLxIWoXU8Q9sRE51Hqcu4+5rlJiv1g4rmA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=GK4YcUT0OhbMNQ0QXVy6/y05HiucLDms3nGLlfig5fDeTkxfAHX7usAV61swrn7KR+iXfNoNJee+wFKT3/wBmyjTtLcQXrBwtGd/FyJqavBQ7zOIu459cuDWhAF0PJHVXK3huhVVhciaK2lZ/j9SqIcV3Fv8LtyJMHmwvSiPQvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hw1451Bx; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-223cc017ef5so54084835ad.0
+        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 07:45:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741189505; x=1741794305; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GJ2jvRHq/+6p9zqriBxmQzPPAbm+CGLsfUo9A1q3kxQ=;
+        b=Hw1451Bxsf9fVW1JIgb8qlxXh1nIdDgNjP1P3bHQNeVTgOu/Fq1RNQj08q3YuinrWw
+         TjQq/EvFhIcO0sHgjiaURi8EeLVpax2qpjp1tOO+wZzm5KXXRx2/GDWq2IqVgKs5/lAO
+         R1L8fsmzpryiH/7SpBD4XsU6Fz0xFhpwiyUWk5OdpW7Nebt1kH/LrLnAcgoucAEtaElI
+         33LhqhXj/pGuMG50WWv8wU0Ul6/NabQkhRAyPQcW0WxUTDbIoNPrxKWVAltmhNiWN4HR
+         dn7Re6QWM+t0JiRVq8jJjFvzAajZAmUmGJoaoEiyss2kFRfra55hXn3E6GlvBxFP6kJi
+         OuTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741189505; x=1741794305;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GJ2jvRHq/+6p9zqriBxmQzPPAbm+CGLsfUo9A1q3kxQ=;
+        b=JHhdZoglEkYt/Vca41vPwzPb7IUYsLh3wExT1DhyPs5M/TqOyfa/2nPWxbbTJ5yolM
+         m9dJLos3dLdpXqF6BdhAud9TMitZnlkDauXDrmOd7GVtHUgnsRD/DpHIvl7dQ4K+JoLq
+         PeE6bbYAYQ5vMEPRDG+/SlHlXNOFpcAL3UA4UBxxh6iiKgfyhOk9wsNq7MM6J/QcbGAo
+         JVF7M5x29CIltWwqP8iDz1LeZ3c2gDHSotgNvLgXm3A7oU/JQ+LuwgrGI6Jj+i+92epr
+         oEDo1RtMtAJOTElWTcLg29yHqlEaVJmBKwNmQZROn/NtYKZ/4Fa/z+jBntR5Ud5NUxs9
+         1Cig==
+X-Forwarded-Encrypted: i=1; AJvYcCVEsfvYESsr4FgcWW515cMkeb2L4PKtUHS3b91+t5YvqqsZHAoDyuO2ammkXkJVXX0n+42IMo4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCVTB9TU2txLLew8SNWQG96+PqrKhKKn6zUBkiEIiTBl/+uOlv
+	WqgVmYC9PlI7fW1dvSrNpTZRp93ei5zuHq40J0rSZyYNBLoWFQdnBMzTOBBU2fCu4RKcd1k=
+X-Gm-Gg: ASbGncvWO9JmJ6IwSJbFRRlEa3pbwVFtLB0FtjWc1Kbs0D4+UAqRKD6a1V+rKNHr7Od
+	7AYT/TQFssJKZGXKdHjh1yaTvRFEECGC8lxiMP8I0mvId6NNmUC/AqQeQp+TqQwKHudaFl8DDvj
+	6Y3XxmpvwS2PbJz+RRAdGnyKzmqljGqO4WjsX9L2OxpCqsKpdlyCQnDgwJc1vHm/jkg0SvpGOEf
+	i/owyXAKBPN+P2gviCDiwKDD24c1XW+Uy86MLHxtYaCKrTqfB6wkK7ZKsbZazRgHBqumhoI1t6w
+	OiwjBaQD69gheC56W+0jtYGXCh7CKLvZ1EEJFqN3QiYQ1MBmPQYg4QEW
+X-Google-Smtp-Source: AGHT+IHJB/OcO5/aFk74DdNqcWXgtzGYuSpD/8cqZJIK73WDBwWJOkxoC8ixK1VqkcLckMyGwGJ/lg==
+X-Received: by 2002:a05:6a00:4f87:b0:736:4d44:8b77 with SMTP id d2e1a72fcca58-73682b737b8mr5164142b3a.8.1741189505179;
+        Wed, 05 Mar 2025 07:45:05 -0800 (PST)
+Received: from localhost.localdomain ([2a02:6ea0:c807:0:fa79:f8bc:7c1:855])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73637081ba7sm8860799b3a.112.2025.03.05.07.45.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Mar 2025 07:45:04 -0800 (PST)
+From: Jun Yang <juny24602@gmail.com>
+To: xiyou.wangcong@gmail.com
+Cc: juny24602@gmail.com,
+	netdev@vger.kernel.org
+Subject: [PATCH] sched: address a potential NULL pointer dereference in the GRED scheduler.
+Date: Wed,  5 Mar 2025 23:44:10 +0800
+Message-ID: <20250305154410.3505642-1-juny24602@gmail.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <Z8ddDSvJZSLtHCGi@pop-os.localdomain>
+References: <Z8ddDSvJZSLtHCGi@pop-os.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 1/2] dt-bindings: net: Add FSD EQoS device tree
- bindings
-To: Swathi K S <swathi.ks@samsung.com>, krzk+dt@kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, conor+dt@kernel.org,
- richardcochran@gmail.com, mcoquelin.stm32@gmail.com,
- alexandre.torgue@foss.st.com
-Cc: rmk+kernel@armlinux.org.uk, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- pankaj.dubey@samsung.com, ravi.patel@samsung.com, gost.dev@samsung.com
-References: <20250305091246.106626-1-swathi.ks@samsung.com>
- <CGME20250305091852epcas5p18a0853e85a5ed3d36d5d42ef89735ca6@epcas5p1.samsung.com>
- <20250305091246.106626-2-swathi.ks@samsung.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20250305091246.106626-2-swathi.ks@samsung.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 05/03/2025 10:12, Swathi K S wrote:
-> Add FSD Ethernet compatible in Synopsys dt-bindings document. Add FSD
-> Ethernet YAML schema to enable the DT validation.
-> 
-> Signed-off-by: Pankaj Dubey <pankaj.dubey@samsung.com>
-> Signed-off-by: Ravi Patel <ravi.patel@samsung.com>
-> Signed-off-by: Swathi K S <swathi.ks@samsung.com>
+If kzalloc in gred_init returns a NULL pointer, the code follows the
+error handling path, invoking gred_destroy. This, in turn, calls
+gred_offload, where memset could receive a NULL pointer as input,
+potentially leading to a kernel crash.
 
-<form letter>
-This is a friendly reminder during the review process.
+Signed-off-by: Jun Yang <juny24602@gmail.com>
+---
+ net/sched/sch_gred.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-It looks like you received a tag and forgot to add it.
+diff --git a/net/sched/sch_gred.c b/net/sched/sch_gred.c
+index ab6234b4fcd5..532fde548b88 100644
+--- a/net/sched/sch_gred.c
++++ b/net/sched/sch_gred.c
+@@ -913,7 +913,8 @@ static void gred_destroy(struct Qdisc *sch)
+ 	for (i = 0; i < table->DPs; i++)
+ 		gred_destroy_vq(table->tab[i]);
+ 
+-	gred_offload(sch, TC_GRED_DESTROY);
++	if (table->opt)
++		gred_offload(sch, TC_GRED_DESTROY);
+ 	kfree(table->opt);
+ }
+ 
+-- 
+2.48.1
 
-If you do not know the process, here is a short explanation:
-Please add Acked-by/Reviewed-by/Tested-by tags when posting new versions
-of patchset, under or above your Signed-off-by tag, unless patch changed
-significantly (e.g. new properties added to the DT bindings). Tag is
-"received", when provided in a message replied to you on the mailing
-list. Tools like b4 can help here. However, there's no need to repost
-patches *only* to add the tags. The upstream maintainer will do that for
-tags received on the version they apply.
-
-Please read:
-https://elixir.bootlin.com/linux/v6.12-rc3/source/Documentation/process/submitting-patches.rst#L577
-
-If a tag was not added on purpose, please state why and what changed.
-</form letter>
-
-Best regards,
-Krzysztof
 
