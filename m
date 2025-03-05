@@ -1,277 +1,200 @@
-Return-Path: <netdev+bounces-171881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65C9DA4F310
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 01:55:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7E0AA4F32A
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 02:00:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF9BB3AAB2E
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 00:54:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7537188C73C
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 01:00:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70B4D152E12;
-	Wed,  5 Mar 2025 00:54:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57F885D8F0;
+	Wed,  5 Mar 2025 01:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XaviOK6x"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="AjnalfrL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F63784D02;
-	Wed,  5 Mar 2025 00:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EE5B11185
+	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 01:00:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741136049; cv=none; b=g9Fowf+hkwxmkFVpmcikZ50hnexJfXeFtKM6yoA/keWkv1IVKSk1D69p3pxuCZXy9ZUQVU1PoN/UesolOrFlY3y72A7KfrWQPS30aBrKdSlVRYWsBKHvZps4WpOCU+QDuqfhtsT8+mMOzHl3BDHSf+IA+8E3jEhTBr0Es+0ZlI8=
+	t=1741136428; cv=none; b=gd18fNBTWovUpBo3N04Q9B172gVypO2bgX99y3ZoIkgzOZGtIo2VdTfJ0a8qY870twaVuDGyePUZh2iLFGvCNst/0TdTM5ShbA4FXxypIsyhQQDnKsT2bqqDjiyQh83e0Be0PJA37Q2/m0IhLSP+GPQAF8ex5mlnPgYMwaQATpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741136049; c=relaxed/simple;
-	bh=+fRE1uLBpFlNZP4DTdKt/a6ropjLqwVe08JZP7EIJHc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=QWyOILC2pfg0tujWXATH7i8ttdxHaSNkvKubtlP8QJrHV5aTAS+Vb2IAcOFQaK6kIun9x+sLywFWuQ1ak0mpTYDXxe8T4Tuw3r6wZz0amFWq+uZbwz2Pz/q9UZ6BvRV50rMbiQPJrb76Pa2LTkMmEiJqV473mm28EKCHLIkLbH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XaviOK6x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E3062C4CEF7;
-	Wed,  5 Mar 2025 00:54:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741136049;
-	bh=+fRE1uLBpFlNZP4DTdKt/a6ropjLqwVe08JZP7EIJHc=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=XaviOK6xGq2O+2DCHF7zek2cek0ffC7NMn0yUeh7mmRIRQ5g9Sw6/IAnEsS98+Obj
-	 cMStCgrG4FSy9w1E3Z9W4iNOvL4qKTzhfKsH7UyBPSFHCAWcWE7LO3LFEpxI0j2vhz
-	 HV918QMpmeij3ol4PRBSoHOZJJIlS0cP0YWTV4oB5WEYDeG9ci6DtQYGooaRxfqiju
-	 HQQFVb2DPL0PdbZPXYo0f2OW2e7lmH7rGeFDlPHxIWYoisIcLLS3MzZ7EsUaiLQXfh
-	 7nHqz/k7V0jdZ6j0JCmPwlc2rJvh8EsAj8UnjEb5ATW+G0A41twdBzLSn7lKLLh6Gy
-	 jDjUiGPEpiDHg==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB6EBC282D3;
-	Wed,  5 Mar 2025 00:54:08 +0000 (UTC)
-From: Satish Kharat via B4 Relay <devnull+satishkh.cisco.com@kernel.org>
-Date: Tue, 04 Mar 2025 19:56:44 -0500
-Subject: [PATCH net-next v2 8/8] enic : get max rq & wq entries supported
- by hw, 16K queues
+	s=arc-20240116; t=1741136428; c=relaxed/simple;
+	bh=FRqmXYpYVBt8WeZOTp6ZTdH2x+Rqo3KDqIOZpuj4mN4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gI8eodQ1hDuoXBfzMp9KrluNnq9V9g7Y+amXTX5kd3phbKSrmDO5nrothyif4VcpQY9kSdOvYO5NLiiemUWvKbCEha2RmKeb9GY+hSwGE+9YwLqXnVdDM0knLflzgeaKDbn6lORvTyaVf45Vt9DI7yKNTRJPTw6lkJ4yyILuElk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=AjnalfrL; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5e4ebc78da5so9292433a12.2
+        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 17:00:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1741136424; x=1741741224; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=chlUX2BPGTU5TeZ1kFFp37lGXktq1FgiG+bxYUO8kTk=;
+        b=AjnalfrLCIreR9PBMDyUPDsCkViRaWgsDAoL+b4DrtIlMlzstx+58eTkM7sEbHA48h
+         nsQ7PezbNoI92/AqBg8Ptp2uk0ryrLcNvF4RT61p//vIpHJHc6M77jgHZfoRHTCfKRC5
+         HupfNj9Vrr84qsV1F+kvPYXcJSw6C7gPk/zwGODA2ECmQ2f6+yEv3oo3wLtaYhhcf51K
+         Ol/VN5PEvPmHHegyynZkUrSLEFB7NpfwgXXv9Q7POgWjbabkTzlwd8UxtT3ncIW1kuyp
+         L8WZtL4+86rOZuQXVXXjCL+PAUPf/Hw+ghzrgC9GmXvvoak1iQ/53Z+X0TBGESixVdqA
+         KwhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741136424; x=1741741224;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=chlUX2BPGTU5TeZ1kFFp37lGXktq1FgiG+bxYUO8kTk=;
+        b=G3XgcbmDYUaJ7GndiKXXz8Dp+oJ0RHz/m/kA1hP6VQ1NavmHCrhl1+YYrGkrO/b5h6
+         hROvbFaLKLEVIJjQuy7n6yNcRZXbfJwNxjcmxj99Rawv6uphc4WRALvlwwxn/VY18IXK
+         XpZQaJyaEPhXi3LYWBkOCkuoU0EqlETMPR7Iz1s7xCntBccO24cT01Y+Thw1BZCLeOt7
+         D3SLNhxUUxwb/0vUzU7jh7Uz+zhksa7UKKR0ZxTghNCqZ5t2/7GuSsLNuZy1iko4BlMK
+         K5m7SMS4/MMg0nIpMNRbBMb0BaXVE7GpAHpAXeHJFYSRp6ol8w16ijpaAWK9+7rYRnDC
+         TIIw==
+X-Gm-Message-State: AOJu0YxrfrONLN5ux1Ceg039JS9l58ZOVhocBK/CkJoMXFaUDfPLa1pc
+	EiDiKzXC3iXI/PrHXNnqYVu97Ol0GHDa1lQboTuzwEanFEUmxQlthHEv1qbXeQc=
+X-Gm-Gg: ASbGncuRXbSrSVfO7cdck7CUXlcG/HDZQsnLJvv2RdwOaWo0K6zYa1Zq5KquMl7sJSN
+	L0mri6P0AHbjfhG4j+Grw212wFkbwo38RZUCen0nU9d2OxT62wIXpPzBXlrvqkrs0N4TLfsaXzh
+	iMlXkSj5zI8ndtGYp5qDEozv/WJeelTH+eWgd5Oj7WfwZ4IDQBBW8tKrsAncrQW7kRJEiTLcj2S
+	p2PGMR4A1+2GQu9g/o0qvQLagmzfLYqeOjlLqPK905THlnaukOwqDCGZwZ8jRu2w8biIpModRoz
+	PxlXG0q5KXR9WKmvt1MaCHhcrwhuAa7MxhUos/AQB/2ko5ZvH5VrFYBUdqetZWTGqBE7DLaqT0V
+	pa/dsg+Y=
+X-Google-Smtp-Source: AGHT+IGwWVFOLcxV0LkUngHq3HFjXHad4jOYWm8uX/RmfUfR8dI9IG0CksFEVnyNPrbp4SNz8LPd6Q==
+X-Received: by 2002:a17:907:94d1:b0:ac1:def4:ce20 with SMTP id a640c23a62f3a-ac20d8bc96fmr114851166b.18.1741136423329;
+        Tue, 04 Mar 2025 17:00:23 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:2107:3d4f:958a:fa5f? ([2001:67c:2fbc:1:2107:3d4f:958a:fa5f])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac1fa431529sm165373366b.148.2025.03.04.17.00.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Mar 2025 17:00:22 -0800 (PST)
+Message-ID: <71c1db26-f147-4578-89ae-c5b95da0ec9a@openvpn.net>
+Date: Wed, 5 Mar 2025 02:00:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v21 20/24] ovpn: implement key add/get/del/swap via
+ netlink
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+References: <20250304-b4-ovpn-tmp-v21-0-d3cbb74bb581@openvpn.net>
+ <20250304-b4-ovpn-tmp-v21-20-d3cbb74bb581@openvpn.net> <Z8braoc3yeBY7lcE@hog>
+ <07c73e1d-3c9c-46c7-92cd-28d728929d18@openvpn.net> <Z8eIJH1LtTtfljSj@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <Z8eIJH1LtTtfljSj@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250304-enic_cleanup_and_ext_cq-v2-8-85804263dad8@cisco.com>
-References: <20250304-enic_cleanup_and_ext_cq-v2-0-85804263dad8@cisco.com>
-In-Reply-To: <20250304-enic_cleanup_and_ext_cq-v2-0-85804263dad8@cisco.com>
-To: Christian Benvenuti <benve@cisco.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Satish Kharat <satishkh@cisco.com>, Nelson Escobar <neescoba@cisco.com>, 
- John Daley <johndale@cisco.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1741136203; l=8011;
- i=satishkh@cisco.com; s=20250226; h=from:subject:message-id;
- bh=x77EXPuH2B5E7HMjpcZQpt6qDulc8/gTpGpVsIUdnxk=;
- b=klhwlNad5PMUYi/XE0V0BWrx5RvISm6CJ1y+qBV7DtUTzlAxnTPd93W+ag73dwSibBudWeajP
- sMjmgYeEeArA27IbUa85CBKVSgOgBXMSz8kEymWc3lsxusAUl49LBj4
-X-Developer-Key: i=satishkh@cisco.com; a=ed25519;
- pk=lkxzORFYn5ejiy0kzcsfkpGoXZDcnHMc4n3YK7jJnJo=
-X-Endpoint-Received: by B4 Relay for satishkh@cisco.com/20250226 with
- auth_id=351
-X-Original-From: Satish Kharat <satishkh@cisco.com>
-Reply-To: satishkh@cisco.com
 
-From: Satish Kharat <satishkh@cisco.com>
+On 05/03/2025 00:09, Sabrina Dubroca wrote:
+> 2025-03-04, 13:11:28 +0100, Antonio Quartulli wrote:
+>> On 04/03/2025 13:00, Sabrina Dubroca wrote:
+>>> 2025-03-04, 01:33:50 +0100, Antonio Quartulli wrote:
+>>>>    int ovpn_nl_key_new_doit(struct sk_buff *skb, struct genl_info *info)
+>>>>    {
+>>> ...
+>>>> +	pkr.slot = nla_get_u8(attrs[OVPN_A_KEYCONF_SLOT]);
+>>>> +	pkr.key.key_id = nla_get_u16(attrs[OVPN_A_KEYCONF_KEY_ID]);
+>>>> +	pkr.key.cipher_alg = nla_get_u16(attrs[OVPN_A_KEYCONF_CIPHER_ALG]);
+>>>
+>>>
+>>> [...]
+>>>> +static int ovpn_nl_send_key(struct sk_buff *skb, const struct genl_info *info,
+>>>> +			    u32 peer_id, enum ovpn_key_slot slot,
+>>>> +			    const struct ovpn_key_config *keyconf)
+>>>> +{
+>>> ...
+>>>> +	if (nla_put_u32(skb, OVPN_A_KEYCONF_SLOT, slot) ||
+>>>> +	    nla_put_u32(skb, OVPN_A_KEYCONF_KEY_ID, keyconf->key_id) ||
+>>>> +	    nla_put_u32(skb, OVPN_A_KEYCONF_CIPHER_ALG, keyconf->cipher_alg))
+>>>
+>>> That's a bit inconsistent. nla_put_u32 matches the generated policy,
+>>> but the nla_get_u{8,16} don't (and nla_get_u16 also doesn't match "u8
+>>> key_id" it's getting stored into).
+>>>
+>>> [also kind of curious that the policy/spec uses U32 with max values of 1/2/7]
+>>
+>>  From https://www.kernel.org/doc/html/next/userspace-api/netlink/specs.html#fix-width-integer-types
+>>
+>> "Note that types smaller than 32 bit should be avoided as using them does
+>> not save any memory in Netlink messages (due to alignment)."
+>>
+>> Hence I went for u32 attributes, although values stored into them are much
+>> smaller.
+> 
+> Right.
 
-Enables reading the max rq and wq entries supported from the hw.
-Enables 16k rq and wq entries on hw that supports.
+What's wrong with key_id being u8 tough?
 
-Co-developed-by: Nelson Escobar <neescoba@cisco.com>
-Signed-off-by: Nelson Escobar <neescoba@cisco.com>
-Co-developed-by: John Daley <johndale@cisco.com>
-Signed-off-by: John Daley <johndale@cisco.com>
-Signed-off-by: Satish Kharat <satishkh@cisco.com>
----
- drivers/net/ethernet/cisco/enic/enic_ethtool.c | 12 +++++------
- drivers/net/ethernet/cisco/enic/enic_res.c     | 29 ++++++++++++++++----------
- drivers/net/ethernet/cisco/enic/enic_res.h     | 11 ++++++----
- drivers/net/ethernet/cisco/enic/enic_wq.c      |  2 +-
- drivers/net/ethernet/cisco/enic/vnic_enet.h    |  5 +++++
- drivers/net/ethernet/cisco/enic/vnic_rq.h      |  2 +-
- drivers/net/ethernet/cisco/enic/vnic_wq.h      |  2 +-
- 7 files changed, 39 insertions(+), 24 deletions(-)
+I am a bit reluctant to change all key_id fields/variables to u32, just 
+because the netlink APIs prefers using u32 instead of u8.
 
-diff --git a/drivers/net/ethernet/cisco/enic/enic_ethtool.c b/drivers/net/ethernet/cisco/enic/enic_ethtool.c
-index 18b929fc2879912ad09025996a4f1b9fdb353961..529160926a9633f5e2d60e6842c2fcf07492854b 100644
---- a/drivers/net/ethernet/cisco/enic/enic_ethtool.c
-+++ b/drivers/net/ethernet/cisco/enic/enic_ethtool.c
-@@ -222,9 +222,9 @@ static void enic_get_ringparam(struct net_device *netdev,
- 	struct enic *enic = netdev_priv(netdev);
- 	struct vnic_enet_config *c = &enic->config;
- 
--	ring->rx_max_pending = ENIC_MAX_RQ_DESCS;
-+	ring->rx_max_pending = c->max_rq_ring;
- 	ring->rx_pending = c->rq_desc_count;
--	ring->tx_max_pending = ENIC_MAX_WQ_DESCS;
-+	ring->tx_max_pending = c->max_wq_ring;
- 	ring->tx_pending = c->wq_desc_count;
- }
- 
-@@ -252,18 +252,18 @@ static int enic_set_ringparam(struct net_device *netdev,
- 	}
- 	rx_pending = c->rq_desc_count;
- 	tx_pending = c->wq_desc_count;
--	if (ring->rx_pending > ENIC_MAX_RQ_DESCS ||
-+	if (ring->rx_pending > c->max_rq_ring ||
- 	    ring->rx_pending < ENIC_MIN_RQ_DESCS) {
- 		netdev_info(netdev, "rx pending (%u) not in range [%u,%u]",
- 			    ring->rx_pending, ENIC_MIN_RQ_DESCS,
--			    ENIC_MAX_RQ_DESCS);
-+	      c->max_rq_ring);
- 		return -EINVAL;
- 	}
--	if (ring->tx_pending > ENIC_MAX_WQ_DESCS ||
-+	if (ring->tx_pending > c->max_wq_ring ||
- 	    ring->tx_pending < ENIC_MIN_WQ_DESCS) {
- 		netdev_info(netdev, "tx pending (%u) not in range [%u,%u]",
- 			    ring->tx_pending, ENIC_MIN_WQ_DESCS,
--			    ENIC_MAX_WQ_DESCS);
-+			c->max_wq_ring);
- 		return -EINVAL;
- 	}
- 	if (running)
-diff --git a/drivers/net/ethernet/cisco/enic/enic_res.c b/drivers/net/ethernet/cisco/enic/enic_res.c
-index a7179cc4b5296cfbce137c54a9e17e6b358a19ae..bbd3143ed73e77d25a1e4921e073c929e92d8230 100644
---- a/drivers/net/ethernet/cisco/enic/enic_res.c
-+++ b/drivers/net/ethernet/cisco/enic/enic_res.c
-@@ -59,31 +59,38 @@ int enic_get_vnic_config(struct enic *enic)
- 	GET_CONFIG(intr_timer_usec);
- 	GET_CONFIG(loop_tag);
- 	GET_CONFIG(num_arfs);
-+	GET_CONFIG(max_rq_ring);
-+	GET_CONFIG(max_wq_ring);
-+	GET_CONFIG(max_cq_ring);
-+
-+	if (!c->max_wq_ring)
-+		c->max_wq_ring = ENIC_MAX_WQ_DESCS_DEFAULT;
-+	if (!c->max_rq_ring)
-+		c->max_rq_ring = ENIC_MAX_RQ_DESCS_DEFAULT;
-+	if (!c->max_cq_ring)
-+		c->max_cq_ring = ENIC_MAX_CQ_DESCS_DEFAULT;
- 
- 	c->wq_desc_count =
--		min_t(u32, ENIC_MAX_WQ_DESCS,
--		max_t(u32, ENIC_MIN_WQ_DESCS,
--		c->wq_desc_count));
-+		min_t(u32, c->max_wq_ring,
-+		      max_t(u32, ENIC_MIN_WQ_DESCS, c->wq_desc_count));
- 	c->wq_desc_count &= 0xffffffe0; /* must be aligned to groups of 32 */
- 
- 	c->rq_desc_count =
--		min_t(u32, ENIC_MAX_RQ_DESCS,
--		max_t(u32, ENIC_MIN_RQ_DESCS,
--		c->rq_desc_count));
-+		min_t(u32, c->max_rq_ring,
-+		      max_t(u32, ENIC_MIN_RQ_DESCS, c->rq_desc_count));
- 	c->rq_desc_count &= 0xffffffe0; /* must be aligned to groups of 32 */
- 
- 	if (c->mtu == 0)
- 		c->mtu = 1500;
--	c->mtu = min_t(u16, ENIC_MAX_MTU,
--		max_t(u16, ENIC_MIN_MTU,
--		c->mtu));
-+	c->mtu = min_t(u16, ENIC_MAX_MTU, max_t(u16, ENIC_MIN_MTU, c->mtu));
- 
- 	c->intr_timer_usec = min_t(u32, c->intr_timer_usec,
- 		vnic_dev_get_intr_coal_timer_max(enic->vdev));
- 
- 	dev_info(enic_get_dev(enic),
--		"vNIC MAC addr %pM wq/rq %d/%d mtu %d\n",
--		enic->mac_addr, c->wq_desc_count, c->rq_desc_count, c->mtu);
-+		 "vNIC MAC addr %pM wq/rq %d/%d max wq/rq/cq %d/%d/%d mtu %d\n",
-+		 enic->mac_addr, c->wq_desc_count, c->rq_desc_count,
-+		 c->max_wq_ring, c->max_rq_ring, c->max_cq_ring, c->mtu);
- 
- 	dev_info(enic_get_dev(enic), "vNIC csum tx/rx %s/%s "
- 		"tso/lro %s/%s rss %s intr mode %s type %s timer %d usec "
-diff --git a/drivers/net/ethernet/cisco/enic/enic_res.h b/drivers/net/ethernet/cisco/enic/enic_res.h
-index b8ee42d297aaf7db75e711be15280b01389567c9..02dca1ae4a2246811277e5ff3aa6650f09fb0f9a 100644
---- a/drivers/net/ethernet/cisco/enic/enic_res.h
-+++ b/drivers/net/ethernet/cisco/enic/enic_res.h
-@@ -12,10 +12,13 @@
- #include "vnic_wq.h"
- #include "vnic_rq.h"
- 
--#define ENIC_MIN_WQ_DESCS		64
--#define ENIC_MAX_WQ_DESCS		4096
--#define ENIC_MIN_RQ_DESCS		64
--#define ENIC_MAX_RQ_DESCS		4096
-+#define ENIC_MIN_WQ_DESCS 64
-+#define ENIC_MAX_WQ_DESCS_DEFAULT 4096
-+#define ENIC_MAX_WQ_DESCS 16384
-+#define ENIC_MIN_RQ_DESCS 64
-+#define ENIC_MAX_RQ_DESCS 16384
-+#define ENIC_MAX_RQ_DESCS_DEFAULT 4096
-+#define ENIC_MAX_CQ_DESCS_DEFAULT (64 * 1024)
- 
- #define ENIC_MIN_MTU			ETH_MIN_MTU
- #define ENIC_MAX_MTU			9000
-diff --git a/drivers/net/ethernet/cisco/enic/enic_wq.c b/drivers/net/ethernet/cisco/enic/enic_wq.c
-index 2a5ddad512e388bf4f42fddaafd9242e20a30fe5..07936f8b423171cd247c3afd695322de820f752f 100644
---- a/drivers/net/ethernet/cisco/enic/enic_wq.c
-+++ b/drivers/net/ethernet/cisco/enic/enic_wq.c
-@@ -93,7 +93,7 @@ unsigned int enic_wq_cq_service(struct enic *enic, unsigned int cq_index,
- 	u8 type, color;
- 	bool ext_wq;
- 
--	ext_wq = cq->ring.size > ENIC_MAX_WQ_DESCS;
-+	ext_wq = cq->ring.size > ENIC_MAX_WQ_DESCS_DEFAULT;
- 
- 	cq_desc = (struct cq_desc *)vnic_cq_to_clean(cq);
- 	enic_wq_cq_desc_dec(cq_desc, ext_wq, &type, &color,
-diff --git a/drivers/net/ethernet/cisco/enic/vnic_enet.h b/drivers/net/ethernet/cisco/enic/vnic_enet.h
-index 5acc236069dea358c2f330824ad57ad7920889cc..9e8e86262a3fea0ab37f8044c81ba798b5b00c90 100644
---- a/drivers/net/ethernet/cisco/enic/vnic_enet.h
-+++ b/drivers/net/ethernet/cisco/enic/vnic_enet.h
-@@ -21,6 +21,11 @@ struct vnic_enet_config {
- 	u16 loop_tag;
- 	u16 vf_rq_count;
- 	u16 num_arfs;
-+	u8 reserved[66];
-+	u32 max_rq_ring;	// MAX RQ ring size
-+	u32 max_wq_ring;	// MAX WQ ring size
-+	u32 max_cq_ring;	// MAX CQ ring size
-+	u32 rdma_rsvd_lkey;	// Reserved (privileged) LKey
- };
- 
- #define VENETF_TSO		0x1	/* TSO enabled */
-diff --git a/drivers/net/ethernet/cisco/enic/vnic_rq.h b/drivers/net/ethernet/cisco/enic/vnic_rq.h
-index 2ee4be2b9a343a7a340c2b4a81fe560ccc2e6715..a1cdd729caece5c3378c3a8025cedf9b2bf758ab 100644
---- a/drivers/net/ethernet/cisco/enic/vnic_rq.h
-+++ b/drivers/net/ethernet/cisco/enic/vnic_rq.h
-@@ -50,7 +50,7 @@ struct vnic_rq_ctrl {
- 	(VNIC_RQ_BUF_BLK_ENTRIES(entries) * sizeof(struct vnic_rq_buf))
- #define VNIC_RQ_BUF_BLKS_NEEDED(entries) \
- 	DIV_ROUND_UP(entries, VNIC_RQ_BUF_BLK_ENTRIES(entries))
--#define VNIC_RQ_BUF_BLKS_MAX VNIC_RQ_BUF_BLKS_NEEDED(4096)
-+#define VNIC_RQ_BUF_BLKS_MAX VNIC_RQ_BUF_BLKS_NEEDED(16384)
- 
- struct vnic_rq_buf {
- 	struct vnic_rq_buf *next;
-diff --git a/drivers/net/ethernet/cisco/enic/vnic_wq.h b/drivers/net/ethernet/cisco/enic/vnic_wq.h
-index 75c52691107447f1ea1deb1d4eeabb0e0313b3eb..3bb4758100ba481c3bd7a873203e8b033d6b99a6 100644
---- a/drivers/net/ethernet/cisco/enic/vnic_wq.h
-+++ b/drivers/net/ethernet/cisco/enic/vnic_wq.h
-@@ -62,7 +62,7 @@ struct vnic_wq_buf {
- 	(VNIC_WQ_BUF_BLK_ENTRIES(entries) * sizeof(struct vnic_wq_buf))
- #define VNIC_WQ_BUF_BLKS_NEEDED(entries) \
- 	DIV_ROUND_UP(entries, VNIC_WQ_BUF_BLK_ENTRIES(entries))
--#define VNIC_WQ_BUF_BLKS_MAX VNIC_WQ_BUF_BLKS_NEEDED(4096)
-+#define VNIC_WQ_BUF_BLKS_MAX VNIC_WQ_BUF_BLKS_NEEDED(16384)
- 
- struct vnic_wq {
- 	unsigned int index;
+Keeping variables/fields u8 allows to understand what values we're going 
+to store internally.
+
+And thanks to the netlink policy we know that no larger value will be 
+attempted to be saved, even if the field is actually u32.
+
+
+Cheers,
+
 
 -- 
-2.48.1
-
+Antonio Quartulli
+OpenVPN Inc.
 
 
