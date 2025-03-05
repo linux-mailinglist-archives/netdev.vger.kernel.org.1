@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-171889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C71EA4F363
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 02:20:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 159F3A4F365
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 02:20:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76AAA188D76A
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 01:20:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4246E16F4A7
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 01:20:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 071D4136672;
-	Wed,  5 Mar 2025 01:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79B0913AA2D;
+	Wed,  5 Mar 2025 01:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qeRb9AB/"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hw8mn4yT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D185E11187;
-	Wed,  5 Mar 2025 01:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5072E11187;
+	Wed,  5 Mar 2025 01:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741137599; cv=none; b=HrdH4DL6HzWxvMpvTnOXOm8pCl9rCuoVdUB6Ma+Ykm6vvEWtCuQocEGKs5UQX5QBhfmTeYskJOoonlFL0HfOXM30FUPsqb26SgPsk/hJDPUqFoL7cO2aX9fgHt1VPStB/D7nJlOyAHOtfeoImgV1S0F1A7Nm8Ra2ND9dM97WrB0=
+	t=1741137605; cv=none; b=MTLg+0erQdkkd0rTXlpn7YB3WI7LTiw3bYgagPL8PuNnTDjtC5CXa/H4mXYeFW66HP6eu0r99YgRP/zYoxPMGIVpKl3+bxIzZ/vap0FugrXZjveBBhCVfRvLrc11M/XrufEkp6ffT1v6wtak2O0zxKNpDIiGvheu0MZJ0nVv/eM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741137599; c=relaxed/simple;
-	bh=Zo1aULGkAE1iQtalKdej5/kWzCNtDu/xrdwQwX+JEHA=;
+	s=arc-20240116; t=1741137605; c=relaxed/simple;
+	bh=mDKHo0Pitg/ucTdMd+1cxtHXnsCmHgjQ5ITdIbe3Zgs=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=E/klvnAE5YmEJgOZDpRIHrfaxrYnpz7tA+Zz4pKJ0mnOGoZR6Z+8lUxBsZTM1Y0zuzHB7bIrBg+/UX0n6jt8o4GPj2STD93K/Sr2RTmV9xCbu0dB72+JAQfqudbo96Ulb41TQ7cjR11GqxB/FGhfnme9SqzOG4WxIH7aCmv2hqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qeRb9AB/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4240FC4CEE5;
-	Wed,  5 Mar 2025 01:19:59 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=gw+8HcOow/o/iKMOLBVVOjTKwk6qEtOW+NHhnWk8da5/F49kG0Gxv/QcIHwp0ukCW/fjG6lZw+ou714WPGEEwX2tfpX/jqymPKWeVgR7s2PQbdelTlhiPY8gNaRuPXovOeAWtSdnwg4/aDNsKHtClBwYfAPJ+hpsUMHWVMT7FGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hw8mn4yT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B717DC4CEE5;
+	Wed,  5 Mar 2025 01:20:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741137599;
-	bh=Zo1aULGkAE1iQtalKdej5/kWzCNtDu/xrdwQwX+JEHA=;
+	s=k20201202; t=1741137604;
+	bh=mDKHo0Pitg/ucTdMd+1cxtHXnsCmHgjQ5ITdIbe3Zgs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qeRb9AB/dK9DxTDq3Tvy1mXCAEgv6QPsLIucgKLTT79XycFRf90j97Egn9o2ubQDg
-	 /Hq0ILo7De2QZxOPHR33hK5REBVX6RFNhi9bk+J0loyC5XWIJmYn+5OlKbwFchGBgU
-	 b8+n0obMSTlk+PPOmYIx28t8ukbrq9jyOVw131Y6ljzJZgh8RDKImzjSyzs3GlzOiw
-	 jMlc+XDd14OD8Qft/rzQMrxu70AGRlJBU18iOli2nIHsD9qmqk0tuaN1hjeA9pESrP
-	 T3H2kZjcIipz3GY6LTq7+OSU/ZULXAomdDWvrlW/wKikuRmmDio5wQNLoGclAx/MCW
-	 23RaUrxik/WpA==
+	b=Hw8mn4yTkUrGdGKZWmULRrc0s0uBZSgODD26zFl1iSWOSr7HxxdsF28pwBzvmPMNI
+	 RuJJXdx7JaOkR/2sVdYkflySxM/qkZ4vZfiDKK/Jc0QCD0JEJzJ8wJjJG1ZetAiuek
+	 qOm4E0D8UlxnwJ/z2P9l/xA+lrb4xM1wzoXIvm09K1Bz+2DSDNe/fLQhw7YdNXtl47
+	 EcVSB1fsHYSlCP+Gvip7W6zjC11ikrxNkBOU0V1iUX+Ig0masrCv/OcQhKJiHR2CzU
+	 DQ5LFOqFt7thh5KckBJ+TVVUXbgS/JamihC+TrGkjBvSjFxCclqB8NlwScbeT/oZiA
+	 zpbO2lwmKR1Lw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7106D380CFEB;
-	Wed,  5 Mar 2025 01:20:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB6A2380CFEB;
+	Wed,  5 Mar 2025 01:20:38 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: ethtool: netlink: Allow NULL nlattrs when getting
- a phy_device
+Subject: Re: [PATCH v2 0/3] net: Convert Gianfar (Triple Speed Ethernet
+ Controller) bindings to YAML
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174113763227.356990.18423879063180957214.git-patchwork-notify@kernel.org>
-Date: Wed, 05 Mar 2025 01:20:32 +0000
-References: <20250301141114.97204-1-maxime.chevallier@bootlin.com>
-In-Reply-To: <20250301141114.97204-1-maxime.chevallier@bootlin.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, andrew@lunn.ch, kuba@kernel.org, edumazet@google.com,
- pabeni@redhat.com, hkallweit1@gmail.com, parthiban.veerasooran@microchip.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, linux-arm-kernel@lists.infradead.org,
- christophe.leroy@csgroup.eu, herve.codina@bootlin.com, f.fainelli@gmail.com,
- vladimir.oltean@nxp.com, kory.maincent@bootlin.com, o.rempel@pengutronix.de,
- horms@kernel.org, romain.gantois@bootlin.com, piergiorgio.beruto@gmail.com
+ <174113763773.356990.16443776503702976199.git-patchwork-notify@kernel.org>
+Date: Wed, 05 Mar 2025 01:20:37 +0000
+References: <20250228-gianfar-yaml-v2-0-6beeefbd4818@posteo.net>
+In-Reply-To: <20250228-gianfar-yaml-v2-0-6beeefbd4818@posteo.net>
+To: =?utf-8?q?J=2E_Neusch=C3=A4fer_via_B4_Relay_=3Cdevnull+j=2Ene=2Eposteo=2Enet?=@codeaurora.org,
+	=?utf-8?q?=40kernel=2Eorg=3E?=@codeaurora.org
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, claudiu.manoil@nxp.com, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, j.ne@posteo.net
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat,  1 Mar 2025 15:11:13 +0100 you wrote:
-> ethnl_req_get_phydev() is used to lookup a phy_device, in the case an
-> ethtool netlink command targets a specific phydev within a netdev's
-> topology.
+On Fri, 28 Feb 2025 18:32:49 +0100 you wrote:
+> The aim of this series is to modernize the device tree bindings for the
+> Freescale "Gianfar" ethernet controller (a.k.a. TSEC, Triple Speed
+> Ethernet Controller) by converting them to YAML.
 > 
-> It takes as a parameter a const struct nlattr *header that's used for
-> error handling :
+> Signed-off-by: J. Neuschäfer <j.ne@posteo.net>
+> ---
+> Changes in v2:
+> - various cleanups suggested by reviewers
+> - use a 'select:' schema to disambiguate compatible = "gianfar" between
+>   network controller and MDIO nodes
+> - Link to v1: https://lore.kernel.org/r/20250220-gianfar-yaml-v1-0-0ba97fd1ef92@posteo.net
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] net: ethtool: netlink: Allow NULL nlattrs when getting a phy_device
-    https://git.kernel.org/netdev/net/c/637399bf7e77
+  - [v2,1/3] dt-bindings: net: Convert fsl,gianfar-{mdio,tbi} to YAML
+    https://git.kernel.org/netdev/net-next/c/e4c4522390c9
+  - [v2,2/3] dt-bindings: net: fsl,gianfar-mdio: Update information about TBI
+    https://git.kernel.org/netdev/net-next/c/0386e29e60bd
+  - [v2,3/3] dt-bindings: net: Convert fsl,gianfar to YAML
+    https://git.kernel.org/netdev/net-next/c/a70fdd936818
 
 You are awesome, thank you!
 -- 
