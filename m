@@ -1,94 +1,81 @@
-Return-Path: <netdev+bounces-171895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F29B6A4F370
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 02:21:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CBF5A4F39D
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 02:26:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 988197A6529
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 01:20:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65FFB16EB84
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 01:26:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9B7C170A13;
-	Wed,  5 Mar 2025 01:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24E4113D8B2;
+	Wed,  5 Mar 2025 01:26:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="as/Shjhq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ed0PkaVf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD299166F32;
-	Wed,  5 Mar 2025 01:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D8511185;
+	Wed,  5 Mar 2025 01:26:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741137612; cv=none; b=midnnEjnPYnBVtvTHR+b8BnZfbDW191Ca2p3/4TBx1mgTMxNN9SiXzj4/DzHATK917yRpF2O+YbhDk6WkIUa6ekcSaQ6btplqfojf/ikT3oxWe+t2I1OuVuCP/Rbhzl3Dkqtc2skkyz6Hp7jbOYclqzjvvMSGp3tdbeE8XzNhaU=
+	t=1741137999; cv=none; b=VrTZ0njar6hQZsgLFaCkxHafhraxfuIXVZrn0vKpwn2yM9eQPsI5UWIFw7f5Lt3xNneW0GThUMjRODsR66waXtsXjVjHPLfAT38zo3qsLgvQrciBIYGl0b5GTtpHnHesbB4gvFRlc/KreiXsZO+obYFxrGBfN0l8YEPLOZ2KzB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741137612; c=relaxed/simple;
-	bh=d42/iWgyP1vCc+gV3LAXpR4hIEbpvz0bwcJDNo+qYIc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gddWhI+UXBS9MqhOL9pajrwcUqfsLPXmEDQht6DcWcxrAgx4hBP1ZZXk7sFtzbl9NkBBG2vsyfEXiq0KqeUFjJZ6LEAB5MSVuFI+4cUkbQ/qyN+bcR9lCVYR4qA5xl4MB1myURxXIR22udIwn4Q6CByRn5AD+zoB3h6LzKr7suQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=as/Shjhq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37CCFC4CEE7;
-	Wed,  5 Mar 2025 01:20:12 +0000 (UTC)
+	s=arc-20240116; t=1741137999; c=relaxed/simple;
+	bh=No48rJZ9BUtGKhIoMFiw/HS/FMwjx8s58pDxfgR/Z5E=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=b16uJTBrLnYjVVCcQoa7O9ry+Uz9aj617OXmslnlweNrVgntNJhBBwqt0kxgOaKXWWLwzcZQCWk1zGqGMDDYcUhg1Hnc7Gp+ZXJzcDgiirl1ikxmWwm3zGtiKsVE2XC+UM6zdkcPppvHfSarfeZKLvbLluOSHN795Fsq9HvaDHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ed0PkaVf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11F7AC19422;
+	Wed,  5 Mar 2025 01:26:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741137612;
-	bh=d42/iWgyP1vCc+gV3LAXpR4hIEbpvz0bwcJDNo+qYIc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=as/Shjhq1e2yBvUpF6PVJaLKyaXiJcJdmwl3uhF1WUqaw6DQt9e8Rv6iz1P0Q+vxS
-	 V6bWIJvAKVzGukgupk5/Oe9PYXrvItzabOJliYg3p5XgJXD6VdHUyikkY+aU526kFg
-	 pAVM9Gp4H0DCYitcp+No5tzh/UFI4SOiBsv0QIvR22nvgHorLbXkidqRPjylVALnod
-	 6q6q1SM1iX2cQkWfIOxNVhcyYve6y/7uH87NwTFQUV6MJDW0oxmS8WJTk2gOPhuQb5
-	 7jbzPCy8RIaXCxiGqzSrRE65IoafetJgNBme6mggyb06GBexkYEnFOAcBMvuomdONY
-	 W5drORNYscs6Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D99380CFEB;
-	Wed,  5 Mar 2025 01:20:46 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1741137998;
+	bh=No48rJZ9BUtGKhIoMFiw/HS/FMwjx8s58pDxfgR/Z5E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Ed0PkaVfMacdhTE89Pj6FIh4ALkwsAL5apZItPR2KuoIaMVRGAcYubTKPCkNw1VIc
+	 3E2XY7ADkMBUFVQjyZCB83XqPJ3pRFnSfH/zbnuMA50wXiqZON+WPo50nR8gR/hyya
+	 434Zn6+kCqlWT+1/6EhJPp/gvxmK8GQl5Xluuz9To0ferdBtRSLesP0O8cHo/ZaYPv
+	 ryIV6300mXSIj7Wa2o5qTRuvVRydPrCef+0M5ZcO6vZSQIHbPaa73+bUrkQFyGUlu/
+	 CiqY/Y1gUzZH4eVI1DslBxcLKBCx71cGvtD23ImTahwgI+WjpB2O/wDPZ4rBwMjq+K
+	 8ofqeBMakFaDg==
+Date: Tue, 4 Mar 2025 17:26:35 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sai Krishna <saikrishnag@marvell.com>
+Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <sgoutham@marvell.com>, <gakula@marvell.com>, <lcherian@marvell.com>,
+ <jerinj@marvell.com>, <hkelam@marvell.com>, <sbhatta@marvell.com>,
+ <andrew+netdev@lunn.ch>, <bbhushan2@marvell.com>, <nathan@kernel.org>,
+ <ndesaulniers@google.com>, <morbo@google.com>, <justinstitt@google.com>,
+ <llvm@lists.linux.dev>, kernel test robot <lkp@intel.com>
+Subject: Re: [net-next PATCH] octeontx2-af: fix build warnings flagged by
+ clang, sparse ,kernel test robot
+Message-ID: <20250304172635.000866fb@kernel.org>
+In-Reply-To: <20250303191339.2679028-1-saikrishnag@marvell.com>
+References: <20250303191339.2679028-1-saikrishnag@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4 net-next] dpll: Add an assertion to check
- freq_supported_num
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174113764499.356990.5931495827775849774.git-patchwork-notify@kernel.org>
-Date: Wed, 05 Mar 2025 01:20:44 +0000
-References: <20250228150210.34404-1-jiashengjiangcool@gmail.com>
-In-Reply-To: <20250228150210.34404-1-jiashengjiangcool@gmail.com>
-To: Jiasheng Jiang <jiashengjiangcool@gmail.com>
-Cc: przemyslaw.kitszel@intel.com, arkadiusz.kubalewski@intel.com,
- davem@davemloft.net, jan.glaza@intel.com, jiri@resnulli.us,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, stable@vger.kernel.org,
- vadim.fedorenko@linux.dev
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Tue, 4 Mar 2025 00:43:39 +0530 Sai Krishna wrote:
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes:
+> https://urldefense.proofpoint.com/v2/url?u=https-3A__lore.kernel.org_o
+> e-2Dkbuild-2Dall_202410221614.07o9QVjo-2Dlkp-40intel.com_&d=DwIBAg&c=n
+> KjWec2b6R0mOyPaz7xtfQ&r=c3MsgrR-U-HFhmFd6R4MWRZG-8QeikJn5PkjqMTpBSg&m=
+> 3BTQZwLYQz62kiZ1f9l4NBS35e13zrdP_5Hx9-1k5Xt-PgWUMdRcW7G4m5xytsHn&s=OeX
+> wAXPel9ALwlzw4B26ORCXJF_gbqT9Sk3-opDDfgA&e=
+> Signed-off-by: Sai Krishna <saikrishnag@marvell.com>
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri, 28 Feb 2025 15:02:10 +0000 you wrote:
-> Since the driver is broken in the case that src->freq_supported is not
-> NULL but src->freq_supported_num is 0, add an assertion for it.
-> 
-> Signed-off-by: Jiasheng Jiang <jiashengjiangcool@gmail.com>
-> ---
-> Changelog:
-> 
-> [...]
-
-Here is the summary with links:
-  - [v4,net-next] dpll: Add an assertion to check freq_supported_num
-    https://git.kernel.org/netdev/net-next/c/39e912a959c1
-
-You are awesome, thank you!
+Your email server massacred the tags.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
