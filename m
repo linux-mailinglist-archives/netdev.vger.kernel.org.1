@@ -1,295 +1,178 @@
-Return-Path: <netdev+bounces-172152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C6F5A505E2
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 18:03:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 777C8A505E0
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 18:03:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 06DB07A2702
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 17:01:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93CE318871F8
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 17:03:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C12641FCF4F;
-	Wed,  5 Mar 2025 17:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C2119C542;
+	Wed,  5 Mar 2025 17:03:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arthurfabre.com header.i=@arthurfabre.com header.b="JPw8WTR9";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="SfllN+YQ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="GQoWGHo/"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E02CB1ACEC6;
-	Wed,  5 Mar 2025 17:02:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D11B8151992;
+	Wed,  5 Mar 2025 17:03:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741194131; cv=none; b=pKH7hhmLvKiBJ26nGmusB1MDR6Rt/hIzfUyFTpZsa+pw/zpAISB7tUKx3QJMt47BAGx8EHebvhT59SIn53ZhJMw7S8c981GQ8FFWj6KdW+M6Yy1rJTM47aD3a41F6SGRLVgr81uQRFl1E1gsLL81mpKtxkS167Zp035RCLjh4G8=
+	t=1741194185; cv=none; b=nU1AGw5ojbk/2l8R4gjxlEoRBBjqrhrVlIKxymsVRUDOnMi6HQweTfhbtdLPuSaPZhiC4o1jUAp819eXzNkpkpmwxqIUfk5X9/gQqJgE4cY4pMq1ZG9h/xB3dG870HquhpdCefsNFbV2c2Mz02xKPpMLCNeCmj+H1vtfwRMhRZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741194131; c=relaxed/simple;
-	bh=xxTUT3hdMOyAGgiz5DA93BGgJAJirNzILMlaS1W1R3U=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=PL6N3LyHlcGB5VMDq8+EjYWKbGYMIciQHa34yWCUx3cCK5e+Rw8iQpadxGwcNUfT8pJtD4rnA0rcQ9Ir8NiOlUJ5hXrvb3sJfjFzMPT3sJNoIn8X0BQEYvDwDACnUVHe/r7yjYioKDPC1Xl5QlKO61XEWIFCGDT4MzbaHwzD1o0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arthurfabre.com; spf=pass smtp.mailfrom=arthurfabre.com; dkim=pass (2048-bit key) header.d=arthurfabre.com header.i=@arthurfabre.com header.b=JPw8WTR9; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=SfllN+YQ; arc=none smtp.client-ip=103.168.172.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arthurfabre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arthurfabre.com
-Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id D5B4E11401D9;
-	Wed,  5 Mar 2025 12:02:07 -0500 (EST)
-Received: from phl-imap-13 ([10.202.2.103])
-  by phl-compute-09.internal (MEProxy); Wed, 05 Mar 2025 12:02:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arthurfabre.com;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm3;
-	 t=1741194127; x=1741280527; bh=g8axi8rrbBC3EqxPS9kqsfgotXviAvz6
-	BbePmttxIBQ=; b=JPw8WTR94I3C1QaZHJL4bH4ZhJQrgtznvILvT9t+WwWwxwFh
-	fM7d5GdKCtT5+K2kGzQK9MPHjAz+qLU7bBqvMTMx6dB2rnU1Ep5JlScN9QNrwyzn
-	bxdEBRix+tXGSHeQPwQ/f2XceK1UtN7ykIhsi2csW4TdmPnxDp24W4b/Ey65oNh8
-	d+aPSCqyLbCLyaikrANComgIJX7ZiNROwxqLQbQyPvrvZMJEMF5T9I+L+2vytoXa
-	8OZY8M8tUIT7slXfpPQAtoh86K/Ne1sT2vWkraeX2VkAOP1hKIea+eyD6+enNdal
-	fVLKQgsQplZeW8kG7J9n2smYeDYvwv3FAeJEvw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1741194127; x=
-	1741280527; bh=g8axi8rrbBC3EqxPS9kqsfgotXviAvz6BbePmttxIBQ=; b=S
-	fllN+YQ7ADeVZBHBXAF6tALWxeromUav8EiXdn5pMWET8VdDVDWYrfw6awF8eO/F
-	+w+XnrfbOdgY2YJgemhXLWeU34esc1jj4tIATi7lk7AAVfmqJhLSkTYVMoPjyg1Q
-	uWLzvXeq+pGCYgQpKbIoOP+scwWfM4sCS8nOR/ZvQ2LsDQV+3mVFHK0n88xsaI61
-	VvH7shHLPnf+wR/YgCc1OY9cWhhDoIcixW9qLjKsWJBj426Y2SI44djCU4g6cFLo
-	BUle2sDQLRusoiKggnZlXocblPWU+CogxU/oGF5j0Z6c0MlwBRoiI6cWjSy/bZ8N
-	DlGufTYJANoxGfYUJKAjg==
-X-ME-Sender: <xms:j4PIZ5wHKTFPhT04kagaxSpnbSfgaWg8V2_ZKlYakCIETePFgdVdHg>
-    <xme:j4PIZ5SBFF-dFTUUPaBZrAEZr37ctDAT0vxgM7sH4BjYYcZ-teXX0WU6BIJKev-9C
-    M7v9bALaXOlgAGUtlk>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddutdehfeekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepofgggfgtfffkvefuhffvofhfjgesthhqredt
-    redtjeenucfhrhhomhepfdetrhhthhhurhcuhfgrsghrvgdfuceorghrthhhuhhrsegrrh
-    hthhhurhhfrggsrhgvrdgtohhmqeenucggtffrrghtthgvrhhnpefhfeejgefhhffhveel
-    teehhfffheffvdettdelgfeltefhteelveeuffetfffgjeenucevlhhushhtvghrufhiii
-    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhthhhurhesrghrthhhuhhrfhgr
-    sghrvgdrtghomhdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhpohhuthdprh
-    gtphhtthhopegrfhgrsghrvgestghlohhuughflhgrrhgvrdgtohhmpdhrtghpthhtohep
-    jhgrkhhusgestghlohhuughflhgrrhgvrdgtohhmpdhrtghpthhtohepjhgsrhgrnhguvg
-    gsuhhrghestghlohhuughflhgrrhgvrdgtohhmpdhrtghpthhtohephigrnhestghlohhu
-    ughflhgrrhgvrdgtohhmpdhrtghpthhtoheprghlvghkshgrnhguvghrrdhlohgsrghkih
-    hnsehinhhtvghlrdgtohhmpdhrtghpthhtohephhgrfihksehkvghrnhgvlhdrohhrghdp
-    rhgtphhtthhopehlsghirghntghonhesrhgvughhrghtrdgtohhmpdhrtghpthhtohepth
-    hhohhilhgrnhgusehrvgguhhgrthdrtghomhdprhgtphhtthhopegsphhfsehvghgvrhdr
-    khgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:j4PIZzV89qtzO87Bz9enGTCvmjFG1aic1mMl705fiJp15DPTTpPqJA>
-    <xmx:j4PIZ7jsSWckxGOPvbtxPbBE2psqHbFhB1SA2lRprCxG4rgRp0EkKA>
-    <xmx:j4PIZ7DeCmvrEdPvZXOk9JimkUnxW63U1dlz3bBwjweClklC2K3jYQ>
-    <xmx:j4PIZ0KN2cL3gMqKKenFSP6hCcX6gP7_nh4eOkPnNILvESok4UJbDg>
-    <xmx:j4PIZ3urEy5ldaKfhmlcEL2uwTA3ZSIdEevHAtZrU31isxFmkwZ0FI7Q>
-Feedback-ID: i9179493c:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 34AB61F00083; Wed,  5 Mar 2025 12:02:07 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1741194185; c=relaxed/simple;
+	bh=OcJoKzORqXVnDNepmErBN3tw8ndKhUmT6pwHugKrtRw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mKXh5xD96t8enb+pmJq9GDvjnVI1kkyRLMELFxAdNT3doce6uuy9yI2XsKtdCg1e952YoPyheLVrsRW9vyTa3/qXC2vo2mJu0M1sgF/zgv+NWaR0tkF3epOTWYVSk00d18wXCnWb7Hs61i3ayvp1njRhseA/OcOmUdXfGUD0sVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=GQoWGHo/; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A0845443F3;
+	Wed,  5 Mar 2025 17:02:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1741194175;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TPyWHc+8KiHi21EkIlCnv3oAaCqNgg8vVnv8v5oHtoM=;
+	b=GQoWGHo/UcXuWM5+M2p+ufkz2NxvtTKkX7cXWb9rICvOTm1tE0DFBFqym0cuD3G6YbSQ16
+	iCwOa+FsBbPlIBYpNlJJzXTucmSoJxeBLxn97OiC/9rZfVoeBdhfkVVnQfTOby5xGMNLuS
+	Gc0tU0Hqrz4xXQa0Yxqkdy91z6FBY5s60ckVmysNr+UxZqCfEVBYPyY5tCxc40eTRGGsI2
+	puejnC5ToaRwTYbRqIwhvaVB0XQOD7aEhLMcxmixXcnur2OtwlgyyQ5bYynaYkmR7ow908
+	bYwafXGx20/WcvxkXmrXEekb0CPkjgcQq9BnfSow+NJLiR8gb1SnFbCLZTA4qw==
+Date: Wed, 5 Mar 2025 18:02:52 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina
+ <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
+ <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Simon Horman <horms@kernel.org>, Romain Gantois
+ <romain.gantois@bootlin.com>, Piergiorgio Beruto
+ <piergiorgio.beruto@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>
+Subject: Re: [PATCH net-next 0/7] net: ethtool: Introduce ethnl dump helpers
+Message-ID: <20250305180252.5a0ceb86@fedora.home>
+In-Reply-To: <20250305141938.319282-1-maxime.chevallier@bootlin.com>
+References: <20250305141938.319282-1-maxime.chevallier@bootlin.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 05 Mar 2025 18:02:06 +0100
-Message-Id: <D88HSZ3GZZNN.160YSWHX1HIO2@arthurfabre.com>
-Cc: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>, <jakub@cloudflare.com>,
- <hawk@kernel.org>, <yan@cloudflare.com>, <jbrandeburg@cloudflare.com>,
- <thoiland@redhat.com>, <lbiancon@redhat.com>, "Arthur Fabre"
- <afabre@cloudflare.com>
-Subject: Re: [PATCH RFC bpf-next 07/20] xdp: Track if metadata is supported
- in xdp_frame <> xdp_buff conversions
-From: "Arthur Fabre" <arthur@arthurfabre.com>
-To: "Alexander Lobakin" <aleksander.lobakin@intel.com>
-X-Mailer: aerc 0.17.0
-References: <20250305-afabre-traits-010-rfc2-v1-0-d0ecfb869797@cloudflare.com> <20250305-afabre-traits-010-rfc2-v1-7-d0ecfb869797@cloudflare.com> <bc356c91-5bff-454a-8f87-7415cb7e82b4@intel.com>
-In-Reply-To: <bc356c91-5bff-454a-8f87-7415cb7e82b4@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddutdehfeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepteefgeehvdeitdeihfeuvdejkeevkeekieefkedvjefhudfhheeiveeuveefhefhnecuffhomhgrihhnpehgihhthhhusgdrtghomhdpkhgvrhhnvghlrdhorhhgnecukfhppedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgdphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvddupdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtp
+ hhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Wed Mar 5, 2025 at 4:24 PM CET, Alexander Lobakin wrote:
-> From: Arthur <arthur@arthurfabre.com>
-> Date: Wed, 05 Mar 2025 15:32:04 +0100
->
-> > From: Arthur Fabre <afabre@cloudflare.com>
-> >=20
-> > xdp_buff stores whether metadata is supported by a NIC by setting
-> > data_meta to be greater than data.
-> >=20
-> > But xdp_frame only stores the metadata size (as metasize), so convertin=
-g
-> > between xdp_frame and xdp_buff is lossy.
-> >=20
-> > Steal an unused bit in xdp_frame to track whether metadata is supported
-> > or not.
-> >=20
-> > This will lets us have "generic" functions for setting skb fields from
-> > either xdp_frame or xdp_buff from drivers.
-> >=20
-> > Signed-off-by: Arthur Fabre <afabre@cloudflare.com>
-> > ---
-> >  include/net/xdp.h | 10 +++++++++-
-> >  1 file changed, 9 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/include/net/xdp.h b/include/net/xdp.h
-> > index 58019fa299b56dbd45c104fdfa807f73af6e4fa4..84afe07d09efdb2ab0cb78b=
-904f02cb74f9a56b6 100644
-> > --- a/include/net/xdp.h
-> > +++ b/include/net/xdp.h
-> > @@ -116,6 +116,9 @@ static __always_inline void xdp_buff_set_frag_pfmem=
-alloc(struct xdp_buff *xdp)
-> >  	xdp->flags |=3D XDP_FLAGS_FRAGS_PF_MEMALLOC;
-> >  }
-> > =20
-> > +static bool xdp_data_meta_unsupported(const struct xdp_buff *xdp);
-> > +static void xdp_set_data_meta_invalid(struct xdp_buff *xdp);
-> > +
-> >  static __always_inline void *xdp_buff_traits(const struct xdp_buff *xd=
-p)
-> >  {
-> >  	return xdp->data_hard_start + _XDP_FRAME_SIZE;
-> > @@ -270,7 +273,9 @@ struct xdp_frame {
-> >  	void *data;
-> >  	u32 len;
-> >  	u32 headroom;
-> > -	u32 metasize; /* uses lower 8-bits */
-> > +	u32	:23, /* unused */
-> > +		meta_unsupported:1,
-> > +		metasize:8;
->
-> See the history of this structure how we got rid of using bitfields here
-> and why.
->
-> ...because of performance.
->
-> Even though metasize uses only 8 bits, 1-byte access is slower than
-> 32-byte access.
+On Wed,  5 Mar 2025 15:19:30 +0100
+Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
 
-Interesting, thanks!
-
-> I was going to write "you can use the fact that metasize is always a
-> multiple of 4 or that it's never > 252, for example, you could reuse LSB
-> as a flag indicating that meta is not supported", but first of all
->
-> Do we still have drivers which don't support metadata?
-> Why don't they do that? It's not HW-specific or even driver-specific.
-> They don't reserve headroom? Then they're invalid, at least XDP_REDIRECT
-> won't work.
->
-> So maybe we need to fix those drivers first, if there are any.
-
-Most drivers don't support metadata unfortunately:
-
-> rg -U "xdp_prepare_buff\([^)]*false\);" drivers/net/
-drivers/net/tun.c
-1712:		xdp_prepare_buff(&xdp, buf, pad, len, false);
-
-drivers/net/ethernet/microsoft/mana/mana_bpf.c
-94:	xdp_prepare_buff(xdp, buf_va, XDP_PACKET_HEADROOM, pkt_len, false);
-
-drivers/net/ethernet/marvell/mvneta.c
-2344:	xdp_prepare_buff(xdp, data, pp->rx_offset_correction + MVNETA_MH_SIZE=
-,
-2345:			 data_len, false);
-
-drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-1436:	xdp_prepare_buff(&xdp, hard_start, OTX2_HEAD_ROOM,
-1437:			 cqe->sg.seg_size, false);
-
-drivers/net/ethernet/socionext/netsec.c
-1021:		xdp_prepare_buff(&xdp, desc->addr, NETSEC_RXBUF_HEADROOM,
-1022:				 pkt_len, false);
-
-drivers/net/ethernet/google/gve/gve_rx.c
-740:	xdp_prepare_buff(&new, frame, headroom, len, false);
-859:		xdp_prepare_buff(&xdp, page_info->page_address +
-860:				 page_info->page_offset, GVE_RX_PAD,
-861:				 len, false);
-
-drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-3984:			xdp_prepare_buff(&xdp, data,
-3985:					 MVPP2_MH_SIZE + MVPP2_SKB_HEADROOM,
-3986:					 rx_bytes, false);
-
-drivers/net/ethernet/aquantia/atlantic/aq_ring.c
-794:		xdp_prepare_buff(&xdp, hard_start, rx_ring->page_offset,
-795:				 buff->len, false);
-
-drivers/net/ethernet/cavium/thunder/nicvf_main.c
-554:	xdp_prepare_buff(&xdp, hard_start, data - hard_start, len, false);
-
-drivers/net/ethernet/ti/cpsw_new.c
-348:		xdp_prepare_buff(&xdp, pa, headroom, size, false);
-
-drivers/net/ethernet/freescale/enetc/enetc.c
-1710:	xdp_prepare_buff(xdp_buff, hard_start - rx_ring->buffer_offset,
-1711:			 rx_ring->buffer_offset, size, false);
-
-drivers/net/ethernet/ti/am65-cpsw-nuss.c
-1335:		xdp_prepare_buff(&xdp, page_addr, AM65_CPSW_HEADROOM,
-1336:				 pkt_len, false);
-
-drivers/net/ethernet/ti/cpsw.c
-403:		xdp_prepare_buff(&xdp, pa, headroom, size, false);
-
-drivers/net/ethernet/sfc/rx.c
-289:	xdp_prepare_buff(&xdp, *ehp - EFX_XDP_HEADROOM, EFX_XDP_HEADROOM,
-290:			 rx_buf->len, false);
-
-drivers/net/ethernet/mediatek/mtk_eth_soc.c
-2097:			xdp_prepare_buff(&xdp, data, MTK_PP_HEADROOM, pktlen,
-2098:					 false);
-
-drivers/net/ethernet/sfc/siena/rx.c
-291:	xdp_prepare_buff(&xdp, *ehp - EFX_XDP_HEADROOM, EFX_XDP_HEADROOM,
-292:			 rx_buf->len, false)
-
-I don't know if it's just because no one has added calls to
-skb_metadata_set() in yet, or if there's a more fundamental reason.
-
-I think they all reserve some amount of headroom, but not always the
-full XDP_PACKET_HEADROOM. Eg sfc:
-
-drivers/net/ethernet/sfc/net_driver.h:
-/* Non-standard XDP_PACKET_HEADROOM and tailroom to satisfy XDP_REDIRECT an=
-d
- * still fit two standard MTU size packets into a single 4K page.
- */
-#define EFX_XDP_HEADROOM	128
-
-If it's just because skb_metadata_set() is missing, I can take the
-patches from this series that adds a "generic" XDP -> skb hook ("trait:
-Propagate presence of traits to sk_buff"), have it call
-skb_metadata_set(), and try to add it to all the drivers in a separate
-series.
-
-> >  	/* Lifetime of xdp_rxq_info is limited to NAPI/enqueue time,
-> >  	 * while mem_type is valid on remote CPU.
-> >  	 */
-> > @@ -369,6 +374,8 @@ void xdp_convert_frame_to_buff(const struct xdp_fra=
-me *frame,
-> >  	xdp->data =3D frame->data;
-> >  	xdp->data_end =3D frame->data + frame->len;
-> >  	xdp->data_meta =3D frame->data - frame->metasize;
-> > +	if (frame->meta_unsupported)
-> > +		xdp_set_data_meta_invalid(xdp);
-> >  	xdp->frame_sz =3D frame->frame_sz;
-> >  	xdp->flags =3D frame->flags;
-> >  }
-> > @@ -396,6 +403,7 @@ int xdp_update_frame_from_buff(const struct xdp_buf=
-f *xdp,
-> >  	xdp_frame->len  =3D xdp->data_end - xdp->data;
-> >  	xdp_frame->headroom =3D headroom - sizeof(*xdp_frame);
-> >  	xdp_frame->metasize =3D metasize;
-> > +	xdp_frame->meta_unsupported =3D xdp_data_meta_unsupported(xdp);
-> >  	xdp_frame->frame_sz =3D xdp->frame_sz;
-> >  	xdp_frame->flags =3D xdp->flags;
->
+> Hi everyone,
+> 
+> This series adds some scaffolding into ethnl to ease the support of
+> DUMP operations.
+> 
+> As of today when using ethnl's default ops, the DUMP requests will
+> simply perform a GET for each netdev.
+> 
+> That hits limitations for commands that may return multiple messages for
+> a single netdev, such as :
+> 
+>  - RSS (listing contexts)
+>  - All PHY-specific commands (PLCA, PSE-PD, phy)
+>  - tsinfo (one item for the netdev +  one per phy)
+> 
+>  Commands that need a non-default DUMP support have to re-implement
+>  ->dumpit() themselves, which prevents using most of ethnl's internal  
+>  circuitry.
+> 
+> This series therefore introduces a better support for dump operations in
+> ethnl.
+> 
+> The patches 1 and 2 introduce the support for filtered DUMPs, where an
+> ifindex/ifname can be passed in the request header for the DUMP
+> operation. This is for when we want to dump everything a netdev
+> supports, but without doing so for every single netdev. ethtool's
+> "--show-phys ethX" option for example performs a filtered dump.
+> 
+> Patch 3 introduces 3 new ethnl ops : 
+>  ->dump_start() to initialize a dump context
+>  ->dump_one_dev(), that can be implemented per-command to dump  
+>  everything on a given netdev
+>  ->dump_done() to release the context  
+> 
+> The default behaviour for dumps remains the same, calling the whole
+> ->doit() path for each netdev.  
+> 
+> Patch 4 introduces a set of ->dump_start(), ->dump_one_dev() and
+> ->dump_done() callback implementations that can simply be plugged into  
+> the existing commands that list objects per-phy, making the 
+> phy-targeting command behaviour more coherent.
+> 
+> Patch 5 uses that new set of helpers to rewrite the phy.c support, which
+> now uses the regulat ethnl_ops instead of fully custom genl ops. This
+> one is the hardest to review, sorry about that, I couldn't really manage
+> to incrementally rework that file :(
+> 
+> Patches 6 and 7 are where the new dump infra shines, adding per-netdev
+> per-phy dump support for PLCA and PSE-PD.
+> 
+> We could also consider converting tsinfo/tsconfig, rss and tunnels to
+> these new ->dump_***() operations as well, but that's out of this
+> series' scope.
+> 
+> I've tested that series with some netdevsim PHY patches that I plan to
+> submit (they can be found here [1]), with the refcount tracker
+> for net/netns enabled to make sure the lock usage is somewhat coherent.
+> 
 > Thanks,
-> Olek
+> 
+> Maxime
+> 
+> [1]: https://github.com/minimaxwell/linux/tree/mc/netdevsim-phy
+> 
+
+This series will very likely conflict with Stanislav's netdev lock
+work [2], I'll of course be happy to rebase should it get merged :)
+
+Thanks,
+
+Maxime
+
+[2]: https://lore.kernel.org/netdev/20250305163732.2766420-1-sdf@fomichev.me/T/#t
+
+> 
+> Maxime Chevallier (7):
+>   net: ethtool: netlink: Allow per-netdevice DUMP operations
+>   net: ethtool: netlink: Rename ethnl_default_dump_one
+>   net: ethtool: netlink: Introduce command-specific dump_one_dev
+>   net: ethtool: netlink: Introduce per-phy DUMP helpers
+>   net: ethtool: phy: Convert the PHY_GET command to generic phy dump
+>   net: ethtool: plca: Use per-PHY DUMP operations
+>   net: ethtool: pse-pd: Use per-PHY DUMP operations
+> 
+>  net/ethtool/netlink.c | 161 ++++++++++++++------
+>  net/ethtool/netlink.h |  46 +++++-
+>  net/ethtool/phy.c     | 335 ++++++++++++------------------------------
+>  net/ethtool/plca.c    |  12 ++
+>  net/ethtool/pse-pd.c  |   6 +
+>  5 files changed, 277 insertions(+), 283 deletions(-)
+> 
+
 
