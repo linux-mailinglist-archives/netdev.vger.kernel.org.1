@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-171887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C6A6A4F343
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 02:10:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 708EAA4F346
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 02:10:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1FA0188CBB6
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 01:10:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBD7916EA2B
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 01:10:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBCA084FAD;
-	Wed,  5 Mar 2025 01:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AD2086340;
+	Wed,  5 Mar 2025 01:10:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="skucHruF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MIBs/HvY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55A45228;
-	Wed,  5 Mar 2025 01:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DFC9282EE;
+	Wed,  5 Mar 2025 01:10:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741136999; cv=none; b=dNHHCRQAqm+yCUgLyUjncsJ6KwLHz0yR66+uyHfLagCiYSdGN47MxIv+/4CL0m7wD2WfGjRA9OM4yrrRZWKaJ8Vz3pqir19XW74b/WMhPn0tKF920hbbwLixUdLQHCaARNzYb0/JIsnX98HeL2hPExCUEzavgg3WhJDtQiMCo5I=
+	t=1741137010; cv=none; b=JQMy4ONwLpJZ0qerMH4ntQx6+iVxraRhY3NS3qnLLdBug+YMSyNh4QN+Hq5nMxa/44LCDohAJXDiWX7ix1r7H2NtM/+YmX4ziUr8Hx2+dJCwCYWIyOHifJInkYRrDQHaSRoGlydu72Q9iri5WtkhN0RZ8cmSx5aBgHcHtGbWyVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741136999; c=relaxed/simple;
-	bh=oRu4ENvt5IO9ShjHhUpiGMnLQIYnQAofJB58ttqXE7c=;
+	s=arc-20240116; t=1741137010; c=relaxed/simple;
+	bh=o2GS4bqqE977OqAGP8Gc1WH1R92Ml4Sy3dtY91sTP1c=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=t2A77PI5TyJ0G0/gnX6Llj1el362DMfxTzlMgICeZvvx+QHT11LpXOpS7vE8THY/a5fokED9WNJ08CMquD9wY2tz6RcWREnC054mLS1U9hjmvpuV8kasg1p9emyC6vUUAXfKkx2/cuywUTbE6dTHxbCzj0dRwiy1v8ybsf8xuRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=skucHruF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 064E0C4CEE5;
-	Wed,  5 Mar 2025 01:09:59 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=I3U0KqkYKo5mXayJCv37rJ+ftafZnRxTNxRkTfC0HrMiI4RORncGCEN7btgHdWMRiPnlFYvxzT+s84GuNWAPfVdWPY+3U4DlZkl+kCLwrpjb3w5mmcH8xVh0XGR3OdZP/o1Ugdyi3BCVuMhu3FvLujTOu18r9/jl1kC2BFvY1Zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MIBs/HvY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9050AC4CEE5;
+	Wed,  5 Mar 2025 01:10:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741136999;
-	bh=oRu4ENvt5IO9ShjHhUpiGMnLQIYnQAofJB58ttqXE7c=;
+	s=k20201202; t=1741137009;
+	bh=o2GS4bqqE977OqAGP8Gc1WH1R92Ml4Sy3dtY91sTP1c=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=skucHruF5uipXBnKaegjV66QTN65SNZJ7h+UT9MiCm7WhrRpQ89Yd9VxH/lSiKG2o
-	 +Ap6hL3tyJ8Zb0bec9HG9WwKoqkmnzda6J096DadF9VTfjeXLctyIe1wHzaTyUibxD
-	 SJHmaDtuTBux0bVwxRe1sOcsFvTRnCKHYbSHEDYvmWq9TbM+eoKx72Taq7VZx+/jFf
-	 k+8qUo9P+yZdtc8tuz58/VXRn/K/s7npgHmMolkoGxBo0UgvMz1ADOJBHyd/CIJ8E8
-	 wPA/aHw6xxhIRT+Q/KNVwPlXJPmCuKPKBpq1uO5Rux1ZZFH4uTCH4WmU20cx4tBxhk
-	 wau7SjCLTTv2w==
+	b=MIBs/HvYoceKM6s3CP46Kv7DLdc7J5vFMIqW7wXABFnd3wmYrxt8DEc3NycgW+Yn3
+	 BxLIYp9wKh/07ldbNG0h09RTuY9VYsOf4cnqUiZc1KqItIC5ERhAMOxHkCjUslS9xD
+	 VQ6wW8BQRqLp0g0YAC9k9ofAWwkiEWWwqX9xzFuVdbEcsB1hb6l/cb9g78Vgq9Qy9Y
+	 PojeabFho7z7OHPRm9dD5XsCihqxhMlwrroiT1zvnc65KAPe9uuDgEfpWgId3L9sCp
+	 qeA8zi8IOg6EwWLK7lWlwQ9i8rpVgKs8UrI3IBiYX8hCvnJjr53Oj+8Eq33Ht84poV
+	 068afxA5xpWdQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C89380CFEB;
-	Wed,  5 Mar 2025 01:10:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE531380CFEB;
+	Wed,  5 Mar 2025 01:10:43 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,57 +52,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5] ppp: Fix KMSAN uninit-value warning with bpf
+Subject: Re: [PATCH net-next 0/5] mptcp: improve code coverage and small
+ optimisations
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174113703200.354590.6042068788472875055.git-patchwork-notify@kernel.org>
-Date: Wed, 05 Mar 2025 01:10:32 +0000
-References: <20250228141408.393864-1-jiayuan.chen@linux.dev>
-In-Reply-To: <20250228141408.393864-1-jiayuan.chen@linux.dev>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: horms@kernel.org, kuba@kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, ricardo@marliere.net,
- viro@zeniv.linux.org.uk, dmantipov@yandex.ru, aleksander.lobakin@intel.com,
- linux-ppp@vger.kernel.org, linux-kernel@vger.kernel.org, mrpre@163.com,
- paulus@samba.org, syzbot+853242d9c9917165d791@syzkaller.appspotmail.com
+ <174113704249.354590.10497092944102408031.git-patchwork-notify@kernel.org>
+Date: Wed, 05 Mar 2025 01:10:42 +0000
+References: <20250228-net-next-mptcp-coverage-small-opti-v1-0-f933c4275676@kernel.org>
+In-Reply-To: <20250228-net-next-mptcp-coverage-small-opti-v1-0-f933c4275676@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, shuah@kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, yangang@kylinos.cn
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 28 Feb 2025 22:14:08 +0800 you wrote:
-> Syzbot caught an "KMSAN: uninit-value" warning [1], which is caused by the
-> ppp driver not initializing a 2-byte header when using socket filter.
+On Fri, 28 Feb 2025 15:38:34 +0100 you wrote:
+> This small series have various unrelated patches:
 > 
-> The following code can generate a PPP filter BPF program:
-> '''
-> struct bpf_program fp;
-> pcap_t *handle;
-> handle = pcap_open_dead(DLT_PPP_PPPD, 65535);
-> pcap_compile(handle, &fp, "ip and outbound", 0, 0);
-> bpf_dump(&fp, 1);
-> '''
-> Its output is:
-> '''
-> (000) ldh [2]
-> (001) jeq #0x21 jt 2 jf 5
-> (002) ldb [0]
-> (003) jeq #0x1 jt 4 jf 5
-> (004) ret #65535
-> (005) ret #0
-> '''
-> Wen can find similar code at the following link:
-> https://github.com/ppp-project/ppp/blob/master/pppd/options.c#L1680
-> The maintainer of this code repository is also the original maintainer
-> of the ppp driver.
+> - Patch 1 and 2: improve code coverage by validating mptcp_diag_dump_one
+>   thanks to a new tool displaying MPTCP info for a specific token.
+> 
+> - Patch 3: a fix for a commit which is only in net-next.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v5] ppp: Fix KMSAN uninit-value warning with bpf
-    https://git.kernel.org/netdev/net/c/4c2d14c40a68
+  - [net-next,1/5] selftests: mptcp: Add a tool to get specific msk_info
+    https://git.kernel.org/netdev/net-next/c/00f5e338cf7e
+  - [net-next,2/5] selftests: mptcp: add a test for mptcp_diag_dump_one
+    https://git.kernel.org/netdev/net-next/c/ba2400166570
+  - [net-next,3/5] mptcp: pm: in-kernel: avoid access entry without lock
+    https://git.kernel.org/netdev/net-next/c/e85d33b35508
+  - [net-next,4/5] mptcp: pm: in-kernel: reduce parameters of set_flags
+    https://git.kernel.org/netdev/net-next/c/70c575d5a94f
+  - [net-next,5/5] mptcp: pm: exit early with ADD_ADDR echo if possible
+    https://git.kernel.org/netdev/net-next/c/f0de92479a09
 
 You are awesome, thank you!
 -- 
