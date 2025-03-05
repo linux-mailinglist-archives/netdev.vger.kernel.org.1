@@ -1,177 +1,179 @@
-Return-Path: <netdev+bounces-171959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 529F7A4FA1F
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 10:31:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91100A4FA54
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 10:38:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A1FF18929F5
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 09:31:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49C8F16D0DD
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 09:38:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 827FC204F91;
-	Wed,  5 Mar 2025 09:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A29F220468F;
+	Wed,  5 Mar 2025 09:38:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oWkEo5Vb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ank+NKPJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB7A21FC7CA
-	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 09:31:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB2F2045B0
+	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 09:38:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741167093; cv=none; b=HWG58FkRFFPX9aKjJPs6VQ7wyfc+hBlT/9mF3vcoRqtOGRggRLjgEh/Q4xxPHvmeTNeSVdgD5t2lgs7iGHjr/Zolfa25E7qcvUu0jgU0uKZuUq/GxInbEbGcVOZ7ZnOVk/S3BjzQc9jyt312z85sUADNPNSlx5s+6wq5zUDGSh4=
+	t=1741167492; cv=none; b=ISN8mS+w1UK/zU9eToFHeigH3TrUupDRMxwx1gCw5XYhSgQhv8j/yb5ytdyuCM5K41kWhRpKGTP3L/bhIlO1sYob0yNxFcUmKu6i7TjAzhtsI2mnDuCkTfqCXV6p8DiahP0FysU37+Y/tkSVDVsNj5z3nuqxMFeOEkrYACv9Yzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741167093; c=relaxed/simple;
-	bh=k0wiGyIgP1X375nTP6KgieVfEGHC5iiA/tF0wfZSE0I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eKjKSadyYAZBPxAF9r2hHmsO3xxw1k04KzEY1Ny8tiu44ycS5ptXDPB2ViapqcKwNx/HYDjExQnwmMs7ZpQxAYE4+zf68kcQnwccDPXQpaIlKVM5QBZRlf3jC9QB62mJTbUrJDtOKK1H8GqAO8BEN9NAm0jpYU89QYVoT7xrCfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=oWkEo5Vb; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-390ec7c2cd8so3485637f8f.1
-        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 01:31:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741167089; x=1741771889; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CGHqSgga9ZWqhfiXbeTFLx+tMRtdQJt+JKetm5hHuhA=;
-        b=oWkEo5Vb20pRDdMqdX3bZprxk0t/SQtfvw0K/EE4zLnhVo+SjO/oHsX+X7YgvT9aC3
-         NFEiMz2U1rWwbZdPUrNnC/vwqdwG9r0BYI0R2VttNx3BEu4B5YTLti84iSTDAHMhITv/
-         A8ilEQCMDnfxV2Bht9XGz8KQGn3lyz1Z5H3h9O15faFRtL0dwhG9zYfkck0yxAJhHNMn
-         LDRgVEa2bc69dEvwZiuSUDBPQ/57OYjHqecYrItmWmaW2Kv33vhgbJFi/87rcR3E+am/
-         GyMhlFFjqQof8J6XBTjawi/iQHd7COQfzmyGF7q6UIFphmoro3oujw/uETjUaSE4JW5f
-         cN0w==
+	s=arc-20240116; t=1741167492; c=relaxed/simple;
+	bh=exY4ZR3eJixCKGY9RcS0uPA/+XbPIVQfPexC74yCyy4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YtPGnwEa5MG7DSsxi8y9DS0zVrngd0GW/FaSITwzt13gHYajDHZSjmrZ7azNWXnKNEHJ82yuUBaIFJ3yM+lZkeen3R1Rtv+rp1KBdzV9jKBjw9Y3oyMNbhuHKd2YO2fRL3ewTttBCvLB7ZVkOgGXw1cUEtWOCyI6WmUmnRorqkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ank+NKPJ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741167489;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0FrWMD0bRhsF9/9bE85tn6Gl17O/CsmNiRx1oo/Ojac=;
+	b=ank+NKPJSN3wkNy6AxSsAUwc8IQpgP5ibKQzFLRXrl9f6/XYRtG6ooXv4aaUYDXeHrZ3PL
+	QO7KKIAwjESxkTrvdM8eI+wllcYf6nLuRocCXB+/8jGFz3+1pfsvUGEmVNZRs9/pfJmMIu
+	245prt8iYz75b8NjtNCr0DXSPXGL4wM=
+Received: from mail-yb1-f200.google.com (mail-yb1-f200.google.com
+ [209.85.219.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-607-Wu-zPx_ANhqo6kkvGSToGw-1; Wed, 05 Mar 2025 04:38:03 -0500
+X-MC-Unique: Wu-zPx_ANhqo6kkvGSToGw-1
+X-Mimecast-MFC-AGG-ID: Wu-zPx_ANhqo6kkvGSToGw_1741167483
+Received: by mail-yb1-f200.google.com with SMTP id 3f1490d57ef6-e572df6db3eso8726319276.3
+        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 01:38:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741167089; x=1741771889;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CGHqSgga9ZWqhfiXbeTFLx+tMRtdQJt+JKetm5hHuhA=;
-        b=vcWkJoEkF7IAfLaGDsklRqS2lAXRmEJosqOtUwoHQYtOymC0ObWN0wqpqujhA0anGP
-         DM+egYY2Hlv9esywgBGzita3ThADrGqA/D7HopumECBjyQO0x03xprq/GBfXc/kD+yhn
-         wEK4Rb84lNiWwAXzZcufELtstXktrUbe1DrsCd9HY8ekj75HoJvIVNodgPHxJ7aamoi+
-         sqkF05uWlZxyA5R+H29z/WnZ7mwEczEwNzYntP24NngT0L1cIBNnGNcFaKuo7vs9HNSH
-         iRNPtEZhcfLCpTQc3H5HnH2O0L/DznUKOI9xKCwG/Y9O2fXIhA7WQTyUQGlZX7kk8dfB
-         y6Ow==
-X-Forwarded-Encrypted: i=1; AJvYcCXJc94HAhukB1eYSTs+X9Mu9F4+jN/K17HWSAN2wn0kcV4ef4eNjd33dDcwAwEPRcwC61xjXFA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQKHosDhKF7p0wKJD5qAXwz+WyUkP5gv+iLOTZHZ/5g2Qmk0io
-	mzXoajlPgDweYY5iBDTHkT4shK95SOIfzphsxNCJefN+OG0dSSWQGW+AaJNFJp8=
-X-Gm-Gg: ASbGncsiL2ic4RCeoFvFinexLPMvPONO+bBcu4yCroHv3OkZ80pjum0QMGtCN2WeQ/r
-	1rrZ7xKb9T7p9rn/bKR7wGdrOmQhxwk20WKE9gpC0tbfOs4DH3k1+rBQdvw746s1CWJg6zl9Jw3
-	AZQ9PhKaFpMf8iLKa3zQfPX+SHN9XZohwqUZeiU0Y2lCpR3AqF1Fj6XoaEOgJbujVPy/ogM79Ws
-	3oLZQcEX9qHt0TdjjPAgjY4EO20VW/x+YBlz5xz39X9U54UXewtv1AeosYub/u2f/m0PqLw/OTE
-	G5/9n2gMpGC4A7KsPAy9kRsIdPlrsrgMjgaGc8S/he9lDjIzmw==
-X-Google-Smtp-Source: AGHT+IGBjeO6TeQERlVAAv2wJR2v/E9DyRfr/DsoCry1ZVSWVEJcRLW+vugv45aqXSWg1cQhm5oZnw==
-X-Received: by 2002:a5d:5850:0:b0:391:4f9:a039 with SMTP id ffacd0b85a97d-3911f7400aamr2203099f8f.16.1741167088987;
-        Wed, 05 Mar 2025 01:31:28 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-43bd42c5b33sm12065705e9.22.2025.03.05.01.31.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Mar 2025 01:31:28 -0800 (PST)
-Date: Wed, 5 Mar 2025 12:31:24 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: "Malladi, Meghana" <m-malladi@ti.com>
-Cc: rogerq@kernel.org, danishanwar@ti.com, pabeni@redhat.com,
-	kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
-	andrew+netdev@lunn.ch, bpf@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, u.kleine-koenig@baylibre.com,
-	matthias.schiffer@ew.tq-group.com, schnelle@linux.ibm.com,
-	diogo.ivo@siemens.com, glaroque@baylibre.com, macro@orcam.me.uk,
-	john.fastabend@gmail.com, hawk@kernel.org, daniel@iogearbox.net,
-	ast@kernel.org, srk@ti.com, Vignesh Raghavendra <vigneshr@ti.com>
-Subject: Re: [EXTERNAL] Re: [PATCH net-next v3 3/3] net: ti: icssg-prueth:
- Add XDP support
-Message-ID: <5f716740-ac45-4881-a27d-91a93de6f8c7@stanley.mountain>
-References: <20250224110102.1528552-1-m-malladi@ti.com>
- <20250224110102.1528552-4-m-malladi@ti.com>
- <d362a527-88cf-4cd5-a22f-7eeb938d4469@stanley.mountain>
- <21f21dfb-264b-4e01-9cb3-8d0133b5b31b@ti.com>
- <2c0c1a4f-95d4-40c9-9ede-6f92b173f05d@stanley.mountain>
- <40ce8ed3-b36c-4d5f-b75a-7e0409beb713@ti.com>
- <61117a07-35b5-48c0-93d9-f97db8e15503@stanley.mountain>
- <fd989751-e7f6-40bb-a0bf-058c752cc7bc@ti.com>
+        d=1e100.net; s=20230601; t=1741167483; x=1741772283;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0FrWMD0bRhsF9/9bE85tn6Gl17O/CsmNiRx1oo/Ojac=;
+        b=kNNVcjTXzlbDAj6FhCAjg1ZliEOWNABsZm88C8WgQLNrg9UhGTLl+krFFpSE8rmyGL
+         BURwuOlV4RSGmSZhY/FEkRqyD1w0+N2L2h0sv3MRr1GEZcTmf2sx67Dn+hPcEgxxyVyL
+         kIuZa3UGBU7rCpNUwjD/HJNjww7UVJ6N5TKHkLlRSZUDvgNhgBGAKE4avNnIuOqc4vBL
+         CIaPFCOOmRCRNV1Q0py2DzJG1pEmVNTxkyGIi6jTKNx3U7JqfLKRHKghOgqswyvP3qyr
+         uvsj3OEWjY8SWtLLVj8PR3DPeS0bhM9ECcNRha/UVsU0Lel/VTugE1g9O8rlNQnq/XdY
+         HT5A==
+X-Forwarded-Encrypted: i=1; AJvYcCWB3k0ZdT6BjgZ9y47dO0HsHlUb8ji+/dqHLsJXVSXr0Ubzdna0x0xJrnbrERJm6Gz68j7iQQE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YybdvOu31oqudUI18GKEU01E26bjPxI4Hb8Yx2aCAdQXePsm6QR
+	3FswBdPXvIYpMHJjZv2/VoPlmt0iaP6KhLnBiTwFvYf9eD2wavM/nR1ygL8BGSKSq9rk6kOzCVH
+	5TpiyemAlO0bKC3PJrTuRpAXH2yhebZVoCrJFTdYzPIoXnkhpbSA+gkqHemCe0YisZDC/RmVctf
+	r7UguXYEz7BK6lpt3NhGJgDTVUHco6
+X-Gm-Gg: ASbGncuKatw8Z7sVnbMmd640NNR/XGmVUTAMwN5HTD08wijqhowCI/AeXmjU4taCUsH
+	XIJnJObYWohlYvMKBg3QabEQ98ay4VkGsdcXg7IN7NSJhvhtiDmy5aoJCdmuzypCkAiouN8I=
+X-Received: by 2002:a05:6902:1183:b0:e60:99d2:cbc2 with SMTP id 3f1490d57ef6-e611e1d985bmr3487859276.25.1741167483054;
+        Wed, 05 Mar 2025 01:38:03 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHdMsgj9Ydu4+cefxVYhObOl86/wGnTsK/HesSGO3ed6Vl99uqasl92wWHUDOUB2G4pt/8bHopoWWjG9JBFIQE=
+X-Received: by 2002:a05:6902:1183:b0:e60:99d2:cbc2 with SMTP id
+ 3f1490d57ef6-e611e1d985bmr3487834276.25.1741167482716; Wed, 05 Mar 2025
+ 01:38:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <fd989751-e7f6-40bb-a0bf-058c752cc7bc@ti.com>
+References: <20200116172428.311437-1-sgarzare@redhat.com> <20200116172428.311437-2-sgarzare@redhat.com>
+ <20250305022900-mutt-send-email-mst@kernel.org> <CAGxU2F5C1kTN+z2XLwATvs9pGq0HAvXhKp6NUULos7O3uarjCA@mail.gmail.com>
+ <20250305042757-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20250305042757-mutt-send-email-mst@kernel.org>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Wed, 5 Mar 2025 10:37:51 +0100
+X-Gm-Features: AQ5f1JrrYEAMMHf_xixI6yuzRilW5TDux-F3sq2MEJ4u_iOmeJJo3IO5_LvXWgY
+Message-ID: <CAGxU2F5D=nx8V4d+iDyQvfJvhASMOM1c3AsRZT0R3TqnAVUhUQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/3] vsock: add network namespace support
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Jorgen Hansen <jhansen@vmware.com>, 
+	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org, 
+	Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux-foundation.org, 
+	linux-hyperv@vger.kernel.org, Dexuan Cui <decui@microsoft.com>, 
+	Bobby Eshleman <bobbyeshleman@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Mar 05, 2025 at 02:53:07PM +0530, Malladi, Meghana wrote:
-> Hi Dan,
-> 
-> On 3/3/2025 7:38 PM, Dan Carpenter wrote:
-> > What I mean is just compile the .o file with and without the unlikely().
-> > $ md5sum drivers/net/ethernet/ti/icssg/icssg_common. o*
-> > 2de875935222b9ecd8483e61848c4fc9 drivers/net/ethernet/ti/icssg/
-> > icssg_common. o. annotation 2de875935222b9ecd8483e61848c4fc9
-> > ZjQcmQRYFpfptBannerStart
-> > This message was sent from outside of Texas Instruments.
-> > Do not click links or open attachments unless you recognize the source
-> > of this email and know the content is safe.
-> > Report Suspicious
-> > <https://us-phishalarm-ewt.proofpoint.com/EWT/v1/G3vK!
-> > uldq3TevVoc7KuXEXHnDf- TXtuZ0bON9iO0jTE7PyIS1jjfs_CzpvIiMi93PVt0MVDzjHGQSK__vY_-6rO7q86rFmBMGW4SSqK5pvNE$>
-> > ZjQcmQRYFpfptBannerEnd
-> > 
-> > What I mean is just compile the .o file with and without the unlikely().
-> > 
-> > $ md5sum drivers/net/ethernet/ti/icssg/icssg_common.o*
-> > 2de875935222b9ecd8483e61848c4fc9  drivers/net/ethernet/ti/icssg/icssg_common.o.annotation
-> > 2de875935222b9ecd8483e61848c4fc9  drivers/net/ethernet/ti/icssg/icssg_common.o.no_anotation
-> > 
-> > Generally the rule is that you should leave likely/unlikely() annotations
-> > out unless it's going to make a difference on a benchmark.  I'm not going
-> > to jump down people's throat about this, and if you want to leave it,
-> > it's fine.  But it just struct me as weird so that's why I commented on
-> > it.
-> > 
-> 
-> I have done some performance tests to see if unlikely() is gonna make any
-> impact and I see around ~9000 pps and 6Mbps drop without unlikely() for
-> small packet sizes (60 Bytes)
-> 
-> You can see summary of the tests here:
-> 
-> packet size   with unlikely(pps)  without unlikely(pps)   regression
-> 
->       60        462377                453251                 9126
-> 
->       80        403020                399372                 3648
-> 
->       96        402059                396881                 5178
-> 
->      120        392725                391312                 4413
-> 
->      140        327706                327099                 607
-> 
-> packet size  with unlikely(Mbps)  without unlikely(Mbps)  regression
-> 
->      60         311                   305                    6
-> 
->      80         335                   332                    3
-> 
->      96         386                   381                    5
-> 
->      120        456                   451                    5
-> 
->      140        430                   429                    1
-> 
-> For more details on the logs, please refer:https://gist.github.com/MeghanaMalladiTI/cc6cc7709791376cb486eb1222de67be
-> 
+On Wed, 5 Mar 2025 at 10:29, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Wed, Mar 05, 2025 at 10:23:08AM +0100, Stefano Garzarella wrote:
+> > On Wed, 5 Mar 2025 at 08:32, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > >
+> > > On Thu, Jan 16, 2020 at 06:24:26PM +0100, Stefano Garzarella wrote:
+> > > > This patch adds a check of the "net" assigned to a socket during
+> > > > the vsock_find_bound_socket() and vsock_find_connected_socket()
+> > > > to support network namespace, allowing to share the same address
+> > > > (cid, port) across different network namespaces.
+> > > >
+> > > > This patch adds 'netns' module param to enable this new feature
+> > > > (disabled by default), because it changes vsock's behavior with
+> > > > network namespaces and could break existing applications.
+> > > > G2H transports will use the default network namepsace (init_net).
+> > > > H2G transports can use different network namespace for different
+> > > > VMs.
+> > >
+> > >
+> > > I'm not sure I understand the usecase. Can you explain a bit more,
+> > > please?
+> >
+> > It's been five years, but I'm trying!
+> > We are tracking this RFE here [1].
+> >
+> > I also add Jakub in the thread with who I discussed last year a possible
+> > restart of this effort, he could add more use cases.
+> >
+> > The problem with vsock, host-side, currently is that if you launch a VM
+> > with a virtio-vsock device (using vhost) inside a container (e.g.,
+> > Kata), so inside a network namespace, it is reachable from any other
+> > container, whereas they would like some isolation. Also the CID is
+> > shared among all, while they would like to reuse the same CID in
+> > different namespaces.
+> >
+> > This has been partially solved with vhost-user-vsock, but it is
+> > inconvenient to use sometimes because of the hybrid-vsock problem
+> > (host-side vsock is remapped to AF_UNIX).
+> >
+> > Something from the cover letter of the series [2]:
+> >
+> >   As we partially discussed in the multi-transport proposal, it could
+> >   be nice to support network namespace in vsock to reach the following
+> >   goals:
+> >   - isolate host applications from guest applications using the same ports
+> >     with CID_ANY
+> >   - assign the same CID of VMs running in different network namespaces
+> >   - partition VMs between VMMs or at finer granularity
+> >
+> > Thanks,
+> > Stefano
+> >
+> > [1] https://gitlab.com/vsock/vsock/-/issues/2
+> > [2] https://lore.kernel.org/virtualization/20200116172428.311437-1-sgarzare@redhat.com/
+>
+>
+> Ok so, host side. I get it.
 
-Huh.  That's very interesting.  Fine, then.
+Now that we're talking about it, I also came back to a guest side
+case, again related to containers and possible nested VMs.
 
-regards,
-dan carpenter
+If you launch a container in a L1 guest, for example to launch a
+nested VM, maybe you don't want to have it communicate with the L0
+host, so it would be desirable to be able to isolate the virtio-vsock
+device from it.
+
+> And the problem with your patches is that
+> they affect the guest side. Fix that, basically.
+
+My main problem, IIRC, was making sure to allow the old behavior as
+well (but that maybe we had solved with two /dev/vhost-vsock and
+/dev/vhost-vsock-netns).
+
+The other problem was really in the guest, on how to tell that the
+virtio-vsock device (thus communication with the host) was reachable
+from a netnamespace or not.
+
+Stefano
 
 
