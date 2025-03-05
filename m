@@ -1,497 +1,275 @@
-Return-Path: <netdev+bounces-172042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D07FA50017
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 14:16:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE2D2A50049
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 14:20:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F03C07A253D
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 13:15:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45C6A1898604
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 13:15:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A3EA24EA87;
-	Wed,  5 Mar 2025 13:14:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CAEE1EDA0E;
+	Wed,  5 Mar 2025 13:14:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="M918CpJX"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE0B24C667
-	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 13:14:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10EA82475CF
+	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 13:14:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741180490; cv=none; b=IDuO9koGHiQFEH/tNzkhZYQvfu1+8BQVsRfsp5R/LgYEJH/PBtxcpSjEff7Gr6W73E18LV2H1i2XoNBrfdCb/+dtUOgiYCIzDeEkTOpjnB4nqaBNSbUCD07oDcVQWXK+XLnVJDgL06uchW4ftMHjSyc8UAkIGBTPfipGyf4wHs4=
+	t=1741180482; cv=none; b=RF5/x5sR0jTkYGX4p3lO+KMGnCQodo956bIXLrdP5WDS57siBnwXhmhGBlXPX+BOLuWgmG0ideZFrSgQMUVXdH6luj2Os9+oytOeZWWqPxgiKg9OQmhfLcYVp4+kGS0W3X2+ooLYtBJU+T483jeGbBxGngP6Ha8v8CTK0IGnhas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741180490; c=relaxed/simple;
-	bh=qu3dMnrB/+ZKvw1h6CFmaump0y4uo0s27FlaBehBgbM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J32TYZYbY8/MTxPBKlOZg6CCZ2n0V/l4gD5zF7rGDzTUIrL/KcpekB6A8DowIQhIRgb7HhmUTYY4q8ZKNVcFGu5uZhdaVKO7oHTQpr+heREkGofiuvLBczl6HifzJLCKK2DU+uZQy2vidv74pYrCaeT/goBsrawejfnVbbpM1/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tpoZw-0000xe-A1; Wed, 05 Mar 2025 14:14:28 +0100
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tpoZv-0049PB-1k;
-	Wed, 05 Mar 2025 14:14:27 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tpoZv-006G63-1T;
-	Wed, 05 Mar 2025 14:14:27 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: [PATCH v5 4/4] arm: dts: stm32: Add Plymovent AQM devicetree
-Date: Wed,  5 Mar 2025 14:14:25 +0100
-Message-Id: <20250305131425.1491769-5-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250305131425.1491769-1-o.rempel@pengutronix.de>
-References: <20250305131425.1491769-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1741180482; c=relaxed/simple;
+	bh=45jOoVrmf7ZgsWRQTRQMoL7DQrUxdR4U7TSnyXd4qBE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YV4TAzOLGmuUtxjnZGzzTjIFa23E3fKzsK8/swjyDCL9+Gehw06kLeazKEV2R4Ob7C+M+vFbKIi3rhPNWW4hKtcN+2kUgi1j2UQQ5r04lU5gpxk06wPvdEdmqsSlUwvx8iVRvC47Xpxsp4TAEzVxkVTm6skRUPphf5opFFC3hns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=M918CpJX; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43bcbdf79cdso12819365e9.2
+        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 05:14:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1741180478; x=1741785278; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=XEqSsXZW/jbuOh14QtUUC+Zr2EQieIMuWtS2Rh7iO5I=;
+        b=M918CpJXfbCqe+/UZD3A7pY13TSRer1ZXjxScZgwbQEq2yKtc7kWBcv6Vk+WST8PIo
+         4Z/vZKWYFpx1ytmWIcv1yBlOP2DcFoXD7c4jljeG8pVvahYAFrZJtbM9OTSIEJC/i9C6
+         pOY7RlR8A3Hk905Zf/Vl8M62Xe5bfg8idr4QddovJwQBh8Wx9FCs1mcOSNAuEsopvRHS
+         sfAGVvGM3ev2ImgL5FXJDK+AMRJYQ7VksSjPSd4IeMjpT7bwL9aot+jgEfBOb6LFqW3H
+         B9kJVisgw5qXTiUljiem3/DxH5aafId3pRmYKzvLVXbQx6+dL+fj+cTLzvKCRgMTA/bA
+         TGOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741180478; x=1741785278;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XEqSsXZW/jbuOh14QtUUC+Zr2EQieIMuWtS2Rh7iO5I=;
+        b=HLfg2GefAexdya6zv9O0XJ2/NLJJzLTWFVn7ggYUiAI8sah+YJa4STLrsYAES0usF8
+         F6zkqDQBVM43q70XwuDzzPN0HQ7nqUPy9vUgwBbP6Ucaa9eg1qmWKGffxIEy/rWAafyX
+         J5qvttYFic5xaIcHex1WrzIQgbbI9PX0Bxh++3Udd2HRMms3+hspPFEK/Vy9UDIJL5xy
+         oWqYbZY+zZnweOk/bU0c5e77C38zo7aKMs3MVZUCR5Xu8RhAMvhCPAT+DAKfLvrLW9la
+         a1plzk4tPctZ0OTxXif0x/AkcD0ae1X/NRem+GozLmc5qPnsCjXCa3chGjKcsityrFRt
+         23Sg==
+X-Gm-Message-State: AOJu0YyFFq9aerEmuqhsA6mWzlXnMrR143wBBFAzC8VFAn+bljEW0Wkh
+	V3G8vrzmCtdjhvQ7F6hG9eqArFxtDja+2ANtmVvufPBjIqKqzDSU+qBWnvWZ9I0=
+X-Gm-Gg: ASbGnctZ/WLhMzQdZwiTMul9WwZnVjcZi/Mg7O0AJ6Bn7nuFgUeBBkKt/CC/PiXi0ur
+	Y4fDVG0hf6wowAQhTfh3HnQjIEFd4Irgj7qQxdg2XG08bPRnTRfMXkh/KjF0dlvPfxr9ejbW039
+	r9LhdwZrlrOQRLOJHTiGPdDUZbtMxEO37udjevd8IJsJj/jjsZujT4mKHLg0aM34IIuGizHGWKp
+	8sGpvVlaQbymJLrTxbh5PGtnEPV90ybwCMfv+8hmGQ6NIIVLimVRbb8heYxDwVSagFwQY4rI4/V
+	5e5zQx6U//EMIRyipG+cCoVW+CyLdvhHH1xDk7CeGKuZvKc/Lx2JEU0f4AStm6edgr42LapOewd
+	nwc6H
+X-Google-Smtp-Source: AGHT+IEiy2/nia8pCn08JsrQD76so2zLJRCd191TfiknY5z43RmcsNheKM7EvMhfTHGqALR0SaGfxA==
+X-Received: by 2002:a05:600c:1d0b:b0:43b:cd12:8c92 with SMTP id 5b1f17b1804b1-43bd2ad7566mr22952425e9.31.1741180478132;
+        Wed, 05 Mar 2025 05:14:38 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:6b84:f104:e1bf:5d7? ([2001:67c:2fbc:1:6b84:f104:e1bf:5d7])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bd426d34csm17415685e9.5.2025.03.05.05.14.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Mar 2025 05:14:37 -0800 (PST)
+Message-ID: <cd9df084-8633-49f0-a851-ed2b1c9946d3@openvpn.net>
+Date: Wed, 5 Mar 2025 14:14:36 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v21 18/24] ovpn: add support for peer floating
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+References: <20250304-b4-ovpn-tmp-v21-0-d3cbb74bb581@openvpn.net>
+ <20250304-b4-ovpn-tmp-v21-18-d3cbb74bb581@openvpn.net> <Z8dIXjwZ3QmiEcd-@hog>
+ <9c919407-fb91-48d7-bf2d-8437c2f3f4da@openvpn.net> <Z8gzbz6YjdeGPqgu@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <Z8gzbz6YjdeGPqgu@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Introduce the devicetree for the Plymovent AQM board
-(stm32mp151c-plyaqm), based on the STM32MP151 SoC.
+On 05/03/2025 12:20, Sabrina Dubroca wrote:
+> 2025-03-05, 00:19:32 +0100, Antonio Quartulli wrote:
+>> On 04/03/2025 19:37, Sabrina Dubroca wrote:
+>>> 2025-03-04, 01:33:48 +0100, Antonio Quartulli wrote:
+>>>> A peer connected via UDP may change its IP address without reconnecting
+>>>> (float).
+>>>
+>>> Should that trigger a reset of the peer->dst_cache? And same when
+>>> userspace updates the remote address? Otherwise it seems we could be
+>>> stuck with a cached dst that cannot reach the peer.
+>>
+>> Yeah, that make sense, otherwise ovpn_udpX_output would just try over and
+>> over to re-use the cached source address (unless it becomes unavailable).
+> 
+> Not just the source address, the routing entry too. I'm more concerned
+> about that: trying to reuse a a cached routing entry that was good for
+> the previous remote address, but not for the new one.
+> 
+> 
+> [adding your next email]
+>> I spent some more time thinking about this.
+>> It makes sense to reset the dst cache when the local address changes, but
+>> not in case of float (remote address changed).
+>>
+>> That's because we always want to first attempt sending packets using the
+>> address where the remote peer sent the traffic to.
+>> Should that not work (quite rare), then we have code in ovpn_udpX_output
+>> that will reset the cache and attempt a different address.
+> 
+> I don't think the code in ovpn_udpX_output will reset the cache unless
+> it was made invalid by a system-wide routing table update (see
+> dst_cache_per_cpu_get).
+> 
+> 	rt = dst_cache_get_ip4(cache, &fl.saddr);
+> 	if (rt)
+> 		goto transmit;
+> ...
+> transmit:
+> 	udp_tunnel_xmit_skb(rt, sk, skb, fl.saddr, fl.daddr, 0,
+> 			    ip4_dst_hoplimit(&rt->dst), 0, fl.fl4_sport,
+> 			    fl.fl4_dport, false, sk->sk_no_check_tx);
+> 
+> 
+> So it seems that as long as dst_cache_get_ip4 gets us a dst (which
+> AFAIU will happen, unless we did a dst_cache_reset or something else
+> made the cached dst invalid -- and ovpn's floating/endpoint update
+> doesn't do that), we'll just use it.
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
-changes v4:
-- move all pinctrls to stm32mp15-pinctrl.dtsi
-- remove some of comments
-changes v2:
-- remove spidev
----
- arch/arm/boot/dts/st/Makefile               |   1 +
- arch/arm/boot/dts/st/stm32mp151c-plyaqm.dts | 376 ++++++++++++++++++++
- 2 files changed, 377 insertions(+)
- create mode 100644 arch/arm/boot/dts/st/stm32mp151c-plyaqm.dts
+Mh yeah, you're right.
+Then I'll reset the cache also when a float is detected.
 
-diff --git a/arch/arm/boot/dts/st/Makefile b/arch/arm/boot/dts/st/Makefile
-index d8f297035812..561819ef7a32 100644
---- a/arch/arm/boot/dts/st/Makefile
-+++ b/arch/arm/boot/dts/st/Makefile
-@@ -38,6 +38,7 @@ dtb-$(CONFIG_ARCH_STM32) += \
- 	stm32mp151a-dhcor-testbench.dtb \
- 	stm32mp151c-mecio1r0.dtb \
- 	stm32mp151c-mect1s.dtb \
-+	stm32mp151c-plyaqm.dtb \
- 	stm32mp153c-dhcom-drc02.dtb \
- 	stm32mp153c-dhcor-drc-compact.dtb \
- 	stm32mp153c-lxa-tac-gen3.dtb \
-diff --git a/arch/arm/boot/dts/st/stm32mp151c-plyaqm.dts b/arch/arm/boot/dts/st/stm32mp151c-plyaqm.dts
-new file mode 100644
-index 000000000000..39a3211c6133
---- /dev/null
-+++ b/arch/arm/boot/dts/st/stm32mp151c-plyaqm.dts
-@@ -0,0 +1,376 @@
-+// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
-+/dts-v1/;
-+
-+#include <arm/st/stm32mp151.dtsi>
-+#include <arm/st/stm32mp15xc.dtsi>
-+#include <arm/st/stm32mp15-pinctrl.dtsi>
-+#include <arm/st/stm32mp15xxad-pinctrl.dtsi>
-+#include <arm/st/stm32mp15-scmi.dtsi>
-+#include <dt-bindings/gpio/gpio.h>
-+#include <dt-bindings/leds/common.h>
-+
-+/ {
-+	model = "Plymovent AQM board";
-+	compatible = "ply,plyaqm", "st,stm32mp151";
-+
-+	aliases {
-+		ethernet0 = &ethernet0;
-+		serial0 = &uart4;
-+		serial1 = &uart7;
-+	};
-+
-+	codec {
-+		compatible = "invensense,ics43432";
-+
-+		port {
-+			codec_endpoint: endpoint {
-+				remote-endpoint = <&i2s1_endpoint>;
-+				dai-format = "i2s";
-+			};
-+		};
-+	};
-+
-+	firmware {
-+		optee {
-+			compatible = "linaro,optee-tz";
-+			method = "smc";
-+		};
-+	};
-+
-+	leds {
-+		compatible = "gpio-leds";
-+
-+		led-0 {
-+			gpios = <&gpioa 3 GPIO_ACTIVE_HIGH>; /* WHITE_EN */
-+			color = <LED_COLOR_ID_WHITE>;
-+			default-state = "on";
-+		};
-+	};
-+
-+	v3v3: fixed-regulator-v3v3 {
-+		compatible = "regulator-fixed";
-+		regulator-name = "v3v3";
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
-+	};
-+
-+	v5v_sw: fixed-regulator-v5sw {
-+		compatible = "regulator-fixed";
-+		regulator-name = "5v-switched";
-+		regulator-min-microvolt = <5000000>;
-+		regulator-max-microvolt = <5000000>;
-+		gpio = <&gpioe 10 GPIO_ACTIVE_HIGH>; /* 5V_SWITCHED_EN */
-+		startup-delay-us = <100000>;
-+		enable-active-high;
-+		regulator-boot-on;
-+	};
-+
-+	reserved-memory {
-+		#address-cells = <1>;
-+		#size-cells = <1>;
-+		ranges;
-+
-+		optee@cfd00000 {
-+			reg = <0xcfd00000 0x300000>;
-+			no-map;
-+		};
-+	};
-+
-+	sound {
-+		compatible = "audio-graph-card";
-+		label = "STM32MP15";
-+		dais = <&i2s1_port>;
-+	};
-+
-+	wifi_pwrseq: wifi-pwrseq {
-+		compatible = "mmc-pwrseq-simple";
-+		reset-gpios = <&gpioe 12 GPIO_ACTIVE_LOW>; /* WLAN_REG_ON */
-+	};
-+};
-+
-+&adc {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&adc1_in10_pins_a>;
-+	vdda-supply = <&v3v3>;
-+	vref-supply = <&v3v3>;
-+	status = "okay";
-+
-+	adc@0 {
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		status = "okay";
-+
-+		channel@10 { /* NTC */
-+			reg = <10>;
-+			st,min-sample-time-ns = <10000>;  /* 10µs sampling time */
-+		};
-+	};
-+};
-+
-+&cpu0 {
-+	clocks = <&scmi_clk CK_SCMI_MPU>;
-+};
-+
-+&cryp1 {
-+	clocks = <&scmi_clk CK_SCMI_CRYP1>;
-+	resets = <&scmi_reset RST_SCMI_CRYP1>;
-+	status = "okay";
-+};
-+
-+&ethernet0 {
-+	pinctrl-names = "default", "sleep";
-+	pinctrl-0 = <&ethernet0_rmii_pins_d>;
-+	pinctrl-1 = <&ethernet0_rmii_sleep_pins_d>;
-+	phy-mode = "rmii";
-+	max-speed = <100>;
-+	phy-handle = <&ethphy0>;
-+	status = "okay";
-+
-+	mdio {
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		compatible = "snps,dwmac-mdio";
-+
-+		/* KSZ8081RNA PHY */
-+		ethphy0: ethernet-phy@0 {
-+			reg = <0>;
-+			interrupts-extended = <&gpiob 0 IRQ_TYPE_LEVEL_LOW>;
-+			reset-gpios = <&gpiob 1 GPIO_ACTIVE_LOW>;
-+			reset-assert-us = <10000>;
-+			reset-deassert-us = <300>;
-+		};
-+	};
-+};
-+
-+&gpioa {
-+	gpio-line-names =
-+		"", "", "", "", "", "", "", "",
-+		"", "", "", "", "", "HWID_PL_N", "HWID_CP", "";
-+};
-+
-+&gpiob {
-+	gpio-line-names =
-+		"", "", "", "", "", "", "LED_LATCH", "",
-+		"", "RELAY1_EN", "", "", "", "", "", "";
-+};
-+
-+&gpioc {
-+	gpio-line-names =
-+		"", "", "", "", "", "", "", "",
-+		"", "", "", "", "", "HWID_Q7", "", "";
-+};
-+
-+&gpioe {
-+	gpio-line-names =
-+		"", "", "", "", "RELAY2_EN", "", "", "",
-+		"", "", "", "", "", "", "", "";
-+};
-+
-+&gpiog {
-+	gpio-line-names =
-+		"", "", "", "", "", "", "", "SW1",
-+		"", "", "", "", "", "", "", "";
-+};
-+
-+&gpioz {
-+	clocks = <&scmi_clk CK_SCMI_GPIOZ>;
-+};
-+
-+&hash1 {
-+	clocks = <&scmi_clk CK_SCMI_HASH1>;
-+	resets = <&scmi_reset RST_SCMI_HASH1>;
-+};
-+
-+&i2c1 {
-+	pinctrl-names = "default", "sleep";
-+	pinctrl-0 = <&i2c1_pins_c>;
-+	pinctrl-1 = <&i2c1_sleep_pins_c>;
-+	i2c-scl-rising-time-ns = <185>;
-+	i2c-scl-falling-time-ns = <20>;
-+	status = "okay";
-+	/delete-property/dmas;
-+	/delete-property/dma-names;
-+};
-+
-+&i2c4 {
-+	clocks = <&scmi_clk CK_SCMI_I2C4>;
-+	resets = <&scmi_reset RST_SCMI_I2C4>;
-+};
-+
-+&i2c6 {
-+	pinctrl-names = "default", "sleep";
-+	pinctrl-0 = <&i2c6_pins_b>;
-+	pinctrl-1 = <&i2c6_sleep_pins_b>;
-+	i2c-scl-rising-time-ns = <185>;
-+	i2c-scl-falling-time-ns = <20>;
-+	clocks = <&scmi_clk CK_SCMI_I2C6>;
-+	resets = <&scmi_reset RST_SCMI_I2C6>;
-+	status = "okay";
-+	/delete-property/dmas;
-+	/delete-property/dma-names;
-+
-+	pressure-sensor@47 {
-+		compatible = "bosch,bmp580";
-+		reg = <0x47>;
-+		vdda-supply = <&v5v_sw>;
-+		vddd-supply = <&v5v_sw>;
-+	};
-+
-+	co2-sensor@62 {
-+		compatible = "sensirion,scd41";
-+		reg = <0x62>;
-+		vdd-supply = <&v5v_sw>;
-+	};
-+
-+	pm-sensor@69 {
-+		compatible = "sensirion,sps30";
-+		reg = <0x69>;
-+	};
-+};
-+
-+&i2s1 {
-+	pinctrl-names = "default", "sleep";
-+	pinctrl-0 = <&i2s1_pins_a>;
-+	pinctrl-1 = <&i2s1_sleep_pins_a>;
-+	clocks = <&rcc SPI1>, <&rcc SPI1_K>, <&rcc PLL3_Q>, <&rcc PLL3_R>;
-+	clock-names = "pclk", "i2sclk", "x8k", "x11k";
-+	#clock-cells = <0>; /* Set I2S2 as master clock provider */
-+	status = "okay";
-+
-+	i2s1_port: port {
-+		i2s1_endpoint: endpoint {
-+			format = "i2s";
-+			mclk-fs = <256>;
-+			remote-endpoint = <&codec_endpoint>;
-+		};
-+	};
-+};
-+
-+&iwdg2 {
-+	clocks = <&rcc IWDG2>, <&scmi_clk CK_SCMI_LSI>;
-+	status = "okay";
-+};
-+
-+&m4_rproc {
-+	/delete-property/ st,syscfg-holdboot;
-+	resets = <&scmi_reset RST_SCMI_MCU>,
-+		 <&scmi_reset RST_SCMI_MCU_HOLD_BOOT>;
-+	reset-names =  "mcu_rst", "hold_boot";
-+};
-+
-+&mdma1 {
-+	resets = <&scmi_reset RST_SCMI_MDMA>;
-+};
-+
-+&rcc {
-+	compatible = "st,stm32mp1-rcc-secure", "syscon";
-+	clock-names = "hse", "hsi", "csi", "lse", "lsi";
-+	clocks = <&scmi_clk CK_SCMI_HSE>,
-+		 <&scmi_clk CK_SCMI_HSI>,
-+		 <&scmi_clk CK_SCMI_CSI>,
-+		 <&scmi_clk CK_SCMI_LSE>,
-+		 <&scmi_clk CK_SCMI_LSI>;
-+};
-+
-+&rng1 {
-+	clocks = <&scmi_clk CK_SCMI_RNG1>;
-+	resets = <&scmi_reset RST_SCMI_RNG1>;
-+	status = "okay";
-+};
-+
-+&rtc {
-+	clocks = <&scmi_clk CK_SCMI_RTCAPB>, <&scmi_clk CK_SCMI_RTC>;
-+};
-+
-+/* SD card without Card-detect */
-+&sdmmc1 {
-+	pinctrl-names = "default", "opendrain", "sleep";
-+	pinctrl-0 = <&sdmmc1_b4_pins_a>;
-+	pinctrl-1 = <&sdmmc1_b4_od_pins_a>;
-+	pinctrl-2 = <&sdmmc1_b4_sleep_pins_a>;
-+	broken-cd;
-+	no-sdio;
-+	no-1-8-v;
-+	st,neg-edge;
-+	bus-width = <4>;
-+	vmmc-supply = <&v3v3>;
-+	status = "okay";
-+};
-+
-+/* EMMC */
-+&sdmmc2 {
-+	pinctrl-names = "default", "opendrain", "sleep";
-+	pinctrl-0 = <&sdmmc2_b4_pins_c &sdmmc2_d47_pins_b>;
-+	pinctrl-1 = <&sdmmc2_b4_od_pins_c &sdmmc2_d47_pins_b>;
-+	pinctrl-2 = <&sdmmc2_b4_sleep_pins_c &sdmmc2_d47_sleep_pins_b>;
-+	non-removable;
-+	no-sd;
-+	no-sdio;
-+	no-1-8-v;
-+	st,neg-edge;
-+	bus-width = <8>;
-+	vmmc-supply = <&v3v3>;
-+	status = "okay";
-+};
-+
-+/* Wifi */
-+&sdmmc3 {
-+	pinctrl-names = "default", "opendrain", "sleep";
-+	pinctrl-0 = <&sdmmc3_b4_pins_c>;
-+	pinctrl-1 = <&sdmmc3_b4_od_pins_c>;
-+	pinctrl-2 = <&sdmmc3_b4_sleep_pins_c>;
-+	non-removable;
-+	st,neg-edge;
-+	bus-width = <4>;
-+	vmmc-supply = <&v3v3>;
-+	mmc-pwrseq = <&wifi_pwrseq>;
-+	#address-cells = <1>;
-+	#size-cells = <0>;
-+	status = "okay";
-+
-+	wifi@1 {
-+		reg = <1>;
-+		compatible = "brcm,bcm4329-fmac";
-+	};
-+};
-+
-+&timers5 {
-+	status = "okay";
-+	/delete-property/dmas;
-+	/delete-property/dma-names;
-+
-+	pwm {
-+		pinctrl-0 = <&pwm1_pins_d>;
-+		pinctrl-1 = <&pwm1_sleep_pins_d>;
-+		pinctrl-names = "default", "sleep";
-+		status = "okay";
-+	};
-+};
-+
-+&uart4 {
-+	pinctrl-names = "default", "sleep", "idle";
-+	pinctrl-0 = <&uart4_pins_e>;
-+	pinctrl-1 = <&uart4_idle_pins_e>;
-+	pinctrl-2 = <&uart4_sleep_pins_e>;
-+	/delete-property/dmas;
-+	/delete-property/dma-names;
-+	status = "okay";
-+};
-+
-+&uart7 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&uart7_pins_d>;
-+	uart-has-rtscts;
-+	status = "okay";
-+
-+	bluetooth {
-+		compatible = "brcm,bcm43438-bt";
-+		shutdown-gpios = <&gpioe 11 GPIO_ACTIVE_HIGH>; /* BT_REG_ON */
-+		max-speed = <4000000>;
-+		vbat-supply = <&v3v3>;
-+		vddio-supply = <&v3v3>;
-+		interrupt-parent = <&gpiog>;
-+		interrupts = <12 IRQ_TYPE_EDGE_RISING>; /* BT_HOST_WAKE */
-+		interrupt-names = "host-wakeup";
-+	};
-+};
+> 
+> 
+>>>> +void ovpn_peer_endpoints_update(struct ovpn_peer *peer, struct sk_buff *skb)
+>>>> +{
+>>>> +	struct hlist_nulls_head *nhead;
+>>>> +	struct sockaddr_storage ss;
+>>>> +	const u8 *local_ip = NULL;
+>>>> +	struct sockaddr_in6 *sa6;
+>>>> +	struct sockaddr_in *sa;
+>>>> +	struct ovpn_bind *bind;
+>>>> +	size_t salen = 0;
+>>>> +
+>>>> +	spin_lock_bh(&peer->lock);
+>>>> +	bind = rcu_dereference_protected(peer->bind,
+>>>> +					 lockdep_is_held(&peer->lock));
+>>>> +	if (unlikely(!bind))
+>>>> +		goto unlock;
+>>>> +
+>>>> +	switch (skb->protocol) {
+>>>> +	case htons(ETH_P_IP):
+>>>> +		/* float check */
+>>>> +		if (unlikely(!ovpn_bind_skb_src_match(bind, skb))) {
+>>>> +			if (bind->remote.in4.sin_family == AF_INET)
+>>>> +				local_ip = (u8 *)&bind->local;
+>>>
+>>> If I'm reading this correctly, we always reuse the existing local
+>>> address when we have to re-create the bind, even if it doesn't match
+>>> the skb? The "local endpoint update" chunk below is doing that, but
+>>> only if we're keeping the same remote? It'll get updated the next time
+>>> we receive a packet and call ovpn_peer_endpoints_update.
+>>>
+>>> That might irritate the RPF check on the other side, if we still use
+>>> our "old" source to talk to the new dest?
+>>>
+>>>> +			sa = (struct sockaddr_in *)&ss;
+>>>> +			sa->sin_family = AF_INET;
+>>>> +			sa->sin_addr.s_addr = ip_hdr(skb)->saddr;
+>>>> +			sa->sin_port = udp_hdr(skb)->source;
+>>>> +			salen = sizeof(*sa);
+>>>> +			break;
+>>
+>> I think the issue is simply this 'break' above - by removing it, everything
+>> should work as expected.
+> 
+> Only if the bind was of the correct family? Checking an IPv4 local
+> address (in the bind) against an IPv6 source address in the packet (or
+> the other way around) isn't going to work well.
+
+Ah I understand what you mean.
+
+The purpose of "local_ip" is to provide a working local endpoint to be 
+used with the new remote address.
+However, if the float is switching family we can't re-use the same old 
+local endpoint (hence the check).
+In this case we'll learn the "new" local address later.
+
+Does it make sense?
+
+Cheers,
+
+> 
+> 
+>> I thin this is a leftover from when float check and endpoint update were two
+>> different functions/switch blocks.
+>>
+>>>> +		}
+>>>> +
+>>>> +		/* local endpoint update */
+>>>> +		if (unlikely(bind->local.ipv4.s_addr != ip_hdr(skb)->daddr)) {
+>>>> +			net_dbg_ratelimited("%s: learning local IPv4 for peer %d (%pI4 -> %pI4)\n",
+>>>> +					    netdev_name(peer->ovpn->dev),
+>>>> +					    peer->id, &bind->local.ipv4.s_addr,
+>>>> +					    &ip_hdr(skb)->daddr);
+>>>> +			bind->local.ipv4.s_addr = ip_hdr(skb)->daddr;
+>>>> +		}
+>>>> +		break;
+> 
+
 -- 
-2.39.5
+Antonio Quartulli
+OpenVPN Inc.
 
 
