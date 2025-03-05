@@ -1,124 +1,99 @@
-Return-Path: <netdev+bounces-171863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59593A4F2A1
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 01:24:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5892A4F2BE
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 01:30:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90A1F188CFA2
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 00:24:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F300B169049
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 00:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6FDD14286;
-	Wed,  5 Mar 2025 00:24:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAFBD1A29A;
+	Wed,  5 Mar 2025 00:29:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I24VjWZc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KxJKehgR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C5E528DB3;
-	Wed,  5 Mar 2025 00:24:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C6D627456;
+	Wed,  5 Mar 2025 00:29:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741134279; cv=none; b=pOayuex/IhrmCyt90f713YCx/7qC22KikNyQFU7wEPFFDC2oFFCd2ssAOqllKFCCm39k9xfB1yEL5nlz85FkpebslmjWdoHDcl8bdQjxzSekabFH52RLkcAxZtSj1BG4FTQQhmLiHm5kqlHqkeL2G3x2Zm/adu0NKtjFEzyoobE=
+	t=1741134599; cv=none; b=WjVYYRoXnQFnA9qjqSTYPRKYk9l8nAIboOI9VuHo6sgkEGIQmSZSfqtNDCa2ND+lW57bI/D6bH2UMc//W97iC07zHKdvYAWL5DCQ9PtK4PmRKIjRNhE6GrajLZvaOrH29HCKG/3QlYLVUi6waG5niLLvW1Bu6lqqp6MQuspm3gU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741134279; c=relaxed/simple;
-	bh=y7MUgOurul1EqCfOPhyeQVHxMvZ/06Rrgth75p612z4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=esTqZUg9un8sZHI2gnj/7aQUuuLXqEDFywDHNzL+l7qh+3fT5h0WpgVkOkCzSIzGCA1HPWtF+z1moOSbBQ3MLz/JhbY2cpIzBiGARjz3TFwOrJLSIBciod4Q55B1hw8+tkuxwI2IA0mz+4QUwMRB8eUBG8PUud88Ekpsf8xYids=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I24VjWZc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E0B7C4CEE5;
-	Wed,  5 Mar 2025 00:24:38 +0000 (UTC)
+	s=arc-20240116; t=1741134599; c=relaxed/simple;
+	bh=Byb9Fn5sdn7q5Onud0bJf9pe9X56OHaqd58xQ8U6HHQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=lrGV4wt+gSU49Y0OiH04upXd045eh5J8C0sD7IlXEXNmROn2+XehcZUbcg4RWr2llts6e+1IcO3wupFXp6KtISsLFvzd2EH7ibJzR/ZL6X5bYOSoZ+fjfK+9YCsEMAWGLlR1ESeDx5ysKLV7utH99zY0UsCzUVLV0QEH1mhQ5XU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KxJKehgR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B537C4CEE5;
+	Wed,  5 Mar 2025 00:29:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741134279;
-	bh=y7MUgOurul1EqCfOPhyeQVHxMvZ/06Rrgth75p612z4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=I24VjWZcx9Ymy+7xo+8CCH9TX+64bhNNNvNx2o7T1lA/eOFylvVerKppIGqIgh1CM
-	 xWVQ9cYsdW2TFSWCBd9dkxuTZ80jX01sUZ+gYa72T3x6fGDCCgO/tZghcrhqhzRg9s
-	 4FYw0WJOcZGfWFzDOH2I+W+ohZ61bo1X0Zm7t8NUhkg3vopQ3wY6XmnzUSlsGvJnb2
-	 IdlKhbZozjSpte/QIdfm5P2wgkS+S0vaVdC4/dcVvcFBjAN6+jwRz6HChWLuViGkji
-	 /3e8whUPFok+qqAFmLYldOD5MWFMM9BKujS+QRTGfx+3RcDM/3TfHYC82SYyWTu2GI
-	 i6ryNq/MPaOjA==
-Date: Tue, 4 Mar 2025 16:24:37 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Meghana Malladi <m-malladi@ti.com>, Diogo Ivo <diogo.ivo@siemens.com>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "David
- S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>, Vignesh Raghavendra
- <vigneshr@ti.com>, Roger Quadros <rogerq@kernel.org>
-Subject: Re: [PATCH net-next] net: ti: icssg-prueth: Add ICSSG FW Stats
-Message-ID: <20250304162437.0160f687@kernel.org>
-In-Reply-To: <33c38844-4fbe-469c-bb5f-06bdb7721114@ti.com>
-References: <20250227093712.2130561-1-danishanwar@ti.com>
-	<20250303172543.249a4fc2@kernel.org>
-	<33c38844-4fbe-469c-bb5f-06bdb7721114@ti.com>
+	s=k20201202; t=1741134599;
+	bh=Byb9Fn5sdn7q5Onud0bJf9pe9X56OHaqd58xQ8U6HHQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=KxJKehgRAd2bl+h+Yvv7nJkhM1Cby+CbdDXUXHyxBhsvw9mTUSofxgHtTERAYKT2K
+	 IXFuBRiIRI8ViMbun2iZAUc5cB1xBmu8N41a/3/ksDYIZjSvmfqQQ5nesJ3+nI92Ya
+	 mghuYFBsMlu5HIkspEe2jRywSosjZ9iT6vFYS8S1oEbNvxy4FMDjP++I8yEKoKq2e5
+	 VAhqF7bs7X3dDdr9CVstiyn0+Qcp8OosAdpTqt1xprluU1ahWZBAhK3bTFcUhWD4Y/
+	 zBkUPLaGW9yeHqMRujRGmJJ4d6TTj/uW5Xsm4XcxLcEli5AGChvGCdJO0dFWaAhG5B
+	 shoxThkaHcLkw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3434D380CFEB;
+	Wed,  5 Mar 2025 00:30:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 0/3] Fixes for IPA v4.7
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174113463200.345304.7962244845761048963.git-patchwork-notify@kernel.org>
+Date: Wed, 05 Mar 2025 00:30:32 +0000
+References: <20250227-ipa-v4-7-fixes-v1-0-a88dd8249d8a@fairphone.com>
+In-Reply-To: <20250227-ipa-v4-7-fixes-v1-0-a88dd8249d8a@fairphone.com>
+To: Luca Weiss <luca.weiss@fairphone.com>
+Cc: elder@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, 4 Mar 2025 13:46:39 +0530 MD Danish Anwar wrote:
-> On 04/03/25 6:55 am, Jakub Kicinski wrote:
-> > On Thu, 27 Feb 2025 15:07:12 +0530 MD Danish Anwar wrote:  
-> >> +	ICSSG_PA_STATS(FW_PREEMPT_BAD_FRAG),
-> >> +	ICSSG_PA_STATS(FW_PREEMPT_ASSEMBLY_ERR),
-> >> +	ICSSG_PA_STATS(FW_PREEMPT_FRAG_CNT_TX),
-> >> +	ICSSG_PA_STATS(FW_PREEMPT_ASSEMBLY_OK),
-> >> +	ICSSG_PA_STATS(FW_PREEMPT_FRAG_CNT_RX),  
-> > 
-> > I presume frame preemption is implemented in silicon? If yes -
-> > what makes these "FW statistics"? Does the FW collect them from   
-> 
-> The statistics are maintained / updated by firmware and thus the name.
-> 
-> Preemption is implemented partially in both the hardware and firmware.
-> The STATE MACHINE for preemption is in the firmware. The decision to
-> when to PREEMEPT / ASSEMBLE a packet is made in firmware.
-> 
-> These preemption statistics are updated by the firmware based on the
-> action performed by the firmware. Driver can read these to know the
-> statistics of preemption. These stats will be able used by
-> ethtool_mm_stats once the support for Preemption is added in the driver.
+Hello:
 
-That was going to be my next question. If the statistic is suitable 
-for a standard interface it should not be reported via ethtool -S.
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Please leave the stats for unimplemented features out.
+On Thu, 27 Feb 2025 11:33:39 +0100 you wrote:
+> During bringup of IPA v4.7 unfortunately some bits were missed, and it
+> couldn't be tested much back then due to missing features in tqftpserv
+> which caused the modem to not enable correctly.
+> 
+> Especially the last commit is important since it makes mobile data
+> actually functional on SoCs with IPA v4.7 like SM6350 - used on the
+> Fairphone 4. Before that, you'd get an IP address on the interface but
+> then e.g. ping never got any response back.
+> 
+> [...]
 
-> >> +/* Incremented if a packet is dropped at PRU because of a rule violation */
-> >> +#define FW_DROPPED_PKT		0x00F8  
-> > 
-> > Instead of adding comments here please add a file under
-> > Documentation/networking/device_drivers/ with the explanations.
-> > That's far more likely to be discovered by users, no?  
-> 
-> Sure I will drop these MACRO comments and create a .rst file in
-> Documentation/networking/device_drivers/
-> 
-> One question though, should I create a table for the stats and it's
-> description or should I create a section for each stats?
-> 
-> Something like this,
-> 
-> FW_RTU_PKT_DROP
-> ---------------
+Here is the summary with links:
+  - [1/3] net: ipa: Fix v4.7 resource group names
+    https://git.kernel.org/netdev/net/c/5eb3dc1396aa
+  - [2/3] net: ipa: Fix QSB data for v4.7
+    https://git.kernel.org/netdev/net/c/6a2843aaf551
+  - [3/3] net: ipa: Enable checksum for IPA_ENDPOINT_AP_MODEM_{RX,TX} for v4.7
+    https://git.kernel.org/netdev/net/c/934e69669e32
 
-Let's document the user-visible names! The strings from ethtool -S
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> Diagnostic error counter which increments when RTU drops a locally
-> injected packet due to port being disabled or rule violation.
-> 
-> Please let me know what do you think.
 
-Taking inspiration from:
-  Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
-should be a safe choice, I hope.
 
