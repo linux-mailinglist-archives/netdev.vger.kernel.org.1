@@ -1,57 +1,75 @@
-Return-Path: <netdev+bounces-172170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFA45A50762
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 18:57:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C83BA507CA
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 19:00:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40B0318935C4
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 17:57:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEC531893A44
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 18:00:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 157AE24C07D;
-	Wed,  5 Mar 2025 17:57:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDDF91C5D4E;
+	Wed,  5 Mar 2025 18:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="q9Q9oB5z"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ziP+c6Rh"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 894F0250C1D
-	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 17:57:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE3B14B075
+	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 18:00:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741197435; cv=none; b=p8TurPHFUGmO6LNNzBVi17Y7o0e74xeJBe+0bIpko4wn79gU9lX/NgT8RE2xcrY7d3y8JXCrhOAYLdzpOdjYIjhs8BylX4kwBjAc+yOPag88wwNrpVh7yJERcAkFqj59OCpUVvOAH9hiZNxDxA5Jy6EKZp4U9E3MMiJnwannlVc=
+	t=1741197635; cv=none; b=BLaVVOxAluDQ8PTQA72o+ZxYdLLyBV7/2u2MrGDXJSWbqCYgG+Zkk3E/DPRRap2XgnD2ME10ZpK1tGmW2CpQLhx1e8ZazKL7Ac0Fr12KZY58M/JFVE4+zAFJcQxf+DpU2Bl+zK4mOjMtbHsQXeDF+66+hD/v4PxdQC+zs3uT/Es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741197435; c=relaxed/simple;
-	bh=tQI8Iaa53ZjRVGy8Lb1Cc41I9xa31OxUOdo+Cv/ovOM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jgpHsQuu69hNjX54npkWtwA0IH4ltgqyv9JtswVwDZM9SLF6DxN37UYPib+k9hN4+e/3a7LYaFFKubUVFRopaXqrNno/IyjSVKxw7ZM5KzgrfR8EvZ6UbT6NBQMlgTgav7fOHTTXDvelt2ohlaGW6SLlHIuPwusdCltFZ6q+it8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=q9Q9oB5z; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=oXYYK6psKGQovX90rdKMWsTaGIrXwVz2qfLGwrnkFwg=; b=q9Q9oB5zm+ZTC7EjbxiD8Ly15h
-	NHoDOSuig1Uo8uB+7w1iVcwXs1C7WHPFyk0Ve823uTCjTlD2Dr5JCjKBqNn8Pe1Fpo0OmnkKh6yOm
-	8TvOUhebdAaMoCdc0MtkYbnGOjZ3XPhKZdawFdumTXWGPgti0/H/iHqBdUx/gPRGR30k=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tpszV-002YKS-Pj; Wed, 05 Mar 2025 18:57:09 +0100
-Date: Wed, 5 Mar 2025 18:57:09 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: max.schulze@online.de, hfdevel@gmx.net, netdev@vger.kernel.org
-Subject: Re: tn40xx / qt2025: cannot load firmware, error -2
-Message-ID: <621e6614-d2a8-4f7a-be53-9f24b1768040@lunn.ch>
-References: <89515e61-6aeb-4063-bc47-52a9ea982a26@lunn.ch>
- <b2296450-74bb-4812-ac1a-6939ef869741@online.de>
- <9aede328-4050-4505-83a5-c0eeb67d1fc5@lunn.ch>
- <20250305.084858.1138848711250818607.fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1741197635; c=relaxed/simple;
+	bh=34IS2Ra3ZQYkYOLhiHmpeb9dNwq+KiAH/7esWeJ6zmY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=t0qEUpnN44pUdNi5PqSrJtEqnwROEv8E3G3sw7c6S3KCkF6IYiOFtCrX0n8HEz9UdHrQj55cvQ/x81Cr2EEabQZ3m1ywFdG1Lgug7eKWixHSCNTefmo7KsRdbKyddtn4aFpz8NjELayt2Rm2BZOk1xtxNUBYOJtvJN5m1igOThI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ziP+c6Rh; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Px9Jz3Pd0I8Y7Fz858xKtuZ+TcOz0/7LpltAItOKKMQ=; b=ziP+c6Rhe1jcgsh/J48ZLSgYEr
+	yXbif+ag+SrRv/jbcc4Eu41tem7vBX+R6ll6sS7LJkP6eexbhTu5TyukH9boDuRgi9IQEvC24Tl6c
+	lIGK5UTFBuj5v0EFhz976kQrP9dxqfmLD0cpZS772/HBPuTXyATCznn2/KEnu7CWMec8i7N7eo8qv
+	wam7BJlJkjZ3Wip4Otsc41ywrGel8goj9rnqO35I3WTufuIgE9vgJE7jeyMfwWiUXwJe+oRihnZvK
+	0N7znjSUBZmUw5GXUf7FhFsscEosuT+H5hnKhe5gkyCB84M4quabjNadkyegPTC1CWsrusGWndnE/
+	R2FO08/Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39552)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tpt2d-0004gX-3D;
+	Wed, 05 Mar 2025 18:00:24 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tpt2Z-0005xy-2E;
+	Wed, 05 Mar 2025 18:00:19 +0000
+Date: Wed, 5 Mar 2025 18:00:19 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jon Hunter <jonathanh@nvidia.com>, Thierry Reding <treding@nvidia.com>,
+	"Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next 0/2] net: stmmac: approach 2 to solve EEE LPI reset
+ issues
+Message-ID: <Z8iRM8Q9Sb-y3fR_@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,47 +78,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250305.084858.1138848711250818607.fujita.tomonori@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-> > From my reading of the PHY datasheet, it can do 1000Base-KX, but there
-> > is no mention of 100BaseSX. There is also limited access to the i2c
-> > eeprom in the SFP, so ethtool -m could be implemented.
-> 
-> Yeah, I have not yet found a way to implement the ethtool operation
-> that accesses the SFP and returns the appropriate information.
+Hi,
 
-There are two different ways you can report the i2c EEPROM
-information:
+This is a second approach to solving the STMMAC reset issues caused by
+the lack of receive clock from the PHY where the media is in low power
+mode with a PHY that supports receive clock-stop.
 
-struct phy_driver has:
+The first approach centred around only addressing the issue in the
+resume path, but it seems to also happen when the platform glue module
+is removed and re-inserted (Jon - can you check whether that's also
+the case for you please?)
 
-        /**
-         * @module_info: Get the size and type of the eeprom contained
-         * within a plug-in module
-         */
-        int (*module_info)(struct phy_device *dev,
-                           struct ethtool_modinfo *modinfo);
+As this is more targetted, I've dropped the patches from this series
+which move the call to phylink_resume(), so the link may still come
+up too early on resume - but that's something I also intend to fix.
 
-        /**
-         * @module_eeprom: Get the eeprom information from the plug-in
-         * module
-         */
-        int (*module_eeprom)(struct phy_device *dev,
-                             struct ethtool_eeprom *ee, u8 *data);
+This is experimental - so I value test reports for this change.
 
-I don't think any PHY driver actually implement these. I've been
-intending to remove them for a couple of years, but have been too
-lazy. I would actually say this is a dead end and you should not do
-this.
+As mentioned recently, the reset timeout will only occur if the PHY
+receive clock is actually stopped at the moment that stmmac_reset()
+is called and remains stopped for the duration of the timeout.
+Network activity can wake up the link, causing the PHY to restart
+its receive clock and allow reset to complete. So, careful testing
+with and without these patches is necessary.
 
-What i think you should do is fake an I2C bus. This is how all other
-boards work, they have a Linux i2c bus device, and phylink knows how
-to use it to retrieve the EEPROM contents and export it in the
-standard way. You are going to need phylink involved anyway to manage
-the SFP cage, determine the link modes, tell the MAC driver what to
-do. The PHY driver then needs a sfp_upstream_ops which it registers
-with phy_sfp_probe(). See marvell10g.c for an example.
+Change from RFC: drop unnecessary first patch.
 
-	Andrew
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c |  3 ++
+ drivers/net/phy/phylink.c                         | 50 +++++++++++++++++++++++
+ include/linux/phylink.h                           |  3 ++
+ 3 files changed, 56 insertions(+)
 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
