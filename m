@@ -1,137 +1,96 @@
-Return-Path: <netdev+bounces-171938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5B07A4F882
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 09:17:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22BE6A4F889
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 09:17:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BB701890FB2
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 08:17:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FE103A0418
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 08:17:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C3FC1EDA0C;
-	Wed,  5 Mar 2025 08:16:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C083A1632E4;
+	Wed,  5 Mar 2025 08:17:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="qXiwMTb1";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="cFY0t7ax"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="p37Fk9NS"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A699470824
-	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 08:16:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E39B1C7007
+	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 08:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741162615; cv=none; b=nAVN6srPq79c8jmrHEI0tsBhEGcS+HuYtsMHNhhkw7H9n+LwXsHS1QT2dwwX+5z7YBDLpobpGpA2q2GdUUUS1ho28nQxy5iS8YsqzTA1Yk/A6AJPyeg0oBv673R+6pND5h+z/DgT5Wo2ezqbCR3b2CZdhPI5eZATUqD3Rcg0dOM=
+	t=1741162640; cv=none; b=qaTJgDXEtfzBGtKX+6u0gtAc1PLU+lL3y/scx9bD2BssXtIrRq4+iuicVs5APDJjxBz5YpQRkL5/VdZJY6Qrr28K8VJyZZc/4k8IM3iHjQ6VkZHcquse6rDzsKFsq02tyWq77c15xKXySzPAVgTdJ5tQOlZfpnnww/JGUpA2g04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741162615; c=relaxed/simple;
-	bh=QStBYi6pwdK1Tb36EYQktQO0A7l90MX13f4+gcwwHC8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=rxnuvh91mDSLlFFtfknbcM6mhJ5GIk1GIYhJ5gQKaR03eTT9UgrOrBSUGKFwnmqPe6/sWa6HyDXuzyWdteh7BwZDyuzRUvjquBDQasu2/cr8wHaj0vQfM4ap4cC+Gq+s+rTKG0FKnDGSi5RG23fYoUVvgasrQflOii9WfqK1SWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=qXiwMTb1; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=cFY0t7ax; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1741162611;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QStBYi6pwdK1Tb36EYQktQO0A7l90MX13f4+gcwwHC8=;
-	b=qXiwMTb1GNumeIUzRqx7+OwDkD+b1GgnGhUIlZGRC5DgMHDFDl3c9cTbK4jSN4r81FWk4i
-	G2T9zI6vBanbigSyO2u0ijZyjaCbnx3A03IhtrHoBz4LED7Gx0oNh7phUS/7XTMWMXX+UU
-	oK7quyWPTZs0mXbPH78+jar1y7mKQ+RcEtULNaFdMsUzTt7IO8oc1otyrYSR3lD5F0R84J
-	9EMGCvQbb75jfTAcbcdDoHyAlT06tYBIjDW0/kHfGqcLPY9CYtw2D0Ehvv6cW+csUk0XfV
-	KE3y8PZWWuNkbUrY1tQNB/GGuz8w1i0Rd/Llep4B+172MF7+6w3fQkaJBi9uZg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1741162611;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QStBYi6pwdK1Tb36EYQktQO0A7l90MX13f4+gcwwHC8=;
-	b=cFY0t7axV2rn/eAyp6C+uQFaHl5YntHsUQ3zTHHndsc8Rk33kBq3Bwemz8Mwve522oWwnK
-	Ul8Hd7CgDpJftGDw==
-To: Simon Horman <horms@kernel.org>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Faizal Rahim
- <faizal.abdul.rahim@linux.intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Subject: Re: [PATCH iwl-next v3] igc: Change Tx mode for MQPRIO offloading
-In-Reply-To: <20250304173021.GH3666230@kernel.org>
-References: <20250303-igc_mqprio_tx_mode-v3-1-0efce85e6ae0@linutronix.de>
- <20250304173021.GH3666230@kernel.org>
-Date: Wed, 05 Mar 2025 09:16:50 +0100
-Message-ID: <87a59zc2od.fsf@kurt.kurt.home>
+	s=arc-20240116; t=1741162640; c=relaxed/simple;
+	bh=1lLJYy802//m4QaVMFxxQbAeFNcT1aHQiJe+jvJ2zcw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uKc83LHgBUQsolM2l0kHfSP1i2lvLD6Udt0OCZ0Kxk4iO825Rc5V7dauQuRycgQ+3y1+n+bHOmhKmaZ2fTnrLSq9M2arEepnxspVKLhtid8iWL1FEiAJsuHmKpT99saLUWMBBOvCcg4AUZWrfnsMq23BoJ5YzVIOC9sB65wdW1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=p37Fk9NS; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from localhost.localdomain (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 7DC9E200EECF;
+	Wed,  5 Mar 2025 09:17:13 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 7DC9E200EECF
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1741162634;
+	bh=McXpfBnJiRHRZI+QB01lpxYfNCBWttpip8sCvpfgCfA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=p37Fk9NSqkwbv7ZAxCjh2XNbqpkxCN+n4n7Q5tuY/dMQY75+g4Fq2HiigreQ8FoZW
+	 lYZZPNFDhaEvMZMS8aqWv4vQgB7/Gxz45jPsgq/GhTm8bYmkhzXl4UiiKECWLvuGfY
+	 YejXkSssTiiEP9st0EN32J9t9J8qwKT2ooks9JRZHxu2rciXrDKieeKZL31x9TJNMH
+	 gQiaUJwX34nx6WSvGH6Ps1nnYIVoxQQmUptpa+MViiXJ2lgzPRWN4Fz4VqeIaDdnDb
+	 p7Jkjv2M0N5BbR0Y5Ct3lmalg59A6wq+27eDggr6ZyScaqY0hcPO3vpSlxTtw/s0df
+	 OmBxNotm5B0Hw==
+From: Justin Iurman <justin.iurman@uliege.be>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	justin.iurman@uliege.be,
+	Tom Herbert <tom@herbertland.com>
+Subject: [PATCH net] net: ipv6: fix missing dst ref drop in ila lwtunnel
+Date: Wed,  5 Mar 2025 09:16:55 +0100
+Message-Id: <20250305081655.19032-1-justin.iurman@uliege.be>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Transfer-Encoding: 8bit
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Add missing skb_dst_drop() to drop reference to the old dst before
+adding the new dst to the skb.
 
-On Tue Mar 04 2025, Simon Horman wrote:
-> On Mon, Mar 03, 2025 at 10:16:33AM +0100, Kurt Kanzenbach wrote:
->> The current MQPRIO offload implementation uses the legacy TSN Tx mode. In
->> this mode the hardware uses four packet buffers and considers queue
->> priorities.
->>=20
->> In order to harmonize the TAPRIO implementation with MQPRIO, switch to t=
-he
->> regular TSN Tx mode. This mode also uses four packet buffers and conside=
-rs
->> queue priorities. In addition to the legacy mode, transmission is always
->> coupled to Qbv. The driver already has mechanisms to use a dummy schedule
->> of 1 second with all gates open for ETF. Simply use this for MQPRIO too.
->>=20
->> This reduces code and makes it easier to add support for frame preemption
->> later.
->>=20
->> While at it limit the netdev_tc calls to MQPRIO only.
->
-> Hi Kurt,
->
-> Can this part be broken out into a separate patch?
-> It seems so to me, but perhaps I'm missing something.
->
-> The reason that I ask is that this appears to be a good portion of the
-> change, and doing so would make the code changes for main part of the
-> patch, as per the description prior to the line above, clearer IMHO.
+Fixes: 79ff2fc31e0f ("ila: Cache a route to translated address")
+Cc: Tom Herbert <tom@herbertland.com>
+Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
+---
+ net/ipv6/ila/ila_lwt.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Sure, i think it can be broken out into a dedicated patch. I'll see what
-I can come up with.
+diff --git a/net/ipv6/ila/ila_lwt.c b/net/ipv6/ila/ila_lwt.c
+index ac4bcc623603..7d574f5132e2 100644
+--- a/net/ipv6/ila/ila_lwt.c
++++ b/net/ipv6/ila/ila_lwt.c
+@@ -96,6 +96,7 @@ static int ila_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 		}
+ 	}
+ 
++	skb_dst_drop(skb);
+ 	skb_dst_set(skb, dst);
+ 	return dst_output(net, sk, skb);
+ 
+-- 
+2.34.1
 
-Thanks,
-Kurt
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmfICHITHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgn/RD/9KB1zcoSwrPck4K0Si/VAbhwwAmN0j
-gf8SCmqPhp7HID5y+ECXInVfcSGXPXJ+95XTrY0IbP5UcAEhrr72Qu2EVfFqsiJb
-dBhfvwSUDh1e1oDNvjsBg8+2AnQXQzZe0JWH94GBIsH0EDVEx1OnrJffvHkjeocm
-L8/h43WlDBGMY9fgtB6O4oqkzb19eGnoyfhloMufpOZEms5DHa4Tf/nshZE+K1Vf
-DCnazJd+af1dCKSM2gRXhcjD7eiLcPt3v4M0N6veKyDWCt+qPcV7u3eSIprEQ815
-IrigR1RH+LhqAnYKfwULRnvlDc4a/JCNlMhLxvoOwRj1vwpwiTWTs+EIHBXWijCr
-T/7P2G2sVvO0khkjTkIfd6JDxE9H+0W/PBfsMwx2R4ap3jjooP7YDze7GPlkk3G0
-AHMfOcuc1rMjuas1VaITz1VdKYCqhCRkQ7rH6NaoFT6e+w3I49vdmw7PpjS2KirE
-NGaw8DzVDPSEnuDWlDdCIuLOdexWa3QxSxYAMJb9F5mKK/eo1sPO7TR6ExrzPxTz
-0+uxJSBfYzcc+pdDvNRXPifjqdGX+qMW6dWysDIOOiv3Y733HrpErKMUbebhF7pE
-pNQqGjIXDe4rLjd7D0yXU41ueBAH5gmnvyR1nVRd7eeOYE/4XkCqhz/dgiPyIAk/
-WzqHNTTsjjuxvw==
-=ES86
------END PGP SIGNATURE-----
---=-=-=--
 
