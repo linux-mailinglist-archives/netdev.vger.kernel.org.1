@@ -1,178 +1,195 @@
-Return-Path: <netdev+bounces-172153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 777C8A505E0
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 18:03:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B191AA50616
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 18:13:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93CE318871F8
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 17:03:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4C177A8996
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 17:10:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C2119C542;
-	Wed,  5 Mar 2025 17:03:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 197B12517A5;
+	Wed,  5 Mar 2025 17:09:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="GQoWGHo/"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="P1p3UOO0"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com [209.85.128.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D11B8151992;
-	Wed,  5 Mar 2025 17:03:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893351AAE1E
+	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 17:09:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741194185; cv=none; b=nU1AGw5ojbk/2l8R4gjxlEoRBBjqrhrVlIKxymsVRUDOnMi6HQweTfhbtdLPuSaPZhiC4o1jUAp819eXzNkpkpmwxqIUfk5X9/gQqJgE4cY4pMq1ZG9h/xB3dG870HquhpdCefsNFbV2c2Mz02xKPpMLCNeCmj+H1vtfwRMhRZk=
+	t=1741194584; cv=none; b=NQgXb8Kgx5ozD7kk9Xi6SYOPDC+NSa8tlR4Ky6rCRVAnLFxt+Ufnc9s1cHNC6HOcM/NwkPwH2Q3DVacFbidIxv+nxgypk/UtkeM/f6vKjdXU/fBz2p+Sq9f2s525Is/0qUejLTrdmgKp5sUJ2PPx+cMFAiqtPjvvR7hbMk517/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741194185; c=relaxed/simple;
-	bh=OcJoKzORqXVnDNepmErBN3tw8ndKhUmT6pwHugKrtRw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mKXh5xD96t8enb+pmJq9GDvjnVI1kkyRLMELFxAdNT3doce6uuy9yI2XsKtdCg1e952YoPyheLVrsRW9vyTa3/qXC2vo2mJu0M1sgF/zgv+NWaR0tkF3epOTWYVSk00d18wXCnWb7Hs61i3ayvp1njRhseA/OcOmUdXfGUD0sVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=GQoWGHo/; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A0845443F3;
-	Wed,  5 Mar 2025 17:02:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1741194175;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TPyWHc+8KiHi21EkIlCnv3oAaCqNgg8vVnv8v5oHtoM=;
-	b=GQoWGHo/UcXuWM5+M2p+ufkz2NxvtTKkX7cXWb9rICvOTm1tE0DFBFqym0cuD3G6YbSQ16
-	iCwOa+FsBbPlIBYpNlJJzXTucmSoJxeBLxn97OiC/9rZfVoeBdhfkVVnQfTOby5xGMNLuS
-	Gc0tU0Hqrz4xXQa0Yxqkdy91z6FBY5s60ckVmysNr+UxZqCfEVBYPyY5tCxc40eTRGGsI2
-	puejnC5ToaRwTYbRqIwhvaVB0XQOD7aEhLMcxmixXcnur2OtwlgyyQ5bYynaYkmR7ow908
-	bYwafXGx20/WcvxkXmrXEekb0CPkjgcQq9BnfSow+NJLiR8gb1SnFbCLZTA4qw==
-Date: Wed, 5 Mar 2025 18:02:52 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, linux-arm-kernel@lists.infradead.org,
- Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina
- <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Vladimir Oltean
- <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
- <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Simon Horman <horms@kernel.org>, Romain Gantois
- <romain.gantois@bootlin.com>, Piergiorgio Beruto
- <piergiorgio.beruto@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>
-Subject: Re: [PATCH net-next 0/7] net: ethtool: Introduce ethnl dump helpers
-Message-ID: <20250305180252.5a0ceb86@fedora.home>
-In-Reply-To: <20250305141938.319282-1-maxime.chevallier@bootlin.com>
-References: <20250305141938.319282-1-maxime.chevallier@bootlin.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1741194584; c=relaxed/simple;
+	bh=irFcCVMJ+YoW6k8byXnRJIVW9wTUS4yGDTwhsoaB6Ak=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HC89aS4MyyK0qOx+5rO5csPyNPei8FowBaP85b97Z8D+6MeJdd0oIYw4yWZ7CN6C1/ugm3Z4a/Wa0nkBngnG6C1pe6gekERxbwBLUxowmI8+o9riUusVs5QgsbIPhHA9y0lLIdxZDqt5/ri3NE+t/q+K7pMcQNhUd1sTXGLAmGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=P1p3UOO0; arc=none smtp.client-ip=209.85.128.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f67.google.com with SMTP id 5b1f17b1804b1-4394a0c65fcso76723395e9.1
+        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 09:09:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1741194579; x=1741799379; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8Xwduz/qNPiyy4RhwG9d9PScJsmgmVdCqCQSC6jOGw4=;
+        b=P1p3UOO0b9YDJTFpWR4YE+ZSKZf6Xcn52yudVG+sPHwyBxBtardW009r9baCZcBeB4
+         4YrBwUNx2JnWKUZCwE8P5GXIHIEPQ0jNvCevdy2YOChbqBHkzpHt/1wzFn5RYouw4lg7
+         Ubnyj/AmJTt084JQMIhTcWp0jpVFjR0Xndt2RDe864mTy2ddPAAr0onst3U6rKkFxD45
+         H0M4bgWyKxC98MlJmxb9oAlG/J9F2VNQt4FJxc+tUtjyiDfKCDHtPn8v130bldZUxkdd
+         1L/Pie03mBgGdJDVfupW8ScDCv5mNHuWB5VmdaSSZ68xZEXatoTBkzENiNCy/KsCr8T5
+         oqQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741194579; x=1741799379;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8Xwduz/qNPiyy4RhwG9d9PScJsmgmVdCqCQSC6jOGw4=;
+        b=SqqETsjd44pZ8CAuHnspVxfP3qebCR8TE2m0UQAq/IvJJiR7iVNewTOsnkTxI791xu
+         dq+dUCPSXuct0lA4VyZy0fVHvv2r4NVYm7os/Ix+LHPoICqgtrMbatR4G9n8ZyWYfgXM
+         0tpIPVnnbLZz1Zv4mmAvyUYfiAUGakVTmwL1budltehKzGe4rFuxTeN8ByUQRjSWQB+n
+         mozY4C6zu9rJAkkmnUMnbHtZZal49JRCx0uaRMureAjSuquCtVomMz6WFGsBQ1Bl7kZs
+         DKfmOqnR6zKkl6nLKy/rjlEHuNC5eXQDnNmK+Mqhkl9KYvTQsARxQJMZWD4hDU63eZp6
+         BiDA==
+X-Forwarded-Encrypted: i=1; AJvYcCW02teZi1OchPtZsjy9hmhDJzNd3pGOcWb3LPRFmKm3ed7cr2/wwL+nEldtJgOyKSgbJLlEwBg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhWl/B1+Tyr6Uj0YHjbaLJb2Y5auUBRc+rS072X0qZwVsJAPxr
+	6Suln0gxI5EX+bnrNbc9PwjafqxwIbfdH+l60Zb7PUfDYhbFJXKcAzt5Y60QTbI=
+X-Gm-Gg: ASbGnctO5tYOiIA7rTFBNz4fXJU3Blo0O63v64kB0ogr2ZOiiEvjnEeNku+9eb8kFUU
+	kSc8QkmqsGA6xiZcp0mDvJ5oyIYSR289WCoPirPrT7fF5k2xEU6n4HOgg9hqiX3QtWAgbkKHrPG
+	/jsXWfsCZN7wgIykdIRPK95USg2JW6WJPwcA8V8plA/uylTDuv7Hruk9QSe0hZbXvebCk9QqcOy
+	+EvcpO/9EO1xyuIYldlW7e5yvlOgy7Zsgzi7f2skZOJHJtJNLpv9HkTzopFIPoBtNAi8/c1Y13W
+	CEdCVxed9Pn0Asj/CphRNY+xE2tHlEtv/n1pxC7kliz1lHI=
+X-Google-Smtp-Source: AGHT+IHtALOlZRY8OEkAfMy/8LP4eO3WEczzKfPhSQDmbP+zhNlJTZUTR0mJ/R+5FMnzK/l5vhD0mw==
+X-Received: by 2002:a05:600c:1d01:b0:43b:cf12:2ca6 with SMTP id 5b1f17b1804b1-43bd292e1cemr28484335e9.1.1741194578635;
+        Wed, 05 Mar 2025 09:09:38 -0800 (PST)
+Received: from blackdock.suse.cz ([193.86.92.181])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390e47b6ceesm21323862f8f.45.2025.03.05.09.09.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Mar 2025 09:09:38 -0800 (PST)
+From: =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>
+To: netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	cgroups@vger.kernel.org,
+	Jan Engelhardt <ej@inai.de>,
+	Florian Westphal <fw@strlen.de>,
+	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>
+Subject: [PATCH v2] netfilter: Make xt_cgroup independent from net_cls
+Date: Wed,  5 Mar 2025 18:09:35 +0100
+Message-ID: <20250305170935.80558-1-mkoutny@suse.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddutdehfeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepteefgeehvdeitdeihfeuvdejkeevkeekieefkedvjefhudfhheeiveeuveefhefhnecuffhomhgrihhnpehgihhthhhusgdrtghomhdpkhgvrhhnvghlrdhorhhgnecukfhppedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgdphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvddupdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtp
- hhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed,  5 Mar 2025 15:19:30 +0100
-Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
+The xt_group matching supports the default hierarchy since commit
+c38c4597e4bf3 ("netfilter: implement xt_cgroup cgroup2 path match").
+The cgroup v1 matching (based on clsid) and cgroup v2 matching (based on
+path) are rather independent. Downgrade the Kconfig dependency to
+mere CONFIG_SOCK_GROUP_DATA so that xt_group can be built even without
+CONFIG_NET_CLS_CGROUP for path matching.
+Also add a message for users when they attempt to specify any
+non-trivial clsid.
 
-> Hi everyone,
-> 
-> This series adds some scaffolding into ethnl to ease the support of
-> DUMP operations.
-> 
-> As of today when using ethnl's default ops, the DUMP requests will
-> simply perform a GET for each netdev.
-> 
-> That hits limitations for commands that may return multiple messages for
-> a single netdev, such as :
-> 
->  - RSS (listing contexts)
->  - All PHY-specific commands (PLCA, PSE-PD, phy)
->  - tsinfo (one item for the netdev +  one per phy)
-> 
->  Commands that need a non-default DUMP support have to re-implement
->  ->dumpit() themselves, which prevents using most of ethnl's internal  
->  circuitry.
-> 
-> This series therefore introduces a better support for dump operations in
-> ethnl.
-> 
-> The patches 1 and 2 introduce the support for filtered DUMPs, where an
-> ifindex/ifname can be passed in the request header for the DUMP
-> operation. This is for when we want to dump everything a netdev
-> supports, but without doing so for every single netdev. ethtool's
-> "--show-phys ethX" option for example performs a filtered dump.
-> 
-> Patch 3 introduces 3 new ethnl ops : 
->  ->dump_start() to initialize a dump context
->  ->dump_one_dev(), that can be implemented per-command to dump  
->  everything on a given netdev
->  ->dump_done() to release the context  
-> 
-> The default behaviour for dumps remains the same, calling the whole
-> ->doit() path for each netdev.  
-> 
-> Patch 4 introduces a set of ->dump_start(), ->dump_one_dev() and
-> ->dump_done() callback implementations that can simply be plugged into  
-> the existing commands that list objects per-phy, making the 
-> phy-targeting command behaviour more coherent.
-> 
-> Patch 5 uses that new set of helpers to rewrite the phy.c support, which
-> now uses the regulat ethnl_ops instead of fully custom genl ops. This
-> one is the hardest to review, sorry about that, I couldn't really manage
-> to incrementally rework that file :(
-> 
-> Patches 6 and 7 are where the new dump infra shines, adding per-netdev
-> per-phy dump support for PLCA and PSE-PD.
-> 
-> We could also consider converting tsinfo/tsconfig, rss and tunnels to
-> these new ->dump_***() operations as well, but that's out of this
-> series' scope.
-> 
-> I've tested that series with some netdevsim PHY patches that I plan to
-> submit (they can be found here [1]), with the refcount tracker
-> for net/netns enabled to make sure the lock usage is somewhat coherent.
-> 
-> Thanks,
-> 
-> Maxime
-> 
-> [1]: https://github.com/minimaxwell/linux/tree/mc/netdevsim-phy
-> 
+Link: https://lists.opensuse.org/archives/list/kernel@lists.opensuse.org/thread/S23NOILB7MUIRHSKPBOQKJHVSK26GP6X/
+Signed-off-by: Michal Koutný <mkoutny@suse.com>
+---
+ net/netfilter/Kconfig     |  2 +-
+ net/netfilter/xt_cgroup.c | 22 ++++++++++++++++++++++
+ 2 files changed, 23 insertions(+), 1 deletion(-)
 
-This series will very likely conflict with Stanislav's netdev lock
-work [2], I'll of course be happy to rebase should it get merged :)
+Changes from v1 (https://lore.kernel.org/r/20250228165216.339407-1-mkoutny@suse.com)
+- terser guard (Jan)
+- verboser message (Florian)
+- better select !CGROUP_BPF (kernel test robot)
 
-Thanks,
+diff --git a/net/netfilter/Kconfig b/net/netfilter/Kconfig
+index df2dc21304efb..346ac2152fa18 100644
+--- a/net/netfilter/Kconfig
++++ b/net/netfilter/Kconfig
+@@ -1180,7 +1180,7 @@ config NETFILTER_XT_MATCH_CGROUP
+ 	tristate '"control group" match support'
+ 	depends on NETFILTER_ADVANCED
+ 	depends on CGROUPS
+-	select CGROUP_NET_CLASSID
++	select SOCK_CGROUP_DATA
+ 	help
+ 	Socket/process control group matching allows you to match locally
+ 	generated packets based on which net_cls control group processes
+diff --git a/net/netfilter/xt_cgroup.c b/net/netfilter/xt_cgroup.c
+index c0f5e9a4f3c65..c3055e74aa0ea 100644
+--- a/net/netfilter/xt_cgroup.c
++++ b/net/netfilter/xt_cgroup.c
+@@ -23,6 +23,13 @@ MODULE_DESCRIPTION("Xtables: process control group matching");
+ MODULE_ALIAS("ipt_cgroup");
+ MODULE_ALIAS("ip6t_cgroup");
+ 
++#define NET_CLS_CLASSID_INVALID_MSG "xt_cgroup: classid invalid without net_cls cgroups\n"
++
++static bool possible_classid(u32 classid)
++{
++	return IS_ENABLED(CONFIG_CGROUP_NET_CLASSID) || classid == 0;
++}
++
+ static int cgroup_mt_check_v0(const struct xt_mtchk_param *par)
+ {
+ 	struct xt_cgroup_info_v0 *info = par->matchinfo;
+@@ -30,6 +37,11 @@ static int cgroup_mt_check_v0(const struct xt_mtchk_param *par)
+ 	if (info->invert & ~1)
+ 		return -EINVAL;
+ 
++	if (!possible_classid(info->id)) {
++		pr_info(NET_CLS_CLASSID_INVALID_MSG);
++		return -EINVAL;
++	}
++
+ 	return 0;
+ }
+ 
+@@ -51,6 +63,11 @@ static int cgroup_mt_check_v1(const struct xt_mtchk_param *par)
+ 		return -EINVAL;
+ 	}
+ 
++	if (!possible_classid(info->classid)) {
++		pr_info(NET_CLS_CLASSID_INVALID_MSG);
++		return -EINVAL;
++	}
++
+ 	info->priv = NULL;
+ 	if (info->has_path) {
+ 		cgrp = cgroup_get_from_path(info->path);
+@@ -83,6 +100,11 @@ static int cgroup_mt_check_v2(const struct xt_mtchk_param *par)
+ 		return -EINVAL;
+ 	}
+ 
++	if (info->has_classid && !possible_classid(info->classid)) {
++		pr_info(NET_CLS_CLASSID_INVALID_MSG);
++		return -EINVAL;
++	}
++
+ 	info->priv = NULL;
+ 	if (info->has_path) {
+ 		cgrp = cgroup_get_from_path(info->path);
 
-Maxime
-
-[2]: https://lore.kernel.org/netdev/20250305163732.2766420-1-sdf@fomichev.me/T/#t
-
-> 
-> Maxime Chevallier (7):
->   net: ethtool: netlink: Allow per-netdevice DUMP operations
->   net: ethtool: netlink: Rename ethnl_default_dump_one
->   net: ethtool: netlink: Introduce command-specific dump_one_dev
->   net: ethtool: netlink: Introduce per-phy DUMP helpers
->   net: ethtool: phy: Convert the PHY_GET command to generic phy dump
->   net: ethtool: plca: Use per-PHY DUMP operations
->   net: ethtool: pse-pd: Use per-PHY DUMP operations
-> 
->  net/ethtool/netlink.c | 161 ++++++++++++++------
->  net/ethtool/netlink.h |  46 +++++-
->  net/ethtool/phy.c     | 335 ++++++++++++------------------------------
->  net/ethtool/plca.c    |  12 ++
->  net/ethtool/pse-pd.c  |   6 +
->  5 files changed, 277 insertions(+), 283 deletions(-)
-> 
+base-commit: dd83757f6e686a2188997cb58b5975f744bb7786
+-- 
+2.48.1
 
 
