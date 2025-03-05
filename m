@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-171894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5620A4F373
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 02:21:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F29B6A4F370
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 02:21:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A240188D715
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 01:21:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 988197A6529
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 01:20:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 798161624FE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9B7C170A13;
 	Wed,  5 Mar 2025 01:20:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iufN0Lw6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="as/Shjhq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D5D61419A9;
-	Wed,  5 Mar 2025 01:20:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD299166F32;
+	Wed,  5 Mar 2025 01:20:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741137612; cv=none; b=msIqpbtyT0NVZ2XIhQi0TFjRrCM2NAkPkB5GUT7b7xT722OQ4wkC70rnw2S53hpc43tsqPO3Z7e0/ZKjbuoMJS3Uir8FzcAXFVIv92o1ktXqvF5BCmAnaaqCD9JfcLmsOlmnHf5Hp4UbqD21DjPXVzHHGEIpwVHfQC7xxyaiZao=
+	t=1741137612; cv=none; b=midnnEjnPYnBVtvTHR+b8BnZfbDW191Ca2p3/4TBx1mgTMxNN9SiXzj4/DzHATK917yRpF2O+YbhDk6WkIUa6ekcSaQ6btplqfojf/ikT3oxWe+t2I1OuVuCP/Rbhzl3Dkqtc2skkyz6Hp7jbOYclqzjvvMSGp3tdbeE8XzNhaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1741137612; c=relaxed/simple;
-	bh=MSS/JdgW92nxdpIvMZcx07EC8dF0EuO/iKJG8Zc6ngA=;
+	bh=d42/iWgyP1vCc+gV3LAXpR4hIEbpvz0bwcJDNo+qYIc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WfDKhpGr8mG4u67NK2xHmQOglXNz8Uq3nJFIPrB1AKmifaVeyQd/bWiWkq/KXrEfH53iCgCRaffgszx4dUcWbeceD50NxJBEdwcB/y8iu1Q8BzD+Qciv9M+t4N9IlEhxJwr0JL01rVZ4AOvZjwQESpHpO09oTZ12z+H/2k/s6s8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iufN0Lw6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2AB2C4CEE5;
-	Wed,  5 Mar 2025 01:20:10 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=gddWhI+UXBS9MqhOL9pajrwcUqfsLPXmEDQht6DcWcxrAgx4hBP1ZZXk7sFtzbl9NkBBG2vsyfEXiq0KqeUFjJZ6LEAB5MSVuFI+4cUkbQ/qyN+bcR9lCVYR4qA5xl4MB1myURxXIR22udIwn4Q6CByRn5AD+zoB3h6LzKr7suQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=as/Shjhq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37CCFC4CEE7;
+	Wed,  5 Mar 2025 01:20:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741137610;
-	bh=MSS/JdgW92nxdpIvMZcx07EC8dF0EuO/iKJG8Zc6ngA=;
+	s=k20201202; t=1741137612;
+	bh=d42/iWgyP1vCc+gV3LAXpR4hIEbpvz0bwcJDNo+qYIc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=iufN0Lw6kEiZz7LNwlF48sD/y8MXg4QoxzugimDaFaMdcswdunyiin9dNLG/KKU6P
-	 SoMXr9mBpH+qvdFwnbJ3Z45sbhTT+jWZb9wACwZxDS7634FEYrP6zHxQo9tfopess1
-	 CuirDuTRsE6AYRDbS5vxs2P0DgCkeCTBCMkIvw61NI9+emzS/066dN0aD3PuCMYLQj
-	 uZIRD7SrH4V6ccb/wW5dm/z34s5t09UtscKuPa1vyG45T74N8cbnvZ4/+M/1GfMqRP
-	 F3Ro6jYgnByVQlkk4HaHLaYEYkCfKcSrXxjXr5y2HuIfdklbRVj7mmVXx06DlG43F7
-	 zSeXM1iMd/D8g==
+	b=as/Shjhq1e2yBvUpF6PVJaLKyaXiJcJdmwl3uhF1WUqaw6DQt9e8Rv6iz1P0Q+vxS
+	 V6bWIJvAKVzGukgupk5/Oe9PYXrvItzabOJliYg3p5XgJXD6VdHUyikkY+aU526kFg
+	 pAVM9Gp4H0DCYitcp+No5tzh/UFI4SOiBsv0QIvR22nvgHorLbXkidqRPjylVALnod
+	 6q6q1SM1iX2cQkWfIOxNVhcyYve6y/7uH87NwTFQUV6MJDW0oxmS8WJTk2gOPhuQb5
+	 7jbzPCy8RIaXCxiGqzSrRE65IoafetJgNBme6mggyb06GBexkYEnFOAcBMvuomdONY
+	 W5drORNYscs6Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF7E380CFEB;
-	Wed,  5 Mar 2025 01:20:44 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D99380CFEB;
+	Wed,  5 Mar 2025 01:20:46 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] ppp: use IFF_NO_QUEUE in virtual interfaces
+Subject: Re: [PATCH v4 net-next] dpll: Add an assertion to check
+ freq_supported_num
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174113764348.356990.15690869237633709247.git-patchwork-notify@kernel.org>
-Date: Wed, 05 Mar 2025 01:20:43 +0000
-References: <20250301135517.695809-1-dqfext@gmail.com>
-In-Reply-To: <20250301135517.695809-1-dqfext@gmail.com>
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: toke@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- mostrows@earthlink.net, jchapman@katalix.com, horms@kernel.org,
- linux-ppp@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ <174113764499.356990.5931495827775849774.git-patchwork-notify@kernel.org>
+Date: Wed, 05 Mar 2025 01:20:44 +0000
+References: <20250228150210.34404-1-jiashengjiangcool@gmail.com>
+In-Reply-To: <20250228150210.34404-1-jiashengjiangcool@gmail.com>
+To: Jiasheng Jiang <jiashengjiangcool@gmail.com>
+Cc: przemyslaw.kitszel@intel.com, arkadiusz.kubalewski@intel.com,
+ davem@davemloft.net, jan.glaza@intel.com, jiri@resnulli.us,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, stable@vger.kernel.org,
+ vadim.fedorenko@linux.dev
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat,  1 Mar 2025 21:55:16 +0800 you wrote:
-> For PPPoE, PPTP, and PPPoL2TP, the start_xmit() function directly
-> forwards packets to the underlying network stack and never returns
-> anything other than 1. So these interfaces do not require a qdisc,
-> and the IFF_NO_QUEUE flag should be set.
+On Fri, 28 Feb 2025 15:02:10 +0000 you wrote:
+> Since the driver is broken in the case that src->freq_supported is not
+> NULL but src->freq_supported_num is 0, add an assertion for it.
 > 
-> Introduces a direct_xmit flag in struct ppp_channel to indicate when
-> IFF_NO_QUEUE should be applied. The flag is set in ppp_connect_channel()
-> for relevant protocols.
+> Signed-off-by: Jiasheng Jiang <jiashengjiangcool@gmail.com>
+> ---
+> Changelog:
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] ppp: use IFF_NO_QUEUE in virtual interfaces
-    https://git.kernel.org/netdev/net-next/c/95d0d094ba26
+  - [v4,net-next] dpll: Add an assertion to check freq_supported_num
+    https://git.kernel.org/netdev/net-next/c/39e912a959c1
 
 You are awesome, thank you!
 -- 
