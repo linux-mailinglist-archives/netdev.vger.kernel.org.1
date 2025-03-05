@@ -1,125 +1,124 @@
-Return-Path: <netdev+bounces-172192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D6E7A50C5F
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 21:19:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3D25A50C65
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 21:21:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8186E170479
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 20:19:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 61A447A647D
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 20:20:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4806225486B;
-	Wed,  5 Mar 2025 20:19:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2FF725486B;
+	Wed,  5 Mar 2025 20:21:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iRip9jbF"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="2ibt5x9I";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="y1haZ0ox"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA3C4253B5D;
-	Wed,  5 Mar 2025 20:19:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5AFE2459FC;
+	Wed,  5 Mar 2025 20:21:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741205971; cv=none; b=szqyFhTSAFu0P0PIkVHEaf9kJts6AydNZFpTklaYbtJHj4F652c5kZJW40rgEgIJmekYWOZ2IDnOTOxnrvanZExvouIABlNnk3iQt8CgJvVhEB+j/KKol53x3MysvIqYM0NxHa+sJmnMTitH4uKwOmAXdRUWkonOowBiIUewyAE=
+	t=1741206068; cv=none; b=N2qPH3D8x5sYV0+ZmroD26jrK7cHUQvDBPFQBv+QVqu9oE+nRQ/yhVGzmu/Nv5Wi8huN/2qGJFAOow5pO5xVuk2kPPBYCL4xEoKbxz3saoEhaj+B8BbqqMyWB0wGG3OzCcXJE2l/9DL+Gc3KAMkKFHU/LXK01vArXbg1jFVsiig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741205971; c=relaxed/simple;
-	bh=DFv/aofqC6RxYldakRl4YDuw3IKqapk4Psuo0zdjGi4=;
+	s=arc-20240116; t=1741206068; c=relaxed/simple;
+	bh=5QhY5f3kf2O/mUI5KeGQzo1tJMrcLmCDJcEng4FRJnI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LTa7FzRr/q3tXLf3v618YiZYVay1g5d1hFZHt6YCs+xXrd1gWAFJxd3KWZyOlKivn4sV6xC5hM43Gb7jY32r4Po3D2rnC/oYkf0dctz1cxuKXRVhQ/yjXfnUrACfDHq/cZUgl16DfmSIya8IMgyCLvX/dpa7Oyh+snpamoPuRqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iRip9jbF; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2235189adaeso23947645ad.0;
-        Wed, 05 Mar 2025 12:19:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741205969; x=1741810769; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ggSYKjNiS8Boto5d0Yt8S4og/EP9GTSZBqieM3le2yU=;
-        b=iRip9jbFBu3WsZpH76L1cMDu76nD6Sd9zbHTgh2qOBlaiz0bw0cIUESYk543utZaUq
-         26+IwHbLkmt0s8hoBkXC31JOkOFnPUYTTDM/KfgdY3pJsBxz7DPzo3JlpquFVz5+mD6G
-         WNAhvbyVB7MAIuugyKSBUk6VxVec69eVBqrfAIS3aIUlhPR00LlFx2zw8cH8311W2OkK
-         WnrMqXJH6nTOzsN3TslQQUHe2EF476teOpKPQZDa8wV9+9t5bdo7YU8dAvJQf5Oe46Ut
-         w5MU9EIijLkJJThv15+Ta56Z0ZPy5PQItAcMKtoue07rg/soL/zDPYDrUREHcABxNEPP
-         dpjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741205969; x=1741810769;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ggSYKjNiS8Boto5d0Yt8S4og/EP9GTSZBqieM3le2yU=;
-        b=ZttuigAv1hvVbMfDuVU8geyWyZWmIVHR0vO6q+q2Z7a3d8QDA4DpJXuCxYAGl+Ont+
-         f60/vidCrjRGOx7VcefWTUSGoBHN7kFwSsWUd6U+ZDvYt9HkcD+DaNaqyHJKB4dRZZyE
-         is9yP9Yf6/dSsXoN3WV6o1krFqnmjK8FEj7vBuZj08ls9dJl0uwDoaUeajjD2SvRcovf
-         trIweyh5lOmZYA0uvqw8WudVTjvPkeYW8q/cTVDAbpCEK3PmU3KEpDBmCCRiOGvyYM4W
-         WumiZ9YYtzJmJVM3PN1zjTadR+qhL7nCmKTfNKZQDtGcYlAwP1dawhGBE1Bm+D/cATqr
-         nefA==
-X-Forwarded-Encrypted: i=1; AJvYcCW0SMJlVRPR/hwwY6QPufe2uwWAcgUdjukzZxaNE1UDkmnp0FuuE/93+1ZkT8Reo/wK/YMMRuaU@vger.kernel.org, AJvYcCWlHaFW6FuhPHGw8zigZvB09zAEQq7ed6g2O8D/8HyaMtwdDuXIP9oCxwiMcZoKLsXCn3A=@vger.kernel.org, AJvYcCXCq7ZxaJYY9nu10QoMdCgYxYv2bLdGj9LSsceyI8HEhwp4iF4769eHNEqUo+sdjimbFxhG6KvdzDOfQwDI@vger.kernel.org, AJvYcCXtYpA7j6X8xTenf9oZHXwYl/pjk/9WYJV68itN5Ey7GkEralGOWdK8beLX85sGt3FjJ3qYAryHcVKwiK8y@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHVl1KBdQC6RQiF37FpU4RRn+qC5scrnV+UeV9Pov6uyZtPrG/
-	d0yhV0dHFPK2u6Ag8DnIEk7GUi6/cAlY7JE3ZPx9JFpt/BEoEDpQ
-X-Gm-Gg: ASbGnctTDfOwrPJ2kd0HMh0PazKm/E3gTkmt51SHLmLI5G3G2qS2TcM/tLdJJsrQhnw
-	y7/qiIO+047C3zKspgF8dtL+SNwcY4eC40xzXs8Q5HyqwMKCbknFrXuGcrtMGBlLmohrwT80pG4
-	GwEJ39DVLL34tCSPAUf08f3otEC+QRkizeiwxhYSseJcH9H0AMM5Vziw4AMKdLNSBs5nOXHobMV
-	XSYzlvSLK6lU/bq5J/CdL27bh+rztTxRxfdomiAWPH+jikiWuGYVG4iFxwN/uo3NNOwoaT7y33l
-	DYC2Bkqd/wAqCgt6SMmRk/OfvAUt1vFWyv6l1OE3DB57oL7F8AwsJvvt5rV0N0m/fDY=
-X-Google-Smtp-Source: AGHT+IHr2tihJ0au2ICgSWnpCRu00yBghmKv/sVI+EDCEbOk0rg+rxUiD5JA8UUFm0k+OdDJoEO2eA==
-X-Received: by 2002:a17:903:1aab:b0:223:fb95:b019 with SMTP id d9443c01a7336-224094a3c17mr11459415ad.24.1741205968892;
-        Wed, 05 Mar 2025 12:19:28 -0800 (PST)
-Received: from devvm6277.cco0.facebook.com ([2a03:2880:2ff:71::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7363fa7f540sm8189030b3a.38.2025.03.05.12.19.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Mar 2025 12:19:27 -0800 (PST)
-Date: Wed, 5 Mar 2025 12:19:26 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	davem@davemloft.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Jorgen Hansen <jhansen@vmware.com>,
-	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	virtualization@lists.linux-foundation.org,
-	linux-hyperv@vger.kernel.org, Dexuan Cui <decui@microsoft.com>
-Subject: Re: [PATCH net-next 1/3] vsock: add network namespace support
-Message-ID: <Z8ixzohy9a0b9QZ2@devvm6277.cco0.facebook.com>
-References: <20200116172428.311437-1-sgarzare@redhat.com>
- <20200116172428.311437-2-sgarzare@redhat.com>
- <20250305022900-mutt-send-email-mst@kernel.org>
- <CAGxU2F5C1kTN+z2XLwATvs9pGq0HAvXhKp6NUULos7O3uarjCA@mail.gmail.com>
- <Z8hzu3+VQKKjlkRN@devvm6277.cco0.facebook.com>
- <CAGxU2F5EBpC1z7QY1VoPewxgEy3zU7P1nZH48PtOV1BtgN=Eyg@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=DXEgyGRxnWISIw/kB3aQtDvN8zn7Utv6npx070Neu8uCTGIes7wM+dnRQkY8H4kNcMSzosF9APNGWGfrs2D3wO4CAoGNlDEmoqngI3vG7YilMniqBXxzEA5JFIo8GO7id8US0oxoz1xjEQNcPSY2r/nXADjg0f8PvY+HS6maxEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=2ibt5x9I; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=y1haZ0ox; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Wed, 5 Mar 2025 21:20:55 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1741206057;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cUNfCA8pHf+83tsUMHJzb2XKVvK6o+uPQfq7/hnMo4A=;
+	b=2ibt5x9IH67QyZtBFRdvYg6tPvzMHBzxKK8sCLbUqlEV2p1dT5OE4f76qjCLScvce5GytI
+	ZPQG3KT3rrJvuBp3kxHS34ip02UOsw+fB2V9cgd5QeaLSQg6R6OZcIkaJh1InZ+Cl7Yt4s
+	4UqzJXZ0nvISNa4LC7ZnytfwEYNzf8jr0uXVyvXy1EDsTGI4l4BKUR8LFup/VF/gnHcPpd
+	lh2lG1kVl2f1vDAgSlPY2Il7UldWMj2u+vyU9iB3koemu65NAW4DEzHD2LpOhgled5Wltp
+	M5u6qihR54pWFBb64QJsqYqxlvqnIh/cXWewsnJpkdyj+3jUwPZlk+mSBYS3Mg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1741206057;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cUNfCA8pHf+83tsUMHJzb2XKVvK6o+uPQfq7/hnMo4A=;
+	b=y1haZ0oxtYCDB88gRYk0otrAmy6FfzsHrC8MXDoH3GpDC9mFD8mb+r0QoybLFlLj6qS1HJ
+	OcFQ0mY7tHnJEWDA==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Joe Damato <jdamato@fastly.com>,
+	Leon Romanovsky <leon@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH net-next] net/mlnx5: Use generic code for page_pool
+ statistics.
+Message-ID: <20250305202055.MHFrfQRO@linutronix.de>
+References: <20250305121420.kFO617zQ@linutronix.de>
+ <8168a8ee-ad2f-46c5-b48e-488a23243b3d@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAGxU2F5EBpC1z7QY1VoPewxgEy3zU7P1nZH48PtOV1BtgN=Eyg@mail.gmail.com>
+In-Reply-To: <8168a8ee-ad2f-46c5-b48e-488a23243b3d@gmail.com>
 
-On Wed, Mar 05, 2025 at 05:07:13PM +0100, Stefano Garzarella wrote:
-> On Wed, 5 Mar 2025 at 16:55, Bobby Eshleman <bobbyeshleman@gmail.com> wrote:
-> >
-> > Do you know of any use cases for guest-side vsock netns?
+On 2025-03-05 21:44:23 [+0200], Tariq Toukan wrote:
+> Hi,
+
+Hi,
+
+> Thanks for your patch.
 > 
-> Yep, as I mentioned in another mail this morning, the use case is
-> nested VMs or containers running in the L1 guests.
-> Users (e.g. Kata) would like to hide the L0<->L1 vsock channel in the
-> container, so anything running there can't talk with the L0 host.
+> IIUC you remove here the per-ring page_pool stats, and keep only the summed
+> stats.
 > 
-> BTW we can do that incrementally if it's too complicated.
+> I guess the reason for this is that the page_pool strings have no per-ring
+> variants.
 > 
+>   59 static const char pp_stats[][ETH_GSTRING_LEN] = {
+>   60         "rx_pp_alloc_fast",
+>   61         "rx_pp_alloc_slow",
+>   62         "rx_pp_alloc_slow_ho",
+>   63         "rx_pp_alloc_empty",
+>   64         "rx_pp_alloc_refill",
+>   65         "rx_pp_alloc_waive",
+>   66         "rx_pp_recycle_cached",
+>   67         "rx_pp_recycle_cache_full",
+>   68         "rx_pp_recycle_ring",
+>   69         "rx_pp_recycle_ring_full",
+>   70         "rx_pp_recycle_released_ref",
+>   71 };
+> 
+> Is this the only reason?
 
-Got it! I will try your solution with /dev/vsock-netns (unless there are
-strong feelings otherwise), and if it becomes hairy maybe I'll omit it
-in the next rev.
+Yes. I haven't seen any reason to keep it. It is only copied around.
 
-I don't think my earlier concern about port collissions in the G2H
-scenario is worth worrying about without a real use case, that doesn't
-sound expected by any users right now.
+> I like the direction of this patch, but we won't give up the per-ring
+> counters. Please keep them.
 
-Thanks,
-Bobby
+Hmm. Okay. I guess I could stuff a struct there. But it really looks
+like waste since it is not used.
+
+> I can think of a new "customized page_pool counters strings" API, where the
+> strings prefix is provided by the driver, and used to generate the per-pool
+> strings.
+
+Okay. So I make room for it and you wire it up ;)
+
+Sebastian
 
