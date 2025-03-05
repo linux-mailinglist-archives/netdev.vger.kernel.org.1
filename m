@@ -1,124 +1,145 @@
-Return-Path: <netdev+bounces-172018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40D9CA4FECB
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 13:39:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 092E6A4FEFF
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 13:50:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEFA13A82F8
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 12:38:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B7C91885EAE
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 12:50:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7C0B245024;
-	Wed,  5 Mar 2025 12:37:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0F3D2441A0;
+	Wed,  5 Mar 2025 12:50:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="FR+UF7HQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 406C6248892
-	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 12:37:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D32813633F
+	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 12:50:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741178278; cv=none; b=pM+HrWWjIy5H+3CkeMJJG4KLzYcbk79UHMLc/3xH+1ysF3X0G1TkHLPNVoF1s25AH8BE/uH7EvKsPtJKj+c+3AJXdZpbtHn0jBkhKHiOmcHR813XvtlGNYbe5QD9yAYdIV9yebKpi+nFm/oY5rhlKaJFq9h1VOyQfyBU1klZ4fQ=
+	t=1741179021; cv=none; b=QtHjB/LLNVXAkWxSUqqAAj8MYeP90ub0L+NgII2SkytP7LEEtNvlWC31PkuBeMegnknxjRhI7MNF79gbrLamVFGzqoiFNNIDPkqpxAmYKTJlAK6f3LWSpxjQ81pvDGd04QTgghLs/x0MJVd4bM8Gu9E22S28Pj33BMVfQwnocBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741178278; c=relaxed/simple;
-	bh=atbo+Sw+ywEjXYbDqhJ7fHwRDqekYLT15511ErIShro=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V+QRNEaL4wLyulTOv9NAC5hnGUuWLFwKDy6jyTVirpnTLNW7wXP14hIJKnnpjqREmNAI0OVdiOg+9ooNm9zjd2B3BbXHEam1bzx+cJPG7/zjXMRuq9D07GuJ1NrHxIvc2f2zD0BzVzYIXyCvNwHouDtcoIiujUxs3ga/BreSH8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tpo0P-0003XA-U0; Wed, 05 Mar 2025 13:37:45 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tpo0O-00495a-0K;
-	Wed, 05 Mar 2025 13:37:44 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tpo0N-00ERN3-37;
-	Wed, 05 Mar 2025 13:37:43 +0100
-Date: Wed, 5 Mar 2025 13:37:43 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, devicetree@vger.kernel.org,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Conor Dooley <conor+dt@kernel.org>, kernel@pengutronix.de,
-	netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Subject: Re: [PATCH v4 1/4] dt-bindings: sound: convert ICS-43432 binding to
- YAML
-Message-ID: <Z8hFlwK27AM4d17b@pengutronix.de>
-References: <20250305102103.1194277-1-o.rempel@pengutronix.de>
- <20250305102103.1194277-2-o.rempel@pengutronix.de>
- <174117806721.1245382.8322491579922154490.robh@kernel.org>
+	s=arc-20240116; t=1741179021; c=relaxed/simple;
+	bh=zNwyls7hnRzCGrgw8LUSVsIQC0m9mT8/7moNhs4Kq3s=;
+	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=CTf6Vvx6S+1XGHHhEWDJGVVvSGvwotLfdqhEhoUNNiMakqQBDcxyN4c71ffs3e5lSjchdepAll2FQKnJe8JS+jnaBuTXfoHiwzMc8w8RafJVeaJKk0DyfcbV11eaufVqHi45jir3/MxCiTF7lBUE9f3uPg/wlah+0yNp8iMq8QY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=FR+UF7HQ; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1741179017; x=1772715017;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version:subject;
+  bh=SsHT4lPrSn/PiKBlUYw2BqwKfos2DXy3sIj+3B4Qg4I=;
+  b=FR+UF7HQ2a6DpNh3vePsRugrw+LJLFxqIzv0uOMMfYTKdRdiO3WVDLch
+   B9ImKTlWjHphxHq9PWSi5Orsn++vj5Fp7KUe0fW1bWDXIqKOrN+qY7XbE
+   GHtiNyDYUmU8sUR00Dh0ZWvXCH7pWe8A3G6OXIdOA/R2pFUlbX8lFNZKp
+   s=;
+X-IronPort-AV: E=Sophos;i="6.14,223,1736812800"; 
+   d="scan'208";a="472257039"
+Subject: RE: [PATCH v8 net-next 5/5] net: ena: Add PHC documentation
+Thread-Topic: [PATCH v8 net-next 5/5] net: ena: Add PHC documentation
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 12:50:13 +0000
+Received: from EX19MTAEUA002.ant.amazon.com [10.0.43.254:28590]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.0.98:2525] with esmtp (Farcaster)
+ id 3e1c7510-2127-4301-84bf-4e50ba8ca3e6; Wed, 5 Mar 2025 12:50:12 +0000 (UTC)
+X-Farcaster-Flow-ID: 3e1c7510-2127-4301-84bf-4e50ba8ca3e6
+Received: from EX19D004EUA001.ant.amazon.com (10.252.50.27) by
+ EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 5 Mar 2025 12:50:12 +0000
+Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
+ EX19D004EUA001.ant.amazon.com (10.252.50.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 5 Mar 2025 12:50:11 +0000
+Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
+ EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
+ 15.02.1544.014; Wed, 5 Mar 2025 12:50:11 +0000
+From: "Arinzon, David" <darinzon@amazon.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Eric Dumazet
+	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Richard Cochran <richardcochran@gmail.com>, "Woodhouse,
+ David" <dwmw@amazon.co.uk>, "Machulsky, Zorik" <zorik@amazon.com>,
+	"Matushevsky, Alexander" <matua@amazon.com>, "Bshara, Saeed"
+	<saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>, "Liguori, Anthony"
+	<aliguori@amazon.com>, "Bshara, Nafea" <nafea@amazon.com>, "Schmeilin,
+ Evgeny" <evgenys@amazon.com>, "Belgazal, Netanel" <netanel@amazon.com>,
+	"Saidi, Ali" <alisaidi@amazon.com>, "Herrenschmidt, Benjamin"
+	<benh@amazon.com>, "Kiyanovski, Arthur" <akiyano@amazon.com>, "Dagan, Noam"
+	<ndagan@amazon.com>, "Bernstein, Amit" <amitbern@amazon.com>, "Allen, Neil"
+	<shayagr@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik,
+ Ofir" <ofirt@amazon.com>, "Machnikowski, Maciek" <maciek@machnikowski.net>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Thread-Index: AQHbjThyr28YLVH3LkCG4RZT31KA07NjeSoAgAEGKrA=
+Date: Wed, 5 Mar 2025 12:50:11 +0000
+Message-ID: <a4be818e2a984c899d978130d6707f1f@amazon.com>
+References: <20250304190504.3743-1-darinzon@amazon.com>
+ <20250304190504.3743-6-darinzon@amazon.com>
+ <aecb8d12-805b-4592-94f3-4dbfcdcd5cff@lunn.ch>
+In-Reply-To: <aecb8d12-805b-4592-94f3-4dbfcdcd5cff@lunn.ch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <174117806721.1245382.8322491579922154490.robh@kernel.org>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Wed, Mar 05, 2025 at 06:34:27AM -0600, Rob Herring (Arm) wrote:
-> 
-> On Wed, 05 Mar 2025 11:21:00 +0100, Oleksij Rempel wrote:
-> > Convert the ICS-43432 MEMS microphone device tree binding from text format
-> > to YAML.
-> > 
-> > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> > Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
-> > ---
-> > changes v4:
-> > - add Reviewed-by: Rob...
-> > changes v3:
-> > - add maintainer
-> > - remove '|' after 'description:'
-> > changes v2:
-> > - use "enum" instead "oneOf + const"
-> > ---
-> >  .../devicetree/bindings/sound/ics43432.txt    | 19 -------
-> >  .../bindings/sound/invensense,ics43432.yaml   | 51 +++++++++++++++++++
-> >  2 files changed, 51 insertions(+), 19 deletions(-)
-> >  delete mode 100644 Documentation/devicetree/bindings/sound/ics43432.txt
-> >  create mode 100644 Documentation/devicetree/bindings/sound/invensense,ics43432.yaml
-> > 
-> 
-> My bot found errors running 'make dt_binding_check' on your patch:
-> 
-> yamllint warnings/errors:
-> 
-> dtschema/dtc warnings/errors:
-> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/sound/invensense,ics43432.yaml: maintainers:0: 'N/A' does not match '@'
-> 	from schema $id: http://devicetree.org/meta-schemas/base.yaml#
-> 
+> > +The feature is turned off by default, in order to turn the feature
+> > +on, please use the following:
+> > +
+> > +- sysfs (during runtime):
+> > +
+> > +.. code-block:: shell
+> > +
+> > +  echo 1 > /sys/bus/pci/devices/<domain:bus:slot.function>/phc_enable
+> > +
+> > +All available PTP clock sources can be tracked here:
+> > +
+> > +.. code-block:: shell
+> > +
+> > +  ls /sys/class/ptp
+> > +
+> > +PHC support and capabilities can be verified using ethtool:
+> > +
+> > +.. code-block:: shell
+> > +
+> > +  ethtool -T <interface>
+> > +
+> > +**PHC timestamp**
+> > +
+> > +To retrieve PHC timestamp, use `ptp-userspace-api`_, usage example
+> using `testptp`_:
+> > +
+> > +.. code-block:: shell
+> > +
+> > +  testptp -d /dev/ptp$(ethtool -T <interface> | awk '/PTP Hardware
+> > + Clock:/ {print $NF}') -k 1
+>=20
+> Why is not opening /dev/ptpX sufficient to enable the PHC?
+>=20
+>     Andrew
 
-Sorry, i picked the old version...
+Hi Andrew,
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+The reasoning for the enablement option of PHC was explained in patch 3 in =
+the series
+https://lore.kernel.org/netdev/20250304190504.3743-4-darinzon@amazon.com/
+
+David
 
