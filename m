@@ -1,79 +1,53 @@
-Return-Path: <netdev+bounces-172187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57690A50B2A
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 20:12:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85FA5A50C06
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 20:56:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8F8B1885FDF
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 19:12:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AAF57A69D7
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 19:55:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DFE21D8E01;
-	Wed,  5 Mar 2025 19:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94CB22566D5;
+	Wed,  5 Mar 2025 19:56:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A6skyESF"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="RI+/h5ml"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx11lb.world4you.com (mx11lb.world4you.com [81.19.149.121])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F5F16426;
-	Wed,  5 Mar 2025 19:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A85BC2566D0;
+	Wed,  5 Mar 2025 19:56:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.121
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741201949; cv=none; b=Jvr8NOuhCUwzEWZupTacP9Fvui3QEa81HAY+Ie3GYMF/NxKKdEiGl8c7m/p9nWvB22rxrYcppWIrP7Z9KKz+OcKgc1FiCj5z5HuKdGWKMpLaDITq3Ej5PUFMq+hbypMZI9FnSH+5fPmvOpV7h2+glMUSapI0IdueOO2ub03ZXAg=
+	t=1741204573; cv=none; b=qoc2sLc3KZi4LQ+XiVOvd497Y9pWr0x+N99EEI5xwMFYIDR1631vosDhq2Xt6Env+8oWPPzIpxutlous/3/B/B+4bU8vKwPsyTCc785tNzZo7FeuzrCrhMzpzJKb1ZdPCNVoOR8P/MoCmggFctQOFfLXtqaIWNkcXsv9rTQdwzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741201949; c=relaxed/simple;
-	bh=OQIS71VY7d37k6PpXEg25jjEYN9BsKp+QOVUVeBB7os=;
+	s=arc-20240116; t=1741204573; c=relaxed/simple;
+	bh=WYEC+ArfSwlKN3FeDLKk0TQMOhpIceugzbJo5Kd8ysc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GoKnkkYoUDojmVN8vJX6kkX7HtnBQvLtCY0sp4PA2F1ATixaitoylRCyQQllNUFlYcaDlO9D12LujphR5E8uEWTCrS6QlssquqMen37+5cmGGZZhXetO9XX5zTEqGEO1+Tj38k59BesCKEGm4kXLTxjE4JK9B7YOwfQHiic4oKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A6skyESF; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3910f525165so2859811f8f.1;
-        Wed, 05 Mar 2025 11:12:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741201946; x=1741806746; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2UAtTDNi9A6LaL+tM+1TUxbX2g8gujKdVZLYK4r9TuM=;
-        b=A6skyESFXR8PPJugQcUEcQ+qY6rbbW6fWETITaQ0eyyshwcezqFkBIQwR1bFhoRxTl
-         m7U2Vg+s0zp8llRDdb5eFRA1OwjYaFe2oa1uxJqCDR5FposIE5l2zHW3evYH9+ncM/rl
-         Siz5Ydr2iFW0ETjTvWN6NR9spxSd1iih8pagKxt+qIjERlfBPf+NDbsXaImRmum/hazj
-         2jRW11Vol6h72QaDOIv57szM7VE89pIgwMAQdmkIsvb0bRTE4uJjqDqj1aB6pIJNZ859
-         bYk5j5Up92UFhRnjS7QBG0hnlwvEzwWGdFLPlqsK/76dc76uO9i5q4JTp34o6GWzB9KJ
-         4vTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741201946; x=1741806746;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2UAtTDNi9A6LaL+tM+1TUxbX2g8gujKdVZLYK4r9TuM=;
-        b=EGiK9dgEVR/4/lEJR/t8lgG6e1Wkw3G1ZbdDtqyel3w4jkWgvGgebVz4e9ZRRaYBUi
-         D26u86cA4OZnGJ/7B158hWqV1l2IN0o6wGdj6EL2vTZPtW6ApQeh/7RmJcjVVhhZxVf2
-         i0p9c6cG+oPJEKmh7xjl70Fk4MvWCiD7sxta5/6QYk1XF9k+du2dNGEpQ/ud4+Jo3TRR
-         uMbY7mLIjqbHnMUqMgkkOoL0Ztys+HGinCyIcaD55i30Ho8KG/rOT14plSULGj2tHJGs
-         Pr+dQzSYVyoU1MX4xjdcjaWM4ROewFMHiXMoLlkC5RZ7h6FeJYdFp7tbzqRAJGrEq66G
-         1JvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU88r3r6+43GtLVuXItqOk7b2aZK72d4Ly/76Yx1i2QpIwDX63XP3POEi4Awm6q8AVdX7fWBCCpUq+6sjU=@vger.kernel.org, AJvYcCXFWhY7FvfZAFLRQpZPoY542X+P5fdZ2h7K4L/LWzl4iLSv05FttQ/bhkUfe2jWsIx2ZhjfU1SqhPHFGA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyUbyjhY8FlePMNYEkKzuZmpYjBUduUvMu8LfTXJuXXnOJ3X/VT
-	2y04YNqmLDWbnQgu9rSO8OjLoGxdXlQdDMhPPyTH7iKInx47wHx5
-X-Gm-Gg: ASbGncvVAe9JacLvy6wAotjMmxjX1JMCcJxLEztUOawN+SydPPLiTZ/PJKOZZqxfBjr
-	qx8wKMHUrQog+dYA7YVxmBHkcbeYiPo2LZhbr+v06bNsGcP4MAZN+tpTSNV5TXuiP5oDBM6Ny+D
-	Mt9jp1kIdJFINvpslTx/QzYvroRYlxLMEfUcq6u/k2RKCcP9PEzX5Pl24/8S8GM918zscXh1EyN
-	BV4Kf5KNq5trYrV7aQdAXj5jXczhodF/lHxwzjzsxxDht1bFPHB/JR79P4KHZ97sEM3IDGXapiU
-	iuG1tWdx42izBqd/CC1iexXG3mEwaTeOYojW4zECbpBhs55VxNQMbunsL3nUvd8QDg==
-X-Google-Smtp-Source: AGHT+IE9Jfcw1QTaD71UiMWcIV4F62fCIiDaj/lP77sDS7GkTItX4uePhMNdB6mev257s1kfrn+nAw==
-X-Received: by 2002:a05:6000:4025:b0:390:f6aa:4e6f with SMTP id ffacd0b85a97d-3911f714de9mr4298289f8f.10.1741201945611;
-        Wed, 05 Mar 2025 11:12:25 -0800 (PST)
-Received: from [172.27.49.130] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390e4844a38sm22061124f8f.75.2025.03.05.11.12.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Mar 2025 11:12:25 -0800 (PST)
-Message-ID: <49df4e60-695a-4562-aa27-f946e7acd485@gmail.com>
-Date: Wed, 5 Mar 2025 21:12:22 +0200
+	 In-Reply-To:Content-Type; b=HOXDGoKO3wFoPPW2tFyXpRI/TqTETtWJ7579ZLzZn4xwBSXlo8IaHb1+rQW98z3iaJfbxBDOc04Ilro2rBfx1vBscGkucTPpoUasQ3ir7kW2daScV360EdUAUpQvS5xLVwrwomA2MM0jvWq1+x20KRbdX/keP5LAvQYYdGYX+q4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=RI+/h5ml; arc=none smtp.client-ip=81.19.149.121
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=x0KQuzyFQUEThFLdYlVvZUJ1cH4hBNZAmoJdDiFksag=; b=RI+/h5mlwDs65E0J/YyCgTt05p
+	a//6ia9q7THHUJjoOvsmkpQr52QzRjnYVtgNBGH+dTSvVXju2HjaUP30mnI4VLvlMfrNn9FnnhTmr
+	+tv+B9/4GtcBM88IRfc6S0l7fbJXX/wnygN3l0PkoOx7ZlndkhxJAnvKBkjWP4Ckx3yk=;
+Received: from [80.121.79.4] (helo=[10.0.0.160])
+	by mx11lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1tpuDg-000000006hj-2m9f;
+	Wed, 05 Mar 2025 20:15:53 +0100
+Message-ID: <c0adcf60-4fb5-411f-84ef-e409cecf8a75@engleder-embedded.com>
+Date: Wed, 5 Mar 2025 20:15:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,56 +55,81 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/mlx5: handle errors in mlx5_chains_create_table()
-To: Wentao Liang <vulab@iscas.ac.cn>, saeedm@nvidia.com, leon@kernel.org,
- tariqt@nvidia.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250304080323.2237-1-vulab@iscas.ac.cn>
+Subject: Re: [PATCH iwl-net] igc: Fix XSK queue NAPI ID mapping
+To: Joe Damato <jdamato@fastly.com>
+Cc: vitaly.lifshits@intel.com, avigailx.dahan@intel.com,
+ anthony.l.nguyen@intel.com, stable@vger.kernel.org,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>,
+ "open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>,
+ "moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+ open list <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org
+References: <20250305180901.128286-1-jdamato@fastly.com>
 Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20250304080323.2237-1-vulab@iscas.ac.cn>
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+In-Reply-To: <20250305180901.128286-1-jdamato@fastly.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-AV-Do-Run: Yes
 
-
-
-On 04/03/2025 10:03, Wentao Liang wrote:
-> Add error handling for mlx5_get_fdb_sub_ns() and
-> mlx5_get_flow_namespace() failures in mlx5_chains_create_table().
-> Log error message with  mlx5_core_warn() to prevent silent failures
-
-nit: double spaces before mlx5_core_warn.
-
-> and return immediately to prevent null pointer dereference of ns.
+On 05.03.25 19:09, Joe Damato wrote:
+> In commit b65969856d4f ("igc: Link queues to NAPI instances"), the XSK
+> queues were incorrectly unmapped from their NAPI instances. After
+> discussion on the mailing list and the introduction of a test to codify
+> the expected behavior, we can see that the unmapping causes the
+> check_xsk test to fail:
 > 
-> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
-
-Please add Fixes tag and target the patch to net.
-
+> NETIF=enp86s0 ./tools/testing/selftests/drivers/net/queues.py
+> 
+> [...]
+>    # Check|     ksft_eq(q.get('xsk', None), {},
+>    # Check failed None != {} xsk attr on queue we configured
+>    not ok 4 queues.check_xsk
+> 
+> After this commit, the test passes:
+> 
+>    ok 4 queues.check_xsk
+> 
+> Note that the test itself is only in net-next, so I tested this change
+> by applying it to my local net-next tree, booting, and running the test.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: b65969856d4f ("igc: Link queues to NAPI instances")
+> Signed-off-by: Joe Damato <jdamato@fastly.com>
 > ---
->   drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c | 5 +++++
->   1 file changed, 5 insertions(+)
+>   drivers/net/ethernet/intel/igc/igc_xdp.c | 2 --
+>   1 file changed, 2 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
-> index a80ecb672f33..e808531cc6f5 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
-> @@ -196,6 +196,11 @@ mlx5_chains_create_table(struct mlx5_fs_chains *chains,
->   		ns = mlx5_get_flow_namespace(chains->dev, chains->ns);
+> diff --git a/drivers/net/ethernet/intel/igc/igc_xdp.c b/drivers/net/ethernet/intel/igc/igc_xdp.c
+> index 13bbd3346e01..869815f48ac1 100644
+> --- a/drivers/net/ethernet/intel/igc/igc_xdp.c
+> +++ b/drivers/net/ethernet/intel/igc/igc_xdp.c
+> @@ -86,7 +86,6 @@ static int igc_xdp_enable_pool(struct igc_adapter *adapter,
+>   		napi_disable(napi);
 >   	}
 >   
-> +	if (!ns) {
-> +		mlx5_core_warn(chains->dev, "Failed to get flow namespace\n");
-> +		return NULL;
+> -	igc_set_queue_napi(adapter, queue_id, NULL);
+>   	set_bit(IGC_RING_FLAG_AF_XDP_ZC, &rx_ring->flags);
+>   	set_bit(IGC_RING_FLAG_AF_XDP_ZC, &tx_ring->flags);
+>   
+> @@ -136,7 +135,6 @@ static int igc_xdp_disable_pool(struct igc_adapter *adapter, u16 queue_id)
+>   	xsk_pool_dma_unmap(pool, IGC_RX_DMA_ATTR);
+>   	clear_bit(IGC_RING_FLAG_AF_XDP_ZC, &rx_ring->flags);
+>   	clear_bit(IGC_RING_FLAG_AF_XDP_ZC, &tx_ring->flags);
+> -	igc_set_queue_napi(adapter, queue_id, napi);
+>   
+>   	if (needs_reset) {
+>   		napi_enable(napi);
+> 
+> base-commit: 3c9231ea6497dfc50ac0ef69fff484da27d0df66
 
-Callers expect error, not NULL.
+igc_set_queue_napi() could be made static as it only used within
+igc_main.c after this change.
 
-> +	}
-> +
->   	ft_attr.autogroup.num_reserved_entries = 2;
->   	ft_attr.autogroup.max_num_groups = chains->group_num;
->   	ft = mlx5_create_auto_grouped_flow_table(ns, &ft_attr);
-
+Reviewed-by: Gerhard Engleder <gerhard@engleder-embedded.com>
 
