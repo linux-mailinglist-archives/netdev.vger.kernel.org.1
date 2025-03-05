@@ -1,135 +1,263 @@
-Return-Path: <netdev+bounces-172195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8067FA50CAE
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 21:41:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87892A50D6E
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 22:28:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6AD91891B99
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 20:41:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C4771716E3
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 21:28:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FE5118E362;
-	Wed,  5 Mar 2025 20:41:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAAC3202984;
+	Wed,  5 Mar 2025 21:27:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GqVQF5do"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UJHcff8L"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 715F216426;
-	Wed,  5 Mar 2025 20:41:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A4F81FECAD;
+	Wed,  5 Mar 2025 21:27:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741207297; cv=none; b=VaIqJByYeGQ6+R8IUKm3ju1/4t6SryA8bo/bh1bq6P+2BATPGc+D5L0+0uwnbwcDT19gGZPk/KAiNGx/a8oEAAzsEJv8Hb1I5YlUqE8w4ocFPM9+QmlYqpc9OXVhhLTblUlA3Xea//nHAdDhEXDXnNJpXS1oamzqu6tTgYxXxOs=
+	t=1741210032; cv=none; b=Qp5Wqy96oS2sOyLxT20vzfr6zCyLbSGMZHo1wcW2VOJMFUUCFfVeS4P8WVLE4KOoVZzutdiIqtXj1WsYqGl4KCvOMjs9oQWfvqdXz/4sTx30JSXr6kkvb4MM0swAHDGqbZKcffbXT9Hv4sNgfcNjMYdegH5p21Hw7tp8fNfpBRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741207297; c=relaxed/simple;
-	bh=A39m//OQ/IH5GlT3VMR17M5XQFlQF1vBGczLPvzKayo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U6yaP3q0QK+UUdew+/fIXYnyIH6cIoTEJuvhzzTZ2Owj1UHoU/jroyrflimul3uYrxllz3b0AnptWAP40tfqn029rnM5S3hAcbGALflR0ewg3vR7MRSNVLhK55EYNmdiNM0TmOZBBUkcyoKZUHKHu8wUqKmfLC5QwOJrsPiAnfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GqVQF5do; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCE03C4CED1;
-	Wed,  5 Mar 2025 20:41:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741207296;
-	bh=A39m//OQ/IH5GlT3VMR17M5XQFlQF1vBGczLPvzKayo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GqVQF5do4DlvHhKJWfrfVYRi2pyew+zez5m3e0KrRDJsb5NdEzuRzMxn0GQrrMERn
-	 hK5AQy74UQuvl2p4fqJsxARf2D0VXYVxhqiAPyNnCk6QT8U+Zqssszb6bVSYG6EW3r
-	 lc2y33HPiTj+ZROEiS/8CSHhLddi/0fC7QrWA8oy1fUSwUZqkkM8kPy4tfbIV9eono
-	 gc5AgIbV+pKCDx3ONBdl7Nb5jXwnBTUqsKyON/vzB+/XeTCC58xyjKw1iNlJ+QQPvK
-	 9QlnDwFqkV2ydVJjporDzGUkDQZeo+OHgTid/20aLHTESgG2SFzIYJ0B9ztzcZR7Pp
-	 gprr9JI/pgmYg==
-Date: Wed, 5 Mar 2025 12:41:35 -0800
-From: Saeed Mahameed <saeed@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: David Ahern <dsahern@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
-	Jason Gunthorpe <jgg@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Aron Silverton <aron.silverton@oracle.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Daniel Vetter <daniel.vetter@ffwll.ch>,
-	Dave Jiang <dave.jiang@intel.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Itay Avraham <itayavr@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Leonid Bloch <lbloch@nvidia.com>, linux-cxl@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	"Nelson, Shannon" <shannon.nelson@amd.com>
-Subject: Re: [PATCH v5 0/8] Introduce fwctl subystem
-Message-ID: <Z8i2_9G86z14KbpB@x130>
-References: <0-v5-642aa0c94070+4447f-fwctl_jgg@nvidia.com>
- <20250303175358.4e9e0f78@kernel.org>
- <20250304140036.GK133783@nvidia.com>
- <20250304164203.38418211@kernel.org>
- <20250305133254.GV133783@nvidia.com>
- <mxw4ngjokr3vumdy5fp2wzxpocjkitputelmpaqo7ungxnhnxp@j4yn5tdz3ief>
- <bcafcf60-47a8-4faf-bea3-19cf0cbc4e08@kernel.org>
- <20250305182853.GO1955273@unreal>
+	s=arc-20240116; t=1741210032; c=relaxed/simple;
+	bh=PhaJRjhXTia/31/igdR5xSfZGqsYBRautCEdMaEAmbY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YJhqdhi2nJ+mGd26ZJYxgC3k349679Als+lURNKElefb4sRCdWS0eFkDfuf0VY08ALF5DxQmlp2j0xAycNi4KUApDJnnmOepcPlCiJZaXg0C9TFyHNiZjCAKvMVJi4CH1yAlSsRtyvrEg4dNnePbKgE0FX4V6NbRIRvYX6ZepHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UJHcff8L; arc=none smtp.client-ip=209.85.221.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-523a00c9d96so1572606e0c.3;
+        Wed, 05 Mar 2025 13:27:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741210030; x=1741814830; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I+98tD0cuYY4ODUibk9ngfQh4l68coG0LYUx4ftM0EE=;
+        b=UJHcff8LFG8rP4hIrLHEqVnI+dptYP8bfP/vmVDtsSim3nd11wfvpw31Xjb9BoI+ul
+         4/VkaOjLKkClUohtLa39yj6H2sjK/shqbzHj4a6C9Ydzr9jBMc/PfChw0wckebfb/PQE
+         WmzdsNAzO+ToMom7j6itdqJY9H33tJb10MmQhQaej0erf8Drz3ANGzRQ2ijQ/Sa+l9jq
+         gT5kcsbXBqS3fAeG5Gkj2Jk/TUOZuy5yxaFbQItPpoAq0I0OmPvqkOUEHQCIejccdGRi
+         5nBgfW9Q1/a2QG6RATZsNLgC/JVVOsYoY+ikavfDp1uS39W51O39xrKdavXEuF1yqVrM
+         eaRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741210030; x=1741814830;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=I+98tD0cuYY4ODUibk9ngfQh4l68coG0LYUx4ftM0EE=;
+        b=VXemPobNHVrJU0xql+6MrUSa4IHAkBAahX1gz/U4HJvkr3TeFffDywcMJoaRY6Ew+Z
+         HFaouA4Sh+Pjlom1kqyoIKTAzVDEBzHuLd/TBtOrhvUApzTZd8IM0v4IXr60tHhLGmXQ
+         v9W27Ul3P+FeQWgk52EgzGIDuJ3HuDLZFGCaE8kOOcOSZtsGZA9WoKGePgYXv4W8R1hv
+         sypBpfXAuC7jjDCn+ePLq5nbB+zXgdA6EFNKwoh+7kBsmrz6WkPok5RMpCMvJzJwPEpH
+         Dov3r0nBDVf11V0/5f8guzXEvY6Q4z1sAm2u18pQEwj0rEaS8WjakDmfVHgoo636Sj+x
+         cStg==
+X-Forwarded-Encrypted: i=1; AJvYcCULPoXEE0CyPTdmvtRtNfJ/17mnmoarRJqEDXiMdkph5BL9rBz9b5c21j7NAtd+/7UgNh9LV39t@vger.kernel.org, AJvYcCW8KUAV9YTBPE5qTQ8r5rbunpaXmlFyC2yb21bX0AvtQ91/hPOEz8WBb4DHvIBBJntcu77cYQcvzHl/@vger.kernel.org, AJvYcCX6X74EYaGfrDcm3YYpt4b+vYe8Bv07ETEJB8BOr+SBMP5oEGCfCr0rkGSe7vAN9Z2hNLgvvCUOTypVlnaD@vger.kernel.org, AJvYcCXBj8qATHv50e6y3hBmv3JYn1jsH3c4+0n2qJj3vrvikdG1SJJGONCXXoxaBN6B7gsbqQvOJrhJgWjYtfHP/J1a6KI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFgc6QmhsYmWff7fDtNuXqRs0NRrOXxbqUQyr+bLrBI7ySvbGd
+	N83oW1dnBsUr3qQLeQ4mEDdirfcGK5/P95kxNjNIKIKQTIjS0TPuOAUQChrc5vXXMPLRsffLKdn
+	nwL7Jv71ixBKf91Uk8QqCt/YVSfQ=
+X-Gm-Gg: ASbGnctgPHq/1xwKet/BTL+zluiisvbKtoOcUascD9Qb3P5SR/0SIbUWd6agq4ojsRM
+	tEgUSc2AFX2ZxZluvhcxRXolSJp1idwaA4+KYkkm1LjtE6VgMqvuJpdhX+O7d3sxXKFY5d2NLCM
+	BBuI7pS+rp1TPFJff9FIlZk38hp6ybhGQVc7IQ5XRKFdQlAhF9hml3k3Pr
+X-Google-Smtp-Source: AGHT+IG+ssz8FQgtSEFpj68TfVKRRDwsRKLtaniWwvYX4uzkub5u7gIJBnmTedw7RHTEnRoOrSctVHagmxmrPgX51wQ=
+X-Received: by 2002:a05:6122:1d90:b0:520:652b:ce18 with SMTP id
+ 71dfb90a1353d-523c5fc2509mr2685539e0c.0.1741210029676; Wed, 05 Mar 2025
+ 13:27:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250305182853.GO1955273@unreal>
+References: <20250302181808.728734-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250302181808.728734-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <Z8SydsdDsZfdrdbE@shell.armlinux.org.uk> <CA+V-a8vCB7nP=tsv4UkOwODSs-9hiG-PxN6cpihfvwjq2itAHg@mail.gmail.com>
+ <Z8TRQX2eaNzXOzV0@shell.armlinux.org.uk> <CA+V-a8vykhxqP30iTwN6yrqDgT8YRVE_MadjiTFp653rHVqMNg@mail.gmail.com>
+ <Z8WQJQo5kW9QV-wV@shell.armlinux.org.uk> <CA+V-a8vCqxCaB_UEf-Ysg3biu5VoQ2_0OxWnN97Mdee9Op3YDA@mail.gmail.com>
+ <Z8XZh9nvX3yrE6wB@shell.armlinux.org.uk>
+In-Reply-To: <Z8XZh9nvX3yrE6wB@shell.armlinux.org.uk>
+From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Date: Wed, 5 Mar 2025 21:26:43 +0000
+X-Gm-Features: AQ5f1JrYTl1BIFJJ-_uY68HuzF6JPMtZUlKlO51FHftq2VbLqpLJwTJpSuwf9OI
+Message-ID: <CA+V-a8teuTznxBE2_LqqQcqRgQu1saAMuOUST8jFLFFTALqUMw@mail.gmail.com>
+Subject: Re: [PATCH 3/3] net: stmmac: Add DWMAC glue layer for Renesas GBETH
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 05 Mar 20:28, Leon Romanovsky wrote:
->On Wed, Mar 05, 2025 at 11:17:19AM -0700, David Ahern wrote:
->> On 3/5/25 8:08 AM, Jiri Pirko wrote:
->> > Wed, Mar 05, 2025 at 02:32:54PM +0100, jgg@nvidia.com wrote:
->> >> On Tue, Mar 04, 2025 at 04:42:03PM -0800, Jakub Kicinski wrote:
->> >>> I thought you were arguing that me opposing the addition was
->> >>> "maintainer overreach". As in me telling other parts of the kernel
->> >>> what is and isn't allowed. Do I not get a say what gets merged under
->> >>> drivers/net/ now?
->> >>
->> >> The PCI core drivers are a shared resource jointly maintained by all
->> >> the subsytems that use them. They are maintained by their respective
->> >> maintainers. Saeed/etc in this case.
->> >>
->> >> It would be inappropriate for your preferences to supersede Saeed's
->> >> when he is a maintainer of the mlx5_core driver and fwctl. Please try
->> >> and get Saeed on board with your plan.
->> >>
->> >> If the placement under drivers/net makes this confusing then we can
->> >> certainly change the directory names.
->> >
->> > According to how mlx5 driver is structured, and the rest of the advanced
->> > drivers in the same area are becoming as well, it would make sense to me
->> > to have mlx5 core in separate core directory, maintained directly by driver
->> > maintainer:
->> > drivers/core/mlx5/
->> > then each of the protocol auxiliary device lands in appropriate
->> > subsystem directory.
->>
->> +1
->>
->> This is how I have structured our drivers -- core driver for owning the
->> PCI device and hosting the APIs to communicate with hardware, an aux bus
->> and then smaller subsystem focused drivers for the aux devices that make
->> the device usable from different contexts.
->>
->> I think we are ready to start upstreaming, but I am waiting to see how
->> this falls out - to see if our core driver can land in a non-subsystem
->> specific location (e.g., drivers/core) or if it needs to go with fwctl
->> as a generic location.
+Hi Russell,
+
+On Mon, Mar 3, 2025 at 4:32=E2=80=AFPM Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
 >
->Do it right, and push it to drivers/core. I'm aware of at least one
->driver from huge company (not Nvidia) which is in preparation phase
->before upstreaming, and will fit nicely into this model.
+> On Mon, Mar 03, 2025 at 04:04:55PM +0000, Lad, Prabhakar wrote:
+> > Hi Russell,
+> >
+> > On Mon, Mar 3, 2025 at 11:19=E2=80=AFAM Russell King (Oracle)
+> > <linux@armlinux.org.uk> wrote:
+> > > I would like to get to the bottom of why this fails for module remova=
+l/
+> > > insertion, but not for admistratively down/upping the interface.
+> > >
+> > > Removal of your module will unregister the netdev, and part of that
+> > > work will bring the netdev administratively down. When re-inserting
+> > > the module, that will trigger various userspace events, and it will
+> > > be userspace bringing the network interface(s) back up. This should
+> > > be no different from administratively down/upping the interface but
+> > > it seems you get different behaviour.
+> > >
+> > > I'd like to understand why that is, because at the moment I'm wonderi=
+ng
+> > > whether my patches that address the suspend/resume need further work
+> > > before I send them - but in order to assess that, I need to work out
+> > > why your issue only seems to occur in the module removal/insertion
+> > > and not down/up as well as I'd expect.
+> > >
+> > > Please could you investigate this?
+> > >
+> > Sure I will look into this. Just wanted to check on your platform does
+> > unload/load work OK? Also do you know any specific reason why DMA
+> > reset could be failing so that I can look at it closer.
 >
+> It may be surprising, but I do not have stmmac hardware (although
+> there is some I might be able to use, it's rather complicated so I
+> haven't investigated that.) However, there's a lot of past history
+> here, because stmmac has been painful for me as phylink maintainer.
+> Consequently, I'm now taking a more active role in this driver,
+> cleaning it up and fixing some of the stuff it's got wrong.
+>
+> That said, NVidia are in the process of arranging hardware for me.
+>
+> You are not the first to encounter reset failures, and this has always
+> come down to clocks that aren't running.
+>
+> The DWMAC core is documented as requiring *all* clocks for each part of
+> the core to be running in order for software reset to complete. If any
+> clock is stopped, then reset will fail. That includes the clk_rx_i /
+> clk_rx_180_i signals that come from the ethernet PHY's receive clock.
+>
+I did investigate on these lines:
 
-How do you imagine this driver/core structure should look like? Who will be
-the top dir maintainer? It should be something that is tightly coupled with
-aux, currently aux is under drivers/base/auxiliary.c I think it should move 
-to drivers/aux/auxiliary.c and device drivers should implement their own
-aux buses, WH access APIs and probing/init logic under that directory
-e.g: drivers/aux/mlx5/..
+1] With my current patch series I have the below in remove callback
 
++static void renesas_gbeth_remove(struct platform_device *pdev)
++{
++       struct renesas_gbeth *gbeth =3D get_stmmac_bsp_priv(&pdev->dev);
++
++       stmmac_dvr_remove(&pdev->dev);
++
++       clk_bulk_disable_unprepare(gbeth->num_clks, gbeth->clks);
++}
+
+After dumping the CLK registers I found out that the Rx and Rx-180 CLK
+never got turned OFF after unbind.
+
+2] I replaced the remove callback with below ie first turn OFF
+Tx-180/Rx/Rx-180 clocks
+
++static void renesas_gbeth_remove(struct platform_device *pdev)
++{
++       struct renesas_gbeth *gbeth =3D get_stmmac_bsp_priv(&pdev->dev);
++
++       clk_bulk_disable_unprepare(gbeth->num_clks, gbeth->clks);
++
++      stmmac_dvr_remove(&pdev->dev);
++}
+
+After dumping the CLK registers I confirmed all the clocks were OFF
+(CSR/PCLK/Tx/Tx-180/Rx/Rx-180) after unbind operation. Now when I do a
+bind operation Rx clock fails to enable, which is probably because the
+PHY is not providing any clock.
+
+> However, PHYs that have negotiated EEE are permitted to stop their
+> receive clock, which can be enabled by an appropriate control bit.
+> phy_eee_rx_clock_stop() manipulates that bit. stmmac has in most
+> cases permitted the PHY to stop its receive clock.
+>
+You mean phy_eee_rx_clock_stop() is the one which tells the PHY to
+disable the Rx clocks? Actually I tried the below hunk with this as
+well the Rx clock fails to be turned ON after unbind/bind operation.
+
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index 0ba434104f5b..e16f4a6f5715 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -1756,6 +1756,7 @@ EXPORT_SYMBOL_GPL(phy_eee_tx_clock_stop_capable);
+  */
+ int phy_eee_rx_clock_stop(struct phy_device *phydev, bool clk_stop_enable)
+ {
++       return 0;
+        int ret;
+
+        /* Configure the PHY to stop receiving xMII
+
+
+
+> NVidia have been a recent victim of this - it is desirable to allow
+> receive clock stop, but there hasn't been the APIs in the kernel
+> to allow MAC drivers to re-enable the clock when they need it.
+>
+> Up until now, I had thought this was just a suspend/resume issue
+> (which is NVidia's reported case). Your testing suggests that it is
+> more widespread than that.
+>
+> While I've been waiting to hear from you, I've prepared some patches
+> that change the solution that I proposed for NVidia (currently on top
+> of that patch set).
+>
+I tried your latest patches [0], this didnt resolve the issue.
+(Actually there was a build problem with the patch I fixed it below
+hunk)
+
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 9a62808cf935..21cdea4aec9a 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -2609,7 +2609,7 @@ void phylink_rx_clk_stop_block(struct phylink *pl)
+         * function has been called and clock-stop was previously enabled.
+         */
+        if (pl->mac_rx_clk_stop_blocked++ =3D=3D 0 &&
+-           pl->mac_supports_eee_ops && pl->phydev)
++           pl->mac_supports_eee_ops && pl->phydev &&
+            pl->config->eee_rx_clk_stop_enable)
+                phy_eee_rx_clock_stop(pl->phydev, false);
+ }
+
+
+[0] https://lore.kernel.org/all/Z8bbnSG67rqTj0pH@shell.armlinux.org.uk/
+
+> However, before I proceed with them, I need you to get to the bottom
+> of why:
+>
+> # ip li set dev $if down
+> # ip li set dev $if up
+>
+> doesn't trigger it, but removing and re-inserting the module does.
+>
+Doing the above does not turn OFF/ON all the clocks. Looking at the
+dump from the CLK driver on my platform only stmmaceth and pclk are
+the clocks which get toggled and rest remain ON. Note Im not sure if
+the PHY is disabling the Rx clocks when I run ip li set dev $if down I
+cannot scope that pin on the board.
+
+Please let me know if you have any pointers for me to look further
+into this issue.
+
+Cheers,
+Prabhakar
 
