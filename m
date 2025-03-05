@@ -1,97 +1,72 @@
-Return-Path: <netdev+bounces-172175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4ABEA508AF
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 19:10:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58860A508B5
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 19:11:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 267531888B99
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 18:09:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C601B7A285B
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 18:10:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68462528E0;
-	Wed,  5 Mar 2025 18:09:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6883250C1A;
+	Wed,  5 Mar 2025 18:11:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="kuN8C7Vb"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="N7+PPHJm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A18D2517AE
-	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 18:09:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C49871ACEDD;
+	Wed,  5 Mar 2025 18:11:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741198152; cv=none; b=WAvmFR5OArW1tKAaBKSynM4mGG7IGF0ZQL+xj6AO1+8lPnrD3V5NXuYfMtgFh+VHLJtOIW7pKZSBswVRiCoWs7GcXmJbhsTYZAuLfCUmiVRLdxsEH2eVHta8UoQQbky10+oEFHxO/IgvaS9+eNyrXn3nMEdiK/h1eJCNE96IE8Y=
+	t=1741198278; cv=none; b=C7WZusVq1Z5zNHTV3qAInUSG2DjHFmSF+lSowRiLEdJ+OKodWfLVw6IYbHAh+wkhKmZaDSP/S1Kv4TjdnK+QITSet2w1d2hGD0mRknjuzme7HIMv1g0DY7sOK0lrYvASAj1nM0duFlDQEc9wnPJZWFUx4KK5oFRpf4Ho41/OLcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741198152; c=relaxed/simple;
-	bh=TMYJJlrCKSQZCcdMd1zXdYIHHKwYt61VvQSuzMKoqkY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OTqFr7iX73Y1fq3toZNdvWddVpxpdhdUy4Jim+iLvJBkKcWlisTi7gR+AXSc9dZKsFejQJdDbb1wOqs45VBXiUSUYQ4ObQcUgKoH+wMoplH0vBndZO6xny/sogRVnAAOTZcMvU/q4Uj+Z57paC6hrMPdwRerTPaLSUuh9s+7iJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=kuN8C7Vb; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2239aa5da08so70262445ad.3
-        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 10:09:10 -0800 (PST)
+	s=arc-20240116; t=1741198278; c=relaxed/simple;
+	bh=fXTc22PcmEtd2wCu5ddU0VzITl3xDm/HEBT5DknTFhk=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Z9M/lMk23Ogx3BkJMhw8iFswR12BtPcQY4pgIvQ5mj4fn4qkYfZ//1ExQaUE9w3NM2HKs9m2Dw/Qm7s2/tvtXFBC8nummDeSX/UZmmOU60iJqR6Ap4FCjuaUqVYM7x4g++S33nJOCkvnXHhZTVgv4wk37DqOFh8HwK2ojdvpXp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=N7+PPHJm; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1741198150; x=1741802950; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/JDOLyKKadEy+ulLyQr89yMyXan48P03nG7aI65rkLw=;
-        b=kuN8C7VbJx+sE3kTFmgofOOZWfbslO5TMFe+od6O4DH3D+BUmyKhUGyxB+FmXGkifT
-         QBjmFW2U2+BEaTVFoGJuGlO3cSY6vsagyHm1HBF6HoHXvv1tPt/4o1RZN5GOEg83QiKL
-         n2zE+Y09Hx/Ngpk4z83H+4jVnjMIY+C1mcPX0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741198150; x=1741802950;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/JDOLyKKadEy+ulLyQr89yMyXan48P03nG7aI65rkLw=;
-        b=w8bavTuAB162TJYXxqgrujI8Lekzsp2Sv6rgdP0UWmDlcgAf8168BOlI7pYp2lFOE+
-         eFoo0yDvV3j2ikjOy7cSO0pKKUFkeTdYt6OdEUt9jI23eXJwJe3LaukF217ZscN0gz2Q
-         6oyld+XoTh5iJLf2YwoO+1mdLOzHkm9htRCQ22bVz//Fj0Dg8cS084BJmSnQ2B20LFiu
-         JZh2jm7VWoO9S23Tt63g6xl8/xTGdRdpKHoyziEWqj+0JkOKyzKfBspVsY7kDqLw8Yi6
-         LSC+spPKwftXKysPXta/c0dRez65y4k3c5p0vQOoYk67YhkiOCOU4sY5aXM8YKnlYlOl
-         8cUw==
-X-Gm-Message-State: AOJu0YzkzeHKgYouwjtHnkC7hIHKV4yiE71of49CR6sdAuEwFARW+qs5
-	y9dLisTd8fTP3VtIq97HTQtplHZYDP91fRFKBMbWVVkdw6zRRa4N2aLmH3dDjveA3yCJO0hzxrJ
-	NAs6dUPupZ5SZX8YzUL6jfNWXS1LequiVA4+6yV+j2UDI8vHJEN1GbdTOk9yLa/68JK6fzpfiAX
-	TmWzImO+ElqWedvnjT6l4XEYR7hP2fa0C/O2BSDg==
-X-Gm-Gg: ASbGncuCIJKWtGYqd9T7K0Xn01prn7h24gFssw23uIjHQPsFyHtUeGUvrFsw3Wi9v62
-	bbMmPLHrSZfUnb4/MJu8B837Rh7len/ODCHPqtisGiinEAcJ/SBR3PTdy00vdFhIGlHbilw7rlT
-	/aT5+Bj8PnOuBPfDN8Mnob9ycMjsCdNboYNO211QdIlNyB4DGMQmAgcVNNUt0+k5LRJDMQ1BwGc
-	HYDkKBZgKdry9IahSg+mRnU9kGUHn4MYYEEaItK5FpJUVKURYzAqAoOyPHSmUh5dxxDtsbB1+33
-	klWdxVgAs0yP8JrlKNseKmRW8V/tafuZJlp66LtHb08zKRHrofvn
-X-Google-Smtp-Source: AGHT+IHHP9qQRDNcIJ6SYkbk3gQTYwbtsOWJYWum8dEqxwJMevmC/aplCxv04Fpb3qqFTQ3JZrfYzA==
-X-Received: by 2002:a17:902:ec89:b0:224:76f:9e59 with SMTP id d9443c01a7336-224076fa0damr12749675ad.10.1741198149933;
-        Wed, 05 Mar 2025 10:09:09 -0800 (PST)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-223504db77fsm115568055ad.162.2025.03.05.10.09.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Mar 2025 10:09:09 -0800 (PST)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: vitaly.lifshits@intel.com,
-	avigailx.dahan@intel.com,
-	anthony.l.nguyen@intel.com,
-	Joe Damato <jdamato@fastly.com>,
-	stable@vger.kernel.org,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	bpf@vger.kernel.org (open list:XDP (eXpress Data Path)),
-	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH iwl-net] igc: Fix XSK queue NAPI ID mapping
-Date: Wed,  5 Mar 2025 18:09:00 +0000
-Message-ID: <20250305180901.128286-1-jdamato@fastly.com>
-X-Mailer: git-send-email 2.43.0
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1741198277; x=1772734277;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=2J15cXOqPd/u5rzTBX8mT/MjrB3duXJF2SeSM4Peubk=;
+  b=N7+PPHJmnvWUlEVNN30XYQEVDakz/EZm3TmNDBaB1tDl6gd7M9mxDyRI
+   w1Ycl5j8pZDW5/RjzsDybeYmkcbQZYlkwoV452id+DMaPt7G/iLFUyu3S
+   MuOUUaKM5RBueilNtZy5WMd/8ZHsLAbNdjaCQpLRVu6eT+lxQ6C1LggBw
+   I=;
+X-IronPort-AV: E=Sophos;i="6.14,223,1736812800"; 
+   d="scan'208";a="724113009"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 18:11:13 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:10366]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.201:2525] with esmtp (Farcaster)
+ id f875b2bd-4da4-4b3d-9682-06f6ba307da0; Wed, 5 Mar 2025 18:11:12 +0000 (UTC)
+X-Farcaster-Flow-ID: f875b2bd-4da4-4b3d-9682-06f6ba307da0
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 5 Mar 2025 18:11:00 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.142.242.208) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 5 Mar 2025 18:10:58 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: Paolo Abeni <pabeni@redhat.com>, <gregkh@linuxfoundation.org>
+CC: <kuni1840@gmail.com>, <kuniyu@amazon.com>, <llfamsec@gmail.com>,
+	<netdev@vger.kernel.org>, <sashal@kernel.org>, <stable@vger.kernel.org>
+Subject: Re: [PATCH stable 5.15/6.1/6.6] af_unix: Clear oob_skb in scan_inflight().
+Date: Wed, 5 Mar 2025 10:10:41 -0800
+Message-ID: <20250305181050.17199-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <2025030543-banker-impale-9c08@gregkh>
+References: <2025030543-banker-impale-9c08@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,57 +74,100 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D046UWB004.ant.amazon.com (10.13.139.164) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-In commit b65969856d4f ("igc: Link queues to NAPI instances"), the XSK
-queues were incorrectly unmapped from their NAPI instances. After
-discussion on the mailing list and the introduction of a test to codify
-the expected behavior, we can see that the unmapping causes the
-check_xsk test to fail:
++Paolo
 
-NETIF=enp86s0 ./tools/testing/selftests/drivers/net/queues.py
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Date: Wed, 5 Mar 2025 15:08:26 +0100
+> On Mon, Mar 03, 2025 at 07:01:49PM -0800, Kuniyuki Iwashima wrote:
+> > Embryo socket is not queued in gc_candidates, so we can't drop
+> > a reference held by its oob_skb.
+> > 
+> > Let's say we create listener and embryo sockets, send the
+> > listener's fd to the embryo as OOB data, and close() them
+> > without recv()ing the OOB data.
+> > 
+> > There is a self-reference cycle like
+> > 
+> >   listener -> embryo.oob_skb -> listener
+> > 
+> > , so this must be cleaned up by GC.  Otherwise, the listener's
+> > refcnt is not released and sockets are leaked:
+> > 
+> >   # unshare -n
+> >   # cat /proc/net/protocols | grep UNIX-STREAM
+> >   UNIX-STREAM 1024      0      -1   NI       0   yes  kernel ...
+> > 
+> >   # python3
+> >   >>> from array import array
+> >   >>> from socket import *
+> >   >>>
+> >   >>> s = socket(AF_UNIX, SOCK_STREAM)
+> >   >>> s.bind('\0test\0')
+> >   >>> s.listen()
+> >   >>>
+> >   >>> c = socket(AF_UNIX, SOCK_STREAM)
+> >   >>> c.connect(s.getsockname())
+> >   >>> c.sendmsg([b'x'], [(SOL_SOCKET, SCM_RIGHTS, array('i', [s.fileno()]))], MSG_OOB)
+> >   1
+> >   >>> quit()
+> > 
+> >   # cat /proc/net/protocols | grep UNIX-STREAM
+> >   UNIX-STREAM 1024      3      -1   NI       0   yes  kernel ...
+> >                         ^^^
+> >                         3 sockets still in use after FDs are close()d
+> > 
+> > Let's drop the embryo socket's oob_skb ref in scan_inflight().
+> > 
+> > This also fixes a racy access to oob_skb that commit 9841991a446c
+> > ("af_unix: Update unix_sk(sk)->oob_skb under sk_receive_queue
+> > lock.") fixed for the new Tarjan's algo-based GC.
+> > 
+> > Fixes: 314001f0bf92 ("af_unix: Add OOB support")
+> > Reported-by: Lei Lu <llfamsec@gmail.com>
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > ---
+> > This has no upstream commit because I replaced the entire GC in
+> > 6.10 and the new GC does not have this bug, and this fix is only
+> > applicable to the old GC (<= 6.9), thus for 5.15/6.1/6.6.
+> 
+> You need to get the networking maintainers to review and agree that this
+> is ok for us to take, as we really don't want to take "custom" stuff
+> like thi s at all.
 
-[...]
-  # Check|     ksft_eq(q.get('xsk', None), {},
-  # Check failed None != {} xsk attr on queue we configured
-  not ok 4 queues.check_xsk
+Paolo, could you take a look at this patch ?
+https://lore.kernel.org/netdev/20250304030149.82265-1-kuniyu@amazon.com/
 
-After this commit, the test passes:
 
-  ok 4 queues.check_xsk
+> Why not just take the commits that are in newer
+> kernels instead?
 
-Note that the test itself is only in net-next, so I tested this change
-by applying it to my local net-next tree, booting, and running the test.
+That will be about 20 patches that rewrite the most lines of
+net/unix/garbage.c and cannot be applied cleanly.
 
-Cc: stable@vger.kernel.org
-Fixes: b65969856d4f ("igc: Link queues to NAPI instances")
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- drivers/net/ethernet/intel/igc/igc_xdp.c | 2 --
- 1 file changed, 2 deletions(-)
+I think backporting these commits is overkill to fix a small
+bug that can be fixed with a much smaller diff.
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_xdp.c b/drivers/net/ethernet/intel/igc/igc_xdp.c
-index 13bbd3346e01..869815f48ac1 100644
---- a/drivers/net/ethernet/intel/igc/igc_xdp.c
-+++ b/drivers/net/ethernet/intel/igc/igc_xdp.c
-@@ -86,7 +86,6 @@ static int igc_xdp_enable_pool(struct igc_adapter *adapter,
- 		napi_disable(napi);
- 	}
- 
--	igc_set_queue_napi(adapter, queue_id, NULL);
- 	set_bit(IGC_RING_FLAG_AF_XDP_ZC, &rx_ring->flags);
- 	set_bit(IGC_RING_FLAG_AF_XDP_ZC, &tx_ring->flags);
- 
-@@ -136,7 +135,6 @@ static int igc_xdp_disable_pool(struct igc_adapter *adapter, u16 queue_id)
- 	xsk_pool_dma_unmap(pool, IGC_RX_DMA_ATTR);
- 	clear_bit(IGC_RING_FLAG_AF_XDP_ZC, &rx_ring->flags);
- 	clear_bit(IGC_RING_FLAG_AF_XDP_ZC, &tx_ring->flags);
--	igc_set_queue_napi(adapter, queue_id, napi);
- 
- 	if (needs_reset) {
- 		napi_enable(napi);
-
-base-commit: 3c9231ea6497dfc50ac0ef69fff484da27d0df66
--- 
-2.34.1
-
+927fa5b3e4f5 af_unix: Fix uninit-value in __unix_walk_scc()
+041933a1ec7b af_unix: Fix garbage collection of embryos carrying OOB with SCM_RIGHTS
+7172dc93d621 af_unix: Add dead flag to struct scm_fp_list.
+1af2dface5d2 af_unix: Don't access successor in unix_del_edges() during GC.
+fd86344823b5 af_unix: Try not to hold unix_gc_lock during accept().
+118f457da9ed af_unix: Remove lock dance in unix_peek_fds().
+4090fa373f0e af_unix: Replace garbage collection algorithm.
+a15702d8b3aa af_unix: Detect dead SCC.
+bfdb01283ee8 af_unix: Assign a unique index to SCC.
+ad081928a8b0 af_unix: Avoid Tarjan's algorithm if unnecessary.
+77e5593aebba af_unix: Skip GC if no cycle exists.
+ba31b4a4e101 af_unix: Save O(n) setup of Tarjan's algo.
+dcf70df2048d af_unix: Fix up unix_edge.successor for embryo socket.
+3484f063172d af_unix: Detect Strongly Connected Components.
+6ba76fd2848e af_unix: Iterate all vertices by DFS.
+22c3c0c52d32 af_unix: Bulk update unix_tot_inflight/unix_inflight when queuing skb.
+42f298c06b30 af_unix: Link struct unix_edge when queuing skb.
+29b64e354029 af_unix: Allocate struct unix_edge for each inflight AF_UNIX fd.
+1fbfdfaa5902 af_unix: Allocate struct unix_vertex for each inflight AF_UNIX fd.
 
