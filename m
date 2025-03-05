@@ -1,73 +1,113 @@
-Return-Path: <netdev+bounces-171886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4402DA4F33D
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 02:07:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C6A6A4F343
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 02:10:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 711A016F3D6
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 01:07:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1FA0188CBB6
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 01:10:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FDD5148314;
-	Wed,  5 Mar 2025 01:06:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBCA084FAD;
+	Wed,  5 Mar 2025 01:09:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tuf4utLm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="skucHruF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E2C14658D;
-	Wed,  5 Mar 2025 01:06:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55A45228;
+	Wed,  5 Mar 2025 01:09:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741136779; cv=none; b=eu9Upymr3bOWJ6ZKiwPJqXDRG8/b0Tz9yQm7Galg+GrGTX3WIe8+5KNtvoht+2Og/bPiL6nMo+RsYwgcIa8Mx8psL7nB5InNBIJnOwwREcX+exKyn5O4+Qj7GhgoWsgOib3Fl1Bdt/3lqyMrJC8uNIYT8qTHovD5T9u+rcoizsc=
+	t=1741136999; cv=none; b=dNHHCRQAqm+yCUgLyUjncsJ6KwLHz0yR66+uyHfLagCiYSdGN47MxIv+/4CL0m7wD2WfGjRA9OM4yrrRZWKaJ8Vz3pqir19XW74b/WMhPn0tKF920hbbwLixUdLQHCaARNzYb0/JIsnX98HeL2hPExCUEzavgg3WhJDtQiMCo5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741136779; c=relaxed/simple;
-	bh=NFjI1EHuABG7s0eSffnKl9hWTBsGsWfNfqbWCI+12aw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GSSkFnJFrncatiXg51OPdR/nPea2D4YXYaoR8LQ1i+cxcTVFCI06oWIBVrT8GJgp2dIKZ2bVfhSDnAIftclvBeV5MrbgdRqy1d1Tm+0ALGBJ7L2fGs5neOAAFKZXrpicsjya9s8MuA5n9XpoXYIHb9hq9zUX1ng/bYB7pqildgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tuf4utLm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EED5BC4CEE5;
-	Wed,  5 Mar 2025 01:06:17 +0000 (UTC)
+	s=arc-20240116; t=1741136999; c=relaxed/simple;
+	bh=oRu4ENvt5IO9ShjHhUpiGMnLQIYnQAofJB58ttqXE7c=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=t2A77PI5TyJ0G0/gnX6Llj1el362DMfxTzlMgICeZvvx+QHT11LpXOpS7vE8THY/a5fokED9WNJ08CMquD9wY2tz6RcWREnC054mLS1U9hjmvpuV8kasg1p9emyC6vUUAXfKkx2/cuywUTbE6dTHxbCzj0dRwiy1v8ybsf8xuRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=skucHruF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 064E0C4CEE5;
+	Wed,  5 Mar 2025 01:09:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741136778;
-	bh=NFjI1EHuABG7s0eSffnKl9hWTBsGsWfNfqbWCI+12aw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tuf4utLm8wRDgL8Ga/dAwN/B4O1akbW0V7KqoyMrYlnTCA3HsOqhdlF+q6dZE3fyC
-	 M+vtntkhBDwypJ47u9mTKkTTEak1aJhZoJmycUpXto+hg37CXryNameXS8Pmn3i8t+
-	 nB4tJvZLHLc+E+OCEnwl5tDBsr5/0uRHnH1GJWPnODYUev2VHMU8Y3A9P6+a57nXOi
-	 uvcQ/Ev4AjR3vP4VtJeyWccPql7mjFErbHFnohmR9va3Df5vxxyIGnJ5+6+YQGHKaj
-	 5BUDLSBxF1DLDsYO0KAPrmz7CHS26TR1ymkJU6x/Dmp5JXoU/tjJJGdKtYtj2wp7r7
-	 Yy0KSyjhZvR1A==
-Date: Tue, 4 Mar 2025 17:06:16 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, Brett
- Creeley <brett.creeley@amd.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jacob Keller
- <jacob.e.keller@intel.com>, Paolo Abeni <pabeni@redhat.com>, Shannon Nelson
- <shannon.nelson@amd.com>, LKML <linux-kernel@vger.kernel.org>,
- kernel-janitors@vger.kernel.org, Qasim Ijaz <qasdev00@gmail.com>, Natalie
- Vock <natalie.vock@gmx.de>
-Subject: Re: [PATCH net-next] ionic: Simplify maximum determination in
- ionic_adminq_napi()
-Message-ID: <20250304170616.22763ca3@kernel.org>
-In-Reply-To: <cbbc2dbd-2028-4623-8cb3-9d01be341daa@web.de>
-References: <cbbc2dbd-2028-4623-8cb3-9d01be341daa@web.de>
+	s=k20201202; t=1741136999;
+	bh=oRu4ENvt5IO9ShjHhUpiGMnLQIYnQAofJB58ttqXE7c=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=skucHruF5uipXBnKaegjV66QTN65SNZJ7h+UT9MiCm7WhrRpQ89Yd9VxH/lSiKG2o
+	 +Ap6hL3tyJ8Zb0bec9HG9WwKoqkmnzda6J096DadF9VTfjeXLctyIe1wHzaTyUibxD
+	 SJHmaDtuTBux0bVwxRe1sOcsFvTRnCKHYbSHEDYvmWq9TbM+eoKx72Taq7VZx+/jFf
+	 k+8qUo9P+yZdtc8tuz58/VXRn/K/s7npgHmMolkoGxBo0UgvMz1ADOJBHyd/CIJ8E8
+	 wPA/aHw6xxhIRT+Q/KNVwPlXJPmCuKPKBpq1uO5Rux1ZZFH4uTCH4WmU20cx4tBxhk
+	 wau7SjCLTTv2w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C89380CFEB;
+	Wed,  5 Mar 2025 01:10:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v5] ppp: Fix KMSAN uninit-value warning with bpf
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174113703200.354590.6042068788472875055.git-patchwork-notify@kernel.org>
+Date: Wed, 05 Mar 2025 01:10:32 +0000
+References: <20250228141408.393864-1-jiayuan.chen@linux.dev>
+In-Reply-To: <20250228141408.393864-1-jiayuan.chen@linux.dev>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: horms@kernel.org, kuba@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, ricardo@marliere.net,
+ viro@zeniv.linux.org.uk, dmantipov@yandex.ru, aleksander.lobakin@intel.com,
+ linux-ppp@vger.kernel.org, linux-kernel@vger.kernel.org, mrpre@163.com,
+ paulus@samba.org, syzbot+853242d9c9917165d791@syzkaller.appspotmail.com
 
-On Sat, 1 Mar 2025 11:12:31 +0100 Markus Elfring wrote:
-> Reduce nested max() calls by a single max3() call in this
+Hello:
 
-max3() is literally a wrapper for max(a, max(b, c))
-This patch is pointless.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri, 28 Feb 2025 22:14:08 +0800 you wrote:
+> Syzbot caught an "KMSAN: uninit-value" warning [1], which is caused by the
+> ppp driver not initializing a 2-byte header when using socket filter.
+> 
+> The following code can generate a PPP filter BPF program:
+> '''
+> struct bpf_program fp;
+> pcap_t *handle;
+> handle = pcap_open_dead(DLT_PPP_PPPD, 65535);
+> pcap_compile(handle, &fp, "ip and outbound", 0, 0);
+> bpf_dump(&fp, 1);
+> '''
+> Its output is:
+> '''
+> (000) ldh [2]
+> (001) jeq #0x21 jt 2 jf 5
+> (002) ldb [0]
+> (003) jeq #0x1 jt 4 jf 5
+> (004) ret #65535
+> (005) ret #0
+> '''
+> Wen can find similar code at the following link:
+> https://github.com/ppp-project/ppp/blob/master/pppd/options.c#L1680
+> The maintainer of this code repository is also the original maintainer
+> of the ppp driver.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v5] ppp: Fix KMSAN uninit-value warning with bpf
+    https://git.kernel.org/netdev/net/c/4c2d14c40a68
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
