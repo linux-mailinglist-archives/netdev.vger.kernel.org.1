@@ -1,60 +1,62 @@
-Return-Path: <netdev+bounces-171910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FA1AA4F4DD
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 03:48:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DD43A4F4DE
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 03:50:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC7A53A9BD4
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 02:48:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 325887A75D0
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 02:49:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D3FFD515;
-	Wed,  5 Mar 2025 02:48:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D2E845C18;
+	Wed,  5 Mar 2025 02:50:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZhOkWAOh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dcKC26AC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38FF16ADD
-	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 02:48:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73E4FBA27;
+	Wed,  5 Mar 2025 02:50:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741142901; cv=none; b=WQYfoOhrozJe2hLy5bF3OShnzMk18nR9f9RrYGfibskEKsXKxm2Ilo55zrOMlG800U2ORW8Qf15VpRdKJ59JMHoXxRuyjuBcANg5E2q2zC5ogutDKUB8TVA0b61j4Ruj7zC5hpd8/iNMdr+8flMJ8Bzq+s+8HC8jzKjyIMxHOEc=
+	t=1741143017; cv=none; b=LQhCuDC9SyZDjJkMV55PhNy0npNGusbN/vE/duD8Qo7DZKJvKuiSAXvxPM3Gm/6g//Pbq96BsA8Srg8q4r+Pdm9Z6BJfjN8o49YzShDA3qtqNp2BFZE9BP2spWFtEraRU+ktytzLwVzLEplHJk/9Hmg5tWjyaK3XURamhJWYeVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741142901; c=relaxed/simple;
-	bh=H/xOnBKP0O41b9YD1jTBDyIcAz/aKGm+vlvzkCA+ocI=;
+	s=arc-20240116; t=1741143017; c=relaxed/simple;
+	bh=p2fHHRwbfxTC+zvZ5vM12u69WQOX7F8wxQnK45TsCJs=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TbOXDod9MJT1A60WuQOYmNaX2oMeC9weV30P6c7YK9AFzjP09rJYtgsf97UG+BC/XsVbn/i4KpHfvW9urkjcxnX3ZpnlzHDdU2R76sd+ZZumt0JIeOMOBxMqTa7z0NQfhUbGRQyaKoDVOrzHuXrNvkv5EKbiNDdNnBOSJPR0M3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZhOkWAOh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5B37C4CEE5;
-	Wed,  5 Mar 2025 02:48:19 +0000 (UTC)
+	 MIME-Version:Content-Type; b=mrd7NyaN9YqwQb7Zd4jvomeZmn4eTL6jPKJyuBTeu4Qb2LwyR0u4/fcLN5pNmcuL6/miLujteqBYhVI4lmMexCQ4wQF87DnU1kL20Nb7JwP4QVqkAedWaK722g8/RyX2pI1kefFWCzWKJjZ1Fa4VpALK3YRpm+9u1wwva54IS4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dcKC26AC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5112EC4CEE5;
+	Wed,  5 Mar 2025 02:50:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741142900;
-	bh=H/xOnBKP0O41b9YD1jTBDyIcAz/aKGm+vlvzkCA+ocI=;
+	s=k20201202; t=1741143016;
+	bh=p2fHHRwbfxTC+zvZ5vM12u69WQOX7F8wxQnK45TsCJs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZhOkWAOhp+gON2rDQVX4ah0G44IFrLnof8LYnlj2QvCL+InGzCzfsKq6QISuUerJA
-	 efZpwoQYsjFPiIKGJfnjojImjOKHjEu/d2furO6FdjsMTB+yeU0FXzv9QgncTtt/c3
-	 IYJqTRGiTvJwd0/MJ92i4XgcEcjNAMOt7bEboRcwHUYQDa7NkVk1onpnh4Aveu9oFg
-	 VjdeRutHAQzNuoSZ4eAYZIT0WPuRd7JikAd1dQIEojVByqUrW4+fZKlUei0NfBJ3hY
-	 3BI8IkdSaOzWr7YkwnyT/lTOWGbHTuWQbSWW5ls8Ac3Nyf0oi8Vfi+f90UwUItKkRA
-	 BBrxhWnq8MIvg==
-Date: Tue, 4 Mar 2025 18:48:19 -0800
+	b=dcKC26ACrFbg1Xbr69Va46gRCxOB4BfgtbugOUyqDAEvp81RqUbeNvXXkj5nCvlM7
+	 g+PZKZe3jpQU9GPRhwVF3uaTxoUOqZy6NNOrn+9THhh9mZuOZFM3W5q6OEo3HWDnby
+	 GgAMkDSNuRFh40Z02fSmw+5cA8rYrm+Gb1ojz/QjdUsrLcaXD1obxb/mY2lgJfxXAQ
+	 6E+M0eRFY8lkQLgNwONl1fT/mrziX0nWvDSXOkxLdWldmULb2eRQ3NEeTYiVB7DatT
+	 4FlmW+IY7H+ISR6Wiox0kYReBdFEKpeNQZlkyndpq0HZgqkzZ7y6JQG1qMmQ5khIs1
+	 9VTN9xPRGpEpQ==
+Date: Tue, 4 Mar 2025 18:50:15 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Xin Tian" <tianx@yunsilicon.com>
-Cc: <netdev@vger.kernel.org>, <leon@kernel.org>, <andrew+netdev@lunn.ch>,
- <pabeni@redhat.com>, <edumazet@google.com>, <davem@davemloft.net>,
- <jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>,
- <weihg@yunsilicon.com>, <wanry@yunsilicon.com>, <jacky@yunsilicon.com>,
- <horms@kernel.org>, <parthiban.veerasooran@microchip.com>,
- <masahiroy@kernel.org>
-Subject: Re: [PATCH net-next v7 01/14] xsc: Add xsc driver basic framework
-Message-ID: <20250304184819.6e28c29a@kernel.org>
-In-Reply-To: <20250228154122.216053-2-tianx@yunsilicon.com>
-References: <20250228154122.216053-1-tianx@yunsilicon.com>
-	<20250228154122.216053-2-tianx@yunsilicon.com>
+To: Lee Trager <lee@trager.us>
+Cc: Alexander Duyck <alexanderduyck@fb.com>, kernel-team@meta.com, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Sanman
+ Pradhan <sanman.p211993@gmail.com>, Michal Swiatkowski
+ <michal.swiatkowski@linux.intel.com>, Mohsin Bashir
+ <mohsin.bashr@gmail.com>, Su Hui <suhui@nfschina.com>, Kalesh AP
+ <kalesh-anakkur.purayil@broadcom.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 0/3] eth: fbnic: Cleanup macros and string
+ function
+Message-ID: <20250304185015.4d0663f5@kernel.org>
+In-Reply-To: <20250228191935.3953712-1-lee@trager.us>
+References: <20250228191935.3953712-1-lee@trager.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,98 +66,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 28 Feb 2025 23:41:24 +0800 Xin Tian wrote:
-> +config NET_VENDOR_YUNSILICON
-> +	depends on ARM64 || X86_64
+On Fri, 28 Feb 2025 11:15:25 -0800 Lee Trager wrote:
+> We have received some feedback that the macros we use for reading FW mailbox
+> attributes are too large in scope and confusing to understanding. Additionally
+> the string function did not provide errors allowing it to silently succeed.
+> This patch set fixes theses issues.
 
-|| COMPILE_TEST please ?
-
-> diff --git a/drivers/net/ethernet/yunsilicon/Makefile b/drivers/net/ethernet/yunsilicon/Makefile
-> new file mode 100644
-> index 000000000..6fc8259a7
-> --- /dev/null
-> +++ b/drivers/net/ethernet/yunsilicon/Makefile
-> @@ -0,0 +1,8 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
-> +# All rights reserved.
-> +# Makefile for the Yunsilicon device drivers.
-> +#
-> +
-> +# obj-$(CONFIG_YUNSILICON_XSC_ETH) += xsc/net/
-
-Why are you adding commented out lines? Add them where needed
-
-> +obj-$(CONFIG_YUNSILICON_XSC_PCI) += xsc/pci/
-> \ No newline at end of file
-
-new line missing
-
-> new file mode 100644
-> index 000000000..de743487e
-> --- /dev/null
-> +++ b/drivers/net/ethernet/yunsilicon/xsc/net/Kconfig
-> @@ -0,0 +1,17 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
-> +# All rights reserved.
-> +# Yunsilicon driver configuration
-> +#
-> +
-> +config YUNSILICON_XSC_ETH
-> +	tristate "Yunsilicon XSC ethernet driver"
-> +	default n
-
-n is the default, you don't have to specify it
-
-> +xsc_eth-y := main.o
-> \ No newline at end of file
-
-new line
-
-> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig b/drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig
-> new file mode 100644
-> index 000000000..2b6d79905
-> --- /dev/null
-> +++ b/drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig
-> @@ -0,0 +1,16 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
-> +# All rights reserved.
-> +# Yunsilicon PCI configuration
-> +#
-> +
-> +config YUNSILICON_XSC_PCI
-> +	tristate "Yunsilicon XSC PCI driver"
-> +	default n
-
-no need
-
-> +	select PAGE_POOL
-
-Why is this in the PCI driver, not the ETH driver?
-Please add this line in a patch which actually makes use of page pool
-
-> +static int set_dma_caps(struct pci_dev *pdev)
-> +{
-> +	int err;
-> +
-> +	err = dma_set_mask(&pdev->dev, DMA_BIT_MASK(64));
-> +	if (err)
-> +		err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
-> +	else
-> +		err = dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(64));
-
-Please grep git history for dma_set_mask_and_coherent
-The fallback is unnecessary, just:
-
-	err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
-
-> +	if (!err)
-> +		dma_set_max_seg_size(&pdev->dev, SZ_2G);
-> +
-> +	return err;
-> +}
--- 
-pw-bot: cr
+Applied, thanks!
 
