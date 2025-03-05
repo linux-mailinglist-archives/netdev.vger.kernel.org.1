@@ -1,235 +1,132 @@
-Return-Path: <netdev+bounces-171934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45A8DA4F7B8
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 08:15:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40FC2A4F7DD
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 08:27:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6790616F046
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 07:15:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5ABB8188FE80
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 07:27:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A02031EA7E9;
-	Wed,  5 Mar 2025 07:14:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB09C1EC00B;
+	Wed,  5 Mar 2025 07:27:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="afS8XBdS";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="mqQEKA+Y";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="OQNjnXNk";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ogxQo14n"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KqHcVqs9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE761EA7F9
-	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 07:14:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEFC01EA7E9
+	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 07:27:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741158898; cv=none; b=GlsA9bNvf/6+1g02vpW5wHuL68qbFeNbCauoXK//Fl4G0V6ew4srN/BXYDfnAJlBrH4gqAnQr47mP6Eni60vdbgS97WwY9opoBocsAzo//KrKESgMzmagjUasTe3jvI2CtizEvBNIa2XkUgvW5ArbaYmmiHNbce7v566d9Ge3h0=
+	t=1741159641; cv=none; b=C8Sv0honwTFWGL/PTdO7RPa1GDK1t96Xy/AkiXOo0jcfyKnr9keQF3BpNG0i8/q2ct+YpnCwCmrnKP0tK9uCXvnLYyr4CQ5hFTvdzD49BmV92FUQDBvTxSv6br+a60Ed+cpCZpVIF6VXJSbw5PwC+vp/OLl+azoDebW1Z/pBvqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741158898; c=relaxed/simple;
-	bh=yvZIGlrzQUS7kneI2ZsUmnrVR8WoOn4WJuyWnxa1vDA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=e9OGkeZ/Kk0jTqoce05tcHRGalXXsI+efhM1JfsSs1THzxiwblpKS4e1npDyY38DvOXsO6r7T4OpBy7nH1Gu+TrWCCkrP0xMpZjzQOYhg0pWmqoEWDa/OJlOpHm5OvLi5qTVl3kcmOMEjR34CtJV2r00J8eJUJJVKo06h0yWmHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=afS8XBdS; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=mqQEKA+Y; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=OQNjnXNk; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ogxQo14n; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id ECFEE2118C;
-	Wed,  5 Mar 2025 07:14:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1741158895; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
+	s=arc-20240116; t=1741159641; c=relaxed/simple;
+	bh=ggBjNt/KlzNhbq7zUAZEYyviD7fOL0zcgpYxjiglnLg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u6P3TG/KUzaGVkgdNRyQnqNeO+q9XJQyedOzcwq5nYEXResfZ9mxyRxL3Rgcn4V2Kg8QFD0bGj5n9QE2eWFyG543cKPJajViMI3zFvCWFlbAMXvbjWCCj1/d3/laGxeMYjKMIuCn9++AWh+OUIBZx/dqZNp3k0MG8CejdwM5iyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KqHcVqs9; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741159638;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=LvFN6KNwKJUNoJkvS2ieU0t84GJ/LyzPiMoahiO9g5c=;
-	b=afS8XBdS7HvS36sBsHegYd1P3QAAV85NE78eW3csQ5S4xT2YgNGxNzsPi65aR0Cf8gpEcu
-	BMWBvmp9Uz4VZbAfT0a1WCkdc9YtkiIrbFoIwxo3JnnxIh9LQWdEJYI397c7fOiT85U+ad
-	jAVmrWfCpeiL2mw5qmxEJYbWmic6JTE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1741158895;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LvFN6KNwKJUNoJkvS2ieU0t84GJ/LyzPiMoahiO9g5c=;
-	b=mqQEKA+YYOMEmtzpjiDaePAuAu5XQMwY0/UlLYwL8wBSq23NQRcUTuFTFCdGClL+xrFEqH
-	0IUQP/kf1CyeVYDw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1741158894; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LvFN6KNwKJUNoJkvS2ieU0t84GJ/LyzPiMoahiO9g5c=;
-	b=OQNjnXNk91XUHVdChxFWVZq9Dxs3SVDybtjahPwY8qCtBZEG4Pjs1czk34HkJnDsHupabE
-	BKgcPIMUwAcRbPqQrpBeGSnhhvGt25EFoshbDFmxjaf0SUPMdXtwd2kHBnQ/psSIvJrKfV
-	oo/pmPYX7UNYvaJ+aLj/4WCtiv5ML6k=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1741158894;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LvFN6KNwKJUNoJkvS2ieU0t84GJ/LyzPiMoahiO9g5c=;
-	b=ogxQo14n0Cfbz+paAo0eHijspk7kwSwRkYpYhn/fcm52Ql9fzsKlWlEpZWJa5N78aNW9Ji
-	6NET4+HBmX1inUCQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8491813939;
-	Wed,  5 Mar 2025 07:14:54 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id naj6He75x2fyQwAAD6G6ig
-	(envelope-from <hare@suse.de>); Wed, 05 Mar 2025 07:14:54 +0000
-Message-ID: <f7306936-1181-432c-9060-1de6bd36a31f@suse.de>
-Date: Wed, 5 Mar 2025 08:14:50 +0100
+	bh=3Gqpuh7OkhW6l3/SGFe53202mdgSid6lnY8KI4KHLQM=;
+	b=KqHcVqs9gkuBBotJ0UU52PmR+tXG3tRCKBCpXh60+sgr507VKdcuJ6HoUd4KUJVATziGZt
+	bOeZTrXs/WgbXPla72WCj40gzoafUSK4LRxWYW/A7edy91yCpa62OKPaydgBhERuS36EsT
+	IOAS/hNEVYDDOpOvuHubbB1J0ja8QIg=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-144-YSiiLFGaOdi1VGV508Iagw-1; Wed, 05 Mar 2025 02:27:17 -0500
+X-MC-Unique: YSiiLFGaOdi1VGV508Iagw-1
+X-Mimecast-MFC-AGG-ID: YSiiLFGaOdi1VGV508Iagw_1741159636
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3911232fd8bso1769051f8f.3
+        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 23:27:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741159636; x=1741764436;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3Gqpuh7OkhW6l3/SGFe53202mdgSid6lnY8KI4KHLQM=;
+        b=NLQYtLCDNj1lKZGqvcNxABfya6Df+56ar+qmXeDhDXoUR7U42sqV4PGV6EV7ii4XLZ
+         YftWMHxkOKwbiNYmTjZxnTDufHeQvZQIfVYKouovu69R8JbWsnhuXvqUJBfiJVYogWb4
+         U8MHjHJHkE4jTdODDqEMtjByqbUUSOLAX/yqwP65Ag6cbu9cEgFUWNfdBP5csNmb+Moa
+         p/k1ZjrU45Ms5P0dkkRriAG39ioGKV2EIfah92UFwITwD0aASXxSRTN7ZRYyCoLQPt+l
+         xbMq/zP6KuyBThg7nWFO1FJ/9JekgHQ++rfByQggHD3thJjWSJajVREx9EgmXlfvh7+L
+         WNDg==
+X-Forwarded-Encrypted: i=1; AJvYcCUqc37Q2bQx8OeJPAcp4p1iERLfthCCh7PuhFjsEMqa5pWiCQeBZ/R3nDWbVqmIngV1usEVMGQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4JjLEXKZBavR9gjXag319mh1lux/pE6K4MY4wdV5/PkiVas60
+	GJmXNQxEpui8yFQLtRl7UAqwvmrQegqTteiwOeACjwwJeeZOdhtHNoVE2V+OI+6M5lToZEP+0lc
+	rw1AwLnrxkoHAklNP9xeOp3wwhxq9V2f/ky8t0O1U0QEgTi0CMs1Beg==
+X-Gm-Gg: ASbGncv9pdVnHtHxFGR0GVyq0a6zaMbegsOJ23qZdKRG0l43joSc4eoHM4T1RQ8SyDB
+	ihWrd5yloQtT9IfO43UpKI3MOF1axylFQVeAQMmi+vZazCw9o1IAOz3AFFPSRLfxMwQIk9YOuX5
+	Yh524atlzD9QUD2DpPzaRF0V8EbVnUdKQc7SYRgEtqGEaJFu03BfsXCYa2S6+qLaVbdpIGRGSz8
+	KxQ2D9RbBIhLk3MuKO2V9ZuDI/fJ0Y0BQys29jneJ5Y4Ot8pBb84jPKXuRj/KIxy6k/oGQooXeK
+	SpBPNdtlHg==
+X-Received: by 2002:a5d:588c:0:b0:391:1222:b459 with SMTP id ffacd0b85a97d-3911f7bd7b9mr1100769f8f.49.1741159636295;
+        Tue, 04 Mar 2025 23:27:16 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFFSwg2gbLwAPlPAn2L1vg/ffvpbpIN3dglqIqZN8294KCbPeBfUkyQP4He1JGn832GdDHxeA==
+X-Received: by 2002:a5d:588c:0:b0:391:1222:b459 with SMTP id ffacd0b85a97d-3911f7bd7b9mr1100756f8f.49.1741159635943;
+        Tue, 04 Mar 2025 23:27:15 -0800 (PST)
+Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390e47a7b88sm19898221f8f.40.2025.03.04.23.27.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Mar 2025 23:27:15 -0800 (PST)
+Date: Wed, 5 Mar 2025 02:27:12 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>,
+	Jason Wang <jasowang@redhat.com>, davem@davemloft.net,
+	Stefan Hajnoczi <stefanha@redhat.com>, linux-kernel@vger.kernel.org,
+	Jorgen Hansen <jhansen@vmware.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	linux-hyperv@vger.kernel.org, Dexuan Cui <decui@microsoft.com>,
+	netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH net-next 0/3] vsock: support network namespace
+Message-ID: <20250305022248-mutt-send-email-mst@kernel.org>
+References: <20200116172428.311437-1-sgarzare@redhat.com>
+ <20200427142518.uwssa6dtasrp3bfc@steredhat>
+ <224cdc10-1532-7ddc-f113-676d43d8f322@redhat.com>
+ <20200428160052.o3ihui4262xogyg4@steredhat>
+ <Z8edJjqAqAaV3Vkt@devvm6277.cco0.facebook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Kernel oops with 6.14 when enabling TLS
-To: Vlastimil Babka <vbabka@suse.cz>, Matthew Wilcox <willy@infradead.org>,
- Hannes Reinecke <hare@suse.com>
-Cc: Boris Pismenny <borisp@nvidia.com>,
- John Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- Sagi Grimberg <sagi@grimberg.me>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
- linux-mm@kvack.org, Harry Yoo <harry.yoo@oracle.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <Z8XPYNw4BSAWPAWT@casper.infradead.org>
- <edf65d4e-90f0-4b12-b04f-35e97974a36f@suse.cz>
- <95b0b93b-3b27-4482-8965-01963cc8beb8@suse.cz>
- <fcfa11c6-2738-4a2e-baa8-09fa8f79cbf3@suse.de>
- <a466b577-6156-4501-9756-1e9960aa4891@suse.cz>
- <6877dfb1-9f44-4023-bb6d-e7530d03e33c@suse.com>
- <db1a4681-1882-4e0a-b96f-a793e8fffb56@suse.cz>
- <Z8cm5bVJsbskj4kC@casper.infradead.org>
- <a4bbf5a7-c931-4e22-bb47-3783e4adcd23@suse.com>
- <Z8cv9VKka2KBnBKV@casper.infradead.org>
- <Z8dA8l1NR-xmFWyq@casper.infradead.org>
- <d9f4b78e-01d7-4d1d-8302-ed18d22754e4@suse.de>
- <27111897-0b36-4d8c-8be9-4f8bdbae88b7@suse.cz>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <27111897-0b36-4d8c-8be9-4f8bdbae88b7@suse.cz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-6.80 / 50.00];
-	REPLY(-4.00)[];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	TAGGED_RCPT(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[12];
-	RCVD_TLS_ALL(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[nvidia.com,gmail.com,kernel.org,grimberg.me,lists.infradead.org,vger.kernel.org,kvack.org,oracle.com];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Score: -6.80
-X-Spam-Flag: NO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z8edJjqAqAaV3Vkt@devvm6277.cco0.facebook.com>
 
-On 3/4/25 20:44, Vlastimil Babka wrote:
-> On 3/4/25 20:39, Hannes Reinecke wrote:
->> On 3/4/25 19:05, Matthew Wilcox wrote:
->>> On Tue, Mar 04, 2025 at 04:53:09PM +0000, Matthew Wilcox wrote:
->>>> Right, that's what happened in the block layer.  We mark the bio with
->>>> BIO_PAGE_PINNED if the pincount needs to be dropped.  As a transitional
->>>> period, we had BIO_PAGE_REFFED which indicated that the page refcount
->>>> needed to be dropped.  Perhaps there's something similar that network
->>>> could be doing.
->>>
->>> Until that time ... how does this look as a quick hack to avoid
->>> reverting the slab change?
->>>
->>> diff --git a/include/linux/mm.h b/include/linux/mm.h
->>> index d6fed25243c3..ca08a923ac6d 100644
->>> --- a/include/linux/mm.h
->>> +++ b/include/linux/mm.h
->>> @@ -1520,7 +1520,10 @@ static inline void folio_get(struct folio *folio)
->>>    
->>>    static inline void get_page(struct page *page)
->>>    {
->>> -	folio_get(page_folio(page));
->>> +	struct folio *folio = page_folio(page);
->>> +	if (WARN_ON_ONCE(folio_test_slab(folio)))
->>> +		return;
->>> +	folio_get(folio);
->>>    }
->>>    
->>>    static inline __must_check bool try_get_page(struct page *page)
->>> @@ -1614,6 +1617,8 @@ static inline void put_page(struct page *page)
->>>    {
->>>    	struct folio *folio = page_folio(page);
->>>    
->>> +	if (folio_test_slab(folio))
->>> +		return;
->>>    	folio_put(folio);
->>>    }
->>>    
->>> diff --git a/lib/iov_iter.c b/lib/iov_iter.c
->>> index 65f550cb5081..8c7fdb7d8c8f 100644
->>> --- a/lib/iov_iter.c
->>> +++ b/lib/iov_iter.c
->>> @@ -1190,8 +1190,12 @@ static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
->>>    		if (!n)
->>>    			return -ENOMEM;
->>>    		p = *pages;
->>> -		for (int k = 0; k < n; k++)
->>> -			get_page(p[k] = page + k);
->>> +		for (int k = 0; k < n; k++) {
->>> +			struct folio *folio = page_folio(page);
->>> +			p[k] = page + k;
->>> +			if (!folio_test_slab(folio))
->>> +				folio_get(folio);
->>> +		}
->>>    		maxsize = min_t(size_t, maxsize, n * PAGE_SIZE - *start);
->>>    		i->count -= maxsize;
->>>    		i->iov_offset += maxsize;
->>>
->>
->> Good news and bad news ...
->> Good news: TLS works again!
->> Bad news: no errors.
-> 
-> Wait, did you add a WARN_ON_ONCE() to the put_page() as I suggested? If yes
-> and there was no error, it would have to be leaking the page. Or the path
-> uses folio_put() and we'd need to put the warning there.
-> 
-Oh, no, I didn't. Just added the WARN_ON to get_page().
-Let me try ...
+On Tue, Mar 04, 2025 at 04:39:02PM -0800, Bobby Eshleman wrote:
+> I think it might be a lot of complexity to bring into the picture from
+> netdev, and I'm not sure there is a big win since the vsock device could
+> also have a vsock->net itself? I think the complexity will come from the
+> address translation, which I don't think netdev buys us because there
+> would still be all of the work work to support vsock in netfilter?
 
-Cheers,
+Ugh.
 
-Hannes
+Guys, let's remember what vsock is.
+
+It's a replacement for the serial device with an interface
+that's easier for userspace to consume, as you get
+the demultiplexing by the port number.
+
+The whole point of vsock is that people do not want
+any firewalling, filtering, or management on it.
+
+It needs to work with no configuration even if networking is
+misconfigured or blocked.
+
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+MST
+
 
