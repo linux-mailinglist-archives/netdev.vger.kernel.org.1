@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-172241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16FF2A50F20
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 23:53:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E101A50F1F
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 23:53:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEC381893197
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 22:53:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C02083AE465
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 22:52:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FDEC266F00;
-	Wed,  5 Mar 2025 22:52:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E13D265632;
+	Wed,  5 Mar 2025 22:52:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TbhIJ9Va"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hsbN9juf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C4A5266EE8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7834D263C97
 	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 22:52:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741215155; cv=none; b=sMf4vpnzhbaJO/9fUa4OVFKW5GgwhtvpavW7RtSxMv+UnJ+NSfUK8aZg3QAMObwK8Tw22lE4LruDd2pxx5fJN0dPGmCpmuGadknT8Tf79iDt/MPrIod/ei/wc76HuTX7mz26jdlpqL6XQZRKkiSR2Fr9wHoYULN4oH2SXKkp2QU=
+	t=1741215154; cv=none; b=dFyMT2rbDwWoG7xhDseazV2u8aS3/RGbX6TGyKSgpJiHx9raTtBUiXhYPCM6eyCOjtKVcfJsiScwYQVgFe+3cL5GAogSPYRh8gXsQ0z7gmRooH36i/oICiUJhQ4AG5FoPHxUI1FwK39GN+uyuUHnYOj10thzIGS8uafn78mL7Ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741215155; c=relaxed/simple;
-	bh=7xfdE6ulWRHzqg2UefNkQLPvSQm33yTlOcS3wYTbyYU=;
+	s=arc-20240116; t=1741215154; c=relaxed/simple;
+	bh=j+HM0zxu1T9sDSYQfj0qD5Ow787jp4ngF/cckbf0Hoo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BonUe+374/z3GpIV7Rx4L86r6ihknX92xBckPatyiAFwBKcHii7ecftjoM3KJqtItvTfTFFLsl5IJlBT9zEICjabrQROTnJ6Ho7283l6F2qk1UlhlYTr09RhFf8taMF1LsxCBIBs2AefzPatEU9yketd1b4cq1nd9ctDvVRFrVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TbhIJ9Va; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 999D9C4CEEE;
-	Wed,  5 Mar 2025 22:52:33 +0000 (UTC)
+	 MIME-Version; b=tGWTLJyNdsMz5h4EOKDCMcf1jJWog1Q61O2Gsj6Z7eO/NCvG6Iwi/8xg9h/wLdR3wilC91NmlBxBHkf8WAr0l3v3cm/Se9tnEp42FmnAA8FVwOZmeyTq5EmV+bY3vm2KmPBFAx2HwhzMtJF2aZi0VtsLSoA82WhfJpYqWbGFAmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hsbN9juf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14720C4CED1;
+	Wed,  5 Mar 2025 22:52:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741215153;
-	bh=7xfdE6ulWRHzqg2UefNkQLPvSQm33yTlOcS3wYTbyYU=;
+	s=k20201202; t=1741215154;
+	bh=j+HM0zxu1T9sDSYQfj0qD5Ow787jp4ngF/cckbf0Hoo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TbhIJ9VatxUj2krlfBGA5XKxqbSG38IGbke/8zn1aatG3yTXQ5qhxK4H1ngl0Wws+
-	 2rpEGQkcpJekGnUPiIIkt8JVCvPw6GWqbeOLnFrAA6F9z/0mrgf4HpVrH4Cqh3NL2z
-	 6ETdnpxg/aUZziFPOzGamu9Mld1mkIS13V+eLDhduC2yLRRsGjvJBAxoXYShMxzZ+4
-	 uNHh6kvYSGpEXWt/xm7iq158VimlOqclcfLZwKEQF008KMDwBs0UZII3eH6FlQfo+X
-	 TAL1Om8WW2lWdGEorcnpTB/OtzXDbR0aM4rnlT5B/eYCMT9+Iq4Fj0D46MZGJubAcq
-	 2U0rtZjwh/QdA==
+	b=hsbN9juf/Gtg26oYdsJrx/WfmJFPz7fda5dWD7qyVAI0rzBkiyht+g6xPl0i9PYGy
+	 wv6m/vRhJYVEqaR+HIEaOTHu6jN+1it6prmksF4NU4hGgeBtdiBPb6sQbJARAgMgot
+	 IJ+BSrkKthrjC6usziabPHDDus+n7qxtP2Pez+1ZiokNPYwvQG+qOUyw+6t5MhWSc+
+	 1JHjeWGxI7+c1ix67khMGFIyycejpFfWTqV1nAHpHfQQcbvENu1Tpj4xs8B7ZgvenK
+	 jOCzJCRhubiw5HSdpuZX3Vk+JKfBsxT+xKDGMCBw33T4OD8Xp8VMeH05K37YgPFAHE
+	 JRnuSB87Leufw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -52,9 +52,9 @@ Cc: netdev@vger.kernel.org,
 	pavan.chebbi@broadcom.com,
 	przemyslaw.kitszel@intel.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v3 04/10] eth: bnxt: snapshot driver stats
-Date: Wed,  5 Mar 2025 14:52:09 -0800
-Message-ID: <20250305225215.1567043-5-kuba@kernel.org>
+Subject: [PATCH net-next v3 05/10] eth: bnxt: don't use ifdef to check for CONFIG_INET in GRO
+Date: Wed,  5 Mar 2025 14:52:10 -0800
+Message-ID: <20250305225215.1567043-6-kuba@kernel.org>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250305225215.1567043-1-kuba@kernel.org>
 References: <20250305225215.1567043-1-kuba@kernel.org>
@@ -66,86 +66,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Subsequent commits will add datapath stats which need u64_stats
-protection. Make current readers work on a snapshot, so it's
-easier to extend this code without much duplication.
+Use IS_ENABLED(CONFIG_INET) to make the code easier to refactor.
+Now all packets which did not go thru GRO will exit in the same
+branch.
 
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 31 +++++++++++++++--------
- 1 file changed, 21 insertions(+), 10 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 4b85f224c344..854e7ec5390b 100644
+index 854e7ec5390b..d8a24a8bcfe8 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -13093,6 +13093,12 @@ static int bnxt_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
- 	return -EOPNOTSUPP;
- }
- 
-+static void bnxt_drv_stat_snapshot(const struct bnxt_sw_stats *sw_stats,
-+				   struct bnxt_sw_stats *snapshot)
-+{
-+	memcpy(snapshot, sw_stats, sizeof(*snapshot));
-+}
-+
- static void bnxt_get_ring_stats(struct bnxt *bp,
- 				struct rtnl_link_stats64 *stats)
+@@ -1740,12 +1740,11 @@ static inline struct sk_buff *bnxt_gro_skb(struct bnxt *bp,
+ 					   struct rx_tpa_end_cmp_ext *tpa_end1,
+ 					   struct sk_buff *skb)
  {
-@@ -13101,8 +13107,11 @@ static void bnxt_get_ring_stats(struct bnxt *bp,
- 	for (i = 0; i < bp->cp_nr_rings; i++) {
- 		struct bnxt_napi *bnapi = bp->bnapi[i];
- 		struct bnxt_cp_ring_info *cpr = &bnapi->cp_ring;
-+		struct bnxt_sw_stats sw_stats;
- 		u64 *sw = cpr->stats.sw_stats;
+-#ifdef CONFIG_INET
+ 	int payload_off;
+ 	u16 segs;
  
-+		bnxt_drv_stat_snapshot(cpr->sw_stats, &sw_stats);
-+
- 		stats->rx_packets += BNXT_GET_RING_STATS64(sw, rx_ucast_pkts);
- 		stats->rx_packets += BNXT_GET_RING_STATS64(sw, rx_mcast_pkts);
- 		stats->rx_packets += BNXT_GET_RING_STATS64(sw, rx_bcast_pkts);
-@@ -13127,8 +13136,8 @@ static void bnxt_get_ring_stats(struct bnxt *bp,
- 		stats->tx_dropped += BNXT_GET_RING_STATS64(sw, tx_error_pkts);
+ 	segs = TPA_END_TPA_SEGS(tpa_end);
+-	if (segs == 1)
++	if (segs == 1 || !IS_ENABLED(CONFIG_INET))
+ 		return skb;
  
- 		stats->rx_dropped +=
--			cpr->sw_stats->rx.rx_netpoll_discards +
--			cpr->sw_stats->rx.rx_oom_discards;
-+			sw_stats.rx.rx_netpoll_discards +
-+			sw_stats.rx.rx_oom_discards;
- 	}
+ 	NAPI_GRO_CB(skb)->count = segs;
+@@ -1759,7 +1758,6 @@ static inline struct sk_buff *bnxt_gro_skb(struct bnxt *bp,
+ 	skb = bp->gro_func(tpa_info, payload_off, TPA_END_GRO_TS(tpa_end), skb);
+ 	if (likely(skb))
+ 		tcp_gro_complete(skb);
+-#endif
+ 	return skb;
  }
  
-@@ -13195,20 +13204,22 @@ static void bnxt_get_one_ring_drv_stats(struct bnxt *bp,
- 					struct bnxt_total_ring_drv_stats *stats,
- 					struct bnxt_cp_ring_info *cpr)
- {
--	struct bnxt_sw_stats *sw_stats = cpr->sw_stats;
- 	u64 *hw_stats = cpr->stats.sw_stats;
-+	struct bnxt_sw_stats sw_stats;
- 
--	stats->rx_total_l4_csum_errors += sw_stats->rx.rx_l4_csum_errors;
--	stats->rx_total_resets += sw_stats->rx.rx_resets;
--	stats->rx_total_buf_errors += sw_stats->rx.rx_buf_errors;
--	stats->rx_total_oom_discards += sw_stats->rx.rx_oom_discards;
--	stats->rx_total_netpoll_discards += sw_stats->rx.rx_netpoll_discards;
-+	bnxt_drv_stat_snapshot(cpr->sw_stats, &sw_stats);
-+
-+	stats->rx_total_l4_csum_errors += sw_stats.rx.rx_l4_csum_errors;
-+	stats->rx_total_resets += sw_stats.rx.rx_resets;
-+	stats->rx_total_buf_errors += sw_stats.rx.rx_buf_errors;
-+	stats->rx_total_oom_discards += sw_stats.rx.rx_oom_discards;
-+	stats->rx_total_netpoll_discards += sw_stats.rx.rx_netpoll_discards;
- 	stats->rx_total_ring_discards +=
- 		BNXT_GET_RING_STATS64(hw_stats, rx_discard_pkts);
--	stats->tx_total_resets += sw_stats->tx.tx_resets;
-+	stats->tx_total_resets += sw_stats.tx.tx_resets;
- 	stats->tx_total_ring_discards +=
- 		BNXT_GET_RING_STATS64(hw_stats, tx_discard_pkts);
--	stats->total_missed_irqs += sw_stats->cmn.missed_irqs;
-+	stats->total_missed_irqs += sw_stats.cmn.missed_irqs;
- }
- 
- void bnxt_get_ring_drv_stats(struct bnxt *bp,
 -- 
 2.48.1
 
