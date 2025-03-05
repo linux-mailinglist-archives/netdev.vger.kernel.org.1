@@ -1,102 +1,211 @@
-Return-Path: <netdev+bounces-171888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 708EAA4F346
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 02:10:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EF54A4F37B
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 02:21:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBD7916EA2B
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 01:10:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2550189045F
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 01:21:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AD2086340;
-	Wed,  5 Mar 2025 01:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 799EA142624;
+	Wed,  5 Mar 2025 01:20:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MIBs/HvY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dhq0i/xL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f194.google.com (mail-yw1-f194.google.com [209.85.128.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DFC9282EE;
-	Wed,  5 Mar 2025 01:10:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0CC613D8B2;
+	Wed,  5 Mar 2025 01:20:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741137010; cv=none; b=JQMy4ONwLpJZ0qerMH4ntQx6+iVxraRhY3NS3qnLLdBug+YMSyNh4QN+Hq5nMxa/44LCDohAJXDiWX7ix1r7H2NtM/+YmX4ziUr8Hx2+dJCwCYWIyOHifJInkYRrDQHaSRoGlydu72Q9iri5WtkhN0RZ8cmSx5aBgHcHtGbWyVc=
+	t=1741137650; cv=none; b=ThnHym03FQx4Ej82dnjiM/zeXU5ko0b6PYAb4bVxpbdu8zswuWUA4g9R1QGA70eEYXlWrMAQYhHQP1JmvipDJrXLszEo+YoW2HgNuuRgRJW4XlWFqxculYXiVLmt1Vq9iSvNtouUTuRH3DM6a6OZLB7X5NrrBQeiV24KQEr9ZE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741137010; c=relaxed/simple;
-	bh=o2GS4bqqE977OqAGP8Gc1WH1R92Ml4Sy3dtY91sTP1c=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=I3U0KqkYKo5mXayJCv37rJ+ftafZnRxTNxRkTfC0HrMiI4RORncGCEN7btgHdWMRiPnlFYvxzT+s84GuNWAPfVdWPY+3U4DlZkl+kCLwrpjb3w5mmcH8xVh0XGR3OdZP/o1Ugdyi3BCVuMhu3FvLujTOu18r9/jl1kC2BFvY1Zs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MIBs/HvY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9050AC4CEE5;
-	Wed,  5 Mar 2025 01:10:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741137009;
-	bh=o2GS4bqqE977OqAGP8Gc1WH1R92Ml4Sy3dtY91sTP1c=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MIBs/HvYoceKM6s3CP46Kv7DLdc7J5vFMIqW7wXABFnd3wmYrxt8DEc3NycgW+Yn3
-	 BxLIYp9wKh/07ldbNG0h09RTuY9VYsOf4cnqUiZc1KqItIC5ERhAMOxHkCjUslS9xD
-	 VQ6wW8BQRqLp0g0YAC9k9ofAWwkiEWWwqX9xzFuVdbEcsB1hb6l/cb9g78Vgq9Qy9Y
-	 PojeabFho7z7OHPRm9dD5XsCihqxhMlwrroiT1zvnc65KAPe9uuDgEfpWgId3L9sCp
-	 qeA8zi8IOg6EwWLK7lWlwQ9i8rpVgKs8UrI3IBiYX8hCvnJjr53Oj+8Eq33Ht84poV
-	 068afxA5xpWdQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE531380CFEB;
-	Wed,  5 Mar 2025 01:10:43 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1741137650; c=relaxed/simple;
+	bh=xqfh+/z+RQyzw3ZjPbcTSHPRwuHVteqzMjyMDRsSiD8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NYMOxTpLIB/WfEeNCMCKaF7AuBoUrpgfm1U02Gph19JzzTWDw9UCyrLzrfJeQcEXJBTCL1PM7uMNSmvoFPgGfxT7hivchh2jM1ne1egCXEQ92Droxct5T/4rk9MVj0YuzesOWSbNGshYjD0BlT5Yj2DOGi34yWZvwVtmNxGLE4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dhq0i/xL; arc=none smtp.client-ip=209.85.128.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f194.google.com with SMTP id 00721157ae682-6ef7c9e9592so48173097b3.1;
+        Tue, 04 Mar 2025 17:20:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741137647; x=1741742447; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OHYZyJk9t+dccX+FpypbsuXH5wnniLUKk++ZCb3Oz18=;
+        b=dhq0i/xLN+xPsYhZcVVd3qpliCAqRJiMobRUSMtjahZN6dPIg7EN4NRPTlOOMN7HSe
+         1tOqPNvpx1zuWQaF8Oua03XQ/v916NlzhPiQtfRyOtXoUEeI4EVTzt9xe567QoMlNY+6
+         PrwOH9fuA30/eS35dY9BEIn+UrN1N1ialPRN69oa/OCBX7X4WoL8joS0bSXnNM3G4Ifv
+         Gnhiw4Vs+mAYaOye6op90SqzGMHA6S1HkOJl0i/AhvGHazSH84iwOt50yRPDexGu6pAA
+         4+7aOHgQZ626Lnp4/s198CooS/gMsr7N3nv+doVo8MeupupFw8OQbkYjGrUrB70ecPZd
+         5BKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741137647; x=1741742447;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OHYZyJk9t+dccX+FpypbsuXH5wnniLUKk++ZCb3Oz18=;
+        b=dGha9FJzQhAyVTCmUuIcw5dNdmYzH1cbfBpQ+HxLqze++yPMaybHcF0OqNvbNIr3uk
+         9sPHJueUyWK/0ySn2T9klXFacIzLKFhaL5XTtNRYuBEZAgv0mumz7OOSGqcoh3a9vPvV
+         M/DH0WxWkjPpTiZxK8rB68KVqt4ANtmt6w6C/kFsNhscTUu15bnBc//85P62fuo7NS9N
+         sPcDotLOZ5xA/3PsqykEjGjXL0vEsIBz6c+mtk0ZeL0tS9ysQQHy6Tj8XhwUB571D7ro
+         NUcPJ47M8AUqKbj/Uy9A7cFKmDs7s+TP1vu2OoaUScf1R8K4POJDjE4fDvsVdajDkOzD
+         Nqlg==
+X-Forwarded-Encrypted: i=1; AJvYcCUxt1jnbJ/z3l51hYcoCjFcP3IrQDXHAUFBwzrRiu+1PWvtpha4YkIJ1s67asP6WbY6vKlSYyskInZLSceRArY51JAC@vger.kernel.org, AJvYcCV3eaYKI2RRbELMbRqR57l3yKuDrZKYuiTOiAXSCdsUtN68kr9qB9NBi9wfdXFlRJ8fqMOLOwLE@vger.kernel.org, AJvYcCVJe4coz8a/kwiyCstaIvutZgg6iKedzV7hETjD5xsIG9fhEJ9JrVp1P7GCvXUSRjKQYHcOmmxDa2J5K1Xh@vger.kernel.org, AJvYcCXHziYkDdC27rheADELsYR8PKsq5kz1m5nkX4yaFALCWUJBcfh/eYQeDeLKw/ZosyTniqo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyB+KIdiQzMbWgOHr5Y6DeGTZxomMRjW32sQkGg14g66RXJIA5y
+	RTMX+w68JayjX+IXqPrmCNEUp28expJ7qU1WcdtymXHmO9gfx/DOJfQHvM5lx/wMuECQSREs1Sj
+	AmKZEp1U/qRxzLqun6iAyzEw9FOE=
+X-Gm-Gg: ASbGncuwbqhZnNl2Fx/rymm2xASjcIYqjdXBxD4f1T5zmY0XB9u5p+FfTJBFzVog/rN
+	u0NPLp8KhIQX/dwpPu/xxKs+nlhtc3PYPXci6ZTPN/vmrzbFS6jkAvg3+9QnffIIJAC1oINCGND
+	HT1iPK/hGYSQBlwlymQNx0HmNPcA==
+X-Google-Smtp-Source: AGHT+IEUFgZnl6Hm/lrUNqrNCPW/Rgad0I4A7NRpQso6+OmPGRY6t9+y0nrp+PzU9oYzztzRMxurMDXN8Jy0BacmWdM=
+X-Received: by 2002:a05:690c:3690:b0:6fb:a376:3848 with SMTP id
+ 00721157ae682-6fda315fdfbmr21998337b3.34.1741137647462; Tue, 04 Mar 2025
+ 17:20:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/5] mptcp: improve code coverage and small
- optimisations
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174113704249.354590.10497092944102408031.git-patchwork-notify@kernel.org>
-Date: Wed, 05 Mar 2025 01:10:42 +0000
-References: <20250228-net-next-mptcp-coverage-small-opti-v1-0-f933c4275676@kernel.org>
-In-Reply-To: <20250228-net-next-mptcp-coverage-small-opti-v1-0-f933c4275676@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, shuah@kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, yangang@kylinos.cn
+References: <20250303132837.498938-1-dongml2@chinatelecom.cn>
+ <20250303132837.498938-2-dongml2@chinatelecom.cn> <20250303165454.GB11590@noisy.programming.kicks-ass.net>
+ <CADxym3aVtKx_mh7aZyZfk27gEiA_TX6VSAvtK+YDNBtuk_HigA@mail.gmail.com>
+ <20250304053853.GA7099@noisy.programming.kicks-ass.net> <20250304061635.GA29480@noisy.programming.kicks-ass.net>
+ <CADxym3bS_6jpGC3vLAAyD20GsR+QZofQw0_GgKT8nN3c-HqG-g@mail.gmail.com>
+ <20250304094220.GC11590@noisy.programming.kicks-ass.net> <6F9EF5C3-4CAE-4C5E-B70E-F73462AC7CA0@zytor.com>
+In-Reply-To: <6F9EF5C3-4CAE-4C5E-B70E-F73462AC7CA0@zytor.com>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Wed, 5 Mar 2025 09:19:09 +0800
+X-Gm-Features: AQ5f1JovIrYFizMaqP4MsodnwT5N7qb6QoTLb6VyR_6OCJq8SQkboYm5nSKxxpw
+Message-ID: <CADxym3busXZKtX=+FY_xnYw7e1CKp5AiHSasZGjVJTdeCZao-g@mail.gmail.com>
+Subject: Re: [PATCH v4 1/4] x86/ibt: factor out cfi and fineibt offset
+To: "H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>
+Cc: rostedt@goodmis.org, mark.rutland@arm.com, alexei.starovoitov@gmail.com, 
+	catalin.marinas@arm.com, will@kernel.org, mhiramat@kernel.org, 
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	eddyz87@gmail.com, yonghong.song@linux.dev, john.fastabend@gmail.com, 
+	kpsingh@kernel.org, sdf@fomichev.me, jolsa@kernel.org, davem@davemloft.net, 
+	dsahern@kernel.org, mathieu.desnoyers@efficios.com, nathan@kernel.org, 
+	nick.desaulniers+lkml@gmail.com, morbo@google.com, samitolvanen@google.com, 
+	kees@kernel.org, dongml2@chinatelecom.cn, akpm@linux-foundation.org, 
+	riel@surriel.com, rppt@kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Tue, Mar 4, 2025 at 10:53=E2=80=AFPM H. Peter Anvin <hpa@zytor.com> wrot=
+e:
+>
+> On March 4, 2025 1:42:20 AM PST, Peter Zijlstra <peterz@infradead.org> wr=
+ote:
+> >On Tue, Mar 04, 2025 at 03:47:45PM +0800, Menglong Dong wrote:
+> >> We don't have to select FUNCTION_ALIGNMENT_32B, so the
+> >> worst case is to increase ~2.2%.
+> >>
+> >> What do you think?
+> >
+> >Well, since I don't understand what you need this for at all, I'm firmly
+> >on the side of not doing this.
+> >
+> >What actual problem is being solved with this meta data nonsense? Why is
+> >it worth blowing up our I$ footprint over.
+> >
+> >Also note, that if you're going to be explaining this, start from
+> >scratch, as I have absolutely 0 clues about BPF and such.
+>
+> I would appreciate such information as well. The idea seems dubious on th=
+e surface.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Ok, let me explain it from the beginning. (My English is not good,
+but I'll try to describe it as clear as possible :/)
 
-On Fri, 28 Feb 2025 15:38:34 +0100 you wrote:
-> This small series have various unrelated patches:
-> 
-> - Patch 1 and 2: improve code coverage by validating mptcp_diag_dump_one
->   thanks to a new tool displaying MPTCP info for a specific token.
-> 
-> - Patch 3: a fix for a commit which is only in net-next.
-> 
-> [...]
+Many BPF program types need to depend on the BPF trampoline,
+such as BPF_PROG_TYPE_TRACING, BPF_PROG_TYPE_EXT,
+BPF_PROG_TYPE_LSM, etc. BPF trampoline is a bridge between
+the kernel (or bpf) function and BPF program, and it acts just like the
+trampoline that ftrace uses.
 
-Here is the summary with links:
-  - [net-next,1/5] selftests: mptcp: Add a tool to get specific msk_info
-    https://git.kernel.org/netdev/net-next/c/00f5e338cf7e
-  - [net-next,2/5] selftests: mptcp: add a test for mptcp_diag_dump_one
-    https://git.kernel.org/netdev/net-next/c/ba2400166570
-  - [net-next,3/5] mptcp: pm: in-kernel: avoid access entry without lock
-    https://git.kernel.org/netdev/net-next/c/e85d33b35508
-  - [net-next,4/5] mptcp: pm: in-kernel: reduce parameters of set_flags
-    https://git.kernel.org/netdev/net-next/c/70c575d5a94f
-  - [net-next,5/5] mptcp: pm: exit early with ADD_ADDR echo if possible
-    https://git.kernel.org/netdev/net-next/c/f0de92479a09
+Generally speaking, it is used to hook a function, just like what ftrace
+do:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+foo:
+    endbr
+    nop5  -->  call trampoline_foo
+    xxxx
 
+In short, the trampoline_foo can be this:
 
+trampoline_foo:
+    prepare a array and store the args of foo to the array
+    call fentry_bpf1
+    call fentry_bpf2
+    ......
+    call foo+4 (origin call)
+    save the return value of foo
+    call fexit_bpf1 (this bpf can get the return value of foo)
+    call fexit_bpf2
+    .......
+    return to the caller of foo
+
+We can see that the trampoline_foo can be only used for
+the function foo, as different kernel function can be attached
+different BPF programs, and have different argument count,
+etc. Therefore, we have to create 1000 BPF trampolines if
+we want to attach a BPF program to 1000 kernel functions.
+
+The creation of the BPF trampoline is expensive. According to
+my testing, It will spend more than 1 second to create 100 bpf
+trampoline. What's more, it consumes more memory.
+
+If we have the per-function metadata supporting, then we can
+create a global BPF trampoline, like this:
+
+trampoline_global:
+    prepare a array and store the args of foo to the array
+    get the metadata by the ip
+    call metadata.fentry_bpf1
+    call metadata.fentry_bpf2
+    ....
+    call foo+4 (origin call)
+    save the return value of foo
+    call metadata.fexit_bpf1 (this bpf can get the return value of foo)
+    call metadata.fexit_bpf2
+    .......
+    return to the caller of foo
+
+(The metadata holds more information for the global trampoline than
+I described.)
+
+Then, we don't need to create a trampoline for every kernel function
+anymore.
+
+Another beneficiary can be ftrace. For now, all the kernel functions that
+are enabled by dynamic ftrace will be added to a filter hash if there are
+more than one callbacks. And hash lookup will happen when the traced
+functions are called, which has an impact on the performance, see
+__ftrace_ops_list_func() -> ftrace_ops_test(). With the per-function
+metadata supporting, we can store the information that if the callback is
+enabled on the kernel function to the metadata, which can make the performa=
+nce
+much better.
+
+The per-function metadata storage is a basic function, and I think there
+may be other functions that can use it for better performance in the featur=
+e
+too.
+
+(Hope that I'm describing it clearly :/)
+
+Thanks!
+Menglong Dong
 
