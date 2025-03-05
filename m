@@ -1,119 +1,173 @@
-Return-Path: <netdev+bounces-172162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51790A506A2
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 18:43:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 560B7A506A5
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 18:45:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9623B188A48B
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 17:43:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EB2616C787
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 17:45:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3788250BE2;
-	Wed,  5 Mar 2025 17:43:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9E2A245010;
+	Wed,  5 Mar 2025 17:44:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LxeE6+Z7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g0UNO2f/"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f193.google.com (mail-yb1-f193.google.com [209.85.219.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3035761FFE;
-	Wed,  5 Mar 2025 17:43:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 279EC18D65C;
+	Wed,  5 Mar 2025 17:44:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741196625; cv=none; b=g4io12F+RLW7PAWpAuFNQucR/8RorUiYqJA7MfX9jyaoHvkTWjlvLg0ZOg3nwmAc2+RyTCOSpbQIEDhyEDAAlm3CMsPiyqtPQ2YeSJAFUhDzNH1vp1JNdMF8NNNUfx9Lr54B0pXfHBIzi0VCytFqMKK2CeLhdjCJ/dgk89Ns90g=
+	t=1741196698; cv=none; b=KJgv3HSctZCYzRaKJ2bEPC6KrX5jtu9rwCUXl5s10uTcrnC/oWw9ROettlNAqV+zH5+EuP0KwD5323SIS1rTQl0jJ+3JBmwIX3OxcMw48Rx/V6KCQDoP0COXwbQvjOcf29B2GIlBV/4K5zxlVaVm8eY3RhGbWzAD8Udz9Cm0qj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741196625; c=relaxed/simple;
-	bh=BULtslcAgRtkIcgu5k0uwjHwL3Dn0IoM6+GCN9lRF9c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gYERgJ9eSvQF9hEVVCvt6KXzqkN7yX48ceSrCl5I3JVmAY7zDzMPpsxzv5wnpCBi9Qt84VUDSpkLNvgY6PE7bVNNthtnLaAETAST3IthvRY3oT0T/+nLYZgitNZ1F2Yx/6qC+bUgDthRr/PpnSRG9qcyH4On2EgGAj6tCPmu6RQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LxeE6+Z7; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=/iA2dVyhk+69gnf3UVI0x/ZxghoxWkLPj4jz9pqw4ys=; b=LxeE6+Z7uUV4cusCkF6VLd9LlI
-	Zzku4m+NQQyy5RfixukDCmLouf7G7BpNBBTfLsnR/VApMww/jjq+w6wH8Xf3/Roz9B7zKPcVBXQpZ
-	1wp2KTh2UzDithOLZ+Z/rggExwtRoVGbDHwM25K7FfGGMyisVEhFQZESShRjGReHeRmQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tpsmR-002Y8C-VW; Wed, 05 Mar 2025 18:43:39 +0100
-Date: Wed, 5 Mar 2025 18:43:39 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Joe Damato <jdamato@fastly.com>,
-	Leon Romanovsky <leon@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH net-next] net/mlnx5: Use generic code for page_pool
- statistics.
-Message-ID: <86aaf4f3-9792-4d70-a16b-2f5fc7ce63a3@lunn.ch>
-References: <20250305121420.kFO617zQ@linutronix.de>
- <433b43b1-0a42-4606-b919-3429c36aa934@lunn.ch>
- <20250305162636.cQf23qHf@linutronix.de>
+	s=arc-20240116; t=1741196698; c=relaxed/simple;
+	bh=eru01qJPLZRma4cwnw7amedWbYee+QZrkhjm7vs2p94=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lfTdVI4jJIC9XAj2uLpYRej+vA08GE4uq1bdfpBu48MkJqcWTRga8v12yZsz8Fwcp3yAa0ZG/sutJujvccMsf3btXTi/tLhX+ng+wJqL/J726H81CqhenrlpcpBWiV2Y+8Z2CQdRzSPBRveoHfJHhLvRPahqaRjG5rnYjoFHkbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g0UNO2f/; arc=none smtp.client-ip=209.85.219.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f193.google.com with SMTP id 3f1490d57ef6-e62d132a6a7so561477276.3;
+        Wed, 05 Mar 2025 09:44:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741196696; x=1741801496; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IrPArySxWj0hN/u8syEF3HrRazPbso2JNukCorkCFeI=;
+        b=g0UNO2f/vAY+O/HrXcS9LLKQgmLA33JRacSA5zFR/vdVD+cVDtOQKWkDYLEv9V6AxK
+         nPnRb72kl4JxHPh/VDidEnPAoB7MxWd5qOzAfcIU4Tp1M8cdjsbFKFQeX7sdZnBeyy1/
+         A7TTCZmtgzLFu4h1SLE6kKa4Xs9xf0f+J/06f+yS2ZPEN8LH8mec2LDxYl2DfjPPUdaH
+         IJCINNVDd25JPqlif7IWVYpTv9rEii0+Cs0zfxVWIZOG0MioP/G8hpJ4xEUGN7MzgUWi
+         LVmXsdn2cmOXOQQJs8fFWOmvxA7AoNVCInjpr6kOumR0XnN7z/ZAEjJeNOMxZLlr/BDO
+         xhCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741196696; x=1741801496;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IrPArySxWj0hN/u8syEF3HrRazPbso2JNukCorkCFeI=;
+        b=CGDuosTP9gA7CmguUktN2horHXhMucc70wev4YQVFiWBnpTvI/780gkEgDMqzZspiT
+         3Ed7RJbHy6yrqwYsspY3nkPOzvhs79rBMxKgsCfKrUgVcr8Zi3+n9GgMyR+M9PUTb2DX
+         tvFgvi2yl2hVX6wRx3ccYMpMAmrJUr2ma9xGZ5gV2zi+hBXVhhkMkqxQYqG+5fNr87SX
+         qwKGOLxyV/TyOwTUN+HakWj362vP/Lk94BO2/vAYZg2PQV+Jt/Wuowef9dSIbOo7+mvo
+         6gZTAmWyKQKDmpAZA6tG3u3UdoN3zv5IICCV4yVaXEzWBloguYlp4u9wDP2WVIW+jO8T
+         fWBg==
+X-Forwarded-Encrypted: i=1; AJvYcCXsUnHRRxm3MI4lECa/i6aQPaIcbRqVxKogY6UIEhg10I9z61jHecnM8K6ucJdBH5BD032Y0gAY3z/EhnQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxn1vPLYw42+pI+v6UYP8y+pIn46Fz5F2yVHQwc8RXMGczvBoQa
+	Sy5VdHZelZATP8YGzc+8MFPXfo7t7Rl5rknMH+2QLB3/0X5btuar
+X-Gm-Gg: ASbGncuVYZbQnqgUeKa+eQ/rjeH6XhxsujvD/ql2CPUvXfz1vb1hBjrpSDHRYkfNk4b
+	xUsGx+n/UJA+dhxvyhxqYnFbDDroNDuOUB3qPE53rVDCZYmNpC25UC3aZ8Q8NfjgiBgxzbDysgN
+	gqwLygPu+fNFHVwIFPRmXq28sIwxU4a/3sftUUk+NjZ9L0dFRuFv3JJ1kryy93k2HKp0Ey5X1BR
+	YQCHmA5qdW7JsclfAUtj9VxnJfDlR523TELZzrth3rOyNPtB62hc2OeDFwbr4jtSEk2pG6ndISe
+	sfTG4DQyDusgjcxtHuekHhL+m96WZhw/n7Jf+T5epdhjXa9ku9T/5UXX708tFVkNY5U=
+X-Google-Smtp-Source: AGHT+IEGqb6bMX99bdb48p+jlKdXJzi/Nxp56tDcGRzsT9dJZPEMisMbuuQK7XQwD8kll+UdneF4ZA==
+X-Received: by 2002:a05:6902:1b12:b0:e60:c10f:c6b9 with SMTP id 3f1490d57ef6-e611e1b7408mr5441603276.15.1741196695636;
+        Wed, 05 Mar 2025 09:44:55 -0800 (PST)
+Received: from [10.102.6.66] ([208.97.243.82])
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e60a3ab0251sm4419617276.49.2025.03.05.09.44.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Mar 2025 09:44:55 -0800 (PST)
+Message-ID: <669d9f33-e861-482a-8fd1-849fc3d22cd2@gmail.com>
+Date: Wed, 5 Mar 2025 12:44:54 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250305162636.cQf23qHf@linutronix.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: dsa: mv88e6xxx: Verify after ATU Load ops
+To: Andrew Lunn <andrew@lunn.ch>, Joseph Huang <Joseph.Huang@garmin.com>
+Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Guenter Roeck <linux@roeck-us.net>, linux-kernel@vger.kernel.org
+References: <20250304235352.3259613-1-Joseph.Huang@garmin.com>
+ <2ea7cde2-2aa1-4ef4-a3ea-9991c1928d68@lunn.ch>
+Content-Language: en-US
+From: Joseph Huang <joseph.huang.2024@gmail.com>
+In-Reply-To: <2ea7cde2-2aa1-4ef4-a3ea-9991c1928d68@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 05, 2025 at 05:26:36PM +0100, Sebastian Andrzej Siewior wrote:
-> On 2025-03-05 17:21:56 [+0100], Andrew Lunn wrote:
-> > > @@ -276,6 +263,9 @@ static MLX5E_DECLARE_STATS_GRP_OP_FILL_STATS(sw)
-> > >  		mlx5e_ethtool_put_stat(data,
-> > >  				       MLX5E_READ_CTR64_CPU(&priv->stats.sw,
-> > >  							    sw_stats_desc, i));
-> > > +#ifdef CONFIG_PAGE_POOL_STATS
-> > > +	*data = page_pool_ethtool_stats_get(*data, &priv->stats.sw.page_pool_stats);
-> > > +#endif
-> > >  }
-> > 
-> > Are these #ifdef required? include/net/page_pool/helpers.h:
-> > 
-> > static inline u64 *page_pool_ethtool_stats_get(u64 *data, const void *stats)
-> > {
-> > 	return data;
-> > }
-> > 
-> > Seems silly to have a stub if it cannot be used.
+On 3/5/2025 10:14 AM, Andrew Lunn wrote:
+> On Tue, Mar 04, 2025 at 06:53:51PM -0500, Joseph Huang wrote:
+>> ATU Load operations could fail silently if there's not enough space
+>> on the device to hold the new entry.
+>>
+>> Do a Read-After-Write verification after each fdb/mdb add operation
+>> to make sure that the operation was really successful, and return
+>> -ENOSPC otherwise.
 > 
-> As I mentioned in the diffstat section, if we add the snippet below then
-> it would work. Because the struct itself is not there.
+> Please could you add a description of what the user sees when the ATU
+> is full. What makes this a bug which needs fixing? I would of thought
+> at least for unicast addresses, the switch has no entry for the
+> destination, so sends the packet to the CPU. The CPU will then
+> software bridge it out the correct port. Reporting ENOSPC will not
+> change that.
+
+Hi Andrew,
+
+What the user will see when the ATU table is full depends on the unknown 
+flood setting. If a user has unknown multicast flood disabled, what the 
+user will see is that multicast packets are dropped when the ATU table 
+is full. In other words, IGMP snooping is broken when the ATU Load 
+operation fails silently.
+
+Even if the packet is kicked up to the CPU and the CPU intends to 
+forward the packet out via the software bridge, the forwarding attempt 
+is going to be blocked due to the 'offload_fwd_mark' flag in 
+nbp_switchdev_allowed_egress(). Even if that somehow worked, we will not 
+be fully utilizing the hardware's switching capability and will be 
+relying on the CPU to do the forwarding, which will likely result in 
+lower throughput.
+
+Reporting -ENOSPC will not change the fact that the ATU table is full, 
+however it does give switchdev a chance to notify the user and then the 
+user can take some further action accordingly. If nothing else, at least 
+'bridge monitor' will now report that the entries are not offloaded.
+
+Some other DSA drivers are reporting -ENOSPC as well when the table is 
+full (at least b53 and ocelot).
+
 > 
-> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
-> index f45d55e6e8643..78984b9286c6b 100644
-> --- a/include/net/page_pool/types.h
-> +++ b/include/net/page_pool/types.h
-> @@ -143,10 +143,14 @@ struct page_pool_recycle_stats {
->   */
->  struct page_pool_stats {
->  	struct page_pool_alloc_stats alloc_stats;
->  	struct page_pool_recycle_stats recycle_stats;
->  };
-> +
-> +#else /* !CONFIG_PAGE_POOL_STATS */
-> +
-> +struct page_pool_stats { };
->  #endif
-  
-Please do add this, in a separate patch. But i wounder how other
-drivers handle this. Do they also have #ifdef?
+>> @@ -2845,7 +2866,8 @@ static int mv88e6xxx_port_fdb_add(struct dsa_switch *ds, int port,
+>>   
+>>   	mv88e6xxx_reg_lock(chip);
+>>   	err = mv88e6xxx_port_db_load_purge(chip, port, addr, vid,
+>> -					   MV88E6XXX_G1_ATU_DATA_STATE_UC_STATIC);
+>> +					   MV88E6XXX_G1_ATU_DATA_STATE_UC_STATIC,
+>> +					   true);
+>>   	mv88e6xxx_reg_unlock(chip);
+>>   
+>>   	return err;
+> 
+>> @@ -6613,7 +6635,8 @@ static int mv88e6xxx_port_mdb_add(struct dsa_switch *ds, int port,
+>>   
+>>   	mv88e6xxx_reg_lock(chip);
+>>   	err = mv88e6xxx_port_db_load_purge(chip, port, mdb->addr, mdb->vid,
+>> -					   MV88E6XXX_G1_ATU_DATA_STATE_MC_STATIC);
+>> +					   MV88E6XXX_G1_ATU_DATA_STATE_MC_STATIC,
+>> +					   true);
+>>   	mv88e6xxx_reg_unlock(chip);
+> 
+> This change seems bigger than what it needs to be. Rather than modify
+> mv88e6xxx_port_db_load_purge(), why not perform the lookup just in
+> these two functions via a helper?
+> 
+>      Andrew
 
-    Andrew
+I will make that change. Thanks for the review.
 
----
-pw-bot: cr
+Thanks,
+Joseph
+> 
+> ---
+> pw-bot: cr
+
 
