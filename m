@@ -1,118 +1,165 @@
-Return-Path: <netdev+bounces-171918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-171919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12E74A4F5F0
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 05:09:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32517A4F604
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 05:17:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DE67188ACAF
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 04:09:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45C961885F46
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 04:18:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 649021A239B;
-	Wed,  5 Mar 2025 04:08:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09208193062;
+	Wed,  5 Mar 2025 04:17:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I+DZLSE4"
+	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="DBvHO/Uc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from va-2-36.ptr.blmpb.com (va-2-36.ptr.blmpb.com [209.127.231.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C83AC45C18
-	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 04:08:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4634D15749C
+	for <netdev@vger.kernel.org>; Wed,  5 Mar 2025 04:17:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741147739; cv=none; b=mwIDomqgTMWNdoWc1UO8Vsx0t8UrqT28g9KdFcL4zI4wZuKuIRmugeRV0Y+bsh43V0PCuO8IeQ4H3bujRB5EHWZ3cfRfG0EtoEPyzGaV9wqVT0dca0a0KuqHRz0GHrd4u0vlCQbWVNDv3pJ2GBf1Gxqa8mAX87dxHKkZfjiIJlM=
+	t=1741148271; cv=none; b=bmlLdIpDao1VHUW9G0Y19ehN7Ub0ONguWSkRmW+dTPe55wseXPakD9VK48vLxX5pElPOwZHsQr0p40xB+cJ6gldB+YofuwspsCNiQTcWdYaNeabSe7RvEtObRZH5bothjIc7TABV2QB9bfN7b44dPtf2DunMPTSsQHpGeLAfS54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741147739; c=relaxed/simple;
-	bh=sl3kF2jIRgykOyy13qNEYv7/mlV05yVeWOFjVH+qAtU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oP5ZhX2M3ECGY1ncHY6+v46ITTD5INFh5p+w1pVR+wYl0DAqlh0e8yMzAIBBeqGjfpVtew5ztyn2Ea4UXfJJVCSvzz2LghV0I2dCtp/RcglYbaeaY1oMldrLf8JXAqKKq9nOePaO5wtkY6QCZOsqpYD1NQVOFzru0Jfwxd0Ev48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I+DZLSE4; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741147736;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sl3kF2jIRgykOyy13qNEYv7/mlV05yVeWOFjVH+qAtU=;
-	b=I+DZLSE4RfdcBrChFqiV4COIQTCnFVvR6GW8D4sC9QnUZcBUQ1HX1qCFxCcM5PhdYVCOXg
-	F/cJRclG9ex273VDLJzjVH++mJpNR+jcKH0p84T9oaYVY554qjAZPWA0/L1HWYZgWcfcBt
-	VqTLW+gupZm43qmE+qzKAz0HALeHcws=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-648-qJNw3c08O7KtEvDg6z5IOA-1; Tue, 04 Mar 2025 23:08:54 -0500
-X-MC-Unique: qJNw3c08O7KtEvDg6z5IOA-1
-X-Mimecast-MFC-AGG-ID: qJNw3c08O7KtEvDg6z5IOA_1741147714
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2f81a0d0a18so12342738a91.3
-        for <netdev@vger.kernel.org>; Tue, 04 Mar 2025 20:08:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741147714; x=1741752514;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sl3kF2jIRgykOyy13qNEYv7/mlV05yVeWOFjVH+qAtU=;
-        b=OxI947CU3VTqUPiqEfjpeh5tYzDG2gHyiCKNix/7UuRjel0tq08gr20BfgXVJ+sWJC
-         Uk96nLfok0I17atsPcObQz4MinAvGVQ2BXdeYIt0rAmVP24CJojzJJESUW46821Tapyl
-         GkQxsf8CzSXW30rvNnkLVKz7x/P4cTzkbyMJGyyw5J/vo4D9HhBFJhUQG6e6ZfDhMbp2
-         PpiXTtxITXzTBAjE3XR4l3KCmcUBIVw6NOb6uf2a8kQESwIpdcdxiXoHV1SJg/Eoz+29
-         W3Cfrvpex7a1dLXi3L/TBQGFhwDt7PhMX0wiTAnwUiF7n1rE2Apk/yzr7Oj2ftoxUDEv
-         xVSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWOP5gOQwMsWtPX9vaKlpkFPxIg5Pg6ZHZpFiz3D2rhlKyBm5kyhhvHHioty8AwqwQSNgITsi0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx9uVsSUZwPKkwtFmXa/2l9Tnt3i6r2uLg8b5Dbjx7enM3VpceZ
-	u1nb+CUR/SoFCFG1enrXM7/phamDFEKaLjscTS54D8SC8ZsXmrLRyxog8SWqLGRzZih2+ymsYcN
-	9diHYis0474yZShGe6ZNKEYcCxlGwBvcd++Q6At5MMy1nLVu93Da/s0us18ir669lludKaWlNb4
-	Vc8Mw/ix6buAPvGrj+/sTw4aa6teF0
-X-Gm-Gg: ASbGncu1pnK2BRnbKyUgMZnUtH/veLP1rYd0JQ9HWqmY2OUa1Xz7OZgauI9pvV0bCOR
-	fgAc9PGGsj0+cLG7DlcysUVznEm1IFTQzeSoS+fhpArkKWkBd+mQyut9UxErSVzjrjCTX/0jNOA
-	==
-X-Received: by 2002:a17:90b:38c7:b0:2ea:3f34:f194 with SMTP id 98e67ed59e1d1-2ff497a94d1mr3253880a91.10.1741147714159;
-        Tue, 04 Mar 2025 20:08:34 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFRhAjiy6oJgdTVYVOYk9K5LcroQa6MmEtafp7KA+t5KO8Pe7O1jHU38xtYt3z4pO+pz1vuRaGm1QENB3uSDNs=
-X-Received: by 2002:a17:90b:38c7:b0:2ea:3f34:f194 with SMTP id
- 98e67ed59e1d1-2ff497a94d1mr3253847a91.10.1741147713755; Tue, 04 Mar 2025
- 20:08:33 -0800 (PST)
+	s=arc-20240116; t=1741148271; c=relaxed/simple;
+	bh=gf1vCeIYW/tU4JLszFsmSkMmSGYph87fs8T0zc8B3qI=;
+	h=In-Reply-To:Subject:Date:Mime-Version:References:Message-Id:
+	 Content-Type:To:Cc:From; b=sYk3jAJFhi2wNyJ+IjmVILeRxX/Nj5JdCiVAZvZc/Cwyitq8U5WG6gjmjvab70rvLAY41vZmdzl3IuWBHIDO39ls1I5xIEQUn8wwde8r6SqLlhWC2jqtSIDqWCOhOJVabsOL/pbSnQIEMow8HNOZwrmNPHi9X52Ps8b1ad+/11Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=DBvHO/Uc; arc=none smtp.client-ip=209.127.231.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=feishu2403070942; d=yunsilicon.com; t=1741148262; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=d23xR35t8Zj0HdI9r08jOc+TPTLVTFFZxAF+8Y3vY6c=;
+ b=DBvHO/UcDYbdKK/p61G/v1QpAx2SfwFf9AcnfOo48taBkRkmUfytMLk6jCfsf2iI9Aox8G
+ MyoxqZJspz/LuOngoz1Z9IzhUinJYmzRIUOO5nQEuZYzJUYFoSsDGm2e6yfKvIroXm3GMF
+ FPFWf7DHvCxjJy6UJLoOI1p75tJaS8Oyhmqw4RZsOUqnGLpp5unkNh84VB+uhOYMbh9gk0
+ h+Xsv9yVHDR25QJi806YC5BKvmGn5d0l7u6CZ596iEflimpDqBhklo8cH3ihmFw4BGtaW5
+ lFkNCxgohs8IBaCB95PGxOmirb/TG2rqESL9BHuIt1qbeHTRjUJAus3XSd7oug==
+In-Reply-To: <20250304184819.6e28c29a@kernel.org>
+Received: from [127.0.0.1] ([218.1.186.193]) by smtp.feishu.cn with ESMTPS; Wed, 05 Mar 2025 12:17:39 +0800
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH net-next v7 01/14] xsc: Add xsc driver basic framework
+Date: Wed, 5 Mar 2025 12:17:37 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250303085237.19990-1-sgarzare@redhat.com> <CAJaqyWfNieVxJu0pGCcjRc++wRnRpyHqfkuYpAqnKCLUjbW6Xw@mail.gmail.com>
-In-Reply-To: <CAJaqyWfNieVxJu0pGCcjRc++wRnRpyHqfkuYpAqnKCLUjbW6Xw@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 5 Mar 2025 12:08:22 +0800
-X-Gm-Features: AQ5f1Jr9X3ymlwY6PrZDcvmZUstskG7PfMhNEYJbHpQgXjCqpakU8L3BFGy8d0g
-Message-ID: <CACGkMEtycEX=8FrKntZ7DUDaXf61y6ZE4=49SmQu5Nkh_tf39g@mail.gmail.com>
-Subject: Re: [PATCH] vhost: fix VHOST_*_OWNER documentation
-To: Eugenio Perez Martin <eperezma@redhat.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, virtualization@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	"Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+X-Original-From: Xin Tian <tianx@yunsilicon.com>
+X-Lms-Return-Path: <lba+267c7d064+96df17+vger.kernel.org+tianx@yunsilicon.com>
+References: <20250228154122.216053-1-tianx@yunsilicon.com> <20250228154122.216053-2-tianx@yunsilicon.com> <20250304184819.6e28c29a@kernel.org>
+Message-Id: <4478921b-067d-484d-ab09-0789c0cdb2ed@yunsilicon.com>
+Content-Type: text/plain; charset=UTF-8
+To: "Jakub Kicinski" <kuba@kernel.org>
+Cc: <netdev@vger.kernel.org>, <leon@kernel.org>, <andrew+netdev@lunn.ch>, 
+	<pabeni@redhat.com>, <edumazet@google.com>, <davem@davemloft.net>, 
+	<jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>, 
+	<weihg@yunsilicon.com>, <wanry@yunsilicon.com>, <jacky@yunsilicon.com>, 
+	<horms@kernel.org>, <parthiban.veerasooran@microchip.com>, 
+	<masahiroy@kernel.org>
+From: "Xin Tian" <tianx@yunsilicon.com>
+User-Agent: Mozilla Thunderbird
 
-On Mon, Mar 3, 2025 at 5:29=E2=80=AFPM Eugenio Perez Martin <eperezma@redha=
-t.com> wrote:
+On 2025/3/5 10:48, Jakub Kicinski wrote:
+> On Fri, 28 Feb 2025 23:41:24 +0800 Xin Tian wrote:
+>> +config NET_VENDOR_YUNSILICON
+>> +	depends on ARM64 || X86_64
+> || COMPILE_TEST please ?
+OK
 >
-> On Mon, Mar 3, 2025 at 9:52=E2=80=AFAM Stefano Garzarella <sgarzare@redha=
-t.com> wrote:
-> >
-> > VHOST_OWNER_SET and VHOST_OWNER_RESET are used in the documentation
-> > instead of VHOST_SET_OWNER and VHOST_RESET_OWNER respectively.
-> >
-> > To avoid confusion, let's use the right names in the documentation.
-> > No change to the API, only the documentation is involved.
-> >
+>> diff --git a/drivers/net/ethernet/yunsilicon/Makefile b/drivers/net/ethernet/yunsilicon/Makefile
+>> new file mode 100644
+>> index 000000000..6fc8259a7
+>> --- /dev/null
+>> +++ b/drivers/net/ethernet/yunsilicon/Makefile
+>> @@ -0,0 +1,8 @@
+>> +# SPDX-License-Identifier: GPL-2.0
+>> +# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
+>> +# All rights reserved.
+>> +# Makefile for the Yunsilicon device drivers.
+>> +#
+>> +
+>> +# obj-$(CONFIG_YUNSILICON_XSC_ETH) += xsc/net/
+> Why are you adding commented out lines? Add them where needed
+ack
 >
-> Reviewed-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+>> +obj-$(CONFIG_YUNSILICON_XSC_PCI) += xsc/pci/
+>> \ No newline at end of file
+> new line missing
+ack
 >
+>> new file mode 100644
+>> index 000000000..de743487e
+>> --- /dev/null
+>> +++ b/drivers/net/ethernet/yunsilicon/xsc/net/Kconfig
+>> @@ -0,0 +1,17 @@
+>> +# SPDX-License-Identifier: GPL-2.0
+>> +# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
+>> +# All rights reserved.
+>> +# Yunsilicon driver configuration
+>> +#
+>> +
+>> +config YUNSILICON_XSC_ETH
+>> +	tristate "Yunsilicon XSC ethernet driver"
+>> +	default n
+> n is the default, you don't have to specify it
+ack
+>
+>> +xsc_eth-y := main.o
+>> \ No newline at end of file
+> new line
+ack
+>> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig b/drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig
+>> new file mode 100644
+>> index 000000000..2b6d79905
+>> --- /dev/null
+>> +++ b/drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig
+>> @@ -0,0 +1,16 @@
+>> +# SPDX-License-Identifier: GPL-2.0
+>> +# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
+>> +# All rights reserved.
+>> +# Yunsilicon PCI configuration
+>> +#
+>> +
+>> +config YUNSILICON_XSC_PCI
+>> +	tristate "Yunsilicon XSC PCI driver"
+>> +	default n
+> no need
+ack
+>
+>> +	select PAGE_POOL
+> Why is this in the PCI driver, not the ETH driver?
+> Please add this line in a patch which actually makes use of page pool
+OK, should be in the ETH driver, thanks for pointing that out
+>> +static int set_dma_caps(struct pci_dev *pdev)
+>> +{
+>> +	int err;
+>> +
+>> +	err = dma_set_mask(&pdev->dev, DMA_BIT_MASK(64));
+>> +	if (err)
+>> +		err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
+>> +	else
+>> +		err = dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(64));
+> Please grep git history for dma_set_mask_and_coherent
+> The fallback is unnecessary, just:
+>
+> 	err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+OK
 
 Thanks
 
+>
+>> +	if (!err)
+>> +		dma_set_max_seg_size(&pdev->dev, SZ_2G);
+>> +
+>> +	return err;
+>> +}
 
