@@ -1,46 +1,65 @@
-Return-Path: <netdev+bounces-172015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A07B0A4FE81
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 13:19:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93E1BA4FEA7
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 13:34:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA8D81881B10
-	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 12:19:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C52F0169CCA
+	for <lists+netdev@lfdr.de>; Wed,  5 Mar 2025 12:34:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96BAA243955;
-	Wed,  5 Mar 2025 12:19:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BAE324418F;
+	Wed,  5 Mar 2025 12:34:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bLrVVClc"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53A77201270;
-	Wed,  5 Mar 2025 12:19:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F073133987;
+	Wed,  5 Mar 2025 12:34:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741177183; cv=none; b=pY+hor4Em5yMKTy1v4zR7hiqT57qBy/jIQcvrhuk0qg8PvbsC3vGcyQ1q7G7PvOWRfeSZypXlNPA78SBuyQ8lonbYkTgBwn0e95zOABlYJjEcvdwkbZo0a7CZXcnQHy0uQ58nuNtOgyt1WfYnAwLqk0poyZl5kcfns5Jt1DeDTw=
+	t=1741178047; cv=none; b=d8Cz9fsUcTCaWtTkQayrOFTbJrzL2MfkNwh+b8hP9XvrPb6RFQapIVgcuvASjjoLryAVmwb6T4XqIXY07EvgMRVT2buNmnmQzPB+lSYQseX4Ue4LJKxj7nfsnCyk9m9OAwR7VxCh7Kv4y4FHsNN+X7H2+KKUyj+6Ksu8VuNhn+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741177183; c=relaxed/simple;
-	bh=vlhpyamIfu0B4jVYp73PoZHZAQox5ZrifYWqOBNLXog=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=XIxLXgyXQTAhKYSHsGUs5gv3moGmAXLGkSXz/ZnwtmZNbDVg19NDLnN0NUYAh8PHquUjSUYFdhNs4JK0M8lQbG+J79QsLMpG0YahL6JIGBlUq2z8PQ1saWPoLYwyjl5uRs8UhrPxjNB1atj+qwSWkhJceiNdeDwTTl+hTK6a3a4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Z7BNm3kTtz9w7R;
-	Wed,  5 Mar 2025 20:16:24 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 85DB3140360;
-	Wed,  5 Mar 2025 20:19:32 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 5 Mar 2025 20:19:32 +0800
-Message-ID: <04c85f03-d3b3-4299-90d8-1d8432925993@huawei.com>
-Date: Wed, 5 Mar 2025 20:19:31 +0800
+	s=arc-20240116; t=1741178047; c=relaxed/simple;
+	bh=KXz7qN+UCvg/zXe/kDPAg/cy+msMPeJPVH/lqPdGHTo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fQ55wi2Gm/t4nrSDsS78f2AdvWH+HoXQ5QRsh8xUt5Ly0Ynrrrw3N4xSWDzfdrKU/WbPfh2W1H4aVd8tSgpznRhZ9EN6oaNS6ZicjP7Zi7ivmEcpNjEbU9YyOhDQDwtZlTKbxe4b9BFwYeHhhVS0sIzTeypupJFvH7vBh0p9Pj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bLrVVClc; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741178046; x=1772714046;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=KXz7qN+UCvg/zXe/kDPAg/cy+msMPeJPVH/lqPdGHTo=;
+  b=bLrVVClcoy9z6vn3AvQfNDWHz6TlGLBX5Xi02/RIsj93kC7Cg80ZdtMJ
+   QRCRahzkmZ6E5sPNioVeJZNMh+cNyOeC4YPmmICGwlxXTK30a4xxBFdP0
+   Hvc6N6mnIgtvEKU2Z/IvPCaLkxc+jJhBFNVkfNk23eSG1XzwiagLpFGWe
+   EVCucO21LIypBMlGLFqXy/mS7SpcJGnX1ESYaznf9Lk74j0s0xYdzhpjr
+   cKEEyTMffiqUek0wrRx0bd9oog4yRd/AyxBN1L0g2Ez1pPepPH36EVSwC
+   cq8Q6+QsO2nQlJmeHGebnpTz29eBGBotOPB/2x9eTJLWLnDD/kBjXOwo4
+   w==;
+X-CSE-ConnectionGUID: GP1ghgVVSB6dFWu866pgpw==
+X-CSE-MsgGUID: THJlhIFHRze8D5E+f6Kgvw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="46064865"
+X-IronPort-AV: E=Sophos;i="6.14,223,1736841600"; 
+   d="scan'208";a="46064865"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 04:34:05 -0800
+X-CSE-ConnectionGUID: N7Xoy4TzQJysW2kMb1XEUQ==
+X-CSE-MsgGUID: eBSnBMUbTKa2RR8mn5mMOA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,223,1736841600"; 
+   d="scan'208";a="118829798"
+Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.123.55]) ([10.247.123.55])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 04:33:58 -0800
+Message-ID: <4882bd5b-1a64-4ac7-ba51-66143d029e8a@linux.intel.com>
+Date: Wed, 5 Mar 2025 20:33:55 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,160 +67,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10 3/4] page_pool: support unlimited number of
- inflight pages
-To: Jesper Dangaard Brouer <hawk@kernel.org>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <zhangkun09@huawei.com>, <liuyonglong@huawei.com>,
-	<fanghaiqing@huawei.com>, Robin Murphy <robin.murphy@arm.com>, Alexander
- Duyck <alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>, Eric
- Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, Donald Hunter
-	<donald.hunter@gmail.com>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, kernel-team <kernel-team@cloudflare.com>, Yan
- Zhai <yan@cloudflare.com>
-References: <20250226110340.2671366-1-linyunsheng@huawei.com>
- <20250226110340.2671366-4-linyunsheng@huawei.com>
- <d3c7d421-566f-4007-b272-650294edd019@kernel.org>
+Subject: Re: [PATCH iwl-next v7 5/9] igc: Add support for frame preemption
+ verification
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, ",chwee.lin.choong"@intel.com
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Furong Xu <0x1207@gmail.com>,
+ Russell King <rmk+kernel@armlinux.org.uk>,
+ Serge Semin <fancer.lancer@gmail.com>,
+ Xiaolei Wang <xiaolei.wang@windriver.com>,
+ Suraj Jaiswal <quic_jsuraj@quicinc.com>,
+ Kory Maincent <kory.maincent@bootlin.com>, Gal Pressman <gal@nvidia.com>,
+ Jesper Nilsson <jesper.nilsson@axis.com>,
+ Andrew Halaney <ahalaney@redhat.com>,
+ Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+ Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org
+References: <20250303102658.3580232-1-faizal.abdul.rahim@linux.intel.com>
+ <20250303102658.3580232-6-faizal.abdul.rahim@linux.intel.com>
+ <20250304152644.y7j7eshr4qxhmxq2@skbuf>
 Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <d3c7d421-566f-4007-b272-650294edd019@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
+In-Reply-To: <20250304152644.y7j7eshr4qxhmxq2@skbuf>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemf200006.china.huawei.com (7.185.36.61)
-
-On 2025/3/4 17:25, Jesper Dangaard Brouer wrote:
 
 
->>   }
->> @@ -514,10 +518,42 @@ static struct page_pool_item *page_pool_fast_item_alloc(struct page_pool *pool)
->>       return llist_entry(first, struct page_pool_item, lentry);
->>   }
->>   +static struct page_pool_item *page_pool_slow_item_alloc(struct page_pool *pool)
+
+On 4/3/2025 11:26 pm, Vladimir Oltean wrote:
+> On Mon, Mar 03, 2025 at 05:26:54AM -0500, Faizal Rahim wrote:
+>> +static inline bool igc_fpe_is_verify_or_response(union igc_adv_rx_desc *rx_desc,
+>> +						 unsigned int size)
 >> +{
->> +    if (unlikely(!pool->slow_items.block ||
->> +             pool->slow_items.next_to_use >= ITEMS_PER_PAGE)) {
->> +        struct page_pool_item_block *block;
->> +        struct page *page;
+>> +	u32 status_error = le32_to_cpu(rx_desc->wb.upper.status_error);
+>> +	int smd;
 >> +
->> +        page = alloc_pages_node(pool->p.nid, GFP_ATOMIC | __GFP_NOWARN |
->> +                    __GFP_ZERO, 0);
->> +        if (!page) {
->> +            alloc_stat_inc(pool, item_slow_failed);
->> +            return NULL;
->> +        }
-> 
-> I'm missing a counter that I can use to monitor the rate of page
-> allocations for these "item" block's.
-> In production want to have a metric that shows me a sudden influx of
-> that cause code to hit this "item_slow_alloc" case (inflight_slow_alloc)
-
-It seems the 'item_fast_empty' stat added in patch 2 is the metric you
-mention above? as we use those slow_items sequentially, the pages allocated
-for slow_items can be calculated by 'item_fast_empty' / ITEMS_PER_PAGE.
-
-> 
-> BTW should this be called "inflight_block" instead of "item_block"?
-> 
-> 
+>> +	smd = FIELD_GET(IGC_RXDADV_STAT_SMD_TYPE_MASK, status_error);
 >> +
->> +        block = page_address(page);
->> +        block->pp = pool;
->> +        block->flags |= PAGE_POOL_SLOW_ITEM_BLOCK_BIT;
->> +        refcount_set(&block->ref, ITEMS_PER_PAGE);
->> +        pool->slow_items.block = block;
->> +        pool->slow_items.next_to_use = 0;
->> +
->> +        spin_lock_bh(&pool->item_lock);
->> +        list_add(&block->list, &pool->item_blocks);
->> +        spin_unlock_bh(&pool->item_lock);
->> +    }
->> +
->> +    return &pool->slow_items.block->items[pool->slow_items.next_to_use++];
+>> +	return (smd == IGC_RXD_STAT_SMD_TYPE_V || smd == IGC_RXD_STAT_SMD_TYPE_R) &&
+>> +		size == SMD_FRAME_SIZE;
 >> +}
-
-...
-
->>   +static void __page_pool_slow_item_free(struct page_pool *pool,
->> +                       struct page_pool_item_block *block)
->> +{
->> +    spin_lock_bh(&pool->item_lock);
->> +    list_del(&block->list);
->> +    spin_unlock_bh(&pool->item_lock);
->> +
->> +    put_page(virt_to_page(block));
 > 
-> Here again I'm missing a counter that I can use to monitor the rate of
-> page free events.
+> The NIC should explicitly not respond to frames which have an SMD-V but
+> are not "verify" mPackets (7 octets of 0x55 + 1 octet SMD-V + 60 octets
+> of 0x00 + mCRC - as per 802.3 definitions). Similarly, it should only
+> treat SMD-R frames which contain 7 octets of 0x55 + 1 octet SMD-R + 60
+> octets of 0x00 + mCRC as "respond" mPackets, and only advance its
+> verification state machine based on those.
 > 
-> In production I want a metric (e.g inflight_slow_free_block) that
-> together with "item_slow_alloc" (perhaps named
-> inflight_slow_alloc_block), show me if this code path is creating churn,
-> that I can correlate/explain some other influx event on the system.
-> 
-> BTW subtracting these (alloc - free) counters gives us the memory used.
+> Specifically, it doesn't look like you are ensuring the packet payload
+> contains 60 octets of zeroes. Is this something that the hardware
+> already does for you, or is it something that needs further validation
+> and differentiation in software?
 
-If I understand it correctly, the 'item_fast_empty' is something like
-the 'alloc' mentioned above, let's discuss the 'free' below.
-
-> 
->> +}
->> +
-
-...
-
->>   }
->>   +static int page_pool_nl_fill_item_mem_info(struct page_pool *pool,
->> +                       struct sk_buff *rsp)
->> +{
->> +    struct page_pool_item_block *block;
->> +    size_t resident = 0, used = 0;
->> +    int err;
->> +
->> +    spin_lock_bh(&pool->item_lock);
->> +
->> +    list_for_each_entry(block, &pool->item_blocks, list) {
->> +        resident += PAGE_SIZE;
->> +
->> +        if (block->flags & PAGE_POOL_SLOW_ITEM_BLOCK_BIT)
->> +            used += (PAGE_SIZE - sizeof(struct page_pool_item) *
->> +                 refcount_read(&block->ref));
->> +        else
->> +            used += PAGE_SIZE;
->> +    }
->> +
->> +    spin_unlock_bh(&pool->item_lock);
-> 
-> Holding a BH spin_lock can easily create production issues.
-
-The above is not only give us the total pages used for page_pool_item,
-but also give us the fragmentation info for those pages too.
-So it seems the BH spin_lock is needed if we want the fragmentation info?
-
-And the 'free' memtioned above can be calculated by 'memory used' - 'alloc'.
-
-> I worry how long time it will take to traverse these lists.
-
-I wouldn't worry about that as it is not supposed to be a lot of pages
-in those list, if it is, it seems it is something we should be fixing
-by increasing the size of fast_item or by defragmenting the slow_item
-pages.
-
-> 
-> We (Cc Yan) are currently hunting down a number of real production issue
-> due to different cases of control-path code querying the kernel that
-> takes a _bh lock to read data, hurting the data-path processing.
-
-I am not sure if the above is the control-path here, I would rather
-treat it as the debug-path?
-
-> 
-> If we had the stats counters, then this would be less work, right?
-
-It depends on if we want the fragmentation info or not as mentioned
-above.
-
-> 
-> 
+The hardware doesn’t handle this, so the igc driver have to do it manually. 
+I missed this handling, and Chwee Lin also noticed the issue while testing 
+this patch series—it wasn’t rejecting SMD-V and SMD-R with a non-zero 
+payload. I’ll update this patch to include the fix that Chwee Lin 
+implemented and tested. Thanks.
 
