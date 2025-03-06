@@ -1,132 +1,128 @@
-Return-Path: <netdev+bounces-172545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CC34A55547
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 19:45:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3829A55559
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 19:50:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E1D41893472
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 18:46:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2582016EAC1
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 18:50:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFFAE19E99E;
-	Thu,  6 Mar 2025 18:45:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25D1525A2B5;
+	Thu,  6 Mar 2025 18:50:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="lOjurV0U"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G3eiXSf6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B08B667;
-	Thu,  6 Mar 2025 18:45:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE9EB667
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 18:50:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741286750; cv=none; b=OjjmIZKltu+fzeK7/HTlJyIsYLe5JTUQIY3bevk6w1RxE/SYEN5P9URPe5aarnsNRiG51lBQpFZUvMSCpqQTebCjqbNZJX0jzxZvOB1Kjh9fq0J8pqHCGeOQVzuIDasp9faTJR6BnW102bfmvUOMvhYxvhQPE1iVmhkT8Tjz/Uk=
+	t=1741287048; cv=none; b=N9q5XeEVLEg7JrSnvDgv2+5BmPC6trC+YMEkOTT115Xjka0XNoCYaIlaLIOnow+hFf0FDeABx7tJYv7/PMwIVcNzFICIQxUtW7ANbHSWIEvnVy6heSnY3amQ0KY9aKJEvBJSCRjypPDXUnp+C1julZ634aWAaV7nwOj/PTGuWvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741286750; c=relaxed/simple;
-	bh=vpj02Xcibt1fcSHiLyj+EWeG4DG8e1S9LTnMiIS0l4Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ze1tNQETndIH9PJ+I0mioBuvovMSsM+zUJYx0FfPawZw5TDw9MLoIOW2PeWJW4Sn+DEScDIo/+Cv/SfTa0yLY2xQRvBBo90w+yVBpWFfQ3nNPmxPRFtDOpJNFLqXR/kBjG6mg5zQEfOEpq9SBvWO7zSVuohTRnoZ5OpBuPsjre0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=lOjurV0U; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=9qD6hhzVShQ+yvnvzEbzDxl+ULTsOh6MSm995HpgMyA=; b=lOjurV0UivhNfL5G
-	J6XMGKBbMgP6zpc5jF33X9lJ1DnS6sP8uVl5HMFAlmyH40aMZYO4Awlph23M+DKK5hdrX8CBXv7zd
-	67TKVfys0XQAJooYY5/QJabVYt9wXwDAjIvgdo2d0cTPoqzNADfWiSkRI4gv08a6ASUkIpD/W4qgU
-	fwALpnJY5w3CYAlkjg6tRNSDZ0xUScERTQ/9HdAEQBvk2b0SuNcVNTd9Sw+D011VmMPhvInXi8Ob2
-	2muv4QZJlu6IgDQ+iSKHcSsrVCwma0irOTdQ0PL+LI+aCWipmpaxfEcofIzjHqV5sjZnTzmcxgZDb
-	JvyiG0qa8JN9lN0+bw==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1tqGDv-003CiH-2q;
-	Thu, 06 Mar 2025 18:45:35 +0000
-From: linux@treblig.org
-To: linux@armlinux.org.uk,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH net-next] net: phylink: Remove unused phylink_init_eee
-Date: Thu,  6 Mar 2025 18:45:34 +0000
-Message-ID: <20250306184534.246152-1-linux@treblig.org>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1741287048; c=relaxed/simple;
+	bh=hziwIFH8GqcTvGzzZypfshMXMU+Bp15ehcSnnNIyJR8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ym/nXJ/qBVmU4sRm5TaOt/19Qp53SgQfhO23Wmg7VrPkTigTqwI78TB3N/vrFJOnbW30I0eT/gIpwxxZYXYAkEK+X5IjL69/boaqmp+XZa8Pmj70XdJXih+NT4oIWdyRXGulLuvdrCAuYMSZ4ilBBSgZ3nHZPbicNRlX0l09uoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G3eiXSf6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12F09C4CEE4;
+	Thu,  6 Mar 2025 18:50:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741287047;
+	bh=hziwIFH8GqcTvGzzZypfshMXMU+Bp15ehcSnnNIyJR8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=G3eiXSf6dibM1+ant550/UzWuJEipRByfffjg+hJxS7fkDvCtlfE/hF0MJQ/5YMtW
+	 Wmq3LAhL+W8BslNp/td77V0qIDeY3nTyCrTc5dkYO43qvcrZOo6m8yf+rXJrQos6aK
+	 +NzcHXjqP/1bLiWD54Opi/Fz2007tTEplQYC0aLT6nIx8RCzKeTLCX/XI9NRqVINfq
+	 H/n5iKGwFNByV58WhbMA1LayK2hp7Mq0ck2CvoX3IF5ggPXc3V+CSb1c5tunD6AY3e
+	 Q8gNJumTZqPx3g73D/dsf8BA56C/kPUqt+YzmFi4vFht03rxLyW07uMzWXZBlqFerS
+	 6+LOaz6pu/niQ==
+Date: Thu, 6 Mar 2025 10:50:46 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, David
+ Ahern <dsahern@kernel.org>
+Subject: Re: [PATCH net-next 0/2] udp_tunnel: GRO optimizations
+Message-ID: <20250306105046.0aca16b3@kernel.org>
+In-Reply-To: <cover.1741275846.git.pabeni@redhat.com>
+References: <cover.1741275846.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+On Thu,  6 Mar 2025 16:56:51 +0100 Paolo Abeni wrote:
+> The UDP tunnel GRO stage is source of measurable overhead for workload
+> based on UDP-encapsulated traffic: each incoming packets requires a full
+> UDP socket lookup and an indirect call.
+>=20
+> In the most common setups a single UDP tunnel device is used. In such
+> case we can optimize both the lookup and the indirect call.
+>=20
+> Patch 1 tracks per netns the active UDP tunnels and replaces the socket
+> lookup with a single destination port comparison when possible.
+>=20
+> Patch 2 tracks the different types of UDP tunnels and replaces the
+> indirect call with a static one when there is a single UDP tunnel type
+> active.
+>=20
+> I measure ~5% performance improvement in TCP over UDP tunnel stream
+> tests on top of this series.
 
-phylink_init_eee() is currently unused.
+Breaks the build with NET_UDP_TUNNEL=3Dn (in contest) :(
 
-It was last added in 2019 by
-commit 86e58135bc4a ("net: phylink: add phylink_init_eee() helper")
-but it didn't actually wire a use up.
-
-It had previous been removed in 2017 by
-commit 939eae25d9a5 ("phylink: remove phylink_init_eee()").
-
-Remove it again.
-
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- drivers/net/phy/phylink.c | 18 ------------------
- include/linux/phylink.h   |  1 -
- 2 files changed, 19 deletions(-)
-
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index b00a315de060..734869ec6f74 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -3159,24 +3159,6 @@ int phylink_get_eee_err(struct phylink *pl)
- }
- EXPORT_SYMBOL_GPL(phylink_get_eee_err);
- 
--/**
-- * phylink_init_eee() - init and check the EEE features
-- * @pl: a pointer to a &struct phylink returned from phylink_create()
-- * @clk_stop_enable: allow PHY to stop receive clock
-- *
-- * Must be called either with RTNL held or within mac_link_up()
-- */
--int phylink_init_eee(struct phylink *pl, bool clk_stop_enable)
--{
--	int ret = -EOPNOTSUPP;
--
--	if (pl->phydev)
--		ret = phy_init_eee(pl->phydev, clk_stop_enable);
--
--	return ret;
--}
--EXPORT_SYMBOL_GPL(phylink_init_eee);
--
- /**
-  * phylink_ethtool_get_eee() - read the energy efficient ethernet parameters
-  * @pl: a pointer to a &struct phylink returned from phylink_create()
-diff --git a/include/linux/phylink.h b/include/linux/phylink.h
-index 898b00451bbf..7fbabd8b96fe 100644
---- a/include/linux/phylink.h
-+++ b/include/linux/phylink.h
-@@ -694,7 +694,6 @@ void phylink_ethtool_get_pauseparam(struct phylink *,
- int phylink_ethtool_set_pauseparam(struct phylink *,
- 				   struct ethtool_pauseparam *);
- int phylink_get_eee_err(struct phylink *);
--int phylink_init_eee(struct phylink *, bool);
- int phylink_ethtool_get_eee(struct phylink *link, struct ethtool_keee *eee);
- int phylink_ethtool_set_eee(struct phylink *link, struct ethtool_keee *eee);
- int phylink_mii_ioctl(struct phylink *, struct ifreq *, int);
--- 
-2.48.1
-
+net/ipv4/udp_offload.c: In function =E2=80=98udp_tunnel_gro_rcv=E2=80=99:
+net/ipv4/udp_offload.c:172:16: error: returning =E2=80=98struct sk_buff *=
+=E2=80=99 from a function with incompatible return type =E2=80=98struct skb=
+uff *=E2=80=99 [-Werror=3Dincompatible-pointer-types]
+  172 |         return call_gro_receive_sk(udp_sk(sk)->gro_receive, sk, hea=
+d, skb);
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~~~~~~~
+net/ipv4/udp_offload.c: In function =E2=80=98udp_gro_receive=E2=80=99:
+net/ipv4/udp_offload.c:786:12: error: assignment to =E2=80=98struct sk_buff=
+ *=E2=80=99 from incompatible pointer type =E2=80=98struct skbuff *=E2=80=
+=99 [-Werror=3Dincompatible-pointer-types]
+  786 |         pp =3D udp_tunnel_gro_rcv(sk, head, skb);
+      |            ^
+In file included from ./include/linux/seqlock.h:19,
+                 from ./include/linux/dcache.h:11,
+                 from ./include/linux/fs.h:8,
+                 from ./include/linux/highmem.h:5,
+                 from ./include/linux/bvec.h:10,
+                 from ./include/linux/skbuff.h:17,
+                 from net/ipv4/udp_offload.c:9:
+net/ipv4/udp_offload.c: In function =E2=80=98udpv4_offload_init=E2=80=99:
+net/ipv4/udp_offload.c:936:21: error: =E2=80=98udp_tunnel_gro_type_lock=E2=
+=80=99 undeclared (first use in this function); did you mean =E2=80=98udp_t=
+unnel_gro_rcv=E2=80=99?
+  936 |         mutex_init(&udp_tunnel_gro_type_lock);
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~
+./include/linux/mutex.h:64:23: note: in definition of macro =E2=80=98mutex_=
+init=E2=80=99
+   64 |         __mutex_init((mutex), #mutex, &__key);                     =
+     \
+      |                       ^~~~~
+net/ipv4/udp_offload.c:936:21: note: each undeclared identifier is reported=
+ only once for each function it appears in
+  936 |         mutex_init(&udp_tunnel_gro_type_lock);
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~
+./include/linux/mutex.h:64:23: note: in definition of macro =E2=80=98mutex_=
+init=E2=80=99
+   64 |         __mutex_init((mutex), #mutex, &__key);                     =
+     \
+      |                       ^~~~~
+cc1: all warnings being treated as errors
+--=20
+pw-bot: cr
 
