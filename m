@@ -1,73 +1,178 @@
-Return-Path: <netdev+bounces-172461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3A66A54C36
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 14:30:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77409A54C4A
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 14:33:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5222A18966E5
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 13:30:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D5FE7A2533
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 13:32:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1239420E6E8;
-	Thu,  6 Mar 2025 13:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C856199B9;
+	Thu,  6 Mar 2025 13:33:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="nEtjtyQ0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Qwyuh9N1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1E220E6E0;
-	Thu,  6 Mar 2025 13:29:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741267786; cv=none; b=KJd4WGMELuTk0HttQzMcf6VrkZkyd+AqjC+LuzWpnOZ/P0RfoVxlvS/KII6gVR6PKT87FmuZxx7/weYHxPUxBActr7eWCtY6UCIHgxhqfRdPEP95SbVona1gMbwTId6gTwPFHDW4VFMsXXFJMl9Ceb4uRoLd0+Nh0jMAY1sIez0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741267786; c=relaxed/simple;
-	bh=yJ2qSR9GQZrAqXGTRIfLZ3P5TOERzkV9N2WRJ0ySwG0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=DdAeDDrsadqS4FXG9ANF2xF9nc9xDZVk594O9WlgZ6QpW0TTwNQGOR/lBRhlYCdqSkS4c95fzeutMtrbRZBPb/Gd+uHKAR2shZeTorQNwxUqkL6R4KNiKHjnxX9JcEMIe2dDFRoLKm7J9UzyhjbEToxAB4YePSuNUrgrb1MW8fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=nEtjtyQ0; arc=none smtp.client-ip=80.241.56.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4Z7qyj6j5wz9sq9;
-	Thu,  6 Mar 2025 14:29:33 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1741267774; h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8HCWghEoRmY3q5i+9iaFbdBZz5vLotiHqKjbDiczyjE=;
-	b=nEtjtyQ0tlThp6Cus3eztikORJNPkzKfgg0bB02cDUlelHYT4Fub4sRohFYbSC4qWjjfUO
-	vAi0JUpBnIiOzpVJOOrUDy+WkTK9jNO0s4HyhkWgyxA9kgcVqhXLslFaljoxk9JkxwZ+mN
-	EJJrkYNAb56elssBQmtsR0BbWU65lw2XrW8kjd8WpZT/vsGknv3fKid1NTq15N3qJ+EOAw
-	KpUuqs6bJxlcE7C9DIVim0sXBhILahFdJpYmiHJXTWiCgyxFBuw0jhhczG4oqzMJslVFGq
-	8t7mhpspkCHYjlCGCW25n8OXvbghGdTR7yr/3hsnhCS3XIKtmjtJfx7knbZN3w==
-Message-ID: <1482683f626c0743e3ec53161dd291de3a6726f6.camel@mailbox.org>
-Subject: Re: [PATCH net-next v3 02/14] motorcomm:yt6801: Add support for a
- pci table in this module
-From: Philipp Stanner <phasta@mailbox.org>
-Reply-To: phasta@kernel.org
-To: Frank Sae <Frank.Sae@motor-comm.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Heiner
- Kallweit <hkallweit1@gmail.com>,  Russell King <linux@armlinux.org.uk>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, netdev@vger.kernel.org
-Cc: Masahiro Yamada <masahiroy@kernel.org>, 
- Parthiban.Veerasooran@microchip.com, linux-kernel@vger.kernel.org, 
- xiaogang.fan@motor-comm.com, fei.zhang@motor-comm.com,
- hua.sun@motor-comm.com
-Date: Thu, 06 Mar 2025 14:29:29 +0100
-In-Reply-To: <20250228100020.3944-3-Frank.Sae@motor-comm.com>
-References: <20250228100020.3944-1-Frank.Sae@motor-comm.com>
-	 <20250228100020.3944-3-Frank.Sae@motor-comm.com>
-Content-Type: text/plain; charset="UTF-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFEF5946C
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 13:33:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741268022; cv=fail; b=GhwZV/bgU3V+aeOSQI+Unfcm2O6gR/QfW76QIS/X4AEUM3/bT/30ByUNQCFLstVQpi2ZVgMy8QsnW9CpRqskXdoxUlDMnatPoF4ygZwVW12tVsTtOSURhMwbIROm0iIy6PXkMmO9886NfbgftO8zuw9oukeeTMAciIZrcacHcBo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741268022; c=relaxed/simple;
+	bh=z5uWCcfLVtq3xTMeWxZXVoMmjJo3qpna3JsWsbiSJ9g=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=iRCF0FafPD1d0faMg8wu3nzqgbYHAaU21WhYkYMWKbCT545CSGSOfMksiJyJtftWRcK8jpTdLl9D5G/spbNGzFZTMuVkGshJAb7mejpcpk5RQ6qZIfJEBL6dbV17f/O+YjLhhLl9FmA3CjSwIj8aIHbNoAmWJWoBXmonWdpSQ3s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Qwyuh9N1; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741268020; x=1772804020;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=z5uWCcfLVtq3xTMeWxZXVoMmjJo3qpna3JsWsbiSJ9g=;
+  b=Qwyuh9N12I5bYrWb4Ri1h0Ti5ovHQ/Ra8q1PG2ib69qroH87MueBoC3h
+   1rKAIVymOBgh/mFjG0gbkVn7Y0qt7D4SIZcL9a2tUQBTw55jgXwem1ftu
+   qaNPewKE1af353BNjuTQYHf5KIsWRjOzgQBGbwLtpOdHZDvYwjNljAnO4
+   nDj46y/zPxyuBYld4Iguyuh6gXoRZ7z+gdNeUHi5xt7mZDFs6ZZFAUAFf
+   HmBHFPMQ+9lOgWf0av8hN7RAa+ezKv3CaWOY5m35TenKACrGODyfG+RQ6
+   xlpqSN6aRurW3qyTzuRhyqnZgxEoz/LSaBnpNJw2Cgp2NARmRf7/ems2s
+   g==;
+X-CSE-ConnectionGUID: xc5fvp07TqSAjsWlUA/Pnw==
+X-CSE-MsgGUID: 0o2O2zrOQe+tulQdiMCG9A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="42190595"
+X-IronPort-AV: E=Sophos;i="6.14,226,1736841600"; 
+   d="scan'208";a="42190595"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2025 05:33:40 -0800
+X-CSE-ConnectionGUID: zYhmt25lQ0OVORjiR4sF2A==
+X-CSE-MsgGUID: qeqhj0p6S1alFxBQpFXtUA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="118937112"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Mar 2025 05:33:40 -0800
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Thu, 6 Mar 2025 05:33:39 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Thu, 6 Mar 2025 05:33:39 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.171)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Thu, 6 Mar 2025 05:33:39 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=aI3zMozLPCZyKufu4HFu0pVvZ4L9LU1/zlQctIB2GmZvFjxCjMbGRQap3JfedHBlVt/+XflB0Jy6X3H+/pfQrjI2YSI/5eZVENETqSVl2oT3CtFu1GqPsahvMkQ50HjeanGjt16TzouI2eNbKeYtvL3ld8THsFgIkVGe+Cc5BUMcjuDPmggT+V/0kuvGSvEKICoht3TLuP0aqVrC1XUgETlCI4MIkDQT+C20xYmmU0TGlgn7e5m9xdXQIsA28WyOfEc+os7RuQkXN1JR5fwpfX0+QDvjpSQV46deMIBeImuW+gTRLGu39G9YHTnxv7uaSoJ16wVCOPqtLrP2m2UOYg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JeB6TEd2jbZ/vhbwwyhnPMtMH5P3eQejKTEHtXPIpY0=;
+ b=AFrzrtKHTnsuA7c2IEJ4lW2PjTQXS6TWxCFMMUyxhKWpwjoykHogBi/WWqHtdYwUKpcslU6PvBVT+V7BNTHdbiNcuSLTI3Z5oUvzTSaFbEGOjO2YeKVHcGELRnY/irBCGwT50r6RvEZmDerKTcNQEVdaBcSLA6v3hoX28qMLExqcHWA1fbDKjoI4ZtHYA3Nar+RwPSM3jG72I/80JeVQUP186WMtiuYHB3zm7bNgFXqEmGuRO4Eaj2+bsBwvIjz7LAAoYioNbyhXFKUXeqU7lTsYcPqIqZlbkjIR5p8675l/Oz6SWKP9LJcjjXKpjfJiuwFgfOypa4nwm+w1HYHR2g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB7785.namprd11.prod.outlook.com (2603:10b6:8:f1::8) by
+ IA0PR11MB8398.namprd11.prod.outlook.com (2603:10b6:208:487::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.17; Thu, 6 Mar
+ 2025 13:33:37 +0000
+Received: from DS0PR11MB7785.namprd11.prod.outlook.com
+ ([fe80::7a4d:ceff:b32a:ed18]) by DS0PR11MB7785.namprd11.prod.outlook.com
+ ([fe80::7a4d:ceff:b32a:ed18%6]) with mapi id 15.20.8511.017; Thu, 6 Mar 2025
+ 13:33:37 +0000
+From: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>
+To: Simon Horman <horms@kernel.org>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "jiri@nvidia.com" <jiri@nvidia.com>, "Polchlopek,
+ Mateusz" <mateusz.polchlopek@intel.com>, "Mrozowicz, SlawomirX"
+	<slawomirx.mrozowicz@intel.com>, "Kwapulinski, Piotr"
+	<piotr.kwapulinski@intel.com>, "Wegrzyn, Stefan" <stefan.wegrzyn@intel.com>
+Subject: RE: [PATCH iwl-next v5 12/15] ixgbe: add support for devlink reload
+Thread-Topic: [PATCH iwl-next v5 12/15] ixgbe: add support for devlink reload
+Thread-Index: AQHbhFkHfvv9OSN8EEuFCSmDTIMVUbNl7xqAgABAHmA=
+Date: Thu, 6 Mar 2025 13:33:37 +0000
+Message-ID: <DS0PR11MB77854D98B36D3863E79FAD1BF0CA2@DS0PR11MB7785.namprd11.prod.outlook.com>
+References: <20250221115116.169158-1-jedrzej.jagielski@intel.com>
+ <20250221115116.169158-13-jedrzej.jagielski@intel.com>
+ <20250306093854.GQ3666230@kernel.org>
+In-Reply-To: <20250306093854.GQ3666230@kernel.org>
+Accept-Language: pl-PL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR11MB7785:EE_|IA0PR11MB8398:EE_
+x-ms-office365-filtering-correlation-id: a987e375-f429-4629-1270-08dd5cb37ff9
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?rb0IjXZbUWsMOpFRJ5kpaaV26L+CUGMYrS9NW9j8xJTQXNz6lgAbrqD7IxNC?=
+ =?us-ascii?Q?5NOrmNMVm9lSzIbSGx71LBXO69881tVnTkJCMAlSENM/3RICjAByY+z9j+Oy?=
+ =?us-ascii?Q?HU7+Z0mRrgu4g08gamTMXHjiaYlL/UqZcuebBJY0bzc2DC0h3EmpENxnK1k9?=
+ =?us-ascii?Q?V3nwr9C9UeGONRqe1sV6AbvmUbLFYvtMqZqN+p9LFEK/UOgj1qqVlFf4fL5d?=
+ =?us-ascii?Q?4vIw65GUr+0o8OR7p3TPKO+KW5YS1GDHU5cmUpER8zW1JTEIT6dEFBa0ByKB?=
+ =?us-ascii?Q?xmCUAY3UclG9XVGMXFr3xBZFwtApuwisc7izP/vHAf1cGg3oBH7VdEG+VIux?=
+ =?us-ascii?Q?ZCdsNwAW2YHUfNyw5KRqzaa0cU8r5/KWP4Gn/S70qpgz+odv2GLasdUrGlxu?=
+ =?us-ascii?Q?jf2/QaONtP4xcl0ZJdz9VLkgRLL3H5v7vOEXnvSMpxNFvAMbdZBX+ys85zNX?=
+ =?us-ascii?Q?JyQCtFLLFqEDaucAFKH6/Gg1A/c7PRO49o+pdwzZNqJ6R1jxT8a2kX/hlt2C?=
+ =?us-ascii?Q?qB/ewnuZ7O0nlvGxEiBd1mtwAtqOtaYn2c7dffaF4TiU66k3EzA7fB5O+enc?=
+ =?us-ascii?Q?VMto94QJ2+5EMUjIDXR2SclgygWqtXfhj40hCOYedqR028rBMRiuTZvaJVnk?=
+ =?us-ascii?Q?cdA4QfPsQPy/RZcOXjBU2HWpzqiezBI1r2jnyYprcDAm/gQdLeaqajlSLQmN?=
+ =?us-ascii?Q?ypNGzzqzRQAcPpq9CW0v2dQL6sSQtHbyAPVrlNaa/gcVg09xMw6sq56s7Qri?=
+ =?us-ascii?Q?Z+j7qpwSnbgr02iYKoSj4meHTgoHgEwy+9/nwtLAxm3ciev6fc3gQXMlDInc?=
+ =?us-ascii?Q?3BNBOiXr2HHV6VwwgRNn40MCuH9Jm4TS3YakssacJ8IbG92Bwzs+Jpwusw7C?=
+ =?us-ascii?Q?7gn2vgMpDYBJST7tdgVqb/zPkoSGgwbwL47ciTBNwQHjgdanbz6AV5GIIXxU?=
+ =?us-ascii?Q?4o6CzP7ckUJ5qAGrYQhBYFb+7x0JDH9Mr6nmAF6AiyufG5qvAoXH+vT8HdkR?=
+ =?us-ascii?Q?f/5XiPwfhQXXoIDLO5mjM2gK3qaGJ8aZkKbvVC4Tr7BH2rziGEd8fiqC0dDv?=
+ =?us-ascii?Q?pYSzf5CwG8gD8752EI8kDDTWLp/qVz0c1iwv9cFZXA39KKdzeeROmaKq9XDK?=
+ =?us-ascii?Q?i0UpaErkckqmZL8BK5NCu+cr2wqSlaegTjGYN2525w2wrqTeKOe+mExWUUoh?=
+ =?us-ascii?Q?7UW+GgABkOmFkpIluKPWt7TrUXaRpHkPwRuLreUSpwwQEPFfx2HlUBtbGKZw?=
+ =?us-ascii?Q?mprTKGvBhPtmGOXl8nrIICi0HgmZVVs7XK99NXvBtjSCOC3+1xJIe4kIgEvP?=
+ =?us-ascii?Q?LJE5ZHOLpbqciG5dCxF6inEmBhTCDfcgt29YmVqsjcvf5tyf1lIKqIOv1/JM?=
+ =?us-ascii?Q?l8rzz4mYCYAyObdT8ZOs724Yhn2ZHyfDWilNwQPN1h8vUcX4Onvl48ACgYr9?=
+ =?us-ascii?Q?3fY3OauQoebVJa5yq0sjzLN4hpRXklYY?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7785.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?YaETHdlo559vL20xgQ1i1hT/5V5fZBVi2ES/cY2qw4xVJlfNeI6I/LubiRGk?=
+ =?us-ascii?Q?rlGN2T9TmD63ecF2zmPhFwFEGnlqGY7zEjQdbZBt3cLmmNPkaPqPI6VqM475?=
+ =?us-ascii?Q?ogBou1Z72AyqkjHU1gTrQ6Rp/02zSK2ZXhTaP3KnoBYt+f/PFmEMI9h9YAWo?=
+ =?us-ascii?Q?NwE0q7XmtE6/WVkMZVYFi+a7Jt4BywsLaLHgPAMD0iPLsuWuyXKaD1oR5VnB?=
+ =?us-ascii?Q?IkNOV9YiKraDhV/rnvemmsfgR1KDzjL1a8MlJpuOPF4aiI6Haoya+frpEW0w?=
+ =?us-ascii?Q?USvPGa1OdrP+J698K7v273iS74qV/cXIIQbm7M7+oyhxEfdkJ0qoXYTeEKkD?=
+ =?us-ascii?Q?EVxXY/B9TmWBmBwI4lGNOfad2YPdhlhOQrroApbqVMxwAjHQbNo2Y5NRZRsu?=
+ =?us-ascii?Q?73WoCtMytpnCMBKN+f0NncvgEuS5j1DOwfz7bKBiTeifUJCKhV0YIbQSpBZv?=
+ =?us-ascii?Q?BmUIYcSkWyQghZDFKs6RDR1yGkKkotUIvcEgLUwRhvkQeyM/Yz0xAvTUIUbA?=
+ =?us-ascii?Q?TrwLn2ytLih0xtjTTg0LB3cdogabEwn9kGniWUQEOHTdKhg0AmA+njJhobHh?=
+ =?us-ascii?Q?pvrLj6Yr61P37Ju6NlV0v+VxPE4EQRq6x5oxTL0jML8oJlwwNZALW/dMCrgO?=
+ =?us-ascii?Q?9X/3evNAtxKnSLSIhvvgzj92i4ZWSLsxZnVTDJFt+l8TwFOH92dltnUHMd3u?=
+ =?us-ascii?Q?KbV0qoBOVVdgKjbNi6HqYYFytzj739FKny1fvDRqFMXz8jIy4pyRpKyTWJ9X?=
+ =?us-ascii?Q?EjIX6AMvBBvrlNy4i8NPCWNGuSLQrFnG4cIouojb4ZULSnU7dvZagdzjC+1D?=
+ =?us-ascii?Q?kIe04MQKcQ8QTnnuAOb1rgilslOXcjV2hD2ijtfMgMBb7v7TV+ud20Q0bTG/?=
+ =?us-ascii?Q?V6worMP5FSm3AF5HHJR0pltRgK354TuJb62SWQrj/wGWlEMBcTKfRIT7SZsm?=
+ =?us-ascii?Q?UIlbKLmN1BFEW/mykP1+PVvy5I3VI8MgG09SvQvCxyHX0qkaGzikyPwbRzMH?=
+ =?us-ascii?Q?tHyPWwa7E7dpf9r8xlwmNhqmv3g32c2aY4fX8b75M3Fqjd+g7rin+HS0be0Z?=
+ =?us-ascii?Q?VIbe/51KIDUJyrp9ZQBANdBqVSKeJVhWcHX3aNo+vhesjMcMwWvFsg2kpwiy?=
+ =?us-ascii?Q?+axhJM+j2CjG4WKTGaHPr9nxqN7Yh86EFdF+CUeoY4m5IN/stB5jjrry8R/C?=
+ =?us-ascii?Q?H8q7blKPt1WYDdmFZXw5IoTj8Bhy4CZTqwIz/ecg27K5T+rDpx2c10B87BKm?=
+ =?us-ascii?Q?s1D4ZxLxEo3E4VNzcxGRQJFhFepy8jgXQbRwwyEbR3PTUN5jG6OCx9ZCIqWd?=
+ =?us-ascii?Q?JiS1DcMvIjegPBR1zDiloJJtEj4dyXjx6+q3JTg7LW+MytV3y7zbWsF/7bei?=
+ =?us-ascii?Q?WEMWWDxRRxL0VA/gW/lyEeHkanUmQcacxn2+Q0evJyCWjXZmRH/nVz9mBgc5?=
+ =?us-ascii?Q?D7jPOleLr1+adMQid7KvzVXClY8HB5OkeA/t6Pgbhm369HFXUXEGSyu6JsPX?=
+ =?us-ascii?Q?/LOSMKVlpfa7zS6N0MdDUX93cv6H5fU9hS6fI0VueGiJ8Suglw/qs110PKR0?=
+ =?us-ascii?Q?uoQwSGV9Grj9i8gI2YNyHzZDBX8gJZLSeZw+Wa06?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -75,305 +180,106 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MBO-RS-ID: ec5928313f90d20e28f
-X-MBO-RS-META: u8qb5wxg3wi6mtz64fqxwffpoc5ni1ns
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7785.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a987e375-f429-4629-1270-08dd5cb37ff9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Mar 2025 13:33:37.2014
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: /g1ODA1BAxBEjO/YS/M6Rc7y5+oRvsxe7DC5NBbzUcrr1GDuZSFuvpdPSKAlg/yyeb4oTMKFrDKpRa/o777jzEczHiOP4okqELDp2TFpjsM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB8398
+X-OriginatorOrg: intel.com
 
-On Fri, 2025-02-28 at 18:00 +0800, Frank Sae wrote:
-> Add support for a pci table in this module, and implement pci_driver
-> =C2=A0function to initialize this driver, remove this driver or shutdown
-> this
-> =C2=A0driver.
-> Implement the fxgmac_drv_probe function to init interrupts, register
-> mdio
-> =C2=A0and netdev.
+From: Simon Horman <horms@kernel.org>=20
+>Sent: Thursday, March 6, 2025 10:41 AM
+>To: Jagielski, Jedrzej <jedrzej.jagielski@intel.com>
+>Cc: intel-wired-lan@lists.osuosl.org; Nguyen, Anthony L <anthony.l.nguyen@=
+intel.com>; netdev@vger.kernel.org; jiri@nvidia.com; Polchlopek, Mateusz <m=
+ateusz.polchlopek@intel.com>; Mrozowicz, SlawomirX <slawomirx.mrozowicz@int=
+el.com>; Kwapulinski, Piotr <piotr.kwapulinski@intel.com>; Wegrzyn, Stefan =
+<stefan.wegrzyn@intel.com>
+>Subject: Re: [PATCH iwl-next v5 12/15] ixgbe: add support for devlink relo=
+ad
+>
+>On Fri, Feb 21, 2025 at 12:51:13PM +0100, Jedrzej Jagielski wrote:
+>> The E610 adapters contain an embedded chip with firmware which can be
+>> updated using devlink flash. The firmware which runs on this chip is
+>> referred to as the Embedded Management Processor firmware (EMP
+>> firmware).
+>>=20
+>> Activating the new firmware image currently requires that the system be
+>> rebooted. This is not ideal as rebooting the system can cause unwanted
+>> downtime.
+>>=20
+>> The EMP firmware itself can be reloaded by issuing a special update
+>> to the device called an Embedded Management Processor reset (EMP
+>> reset). This reset causes the device to reset and reload the EMP
+>> firmware.
+>>=20
+>> Implement support for devlink reload with the "fw_activate" flag. This
+>> allows user space to request the firmware be activated immediately.
+>>=20
+>> Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+>> Co-developed-by: Slawomir Mrozowicz <slawomirx.mrozowicz@intel.com>
+>> Signed-off-by: Slawomir Mrozowicz <slawomirx.mrozowicz@intel.com>
+>> Co-developed-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+>> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+>> Co-developed-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
+>> Signed-off-by: Stefan Wegrzyn <stefan.wegrzyn@intel.com>
+>> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+>
+>...
+>
+>> diff --git a/Documentation/networking/devlink/ixgbe.rst b/Documentation/=
+networking/devlink/ixgbe.rst
+>> index 41aedf4b8017..e5fef951c6f5 100644
+>> --- a/Documentation/networking/devlink/ixgbe.rst
+>> +++ b/Documentation/networking/devlink/ixgbe.rst
+>> @@ -88,3 +88,18 @@ combined flash image that contains the ``fw.mgmt``, `=
+`fw.undi``, and
+>>         and device serial number. It is expected that this combination b=
+e used with an
+>>         image customized for the specific device.
+>> =20
+>> +Reload
+>> +=3D=3D=3D=3D=3D=3D
+>> +
+>> +The ``ixgbe`` driver supports activating new firmware after a flash upd=
+ate
+>> +using ``DEVLINK_CMD_RELOAD`` with the ``DEVLINK_RELOAD_ACTION_FW_ACTIVA=
+TE``
+>> +action.
+>> +
+>> +.. code:: shell
+>> +    $ devlink dev reload pci/0000:01:00.0 reload action fw_activate
+>> +The new firmware is activated by issuing a device specific Embedded
+>> +Management Processor reset which requests the device to reset and reloa=
+d the
+>> +EMP firmware image.
+>> +
+>> +The driver does not currently support reloading the driver via
+>> +``DEVLINK_RELOAD_ACTION_DRIVER_REINIT``.
+>
+>Hi Jedrzej, all,
+>
+>This is not a proper review. And I didn't look into this, but make htmldoc=
+s
+>complains that:
+>
+> .../ixgbe.rst:98: ERROR: Error in "code" directive:
+> maximum 1 argument(s) allowed, 9 supplied.
 >=20
-> Signed-off-by: Frank Sae <Frank.Sae@motor-comm.com>
-> ---
-> =C2=A0.../ethernet/motorcomm/yt6801/yt6801_net.c=C2=A0=C2=A0=C2=A0 | 111
-> ++++++++++++++++++
-> =C2=A0.../ethernet/motorcomm/yt6801/yt6801_pci.c=C2=A0=C2=A0=C2=A0 | 104 =
-++++++++++++++++
-> =C2=A02 files changed, 215 insertions(+)
-> =C2=A0create mode 100644
-> drivers/net/ethernet/motorcomm/yt6801/yt6801_pci.c
->=20
-> diff --git a/drivers/net/ethernet/motorcomm/yt6801/yt6801_net.c
-> b/drivers/net/ethernet/motorcomm/yt6801/yt6801_net.c
-> index 7cf4d1581..c54550cd4 100644
-> --- a/drivers/net/ethernet/motorcomm/yt6801/yt6801_net.c
-> +++ b/drivers/net/ethernet/motorcomm/yt6801/yt6801_net.c
-> @@ -97,3 +97,114 @@ static int fxgmac_mdio_register(struct
-> fxgmac_pdata *priv)
-> =C2=A0	priv->phydev =3D phydev;
-> =C2=A0	return 0;
-> =C2=A0}
-> +
-> +static void fxgmac_phy_release(struct fxgmac_pdata *priv)
-> +{
-> +	FXGMAC_IO_WR_BITS(priv, EPHY_CTRL, RESET, 1);
-> +	fsleep(100);
-> +}
-> +
-> +void fxgmac_phy_reset(struct fxgmac_pdata *priv)
-> +{
-> +	FXGMAC_IO_WR_BITS(priv, EPHY_CTRL, RESET, 0);
-> +	fsleep(1500);
-> +}
-> +
-> +#ifdef CONFIG_PCI_MSI
-> +static void fxgmac_init_interrupt_scheme(struct fxgmac_pdata *priv)
-> +{
-> +	struct pci_dev *pdev =3D to_pci_dev(priv->dev);
-> +	int req_vectors =3D FXGMAC_MAX_DMA_CHANNELS;
-> +
-> +	/* Since we have FXGMAC_MAX_DMA_CHANNELS channels, we must
-> +	 *=C2=A0 ensure the number of cpu core is ok. otherwise, just
-> roll back to legacy.
-> +	 */
-> +	if (num_online_cpus() < FXGMAC_MAX_DMA_CHANNELS - 1)
-> +		goto enable_msi_interrupt;
-> +
-> +	priv->msix_entries =3D
-> +		kcalloc(req_vectors, sizeof(struct msix_entry),
-> GFP_KERNEL);
-> +	if (!priv->msix_entries)
-> +		goto enable_msi_interrupt;
-> +
-> +	for (u32 i =3D 0; i < req_vectors; i++)
-> +		priv->msix_entries[i].entry =3D i;
-> +
-> +	if (pci_enable_msix_exact(pdev, priv->msix_entries,
-> req_vectors) < 0) {
-> +		/* Roll back to msi */
-> +		kfree(priv->msix_entries);
-> +		priv->msix_entries =3D NULL;
-> +		yt_err(priv, "enable MSIx err, clear msix
-> entries.\n");
-> +		goto enable_msi_interrupt;
-> +	}
-> +
-> +	FXGMAC_SET_BITS(priv->int_flag, INT_FLAG, INTERRUPT,
-> BIT(INT_FLAG_MSIX_POS));
-> +	priv->per_channel_irq =3D 1;
-> +	return;
-> +
-> +enable_msi_interrupt:
-> +	if (pci_enable_msi(pdev) < 0) {
-> +		FXGMAC_SET_BITS(priv->int_flag, INT_FLAG, INTERRUPT,
-> BIT(INT_FLAG_LEGACY_POS));
-> +		yt_err(priv, "MSI err, rollback to LEGACY.\n");
-> +	} else {
-> +		FXGMAC_SET_BITS(priv->int_flag, INT_FLAG, INTERRUPT,
-> BIT(INT_FLAG_MSI_POS));
-> +		priv->dev_irq =3D pdev->irq;
-> +	}
-> +}
-> +#endif
-> +
-> +int fxgmac_drv_probe(struct device *dev, struct fxgmac_resources
-> *res)
-> +{
-> +	struct fxgmac_pdata *priv;
-> +	struct net_device *netdev;
-> +	int ret;
-> +
-> +	netdev =3D alloc_etherdev_mq(sizeof(struct fxgmac_pdata),
-> +				=C2=A0=C2=A0 FXGMAC_MAX_DMA_RX_CHANNELS);
-> +	if (!netdev)
-> +		return -ENOMEM;
-> +
-> +	SET_NETDEV_DEV(netdev, dev);
-> +	priv =3D netdev_priv(netdev);
-> +
-> +	priv->dev =3D dev;
-> +	priv->netdev =3D netdev;
-> +	priv->dev_irq =3D res->irq;
-> +	priv->hw_addr =3D res->addr;
-> +	priv->msg_enable =3D NETIF_MSG_DRV;
-> +	priv->dev_state =3D FXGMAC_DEV_PROBE;
-> +
-> +	/* Default to legacy interrupt */
-> +	FXGMAC_SET_BITS(priv->int_flag, INT_FLAG, INTERRUPT,
-> BIT(INT_FLAG_LEGACY_POS));
-> +	pci_set_drvdata(to_pci_dev(priv->dev), priv);
-> +
-> +	if (IS_ENABLED(CONFIG_PCI_MSI))
-> +		fxgmac_init_interrupt_scheme(priv);
-> +
-> +	ret =3D fxgmac_init(priv, true);
-> +	if (ret < 0) {
-> +		yt_err(priv, "fxgmac_init err:%d\n", ret);
-> +		goto err_free_netdev;
-> +	}
-> +
-> +	fxgmac_phy_reset(priv);
-> +	fxgmac_phy_release(priv);
-> +	ret =3D fxgmac_mdio_register(priv);
-> +	if (ret < 0) {
-> +		yt_err(priv, "fxgmac_mdio_register err:%d\n", ret);
-> +		goto err_free_netdev;
-> +	}
-> +
-> +	netif_carrier_off(netdev);
-> +	ret =3D register_netdev(netdev);
-> +	if (ret) {
-> +		yt_err(priv, "register_netdev err:%d\n", ret);
-> +		goto err_free_netdev;
-> +	}
-> +
-> +	return 0;
-> +
-> +err_free_netdev:
-> +	free_netdev(netdev);
-> +	return ret;
-> +}
-> diff --git a/drivers/net/ethernet/motorcomm/yt6801/yt6801_pci.c
-> b/drivers/net/ethernet/motorcomm/yt6801/yt6801_pci.c
-> new file mode 100644
-> index 000000000..1b80ae15a
-> --- /dev/null
-> +++ b/drivers/net/ethernet/motorcomm/yt6801/yt6801_pci.c
-> @@ -0,0 +1,104 @@
-> +// SPDX-License-Identifier: GPL-2.0+
-> +/* Copyright (c) 2022 - 2024 Motorcomm Electronic Technology
-> Co.,Ltd.
-> + *
-> + * Below is a simplified block diagram of YT6801 chip and its
-> relevant
-> + * interfaces.
-> + *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ||
-> + *=C2=A0 ********************++**********************
-> + *=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 | PCIE Endpoint |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 *
-> + *=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 +---------------+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 *
-> + *=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | GMAC |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
-> + *=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 +--++--+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
-> + *=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |**|=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 *
-> + *=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 GMII --> |**|=
- <-- MDIO=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
-> + *=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 +-++--+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *
-> + *=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 | Integrated PHY |=C2=A0 YT8531S=C2=A0=C2=A0 *
-> + *=C2=A0 *=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 +-++-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 *
-> + *=C2=A0 ********************||******************* **
-> + */
-> +
-> +#include <linux/kernel.h>
-> +#include <linux/module.h>
-> +
-> +#ifdef CONFIG_PCI_MSI
-> +#include <linux/pci.h>
-> +#endif
-> +
-> +#include "yt6801.h"
-> +
-> +static int fxgmac_probe(struct pci_dev *pcidev, const struct
-> pci_device_id *id)
-> +{
-> +	struct device *dev =3D &pcidev->dev;
-> +	struct fxgmac_resources res;
-> +	int i, ret;
-> +
-> +	ret =3D pcim_enable_device(pcidev);
-> +	if (ret) {
-> +		dev_err(dev, "%s pcim_enable_device err:%d\n",
-> __func__, ret);
-> +		return ret;
-> +	}
-> +
-> +	for (i =3D 0; i < PCI_STD_NUM_BARS; i++) {
-> +		if (pci_resource_len(pcidev, i) =3D=3D 0)
-> +			continue;
-> +
-> +		ret =3D pcim_iomap_regions(pcidev, BIT(i),
-> FXGMAC_DRV_NAME);
+> .. code:: shell
+>     $ devlink dev reload pci/0000:01:00.0 reload action fw_activate
+>
+>...
 
-This function is deprecated.
+Hi Simon
 
-Use pcim_iomap_region() instead.
+looks like blank lines might be missing there.
+I will fix that in the next revision then.
 
-> +		if (ret) {
-> +			dev_err(dev, "%s, pcim_iomap_regions
-> err:%d\n",
-> +				__func__, ret);
-> +			return ret;
-> +		}
-> +		break;
-> +	}
-> +
-> +	pci_set_master(pcidev);
-> +
-> +	memset(&res, 0, sizeof(res));
-> +	res.irq =3D pcidev->irq;
-> +	res.addr =3D pcim_iomap_table(pcidev)[i];
-
-This function is also deprecated. You can use the function mentioned
-above to obtain the mapping addr.
-
-
-P.
-
-> +
-> +	return fxgmac_drv_probe(&pcidev->dev, &res);
-> +}
-> +
-> +static void fxgmac_remove(struct pci_dev *pcidev)
-> +{
-> +	struct fxgmac_pdata *priv =3D dev_get_drvdata(&pcidev->dev);
-> +	struct net_device *netdev =3D priv->netdev;
-> +	struct device *dev =3D &pcidev->dev;
-> +
-> +	unregister_netdev(netdev);
-> +	fxgmac_phy_reset(priv);
-> +	free_netdev(netdev);
-> +
-> +	if (IS_ENABLED(CONFIG_PCI_MSI) &&
-> +	=C2=A0=C2=A0=C2=A0 FXGMAC_GET_BITS(priv->int_flag, INT_FLAG, MSIX)) {
-> +		pci_disable_msix(pcidev);
-> +		kfree(priv->msix_entries);
-> +		priv->msix_entries =3D NULL;
-> +	}
-> +
-> +	dev_dbg(dev, "%s has been removed\n", netdev->name);
-> +}
-> +
-> +#define MOTORCOMM_PCI_ID			0x1f0a
-> +#define YT6801_PCI_DEVICE_ID			0x6801
-> +
-> +static const struct pci_device_id fxgmac_pci_tbl[] =3D {
-> +	{ PCI_DEVICE(MOTORCOMM_PCI_ID, YT6801_PCI_DEVICE_ID) },
-> +	{ 0 }
-> +};
-> +
-> +MODULE_DEVICE_TABLE(pci, fxgmac_pci_tbl);
-> +
-> +static struct pci_driver fxgmac_pci_driver =3D {
-> +	.name		=3D FXGMAC_DRV_NAME,
-> +	.id_table	=3D fxgmac_pci_tbl,
-> +	.probe		=3D fxgmac_probe,
-> +	.remove		=3D fxgmac_remove,
-> +};
-> +
-> +module_pci_driver(fxgmac_pci_driver);
-> +
-> +MODULE_AUTHOR("Motorcomm Electronic Tech. Co., Ltd.");
-> +MODULE_DESCRIPTION(FXGMAC_DRV_DESC);
-> +MODULE_LICENSE("GPL");
 
 
