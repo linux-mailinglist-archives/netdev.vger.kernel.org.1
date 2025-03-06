@@ -1,107 +1,137 @@
-Return-Path: <netdev+bounces-172480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172483-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AC0BA54F1F
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 16:31:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A8B5A54F53
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 16:37:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ECB847AA922
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 15:30:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBE6D18989C4
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 15:35:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC2DE20F075;
-	Thu,  6 Mar 2025 15:29:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1645220FA86;
+	Thu,  6 Mar 2025 15:35:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fZezFYM7"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="gr69QlAM";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="bW5lT3xQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD68C20E6F6;
-	Thu,  6 Mar 2025 15:29:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 991CA18E054;
+	Thu,  6 Mar 2025 15:34:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741274977; cv=none; b=IRHIIxnhHTSu4z+FUG1jnPL+DVjQ/+l8hBSPywd9glphIjDkRCWbkQ8G5a+S/7Mk8tJB2b+z6KSWsVnBfiByUe8t1BN4ZvywEhm7IIROE4YZ7K6krfQ1xn1r54Jki0kEDI+5b1GHr6pJL5bNYu9ArHZ94AU4TqorZ9xSrau2TEY=
+	t=1741275303; cv=none; b=QtVoYMPTjRj6wPUslaQbD3GOnd48YiTH8bRYcXZ5p/OmTnl5lTSFAElZ1GX02wNUHgS6oCY9hO/scKALN0QiX+wBUvRQAF3PuiignN0OmhKE0z/a8w9Mlvq55UMHVhqB32DfOLVAZjj1RdKgQVJurFISIzu0gBWHbvAI3SqL9tE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741274977; c=relaxed/simple;
-	bh=fOOQowHJHtW+gHqQRw+cobzO7tlDBCXQk58mod4OwP4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H8XHDjItxwBtyNG7qjOXWb9c/m+sKqC1WMdiuoxZio+iEGRqslPGQuiM5HidzP6EP+lLRbnrFegQKg65waUh8yJi+1/zDEAr/52f0ftO8Hwij3R5WDD/0Pcc9evkJAqhsdzkBxaC3fkHzrl5b3RRA3HAtYj9u0HS0J2Wq/8wHsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fZezFYM7; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=+IzmAbgju3FDk0Ryltpo+ejh+hoS4Rf/7x9rJ3Yw0EU=; b=fZezFYM7Q7hsuSZ7fLNC1YsWMD
-	DMwJd4MIBQUfPVlx1hne+poqp2G3TNmrhsdZ10bbkAJkvrwOoaKZRJI6Frn1wp/XUr/I4vKrB3sgN
-	XPoJWax9YeByq6lz1rUci/uJ0sZ1jzmG+TQ3rdi1O35pli7N37Qp6ofYEqu27pc6pHGs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tqDA0-002pzB-Ms; Thu, 06 Mar 2025 16:29:20 +0100
-Date: Thu, 6 Mar 2025 16:29:20 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jie Luo <quic_luoj@quicinc.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Lei Wei <quic_leiwei@quicinc.com>,
-	Suruchi Agarwal <quic_suruchia@quicinc.com>,
-	Pavithra R <quic_pavir@quicinc.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-hardening@vger.kernel.org,
-	quic_kkumarcs@quicinc.com, quic_linchen@quicinc.com,
-	srinivas.kandagatla@linaro.org, bartosz.golaszewski@linaro.org,
-	john@phrozen.org
-Subject: Re: [PATCH net-next v3 04/14] net: ethernet: qualcomm: Initialize
- PPE buffer management for IPQ9574
-Message-ID: <74f89e1e-c440-42cb-9d8e-be213a3d83a4@lunn.ch>
-References: <20250209-qcom_ipq_ppe-v3-0-453ea18d3271@quicinc.com>
- <20250209-qcom_ipq_ppe-v3-4-453ea18d3271@quicinc.com>
- <a79027ed-012c-4771-982c-b80b55ab0c8a@lunn.ch>
- <c592c262-5928-476f-ac2a-615c44d67277@quicinc.com>
- <33529292-00cd-4a0f-87e4-b8127ca722a4@lunn.ch>
- <cffdd8e8-76bc-4424-8cdb-d48f5010686d@quicinc.com>
+	s=arc-20240116; t=1741275303; c=relaxed/simple;
+	bh=SIMrxnR6CRgdLuJ43aqdD5f3kYmdlm/srJC0O33eMQE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sLPHBhgI2RCblMnOjKlZNEU2I8KUttKu+kYBbAiJ89XUhTd5mrR3uIHKkY/xxqHCZ8nMEDg8CudrVM7JgF9MDJ9WJzM9Ro6XRyhNMjjePp7AGjepnjnV6pPNeduhL9dxlL2gNNo1r7fkI/eVFqGV/UIHDOLEfKGkdbImyeUmvio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=gr69QlAM; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=bW5lT3xQ; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id 5A02D602FF; Thu,  6 Mar 2025 16:34:52 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1741275292;
+	bh=ubsqguGlhFw0mjx+KC1rrow+/cN6Y0E/ZO8cgSci2rA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=gr69QlAMOQc7KhfqJiRwFItBlCe9AvEZk9IpI9m4UmCzRYLCKYgFb7qDenT8S3OfF
+	 CIPXIFcYkSsVPNdE9RkY+uD+6RDzU5jfBMb0a59T9746tLkzWSS+cUk2qlkHPmAHWD
+	 pe9Ee9siKg7TfrcO2WhSsGTSu/81pyGUO7fOle7tpIZvInsvlfoBfqKamVuA5z0GLR
+	 uWjwoKdZaJBmHZgKXyUtpzBkFhepAdG0js2bjwpI2AdgT10Xt76CdBZwgOQB1ZUh7c
+	 hdhC+Oj0SoltifFvHWlglfPiUdfdjhqj0q3vK/sIOQfK8hvM6WLcejq4ep7roZACOb
+	 NCpm20OVzD+9A==
+X-Spam-Level: 
+Received: from localhost.localdomain (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id 43672602FF;
+	Thu,  6 Mar 2025 16:34:50 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1741275290;
+	bh=ubsqguGlhFw0mjx+KC1rrow+/cN6Y0E/ZO8cgSci2rA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=bW5lT3xQSO/5SJGVAmMkBiuh+0xfPXX5SdiwEUTWy3N+1FNjEYvIHUXB8qGqHtkVD
+	 LZ2nx5qg/HHKxNwmQ+h5VOq4PKqJgvgrv55S0f7vL+M9J8JQZSv0W8BGddGK6P8HhJ
+	 ZOsvwL5635OSCws4uVjqNlYB2nGYEd4mG1COmUbXbBwaGXE6YBhVJCI1LAohDccP2w
+	 NSnFFFmkgmRJdTqG3L49+o0P9lRgIVdHsLbR5CMyV3Le6N0iArjQ1a26qgyy+Ik598
+	 kC8cbRDnfSxBNozMCbDp2986lseiPX4xPclKYfmIAGp+YEWMBQBlEDNBywfM8GjRqY
+	 eDYwaGjM89b8w==
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de,
+	horms@kernel.org
+Subject: [PATCH net 0/3] Netfilter fixes for net
+Date: Thu,  6 Mar 2025 16:34:43 +0100
+Message-Id: <20250306153446.46712-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cffdd8e8-76bc-4424-8cdb-d48f5010686d@quicinc.com>
+Content-Transfer-Encoding: 8bit
 
-> Thanks for the suggestion. Just to clarify, we preferred
-> u32p_replace_bits() over FIELD_PREP() because the former does
-> a clear-and-set operation against a given mask, where as with
-> FIELD_PREP(), we need to clear the bits first before we use the
-> macro and then set it. Due to this, we preferred using
-> u32_replace_bits() since it made the macro definitions to modify
-> the registers simpler. Given this, would it be acceptable to
-> document u32p_replace_bits() better, as it is already being used
-> by other drivers as well?
+Hi,
 
-I suggest you submit a patch to those who maintain that file and see
-what they say.
+The following patchset contains Netfilter fixes for net:
 
-But maybe also look at how others are using u32p_replace_bits() and
-should it be wrapped up in a macro? FIELD_MOD()? These macros do a lot
-of build time checking that you are not overflowing the type. It would
-be good to have that to catch bugs at build time, rather than years
-later at runtime.
+1) Fix racy non-atomic read-then-increment operation with
+   PREEMPT_RT in nft_ct, from Sebastian Andrzej Siewior.
 
-      Andrew
+2) GC is not skipped when jiffies wrap around in nf_conncount,
+   from Nicklas Bo Jensen.
+
+3) flush_work() on nf_tables_destroy_work waits for the last queued
+   instance, this could be an instance that is different from the one
+   that we must wait for, then make destruction work queue.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-25-03-06
+
+Thanks.
+
+P.S: This is coming late after net-6.14-rc6, please, apply after your
+pending pull request is accepted. Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit a466fd7e9fafd975949e5945e2f70c33a94b1a70:
+
+  caif_virtio: fix wrong pointer check in cfv_probe() (2025-02-28 18:04:23 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-25-03-06
+
+for you to fetch changes up to fb8286562ecfb585e26b033c5e32e6fb85efb0b3:
+
+  netfilter: nf_tables: make destruction work queue pernet (2025-03-06 13:35:54 +0100)
+
+----------------------------------------------------------------
+netfilter pull request 25-03-06
+
+----------------------------------------------------------------
+Florian Westphal (1):
+      netfilter: nf_tables: make destruction work queue pernet
+
+Nicklas Bo Jensen (1):
+      netfilter: nf_conncount: garbage collection is not skipped when jiffies wrap around
+
+Sebastian Andrzej Siewior (1):
+      netfilter: nft_ct: Use __refcount_inc() for per-CPU nft_ct_pcpu_template.
+
+ include/net/netfilter/nf_tables.h |  4 +++-
+ net/netfilter/nf_conncount.c      |  4 ++--
+ net/netfilter/nf_tables_api.c     | 24 ++++++++++++++----------
+ net/netfilter/nft_compat.c        |  8 ++++----
+ net/netfilter/nft_ct.c            |  6 ++++--
+ 5 files changed, 27 insertions(+), 19 deletions(-)
 
