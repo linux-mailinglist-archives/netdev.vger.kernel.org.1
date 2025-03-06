@@ -1,120 +1,135 @@
-Return-Path: <netdev+bounces-172625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7373CA55912
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 22:50:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 45B26A5592C
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 22:55:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AFF967A9057
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 21:49:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74CF37A21C2
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 21:54:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A69FD26FD9A;
-	Thu,  6 Mar 2025 21:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F3D277017;
+	Thu,  6 Mar 2025 21:55:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vQZufM30"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2e6Y22X2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818FB20764E
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 21:50:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5122702B8
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 21:55:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741297821; cv=none; b=JLv7lvpkljWEziAjyJ/7mPSIqfiA6sK8ODdd3cX9IRARNifqTvUtEts7jApubdcdAXjDPrb5K7puxoPp/bAvTTqNp60I2u9EL/TpE4lNmVPwOCpPuu56PA7EaiVCLLuzyQCIrxBo0kLC6xicmWYB0v9FIBqyQolufZh4WYsOzJw=
+	t=1741298126; cv=none; b=X50JJBywGdW3wOO67zD3y1BOdzPQiZc5hwiiDn4Og4r9esT//T8/yJ6jeqiq9HPyQob62gizGPE+rEtwDVf7b59k7GVKKly99Bs2sBDLrqy5LR//EFWogivB4DP6JI+xwSFjDhNB34T+LiM9pU3LQhxKzE2FPaAsmAuOak2s0AI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741297821; c=relaxed/simple;
-	bh=wEmmL+hhFDbjgw0/bq8DVgoZ99wj4lATLiWtnzra4t0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iFsVMAKNgeIHX5FTTwD3RNY4/45EuMtx3E9X7xN+MDyLSacuV8iS09Gy/oQ0djH1HxYxl1uquK0F3WeYTS70MVC4l48zuexuPopGnNhuuDUkADnl7Oypd97IMIO3NE2gOly0nz2NI1t6N4cfcw4TvS2qCOoSMsGU14WCS88IY8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vQZufM30; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD972C4CEE0;
-	Thu,  6 Mar 2025 21:50:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741297820;
-	bh=wEmmL+hhFDbjgw0/bq8DVgoZ99wj4lATLiWtnzra4t0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=vQZufM30fQW90ekfAs00gDwQJDidjkshmw6a80u2NKOiQ90FUUBKNAq/gT2cKm4Z2
-	 jdd01eIX+mQjdGUfk4tDxYeKwn/IJn6m85+BfPlT46sV71RYFmYMJxJ06eZEHM+JkG
-	 HoZql3aaaWefKh6EDNkQQ+FP9piX7dq0ncR0OKYoKBc8N9qhOsC0e+CaSaa2eUBiJ0
-	 +EkWCdvDh0G1aqDgh0dYtAoeF12rDMvumYsGHhchMDJYDqZZ7U29hOS5CudiyCCseW
-	 dM9MqF5XIEw0VYT1hr8ZHWYu+tYdW12Q9/+HIzdAPqmqNbNwmaoQBb10FPPArZ1GZt
-	 3EUh9zYnI2bmQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E8E380CEE6;
-	Thu,  6 Mar 2025 21:50:55 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1741298126; c=relaxed/simple;
+	bh=azxxHglNwZOmOo21MSzDsXJjKofzRYYuFM+xpJtchuw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=SEvCBkx26aYhHho1kzGURhCpwaIPog7hMfM6Nkq6owlu0m7FQYLEGFdpG55vWgyUS8EAdW+40+jDl3u0OMnuUoZe+dAzTVNv9w4lsa5/y48lkykdmiN0x7fZPsnQrgwLz/J5XjjJm/6LvYEL4fAFFyUOWWo8PwQ6M7pJLkszkQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2e6Y22X2; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ff68033070so1907015a91.2
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 13:55:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741298124; x=1741902924; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=NLkSmt1DZnRhFx9XULHVdYEwtFXJcPydAoKqmySuLlQ=;
+        b=2e6Y22X2yuv+HlRfCtMdXPKmiILHbBvD5jKCLW5IIzXiSw+gzORJCF2/ZTua/OPmAS
+         uun1x+WWai9AqJxTfmJ1RELdjJ4sfoSuZvrbv/3Zwv6HQNXRrMcqWyFrcbrKsHAFz1Ce
+         744en2q9mUwqynJ0e0UmPNrngk+B7hs0Mz/IGx0XFGfzZfL2k4WoG3It8z0FsuFwpA98
+         4qw/6zYDHRvFBvC8cFcozuqeRktwkikBAuUAvNzsreEXXKvvffY9BDHuU4B04JMEwP7v
+         B9lBpjS+y2XI+e0xJHo5DlDvLeMr5G+gq3t57Z7/ArGi84U0cQyhhX79TNB9vJUCB7g0
+         Gy1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741298124; x=1741902924;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NLkSmt1DZnRhFx9XULHVdYEwtFXJcPydAoKqmySuLlQ=;
+        b=Cxi4lhH1ECMRTwxBFnWi+9MG3HH9UXoAEtJB6sKYyGKgON513PuVT+AZ63HUjwI8P7
+         HxfsIoYM68Ern+5fonwmPRIXKOqX9PyrD/8sQ0eRVngHoUKbeh/OspRPllEWTUWKM5mN
+         thX1hUQHY2jATMtkbzZ3ibs0iFi5t4ypuNlriCXOr9vllOC78vfro/nlB0w5mggOmQcM
+         BnKvudM+DzRv45HUR6ERYsTXPHlxi48rFr+7Q7S96UMxKHZxG8NT6Yb5cv0wioVsvlHy
+         fGLvZV2pMduaxI9EaI8HtNrII+CeUMerjcf/8iU3X4RdON+W36odQgq97RcOysL7dhQS
+         YBnw==
+X-Gm-Message-State: AOJu0Yzh3LDPUdcXUgjas3uaHJ+YvnvlBhgsIkhhWRC/bMjEyPxqasgX
+	PJlmM3TuLNC9bGfvayZpuKt+OsQ+PHPtXPEUL+ihgrpS9mG1OH/LIzfofNchVYYiYa/QkuBnSx7
+	34kJTOKbAcrA/M43oiQJ3VxjhXbBeWUwUVUg1jGr2QnHCOxe39upjlspa8ca3kdi5noY/BBWXBB
+	ScQqi3wlwvsl3hqHhO5ZbksHWukCXFHWZZYlpyOPBPNCCF6X6FQ0IMUG8au5s=
+X-Google-Smtp-Source: AGHT+IGHDB9A44dGCVln69a2GwdZhq805JNhLs2P9Wez5QFWx8ZhmbyqG15VhWEUgx6YhN7ouHokY7Am1brqjoBqXw==
+X-Received: from pjbdb16.prod.google.com ([2002:a17:90a:d650:b0:2e5:5ffc:1c36])
+ (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:4b11:b0:2fe:955d:cdb1 with SMTP id 98e67ed59e1d1-2ff7cef99b6mr1144261a91.23.1741298123934;
+ Thu, 06 Mar 2025 13:55:23 -0800 (PST)
+Date: Thu,  6 Mar 2025 21:55:20 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v10 00/14] net: Hold netdev instance lock during ndo
- operations
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174129785425.1790842.9872735858764773480.git-patchwork-notify@kernel.org>
-Date: Thu, 06 Mar 2025 21:50:54 +0000
-References: <20250305163732.2766420-1-sdf@fomichev.me>
-In-Reply-To: <20250305163732.2766420-1-sdf@fomichev.me>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, saeed@kernel.org, dw@davidwei.uk
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.rc0.332.g42c0ae87b1-goog
+Message-ID: <20250306215520.1415465-1-almasrymina@google.com>
+Subject: [PATCH net v2] netmem: prevent TX of unreadable skbs
+From: Mina Almasry <almasrymina@google.com>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hello:
+Currently on stable trees we have support for netmem/devmem RX but not
+TX. It is not safe to forward/redirect an RX unreadable netmem packet
+into the device's TX path, as the device may call dma-mapping APIs on
+dma addrs that should not be passed to it.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Fix this by preventing the xmit of unreadable skbs.
 
-On Wed,  5 Mar 2025 08:37:18 -0800 you wrote:
-> As the gradual purging of rtnl continues, start grabbing netdev
-> instance lock in more places so we can get to the state where
-> most paths are working without rtnl. Start with requiring the
-> drivers that use shaper api (and later queue mgmt api) to work
-> with both rtnl and netdev instance lock. Eventually we might
-> attempt to drop rtnl. This mostly affects iavf, gve, bnxt and
-> netdev sim (as the drivers that implement shaper/queue mgmt)
-> so those drivers are converted in the process.
-> 
-> [...]
+Tested by configuring tc redirect:
 
-Here is the summary with links:
-  - [net-next,v10,01/14] net: hold netdev instance lock during ndo_open/ndo_stop
-    https://git.kernel.org/netdev/net-next/c/d4c22ec680c8
-  - [net-next,v10,02/14] net: hold netdev instance lock during nft ndo_setup_tc
-    https://git.kernel.org/netdev/net-next/c/c4f0f30b424e
-  - [net-next,v10,03/14] net: sched: wrap doit/dumpit methods
-    https://git.kernel.org/netdev/net-next/c/7c79cff95535
-  - [net-next,v10,04/14] net: hold netdev instance lock during qdisc ndo_setup_tc
-    https://git.kernel.org/netdev/net-next/c/a0527ee2df3f
-  - [net-next,v10,05/14] net: hold netdev instance lock during queue operations
-    https://git.kernel.org/netdev/net-next/c/cae03e5bdd9e
-  - [net-next,v10,06/14] net: hold netdev instance lock during rtnetlink operations
-    https://git.kernel.org/netdev/net-next/c/7e4d784f5810
-  - [net-next,v10,07/14] net: hold netdev instance lock during ioctl operations
-    https://git.kernel.org/netdev/net-next/c/ffb7ed19ac0a
-  - [net-next,v10,08/14] net: hold netdev instance lock during sysfs operations
-    https://git.kernel.org/netdev/net-next/c/ad7c7b2172c3
-  - [net-next,v10,09/14] net: hold netdev instance lock during ndo_bpf
-    https://git.kernel.org/netdev/net-next/c/97246d6d21c2
-  - [net-next,v10,10/14] net: ethtool: try to protect all callback with netdev instance lock
-    https://git.kernel.org/netdev/net-next/c/2bcf4772e45a
-  - [net-next,v10,11/14] net: replace dev_addr_sem with netdev instance lock
-    https://git.kernel.org/netdev/net-next/c/df43d8bf1031
-  - [net-next,v10,12/14] net: add option to request netdev instance lock
-    https://git.kernel.org/netdev/net-next/c/605ef7aec060
-  - [net-next,v10,13/14] docs: net: document new locking reality
-    https://git.kernel.org/netdev/net-next/c/cc34acd577f1
-  - [net-next,v10,14/14] eth: bnxt: remove most dependencies on RTNL
-    https://git.kernel.org/netdev/net-next/c/004b5008016a
+sudo tc qdisc add dev eth1 ingress
+sudo tc filter add dev eth1 ingress protocol ip prio 1 flower ip_proto \
+	tcp src_ip 192.168.1.12 action mirred egress redirect dev eth1
 
-You are awesome, thank you!
+Before, I see unreadable skbs in the driver's TX path passed to dma
+mapping APIs.
+
+After, I don't see unreadable skbs in the driver's TX path passed to dma
+mapping APIs.
+
+Fixes: 65249feb6b3d ("net: add support for skbs with unreadable frags")
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Cc: stable@vger.kernel.org
+Signed-off-by: Mina Almasry <almasrymina@google.com>
+
+---
+
+v2: https://lore.kernel.org/netdev/20250305191153.6d899a00@kernel.org/
+
+- Put unreadable check at the top (Jakub)
+---
+ net/core/dev.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 30da277c5a6f..2f7f5fd9ffec 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -3872,6 +3872,9 @@ static struct sk_buff *validate_xmit_skb(struct sk_buff *skb, struct net_device
+ {
+ 	netdev_features_t features;
+ 
++	if (!skb_frags_readable(skb))
++		goto out_kfree_skb;
++
+ 	features = netif_skb_features(skb);
+ 	skb = validate_xmit_vlan(skb, features);
+ 	if (unlikely(!skb))
+
+base-commit: f315296c92fd4b7716bdea17f727ab431891dc3b
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.49.0.rc0.332.g42c0ae87b1-goog
 
 
