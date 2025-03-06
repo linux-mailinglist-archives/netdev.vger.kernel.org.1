@@ -1,87 +1,81 @@
-Return-Path: <netdev+bounces-172449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B72B0A54B28
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 13:47:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5581EA54B2B
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 13:48:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEFEE17047B
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 12:47:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7D601894FD5
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 12:48:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDC181863E;
-	Thu,  6 Mar 2025 12:47:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1A471E52D;
+	Thu,  6 Mar 2025 12:48:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="GCgb1+1o"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="CxxAsc2m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 716A217BA9
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 12:47:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D67472040BD;
+	Thu,  6 Mar 2025 12:48:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741265255; cv=none; b=NlvZsMyzuQS6Yqmy+OS9x/P/ikwmPX0Elb2ZGVgHxLCLcpox3fkb1bl/c3HQkXieL2CSkjwFWORtxczQOWYxCS/P3kZcNaGgdYJLKx0rLReIk/zCoA1Y50yeHCfTz5xLQ42/yeL5K6AzvtKdJHSF462uhKplXzEm+NDzV3Gzylw=
+	t=1741265309; cv=none; b=btUnTHwDiujNjI+QxMPgPX1jJFcEoRSPcKOHdXHiLohVuXjvUeexiNFiz3UDNo+SKIOfk5SmFdnh2p9cXD4rpVreJMidMHjI56Xwj3X9RiAsf4cMEnq/6TXsD/nryibxkzrr0tO+QWb3zDON3K1hVA4WC6CMd+ACkmBLWRjcKqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741265255; c=relaxed/simple;
-	bh=Up+aldGBaA00n3mn0fpGZ+nU/HjGiZgvNhtWaB0Brh0=;
+	s=arc-20240116; t=1741265309; c=relaxed/simple;
+	bh=ViLXaYDDh1JWsyMIsFtFXeNpOns6R2CWpAsph1iAvMU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hI/CZysh0njtiSRNWBwbvgYOD8ezTWiPB8N63tXq0czMKvXWxPd+pxBzfcQ0/EilXT/pGdoZEI++KJIL4FGtfpwD5w8xSEo8p7vQ2ZHd9ylDjB98wU/9kCGPSeoidJDX5YHVM/VqAQKZSvMTp0ydru9rXlLJR5cKl2oI/av/47c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=GCgb1+1o; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4394a0c65fcso6728805e9.1
-        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 04:47:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1741265251; x=1741870051; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5hZNm5FBtBQ8RgVFKxGhGMV35WiDPZm3S3W8QbGcDLk=;
-        b=GCgb1+1oYkEp9j5sozs9muKAozHrUjmYF870MuvDryV2m1uDbu/5bkEfSOI97l83wb
-         fW+RsvuTIK+gWjrAqgIhnNkg/ei5PqSePG7RtU6zwkWSSjHb6a74jf5jIuIXhyPP8RpJ
-         Cu4UX+huu6eYIOGcziVvbujIgtnayHMX2hZRUB2hV+/bSG5EK7Dq4TjVAHpjEm7zWryP
-         dG6k8FvYTiP41G34Lu4itaZ6MksWuRuap5J5x9fUNGeb2UovT67/ON5aumlmmBaqinzn
-         rvOBKuk+STuzRoPulHwN0b8Y/+HGj+hA7yrBJTf73ETloyAswCfdQMyAXbE9HzCWjKmE
-         z2vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741265251; x=1741870051;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5hZNm5FBtBQ8RgVFKxGhGMV35WiDPZm3S3W8QbGcDLk=;
-        b=DW8XxHQvgSgjI1y2JRQMAnddpA4lzgYGoVNuB2ab/UgeQFAHQVD36D1I+aLOAlqi2n
-         to+/ki/rDDD+OV4ivcA+Mptb7lmmWFy5MDtPUwkDV81IR8jyCIF4Glpj2T71mUcLbkfz
-         px7N/ueXiRRcDETfrsq2cgf7a7oinpu2eYt4/IdBDP4TMU0IgNJybR3MZDQn4ltmRKxe
-         7DZXtZjwe2HZK8MNbK3xKByAHpOuzspHv0/6sL0tYhLWB1sRGTApwE4/0h9MDmx3PRGH
-         j0Z8SLOdXpekLMp7ql/WguD9iOYG45tqRJNushgD+LPIYv2zRYskMHkh8DH7m7udlKQl
-         dInA==
-X-Forwarded-Encrypted: i=1; AJvYcCUcAVC8VJP5FtfbEI+e4hgCPuKP74fto+nLLaRP2NNkN+NyvVT0f4GOF/Sn1qZuGxChJGRBKr0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykC05h1Rmn7Th6F73nFcDNZGOI586Xg3XIuBganrEdDM5dD7Yb
-	PmRVeuCtJQ7BasvOBXw/wjj9aF88fMNi7JmCJMckGuWA5ardQfcP5iuxrdBtheo=
-X-Gm-Gg: ASbGncsFDAv9/rMv2mXwcCWoL/wo/FU68cl8s6iGvlaGRC8NFfFFc54WPisQTO7wAUp
-	Ct9yHojZcp0zKJ06mNb63YK48ovp2yRLVI6qtyjtbEqcbQeIMjyy5hoYRAStwnWS59Bmk4Gt2pu
-	29G74cCPQKb2SRZ42rmUnjFYDEwOBUMh9uKP9hkKmAuy8wHkTNpUovJjd2zjD1mVRkVQXR8aysq
-	UF+HLVYaKY3yKJtpBaklIArISOY1F0n5AGSme+POi8VdbkzhgFj+QmPXiscrPUhV9U7MYQJxOhS
-	xxqhlYjkqWWM4mbv4VSZKShjmOoq5dYUvopNIwcCud4+tPNOTPidspMti0m25O0tpURVIHcp
-X-Google-Smtp-Source: AGHT+IEFhNuYZ+z6bxKs94XD1T5cvtdGwqhGzhRcTFV4h7HNuB7NXh8n+T71Gn5iWt8ClaoNyS2TtA==
-X-Received: by 2002:a05:600c:4ed2:b0:439:9d75:9e92 with SMTP id 5b1f17b1804b1-43bd29d239bmr56832535e9.28.1741265251345;
-        Thu, 06 Mar 2025 04:47:31 -0800 (PST)
-Received: from jiri-mlt.client.nvidia.com ([140.209.217.212])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bdd8c327fsm19056285e9.13.2025.03.06.04.47.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Mar 2025 04:47:30 -0800 (PST)
-Date: Thu, 6 Mar 2025 13:47:27 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Tariq Toukan <ttoukan.linux@gmail.com>, netdev@vger.kernel.org, 
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com, 
-	leon@kernel.org, tariqt@nvidia.com, andrew+netdev@lunn.ch
-Subject: Re: [PATCH net] net/mlx5: Fill out devlink dev info only for PFs
-Message-ID: <amselxwxk5wimldqon5pwiue2canabbbzebrtb7um3osmnjsue@immvwjergd5m>
-References: <20250303133200.1505-1-jiri@resnulli.us>
- <53c284be-f435-4945-a8eb-58278bf499ad@gmail.com>
- <20250305183016.413bda40@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qQN2EKPWXMTgHCvG89V9exKXcywk4D150l3eiMD9gk9+2yDhgWjrhA/KvTxav8vHktSXEfNrOf79HphGePsuCSo+NUs+2iE7UefAXHbgKtqUhF7XteGYGtIhNhmkARY0SjLiFiopa3XTxsQIU6r0Kf6UJiYAKkFzL29Q6fbMFlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=CxxAsc2m; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=+DzXmk4dFbeO+m8INiuwLYdFt5umLSVckqHmHFprSKg=; b=CxxAsc2me4QVCsLdkb0TVQu/h+
+	R9lAsFcYFiT7hXeI1jTEY5Uu58JXIQjI3gtjpM+pgssnH97R7qM9eahOg2aZPqHkH8tWttXmwvKmt
+	12Tc0Fgpt8cCB9suT7loDaMO3O3+7xHS/UIW72QUAE2quCTqsvRmgGoaLrOzD0WFxvtumRDY5+5OA
+	+p+q99J6JRgZ0nngzpfFEIHB3pXGInsxjScLQd02zDVYMpSh0wK/yon0/5m8+/w7E7nLIMCt28zMA
+	ghSe+sBkFss3w2hxOhxiJSePMHyU5+ma38K79kcOC8t/GszICm62dUH2h3oQtVG3PxuK07YK+Cwt2
+	1adcMuyw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40594)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tqAeA-0005rj-0H;
+	Thu, 06 Mar 2025 12:48:18 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tqAe5-0006no-2J;
+	Thu, 06 Mar 2025 12:48:13 +0000
+Date: Thu, 6 Mar 2025 12:48:13 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Simon Horman <horms@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>
+Subject: Re: [PATCH net-next v4 09/13] net: phylink: Use phy_caps_lookup for
+ fixed-link configuration
+Message-ID: <Z8mZjabeITVg1Khg@shell.armlinux.org.uk>
+References: <20250303090321.805785-1-maxime.chevallier@bootlin.com>
+ <20250303090321.805785-10-maxime.chevallier@bootlin.com>
+ <20250304154330.6e00961b@fedora.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,18 +84,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250305183016.413bda40@kernel.org>
+In-Reply-To: <20250304154330.6e00961b@fedora.home>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Thu, Mar 06, 2025 at 03:30:16AM +0100, kuba@kernel.org wrote:
->On Wed, 5 Mar 2025 20:55:15 +0200 Tariq Toukan wrote:
->> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
->
->Too late, take it via your tree, please. 
->You need to respond within 24h or take the patches.
+On Tue, Mar 04, 2025 at 03:43:30PM +0100, Maxime Chevallier wrote:
+> On Mon,  3 Mar 2025 10:03:15 +0100
+> Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
+> 
+> > When phylink creates a fixed-link configuration, it finds a matching
+> > linkmode to set as the advertised, lp_advertising and supported modes
+> > based on the speed and duplex of the fixed link.
+> > 
+> > Use the newly introduced phy_caps_lookup to get these modes instead of
+> > phy_lookup_settings(). This has the side effect that the matched
+> > settings and configured linkmodes may now contain several linkmodes (the
+> > intersection of supported linkmodes from the phylink settings and the
+> > linkmodes that match speed/duplex) instead of the one from
+> > phy_lookup_settings().
+> > 
+> > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> > ---
+> 
+> Maybe before anything goes further with this patch, I'd like to get
+> some feedback from it on a particular point. This changes the linkmodes
+> that are reported on fixed-link interfaces. Instead of reporting one
+> single mode, we report all modes supported by the fixed-link' speed and
+> duplex settings.
 
-Can I repost with Tariq's tag (I was not aware it is needed). I have a
-net-next patchset based on top of this I would like to push.
+This is a good question. We have historically only used the baseT link
+modes because the software PHY implementation was based around clause
+22 baseT PHYs (although that doesn't support >1G of course.)
 
-Thanks!
+The real question is... does it matter, to which I'd say I don't know.
+One can argue that it shouldn't matter, and I think userspace would be
+unlikely to break, but userspace tends to do weird stuff all the time
+so there's never any guarantee.
 
+> The fixed-link in question is for the CPU port of a DSA switch.
+> 
+> In my opinion, this is OK as the linkmodes expressed here don't match
+> physical linkmodes on an actual wire, but as this is a user visible
+> change, I'd like to make sure this is OK. Any comment here is more than
+> welcome.
+
+Maybe Andrew has an opinion, but I suspect like me, it's really a case
+that "we don't know".
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
