@@ -1,113 +1,90 @@
-Return-Path: <netdev+bounces-172623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB664A558F4
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 22:41:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB2A7A5590D
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 22:46:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 002F5173D53
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 21:41:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF8283B307B
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 21:46:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 832CC2135A3;
-	Thu,  6 Mar 2025 21:41:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 114F52702B8;
+	Thu,  6 Mar 2025 21:46:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b="mWBugUuD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XxYeI3hk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.manjaro.org (mail.manjaro.org [116.203.91.91])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2096249E5;
-	Thu,  6 Mar 2025 21:41:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.91.91
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D0320764E
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 21:46:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741297267; cv=none; b=SvdlwCVXFM2YzgBKrgzJwERcSEQ0YFBJnsPyjrJQZ6DrYwy5Zb7UKfPIx4nMjaR6bQ5k/jQVonQZZh8RT1n7LMFuxZDSIa3ZG9r2ThbXovBsn5Bg4HBSBCN91ZAUoTacY7y2jFru9DpOeDLvt8T7lJL7Lwz+ErPFLgGB27F2ZBQ=
+	t=1741297601; cv=none; b=I+TCKT8tp3xiyZFlBISq2AzKZ7H0vuY0r/L5doD2ueWgOlN/ifjYhLOFBSWE7xfP8kcJAWwUrYwY+EP9heFpxHY1nNKAldXgNw/TaCNaJEeftmbsAJ+M9HyIhvEcCFmvaucdishobQpUeEIH2+jtruz8c/K7TU4DH4bLMC+yIHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741297267; c=relaxed/simple;
-	bh=Gb8LX0FDsLupGyOUwSvKzXTC0OHMDI948YPUXXrpV7k=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=HTKQ6ED0e8ST0tDFYQnAByAHZeNfJXNsRv6RxvMFkegFtL9yjHQoAs3xq4Pga1pZ3tjKWx5v9M/2dl+m3ZZEd7aZBLh9IvxgCtweH5EhJZQIxEkXxLP/JQPTCLnS57kAnkYXRpf2e4CuU2C3K/xCHrwKKTC2hdzmkzo+JTYqTeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org; spf=pass smtp.mailfrom=manjaro.org; dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b=mWBugUuD; arc=none smtp.client-ip=116.203.91.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manjaro.org
+	s=arc-20240116; t=1741297601; c=relaxed/simple;
+	bh=eUeYN3cF+grGOhOxoZEc85rrNa0gntdXdJRsdbURvp8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=K/tgiYZEh9pyTl3dkIe//af99+xjfbN4sWrSDJ3+E3eSL5da7NCCEvuqee8FGRhRhhYQWIGIeZ+B2r+jLvTVmnZhPFHvHFa/8XAjvvj67OFZf8DW6oBwYd4LuwzIQi4SLc4S//ZtF+Twy/ktDgeVStwRLnM68DA6QdFeDt9Zxoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XxYeI3hk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D58F7C4CEE8;
+	Thu,  6 Mar 2025 21:46:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741297599;
+	bh=eUeYN3cF+grGOhOxoZEc85rrNa0gntdXdJRsdbURvp8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XxYeI3hk2meM8eXZvbvzGUiWYyCxWIe3wP7kLNrvjW0gcoF8EN9XVTIoCd9Ycn+Li
+	 f8PPn2XuXhVW1hjesDLSEdKpolpD8ox8tU0THFFQ9kzt74SXJF9M0HoKBRf6PG5N4j
+	 jTeq8ZR+seCgEIoCAxerCHCjLgvt1dNfzEu4nsmV1xX21f8S3fkYWhdyj9BtYT/pB2
+	 hS/ev9c8IggKtzvYtZC3JfadX+yK73nh82k0+jF2UKnZKn2eTa2Wzz/EFNY8xaU9cP
+	 sfKg4IqAkHcdWlN4ngzmoGq5avLywfu3rh7A7t+bswHx2BTFnHUgxFkD9T0i2re3M/
+	 473Yh2wck6Aaw==
+Date: Thu, 6 Mar 2025 13:46:38 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+ andrew+netdev@lunn.ch, Gal Pressman <gal@nvidia.com>
+Subject: Re: [PATCH net] net/mlx5: Fill out devlink dev info only for PFs
+Message-ID: <20250306134638.3b4f234e@kernel.org>
+In-Reply-To: <6ae56b95-8736-405b-b090-2ecd2e247988@gmail.com>
+References: <20250303133200.1505-1-jiri@resnulli.us>
+	<53c284be-f435-4945-a8eb-58278bf499ad@gmail.com>
+	<20250305183016.413bda40@kernel.org>
+	<7bb21136-83e8-4eff-b8f7-dc4af70c2199@gmail.com>
+	<20250306113914.036e75ea@kernel.org>
+	<3faf95ef-022a-412e-879d-c6a326f4267a@gmail.com>
+	<20250306123448.189615da@kernel.org>
+	<6ae56b95-8736-405b-b090-2ecd2e247988@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjaro.org; s=2021;
-	t=1741297263;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ogLZAuYeTK3/4DxQxKpS5NhtK0uL51zVQoxAkrY1bR8=;
-	b=mWBugUuD92cKAZA0g1fWhmejy6D+0gx+j1JkJJNyP7AZqdfO+gC1rD6xbKped/eNbIufKf
-	rEv8Ou+aL2CUSWmiKN5mrd0No3l4TVFv7UwCMH/pJ8josaFzXztiiuWwGxEWgpeSgNtsbV
-	DNAq0m4+EzHbCMT4CUNoysz7LNDrSyFo3RhVtpy5hkP3HskAuDzJFyYXXxEtAe7xKtgBUv
-	8bh84TgqT65ytOhqqfTBOfV9CwvMx6A2tZ4V42WlQJst30nkG3pyp3XOWv0pD8u/rhLzS6
-	CDE3Ah/+COdJw3ETzBPp3221mqy6DXbuWjdmlTe+/oOO7hqaGbYwBQaSa5TGeA==
-Date: Thu, 06 Mar 2025 22:41:03 +0100
-From: Dragan Simic <dsimic@manjaro.org>
-To: Jonas Karlman <jonas@kwiboo.se>
-Cc: Heiko Stuebner <heiko@sntech.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-rockchip@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/3] Use DELAY_ENABLE macro for RK3328, RK3566/RK3568 and
- RK3588
-In-Reply-To: <20250306203858.1677595-1-jonas@kwiboo.se>
-References: <20250306203858.1677595-1-jonas@kwiboo.se>
-Message-ID: <41bb2c8d963e890768bceb477488250e@manjaro.org>
-X-Sender: dsimic@manjaro.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Authentication-Results: ORIGINATING;
-	auth=pass smtp.auth=dsimic@manjaro.org smtp.mailfrom=dsimic@manjaro.org
 
-Hello Jonas,
+On Thu, 6 Mar 2025 23:13:33 +0200 Tariq Toukan wrote:
+> >> So no less than two working days for any subsystem.
+> >> Okay, now this makes more sense.  
+> > 
+> > Could you explain to me why this is a problem for you?  
+> 
+> Nothing special about "me" here.
+> 
+> I thought it's obvious. As patches are coming asynchronously, it is not 
+> rare to won't be able to respond within a single working day.
+> 
+> This becomes significantly rarer with two consecutive working days.
 
-On 2025-03-06 21:38, Jonas Karlman wrote:
-> Almost all Rockchip GMAC variants use the DELAY_ENABLE macro to help
-> enable or disable use of MAC rx/tx delay. However, RK3328, 
-> RK3566/RK3568
-> and RK3588 GMAC driver does not.
-> 
-> Use of the DELAY_ENABLE macro help ensure the MAC rx/tx delay is
-> disabled, instead of being enabled and using a zero delay, when
-> RGMII_ID/RXID/TXID is used.
-> 
-> RK3328 driver was merged around the same time as when DELAY_ENABLE was
-> introduced so it is understandable why it was missed. Both 
-> RK3566/RK3568
-> and RK3588 support were introduced much later yet they also missed 
-> using
-> the DELAY_ENABLE macro (so did vendor kernel at that time).
-> 
-> This series fixes all these cases to unify how GMAC delay feature is
-> enabled or disabled across the different GMAC variants.
-> 
-> Jonas Karlman (3):
->   net: stmmac: dwmac-rk: Use DELAY_ENABLE macro for RK3328
->   net: stmmac: dwmac-rk: Use DELAY_ENABLE macro for RK3566/RK3568
->   net: stmmac: dwmac-rk: Use DELAY_ENABLE macro for RK3588
-> 
->  .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 19 ++++++++++---------
->  1 file changed, 10 insertions(+), 9 deletions(-)
+On one thread Saeed is claiming that nVidia is a major netdev
+contributor, and pillar of the community.
 
-As far as I can tell, the RV1126 GMAC should also be converted to use
-the DELAY_ENABLE macro, which the vendor kernel already does. [*]  
-Perhaps
-that could be performed in new patch 4/4 in this series?
-
-BTW, it would be quite neat to introduce the DELAY_VALUE macro, which
-makes the function calls a bit more compact. [*]
-
-[*] 
-https://raw.githubusercontent.com/rockchip-linux/kernel/refs/heads/develop-5.10/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+On another thread it's too hard for the main mlx5 maintainer
+to open their inbox once a day to look at patches for their
+own driver, that they were CCed on.
 
