@@ -1,118 +1,75 @@
-Return-Path: <netdev+bounces-172435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56F0EA549DB
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 12:46:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4D6EA549EE
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 12:49:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAEAD16ACCE
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 11:44:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB8EC3A321B
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 11:47:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E05720B7FD;
-	Thu,  6 Mar 2025 11:43:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9663220A5F0;
+	Thu,  6 Mar 2025 11:47:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VCLXa+nz"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5261A20B7F1;
-	Thu,  6 Mar 2025 11:43:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71FC5204C28
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 11:47:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741261413; cv=none; b=X23PlnI0ircUjs7WULp35xxzJiZ3zXScQQ1U3ncuyvBO+x+yh23PmvOmkHJlo5lxlgoUiASBevdQHnGMncHNU1eCofaiI8IcjZS0FcehHUTIiNYKD3A38tLRW9Nv41TroNhGdncRBQJQ2pu1nMIOJX/BRfp+8BII/xPjTpcZLiw=
+	t=1741261656; cv=none; b=OGVOJj2VaXo8TwVDiLdW4fT41+EJJ5x7IUMfAZJqwRfRhSYuz8OU0dvRy+3XtNF1CxrTn3YWAVN6Ez3iznD8QbKpIPHqVRXTixgopJ1KnEdZHVH43R6BEBJiObyiqxQPx1rr9J+fkYqJ51O7VLikc/OqCd0nAMQqzXVOs7GWqlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741261413; c=relaxed/simple;
-	bh=Q3McjjKLJ/px/KaPolwOtAzJP+Ph3x4mOmHfpx1Kogc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=kjZQzQMQfR8BpALv6E0eInDkfBHQVaiOtkSEzcWF8kfL9z3O1/0H2tvrnywO6GNdH8G6YlbGHj0wQecWMLbr3RD+Hf6oOqyd89qnuNsmNjZwYIJKOPJRGklY20SutqVqA/PpY4nmNGQNtkXCxHWk8kRBT6VVfNkeUukTa+MW17I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Z7nZM3B73z1R5yB;
-	Thu,  6 Mar 2025 19:41:47 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id EF1211A0171;
-	Thu,  6 Mar 2025 19:43:25 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 6 Mar 2025 19:43:23 +0800
-Message-ID: <f834a7cd-ca0a-4495-a787-134810aa0e4d@huawei.com>
-Date: Thu, 6 Mar 2025 19:43:22 +0800
+	s=arc-20240116; t=1741261656; c=relaxed/simple;
+	bh=UTh+0Zo9U5+ktJAQ16w7FzZ/V/OLvccdabZ2MgWYn4E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZTR6Dx9eTJFyhrmvowjQn+tNVqBqTrCtlu61qImUsDEKSgrdY0TTUoKZJDfe9ZfyKtvZpaZG25bstsfo3FQTF+z3OsS7FqhMPuWYKl3tE8gOPGXZHC2CSYfC1A1TlgtPoep0mgBy7FUjHDk3D7JzPEox37INwTaRIvymLEH6D7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VCLXa+nz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E1B0C4CEE0;
+	Thu,  6 Mar 2025 11:47:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741261655;
+	bh=UTh+0Zo9U5+ktJAQ16w7FzZ/V/OLvccdabZ2MgWYn4E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VCLXa+nzyKf/wJaNPjU/crdU3OawzhGW1MhI0TsvhoOgkV5oQ9oZ6AnGr7cpWuQyz
+	 d1p17V1lXb4hcpbuDMHJe1/OY+HL85ySZY3D9lqhk3pVn7V04+sJNqQeQqBEyZYtrW
+	 k0S4bW19p6wVxXrPJfs6AznTeJL5CwzuR8W3POnKR9Rg5sE8QGOfVerqvWvs1Mk2lH
+	 J0VcC/vnHs8wyz0p+8VaheiOORq6VcgRTb94Sdz40s4VrKe1W/nL/1l9fSXgE8rwOp
+	 F73hh2zmdMnP/Ck/4xc5a4mLXjNHLuFS+BPK8B/TI8aZUYve9v6YVJ3eQIb5buF5EP
+	 bn7A8qBLY4GTw==
+Date: Thu, 6 Mar 2025 11:47:31 +0000
+From: Simon Horman <horms@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: airoha: Fix lan4 support in
+ airoha_qdma_get_gdm_port()
+Message-ID: <20250306114731.GW3666230@kernel.org>
+References: <20250304-airoha-eth-fix-lan4-v1-1-832417da4bb5@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] mm: alloc_pages_bulk: remove assumption of populating
- only NULL elements
-To: NeilBrown <neilb@suse.de>
-CC: Qu Wenruo <wqu@suse.com>, Yishai Hadas <yishaih@nvidia.com>, Jason
- Gunthorpe <jgg@ziepe.ca>, Shameer Kolothum
-	<shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>, Chris Mason <clm@fb.com>, Josef
- Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>, Gao Xiang
-	<xiang@kernel.org>, Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>,
-	Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep Dhavale <dhavale@google.com>,
-	Carlos Maiolino <cem@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>, Jesper Dangaard Brouer
-	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker
-	<anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, Jeff Layton
-	<jlayton@kernel.org>, Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo
-	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Luiz Capitulino
-	<luizcap@redhat.com>, Mel Gorman <mgorman@techsingularity.net>, Dave Chinner
-	<david@fromorbit.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
-	<linux-btrfs@vger.kernel.org>, <linux-erofs@lists.ozlabs.org>,
-	<linux-xfs@vger.kernel.org>, <linux-mm@kvack.org>, <netdev@vger.kernel.org>,
-	<linux-nfs@vger.kernel.org>
-References: <> <18c68e7a-88c9-49d1-8ff8-17c63bcc44f4@huawei.com>
- <174121808436.33508.1242845473359255682@noble.neil.brown.name>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <174121808436.33508.1242845473359255682@noble.neil.brown.name>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250304-airoha-eth-fix-lan4-v1-1-832417da4bb5@kernel.org>
 
-On 2025/3/6 7:41, NeilBrown wrote:
-> On Wed, 05 Mar 2025, Yunsheng Lin wrote:
->>
->> For the existing btrfs and sunrpc case, I am agreed that there
->> might be valid use cases too, we just need to discuss how to
->> meet the requirements of different use cases using simpler, more
->> unified and effective APIs.
+On Tue, Mar 04, 2025 at 03:38:05PM +0100, Lorenzo Bianconi wrote:
+> EN7581 SoC supports lan{1,4} ports on MT7530 DSA switch. Fix lan4
+> reported value in airoha_qdma_get_gdm_port routine.
 > 
-> We don't need "more unified".
+> Fixes: 23020f0493270 ("net: airoha: Introduce ethernet support for EN7581 SoC")
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 
-What I meant about 'more unified' is how to avoid duplicated code as
-much as possible for two different interfaces with similar‌ functionality.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-The best way I tried to avoid duplicated code as much as possible is
-to defragment the page_array before calling the alloc_pages_bulk()
-for the use case of btrfs and sunrpc so that alloc_pages_bulk() can
-be removed of the assumption populating only NULL elements, so that
-the API is simpler and more efficient.
-
-> 
-> If there are genuinely two different use cases with clearly different
-> needs - even if only slightly different - then it is acceptable to have
-> two different interfaces.  Be sure to choose names which emphasise the
-> differences.
-
-The best name I can come up with for the use case of btrfs and sunrpc
-is something like alloc_pages_bulk_refill(), any better suggestion about
-the naming?
-
-> 
-> Thanks,
-> NeilBrown
 
