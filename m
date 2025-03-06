@@ -1,393 +1,133 @@
-Return-Path: <netdev+bounces-172666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F330A55A9A
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 00:06:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC352A55A7A
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 00:02:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 333523B2FA3
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 23:05:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CE8B1898A08
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 23:03:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 102E7280A27;
-	Thu,  6 Mar 2025 23:04:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0981A27C167;
+	Thu,  6 Mar 2025 23:02:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enfabrica.net header.i=@enfabrica.net header.b="S7PASkt1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AgEZWsyC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 354DC2803FD
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 23:04:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC0E42E3373;
+	Thu,  6 Mar 2025 23:02:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741302260; cv=none; b=eDnGACZTP3rlYJGKFdpl+VJQ3Vojw9M8r9oyQLFoNSoIpi1pOvp+u0QtHz3+Zf/K1TiwpVx93Kl/Xn43H0wqNMdz43fLyhbvjyKf3TFZlew9UnxYHLNZgQfYllqvzjqVP7E0ZFIe7LVS+TRkfGsLDo1GDTjth4/t4+EJDWJqGyU=
+	t=1741302167; cv=none; b=swXh6nnJmgXuNe+MuV3KLnZTP1KIZEpq6TcKI0lSQU7T2aD58IW7Ds/iGJWZtXqZukh+Q8YPIGMiRb7UbkUKY4yITJyfVR2fEOooKrQ7EItWoAER1tjQqoPh9Z+PqxtQ7/md+k/6oyrMduY7CkwDtadhRhgS/XPJcRftiMu5oc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741302260; c=relaxed/simple;
-	bh=8zoJVMPNc2FcN+4s7xjapXpTwku8ERNAOulLVuTwkis=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G1ipSp//w5rohyey2THx+LttWJgPVFR5Cb4m5aQixsmrLSBtpAf1HstxNq0lZBulXpFvDxCAtzq6rrCX6yYXSCH0RS5kk6mH1fupKI83ji23E2GXU9uWF3lg8IHTlVssKW5Ph7Mh64vHvBI3+l6ULYt2doJtYHoBWphvuDCY5JE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=enfabrica.net; spf=pass smtp.mailfrom=enfabrica.net; dkim=pass (2048-bit key) header.d=enfabrica.net header.i=@enfabrica.net header.b=S7PASkt1; arc=none smtp.client-ip=209.85.219.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=enfabrica.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enfabrica.net
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6e8fb8ad525so8226166d6.3
-        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 15:04:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=enfabrica.net; s=google; t=1741302257; x=1741907057; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iK4c5koKFv1LWAiQEBPg2eanOfUAKl1IQ+bM1zpj/YY=;
-        b=S7PASkt1v+wU1hrJp67RK/pmk+ULSaNnddrZa6vZENx9B1mCbDnEC+SNeay2fhmjUx
-         PuHEInp63tNXRrZjMK6HZDGNQ3xmF3pm795M9IgB5nbtoZDtocP+W/4KndeDQ+5obMOW
-         eYxJqErfQbgZ+ljOEbCJ42zEP0S7fkHgi9oj9zQiLAOuqoqZFUHdGypqR4j2wNGvsdjf
-         Dibltc3wL77IXhsrW/XnAJf9AoN9J+j4095XiPHdHeOuHZ7DfF8cmiVxSvYWjsLDjnP0
-         zcyVR0uBViyGX2NewdzoHiecTAYPQPD1qROi35LLJD2E3mXALJYVd1Fu7E49Zfbqnv3r
-         /h+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741302257; x=1741907057;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iK4c5koKFv1LWAiQEBPg2eanOfUAKl1IQ+bM1zpj/YY=;
-        b=pCG1mlRdUsLhyAjY+9+3er6+nIyFf5dqoQQY3pruBprgQgRXc1zRLNU9GRp/6T4FH3
-         3atxsEQyy1mgtrt+SsEhPT7bIEQsvQknPnGVRB01O4mbF7ZZmiSoeLacIojANMznD57c
-         PjZgVjBV0R9UACx3mQBtoRUutaI60LQlgQ5K/g9E4EKlaCGPMRQR0fwM/UoFMHZ8IQXT
-         EoIb8XuUC5A4UfMio31bnFtjSep0BCPYwvarZ9vIadS9qz4moX3/dWi+1wvPkKH8LwiH
-         Tqu6BDIw+m8i+h8R7R2myVp+bQ9iztgzwp6AQzmSjvJAaq082jfj6q7r0uXAmUeQdjmz
-         gDIg==
-X-Gm-Message-State: AOJu0YzhJbyMMBYEb0IqD5O4nIr+oTzwbtozeoUekJFKI9mVfiBrs0/B
-	VjQ6ObFX7Cbj6YR4+BwuUdbXtPtYEPqsj46RIr6rprBx1bMHcFE6qf6VxVsZtSWQopsxCkDGkMJ
-	9iJPFMZ5cHNU5dF/sgD1CV2Ob7K+RWWjzWlzPwHxB/jrCkzaZwmHCHfbzoYgrjZF4ZEZ+FMvRN3
-	A97uya6GgzhRAT6CIaPbwbtW2JF3V4AcQjUdlFJJgpdas=
-X-Gm-Gg: ASbGncuMyVG1u8mbv8UMbQZpmV3IjyYG+pEja/zUwn0fWpoiXewiSmrR3fu8AleKGHZ
-	GWzwErQg5PRFT96Pi4Ob7+rS04nVLcFEiy4b3mF4I3W8RQUARBPYtqErIlXg/hu981Yy8p9zoqb
-	OBvXTYA2OWlUuNTYXseOiOjJXGkO9P1XJU7d4sc7FbObWIeSbFYO4wshy7BHfG4Ps5uZFaki9tu
-	11oHXHDXhDAljpRlCMUDYDOwX+m0M4MGV0rx41c6Uvl0gJLkkO0TP0oJHoYHj/Ea/rSownwhI+R
-	fiAmwObqgRUvladeRueTbvcFdT1gCMIk2OTt+EpLx8sDel4aQdjnlNL93qxd10GOoUsY
-X-Google-Smtp-Source: AGHT+IHxTfaUjmuCoF7ih1GrTDipQZTYiCzwagxprA1b0yB9ai/NIjpk6yNwjcfOnnxMdiGhDrPEYQ==
-X-Received: by 2002:ad4:5beb:0:b0:6e8:ed7f:1a79 with SMTP id 6a1803df08f44-6e9006773e7mr18910576d6.32.1741302256701;
-        Thu, 06 Mar 2025 15:04:16 -0800 (PST)
-Received: from debil.. (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac256654fa6sm14971966b.93.2025.03.06.15.04.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Mar 2025 15:04:16 -0800 (PST)
-From: Nikolay Aleksandrov <nikolay@enfabrica.net>
-To: netdev@vger.kernel.org
-Cc: shrijeet@enfabrica.net,
-	alex.badea@keysight.com,
-	eric.davis@broadcom.com,
-	rip.sohan@amd.com,
-	dsahern@kernel.org,
-	bmt@zurich.ibm.com,
-	roland@enfabrica.net,
-	nikolay@enfabrica.net,
-	winston.liu@keysight.com,
-	dan.mihailescu@keysight.com,
-	kheib@redhat.com,
-	parth.v.parikh@keysight.com,
-	davem@redhat.com,
-	ian.ziemba@hpe.com,
-	andrew.tauferner@cornelisnetworks.com,
-	welch@hpe.com,
-	rakhahari.bhunia@keysight.com,
-	kingshuk.mandal@keysight.com,
-	linux-rdma@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Subject: [RFC PATCH 10/13] drivers: ultraeth: add sack support
-Date: Fri,  7 Mar 2025 01:02:00 +0200
-Message-ID: <20250306230203.1550314-11-nikolay@enfabrica.net>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250306230203.1550314-1-nikolay@enfabrica.net>
-References: <20250306230203.1550314-1-nikolay@enfabrica.net>
+	s=arc-20240116; t=1741302167; c=relaxed/simple;
+	bh=xxzdOTbyVDKJ1V6Mx9dmKMG+OcM8YuhuwEFYbCHADjk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OB51rZCujtEu3vdlHhSeia61Tf+sY0BnW2oMNAshB/IhS98e2glsysm1mQxSiQPCU/Qgmdz/jTATbnYBov+4f2RMpESdHrDEG+5u/ENGPsO7SZMfaL7pjN+R6k7WfgO4t2Nz/GwgqrvEhHPlSKXaxrE1jKX/TDMYEaCLmyMaDnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AgEZWsyC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BABEFC4CEE0;
+	Thu,  6 Mar 2025 23:02:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741302167;
+	bh=xxzdOTbyVDKJ1V6Mx9dmKMG+OcM8YuhuwEFYbCHADjk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AgEZWsyCFNH4MgmdfPlRnG8352i6INOBiH0RlJ6kt5NyugNduBFCTmbdKPulK14nq
+	 KreMkFdOqGN2l6B6EpywYebIzJaLveGYcbdKzUu7gRvQKxq93FjGP/CXR0G9Jhg7bW
+	 GgZSH9b33jeYW6Nr6QT0Xn6befWNJUpwTmGPLLFasjD/kcTp0R8TCj+q91Q4sJBpF8
+	 nBQQIFmCRS0jq6i+UKw1LvZ2VStimB4squSZY3sxPs0X4bMnzJ51BVWkwkIAXBL8gO
+	 0n9UjfcrGkeeYAlnwOmIzfbPhyfVFBD9qCIIj/h7iCVrGGOyiDbVDNSoxChRzGbhXH
+	 vhepwGAKpH+Zg==
+Date: Thu, 6 Mar 2025 15:02:44 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Pranjal Shrivastava <praan@google.com>, Shivaji Kant
+ <shivajikant@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ kvm@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-kselftest@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Jeroen de Borst <jeroendb@google.com>, Harshitha
+ Ramamurthy <hramamurthy@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>,
+ Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin"
+ <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Eugenio =?UTF-8?B?UMOpcmV6?=
+ <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano
+ Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, Jamal Hadi Salim
+ <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
+ <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
+Subject: Re: [PATCH net-next v6 1/8] net: add get_netmem/put_netmem support
+Message-ID: <20250306150244.7797232f@kernel.org>
+In-Reply-To: <CAHS8izM8dnFNj5p8vKiyhV9qeE+9=a=BWRnH=vCu49Tq_XTL9g@mail.gmail.com>
+References: <20250227041209.2031104-1-almasrymina@google.com>
+	<20250227041209.2031104-2-almasrymina@google.com>
+	<20250228163846.0a59fb40@kernel.org>
+	<CAHS8izNQnTW7sad_oABtxhy3cHxGR0FWJucrHTSVX7ZAA6jT3Q@mail.gmail.com>
+	<20250303162051.09ad684e@kernel.org>
+	<CAHS8izNWt2-1bC2f0jv4Qpk_A9VpEXNvVRoXUtL43_16d-Ui-A@mail.gmail.com>
+	<20250306134019.1702e609@kernel.org>
+	<CAHS8izM8dnFNj5p8vKiyhV9qeE+9=a=BWRnH=vCu49Tq_XTL9g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Add SACK support, we choose to send SACK (and extended header) when we
-have to send an ACK but cannot advance CACK. The logic is a bit
-complicated because the spec says we have to align CACK and SACK_BASE to
-8 which could effectively move CACK back so we have to fill in for those
-bits as 1s in the SACK bitmap
+On Thu, 6 Mar 2025 14:44:41 -0800 Mina Almasry wrote:
+> > Meaning it doesn't currently do anything special, or you can't make it
+> > do anything special with netdevsim?
+>
+> Meaning it currently doesn't do anything special with netdevsim. I
+> imagine we may be able to create a specialized syzbot instance that
+> loads netdevsim and starts fuzzing its APIs. However I'm told
+> specialized syzbot instances are much less valuable than making the
+> feature discoverable to existing syzbot instances, which is why our
+> thoughts went to adding devmem/unreadable skb support to virtio or
+> tun/tap.
+> 
+> Do I surmise from your question you prefer a netdevsim-based approach?
+> (and just curious maybe, why?)
 
-Signed-off-by: Nikolay Aleksandrov <nikolay@enfabrica.net>
-Signed-off-by: Alex Badea <alex.badea@keysight.com>
----
- drivers/ultraeth/uet_pdc.c     | 100 ++++++++++++++++++++++++++++++---
- drivers/ultraeth/uet_pds.c     |   3 +
- include/net/ultraeth/uet_pdc.h |  10 ++++
- include/uapi/linux/ultraeth.h  |  40 +++++++++++++
- 4 files changed, 146 insertions(+), 7 deletions(-)
+My exposure to syzbot is mostly as a consumer of reports, I thought
+from looking at the repros that there's a way of teaching syzbot
+how to perform more complex "ops", like a sequence of specific
+writes. IIRC for netlink it does things like resolve family.
+But not sure if it's true or how much of an exception adding such
+things is.
 
-diff --git a/drivers/ultraeth/uet_pdc.c b/drivers/ultraeth/uet_pdc.c
-index 55b893ac5479..e9469edd9014 100644
---- a/drivers/ultraeth/uet_pdc.c
-+++ b/drivers/ultraeth/uet_pdc.c
-@@ -401,13 +401,55 @@ static int uet_pdc_build_req(struct uet_pdc *pdc,
- 	return 0;
- }
- 
-+static void pdc_build_sack(struct uet_pdc *pdc,
-+			   struct uet_pds_ack_ext_hdr *ack_ext)
-+{
-+	u32 sack_base = pdc->lowest_unack_psn, shift;
-+	unsigned long bit, start_bit;
-+	s16 sack_psn_offset;
-+	u64 sack_bitmap;
-+
-+	if (sack_base + UET_PDC_SACK_BITS > pdc->max_rcv_psn)
-+		sack_base = max(pdc->max_rcv_psn - UET_PDC_SACK_BITS,
-+				pdc->rx_base_psn);
-+	sack_base &= UET_PDC_SACK_MASK;
-+	sack_psn_offset = (s16)(sack_base -
-+				(pdc->rx_base_psn & UET_PDC_SACK_MASK));
-+	if (sack_base == pdc->rx_base_psn) {
-+		shift = 1;
-+		sack_bitmap = 1;
-+		bit = 0;
-+	} else if (sack_base < pdc->rx_base_psn) {
-+		shift = pdc->rx_base_psn - sack_base;
-+		sack_bitmap = U64_MAX >> (64 - shift);
-+		bit = 0;
-+	} else {
-+		shift = 0;
-+		sack_bitmap = 0;
-+		bit = sack_base - pdc->rx_base_psn;
-+	}
-+
-+	start_bit = bit;
-+	for_each_set_bit_from(bit, pdc->rx_bitmap, UET_PDC_MPR) {
-+		shift += (bit - start_bit);
-+		if (shift >= UET_PDC_SACK_BITS)
-+			break;
-+		sack_bitmap |= BIT(shift);
-+	}
-+
-+	pdc->lowest_unack_psn += UET_PDC_SACK_BITS;
-+	ack_ext->sack_psn_offset = cpu_to_be16(sack_psn_offset);
-+	ack_ext->sack_bitmap = cpu_to_be64(sack_bitmap);
-+}
-+
- static void pdc_build_ack(struct uet_pdc *pdc, struct sk_buff *skb, u32 psn,
- 			  u8 ack_flags, bool exact_psn)
- {
-+	u8 type = pdc_should_sack(pdc) ? UET_PDS_TYPE_ACK_CC : UET_PDS_TYPE_ACK;
- 	struct uet_pds_ack_hdr *ack = skb_put(skb, sizeof(*ack));
- 
--	uet_pdc_build_prologue(&ack->prologue, UET_PDS_TYPE_ACK,
--			       UET_PDS_NEXT_HDR_RSP, ack_flags);
-+	uet_pdc_build_prologue(&ack->prologue, type, UET_PDS_NEXT_HDR_RSP,
-+			       ack_flags);
- 	if (exact_psn) {
- 		ack->ack_psn_offset = 0;
- 		ack->cack_psn = cpu_to_be32(psn);
-@@ -417,6 +459,13 @@ static void pdc_build_ack(struct uet_pdc *pdc, struct sk_buff *skb, u32 psn,
- 	}
- 	ack->spdcid = cpu_to_be16(pdc->spdcid);
- 	ack->dpdcid = cpu_to_be16(pdc->dpdcid);
-+
-+	if (pdc_should_sack(pdc)) {
-+		struct uet_pds_ack_ext_hdr *ack_ext = skb_put(skb,
-+							      sizeof(*ack_ext));
-+
-+		pdc_build_sack(pdc, ack_ext);
-+	}
- }
- 
- static void uet_pdc_build_ses_ack(struct uet_pdc *pdc, struct sk_buff *skb,
-@@ -439,10 +488,12 @@ static void uet_pdc_build_ses_ack(struct uet_pdc *pdc, struct sk_buff *skb,
- static int uet_pdc_send_ses_ack(struct uet_pdc *pdc, __u8 ses_rc, __be16 msg_id,
- 				u32 psn, u8 ack_flags, bool exact_psn)
- {
-+	unsigned int skb_size = sizeof(struct uet_ses_rsp_hdr) +
-+				sizeof(struct uet_pds_ack_hdr);
- 	struct sk_buff *skb;
- 
--	skb = alloc_skb(sizeof(struct uet_ses_rsp_hdr) +
--			sizeof(struct uet_pds_ack_hdr), GFP_ATOMIC);
-+	skb_size += pdc_should_sack(pdc) ? sizeof(struct uet_pds_ack_ext_hdr) : 0;
-+	skb = alloc_skb(skb_size, GFP_ATOMIC);
- 	if (!skb)
- 		return -ENOBUFS;
- 
-@@ -514,6 +565,30 @@ int uet_pdc_tx_req(struct uet_pdc *pdc, struct sk_buff *skb, u8 type)
- 	return ret;
- }
- 
-+static void uet_pdc_rx_sack(struct uet_pdc *pdc, struct sk_buff *skb,
-+			    u32 cack_psn, struct uet_pds_ack_ext_hdr *ext_ack,
-+			    bool ecn_marked)
-+{
-+	unsigned long bit, *sack_bitmap = (unsigned long *)&ext_ack->sack_bitmap;
-+	u32 sack_base_psn = cack_psn +
-+			    (s16)be16_to_cpu(ext_ack->sack_psn_offset);
-+
-+	while ((bit = find_next_bit(sack_bitmap, 64, 0)) != 64) {
-+		/* skip bits that were already acked */
-+		if (sack_base_psn + bit <= pdc->tx_base_psn) {
-+			if (sack_base_psn + bit == pdc->tx_base_psn)
-+				__uet_pdc_mpr_advance_tx(pdc, 1);
-+			continue;
-+		}
-+		if (!psn_bit_valid((sack_base_psn + bit) - pdc->tx_base_psn))
-+			break;
-+		if (test_and_set_bit((sack_base_psn + bit) - pdc->tx_base_psn,
-+				     pdc->ack_bitmap))
-+			continue;
-+		uet_pdc_ack_psn(pdc, skb, sack_base_psn + bit, ecn_marked);
-+	}
-+}
-+
- int uet_pdc_rx_ack(struct uet_pdc *pdc, struct sk_buff *skb,
- 		   __be32 remote_fep_addr)
- {
-@@ -521,10 +596,11 @@ int uet_pdc_rx_ack(struct uet_pdc *pdc, struct sk_buff *skb,
- 	struct uet_pds_ack_hdr *ack = pds_ack_hdr(skb);
- 	s16 ack_psn_offset = be16_to_cpu(ack->ack_psn_offset);
- 	const char *drop_reason = "ack_psn not in MPR window";
-+	struct uet_pds_ack_ext_hdr *ext_ack = NULL;
- 	u32 cack_psn = be32_to_cpu(ack->cack_psn);
- 	u32 ack_psn = cack_psn + ack_psn_offset;
-+	bool is_sack = false, ecn_marked;
- 	int ret = -EINVAL;
--	bool ecn_marked;
- 	u32 psn_bit;
- 
- 	spin_lock(&pdc->lock);
-@@ -545,9 +621,16 @@ int uet_pdc_rx_ack(struct uet_pdc *pdc, struct sk_buff *skb,
- 		drop_reason = "ack_psn bit is invalid";
- 		goto err_dbg;
- 	}
-+	if (uet_prologue_type(&ack->prologue) == UET_PDS_TYPE_ACK_CC) {
-+		ext_ack = pds_ack_ext_hdr(skb);
-+		is_sack = !!ext_ack->sack_bitmap;
-+	}
- 	if (test_and_set_bit(psn_bit, pdc->ack_bitmap)) {
--		drop_reason = "ack_psn bit already set in ack_bitmap";
--		goto err_dbg;
-+		/* SACK packets can include already acked packets */
-+		if (!is_sack) {
-+			drop_reason = "ack_psn bit already set in ack_bitmap";
-+			goto err_dbg;
-+		}
- 	}
- 
- 	/* either using ROD mode or in SYN_SENT state */
-@@ -573,6 +656,9 @@ int uet_pdc_rx_ack(struct uet_pdc *pdc, struct sk_buff *skb,
- 	if (cack_psn != ack_psn)
- 		uet_pdc_ack_psn(pdc, skb, ack_psn, ecn_marked);
- 
-+	if (is_sack)
-+		uet_pdc_rx_sack(pdc, skb, cack_psn, ext_ack, ecn_marked);
-+
- 	ret = 0;
- 	switch (pdc->state) {
- 	case UET_PDC_EP_STATE_SYN_SENT:
-diff --git a/drivers/ultraeth/uet_pds.c b/drivers/ultraeth/uet_pds.c
-index 52122998079d..436b63189800 100644
---- a/drivers/ultraeth/uet_pds.c
-+++ b/drivers/ultraeth/uet_pds.c
-@@ -266,6 +266,9 @@ int uet_pds_rx(struct uet_pds *pds, struct sk_buff *skb, __be32 local_fep_addr,
- 
- 	prologue = pds_prologue_hdr(skb);
- 	switch (uet_prologue_type(prologue)) {
-+	case UET_PDS_TYPE_ACK_CC:
-+		offset += sizeof(struct uet_pds_ack_ext_hdr);
-+		fallthrough;
- 	case UET_PDS_TYPE_ACK:
- 		if (!uet_pds_rx_valid_ack_next_hdr(prologue))
- 			break;
-diff --git a/include/net/ultraeth/uet_pdc.h b/include/net/ultraeth/uet_pdc.h
-index 8a87fc0bc869..d6710f92fb16 100644
---- a/include/net/ultraeth/uet_pdc.h
-+++ b/include/net/ultraeth/uet_pdc.h
-@@ -20,6 +20,8 @@
- 					  NSEC_PER_SEC)
- #define UET_PDC_RTX_DEFAULT_MAX 3
- #define UET_PDC_MPR 128
-+#define UET_PDC_SACK_BITS 64
-+#define UET_PDC_SACK_MASK (U64_MAX << 3)
- 
- #define UET_SKB_CB(skb)       ((struct uet_skb_cb *)&((skb)->cb[0]))
- 
-@@ -93,6 +95,8 @@ struct uet_pdc {
- 
- 	u32 rx_base_psn;
- 	u32 tx_base_psn;
-+	u32 lowest_unack_psn;
-+	u32 max_rcv_psn;
- 
- 	u32 ack_gen_trigger;
- 	u32 ack_gen_min_pkt_add;
-@@ -146,4 +150,10 @@ static inline bool before(u32 seq1, u32 seq2)
- {
- 	return (s32)(seq1-seq2) < 0;
- }
-+
-+static inline bool pdc_should_sack(const struct uet_pdc *pdc)
-+{
-+	return pdc->lowest_unack_psn > pdc->rx_base_psn &&
-+	       pdc->lowest_unack_psn < pdc->max_rcv_psn;
-+}
- #endif /* _UECON_PDC_H */
-diff --git a/include/uapi/linux/ultraeth.h b/include/uapi/linux/ultraeth.h
-index cc39bf970e08..3b8e95d7ed7b 100644
---- a/include/uapi/linux/ultraeth.h
-+++ b/include/uapi/linux/ultraeth.h
-@@ -152,6 +152,46 @@ struct uet_pds_ack_hdr {
- 	__be16 dpdcid;
- } __attribute__ ((__packed__));
- 
-+/* ext ack CC flags */
-+enum {
-+	UET_PDS_ACK_EXT_CC_F_RSVD	= (1 << 0)
-+};
-+
-+/* field: cc_type_mpr_sack_off */
-+#define UET_PDS_ACK_EXT_MPR_BITS 8
-+#define UET_PDS_ACK_EXT_MPR_MASK 0xff
-+#define UET_PDS_ACK_EXT_CC_FLAGS_BITS 4
-+#define UET_PDS_ACK_EXT_CC_FLAGS_MASK 0xf
-+#define UET_PDS_ACK_EXT_CC_FLAGS_SHIFT UET_PDS_ACK_EXT_MPR_BITS
-+#define UET_PDS_ACK_EXT_CC_TYPE_BITS 4
-+#define UET_PDS_ACK_EXT_CC_TYPE_MASK 0xf
-+#define UET_PDS_ACK_EXT_CC_TYPE_SHIFT (UET_PDS_ACK_EXT_CC_FLAGS_SHIFT + \
-+				       UET_PDS_ACK_EXT_CC_FLAGS_BITS)
-+/* header used for ACK_CC */
-+struct uet_pds_ack_ext_hdr {
-+	__be16 cc_type_flags_mpr;
-+	__be16 sack_psn_offset;
-+	__be64 sack_bitmap;
-+	__be64 ack_cc_state;
-+} __attribute__ ((__packed__));
-+
-+static inline __u8 uet_pds_ack_ext_mpr(const struct uet_pds_ack_ext_hdr *ack)
-+{
-+	return __be16_to_cpu(ack->cc_type_flags_mpr) & UET_PDS_ACK_EXT_MPR_MASK;
-+}
-+
-+static inline __u8 uet_pds_ack_ext_cc_flags(const struct uet_pds_ack_ext_hdr *ack)
-+{
-+	return (__be16_to_cpu(ack->cc_type_flags_mpr) >> UET_PDS_ACK_EXT_CC_FLAGS_SHIFT) &
-+	       UET_PDS_ACK_EXT_CC_FLAGS_MASK;
-+}
-+
-+static inline __u8 uet_pds_ack_ext_cc_type(const struct uet_pds_ack_ext_hdr *ack)
-+{
-+	return (__be16_to_cpu(ack->cc_type_flags_mpr) >> UET_PDS_ACK_EXT_CC_TYPE_SHIFT) &
-+	       UET_PDS_ACK_EXT_CC_TYPE_MASK;
-+}
-+
- /* ses request op codes */
- enum {
- 	UET_SES_REQ_OP_NOOP			= 0x00,
--- 
-2.48.1
+Here we'd need to guide syzbot towards a specific series of
+sysfs writes, so that it creates the correctly configured netdevsim
+instance with higher probability.
 
+Just explaining my thinking, not saying this is the way we should
+necessarily go.
+
+> > > We'll need to add queue API/page_pool/unreadable netmem support to
+> > > one of the drivers qemu (syzbot) uses, and that should get syzbot
+> > > fuzzing the control plane.
+> > >
+> > > To get syzbot to fuzz the data plane, I think we need to set up a
+> > > special syzbot instance which configures udmabuf/rss/flow  
+> >
+> > To be clear for Tx you don't need RSS and flow steering, Tx should
+> > be trivial for any device driver which managers DMAs directly (not USB).
+> 
+> Yes, we don't need queue API or page_pool support or header split
+> either for that matter. TX fuzzing is definitely simpler. Maybe we can
+> start with that.
+
+Adding support to virtio would be ideal, if syzbot already fuzzes it. 
+I was recently talking to David Wei about it for the Rx side, too, 
+so we can test io_uring ZC. But io_uring can only ZC user memory now.
+I'm not sure what adding DEVMEM support to virtio would entail.
 
