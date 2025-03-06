@@ -1,83 +1,101 @@
-Return-Path: <netdev+bounces-172596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 173B0A55782
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 21:35:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77A32A5578E
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 21:39:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38D543AD190
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 20:34:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A32F91765D7
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 20:39:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE0627603F;
-	Thu,  6 Mar 2025 20:34:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA608276052;
+	Thu,  6 Mar 2025 20:39:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hV7eR4/A"
+	dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b="eojZz75y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.forwardemail.net (smtp.forwardemail.net [149.28.215.223])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC7B0249E5
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 20:34:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5139B270EB8
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 20:39:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=149.28.215.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741293290; cv=none; b=uAJh3mCU2pWj0u+VP5UJTJb9UGMQXZcGmkFIVDFFAqkoy7ofGD0TRycLEbw4RHb21foBWvm2jdq5zWysb0oPv5J0l1bdjbdOApzzPeg6W01HqWjXdIm9UMEp+vnMp1M6Q5Si3TpWOPNvJdbuEjGwuqoSYZ1FLz1LoYdx7rxGdTI=
+	t=1741293554; cv=none; b=nn2rDcdy6v9B1/25lFm6//q6JFMcJqOWGFr2lK2tydD+Oq9rRoCyGvPvgh/R3XlGiXQExWF3tdz6q1zHH77Y25Q4jw+GfwSM3C5V9+/e1Za2FZJRuXOMWPhZCvpyaPXEkmGvijxtyR5XK1YA343sAgUns4h1gVdFHlME0cqtLLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741293290; c=relaxed/simple;
-	bh=aniIYBl4gqtdOD6l9WBwzQflxuG+wa6epLodlkSYJcY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lJ29J6Nfn2G4nNgCeT/2VyoAPhuF2ZHXMSL2OIB/5LbIYm3mgfgx5qRtEA6HoRsbJ4pOVuiHWVjYchqZDU2L/8kiB+DbihmZkVuXUnAYbaSDRFTofiuCMr/zvjLDUxfG7zeLzSTkg0mRVuxVpsCrF4jO3N4zJhQcRNg7kVFwhSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hV7eR4/A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFFA4C4CEE0;
-	Thu,  6 Mar 2025 20:34:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741293289;
-	bh=aniIYBl4gqtdOD6l9WBwzQflxuG+wa6epLodlkSYJcY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hV7eR4/ApXl6FY4w31kVH5JLkBsXqUWwpwMbwS57tzyApCP59sUBrI1uY6EheWrcp
-	 zp60siukavydEg+DO0Poakr+HOQjc+Osfh3rIBxXjTxF9HiAUMzrV7Wa9q6xXbhmeD
-	 3gRkpJCjORs9alswzxc8wxonj50jiwY1lDZSjNsRTdzHD8eIZj9VNRJRZDO8idLeTD
-	 soz0ZF2LPJ6N7DXBBtCIZvhdye25VE2NAXpw8Tt+5Q794GIdI0T5CULhkDl24j3nax
-	 aq95EKtetHxhcyMpzRrTG0s1bXD/NQOfsKDYh46FY3cFbGq/vj1yShAnjiLwBcyzT4
-	 T7DVrk6vZYAzw==
-Date: Thu, 6 Mar 2025 12:34:48 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
- andrew+netdev@lunn.ch, Gal Pressman <gal@nvidia.com>
-Subject: Re: [PATCH net] net/mlx5: Fill out devlink dev info only for PFs
-Message-ID: <20250306123448.189615da@kernel.org>
-In-Reply-To: <3faf95ef-022a-412e-879d-c6a326f4267a@gmail.com>
-References: <20250303133200.1505-1-jiri@resnulli.us>
-	<53c284be-f435-4945-a8eb-58278bf499ad@gmail.com>
-	<20250305183016.413bda40@kernel.org>
-	<7bb21136-83e8-4eff-b8f7-dc4af70c2199@gmail.com>
-	<20250306113914.036e75ea@kernel.org>
-	<3faf95ef-022a-412e-879d-c6a326f4267a@gmail.com>
+	s=arc-20240116; t=1741293554; c=relaxed/simple;
+	bh=kXlwnVm/MmDRRUROUu6959pIgE0xYihWzk7uz8o+OKM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DwsoM9wFjw9pYwMLguja/vLWmJpOK9+psxgOUu1H64ogdvFsbz+fFG/h/LPaYs/Twy36FxdFPxmuUo31vOoKGaISf90nvnSR3zNYo2wTeFy/3EnlDoKbiCZQo7VeDnywa/oDpVEGyYBYOERZ17+7f4MEBkExJiYXrqFgwQhc4yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se; dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b=eojZz75y; arc=none smtp.client-ip=149.28.215.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kwiboo.se;
+ h=Content-Transfer-Encoding: MIME-Version: Message-ID: Date: Subject: Cc:
+ To: From; q=dns/txt; s=fe-e1b5cab7be; t=1741293552;
+ bh=+Q3pBznN8M0b0cdvrfOAVu+/YpKDnQ8zfRnmStTM8EY=;
+ b=eojZz75yBe6hvYVwFNIRKF2F9RHHdkZdgbpWs325h0MRIsdMJRQ9IAreHpvryLN/HlipjZtWa
+ fEtyR140//fSgQBBdB5lnqN6XeWoIm85H5bktpcepZ9Wp325GodstsvVyVzIW5XNlOeg82k+gi+
+ SS7Towx8Rslou0WUKgWv7tov+NVlUDrWw1QP282YMDM8Dry4pRY4nr4Fw8yiAtLFj8bAreQetMv
+ uMJCeh4r6PaFfxO99/bFn7giIz6xbc5yc8Lzs2yNZknQqjYlKpvbNXbiGMKtWoGJXizrlPeMCwq
+ IJHYpsp83g4eggPTHoYYl6syJSAc1QWGCz0UinMDeJDw==
+X-Forward-Email-ID: 67ca07e7deafcb1458af9232
+X-Forward-Email-Sender: rfc822; jonas@kwiboo.se, smtp.forwardemail.net,
+ 149.28.215.223
+X-Forward-Email-Version: 0.4.40
+X-Forward-Email-Website: https://forwardemail.net
+X-Complaints-To: abuse@forwardemail.net
+X-Report-Abuse: abuse@forwardemail.net
+X-Report-Abuse-To: abuse@forwardemail.net
+From: Jonas Karlman <jonas@kwiboo.se>
+To: Heiko Stuebner <heiko@sntech.de>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-rockchip@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Jonas Karlman <jonas@kwiboo.se>
+Subject: [PATCH 0/3] Use DELAY_ENABLE macro for RK3328, RK3566/RK3568 and RK3588
+Date: Thu,  6 Mar 2025 20:38:51 +0000
+Message-ID: <20250306203858.1677595-1-jonas@kwiboo.se>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Thu, 6 Mar 2025 22:12:52 +0200 Tariq Toukan wrote:
-> >    The exact expectations on the response time will vary by subsystem.
-> >    The patch review SLA the subsystem had set for itself can sometimes
-> >    be found in the subsystem documentation. Failing that as a rule of thumb
-> >    reviewers should try to respond quicker than what is the usual patch
-> >    review delay of the subsystem maintainer. The resulting expectations
-> >    may range from two working days for fast-paced subsystems (e.g. networking)  
-> 
-> So no less than two working days for any subsystem.
-> Okay, now this makes more sense.
+Almost all Rockchip GMAC variants use the DELAY_ENABLE macro to help
+enable or disable use of MAC rx/tx delay. However, RK3328, RK3566/RK3568
+and RK3588 GMAC driver does not.
 
-Could you explain to me why this is a problem for you?
-You're obviously capable of opening your email client once a day.
-Are you waiting for QA results or some such?
+Use of the DELAY_ENABLE macro help ensure the MAC rx/tx delay is
+disabled, instead of being enabled and using a zero delay, when
+RGMII_ID/RXID/TXID is used.
+
+RK3328 driver was merged around the same time as when DELAY_ENABLE was
+introduced so it is understandable why it was missed. Both RK3566/RK3568
+and RK3588 support were introduced much later yet they also missed using
+the DELAY_ENABLE macro (so did vendor kernel at that time).
+
+This series fixes all these cases to unify how GMAC delay feature is
+enabled or disabled across the different GMAC variants.
+
+Jonas Karlman (3):
+  net: stmmac: dwmac-rk: Use DELAY_ENABLE macro for RK3328
+  net: stmmac: dwmac-rk: Use DELAY_ENABLE macro for RK3566/RK3568
+  net: stmmac: dwmac-rk: Use DELAY_ENABLE macro for RK3588
+
+ .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
+
+-- 
+2.48.1
+
 
