@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-172316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31B13A54334
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 08:05:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 080A3A5434E
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 08:10:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57477189417A
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 07:05:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 19C9C7A5FF0
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 07:09:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ED841A5B8B;
-	Thu,  6 Mar 2025 07:05:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5480A1C5F2C;
+	Thu,  6 Mar 2025 07:09:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hecywSUY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PCipHMVs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F23019DF4D;
-	Thu,  6 Mar 2025 07:05:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 246101AB6D4;
+	Thu,  6 Mar 2025 07:09:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741244734; cv=none; b=aOxOYVvmhR9FUTI6swLu8jouz15+ClEaI8X5/AaEMA0WnXCZ8knre5IVKgm2hvX9O3TWYy4uZ+PCsVF+LP+fP9DHjG50p1FMHb0jQjxujliqA9n6hpWd6ccgl+l4b+PrOnQ418m48deI3JaA9k5/HNo6YPKSfTN6xKo2VsWRdss=
+	t=1741244992; cv=none; b=dzv3atduTfFhn89wOovWuNYQoOND/U2Z2to5TGezADDerhB7Su7KjVF5SpT1cRnYuoBdCJV1emb0kMGAYjnhiAxptXbuuQhTJC4xGOVXRtkqgR34ZOjeL/snV7VZduslSXTWTU8a3vRZ4mes5TUKpixh/Rmsn8cqGNbYGyHrU6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741244734; c=relaxed/simple;
-	bh=2mj5Lmm88y0kQhwct/3wA//D7aNt1Lt6qq942WjAldk=;
+	s=arc-20240116; t=1741244992; c=relaxed/simple;
+	bh=EP/2OzblPB5fEA8S496jYOnDzsVwjUYkXmbBY2uXZQU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pEQrmi8deyqvItoYOnmSvexVgk0t5B4EHNcXXDLyKTj24RInmi86sRhloSjNG7RPYto4IMErpu5ocHWY8EhpzfSlfMgYK8v1TbTTN69SaT/RQHHnBE3dnOodVTgvNAaaahD25Yg2m4Z8zlkjdbIwv0DmLq7KGhTtLlIg81MA95Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hecywSUY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5351C4CEE4;
-	Thu,  6 Mar 2025 07:05:26 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=sDHinfvvZJh4UGPmzhDTd/15CwSujkFyXDbtNyH/vswKUiECXOw/7Nb2+eeJInohDgwYqEgFGlolPM7tU7/M3c02O+7rACgs3UMNp/0gTibe1vjC5j9mFpbwkJFb09SLYXKAZCP9SCTDLaY4x2uQicxLdHItzEQS9dWQ7Yg320k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PCipHMVs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46444C4CEE4;
+	Thu,  6 Mar 2025 07:09:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741244733;
-	bh=2mj5Lmm88y0kQhwct/3wA//D7aNt1Lt6qq942WjAldk=;
+	s=k20201202; t=1741244990;
+	bh=EP/2OzblPB5fEA8S496jYOnDzsVwjUYkXmbBY2uXZQU=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hecywSUYoB+yhiCnpdiocJrMUNx0RFZxotj9PrwxwOJfD+IpqekqyEGYzIoC/Ki6s
-	 0pSBfM6vb6795Kc4ZhfRBXfWpvf/kE2mdScp4ZsFSWoBqN8i8RESTgAMJncMDoYrPm
-	 /WF0TBB6Cy+6xza1/byUoc8H5eMdxZDJ5YLetldg4u/YsEMjbsyz2aI8MQpvo3nojR
-	 KZ4QutpDIis4cR+rovFhn+587Bw7rIN5/GiHcJZ1BMMAsP6g0fsDr7vbAUOZ7sAX3y
-	 xDWZtuOr9Y4Tu3dAaX6EqdSofxeYwQX6ywsdXd0UGW4eGRjzcomZ2XYu3ZSMk1a02/
-	 sz15W+hbCJMiw==
-Message-ID: <a9ddeccf-8fc6-453c-af62-55e895888a77@kernel.org>
-Date: Thu, 6 Mar 2025 08:05:23 +0100
+	b=PCipHMVs2wDZAx5qquTkBOjLYgWz00kvpXPyIsybNOpVGDhDuqxtIagPpo59lbZY/
+	 +Uo3BFyy/+ucaSG5q597z9Oh5y9hxZ2sytozQiP4gE96PNdkytAxCtMQNN5rwza7Gk
+	 0krjuDiXfI0/SfZj+KBidbi+jgVeoIfzytD3OmAN/NzEhQGhRXB8jN+AHilmiXn5uw
+	 R1MRSGvkcC4gna8Jn33tVgupvmg4BjFAO80SX+KOjbAxHUh7LDjcaBRhe7eYO+d95u
+	 4UvuxL4dpn5h+mW+7dMnYGaeB2gyIsWxpCjefdPsJhb/m264z6D/Uqn5MQ+tBV+mCp
+	 bWYASCeptYutg==
+Message-ID: <041d55fd-99f0-4b55-92e5-fa46f37096c1@kernel.org>
+Date: Thu, 6 Mar 2025 08:09:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,8 +50,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 1/2] dt-bindings: net: Add FSD EQoS device tree
- bindings
+Subject: Re: [PATCH v8 0/2] net: stmmac: dwc-qos: Add FSD EQoS support
 To: Swathi K S <swathi.ks@samsung.com>, krzk+dt@kernel.org,
  andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
  kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, conor+dt@kernel.org,
@@ -60,12 +59,10 @@ To: Swathi K S <swathi.ks@samsung.com>, krzk+dt@kernel.org,
 Cc: rmk+kernel@armlinux.org.uk, netdev@vger.kernel.org,
  devicetree@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
  linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- pankaj.dubey@samsung.com, ravi.patel@samsung.com, gost.dev@samsung.com
-References: <20250305091246.106626-1-swathi.ks@samsung.com>
- <CGME20250305091852epcas5p18a0853e85a5ed3d36d5d42ef89735ca6@epcas5p1.samsung.com>
- <20250305091246.106626-2-swathi.ks@samsung.com>
- <89dcfb2a-d093-48f9-b6d7-af99b383a1bc@kernel.org>
- <00e301db8e49$95bfbf90$c13f3eb0$@samsung.com>
+ pankaj.dubey@samsung.com, ravi.patel@samsung.com, gost.dev@samsung.com,
+ tools@linux.kernel.org
+References: <CGME20250305091845epcas5p1689eda3ba03572377997897271636cfd@epcas5p1.samsung.com>
+ <20250305091246.106626-1-swathi.ks@samsung.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -111,67 +108,33 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <00e301db8e49$95bfbf90$c13f3eb0$@samsung.com>
+In-Reply-To: <20250305091246.106626-1-swathi.ks@samsung.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 06/03/2025 04:40, Swathi K S wrote:
+On 05/03/2025 10:12, Swathi K S wrote:
+> FSD platform has two instances of EQoS IP, one is in FSYS0 block and
+> another one is in PERIC block. This patch series add required DT binding
+> and platform driver specific changes for the same.
 > 
+> Changes since v1:
+> 1. Updated dwc_eqos_setup_rxclock() function as per the review comments
+> given by Andrew.
 > 
->> -----Original Message-----
->> From: Krzysztof Kozlowski <krzk@kernel.org>
->> Sent: 05 March 2025 21:12
->> To: Swathi K S <swathi.ks@samsung.com>; krzk+dt@kernel.org;
->> andrew+netdev@lunn.ch; davem@davemloft.net; edumazet@google.com;
->> kuba@kernel.org; pabeni@redhat.com; robh@kernel.org;
->> conor+dt@kernel.org; richardcochran@gmail.com;
->> mcoquelin.stm32@gmail.com; alexandre.torgue@foss.st.com
->> Cc: rmk+kernel@armlinux.org.uk; netdev@vger.kernel.org;
->> devicetree@vger.kernel.org; linux-stm32@st-md-mailman.stormreply.com;
->> linux-arm-kernel@lists.infradead.org; linux-kernel@vger.kernel.org;
->> pankaj.dubey@samsung.com; ravi.patel@samsung.com;
->> gost.dev@samsung.com
->> Subject: Re: [PATCH v8 1/2] dt-bindings: net: Add FSD EQoS device tree
->> bindings
->>
->> On 05/03/2025 10:12, Swathi K S wrote:
->>> Add FSD Ethernet compatible in Synopsys dt-bindings document. Add FSD
->>> Ethernet YAML schema to enable the DT validation.
->>>
->>> Signed-off-by: Pankaj Dubey <pankaj.dubey@samsung.com>
->>> Signed-off-by: Ravi Patel <ravi.patel@samsung.com>
->>> Signed-off-by: Swathi K S <swathi.ks@samsung.com>
->>
->> <form letter>
->> This is a friendly reminder during the review process.
->>
->> It looks like you received a tag and forgot to add it.
->>
->> If you do not know the process, here is a short explanation:
->> Please add Acked-by/Reviewed-by/Tested-by tags when posting new
->> versions of patchset, under or above your Signed-off-by tag, unless patch
->> changed significantly (e.g. new properties added to the DT bindings). Tag is
->> "received", when provided in a message replied to you on the mailing list.
->> Tools like b4 can help here. However, there's no need to repost patches
->> *only* to add the tags. The upstream maintainer will do that for tags
->> received on the version they apply.
->>
->> Please read:
->> https://protect2.fireeye.com/v1/url?k=19972162-781c345b-1996aa2d-
->> 000babffae10-7bd6b1a1d78b210b&q=1&e=94dcc3a6-5303-441a-8c1e-
->> de696b216f86&u=https%3A%2F%2Felixir.bootlin.com%2Flinux%2Fv6.12-
->> rc3%2Fsource%2FDocumentation%2Fprocess%2Fsubmitting-
->> patches.rst%23L577
->>
->> If a tag was not added on purpose, please state why and what changed.
-> 
-> Hi Krzysztof, 
-> As per a review comment received from Russell, I had added 2 new properties to the DT - assigned-clocks and assigned-clock-parents properties. 
-> The example in the DT binding reflects the same.
-> I felt it wouldn't be fair to add 'Reviewed-by' tag without you reviewing the updates again.
-> But I should have mentioned that in cover letter and apologies for missing to do that.
-Nothing in changelog explained new properties. Nothing mentioned
-dropping tag, which you always must explicitly say.
+Please stop referencing some other threads in your email headers via
+"References". This is neither necessary nor helping our tools. I can
+never compare your patches because this makes b4 busy 100%:
+
+b4 diff -C '<20250305091246.106626-2-swathi.ks@samsung.com>'
+Grabbing thread from
+lore.kernel.org/all/20250305091246.106626-2-swathi.ks@samsung.com/t.mbox.gz
+Checking for older revisions
+  Added from v7: 3 patches
+---
+Analyzing 86 messages in the thread
+Preparing fake-am for v7: dt-bindings: net: Add FSD EQoS device tree
+bindings
+<never ends, 100% CPU>
 
 Best regards,
 Krzysztof
