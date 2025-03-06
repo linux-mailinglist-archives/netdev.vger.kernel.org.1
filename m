@@ -1,337 +1,174 @@
-Return-Path: <netdev+bounces-172253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 176D4A53EF2
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 01:13:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46EB9A53EF5
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 01:15:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 458153AF2DA
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 00:13:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A0841892E36
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 00:15:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA1597FD;
-	Thu,  6 Mar 2025 00:13:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 155001C27;
+	Thu,  6 Mar 2025 00:15:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U67+dyc8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QXXXIp60"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B159CA64
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 00:13:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5077C1373
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 00:15:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741220028; cv=none; b=Sdg3CxuS4RvBFT5KaRZ+si1uOxXqMkW3KaUKaIh8ZhZ3u5kOvEjW5cvOmbQdJ66aU/74MeSk3ViW8txV4VnCuuVmoZME74U/yvyXCn/iRfXxziQZtoZ9oRfhQ+XlPxBGlMjkzNvJHjArgg8sC0/vYqLPy/ZlB4wjqMtiZMHkBMQ=
+	t=1741220118; cv=none; b=c8bIlTrhrrf4pFpsUXHtMA6mafOVR5m0ThmWLFY1UqtoyD0Oa//gX7EmwXu2bi7iEBNXOIIKPHpDz8YEnr/9N52msn5GAetksuL58vgWKek6TqvLQ+FbkCtW6FLpu5Dc/kPD0XK+pv7jihpxdOYRlhZo/k8sLfPgsXXdZm94ROg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741220028; c=relaxed/simple;
-	bh=CbB+t2wx8ulyAV+Ao8n/oRFHi5dJ3R8LpSdjZsjgwiA=;
+	s=arc-20240116; t=1741220118; c=relaxed/simple;
+	bh=/6IEXb3+kPC8h38g1+n1WPXpZUCUEbiDTLSputptZro=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=C/I3l5hm8a1CAbvTSsyA7NMVxFY/JXrUOd3U6lAP6xf9wmhDc2mVrhO2Q7W9Q2uyVCo6MOhEGmbKppO/hZwnSt1LHrPGSNB5aLWAmmJ/WIkouIZYmbMMKhKUU7RMe8fbI1WoMrYBi/l2z3mjxrPqZnWh3mjgU3RcKSH0RWZcvwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U67+dyc8; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2240aad70f2so63165ad.0
-        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 16:13:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741220026; x=1741824826; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eDnLFwEvvEpNYu/pftJLZDDdebALTcuGQmwyzcVj2go=;
-        b=U67+dyc8jfBNXe+/9ysSAPv2PeLqNonbT9Fl4bj05uaQ0Ji7wSK9hrFr0c8lNykDCr
-         0MdDxN9nT2Y9lBE8WMpehTK6rqm0o8vMqOynoKTRJaz2Duzhi/ZMBTxVENEq4OPyU7Ca
-         GTj3v9Cr/jJ974u0mpTny+vQBis/65PDq3aUnCYrSB/x60nwId4Ft5ASRXwWXjuiJZIZ
-         mISZK9FIy17/AlAegQZKE7F+djQC6u69g8JZEYCea+KXCqcmpXsUunar5SqhBfQC4jcK
-         4xfCWZqTbwYAEVa5CDhrNjZzRvkoNVDoBt1bb/QwhbpDQTHKFAEj0lU0QqRWdXXtlZyq
-         gb3g==
+	 To:Content-Type; b=AVQ93FaZBFHrjpdOjohfIBNnGv/KQJGzw7q058lJOzWnkiygS7Xtca2lWpcJlRywlAcDrtt8W0ayVh45nTUI4O0c+ENO1XjxlU7paw3dEaeeAOu2elXAXYxP0USqZ5L2s4o26XYHnutIXi1iQtRTk9gZ6E9UNI2BfBpiiUnIWp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QXXXIp60; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741220115;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yzkSOfMIvpfEW3kC3MKb1XgIDTgn62WcB2Xn0huNZiQ=;
+	b=QXXXIp6059+Y1VL9Qh1Y2DQbljO4TkTWiPLuKgG9pW/SyOdzlObBRBNR6pmae61ldT1K1Q
+	pC9RDysQIsgF7vFcdAjk3LplZLmShd9+P/UQUPCCXs+zhfDerabqB77SFrk/ZG5uLRRxwm
+	ZPhrPSVt8iSsCMiu0BIb7AtJs0K7aYY=
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
+ [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-59-Iz6xZjIYO_CWw_V91Mx5aw-1; Wed, 05 Mar 2025 19:15:13 -0500
+X-MC-Unique: Iz6xZjIYO_CWw_V91Mx5aw-1
+X-Mimecast-MFC-AGG-ID: Iz6xZjIYO_CWw_V91Mx5aw_1741220113
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-22379af38e0so801685ad.2
+        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 16:15:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741220026; x=1741824826;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+        d=1e100.net; s=20230601; t=1741220113; x=1741824913;
+        h=content-transfer-encoding:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=eDnLFwEvvEpNYu/pftJLZDDdebALTcuGQmwyzcVj2go=;
-        b=HcdHDzAuSLJlOYVKAXfBrO2wbEdvjcJMuxTIHIAGcu1iKTCt1swmdC/w59AKZwRi+e
-         MxCXhDYMUVKW1DUpaCuyVXzIfVQxK2m/AdYx1pmaYt82DxcjOA/6iYg3ZbQ16FTSEH1j
-         +3u4s2vEFXbuXrpwyUU1Mn9Fapzh07/uBSTaRnEqG6WYBRbJ5v499UISZnaw8fgcowqD
-         xDCFKXOj6zGUChc/r1PmJLvORYoxMKXxVSfdBN/yHYHAXwKn8HOXyuq4XIu538PC2x/E
-         xUSiW9s/5qgOfgujXFDOYi+OJ9vtAndVT8WMyhUwxxl5CmuiYTqRVOwN4jX2zynEoHcL
-         WkZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUzm0yoK5DQkh8HqavZAsit2zi4kJKHSNUXfAdJDlkt3WUiyEPsK2H2Gbap7hMT5LpgSUOr7U0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7qciRlGQN37bMU7eJlKPPHAm9Vkj97+TVvJA3AzRXFKKShLlN
-	8d2nhORuH1Hc0stKwyuPK6iKy17Hf91nRUXRO9ihjzMYvry0fSfzZaeuPU3L2llsI7zjeRcCjs7
-	ETlIEttA+cIgprXjiDOpcZHYH7CwZkRaWf5MB
-X-Gm-Gg: ASbGncu2/kHbJyz0dZsvqcZn04go0jXYlRGs6ayCtBJPWbGotoLN4YshH8gS/6h4LUU
-	ca8iVnkSvHxJLqvuJwAaJ0sZ/jgCTfxcx2QymhZreffLyYoLZMJGmyjFVpP3//qR848APBmc44K
-	728TZeIhH8v7BbVqxb51zI4bjTxfLSi1HPiDJehBNBWShICeeLL9/iNjgs
-X-Google-Smtp-Source: AGHT+IGy6mwqDeE6hP4mW2lNUaQoNEOULztBWV7SpORptZ7wD7ESKPioklawIj1QBzqVCmZgosG173WYV9rdFUAdXf4=
-X-Received: by 2002:a17:903:32cb:b0:21f:3e29:9cd1 with SMTP id
- d9443c01a7336-2240e4416eamr531465ad.1.1741220025366; Wed, 05 Mar 2025
- 16:13:45 -0800 (PST)
+        bh=yzkSOfMIvpfEW3kC3MKb1XgIDTgn62WcB2Xn0huNZiQ=;
+        b=OBGyB3BJwWTYJ1UJAVo8aq7Wmn+Dp07SetFu4DbstsJblpJygO8Rsl+ROQ22WrCaPt
+         jEZoNbxAPvLK/NemLu6XrY6TZQTKqTcp1h9V4tn2eAzgAyX7O8Y0K+SLe8Nppfkei2mV
+         vJuqK8SGR1zG0eCXFqNQaRGsaXS1zytd35tiBgCcSxM/dOGXRccBBVk+bZV/7u0kqWTg
+         GYvRnQO41C30z0Dt/huLp4xdHrEmZVk1vdQUzEj67GG5xxn2PF/cxfPVCL2LoD6MURXb
+         +2LR44BryWs3kbPz7Xxq8yOeb+aw9TzdZtbs/tKjUeXPgJ5derpbKNlkDc+dT4wHCBwX
+         SIAA==
+X-Forwarded-Encrypted: i=1; AJvYcCWuvRlDNPoAdR3ZMdyt0KHYgC2PVwHLCevWBtCwo76JJoVBegXlTT884Gmwto7GjM32wTf7PJQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yytg7ovvSwhtcabrsaGIf0S67RU7DCEjbc1/3jivIC3Jh4UntRR
+	E5bSke5O2kd+tQJf5pKgRdeeM7xSSHidFkvZNOK6I9hcD5VZ31sfF1vxQdrUHZLgGVoQdzLO7/T
+	8Suq5h+3DLTaTRVSOToVs+h4k4vTcHKTHpfs02tlfWRF4cJc6QF7aHJ4mTNJ7bsk7qKMTaKb0zv
+	C4Su9smEnJVqcir2EL/qYjQU8gENal
+X-Gm-Gg: ASbGncvsjDv+2O9tXwmKtXH2sUdR9mD7RFbc+zPUjC22irGrBtlHatquRY38+1xcX3k
+	/ZCBAwQ7u6Cq07e5cy4YM1yfH5ySMV9WXy1gtWdJLCTEovJQiGnIQ6XJLxQlAHdF1/oCmeFufZj
+	U=
+X-Received: by 2002:a05:6a00:3d0f:b0:736:3c6a:be02 with SMTP id d2e1a72fcca58-73682bfe22amr6348880b3a.11.1741220112729;
+        Wed, 05 Mar 2025 16:15:12 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG+Pz3spV69sGxcycRcHq7WRbf81Tq+kwPwJB61GZMQ3BtGGM82dqOuykRK2W4wGAVBuZATFe4m7QNuLdjS0w0=
+X-Received: by 2002:a05:6a00:3d0f:b0:736:3c6a:be02 with SMTP id
+ d2e1a72fcca58-73682bfe22amr6348836b3a.11.1741220112304; Wed, 05 Mar 2025
+ 16:15:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250305162132.1106080-1-aleksander.lobakin@intel.com> <20250305162132.1106080-2-aleksander.lobakin@intel.com>
-In-Reply-To: <20250305162132.1106080-2-aleksander.lobakin@intel.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 5 Mar 2025 16:13:32 -0800
-X-Gm-Features: AQ5f1JpwyS2LgVF_6CQ0Nd6F_1zne96k1n8huufqfHiSYKpnVo2qZ5P3BVu139Y
-Message-ID: <CAHS8izNnNJZsEXwZ07zhpn8AjxhGGcm9vyt8uFos1rVvn66qsQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 01/16] libeth: convert to netmem
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, Michal Kubiak <michal.kubiak@intel.com>, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Simon Horman <horms@kernel.org>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250227185017.206785-1-jdamato@fastly.com> <20250227185017.206785-4-jdamato@fastly.com>
+ <20250228182759.74de5bec@kernel.org> <Z8Xc0muOV8jtHBkX@LQ3V64L9R2>
+ <Z8XgGrToAD7Bak-I@LQ3V64L9R2> <Z8X15hxz8t-vXpPU@LQ3V64L9R2>
+ <20250303160355.5f8d82d8@kernel.org> <Z8cXh43GJq2lolxE@LQ3V64L9R2>
+ <CACGkMEug5+zjTjEiaUtvU6XtTe+tc7MEBaQSFbXG5YP_7tcPiQ@mail.gmail.com> <Z8h9IKvGh4z8h35Y@LQ3V64L9R2>
+In-Reply-To: <Z8h9IKvGh4z8h35Y@LQ3V64L9R2>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 6 Mar 2025 08:15:00 +0800
+X-Gm-Features: AQ5f1JrbAXMd3bdeu_op8lg8kCwD5-0ozvqwDnLIuAighSIhe17FVCeIQAOl_N8
+Message-ID: <CACGkMEvWuRjBbc3PvOUpDFkjcby5QNLw5hA_FpNSPyWjkEXD_Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 3/4] virtio-net: Map NAPIs to queues
+To: Joe Damato <jdamato@fastly.com>, Jason Wang <jasowang@redhat.com>, 
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, mkarsten@uwaterloo.ca, 
+	gerhard@engleder-embedded.com, xuanzhuo@linux.alibaba.com, mst@redhat.com, 
+	leiyang@redhat.com, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>, open list <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 5, 2025 at 8:23=E2=80=AFAM Alexander Lobakin
-<aleksander.lobakin@intel.com> wrote:
+On Thu, Mar 6, 2025 at 12:34=E2=80=AFAM Joe Damato <jdamato@fastly.com> wro=
+te:
 >
-> Back when the libeth Rx core was initially written, devmem was a draft
-> and netmem_ref didn't exist in the mainline. Now that it's here, make
-> libeth MP-agnostic before introducing any new code or any new library
-> users.
-> When it's known that the created PP/FQ is for header buffers, use faster
-> "unsafe" underscored netmem <--> virt accessors as netmem_is_net_iov()
-> is always false in that case, but consumes some cycles (bit test +
-> true branch).
-> Misc: replace explicit EXPORT_SYMBOL_NS_GPL("NS") with
-> DEFAULT_SYMBOL_NAMESPACE.
+> On Wed, Mar 05, 2025 at 01:11:55PM +0800, Jason Wang wrote:
+> > On Tue, Mar 4, 2025 at 11:09=E2=80=AFPM Joe Damato <jdamato@fastly.com>=
+ wrote:
+> > >
+> > > On Mon, Mar 03, 2025 at 04:03:55PM -0800, Jakub Kicinski wrote:
+> > > > On Mon, 3 Mar 2025 13:33:10 -0500 Joe Damato wrote:
 >
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> ---
->  include/net/libeth/rx.h                       | 22 +++++++------
->  drivers/net/ethernet/intel/iavf/iavf_txrx.c   | 14 ++++----
->  .../ethernet/intel/idpf/idpf_singleq_txrx.c   |  2 +-
->  drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 33 +++++++++++--------
->  drivers/net/ethernet/intel/libeth/rx.c        | 20 ++++++-----
->  5 files changed, 51 insertions(+), 40 deletions(-)
+> [...]
 >
-> diff --git a/include/net/libeth/rx.h b/include/net/libeth/rx.h
-> index ab05024be518..7d5dc58984b1 100644
-> --- a/include/net/libeth/rx.h
-> +++ b/include/net/libeth/rx.h
-> @@ -1,5 +1,5 @@
->  /* SPDX-License-Identifier: GPL-2.0-only */
-> -/* Copyright (C) 2024 Intel Corporation */
-> +/* Copyright (C) 2024-2025 Intel Corporation */
+> > > > Middle ground would be to do what you suggested above and just leav=
+e
+> > > > a well worded comment somewhere that will show up in diffs adding q=
+ueue
+> > > > API support?
+> > >
+> > > Jason, Michael, et. al.:  what do you think ? I don't want to spin
+> > > up a v6 if you are opposed to proceeding this way. Please let me
+> > > know.
+> > >
+> >
+> > Maybe, but need to make sure there's no use-after-free (etc.
+> > virtnet_close() has several callers).
 >
->  #ifndef __LIBETH_RX_H
->  #define __LIBETH_RX_H
-> @@ -31,7 +31,7 @@
+> Sorry, I think I am missing something. Can you say more?
 >
->  /**
->   * struct libeth_fqe - structure representing an Rx buffer (fill queue e=
-lement)
-> - * @page: page holding the buffer
-> + * @netmem: network memory reference holding the buffer
->   * @offset: offset from the page start (to the headroom)
->   * @truesize: total space occupied by the buffer (w/ headroom and tailro=
-om)
->   *
-> @@ -40,7 +40,7 @@
->   * former, @offset is always 0 and @truesize is always ```PAGE_SIZE```.
->   */
->  struct libeth_fqe {
-> -       struct page             *page;
-> +       netmem_ref              netmem;
->         u32                     offset;
->         u32                     truesize;
->  } __aligned_largest;
-> @@ -102,15 +102,16 @@ static inline dma_addr_t libeth_rx_alloc(const stru=
-ct libeth_fq_fp *fq, u32 i)
->         struct libeth_fqe *buf =3D &fq->fqes[i];
->
->         buf->truesize =3D fq->truesize;
-> -       buf->page =3D page_pool_dev_alloc(fq->pp, &buf->offset, &buf->tru=
-esize);
-> -       if (unlikely(!buf->page))
-> +       buf->netmem =3D page_pool_dev_alloc_netmem(fq->pp, &buf->offset,
-> +                                                &buf->truesize);
-> +       if (unlikely(!buf->netmem))
->                 return DMA_MAPPING_ERROR;
->
-> -       return page_pool_get_dma_addr(buf->page) + buf->offset +
-> +       return page_pool_get_dma_addr_netmem(buf->netmem) + buf->offset +
->                fq->pp->p.offset;
->  }
->
-> -void libeth_rx_recycle_slow(struct page *page);
-> +void libeth_rx_recycle_slow(netmem_ref netmem);
->
->  /**
->   * libeth_rx_sync_for_cpu - synchronize or recycle buffer post DMA
-> @@ -126,18 +127,19 @@ void libeth_rx_recycle_slow(struct page *page);
->  static inline bool libeth_rx_sync_for_cpu(const struct libeth_fqe *fqe,
->                                           u32 len)
->  {
-> -       struct page *page =3D fqe->page;
-> +       netmem_ref netmem =3D fqe->netmem;
->
->         /* Very rare, but possible case. The most common reason:
->          * the last fragment contained FCS only, which was then
->          * stripped by the HW.
->          */
->         if (unlikely(!len)) {
-> -               libeth_rx_recycle_slow(page);
-> +               libeth_rx_recycle_slow(netmem);
+> I was asking: if I add the following diff below to patch 3, will
+> that be acceptable for you as a middle ground until a more idiomatic
+> implementation can be done ?
 
-I think before this patch this would have expanded to:
+Yes, I misunderstand you before.
 
-page_pool_put_full_page(pool, page, true);
-
-But now I think it expands to:
-
-page_pool_put_full_netmem(netmem_get_pp(netmem), netmem, false);
-
-Is the switch from true to false intentional? Is this a slow path so
-it doesn't matter?
-
->                 return false;
->         }
 >
-> -       page_pool_dma_sync_for_cpu(page->pp, page, fqe->offset, len);
-> +       page_pool_dma_sync_netmem_for_cpu(netmem_get_pp(netmem), netmem,
-> +                                         fqe->offset, len);
+> Since this diff leaves refill_work as it functioned before, it
+> avoids the problem Jakub pointed out and shouldn't introduce any
+> bugs since refill_work isn't changing from the original
+> implementation ?
 >
->         return true;
->  }
-> diff --git a/drivers/net/ethernet/intel/iavf/iavf_txrx.c b/drivers/net/et=
-hernet/intel/iavf/iavf_txrx.c
-> index 422312b8b54a..35d353d38129 100644
-> --- a/drivers/net/ethernet/intel/iavf/iavf_txrx.c
-> +++ b/drivers/net/ethernet/intel/iavf/iavf_txrx.c
-> @@ -723,7 +723,7 @@ static void iavf_clean_rx_ring(struct iavf_ring *rx_r=
-ing)
->         for (u32 i =3D rx_ring->next_to_clean; i !=3D rx_ring->next_to_us=
-e; ) {
->                 const struct libeth_fqe *rx_fqes =3D &rx_ring->rx_fqes[i]=
-;
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 76dcd65ec0f2..d6c8fe670005 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -2883,15 +2883,9 @@ static void refill_work(struct work_struct *work)
+>         for (i =3D 0; i < vi->curr_queue_pairs; i++) {
+>                 struct receive_queue *rq =3D &vi->rq[i];
 >
-> -               page_pool_put_full_page(rx_ring->pp, rx_fqes->page, false=
-);
-> +               libeth_rx_recycle_slow(rx_fqes->netmem);
+> -               rtnl_lock();
+> -               virtnet_napi_disable(rq);
+> -               rtnl_unlock();
+> -
+> +               napi_disable(&rq->napi);
+>                 still_empty =3D !try_fill_recv(vi, rq, GFP_KERNEL);
+> -
+> -               rtnl_lock();
+> -               virtnet_napi_enable(rq);
+> -               rtnl_unlock();
+> +               virtnet_napi_do_enable(rq->vq, &rq->napi);
 >
->                 if (unlikely(++i =3D=3D rx_ring->count))
->                         i =3D 0;
-> @@ -1197,10 +1197,11 @@ static void iavf_add_rx_frag(struct sk_buff *skb,
->                              const struct libeth_fqe *rx_buffer,
->                              unsigned int size)
->  {
-> -       u32 hr =3D rx_buffer->page->pp->p.offset;
-> +       u32 hr =3D netmem_get_pp(rx_buffer->netmem)->p.offset;
->
-> -       skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags, rx_buffer->page,
-> -                       rx_buffer->offset + hr, size, rx_buffer->truesize=
-);
-> +       skb_add_rx_frag_netmem(skb, skb_shinfo(skb)->nr_frags,
-> +                              rx_buffer->netmem, rx_buffer->offset + hr,
-> +                              size, rx_buffer->truesize);
->  }
->
->  /**
-> @@ -1214,12 +1215,13 @@ static void iavf_add_rx_frag(struct sk_buff *skb,
->  static struct sk_buff *iavf_build_skb(const struct libeth_fqe *rx_buffer=
-,
->                                       unsigned int size)
->  {
-> -       u32 hr =3D rx_buffer->page->pp->p.offset;
-> +       struct page *buf_page =3D __netmem_to_page(rx_buffer->netmem);
-> +       u32 hr =3D buf_page->pp->p.offset;
->         struct sk_buff *skb;
->         void *va;
->
->         /* prefetch first cache line of first page */
-> -       va =3D page_address(rx_buffer->page) + rx_buffer->offset;
-> +       va =3D page_address(buf_page) + rx_buffer->offset;
->         net_prefetch(va + hr);
->
->         /* build an skb around the page buffer */
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c b/driver=
-s/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-> index eae1b6f474e6..aeb2ca5f5a0a 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
-> @@ -1009,7 +1009,7 @@ static int idpf_rx_singleq_clean(struct idpf_rx_que=
-ue *rx_q, int budget)
->                         break;
->
->  skip_data:
-> -               rx_buf->page =3D NULL;
-> +               rx_buf->netmem =3D 0;
->
->                 IDPF_SINGLEQ_BUMP_RING_IDX(rx_q, ntc);
->                 cleaned_count++;
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/et=
-hernet/intel/idpf/idpf_txrx.c
-> index bdf52cef3891..6254806c2072 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> @@ -382,12 +382,12 @@ static int idpf_tx_desc_alloc_all(struct idpf_vport=
- *vport)
->   */
->  static void idpf_rx_page_rel(struct libeth_fqe *rx_buf)
->  {
-> -       if (unlikely(!rx_buf->page))
-> +       if (unlikely(!rx_buf->netmem))
->                 return;
->
-> -       page_pool_put_full_page(rx_buf->page->pp, rx_buf->page, false);
-> +       libeth_rx_recycle_slow(rx_buf->netmem);
->
-> -       rx_buf->page =3D NULL;
-> +       rx_buf->netmem =3D 0;
->         rx_buf->offset =3D 0;
->  }
->
-> @@ -3096,10 +3096,10 @@ idpf_rx_process_skb_fields(struct idpf_rx_queue *=
-rxq, struct sk_buff *skb,
->  void idpf_rx_add_frag(struct idpf_rx_buf *rx_buf, struct sk_buff *skb,
->                       unsigned int size)
->  {
-> -       u32 hr =3D rx_buf->page->pp->p.offset;
-> +       u32 hr =3D netmem_get_pp(rx_buf->netmem)->p.offset;
->
-> -       skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags, rx_buf->page,
-> -                       rx_buf->offset + hr, size, rx_buf->truesize);
-> +       skb_add_rx_frag_netmem(skb, skb_shinfo(skb)->nr_frags, rx_buf->ne=
-tmem,
-> +                              rx_buf->offset + hr, size, rx_buf->truesiz=
-e);
->  }
->
->  /**
-> @@ -3122,16 +3122,20 @@ static u32 idpf_rx_hsplit_wa(const struct libeth_=
-fqe *hdr,
->                              struct libeth_fqe *buf, u32 data_len)
->  {
->         u32 copy =3D data_len <=3D L1_CACHE_BYTES ? data_len : ETH_HLEN;
-> +       struct page *hdr_page, *buf_page;
->         const void *src;
->         void *dst;
->
-> -       if (!libeth_rx_sync_for_cpu(buf, copy))
-> +       if (unlikely(netmem_is_net_iov(buf->netmem)) ||
-> +           !libeth_rx_sync_for_cpu(buf, copy))
->                 return 0;
+>                 /* In theory, this can happen: if we don't get any buffer=
+s in
+>                  * we will *never* try to fill again.
 >
 
-I could not immediately understand why you need a netmem_is_net_iov
-check here. libeth_rx_sync_for_cpu will delegate to
-page_pool_dma_sync_netmem_for_cpu which should do the right thing
-regardless of whether the netmem is a page or net_iov, right? Is this
-to save some cycles?
+Works for me.
 
---
-Thanks,
-Mina
+Thanks
+
 
