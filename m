@@ -1,79 +1,85 @@
-Return-Path: <netdev+bounces-172378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B5A2A546E8
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:52:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44C7BA546F1
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:56:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 342721897588
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:52:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 557943B0A2A
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:55:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5CEC20ADD6;
-	Thu,  6 Mar 2025 09:50:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1A9420AF85;
+	Thu,  6 Mar 2025 09:55:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RhIo5Q6I"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hGbZiE+B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B90D20AF85;
-	Thu,  6 Mar 2025 09:50:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 212E71FF7C3
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 09:55:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741254634; cv=none; b=A1GsCvOG9P5sOkastcneOwAL6e7O4suroh55Bx2fVXFJKnImRMq4nFUikTmgucGEmwVKyC07Mt1Bl9to6rhsqrwb0vBI28pVfZYway3tA7LdGbDdCIzVkKstEgmQ/Tk65Ut2VI7vl8QIf8hCvWlWw+y2S3kqJlmpDNABs53cvGk=
+	t=1741254943; cv=none; b=p7tjVDsbJaCStVr8eSGNH7N44cpKWhzh0ZCOsxrcZjU0bKm4Zrsj7y8DJfQMSjNLodxl9HYSZG0t3xhzSAKs+Y/yLWUREELgMGUI25AHfHApXEd/EjNyEw8boR5As9GbVGIPCf3eHv9XFZM/YLL0YLOUlr3QZZ0hRLEClPpHlu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741254634; c=relaxed/simple;
-	bh=eIpesmObrZ0L4HIdewr2PrvroaN5yY0jVZ2nNpCzc+o=;
+	s=arc-20240116; t=1741254943; c=relaxed/simple;
+	bh=qyHU6nwK/mjGzxTaEot56wQs50VKvF/RPMJSYFa6hEE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ea8TqUFb42ueOA1+wsdCQtdI40wOWozRS4YUXY+urkOPkSpxtqOLfxVDxsakC7LgKeBwtwy1108QeTNsUZhwQVFtvAeVlPV4yi+E6vqnuM2LMeulxxknriuX0hI1ERxA4gkRE3QRFszkl1JUbhzo4ckwAYVgW3szK6lZxsn5Odo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RhIo5Q6I; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43bdc607c3fso2534075e9.3;
-        Thu, 06 Mar 2025 01:50:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741254631; x=1741859431; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=o8tyc0jAmpZLCohvENRUoCJi064Uu0mWojXRk7xpusM=;
-        b=RhIo5Q6ITVMce4ojujPE+2J/cbGV8Qcq2jMAD6RZU5E/9N3+R7OxyOq24SMIxBbIYL
-         PNaCBu0kEtU1GvRbC5dZIYNbYc6vb7fOTyvBdk58jhsEwq3HsEbkNK3H/kjAcRoBjgH9
-         89ZctKn1v7WMEeU6NGZnu8N5t6u7yt7kBgsRA1er7P/CvkvGgoLHggS2YfFdf951lfFF
-         IcIExdCdAyhvnhv+3vcmWHr6IrHGh9bt+8RihAii9eVraJqKVOzizbNSBUKoEPvjStn5
-         0gTFHpofnYusiOSc1Da0TymiWytK8vEEnOVB3vh3JoSBO1L4KC4uB/hvhTO/ij5V4gPt
-         2u1w==
+	 In-Reply-To:Content-Type; b=u6pQKDh3nTomXc8Jt3E5CPFa0DoEovIwuXZ3+onzBIbzFoFpS31kSSRnzck+/FuJi7Dk927xKY7Ti4IsXAlfb27bS4Hml+mms1quWHknyuZu+qEZxw63hEWIF6CAxPmJLUGxyWobT6pPXVDy7xomzqBGiLrAU2c6KsBhW5apkNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hGbZiE+B; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741254940;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=U5Iyl/8UKDSiwGF8KFxT8SB0q5g2Qi8O53ARUdlTeQ4=;
+	b=hGbZiE+B4SGtsQDxPc4Ey18UIABqbpSsD7MNjAleTbxBpqZce3hsnwOriYh2kP+k+FiBG1
+	iAFKN4InGhyS63y6cdPDIyhFml8F83i0FIFeFB3BAq25uklfbZkFFzRcjP7i8REInHUj6c
+	R+0AwSj8LwCcIVCXqOCtQUuPQkwjijg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-369-85KSjylPNXqRRmh2XsS7Nw-1; Thu, 06 Mar 2025 04:55:34 -0500
+X-MC-Unique: 85KSjylPNXqRRmh2XsS7Nw-1
+X-Mimecast-MFC-AGG-ID: 85KSjylPNXqRRmh2XsS7Nw_1741254933
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-390eefb2913so328323f8f.0
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 01:55:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741254631; x=1741859431;
+        d=1e100.net; s=20230601; t=1741254933; x=1741859733;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o8tyc0jAmpZLCohvENRUoCJi064Uu0mWojXRk7xpusM=;
-        b=qx4uOp8tfZ7xTKKX0bjZnPJIxdU8Cs8Z6v1wWTQuoh/gCXDeQtgpOfox+go4qGKRSw
-         7cinhZUyTGuzm15cL9IotMkBVu3S8bsZkvFQVFQ16ZksmprZ36+bVWZ5EizqpMAlFj3g
-         Lq1A/ZP3YVMsnWbaXhO4sWVwKJ1rLeVEuWr6MDOCfIUCbfys1Kss65qEU9cw7VUyivdc
-         TUl+PTlphhk8tcb9C/fncYidQVwI6o92qt/veUf+R4F+gx5Eou85YiEZYm2qxsWRi3gm
-         wXQICHvgwHVtWjblamVFfgARomVDs6d8+p3Ra6+HZgghC42d4lnTdhm9/eOPErG/yMfZ
-         2a6w==
-X-Forwarded-Encrypted: i=1; AJvYcCWhSh479IVt5XppfqlvzxlBtVVhUBN8toOpS47a5Hkgu17iUjfFErSPd9T1BAd5rMa4cFfbUr8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yziox9Igqe2AICvRwenogK7Dtd1G4p9nT01bKtTgJiH3ezICT92
-	UzgFFLggiuJxP3xR5O3qdlP2ZAxD2bUhIQsuION1sS2pNC5++YsJZg+LlA==
-X-Gm-Gg: ASbGncvPnakgZ2dZsTx48Pk/8mM4FNk4L90DVr+KmFVHu0i63P2n3w2aRBuCZBCzbti
-	jKjmKXSFYMv9Jn4fcMV0Ze4zsR/n7ahtbh0O7eciqh5mSUWkWm5Y9JD4ICXQZl9gFvw6nx0qoU9
-	TCF5MdJTKnen685T9sSEdbScYqrFAD3YpoenDOFIwIo17xJg0pNMoW39uu/hswyla93Uh0HtdS9
-	L1N0oiQ4bD0vKfiWz7loyU53HbLWyDpboIubAcb6Y2AfmVDL1wvaL2s/u8U4qDvraNKOImhO1Ep
-	3qpo/gwwHXRoyCEXIC4t2fug1Ms/ewZr+vFiIwO0dveMqOiSp0pic4z90UWL5+nTrQ==
-X-Google-Smtp-Source: AGHT+IFFTFJxFegJEwOJDqt5Eo5oe21FvRGic1Equ7xNcRSZs55qJ9m4YxxswohlDS19Js2nxDIkNQ==
-X-Received: by 2002:a05:6000:2b0a:b0:391:5f:fa30 with SMTP id ffacd0b85a97d-3911f7700d4mr3720866f8f.28.1741254630808;
-        Thu, 06 Mar 2025 01:50:30 -0800 (PST)
-Received: from [172.27.49.130] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c1031fdsm1452341f8f.89.2025.03.06.01.50.29
+        bh=U5Iyl/8UKDSiwGF8KFxT8SB0q5g2Qi8O53ARUdlTeQ4=;
+        b=YXTQh9fX9ebhXtG4UwDblPN5QtWZ3rv20SD1aCHzHJBfGuRlFezuX9h6c1na55Dn5g
+         s+hyslJJ2Pot+xIZzcsNX4hYG4wBHa6z7APLEtDdmulttlfq85SWwSA0Y/tvROpNxt+0
+         Q4lr7FNO6Tcwh0BSsCsXFkiRx1AzTKGNgYIjwypdnoaiP/0xYcq/PNbiw54op3sNBYjz
+         Pj81ZrrWZkq6BzpSMvMy4b4gke+fby4sEbVkm/qMHsJJ1WTUuI2rfPwzfIhxpitfkkJw
+         c/Q35F5IatG846QJPcwCthTTcxLlvV8kS01JS8vf+KOxz0ggVPyt8uuw4n5fV9Crhyoc
+         QhAA==
+X-Gm-Message-State: AOJu0Yw8oajvKrFdHVi9QnZ/TAKSLQN2wDVtXYX0CUFz5X4AB7deYN83
+	nFajrXS/cCJc00r1X/KhrGO2lTne2cPmNaqvDwXqUL72gcE6QpzdQkdN9FzVuuqOn3D4/armk48
+	0gtU0hKUTfPR6TF4KwYF0JcA9T6pGozPWg/cjTC1VuHYLfIzCb7AzDQ==
+X-Gm-Gg: ASbGnctOX5gtEk5FNeZYE6srsL7yOKFEvsaFTjv8dGD6ANDrGuf+JEmH8FTiuvCpqGE
+	rfnC+g0mm0rOJAgcGyS9Tm5ENKjbmts90uK/NB3ufIUvGyUwgTioAbXeggvi0w19MvRXjE6ChuZ
+	bmYjfwaaTiJX/5+9Vchb4YsOGFM6zAokAA8KCIshQ1YiE8V5207NMQtKn4/PNr/p7KaG/Q48sR8
+	fMt5O87lQjyvaZjCP8tv49l4+UoUQRROREudmqQajDI9xVnVte3DSeb9a0Tiq940lKVbB3UFbCb
+	MF2CyrAT3FApdYlU09Ctd0/QLZibrBFMiZYy6VHEUrFWLQ==
+X-Received: by 2002:a05:6000:1acc:b0:390:f358:85db with SMTP id ffacd0b85a97d-3911f75c743mr4469455f8f.30.1741254933431;
+        Thu, 06 Mar 2025 01:55:33 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHEYFBaDFnSpPs5pnagi08E3gV1mWTE+gn0Ul/oBprxbACvaeGpZ/eXBvO+4VtQ/ZMf/PsM3g==
+X-Received: by 2002:a05:6000:1acc:b0:390:f358:85db with SMTP id ffacd0b85a97d-3911f75c743mr4469436f8f.30.1741254933091;
+        Thu, 06 Mar 2025 01:55:33 -0800 (PST)
+Received: from [192.168.88.253] (146-241-81-153.dyn.eolo.it. [146.241.81.153])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c0194f2sm1534441f8f.54.2025.03.06.01.55.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Mar 2025 01:50:30 -0800 (PST)
-Message-ID: <042d8459-e5be-4935-a688-9fe18b16afa1@gmail.com>
-Date: Thu, 6 Mar 2025 11:50:27 +0200
+        Thu, 06 Mar 2025 01:55:32 -0800 (PST)
+Message-ID: <7f2c4478-cbb1-4c68-b980-d6e07a7b971a@redhat.com>
+Date: Thu, 6 Mar 2025 10:55:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,58 +87,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/mlnx5: Use generic code for page_pool
- statistics.
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Joe Damato <jdamato@fastly.com>,
- Leon Romanovsky <leon@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Saeed Mahameed <saeedm@nvidia.com>, Thomas Gleixner <tglx@linutronix.de>,
- Tariq Toukan <tariqt@nvidia.com>
-References: <20250305121420.kFO617zQ@linutronix.de>
- <8168a8ee-ad2f-46c5-b48e-488a23243b3d@gmail.com>
- <20250305202055.MHFrfQRO@linutronix.de>
- <20250306083258.0pqISYSF@linutronix.de>
+Subject: Re: [PATCH] net: marvell: mvmdio: Add missing function argument name
+To: Vinitha Vijayan <vinithamvijayan723@gmail.com>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <CAPSa425Ntd36P3DHMGNhRN_GJ6g1JCMW1t2gMYFppJYSXqetoA@mail.gmail.com>
+ <PU4P216MB103753B46AF6597DAB78A4CBA2C82@PU4P216MB1037.KORP216.PROD.OUTLOOK.COM>
 Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20250306083258.0pqISYSF@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <PU4P216MB103753B46AF6597DAB78A4CBA2C82@PU4P216MB1037.KORP216.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-
-
-On 06/03/2025 10:32, Sebastian Andrzej Siewior wrote:
-> On 2025-03-05 21:20:57 [+0100], To Tariq Toukan wrote:
->>> I like the direction of this patch, but we won't give up the per-ring
->>> counters. Please keep them.
->>
->> Hmm. Okay. I guess I could stuff a struct there. But it really looks
->> like waste since it is not used.
->>
->>> I can think of a new "customized page_pool counters strings" API, where the
->>> strings prefix is provided by the driver, and used to generate the per-pool
->>> strings.
->>
->> Okay. So I make room for it and you wire it up ;)
+On 3/4/25 8:58 PM, Vinitha Vijayan wrote:
+> Fix a coding style issue in mvmdio.c where a function definition argument `struct orion_mdio_dev *` was missing an identifier name. This aligns with Linux kernel coding standards.
 > 
-> Could I keep it as-is for now with the removal of the counter from the
-> RQ since we don't have the per-queue/ ring API for it now? 
+> Signed-off-by: Vinitha <vinithamvijayan723@gmail.com<mailto:vinithamvijayan723@gmail.com>>
 
-I'm fine with transition to generic APIs, as long as we get no regression.
-We must keep the per-ring counters exposed.
+The patch does not apply, the commit message is not trimmed at 72
+colums, and the SoB tag is mangled.
 
->It is not too
-> hard it back later on.
-> The thing is that page_pool_get_stats() sums up the individual stats
-> (from each ring) and it works as intended. To do what you ask for, you I
-> would have to add a struct page_pool_stats to each struct mlx5e_rq_stats
-> for the per-ring stats (so far so good) but then I would have manually
-> merge the stats into one struct page_pool_stats to expose it via
-> page_pool_ethtool_stats_get(). Then I am touching it again while
-> changing the type of the counters and this is how this patch started.
-> 
-> Sebastian
+More importantly, this kind of purely formal refactor should be part of
+larger/functional changes.
+
+I'm sorry, this patch is not going to be applied.
+
+Cheers,
+
+Paolo
 
 
