@@ -1,248 +1,232 @@
-Return-Path: <netdev+bounces-172391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C27EA5473A
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 967E6A54739
 	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 11:03:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8DC27A8373
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:01:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B56531685E1
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:03:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3583C1F5837;
-	Thu,  6 Mar 2025 10:02:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46151200106;
+	Thu,  6 Mar 2025 10:02:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="S2xB2lWj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fw3+OLQ9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 394762E64A;
-	Thu,  6 Mar 2025 10:02:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6ADBE46;
+	Thu,  6 Mar 2025 10:02:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741255338; cv=none; b=lHfb543M/FkwLw+eeoLbA4zQKNJOAyKlPUO10WoME30K0cU685MFUH2vVNQDxLNIJ4WeznMZQRGNeGv/7SQA1yEDELL79+cxM+3s0okq9hFgHUBOta7vC1pFxfRN2lBes+YmCC62eNeZolpqQUBEZ+QGabV3wB7efvnW//Goa2o=
+	t=1741255356; cv=none; b=B/rhY942xD6orGmnFG/EMhsInfvDw31dv2b665bxr6iC/RmgP3Eh/Cf927v/cheh5Guj13ZNWZi3CkfEGVAD7E3F33o8JqbjNI7Rnuomh3xKhgS2kv1+atUdgbMGCKM4CzxyQCL0EpTV+yutR3YdyzOJGT4QcoYrUMCl4xbjPvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741255338; c=relaxed/simple;
-	bh=4PhF8y6VGkokPsiYhWYkMDRA6AcFOvVZ20VX6LyDvh8=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
-	 In-Reply-To:Content-Type; b=jIT/UjvFzV1ZxMk2NYDTu4bZ95OojgsgJ2ePXQs63Gt54N1zfKlVCWx8RMuvavzUXeVzpKV9bProa3R7oPEQxwYvohGlG1+X7CwIu3t4f4tYe3R9PVnqlMxWIagQ3tG5/nciyC5yAdagpMbK2WThwtnuK1NdyuWnMOSlQdR7m8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=S2xB2lWj; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5268stUI027093;
-	Thu, 6 Mar 2025 10:01:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	GUiNQxR6oXFyrfw8pmpUcgdUr3UYT8uMhlX0EwErzwg=; b=S2xB2lWjBg2sjruf
-	Qioeo9dhbHS8bie7RPugvvpgnWm9GDmfsS78ExNm7PQ8wXuQ5E9WJA1YzLBXtaSg
-	iVBRqa0vKn2LMkafTk9O6AcuKP8XWXCvsrJwRZlHgC8cE1x+fJtJY3U1SUl2L6x1
-	XgRLjPi1wiPbfjnAcfsoPwUuVpm8/b6AUAv5AyOfn6DXQY//oBT7uklBk/Yzti+H
-	jj+e4cyJzDWUFfceXxsMVmm7qRwOPW4gQ9oz2qv9tekLQv50olhcOPqcR6/swP6h
-	Z+dSCngBj9RUBEj5xV/mRUkhl+2le8IX+QujkrIUHavcTiNK2eHM8/3XnjM7ZhwJ
-	iSWRew==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 455p6trhph-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 06 Mar 2025 10:01:58 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 526A1vdl007311
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 6 Mar 2025 10:01:57 GMT
-Received: from [10.253.37.89] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 6 Mar 2025
- 02:01:51 -0800
-Message-ID: <cffdd8e8-76bc-4424-8cdb-d48f5010686d@quicinc.com>
-Date: Thu, 6 Mar 2025 18:01:49 +0800
+	s=arc-20240116; t=1741255356; c=relaxed/simple;
+	bh=wTFlYBvJD+DPro0IJ6A0zpCSv+QG49I4vgkSUKda6Co=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fyus86SitiLNSdRYXfgirTrVk28VVDmR++xWEwYwA+GRWakjjEqwFU9Dote0sCA3nekFiq8dL26UBJKEhZGd1Nu8h+T6E86lnJnHCALO/3UsRS2ECqo4Q3aafNPQAiNe/tgcEHCqbehLNIrIKeXvIg2h1YslXpVD4pwbDkbdp4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fw3+OLQ9; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-223a7065ff8so8978975ad.0;
+        Thu, 06 Mar 2025 02:02:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741255354; x=1741860154; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=I6C2R+19zIRVeliQUNh0n4zfR/ryo+Fy/zku5DukOZs=;
+        b=fw3+OLQ9h5wO9+PUdm5kJfjnviEHfpqRREeqzEvI6F1TRTFjquaQtPgmlWXMDCue2B
+         FR9SqS4yFXvqbZC0+vNm+36RSJU2kSNk9nWlOk1JQ0WPCGrC7UJ5ncIAf3kH8ISClED8
+         mg+bVTSqI3dqJtOMc0XQHIrnR0eLvYxHoE/2vVI9+k4tbMb8sXZ/0Gm4veWMf/iA99pX
+         o6ORt0zxDnsDv16pfoCFkI31XcrnPaBS79vcMz+WRSOzf6XS/W2C0opbX7gZKvH43FU+
+         bHYULK/nluGEQE5aYlTD1+dMG/ZF39bo0RNOlmGyAwZEVeE7ADSwHqhDDsKdMHI2w6qM
+         PrjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741255354; x=1741860154;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I6C2R+19zIRVeliQUNh0n4zfR/ryo+Fy/zku5DukOZs=;
+        b=sZuwvIiXpGqgsGvnY3zJ9iA516yL061uywpglT9skyHUDF24SqysVZd4JuOh671Y8X
+         IXVNo7q+7AvVTeYCwuoMBoNjg3w1xeaw04VtvvSjx573zQHi5eE09yQP0bpVwJ7OnRgD
+         AnZy03LYDjpjJf39Bp5DpIjv2ukY6CDrp1FNz1wl/a3yMTI4awTD4PCS1lQVzr6JwWhm
+         AhuU4FURViE99TUPLPUND8ZICCjNu3VECh1gOOk96PKsZmtcRVJBoqlrYVkhNIJ0VURL
+         c0dcwOLo350BB0+p3WcHR9Jq8P0kAvAwlQAlcrKNJ/rZs5+rfrySRDaVwhk/rahVu9sP
+         tQ2g==
+X-Forwarded-Encrypted: i=1; AJvYcCVyaGViFgO+KkQ6r0zS5ayd6iLrPsOjXT/9e6a0KhH+WZRYht0iTVyCKhvAjOBn0sTeUZ8lzX/S@vger.kernel.org, AJvYcCWMsZRURKSfUUs0YsgWgqxCR4w+3fctLak9zs/ZrphZ0eAaFqqJ/6yc2c90yiW7pSeKIrMN10VWO/qJrgB0dzjl@vger.kernel.org, AJvYcCWjHe2jvthx/FALvb0xtBTeTkEH6ogv2j387L+MFalCbqQTi6UIMRixphsLapSuhPe4KEm9DtX8IztnoJs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0Due2JMqdxNq1hOCw9pf6mQ8S0sqx+El2TWXTva1tJdv6N9xf
+	K9uXdNNi54G8E0/e9x5nqweRss3hm5+5ioN8NZIQUBrNBvFxhhf7
+X-Gm-Gg: ASbGnctI+ewAvBcOH6aVU/suQBhdyLdU9YGsEEjcnLmePoxgPSHu1ktjMmK2TErCMQK
+	rR49TXkBd8o+m9O4VN7ePRQM8Iuz2+e0OvPJUsBRe1SSzeemJ7UprTpFDH0TN1AG/XgVh6Gqqb0
+	4odBUwa/YrxYOwJQTOAaeP7+ys8OX8cawl4h4eThG0pluYvd5yt/MDpelOX8OXLwKL3sluM/Y2R
+	hPeGI+Zt7piMKMnv+HRQMPI7o6owgi/1DbR/e0SDxoXhRA97b1lT9Fa66AC6fZ3xbySgpsdvv8w
+	wwQrY7uHTjckreKoO4yo1P0wsMwnV8dYy8/H6iQDxhJGiWgP3g==
+X-Google-Smtp-Source: AGHT+IEQ/HT20nm25UhSyrBIvKEOt7us6r/8Uje5w1QgDMFkAlZcymJjjQmF/1bibHtRHpgmynXDZA==
+X-Received: by 2002:a05:6a21:8dc2:b0:1f0:e7a4:8f7c with SMTP id adf61e73a8af0-1f34959e143mr12555833637.36.1741255353853;
+        Thu, 06 Mar 2025 02:02:33 -0800 (PST)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af281075ec4sm848915a12.2.2025.03.06.02.02.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Mar 2025 02:02:33 -0800 (PST)
+Date: Thu, 6 Mar 2025 10:02:24 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: "razor@blackwall.org" <razor@blackwall.org>,
+	Petr Machata <petrm@nvidia.com>,
+	"shuah@kernel.org" <shuah@kernel.org>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"jv@jvosburgh.net" <jv@jvosburgh.net>,
+	"jarod@redhat.com" <jarod@redhat.com>,
+	Jianbo Liu <jianbol@nvidia.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"steffen.klassert@secunet.com" <steffen.klassert@secunet.com>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCHv4 net 1/3] bonding: move IPsec deletion to
+ bond_ipsec_free_sa
+Message-ID: <Z8lysOLMnYoknLsW@fedora>
+References: <20250304131120.31135-1-liuhangbin@gmail.com>
+ <20250304131120.31135-2-liuhangbin@gmail.com>
+ <4108bfd8-b19f-46ea-8820-47dd8fb9ee7c@blackwall.org>
+ <Z8hcFSElK7iF8u9o@fedora>
+ <f9bf79aff80eae232bc16863aa7a3ea56c80069a.camel@nvidia.com>
+ <Z8ls6fAwBtiV_C9b@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Jie Luo <quic_luoj@quicinc.com>
-Subject: Re: [PATCH net-next v3 04/14] net: ethernet: qualcomm: Initialize PPE
- buffer management for IPQ9574
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>, Lei Wei <quic_leiwei@quicinc.com>,
-        Suruchi Agarwal
-	<quic_suruchia@quicinc.com>,
-        Pavithra R <quic_pavir@quicinc.com>,
-        "Simon
- Horman" <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-        Kees Cook
-	<kees@kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        "Philipp
- Zabel" <p.zabel@pengutronix.de>,
-        <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
-        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>,
-        <srinivas.kandagatla@linaro.org>, <bartosz.golaszewski@linaro.org>,
-        <john@phrozen.org>
-References: <20250209-qcom_ipq_ppe-v3-0-453ea18d3271@quicinc.com>
- <20250209-qcom_ipq_ppe-v3-4-453ea18d3271@quicinc.com>
- <a79027ed-012c-4771-982c-b80b55ab0c8a@lunn.ch>
- <c592c262-5928-476f-ac2a-615c44d67277@quicinc.com>
- <33529292-00cd-4a0f-87e4-b8127ca722a4@lunn.ch>
-Content-Language: en-US
-In-Reply-To: <33529292-00cd-4a0f-87e4-b8127ca722a4@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Authority-Analysis: v=2.4 cv=HZbuTjE8 c=1 sm=1 tr=0 ts=67c97296 cx=c_pps a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17 a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=Vs1iUdzkB0EA:10 a=P-IC7800AAAA:8 a=pGLkceISAAAA:8 a=-cV8Hw4QFi719GmBsEsA:9
- a=QEXdDO2ut3YA:10 a=d3PnA9EDa4IxuAV0gXij:22
-X-Proofpoint-GUID: ORV12Dt2uiUbTZnam6MxJqs5otzzHqIG
-X-Proofpoint-ORIG-GUID: ORV12Dt2uiUbTZnam6MxJqs5otzzHqIG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-06_04,2025-03-06_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- adultscore=0 mlxscore=0 spamscore=0 clxscore=1015 phishscore=0 bulkscore=0
- priorityscore=1501 impostorscore=0 suspectscore=0 malwarescore=0
- mlxlogscore=999 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2502100000
- definitions=main-2503060074
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z8ls6fAwBtiV_C9b@fedora>
 
-
-
-On 2/20/2025 11:09 PM, Andrew Lunn wrote:
-> On Thu, Feb 20, 2025 at 10:38:03PM +0800, Jie Luo wrote:
->>
->>
->> On 2/11/2025 9:22 PM, Andrew Lunn wrote:
->>>> +	/* Configure BM flow control related threshold. */
->>>> +	PPE_BM_PORT_FC_SET_WEIGHT(bm_fc_val, port_cfg.weight);
->>>> +	PPE_BM_PORT_FC_SET_RESUME_OFFSET(bm_fc_val, port_cfg.resume_offset);
->>>> +	PPE_BM_PORT_FC_SET_RESUME_THRESHOLD(bm_fc_val, port_cfg.resume_ceil);
->>>> +	PPE_BM_PORT_FC_SET_DYNAMIC(bm_fc_val, port_cfg.dynamic);
->>>> +	PPE_BM_PORT_FC_SET_REACT_LIMIT(bm_fc_val, port_cfg.in_fly_buf);
->>>> +	PPE_BM_PORT_FC_SET_PRE_ALLOC(bm_fc_val, port_cfg.pre_alloc);
->>>
->>> ...
->>>
->>>> +#define PPE_BM_PORT_FC_CFG_TBL_ADDR		0x601000
->>>> +#define PPE_BM_PORT_FC_CFG_TBL_ENTRIES		15
->>>> +#define PPE_BM_PORT_FC_CFG_TBL_INC		0x10
->>>> +#define PPE_BM_PORT_FC_W0_REACT_LIMIT		GENMASK(8, 0)
->>>> +#define PPE_BM_PORT_FC_W0_RESUME_THRESHOLD	GENMASK(17, 9)
->>>> +#define PPE_BM_PORT_FC_W0_RESUME_OFFSET		GENMASK(28, 18)
->>>> +#define PPE_BM_PORT_FC_W0_CEILING_LOW		GENMASK(31, 29)
->>>> +#define PPE_BM_PORT_FC_W1_CEILING_HIGH		GENMASK(7, 0)
->>>> +#define PPE_BM_PORT_FC_W1_WEIGHT		GENMASK(10, 8)
->>>> +#define PPE_BM_PORT_FC_W1_DYNAMIC		BIT(11)
->>>> +#define PPE_BM_PORT_FC_W1_PRE_ALLOC		GENMASK(22, 12)
->>>> +
->>>> +#define PPE_BM_PORT_FC_SET_REACT_LIMIT(tbl_cfg, value)	\
->>>> +	u32p_replace_bits((u32 *)tbl_cfg, value, PPE_BM_PORT_FC_W0_REACT_LIMIT)
->>>> +#define PPE_BM_PORT_FC_SET_RESUME_THRESHOLD(tbl_cfg, value)	\
->>>> +	u32p_replace_bits((u32 *)tbl_cfg, value, PPE_BM_PORT_FC_W0_RESUME_THRESHOLD)
->>>
->>> Where is u32p_replace_bits()?
->>
->> u32p_replace_bits is defined by the macro __MAKE_OP(32) in the header
->> file "include/linux/bitfield.h".
+On Thu, Mar 06, 2025 at 09:37:53AM +0000, Hangbin Liu wrote:
+> > 
+> > The reason the mutex was added (instead of the spinlock used before)
+> > was exactly because the add and free offload operations could sleep.
+> > 
+> > > With your reply, I also checked the xdo_dev_state_add() in
+> > > bond_ipsec_add_sa_all(), which may also sleep, e.g.
+> > > mlx5e_xfrm_add_state(),
+> > > 
+> > > If we unlock the spin lock, then the race came back again.
+> > > 
+> > > Any idea about this?
+> > 
+> > The race is between bond_ipsec_del_sa_all and bond_ipsec_del_sa (plus
+> > bond_ipsec_free_sa). The issue is that when bond_ipsec_del_sa_all
+> > releases x->lock, bond_ipsec_del_sa can immediately be called, followed
+> > by bond_ipsec_free_sa.
+> > Maybe dropping x->lock after setting real_dev to NULL? I checked,
+> > real_dev is not used anywhere on the free calls, I think. I have
+> > another series refactoring things around real_dev, I hope to be able to
+> > send it soon.
+> > 
+> > Here's a sketch of this idea:
+> > 
+> > --- a/drivers/net/bonding/bond_main.c
+> > +++ b/drivers/net/bonding/bond_main.c
+> > @@ -613,8 +613,11 @@ static void bond_ipsec_del_sa_all(struct bonding
+> > *bond)
+> >  
+> >         mutex_lock(&bond->ipsec_lock);
+> >         list_for_each_entry(ipsec, &bond->ipsec_list, list) {
+> > -               if (!ipsec->xs->xso.real_dev)
+> > +               spin_lock(&ipsec->x->lock);
+> > +               if (!ipsec->xs->xso.real_dev) {
+> > +                       spin_unlock(&ipsec->x->lock);
+> >                         continue;
+> > +               }
+> >  
+> >                 if (!real_dev->xfrmdev_ops ||
+> >                     !real_dev->xfrmdev_ops->xdo_dev_state_delete ||
+> > @@ -622,12 +625,16 @@ static void bond_ipsec_del_sa_all(struct bonding
+> > *bond)
+> >                         slave_warn(bond_dev, real_dev,
+> >                                    "%s: no slave
+> > xdo_dev_state_delete\n",
+> >                                    __func__);
+> > -               } else {
+> > -                       real_dev->xfrmdev_ops-
+> > >xdo_dev_state_delete(real_dev, ipsec->xs);
+> > -                       if (real_dev->xfrmdev_ops->xdo_dev_state_free)
+> > -                               real_dev->xfrmdev_ops-
+> > >xdo_dev_state_free(ipsec->xs);
+> > -                       ipsec->xs->xso.real_dev = NULL;
+> > +                       spin_unlock(&ipsec->x->lock);
+> > +                       continue;
+> >                 }
+> > +
+> > +               real_dev->xfrmdev_ops->xdo_dev_state_delete(real_dev,
+> > ipsec->xs);
+> > +               ipsec->xs->xso.real_dev = NULL;
 > 
-> Given it is pretty well hidden, and not documented, it makes me think
-> you should not be using it. The macros you are expected to use from
-> that file are all well documented.
-
-OK, understand.
-
+> Set xs->xso.real_dev = NULL is a good idea. As we will break
+> in bond_ipsec_del_sa()/bond_ipsec_free_sa() when there is no
+> xs->xso.real_dev.
 > 
->>> This cast does not look good.
->>
->> Yes, we can remove the cast.
+> For bond_ipsec_add_sa_all(), I will move the xso.real_dev = real_dev
+> after .xdo_dev_state_add() in case the following situation.
 > 
-> To some extent, this is a symptom. Why is the cast there in the first
-> place? Cast suggest bad design, not thinking about types, thinking it
-> is actual O.K. to cast between types. Please look at all the casts you
-> have. Is it because of bad design? If so, please fix your types to
-> eliminate the casts.
+> bond_ipsec_add_sa_all()
+> spin_unlock(&ipsec->x->lock);
+> ipsec->xs->xso.real_dev = real_dev;
+>                                            __xfrm_state_delete x->state = DEAD
+>                                               - bond_ipsec_del_sa()
+>                                                 - .xdo_dev_state_delete()
+> .xdo_dev_state_add()
 
-Sure, this cast is actually redundant, the type of value passed to this
-macro is already defined as the type u32. I will review and remove the
-remaining casts in the ppe_reg.h file.
 
-> 
->>> And this does not look like anything any
->>> other driver does. I suspect you are not using FIELD_PREP() etc when
->>> you should.
->>>
->>> https://elixir.bootlin.com/linux/v6.14-rc2/source/include/linux/bitfield.h
->>>
->>> 	Andrew
->>
->> The PPE_BM_XXX macros defined here write to either of two different
->> 32bit words in the register table, and the actual word used (0 or 1)
->> is hidden within the macro. For example, the below macro.
->>
->> #define PPE_BM_PORT_FC_SET_CEILING_HIGH(tbl_cfg, value)	\
->> 	u32p_replace_bits((u32 *)(tbl_cfg) + 0x1, value,
->> 	PPE_BM_PORT_FC_W1_CEILING_HIGH)
->>
->> We could have used FIELD_PREP as well for this purpose. However using
->> u32p_replace_bits() seemed more convenient and cleaner in this case,
->> since with FIELD_PREP, we would have needed an assignment statement to
->> be defined in the macro implementation. We also noticed many other
->> drivers using u32_replace_bits(). Hope this is ok.
-> 
-> Please extend the set of FIELD_{GET,PREP} macros to cover your use
-> case. Document them to the level of the existing macros. Submit the
-> patch to:
-> 
-> Yury Norov <yury.norov@gmail.com> (maintainer:BITMAP API)
-> Rasmus Villemoes <linux@rasmusvillemoes.dk> (reviewer:BITMAP API)
-> etc
-> 
-> and see what they say about this.
-> 
-> 	Andrew
+Hmm, do we still need to the spin_lock in bond_ipsec_add_sa_all()? With
+xs->xso.real_dev = NULL after bond_ipsec_del_sa_all(), it looks there is
+no need the spin_lock in bond_ipsec_add_sa_all(). e.g.
 
-Thanks for the suggestion. Just to clarify, we preferred
-u32p_replace_bits() over FIELD_PREP() because the former does
-a clear-and-set operation against a given mask, where as with
-FIELD_PREP(), we need to clear the bits first before we use the
-macro and then set it. Due to this, we preferred using
-u32_replace_bits() since it made the macro definitions to modify
-the registers simpler. Given this, would it be acceptable to
-document u32p_replace_bits() better, as it is already being used
-by other drivers as well?
 
-If you prefer to use FIELD_PREP() over u32p_replace_bits(), we
-can update the driver to change the macros to use FIELD_PREP().
-Please note that all our macros for register modifications
-operate only on 32bit values. so we do not have any necessity
-for casts in the code.
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 04b677d0c45b..3ada51c63207 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -537,15 +537,27 @@ static void bond_ipsec_add_sa_all(struct bonding *bond)
+ 	}
+ 
+ 	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
++		spin_lock_bh(&ipsec->xs->lock);
++		/* Skip dead xfrm states, they'll be freed later. */
++		if (ipsec->xs->km.state == XFRM_STATE_DEAD) {
++			spin_unlock_bh(&ipsec->xs->lock);
++			continue;
++		}
++
+ 		/* If new state is added before ipsec_lock acquired */
+-		if (ipsec->xs->xso.real_dev == real_dev)
++		if (ipsec->xs->xso.real_dev == real_dev) {
++			spin_unlock_bh(&ipsec->xs->lock);
+ 			continue;
++		}
+ 
+-		ipsec->xs->xso.real_dev = real_dev;
+ 		if (real_dev->xfrmdev_ops->xdo_dev_state_add(ipsec->xs, NULL)) {
+ 			slave_warn(bond_dev, real_dev, "%s: failed to add SA\n", __func__);
+ 			ipsec->xs->xso.real_dev = NULL;
+ 		}
++		/* Set real_dev after .xdo_dev_state_add in case
++		 * __xfrm_state_delete() is called in parallel
++		 */
++		ipsec->xs->xso.real_dev = real_dev;
+ 	}
 
-Below is one example per my understanding, implemented for
-both cases - u32p_replace_bits() and FIELD_PREP:
+The spin_lock here seems useless now. What do you think?
 
-#define PPE_BM_PORT_FC_SET_WEIGHT(tbl_cfg, value) \
-       u32p_replace_bits(tbl_cfg + 0x1, value, PPE_BM_PORT_FC_W1_WEIGHT)
-		
-#define PPE_BM_PORT_FC_SET_WEIGHT(tbl_cfg, value) \
-do { \
-      *(tbl_cfg + 0x1) &= ~PPE_BM_PORT_FC_W1_WEIGHT; \
-      *(tbl_cfg + 0x1) |= FIELD_PREP(PPE_BM_PORT_FC_W1_WEIGHT, value); \
-} while (0)
-
+Thanks
+Hangbin
 
