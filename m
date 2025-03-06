@@ -1,398 +1,265 @@
-Return-Path: <netdev+bounces-172328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03FEAA543A0
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 08:25:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 642ACA543A5
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 08:26:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F9F116772E
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 07:25:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B5A21894A17
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 07:26:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 555F11C861B;
-	Thu,  6 Mar 2025 07:25:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88B591A76DE;
+	Thu,  6 Mar 2025 07:26:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jELIyqBH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3bvolEH2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8186717C98;
-	Thu,  6 Mar 2025 07:25:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C524217C98
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 07:26:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741245910; cv=none; b=brzMa0qg76Y8EagNAZMosMHrJFMOTSzG5YbE3DmcsedR1PZgRJj+P/QaDnH9Vrgegkp9iw3EPeRVAuaTrWGHCMz1Li5bSb/+hXmL01nF0EAunkLDAR5Ax1vi/dmRyuh96vppLoNZBnN6XM5djHpC8ziXN9F67pGBhYyEkWdW3WI=
+	t=1741245970; cv=none; b=ThboTZeJNngdp36hj1zrqksLX0FmzXFcCovwdrXH5v1pHXWmQsp4ksKbh3/p9GJWhWjJrTbl6URMU2mXshswzjP5Wufg4n8JZ1DVUpPI4S/Rr7H1vwt8bvvnVq7Mh25OozWsK7MlEa+5VEecNTKQwvD8PyCivC9TdVtLi2gAX4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741245910; c=relaxed/simple;
-	bh=kufHmTRB++jZQY64ZMozQJ3Wbc9eALcrHlZIJBbmxK8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CBrbhk6htbBaqeRDIlN+JFxiiRJMXdapdDALjXYX63JpjwvbalPEIYdkaQYskigOIrR/Fykk/5068iBzWh/Bu97SBzM6Q+oCdPIeBZc1MC5hBLdKhtlgtLciFhQIBHcoKMgmOsbvwgSoU8SHzpa7OCRxBulHrE71Pc+GRkcL02w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jELIyqBH; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2239c066347so4372105ad.2;
-        Wed, 05 Mar 2025 23:25:08 -0800 (PST)
+	s=arc-20240116; t=1741245970; c=relaxed/simple;
+	bh=6UXSJghHZkE2Mood6VmBGeZAOZpSPkS5mT4MQz0iFXs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=l+XuWnyoGJLWyEVkw9ilr4aEJkyXGDJW7plZRDwZuAqji8C4vhKgICqCcQRsDb+Xlsj3eITNGFQZJ5OahRbp06GvocyWyFQdS1740ppCliz2fhzne28kZDCSDKyhqtZPqDQFah4Jr0/6K78zj4xnNPkP588XRElO2VAY8WwWzwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3bvolEH2; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-474f8d2f21aso3475751cf.1
+        for <netdev@vger.kernel.org>; Wed, 05 Mar 2025 23:26:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741245908; x=1741850708; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1741245967; x=1741850767; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OsKO0nzseNJqKnkU34vflNea8Zesxh3zcsIa2WAI8VI=;
-        b=jELIyqBHkw3v66z8MZ+ZE6caQWMraVWmg8MS7uNxvRyS7ilMSWjlGqUNUs/1PVTaEk
-         nQncACAzgCCEU48SPo3mB7KvvWPLS1Px4kn9/N8tEy+UGcce696V0S3g0SkdHjkmlN85
-         HdjNMVrWZ5CNB9xU9Z0qn6cqS6IOpe+FE/MLG7+Kw3+N1v8EttsxAee5N1WLz84XV/2A
-         YRYYd7WWcdM//JCuMy0r+DWhakt5dq795Tmub5PDjpzFhsBYq4nQC5slY9l8jE+/9IF7
-         PfgOXUjEeWYPyZz0emgwgmzYfQHtuC2I7pU1rp0RTT2njTjKD4AXqkUDyddma84t6JWx
-         e6dw==
+        bh=qvDdcxXKrFz1j794M8wHP6xmw4SDyW5t9pAKNcmZaUA=;
+        b=3bvolEH2rHpH8w9SUM+BVU7uWTNSd0bv/+NlCVlV3nhiWFr+ZJpVTmqjNCFufVIOrT
+         +EEc1SuKWz/KvT3lNbUTkjVmIeNexrnqKLOAspiemQ8acUR+Dy83a3/Uz82gP2IMl8Ck
+         rVvQBMp+vu98l72FuTdmPFJgTPSppbka4xUrCv/mBedvig1gn5N3iQ1pcCNgrXmkrk0r
+         T4ssY7yQC1iA3qt1OsvzgLTSrrCaWNF8XqTEv6fi7pBJV6lASVMRGNrbOlJ8Z4AIdLag
+         3raVSjoas9xvk4hw2tx4UDe+8dCp+sOkYVU6lLwaI8w0Hs38ajEv925XGvYEQ8ukLIS7
+         RdyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741245908; x=1741850708;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1741245967; x=1741850767;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=OsKO0nzseNJqKnkU34vflNea8Zesxh3zcsIa2WAI8VI=;
-        b=YXnfgA5ikcu5xeoVlRilJvbDh8u5tfWR78NZPoyt+1ndJPO8wbKuAqoHWUTCwrn0AN
-         QffiwSogzN9ZRB4h5vxM02sfgVegwoDohr2ZwtVC8NqMSpxu7VIUVPsVOp6TS9QlvCA2
-         DrwFC2G7NPErWWDVVLqetviTW2uWt2WX5rnOGEtPP0ktufyyrPE+/gN6Aqpz627Yoaz0
-         mj6FWvAJS4YNjgQ+u/cL+DvVERzRY4zzSEchMoYMJFoiKtl6G12PS8mXbUU+nvbMy2Dt
-         Nze84A0C3SxNBCXYww/WZ3jdeGEuiEqMfzlU1mWmmFsysYBdLQngPWiDEwpIIqFgkqNN
-         tu/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVXnCQXs9D9AqtZayv8LJqHbEHeVWPR/20EZAg2ODHDatyzv2KRFN0fQc8bB8pIj2R17UvFnn/dN9egT5g/4Bw=@vger.kernel.org, AJvYcCXRBljGb97hQ7SWza9+RCppSqMCJ3i15lTO001g0lU7Ri30a4HIU3F8P4dCCwQBvjdgooLNHJMs@vger.kernel.org
-X-Gm-Message-State: AOJu0YxReqNvws4s59rmVXz6AgwnNRW6JyNgRXANLHzBWiy+SWs85aLk
-	l0JlPf26JsBrCUlHIhsPxujfa3n0GIfyiocf0LbxYI2CDC4sFjy0
-X-Gm-Gg: ASbGncs12icXZuOcBonailiHLA1YTQEBRbNsodQtxhA0Tq+7vzNw5Rm8Dm6wUW/eCfN
-	zPPr+xFHH/d2i2GP2l8JCd8JAILCOoM4M48DoNMTHqnFV5qmORnx6He9488gSikP4iMMkO2HJAv
-	isF4nGiPd3y/R6bJlPWV92lvUJ3DU+DMtdu701YBv+YP2rDn36hi0HnvBKwGru4PS5SWQvtUUrR
-	wed+ho5/QU+9acnP6FmbtGNU7iLhR0P9XcEOMQ84jL14tMZo4fDmvUMUZeYxQ8XBBBGZSs4kc34
-	vtLvkf+iRUbOMvoaq+nSDcRw3tXV60fYMA==
-X-Google-Smtp-Source: AGHT+IE0tBICBW97zmbYjsCSFEvkmjp0kkAzkNWysxV3gfvI+A1Lsvn17an83iZMNzP1vaAj1An9bQ==
-X-Received: by 2002:a17:902:ebc4:b0:224:10b9:357a with SMTP id d9443c01a7336-22410c87c9emr16495845ad.32.1741245907691;
-        Wed, 05 Mar 2025 23:25:07 -0800 (PST)
-Received: from ap.. ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ff693534f8sm567196a91.17.2025.03.05.23.25.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Mar 2025 23:25:06 -0800 (PST)
-From: Taehee Yoo <ap420073@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com,
-	horms@kernel.org,
-	shuah@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: almasrymina@google.com,
-	asml.silence@gmail.com,
-	willemb@google.com,
-	kaiyuanz@google.com,
-	skhawaja@google.com,
-	sdf@fomichev.me,
-	gospo@broadcom.com,
-	somnath.kotur@broadcom.com,
-	dw@davidwei.uk,
-	ap420073@gmail.com
-Subject: [PATCH v2 net 6/6] selftests: drv-net: add xdp cases for ping.py
-Date: Thu,  6 Mar 2025 07:24:22 +0000
-Message-Id: <20250306072422.3303386-7-ap420073@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250306072422.3303386-1-ap420073@gmail.com>
-References: <20250306072422.3303386-1-ap420073@gmail.com>
+        bh=qvDdcxXKrFz1j794M8wHP6xmw4SDyW5t9pAKNcmZaUA=;
+        b=wGgvk6itxR4xSwSylYaf5vwA35ctMsM6JU4A2uofjHz7k1XXRyzkLTwDj9rZAVGeGh
+         REOBs62DjXb1poYKhgagVF4p5Xfm3E1mHl8tOklIn5KplQHGxG/i0Ry7W7lAh+GulZAH
+         MCPYBJ5n+0AX0n8hh0z0kxn9lwzU+/bballEFjlfZJ7HIUGPt2GHL4Zkqx3eYtPUagNX
+         IhiCEhBeBx+UNrR7PpNDrxUnruobXeRUAqqgHiD4zni3tKinfuWEm4IPnGKZ+BE9VKza
+         L6M97YH7QVnm4n+PKWT/YqBrnax+ZCxIEI7eP8GLXIVvqdQbz6VlIHy9hk2sd4b6nB6v
+         DR6w==
+X-Forwarded-Encrypted: i=1; AJvYcCUs7RrzpZbuoEeZkwL3dq2A02VM7JLG5nXP568TQaINr/UnqKQJhCjy7AIg6PYL3rLqY7xO49Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlebgaBUcGh6OX3TK/tHjooZDkYU8fy/HiDwOUkhrTrikhvxsJ
+	QGtmqrc7lPnyNkPaA/GHqLAZgLF1fn06WUufkwayIr6pEMXtxBVtaWdn1MCvpEkmTlp3cc1JfFB
+	tDX4xcTAXFeT2hk4rGODReBFJSyFEM+kT5CMl
+X-Gm-Gg: ASbGncvSeV3tjpTz1wGEogmlPJdh7FRqVfDtCTPvAiZzHoEEAjXJT0SfniBl5fTmXJw
+	ZDjGZHon+hO3a78JxHcGHpRBJ2d6bp2vXyZQwelEe8nZ3t+PvB98PBnroGfz98+nCrP4d97jap8
+	rtEEqpN4Ubnlxun96MHiKQAtzcfw==
+X-Google-Smtp-Source: AGHT+IGCzGffZO0ilrEMYCJhnFWutX+ApMUqjo2tb9Y4t24hIAq21u3xa5TlLKpLgjX2u8QvpPIe8gJF7areMzxYbE0=
+X-Received: by 2002:a05:622a:1a97:b0:471:fc73:b656 with SMTP id
+ d75a77b69052e-4751a5632b7mr32430111cf.12.1741245967399; Wed, 05 Mar 2025
+ 23:26:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAL+tcoDFSSdMXGyUeR+3nqdyVpjsky7y4ZaCB-n1coR_x_Vhfw@mail.gmail.com>
+ <20250306062218.85962-1-kuniyu@amazon.com> <CAL+tcoAEPkyyvzULua_MUNQb=up_8Qqg+w3Oq6B9C1JS9gvdrQ@mail.gmail.com>
+In-Reply-To: <CAL+tcoAEPkyyvzULua_MUNQb=up_8Qqg+w3Oq6B9C1JS9gvdrQ@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 6 Mar 2025 08:25:56 +0100
+X-Gm-Features: AQ5f1JqA_t9R3xwmuBRD0BdNqqe98uIbeDRXsXfeWUgMNR4hAPhFuXTrCj-sFKI
+Message-ID: <CANn89iL_sT7a+49HNDLjsP5qnREPKpx6yEu8USMZPxW1vP+skg@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: bring back NUMA dispersion in inet_ehash_locks_alloc()
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, davem@davemloft.net, eric.dumazet@gmail.com, 
+	horms@kernel.org, kernelxing@tencent.com, kuba@kernel.org, 
+	ncardwell@google.com, netdev@vger.kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-ping.py has 3 cases, test_v4, test_v6 and test_tcp.
-But these cases are not executed on the XDP environment.
-So, it adds XDP environment, existing tests(test_v4, test_v6, and
-test_tcp) are executed too on the below XDP environment.
-So, it adds XDP cases.
-1. xdp-generic + single-buffer
-2. xdp-generic + multi-buffer
-3. xdp-native + single-buffer
-4. xdp-native + multi-buffer
-5. xdp-offload
+On Thu, Mar 6, 2025 at 7:35=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.co=
+m> wrote:
+>
+> On Thu, Mar 6, 2025 at 2:22=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.c=
+om> wrote:
+> >
+> > From: Jason Xing <kerneljasonxing@gmail.com>
+> > Date: Thu, 6 Mar 2025 12:59:03 +0800
+> > > On Thu, Mar 6, 2025 at 12:12=E2=80=AFPM Kuniyuki Iwashima <kuniyu@ama=
+zon.com> wrote:
+> > > >
+> > > > From: Jason Xing <kerneljasonxing@gmail.com>
+> > > > Date: Thu, 6 Mar 2025 11:35:27 +0800
+> > > > > On Wed, Mar 5, 2025 at 9:06=E2=80=AFPM Eric Dumazet <edumazet@goo=
+gle.com> wrote:
+> > > > > >
+> > > > > > We have platforms with 6 NUMA nodes and 480 cpus.
+> > > > > >
+> > > > > > inet_ehash_locks_alloc() currently allocates a single 64KB page
+> > > > > > to hold all ehash spinlocks. This adds more pressure on a singl=
+e node.
+> > > > > >
+> > > > > > Change inet_ehash_locks_alloc() to use vmalloc() to spread
+> > > > > > the spinlocks on all online nodes, driven by NUMA policies.
+> > > > > >
+> > > > > > At boot time, NUMA policy is interleave=3Dall, meaning that
+> > > > > > tcp_hashinfo.ehash_locks gets hash dispersion on all nodes.
+> > > > > >
+> > > > > > Tested:
+> > > > > >
+> > > > > > lack5:~# grep inet_ehash_locks_alloc /proc/vmallocinfo
+> > > > > > 0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_locks_=
+alloc+0x90/0x100 pages=3D16 vmalloc N0=3D2 N1=3D3 N2=3D3 N3=3D3 N4=3D3 N5=
+=3D2
+> > > > > >
+> > > > > > lack5:~# echo 8192 >/proc/sys/net/ipv4/tcp_child_ehash_entries
+> > > > > > lack5:~# numactl --interleave=3Dall unshare -n bash -c "grep in=
+et_ehash_locks_alloc /proc/vmallocinfo"
+> > > > > > 0x000000004e99d30c-0x00000000763f3279   36864 inet_ehash_locks_=
+alloc+0x90/0x100 pages=3D8 vmalloc N0=3D1 N1=3D2 N2=3D2 N3=3D1 N4=3D1 N5=3D=
+1
+> > > > > > 0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_locks_=
+alloc+0x90/0x100 pages=3D16 vmalloc N0=3D2 N1=3D3 N2=3D3 N3=3D3 N4=3D3 N5=
+=3D2
+> > > > > >
+> > > > > > lack5:~# numactl --interleave=3D0,5 unshare -n bash -c "grep in=
+et_ehash_locks_alloc /proc/vmallocinfo"
+> > > > > > 0x00000000fd73a33e-0x0000000004b9a177   36864 inet_ehash_locks_=
+alloc+0x90/0x100 pages=3D8 vmalloc N0=3D4 N5=3D4
+> > > > > > 0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_locks_=
+alloc+0x90/0x100 pages=3D16 vmalloc N0=3D2 N1=3D3 N2=3D3 N3=3D3 N4=3D3 N5=
+=3D2
+> > > > > >
+> > > > > > lack5:~# echo 1024 >/proc/sys/net/ipv4/tcp_child_ehash_entries
+> > > > > > lack5:~# numactl --interleave=3Dall unshare -n bash -c "grep in=
+et_ehash_locks_alloc /proc/vmallocinfo"
+> > > > > > 0x00000000db07d7a2-0x00000000ad697d29    8192 inet_ehash_locks_=
+alloc+0x90/0x100 pages=3D1 vmalloc N2=3D1
+> > > > > > 0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_locks_=
+alloc+0x90/0x100 pages=3D16 vmalloc N0=3D2 N1=3D3 N2=3D3 N3=3D3 N4=3D3 N5=
+=3D2
+> > > > > >
+> > > > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > > > >
+> > > > > Tested-by: Jason Xing <kerneljasonxing@gmail.com>
+> > > >
+> > > > Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > > >
+> > > >
+> > > > >
+> > > > > > ---
+> > > > > >  net/ipv4/inet_hashtables.c | 37 ++++++++++++++++++++++++++----=
+-------
+> > > > > >  1 file changed, 26 insertions(+), 11 deletions(-)
+> > > > > >
+> > > > > > diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtab=
+les.c
+> > > > > > index 9bfcfd016e18275fb50fea8d77adc8a64fb12494..2b4a588247639e0=
+c7b2e70d1fc9b3b9b60256ef7 100644
+> > > > > > --- a/net/ipv4/inet_hashtables.c
+> > > > > > +++ b/net/ipv4/inet_hashtables.c
+> > > > > > @@ -1230,22 +1230,37 @@ int inet_ehash_locks_alloc(struct inet_=
+hashinfo *hashinfo)
+> > > > > >  {
+> > > > > >         unsigned int locksz =3D sizeof(spinlock_t);
+> > > > > >         unsigned int i, nblocks =3D 1;
+> > > > > > +       spinlock_t *ptr =3D NULL;
+> > > > > >
+> > > > > > -       if (locksz !=3D 0) {
+> > > > > > -               /* allocate 2 cache lines or at least one spinl=
+ock per cpu */
+> > > > > > -               nblocks =3D max(2U * L1_CACHE_BYTES / locksz, 1=
+U);
+> > > > > > -               nblocks =3D roundup_pow_of_two(nblocks * num_po=
+ssible_cpus());
+> > > > > > +       if (locksz =3D=3D 0)
+> > > > > > +               goto set_mask;
+> > > > > >
+> > > > > > -               /* no more locks than number of hash buckets */
+> > > > > > -               nblocks =3D min(nblocks, hashinfo->ehash_mask +=
+ 1);
+> > > > > > +       /* Allocate 2 cache lines or at least one spinlock per =
+cpu. */
+> > > > > > +       nblocks =3D max(2U * L1_CACHE_BYTES / locksz, 1U) * num=
+_possible_cpus();
+> > > > > >
+> > > > > > -               hashinfo->ehash_locks =3D kvmalloc_array(nblock=
+s, locksz, GFP_KERNEL);
+> > > > > > -               if (!hashinfo->ehash_locks)
+> > > > > > -                       return -ENOMEM;
+> > > > > > +       /* At least one page per NUMA node. */
+> > > > > > +       nblocks =3D max(nblocks, num_online_nodes() * PAGE_SIZE=
+ / locksz);
+> > > > > > +
+> > > > > > +       nblocks =3D roundup_pow_of_two(nblocks);
+> > > > > > +
+> > > > > > +       /* No more locks than number of hash buckets. */
+> > > > > > +       nblocks =3D min(nblocks, hashinfo->ehash_mask + 1);
+> > > > > >
+> > > > > > -               for (i =3D 0; i < nblocks; i++)
+> > > > > > -                       spin_lock_init(&hashinfo->ehash_locks[i=
+]);
+> > > > > > +       if (num_online_nodes() > 1) {
+> > > > > > +               /* Use vmalloc() to allow NUMA policy to spread=
+ pages
+> > > > > > +                * on all available nodes if desired.
+> > > > > > +                */
+> > > > > > +               ptr =3D vmalloc_array(nblocks, locksz);
+> > > > >
+> > > > > I wonder if at this point the memory shortage occurs, is it neces=
+sary
+> > > > > to fall back to kvmalloc() later
+> > > >
+> > > > If ptr is NULL here, kvmalloc_array() is called below.
+> > >
+> > > My point is why not return with -ENOMEM directly? Or else It looks me=
+aningless.
+> > >
+> >
+> > Ah, I misread.  I'm not sure how likely such a case happens, but I
+> > think vmalloc() and kmalloc() failure do not always correlate, the
+> > former uses node_alloc() and the latter use the page allocator.
+>
+> Sure, it is unlikely to happen.
+>
+> As to memory allocation, we usually try kmalloc() for less than page
+> size memory allocation while vmalloc() for larger one. The same logic
+> can be seen in kvmalloc(): try kmalloc() first, then fall back to
+> vmalloc(). Since we fail to allocate non-contiguous memory, there is
+> no need to try kvmalloc() (which will call kmalloc and vmalloc one
+> more round).
 
-It also makes test_{v4 | v6 | tcp} sending large size packets. this may
-help to check whether multi-buffer is working or not.
+I chose to not add code, because:
 
-Note that the physical interface may be down and then up when xdp is
-attached or detached.
-This takes some period to activate traffic. So sleep(10) is
-added if the test interface is the physical interface.
-netdevsim and veth type interfaces skip sleep.
+       if (num_online_nodes() > 1) {
+               /* Use vmalloc() to allow NUMA policy to spread pages
+                * on all available nodes if desired.
+                */
+               ptr =3D vmalloc_array(nblocks, locksz);
 
-Signed-off-by: Taehee Yoo <ap420073@gmail.com>
----
+<< adding here a test is pointless, we already have correct code if
+ptr =3D=3D NULLL >>
 
-v2:
- - Patch added.
+       }
+       if (!ptr) {
+               ptr =3D kvmalloc_array(nblocks, locksz, GFP_KERNEL);
+               if (!ptr)
+                       return -ENOMEM;
+        }
 
- tools/testing/selftests/drivers/net/ping.py   | 200 ++++++++++++++++--
- .../testing/selftests/net/lib/xdp_dummy.bpf.c |   6 +
- 2 files changed, 191 insertions(+), 15 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/ping.py b/tools/testing/selftests/drivers/net/ping.py
-index eb83e7b48797..93f4b411b378 100755
---- a/tools/testing/selftests/drivers/net/ping.py
-+++ b/tools/testing/selftests/drivers/net/ping.py
-@@ -1,49 +1,219 @@
- #!/usr/bin/env python3
- # SPDX-License-Identifier: GPL-2.0
- 
-+import os
-+import random, string, time
- from lib.py import ksft_run, ksft_exit
--from lib.py import ksft_eq
--from lib.py import NetDrvEpEnv
-+from lib.py import ksft_eq, KsftSkipEx, KsftFailEx
-+from lib.py import EthtoolFamily, NetDrvEpEnv
- from lib.py import bkg, cmd, wait_port_listen, rand_port
-+from lib.py import ethtool, ip
- 
-+remote_ifname=""
-+no_sleep=False
- 
--def test_v4(cfg) -> None:
-+def _test_v4(cfg) -> None:
-     cfg.require_v4()
- 
-     cmd(f"ping -c 1 -W0.5 {cfg.remote_v4}")
-     cmd(f"ping -c 1 -W0.5 {cfg.v4}", host=cfg.remote)
-+    cmd(f"ping -s 65000 -c 1 -W0.5 {cfg.remote_v4}")
-+    cmd(f"ping -s 65000 -c 1 -W0.5 {cfg.v4}", host=cfg.remote)
- 
--
--def test_v6(cfg) -> None:
-+def _test_v6(cfg) -> None:
-     cfg.require_v6()
- 
--    cmd(f"ping -c 1 -W0.5 {cfg.remote_v6}")
--    cmd(f"ping -c 1 -W0.5 {cfg.v6}", host=cfg.remote)
--
-+    cmd(f"ping -c 1 -W5 {cfg.remote_v6}")
-+    cmd(f"ping -c 1 -W5 {cfg.v6}", host=cfg.remote)
-+    cmd(f"ping -s 65000 -c 1 -W0.5 {cfg.remote_v6}")
-+    cmd(f"ping -s 65000 -c 1 -W0.5 {cfg.v6}", host=cfg.remote)
- 
--def test_tcp(cfg) -> None:
-+def _test_tcp(cfg) -> None:
-     cfg.require_cmd("socat", remote=True)
- 
-     port = rand_port()
-     listen_cmd = f"socat -{cfg.addr_ipver} -t 2 -u TCP-LISTEN:{port},reuseport STDOUT"
- 
-+    test_string = ''.join(random.choice(string.ascii_lowercase) for _ in range(65536))
-     with bkg(listen_cmd, exit_wait=True) as nc:
-         wait_port_listen(port)
- 
--        cmd(f"echo ping | socat -t 2 -u STDIN TCP:{cfg.baddr}:{port}",
-+        cmd(f"echo {test_string} | socat -t 2 -u STDIN TCP:{cfg.baddr}:{port}",
-             shell=True, host=cfg.remote)
--    ksft_eq(nc.stdout.strip(), "ping")
-+    ksft_eq(nc.stdout.strip(), test_string)
- 
-+    test_string = ''.join(random.choice(string.ascii_lowercase) for _ in range(65536))
-     with bkg(listen_cmd, host=cfg.remote, exit_wait=True) as nc:
-         wait_port_listen(port, host=cfg.remote)
- 
--        cmd(f"echo ping | socat -t 2 -u STDIN TCP:{cfg.remote_baddr}:{port}", shell=True)
--    ksft_eq(nc.stdout.strip(), "ping")
--
-+        cmd(f"echo {test_string} | socat -t 2 -u STDIN TCP:{cfg.remote_baddr}:{port}", shell=True)
-+    ksft_eq(nc.stdout.strip(), test_string)
-+
-+def _set_offload_checksum(cfg, netnl, on) -> None:
-+    try:
-+        ethtool(f" -K {cfg.ifname} rx {on} tx {on} ")
-+    except:
-+        return
-+
-+def _set_xdp_generic_sb_on(cfg) -> None:
-+    test_dir = os.path.dirname(os.path.realpath(__file__))
-+    prog = test_dir + "/../../net/lib/xdp_dummy.bpf.o"
-+    cmd(f"ip link set dev {remote_ifname} mtu 1500", shell=True, host=cfg.remote)
-+    cmd(f"ip link set dev {cfg.ifname} mtu 1500 xdpgeneric obj {prog} sec xdp", shell=True)
-+
-+    if no_sleep != True:
-+        time.sleep(10)
-+
-+def _set_xdp_generic_mb_on(cfg) -> None:
-+    test_dir = os.path.dirname(os.path.realpath(__file__))
-+    prog = test_dir + "/../../net/lib/xdp_dummy.bpf.o"
-+    cmd(f"ip link set dev {remote_ifname} mtu 9000", shell=True, host=cfg.remote)
-+    ip("link set dev %s mtu 9000 xdpgeneric obj %s sec xdp.frags" % (cfg.ifname, prog))
-+
-+    if no_sleep != True:
-+        time.sleep(10)
-+
-+def _set_xdp_native_sb_on(cfg) -> None:
-+    test_dir = os.path.dirname(os.path.realpath(__file__))
-+    prog = test_dir + "/../../net/lib/xdp_dummy.bpf.o"
-+    cmd(f"ip link set dev {remote_ifname} mtu 1500", shell=True, host=cfg.remote)
-+    cmd(f"ip -j link set dev {cfg.ifname} mtu 1500 xdp obj {prog} sec xdp", shell=True)
-+    xdp_info = ip("-d link show %s" % (cfg.ifname), json=True)[0]
-+    if xdp_info['xdp']['mode'] != 1:
-+        """
-+        If the interface doesn't support native-mode, it falls back to generic mode.
-+        The mode value 1 is native and 2 is generic.
-+        So it raises an exception if mode is not 1(native mode).
-+        """
-+        raise KsftSkipEx('device does not support native-XDP')
-+
-+    if no_sleep != True:
-+        time.sleep(10)
-+
-+def _set_xdp_native_mb_on(cfg) -> None:
-+    test_dir = os.path.dirname(os.path.realpath(__file__))
-+    prog = test_dir + "/../../net/lib/xdp_dummy.bpf.o"
-+    cmd(f"ip link set dev {remote_ifname} mtu 9000", shell=True, host=cfg.remote)
-+    try:
-+        cmd(f"ip link set dev {cfg.ifname} mtu 9000 xdp obj {prog} sec xdp.frags", shell=True)
-+    except Exception as e:
-+        cmd(f"ip link set dev {remote_ifname} mtu 1500", shell=True, host=cfg.remote)
-+        raise KsftSkipEx('device does not support native-multi-buffer XDP')
-+
-+    if no_sleep != True:
-+        time.sleep(10)
-+
-+def _set_xdp_offload_on(cfg) -> None:
-+    test_dir = os.path.dirname(os.path.realpath(__file__))
-+    prog = test_dir + "/../../net/lib/xdp_dummy.bpf.o"
-+    cmd(f"ip link set dev {cfg.ifname} mtu 1500", shell=True)
-+    try:
-+        cmd(f"ip link set dev {cfg.ifname} xdpoffload obj {prog} sec xdp", shell=True)
-+    except Exception as e:
-+        raise KsftSkipEx('device does not support offloaded XDP')
-+    cmd(f"ip link set dev {remote_ifname} mtu 1500", shell=True, host=cfg.remote)
-+
-+    if no_sleep != True:
-+        time.sleep(10)
-+
-+def get_interface_info(cfg) -> None:
-+    global remote_ifname
-+    global no_sleep
-+
-+    remote_info = cmd(f"ip -4 -o addr show to {cfg.remote_v4} | awk '{{print $2}}'", shell=True, host=cfg.remote).stdout
-+    remote_ifname = remote_info.rstrip('\n')
-+    if remote_ifname == "":
-+        raise KsftFailEx('Can not get remote interface')
-+    local_info = ip("-d link show %s" % (cfg.ifname), json=True)[0]
-+    if 'parentbus' in local_info and local_info['parentbus'] == "netdevsim":
-+        no_sleep=True
-+    if 'linkinfo' in local_info and local_info['linkinfo']['info_kind'] == "veth":
-+        no_sleep=True
-+
-+def set_interface_init(cfg) -> None:
-+    cmd(f"ip link set dev {cfg.ifname} mtu 1500", shell=True)
-+    cmd(f"ip link set dev {cfg.ifname} xdp off ", shell=True)
-+    cmd(f"ip link set dev {cfg.ifname} xdpgeneric off ", shell=True)
-+    cmd(f"ip link set dev {cfg.ifname} xdpoffload off", shell=True)
-+    cmd(f"ip link set dev {remote_ifname} mtu 1500", shell=True, host=cfg.remote)
-+
-+def test_default(cfg, netnl) -> None:
-+    _set_offload_checksum(cfg, netnl, "off")
-+    _test_v4(cfg)
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+    _set_offload_checksum(cfg, netnl, "on")
-+    _test_v4(cfg)
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+
-+def test_xdp_generic_sb(cfg, netnl) -> None:
-+    _set_xdp_generic_sb_on(cfg)
-+    _set_offload_checksum(cfg, netnl, "off")
-+    _test_v4(cfg)
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+    _set_offload_checksum(cfg, netnl, "on")
-+    _test_v4(cfg)
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+    ip("link set dev %s xdpgeneric off" % cfg.ifname)
-+
-+def test_xdp_generic_mb(cfg, netnl) -> None:
-+    _set_xdp_generic_mb_on(cfg)
-+    _set_offload_checksum(cfg, netnl, "off")
-+    _test_v4(cfg)
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+    _set_offload_checksum(cfg, netnl, "on")
-+    _test_v4(cfg)
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+    ip("link set dev %s xdpgeneric off" % cfg.ifname)
-+
-+def test_xdp_native_sb(cfg, netnl) -> None:
-+    _set_xdp_native_sb_on(cfg)
-+    _set_offload_checksum(cfg, netnl, "off")
-+    _test_v4(cfg)
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+    _set_offload_checksum(cfg, netnl, "on")
-+    _test_v4(cfg)
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+    ip("link set dev %s xdp off" % cfg.ifname)
-+
-+def test_xdp_native_mb(cfg, netnl) -> None:
-+    _set_xdp_native_mb_on(cfg)
-+    _set_offload_checksum(cfg, netnl, "off")
-+    _test_v4(cfg)
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+    _set_offload_checksum(cfg, netnl, "on")
-+    _test_v4(cfg)
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+    ip("link set dev %s xdp off" % cfg.ifname)
-+
-+def test_xdp_offload(cfg, netnl) -> None:
-+    _set_xdp_offload_on(cfg)
-+    _test_v4(cfg)
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+    ip("link set dev %s xdpoffload off" % cfg.ifname)
- 
- def main() -> None:
-     with NetDrvEpEnv(__file__) as cfg:
--        ksft_run(globs=globals(), case_pfx={"test_"}, args=(cfg, ))
-+        get_interface_info(cfg)
-+        set_interface_init(cfg)
-+        ksft_run([test_default,
-+                  test_xdp_generic_sb,
-+                  test_xdp_generic_mb,
-+                  test_xdp_native_sb,
-+                  test_xdp_native_mb,
-+                  test_xdp_offload],
-+                 args=(cfg, EthtoolFamily()))
-+        set_interface_init(cfg)
-     ksft_exit()
- 
- 
-diff --git a/tools/testing/selftests/net/lib/xdp_dummy.bpf.c b/tools/testing/selftests/net/lib/xdp_dummy.bpf.c
-index d988b2e0cee8..e73fab3edd9f 100644
---- a/tools/testing/selftests/net/lib/xdp_dummy.bpf.c
-+++ b/tools/testing/selftests/net/lib/xdp_dummy.bpf.c
-@@ -10,4 +10,10 @@ int xdp_dummy_prog(struct xdp_md *ctx)
- 	return XDP_PASS;
- }
- 
-+SEC("xdp.frags")
-+int xdp_dummy_prog_frags(struct xdp_md *ctx)
-+{
-+	return XDP_PASS;
-+}
-+
- char _license[] SEC("license") = "GPL";
--- 
-2.34.1
-
+Sure, this could be written in a different way, but ultimately it is a
+matter of taste.
 
