@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-172318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 080A3A5434E
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 08:10:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BA05A5436B
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 08:15:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 19C9C7A5FF0
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 07:09:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 304EE189526E
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 07:15:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5480A1C5F2C;
-	Thu,  6 Mar 2025 07:09:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECB711C8602;
+	Thu,  6 Mar 2025 07:15:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PCipHMVs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rGGZAxkd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 246101AB6D4;
-	Thu,  6 Mar 2025 07:09:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCEF21A5B9C;
+	Thu,  6 Mar 2025 07:15:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741244992; cv=none; b=dzv3atduTfFhn89wOovWuNYQoOND/U2Z2to5TGezADDerhB7Su7KjVF5SpT1cRnYuoBdCJV1emb0kMGAYjnhiAxptXbuuQhTJC4xGOVXRtkqgR34ZOjeL/snV7VZduslSXTWTU8a3vRZ4mes5TUKpixh/Rmsn8cqGNbYGyHrU6A=
+	t=1741245306; cv=none; b=gRen1o/GHHvws2/SP1OFFNtkTMGM6fCt73FmN/mpSrJ0YjV7C8OBa0B5P9gq40LdHc62AcrEWXT/RuRKvnL6U7xantlHjOeWcXOCeiGer4Wd4Q97+Phb0WHjxM0X18AfqHjohYRo0rX7MnJ90MapBvmYvxLeIjByGIYHBngfVYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741244992; c=relaxed/simple;
-	bh=EP/2OzblPB5fEA8S496jYOnDzsVwjUYkXmbBY2uXZQU=;
+	s=arc-20240116; t=1741245306; c=relaxed/simple;
+	bh=XJIMiL0K7y9DfdSjMQIYYyq4R6d3/GrM2ZzC9MoWLtE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sDHinfvvZJh4UGPmzhDTd/15CwSujkFyXDbtNyH/vswKUiECXOw/7Nb2+eeJInohDgwYqEgFGlolPM7tU7/M3c02O+7rACgs3UMNp/0gTibe1vjC5j9mFpbwkJFb09SLYXKAZCP9SCTDLaY4x2uQicxLdHItzEQS9dWQ7Yg320k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PCipHMVs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46444C4CEE4;
-	Thu,  6 Mar 2025 07:09:43 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=eGNE5UqRVuxL9KQvAGCPDZO/cSy6l5vHf759pGJCpXSCBp/VLa47hfou4Mv3Gdcpuy5u05LMPuKxwCUDryXX5s7t5bHCkrlyTmvf07MEeCCqHENATdAc86fT1Embg8PgsLllf66Vnt4u1SqL36puDOUvWdlOR6EJ/Qi/rKAoyRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rGGZAxkd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D799BC4CEE4;
+	Thu,  6 Mar 2025 07:14:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741244990;
-	bh=EP/2OzblPB5fEA8S496jYOnDzsVwjUYkXmbBY2uXZQU=;
+	s=k20201202; t=1741245306;
+	bh=XJIMiL0K7y9DfdSjMQIYYyq4R6d3/GrM2ZzC9MoWLtE=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=PCipHMVs2wDZAx5qquTkBOjLYgWz00kvpXPyIsybNOpVGDhDuqxtIagPpo59lbZY/
-	 +Uo3BFyy/+ucaSG5q597z9Oh5y9hxZ2sytozQiP4gE96PNdkytAxCtMQNN5rwza7Gk
-	 0krjuDiXfI0/SfZj+KBidbi+jgVeoIfzytD3OmAN/NzEhQGhRXB8jN+AHilmiXn5uw
-	 R1MRSGvkcC4gna8Jn33tVgupvmg4BjFAO80SX+KOjbAxHUh7LDjcaBRhe7eYO+d95u
-	 4UvuxL4dpn5h+mW+7dMnYGaeB2gyIsWxpCjefdPsJhb/m264z6D/Uqn5MQ+tBV+mCp
-	 bWYASCeptYutg==
-Message-ID: <041d55fd-99f0-4b55-92e5-fa46f37096c1@kernel.org>
-Date: Thu, 6 Mar 2025 08:09:40 +0100
+	b=rGGZAxkdmlz6aMntaSvaqI4j3yzPHU5IubqOr17HjUV5BZIFiGw1pW9x+HaQbm2zp
+	 RhJpygD79AduGVYNKtgTt9rw0sE8mmGUyfjI5slL2DpWq7vWp/uZ5ABoLAlj1Xsrey
+	 C54JQo5dxQjnAPUfDiO8H9FZumDU7UBapMkUxkYCshX1O7knY0TdlfK1wDxs/Nluby
+	 6TBWOJY9B6xy+mirOTMsCkGYNoMk2XHRWVcyhjlG2xiQoTJOSW6Psxd8GgCcVcFwb/
+	 IwCModRptWQf3ijiAFzN8stVqoHBg5bdbc+UDZ8bHdd/Xz4OMn6rLrtTmIcrMKFd+U
+	 v/5Jl6Oa3af2A==
+Message-ID: <789ecb2f-dddc-491b-b9f8-5fb89058fd1b@kernel.org>
+Date: Thu, 6 Mar 2025 08:14:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,7 +50,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 0/2] net: stmmac: dwc-qos: Add FSD EQoS support
+Subject: Re: [PATCH v8 1/2] dt-bindings: net: Add FSD EQoS device tree
+ bindings
 To: Swathi K S <swathi.ks@samsung.com>, krzk+dt@kernel.org,
  andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
  kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, conor+dt@kernel.org,
@@ -59,10 +60,10 @@ To: Swathi K S <swathi.ks@samsung.com>, krzk+dt@kernel.org,
 Cc: rmk+kernel@armlinux.org.uk, netdev@vger.kernel.org,
  devicetree@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
  linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- pankaj.dubey@samsung.com, ravi.patel@samsung.com, gost.dev@samsung.com,
- tools@linux.kernel.org
-References: <CGME20250305091845epcas5p1689eda3ba03572377997897271636cfd@epcas5p1.samsung.com>
- <20250305091246.106626-1-swathi.ks@samsung.com>
+ pankaj.dubey@samsung.com, ravi.patel@samsung.com, gost.dev@samsung.com
+References: <20250305091246.106626-1-swathi.ks@samsung.com>
+ <CGME20250305091852epcas5p18a0853e85a5ed3d36d5d42ef89735ca6@epcas5p1.samsung.com>
+ <20250305091246.106626-2-swathi.ks@samsung.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -108,33 +109,26 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20250305091246.106626-1-swathi.ks@samsung.com>
+In-Reply-To: <20250305091246.106626-2-swathi.ks@samsung.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 05/03/2025 10:12, Swathi K S wrote:
-> FSD platform has two instances of EQoS IP, one is in FSYS0 block and
-> another one is in PERIC block. This patch series add required DT binding
-> and platform driver specific changes for the same.
+> Add FSD Ethernet compatible in Synopsys dt-bindings document. Add FSD
+> Ethernet YAML schema to enable the DT validation.
 > 
-> Changes since v1:
-> 1. Updated dwc_eqos_setup_rxclock() function as per the review comments
-> given by Andrew.
+> Signed-off-by: Pankaj Dubey <pankaj.dubey@samsung.com>
+> Signed-off-by: Ravi Patel <ravi.patel@samsung.com>
+> Signed-off-by: Swathi K S <swathi.ks@samsung.com>
+> ---
+>  .../devicetree/bindings/net/snps,dwmac.yaml   |   5 +-
+>  .../bindings/net/tesla,fsd-ethqos.yaml        | 118 ++++++++++++++++++
+>  2 files changed, 121 insertions(+), 2 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/net/tesla,fsd-ethqos.yaml
 > 
-Please stop referencing some other threads in your email headers via
-"References". This is neither necessary nor helping our tools. I can
-never compare your patches because this makes b4 busy 100%:
 
-b4 diff -C '<20250305091246.106626-2-swathi.ks@samsung.com>'
-Grabbing thread from
-lore.kernel.org/all/20250305091246.106626-2-swathi.ks@samsung.com/t.mbox.gz
-Checking for older revisions
-  Added from v7: 3 patches
----
-Analyzing 86 messages in the thread
-Preparing fake-am for v7: dt-bindings: net: Add FSD EQoS device tree
-bindings
-<never ends, 100% CPU>
+I tried and did not see any differences, so point me exactly to any
+difference in the binding (binding!) which would justify dropping review?
 
 Best regards,
 Krzysztof
