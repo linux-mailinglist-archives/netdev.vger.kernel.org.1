@@ -1,190 +1,130 @@
-Return-Path: <netdev+bounces-172611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8576A5586B
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 22:12:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70FB5A55876
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 22:13:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 531987A2764
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 21:11:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA71F18952CF
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 21:13:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E330B207E1C;
-	Thu,  6 Mar 2025 21:12:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA6C02063EB;
+	Thu,  6 Mar 2025 21:13:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JfJ8B+6I"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AHEjWPx2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC3E129CF0
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 21:12:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281C51FFC47
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 21:13:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741295535; cv=none; b=lWecQgk3+3VhWPwf+PzqyMNyPtd6jI6TJfPopJtehg5RQ2NrRiIN9MIRHbhMwqgAVd4ntrogJMTdfJa3qYB9puhZ0B7Fn10BidzGVdCWn6oPv3RNtd9T3UNJbO9RtXRWaUg7nzhbRz/ITrF3/e50fF6YHvEMLbkh2QOAGamHgQY=
+	t=1741295619; cv=none; b=Cw3zU3A4T4AP16JibJVgORhVyHLt30b33KLY2k0hGwVHENXs1hpRozYThUSXK05wbr83PJDLKROnGhZIwCn10ZUsab+7QKd6XU/0mpFFNB2EJY0ekBgYJ/Cw9ypdMjQmp3G8FB9g8tHVldWasqHJTjgz21cepezDzOFIpUURl4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741295535; c=relaxed/simple;
-	bh=noFQI/+OKpviQdrTCdYtve+C4IwhM2qGT9hoSqN6Ct4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W7TjunAg5ZcJP65mABWaBVhxFItT31Agy/08BG2ANxwhs0prcOqr9PZIlz8LOJsP4TT7CRxbYqOpsUuB5gWj9G063dJttFr7bhA94ERWv0CZiwS2Z84we2gMyYYw1Kd167DKCRkAU0qRbgqd/Zx+HVtTKxE6FNplMOXpCa6n2Zs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JfJ8B+6I; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741295534; x=1772831534;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=noFQI/+OKpviQdrTCdYtve+C4IwhM2qGT9hoSqN6Ct4=;
-  b=JfJ8B+6IBVRmluHAASnYgjQ3/DsKc95g3fEhdtd+iAq7bYX35f2djXdq
-   MfSkDlbaZnPe+RnoYO3C18Hx2ecpQsWv9ksF1yBas95oySdIL7hwsZNMd
-   jzyRlu9tNtSXfxnLI9VrbSLS8VxfZGFqXtXt4bXk8+wVcC3wt0wLmmro0
-   KQqcyGHBy4+Ge1w9fn8OGK0k1QtyfS5LjtcF/ISEA1jCs3EL/visdWdac
-   H4UTykJP7NGTDK+g560n2cdZZhh8QHytUqmCj7bP5Zi4a3YVUfgBpOSZI
-   bum1cbb8eLWQMQBaKx5ZY8pc8NKR0mbaDSOUMdBK057kXtCzCsGFW2u7e
-   A==;
-X-CSE-ConnectionGUID: BLQeHzWhQDel78ds+iKgAQ==
-X-CSE-MsgGUID: fLbvxk99REe+Bj6uMR+gLw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="42216584"
-X-IronPort-AV: E=Sophos;i="6.14,227,1736841600"; 
-   d="scan'208";a="42216584"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2025 13:12:13 -0800
-X-CSE-ConnectionGUID: jZSwRtcrRz+PTJPfqc0PVQ==
-X-CSE-MsgGUID: Dqu0o1ViRrGZHJXoyU6daA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,227,1736841600"; 
-   d="scan'208";a="149932957"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orviesa002.jf.intel.com with ESMTP; 06 Mar 2025 13:12:10 -0800
-Received: from pkitszel-desk.intel.com (unknown [10.245.246.184])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 5845432ED3;
-	Thu,  6 Mar 2025 21:12:07 +0000 (GMT)
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: netdev@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Karol Kolacinski <karol.kolacinski@intel.com>,
-	Grzegorz Nitka <grzegorz.nitka@intel.com>,
-	Michal Schmidt <mschmidt@redhat.com>,
-	Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-Subject: [PATCH iwl-next] ice: use DSN instead of PCI BDF for ice_adapter index
-Date: Thu,  6 Mar 2025 22:11:46 +0100
-Message-ID: <20250306211159.3697-2-przemyslaw.kitszel@intel.com>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1741295619; c=relaxed/simple;
+	bh=7vBiwYGcBRfFpGS24BZEqxXbgGRgHQCVAy8id2b2oLU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dLishSbJsj/WAcJPBtnnnQ8sbpK/0nU+1eN1oJYph9foFVfs2kjaDseDC+j4EcxZ0I6Aaka+c2SNusfAzOyEg3U/KeVKCQtaSl/+bN/t1WohLuDF8IIGW+lANThIGh5J7qsPBmqzbGSdRdHywc0YRIlfc27XxckKK0VlfIjd6gA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AHEjWPx2; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-391211ea598so845638f8f.1
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 13:13:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741295616; x=1741900416; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=z3ZWdCBYRo/mCB5K2mT13CwcgIhXabRyTEGjOq9drwA=;
+        b=AHEjWPx2l27EFx08dVMuIQYS0+w0AxhiBkETmfDo1xuqBJNCXacu3/+bLkpptA9uY1
+         JJ1IG1NzrXQv7feFhWVMk6Wq2z9hvarWJCeFqjqgv30PfJBJhPTkctmCPccGX0SE4Rm1
+         o76n/OrNNTBYuXhTqxtHYs+xTDfJBvTCkZKRBUyGIfQmTcwAbbxIBimnP50qIZsGTgVX
+         zDurmqv+PXgFxOwDdSdd4Nf8hnKXY4JM9JCwJIy6RWKZUzNEmjwXYVpNP4pDePm/wPAv
+         3S6hpCmpy4H41JMsg296driG3fNi+WQ5os6KjnDrQJTWppKT59EX3to8sXi1+32B/XAk
+         npsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741295616; x=1741900416;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=z3ZWdCBYRo/mCB5K2mT13CwcgIhXabRyTEGjOq9drwA=;
+        b=BBepgLDL2wqXvOSBxSettZj66V9hvlNv1YPrgWJ7pBpq3FJOtkyiK9zu1085azO1as
+         qBwGg0PUoOTvEGNz56kY4icRHk4xBuzKEj7nKEeUkYksbG++v1oebCA5BvTZWXj3g7ov
+         wS7lN2nOaOUTSfLj+uPnr5oYtSaV6bw/xUampmVxLSv8mL1PWWDT05vtFPGhXYid03al
+         8NY6xZrXkzF/yzr1It0JS4J2fhJnfsXODRf95KQX5SPl19bb+fz1njE4u5VCblvJqThU
+         QuttnfL3BoInIk/E9zYSDRrR+TDjZhiH6ayMF8LyMTUhBp1sc8HiyIYZ04GOVcEH4YXp
+         k4Hw==
+X-Forwarded-Encrypted: i=1; AJvYcCXZgullJ0QCGwIixW3f0afsE8Z//s9jjLXL1ZtfHrAgm+iarqJkswBAOF2uh+P0w8ZHgqF19/A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyrrIsxCVDpyIhDWi190ysPj4XgET7z2gONgRbEKMAJghY0/z9Z
+	BZOQZ8RhO1yAj8gHrwyQqm93V+aRC1pMsPsJ7jxhtAi2j68zwtyl
+X-Gm-Gg: ASbGncus3PaYESvM4KoPDCgW4qRwf7DpAYXOX8eOVNIJPd6MsQim6Z2lyxoaskxGHu8
+	4iu1tZHWuLM3ifa2eFAtOXFJGEoAFwqhXTI5bNMiX3IICCd3ua3JqI+3cXHrx3fY8ccUH9Q76V3
+	P4FsM/eI29nnMKk3nbBj0zFFNaAxvg1C4ULoGz+BbbWG6BWaA4+p3QezW6LWo5h2+S/2Xd9Q9+3
+	vAe+/6vEvR6nrZkMZ/8YdLHd36iac+BP9PSG6clYwbrSsiZaRvUhHVjlr+WWAMdDD91zq49M7qa
+	OhYJevBZ4ADU7DJ/HIRJc69eIgX7+oYdxTiKhHGr/7GEv4NkNg6zcTMEMhlT0C6TiA==
+X-Google-Smtp-Source: AGHT+IH/yEZtSviL5gIy67IldHUv8skW8SR/qCANnl11kjuNXxqrd60cxk+EYS8c4Pie5vy+9K6VNA==
+X-Received: by 2002:a05:6000:18a3:b0:391:2df9:772d with SMTP id ffacd0b85a97d-39132d3bad8mr419368f8f.13.1741295616078;
+        Thu, 06 Mar 2025 13:13:36 -0800 (PST)
+Received: from [172.27.49.130] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c0e1d67sm3129366f8f.74.2025.03.06.13.13.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Mar 2025 13:13:35 -0800 (PST)
+Message-ID: <6ae56b95-8736-405b-b090-2ecd2e247988@gmail.com>
+Date: Thu, 6 Mar 2025 23:13:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/mlx5: Fill out devlink dev info only for PFs
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+ andrew+netdev@lunn.ch, Gal Pressman <gal@nvidia.com>
+References: <20250303133200.1505-1-jiri@resnulli.us>
+ <53c284be-f435-4945-a8eb-58278bf499ad@gmail.com>
+ <20250305183016.413bda40@kernel.org>
+ <7bb21136-83e8-4eff-b8f7-dc4af70c2199@gmail.com>
+ <20250306113914.036e75ea@kernel.org>
+ <3faf95ef-022a-412e-879d-c6a326f4267a@gmail.com>
+ <20250306123448.189615da@kernel.org>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20250306123448.189615da@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Use Device Serial Number instead of PCI bus/device/function for
-index of struct ice_adapter.
-Functions on the same physical device should point to the very same
-ice_adapter instance.
 
-This is not only simplification, but also fixes things up when PF
-is passed to VM (and thus has a random BDF).
 
-Suggested-by: Jacob Keller <jacob.e.keller@intel.com>
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Suggested-by: Jiri Pirko <jiri@resnulli.us>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
----
-CC: Karol Kolacinski <karol.kolacinski@intel.com>
-CC: Grzegorz Nitka <grzegorz.nitka@intel.com>
-CC: Michal Schmidt <mschmidt@redhat.com>
-CC: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_adapter.h |  4 +--
- drivers/net/ethernet/intel/ice/ice_adapter.c | 29 +++-----------------
- 2 files changed, 6 insertions(+), 27 deletions(-)
+On 06/03/2025 22:34, Jakub Kicinski wrote:
+> On Thu, 6 Mar 2025 22:12:52 +0200 Tariq Toukan wrote:
+>>>     The exact expectations on the response time will vary by subsystem.
+>>>     The patch review SLA the subsystem had set for itself can sometimes
+>>>     be found in the subsystem documentation. Failing that as a rule of thumb
+>>>     reviewers should try to respond quicker than what is the usual patch
+>>>     review delay of the subsystem maintainer. The resulting expectations
+>>>     may range from two working days for fast-paced subsystems (e.g. networking)
+>>
+>> So no less than two working days for any subsystem.
+>> Okay, now this makes more sense.
+> 
+> Could you explain to me why this is a problem for you?
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.h b/drivers/net/ethernet/intel/ice/ice_adapter.h
-index e233225848b3..1935163bd32f 100644
---- a/drivers/net/ethernet/intel/ice/ice_adapter.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adapter.h
-@@ -42,7 +42,7 @@ struct ice_adapter {
- 	struct ice_port_list ports;
- };
- 
--struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev);
--void ice_adapter_put(const struct pci_dev *pdev);
-+struct ice_adapter *ice_adapter_get(struct pci_dev *pdev);
-+void ice_adapter_put(struct pci_dev *pdev);
- 
- #endif /* _ICE_ADAPTER_H */
-diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.c b/drivers/net/ethernet/intel/ice/ice_adapter.c
-index 01a08cfd0090..b668339ed0ef 100644
---- a/drivers/net/ethernet/intel/ice/ice_adapter.c
-+++ b/drivers/net/ethernet/intel/ice/ice_adapter.c
-@@ -1,7 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0-only
- // SPDX-FileCopyrightText: Copyright Red Hat
- 
--#include <linux/bitfield.h>
- #include <linux/cleanup.h>
- #include <linux/mutex.h>
- #include <linux/pci.h>
-@@ -14,29 +13,9 @@
- static DEFINE_XARRAY(ice_adapters);
- static DEFINE_MUTEX(ice_adapters_mutex);
- 
--/* PCI bus number is 8 bits. Slot is 5 bits. Domain can have the rest. */
--#define INDEX_FIELD_DOMAIN GENMASK(BITS_PER_LONG - 1, 13)
--#define INDEX_FIELD_DEV    GENMASK(31, 16)
--#define INDEX_FIELD_BUS    GENMASK(12, 5)
--#define INDEX_FIELD_SLOT   GENMASK(4, 0)
--
--static unsigned long ice_adapter_index(const struct pci_dev *pdev)
-+static unsigned long ice_adapter_index(struct pci_dev *pdev)
- {
--	unsigned int domain = pci_domain_nr(pdev->bus);
--
--	WARN_ON(domain > FIELD_MAX(INDEX_FIELD_DOMAIN));
--
--	switch (pdev->device) {
--	case ICE_DEV_ID_E825C_BACKPLANE:
--	case ICE_DEV_ID_E825C_QSFP:
--	case ICE_DEV_ID_E825C_SFP:
--	case ICE_DEV_ID_E825C_SGMII:
--		return FIELD_PREP(INDEX_FIELD_DEV, pdev->device);
--	default:
--		return FIELD_PREP(INDEX_FIELD_DOMAIN, domain) |
--		       FIELD_PREP(INDEX_FIELD_BUS,    pdev->bus->number) |
--		       FIELD_PREP(INDEX_FIELD_SLOT,   PCI_SLOT(pdev->devfn));
--	}
-+	return (unsigned long)pci_get_dsn(pdev);
- }
- 
- static struct ice_adapter *ice_adapter_new(void)
-@@ -77,7 +56,7 @@ static void ice_adapter_free(struct ice_adapter *adapter)
-  * Return:  Pointer to ice_adapter on success.
-  *          ERR_PTR() on error. -ENOMEM is the only possible error.
-  */
--struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev)
-+struct ice_adapter *ice_adapter_get(struct pci_dev *pdev)
- {
- 	unsigned long index = ice_adapter_index(pdev);
- 	struct ice_adapter *adapter;
-@@ -110,7 +89,7 @@ struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev)
-  *
-  * Context: Process, may sleep.
-  */
--void ice_adapter_put(const struct pci_dev *pdev)
-+void ice_adapter_put(struct pci_dev *pdev)
- {
- 	unsigned long index = ice_adapter_index(pdev);
- 	struct ice_adapter *adapter;
--- 
-2.46.0
+Nothing special about "me" here.
 
+I thought it's obvious. As patches are coming asynchronously, it is not 
+rare to won't be able to respond within a single working day.
+
+This becomes significantly rarer with two consecutive working days.
+
+> You're obviously capable of opening your email client once a day.
+> Are you waiting for QA results or some such?
+
+No. I update when I do.
 
