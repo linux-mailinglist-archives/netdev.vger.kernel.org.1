@@ -1,299 +1,125 @@
-Return-Path: <netdev+bounces-172394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A259A54744
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 11:04:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CDB2A54750
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 11:06:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBFF23AE83A
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:04:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7D83A7A965B
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:03:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6785202F61;
-	Thu,  6 Mar 2025 10:02:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE8BD1F4188;
+	Thu,  6 Mar 2025 10:03:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="NzqatPjf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eL7ogPBm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5302B202C22
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 10:02:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E0B2E64A;
+	Thu,  6 Mar 2025 10:03:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741255378; cv=none; b=jHfWMH47UuEXxfHs7DsvSdrW2ljy5bVM8rlJYVHykv2X5RHxENdgs3snL9/yF9m4YZChuyF0lH8Jfo/VIp7OT9K8NvMAdBBMuiSVsEgYQPaLL0yEkQ+1KXzc39P2VVsMAnusqNqoV+shT5MG4Uipbfpcekmw90gR6SirrnxX+XM=
+	t=1741255434; cv=none; b=nu+TgNMgrJk8+XX69iIDbYihGwH6lm3E6IfKZ/lC+9XDZbqeAJXbW/4JNk2uPOW5PVX1YhzMfuCCVwK0WHtsHnGiRDoWrMRJuu50h9A4EuA/2aDxHheJZuGEbYF/AQSljuxsIfmWjKUS+YbQEHokwZRw8BxjA3laTNcLQY3qCYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741255378; c=relaxed/simple;
-	bh=a8PePnP6Da9TatKC4r183l014uL/MB4JIaip0KYl0eY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C6568ZZ0t0o5j7MVJv1QMkINieuAnltQgUV8fl5xVQw0udZIlIr26QMJ2/0IZBs0OQPmx+50Nh3rqQKQd0NHiP8LQvAhMoH2wBrZVctc9sJnSnycMb8UcnmO75oGq+h6GVy36nJDZaS1+fqTSrNSxDscM0ECMSI3igyqiqG1BM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=NzqatPjf; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5e0813bd105so678082a12.1
-        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 02:02:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1741255374; x=1741860174; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=NjA/0x1ULbdGmJAhtVrbQ19bSfwG1MXXmI+NBV/yxT4=;
-        b=NzqatPjf/88cIsrrdK2V0c9AyyKpREboscok1bxm74kRAG2AuKOuQMBMGtg13ZVtOP
-         m+xKY7PMa3sOxUS+qHFYicBJQfeLVxm8xQ0fHxtfxytkL4sC0vO97uWe8VFYl2o5B/Al
-         DZspDKSISf+79caWhxfOu8nmN8X3uoBmPrqDm90VvWjwXfb5PVzpGJcNUqirhLiUyPdl
-         aDzblB1IBqbhgEKge4nM/+PQC+vibx3mKeP9t+Ek04BAgPMgd3M4bVZzoyDocvGrtgbq
-         ViBDTte4pJdOG2h6AwG3kWuDKZA6hT+GpiyV88uJydK+FuxLg1dJCj6NAv3qNZmrOG7D
-         xcHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741255374; x=1741860174;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NjA/0x1ULbdGmJAhtVrbQ19bSfwG1MXXmI+NBV/yxT4=;
-        b=JU6/g4owupl4zKM8i70i5LAZDBI1ls/IdH/8l0/wuONPiwd/ssKajllQr7BdL5W3+Q
-         WQYihn5GZnvQsT4e7nRfoiIRcmoBaFF/CWo1hR/nNyMgaQWb7OvkO4YS7d0YlcKPclf9
-         lUB6QlZKIoVZFBGq0l4xpyVXa2QcLoqmgjgE2j/5IT3IS0ntDuDdq5mwPvReHCyknNtg
-         1Pfn/fYID+eKNPuM+L1XUj97uzYPLKQIOdvXpoIescGhN8FfxAG3AevF2Nb5FXYF5lEm
-         H7YFSiSlHtuFHRukOza1j/5Yp3+dYZlxwYLH6OwkQAP83MfjJfIyMXeaWEIaq60WqKbQ
-         OUSg==
-X-Gm-Message-State: AOJu0Yz2KHM42o5YOdAi377sa1Dkwz6yGEBhhsWPU+PXVilHkfwfN6Tx
-	e3lU4Fc5Lrmko7DM75SnTO3kO1tFd8Sfudx32RtFR8SCb5r8ldcsrCxh2itP/X4=
-X-Gm-Gg: ASbGncsXFcg8t3oTNQ5S4+GZThmj1dUcWAi0/84sm0AjHMbGieSG3xeJCTi54o+KRVw
-	0h1kgfpw3JdT3Mna9C+/S2FzOfD3aWkNJE4NoZu4OX2R9uxS9K2gau1jxWDaffuAZSugaNt9/JK
-	h/g/trQBqdQzjijNLxkr5jYQAmqs7HEfpPnYLJ/QQd5pE7kBd5kHk+WUvF4nBBzteFI9Gv+e/Gc
-	jqI2v1a2UWcT+ESNcMIK6TQuJEDY042/xwiobDytDPN7XX6fA4E/lTNr36x6dpKFtNw22GY5Gzp
-	jRiGw/TOzRsE1Da6v1UbjUoThdIY+Uvs9DsMubj8yV3c+RbDUkwvWmr/44lwOPimfmlOHxc6PAk
-	LuTvM0UQ=
-X-Google-Smtp-Source: AGHT+IG/MX6Ctc3Sop+bjN6l6wOSX1XkN7zoXS/g0txiaNk9dp7eFWZRrKBRB2smH9x66Qm1lITf3Q==
-X-Received: by 2002:a05:6402:540c:b0:5de:5263:ae79 with SMTP id 4fb4d7f45d1cf-5e59f3d6532mr6189327a12.12.1741255373377;
-        Thu, 06 Mar 2025 02:02:53 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:b199:f7fb:728b:9279? ([2001:67c:2fbc:1:b199:f7fb:728b:9279])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e5c7669fd0sm678988a12.51.2025.03.06.02.02.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Mar 2025 02:02:52 -0800 (PST)
-Message-ID: <e3def5b5-3450-4ad0-aced-fd80af943c31@openvpn.net>
-Date: Thu, 6 Mar 2025 11:02:50 +0100
+	s=arc-20240116; t=1741255434; c=relaxed/simple;
+	bh=Wbtc/VWtrwzW/JVi9BqzKa6DRXsMZV5G0xEJdfogr7g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n75iGnQWlj22S2nbS/9KchTYm5am+kfnLb5qCNCGDX4xW2fqMM2oqbDdHTw8ZtZKXxS+CL6d8fAeUdIwmCy/G09lXbqXq+cKfOxYLI9QfF/Z7BmQnYxwFeweda+SnHblYhTogzSIsm6X/csCjTs4v5DkYww8j/3jphh3fI95k48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eL7ogPBm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5EE8C4CEE0;
+	Thu,  6 Mar 2025 10:03:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741255434;
+	bh=Wbtc/VWtrwzW/JVi9BqzKa6DRXsMZV5G0xEJdfogr7g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eL7ogPBmqNtZhXSP2IlPVYn13/1pqa/WpjYcZRaScouvKdz1xomjpm/Sj20/ICuIH
+	 x6myFplC/GBDhmrOPh0MA5I9tMdR0TMSClxUncPXR7LaBCGt1+c5j+Wz7fLsdzAywj
+	 gXWS/S1Cn6yqreVd99geuhCIFMjj3nsc+zqqxfYkT/3VxOTzQNk/2bRONIWle54j+S
+	 yoeGpSja2USCNPp2aeSbAXP+e5jyCU3RBNkXxtyMegig5uUJqOogPgdwMAArXShMO5
+	 JZTTOIw58PPdJZ3dQXeD9L2lrR5jNgjkVjDwf45K6jepKCHlrtvEyXiU14s0X+n2qq
+	 23kVvHWO+KdMQ==
+Date: Thu, 6 Mar 2025 11:03:51 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Lukas Bulwahn <lbulwahn@redhat.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Lukas Bulwahn <lukas.bulwahn@redhat.com>
+Subject: Re: [PATCH] MAINTAINERS: adjust entry in AIROHA ETHERNET DRIVER
+Message-ID: <Z8lzBx-A3372P8Pv@lore-desk>
+References: <20250306094636.63709-1-lukas.bulwahn@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v21 18/24] ovpn: add support for peer floating
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-References: <20250304-b4-ovpn-tmp-v21-0-d3cbb74bb581@openvpn.net>
- <20250304-b4-ovpn-tmp-v21-18-d3cbb74bb581@openvpn.net> <Z8dIXjwZ3QmiEcd-@hog>
- <9c919407-fb91-48d7-bf2d-8437c2f3f4da@openvpn.net> <Z8gzbz6YjdeGPqgu@hog>
- <cd9df084-8633-49f0-a851-ed2b1c9946d3@openvpn.net> <Z8iCKvIfFaskshlz@hog>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <Z8iCKvIfFaskshlz@hog>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="5lTqbbBiqNaWNbWm"
+Content-Disposition: inline
+In-Reply-To: <20250306094636.63709-1-lukas.bulwahn@redhat.com>
 
-On 05/03/2025 17:56, Sabrina Dubroca wrote:
-> 2025-03-05, 14:14:36 +0100, Antonio Quartulli wrote:
->> On 05/03/2025 12:20, Sabrina Dubroca wrote:
->>> 2025-03-05, 00:19:32 +0100, Antonio Quartulli wrote:
->>>> On 04/03/2025 19:37, Sabrina Dubroca wrote:
->>>>> 2025-03-04, 01:33:48 +0100, Antonio Quartulli wrote:
->>>>>> A peer connected via UDP may change its IP address without reconnecting
->>>>>> (float).
->>>>>
->>>>> Should that trigger a reset of the peer->dst_cache? And same when
->>>>> userspace updates the remote address? Otherwise it seems we could be
->>>>> stuck with a cached dst that cannot reach the peer.
->>>>
->>>> Yeah, that make sense, otherwise ovpn_udpX_output would just try over and
->>>> over to re-use the cached source address (unless it becomes unavailable).
->>>
->>> Not just the source address, the routing entry too. I'm more concerned
->>> about that: trying to reuse a a cached routing entry that was good for
->>> the previous remote address, but not for the new one.
->>>
->>>
->>> [adding your next email]
->>>> I spent some more time thinking about this.
->>>> It makes sense to reset the dst cache when the local address changes, but
->>>> not in case of float (remote address changed).
->>>>
->>>> That's because we always want to first attempt sending packets using the
->>>> address where the remote peer sent the traffic to.
->>>> Should that not work (quite rare), then we have code in ovpn_udpX_output
->>>> that will reset the cache and attempt a different address.
->>>
->>> I don't think the code in ovpn_udpX_output will reset the cache unless
->>> it was made invalid by a system-wide routing table update (see
->>> dst_cache_per_cpu_get).
->>>
->>> 	rt = dst_cache_get_ip4(cache, &fl.saddr);
->>> 	if (rt)
->>> 		goto transmit;
->>> ...
->>> transmit:
->>> 	udp_tunnel_xmit_skb(rt, sk, skb, fl.saddr, fl.daddr, 0,
->>> 			    ip4_dst_hoplimit(&rt->dst), 0, fl.fl4_sport,
->>> 			    fl.fl4_dport, false, sk->sk_no_check_tx);
->>>
->>>
->>> So it seems that as long as dst_cache_get_ip4 gets us a dst (which
->>> AFAIU will happen, unless we did a dst_cache_reset or something else
->>> made the cached dst invalid -- and ovpn's floating/endpoint update
->>> doesn't do that), we'll just use it.
->>
->> Mh yeah, you're right.
->> Then I'll reset the cache also when a float is detected.
-> 
-> Ok, thanks.
-> 
->>>
->>>
->>>>>> +void ovpn_peer_endpoints_update(struct ovpn_peer *peer, struct sk_buff *skb)
->>>>>> +{
->>>>>> +	struct hlist_nulls_head *nhead;
->>>>>> +	struct sockaddr_storage ss;
->>>>>> +	const u8 *local_ip = NULL;
->>>>>> +	struct sockaddr_in6 *sa6;
->>>>>> +	struct sockaddr_in *sa;
->>>>>> +	struct ovpn_bind *bind;
->>>>>> +	size_t salen = 0;
->>>>>> +
->>>>>> +	spin_lock_bh(&peer->lock);
->>>>>> +	bind = rcu_dereference_protected(peer->bind,
->>>>>> +					 lockdep_is_held(&peer->lock));
->>>>>> +	if (unlikely(!bind))
->>>>>> +		goto unlock;
->>>>>> +
->>>>>> +	switch (skb->protocol) {
->>>>>> +	case htons(ETH_P_IP):
->>>>>> +		/* float check */
->>>>>> +		if (unlikely(!ovpn_bind_skb_src_match(bind, skb))) {
->>>>>> +			if (bind->remote.in4.sin_family == AF_INET)
->>>>>> +				local_ip = (u8 *)&bind->local;
->>>>>
->>>>> If I'm reading this correctly, we always reuse the existing local
->>>>> address when we have to re-create the bind, even if it doesn't match
->>>>> the skb? The "local endpoint update" chunk below is doing that, but
->>>>> only if we're keeping the same remote? It'll get updated the next time
->>>>> we receive a packet and call ovpn_peer_endpoints_update.
->>>>>
->>>>> That might irritate the RPF check on the other side, if we still use
->>>>> our "old" source to talk to the new dest?
->>>>>
->>>>>> +			sa = (struct sockaddr_in *)&ss;
->>>>>> +			sa->sin_family = AF_INET;
->>>>>> +			sa->sin_addr.s_addr = ip_hdr(skb)->saddr;
->>>>>> +			sa->sin_port = udp_hdr(skb)->source;
->>>>>> +			salen = sizeof(*sa);
->>>>>> +			break;
->>>>
->>>> I think the issue is simply this 'break' above - by removing it, everything
->>>> should work as expected.
->>>
->>> Only if the bind was of the correct family? Checking an IPv4 local
->>> address (in the bind) against an IPv6 source address in the packet (or
->>> the other way around) isn't going to work well.
->>
->> Ah I understand what you mean.
->>
->> The purpose of "local_ip" is to provide a working local endpoint to be used
->> with the new remote address.
->> However, if the float is switching family we can't re-use the same old local
->> endpoint (hence the check).
->> In this case we'll learn the "new" local address later.
->>
->> Does it make sense?
-> 
-> Sure, but we could have learned it immediately from the packet we just
-> got, whether we're changing family or not. No need to wait for the
-> next RX packet to also learn the new local address.
 
-Indeed.
+--5lTqbbBiqNaWNbWm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> But if we now do a dst_cache_reset with the peer float,
-> ovpn_udp*_output will have to do a new route/local address lookup and
-> I guess that should clean up the local address stored in the bind, and
-> then update the dst_cache with the local address we just found.
+> From: Lukas Bulwahn <lukas.bulwahn@redhat.com>
+>=20
+> Commit fb3dda82fd38 ("net: airoha: Move airoha_eth driver in a dedicated
+> folder") moves the driver to drivers/net/ethernet/airoha/, but misses to
+> adjust the AIROHA ETHERNET DRIVER section in MAINTAINERS. Hence,
+> ./scripts/get_maintainer.pl --self-test=3Dpatterns complains about a brok=
+en
+> reference.
+>=20
+> Adjust the file entry to the dedicated folder for this driver.
 
-Right and this may not truly be what we want.
+Thx for fixing it, it was in my backlog.
 
-If peer X is sending packets to our IP1, we should at least try to reply 
-from the same address.
+Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
 
-If we have two IPs, IP1 and IP2, and both can be used to reach peer X, 
-we should always try to use the one where we received traffic from X in 
-the first place.
+>=20
+> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@redhat.com>
+> ---
+>  MAINTAINERS | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 37fedd2a0813..f9d3ff8b4ddb 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -726,7 +726,7 @@ L:	linux-mediatek@lists.infradead.org (moderated for =
+non-subscribers)
+>  L:	netdev@vger.kernel.org
+>  S:	Maintained
+>  F:	Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
+> -F:	drivers/net/ethernet/mediatek/airoha_eth.c
+> +F:	drivers/net/ethernet/airoha/
+> =20
+>  AIROHA PCIE PHY DRIVER
+>  M:	Lorenzo Bianconi <lorenzo@kernel.org>
+> --=20
+> 2.48.1
+>=20
 
-OTOH hand it is also true that with floating detection on both sides, 
-the situation will converge quickly, but there might be a reason why X 
-chose IP1 as destination, therefore we should do our best to respect that.
+--5lTqbbBiqNaWNbWm
+Content-Type: application/pgp-signature; name="signature.asc"
 
-So, even in case of float, we should still store the local endpoint and 
-attempt fetching a route that takes that into consideration.
-Which I think is what is happening (assuming we reset the dst_cache on 
-float).
+-----BEGIN PGP SIGNATURE-----
 
-ovpn_udpX_output() will:
-* get no rt from the cache
-* possibly confirm that saddr is ok
-* fetch the new rt using the provided saddr and daddr
-* update the cache.
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ8lzBwAKCRA6cBh0uS2t
+rAW3AP9Ap1HMYdHGy1e7oc/z4Mvd9W/lBms+ZnwVsLYo6Ql/AwD9Ezb0TReXGZzU
+RbjBQYkv0msYfWFjjkurfgOZgwdj+Ac=
+=QIY1
+-----END PGP SIGNATURE-----
 
-That makes sense to me.
-Would you agree?
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
-
+--5lTqbbBiqNaWNbWm--
 
