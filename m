@@ -1,208 +1,224 @@
-Return-Path: <netdev+bounces-172421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20828A54876
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 11:54:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D137A548BC
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 12:08:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CAC77A3A01
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:53:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B633D172978
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 11:08:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3AEC202C56;
-	Thu,  6 Mar 2025 10:54:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A0902045BC;
+	Thu,  6 Mar 2025 11:08:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xg2VhGii"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CmAfn7Yg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15DBA1A76BC
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 10:54:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66B0D20371F
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 11:08:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741258477; cv=none; b=oqIVjE4umeXp6egi/YwpI/PR90cgyRLmPXpBNLEi8i62zj0rKH54C+NZ96329DJZWIhsUMFVRzhSq5nbzAJixRj8i8Jz2Nh/IiLGkOxc0FTsMW+IVHAphaJiUNEsmsGn4zbRoxZZNyKKi9O0eVvGQ4w8gCDOoWv2Ndf7R23iQxg=
+	t=1741259323; cv=none; b=PiLPQJZyrxO6iU/3uOdIUaWSrO5JVCSYjmJaOJg6+ptmDUx0v9pF/n6mmWvN40awo76YBbv1O6XapVRIplaO/4bWrfumH+UKiQAMe/xo1A39v3Yk/N0Oy5VkCCwAKk9T521GD8fsPw1+ArWqVTsT9YCO3GydTJsrRQx1ZM4G6aY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741258477; c=relaxed/simple;
-	bh=DTXEqHRsUv7IuY3EGwfy8QvHIz/IJAu6F5Yuo1zJ9og=;
+	s=arc-20240116; t=1741259323; c=relaxed/simple;
+	bh=1l2lg4pxnKWN66VYlhTC0zCZyNqViTJOeCnoCR667mQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K79ypXMoUdFKplMquc4WdJTfIR6oeVQ7KixtzCv6ojW0I9BZw7S4zfY4RwnVBDoFmb7Zgiu1erppE/j1PH7t1l5BwVOJz1WmLfKa3ZmZmcuSGVdfx4rr19TDiJ9N5m9jV0DvtmRt/DpftywopErNr19c1rTrMcKz16ZIhd8Ygo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xg2VhGii; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5dee07e51aaso946834a12.3
-        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 02:54:35 -0800 (PST)
+	 To:Cc:Content-Type; b=kGkLUn0Oqcq3AiLQUfP7ajl2JvMpkuVzMrtHr/74puD6pKuSAH8jX6egZBKV4Km21YIrGmp4j6BLIAgTJ6EUM/ruIWNd4DYvNKVuZmStvKrvFBVe+9e96UgcK07Kl2KQGauT2UfVrW9QrzDr/EFVWC88KZjLQtGuRsBS3+SraAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CmAfn7Yg; arc=none smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6dd420f82e2so6981006d6.1
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 03:08:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741258474; x=1741863274; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1741259320; x=1741864120; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Pjfn8yDfqOIVmY+I84TFADLHMjbAadZWj3wyHrkso50=;
-        b=Xg2VhGiizOR/SFdCBTpEpz03YAKGMvEHMSu/lJiZ3ShXOlhtsYmuFCLB2PK/etpggP
-         vg6EGZ7YPIOlI+uQlgFYjbz5AMG9f2Y1ifkvPnV6YZ0A/usTS2MRRzcernAlMfLW2yqT
-         QHgc/CtoyTJ9pOZIubvYnXExsk+qbl549JzJPvc7gv6tHOZDvO/CIo7L3j7F/uDeBtRN
-         g/Qd01doX2ahJjLgS+1UKSUTiNpc2XGfF8v0nC3bVofbAn7ee4IueOBxkGRlflVOtPFu
-         +Y9Un0d5yyvqaUGy9kNozUmSufcS7Zds0qfbbln+Q4z3iIDqfATFqTIjJp1BmY4mMhN/
-         HrIQ==
+        bh=8HOAdle44AxtzHdRU+24G5NySxyY61Mu4iq8aJK231o=;
+        b=CmAfn7Yg6yY2VH2yjSe3sy6EMny1FCd3wcKfhsOYhaRauUsDq8VqTA3EjygXuhS6gi
+         tahiMvzPr+kDtxJvtbAt3+ZMw471nibDAkoaiI3rZdBforj61QYKuza9iFFB7F9+G0fw
+         lDRwdfNbFowqsw18evrmyrIF3KfOgC/yF4/Yn9FFm38/1mSeXT8M5NTS75oo5NsBpMFA
+         CPNuraePWimvYNkzZ2q3tZg3QALNg9kmXx0f4VfBNWU7xENmY+fl8uqsLUH5YwR9Y/Dt
+         W+/ZgTja8cvfnjVolpCUlidCcqpiWzGJairMjuslCwTCSoU7jZ8ktKIFT5stb9Er/o4o
+         88TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741258474; x=1741863274;
+        d=1e100.net; s=20230601; t=1741259320; x=1741864120;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Pjfn8yDfqOIVmY+I84TFADLHMjbAadZWj3wyHrkso50=;
-        b=kXs/H8VH4V5gk4LkGFfNuBkjpUeQbi1r+nCUFLbu2/i9zr0QPN3ciAN/cMFJvIqbJY
-         4nuXaTnlYhlT29yN6yzxItLz2/VD170s9WRXpi0xis0r1OTDsrgJi9dteajud4nt7Mgt
-         JRWNj85zPN1FqfeC+MguXsQKUyx/1yarvxmsODx6C+7pE35TIjlv2Hv7Yiju99Svl2qr
-         Q6VOnfAxlhHs7XpTrrWPVD0EyrjXMUjlPM7hGEXVIjjzX/hk2hf8vbEUbeqOFTduRS+j
-         d3zvqtUvzjVP/tkTqHYP16T37y864HhMDfoQuvf4YOHOWgKE/zApSU2X70goURCXEoZ9
-         JpXg==
-X-Forwarded-Encrypted: i=1; AJvYcCUz6y5SF2zCNzk4sFPMWQwvcRTGkM1LiQqmGcOpsia1oTl1ZXhior7B8ijub+a3CfoAis6WMwc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvNkIB9f4E5ez4179BuG/50RsIx7++XHXPKEM0Skfbr7r/3R+N
-	KQP59B7jqAGSvPW9yZE/C4CVkonf29S6EGoybeBTxIdfKgxxVImBbq3Rctvr+a2VaEvpcHR0A4Y
-	MD7xisQtW7qtNn7lRjQYonFsJ0i0=
-X-Gm-Gg: ASbGncunvyad+UdMeKQccm6nspa2SVcQQQf0zl7f4uyHwaJqzkefrPlMw2EhMygnKEd
-	3deWany1mBVPP5WRnRPeclXkE098VDx+X0V9Unkk+eKo7Y5HHKLUTkh/Pv/ohOf10gW/YzKl2hB
-	SCv/ogieEI6zFigxnmY2kzppTb5vFP
-X-Google-Smtp-Source: AGHT+IFs1Y7K47JL+uPMO80i5xRb2496qmNQrpIK8qO8RdYeGaXfITUWaAmrKkqKKcSVnG0KfmuQTYIW5LgkhE0rZD0=
-X-Received: by 2002:a05:6402:13ce:b0:5e4:a1e8:3f04 with SMTP id
- 4fb4d7f45d1cf-5e59f3d47fcmr6148290a12.8.1741258473988; Thu, 06 Mar 2025
- 02:54:33 -0800 (PST)
+        bh=8HOAdle44AxtzHdRU+24G5NySxyY61Mu4iq8aJK231o=;
+        b=dgMdbAOGojJsGVIULG6kQffl5ZTWOd6OsYaFVta263va3MsPI95wUFCABm+gzlnDb/
+         zqRknPMi0pQK++08d3K/ylGLSmRYtOedtM3pxdNV87t5tA6rpDwYFzBJMCeKVqm5zHpq
+         /EtuP7AUw1mGHmkXTgNWHAIkoTylaL3F7ISjVzIASKmF0zqIZytpYGegXM4ohuhycXlf
+         G9LhMnQI9jriu56pzv5ZHbpRzFLWSezj5fbqHdpYm8nywiuTZQKk13dl0Sozw8JFaXS1
+         VaCDwkadbB/HERb3Zs22rnlz8z2tW/Va6xOcqBu2ycgt5cLm1+lJa8Oi0S4489sx4wqP
+         GJLg==
+X-Forwarded-Encrypted: i=1; AJvYcCUzTMu4jNlK3cXFnvVLXK5R4UHQmlsHZB/0DlThxLJ8l25IlbwyDy/To03Xe3zxmSWhwoTrQwQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBYqM93yrryCJ5AjahukoqpGATmZeU8vdQbzVa9U5PWcLno503
+	tBoezhgwKoM3HkrOj4PPqFaTNoRe9rilU/0Yt13Eh0g4YXBNI9Dmxq94KID8G/RFFuFskuCaAjh
+	DDx3oaooFg7G1euPicc7YxlsrZzY+ylna2vhh
+X-Gm-Gg: ASbGncs/RehBInVqJMUK8WiujfTlFQcXj7loVE2n1XLGaPZWQtZ3Oqq53M9Lk7NPrvg
+	jUZ1WF3yLPrHIT8JqTPCfWylQPTK/L0scfNHefudyXO8DcmcWXZTzli1RFqU34E7tImXDX0hF82
+	FatCiodqA6x5sE4+DXORc+P6h4/1Y=
+X-Google-Smtp-Source: AGHT+IGqjDyiWMbG6cj6FS2OJY2L/aGCOTmLPTlaPopreMPZINSjvjq5BUceWbtCkk+LzB1fdNlNrVp3CR8l8HiQTI4=
+X-Received: by 2002:a05:6214:252f:b0:6e8:ddf6:d137 with SMTP id
+ 6a1803df08f44-6e8e6cd170cmr106132706d6.18.1741259319968; Thu, 06 Mar 2025
+ 03:08:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250305225215.1567043-1-kuba@kernel.org>
-In-Reply-To: <20250305225215.1567043-1-kuba@kernel.org>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Thu, 6 Mar 2025 19:54:22 +0900
-X-Gm-Features: AQ5f1Jqxn4czFn9uxXE6SHMogeqJxaJB2zJEtMvzo5u_DD4vLL7SLeC7BO14ryU
-Message-ID: <CAMArcTWwuQ0F5-oVGVt9j-juqyrVibQObpG1Jvqfjc17CxS7Bg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 00/10] eth: bnxt: maintain basic pkt/byte
- counters in SW
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
-	michael.chan@broadcom.com, pavan.chebbi@broadcom.com, 
-	przemyslaw.kitszel@intel.com
+References: <20250305-net-next-fix-tcp-win-clamp-v1-1-12afb705d34e@kernel.org>
+ <CAL+tcoAqZmeV0-4rjH-EPmhBBaS=ZSwgcXhU8ZsBCr_aXS3Lqw@mail.gmail.com>
+ <CANn89iLqgi5byZd+Si7jTdg7zrLNn13ejWAQjMRurvrQPeg3zg@mail.gmail.com>
+ <281edb3a-4679-4c75-9192-a5f0ef6952ea@kernel.org> <CANn89iKVsDrL9YFx883wTfRSAe6tOR7x2U5zk=TcgHBMr+VtkQ@mail.gmail.com>
+ <a3266974-d561-4e8f-a23a-9c0774ee2bbe@kernel.org> <CANn89iJ4DyC8OSEA2Qn3WhWHAUr9Bpo_ZmJdcx3ofM-qKvEU=g@mail.gmail.com>
+In-Reply-To: <CANn89iJ4DyC8OSEA2Qn3WhWHAUr9Bpo_ZmJdcx3ofM-qKvEU=g@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 6 Mar 2025 12:08:28 +0100
+X-Gm-Features: AQ5f1JqnqOEjgEt1NTmjqKYptzUm18O7uGofh7YTyGk_91RbtSC-SoxS4lIhJ18
+Message-ID: <CANn89iJ2S+mCs8PxZ-EBAfH--j6v9cUazCc8O4FWvMat=_yURQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: clamp window like before the cleanup
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Jason Xing <kerneljasonxing@gmail.com>, mptcp@lists.linux.dev, 
+	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 6, 2025 at 7:52=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
+On Thu, Mar 6, 2025 at 11:16=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
 >
-
-Hi Jakub,
-Thanks a lot for this work!
-
-> Some workloads want to be able to track bandwidth utilization on
-> the scale of 10s of msecs. bnxt uses HW stats and async stats
-> updates, with update frequency controlled via ethtool -C.
-> Updating all HW stats more often than 100 msec is both hard for
-> the device and consumes PCIe bandwidth. Switch to maintaining
-> basic Rx / Tx packet and byte counters in SW.
->
-> Tested with drivers/net/stats.py:
->   # Totals: pass:7 fail:0 xfail:0 xpass:0 skip:0 error:0
-
-I found kernel panic while testing stats.py, it occurs when the
-interface is down. If the interface is down, cp_ring is not allocated
-but bnxt_get_queue_stats_rx() accesses it without null check.
-
-BUG: kernel NULL pointer dereference, address: 0000000000000000
-#PF: supervisor read access in kernel mode
-#PF: error_code(0x0000) - not-present page
-PGD 163990067 P4D 163990067 PUD 144363067 PMD 0
-Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
-CPU: 0 UID: 0 PID: 1654 Comm: python3 Not tainted 6.14.0-rc1+ #6
-da0f9ad0522edf8bf0c96e8453594913017a5fc9
-Hardware name: ASUS System Product Name/PRIME Z690-P D4, BIOS 0603 11/01/20=
-21
-RIP: 0010:bnxt_get_queue_stats_rx+0xf/0x70 [bnxt_en]
-Code: c6 87 b5 18 00 00 02 eb a2 66 90 90 90 90 90 90 90 90 90 90 90
-90 90 90 90 90 90 0f 1f 44 00 00 48 8b 87 48 0b 00 00 48 63 f6 <48> 8b
+> On Thu, Mar 6, 2025 at 11:12=E2=80=AFAM Matthieu Baerts <matttbe@kernel.o=
+rg> wrote:
+> >
+> > On 06/03/2025 11:02, Eric Dumazet wrote:
+> > > On Thu, Mar 6, 2025 at 10:55=E2=80=AFAM Matthieu Baerts <matttbe@kern=
+el.org> wrote:
+> > >>
+> > >> Hi Eric,
+> > >>
+> > >> On 06/03/2025 10:45, Eric Dumazet wrote:
+> > >>> On Thu, Mar 6, 2025 at 6:22=E2=80=AFAM Jason Xing <kerneljasonxing@=
+gmail.com> wrote:
+> > >>>>
+> > >>>> On Wed, Mar 5, 2025 at 10:49=E2=80=AFPM Matthieu Baerts (NGI0)
+> > >>>> <matttbe@kernel.org> wrote:
+> > >>>>>
+> > >>>>> A recent cleanup changed the behaviour of tcp_set_window_clamp().=
+ This
+> > >>>>> looks unintentional, and affects MPTCP selftests, e.g. some tests
+> > >>>>> re-establishing a connection after a disconnect are now unstable.
+> > >>>>>
+> > >>>>> Before the cleanup, this operation was done:
+> > >>>>>
+> > >>>>>   new_rcv_ssthresh =3D min(tp->rcv_wnd, new_window_clamp);
+> > >>>>>   tp->rcv_ssthresh =3D max(new_rcv_ssthresh, tp->rcv_ssthresh);
+> > >>>>>
+> > >>>>> The cleanup used the 'clamp' macro which takes 3 arguments -- val=
+ue,
+> > >>>>> lowest, and highest -- and returns a value between the lowest and=
+ the
+> > >>>>> highest allowable values. This then assumes ...
+> > >>>>>
+> > >>>>>   lowest (rcv_ssthresh) <=3D highest (rcv_wnd)
+> > >>>>>
+> > >>>>> ... which doesn't seem to be always the case here according to th=
+e MPTCP
+> > >>>>> selftests, even when running them without MPTCP, but only TCP.
+> > >>>>>
+> > >>>>> For example, when we have ...
+> > >>>>>
+> > >>>>>   rcv_wnd < rcv_ssthresh < new_rcv_ssthresh
+> > >>>>>
+> > >>>>> ... before the cleanup, the rcv_ssthresh was not changed, while a=
+fter
+> > >>>>> the cleanup, it is lowered down to rcv_wnd (highest).
+> > >>>>>
+> > >>>>> During a simple test with TCP, here are the values I observed:
+> > >>>>>
+> > >>>>>   new_window_clamp (val)  rcv_ssthresh (lo)  rcv_wnd (hi)
+> > >>>>>       117760   (out)         65495         <  65536
+> > >>>>>       128512   (out)         109595        >  80256  =3D> lo > hi
+> > >>>>>       1184975  (out)         328987        <  329088
+> > >>>>>
+> > >>>>>       113664   (out)         65483         <  65536
+> > >>>>>       117760   (out)         110968        <  110976
+> > >>>>>       129024   (out)         116527        >  109696 =3D> lo > hi
+> > >>>>>
+> > >>>>> Here, we can see that it is not that rare to have rcv_ssthresh (l=
+o)
+> > >>>>> higher than rcv_wnd (hi), so having a different behaviour when th=
+e
+> > >>>>> clamp() macro is used, even without MPTCP.
+> > >>>>>
+> > >>>>> Note: new_window_clamp is always out of range (rcv_ssthresh < rcv=
+_wnd)
+> > >>>>> here, which seems to be generally the case in my tests with small
+> > >>>>> connections.
+> > >>>>>
+> > >>>>> I then suggests reverting this part, not to change the behaviour.
+> > >>>>>
+> > >>>>> Fixes: 863a952eb79a ("tcp: tcp_set_window_clamp() cleanup")
+> > >>>>> Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/55=
 1
-RSP: 0018:ffffa95ac3c2b7e0 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: ffffffffc0650710 RCX: 0000000000000000
-RDX: ffffa95ac3c2b858 RSI: 0000000000000000 RDI: ffffa25a1c1e8000
-RBP: ffffa259e3947100 R08: 0000000000000004 R09: ffffa259e4a6601c
-R10: 0000000000000015 R11: ffffa259e4a66000 R12: 0000000000000000
-R13: ffffa95ac3c2b8c0 R14: ffffa25a1c1e8000 R15: 0000000000000000
-FS:  00007f0b3ccbf080(0000) GS:ffffa260df600000(0000) knlGS:000000000000000=
-0
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 0000000162d5a000 CR4: 00000000007506f0
-PKRU: 55555554
-Call Trace:
- <TASK>
- ? __die+0x20/0x70
- ? page_fault_oops+0x15a/0x460
- ? exc_page_fault+0x6e/0x180
- ? asm_exc_page_fault+0x22/0x30
- ? bnxt_get_queue_stats_rx+0xf/0x70 [bnxt_en
-3bf73dc1ebebb3ca46ef8948d1fc1a94acbeeba1]
- netdev_nl_stats_by_netdev+0x2b1/0x4e0
- ? xas_load+0x9/0xb0
- ? xas_find+0x183/0x1d0
- ? xa_find+0x8b/0xe0
- netdev_nl_qstats_get_dumpit+0xbf/0x1e0
- genl_dumpit+0x31/0x90
- netlink_dump+0x1a8/0x360
+> > >>>>> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> > >>>>
+> > >>>> Tested-by: Jason Xing <kerneljasonxing@gmail.com>
+> > >>>>
+> > >>>> Thanks for catching this. I should have done more tests :(
+> > >>>>
+> > >>>> Now I use netperf with TCP_CRR to test loopback and easily see the
+> > >>>> case where tp->rcv_ssthresh is larger than tp->rcv_wnd, which mean=
+s
+> > >>>> tp->rcv_wnd is not the upper bound as you said.
+> > >>>>
+> > >>>> Thanks,
+> > >>>> Jason
+> > >>>>
+> > >>>
+> > >>> Patch looks fine to me but all our tests are passing with the curre=
+nt kernel,
+> > >>> and I was not able to trigger the condition.
+> > >>
+> > >> Thank you for having looked at this patch!
+> > >>
+> > >>
+> > >>> Can you share what precise test you did ?
+> > >>
+> > >> To be able to get a situation where "rcv_ssthresh > rcv_wnd", I simp=
+ly
+> > >> executed MPTCP Connect selftest. You can also force creating TCP onl=
+y
+> > >> connections with '-tt', e.g.
+> > >>
+> > >>   ./mptcp_connect.sh -tt
+> > >
+> > > I was asking Jason about TCP tests. He mentioned TCP_CRR
+> >
+> > Oops, I'm sorry, I didn't look at the "To:" field.
+> >
+> > > I made several of them, with temporary debug in the kernel that did
+> > > not show the issue.
+> > >
+> > >
+> > > I am wondering if this could hide an issue in MPTCP ?
+> > Indeed, I was wondering the same thing. I didn't see anything obvious
+> > when looking at this issue. The behaviours around the window clamping,
+> > with MPTCP single flow, and "plain" TCP were quite similar I think.
+>
+> OK, let me run mptcp tests just in case I see something dubious.
 
-This is not a bug of this series, we can reproduce top of net/net-next
-without this series.
-Reproduce:
- ip link set $interface down
- ./cli.py --spec netdev.yaml --dump qstats-get
-OR
- python ./stats.py
+I have no idea why only MPTCP flows can trigger the condition, I do
+not think it matters anyway.
 
-It seems that the driver is supposed to return qstats even if interface
-is down. So, I think bnxt driver needs to store the sw_stats when the
-interface is down. that may be very similar to the bnxt_get_ring_stats()
-and bnxt_get_ring_drv_stats().
-What do you think about it?
-
-Thanks a lot!
-Taehee Yoo
-
->
-> Manually tested by comparing the ethtool -S stats (which continues
-> to show HW stats) with qstats, and total interface stats.
-> With and without HW-GRO, and with XDP on / off.
-> Stopping and starting the interface also doesn't corrupt the values.
->
-> v3:
->  - try to include vlan tag and padding length in the stats
-> v2: https://lore.kernel.org/20250228012534.3460918-1-kuba@kernel.org
->  - fix skipping XDP vs the XDP Tx ring handling (Michael)
->  - rename the defines as well as the structs (Przemek)
->  - fix counding frag'ed packets in XDP Tx
-> v1: https://lore.kernel.org/20250226211003.2790916-1-kuba@kernel.org
->
-> Jakub Kicinski (10):
->   eth: bnxt: use napi_consume_skb()
->   eth: bnxt: don't run xdp programs on fallback traffic
->   eth: bnxt: rename ring_err_stats -> ring_drv_stats
->   eth: bnxt: snapshot driver stats
->   eth: bnxt: don't use ifdef to check for CONFIG_INET in GRO
->   eth: bnxt: consolidate the GRO-but-not-really paths in bnxt_gro_skb()
->   eth: bnxt: extract VLAN info early on
->   eth: bnxt: maintain rx pkt/byte stats in SW
->   eth: bnxt: maintain tx pkt/byte stats in SW
->   eth: bnxt: count xdp xmit packets
->
->  drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  49 +++-
->  drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h |   5 +-
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 272 +++++++++++-------
->  .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  20 +-
->  drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |  47 ++-
->  5 files changed, 264 insertions(+), 129 deletions(-)
->
-> --
-> 2.48.1
->
->
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
