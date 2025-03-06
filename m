@@ -1,108 +1,141 @@
-Return-Path: <netdev+bounces-172573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E9D2A556F2
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 20:39:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6182DA556F7
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 20:41:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1DFA1884671
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 19:39:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BF2917630B
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 19:41:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62F6E26BDB3;
-	Thu,  6 Mar 2025 19:39:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B56BC26E16F;
+	Thu,  6 Mar 2025 19:41:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="quw3/QJW"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KZHiWWR4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E3BB6F31E
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 19:39:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E45EDDA8
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 19:41:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741289957; cv=none; b=aNnGfqDFIfIiCwfgeCGREzmrNiZ1TnVlKOYxua21IEEWlgvab1ocKjJvP7saJrBVq3++OwrnkpjUPyUGlroGuof9FaqAufe6psGX4xASRFnw1rYTy7gCs0ffI1E1kYSYgx38a8rwCQHbKhXU46eYj6v4stzLkdQlCDBwrVXgwy8=
+	t=1741290081; cv=none; b=pKJqvPAcPCDupFUFLZtLHWj1Vw3HLk17jOYOZ1bMQYglivN+AWJKYW8m0HCCzh9SnLHBUSzxAoui7RMomZ+XUVCuHTwo85LE5QY+Q1CWkPXcLT2DSMfGRN7+v1sxj+VfB5Dk42DkyNSKMb9jh69kgEQL3DRUbyWgfdETsrKOAcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741289957; c=relaxed/simple;
-	bh=XLeyAtcQmGuZQtOWfz3BoS1IUEjoRUCRk9IBsqcWV7s=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WLl0ggKj84SRe9eY/nyAFvby+47htPMLREYG0dpJwSrUa1fyoepxFmNJ704Hbx5H/dRw1mrwkfEUkoRR72y4X22IOlQLymjo2ARfZRuUngq9fiVGh8CBw8HwZgfwgavdAr6sg9fmQI61Ge5NZq+E6LDz8hqTE9gLYjrT+EviEeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=quw3/QJW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14953C4CEE0;
-	Thu,  6 Mar 2025 19:39:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741289955;
-	bh=XLeyAtcQmGuZQtOWfz3BoS1IUEjoRUCRk9IBsqcWV7s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=quw3/QJWN2XY1pHLIOD3yo+pOPIxmSHwEg0emvu8Flu3fo2ZTqo7opKaJno6uaDgP
-	 V51vM4HPDW/f1WVAReAQAyzyiNdt1V/UeWqyjpvZEJ4YJc0lxiwb0ek/4+tpMihgaY
-	 QiZo5xGvEPMLYyVFSN39N2Uv0NfBDK0zrX2c4J7xav9duD/APu+O+HHmWd+WtX4Xop
-	 TorCaKpq6nlLBm96Rr6CZ8KWF0WOwjE7RYH9jKOIgiZ9vVQppjIofdRPPASn3WEecS
-	 ovqcL9l2jZevkgQN/rxoCkgpUPgxLgKEhSxE8HBVbmVBFu1YEE7aihNeqP+uZEceYx
-	 FqeraRH/WyT/Q==
-Date: Thu, 6 Mar 2025 11:39:14 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
- andrew+netdev@lunn.ch, Gal Pressman <gal@nvidia.com>
-Subject: Re: [PATCH net] net/mlx5: Fill out devlink dev info only for PFs
-Message-ID: <20250306113914.036e75ea@kernel.org>
-In-Reply-To: <7bb21136-83e8-4eff-b8f7-dc4af70c2199@gmail.com>
-References: <20250303133200.1505-1-jiri@resnulli.us>
-	<53c284be-f435-4945-a8eb-58278bf499ad@gmail.com>
-	<20250305183016.413bda40@kernel.org>
-	<7bb21136-83e8-4eff-b8f7-dc4af70c2199@gmail.com>
+	s=arc-20240116; t=1741290081; c=relaxed/simple;
+	bh=a4/H17QdyhUQ9lsG9asq7ncIiJGi9nsUmwthOROKUwc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=k/4HEPQBNHOv51hOoX3XIfB2x0+6afphYYRhlIAJSY7XaPYf27EVvJ3KgEZkuz8/wwn/ytPQ4NNRESreeuPIB+xFoMRJQIoZm5srbU7q+yXDdprD3KmnMX7+v4lKZKmFHBBLnHKVYrJBwouHuUQo2XHCmv+wdtkZNpHvS40L4Jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=KZHiWWR4; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2feb9076cdcso2366530a91.0
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 11:41:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1741290079; x=1741894879; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=LVL6+28pQW+71axRyK5XesnFXBZvUmkWaO6p4RpyIVo=;
+        b=KZHiWWR4HCnP6tccCrwH765VCKcWIuEXDKr4/Hw7iUSFqMPTiTkXaO1tlM+5/C5zh2
+         nub6pd6Yr7VldRHZ4EYpLqo/2YXCMfCMqYFNTPJ2T2ZV3F8u6dOSkjOoBQWJJ7O+Sq6V
+         7ygb7R1lF0HHJP3MHbdFBaT5p7PHmyqZ3Vfdg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741290079; x=1741894879;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LVL6+28pQW+71axRyK5XesnFXBZvUmkWaO6p4RpyIVo=;
+        b=uzqj+TWql4F2TZh4jFn44L04qAGjdoHtmGpxSNKoKdeX9UL5L4wqga31aIReNEKyZu
+         VbbXBinQ3wLz0L43mJRYM+v33WGaU2gMx/EIns8NEQBIsf0aGqMUmRTHmckfn0Ia8b80
+         pZYurjrXnjR5Se9VqoDgM/H09Xock5MRt4ZQ7z7lij4ntR+x4SdIZcpwCwi8bGfQboLb
+         S4WE6GjBNMSRdanNVdK/otcJDxkc8/awhctlSySxSZF3gFXXuMfAeT3Iyoe0iLApdhNo
+         scFCpKWitBYgHhDgBBZkQzmzxz/51QGPex7ZIlfxAR7ehADMzt93XvBf5YldFMPLqXD7
+         cX2g==
+X-Forwarded-Encrypted: i=1; AJvYcCVCIEnq5bETyu5z2m9J+G6nlSk6mD1Iye0Gytn/Iu/7CGm+YrfjfoGar7wIcqZpiL97/FCevmE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyw89JyMaV/2fGgPy47C9a0w8NrivND3WLAmB5sBetCQGpgUaot
+	hgdsH+68Z5UulkiQGt63B6QC9UOVGRv6IMnMj8RpnWCWCcFS+Kh02hpE4x7OZA==
+X-Gm-Gg: ASbGnctSBvVSEXwt+C/GtiOIStU+BSzIngJz7N414icxPuV+WGDloOYvynJYWAxYgjE
+	aso1+8PEuFHsmthnAmFp5dUR7UbwlsxIZ/NY0SgZqqRQH25a4R4WcVMcofpMQNHU97xrWaC4Gh7
+	+67gZsy1Z5lqIYHM0lbV4vXGNeQAqxC7ttkeFp13IuzrqiShCRdBKXZ+h/Jsr+EHPXqsIyVWnVB
+	scMyW11h9t4O6bCr1P7Tr/j39LORsXjebar+lyyHbKAXF1PnvlS6D8va56B7AHbhOh0FAud/STB
+	TwE7v0DXVv5ILkk1i4bRzHmPtnPKIy4yQ0/KTviORSY27gYmUJiNkr3Zk6JhwlJJg+WZs1skcEP
+	mIsfpKYjH
+X-Google-Smtp-Source: AGHT+IFqE4TLwQa2Dg4INaDzax/i5SEZyAIrYbIrg5js+SzvBWKKp0IE8nnP0ztQ5rWllvG2RHp5xA==
+X-Received: by 2002:a17:90b:5290:b0:2fe:ba82:ca5 with SMTP id 98e67ed59e1d1-2ff7ce93e3dmr834349a91.11.1741290079511;
+        Thu, 06 Mar 2025 11:41:19 -0800 (PST)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ff693746b9sm1643765a91.27.2025.03.06.11.41.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Mar 2025 11:41:18 -0800 (PST)
+Message-ID: <13093957-0457-4bda-b807-2fac6f01a80b@broadcom.com>
+Date: Thu, 6 Mar 2025 11:41:15 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 01/14] net: bcmgenet: bcmgenet_hw_params clean up
+To: Doug Berger <opendmb@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250306192643.2383632-1-opendmb@gmail.com>
+ <20250306192643.2383632-2-opendmb@gmail.com>
+Content-Language: en-US
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <20250306192643.2383632-2-opendmb@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Thu, 6 Mar 2025 21:20:58 +0200 Tariq Toukan wrote:
-> On 06/03/2025 4:30, Jakub Kicinski wrote:
-> > On Wed, 5 Mar 2025 20:55:15 +0200 Tariq Toukan wrote:  
-> >> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>  
-> > 
-> > Too late, take it via your tree, please.
-> > You need to respond within 24h or take the patches.  
+On 3/6/25 11:26, Doug Berger wrote:
+> The entries of the bcmgenet_hw_params array are broken out to
+> remove unused and duplicate entries and are made read only since
+> they should not change for a specific version of the GENET
+> hardware.
 > 
-> Never heard of a 24h rule. Not clear to me what rule you're talking 
-> about, what's the rationale behind it, and where it's coming from.
-> 
-> It's pretty obvious for everyone that responding within 24h cannot be 
-> committed, and is not always achievable.
-> 
-> Moreover, this contradicts with maintainer-netdev.rst, which explicitly 
-> aligns the expected review timeline to be 48h for triage, also to give 
-> the opportunity for more reviewers to share their thoughts.
+> Signed-off-by: Doug Berger <opendmb@gmail.com>
 
-Quoting documentation:
-
-  Responsibilities
-  ================
-  
-  The amount of maintenance work is usually proportional to the size
-  and popularity of the code base. Small features and drivers should
-  require relatively small amount of care and feeding. Nonetheless
-  when the work does arrive (in form of patches which need review,
-  user bug reports etc.) it has to be acted upon promptly.
-  Even when a particular driver only sees one patch a month, or a quarter,
-  a subsystem could well have a hundred such drivers. Subsystem
-  maintainers cannot afford to wait a long time to hear from reviewers.
-  
-  The exact expectations on the response time will vary by subsystem.
-  The patch review SLA the subsystem had set for itself can sometimes
-  be found in the subsystem documentation. Failing that as a rule of thumb
-  reviewers should try to respond quicker than what is the usual patch
-  review delay of the subsystem maintainer. The resulting expectations
-  may range from two working days for fast-paced subsystems (e.g. networking)
-  to as long as a few weeks in slower moving parts of the kernel.
-  
-See: https://www.kernel.org/doc/html/next/maintainer/feature-and-driver-maintainers.html#responsibilities
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+-- 
+Florian
 
