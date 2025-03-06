@@ -1,277 +1,309 @@
-Return-Path: <netdev+bounces-172336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 005E2A5441A
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 08:59:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7939DA54423
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:04:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E7A4188A92E
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 07:59:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B78613AE90D
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 08:04:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C23E1A705C;
-	Thu,  6 Mar 2025 07:59:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EC651FBC9F;
+	Thu,  6 Mar 2025 08:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DKlxgjm7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gz+G6t6g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E6541A238D
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 07:59:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741247967; cv=fail; b=agDm51QaoKMGzuwRZWNzNfogAB/9+z7DDowygAOX/rUEHsHXkGFRiHptY51/D3Bsu9Aaw0hdLZoqw9l0/ybB0JDau50kF1eP4sjj0x09WytgYEijhxDgvSq8u3wOAlzfUMAOccP2Bzj/tdStoCyTGBdMATNgx9vfMLNy5h4gPbE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741247967; c=relaxed/simple;
-	bh=MVXdh07T4oybHm6utY+1LFaQ+x4yjCfchdr5yj4n1vw=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=MRa+k/m9ylNVC3JA3L2cayNp5tFJ9YCFYVVrpCONkdai71sD/diWUk82cpKnfI2eo23NiBlxt4U+DpbKJQ8N7tnb+O/VmhqxIKFhu9FysIuK7/XI8JIRkEFVnbkpQ3lvnMd4sQ3SnreW15dRLTONxFAyDpOj+rEv2uSCXUd/AYM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DKlxgjm7; arc=fail smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741247965; x=1772783965;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=MVXdh07T4oybHm6utY+1LFaQ+x4yjCfchdr5yj4n1vw=;
-  b=DKlxgjm7b8Sa1eu7kLdNTukh5/BKSB4UHWlYwx2ANEZ7/Z+KLG33ZKgZ
-   dq5jL641KRM4CsY5Na3UEGUvdl8uKPDY7jhUi4f8FO9bFeKU3TmboMOX2
-   eADrp8Dtu2IGD/sT8AT09Sw0LTMsyfqJO/1m0vXSgJ/txjBwpRIFyTi8m
-   CXmpqDgbJ18tt949yiLRiKqi5Fh50mm31p+SAj0y62jMGPvGRl/zxdpqf
-   TdT1nR1NCAEG4p6EabCahkrbZT0f16shJsAhsGd9MnIq3K2gtM9A/HrBH
-   BARAwiah26XnW5qISCgwVFD/Vn1PaXtXcujKN5qmhmlyuwMNS9v7EmF+f
-   w==;
-X-CSE-ConnectionGUID: ycFKPQT9RgCPen0Wmb7PRg==
-X-CSE-MsgGUID: 1jiJlLj5TR6JMDo4v3iYCQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="42131542"
-X-IronPort-AV: E=Sophos;i="6.14,225,1736841600"; 
-   d="scan'208";a="42131542"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 23:59:24 -0800
-X-CSE-ConnectionGUID: MmlG4v/eRKyUwyIz4O/HBg==
-X-CSE-MsgGUID: I6esQn72SJOocsOXrEv/SA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,225,1736841600"; 
-   d="scan'208";a="149723150"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 23:59:24 -0800
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.14; Wed, 5 Mar 2025 23:59:23 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Wed, 5 Mar 2025 23:59:23 -0800
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.171)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Wed, 5 Mar 2025 23:59:23 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qO0HyWQ92ZQ/ZW8IuHNLyZsOmeshIczCydRffoU1gELDQApAGd/OHxMWpcM4GcRaUaRIQjny8W+nQyRaXnGFI9OlLV8Pu03ezIfu5Y2oWigTiPp32jwjIPimKsoDhyGN8s2Edm7X3SOlQ6s2nfN5op71meYJvyLFCHJQCrxxl+aV7aF5ex2s2X/MDZpviWia7F7jLx3A2z73yJgZkZErSyEY3Bqtu23w8rtR/Z5M4j3NTr1HZ0sDQdDNXo8QHMn5H2GS4uv+o11uGABswhUfIXhFek3aeSIcDM6JpEwQZDtZpZd1CQVPMjD5GLuxojEjX7thTkw5XSGZ+RB8k7EiPw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rlfaEEdCyv8KuhdWOCdvcHLgtVlFgvFEL43YnMhfUVo=;
- b=dv+wSykmezuYXvwtXgiMJ0ymGE149t0x8nHqPAOdJkM6oOtWSvlw7h4tDe1Y7zVr6hZSpySpkzrbAqHsp/c62LpBGXLyfqvIYoG6peOh+d059MHKqmWLEjdkFcTY697PpVQ9KYtagveD3gJocKwqJpgwhFWm6B5FvAY2nNf5jGe7uv7o3TZeoUuu+WOpfRZ46QYtraX3S2Mpvk93hWL2sfRwAA3FOm54p+RTjlsMRkpuanezlQ/W8dnalmy06H6RDcznTu1KANhrIb0O07IFaev5ja05oc5E2OBc0Osdx4IrL2SpPhqlzFkh3qgApHTChW4MvlVnKAKR8RqazS8VJg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by PH7PR11MB8454.namprd11.prod.outlook.com (2603:10b6:510:30c::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.28; Thu, 6 Mar
- 2025 07:59:21 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6%4]) with mapi id 15.20.8511.017; Thu, 6 Mar 2025
- 07:59:20 +0000
-Message-ID: <5cfd4c17-71a8-4bd8-972b-31fc0634f518@intel.com>
-Date: Thu, 6 Mar 2025 08:59:16 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] i40e: fix MMIO write access to an invalid page in
- i40e_clear_hw
-To: Kyungwook Boo <bookyungwook@gmail.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, "Loktionov, Aleksandr"
-	<aleksandr.loktionov@intel.com>
-References: <55acc5dc-8d5a-45bc-a59c-9304071e4579@gmail.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <55acc5dc-8d5a-45bc-a59c-9304071e4579@gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: VI1PR0102CA0059.eurprd01.prod.exchangelabs.com
- (2603:10a6:803::36) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF93B1F8BD6
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 08:04:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741248254; cv=none; b=Qd1Lwpic1e1z/hqAHrHZ8a6YYUuZiejQRuQRVd/AH/2aHjq6dm1hCb9ioT+iXC5P/FJ8sPFWy+boI2DDjO7lFHYUbsLkJt5i3YGzRs40gDB0Ha+YbGyRH8K4B1xndd5VG8FV/E5RUZcjNNDQ3xUCvcQPaL8EmK3iL1+I6dreO6Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741248254; c=relaxed/simple;
+	bh=m2xqvtA8wuVTjbbihdbE7B3lD7dPnEgCpk/FmPcG7KE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qqHR7pahPwSUk4HKLBcXFvuSrgWWUl6xZVzWe+lh6M+srZmzHzMkhCwDJUr/sbVa1bJj3APaodQRX8fDuGQw4Lay5gGnd9moPrOzdxyMXE+4jYuediZqYDi/C/ETSVlXM46PU6pdaK4gM+Kafy02M/GbNHrIZ3a47wzpbd4ZzS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gz+G6t6g; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3ce868498d3so1205565ab.3
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 00:04:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741248252; x=1741853052; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yBM15w5m4MRbYG9kBYKoEqOtfhQE0UDg6LnRhSweRC0=;
+        b=Gz+G6t6g5nK8i0zlhxNZ80MCm/U5quXDBKtVk1G9AfRlZe8V+bZsX2Mb6GJsUIJBFF
+         UUhYAgwE2VXxzyDe6urGEBNEw8u9Ygs9FvjMOQWIYYAgT9KYdW7RjVjNzNZd2lspEILR
+         ArhTcbl6uIZkU4R9iGovQl9wUS84p1fk4G4aN0gyfaXrQskzyOiOmauxUkOZpJ/ICq16
+         r0fmU4y1iYgHcaw5mFwwE//sY9dfede+vMHhc/BpCllG40Ar1MUduxt8REHIqLoBKaEl
+         nqlUrKE3OkJTulWLJDUtWPgw48cZlZrF1QBY0iAODoeDDdaumOPRbMAKDb4JV4BWmcr5
+         h/EQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741248252; x=1741853052;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yBM15w5m4MRbYG9kBYKoEqOtfhQE0UDg6LnRhSweRC0=;
+        b=UkH5DSonKViGuOu2hTpc5yhivuswZXesEAHSsbfYcYVhh88ST9LVa1u5qooY3V0a2i
+         If4b89HVWnli71fNGusdt5RfA8ZqyUksGe2mvPysNsbwbWuqr+GHFa3+ydURaD2yq6Ap
+         0qnKcG8L7l69JTEp0bkYmxTyucAujtBTghCItMPao8tuiXDhPOkiXUsf9k2+jZ4GVnT+
+         HiWGScDS4iV1q0q8I1s3HHHWK3HPfdyJ7v0jx7Y/AQREf2vjnfpCJ7h87QxtRNcU9ots
+         dy7zQ7uUsyYftpWLur9tvOLE6K0pRai3W7q0uYQ2jfuh5sdpALIlz5tYcujbVBkrcdSG
+         dZhA==
+X-Forwarded-Encrypted: i=1; AJvYcCW5VzHpe/BJ5H6E7W3SsfqWpkncA8NyzB9rdI5XSBmjBXO+ylTrQEDeNz75zPeWePmCmSMpAYk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgnvWuYBzyEBPvZV/ecGTZprgnKxlJe6J5PixfmXlWLwnyrI0z
+	trwpWt4ymtbmRpaQpeCXsyLbkULcek1Qkhzj4PDjpX58L0qOsHgQ6Iad2dXL9Fhuo/5BSbnwAkx
+	/1mn9XtOwvoZugTWa4VyehDVl0gA=
+X-Gm-Gg: ASbGncsz9Dd4rmOpR8lvWAPwvnx35qtFjQP1KTl0JIC2/GacXIb51yW+ODPHm6a4U8A
+	sPjbzjUvyxgBbaOyBiNFj2xLboWdebHyCBAuX27QafWOtFa6IP8X+RpMBIke6YgYhRYT1ggT38d
+	Ha/yQkD0CYmqmJoArZao8eZdQwMQ==
+X-Google-Smtp-Source: AGHT+IEGhihG+wrM11wGwAgX+z7XTCGMteAItphOUcclK0J1+fHb/GhgqUisELsn6GIKvBdcvnPbtl32Yc+PmnmkI3g=
+X-Received: by 2002:a05:6e02:18ca:b0:3d3:e11a:39d with SMTP id
+ e9e14a558f8ab-3d42b8d397amr55808315ab.13.1741248251615; Thu, 06 Mar 2025
+ 00:04:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|PH7PR11MB8454:EE_
-X-MS-Office365-Filtering-Correlation-Id: dfce496e-bc7e-4d04-7f5b-08dd5c84cd3f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?c29aOEhKM0xoZzE3QnpVU0pyYzdaZXJGeENUOTlnL0wwcUVXai8yNWxQelVz?=
- =?utf-8?B?U25MWHRYelh1SFNHeit2a0w0a3BWVkUxRVFxcDlMWEJWeE0vNStwZUl6Q3NM?=
- =?utf-8?B?RE5mSVBxckk2dThZb0p4d1psNlI2ZWlJZFFMalVwVnJQaGswNGcyOVpRS3hQ?=
- =?utf-8?B?c0F2M0tQSjRVN05rYU83bWkrbE0xREF2TCtndzNBa1BYL0cvcGRvdkttaU9I?=
- =?utf-8?B?d0lhSWJLMzFrd2IxZFNEdUkxazlvMk9aWmxnWmpqdEh2UXFwREZDTjJUTUg0?=
- =?utf-8?B?QWtLRHJRekFhUWJrMnlVRXJ5c1NwTlVGbG5RNC9PN2dxbUlxRmlhUzVUb1BU?=
- =?utf-8?B?TkpyeWM0TG1BU1NWZXU0RmdCaU53RjRTWm1HSlAxWFBLVGt1Ymp3anBVMHRH?=
- =?utf-8?B?VXRGL1FleGNreEcremRDN3k2aWFhTVVrVjFXT0pNb3JCRnZOcjFyeDdpS1FV?=
- =?utf-8?B?N1VMR3RrYVUrM0JPTVA2MDVoa1ZEKzgzQ1pJWmVqVkxSSG5RSVluV1FtRlA3?=
- =?utf-8?B?bHBONnVUU2xrZnAxTW1QaTNoK3ZKLzBZaE5kQXkwODA5aUFJNkhUTEdnRHJD?=
- =?utf-8?B?SVp6dXllL0U1TGlubHpacXUzV3dDQnVBQXZPZHhQdkFDZjJZZzNvWWlhejRp?=
- =?utf-8?B?NUlkQUQ0SFZhT2FONmpneURFODZiWU9kanVkSWY0aFd6eTBPWWhMVEV1dzB2?=
- =?utf-8?B?aVNheHhSdzNOYUxFdjFzYm5JbGVrZElPdUdsMjNjeXorMVF6V2RuUkhGM1cy?=
- =?utf-8?B?cDltV01yYTFEK3BwZG94Nytic3BJSU9vS1QxU3dzZ2tuNlV3b0dXWlJOQitD?=
- =?utf-8?B?WjUzSE9NZHVDYUhMQ3NVeFNWNGVUcVJpcGFGM2VDZVpNNVdKK2FGMnJ4bk1G?=
- =?utf-8?B?Skw4WW93K0xBbWRVeDF6S1htazFpVmtjRWlYYjFaYXFNcVQ5UUZvbUNjaUdy?=
- =?utf-8?B?bjhkZm0xTDVmeVlEU05ZSGRGR2NTUjFIQzBBNWlJVkF2UzExc2VGWDdrU2Vn?=
- =?utf-8?B?R3FSbW1LWGxsWkhuRTFmSVhzZFIxVDZUcnZXOEd2bE03Z0tzUTNIanllOGhB?=
- =?utf-8?B?NHBsdVh5aVVRd2NIZ2I3Uk5NR2VQYTFBemlLWlA3ZGVRMzltVWo1djROTmtC?=
- =?utf-8?B?NzYwR0hWODBBNGVSTWE4d3VaUEhOOENZSElSL2pXaWxYYkpWS256cHIwc3Bs?=
- =?utf-8?B?QjBaTGg4QTdlbzJKaHN4dFJicGZqY2Q0SUs2TmxJR3FzVzFoUjhjbmZwOEZ5?=
- =?utf-8?B?OGNBdTBrdjdwOGZsTmMyR3lZOXg0b0Y0UFlUazFZbW1YdDVBSGFxdGg5MEx4?=
- =?utf-8?B?R1RlVVorampqd0wydkwwbUlCTE1lcnV2SklXQUt5S3ZBbk9NVFVnV01Bamh0?=
- =?utf-8?B?VzB0L2hVUjFMQ0krcmg3Y25aL1MwQUhWK1l3VTVPNnF3NnFhTzdFQWVkdnJW?=
- =?utf-8?B?eW52MHJYa1BVUTNBQkpwMG54Z2FwUHordFJRYU14SlJORHd2RnVjTDVZL2dY?=
- =?utf-8?B?L0FqMkFpclM3ZHR6SzRWcC9YMCtqY3E3MkQ2WlpCNVhuVzd0SEQ1c3Z3dWRB?=
- =?utf-8?B?eXQzN3Z4aVR2RUVQMjZuM29ZNWlreEFWWVlqLzREVllsZmF6R1ZrTFE0VjQ5?=
- =?utf-8?B?dTBxcUsrOU45WXhXZVdQMjNaWkI5cHVYMWlzdWtNZlVjZmN2Vkt5N3NULzJj?=
- =?utf-8?B?eHVKazVMV3RaWm1URzFuZ1FCTW4xQ1pESGxQMzdlVGt4M01idzFzZlZrNDJN?=
- =?utf-8?B?NGEvT0hucjRCUlBuOWg1OTc1Yk16KzdDb0FwY1hIUi9wS25MK3NTczF3eFQ4?=
- =?utf-8?B?RWlML1MvR2JTRjdhLzJ5Zz09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bHd1ZjhyVTRlcTNqaFg5SkQ3MERYN0pWeDdvNktlZGJnMFI2Y05xb21LSXpW?=
- =?utf-8?B?Mk04WVhQSHoxbE9lc2tQenZBSWVkUzlpKzhzUDVzLzUxVjJEVFNYTldPTkxY?=
- =?utf-8?B?bTFXZEYrSUFUajBCZTFUa1h4QUV3aEgwY3Z2K0pxbGdUMlg5akx4T2syamR1?=
- =?utf-8?B?czc0cEdISTBSeGE5bEU4TFlqbjFtbmwxVWNIVWtUUjdNTllTWE5EWUtYU2ZH?=
- =?utf-8?B?bVBabjl0N2p0c25MdlJtYjZ0elBqMUYvU0dmd3pnSmNyUGsxK1hDb3ZLeFJT?=
- =?utf-8?B?WUJPbStNR1c2amZjQ252T1RYaXBmdFZVUVM0UDRtazZRVDdBWTNDNG94SnBN?=
- =?utf-8?B?RElkYVRFcFY5RFFrWStOa3A5Ukl0VlUwa1MydkswR3dyQ2hYUTFSbVU1WjVC?=
- =?utf-8?B?b2I3aUgrSHdKNmpTekcyK3U1QXBTV0VpL3MvbFJqbDBGbGZ4aG54YW16b0Rv?=
- =?utf-8?B?NzA1YTBlUjk0VG5iNVZJcmwwd3owTXRzN2ljQWFIaHVKaktWcDhjWHRjRXMx?=
- =?utf-8?B?eXVGVVlsYWc2MzY1c281WTg2MHVYbjJDOFRDeHk2S2hCclIzUlB2WW9kV1Nr?=
- =?utf-8?B?VU9qWE9ER3dINzlhOGFDNklScjdRVW9BT0pjaSs4MDhyL3Z6TXFHamdLRGJt?=
- =?utf-8?B?aGNZKzM5N0ZibkZ5WHpiNTI4NEVBY1RJcVFlemRRZ0FYeEdoYzByYnQ3WGpL?=
- =?utf-8?B?NlI0UUtBN1RCN0t6T1p6WVlpUkpQYXJGWUtXRzVuTW14SC84V3hkWGdXYUN2?=
- =?utf-8?B?MGFScmx3Y3Q3bXNwS044dm1qQUtLODJsc2lWVFJ3UWtwTUN6bjJQU2VNalVl?=
- =?utf-8?B?dmcrL2JpQ1Z0SitNeGNqWjlyYnk2UGVsYkZETVJnV2N6UjgvdHRXTjBicTNG?=
- =?utf-8?B?OFY0bU40RkZJbkdnazdGNU5yVTNPWnYreVgwM2xzdEprZ3dtV1QrYzFnci9U?=
- =?utf-8?B?RlpGZVVqZHkyREdpT0pjaUtDT0x1MWwvYXgzU3daZ2dWdjJBMWEvQ0k5ZEd3?=
- =?utf-8?B?R1F1eGcvMDRKMjBFRjEzSjBCWkFIQ2R5SDU0NzVyTnVvdVl4UUlIYkNSTHZE?=
- =?utf-8?B?cHorVldQNDJjanBQNmtMS0E2YTRmcXBQb2tlak9adUVJWktSeVRycE1Ra1pz?=
- =?utf-8?B?V3RkNnlzZEJweHpldGxManBzOFR5VnhNRFovd3VITzdvNnNEZXZ3ZTdSQlM5?=
- =?utf-8?B?QnlnZ0dkM3pzY255NG5XSk9PNlpIajNETHdZeVNhNnZvWnFyY0pFU2VjRnhW?=
- =?utf-8?B?Ri9leFVpYjhjNFRFRU83NkVIdmZWajRUQ1pOVHZOTTVSb09CVDluYVdyK1hR?=
- =?utf-8?B?VVV6TFB3QWs1MjBYVlpGdGxGOFovR2tTakR2UjE5ZU5lOXhHRGZMOC9jRXQx?=
- =?utf-8?B?MzFoUndUR25aZEx1ZTdpWmp0V3J1U1pxUXd5dW9HaVdRNkVJMTZ5R2dTU1VH?=
- =?utf-8?B?VE9ja1VZZ2NGalE0dVR2bGpJdlYvMUhna3FDUUFGTnl1YTY3amhhRVN2SmVl?=
- =?utf-8?B?VkZpZHN1cE8zWUNiUVVkeW5PVVlmeGVUR3Fxd3h5ZENIODNaVXNpY3VTRHlz?=
- =?utf-8?B?SEdSMEtBZEpGcGZmNGt6V3NaV1NmeHF5ZGN5Nkw2ZVc5dHpuZkRvQmdBTHBU?=
- =?utf-8?B?c0crek9ORStKUjlHa1dJSTYvQlJkSnhaR0E1VWxNUDZvOVB1NnB6dFUybXhy?=
- =?utf-8?B?aUJjN2FobmQ5L2dqcEUwYkkxZnh3cHFoLzd0UWZhRjljNVhMZUtKMTVVM2dC?=
- =?utf-8?B?Ry85VDNpTjk2Y3c5ZlVFWGhCU3B0K0N0ZUkyUFM2NEJ6S2tNODI4Z1N1S1Rl?=
- =?utf-8?B?OEtwbU5MR01JNW9kdTZGbjhjZVR3QVlsck50TUJTTm0veStGaWF5ZjR1amd2?=
- =?utf-8?B?MFphUUpKajNqR21tTUtqdC84cDZpL2U3YURYSEhMNmNzSmJXWU9HRzlPRW5q?=
- =?utf-8?B?eHZNejdBbTV3ODNIK0I1ZnRFSzZESXB4TTN5S1E0SzFVZlBSbHlNYTFZRFpn?=
- =?utf-8?B?VFg1bFVaMEVTK0FRNy9SR0h2eHpCWkk0d0xzblBDVjhIMTJ5d2VzWnNkSlJZ?=
- =?utf-8?B?UHpoUFI1RStKY2RIZVhrblJXQUZIU2dzOTQyMVVKMlZvSUMrYndtRk5uVjda?=
- =?utf-8?B?WXFwWjVsQ3B5L0RoalVaNTR5cFhvNG1MK0ZuZ3U4eVhvSExBOE54RXRVcm43?=
- =?utf-8?B?bVE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: dfce496e-bc7e-4d04-7f5b-08dd5c84cd3f
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2025 07:59:20.7093
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VpxZXDrbpqLopZLysXw2DqRaJY2pmNfct3DDvZt83tyyvgaft30o/6on0uW4ihgn+sE0xbztvJwyQOnkNnrtb9/F5LD4Gh6ekBmzKGhZ9QM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8454
-X-OriginatorOrg: intel.com
+References: <CAL+tcoDFSSdMXGyUeR+3nqdyVpjsky7y4ZaCB-n1coR_x_Vhfw@mail.gmail.com>
+ <20250306062218.85962-1-kuniyu@amazon.com> <CAL+tcoAEPkyyvzULua_MUNQb=up_8Qqg+w3Oq6B9C1JS9gvdrQ@mail.gmail.com>
+ <CANn89iL_sT7a+49HNDLjsP5qnREPKpx6yEu8USMZPxW1vP+skg@mail.gmail.com>
+In-Reply-To: <CANn89iL_sT7a+49HNDLjsP5qnREPKpx6yEu8USMZPxW1vP+skg@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 6 Mar 2025 16:03:35 +0800
+X-Gm-Features: AQ5f1JqDjmmbflvPe26W39MOFhZ9WmPV4bU3bhkFbSX8y77T6GNNdDbYEqGXWPc
+Message-ID: <CAL+tcoBpUxfMo6Assb6gU9JaJctS4Gt7G889GNmJsRFQeaxHJA@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: bring back NUMA dispersion in inet_ehash_locks_alloc()
+To: Eric Dumazet <edumazet@google.com>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, davem@davemloft.net, eric.dumazet@gmail.com, 
+	horms@kernel.org, kernelxing@tencent.com, kuba@kernel.org, 
+	ncardwell@google.com, netdev@vger.kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/6/25 06:25, Kyungwook Boo wrote:
-> In i40e_clear_hw(), when the device sends a specific input(e.g., 0),
-> an integer underflow in the num_{pf,vf}_int variables can occur,
-> leading to MMIO write access to an invalid page.
-> 
-> To fix this, we change the type of the unsigned integer variables
-> num_{pf,vf}_int to signed integers. Additionally, in the for-loop where the
-> integer underflow occurs, we also change the type of the loop variable i to
-> a signed integer.
-> 
-> Signed-off-by: Kyungwook Boo <bookyungwook@gmail.com>
-> Signed-off-by: Loktionov, Aleksandr <aleksandr.loktionov@intel.com>
+On Thu, Mar 6, 2025 at 3:26=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> On Thu, Mar 6, 2025 at 7:35=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
+com> wrote:
+> >
+> > On Thu, Mar 6, 2025 at 2:22=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon=
+.com> wrote:
+> > >
+> > > From: Jason Xing <kerneljasonxing@gmail.com>
+> > > Date: Thu, 6 Mar 2025 12:59:03 +0800
+> > > > On Thu, Mar 6, 2025 at 12:12=E2=80=AFPM Kuniyuki Iwashima <kuniyu@a=
+mazon.com> wrote:
+> > > > >
+> > > > > From: Jason Xing <kerneljasonxing@gmail.com>
+> > > > > Date: Thu, 6 Mar 2025 11:35:27 +0800
+> > > > > > On Wed, Mar 5, 2025 at 9:06=E2=80=AFPM Eric Dumazet <edumazet@g=
+oogle.com> wrote:
+> > > > > > >
+> > > > > > > We have platforms with 6 NUMA nodes and 480 cpus.
+> > > > > > >
+> > > > > > > inet_ehash_locks_alloc() currently allocates a single 64KB pa=
+ge
+> > > > > > > to hold all ehash spinlocks. This adds more pressure on a sin=
+gle node.
+> > > > > > >
+> > > > > > > Change inet_ehash_locks_alloc() to use vmalloc() to spread
+> > > > > > > the spinlocks on all online nodes, driven by NUMA policies.
+> > > > > > >
+> > > > > > > At boot time, NUMA policy is interleave=3Dall, meaning that
+> > > > > > > tcp_hashinfo.ehash_locks gets hash dispersion on all nodes.
+> > > > > > >
+> > > > > > > Tested:
+> > > > > > >
+> > > > > > > lack5:~# grep inet_ehash_locks_alloc /proc/vmallocinfo
+> > > > > > > 0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_lock=
+s_alloc+0x90/0x100 pages=3D16 vmalloc N0=3D2 N1=3D3 N2=3D3 N3=3D3 N4=3D3 N5=
+=3D2
+> > > > > > >
+> > > > > > > lack5:~# echo 8192 >/proc/sys/net/ipv4/tcp_child_ehash_entrie=
+s
+> > > > > > > lack5:~# numactl --interleave=3Dall unshare -n bash -c "grep =
+inet_ehash_locks_alloc /proc/vmallocinfo"
+> > > > > > > 0x000000004e99d30c-0x00000000763f3279   36864 inet_ehash_lock=
+s_alloc+0x90/0x100 pages=3D8 vmalloc N0=3D1 N1=3D2 N2=3D2 N3=3D1 N4=3D1 N5=
+=3D1
+> > > > > > > 0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_lock=
+s_alloc+0x90/0x100 pages=3D16 vmalloc N0=3D2 N1=3D3 N2=3D3 N3=3D3 N4=3D3 N5=
+=3D2
+> > > > > > >
+> > > > > > > lack5:~# numactl --interleave=3D0,5 unshare -n bash -c "grep =
+inet_ehash_locks_alloc /proc/vmallocinfo"
+> > > > > > > 0x00000000fd73a33e-0x0000000004b9a177   36864 inet_ehash_lock=
+s_alloc+0x90/0x100 pages=3D8 vmalloc N0=3D4 N5=3D4
+> > > > > > > 0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_lock=
+s_alloc+0x90/0x100 pages=3D16 vmalloc N0=3D2 N1=3D3 N2=3D3 N3=3D3 N4=3D3 N5=
+=3D2
+> > > > > > >
+> > > > > > > lack5:~# echo 1024 >/proc/sys/net/ipv4/tcp_child_ehash_entrie=
+s
+> > > > > > > lack5:~# numactl --interleave=3Dall unshare -n bash -c "grep =
+inet_ehash_locks_alloc /proc/vmallocinfo"
+> > > > > > > 0x00000000db07d7a2-0x00000000ad697d29    8192 inet_ehash_lock=
+s_alloc+0x90/0x100 pages=3D1 vmalloc N2=3D1
+> > > > > > > 0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_lock=
+s_alloc+0x90/0x100 pages=3D16 vmalloc N0=3D2 N1=3D3 N2=3D3 N3=3D3 N4=3D3 N5=
+=3D2
+> > > > > > >
+> > > > > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > > > > >
+> > > > > > Tested-by: Jason Xing <kerneljasonxing@gmail.com>
+> > > > >
+> > > > > Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > > > >
+> > > > >
+> > > > > >
+> > > > > > > ---
+> > > > > > >  net/ipv4/inet_hashtables.c | 37 ++++++++++++++++++++++++++--=
+---------
+> > > > > > >  1 file changed, 26 insertions(+), 11 deletions(-)
+> > > > > > >
+> > > > > > > diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hasht=
+ables.c
+> > > > > > > index 9bfcfd016e18275fb50fea8d77adc8a64fb12494..2b4a588247639=
+e0c7b2e70d1fc9b3b9b60256ef7 100644
+> > > > > > > --- a/net/ipv4/inet_hashtables.c
+> > > > > > > +++ b/net/ipv4/inet_hashtables.c
+> > > > > > > @@ -1230,22 +1230,37 @@ int inet_ehash_locks_alloc(struct ine=
+t_hashinfo *hashinfo)
+> > > > > > >  {
+> > > > > > >         unsigned int locksz =3D sizeof(spinlock_t);
+> > > > > > >         unsigned int i, nblocks =3D 1;
+> > > > > > > +       spinlock_t *ptr =3D NULL;
+> > > > > > >
+> > > > > > > -       if (locksz !=3D 0) {
+> > > > > > > -               /* allocate 2 cache lines or at least one spi=
+nlock per cpu */
+> > > > > > > -               nblocks =3D max(2U * L1_CACHE_BYTES / locksz,=
+ 1U);
+> > > > > > > -               nblocks =3D roundup_pow_of_two(nblocks * num_=
+possible_cpus());
+> > > > > > > +       if (locksz =3D=3D 0)
+> > > > > > > +               goto set_mask;
+> > > > > > >
+> > > > > > > -               /* no more locks than number of hash buckets =
+*/
+> > > > > > > -               nblocks =3D min(nblocks, hashinfo->ehash_mask=
+ + 1);
+> > > > > > > +       /* Allocate 2 cache lines or at least one spinlock pe=
+r cpu. */
+> > > > > > > +       nblocks =3D max(2U * L1_CACHE_BYTES / locksz, 1U) * n=
+um_possible_cpus();
+> > > > > > >
+> > > > > > > -               hashinfo->ehash_locks =3D kvmalloc_array(nblo=
+cks, locksz, GFP_KERNEL);
+> > > > > > > -               if (!hashinfo->ehash_locks)
+> > > > > > > -                       return -ENOMEM;
+> > > > > > > +       /* At least one page per NUMA node. */
+> > > > > > > +       nblocks =3D max(nblocks, num_online_nodes() * PAGE_SI=
+ZE / locksz);
+> > > > > > > +
+> > > > > > > +       nblocks =3D roundup_pow_of_two(nblocks);
+> > > > > > > +
+> > > > > > > +       /* No more locks than number of hash buckets. */
+> > > > > > > +       nblocks =3D min(nblocks, hashinfo->ehash_mask + 1);
+> > > > > > >
+> > > > > > > -               for (i =3D 0; i < nblocks; i++)
+> > > > > > > -                       spin_lock_init(&hashinfo->ehash_locks=
+[i]);
+> > > > > > > +       if (num_online_nodes() > 1) {
+> > > > > > > +               /* Use vmalloc() to allow NUMA policy to spre=
+ad pages
+> > > > > > > +                * on all available nodes if desired.
+> > > > > > > +                */
+> > > > > > > +               ptr =3D vmalloc_array(nblocks, locksz);
+> > > > > >
+> > > > > > I wonder if at this point the memory shortage occurs, is it nec=
+essary
+> > > > > > to fall back to kvmalloc() later
+> > > > >
+> > > > > If ptr is NULL here, kvmalloc_array() is called below.
+> > > >
+> > > > My point is why not return with -ENOMEM directly? Or else It looks =
+meaningless.
+> > > >
+> > >
+> > > Ah, I misread.  I'm not sure how likely such a case happens, but I
+> > > think vmalloc() and kmalloc() failure do not always correlate, the
+> > > former uses node_alloc() and the latter use the page allocator.
+> >
+> > Sure, it is unlikely to happen.
+> >
+> > As to memory allocation, we usually try kmalloc() for less than page
+> > size memory allocation while vmalloc() for larger one. The same logic
+> > can be seen in kvmalloc(): try kmalloc() first, then fall back to
+> > vmalloc(). Since we fail to allocate non-contiguous memory, there is
+> > no need to try kvmalloc() (which will call kmalloc and vmalloc one
+> > more round).
+>
+> I chose to not add code, because:
+>
+>        if (num_online_nodes() > 1) {
+>                /* Use vmalloc() to allow NUMA policy to spread pages
+>                 * on all available nodes if desired.
+>                 */
+>                ptr =3D vmalloc_array(nblocks, locksz);
+>
+> << adding here a test is pointless, we already have correct code if
+> ptr =3D=3D NULLL >>
+>
+>        }
+>        if (!ptr) {
+>                ptr =3D kvmalloc_array(nblocks, locksz, GFP_KERNEL);
+>                if (!ptr)
+>                        return -ENOMEM;
+>         }
+>
+>
+> Sure, this could be written in a different way, but ultimately it is a
+> matter of taste.
 
-when Alex said "make sure I signed too" he meant:
-"make sure the variable @i is signed too", not the Sign-off ;)
+Sorry that I didn't make myself clear enough. I mean if
+vmalloc_array() fails, then it will fall back to kvmalloc_array()
+which will call kmalloc() or even vmalloc() to allocate memory again.
+My intention is to return with an error code when the first time
+allocation fails.
 
-(please wait 24h for the next submission, and also put "iwl-next" after
-the "PATCH" word)
+Code like this on top of your patch:
+diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+index 3edbe2dad8ba..d026918319d2 100644
+--- a/net/ipv4/inet_hashtables.c
++++ b/net/ipv4/inet_hashtables.c
+@@ -1282,12 +1282,12 @@ int inet_ehash_locks_alloc(struct
+inet_hashinfo *hashinfo)
+                 * on all available nodes if desired.
+                 */
+                ptr =3D vmalloc_array(nblocks, locksz);
+-       }
+-       if (!ptr) {
++       } else {
+                ptr =3D kvmalloc_array(nblocks, locksz, GFP_KERNEL);
+-               if (!ptr)
+-                       return -ENOMEM;
+        }
++       if (!ptr)
++               return -ENOMEM;
++
+        for (i =3D 0; i < nblocks; i++)
+                spin_lock_init(&ptr[i]);
+        hashinfo->ehash_locks =3D ptr;
 
-> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Sure, it's not a big deal at all. Just try more rounds to allocate memory..=
+.
 
-I didn't signed that either
-
-> Link: https://lore.kernel.org/lkml/ffc91764-1142-4ba2-91b6-8c773f6f7095@gmail.com/T/
-> ---
->   drivers/net/ethernet/intel/i40e/i40e_common.c | 10 +++++-----
->   1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_common.c b/drivers/net/ethernet/intel/i40e/i40e_common.c
-> index 370b4bddee44..9a73cb94dc5e 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_common.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_common.c
-> @@ -817,8 +817,8 @@ int i40e_pf_reset(struct i40e_hw *hw)
->   void i40e_clear_hw(struct i40e_hw *hw)
->   {
->   	u32 num_queues, base_queue;
-> -	u32 num_pf_int;
-> -	u32 num_vf_int;
-> +	s32 num_pf_int;
-> +	s32 num_vf_int;
->   	u32 num_vfs;
->   	u32 i, j;
-
-It's fine to move the declaration of @i into the for loop, but
-you have to remove it here, otherwise it's shadowing, which we
-avoid.
-
->   	u32 val;
-> @@ -848,18 +848,18 @@ void i40e_clear_hw(struct i40e_hw *hw)
->   	/* stop all the interrupts */
->   	wr32(hw, I40E_PFINT_ICR0_ENA, 0);
->   	val = 0x3 << I40E_PFINT_DYN_CTLN_ITR_INDX_SHIFT;
-> -	for (i = 0; i < num_pf_int - 2; i++)
-> +	for (s32 i = 0; i < num_pf_int - 2; i++)
->   		wr32(hw, I40E_PFINT_DYN_CTLN(i), val);
->   
->   	/* Set the FIRSTQ_INDX field to 0x7FF in PFINT_LNKLSTx */
->   	val = eol << I40E_PFINT_LNKLST0_FIRSTQ_INDX_SHIFT;
->   	wr32(hw, I40E_PFINT_LNKLST0, val);
-> -	for (i = 0; i < num_pf_int - 2; i++)
-> +	for (s32 i = 0; i < num_pf_int - 2; i++)
->   		wr32(hw, I40E_PFINT_LNKLSTN(i), val);
->   	val = eol << I40E_VPINT_LNKLST0_FIRSTQ_INDX_SHIFT;
->   	for (i = 0; i < num_vfs; i++)
->   		wr32(hw, I40E_VPINT_LNKLST0(i), val);
-> -	for (i = 0; i < num_vf_int - 2; i++)
-> +	for (s32 i = 0; i < num_vf_int - 2; i++)
->   		wr32(hw, I40E_VPINT_LNKLSTN(i), val);
->   
->   	/* warn the HW of the coming Tx disables */
-
+Thanks,
+jason
 
