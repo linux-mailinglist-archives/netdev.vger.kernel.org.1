@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-172290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 618D6A5412A
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 04:20:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 545B3A5412B
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 04:20:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A69816F389
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 03:20:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A91816F351
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 03:20:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4F8C19309E;
-	Thu,  6 Mar 2025 03:20:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10DB3198A34;
+	Thu,  6 Mar 2025 03:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KaxBoBek"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hN+i3tkh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AACFB18DB1E;
-	Thu,  6 Mar 2025 03:20:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91B5197A8E;
+	Thu,  6 Mar 2025 03:20:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741231201; cv=none; b=MeyzJvs2Pk7cdgDSn3OUO2H9oe0b15tUBykIfDYG1Ffk3H1FPN6UDI2Q4H/1UWiyQiyoCR7iLTpkh7ZJHTEO1QdrVz5SzGCRxF80tB66gEsMeXSEXmjrrTeey8z/ZD1gPlABh9TI6zgjfC1jm3chKN78GzOZ9eH3EeoAU1UdiO0=
+	t=1741231203; cv=none; b=LVfCwHTY0yPFR/GOUhh24inyn/a4Ydli/ZeYOYjiaDG8CxUZnf0oWYupuZxU7s1W780ITFuWPIkjv5obRGIkaRGDpNEbuQunX378ETiXxaD9PkI4M8ZbqWuuFFP6WT77OgjOnLUuthy4nObnG1ulyNzVa2tRWieX/NONbikP73o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741231201; c=relaxed/simple;
-	bh=ldpseiZdwbk12xd//hJkl8SkTToSHiL6VywDH4TCwFs=;
+	s=arc-20240116; t=1741231203; c=relaxed/simple;
+	bh=puW1fkF16Qim9hZZEw4ModRCF3+zrl3JO6/d11Mn3Uk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=q6s/EmB61bxcrASqLBUqhC57iJpg3iIzgqdgsWPFLkLnYoBKnmR/0sNZbSMTWz9h2UOcx4r764XpFyIgWjM82cALGfCl7+L/nnsSXPq8A/XPvILnKSLNBnyZwTIx23gvpPkCrQd8e0O02/hnTsnkw28H7eoTfPRygFdPa2EYMhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KaxBoBek; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AC6FC4CED1;
-	Thu,  6 Mar 2025 03:20:01 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=rSEky42RGB1/R6X31d7J3lpY3XkHzCaE83zyBgBRML0iHON9HVhCqMxkJbJ4MxkQo91IjoduqCjZz7hdoxo+AHDSUHQVT5+xv4kC6n2Fk0Sq1Ng4Khctob1bBpBCgOEnAGNluqDiZFXegnraeswANdDl+v53SFXJi9BzEOaiC4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hN+i3tkh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 506A9C4CEE9;
+	Thu,  6 Mar 2025 03:20:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741231201;
-	bh=ldpseiZdwbk12xd//hJkl8SkTToSHiL6VywDH4TCwFs=;
+	s=k20201202; t=1741231202;
+	bh=puW1fkF16Qim9hZZEw4ModRCF3+zrl3JO6/d11Mn3Uk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KaxBoBekBiKcBUHabZEgWALw3F8Nh0J2upfew+y2V3QUsiTxcdEA7qE7laE8r3NdC
-	 Z71TwxipZfcyfoeHwawduMzD+HtzyE9Kz9aaujw33rKOSAm9hmLiCYcvg0hAwnjiy+
-	 UCMZ4yVWvFyHBfwhsLEk+oZGXGw3/OYaolfEH2KtKkKj3221/5vN/IuKWZS3XLXtXb
-	 H/dN/11RyUrP+2SIiwA1UCzJsFN3U6SJKgxgfrtTM5+U4qbf0XjERz7IWJnNeeUnJH
-	 7ub25Q7J5GY8V8WPDyMt58J1i9p7Wn4iGPiD5Ull9lbfaCKTmN8NqIPZpNemXi4ljx
-	 EKkXF7nn/WOyQ==
+	b=hN+i3tkhBsXNtUnRx9tV1K3ezT65JSWich6bKEtNqjEB16j4/AnXmyeLyJwFpcY+v
+	 mz0SizSVVZ2G0R7l7mTgBqYv4vN97mJhSRCB6D1WrF7HKK1f6fm+pxW2lFwwie+aCe
+	 aJEIFrY2Z58zuUpeiiLRTs6SOK6T0765uz+uy2YHy7BH7q0YYELaxZE7ugKGDOBS2/
+	 q73tcgEuYon/1TdOyEKwMCYht45VykkNl/LHXGmEDgazQn1Iw6S/xJWWP8xiJc2NL9
+	 90zXfea49B/wVQDkAYGenbtXLbc7XZl45eOwDsUxrtuWKNeKRaqaE7Q8ZA86eCVxs7
+	 EFzIxwEW+ZipQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71D08380CFF3;
-	Thu,  6 Mar 2025 03:20:35 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE2B5380CFF3;
+	Thu,  6 Mar 2025 03:20:36 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,57 +52,59 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/8] net: phy: move PHY package code to its own
- source file
+Subject: Re: [PATCH net-next v9 0/6] Enable SGMII and 2500BASEX interface mode
+ switching for Intel platforms
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174123123425.1112346.6998420178306205592.git-patchwork-notify@kernel.org>
-Date: Thu, 06 Mar 2025 03:20:34 +0000
-References: <5c5e60b3-0378-4960-8cf0-07ce0e219c68@gmail.com>
-In-Reply-To: <5c5e60b3-0378-4960-8cf0-07ce0e219c68@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: andrew@lunn.ch, linux@armlinux.org.uk, kuba@kernel.org, pabeni@redhat.com,
- davem@davemloft.net, edumazet@google.com, daniel@makrotopia.org,
- dqfext@gmail.com, SkyLake.Huang@mediatek.com, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, richardcochran@gmail.com,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
- robimarko@gmail.com, kory.maincent@bootlin.com, rosenp@gmail.com
+ <174123123550.1112346.5967919465567432247.git-patchwork-notify@kernel.org>
+Date: Thu, 06 Mar 2025 03:20:35 +0000
+References: <20250227121522.1802832-1-yong.liang.choong@linux.intel.com>
+In-Reply-To: <20250227121522.1802832-1-yong.liang.choong@linux.intel.com>
+To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+Cc: horms@kernel.org, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+ david.e.box@linux.intel.com, tglx@linutronix.de, mingo@redhat.com,
+ bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+ irenic.rajneesh@gmail.com, david.e.box@intel.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+ jiawenwu@trustnetic.com, mengyuanlou@net-swift.com, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, hdegoede@redhat.com, ilpo.jarvinen@linux.intel.com,
+ richardcochran@gmail.com, fancer.lancer@gmail.com, x86@kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ platform-driver-x86@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 3 Mar 2025 21:13:05 +0100 you wrote:
-> This series contributes to cleaning up phylib by moving PHY package
-> related code to its own source file.
+On Thu, 27 Feb 2025 20:15:16 +0800 you wrote:
+> During the interface mode change, the 'phylink_major_config' function will
+> be triggered in phylink. The modification of the following functions will
+> support the switching between SGMII and 2500BASE-X interface modes for
+> the Intel platform:
 > 
-> v2:
-> - rename the getters
-> - add a new header file phylib.h, which is used by PHY drivers only
-> v3:
-> - include phylib.h in bcm54140.c
+> - xpcs_switch_interface_mode: Re-initiates clause 37 auto-negotiation for
+>   the SGMII interface mode to perform auto-negotiation.
+> - mac_finish: Configures the SerDes according to the interface mode.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v3,1/8] net: phy: move PHY package code from phy_device.c to own source file
-    https://git.kernel.org/netdev/net-next/c/61dc9cae8727
-  - [net-next,v3,2/8] net: phy: add getters for public members in struct phy_package_shared
-    https://git.kernel.org/netdev/net-next/c/2c8cd9783f46
-  - [net-next,v3,3/8] net: phy: qca807x: use new phy_package_shared getters
-    https://git.kernel.org/netdev/net-next/c/947030f3c32b
-  - [net-next,v3,4/8] net: phy: micrel: use new phy_package_shared getters
-    https://git.kernel.org/netdev/net-next/c/890fe6841d81
-  - [net-next,v3,5/8] net: phy: mediatek: use new phy_package_shared getters
-    https://git.kernel.org/netdev/net-next/c/dc5a6164feda
-  - [net-next,v3,6/8] net: phy: mscc: use new phy_package_shared getters
-    https://git.kernel.org/netdev/net-next/c/e0327e9f8597
-  - [net-next,v3,7/8] net: phy: move PHY package related code from phy.h to phy_package.c
-    https://git.kernel.org/netdev/net-next/c/e7f984e925d2
-  - [net-next,v3,8/8] net: phy: remove remaining PHY package related definitions from phy.h
-    https://git.kernel.org/netdev/net-next/c/a40028497769
+  - [net-next,v9,1/6] net: phylink: use pl->link_interface in phylink_expects_phy()
+    https://git.kernel.org/netdev/net-next/c/b63263555eaa
+  - [net-next,v9,2/6] net: pcs: xpcs: re-initiate clause 37 Auto-negotiation
+    https://git.kernel.org/netdev/net-next/c/065d3cef99a1
+  - [net-next,v9,3/6] arch: x86: add IPC mailbox accessor function and add SoC register access
+    https://git.kernel.org/netdev/net-next/c/7e2f7e25f6ff
+  - [net-next,v9,4/6] net: stmmac: configure SerDes on mac_finish
+    https://git.kernel.org/netdev/net-next/c/e654cfc718d4
+  - [net-next,v9,5/6] net: stmmac: configure SerDes according to the interface mode
+    https://git.kernel.org/netdev/net-next/c/a42f6b3f1cc1
+  - [net-next,v9,6/6] net: stmmac: interface switching support for ADL-N platform
+    https://git.kernel.org/netdev/net-next/c/7598ef621a43
 
 You are awesome, thank you!
 -- 
