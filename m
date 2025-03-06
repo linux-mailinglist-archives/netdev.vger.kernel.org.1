@@ -1,108 +1,75 @@
-Return-Path: <netdev+bounces-172414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC2FFA54841
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 11:45:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3C58A54852
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 11:46:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46278188E77F
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:45:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 804EC7A6061
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:45:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84BE6204C25;
-	Thu,  6 Mar 2025 10:44:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1680A202984;
+	Thu,  6 Mar 2025 10:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DZcjHyf+"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C452045AE;
-	Thu,  6 Mar 2025 10:44:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E71A953BE
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 10:46:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741257854; cv=none; b=YRnRPbViALbAzNQlWBX8z3EgHK7dEivpFHrGeWA5YULYV2hC2C/paaOa+CtRaRyyePmuhvkAIqM4SzDTqhSnx6Oz1CG3nOkNdhm3gbI1ANbTa/BZao9lKTAa0bfgnsDH4DdgxCvJLDUuiB1HkEL2Qj95G1wtA79QXRwCCegqHRI=
+	t=1741258013; cv=none; b=FArTK0kjfVcr3hDSZ9s/PVv/sdx9eInbcTtR5XWJNY/PVtuhGs+DDjU9NAMkpA9y7Ur7Cb090sYLIqRQIoHg6OGdrsOtKj9F0Ztg19vJ025aGilaEc06u/n6nhFhLwm6lkJEEEsq+wPjil1pTxiwCMYwPYWppSgIxOOJtjwI/f0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741257854; c=relaxed/simple;
-	bh=Y2Ze13u5oiC3+cLqwxTGSF5SsH2PLvoyTg85F5Ty7RA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=traxqp1NeiMTu2kNiF0HjQf3K9rP5qJUi30J94ScoSqx0GvTy6brckvJhzsuAcN8OVxkTr0J755rXR6u8afWx20ZqDAp6RLFCV3a/hCRPPqRfMSOdSSjYNJ1tNAn31qD4XMT97DLLOzhPmjt8NCFMQdHnEZ4ECsI4UShj4gYby4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [124.16.141.245])
-	by APP-03 (Coremail) with SMTP id rQCowAD3_lppfMlnVXXHEg--.33580S2;
-	Thu, 06 Mar 2025 18:43:55 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: saeedm@nvidia.com,
-	leon@kernel.org,
-	tariqt@nvidia.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>
-Subject: [PATCH v3] net/mlx5: handle errors in mlx5_chains_create_table()
-Date: Thu,  6 Mar 2025 18:43:37 +0800
-Message-ID: <20250306104337.2581-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.42.0.windows.2
+	s=arc-20240116; t=1741258013; c=relaxed/simple;
+	bh=lojiNXCclQcDM8RuW+yJvuFzUVUJspCuWIvSyWIclLM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bUkGsrzA+ltvWa36IF1xBCQBmqxUKA0DhMRQFamfqeqtkUbrP/0dVRj1LxFsgfnfE5yM2MqJwyFGkM6iFZ/PbpauYsqLaFvLQ4CvLTF+oTwr95yd2iPSFL0xAbe3wvCyRD+GUR2s1lIKSlXuO1bUA+5HiDGopC++uxhi3S9jYTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DZcjHyf+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B25DBC4CEE0;
+	Thu,  6 Mar 2025 10:46:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741258012;
+	bh=lojiNXCclQcDM8RuW+yJvuFzUVUJspCuWIvSyWIclLM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DZcjHyf+wqG8t9vhRIu0UjF33cE9uvuIzAW2sTmbYy3CVOh0q17wiVnaHMtj462Nd
+	 6UldRUZ+OG0GAQyvwxC0zAEyQ3aqQhpavLVEZ2YvsngJ+7pPRxUnoQyS8PBBaCmmco
+	 hQlDAxOHP78w4bbJa4rXn1OWabqK4AqUin2j35RNZWDHWTsUqn68Ue7zAibPh5aY4V
+	 PfWquf5gs+ijDMIATbkIvkGkNvfsN+je2GWpAq8YSQfAUxJ4lSYQcMywWyCiXPUhXr
+	 x+j5uvJZUGLM/ry2o3/hiYKmQjz63RKDYxaReIBFp9cLcZyVkxqAXlDaM0wtwB4CqH
+	 zMl5uFoJFe7uw==
+Date: Thu, 6 Mar 2025 10:46:48 +0000
+From: Simon Horman <horms@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 1/4] net: airoha: Move min/max packet len
+ configuration in airoha_dev_open()
+Message-ID: <20250306104648.GS3666230@kernel.org>
+References: <20250304-airoha-eth-rx-sg-v1-0-283ebc61120e@kernel.org>
+ <20250304-airoha-eth-rx-sg-v1-1-283ebc61120e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowAD3_lppfMlnVXXHEg--.33580S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7uF17XFyfCw1xGryxXFWrZrb_yoW8Gr1rpF
-	47AryDWrZ5J348J34UZFWFq34rua1kKa4j9Fs3K3yfZwnrXanrAF1rG34akr4jkry5G39x
-	tFn8A3WUZFZxC3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
-	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-	VFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBwkNA2fJcksk+wAAsI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250304-airoha-eth-rx-sg-v1-1-283ebc61120e@kernel.org>
 
-In mlx5_chains_create_table(), the return value of mlx5_get_fdb_sub_ns()
-and mlx5_get_flow_namespace() must be checked to prevent NULL pointer
-dereferences. If either function fails, the function should log error
-message with mlx5_core_warn() and return error pointer.
+On Tue, Mar 04, 2025 at 03:21:08PM +0100, Lorenzo Bianconi wrote:
+> In order to align max allowed packet size to the configured mtu, move
+> REG_GDM_LEN_CFG configuration in airoha_dev_open routine.
+> 
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 
-Fixes: 39ac237ce009 ("net/mlx5: E-Switch, Refactor chains and priorities")
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
- drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
-index a80ecb672f33..711d14dea248 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
-@@ -196,6 +196,11 @@ mlx5_chains_create_table(struct mlx5_fs_chains *chains,
- 		ns = mlx5_get_flow_namespace(chains->dev, chains->ns);
- 	}
- 
-+	if (!ns) {
-+		mlx5_core_warn(chains->dev, "Failed to get flow namespace\n");
-+		return ERR_PTR(-EOPNOTSUPP);
-+	}
-+
- 	ft_attr.autogroup.num_reserved_entries = 2;
- 	ft_attr.autogroup.max_num_groups = chains->group_num;
- 	ft = mlx5_create_auto_grouped_flow_table(ns, &ft_attr);
--- 
-2.42.0.windows.2
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
