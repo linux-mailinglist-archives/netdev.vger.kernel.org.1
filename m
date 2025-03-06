@@ -1,135 +1,114 @@
-Return-Path: <netdev+bounces-172319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BA05A5436B
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 08:15:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A194A5436F
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 08:15:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 304EE189526E
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 07:15:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6F9718952EA
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 07:15:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECB711C8602;
-	Thu,  6 Mar 2025 07:15:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0D3D1A83EE;
+	Thu,  6 Mar 2025 07:15:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rGGZAxkd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q+fze49d"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCEF21A5B9C;
-	Thu,  6 Mar 2025 07:15:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC7011A2567
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 07:15:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741245306; cv=none; b=gRen1o/GHHvws2/SP1OFFNtkTMGM6fCt73FmN/mpSrJ0YjV7C8OBa0B5P9gq40LdHc62AcrEWXT/RuRKvnL6U7xantlHjOeWcXOCeiGer4Wd4Q97+Phb0WHjxM0X18AfqHjohYRo0rX7MnJ90MapBvmYvxLeIjByGIYHBngfVYs=
+	t=1741245317; cv=none; b=geLknsc1Ttf6Llzi299H7jQ3apaUJZicmdFlAuVVDy68lgHYccaLpgSOQhY5L9FTCyuYGyXE1k1pOMn7upXYCyLk1kSi38LW5jSKMHiB6kGMrsTxQ2f98hwivLh267zTE1VCz5WmxKqkVl5mOxvk0fol4is//T+3QRGjDLwKCWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741245306; c=relaxed/simple;
-	bh=XJIMiL0K7y9DfdSjMQIYYyq4R6d3/GrM2ZzC9MoWLtE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eGNE5UqRVuxL9KQvAGCPDZO/cSy6l5vHf759pGJCpXSCBp/VLa47hfou4Mv3Gdcpuy5u05LMPuKxwCUDryXX5s7t5bHCkrlyTmvf07MEeCCqHENATdAc86fT1Embg8PgsLllf66Vnt4u1SqL36puDOUvWdlOR6EJ/Qi/rKAoyRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rGGZAxkd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D799BC4CEE4;
-	Thu,  6 Mar 2025 07:14:58 +0000 (UTC)
+	s=arc-20240116; t=1741245317; c=relaxed/simple;
+	bh=R4RmrGbauNXthzQkd+yMXMqsfyZpAbM9F5rByWS0Pss=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q/p7FlFkzv67gtCpJGoSi1g8eYX9wFgsmTVpobbdgIZXqctM+pDGP/tbV7vspfViMhjIWX3mrimiWwdf9ldKT2foqZu8MHx6GjXPLsWJ4v+a1pRQF2QyAY3ZOVFWrafYF8NEJ0ZveExuR6SDYIG2bXngpG9vxOrEO08rOE4eLnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q+fze49d; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DC43C4CEE8;
+	Thu,  6 Mar 2025 07:15:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741245306;
-	bh=XJIMiL0K7y9DfdSjMQIYYyq4R6d3/GrM2ZzC9MoWLtE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=rGGZAxkdmlz6aMntaSvaqI4j3yzPHU5IubqOr17HjUV5BZIFiGw1pW9x+HaQbm2zp
-	 RhJpygD79AduGVYNKtgTt9rw0sE8mmGUyfjI5slL2DpWq7vWp/uZ5ABoLAlj1Xsrey
-	 C54JQo5dxQjnAPUfDiO8H9FZumDU7UBapMkUxkYCshX1O7knY0TdlfK1wDxs/Nluby
-	 6TBWOJY9B6xy+mirOTMsCkGYNoMk2XHRWVcyhjlG2xiQoTJOSW6Psxd8GgCcVcFwb/
-	 IwCModRptWQf3ijiAFzN8stVqoHBg5bdbc+UDZ8bHdd/Xz4OMn6rLrtTmIcrMKFd+U
-	 v/5Jl6Oa3af2A==
-Message-ID: <789ecb2f-dddc-491b-b9f8-5fb89058fd1b@kernel.org>
-Date: Thu, 6 Mar 2025 08:14:56 +0100
+	s=k20201202; t=1741245316;
+	bh=R4RmrGbauNXthzQkd+yMXMqsfyZpAbM9F5rByWS0Pss=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=q+fze49dvw+jNnRPdfpRKAouWpMfPLXS6rY6sovexKJYJMVcoTGPvL2jvJAxxS39H
+	 5LrgmDw/veg/xdtHeso6MP6qIW46X8CIyoz1Usq8kwidLdMKG5zK1qZfdlKjIjZTGG
+	 xbZQ0QDJx8mQDREeaUKXJ3LWue+TWC9H9OYXSjth7d55YXKyeXs/i1l1/C+TZCClds
+	 imESrxFZu4s8ie7+kQ1swz01lUCoN/80/euvXA+jMla6Q/xuJYyKg4zFh3OMom48+V
+	 xbtGCJBGP6QFYWGU1cOeUURK0AmbWhC5pqI5GTwNHR6/lWtcQLGi368nRucXNXZ1J5
+	 tksVa4QDsLkJg==
+Date: Thu, 6 Mar 2025 09:15:11 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, David Arinzon <darinzon@amazon.com>,
+	David Miller <davem@davemloft.net>, netdev@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	"Woodhouse, David" <dwmw@amazon.com>,
+	"Machulsky, Zorik" <zorik@amazon.com>,
+	"Matushevsky, Alexander" <matua@amazon.com>,
+	Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>,
+	"Liguori, Anthony" <aliguori@amazon.com>,
+	"Bshara, Nafea" <nafea@amazon.com>,
+	"Schmeilin, Evgeny" <evgenys@amazon.com>,
+	"Belgazal, Netanel" <netanel@amazon.com>,
+	"Saidi, Ali" <alisaidi@amazon.com>,
+	"Herrenschmidt, Benjamin" <benh@amazon.com>,
+	"Kiyanovski, Arthur" <akiyano@amazon.com>,
+	"Dagan, Noam" <ndagan@amazon.com>,
+	"Bernstein, Amit" <amitbern@amazon.com>,
+	"Agroskin, Shay" <shayagr@amazon.com>,
+	"Ostrovsky, Evgeny" <evostrov@amazon.com>,
+	"Tabachnik, Ofir" <ofirt@amazon.com>,
+	"Machnikowski, Maciek" <maciek@machnikowski.net>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Subject: Re: [PATCH v8 net-next 4/5] net: ena: PHC stats through sysfs
+Message-ID: <20250306071511.GP1955273@unreal>
+References: <20250304190504.3743-1-darinzon@amazon.com>
+ <20250304190504.3743-5-darinzon@amazon.com>
+ <21fe01f0-7882-46b8-8e7c-8884f4e803f6@lunn.ch>
+ <20250304145857.61a3bd6e@kernel.org>
+ <89b4ceae-c2c8-4a7b-9f1b-39b6bce17d34@lunn.ch>
+ <20250305183637.2e0f6a9f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 1/2] dt-bindings: net: Add FSD EQoS device tree
- bindings
-To: Swathi K S <swathi.ks@samsung.com>, krzk+dt@kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, conor+dt@kernel.org,
- richardcochran@gmail.com, mcoquelin.stm32@gmail.com,
- alexandre.torgue@foss.st.com
-Cc: rmk+kernel@armlinux.org.uk, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- pankaj.dubey@samsung.com, ravi.patel@samsung.com, gost.dev@samsung.com
-References: <20250305091246.106626-1-swathi.ks@samsung.com>
- <CGME20250305091852epcas5p18a0853e85a5ed3d36d5d42ef89735ca6@epcas5p1.samsung.com>
- <20250305091246.106626-2-swathi.ks@samsung.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20250305091246.106626-2-swathi.ks@samsung.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250305183637.2e0f6a9f@kernel.org>
 
-On 05/03/2025 10:12, Swathi K S wrote:
-> Add FSD Ethernet compatible in Synopsys dt-bindings document. Add FSD
-> Ethernet YAML schema to enable the DT validation.
+On Wed, Mar 05, 2025 at 06:36:37PM -0800, Jakub Kicinski wrote:
+> On Wed, 5 Mar 2025 16:33:10 +0100 Andrew Lunn wrote:
+> > > I asked them to do this.
+> > > They are using a PTP device as a pure clock. The netdev doesn't support
+> > > any HW timestamping, so none of the stats are related to packets.  
+> > 
+> > So how intertwined is the PHC with the network device? Can it be
+> > separated into a different driver? Moved into drivers/ptp?
+> > 
+> > We have already been asked if this means network drivers can be
+> > configured via sysfs. Clearly we don't want that, so we want to get
+> > this code out of drivers/net if possible.
 > 
-> Signed-off-by: Pankaj Dubey <pankaj.dubey@samsung.com>
-> Signed-off-by: Ravi Patel <ravi.patel@samsung.com>
-> Signed-off-by: Swathi K S <swathi.ks@samsung.com>
-> ---
->  .../devicetree/bindings/net/snps,dwmac.yaml   |   5 +-
->  .../bindings/net/tesla,fsd-ethqos.yaml        | 118 ++++++++++++++++++
->  2 files changed, 121 insertions(+), 2 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/net/tesla,fsd-ethqos.yaml
+> Is it good enough to move the relevant code to a ptp/ or phc/ dir
+> under ...thernet/amazon/ena/ ? Moving it to ptp/ proper would require
+> some weird abstractions, not sure if it's warranted? 
+
+In normal world, where linux kernel driver model is respected, one will write
+separate driver for PTP and place it under drivers/ptp. This current series
+doesn't belong to netdev at all.
+
+Thanks
+
 > 
-
-I tried and did not see any differences, so point me exactly to any
-difference in the binding (binding!) which would justify dropping review?
-
-Best regards,
-Krzysztof
 
