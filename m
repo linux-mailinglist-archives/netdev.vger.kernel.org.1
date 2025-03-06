@@ -1,77 +1,60 @@
-Return-Path: <netdev+bounces-172487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE0F9A54F6A
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 16:45:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2A6EA54F6E
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 16:45:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13F1416A329
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 15:45:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA24E169B3B
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 15:45:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1143F20E703;
-	Thu,  6 Mar 2025 15:44:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53222183CB0;
+	Thu,  6 Mar 2025 15:45:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="zg5fWzzg"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ckyXPoQY"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00B7148FF5;
-	Thu,  6 Mar 2025 15:44:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7532E158851;
+	Thu,  6 Mar 2025 15:45:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741275887; cv=none; b=fYQYxO63SXqApByXCT8A8Nvd+PlDkKti0xdhGyIeKi96sqkmZ4OfPoagEkNjO34NzV//s6xljsMz16DyZHyE2CSVA7nwXxTOfxAV/14d8gNmKhGhL/R5ML9jnCyHe1Mp1PmroLHX3V51Zgol62V4mGBEug36t/6ZfKbjGxN5FqQ=
+	t=1741275946; cv=none; b=q5SrXFOMynAU6QpTl3b6vfBbNOp/yulkFC/+IC2R5sByQSL86DTXWSkELC90cmGpNR5BCiveyN0xTSs5UQ3JQGs0hSfabERz9JCbOkfjIeg9TSa9XjfDCbwU/aFWnJ9oEHWj7NaKO7Wx8BQIfOGAkzADKuaar6EEJsXSWxobT4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741275887; c=relaxed/simple;
-	bh=aixKISa0kyko036hL5V+qG8LL9qF3VO6FIAxvZvxJ70=;
+	s=arc-20240116; t=1741275946; c=relaxed/simple;
+	bh=yc12q/9VarqqACL+4SSHR1iRG15Iia1AK1NmxQMuyMk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E1b5oS+VmPT+Smfy7w3WnN2IzyEnfQjqxaUjsr4H7gYWaLAhLC/SLMV/8oie7uA4AWxOtXBVAMc8lFsYMABDbk/LckkKHB8qFsdT9oiizCTQ7uWXXJmReKFq/dlPGkP23EFOVqoFzkqhl8sAxemuenXQUdMzYnFLx7Gnn9mG390=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=zg5fWzzg; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=iqLTGgFW/Idb/RWJchf5+oj54Xp1Xr/3EggXQFnKjbg=; b=zg5fWzzg0ciofiTPI5rB/vbzNy
-	WfPtrhrK/GWO2fk4YllvIpM+OR9zwj+nAcHdFxGejKYSLJxFb14lamIUz029dUennkO+S/8xVwuKc
-	pWpGlU0OakPqbwkewGvaK7xfdpzRob+q6JwaxaXhNoWbqP9Op+aRtpsOdJre4ZOSQX1nrxyDbY+36
-	dwWYXr59SJGNLnf9PF1mlryhiM4aHClD6+aAm22Y4/shvpvQn0l2CNkrHW7lUv7g6/QFOfOTssfz+
-	4myjdw/1c6uQYOEnEyXLxfIhfWMGyWFfhFtY6V5aE6sU8xkDUpYR9cz8mguYi05IG5uCLynbEIjiF
-	Xtu/bAfA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36454)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tqDOj-00067c-2X;
-	Thu, 06 Mar 2025 15:44:33 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tqDOh-0006uz-01;
-	Thu, 06 Mar 2025 15:44:31 +0000
-Date: Thu, 6 Mar 2025 15:44:30 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jon Hunter <jonathanh@nvidia.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=bMWvrGFA1ICvR+n7gLZUa4UBzvUTjOVtcATduDXyjVFXw1mBIMz7xos6hK2M0nD8pBoNlUhODiR7c5WvJyWG68LZvMwAqk0fbJNSj7tm8mnOaeXAcLpgmQhkDBgQfEdV16C1qMEbVGTkM5Xh6uVqEQvOjpgTUzPbTJfHaQV+ir0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ckyXPoQY; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=DaZf4IUwIv+KPIOCFk7sNexM9Sy5HaExOZEMTIADKLs=; b=ckyXPoQY9UE0Sjp+gFeFoAZmA0
+	VORoHsfWL5x2ltTzZIVm1sb0maXNpTUmMX2uzMptOm+xYwaEr7axcmgakLZnT+GLRkQTIuzAAYc2M
+	x3zdMj6lDQ8ReNAKgxoBqPAjKI/NggVp2fbjDHAVlMmzZcBmLnf+vDjZBYWHptZpwIac=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tqDPi-002qG1-AR; Thu, 06 Mar 2025 16:45:34 +0100
+Date: Thu, 6 Mar 2025 16:45:34 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Joseph Huang <Joseph.Huang@garmin.com>
+Cc: netdev@vger.kernel.org, Joseph Huang <joseph.huang.2024@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Thierry Reding <treding@nvidia.com>,
-	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
-Subject: Re: [PATCH RFC 0/5] net: stmmac: fix resume failures due to RX clock
-Message-ID: <Z8nC3vvZWAl5_8WZ@shell.armlinux.org.uk>
-References: <Z8B4tVd4nLUKXdQ4@shell.armlinux.org.uk>
- <f783cf9c-9f79-4680-a6e9-d078abbd96ec@nvidia.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Guenter Roeck <linux@roeck-us.net>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net 1/1] net: dsa: mv88e6xxx: Verify after ATU Load ops
+Message-ID: <2376767d-e504-437b-b1b9-d1a41b02598e@lunn.ch>
+References: <20250304235352.3259613-1-Joseph.Huang@garmin.com>
+ <20250305202828.3545731-1-Joseph.Huang@garmin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,42 +63,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f783cf9c-9f79-4680-a6e9-d078abbd96ec@nvidia.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250305202828.3545731-1-Joseph.Huang@garmin.com>
 
-On Thu, Mar 06, 2025 at 11:30:53AM +0000, Jon Hunter wrote:
-> Hi Russell,
+On Wed, Mar 05, 2025 at 03:28:27PM -0500, Joseph Huang wrote:
+> ATU Load operations could fail silently if there's not enough space
+> on the device to hold the new entry. When this happens, the symptom
+> depends on the unknown flood settings. If unknown multicast flood is
+> disabled, the multicast packets are dropped when the ATU table is
+> full. If unknown multicast flood is enabled, the multicast packets
+> will be flooded to all ports. Either way, IGMP snooping is broken
+> when the ATU Load operation fails silently.
 > 
-> On 27/02/2025 14:37, Russell King (Oracle) wrote:
-> > Hi,
-> > 
-> > This series is likely dependent on the "net: stmmac: cleanup transmit
-> > clock setting" series which was submitted earlier today.
+> Do a Read-After-Write verification after each fdb/mdb add operation
+> to make sure that the operation was really successful, and return
+> -ENOSPC otherwise.
 > 
-> I tested this series without the above on top of mainline and I still saw
-> some issues with suspend. However, when testing this on top of -next (which
-> has the referenced series) it works like a charm. So yes it does appear to
-> be dependent indeed.
-> 
-> I have tested this on Tegra186, Tegra194 and Tegra234 with -next and all are
-> working fine. So with that feel free to add my ...
-> 
-> Tested-by: Jon Hunter <jonathanh@nvidia.com>
+> Fixes: defb05b9b9b4 ("net: dsa: mv88e6xxx: Add support for fdb_add, fdb_del, and fdb_getnext")
+> Signed-off-by: Joseph Huang <Joseph.Huang@garmin.com>
+> ---
+> V1: https://lore.kernel.org/lkml/20250304235352.3259613-1-Joseph.Huang@garmin.com/
+> V2: Add helper function to check the existence of an entry and only
+>     call it in mv88e6xxx_port_fdb/mdb_add().
 
-Hi Jon,
+You need to start a new thread for each version of the
+patch. Otherwise the tooling does not always recognise it.
 
-I came up with an alternative approach which should make this safer -
-for example, if the PHY remains linked with the partner over an
-ifdown or module remove/re-insert.
+> @@ -2847,6 +2870,13 @@ static int mv88e6xxx_port_fdb_add(struct dsa_switch *ds, int port,
+>  	err = mv88e6xxx_port_db_load_purge(chip, port, addr, vid,
+>  					   MV88E6XXX_G1_ATU_DATA_STATE_UC_STATIC);
+>  	mv88e6xxx_reg_unlock(chip);
+> +	if (err)
+> +		return err;
+> +
+> +	mv88e6xxx_reg_lock(chip);
+> +	if (!mv88e6xxx_port_db_find(chip, addr, vid))
+> +		err = -ENOSPC;
+> +	mv88e6xxx_reg_unlock(chip);
 
-Please see v2 of "net: stmmac: approach 2 to solve EEE LPI reset
-issues" which replaces this series.
+unlocking and lock the registers seems to introduce a race
+condition. Could another thread delete the just added entry before you
+test to see if it was correctly added?
 
-https://lore.kernel.org/r/Z8m-CRucPxDW5zZK@shell.armlinux.org.uk
+Please hold the lock across the entire operation.
 
-Thanks.
+    Andrew
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+---
+pw-bot: cr
 
