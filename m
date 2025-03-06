@@ -1,133 +1,80 @@
-Return-Path: <netdev+bounces-172284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05517A540C5
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 03:40:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B868A540D4
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 03:47:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 483121892ED5
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 02:40:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C478916AA47
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 02:47:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF441192D77;
-	Thu,  6 Mar 2025 02:39:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C736518FDB2;
+	Thu,  6 Mar 2025 02:47:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GFp+HLV6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oP1HEeN2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E3A18DB2C;
-	Thu,  6 Mar 2025 02:39:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BEA018DB13;
+	Thu,  6 Mar 2025 02:47:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741228787; cv=none; b=RGg4XLW9r+BnyWsm8NwAbxLpfGWrTZPRi79xkHX52LjM+zhWxNv7t8s0/q49ct1umV/Tx7WYHtrj7zjBF/bvRUwbXWUs77T6/Gjl0g97EtDu6vdtmEgm+VsuxNAL2ovMgWmiRHbbkxIJNHbVlpNNGVswNRWdL+Qo5VKnvAL9feI=
+	t=1741229271; cv=none; b=t098f8CQCh1mTlwNw4H7gW7ElrKkhYntZ6iXJYRUPUQ71FIWYX6z04G5/dYzdzdSpVuKr+RgMLKzX0eB5azIQpzhkuNNCpSH0BvEdwa7Fd0P1nDwJaEWbiJJ+SgzJrM7C5gcTFhiO+i4iy88Br5IOinD2f+0R2kxoMlSKHeFgVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741228787; c=relaxed/simple;
-	bh=8WBcXaLXL/iP7nl/3ES4eit2pxrZ+37ELIaPFNukPYg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OeBitLxT9aMRl/nA84D/5obZZmRVLeex39iosa1pOULVD+6uzEdQ+Io/cAs/hodU8juNx+URDnnpzHc4OaG0UryuX4D2OCMtEfH+9sxTQMM2IGUy3ei8TUi0GaQBX6NhLf6dOoqvw4FFUmXZH8XbSB8220LiuONFxVB36/i8/2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GFp+HLV6; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-223f4c06e9fso3295705ad.1;
-        Wed, 05 Mar 2025 18:39:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741228784; x=1741833584; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nO/K3jIMTWzpsGmyTlzR4YihT171aoPHTsbAGep3ycE=;
-        b=GFp+HLV6g6pcMSUQx65h975kuaTuobaOZIlzxP2V0lh1OPfLSZwK8ZTL7ALVKA6yrc
-         B1UE6V8FoQuqckwyU8pr0K9qGsA4rkCHGFVuXtstO1FVFoK4X3ChGqCJAYobS2587QeS
-         K8u649xEOIvWHRYF0mXMAn8gpH6qNBRsnLf9zyflJw53LHLKI+MzIssxWds9MlNuT+JF
-         0ocqNuOy6kJ4jIAeyLrNsInq4ssA6QCfdck0UQt2rUqJh1/itGlPw4xVex7F9Ef1/6EK
-         IzwJfX+9wOa2ehDB6v6N9AplXPIg981agLJmxq1msGG8b/ow8tAuk3aSaM35iT/Xnu/m
-         cdGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741228784; x=1741833584;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nO/K3jIMTWzpsGmyTlzR4YihT171aoPHTsbAGep3ycE=;
-        b=qrmMUvum4UaC2Obrrg02fs3B2DB/J/BdQqqcpvadn7G4rKzmkJsWa66dUqVRVNTGyR
-         7fnZn+arvkPx9MB1603wDrHUp+Hf1PoLanAJbT/h9sIDiHGXAJPRJlJi0COJhyHtv9vc
-         9eoatvzqm8gkGr39mmzYG6yeHQIuBGFWBbq+ExDdSFbso0tD8hmIFHzQmLn8R0V5SjdL
-         VQp7ylrDUU7quxR3wk70QhtQo2rUsq8uNIANicveXDZ3k0gKDeT3yEkIYwNheT5pd8GI
-         XVaM+8u37WFFNBi5rYSCQViIZGgHrDl+ba09qkPI4uXthCb9cAT8Ks9PA3lCN0L2facz
-         0czw==
-X-Forwarded-Encrypted: i=1; AJvYcCURbwHudxyMU5Ax1qI0Uy9/i+1vhSDS92ssDKksRkouKLM2JebitTqXsAM7qxQarw1uN4Ajb6DEsdUPjdnfJPhO@vger.kernel.org, AJvYcCXZOZwM87ewpnasyt3QqZEBPKTcg77NKGA034j9vt04j8gJ4mMb/pH4NG4nab8vM2BW40Fk8y3Jx/HTJGI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuFNU73f5HeKDzIoE2YH2NFqHS/UvNSmXdF9jaZGi+nOxST7Hr
-	HEHix2kVoIxWPrK9Aw2tslFGw1554TCe1m1wHU2iDn+uGuD1nlI6JAVo28DQNdWh2w==
-X-Gm-Gg: ASbGncs0STNJdnfji7//yU78J5FS+z2cklgz3dSJZwVrIqBS1DxEartkHb/Cu7CMeo7
-	8hQ6ZSgbkhjDhsgcTcfw35J4KqoaVMieODcSKg2+1BH/ugcbQa37uCHGzh6lw/6GFuiLlrNt+Ga
-	daL6Cc6EHMoQaKPVJcyLCb1zyVFAL/PQbSiuTrflUQyMg88SzZgKv4oSEFhi0RcPuKm1GGIhbVk
-	RxZPfdeQPTnaqFENuWTwMWtScdAStPoYB+Dv1iVp3J7lfjI04TGxpgbWTL0hO46GDJq+417slTa
-	pf1I8hsscoMBdTEQHqCPGCmeozzKkpnnX0YEkzftQUQuynxJaqIU3URpSdg+9Yd9
-X-Google-Smtp-Source: AGHT+IHYwOCpr7hGkL1F7WPPMLX5exZ5+7vBbvbuOwSyzigC1YACRXQNSDsEgsOfuAbn3XruKcOAKw==
-X-Received: by 2002:a17:902:ce0c:b0:215:6c5f:d142 with SMTP id d9443c01a7336-22409471a71mr26077915ad.20.1741228784127;
-        Wed, 05 Mar 2025 18:39:44 -0800 (PST)
-Received: from fedora.dns.podman ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22410aa8ae4sm1292185ad.243.2025.03.05.18.39.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Mar 2025 18:39:43 -0800 (PST)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Cosmin Ratiu <cratiu@nvidia.com>,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv4 net 2/2] selftests: bonding: fix incorrect mac address
-Date: Thu,  6 Mar 2025 02:39:23 +0000
-Message-ID: <20250306023923.38777-3-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20250306023923.38777-1-liuhangbin@gmail.com>
-References: <20250306023923.38777-1-liuhangbin@gmail.com>
+	s=arc-20240116; t=1741229271; c=relaxed/simple;
+	bh=xKLvEuTiVxI8xYqmlOoOvu1y3DL0CNtKqe5Ki+KcoZ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qTMH90pay0ixTeaQzYcm2c6++netCvaeW3IPWvbGtQRA4DGPKimTFOi8mitWdJ2TkTj/0vgZhEhD8PGLsgSU1KJE+2ysZN1KUvw7vdaACynBNcc4+E6/NTj4/WtHZkEYtBig/AflHSNPEufyZ2SOjboNCZDDS7ptIRfH6fKEpdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oP1HEeN2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70F7EC4CED1;
+	Thu,  6 Mar 2025 02:47:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741229271;
+	bh=xKLvEuTiVxI8xYqmlOoOvu1y3DL0CNtKqe5Ki+KcoZ8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=oP1HEeN29Mtk/lLYprOLObdtx7M0mbOaMpc7d4RzXBSReiw8+G9lSYSQVdgEnf567
+	 6jOFoc4j3gffEyqnl5A9xNd8FlkXDAaDHPFW9bry9lsjBPcE3IS9yRw0bDFKMNuV5z
+	 xpEJnwLYIPM5jVxy2NyP7KG8+ano/bB3ILbXf7p+0P7NwGbBo0VTbAwXyweqyzXX/2
+	 VTlXl1s/jAXRjgj/50xW7FQzng2IQBygy93KNRATuW3swTyTLHdwdhIv+n5lmCn4LO
+	 lSqRoFJxT3PveOZTirJpvdV9k4A9iilpkFqCFLHNNLswkT0E/sX2Hb2fwUgTRs2SvN
+	 ZFkdrBXrirQ8A==
+Date: Wed, 5 Mar 2025 18:47:49 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, Simon Horman <horms@kernel.org>, Romain Gantois
+ <romain.gantois@bootlin.com>, Piergiorgio Beruto
+ <piergiorgio.beruto@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>
+Subject: Re: [PATCH net-next 0/7] net: ethtool: Introduce ethnl dump helpers
+Message-ID: <20250305184749.5519e7a9@kernel.org>
+In-Reply-To: <20250305180252.5a0ceb86@fedora.home>
+References: <20250305141938.319282-1-maxime.chevallier@bootlin.com>
+	<20250305180252.5a0ceb86@fedora.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The correct mac address for NS target 2001:db8::254 is 33:33:ff:00:02:54,
-not 33:33:00:00:02:54. The same with client maddress.
+On Wed, 5 Mar 2025 18:02:52 +0100 Maxime Chevallier wrote:
+> This series will very likely conflict with Stanislav's netdev lock
+> work [2], I'll of course be happy to rebase should it get merged :)
 
-Fixes: 86fb6173d11e ("selftests: bonding: add ns multicast group testing")
-Acked-by: Jay Vosburgh <jv@jvosburgh.net>
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
- tools/testing/selftests/drivers/net/bonding/bond_options.sh | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/drivers/net/bonding/bond_options.sh b/tools/testing/selftests/drivers/net/bonding/bond_options.sh
-index edc56e2cc606..7bc148889ca7 100755
---- a/tools/testing/selftests/drivers/net/bonding/bond_options.sh
-+++ b/tools/testing/selftests/drivers/net/bonding/bond_options.sh
-@@ -11,8 +11,8 @@ ALL_TESTS="
- 
- lib_dir=$(dirname "$0")
- source ${lib_dir}/bond_topo_3d1c.sh
--c_maddr="33:33:00:00:00:10"
--g_maddr="33:33:00:00:02:54"
-+c_maddr="33:33:ff:00:00:10"
-+g_maddr="33:33:ff:00:02:54"
- 
- skip_prio()
- {
--- 
-2.46.0
-
+Also this doesn't build. Please hold off on reposting for a couple of
+days - because of the large conflict radius the previous few revisions
+of the locking series haven't even gotten into the selftest CI queue :(
 
