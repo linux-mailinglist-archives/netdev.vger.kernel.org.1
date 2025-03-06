@@ -1,127 +1,113 @@
-Return-Path: <netdev+bounces-172622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74ECBA558F0
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 22:40:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB664A558F4
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 22:41:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC6B67A2215
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 21:39:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 002F5173D53
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 21:41:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4754026F478;
-	Thu,  6 Mar 2025 21:40:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 832CC2135A3;
+	Thu,  6 Mar 2025 21:41:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qWvQBC8c"
+	dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b="mWBugUuD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.manjaro.org (mail.manjaro.org [116.203.91.91])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A155151990;
-	Thu,  6 Mar 2025 21:40:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2096249E5;
+	Thu,  6 Mar 2025 21:41:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.91.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741297222; cv=none; b=rIgEnVy4a0V90F1acWNuVIuTCKknnHzOLOCGU1qfBGbiZk56z+pIrbMQbnCdLHvRX2ipDYRKTX7OrzhsLjagCut2xe4nckf0ZOrWNHGPFuyxczQv49aeHco8fWhjCwsu5lqUyWwg/xJtEEZp6e31GOK9ynG3q/KCNnVzCwO/c9E=
+	t=1741297267; cv=none; b=SvdlwCVXFM2YzgBKrgzJwERcSEQ0YFBJnsPyjrJQZ6DrYwy5Zb7UKfPIx4nMjaR6bQ5k/jQVonQZZh8RT1n7LMFuxZDSIa3ZG9r2ThbXovBsn5Bg4HBSBCN91ZAUoTacY7y2jFru9DpOeDLvt8T7lJL7Lwz+ErPFLgGB27F2ZBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741297222; c=relaxed/simple;
-	bh=hLwEVcHmWyfHzwJcntUNMaPG82MeB24Us0ZhRuq1ojA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dpCOTTI6JK3JHKJLKBRBqtlxmFXi5QWbbScGEH6VCsPRA3xvuRdNDdnYZKNRjdJIm7EsxqA/CkhMJheayX0TkZ4aDX8abLUPoUg8iT5TMPPAF+pNzApJcHEYARC2N+jPoj/RSxXbt0fEy1nRHGqjX6rYRk2jsL7Ratuyt6RiBho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qWvQBC8c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36E2DC4CEE0;
-	Thu,  6 Mar 2025 21:40:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741297221;
-	bh=hLwEVcHmWyfHzwJcntUNMaPG82MeB24Us0ZhRuq1ojA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qWvQBC8cMlzIYQijdnco18mw0T0tVzn2B4U0wQLNkSKO5KTDqAxHSAGxvUfNybRah
-	 8lgFJ/enNu+swZgndUBSSsT5aSgOH3LFxfQ7CBfpSPo1wvKYEI+3pTXeaGTbLi3nx1
-	 rY6v8/WbCqCOX/VNd4Il5HC86ulDEYjbHuSLFbXXU/PbA+kacBAbBC5sPifvmJygEA
-	 Gk76Ko19HRTBKiFw167crQ7jTK+XK1Tcg0oetXWQ6gB/SFDpI5GuXRkqgAdhL3hBPs
-	 oyvPuKTFtSIWVx07LChKUPoeB6Fpe7zRJAx/slFPjRcMwu7cc6yDZ/HFA3+bfVMKla
-	 alosVkK00Ebqw==
-Date: Thu, 6 Mar 2025 13:40:19 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, Donald
- Hunter <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Jeroen de Borst <jeroendb@google.com>, Harshitha
- Ramamurthy <hramamurthy@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
- Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>,
- Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin"
- <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Eugenio =?UTF-8?B?UMOpcmV6?=
- <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano
- Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
- sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, Jamal Hadi Salim
- <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
- <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
-Subject: Re: [PATCH net-next v6 1/8] net: add get_netmem/put_netmem support
-Message-ID: <20250306134019.1702e609@kernel.org>
-In-Reply-To: <CAHS8izNWt2-1bC2f0jv4Qpk_A9VpEXNvVRoXUtL43_16d-Ui-A@mail.gmail.com>
-References: <20250227041209.2031104-1-almasrymina@google.com>
-	<20250227041209.2031104-2-almasrymina@google.com>
-	<20250228163846.0a59fb40@kernel.org>
-	<CAHS8izNQnTW7sad_oABtxhy3cHxGR0FWJucrHTSVX7ZAA6jT3Q@mail.gmail.com>
-	<20250303162051.09ad684e@kernel.org>
-	<CAHS8izNWt2-1bC2f0jv4Qpk_A9VpEXNvVRoXUtL43_16d-Ui-A@mail.gmail.com>
+	s=arc-20240116; t=1741297267; c=relaxed/simple;
+	bh=Gb8LX0FDsLupGyOUwSvKzXTC0OHMDI948YPUXXrpV7k=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=HTKQ6ED0e8ST0tDFYQnAByAHZeNfJXNsRv6RxvMFkegFtL9yjHQoAs3xq4Pga1pZ3tjKWx5v9M/2dl+m3ZZEd7aZBLh9IvxgCtweH5EhJZQIxEkXxLP/JQPTCLnS57kAnkYXRpf2e4CuU2C3K/xCHrwKKTC2hdzmkzo+JTYqTeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org; spf=pass smtp.mailfrom=manjaro.org; dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b=mWBugUuD; arc=none smtp.client-ip=116.203.91.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manjaro.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjaro.org; s=2021;
+	t=1741297263;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ogLZAuYeTK3/4DxQxKpS5NhtK0uL51zVQoxAkrY1bR8=;
+	b=mWBugUuD92cKAZA0g1fWhmejy6D+0gx+j1JkJJNyP7AZqdfO+gC1rD6xbKped/eNbIufKf
+	rEv8Ou+aL2CUSWmiKN5mrd0No3l4TVFv7UwCMH/pJ8josaFzXztiiuWwGxEWgpeSgNtsbV
+	DNAq0m4+EzHbCMT4CUNoysz7LNDrSyFo3RhVtpy5hkP3HskAuDzJFyYXXxEtAe7xKtgBUv
+	8bh84TgqT65ytOhqqfTBOfV9CwvMx6A2tZ4V42WlQJst30nkG3pyp3XOWv0pD8u/rhLzS6
+	CDE3Ah/+COdJw3ETzBPp3221mqy6DXbuWjdmlTe+/oOO7hqaGbYwBQaSa5TGeA==
+Date: Thu, 06 Mar 2025 22:41:03 +0100
+From: Dragan Simic <dsimic@manjaro.org>
+To: Jonas Karlman <jonas@kwiboo.se>
+Cc: Heiko Stuebner <heiko@sntech.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-rockchip@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/3] Use DELAY_ENABLE macro for RK3328, RK3566/RK3568 and
+ RK3588
+In-Reply-To: <20250306203858.1677595-1-jonas@kwiboo.se>
+References: <20250306203858.1677595-1-jonas@kwiboo.se>
+Message-ID: <41bb2c8d963e890768bceb477488250e@manjaro.org>
+X-Sender: dsimic@manjaro.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
+Authentication-Results: ORIGINATING;
+	auth=pass smtp.auth=dsimic@manjaro.org smtp.mailfrom=dsimic@manjaro.org
 
-On Tue, 4 Mar 2025 17:39:37 -0800 Mina Almasry wrote:
-> > > Yes, great idea. I don't see why it wouldn't work.
-> > >
-> > > We don't expect mixing of net_iovs and pages in the same skb, but
-> > > netdevsim could create one net_iov skb every N skbs.
-> > >
-> > > I guess I'm not totally sure something is discoverable to syzbot. Is a
-> > > netdevsim hack toggleable via a debugfs sufficient for syzbot? I'll
-> > > investigate and ask.  
-> >
-> > Yeah, my unreliable memory is that syzbot has a mixed record discovering
-> > problems with debugfs. If you could ask Dmitry for advice that'd be
-> > ideal.  
+Hello Jonas,
+
+On 2025-03-06 21:38, Jonas Karlman wrote:
+> Almost all Rockchip GMAC variants use the DELAY_ENABLE macro to help
+> enable or disable use of MAC rx/tx delay. However, RK3328, 
+> RK3566/RK3568
+> and RK3588 GMAC driver does not.
 > 
-> Yes, I took a look here and discussed with Willem. Long story short is
-> that syzbot support is possible but with a handful of changes. We'll
-> look into that.
+> Use of the DELAY_ENABLE macro help ensure the MAC rx/tx delay is
+> disabled, instead of being enabled and using a zero delay, when
+> RGMII_ID/RXID/TXID is used.
 > 
-> Long story long, for syzbot support I don't think netdevsim itself
-> will be useful. Its our understanding so far that syzbot doesn't do
-> anything special with netdevsim.
-
-Meaning it doesn't currently do anything special, or you can't make it
-do anything special with netdevsim?
-
-> We'll need to add queue API/page_pool/unreadable netmem support to
-> one of the drivers qemu (syzbot) uses, and that should get syzbot
-> fuzzing the control plane.
+> RK3328 driver was merged around the same time as when DELAY_ENABLE was
+> introduced so it is understandable why it was missed. Both 
+> RK3566/RK3568
+> and RK3588 support were introduced much later yet they also missed 
+> using
+> the DELAY_ENABLE macro (so did vendor kernel at that time).
 > 
-> To get syzbot to fuzz the data plane, I think we need to set up a
-> special syzbot instance which configures udmabuf/rss/flow
-
-To be clear for Tx you don't need RSS and flow steering, Tx should
-be trivial for any device driver which managers DMAs directly (not USB).
-
-> steering/netlink binding and start injecting packets through the data
-> path. Syzbot would not discover a working config on its own. I'm told
-> it's rare to set up specialized syzbot instances but we could sell
-> that this coverage is important enough.
+> This series fixes all these cases to unify how GMAC delay feature is
+> enabled or disabled across the different GMAC variants.
 > 
-> Hacking netdevsim like you suggested would be useful as well, but
-> outside of syzbot, AFAICT so far. We can run existing netdevsim data
-> path tests with netdevsim in 'unreadable netmem mode' and see if it
-> can reproduce issues. Although I'm not sure how to integrate that with
-> continuous testing yet.
+> Jonas Karlman (3):
+>   net: stmmac: dwmac-rk: Use DELAY_ENABLE macro for RK3328
+>   net: stmmac: dwmac-rk: Use DELAY_ENABLE macro for RK3566/RK3568
+>   net: stmmac: dwmac-rk: Use DELAY_ENABLE macro for RK3588
+> 
+>  .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 19 ++++++++++---------
+>  1 file changed, 10 insertions(+), 9 deletions(-)
+
+As far as I can tell, the RV1126 GMAC should also be converted to use
+the DELAY_ENABLE macro, which the vendor kernel already does. [*]  
+Perhaps
+that could be performed in new patch 4/4 in this series?
+
+BTW, it would be quite neat to introduce the DELAY_VALUE macro, which
+makes the function calls a bit more compact. [*]
+
+[*] 
+https://raw.githubusercontent.com/rockchip-linux/kernel/refs/heads/develop-5.10/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
 
