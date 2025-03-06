@@ -1,128 +1,144 @@
-Return-Path: <netdev+bounces-172396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AC1EA5474B
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 11:05:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 124B3A5476F
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 11:14:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43770167EE1
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:05:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6D2FA7A65FB
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:13:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80E971F5845;
-	Thu,  6 Mar 2025 10:05:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C59E202C56;
+	Thu,  6 Mar 2025 10:14:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dza/0pup"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gWZswxCu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52DE97E9;
-	Thu,  6 Mar 2025 10:05:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B34AD1FF7CC;
+	Thu,  6 Mar 2025 10:14:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741255519; cv=none; b=kgE7nnG6oiRTj6vXPiXN92ZYIJFc88PmCHaImEheeqFjlsI8SeaE7BI9EAKG8DVRP1HhcpfOsZeVLw88tjH7RNjHfmmaKzLK6tPqTsLVY1wKHTVf8q7isP1bsuzAZy0/2RfjUUSkNTYD+tb8z/VNdivPZjiMM9eaeFO63aviIh0=
+	t=1741256059; cv=none; b=HD4MEMKqW45Cxzx9yehP8Zx4l2ER7oSRvapnM2bLf6TOB2f8BUP13TKqHmwyyLy3C4eQdVT9igGHA6hP3W8ebG/rP967cS2c4j37A7v1gCMs+axmtAywygvLHW5SnoMBq+ZOxcJpW0kUYVbpt7eGtMwLY7T4Fa2cIwmuoyLhoWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741255519; c=relaxed/simple;
-	bh=DQX5lg3HEIkDGfIdaCFSobFn9jNWVFULDjoXWXHvXzM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LA9pZQXMH5hZJEYKFrWRLsD5moSwrcaaLN+/8LJN0rjuvOgUnaZBcFSTurg+Jvf25wKz40S6lZBAlN4V78vDd2fIIcSJW5qCZ0Bnw0/Do2/XI62heFK+oH/Uqtz0E9CdN92/cd/ukRh4S0Pq2AInMOKDTSEPq8DNjpJGndBwHJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dza/0pup; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78383C4CEE0;
-	Thu,  6 Mar 2025 10:05:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741255518;
-	bh=DQX5lg3HEIkDGfIdaCFSobFn9jNWVFULDjoXWXHvXzM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dza/0pup0UtKgDNsoV7kH1Bxb3D4inSmojbSpyY8HhQSReuuy6MNyosFgweLQaK56
-	 2bIbbHloa0QK/XCmDFzpuADNpbh/LrFlKMTIP/+V2HJojOR0J/qpX6JOoxZm+Iftw8
-	 DKF1XYQBl/m1aB25xTIUdZUiSqsKxmR1tAa97rw0vze24u5ucmzoAL0segs9rPEjgC
-	 Url/qLypDRF0zl45dvzrObMkJYOELtv61lb5/RVVLTGeHBFwrVj+1STaAEKDKW/hyk
-	 YTueA+5s8kU9pA0KYH6PRO+HPRKfhKYLZuq3Jcmf79HNjPFbUILbvnvznfkAg66D8W
-	 vmw9GJu8s6Sfw==
-Date: Thu, 6 Mar 2025 11:05:16 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Lukas Bulwahn <lbulwahn@redhat.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1741256059; c=relaxed/simple;
+	bh=sx8yumw7/slQUX1H6tCQVoJjkcOlHDuGOyOYDOcCSjI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Jb8KqRt60FhIlWQa94hp3xgkqhWTgdVaA43uRyRBVixlwbrrWIhJyOmGsYCbqPr6g3hz3MRV6AJSnmiExzX8CeKncfBh7We0Do+Z4klQADcrisp10hwjaHJLBiJdh493UPHN86VOPkvsoccH6AhD8fylRycARJx0B0pZS6QTbNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gWZswxCu; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-30ba5cccc19so4710911fa.1;
+        Thu, 06 Mar 2025 02:14:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741256056; x=1741860856; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SC6AHDf1+LSGmHO4yF1LlfxNEvEUB10IW0zw+9ERfVQ=;
+        b=gWZswxCu6wptNfsZBfZ/eB3qYEsrCKBljuJ8repXjxS8fiNA9aEbHEBF3FZRkWXapT
+         tV6jngcZs/knqYGDq7RIyHzy1JdSKmj1gWsTnbk+LrF9Tu+uda1Sl0mFaq7MqW5OHEES
+         6DIuAueXGjjv2zNTvo5u9soB0Cpzfwy/4Ww1iz4kXMjBmmfH9fkd9hI6AiUxf5MIWQ2b
+         a8Ibec9+1zHn+yNofhHW6ts7hCPYGpTflK6YPwcMTX1UzC/ZuLCOcfnmA6oDJLDX6X7k
+         98+A7g0B8gYOepQzBfBdTTXUvW3MMr4DaPvxj9YG8ILSL2aIaVKOsNkIqRFnXCJbQaq9
+         HJnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741256056; x=1741860856;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SC6AHDf1+LSGmHO4yF1LlfxNEvEUB10IW0zw+9ERfVQ=;
+        b=McXTGvouSdZKC9FxJANPOSTZM2m2UNCnpzkGDXEdk+CpL8zwjHiF+ajlmH0dlXzC7y
+         g0g0VCyUuNCVVTxSfY54hzp2Py6so1hIqEpGyJjy3OkUCggXDgdDijc/SJ/38LKM9IQF
+         jNcGSL6/lC3cNX4mkrC8Onvw5UQvfhacOU/9HlKzRA1fFlfCPwEG/XtHl4a6t7uf5PSc
+         pCfZaWt+UEkEtMlCfBgjYxbGwpLVs1wtWIw12wloLQFO80ALB4VKHlcItiKREY7EWCuL
+         2ps2pixjaZwh+FjAslwds18vuQGzI+t6zyIvj8ahtRU3tiYLkWzDGftYRYpAeucjQvG9
+         t9UA==
+X-Forwarded-Encrypted: i=1; AJvYcCUKSbofjdqltj2J2eZ2fRZTODPs6lxvry4AchXSVbZqX6GpbwU0Q5Xyloe0IAJUESZE9B/E4aDyE36UsoU=@vger.kernel.org, AJvYcCWre6+Q6stbhZabu6QE0voQF7rW/ePQ+sIpohMf9Z/3pGk1khomYOc90YU1zuQG5/iLbH5YGXaM@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1EbJJK9P1OLWdVp48mnnGd4OV3t4OdzsLcxN3ZjVBDxmm05Ik
+	O/QU6eDNOryrMfT71ZswIM8aYvjRWUGOA4nQcv6BB1RctNsn3KRb
+X-Gm-Gg: ASbGncsIFtg6oo0rTYxNgBYVdy6+ArKVh6gfYiTrM2QMBWTpIJRhRUJRpLKuOk5p/ID
+	FWmYVIf6En2MJqmv/itET6YoFwhFovtZvBBHOl4ZNrPQlbJJU1WXL9i1GTGlG04UJYC2oah6Nxf
+	KSRdKEevTm+imr+ki30fU0ZYTTRvcKbgopL7E8hTm9W0A21Tu3KAoTs8bYiwmMurY8tNNGnWXGt
+	HcM6z6liAy/mtUIbIpO+PdsbQU7CDqPxpMWYd2zOtskVlPo3OJ5Bvky24FzOj30l0xTB+DBhweB
+	Kw+cybtwKV6D/yXLgwrCCwdtOZhjiY5RKQ0ZVkVUc9SaGCRmxcxgSraD3aPsaBKgatCP1qq1xbr
+	vKA15C9mrdeg=
+X-Google-Smtp-Source: AGHT+IHVUL4RmtkhR/oSDlMOZ3ZOLWUDnE3XMBPxWsK2S/UqrYa1tBtOoYQq3Q6pxGdr9M6ejBkxaA==
+X-Received: by 2002:a2e:bc06:0:b0:30b:cd68:b69c with SMTP id 38308e7fff4ca-30bd7a1c6admr24523521fa.3.1741256055483;
+        Thu, 06 Mar 2025 02:14:15 -0800 (PST)
+Received: from rand-ubuntu-development.dl.local (mail.confident.ru. [85.114.29.218])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-30be98d09e2sm1550631fa.12.2025.03.06.02.14.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Mar 2025 02:14:15 -0800 (PST)
+From: Rand Deeb <rand.sec96@gmail.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Lukas Bulwahn <lukas.bulwahn@redhat.com>
-Subject: Re: [PATCH] net: ethernet: Remove accidental duplication in Kconfig
- file
-Message-ID: <Z8lzXDc8V09hz7k9@lore-desk>
-References: <20250306094753.63806-1-lukas.bulwahn@redhat.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
+	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+	linux-kernel@vger.kernel.org (open list)
+Cc: deeb.rand@confident.ru,
+	lvc-project@linuxtesting.org,
+	voskresenski.stanislav@confident.ru,
+	Rand Deeb <rand.sec96@gmail.com>
+Subject: [PATCH] ixgbe: Fix unreachable retry logic in combined and byte I2C write functions
+Date: Thu,  6 Mar 2025 13:12:00 +0300
+Message-Id: <20250306101201.1938376-1-rand.sec96@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="XigoDoLbpCnqzKzj"
-Content-Disposition: inline
-In-Reply-To: <20250306094753.63806-1-lukas.bulwahn@redhat.com>
+Content-Transfer-Encoding: 8bit
 
+The current implementation of `ixgbe_write_i2c_combined_generic_int` and
+`ixgbe_write_i2c_byte_generic_int` sets `max_retry` to `1`, which makes
+the condition `retry < max_retry` always evaluate to `false`. This renders
+the retry mechanism ineffective, as the debug message and retry logic are
+never executed.
 
---XigoDoLbpCnqzKzj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This patch increases `max_retry` to `3` in both functions, aligning them
+with the retry logic in `ixgbe_read_i2c_combined_generic_int`. This
+ensures that the retry mechanism functions as intended, improving
+robustness in case of I2C write failures.
 
-On Mar 06, Lukas Bulwahn wrote:
-> From: Lukas Bulwahn <lukas.bulwahn@redhat.com>
->=20
-> Commit fb3dda82fd38 ("net: airoha: Move airoha_eth driver in a dedicated
-> folder") accidentally added the line:
->=20
->   source "drivers/net/ethernet/mellanox/Kconfig"
->=20
-> in drivers/net/ethernet/Kconfig, so that this line is duplicated in that
-> file.
->=20
-> Remove this accidental duplication.
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-Thx for fixing it, it was in my backlog.
+Signed-off-by: Rand Deeb <rand.sec96@gmail.com>
+---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
+index 0a03a8bb5f88..2d54828bdfbb 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
+@@ -167,7 +167,7 @@ int ixgbe_write_i2c_combined_generic_int(struct ixgbe_hw *hw, u8 addr,
+ 					 u16 reg, u16 val, bool lock)
+ {
+ 	u32 swfw_mask = hw->phy.phy_semaphore_mask;
+-	int max_retry = 1;
++	int max_retry = 3;
+ 	int retry = 0;
+ 	u8 reg_high;
+ 	u8 csum;
+@@ -2285,7 +2285,7 @@ static int ixgbe_write_i2c_byte_generic_int(struct ixgbe_hw *hw, u8 byte_offset,
+ 					    u8 dev_addr, u8 data, bool lock)
+ {
+ 	u32 swfw_mask = hw->phy.phy_semaphore_mask;
+-	u32 max_retry = 1;
++	u32 max_retry = 3;
+ 	u32 retry = 0;
+ 	int status;
+ 
+-- 
+2.34.1
 
->=20
-> Fixes: fb3dda82fd38 ("net: airoha: Move airoha_eth driver in a dedicated =
-folder")
-> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@redhat.com>
-> ---
->  drivers/net/ethernet/Kconfig | 1 -
->  1 file changed, 1 deletion(-)
->=20
-> diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
-> index 7941983d21e9..f86d4557d8d7 100644
-> --- a/drivers/net/ethernet/Kconfig
-> +++ b/drivers/net/ethernet/Kconfig
-> @@ -21,7 +21,6 @@ source "drivers/net/ethernet/adaptec/Kconfig"
->  source "drivers/net/ethernet/aeroflex/Kconfig"
->  source "drivers/net/ethernet/agere/Kconfig"
->  source "drivers/net/ethernet/airoha/Kconfig"
-> -source "drivers/net/ethernet/mellanox/Kconfig"
->  source "drivers/net/ethernet/alacritech/Kconfig"
->  source "drivers/net/ethernet/allwinner/Kconfig"
->  source "drivers/net/ethernet/alteon/Kconfig"
-> --=20
-> 2.48.1
->=20
-
---XigoDoLbpCnqzKzj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ8lzXAAKCRA6cBh0uS2t
-rNAtAP9V+Q8UNILqo204AczQON+hWYW+Nxp3hNLk/WODmD+jVgEAyLr8ClMd7Y3l
-NQlj7zTHYDTTZvu0Wg6HnRtRR6MiSww=
-=vhTP
------END PGP SIGNATURE-----
-
---XigoDoLbpCnqzKzj--
 
