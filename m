@@ -1,99 +1,229 @@
-Return-Path: <netdev+bounces-172495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADE3FA55067
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 17:19:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66D9FA55195
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 17:43:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5C1A170E67
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 16:19:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C61F1891FA8
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 16:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C9AB20F09C;
-	Thu,  6 Mar 2025 16:19:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3412021638B;
+	Thu,  6 Mar 2025 16:26:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="dS7JjNSp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tmj5ojKk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 887D71991CF;
-	Thu,  6 Mar 2025 16:19:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DE52212FAA;
+	Thu,  6 Mar 2025 16:25:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741277983; cv=none; b=tVw1BWDL5pAxrOrGxDiPQORWbXhCw/HrjhKFdHTc9dgvxUVqDfPrxLb4iwUNLcvA2Dds5GgWmPxvSn1OI7mo9i3gVG2hzu8WI6xtcj8nlPnTZJkUcRdG1jPrUHDUueQB5OXG8s8+BCHfERQqKmAEXl9Rkou2wO6WncDgHAoiieo=
+	t=1741278360; cv=none; b=nLnyJlKSu4dAW6A6lp2iR+wS4U+V679bAkJGNKe2JPogAZbkTZzetJfc/RBAM7l5kQIzD8pjOqk/wYmH5URPQxb8s9o2ARUJBENbiNj6H8WmgYEO0BJQp/Dzo2RQO8ZIFNnzYeVugBNs59ezTT8pZ5eagPUFRc3VlGCvfRT6s2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741277983; c=relaxed/simple;
-	bh=mha3/rqc6BD2iffoShtz4KfaDYz7lkqmtpJkKWRR2i8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RW0wfx/polUzRPoaaFZzGT1M0Zhywkox/swGVgEIbk6XhQWOPQ3NVOB+WlIuGx//LSIKQWVuXFg4RBfrg0ZZr0y8nlk0yUxxtj7B7xAIep00VdY9PFyrhP+cpU8ta6gTlTebKlwCm3fMkg7d+/UxNxwokFaAf3tOwXtJqEeZkHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=dS7JjNSp; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 25FEC40E0214;
-	Thu,  6 Mar 2025 16:19:32 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id XhiL8TMhWTUD; Thu,  6 Mar 2025 16:19:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1741277968; bh=2JaKV6O0O/0Vj73XlyNNmyimAQdzhmggMcmuSrsq1/I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dS7JjNSpUUz8pB3vHUR83NVR42s86t/OupTWRDjgGYObQuWambmQhTl9elUQFq6ZE
-	 TrVPLF3PVOZEsheqDeohpwMU2+sOMIdWqzlDnuyAccGUWkzCi8x4Wt1AUS5BmukxVX
-	 S9QfoEtvekOzRH/tZTWbuSzgMK56ezgEDuOkNrpIPYVr2mVZhDBbbqqsPo5qCrU75z
-	 n+CMXj8PkxkZC4KPNEGk11OORutA1UITOMp+giZjCshSlqnR4tbOZpx/Y9ehQywDJ2
-	 exgKMv5iRAeczNgwt+ZzkmKTooUCyonNHIXbA29DuI9nKmyOVcFOzjLWMHoxrg2fx5
-	 S5Rm2AvLLV9bOHhEitJx1FuvMuNGZB6ZZIUXwnoT7twZcFnDtovt6CcOTtH+MNv3PL
-	 TM2DpPkYBguBK9dZj9eo5KzAUtElAKwUuXtml7UndvvF0QGXj1pDkVsS2L1ESgCwqM
-	 ms4aRTEcSnUji+0tdT1WPsHIdKsvdaHnmNr2E2hSl+cAS0Iou+rYlPERSPyH/gywe2
-	 RiaVZKwbKMRXAJXCv2vNbNOaMWS64dwJNv2lShtWCVk0qMWlU7oHh9J/cIC0eC3Voq
-	 csTEElcfNt/dnvBIymmztWXU0rCSnMfYC1RQQruI/dnE7iiidrQEjKdu87TUd+/ZSf
-	 sm3T6DemNaXPeWKzA6umfHM8=
-Received: from zn.tnic (pd95303ce.dip0.t-ipconnect.de [217.83.3.206])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 68E8440E015D;
-	Thu,  6 Mar 2025 16:19:19 +0000 (UTC)
-Date: Thu, 6 Mar 2025 17:19:12 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>, linux-kernel@vger.kernel.org,
-	x86-ml <x86@kernel.org>
-Subject: Re: request_irq() with local bh disabled
-Message-ID: <20250306161912.GFZ8nLAAVKdlx0s4xv@fat_crate.local>
-References: <20250306122413.GBZ8mT7Z61Tmgnh5Y9@fat_crate.local>
- <CANn89iJeHhGQaeRp01HP-KqA65aML+P5ppHjYT_oHSdXbcuzoQ@mail.gmail.com>
+	s=arc-20240116; t=1741278360; c=relaxed/simple;
+	bh=X1osDnOd9IPjfmzORkmuJvIJiGkdvCzDfoi5CFuWloE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MSB5fqwmhU0aaqB0d/KSbcpKRVUplO0iMpkP8/xFdLla/lCD4HSAbtYbSdmDqWtOXvHIPMYYNiNZfee82wuqEGh1dugUSqKClr78hErWhgC2XVhQ/sjauaGoTSpmoqFZNRvaIkwlSq+9IQgrjcW/2Y5T7WcoyRrAHrUdhDgjV+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tmj5ojKk; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2ff4a4f901fso1424943a91.2;
+        Thu, 06 Mar 2025 08:25:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741278358; x=1741883158; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=v1Sq6955SeW7fXdSe6bezpmzNTL9tmkfZyPLC9/YdtI=;
+        b=Tmj5ojKk3Y/y3B8NDm7yycDjSt9Ieoe1fK/mJwN0EnDLY1N4fSdHpRUqmlVXrrVuBk
+         J9+X7OvoSpe9NH/lF56BIj+uVsl2b6TtrqzETOUiOqHxnvQoNcpyeGFNMfL+4mPlP3RG
+         19HDTQ+9qWFdRRkwlXKJXqc/JYKFMFhqmXv/sXgvHpFgCANe4Aeh2tqxBWsYyHfa6hzN
+         Zs/UULXxJV5T8dbRc04CO4QREiC2xJ++R9cjjL0vUaSRke9ymGRbFTHEA6iDrZ2Tjycq
+         MeOlrqBYUypicJ/fF1pXr9ZyBIAde5vg3zvVXd/pfhe+BwzWpgMGWnenHOrCfYLQHVWp
+         gx/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741278358; x=1741883158;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=v1Sq6955SeW7fXdSe6bezpmzNTL9tmkfZyPLC9/YdtI=;
+        b=vhAugXAbiVYnasBckF1rMeqfvIVkTWNn5LiCYoDxxyLa1a/j0pdoguwtLb9Cf+0huj
+         84ZUfTNtL53eOTsnepabdGp94+I/Dx4KZPQ0fVQQWNdCgfRw8PZvBnbaga26PqSOz5o/
+         dIwp3gf1VkcrTh5ihUB0riJNlx2SLDzFl3307omkEwJO3365o004vQ6tI7f/J+OmM4Ml
+         3NPpY+ix+YhOPtxO58aPL8fx+8JeBEhGNYCu8n/QYugobSyi8Kn9wgPhZBc5LRDLvFK4
+         1Vg22xkOI5PZzaS2AgQnbr2xXpVBw6Y5zQvx4sy7MWSLG3jRrB9CGTsDhddWh9l3kJ7H
+         kM6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUEMfPcrSxvZ/qNdWlW7I6k1KQS79bRg0Hx+Van65vV9kMbNxy7Qa5ni+i+pHN9dzkZWF8cW7TXjEEhFqk=@vger.kernel.org, AJvYcCUXXg2PVwP2z+brOFLbDp67XNYW4VC4v3NPMt+NlBCD1eQEcnTGIxNyzKs+v0wAHcVq8BJe8L0PKdlkorY/Oow=@vger.kernel.org, AJvYcCVkBRttH3Ycme1KPguOL7zfYvf7bJK/Br7PjmxGIPVq/CLCfawNF5XMRR/piAj2M0PFr7aW1IK01qpLFH0=@vger.kernel.org, AJvYcCVnej78gTmX/VUPAIS+vlvFuDsXyDBaotcjiolQlzlBd9bpr7ZWAmF2W4O/Jv3RMarVfDg=@vger.kernel.org, AJvYcCVvhGKOJ+O4M6G2xptlBq5gabWHMqmejie5GVheOoeGlqKbjzVgzXVQJcRuqVNZDk8gy597ghiC1zp1XqRS@vger.kernel.org, AJvYcCW1JEOjBNEtRD0UnSBcuWdy6pMrFiBl56o/3EPVclYTYVqBe6bcL3pIlJZ0uX21u/kbuRkl4Jt/suipic+j@vger.kernel.org, AJvYcCWpNuTTPpvkYBDBDmTaJATuKpV221TwkVCD32lzmBPegnLLnmazX5jhBK1vqeXCsPNZgoPyaonu@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlqFxtc3YLM19EUlu5UtnT8jzqmxbj9h0t9S87vpCCCZ4nZRdV
+	gsqT+1joPWeRkisX5yQfpoj4P2kQjOY9bKTuR9V6hXI2mbuqUQ7L
+X-Gm-Gg: ASbGncunWJdw5bIvitwVAXxuJwgU2UlLQpzqQhqMjnBHrYQbpuc/P3aELgTDU5tXvNL
+	pfjPH71VlyP8sfrA99U11YJETHxQg56eOhttoI+RcR0PZjeH2ZgJpC4p7U3XF2xN9obbRX8Ifuz
+	WxqGOOiTeZYSEJSs4U1S9j08DLjUcgWFRtJ7HWjDnh6/puQM2Fz6ED4cocX37qao3DaQpTZJi/K
+	uMVl9BD/o4t68fVo/yDnUxe16oLPRxX3jQsU9z9S0bF6rdNfCxHlg6d7Du/t+Cn9eV1SxKgMziE
+	qHGmjNanmFlTJtHUOB+BBwJATlpzPkQ6pHvEkBRcuJEajRxFgPo2A4XjTTQ+JhHrCUWX4X0oros
+	=
+X-Google-Smtp-Source: AGHT+IHx/FA9q9VeYWlT31tM+odxs15FTKCjv2n+9fQOLwshtfFtm1FM7EynPDhqEgIZlabXqJLing==
+X-Received: by 2002:a17:90b:2702:b0:2fe:99cf:f566 with SMTP id 98e67ed59e1d1-2ff49775b54mr11884816a91.13.1741278357585;
+        Thu, 06 Mar 2025 08:25:57 -0800 (PST)
+Received: from visitorckw-System-Product-Name.. ([140.113.216.168])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ff693e75bfsm1464298a91.33.2025.03.06.08.25.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Mar 2025 08:25:56 -0800 (PST)
+From: Kuan-Wei Chiu <visitorckw@gmail.com>
+To: tglx@linutronix.de,
+	mingo@redhat.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	x86@kernel.org,
+	jk@ozlabs.org,
+	joel@jms.id.au,
+	eajames@linux.ibm.com,
+	andrzej.hajda@intel.com,
+	neil.armstrong@linaro.org,
+	rfoss@kernel.org,
+	maarten.lankhorst@linux.intel.com,
+	mripard@kernel.org,
+	tzimmermann@suse.de,
+	airlied@gmail.com,
+	simona@ffwll.ch,
+	dmitry.torokhov@gmail.com,
+	mchehab@kernel.org,
+	awalls@md.metrocast.net,
+	hverkuil@xs4all.nl,
+	miquel.raynal@bootlin.com,
+	richard@nod.at,
+	vigneshr@ti.com,
+	louis.peens@corigine.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	parthiban.veerasooran@microchip.com,
+	arend.vanspriel@broadcom.com,
+	johannes@sipsolutions.net,
+	gregkh@linuxfoundation.org,
+	jirislaby@kernel.org,
+	yury.norov@gmail.com,
+	akpm@linux-foundation.org
+Cc: hpa@zytor.com,
+	alistair@popple.id.au,
+	linux@rasmusvillemoes.dk,
+	Laurent.pinchart@ideasonboard.com,
+	jonas@kwiboo.se,
+	jernej.skrabec@gmail.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-fsi@lists.ozlabs.org,
+	dri-devel@lists.freedesktop.org,
+	linux-input@vger.kernel.org,
+	linux-media@vger.kernel.org,
+	linux-mtd@lists.infradead.org,
+	oss-drivers@corigine.com,
+	netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	brcm80211@lists.linux.dev,
+	brcm80211-dev-list.pdl@broadcom.com,
+	linux-serial@vger.kernel.org,
+	bpf@vger.kernel.org,
+	jserv@ccns.ncku.edu.tw,
+	Kuan-Wei Chiu <visitorckw@gmail.com>,
+	Yu-Chun Lin <eleanor15x@gmail.com>
+Subject: [PATCH v3 00/16] Introduce and use generic parity16/32/64 helper
+Date: Fri,  7 Mar 2025 00:25:25 +0800
+Message-Id: <20250306162541.2633025-1-visitorckw@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CANn89iJeHhGQaeRp01HP-KqA65aML+P5ppHjYT_oHSdXbcuzoQ@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Mar 06, 2025 at 02:45:16PM +0100, Eric Dumazet wrote:
-> Hmmm.. not sure why local_bh is considered held..
+Several parts of the kernel contain redundant implementations of parity
+calculations for 16/32/64-bit values. Introduces generic
+parity16/32/64() helpers in bitops.h, providing a standardized
+and optimized implementation. 
 
-Yeah, it looks like it is some crap in tip as current mainline is fine.
+Subsequent patches refactor various kernel components to replace
+open-coded parity calculations with the new helpers, reducing code
+duplication and improving maintainability.
 
-Lemme see what I can find there.
+Co-developed-by: Yu-Chun Lin <eleanor15x@gmail.com>
+Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
+Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail.com>
+---
+In v3, I use parityXX() instead of the parity() macro since the
+parity() macro may generate suboptimal code and requires special hacks
+to make GCC happy. If anyone still prefers a single parity() macro,
+please let me know.
 
-Thx and sorry for the noise.
+Additionally, I changed parityXX() << y users to !!parityXX() << y
+because, unlike C++, C does not guarantee that true casts to int as 1.
+
+Changes in v3:
+- Avoid using __builtin_parity.
+- Change return type to bool.
+- Drop parity() macro.
+- Change parityXX() << y to !!parityXX() << y.
+
+
+Changes in v2:
+- Provide fallback functions for __builtin_parity() when the compiler
+  decides not to inline it
+- Use __builtin_parity() when no architecture-specific implementation
+  is available
+- Optimize for constant folding when val is a compile-time constant
+- Add a generic parity() macro
+- Drop the x86 bootflag conversion patch since it has been merged into
+  the tip tree
+
+v1: https://lore.kernel.org/lkml/20250223164217.2139331-1-visitorckw@gmail.com/
+v2: https://lore.kernel.org/lkml/20250301142409.2513835-1-visitorckw@gmail.com/
+
+Kuan-Wei Chiu (16):
+  bitops: Change parity8() return type to bool
+  bitops: Add parity16(), parity32(), and parity64() helpers
+  media: media/test_drivers: Replace open-coded parity calculation with
+    parity8()
+  media: pci: cx18-av-vbi: Replace open-coded parity calculation with
+    parity8()
+  media: saa7115: Replace open-coded parity calculation with parity8()
+  serial: max3100: Replace open-coded parity calculation with parity8()
+  lib/bch: Replace open-coded parity calculation with parity32()
+  Input: joystick - Replace open-coded parity calculation with
+    parity32()
+  net: ethernet: oa_tc6: Replace open-coded parity calculation with
+    parity32()
+  wifi: brcm80211: Replace open-coded parity calculation with parity32()
+  drm/bridge: dw-hdmi: Replace open-coded parity calculation with
+    parity32()
+  mtd: ssfdc: Replace open-coded parity calculation with parity32()
+  fsi: i2cr: Replace open-coded parity calculation with parity32()
+  fsi: i2cr: Replace open-coded parity calculation with parity64()
+  Input: joystick - Replace open-coded parity calculation with
+    parity64()
+  nfp: bpf: Replace open-coded parity calculation with parity64()
+
+ drivers/fsi/fsi-master-i2cr.c                 | 18 ++-----
+ .../drm/bridge/synopsys/dw-hdmi-ahb-audio.c   |  8 +--
+ drivers/input/joystick/grip_mp.c              | 17 +-----
+ drivers/input/joystick/sidewinder.c           | 24 ++-------
+ drivers/media/i2c/saa7115.c                   | 12 +----
+ drivers/media/pci/cx18/cx18-av-vbi.c          | 12 +----
+ .../media/test-drivers/vivid/vivid-vbi-gen.c  |  8 +--
+ drivers/mtd/ssfdc.c                           | 20 ++-----
+ drivers/net/ethernet/netronome/nfp/nfp_asm.c  |  7 +--
+ drivers/net/ethernet/oa_tc6.c                 | 19 ++-----
+ .../broadcom/brcm80211/brcmsmac/dma.c         | 16 +-----
+ drivers/tty/serial/max3100.c                  |  3 +-
+ include/linux/bitops.h                        | 52 +++++++++++++++++--
+ lib/bch.c                                     | 14 +----
+ 14 files changed, 77 insertions(+), 153 deletions(-)
 
 -- 
-Regards/Gruss,
-    Boris.
+2.34.1
 
-https://people.kernel.org/tglx/notes-about-netiquette
 
