@@ -1,106 +1,165 @@
-Return-Path: <netdev+bounces-172650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00879A559EA
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 23:37:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62195A55A0B
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 23:45:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 56CF47A39C5
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 22:36:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 924331898430
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 22:45:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4FFE27CB10;
-	Thu,  6 Mar 2025 22:37:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C496427CB23;
+	Thu,  6 Mar 2025 22:44:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IRzhDcZx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MOTan+I4"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108841F4185;
-	Thu,  6 Mar 2025 22:37:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47DB61F4185
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 22:44:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741300661; cv=none; b=e+LiWL2u5RWVFajswP/q9cfXRV0AmhgV+igSgaq4BoSWY4t8mkkblyO8nO8l8U8DA9RkTeVxvx7g0gsZYtx9hhAy1ARFvwkAsjf+ZG7ASCmurq8acOQ5bEZxUXNhX/SKR3EuXAk+dPbFLxLQOIW9Rsc/BLtdUaxPZ0qpQW171bg=
+	t=1741301097; cv=none; b=pDyInEylH1VxgozI6o585CHoYurFQqrmWJUT9uTovZnKET42Y3mK4nA1PV9NiyFFntrzTrIAsyzDBg1LVaoELYAuYftyWMdzWHxrP87HLqqYSUj48YvefvSWtr8kfM24JWfsQa2TMDF4v5mlft0uVO4kNTcwE5G8KpdOoUveZ3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741300661; c=relaxed/simple;
-	bh=R8cvFyR/5j2NITIsRkLL8TuNA6KRr6QGmYRfv8pn+4A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sLSznKhuQsQ+oCwEZvFTy4UOalpvLlVigfTPhutV14g4/zi6xcTVoWLcaDxxnSEbyF3Dn2K7Vq4MO2RHqPrxNZdD7QmJQ8h4W2aa2DRg8RL0Hzrllh3KGgDnuZcI9QFBdWnLpj9a+Ct5nlQLQG6b4772bYJmJQC5phSECVz0/lY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IRzhDcZx; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=dV4SgXTKPQRxhmfsW6BVI1ffsVoZlfX/2pdna3rupKY=; b=IRzhDcZxrjSQpHJrI0vOG307PI
-	4Q3zFT2Lm7742/6V+Zy28VNBTQDyPbga72V/f058fDc2wie/b+PEhFuwl65zKZkyMo5cctlbL8LJY
-	ehLYgxrxr1RmotX+87e2e13mIu3sITEu8+lf19srPgserUr4akQURsT8UKxhccoLO+lI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tqJqJ-002wLx-Da; Thu, 06 Mar 2025 23:37:27 +0100
-Date: Thu, 6 Mar 2025 23:37:27 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jonas Karlman <jonas@kwiboo.se>
-Cc: Heiko Stuebner <heiko@sntech.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-rockchip@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH 2/2] net: stmmac: dwmac-rk: Validate rockchip,grf and
- php-grf during probe
-Message-ID: <bab793bb-1cbe-4df6-ba6b-7ac8bfef989d@lunn.ch>
-References: <20250306210950.1686713-1-jonas@kwiboo.se>
- <20250306210950.1686713-3-jonas@kwiboo.se>
+	s=arc-20240116; t=1741301097; c=relaxed/simple;
+	bh=WJGCuAvULpegUxMdbOK1NHjZx/sGgwb92zX49N6RDkA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=okWbktn+MetU++Fp74PPh0ZMQbN8ZI305sz0eNeyQhK5U2VTcCQCr2puIWOZB/WUzsYH48+P5qfKIk2PmSD57JZcBX5imbqTBhyu/XJ3BdmntFvCDD9+fpLYKFUtmCigh5RNlv1XJZN8OLatWrgaFJL53K7JS7qr0JF40l7CvGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MOTan+I4; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2240aad70f2so61745ad.0
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 14:44:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741301095; x=1741905895; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WJGCuAvULpegUxMdbOK1NHjZx/sGgwb92zX49N6RDkA=;
+        b=MOTan+I41gCr2d1GB8Xs6Lbx8+4B5Eh49nNkmhmZ1JIhS0QEInna++EqD3GkW4LIQk
+         G6xBxiFM4ehF43qfNLA08eTgyjhAuELXyV2gy8vY5k06fNTfam8NUTR6Anjd7oH/oSEa
+         j08o51JuN2Mcoj9ZD5ro39XQCNJjpc9WRGRtz2iZOKjE57Cr5TK13FU6WopaDuKmc24x
+         D+gorw/IlxsnwFb2L0mZaGJ4xIG0OjLU1K35/3+drfaLv5ld5qvbs94+Ak1P2eMmfJit
+         Lhcpe0tlhWmW6Mld8IXbCNiBglX3jM72vrpesgZZxYRB0oXIhRYWuZpP2L5vDfNvyAVG
+         LqbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741301095; x=1741905895;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WJGCuAvULpegUxMdbOK1NHjZx/sGgwb92zX49N6RDkA=;
+        b=dAu6WNW6lHiFsx4IwrXYrWxYLL3aoX9DMbxTGA3KPu6phcwXgQUFSMlB+gRhoLUshx
+         H9K/pNPoXnxPrrRI8znrgu/Jcwj08ACqjum6WsWmFPF3uNWX2QLc5qltbLwybmWN7uHO
+         t6gdtoW1Xs2vomq0E9FZPsVTIXcyeNGqJODnutkjNICHqQrxAmaGfMpFGixcX4G9EbO1
+         X9Rt6HRyChzCw6bF/oiWBvqHCyzs7TlYu56NMa2f5pIuVEexH8ETFR7KBdFZmpGROTHS
+         ZAPphoQ9XovkYxghEoCFfEYRky4tgCEQ+1xC9DBUNdkjoI6O1t0OE69U5eGuMJjoLzPa
+         V2gA==
+X-Gm-Message-State: AOJu0YyqJnwUxRw9dSouJBgoiTaW0i2Hd1g5nRHj6Om/d6cVUZM5X5c5
+	VX3f4TiTHmxsBdO1YH09McN6ZjS6vfLwMMiSZOfSxQ7NLyRdJhXyUHq6NgWqZjjpRe8fLEsMALu
+	9W+pO9UE645RI4GLaNzqu3Lp+Ig771igQ4HVu
+X-Gm-Gg: ASbGnctGQMH6pE3i7naabG4b26Bl+3X9oyoWMj9mJUkviq6gp+nV4S36TSCXPQTiKXm
+	jk6a1zqdJTaw9D/4HlYxywfJ3Qww/MzO4jlfFmq880RK5rSX4I+Be8UsEQWLiVHwTAIVqSwEolR
+	iKJGmI/W8EUqzSqcXO6eFLInCbh014MGNLiOzc1XkJL/UPI8k5+LKiwQ==
+X-Google-Smtp-Source: AGHT+IGS+g4ZXFAp2nGdJpOHDce9EEY1Ln9JHFM0oHkP+LPpqqepXFJR4Sm8vslWM6D7/epATYsYkpZ1n4ukdSKEsNY=
+X-Received: by 2002:a17:902:ea0c:b0:216:21cb:2e14 with SMTP id
+ d9443c01a7336-2242a62b87amr242655ad.21.1741301095087; Thu, 06 Mar 2025
+ 14:44:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250306210950.1686713-3-jonas@kwiboo.se>
+References: <20250227041209.2031104-1-almasrymina@google.com>
+ <20250227041209.2031104-2-almasrymina@google.com> <20250228163846.0a59fb40@kernel.org>
+ <CAHS8izNQnTW7sad_oABtxhy3cHxGR0FWJucrHTSVX7ZAA6jT3Q@mail.gmail.com>
+ <20250303162051.09ad684e@kernel.org> <CAHS8izNWt2-1bC2f0jv4Qpk_A9VpEXNvVRoXUtL43_16d-Ui-A@mail.gmail.com>
+ <20250306134019.1702e609@kernel.org>
+In-Reply-To: <20250306134019.1702e609@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 6 Mar 2025 14:44:41 -0800
+X-Gm-Features: AQ5f1JpdzmIgb4Qp1uwhgyjnsZGuDnrddzCXLNm0isLe9E-TpLpq-VU4X-9HjRo
+Message-ID: <CAHS8izM8dnFNj5p8vKiyhV9qeE+9=a=BWRnH=vCu49Tq_XTL9g@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 1/8] net: add get_netmem/put_netmem support
+To: Jakub Kicinski <kuba@kernel.org>, Pranjal Shrivastava <praan@google.com>, 
+	Shivaji Kant <shivajikant@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
+	Donald Hunter <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 06, 2025 at 09:09:46PM +0000, Jonas Karlman wrote:
-> All Rockchip GMAC variants require writing to GRF to configure e.g.
-> interface mode and MAC rx/tx delay. The GRF syscon regmap is located
-> with help of a rockchip,grf and rockchip,php-grf phandle.
+On Thu, Mar 6, 2025 at 1:40=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Tue, 4 Mar 2025 17:39:37 -0800 Mina Almasry wrote:
+> > > > Yes, great idea. I don't see why it wouldn't work.
+> > > >
+> > > > We don't expect mixing of net_iovs and pages in the same skb, but
+> > > > netdevsim could create one net_iov skb every N skbs.
+> > > >
+> > > > I guess I'm not totally sure something is discoverable to syzbot. I=
+s a
+> > > > netdevsim hack toggleable via a debugfs sufficient for syzbot? I'll
+> > > > investigate and ask.
+> > >
+> > > Yeah, my unreliable memory is that syzbot has a mixed record discover=
+ing
+> > > problems with debugfs. If you could ask Dmitry for advice that'd be
+> > > ideal.
+> >
+> > Yes, I took a look here and discussed with Willem. Long story short is
+> > that syzbot support is possible but with a handful of changes. We'll
+> > look into that.
+> >
+> > Long story long, for syzbot support I don't think netdevsim itself
+> > will be useful. Its our understanding so far that syzbot doesn't do
+> > anything special with netdevsim.
+>
+> Meaning it doesn't currently do anything special, or you can't make it
+> do anything special with netdevsim?
+>
 
-> @@ -1813,8 +1564,24 @@ static struct rk_priv_data *rk_gmac_setup(struct platform_device *pdev,
->  
->  	bsp_priv->grf = syscon_regmap_lookup_by_phandle(dev->of_node,
->  							"rockchip,grf");
-> -	bsp_priv->php_grf = syscon_regmap_lookup_by_phandle(dev->of_node,
-> -							    "rockchip,php-grf");
-> +	if (IS_ERR(bsp_priv->grf)) {
-> +		ret = PTR_ERR(bsp_priv->grf);
-> +		dev_err_probe(dev, ret, "failed to lookup rockchip,grf\n");
-> +		return ERR_PTR(ret);
-> +	}
-> +
-> +	bsp_priv->php_grf =
-> +		syscon_regmap_lookup_by_phandle_optional(dev->of_node,
-> +							 "rockchip,php-grf");
-> +	if ((of_device_is_compatible(dev->of_node, "rockchip,rk3588-gmac") ||
-> +	     of_device_is_compatible(dev->of_node, "rockchip,rk3576-gmac")) &&
-> +	    !bsp_priv->php_grf)
-> +		bsp_priv->php_grf = ERR_PTR(-ENODEV);
+Meaning it currently doesn't do anything special with netdevsim. I
+imagine we may be able to create a specialized syzbot instance that
+loads netdevsim and starts fuzzing its APIs. However I'm told
+specialized syzbot instances are much less valuable than making the
+feature discoverable to existing syzbot instances, which is why our
+thoughts went to adding devmem/unreadable skb support to virtio or
+tun/tap.
 
-It seems odd you say all variants need this property, and then you
-look for two specific variants here and do something different? Why
-are these two special?
+Do I surmise from your question you prefer a netdevsim-based approach?
+(and just curious maybe, why?)
+> > We'll need to add queue API/page_pool/unreadable netmem support to
+> > one of the drivers qemu (syzbot) uses, and that should get syzbot
+> > fuzzing the control plane.
+> >
+> > To get syzbot to fuzz the data plane, I think we need to set up a
+> > special syzbot instance which configures udmabuf/rss/flow
+>
+> To be clear for Tx you don't need RSS and flow steering, Tx should
+> be trivial for any device driver which managers DMAs directly (not USB).
+>
 
-	Andrew
+Yes, we don't need queue API or page_pool support or header split
+either for that matter. TX fuzzing is definitely simpler. Maybe we can
+start with that.
+
+--
+Thanks,
+Mina
 
