@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-172638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0FF5A5597B
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 23:15:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DE86A55979
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 23:15:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0960F1898CFA
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 22:15:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D95C23AF0AF
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 22:14:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB72627CCF8;
-	Thu,  6 Mar 2025 22:14:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B62B27CB3B;
+	Thu,  6 Mar 2025 22:14:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b="Un73Vq0M"
+	dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b="0N6EQO2O"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.forwardemail.net (smtp.forwardemail.net [149.28.215.223])
+Received: from smtp.forwardemail.net (smtp.forwardemail.net [121.127.44.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7F6427C852
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 22:14:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=149.28.215.223
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D1F627CB10
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 22:14:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=121.127.44.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741299268; cv=none; b=m1lCKwZiDNcWTPKoPSHwA3j8Nm6WGFHWSA+0+zW0fEkrxYDW6Udh61ZAXcH1BrClnYjsvMbCBfj2+cASmAvoGlZO510PWlrHFt50Ev+YLeIqYwXkN1nq465FjU+20isQPCHgLCdqYzsHg1yeTMtmlBxunaw1NmAXUWfRYoA8Rjo=
+	t=1741299267; cv=none; b=NoZfd/0hCaAHt/K2jdKxw+gvsIWjvxZZLlGGWX3HyjAUw3kfsFQ9Uj2epSpfHe7Phl1XcU7ph+HW0TFVincwwFP+Yvrs6QJVD6eYLlYZYhihUTUISWNfRX53zT+dhI65DcYqfvGhsHu2mKtvVOR9/JX/uEvrY4bbd8A7BzPGEWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741299268; c=relaxed/simple;
-	bh=vz8P+EDskUvsrqvMhYZsE++7gY4flX7CxLvX4+hsHWg=;
+	s=arc-20240116; t=1741299267; c=relaxed/simple;
+	bh=wCRkM354a8TxW667a3g0fsIH10ONtZ5IxZkFWyNzvLk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jQTpEpNb6JvSQXgjvdh7mqPsLUwOqTFdqYts76o9DEoBcuhpiY/snMV9vuHgeZ/8MQjoMZ6rSonk5DFMIiJVf7IcmIVREMvzdQgPSjlG7EY6rS0n+oMshy6b9hBtYHaaK6o18wd33ehq8LMJr5GAZZ8YjfI6YUsxW+SQKpGKGFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se; dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b=Un73Vq0M; arc=none smtp.client-ip=149.28.215.223
+	 MIME-Version; b=dPpuBglcT3BMeqnUzfydKnpfWHny+RtnwdM5G6nUGh9660O8Cj2EzG0+cJfluzvbsx6Edy9GcfcvTXQuUSpuXk7gNtOtdW72ohurCXYKVU3mjjTK1JGDORBS5xNZ8eXzTJyqfK5QSNofQzaFXsdSo5BR4e8pfEoOZ+xR7z1XgIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se; dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b=0N6EQO2O; arc=none smtp.client-ip=121.127.44.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kwiboo.se;
  h=Content-Transfer-Encoding: MIME-Version: References: In-Reply-To:
  Message-ID: Date: Subject: Cc: To: From; q=dns/txt; s=fe-e1b5cab7be;
- t=1741299266; bh=bOC8WbiFRMmQ2t5uzX1HETVDEhXpaqLAKBxWpaNaFx0=;
- b=Un73Vq0MWNwvyXJiMcRXOTxb+BGXLVCZAtSP4hPsQF+S5HLKw06uSnxX+wiV9s9tCgcfmOhIz
- Tnk3cB+L3XCM8Wh4iGXoufxyl6v0bDadZx4kvuyUzvOg40w0yZ78wTJxCZ6Vzdc5qLgvOlhyPcT
- vwiyTMzOVjxkK+oZ+CMOdlisNYNc56609eauP31plNgfAuDko8D2Ane8dwdtVt86/7wpG30J2HU
- A2IAO7Z7WK4/rpf0aAPFQ4Ki9/AlAWoWAz8QG7nuFDFlR4jLUdmtL6HIL3liu+giGt7WNkWNWl0
- /+M5FRjJNNmciZ6EGd8Qk3k1+hQPv7PHqF8khYoMkuag==
-X-Forward-Email-ID: 67ca1e39c1763851c065c013
+ t=1741299264; bh=fshpc8o5qKk/aC1XdolZ+vML6RG3s5omLxYcjsXplmM=;
+ b=0N6EQO2O3ChzeDvXmArhM7zB8CCuYBrPu87Vce+Gyep8qpLJWlg/8CBITVIyCerS6UR0D+t9p
+ 8RIkAjGQwERA7dEFXvfbji2qKNu9i9Ua8L7MeLAY2oisZjeqJOA5JwKauIXx/8aE5Q+TgnGvLG4
+ o2yBwDtrk1TDLOp5C8JsB4VufnG8LERTrpRJCGkf0Ce1jhp85RUe63PZ8rnPcQic6UQadVkjtBl
+ N/IYDHjM0bsuw73x5PCkMyiRWpwGK81fxy6OY+nYQLw+oXmZai1VTq//NTGK8JGXGqgQOOp2+r5
+ cvs2VmyMUIhYOFMjRr+MHTyb1KcbuQyfgdPJ1nROBdQg==
+X-Forward-Email-ID: 67ca1e3ec1763851c065c028
 X-Forward-Email-Sender: rfc822; jonas@kwiboo.se, smtp.forwardemail.net,
- 149.28.215.223
+ 121.127.44.73
 X-Forward-Email-Version: 0.4.40
 X-Forward-Email-Website: https://forwardemail.net
 X-Complaints-To: abuse@forwardemail.net
@@ -57,21 +57,17 @@ To: Heiko Stuebner <heiko@sntech.de>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>
+	Conor Dooley <conor+dt@kernel.org>
 Cc: Yao Zi <ziyao@disroot.org>,
 	linux-rockchip@lists.infradead.org,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
-	Jonas Karlman <jonas@kwiboo.se>,
-	David Wu <david.wu@rock-chips.com>,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: [PATCH 2/4] ethernet: stmmac: dwmac-rk: Add GMAC support for RK3528
-Date: Thu,  6 Mar 2025 22:13:55 +0000
-Message-ID: <20250306221402.1704196-3-jonas@kwiboo.se>
+	Jonas Karlman <jonas@kwiboo.se>
+Subject: [PATCH 3/4] arm64: dts: rockchip: Add GMAC nodes for RK3528
+Date: Thu,  6 Mar 2025 22:13:56 +0000
+Message-ID: <20250306221402.1704196-4-jonas@kwiboo.se>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250306221402.1704196-1-jonas@kwiboo.se>
 References: <20250306221402.1704196-1-jonas@kwiboo.se>
@@ -83,171 +79,122 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: David Wu <david.wu@rock-chips.com>
-
 Rockchip RK3528 has two Ethernet controllers based on Synopsys DWC
 Ethernet QoS IP.
 
-Add initial support for the RK3528 variants.
+Add device tree nodes for the two Ethernet controllers in RK3528.
 
-Signed-off-by: David Wu <david.wu@rock-chips.com>
 Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
 ---
-This does not include power on/off support for the integrated PHY.
+gmac0 is missing the integrated-phy and has not been tested bacause I do
+not have any board that use this Ethernet controller.
 ---
- .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 132 ++++++++++++++++++
- 1 file changed, 132 insertions(+)
+ arch/arm64/boot/dts/rockchip/rk3528.dtsi | 92 ++++++++++++++++++++++++
+ 1 file changed, 92 insertions(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index ba1cd079adf2..0ae3ffacb794 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -830,6 +830,137 @@ static const struct rk_gmac_ops rk3399_ops = {
- 	.set_rmii_speed = rk3399_set_rmii_speed,
- };
+diff --git a/arch/arm64/boot/dts/rockchip/rk3528.dtsi b/arch/arm64/boot/dts/rockchip/rk3528.dtsi
+index c1a71ea81e03..5940719cffec 100644
+--- a/arch/arm64/boot/dts/rockchip/rk3528.dtsi
++++ b/arch/arm64/boot/dts/rockchip/rk3528.dtsi
+@@ -286,6 +286,98 @@ saradc: adc@ffae0000 {
+ 			#io-channel-cells = <1>;
+ 		};
  
-+#define RK3528_VO_GRF_GMAC_CON		0x0018
-+#define RK3528_VO_GRF_MACPHY_CON0	0x001c
-+#define RK3528_VO_GRF_MACPHY_CON1	0x0020
-+#define RK3528_VPU_GRF_GMAC_CON5	0x0018
-+#define RK3528_VPU_GRF_GMAC_CON6	0x001c
++		gmac0: ethernet@ffbd0000 {
++			compatible = "rockchip,rk3528-gmac", "snps,dwmac-4.20a";
++			reg = <0x0 0xffbd0000 0x0 0x10000>;
++			clocks = <&cru CLK_GMAC0_SRC>, <&cru CLK_GMAC0_RMII_50M>,
++				 <&cru CLK_GMAC0_RX>, <&cru CLK_GMAC0_TX>,
++				 <&cru PCLK_MAC_VO>, <&cru ACLK_MAC_VO>;
++			clock-names = "stmmaceth", "clk_mac_ref",
++				      "mac_clk_rx", "mac_clk_tx",
++				      "pclk_mac", "aclk_mac";
++			interrupts = <GIC_SPI 113 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 116 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "macirq", "eth_wake_irq";
++			resets = <&cru SRST_A_MAC_VO>;
++			reset-names = "stmmaceth";
++			rockchip,grf = <&vo_grf>;
++			snps,axi-config = <&gmac0_stmmac_axi_setup>;
++			snps,mixed-burst;
++			snps,mtl-rx-config = <&gmac0_mtl_rx_setup>;
++			snps,mtl-tx-config = <&gmac0_mtl_tx_setup>;
++			snps,tso;
++			status = "disabled";
 +
-+#define RK3528_GMAC_RXCLK_DLY_ENABLE	GRF_BIT(15)
-+#define RK3528_GMAC_RXCLK_DLY_DISABLE	GRF_CLR_BIT(15)
-+#define RK3528_GMAC_TXCLK_DLY_ENABLE	GRF_BIT(14)
-+#define RK3528_GMAC_TXCLK_DLY_DISABLE	GRF_CLR_BIT(14)
++			mdio0: mdio {
++				compatible = "snps,dwmac-mdio";
++				#address-cells = <0x1>;
++				#size-cells = <0x0>;
++			};
 +
-+#define RK3528_GMAC_CLK_RX_DL_CFG(val)	HIWORD_UPDATE(val, 0xFF, 8)
-+#define RK3528_GMAC_CLK_TX_DL_CFG(val)	HIWORD_UPDATE(val, 0xFF, 0)
++			gmac0_stmmac_axi_setup: stmmac-axi-config {
++				snps,blen = <0 0 0 0 16 8 4>;
++				snps,rd_osr_lmt = <8>;
++				snps,wr_osr_lmt = <4>;
++			};
 +
-+#define RK3528_GMAC0_PHY_INTF_SEL_RMII	GRF_BIT(1)
-+#define RK3528_GMAC1_PHY_INTF_SEL_RGMII	GRF_CLR_BIT(8)
-+#define RK3528_GMAC1_PHY_INTF_SEL_RMII	GRF_BIT(8)
++			gmac0_mtl_rx_setup: rx-queues-config {
++				snps,rx-queues-to-use = <1>;
++				queue0 {};
++			};
 +
-+#define RK3528_GMAC1_CLK_SELECT_CRU	GRF_CLR_BIT(12)
-+#define RK3528_GMAC1_CLK_SELECT_IO	GRF_BIT(12)
++			gmac0_mtl_tx_setup: tx-queues-config {
++				snps,tx-queues-to-use = <1>;
++				queue0 {};
++			};
++		};
 +
-+#define RK3528_GMAC0_CLK_RMII_DIV2	GRF_BIT(3)
-+#define RK3528_GMAC0_CLK_RMII_DIV20	GRF_CLR_BIT(3)
-+#define RK3528_GMAC1_CLK_RMII_DIV2	GRF_BIT(10)
-+#define RK3528_GMAC1_CLK_RMII_DIV20	GRF_CLR_BIT(10)
++		gmac1: ethernet@ffbe0000 {
++			compatible = "rockchip,rk3528-gmac", "snps,dwmac-4.20a";
++			reg = <0x0 0xffbe0000 0x0 0x10000>;
++			clocks = <&cru CLK_GMAC1_SRC_VPU>,
++				 <&cru CLK_GMAC1_RMII_VPU>,
++				 <&cru PCLK_MAC_VPU>,
++				 <&cru ACLK_MAC_VPU>;
++			clock-names = "stmmaceth",
++				      "clk_mac_ref",
++				      "pclk_mac",
++				      "aclk_mac";
++			interrupts = <GIC_SPI 121 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 124 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "macirq", "eth_wake_irq";
++			resets = <&cru SRST_A_MAC>;
++			reset-names = "stmmaceth";
++			rockchip,grf = <&vpu_grf>;
++			snps,axi-config = <&gmac1_stmmac_axi_setup>;
++			snps,mixed-burst;
++			snps,mtl-rx-config = <&gmac1_mtl_rx_setup>;
++			snps,mtl-tx-config = <&gmac1_mtl_tx_setup>;
++			snps,tso;
++			status = "disabled";
 +
-+#define RK3528_GMAC1_CLK_RGMII_DIV1	(GRF_CLR_BIT(11) | GRF_CLR_BIT(10))
-+#define RK3528_GMAC1_CLK_RGMII_DIV5	(GRF_BIT(11) | GRF_BIT(10))
-+#define RK3528_GMAC1_CLK_RGMII_DIV50	(GRF_BIT(11) | GRF_CLR_BIT(10))
++			mdio1: mdio {
++				compatible = "snps,dwmac-mdio";
++				#address-cells = <0x1>;
++				#size-cells = <0x0>;
++			};
 +
-+#define RK3528_GMAC0_CLK_RMII_GATE	GRF_BIT(2)
-+#define RK3528_GMAC0_CLK_RMII_NOGATE	GRF_CLR_BIT(2)
-+#define RK3528_GMAC1_CLK_RMII_GATE	GRF_BIT(9)
-+#define RK3528_GMAC1_CLK_RMII_NOGATE	GRF_CLR_BIT(9)
++			gmac1_stmmac_axi_setup: stmmac-axi-config {
++				snps,blen = <0 0 0 0 16 8 4>;
++				snps,rd_osr_lmt = <8>;
++				snps,wr_osr_lmt = <4>;
++			};
 +
-+static void rk3528_set_to_rgmii(struct rk_priv_data *bsp_priv,
-+				int tx_delay, int rx_delay)
-+{
-+	regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5,
-+		     RK3528_GMAC1_PHY_INTF_SEL_RGMII);
++			gmac1_mtl_rx_setup: rx-queues-config {
++				snps,rx-queues-to-use = <1>;
++				queue0 {};
++			};
 +
-+	regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5,
-+		     DELAY_ENABLE(RK3528, tx_delay, rx_delay));
++			gmac1_mtl_tx_setup: tx-queues-config {
++				snps,tx-queues-to-use = <1>;
++				queue0 {};
++			};
++		};
 +
-+	regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON6,
-+		     RK3528_GMAC_CLK_RX_DL_CFG(rx_delay) |
-+		     RK3528_GMAC_CLK_TX_DL_CFG(tx_delay));
-+}
-+
-+static void rk3528_set_to_rmii(struct rk_priv_data *bsp_priv)
-+{
-+	if (bsp_priv->id == 1)
-+		regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5,
-+			     RK3528_GMAC1_PHY_INTF_SEL_RMII);
-+	else
-+		regmap_write(bsp_priv->grf, RK3528_VO_GRF_GMAC_CON,
-+			     RK3528_GMAC0_PHY_INTF_SEL_RMII |
-+			     RK3528_GMAC0_CLK_RMII_DIV2);
-+}
-+
-+static void rk3528_set_rgmii_speed(struct rk_priv_data *bsp_priv, int speed)
-+{
-+	struct device *dev = &bsp_priv->pdev->dev;
-+
-+	if (speed == 10)
-+		regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5,
-+			     RK3528_GMAC1_CLK_RGMII_DIV50);
-+	else if (speed == 100)
-+		regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5,
-+			     RK3528_GMAC1_CLK_RGMII_DIV5);
-+	else if (speed == 1000)
-+		regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5,
-+			     RK3528_GMAC1_CLK_RGMII_DIV1);
-+	else
-+		dev_err(dev, "unknown speed value for RGMII! speed=%d", speed);
-+}
-+
-+static void rk3528_set_rmii_speed(struct rk_priv_data *bsp_priv, int speed)
-+{
-+	struct device *dev = &bsp_priv->pdev->dev;
-+	unsigned int reg, val;
-+
-+	if (speed == 10)
-+		val = bsp_priv->id == 1 ? RK3528_GMAC1_CLK_RMII_DIV20 :
-+					  RK3528_GMAC0_CLK_RMII_DIV20;
-+	else if (speed == 100)
-+		val = bsp_priv->id == 1 ? RK3528_GMAC1_CLK_RMII_DIV2 :
-+					  RK3528_GMAC0_CLK_RMII_DIV2;
-+	else {
-+		dev_err(dev, "unknown speed value for RMII! speed=%d", speed);
-+		return;
-+	}
-+
-+	reg = bsp_priv->id == 1 ? RK3528_VPU_GRF_GMAC_CON5 :
-+				  RK3528_VO_GRF_GMAC_CON;
-+
-+	regmap_write(bsp_priv->grf, reg, val);
-+}
-+
-+static void rk3528_set_clock_selection(struct rk_priv_data *bsp_priv,
-+				       bool input, bool enable)
-+{
-+	unsigned int val;
-+
-+	if (bsp_priv->id == 1) {
-+		val = input ? RK3528_GMAC1_CLK_SELECT_IO :
-+			      RK3528_GMAC1_CLK_SELECT_CRU;
-+		val |= enable ? RK3528_GMAC1_CLK_RMII_NOGATE :
-+				RK3528_GMAC1_CLK_RMII_GATE;
-+		regmap_write(bsp_priv->grf, RK3528_VPU_GRF_GMAC_CON5, val);
-+	} else {
-+		val = enable ? RK3528_GMAC0_CLK_RMII_NOGATE :
-+			       RK3528_GMAC0_CLK_RMII_GATE;
-+		regmap_write(bsp_priv->grf, RK3528_VO_GRF_GMAC_CON, val);
-+	}
-+}
-+
-+static const struct rk_gmac_ops rk3528_ops = {
-+	.set_to_rgmii = rk3528_set_to_rgmii,
-+	.set_to_rmii = rk3528_set_to_rmii,
-+	.set_rgmii_speed = rk3528_set_rgmii_speed,
-+	.set_rmii_speed = rk3528_set_rmii_speed,
-+	.set_clock_selection = rk3528_set_clock_selection,
-+	.regs_valid = true,
-+	.regs = {
-+		0xffbd0000, /* gmac0 */
-+		0xffbe0000, /* gmac1 */
-+		0x0, /* sentinel */
-+	},
-+};
-+
- #define RK3568_GRF_GMAC0_CON0		0x0380
- #define RK3568_GRF_GMAC0_CON1		0x0384
- #define RK3568_GRF_GMAC1_CON0		0x0388
-@@ -1816,6 +1947,7 @@ static const struct of_device_id rk_gmac_dwmac_match[] = {
- 	{ .compatible = "rockchip,rk3366-gmac", .data = &rk3366_ops },
- 	{ .compatible = "rockchip,rk3368-gmac", .data = &rk3368_ops },
- 	{ .compatible = "rockchip,rk3399-gmac", .data = &rk3399_ops },
-+	{ .compatible = "rockchip,rk3528-gmac", .data = &rk3528_ops },
- 	{ .compatible = "rockchip,rk3568-gmac", .data = &rk3568_ops },
- 	{ .compatible = "rockchip,rk3576-gmac", .data = &rk3576_ops },
- 	{ .compatible = "rockchip,rk3588-gmac", .data = &rk3588_ops },
+ 		sdhci: mmc@ffbf0000 {
+ 			compatible = "rockchip,rk3528-dwcmshc",
+ 				     "rockchip,rk3588-dwcmshc";
 -- 
 2.48.1
 
