@@ -1,230 +1,112 @@
-Return-Path: <netdev+bounces-172338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61F1FA54426
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:05:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16EE8A54457
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:13:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E2DB3ACE0C
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 08:05:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38A597A5A95
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 08:12:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88D551DDA14;
-	Thu,  6 Mar 2025 08:05:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E084E1FBEA6;
+	Thu,  6 Mar 2025 08:12:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="S6H9aLsO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YVTVvhdZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com [209.85.222.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B7691DC9B1
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 08:05:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8E171DF964;
+	Thu,  6 Mar 2025 08:12:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741248351; cv=none; b=fzwUDrfSRFvVXi8J1k/99hXBn7Z0g3MzazW92baAK8Lurst/32hLckvtJ/9D3aEvQeCxRJ5tkZe5qXWFDElM4Fp8EfRwkCoMbc2lGsmo0VAMchApUminQZIsujH6WCeQ1YIIiORzE1vqMxBIP8GFMH/VY9ylKEAOdde+75WyUrQ=
+	t=1741248768; cv=none; b=eLkMHO2RGXEVFpitqjxw/GLCAKjDQ3cGG0ThTZkgoQKCpmFC9j3aICDVbS9JVP05vc0rUey0uYTpRDCnxoDX/MQRsolC5RlCTdS/ccAnH+RMkZj07Yfra644GqN/2RGYl9/Q+omIDAu6BDhITR0Dbz4gb+hj9jWLx+31j3Cm8wU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741248351; c=relaxed/simple;
-	bh=lNZDgZULrgRLQ1Q9KJqW4LlVA8M+cqG0zmapVrEq4BM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HE6uqZBmxN3/I6bu8wekdo7aDIgS5JoFOaTTfzgx3XQksvaBE4w4d1SuzgnPXDEwhWCb+3NNseT6KT0lpPZuTUNsb23uXmXSC7Cq2zdhJo8L6/lP5azL9v8LsXZpLfsyNl1QAp2XlbPreK9wB7SyBAu12KAsyZru26ZeO1YmuNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=S6H9aLsO; arc=none smtp.client-ip=209.85.222.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-866de72bb82so133720241.1
-        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 00:05:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1741248348; x=1741853148; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kwd9LxC2aj64bh3D8PK8320uHvsJOsyuN8dKKFoqWpU=;
-        b=S6H9aLsOagCLWWpQMBzkQ5iwTiPeR+wDDzhIJ3rIFkkzSAkmjWjq8yqGKF1Tnc0AjS
-         cdjic4K//wAMnN7annEWIuAJYogbh4uifKtbKofhZ0Zkgl6RsoW0EmVcKDR9a6r+nZEz
-         0VwAFOFli/sb+7SIckZcMYoZ7bSnLmN34mol0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741248348; x=1741853148;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Kwd9LxC2aj64bh3D8PK8320uHvsJOsyuN8dKKFoqWpU=;
-        b=Lub55HaXsHl34eYSM8nDq+qDHvwaM27GsUCC/reTipFboVt6fu9a5T5nZhuV7G+mZ/
-         y6Td/X/WLRCT995OVxlnNmxFXNQU02ukgLGZnJMo+uydwsNGqr+bXBFHNzWvttC1thG3
-         2JmLFG9HUfrA1056AG9vU2ouFgEexPi/+35+3SbfLhndXKjPp+GqVKHLRbb8/Pir3CO/
-         KuofF5CDdgEahAJSvsQktPJ/Hw06ET5eDrdmxHSrTeGtQY0VPO/MbFs3LqQsK0Ny4DKi
-         rOXNW4bv1nkbK6IZBYIb9Je3BfSNIHTHlh+diPIZZG/F56gzK7ZUqldLT7EH6ztYkncE
-         Aojw==
-X-Forwarded-Encrypted: i=1; AJvYcCUD+eV6A91Svgs5ynHVPYppG3AQ70KQOUWO05c+KF6T4qsHL9y+/sXDqdO6VD4wX7T1gulos9A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxO7MNR4AWmeq3AK+Gzjc8HO7NlcFGAmTbVd+ULquxbfHNykgjP
-	e0SOglC/afuEuHToydohaXTotKBWXtOhKrHPu/6+X5X2DGMRyk1X6FpuZ1vkVCv0inQf3wgy7/2
-	N7CpAqosXCIR3z4gJKzuCb1lFEpj9zV6raz2Q
-X-Gm-Gg: ASbGncusloLxNoxPJFOAgf/+Oy120g84t4dd8T+UwHdkin5HZ0t0GTkhRCsvgi4DWfa
-	KYxK345/3GmrfLk2p9x3ahOGdqamZ0HLcDJuRDCeIPO83A3F7z8IfGt7MbPsHXM6GO3Jh4cqwOm
-	mEsF4LEtsesf8Vbipja3qiJQ/ley4=
-X-Google-Smtp-Source: AGHT+IFgvy2y31AWFchFIc697gBXoh7MFAeZNWqg2+aRw4qkid04h8SsEOktJvxo8A38YPWS7fZos6pV15yhZf2Csic=
-X-Received: by 2002:a05:6102:5492:b0:4c1:8c9e:6507 with SMTP id
- ada2fe7eead31-4c2e281555amr3590861137.15.1741248347774; Thu, 06 Mar 2025
- 00:05:47 -0800 (PST)
+	s=arc-20240116; t=1741248768; c=relaxed/simple;
+	bh=91HAbFKr7vBKjRHPh0vxDKg8p6ugHwwzn5VdM9GPrV8=;
+	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
+	 To:Date:Message-ID; b=RQfu5ptIh9ovosZAiVabAESU2JrpUUko7DcvT9U1e7VSesA0+ka/sKkdSIHOZePal5jthCF4jLq+p0f+HLXk9eJw3pQBpPtjx8gpPYYM7TkJ/prXAauiGYwYzi+PZ3FYPuW/BHtUiyEvzV4ZljO+DfyYs1g5yE5PVr7SqS9nbtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YVTVvhdZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81449C4CEE0;
+	Thu,  6 Mar 2025 08:12:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741248768;
+	bh=91HAbFKr7vBKjRHPh0vxDKg8p6ugHwwzn5VdM9GPrV8=;
+	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
+	b=YVTVvhdZD38kw3XWzYl9bT4ixATz5AjarMGBIoTY8YrM7wEDY5vmkHwThyQ2Fa8CF
+	 z4l/hAwV7fDGOU8rWHADcuNoC9rC8xwfzthkIHESwQs0tjlR+cXfNpYJuJmHzMO/q6
+	 Ukkof8dlEA8MburZ+4uARDiwV9tgmhVBtbiZIO7PsIQpXfW8Q+2fZLUZwyXWxmLSMA
+	 gRwX3iWEcR1hSIjp5i+42JwKXDeVALajUkmtrL+VEJwkG/NGaWZCNcuYo0Jjcyem8+
+	 K4yDivhSwyeqUYUyA+9aDI6frqoWL+AC4qFo4Rq+gG3l4SVWdGDvySYUdwtB1kbS+0
+	 g7HYswoOr/gUA==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250306072422.3303386-1-ap420073@gmail.com> <20250306072422.3303386-4-ap420073@gmail.com>
-In-Reply-To: <20250306072422.3303386-4-ap420073@gmail.com>
-From: Somnath Kotur <somnath.kotur@broadcom.com>
-Date: Thu, 6 Mar 2025 13:35:35 +0530
-X-Gm-Features: AQ5f1Jp2ACsUpN8odBMOJ9ZrNvrhjD8QMfYXSOuonjDGPGdO9e1BHh8sIl23VrU
-Message-ID: <CAOBf=msu_ysgsMPN0n6NQ6wzitFqX9kHqatcJAXtqFeQEgY0PQ@mail.gmail.com>
-Subject: Re: [PATCH v2 net 3/6] eth: bnxt: do not use BNXT_VNIC_NTUPLE
- unconditionally in queue restart logic
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, andrew+netdev@lunn.ch, michael.chan@broadcom.com, 
-	pavan.chebbi@broadcom.com, horms@kernel.org, shuah@kernel.org, 
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	almasrymina@google.com, asml.silence@gmail.com, willemb@google.com, 
-	kaiyuanz@google.com, skhawaja@google.com, sdf@fomichev.me, gospo@broadcom.com, 
-	dw@davidwei.uk
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000041dc2c062fa7f967"
-
---00000000000041dc2c062fa7f967
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250305235307.14829-1-qasdev00@gmail.com>
+References: <20250305235307.14829-1-qasdev00@gmail.com>
+Subject: Re: [PATCH] net-sysfs: fix NULL pointer dereference
+From: Antoine Tenart <atenart@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Qasim Ijaz <qasdev00@gmail.com>, aleksander.lobakin@intel.com, davem@davemloft.net, edumazet@google.com, horms@kernel.org, jdamato@fastly.com, kuba@kernel.org, pabeni@redhat.com
+Date: Thu, 06 Mar 2025 09:12:44 +0100
+Message-ID: <174124876418.4824.8589202932419197412@kwain>
 
-On Thu, Mar 6, 2025 at 12:54=E2=80=AFPM Taehee Yoo <ap420073@gmail.com> wro=
-te:
->
-> When a queue is restarted, it sets MRU to 0 for stopping packet flow.
-> MRU variable is a member of vnic_info[], the first vnic_info is default
-> and the second is ntuple.
-> Only when ntuple is enabled(ethtool -K eth0 ntuple on), vnic_info for
-> ntuple is allocated in init logic.
-> The bp->nr_vnics indicates how many vnic_info are allocated.
-> However bnxt_queue_{start | stop}() accesses vnic_info[BNXT_VNIC_NTUPLE]
-> regardless of ntuple state.
->
-> Fixes: b9d2956e869c ("bnxt_en: stop packet flow during bnxt_queue_stop/st=
-art")
-> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+Quoting Qasim Ijaz (2025-03-06 00:53:07)
+> Commit <79c61899b5ee> introduces a potential NULL pointer dereference=20
+> in the sysfs_rtnl_lock() function when initialising kn:
+>=20
+>         kn =3D sysfs_break_active_protection(kobj, attr);
+>        =20
+> The commit overlooks the fact that sysfs_break_active_protection can=20
+> return NULL if kernfs_find_and_get() fails to find and get the kernfs_nod=
+e=20
+> with the given name.=20
+
+If it fails to get it, should we let sysfs_rtnl_lock continue is
+execution?
+
+> Later on the code calls sysfs_unbreak_active_protection(kn)=20
+> unconditionally, which could lead to a NULL pointer dereference.
+>=20
+> Resolve this bug by introducing a NULL check before using kn
+> in the sysfs_unbreak_active_protection() call.
+
+Did you see this in practice? Can you describe what led to this?
+
+Thanks!
+Antoine
+
+> Signed-off-by: Qasim Ijaz <qasdev00@gmail.com>
+> Fixes: 79c61899b5ee ("net-sysfs: remove rtnl_trylock from device attribut=
+es")
 > ---
+>  net/core/net-sysfs.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+> index 8d9dc048a548..c5085588e536 100644
+> --- a/net/core/net-sysfs.c
+> +++ b/net/core/net-sysfs.c
+> @@ -117,7 +117,8 @@ static int sysfs_rtnl_lock(struct kobject *kobj, stru=
+ct attribute *attr,
+>          * the rtnl lock.
+>          */
+>  unbreak:
+> -       sysfs_unbreak_active_protection(kn);
+> +       if (kn)
+> +               sysfs_unbreak_active_protection(kn);
+>         dev_put(ndev);
+> =20
+>         return ret;
+> --=20
+> 2.39.5
+>=20
 >
-> v2:
->  - No changes.
->
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethe=
-rnet/broadcom/bnxt/bnxt.c
-> index d09986308582..c9d37fea5d32 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -15635,7 +15635,7 @@ static int bnxt_queue_start(struct net_device *de=
-v, void *qmem, int idx)
->         cpr =3D &rxr->bnapi->cp_ring;
->         cpr->sw_stats->rx.rx_resets++;
->
-> -       for (i =3D 0; i <=3D BNXT_VNIC_NTUPLE; i++) {
-> +       for (i =3D 0; i <=3D bp->nr_vnics; i++) {
->                 vnic =3D &bp->vnic_info[i];
->
->                 rc =3D bnxt_hwrm_vnic_set_rss_p5(bp, vnic, true);
-> @@ -15663,7 +15663,7 @@ static int bnxt_queue_stop(struct net_device *dev=
-, void *qmem, int idx)
->         struct bnxt_vnic_info *vnic;
->         int i;
->
-> -       for (i =3D 0; i <=3D BNXT_VNIC_NTUPLE; i++) {
-> +       for (i =3D 0; i <=3D bp->nr_vnics; i++) {
->                 vnic =3D &bp->vnic_info[i];
->                 vnic->mru =3D 0;
->                 bnxt_hwrm_vnic_update(bp, vnic,
-> --
-> 2.34.1
->
-Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-
---00000000000041dc2c062fa7f967
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-nSGLsSobByQoGh1GyLfFTXI7QOGn/6qvrJ7x9Oem5V7miUTD0wGAIozD7MCVoluf5Psa4Q2a5AFV
-gROLty059Ex4oK55Op/0e3Aa/a8hZD/tPBT3WE70owdiCwIDAQABo4IB2zCCAdcwDgYDVR0PAQH/
-BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3VyZS5nbG9i
-YWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEGCCsGAQUF
-BzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAy
-MDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93d3cuZ2xv
-YmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6hjhodHRw
-Oi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNybDAlBgNV
-HREEHjAcgRpzb21uYXRoLmtvdHVyQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAf
-BgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUabMpSsFcjDNUWMvGf76o
-yB7jBJUwDQYJKoZIhvcNAQELBQADggEBAJBDQpQ1TqY57vpQbwtXYP0N01q8J3tfNA/K2vOiNOpv
-IufqZ5WKdKEtmT21nujCeuaCQ6SmpWqCUJVkLd+u/sHR62vCo8j2fb1pTkA7jeuCAuT9YMPRE86M
-sUphsGDq2ylriQ7y5kvl728hZ0Oakm3xUCnZ9DYS/32sFGSZyrCGZipTBnjK4n5uLQ0yekSLACiD
-R0zi4nzkbhwXqDbDaB+Duk52ec/Vj4xuc2uWu9rTmJNVjdk0qu9vh48xcd/BzrlmwY0crGTijAC/
-r4x2/y9OfG0FyVmakU0qwDnZX982aa66tXnKNgae2k20WCDVMM5FPTrbMsQyz6Hrv3bg6qgxggJg
-MIICXAIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYD
-VQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgx6wAr6NdQY0sTG
-G7cwDQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEII3TWrszYPKLQEFJVhUpAxS3nZ0N
-MlB+zYy7kUOQOWtCMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1
-MDMwNjA4MDU0OFowXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsG
-CWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3
-DQEBAQUABIIBAGTmV1bSHv+6kGBU8VZKDUN7S4YePFivYVU+Up+nrCIwpzhj6rlZn3XbgqWd5lsa
-h7BViyo0WkkKJNOi9YVwSk41wkEW7ZBdoUHjunADZ+yRzC1vLjvaMx2xHXWRqLrmNU5KtaO+Uxmp
-dG/uvidS8rOu2Go7FHIs47eisJNFtOTxPAkUUnWdkEufLvoNOY0vwblCqtukXkT2lo5j2V7RQwDd
-326kF/mWdyDAnSeN5bdSqZ5wk2X8JDvHV/DiBNOBLgfJgpn9ZTXWjHROxEKb8PUbAiMZuZbf4J2e
-PY0SbLzsu94uFZY0b5E9ZBOt9ejCo+GDWexacczXOi5GxODQDgs=
---00000000000041dc2c062fa7f967--
 
