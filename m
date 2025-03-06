@@ -1,125 +1,176 @@
-Return-Path: <netdev+bounces-172582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EED07A5572E
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 20:54:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 590ACA55734
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 20:57:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E1531899972
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 19:54:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 720B13A8862
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 19:57:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E44227183F;
-	Thu,  6 Mar 2025 19:53:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB0F32702CF;
+	Thu,  6 Mar 2025 19:57:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="bFPn4Wui"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hLesiv/z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EB01270EC3
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 19:53:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15869DDA8
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 19:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741290838; cv=none; b=i+/X4I483spCA94/wS+hVYFBbH77WI+vrJmA93OC+EdechUdKS7FGjpaM7nMIzX8APuza8mg/tKwYcYEOrVHXXIv23ngPyfDthgClcii6Q2hP4pD/8XChXj3em4tMjYTeCRMwYzcyOZpAN5EeVOl/KXDMpadkLoQYfgAlq1zA6s=
+	t=1741291054; cv=none; b=SNHKUGU9ZdyVIWefUFHUDwg4QGuR+jTzDMDw82tVdKEXWZZ5ButlVMLTWif5HLr+x6p0WvKWKf2/y+YmVB1Ua0lZzNam6XLoPPAt4HliUeUuSfk/eB0lEAhOlAG6WUDovwk6yhqcQwYMckYRHfDtHynG77t3PSvN5+j2Kqz9zlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741290838; c=relaxed/simple;
-	bh=iSKcr4EnKpiqI9Vm20mF226SY1sqzT7i4gJiswq5lWY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZYRdB/88BWnnpBpdV2XpkagCFAHZhwyQuMG6K7bE+UiHa+BhDaC68isfjGTFeEvg/HkPxd8xMreZ7gyAAnjrRkkDmW9/xdsOs993TRhEomo6Zpc2PgolCfXpu3KvR8WqOY5+abka7OmL43iK0t2gd6RNfWTv55p349BiBBWQEg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=bFPn4Wui; arc=none smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7c3b63dfebfso113935885a.3
-        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 11:53:56 -0800 (PST)
+	s=arc-20240116; t=1741291054; c=relaxed/simple;
+	bh=u+8ZBDTvjgIGKVgXIkpl33y54B6y7BXQzI86vIc0ovY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=jSDzUxCEhCTUP6CNvlfFAvf3uTOrCD5L9wsplpHDc5/yr69Hc9kgdfTaI2rNr4Jz9lEeAgdPe9UmUW9Q+keaQmT3AfykhY6/gFhTV7l7oGlUTD5IzgVoazwan6LO/hlbO82zVaToTNMnz/Je5ctShMPFnpu+4wYHmjq96VYXboE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hLesiv/z; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-47520132245so7498151cf.2
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 11:57:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1741290835; x=1741895635; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FvFqmpmbcQZU3HzVSLSr0IyMCuH53u7PNYguyBEwL0Q=;
-        b=bFPn4WuihcX3QvOSuxxYYLccbEBmmFAuQln0piO0dO23rDExA7kmxWzpu1EUvB3aqz
-         0oMLT8hO4LAyrsKXoerQFoNUj80ay/IhXSu+cQGPVzcYY4heb9jUudUQkRh3ZTdSOHy6
-         YXo5fKHrCKYI+3xvNuxabBFl7S4dzSzzyK+nCzSIyv5RNSYTRH3Bkv6pCXMgTQYMDtAD
-         qu5EU1IozfpUNKPTETkjvDYPymV/g/Rast9ir6RqBdAuwYQNWDh08E6h1uiw5FgQ68jT
-         7lCmfXy7NN+wFy8Pi424vyCqw7blQEgK5T4JAAwyP+xaz6tb7vbcFeNRcPfgltfEE049
-         KWPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741290835; x=1741895635;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1741291052; x=1741895852; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FvFqmpmbcQZU3HzVSLSr0IyMCuH53u7PNYguyBEwL0Q=;
-        b=J0SIxdporCf9K7kd85enZnuTiAhgBsw4THBLcCevAM2DNSjcDcvNWIUyXPtD8dea3T
-         kIiDTqF4mXBh60ScxCafoqZmEhlcBFxakXJz42iVDWQq5mxWwQGgVaUW37u1qqTibSkf
-         rRFIkOylN7Of6+LZSkCexnEd/EK3fKR+gB7xBs02HYFMglZ202jEKerHfHnMnpMZ4P+U
-         IYwLM2tVDOnKAo08tE0KJnHe3PCMPa6Zm971EkKn16cCvXLaWr2qQ7fdUnuGeslulbE+
-         Q4N7PYjsnqli1SQfdTPAIzjly4EAR3UYqz5DY6Et6TE4Z+R85aIHRq+8X3euMxKJTxrg
-         RBRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUVRQZaYrbFJE199g+aXNWMQh57kj9QbzWiXCvUzxj9NdTQ/pa4eBNn/lXpPF3P8rFJcO0coio=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzF4Uu5FpNyHPZ96Fc2fidfa+NV1HXZDTIg5MDxLYoN0UbUQae6
-	s70deR2A/O7nR1R46o5XN6yzfncCN1a+KHzfFzGOVDpfTiAjQNKvEZxrP93pJfk=
-X-Gm-Gg: ASbGnctV3Y8fc8KRIeaXwZQb+AdbbZ4nXcdXS+YV83VvCjKrcayh3V+Z4uMbBAyiSI9
-	DrTupqrPUjLX1rQHz7cWHpDNDkqNer4/41ET03uDtCKz1afbAUUT1OG3xEz/1iO3VsWjNnXHBML
-	Uf0UkpZks9KkblgFlzQzH17RL7pXO/LLqn/vEYxxVGeKFZ1wmQUpxvFl5nzfFPmJKl5nJrNn1XI
-	wJdyMb2owlFET9aO50W+8TXPlw1bRCJbfqkCQKXHhnFNr0/cHHlbL54Y/FQ5bB+R+0MlMd2IwlD
-	n+KpgVmsSgLgVqeoVswKBNmMQsJ8lFwFq3j5w2+sNkSYwqYUxeEP0AMmt0KYJuYiM/2Mb1afWha
-	EQhXeFU7eJmGLtD08Aw==
-X-Google-Smtp-Source: AGHT+IH5m1Jox8CfH4jOxkXbL+wqEn5oIztJ9Ikf3gVuh+SbDr69e2lOimMWgZyeibm6K/JApYccoQ==
-X-Received: by 2002:ad4:5c8e:0:b0:6e8:fb44:5bda with SMTP id 6a1803df08f44-6e900609592mr5341976d6.19.1741290835448;
-        Thu, 06 Mar 2025 11:53:55 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e8f707c514sm10606706d6.24.2025.03.06.11.53.54
+        bh=RdSjtrzKMft12FSxpZnaTvxOWuB5HQQvSzB0pWT7z1k=;
+        b=hLesiv/zJNuzkMebxycjtuQ1Qe752YGqXQa7+beFyeKlLlWBOtS2xL2/s80C0z+rbJ
+         X33Wu45RITfDUua742eUjdx2zCtofQ+Rk94fUqJ+/hcv/Ty68dlbTjU7XbOZcWJkidgW
+         OjJP9A762qc4kh3JTv2fY24sWjF1jUa9+ENt05u/mbaOhF+BvqoqDoMBvTh7MoUuOcKv
+         LVQU9XBmc5TQRlns71aywikdM0PTfq1LTO/PZDQ1phM/7dkpMLydDvmgGj/lKvGtfkoD
+         JB/jDS53g8yOKQCYJvEf3ESQhph5ElQR2gYa36YuAkb11ogt0ho4Ug7E6V9WxFDo3mpX
+         fQbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741291052; x=1741895852;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=RdSjtrzKMft12FSxpZnaTvxOWuB5HQQvSzB0pWT7z1k=;
+        b=Yd8dNjELOHOBLBpWLlLVF0drsuXLQK3L/r+Srl2io1Cbulgc1SwjX7IQYhfQh1i4cE
+         3c/bHspEbMgaeU3Kmkx3LV3GKefFch5fWysyHBCaUN4BnYSK2DhFJQYtXAOWLCK7S+ld
+         yjPGLAEM8Jh4luGSJUEq8vOeeoJQXD40JIjJ8jBQcdQ/cgqAV7YX7Wm9NXNze8U0dQ6v
+         JXzYoUo/x3ktWEYRIMGcznDfGLcbGGLRdo+LEUoXxNjIJ+6lBX0MWbYITxsVlFPOL1p3
+         K1uQshc5lEZNwWzvivRg0XAHkz9pAgkMUZ6nAgVwcW4lzwoJgixeiSul129mR9/JXl8K
+         bSAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWPZEpjQRO25SjN3uXiqwpFYf8xpGSsMxfSqll9GKUNy74zUBXswFRjscKu4wUHZXkg5HS3qqs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhzNr7kBTej6c05/yqdzDZqT79/pbju0Wa1LqnOpUJwkNKPK0h
+	hWsoN27v/Nouix9R5lmJlQMPVfeTgNU+mEX/CGgDNPK9AftrsXBg
+X-Gm-Gg: ASbGncvipVLU61sxcVni2tlxc8n9sPst441+YuvggJrX4nGwCSOOC1NAatb4twbs2c7
+	Rp4n+dQw5WRHbvIlMRKWKl7vPFTgTcVVrpVuBvyB9iXVtbtpWsoawLdbGZfCqTtkBiBPwwPsUSj
+	6gWbKl3s/FOftZxxVu+tUszXE4JcDPIVefUsufNkrya1jHJvyEOX9A4KJm94SMsr/ZGstLQSPVI
+	hATqfjpUqczp5otKymzi2KLNwwld48wOJgdV2hkUcRB1l/33znDtvX7d7+X50gnCzn4xbVWGYf2
+	yhVwAY7SVb89NJj8cx8tF7Dv5rsAT92WeItShw7GS74UO9wFSP82h59mAAQ5GhM2TrgM1PeE9h0
+	6n5oIX2TwknYrRLqrJlh0vg==
+X-Google-Smtp-Source: AGHT+IFh6s2B32dGCZbrmBwTL6h8kBMVKVgTji+uITQw9P1pD1YWa//5Eid/fCZL/2EhUXeUAdkr5A==
+X-Received: by 2002:ac8:7f50:0:b0:475:1734:296b with SMTP id d75a77b69052e-476109b174cmr5140871cf.25.1741291051807;
+        Thu, 06 Mar 2025 11:57:31 -0800 (PST)
+Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4751db379a4sm10848931cf.50.2025.03.06.11.57.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Mar 2025 11:53:54 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1tqHI2-00000001fCB-20Yh;
-	Thu, 06 Mar 2025 15:53:54 -0400
-Date: Thu, 6 Mar 2025 15:53:54 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: longli@linuxonhyperv.com
-Cc: Leon Romanovsky <leon@kernel.org>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	Long Li <longli@microsoft.com>
-Subject: Re: [patch rdma-next v5 2/2] RDMA/mana_ib: Handle net event for
- pointing to the current netdev
-Message-ID: <20250306195354.GG354403@ziepe.ca>
-References: <1741289079-18744-1-git-send-email-longli@linuxonhyperv.com>
- <1741289079-18744-2-git-send-email-longli@linuxonhyperv.com>
+        Thu, 06 Mar 2025 11:57:31 -0800 (PST)
+Date: Thu, 06 Mar 2025 14:57:30 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Eric Dumazet <edumazet@google.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ David Ahern <dsahern@kernel.org>, 
+ Simon Horman <horms@kernel.org>, 
+ netdev@vger.kernel.org, 
+ eric.dumazet@gmail.com
+Message-ID: <67c9fe2af078b_1bb0a2942a@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CANn89i+QnSwxB33Hp48587EWAX=QYY0Msmv_bkfe_C1amk8Ftg@mail.gmail.com>
+References: <20250306183101.817063-1-edumazet@google.com>
+ <67c9f10e7f7e8_1580029446@willemb.c.googlers.com.notmuch>
+ <CANn89i+QnSwxB33Hp48587EWAX=QYY0Msmv_bkfe_C1amk8Ftg@mail.gmail.com>
+Subject: Re: [PATCH net-next] udp: expand SKB_DROP_REASON_UDP_CSUM use
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1741289079-18744-2-git-send-email-longli@linuxonhyperv.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 06, 2025 at 11:24:39AM -0800, longli@linuxonhyperv.com wrote:
-> +	switch (event) {
-> +	case NETDEV_CHANGEUPPER:
-> +		ndev = mana_get_primary_netdev(mc, 0, &dev->dev_tracker);
-> +		/*
-> +		 * RDMA core will setup GID based on updated netdev.
-> +		 * It's not possible to race with the core as rtnl lock is being
-> +		 * held.
-> +		 */
-> +		ib_device_set_netdev(&dev->ib_dev, ndev, 1);
-> +
-> +		/* mana_get_primary_netdev() returns ndev with refcount held */
-> +		netdev_put(ndev, &dev->dev_tracker);
+Eric Dumazet wrote:
+> On Thu, Mar 6, 2025 at 8:01=E2=80=AFPM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> >
+> > Eric Dumazet wrote:
+> > > Use SKB_DROP_REASON_UDP_CSUM in __first_packet_length()
+> > > and udp_read_skb() when dropping a packet because of
+> > > a wrong UDP checksum.
+> > >
+> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > > ---
+> > >  net/ipv4/udp.c | 4 ++--
+> > >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> > > index 17c7736d8349433ad2d4cbcc9414b2f8112610af..39c3adf333b5f02ca53=
+f768c918c75f2fc7f93ac 100644
+> > > --- a/net/ipv4/udp.c
+> > > +++ b/net/ipv4/udp.c
+> > > @@ -1848,7 +1848,7 @@ static struct sk_buff *__first_packet_length(=
+struct sock *sk,
+> > >                       atomic_inc(&sk->sk_drops);
+> > >                       __skb_unlink(skb, rcvq);
+> > >                       *total +=3D skb->truesize;
+> > > -                     kfree_skb(skb);
+> > > +                     kfree_skb_reason(skb, SKB_DROP_REASON_UDP_CSU=
+M);
+> > >               } else {
+> > >                       udp_skb_csum_unnecessary_set(skb);
+> > >                       break;
+> > > @@ -2002,7 +2002,7 @@ int udp_read_skb(struct sock *sk, skb_read_ac=
+tor_t recv_actor)
+> > >               __UDP_INC_STATS(net, UDP_MIB_CSUMERRORS, is_udplite);=
 
-? What is the point of a tracker in dev if it never lasts outside this
-scope?
+> > >               __UDP_INC_STATS(net, UDP_MIB_INERRORS, is_udplite);
+> > >               atomic_inc(&sk->sk_drops);
+> > > -             kfree_skb(skb);
+> > > +             kfree_skb_reason(skb, SKB_DROP_REASON_UDP_CSUM);
+> > >               goto try_again;
+> > >       }
+> >
+> > From a quick search for UDP_MIB_CSUMERRORS, one more case with regula=
+r
+> > kfree_skb:
+> >
+> > csum_copy_err:
+> >         if (!__sk_queue_drop_skb(sk, &udp_sk(sk)->reader_queue, skb, =
+flags,
+> >                                  udp_skb_destructor)) {
+> >                 UDP_INC_STATS(sock_net(sk), UDP_MIB_CSUMERRORS, is_ud=
+plite);
+> >                 UDP_INC_STATS(sock_net(sk), UDP_MIB_INERRORS, is_udpl=
+ite);
+> >         }
+> >         kfree_skb(skb);
+> =
 
-ib_device_set_netdev() already has a tracker built into it.
+> Right, I was unsure because of the conditional SNMP updates.
 
-Jason
+That seems to only suppress the update if peeking and the skb was
+already dequeued (ENOENT).
+
+Frankly, we probably never intended to increment this counter when
+peeking, as it is intended to be a per-datagram counter, not a
+per-recvmsg counter.
+
+I think ever erring on the side of extra increments in the unlikely
+case of ENOENT is fine.
+
+Cleaner is perhaps to have a kfree_skb_reason inside that branch and
+a consume_skb in the else.
+
 
