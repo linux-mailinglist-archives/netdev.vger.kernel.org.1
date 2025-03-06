@@ -1,335 +1,171 @@
-Return-Path: <netdev+bounces-172356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07615A54555
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:50:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EDBCA54567
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:52:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E5E67A9530
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 08:49:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6EBC6188E855
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 08:52:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7935F1FF7CC;
-	Thu,  6 Mar 2025 08:50:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20F46207E03;
+	Thu,  6 Mar 2025 08:52:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CZ7RBKtT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WYL/lECD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+Received: from mail-yw1-f193.google.com (mail-yw1-f193.google.com [209.85.128.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958292E3369
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 08:50:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91EE71A83ED;
+	Thu,  6 Mar 2025 08:52:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741251039; cv=none; b=eXyXiGgf5Tc7XFxjoHNUVKo8jUSvYKeAmGx8g6TSQT//Wbgk/kmYAvmMGnBMSAs8ZTj2nWIv5KF719C9jfcgNwYjsCVy6f5+S1jKw0rFOMjudgmxtJkSwfm79B5Q5vUAVAdLNHNbRloB44KIm6ZVqNjuNrE8QtJGHgsGxX9KwmE=
+	t=1741251161; cv=none; b=MtE5NQtFSxRV2E1M1P8XQ728rUNMnsq6M88ghogEct2SK6iBD5A4zBC8DTQuYxtwFV9uuQttlSuqzRR/D2sxmKKXMJC0OR/WKDKTgrjJHQC23HsZvMo2fbYuZdaw7NsqxqR+7qlUmbPs0vL7CRH71jXHbwi+GSb8P5GNeJrwKFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741251039; c=relaxed/simple;
-	bh=9TqfMFTJndzkXWLjTqaQ/zZPKzLwulcfZy+rIHknwvM=;
+	s=arc-20240116; t=1741251161; c=relaxed/simple;
+	bh=XXs8uZWN9WWnGCHphGrfM+z/OKcBjkW6AX8J7E+t69Y=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gmVb4a8+PJq3Y2Huhhx1BhP2EWvtQctFHrXnUgOsAuCSLworuV/J0rwtlFIFKChieBF3R37TKHe8PYk+cMb1P/HFJW+9FdimSLSZz05BVsrJHKGxVGTxpWC4gDXaHJrTYR6mYongmWOTjWTkJQVpVCY72TAW+zwuBFHx54JEFbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CZ7RBKtT; arc=none smtp.client-ip=209.85.166.174
+	 To:Cc:Content-Type; b=nvWLY5dgc4v0EKiA4C0lVkR/6N00tWO9qOTVlp/SuUlo6DmYh2VwZyBd2mUG8smMFksk1f2HMDf8CNNSybkPjNeLjZJcstoIHMI59nin+VopCXeZM3FEIJUYt668ENrHPmMVXyGWi7+621HjOEuzYs/LcQI3unY/tji+TATz/54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WYL/lECD; arc=none smtp.client-ip=209.85.128.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3d43bb5727fso882755ab.1
-        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 00:50:37 -0800 (PST)
+Received: by mail-yw1-f193.google.com with SMTP id 00721157ae682-6ef7c9e9592so3532527b3.1;
+        Thu, 06 Mar 2025 00:52:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741251036; x=1741855836; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1741251158; x=1741855958; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uBNnWb4h0P3DkIcfcNbfaVgVkKvOmxVfLMp6Ps9ecds=;
-        b=CZ7RBKtTySWNKzdqvWHTZbDD3poBWB/55qCHHaYb6cOVvAYG8Ah8VgMOJ5Mn2CnzFH
-         lxq6ndj9cHHFQRIigH166djSL4QxtWbQyqHthLHMejKkkMFxm0lqHpzO36ILbmKcn10k
-         vNVR+WCszlSjm6N0aSUZx99Jjbmx+nImFTwwoOwJXqXu6hvxLghlIFrfhqFn9qnv5KP3
-         WN6JhCimKpgEoOJP3JLu9Q7Z8tPMPXBBgD9RldG+WJUw4KFSX+iWx+T1O6UI2qLZmBY7
-         dfhg8n9BW9jLcWTajGHKLy3YhKGUJhJF5QKrXn0GTj8nhcampUt8QhMZ/vh3SdoooLlc
-         MWUw==
+        bh=XXs8uZWN9WWnGCHphGrfM+z/OKcBjkW6AX8J7E+t69Y=;
+        b=WYL/lECD/6JlqWhX9RYHhAA2g2y+5llFJmL2bkMLkoS9yuVVPljQgSBG8lICn7iD5k
+         otAGDP15oBIQJjrIC24CJZzYBsvLOEyQrgGvmQ7VXKcVDRy0g1v7JFQ1B0x2b/VO0K8M
+         PZ71h/h1I4gAmn2qp9sGFGGJkCwA1ecOwplWxIsjcf7NB5/UnVMnYf5yw1Dx6WiR1OM+
+         1fVsBlh5a96tjMCUFlk5TS1ujPv0CU2VMMwhfgIdcRrSfq2Ue2JD1JLzvSReg3IVUylk
+         ZQA38y7nR4jlJvwfdAEoJMfzYsW5ER/GpedU2kcRw5YoLb73lFk3eti19JbUrMctagTg
+         QmBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741251036; x=1741855836;
+        d=1e100.net; s=20230601; t=1741251158; x=1741855958;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uBNnWb4h0P3DkIcfcNbfaVgVkKvOmxVfLMp6Ps9ecds=;
-        b=pzEpZn1aWWOmpTOmEsCfNMXXL4T/pbTSnsMn7ctKZ/zx3HoZ1m36vLnu+0z0ZwjP1o
-         UXI7G8qSGG8cj8cyNylUqn6yopKrp2RIbet64nSa/CTBpWz+LqNRDyr876ErUWf7Umpp
-         hi5pOpL5X4nfEKu880EoIbltcxju6slodcTofalltGuZ2e5gY4AsBIkrEINC57q/P4ej
-         BGxdVTXm1cFdpooVEuih7CUnsGeVzbP3d7dImrIX/DiTHIDvM4715oipnU8XxQnKHfMI
-         sgMCER62aJgZcWJNgELoV98z6kqepA/WXrsYXPXxKnnJq4ovp84mCbuaDdZwe5RX1A/7
-         fSKA==
-X-Forwarded-Encrypted: i=1; AJvYcCXZ+sZmdHJwBvlK515xWEPbFf1RoEbpyRt7UyiWxxik1yCj3SiRfDlFDb2NVhCGdwTVUW5Ho7U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx95hylb/FI+JJsCJKm4U5GSnCYnpwztF83k+BaCYxwi/jajC7Z
-	p6bg10G+5djOTDC97qSG5bzXnBoMJaZHt7uLNCsVprixfcTdSanV6vZ307Nt9+Uec4YmcCI0daW
-	/1+p0qaWRoqERBK+FtWaDgxH+H44=
-X-Gm-Gg: ASbGncuuYowGN+i2ecHXHw4OE8ODzbqkXwLdmAgQN0DNU6nEfHGjhHMu0r5Nmfe0pLc
-	jBxWis6JwfS4J2zXTKiQ5DDoNOVur0wJljwF30W3szMdNZES8QXkNydMNSddZO2T+lRrYRpeiiv
-	GZRkGTeijQunCOzpvM2n4LdA3Clg==
-X-Google-Smtp-Source: AGHT+IHJL1tFTyYpBdIeyg/HO1gLTV/01YsZ8vyUsLNZ2r0CYlOQ05RWg8Xsc83hfUx68egP/tYGDk83sC1ewckxK/c=
-X-Received: by 2002:a05:6e02:18ca:b0:3d3:e11a:39d with SMTP id
- e9e14a558f8ab-3d42b8d397amr56706805ab.13.1741251036513; Thu, 06 Mar 2025
- 00:50:36 -0800 (PST)
+        bh=XXs8uZWN9WWnGCHphGrfM+z/OKcBjkW6AX8J7E+t69Y=;
+        b=u3Dm5FrTpVtpxvABx06usUJrYAaw0N3wKuRjnqil+hPpcW7WQExz6/Q4o9v06YQTC2
+         s2EgxO18p/jf/XFzL/t7ewCJ8U/jipMHpeybkF0RKjur85gRHcRAiPpvontZiQSUOSdn
+         soiK2Zcuar6CKHm/xPss9PelYZj05BULPJKYNh+igm/+TzH5O2P4BBSExUMYM1h7DLy6
+         w9NGlfQZ6MajglCrGfwh8IhmHBnoiLbGkDPsiVFJY2iA3QdMWhqzVqclzteyOYTTdEgp
+         czOiYuT5cldeDXtzD//fK929N6aU1ZO38u8QplBSJeMSIJVnrjvZcI5zjU4sRyZ95uTA
+         dPmg==
+X-Forwarded-Encrypted: i=1; AJvYcCW1mOWHaOXmP0IapArRnt7tDHoD72lI2BCDKwSQhPTLlUbi7U6tnBk/226X1BqWo7Nd7PQ=@vger.kernel.org, AJvYcCW3oOT3+XjTnVzUTrOu66fw8EDk5m249DysahljvLIiFTe0SdiHlcrKDdSpqCosGJPVApEQoJPH@vger.kernel.org, AJvYcCW5U6SwoQBuoQpQaRxEbBHEvyqjC6N6k80NpNuxLGFct4Wzv98hF46094VdvpuCk63GDprx44MIcAaJbmzF@vger.kernel.org, AJvYcCWyAesTNLAt4b9i8uxF11/HZVY6LzLXP/iOirqrtUa1YbkNCLHWengE4RTC/gUGaoWv5hD+oqgYM4MQPFX3oN64PfX0@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxASEINJGo1aZ5GbPoQPI2XBp0zr2pYOBDXjKgSCrSos3de4ES
+	cdpVjSdFCGApbWwMQ7JhhQw8BkjLQieqXksxygWAQ8U1GGUjipCQThVCElCyqTCe5pZDDt2V+eV
+	HScX1S1czCauYJHvvU6WGop1lmzg=
+X-Gm-Gg: ASbGncs3WXbzpAca2FJtMZnGMcNAlzivcKQtm/HWVqHHFkh0UCp7Av27ru56FLc+EcK
+	nLYVOlDnpMT8hPXOfExWI7ufY+25evVbRo4n+izPqMlABodjEvXbfoOYaJc3TqtplDMOEqu7KhE
+	KxlZSBvxUeToq8zLhrwDaW2TEWrA==
+X-Google-Smtp-Source: AGHT+IHUPHaw0YZdo+mDMRAkSmdnWIm6D16Vg79ihR5A4Mv8LJil7rF/h/OfZk/ywEv5+Ey8+JWj4dl2X5zMiVr1zBQ=
+X-Received: by 2002:a05:690c:2b03:b0:6fe:b88e:4d82 with SMTP id
+ 00721157ae682-6feb88e57c7mr3700567b3.28.1741251158459; Thu, 06 Mar 2025
+ 00:52:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAL+tcoDFSSdMXGyUeR+3nqdyVpjsky7y4ZaCB-n1coR_x_Vhfw@mail.gmail.com>
- <20250306062218.85962-1-kuniyu@amazon.com> <CAL+tcoAEPkyyvzULua_MUNQb=up_8Qqg+w3Oq6B9C1JS9gvdrQ@mail.gmail.com>
- <CANn89iL_sT7a+49HNDLjsP5qnREPKpx6yEu8USMZPxW1vP+skg@mail.gmail.com>
- <CAL+tcoBpUxfMo6Assb6gU9JaJctS4Gt7G889GNmJsRFQeaxHJA@mail.gmail.com> <CANn89iKwCPfHmEkjUn7Xedz+=maFArk5Nx8cNS_fDKgWZ4_Nvw@mail.gmail.com>
-In-Reply-To: <CANn89iKwCPfHmEkjUn7Xedz+=maFArk5Nx8cNS_fDKgWZ4_Nvw@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 6 Mar 2025 16:50:00 +0800
-X-Gm-Features: AQ5f1Jqze17hqbMGuVOOQXedv66c3RPN48NbxsAUiLEjsIxG9MEhNPdo5U8nIdY
-Message-ID: <CAL+tcoBh4LrTqp6KA2DqwamP5e863vQfnTA8KrZ15+mBnPS7dQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: bring back NUMA dispersion in inet_ehash_locks_alloc()
-To: Eric Dumazet <edumazet@google.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, davem@davemloft.net, eric.dumazet@gmail.com, 
-	horms@kernel.org, kernelxing@tencent.com, kuba@kernel.org, 
-	ncardwell@google.com, netdev@vger.kernel.org, pabeni@redhat.com
+References: <20250303132837.498938-1-dongml2@chinatelecom.cn>
+ <20250303132837.498938-2-dongml2@chinatelecom.cn> <20250303165454.GB11590@noisy.programming.kicks-ass.net>
+ <CADxym3aVtKx_mh7aZyZfk27gEiA_TX6VSAvtK+YDNBtuk_HigA@mail.gmail.com>
+ <20250304053853.GA7099@noisy.programming.kicks-ass.net> <20250304061635.GA29480@noisy.programming.kicks-ass.net>
+ <CADxym3bS_6jpGC3vLAAyD20GsR+QZofQw0_GgKT8nN3c-HqG-g@mail.gmail.com>
+ <20250304094220.GC11590@noisy.programming.kicks-ass.net> <6F9EF5C3-4CAE-4C5E-B70E-F73462AC7CA0@zytor.com>
+ <CADxym3busXZKtX=+FY_xnYw7e1CKp5AiHSasZGjVJTdeCZao-g@mail.gmail.com>
+ <20250305100306.4685333a@gandalf.local.home> <CADxym3ZB_eQny=-aO4AwrHiwT264NXitdKwjRUYrnGJ2tH=Qwg@mail.gmail.com>
+ <CAADnVQJ0_+Hij=kf9eVPX_ZND=2=uDHaYPWvv1x-WmR5sZRSmA@mail.gmail.com>
+In-Reply-To: <CAADnVQJ0_+Hij=kf9eVPX_ZND=2=uDHaYPWvv1x-WmR5sZRSmA@mail.gmail.com>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Thu, 6 Mar 2025 16:50:58 +0800
+X-Gm-Features: AQ5f1JpgFvunO0OQTqf93RDkyeUwF-IllYoHkeBCNOU1pNT2c-N8DSTxA6mOAMI
+Message-ID: <CADxym3YMeAPpc+ozM2E7yW1qpB_arKJiDyAcRs8pW8sRqJZOZw@mail.gmail.com>
+Subject: Re: [PATCH v4 1/4] x86/ibt: factor out cfi and fineibt offset
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Steven Rostedt <rostedt@goodmis.org>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eddy Z <eddyz87@gmail.com>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Jiri Olsa <jolsa@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Nathan Chancellor <nathan@kernel.org>, 
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, 
+	Sami Tolvanen <samitolvanen@google.com>, Kees Cook <kees@kernel.org>, dongml2@chinatelecom.cn, 
+	Andrew Morton <akpm@linux-foundation.org>, Rik van Riel <riel@surriel.com>, 
+	Mike Rapoport <rppt@kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
+	LKML <linux-kernel@vger.kernel.org>, 
+	linux-trace-kernel <linux-trace-kernel@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, clang-built-linux <llvm@lists.linux.dev>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 6, 2025 at 4:18=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
+On Thu, Mar 6, 2025 at 11:39=E2=80=AFAM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
 >
-> On Thu, Mar 6, 2025 at 9:04=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
+> On Wed, Mar 5, 2025 at 6:59=E2=80=AFPM Menglong Dong <menglong8.dong@gmai=
+l.com> wrote:
 > >
-> > On Thu, Mar 6, 2025 at 3:26=E2=80=AFPM Eric Dumazet <edumazet@google.co=
-m> wrote:
-> > >
-> > > On Thu, Mar 6, 2025 at 7:35=E2=80=AFAM Jason Xing <kerneljasonxing@gm=
-ail.com> wrote:
-> > > >
-> > > > On Thu, Mar 6, 2025 at 2:22=E2=80=AFPM Kuniyuki Iwashima <kuniyu@am=
-azon.com> wrote:
-> > > > >
-> > > > > From: Jason Xing <kerneljasonxing@gmail.com>
-> > > > > Date: Thu, 6 Mar 2025 12:59:03 +0800
-> > > > > > On Thu, Mar 6, 2025 at 12:12=E2=80=AFPM Kuniyuki Iwashima <kuni=
-yu@amazon.com> wrote:
-> > > > > > >
-> > > > > > > From: Jason Xing <kerneljasonxing@gmail.com>
-> > > > > > > Date: Thu, 6 Mar 2025 11:35:27 +0800
-> > > > > > > > On Wed, Mar 5, 2025 at 9:06=E2=80=AFPM Eric Dumazet <edumaz=
-et@google.com> wrote:
-> > > > > > > > >
-> > > > > > > > > We have platforms with 6 NUMA nodes and 480 cpus.
-> > > > > > > > >
-> > > > > > > > > inet_ehash_locks_alloc() currently allocates a single 64K=
-B page
-> > > > > > > > > to hold all ehash spinlocks. This adds more pressure on a=
- single node.
-> > > > > > > > >
-> > > > > > > > > Change inet_ehash_locks_alloc() to use vmalloc() to sprea=
-d
-> > > > > > > > > the spinlocks on all online nodes, driven by NUMA policie=
-s.
-> > > > > > > > >
-> > > > > > > > > At boot time, NUMA policy is interleave=3Dall, meaning th=
-at
-> > > > > > > > > tcp_hashinfo.ehash_locks gets hash dispersion on all node=
-s.
-> > > > > > > > >
-> > > > > > > > > Tested:
-> > > > > > > > >
-> > > > > > > > > lack5:~# grep inet_ehash_locks_alloc /proc/vmallocinfo
-> > > > > > > > > 0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_=
-locks_alloc+0x90/0x100 pages=3D16 vmalloc N0=3D2 N1=3D3 N2=3D3 N3=3D3 N4=3D=
-3 N5=3D2
-> > > > > > > > >
-> > > > > > > > > lack5:~# echo 8192 >/proc/sys/net/ipv4/tcp_child_ehash_en=
-tries
-> > > > > > > > > lack5:~# numactl --interleave=3Dall unshare -n bash -c "g=
-rep inet_ehash_locks_alloc /proc/vmallocinfo"
-> > > > > > > > > 0x000000004e99d30c-0x00000000763f3279   36864 inet_ehash_=
-locks_alloc+0x90/0x100 pages=3D8 vmalloc N0=3D1 N1=3D2 N2=3D2 N3=3D1 N4=3D1=
- N5=3D1
-> > > > > > > > > 0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_=
-locks_alloc+0x90/0x100 pages=3D16 vmalloc N0=3D2 N1=3D3 N2=3D3 N3=3D3 N4=3D=
-3 N5=3D2
-> > > > > > > > >
-> > > > > > > > > lack5:~# numactl --interleave=3D0,5 unshare -n bash -c "g=
-rep inet_ehash_locks_alloc /proc/vmallocinfo"
-> > > > > > > > > 0x00000000fd73a33e-0x0000000004b9a177   36864 inet_ehash_=
-locks_alloc+0x90/0x100 pages=3D8 vmalloc N0=3D4 N5=3D4
-> > > > > > > > > 0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_=
-locks_alloc+0x90/0x100 pages=3D16 vmalloc N0=3D2 N1=3D3 N2=3D3 N3=3D3 N4=3D=
-3 N5=3D2
-> > > > > > > > >
-> > > > > > > > > lack5:~# echo 1024 >/proc/sys/net/ipv4/tcp_child_ehash_en=
-tries
-> > > > > > > > > lack5:~# numactl --interleave=3Dall unshare -n bash -c "g=
-rep inet_ehash_locks_alloc /proc/vmallocinfo"
-> > > > > > > > > 0x00000000db07d7a2-0x00000000ad697d29    8192 inet_ehash_=
-locks_alloc+0x90/0x100 pages=3D1 vmalloc N2=3D1
-> > > > > > > > > 0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_=
-locks_alloc+0x90/0x100 pages=3D16 vmalloc N0=3D2 N1=3D3 N2=3D3 N3=3D3 N4=3D=
-3 N5=3D2
-> > > > > > > > >
-> > > > > > > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > > > > > > >
-> > > > > > > > Tested-by: Jason Xing <kerneljasonxing@gmail.com>
-> > > > > > >
-> > > > > > > Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > > > > > >
-> > > > > > >
-> > > > > > > >
-> > > > > > > > > ---
-> > > > > > > > >  net/ipv4/inet_hashtables.c | 37 ++++++++++++++++++++++++=
-++-----------
-> > > > > > > > >  1 file changed, 26 insertions(+), 11 deletions(-)
-> > > > > > > > >
-> > > > > > > > > diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_h=
-ashtables.c
-> > > > > > > > > index 9bfcfd016e18275fb50fea8d77adc8a64fb12494..2b4a58824=
-7639e0c7b2e70d1fc9b3b9b60256ef7 100644
-> > > > > > > > > --- a/net/ipv4/inet_hashtables.c
-> > > > > > > > > +++ b/net/ipv4/inet_hashtables.c
-> > > > > > > > > @@ -1230,22 +1230,37 @@ int inet_ehash_locks_alloc(struct=
- inet_hashinfo *hashinfo)
-> > > > > > > > >  {
-> > > > > > > > >         unsigned int locksz =3D sizeof(spinlock_t);
-> > > > > > > > >         unsigned int i, nblocks =3D 1;
-> > > > > > > > > +       spinlock_t *ptr =3D NULL;
-> > > > > > > > >
-> > > > > > > > > -       if (locksz !=3D 0) {
-> > > > > > > > > -               /* allocate 2 cache lines or at least one=
- spinlock per cpu */
-> > > > > > > > > -               nblocks =3D max(2U * L1_CACHE_BYTES / loc=
-ksz, 1U);
-> > > > > > > > > -               nblocks =3D roundup_pow_of_two(nblocks * =
-num_possible_cpus());
-> > > > > > > > > +       if (locksz =3D=3D 0)
-> > > > > > > > > +               goto set_mask;
-> > > > > > > > >
-> > > > > > > > > -               /* no more locks than number of hash buck=
-ets */
-> > > > > > > > > -               nblocks =3D min(nblocks, hashinfo->ehash_=
-mask + 1);
-> > > > > > > > > +       /* Allocate 2 cache lines or at least one spinloc=
-k per cpu. */
-> > > > > > > > > +       nblocks =3D max(2U * L1_CACHE_BYTES / locksz, 1U)=
- * num_possible_cpus();
-> > > > > > > > >
-> > > > > > > > > -               hashinfo->ehash_locks =3D kvmalloc_array(=
-nblocks, locksz, GFP_KERNEL);
-> > > > > > > > > -               if (!hashinfo->ehash_locks)
-> > > > > > > > > -                       return -ENOMEM;
-> > > > > > > > > +       /* At least one page per NUMA node. */
-> > > > > > > > > +       nblocks =3D max(nblocks, num_online_nodes() * PAG=
-E_SIZE / locksz);
-> > > > > > > > > +
-> > > > > > > > > +       nblocks =3D roundup_pow_of_two(nblocks);
-> > > > > > > > > +
-> > > > > > > > > +       /* No more locks than number of hash buckets. */
-> > > > > > > > > +       nblocks =3D min(nblocks, hashinfo->ehash_mask + 1=
-);
-> > > > > > > > >
-> > > > > > > > > -               for (i =3D 0; i < nblocks; i++)
-> > > > > > > > > -                       spin_lock_init(&hashinfo->ehash_l=
-ocks[i]);
-> > > > > > > > > +       if (num_online_nodes() > 1) {
-> > > > > > > > > +               /* Use vmalloc() to allow NUMA policy to =
-spread pages
-> > > > > > > > > +                * on all available nodes if desired.
-> > > > > > > > > +                */
-> > > > > > > > > +               ptr =3D vmalloc_array(nblocks, locksz);
-> > > > > > > >
-> > > > > > > > I wonder if at this point the memory shortage occurs, is it=
- necessary
-> > > > > > > > to fall back to kvmalloc() later
-> > > > > > >
-> > > > > > > If ptr is NULL here, kvmalloc_array() is called below.
-> > > > > >
-> > > > > > My point is why not return with -ENOMEM directly? Or else It lo=
-oks meaningless.
-> > > > > >
-> > > > >
-> > > > > Ah, I misread.  I'm not sure how likely such a case happens, but =
-I
-> > > > > think vmalloc() and kmalloc() failure do not always correlate, th=
-e
-> > > > > former uses node_alloc() and the latter use the page allocator.
-> > > >
-> > > > Sure, it is unlikely to happen.
-> > > >
-> > > > As to memory allocation, we usually try kmalloc() for less than pag=
-e
-> > > > size memory allocation while vmalloc() for larger one. The same log=
-ic
-> > > > can be seen in kvmalloc(): try kmalloc() first, then fall back to
-> > > > vmalloc(). Since we fail to allocate non-contiguous memory, there i=
-s
-> > > > no need to try kvmalloc() (which will call kmalloc and vmalloc one
-> > > > more round).
-> > >
-> > > I chose to not add code, because:
-> > >
-> > >        if (num_online_nodes() > 1) {
-> > >                /* Use vmalloc() to allow NUMA policy to spread pages
-> > >                 * on all available nodes if desired.
-> > >                 */
-> > >                ptr =3D vmalloc_array(nblocks, locksz);
-> > >
-> > > << adding here a test is pointless, we already have correct code if
-> > > ptr =3D=3D NULLL >>
-> > >
-> > >        }
-> > >        if (!ptr) {
-> > >                ptr =3D kvmalloc_array(nblocks, locksz, GFP_KERNEL);
-> > >                if (!ptr)
-> > >                        return -ENOMEM;
-> > >         }
-> > >
-> > >
-> > > Sure, this could be written in a different way, but ultimately it is =
-a
-> > > matter of taste.
+> > I'm not sure if it works. However, indirect call is also used
+> > in function graph, so we still have better performance. Isn't it?
 > >
-> > Sorry that I didn't make myself clear enough. I mean if
-> > vmalloc_array() fails, then it will fall back to kvmalloc_array()
-> > which will call kmalloc() or even vmalloc() to allocate memory again.
-> > My intention is to return with an error code when the first time
-> > allocation fails.
-> >
-> > Code like this on top of your patch:
-> > diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-> > index 3edbe2dad8ba..d026918319d2 100644
-> > --- a/net/ipv4/inet_hashtables.c
-> > +++ b/net/ipv4/inet_hashtables.c
-> > @@ -1282,12 +1282,12 @@ int inet_ehash_locks_alloc(struct
-> > inet_hashinfo *hashinfo)
-> >                  * on all available nodes if desired.
-> >                  */
-> >                 ptr =3D vmalloc_array(nblocks, locksz);
-> > -       }
-> > -       if (!ptr) {
-> > +       } else {
-> >                 ptr =3D kvmalloc_array(nblocks, locksz, GFP_KERNEL);
-> > -               if (!ptr)
-> > -                       return -ENOMEM;
-> >         }
-> > +       if (!ptr)
-> > +               return -ENOMEM;
-> > +
+> > Let me have a look at the code of the function graph first :/
 >
-> I think I understood pretty well, and said it was a matter of taste.
+> Menglong,
 >
-> I wish we could move on to more interesting stuff, like the main ehash
-> table, which currently
-> uses 2 huge pages, they can all land into one physical socket.
+> Function graph infra isn't going to help.
+> "call foo" isn't a problem either.
+>
+> But we have to step back.
+> per-function metadata is an optimization and feels like
+> we're doing a premature optimization here without collecting
+> performance numbers first.
+>
+> Let's implement multi-fentry with generic get_metadata_by_ip() first.
+> get_metadata_by_ip() will be a hashtable in such a case and
+> then we can compare its performance when it's implemented as
+> a direct lookup from ip-4 (this patch) vs hash table
+> (that does 'ip' to 'metadata' lookup).
 
-Interesting. I will dig into it after next week because next week
-netdev will take place :)
+Hi, Alexei
 
-Before this, I tried to accelerate transmitting skbs with four numa
-nodes like allocating skbs in local numa nodes or something like that,
-but it didn't show good throughput. Glad to know you're doing various
-challenging tests.
+You are right, I should do such a performance comparison.
 
-Thanks,
-Jason
+>
+> If/when we decide to do this per-function metadata we can also
+> punt to generic hashtable for cfi, IBT, FineIBT, etc configs.
+> When mitigations are enabled the performance suffers anyway,
+> so hashtable lookup vs direct ip-4 lookup won't make much difference.
+> So we can enable per-function metadata only on non-mitigation configs
+> when FUNCTION_ALIGNMENT=3D16.
+> There will be some number of bytes available before every function
+> and if we can tell gcc/llvm to leave at least 5 bytes there
+> the growth of vmlinux .text will be within a noise.
+
+Sounds great! It's so different to make the per-function metadata
+work in all the cases. Especially, we can't implement it in arm64
+if CFI_CLANG is enabled. And the fallbacking to the hash table makes
+it much easier in these cases.
+
+>
+> So let's figure out the design of multi-fenty first with a hashtable
+> for metadata and decide next steps afterwards.
+
+Ok, I'll develop a version for fentry multi-link with both hashtable
+and function metadata, and do some performance testing. Thank
+you for your advice :/
+
+Thanks!
+Menglong Dong
 
