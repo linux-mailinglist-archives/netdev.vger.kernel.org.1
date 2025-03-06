@@ -1,287 +1,245 @@
-Return-Path: <netdev+bounces-172362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45F4FA545F6
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:10:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03D88A545FE
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:13:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C17E188C878
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:10:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 920427A339B
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:11:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6D8F207E11;
-	Thu,  6 Mar 2025 09:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ABCD2080C5;
+	Thu,  6 Mar 2025 09:12:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UKOKhOPJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RWHamFQK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC4071EDA10
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 09:10:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741252238; cv=fail; b=e0IgNpcTIOdEfHudYKxoMKkswcS9lt3hO1GyCk5Hzgg+7fsr+9CogF/i8B5vSXRqgXnvNd6mU28ejIc8D6LO7bVCUXp+6mhFazNdpKm9rzYeq1OaE5+pD6etjXpbPzDwgZyVwfImxI+Wu8SS7qElvjTMyHp//bSF4EK+0b5i5bg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741252238; c=relaxed/simple;
-	bh=yA+cpwEntnR+JNOHrG6ttUfNGbJ0WR4iwz/INB9QVZ8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=bVa/ocYB+byqj+20uv5s3X7b4kaXohQvUiDlqJQI1brnh5SqZhe5vB+5JUEv2EXKj1mnWlTp5eX5BbQa/Mq2GrtJ3/hkyDGVeZDLigafGFWoGEZrmdKGZ2tM6kkiJWEc57HvnpErqXjRaiNEXOgnkx6fcJ9Nr+4OHV/nwM5zPx4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UKOKhOPJ; arc=fail smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741252237; x=1772788237;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=yA+cpwEntnR+JNOHrG6ttUfNGbJ0WR4iwz/INB9QVZ8=;
-  b=UKOKhOPJcR57RnU+DlMB6uzBBQoXws6+tMs2yaFVYracZ5aHbCsQbTWV
-   62rdqYrZZWtepFdI/04HUJ5PYRUF/i7ujvS0ULSOPfEnLw/VXltFNyDm6
-   1PIWrr4RLwJY7vnlkKWXNE5xg2m/izaT4IvG/ltUqQZXbOHU6dv/4YUoe
-   qUfLaE+3Qi5lFF2Nj1crW1Esi0sOSjaeRwM/+c4feA6K8ctcTxkIlduRI
-   PewJEuAeDRD7cuJuN+RjSv0m584zEmy5b4RJ6/Lu2V1XaHucCA/TnD2Ps
-   Q1kD0mPv2+eRdgiLD//1qlhPrHfZV9K4EmlVUoL7gJdSW8tOpHZthgF2E
-   A==;
-X-CSE-ConnectionGUID: Z+7hspmYSPy/IFbEW1W56g==
-X-CSE-MsgGUID: wX8GrV3HRryaXuFyFyruaQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="42490593"
-X-IronPort-AV: E=Sophos;i="6.14,225,1736841600"; 
-   d="scan'208";a="42490593"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2025 01:10:36 -0800
-X-CSE-ConnectionGUID: TRMqWUzPQxyYdjB9TQdJlg==
-X-CSE-MsgGUID: rd9EPW5oQuKzV8DMrgIO9w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,225,1736841600"; 
-   d="scan'208";a="119466519"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Mar 2025 01:10:36 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Thu, 6 Mar 2025 01:10:35 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Thu, 6 Mar 2025 01:10:35 -0800
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.48) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Thu, 6 Mar 2025 01:10:35 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tUnXANh5dgUt5c88rZXlCv1o1jkrYdhz9hrQqd0Y2zY9dT1G85ZDRNxd5PTGBE0adWgS5kFWEDrk3Yr/s+rbOFuScbzfZg7Muh5Ec6hZUwNsnY//S2P+hYPPi00MdbHVa80ZhqwN840853df4ln6NWlFWv5xUsLd/5BbjwPtkfaDAAjnsV46twnQ3Wac3UGMC16fPdMoutgkdwTKMMpHVhn4j4E7CHqpU+FGr+lX236m0MHr2vMOdS1fL08VCWGp628aZYqFudk/4390Z2R07hTqbau3RTloQ26YuVtRMpoZtQ6Q+561v50b0OqeBw+hZ2qAMzyG+Q0nB1jKji45Og==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ORG0EQ3X7a7pGfSzhr0EymhuNAkqsY5vWJq67JE9ceg=;
- b=IjtA7r0oRcYZQTmaVB1lViozW21WqqccFPTVBFN+i3k7ckRe9NV2BjC+KGcblIQ2LMZoXBOQ5ex70WinUpajt+K45GutiWqx/06o0Gvf8J/4Kry9KmrZxtlJ7/YTDH9zrnlCAvR2FJTCZnJHaJpxw2t7gir72Jxq7e/q2Jl4wvEkqjdIFrYIuanjC2ipyAY8B0SZGpVomi/42+J4vTkODNO3Mooj8zIEqCbM5I83jzn3wDgygE68u2CEi0iKxDyGpMmrKPTT5yCOIvmpVSjUNsWIwS5tgeQWWwn2WSJ1BlYyax7SrE7902uTfX3M3JOJCHF9ed/0idbHVgtbWZF5Mw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CY5PR11MB6258.namprd11.prod.outlook.com (2603:10b6:930:25::16)
- by BN9PR11MB5323.namprd11.prod.outlook.com (2603:10b6:408:118::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.19; Thu, 6 Mar
- 2025 09:10:31 +0000
-Received: from CY5PR11MB6258.namprd11.prod.outlook.com
- ([fe80::1be9:1746:a35f:7e6c]) by CY5PR11MB6258.namprd11.prod.outlook.com
- ([fe80::1be9:1746:a35f:7e6c%6]) with mapi id 15.20.8511.017; Thu, 6 Mar 2025
- 09:10:30 +0000
-From: "Rinitha, SX" <sx.rinitha@intel.com>
-To: "Greenwalt, Paul" <paul.greenwalt@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "kuba@kernel.org" <kuba@kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Greenwalt, Paul" <paul.greenwalt@intel.com>, Alice
- Michael <alice.michael@intel.com>, Eric Joyner <eric.joyner@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v6] ice: Add E830 checksum
- offload support
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v6] ice: Add E830 checksum
- offload support
-Thread-Index: AQHbUW7QZt6BRGrVL06uiSMxdy/3/bNmSHFw
-Date: Thu, 6 Mar 2025 09:10:30 +0000
-Message-ID: <CY5PR11MB625801B244213D3FEDA181B28BCA2@CY5PR11MB6258.namprd11.prod.outlook.com>
-References: <20241218091145.240373-1-paul.greenwalt@intel.com>
-In-Reply-To: <20241218091145.240373-1-paul.greenwalt@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY5PR11MB6258:EE_|BN9PR11MB5323:EE_
-x-ms-office365-filtering-correlation-id: f219c574-8501-492c-dcf8-08dd5c8ebe95
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7053199007|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?mIL0bm9f/XmY3N810ggYAFzS6KWTEE8H1J/h/EAC0z5Q+Bf2UGuHDGR23spJ?=
- =?us-ascii?Q?UAjx52CIXzqsnSyYTwgDFgQWhB9qnZ7jMlZW3y8y87AISddZj2k8aUO1PFng?=
- =?us-ascii?Q?aZxeXo94hfoi21HXSlV51g41t5rtMI0H7D3AbBkiJ6nzMqUjRq0Nzo1JvhqU?=
- =?us-ascii?Q?l+N3IgEhOK4RD0xWiUaAV7aznruI9EpSJyfio6kIsQZKnPuWQK/jDZlh/pWk?=
- =?us-ascii?Q?608/eO5qjP4UdDIRQI7Musjnpl4mHQRGZoIxBXI3ertj3rlAHPfPPjAHHmrh?=
- =?us-ascii?Q?+fn7wIlg+LQBVrBDlu7hsPHiGc9nj7ratH4a1nj26qbAy8qZQZPWUa0Haop8?=
- =?us-ascii?Q?lgHfsUe51JBqgn3haRLgqVV6S2PbGbcubP/tJpJWAqVn6TbNI1ll4kBPj623?=
- =?us-ascii?Q?HvjzJsj2AkCXgZsRvR6W7oLd+6qxl8prxt1RnAN6d/gcu6XTUKHOCQxcynHM?=
- =?us-ascii?Q?52P/BS4r+r/c2EkGBd7nqQ6MQ1yYaIFtwgwPS4YLeckBqFxMBR7P6Cks1BUV?=
- =?us-ascii?Q?V6p3W7ZsXATUybSt/I7DoPx9vXuMjXlIM9hgj6ydkDvGhaVV7FOo7co1fAjP?=
- =?us-ascii?Q?PQmJxIihFwM66Nh4wmyv9SccxTK/fl73HUY2d9KGfUVZxy+of6gYkVzcr4GP?=
- =?us-ascii?Q?xpfXtl2AI0OUlbjpVqI7XBffz1+qUqN5Vl70Wr/KAlnz6lKbNloR8ZAVfKwU?=
- =?us-ascii?Q?wBpDWZ5IX6vbE5VWNM75zpI8ZxF6gqkgT/ROD7PxqmSSCxhNKuIFt7upjS18?=
- =?us-ascii?Q?eyNZhp87S394Tjnr1srgFlq1vnJeW6tXqLJn+IXVCU3wciQ17XCTmGOM7p8e?=
- =?us-ascii?Q?L9XXy+hN0PwExSoUYvXTTHqhvXYUiOLpDbxQlT2tFHH5OOPe1VgTIxDBNZ5d?=
- =?us-ascii?Q?SrWhvE4s95zjYz7IutFijmf2T1cmKezkeuRGbr35M6GCge5fnRqxej/YzXJz?=
- =?us-ascii?Q?n658iuIO6tLkKHjJMiNpczVZ9gRpI/kFiw26RBqYB/9x4VIkdHUl0VHGCT5o?=
- =?us-ascii?Q?/Ir9gAZkzbVZDYflILfiAEOKC5BYbvZso/nXwJi5E4EDvPlCj2wq+h6rBhoy?=
- =?us-ascii?Q?yjjrW4h4nU4dexJLgY1MTpQFYZR2tFLdjYb8GWsX7kbTg5hSWw+efgvR8Sve?=
- =?us-ascii?Q?mzsKx8EKcwDwqjbVcSctAk8VZWTVqd3EX/L21XQRuIwgt/QlUdEUjeat+B8t?=
- =?us-ascii?Q?0JVBOkc2ToCCFuyCuWf6SmvqKkfZVxMFxRjY5fMq5z/Mqc4VF+6PSYhttgkM?=
- =?us-ascii?Q?LhKmSE/VOXHdMIiBNligZgZvTcn9aIoqpKiJIcB+7E4D7nnsU/eCpXJgnyd8?=
- =?us-ascii?Q?ERyfzGWwVi+gDS55wkBeHfjRmjItlwGiV1FbSbDgxRirC1Gw4cx4BHnxR7V6?=
- =?us-ascii?Q?4pswk7JYHoTSXa5D4dWwLe+yqa+33ydy2v9jF62a8nQBIuF6VnlHZ6dYAS9D?=
- =?us-ascii?Q?H4wujW7DpaZi2lNAsRFKv65KvAKeJtqT?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6258.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7053199007)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?RFZ4ojfzzTRoqWXTLiH0USAoyh/rR+MdUPQFqJ2/8qqjLSXjLM9nA/y+kUhQ?=
- =?us-ascii?Q?sDiPijB3xfJEHhb+zqLb70b4K2MJ2uitNOqyc5UidX1QLwvJMalm/DW3mnhK?=
- =?us-ascii?Q?ovysx2fUHXXdVL21ZyqrWa4wF/h6ERJkzUvKeQqUa4aUOhZn6o6enMvRXe8E?=
- =?us-ascii?Q?zcS/uu7OMuDFXVpytdYj9bVeYqMDgBDkM1zrEbu7sxwz0plpNJ5XZLyodECU?=
- =?us-ascii?Q?vYzzSvgJxNCb6riLBu7maflyr+DRIQNTMdj+JzpyHkU5FMPeHEj5kRFtq3hM?=
- =?us-ascii?Q?5rTrdPxzWTsGarfdTeE+2wjnS4s3AUj8EMRTB5XPVJ0LDT5Bsf5nlUFxdtSq?=
- =?us-ascii?Q?2n/64nfL12PU47a2fErPtGUu9osTH/L98qG0o5l5KnGMmLlbPVC6OrSB3LXG?=
- =?us-ascii?Q?YZAXuSTTkl7seyvNeMo74PvPDqFcQ3WaLjAizqYU/2LUmXuOYcVogsjQrc47?=
- =?us-ascii?Q?2JgnDgPsjbCdff9NM5DcNLU+Nd4jl+MaiTvzWhjv624G4AZRx63Eteo1HEN0?=
- =?us-ascii?Q?yInH2XfflTIYxuINYKkUKrelj4ng462QerKDZlkYlZdt+XD72+qM0nBRwdxa?=
- =?us-ascii?Q?86sE6qYyfUPDHsl1QSNyLbzzes9a76oMbC8BCZYRVA4xKMo/lX6WO64PV470?=
- =?us-ascii?Q?ho0X/gYz0RAW2rVSovF5mXQhW+RDFoh7UYm/6OAHj79gk5yVggNmkwv/MT/F?=
- =?us-ascii?Q?BkFdzl6SCLjtjQeiQFOIbiTmdP3H0tN5JYxp9H473+RBq9GB3Tl5euNDZE83?=
- =?us-ascii?Q?htGFF88XvFz7wQAJH76mnizf3JddoTwDxfSqnxQv5j081oa7LkqYSAx6xhzo?=
- =?us-ascii?Q?wtD5KnpPevro1M1Obkm/vH/7rvScGejWxTI6aPC/l1JOmfAJLLA+qyxGwN7R?=
- =?us-ascii?Q?1gn0415lKBXtH6ZU3U9W8NPm0iEuhQQUGPE86Ialro6l/HQfy65gBZjJ6IR5?=
- =?us-ascii?Q?YZidk1cp8nkTk2wvhrnZ+2VpINOPD/DG+a03nEW+ToAfnWxXWaAqCLiBrbu2?=
- =?us-ascii?Q?RfroOUUmIwhZOBlXfTd8swz0/E6KntXWSxCgZhNMs3um7z50/aJD+f+lnYs4?=
- =?us-ascii?Q?UGiEZdz31cAuaCViNUWI2ja66x6AXY8YNeVMpyIMvUOtp5bAiVjtZfhuDW9d?=
- =?us-ascii?Q?jxpRyfYep9jRpttQsO5tIMUSUdvhHBMXRxYwd5rfPbC6k3d0vYDSyhneJ8yQ?=
- =?us-ascii?Q?dnrmsRMt0Ess5tbIMm7r8hqZtji1LUTTlMZ1qQjOto+3QxVHDsaM1bkncuKl?=
- =?us-ascii?Q?1/pAjJ1tPpi1TlG71lztJD7lbNQ/P0cGfsWItSYTEqGAfKN8ZXZ5CG3reuwB?=
- =?us-ascii?Q?+GS9VO7WBKX1sGkEdX9O3ejZrRhvfLcAuyRLFMZRkcvJQOyTnV1to98z4n1X?=
- =?us-ascii?Q?zceuAiPQyPNc76NZA4diqoEirZ+vk7v0Y43iW+AElTRlSFvbEjpTGtpC0E1k?=
- =?us-ascii?Q?HVMy1cn+Fz1pFWY7/9yL/YOv4pqYztsnfMnnWdW6urNyOwxUZDcen6MqZ2VN?=
- =?us-ascii?Q?Legr2S/vLBPyGxLKla8FeW+lgOD+6g8PC1kiYekJUjqwFNdw5CHpjRRT5OhE?=
- =?us-ascii?Q?C5K4ysWLqPQ4thw7wzOGYqFFQFViZ6hKSaWoPNZL?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 422952080E8
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 09:12:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741252374; cv=none; b=kQfJGLEvy5whSedVe8UwOCFsocySDOLYTU21gK4+yabz/HSo67VbbKAW5p2pCwKqMAms2qD9aN85z5P9Oqd5xyWXGzfJGl/O11bKzR3OamXYBE82caOXrB+zOuM71aNVYNW02L4h07Exf+LHJDrIdWK8B2DCbkAWXlbnJHMQ1bc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741252374; c=relaxed/simple;
+	bh=mSmxSodve0PlbUHGBdbSXfSGjnqU4KNXXxkLRgpJjd8=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=rf7UawZdLO5zKNyMufzcjxYU0ar7aPYBYpB8rp1Suv+9GBpf3xGF/Q6zrXdk/mQkeW6cBSUpUV54hetfHug0TmY1hGBoMgjq9JChTSs1y/w6hGRlovtiXtXCh203/A1zHwf+Lh0y/7xtAnfrR5cmh40LbOWTySjkIxrtywXioV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RWHamFQK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741252371;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OLLdr9AqfAd99MzyxSvOzi/mUQAgoq76kZjDdYfTJYM=;
+	b=RWHamFQKZQWHIslSEoxyChKjTgy0gz/d6AnIKyM2Ic8HMNS6VYsENpYGxke+aW4E8sTuAD
+	y0az+fhtSVliOfJxH8KRFTbtl2KzNzH8pOAx6foYlQZ+VdHdjd5n8XGu2897QYRX2Jr7zw
+	2p7osoPxVCPEdJsBpz7owXfBwaNr9/A=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-249-pSKpUaHrPQWvv75Yu9GcHw-1; Thu,
+ 06 Mar 2025 04:12:47 -0500
+X-MC-Unique: pSKpUaHrPQWvv75Yu9GcHw-1
+X-Mimecast-MFC-AGG-ID: pSKpUaHrPQWvv75Yu9GcHw_1741252366
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6988C18001F8;
+	Thu,  6 Mar 2025 09:12:45 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.32.200])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 133A418009BC;
+	Thu,  6 Mar 2025 09:12:40 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <3761344.1740995350@warthog.procyon.org.uk>
+References: <3761344.1740995350@warthog.procyon.org.uk>
+To: Christian Brauner <brauner@kernel.org>,
+    Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: dhowells@redhat.com, Marc Dionne <marc.dionne@auristor.com>,
+    Jakub Kicinski <kuba@kernel.org>,
+    "David S.
+ Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+    linux-afs@lists.infradead.org, linux-fsdevel@lists.infradead.org,
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [GIT PULL v3] afs, rxrpc: Clean up refcounting on afs_cell and afs_server records
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6258.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f219c574-8501-492c-dcf8-08dd5c8ebe95
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Mar 2025 09:10:30.8627
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: f5yRJa1xo6VQ5D+CMUBuTe/3k8HnJ/muWR+TtX6dsTKCm7beaiVcsIRyVAEuQ0gZAMbPIx3G8JIKY8tILQUVlw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5323
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <66440.1741252359.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 06 Mar 2025 09:12:39 +0000
+Message-ID: <66441.1741252359@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of P=
-aul Greenwalt
-> Sent: 18 December 2024 14:42
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: kuba@kernel.org; netdev@vger.kernel.org; Greenwalt, Paul <paul.greenw=
-alt@intel.com>; Alice Michael <alice.michael@intel.com>; Eric Joyner <eric.=
-joyner@intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-next v6] ice: Add E830 checksum off=
-load support
->
-> E830 supports raw receive and generic transmit checksum offloads.
->
-> Raw receive checksum support is provided by hardware calculating the chec=
-ksum over the whole packet, regardless of type. The calculated checksum is =
-provided to driver in the Rx flex descriptor. Then the driver assigns the c=
-hecksum to skb->csum and sets skb->ip_summed to CHECKSUM_COMPLETE.
->
-> Generic transmit checksum support is provided by hardware calculating the=
- checksum given two offsets: the start offset to begin checksum calculation=
-, and the offset to insert the calculated checksum in the packet. Support i=
-s advertised to the stack using NETIF_F_HW_CSUM feature.
->
-> E830 has the following limitations when both generic transmit checksum of=
-fload and TCP Segmentation Offload (TSO) are enabled:
->
-> 1. Inner packet header modification is not supported. This restriction
->   includes the inability to alter TCP flags, such as the push flag. As a
->   result, this limitation can impact the receiver's ability to coalesce
->  packets, potentially degrading network throughput.
-> 2. The Maximum Segment Size (MSS) is limited to 1023 bytes, which prevent=
-s
->   support of Maximum Transmission Unit (MTU) greater than 1063 bytes.
->
-> Therefore NETIF_F_HW_CSUM and NETIF_F_ALL_TSO features are mutually exclu=
-sive. NETIF_F_HW_CSUM hardware feature support is indicated but is not enab=
-led by default. Instead, IP checksums and NETIF_F_ALL_TSO are > the default=
-s. Enforcement of mutual exclusivity of NETIF_F_HW_CSUM and NETIF_F_ALL_TSO=
- is done in ice_set_features(). Mutual exclusivity of IP checksums and NETI=
-F_F_HW_CSUM is handled by netdev_fix_features().
->
-> When NETIF_F_HW_CSUM is requested the provided skb->csum_start and
-> skb->csum_offset are passed to hardware in the Tx context descriptor
-> generic checksum (GCS) parameters. Hardware calculates the 1's complement=
- from skb->csum_start to the end of the packet, and inserts the result in t=
-he packet at skb->csum_offset.
->
-> Co-developed-by: Alice Michael <alice.michael@intel.com>
-> Signed-off-by: Alice Michael <alice.michael@intel.com>
-> Co-developed-by: Eric Joyner <eric.joyner@intel.com>
-> Signed-off-by: Eric Joyner <eric.joyner@intel.com>
-> Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
-> ---
-> Changelog:
-> v1->v2
-> - Update commit message with additional details.
-> - Add newlines, and add params around
-> - Return early from ice_fix_features() to avoid extra indentation and
-> large if block.
-> - Move and change some defines.
-> - replace htons and le16_t_cpu with swap16.
-> - Use FIELD_PREP where possible.
-> - Removed checksum valid bit check STATUS1_L2TAG2P_S. This check is not
-> needed since there is no situation which will return an error.
-> v2->v3
-> - Minor fixes in commit message.
-> - Removed unused register defines in ice_hw_autogen.h.
-> - Moved GCS and TSO feature fix to helper function
-> ice_fix_features_gcs(), and updated logic.
-> - Update to align naming with related flags.
-> v3->v4
-> - Move a check for GCS and TSO mutual exclusivity from
-> ice_fix_features() to ice_set_features().
-> v4->v5
-> - Remove lingering GCS and TSO mutual exclusivity comments and code in
-> ice_fix_features().
-> - Remove unused variable ICE_TX_FLAGS_RING_GCS.
-> - Remove Tested-by and Signed-off-by tag due to changes to patch.
-> - Use ICE_TX_GCS_DESC_TYPE_M and ICE_TX_GCS_DESC_CSUM_PSH in
-> ice_tx_csum() to set the GCS decriptor field type.
-> v5->v6
-> - Fix build error.
-> ---
-> drivers/net/ethernet/intel/ice/ice.h          |  1 +
-> .../net/ethernet/intel/ice/ice_lan_tx_rx.h    |  9 +++++--
-> drivers/net/ethernet/intel/ice/ice_lib.c      |  8 +++++-
-> drivers/net/ethernet/intel/ice/ice_main.c     | 18 +++++++++++++
-> drivers/net/ethernet/intel/ice/ice_txrx.c     | 27 ++++++++++++++++++-
-> drivers/net/ethernet/intel/ice/ice_txrx.h     |  2 ++
-> drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 26 ++++++++++++++++++
-> 7 files changed, 87 insertions(+), 4 deletions(-)
->
+Al spotted another bug (fix below).  Subject to his okaying of the patch, =
+I'll
+fold it down and ask for a repull.
 
-Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
+David
+---
+afs: Fix afs_atcell_get_link() to handle RCU pathwalk
+
+The ->get_link() method may be entered under RCU pathwalk conditions (in
+which case, the dentry pointer is NULL).  This is not taken account of by
+afs_atcell_get_link() and lockdep will complain when it tries to lock an
+rwsem.
+
+Fix this by marking net->ws_cell as __rcu and using RCU access macros on i=
+t
+and by making afs_atcell_get_link() just return a pointer to the name in
+RCU pathwalk without taking net->cells_lock or a ref on the cell as RCU
+will protect the name storage (the cell is already freed via call_rcu()).
+
+Reported-by: Alexander Viro <viro@zeniv.linux.org.uk>
+Signed-off-by: David Howells <dhowells@redhat.com>
+---
+ fs/afs/cell.c     |   11 ++++++-----
+ fs/afs/dynroot.c  |   21 +++++++++++++++++----
+ fs/afs/internal.h |    2 +-
+ fs/afs/proc.c     |    2 +-
+ 4 files changed, 25 insertions(+), 11 deletions(-)
+
+diff --git a/fs/afs/cell.c b/fs/afs/cell.c
+index 4ca713d3862c..0168bbf53fe0 100644
+--- a/fs/afs/cell.c
++++ b/fs/afs/cell.c
+@@ -57,7 +57,8 @@ static struct afs_cell *afs_find_cell_locked(struct afs_=
+net *net,
+ 		return ERR_PTR(-ENAMETOOLONG);
+ =
+
+ 	if (!name) {
+-		cell =3D net->ws_cell;
++		cell =3D rcu_dereference_protected(net->ws_cell,
++						 lockdep_is_held(&net->cells_lock));
+ 		if (!cell)
+ 			return ERR_PTR(-EDESTADDRREQ);
+ 		goto found;
+@@ -394,8 +395,8 @@ int afs_cell_init(struct afs_net *net, const char *roo=
+tcell)
+ =
+
+ 	/* install the new cell */
+ 	down_write(&net->cells_lock);
+-	old_root =3D net->ws_cell;
+-	net->ws_cell =3D new_root;
++	old_root =3D rcu_replace_pointer(net->ws_cell, new_root,
++				       lockdep_is_held(&net->cells_lock));
+ 	up_write(&net->cells_lock);
+ =
+
+ 	afs_unuse_cell(old_root, afs_cell_trace_unuse_ws);
+@@ -869,8 +870,8 @@ void afs_cell_purge(struct afs_net *net)
+ 	_enter("");
+ =
+
+ 	down_write(&net->cells_lock);
+-	ws =3D net->ws_cell;
+-	net->ws_cell =3D NULL;
++	ws =3D rcu_replace_pointer(net->ws_cell, NULL,
++				 lockdep_is_held(&net->cells_lock));
+ 	up_write(&net->cells_lock);
+ 	afs_unuse_cell(ws, afs_cell_trace_unuse_ws);
+ =
+
+diff --git a/fs/afs/dynroot.c b/fs/afs/dynroot.c
+index 0b66865e3535..9732a1e17db3 100644
+--- a/fs/afs/dynroot.c
++++ b/fs/afs/dynroot.c
+@@ -210,12 +210,23 @@ static const char *afs_atcell_get_link(struct dentry=
+ *dentry, struct inode *inod
+ 	const char *name;
+ 	bool dotted =3D vnode->fid.vnode =3D=3D 3;
+ =
+
+-	if (!net->ws_cell)
++	if (!dentry) {
++		/* We're in RCU-pathwalk. */
++		cell =3D rcu_dereference(net->ws_cell);
++		if (dotted)
++			name =3D cell->name - 1;
++		else
++			name =3D cell->name;
++		/* Shouldn't need to set a delayed call. */
++		return name;
++	}
++
++	if (!rcu_access_pointer(net->ws_cell))
+ 		return ERR_PTR(-ENOENT);
+ =
+
+ 	down_read(&net->cells_lock);
+ =
+
+-	cell =3D net->ws_cell;
++	cell =3D rcu_dereference_protected(net->ws_cell, lockdep_is_held(&net->c=
+ells_lock));
+ 	if (dotted)
+ 		name =3D cell->name - 1;
+ 	else
+@@ -324,12 +335,14 @@ static int afs_dynroot_readdir(struct file *file, st=
+ruct dir_context *ctx)
+ 		return 0;
+ =
+
+ 	if (ctx->pos =3D=3D 2) {
+-		if (net->ws_cell && !dir_emit(ctx, "@cell", 5, 2, DT_LNK))
++		if (rcu_access_pointer(net->ws_cell) &&
++		    !dir_emit(ctx, "@cell", 5, 2, DT_LNK))
+ 			return 0;
+ 		ctx->pos =3D 3;
+ 	}
+ 	if (ctx->pos =3D=3D 3) {
+-		if (net->ws_cell && !dir_emit(ctx, ".@cell", 6, 3, DT_LNK))
++		if (rcu_access_pointer(net->ws_cell) &&
++		    !dir_emit(ctx, ".@cell", 6, 3, DT_LNK))
+ 			return 0;
+ 		ctx->pos =3D 4;
+ 	}
+diff --git a/fs/afs/internal.h b/fs/afs/internal.h
+index addce2f03562..440b0e731093 100644
+--- a/fs/afs/internal.h
++++ b/fs/afs/internal.h
+@@ -288,7 +288,7 @@ struct afs_net {
+ 	/* Cell database */
+ 	struct rb_root		cells;
+ 	struct idr		cells_dyn_ino;	/* cell->dynroot_ino mapping */
+-	struct afs_cell		*ws_cell;
++	struct afs_cell __rcu	*ws_cell;
+ 	atomic_t		cells_outstanding;
+ 	struct rw_semaphore	cells_lock;
+ 	struct mutex		cells_alias_lock;
+diff --git a/fs/afs/proc.c b/fs/afs/proc.c
+index 0af94c846504..9d4df9e4562b 100644
+--- a/fs/afs/proc.c
++++ b/fs/afs/proc.c
+@@ -207,7 +207,7 @@ static int afs_proc_rootcell_show(struct seq_file *m, =
+void *v)
+ =
+
+ 	net =3D afs_seq2net_single(m);
+ 	down_read(&net->cells_lock);
+-	cell =3D net->ws_cell;
++	cell =3D rcu_dereference_protected(net->ws_cell, lockdep_is_held(&net->c=
+ells_lock));
+ 	if (cell)
+ 		seq_printf(m, "%s\n", cell->name);
+ 	up_read(&net->cells_lock);
+
 
