@@ -1,106 +1,129 @@
-Return-Path: <netdev+bounces-172534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE9F2A553B7
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 18:57:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8207A55428
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 19:09:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C7277AB815
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 17:56:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D25C1178CB7
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 18:07:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2835C25D522;
-	Thu,  6 Mar 2025 17:56:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0651626AA94;
+	Thu,  6 Mar 2025 18:05:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uTmdmg9+"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="c57e2SFt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 036DB25D1F8
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 17:56:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 423C0275604
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 18:05:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741283819; cv=none; b=YYHCLMgmMSMrSkuu2WTgaXCrOl9xtMkZv1LNinAn7KM1IFBdT8yOCTbgtImmkCJe+0Eu2YkA6qqeD6xh/cKSfm4ijRfnmRcUkiEN3ztuLLbt4iv9zBA0G90kd3duMKzB+dzS8W14wFvv22v0HcHJK9h0X9V99BTGd5wPhrQDKDA=
+	t=1741284313; cv=none; b=PP5Y3CA1gsWjIOrZOivN4wO81YSE5SntC0z7iP8tkrA6lp2pztcsCDPeu1S7l0qDSiFHiszZ0s4X3CWTtdr/t9uUek/gGiSKDD/u+CULwpWtY+XLoUbfDSdiGXoLcaokxBlGZ3JAB60GnhSYlfWCOilUnHUlZlbI6ACklUkwU8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741283819; c=relaxed/simple;
-	bh=9La0ODpzt9XGnL00Cb5mnMsFzrpzsSQqAsTJATJZY7o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sTkO3NLKO5mI6XCMtku5/zN+FpBUxFECvKYtd+StIe36XJdt8clxoifKeR5vHdckoGpyoDYIAxnfEzcgwN01Uffb0erproVZUnnqJ07GIxGNSVfT0jMy2AHNi3G+5hrv0WQUpBf+k7dwbfSElsNpyy+JlKiJGfQpp8fItENrBTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uTmdmg9+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C1E1C4CEE4;
-	Thu,  6 Mar 2025 17:56:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741283818;
-	bh=9La0ODpzt9XGnL00Cb5mnMsFzrpzsSQqAsTJATJZY7o=;
-	h=From:To:Cc:Subject:Date:From;
-	b=uTmdmg9+fgVzLKCmmGOm73A60ihWA3KyG9NwYPN+HHuejinouIyr64J4YbW2s5KaJ
-	 piE3g5rmi/n0zVSGeEl7mSyPuUAjTqeVCA2ZXf7G/L50Jwg+4++KsuJsnKSk2/0+b1
-	 Y3NdC006uuC44KV7BnVbf0xrU8UV65zR/5xiuWGpg2t8Q5u3KS+ZTK+WTCMT81VPzP
-	 aC2fuJGL33h6CU+AHJgU+hJ7x3IGEFEtc3gc3/p6oiP/7TJqBvYd4KD8nNVltoQjNv
-	 QRo4NcBUNA254X/yyLDLmLRXVKJH3WeZVSRR6lY82xzL0vgnh6EO0MPP8orORQGBnW
-	 oGnyvndBMPZwQ==
-From: Jesse Brandeburg <jbrandeb@kernel.org>
-To: intel-wired-lan@lists.osuosl.org
-Cc: Jesse Brandeburg <jbrandeburg@cloudflare.com>,
-	netdev@vger.kernel.org,
-	kernel-team@cloudflare.com,
-	jbrandeb@kernel.org,
-	leon@kernel.org,
-	przemyslaw.kitszel@intel.com,
-	Dave Ertman <david.m.ertman@intel.com>
-Subject: [PATCH intel-net v2] ice: fix reservation of resources for RDMA when disabled
-Date: Thu,  6 Mar 2025 09:56:34 -0800
-Message-ID: <20250306175640.29565-1-jbrandeb@kernel.org>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1741284313; c=relaxed/simple;
+	bh=3PwoF0zToj772xqwtTkyDD+wV+pt7RShXzlQFoHxZOc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PK1ez35EXyS/DsR5dMbNz3B4KuLUKBnetRnIggjmL4DzqJhu9wPVVFtVXprigo12BgXOr3lhDSl2l02bxrnV4UyAPPY+g9DdJb8jaUmvVr8QVppxMum5XbdelJ8UiJRj9QRpIae0xzm3yPa3+dLt7R31Dkch1Cv05z3LePnm0To=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=c57e2SFt; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-223fd89d036so20118475ad.1
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 10:05:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1741284311; x=1741889111; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NfbzyHW+3j1Fc44hupdNIMdLCl+IfI1UFsdc+cpACxY=;
+        b=c57e2SFtuCS73TnpxSNusYduKh+ZnrqKs4LHfOOYzYpVW/r0hzwfvUXPB0iLFY/eum
+         8HeXsyc9hZYMuvqb2jtk88inE9K4cFL4qwH3/wVetFl7hYko7Vn9kI430/f6WJG9bxdv
+         NVTyZ3JJKsJsx/DTLx/JqpnvTFWVCh87cDoBI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741284311; x=1741889111;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NfbzyHW+3j1Fc44hupdNIMdLCl+IfI1UFsdc+cpACxY=;
+        b=axMgkPkcsipVVpk2QKJYjafb6GU0c9YJ+JijouETor0whvQ00QbG7PUFCRPiESDKRO
+         HWMJBfe1ElqE9XGh0LrFx3MT3BTLrOOTg+aSy61b+JynkoKyr7jYhkqXh7qyFEATIOWX
+         qWTvZvYQFQlOItOtkUelWJsv+QEFgoWJOhJlL/n/aklrMHnn78WhX5yDlFDwzZNTc8cA
+         a6iU3xR2u5njtOexsAAE2PfBYhUH8bbF1Rhqrx5XMglolFC0NQrXqkxWBuTBubeCLnw0
+         Yikwp3RrnU+k4d6uf0WSSZxnXfUQh8X51Yf9UZjaVBsom3oDMctI8NJY0EsBxrnIukj2
+         Wnxg==
+X-Forwarded-Encrypted: i=1; AJvYcCVrMKP4nseR9lTU9Mxn4QM5V8YpU14vbGPjUCoaN/jYq1+EokA7Q5CT7IsDJlhCPpuuzTE1l/g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCF2b5ScGsavW8Ivrxqls/LNeiPDXSdvC38sYe225NlbLDzMT+
+	JOV9bKeliSqT8+x0NuGtjaGRfafkQAlrGs4YRmo9VTfFCYrMfBFqitQg2XAjQ3Y=
+X-Gm-Gg: ASbGncvTemBs/Gl7e0K55qsBgeuMmij6z090J0DjBwO9AzdYQGuqdXFNbv9zT1Du/G9
+	4brCDyNI1K3UqseYgeeEth8BgQAQxXEAT/wDTeDqadx8lZMXYS1+Fls9yWYBywCvq9Te3yIKQBR
+	G+WTM386R7hxjuHTYkOle4mvM8jYN3DhqZRJkxAZEmueaT/0o5ZvWKxowgvY2WqQfghW1nNO9GV
+	KeaMulwsWIn/N3M0dXPIh4x5nI2NeuFUF69E3oGgVMzu6nVTIbcgAT+wCoZDWUPHNlwyrXgasLE
+	KyrGMYt1phaHFCJ0vaGmMB+YiM7uE5meVIGgjIl80nHEuwPUPLsktbj39BVW94+CjbKJvT58l1/
+	DteBvAaUKvrQ=
+X-Google-Smtp-Source: AGHT+IETVMt8ZHlhAk9BJSz3LJj1C/mnpejwDBQPZvWM6/uxlLsqo5dzDk70ohOCzj3MwmldoP92Lg==
+X-Received: by 2002:a05:6a21:398:b0:1f3:1eb8:7597 with SMTP id adf61e73a8af0-1f544c8863cmr696222637.35.1741284311370;
+        Thu, 06 Mar 2025 10:05:11 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-736a587cf4dsm651046b3a.93.2025.03.06.10.05.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Mar 2025 10:05:10 -0800 (PST)
+Date: Thu, 6 Mar 2025 10:05:08 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	alexanderduyck@fb.com
+Subject: Re: [PATCH net-next 3/3] eth: fbnic: support ring size configuration
+Message-ID: <Z8nj1Aq7TC3V6WOc@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, alexanderduyck@fb.com
+References: <20250306145150.1757263-1-kuba@kernel.org>
+ <20250306145150.1757263-4-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250306145150.1757263-4-kuba@kernel.org>
 
-From: Jesse Brandeburg <jbrandeburg@cloudflare.com>
+On Thu, Mar 06, 2025 at 06:51:50AM -0800, Jakub Kicinski wrote:
+> Support ethtool -g / -G. Leverage the code added for -l / -L
+> to alloc / stop / start / free.
+> 
+> Check parameters against HW min/max but also our own min/max.
+> Min HW queue is 16 entries, we can't deal with TWQs that small
+> because of the queue waking logic. Add similar contraint on RCQ
+> for symmetry.
+> 
+> We need 3 sizes on Rx, as the NIC does header-data split two separate
+> buffer pools:
+>   (1) head page ring    - how many empty pages we post for headers
+>   (2) payload page ring - how many empty pages we post for payloads
+>   (3) completion ring   - where NIC produces the Rx descriptors
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> v0.2:
+>  - trim unused defines
+>  - add comment
+>  - add info to commit msg
+>  - add extack
+> ---
+>  drivers/net/ethernet/meta/fbnic/fbnic_txrx.h  |  13 +++
+>  .../net/ethernet/meta/fbnic/fbnic_ethtool.c   | 109 ++++++++++++++++++
+>  2 files changed, 122 insertions(+)
 
-If the CONFIG_INFINIBAND_IRDMA symbol is not enabled as a module or a
-built-in, then don't let the driver reserve resources for RDMA. The result
-of this change is a large savings in resources for older kernels, and a
-cleaner driver configuration for the IRDMA=n case for old and new kernels.
+Looked at this for a bit and read a bit more of fbnic. I obviously
+know nothing about this device but nothing jumped out to me while
+reading the patch:
 
-Implement this by avoiding enabling the RDMA capability when scanning
-hardware capabilities.
-
-Note: Loading the out-of-tree irdma driver in connection to the in-kernel
-ice driver, is not supported, and should not be attempted, especially when
-disabling IRDMA in the kernel config.
-
-Fixes: d25a0fc41c1f ("ice: Initialize RDMA support")
-Signed-off-by: Jesse Brandeburg <jbrandeburg@cloudflare.com>
-Acked-by: Dave Ertman <david.m.ertman@intel.com>
----
-v2: resend with acks, add note about oot irdma (Leon), reword commit
-message
-v1: https://lore.kernel.org/netdev/20241114000105.703740-1-jbrandeb@kernel.org/
----
- drivers/net/ethernet/intel/ice/ice_common.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 7a2a2e8da8fa..1e801300310e 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -2271,7 +2271,8 @@ ice_parse_common_caps(struct ice_hw *hw, struct ice_hw_common_caps *caps,
- 			  caps->nvm_unified_update);
- 		break;
- 	case ICE_AQC_CAPS_RDMA:
--		caps->rdma = (number == 1);
-+		if (IS_ENABLED(CONFIG_INFINIBAND_IRDMA))
-+			caps->rdma = (number == 1);
- 		ice_debug(hw, ICE_DBG_INIT, "%s: rdma = %d\n", prefix, caps->rdma);
- 		break;
- 	case ICE_AQC_CAPS_MAX_MTU:
--- 
-2.43.0
-
+Acked-by: Joe Damato <jdamato@fastly.com>
 
