@@ -1,145 +1,125 @@
-Return-Path: <netdev+bounces-172639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1161DA5597F
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 23:15:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB0B7A55994
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 23:21:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02B091898FBE
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 22:15:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADEE43AF56E
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 22:20:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5208527E1C5;
-	Thu,  6 Mar 2025 22:14:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EEC9276052;
+	Thu,  6 Mar 2025 22:20:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b="xAfxiYMF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j0kgmuw1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.forwardemail.net (smtp.forwardemail.net [121.127.44.73])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A43F3272917
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 22:14:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=121.127.44.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05BA71FCFFE
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 22:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741299272; cv=none; b=Lcu8nY+vm2AgAIRt6BfAh9yHkRCMaUsw8T9jqv7YvPQqddKfdoZMoWgHXv7qLdlGF+IOOioLDhBQU/0u6iS4gmhoiLsfmnRJHZvAuMKBWqM6FMjHooGhDp1BaeNuLOfc/LQcjw8iWSD6Ra2QxLcPuLac2NCegdUo+zGah7KToKA=
+	t=1741299657; cv=none; b=CCKPGJCyywRs5H/leP6vLlP02DIq2YpK0idmtPjY2QH3HTuuenu6ISQz6CiJyDke+cgmdMWVh1fcZ692bi2gTS3j9C0UtNRU0C9+rpW+T5EIKI2Xf0hXbw/sCSOsoR6VhHTVNSQfb0/dhZZKJ1RfcEJm7/3F2uX/RD5REeUgOwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741299272; c=relaxed/simple;
-	bh=nDkDW/2G/un6ApgnlvHac6AAuH6JzuIvEoSxNoxUP48=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SARP1VrgyU/EdH+YpRi5DRU+hBJ25OYwq3/BLCbdwYTMLMOw/Jf/XhlSWWV8CIiLVJb5lWYWFfH0RH71c+tASt1JTGq8pGc8WOH9wjUtE6fImZWlLYhFw5KLGojdOe7va7Wu9dEmp7mQD/l9I2/COqOELPG0sTY6XIJV+j64Yf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se; dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b=xAfxiYMF; arc=none smtp.client-ip=121.127.44.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kwiboo.se;
- h=Content-Transfer-Encoding: MIME-Version: References: In-Reply-To:
- Message-ID: Date: Subject: Cc: To: From; q=dns/txt; s=fe-e1b5cab7be;
- t=1741299269; bh=Vz67m0H+Fsmm+X3vntSM32uhdrZ3/NlRzpKG4VSgLhc=;
- b=xAfxiYMFsPHN4DExg5q+YVfPGqrlvp8oAUHWZnWN1xyDO8e70GFFiEWnq4/8+zjTqvJ4otbXm
- taI3VQI+3Qz8S9AngjSxBEKGVATMlhd8Jvbs2quzNyRVmzPK+xcDeRJFxYlvA7BC/s4EQmfoAZr
- TwYSuyKtVz/3EQJHvef4DWt0mxXt7w58KcjqQ0NLn7TE+TmThA3mJeBdPzbQAre5crAsTpjl844
- TymZ2MfjEJYhW3vtK83tHTntRhU53TDSpvFSkg+jxZN/1b6qQVmnV4RVJt1lexLoGV8PKbcwRY7
- QwZ8hwu3pDCN7/t3gA+y3K+TxwbvD9tQvIYDufFac+7Q==
-X-Forward-Email-ID: 67ca1e42c1763851c065c03d
-X-Forward-Email-Sender: rfc822; jonas@kwiboo.se, smtp.forwardemail.net,
- 121.127.44.73
-X-Forward-Email-Version: 0.4.40
-X-Forward-Email-Website: https://forwardemail.net
-X-Complaints-To: abuse@forwardemail.net
-X-Report-Abuse: abuse@forwardemail.net
-X-Report-Abuse-To: abuse@forwardemail.net
-From: Jonas Karlman <jonas@kwiboo.se>
-To: Heiko Stuebner <heiko@sntech.de>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Cc: Yao Zi <ziyao@disroot.org>,
-	linux-rockchip@lists.infradead.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Jonas Karlman <jonas@kwiboo.se>
-Subject: [PATCH 4/4] arm64: dts: rockchip: Enable Ethernet controller on Radxa E20C
-Date: Thu,  6 Mar 2025 22:13:57 +0000
-Message-ID: <20250306221402.1704196-5-jonas@kwiboo.se>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250306221402.1704196-1-jonas@kwiboo.se>
-References: <20250306221402.1704196-1-jonas@kwiboo.se>
+	s=arc-20240116; t=1741299657; c=relaxed/simple;
+	bh=jijdJY1WNEMtaADEADccQQLCKIQ1VEpcBe0JlrxiChM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MfBdeoOndIe+FPGkHF5/5EI3f9qqZYwAtP8Qn9Nel9ycnb1nPCtvqGB2EPp7z4WMl9Af0sKoQsbg+34sW+MiQc43WOb+U4qxeMyWeqcv0eF5UUkLotRctD38ajnYopjloFuAsOWzkwTyoTGAULE/tx+E/icMLnaZGZlSUIQqwUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j0kgmuw1; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5496078888eso1448544e87.0
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 14:20:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741299653; x=1741904453; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sxnxNhRkl2oL5lhMxI8nazAurkutLlKeiLI6Pg9V1N0=;
+        b=j0kgmuw1crX55YfX8ceofq/+A3IoPu+Ne87z/kzb6D1GPHx3wDptI+e3waS/0oq69v
+         Rzw9JDTUwYp1LPDKb2vII2+PkbVGKgy1k89xpnGggsjR/GkM6JzBV8+udg8K74uYKr6V
+         ihmBlVgBvpJn56iYO3/K0Q5odU5fUT2/dl71n5VZaYw7r5YJKVelhmyEIhhkyiAI68rQ
+         yr4Di8jDjmjp8EVoIqLHQ/fsXVGZ83oUr/NkWGQRoB4kQyXFOmZF9Rs2NbO1wuC2DrJC
+         jGJUv9Udzm1V+22GZMHi3iXg5ub0J3avot6lb735u65UuQPcbbKnyMcyA/543HyZcAu9
+         +RhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741299653; x=1741904453;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sxnxNhRkl2oL5lhMxI8nazAurkutLlKeiLI6Pg9V1N0=;
+        b=ANm5KH/kBQG8NhgsxsvwCriCene8egTTtUlpvtWZ6vjluyHxIFQWJxL/dRk9Et974P
+         AcQL6cht57+ahSLRwp6kdKRHsz9Ze0qBx2HKxwrnIsq+mRcYoIqvg9JYWs+MzW+vX4n5
+         IzmzCJVqwCgWfHKelr7bYdIAmgTrbgBC9MO/LCLfiWqAMAwEJhwmSOaVeavNy3ceIVo7
+         jmJ+Bp+HS70bNOaEz1Fl7W9BUAxBJINEx5H8L1WrrlrzGFnquoxtM5P6uQF4nc6HfGMB
+         K71W/HbszaYPSRZodUK4Z4VXnjhtqJnO2DYiaEO/a3YKsYl3LvLlKvhN7q7zFrKnm8Js
+         TroA==
+X-Forwarded-Encrypted: i=1; AJvYcCU4ttHgxPJXe7s5ZT5yaji/UEBcKcCquEuabMsDeyOFLVAQNc3XIECUlL0NsYxxiGHQwepyNHM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywlugk/DNrT6x6OHyAyUx2yH8Ws+cSn3lf25aT/u2GDDmrBaP7z
+	8MoDkvM3hybHAfLLUv0KjFJcAa81e6N63ztiDIIgSVpLYEN0LWxPhQHVYq5Z7V3Qn5P451OnV/w
+	u6NHd6igtKke4cWPEl7JcAajm3dbT8DQwyAXb
+X-Gm-Gg: ASbGncs3/ksAoRu+vJmRf98V+D2URAEIZdfMI0MxQDfc56OmKRlzEFMpx+ZqJYXoiXA
+	QF77864vxaGKA4yIb3CtDamxt9IA7T0zsjE8iSBMMJ5RP8hRXy49P66eVgFg+S8jFkTzA0Z6zMR
+	dboZcnWp8o+Nr23N/r/kXoriBA4jLbZQa/wM5AZE8vb9etK5DMYwVT1w8LdRy3
+X-Google-Smtp-Source: AGHT+IFQgIlBAILKlFeBj7k9VDE4fActFzDL06Lw+FnjKfZU+rvuCrTsR7pDVJjk4w6BeOMqBwDPg7MqdYOkyAUoeYQ=
+X-Received: by 2002:a05:6512:ba6:b0:545:291:7ee0 with SMTP id
+ 2adb3069b0e04-549910b5b79mr293613e87.34.1741299652869; Thu, 06 Mar 2025
+ 14:20:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250306171158.1836674-1-kuba@kernel.org> <20250306171158.1836674-2-kuba@kernel.org>
+ <67c9f8ed24f9c_1580029416@willemb.c.googlers.com.notmuch> <20250306125601.522b285a@kernel.org>
+In-Reply-To: <20250306125601.522b285a@kernel.org>
+From: Willem de Bruijn <willemb@google.com>
+Date: Thu, 6 Mar 2025 17:20:15 -0500
+X-Gm-Features: AQ5f1JrhQnewTLzm97XmL5Ku02o7-1hgYN3SI2rppHUO_6A3ax5AY4i0rPHDXRM
+Message-ID: <CA+FuTScAQD9eMc6==2en7wko9WR4YjX9LO_jd1rngVbECQK1Nw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 2/2] selftests: net: use the dummy bpf from net/lib
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net, 
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com, 
+	andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org, petrm@nvidia.com, 
+	sdf@fomichev.me, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The Radxa E20C has two GbE ports, LAN and WAN. The LAN port is provided
-using a GMAC controller and a YT8531C PHY and the WAN port is provided
-by an RTL8111H PCIe Ethernet controller.
+On Thu, Mar 6, 2025 at 3:56=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Thu, 06 Mar 2025 14:35:09 -0500 Willem de Bruijn wrote:
+> > How does tools/testing/selftests/net/lib get compiled?
+> > The other subdirs of net are separate explicit targets in
+> > tools/testing/selftests/Makefile
+>
+> There is some magic / hack at top level:
+>
+> # Networking tests want the net/lib target, include it automatically
+> ifneq ($(filter net drivers/net drivers/net/hw,$(TARGETS)),)
+> ifeq ($(filter net/lib,$(TARGETS)),)
+>         INSTALL_DEP_TARGETS :=3D net/lib
+> endif
+> endif
 
-Enable support for the LAN port on Radxa E20C.
+Oh right.
+>
+> https://web.git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/t=
+ree/tools/testing/selftests/Makefile#n129
+>
+> > And what is the magic that avoids the need for adding bpf objects to
+> > .gitignore?
+>
+> All BPF files are suffixed with .bpf.c and we turn that into .bpf.o
+> So they have an .o at the end, I think the global gitignore ignores
+> those?
 
-Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
----
- .../boot/dts/rockchip/rk3528-radxa-e20c.dts   | 30 +++++++++++++++++++
- 1 file changed, 30 insertions(+)
+Also makes sense. Thanks!
 
-diff --git a/arch/arm64/boot/dts/rockchip/rk3528-radxa-e20c.dts b/arch/arm64/boot/dts/rockchip/rk3528-radxa-e20c.dts
-index a511e2a2d4a5..61ba0471095a 100644
---- a/arch/arm64/boot/dts/rockchip/rk3528-radxa-e20c.dts
-+++ b/arch/arm64/boot/dts/rockchip/rk3528-radxa-e20c.dts
-@@ -16,6 +16,7 @@ / {
- 	compatible = "radxa,e20c", "rockchip,rk3528";
- 
- 	aliases {
-+		ethernet0 = &gmac1;
- 		mmc0 = &sdhci;
- 		mmc1 = &sdmmc;
- 	};
-@@ -123,7 +124,36 @@ vccio_sd: regulator-vccio-sd {
- 	};
- };
- 
-+&gmac1 {
-+	clock_in_out = "output";
-+	phy-handle = <&rgmii_phy>;
-+	phy-mode = "rgmii-id";
-+	phy-supply = <&vcc_3v3>;
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&rgmii_miim>, <&rgmii_tx_bus2>, <&rgmii_rx_bus2>,
-+		    <&rgmii_rgmii_clk>, <&rgmii_rgmii_bus>;
-+	status = "okay";
-+};
-+
-+&mdio1 {
-+	rgmii_phy: ethernet-phy@1 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <0x1>;
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&gmac1_rstn_l>;
-+		reset-assert-us = <20000>;
-+		reset-deassert-us = <100000>;
-+		reset-gpios = <&gpio4 RK_PC2 GPIO_ACTIVE_LOW>;
-+	};
-+};
-+
- &pinctrl {
-+	ethernet {
-+		gmac1_rstn_l: gmac1-rstn-l {
-+			rockchip,pins = <4 RK_PC2 RK_FUNC_GPIO &pcfg_pull_none>;
-+		};
-+	};
-+
- 	gpio-keys {
- 		user_key: user-key {
- 			rockchip,pins = <0 RK_PA0 RK_FUNC_GPIO &pcfg_pull_up>;
--- 
-2.48.1
-
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
