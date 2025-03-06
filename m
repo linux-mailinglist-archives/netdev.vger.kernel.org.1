@@ -1,230 +1,98 @@
-Return-Path: <netdev+bounces-172389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAB52A5471E
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 11:00:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 383D6A546F4
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:56:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02189167BA8
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:00:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A1CA18928AA
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:57:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F0D720E331;
-	Thu,  6 Mar 2025 09:57:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A821420A5D5;
+	Thu,  6 Mar 2025 09:56:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="liTDfdTi"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="DMuS5bSZ";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="TH88ptt3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5322820E039
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 09:57:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 091F92080D4;
+	Thu,  6 Mar 2025 09:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741255059; cv=none; b=dqdA8qkPEqBJQZSwY0hGPk/8Q/duyh75uQDjptWRN2YYCo8zCW1GMNkVBpL7j00F5KIOX2cpSCEWFjvhoPoaplruMu68W1Eyzi2lMl7uKbAuJ+km98w/FLmdGQCy6g7CLE+duffpknShpPk+dBwgNvNFTXigAVagh+t76QtE3W8=
+	t=1741255005; cv=none; b=oWzoo1ssAluGfdkxQgNy9ohfOmwRAEZyW8Bv1jshw84QQdYMI6O9+Tjuex+CNQE9CA+Vf4mW4Bj8fjcZ1xvXx4VdEIVmSB42VXJaoPFgJJsHfFBk4n/Z0MeUWDH0/D66QSzM2ruaAdL/WRkSmCy7za/tlRTCvz/ZPwLRKMYSpio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741255059; c=relaxed/simple;
-	bh=efUQp3xn6WYS8yAIVpG+8nNESAbDYNoZwtefI4rJo8g=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To; b=MlDydmtYn9D+Qz5hVrpH/ZGWjpkAoNONkjquvX/JTOby8k9UiS+tgDS05+Eln/WaryQK2hTY7rW2BozCUzHZReVIrR10EGA+oceX7Wd9Y6sGkP54gLk2IYhJ9RxQWvZeD+bF8LAazm7z0jTL8IGlnGAx4MPiAwrRPREZiTssfiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=liTDfdTi; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-22185cddbffso31092605ad.1
-        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 01:57:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1741255057; x=1741859857; darn=vger.kernel.org;
-        h=to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CnuaMjhFxZ/6ziAA9dAFSZFZKEXkUeKJopwW9aMJd8c=;
-        b=liTDfdTiAJZ/79okWEDZNcbgi7+Hp66nqq9EZCfTbn2l7x4IhDeyq5Hn/bi1lpczj0
-         ORpVll2qWNQ+89fV7LDV/Eh1lR8HK015UvQZu/eitRX4VLlosUTS6em93Awo6Ofqz0d8
-         m37RFcDHHI+c0Gbm2ZKVUwbAm54vMtsM6Mut8pwWAMDDORC48Sqm0wmsnYHKnxh+pX5o
-         iZNrWzyJaESgGSI6LdUqfhVKnrb2k1Tbyf1jkCBYqCp8LenuvXvtzJZv50Fg+V9NLtLg
-         dBtaf+U2HIV//gwDRQQHm3wvNZTA/sIFJf6JhUen7QfpiCZnwHEXSA3G4OcHc3/Pdwfp
-         zBTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741255057; x=1741859857;
-        h=to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CnuaMjhFxZ/6ziAA9dAFSZFZKEXkUeKJopwW9aMJd8c=;
-        b=ViJCY3xX3E3GRiVPdksv1f8e16SCWnI6Mc0ktWa3MZqfwRewWw2W14nRqR/66LYvOj
-         bYkXk9/VFPJ7v5FJ3ASdgZLuadtYZ/Cxn0VFl9b7L6/tinpUOofnPAmw8KFVHNz30/H6
-         ny9O15T6z/1g4JBHAL7lcS6kAuzw/d8eYBgmU1YlmoYzXD86XX6c7LA+XEVxggZf+grB
-         6z0YYBrpd1JWJj/AFXD4X9Ec649FagSyxHWm97+I5gmdlXJdsTIIPLO/3YTjKHgqrQy2
-         gb5muc0ayxdjrmDNFgEhJ1a/TIpV19rniBXC0THeH+TN4xmD7XnuxH0R7G0+XVf3UMYA
-         ZuIw==
-X-Forwarded-Encrypted: i=1; AJvYcCWjcfPHZTjEpkoZDGgNbLJFUiBrudvVkF9JtwzbQlwpq1m66pW0g7LEdWsVQEcc/ku1Bm1FChs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxsuv6roeT08oFLmWUS3AkvnrfUMFm0LBXAkBW+kBsh5lzFCG3P
-	1WqH3bioNsXLzg1ple70qRBHLhxADPDMqFa+hk5NzXq6nXKpLZMObB/0sD4jB8A=
-X-Gm-Gg: ASbGncuOClvinS/yfiRvkBG2AslTDop5Mllcj0IkVSaY7XYAF/A6nXIsAPtvLcGfGo8
-	7jdIIffK5icLHs0vCI+Ig8zM3AACja2KUs6CeEUYdw6O3DVfVaLUoxEMSduXC8f3Fp9xj6nlrhg
-	Rwacw8cCuHgavLnpR2JwE3An3ek52FA05xsd3ZABEFRzolhcgFjaU4Hj7qJ+gycnibdKrfWK+Rp
-	G+q8HuZu03tV4ZczxizJcYeMKqAFWPTzplUwcPpsQAyDF2jeQ4XcSoapHQx7VCC7HyxWfla5efa
-	1wMOFm1nzOms2wB7UilA3eJLot4nzZimbA3DFe5dft3de07Z
-X-Google-Smtp-Source: AGHT+IHJGksHinhnEKP7Vul6y/8p6O/KEECmCOaw6lnVXA484Y6gp9ZfN9uJUdcGYFrU6DtyYorN0g==
-X-Received: by 2002:a05:6a00:3397:b0:734:26c6:26d3 with SMTP id d2e1a72fcca58-73693e85ddcmr5480443b3a.5.1741255056584;
-        Thu, 06 Mar 2025 01:57:36 -0800 (PST)
-Received: from localhost ([157.82.207.107])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-73698514f58sm948820b3a.133.2025.03.06.01.57.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Mar 2025 01:57:36 -0800 (PST)
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-Date: Thu, 06 Mar 2025 18:56:36 +0900
-Subject: [PATCH net-next v8 6/6] vhost/net: Support
- VIRTIO_NET_F_HASH_REPORT
+	s=arc-20240116; t=1741255005; c=relaxed/simple;
+	bh=zBqKLeLcKRYNMfeqT2BCbDBp9u+d5ynueRcK+eTycdY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aeTvnEtLNVKHw2eAiezajVQU19rwENy9+Jh9y7ABZgXzb69yI35MpU0km9Or0YefaJNpEl7LzSNBSz5MAp7zKeK1VlQYsVSphlCj6pUQUsMmyY6D21a7YRDcLg354A2L79ZIEmX6J8w5IJwHnZamcFN+ETjt5u93eBOgQJJjwec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=DMuS5bSZ; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=TH88ptt3; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Thu, 6 Mar 2025 10:56:39 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1741255001;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=b0hBTOKk34vwmWSLU8KV6qhcfbvYPUsAocrMEWuIr0s=;
+	b=DMuS5bSZgTBx+JCWBVj/s9j/dleIr+1rJAiFtbNBenDPkNc7UTd71WSft0POQ96oLe/Cwu
+	qlV2uKD7Yq7VRBB59ay8v19yBFX5Hsbrkac804Hewz0OZSlAennDmLfyRXClEHMVi/C+nH
+	xOa0b4v6xW/HG0xXhSOg0GIoZA44Pd0lxYIk2fP2d9j/oCd63tP86+WM/i4huvptLL7K43
+	OATQpOoIv94OQYPhmSgeNDm2s/2L/TlXZoQXBk1TJs48ajlkAKOid3X6p9oXw/qVNuH6Ef
+	FAQD8U1A5ofKQ/avQ3vLFvCbJ+3coBB/8nQavYf8ztk6IT72tUwOxu5ngZ+lmw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1741255001;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=b0hBTOKk34vwmWSLU8KV6qhcfbvYPUsAocrMEWuIr0s=;
+	b=TH88ptt31qssT1yc02e+CpNdG48MsE8zU2taGb9wo7RyEjXbIyza3vD5bprMJABrxDWz3P
+	jOJOf9ixiduVlACQ==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Joe Damato <jdamato@fastly.com>,
+	Leon Romanovsky <leon@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH net-next] net/mlnx5: Use generic code for page_pool
+ statistics.
+Message-ID: <20250306095639.HpT1e8jH@linutronix.de>
+References: <20250305121420.kFO617zQ@linutronix.de>
+ <8168a8ee-ad2f-46c5-b48e-488a23243b3d@gmail.com>
+ <20250305202055.MHFrfQRO@linutronix.de>
+ <20250306083258.0pqISYSF@linutronix.de>
+ <042d8459-e5be-4935-a688-9fe18b16afa1@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250306-rss-v8-6-7ab4f56ff423@daynix.com>
-References: <20250306-rss-v8-0-7ab4f56ff423@daynix.com>
-In-Reply-To: <20250306-rss-v8-0-7ab4f56ff423@daynix.com>
-To: Jonathan Corbet <corbet@lwn.net>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>, 
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, kvm@vger.kernel.org, 
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
- Yuri Benditovich <yuri.benditovich@daynix.com>, 
- Andrew Melnychenko <andrew@daynix.com>, 
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
- Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>, 
- Akihiko Odaki <akihiko.odaki@daynix.com>
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <042d8459-e5be-4935-a688-9fe18b16afa1@gmail.com>
 
-VIRTIO_NET_F_HASH_REPORT allows to report hash values calculated on the
-host. When VHOST_NET_F_VIRTIO_NET_HDR is employed, it will report no
-hash values (i.e., the hash_report member is always set to
-VIRTIO_NET_HASH_REPORT_NONE). Otherwise, the values reported by the
-underlying socket will be reported.
+On 2025-03-06 11:50:27 [+0200], Tariq Toukan wrote:
+> On 06/03/2025 10:32, Sebastian Andrzej Siewior wrote:
+> > Could I keep it as-is for now with the removal of the counter from the
+> > RQ since we don't have the per-queue/ ring API for it now?
+> 
+> I'm fine with transition to generic APIs, as long as we get no regression.
+> We must keep the per-ring counters exposed.
 
-VIRTIO_NET_F_HASH_REPORT requires VIRTIO_F_VERSION_1.
+I don't see a regression.
+Could you please show me how per-ring counters for page_pool_stats are
+exposed at the moment? Maybe I am missing something important.
 
-Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
----
- drivers/vhost/net.c | 49 +++++++++++++++++++++++++++++--------------------
- 1 file changed, 29 insertions(+), 20 deletions(-)
-
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index b9b9e9d40951856d881d77ac74331d914473cd56..16b241b44f89820a42c302f3586ea6bb5e0d4289 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -73,6 +73,7 @@ enum {
- 	VHOST_NET_FEATURES = VHOST_FEATURES |
- 			 (1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
- 			 (1ULL << VIRTIO_NET_F_MRG_RXBUF) |
-+			 (1ULL << VIRTIO_NET_F_HASH_REPORT) |
- 			 (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
- 			 (1ULL << VIRTIO_F_RING_RESET)
- };
-@@ -1097,9 +1098,11 @@ static void handle_rx(struct vhost_net *net)
- 		.msg_controllen = 0,
- 		.msg_flags = MSG_DONTWAIT,
- 	};
--	struct virtio_net_hdr hdr = {
--		.flags = 0,
--		.gso_type = VIRTIO_NET_HDR_GSO_NONE
-+	struct virtio_net_hdr_v1_hash hdr = {
-+		.hdr = {
-+			.flags = 0,
-+			.gso_type = VIRTIO_NET_HDR_GSO_NONE
-+		}
- 	};
- 	size_t total_len = 0;
- 	int err, mergeable;
-@@ -1110,7 +1113,6 @@ static void handle_rx(struct vhost_net *net)
- 	bool set_num_buffers;
- 	struct socket *sock;
- 	struct iov_iter fixup;
--	__virtio16 num_buffers;
- 	int recv_pkts = 0;
- 
- 	mutex_lock_nested(&vq->mutex, VHOST_NET_VQ_RX);
-@@ -1191,30 +1193,30 @@ static void handle_rx(struct vhost_net *net)
- 			vhost_discard_vq_desc(vq, headcount);
- 			continue;
- 		}
-+		hdr.hdr.num_buffers = cpu_to_vhost16(vq, headcount);
- 		/* Supply virtio_net_hdr if VHOST_NET_F_VIRTIO_NET_HDR */
- 		if (unlikely(vhost_hlen)) {
--			if (copy_to_iter(&hdr, sizeof(hdr),
--					 &fixup) != sizeof(hdr)) {
-+			if (copy_to_iter(&hdr, vhost_hlen,
-+					 &fixup) != vhost_hlen) {
- 				vq_err(vq, "Unable to write vnet_hdr "
- 				       "at addr %p\n", vq->iov->iov_base);
- 				goto out;
- 			}
--		} else {
-+		} else if (likely(set_num_buffers)) {
- 			/* Header came from socket; we'll need to patch
- 			 * ->num_buffers over if VIRTIO_NET_F_MRG_RXBUF
- 			 */
--			iov_iter_advance(&fixup, sizeof(hdr));
-+			iov_iter_advance(&fixup, offsetof(struct virtio_net_hdr_v1, num_buffers));
-+
-+			if (copy_to_iter(&hdr.hdr.num_buffers, sizeof(hdr.hdr.num_buffers),
-+					 &fixup) != sizeof(hdr.hdr.num_buffers)) {
-+				vq_err(vq, "Failed num_buffers write");
-+				vhost_discard_vq_desc(vq, headcount);
-+				goto out;
-+			}
- 		}
- 		/* TODO: Should check and handle checksum. */
- 
--		num_buffers = cpu_to_vhost16(vq, headcount);
--		if (likely(set_num_buffers) &&
--		    copy_to_iter(&num_buffers, sizeof num_buffers,
--				 &fixup) != sizeof num_buffers) {
--			vq_err(vq, "Failed num_buffers write");
--			vhost_discard_vq_desc(vq, headcount);
--			goto out;
--		}
- 		nvq->done_idx += headcount;
- 		if (nvq->done_idx > VHOST_NET_BATCH)
- 			vhost_net_signal_used(nvq);
-@@ -1607,10 +1609,13 @@ static int vhost_net_set_features(struct vhost_net *n, u64 features)
- 	size_t vhost_hlen, sock_hlen, hdr_len;
- 	int i;
- 
--	hdr_len = (features & ((1ULL << VIRTIO_NET_F_MRG_RXBUF) |
--			       (1ULL << VIRTIO_F_VERSION_1))) ?
--			sizeof(struct virtio_net_hdr_mrg_rxbuf) :
--			sizeof(struct virtio_net_hdr);
-+	if (features & (1ULL << VIRTIO_NET_F_HASH_REPORT))
-+		hdr_len = sizeof(struct virtio_net_hdr_v1_hash);
-+	else if (features & ((1ULL << VIRTIO_NET_F_MRG_RXBUF) |
-+			     (1ULL << VIRTIO_F_VERSION_1)))
-+		hdr_len = sizeof(struct virtio_net_hdr_mrg_rxbuf);
-+	else
-+		hdr_len = sizeof(struct virtio_net_hdr);
- 	if (features & (1 << VHOST_NET_F_VIRTIO_NET_HDR)) {
- 		/* vhost provides vnet_hdr */
- 		vhost_hlen = hdr_len;
-@@ -1691,6 +1696,10 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
- 			return -EFAULT;
- 		if (features & ~VHOST_NET_FEATURES)
- 			return -EOPNOTSUPP;
-+		if ((features & ((1ULL << VIRTIO_F_VERSION_1) |
-+				 (1ULL << VIRTIO_NET_F_HASH_REPORT))) ==
-+		    (1ULL << VIRTIO_NET_F_HASH_REPORT))
-+			return -EINVAL;
- 		return vhost_net_set_features(n, features);
- 	case VHOST_GET_BACKEND_FEATURES:
- 		features = VHOST_NET_BACKEND_FEATURES;
-
--- 
-2.48.1
+Sebastian
 
 
