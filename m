@@ -1,194 +1,111 @@
-Return-Path: <netdev+bounces-172617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9C05A558A6
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 22:20:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AD5E4A558AC
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 22:21:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEF503AA81F
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 21:20:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0E673A780A
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 21:21:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C083127425F;
-	Thu,  6 Mar 2025 21:20:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E44D207DF3;
+	Thu,  6 Mar 2025 21:21:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QocXZtXO"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="guMhklL/"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD81627604A
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 21:20:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0E620469E;
+	Thu,  6 Mar 2025 21:21:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741296010; cv=none; b=oNQ9VEfLTIyznQVrMMM8mbX2gLvkVR+ZkwiOeqnxDBFn5aqgonLtF33Ea0R9+NqwDkSilOtTYfrkK40Z96ngsqyLbzNPAFrbliMyUhfobyagf7j/CoewIejKhaBsuGtFXCORbc2k2LwDAKJ8qVtO7Q+NG1DTbpDBudCaV0UajEU=
+	t=1741296102; cv=none; b=DiEDcjvzhgFteC76fVzOorit8Po8lT2ZbeSt4rY0LoQQvVGBpWGNPFwptXkd8+or9m/yI/ahKB5ADNdr4d5m6S0D8hhsQS2l68zl2c2V5r59YRIYxy2p8+HEIhJfLB+W0T0VJMQ9XMOuQ88JpZ5R11O7KXvuuqB8DNOprRpEUr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741296010; c=relaxed/simple;
-	bh=MWyaA/wXp/49YLSpcBoDA2oV52EWTWcTe7PxH3yM7aQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ReUedE76Y1AWOG31/6TbMrzPSoT+r0uQEqgSWACQYJinNiGsmgk2CTVoaG25rDcYtAUImWFEvftffglYetySyhvBvmyYVEtfZKYUeV0YxsnPlBaWy0TMh6Rx3HuljWltWJriQv7UuQ0tZnkS2/T1p86lsw8twWmRH4ToeLsRmWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QocXZtXO; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741296007;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2AlfdTT3ny7ZX4l+1N98G7yPvo2PKCMNZ5L+Imm0SJE=;
-	b=QocXZtXOy8zejy5KRbFKXQFLKCKi1xj0yooPwnl6ytiw0ydqLAdOMgKwqCLzSDTllSBdo4
-	+ETiQSFHZrCtG7xbLiVtqcZBdY6rIRyKbbproPub/8SjMhjQL8HJ8doimPhRzmMC9V2RgS
-	q2xuidrLHuP0PICavyfVtw1FkZ6a1tQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-602-5BTe_RuxNOqXiNpwARpBWQ-1; Thu, 06 Mar 2025 16:20:06 -0500
-X-MC-Unique: 5BTe_RuxNOqXiNpwARpBWQ-1
-X-Mimecast-MFC-AGG-ID: 5BTe_RuxNOqXiNpwARpBWQ_1741296005
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-39131f2bbe5so155015f8f.3
-        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 13:20:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741296005; x=1741900805;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2AlfdTT3ny7ZX4l+1N98G7yPvo2PKCMNZ5L+Imm0SJE=;
-        b=G7p3zt/OyNUP7OYO6QuKVg1C05HaF1emq/rG7lkKTVrvGXb+E8d69YrsHqDJb8/pWG
-         DK2L12N51ZzNDNXC8T9ATQINt0DSDZFOcID4M4NhWFDdXa3OO5Kh9PDY5TX0JNP4RrQa
-         98PSWK1i72r1JZrI3az3jQtiipYpsl8Fx2sGpzX8WoNFYeo+UcHp2YNMQoPzxdM9ZGvs
-         HUaStClZL9q+5C14gnFCm/dafD+WqmkUJzEZOG3789PUOqwbMoRG4YnLj8nFZkhi3Yn8
-         ab2DbIPOIOpds8qFtjzyNp9JAu1jaezj1oKsXW9fnptQ7x/jAfYSPQKctPpd3NyKsxzY
-         TNUg==
-X-Forwarded-Encrypted: i=1; AJvYcCX5MjQYCUhqeBjA6xQH/ZtyEa6TosFVsjMfpsQyxjioT6oMI4nxgFFMLAcx1FSxYmRmKwKiuuw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxZmnQv+Dyci09YDYuL+nszF5CgdZwsTiAJ6FNJi8UQCOf8QHD
-	NM8XbuVKBxSuc2yG4jtcB7Qs/XyWL++fmnAhDGYWN6QL4UHCwF3pZVPuVrvD4kWPvl/80eQ0cEP
-	lr/fPpRUvNpq7xMnaXW2RBF718YNMDwufFxLv/JMgCueXvDo3VT3oCA==
-X-Gm-Gg: ASbGnct/dw8IlKLhIzZVwp/eSq8B6lZbs21f0b6ffNGIHoigpy6TimbudkOOsDdhCxp
-	PMrN1D4A5M+MHoYJzm+fKiiab13eclVro7hWarmXl5Ialpa7KJVcWpDMmqidtuvENajK2I46YtS
-	HuvM20HcQDzte8RA54gUoRpjp08rUUxkDlSBXj5TITErKJHksOWaORGh/9kvdxq99RCRNSkBduC
-	YUE9qHo4S2TgrMYraqM4ZiFfyjuvibsxlH9Yf9boeG3iZa3Z9Q+wDRexUgQOQpbhElDdcPGCcaZ
-	q5zlLkODbbmbaYcq8usfCq26qM4fN6xm99jJSrWwmN8apA==
-X-Received: by 2002:a05:6000:156f:b0:391:ba6:c066 with SMTP id ffacd0b85a97d-39132d9870emr691134f8f.35.1741296005030;
-        Thu, 06 Mar 2025 13:20:05 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGo7jqUc+ullGC8UPfcJOZAMWJf/WBUb9tGIJsV3mTYhmFuw8Dpxqfmt0bCv5OTwco2J1SS2Q==
-X-Received: by 2002:a05:6000:156f:b0:391:ba6:c066 with SMTP id ffacd0b85a97d-39132d9870emr691117f8f.35.1741296004680;
-        Thu, 06 Mar 2025 13:20:04 -0800 (PST)
-Received: from [192.168.88.253] (146-241-81-153.dyn.eolo.it. [146.241.81.153])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c0195bfsm3148212f8f.48.2025.03.06.13.20.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Mar 2025 13:20:04 -0800 (PST)
-Message-ID: <840bec2f-51a6-4036-bf9a-f215a4db1be5@redhat.com>
-Date: Thu, 6 Mar 2025 22:20:02 +0100
+	s=arc-20240116; t=1741296102; c=relaxed/simple;
+	bh=dG3d9aBGMx3DfnzuFFKM0PvgEVAcQQKTYUoYLJZ2bfw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gpxH2YtPeLbSPFeG7XI+1y0btE78hs2KV8g4qh5I+ENIpjoWxM7/OtEb/tbl54mPuz4a+k72Fd1iY+14xuTtGwy3KvtQNgF8v8M9TEsDv8BqO4ZQyoEusMYkdW2xpaEj/V9m9/EdM/yliq/xMdAxivPZ7+yhCS8jfU0QKbrXCj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=guMhklL/; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=9H78NGtDgrJN8almAooGMPfIHicQD7QyEml+BfISIgg=; b=guMhklL/+BIxtizh+xS6aUCkcs
+	xiqV6+jRMkvDCFI1Sdi2vxBbaC8HFPmkFSPNomuM1DaFuR9gXBO5W5pyVze8dw4T1rail/m4jEtUx
+	Sl+bfrPyvulBDrN60FqU93ZP8sEOV2aYu0DUfALLj08VQcaukP31Ov9Z/eDXCzgNeMYfJ7JgOoYxm
+	LPp2dr+vWeNh/k4dbT3BM/AH62dODYTy86qE4hCFZTafmDcEGEjAArTWjqtWhJCGRgRQU2TGorsuO
+	lhbZjQJ6ndCqIFdVoMdRuVoKtIzDJrHoh05ZDgdAg/TKTa1NWtUgxeKTc/aq5QAwqsoVm3sVyDVdT
+	vzH1AxrA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44602)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tqIeb-0006Vr-05;
+	Thu, 06 Mar 2025 21:21:17 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tqIeW-00078z-38;
+	Thu, 06 Mar 2025 21:21:12 +0000
+Date: Thu, 6 Mar 2025 21:21:12 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jonas Karlman <jonas@kwiboo.se>
+Cc: Heiko Stuebner <heiko@sntech.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-rockchip@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH 2/2] net: stmmac: dwmac-rk: Validate rockchip,grf and
+ php-grf during probe
+Message-ID: <Z8oRyHThun9mLgx8@shell.armlinux.org.uk>
+References: <20250306210950.1686713-1-jonas@kwiboo.se>
+ <20250306210950.1686713-3-jonas@kwiboo.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] udp_tunnel: create a fast-path GRO lookup.
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>
-References: <cover.1741275846.git.pabeni@redhat.com>
- <ef5aa34bd772ec9b6759cf0fde2d2854b3e98913.1741275846.git.pabeni@redhat.com>
- <67c9fb8199ef0_15800294cc@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <67c9fb8199ef0_15800294cc@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250306210950.1686713-3-jonas@kwiboo.se>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 3/6/25 8:46 PM, Willem de Bruijn wrote:
-> Paolo Abeni wrote:
->> Most UDP tunnels bind a socket to a local port, with ANY address, no
->> peer and no interface index specified.
->> Additionally it's quite common to have a single tunnel device per
->> namespace.
->>
->> Track in each namespace the UDP tunnel socket respecting the above.
->> When only a single one is present, store a reference in the netns.
->>
->> When such reference is not NULL, UDP tunnel GRO lookup just need to
->> match the incoming packet destination port vs the socket local port.
->>
->> The tunnel socket never set the reuse[port] flag[s], when bound to no
->> address and interface, no other socket can exist in the same netns
->> matching the specified local port.
->>
->> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> 
->> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
->> index c1a85b300ee87..ac6dd2703190e 100644
->> --- a/net/ipv4/udp_offload.c
->> +++ b/net/ipv4/udp_offload.c
->> @@ -12,6 +12,38 @@
->>  #include <net/udp.h>
->>  #include <net/protocol.h>
->>  #include <net/inet_common.h>
->> +#include <net/udp_tunnel.h>
->> +
->> +#if IS_ENABLED(CONFIG_NET_UDP_TUNNEL)
->> +static DEFINE_SPINLOCK(udp_tunnel_gro_lock);
->> +
->> +void udp_tunnel_update_gro_lookup(struct net *net, struct sock *sk, bool add)
->> +{
->> +	bool is_ipv6 = sk->sk_family == AF_INET6;
->> +	struct udp_sock *tup, *up = udp_sk(sk);
->> +	struct udp_tunnel_gro *udp_tunnel_gro;
->> +
->> +	spin_lock(&udp_tunnel_gro_lock);
->> +	udp_tunnel_gro = &net->ipv4.udp_tunnel_gro[is_ipv6];
-> 
-> It's a bit odd to have an ipv6 member in netns.ipv4. Does it
-> significantly simplify the code vs a separate entry in netns.ipv6?
+On Thu, Mar 06, 2025 at 09:09:46PM +0000, Jonas Karlman wrote:
+> @@ -1813,8 +1564,24 @@ static struct rk_priv_data *rk_gmac_setup(struct platform_device *pdev,
+>  
+>  	bsp_priv->grf = syscon_regmap_lookup_by_phandle(dev->of_node,
+>  							"rockchip,grf");
+> -	bsp_priv->php_grf = syscon_regmap_lookup_by_phandle(dev->of_node,
+> -							    "rockchip,php-grf");
+> +	if (IS_ERR(bsp_priv->grf)) {
+> +		ret = PTR_ERR(bsp_priv->grf);
+> +		dev_err_probe(dev, ret, "failed to lookup rockchip,grf\n");
+> +		return ERR_PTR(ret);
 
-The code complexity should not change much. I place both the ipv4 and
-ipv6 data there to allow cache-line based optimization, as all the netns
-fast-path fields are under struct netns_ipv4.
+Did you consider using ERR_CAST() for these, which would look like this:
 
-Currently the UDP tunnel related fields share the same cache-line of
-`udp_table`.
+		dev_err_probe(dev, PTR_ERR(bsp_priv->grf),
+			      "failed to lookup rockchip,grf\n");
+		return ERR_CAST(bsp_priv->grf);
 
->> @@ -631,8 +663,13 @@ static struct sock *udp4_gro_lookup_skb(struct sk_buff *skb, __be16 sport,
->>  {
->>  	const struct iphdr *iph = skb_gro_network_header(skb);
->>  	struct net *net = dev_net_rcu(skb->dev);
->> +	struct sock *sk;
->>  	int iif, sdif;
->>  
->> +	sk = udp_tunnel_sk(net, false);
->> +	if (sk && dport == htons(sk->sk_num))
->> +		return sk;
->> +
-> 
-> This improves tunnel performance at a slight cost to everything else,
-> by having the tunnel check before the normal socket path.
-> 
-> Does a 5% best case gain warrant that? Not snark, I don't have a
-> good answer.
+?
 
-We enter this function only when udp_encap_needed_key is true: ~an UDP
-tunnel has been configured[1].
-
-When tunnels are enabled, AFAIK the single tunnel device is the most
-common and most relevant scenario, and in such setup this gives
-measurable performance improvement. Other tunnel-based scenarios will
-see the additional cost of a single conditional (using data on an
-already hot cacheline, due to the above layout).
-
-If you are concerned about such cost, I can add an additional static
-branch protecting the above code chunk, so that the conditional will be
-performed only when there is a single UDP tunnel configured. Please, let
-me know.
-
-Thanks,
-
-Paolo
-
-[1] to be more accurate: an UDP tunnel or an UDP socket with GRO enabled
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
