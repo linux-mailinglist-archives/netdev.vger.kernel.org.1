@@ -1,76 +1,78 @@
-Return-Path: <netdev+bounces-172656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9783EA55A83
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 00:04:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCD91A55A84
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 00:04:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C337E1682BA
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 23:04:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B5A71896007
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 23:04:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0384227CB2E;
-	Thu,  6 Mar 2025 23:04:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1051C27CCE3;
+	Thu,  6 Mar 2025 23:04:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=enfabrica.net header.i=@enfabrica.net header.b="Jyeh2Q0l"
+	dkim=pass (2048-bit key) header.d=enfabrica.net header.i=@enfabrica.net header.b="JAg5nyfN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D475D2054FD
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 23:03:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 619A5279349
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 23:04:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741302240; cv=none; b=DD58rNEoRPwKOlG171o/JPyT8cY0WcT/8kxp1DOefz75SZg+1ZEefRdoJYqXDnr0NuapP0sFLqVTjO6BfK04DTgovrAwbpj0HD5SBW9P+s5VPZHAgmJuxWL5W13vBWb1c/4PHNCSPg7h64ikZLiN0qkxY2IpQRlBlj/f5I41fNc=
+	t=1741302242; cv=none; b=Ea2619UqaDXZI3gq7fCvXtAl/38g0ayJISFECOzkBRfY1RDNaRPKSgM6cvYRGVBjPnSAZGhkekqFifmLSQd2IIvXj1/LlpQgXQzdOJiHrTUbAHZBUA8EC0Fm34jEBQUcVoYSVVrPp1vNm+MljiDGHfl2rDyWC9YpZwXNIg1yqmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741302240; c=relaxed/simple;
-	bh=9P5cR3wVGceuqqoN5Lm0uHgjh9VXikU5XM/VGHCnUDw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SPnXCFlf51yUlmHeRzYxrbqOjwq1BULS5i/xec2HLEjOXHfXOS44tHuq5YZhZLXS5UaN4tBIIqJRNIPSOStE/8WZ4mU42bSMyBY/sTub6/NDRDel5HR1DKf7ExbTEglgsSkjvREPCS04yOpvXjzOYNB8M9ZuVOGS/IKnvSjXQZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=enfabrica.net; spf=pass smtp.mailfrom=enfabrica.net; dkim=pass (2048-bit key) header.d=enfabrica.net header.i=@enfabrica.net header.b=Jyeh2Q0l; arc=none smtp.client-ip=209.85.219.48
+	s=arc-20240116; t=1741302242; c=relaxed/simple;
+	bh=A9mobOvuIeF00fIfjCqC9uNVWIrG6j7W2+rdHsW6dwk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=JRNj4y1sanPhD2Kzg4dWmUtEzVwihXoeUZfqg6YdhFdo45RcuTq+C1mvHnl2eXMhhhaLTdSM9Iy9X/XptLW2vy8jZFMioQn45HOAWhGTiRqQHUCk1dXg1GfOCqD/2yOpRkA8mnUERgHDhF07DfhRDDv74OfGuMZTuRemrqxqJU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=enfabrica.net; spf=pass smtp.mailfrom=enfabrica.net; dkim=pass (2048-bit key) header.d=enfabrica.net header.i=@enfabrica.net header.b=JAg5nyfN; arc=none smtp.client-ip=209.85.219.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=enfabrica.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enfabrica.net
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6e41e18137bso8794586d6.1
-        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 15:03:58 -0800 (PST)
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6e8f254b875so9606796d6.1
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 15:04:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=enfabrica.net; s=google; t=1741302237; x=1741907037; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5InOh2hFVrqxOK4OiWxKFEK8Qv8GjpqOw6YDveGcgX4=;
-        b=Jyeh2Q0lw4XDicKEzBiUEOwTgRzL47m0qnfOvXwtL77qio/+saDvQ6/nqEygrIyxzn
-         ItE0FGMg6X5lsj+Tf+5BnnNfsun0/Dgn1P/Oss2rqpE7SSYPN2X2WD5FSiciTLTjloh2
-         wNS06+XYWJr7yVyyNgRQA8F7ZWGyQ3SDczKBtJhYm5cmXAXIK+rpgmkxs7K+0LajYQuC
-         KA06QcoAJnGH5ylfhHhcyX3cZG8oMGO8puhynGUfN0jTiCWV+KbcW9j3uN4yUeH5po1d
-         oahhybg7Z6FvuWOUXjdVNn3qixVcxtfE6crjoQ4slCrncbRsf69EHQM9JQs+AbfcSd/R
-         Qh0w==
+        d=enfabrica.net; s=google; t=1741302239; x=1741907039; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WdHcT+hSCoYTik958njnGQie2UZi8YbiCIJN/dVy/UQ=;
+        b=JAg5nyfN5RaHuEntmBdUUTuczyCp7OYwxGwEeYFUtP4PxZRfWe4epLXmfUtpeNFrmh
+         tn5nn65djzlxI93yakBkU+bvlEf1+nRy00RFlSoFP/ZtFxF1m7cnuUz4cIgQy4qruqFs
+         s5I15mCxKpf8w1utGm+BrZuaCmTEJgQqQ6Wo10j4GhDjlZ35bZkunem6EI80D/TXMhGN
+         fRNyJfZrzJ2+p+VcDUQmk4oEMdgaWjMXhfP3Mtg5DqhiqMH+f930EBOZeSgarB1jTVva
+         zKMSCdYjnbms4JQ1WeqDE686761kovjU8tZNJZNrF1wAYqVw7r0gIpUupSxtFTTQ75zE
+         865g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741302237; x=1741907037;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5InOh2hFVrqxOK4OiWxKFEK8Qv8GjpqOw6YDveGcgX4=;
-        b=CSTT0WXZ/kX1+Onf45mXUO/+pI/bwZAXbLW3kCXFclBDEp6fjijFnl0vAtjVybolM2
-         sE6MFrjJBdBTD2/DC+Y3Av+yULW6DaN/hWDTw2PdM/JYMKOKoX6fw3zaols0Oukmz08W
-         yGDVlmjpFz6W8PxNxy2UVW/1txl8yqe3Fh5k+Vho8nadc/xdAgYOuEa0PCKDZPACkKBV
-         AM7BI4NX0h3aln/SLkYbQIo7U30thPMN5J75CvVikWDS516vLw8k0ATgCVzGNtRJ2g58
-         7BRScCrfmN/2xqCA/WBQ13yI81klD62ma6enqs8fEvVXoEYeymsUi/BGg5kj97imVb8u
-         xNUQ==
-X-Gm-Message-State: AOJu0YwEV7+9TWhkqxn0Tv83kBV89oKGjh6RfHM1Ydq8y1mTYg9hKqzk
-	BO4QkYJqadbhF8Fg/Uhra7aDzEqIpdMC87SIdx1oyitxW2Q8aPtnhBuBeGndrnyldEi35rzXWE/
-	Jxvv7BnNcuQ03zRVQiBvj7gmUAdK2H+tZiu26XXjmMDc9lRxuWXHpt+p6d/JahplbPjfrUMB/4P
-	a7GDkQ5NTCRiDx0VuMlt6LsbZY9yWGDEUETqvfs3MAId4=
-X-Gm-Gg: ASbGncu9vlkaLDyZ1OLybvByn411R0/0GSCZtpapaWAGhsYxYGpGD668oPMjkrFdhR3
-	9z2k6v9QhWoa/5gtU+DE5CyAto37bmkthyQ2pusGW6qboUzAzqKfXjIP68TxDxrce5anG7LEEE7
-	VVAZvwXeEL/wL13CZx4A3m0Sq+gV4MgRQmZtKt6Tlyq1dGP0O7pwHO1qEGdbr9VsdB5Qe36+uWD
-	+SUlGwPJlXSjdcdsR7IMayLzj7ncraayHiMlXZ6nMB5PGoYfBAiVgnt/0kaGZie3JJfb3GSercu
-	Sr/Xpjs0Sd6yBvuzl3X9Cf/dXYANaxzXznxpRPmPP4tmQqOF/rp2rKsvwq/7vX9VwTbS
-X-Google-Smtp-Source: AGHT+IE0VCegJ5qUOHQr9rsnIZKUaDSaW8i/nzICrIQVmh8UnzI3rC2bisxKwRROzU5eyrR4TJ3QlA==
-X-Received: by 2002:a05:6214:21a6:b0:6e4:2dd7:5c88 with SMTP id 6a1803df08f44-6e90068196dmr15445456d6.38.1741302237271;
-        Thu, 06 Mar 2025 15:03:57 -0800 (PST)
+        d=1e100.net; s=20230601; t=1741302239; x=1741907039;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WdHcT+hSCoYTik958njnGQie2UZi8YbiCIJN/dVy/UQ=;
+        b=KJKPjIeyjYMSD1W9ZqLzhjbKiKR6SDG1GwaN+2j2Uc/quGMdvH1lfrHP7Twu46bYF3
+         Q0kBaoKOJDuD5YjAN048T83wscnENnoQmu6DKi8dy38b7iWMf5Xw8twWt3GK/CqlzXpW
+         ebUMn3X3cxWDyeM3u6V1K++wHu9NxDVm57Lf60xqDYzrLplXrwVdQbLNEtoWumGMACz6
+         D79U+833oCZqKV43fU0V/cDlT83tl7NFJnbdMvdzIt7O1ekPO/rh7oPlSwbBX43SxJMW
+         wVyGBEETm+PdrYbKLNNm6jB9C9m0UVg7gRspZbTSbpKq6Ad1iFt7O/TGXwO4j6Z4X4MU
+         P/+Q==
+X-Gm-Message-State: AOJu0YzIuLGBQhyLCxZBSoxq10JZ+VL/lcM4LcQ6uKk96EOMdmzayowS
+	+oP9oWkUCztsVy514bVq1IYH079RjQsxB31lGSoOvXVuqm+EFTkB5WSCyBHu0Dt4E51MehNRmvp
+	sRQYopVITte9RzZNPmtfwBmhMJIz7sMtg6QJn++RbygeUe2tyI5GSh9Au0TYPcgiaylPl8SGD3K
+	YHs0JJUEx5iYd55MeV83F5y11hABph3fSV3iQTbf+AUN8=
+X-Gm-Gg: ASbGncuB6tMU933WARqhsGQ6VCAd1k6xVtPo6btL6cz94cIgqlBd2jTZCe19ijZb1AR
+	oNw1/9SDJfFHl2bxfKf3k/NAnym/eEO5wo3qJ4T3ToctObXqVP4jPlhj3jqoxdGazmBi5R9fdFT
+	yCRuaPMZ4VRUCovnCtZe5QGssvL3m5nGIN14ay6OAqIdULjPJ1SODbyDMRBAShBh1PgN0FVhrSe
+	bjsSDedrQo8CScCzznEL0nix/oEWkQ8d7hPq3ODuI5wPoO5aaVxk7aLD5SjQMf5Fs3Xd7/o6+BZ
+	635oRK+obhKyIXyFc4nFDhHbCo7Ib/Fv8tdx/XVKTRZPeDpNC5Z9DqgQDyYYjFSqnAG/
+X-Google-Smtp-Source: AGHT+IF1kfGspX38JaOE5QuV2pL9LaOd4NlYMWkRbiYsvXZp2jxSiWbyI1svMuCu7yxj+68lLI/tfg==
+X-Received: by 2002:ad4:5d49:0:b0:6e8:fbb7:6764 with SMTP id 6a1803df08f44-6e9006ba2fbmr13156446d6.45.1741302239103;
+        Thu, 06 Mar 2025 15:03:59 -0800 (PST)
 Received: from debil.. (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac256654fa6sm14971966b.93.2025.03.06.15.03.55
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac256654fa6sm14971966b.93.2025.03.06.15.03.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Mar 2025 15:03:56 -0800 (PST)
+        Thu, 06 Mar 2025 15:03:58 -0800 (PST)
 From: Nikolay Aleksandrov <nikolay@enfabrica.net>
 To: netdev@vger.kernel.org
 Cc: shrijeet@enfabrica.net,
@@ -94,10 +96,12 @@ Cc: shrijeet@enfabrica.net,
 	linux-rdma@vger.kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com
-Subject: [RFC PATCH 00/13] Ultra Ethernet driver introduction
-Date: Fri,  7 Mar 2025 01:01:50 +0200
-Message-ID: <20250306230203.1550314-1-nikolay@enfabrica.net>
+Subject: [RFC PATCH 01/13] drivers: ultraeth: add initial skeleton and kconfig option
+Date: Fri,  7 Mar 2025 01:01:51 +0200
+Message-ID: <20250306230203.1550314-2-nikolay@enfabrica.net>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250306230203.1550314-1-nikolay@enfabrica.net>
+References: <20250306230203.1550314-1-nikolay@enfabrica.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -106,129 +110,93 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi all,
-This patch-set introduces minimal Ultra Ethernet driver infrastructure and
-the lowest Ultra Ethernet sublayer - the Packet Delivery Sublayer (PDS),
-which underpins the entire communication model of the Ultra Ethernet
-Transport[1] (UET). Ultra Ethernet is a new RDMA transport designed for
-efficient AI and HPC communication. The specifications are still being
-ironed out and first public versions should be available soon. As there
-isn't any UET hardware available yet, we introduce a software device model
-which implements the lowest sublayer of the spec - PDS. The code is still
-in early stages and experimental, aiming to start a discussion on the
-kernel implementation and to show how we plan to organize it.
+Create drivers/ultraeth/ for the upcoming new Ultra Ethernet driver and add
+a new Kconfig option for it.
 
-The PDS is responsible for establishing dynamic connections between Fabric
-Endpoints (FEPs) called Packet Delivery Contexts (PDCs), packet
-reliability, ordering, duplicate elimination and congestion management.
-The PDS packet ordering is defined by a mode which can be one of:
- - Reliable, Ordered Delivery (ROD)
- - Reliable, Unordered Delivery (RUD)
- - Reliable, Unordered Delivery for Idempotent Operations (RUDI)
- - Unreliable, Unordered Delivery (UUD)
-
-This set implements RUD mode of communication with Packet Sequence
-Number (PSN) tracking, retransmits, idle timeouts, coalescing and selective
-ACKs. It adds support for generating and processing Request, ACK, NACK and
-Control packet types. Communication is done over UDP, so all Ultra Ethernet
-headers are on top of UDP packets. Packets are tracked by Packet Sequence
-Numbers (PSNs) uniquely assigned within a PDC, the PSN window sizes are
-currently static.
-
-In this RFC all of the code is under a single kernel module in
-drivers/ultraeth/ and guarded by a new kconfig option CONFIG_ULTRAETH. The
-plan is to have that split into core Ultra Ethernet module (ultraeth.ko)
-which is responsible for managing the UET contexts, jobs and all other
-common/generic UET configuration, and the software UET device model
-(uecon.ko) which implements the UET protocols for communication in software
-(e.g. the PDS will be a part of uecon) and is represented by a UDP tunnel
-network device. Note that there are critical missing pieces that will be
-present when we send the first version such as:
- - Ultra Ethernet specs will be publicly available
- - missing UET sublayers critical for communication
- - more complete user API
- - kernel UET device API
- - memory management
- - IPv6
-
-The last patch is a hack which adds a custom character device used to test
-communication and basic PDS functionality, for the first version of this set
-we would rather extend and re-use some of the Infiniband infrastructure.
-
-This set will also be used to better illustrate the UET code and concepts
-for the "Networking For AI BoF"[2] at the upcoming Netdev 0x19 conference
-in Zagreb, Croatia.
-
-Thank you,
- Nik
-
-[1] https://ultraethernet.org/
-[2] https://netdevconf.info/0x19/sessions/bof/networking-for-ai-bof.html
-
-
-Alex Badea (1):
-  HACK: drivers: ultraeth: add char device
-
-Nikolay Aleksandrov (12):
-  drivers: ultraeth: add initial skeleton and kconfig option
-  drivers: ultraeth: add context support
-  drivers: ultraeth: add new genl family
-  drivers: ultraeth: add job support
-  drivers: ultraeth: add tunnel udp device support
-  drivers: ultraeth: add initial PDS infrastructure
-  drivers: ultraeth: add request and ack receive support
-  drivers: ultraeth: add request transmit support
-  drivers: ultraeth: add support for coalescing ack
-  drivers: ultraeth: add sack support
-  drivers: ultraeth: add nack support
-  drivers: ultraeth: add initiator and target idle timeout support
-
- Documentation/netlink/specs/rt_link.yaml  |   14 +
- Documentation/netlink/specs/ultraeth.yaml |  218 ++++
- drivers/Kconfig                           |    2 +
- drivers/Makefile                          |    1 +
- drivers/ultraeth/Kconfig                  |   11 +
- drivers/ultraeth/Makefile                 |    4 +
- drivers/ultraeth/uecon.c                  |  324 ++++++
- drivers/ultraeth/uet_chardev.c            |  264 +++++
- drivers/ultraeth/uet_context.c            |  274 +++++
- drivers/ultraeth/uet_job.c                |  456 +++++++++
- drivers/ultraeth/uet_main.c               |   41 +
- drivers/ultraeth/uet_netlink.c            |  113 +++
- drivers/ultraeth/uet_netlink.h            |   29 +
- drivers/ultraeth/uet_pdc.c                | 1122 +++++++++++++++++++++
- drivers/ultraeth/uet_pds.c                |  481 +++++++++
- include/net/ultraeth/uecon.h              |   28 +
- include/net/ultraeth/uet_chardev.h        |   11 +
- include/net/ultraeth/uet_context.h        |   47 +
- include/net/ultraeth/uet_job.h            |   80 ++
- include/net/ultraeth/uet_pdc.h            |  170 ++++
- include/net/ultraeth/uet_pds.h            |  110 ++
- include/uapi/linux/if_link.h              |    8 +
- include/uapi/linux/ultraeth.h             |  536 ++++++++++
- include/uapi/linux/ultraeth_nl.h          |  116 +++
- 24 files changed, 4460 insertions(+)
- create mode 100644 Documentation/netlink/specs/ultraeth.yaml
+Signed-off-by: Nikolay Aleksandrov <nikolay@enfabrica.net>
+Signed-off-by: Alex Badea <alex.badea@keysight.com>
+---
+ drivers/Kconfig             |  2 ++
+ drivers/Makefile            |  1 +
+ drivers/ultraeth/Kconfig    | 11 +++++++++++
+ drivers/ultraeth/Makefile   |  3 +++
+ drivers/ultraeth/uet_main.c | 19 +++++++++++++++++++
+ 5 files changed, 36 insertions(+)
  create mode 100644 drivers/ultraeth/Kconfig
  create mode 100644 drivers/ultraeth/Makefile
- create mode 100644 drivers/ultraeth/uecon.c
- create mode 100644 drivers/ultraeth/uet_chardev.c
- create mode 100644 drivers/ultraeth/uet_context.c
- create mode 100644 drivers/ultraeth/uet_job.c
  create mode 100644 drivers/ultraeth/uet_main.c
- create mode 100644 drivers/ultraeth/uet_netlink.c
- create mode 100644 drivers/ultraeth/uet_netlink.h
- create mode 100644 drivers/ultraeth/uet_pdc.c
- create mode 100644 drivers/ultraeth/uet_pds.c
- create mode 100644 include/net/ultraeth/uecon.h
- create mode 100644 include/net/ultraeth/uet_chardev.h
- create mode 100644 include/net/ultraeth/uet_context.h
- create mode 100644 include/net/ultraeth/uet_job.h
- create mode 100644 include/net/ultraeth/uet_pdc.h
- create mode 100644 include/net/ultraeth/uet_pds.h
- create mode 100644 include/uapi/linux/ultraeth.h
- create mode 100644 include/uapi/linux/ultraeth_nl.h
 
+diff --git a/drivers/Kconfig b/drivers/Kconfig
+index 7bdad836fc62..df3369781d37 100644
+--- a/drivers/Kconfig
++++ b/drivers/Kconfig
+@@ -245,4 +245,6 @@ source "drivers/cdx/Kconfig"
+ 
+ source "drivers/dpll/Kconfig"
+ 
++source "drivers/ultraeth/Kconfig"
++
+ endmenu
+diff --git a/drivers/Makefile b/drivers/Makefile
+index 45d1c3e630f7..47848677605a 100644
+--- a/drivers/Makefile
++++ b/drivers/Makefile
+@@ -195,3 +195,4 @@ obj-$(CONFIG_CDX_BUS)		+= cdx/
+ obj-$(CONFIG_DPLL)		+= dpll/
+ 
+ obj-$(CONFIG_S390)		+= s390/
++obj-$(CONFIG_ULTRAETH)		+= ultraeth/
+diff --git a/drivers/ultraeth/Kconfig b/drivers/ultraeth/Kconfig
+new file mode 100644
+index 000000000000..a769c6118f2f
+--- /dev/null
++++ b/drivers/ultraeth/Kconfig
+@@ -0,0 +1,11 @@
++# SPDX-License-Identifier: GPL-2.0-only
++
++config ULTRAETH
++	tristate "Ultra Ethernet core"
++	depends on INET
++	depends on IPV6 || !IPV6
++	select NET_UDP_TUNNEL
++	select GRO_CELLS
++	help
++	  To compile this driver as a module, choose M here: the module
++	  will be called ultraeth.
+diff --git a/drivers/ultraeth/Makefile b/drivers/ultraeth/Makefile
+new file mode 100644
+index 000000000000..e30373d4b5dc
+--- /dev/null
++++ b/drivers/ultraeth/Makefile
+@@ -0,0 +1,3 @@
++obj-$(CONFIG_ULTRAETH) += ultraeth.o
++
++ultraeth-objs := uet_main.o
+diff --git a/drivers/ultraeth/uet_main.c b/drivers/ultraeth/uet_main.c
+new file mode 100644
+index 000000000000..0d74175fc047
+--- /dev/null
++++ b/drivers/ultraeth/uet_main.c
+@@ -0,0 +1,19 @@
++// SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
++
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/types.h>
++
++static int __init uet_init(void)
++{
++	return 0;
++}
++
++static void __exit uet_exit(void)
++{
++}
++
++module_init(uet_init);
++module_exit(uet_exit);
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Ultra Ethernet core");
 -- 
 2.48.1
 
