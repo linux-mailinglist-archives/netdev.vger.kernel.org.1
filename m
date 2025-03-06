@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-172591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04E2BA55761
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 21:22:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3279A55763
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 21:22:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FA201749DC
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 20:22:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4CB31899422
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 20:23:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AEEB214A61;
-	Thu,  6 Mar 2025 20:22:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AB1B270EB8;
+	Thu,  6 Mar 2025 20:22:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="DMUuoxbG"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ZYvLAvog"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
+Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7A442A8C
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 20:21:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD64442A8C
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 20:22:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741292520; cv=none; b=kdSdZhnXRVLukGrf+OXEkxNtIemAPDosKTuF4ftKRzsvKYHOKFgmq5aHVXa1L2nArCLyRuBdixyP4F9ucxGpag1wuetHgvMIQOMsEVOGq3a5HBzsSyg4d5Esas9blIoQB5b2MHDV92dluppD+3XYRGPRh1cij7xOC8xIuTpbREM=
+	t=1741292568; cv=none; b=KwdO+WkunYsBoRKYfNKgFrEHN6V3YSz3+ibz3h6a8jf84LwBbRrgTabqblfyUAKOhvzzUX018jIjXvnbKggrbWfT06N2xoh2NtC9u/Y6jIq6dSPQsuEaRm6N4UbN9Z7pLyJx+2nNPUsa/QLsNvKkIb39GKqGoPNbt8DtdN601YM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741292520; c=relaxed/simple;
-	bh=2VBd/zOJ2XdcIZrA7YFIi2LRzrpj2tn9lgvafsi2Mtw=;
+	s=arc-20240116; t=1741292568; c=relaxed/simple;
+	bh=ON414bEsmI7Kzbpf1j1OeEbswytZMtapoqrVk7J1nB0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cGGGECwkB01x3DZvNoyNBkuANjNwQ5luhs9aBBDTXlnZY42/p0BbGUzwNdV/96kzAiL7YcHLBEZv2/PsoQ5Rj+PpNfRrWP/l7g0Nn1OXciXJ+0XmL96hiyGTMrV4dbusUJaGDeZNJ4c/MSR/APrYBuDnVXeVkMM0FuvqlO38bsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=DMUuoxbG; arc=none smtp.client-ip=209.85.167.172
+	 In-Reply-To:Content-Type; b=UU6LavKHlXnTp1rDgV4xpicEFowLMrEX6G/ZGTo49D0eGSMvkAg9OjXEfOx8fSQezzjDFxhdpEDTDSCYHnSjbVs422EKu35y37sknmLUj7LIzEGqOREh4txLzKioX9TZiWumiZQgcxjmH1i6Obd3zEU7Oy9Xp1SU4T80xQupcTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ZYvLAvog; arc=none smtp.client-ip=209.85.167.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3f6818bec2dso618607b6e.3
-        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 12:21:59 -0800 (PST)
+Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-3f681654a31so370114b6e.1
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 12:22:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1741292518; x=1741897318; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1741292566; x=1741897366; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=0I6ZAzFQiKIMiN6FpQnZXDpm6LT/UC8GICDUZSyRC7A=;
-        b=DMUuoxbGdGk0Hi+1COixB4OQ9A7ibF4guSfPCTp7OiXCNokmg8IdZjb4w8uLlY6A+v
-         PBWQoAKxCtJJX+U1Dy/gQMU71/64iucwB9JMkLfohGmC+u2x5gzklW8fQvhX/YTgW8pi
-         xJcWukmH62di5wmLa2+PLmL4LQiKW2eIySoWQ=
+        bh=0fV4C6ZTzhDt2XWuqBlLp9/cnCQnehn6IMh+DJqT+0Y=;
+        b=ZYvLAvogb13GhgT2YyspWBvg+waX3hxFwCu2UWqfhmXmXi27CpvDQfpwyno4I5Vojn
+         fODERS6ZApEiAkp5k163bl7xIzVdxAoQqV17zBjjVAw0SPaa3HUfOT0npD2iwbCYI2ui
+         318FFX+IAXL9UZ9JA1VhQKP0L/WSrnofWwkaU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741292518; x=1741897318;
+        d=1e100.net; s=20230601; t=1741292566; x=1741897366;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0I6ZAzFQiKIMiN6FpQnZXDpm6LT/UC8GICDUZSyRC7A=;
-        b=XYZoClSCcRcgXU5DJL6erZ3PPYvTKF6cmInBI/1npfBpJgvIAXOKOdo1MuPGsPSApj
-         DTnC9Zt6io5qddeYqCt+5DJPkRF2OYt+y5Xva13L6BhOchy/qXwRIvFTM8fWluuBm7eK
-         rFOIFM+z4p02fECQoSnndb+ufRsQyR5DPQTCy8bJdhmljeMmeDy0/+pHtrulbashK129
-         iSWoCamEHLbs0f6d7HgdiX6klrV1J3N+eWAMEKyGVTK339uaJTUFGMqEZ5d+bjQZExuQ
-         SzWFhCQlq0R3SYQQXEEzvcDWoR3zdM6f70QfIgUKx/h6am85PRXPcr8hE3dKzNMiyhkN
-         vF1g==
-X-Forwarded-Encrypted: i=1; AJvYcCV/Exc0kcNLi/QuawdKJPD5O1zWA0aLkQC+e2XqnIZ5ROdyIHhFoQqlOD+KcfvwqtdoLbXsozo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3DTKP/UyFV/3JRztcD+lTNm2ZTkgyCaH9zB8OOQDH6Y9mgzDf
-	o+GzB3mTHLO1aaRFXyFPNegIzqzgkyN048wYLXiuRfwDL1GjmHbHFEKwmR5Uiw==
-X-Gm-Gg: ASbGncsaygsA0IQTkuG3ii0FXZW+OrdPH2R0N6tSqxP+ZRcnUwlQgH7rhGpYcnaV+Wx
-	zb+LnL7re/QcKp5SghLh42yud2/mkaMaCXgtRlvm5n3RvW+FY3EtOijNFPtBQ+zzuRzoiX1szMv
-	syNe5tQySb3HU/MJWmFzeswEB+6Fz2f2VSAF7kwsdpft0x09r76us2M6UD7YZgSNVx3UISK6Cne
-	0wjOrrgByG57PLMjifl22aYeRArC1YAnwJ6ZijT8fSrdZGZgzC3QjCkhCYbWXc3vD3WTAvYcvS2
-	TSbKPhPuQvEnNTP7NlhZoEO04EMAXl/04TVMa+eLtU4Xy9bM8TY8v7iPrr6+mO/XohH1mlW0Lo8
-	9jqPkhgni
-X-Google-Smtp-Source: AGHT+IFXR7B7N4mLArY9Ygzzid9PoIdr4iYXV4Nnl9a7SskgK9QfJbLBFdZMRIi0ZfULxmRmIdGzPQ==
-X-Received: by 2002:a05:6808:15aa:b0:3f3:e3ad:f5bc with SMTP id 5614622812f47-3f697b643camr582557b6e.9.1741292518676;
-        Thu, 06 Mar 2025 12:21:58 -0800 (PST)
+        bh=0fV4C6ZTzhDt2XWuqBlLp9/cnCQnehn6IMh+DJqT+0Y=;
+        b=PCLYxmjg9YEvXYeVLNlKsixHEKzxBxwMNMVBCjC+3oiRC6mVNLiTmffGQ8f1TB8d1a
+         Jd0TZUyk/UwcaQk9jrtiVdt2B3+ojx4y8/c1IB2OaGi2CRQ613zltMEPsTDluqHYnzzM
+         GeAQkni8kvLZnOCdWcFZvKU5L4BDxxJnLqyUdPcWoOWDwxqe8/fd2ARu0yVuJuGL87gg
+         ToWkPZRvTwYv633XSWL2+A+LbparU5yU5Dl7IQTvUSPEpL/kBQKDyMD5pxcI8qxEoA+P
+         aWAHWRR0o4CCO+Zl8saWAJm2OBAwq6vr3BmBw5APLnpxduONnq6tX1XOixQBgnsySYw2
+         TyHg==
+X-Forwarded-Encrypted: i=1; AJvYcCUBj/dovgtHbz/PoVoQX7HmAE9YvlmDuh8w1DlJW2ZcCWLQ46dW4kp6+zfr0EVE3xBwzXG6BpQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKNT+1gwf7oIqxyghBHUnHRKxsAriYPUjCwnlk2TzxRMOPyOWB
+	tWUHnSSi0xfyZPKWzeBvoO+zJ0keehsKjTlzlYTuV/qbYslbiUEttGUwGoMq3Q==
+X-Gm-Gg: ASbGncuXJ7aqKJR2KSdkC2QnFzVPeXlz0zsvPb8bostBC0dN7L/wkoL4IJm0a93Sa1G
+	AkFVOtpjuuxOtdK0/+jcPpEMUU3AKnuQRb3vPmdLO7Zr1tvHTxJR+WxtXLSfwjciamy6ZbO/ATw
+	9RV5SrMkCrOpgZxWSmuFqPHT30TtTd45tZPQEh5P2L/dbWB4nPvDmadhGzhjzN6CyOHxGiO3kfJ
+	AGePOEXtk/sAx0eK5iiheRerFxIwzqQRvfZWh0GDDGpg3SeBhp91PcppgaXfCvB6Xz+gnuqk9hG
+	sOX0UeILv2N0yct90XRwt5viciLsSFdMuFSBCUXvySp1dc8+HO0i9RilUtxskATBTys3yXtCTSS
+	XRcKAjqFO
+X-Google-Smtp-Source: AGHT+IEdLSMTM+U1dxEzVQjeAw8cYaR617NV4bb1dBf2bLmJ2qMuhMkOJTz+bmv/KTdq+0eV6JjHpg==
+X-Received: by 2002:a05:6808:1409:b0:3f4:7be:818c with SMTP id 5614622812f47-3f697bee1f9mr476916b6e.35.1741292565899;
+        Thu, 06 Mar 2025 12:22:45 -0800 (PST)
 Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-3f68efbcc4csm385309b6e.13.2025.03.06.12.21.53
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-3f68f044f24sm388851b6e.32.2025.03.06.12.22.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Mar 2025 12:21:56 -0800 (PST)
-Message-ID: <25b342f3-1a41-4c48-9f5e-6e00f3e3c425@broadcom.com>
-Date: Thu, 6 Mar 2025 12:21:52 -0800
+        Thu, 06 Mar 2025 12:22:44 -0800 (PST)
+Message-ID: <043c3b07-499d-4929-b8ef-fc4dfedb3f84@broadcom.com>
+Date: Thu, 6 Mar 2025 12:22:41 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,8 +80,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 10/14] net: bcmgenet: introduce
- bcmgenet_[r|t]dma_disable
+Subject: Re: [PATCH net-next 11/14] net: bcmgenet: support reclaiming unsent
+ Tx packets
 To: Doug Berger <opendmb@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
@@ -89,7 +89,7 @@ Cc: Broadcom internal kernel review list
  <bcm-kernel-feedback-list@broadcom.com>, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org
 References: <20250306192643.2383632-1-opendmb@gmail.com>
- <20250306192643.2383632-11-opendmb@gmail.com>
+ <20250306192643.2383632-12-opendmb@gmail.com>
 Content-Language: en-US
 From: Florian Fainelli <florian.fainelli@broadcom.com>
 Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
@@ -124,14 +124,14 @@ Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
  MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
  7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
  95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20250306192643.2383632-11-opendmb@gmail.com>
+In-Reply-To: <20250306192643.2383632-12-opendmb@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 3/6/25 11:26, Doug Berger wrote:
-> The bcmgenet_rdma_disable and bcmgenet_tdma_disable functions
-> are introduced to provide a common method for disabling each
-> dma and the code is simplified.
+> When disabling the transmitter any outstanding packets can now
+> be reclaimed by bcmgenet_tx_reclaim_all() rather than by the
+> bcmgenet_fini_dma() function.
 > 
 > Signed-off-by: Doug Berger <opendmb@gmail.com>
 
