@@ -1,251 +1,299 @@
-Return-Path: <netdev+bounces-172393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71A87A5474A
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 11:05:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A259A54744
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 11:04:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17CDC7A8937
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:02:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBFF23AE83A
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:04:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFB6B20A5F2;
-	Thu,  6 Mar 2025 10:02:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6785202F61;
+	Thu,  6 Mar 2025 10:02:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fuYz1YKl"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="NzqatPjf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 494B41F4289
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 10:02:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5302B202C22
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 10:02:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741255371; cv=none; b=k+vtN5gnokPNIjKhLGatxb62vXt0H9d3QnG7/p0/jFbM+3yM24jHTGOmmB0lPqt9WezZ9zhVNC29s+SGxSMZFCCShN88j+feBv7qdgQVYZgsFhMV0J+1V7xoRW0RU8A1GGyRsRCXhQAarko4WzWMMoveQYIvHuEZR6qjEIZchp4=
+	t=1741255378; cv=none; b=jHfWMH47UuEXxfHs7DsvSdrW2ljy5bVM8rlJYVHykv2X5RHxENdgs3snL9/yF9m4YZChuyF0lH8Jfo/VIp7OT9K8NvMAdBBMuiSVsEgYQPaLL0yEkQ+1KXzc39P2VVsMAnusqNqoV+shT5MG4Uipbfpcekmw90gR6SirrnxX+XM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741255371; c=relaxed/simple;
-	bh=HsRBxEOsATnne1eQ3OkNuWRbsRwyHHR86jhp69zJgzk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pNObR5/KhC9yiJXwwv+rg7ACUdQ1PkAiSYoQjDTKIsrV1YECTbhRigxcctQZ6S/p1CZ2jo5IoNlHuCjcwwXan0z3ZBkiJ7vBKP241pSHGam5saxLvSDb6LyGdCgbhxMKxyf5urmCY/DiolBs5CDtiMMtyhWmnBYJFcKA3k2viz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fuYz1YKl; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4750bc8d102so4160161cf.1
-        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 02:02:48 -0800 (PST)
+	s=arc-20240116; t=1741255378; c=relaxed/simple;
+	bh=a8PePnP6Da9TatKC4r183l014uL/MB4JIaip0KYl0eY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C6568ZZ0t0o5j7MVJv1QMkINieuAnltQgUV8fl5xVQw0udZIlIr26QMJ2/0IZBs0OQPmx+50Nh3rqQKQd0NHiP8LQvAhMoH2wBrZVctc9sJnSnycMb8UcnmO75oGq+h6GVy36nJDZaS1+fqTSrNSxDscM0ECMSI3igyqiqG1BM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=NzqatPjf; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5e0813bd105so678082a12.1
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 02:02:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741255368; x=1741860168; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/sPmaeX1x05bYpEnk3NGTrmxS0rSOx4NYk/DbTEnnrk=;
-        b=fuYz1YKl4HDOSeCh2HfvnuAu8tRf+TEZaC0fNJc87TJ+bLvQ6hc/wp/ZavMeJNHSmy
-         l+Ka+NbEoiLCCbroLT01wf/wV1iIDtBpdLhE0rfJSnczuxSn1/fbZMM1wNAbpLKqDWZO
-         iPwpvLoWktWiznhbJf82Uj7KTRIHIHFDxXMzh8+ry7+Ag8qjSzb1G8S1nGHz3we+Ucus
-         2euAkcxeVpcRIlyaVR53mygnTNJKN3/yvbQVg19iU82f7tZSX9ww2FqRw2jl8VrdNQOU
-         d+lGjS0Z0OeDDAOJd7pW80QI+hlMZYBOq/NUJn8mfKDqSOqsTXx4CFqSERYy64rZujsH
-         GAgQ==
+        d=openvpn.net; s=google; t=1741255374; x=1741860174; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=NjA/0x1ULbdGmJAhtVrbQ19bSfwG1MXXmI+NBV/yxT4=;
+        b=NzqatPjf/88cIsrrdK2V0c9AyyKpREboscok1bxm74kRAG2AuKOuQMBMGtg13ZVtOP
+         m+xKY7PMa3sOxUS+qHFYicBJQfeLVxm8xQ0fHxtfxytkL4sC0vO97uWe8VFYl2o5B/Al
+         DZspDKSISf+79caWhxfOu8nmN8X3uoBmPrqDm90VvWjwXfb5PVzpGJcNUqirhLiUyPdl
+         aDzblB1IBqbhgEKge4nM/+PQC+vibx3mKeP9t+Ek04BAgPMgd3M4bVZzoyDocvGrtgbq
+         ViBDTte4pJdOG2h6AwG3kWuDKZA6hT+GpiyV88uJydK+FuxLg1dJCj6NAv3qNZmrOG7D
+         xcHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741255368; x=1741860168;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/sPmaeX1x05bYpEnk3NGTrmxS0rSOx4NYk/DbTEnnrk=;
-        b=mL/kUSYkBTvcdnwuB18QKr+iVDyMOP5knPbFFagdq26tjde6sQtTKA/DMtTZG1x7dv
-         5afagYGD+8+El4HE3FJxB/n4FfbsLN6QLzKxR6JMmTafiLRbn8Jcm3ZA4gPS9W93wxvL
-         ubdi5DcFE9mkFoISYitFxbm4iRY3bA0MTVtr2W3pWyPPie6I2lqcduo6AVQdbGZsSmSk
-         l27BULkdFUf7EmjI2tR6tsGUrUoRjDvbLe86KCipChzWpddjIhXoT5zNi+k9XYKJy9dc
-         fA2pFvgdyKHgRiPlMWIBk1PTXk0WBEtAozzDp2y6ZFcXGLLXRs4DS+Z2yybXlfdxKufH
-         GbwA==
-X-Forwarded-Encrypted: i=1; AJvYcCXEj1sLmKdAHkHdAZXPhWofpY7anu0dI/GLpcZiuJta9uxp96OYsZC+SjbnNuHtEUTgcvS0TQE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzcOoirN1oIP0bsNeT9gkMlrCVjNkxSEGI1vJAfmlCs03pAS12U
-	jFPq1eP6GCech2yd8P3pUhOUHAah8wlfMLw7rbSyx0UNg4PEGKb2v3wbSqdJAVI5LHdE30NbvSK
-	z9GWgrE58tAFs4R7MdaTFxbw/ecbwcEUlczOU
-X-Gm-Gg: ASbGncsXdvl2IEUWl4oMjHHyi+K5dbyTSrvzZfVz1ykDCzSh3CkUzbqdX+1YiA3MCHH
-	Kpc9EflgWtrGjSQ3pX6Qw+v6pkcUxuy6lYNCaKkNYXRuvLYak4+CdzxXSS5kLys5fpb97NSloMK
-	Vdovvib79p4KBEQ2hDrZ0bNbKzioE=
-X-Google-Smtp-Source: AGHT+IHd1HIb0eXA4rKqblE465qJbAez2NG9Yf1BwvaxbW9nnIkEBNovq0uQEXai6+ONuiH5tyu+dBoz8/Y2zl/Vxxg=
-X-Received: by 2002:ac8:7d56:0:b0:475:aef:3f9b with SMTP id
- d75a77b69052e-4750b4e6a53mr96885501cf.47.1741255367764; Thu, 06 Mar 2025
- 02:02:47 -0800 (PST)
+        d=1e100.net; s=20230601; t=1741255374; x=1741860174;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NjA/0x1ULbdGmJAhtVrbQ19bSfwG1MXXmI+NBV/yxT4=;
+        b=JU6/g4owupl4zKM8i70i5LAZDBI1ls/IdH/8l0/wuONPiwd/ssKajllQr7BdL5W3+Q
+         WQYihn5GZnvQsT4e7nRfoiIRcmoBaFF/CWo1hR/nNyMgaQWb7OvkO4YS7d0YlcKPclf9
+         lUB6QlZKIoVZFBGq0l4xpyVXa2QcLoqmgjgE2j/5IT3IS0ntDuDdq5mwPvReHCyknNtg
+         1Pfn/fYID+eKNPuM+L1XUj97uzYPLKQIOdvXpoIescGhN8FfxAG3AevF2Nb5FXYF5lEm
+         H7YFSiSlHtuFHRukOza1j/5Yp3+dYZlxwYLH6OwkQAP83MfjJfIyMXeaWEIaq60WqKbQ
+         OUSg==
+X-Gm-Message-State: AOJu0Yz2KHM42o5YOdAi377sa1Dkwz6yGEBhhsWPU+PXVilHkfwfN6Tx
+	e3lU4Fc5Lrmko7DM75SnTO3kO1tFd8Sfudx32RtFR8SCb5r8ldcsrCxh2itP/X4=
+X-Gm-Gg: ASbGncsXFcg8t3oTNQ5S4+GZThmj1dUcWAi0/84sm0AjHMbGieSG3xeJCTi54o+KRVw
+	0h1kgfpw3JdT3Mna9C+/S2FzOfD3aWkNJE4NoZu4OX2R9uxS9K2gau1jxWDaffuAZSugaNt9/JK
+	h/g/trQBqdQzjijNLxkr5jYQAmqs7HEfpPnYLJ/QQd5pE7kBd5kHk+WUvF4nBBzteFI9Gv+e/Gc
+	jqI2v1a2UWcT+ESNcMIK6TQuJEDY042/xwiobDytDPN7XX6fA4E/lTNr36x6dpKFtNw22GY5Gzp
+	jRiGw/TOzRsE1Da6v1UbjUoThdIY+Uvs9DsMubj8yV3c+RbDUkwvWmr/44lwOPimfmlOHxc6PAk
+	LuTvM0UQ=
+X-Google-Smtp-Source: AGHT+IG/MX6Ctc3Sop+bjN6l6wOSX1XkN7zoXS/g0txiaNk9dp7eFWZRrKBRB2smH9x66Qm1lITf3Q==
+X-Received: by 2002:a05:6402:540c:b0:5de:5263:ae79 with SMTP id 4fb4d7f45d1cf-5e59f3d6532mr6189327a12.12.1741255373377;
+        Thu, 06 Mar 2025 02:02:53 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:b199:f7fb:728b:9279? ([2001:67c:2fbc:1:b199:f7fb:728b:9279])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e5c7669fd0sm678988a12.51.2025.03.06.02.02.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Mar 2025 02:02:52 -0800 (PST)
+Message-ID: <e3def5b5-3450-4ad0-aced-fd80af943c31@openvpn.net>
+Date: Thu, 6 Mar 2025 11:02:50 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250305-net-next-fix-tcp-win-clamp-v1-1-12afb705d34e@kernel.org>
- <CAL+tcoAqZmeV0-4rjH-EPmhBBaS=ZSwgcXhU8ZsBCr_aXS3Lqw@mail.gmail.com>
- <CANn89iLqgi5byZd+Si7jTdg7zrLNn13ejWAQjMRurvrQPeg3zg@mail.gmail.com> <281edb3a-4679-4c75-9192-a5f0ef6952ea@kernel.org>
-In-Reply-To: <281edb3a-4679-4c75-9192-a5f0ef6952ea@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 6 Mar 2025 11:02:36 +0100
-X-Gm-Features: AQ5f1JponQjKg0-oTqSrqiSL_Le-2bBFIMoznJ3kyCjReeZGsPCuhxXuES6US3o
-Message-ID: <CANn89iKVsDrL9YFx883wTfRSAe6tOR7x2U5zk=TcgHBMr+VtkQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: clamp window like before the cleanup
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Jason Xing <kerneljasonxing@gmail.com>, mptcp@lists.linux.dev, 
-	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v21 18/24] ovpn: add support for peer floating
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+References: <20250304-b4-ovpn-tmp-v21-0-d3cbb74bb581@openvpn.net>
+ <20250304-b4-ovpn-tmp-v21-18-d3cbb74bb581@openvpn.net> <Z8dIXjwZ3QmiEcd-@hog>
+ <9c919407-fb91-48d7-bf2d-8437c2f3f4da@openvpn.net> <Z8gzbz6YjdeGPqgu@hog>
+ <cd9df084-8633-49f0-a851-ed2b1c9946d3@openvpn.net> <Z8iCKvIfFaskshlz@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <Z8iCKvIfFaskshlz@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 6, 2025 at 10:55=E2=80=AFAM Matthieu Baerts <matttbe@kernel.org=
-> wrote:
->
-> Hi Eric,
->
-> On 06/03/2025 10:45, Eric Dumazet wrote:
-> > On Thu, Mar 6, 2025 at 6:22=E2=80=AFAM Jason Xing <kerneljasonxing@gmai=
-l.com> wrote:
-> >>
-> >> On Wed, Mar 5, 2025 at 10:49=E2=80=AFPM Matthieu Baerts (NGI0)
-> >> <matttbe@kernel.org> wrote:
-> >>>
-> >>> A recent cleanup changed the behaviour of tcp_set_window_clamp(). Thi=
-s
-> >>> looks unintentional, and affects MPTCP selftests, e.g. some tests
-> >>> re-establishing a connection after a disconnect are now unstable.
-> >>>
-> >>> Before the cleanup, this operation was done:
-> >>>
-> >>>   new_rcv_ssthresh =3D min(tp->rcv_wnd, new_window_clamp);
-> >>>   tp->rcv_ssthresh =3D max(new_rcv_ssthresh, tp->rcv_ssthresh);
-> >>>
-> >>> The cleanup used the 'clamp' macro which takes 3 arguments -- value,
-> >>> lowest, and highest -- and returns a value between the lowest and the
-> >>> highest allowable values. This then assumes ...
-> >>>
-> >>>   lowest (rcv_ssthresh) <=3D highest (rcv_wnd)
-> >>>
-> >>> ... which doesn't seem to be always the case here according to the MP=
-TCP
-> >>> selftests, even when running them without MPTCP, but only TCP.
-> >>>
-> >>> For example, when we have ...
-> >>>
-> >>>   rcv_wnd < rcv_ssthresh < new_rcv_ssthresh
-> >>>
-> >>> ... before the cleanup, the rcv_ssthresh was not changed, while after
-> >>> the cleanup, it is lowered down to rcv_wnd (highest).
-> >>>
-> >>> During a simple test with TCP, here are the values I observed:
-> >>>
-> >>>   new_window_clamp (val)  rcv_ssthresh (lo)  rcv_wnd (hi)
-> >>>       117760   (out)         65495         <  65536
-> >>>       128512   (out)         109595        >  80256  =3D> lo > hi
-> >>>       1184975  (out)         328987        <  329088
-> >>>
-> >>>       113664   (out)         65483         <  65536
-> >>>       117760   (out)         110968        <  110976
-> >>>       129024   (out)         116527        >  109696 =3D> lo > hi
-> >>>
-> >>> Here, we can see that it is not that rare to have rcv_ssthresh (lo)
-> >>> higher than rcv_wnd (hi), so having a different behaviour when the
-> >>> clamp() macro is used, even without MPTCP.
-> >>>
-> >>> Note: new_window_clamp is always out of range (rcv_ssthresh < rcv_wnd=
-)
-> >>> here, which seems to be generally the case in my tests with small
-> >>> connections.
-> >>>
-> >>> I then suggests reverting this part, not to change the behaviour.
-> >>>
-> >>> Fixes: 863a952eb79a ("tcp: tcp_set_window_clamp() cleanup")
-> >>> Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/551
-> >>> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> >>
-> >> Tested-by: Jason Xing <kerneljasonxing@gmail.com>
-> >>
-> >> Thanks for catching this. I should have done more tests :(
-> >>
-> >> Now I use netperf with TCP_CRR to test loopback and easily see the
-> >> case where tp->rcv_ssthresh is larger than tp->rcv_wnd, which means
-> >> tp->rcv_wnd is not the upper bound as you said.
-> >>
-> >> Thanks,
-> >> Jason
-> >>
-> >
-> > Patch looks fine to me but all our tests are passing with the current k=
-ernel,
-> > and I was not able to trigger the condition.
->
-> Thank you for having looked at this patch!
->
->
-> > Can you share what precise test you did ?
->
-> To be able to get a situation where "rcv_ssthresh > rcv_wnd", I simply
-> executed MPTCP Connect selftest. You can also force creating TCP only
-> connections with '-tt', e.g.
->
->   ./mptcp_connect.sh -tt
+On 05/03/2025 17:56, Sabrina Dubroca wrote:
+> 2025-03-05, 14:14:36 +0100, Antonio Quartulli wrote:
+>> On 05/03/2025 12:20, Sabrina Dubroca wrote:
+>>> 2025-03-05, 00:19:32 +0100, Antonio Quartulli wrote:
+>>>> On 04/03/2025 19:37, Sabrina Dubroca wrote:
+>>>>> 2025-03-04, 01:33:48 +0100, Antonio Quartulli wrote:
+>>>>>> A peer connected via UDP may change its IP address without reconnecting
+>>>>>> (float).
+>>>>>
+>>>>> Should that trigger a reset of the peer->dst_cache? And same when
+>>>>> userspace updates the remote address? Otherwise it seems we could be
+>>>>> stuck with a cached dst that cannot reach the peer.
+>>>>
+>>>> Yeah, that make sense, otherwise ovpn_udpX_output would just try over and
+>>>> over to re-use the cached source address (unless it becomes unavailable).
+>>>
+>>> Not just the source address, the routing entry too. I'm more concerned
+>>> about that: trying to reuse a a cached routing entry that was good for
+>>> the previous remote address, but not for the new one.
+>>>
+>>>
+>>> [adding your next email]
+>>>> I spent some more time thinking about this.
+>>>> It makes sense to reset the dst cache when the local address changes, but
+>>>> not in case of float (remote address changed).
+>>>>
+>>>> That's because we always want to first attempt sending packets using the
+>>>> address where the remote peer sent the traffic to.
+>>>> Should that not work (quite rare), then we have code in ovpn_udpX_output
+>>>> that will reset the cache and attempt a different address.
+>>>
+>>> I don't think the code in ovpn_udpX_output will reset the cache unless
+>>> it was made invalid by a system-wide routing table update (see
+>>> dst_cache_per_cpu_get).
+>>>
+>>> 	rt = dst_cache_get_ip4(cache, &fl.saddr);
+>>> 	if (rt)
+>>> 		goto transmit;
+>>> ...
+>>> transmit:
+>>> 	udp_tunnel_xmit_skb(rt, sk, skb, fl.saddr, fl.daddr, 0,
+>>> 			    ip4_dst_hoplimit(&rt->dst), 0, fl.fl4_sport,
+>>> 			    fl.fl4_dport, false, sk->sk_no_check_tx);
+>>>
+>>>
+>>> So it seems that as long as dst_cache_get_ip4 gets us a dst (which
+>>> AFAIU will happen, unless we did a dst_cache_reset or something else
+>>> made the cached dst invalid -- and ovpn's floating/endpoint update
+>>> doesn't do that), we'll just use it.
+>>
+>> Mh yeah, you're right.
+>> Then I'll reset the cache also when a float is detected.
+> 
+> Ok, thanks.
+> 
+>>>
+>>>
+>>>>>> +void ovpn_peer_endpoints_update(struct ovpn_peer *peer, struct sk_buff *skb)
+>>>>>> +{
+>>>>>> +	struct hlist_nulls_head *nhead;
+>>>>>> +	struct sockaddr_storage ss;
+>>>>>> +	const u8 *local_ip = NULL;
+>>>>>> +	struct sockaddr_in6 *sa6;
+>>>>>> +	struct sockaddr_in *sa;
+>>>>>> +	struct ovpn_bind *bind;
+>>>>>> +	size_t salen = 0;
+>>>>>> +
+>>>>>> +	spin_lock_bh(&peer->lock);
+>>>>>> +	bind = rcu_dereference_protected(peer->bind,
+>>>>>> +					 lockdep_is_held(&peer->lock));
+>>>>>> +	if (unlikely(!bind))
+>>>>>> +		goto unlock;
+>>>>>> +
+>>>>>> +	switch (skb->protocol) {
+>>>>>> +	case htons(ETH_P_IP):
+>>>>>> +		/* float check */
+>>>>>> +		if (unlikely(!ovpn_bind_skb_src_match(bind, skb))) {
+>>>>>> +			if (bind->remote.in4.sin_family == AF_INET)
+>>>>>> +				local_ip = (u8 *)&bind->local;
+>>>>>
+>>>>> If I'm reading this correctly, we always reuse the existing local
+>>>>> address when we have to re-create the bind, even if it doesn't match
+>>>>> the skb? The "local endpoint update" chunk below is doing that, but
+>>>>> only if we're keeping the same remote? It'll get updated the next time
+>>>>> we receive a packet and call ovpn_peer_endpoints_update.
+>>>>>
+>>>>> That might irritate the RPF check on the other side, if we still use
+>>>>> our "old" source to talk to the new dest?
+>>>>>
+>>>>>> +			sa = (struct sockaddr_in *)&ss;
+>>>>>> +			sa->sin_family = AF_INET;
+>>>>>> +			sa->sin_addr.s_addr = ip_hdr(skb)->saddr;
+>>>>>> +			sa->sin_port = udp_hdr(skb)->source;
+>>>>>> +			salen = sizeof(*sa);
+>>>>>> +			break;
+>>>>
+>>>> I think the issue is simply this 'break' above - by removing it, everything
+>>>> should work as expected.
+>>>
+>>> Only if the bind was of the correct family? Checking an IPv4 local
+>>> address (in the bind) against an IPv6 source address in the packet (or
+>>> the other way around) isn't going to work well.
+>>
+>> Ah I understand what you mean.
+>>
+>> The purpose of "local_ip" is to provide a working local endpoint to be used
+>> with the new remote address.
+>> However, if the float is switching family we can't re-use the same old local
+>> endpoint (hence the check).
+>> In this case we'll learn the "new" local address later.
+>>
+>> Does it make sense?
+> 
+> Sure, but we could have learned it immediately from the packet we just
+> got, whether we're changing family or not. No need to wait for the
+> next RX packet to also learn the new local address.
 
-I was asking Jason about TCP tests. He mentioned TCP_CRR
+Indeed.
 
-I made several of them, with temporary debug in the kernel that did
-not show the issue.
+> 
+> But if we now do a dst_cache_reset with the peer float,
+> ovpn_udp*_output will have to do a new route/local address lookup and
+> I guess that should clean up the local address stored in the bind, and
+> then update the dst_cache with the local address we just found.
 
+Right and this may not truly be what we want.
 
-I am wondering if this could hide an issue in MPTCP ?
+If peer X is sending packets to our IP1, we should at least try to reply 
+from the same address.
 
->
->
-> To be able to reproduce the issue with the selftests mentioned in [1], I
-> simply executed ./mptcp_connect.sh in a loop after having applied this
-> small patch to execute only a part of the subtests ("disconnect"):
->
-> > diff --git a/tools/testing/selftests/net/mptcp/mptcp_connect.sh b/tools=
-/testing/selftests/net/mptcp/mptcp_connect.sh
-> > index 5e3c56253274..d8ebea5abc6c 100755
-> > --- a/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-> > +++ b/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-> > @@ -855,6 +855,7 @@ make_file "$sin" "server"
-> >
-> >  mptcp_lib_subtests_last_ts_reset
-> >
-> > +if false; then
-> >  check_mptcp_disabled
-> >
-> >  stop_if_error "The kernel configuration is not valid for MPTCP"
-> > @@ -882,6 +883,7 @@ mptcp_lib_result_code "${ret}" "ping tests"
-> >
-> >  stop_if_error "Could not even run ping tests"
-> >  mptcp_lib_pr_ok
-> > +fi
-> >
-> >  [ -n "$tc_loss" ] && tc -net "$ns2" qdisc add dev ns2eth3 root netem l=
-oss random $tc_loss delay ${tc_delay}ms
-> >  tc_info=3D"loss of $tc_loss "
-> > @@ -910,6 +912,7 @@ mptcp_lib_pr_info "Using ${tc_info}on ns3eth4"
-> >
-> >  tc -net "$ns3" qdisc add dev ns3eth4 root netem delay ${reorder_delay}=
-ms $tc_reorder
-> >
-> > +if false; then
-> >  TEST_GROUP=3D"loopback v4"
-> >  run_tests_lo "$ns1" "$ns1" 10.0.1.1 1
-> >  stop_if_error "Could not even run loopback test"
-> > @@ -959,6 +962,7 @@ log_if_error "Tests with MPTFO have failed"
-> >  run_test_transparent 10.0.3.1 "tproxy ipv4"
-> >  run_test_transparent dead:beef:3::1 "tproxy ipv6"
-> >  log_if_error "Tests with tproxy have failed"
-> > +fi
-> >
-> >  run_tests_disconnect
-> >  log_if_error "Tests of the full disconnection have failed"
->
-> Note that our CI was able to easily reproduce it. Locally, it was taking
-> around 30 to 50 iterations to reproduce the issue.
->
-> [1] https://github.com/multipath-tcp/mptcp_net-next/issues/551
->
-> Cheers,
-> Matt
-> --
-> Sponsored by the NGI0 Core fund.
->
+If we have two IPs, IP1 and IP2, and both can be used to reach peer X, 
+we should always try to use the one where we received traffic from X in 
+the first place.
+
+OTOH hand it is also true that with floating detection on both sides, 
+the situation will converge quickly, but there might be a reason why X 
+chose IP1 as destination, therefore we should do our best to respect that.
+
+So, even in case of float, we should still store the local endpoint and 
+attempt fetching a route that takes that into consideration.
+Which I think is what is happening (assuming we reset the dst_cache on 
+float).
+
+ovpn_udpX_output() will:
+* get no rt from the cache
+* possibly confirm that saddr is ok
+* fetch the new rt using the provided saddr and daddr
+* update the cache.
+
+That makes sense to me.
+Would you agree?
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
+
 
