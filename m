@@ -1,177 +1,169 @@
-Return-Path: <netdev+bounces-172372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAFD1A546BC
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:44:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52238A546C2
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:46:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFC0F16865B
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:44:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E8957A2C40
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:45:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68B5120A5CF;
-	Thu,  6 Mar 2025 09:44:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE89820A5C1;
+	Thu,  6 Mar 2025 09:45:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I/uF1thv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IbsvuwCv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C58DF209F24
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 09:44:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CBD018DB3F
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 09:45:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741254258; cv=none; b=pIzD9L2kop9SItR4ZSCA1jJldMyQB2D72XQwWVQ7q405nN9ye373NlIqbXdF7tD2dEKHj7mpmcHOGOcnlLuq7Aa9lZiqOvkeJ2wXLJS8dbISQWtbfPEorldWxMfpW2sWgneX/yZaV+aEatJVn8OIdt58R77EoX7cLBw3ZaDdxR8=
+	t=1741254354; cv=none; b=BxlmtHKK0IMqVb09bFzFb+oGj/BidkRcK2RyqX/9z3iMTzEU4ZE3jo+/g15jbl96JNzn3p57wMN1vr2+iJlpESghRQE4sqvz0yk4h2CXL0aiBxJLZfV+uCDqvyMThRezFHGp5XNzQ0s0sVE/9LRd+o6+d+Vu/wKnfzoXqU1xZH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741254258; c=relaxed/simple;
-	bh=fvnfRUaIZlTDMzpxO7pjaeHR5Y14Zwabg67Nn6Y6wEM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hEBlW1uEPeRioF8vFJ5E3p0XjGWztgmzdVgI4wqLhokli4p/k+qdNEWlnzSELKe4eeuyUR6hTV67uQlk8G6YRs0k9RiEUmSReNEnCV4FsmlImg+XabmJ5Jvvq6hWOBiwL0w7nDiIUlmO/Ct4nrkd5IZ/Mot2ry2dsZQpDVefq14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I/uF1thv; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2ff6ae7667dso683540a91.0
-        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 01:44:16 -0800 (PST)
+	s=arc-20240116; t=1741254354; c=relaxed/simple;
+	bh=qjo4gtWl14tUvMyk93jmHZ18fnXzKIxhyABTH4qjF4U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VQChDQAIrK0HFjZVTGEDAaw42Zzfb4aKhx1uiEjEFzZUkQFcO1fhu6rGMnGP08P07agOVHpOnS9muRU+PV4m9u3zNuvBPDAVVEPrfQfQJKyCDwgw3YcKQnXwQq09fIUHTe0fOBSVvUnUNHieQEPqVh4AS+9rt+9crRoxcBYA+tE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IbsvuwCv; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7c08b14baa9so39432085a.3
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 01:45:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741254256; x=1741859056; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LoDVmzMkKNOHCOAEkEWbxwwYdyhsPDeYQQkLswcEOWg=;
-        b=I/uF1thvbwnv0mfRxw+VqIJ4vMOdfL+aJaOeFJ78b0GkfGhz9LJLzuA0wOSS/FwHiU
-         5ItjUpueSB97xabJzcsMEPpqOTV1Rq1Yl20UMbzkyNPFmhb8NPez3wv1I25F8fuMtHBy
-         dod59xJMurap8XQZ6vQiEV/G489ZTMFn+rWIewpigCkM8/hQ2OnImSa239WjgCBs/QVK
-         KiUZNiRS9Q4IUH+Qi3GMdKe3lL/fNFpFDEcCLY2QG9LVf1Byky9LX6VZdaCMP2aSbTiH
-         fWHDpAU7dIvAsErm/SfrhqAjL5nn2dm1Rb38EyFxulxY/2XN9i2QGIutrUrgMk3w3ZMk
-         MErw==
+        d=google.com; s=20230601; t=1741254351; x=1741859151; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gsHho8Y99QQpo0CdnWI7k6TmyzrDv14W4rRXNpqU1DE=;
+        b=IbsvuwCvTmYG2c3sTdld0KxkfMXo0SOuer/b72QIebAY5tw4xbIwHOsXX8Cxqi8wGk
+         MnCikdfHkruHrL/zqoGsBZYMPiLY0WimDT9cFh4Pm0GHuma9B6iXQdzLFnfdLfZeNlsn
+         He8B0dAs17uLo/HtJCos1v9fPmtNCLe6IwgrKbE0qL80lY0YDDEbcmn+d6qZOYN/g+bP
+         84rMlhSLJsBpP8V2DlxWFoAipDY8GdChq2kS5GtH2c0BlbJsKSCQ1MZoefSr+B2RpRMu
+         PL9Wx+mz0kFhSW8k3vCAVFWV7CkPOO8h8leeDFuYPvU/lVNP6p05uouLGL0vR3panKV1
+         Kcqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741254256; x=1741859056;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LoDVmzMkKNOHCOAEkEWbxwwYdyhsPDeYQQkLswcEOWg=;
-        b=MDCVvcbcocTiKJ2l81EKmFHi0z8+7UrYdN6tOzH1S58eQ6ViPsfIHXklvJM0VEDE/R
-         WVLv37sMYILxIScOZqoOFCWPV49tDKyrsS7RFeD5p+Rgk1uyOhNcSSlZzDBrEHjY5dTO
-         +2HyloxdzCUdYfH9toHnaJnE3Cj1axFnNdFBAL7Tosj8vWYpw716PI2gpy0afRruEqSC
-         Nii9ANpx3RDB2cbZVYLGYdnVaWiLEv8/trocsBYHNmhBpDJ+/qB23PHlr49lm1EcS42a
-         m/aNT6lfvHcByGqdz3jzSdaE9nGpYpIyg1vhYlSnnaj71rJlBZL7P01sZT8VJuXauPhq
-         B2ag==
-X-Forwarded-Encrypted: i=1; AJvYcCWhx4qp+PcE0gRmhF4S7Qq2xVhBaQrN6IeHgxFDNeuWuweLPMr+SpgiNEUbi27nuu70HKkT7bI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwoNeSCsWebEB06utRuSKodEZCWNEchA33mMt8cHRAHtxx7aofE
-	Qz+8nlTJ3R7WjLBjAU4XSigABzjJU2PS6+eOoDpK0Y1zDre3T/tR
-X-Gm-Gg: ASbGncuI+9soRDhSlKaY1AiooT3gucl0oll86p3nCeJWZt3yeQVkitjw6QMnxrLAe/h
-	++455VlWC1M3OVgBYkLLik5NN68eM4y5cNpe9MTQHbI3CRczw5x9c/6aOCxLui6IT7GXgfzjQr8
-	5MGmMYsKh7vR3O6tL+L+WToM097Zx1W2cO+zput9PcCkifQJztpfrRPWqsvp6ZPrPRmb5I4kTzj
-	XP0sTwLt3GPmzhqazU26XMeBcAN79KNqyCx64HitxpCmNu8TynieT1t5KiC6r2jqaKkkPs1JmCG
-	i9Sie5QN8Hk+jj8mqRpbjtkFH6AsFBLzA21DRG0GGs2qrGtt6mHLWEI=
-X-Google-Smtp-Source: AGHT+IFxv3BtYiIiQ66UvRlNbCoDHRKsWxF4/Se9O6aSCZjDKGGPdqrlNBu9pCNZi9NMXBU/kJkUBg==
-X-Received: by 2002:a05:6a20:244c:b0:1f3:3ab7:cf29 with SMTP id adf61e73a8af0-1f34944b65amr13097939637.3.1741254255944;
-        Thu, 06 Mar 2025 01:44:15 -0800 (PST)
-Received: from [147.47.189.163] ([147.47.189.163])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af281287d78sm802997a12.74.2025.03.06.01.44.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Mar 2025 01:44:15 -0800 (PST)
-Message-ID: <76a11baf-e3c1-4b83-bc53-73b74fe1b8e9@gmail.com>
-Date: Thu, 6 Mar 2025 18:44:11 +0900
+        d=1e100.net; s=20230601; t=1741254351; x=1741859151;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gsHho8Y99QQpo0CdnWI7k6TmyzrDv14W4rRXNpqU1DE=;
+        b=S9QHcQpaSyXZysuqMrGjD4cDgx7Zjc3YVY/Z/qquqNRSDOgFGWdO0Mu79qQyBWLpDJ
+         IPRFjvGR6rS9qwxWGZPedjRRZVh7QD/6VCSQqruQPoCMSU37WKXXeV9fkpYrVljcQblc
+         ksKeY7WddYJv7irbXG866aCHDojBP8uZsOF4/VfxGF3IavGwVDGTpDbDE5O8QckCH2xe
+         fF8RJvD1iOkkuMZ/CnbhR/eqXoEBhKEFt8VtoRuC+vAdp8hmrcNNMpwJL6DRYgva5xXB
+         QlFZOR60h/8LfC3u0WwsZlzlTvPbBdcA1pnwtBYoAM5TGuvPNTsPXXUb2FTH4At0cgep
+         G2tQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWXziM4ynUeUhbX5HMwgwFMw3pYIeV5ndBsMnhXcIO3iR7NEhwY39nrRx0ZqOVbc+QpFXo5Uqo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/2uxMtb5lIQ56Ouprg9c+dLHG2FwMpoFjSDwgTkbHbfD4YvdE
+	s35XXicYuQx1TcjDKVbBVJpHoh4F9yhNVuEfCq3yuNizNsMPCFwdGzRVXaKnFRH1dZNN53lf4qO
+	DsGVcjS3k/53MwvRZAGxeXoXwCxtgfkpldK6v
+X-Gm-Gg: ASbGncscD4E6B8KvglSPDqHuMRi1yohAnovGztk1jzsBCBsMCLPA5AsppLV4ozXdh0P
+	mGg1HedRcZbBgwImpUmaAKJpah5qMpyWredycBcGGle++mhAS/BTTMV1yb3RooTzb+c1kq8lffu
+	BsDOgtK/adH1k6/8YmsUWndJpHpHo=
+X-Google-Smtp-Source: AGHT+IE6EUehIhxTcDsLk5kTJDnbnvq9N+O903gXW3JiyNgA2aMjfH7hC/XgVWrM/4NxpLff1hnyKD7alGG7U4imr3s=
+X-Received: by 2002:ac8:5807:0:b0:472:1406:69ea with SMTP id
+ d75a77b69052e-4750b4484aemr103704431cf.19.1741254351049; Thu, 06 Mar 2025
+ 01:45:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] i40e: fix MMIO write access to an invalid page in
- i40e_clear_hw
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-References: <55acc5dc-8d5a-45bc-a59c-9304071e4579@gmail.com>
- <5cfd4c17-71a8-4bd8-972b-31fc0634f518@intel.com>
-Content-Language: en-US
-From: Kyungwook Boo <bookyungwook@gmail.com>
-In-Reply-To: <5cfd4c17-71a8-4bd8-972b-31fc0634f518@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250305-net-next-fix-tcp-win-clamp-v1-1-12afb705d34e@kernel.org> <CAL+tcoAqZmeV0-4rjH-EPmhBBaS=ZSwgcXhU8ZsBCr_aXS3Lqw@mail.gmail.com>
+In-Reply-To: <CAL+tcoAqZmeV0-4rjH-EPmhBBaS=ZSwgcXhU8ZsBCr_aXS3Lqw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 6 Mar 2025 10:45:40 +0100
+X-Gm-Features: AQ5f1Jpgmfpp_PSnvqSs1MH6kttfr7_Y21lbioBLWHOJed_oQfDKk154L2pM6C0
+Message-ID: <CANn89iLqgi5byZd+Si7jTdg7zrLNn13ejWAQjMRurvrQPeg3zg@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: clamp window like before the cleanup
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, mptcp@lists.linux.dev, 
+	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 25. 3. 6. 16:59, Przemek Kitszel wrote:
-> On 3/6/25 06:25, Kyungwook Boo wrote:
->> In i40e_clear_hw(), when the device sends a specific input(e.g., 0),
->> an integer underflow in the num_{pf,vf}_int variables can occur,
->> leading to MMIO write access to an invalid page.
->>
->> To fix this, we change the type of the unsigned integer variables
->> num_{pf,vf}_int to signed integers. Additionally, in the for-loop where the
->> integer underflow occurs, we also change the type of the loop variable i to
->> a signed integer.
->>
->> Signed-off-by: Kyungwook Boo <bookyungwook@gmail.com>
->> Signed-off-by: Loktionov, Aleksandr <aleksandr.loktionov@intel.com>
-> 
-> when Alex said "make sure I signed too" he meant:
-> "make sure the variable @i is signed too", not the Sign-off ;)
-> 
-> (please wait 24h for the next submission, and also put "iwl-next" after
-> the "PATCH" word)
-> 
->> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> 
-> I didn't signed that either
+On Thu, Mar 6, 2025 at 6:22=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.co=
+m> wrote:
+>
+> On Wed, Mar 5, 2025 at 10:49=E2=80=AFPM Matthieu Baerts (NGI0)
+> <matttbe@kernel.org> wrote:
+> >
+> > A recent cleanup changed the behaviour of tcp_set_window_clamp(). This
+> > looks unintentional, and affects MPTCP selftests, e.g. some tests
+> > re-establishing a connection after a disconnect are now unstable.
+> >
+> > Before the cleanup, this operation was done:
+> >
+> >   new_rcv_ssthresh =3D min(tp->rcv_wnd, new_window_clamp);
+> >   tp->rcv_ssthresh =3D max(new_rcv_ssthresh, tp->rcv_ssthresh);
+> >
+> > The cleanup used the 'clamp' macro which takes 3 arguments -- value,
+> > lowest, and highest -- and returns a value between the lowest and the
+> > highest allowable values. This then assumes ...
+> >
+> >   lowest (rcv_ssthresh) <=3D highest (rcv_wnd)
+> >
+> > ... which doesn't seem to be always the case here according to the MPTC=
+P
+> > selftests, even when running them without MPTCP, but only TCP.
+> >
+> > For example, when we have ...
+> >
+> >   rcv_wnd < rcv_ssthresh < new_rcv_ssthresh
+> >
+> > ... before the cleanup, the rcv_ssthresh was not changed, while after
+> > the cleanup, it is lowered down to rcv_wnd (highest).
+> >
+> > During a simple test with TCP, here are the values I observed:
+> >
+> >   new_window_clamp (val)  rcv_ssthresh (lo)  rcv_wnd (hi)
+> >       117760   (out)         65495         <  65536
+> >       128512   (out)         109595        >  80256  =3D> lo > hi
+> >       1184975  (out)         328987        <  329088
+> >
+> >       113664   (out)         65483         <  65536
+> >       117760   (out)         110968        <  110976
+> >       129024   (out)         116527        >  109696 =3D> lo > hi
+> >
+> > Here, we can see that it is not that rare to have rcv_ssthresh (lo)
+> > higher than rcv_wnd (hi), so having a different behaviour when the
+> > clamp() macro is used, even without MPTCP.
+> >
+> > Note: new_window_clamp is always out of range (rcv_ssthresh < rcv_wnd)
+> > here, which seems to be generally the case in my tests with small
+> > connections.
+> >
+> > I then suggests reverting this part, not to change the behaviour.
+> >
+> > Fixes: 863a952eb79a ("tcp: tcp_set_window_clamp() cleanup")
+> > Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/551
+> > Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+>
+> Tested-by: Jason Xing <kerneljasonxing@gmail.com>
+>
+> Thanks for catching this. I should have done more tests :(
+>
+> Now I use netperf with TCP_CRR to test loopback and easily see the
+> case where tp->rcv_ssthresh is larger than tp->rcv_wnd, which means
+> tp->rcv_wnd is not the upper bound as you said.
+>
+> Thanks,
+> Jason
+>
 
-Oh.. I totally misunderstood the comment.
-I apologize for mistakenly adding the sign.
+Patch looks fine to me but all our tests are passing with the current kerne=
+l,
+and I was not able to trigger the condition.
 
->> Link: https://lore.kernel.org/lkml/ffc91764-1142-4ba2-91b6-8c773f6f7095@gmail.com/T/
->> ---
->>   drivers/net/ethernet/intel/i40e/i40e_common.c | 10 +++++-----
->>   1 file changed, 5 insertions(+), 5 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/intel/i40e/i40e_common.c b/drivers/net/ethernet/intel/i40e/i40e_common.c
->> index 370b4bddee44..9a73cb94dc5e 100644
->> --- a/drivers/net/ethernet/intel/i40e/i40e_common.c
->> +++ b/drivers/net/ethernet/intel/i40e/i40e_common.c
->> @@ -817,8 +817,8 @@ int i40e_pf_reset(struct i40e_hw *hw)
->>   void i40e_clear_hw(struct i40e_hw *hw)
->>   {
->>       u32 num_queues, base_queue;
->> -    u32 num_pf_int;
->> -    u32 num_vf_int;
->> +    s32 num_pf_int;
->> +    s32 num_vf_int;
->>       u32 num_vfs;
->>       u32 i, j;
-> 
-> It's fine to move the declaration of @i into the for loop, but
-> you have to remove it here, otherwise it's shadowing, which we
-> avoid.
-> 
->>       u32 val;
->> @@ -848,18 +848,18 @@ void i40e_clear_hw(struct i40e_hw *hw)
->>       /* stop all the interrupts */
->>       wr32(hw, I40E_PFINT_ICR0_ENA, 0);
->>       val = 0x3 << I40E_PFINT_DYN_CTLN_ITR_INDX_SHIFT;
->> -    for (i = 0; i < num_pf_int - 2; i++)
->> +    for (s32 i = 0; i < num_pf_int - 2; i++)
->>           wr32(hw, I40E_PFINT_DYN_CTLN(i), val);
->>         /* Set the FIRSTQ_INDX field to 0x7FF in PFINT_LNKLSTx */
->>       val = eol << I40E_PFINT_LNKLST0_FIRSTQ_INDX_SHIFT;
->>       wr32(hw, I40E_PFINT_LNKLST0, val);
->> -    for (i = 0; i < num_pf_int - 2; i++)
->> +    for (s32 i = 0; i < num_pf_int - 2; i++)
->>           wr32(hw, I40E_PFINT_LNKLSTN(i), val);
->>       val = eol << I40E_VPINT_LNKLST0_FIRSTQ_INDX_SHIFT;
->>       for (i = 0; i < num_vfs; i++)
->>           wr32(hw, I40E_VPINT_LNKLST0(i), val);
->> -    for (i = 0; i < num_vf_int - 2; i++)
->> +    for (s32 i = 0; i < num_vf_int - 2; i++)
->>           wr32(hw, I40E_VPINT_LNKLSTN(i), val);
->>         /* warn the HW of the coming Tx disables */
-> 
+Can you share what precise test you did ?
 
-Thank you for reviewing the patch.
-I will correct the patch and resubmit it.
-
-Best,
-Kyungwook Boo
+Thanks !
 
