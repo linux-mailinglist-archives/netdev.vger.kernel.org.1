@@ -1,153 +1,206 @@
-Return-Path: <netdev+bounces-172303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32C57A541E9
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 06:07:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A144A54207
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 06:22:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 304C7168548
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 05:07:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AC083A72FA
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 05:22:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65EA519A28D;
-	Thu,  6 Mar 2025 05:07:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCF1E19CD1B;
+	Thu,  6 Mar 2025 05:22:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="PnZqaQi3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DZDlg71Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20B7E7E9;
-	Thu,  6 Mar 2025 05:07:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E9219C546;
+	Thu,  6 Mar 2025 05:22:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741237632; cv=none; b=EWE8AZZ5NrnX074Evqe/HM44UMVjn6JJ/cyugd5c6qOEIv/O36Nh/dmTTe4qmv0noE77jikIeB49dWTbl+rA8X8pVGTHUlauj4g1pk8QelHLLUkhKZV4IRzbKvu2htah749SjWU6tUp3OpRKJWSu8sZitJ2iQc3p7YR8Gzk/JaQ=
+	t=1741238555; cv=none; b=hyKW25SfsFv2+cofw4FyrSomgl2xcFWQM8OTZcXyzZ10pXG7gTt0zIyVUqQSPa2zZX1MqRanEwumghyOH+saN+X8/U+P0ilKsEXVvnB9BFR4ZWumOjhZYjkif1+5h/EatcdmnCJoEI4FjlJpNQ4b2nD29CQgVNFLQ9ygKcXiwUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741237632; c=relaxed/simple;
-	bh=/PPhRFzrpmFZp2JOVjBtoaRYAfck4wy1OA0abEzrkPM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XLp8pvq/4/NwMrXX/TzN7FcZe0PHRXFa3TebdBQnGDYkZIspcnSkqxagXTjZRAiycN/E5gJ9z5VGM4iJCvII+cSxOKJ9E8eCYYHIdyhxOBqsCer3JVDl8J8aYxY9PN1n8LgNfVah+5lt+hU4hid+Inrox4fJ5a2Qf3sOSPjoawU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=PnZqaQi3; arc=none smtp.client-ip=220.197.31.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:Subject:Message-ID:MIME-Version:
-	Content-Type; bh=/p/yIsR0VNJP/SLkOWHis+551OQIlaMtljBwiPLa3rc=;
-	b=PnZqaQi3qQzw/vDpzioNDuo4P+rfjiJdZfzZSsSwax/k+cup0oaomQzGcmBLIT
-	D6sRen8XTYPDJCp8Ovy7EaJLibvBWrAeSekJ0cb/ZrSg5RJPLR4sZp8zojiGiIA3
-	YrWvnGPux8Cpv9ZCegRYU3lCycgv1BbEICa9slzjzTMEc=
-Received: from osx (unknown [])
-	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wAnIKM8LclnR8xMQw--.53729S2;
-	Thu, 06 Mar 2025 13:06:05 +0800 (CST)
-Date: Thu, 6 Mar 2025 13:06:04 +0800
-From: Jiayuan Chen <mrpre@163.com>
-To: Cong Wang <xiyou.wangcong@gmail.com>, dongchenchen2@huawei.com
-Cc: Dong Chenchen <dongchenchen2@huawei.com>, edumazet@google.com, 
-	kuniyu@amazon.com, pabeni@redhat.com, willemb@google.com, john.fastabend@gmail.com, 
-	jakub@cloudflare.com, davem@davemloft.net, kuba@kernel.org, horms@kernel.org, 
-	daniel@iogearbox.net, netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	zhangchangzhong@huawei.com, weiyongjun1@huawei.com
-Subject: Re: [PATCH net] bpf, sockmap: Restore sk_prot ops when psock is
- removed from sockmap
-Message-ID: <3jmiqsl2betwyceyrwwuc5hb4amh2olbdgwfhijkmyk3avp42g@f3jdm7wz7pno>
-References: <20250305140234.2082644-1-dongchenchen2@huawei.com>
- <Z8iUG8aTF9Kww09z@pop-os.localdomain>
+	s=arc-20240116; t=1741238555; c=relaxed/simple;
+	bh=0z5yhqvQqhdwGnoq2F+YoE5Fl3fUyiC68CgC2ANTf2U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sG6Li1dFEAsNn8wKKwypCXyIstD3dCPky4k/L5hyOtE767JUDF79ZIoGfNbxIDb7oTGBohmA7ISdOCAuHG/5CIn/SSzvwJ06MWpjEsUQjIjijDZbjiUYBhI2AV14GWD3Lye/3FLlMxxxSYyK4ZHmONegiNuHuof2cDQSoI9qo+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DZDlg71Y; arc=none smtp.client-ip=209.85.166.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3d3e68939deso884115ab.1;
+        Wed, 05 Mar 2025 21:22:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741238553; x=1741843353; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZVTkF/tobSDNmB1ZjwvbLTru0Ubgqet17u+KkorpADw=;
+        b=DZDlg71YWpr+MqCtrThQtLcbX/VUH0zy8eSf8V0akVo1zT7ph6VywRApwjXckT7kry
+         CCDOd4SoWl5YT7DICJjhH9LUJlu8WCK+RCM1ZmxTbI50wahuVulguA3IckmvrEXS6TeZ
+         lPyvi8AoufvecNAbW49VWV3bPtff2B+plH2SsyasU3WMxWy6YWM8yebHZs2awABmqlhL
+         eOtIlFZcdpVLVvukWYXoc5sEjxcZVojma8SMslfj/mETB+sjdiRPM4IPimL/vVqSbQhc
+         kA0e79U0gAt3VKJzjNianpLacKhVX1DVSIlFAZlxTTLT5EdOwsPdMvhbpy/eTi8pWyjQ
+         /bEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741238553; x=1741843353;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZVTkF/tobSDNmB1ZjwvbLTru0Ubgqet17u+KkorpADw=;
+        b=KOLCClxyRpv2uc3/TlqaOGfFyLOoJQEIXgv4MMIqcfCF8Kxjy1Rct00ipOFXgGLKMO
+         DwbVk+cWq3EXzRJcXJb0M2gWVkPKxxKI03Z8+v6/DX9txWfGIbJOzoU5bwUMHHOG+VbM
+         HSrkJH4TK0gy2OmZwZm7GfrxY9oTT1ZtRi3HxuRKRM31Lio6Ayj1kcRclKTXzFAvK8MZ
+         /caye1w9NsMo6mOWXqKrVWoUzRyq57TgkAD1m3SshI2uV2OVXIthVwGhGO5/vcLGtorQ
+         TZj5r+1QqXf0EEdENCCd48OufX3jHP7Ii5KrUN5Xz4huAM63nWzaKEQYSQjFhDUrZo7r
+         WBIw==
+X-Forwarded-Encrypted: i=1; AJvYcCWx7c9ffyr6kQxaCWagyLZDcJEwbOf3kpX7c7tWNWR7uIWUaTDreyC8gQMWjoNANS/QnPs7O60vUGi3Rms=@vger.kernel.org, AJvYcCXwaB4gUJ4AVWrPbR2aVHBMcQx05MC9kr/YyQ63E24cjHW4ASHszg3zSA25oJEDxl7kPCONSj8d@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5kETpOTk9txftFUGKcK2dPB4JerpT5iw3hGtJo/Oziwg4Nv8L
+	Ro7neOcTWLKIfUhKyBBwAjdSPslclVb5Mif+LSotBSdrReEP+itgssIPfsA2FfDCnz05XRftR5d
+	OvVr5tLhfK5OFAIDFkVBkpfv2AtY=
+X-Gm-Gg: ASbGncurUIDWr2gvzTpH8dZESjO24SJekx7jNjV7QRlF9f0M5q2x7OHY4o8yhHmhSF8
+	12K7Ce7JJMvL6Jk+tcR1Ay4b2X9ExiSQLvicmkc9jnC6A0Tbu0YNXGyjfoTRdaOZZO7jN1hnM6Y
+	gaXhD/DznkLqD3aKBYoIj2VQE+
+X-Google-Smtp-Source: AGHT+IHCu3R0Gkmwvr/d9D10F4Fnp1D31Fns4gsp95Cvm16wLRe/2+tUmYP2EhB/RwGE6zwifzgmFMixL2an/0JA4H0=
+X-Received: by 2002:a05:6e02:221b:b0:3d4:27d4:f76 with SMTP id
+ e9e14a558f8ab-3d436adf50bmr25879205ab.7.1741238553323; Wed, 05 Mar 2025
+ 21:22:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z8iUG8aTF9Kww09z@pop-os.localdomain>
-X-CM-TRANSID:_____wAnIKM8LclnR8xMQw--.53729S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxGFW7Cry5AF15AFyxuryxAFb_yoW5WF4rpa
-	95Ka15A3WDJrW2vws3Jw4kXw18Kan3JF1YkF97Xry7Jw4xur1fWr47JayIvF1vyr93C348
-	X39rW3ykXay3ua7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UZ6pQUUUUU=
-X-CM-SenderInfo: xpus2vi6rwjhhfrp/xtbBDwwIp2fJIobgPwAAs5
+References: <20250305-net-next-fix-tcp-win-clamp-v1-1-12afb705d34e@kernel.org>
+In-Reply-To: <20250305-net-next-fix-tcp-win-clamp-v1-1-12afb705d34e@kernel.org>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 6 Mar 2025 13:21:56 +0800
+X-Gm-Features: AQ5f1JohJfb3wH0oihOcAk_5UlajfKw7zjaDJ6N5o0gNhKuh5XmYb8DNNJeXchw
+Message-ID: <CAL+tcoAqZmeV0-4rjH-EPmhBBaS=ZSwgcXhU8ZsBCr_aXS3Lqw@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: clamp window like before the cleanup
+To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, Eric Dumazet <edumazet@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 05, 2025 at 10:12:43AM +0800, Cong Wang wrote:
-> On Wed, Mar 05, 2025 at 10:02:34PM +0800, Dong Chenchen wrote:
-> > WARNING: CPU: 0 PID: 6558 at net/core/sock_map.c:1703 sock_map_close+0x3c4/0x480
-> > Modules linked in:
-> > CPU: 0 UID: 0 PID: 6558 Comm: syz-executor.14 Not tainted 6.14.0-rc5+ #238
-> > RIP: 0010:sock_map_close+0x3c4/0x480
-> > Call Trace:
-> >  <TASK>
-> >  inet_release+0x144/0x280
-> >  __sock_release+0xb8/0x270
-> >  sock_close+0x1e/0x30
-> >  __fput+0x3c6/0xb30
-> >  __fput_sync+0x7b/0x90
-> >  __x64_sys_close+0x90/0x120
-> >  do_syscall_64+0x5d/0x170
-> >  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> > 
-> > The root cause is:
-> > sock_hash_update_common
-> >   sock_map_unref
-> >     sock_map_del_link
-> >       psock->psock_update_sk_prot(sk, psock, false);
-> > 	//false won't restore proto
-> >     sk_psock_put
-> >        rcu_assign_sk_user_data(sk, NULL);
-> > inet_release
-> >   sk->sk_prot->close
-> >     sock_map_close
-> >       WARN(sk->sk_prot->close == sock_map_close)
-> > 
-> > When psock is removed from sockmap, sock_map_del_link() still set
-> > sk->sk_prot to bpf proto instead of restore it (for incorrect restore
-> > value). sock release will triger warning of sock_map_close() for
-> > recurse after psock drop.
-> 
-> But sk_psock_drop() restores it with sk_psock_restore_proto() after the
-> psock reference count goes to zero. So how could the above happen?
-> 
-> By the way, it would be perfect if you could add a test case for it 
-> together with this patch (a followup patch is fine too).
-> 
-> Thanks!
-I also have the same question as Cong, and I'll describe it in more detail
-here:
+On Wed, Mar 5, 2025 at 10:49=E2=80=AFPM Matthieu Baerts (NGI0)
+<matttbe@kernel.org> wrote:
+>
+> A recent cleanup changed the behaviour of tcp_set_window_clamp(). This
+> looks unintentional, and affects MPTCP selftests, e.g. some tests
+> re-establishing a connection after a disconnect are now unstable.
+>
+> Before the cleanup, this operation was done:
+>
+>   new_rcv_ssthresh =3D min(tp->rcv_wnd, new_window_clamp);
+>   tp->rcv_ssthresh =3D max(new_rcv_ssthresh, tp->rcv_ssthresh);
+>
+> The cleanup used the 'clamp' macro which takes 3 arguments -- value,
+> lowest, and highest -- and returns a value between the lowest and the
+> highest allowable values. This then assumes ...
+>
+>   lowest (rcv_ssthresh) <=3D highest (rcv_wnd)
+>
+> ... which doesn't seem to be always the case here according to the MPTCP
+> selftests, even when running them without MPTCP, but only TCP.
+>
+> For example, when we have ...
+>
+>   rcv_wnd < rcv_ssthresh < new_rcv_ssthresh
+>
+> ... before the cleanup, the rcv_ssthresh was not changed, while after
+> the cleanup, it is lowered down to rcv_wnd (highest).
+>
+> During a simple test with TCP, here are the values I observed:
+>
+>   new_window_clamp (val)  rcv_ssthresh (lo)  rcv_wnd (hi)
+>       117760   (out)         65495         <  65536
+>       128512   (out)         109595        >  80256  =3D> lo > hi
+>       1184975  (out)         328987        <  329088
+>
+>       113664   (out)         65483         <  65536
+>       117760   (out)         110968        <  110976
+>       129024   (out)         116527        >  109696 =3D> lo > hi
+>
+> Here, we can see that it is not that rare to have rcv_ssthresh (lo)
+> higher than rcv_wnd (hi), so having a different behaviour when the
+> clamp() macro is used, even without MPTCP.
+>
+> Note: new_window_clamp is always out of range (rcv_ssthresh < rcv_wnd)
+> here, which seems to be generally the case in my tests with small
+> connections.
+>
+> I then suggests reverting this part, not to change the behaviour.
+>
+> Fixes: 863a952eb79a ("tcp: tcp_set_window_clamp() cleanup")
+> Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/551
+> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
-'psock->saved_close' is always tcp_close (if your socket is TCP) and will
-not change regardless of whether restore is executed or not. So when
-entering the function sock_map_close() and encountering
-WARN_ON_ONCE(saved_close == sock_map_close), 'saved_close' can only come
-from 'saved_close = READ_ONCE(sk->sk_prot)->close'. This means we obtain 
-sock through psock = sk_psock(sk) and then enter the branch code after
-judging it to be null.
-'''
-sock_map_close()
-{
-	psock = sk_psock(sk);
-	if (likely(psock)) {
-		saved_close = psock->saved_close;
-	} else {
-		saved_close = READ_ONCE(sk->sk_prot)->close;
-	}
-	WARN_ON_ONCE(saved_close == sock_map_close);
-}
-'''
-However, before psock becomes null, we have actually successfully executed
-the restore:
-'''
-void sk_psock_drop(struct sock *sk, struct sk_psock *psock)
-{
-    write_lock_bh(&sk->sk_callback_lock);
-    sk_psock_restore_proto(sk, psock); // restore correctly
-    rcu_assign_sk_user_data(sk, NULL); // set psock null
-   ...
-}
-'''
+Tested-by: Jason Xing <kerneljasonxing@gmail.com>
 
-Passing false to psock_update_sk_prot may be problematic, but it shouldn't
-cause the issue described in the commit message.
-It may be necessary to provide more information on how sockmap is used to
-determine the issue. :)
+Thanks for catching this. I should have done more tests :(
 
-Thanks.
+Now I use netperf with TCP_CRR to test loopback and easily see the
+case where tp->rcv_ssthresh is larger than tp->rcv_wnd, which means
+tp->rcv_wnd is not the upper bound as you said.
 
+Thanks,
+Jason
+
+> ---
+> Notes: the 'Fixes' commit is only in net-next
+> ---
+>  net/ipv4/tcp.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index eb5a60c7a9ccdd23fb78a74d614c18c4f7e281c9..46951e74930844af952dfbc57=
+a107b504d4e296b 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -3693,7 +3693,7 @@ EXPORT_SYMBOL(tcp_sock_set_keepcnt);
+>
+>  int tcp_set_window_clamp(struct sock *sk, int val)
+>  {
+> -       u32 old_window_clamp, new_window_clamp;
+> +       u32 old_window_clamp, new_window_clamp, new_rcv_ssthresh;
+>         struct tcp_sock *tp =3D tcp_sk(sk);
+>
+>         if (!val) {
+> @@ -3714,12 +3714,12 @@ int tcp_set_window_clamp(struct sock *sk, int val=
+)
+>         /* Need to apply the reserved mem provisioning only
+>          * when shrinking the window clamp.
+>          */
+> -       if (new_window_clamp < old_window_clamp)
+> +       if (new_window_clamp < old_window_clamp) {
+>                 __tcp_adjust_rcv_ssthresh(sk, new_window_clamp);
+> -       else
+> -               tp->rcv_ssthresh =3D clamp(new_window_clamp,
+> -                                        tp->rcv_ssthresh,
+> -                                        tp->rcv_wnd);
+> +       } else {
+> +               new_rcv_ssthresh =3D min(tp->rcv_wnd, new_window_clamp);
+> +               tp->rcv_ssthresh =3D max(new_rcv_ssthresh, tp->rcv_ssthre=
+sh);
+> +       }
+>         return 0;
+>  }
+>
+>
+> ---
+> base-commit: c62e6f056ea308d6382450c1cb32e41727375885
+> change-id: 20250305-net-next-fix-tcp-win-clamp-9f4c417ff44d
+>
+> Best regards,
+> --
+> Matthieu Baerts (NGI0) <matttbe@kernel.org>
+>
 
