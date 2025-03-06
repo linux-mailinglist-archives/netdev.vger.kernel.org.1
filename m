@@ -1,309 +1,230 @@
-Return-Path: <netdev+bounces-172337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7939DA54423
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:04:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 61F1FA54426
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:05:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B78613AE90D
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 08:04:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E2DB3ACE0C
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 08:05:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EC651FBC9F;
-	Thu,  6 Mar 2025 08:04:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88D551DDA14;
+	Thu,  6 Mar 2025 08:05:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gz+G6t6g"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="S6H9aLsO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com [209.85.222.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF93B1F8BD6
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 08:04:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B7691DC9B1
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 08:05:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741248254; cv=none; b=Qd1Lwpic1e1z/hqAHrHZ8a6YYUuZiejQRuQRVd/AH/2aHjq6dm1hCb9ioT+iXC5P/FJ8sPFWy+boI2DDjO7lFHYUbsLkJt5i3YGzRs40gDB0Ha+YbGyRH8K4B1xndd5VG8FV/E5RUZcjNNDQ3xUCvcQPaL8EmK3iL1+I6dreO6Q=
+	t=1741248351; cv=none; b=fzwUDrfSRFvVXi8J1k/99hXBn7Z0g3MzazW92baAK8Lurst/32hLckvtJ/9D3aEvQeCxRJ5tkZe5qXWFDElM4Fp8EfRwkCoMbc2lGsmo0VAMchApUminQZIsujH6WCeQ1YIIiORzE1vqMxBIP8GFMH/VY9ylKEAOdde+75WyUrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741248254; c=relaxed/simple;
-	bh=m2xqvtA8wuVTjbbihdbE7B3lD7dPnEgCpk/FmPcG7KE=;
+	s=arc-20240116; t=1741248351; c=relaxed/simple;
+	bh=lNZDgZULrgRLQ1Q9KJqW4LlVA8M+cqG0zmapVrEq4BM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qqHR7pahPwSUk4HKLBcXFvuSrgWWUl6xZVzWe+lh6M+srZmzHzMkhCwDJUr/sbVa1bJj3APaodQRX8fDuGQw4Lay5gGnd9moPrOzdxyMXE+4jYuediZqYDi/C/ETSVlXM46PU6pdaK4gM+Kafy02M/GbNHrIZ3a47wzpbd4ZzS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gz+G6t6g; arc=none smtp.client-ip=209.85.166.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3ce868498d3so1205565ab.3
-        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 00:04:12 -0800 (PST)
+	 To:Cc:Content-Type; b=HE6uqZBmxN3/I6bu8wekdo7aDIgS5JoFOaTTfzgx3XQksvaBE4w4d1SuzgnPXDEwhWCb+3NNseT6KT0lpPZuTUNsb23uXmXSC7Cq2zdhJo8L6/lP5azL9v8LsXZpLfsyNl1QAp2XlbPreK9wB7SyBAu12KAsyZru26ZeO1YmuNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=S6H9aLsO; arc=none smtp.client-ip=209.85.222.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-866de72bb82so133720241.1
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 00:05:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741248252; x=1741853052; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yBM15w5m4MRbYG9kBYKoEqOtfhQE0UDg6LnRhSweRC0=;
-        b=Gz+G6t6g5nK8i0zlhxNZ80MCm/U5quXDBKtVk1G9AfRlZe8V+bZsX2Mb6GJsUIJBFF
-         UUhYAgwE2VXxzyDe6urGEBNEw8u9Ygs9FvjMOQWIYYAgT9KYdW7RjVjNzNZd2lspEILR
-         ArhTcbl6uIZkU4R9iGovQl9wUS84p1fk4G4aN0gyfaXrQskzyOiOmauxUkOZpJ/ICq16
-         r0fmU4y1iYgHcaw5mFwwE//sY9dfede+vMHhc/BpCllG40Ar1MUduxt8REHIqLoBKaEl
-         nqlUrKE3OkJTulWLJDUtWPgw48cZlZrF1QBY0iAODoeDDdaumOPRbMAKDb4JV4BWmcr5
-         h/EQ==
+        d=broadcom.com; s=google; t=1741248348; x=1741853148; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Kwd9LxC2aj64bh3D8PK8320uHvsJOsyuN8dKKFoqWpU=;
+        b=S6H9aLsOagCLWWpQMBzkQ5iwTiPeR+wDDzhIJ3rIFkkzSAkmjWjq8yqGKF1Tnc0AjS
+         cdjic4K//wAMnN7annEWIuAJYogbh4uifKtbKofhZ0Zkgl6RsoW0EmVcKDR9a6r+nZEz
+         0VwAFOFli/sb+7SIckZcMYoZ7bSnLmN34mol0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741248252; x=1741853052;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yBM15w5m4MRbYG9kBYKoEqOtfhQE0UDg6LnRhSweRC0=;
-        b=UkH5DSonKViGuOu2hTpc5yhivuswZXesEAHSsbfYcYVhh88ST9LVa1u5qooY3V0a2i
-         If4b89HVWnli71fNGusdt5RfA8ZqyUksGe2mvPysNsbwbWuqr+GHFa3+ydURaD2yq6Ap
-         0qnKcG8L7l69JTEp0bkYmxTyucAujtBTghCItMPao8tuiXDhPOkiXUsf9k2+jZ4GVnT+
-         HiWGScDS4iV1q0q8I1s3HHHWK3HPfdyJ7v0jx7Y/AQREf2vjnfpCJ7h87QxtRNcU9ots
-         dy7zQ7uUsyYftpWLur9tvOLE6K0pRai3W7q0uYQ2jfuh5sdpALIlz5tYcujbVBkrcdSG
-         dZhA==
-X-Forwarded-Encrypted: i=1; AJvYcCW5VzHpe/BJ5H6E7W3SsfqWpkncA8NyzB9rdI5XSBmjBXO+ylTrQEDeNz75zPeWePmCmSMpAYk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgnvWuYBzyEBPvZV/ecGTZprgnKxlJe6J5PixfmXlWLwnyrI0z
-	trwpWt4ymtbmRpaQpeCXsyLbkULcek1Qkhzj4PDjpX58L0qOsHgQ6Iad2dXL9Fhuo/5BSbnwAkx
-	/1mn9XtOwvoZugTWa4VyehDVl0gA=
-X-Gm-Gg: ASbGncsz9Dd4rmOpR8lvWAPwvnx35qtFjQP1KTl0JIC2/GacXIb51yW+ODPHm6a4U8A
-	sPjbzjUvyxgBbaOyBiNFj2xLboWdebHyCBAuX27QafWOtFa6IP8X+RpMBIke6YgYhRYT1ggT38d
-	Ha/yQkD0CYmqmJoArZao8eZdQwMQ==
-X-Google-Smtp-Source: AGHT+IEGhihG+wrM11wGwAgX+z7XTCGMteAItphOUcclK0J1+fHb/GhgqUisELsn6GIKvBdcvnPbtl32Yc+PmnmkI3g=
-X-Received: by 2002:a05:6e02:18ca:b0:3d3:e11a:39d with SMTP id
- e9e14a558f8ab-3d42b8d397amr55808315ab.13.1741248251615; Thu, 06 Mar 2025
- 00:04:11 -0800 (PST)
+        d=1e100.net; s=20230601; t=1741248348; x=1741853148;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Kwd9LxC2aj64bh3D8PK8320uHvsJOsyuN8dKKFoqWpU=;
+        b=Lub55HaXsHl34eYSM8nDq+qDHvwaM27GsUCC/reTipFboVt6fu9a5T5nZhuV7G+mZ/
+         y6Td/X/WLRCT995OVxlnNmxFXNQU02ukgLGZnJMo+uydwsNGqr+bXBFHNzWvttC1thG3
+         2JmLFG9HUfrA1056AG9vU2ouFgEexPi/+35+3SbfLhndXKjPp+GqVKHLRbb8/Pir3CO/
+         KuofF5CDdgEahAJSvsQktPJ/Hw06ET5eDrdmxHSrTeGtQY0VPO/MbFs3LqQsK0Ny4DKi
+         rOXNW4bv1nkbK6IZBYIb9Je3BfSNIHTHlh+diPIZZG/F56gzK7ZUqldLT7EH6ztYkncE
+         Aojw==
+X-Forwarded-Encrypted: i=1; AJvYcCUD+eV6A91Svgs5ynHVPYppG3AQ70KQOUWO05c+KF6T4qsHL9y+/sXDqdO6VD4wX7T1gulos9A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxO7MNR4AWmeq3AK+Gzjc8HO7NlcFGAmTbVd+ULquxbfHNykgjP
+	e0SOglC/afuEuHToydohaXTotKBWXtOhKrHPu/6+X5X2DGMRyk1X6FpuZ1vkVCv0inQf3wgy7/2
+	N7CpAqosXCIR3z4gJKzuCb1lFEpj9zV6raz2Q
+X-Gm-Gg: ASbGncusloLxNoxPJFOAgf/+Oy120g84t4dd8T+UwHdkin5HZ0t0GTkhRCsvgi4DWfa
+	KYxK345/3GmrfLk2p9x3ahOGdqamZ0HLcDJuRDCeIPO83A3F7z8IfGt7MbPsHXM6GO3Jh4cqwOm
+	mEsF4LEtsesf8Vbipja3qiJQ/ley4=
+X-Google-Smtp-Source: AGHT+IFgvy2y31AWFchFIc697gBXoh7MFAeZNWqg2+aRw4qkid04h8SsEOktJvxo8A38YPWS7fZos6pV15yhZf2Csic=
+X-Received: by 2002:a05:6102:5492:b0:4c1:8c9e:6507 with SMTP id
+ ada2fe7eead31-4c2e281555amr3590861137.15.1741248347774; Thu, 06 Mar 2025
+ 00:05:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAL+tcoDFSSdMXGyUeR+3nqdyVpjsky7y4ZaCB-n1coR_x_Vhfw@mail.gmail.com>
- <20250306062218.85962-1-kuniyu@amazon.com> <CAL+tcoAEPkyyvzULua_MUNQb=up_8Qqg+w3Oq6B9C1JS9gvdrQ@mail.gmail.com>
- <CANn89iL_sT7a+49HNDLjsP5qnREPKpx6yEu8USMZPxW1vP+skg@mail.gmail.com>
-In-Reply-To: <CANn89iL_sT7a+49HNDLjsP5qnREPKpx6yEu8USMZPxW1vP+skg@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 6 Mar 2025 16:03:35 +0800
-X-Gm-Features: AQ5f1JqDjmmbflvPe26W39MOFhZ9WmPV4bU3bhkFbSX8y77T6GNNdDbYEqGXWPc
-Message-ID: <CAL+tcoBpUxfMo6Assb6gU9JaJctS4Gt7G889GNmJsRFQeaxHJA@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: bring back NUMA dispersion in inet_ehash_locks_alloc()
-To: Eric Dumazet <edumazet@google.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, davem@davemloft.net, eric.dumazet@gmail.com, 
-	horms@kernel.org, kernelxing@tencent.com, kuba@kernel.org, 
-	ncardwell@google.com, netdev@vger.kernel.org, pabeni@redhat.com
+References: <20250306072422.3303386-1-ap420073@gmail.com> <20250306072422.3303386-4-ap420073@gmail.com>
+In-Reply-To: <20250306072422.3303386-4-ap420073@gmail.com>
+From: Somnath Kotur <somnath.kotur@broadcom.com>
+Date: Thu, 6 Mar 2025 13:35:35 +0530
+X-Gm-Features: AQ5f1Jp2ACsUpN8odBMOJ9ZrNvrhjD8QMfYXSOuonjDGPGdO9e1BHh8sIl23VrU
+Message-ID: <CAOBf=msu_ysgsMPN0n6NQ6wzitFqX9kHqatcJAXtqFeQEgY0PQ@mail.gmail.com>
+Subject: Re: [PATCH v2 net 3/6] eth: bnxt: do not use BNXT_VNIC_NTUPLE
+ unconditionally in queue restart logic
+To: Taehee Yoo <ap420073@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, andrew+netdev@lunn.ch, michael.chan@broadcom.com, 
+	pavan.chebbi@broadcom.com, horms@kernel.org, shuah@kernel.org, 
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	almasrymina@google.com, asml.silence@gmail.com, willemb@google.com, 
+	kaiyuanz@google.com, skhawaja@google.com, sdf@fomichev.me, gospo@broadcom.com, 
+	dw@davidwei.uk
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000041dc2c062fa7f967"
+
+--00000000000041dc2c062fa7f967
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 6, 2025 at 3:26=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
+On Thu, Mar 6, 2025 at 12:54=E2=80=AFPM Taehee Yoo <ap420073@gmail.com> wro=
+te:
 >
-> On Thu, Mar 6, 2025 at 7:35=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
-> >
-> > On Thu, Mar 6, 2025 at 2:22=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon=
-.com> wrote:
-> > >
-> > > From: Jason Xing <kerneljasonxing@gmail.com>
-> > > Date: Thu, 6 Mar 2025 12:59:03 +0800
-> > > > On Thu, Mar 6, 2025 at 12:12=E2=80=AFPM Kuniyuki Iwashima <kuniyu@a=
-mazon.com> wrote:
-> > > > >
-> > > > > From: Jason Xing <kerneljasonxing@gmail.com>
-> > > > > Date: Thu, 6 Mar 2025 11:35:27 +0800
-> > > > > > On Wed, Mar 5, 2025 at 9:06=E2=80=AFPM Eric Dumazet <edumazet@g=
-oogle.com> wrote:
-> > > > > > >
-> > > > > > > We have platforms with 6 NUMA nodes and 480 cpus.
-> > > > > > >
-> > > > > > > inet_ehash_locks_alloc() currently allocates a single 64KB pa=
-ge
-> > > > > > > to hold all ehash spinlocks. This adds more pressure on a sin=
-gle node.
-> > > > > > >
-> > > > > > > Change inet_ehash_locks_alloc() to use vmalloc() to spread
-> > > > > > > the spinlocks on all online nodes, driven by NUMA policies.
-> > > > > > >
-> > > > > > > At boot time, NUMA policy is interleave=3Dall, meaning that
-> > > > > > > tcp_hashinfo.ehash_locks gets hash dispersion on all nodes.
-> > > > > > >
-> > > > > > > Tested:
-> > > > > > >
-> > > > > > > lack5:~# grep inet_ehash_locks_alloc /proc/vmallocinfo
-> > > > > > > 0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_lock=
-s_alloc+0x90/0x100 pages=3D16 vmalloc N0=3D2 N1=3D3 N2=3D3 N3=3D3 N4=3D3 N5=
-=3D2
-> > > > > > >
-> > > > > > > lack5:~# echo 8192 >/proc/sys/net/ipv4/tcp_child_ehash_entrie=
-s
-> > > > > > > lack5:~# numactl --interleave=3Dall unshare -n bash -c "grep =
-inet_ehash_locks_alloc /proc/vmallocinfo"
-> > > > > > > 0x000000004e99d30c-0x00000000763f3279   36864 inet_ehash_lock=
-s_alloc+0x90/0x100 pages=3D8 vmalloc N0=3D1 N1=3D2 N2=3D2 N3=3D1 N4=3D1 N5=
-=3D1
-> > > > > > > 0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_lock=
-s_alloc+0x90/0x100 pages=3D16 vmalloc N0=3D2 N1=3D3 N2=3D3 N3=3D3 N4=3D3 N5=
-=3D2
-> > > > > > >
-> > > > > > > lack5:~# numactl --interleave=3D0,5 unshare -n bash -c "grep =
-inet_ehash_locks_alloc /proc/vmallocinfo"
-> > > > > > > 0x00000000fd73a33e-0x0000000004b9a177   36864 inet_ehash_lock=
-s_alloc+0x90/0x100 pages=3D8 vmalloc N0=3D4 N5=3D4
-> > > > > > > 0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_lock=
-s_alloc+0x90/0x100 pages=3D16 vmalloc N0=3D2 N1=3D3 N2=3D3 N3=3D3 N4=3D3 N5=
-=3D2
-> > > > > > >
-> > > > > > > lack5:~# echo 1024 >/proc/sys/net/ipv4/tcp_child_ehash_entrie=
-s
-> > > > > > > lack5:~# numactl --interleave=3Dall unshare -n bash -c "grep =
-inet_ehash_locks_alloc /proc/vmallocinfo"
-> > > > > > > 0x00000000db07d7a2-0x00000000ad697d29    8192 inet_ehash_lock=
-s_alloc+0x90/0x100 pages=3D1 vmalloc N2=3D1
-> > > > > > > 0x00000000d9aec4d1-0x00000000a828b652   69632 inet_ehash_lock=
-s_alloc+0x90/0x100 pages=3D16 vmalloc N0=3D2 N1=3D3 N2=3D3 N3=3D3 N4=3D3 N5=
-=3D2
-> > > > > > >
-> > > > > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > > > > >
-> > > > > > Tested-by: Jason Xing <kerneljasonxing@gmail.com>
-> > > > >
-> > > > > Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > > > >
-> > > > >
-> > > > > >
-> > > > > > > ---
-> > > > > > >  net/ipv4/inet_hashtables.c | 37 ++++++++++++++++++++++++++--=
----------
-> > > > > > >  1 file changed, 26 insertions(+), 11 deletions(-)
-> > > > > > >
-> > > > > > > diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hasht=
-ables.c
-> > > > > > > index 9bfcfd016e18275fb50fea8d77adc8a64fb12494..2b4a588247639=
-e0c7b2e70d1fc9b3b9b60256ef7 100644
-> > > > > > > --- a/net/ipv4/inet_hashtables.c
-> > > > > > > +++ b/net/ipv4/inet_hashtables.c
-> > > > > > > @@ -1230,22 +1230,37 @@ int inet_ehash_locks_alloc(struct ine=
-t_hashinfo *hashinfo)
-> > > > > > >  {
-> > > > > > >         unsigned int locksz =3D sizeof(spinlock_t);
-> > > > > > >         unsigned int i, nblocks =3D 1;
-> > > > > > > +       spinlock_t *ptr =3D NULL;
-> > > > > > >
-> > > > > > > -       if (locksz !=3D 0) {
-> > > > > > > -               /* allocate 2 cache lines or at least one spi=
-nlock per cpu */
-> > > > > > > -               nblocks =3D max(2U * L1_CACHE_BYTES / locksz,=
- 1U);
-> > > > > > > -               nblocks =3D roundup_pow_of_two(nblocks * num_=
-possible_cpus());
-> > > > > > > +       if (locksz =3D=3D 0)
-> > > > > > > +               goto set_mask;
-> > > > > > >
-> > > > > > > -               /* no more locks than number of hash buckets =
-*/
-> > > > > > > -               nblocks =3D min(nblocks, hashinfo->ehash_mask=
- + 1);
-> > > > > > > +       /* Allocate 2 cache lines or at least one spinlock pe=
-r cpu. */
-> > > > > > > +       nblocks =3D max(2U * L1_CACHE_BYTES / locksz, 1U) * n=
-um_possible_cpus();
-> > > > > > >
-> > > > > > > -               hashinfo->ehash_locks =3D kvmalloc_array(nblo=
-cks, locksz, GFP_KERNEL);
-> > > > > > > -               if (!hashinfo->ehash_locks)
-> > > > > > > -                       return -ENOMEM;
-> > > > > > > +       /* At least one page per NUMA node. */
-> > > > > > > +       nblocks =3D max(nblocks, num_online_nodes() * PAGE_SI=
-ZE / locksz);
-> > > > > > > +
-> > > > > > > +       nblocks =3D roundup_pow_of_two(nblocks);
-> > > > > > > +
-> > > > > > > +       /* No more locks than number of hash buckets. */
-> > > > > > > +       nblocks =3D min(nblocks, hashinfo->ehash_mask + 1);
-> > > > > > >
-> > > > > > > -               for (i =3D 0; i < nblocks; i++)
-> > > > > > > -                       spin_lock_init(&hashinfo->ehash_locks=
-[i]);
-> > > > > > > +       if (num_online_nodes() > 1) {
-> > > > > > > +               /* Use vmalloc() to allow NUMA policy to spre=
-ad pages
-> > > > > > > +                * on all available nodes if desired.
-> > > > > > > +                */
-> > > > > > > +               ptr =3D vmalloc_array(nblocks, locksz);
-> > > > > >
-> > > > > > I wonder if at this point the memory shortage occurs, is it nec=
-essary
-> > > > > > to fall back to kvmalloc() later
-> > > > >
-> > > > > If ptr is NULL here, kvmalloc_array() is called below.
-> > > >
-> > > > My point is why not return with -ENOMEM directly? Or else It looks =
-meaningless.
-> > > >
-> > >
-> > > Ah, I misread.  I'm not sure how likely such a case happens, but I
-> > > think vmalloc() and kmalloc() failure do not always correlate, the
-> > > former uses node_alloc() and the latter use the page allocator.
-> >
-> > Sure, it is unlikely to happen.
-> >
-> > As to memory allocation, we usually try kmalloc() for less than page
-> > size memory allocation while vmalloc() for larger one. The same logic
-> > can be seen in kvmalloc(): try kmalloc() first, then fall back to
-> > vmalloc(). Since we fail to allocate non-contiguous memory, there is
-> > no need to try kvmalloc() (which will call kmalloc and vmalloc one
-> > more round).
+> When a queue is restarted, it sets MRU to 0 for stopping packet flow.
+> MRU variable is a member of vnic_info[], the first vnic_info is default
+> and the second is ntuple.
+> Only when ntuple is enabled(ethtool -K eth0 ntuple on), vnic_info for
+> ntuple is allocated in init logic.
+> The bp->nr_vnics indicates how many vnic_info are allocated.
+> However bnxt_queue_{start | stop}() accesses vnic_info[BNXT_VNIC_NTUPLE]
+> regardless of ntuple state.
 >
-> I chose to not add code, because:
+> Fixes: b9d2956e869c ("bnxt_en: stop packet flow during bnxt_queue_stop/st=
+art")
+> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+> ---
 >
->        if (num_online_nodes() > 1) {
->                /* Use vmalloc() to allow NUMA policy to spread pages
->                 * on all available nodes if desired.
->                 */
->                ptr =3D vmalloc_array(nblocks, locksz);
+> v2:
+>  - No changes.
 >
-> << adding here a test is pointless, we already have correct code if
-> ptr =3D=3D NULLL >>
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
->        }
->        if (!ptr) {
->                ptr =3D kvmalloc_array(nblocks, locksz, GFP_KERNEL);
->                if (!ptr)
->                        return -ENOMEM;
->         }
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethe=
+rnet/broadcom/bnxt/bnxt.c
+> index d09986308582..c9d37fea5d32 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -15635,7 +15635,7 @@ static int bnxt_queue_start(struct net_device *de=
+v, void *qmem, int idx)
+>         cpr =3D &rxr->bnapi->cp_ring;
+>         cpr->sw_stats->rx.rx_resets++;
 >
+> -       for (i =3D 0; i <=3D BNXT_VNIC_NTUPLE; i++) {
+> +       for (i =3D 0; i <=3D bp->nr_vnics; i++) {
+>                 vnic =3D &bp->vnic_info[i];
 >
-> Sure, this could be written in a different way, but ultimately it is a
-> matter of taste.
+>                 rc =3D bnxt_hwrm_vnic_set_rss_p5(bp, vnic, true);
+> @@ -15663,7 +15663,7 @@ static int bnxt_queue_stop(struct net_device *dev=
+, void *qmem, int idx)
+>         struct bnxt_vnic_info *vnic;
+>         int i;
+>
+> -       for (i =3D 0; i <=3D BNXT_VNIC_NTUPLE; i++) {
+> +       for (i =3D 0; i <=3D bp->nr_vnics; i++) {
+>                 vnic =3D &bp->vnic_info[i];
+>                 vnic->mru =3D 0;
+>                 bnxt_hwrm_vnic_update(bp, vnic,
+> --
+> 2.34.1
+>
+Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
 
-Sorry that I didn't make myself clear enough. I mean if
-vmalloc_array() fails, then it will fall back to kvmalloc_array()
-which will call kmalloc() or even vmalloc() to allocate memory again.
-My intention is to return with an error code when the first time
-allocation fails.
+--00000000000041dc2c062fa7f967
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-Code like this on top of your patch:
-diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index 3edbe2dad8ba..d026918319d2 100644
---- a/net/ipv4/inet_hashtables.c
-+++ b/net/ipv4/inet_hashtables.c
-@@ -1282,12 +1282,12 @@ int inet_ehash_locks_alloc(struct
-inet_hashinfo *hashinfo)
-                 * on all available nodes if desired.
-                 */
-                ptr =3D vmalloc_array(nblocks, locksz);
--       }
--       if (!ptr) {
-+       } else {
-                ptr =3D kvmalloc_array(nblocks, locksz, GFP_KERNEL);
--               if (!ptr)
--                       return -ENOMEM;
-        }
-+       if (!ptr)
-+               return -ENOMEM;
-+
-        for (i =3D 0; i < nblocks; i++)
-                spin_lock_init(&ptr[i]);
-        hashinfo->ehash_locks =3D ptr;
-
-Sure, it's not a big deal at all. Just try more rounds to allocate memory..=
-.
-
-Thanks,
-jason
+MIIQYwYJKoZIhvcNAQcCoIIQVDCCEFACAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+gg3HMIIFDTCCA/WgAwIBAgIQeEqpED+lv77edQixNJMdADANBgkqhkiG9w0BAQsFADBMMSAwHgYD
+VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
+AxMKR2xvYmFsU2lnbjAeFw0yMDA5MTYwMDAwMDBaFw0yODA5MTYwMDAwMDBaMFsxCzAJBgNVBAYT
+AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBS
+MyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+vbCmXCcsbZ/a0fRIQMBxp4gJnnyeneFYpEtNydrZZ+GeKSMdHiDgXD1UnRSIudKo+moQ6YlCOu4t
+rVWO/EiXfYnK7zeop26ry1RpKtogB7/O115zultAz64ydQYLe+a1e/czkALg3sgTcOOcFZTXk38e
+aqsXsipoX1vsNurqPtnC27TWsA7pk4uKXscFjkeUE8JZu9BDKaswZygxBOPBQBwrA5+20Wxlk6k1
+e6EKaaNaNZUy30q3ArEf30ZDpXyfCtiXnupjSK8WU2cK4qsEtj09JS4+mhi0CTCrCnXAzum3tgcH
+cHRg0prcSzzEUDQWoFxyuqwiwhHu3sPQNmFOMwIDAQABo4IB2jCCAdYwDgYDVR0PAQH/BAQDAgGG
+MGAGA1UdJQRZMFcGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNxQCAgYKKwYBBAGCNwoDBAYJ
+KwYBBAGCNxUGBgorBgEEAYI3CgMMBggrBgEFBQcDBwYIKwYBBQUHAxEwEgYDVR0TAQH/BAgwBgEB
+/wIBADAdBgNVHQ4EFgQUljPR5lgXWzR1ioFWZNW+SN6hj88wHwYDVR0jBBgwFoAUj/BLf6guRSSu
+TVD6Y5qL3uLdG7wwegYIKwYBBQUHAQEEbjBsMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5nbG9i
+YWxzaWduLmNvbS9yb290cjMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
+b20vY2FjZXJ0L3Jvb3QtcjMuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
+c2lnbi5jb20vcm9vdC1yMy5jcmwwWgYDVR0gBFMwUTALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgEo
+CjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAN
+BgkqhkiG9w0BAQsFAAOCAQEAdAXk/XCnDeAOd9nNEUvWPxblOQ/5o/q6OIeTYvoEvUUi2qHUOtbf
+jBGdTptFsXXe4RgjVF9b6DuizgYfy+cILmvi5hfk3Iq8MAZsgtW+A/otQsJvK2wRatLE61RbzkX8
+9/OXEZ1zT7t/q2RiJqzpvV8NChxIj+P7WTtepPm9AIj0Keue+gS2qvzAZAY34ZZeRHgA7g5O4TPJ
+/oTd+4rgiU++wLDlcZYd/slFkaT3xg4qWDepEMjT4T1qFOQIL+ijUArYS4owpPg9NISTKa1qqKWJ
+jFoyms0d0GwOniIIbBvhI2MJ7BSY9MYtWVT5jJO3tsVHwj4cp92CSFuGwunFMzCCA18wggJHoAMC
+AQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9v
+dCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5
+MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENB
+IC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqG
+SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0E
+XyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+J
+J5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8u
+nPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTv
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBU8wggQ3oAMCAQICDHrACvo11BjSxMYbtzANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODE4NDJaFw0yNTA5MTAwODE4NDJaMIGQ
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xFjAUBgNVBAMTDVNvbW5hdGggS290dXIxKTAnBgkqhkiG9w0B
+CQEWGnNvbW5hdGgua290dXJAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB
+CgKCAQEAwSM6HryOBKGRppHga4G18QnbgnWFlW7A7HePfwcVN3QOMgkXq0EfqT2hd3VAX9Dgoi2U
+JeG28tGwAJpNxAD+aAlL0MVG7D4IcsTW9MrBzUGFMBpeUqG+81YWwUNqxL47kkNHZU5ecEbaUto9
+ochP8uGU16ud4wv60eNK59ZvoBDzhc5Po2bEQxrJ5c8V5JHX1K2czTnR6IH6aPmycffF/qHXfWHN
+nSGLsSobByQoGh1GyLfFTXI7QOGn/6qvrJ7x9Oem5V7miUTD0wGAIozD7MCVoluf5Psa4Q2a5AFV
+gROLty059Ex4oK55Op/0e3Aa/a8hZD/tPBT3WE70owdiCwIDAQABo4IB2zCCAdcwDgYDVR0PAQH/
+BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3VyZS5nbG9i
+YWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEGCCsGAQUF
+BzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAy
+MDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93d3cuZ2xv
+YmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6hjhodHRw
+Oi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNybDAlBgNV
+HREEHjAcgRpzb21uYXRoLmtvdHVyQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAf
+BgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUabMpSsFcjDNUWMvGf76o
+yB7jBJUwDQYJKoZIhvcNAQELBQADggEBAJBDQpQ1TqY57vpQbwtXYP0N01q8J3tfNA/K2vOiNOpv
+IufqZ5WKdKEtmT21nujCeuaCQ6SmpWqCUJVkLd+u/sHR62vCo8j2fb1pTkA7jeuCAuT9YMPRE86M
+sUphsGDq2ylriQ7y5kvl728hZ0Oakm3xUCnZ9DYS/32sFGSZyrCGZipTBnjK4n5uLQ0yekSLACiD
+R0zi4nzkbhwXqDbDaB+Duk52ec/Vj4xuc2uWu9rTmJNVjdk0qu9vh48xcd/BzrlmwY0crGTijAC/
+r4x2/y9OfG0FyVmakU0qwDnZX982aa66tXnKNgae2k20WCDVMM5FPTrbMsQyz6Hrv3bg6qgxggJg
+MIICXAIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYD
+VQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgx6wAr6NdQY0sTG
+G7cwDQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEII3TWrszYPKLQEFJVhUpAxS3nZ0N
+MlB+zYy7kUOQOWtCMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1
+MDMwNjA4MDU0OFowXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsG
+CWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3
+DQEBAQUABIIBAGTmV1bSHv+6kGBU8VZKDUN7S4YePFivYVU+Up+nrCIwpzhj6rlZn3XbgqWd5lsa
+h7BViyo0WkkKJNOi9YVwSk41wkEW7ZBdoUHjunADZ+yRzC1vLjvaMx2xHXWRqLrmNU5KtaO+Uxmp
+dG/uvidS8rOu2Go7FHIs47eisJNFtOTxPAkUUnWdkEufLvoNOY0vwblCqtukXkT2lo5j2V7RQwDd
+326kF/mWdyDAnSeN5bdSqZ5wk2X8JDvHV/DiBNOBLgfJgpn9ZTXWjHROxEKb8PUbAiMZuZbf4J2e
+PY0SbLzsu94uFZY0b5E9ZBOt9ejCo+GDWexacczXOi5GxODQDgs=
+--00000000000041dc2c062fa7f967--
 
