@@ -1,100 +1,105 @@
-Return-Path: <netdev+bounces-172333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29091A543CD
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 08:39:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC456A543D7
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 08:42:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61B061697CB
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 07:38:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 575D63A4E22
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 07:42:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E81351A9B3F;
-	Thu,  6 Mar 2025 07:38:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C93E81C84B8;
+	Thu,  6 Mar 2025 07:42:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="zw4s+xf5";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ZK9UfUwb"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="SuXMt55W"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CE85184E;
-	Thu,  6 Mar 2025 07:38:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E87E5184E;
+	Thu,  6 Mar 2025 07:42:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741246735; cv=none; b=cKNY2EbyG0sBncXKBGPjwj8y5CyvA/eK2JEyUVPR5MrfpVfiwHxAlwjK1Jj2gOiRnxIzcQdIu/EKhRsNn5D4aEKSwTufLlx/5lUPaNjSSDgqgt9V7iTEi5Jrbqlz7W3SDcHgxhcjYn85L+YghzJapOA9ZH3N01YphTJt3ZmtezQ=
+	t=1741246939; cv=none; b=fJw0OqMzxnrxrc/gyMIkewSzMAo8QQ39rFLy0FuRrMR9RBluLILDT4eURc4Nq6HsNHsgb4v+IbFpIyfBQUNCktkCmkm60J4hRLQOCFzVmMtGGYbmwSsM5WjOFST4otfr+LA7KBhNj8Vo1hBgW9btuoQDLgOtAyebA+Abs/XoJVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741246735; c=relaxed/simple;
-	bh=hNwFeJd87ylqxeZqYsq4ZSvBei/DfdwstfqBdRI/zTQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uIyVxfNawcaJHEcOc/HMD8j8S09WkgDtNTcxZxl4/QfEUilAjBqXY/V33b7c/ZOYpD6hsOmTVW40C29FK35ZDjAB4VeWUiaIn4j3+6GYOEYwdZ3B9XSSyAzQAXHS0930Wy15/z4ln9mRrscr8uzAU4q3HEyb1EG39ah/cXl5jqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=zw4s+xf5; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ZK9UfUwb; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Thu, 6 Mar 2025 08:38:50 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1741246731;
+	s=arc-20240116; t=1741246939; c=relaxed/simple;
+	bh=F93TNatBfwgiPsBEPPu7EdB4/RZAnlqun61fYvReQWQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GsIJ2ijqASYtiLcCqcv0KAGetVJoAIzOMmheW8l6FclYrg0eqdv+PzlaVr14QdTb/JKFa8XyNJTLAH6hXaGY82U/Ia84pPaePloC1Iz08CkGFbMhd2ZhTAxRgRUG9mbEc/E3vqEio+90fswXT35kjvcl3jnqqwLbLFTA5JZFNYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=SuXMt55W; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 0BD7D442CA;
+	Thu,  6 Mar 2025 07:42:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1741246928;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=nS6P45mUCMn1oxPskIVg60Xol7SNa+58TiakbC7+hHg=;
-	b=zw4s+xf5dsyadrhmnGzHbAKgd/t3uO0oPcc9Ux9SE1moOH0muQErKQA+gQBTnRDXHSqIv9
-	5/0ZbPWOg863g4f45010u+US00oYD/ZqMg6AzmU5X0fCMfs/vqbTlg9CTY4KSJnYLRznEO
-	g30StBN+jzlF5MS3LcxB7cx7FimhQ+n3Ymbjrse95aZ4dGP6GKAbkq6kR+JJre3osYCkYF
-	mmjh4xmpSr42IDcqqrtwO95KD3jLFjYq/uiIPqM+U/z+JDoBwAGVpXtYRNjtV6hC9TOT5s
-	SbuSgHR4NUzmdPu1gS/D5dr3Bs0LcB708PiUa53oGK+HHVLJUcpAJciHU74HHQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1741246731;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nS6P45mUCMn1oxPskIVg60Xol7SNa+58TiakbC7+hHg=;
-	b=ZK9UfUwb8ysLQcbN0g8kGRBKKqnokQHjSmyWWh210PgArkq7Vn5WiieXj8eoAHcRTOnHhx
-	hI3sdQrL7IBJ30CQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Joe Damato <jdamato@fastly.com>,
-	Leon Romanovsky <leon@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [PATCH net-next] net/mlnx5: Use generic code for page_pool
- statistics.
-Message-ID: <20250306073850.yA23Fs1V@linutronix.de>
-References: <20250305121420.kFO617zQ@linutronix.de>
- <8168a8ee-ad2f-46c5-b48e-488a23243b3d@gmail.com>
- <20250305202055.MHFrfQRO@linutronix.de>
- <42892aa7-f7a9-4227-9f3f-24a0f1c96992@gmail.com>
+	bh=3xoURsCfOKW/dz0Jqi7uXc/ZFxx8fcEUzD+XtCJ3Q3s=;
+	b=SuXMt55WxRBIvDxHEMAAOlvC/+AA+n7CeEr5M+yDIrFE5ml2rzwpg1c5GpDq7pwU6lp83B
+	Bn+bnzV5UlLIfdz8g7Yovz9VfOw3UNNY2NzFBCaTCrzCyZs1OJUAmv71hZXq0H4i7eXogl
+	mDcEPIq3ZxhtM3irJpADhradX2IGZl+oVYjmNoM0Xq+vrx1knAH614E9HwPm644aiDKxin
+	W+EVtusIT70HhOjkFspQWVDEmWsjtfSDznxx+PenKppqQwWdEzIIrgD8FCd/JkqvXSpzO8
+	BnkiZxUpeITdopx3NvEELgIdYMhXtURLNJu9YbPdDehtMQX/z/FSgec68y11IQ==
+Date: Thu, 6 Mar 2025 08:42:01 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, Simon Horman <horms@kernel.org>, Romain Gantois
+ <romain.gantois@bootlin.com>, Piergiorgio Beruto
+ <piergiorgio.beruto@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>
+Subject: Re: [PATCH net-next 0/7] net: ethtool: Introduce ethnl dump helpers
+Message-ID: <20250306084201.23885f5b@fedora.home>
+In-Reply-To: <20250305184749.5519e7a9@kernel.org>
+References: <20250305141938.319282-1-maxime.chevallier@bootlin.com>
+	<20250305180252.5a0ceb86@fedora.home>
+	<20250305184749.5519e7a9@kernel.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <42892aa7-f7a9-4227-9f3f-24a0f1c96992@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddutdejudejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgdphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvddupdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepvgguu
+ hhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On 2025-03-06 08:49:55 [+0200], Tariq Toukan wrote:
-> > > I like the direction of this patch, but we won't give up the per-ring
-> > > counters. Please keep them.
-> > 
-> > Hmm. Okay. I guess I could stuff a struct there. But it really looks
-> > like waste since it is not used.
-> > 
+On Wed, 5 Mar 2025 18:47:49 -0800
+Jakub Kicinski <kuba@kernel.org> wrote:
+
+> On Wed, 5 Mar 2025 18:02:52 +0100 Maxime Chevallier wrote:
+> > This series will very likely conflict with Stanislav's netdev lock
+> > work [2], I'll of course be happy to rebase should it get merged :)  
 > 
-> Of course they are used.
-> Per-ring (per-pool) counters are exposed via ethtool -S.
+> Also this doesn't build. Please hold off on reposting for a couple of
+> days - because of the large conflict radius the previous few revisions
+> of the locking series haven't even gotten into the selftest CI queue :(
 
-That is true for some stats and they are prefixed with a number for the
-individual ring. In case of page_pool_stats they are not exposed
-individually. The individual page_pool_stats counters from each ring are
-merged into one counter and as exposed as one (not per ring).
+Sure no problem. I'll try t figure out what's up with the build in the
+meantime, looks like I inverted a few changes that break
+bissecatability.
 
-Sebastian
+I'll keep an eye on Stanislav's work in the meantime as well.
+
+Thanks,
+
+Maxime
 
