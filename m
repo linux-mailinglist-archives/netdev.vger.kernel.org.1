@@ -1,153 +1,207 @@
-Return-Path: <netdev+bounces-172585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25545A5574E
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 21:13:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4AFFA55754
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 21:15:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B7F73AAB63
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 20:12:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E18DC7A6ADB
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 20:14:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DF2127004F;
-	Thu,  6 Mar 2025 20:13:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1D0D2702D6;
+	Thu,  6 Mar 2025 20:15:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YX6BRc/u"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vd00UXZF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D780342A8C
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 20:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45BF842A8C
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 20:15:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741291980; cv=none; b=XMwo1kyG2NK+D9clHGUN43ZPWF7jTCI98Q6ZXBxkBarVw9jWx6p15P3hWotfvPJu8lkiQe0DyKRC2lfheIAflLQKQkCpYzLC6deR1WxfnULmuNIhBlXJv52D8wm5nl9crPxSa0M81CSMl2WJxRo8OJTt6fr4sacUEJObFo4o2jw=
+	t=1741292109; cv=none; b=j3IaZO5dIUMH9E5xyw3/258YlYxYmPG7ZGzVDOx156bSmEBwstJSCLDKPali71CV4FvtmHPsfHDmMdWYEYirBuIfBRWtSibTNpmRrpJgaDHYMprpeQMv91o+0bTywzlVPOy8/aun/96aemkZ5BS+xHC9T/Efcc62y3LwtZGDQuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741291980; c=relaxed/simple;
-	bh=2S1Kp5JkT1qcd1Vk2F/xWaElUr1SPbSMlpkzjmOCq2w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=R8ZDOMjDOVewJXigq6R81SIVhjLbJkLrtGyep/D6xIsmzraxAmh2r4IgaycIUZikXYkSUkXYxu4C2P6k3aKMRlj0f0G1lC5ggm0gsKfIX1pOujvtHun96kxbVcX2xZ8fsNThsRtHV7I7xuZaR0xojhpRb+wCdoRmJBkqv9W2Odg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YX6BRc/u; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43bd03ed604so9769225e9.2
-        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 12:12:56 -0800 (PST)
+	s=arc-20240116; t=1741292109; c=relaxed/simple;
+	bh=bFJMZEx96Ql0Kw2JTwB7c9FTIFV7IfnoUuBTspqGm8c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uNq54t3MqvnEt0eB8XF2HEBY8n6IXsbh+h5Noo3+55kpkuw54QqqomEjG7BcAaJsvCYeFCztD4fwthIpSxYaKO0klIo/g6/8k4pDPgiWwrqtrOZAnsOzYfZ/OZzdWSnm/ngJu0/1YqVMIOqpvBds/1CP2SyFRI20gyxwBCCKXKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vd00UXZF; arc=none smtp.client-ip=209.85.219.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6e86b92d3b0so7822716d6.2
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 12:15:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741291975; x=1741896775; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XM9NroXNmh9SFHEfObXdCAXMKxLrtNnq7LKRHsgAuB8=;
-        b=YX6BRc/ui5UCgDTJy9b8M9EsVuRqOjIIGc+dhKqUWYA/XGACJ3XgcMRyKuvzMul5BB
-         V9riQKwt4L/viSY6/o2K3dPiGlWccXs0eaaAv5a2AmmITSs87+unOwfynPJILCnzYe0S
-         BY0ChHonhj+loEaHW/nkg2MT9xEjRutjillIsUy1qTuRXmwFurjHhyIlfEW7DjU2Neo1
-         RNdPlkF8Hy51d/zMQenS4bvm5WCHpGyVAqpIYoLgoZWiI0koOa/RmFvzswfwMlhCKYUd
-         9ikHgS3RpYBaCi7S5THyzgK3pZroQRo3KYzES1bv0lMykbVEzH6h3L4Cbn46UbMMeaw7
-         3Hww==
+        d=google.com; s=20230601; t=1741292107; x=1741896907; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9ef1Fclr81ZVjX9jtguwD6ejsAi9gXl6B/HalLOlbJE=;
+        b=vd00UXZFgjicGk7x6jFk5vMZDIRBYERGu8waLJ4YduR3+uK/AU+yb/MeKITARiXlvR
+         KXLBEJaic4CTmQUzGdwGz/H/TqbaZZqcvldiOI5v6D3tG9rIUJ9Wl+uQyiEHU7AP+QsJ
+         IBmNP4TOLR81bkfqHINho1W6rSjmq3SpOsf+B/T5aK2Ssy8TayeHqPoVF0ZGXXuy7xvv
+         f2n40hXCzhN7Z2Laq8jQ+zVXPkR6umIu5g69wpnTC9D45FdCXlRBSBGtIRLNUhyDSSdY
+         zXXaSARHDabZPOPDV9gyGODytShUHUQiFBLl/5Xtc5b3joez+7cgs/zH0rq8XtezU5C9
+         FahA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741291975; x=1741896775;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XM9NroXNmh9SFHEfObXdCAXMKxLrtNnq7LKRHsgAuB8=;
-        b=GGxch4gK/c6WdCC9pI7LbY46YxdJXaTfedURS4L6WjBkdwYxpuqPWX4H6lxM/y6lXt
-         T/C1XT3mONt/kuQToPAoOCTN6MVSL1KdUn7FzGg2saCAp+5gyWw0toKKogIrbvnjNudR
-         nrGYYA9iIn/B1vC6UKkDbT4+OXbRk6yanMFutOQamqFg9O0wNFSLkxh0/N8mCoGhoqIu
-         a10bmFC5b9OO6w9fQl35nU5Pylwi2WqZGzpiS2lM7jM/wIc06AA9OmTRtpzFDtV2/Y3+
-         CQdH4BTGK0vwFD+yI6xEJwrvc3N5oS3OYqZ3kFcVifzsc4cLKW3hfvpProcI6e4DsBQc
-         6UEw==
-X-Forwarded-Encrypted: i=1; AJvYcCVeC9qXAO3E/sDM+pG8den6zwuSU6rhbJ2Ftdi8FrWxrYwFVlm5WQ1BJxVdtxNzKuKCydPBXLE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRmLv39LQRuvJrG0eDlLn4KRBsXkQUSgRI2TPZtoojMNosbYi3
-	5LP8xsyoE8LC0qot4vCFJruR6GPZxq+t4N0bPyvRKgQhmiyg8ko1
-X-Gm-Gg: ASbGncsJRJUQaW2XnAy2S8ZpvRgVVfkFEndlKqIS/N7QVQMPc7oKsRG8TeCav2D1BQh
-	6K4u2t0pgjAQ6tja5gn1Aib5qV/Y4eBcUAMkSveaUn74Oz61UNGb/OIQ5UeHxtC7f18Az2mpKEI
-	8h92ad1qlHXPOaytiX1PT7fWFteXapwic9yKhlCGyaQ08ML55SQv37kP29bbxLKgB+8TUbW/R9i
-	F/v3Ul3a4oqDjijELG0mVbLCnRd8jiQKVEsKsh3QoN64QdBTOfyA7FM8B79Y3ITuUGYZyiaI2xs
-	qWBzgYTuoYkpWljk0O5Ga7sdR5+WfjKn3ds7uQmudGT9VTWXMetxYvcy3dIG6fs32A==
-X-Google-Smtp-Source: AGHT+IHC+zO9mrSmTQ+f9DwcLW6rYm67+tSZr1m4hDMWCEeoiLkyhW46YFvcUh4AAp+GB/KkhIw/2g==
-X-Received: by 2002:a05:6000:2cb:b0:391:13d6:c9f0 with SMTP id ffacd0b85a97d-39132dc51a0mr359603f8f.47.1741291974650;
-        Thu, 06 Mar 2025 12:12:54 -0800 (PST)
-Received: from [172.27.49.130] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912bfba87csm3081376f8f.17.2025.03.06.12.12.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Mar 2025 12:12:54 -0800 (PST)
-Message-ID: <3faf95ef-022a-412e-879d-c6a326f4267a@gmail.com>
-Date: Thu, 6 Mar 2025 22:12:52 +0200
+        d=1e100.net; s=20230601; t=1741292107; x=1741896907;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9ef1Fclr81ZVjX9jtguwD6ejsAi9gXl6B/HalLOlbJE=;
+        b=RBwfGSECuzEdBpDXoBHzSXaZQS0EmhVn5R4YrJK2JYyopwVBR7/1morDdd4EZFnnlb
+         2fvw52+10V+bkiJ65AQvyk5dATJAAAAQgd/LHjbsbYWdRLkd+kOuhX+q5BaeHI+h4tFp
+         +L+Fixld1rmspkxfOyNGhOprxYgaZzd8reWEbJPmj+WCNqyPNI7ZDvAH3x9buZjlmfOZ
+         Wfjc86bGYYUMeeGpBsZuJwUMeAGQIV2bK/mSwTFGbLTj2wqULixOVcy7Le0quQreGNDU
+         WrbOHpn21eewHuwyDd3NbGxd6018SAZ+rk7Paaf+ITLrahi4N1uY6cob5elQt/4sckqS
+         P4EQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX7oWUEfZibHRgbL6oNM3VTg2rmQsH+GkroMzT2r7V1NoD4yarlZBiWsvA2V6EL3jEOlzhbVHI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDjlsMmYc3qZkgb3/NmcroUjD8bjKLYGDXvRMRe0PPaaFScAx0
+	ssRy3r03QU5ujmMQwYZN8kC1ZHwj8txWB/SGOOfL+R8rNxcBgc6ApJoBv7IpK4QyN3jlZQYSj4t
+	6rH5NI82nJQt3OR5iTCVhNZyFULKc/6ZkiBie
+X-Gm-Gg: ASbGncuRiVBB6e/XDxwDulnBFVWKch1WInUQKoJ9dc1H2pcRXzWmENvGR/Uif5mZ/im
+	crIHd4WsoHJNscf/HQmepITHtINfkKe3Rb6cCXd58KjGoW4t5iLBMANQm2WvEWMB9V9ugr2CVvK
+	ZzVuurA42m+qMSLmYYCe2wgDYlV8U=
+X-Google-Smtp-Source: AGHT+IFCiBiyWAF0ulMN+ynaK89LvEOVytGQ+T63z3mZ2mLUyORRge8r1OlqdCFMq8wWxIzfrv1gyhxtD13HjGM6k7g=
+X-Received: by 2002:a05:622a:18a7:b0:475:531:9b1a with SMTP id
+ d75a77b69052e-47610952122mr6471131cf.10.1741292106764; Thu, 06 Mar 2025
+ 12:15:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/mlx5: Fill out devlink dev info only for PFs
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
- andrew+netdev@lunn.ch, Gal Pressman <gal@nvidia.com>
-References: <20250303133200.1505-1-jiri@resnulli.us>
- <53c284be-f435-4945-a8eb-58278bf499ad@gmail.com>
- <20250305183016.413bda40@kernel.org>
- <7bb21136-83e8-4eff-b8f7-dc4af70c2199@gmail.com>
- <20250306113914.036e75ea@kernel.org>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20250306113914.036e75ea@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250306183101.817063-1-edumazet@google.com> <67c9f10e7f7e8_1580029446@willemb.c.googlers.com.notmuch>
+ <CANn89i+QnSwxB33Hp48587EWAX=QYY0Msmv_bkfe_C1amk8Ftg@mail.gmail.com> <67c9fe2af078b_1bb0a2942a@willemb.c.googlers.com.notmuch>
+In-Reply-To: <67c9fe2af078b_1bb0a2942a@willemb.c.googlers.com.notmuch>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 6 Mar 2025 21:14:55 +0100
+X-Gm-Features: AQ5f1JqcIMqOYBntvHmSZWFbOH1XGOHvpKENIdz2AqvrhL5sAGxKn1ELxfsc690
+Message-ID: <CANn89iJi5GsaK6ZbuuiMDpHsWxj9fbAEG5Vj0CzoJeWFJvpj4Q@mail.gmail.com>
+Subject: Re: [PATCH net-next] udp: expand SKB_DROP_REASON_UDP_CSUM use
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Mar 6, 2025 at 8:57=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Eric Dumazet wrote:
+> > On Thu, Mar 6, 2025 at 8:01=E2=80=AFPM Willem de Bruijn
+> > <willemdebruijn.kernel@gmail.com> wrote:
+> > >
+> > > Eric Dumazet wrote:
+> > > > Use SKB_DROP_REASON_UDP_CSUM in __first_packet_length()
+> > > > and udp_read_skb() when dropping a packet because of
+> > > > a wrong UDP checksum.
+> > > >
+> > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > > > ---
+> > > >  net/ipv4/udp.c | 4 ++--
+> > > >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > > >
+> > > > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> > > > index 17c7736d8349433ad2d4cbcc9414b2f8112610af..39c3adf333b5f02ca53=
+f768c918c75f2fc7f93ac 100644
+> > > > --- a/net/ipv4/udp.c
+> > > > +++ b/net/ipv4/udp.c
+> > > > @@ -1848,7 +1848,7 @@ static struct sk_buff *__first_packet_length(=
+struct sock *sk,
+> > > >                       atomic_inc(&sk->sk_drops);
+> > > >                       __skb_unlink(skb, rcvq);
+> > > >                       *total +=3D skb->truesize;
+> > > > -                     kfree_skb(skb);
+> > > > +                     kfree_skb_reason(skb, SKB_DROP_REASON_UDP_CSU=
+M);
+> > > >               } else {
+> > > >                       udp_skb_csum_unnecessary_set(skb);
+> > > >                       break;
+> > > > @@ -2002,7 +2002,7 @@ int udp_read_skb(struct sock *sk, skb_read_ac=
+tor_t recv_actor)
+> > > >               __UDP_INC_STATS(net, UDP_MIB_CSUMERRORS, is_udplite);
+> > > >               __UDP_INC_STATS(net, UDP_MIB_INERRORS, is_udplite);
+> > > >               atomic_inc(&sk->sk_drops);
+> > > > -             kfree_skb(skb);
+> > > > +             kfree_skb_reason(skb, SKB_DROP_REASON_UDP_CSUM);
+> > > >               goto try_again;
+> > > >       }
+> > >
+> > > From a quick search for UDP_MIB_CSUMERRORS, one more case with regula=
+r
+> > > kfree_skb:
+> > >
+> > > csum_copy_err:
+> > >         if (!__sk_queue_drop_skb(sk, &udp_sk(sk)->reader_queue, skb, =
+flags,
+> > >                                  udp_skb_destructor)) {
+> > >                 UDP_INC_STATS(sock_net(sk), UDP_MIB_CSUMERRORS, is_ud=
+plite);
+> > >                 UDP_INC_STATS(sock_net(sk), UDP_MIB_INERRORS, is_udpl=
+ite);
+> > >         }
+> > >         kfree_skb(skb);
+> >
+> > Right, I was unsure because of the conditional SNMP updates.
+>
+> That seems to only suppress the update if peeking and the skb was
+> already dequeued (ENOENT).
+>
+> Frankly, we probably never intended to increment this counter when
+> peeking, as it is intended to be a per-datagram counter, not a
+> per-recvmsg counter.
+>
+> I think ever erring on the side of extra increments in the unlikely
+> case of ENOENT is fine.
+>
+> Cleaner is perhaps to have a kfree_skb_reason inside that branch and
+> a consume_skb in the else.
 
+I think it should be a  kfree_skb_reason(skb, SKB_DROP_REASON_UDP_CSUM),
+because only one real 'free' will happen, if two or more threads were
+using MSG_PEEK for this packet.
 
-On 06/03/2025 21:39, Jakub Kicinski wrote:
-> On Thu, 6 Mar 2025 21:20:58 +0200 Tariq Toukan wrote:
->> On 06/03/2025 4:30, Jakub Kicinski wrote:
->>> On Wed, 5 Mar 2025 20:55:15 +0200 Tariq Toukan wrote:
->>>> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
->>>
->>> Too late, take it via your tree, please.
->>> You need to respond within 24h or take the patches.
->>
->> Never heard of a 24h rule. Not clear to me what rule you're talking
->> about, what's the rationale behind it, and where it's coming from.
->>
->> It's pretty obvious for everyone that responding within 24h cannot be
->> committed, and is not always achievable.
->>
->> Moreover, this contradicts with maintainer-netdev.rst, which explicitly
->> aligns the expected review timeline to be 48h for triage, also to give
->> the opportunity for more reviewers to share their thoughts.
-> 
-> Quoting documentation:
-> 
+Using a consume_skb() would be racy, because if the skb refcount
+reaches 0, a wrong event would be generated.
 
-Thanks for the pointer.
+I will squash in v2 :
 
->    Responsibilities
->    ================
->    
->    The amount of maintenance work is usually proportional to the size
->    and popularity of the code base. Small features and drivers should
->    require relatively small amount of care and feeding. Nonetheless
->    when the work does arrive (in form of patches which need review,
->    user bug reports etc.) it has to be acted upon promptly.
->    Even when a particular driver only sees one patch a month, or a quarter,
->    a subsystem could well have a hundred such drivers. Subsystem
->    maintainers cannot afford to wait a long time to hear from reviewers.
->    
->    The exact expectations on the response time will vary by subsystem.
->    The patch review SLA the subsystem had set for itself can sometimes
->    be found in the subsystem documentation. Failing that as a rule of thumb
->    reviewers should try to respond quicker than what is the usual patch
->    review delay of the subsystem maintainer. The resulting expectations
->    may range from two working days for fast-paced subsystems (e.g. networking)
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 39c3adf333b5f02ca53f768c918c75f2fc7f93ac..d0bffcfa56d8deb14f38cc48a4a=
+2b1d899ad6af4
+100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -2117,7 +2117,7 @@ int udp_recvmsg(struct sock *sk, struct msghdr
+*msg, size_t len, int flags,
+                UDP_INC_STATS(sock_net(sk), UDP_MIB_CSUMERRORS, is_udplite)=
+;
+                UDP_INC_STATS(sock_net(sk), UDP_MIB_INERRORS, is_udplite);
+        }
+-       kfree_skb(skb);
++       kfree_skb_reason(skb, SKB_DROP_REASON_UDP_CSUM);
 
-So no less than two working days for any subsystem.
-Okay, now this makes more sense.
+        /* starting over for a new packet, but check if we need to yield */
+        cond_resched();
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index 3a0d6c5a8286b1685e8a1dec50365fe392ab9a87..024458ef163c9e24dfb37aea269=
+0b2030f6a0fbc
+100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -586,7 +586,7 @@ int udpv6_recvmsg(struct sock *sk, struct msghdr
+*msg, size_t len,
+                SNMP_INC_STATS(mib, UDP_MIB_CSUMERRORS);
+                SNMP_INC_STATS(mib, UDP_MIB_INERRORS);
+        }
+-       kfree_skb(skb);
++       kfree_skb_reason(skb, SKB_DROP_REASON_UDP_CSUM);
 
->    to as long as a few weeks in slower moving parts of the kernel.
->    
-> See: https://www.kernel.org/doc/html/next/maintainer/feature-and-driver-maintainers.html#responsibilities
-
+        /* starting over for a new packet, but check if we need to yield */
+        cond_resched();
 
