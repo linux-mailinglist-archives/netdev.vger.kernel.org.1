@@ -1,125 +1,138 @@
-Return-Path: <netdev+bounces-172377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5F8EA546E3
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:52:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B5A2A546E8
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:52:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD2297A99D3
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:50:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 342721897588
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:52:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BDE220A5F2;
-	Thu,  6 Mar 2025 09:49:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5CEC20ADD6;
+	Thu,  6 Mar 2025 09:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ezVXRm/X"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RhIo5Q6I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE80420B7E0
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 09:49:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B90D20AF85;
+	Thu,  6 Mar 2025 09:50:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741254553; cv=none; b=L/zUpZvFOTGTH6C+m19ljLAAzovFDqyq/yFQhN96/ggB3rMw1/ODq9dKhHnV5PVzfazENDy5L0uTKbYLL0ODVkyUv8cAKv/dw1L/dnE7X+JzbRicYliehLrHI0IjkQp4gp/MJnb5XgRHdpQxhgDr7ibIkUPbZBdGsU1U9Z8JEqI=
+	t=1741254634; cv=none; b=A1GsCvOG9P5sOkastcneOwAL6e7O4suroh55Bx2fVXFJKnImRMq4nFUikTmgucGEmwVKyC07Mt1Bl9to6rhsqrwb0vBI28pVfZYway3tA7LdGbDdCIzVkKstEgmQ/Tk65Ut2VI7vl8QIf8hCvWlWw+y2S3kqJlmpDNABs53cvGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741254553; c=relaxed/simple;
-	bh=NTtVgflWu6tAlA8pd6DftngJAv6JiE0FqLRO924rdyI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=uxwHAWGjgJdXf1gI+LIFw7DXghi+Zn2xP9ug7usPyrF7SY22Th/TS7B6k5zjTeolVuBodd/zd4g3SdXSbPGmYBY9166UezHoGrF4SUob/GV3hWEwzPUkUZdSDzXYa0Kh9O5fGdMNlbLEBIIZbCYuas2pBXbktolGWccs42HXtuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ezVXRm/X; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-43bbc8b7c65so4251375e9.0
-        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 01:49:11 -0800 (PST)
+	s=arc-20240116; t=1741254634; c=relaxed/simple;
+	bh=eIpesmObrZ0L4HIdewr2PrvroaN5yY0jVZ2nNpCzc+o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ea8TqUFb42ueOA1+wsdCQtdI40wOWozRS4YUXY+urkOPkSpxtqOLfxVDxsakC7LgKeBwtwy1108QeTNsUZhwQVFtvAeVlPV4yi+E6vqnuM2LMeulxxknriuX0hI1ERxA4gkRE3QRFszkl1JUbhzo4ckwAYVgW3szK6lZxsn5Odo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RhIo5Q6I; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43bdc607c3fso2534075e9.3;
+        Thu, 06 Mar 2025 01:50:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741254550; x=1741859350; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+        d=gmail.com; s=20230601; t=1741254631; x=1741859431; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=sOvH1h7gY+S/5tjP1o4zbH2Xsc8NxkuCe8boz90iQSw=;
-        b=ezVXRm/X8FVlWPru8QQQJ124NAs0KNMCLcbBPQ7e/LKLzHVVIP+zQdy6n9giHZ26MA
-         RAiCRvHvaJgw+1D9R/fnNZwrXCa1NfXBlLDK942fS+F62lB2lzIQqACTA5VhcijemrOT
-         O5Y+TeV92ydcgnh8MYmqMjkeZBKyBIa9VouHmJjCvAhy1GSCmt5xxS0EUlk42RulYueL
-         lRMoqgixdfxRHwr5E79TKetbFL+URKH5+J6L5lTCUxz0HFyMUr97x1bVksGkV8I5CINp
-         3R+d3yleeqoyO3Du4hdrWtRpL4Nm0NJuudD5ebRGekVTcb3wwc16P3I+3B8h1lDiBXHp
-         sMkw==
+        bh=o8tyc0jAmpZLCohvENRUoCJi064Uu0mWojXRk7xpusM=;
+        b=RhIo5Q6ITVMce4ojujPE+2J/cbGV8Qcq2jMAD6RZU5E/9N3+R7OxyOq24SMIxBbIYL
+         PNaCBu0kEtU1GvRbC5dZIYNbYc6vb7fOTyvBdk58jhsEwq3HsEbkNK3H/kjAcRoBjgH9
+         89ZctKn1v7WMEeU6NGZnu8N5t6u7yt7kBgsRA1er7P/CvkvGgoLHggS2YfFdf951lfFF
+         IcIExdCdAyhvnhv+3vcmWHr6IrHGh9bt+8RihAii9eVraJqKVOzizbNSBUKoEPvjStn5
+         0gTFHpofnYusiOSc1Da0TymiWytK8vEEnOVB3vh3JoSBO1L4KC4uB/hvhTO/ij5V4gPt
+         2u1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741254550; x=1741859350;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1741254631; x=1741859431;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sOvH1h7gY+S/5tjP1o4zbH2Xsc8NxkuCe8boz90iQSw=;
-        b=D7wBZxq7gVj4tyEKCLWIppGjXrBgWtG1YSVuyUa0+oA7aDdQqWQgwqWnYwJ+xX4iq+
-         lVKlq2ZnmFZFtS9Kn6PsbUD7SWxxjM4JAiEp9UDujMHSV0p5/o0ipk4Xlyjympb2HwcY
-         jpmds2SW6UW8RAaj/2C157nZN8mOop27MIiPU0EU3Q0kHR+AmR1SwB/pUYT/UHI7KcRe
-         8yemwJaMV53gDPG20/nRRdp+BqQjeEG8v0BtCJV6sJ/mHXZyxUgDyWzzdqTWZD1rVcfn
-         U+znH4ZPoHTr3xz9U7fF9B7vo2gyie8YXPKN77KvuSQyD1JmHoxxGALMbj6Z1ZuLGhSs
-         ltQQ==
-X-Gm-Message-State: AOJu0Yzqqzz5D/O0RAAbH6LddoQ0CBpBC24xzLQp7cNs6bFdMEgw2Ib8
-	RkUCqakWRbHboMe/zwv0ba0mpVw842720XLuWmIcNCDzhjqsH6MHcisPDoazsW0=
-X-Gm-Gg: ASbGncsaqN/WfdkTyjDVVy96+ube6ldBewK3Aqk3vkjEl3YrmH+LIJpSJG42/J47xt1
-	33+7WujE1sMvR7taej5wob/E+ms5eMSvOrBH/+ZQT1JE7bSc/wn2OaNWii6jXiFDCCtvFxsjdHx
-	wKZ9HKyi59cDkXnPGqkzfnIMpoupT+S6Mvv6qcHa6B5WYQuMvGw1ycs4qWWWs3yqQ9VSfof2FID
-	BSo7d+zx/Y3zX7xxRqX8WBWEemYi3FA8n8H3EUBbSnGoMIWd51WagM+IzCI6Cl8aGePdjZld71h
-	/ng4XxtbBm/wXiRMAftPba9z6Iib7E5sEdvnR3qk5gcuhRP+Pg==
-X-Google-Smtp-Source: AGHT+IEki70s8g2dcmrVd4Kz2FOJSXan2nOY7Num+J04ZyHi92TIuTxZvYZZl5FNgz3JAp5OJn/Kgg==
-X-Received: by 2002:a05:600c:4f11:b0:439:916a:b3db with SMTP id 5b1f17b1804b1-43bd292fee0mr60000385e9.6.1741254550014;
-        Thu, 06 Mar 2025 01:49:10 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-43bd426c16dsm45237025e9.6.2025.03.06.01.49.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Mar 2025 01:49:09 -0800 (PST)
-Date: Thu, 6 Mar 2025 12:49:04 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: netdev@vger.kernel.org
-Subject: [bug report] net: airoha: Move DSA tag in DMA descriptor
-Message-ID: <46c1790a-0860-4907-894e-2d8ec4622147@stanley.mountain>
+        bh=o8tyc0jAmpZLCohvENRUoCJi064Uu0mWojXRk7xpusM=;
+        b=qx4uOp8tfZ7xTKKX0bjZnPJIxdU8Cs8Z6v1wWTQuoh/gCXDeQtgpOfox+go4qGKRSw
+         7cinhZUyTGuzm15cL9IotMkBVu3S8bsZkvFQVFQ16ZksmprZ36+bVWZ5EizqpMAlFj3g
+         Lq1A/ZP3YVMsnWbaXhO4sWVwKJ1rLeVEuWr6MDOCfIUCbfys1Kss65qEU9cw7VUyivdc
+         TUl+PTlphhk8tcb9C/fncYidQVwI6o92qt/veUf+R4F+gx5Eou85YiEZYm2qxsWRi3gm
+         wXQICHvgwHVtWjblamVFfgARomVDs6d8+p3Ra6+HZgghC42d4lnTdhm9/eOPErG/yMfZ
+         2a6w==
+X-Forwarded-Encrypted: i=1; AJvYcCWhSh479IVt5XppfqlvzxlBtVVhUBN8toOpS47a5Hkgu17iUjfFErSPd9T1BAd5rMa4cFfbUr8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yziox9Igqe2AICvRwenogK7Dtd1G4p9nT01bKtTgJiH3ezICT92
+	UzgFFLggiuJxP3xR5O3qdlP2ZAxD2bUhIQsuION1sS2pNC5++YsJZg+LlA==
+X-Gm-Gg: ASbGncvPnakgZ2dZsTx48Pk/8mM4FNk4L90DVr+KmFVHu0i63P2n3w2aRBuCZBCzbti
+	jKjmKXSFYMv9Jn4fcMV0Ze4zsR/n7ahtbh0O7eciqh5mSUWkWm5Y9JD4ICXQZl9gFvw6nx0qoU9
+	TCF5MdJTKnen685T9sSEdbScYqrFAD3YpoenDOFIwIo17xJg0pNMoW39uu/hswyla93Uh0HtdS9
+	L1N0oiQ4bD0vKfiWz7loyU53HbLWyDpboIubAcb6Y2AfmVDL1wvaL2s/u8U4qDvraNKOImhO1Ep
+	3qpo/gwwHXRoyCEXIC4t2fug1Ms/ewZr+vFiIwO0dveMqOiSp0pic4z90UWL5+nTrQ==
+X-Google-Smtp-Source: AGHT+IFFTFJxFegJEwOJDqt5Eo5oe21FvRGic1Equ7xNcRSZs55qJ9m4YxxswohlDS19Js2nxDIkNQ==
+X-Received: by 2002:a05:6000:2b0a:b0:391:5f:fa30 with SMTP id ffacd0b85a97d-3911f7700d4mr3720866f8f.28.1741254630808;
+        Thu, 06 Mar 2025 01:50:30 -0800 (PST)
+Received: from [172.27.49.130] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c1031fdsm1452341f8f.89.2025.03.06.01.50.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Mar 2025 01:50:30 -0800 (PST)
+Message-ID: <042d8459-e5be-4935-a688-9fe18b16afa1@gmail.com>
+Date: Thu, 6 Mar 2025 11:50:27 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net/mlnx5: Use generic code for page_pool
+ statistics.
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Joe Damato <jdamato@fastly.com>,
+ Leon Romanovsky <leon@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Tariq Toukan <tariqt@nvidia.com>
+References: <20250305121420.kFO617zQ@linutronix.de>
+ <8168a8ee-ad2f-46c5-b48e-488a23243b3d@gmail.com>
+ <20250305202055.MHFrfQRO@linutronix.de>
+ <20250306083258.0pqISYSF@linutronix.de>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20250306083258.0pqISYSF@linutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello Lorenzo Bianconi,
 
-Commit af3cf757d5c9 ("net: airoha: Move DSA tag in DMA descriptor")
-from Feb 28, 2025 (linux-next), leads to the following Smatch static
-checker warning:
 
-	drivers/net/ethernet/airoha/airoha_eth.c:1722 airoha_get_dsa_tag()
-	warn: 'dp' isn't an ERR_PTR
+On 06/03/2025 10:32, Sebastian Andrzej Siewior wrote:
+> On 2025-03-05 21:20:57 [+0100], To Tariq Toukan wrote:
+>>> I like the direction of this patch, but we won't give up the per-ring
+>>> counters. Please keep them.
+>>
+>> Hmm. Okay. I guess I could stuff a struct there. But it really looks
+>> like waste since it is not used.
+>>
+>>> I can think of a new "customized page_pool counters strings" API, where the
+>>> strings prefix is provided by the driver, and used to generate the per-pool
+>>> strings.
+>>
+>> Okay. So I make room for it and you wire it up ;)
+> 
+> Could I keep it as-is for now with the removal of the counter from the
+> RQ since we don't have the per-queue/ ring API for it now? 
 
-drivers/net/ethernet/airoha/airoha_eth.c
-    1710 static u32 airoha_get_dsa_tag(struct sk_buff *skb, struct net_device *dev)
-    1711 {
-    1712 #if IS_ENABLED(CONFIG_NET_DSA)
-    1713         struct ethhdr *ehdr;
-    1714         struct dsa_port *dp;
-    1715         u8 xmit_tpid;
-    1716         u16 tag;
-    1717 
-    1718         if (!netdev_uses_dsa(dev))
-    1719                 return 0;
-    1720 
-    1721         dp = dev->dsa_ptr;
---> 1722         if (IS_ERR(dp))
+I'm fine with transition to generic APIs, as long as we get no regression.
+We must keep the per-ring counters exposed.
 
-Why would this be an error pointer?  Is this supposed to be a check for
-NULL?
+>It is not too
+> hard it back later on.
+> The thing is that page_pool_get_stats() sums up the individual stats
+> (from each ring) and it works as intended. To do what you ask for, you I
+> would have to add a struct page_pool_stats to each struct mlx5e_rq_stats
+> for the per-ring stats (so far so good) but then I would have manually
+> merge the stats into one struct page_pool_stats to expose it via
+> page_pool_ethtool_stats_get(). Then I am touching it again while
+> changing the type of the counters and this is how this patch started.
+> 
+> Sebastian
 
-    1723                 return 0;
-    1724 
-    1725         if (dp->tag_ops->proto != DSA_TAG_PROTO_MTK)
-    1726                 return 0;
-    1727 
-    1728         if (skb_cow_head(skb, 0))
-    1729                 return 0;
-    1730 
-
-regards,
-dan carpenter
 
