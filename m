@@ -1,221 +1,94 @@
-Return-Path: <netdev+bounces-172345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E67F1A5448B
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:20:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CC09BA5448F
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:20:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 071C516B67A
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 08:20:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00AA51714B0
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 08:20:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C1261FCFE2;
-	Thu,  6 Mar 2025 08:19:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ecLVqboC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69D851FC11D;
+	Thu,  6 Mar 2025 08:20:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5FD01FBEB1
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 08:19:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A34DB1DF24E
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 08:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741249192; cv=none; b=jUQjsZzqAE39t5q6IDogrHIkwJuh5PoeTyjRuEgLO9sqZ5EcLEWNGQet3AtsJ/kF/5e7DYya644rxF7w6pvWeI/dzwLh3nva5z/LEbUaXGFuErunlxs+/IdimIN9H5q9+yaK1mgGr0/LIqnvGbaWv6L8GqHMlCWeyjKk0AeGPTA=
+	t=1741249204; cv=none; b=QYD1kw6N4GxESlmMYah56ha077AGQ81tg5XNbWcBJr25+3UITLAV6dkI5tE991epSm9PeWr/84vp5s32zI8gD/ZhngUcdpiwFyl19FnJaKTIQzpw9dlY981t2bHISpc3SHnsAqXiQTH3Mh2trd1NLx8cuDQ4UquIEodKmT1XnAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741249192; c=relaxed/simple;
-	bh=9W3AU/dNsDB6L5vEie+ANoC31wnwyUPXsmhy3hT6+Fg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gRGu9IbHwN8TvYJ5ox5Y0eZsGng9nT/CMX/DcW717xDGYKTEyn8hEhXIMxuxLVEsxrG6hvB4jgj3r3M0+VzwxIEyu13b/0E5SGy8AzxEP0o0W1VPGT6pNAB3sb/UWlyoTtbY41rYtnSbwXq+kAa9vDs67Zy5QsA4pBXk2ccXmZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ecLVqboC; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3cfc8772469so1316095ab.3
-        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 00:19:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741249190; x=1741853990; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0MAoTekFRytv8K8d2Axqqf6mEH29hUgz/VkOQlssyv0=;
-        b=ecLVqboC2eNXgnM1C2bhTsKTFGWi79aX3lQBPxVrm+oHN7anD3Tnq4AcSwpysT/Ag/
-         +lloMqMHy7XUGN0jGT1jdb4GqkgXmbDh2q4NMDAhlz4QHATRpTRT6ji/FWJ+k7v5gIXt
-         VXNGHm2yk8lW2kgolUs/Oop5n1npJcRysDvL2E2dn9H1bWiFPOIWnT9MkUFIMEvC0ijL
-         W8gEOPtPTeHmDBnhwADqp4MwK3Y19AP2ObF2NdHZNPd+tdzZ5nULSpyY8vxMCJf95GuY
-         hEcr98B3fmoF5Kx9vcrPJrrCzwS3a7M5N5k6HxAOFgIXExogw1wFoJylzOQ8ZfOLNISB
-         kjmg==
+	s=arc-20240116; t=1741249204; c=relaxed/simple;
+	bh=gHN6Ds/h4YVfEldKcJ19rEHnazmHoy39GSi4zICTIM4=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=Q+LOvxk9Z5bT3gHCT6jMa2azu5l66p6EPzFMPFwngNk39PsQcnrZy/0ko7yeUt3Ly5mZWiQOgGqlHhi6ZAWMEjkiG/O6ij2kBQvM4OiCXZ1dmemA8hqj3txDBNGWmcXyTusoad9oty+qS/ubqSpPxdjCsT2MIp9OWeTwzYS2fS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3d3e09da2c0so15071975ab.0
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 00:20:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741249190; x=1741853990;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0MAoTekFRytv8K8d2Axqqf6mEH29hUgz/VkOQlssyv0=;
-        b=vVcvWAS+fyG3UoazkUM21vP0EXa16UwfaedlbeEgA4s0bF3YGbMw8IhBJ+aeSwzA5b
-         aHYxv+Lo9AsnbI9CnwxC9rVDke9DWvTIxa1vmzRJKzZx/hS8/IXaial6yp3u+yRSnGii
-         R/UV2n5jmAiZwiRjo6p62E9NPmOoRuoubNl6tra8Bjm9B083ERJRvpjEapmBlnSCoYbP
-         SpXYeoygCC6yaDlpu4gZVEGOCVIsMnvl4O+6QtuNmX7r/jFXm15C7/RE8KRL9Gqb73mz
-         9/jxqBeffPvZlJUVMfT7/xdNRC+kQ60fs5SnLgaNLmW01e4UhvpS7y3SAJIo+21CTerJ
-         iqdA==
-X-Forwarded-Encrypted: i=1; AJvYcCVSXwpHspp/Qz7d5p59W5oZSrzqWHdg+BqDiECfewT88xE23SJBctenn/VrnuUodF8UvRcvOls=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJAPBJYe/1d2FA6DZyLBbTaRfQhHgxxo44/QGzvneE3HWlxvke
-	9pp9m53qH2oPFlOIzy/+3e3YGESomDO2sS19WZtrG8qVhoX6m7Ul7nHwgnGQZTeYgctlAHy9G19
-	ZwPym8bOub+rx5Zf+D8e8BwtV0oexy3AT
-X-Gm-Gg: ASbGncuTvvx3K/X6FryJyZOs9fHOi6C4U4PWDxi+ZBJkaaYF0eU5RLEeUBEoT348/4k
-	rlwZiWig75Y/e5VKc9CG3bzFo9WQWpKSNqnfSfOw6QLDrOESMiTTliqNLn15+Z2CXSdYfe+G9iv
-	6oOYjAFDU3rxpYTmLngrYr5xm8qw==
-X-Google-Smtp-Source: AGHT+IEcJUtQ7n0JueRXmCjioncdVznfbGNj+ZLWGnEa6f7tVTkMP9Ezqpxdk6fAPEfgc+4vhDc65NcLk9vb3E7k0rI=
-X-Received: by 2002:a05:6e02:1526:b0:3d3:dece:3dab with SMTP id
- e9e14a558f8ab-3d42b87cf0bmr70484545ab.1.1741249189774; Thu, 06 Mar 2025
- 00:19:49 -0800 (PST)
+        d=1e100.net; s=20230601; t=1741249202; x=1741854002;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=c0hd4M1D7MlFaULZOul0ePw1a/pBWIY/W9+Rm+LP3lo=;
+        b=u/Nuyl/DiHByEHywNdcitx1+CtSiu1t2TI7qo274H7iYZE0lvqQjgPbHoJ2CdgYIje
+         +Qj2C1WwJRngk2cgT+LCl8qfx7mqKssiP9dMyTtoDhVeqhs/xJRoRTuXUsnxasbMaHD+
+         zDlNKVLPiy9hct2jPVSCD1OKd7IxxzlIQs+GL++iWhW7jztNnEIkMI3xLP/nB9hgVPq3
+         sQLpjmmz+RX2xZML4WLfqZxqPQoKOy3rIE0cVtj+4Fglraw0f/9LhOxzJWRhmZt5TGKa
+         zd9jwpNILHQEAnzCoVFsdNVxChCdBFtLI39RewdAlMwM4o3xG5MIoSj9elC0PsS6H35X
+         3Xfw==
+X-Forwarded-Encrypted: i=1; AJvYcCXPBzs7y+WnwnN1xuIPv15amu2L/FDViBe4CFFa5OfCCqYpGjRLLReYkE69OWDkRO+apZs89QM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDIAUFun329034G8KP/FhjVgj61xZL5HWWJGpUCjM9x+NekOHf
+	Qh9uRD4rB7VA2L0kZ/EzP8dJHyfN3fBsnvmpLtrrou6jny4VDHdV/lzius1+tpsq1Q42A0R5++D
+	eMwj5sSzLw3MG6s0biwbyZ7VjvHFsX48ThsgGD3BwiCsxGDeU2/uZmNk=
+X-Google-Smtp-Source: AGHT+IFenqW4PdQH9l07esEqQ/uhih8b0tkc9NwLzLA/q7gUPf7eB7FiANpwSUE47hb7jqPCIfEI7ghIJ1cLYQmURoUwJgWZN4t3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250305034550.879255-1-edumazet@google.com> <20250305034550.879255-2-edumazet@google.com>
- <CAL+tcoAzeBGpv53cXdm7s_3C63fMR8vkeLyCReSbnSNuf6pWcg@mail.gmail.com> <CANn89iKLgA_BhiXik2_Xq4HMmA4vnU3JHC8CEsaH6dvD9QK_ng@mail.gmail.com>
-In-Reply-To: <CANn89iKLgA_BhiXik2_Xq4HMmA4vnU3JHC8CEsaH6dvD9QK_ng@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 6 Mar 2025 16:19:13 +0800
-X-Gm-Features: AQ5f1Joy8C8IW65KSNVTK2ZQkZ-O8btlInmpez_HRM9v-rlJzpJPum-kHo3r5Ak
-Message-ID: <CAL+tcoC8qW_N62U9z+eQWsDwQ-w6f9Voy87E2a5MJC5C71fSYA@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] inet: change lport contribution to
- inet_ehashfn() and inet6_ehashfn()
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Jason Xing <kernelxing@tencent.com>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+X-Received: by 2002:a92:d349:0:b0:3d3:d156:1dcd with SMTP id
+ e9e14a558f8ab-3d436a77b84mr23771455ab.1.1741249201808; Thu, 06 Mar 2025
+ 00:20:01 -0800 (PST)
+Date: Thu, 06 Mar 2025 00:20:01 -0800
+In-Reply-To: <67c6cf6f.050a0220.15b4b9.0008.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67c95ab1.050a0220.15b4b9.002f.GAE@google.com>
+Subject: Re: [syzbot] [net?] [ext4?] BUG: corrupted list in __sk_destruct (2)
+From: syzbot <syzbot+2f2bc79f24dae1dc62b6@syzkaller.appspotmail.com>
+To: adilger.kernel@dilger.ca, adilger@dilger.ca, davem@davemloft.net, 
+	edumazet@google.com, horms@kernel.org, jack@suse.cz, kuba@kernel.org, 
+	kuniyu@amazon.com, linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, sandeen@redhat.com, 
+	syzkaller-bugs@googlegroups.com, tytso@mit.edu
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 6, 2025 at 4:14=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> On Thu, Mar 6, 2025 at 8:54=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
-> >
-> > On Wed, Mar 5, 2025 at 11:46=E2=80=AFAM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> > >
-> > > In order to speedup __inet_hash_connect(), we want to ensure hash val=
-ues
-> > > for <source address, port X, destination address, destination port>
-> > > are not randomly spread, but monotonically increasing.
-> > >
-> > > Goal is to allow __inet_hash_connect() to derive the hash value
-> > > of a candidate 4-tuple with a single addition in the following
-> > > patch in the series.
-> > >
-> > > Given :
-> > >   hash_0 =3D inet_ehashfn(saddr, 0, daddr, dport)
-> > >   hash_sport =3D inet_ehashfn(saddr, sport, daddr, dport)
-> > >
-> > > Then (hash_sport =3D=3D hash_0 + sport) for all sport values.
-> > >
-> > > As far as I know, there is no security implication with this change.
-> >
-> > Good to know this. The moment I read the first paragraph, I was
-> > thinking if it might bring potential risk.
-> >
-> > Sorry that I hesitate to bring up one question: could this new
-> > algorithm result in sockets concentrating into several buckets instead
-> > of being sufficiently dispersed like before.
->
-> As I said, I see no difference for servers, since their sport is a fixed =
-value.
->
-> What matters for them is the hash contribution of the remote address and =
-port,
-> because the server port is usually well known.
->
-> This change does not change the hash distribution, an attacker will not b=
-e able
-> to target a particular bucket.
+syzbot has bisected this issue to:
 
-Point taken. Thank you very much for the explanation.
+commit 5872331b3d91820e14716632ebb56b1399b34fe1
+Author: Eric Sandeen <sandeen@redhat.com>
+Date:   Wed Jun 17 19:19:04 2020 +0000
 
-Thanks,
-Jason
+    ext4: fix potential negative array index in do_split()
 
->
-> > Well good news is that I
-> > tested other cases like TCP_CRR and saw no degradation in performance.
-> > But they didn't cover establishing from one client to many different
-> > servers cases.
-> >
-> > >
-> > > After this patch, when __inet_hash_connect() has to try XXXX candidat=
-es,
-> > > the hash table buckets are contiguous and packed, allowing
-> > > a better use of cpu caches and hardware prefetchers.
-> > >
-> > > Tested:
-> > >
-> > > Server: ulimit -n 40000; neper/tcp_crr -T 200 -F 30000 -6 --nolog
-> > > Client: ulimit -n 40000; neper/tcp_crr -T 200 -F 30000 -6 --nolog -c =
--H server
-> > >
-> > > Before this patch:
-> > >
-> > >   utime_start=3D0.271607
-> > >   utime_end=3D3.847111
-> > >   stime_start=3D18.407684
-> > >   stime_end=3D1997.485557
-> > >   num_transactions=3D1350742
-> > >   latency_min=3D0.014131929
-> > >   latency_max=3D17.895073144
-> > >   latency_mean=3D0.505675853
-> > >   latency_stddev=3D2.125164772
-> > >   num_samples=3D307884
-> > >   throughput=3D139866.80
-> > >
-> > > perf top on client:
-> > >
-> > >  56.86%  [kernel]       [k] __inet6_check_established
-> > >  17.96%  [kernel]       [k] __inet_hash_connect
-> > >  13.88%  [kernel]       [k] inet6_ehashfn
-> > >   2.52%  [kernel]       [k] rcu_all_qs
-> > >   2.01%  [kernel]       [k] __cond_resched
-> > >   0.41%  [kernel]       [k] _raw_spin_lock
-> > >
-> > > After this patch:
-> > >
-> > >   utime_start=3D0.286131
-> > >   utime_end=3D4.378886
-> > >   stime_start=3D11.952556
-> > >   stime_end=3D1991.655533
-> > >   num_transactions=3D1446830
-> > >   latency_min=3D0.001061085
-> > >   latency_max=3D12.075275028
-> > >   latency_mean=3D0.376375302
-> > >   latency_stddev=3D1.361969596
-> > >   num_samples=3D306383
-> > >   throughput=3D151866.56
-> > >
-> > > perf top:
-> > >
-> > >  50.01%  [kernel]       [k] __inet6_check_established
-> > >  20.65%  [kernel]       [k] __inet_hash_connect
-> > >  15.81%  [kernel]       [k] inet6_ehashfn
-> > >   2.92%  [kernel]       [k] rcu_all_qs
-> > >   2.34%  [kernel]       [k] __cond_resched
-> > >   0.50%  [kernel]       [k] _raw_spin_lock
-> > >   0.34%  [kernel]       [k] sched_balance_trigger
-> > >   0.24%  [kernel]       [k] queued_spin_lock_slowpath
-> > >
-> > > There is indeed an increase of throughput and reduction of latency.
-> > >
-> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> >
-> > Tested-by: Jason Xing <kerneljasonxing@gmail.com>
-> > Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
-> >
-> > Throughput goes from 12829 to 26072.. The percentage increase - 103% -
-> > is alluring to me!
-> >
-> > Thanks,
-> > Jason
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=122e44b7980000
+start commit:   7eb172143d55 Linux 6.14-rc5
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=112e44b7980000
+console output: https://syzkaller.appspot.com/x/log.txt?x=162e44b7980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=523d3ff8e053340a
+dashboard link: https://syzkaller.appspot.com/bug?extid=2f2bc79f24dae1dc62b6
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=126fd5a8580000
+
+Reported-by: syzbot+2f2bc79f24dae1dc62b6@syzkaller.appspotmail.com
+Fixes: 5872331b3d91 ("ext4: fix potential negative array index in do_split()")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
