@@ -1,165 +1,107 @@
-Return-Path: <netdev+bounces-172448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF8E8A54AEC
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 13:40:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B72B0A54B28
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 13:47:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F3E97A8AAD
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 12:39:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEFEE17047B
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 12:47:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 574C420F080;
-	Thu,  6 Mar 2025 12:38:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDC181863E;
+	Thu,  6 Mar 2025 12:47:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="msxHK9XV"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="GCgb1+1o"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C52320F073;
-	Thu,  6 Mar 2025 12:38:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 716A217BA9
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 12:47:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741264718; cv=none; b=RcDYPSGhY542FUA2ygBFn+KIPdrkfg0DkKU5gHB+cEQ5W7k2z89W+1CKU0fO42vd3TqMTVtYxVg5vNGZLjjLXBrwKOMh8rIkvJ9FEunItW4A+uiVjVv98+xyv2oXBjrycWIO05yqrkLeVzKdRhVSU+//FqtYY8HXky/lgG7cY38=
+	t=1741265255; cv=none; b=NlvZsMyzuQS6Yqmy+OS9x/P/ikwmPX0Elb2ZGVgHxLCLcpox3fkb1bl/c3HQkXieL2CSkjwFWORtxczQOWYxCS/P3kZcNaGgdYJLKx0rLReIk/zCoA1Y50yeHCfTz5xLQ42/yeL5K6AzvtKdJHSF462uhKplXzEm+NDzV3Gzylw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741264718; c=relaxed/simple;
-	bh=dyD83E6xBgj8xEPdWKHMuiwEZpx2QwPrP55hvE4goOM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Zo9QBJOOoTRv7ZFX67QwjVm/nn6r9qffwodlySsMhTNy5tg279twRKDu71mh2EtMyVAHAH0pcX6SInjPPCEcvmHx2aAJTOCuxAvG+I31JFI7XjkuNYvu5yDnbFHoslRDQUTCfABo7LvFIJO1/IDfEZu5V/anOZYWBwundRljBfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=msxHK9XV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5713AC4CEE9;
-	Thu,  6 Mar 2025 12:38:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741264717;
-	bh=dyD83E6xBgj8xEPdWKHMuiwEZpx2QwPrP55hvE4goOM=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=msxHK9XVTE/iAEB1CIFbZ3xuYCpuVOzc1hQROyhx73F7J5zvYznz9WZDNmnmN3VuN
-	 cp+MCgnB7fiHcyeQQMjYPUxpNKIBLu6EK+qJXESr2iTvGa3rNcYaDSbZ3tpxWQ4+pe
-	 2+h41P267DhcbaimMWpY+AiAgrAOyb6s0fiKzrU0CYgIalQRmJPVAUtr6xIvidHses
-	 MAbWL/ifA8OQInDxRL46X3ki7DnTPpmDhW8DmLzWFKyMyMmBxkUf9+798XS9yBb1x3
-	 SRUf8jdZZYWGpXpdQsAh0rTwVEOv6psszH/4VO0Wd3o9rZgNOoABLZFaZaEbGnrQHt
-	 UlwDITkIQzuuw==
-From: Jeff Layton <jlayton@kernel.org>
-Date: Thu, 06 Mar 2025 07:38:16 -0500
-Subject: [PATCH 4/4] sunrpc: keep a count of when there are no threads
- available
+	s=arc-20240116; t=1741265255; c=relaxed/simple;
+	bh=Up+aldGBaA00n3mn0fpGZ+nU/HjGiZgvNhtWaB0Brh0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hI/CZysh0njtiSRNWBwbvgYOD8ezTWiPB8N63tXq0czMKvXWxPd+pxBzfcQ0/EilXT/pGdoZEI++KJIL4FGtfpwD5w8xSEo8p7vQ2ZHd9ylDjB98wU/9kCGPSeoidJDX5YHVM/VqAQKZSvMTp0ydru9rXlLJR5cKl2oI/av/47c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=GCgb1+1o; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4394a0c65fcso6728805e9.1
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 04:47:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1741265251; x=1741870051; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5hZNm5FBtBQ8RgVFKxGhGMV35WiDPZm3S3W8QbGcDLk=;
+        b=GCgb1+1oYkEp9j5sozs9muKAozHrUjmYF870MuvDryV2m1uDbu/5bkEfSOI97l83wb
+         fW+RsvuTIK+gWjrAqgIhnNkg/ei5PqSePG7RtU6zwkWSSjHb6a74jf5jIuIXhyPP8RpJ
+         Cu4UX+huu6eYIOGcziVvbujIgtnayHMX2hZRUB2hV+/bSG5EK7Dq4TjVAHpjEm7zWryP
+         dG6k8FvYTiP41G34Lu4itaZ6MksWuRuap5J5x9fUNGeb2UovT67/ON5aumlmmBaqinzn
+         rvOBKuk+STuzRoPulHwN0b8Y/+HGj+hA7yrBJTf73ETloyAswCfdQMyAXbE9HzCWjKmE
+         z2vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741265251; x=1741870051;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5hZNm5FBtBQ8RgVFKxGhGMV35WiDPZm3S3W8QbGcDLk=;
+        b=DW8XxHQvgSgjI1y2JRQMAnddpA4lzgYGoVNuB2ab/UgeQFAHQVD36D1I+aLOAlqi2n
+         to+/ki/rDDD+OV4ivcA+Mptb7lmmWFy5MDtPUwkDV81IR8jyCIF4Glpj2T71mUcLbkfz
+         px7N/ueXiRRcDETfrsq2cgf7a7oinpu2eYt4/IdBDP4TMU0IgNJybR3MZDQn4ltmRKxe
+         7DZXtZjwe2HZK8MNbK3xKByAHpOuzspHv0/6sL0tYhLWB1sRGTApwE4/0h9MDmx3PRGH
+         j0Z8SLOdXpekLMp7ql/WguD9iOYG45tqRJNushgD+LPIYv2zRYskMHkh8DH7m7udlKQl
+         dInA==
+X-Forwarded-Encrypted: i=1; AJvYcCUcAVC8VJP5FtfbEI+e4hgCPuKP74fto+nLLaRP2NNkN+NyvVT0f4GOF/Sn1qZuGxChJGRBKr0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YykC05h1Rmn7Th6F73nFcDNZGOI586Xg3XIuBganrEdDM5dD7Yb
+	PmRVeuCtJQ7BasvOBXw/wjj9aF88fMNi7JmCJMckGuWA5ardQfcP5iuxrdBtheo=
+X-Gm-Gg: ASbGncsFDAv9/rMv2mXwcCWoL/wo/FU68cl8s6iGvlaGRC8NFfFFc54WPisQTO7wAUp
+	Ct9yHojZcp0zKJ06mNb63YK48ovp2yRLVI6qtyjtbEqcbQeIMjyy5hoYRAStwnWS59Bmk4Gt2pu
+	29G74cCPQKb2SRZ42rmUnjFYDEwOBUMh9uKP9hkKmAuy8wHkTNpUovJjd2zjD1mVRkVQXR8aysq
+	UF+HLVYaKY3yKJtpBaklIArISOY1F0n5AGSme+POi8VdbkzhgFj+QmPXiscrPUhV9U7MYQJxOhS
+	xxqhlYjkqWWM4mbv4VSZKShjmOoq5dYUvopNIwcCud4+tPNOTPidspMti0m25O0tpURVIHcp
+X-Google-Smtp-Source: AGHT+IEFhNuYZ+z6bxKs94XD1T5cvtdGwqhGzhRcTFV4h7HNuB7NXh8n+T71Gn5iWt8ClaoNyS2TtA==
+X-Received: by 2002:a05:600c:4ed2:b0:439:9d75:9e92 with SMTP id 5b1f17b1804b1-43bd29d239bmr56832535e9.28.1741265251345;
+        Thu, 06 Mar 2025 04:47:31 -0800 (PST)
+Received: from jiri-mlt.client.nvidia.com ([140.209.217.212])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bdd8c327fsm19056285e9.13.2025.03.06.04.47.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Mar 2025 04:47:30 -0800 (PST)
+Date: Thu, 6 Mar 2025 13:47:27 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Tariq Toukan <ttoukan.linux@gmail.com>, netdev@vger.kernel.org, 
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com, 
+	leon@kernel.org, tariqt@nvidia.com, andrew+netdev@lunn.ch
+Subject: Re: [PATCH net] net/mlx5: Fill out devlink dev info only for PFs
+Message-ID: <amselxwxk5wimldqon5pwiue2canabbbzebrtb7um3osmnjsue@immvwjergd5m>
+References: <20250303133200.1505-1-jiri@resnulli.us>
+ <53c284be-f435-4945-a8eb-58278bf499ad@gmail.com>
+ <20250305183016.413bda40@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250306-nfsd-tracepoints-v1-4-4405bf41b95f@kernel.org>
-References: <20250306-nfsd-tracepoints-v1-0-4405bf41b95f@kernel.org>
-In-Reply-To: <20250306-nfsd-tracepoints-v1-0-4405bf41b95f@kernel.org>
-To: Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>, 
- Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
- Tom Talpey <tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>, 
- Anna Schumaker <anna@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: Sargun Dillon <sargun@meta.com>, linux-nfs@vger.kernel.org, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Jeff Layton <jlayton@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3042; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=dyD83E6xBgj8xEPdWKHMuiwEZpx2QwPrP55hvE4goOM=;
- b=owEBbQKS/ZANAwAIAQAOaEEZVoIVAcsmYgBnyZdFnf7gFL693DACTwjc5lS7TCYZ6V0GGpM6p
- b+7E2endsWJAjMEAAEIAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCZ8mXRQAKCRAADmhBGVaC
- FYnJEACXHTkEJe6iR66DsLQGjBAXCPwcK40MVENvsNzhhADmEbTed0FKW2o9iZcIwZmz3MQKo10
- NOc6VALWuBSiBw+ygP6x6sIpa8z4q1PV0gfwWCwTj2obQ/R3w82GJJ5jEeZgeklj3gyGdOaIjeZ
- My4cT5af4xHXEhqHK2AyRBZqxr1THlO/X5WeuXxlfXhdC3dfKznTytd15InNgWPR/XuCEGceILo
- Uqd9b3+R7vCNjiSZbA3RBxkTmZE43kxAWX3aJ82Mb5sAPOSSAUU7GQZgW/6OniLEGFkx+D53igu
- oT7F+bOCJcbs8stmAYeXh/YOiTggE7KiEM/P5KthWrqSmi4l08ec/YQ0TTFXY52CMwz/uEajPKn
- geYlij3FgIEYMKSpcW4B69flPCzMwxhMKXLvPDfrq0ZGeKGp8OiIOUP3QT4j4dfQlVoUsVkPkSH
- RgE3YY8SDo8IndxL55Oun6KWtElhmWEn281alhqhOVsztjkpfmFWYKJZbNimZuba2EzO+9Wb0lc
- SIXWJZFkfgUF6Z2gy8UkLSLOu4Zt6s8HAOke8lMA+e91pJ4eegMmtXt4sab2SV8542IuPJNuTo+
- M6nt0XgrFK5joSao7n0Nu73oi4lCk5zy11brcXBcp0JBZjBTpVi5Thy5TzRUJpVhlF6V6q/Pq4f
- OlrKhKhi7AU3z0Q==
-X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
- fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250305183016.413bda40@kernel.org>
 
-Add a new percpu counter and pool_stat that can track how often the
-kernel went to wake up a thread, but they all were busy.
+Thu, Mar 06, 2025 at 03:30:16AM +0100, kuba@kernel.org wrote:
+>On Wed, 5 Mar 2025 20:55:15 +0200 Tariq Toukan wrote:
+>> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+>
+>Too late, take it via your tree, please. 
+>You need to respond within 24h or take the patches.
 
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
----
- include/linux/sunrpc/svc.h | 1 +
- net/sunrpc/svc.c           | 4 +++-
- net/sunrpc/svc_xprt.c      | 7 ++++---
- 3 files changed, 8 insertions(+), 4 deletions(-)
+Can I repost with Tariq's tag (I was not aware it is needed). I have a
+net-next patchset based on top of this I would like to push.
 
-diff --git a/include/linux/sunrpc/svc.h b/include/linux/sunrpc/svc.h
-index 74658cca0f38f21e2673c84c7bcae948ff7feea6..179dbfc86887374e1a0a2b669c5839cb622dd3f5 100644
---- a/include/linux/sunrpc/svc.h
-+++ b/include/linux/sunrpc/svc.h
-@@ -44,6 +44,7 @@ struct svc_pool {
- 	struct percpu_counter	sp_messages_arrived;
- 	struct percpu_counter	sp_sockets_queued;
- 	struct percpu_counter	sp_threads_woken;
-+	struct percpu_counter	sp_no_threads_avail;
- 
- 	unsigned long		sp_flags;
- } ____cacheline_aligned_in_smp;
-diff --git a/net/sunrpc/svc.c b/net/sunrpc/svc.c
-index e7f9c295d13c03bf28a5eeec839fd85e24f5525f..789f08022aec210b6df08036997ef801d3c73ac8 100644
---- a/net/sunrpc/svc.c
-+++ b/net/sunrpc/svc.c
-@@ -545,6 +545,7 @@ __svc_create(struct svc_program *prog, int nprogs, struct svc_stat *stats,
- 		percpu_counter_init(&pool->sp_messages_arrived, 0, GFP_KERNEL);
- 		percpu_counter_init(&pool->sp_sockets_queued, 0, GFP_KERNEL);
- 		percpu_counter_init(&pool->sp_threads_woken, 0, GFP_KERNEL);
-+		percpu_counter_init(&pool->sp_no_threads_avail, 0, GFP_KERNEL);
- 	}
- 
- 	return serv;
-@@ -629,6 +630,7 @@ svc_destroy(struct svc_serv **servp)
- 		percpu_counter_destroy(&pool->sp_messages_arrived);
- 		percpu_counter_destroy(&pool->sp_sockets_queued);
- 		percpu_counter_destroy(&pool->sp_threads_woken);
-+		percpu_counter_destroy(&pool->sp_no_threads_avail);
- 	}
- 	kfree(serv->sv_pools);
- 	kfree(serv);
-@@ -756,7 +758,7 @@ void svc_pool_wake_idle_thread(struct svc_pool *pool)
- 		return;
- 	}
- 	rcu_read_unlock();
--
-+	percpu_counter_inc(&pool->sp_no_threads_avail);
- }
- EXPORT_SYMBOL_GPL(svc_pool_wake_idle_thread);
- 
-diff --git a/net/sunrpc/svc_xprt.c b/net/sunrpc/svc_xprt.c
-index ae25405d8bd22672a361d1fd3adfdcebb403f90f..b2c5a74e4609e8f4a3f5f4637dd9b46b40b79324 100644
---- a/net/sunrpc/svc_xprt.c
-+++ b/net/sunrpc/svc_xprt.c
-@@ -1451,15 +1451,16 @@ static int svc_pool_stats_show(struct seq_file *m, void *p)
- 	struct svc_pool *pool = p;
- 
- 	if (p == SEQ_START_TOKEN) {
--		seq_puts(m, "# pool packets-arrived sockets-enqueued threads-woken threads-timedout\n");
-+		seq_puts(m, "# pool packets-arrived sockets-enqueued threads-woken threads-timedout no-threads-avail\n");
- 		return 0;
- 	}
- 
--	seq_printf(m, "%u %llu %llu %llu 0\n",
-+	seq_printf(m, "%u %llu %llu %llu 0 %llu\n",
- 		   pool->sp_id,
- 		   percpu_counter_sum_positive(&pool->sp_messages_arrived),
- 		   percpu_counter_sum_positive(&pool->sp_sockets_queued),
--		   percpu_counter_sum_positive(&pool->sp_threads_woken));
-+		   percpu_counter_sum_positive(&pool->sp_threads_woken),
-+		   percpu_counter_sum_positive(&pool->sp_no_threads_avail));
- 
- 	return 0;
- }
-
--- 
-2.48.1
+Thanks!
 
 
