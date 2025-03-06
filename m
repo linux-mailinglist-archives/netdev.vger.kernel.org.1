@@ -1,98 +1,93 @@
-Return-Path: <netdev+bounces-172381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 383D6A546F4
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:56:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C345A5470B
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:58:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A1CA18928AA
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:57:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD3BD1893B26
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:58:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A821420A5D5;
-	Thu,  6 Mar 2025 09:56:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A055120C46B;
+	Thu,  6 Mar 2025 09:57:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="DMuS5bSZ";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="TH88ptt3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BkUmWWfq"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 091F92080D4;
-	Thu,  6 Mar 2025 09:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AB0620AF78
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 09:57:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741255005; cv=none; b=oWzoo1ssAluGfdkxQgNy9ohfOmwRAEZyW8Bv1jshw84QQdYMI6O9+Tjuex+CNQE9CA+Vf4mW4Bj8fjcZ1xvXx4VdEIVmSB42VXJaoPFgJJsHfFBk4n/Z0MeUWDH0/D66QSzM2ruaAdL/WRkSmCy7za/tlRTCvz/ZPwLRKMYSpio=
+	t=1741255036; cv=none; b=cefLyh1tEwKKdm4GR4xjhcq5z3KAmcpOV9C2GG2zXnLCb9w+iqZmMB7vhxFxDv8zMZ6Mezw2XKzVEP5If8BI4rtJwrtB00D3WTsTNF9ncVDXagGsCH0YpkYhoCOjyRDUH0VAuLLlqAKLwPG7wrGz3NWi0yIwrdCBKe1f6UGCNeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741255005; c=relaxed/simple;
-	bh=zBqKLeLcKRYNMfeqT2BCbDBp9u+d5ynueRcK+eTycdY=;
+	s=arc-20240116; t=1741255036; c=relaxed/simple;
+	bh=wsDrmZWqNwZ8Z92QvIsMkJWkfZRuwXzjXEV5bkQIeE8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aeTvnEtLNVKHw2eAiezajVQU19rwENy9+Jh9y7ABZgXzb69yI35MpU0km9Or0YefaJNpEl7LzSNBSz5MAp7zKeK1VlQYsVSphlCj6pUQUsMmyY6D21a7YRDcLg354A2L79ZIEmX6J8w5IJwHnZamcFN+ETjt5u93eBOgQJJjwec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=DMuS5bSZ; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=TH88ptt3; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Thu, 6 Mar 2025 10:56:39 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1741255001;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b0hBTOKk34vwmWSLU8KV6qhcfbvYPUsAocrMEWuIr0s=;
-	b=DMuS5bSZgTBx+JCWBVj/s9j/dleIr+1rJAiFtbNBenDPkNc7UTd71WSft0POQ96oLe/Cwu
-	qlV2uKD7Yq7VRBB59ay8v19yBFX5Hsbrkac804Hewz0OZSlAennDmLfyRXClEHMVi/C+nH
-	xOa0b4v6xW/HG0xXhSOg0GIoZA44Pd0lxYIk2fP2d9j/oCd63tP86+WM/i4huvptLL7K43
-	OATQpOoIv94OQYPhmSgeNDm2s/2L/TlXZoQXBk1TJs48ajlkAKOid3X6p9oXw/qVNuH6Ef
-	FAQD8U1A5ofKQ/avQ3vLFvCbJ+3coBB/8nQavYf8ztk6IT72tUwOxu5ngZ+lmw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1741255001;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b0hBTOKk34vwmWSLU8KV6qhcfbvYPUsAocrMEWuIr0s=;
-	b=TH88ptt31qssT1yc02e+CpNdG48MsE8zU2taGb9wo7RyEjXbIyza3vD5bprMJABrxDWz3P
-	jOJOf9ixiduVlACQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=SKL1exyAf3OAbnMsELnDERUdVRDT7cEq03fB9u4rW+TJu0fadp2epP3SrHDEnrF5UVUeW1L84AU9LVcnQX3RP0AlNO+xdeJLUdmWQscgeyOUF+lQ1R/YFp8TN6B1ESXveHO/TBJGjlT/r1oyZ4YbsOSZytMpmugBczrawt/ROIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BkUmWWfq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 335F6C4CEE2;
+	Thu,  6 Mar 2025 09:57:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741255035;
+	bh=wsDrmZWqNwZ8Z92QvIsMkJWkfZRuwXzjXEV5bkQIeE8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BkUmWWfq0wnktTbrQMOzFCxZ1idiOiZOA0Td5RKlwaMZLIzNz8MCsANI6ruO+VVZp
+	 gbGm7NG8dpfDTk4y3ua5cy3hTFiR8v4JXyYFNoQE450Jkq+dXHs9gXxrUbNs7B7+q4
+	 xySW/R9nLFVa21UfFdAEhuSjeQJh/tp6GlJbhPT3tEcjlRW6hLVnCgjQ0rtGnls/dz
+	 tlLYsYOaP4jm3eK0Ipat41qGStDjxly3buRLC7i+x/V7WgMlU7AerBmYZ26g9j/0Fi
+	 hLTgZNC0sfOIk976NyWco3xeMZQ5uQndGt+QKyO3FUfl5L3DdTnKUCV1f0RFX7wxY9
+	 QETTN5tbBhK3w==
+Date: Thu, 6 Mar 2025 09:57:10 +0000
+From: Simon Horman <horms@kernel.org>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Joe Damato <jdamato@fastly.com>,
-	Leon Romanovsky <leon@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [PATCH net-next] net/mlnx5: Use generic code for page_pool
- statistics.
-Message-ID: <20250306095639.HpT1e8jH@linutronix.de>
-References: <20250305121420.kFO617zQ@linutronix.de>
- <8168a8ee-ad2f-46c5-b48e-488a23243b3d@gmail.com>
- <20250305202055.MHFrfQRO@linutronix.de>
- <20250306083258.0pqISYSF@linutronix.de>
- <042d8459-e5be-4935-a688-9fe18b16afa1@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next] net: stmmac: simplify phylink_suspend() and
+ phylink_resume() calls
+Message-ID: <20250306095710.GR3666230@kernel.org>
+References: <E1tpQL1-005St4-Hn@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <042d8459-e5be-4935-a688-9fe18b16afa1@gmail.com>
+In-Reply-To: <E1tpQL1-005St4-Hn@rmk-PC.armlinux.org.uk>
 
-On 2025-03-06 11:50:27 [+0200], Tariq Toukan wrote:
-> On 06/03/2025 10:32, Sebastian Andrzej Siewior wrote:
-> > Could I keep it as-is for now with the removal of the counter from the
-> > RQ since we don't have the per-queue/ ring API for it now?
+On Tue, Mar 04, 2025 at 11:21:27AM +0000, Russell King (Oracle) wrote:
+> Currently, the calls to phylink's suspend and resume functions are
+> inside overly complex tests, and boil down to:
 > 
-> I'm fine with transition to generic APIs, as long as we get no regression.
-> We must keep the per-ring counters exposed.
+> 	if (device_may_wakeup(priv->device) && priv->plat->pmt) {
+> 		call phylink
+> 	} else {
+> 		call phylink and
+> 		if (device_may_wakeup(priv->device))
+> 			do something else
+> 	}
+> 
+> This results in phylink always being called, possibly with differing
+> arguments for phylink_suspend().
+> 
+> Simplify this code, noting that each site is slightly different due to
+> the order in which phylink is called and the "something else".
+> 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-I don't see a regression.
-Could you please show me how per-ring counters for page_pool_stats are
-exposed at the moment? Maybe I am missing something important.
-
-Sebastian
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
