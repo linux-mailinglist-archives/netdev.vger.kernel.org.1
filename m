@@ -1,95 +1,190 @@
-Return-Path: <netdev+bounces-172642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79761A559BA
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 23:25:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F5A5A559BC
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 23:26:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2C2F18961EC
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 22:25:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78DBA1718B2
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 22:26:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D422627C850;
-	Thu,  6 Mar 2025 22:25:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 845601FC11F;
+	Thu,  6 Mar 2025 22:26:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="aEbE1vfv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bidKEMmE"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4512B27C84F;
-	Thu,  6 Mar 2025 22:25:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D35E279338
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 22:26:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741299944; cv=none; b=N65FP0NwqnhGnthyjtq5o0m4hsErO5661JeSkGy9aOCrHDhsunfaMfkyh8aBWt1lcjqIISLEBLoSMu86cfFhL1dDgAlzVSNGOI9QmiZia85aYggvJ7vOLZEiplDc49wRfuKpV5F/L8cpC8bnAymMCj3g+rgSBbIX5bf+qhxqDMg=
+	t=1741299974; cv=none; b=ngtwQRyrWuKgND1SkM7m5H49+qQx31syn4Hk4Lr7pmwqzJYEeMW+PL+WTAJkmA6U73hnBvpW7BczWXjpfWnWVLmbf7fcmAgZHPDw+jhWRpBnCuo+U3x2ue4/+W7o5fhqoPOYrJFWEnlUqy52UkI7gSV6iAV+CIq9Rlx5WiowOwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741299944; c=relaxed/simple;
-	bh=ODNkFsouAB0zbMg27325e5pEmsJgKLlSe0Vl9ayg0pw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=asUV6rlNrTiQF//G4Brv6G2Zpq4aZbmM7vLtlmFNEvzNATWnaydvVJ5IIeVLIEQYDyYOjPIUoeCNgBCfrwIRIyMC3q6MAZsYv4H+wnZWXFeak6lolZh9+aeVjIb1U4fuGaYc6umr8Gqx51dBl53/EIYwqErIXO5RN1SvqmyoWvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=aEbE1vfv; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=bRSDAzfZLY2i8MApo1JUO6NM3IHVWAv/taEIFNyzysc=; b=aEbE1vfv1e3AU8SHMntOcjLfhO
-	o4jRVQLRSpwkGCUp9Ka9Ne7bx/lv00Lx+rnidJ1w5Twskz7BRBRgip3wtBDguPkSh4Ttw8HPM4it1
-	VbDb6vldTX9eINY76jtGbL99YaW2g9QycS+Br/QGig7TFoO/MSJjV019m3VjwxztKinY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tqJeV-002w7o-Cf; Thu, 06 Mar 2025 23:25:15 +0100
-Date: Thu, 6 Mar 2025 23:25:15 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jonas Karlman <jonas@kwiboo.se>
-Cc: Heiko Stuebner <heiko@sntech.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Wadim Egorov <w.egorov@phytec.de>, netdev@vger.kernel.org,
-	linux-rockchip@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH 1/3] net: stmmac: dwmac-rk: Use DELAY_ENABLE macro for
- RK3328
-Message-ID: <d6b15dc2-f6b2-4703-a4da-07618eaed4db@lunn.ch>
-References: <20250306203858.1677595-1-jonas@kwiboo.se>
- <20250306203858.1677595-2-jonas@kwiboo.se>
+	s=arc-20240116; t=1741299974; c=relaxed/simple;
+	bh=VcVQVZsw2Mva33VX5MMwYKuFglGYXsfKFw0U7WHnkBo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ssahAAaVfTaZhfH8M0bgn62TADZZs7emnwPmwnsVw40CZHj9iEZ0SrrXbZ6Z7MlmkjPLBOqcEC+Uufw4+B4HDXMYhFrtkmqZ66xahxjOPPWDraWJTcSCYLRA7KdBhRpKB/L4e3UmcqC7qCdW2sIvvyg9WD79Yp4ICCQxi8XPVv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bidKEMmE; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-54954fa61c8so1365319e87.1
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 14:26:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741299971; x=1741904771; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yz+ztoFCrEz7wTkdNhztSYbp1A3kxnM2qM63vYDcoyQ=;
+        b=bidKEMmEOqsQMkatYlDa90JsXAQ6g33ZGgKuKrKNt5oXjMj/Y98Vi44krQ7AS4XpGa
+         xtoryV0ha7KwB8E/mRFGGEZCoi7GGvj0yXRPS72yZ8cKGzvgB8SJZw7GqR78R/Pq6qbe
+         9M7cV+apF3KgZX3IQHK1Xhw1ced3nHIIZp1+HtZLqBqUxZldo5tHaRbYWQrRew5KPrGA
+         aMQjlDS/CcUO1de/5RApopCuQhsH1768SlHdYvLMPYaeTFUyyY7utY1jA27oyPEZxhN1
+         dBUG9HpFkukoeB8EU+0fH2q1Z6OgDFyK0emC9qDPI94OcGCuPNidNxUih6pAFQ6j+koh
+         3lCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741299971; x=1741904771;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yz+ztoFCrEz7wTkdNhztSYbp1A3kxnM2qM63vYDcoyQ=;
+        b=hoE51LECx0l8h1KhL7PoLi28XNC4KLRhNEiQfaGlfLR/ze7E1ermf4hDZ8OB59KJa1
+         igUTS75pjfq7o7D+zoMQydZsaZyDoOmVmPSc55Op6JMLqgfGlv1FdchFOTRXp+WanWhW
+         BgN1sxEdjFmTHjgwtik3wUhXJAnHbSBzpHyCMsb0jFLeMxDlZerSb8BpJnlGx0yIX1D4
+         keyeq/uMp5e6lLm4e9SCkQGcHImtsRqaiA5BoQF7y2eK7rhxs3ksv/FV/QapA920azZL
+         eIZ8UFyeUl3tc6MdsVScK1LDtJjcqsYgydUhZ5Etr16aV46FqKem26wp7pzygjSl4Bta
+         GMEw==
+X-Forwarded-Encrypted: i=1; AJvYcCX0ZjrB9nS9yUDfRrI/qFQeyl1rcY/b1zuqgS9xDFhxdoUTcU6Ub+j0lLrdMTLi6KRp2UnD8MI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyuhhZa4lFAqW0hhTNBrOZP8gw+SM5vmNpTwSoQRXVou44wlmw/
+	UM386UL+Tl+/JwLmk8VGEXoB7mG1oNqwtewi0FaR3OY2yICUDwOxNZJSjQl8jARICTpK97E6n/Y
+	W4sSynRoXUj5z2aaymDbNQVlYrqX+RkqvWuQN
+X-Gm-Gg: ASbGncuo0Rdd5gpsTjGnxBboyIMDkyiRnuA2DqVrnwTqvjvglvHcjzh1tKeMYcEc1Kf
+	RHsSBO2edJovwoTruG+HQoXKaP91Bfru1r5AmZpoGuR4yOyMFPfjWAwk17jypmwm8lx30DXFUk6
+	Fe3VoeMns0EhAHp6r2Hx3vs8PrxjTVBZpWDP0AA5UDvFWNT3sHSad3Y8kGAM/3
+X-Google-Smtp-Source: AGHT+IFA+tN0laTQ0wbQLy5AyrNHomLVhw7MjPMP3WSQtVEg1FEjodPrecLmUDuuz7/aYEXcakm/l3ENnb4cOa17ID0=
+X-Received: by 2002:a05:6512:3b9b:b0:549:3b4f:4b39 with SMTP id
+ 2adb3069b0e04-54990e298bfmr342834e87.10.1741299970426; Thu, 06 Mar 2025
+ 14:26:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250306203858.1677595-2-jonas@kwiboo.se>
+References: <cover.1741275846.git.pabeni@redhat.com> <ef5aa34bd772ec9b6759cf0fde2d2854b3e98913.1741275846.git.pabeni@redhat.com>
+ <67c9fb8199ef0_15800294cc@willemb.c.googlers.com.notmuch> <840bec2f-51a6-4036-bf9a-f215a4db1be5@redhat.com>
+In-Reply-To: <840bec2f-51a6-4036-bf9a-f215a4db1be5@redhat.com>
+From: Willem de Bruijn <willemb@google.com>
+Date: Thu, 6 Mar 2025 17:25:33 -0500
+X-Gm-Features: AQ5f1Joopu4YWZIW9KmRM-IkbRvCLNIyHENj0As-tPQOKGWmp5UT6LXVhlsZwnA
+Message-ID: <CA+FuTScuTVjJLZFzMrufhp9+WzUnvmtsvShN6FWPx1R_Cau7Uw@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] udp_tunnel: create a fast-path GRO lookup.
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 06, 2025 at 08:38:52PM +0000, Jonas Karlman wrote:
-> Support for Rockchip RK3328 GMAC and addition of the DELAY_ENABLE macro
-> was merged in the same merge window. This resulted in RK3328 not being
-> converted to use the new DELAY_ENABLE macro.
-> 
-> Change to use the DELAY_ENABLE macro to help disable MAC delay when
-> RGMII_ID/RXID/TXID is used.
-> 
-> Fixes: eaf70ad14cbb ("net: stmmac: dwmac-rk: Add handling for RGMII_ID/RXID/TXID")
+On Thu, Mar 6, 2025 at 4:20=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
+>
+> On 3/6/25 8:46 PM, Willem de Bruijn wrote:
+> > Paolo Abeni wrote:
+> >> Most UDP tunnels bind a socket to a local port, with ANY address, no
+> >> peer and no interface index specified.
+> >> Additionally it's quite common to have a single tunnel device per
+> >> namespace.
+> >>
+> >> Track in each namespace the UDP tunnel socket respecting the above.
+> >> When only a single one is present, store a reference in the netns.
+> >>
+> >> When such reference is not NULL, UDP tunnel GRO lookup just need to
+> >> match the incoming packet destination port vs the socket local port.
+> >>
+> >> The tunnel socket never set the reuse[port] flag[s], when bound to no
+> >> address and interface, no other socket can exist in the same netns
+> >> matching the specified local port.
+> >>
+> >> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> >
+> >> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+> >> index c1a85b300ee87..ac6dd2703190e 100644
+> >> --- a/net/ipv4/udp_offload.c
+> >> +++ b/net/ipv4/udp_offload.c
+> >> @@ -12,6 +12,38 @@
+> >>  #include <net/udp.h>
+> >>  #include <net/protocol.h>
+> >>  #include <net/inet_common.h>
+> >> +#include <net/udp_tunnel.h>
+> >> +
+> >> +#if IS_ENABLED(CONFIG_NET_UDP_TUNNEL)
+> >> +static DEFINE_SPINLOCK(udp_tunnel_gro_lock);
+> >> +
+> >> +void udp_tunnel_update_gro_lookup(struct net *net, struct sock *sk, b=
+ool add)
+> >> +{
+> >> +    bool is_ipv6 =3D sk->sk_family =3D=3D AF_INET6;
+> >> +    struct udp_sock *tup, *up =3D udp_sk(sk);
+> >> +    struct udp_tunnel_gro *udp_tunnel_gro;
+> >> +
+> >> +    spin_lock(&udp_tunnel_gro_lock);
+> >> +    udp_tunnel_gro =3D &net->ipv4.udp_tunnel_gro[is_ipv6];
+> >
+> > It's a bit odd to have an ipv6 member in netns.ipv4. Does it
+> > significantly simplify the code vs a separate entry in netns.ipv6?
+>
+> The code complexity should not change much. I place both the ipv4 and
+> ipv6 data there to allow cache-line based optimization, as all the netns
+> fast-path fields are under struct netns_ipv4.
+>
+> Currently the UDP tunnel related fields share the same cache-line of
+> `udp_table`.
 
-Please add a description of the broken behaviour. How would i know i
-need this fix? What would i see?
+That's reason enough. Since you have to respin, please add a comment
+in the commit message. It looked surprising at first read.
 
-We also need to be careful with backwards compatibility. Is there the
-potential for double bugs cancelling each other out? A board which has
-the wrong phy-mode in DT, but because of this bug, the wrong register
-is written and it actually works because of reset defaults?
+> >> @@ -631,8 +663,13 @@ static struct sock *udp4_gro_lookup_skb(struct sk=
+_buff *skb, __be16 sport,
+> >>  {
+> >>      const struct iphdr *iph =3D skb_gro_network_header(skb);
+> >>      struct net *net =3D dev_net_rcu(skb->dev);
+> >> +    struct sock *sk;
+> >>      int iif, sdif;
+> >>
+> >> +    sk =3D udp_tunnel_sk(net, false);
+> >> +    if (sk && dport =3D=3D htons(sk->sk_num))
+> >> +            return sk;
+> >> +
+> >
+> > This improves tunnel performance at a slight cost to everything else,
+> > by having the tunnel check before the normal socket path.
+> >
+> > Does a 5% best case gain warrant that? Not snark, I don't have a
+> > good answer.
+>
+> We enter this function only when udp_encap_needed_key is true: ~an UDP
+> tunnel has been configured[1].
+>
+> When tunnels are enabled, AFAIK the single tunnel device is the most
+> common and most relevant scenario, and in such setup this gives
+> measurable performance improvement. Other tunnel-based scenarios will
+> see the additional cost of a single conditional (using data on an
+> already hot cacheline, due to the above layout).
+>
+> If you are concerned about such cost, I can add an additional static
+> branch protecting the above code chunk, so that the conditional will be
+> performed only when there is a single UDP tunnel configured. Please, let
+> me know.
+>
+> Thanks,
+>
+> Paolo
+>
+> [1] to be more accurate: an UDP tunnel or an UDP socket with GRO enabled
 
-    Andrew
-
----
-pw-bot: cr
+Oh right, not all regular UDP GRO. That is okay then.
 
