@@ -1,174 +1,238 @@
-Return-Path: <netdev+bounces-172602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47133A557B3
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 21:45:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1C51A557BE
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 21:48:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 719FA176804
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 20:45:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 032367A4712
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 20:47:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 446C51FCFCA;
-	Thu,  6 Mar 2025 20:45:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA37B1FCF7C;
+	Thu,  6 Mar 2025 20:48:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yo8GMXYQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kPWSIqeO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D521A23BD;
-	Thu,  6 Mar 2025 20:45:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C6B92907
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 20:48:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741293950; cv=none; b=gBpufuVS7owY7AJpKyHGEiChOHs5GjxdhQ/GvxD+OB/y0gmFRRgDkrzXfPX/VcL6RXzeipxQh3wJ8h8LzePDDBy23PhxeKEFK7UCdurfP9k3WEun2plUEyQw53ZO8NIrG1Xtdm8sURa0A7mCMifAI1vkCI+2N476C9GofsHisZw=
+	t=1741294129; cv=none; b=t2gPv6C2xGUbXdgYJDuEF93+5elGNiSIq3Bjxv+qkrKkCaIxnKpS9CxmAbAeJ9dooTRztgXDt8r4HueXG7+98JDqx0mzKD63tXWPiGNN3ncXydIe/ntQNTWuIFHn6QWsmlGv1jP/f+YO9JTjoaS0WK55YjETYakPiRYSvE8hodA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741293950; c=relaxed/simple;
-	bh=YRiEklZgyKif9YQuFPeDNCuPRKOpVl4Sp4NBuCatdYk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EqdfaPhY605s4c6GqFcl/zo0MjHxNNOqB426UKNjTnw9V2K9ivq5XtcBYGh7xcW5b53IoBsy7jESaXPkT9am8zzlxDZi+32fsNKMqt8MpVrrpuRf6y1jQGxvO8kqLTAn/WxeBm8NR3n3ybrVonMpMz+B3mue2lvNJKMlffuRzB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yo8GMXYQ; arc=none smtp.client-ip=209.85.221.45
+	s=arc-20240116; t=1741294129; c=relaxed/simple;
+	bh=Fd0Biosx6kqIBMtJeFuBa0EjIyD6B6DSPc96Hb8V8tc=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=gMVrEaA5B5cRIbKFlaiBQP3TRIqpe1obitsfUyAFiegSUx7B3tEW8yBe68lRLv+DxsB4TAo3hyjibmADyRFutWrsbl/cDLXgJbG59Lw8aIuQ5vlT8iN6BOrQ8KndBNdMxT18gvfDh3D9pAyISUdMLFZuh/YU2v/3xJ9CbY+e1oQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kPWSIqeO; arc=none smtp.client-ip=209.85.160.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-390d98ae34dso876605f8f.3;
-        Thu, 06 Mar 2025 12:45:48 -0800 (PST)
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-475038900b4so10863841cf.0
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 12:48:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741293947; x=1741898747; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1741294127; x=1741898927; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=U/2AW/XQ+C1Dkr/bifBKVXkd3UKdww00iQvvrQ69JSo=;
-        b=Yo8GMXYQY66Qke/AigSX3nfeldGlI4YA8pihoQyOws62kK/g2lLRepvjNAgN+XL6cR
-         ZBqg5LkSaU3JXTpUBUFJheGjOmvViwCbwV2t/v6AxJegDBfljJCkazn2KioQou8rgkJ1
-         VqMHqOwujeGuYyx6dYQubWKWZVgG150yAvNIRLSf5MfxerDbgCLcnu3aoEjy+be4FppB
-         Xie6o5bIcKevKXUWUmPgHbrrvDche+/zHf3uh1oXVEUxPK9BuNgCttNmi3QWQLZDIj0E
-         mrABgL4PTwo5Hy25mk4gYqaa94/c4x61pnMQSy4fwItFJdFhJHNzoYy5euy+blTnPiAA
-         3wmQ==
+        bh=+t6PqjADSQvvRE38351jKHjhxK9cNu9LvZB0GI1TtZU=;
+        b=kPWSIqeO4fhSbaR+JxYM7bysqpJ64lpHF3UowP96CSvSRZXyReS9zmFQ2NCooGfnPU
+         e6pi4I1uQ3SoTEwmQ95J+V4NsTF0fE5xE7Xo0IGD0TMtCZaCZXs5hAaqzQiSyckgOyF5
+         s/r2/m7+Je9llnp89Rd93Z9aCyMpkhIl6Iidjytaq3vEb6l7hZd3WlZ8zXpRm6L4naVV
+         ZinKAJfrwpSTTxrvQIQxORudWuMtCvClOhMPrtSsaaGTOOgtW6c0cy7id680HyOb06cZ
+         LhZqM47XMLtlVwGeA5GZfzJNxPm8krWD42c+AS1a8pL+gtrQ2M6sJso7w3qfnacgedbg
+         UNeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741293947; x=1741898747;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=U/2AW/XQ+C1Dkr/bifBKVXkd3UKdww00iQvvrQ69JSo=;
-        b=dGk4qQnr5wTn0Qt6k6QAu/0Eq5sBYTc3fiB1xeSxjUtuXuScwx1F9Ls7+pQeMQaL5h
-         cbgaWMd2Ue89OBod/8v50SpZmKwQDcUkd6ID1wZnoUz824WONUe5K9BZP05/Kvg9Hdk/
-         Vja/7tw0VTkPXBY/pudXc1edRllvOQKRLThBG3G1UzTZLYiyq6W8WXAWVd+K+EOLVutR
-         pa/V/3TLkCNdjbg6BWL23g4SLT5hSP2FAOZnfy8sMpAOxeWIzmG3e42AuL+GsJxmvJ0P
-         GZ9qXJJ5GZZUJeaG9Bjm0tT839FvCJXeO0lPWNO3ZASr84Wfnn8vSwEaRgExibSGzvkb
-         Ua5A==
-X-Forwarded-Encrypted: i=1; AJvYcCUAA6Y2WGbWYU+CfGFBVpNZp27DAMP5AXS6Yi603QwE/qdsMqn6klEBZ8Q3vyPMR7RwjCILOT7e@vger.kernel.org, AJvYcCVLpF6g/9OucMzsFrmUNI6Zep3ugGq6WrIlzXGlSoqd9u8es1OlPFuMyL5eSWTC4Pcerz5xoJYrIS4Mpvo=@vger.kernel.org, AJvYcCVb/K+WKCPbEriErmdbYMpqC4JhbsmKk1Ko+aDksTb+dFHszy1l/EtwwZlsYqkPOy/R4+liiXoneZm1glFv@vger.kernel.org, AJvYcCWMUC6Xz/HI0Fs5x2itxY03lT3gnHWLPu/zdqb3KOZ30Nd1Qv7D+ET1s1qJYCgBMU3WCA1gohZwYLbWyEoA@vger.kernel.org, AJvYcCWRBwtOHCvnkEG52PyJyybFHECALqeRSUKIkKhePFHMjJPfFB50341yxdMdGhyihwbALtkfNxbjLfItXx/hzuE=@vger.kernel.org, AJvYcCXHqXLyitFhoJGpm+nGHxoOKXslNU6p16OgAtpgod9J2qpeZoygAIRmRWaTRt1tJTSAgD0=@vger.kernel.org, AJvYcCXhZ6RBFFDE6j/t5bUBHV6e7fdLCXeQB/LGXJxdN/BQpBjSx2tu7cUKBbz5xpbztTGjd/pN141sOomb9RQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyv1tkDo+b+EAxhTsNHEFESwkWTPtgZEXGF+ZbhaSzuSC0M5WyU
-	t/kPBAG/wX+QebzoUo5aBWmHJ06RyMmbqgKXipm51sNI/Ar6xF5x
-X-Gm-Gg: ASbGncsQoFz0KdJ5miS5ff6gASWPNKOWRLiMzEQXLHirJgIwJzw5cGb1NcuxBwr7w9X
-	gD3ERHVQsRamYkJakm9mbiynZN0cCVG5AxOAnCBq/fG0B+geRsf/xsVnlkAf1xwhM5G3MEznnlB
-	NPfOVGK7kjapW6Qk+1cPV0U26V4Xg72ZdGAS/51PTBDb8mBskqARsIrhWcA19M9mUUHjTOoavfK
-	pwVkWr92bbSizQ6c441xIvsG4wqxG/qgu6xPiRflAeb2dphewEjNdpcoQNwLqku6v/g+JUM+zx6
-	iV1F51T7UQRoVK/+JnPo1ItDxIxwCjvT1ycXYpfK5Cn3jhuSM6JEmxuYHH7X9lkLNmC1ROQ4Tsd
-	moGlN3Rk=
-X-Google-Smtp-Source: AGHT+IGypB/6b6ARKmDBu94pyV9a8VQg2efcRX5KU7nOp2iuQaxkdpIq9rBXtaXWDKzDk6KRW6vJqA==
-X-Received: by 2002:a05:6000:4112:b0:391:b87:37ad with SMTP id ffacd0b85a97d-39132dad239mr349795f8f.42.1741293946634;
-        Thu, 06 Mar 2025 12:45:46 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c01de21sm3140996f8f.59.2025.03.06.12.45.45
+        d=1e100.net; s=20230601; t=1741294127; x=1741898927;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=+t6PqjADSQvvRE38351jKHjhxK9cNu9LvZB0GI1TtZU=;
+        b=m6tGktoQC0XSIycbWX6LR3JxV9EcPfwcyUvJ1upn2mMp/UFmOeAyTrZ1p+2F3zeaTS
+         BvaiRddY4kpW8wlAM7zdc9SQkTQJ/LI3yIZkqdJBhnn4mDgaEvBydVphjWBgNf38/zUk
+         hutyoLwsedWjELnY74+h9h6d6M9vTlWOp+t+9zX13yfPE1UAg6W18WcXd7d7pTcUMnDf
+         Fh+AVJCGAhRuaKRsqAFF3Z/0fe+BPUMUqAqZLz21VHEQjNq8OOFzSJiqRGDgS52vdRV7
+         F2zYnYYXklLI4bTQVbD9em+oKir8Mp4MahGWPJv5PZrsgSzp4GmEG9koBfYHG1Tf6EYr
+         QRrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWbgs9rGfMPYTgVw250TTQtq9WDCbC0iL3scpzx1XtFRe+V2HluUaXE7d8j9Z2x09hmFap9RUo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxf3CWCT4h3jIm89ulb+tqsqeUh7tY0JS15x9HpLG517pc6IVQI
+	ZTxOyXaDOqbsjwJCIzwd/GNIBcp6JEsPA/LO84TDI0j7NSfYFuYy
+X-Gm-Gg: ASbGncuF5OJD+7AQ+UAxCzGTG/iY2u9diGeaACr/NNtbPIcYMCLbrt/C4zgkdep7lsj
+	wRwMHC9hgjuOBGmi1EhpF8YRIiTWAXwRQpWCCcUVnmel/xHpEWVOrR8ftWpNsfKh5L3sYjlrrOn
+	1AXzVqQY1o5atOgICflB4TKdThg9c/KDHYn+Xsqcc5p6mBKslrN+CnknWx91S85ommvgSVZx2mk
+	gx6QfaVi4lV0AEUwXc/UfJmX3OstSCwgKba8CjRnsB95JPqtFk2IN0xBqWtVasnSkTBE+lwvKT1
+	dUM1/VwuBuOU8mboFqUayOFeYlO+83uMwhuBvlcd3uHUVsBG8kV4WerAxuxlNk1KvYglMqyYA7g
+	6qOYTWt2ejX860EN/xhMFIA==
+X-Google-Smtp-Source: AGHT+IHgc4aJ/GQ2yr8EL72KLtAdKklD4mV7JxAYwC6lWswcYrAuO6v3mIoZC9Br0QBQr4s+av2vGw==
+X-Received: by 2002:a05:622a:14d:b0:472:2d4:5036 with SMTP id d75a77b69052e-4751a4d8ca8mr59363361cf.2.1741294126778;
+        Thu, 06 Mar 2025 12:48:46 -0800 (PST)
+Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4751d9b3746sm11688101cf.48.2025.03.06.12.48.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Mar 2025 12:45:46 -0800 (PST)
-Date: Thu, 6 Mar 2025 20:45:44 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Kuan-Wei Chiu <visitorckw@gmail.com>
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, jk@ozlabs.org, joel@jms.id.au,
- eajames@linux.ibm.com, andrzej.hajda@intel.com, neil.armstrong@linaro.org,
- rfoss@kernel.org, maarten.lankhorst@linux.intel.com, mripard@kernel.org,
- tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
- dmitry.torokhov@gmail.com, mchehab@kernel.org, awalls@md.metrocast.net,
- hverkuil@xs4all.nl, miquel.raynal@bootlin.com, richard@nod.at,
- vigneshr@ti.com, louis.peens@corigine.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- parthiban.veerasooran@microchip.com, arend.vanspriel@broadcom.com,
- johannes@sipsolutions.net, gregkh@linuxfoundation.org,
- jirislaby@kernel.org, yury.norov@gmail.com, akpm@linux-foundation.org,
- hpa@zytor.com, alistair@popple.id.au, linux@rasmusvillemoes.dk,
- Laurent.pinchart@ideasonboard.com, jonas@kwiboo.se,
- jernej.skrabec@gmail.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
- linux-fsi@lists.ozlabs.org, dri-devel@lists.freedesktop.org,
- linux-input@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mtd@lists.infradead.org, oss-drivers@corigine.com,
- netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
- brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
- linux-serial@vger.kernel.org, bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw,
- Yu-Chun Lin <eleanor15x@gmail.com>
-Subject: Re: [PATCH v3 01/16] bitops: Change parity8() return type to bool
-Message-ID: <20250306204544.35086b52@pumpkin>
-In-Reply-To: <20250306162541.2633025-2-visitorckw@gmail.com>
-References: <20250306162541.2633025-1-visitorckw@gmail.com>
-	<20250306162541.2633025-2-visitorckw@gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        Thu, 06 Mar 2025 12:48:46 -0800 (PST)
+Date: Thu, 06 Mar 2025 15:48:45 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Eric Dumazet <edumazet@google.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ David Ahern <dsahern@kernel.org>, 
+ Simon Horman <horms@kernel.org>, 
+ netdev@vger.kernel.org, 
+ eric.dumazet@gmail.com
+Message-ID: <67ca0a2dea753_212e62946f@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CANn89iJi5GsaK6ZbuuiMDpHsWxj9fbAEG5Vj0CzoJeWFJvpj4Q@mail.gmail.com>
+References: <20250306183101.817063-1-edumazet@google.com>
+ <67c9f10e7f7e8_1580029446@willemb.c.googlers.com.notmuch>
+ <CANn89i+QnSwxB33Hp48587EWAX=QYY0Msmv_bkfe_C1amk8Ftg@mail.gmail.com>
+ <67c9fe2af078b_1bb0a2942a@willemb.c.googlers.com.notmuch>
+ <CANn89iJi5GsaK6ZbuuiMDpHsWxj9fbAEG5Vj0CzoJeWFJvpj4Q@mail.gmail.com>
+Subject: Re: [PATCH net-next] udp: expand SKB_DROP_REASON_UDP_CSUM use
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri,  7 Mar 2025 00:25:26 +0800
-Kuan-Wei Chiu <visitorckw@gmail.com> wrote:
+Eric Dumazet wrote:
+> On Thu, Mar 6, 2025 at 8:57=E2=80=AFPM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> >
+> > Eric Dumazet wrote:
+> > > On Thu, Mar 6, 2025 at 8:01=E2=80=AFPM Willem de Bruijn
+> > > <willemdebruijn.kernel@gmail.com> wrote:
+> > > >
+> > > > Eric Dumazet wrote:
+> > > > > Use SKB_DROP_REASON_UDP_CSUM in __first_packet_length()
+> > > > > and udp_read_skb() when dropping a packet because of
+> > > > > a wrong UDP checksum.
+> > > > >
+> > > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > > > > ---
+> > > > >  net/ipv4/udp.c | 4 ++--
+> > > > >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > > > >
+> > > > > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> > > > > index 17c7736d8349433ad2d4cbcc9414b2f8112610af..39c3adf333b5f02=
+ca53f768c918c75f2fc7f93ac 100644
+> > > > > --- a/net/ipv4/udp.c
+> > > > > +++ b/net/ipv4/udp.c
+> > > > > @@ -1848,7 +1848,7 @@ static struct sk_buff *__first_packet_len=
+gth(struct sock *sk,
+> > > > >                       atomic_inc(&sk->sk_drops);
+> > > > >                       __skb_unlink(skb, rcvq);
+> > > > >                       *total +=3D skb->truesize;
+> > > > > -                     kfree_skb(skb);
+> > > > > +                     kfree_skb_reason(skb, SKB_DROP_REASON_UDP=
+_CSUM);
+> > > > >               } else {
+> > > > >                       udp_skb_csum_unnecessary_set(skb);
+> > > > >                       break;
+> > > > > @@ -2002,7 +2002,7 @@ int udp_read_skb(struct sock *sk, skb_rea=
+d_actor_t recv_actor)
+> > > > >               __UDP_INC_STATS(net, UDP_MIB_CSUMERRORS, is_udpli=
+te);
+> > > > >               __UDP_INC_STATS(net, UDP_MIB_INERRORS, is_udplite=
+);
+> > > > >               atomic_inc(&sk->sk_drops);
+> > > > > -             kfree_skb(skb);
+> > > > > +             kfree_skb_reason(skb, SKB_DROP_REASON_UDP_CSUM);
+> > > > >               goto try_again;
+> > > > >       }
+> > > >
+> > > > From a quick search for UDP_MIB_CSUMERRORS, one more case with re=
+gular
+> > > > kfree_skb:
+> > > >
+> > > > csum_copy_err:
+> > > >         if (!__sk_queue_drop_skb(sk, &udp_sk(sk)->reader_queue, s=
+kb, flags,
+> > > >                                  udp_skb_destructor)) {
+> > > >                 UDP_INC_STATS(sock_net(sk), UDP_MIB_CSUMERRORS, i=
+s_udplite);
+> > > >                 UDP_INC_STATS(sock_net(sk), UDP_MIB_INERRORS, is_=
+udplite);
+> > > >         }
+> > > >         kfree_skb(skb);
+> > >
+> > > Right, I was unsure because of the conditional SNMP updates.
+> >
+> > That seems to only suppress the update if peeking and the skb was
+> > already dequeued (ENOENT).
+> >
+> > Frankly, we probably never intended to increment this counter when
+> > peeking, as it is intended to be a per-datagram counter, not a
+> > per-recvmsg counter.
+> >
+> > I think ever erring on the side of extra increments in the unlikely
+> > case of ENOENT is fine.
+> >
+> > Cleaner is perhaps to have a kfree_skb_reason inside that branch and
+> > a consume_skb in the else.
+> =
 
-> Change return type to bool for better clarity. Update the kernel doc
-> comment accordingly, including fixing "@value" to "@val" and adjusting
-> examples. Also mark the function with __attribute_const__ to allow
-> potential compiler optimizations.
+> I think it should be a  kfree_skb_reason(skb, SKB_DROP_REASON_UDP_CSUM)=
+,
+> because only one real 'free' will happen, if two or more threads were
+> using MSG_PEEK for this packet.
 
-If the result type is 'bool' you should just check it.
-Not compare against true/false.
+Oh right.
+ =
 
-	David
+> Using a consume_skb() would be racy, because if the skb refcount
+> reaches 0, a wrong event would be generated.
+> =
 
-> 
-> Co-developed-by: Yu-Chun Lin <eleanor15x@gmail.com>
-> Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
-> Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail.com>
-> ---
->  include/linux/bitops.h | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/include/linux/bitops.h b/include/linux/bitops.h
-> index c1cb53cf2f0f..44e5765b8bec 100644
-> --- a/include/linux/bitops.h
-> +++ b/include/linux/bitops.h
-> @@ -231,26 +231,26 @@ static inline int get_count_order_long(unsigned long l)
->  
->  /**
->   * parity8 - get the parity of an u8 value
-> - * @value: the value to be examined
-> + * @val: the value to be examined
->   *
->   * Determine the parity of the u8 argument.
->   *
->   * Returns:
-> - * 0 for even parity, 1 for odd parity
-> + * false for even parity, true for odd parity
->   *
->   * Note: This function informs you about the current parity. Example to bail
->   * out when parity is odd:
->   *
-> - *	if (parity8(val) == 1)
-> + *	if (parity8(val) == true)
->   *		return -EBADMSG;
->   *
->   * If you need to calculate a parity bit, you need to draw the conclusion from
->   * this result yourself. Example to enforce odd parity, parity bit is bit 7:
->   *
-> - *	if (parity8(val) == 0)
-> + *	if (parity8(val) == false)
->   *		val ^= BIT(7);
->   */
-> -static inline int parity8(u8 val)
-> +static inline __attribute_const__ bool parity8(u8 val)
->  {
->  	/*
->  	 * One explanation of this algorithm:
+> I will squash in v2 :
+> =
 
+> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> index 39c3adf333b5f02ca53f768c918c75f2fc7f93ac..d0bffcfa56d8deb14f38cc4=
+8a4a2b1d899ad6af4
+> 100644
+> --- a/net/ipv4/udp.c
+> +++ b/net/ipv4/udp.c
+> @@ -2117,7 +2117,7 @@ int udp_recvmsg(struct sock *sk, struct msghdr
+> *msg, size_t len, int flags,
+>                 UDP_INC_STATS(sock_net(sk), UDP_MIB_CSUMERRORS, is_udpl=
+ite);
+>                 UDP_INC_STATS(sock_net(sk), UDP_MIB_INERRORS, is_udplit=
+e);
+>         }
+> -       kfree_skb(skb);
+> +       kfree_skb_reason(skb, SKB_DROP_REASON_UDP_CSUM);
+> =
+
+>         /* starting over for a new packet, but check if we need to yiel=
+d */
+>         cond_resched();
+> diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+> index 3a0d6c5a8286b1685e8a1dec50365fe392ab9a87..024458ef163c9e24dfb37ae=
+a2690b2030f6a0fbc
+> 100644
+> --- a/net/ipv6/udp.c
+> +++ b/net/ipv6/udp.c
+> @@ -586,7 +586,7 @@ int udpv6_recvmsg(struct sock *sk, struct msghdr
+> *msg, size_t len,
+>                 SNMP_INC_STATS(mib, UDP_MIB_CSUMERRORS);
+>                 SNMP_INC_STATS(mib, UDP_MIB_INERRORS);
+>         }
+> -       kfree_skb(skb);
+> +       kfree_skb_reason(skb, SKB_DROP_REASON_UDP_CSUM);
+> =
+
+>         /* starting over for a new packet, but check if we need to yiel=
+d */
+>         cond_resched();
+
+Sounds good. Thanks Eric.
 
