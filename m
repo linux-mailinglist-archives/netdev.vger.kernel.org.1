@@ -1,68 +1,61 @@
-Return-Path: <netdev+bounces-172276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E298EA5409B
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 03:21:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BFF4A540A2
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 03:25:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4456D3ADB93
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 02:21:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDBEA3AEB56
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 02:25:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BC6D190051;
-	Thu,  6 Mar 2025 02:21:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DC3018DB1E;
+	Thu,  6 Mar 2025 02:25:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Va/OOF/y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D0w+ZGr3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3837018FDAA;
-	Thu,  6 Mar 2025 02:21:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DA589450;
+	Thu,  6 Mar 2025 02:25:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741227680; cv=none; b=Gm6B23Os6EiJupLJhk7MgpltDWTtA5G3z6/65v7t41MAi7ZNClEhpo1FEi74Hf2DgLOp3FYjmgb4/6ZdMw7NmpdtrDsPHqi+8E22b0nNFQnjgzrr8RYMJaj9BjnGvG5bBaZNA0eF1sLiWbgvH5ErmSyLlEQFqtzN2I8mnbw03z8=
+	t=1741227933; cv=none; b=TLyqm6oFWxIp/iAIjzgsnZMazp1Kd6FgdXdqG10bDEjhmix6ygg16IyBSanZn6r3XisJm8vjYX2B1WnQSc/u6nq59HGOBHaZ4EtcLxBb1mGR61KTLD/s3uXd27H7sddB4stEDB5VCo/53wWHShm4TWwsp41gak3maFRQ9TaBeoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741227680; c=relaxed/simple;
-	bh=PgAbraQZXPJUTM0sapawAo5nQCEsVdzy9GJWZx0L0YI=;
+	s=arc-20240116; t=1741227933; c=relaxed/simple;
+	bh=KnpNO+5ktqkAQIHcChs8cLmYjY/VGJmY6SdSL8ui50c=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MpengWj5yMgH8BeXoEuVs9Pw+lvlKUhjl5aOhmaYczvoU5oWma6V8VR3UTeCilH5l3O/dobhT4uzVgvJrX3IAQXHDwYqtCaLLqy82EJNdbtTBVrm7EJSxPtwU6q5sGv3sIjhJ6hOorAfl4kM102JT1D7juPXsguZ4os0IBoNoxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Va/OOF/y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1F78C4CEE7;
-	Thu,  6 Mar 2025 02:21:19 +0000 (UTC)
+	 MIME-Version:Content-Type; b=pOZmFRruzavy/XmGjGzdUr7GfE1lgFy1/YPXxF2gtZDqx1gf392ivxCD9L+LfI1BLU/rGiww6hkngey8HuN4vN6WWhLoNKFMa6hyK0jvVrrs+4xcG9LOZEcd2z5JDIA3rax0ONFKPoAjA5H77jqGjT3mTcsn8oNqbCuR4S2+W3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D0w+ZGr3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6595EC4CED1;
+	Thu,  6 Mar 2025 02:25:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741227680;
-	bh=PgAbraQZXPJUTM0sapawAo5nQCEsVdzy9GJWZx0L0YI=;
+	s=k20201202; t=1741227932;
+	bh=KnpNO+5ktqkAQIHcChs8cLmYjY/VGJmY6SdSL8ui50c=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Va/OOF/yWwSnj/6i/OuBNmFDuMfFhheOe52bkZGv5i/EZsptALR26VDmvYqzK+AAJ
-	 zKQ0kqQjIzlDXabXJY/4TTYF4VX75ZPPqM9CyUltcSTxqCzLRzBP+2jcgtKOcGG5H/
-	 tuUJR/CyuEyeHg8ldFReETTf0y008U3GmjCrdi0FaPe98UC0f6VQUa88y5jJAiH06L
-	 YwdBsnwKR0nDY44w9s647hggpUdGOBHNN3rIKopwyj9aPvhB6f3SIu9pTZPMlr+6yr
-	 riuZC9D3cHWWiVPoYOMU7yNGt5nGWNkq16c1jEQYLbzzMpYmVNUBPLi3nAKvR5lDAM
-	 zWYFsgLqLqLNw==
-Date: Wed, 5 Mar 2025 18:21:18 -0800
+	b=D0w+ZGr3BO0SJdKc7ucFvO4E6TmFR6/lmxho2QwlVoP74g7n++8APCV4SGEd6eIRV
+	 goI2OoJdLoP9dAfVMRrhHpf+elQ/++/5gJc9s68UZtQ3SeLcZ9Rrm2fvV5948nelsi
+	 xuUboo2jtTMEoaXrdQnLw+0cOLnrJ+pOQoDIe+2baWh8lbOyd1iP/7w2tzZ8yt7+Uj
+	 NIA+soQHuyXD5DVUvjVpkn6IBLr4S1mVcmnf01CfAvoVtxIghY6XryuTBQz2CrGtJ4
+	 gF5zBFZwQd/F3izgb455YXrCOCjZdyu0TIX18tcIVbpBBKAnuCjbuUDo3HN9dIJnHN
+	 wqIRTgOl7r7fg==
+Date: Wed, 5 Mar 2025 18:25:31 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca,
- gerhard@engleder-embedded.com, jasowang@redhat.com,
- xuanzhuo@linux.alibaba.com, mst@redhat.com, leiyang@redhat.com, Eugenio
- =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "open
- list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>, open
- list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v5 3/4] virtio-net: Map NAPIs to queues
-Message-ID: <20250305182118.3d885f0d@kernel.org>
-In-Reply-To: <Z8j9i-bW3P-GOpbw@LQ3V64L9R2>
-References: <20250227185017.206785-1-jdamato@fastly.com>
-	<20250227185017.206785-4-jdamato@fastly.com>
-	<20250228182759.74de5bec@kernel.org>
-	<Z8Xc0muOV8jtHBkX@LQ3V64L9R2>
-	<Z8XgGrToAD7Bak-I@LQ3V64L9R2>
-	<Z8X15hxz8t-vXpPU@LQ3V64L9R2>
-	<20250303160355.5f8d82d8@kernel.org>
-	<Z8j9i-bW3P-GOpbw@LQ3V64L9R2>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, Nikolay
+ Aleksandrov <razor@blackwall.org>, Simon Horman <horms@kernel.org>, Jianbo
+ Liu <jianbol@nvidia.com>, Boris Pismenny <borisp@nvidia.com>, Tariq Toukan
+ <tariqt@nvidia.com>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv3 net 0/2] bonding: fix incorrect mac address setting
+Message-ID: <20250305182531.7f612203@kernel.org>
+In-Reply-To: <Z8gKYzpJw_DoYEMx@fedora>
+References: <20250207092920.543458-1-liuhangbin@gmail.com>
+	<Z8gKYzpJw_DoYEMx@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,15 +65,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 5 Mar 2025 17:42:35 -0800 Joe Damato wrote:
-> Two spots that come to mind are:
->  - in virtnet_probe where all the other netdev ops are plumbed
->    through, or
->  - above virtnet_disable_queue_pair which I assume a future queue
->    API implementor would need to call for ndo_queue_stop
+On Wed, 5 Mar 2025 08:25:07 +0000 Hangbin Liu wrote:
+> Could you help process it, or should I re-post it?
 
-I'd put it next to some call which will have to be inspected.
-Normally we change napi_disable() to napi_disable_locked()
-for drivers using the instance lock, so maybe on the napi_disable()
-line in the refill? 
+Repost.
 
