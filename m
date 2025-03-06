@@ -1,250 +1,252 @@
-Return-Path: <netdev+bounces-172379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C212CA546EE
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:55:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C94CDA546F7
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:57:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7B083AFC72
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:55:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3839162F80
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:57:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F54220A5D5;
-	Thu,  6 Mar 2025 09:55:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 353F020ADE9;
+	Thu,  6 Mar 2025 09:57:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tk9yMbAl"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="XKl0PTF0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF4541FF7C3;
-	Thu,  6 Mar 2025 09:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3615420A5F0
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 09:57:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741254938; cv=none; b=SXRHEqhhVJhq/1lwXkfuKkiimNO1o+wQRMYsJdNI7rjFRBC0UDvAqn3QzBvaRMPhoWpDpbos46KLrzaggiGGOxP1gkAJwquBjVUEL/v2Hr5rGhhFH946WuFPvdwr8cG9DSxx1gh5kL7PO+7zBpmRjZXiBsYuBZi+kQzPYQ5Gn8E=
+	t=1741255023; cv=none; b=RwSoKReFBP1timHBJN/C0OImpt1WkndcsKTyGOvPkEWvtP6gPuvIkUK7IHe1sVUo6AogRaQ8OngIN00/6yoeTz2CL0NAgIsSDsqdT/U+EYIWg8pUbUxJoEvpr0l1HGA3gO3z7JYPZjrQ3dSaMntSG1HcuJ/7HVoccwUrHxByEU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741254938; c=relaxed/simple;
-	bh=W69mQnK96OZE6yVn8XWK8uNmeTh6bHIJPek5V7ObkL8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a/eO6mHe67GZ9C9h73nDdOakGxxzCMnMbwDCJnXeg5s4duBKXr4pmYcHe6+0qzugGZgSqC7uR9xrHFD4W9gC1CorX1Jm1flUJ2jRsV6qaxTKAC/8QzHtxhRJkijKSFGewOFnNnRuOL9E0XQkEd1+AQYathIdlThAHsjGdIO8l1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tk9yMbAl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3E4CC4CEE0;
-	Thu,  6 Mar 2025 09:55:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741254937;
-	bh=W69mQnK96OZE6yVn8XWK8uNmeTh6bHIJPek5V7ObkL8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=tk9yMbAlgc8aER2jv1U8l3QNrE3VHF4cGzHdInJLooo9oMIwBYOamIMVoVn5vxoBN
-	 igpXEnIYU4RD8M0efnrkUrmAqPPzOiXIxVVrQCGsRDloCvQ+ExrzZl5u2Ec+Gp9CQK
-	 Xj27Hz2tNZGBTHxPEZ8l+zlhcsoqWbTpw7cIlwvnsk9BcEzoV3KmocCGgwuNJHx7hc
-	 O5VAJoX3vQxg1N8fa6cRhOD6pxMdKixowceDDyBUuVAPeShz0b2iDV4M/OkyxA3LMw
-	 sdjyFLVWQfGTpz5XeQdphXmjunG14fdP4ACjz5Iv1aYZWkGydjVjZ8H4H4BsDkH/g4
-	 ECDlZhFI80X5g==
-Message-ID: <281edb3a-4679-4c75-9192-a5f0ef6952ea@kernel.org>
-Date: Thu, 6 Mar 2025 10:55:32 +0100
+	s=arc-20240116; t=1741255023; c=relaxed/simple;
+	bh=8nXRTGudzBBRfx66S5WuBv+BBtiXafaeFQXEswlaDnY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To; b=uKtHrbvgKe6RZvTo86OnZifobg04hlcLMllI48x5rQJDHBmqsmP3E0tqzmhSjnF0YPqlDs/pTgJSuIej64sDaW2zKeC9ggv3x/XJAqAcDMmCp2ahdqlyLhIgesjEKyzladK+mbSK6zqLES8hMYnO5x3JWTmQBQBfrnSpq8A1TKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=XKl0PTF0; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-223594b3c6dso6286205ad.2
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 01:57:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1741255020; x=1741859820; darn=vger.kernel.org;
+        h=to:content-transfer-encoding:mime-version:message-id:date:subject
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+1Q1NyitEWr4IZ0KCgYL2Tz8PJ2srBtknby9HFciIus=;
+        b=XKl0PTF0QDgQ3pEkSAZXmAz4DxU0bDJLhSCUzWlzLm6/Tj3f46HHPPuT6VIkeEEuVp
+         C2uyUuR5brWIOHRmvmJnp3UOlNewyGniYYY54fZQTwQUkCek7i/5fwYLvAHZZq8gZaXM
+         351rl/eVReKewj61M3BniMU0qeH7gyen064WoLT5mkanYVLFV/POnDgRnrLQ3kXCqpfk
+         y73WeD/fWCtWzQBX67pUJHpAvEL9GVuUoxLV8OeC2T82ohp3P//dfQgZIbmn1cEx6mnH
+         Cpd0K7Gh5pFLexjsUOAxa8Zr2HK5sYMqKiqivCr0OFauD7GHnU8uDZqLIkp46BaZVW2q
+         +1ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741255020; x=1741859820;
+        h=to:content-transfer-encoding:mime-version:message-id:date:subject
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+1Q1NyitEWr4IZ0KCgYL2Tz8PJ2srBtknby9HFciIus=;
+        b=Fp/S6acXIKAojd7PX7sWlfErRukXq+vZldahy1XNzdez7o7/DaSstFqTDM2ZUlZbqv
+         ljtGrbJA7iAY41r/zF3KE3pP9lL+AVpvL7ClY6UdHul+URv19++RxAP+wAP36eS1q+O+
+         aXOsmkUuPBjL6JPJ+UiHN68x+zq2zQNz4jKxhTNKWWOj3v2pmLMq7NLdYWnclcVuFZ6d
+         qD9hONCT4JZ3Wmo3/OA3yVpAmcA3yUKx0qKAzkzpMuDNW8UvzQgMGzZu+GzLtW8NlGNr
+         Cb0mc8E2LD524HOVSZ4ai8W2LYe07sgOx3USvqqBeSZXk6Q2m/Jhz9OYl2WDhWFmR0t1
+         ijLg==
+X-Forwarded-Encrypted: i=1; AJvYcCXuWzgTrVl0ZsQDoJQxT4tynA+rvksjP9k+Q0wwT3ne+zt0mV+bOYGB7ibvsWdaaaiq2qpyqwI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnYIA3BuaSbh+7EO0rNx9Ke08JQAtf0sDSW0WxOKDszYS7H3VV
+	krVrt8uCaXwGCpnXLBbTAVGPbwXB12rTUEBuYzLEyA8cVRFH33H9Kdickvigq6I=
+X-Gm-Gg: ASbGnctjjztXi1o+CsdQsu+/jn0tE1sootpgjSsQSKx8e6WqIbAcOhcv8cE3QWz3lce
+	EUdfWll94gAXXlWW3EN6S6Dd00wTpS1N4UvUXSPKJSQrcTkxWVTX1ztqp6pm84SjT9kcza0XbIX
+	VeYrhmoz96iQBZJYiZRcPxCf4lbASHSOeZk60jLL90CzUeRxNPPOW2AlhHIseb/wDckCQHBWdUm
+	Q3RpwS5JoHvWh3l0iPt5uemKzRFRANI2mS4a+c0GBVCgkypvOWAu88xDSwJL6qQETEB6yUsP8T9
+	wS15cRzG/NKYBI4xFWiWkcARPdKqRioBh0p4ldlUac2hV3zv
+X-Google-Smtp-Source: AGHT+IHXeng5qGtVnY36Dm4C6gPvAiJUnMMUTbAF4BmiVlWPS+BPqS54LKH0wpj1Sfm2RVks4zC/qA==
+X-Received: by 2002:a17:902:e891:b0:223:47e4:d288 with SMTP id d9443c01a7336-223f1d83ce1mr103355185ad.47.1741255020410;
+        Thu, 06 Mar 2025 01:57:00 -0800 (PST)
+Received: from localhost ([157.82.207.107])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22410a918f0sm8255215ad.168.2025.03.06.01.56.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Mar 2025 01:56:59 -0800 (PST)
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+Subject: [PATCH net-next v8 0/6] tun: Introduce virtio-net hashing feature
+Date: Thu, 06 Mar 2025 18:56:30 +0900
+Message-Id: <20250306-rss-v8-0-7ab4f56ff423@daynix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next] tcp: clamp window like before the cleanup
-Content-Language: en-GB
-To: Eric Dumazet <edumazet@google.com>, Jason Xing <kerneljasonxing@gmail.com>
-Cc: mptcp@lists.linux.dev, Neal Cardwell <ncardwell@google.com>,
- Kuniyuki Iwashima <kuniyu@amazon.com>, "David S. Miller"
- <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250305-net-next-fix-tcp-win-clamp-v1-1-12afb705d34e@kernel.org>
- <CAL+tcoAqZmeV0-4rjH-EPmhBBaS=ZSwgcXhU8ZsBCr_aXS3Lqw@mail.gmail.com>
- <CANn89iLqgi5byZd+Si7jTdg7zrLNn13ejWAQjMRurvrQPeg3zg@mail.gmail.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <CANn89iLqgi5byZd+Si7jTdg7zrLNn13ejWAQjMRurvrQPeg3zg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAE5xyWcC/4WSTW7jMAyFrxJ4XQWURFGSV71H0YUlUROhqD1jO
+ 0GKoncv6/Qngyy6E0F+j494eu0WnhsvXb977WY+taVNoxThbtflwzD+YdWK1J0Bg4Bg1bwsir3
+ 1JUSug/edTP6dubbzpvLQjbyqkc9r9yidQ1vWaX7Z5E9664uS1QABnNGg9xoRjVFaDU/t0J6m/
+ VTkdV+Gl7Gd93l63nRO5orVTqMmxL0hIKRfWfvFIkTttgtOVoHKZEHESoJgbiC8ggxeIBQoIEd
+ rOANTvoHcN/Rx4QVyAlWbK4VSAVy5gegLcqAhXiASKOkcYSgeQqUbyP9Axnxu8ps9NOBySqX8D
+ 71dcpr531FCXj/D+s64322ujQW1HkdFxBoGjAmy78Xh9XfYRsWrJpWOtfK8qCjjmKqkU3MvWcl
+ 4GhZWsvm5rf2ulGC985WYAg1GhxCjz8mF5KJ31SOm5H0gsfn2DtcaZfOTAgAA
+X-Change-ID: 20240403-rss-e737d89efa77
+To: Jonathan Corbet <corbet@lwn.net>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>, 
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, kvm@vger.kernel.org, 
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
+ Yuri Benditovich <yuri.benditovich@daynix.com>, 
+ Andrew Melnychenko <andrew@daynix.com>, 
+ Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
+ Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Akihiko Odaki <akihiko.odaki@daynix.com>
+X-Mailer: b4 0.14.2
 
-Hi Eric,
+virtio-net have two usage of hashes: one is RSS and another is hash
+reporting. Conventionally the hash calculation was done by the VMM.
+However, computing the hash after the queue was chosen defeats the
+purpose of RSS.
 
-On 06/03/2025 10:45, Eric Dumazet wrote:
-> On Thu, Mar 6, 2025 at 6:22 AM Jason Xing <kerneljasonxing@gmail.com> wrote:
->>
->> On Wed, Mar 5, 2025 at 10:49 PM Matthieu Baerts (NGI0)
->> <matttbe@kernel.org> wrote:
->>>
->>> A recent cleanup changed the behaviour of tcp_set_window_clamp(). This
->>> looks unintentional, and affects MPTCP selftests, e.g. some tests
->>> re-establishing a connection after a disconnect are now unstable.
->>>
->>> Before the cleanup, this operation was done:
->>>
->>>   new_rcv_ssthresh = min(tp->rcv_wnd, new_window_clamp);
->>>   tp->rcv_ssthresh = max(new_rcv_ssthresh, tp->rcv_ssthresh);
->>>
->>> The cleanup used the 'clamp' macro which takes 3 arguments -- value,
->>> lowest, and highest -- and returns a value between the lowest and the
->>> highest allowable values. This then assumes ...
->>>
->>>   lowest (rcv_ssthresh) <= highest (rcv_wnd)
->>>
->>> ... which doesn't seem to be always the case here according to the MPTCP
->>> selftests, even when running them without MPTCP, but only TCP.
->>>
->>> For example, when we have ...
->>>
->>>   rcv_wnd < rcv_ssthresh < new_rcv_ssthresh
->>>
->>> ... before the cleanup, the rcv_ssthresh was not changed, while after
->>> the cleanup, it is lowered down to rcv_wnd (highest).
->>>
->>> During a simple test with TCP, here are the values I observed:
->>>
->>>   new_window_clamp (val)  rcv_ssthresh (lo)  rcv_wnd (hi)
->>>       117760   (out)         65495         <  65536
->>>       128512   (out)         109595        >  80256  => lo > hi
->>>       1184975  (out)         328987        <  329088
->>>
->>>       113664   (out)         65483         <  65536
->>>       117760   (out)         110968        <  110976
->>>       129024   (out)         116527        >  109696 => lo > hi
->>>
->>> Here, we can see that it is not that rare to have rcv_ssthresh (lo)
->>> higher than rcv_wnd (hi), so having a different behaviour when the
->>> clamp() macro is used, even without MPTCP.
->>>
->>> Note: new_window_clamp is always out of range (rcv_ssthresh < rcv_wnd)
->>> here, which seems to be generally the case in my tests with small
->>> connections.
->>>
->>> I then suggests reverting this part, not to change the behaviour.
->>>
->>> Fixes: 863a952eb79a ("tcp: tcp_set_window_clamp() cleanup")
->>> Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/551
->>> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
->>
->> Tested-by: Jason Xing <kerneljasonxing@gmail.com>
->>
->> Thanks for catching this. I should have done more tests :(
->>
->> Now I use netperf with TCP_CRR to test loopback and easily see the
->> case where tp->rcv_ssthresh is larger than tp->rcv_wnd, which means
->> tp->rcv_wnd is not the upper bound as you said.
->>
->> Thanks,
->> Jason
->>
-> 
-> Patch looks fine to me but all our tests are passing with the current kernel,
-> and I was not able to trigger the condition.
+Another approach is to use eBPF steering program. This approach has
+another downside: it cannot report the calculated hash due to the
+restrictive nature of eBPF.
 
-Thank you for having looked at this patch!
+Introduce the code to compute hashes to the kernel in order to overcome
+thse challenges.
 
+An alternative solution is to extend the eBPF steering program so that it
+will be able to report to the userspace, but it is based on context
+rewrites, which is in feature freeze. We can adopt kfuncs, but they will
+not be UAPIs. We opt to ioctl to align with other relevant UAPIs (KVM
+and vhost_net).
 
-> Can you share what precise test you did ?
+The patches for QEMU to use this new feature was submitted as RFC and
+is available at:
+https://patchew.org/QEMU/20240915-hash-v3-0-79cb08d28647@daynix.com/
 
-To be able to get a situation where "rcv_ssthresh > rcv_wnd", I simply
-executed MPTCP Connect selftest. You can also force creating TCP only
-connections with '-tt', e.g.
+This work was presented at LPC 2024:
+https://lpc.events/event/18/contributions/1963/
 
-  ./mptcp_connect.sh -tt
+V1 -> V2:
+  Changed to introduce a new BPF program type.
 
+Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+---
+Changes in v8:
+- Disabled IPv6 to eliminate noises in tests.
+- Added a branch in tap to avoid unnecessary dissection when hash
+  reporting is disabled.
+- Removed unnecessary rtnl_lock().
+- Extracted code to handle new ioctls into separate functions to avoid
+  adding extra NULL checks to the code handling other ioctls.
+- Introduced variable named "fd" to __tun_chr_ioctl().
+- s/-/=/g in a patch message to avoid confusing Git.
+- Link to v7: https://lore.kernel.org/r/20250228-rss-v7-0-844205cbbdd6@daynix.com
 
-To be able to reproduce the issue with the selftests mentioned in [1], I
-simply executed ./mptcp_connect.sh in a loop after having applied this
-small patch to execute only a part of the subtests ("disconnect"):
+Changes in v7:
+- Ensured to set hash_report to VIRTIO_NET_HASH_REPORT_NONE for
+  VHOST_NET_F_VIRTIO_NET_HDR.
+- s/4/sizeof(u32)/ in patch "virtio_net: Add functions for hashing".
+- Added tap_skb_cb type.
+- Rebased.
+- Link to v6: https://lore.kernel.org/r/20250109-rss-v6-0-b1c90ad708f6@daynix.com
 
-> diff --git a/tools/testing/selftests/net/mptcp/mptcp_connect.sh b/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-> index 5e3c56253274..d8ebea5abc6c 100755
-> --- a/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-> +++ b/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-> @@ -855,6 +855,7 @@ make_file "$sin" "server"
->  
->  mptcp_lib_subtests_last_ts_reset
->  
-> +if false; then
->  check_mptcp_disabled
->  
->  stop_if_error "The kernel configuration is not valid for MPTCP"
-> @@ -882,6 +883,7 @@ mptcp_lib_result_code "${ret}" "ping tests"
->  
->  stop_if_error "Could not even run ping tests"
->  mptcp_lib_pr_ok
-> +fi
->  
->  [ -n "$tc_loss" ] && tc -net "$ns2" qdisc add dev ns2eth3 root netem loss random $tc_loss delay ${tc_delay}ms
->  tc_info="loss of $tc_loss "
-> @@ -910,6 +912,7 @@ mptcp_lib_pr_info "Using ${tc_info}on ns3eth4"
->  
->  tc -net "$ns3" qdisc add dev ns3eth4 root netem delay ${reorder_delay}ms $tc_reorder
->  
-> +if false; then
->  TEST_GROUP="loopback v4"
->  run_tests_lo "$ns1" "$ns1" 10.0.1.1 1
->  stop_if_error "Could not even run loopback test"
-> @@ -959,6 +962,7 @@ log_if_error "Tests with MPTFO have failed"
->  run_test_transparent 10.0.3.1 "tproxy ipv4"
->  run_test_transparent dead:beef:3::1 "tproxy ipv6"
->  log_if_error "Tests with tproxy have failed"
-> +fi
->  
->  run_tests_disconnect
->  log_if_error "Tests of the full disconnection have failed"
+Changes in v6:
+- Extracted changes to fill vnet header holes into another series.
+- Squashed patches "skbuff: Introduce SKB_EXT_TUN_VNET_HASH", "tun:
+  Introduce virtio-net hash reporting feature", and "tun: Introduce
+  virtio-net RSS" into patch "tun: Introduce virtio-net hash feature".
+- Dropped the RFC tag.
+- Link to v5: https://lore.kernel.org/r/20241008-rss-v5-0-f3cf68df005d@daynix.com
 
-Note that our CI was able to easily reproduce it. Locally, it was taking
-around 30 to 50 iterations to reproduce the issue.
+Changes in v5:
+- Fixed a compilation error with CONFIG_TUN_VNET_CROSS_LE.
+- Optimized the calculation of the hash value according to:
+  https://git.dpdk.org/dpdk/commit/?id=3fb1ea032bd6ff8317af5dac9af901f1f324cab4
+- Added patch "tun: Unify vnet implementation".
+- Dropped patch "tap: Pad virtio header with zero".
+- Added patch "selftest: tun: Test vnet ioctls without device".
+- Reworked selftests to skip for older kernels.
+- Documented the case when the underlying device is deleted and packets
+  have queue_mapping set by TC.
+- Reordered test harness arguments.
+- Added code to handle fragmented packets.
+- Link to v4: https://lore.kernel.org/r/20240924-rss-v4-0-84e932ec0e6c@daynix.com
 
-[1] https://github.com/multipath-tcp/mptcp_net-next/issues/551
+Changes in v4:
+- Moved tun_vnet_hash_ext to if_tun.h.
+- Renamed virtio_net_toeplitz() to virtio_net_toeplitz_calc().
+- Replaced htons() with cpu_to_be16().
+- Changed virtio_net_hash_rss() to return void.
+- Reordered variable declarations in virtio_net_hash_rss().
+- Removed virtio_net_hdr_v1_hash_from_skb().
+- Updated messages of "tap: Pad virtio header with zero" and
+  "tun: Pad virtio header with zero".
+- Fixed vnet_hash allocation size.
+- Ensured to free vnet_hash when destructing tun_struct.
+- Link to v3: https://lore.kernel.org/r/20240915-rss-v3-0-c630015db082@daynix.com
 
-Cheers,
-Matt
+Changes in v3:
+- Reverted back to add ioctl.
+- Split patch "tun: Introduce virtio-net hashing feature" into
+  "tun: Introduce virtio-net hash reporting feature" and
+  "tun: Introduce virtio-net RSS".
+- Changed to reuse hash values computed for automq instead of performing
+  RSS hashing when hash reporting is requested but RSS is not.
+- Extracted relevant data from struct tun_struct to keep it minimal.
+- Added kernel-doc.
+- Changed to allow calling TUNGETVNETHASHCAP before TUNSETIFF.
+- Initialized num_buffers with 1.
+- Added a test case for unclassified packets.
+- Fixed error handling in tests.
+- Changed tests to verify that the queue index will not overflow.
+- Rebased.
+- Link to v2: https://lore.kernel.org/r/20231015141644.260646-1-akihiko.odaki@daynix.com
+
+---
+Akihiko Odaki (6):
+      virtio_net: Add functions for hashing
+      net: flow_dissector: Export flow_keys_dissector_symmetric
+      tun: Introduce virtio-net hash feature
+      selftest: tun: Test vnet ioctls without device
+      selftest: tun: Add tests for virtio-net hashing
+      vhost/net: Support VIRTIO_NET_F_HASH_REPORT
+
+ Documentation/networking/tuntap.rst  |   7 +
+ drivers/net/Kconfig                  |   1 +
+ drivers/net/tap.c                    |  67 +++-
+ drivers/net/tun.c                    |  98 +++++-
+ drivers/net/tun_vnet.h               | 159 ++++++++-
+ drivers/vhost/net.c                  |  49 +--
+ include/linux/if_tap.h               |   2 +
+ include/linux/skbuff.h               |   3 +
+ include/linux/virtio_net.h           | 188 ++++++++++
+ include/net/flow_dissector.h         |   1 +
+ include/uapi/linux/if_tun.h          |  75 ++++
+ net/core/flow_dissector.c            |   3 +-
+ net/core/skbuff.c                    |   4 +
+ tools/testing/selftests/net/Makefile |   2 +-
+ tools/testing/selftests/net/tun.c    | 656 ++++++++++++++++++++++++++++++++++-
+ 15 files changed, 1254 insertions(+), 61 deletions(-)
+---
+base-commit: dd83757f6e686a2188997cb58b5975f744bb7786
+change-id: 20240403-rss-e737d89efa77
+prerequisite-change-id: 20241230-tun-66e10a49b0c7:v6
+prerequisite-patch-id: 871dc5f146fb6b0e3ec8612971a8e8190472c0fb
+prerequisite-patch-id: 2797ed249d32590321f088373d4055ff3f430a0e
+prerequisite-patch-id: ea3370c72d4904e2f0536ec76ba5d26784c0cede
+prerequisite-patch-id: 837e4cf5d6b451424f9b1639455e83a260c4440d
+prerequisite-patch-id: ea701076f57819e844f5a35efe5cbc5712d3080d
+prerequisite-patch-id: 701646fb43ad04cc64dd2bf13c150ccbe6f828ce
+prerequisite-patch-id: 53176dae0c003f5b6c114d43f936cf7140d31bb5
+prerequisite-change-id: 20250116-buffers-96e14bf023fc:v2
+prerequisite-patch-id: 25fd4f99d4236a05a5ef16ab79f3e85ee57e21cc
+
+Best regards,
 -- 
-Sponsored by the NGI0 Core fund.
+Akihiko Odaki <akihiko.odaki@daynix.com>
 
 
