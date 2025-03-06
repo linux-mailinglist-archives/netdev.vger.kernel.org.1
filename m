@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-172292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EEE6A54138
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 04:30:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 253A2A54139
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 04:30:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C074C3AD749
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 03:29:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D3933AD835
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 03:29:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70AE1198A29;
-	Thu,  6 Mar 2025 03:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E64F199238;
+	Thu,  6 Mar 2025 03:30:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iR2uE0+S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sJklbOsp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CD926FC3
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 03:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE40C1991DD
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 03:30:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741231798; cv=none; b=ki+UJXAeHMrb3u3XOaBcz4JEb7EOGH99kkgDiPZLDwSoWtFCjqqlUhYbyVG2loVF+t3eQC5ET2h/l5nrK/CU4WLEGdEDMLKD3LQ8BqyV+4s1EOX3df5cYGHo9wQQ0oB2e7p7o+YPm84niy9njHpOobkCPnN7ZThcDnV5qqLkUds=
+	t=1741231802; cv=none; b=FOw01QewtDSIxkdpSh8vccCOWT01vuIQWlg/B47Ca7MFleU6dQ1FiPp5wdYzQMrglT1cw0FyPbndl9ylElLsNQKG8yc5LpvjsvHrM2ayImEicJbryTq+QQ/gzuskrI9B9mog/oZy1YbtUHjYvunEPQsDjSQCz4RymwOBVdPpRA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741231798; c=relaxed/simple;
-	bh=DwjSgGJVgef0kI17Lci/NSOLJqNZW6lcGDA3JVs0eN4=;
+	s=arc-20240116; t=1741231802; c=relaxed/simple;
+	bh=QBzAMIQU65GVKy3VqgNNyRzIbrrn7hbPwKJ+A11cEFI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=P/TnBLmpY8H3oaVxvgkW3Xfv+P/D7ZN7GFXX7nygoVVD7w9xqTT2eb2RYVBmh7ygpQW2qvApcbizVv0VB+B3XF15El7AAXjUyMA7KOWp5kQsfFlggIRbQMVjAZBQIwNe+cr/APH3hhiVbU/hFKZMSHWcshXYFfgs22FumUSEx64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iR2uE0+S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17194C4CED1;
-	Thu,  6 Mar 2025 03:29:58 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=NOoRV/vsdzYm5kDH191Mum44Sm7jyTfZY0qEd9HuadnwO4T5FN4pBDiOptKVGBy/jQbd2V0F8Z86Ci0gDmd5zeruDbtb+jinlcIp6jQVvCZFdIlh74yc/bNT6Y4njHb9yPFxi2gvVD7EGlFbdyMJUoUT1soBZDlJi5qlv7QZfbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sJklbOsp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F514C4CED1;
+	Thu,  6 Mar 2025 03:30:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741231798;
-	bh=DwjSgGJVgef0kI17Lci/NSOLJqNZW6lcGDA3JVs0eN4=;
+	s=k20201202; t=1741231801;
+	bh=QBzAMIQU65GVKy3VqgNNyRzIbrrn7hbPwKJ+A11cEFI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=iR2uE0+SfSnt77476JZXnJN680qkQ/cgSHA59A3DTlSi8ygN62IKie4hn9Kc2xf2t
-	 wzZnWPedXan6eQAbf1y0Wb3pOYpjwdIiAgm4/BL87RPJjVx9WLYDGZNpK4HbkQ/zoR
-	 VIv2ROKc2PxUfpfdrPaDaDsYr651G1ldqAi9pOW1Pr/Dlk9swxR2Fmcmn1Oepdiror
-	 e9We/yar6Xn69T1B8NlA0isfyRyeZRJXHmMebxtOAjcJQznpHygSPxYaExy8WvSU3h
-	 GKS773jmuClkSi0Xan0k+aSy/LYPN1UC1IF+bQxrk/xUhA12UjJaQEzehHLSh+rs6z
-	 Gal35QdNkTK7A==
+	b=sJklbOsp3OybJ4iTK2IgP2Bjj9aTY0viL73+YmSiKkDFELRADb2pbvp8MZRkfxcEX
+	 YOkLs6jeCZa+HmpQuWc74kOWr0H/5kSvKtxliBH2J47o8uLdrLAWE/Dy48s+RuJBNX
+	 0wvZ4A1SnBAdpD8k6/q6ymP3OrZPHXSzviSj4BnQ28F9tClKE5DlsQc3UMh3QOFN1U
+	 23kSh1f2offDk88KLKRRbn6/bCe+A/++yVvse57cI1v8RJKvIq3Ak+y68DLq0VUsW/
+	 ZaQC048uMa46oRv2YkbWOijx8eIyrfp1gpXK3YA6dHvn7QrOnwRUR5SR21AT5vWX0l
+	 OBOC4Zq7uWc/A==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C5A380CFF3;
-	Thu,  6 Mar 2025 03:30:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE0D8380CFF3;
+	Thu,  6 Mar 2025 03:30:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: dsa: mt7530: Fix traffic flooding for MMIO
- devices
+Subject: Re: [PATCH net-next] inet: fix lwtunnel_valid_encap_type() lock imbalance
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174123183127.1114452.4008171486418029850.git-patchwork-notify@kernel.org>
-Date: Thu, 06 Mar 2025 03:30:31 +0000
-References: <20250304-mt7988-flooding-fix-v1-1-905523ae83e9@kernel.org>
-In-Reply-To: <20250304-mt7988-flooding-fix-v1-1-905523ae83e9@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: chester.a.unal@arinc9.com, daniel@makrotopia.org, dqfext@gmail.com,
- sean.wang@mediatek.com, andrew@lunn.ch, olteanv@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
+ <174123183424.1114452.760275294340733893.git-patchwork-notify@kernel.org>
+Date: Thu, 06 Mar 2025 03:30:34 +0000
+References: <20250304125918.2763514-1-edumazet@google.com>
+In-Reply-To: <20250304125918.2763514-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ kuniyu@amazon.com, dsahern@kernel.org, horms@kernel.org,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ syzbot+3f18ef0f7df107a3f6a0@syzkaller.appspotmail.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 04 Mar 2025 09:50:23 +0100 you wrote:
-> On MMIO devices (e.g. MT7988 or EN7581) unicast traffic received on lanX
-> port is flooded on all other user ports if the DSA switch is configured
-> without VLAN support since PORT_MATRIX in PCR regs contains all user
-> ports. Similar to MDIO devices (e.g. MT7530 and MT7531) fix the issue
-> defining default VLAN-ID 0 for MT7530 MMIO devices.
+On Tue,  4 Mar 2025 12:59:18 +0000 you wrote:
+> After blamed commit rtm_to_fib_config() now calls
+> lwtunnel_valid_encap_type{_attr}() without RTNL held,
+> triggering an unlock balance in __rtnl_unlock,
+> as reported by syzbot [1]
 > 
-> Fixes: 110c18bfed414 ("net: dsa: mt7530: introduce driver for MT7988 built-in switch")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> IPv6 and rtm_to_nh_config() are not yet converted.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: dsa: mt7530: Fix traffic flooding for MMIO devices
-    https://git.kernel.org/netdev/net/c/ccc2f5a436fb
+  - [net-next] inet: fix lwtunnel_valid_encap_type() lock imbalance
+    https://git.kernel.org/netdev/net-next/c/f130a0cc1b4f
 
 You are awesome, thank you!
 -- 
