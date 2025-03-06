@@ -1,114 +1,101 @@
-Return-Path: <netdev+bounces-172407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 362C2A547B4
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 11:25:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87A9AA547C4
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 11:28:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4BA34188C3F4
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:24:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F0A216EB08
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:28:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BF1C200100;
-	Thu,  6 Mar 2025 10:24:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CA621FE476;
+	Thu,  6 Mar 2025 10:28:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="dCBy8gCr"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mpXhhjB7"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 907FC204879
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 10:24:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB3F200B9B
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 10:28:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741256663; cv=none; b=SfGzJUFGQaY2MR8Pmc1t9S1dUPM8DcAzL6Y2WOKu4DCKjlH+ijxbSwoIg4obc71M1i+UvYULCNdts3oZ30nB7oIs/jg+yd3uitu/xA6VhftCTmrr37VZ9AdoytqjHHOUgxM9Ir2IFflXUDJ9uOHuf58dATwBkm9y7ao4LzDYrT8=
+	t=1741256907; cv=none; b=t8khZWoCrJIypkPdcw2HouRYu9IhBkA0nv2cJ6s0vG8oTov9Z/YyVEffnTEwDprdF3wP8jL981i9ALlyihbHwJD9/cPi5vy73TCx7SJTeUsfsapX3WlY3KvjUSEKtUgP597I2sVxCi1ay+22fRft5gB/buUnNz+zRpJ0Il+4nts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741256663; c=relaxed/simple;
-	bh=TLILMbpW9cuWipE31cSngedfJJWTQsmSQHNHRS4mdZw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=uFzq9EjjCznu5ei1Tgz6BWyJIq3DbUSEi9q+twncp4wZAPpzuDXEJi15B2NE+oCJcdVCltmB7Tl+QFqkl7QYFlJFM7YRmaF2P07cMv1FmDUcPOJ6vqkO2Sto4+WBoAlU/dxh+E/jGRzckkwCAuqqhKtxfFDGK22qShoxyKXAXaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=dCBy8gCr; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1741256659;
-	bh=dkUBE335YDVLCItzeLFhkN1AuiDIZKC/1OwAdtAB6jo=;
-	h=From:Date:Subject:To:Cc;
-	b=dCBy8gCrgfRzQzAEN9Z5f6p6PlTRZ0IwivzaamY3nZEdyamiG3ZAOni8AOtJQytPr
-	 KLqe6eD4Ga15h3WyFsPjzzRd8xh3A5LHD+GsXKFDROQ0AXQenthRylHaR1O1FqNLKv
-	 pGsgXmdBhIv60qx48FGQl0UmFtABaiIlL83JNPXt759b8AP7mDc+V1DBJYTDDBykU7
-	 8bH2oYqbL5ifmU1KRkGVfideMo19INQwvvWwcRbb2VQEiUuR4hP3O4lGPfCK9v3VgR
-	 wH9LC+DVPibyam/kbJEa8QtEj0zCham2BSuxgt1EQUwzbDydWAQBOWcwAwIKrCmcNL
-	 kJSpyj6n+UJVg==
-Received: by codeconstruct.com.au (Postfix, from userid 10001)
-	id 1478978BC9; Thu,  6 Mar 2025 18:24:19 +0800 (AWST)
-From: Matt Johnston <matt@codeconstruct.com.au>
-Date: Thu, 06 Mar 2025 18:24:18 +0800
-Subject: [PATCH net] net: mctp i3c: Copy headers if cloned
+	s=arc-20240116; t=1741256907; c=relaxed/simple;
+	bh=qI8it5A5hlwyHuUSeuaxgIYo1Ohc1NWkDcH6Dn5NCdE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WGdzl23PL2Du4qjSKetGgeawc5EpIVv6o2GKfQnfNbxO9nlYF0cAOlc5GqkYBHJomjkBv/J2m1oM5sF9QxIsdeksrFkEtX4Sk1cy2+56sMclAeQRCqshRRRR5JX/4Z0xh8ELc59YaT5T4GweSjWbIcxdJp7/fkA0Gtm1g4sQUZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mpXhhjB7; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <6b4c0c8f-8d3a-4e10-840f-7f2fa1bc8800@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1741256903;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pqWU0pywSUoU0LqWrGdm1CtIEy9jCGEQBVNyKe4FV4o=;
+	b=mpXhhjB77skez3U0Dqjj8qBhagUhFdG0P5QdWkme940gWN7wKyYbLhQkkPUtt7auyoiNIM
+	uFWxa84h9QxNhDghxTFH+wblg9cEs0doLCTFSRBWr6vlpUeOUMQKhkbEtrLtZlW8sSzbs9
+	eBQd1AWoEKNCnkTIw9v/SghrYyOSquI=
+Date: Thu, 6 Mar 2025 10:28:19 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Subject: Re: [PATCH] ptp: ocp: Remove redundant check in _signal_summary_show
+To: Ivan Abramov <i.abramov@mt-integration.ru>,
+ Richard Cochran <richardcochran@gmail.com>
+Cc: Jonathan Lemon <jonathan.lemon@gmail.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ lvc-project@linuxtesting.org
+References: <20250305092520.25817-1-i.abramov@mt-integration.ru>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250305092520.25817-1-i.abramov@mt-integration.ru>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250306-matt-i3c-cow-head-v1-1-d5e6a5495227@codeconstruct.com.au>
-X-B4-Tracking: v=1; b=H4sIANF3yWcC/x3MQQqDMBBG4avIrB2IBm3xKsXFkPzRWTSWJFRBc
- veGLr/FezdlJEWmpbsp4atZj9gw9B25XeIGVt9MoxknY83MbymF1Tp2x8k7xPMs1oenwIcHqHW
- fhKDX//miiEJrrT+Tsq2IaAAAAA==
-X-Change-ID: 20250306-matt-i3c-cow-head-6a3df8aedf7e
-To: Jeremy Kerr <jk@codeconstruct.com.au>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, Matt Johnston <matt@codeconstruct.com.au>
-X-Mailer: b4 0.15-dev-cbbb4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1741256658; l=1219;
- i=matt@codeconstruct.com.au; s=20241018; h=from:subject:message-id;
- bh=TLILMbpW9cuWipE31cSngedfJJWTQsmSQHNHRS4mdZw=;
- b=XuxOWMUB6pd40KIW81YVscK5AsO7mRBON2v4YqccTebdxEvdn7wyD3sEsOM/7x7oNP0bx0/e5
- 809C22E0cMYBkJwd7L5vA1gfs5eZEYpL4RUnyX+jU8u2e8Dwx6aJqzJ
-X-Developer-Key: i=matt@codeconstruct.com.au; a=ed25519;
- pk=exersTcCYD/pEBOzXGO6HkLd6kKXRuWxHhj+LXn3DYE=
+X-Migadu-Flow: FLOW_OUT
 
-Use skb_cow_head() prior to modifying the tx skb. This is necessary
-when the skb has been cloned, to avoid modifying other shared clones.
+On 05/03/2025 09:25, Ivan Abramov wrote:
+> In the function _signal_summary_show(), there is a NULL-check for
+> &bp->signal[nr], which cannot actually be NULL.
+> 
+> Therefore, this redundant check can be removed.
+> 
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> 
+> Signed-off-by: Ivan Abramov <i.abramov@mt-integration.ru>
+> ---
+>   drivers/ptp/ptp_ocp.c | 3 ---
+>   1 file changed, 3 deletions(-)
+> 
+> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+> index b651087f426f..34c616bd0a02 100644
+> --- a/drivers/ptp/ptp_ocp.c
+> +++ b/drivers/ptp/ptp_ocp.c
+> @@ -3959,9 +3959,6 @@ _signal_summary_show(struct seq_file *s, struct ptp_ocp *bp, int nr)
+>   	bool on;
+>   	u32 val;
+>   
+> -	if (!signal)
+> -		return;
+> -
+>   	on = signal->running;
+>   	sprintf(label, "GEN%d", nr + 1);
+>   	seq_printf(s, "%7s: %s, period:%llu duty:%d%% phase:%llu pol:%d",
 
-Signed-off-by: Matt Johnston <matt@codeconstruct.com.au>
-Fixes: c8755b29b58e ("mctp i3c: MCTP I3C driver")
----
- drivers/net/mctp/mctp-i3c.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Thanks,
 
-diff --git a/drivers/net/mctp/mctp-i3c.c b/drivers/net/mctp/mctp-i3c.c
-index c1e72253063b54a9c2ff9e45e6202347b8c962a7..c678f79aa35611272a4a410c14dcaeea290d265c 100644
---- a/drivers/net/mctp/mctp-i3c.c
-+++ b/drivers/net/mctp/mctp-i3c.c
-@@ -506,10 +506,15 @@ static int mctp_i3c_header_create(struct sk_buff *skb, struct net_device *dev,
- 	   const void *saddr, unsigned int len)
- {
- 	struct mctp_i3c_internal_hdr *ihdr;
-+	int rc;
- 
- 	if (!daddr || !saddr)
- 		return -EINVAL;
- 
-+	rc = skb_cow_head(skb, sizeof(struct mctp_i3c_internal_hdr));
-+	if (rc)
-+		return rc;
-+
- 	skb_push(skb, sizeof(struct mctp_i3c_internal_hdr));
- 	skb_reset_mac_header(skb);
- 	ihdr = (void *)skb_mac_header(skb);
-
----
-base-commit: 0e7633d7b95b67f1758aea19f8e85621c5f506a3
-change-id: 20250306-matt-i3c-cow-head-6a3df8aedf7e
-
-Best regards,
--- 
-Matt Johnston <matt@codeconstruct.com.au>
-
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
