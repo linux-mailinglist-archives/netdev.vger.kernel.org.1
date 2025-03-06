@@ -1,79 +1,48 @@
-Return-Path: <netdev+bounces-172423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53451A548CF
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 12:10:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 941A5A548D7
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 12:13:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA48F7A5272
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 11:09:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 435997A668C
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 11:12:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09651209F2A;
-	Thu,  6 Mar 2025 11:10:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 212F8209F46;
+	Thu,  6 Mar 2025 11:12:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OPxHp4gw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sd+dAWLr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38224209F46;
-	Thu,  6 Mar 2025 11:10:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD3D209F31;
+	Thu,  6 Mar 2025 11:12:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741259419; cv=none; b=Tfm4r5R/qFcB4iptHvKDDCyFKibsdtqmlYqg7sHmVmq32iTpRyGVBwo1GYK3T9hizzJsqYtr9bAeRFMoXJvNk9/EDqx40prY0wZB7Aivx8vMjktdj96Yuou9W5gFo4KhCgBGMEsTWWzrxFV9LFDAaDQHA3oCUG+EZEGjsjcJbns=
+	t=1741259576; cv=none; b=k0G4gTQQVn03sgB7vthHtWZuhmugCED3cKGoxdAX9SPgJOST5nDGDjFIWac83wjb6xHL4pQ0RTG+UL0QbruAeMUlaKBNvHgZcZ1sWy5/fsXaJNo2a13N9XJQPsR+a1U2Y9jjwUZYkjY8OyrKsUExLomwTJSJWEAaFfh5AVM9fFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741259419; c=relaxed/simple;
-	bh=RygwUEhNHPlhbE0HafZjFRQTBG7+a2BwUJgc4oU19CE=;
+	s=arc-20240116; t=1741259576; c=relaxed/simple;
+	bh=lYae3WRiLznydk3RHjj+Z/pugxhSWQ36o+GiMUuG2XI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h4KmnIKtOOpmOS7zTftqsCi+QLFSV1WjJ6JRK8OgVuaV/dE6eB/nDVy8hHVgE3pX3t50tZ6/hjfz86VlNBqRY52b2q/kdokbfphcpxNwRHTl/wOCtkiD5WxjWYItTjkh12taoj115Q4sY3EvDwutkRdiUZEHhCoNsEeRJaqzkE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OPxHp4gw; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-438a39e659cso2739285e9.2;
-        Thu, 06 Mar 2025 03:10:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741259416; x=1741864216; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nEdW2uFJfd1t87imdFoq2TwacwEguGV2HfO/MLrDxwo=;
-        b=OPxHp4gwLydO6Jl/ILvbjmxV9JV2rsiSXQUeAI7O29tCMVJ7pbx0TUGX2HlMPi2+OS
-         Th9cmuWk8JRS6Z6f7S2zAjqys0KhWCYfl8yEgZFrwb+sNXlJZHGc/nfqINRYM/Wr9BTl
-         g5vUyQnpCE5ynVFEfnSHDY11uTl2mmKC4U66z3+lm2yeoXgCNG7zqChQnDAkIKaVcExd
-         F+y4KBsiXEIChwy72fSZRN5QlMl0yKfFAfJZkO+odXNzNknH1m5lMZddLvp/1uk51Jmo
-         VqabrEqcwqu09BEaukwbKqHz345M0+SzoSZI3aBXFlesm08tLZH5+rt0cfm/aX1Elyfm
-         f3YA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741259416; x=1741864216;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nEdW2uFJfd1t87imdFoq2TwacwEguGV2HfO/MLrDxwo=;
-        b=rEJThZSCztEun63rKVweT0GYTpatX6nPocHvIDavxSXyVKw1SJdtaSlxfe5WusyZpz
-         74Y5U9E3OQNeT1+I4jWZtkLBqR/wa7VkXx0++lgUzq9OTX7KqiLzpeAJ/Kat1awu+zIM
-         ZadNTrwNdaPzKvi/X3WGG/mI4LbeazgmTUezW7DBAvHVYpyX9X2WtnlSOgwYVbUF5rEu
-         vp/e23CmuZqkNHKgGImr6jm0AVhoMBzpkxV7YWQ8vR0ut9PxRwJ3F68rKTdHFRIQISJz
-         wUDxLOI+X8MZXLXnUAXP8Y35/4y9MAcB3OwHLDKmlqfp/UgfSKnzGsf5YFscNXtJC063
-         SPgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUEWd/xEzLyaDeExe+qmi+lPH3+a9eceMKuTNwn5jY3cpBHOQFtaWyRcuMI87zRv5ZvkHU6NvI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMOYVoGZURQgec9xcvWjpY0yCt3prKIUP8Emh+IYKaeC8xwYYV
-	+UZ+L975eNWQgFnLwrU7d7Q2HIH/G6aSfkvzDeoPigQYn0FDmkCj
-X-Gm-Gg: ASbGncv2Z8xUb/+9CwRm91S6md9kH6q+mYRtXLZQECYKgzwOug1Af/kCXUgHxmf6/0H
-	35uZIc9eAo9Gb7dzx24Mv5iTH8jwoFtgFMDBxQz5aFLYNV5x2rAV/2kohrKbAju/ZEycv8YP7bF
-	ZRUZ//S34eCUJ90OjJJr9YS5xlv6EsT8zDglz/59v6rNzQfIki3rN7qdoPH8SN2pRnBII01R6zT
-	3jV1Y1NHQ8D+oE9grxEJNqsg8kGR1Tpw4w/EnkxMGzB080go8UdcdgJooU9PmPGHcPE2ioCleQD
-	16YD8mgBuYbVrgKPfTqyUl7P2Wm7boroYKmO+XwpDVkHkKeONULCs968HyJpe8coZA==
-X-Google-Smtp-Source: AGHT+IGCqiSCYTgS6FIPyvY4yHmJsNicW2x5TXtVbejyezmMi57ab0VsOnOOk5Mh5lvpsHJdDP76LA==
-X-Received: by 2002:a05:600c:4747:b0:43b:caac:595d with SMTP id 5b1f17b1804b1-43bd29b3c72mr47827515e9.23.1741259415880;
-        Thu, 06 Mar 2025 03:10:15 -0800 (PST)
-Received: from [172.27.49.130] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bdd8b04bbsm16693745e9.2.2025.03.06.03.10.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Mar 2025 03:10:15 -0800 (PST)
-Message-ID: <59987f5c-daa1-4063-9781-ac50f7eabb6c@gmail.com>
-Date: Thu, 6 Mar 2025 13:10:12 +0200
+	 In-Reply-To:Content-Type; b=j6Jp1eYDXTSw816gjmpXhcwp2PtwPly7C3G0gR7TxAejyRKMD6L+T2nqooXQ+WNLLXA3R3ARTBjJcJ2/yYlsPPTOY3klbQ+bgnB8DLapsBWXK+L/u5U7WmVBxnCzkuV6I7wlomhzvlIV3TeYfTsxQSXbHLCvLYdJnGicQMd1RVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sd+dAWLr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C106BC4CEE0;
+	Thu,  6 Mar 2025 11:12:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741259575;
+	bh=lYae3WRiLznydk3RHjj+Z/pugxhSWQ36o+GiMUuG2XI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Sd+dAWLrPhqy7K84mF4HKJupEybbidTN6Q5TOfLgUI2s8CaVxwojucugH5VqtoFxB
+	 0igOi8Bu4TqDAkvL8pQAPNUvHA19/dMsYfAIbBzO1CBdG8f96iarz9q+AdszpXbSe6
+	 087IpifCfWTlG5WNJHVaWit3lNmyxZvSD7criyDZpSAcr8Zy96jsqgHXzFSwrMZYb7
+	 6NJFJL2sUj6Bniv599rLbpXKEe0y5fTcG9XXiTJju3UNkrR3HbDcKekGDPtKUeHbXx
+	 09fdpAlXslO7YZx55mBl6g3tNWYKpDYeS7h/DIC2qcSX+mR4KRHszV7NqBDEXVMrU1
+	 iMKOfxFDxvgMA==
+Message-ID: <45522396-0fad-406e-ba53-0bb4aee53e67@kernel.org>
+Date: Thu, 6 Mar 2025 12:12:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,50 +50,228 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/mlnx5: Use generic code for page_pool
- statistics.
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Joe Damato <jdamato@fastly.com>,
- Leon Romanovsky <leon@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Saeed Mahameed <saeedm@nvidia.com>, Thomas Gleixner <tglx@linutronix.de>,
- Tariq Toukan <tariqt@nvidia.com>
-References: <20250305121420.kFO617zQ@linutronix.de>
- <8168a8ee-ad2f-46c5-b48e-488a23243b3d@gmail.com>
- <20250305202055.MHFrfQRO@linutronix.de>
- <20250306083258.0pqISYSF@linutronix.de>
- <042d8459-e5be-4935-a688-9fe18b16afa1@gmail.com>
- <20250306095639.HpT1e8jH@linutronix.de>
+Subject: Re: [PATCH RFC bpf-next 07/20] xdp: Track if metadata is supported in
+ xdp_frame <> xdp_buff conversions
+To: Arthur Fabre <arthur@arthurfabre.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, jakub@cloudflare.com,
+ yan@cloudflare.com, jbrandeburg@cloudflare.com, thoiland@redhat.com,
+ lbiancon@redhat.com, Arthur Fabre <afabre@cloudflare.com>
+References: <20250305-afabre-traits-010-rfc2-v1-0-d0ecfb869797@cloudflare.com>
+ <20250305-afabre-traits-010-rfc2-v1-7-d0ecfb869797@cloudflare.com>
+ <bc356c91-5bff-454a-8f87-7415cb7e82b4@intel.com>
+ <D88HSZ3GZZNN.160YSWHX1HIO2@arthurfabre.com>
 Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20250306095639.HpT1e8jH@linutronix.de>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <D88HSZ3GZZNN.160YSWHX1HIO2@arthurfabre.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
-On 06/03/2025 11:56, Sebastian Andrzej Siewior wrote:
-> On 2025-03-06 11:50:27 [+0200], Tariq Toukan wrote:
->> On 06/03/2025 10:32, Sebastian Andrzej Siewior wrote:
->>> Could I keep it as-is for now with the removal of the counter from the
->>> RQ since we don't have the per-queue/ ring API for it now?
+On 05/03/2025 18.02, Arthur Fabre wrote:
+> On Wed Mar 5, 2025 at 4:24 PM CET, Alexander Lobakin wrote:
+>> From: Arthur <arthur@arthurfabre.com>
+>> Date: Wed, 05 Mar 2025 15:32:04 +0100
 >>
->> I'm fine with transition to generic APIs, as long as we get no regression.
->> We must keep the per-ring counters exposed.
+>>> From: Arthur Fabre <afabre@cloudflare.com>
+>>>
+>>> xdp_buff stores whether metadata is supported by a NIC by setting
+>>> data_meta to be greater than data.
+>>>
+>>> But xdp_frame only stores the metadata size (as metasize), so converting
+>>> between xdp_frame and xdp_buff is lossy.
+>>>
+>>> Steal an unused bit in xdp_frame to track whether metadata is supported
+>>> or not.
+>>>
+>>> This will lets us have "generic" functions for setting skb fields from
+>>> either xdp_frame or xdp_buff from drivers.
+>>>
+>>> Signed-off-by: Arthur Fabre <afabre@cloudflare.com>
+>>> ---
+>>>   include/net/xdp.h | 10 +++++++++-
+>>>   1 file changed, 9 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/include/net/xdp.h b/include/net/xdp.h
+>>> index 58019fa299b56dbd45c104fdfa807f73af6e4fa4..84afe07d09efdb2ab0cb78b904f02cb74f9a56b6 100644
+>>> --- a/include/net/xdp.h
+>>> +++ b/include/net/xdp.h
+>>> @@ -116,6 +116,9 @@ static __always_inline void xdp_buff_set_frag_pfmemalloc(struct xdp_buff *xdp)
+>>>   	xdp->flags |= XDP_FLAGS_FRAGS_PF_MEMALLOC;
+>>>   }
+>>>   
+>>> +static bool xdp_data_meta_unsupported(const struct xdp_buff *xdp);
+>>> +static void xdp_set_data_meta_invalid(struct xdp_buff *xdp);
+>>> +
+>>>   static __always_inline void *xdp_buff_traits(const struct xdp_buff *xdp)
+>>>   {
+>>>   	return xdp->data_hard_start + _XDP_FRAME_SIZE;
+>>> @@ -270,7 +273,9 @@ struct xdp_frame {
+>>>   	void *data;
+>>>   	u32 len;
+>>>   	u32 headroom;
+>>> -	u32 metasize; /* uses lower 8-bits */
+>>> +	u32	:23, /* unused */
+>>> +		meta_unsupported:1,
+>>> +		metasize:8;
+>>
+>> See the history of this structure how we got rid of using bitfields here
+>> and why.
+>>
+>> ...because of performance.
+>>
+>> Even though metasize uses only 8 bits, 1-byte access is slower than
+>> 32-byte access.
 > 
-> I don't see a regression.
-> Could you please show me how per-ring counters for page_pool_stats are
-> exposed at the moment? Maybe I am missing something important.
+> Interesting, thanks!
 > 
 
-What do you see in your ethtool -S?
+I agree with Olek, we should not use bitfields.  Thanks for catching this.
 
-In code, you can check this function:
-
-drivers/net/ethernet/mellanox/mlx5/core/en_stats.c ::
-static MLX5E_DECLARE_STATS_GRP_OP_FILL_STRS(channels)
+(The xdp_frame have a flags member...)
+Why don't we use the flags member for storing this information?
 
 
+>> I was going to write "you can use the fact that metasize is always a
+>> multiple of 4 or that it's never > 252, for example, you could reuse LSB
+>> as a flag indicating that meta is not supported", but first of all
+>>
+>> Do we still have drivers which don't support metadata?
+>> Why don't they do that? It's not HW-specific or even driver-specific.
+>> They don't reserve headroom? Then they're invalid, at least XDP_REDIRECT
+>> won't work.
+>>
+
+I'm fairly sure that all drivers support XDP_REDIRECT.
+Except didn't Lorenzo add a feature bit for this?
+(so, some drivers might explicitly not-support this)
+
+>> So maybe we need to fix those drivers first, if there are any.
+> 
+> Most drivers don't support metadata unfortunately:
+> 
+>> rg -U "xdp_prepare_buff\([^)]*false\);" drivers/net/
+> drivers/net/tun.c
+> 1712:		xdp_prepare_buff(&xdp, buf, pad, len, false);
+> 
+> drivers/net/ethernet/microsoft/mana/mana_bpf.c
+> 94:	xdp_prepare_buff(xdp, buf_va, XDP_PACKET_HEADROOM, pkt_len, false);
+> 
+> drivers/net/ethernet/marvell/mvneta.c
+> 2344:	xdp_prepare_buff(xdp, data, pp->rx_offset_correction + MVNETA_MH_SIZE,
+> 2345:			 data_len, false);
+> 
+> drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+> 1436:	xdp_prepare_buff(&xdp, hard_start, OTX2_HEAD_ROOM,
+> 1437:			 cqe->sg.seg_size, false);
+> 
+> drivers/net/ethernet/socionext/netsec.c
+> 1021:		xdp_prepare_buff(&xdp, desc->addr, NETSEC_RXBUF_HEADROOM,
+> 1022:				 pkt_len, false);
+> 
+> drivers/net/ethernet/google/gve/gve_rx.c
+> 740:	xdp_prepare_buff(&new, frame, headroom, len, false);
+> 859:		xdp_prepare_buff(&xdp, page_info->page_address +
+> 860:				 page_info->page_offset, GVE_RX_PAD,
+> 861:				 len, false);
+> 
+> drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+> 3984:			xdp_prepare_buff(&xdp, data,
+> 3985:					 MVPP2_MH_SIZE + MVPP2_SKB_HEADROOM,
+> 3986:					 rx_bytes, false);
+> 
+> drivers/net/ethernet/aquantia/atlantic/aq_ring.c
+> 794:		xdp_prepare_buff(&xdp, hard_start, rx_ring->page_offset,
+> 795:				 buff->len, false);
+> 
+> drivers/net/ethernet/cavium/thunder/nicvf_main.c
+> 554:	xdp_prepare_buff(&xdp, hard_start, data - hard_start, len, false);
+> 
+> drivers/net/ethernet/ti/cpsw_new.c
+> 348:		xdp_prepare_buff(&xdp, pa, headroom, size, false);
+> 
+> drivers/net/ethernet/freescale/enetc/enetc.c
+> 1710:	xdp_prepare_buff(xdp_buff, hard_start - rx_ring->buffer_offset,
+> 1711:			 rx_ring->buffer_offset, size, false);
+> 
+> drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> 1335:		xdp_prepare_buff(&xdp, page_addr, AM65_CPSW_HEADROOM,
+> 1336:				 pkt_len, false);
+> 
+> drivers/net/ethernet/ti/cpsw.c
+> 403:		xdp_prepare_buff(&xdp, pa, headroom, size, false);
+> 
+> drivers/net/ethernet/sfc/rx.c
+> 289:	xdp_prepare_buff(&xdp, *ehp - EFX_XDP_HEADROOM, EFX_XDP_HEADROOM,
+> 290:			 rx_buf->len, false);
+> 
+> drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> 2097:			xdp_prepare_buff(&xdp, data, MTK_PP_HEADROOM, pktlen,
+> 2098:					 false);
+> 
+> drivers/net/ethernet/sfc/siena/rx.c
+> 291:	xdp_prepare_buff(&xdp, *ehp - EFX_XDP_HEADROOM, EFX_XDP_HEADROOM,
+> 292:			 rx_buf->len, false)
+> 
+> I don't know if it's just because no one has added calls to
+> skb_metadata_set() in yet, or if there's a more fundamental reason.
+> 
+
+I simply think driver developers have been lazy.
+
+If someone want some easy kernel commits, these drivers should be fairly
+easy to fix...
+
+> I think they all reserve some amount of headroom, but not always the
+> full XDP_PACKET_HEADROOM. Eg sfc:
+> 
+
+The Intel drivers use 192 (AFAIK if that is still true). The API ended
+up supporting non-standard XDP_PACKET_HEADROOM, due to the Intel
+drivers, when XDP support was added to those (which is a long time ago now).
+
+> drivers/net/ethernet/sfc/net_driver.h:
+> /* Non-standard XDP_PACKET_HEADROOM and tailroom to satisfy XDP_REDIRECT and
+>   * still fit two standard MTU size packets into a single 4K page.
+>   */
+> #define EFX_XDP_HEADROOM	128
+> 
+
+This is smaller than most drivers, but still have enough headroom for 
+xdp_frame + traits.
+
+> If it's just because skb_metadata_set() is missing, I can take the
+> patches from this series that adds a "generic" XDP -> skb hook ("trait:
+> Propagate presence of traits to sk_buff"), have it call
+> skb_metadata_set(), and try to add it to all the drivers in a separate
+> series.
+> 
+
+I think someone should cleanup those drivers and add support.
+
+--Jesper
+
+>>>   	/* Lifetime of xdp_rxq_info is limited to NAPI/enqueue time,
+>>>   	 * while mem_type is valid on remote CPU.
+>>>   	 */
+>>> @@ -369,6 +374,8 @@ void xdp_convert_frame_to_buff(const struct xdp_frame *frame,
+>>>   	xdp->data = frame->data;
+>>>   	xdp->data_end = frame->data + frame->len;
+>>>   	xdp->data_meta = frame->data - frame->metasize;
+>>> +	if (frame->meta_unsupported)
+>>> +		xdp_set_data_meta_invalid(xdp);
+>>>   	xdp->frame_sz = frame->frame_sz;
+>>>   	xdp->flags = frame->flags;
+>>>   }
+>>> @@ -396,6 +403,7 @@ int xdp_update_frame_from_buff(const struct xdp_buff *xdp,
+>>>   	xdp_frame->len  = xdp->data_end - xdp->data;
+>>>   	xdp_frame->headroom = headroom - sizeof(*xdp_frame);
+>>>   	xdp_frame->metasize = metasize;
+>>> +	xdp_frame->meta_unsupported = xdp_data_meta_unsupported(xdp);
+>>>   	xdp_frame->frame_sz = xdp->frame_sz;
+>>>   	xdp_frame->flags = xdp->flags;
+>>
+>> Thanks,
+>> Olek
 
