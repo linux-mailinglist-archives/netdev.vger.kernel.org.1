@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-172608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97BE2A5585D
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 22:10:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5178A55863
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 22:10:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1EE2188E5A8
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 21:10:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D2CA3A9515
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 21:10:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFF2D207A03;
-	Thu,  6 Mar 2025 21:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77D98276046;
+	Thu,  6 Mar 2025 21:10:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b="YfspTFSe"
+	dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b="zdvLcJx8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.forwardemail.net (smtp.forwardemail.net [149.28.215.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D17C41311AC
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 21:10:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9F0926FDBF
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 21:10:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=149.28.215.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741295403; cv=none; b=Snm7svBZt2gujqrW7/jQXBaIpXe3XWhhk2oY1www055Hi0xN9pRXXNjEAp4L0M6G/ZsiSxKvnmrY7PXlwNrvF0dTtxlbqNl6uv5ixaUnohf6+14pO4356Whsr/IAkCrefB9KK0rGKjJEtNfd4vqZKVofgFT/kTBIqCok72YL8tM=
+	t=1741295408; cv=none; b=uOMXPsyWfFa+Kewl2QmEoA/92r+FhnwaKMiRFnxaAZBnBiCUrLq4kr8C0a5svkgjzZDpG1RcVY2xOGaHi6QA+Hoo5qTrH8Nb2QzrDzU3zqL8Aq91UO29XRLoyzQXXOnE2da1jDYVWxWwIoJDYTA6oZjHlqWiNE8LoAUiH7iU7+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741295403; c=relaxed/simple;
-	bh=CqDwVU/7nprSiF8y5VrrWZurTCaefDs5QFxlc3Lmriw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eK1r+TGaFN8mgReLflUf+bzpGhREFlfOpub8lHzZ1HbuYZWhWsgkYVmaxubvtMjx1+Grl7YDNoPiI6MEgdZ4mOhGt/l6pwWNOg0VWreZHaPIdXDDh7o/CWeMIrkTeiLmcM6ia2nUmgjTHVNC7Nau68kgajG5dFWtml0z2WvPFyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se; dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b=YfspTFSe; arc=none smtp.client-ip=149.28.215.223
+	s=arc-20240116; t=1741295408; c=relaxed/simple;
+	bh=PZ5qH9yvGt5eTfj8OElDpoP9yqBuUcoT9cDMPNjfalc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=KmzbC/jd0/3wyQnsqKA7ZtHnPyd7H39ucWBDscWk2UawiQI3CnV/CsWK/ZDK7LX9O9ojxvqyxexQzkgiX0AEVwHCUerOxh8ucZv5m6AnWViu7ijGx7cu3F0VNrbVuXexZ7R7G3m0C8+LhQ5a0v/+iSlY2w7CDsdO+pqVvGMC5eM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se; dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b=zdvLcJx8; arc=none smtp.client-ip=149.28.215.223
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kwiboo.se;
- h=Content-Transfer-Encoding: MIME-Version: Message-ID: Date: Subject: Cc:
- To: From; q=dns/txt; s=fe-e1b5cab7be; t=1741295401;
- bh=sDXS6ccmXHM7aVTn2W8PvKDj84puFXbx1PJBmmh83iE=;
- b=YfspTFSeIMHzRRto45DBpf8rkOu/8hLwCDbAUzwBCc5R8eCoeVdOpcsCH9c/w0BjndnoRXjMi
- 05xcrTXCq3NE5HFzjISp91NnRXo+DyuqgEwwpa1HobxVyksvPaeYSZ2jnRUtXxEx0DK2I/hcDVs
- s1zyuKl+/+A1ebqB3OxveEpT4DAO1jCNJERQIuZOVG7vcL5Um6MO5vylmt57JYEth+nymHohlHl
- +N/7xnSRtKemjAQj0lAmkKLEQtvsHV0oNFxBQQjkpKCxePa+trsaWTl3Ln6E6RTqWrGrJWN/T05
- mTIgyAOz1trHyIcUsHKDJKcth5ZSpzYXcNRcHH+P/0AA==
-X-Forward-Email-ID: 67ca0f24ad3e70e1cd99d7f2
+ h=Content-Transfer-Encoding: MIME-Version: References: In-Reply-To:
+ Message-ID: Date: Subject: Cc: To: From; q=dns/txt; s=fe-e1b5cab7be;
+ t=1741295406; bh=6VW3CJR3YgKXxnut+qsI9aD1jITQWnOV71qJ1GMseJA=;
+ b=zdvLcJx8xtLTfH3IaXN+5wRmMaMaxjaq/HRLWPQVqI2Ns0y3acLE8ok2mTRMe/uoGV8IeM8fa
+ iu7C/uya8GsGrik7K8PqYAVCK9vbcX2wCwiTI/8xSgjLthZKavmTYF3AL+tIh3RLl45PXw+gxs/
+ CEz2bFhh6g2XQb0SugfBdUr1d02cvdjJScjIsDIzsUByerqiWG8x1XiHZAc9+R2ZAPnJSaWm88s
+ t0e5jTkU0O+y/CQ3eDYVBInuAnf5EnrBW7IdDvhDsx4yxDhc4LSwl7SLUfAHuaBPFdtPOF4vfW9
+ yZXQPv3b2o3eKteGp15l0g+vL3eejQmIm1MVhfrDXqyA==
+X-Forward-Email-ID: 67ca0f28ad3e70e1cd99d807
 X-Forward-Email-Sender: rfc822; jonas@kwiboo.se, smtp.forwardemail.net,
  149.28.215.223
 X-Forward-Email-Version: 0.4.40
@@ -56,17 +57,20 @@ To: Heiko Stuebner <heiko@sntech.de>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>
+	Conor Dooley <conor+dt@kernel.org>,
+	David Wu <david.wu@rock-chips.com>
 Cc: netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-rockchip@lists.infradead.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Jonas Karlman <jonas@kwiboo.se>
-Subject: [PATCH 0/2] net: stmmac: dwmac-rk: Validate rockchip,grf and php-grf during probe
-Date: Thu,  6 Mar 2025 21:09:44 +0000
-Message-ID: <20250306210950.1686713-1-jonas@kwiboo.se>
+Subject: [PATCH 1/2] dt-bindings: net: rockchip-dwmac: Require rockchip,grf and rockchip,php-grf
+Date: Thu,  6 Mar 2025 21:09:45 +0000
+Message-ID: <20250306210950.1686713-2-jonas@kwiboo.se>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250306210950.1686713-1-jonas@kwiboo.se>
+References: <20250306210950.1686713-1-jonas@kwiboo.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,29 +80,52 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 All Rockchip GMAC variants require writing to GRF to configure e.g.
-interface mode and MAC rx/tx delay. The GRF syscon regmap is located
-with help of a rockchip,grf and rockchip,php-grf phandle.
+interface mode and MAC rx/tx delay.
 
-However, validating the rockchip,grf and rockchip,php-grf syscon regmap
-is deferred until e.g. interface mode or speed is configured.
+Change binding to require rockchip,grf and rockchip,php-grf to reflect
+that GRF (and PHP-GRF for RK3576/RK3588) control part of GMAC.
 
-This series change to validate the rockchip,grf and rockchip,php-grf
-syscon regmap at probe time to help simplify the SoC specific operations.
+Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
+---
+---
+ .../devicetree/bindings/net/rockchip-dwmac.yaml | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
-I do not expect that this will introduce any regression. Prior to this,
-use of a device tree without a rockchip,grf would fail when interface
-mode or speed is configured, with this use of such device tree would
-instead result in failure at probe time.
-
-Jonas Karlman (2):
-  dt-bindings: net: rockchip-dwmac: Require rockchip,grf and
-    rockchip,php-grf
-  net: stmmac: dwmac-rk: Validate rockchip,grf and php-grf during probe
-
- .../bindings/net/rockchip-dwmac.yaml          |  17 +-
- .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 269 ++----------------
- 2 files changed, 32 insertions(+), 254 deletions(-)
-
+diff --git a/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml b/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
+index f8a576611d6c..05a5605f1b51 100644
+--- a/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
++++ b/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
+@@ -32,9 +32,6 @@ select:
+   required:
+     - compatible
+ 
+-allOf:
+-  - $ref: snps,dwmac.yaml#
+-
+ properties:
+   compatible:
+     oneOf:
+@@ -114,6 +111,20 @@ required:
+   - compatible
+   - clocks
+   - clock-names
++  - rockchip,grf
++
++allOf:
++  - $ref: snps,dwmac.yaml#
++  - if:
++      properties:
++        compatible:
++          contains:
++            enum:
++              - rockchip,rk3576-gmac
++              - rockchip,rk3588-gmac
++    then:
++      required:
++        - rockchip,php-grf
+ 
+ unevaluatedProperties: false
+ 
 -- 
 2.48.1
 
