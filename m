@@ -1,161 +1,134 @@
-Return-Path: <netdev+bounces-172360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EB82A5459F
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:58:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4483A545DA
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:06:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 658057A35DA
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 08:57:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D24016C916
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 09:06:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B1442080DA;
-	Thu,  6 Mar 2025 08:57:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2103A209695;
+	Thu,  6 Mar 2025 09:05:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="aB2pAhX8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XLXJ068n"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1AF01FF7CC;
-	Thu,  6 Mar 2025 08:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 638FF20967B;
+	Thu,  6 Mar 2025 09:05:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741251458; cv=none; b=rhsIF6bCPNmM7FGfLZxA5NhR9sRATMEKULusHWvhH6FnZVs+2JveYJcJ0/8c+OhdMj2g908vFUH+H888375ECZhULS8KdnN7562TdT7zq44+5amTxLH4SuClGR8FDrf5x0YuXkHekbpf9KFXZHure90TBdvh34NyRqvswa5PpjU=
+	t=1741251948; cv=none; b=NUikHsPUpX09/X9R3IzteJ2s/6VRx5uZXGvqP+MswBSIiHWq5FLBQ0WvKVxFJuFvhR7Hl+QenNwd+ED+knk2OpXz/WKv/lYyP5u+GnKWmjPh5THLEdZSYezs9DBqBdwEhhqE1hItuNdqe8JxIQZ5IrpLUJW4f3Eutsb9NcyzN0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741251458; c=relaxed/simple;
-	bh=n2BLu+Wu2eYN86k7ZRRHm5l9dQn/ExFVkpkl7i1CO1I=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u1tPfBx9LFfQmpFk6gmsIsTZLn+eNaQ1Gudzr6gvWaJFAD/gniK8XR8VkahjTLpqWOM6dxaPzw/3j83NsH8EKW/P89zpJBEGQVEoko/RoSWF7ZlUdKD6pTGxceiDu9PM/KF/GwNbSI2ATXUp9ecxQgniA5Jycmx3RBZ6UN/GxY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=aB2pAhX8; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 27221443D1;
-	Thu,  6 Mar 2025 08:57:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1741251448;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=j8Ai/j9FWWA8BuJUB3RoPY/GqoMvHgqve37LLwirBbU=;
-	b=aB2pAhX86gJ5Okidw2qqL44L/5oQPxeMT8/W0NaSFXpM4wICQD+xVuyjuP0I8hLLAOHAVT
-	wH9OpIbQtbFkWaXKbxzjWjLiGrlIouHnC+loz/GIPwyQEYgCJXE+9g+vM8/BebvuDf+9Xu
-	yWT/9y3nbhQShoPQHgLd6KIiJdG3233LVuXyToZf+X3NzUWGA1irx00zQFPoYWAVY491GU
-	xSL4L7m2lBinbXXphSxowPEzyYN2JcYiDs0CJf1pk6meg0Q311TwMlylExRJL6SM29ewzQ
-	P8HKGCJMe+qTtGud89KRbhi/0iDQyLHgJNZ2/jxmHmlg7ysZDt7OdRs+EMG/OQ==
-Date: Thu, 6 Mar 2025 09:57:26 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Russell King
- <linux@armlinux.org.uk>, Heiner Kallweit <hkallweit1@gmail.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, linux-arm-kernel@lists.infradead.org,
- Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina
- <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
- <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Simon Horman <horms@kernel.org>, Romain Gantois
- <romain.gantois@bootlin.com>
-Subject: Re: [PATCH net-next v4 02/13] net: phy: Use an internal, searchable
- storage for the linkmodes
-Message-ID: <20250306095726.04125e5f@fedora.home>
-In-Reply-To: <738bd67c-8688-4902-805f-4e35e6aaed4a@redhat.com>
-References: <20250303090321.805785-1-maxime.chevallier@bootlin.com>
-	<20250303090321.805785-3-maxime.chevallier@bootlin.com>
-	<738bd67c-8688-4902-805f-4e35e6aaed4a@redhat.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1741251948; c=relaxed/simple;
+	bh=tBF7qxWzzza3ZW6Fbt/OJqSoYXdfOO97tMGgtm4bT6I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=F4ekfhXEpGXLiQWpukbcXeFnfQ34Vfz1Ot/qJS92UM8DNxDCsgLb2AhPskrXtp5OxaQ2/yx21TX+86d5zf4gkbiqNkxjji9ahX44KWaHI+xkXEodshY3n3n+4UOooccVSyJR8KgLeKUVPgQahe8Tg0f99F7SLra76TxGhGaU4Ms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XLXJ068n; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5e4f88ea298so641730a12.2;
+        Thu, 06 Mar 2025 01:05:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741251944; x=1741856744; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qF1a4xy5g06O2GkwhB05ytvAS2BqrA8TH0Jy33gZxiw=;
+        b=XLXJ068nQF617QcsTcy1UAF5lPxx3GnBfjfa+C36yU7rSvA4xLdLGIV98Dzg92NEub
+         Ke4Vsl9QQP3/hYA2lUpJxYpMzhUg6UzKCSuVoKcDueZHwz7k0gzA5j+lBrotssOAF+bY
+         Qo/+xo0UQPmC+ubkoY6uDJTaE6chnzu4+S8Ovpipd5Dvc0bhkDwo7sonT80+tbxpfovO
+         L71ZKmeTWkx5/JqZKdfTHG0CCior8j6rE3HND0Vvdyy/H4TmAPoHutJtYJb5MX986Ast
+         P96sYYDGA+3O8TQUaTyd/0t9u5fjDWW6ZZ2Sh0IZq7ItdhNiq8CvkJQEzl563vnlZwdo
+         V27A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741251944; x=1741856744;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qF1a4xy5g06O2GkwhB05ytvAS2BqrA8TH0Jy33gZxiw=;
+        b=t75E2Xs/JxKskRnREqvL10iIsbBEeGOJhQKHNCFrjf23WXAKef896ef/eSRagyLRao
+         vPAlpPy9eAHgcRUjrJy6D9+uGSk8lLFKf+SFKdywABkymsNhinURFtmOGi/wFeHeKaaC
+         9LRcvYFEVB8egXFwOkt/yBkQjR18JTdJps1JOp3MncfpdlQKVSOOn+BqBC0B6A5569HE
+         4kp4q+YKImyhM2KvrXo8vNOIv25JPjk4eXAFlPHNdnZhcrx2Sa2LilvOE9WaPCH8orzA
+         669J/9A3x8qU6Sp0BYr5iKUgAILsU3zb9oBDzRLAIsN3J8NxTNqX6LPl5ZY9hC0e8tro
+         2gqA==
+X-Forwarded-Encrypted: i=1; AJvYcCUV1T8Ee4Ctcu6y+cwXmhWab8/azRdpmmISv0M5Ax9E+/M7CSA6Ox0p3w4tUby9SuGQduCZEg9Q@vger.kernel.org, AJvYcCUaod/z7+h4i9R453j8SDS5a/5WQv/eOn93pvRGsML6jy30ydvlwuHTjVlzIkdNaQ/NTx786i9/sUQlpfc=@vger.kernel.org, AJvYcCWNfPtdKKyJI5bndBiGngVofVobEkyGGh+g7pWBAfQExteY5Xj/yKyW5MnJGBC7rHWORaLFls/XAtXpZTxZuEIvKAdIeQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhQG3EqFJ/km3oC3xEwXWsaKN9Ti+zv0h2z980u7RK/NVqvYEt
+	XX9+IL+w+5wx7xt0PaRz+p0UYLOwtj6Ry9Qz42BbjtqOncd5CiEWgH3/5C42DAksiJg27T/caiV
+	zsouH53hrV1Ujvxj8VVPNmQV7ZqU=
+X-Gm-Gg: ASbGncsoxe8s33U1rOfaCFTrrxBBmX4W8O1FSbNfkfA8b+MV4ZRcqRWonHnSISsJbIC
+	yaVlb3WfqeVWXXdvyxA6EoqSSD8tvvirOL1E9kOIIbRmw7JBrOzmrMivvUKMMhswx5NR9WGchVE
+	9ENw3TWk0jjJzNwRHCww2uyYv94KqB
+X-Google-Smtp-Source: AGHT+IEZf+mByLmt2C5pECGvzvf9DNU4dvPx4rdt3aJSm/Ho3YYl4NaclXM6a/5zGcCuNqGotXObOzkukzSbT9Fj/lE=
+X-Received: by 2002:a17:907:2d21:b0:ac1:de84:dea1 with SMTP id
+ a640c23a62f3a-ac20da878e7mr662880966b.43.1741251944175; Thu, 06 Mar 2025
+ 01:05:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddutdejfedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgdphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudelpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepk
- hhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-GND-Sasl: maxime.chevallier@bootlin.com
+References: <20250227121522.1802832-1-yong.liang.choong@linux.intel.com>
+ <20250227121522.1802832-6-yong.liang.choong@linux.intel.com>
+ <Z8lLm9Ze9VAx3cE_@surfacebook.localdomain> <601c88fb-8ec8-4866-a45d-f28dea6d9625@linux.intel.com>
+In-Reply-To: <601c88fb-8ec8-4866-a45d-f28dea6d9625@linux.intel.com>
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+Date: Thu, 6 Mar 2025 11:05:08 +0200
+X-Gm-Features: AQ5f1JpWFPB7HB7xwoyOVydwoKV_kFgASdMk4fd6Z1W-9JCutpUYIBvLsaYm1DU
+Message-ID: <CAHp75VeOKbAsvSuf5+VQnGFmUcN92TNnR2eF1+70h3PjaMdMqA@mail.gmail.com>
+Subject: Re: [PATCH net-next v9 5/6] net: stmmac: configure SerDes according
+ to the interface mode
+To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+Cc: Simon Horman <horms@kernel.org>, Jose Abreu <joabreu@synopsys.com>, 
+	Jose Abreu <Jose.Abreu@synopsys.com>, David E Box <david.e.box@linux.intel.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H . Peter Anvin" <hpa@zytor.com>, 
+	Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>, David E Box <david.e.box@intel.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Hans de Goede <hdegoede@redhat.com>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Serge Semin <fancer.lancer@gmail.com>, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	platform-driver-x86@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello Paolo,
+On Thu, Mar 6, 2025 at 10:39=E2=80=AFAM Choong Yong Liang
+<yong.liang.choong@linux.intel.com> wrote:
+> On 6/3/2025 3:15 pm, Andy Shevchenko wrote:
+> > Thu, Feb 27, 2025 at 08:15:21PM +0800, Choong Yong Liang kirjoitti:
 
-On Thu, 6 Mar 2025 09:30:11 +0100
-Paolo Abeni <pabeni@redhat.com> wrote:
+...
 
-> On 3/3/25 10:03 AM, Maxime Chevallier wrote:
-> [...]
-> > +static int speed_duplex_to_capa(int speed, unsigned int duplex)
-> > +{
-> > +	if (duplex == DUPLEX_UNKNOWN ||
-> > +	    (speed > SPEED_1000 && duplex != DUPLEX_FULL))
-> > +		return -EINVAL;
-> > +
-> > +	switch (speed) {
-> > +	case SPEED_10: return duplex == DUPLEX_FULL ?
-> > +			      LINK_CAPA_10FD : LINK_CAPA_10HD;
-> > +	case SPEED_100: return duplex == DUPLEX_FULL ?
-> > +			       LINK_CAPA_100FD : LINK_CAPA_100HD;
-> > +	case SPEED_1000: return duplex == DUPLEX_FULL ?
-> > +				LINK_CAPA_1000FD : LINK_CAPA_1000HD;
-> > +	case SPEED_2500: return LINK_CAPA_2500FD;
-> > +	case SPEED_5000: return LINK_CAPA_5000FD;
-> > +	case SPEED_10000: return LINK_CAPA_10000FD;
-> > +	case SPEED_20000: return LINK_CAPA_20000FD;
-> > +	case SPEED_25000: return LINK_CAPA_25000FD;
-> > +	case SPEED_40000: return LINK_CAPA_40000FD;
-> > +	case SPEED_50000: return LINK_CAPA_50000FD;
-> > +	case SPEED_56000: return LINK_CAPA_56000FD;
-> > +	case SPEED_100000: return LINK_CAPA_100000FD;
-> > +	case SPEED_200000: return LINK_CAPA_200000FD;
-> > +	case SPEED_400000: return LINK_CAPA_400000FD;
-> > +	case SPEED_800000: return LINK_CAPA_800000FD;
-> > +	}
-> > +  
-> 
-> What about adding some code here to help future patch updating LINK_CAPA
-> definition as needed?
-> 
-> Something alike:
-> 
-> 	pr_err_once("Unknown speed %d, please update LINK_CAPS\n", speed);
-> 
-> 
-> > +	return -EINVAL;
-> > +}
-> > +
-> > +/**
-> > + * phy_caps_init() - Initializes the link_caps array from the link_mode_params.
-> > + */
-> > +void phy_caps_init(void)
-> > +{
-> > +	const struct link_mode_info *linkmode;
-> > +	int i, capa;
-> > +
-> > +	/* Fill the caps array from net/ethtool/common.c */
-> > +	for (i = 0; i < __ETHTOOL_LINK_MODE_MASK_NBITS; i++) {
-> > +		linkmode = &link_mode_params[i];
-> > +		capa = speed_duplex_to_capa(linkmode->speed, linkmode->duplex);
-> > +
-> > +		if (capa < 0)
-> > +			continue;  
-> 
-> Or even error-out here.
+> >> config DWMAC_INTEL
+> >>      default X86
+> >>      depends on X86 && STMMAC_ETH && PCI
+> >>      depends on COMMON_CLK
+> >> +    depends on ACPI
+> > Stray and unexplained change. Please, fix it. We don't need the depende=
+ncies
+> > which are not realised in the compile time.
+>
+> The dependency on ACPI is necessary because the intel_pmc_ipc.h header
+> relies on ACPI functionality to interact with the Intel PMC.
 
-Good point yes indeed. Russell raised the point for the need of keeping
-this in sync with new SPEED_XXX definitions, I'll add a check that
-errors out.
+So, that header has to be fixed as ACPI here is really unneeded
+dependency for the cases when somebody (for whatever reasons) want to
+build a kernel without ACPI support but with the driver enabled for
+let's say PCI device.
 
-I hope that's OK though, as higher speeds are introduced and used by
-NICs that usually don't use phylib at all, so there's a good chance
-that the developper introducing the new speed won't have CONFIG_PHYLIB
-enabled.
 
-Is that still good ?
-
-Maxime
+--=20
+With Best Regards,
+Andy Shevchenko
 
