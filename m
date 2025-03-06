@@ -1,270 +1,204 @@
-Return-Path: <netdev+bounces-172432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBA2CA54956
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 12:31:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ECDCA5499A
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 12:38:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1571189392E
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 11:31:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4ED4F1885989
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 11:37:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC8D420C46B;
-	Thu,  6 Mar 2025 11:30:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB6F9221F07;
+	Thu,  6 Mar 2025 11:31:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XZPNKcRM"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="OHCTsWgp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2066.outbound.protection.outlook.com [40.107.244.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A75CB20C03B;
-	Thu,  6 Mar 2025 11:30:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741260640; cv=none; b=lb4Nt5KQHI3Swha1wVENcYPfNgxZX6F3Qx85vJ/1kQxamCyGZ6jFGHgzijPONUt/it4z2HHENSHn7bHC41SfDzXiG5Jov3Rmnjz/uvyzTUcf9yHgRrCKmvWG2JMjyvNjvLmPIrL6uVobOOjT6zI8Z8hEgRESaDEvi9uw8n53Z0g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741260640; c=relaxed/simple;
-	bh=yhMS1w6Qo37ABqlbxVoPYaQ/5By/4/GAkmJVfu0AuF8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dFReA4jVNemWrXN6gWBLXArpyyAlLY4veHRVkQfuuvalg/4gbI9QRitlhdTrPbgQ2nuXKKJZ/DkaijtMilp812u7Toj5OvatV0SLforxqxURJS+oWzuNdn6cL4aEMqyU8Tvq7VFV/h2Qfxj/expBhjFHkD0ujNhnRDeCCAzqxXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XZPNKcRM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1A7BC4CEF5;
-	Thu,  6 Mar 2025 11:30:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741260640;
-	bh=yhMS1w6Qo37ABqlbxVoPYaQ/5By/4/GAkmJVfu0AuF8=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=XZPNKcRMWlRtft0Ctt6/POlNyzFhtDlnk5Yt+JrkBWWIRKAoab1M0vB3baWb3NDEp
-	 cH4juvkKatXcL9oW5+mN9GGMdzjxmOYbr+u2uUeEgI6NuVKfe7im6GxdI2DCDgRL6u
-	 bgfsWcy8ij+XFATJy8At1uoKI8TAhpZm0m/BXXlb0rmV7wc4khrMAwtdLFZ+w2rr4V
-	 f3+BBDeYwodnmWBiN063t4bC4xPAAoYw2Q59aKh8hBRc5MFFVWCZili323kkXW+MRn
-	 5wyO9wFWL/VoOGRDke50n93hlwWOAGvaMP2FMBB3Bgv7bEISpcDZIwFrVyfggtmhXN
-	 qIEM2yxoAZv0w==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Thu, 06 Mar 2025 12:29:28 +0100
-Subject: [PATCH net-next 2/2] tcp: ulp: diag: more info without
- CAP_NET_ADMIN
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B6CB2206AF;
+	Thu,  6 Mar 2025 11:31:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.66
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741260665; cv=fail; b=t7KncrzXthFiS4IYhtukrvLUabNfWYWy5gJqw5f7l5u+86JtrJ11bcKKLM+D6nxzzVUcGcNLMZ2W0nKIm38Vdbnn9f2luvIDD+PkH2QIlNcWa/bCYUgdk27jyF5K9sfdScqcJcX3RSV+q8iV2YJqwjMHxQz76hSoIv2kkxQO4V4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741260665; c=relaxed/simple;
+	bh=CXXA/yemXFjdZRueluYGMU1xWXJdV7REwhghOVXIUnI=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=p1skH0EIo8STkMtFMIW4NU9ejgoaxtdErQHlFQNHSKB9btTQXuhWsgSMTmWaTHuZfKjW5zD54Q3rBAwiSuLgskDe+xP6L5OlGUgG3lnN/kxNhWRTomcZg5e73oQUMRAj1f+y1VBbMinGKIhB55Y/4R/xaQeoQp6c18uvxyxL7uo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=OHCTsWgp; arc=fail smtp.client-ip=40.107.244.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=syYs9vNnH2M/U3ijoImakRQ+skd0YfL+CfxaQ6EBNDNsyfS/lH1UeqWX6d23ysW/ebMd6lRx4Pn0CdK3dC2UnoC86B5fE/1O9Hin0J+WLINwwqkrQNDCyedrSNm5ST5/ycjvW1E0/VGDIH1e5q5pWaav2yEEpizL0/Sklhhxm4FZCLY8/8bspIm0m+9bx+0qLqfusnBUg0sxTVqEg9JxQFaQtb6RQJXk2mVLvw79k+LJ9KxC+bvWgyinqZ/Q0h7IPZL0xVfhy54pWMFKoWbJqAi73mOpYgRdnBhJv1ipGeQXr29TJEOT2K0a/IeMpccgMQjCK+gowTwG8rA+U95I8g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7hl5iS6eOs+7nCIqGUHYgqSGfWd6yqE4neebcee/8p4=;
+ b=bXgdS1OGs5WGtwHTQ9Aw6aifcHrJyWdzpgNRjmQLyOQjo+SA644wO2BSeAPKq2WL1Q0G4Aoe8He6I68g8o8qA44RgmeqLp/vCOdZYazbFR3SBnSHQdCQ1oFM8iax0dNGAF9IIXncFkB6eZokdxsNUa0ca8ay9rUTigUWzDMy7JI6Ukj14Oq2iTB8dwnx89i5vNsusCHX2iL0YVBS9OHzBakUQ+p+00qVbDQ5hNBngtma+fsdzMVqJ1VbJ+xe4ZJkVlMaxVxJjLxB/4SXJ3E0dM45jxGQSiE+jVEutdiL477vRggzWznJliSNV+UyEg9iR/U7i3+BulO7R2Dq6L4Zxg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7hl5iS6eOs+7nCIqGUHYgqSGfWd6yqE4neebcee/8p4=;
+ b=OHCTsWgpK+pa+XetZS/0tim3Yj6tBBHj6nRI/0SpynDw9R9O0C7OmJYAUzAhAZevfQqGKfybUY3ASOAD2HzCkzXVe46dE7abnZqEp7LfG+Pn5zOP9niIK9upUelr5BhdtMHMnPdrm2+r2JG84D5eMyDeWD/se0HCzCpe9ylWwrxhrkSl4RMPRrltQwpSBzCxYCWzczsW4y8xwMh9L+OQlgZbDyetmvBFI9OGxK3wLpvDXXgRExdB+Q/SgGzii3kYK1KjTofMThStZ4252zO1YinlYokq+GcCSIrJDCC85hkT8Ziyz8ybJm3xIu+0AdyXdJr8neJQ43kcycJ88Dbw6A==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SJ2PR12MB8784.namprd12.prod.outlook.com (2603:10b6:a03:4d0::11)
+ by BL3PR12MB6571.namprd12.prod.outlook.com (2603:10b6:208:38e::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.16; Thu, 6 Mar
+ 2025 11:30:59 +0000
+Received: from SJ2PR12MB8784.namprd12.prod.outlook.com
+ ([fe80::1660:3173:eef6:6cd9]) by SJ2PR12MB8784.namprd12.prod.outlook.com
+ ([fe80::1660:3173:eef6:6cd9%6]) with mapi id 15.20.8511.017; Thu, 6 Mar 2025
+ 11:30:58 +0000
+Message-ID: <f783cf9c-9f79-4680-a6e9-d078abbd96ec@nvidia.com>
+Date: Thu, 6 Mar 2025 11:30:53 +0000
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 0/5] net: stmmac: fix resume failures due to RX clock
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>, Thierry Reding <treding@nvidia.com>,
+ "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+References: <Z8B4tVd4nLUKXdQ4@shell.armlinux.org.uk>
+From: Jon Hunter <jonathanh@nvidia.com>
+Content-Language: en-US
+In-Reply-To: <Z8B4tVd4nLUKXdQ4@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P123CA0377.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:18e::22) To SJ2PR12MB8784.namprd12.prod.outlook.com
+ (2603:10b6:a03:4d0::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250306-net-next-tcp-ulp-diag-net-admin-v1-2-06afdd860fc9@kernel.org>
-References: <20250306-net-next-tcp-ulp-diag-net-admin-v1-0-06afdd860fc9@kernel.org>
-In-Reply-To: <20250306-net-next-tcp-ulp-diag-net-admin-v1-0-06afdd860fc9@kernel.org>
-To: mptcp@lists.linux.dev, Eric Dumazet <edumazet@google.com>, 
- Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, Boris Pismenny <borisp@nvidia.com>, 
- John Fastabend <john.fastabend@gmail.com>
-Cc: Davide Caratti <dcaratti@redhat.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7443; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=yhMS1w6Qo37ABqlbxVoPYaQ/5By/4/GAkmJVfu0AuF8=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnyYdUEEYv1cOiGQDt6Iv/zXtQ8ZTlE3GmEM/wx
- cLVfzOu26iJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ8mHVAAKCRD2t4JPQmmg
- c61lEACErGicQcawp+cHJ6ylYIZceszFnKXWN4dH4s0y0xYDi7n9OUMU40ZauZ6EnIGK9EAw69U
- CB2bKdmk6VEwYWxkueJRaoXSfccyZ8Gap0tuT/ShfBdZ7TyKVtdCD2XxSo8RImplMqHwieiDIXz
- ZvDvA9QHFDZB4HladyLPqD3S1juoqAik4ORC2lvYZGVoc0EaxaERCJojgANMg+BJFMKg6LGOzA9
- OjAHWUAB7bAy/ToT7WYhjMXWyFbxv7yCwINg6Hfcbb9IMWVkvQ7+F7P10YkKyjaMb5ZpsaLKVR1
- 419z5nYqbC/1Qhucwyn37Yd/XEPdqMliDb8WC8em+Ihk/bq96Et3zPzen0ZqvW9qw7Ok/ZAqM5+
- JSiA+h7/3+vzzzPUbb92hELS/VGjS/zqO+1/IL0u4klqAh2/php5TmHoamlrJmmWaSjl+CukF/F
- a0tRoRsXfruXc7oO9wa+7fb3MBC8oXeINz05CVJMaPnD7sR535kLUmwS+PBnWRIeFvuJ2VjPnx4
- nOEnC9h2R72EX8fpYnMJG5SWcr4wOQWujb3pRO1ZtF47jRuENa4vPezUlhFSPVP5w8FMmERkEaD
- A1tv0kdYwAVVpNSjeDAeDscJFIIEW/v1kBrtFuE/izaDcH3SF8ddQeovpPffD171lz/JDvTxYy9
- A4FalpZMzdfG5UA==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR12MB8784:EE_|BL3PR12MB6571:EE_
+X-MS-Office365-Filtering-Correlation-Id: 494b445d-242d-4f4e-2845-08dd5ca25da9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?bzJGWDB3clFsWndjSDFZeWpDcTh2aVZmd2lzSmJVWUZpamFEckZ3NFVQN2NX?=
+ =?utf-8?B?dzY3TEJHVTFZa3FjZjlMdHBKZEF6VWZUMlB1Z0RkTUg3bytNNjc0SVhGdmhT?=
+ =?utf-8?B?QlJ5MkZoRjNBemJPSVJOZElraDJFUll0MytOZ1NmcU5UaUhrUXJlVGVzQndk?=
+ =?utf-8?B?K3pCb2RFTFpFRFRIOGJycVhsLzJTOUhMbGlHSEVhSzFrS2loMDFxTkZ6WEVE?=
+ =?utf-8?B?Vm45ZDRibW0yRjRWcW1kc1lxYlF6NjFjSWQ4YWNCQlNBbm9Ka0I4OGFoNDJv?=
+ =?utf-8?B?RmVqQnRCL2xYc3hHQm9WUzB0R2ZUNm9oSUZpOFNwTzF1YXNKTU03V295RzN3?=
+ =?utf-8?B?T2tOcTFOWllSQXByRTRRZEVBQUg3cWxtYkZLMmNyWTRPZjVNeHVvUGlGdEFz?=
+ =?utf-8?B?MTJnVEtjTFNwcnIxMGQrUGl6WTQwQWpITGpKOXpqZ0JycUdSaU9LRy9vS1ov?=
+ =?utf-8?B?SFplYkxVK3Q1RDRMamtoR2x5ZlRBWkU2REFZcGVyRmJrVEp2WFJiRXF6MnNR?=
+ =?utf-8?B?TzlPa1VhcjA3SEd1Vk90NFpKNlB2Y1l3WGhiUitvdElKUG1FWWxxcUtiem9r?=
+ =?utf-8?B?cnRLVGhOMERCY0FWMVByUkJvS2tvM0tMS0YxU2doNVQvNWJqVmtKVWY5N0ZW?=
+ =?utf-8?B?bk42WjhJLzcrM0djMGQzVjB5THF2ZWVRZENMZTJXTXlDTkRyKzJ2ODB1Z3p0?=
+ =?utf-8?B?VTJCZ2NjVnpDMDdyWlpDcWQrMnFaMWRaWWI2d0Q2UEExQ2NKNzlwMjVvZENX?=
+ =?utf-8?B?aitqb0lMQnFtUW9HU2xpKytSa2hkT2luZENHVHdlZkFISDNLOWxyVm82SjM5?=
+ =?utf-8?B?WDBBTEx1UVFKQXJzckFuNVo5RmFIdEZZenIxK3R2UTBLRm13NFg4MHVFWW9Z?=
+ =?utf-8?B?aHZka1BSd2dmYWI0Qmw4V1NiOTJlNUR6N3JlK2l6NVB5Z0Fva01jRnhYMkFn?=
+ =?utf-8?B?UmpGOHJiNTBpSmhPT0RNVkZNUmJ4ZnkxQnRidktadnYyblVjM1Q2ZGpsNmpY?=
+ =?utf-8?B?bm5uZUpoNjBtZHBHV001VWQxSmVMcTlzYXo0VDN5TmM4STlKRXJ2anV4U3k5?=
+ =?utf-8?B?T3U2bC9GY2pCTVBDejYxWEg4TDVieVNTd1pFdm4vZTBrVkNTUmhZVnVMcDlM?=
+ =?utf-8?B?NTBHK1Bpa1NHRldIV1NLT3lWMFVTK2lQRTNyMmlDVEtLbkVlbVpDSTJ6VU1G?=
+ =?utf-8?B?SmFPQ1czYXowMUNpcVFmbFpsdU1Fd2U5VVAwYUMyaHUrakRNbTdvem9BbStn?=
+ =?utf-8?B?enZxbnp3ZFQ0RGwyRCtpZEVSUFRsdEN3ZHV2VWJrVnpkZmc2TEZKcVhHNGE3?=
+ =?utf-8?B?c0ZQbmFCUEVkWWpsaWQwS1BjRW9YL0ZTbFNIamN5VDJ6S0tvemt4dkhESmgy?=
+ =?utf-8?B?YTcxdUpsU1NUZ1BZdGJFWWM1ejFBM2RRcUpQdG1TQWh2ZU1rWVpZSWdwY3pz?=
+ =?utf-8?B?c25jMytpQmtMVDNrVWl0NTNGV2dJRy9QNWRrU01vTDRndHA5TEp4bWxlMlhl?=
+ =?utf-8?B?SlhFSWk0cXlGbyt6RWJTZlQzSDBJdlI2VzJ0UWs4RnBDOUwxWXMvaW1uTzlD?=
+ =?utf-8?B?Z2JQZXYyWUVIVnNUZjhaSVlUbHowVEJRTWJwclc4RFQxRkQwQ1hxcEMvWTB1?=
+ =?utf-8?B?czdESUduWlFCODdkZlpTbjFTL0JkeGFKSXNheWI2MmFxZUJJM3NhN0xRdjd1?=
+ =?utf-8?B?VzhvQ1JUcTQxcEh0OEhiRTlOdnJ0RjZ6ZXNrWnV3emk3UFp3Z2VMZ0JxVGJj?=
+ =?utf-8?B?Ri92Q0ZUTjhnZGEzM2FWQlcrejgwMFRZaldPQ2ttdDRnTEN5dWlIdlV0Ym9Q?=
+ =?utf-8?B?bFFCb3FPY0ZBbUFGV0FPRkYyWVNwc01PeWxobWhGWmcreGZ5RmxmbXRaa1lq?=
+ =?utf-8?Q?Y4LBltASFudyx?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR12MB8784.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MG1lN2pVYXFYQ1RQellJNmVGcXpZT254a2hQYjlGaW1DaDczb1JTVXRBQ3NL?=
+ =?utf-8?B?cjFxa1NSZmpoWFZWdWRaNG90TmppdkUyRVpDK3Aram9TdmFTVjZlUU9Qc3hV?=
+ =?utf-8?B?emhmSDkzVGJXUEZSdUVMVzJTbXNuMi95MG8wcDlnRUVVVWhyL3pUdW1QclBt?=
+ =?utf-8?B?MmNQczdZUlI2a2JxaS9BTVQ5OHQxakgvZzAzelhKS1BGOTl6aEM4c0ZpWDIv?=
+ =?utf-8?B?cm5CZGZNOGxKREs3T3RnMGdpbTBydXY5SVVaQXpoMW40U1NYZUI4TWE5MUhk?=
+ =?utf-8?B?QnpVaDdYNFd4V3pmVFJzRVNROXZ3L3dUZ2k3UFZRTTdQUEJhVVZNNEh4TjZ0?=
+ =?utf-8?B?NXpBSzBrdkIzU29yenUva1Q5b0JCejRkUTI1RG8xTDdvcU1LYmNrOFdxZGFi?=
+ =?utf-8?B?ZjZjbmx5a2NObzlWRkhid3dFQXNqNVBVR2NzdzFTNmxzNml3MUxBdnkyNjBQ?=
+ =?utf-8?B?U2FqR1psdVZsZjVLdHdPclowcFJnb0Vtb1F6V2FBaHlqQmkyR05VTE5EWkNj?=
+ =?utf-8?B?ZG5hSXNUajdYdmJUN1JtQzk1VllDNkxmSTBjN1dOV2FVenVmcTB2WmhId09s?=
+ =?utf-8?B?VmpnWGNUR3luWmlXalRKbmovMGxwSzdhTmhlM2JvTytlQ0NIMTVFZVplUVYv?=
+ =?utf-8?B?b1FaZmxmTXE0cWt0WmdGakhYNDdNdFI3OGNicFV6VVVtbmdiUGZBZ3pjenJo?=
+ =?utf-8?B?cm80NzdKWXFPdmZKN0VIcUMzbEE5c0txZUhOY0t0NEN5ZkMyRmtTQ0s2R3RK?=
+ =?utf-8?B?cmRqZFUyQUluRndaZUhHaTN5Q29hRTJNb2UrL1ErdVlTaE53NHcwY0pjNU5w?=
+ =?utf-8?B?OUp0WE52cGl4MTh2SCtibXp5azJ3V21UY2VBK0ZvUVg4MXhrV2l6Zm5oNThL?=
+ =?utf-8?B?T1ZjVm9PbzZMZTl0Nld6QmtWamlCMW1QVTcyQjBzY1U0d2liSnBraS9NNmd4?=
+ =?utf-8?B?SHI5Y0ttR1pDbHpxOVlZbEFySDBrZlk5Q1ArcVRmdU5odXJNVk5Nd0ZFUmRW?=
+ =?utf-8?B?SXlvdmFBUXlDVlBnZDhWQTNBYmxnanhvQXU1dGxjR3NGY2xmcUVLNTRJcWlQ?=
+ =?utf-8?B?VE8vUzZCY1FjcG9GVjJqY0FRMFh3Snoyd292QWtZL2xqcjFURzV1TWxhditZ?=
+ =?utf-8?B?MHZ4N3BSUml0bnZTQmpRckNOTUx0dkZFN3cxeEkxWFFmR2JBczFPL3krTXpL?=
+ =?utf-8?B?WGZtNHdsbWY4Qml6VUUzRWFROG93dk01aldzMEcwTjNvb254bGFHUmFQTXpW?=
+ =?utf-8?B?WjdmNTJlQmFZNjFMNTRJOEtsdUxocDNaTFNQZHVxUnpDVUE3K3BiZmgvamUv?=
+ =?utf-8?B?U1E5aUZjZ21OT1RuM1Y5dHdoYURKQjQ4TmEzOGVtbVMwWWJHSzM1OWU4MFpa?=
+ =?utf-8?B?eElPd1ZIRWFwTSs1RUtURXp4WG56THMvYkpmZUwxd2tITDRpdnZUUFVTbzJR?=
+ =?utf-8?B?RER3dUtTMTRHbVNYanhkTWdvNXR3MzhPaVJjTW5zOXFUN2lVOHBJdFdwWHJW?=
+ =?utf-8?B?NTZTMjNpdFBlOXlLWkNEbmI0ZGhTbWxjN2VOV1luZFAyMkUyRWRsNXZnRnB2?=
+ =?utf-8?B?YnU3VVFLYXVVTi9yai81ay90MEQyUnpxOGtMbjV3c1BTNGJxdmFJMjZiVmRm?=
+ =?utf-8?B?QnBxNnpZOXhmVmxCdDY1SXNyeXhKVkVtcUE4cWZlRDZETm1YSEdpdWVwYUxL?=
+ =?utf-8?B?OVlkZzFRdDhrSk8ydFlGZlRmSDZIekx6QTZsdkZNbGppTlArN1JKN1dJa2s4?=
+ =?utf-8?B?Um1udUQ4bDdhb1ROb2s1c0ZUaWNGUDVYMFhNb0R1dmRGSG9FWTNNbmJtNmp5?=
+ =?utf-8?B?K20xVUxmUFdZSHNaK1lNcHp5bVV1aFJWN21pTDBLRVhvYmg2bFZJVTZBRW0r?=
+ =?utf-8?B?eTU1QWJQYWF0blh5Y1VZN1BaaFR2SVZvbURpQ3FUNXBmMW5OV0dJaUhTSVYx?=
+ =?utf-8?B?eWZPdkdUZGd2ZjFLejAwcUoxYlJXOGRyWjlFNnJpaWNSMnVRVTNPS2xTV2di?=
+ =?utf-8?B?Znp1NTlZeUJyd0VXM0pQUVVwQm5aV2t6L2JRdC82S0ZHSCtSVXdxamEvWVhU?=
+ =?utf-8?B?UGhwSmxIYjcvQ095WTB1T3lHU3RKcUl0cEo2OXhIVmNSQ0syQ2xvN3ZSeUx3?=
+ =?utf-8?Q?aZPjX/YL3h1CYo9KDtfH8WbM9?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 494b445d-242d-4f4e-2845-08dd5ca25da9
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR12MB8784.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2025 11:30:58.5740
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: PVFjr93KUWYWLQQuxttU74MZhnhvIE9+XaasMORL8qSqIzrMqUTI4JBHv6ZF9TAsL7jqfoFuMkJ9PTOYINwZ3g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6571
 
-When introduced in commit 61723b393292 ("tcp: ulp: add functions to dump
-ulp-specific information"), the whole ULP diag info has been exported
-only if the requester had CAP_NET_ADMIN.
+Hi Russell,
 
-It looks like not everything is sensitive, and some info can be exported
-to all users in order to ease the debugging from the userspace side
-without requiring additional capabilities. Each layer should then decide
-what can be exposed to everybody. The 'net_admin' boolean is then passed
-to the different layers.
+On 27/02/2025 14:37, Russell King (Oracle) wrote:
+> Hi,
+> 
+> This series is likely dependent on the "net: stmmac: cleanup transmit
+> clock setting" series which was submitted earlier today.
 
-On kTLS side, it looks like there is nothing sensitive there: version,
-cipher type, tx/rx user config type, plus some flags. So, only some
-metadata about the configuration, no cryptographic info like keys, etc.
-Then, everything can be exported to all users.
+I tested this series without the above on top of mainline and I still 
+saw some issues with suspend. However, when testing this on top of -next 
+(which has the referenced series) it works like a charm. So yes it does 
+appear to be dependent indeed.
 
-On MPTCP side, that's different. The MPTCP-related sequence numbers per
-subflow should certainly not be exposed to everybody. For example, the
-DSS mapping and ssn_offset would give all users on the system access to
-narrow ranges of values for the subflow TCP sequence numbers and
-MPTCP-level DSNs, and then ease packet injection. The TCP diag interface
-doesn't expose the TCP sequence numbers for TCP sockets, so best to do
-the same here. The rest -- token, IDs, flags -- can be exported to
-everybody.
+I have tested this on Tegra186, Tegra194 and Tegra234 with -next and all 
+are working fine. So with that feel free to add my ...
 
-Acked-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- include/net/tcp.h   |  4 ++--
- net/ipv4/tcp_diag.c |  8 ++++----
- net/mptcp/diag.c    | 42 ++++++++++++++++++++++++++----------------
- net/tls/tls_main.c  |  4 ++--
- 4 files changed, 34 insertions(+), 24 deletions(-)
+Tested-by: Jon Hunter <jonathanh@nvidia.com>
 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index a9bc959fb102fc6697b4a664b3773b47b3309f13..7207c52b1fc9ce3cd9cf2a8580310d0e629f82d6 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -2598,8 +2598,8 @@ struct tcp_ulp_ops {
- 	/* cleanup ulp */
- 	void (*release)(struct sock *sk);
- 	/* diagnostic */
--	int (*get_info)(struct sock *sk, struct sk_buff *skb);
--	size_t (*get_info_size)(const struct sock *sk);
-+	int (*get_info)(struct sock *sk, struct sk_buff *skb, bool net_admin);
-+	size_t (*get_info_size)(const struct sock *sk, bool net_admin);
- 	/* clone ulp */
- 	void (*clone)(const struct request_sock *req, struct sock *newsk,
- 		      const gfp_t priority);
-diff --git a/net/ipv4/tcp_diag.c b/net/ipv4/tcp_diag.c
-index d8bba37dbffd8c6cc7fab2328a88b6ce6ea3e9f4..45e174b8cd22173b6b8eeffe71df334c45498b15 100644
---- a/net/ipv4/tcp_diag.c
-+++ b/net/ipv4/tcp_diag.c
-@@ -96,8 +96,8 @@ static int tcp_diag_put_ulp(struct sk_buff *skb, struct sock *sk,
- 	if (err)
- 		goto nla_failure;
- 
--	if (net_admin && ulp_ops->get_info)
--		err = ulp_ops->get_info(sk, skb);
-+	if (ulp_ops->get_info)
-+		err = ulp_ops->get_info(sk, skb, net_admin);
- 	if (err)
- 		goto nla_failure;
- 
-@@ -170,8 +170,8 @@ static size_t tcp_diag_get_aux_size(struct sock *sk, bool net_admin)
- 		if (ulp_ops) {
- 			size += nla_total_size(0) +
- 				nla_total_size(TCP_ULP_NAME_MAX);
--			if (net_admin && ulp_ops->get_info_size)
--				size += ulp_ops->get_info_size(sk);
-+			if (ulp_ops->get_info_size)
-+				size += ulp_ops->get_info_size(sk, net_admin);
- 		}
- 	}
- 	return size;
-diff --git a/net/mptcp/diag.c b/net/mptcp/diag.c
-index 02205f7994d752cc505991efdf7aa0bbbfd830db..70cf9ebce8338bde3b0bb10fc8620905b15f5190 100644
---- a/net/mptcp/diag.c
-+++ b/net/mptcp/diag.c
-@@ -12,7 +12,7 @@
- #include <net/netlink.h>
- #include "protocol.h"
- 
--static int subflow_get_info(struct sock *sk, struct sk_buff *skb)
-+static int subflow_get_info(struct sock *sk, struct sk_buff *skb, bool net_admin)
- {
- 	struct mptcp_subflow_context *sf;
- 	struct nlattr *start;
-@@ -56,15 +56,6 @@ static int subflow_get_info(struct sock *sk, struct sk_buff *skb)
- 
- 	if (nla_put_u32(skb, MPTCP_SUBFLOW_ATTR_TOKEN_REM, sf->remote_token) ||
- 	    nla_put_u32(skb, MPTCP_SUBFLOW_ATTR_TOKEN_LOC, sf->token) ||
--	    nla_put_u32(skb, MPTCP_SUBFLOW_ATTR_RELWRITE_SEQ,
--			sf->rel_write_seq) ||
--	    nla_put_u64_64bit(skb, MPTCP_SUBFLOW_ATTR_MAP_SEQ, sf->map_seq,
--			      MPTCP_SUBFLOW_ATTR_PAD) ||
--	    nla_put_u32(skb, MPTCP_SUBFLOW_ATTR_MAP_SFSEQ,
--			sf->map_subflow_seq) ||
--	    nla_put_u32(skb, MPTCP_SUBFLOW_ATTR_SSN_OFFSET, sf->ssn_offset) ||
--	    nla_put_u16(skb, MPTCP_SUBFLOW_ATTR_MAP_DATALEN,
--			sf->map_data_len) ||
- 	    nla_put_u32(skb, MPTCP_SUBFLOW_ATTR_FLAGS, flags) ||
- 	    nla_put_u8(skb, MPTCP_SUBFLOW_ATTR_ID_REM, sf->remote_id) ||
- 	    nla_put_u8(skb, MPTCP_SUBFLOW_ATTR_ID_LOC, subflow_get_local_id(sf))) {
-@@ -72,6 +63,21 @@ static int subflow_get_info(struct sock *sk, struct sk_buff *skb)
- 		goto nla_failure;
- 	}
- 
-+	/* Only export seq related counters to user with CAP_NET_ADMIN */
-+	if (net_admin &&
-+	    (nla_put_u32(skb, MPTCP_SUBFLOW_ATTR_RELWRITE_SEQ,
-+			 sf->rel_write_seq) ||
-+	     nla_put_u64_64bit(skb, MPTCP_SUBFLOW_ATTR_MAP_SEQ, sf->map_seq,
-+			       MPTCP_SUBFLOW_ATTR_PAD) ||
-+	     nla_put_u32(skb, MPTCP_SUBFLOW_ATTR_MAP_SFSEQ,
-+			 sf->map_subflow_seq) ||
-+	     nla_put_u32(skb, MPTCP_SUBFLOW_ATTR_SSN_OFFSET, sf->ssn_offset) ||
-+	     nla_put_u16(skb, MPTCP_SUBFLOW_ATTR_MAP_DATALEN,
-+			 sf->map_data_len))) {
-+		err = -EMSGSIZE;
-+		goto nla_failure;
-+	}
-+
- 	rcu_read_unlock();
- 	unlock_sock_fast(sk, slow);
- 	nla_nest_end(skb, start);
-@@ -84,22 +90,26 @@ static int subflow_get_info(struct sock *sk, struct sk_buff *skb)
- 	return err;
- }
- 
--static size_t subflow_get_info_size(const struct sock *sk)
-+static size_t subflow_get_info_size(const struct sock *sk, bool net_admin)
- {
- 	size_t size = 0;
- 
- 	size += nla_total_size(0) +	/* INET_ULP_INFO_MPTCP */
- 		nla_total_size(4) +	/* MPTCP_SUBFLOW_ATTR_TOKEN_REM */
- 		nla_total_size(4) +	/* MPTCP_SUBFLOW_ATTR_TOKEN_LOC */
--		nla_total_size(4) +	/* MPTCP_SUBFLOW_ATTR_RELWRITE_SEQ */
--		nla_total_size_64bit(8) +	/* MPTCP_SUBFLOW_ATTR_MAP_SEQ */
--		nla_total_size(4) +	/* MPTCP_SUBFLOW_ATTR_MAP_SFSEQ */
--		nla_total_size(4) +	/* MPTCP_SUBFLOW_ATTR_SSN_OFFSET */
--		nla_total_size(2) +	/* MPTCP_SUBFLOW_ATTR_MAP_DATALEN */
- 		nla_total_size(4) +	/* MPTCP_SUBFLOW_ATTR_FLAGS */
- 		nla_total_size(1) +	/* MPTCP_SUBFLOW_ATTR_ID_REM */
- 		nla_total_size(1) +	/* MPTCP_SUBFLOW_ATTR_ID_LOC */
- 		0;
-+
-+	if (net_admin)
-+		size += nla_total_size(4) +	/* MPTCP_SUBFLOW_ATTR_RELWRITE_SEQ */
-+			nla_total_size_64bit(8) +	/* MPTCP_SUBFLOW_ATTR_MAP_SEQ */
-+			nla_total_size(4) +	/* MPTCP_SUBFLOW_ATTR_MAP_SFSEQ */
-+			nla_total_size(4) +	/* MPTCP_SUBFLOW_ATTR_SSN_OFFSET */
-+			nla_total_size(2) +	/* MPTCP_SUBFLOW_ATTR_MAP_DATALEN */
-+			0;
-+
- 	return size;
- }
- 
-diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-index 99ca4465f70216c5a44e4ca7477df0e93df6b76d..cb86b0bf9a53e1ff060d8e69eddbd6acfbee5194 100644
---- a/net/tls/tls_main.c
-+++ b/net/tls/tls_main.c
-@@ -1057,7 +1057,7 @@ static u16 tls_user_config(struct tls_context *ctx, bool tx)
- 	return 0;
- }
- 
--static int tls_get_info(struct sock *sk, struct sk_buff *skb)
-+static int tls_get_info(struct sock *sk, struct sk_buff *skb, bool net_admin)
- {
- 	u16 version, cipher_type;
- 	struct tls_context *ctx;
-@@ -1115,7 +1115,7 @@ static int tls_get_info(struct sock *sk, struct sk_buff *skb)
- 	return err;
- }
- 
--static size_t tls_get_info_size(const struct sock *sk)
-+static size_t tls_get_info_size(const struct sock *sk, bool net_admin)
- {
- 	size_t size = 0;
- 
+Thanks!
+Jon
 
 -- 
-2.47.1
+nvpublic
 
 
