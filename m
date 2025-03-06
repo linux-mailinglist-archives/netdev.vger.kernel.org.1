@@ -1,82 +1,77 @@
-Return-Path: <netdev+bounces-172486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52D4EA54F57
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 16:41:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE0F9A54F6A
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 16:45:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A039118851AD
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 15:41:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13F1416A329
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 15:45:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CC5D1A08A6;
-	Thu,  6 Mar 2025 15:41:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1143F20E703;
+	Thu,  6 Mar 2025 15:44:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RXpJpZEb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="zg5fWzzg"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E9241714CF
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 15:41:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00B7148FF5;
+	Thu,  6 Mar 2025 15:44:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741275662; cv=none; b=h9Zp+hiDjLPPviJdbtWv406q5cMegioSm8SgyeE37zb8eZXfmXFNPXHPDqhW+HpEsRBpmsGhefCPcsYefo+D9oJXOUGgEfMUtu+BANQZHR0zm+JM5aIlMulhyWI43g7X11iCGwvU50cnifk7XJVv4Lwkx+UfNhEHJdZ3PWJx9us=
+	t=1741275887; cv=none; b=fYQYxO63SXqApByXCT8A8Nvd+PlDkKti0xdhGyIeKi96sqkmZ4OfPoagEkNjO34NzV//s6xljsMz16DyZHyE2CSVA7nwXxTOfxAV/14d8gNmKhGhL/R5ML9jnCyHe1Mp1PmroLHX3V51Zgol62V4mGBEug36t/6ZfKbjGxN5FqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741275662; c=relaxed/simple;
-	bh=ZQLuwbFhbi0smCrC2wfjjyR8VAPyLu4roSJBDhPRYEw=;
+	s=arc-20240116; t=1741275887; c=relaxed/simple;
+	bh=aixKISa0kyko036hL5V+qG8LL9qF3VO6FIAxvZvxJ70=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NQca8qnrdVMqq1HTjZKWcR3TeX++z/pSjub6U5BGPqxRcitE6YvtvvqsOXQRa1fubuWesTiclLcymDrDd8qTfdC8bB8UueKybtQTsDlvaZ0+4p630qz3/lOzePM661316Oo4sUgCZKQJfadm4D6OI1Vy69BMHIfvdBlGY+S0QXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RXpJpZEb; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=b87sEP6a0Gf2QToPUSiwklAqQDeMoHXu0wjio8Y2Ccs=; b=RXpJpZEbe6ZAf9qdE6rqf93TET
-	7jQImFewncXzu5AmtAA7S3M1+f6eEtTQnvpCuSYVfORDd+smwEGvlZkIJTefB9YZ7oja5hF1DV4Q9
-	mzMg4T//TAwmWSUzJNMZoZWto146Y84IgnWnyTgnwFsTjmUVpmxsBoKuqjQJ4dEA3LPU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tqDLD-002qBX-I2; Thu, 06 Mar 2025 16:40:55 +0100
-Date: Thu, 6 Mar 2025 16:40:55 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: David Arinzon <darinzon@amazon.com>, David Miller <davem@davemloft.net>,
-	netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	"Woodhouse, David" <dwmw@amazon.com>,
-	"Machulsky, Zorik" <zorik@amazon.com>,
-	"Matushevsky, Alexander" <matua@amazon.com>,
-	Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>,
-	"Liguori, Anthony" <aliguori@amazon.com>,
-	"Bshara, Nafea" <nafea@amazon.com>,
-	"Schmeilin, Evgeny" <evgenys@amazon.com>,
-	"Belgazal, Netanel" <netanel@amazon.com>,
-	"Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>,
-	"Kiyanovski, Arthur" <akiyano@amazon.com>,
-	"Dagan, Noam" <ndagan@amazon.com>,
-	"Bernstein, Amit" <amitbern@amazon.com>,
-	"Agroskin, Shay" <shayagr@amazon.com>,
-	"Ostrovsky, Evgeny" <evostrov@amazon.com>,
-	"Tabachnik, Ofir" <ofirt@amazon.com>,
-	"Machnikowski, Maciek" <maciek@machnikowski.net>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: Re: [PATCH v8 net-next 4/5] net: ena: PHC stats through sysfs
-Message-ID: <ed0fb5d8-5cd7-446a-9637-493224af4fb3@lunn.ch>
-References: <20250304190504.3743-1-darinzon@amazon.com>
- <20250304190504.3743-5-darinzon@amazon.com>
- <21fe01f0-7882-46b8-8e7c-8884f4e803f6@lunn.ch>
- <20250304145857.61a3bd6e@kernel.org>
- <89b4ceae-c2c8-4a7b-9f1b-39b6bce17d34@lunn.ch>
- <20250305183637.2e0f6a9f@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=E1b5oS+VmPT+Smfy7w3WnN2IzyEnfQjqxaUjsr4H7gYWaLAhLC/SLMV/8oie7uA4AWxOtXBVAMc8lFsYMABDbk/LckkKHB8qFsdT9oiizCTQ7uWXXJmReKFq/dlPGkP23EFOVqoFzkqhl8sAxemuenXQUdMzYnFLx7Gnn9mG390=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=zg5fWzzg; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=iqLTGgFW/Idb/RWJchf5+oj54Xp1Xr/3EggXQFnKjbg=; b=zg5fWzzg0ciofiTPI5rB/vbzNy
+	WfPtrhrK/GWO2fk4YllvIpM+OR9zwj+nAcHdFxGejKYSLJxFb14lamIUz029dUennkO+S/8xVwuKc
+	pWpGlU0OakPqbwkewGvaK7xfdpzRob+q6JwaxaXhNoWbqP9Op+aRtpsOdJre4ZOSQX1nrxyDbY+36
+	dwWYXr59SJGNLnf9PF1mlryhiM4aHClD6+aAm22Y4/shvpvQn0l2CNkrHW7lUv7g6/QFOfOTssfz+
+	4myjdw/1c6uQYOEnEyXLxfIhfWMGyWFfhFtY6V5aE6sU8xkDUpYR9cz8mguYi05IG5uCLynbEIjiF
+	Xtu/bAfA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36454)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tqDOj-00067c-2X;
+	Thu, 06 Mar 2025 15:44:33 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tqDOh-0006uz-01;
+	Thu, 06 Mar 2025 15:44:31 +0000
+Date: Thu, 6 Mar 2025 15:44:30 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jon Hunter <jonathanh@nvidia.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Thierry Reding <treding@nvidia.com>,
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+Subject: Re: [PATCH RFC 0/5] net: stmmac: fix resume failures due to RX clock
+Message-ID: <Z8nC3vvZWAl5_8WZ@shell.armlinux.org.uk>
+References: <Z8B4tVd4nLUKXdQ4@shell.armlinux.org.uk>
+ <f783cf9c-9f79-4680-a6e9-d078abbd96ec@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,30 +80,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250305183637.2e0f6a9f@kernel.org>
+In-Reply-To: <f783cf9c-9f79-4680-a6e9-d078abbd96ec@nvidia.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, Mar 05, 2025 at 06:36:37PM -0800, Jakub Kicinski wrote:
-> On Wed, 5 Mar 2025 16:33:10 +0100 Andrew Lunn wrote:
-> > > I asked them to do this.
-> > > They are using a PTP device as a pure clock. The netdev doesn't support
-> > > any HW timestamping, so none of the stats are related to packets.  
-> > 
-> > So how intertwined is the PHC with the network device? Can it be
-> > separated into a different driver? Moved into drivers/ptp?
-> > 
-> > We have already been asked if this means network drivers can be
-> > configured via sysfs. Clearly we don't want that, so we want to get
-> > this code out of drivers/net if possible.
+On Thu, Mar 06, 2025 at 11:30:53AM +0000, Jon Hunter wrote:
+> Hi Russell,
 > 
-> Is it good enough to move the relevant code to a ptp/ or phc/ dir
-> under ...thernet/amazon/ena/ ? Moving it to ptp/ proper would require
-> some weird abstractions, not sure if it's warranted? 
+> On 27/02/2025 14:37, Russell King (Oracle) wrote:
+> > Hi,
+> > 
+> > This series is likely dependent on the "net: stmmac: cleanup transmit
+> > clock setting" series which was submitted earlier today.
+> 
+> I tested this series without the above on top of mainline and I still saw
+> some issues with suspend. However, when testing this on top of -next (which
+> has the referenced series) it works like a charm. So yes it does appear to
+> be dependent indeed.
+> 
+> I have tested this on Tegra186, Tegra194 and Tegra234 with -next and all are
+> working fine. So with that feel free to add my ...
+> 
+> Tested-by: Jon Hunter <jonathanh@nvidia.com>
 
-mtd devices have been doing this for decades. And the auxiliary bus
-seems to be a reinvention of the mtd concepts.
+Hi Jon,
 
-As i said, it comes down to how intertwined the PHC is with the
-network device.
+I came up with an alternative approach which should make this safer -
+for example, if the PHY remains linked with the partner over an
+ifdown or module remove/re-insert.
 
-	Andrew
+Please see v2 of "net: stmmac: approach 2 to solve EEE LPI reset
+issues" which replaces this series.
+
+https://lore.kernel.org/r/Z8m-CRucPxDW5zZK@shell.armlinux.org.uk
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
