@@ -1,104 +1,108 @@
-Return-Path: <netdev+bounces-172413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11BE0A5480C
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 11:40:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC2FFA54841
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 11:45:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7D91173971
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:40:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46278188E77F
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 10:45:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E7D920A5C2;
-	Thu,  6 Mar 2025 10:39:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tzM5r4HY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84BE6204C25;
+	Thu,  6 Mar 2025 10:44:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281FB18A6B5
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 10:39:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C452045AE;
+	Thu,  6 Mar 2025 10:44:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741257555; cv=none; b=n26XhwNwrSTEia6c//sCygEEoYfyDctBR81fPudJhyD/HTwKWTsCU35ZBvLxWpa//QoHIXr2al3ceJAWljksm5Ap1x7aY6dEUYg95/8fsXTD+0RMbCVHEJBYZM82ByJ7FHJvUuQr+2NQo73/EC0bRecMG2vo1fsN0PKfOg0np7w=
+	t=1741257854; cv=none; b=YRnRPbViALbAzNQlWBX8z3EgHK7dEivpFHrGeWA5YULYV2hC2C/paaOa+CtRaRyyePmuhvkAIqM4SzDTqhSnx6Oz1CG3nOkNdhm3gbI1ANbTa/BZao9lKTAa0bfgnsDH4DdgxCvJLDUuiB1HkEL2Qj95G1wtA79QXRwCCegqHRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741257555; c=relaxed/simple;
-	bh=XoEY1soOodVF6JjtM1YA01cLzG6rbE6ImGLVAFhBFMo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c0cKccGalMiIRXpTSLvCvOWF36JYgOKD9rsiQhiwZxtWd3v9NRF+IW0OgHtGkEyJfkq92N9bbQZw1OsLQPTI0/jUG90HAtjxt/sgga6po6KGEuxSFOyTgS37TsSnPOPesETIpHztwrura3g2YgIW4LTXdYTxSTCcT/1mfp+hTmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tzM5r4HY; arc=none smtp.client-ip=91.218.175.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <eb1ee266-4b2f-4c6f-a728-2d39469a7855@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1741257540;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OzZ1/UTKo+vdwqq530EncHXy2nYHETwmi3muumMefWw=;
-	b=tzM5r4HYSMpcv81tduO3Z1Ky51f7J1lwPAMf4w32lUOV/+KLNY54jeAu9z3tN87akAZ+Us
-	mtNJYB/88YIojOqHdlxV2OTkjrEBOo9GZE5g0CJo4T6by6QYigWaGof8ii08Zb/GHbRQ7E
-	Qu2vGvOVM+9aezwlYvM00rKdabZ1xQE=
-Date: Thu, 6 Mar 2025 10:38:58 +0000
+	s=arc-20240116; t=1741257854; c=relaxed/simple;
+	bh=Y2Ze13u5oiC3+cLqwxTGSF5SsH2PLvoyTg85F5Ty7RA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=traxqp1NeiMTu2kNiF0HjQf3K9rP5qJUi30J94ScoSqx0GvTy6brckvJhzsuAcN8OVxkTr0J755rXR6u8afWx20ZqDAp6RLFCV3a/hCRPPqRfMSOdSSjYNJ1tNAn31qD4XMT97DLLOzhPmjt8NCFMQdHnEZ4ECsI4UShj4gYby4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [124.16.141.245])
+	by APP-03 (Coremail) with SMTP id rQCowAD3_lppfMlnVXXHEg--.33580S2;
+	Thu, 06 Mar 2025 18:43:55 +0800 (CST)
+From: Wentao Liang <vulab@iscas.ac.cn>
+To: saeedm@nvidia.com,
+	leon@kernel.org,
+	tariqt@nvidia.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Wentao Liang <vulab@iscas.ac.cn>
+Subject: [PATCH v3] net/mlx5: handle errors in mlx5_chains_create_table()
+Date: Thu,  6 Mar 2025 18:43:37 +0800
+Message-ID: <20250306104337.2581-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.42.0.windows.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] net: ethtool: tsinfo: Fix dump command
-To: Kory Maincent <kory.maincent@bootlin.com>,
- "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-References: <20250305140352.1624543-1-kory.maincent@bootlin.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250305140352.1624543-1-kory.maincent@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowAD3_lppfMlnVXXHEg--.33580S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7uF17XFyfCw1xGryxXFWrZrb_yoW8Gr1rpF
+	47AryDWrZ5J348J34UZFWFq34rua1kKa4j9Fs3K3yfZwnrXanrAF1rG34akr4jkry5G39x
+	tFn8A3WUZFZxC3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+	VFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBwkNA2fJcksk+wAAsI
 
-On 05/03/2025 14:03, Kory Maincent wrote:
-> Fix missing initialization of ts_info->phc_index in the dump command,
-> which could cause a netdev interface to incorrectly display a PTP provider
-> at index 0 instead of "none".
-> Fix it by initializing the phc_index to -1.
-> 
-> In the same time, restore missing initialization of ts_info.cmd for the
-> IOCTL case, as it was before the transition from ethnl_default_dumpit to
-> custom ethnl_tsinfo_dumpit.
-> 
-> Fixes: b9e3f7dc9ed95 ("net: ethtool: tsinfo: Enhance tsinfo to support several hwtstamp by net topology")
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> ---
->   net/ethtool/tsinfo.c | 2 ++
->   1 file changed, 2 insertions(+)
-> 
-> diff --git a/net/ethtool/tsinfo.c b/net/ethtool/tsinfo.c
-> index 691be6c445b38..9edc5dc30de88 100644
-> --- a/net/ethtool/tsinfo.c
-> +++ b/net/ethtool/tsinfo.c
-> @@ -291,6 +291,8 @@ static void *ethnl_tsinfo_prepare_dump(struct sk_buff *skb,
->   	memset(reply_data, 0, sizeof(*reply_data));
->   	reply_data->base.dev = dev;
->   	memset(&reply_data->ts_info, 0, sizeof(reply_data->ts_info));
-> +	reply_data->ts_info.cmd = ETHTOOL_GET_TS_INFO;
-> +	reply_data->ts_info.phc_index = -1;
+In mlx5_chains_create_table(), the return value of mlx5_get_fdb_sub_ns()
+and mlx5_get_flow_namespace() must be checked to prevent NULL pointer
+dereferences. If either function fails, the function should log error
+message with mlx5_core_warn() and return error pointer.
 
-This change makes sense, but I'm curious why do we need
-memset(&reply_data->ts_info, 0, sizeof(reply_data->ts_info))
-at all? ts_info is embedded into reply_data which fully zeroed 2 lines
-before.
+Fixes: 39ac237ce009 ("net/mlx5: E-Switch, Refactor chains and priorities")
+Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
->   
->   	return ehdr;
->   }
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
+index a80ecb672f33..711d14dea248 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
+@@ -196,6 +196,11 @@ mlx5_chains_create_table(struct mlx5_fs_chains *chains,
+ 		ns = mlx5_get_flow_namespace(chains->dev, chains->ns);
+ 	}
+ 
++	if (!ns) {
++		mlx5_core_warn(chains->dev, "Failed to get flow namespace\n");
++		return ERR_PTR(-EOPNOTSUPP);
++	}
++
+ 	ft_attr.autogroup.num_reserved_entries = 2;
+ 	ft_attr.autogroup.max_num_groups = chains->group_num;
+ 	ft = mlx5_create_auto_grouped_flow_table(ns, &ft_attr);
+-- 
+2.42.0.windows.2
 
 
