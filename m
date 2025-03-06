@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-172599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D79F6A55790
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 21:40:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AD4DA55792
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 21:40:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 56FD67AB93E
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 20:38:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EACA189A2B8
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 20:40:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8419F27814A;
-	Thu,  6 Mar 2025 20:39:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB3B02755E9;
+	Thu,  6 Mar 2025 20:39:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b="ocIaY6br"
+	dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b="m0nMUEMd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.forwardemail.net (smtp.forwardemail.net [121.127.44.73])
+Received: from smtp.forwardemail.net (smtp.forwardemail.net [149.28.215.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88FF12780F0
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 20:39:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=121.127.44.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E4027426C
+	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 20:39:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=149.28.215.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741293558; cv=none; b=sSTpgZikqKL1C/DxfkKPkNfHje+PKjLkxXozNoRRbE6WR0qnca9u9NyAo5XxQUX0LApMPyGm8BPadxseDvCKUyEG3u5d3QF3uoX+LV263mrYPAyVMzapIafz3XZtHt7+tZxCXBJ71T6H1HKNsmzUDJeZg3rTPey8NZivEfwvRfU=
+	t=1741293563; cv=none; b=ZjpE1sCa01bsRmbA/OdfpE1SzJmdji3CW0KJPRg8PSQE/nSz8kUXWYbg9hsQViqe2D95Tr4nVCO4VytA+wDrhMmcOuQcaOT13A/hNISvXRUL+2FmPSkBoFXrQGY1HLSxwQxbtbm+nnfaEsBZX5PvmdHiL3clxPJW8nsqg0H+u1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741293558; c=relaxed/simple;
-	bh=9aoxFI2B+mD9My0HbvJ4N51Lsc7k7yX5fH7tkCyc4HU=;
+	s=arc-20240116; t=1741293563; c=relaxed/simple;
+	bh=3oyhS/neJz80BZOQqYNoBOpdxi5uNvHfAJDCokDJxVg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z//UEXto1GZk2MDgPsPVIL+I+faW4DjTpraFUZPjYdXft0TrGaWMEC3qGjluVZ6I3tDnuqd84qbGd5xW9c08mKCFLLvH61ILL9LxAv9N2v8rxjegKHUCYt9qItJWvx/E/Dgz7iS/vcnUATKGuHsvMUA9t204pusFNpSnhw4TCHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se; dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b=ocIaY6br; arc=none smtp.client-ip=121.127.44.73
+	 MIME-Version; b=PJyBnKBQpHog/ZtwBq63iJBUH9sxt9O7tT3rsgw8pFAisAhebJH9r1qG5j5KcGGpF4E88Tm9xf29ucr1NMqRTgazQaeI5jKVVP8RQIoOhO+RUdYHyeLzzhQicHQYXhZr7n1j42H5MRZZFRNVG8pCS9cpyE7UJHIA/Xzy1x1FzEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se; dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b=m0nMUEMd; arc=none smtp.client-ip=149.28.215.223
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kwiboo.se;
  h=Content-Transfer-Encoding: MIME-Version: References: In-Reply-To:
  Message-ID: Date: Subject: Cc: To: From; q=dns/txt; s=fe-e1b5cab7be;
- t=1741293554; bh=YyDWZm/uji1wnOwzLL0mO19G3wOIsbkpkj7q10ooChs=;
- b=ocIaY6brCvyCWigrNCSntNZ278iUaEDFBNh1LKBp/NYTO/Wt7AMeiCvIKqr34lQPyYZIbw9Qj
- v+a0wtjH9eOx63STBt5hmRkP5Q2UP0jarbljnpKiQsHuS64KYKYdeCpKonf1/fG/GZe4jsv+SRv
- Xw6p/a5lmWzvI9a3LVsURypiKVymx3yBZ7+ktdTdcS0Ow+Klduswh5TEQo8a4TocduCt8vEzHxE
- 5mrWXh8yWUX2SsbqrMzysBcbDZU68Z/WaInN4/Tqe/xW9kfBbW05XwBxer4oy3YoKPiPQbpRREY
- c3kiwC1myykkYJ7kobyd3b8qFRyTG22yBEWeQSYiWK8w==
-X-Forward-Email-ID: 67ca07f0deafcb1458af9276
+ t=1741293561; bh=qK3GcAy1T7b7ZQP5vAw6ojWgGkMIfURsR+RxPTcGPYs=;
+ b=m0nMUEMdasbqnujUuvlfygfdR5xDDGVGQ23tn3MP811H6BaX5/jlCsfIu7VZPaKP5QbTfPNfS
+ 24UvBirCp8B5lnkyflf029a6W48J4aR8vIR6IGunub+uW3u60/rHRaWHoBixndazxD3VFOthxWz
+ xMWR2t+pygkpCTiU2dGxDuBccrEUPtBrBGEij73k8XmlKtZl9PC/tCcJLK/kvHx8Wvk6g7DQrvo
+ XCIsultszmcU13eGwCiKV9QTzIVTx4IGmFORKPHbV4XpQT8pwSGyEaezff/NUyZV2WAYjigJEJQ
+ PjBV4ZBqZkGtJc8YLuY25plVdE3YgK1GR+rtsYKohOdw==
+X-Forward-Email-ID: 67ca07f4deafcb1458af928b
 X-Forward-Email-Sender: rfc822; jonas@kwiboo.se, smtp.forwardemail.net,
- 121.127.44.73
+ 149.28.215.223
 X-Forward-Email-Version: 0.4.40
 X-Forward-Email-Website: https://forwardemail.net
 X-Complaints-To: abuse@forwardemail.net
@@ -57,17 +57,17 @@ To: Heiko Stuebner <heiko@sntech.de>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
 	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Ezequiel Garcia <ezequiel@vanguardiasur.com.ar>,
-	David Wu <david.wu@rock-chips.com>
+	David Wu <david.wu@rock-chips.com>,
+	Sebastian Reichel <sebastian.reichel@collabora.com>
 Cc: netdev@vger.kernel.org,
 	linux-rockchip@lists.infradead.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Jonas Karlman <jonas@kwiboo.se>,
 	linux-stm32@st-md-mailman.stormreply.com
-Subject: [PATCH 2/3] net: stmmac: dwmac-rk: Use DELAY_ENABLE macro for RK3566/RK3568
-Date: Thu,  6 Mar 2025 20:38:53 +0000
-Message-ID: <20250306203858.1677595-3-jonas@kwiboo.se>
+Subject: [PATCH 3/3] net: stmmac: dwmac-rk: Use DELAY_ENABLE macro for RK3588
+Date: Thu,  6 Mar 2025 20:38:54 +0000
+Message-ID: <20250306203858.1677595-4-jonas@kwiboo.se>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250306203858.1677595-1-jonas@kwiboo.se>
 References: <20250306203858.1677595-1-jonas@kwiboo.se>
@@ -79,42 +79,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Support for Rockchip RK3566/RK3568 GMAC was added without use of the
+Support for Rockchip RK3588 GMAC was added without use of the
 DELAY_ENABLE macro to assist with enable/disable use of MAC rx/tx delay.
 
-Change to use the DELAY_ENABLE macro to help disable MAC delay when
-RGMII_ID/RXID/TXID is used. This also re-order to enable/disable before
-the delay is written to match all other GMAC and vendor kernel.
+Change to use a variant of the DELAY_ENABLE macro to help disable MAC
+delay when RGMII_ID/RXID/TXID is used.
 
-Fixes: 3bb3d6b1c195 ("net: stmmac: Add RK3566/RK3568 SoC support")
+Fixes: 2f2b60a0ec28 ("net: ethernet: stmmac: dwmac-rk: Add gmac support for rk3588")
 Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index 297fa93e4a39..37eb86e4e325 100644
+index 37eb86e4e325..79db81d68afd 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -1049,14 +1049,13 @@ static void rk3568_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 	con1 = (bsp_priv->id == 1) ? RK3568_GRF_GMAC1_CON1 :
- 				     RK3568_GRF_GMAC0_CON1;
+@@ -91,6 +91,10 @@ struct rk_priv_data {
+ 	(((tx) ? soc##_GMAC_TXCLK_DLY_ENABLE : soc##_GMAC_TXCLK_DLY_DISABLE) | \
+ 	 ((rx) ? soc##_GMAC_RXCLK_DLY_ENABLE : soc##_GMAC_RXCLK_DLY_DISABLE))
  
-+	regmap_write(bsp_priv->grf, con1,
-+		     RK3568_GMAC_PHY_INTF_SEL_RGMII |
-+		     DELAY_ENABLE(RK3568, tx_delay, rx_delay));
++#define DELAY_ENABLE_BY_ID(soc, tx, rx, id) \
++	(((tx) ? soc##_GMAC_TXCLK_DLY_ENABLE(id) : soc##_GMAC_TXCLK_DLY_DISABLE(id)) | \
++	 ((rx) ? soc##_GMAC_RXCLK_DLY_ENABLE(id) : soc##_GMAC_RXCLK_DLY_DISABLE(id)))
 +
- 	regmap_write(bsp_priv->grf, con0,
- 		     RK3568_GMAC_CLK_RX_DL_CFG(rx_delay) |
- 		     RK3568_GMAC_CLK_TX_DL_CFG(tx_delay));
--
--	regmap_write(bsp_priv->grf, con1,
--		     RK3568_GMAC_PHY_INTF_SEL_RGMII |
--		     RK3568_GMAC_RXCLK_DLY_ENABLE |
--		     RK3568_GMAC_TXCLK_DLY_ENABLE);
- }
+ #define PX30_GRF_GMAC_CON1		0x0904
  
- static void rk3568_set_to_rmii(struct rk_priv_data *bsp_priv)
+ /* PX30_GRF_GMAC_CON1 */
+@@ -1322,8 +1326,7 @@ static void rk3588_set_to_rgmii(struct rk_priv_data *bsp_priv,
+ 		     RK3588_GMAC_CLK_RGMII_MODE(id));
+ 
+ 	regmap_write(bsp_priv->grf, RK3588_GRF_GMAC_CON7,
+-		     RK3588_GMAC_RXCLK_DLY_ENABLE(id) |
+-		     RK3588_GMAC_TXCLK_DLY_ENABLE(id));
++		     DELAY_ENABLE_BY_ID(RK3588, tx_delay, rx_delay, id));
+ 
+ 	regmap_write(bsp_priv->grf, offset_con,
+ 		     RK3588_GMAC_CLK_RX_DL_CFG(rx_delay) |
 -- 
 2.48.1
 
