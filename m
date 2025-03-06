@@ -1,165 +1,89 @@
-Return-Path: <netdev+bounces-172651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62195A55A0B
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 23:45:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AE91A55A1E
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 23:47:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 924331898430
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 22:45:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 643DC177D7F
+	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 22:46:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C496427CB23;
-	Thu,  6 Mar 2025 22:44:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A4DE202F7C;
+	Thu,  6 Mar 2025 22:46:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MOTan+I4"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OfEm/pu2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47DB61F4185
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 22:44:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9634DA2D;
+	Thu,  6 Mar 2025 22:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741301097; cv=none; b=pDyInEylH1VxgozI6o585CHoYurFQqrmWJUT9uTovZnKET42Y3mK4nA1PV9NiyFFntrzTrIAsyzDBg1LVaoELYAuYftyWMdzWHxrP87HLqqYSUj48YvefvSWtr8kfM24JWfsQa2TMDF4v5mlft0uVO4kNTcwE5G8KpdOoUveZ3A=
+	t=1741301215; cv=none; b=oUV31Voed9my6SdH2zbl4NDuRo8nOKgAl2otLqh6904Trk+4YK+T0yb3bgiKoEDLMYs2TZKzWcMECHaKK5Wg/VU0nBwvpd07XdAFwNMRhy1jF/B79M6ljU0yO2GT8xQ2QUfAziWwDNNy2kCWHNWaDubG+t3i55YuzD8bo4WKlKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741301097; c=relaxed/simple;
-	bh=WJGCuAvULpegUxMdbOK1NHjZx/sGgwb92zX49N6RDkA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=okWbktn+MetU++Fp74PPh0ZMQbN8ZI305sz0eNeyQhK5U2VTcCQCr2puIWOZB/WUzsYH48+P5qfKIk2PmSD57JZcBX5imbqTBhyu/XJ3BdmntFvCDD9+fpLYKFUtmCigh5RNlv1XJZN8OLatWrgaFJL53K7JS7qr0JF40l7CvGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MOTan+I4; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2240aad70f2so61745ad.0
-        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 14:44:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741301095; x=1741905895; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WJGCuAvULpegUxMdbOK1NHjZx/sGgwb92zX49N6RDkA=;
-        b=MOTan+I41gCr2d1GB8Xs6Lbx8+4B5Eh49nNkmhmZ1JIhS0QEInna++EqD3GkW4LIQk
-         G6xBxiFM4ehF43qfNLA08eTgyjhAuELXyV2gy8vY5k06fNTfam8NUTR6Anjd7oH/oSEa
-         j08o51JuN2Mcoj9ZD5ro39XQCNJjpc9WRGRtz2iZOKjE57Cr5TK13FU6WopaDuKmc24x
-         D+gorw/IlxsnwFb2L0mZaGJ4xIG0OjLU1K35/3+drfaLv5ld5qvbs94+Ak1P2eMmfJit
-         Lhcpe0tlhWmW6Mld8IXbCNiBglX3jM72vrpesgZZxYRB0oXIhRYWuZpP2L5vDfNvyAVG
-         LqbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741301095; x=1741905895;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WJGCuAvULpegUxMdbOK1NHjZx/sGgwb92zX49N6RDkA=;
-        b=dAu6WNW6lHiFsx4IwrXYrWxYLL3aoX9DMbxTGA3KPu6phcwXgQUFSMlB+gRhoLUshx
-         H9K/pNPoXnxPrrRI8znrgu/Jcwj08ACqjum6WsWmFPF3uNWX2QLc5qltbLwybmWN7uHO
-         t6gdtoW1Xs2vomq0E9FZPsVTIXcyeNGqJODnutkjNICHqQrxAmaGfMpFGixcX4G9EbO1
-         X9Rt6HRyChzCw6bF/oiWBvqHCyzs7TlYu56NMa2f5pIuVEexH8ETFR7KBdFZmpGROTHS
-         ZAPphoQ9XovkYxghEoCFfEYRky4tgCEQ+1xC9DBUNdkjoI6O1t0OE69U5eGuMJjoLzPa
-         V2gA==
-X-Gm-Message-State: AOJu0YyqJnwUxRw9dSouJBgoiTaW0i2Hd1g5nRHj6Om/d6cVUZM5X5c5
-	VX3f4TiTHmxsBdO1YH09McN6ZjS6vfLwMMiSZOfSxQ7NLyRdJhXyUHq6NgWqZjjpRe8fLEsMALu
-	9W+pO9UE645RI4GLaNzqu3Lp+Ig771igQ4HVu
-X-Gm-Gg: ASbGnctGQMH6pE3i7naabG4b26Bl+3X9oyoWMj9mJUkviq6gp+nV4S36TSCXPQTiKXm
-	jk6a1zqdJTaw9D/4HlYxywfJ3Qww/MzO4jlfFmq880RK5rSX4I+Be8UsEQWLiVHwTAIVqSwEolR
-	iKJGmI/W8EUqzSqcXO6eFLInCbh014MGNLiOzc1XkJL/UPI8k5+LKiwQ==
-X-Google-Smtp-Source: AGHT+IGS+g4ZXFAp2nGdJpOHDce9EEY1Ln9JHFM0oHkP+LPpqqepXFJR4Sm8vslWM6D7/epATYsYkpZ1n4ukdSKEsNY=
-X-Received: by 2002:a17:902:ea0c:b0:216:21cb:2e14 with SMTP id
- d9443c01a7336-2242a62b87amr242655ad.21.1741301095087; Thu, 06 Mar 2025
- 14:44:55 -0800 (PST)
+	s=arc-20240116; t=1741301215; c=relaxed/simple;
+	bh=zs7g5b8i1KCeLS8bZsz0/RmzAKizQG5V0mKic0zbqZE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pp5TiYPCYMow1jBdCstM340kzn0O2DqmU+/LohjhQtO1h6+mpAS4J+4J19xWDkgrw6nLLoopamfv/9y+jiPdn+kN3+8jJv2Q1WrpZUdFU1fhsuuDD0KkVJsO2SkN27qcAIKwJIgk5yOBdVyzaaCUHQqPNYAJSJINtMWaELC3/5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=OfEm/pu2; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=WLg3duqCK2hWUeRlR2AWlamGy6Hsm8C3eYidl98LRSk=; b=OfEm/pu2toLz8/Xyzv0lALa3nZ
+	g91nhITzmWSogS26PvhjV1wX0ump/l/NHKrlqbzEY2xKc+YEjrmnQupJVoK+OgpAxOKn/KAEL9Dat
+	expL+6hVxhKMlG2xEZEeQGibmPe8TSrIsV4XTXiZ3n4Jhw6ix5MPIvBYzJOhLQfcQPas=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tqJzD-002wTu-Hw; Thu, 06 Mar 2025 23:46:39 +0100
+Date: Thu, 6 Mar 2025 23:46:39 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jonas Karlman <jonas@kwiboo.se>
+Cc: Heiko Stuebner <heiko@sntech.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Yao Zi <ziyao@disroot.org>,
+	linux-rockchip@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/4] arm64: dts: rockchip: Add GMAC nodes for RK3528
+Message-ID: <a827e7e9-882a-40c6-9f2c-03d8181dff88@lunn.ch>
+References: <20250306221402.1704196-1-jonas@kwiboo.se>
+ <20250306221402.1704196-4-jonas@kwiboo.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250227041209.2031104-1-almasrymina@google.com>
- <20250227041209.2031104-2-almasrymina@google.com> <20250228163846.0a59fb40@kernel.org>
- <CAHS8izNQnTW7sad_oABtxhy3cHxGR0FWJucrHTSVX7ZAA6jT3Q@mail.gmail.com>
- <20250303162051.09ad684e@kernel.org> <CAHS8izNWt2-1bC2f0jv4Qpk_A9VpEXNvVRoXUtL43_16d-Ui-A@mail.gmail.com>
- <20250306134019.1702e609@kernel.org>
-In-Reply-To: <20250306134019.1702e609@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 6 Mar 2025 14:44:41 -0800
-X-Gm-Features: AQ5f1JpdzmIgb4Qp1uwhgyjnsZGuDnrddzCXLNm0isLe9E-TpLpq-VU4X-9HjRo
-Message-ID: <CAHS8izM8dnFNj5p8vKiyhV9qeE+9=a=BWRnH=vCu49Tq_XTL9g@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 1/8] net: add get_netmem/put_netmem support
-To: Jakub Kicinski <kuba@kernel.org>, Pranjal Shrivastava <praan@google.com>, 
-	Shivaji Kant <shivajikant@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
-	Donald Hunter <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250306221402.1704196-4-jonas@kwiboo.se>
 
-On Thu, Mar 6, 2025 at 1:40=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Tue, 4 Mar 2025 17:39:37 -0800 Mina Almasry wrote:
-> > > > Yes, great idea. I don't see why it wouldn't work.
-> > > >
-> > > > We don't expect mixing of net_iovs and pages in the same skb, but
-> > > > netdevsim could create one net_iov skb every N skbs.
-> > > >
-> > > > I guess I'm not totally sure something is discoverable to syzbot. I=
-s a
-> > > > netdevsim hack toggleable via a debugfs sufficient for syzbot? I'll
-> > > > investigate and ask.
-> > >
-> > > Yeah, my unreliable memory is that syzbot has a mixed record discover=
-ing
-> > > problems with debugfs. If you could ask Dmitry for advice that'd be
-> > > ideal.
-> >
-> > Yes, I took a look here and discussed with Willem. Long story short is
-> > that syzbot support is possible but with a handful of changes. We'll
-> > look into that.
-> >
-> > Long story long, for syzbot support I don't think netdevsim itself
-> > will be useful. Its our understanding so far that syzbot doesn't do
-> > anything special with netdevsim.
->
-> Meaning it doesn't currently do anything special, or you can't make it
-> do anything special with netdevsim?
->
+On Thu, Mar 06, 2025 at 10:13:56PM +0000, Jonas Karlman wrote:
+> Rockchip RK3528 has two Ethernet controllers based on Synopsys DWC
+> Ethernet QoS IP.
+> 
+> Add device tree nodes for the two Ethernet controllers in RK3528.
+> 
+> Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
+> ---
+> gmac0 is missing the integrated-phy and has not been tested bacause I do
+> not have any board that use this Ethernet controller.
 
-Meaning it currently doesn't do anything special with netdevsim. I
-imagine we may be able to create a specialized syzbot instance that
-loads netdevsim and starts fuzzing its APIs. However I'm told
-specialized syzbot instances are much less valuable than making the
-feature discoverable to existing syzbot instances, which is why our
-thoughts went to adding devmem/unreadable skb support to virtio or
-tun/tap.
+What do you know about the integrated PHY? Does it use one of the
+standard phy-modes? RMII? Does the datasheet indicate what address it
+uses on the MDIO bus? If you know these two bits of information, you
+can probably add it.
 
-Do I surmise from your question you prefer a netdevsim-based approach?
-(and just curious maybe, why?)
-> > We'll need to add queue API/page_pool/unreadable netmem support to
-> > one of the drivers qemu (syzbot) uses, and that should get syzbot
-> > fuzzing the control plane.
-> >
-> > To get syzbot to fuzz the data plane, I think we need to set up a
-> > special syzbot instance which configures udmabuf/rss/flow
->
-> To be clear for Tx you don't need RSS and flow steering, Tx should
-> be trivial for any device driver which managers DMAs directly (not USB).
->
-
-Yes, we don't need queue API or page_pool support or header split
-either for that matter. TX fuzzing is definitely simpler. Maybe we can
-start with that.
-
---
-Thanks,
-Mina
+    Andrew
 
