@@ -1,129 +1,168 @@
-Return-Path: <netdev+bounces-173090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCF24A57245
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 20:42:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68DA1A57278
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 20:50:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51D7B189603E
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 19:42:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A4A8D7A641C
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 19:48:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E84525487A;
-	Fri,  7 Mar 2025 19:42:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 359B125485E;
+	Fri,  7 Mar 2025 19:49:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IWdkuHeR"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Y2tbYJSD"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA3CC24FC03
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 19:42:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2643521859D;
+	Fri,  7 Mar 2025 19:49:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741376539; cv=none; b=HtO4gF2ecf1+trFT7+CgEp4tJBaNVH+2Gb1/CWM8EE8g5LZ81M/IwhifyROXiZtg6ZoE9Vgm6FL2m+ChaXo/xHfyg2+yGae1VhCDsP+qQY45egND610QSuIlyXk9fX7KS+D9FleX00FoM8YncFroPSKfW4jq22WG0UzzXbYsm4c=
+	t=1741376986; cv=none; b=VAAl9Aq7AHP997w80JCblrRb+XNbPzG3Gvaw+JeB6DGTUeEBS++j9KHr5eZkq9z8bpi+V2X4EwU9q0+tMJar9HobB5ZoJ/ezmlROwkA4sd/T1316YX/0zboCsofmotkbyy9gmlxbvOO/JFID1HukBlTFpnRrLwRrEbkjsLkakRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741376539; c=relaxed/simple;
-	bh=OZkliL2bYezi7a2we+4OxPKOzQpAk3iSHqbABO6VJ4E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=edIEuvjtWuuwUogbUbry62rzJ9z/rnakOHOj4G3BbPnK8fvsHa7RH74MJUmjbp/g5C7TwcduFozP+nXzGJY2R9WCMoQHimZlwGC2ssYT+u6sEDY5t7mSupoGr31rIlbhdb6jLWnNqIbjpG5X8TqY66hwPq+fJ5K0pefRSb8KhcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IWdkuHeR; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 7 Mar 2025 19:41:59 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1741376525;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hUfk1/2NcSfPN/tpPfLTglczAj9VxtvTU3Ogyf9VQss=;
-	b=IWdkuHeRMDC+9wNq0Lo0/O/5kMk6BYVu38wbtXm8ScUXAhZyee1hoE9gApdp7k2fHqLaEa
-	lSJIMUsgS+5avUY2z2QStbB7g6TAtfdGW26DdBIJvqBW7FbfDuySpBvMwgW+pR60vCGAUR
-	kaRdKLxXImqEfy4bcU+uXr24hZsNnsU=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Shakeel Butt <shakeel.butt@linux.dev>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Michal Hocko <mhocko@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Muchun Song <muchun.song@linux.dev>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-mm@kvack.org, cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Meta kernel team <kernel-team@meta.com>
-Subject: Re: [RFC PATCH] memcg: net: improve charging of incoming network
- traffic
-Message-ID: <Z8tMB4i_hBLaSZS1@google.com>
-References: <20250307055936.3988572-1-shakeel.butt@linux.dev>
+	s=arc-20240116; t=1741376986; c=relaxed/simple;
+	bh=TukhM5KfrnykmpRsPrYHap4TTY4YTDzqHtaP7gRPqLM=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SpdvnTlQICin1cJYucEvF+gluLXZVHBD/bNihs2W1Etlinm0HQHZqV8skATXgTH5o4RJaeCpFbfuvsQ5i5mOg/PVWZ1jVxEjv2/p3URMIr12YZJo3FjFrLE5b6f77Hu2ykb5NiwcX/swzDz45eBSZMtAhAdnZkvNDe7+1LHYagU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Y2tbYJSD; arc=none smtp.client-ip=198.47.19.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 527JlIFS4055826
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Fri, 7 Mar 2025 13:47:18 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1741376838;
+	bh=7MSwLxTEPEB7snYOzkakSs7OVnf7mnb46OQFG90frxc=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To;
+	b=Y2tbYJSDFXtb3qSItccHoXSTovU+G8ZIHcDkpgt0qh+7JsRIao8dT8ZNiFm+djIOT
+	 mv5xUKzEcQugm2lxrxWpdUuKsJGmA2E7sUR8pccE5cGFJyRIIwjAr8U+ruPqX1wqyH
+	 ARsPzPF1GEpfesp4iIYc6GHzIr+qfutYDJph480w=
+Received: from DFLE115.ent.ti.com (dfle115.ent.ti.com [10.64.6.36])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 527JlIOk107175;
+	Fri, 7 Mar 2025 13:47:18 -0600
+Received: from DFLE102.ent.ti.com (10.64.6.23) by DFLE115.ent.ti.com
+ (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 7
+ Mar 2025 13:47:17 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 7 Mar 2025 13:47:17 -0600
+Received: from localhost (uda0133052.dhcp.ti.com [128.247.81.232])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 527JlHRK114562;
+	Fri, 7 Mar 2025 13:47:17 -0600
+Date: Fri, 7 Mar 2025 13:47:17 -0600
+From: Nishanth Menon <nm@ti.com>
+To: Parvathi Pudi <parvathi@couthit.com>
+CC: danishanwar <danishanwar@ti.com>, rogerq <rogerq@kernel.org>,
+        andrew+netdev <andrew+netdev@lunn.ch>, davem <davem@davemloft.net>,
+        edumazet
+	<edumazet@google.com>, kuba <kuba@kernel.org>,
+        pabeni <pabeni@redhat.com>, robh <robh@kernel.org>,
+        krzk+dt <krzk+dt@kernel.org>, conor+dt
+	<conor+dt@kernel.org>,
+        ssantosh <ssantosh@kernel.org>,
+        richardcochran
+	<richardcochran@gmail.com>,
+        basharath <basharath@couthit.com>, schnelle
+	<schnelle@linux.ibm.com>,
+        diogo ivo <diogo.ivo@siemens.com>, m-karicheri2
+	<m-karicheri2@ti.com>,
+        horms <horms@kernel.org>, jacob e keller
+	<jacob.e.keller@intel.com>,
+        m-malladi <m-malladi@ti.com>,
+        "javier carrasco
+ cruz" <javier.carrasco.cruz@gmail.com>,
+        afd <afd@ti.com>, s-anna
+	<s-anna@ti.com>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        netdev <netdev@vger.kernel.org>,
+        devicetree <devicetree@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        pratheesh <pratheesh@ti.com>, Prajith Jayarajan <prajith@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>, praneeth <praneeth@ti.com>,
+        srk <srk@ti.com>, rogerq <rogerq@ti.com>,
+        krishna
+	<krishna@couthit.com>, pmohan <pmohan@couthit.com>,
+        mohan <mohan@couthit.com>
+Subject: Re: [PATCH net-next v3 00/10] PRU-ICSSM Ethernet Driver
+Message-ID: <20250307194717.isd2yv5qvuwe6jgp@strongly>
+References: <20250214054702.1073139-1-parvathi@couthit.com>
+ <20250226184408.d4gpr3uu2dm7oxa2@handwork>
+ <506678778.717678.1740740287558.JavaMail.zimbra@couthit.local>
+ <1229872038.768025.1741268586173.JavaMail.zimbra@couthit.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20250307055936.3988572-1-shakeel.butt@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <1229872038.768025.1741268586173.JavaMail.zimbra@couthit.local>
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Thu, Mar 06, 2025 at 09:59:36PM -0800, Shakeel Butt wrote:
-> Memory cgroup accounting is expensive and to reduce the cost, the kernel
-> maintains per-cpu charge cache for a single memcg. So, if a charge
-> request comes for a different memcg, the kernel will flush the old
-> memcg's charge cache and then charge the newer memcg a fixed amount (64
-> pages), subtracts the charge request amount and stores the remaining in
-> the per-cpu charge cache for the newer memcg.
+On 19:13-20250306, Parvathi Pudi wrote:
+> Hi,
 > 
-> This mechanism is based on the assumption that the kernel, for locality,
-> keep a process on a CPU for long period of time and most of the charge
-> requests from that process will be served by that CPU's local charge
-> cache.
+> >> On 11:16-20250214, parvathi wrote:
+> >> [...]
+> >>> The patches presented in this series have gone through the patch verification
+> >>> tools and no warnings or errors are reported. Sample test logs verifying the
+> >>> functionality on Linux next kernel are available here:
+> >>> 
+> >>> [Interface up
+> >>> Testing](https://gist.github.com/ParvathiPudi/f481837cc6994e400284cb4b58972804)
+> >>> 
+> >>> [Ping
+> >>> Testing](https://gist.github.com/ParvathiPudi/a121aad402defcef389e93f303d79317)
+> >>> 
+> >>> [Iperf
+> >>> Testing](https://gist.github.com/ParvathiPudi/581db46b0e9814ddb5903bdfee73fc6f)
+> >>> 
+> >> 
+> >> 
+> >> I am looking at
+> >> https://lore.kernel.org/all/20250214085315.1077108-11-parvathi@couthit.com/
+> >> and wondering if i can see the test log for am335x and am47xx to make
+> >> sure that PRUs are functional on those two?
+> >> 
+> > 
+> > In this patch series we have added support for PRU-ICSS on the AM57x SOC.
+> > Hence the test log was only included for the AM57x SOC. We are working in
+> > parallel
+> > to add support for PRU-ICSS on the AM33x and AM43x SOC's as well. We will send
+> > it as
+> > a separate patch series at a later time.
+> > 
 > 
-> However this assumption breaks down for incoming network traffic in a
-> multi-tenant machine. We are in the process of running multiple
-> workloads on a single machine and if such workloads are network heavy,
-> we are seeing very high network memory accounting cost. We have observed
-> multiple CPUs spending almost 100% of their time in net_rx_action and
-> almost all of that time is spent in memcg accounting of the network
-> traffic.
+> Further update:
 > 
-> More precisely, net_rx_action is serving packets from multiple workloads
-> and is observing/serving mix of packets of these workloads. The memcg
-> switch of per-cpu cache is very expensive and we are observing a lot of
-> memcg switches on the machine. Almost all the time is being spent on
-> charging new memcg and flushing older memcg cache. So, definitely we
-> need per-cpu cache that support multiple memcgs for this scenario.
+> We have successfully cross compiled the kernel (linux-next) with this patch series
+> for AM335x and AM437x SOC respectively.
+> 
+> Kernel is booting well on both the SOCs and we have verified PRU functionality by
+> loading simple example application (pru_addition.elf) on the PRU cores, by using
+> "remoteproc" driver from mainline kernel.
+> 
+> Below are the logs for the SOCs with boot log and running PRU with elf file specified
+> above:
+> 
+> AM335x test log: <https://gist.github.com/ParvathiPudi/87d7ddf949913b80f022ed99706337ac>
+> AM437x test log: <https://gist.github.com/ParvathiPudi/b2d556829cb4a9e3b6b4c5656dbdd594>
 
-We've internally faced a different situation on machines with a large
-number of CPUs where the mod_memcg_state(MEMCG_SOCK) call in
-mem_cgroup_[un]charge_skmem() causes latency due to high contention on
-the atomic update in memcg_rstat_updated().
 
-In this case, networking performs a lot of charge/uncharge operations,
-but because we count the absolute magnitude updates in
-memcg_rstat_updated(), we reach the threshold quickly. In practice, a
-lot of these updates cancel each other out so the net change in the
-stats may not be that large.
+Thanks for testing this, I just got some time to dig further, I will
+respond on the standalone patch
+https://lore.kernel.org/all/20250108125937.10604-2-basharath@couthit.com/
 
-However, not using the absolute value of the updates could cause stat
-updates of irrelevant stats with opposite polarity to cancel out,
-potentially delaying stat updates.
-
-I wonder if we can leverage the batching introduced here to fix this
-problem as well. For example, if the charging in
-mem_cgroup_[un]charge_skmem() is satisfied from this catch, can we avoid
-mod_memcg_state() and only update the stats once at the end of batching?
-
-IIUC the current implementation only covers the RX path, so it will
-reduce the number of calls to mod_memcg_state(), but it won't prevent
-charge/uncharge operations from raising the update counter
-unnecessarily. I wonder if the scope of the batching could be increased
-so that both TX and RX use the same cache, and charge/uncharge
-operations cancel out completely in terms of stat updates.
-
-WDYT?
+-- 
+Regards,
+Nishanth Menon
+Key (0xDDB5849D1736249D) / Fingerprint: F8A2 8693 54EB 8232 17A3  1A34 DDB5 849D 1736 249D
 
