@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-172827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4522CA56404
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 10:35:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26A7EA56431
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 10:46:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60FBF1780C1
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 09:35:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B8BB3AA0D9
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 09:45:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A57D9209F5C;
-	Fri,  7 Mar 2025 09:32:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB0351FFC47;
+	Fri,  7 Mar 2025 09:45:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="lwfzFAp+"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="Fpv3ofoW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CDE4204C0E
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 09:32:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9926E19C575;
+	Fri,  7 Mar 2025 09:45:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741339971; cv=none; b=EDCgvKQfmVQd3ZNc9kYdjOWmzh7n5hAFvBnkMVSd0hJ7YMpAjUlo2UkDkHOgbqsLKlbvLja/BWgvDKgLMTUSuGhy22j6z6Fq/UntK9jG4AcWVlaP3jTEElZRr0tuYrJ6Euu2y82pv/w0nDewmPbQidnF8DLPRweHEujgUE7i2wA=
+	t=1741340755; cv=none; b=WI+kxDqSwgzzlq4neSMyryc5ID8ikVezs6axpzZcdDySTMPGFKOmwqG6k/iMBZv8YL36+s47ATY3PtLZO/npDdT5lhFSWGm3upwS6AeuVVlRRkexqf8OoJaJHJhH/MTSxaFIho/o3GdrdD8fxwcr9PlRa5ONpQUgph34Kw6C/xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741339971; c=relaxed/simple;
-	bh=kUGNhKndVnG4lvy0lWi69O4G6X3wRJgHqMdT0byLlYc=;
+	s=arc-20240116; t=1741340755; c=relaxed/simple;
+	bh=8BxwcUC03a1oPRZ2pAlv3i2yCxXMrV7cP/jYoHXH/zs=;
 	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=hZn34iws/qgvBdwrgYumMltiHMw4k2kYYrjS+GlJe9eF98R/4DZMiMg8+DwVe48bPemClJCTOXIsNAmWKOBjHYQNh4E6wBbRnCgA/yiOJR3NPcPJcrBspFUJ5/aMi83KZyzeFaFOswuh/GNe+TL1F9iO8qf0LKXOMin8gvfIcdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=lwfzFAp+; arc=none smtp.client-ip=185.226.149.38
+	 In-Reply-To:Content-Type; b=BgjmWmVJQwBPqGQtHDMUQB9n/kXDyASiQj3QIjc9lU6rvuzNLutrc6bsELooNpJlc5kqSGe84g44ohGk3NzstBpyWRhdts8SGDH0OZ/rFgLdPhGE0jlYJRGN96nJr0nxIqRapN0yVh7mvs14LzuHCnPoCMmknKrgPOT4O3niaAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=Fpv3ofoW; arc=none smtp.client-ip=185.226.149.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
 Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <mhal@rbox.co>)
-	id 1tqU4T-00335K-8T; Fri, 07 Mar 2025 10:32:45 +0100
+	id 1tqUGs-0033xo-8z; Fri, 07 Mar 2025 10:45:34 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
 	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
 	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
-	bh=I6WduNgDa6X5BJ/G54SlQLFV0rIsjm0NYn74kwGYfC4=; b=lwfzFAp++zSl/XVJsfmLsgAb7b
-	rMO4Kh38ac0I6Ab0OhU0JPnLpcW5I1oNrMnwGwPXWAQw8Rvf5b1QCyodGeykF6W9WVremiubCW9Qk
-	8j5ZhQOM2oA3tl3LFuSUAvQ+5x2ybKTtu54pNSGxXoXmmlXG4BmQlFjVcuJiUNbRBYeNH3Azylo8i
-	oXMZvtllBUWdbosyzX2XzQGWFNYV7vFm8YkZCMTZk9cNO0p1oWpMxZymLEFS68ZIUzdJ2OYVzZ4pO
-	bch9zFw7um2YBOFSiR83u8fciR7qKwN4dV/WqYENXZMZ1EhAZJtlOqqgyNNN1qcTvyLKq+SV19wek
-	ihOJwMHQ==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
+	bh=8tA/kRSVyx+JyEIR4+usiCzAfmuIpsak7pwQ/jnN35Y=; b=Fpv3ofoWZmCgQnpYPTTrolVu6P
+	de8JefFtWeInaxjfUg6dvQf0fUMLHGZAWWioaw1DKq2pRg6rudQT4aJqR9D4nsI3a6I8wPG33XdWB
+	8ktI4nOIW40I3Dycgnpt/LHRPDIQceBf4zW8rLy37gvK2Zf3mGEmxZ8axKldzz5/shnBQY3FhrqCa
+	xySf0CsXSEEiR3LVnC6gDAo9QTdYg1onBEwRlHQ9wN00pIku4eado38x+zfsxt0Mdw8LPd/eu6hq6
+	/IOIurS90GnhKLVxkwwHaesvOfewix+ImcI5Sz82I+c7v3hHOeoWN9TkumkXoCAHDmVoTZm62hlFX
+	BQVMGIlg==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
 	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <mhal@rbox.co>)
-	id 1tqU4S-0002Qc-Ls; Fri, 07 Mar 2025 10:32:44 +0100
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	id 1tqUGq-0003Tb-67; Fri, 07 Mar 2025 10:45:32 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.93)
-	id 1tqU4C-0064FB-VN; Fri, 07 Mar 2025 10:32:29 +0100
-Message-ID: <7e3ccc22-0028-4cb6-829f-67d93cb5c14e@rbox.co>
-Date: Fri, 7 Mar 2025 10:32:27 +0100
+	id 1tqUGl-006bBn-4U; Fri, 07 Mar 2025 10:45:27 +0100
+Message-ID: <baeca627-e6f1-4d0a-aea5-fa31689edc4d@rbox.co>
+Date: Fri, 7 Mar 2025 10:45:25 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,45 +62,73 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 From: Michal Luczaj <mhal@rbox.co>
-Subject: Re: [PATCH net-next 2/2] vsock/test: Add test for null ptr deref when
- transport changes
-To: Luigi Leonardi <leonardi@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250306-test_vsock-v1-0-0320b5accf92@redhat.com>
- <20250306-test_vsock-v1-2-0320b5accf92@redhat.com>
+Subject: Re: [PATCH bpf-next v2 1/3] bpf, sockmap: avoid using sk_socket after
+ free
+To: Jiayuan Chen <jiayuan.chen@linux.dev>, xiyou.wangcong@gmail.com,
+ john.fastabend@gmail.com, jakub@cloudflare.com, martin.lau@linux.dev
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, andrii@kernel.org, eddyz87@gmail.com,
+ mykolal@fb.com, ast@kernel.org, daniel@iogearbox.net, song@kernel.org,
+ yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, sgarzare@redhat.com,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, mrpre@163.com, cong.wang@bytedance.com,
+ syzbot+dd90a702f518e0eac072@syzkaller.appspotmail.com
+References: <20250228055106.58071-1-jiayuan.chen@linux.dev>
+ <20250228055106.58071-2-jiayuan.chen@linux.dev>
 Content-Language: pl-PL, en-GB
-In-Reply-To: <20250306-test_vsock-v1-2-0320b5accf92@redhat.com>
+In-Reply-To: <20250228055106.58071-2-jiayuan.chen@linux.dev>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 3/6/25 17:09, Luigi Leonardi wrote:
-> Add a new test to ensure that when the transport changes a null pointer
-> dereference does not occur[1].
-> 
-> Note that this test does not fail, but it may hang on the client side if
-> it triggers a kernel oops.
-> 
-> This works by creating a socket, trying to connect to a server, and then
-> executing a second connect operation on the same socket but to a
-> different CID (0). This triggers a transport change. If the connect
-> operation is interrupted by a signal, this could cause a null-ptr-deref.
-> 
-> Since this bug is non-deterministic, we need to try several times. It
-> is safe to assume that the bug will show up within the timeout period.
-> 
-> If there is a G2H transport loaded in the system, the bug is not
-> triggered and this test will always pass.
-> 
-> [1]https://lore.kernel.org/netdev/Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX/
-> 
-> Suggested-by: Michal Luczaj <mhal@rbox.co>
-> Signed-off-by: Luigi Leonardi <leonardi@redhat.com>
-> ---
+On 2/28/25 06:51, Jiayuan Chen wrote:
+> ...
+>  static void sk_psock_verdict_data_ready(struct sock *sk)
+>  {
+> -	struct socket *sock = sk->sk_socket;
+> +	struct socket *sock;
+>  	const struct proto_ops *ops;
+>  	int copied;
+>  
+>  	trace_sk_data_ready(sk);
+>  
+> +	/* We need RCU to prevent the sk_socket from being released.
+> +	 * Especially for Unix sockets, we are currently in the process
+> +	 * context and do not have RCU protection.
+> +	 */
+> +	rcu_read_lock();
+> +	sock = sk->sk_socket;
+>  	if (unlikely(!sock))
+> -		return;
+> +		goto unlock;
+> +
+>  	ops = READ_ONCE(sock->ops);
+>  	if (!ops || !ops->read_skb)
+> -		return;
+> +		goto unlock;
+> +
+>  	copied = ops->read_skb(sk, sk_psock_verdict_recv);
+>  	if (copied >= 0) {
+>  		struct sk_psock *psock;
+>  
+> -		rcu_read_lock();
+>  		psock = sk_psock(sk);
+>  		if (psock)
+>  			sk_psock_data_ready(sk, psock);
+> -		rcu_read_unlock();
+>  	}
+> +unlock:
+> +	rcu_read_unlock();
+>  }
 
-I think the credit should be given to Hyunwoo Kim, not me.
+Hi,
 
-Thanks though,
+Doesn't sk_psock_handle_skb() (!ingress path) have the same `struct socket`
+release race issue? Any plans on fixing that one, too?
+
+BTW, lockdep (CONFIG_LOCKDEP=y) complains about calling AF_UNIX's
+read_skb() under RCU read lock.
+
+Thanks,
 Michal
 
