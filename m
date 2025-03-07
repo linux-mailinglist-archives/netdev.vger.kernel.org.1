@@ -1,230 +1,130 @@
-Return-Path: <netdev+bounces-172882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 088D0A5662E
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 12:04:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C896A56636
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 12:05:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E96723B639A
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 11:03:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05F993B421D
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 11:04:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 809DB2135D9;
-	Fri,  7 Mar 2025 11:02:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A9BE20F063;
+	Fri,  7 Mar 2025 11:03:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="BV8lPg2W"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GDFN9sxH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC2FA2135BE
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 11:02:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D081925AC;
+	Fri,  7 Mar 2025 11:03:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741345330; cv=none; b=ie3eAIK/2/v3BOviFoqSkZTV0cjn07y8osjS5GrwazVapnDsxJzYkxPRyiKMuPisbYtvsiUez85q4e/pHbqXA986/KYLzpcy2ghe6nuGPFlq93HF/ADoDE0SIjvMwJqnMkvWon8nhaa36/3HOhUsiX15K0OPFW+8gutFpYrxfS8=
+	t=1741345432; cv=none; b=T9WHr/7J0WrQFaluetJrcbpVTnDFIXwzWqbXDmYCSCJWlp59v0yCLSRVuq+IyNytzul2NcD9Lsra3MYafdbiG2LOLWltK+tzt1hWwX5h4oCBRHpSrTqvam7ewCgbtPoYZ3bhNFAWjji1+2GoP4vRkfc9x3RoJ4IJQ1cmsdChEPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741345330; c=relaxed/simple;
-	bh=bUqgi3dszTeuIO6Jayt7FNCSfLxGF0Q3vs9yEXuCbLI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To; b=gsre34SeXIcTOHXvcVqnoOwv80o/Y70LTey5+VdYxglKa1zTR1GiF74jz4bYH9U3Z/4sUMFKcDXeRCXCe0jkA76cc+P++Ejp81LmnIBDltDbisPdXFSe7ZmU+an2J1E62LN/kmAkmXIy9IzWy1SsjoT2jns7CqRcIJpwxHe6vAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=BV8lPg2W; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-22349bb8605so31761485ad.0
-        for <netdev@vger.kernel.org>; Fri, 07 Mar 2025 03:02:08 -0800 (PST)
+	s=arc-20240116; t=1741345432; c=relaxed/simple;
+	bh=pzjFzK1eLmN7NkZe7es86B7QKp3hIAs0x8XnRYMwGpU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CbzB9UxJPmAGs2VfGOip/13GKK68s5rv4ccUHPugt1CwmlWkhn0M4gveAtP9C+F4RXiMpi56lQmyaqUAWAbSzyCR9tjSq+oZZjSkiqlNsHUNQHqKU+wK3sSBMXRjC5StzI6D3gnxkWl7+qBAjYpJpGAWqF2XxqP4wUQB03ux6ec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GDFN9sxH; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43bdc607c3fso10335285e9.3;
+        Fri, 07 Mar 2025 03:03:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1741345328; x=1741950128; darn=vger.kernel.org;
-        h=to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Y12vdXD8IUD5lnVxvCmdhC+FVPs9nLD3u7Whh+JFE1I=;
-        b=BV8lPg2W+w8JYUuHvukENfQu1yEcqAfhTffhdX84e9KY40mWidZAHKVgite9chElwl
-         565JSX43tcP+myeQSpriEqik41rF+49s27l9Bs9I63gnt7xAr75bkYd2ofHi01ApKBnR
-         tYo5xZjmPnyCU0X/r3W0Mtn1vQ26v875DGlGOVgq5k/OB4pDwIDGqR6pe2qKg0pfeb7r
-         guT/kuRyEa1z76tXhAK9rdHJSiy+fIczLF+0HkKnkh3PUgA5ZAmKrjYoRGm++P5Box3w
-         4QJ80cMva+6bc1BrKw3ELlcY5UmOKKA4H4hJFtyAEZxISJX6UarGhJw6f69rvQ6vVeVK
-         meMA==
+        d=gmail.com; s=20230601; t=1741345429; x=1741950229; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gpotCte8H4PC7hGvjJ+k1ZIol1Rkv0hHrJYEaQxCJ6Y=;
+        b=GDFN9sxHD363h0Urtv9PLpBTtgf7BRQl2vIncmcWHLlxK8eqUyOxGe05qO9IxINKjt
+         fKW8v3woffxBulBMgHm3ZYBvHJOq0iIU8swYt2SOQdCrJQ44i2dSHboV9bYU5p4gQdnO
+         rhvAxgV1PXtMsKlvRCdyrN4tUDhwpzY3k/w3ucySdb57M9PvfxBJIpR/SmQe9RKjd0fl
+         H5Y7nuXsbkNJeSmnYF72GidDo8gilGTA8LkNWsGLm9X/M+8yFaM5Bof13kC3JLUUGt+5
+         O61qadkKEmUNszqrYMTUc0Z1gA5ofiG8+dxmyZOMh/W8NoSP4jb3sgXV3QkhmbiY63jS
+         rGlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741345328; x=1741950128;
-        h=to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Y12vdXD8IUD5lnVxvCmdhC+FVPs9nLD3u7Whh+JFE1I=;
-        b=Gl9V4f1LZHNaXTB5ZLQZVURFsvAvnpFoEGU3jD8GUWRxy0ze1iTENIIQTP8cCT/Shl
-         lIG10yEM6m+5vSglvjnBiqzBi7IGoYrAeI4FV6UR2hEBlm69F13vqMbO+k/ueqOR42mS
-         XsnBJI+V2xs34atPTObr/5dpKsrezcWk7FJSEtrE0uH8FMxsXsi0JuzO3a05IrcyD1U8
-         ipaD899v8hf0/sod/PTLWoYEKVGVyUbIf1OJYEQ179KyfDVfaIMgNgMalVH8HZshr7Z2
-         Fyx6ehRFl9ARXEnL+nsEWQGxB2MFKpoDeJ5yUNc/u3w6Gcxm0ArS005p1qEJ5IGy4BQc
-         fxOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWQ2Q3+T7J6qmiXdJd+et1uzBCUzfhjX0Y/FVPRoaFA0z8jexP0P3IigEHSdjeSxyxWxjGvPww=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhezfUN6kF6/jso8/M0CV7KtQbdcmPMDubCCp25kxDKorpT3z3
-	lRTJeXzD+3+DpTnJ5+yeggvVg6bfn85QKHUnfM0XRGpru/rmjBfOUIV0Hi75ayI=
-X-Gm-Gg: ASbGncuWkSZqypfgtS4FHjVaqKuwyZgypPMZXmojWIsgo/jynm3qSelS2gRNTx/TvLM
-	MLhWv20z0WVIdeWdD828FK1PnlKrzH0mwhSOmBuudDR1OqvsZQrup1yKmB7NTJR5qDGxmdQf/Fa
-	iFR8/mr/qx72PVWa1yfJn98xFNtCxlMbdPV/iAjLwS0ig13i2Bh+npceJ7VdkPw3SIoxiHcyZSi
-	mvuHyy9TZhWkPWYyUU4bZ0edlsbBZcWYocnOccmBMEEmsJ2FqSW5+/j8unpeiwRn7hlPRxE/nNb
-	kCH5iKKVt6IFpPM4UDjm9msI1bmthxEyw97vcS0ggibzRoZf
-X-Google-Smtp-Source: AGHT+IF6zWuYi6fdLJEcdg62jGV3EWL/4omMjcZtlNvZShjxdxWSb6A2HX3eGBs7ZpbGb0lfsNdgeA==
-X-Received: by 2002:a17:903:283:b0:21f:6a36:7bf3 with SMTP id d9443c01a7336-224288974admr56342095ad.12.1741345328248;
-        Fri, 07 Mar 2025 03:02:08 -0800 (PST)
-Received: from localhost ([157.82.205.237])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-224109ddfd2sm27280985ad.39.2025.03.07.03.02.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Mar 2025 03:02:07 -0800 (PST)
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-Date: Fri, 07 Mar 2025 20:01:22 +0900
-Subject: [PATCH net-next v9 6/6] vhost/net: Support
- VIRTIO_NET_F_HASH_REPORT
+        d=1e100.net; s=20230601; t=1741345429; x=1741950229;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gpotCte8H4PC7hGvjJ+k1ZIol1Rkv0hHrJYEaQxCJ6Y=;
+        b=R8gYi9lDyM8H1HQ823GqbseR6l6Hyh4rsZHPjSHl51fZPxL0M64vwnrpJGq2QNxxPE
+         pYktV3wY8Zp4p0LjCl9XXwHIJw0JfFhwy2yR7OrfsQGqJbIJrS7MZPLpBiDIKLM3mojT
+         J7gsq1w09LaoGm+EhbTwKm9G+aRlhfQmiy1be5oRpFH6xyp/TAvqjlxI8yfSrXP3yxby
+         AqnmJgMOLcVYUHk5hRxg5XOI1SRlyvjkeVWZUjjXm4FMWmJG61R267dyoVY6V6iOGMh/
+         z3mcIjkIwY2YlhBUM948epXtk3Mr/0Z9QO8IiDLJ/ABsXHxFqTuVGF1g5N56WP7csAmW
+         GKfA==
+X-Forwarded-Encrypted: i=1; AJvYcCWIPlWFQVqgMbXFRX5KRn6gA5YRcA+s4jY4UsLFZ+sneJEsGMr6cLB8g0lZko9QJy7wGeb0+u1S@vger.kernel.org, AJvYcCXc3RBJ+yFRbzzJ9dL5p/TcFRs8xQX9xHgiCipoOjgJe55CHP3lZcHBt1XM76uFalIbBDzBht9i8wXRCIM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWfOmq0BHQxaOrOE60oXJnqGUbCTYfbUHyCPNdHXyS0vq0o5Sa
+	HOcd0XlXtbexcsODE8LZBRJhwKjl840b8+cCGD+NUxVNI5Sd2n4=
+X-Gm-Gg: ASbGncsRJ8008uB0uakB7lgq6xTQkyc1gP+eQy/YRKcZpht/YREDoLqkCNSeAVM6xbc
+	jF6G6XTBnS0hFgIDuhkXEt7D3MOIzSaNjsm9Xxtqg0g/OWOGQ1iLm1dtyYLND2iPDav58PzjQCz
+	yKFJt1wAAQRbQHifGdAtQ5IoPpMZsB0oYJqpWjorrB7TtYKPmNReyRaf5OIWUCblIU36rZ8emfo
+	U9JlfNbthJCPShJcqp5kKoOtArByx3gQDYhBHhfAVVMvZF2SF1wgEfDr7p2RBROD5O5KfsvZsZI
+	1N5A5mfxKLESQiXpLQYEZDV7bdU635RDAbaV36RS88SM
+X-Google-Smtp-Source: AGHT+IEHSVkCVjCtHLyZDimSRoBR6Awi60yFRDLb8q1oMuE9nsLyv1iPrBcITJfvZYX/8JUJYfxlww==
+X-Received: by 2002:a05:600c:524d:b0:439:84ba:5773 with SMTP id 5b1f17b1804b1-43c6871c50fmr21332895e9.31.1741345428437;
+        Fri, 07 Mar 2025 03:03:48 -0800 (PST)
+Received: from phoenix.rocket.internal ([2a12:26c0:2101:6702::14])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c0e4065sm5074863f8f.62.2025.03.07.03.03.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Mar 2025 03:03:48 -0800 (PST)
+From: Rui Salvaterra <rsalvaterra@gmail.com>
+To: muhammad.husaini.zulkifli@intel.com,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com
+Cc: edumazet@google.com,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Rui Salvaterra <rsalvaterra@gmail.com>
+Subject: [PATCH] igc: enable HW VLAN insertion/stripping by default
+Date: Fri,  7 Mar 2025 11:02:39 +0000
+Message-ID: <20250307110339.13788-1-rsalvaterra@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250307-rss-v9-6-df76624025eb@daynix.com>
-References: <20250307-rss-v9-0-df76624025eb@daynix.com>
-In-Reply-To: <20250307-rss-v9-0-df76624025eb@daynix.com>
-To: Jonathan Corbet <corbet@lwn.net>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>, 
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, kvm@vger.kernel.org, 
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
- Yuri Benditovich <yuri.benditovich@daynix.com>, 
- Andrew Melnychenko <andrew@daynix.com>, 
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
- Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>, 
- Akihiko Odaki <akihiko.odaki@daynix.com>
-X-Mailer: b4 0.14.2
+Content-Transfer-Encoding: 8bit
 
-VIRTIO_NET_F_HASH_REPORT allows to report hash values calculated on the
-host. When VHOST_NET_F_VIRTIO_NET_HDR is employed, it will report no
-hash values (i.e., the hash_report member is always set to
-VIRTIO_NET_HASH_REPORT_NONE). Otherwise, the values reported by the
-underlying socket will be reported.
+This is enabled by default in other Intel drivers I've checked (e1000, e1000e,
+iavf, igb and ice). Fixes an out-of-the-box performance issue when running
+OpenWrt on typical mini-PCs with igc-supported Ethernet controllers and 802.1Q
+VLAN configurations, as ethtool isn't part of the default packages and sane
+defaults are expected.
 
-VIRTIO_NET_F_HASH_REPORT requires VIRTIO_F_VERSION_1.
+In my specific case, with an Intel N100-based machine with four I226-V Ethernet
+controllers, my upload performance increased from under 30 Mb/s to the expected
+~1 Gb/s.
 
-Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-Tested-by: Lei Yang <leiyang@redhat.com>
+Signed-off-by: Rui Salvaterra <rsalvaterra@gmail.com>
 ---
- drivers/vhost/net.c | 49 +++++++++++++++++++++++++++++--------------------
- 1 file changed, 29 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index b9b9e9d40951856d881d77ac74331d914473cd56..16b241b44f89820a42c302f3586ea6bb5e0d4289 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -73,6 +73,7 @@ enum {
- 	VHOST_NET_FEATURES = VHOST_FEATURES |
- 			 (1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
- 			 (1ULL << VIRTIO_NET_F_MRG_RXBUF) |
-+			 (1ULL << VIRTIO_NET_F_HASH_REPORT) |
- 			 (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
- 			 (1ULL << VIRTIO_F_RING_RESET)
- };
-@@ -1097,9 +1098,11 @@ static void handle_rx(struct vhost_net *net)
- 		.msg_controllen = 0,
- 		.msg_flags = MSG_DONTWAIT,
- 	};
--	struct virtio_net_hdr hdr = {
--		.flags = 0,
--		.gso_type = VIRTIO_NET_HDR_GSO_NONE
-+	struct virtio_net_hdr_v1_hash hdr = {
-+		.hdr = {
-+			.flags = 0,
-+			.gso_type = VIRTIO_NET_HDR_GSO_NONE
-+		}
- 	};
- 	size_t total_len = 0;
- 	int err, mergeable;
-@@ -1110,7 +1113,6 @@ static void handle_rx(struct vhost_net *net)
- 	bool set_num_buffers;
- 	struct socket *sock;
- 	struct iov_iter fixup;
--	__virtio16 num_buffers;
- 	int recv_pkts = 0;
+This patch cost me two afternoons of network debugging, last weekend. Is there
+any plausible reason why VLAN acceleration wasn't enabled by default for this
+driver, specifically?
+
+ drivers/net/ethernet/intel/igc/igc_main.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+index 84307bb7313e..6fef763239bc 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -7049,6 +7049,9 @@ static int igc_probe(struct pci_dev *pdev,
+ 	netdev->xdp_features = NETDEV_XDP_ACT_BASIC | NETDEV_XDP_ACT_REDIRECT |
+ 			       NETDEV_XDP_ACT_XSK_ZEROCOPY;
  
- 	mutex_lock_nested(&vq->mutex, VHOST_NET_VQ_RX);
-@@ -1191,30 +1193,30 @@ static void handle_rx(struct vhost_net *net)
- 			vhost_discard_vq_desc(vq, headcount);
- 			continue;
- 		}
-+		hdr.hdr.num_buffers = cpu_to_vhost16(vq, headcount);
- 		/* Supply virtio_net_hdr if VHOST_NET_F_VIRTIO_NET_HDR */
- 		if (unlikely(vhost_hlen)) {
--			if (copy_to_iter(&hdr, sizeof(hdr),
--					 &fixup) != sizeof(hdr)) {
-+			if (copy_to_iter(&hdr, vhost_hlen,
-+					 &fixup) != vhost_hlen) {
- 				vq_err(vq, "Unable to write vnet_hdr "
- 				       "at addr %p\n", vq->iov->iov_base);
- 				goto out;
- 			}
--		} else {
-+		} else if (likely(set_num_buffers)) {
- 			/* Header came from socket; we'll need to patch
- 			 * ->num_buffers over if VIRTIO_NET_F_MRG_RXBUF
- 			 */
--			iov_iter_advance(&fixup, sizeof(hdr));
-+			iov_iter_advance(&fixup, offsetof(struct virtio_net_hdr_v1, num_buffers));
++	/* enable hardware VLAN insertion/stripping by default */
++	netdev->features |= NETIF_F_HW_VLAN_CTAG_TX | NETIF_F_HW_VLAN_CTAG_RX;
 +
-+			if (copy_to_iter(&hdr.hdr.num_buffers, sizeof(hdr.hdr.num_buffers),
-+					 &fixup) != sizeof(hdr.hdr.num_buffers)) {
-+				vq_err(vq, "Failed num_buffers write");
-+				vhost_discard_vq_desc(vq, headcount);
-+				goto out;
-+			}
- 		}
- 		/* TODO: Should check and handle checksum. */
- 
--		num_buffers = cpu_to_vhost16(vq, headcount);
--		if (likely(set_num_buffers) &&
--		    copy_to_iter(&num_buffers, sizeof num_buffers,
--				 &fixup) != sizeof num_buffers) {
--			vq_err(vq, "Failed num_buffers write");
--			vhost_discard_vq_desc(vq, headcount);
--			goto out;
--		}
- 		nvq->done_idx += headcount;
- 		if (nvq->done_idx > VHOST_NET_BATCH)
- 			vhost_net_signal_used(nvq);
-@@ -1607,10 +1609,13 @@ static int vhost_net_set_features(struct vhost_net *n, u64 features)
- 	size_t vhost_hlen, sock_hlen, hdr_len;
- 	int i;
- 
--	hdr_len = (features & ((1ULL << VIRTIO_NET_F_MRG_RXBUF) |
--			       (1ULL << VIRTIO_F_VERSION_1))) ?
--			sizeof(struct virtio_net_hdr_mrg_rxbuf) :
--			sizeof(struct virtio_net_hdr);
-+	if (features & (1ULL << VIRTIO_NET_F_HASH_REPORT))
-+		hdr_len = sizeof(struct virtio_net_hdr_v1_hash);
-+	else if (features & ((1ULL << VIRTIO_NET_F_MRG_RXBUF) |
-+			     (1ULL << VIRTIO_F_VERSION_1)))
-+		hdr_len = sizeof(struct virtio_net_hdr_mrg_rxbuf);
-+	else
-+		hdr_len = sizeof(struct virtio_net_hdr);
- 	if (features & (1 << VHOST_NET_F_VIRTIO_NET_HDR)) {
- 		/* vhost provides vnet_hdr */
- 		vhost_hlen = hdr_len;
-@@ -1691,6 +1696,10 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
- 			return -EFAULT;
- 		if (features & ~VHOST_NET_FEATURES)
- 			return -EOPNOTSUPP;
-+		if ((features & ((1ULL << VIRTIO_F_VERSION_1) |
-+				 (1ULL << VIRTIO_NET_F_HASH_REPORT))) ==
-+		    (1ULL << VIRTIO_NET_F_HASH_REPORT))
-+			return -EINVAL;
- 		return vhost_net_set_features(n, features);
- 	case VHOST_GET_BACKEND_FEATURES:
- 		features = VHOST_NET_BACKEND_FEATURES;
-
+ 	/* MTU range: 68 - 9216 */
+ 	netdev->min_mtu = ETH_MIN_MTU;
+ 	netdev->max_mtu = MAX_STD_JUMBO_FRAME_SIZE;
 -- 
 2.48.1
 
