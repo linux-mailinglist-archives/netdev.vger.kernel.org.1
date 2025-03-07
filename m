@@ -1,147 +1,179 @@
-Return-Path: <netdev+bounces-172751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99BD9A55E3D
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 04:21:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DB85A55E4D
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 04:32:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 915043B21A9
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 03:21:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9639177E89
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 03:32:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D62918DB28;
-	Fri,  7 Mar 2025 03:21:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFD2F14AD0D;
+	Fri,  7 Mar 2025 03:32:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eVKYI77C"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="fS9JxuYS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 413471624F7;
-	Fri,  7 Mar 2025 03:21:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08279DDC5;
+	Fri,  7 Mar 2025 03:32:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741317686; cv=none; b=t9CY0pdxW3F86slvR5FgkNr6rjw3Pog+dqmQ9BhYZ3ekczrKKeHSWEMKeg1psRslPkxiLOQfAcxix+Nlk4yQXlXgXMpit1BPln4h1dQShKyvGXQ9JrUbHKqcn4AIfgnZp+DRZzdunYdf0uEU4QXwyg7Kb+aNSq8Ut1ZxMBAC634=
+	t=1741318354; cv=none; b=tBdyWOSYNXotbgG/PD0DMrgPBYxRFtdNTxu5KqDWDj333JdzYXhEoD7psO8Oo9FyTSu8hVcbMyx5ozrzAF9GOedehixRLc+ZY5yCjD8j3TtAatDgaM9TxPs8aiywRzPcHLOPkGjwO/gpV+j6X9dpLLd9/dgqDVFSM+KDv7bWimw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741317686; c=relaxed/simple;
-	bh=Jg5XeRxyuKD825uDbJYMZSOpqP9zMmh8t5nyw3/cSXk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Au7scVnqTOpO7MiaA+1usvUlKfKL3O2HbDvAECqxFG201xVpW/BRXkJSRxiWkWws5v3/tQFM60mwtvKY5R03e983hMORLwYMYkf9P9aGZ9VjGqIOgqiFhIpIwYkEjR6BljbmrdUKs5tJI+rj+1kVZxrU00+n6fwBd61mqmSVaSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eVKYI77C; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741317684; x=1772853684;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Jg5XeRxyuKD825uDbJYMZSOpqP9zMmh8t5nyw3/cSXk=;
-  b=eVKYI77CQg1VBIAf3OxuOQrecRd1/4XNcA6wNVhduzIa7gX9tb5hf+Vu
-   k9i6sqD8EQzt5uLhJ7LZ4ZDpO6FNEaw8jYbOCYKOh80+WJm+qZmWQrJwV
-   Cit4b+ZOWvSjS4ZM/Xx368Uek4dio7dQJUK2agC17J6ARiioZRQ93hlUb
-   sEpFfS3ZLcNDyUGqakmanJAmSxVSuMkAQimAZ0TFyMhv8/ldc/5ygpw+y
-   FFwAYIYIP3lnCD+cUckJG9nmRV/48zOD28NQ8qSragERDKxpRPNf1AEaA
-   zftZQxxU0h8593rqSZeIiGc4SsPI+Oe/Or7XcOhV79q1AfTzLgE+flQMZ
-   g==;
-X-CSE-ConnectionGUID: 4a2FtoJwRoeo7X8ccIL9pg==
-X-CSE-MsgGUID: AVofDC1bT7S0wIxXX1BV/Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="45164185"
-X-IronPort-AV: E=Sophos;i="6.14,228,1736841600"; 
-   d="scan'208";a="45164185"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2025 19:21:23 -0800
-X-CSE-ConnectionGUID: iDlWGXgBRa+qU7VDX2G/zg==
-X-CSE-MsgGUID: jWEeBpZ0ToCaX0rjX89xkQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,228,1736841600"; 
-   d="scan'208";a="119388873"
-Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.247.100.177]) ([10.247.100.177])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2025 19:20:57 -0800
-Message-ID: <df5f2ff0-2ead-4074-a40e-8a2fc9b63339@linux.intel.com>
-Date: Fri, 7 Mar 2025 11:20:53 +0800
+	s=arc-20240116; t=1741318354; c=relaxed/simple;
+	bh=JgXvI8eby/pVJCPI3OtXr1NPnBv+rXku4TbyF2UNnt8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QqUaL+SPiTj0r3RJfRqUdIkATQwvE0ZTsv0Ht3pRZIDZvy1VosAzH3ckQoElacjmmwXA157IqBfWuslSqT95GD6UJF/7NiI2txIwPmfMQgxeBT08QRdIbbQpbMKb+ai+zsJew1AfRwYgynVSak90xSnUuISvtB9+nofQPFJkfV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=fS9JxuYS; arc=none smtp.client-ip=210.61.82.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: ca3e8e2cfb0411ef8eb9c36241bbb6fb-20250307
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=5frJAB9y8a+BiVXJdjweEmbFcW3Z5pKKgyZuRvk20D0=;
+	b=fS9JxuYS0cWAjniF/aYx04gIMbRgUecBUrtMREHZ/ffQYNDxBcEf+XinHL9GzranUl5hBFOWSUXnVviVU4TVDP6PZtCqIIdSYVxvgFw+QM3J6UDHoXKZ6fEu4iv7ZIH7ImWfvCgNwjvv7tUaXuVq+T+YZl7dmxdAmmuGoOwd5Yw=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.2.1,REQID:e7b909c0-bf0f-4ee5-a0fb-7c59aa875745,IP:0,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:0
+X-CID-META: VersionHash:0ef645f,CLOUDID:f226cc49-a527-43d8-8af6-bc8b32d9f5e9,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|50,EDM:-3,IP:ni
+	l,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: ca3e8e2cfb0411ef8eb9c36241bbb6fb-20250307
+Received: from mtkmbs10n1.mediatek.inc [(172.21.101.34)] by mailgw02.mediatek.com
+	(envelope-from <guangjie.song@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1685896031; Fri, 07 Mar 2025 11:32:26 +0800
+Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
+ MTKMBS09N2.mediatek.inc (172.21.101.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Fri, 7 Mar 2025 11:32:25 +0800
+Received: from mhfsdcap04.gcn.mediatek.inc (10.17.3.154) by
+ mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1258.28 via Frontend Transport; Fri, 7 Mar 2025 11:32:24 +0800
+From: Guangjie Song <guangjie.song@mediatek.com>
+To: Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+	<sboyd@kernel.org>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
+	<matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>, Richard Cochran
+	<richardcochran@gmail.com>
+CC: <linux-clk@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-mediatek@lists.infradead.org>, <netdev@vger.kernel.org>, Guangjie Song
+	<guangjie.song@mediatek.com>,
+	<Project_Global_Chrome_Upstream_Group@mediatek.com>
+Subject: [PATCH 00/26] clk: mediatek: Add MT8196 clock support
+Date: Fri, 7 Mar 2025 11:26:56 +0800
+Message-ID: <20250307032942.10447-1-guangjie.song@mediatek.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next v8 11/11] igc: add support to get frame
- preemption statistics via ethtool
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Simon Horman <horms@kernel.org>, Russell King <linux@armlinux.org.uk>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Furong Xu <0x1207@gmail.com>,
- Russell King <rmk+kernel@armlinux.org.uk>,
- Serge Semin <fancer.lancer@gmail.com>,
- Xiaolei Wang <xiaolei.wang@windriver.com>,
- Suraj Jaiswal <quic_jsuraj@quicinc.com>,
- Kory Maincent <kory.maincent@bootlin.com>, Gal Pressman <gal@nvidia.com>,
- Jesper Nilsson <jesper.nilsson@axis.com>,
- Choong Yong Liang <yong.liang.choong@linux.intel.com>,
- Chwee-Lin Choong <chwee.lin.choong@intel.com>,
- Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
- Vinicius Costa Gomes <vinicius.gomes@intel.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org
-References: <20250305130026.642219-1-faizal.abdul.rahim@linux.intel.com>
- <20250305130026.642219-1-faizal.abdul.rahim@linux.intel.com>
- <20250305130026.642219-12-faizal.abdul.rahim@linux.intel.com>
- <20250305130026.642219-12-faizal.abdul.rahim@linux.intel.com>
- <20250306004809.q2x565rys5zja6kh@skbuf>
-Content-Language: en-US
-From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
-In-Reply-To: <20250306004809.q2x565rys5zja6kh@skbuf>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
+This series is based on linux-next, tag: next-20250306.
 
+Changes:
+- Update clock driver for MT8196
+- Add MT8196 clock support
 
-On 6/3/2025 8:48 am, Vladimir Oltean wrote:
-> On Wed, Mar 05, 2025 at 08:00:26AM -0500, Faizal Rahim wrote:
->> +/* Received out of order packets with SMD-C */
->> +#define IGC_PRMEXCPRCNT_OOO_SMDC			0x000000FF
->> +/* Received out of order packets with SMD-C and wrong Frame CNT */
->> +#define IGC_PRMEXCPRCNT_OOO_FRAME_CNT			0x0000FF00
->> +/* Received out of order packets with SMD-C and wrong Frag CNT */
->> +#define IGC_PRMEXCPRCNT_OOO_FRAG_CNT			0x00FF0000
->> +/* Received packets with SMD-S and wrong Frag CNT and Frame CNT */
->> +#define IGC_PRMEXCPRCNT_MISS_FRAME_FRAG_CNT		0xFF000000
->>   
->> +/**
->> + * igc_ethtool_get_frame_ass_error - Get the frame assembly error count.
->> + * @reg_value: Register value for IGC_PRMEXCPRCNT
->> + * Return: The count of frame assembly errors.
->> + */
->> +static u64 igc_ethtool_get_frame_ass_error(u32 reg_value)
->> +{
->> +	u32 ooo_frame_cnt, ooo_frag_cnt; /* Out of order statistics */
->> +	u32 miss_frame_frag_cnt;
->> +
->> +	ooo_frame_cnt = FIELD_GET(IGC_PRMEXCPRCNT_OOO_FRAME_CNT, reg_value);
->> +	ooo_frag_cnt = FIELD_GET(IGC_PRMEXCPRCNT_OOO_FRAG_CNT, reg_value);
->> +	miss_frame_frag_cnt = FIELD_GET(IGC_PRMEXCPRCNT_MISS_FRAME_FRAG_CNT, reg_value);
->> +
->> +	return ooo_frame_cnt + ooo_frag_cnt + miss_frame_frag_cnt;
->> +}
-> 
-> These counters are quite small (8 bits each). What is their behavior
-> once they reach 255? Saturate? Truncate? Do they clear on read?
-> 
-Hi Vladimir,
+Guangjie Song (26):
+  clk: mediatek: Add defines for vote
+  clk: mediatek: Support voting for pll
+  clk: mediatek: Support voting for mux
+  clk: mediatek: Support voting for gate
+  clk: mediatek: Add gate ops without disable
+  dt-bindings: clock: mediatek: Add new MT8196 clock
+  clk: mediatek: Add MT8196 apmixedsys clock support
+  clk: mediatek: Add MT8196 apmixedsys_gp2 clock support
+  clk: mediatek: Add MT8196 topckgen clock support
+  clk: mediatek: Add MT8196 topckgen2 clock support
+  clk: mediatek: Add MT8196 vlpckgen clock support
+  clk: mediatek: Add MT8196 peripheral clock support
+  clk: mediatek: Add MT8196 adsp clock support
+  clk: mediatek: Add MT8196 i2c clock support
+  clk: mediatek: Add MT8196 mcu clock support
+  clk: mediatek: Add MT8196 mdpsys clock support
+  clk: mediatek: Add MT8196 mfg clock support
+  clk: mediatek: Add MT8196 disp0 clock support
+  clk: mediatek: Add MT8196 disp1 clock support
+  clk: mediatek: Add MT8196 disp-ao clock support
+  clk: mediatek: Add MT8196 ovl0 clock support
+  clk: mediatek: Add MT8196 ovl1 clock support
+  clk: mediatek: Add MT8196 pextpsys clock support
+  clk: mediatek: Add MT8196 ufssys clock support
+  clk: mediatek: Add MT8196 vdecsys clock support
+  clk: mediatek: Add MT8196 vencsys clock support
 
-These are part of the statistic registers, which in IGC, reset upon read. 
-When they reach their maximum value, each field remain at 0xFF.
+ .../bindings/clock/mediatek,mt8196-clock.yaml |   66 +
+ .../clock/mediatek,mt8196-sys-clock.yaml      |   63 +
+ drivers/clk/mediatek/Kconfig                  |   78 +
+ drivers/clk/mediatek/Makefile                 |   14 +
+ drivers/clk/mediatek/clk-gate.c               |  236 ++-
+ drivers/clk/mediatek/clk-gate.h               |    6 +
+ drivers/clk/mediatek/clk-mt8196-adsp.c        |  291 ++++
+ drivers/clk/mediatek/clk-mt8196-apmixedsys.c  |  146 ++
+ .../clk/mediatek/clk-mt8196-apmixedsys_gp2.c  |  154 ++
+ drivers/clk/mediatek/clk-mt8196-disp0.c       |  247 +++
+ drivers/clk/mediatek/clk-mt8196-disp1.c       |  260 +++
+ .../clk/mediatek/clk-mt8196-imp_iic_wrap.c    |  211 +++
+ drivers/clk/mediatek/clk-mt8196-mcu.c         |  167 ++
+ drivers/clk/mediatek/clk-mt8196-mdpsys.c      |  357 ++++
+ drivers/clk/mediatek/clk-mt8196-mfg.c         |  143 ++
+ drivers/clk/mediatek/clk-mt8196-ovl0.c        |  256 +++
+ drivers/clk/mediatek/clk-mt8196-ovl1.c        |  255 +++
+ drivers/clk/mediatek/clk-mt8196-peri_ao.c     |  218 +++
+ drivers/clk/mediatek/clk-mt8196-pextp.c       |  162 ++
+ drivers/clk/mediatek/clk-mt8196-topckgen.c    | 1373 +++++++++++++++
+ drivers/clk/mediatek/clk-mt8196-topckgen2.c   |  701 ++++++++
+ drivers/clk/mediatek/clk-mt8196-ufs_ao.c      |  107 ++
+ drivers/clk/mediatek/clk-mt8196-vdec.c        |  449 +++++
+ drivers/clk/mediatek/clk-mt8196-vdisp_ao.c    |  100 ++
+ drivers/clk/mediatek/clk-mt8196-venc.c        |  413 +++++
+ drivers/clk/mediatek/clk-mt8196-vlpckgen.c    |  777 +++++++++
+ drivers/clk/mediatek/clk-mtk.h                |   10 +
+ drivers/clk/mediatek/clk-mux.c                |  198 ++-
+ drivers/clk/mediatek/clk-mux.h                |   79 +
+ drivers/clk/mediatek/clk-pll.c                |   51 +-
+ drivers/clk/mediatek/clk-pll.h                |    5 +
+ include/dt-bindings/clock/mt8196-clk.h        | 1503 +++++++++++++++++
+ 32 files changed, 9086 insertions(+), 10 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/clock/mediatek,mt8196-clock.yaml
+ create mode 100644 Documentation/devicetree/bindings/clock/mediatek,mt8196-sys-clock.yaml
+ create mode 100644 drivers/clk/mediatek/clk-mt8196-adsp.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8196-apmixedsys.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8196-apmixedsys_gp2.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8196-disp0.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8196-disp1.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8196-imp_iic_wrap.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8196-mcu.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8196-mdpsys.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8196-mfg.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8196-ovl0.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8196-ovl1.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8196-peri_ao.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8196-pextp.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8196-topckgen.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8196-topckgen2.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8196-ufs_ao.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8196-vdec.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8196-vdisp_ao.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8196-venc.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8196-vlpckgen.c
+ create mode 100644 include/dt-bindings/clock/mt8196-clk.h
 
+-- 
+2.45.2
 
 
