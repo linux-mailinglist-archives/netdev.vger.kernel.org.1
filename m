@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-173035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6F1CA56F33
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 18:38:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8902A56F38
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 18:39:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F9C618993A6
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 17:38:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEF07179FCC
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 17:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD35C24A079;
-	Fri,  7 Mar 2025 17:36:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19A2F241670;
+	Fri,  7 Mar 2025 17:36:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="UqSaJ9Od"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="SXgA8NnI"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE6212459D0;
-	Fri,  7 Mar 2025 17:36:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10CD42417D7;
+	Fri,  7 Mar 2025 17:36:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741368988; cv=none; b=Ach8aHHtvu/qkexXnjWUoq7t+qMdFcYQdzh5u2dtb4YFpGqGuaioCDanHO4JFkdbOKwaql2jAhoIXExHxV9CIxKIKh7FMZQ/vxXWfxqxYkyFJFoUTT23JQVlhXnJfvCOX9pzgaj4AukUmXzuqfOwZKpekrdgAcSFy2T+vjLtn8U=
+	t=1741368990; cv=none; b=mdqdZ6inwPayo2frvxrWh1r3l2gjoANsx4zl3eChwdk/tH5kA+WeNsarbU8LHSneNxeg7DP25jQw33sAjkjwvtqwoKAMPYzOoG+LrPTN+shJCdAKVOr3U1YnRCxad+AXij0wOpl2dwp1M8WwTwvpW8jRQY0X2X6UZXzWWksgZ1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741368988; c=relaxed/simple;
-	bh=EtINOFWjN8cF2FjXNmwRkR6p4vBgDhoq8pjxnyvuLks=;
+	s=arc-20240116; t=1741368990; c=relaxed/simple;
+	bh=LcrmNFqkf9mltWpePWv4YcSsz7kpJAo6wt+wT/rSss4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nX52x8HRhLbCVMERzoXMiviSLkoKRmZfPdhmutoNoxnF3l76fuHfTdAf8CmzQOme3jTRHxv7D/ILUnJAX2U9qCOCZTfw1ymkPBQTA1uERsAk7XnwnOZ8Iu1J4DgIDFMpdGmyXr1mnKAGJAwau3SaSBS8jMNWMNLuoosRxMO3Bx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=UqSaJ9Od; arc=none smtp.client-ip=217.70.183.195
+	 MIME-Version; b=MPmNMvxhLzkdM5tesvEXHkC5134EnLcX12Si81vXnucqGJ19+9P1hPHnNsAeyerlHYGIIb9fY/OFR5+rQxdkPtmq8Z+iqx/zUESwJv494BD2lqZC7mYKq+H1Q89FtRKHy1Yft6pbwGk/ncC6dlzdG9JuJKEIHQWX5gCDAnlI3tk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=SXgA8NnI; arc=none smtp.client-ip=217.70.183.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 0A1B520479;
-	Fri,  7 Mar 2025 17:36:23 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 3FACE204CC;
+	Fri,  7 Mar 2025 17:36:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1741368985;
+	t=1741368986;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HVd3r6xyUhzL3YyY3xmXBLCsInUdeXPR3YjTneAcH4c=;
-	b=UqSaJ9Odb+/iV2DBDMwtNuqm+7hlDAHnUg7Q4RSEjoOSVdzZZ0PXkofi6IODm4uU/llrfh
-	OFf2hY/lDMBnk/PFoPyaZGPr9LUtah1+OGeRhTMkpb33Fgj0XF7kdMAWQj7EcL3Hc2p/fK
-	WwEYeLLXWZ7LOW0aHsl5VOV7XsTZl1XN50rkL5N9Izwlot/FdIt6WJBjSiORpA8hLZVw/x
-	JonZIeJrQzQZ6zym2CuSwnHmTmmJ7pZ6bIxlXcNJDAR3xSA/HE8nzDGPiPp1V/21fzsJCz
-	bLeoC4QIWXXLHJzp/cDg2mE2+0Pjl2m8qJmLye1lUvB30VuycITrpBX8DtCkTA==
+	bh=gOTBrAWgomwpXzetebdPwqIn4CzSTSazGmOiV/vOWH0=;
+	b=SXgA8NnIIQhvUl8fZMdzrcIdgW2JwjZ+Pvs0V80j+ajbjJ8VCm+M1fFypevRJ0xrcQBD8c
+	GvbR0nwQjXYHna7xPwNS/nSwMMnZE4Lfg5Vbyw670x/Xz6vnEEAjf062WxuvVfJSO0DvVf
+	zwsPj4UuCgd0nvFm4uCZRcjxjhn3yuNRBN8MHMbLPMbp7GQ62j4/Z94sSMyl+p5ilQEAEJ
+	+CDBAWpNVDkkxxyeVET3wXmMraNWvp19aKkhMNzN9CNtU4UFFcGSab0BiRtvO4D64kyKbK
+	E/Kb+0ICBqT7p6K6z6+rvcKf/k8/Br9i6SDve5pxQaUrKaMCVuIGmyLOf+wbJw==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -66,9 +66,9 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Oleksij Rempel <o.rempel@pengutronix.de>,
 	Simon Horman <horms@kernel.org>,
 	Romain Gantois <romain.gantois@bootlin.com>
-Subject: [PATCH net-next v5 08/13] net: phy: phy_device: Use link_capabilities lookup for PHY aneg config
-Date: Fri,  7 Mar 2025 18:36:05 +0100
-Message-ID: <20250307173611.129125-9-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next v5 09/13] net: phylink: Use phy_caps_lookup for fixed-link configuration
+Date: Fri,  7 Mar 2025 18:36:06 +0100
+Message-ID: <20250307173611.129125-10-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250307173611.129125-1-maxime.chevallier@bootlin.com>
 References: <20250307173611.129125-1-maxime.chevallier@bootlin.com>
@@ -85,48 +85,115 @@ X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduudduvdekucetufdoteggode
  giivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhm
 X-GND-Sasl: maxime.chevallier@bootlin.com
 
-When configuring PHY advertising with autoneg disabled, we lookd for an
-exact linkmode to advertise and configure for the requested Speed and
-Duplex, specially at or over 1G.
+When phylink creates a fixed-link configuration, it finds a matching
+linkmode to set as the advertised, lp_advertising and supported modes
+based on the speed and duplex of the fixed link.
 
-Using phy_caps_lookup allows us to build a list of the supported
-linkmodes at that speed that we can advertise instead of the first mode
-that matches.
+Use the newly introduced phy_caps_lookup to get these modes instead of
+phy_lookup_settings(). This has the side effect that the matched
+settings and configured linkmodes may now contain several linkmodes (the
+intersection of supported linkmodes from the phylink settings and the
+linkmodes that match speed/duplex) instead of the one from
+phy_lookup_settings().
 
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
- drivers/net/phy/phy_device.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ drivers/net/phy/phylink.c | 44 +++++++++++++++++++++++++++------------
+ 1 file changed, 31 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 4980862398d0..3f734e847e8e 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -2120,7 +2120,7 @@ EXPORT_SYMBOL(genphy_check_and_restart_aneg);
- int __genphy_config_aneg(struct phy_device *phydev, bool changed)
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index cf9f019382ad..8e2b7d647a92 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -802,12 +802,26 @@ static int phylink_validate(struct phylink *pl, unsigned long *supported,
+ 	return phylink_validate_mac_and_pcs(pl, supported, state);
+ }
+ 
++static void phylink_fill_fixedlink_supported(unsigned long *supported)
++{
++	linkmode_set_bit(ETHTOOL_LINK_MODE_10baseT_Half_BIT, supported);
++	linkmode_set_bit(ETHTOOL_LINK_MODE_10baseT_Full_BIT, supported);
++	linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Half_BIT, supported);
++	linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT, supported);
++	linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Half_BIT, supported);
++	linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT, supported);
++	linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, supported);
++	linkmode_set_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT, supported);
++	linkmode_set_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT, supported);
++}
++
+ static int phylink_parse_fixedlink(struct phylink *pl,
+ 				   const struct fwnode_handle *fwnode)
  {
- 	__ETHTOOL_DECLARE_LINK_MODE_MASK(fixed_advert);
--	const struct phy_setting *set;
++	__ETHTOOL_DECLARE_LINK_MODE_MASK(match) = { 0, };
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(mask) = { 0, };
 +	const struct link_capabilities *c;
- 	unsigned long *advert;
- 	int err;
+ 	struct fwnode_handle *fixed_node;
+-	const struct phy_setting *s;
+ 	struct gpio_desc *desc;
+ 	u32 speed;
+ 	int ret;
+@@ -875,12 +889,16 @@ static int phylink_parse_fixedlink(struct phylink *pl,
+ 		phylink_warn(pl, "fixed link specifies half duplex for %dMbps link?\n",
+ 			     pl->link_config.speed);
  
-@@ -2146,10 +2146,11 @@ int __genphy_config_aneg(struct phy_device *phydev, bool changed)
+-	linkmode_fill(pl->supported);
++	linkmode_zero(pl->supported);
++	phylink_fill_fixedlink_supported(pl->supported);
++
+ 	linkmode_copy(pl->link_config.advertising, pl->supported);
+ 	phylink_validate(pl, pl->supported, &pl->link_config);
+ 
+-	s = phy_lookup_setting(pl->link_config.speed, pl->link_config.duplex,
+-			       pl->supported, true);
++	c = phy_caps_lookup(pl->link_config.speed, pl->link_config.duplex,
++			    pl->supported, true);
++	if (c)
++		linkmode_and(match, pl->supported, c->linkmodes);
+ 
+ 	linkmode_set_bit(ETHTOOL_LINK_MODE_Pause_BIT, mask);
+ 	linkmode_set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT, mask);
+@@ -889,9 +907,10 @@ static int phylink_parse_fixedlink(struct phylink *pl,
+ 
+ 	phylink_set(pl->supported, MII);
+ 
+-	if (s) {
+-		__set_bit(s->bit, pl->supported);
+-		__set_bit(s->bit, pl->link_config.lp_advertising);
++	if (c) {
++		linkmode_or(pl->supported, pl->supported, match);
++		linkmode_or(pl->link_config.lp_advertising,
++			    pl->link_config.lp_advertising, match);
  	} else {
- 		linkmode_zero(fixed_advert);
+ 		phylink_warn(pl, "fixed link %s duplex %dMbps not recognised\n",
+ 			     pl->link_config.duplex == DUPLEX_FULL ? "full" : "half",
+@@ -1879,21 +1898,20 @@ static int phylink_register_sfp(struct phylink *pl,
+ int phylink_set_fixed_link(struct phylink *pl,
+ 			   const struct phylink_link_state *state)
+ {
+-	const struct phy_setting *s;
++	const struct link_capabilities *c;
+ 	unsigned long *adv;
  
--		set = phy_lookup_setting(phydev->speed, phydev->duplex,
--					 phydev->supported, true);
--		if (set)
--			linkmode_set_bit(set->bit, fixed_advert);
-+		c = phy_caps_lookup(phydev->speed, phydev->duplex,
-+				    phydev->supported, true);
-+		if (c)
-+			linkmode_and(fixed_advert, phydev->supported,
-+				     c->linkmodes);
+ 	if (pl->cfg_link_an_mode != MLO_AN_PHY || !state ||
+ 	    !test_bit(PHYLINK_DISABLE_STOPPED, &pl->phylink_disable_state))
+ 		return -EINVAL;
  
- 		advert = fixed_advert;
- 	}
+-	s = phy_lookup_setting(state->speed, state->duplex,
+-			       pl->supported, true);
+-	if (!s)
++	c = phy_caps_lookup(state->speed, state->duplex,
++			    pl->supported, true);
++	if (!c)
+ 		return -EINVAL;
+ 
+ 	adv = pl->link_config.advertising;
+-	linkmode_zero(adv);
+-	linkmode_set_bit(s->bit, adv);
++	linkmode_and(adv, pl->supported, c->linkmodes);
+ 	linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT, adv);
+ 
+ 	pl->link_config.speed = state->speed;
 -- 
 2.48.1
 
