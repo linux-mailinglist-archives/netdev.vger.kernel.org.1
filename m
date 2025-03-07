@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-172712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 350E5A55C96
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 02:03:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9373A55C98
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 02:03:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D3733B72BC
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 01:02:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7519F1899598
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 01:02:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FCCB85270;
-	Fri,  7 Mar 2025 01:00:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F03218FDDC;
+	Fri,  7 Mar 2025 01:00:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Aqbl255n"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cEiaMT+S"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7FE152160
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 00:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E3713D52E;
+	Fri,  7 Mar 2025 01:00:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741309200; cv=none; b=oTkUSTyU81QZAt6EqpTmigjR0OyMhFbYVIDszPEHvOnCVR5cJqqT30DzreSSiPA8y3X/tM+KmjBbjzG7cWMySkEfCbsUMV9hcNv4Knn1UiM1R3z+349j8O3uj65mYMtCJhM1C8Xml2xMAFr4xSJ8DPvB7uwFBqkF1fuYctxlShU=
+	t=1741309201; cv=none; b=apKrNUACLS5y7Acw43f/1aYFVMmf5nC5E0hgl0wrpKShg1yw9Gl5J5aoor9e3dzIx6uyyIn5J89UBllTk6LU+JBHfr2lYLZ8HFgIqzsyP5uyfMbRsxsV8oFgcs5Xtb0HyBONVX+c4FcIgLZ944KToO6sW46dghGEDRH3KMSjngE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741309200; c=relaxed/simple;
-	bh=X55DFRFSwu+cUi1eXLiOrNYt6pgkbJ1bD1YE9jn5pFc=;
+	s=arc-20240116; t=1741309201; c=relaxed/simple;
+	bh=DLP1SeRWzG6iJPgv5Efqev3aQLJ91Lz2sSo6cQAKfSg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tyP9B5D2KnFgqyojENPMNwbAF1bcfwYhTg3AXa7ETdWdFnMmBWgFr8Ak7QzfyxdQVgljDl9Sv+wUbo/xE2t631e/lGGAb5NnnHY5kGtEcBXehZ2BN7kTBmXFqg64WTPDgoSrNy40/Ad0fq9Kdr3lnMdkVAO4a0klqnQicFGjfHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Aqbl255n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61872C4CEE0;
-	Fri,  7 Mar 2025 00:59:59 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=JgJqY73DyKW8zXY//rmajGwjPY/MMPuz1NvYfaqPxe6QGh3AJiBm5ENGZocvM/C2pFVXdKG84+nRFMf/E/kg7aw1r0yxHRGscFysaeHORd/ErK4UL1sNleGyUVlaq1sTS3WtpXfNkwm+zci8NyGEV5vi2qjMK6TM5vYDVWk/YD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cEiaMT+S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1DA0C4CEFF;
+	Fri,  7 Mar 2025 01:00:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741309199;
-	bh=X55DFRFSwu+cUi1eXLiOrNYt6pgkbJ1bD1YE9jn5pFc=;
+	s=k20201202; t=1741309200;
+	bh=DLP1SeRWzG6iJPgv5Efqev3aQLJ91Lz2sSo6cQAKfSg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Aqbl255nyucQICStW8ErA4WgsR0Jvj+T3uC7XgvHztIUhzZVVjJON7tOJXPqP355u
-	 UjzOQL6WfcmOckfIECPr81z/GDmC60jB1ejUAgqz0FRIGJ/QzIlL7l6FgD3KvUYx7e
-	 3JibRGygvBaSMb7eqghJYwHy1tH+12kNhnMr97tZT+DdJ+v6L2YMp9qe4fvs+YP4pi
-	 xVfPbCi3gYdOwGY6YqOmNCp0eCIvciY3gmJYlbB4mpYp0iOwW8n0metqkHZbTIY8vc
-	 4CdidXM26HHCYOl2fxD62pxJQVaVKon/QRA8ob2zz4/3iBkTqdYD7wzMW4oIAPfB3Y
-	 /lrTtN3llUF1A==
+	b=cEiaMT+Srjx2UQEHZJHbSimc2CV7OqTXFRuuzTL0I5DwXLcQ9yPaXvQoeEAF0Lk7s
+	 GRd0q8x9HXBjrqfR/z6ccx53s2gH98/9qO/4TT4l5bvUqpzrKgnr0WIPQ3rB/qopyL
+	 +0J0ee+Oi+5bRZtAM2Ew/4wePtajsKRt0mvbLCIMnR7j9y0TjA++MsG3sHHvqqtQgC
+	 kzL5F0jqlRV71nngbLifdNC3uz72oTQeOggMG0hgPrnSJK4DuR5WCttSzK6u0MAOOk
+	 y1jKSCBMowsnNf5aJh85EiXlks7hkG7BoljuQ/5tBsAnkQK8HnCrwo1vtwvqACQANy
+	 gyYLHDJIY67iw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EBA70380CFF6;
-	Fri,  7 Mar 2025 01:00:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B61380CFF6;
+	Fri,  7 Mar 2025 01:00:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: airoha: Enable TSO/Scatter Gather for LAN
- port
+Subject: Re: [PATCH net-next] selftests: openvswitch: don't hardcode the drop
+ reason subsys
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174130923275.1838424.9254960891722689987.git-patchwork-notify@kernel.org>
-Date: Fri, 07 Mar 2025 01:00:32 +0000
-References: <20250304-lan-enable-tso-v1-1-b398eb9976ba@kernel.org>
-In-Reply-To: <20250304-lan-enable-tso-v1-1-b398eb9976ba@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- mateusz.polchlopek@intel.com
+ <174130923400.1838424.14777201199250790985.git-patchwork-notify@kernel.org>
+Date: Fri, 07 Mar 2025 01:00:34 +0000
+References: <20250304180615.945945-1-kuba@kernel.org>
+In-Reply-To: <20250304180615.945945-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
+ pshelar@ovn.org, aconole@redhat.com, amorenoz@redhat.com,
+ linux-kselftest@vger.kernel.org, dev@openvswitch.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 04 Mar 2025 16:46:40 +0100 you wrote:
-> Set net_device vlan_features in order to enable TSO and Scatter Gather
-> for DSA user ports.
+On Tue,  4 Mar 2025 10:06:15 -0800 you wrote:
+> WiFi removed one of their subsys entries from drop reasons, in
+> commit 286e69677065 ("wifi: mac80211: Drop cooked monitor support")
+> SKB_DROP_REASON_SUBSYS_OPENVSWITCH is now 2 not 3.
+> The drop reasons are not uAPI, read the correct value
+> from debug info.
 > 
-> Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
->  drivers/net/ethernet/airoha/airoha_eth.c | 1 +
->  1 file changed, 1 insertion(+)
+> We need to enable vmlinux BTF, otherwise pahole needs
+> a few GB of memory to decode the enum name.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: airoha: Enable TSO/Scatter Gather for LAN port
-    https://git.kernel.org/netdev/net-next/c/a202dfe31cae
+  - [net-next] selftests: openvswitch: don't hardcode the drop reason subsys
+    https://git.kernel.org/netdev/net-next/c/1cc3462159ba
 
 You are awesome, thank you!
 -- 
