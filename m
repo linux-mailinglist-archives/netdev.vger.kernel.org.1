@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-172781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56A0DA55EC3
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 04:42:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6867A55EBE
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 04:42:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 600711889065
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 03:41:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 829FF3B5317
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 03:41:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64C97194C9E;
-	Fri,  7 Mar 2025 03:36:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 797E1198E65;
+	Fri,  7 Mar 2025 03:36:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gSYzYKNi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W7+0oWVs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB804192B81
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 03:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7F9A194A66
+	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 03:36:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741318588; cv=none; b=LnauWIGSlcD57G7K3jwClWb3jhFAX7chxT/AWPlECC34e+PniKMdTaCkuFA/MgcbI1rZKjIq85V7vhdpdhJVatO+zEK8V6eUl8k3SXcCoGqBrY4T650gHC06WtFf8K7mRUtxSfJhr9FVyVD24wnn8QP2mD+KjNuJOWv1spO3AUQ=
+	t=1741318589; cv=none; b=VHBlFDoAQk9Xz6Lw8ekR2g9PAMWxfZR4uhlcKEjaMcLAqnrj3Nqu7N5+aqi632yT+VJvyQwzEP3lcdyov1GrcsCeKRaTlCWMiRP1bPtENe/UJg0esm3hZIcnlfzyvQxBXy2QLgRpB0kF+y6tNGRcGFWetkvs3/x8O09QqNZBfKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741318588; c=relaxed/simple;
-	bh=4cr705Fz7tE6fPfVacy0geRhdmKGhlODOAipS07vVCQ=;
+	s=arc-20240116; t=1741318589; c=relaxed/simple;
+	bh=WbK6+6SUrxvSfG7PKZyJJbtLua8PwtOGKuwMIHIvRX0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=d6x7Qeq+Cif3F7coVHgLofPHkJPkExOLsGz2xe4cGPCZNmNZB+N5LM+FCtsDgqucCbPlClQrptHb+iTxbBTz1xWO/CFQrrFrn9NrbS1z3WLV/E2e6eP92IhuWDcl6r1sktZHVApc83iGAoF92vZ8UF6u8wq77dF839scX/TQ6TM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gSYzYKNi; arc=none smtp.client-ip=209.85.160.172
+	 MIME-Version; b=G0sqGwuZ8IzDC2ZA364Hg2EoiCvLtgLfJ+ZooXOfTUSsvYwTVAVOi1YiDUPJKW9yd4YhI6xNDo+SGo2Sq7J/VCyyI8bbfgPB/Yv0RKBwDLb/jLTof/5ubhmUh/nAPEw9Xq/S8F7G6mDGeroX4QimAKvH3Qoxyt+hp77fgycuWdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W7+0oWVs; arc=none smtp.client-ip=209.85.219.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4750bc8d102so13762281cf.1
-        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 19:36:26 -0800 (PST)
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6e8fb83e137so8118586d6.0
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 19:36:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741318585; x=1741923385; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1741318586; x=1741923386; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SaP1lDZYkL3tJ7ndT8o1iYCUjUlsXXOPt5hOoDFAnnI=;
-        b=gSYzYKNiSRZwfHhLK2b28GH08Kh3Aycu9VumKzTOa2dJdHYU/JGA1FE6UkuKAxZmGL
-         unQM26J9id4lHUEk+IFJ7dzDvBgFsmL61hMpE8MFXYuDfNi3+bzFG3126VgHIqzJvCrc
-         U62u8lfrbj2hLBKF74h0xuTtjONuDTWFt7IVdvRoWEmMKOGMCQugTnnnHLyR5rdy0ldo
-         JfNjBtCocAZNkkLdq0+HPq2u4zo19IqZLUV9RRqC5UuG6avxZr1FKpgcgoabPAnWhCy6
-         8dVAsQ1ZHzACrIggJbIZp7hbujnXWMF/QO9kZ8I5sApYfA+5eB1aPORZdK6L4DPfFkWP
-         /Feg==
+        bh=1hvOlbfnK+oYf7GNQWvVi9A0q+hidiiMQXBwWziDpvo=;
+        b=W7+0oWVso0tA8bJr30OtEXQ67zOLG+yms8bvZgpXEveIv3l9qwRN9GQrhxpxREigI2
+         DqigafVCKhem14gRNgBw0Omn1edwwtlwdeETfQiSoJv5eSfRItKm2Q9TYXGd3p9G/MQe
+         hL7P+9G4hed1LRkVLN4oZPxANXNeOcB5HP/hTOsQ1/PW9q5nl2tZEGQK0K27ZY6ksSkb
+         3vDp2LnfxrsraDrztUSH1iqayxTrI6Pd3nLG9P0CaKQ8IlsnoQlP5CDSaCgoBrESAdgW
+         YV3Z5JdDt2A02KCluyBo7pqv+G/gZiedUY7NRtyEPQN9NeRb52soPPBXeR5RC1/O7RXy
+         DGNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741318585; x=1741923385;
+        d=1e100.net; s=20230601; t=1741318586; x=1741923386;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=SaP1lDZYkL3tJ7ndT8o1iYCUjUlsXXOPt5hOoDFAnnI=;
-        b=Q+VQM0Rpxyg0I2HC8Zrn9Kt5+zU89TxNB3bJn8rBV6ZMlSyX64ZEEZnMgclv7r8K1+
-         4VntjtaYWmpQD3sJqKzArhr7A05B9I0+7Uhf4rL/D6CicaJP5y8it+5wILud4rdact5/
-         MHrIWHYrN+AfyBRCa2gnfJ9gvPngSCWxa/RV136fukIN0qJMzbXaYxhCNJWxPx9NpIsA
-         aJiq8O7QMBT6ADAhSBnJWG7xtefOfl4K9150zlcz4n/DC0d/kW9aoKrBtr7joqJia4Gj
-         pnR9xPnSiUGotiAEQH9lAxM2JiE5mDiCUuDfjZaYS5hkRuc+y7Kl/E35LHUtNxCrr00F
-         8lIA==
-X-Gm-Message-State: AOJu0YxhstReOPu256yTngWQCHFdQ6pum+GDbv0wLBZs3KEN7Pctwiy4
-	t5K5C0SRBLW0DXZGD7uzJ/FRXkC+cEgLiMIx9zoTGvKALEMr/GBtLrDqvQ==
-X-Gm-Gg: ASbGncuxDU8sX0IG34kTT7SwxiH64IUJMpUu2GT8DvxVLyaIVLQERgbC3rO+QBQLj+f
-	oaXnvpfxg/Ri+sT031tqx8SDLZ5u2W4aHHAd6pedby6xYKjzFra1Wp3CuagUunyNfbQQnWcXVRQ
-	SWLY9zlpS3rAw6KGi7iapCv5nyNnn7xYa78HftXV8OX3A6zfcCZW4LvmZuI5vGTPFP5W5oLkHwO
-	aLHMjDa84mJ02hmZ3/G8PSXbRicX2zpFKcUNzZtLBLk+D3VqS4H5BG36AGylT9EAqqWcB/abP+9
-	XOkP4O/LO5L549rxo6DShnB5i5D4nWaw17p7kpGvT+3xvegqhtyHwPNp4l6nP9h9BiJdsIflf0+
-	BiO1vePeXmlnvsqlN9Hiy5RhHKwcuyVU6xwSyrdMvTG6Y
-X-Google-Smtp-Source: AGHT+IEWJoy42BTscloNA4+3qorLdbglh3CoQMmFHiF4id97ekDFXeo2KRYYWZ4kqV/aqlksHXsKVQ==
-X-Received: by 2002:ad4:5f46:0:b0:6e8:fb7e:d33b with SMTP id 6a1803df08f44-6e900677496mr22037746d6.33.1741318585492;
-        Thu, 06 Mar 2025 19:36:25 -0800 (PST)
+        bh=1hvOlbfnK+oYf7GNQWvVi9A0q+hidiiMQXBwWziDpvo=;
+        b=ao1WU0XS6GP0dShovPgACjx4i5HR0518mh6ktrq0CBIS9z1osn8ZVmxGN4QPd8fNfF
+         LudJA4MFJ8Bba4vaPeWfa/txmnmq8yHmKNmTUHk/Xa/WLYj9ekj8w19eQ6JBAFMhtdns
+         1Dh6D4SdhA0NP9B3U1un96oqjbG6nwXU0aeN+JV4xKaCzTvFqLRFFaGFKXuWpI8ANLyQ
+         271dTmXhzodbQ8Acy1KjgbZoUSPdNXVlSjlhi0zKJUw1ePXzXojxQqkplho7Aw1BnaI6
+         yUSV5YtJ/s4pyVxDxUbOE6EikUN0GeBzPlBc4Zt5ka4wm/3a7ZzZ4ejbZ4Nrk2HJjER/
+         Fohg==
+X-Gm-Message-State: AOJu0YwiqSqHhvoRkEvTLF6AWdRZd1WcilW1rxIN8FFA+Z3umiU2Fwnc
+	SXpQykJSZWsqF/lxyB2t/10b4w9OG4Ia9bxiSbZcKeAXu3ZCEXSPKlMotg==
+X-Gm-Gg: ASbGncspW8pUItA9OwvD8q191PuhrYqNpISYJlqOd2WTFoBFU5e/W6OE5HpVvYYvPIV
+	DA7Ok/0SiNkj5xC6HfOWrpYfUWOT7J1Rx4X9pdPwNWAbEqWvI2ugfQWiU6+FWMz0iTUnLt9carc
+	wV3ssbel5dS1XdiyKjzqaNjlr0J9BUPlQo55d+Ywyfq2Ijbb0hxKqE8sfbAXkBcEw6eNomr5vJG
+	zzn18DMvndbQKEaVY/dSAQSVx6c0/ynKkBZIutYbInLgv/eqcTLUImAhisp2nHSedwpY9siKmtF
+	/tCw3vSxc6FS3yquhISJDEvVQXxJTEQwvmYUJ3R0mWTrN8iJPkBoQx6u5N9aixzVbtuUxb8lPXf
+	lZOxSyETSNfW88ZQMP4S+7CPKsvHNLqjI75KNfryH3uhN
+X-Google-Smtp-Source: AGHT+IEGlMyW+haW3YwOYBwPO7AzSRDSy17gBj1hlDoZwVYlg4+O1PCPcg67BwFj3dJVTZ6PmlV4rQ==
+X-Received: by 2002:a05:6214:2622:b0:6e6:6506:af59 with SMTP id 6a1803df08f44-6e9005ea3cemr23438696d6.15.1741318586410;
+        Thu, 06 Mar 2025 19:36:26 -0800 (PST)
 Received: from willemb.c.googlers.com.com (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e8f71727d1sm14528946d6.117.2025.03.06.19.36.24
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e8f71727d1sm14528946d6.117.2025.03.06.19.36.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Mar 2025 19:36:24 -0800 (PST)
+        Thu, 06 Mar 2025 19:36:25 -0800 (PST)
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -81,9 +81,9 @@ Cc: davem@davemloft.net,
 	dsahern@kernel.org,
 	horms@kernel.org,
 	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next 2/3] ipv6: save dontfrag in cork
-Date: Thu,  6 Mar 2025 22:34:09 -0500
-Message-ID: <20250307033620.411611-3-willemdebruijn.kernel@gmail.com>
+Subject: [PATCH net-next 3/3] selftests/net: expand cmsg_ip with MSG_MORE
+Date: Thu,  6 Mar 2025 22:34:10 -0500
+Message-ID: <20250307033620.411611-4-willemdebruijn.kernel@gmail.com>
 X-Mailer: git-send-email 2.49.0.rc0.332.g42c0ae87b1-goog
 In-Reply-To: <20250307033620.411611-1-willemdebruijn.kernel@gmail.com>
 References: <20250307033620.411611-1-willemdebruijn.kernel@gmail.com>
@@ -97,93 +97,146 @@ Content-Transfer-Encoding: 8bit
 
 From: Willem de Bruijn <willemb@google.com>
 
-When spanning datagram construction over multiple send calls using
-MSG_MORE, per datagram settings are configured on the first send.
+UDP send with MSG_MORE takes a slightly different path than the
+lockless fast path.
 
-That is when ip(6)_setup_cork stores these settings for subsequent use
-in __ip(6)_append_data and others.
+For completeness, add coverage to this case too.
 
-The only flag that escaped this was dontfrag. As a result, a datagram
-could be constructed with df=0 on the first sendmsg, but df=1 on a
-next. Which is what cmsg_ip.sh does in an upcoming MSG_MORE test in
-the "diff" scenario.
+Pass MSG_MORE on the initial sendmsg, then follow up with a zero byte
+write to unplug the cork.
 
-Changing datagram conditions in the middle of constructing an skb
-makes this already complex code path even more convoluted. It is here
-unintentional. Bring this flag in line with expected sockopt/cmsg
-behavior.
-
-And stop passing ipc6 to __ip6_append_data, to avoid such issues
-in the future. This is already the case for __ip_append_data.
-
-inet6_cork had a 6 byte hole, so the 1B flag has no impact.
+Unrelated: also add two missing endlines in usage().
 
 Signed-off-by: Willem de Bruijn <willemb@google.com>
 ---
- include/linux/ipv6.h  | 1 +
- net/ipv6/ip6_output.c | 9 +++++----
- 2 files changed, 6 insertions(+), 4 deletions(-)
+ tools/testing/selftests/net/cmsg_ip.sh    | 11 +++++++----
+ tools/testing/selftests/net/cmsg_sender.c | 24 ++++++++++++++++++-----
+ 2 files changed, 26 insertions(+), 9 deletions(-)
 
-diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
-index a6e2aadbb91b..5aeeed22f35b 100644
---- a/include/linux/ipv6.h
-+++ b/include/linux/ipv6.h
-@@ -207,6 +207,7 @@ struct inet6_cork {
- 	struct ipv6_txoptions *opt;
- 	u8 hop_limit;
- 	u8 tclass;
-+	u8 dontfrag:1;
+diff --git a/tools/testing/selftests/net/cmsg_ip.sh b/tools/testing/selftests/net/cmsg_ip.sh
+index 2a52520aca32..b55680e081ad 100755
+--- a/tools/testing/selftests/net/cmsg_ip.sh
++++ b/tools/testing/selftests/net/cmsg_ip.sh
+@@ -50,8 +50,9 @@ check_result() {
+ # IPV6_DONTFRAG
+ for ovr in setsock cmsg both diff; do
+     for df in 0 1; do
+-	for p in u i r; do
++	for p in u U i r; do
+ 	    [ $p == "u" ] && prot=UDP
++	    [ $p == "U" ] && prot=UDP
+ 	    [ $p == "i" ] && prot=ICMP
+ 	    [ $p == "r" ] && prot=RAW
+ 
+@@ -81,8 +82,9 @@ test_dscp() {
+     ip $IPVER -netns $NS route add table 300 prohibit any
+ 
+     for ovr in setsock cmsg both diff; do
+-	for p in u i r; do
++	for p in u U i r; do
+ 	    [ $p == "u" ] && prot=UDP
++	    [ $p == "U" ] && prot=UDP
+ 	    [ $p == "i" ] && prot=ICMP
+ 	    [ $p == "r" ] && prot=RAW
+ 
+@@ -134,8 +136,9 @@ test_ttl_hoplimit() {
+     local -r LIM=4
+ 
+     for ovr in setsock cmsg both diff; do
+-	for p in u i r; do
++	for p in u U i r; do
+ 	    [ $p == "u" ] && prot=UDP
++	    [ $p == "U" ] && prot=UDP
+ 	    [ $p == "i" ] && prot=ICMP
+ 	    [ $p == "r" ] && prot=RAW
+ 
+@@ -166,7 +169,7 @@ test_ttl_hoplimit -4 $TGT4 ttl
+ test_ttl_hoplimit -6 $TGT6 hlim
+ 
+ # IPV6 exthdr
+-for p in u i r; do
++for p in u U i r; do
+     # Very basic "does it crash" test
+     for h in h d r; do
+ 	$NSEXE ./cmsg_sender -p $p -6 -H $h $TGT6 1234
+diff --git a/tools/testing/selftests/net/cmsg_sender.c b/tools/testing/selftests/net/cmsg_sender.c
+index 19bd8499031b..a825e628aee7 100644
+--- a/tools/testing/selftests/net/cmsg_sender.c
++++ b/tools/testing/selftests/net/cmsg_sender.c
+@@ -33,6 +33,7 @@ enum {
+ 	ERN_RECVERR,
+ 	ERN_CMSG_RD,
+ 	ERN_CMSG_RCV,
++	ERN_SEND_MORE,
  };
  
- /* struct ipv6_pinfo - ipv6 private area */
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index d91da522c34e..581bc6289081 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -1386,6 +1386,7 @@ static int ip6_setup_cork(struct sock *sk, struct inet_cork_full *cork,
- 	}
- 	v6_cork->hop_limit = ipc6->hlimit;
- 	v6_cork->tclass = ipc6->tclass;
-+	v6_cork->dontfrag = ipc6->dontfrag;
- 	if (rt->dst.flags & DST_XFRM_TUNNEL)
- 		mtu = READ_ONCE(np->pmtudisc) >= IPV6_PMTUDISC_PROBE ?
- 		      READ_ONCE(rt->dst.dev->mtu) : dst_mtu(&rt->dst);
-@@ -1421,7 +1422,7 @@ static int __ip6_append_data(struct sock *sk,
- 			     int getfrag(void *from, char *to, int offset,
- 					 int len, int odd, struct sk_buff *skb),
- 			     void *from, size_t length, int transhdrlen,
--			     unsigned int flags, struct ipcm6_cookie *ipc6)
-+			     unsigned int flags)
- {
- 	struct sk_buff *skb, *skb_prev = NULL;
- 	struct inet_cork *cork = &cork_full->base;
-@@ -1475,7 +1476,7 @@ static int __ip6_append_data(struct sock *sk,
- 	if (headersize + transhdrlen > mtu)
- 		goto emsgsize;
- 
--	if (cork->length + length > mtu - headersize && ipc6->dontfrag &&
-+	if (cork->length + length > mtu - headersize && v6_cork->dontfrag &&
- 	    (sk->sk_protocol == IPPROTO_UDP ||
- 	     sk->sk_protocol == IPPROTO_ICMPV6 ||
- 	     sk->sk_protocol == IPPROTO_RAW)) {
-@@ -1855,7 +1856,7 @@ int ip6_append_data(struct sock *sk,
- 
- 	return __ip6_append_data(sk, &sk->sk_write_queue, &inet->cork,
- 				 &np->cork, sk_page_frag(sk), getfrag,
--				 from, length, transhdrlen, flags, ipc6);
-+				 from, length, transhdrlen, flags);
+ struct option_cmsg_u32 {
+@@ -46,6 +47,7 @@ struct options {
+ 	const char *service;
+ 	unsigned int size;
+ 	unsigned int num_pkt;
++	bool msg_more;
+ 	struct {
+ 		unsigned int mark;
+ 		unsigned int dontfrag;
+@@ -94,7 +96,8 @@ static void __attribute__((noreturn)) cs_usage(const char *bin)
+ 	       "\t\t-S      send() size\n"
+ 	       "\t\t-4/-6   Force IPv4 / IPv6 only\n"
+ 	       "\t\t-p prot Socket protocol\n"
+-	       "\t\t        (u = UDP (default); i = ICMP; r = RAW)\n"
++	       "\t\t        (u = UDP (default); i = ICMP; r = RAW;\n"
++	       "\t\t         U = UDP with MSG_MORE)\n"
+ 	       "\n"
+ 	       "\t\t-m val  Set SO_MARK with given value\n"
+ 	       "\t\t-M val  Set SO_MARK via setsockopt\n"
+@@ -109,8 +112,8 @@ static void __attribute__((noreturn)) cs_usage(const char *bin)
+ 	       "\t\t-l val  Set TTL/HOPLIMIT via cmsg\n"
+ 	       "\t\t-L val  Set TTL/HOPLIMIT via setsockopt\n"
+ 	       "\t\t-H type Add an IPv6 header option\n"
+-	       "\t\t        (h = HOP; d = DST; r = RTDST)"
+-	       "");
++	       "\t\t        (h = HOP; d = DST; r = RTDST)\n"
++	       "\n");
+ 	exit(ERN_HELP);
  }
- EXPORT_SYMBOL_GPL(ip6_append_data);
  
-@@ -2058,7 +2059,7 @@ struct sk_buff *ip6_make_skb(struct sock *sk,
- 	err = __ip6_append_data(sk, &queue, cork, &v6_cork,
- 				&current->task_frag, getfrag, from,
- 				length + exthdrlen, transhdrlen + exthdrlen,
--				flags, ipc6);
-+				flags);
- 	if (err) {
- 		__ip6_flush_pending_frames(sk, &queue, cork, &v6_cork);
- 		return ERR_PTR(err);
+@@ -133,8 +136,11 @@ static void cs_parse_args(int argc, char *argv[])
+ 			opt.sock.family = AF_INET6;
+ 			break;
+ 		case 'p':
+-			if (*optarg == 'u' || *optarg == 'U') {
++			if (*optarg == 'u') {
+ 				opt.sock.proto = IPPROTO_UDP;
++			} else if (*optarg == 'U') {
++				opt.sock.proto = IPPROTO_UDP;
++				opt.msg_more = true;
+ 			} else if (*optarg == 'i' || *optarg == 'I') {
+ 				opt.sock.proto = IPPROTO_ICMP;
+ 			} else if (*optarg == 'r') {
+@@ -531,7 +537,7 @@ int main(int argc, char *argv[])
+ 	cs_write_cmsg(fd, &msg, cbuf, sizeof(cbuf));
+ 
+ 	for (i = 0; i < opt.num_pkt; i++) {
+-		err = sendmsg(fd, &msg, 0);
++		err = sendmsg(fd, &msg, opt.msg_more ? MSG_MORE : 0);
+ 		if (err < 0) {
+ 			if (!opt.silent_send)
+ 				fprintf(stderr, "send failed: %s\n", strerror(errno));
+@@ -542,6 +548,14 @@ int main(int argc, char *argv[])
+ 			err = ERN_SEND_SHORT;
+ 			goto err_out;
+ 		}
++		if (opt.msg_more) {
++			err = write(fd, NULL, 0);
++			if (err < 0) {
++				fprintf(stderr, "send more: %s\n", strerror(errno));
++				err = ERN_SEND_MORE;
++				goto err_out;
++			}
++		}
+ 	}
+ 	err = ERN_SUCCESS;
+ 
 -- 
 2.49.0.rc0.332.g42c0ae87b1-goog
 
