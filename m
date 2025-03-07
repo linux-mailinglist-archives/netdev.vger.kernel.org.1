@@ -1,248 +1,238 @@
-Return-Path: <netdev+bounces-172854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10DE5A564DF
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 11:13:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56F83A564E2
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 11:16:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9F2317566C
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 10:13:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B2051890538
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 10:16:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B1A820DD7E;
-	Fri,  7 Mar 2025 10:12:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 129AC1E1DFB;
+	Fri,  7 Mar 2025 10:16:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="LVQ6ggg1";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="mkuUJvPY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J8z1qYrx"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 941AF20CCF5;
-	Fri,  7 Mar 2025 10:12:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741342374; cv=none; b=BGyz/VTrGXD08Cz48brJPdPNmO+buZKcTZ3uvwMN3gb4cH3/1HP0HU7GxJv9QT60YwyzjXdsJf0AGnJiYXfgJPcPmcT4uwsi78qE9Paupj0mAIDwz/mLKc/kyi+CecXE9tJJF6U8iy7nZxpwPeURqLx3QBhl+EnWyPc7GLPBMKg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741342374; c=relaxed/simple;
-	bh=9uIC5gZH8Qm7HDH6SwlK89APamrJxmZZP5bnWb+3pf4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cu4MM/Er6mIur1hgmH90e7J0AQOrGjslztTNgPA7HCTQNYXDBk78ya53jrJuDGdV+ajYif+VGM3cnQWnVvrvUWzMzEm1rwbqrDS6G84QWgCqhrvNeryvE8c0miXCdiXcdA4/r7AwcUi5gX6vR5p3OLhJUadOzAWSy6nK+Ae5oTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=LVQ6ggg1; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=mkuUJvPY; arc=none smtp.client-ip=202.12.124.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id EB8AB25401C3;
-	Fri,  7 Mar 2025 05:12:48 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-09.internal (MEProxy); Fri, 07 Mar 2025 05:12:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1741342368; x=
-	1741428768; bh=qHQnYT/Qyj9dWXE+hev7Uqrdhl7JEOFfEEcRNdgyx2I=; b=L
-	VQ6ggg1uTqb7YhLEiEMuTCpkK6J55k/cUrCgcDcZmZJHAHOtvN132XlQsAQ7W4oy
-	LmoqRVYLPCFly8nZeAfgfURXgDq+Ve3HH/r/I49tCaPIG0JIn2dZNjB34cJ3GJsm
-	NPW1bSJYNlOHfNVdUAWof91qI+FnIfYNK24G803Mbx08IQcVz6QUrZTFGTRE1P45
-	E6So1mIh1SiI4CsixBroogl+W1095Ca5Nd0gWD8HSp8BiuIx+1YbuuGleCm87yn5
-	6U2XXprRVYJA7D6jwFUtjWrdtc9iFxmRosqt4X8blJDLVS6fHPxoDgOKDa8A+XqU
-	xTot1fJBJQbSkCbvO/jAQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1741342368; x=1741428768; bh=qHQnYT/Qyj9dWXE+hev7Uqrdhl7JEOFfEEc
-	RNdgyx2I=; b=mkuUJvPY3b/cGMcdym4n2sD7Xv1vEn0e8Gs87hz2tOMnK7GQj5o
-	eWPiTsxA3YVQ0DahT/J4fE+w9J+ryVSacNudMd5BdDuP+NSYJtDmchKo/2BxXzei
-	ZDLBXHDjuLmR/EJABKRRpGJoTDWv/pwBcIEx+mcoL3XBaFsgNk00TIFDW1DpmF5e
-	ZwlR476pH25wAKEbgGEhZOVlAU9i6zewHxUtIPP0wNLKVUgytcXM3jyEYfFNxUsC
-	OZRhEIzLykOkz099FEb7/hur4m/cY48Bd0wAMJ8a5OuUn7nGWjx4fCvHHuHkdSxm
-	XXT2Pd4mRqzVmuCeN8HIoAYBk/uJY8Ypnpw==
-X-ME-Sender: <xms:oMbKZw6R9jVOMyg5qNb_fS5q0ppeisHdSYlDhBygyBaDekNnNIzDbg>
-    <xme:oMbKZx5zLKVwuBZcD7xi4VA80aBonb0Y2oU1b3U3yy8NLoR9wtiwriR4cruLMlsHU
-    1_lu3_M-bgLxWiNQIM>
-X-ME-Received: <xmr:oMbKZ_dPYl73KXtjaC1fceRhcAFqBiDkFxBP7kg5xbmKtz6HuGNp5G8M4ck8>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduuddtfeelucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
-    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
-    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdef
-    hfekgeetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhn
-    sggprhgtphhtthhopedufedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnth
-    honhhiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghr
-    rdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrd
-    gtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehp
-    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepughonhgrlhgurdhhuhhnth
-    gvrhesghhmrghilhdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhr
-    ghdprhgtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdprhgtph
-    htthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghh
-X-ME-Proxy: <xmx:oMbKZ1JiS7ItpmdrVIHsUgCb54-z7hIekeGvw22wtrIS0WKV1qw30Q>
-    <xmx:oMbKZ0JNSqDPSYZ2CaElrCP3cOf2xJ5xb7XaMBgXaExrNsH4CFxnCg>
-    <xmx:oMbKZ2zNyvY2IKWNs08SBicNxeS7NdABDXIkf6ZZrMkxMlG4SDCbQg>
-    <xmx:oMbKZ4IQFsPSi8H6GHOdf9G23jMTvUithDaNPgvTXgjcsRLQmKLHQg>
-    <xmx:oMbKZ3Z1jwjygpZeMHxzIoxnZwuWTdjf0zZE_eeoy1aVrRroofwts9vr>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 7 Mar 2025 05:12:47 -0500 (EST)
-Date: Fri, 7 Mar 2025 11:12:45 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-Subject: Re: [PATCH v21 18/24] ovpn: add support for peer floating
-Message-ID: <Z8rGnTaRE_mph_tD@hog>
-References: <20250304-b4-ovpn-tmp-v21-0-d3cbb74bb581@openvpn.net>
- <20250304-b4-ovpn-tmp-v21-18-d3cbb74bb581@openvpn.net>
- <Z8dIXjwZ3QmiEcd-@hog>
- <9c919407-fb91-48d7-bf2d-8437c2f3f4da@openvpn.net>
- <Z8gzbz6YjdeGPqgu@hog>
- <cd9df084-8633-49f0-a851-ed2b1c9946d3@openvpn.net>
- <Z8iCKvIfFaskshlz@hog>
- <e3def5b5-3450-4ad0-aced-fd80af943c31@openvpn.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34DB516DED0;
+	Fri,  7 Mar 2025 10:16:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741342576; cv=fail; b=JpobsTdLCyh++3S1QpcNmwBZu9jzCqCk5x1V4XFZUXxIbNwDREWZsiU9xY/+rdgNcTKQF8Ry/5H2IVsVmIrEtxdu1rLZZga2upwESMeHOf5FyhzdxiQEl8LjS+HQ+0g9tuKksD3jEgudMWyvhU5ccztS+L6UBqSnuP/LiTxTG5E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741342576; c=relaxed/simple;
+	bh=8QWQrRS4Q8qPV6pK1jIF1UgjvAhI+0DgAijWZGStV1c=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=LMlg/T0S0yZM15EBmOcLq/35Kh/fFw6gdXj9LzboAl8s1x5zX2T7KMKZ1J9PeqTsdQBvMOAzH9EXN6Px++kLDwrQdiTdkVs6tiWZ4LAk7f+N3TSXBBi9hPQ02chgdN74tQgxPbfMcdkzFElRj4hnfYJLUkVPdT3jyMIIf1zIvhM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J8z1qYrx; arc=fail smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741342574; x=1772878574;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=8QWQrRS4Q8qPV6pK1jIF1UgjvAhI+0DgAijWZGStV1c=;
+  b=J8z1qYrx4km/O7Fw3RE1Pqv5aElncSwiJvTXqIMTDdHPB3L1iMCfl+i1
+   YCWYjAEUYo67gYTMJjTks8aNbzCUF31VEUA1T4L4JT8I5N/GARj1Dl1qG
+   WvhXNt0eNa4PVian7ZbEB6SMqbgXBMTFfu5Yi1Qc6RsfolOtK4zIjwgae
+   +9h5pgxkhVezK+Mb0k5YYoovwr0rlUhTTYCQCa5FLr1YqmfD0kCrq3sOb
+   IzBYfEKdIbHe3lAfesbB3M1i1OUPCTxHVN4Q1trAfRN0NoV/5Q8Sy6uEC
+   nbmwx31OPz/mdwTfBWNj+aQg2gGmBNBlrcgL1T02cijXS1kl1I5XxwD+0
+   A==;
+X-CSE-ConnectionGUID: 254MWdZzSSac3oRms2nvBw==
+X-CSE-MsgGUID: zMofrC+KSQOdhLmrxs+VUw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="42518179"
+X-IronPort-AV: E=Sophos;i="6.14,228,1736841600"; 
+   d="scan'208";a="42518179"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 02:16:13 -0800
+X-CSE-ConnectionGUID: TivOzGr2RxKGgV5Oh8DIoQ==
+X-CSE-MsgGUID: WXlGiQY4SHKrprawclJqXQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,228,1736841600"; 
+   d="scan'208";a="119458982"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 02:16:11 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Fri, 7 Mar 2025 02:16:10 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Fri, 7 Mar 2025 02:16:10 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.174)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Fri, 7 Mar 2025 02:16:10 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=P8e3IIUqGkW21Fs59Q4Lc5U7qo4nnAUvZsmTA9iUI7BqerJS1YdY0h45aXddzdBtThfIHeqSNTnYl75rSJQz6RCLt6e5Wc2AVip5YOEbvSqkl0ebPxzKtuyND/wsk6Vw03dBfx8dXJhqw1a05U7v4lu6w+bgNKdDXD6CdyIQX2J2fgygKu9qYo73kIlenAoLw0QLsTpO9xaPaHVbzu26ThgeTongFunHYapCDmSRv8764rPXXwOttgCScojvrOQkYD6ajOuo4xpDTtzn7x2zgx6Za/R2qQS/isnenxzA8gehGeuR81ZA8xppGpu5D2B7FB1vforOZ6iz+s1W+zakRQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vpdyrmaIhwSpZUzGcCZPSu6uIuCRLPTA4yOzkDvMaWY=;
+ b=PGq66HMzQy5idGkTasrhyeSXDEVybz2pjdwi+i3fZ1WZLDrTjMelTsfV+2Egx7Tn+eO+XBJWL5yWGgoa/ArCxL/CGptVkVp+pU/qLEeiD5Tsaogq5tYesudc5QW0jJM4z7o1qpzqxUUTlodoU4jiNP4XLAbaS0QvGwv2dFXiAhA8ohibIsVvyrBnTO1behS6eVVr4pNZ0UrxWyMK52qmWBftX7WuyUyyRL04j87LkBYyaLKkjyve5u6VIHObnISbw3AAe2V79YBYKDXFmPE9PqBcGmC3crMFye/uhM7bEm3YzCGnjDvNzR3NlW5izxISP1pe1YINuY1EGJwf5SkTIQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ CY5PR11MB6163.namprd11.prod.outlook.com (2603:10b6:930:28::19) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8511.19; Fri, 7 Mar 2025 10:16:08 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca%3]) with mapi id 15.20.8511.017; Fri, 7 Mar 2025
+ 10:16:08 +0000
+Date: Fri, 7 Mar 2025 11:15:56 +0100
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, Michal Kubiak
+	<michal.kubiak@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, "Przemek
+ Kitszel" <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Alexei
+ Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+	"Jesper Dangaard Brouer" <hawk@kernel.org>, John Fastabend
+	<john.fastabend@gmail.com>, Simon Horman <horms@kernel.org>,
+	<bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 04/16] libeth: add XSk helpers
+Message-ID: <Z8rHXMzaMowRSv2m@boxer>
+References: <20250305162132.1106080-1-aleksander.lobakin@intel.com>
+ <20250305162132.1106080-5-aleksander.lobakin@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250305162132.1106080-5-aleksander.lobakin@intel.com>
+X-ClientProxiedBy: ZR2P278CA0006.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:50::12) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <e3def5b5-3450-4ad0-aced-fd80af943c31@openvpn.net>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|CY5PR11MB6163:EE_
+X-MS-Office365-Filtering-Correlation-Id: dee415a1-7ce9-4784-92b9-08dd5d6113b6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?H+M41cZmXx0bVKBVBafcP7YuM52CMIrA5MNhJ5WNfgTuqATT9iVrO/yrQ7jJ?=
+ =?us-ascii?Q?ZYY7QtwUfP9WqMySruBl9FH4k9ld2eqhk3Fq0/v+PyIQLZpm20xtktp121K1?=
+ =?us-ascii?Q?88rJdabXUU96HPtmn+5Rk5jcl6LdO3Pr8C5JVAPaBcxi3v5oQJO+Jb6xfCfG?=
+ =?us-ascii?Q?vb8cW+9L0r/YESnGO2/W8fOHZF5MqNEeQfCBs++qi6oeYYM+eDwOBZ0oqkPW?=
+ =?us-ascii?Q?1JwwqN5G+a0CI/moo2dNvQOKDDwhdUqAMT8c3hn1sJU0Sd1m6mSGNKXO5rM/?=
+ =?us-ascii?Q?5OCji9p1bDnu0mqqMfQXqS8DNvWyXh4iZVeullxYYh/B50NVOukOJ8uR96TB?=
+ =?us-ascii?Q?bQ8QLoUYBsJHxE3pWCSlwNlH5daGHgHuUB6LIsaqCtjQNF/e1GfRP7JRdKBJ?=
+ =?us-ascii?Q?xcrEk0KlAQ6fGYl20PdTO4WTRcYObKMehCQ9FbJu4e5AkHmGtqehMemXggmB?=
+ =?us-ascii?Q?pu/RGICVfJvELyQS/9Q2LIexcR/C8/+BC69AZjpxERfgjkSSN/AuIw0QEgPZ?=
+ =?us-ascii?Q?X/IxyEIsjVCMP9zI9QaKpefS9iknINfvg/LOxWOPQLOoVJBH4H0a0ETo8wSc?=
+ =?us-ascii?Q?aCFWBU7dk6hykhXpPUEnG1bFK/VHe8ci864s5bek6rykvHGW1gwQD9tLK54A?=
+ =?us-ascii?Q?KKw4tm28MUsDhTeNbotAvzzhTZI33o4jaBF7cbVjtFbcFPJ+CEid16X+KgtH?=
+ =?us-ascii?Q?+Bic3MdxJFaxIWKlrWsduYqJmMU0fQ+2+/FwQWeit7OkzaNmgtLMoFBkDQS5?=
+ =?us-ascii?Q?grb0yMxiVb7NesYyjwf+8XKFM2HacDOS6xFc9XLgqmMetts4PIv6d7aU5UtX?=
+ =?us-ascii?Q?7+OoAOgNQEg02hRRkKs09KoNh74hXshC6qLx7L65zRcngfkhdtcB4KMUMspr?=
+ =?us-ascii?Q?K9llU4uWwDgiqWMqG+Kv0rBrCb9eV1rF+OKXSzEDIZ+ILSLtSNyPGGon46FG?=
+ =?us-ascii?Q?9WcNJvCc08m+c1aqOZJb+G8fdyRe+7oKd2Md6KjVceuF91mlOdkfCKb6AcT7?=
+ =?us-ascii?Q?xFJ/sIg0OqquTu8taajEbsBLo01uvL3dKe5vHNke8UV4C4JfLHMQu6PMQ1HM?=
+ =?us-ascii?Q?9WnglU64fSriUo6RVol27JfwZ+D+EcVJia99Gmtk1SNCtw8rbksnkBJ/GWHS?=
+ =?us-ascii?Q?GI7FDfatcrgsQPZ5pys6Pu+HzTCYT58n65oWn+OsqvqAzX5wgCVDDN8KNOVs?=
+ =?us-ascii?Q?3lDuNnSYvIqnawXa9sq6Jxt3Uj9Kudb/yTohd2jyqql+/xs7420rMn4wYC+d?=
+ =?us-ascii?Q?BDpdQFRjoNVGQ25i1T0JXACBWAfbcjeYMFbxKvPbpGpBRfa7ZQxsqm2ZrY3u?=
+ =?us-ascii?Q?GYSCSYXCxLlwMGWvZd0ffu76vhNiuKiqVy4jVjcXnEtVnY2UhW6Tr+8zgAEg?=
+ =?us-ascii?Q?5K+88IQoMDkUq4IY7bddcXvnki0V?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?oGAbc0A0aySKVz7JXOJn0plRbJhFqS/s/tz26YngpM5aJwD51sQj8gjIhjRX?=
+ =?us-ascii?Q?ytH1kLv2Aavfqc/1eeD6y+gceXHIDSxGqJwTsE9YuOxxUePgInqT/3uvCuH/?=
+ =?us-ascii?Q?b2/R5wztc0qYSWBypeWx4Wd56a701DAdGODP+GqvHUpH3r6AjKbxNx1TC6/u?=
+ =?us-ascii?Q?/giR9K8JCSiG/enVfZfKTh4sCQE1QFbpj1di02jZBocwhYPPpbuk6IMeMVC4?=
+ =?us-ascii?Q?5s6i0ObUPUhfsFWGZCyLRWQRXSRl/+g51ro6he8braVb2AYSabq0uuFo2yvA?=
+ =?us-ascii?Q?k2hndSKgrRhmaz1kwc79nwoS7+pVCKs2ziI8zbo/KwgBNEZRqzKu/sSppkD6?=
+ =?us-ascii?Q?kxOvCyO0cFnymcfsjrrT1Nqr0xfKov+1aloc+Rp3eif9G2BKvQlwhoy+TA0E?=
+ =?us-ascii?Q?MjvuRDdRl0M8O7B+5FpGtz5TmZGw5xpsoqyYcZE7NnXqihT3rtgCCD06ftAg?=
+ =?us-ascii?Q?hLqkGm6pPXedaQGHutMUQ6/Xzcr3wqP374eDrnTnhjAd+d+iV18A2Z/CnGFX?=
+ =?us-ascii?Q?bh8VPSBhaZS3eU7phZfTprEtEZu7sYVFAarE9a7AVU3LL4eu2rzt6+zWJQJC?=
+ =?us-ascii?Q?Urj6oVSX+yKfKARQ/QBtn1iEXwidtouZ6Q6VvW8mYF95ypCSRAUeDoqmQZLN?=
+ =?us-ascii?Q?BPsZN3h+VVZ9CPqvwkVagIvjZbxfE5DdkjPPl1t2eHpFhGGWWyDb9zeflzr7?=
+ =?us-ascii?Q?sVJgxtKAtx02Tb88X9GfN1v1lJSk67uPocvO7u5fmX6ZCrqkIzaJFKbSCp7a?=
+ =?us-ascii?Q?3XIQsNNgIMP4AVuMx5eljcET1dsBOop2UZEXxzjDnkSnC90Ox7EezUt3h7fy?=
+ =?us-ascii?Q?CqIrpwvG/spdrHrvsP4vwl+UNh1+ht20B7flbhI1VmVBrHFRs4g0ZhTlLgFG?=
+ =?us-ascii?Q?H+3VVobCgFLMPK1Y0qEwXbm1yvol9GmzdntnTU1pCoUGx4JlY0szZyBdvXtB?=
+ =?us-ascii?Q?VCE2ITaWudmQtSbsgjAKnWgMLGHoFh8VUGQy0UpVDhSgYa4Gg65fzYk4KbDh?=
+ =?us-ascii?Q?9Y2XmSfwD9xsb6TqHWMctKLddvHxNNK7pps2+UR+VqKHUSajOKcmvG1xxo+E?=
+ =?us-ascii?Q?Y2LDswqLDviWjbdjtxvXQX+AnVeepnWIEcblo8PSjb4QD/+XnFiK7FtKuNF4?=
+ =?us-ascii?Q?how+6uAwtHKaKqRAr/vFt33kHOrYIzrLzUQtYn1cLpZBDDob3/s0i6mYibuX?=
+ =?us-ascii?Q?w8uSDMKh+miq65rsemGDt3UkCWleNUa8iJh7HhxhQubWtXhiB6Q6cFMrQ2Xl?=
+ =?us-ascii?Q?XYbVVLjksYs7LAsG1H3K4ehja9uAD4LSIdJAb5a6hBgdDRK/09trJ3nOC2by?=
+ =?us-ascii?Q?eq3tJKdK7Y/b1ihzUqvAMiCL6kqUASQb6HBlTKzZQtpdxZ9yaj93irBzaj3t?=
+ =?us-ascii?Q?q7Hps9vKTRBZSzFcrP2iWZ/G0Mo31QUnnHOFjTitLURuet4AvcC6WL16Llef?=
+ =?us-ascii?Q?fgO2LVKqvHpKkFnP2jEAHZUmv1aaqQ1fDfcpeoZ8RyGsBLaTQGVmFW34VPuu?=
+ =?us-ascii?Q?URBNqF9u3ul0qrQw8WGhvJsNf2GyEARrHwNDqHjXnDDxhTiYw0EXzVLa2Xvs?=
+ =?us-ascii?Q?ONzdZ5+qhJyzSr713ZN8GOxv/vI1LJUkXb1OTGU6l0gFeADuAHvaTpZCqu/w?=
+ =?us-ascii?Q?uA=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: dee415a1-7ce9-4784-92b9-08dd5d6113b6
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Mar 2025 10:16:08.1520
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: oOBTIFCHSiDZ76bxX/YwdbMpkNU/+6KiAy5JXpeWTm2yOcHU5EseYahBw55UVvPfSOWL3T2nOkC2ByMLaGYHSmPO4FxTA/frXe5M6DggABc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6163
+X-OriginatorOrg: intel.com
 
-2025-03-06, 11:02:50 +0100, Antonio Quartulli wrote:
-> On 05/03/2025 17:56, Sabrina Dubroca wrote:
-> > 2025-03-05, 14:14:36 +0100, Antonio Quartulli wrote:
-> > > On 05/03/2025 12:20, Sabrina Dubroca wrote:
-> > > > 2025-03-05, 00:19:32 +0100, Antonio Quartulli wrote:
-> > > > > On 04/03/2025 19:37, Sabrina Dubroca wrote:
-> > > > > > 2025-03-04, 01:33:48 +0100, Antonio Quartulli wrote:
-> > > > > > > +void ovpn_peer_endpoints_update(struct ovpn_peer *peer, struct sk_buff *skb)
-> > > > > > > +{
-> > > > > > > +	struct hlist_nulls_head *nhead;
-> > > > > > > +	struct sockaddr_storage ss;
-> > > > > > > +	const u8 *local_ip = NULL;
-> > > > > > > +	struct sockaddr_in6 *sa6;
-> > > > > > > +	struct sockaddr_in *sa;
-> > > > > > > +	struct ovpn_bind *bind;
-> > > > > > > +	size_t salen = 0;
-> > > > > > > +
-> > > > > > > +	spin_lock_bh(&peer->lock);
-> > > > > > > +	bind = rcu_dereference_protected(peer->bind,
-> > > > > > > +					 lockdep_is_held(&peer->lock));
-> > > > > > > +	if (unlikely(!bind))
-> > > > > > > +		goto unlock;
-> > > > > > > +
-> > > > > > > +	switch (skb->protocol) {
-> > > > > > > +	case htons(ETH_P_IP):
-> > > > > > > +		/* float check */
-> > > > > > > +		if (unlikely(!ovpn_bind_skb_src_match(bind, skb))) {
-> > > > > > > +			if (bind->remote.in4.sin_family == AF_INET)
-> > > > > > > +				local_ip = (u8 *)&bind->local;
-> > > > > > 
-> > > > > > If I'm reading this correctly, we always reuse the existing local
-> > > > > > address when we have to re-create the bind, even if it doesn't match
-> > > > > > the skb? The "local endpoint update" chunk below is doing that, but
-> > > > > > only if we're keeping the same remote? It'll get updated the next time
-> > > > > > we receive a packet and call ovpn_peer_endpoints_update.
-> > > > > > 
-> > > > > > That might irritate the RPF check on the other side, if we still use
-> > > > > > our "old" source to talk to the new dest?
-> > > > > > 
-> > > > > > > +			sa = (struct sockaddr_in *)&ss;
-> > > > > > > +			sa->sin_family = AF_INET;
-> > > > > > > +			sa->sin_addr.s_addr = ip_hdr(skb)->saddr;
-> > > > > > > +			sa->sin_port = udp_hdr(skb)->source;
-> > > > > > > +			salen = sizeof(*sa);
-> > > > > > > +			break;
-> > > > > 
-> > > > > I think the issue is simply this 'break' above - by removing it, everything
-> > > > > should work as expected.
-> > > > 
-> > > > Only if the bind was of the correct family? Checking an IPv4 local
-> > > > address (in the bind) against an IPv6 source address in the packet (or
-> > > > the other way around) isn't going to work well.
-> > > 
-> > > Ah I understand what you mean.
-> > > 
-> > > The purpose of "local_ip" is to provide a working local endpoint to be used
-> > > with the new remote address.
-> > > However, if the float is switching family we can't re-use the same old local
-> > > endpoint (hence the check).
-> > > In this case we'll learn the "new" local address later.
-> > > 
-> > > Does it make sense?
-> > 
-> > Sure, but we could have learned it immediately from the packet we just
-> > got, whether we're changing family or not. No need to wait for the
-> > next RX packet to also learn the new local address.
+On Wed, Mar 05, 2025 at 05:21:20PM +0100, Alexander Lobakin wrote:
+> Add the following counterparts of functions from libeth_xdp which need
+> special care on XSk path:
 > 
-> Indeed.
+> * building &xdp_buff (head and frags);
+> * running XDP prog and managing all possible verdicts;
+> * xmit (with S/G and metadata support);
+> * wakeup via CSD/IPI;
+> * FQ init/deinit and refilling.
 > 
-> > 
-> > But if we now do a dst_cache_reset with the peer float,
-> > ovpn_udp*_output will have to do a new route/local address lookup and
-> > I guess that should clean up the local address stored in the bind, and
-> > then update the dst_cache with the local address we just found.
+> Xmit by default unrolls loops by 8 when filling Tx DMA descriptors.
+> XDP_REDIRECT verdict is considered default/likely(). Rx frags are
+> considered unlikely().
+> It is assumed that Tx/completion queues are not mapped to any
+> interrupts, thus we clean them only when needed (=> 3/4 of
+> descriptors is busy) and keep need_wakeup set.
+> IPI for XSk wakeup showed better performance than triggering an SW
+> NIC interrupt, though it doesn't respect NIC's interrupt affinity.
+
+Maybe introduce this with xsk support on idpf (i suppose when set after
+this one) ?
+
+Otherwise, what is the reason to have this included? I didn't check
+in-depth if there are any functions used from this patch on drivers side.
+
 > 
-> Right and this may not truly be what we want.
+> Suggested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com> # lots of stuff
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> ---
+>  drivers/net/ethernet/intel/libeth/Kconfig  |   2 +-
+>  drivers/net/ethernet/intel/libeth/Makefile |   1 +
+>  drivers/net/ethernet/intel/libeth/priv.h   |  11 +
+>  include/net/libeth/tx.h                    |  10 +-
+>  include/net/libeth/xdp.h                   |  90 ++-
+>  include/net/libeth/xsk.h                   | 685 +++++++++++++++++++++
+>  drivers/net/ethernet/intel/libeth/tx.c     |   5 +-
+>  drivers/net/ethernet/intel/libeth/xdp.c    |  26 +-
+>  drivers/net/ethernet/intel/libeth/xsk.c    | 269 ++++++++
+>  9 files changed, 1067 insertions(+), 32 deletions(-)
+>  create mode 100644 include/net/libeth/xsk.h
+>  create mode 100644 drivers/net/ethernet/intel/libeth/xsk.c
 > 
-> If peer X is sending packets to our IP1, we should at least try to reply
-> from the same address.
->
-> If we have two IPs, IP1 and IP2, and both can be used to reach peer X, we
-> should always try to use the one where we received traffic from X in the
-> first place.
 
-I had a thought that it might not be our prefered address to talk to
-X, but it would probably be, since we decided to use it (and thus X
-used it as remote to talk to us).
-
-> OTOH hand it is also true that with floating detection on both sides, the
-> situation will converge quickly, but there might be a reason why X chose IP1
-> as destination, therefore we should do our best to respect that.
-
-And I guess the primary reason for X to choose IP1 would be "we sent
-packets to X from IP1".
-
-> So, even in case of float, we should still store the local endpoint and
-> attempt fetching a route that takes that into consideration.
-> Which I think is what is happening (assuming we reset the dst_cache on
-> float).
-
-Not at the same time as float, unless ovpn_peer_endpoints_update sets
-local_ip = ip_hdr(skb)->daddr unconditionally on float?
-
-Otherwise the next route lookup in ovpn_udpX_output will pick whatever
-source address it wants (which would likely match what's in the
-received skb during float, so probably fine anyway).
-
-> ovpn_udpX_output() will:
-> * get no rt from the cache
-> * possibly confirm that saddr is ok
-> * fetch the new rt using the provided saddr and daddr
-> * update the cache.
-> 
-> That makes sense to me.
-> Would you agree?
-
-With dst_cache reset on float, yes. As long as we have that, the main
-behavior seems correct to me. (maybe some corner cases will not be
-handled optimally, but that can be improved later - which is most
-likely what I've been discussing in these emails :))
-
-[this could be a useful counter to add in the future: number of floats
-and local address updates - so the user can check if that's increasing
-"too often", which would indicate something weird is happening]
-
--- 
-Sabrina
+(...)
 
