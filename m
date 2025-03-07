@@ -1,187 +1,116 @@
-Return-Path: <netdev+bounces-173088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAE72A5720B
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 20:37:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BD38A571F3
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 20:35:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24A7E3B3C91
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 19:37:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8BC9B7A35E3
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 19:34:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C4D025487A;
-	Fri,  7 Mar 2025 19:37:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7189B24FC1F;
+	Fri,  7 Mar 2025 19:35:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="JpM4cAI/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="McuRxN67"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D0A6241691;
-	Fri,  7 Mar 2025 19:37:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1156A1A3035;
+	Fri,  7 Mar 2025 19:35:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741376225; cv=none; b=uTrnD7dcj8jkxrKoaV/uGt1OuoxBJpzaEiLGweYnHNJfxiaEwvUW6ybFRwBQC/G0CI/wm0E7eTTgqQ41IU9A7nB8eltq5NvANdce2TsKb7SY+H8kYhvM51JFi/OIN8qW37abRFWXIqTGMllMkuQOI1KU4/FNYBuuItc9KUpMabw=
+	t=1741376127; cv=none; b=obq296Ah9D6RfLyAFbVlfvpsebjM47OoA82IYHVAXuHvSVWRw6C0fK/PG6u1tRXE3nholygBgh5uG8jxmZkaXlB7dIHMxkeqvtxw37gAsnrUACd32RFGe/4SMZ1rrWB8gD4cLzo4LMOF42VdpxcKyq2O0l7RFB2gIEG8fWYiFe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741376225; c=relaxed/simple;
-	bh=lGOlEUKYMEj4dil0Op2XWbTDHNW0cDTVOQuuf8NM8P8=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=JleE7uEo4JlabypfKvFneOyyudRt/Tt6SG7R63UXwhPwWu50x9faOYJPMcRQpdHrL/uh31cxwL9X7gDDlfZEMBR9SigEtCR56ZIUHJdid4cHIxELG943VzYN5/iyV62Us9tnImW2H6wafNb1opGqIZrSBMvGkOZ8HSFNIn3Rq4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=JpM4cAI/; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [127.0.0.1] ([76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 527JXgtA396336
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Fri, 7 Mar 2025 11:33:43 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 527JXgtA396336
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025021701; t=1741376026;
-	bh=Rba/iYpx+v1WUJY9TbQtNNXz3bzAixuum4cy0AAzIQ8=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=JpM4cAI/6OO4nOvQdC38mdUbpbB1lWPHBSF4ljFw2qA3FLC4pjNg+SSz3ep6OIzF7
-	 WYl+0db+AhekbzgxwomC3ymIRs5j71mlLZtD2iw8tO5cOhAoYMQ4MbYIxxObh+RsB1
-	 GUcEWcPFEboLGkCpDZbKwA820RTWL1qGA26P0tk+SNSZddRBNxaRNIo9I6OO/l2PS1
-	 suoEHlGlNSslZA0RrcNHi/ZRxh3u7yF1UBB/uL9NLK/IuoZSDmbFqv5gKyuDiKqw3E
-	 CP62OwczhWCynLtrpzDYfzi+I/IgCMQrBEruwEEHJe0dh0Owv8tBZshia4KmpgLZct
-	 MdGqjzEQfz58Q==
-Date: Fri, 07 Mar 2025 11:33:40 -0800
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: Yury Norov <yury.norov@gmail.com>
-CC: Ingo Molnar <mingo@kernel.org>, Jiri Slaby <jirislaby@kernel.org>,
-        Kuan-Wei Chiu <visitorckw@gmail.com>, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, jk@ozlabs.org, joel@jms.id.au, eajames@linux.ibm.com,
-        andrzej.hajda@intel.com, neil.armstrong@linaro.org, rfoss@kernel.org,
-        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-        tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
-        dmitry.torokhov@gmail.com, mchehab@kernel.org, awalls@md.metrocast.net,
-        hverkuil@xs4all.nl, miquel.raynal@bootlin.com, richard@nod.at,
-        vigneshr@ti.com, louis.peens@corigine.com, andrew+netdev@lunn.ch,
-        davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-        parthiban.veerasooran@microchip.com, arend.vanspriel@broadcom.com,
-        johannes@sipsolutions.net, gregkh@linuxfoundation.org,
-        akpm@linux-foundation.org, alistair@popple.id.au,
-        linux@rasmusvillemoes.dk, Laurent.pinchart@ideasonboard.com,
-        jonas@kwiboo.se, jernej.skrabec@gmail.com, kuba@kernel.org,
-        linux-kernel@vger.kernel.org, linux-fsi@lists.ozlabs.org,
-        dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
-        oss-drivers@corigine.com, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev,
-        brcm80211-dev-list.pdl@broadcom.com, linux-serial@vger.kernel.org,
-        bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw,
-        Yu-Chun Lin <eleanor15x@gmail.com>
-Subject: Re: [PATCH v3 01/16] bitops: Change parity8() return type to bool
-User-Agent: K-9 Mail for Android
-In-Reply-To: <Z8tJNt83uVBca0cj@thinkpad>
-References: <20250306162541.2633025-1-visitorckw@gmail.com> <20250306162541.2633025-2-visitorckw@gmail.com> <9d4b77da-18c5-4551-ae94-a2b9fe78489a@kernel.org> <Z8ra0s9uRoS35brb@gmail.com> <a4040c78-8765-425e-a44e-c374dfc02a9c@kernel.org> <Z8ri5h-nvNXNp6NB@gmail.com> <04AA7852-2D68-4B3F-9AA7-51AA57E3D23D@zytor.com> <Z8tJNt83uVBca0cj@thinkpad>
-Message-ID: <783456A8-67F9-47DD-AB15-914622A921CD@zytor.com>
+	s=arc-20240116; t=1741376127; c=relaxed/simple;
+	bh=b3YKDd4f5VM0/bYXYdj1H2B9mEQNOdGupx/drXrREsA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nMPex/MeDgidOeGT4IUbTIRYO1Lm5bkR0770oiwV9v+VM9Ke0Lv02HZgPStknXC7vxxETDYv+z/d/Csuw39Ii69gAkupSmz/1Ff/FsIgbUF6i0kN/wG1sdIdz5Ns2s9l3rCeHGDv+oOPw/BJxxmnckDItOGF+96arcdc6rv2+cs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=McuRxN67; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-223fb0f619dso47624385ad.1;
+        Fri, 07 Mar 2025 11:35:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741376125; x=1741980925; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=w8BWp7SYMVhayY4CKxIe7LlJTrQSlVuOhnW/1p2aS4w=;
+        b=McuRxN67rqeNwb8r41mYaMJYW31m1uJUEMQlwzxPp+8FMdLkpLK+i0D2DR4ufQLY/1
+         mXdhXZsPKXt0ta9HiYo18nUWzT2cAbquzN+0gksm9GGGYwHgbQNwh+rxs7LEWCEBVFFY
+         A2hVW4r6pql8gwrc4YWl39kZK2KH7vnE2CMKvnHDoi02gtlcv/XdCGmWFisVlz2Eaftc
+         QBdlksR0DPnMqYf/h0//JKip6CgGfeqSnsKcSC6XWHcR+9WcbJSjfigvgNDWDjatqj39
+         ql4GZSmVolDZiFJEyLzUg8tCLHVMsVbtsyacxGJQofd0sTBZprocgaSKUz/QvNPhY4P6
+         kMQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741376125; x=1741980925;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w8BWp7SYMVhayY4CKxIe7LlJTrQSlVuOhnW/1p2aS4w=;
+        b=Wu/ogzMxoTOhmuQ/SWwDEngF9HsVxFlGG/NgEtXaCPMOjfpBfSKDf4eAQ5zBeHuIi3
+         GCx8iT+iK9Q1Mh+7ljrQpVcd7AJBG3z5FDBOUrPAY1S7Opi22bDOi9jPfFsupGJzoF+y
+         QKg1nv+BAW/fnffFCW3wtDWayfDX+0lJX6it+di7Luk9NhRxYhV9wYlqeiZqMNV5x5df
+         WBbtnXxsEyqa0c7Hs5FlQ5V/Uaz2eoxtnvRSf4Y6WPbfU0WdO3p85i1TD6ekwWDe/WHG
+         6Jmhue3KuMkUcLsretacOftq0a6023qJ9g4iPCPbcq/yV07pTuJgecDNYYzhBncISNOX
+         OSuA==
+X-Forwarded-Encrypted: i=1; AJvYcCVZl6GOeE03Ooz+QrNTOsR6eQN8W5bQXAUzKIVLoeEbBM1u13j8+4Znqb3ivFPrgdHnw8XKlFcx@vger.kernel.org, AJvYcCXojccpn4Ov7vqpuS2cxsjzTMDnYNUZEJzpq5Hp0/rqvqWM8TaF5tlPTZnH9FCO730KzGPqQoIqt4a+usU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEaJMs5+a4+IjJM7tv482ztnoIJFOmm0XOb6lZasrqdnDoCBVg
+	uMu9aEHFsJSuGjrpVwkWXKUxDFpgAVOn2TQpkom1xuVcWPvEHeY=
+X-Gm-Gg: ASbGncvMBHGIkkz3wAfSHWRRtmRrxvEYV22Phwky2kWxO0vwXUH6ubk11PrTwcsJLWE
+	JvCsQATS36ARf2gl8FMfozL26syRIf8yfcluitGG1ms2BDFHiI7Y3tmdRWMGbavCOW099KKmUXy
+	Inof44NB6c9ZHcurA0kfPzStRVda+U/B5dSi4WVK/E4ymwMfT7Q6htaXo9PVbsNssQ3rUj+CWC6
+	J4T7+ixTwYqCnWOpT80EOiXmitwcWQMkrXd5+Naz8zVY+JLnW24UbTlHkN5MLc/WUfw/Vc4GszG
+	BIenU86UUTn0EolsQrYT3dUlfmC+tcuG37LW1PyeP8eB
+X-Google-Smtp-Source: AGHT+IEE0ql92Xapw9wLKAOKUtGO9j+8KA94RO/jKP8EfxcqJZ3AEbydlBJnrddqp7jCteCnMnGH7w==
+X-Received: by 2002:a17:902:d4c5:b0:224:76f:9e4a with SMTP id d9443c01a7336-2242889249amr79831735ad.14.1741376125143;
+        Fri, 07 Mar 2025 11:35:25 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-7369820697esm3634589b3a.8.2025.03.07.11.35.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Mar 2025 11:35:24 -0800 (PST)
+Date: Fri, 7 Mar 2025 11:35:23 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	linux-kernel@vger.kernel.org, horms@kernel.org,
+	donald.hunter@gmail.com, michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com, andrew+netdev@lunn.ch,
+	jdamato@fastly.com, xuanzhuo@linux.alibaba.com,
+	almasrymina@google.com, asml.silence@gmail.com, dw@davidwei.uk
+Subject: Re: [PATCH net-next v1 3/4] net: add granular lock for the netdev
+ netlink socket
+Message-ID: <Z8tKe5O7ICE3xK80@mini-arch>
+References: <20250307155725.219009-1-sdf@fomichev.me>
+ <20250307155725.219009-4-sdf@fomichev.me>
+ <20250307095049.39cba053@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250307095049.39cba053@kernel.org>
 
-On March 7, 2025 11:30:08 AM PST, Yury Norov <yury=2Enorov@gmail=2Ecom> wro=
-te:
->On Fri, Mar 07, 2025 at 04:14:34AM -0800, H=2E Peter Anvin wrote:
->> On March 7, 2025 4:13:26 AM PST, Ingo Molnar <mingo@kernel=2Eorg> wrote=
-:
->> >
->> >* Jiri Slaby <jirislaby@kernel=2Eorg> wrote:
->> >
->> >> On 07=2E 03=2E 25, 12:38, Ingo Molnar wrote:
->> >> >=20
->> >> > * Jiri Slaby <jirislaby@kernel=2Eorg> wrote:
->> >> >=20
->> >> > > On 06=2E 03=2E 25, 17:25, Kuan-Wei Chiu wrote:
->> >> > > > Change return type to bool for better clarity=2E Update the ke=
-rnel doc
->> >> > > > comment accordingly, including fixing "@value" to "@val" and a=
-djusting
->> >> > > > examples=2E Also mark the function with __attribute_const__ to=
- allow
->> >> > > > potential compiler optimizations=2E
->> >> > > >=20
->> >> > > > Co-developed-by: Yu-Chun Lin <eleanor15x@gmail=2Ecom>
->> >> > > > Signed-off-by: Yu-Chun Lin <eleanor15x@gmail=2Ecom>
->> >> > > > Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail=2Ecom>
->> >> > > > ---
->> >> > > >    include/linux/bitops=2Eh | 10 +++++-----
->> >> > > >    1 file changed, 5 insertions(+), 5 deletions(-)
->> >> > > >=20
->> >> > > > diff --git a/include/linux/bitops=2Eh b/include/linux/bitops=
-=2Eh
->> >> > > > index c1cb53cf2f0f=2E=2E44e5765b8bec 100644
->> >> > > > --- a/include/linux/bitops=2Eh
->> >> > > > +++ b/include/linux/bitops=2Eh
->> >> > > > @@ -231,26 +231,26 @@ static inline int get_count_order_long(u=
-nsigned long l)
->> >> > > >    /**
->> >> > > >     * parity8 - get the parity of an u8 value
->> >> > > > - * @value: the value to be examined
->> >> > > > + * @val: the value to be examined
->> >> > > >     *
->> >> > > >     * Determine the parity of the u8 argument=2E
->> >> > > >     *
->> >> > > >     * Returns:
->> >> > > > - * 0 for even parity, 1 for odd parity
->> >> > > > + * false for even parity, true for odd parity
->> >> > >=20
->> >> > > This occurs somehow inverted to me=2E When something is in parit=
-y means that
->> >> > > it has equal number of 1s and 0s=2E I=2Ee=2E return true for eve=
-n distribution=2E
->> >> > > Dunno what others think? Or perhaps this should be dubbed odd_pa=
-rity() when
->> >> > > bool is returned? Then you'd return true for odd=2E
->> >> >=20
->> >> > OTOH:
->> >> >=20
->> >> >   - '0' is an even number and is returned for even parity,
->> >> >   - '1' is an odd  number and is returned for odd  parity=2E
->> >>=20
->> >> Yes, that used to make sense for me=2E For bool/true/false, it no lo=
-nger does=2E
->> >> But as I wrote, it might be only me=2E=2E=2E
->> >
->> >No strong opinion on this from me either, I'd guess existing practice=
-=20
->> >with other parity functions should probably control=2E (If a coherent=
-=20
->> >praxis exists=2E)=2E
->> >
->> >Thanks,
->> >
->> >	Ingo
->>=20
->> Instead of "bool" think of it as "bit" and it makes more sense
->
->So, to help people thinking that way we can introduce a corresponding
->type:
->        typedef unsigned _BitInt(1) u1;
->
->It already works for clang, and GCC is going to adopt it with std=3Dc23=
-=2E
->We can make u1 an alias to bool for GCC for a while=2E If you guys like
->it, I can send a patch=2E
->
->For clang it prints quite a nice overflow warning:
->
->tst=2Ec:59:9: warning: implicit conversion from 'int' to 'u1' (aka 'unsig=
-ned _BitInt(1)') changes value from 2 to 0 [-Wconstant-conversion]
->   59 |         u1 r =3D 2;
->      |            ~   ^
->
->Thanks,
->Yury
+On 03/07, Jakub Kicinski wrote:
+> On Fri,  7 Mar 2025 07:57:24 -0800 Stanislav Fomichev wrote:
+> > As we move away from rtnl_lock for queue ops, introduce
+> > per-netdev_nl_sock lock.
+> 
+> What is it protecting?
 
-No, for a whole bunch of reasons=2E
+The 'bindings' field of the netlink socket:
+
+struct netdev_nl_sock {
+       struct mutex lock;
+       struct list_head bindings; <<<
+};
+
+I'm assuming it's totally valid to have several bindings per socket?
+(attached to different rx queues)
 
