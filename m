@@ -1,83 +1,190 @@
-Return-Path: <netdev+bounces-172732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 145C7A55D26
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 02:35:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8102A55D33
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 02:39:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 473D1176275
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 01:35:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F00647A8AC4
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 01:38:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A1E91624EA;
-	Fri,  7 Mar 2025 01:35:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u7S242Jk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E064DDA9;
+	Fri,  7 Mar 2025 01:39:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from HK2PR02CU002.outbound.protection.outlook.com (mail-eastasiaazon11020107.outbound.protection.outlook.com [52.101.128.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E57871624E0;
-	Fri,  7 Mar 2025 01:35:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741311326; cv=none; b=kPhpKd5eB1Um2XJK+LWpU1SFGCRFkFbEZsV3ePO8gaWgvRtajM4XWvFeEvXMVGma2LZw0rjflyG7SNhd5Yngx6TsVBn5iWNRW2CCsLxySGGkj6fytFaxa/DYAff+7Mru6TRhWUQqcjtuMskJUcwarRM1Kp6IgSBlZIqa99k51Q0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741311326; c=relaxed/simple;
-	bh=uoNOKp4tAcKXN9P0cFOznFn6Il+0clSpMIvC18lTfcU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eNV9z15ghWaIzQiTtweH192jt6qK7Q5+g2+hU+vul+ehJyekW2zgdiTKVsN41XPM8g8uSY/AO6DuC/ijdmUfqsSaRFp9hZa742J2nxXE5n8+tBfzYtW25aDeq/wHNFkSW2DNnYwvbX0FZY1gSq9Iqx+CkLwnY3/+dWCXo6fLpCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u7S242Jk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F6A9C4CEE0;
-	Fri,  7 Mar 2025 01:35:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741311325;
-	bh=uoNOKp4tAcKXN9P0cFOznFn6Il+0clSpMIvC18lTfcU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=u7S242JkxA8KBOKnWV4Sm3duhOAmFqc9ZidmSVc7cwK+vNeJPDru9BAHRsqz51OXG
-	 cIbYG+XRn2SSX0NHaRYFTTxVbVl/wNGw+wyNVao8vcdznVjbFzMT8X3UBA0c7MtqLq
-	 LBSAFE8ymKxbrOapdg0nvFa0qwTqbBNogZtSl2tlLQztNY8b5cyUHXHgjPc02SoEw4
-	 Bjz2qLar6uxBsOjmVmDwDy4MobXNDj9G4EWabLiujEGKs1x2xMNNHIPYwbEsvMMN1L
-	 ziQ4tRb8Atrxq+eg6EAIQ3HhSFkP3cUBlbj6yEIcRLoWTe9i97Ufhkw7KuPoWt9M+o
-	 TMjCgOBptaAkQ==
-Date: Thu, 6 Mar 2025 17:35:23 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- andrew+netdev@lunn.ch, michael.chan@broadcom.com,
- pavan.chebbi@broadcom.com, horms@kernel.org, shuah@kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- almasrymina@google.com, asml.silence@gmail.com, willemb@google.com,
- kaiyuanz@google.com, skhawaja@google.com, sdf@fomichev.me,
- gospo@broadcom.com, somnath.kotur@broadcom.com, dw@davidwei.uk
-Subject: Re: [PATCH v2 net 1/6] eth: bnxt: fix truesize for mb-xdp-pass case
-Message-ID: <20250306173523.20b136ea@kernel.org>
-In-Reply-To: <20250306072422.3303386-2-ap420073@gmail.com>
-References: <20250306072422.3303386-1-ap420073@gmail.com>
-	<20250306072422.3303386-2-ap420073@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB366BB5B;
+	Fri,  7 Mar 2025 01:38:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.128.107
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741311542; cv=fail; b=TiTSEdW+M2bl2uyzc6ktphRUkriFQuhs9LLeK7Nhy0vy7SgonDoAG+wcertPmzFTb3qLXEsJ+ojnp6CACFtScw8J0QepRVe2Aau921/6JiJl/z0zfx/yqynSzYkzRNsaylbjHIPeFKBuHUgpNubKAw49YlUUls7yOWNzpJLEE9c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741311542; c=relaxed/simple;
+	bh=OlgnnvVLSrBdYIMfMPZu9/VSgGBE8hfHNG02grXtGco=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W3eqgBwShzMHaQ7SJnZVIbdJKtSWMiFyR7pvr87LMQAG1VxT+YMlD75SYwQIzGkx9N3zU59Bncq7mtthW+fP7gPqSKQu9onaG8nGephFFmCoRMkeO1i/3RfqaTy6fqYtOoikD/fk/cN+2L/ow0MMJjlim5CCtAXVgFyKGFmb7rs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cixtech.com; spf=pass smtp.mailfrom=cixtech.com; arc=fail smtp.client-ip=52.101.128.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cixtech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cixtech.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qGKbCQMhGlGKls5xx+kRW6dLLgnAWyIHvz6ZUQWqg2A2aYo1G/jXLmiYcVjdnZJ+N2hr0ay6+JWxlhM28krlUTY7TKad2eFoNnY+7eirKfy3yaDmbXbslv8OrL2E0jjvlMlI2UjGtxGvjQZaT5mwbNSTy4z9uoz/mDLNNAMFp59ySd5Yz1XCkDNhIHxs6cO9BNV9990h8CUM64dwwOJ01UF60o+PqFtLp8jT0acqPNCWE6TTAO9bUfnLLpRHfavOOYSxgK1JtyQF+ZurBsFACVBFAW3G7rgm8SFj30sf1PNTGhG/PthiUVCrnAuROKrjN2u0NE3JeaGvzcnqmj3Yuw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=i2Wxt2mnFkmkvbXAz0aLM5OWBdfHQFjCuUkO1Fq67wA=;
+ b=OalU62QD9mqi9IifMr1c6wSnuB4EjVQL+LgZSwzHyr93xBX8YZvDlqWni8c1BEBncXOOoB29SJtU4uN+1I+wjnrefCex4BO1TXUBJxQnTRExhz26sY7L+XLFffjxGJzxcqwLmjyPnQljW+78DVx2cAP+4z8ocNOzJV7+Jabx2QSmUGp/pvofb/xixpESY1H/gMvaSH6Sog4cDdr5luw949kKEj6OoQPZPwTOhUQjdaciMSOGrJXjJDnZ1rOQoVY0mI7S4Ni6udN85djKd+9RZ/IuKI2KEZ+38sbkcNGhTv4O3fv07LXUciNjyQwaj/Op6Rs8+BuebDG9pDf+ywKONQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 222.71.101.198) smtp.rcpttodomain=cixtech.com smtp.mailfrom=cixtech.com;
+ dmarc=bestguesspass action=none header.from=cixtech.com; dkim=none (message
+ not signed); arc=none (0)
+Received: from SGBP274CA0022.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b0::34) by
+ JH0PR06MB7032.apcprd06.prod.outlook.com (2603:1096:990:70::10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8511.17; Fri, 7 Mar 2025 01:38:54 +0000
+Received: from SG1PEPF000082E6.apcprd02.prod.outlook.com
+ (2603:1096:4:b0:cafe::8d) by SGBP274CA0022.outlook.office365.com
+ (2603:1096:4:b0::34) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8511.19 via Frontend Transport; Fri,
+ 7 Mar 2025 01:38:54 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 222.71.101.198)
+ smtp.mailfrom=cixtech.com; dkim=none (message not signed)
+ header.d=none;dmarc=bestguesspass action=none header.from=cixtech.com;
+Received-SPF: Pass (protection.outlook.com: domain of cixtech.com designates
+ 222.71.101.198 as permitted sender) receiver=protection.outlook.com;
+ client-ip=222.71.101.198; helo=smtprelay.cixcomputing.com; pr=C
+Received: from smtprelay.cixcomputing.com (222.71.101.198) by
+ SG1PEPF000082E6.mail.protection.outlook.com (10.167.240.9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8511.15 via Frontend Transport; Fri, 7 Mar 2025 01:38:53 +0000
+Received: from [172.16.64.208] (unknown [172.16.64.208])
+	by smtprelay.cixcomputing.com (Postfix) with ESMTPSA id C8AA24160CA0;
+	Fri,  7 Mar 2025 09:38:52 +0800 (CST)
+Message-ID: <79869ce4-c0d5-4b20-ad79-7b6244602d13@cixtech.com>
+Date: Fri, 7 Mar 2025 09:38:52 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] PCI: Add PCI quirk to disable L0s ASPM state for RTL8125
+ 2.5GbE Controller
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: bhelgaas@google.com, cix-kernel-upstream@cixtech.com,
+ linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Peter Chen <peter.chen@cixtech.com>, ChunHao Lin <hau@realtek.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com,
+ netdev@vger.kernel.org
+References: <20250306162842.GA344204@bhelgaas>
+Content-Language: en-US
+From: "hans.zhang" <hans.zhang@cixtech.com>
+In-Reply-To: <20250306162842.GA344204@bhelgaas>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SG1PEPF000082E6:EE_|JH0PR06MB7032:EE_
+X-MS-Office365-Filtering-Correlation-Id: ff3c992f-d846-4ea0-bde4-08dd5d18d1bb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Nk9lT2RDblViU1JKdUs2ZUhEM2FJOGltRmZvQXlBMVQ0QVNnbmVFcVM4RTlK?=
+ =?utf-8?B?QkkxNVlxTDh1aWk1QW05ZXdZQUhmZGZXUXRSRGxmVmNLemVTQUJ0TXNHVnpy?=
+ =?utf-8?B?QU83SG9mRjR6dkpmTWY0aDhZSU9uMjk0c3M2Vmg4aDZVR2JhbXYrazlWY016?=
+ =?utf-8?B?UVkwM0lMR29PTUpMTFcxdnNYeVduV2lObmlsdzRBWFVnMnl6bmI2TTZzMnB3?=
+ =?utf-8?B?OFJ3M0lKVmlYS2prdGFMaThYWFdJNDU2U2pUV0dyY2hNbjY3dEhoSTVBTXFi?=
+ =?utf-8?B?akxTeFQ3eEwvdjNzUjZ4UFhJRWlXcFMzTk91ay9odDViSDQxNFFoUjZJQURw?=
+ =?utf-8?B?aS9mL3pZR3pBRGJscmg3WkNQUVVYNWpncTQ1WmlFVzNldU91eWtlaXk3SEtp?=
+ =?utf-8?B?RXFVZHdLS3l3eCtSNTFZYi8wbkNaOTNlaVhjYXB0NFE0dzRqbGN3ejJzb3dP?=
+ =?utf-8?B?OU80V1dpYk1ndGd5ZWdNOStQdTVoeDJwdGdEUDU1YTVlUzNOaFk3anp0ajBN?=
+ =?utf-8?B?S3JwRnVsNkF0L0tscnlhbTZ2TEJ2eHB2NVVJWVRrWEF1eGR0Z3FsenNaM2pJ?=
+ =?utf-8?B?VjdySTB0V015WklMNDIvWEFzeG5COHlXMWFibVpnRjdlbmY2ZEh0VkxwcUM5?=
+ =?utf-8?B?QXBZSnNPbG9LNjRGYStQY0ZjVTM4WTMwbHJKWVRHK3RnbXk0UzRrUzUzQmc2?=
+ =?utf-8?B?dmNYT3hlWnhLclE5MWduNkpBL2NGUmpRZDk2c2lPbmZ2cEtlMDlYT2I3cDkx?=
+ =?utf-8?B?WW5Vc2psV21vVktXeXlpU0gwcEFkWWZhdW15S2YyRkVwS1BhbWlDSVJtVnlE?=
+ =?utf-8?B?NVpNb2s4WnVLMHJjQlYxUkVZMnZYbDNYK29XTjZ1eWQyMTU0VU1OZVNRZjMz?=
+ =?utf-8?B?UTc5M0piZHVoY1M0MitSUDhLTUJZQ24rK3QyaEM2NlBxc2QyV0Ztb1E2Vk5N?=
+ =?utf-8?B?dzdPbURnbEtIV0JaT2ZhWVRvZnJkb0hHNTdDQkZIc01tWkl0WTJyQ1crWFpv?=
+ =?utf-8?B?am5TOWNNdXRwSWpzWXF3bE1kOWFyanl0bU05MVB2RnkxMGI0Rk5aY016NEls?=
+ =?utf-8?B?R2F2QUFjZm1McllZcWVrMVZUdloxMUhWdUdGdEVwemYwYVNGZVVWZnM1SVdk?=
+ =?utf-8?B?VFFFTXlZL2tGRkk3T0JreWlCV0hrcGJFYS9uc3FsdTN4QUlSRzFuS3h4UGJk?=
+ =?utf-8?B?YWQ5ZFFVSmxzRFNvMWd2cGQrZW9rbG8rcnNrdmg2Q0IxK1ZJcjZzZms2aXQ2?=
+ =?utf-8?B?cUhhU0EyWW53bFVIUTZvQ3hjc1ErVlRoL3gvMDBXc0VWYnBCNTF2R3BXbXRW?=
+ =?utf-8?B?UEkvNGR0WVdWT1JuVk03dFRwaEtvNkJjOHczcVlhTFlZY2tlWG03NklFWnJC?=
+ =?utf-8?B?TzZwQ1JwaE9pOURHVExRZDJrdkJGeWNsUFdJWlFlaEloSmdTQzFFOW1lQ05o?=
+ =?utf-8?B?WHRWK2wrMGJEaStDdkRjbTZtUG5wZjFYaFZpUHZPTkZhaVphZlpvMVpFVUEv?=
+ =?utf-8?B?STl3eDhpOVQwRUYxUGN1T3lQWU0yaWlkL3kyZUxZTDhXcGRqSjJENlBlY0lP?=
+ =?utf-8?B?RHlXQXUwdjI2c2xrNmh6VFZMdHcvRFRaVVE1NFVWUXhnUnQwSE5tYnBaQmRD?=
+ =?utf-8?B?bTBhU01ManhKTmtEbU5BdGlObVJkNWRqUHpQYjFrWTNsaXpWRFVpeVppS05i?=
+ =?utf-8?B?dUtKNnBjdzhFbHlGTFJVSmFTTWtWbi9tZjZORGRFOXNvbXdZVCtSR2l0bG5v?=
+ =?utf-8?B?MXdicHUwMHdrRFk4NjZSZEc0MlpYdXo2ZUZOUkszMldVMEdiVmFwVDlXMk9K?=
+ =?utf-8?B?V1ZFTlozY0MyUE95QUl3OG9JSHN0OVlNYU85MTg3U2svL2tmWmZicHN2QkE2?=
+ =?utf-8?B?T1E1Skg4MUdxVnUzNkE0VGlteFhYdTNRN2Jlbm9xY3VPVzN6MGNRM3FreGNy?=
+ =?utf-8?Q?LNQUyKcJXZQ=3D?=
+X-Forefront-Antispam-Report:
+	CIP:222.71.101.198;CTRY:CN;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:smtprelay.cixcomputing.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014)(7053199007);DIR:OUT;SFP:1102;
+X-OriginatorOrg: cixtech.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Mar 2025 01:38:53.4099
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ff3c992f-d846-4ea0-bde4-08dd5d18d1bb
+X-MS-Exchange-CrossTenant-Id: 0409f77a-e53d-4d23-943e-ccade7cb4811
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=0409f77a-e53d-4d23-943e-ccade7cb4811;Ip=[222.71.101.198];Helo=[smtprelay.cixcomputing.com]
+X-MS-Exchange-CrossTenant-AuthSource: SG1PEPF000082E6.apcprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: JH0PR06MB7032
 
-On Thu,  6 Mar 2025 07:24:17 +0000 Taehee Yoo wrote:
-> +	struct skb_shared_info sinfo = {0};
 
-> +		memcpy(&sinfo, xdp_get_shared_info_from_buff(&xdp),
-> +		       sizeof(struct skb_shared_info));
 
-This may be a little expensive, struct skb_shared_info
-is 320B and we only really need it in a rare occasion
-of having multi-buf XDP.
+On 2025/3/7 00:28, Bjorn Helgaas wrote:
+> [Some people who received this message don't often get email from helgaas@kernel.org. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
+> 
+> EXTERNAL EMAIL
+> 
+> On Thu, Mar 06, 2025 at 11:32:04AM +0800, hans.zhang wrote:
+>> On 2025/3/6 06:20, Bjorn Helgaas wrote:
+>>> Sounds like this should be a documented erratum.  Realtek folks?  Or
+>>> maybe an erratum on the other end of the link, which looks like a CIX
+>>> Root Port:
+>>>
+>>>     https://admin.pci-ids.ucw.cz/read/PC/1f6c/0001
+>>
+>> Name: CIX P1 CD8180 PCI Express Root Port
+>>
+>> 0000:90:00.0 PCI bridge [0604]: Device [1f6c:0001]
+>> 0001:60:00.0 PCI bridge [0604]: Device [1f6c:0001]
+>> 0002:00:00.0 PCI bridge [0604]: Device [1f6c:0001]
+>> 0003:30:00.0 PCI bridge [0604]: Device [1f6c:0001]
+>>
+>>
+>> This URL does not appear right, how should be changed, is it you? Or can you
+>> tell me who I should call to change it?
+>>
+>> The correct answer is:
+>> 0000:90:00.0 PCI bridge [0604]: Device [1f6c:0001]
+>> 0001:C0:00.0 PCI bridge [0604]: Device [1f6c:0001]
+>> 0002:60:00.0 PCI bridge [0604]: Device [1f6c:0001]
+>> 0003:30:00.0 PCI bridge [0604]: Device [1f6c:0001]
+>> 0004:00:00.0 PCI bridge [0604]: Device [1f6c:0001]
+> 
+> This part of the web page is just commentary.  In this case it's just
+> an example of what devices might be on some system.  It's not a
+> requirement that all systems have this many devices or devices at
+> these addresses.
+> 
+> The only important parts are the Vendor ID, Device ID, and the name
+> ("CIX P1 CD8180 PCI Express Root Port").  If those are correct, no
+> need to do anything.
 
-Can we update agg_bufs = sinfo->nr_frags after calling 
-bnxt_rx_xdp(), and otherwise go back to something like you v1?
-Sorry if I mislead you.
--- 
-pw-bot: cr
+I see. Thank you very much Bjorn.
+
+Best regards,
+Hans
+
 
