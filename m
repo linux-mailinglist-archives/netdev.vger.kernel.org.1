@@ -1,103 +1,62 @@
-Return-Path: <netdev+bounces-173096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D56B3A572CB
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 21:11:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0DA6A572D1
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 21:13:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C28F3B84E5
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 20:11:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 405F3189B8A4
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 20:13:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 694D32566EE;
-	Fri,  7 Mar 2025 20:11:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33BA12500CE;
+	Fri,  7 Mar 2025 20:13:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="CfSYRyIR"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cRi42CuO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f227.google.com (mail-yb1-f227.google.com [209.85.219.227])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C12B2561C7
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 20:11:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1F121A5B8C
+	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 20:13:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741378282; cv=none; b=u8VtUgcOmB0VI3lRnM2xetCaRR/1EzV1F+Ku+jFLSXknVIbnIkEOQrGLKGApaeKuqQ0otL/efxWv0qpJcSh/SL/7y59ZL2mtwpdjjY5ezz71w5a232+QfsT1yhP/x8lICV9gLBdlY0OaGBI3+B7wEC7xf+CqUGjPaGAaWegjq4k=
+	t=1741378387; cv=none; b=g/Y0R+LnCS4dRQIy/InfqwEmzGautXnWHMRcHrAOfvdrGOBQI67uB4ft/qBQsncIj56stoxnFh7EtXx+YpzFxKgJmZuY32UXTZvsR5Vk94rbA+7/2WHy7TkfdfKukysKLP3FEqlcc/XeqlPEF/FtkCvYCJrQLofeF3tHhDxEkFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741378282; c=relaxed/simple;
-	bh=XnokswpRVUawxvrh0+H2EO37FE3w3hGAjLgWW05bx5c=;
+	s=arc-20240116; t=1741378387; c=relaxed/simple;
+	bh=i4tXWbK2Su3es/UUrOMUUWCh7h0iXBpxDBqUtqDrJ+Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FVboDl7z2PiJeTUslNelTvEFnYuiNCPCn/qs80cMk+otrxcCjscaxHit9Am/zOxQb+Gnp/mvqLOTvxeX8nJyxLMBWTTiZSJ2qhAzkgJA2q5O8SRrhRNqp2vb0IwCLfFsd2INL5ZcQh4HcZGvHeLY94lUuPgr84KMV5w3xH+Uo1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=CfSYRyIR; arc=none smtp.client-ip=209.85.219.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-yb1-f227.google.com with SMTP id 3f1490d57ef6-e5ad75ca787so1961165276.0
-        for <netdev@vger.kernel.org>; Fri, 07 Mar 2025 12:11:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1741378279; x=1741983079; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XnokswpRVUawxvrh0+H2EO37FE3w3hGAjLgWW05bx5c=;
-        b=CfSYRyIRM0jvy6C5rlcEtYOXSsnlv7OSvkQwANLjzG2JXhoMm29V4p54eVVBQaje+J
-         fWjH37Oz3gCjbNIjGSRJDd58FFpgoTDu4qHV0L/RSIeIm5t50TJc7cj8na9T0Js1Wx/J
-         WtGmHs0cgm5U8BMk1qViLwLSPXK3GwdvDgVDX3krXqKGT6Y0eP+Er1BZoBVCG6zajfT0
-         IfFmQE8wEa5aBolFsh6lsZbzpq8YMdrRelsbbiCep5cpxj1AIOdCVkld3PupzTZ4EYnO
-         in26eGJxEloLkalZNdVzOEeZtjcFo4jpIQbpDpfO3IE1KSw0IGC/rym+0ZZLVNwj9SPP
-         /QPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741378279; x=1741983079;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XnokswpRVUawxvrh0+H2EO37FE3w3hGAjLgWW05bx5c=;
-        b=DORekoXIbYHPyj1g9HBeS3r/e5Oh/WBukp/fbm+vb4qhZNxkPPZ+G+b77V3xS9nUme
-         YFU+SGaMDHcEL0DIURF0At8ciC3YJW7qeeDXCPA2cBdj6vBCBckdjRzHg7TPeEEd/Udy
-         SPhCKe9sFJaCyS9QxVA9aRxWIGoFxmaVo8fBQNbxumzVfmygPKVXt/OgJUUFMnMLOAJw
-         Y0f6CifjAYKqBw8OISwwUgIugen3IW/02NSgEx3n/9Wi1QatQX2373jMNQ9L5IkwMFVz
-         m41mQ0/0ihgsRMYIgc8IuJO6/+DSfd0puB0Ru6bFdz+IBTH5hfMhTKXVivABXRbF1XnU
-         bKxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWUIAYdE4cuvRsXkrGq++0VkyfndDMFvdlGe1Trlc6mpB8exB5MGd9U3TqAfjNC6yFTren6S1M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzr6aRfcaqP1dwKlnYFnwYksXdx0hMvERIcRE2GA2dlSTbmJa7m
-	BfN7gmi6pOsbILHXE0OtTjXl1/AXH8jKoKST39O4McuXeZYuHtLdOzK5LUncy+SkAo3cOllHAGx
-	7t2M2QwS4sDsFrfYdvT0GKMR1rdiWkvcH
-X-Gm-Gg: ASbGncvpTC5oS+5iyVfh2F1XGWUcCBRsGb7XAOt0I1poANcVaf45o8Ea2NTYFDazLyf
-	rZiqqP18Ihn0l27NiQgpTZexpi9knLgPuxk7WgRcwoNKnH1pnUqSF7jf1kFbHv1Ez71odQtc5NP
-	m67cqQUzpG8pgc9vvwY+Uu9fiM+SpW45FduU8TPZfjeUAT9OjhVgKbeGoEOWVxvNIgFcj7PbVKF
-	I2omZz9U6axS5WWeLlWen5II2dWbzdMXCAwCOEk7IuZfmeRz+YV/RCsAJH3E+MA5MUjjZyFOuNH
-	b3aiSN8KLcK1gG6gqIrLUsh2Vjg56Kt4gWUnjn305gVfaloSKw==
-X-Google-Smtp-Source: AGHT+IFVIC1dPB2oQzuEy2i1L1p+CBm3CNBs2IFDf0LbWaFMmjn30sMZygpeRyebFOscyIQ6uTQhXSytdw3F
-X-Received: by 2002:a05:6902:18c5:b0:e63:3e25:d71a with SMTP id 3f1490d57ef6-e636f7e8b1cmr1236822276.15.1741378279189;
-        Fri, 07 Mar 2025 12:11:19 -0800 (PST)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.129])
-        by smtp-relay.gmail.com with ESMTPS id 3f1490d57ef6-e636dfd2009sm42439276.12.2025.03.07.12.11.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Mar 2025 12:11:19 -0800 (PST)
-X-Relaying-Domain: purestorage.com
-Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 4B339340245;
-	Fri,  7 Mar 2025 13:11:18 -0700 (MST)
-Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id 3F0D3E56FE8; Fri,  7 Mar 2025 13:11:18 -0700 (MST)
-Date: Fri, 7 Mar 2025 13:11:18 -0700
-From: Uday Shankar <ushankar@purestorage.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next v5 2/2] netconsole: allow selection of egress
- interface via MAC address
-Message-ID: <Z8tS5t+warQdwFTs@dev-ushankar.dev.purestorage.com>
-References: <20250220-netconsole-v5-0-4aeafa71debf@purestorage.com>
- <20250220-netconsole-v5-2-4aeafa71debf@purestorage.com>
- <20250225144035.GY1615191@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nCMWtA2rt8uA0rfhavnW57YSLFHiIDW4F7o+eOXRA1AJTWwLDBrdVriXA/6uZcse48FPdOJfsumFAvD/19D6muejP2PmTn81LzwztIptXBHi+sAx43Jcos7ENF+uHSc39ZEyHg/nYpNFG1QaxS/VEGpb/sb2mIroqyCdC8sq42g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cRi42CuO; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Fri, 7 Mar 2025 12:12:55 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1741378381;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YljDuPqUyrSKj1qY6CTlyxawJAoX4glZcEt/JKL20jE=;
+	b=cRi42CuORB2PT/6TuaBDeboPqIk1v1v+grz2MHaj4U6p5d4n8CFV1S3qgY+8frY05pdVhN
+	Sf+vXMzBmP1jsidnwGDqehrbtzS0KMNx1xt2mwVMeA66NIUE6gUdCdO6BVtVI5ufuf4mPQ
+	JU/fYuTQ/0fd6LbVAuRTsa/vx0qT6mc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Andrew Morton <akpm@linux-foundation.org>, 
+	JP Kobryn <inwardvessel@gmail.com>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
+	Muchun Song <muchun.song@linux.dev>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-mm@kvack.org, 
+	cgroups@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Meta kernel team <kernel-team@meta.com>
+Subject: Re: [RFC PATCH] memcg: net: improve charging of incoming network
+ traffic
+Message-ID: <dpnv6luzeby3wni3jlcv2utgx4ozfp5zl3zfnhn2shv3q4iejz@sbex7f6azcpc>
+References: <20250307055936.3988572-1-shakeel.butt@linux.dev>
+ <Z8tMB4i_hBLaSZS1@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -106,13 +65,85 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250225144035.GY1615191@kernel.org>
+In-Reply-To: <Z8tMB4i_hBLaSZS1@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Feb 25, 2025 at 02:40:35PM +0000, Simon Horman wrote:
-> Reviewed-by: Simon Horman <horms@kernel.org>
+On Fri, Mar 07, 2025 at 07:41:59PM +0000, Yosry Ahmed wrote:
+> On Thu, Mar 06, 2025 at 09:59:36PM -0800, Shakeel Butt wrote:
+> > Memory cgroup accounting is expensive and to reduce the cost, the kernel
+> > maintains per-cpu charge cache for a single memcg. So, if a charge
+> > request comes for a different memcg, the kernel will flush the old
+> > memcg's charge cache and then charge the newer memcg a fixed amount (64
+> > pages), subtracts the charge request amount and stores the remaining in
+> > the per-cpu charge cache for the newer memcg.
+> > 
+> > This mechanism is based on the assumption that the kernel, for locality,
+> > keep a process on a CPU for long period of time and most of the charge
+> > requests from that process will be served by that CPU's local charge
+> > cache.
+> > 
+> > However this assumption breaks down for incoming network traffic in a
+> > multi-tenant machine. We are in the process of running multiple
+> > workloads on a single machine and if such workloads are network heavy,
+> > we are seeing very high network memory accounting cost. We have observed
+> > multiple CPUs spending almost 100% of their time in net_rx_action and
+> > almost all of that time is spent in memcg accounting of the network
+> > traffic.
+> > 
+> > More precisely, net_rx_action is serving packets from multiple workloads
+> > and is observing/serving mix of packets of these workloads. The memcg
+> > switch of per-cpu cache is very expensive and we are observing a lot of
+> > memcg switches on the machine. Almost all the time is being spent on
+> > charging new memcg and flushing older memcg cache. So, definitely we
+> > need per-cpu cache that support multiple memcgs for this scenario.
+> 
+> We've internally faced a different situation on machines with a large
+> number of CPUs where the mod_memcg_state(MEMCG_SOCK) call in
+> mem_cgroup_[un]charge_skmem() causes latency due to high contention on
+> the atomic update in memcg_rstat_updated().
 
-Hey, since this has gotten quiet for a while, just wanted to confirm
-that there's no action needed from my end? Is this in the queue for
-net-next?
+Interesting. At Meta, we are not seeing the latency issue due to
+memcg_rstat_updated() but it is one of most expensive function in our
+fleet and optimizing it is in our plan.
+
+> 
+> In this case, networking performs a lot of charge/uncharge operations,
+> but because we count the absolute magnitude updates in
+> memcg_rstat_updated(), we reach the threshold quickly. In practice, a
+> lot of these updates cancel each other out so the net change in the
+> stats may not be that large.
+> 
+> However, not using the absolute value of the updates could cause stat
+> updates of irrelevant stats with opposite polarity to cancel out,
+> potentially delaying stat updates.
+> 
+> I wonder if we can leverage the batching introduced here to fix this
+> problem as well. For example, if the charging in
+> mem_cgroup_[un]charge_skmem() is satisfied from this catch, can we avoid
+> mod_memcg_state() and only update the stats once at the end of batching?
+> 
+> IIUC the current implementation only covers the RX path, so it will
+> reduce the number of calls to mod_memcg_state(), but it won't prevent
+> charge/uncharge operations from raising the update counter
+> unnecessarily. I wonder if the scope of the batching could be increased
+> so that both TX and RX use the same cache, and charge/uncharge
+> operations cancel out completely in terms of stat updates.
+> 
+> WDYT?
+
+JP (CCed) is currently working on collecting data from our fleet to find
+the hotest memcg stats i.e. with the most updates. I think the early
+data show MEMCG_SOCK and MEMCG_KMEM are among the hot ones. JP has
+couple of ideas to improve the situation here which he will experiment
+with and share in due time.
+
+Regarding batching for TX and RX, my intention is to keep the charge
+batching general purpose but I think the batching the MEMCG_SOCK for
+networking with a scoping API can be done and seems like a good idea. I
+will do that in the followup.
+
+Thanks for taking a look.
+
+
 
 
