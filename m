@@ -1,82 +1,100 @@
-Return-Path: <netdev+bounces-172930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 555BBA5686E
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 14:04:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA4A3A56897
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 14:14:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA3061884EC3
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 13:04:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA58F188ACE0
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 13:14:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACE7421766A;
-	Fri,  7 Mar 2025 13:04:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB506219A97;
+	Fri,  7 Mar 2025 13:13:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HjLGnbC/"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="N+/gt2Ef"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87FB220968E
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 13:04:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F094A218E85;
+	Fri,  7 Mar 2025 13:13:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741352677; cv=none; b=a9ouPmC9h1933abjNeitNRgvoIGpjtvEWLwLee1lu3REEqMt2tkggWKN5xKR/8VTgUYDOl6JTuLTeyAeGPg33a5F/CRfRShG8YVyb/JJO0MKsP4IbGrzj9rNu/wTsmjmhfqQwSyNg76HEz8LVMH4AAc13reLbk6KH7JQQLvNng4=
+	t=1741353229; cv=none; b=Y9C/8Fk9srueWwzq3z/uIfZAxq5Qs1pd2+1i8KvcsiHPAo7WU9OdZJBnNhGR981NZ+2HcQ/c5CpGAkZUKFpWYfv4QzMnGYHgoF9/LrsuDZhsA1+UhN8QRKXZS/INNBJaNrIOwF0aYYGS4EmmvznYNdvevnnZvzYRSf6hdeCHmfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741352677; c=relaxed/simple;
-	bh=zwdH5kjc0pp6WgGw7ooJgwfJ9cZrFa4Qa7IBZJ+FcWA=;
+	s=arc-20240116; t=1741353229; c=relaxed/simple;
+	bh=GVX/45xtoMq3BlHwGdtCnLfwLJW456/WdNqXEQIstCA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jBR1dwQLTHzppmOfyyQ2ByJzVrUUL/ysZo79/hWMXj1FhD8J5V/DNL164+n2M5aEckcc3xg90P37rLJzEUsTpPZimjpeCsvclqKFw7H/cp3b9yp99WS6VeWBO2LQbqSEHbNpWKmkuzgMJNMKBm8RqysKKMAfZsgrougJoXtAP5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HjLGnbC/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED3DBC4CED1;
-	Fri,  7 Mar 2025 13:04:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741352677;
-	bh=zwdH5kjc0pp6WgGw7ooJgwfJ9cZrFa4Qa7IBZJ+FcWA=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kwo+UCaSErgv1QJ1IoA2v2MIulHZad34OrBAUEuGe92662nrURcSZDTG/KiRtYtVgJDHRTAt9sqDazN+sGsIPKjemPFGXaSnd94wuGEVcKNcrnNeug1X+FvhfnJHA7tuZvYkjJYVoI5DlGteXOapkB5QeQ8YcyGsffLOnJF5Lt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=N+/gt2Ef; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 9B1C040E0214;
+	Fri,  7 Mar 2025 13:13:41 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id qNpdm8wJqPa1; Fri,  7 Mar 2025 13:13:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1741353217; bh=/r1xSvLh1EfmzW0LJsVKSKXPjNjN3VjMBRhfKjjEkBg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HjLGnbC/8F8MuJbDB9cMtyneOj8/xFDB5Lw4mKlw90yvx+CMgX06/HqaLQwYt+zVl
-	 tdfXKKw/g6LElRLiphrDjk6jlxqvhQLS9R5av4tZaI+/Csv/JtpIkIMmAVlyvlIG9W
-	 KPac9xnJuXcmFWHUaHG52h2AjeeN8qY3iFW2MXOSXJB+RNdK6vyrKwmjdXI2/60tMD
-	 /a7ip0nG5Pq+GzpfucyihJroBWuifVSDw/Q4EWjgQna2/0/EHqxlUdJo1JmQB4xkKu
-	 6LQrX1KzJXGyQIymX4292SVyifXZdxS6BA8ZdTuOH6HG0FKSpRxpStnpVttDWopWyg
-	 89hJnvxEGL8/w==
-Date: Fri, 7 Mar 2025 13:04:32 +0000
-From: Simon Horman <horms@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Dan Carpenter <dan.carpenter@linaro.org>
-Subject: Re: [PATCH net-next] net: airoha: Fix dev->dsa_ptr check in
- airoha_get_dsa_tag()
-Message-ID: <20250307130432.GF3666230@kernel.org>
-References: <20250306-airoha-flowtable-fixes-v1-1-68d3c1296cdd@kernel.org>
+	b=N+/gt2Ef6+XmGHCgSvW74E76Y14WGuI5srhiUvzspjp0p2YFjo0ba/ztVgnHLeHCK
+	 uSHK6/7ShuXhDMabuGml/Yh6iL2ebfpYQOn15lPH+0BiAuimcqQtTh02uoL11B5e/z
+	 mZNYjgDtGkEZyZZJHOu5EH5f5V/Ec7YCG5uA/nHEXkqOqakqY1NUAuaiCAFFLH7tuQ
+	 ycBvym/B4eoue1+nuPlhJQO88LSJz+z5xaUpbWo8Uept7iSiFR8M6nQXqE/QBIGZnw
+	 hD0du8+6c+F36ONDuHXs7PRg4lc2HfZy34Ga8ZCllfvsj+ozHTucSY/MqM08xY/aIu
+	 e3TGqzq//5bdP1hMgCiDZJV+5luabvM26Wd/w9T6TjjBcMyabTcFA/Bt47mgateO5E
+	 OEcFgnMYQ2T6rMz/mkRoSc7J3ihvjwOZUcwRYuFoTsRdq/YHmf4PFMY0klnTpdhQHf
+	 HLR7TOUiIejSKS9gy7BsNvCMLDiE7jLeIYkwKEVTmbFEWa/9OGeObL/88BU96wV+s9
+	 QICEHy67N0xqNJUUeEraS6ZWnD6Umt5uF8Jb7tg6crbEWZbpa5dDswcts79FCxMRub
+	 1GkN0aWIW82URj05Sc9pLE3ogOeDnICShm+gZy2mHyTvxLemVJyztpMrYPXRF0FSdx
+	 X6NXB7VP8jXBOrCrLHf+xEZA=
+Received: from zn.tnic (pd95303ce.dip0.t-ipconnect.de [217.83.3.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 830A040E0213;
+	Fri,  7 Mar 2025 13:13:25 +0000 (UTC)
+Date: Fri, 7 Mar 2025 14:13:19 +0100
+From: Borislav Petkov <bp@alien8.de>
+To: Ryo Takakura <ryotkkr98@gmail.com>
+Cc: peterz@infradead.org, boqun.feng@gmail.com, davem@davemloft.net,
+	edumazet@google.com, horms@kernel.org, kuba@kernel.org,
+	kuniyu@amazon.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com, x86@kernel.org
+Subject: Re: request_irq() with local bh disabled
+Message-ID: <20250307131319.GBZ8rw74dL4xQXxW-O@fat_crate.local>
+References: <20250307115550.GAZ8rexkba5ryV3zk0@fat_crate.local>
+ <20250307125851.54493-1-ryotkkr98@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250306-airoha-flowtable-fixes-v1-1-68d3c1296cdd@kernel.org>
+In-Reply-To: <20250307125851.54493-1-ryotkkr98@gmail.com>
 
-On Thu, Mar 06, 2025 at 11:52:20AM +0100, Lorenzo Bianconi wrote:
-> Fix the following warning reported by Smatch static checker in
-> airoha_get_dsa_tag routine:
-> 
-> drivers/net/ethernet/airoha/airoha_eth.c:1722 airoha_get_dsa_tag()
-> warn: 'dp' isn't an ERR_PTR
-> 
-> dev->dsa_ptr can't be set to an error pointer, it can just be NULL.
-> Remove this check since it is already performed in netdev_uses_dsa().
-> 
-> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> Closes: https://lore.kernel.org/netdev/Z8l3E0lGOcrel07C@lore-desk/T/#m54adc113fcdd8c5e6c5f65ffd60d8e8b1d483d90
-> Fixes: af3cf757d5c9 ("net: airoha: Move DSA tag in DMA descriptor")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+On Fri, Mar 07, 2025 at 09:58:51PM +0900, Ryo Takakura wrote:
+> I'm so sorry that the commit caused this problem...
+> Please let me know if there is anything that I should do.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+It is gone from the tip tree so you can take your time and try to do it right.
+
+Peter and/or I could help you reproduce the issue and try to figure out what
+needs to change there.
+
+HTH.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
