@@ -1,146 +1,353 @@
-Return-Path: <netdev+bounces-172794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09408A56092
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 07:02:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F20CA5608D
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 06:59:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5D3A3B2149
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 06:02:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81081189671F
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 05:59:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16DB718DB3A;
-	Fri,  7 Mar 2025 06:02:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA0BB19992C;
+	Fri,  7 Mar 2025 05:59:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hz9wN5iY"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Y23GtGUH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2048B1624F8
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 06:02:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F25F1990C4
+	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 05:59:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741327335; cv=none; b=gIgZB3jWbnQWOrhZ8mqVfxON2DyFsZ4SbIqZ81OJOT9M8x4pxzrrCMg6cV6r7ulmqnE+g82RKdgaK1bVL0D/3uNltuhTzjzYX/3j7DzjLdnCFO2cdrIdLZe78Nm4jqQxPuAXdxUpZiDff83YTXzlLymgNgHGx5jQPor2oa6bgaU=
+	t=1741327185; cv=none; b=mfNkL2CW0F0ER92DWyve6mTuwSU5xKGpCnUIilqc6Uqxb5BCQ0or2dUB8DwoOOazJucUTwQEXrVAAoJ8Zf29GMrcC2yGhMsLEwRb0/kA/Cp0lV+xJ0S35yGfqLtq3y9H82gcAAL35YzndlPI48BzC4i/GsyFN5G3O08i32tJb28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741327335; c=relaxed/simple;
-	bh=ssS2yLuyvtoLCM/MENPJQ5W4+oovXZms8MTFYP3JgBI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V9olYZxr5CQPhwoJ8vfvSHn2JCWW4DQSgwnt5cxln9sD5lBarVXLQJt0fHxyZ1b6PlhHcLGRY1rmBoWKI5vYc4QLSKO5d0Wj/8aOtgy9E18JW06V2hQU8xoQqWIHiax52DR3PJqzxkGzvvwXaXoeDA5FrgR5nWq4ETVlzYVzogw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hz9wN5iY; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741327333; x=1772863333;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ssS2yLuyvtoLCM/MENPJQ5W4+oovXZms8MTFYP3JgBI=;
-  b=hz9wN5iYTTtDCnyzDaOxm+IO6xpF/7Nox884t7z3BIYe/oMyLNXpzpYy
-   3bdRpBklFJtanVhmPrDsOnedqJZH3/RQzBvxnTi0A4jt4OGeAS5h1oOQb
-   unVebAo6Eda+WQIKVqwnMlvyAHzl06Z9F7ozAwBWR0TPFGo5RqFW7j85D
-   fWLiwfeo/6nTmzsLRgyXsOUNDxwu94RlL932LwRvvLsICvnVPQX6CfC/m
-   /mMTskRHkN0KP//ymPHPDmgi2SUoVtzjxwdRGb0Ia41gRFJjx+XpIJXi0
-   7jSTk6wDI/23cyPfYiJhqUoK1ebR/VVMtpAs915e4fExYo2z7MZevgTw0
-   A==;
-X-CSE-ConnectionGUID: G83hnTAKSh6VR8U1oXO63A==
-X-CSE-MsgGUID: t2Lb8ndqSl6YuYKePVQh+Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="59773283"
-X-IronPort-AV: E=Sophos;i="6.14,228,1736841600"; 
-   d="scan'208";a="59773283"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2025 22:02:12 -0800
-X-CSE-ConnectionGUID: +Qv+ViwPSiqObnDp32HgIg==
-X-CSE-MsgGUID: Kdz37tCaRWaUHQp3t9pPYw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="150181763"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2025 22:02:09 -0800
-Date: Fri, 7 Mar 2025 06:58:21 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Emil Tantilov <emil.s.tantilov@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	decot@google.com, willemb@google.com, anthony.l.nguyen@intel.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, madhu.chittim@intel.com,
-	Aleksandr.Loktionov@intel.com, yuma@redhat.com, mschmidt@redhat.com
-Subject: Re: [PATCH iwl-net] idpf: fix adapter NULL pointer dereference on
- reboot
-Message-ID: <Z8qK/Z/8lYtdR2UM@mev-dev.igk.intel.com>
-References: <20250307003956.22018-1-emil.s.tantilov@intel.com>
+	s=arc-20240116; t=1741327185; c=relaxed/simple;
+	bh=wwmac+s+ESlIyXNfnNVtMPr0GhgEwFZOhY1IMJmPMZQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fcb8kCx5wUi1cHXYALydCoZv4sIDgPEtDVreFWTyhVVWrhRWxm1OhV1sx40ywzIigYX1xIFXPcvRISpR+ogZyllNLXGALmB4EWbKCuEqOk2B3jvSaEcNi//iYd4AT7pzVB++9nunp9yo6Hfsw8GYSI9QXzdovCMaFGQAJwHgw9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Y23GtGUH; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1741327181;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=7I8JlXAk7XOW8Ec0KDXoqsOGAqhiP+woZaSK8OFzW+A=;
+	b=Y23GtGUH7snKv5PLNOK1WbMqZLI09sdw345e87VF5yfzvB/zAhflbUQmQTPf8N2U71HX42
+	9iJ6OfxCBiKqGj8MEFCfnZc1JK4oC8B6AgkVL4L3HLXDrcT8fwDx3t+wBPGe8HsbMpY1Ot
+	ecJDGe8A2vtpgskccGCGs0JM/0SsYNM=
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Johannes Weiner <hannes@cmpxchg.org>,
+	Michal Hocko <mhocko@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Muchun Song <muchun.song@linux.dev>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-mm@kvack.org,
+	cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Meta kernel team <kernel-team@meta.com>
+Subject: [RFC PATCH] memcg: net: improve charging of incoming network traffic
+Date: Thu,  6 Mar 2025 21:59:36 -0800
+Message-ID: <20250307055936.3988572-1-shakeel.butt@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250307003956.22018-1-emil.s.tantilov@intel.com>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Mar 06, 2025 at 04:39:56PM -0800, Emil Tantilov wrote:
-> Driver calls idpf_remove() from idpf_shutdown(), which can end up
-> calling idpf_remove() again when disabling SRIOV.
-> 
+Memory cgroup accounting is expensive and to reduce the cost, the kernel
+maintains per-cpu charge cache for a single memcg. So, if a charge
+request comes for a different memcg, the kernel will flush the old
+memcg's charge cache and then charge the newer memcg a fixed amount (64
+pages), subtracts the charge request amount and stores the remaining in
+the per-cpu charge cache for the newer memcg.
 
-The same is done in other drivers (ice, iavf). Why here it is a problem?
-I am asking because heaving one function to remove is pretty handy.
-Maybe the problem can be fixed by some changes in idpf_remove() instead?
+This mechanism is based on the assumption that the kernel, for locality,
+keep a process on a CPU for long period of time and most of the charge
+requests from that process will be served by that CPU's local charge
+cache.
 
-> echo 1 > /sys/class/net/<netif>/device/sriov_numvfs
-> reboot
-> 
-> BUG: kernel NULL pointer dereference, address: 0000000000000020
-> ...
-> RIP: 0010:idpf_remove+0x22/0x1f0 [idpf]
-> ...
-> ? idpf_remove+0x22/0x1f0 [idpf]
-> ? idpf_remove+0x1e4/0x1f0 [idpf]
-> pci_device_remove+0x3f/0xb0
-> device_release_driver_internal+0x19f/0x200
-> pci_stop_bus_device+0x6d/0x90
-> pci_stop_and_remove_bus_device+0x12/0x20
-> pci_iov_remove_virtfn+0xbe/0x120
-> sriov_disable+0x34/0xe0
-> idpf_sriov_configure+0x58/0x140 [idpf]
-> idpf_remove+0x1b9/0x1f0 [idpf]
-> idpf_shutdown+0x12/0x30 [idpf]
-> pci_device_shutdown+0x35/0x60
-> device_shutdown+0x156/0x200
-> ...
-> 
-> Replace the direct idpf_remove() call in idpf_shutdown() with
-> idpf_vc_core_deinit() and idpf_deinit_dflt_mbx(), which perform
-> the bulk of the cleanup, such as stopping the init task, freeing IRQs,
-> destroying the vports and freeing the mailbox.
-> 
-> Reported-by: Yuying Ma <yuma@redhat.com>
-> Fixes: e850efed5e15 ("idpf: add module register and probe functionality")
-> Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
-> Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
-> ---
->  drivers/net/ethernet/intel/idpf/idpf_main.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
-> index b6c515d14cbf..bec4a02c5373 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_main.c
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
-> @@ -87,7 +87,11 @@ static void idpf_remove(struct pci_dev *pdev)
->   */
->  static void idpf_shutdown(struct pci_dev *pdev)
->  {
-> -	idpf_remove(pdev);
-> +	struct idpf_adapter *adapter = pci_get_drvdata(pdev);
-> +
-> +	cancel_delayed_work_sync(&adapter->vc_event_task);
-> +	idpf_vc_core_deinit(adapter);
-> +	idpf_deinit_dflt_mbx(adapter);
->  
->  	if (system_state == SYSTEM_POWER_OFF)
->  		pci_set_power_state(pdev, PCI_D3hot);
-> -- 
-> 2.17.2
+However this assumption breaks down for incoming network traffic in a
+multi-tenant machine. We are in the process of running multiple
+workloads on a single machine and if such workloads are network heavy,
+we are seeing very high network memory accounting cost. We have observed
+multiple CPUs spending almost 100% of their time in net_rx_action and
+almost all of that time is spent in memcg accounting of the network
+traffic.
+
+More precisely, net_rx_action is serving packets from multiple workloads
+and is observing/serving mix of packets of these workloads. The memcg
+switch of per-cpu cache is very expensive and we are observing a lot of
+memcg switches on the machine. Almost all the time is being spent on
+charging new memcg and flushing older memcg cache. So, definitely we
+need per-cpu cache that support multiple memcgs for this scenario.
+
+This prototype implements a network specific scope based memcg charge
+cache that supports holding charge for multiple memcgs. However this is
+not the final design and I wanted to start the conversation on this
+topic with some open questions below:
+
+1. Should we keep existing per-cpu single memcg cache?
+2. Should we have a network specific solution similar to this prototype
+   or more general solution?
+3. If we decide to have multi memcg charge cache, what should be the
+   size? Should it be dynamic or static?
+4. Do we really care about performance (throughput) in PREEMPT_RT?
+
+Let me give my opinion on these questions:
+
+A1. We definitely need to evolve the per-cpu charge cache. I am not
+    happy with the irq disabling for memcg charging and stats code. I am
+    planning to move towards two set of stocks, one for in_task() and
+    the other for !in_task() (similar to active_memcg handling) and with
+    that remove the irq disabling from the charge path. In the followup
+    I want to expand this to the obj stocks as well and also remove the
+    irq disabling from that.
+
+A2. I think we need a general solution as I suspect kvfree_rcu_bulk()
+    might be in a similar situation. However I think we can definitely
+    use network specific knowledge to further improve network memory
+    charging. For example, we know kernel uses GFP_ATOMIC for charging
+    incoming traffic which always succeeds. We can exploit this
+    knowledge to further improve network charging throughput.
+
+A3. Here I think we need to start simple and make it more sophisticated
+    as we see more data from production/field from multiple places. This
+    can become complicated very easily. For example the evict policy for
+    memcg charge cache.
+
+A4. I don't think PREEMPT_RT is about throughput but it cares about
+    latency but these memcg charge caches are about throughput. In
+    addition PREEMPT_RT has made memcg code a lot messier (IMO). IMO the
+    PREEMPT_RT kernel should just skip all per-cpu memcg caches
+    including objcg ones and that would make code much simpler.
+
+That is my take and I would really like opinions and suggestions from
+others. BTW I want to resolve this issue asap as this is becoming a
+blocker for multi-tenancy for us.
+
+Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
+---
+ include/linux/memcontrol.h | 37 +++++++++++++++++
+ mm/memcontrol.c            | 83 ++++++++++++++++++++++++++++++++++++++
+ net/core/dev.c             |  4 ++
+ 3 files changed, 124 insertions(+)
+
+diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
+index 57664e2a8fb7..3aa22b0261be 100644
+--- a/include/linux/memcontrol.h
++++ b/include/linux/memcontrol.h
+@@ -1617,6 +1617,30 @@ extern struct static_key_false memcg_sockets_enabled_key;
+ #define mem_cgroup_sockets_enabled static_branch_unlikely(&memcg_sockets_enabled_key)
+ void mem_cgroup_sk_alloc(struct sock *sk);
+ void mem_cgroup_sk_free(struct sock *sk);
++
++struct memcg_skmem_batch {
++	int size;
++	struct mem_cgroup *memcg[MEMCG_CHARGE_BATCH];
++	unsigned int nr_pages[MEMCG_CHARGE_BATCH];
++};
++
++void __mem_cgroup_batch_charge_skmem_begin(struct memcg_skmem_batch *batch);
++void __mem_cgroup_batch_charge_skmem_end(struct memcg_skmem_batch *batch);
++
++static inline void mem_cgroup_batch_charge_skmem_begin(struct memcg_skmem_batch *batch)
++{
++	if (cgroup_subsys_on_dfl(memory_cgrp_subsys) &&
++	   mem_cgroup_sockets_enabled)
++		__mem_cgroup_batch_charge_skmem_begin(batch);
++}
++
++static inline void mem_cgroup_batch_charge_skmem_end(struct memcg_skmem_batch *batch)
++{
++	if (cgroup_subsys_on_dfl(memory_cgrp_subsys) &&
++	   mem_cgroup_sockets_enabled)
++		__mem_cgroup_batch_charge_skmem_end(batch);
++}
++
+ static inline bool mem_cgroup_under_socket_pressure(struct mem_cgroup *memcg)
+ {
+ #ifdef CONFIG_MEMCG_V1
+@@ -1638,6 +1662,19 @@ void reparent_shrinker_deferred(struct mem_cgroup *memcg);
+ #define mem_cgroup_sockets_enabled 0
+ static inline void mem_cgroup_sk_alloc(struct sock *sk) { };
+ static inline void mem_cgroup_sk_free(struct sock *sk) { };
++
++struct memcg_skmem_batch {};
++
++static inline void mem_cgroup_batch_charge_skmem_begin(
++					struct memcg_skmem_batch *batch)
++{
++}
++
++static inline void mem_cgroup_batch_charge_skmem_end(
++					struct memcg_skmem_batch *batch)
++{
++}
++
+ static inline bool mem_cgroup_under_socket_pressure(struct mem_cgroup *memcg)
+ {
+ 	return false;
+diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+index 709b16057048..3afca4d055b3 100644
+--- a/mm/memcontrol.c
++++ b/mm/memcontrol.c
+@@ -88,6 +88,7 @@ EXPORT_PER_CPU_SYMBOL_GPL(int_active_memcg);
+ 
+ /* Socket memory accounting disabled? */
+ static bool cgroup_memory_nosocket __ro_after_init;
++DEFINE_PER_CPU(struct memcg_skmem_batch *, int_skmem_batch);
+ 
+ /* Kernel memory accounting disabled? */
+ static bool cgroup_memory_nokmem __ro_after_init;
+@@ -1775,6 +1776,57 @@ static struct obj_cgroup *drain_obj_stock(struct memcg_stock_pcp *stock);
+ static bool obj_stock_flush_required(struct memcg_stock_pcp *stock,
+ 				     struct mem_cgroup *root_memcg);
+ 
++static inline bool consume_batch_stock(struct mem_cgroup *memcg,
++				       unsigned int nr_pages)
++{
++	int i;
++	struct memcg_skmem_batch *batch;
++
++	if (IS_ENABLED(CONFIG_PREEMPT_RT) || in_task() ||
++	    !this_cpu_read(int_skmem_batch))
++		return false;
++
++	batch = this_cpu_read(int_skmem_batch);
++	for (i = 0; i < batch->size; ++i) {
++		if (batch->memcg[i] == memcg) {
++			if (nr_pages <= batch->nr_pages[i]) {
++				batch->nr_pages[i] -= nr_pages;
++				return true;
++			}
++			return false;
++		}
++	}
++	return false;
++}
++
++static inline bool refill_stock_batch(struct mem_cgroup *memcg,
++				      unsigned int nr_pages)
++{
++	int i;
++	struct memcg_skmem_batch *batch;
++
++	if (IS_ENABLED(CONFIG_PREEMPT_RT) || in_task() ||
++	    !this_cpu_read(int_skmem_batch))
++		return false;
++
++	batch = this_cpu_read(int_skmem_batch);
++	for (i = 0; i < batch->size; ++i) {
++		if (memcg == batch->memcg[i]) {
++			batch->nr_pages[i] += nr_pages;
++			return true;
++		}
++	}
++
++	if (i == MEMCG_CHARGE_BATCH)
++		return false;
++
++	/* i == batch->size */
++	batch->memcg[i] = memcg;
++	batch->nr_pages[i] = nr_pages;
++	batch->size++;
++	return true;
++}
++
+ /**
+  * consume_stock: Try to consume stocked charge on this cpu.
+  * @memcg: memcg to consume from.
+@@ -1795,6 +1847,9 @@ static bool consume_stock(struct mem_cgroup *memcg, unsigned int nr_pages,
+ 	unsigned long flags;
+ 	bool ret = false;
+ 
++	if (consume_batch_stock(memcg, nr_pages))
++		return true;
++
+ 	if (nr_pages > MEMCG_CHARGE_BATCH)
+ 		return ret;
+ 
+@@ -1887,6 +1942,9 @@ static void refill_stock(struct mem_cgroup *memcg, unsigned int nr_pages)
+ {
+ 	unsigned long flags;
+ 
++	if (refill_stock_batch(memcg, nr_pages))
++		return;
++
+ 	if (!localtry_trylock_irqsave(&memcg_stock.stock_lock, flags)) {
+ 		/*
+ 		 * In case of unlikely failure to lock percpu stock_lock
+@@ -4894,6 +4952,31 @@ void mem_cgroup_sk_free(struct sock *sk)
+ 		css_put(&sk->sk_memcg->css);
+ }
+ 
++void __mem_cgroup_batch_charge_skmem_begin(struct memcg_skmem_batch *batch)
++{
++	if (IS_ENABLED(CONFIG_PREEMPT_RT) || in_task() ||
++	    this_cpu_read(int_skmem_batch))
++		return;
++
++	this_cpu_write(int_skmem_batch, batch);
++}
++
++void __mem_cgroup_batch_charge_skmem_end(struct memcg_skmem_batch *batch)
++{
++	int i;
++
++	if (IS_ENABLED(CONFIG_PREEMPT_RT) || in_task() ||
++	    batch != this_cpu_read(int_skmem_batch))
++		return;
++
++	this_cpu_write(int_skmem_batch, NULL);
++	for (i = 0; i < batch->size; ++i) {
++		if (batch->nr_pages[i])
++			page_counter_uncharge(&batch->memcg[i]->memory,
++					      batch->nr_pages[i]);
++	}
++}
++
+ /**
+  * mem_cgroup_charge_skmem - charge socket memory
+  * @memcg: memcg to charge
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 0eba6e4f8ccb..846305d019c6 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -7484,9 +7484,12 @@ static __latent_entropy void net_rx_action(void)
+ 		usecs_to_jiffies(READ_ONCE(net_hotdata.netdev_budget_usecs));
+ 	struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
+ 	int budget = READ_ONCE(net_hotdata.netdev_budget);
++	struct memcg_skmem_batch batch = {};
+ 	LIST_HEAD(list);
+ 	LIST_HEAD(repoll);
+ 
++	mem_cgroup_batch_charge_skmem_begin(&batch);
++
+ 	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
+ start:
+ 	sd->in_net_rx_action = true;
+@@ -7542,6 +7545,7 @@ static __latent_entropy void net_rx_action(void)
+ 	net_rps_action_and_irq_enable(sd);
+ end:
+ 	bpf_net_ctx_clear(bpf_net_ctx);
++	mem_cgroup_batch_charge_skmem_end(&batch);
+ }
+ 
+ struct netdev_adjacent {
+-- 
+2.43.5
+
 
