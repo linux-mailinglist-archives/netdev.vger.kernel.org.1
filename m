@@ -1,61 +1,75 @@
-Return-Path: <netdev+bounces-172710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 738A9A55C49
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 01:55:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4530A55C8B
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 02:02:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F4523A3C76
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 00:55:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 098E2177849
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 01:02:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 721587DA8C;
-	Fri,  7 Mar 2025 00:55:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55B951519A3;
+	Fri,  7 Mar 2025 00:59:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QrpItbRe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xx49e8od"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 409DB1E868;
-	Fri,  7 Mar 2025 00:55:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2541414A4F9;
+	Fri,  7 Mar 2025 00:59:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741308915; cv=none; b=h522Np4KPooqJhkgXZq5UstIp+LGhOHwsbVO/pTBVFsljBBGUw+c+7Zuj8BMdHciO+RLjRXYKrh7mYjmKUoeXxmpkjlSgn1D1jQY7iIvCJWdKO4xAgSLNT8Daf/iTthNG7MWYep3WKQxEOIYH1F0JBSRBbe6Pn3PKOefxawaC7M=
+	t=1741309174; cv=none; b=Zitk01o8x/qn2myIdXbK+4uk7PIzP4fwqQapjt0Dp3eA1W3MFOGhJdP6C9dqGfpvPQG/9IrNJX0iiAZoAMNydfHot7qO9teaChXz9mrMfZ9v9IOtpnsWlFr+BbMI05BDtrJu84ecYdDduFqzsO48cAk6Hk2kZZBXGt5G2afMenw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741308915; c=relaxed/simple;
-	bh=xek2BHPVZ26qJOlIwvynXxMSgyWkeMn3liBIClkp3lI=;
+	s=arc-20240116; t=1741309174; c=relaxed/simple;
+	bh=Cg2qsx4qx6dQxL2dKMoV09fLDr7a4hn6EBItwZqDGGk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V4/yeyKO0VJek+5gHXcoMgDrY5yItiqfROE7NagW4d4MxElJMYZ402ivbKa+hpj0gW4sgNtEgLXwtPDjU3Hq+etqF7HluTxI0Z5a29tDREduUGT5MlnQ458EPWwYfQBpJxd/dbAXQLWA0lwhZszSkFHvKOyAXIEVJisQ3D1gRB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QrpItbRe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0F97C4CEE0;
-	Fri,  7 Mar 2025 00:55:13 +0000 (UTC)
+	 MIME-Version:Content-Type; b=GjJ3UYmGZft34cQA8CnVpiQhu7LtU4zpqUXhHxC18ajtVYiPgWIBbfEMNu8qLvK2JukEDQiKNWkxOfQzWPzKMmfqbK7Lh3ODEa72yfj93GIt9b4CUI1FRMNSMagHpTQjzsUAAmeVNfypo6x3s6Fp2WQUxVPndxZs48BXKvBB6ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xx49e8od; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37826C4CEE0;
+	Fri,  7 Mar 2025 00:59:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741308914;
-	bh=xek2BHPVZ26qJOlIwvynXxMSgyWkeMn3liBIClkp3lI=;
+	s=k20201202; t=1741309173;
+	bh=Cg2qsx4qx6dQxL2dKMoV09fLDr7a4hn6EBItwZqDGGk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QrpItbReJvXV4f5NgW5mLT6raAXR9ILcWXRqNJek5KIcTTvGN4K/B/vomAxa0s7LW
-	 u4aZDEn0nSrDXhaoRTqiVXvn3VaThme6YX8s6fmORw6eDBPiM8AqInegTSJnIygUbN
-	 kmkzeTMC5o/97KmCJg36JTQAlrvaMcAxFirIDLb5xVmPAOJVe3jVwL0fCb3/QRj3A+
-	 wH5k2Okk0ScuJX1DrWC0/L8AYVJCKq8PdMiLFuNuJ8B4IhoS4LvwUN5iu2xUu8z5hV
-	 86lbzUFCHlPP2SMdOd/H4zSLjWAQwKdWKWfq348B2QMnnbe/oMlMH5KgNaN3ZRDPCA
-	 yO7SLVnzsbOzA==
-Date: Thu, 6 Mar 2025 16:55:13 -0800
+	b=Xx49e8odjgKN5abFOiSV4WP/FDGjg6AN+86g670RJ4qn7DNDD6tzDFYOf5sO6pYyg
+	 J9uIA95n5YPjL3ubaBjCrbvqO/lwtwbrBPvSulpqdMwTdF4+H5O+MSorPu282E7sIp
+	 WGJ05Mge/msv+7DjZ7soWwFlJCMjX5LTiP8Xndj5HiEDpr1Cfoizm0THFCdyq98nJs
+	 0s2TJysz2Q0ybXYPB42JpVxbGuwEYcntGG7VjIBoSJp7zY8QgZqRJdmtqUBYKoGKwK
+	 EncNbvLjrOCcLU5aGpV9/7TwEVK9R3DoU6vLDbykGzcGDCapLljk5XvGICRlR8A4ZY
+	 FITRCI7Qg0q2g==
+Date: Thu, 6 Mar 2025 16:59:31 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Vignesh Raghavendra <vigneshr@ti.com>, Meghana Malladi
- <m-malladi@ti.com>, Diogo Ivo <diogo.ivo@siemens.com>, Lee Trager
- <lee@trager.us>, Andrew Lunn <andrew+netdev@lunn.ch>, Roger Quadros
- <rogerq@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Simon Horman
- <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
- <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
- <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
- <linux-doc@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>
-Subject: Re: [PATCH net-next v2] net: ti: icssg-prueth: Add ICSSG FW Stats
-Message-ID: <20250306165513.541ff46e@kernel.org>
-In-Reply-To: <20250305111608.520042-1-danishanwar@ti.com>
-References: <20250305111608.520042-1-danishanwar@ti.com>
+To: Inochi Amaoto <inochiama@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Chen Wang
+ <unicorn_wang@outlook.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Richard Cochran
+ <richardcochran@gmail.com>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Romain Gantois <romain.gantois@bootlin.com>, Hariprasad Kelam
+ <hkelam@marvell.com>, Jisheng Zhang <jszhang@kernel.org>, =?UTF-8?B?Q2w=?=
+ =?UTF-8?B?w6ltZW50IEzDqWdlcg==?= <clement.leger@bootlin.com>, "Jan Petrous
+ (OSS)" <jan.petrous@oss.nxp.com>, Simon Horman <horms@kernel.org>, Furong
+ Xu <0x1207@gmail.com>, Lothar Rubusch <l.rubusch@gmail.com>, Joe Hattori
+ <joe@pf.is.s.u-tokyo.ac.jp>, Bartosz Golaszewski
+ <bartosz.golaszewski@linaro.org>, Giuseppe Cavallaro
+ <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, sophgo@lists.linux.dev,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org,
+ Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>
+Subject: Re: [PATCH net-next v6 0/4] riscv: sophgo: Add ethernet support for
+ SG2044
+Message-ID: <20250306165931.7ffefe3a@kernel.org>
+In-Reply-To: <20250305063920.803601-1-inochiama@gmail.com>
+References: <20250305063920.803601-1-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,37 +79,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 5 Mar 2025 16:46:08 +0530 MD Danish Anwar wrote:
-> + - ``FW_RTU_PKT_DROP``: Diagnostic error counter which increments when RTU drops a locally injected packet due to port being disabled or rule violation.
-> + - ``FW_Q0_OVERFLOW``: TX overflow counter for queue0
-> + - ``FW_Q1_OVERFLOW``: TX overflow counter for queue1
-> + - ``FW_Q2_OVERFLOW``: TX overflow counter for queue2
-> + - ``FW_Q3_OVERFLOW``: TX overflow counter for queue3
-> + - ``FW_Q4_OVERFLOW``: TX overflow counter for queue4
-> + - ``FW_Q5_OVERFLOW``: TX overflow counter for queue5
-> + - ``FW_Q6_OVERFLOW``: TX overflow counter for queue6
-> + - ``FW_Q7_OVERFLOW``: TX overflow counter for queue7
-...
+On Wed,  5 Mar 2025 14:39:12 +0800 Inochi Amaoto wrote:
+> The ethernet controller of SG2044 is Synopsys DesignWare IP with
+> custom clock. Add glue layer for it.
 
-Thanks for the docs, it looks good. Now, do all of these get included
-in the standard stats returned by icssg_ndo_get_stats64 ?
-That's the primary source of information for the user regarding packet
-loss.
-
->  	if (prueth->pa_stats) {
->  		for (i = 0; i < ARRAY_SIZE(icssg_all_pa_stats); i++) {
-> -			reg = ICSSG_FW_STATS_BASE +
-> -			      icssg_all_pa_stats[i].offset *
-> -			      PRUETH_NUM_MACS + slice * sizeof(u32);
-> +			reg = icssg_all_pa_stats[i].offset +
-> +			      slice * sizeof(u32);
->  			regmap_read(prueth->pa_stats, reg, &val);
->  			emac->pa_stats[i] += val;
-
-This gets called by icssg_ndo_get_stats64() which is under RCU 
-protection and nothing else. I don't see any locking here, and
-I hope the regmap doesn't sleep. cat /proc/net/dev to test.
-You probably need to send some fixes to net.
+Looks like we have a conflict on the binding, could you rebase
+against latest net-next/main and repost?
 -- 
 pw-bot: cr
 
