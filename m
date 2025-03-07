@@ -1,353 +1,136 @@
-Return-Path: <netdev+bounces-172793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F20CA5608D
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 06:59:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EF3CA560DA
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 07:27:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81081189671F
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 05:59:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54F54176886
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 06:26:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA0BB19992C;
-	Fri,  7 Mar 2025 05:59:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52B551C84A2;
+	Fri,  7 Mar 2025 06:25:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Y23GtGUH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P4vQ7two"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F25F1990C4
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 05:59:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EEB61A0731;
+	Fri,  7 Mar 2025 06:25:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741327185; cv=none; b=mfNkL2CW0F0ER92DWyve6mTuwSU5xKGpCnUIilqc6Uqxb5BCQ0or2dUB8DwoOOazJucUTwQEXrVAAoJ8Zf29GMrcC2yGhMsLEwRb0/kA/Cp0lV+xJ0S35yGfqLtq3y9H82gcAAL35YzndlPI48BzC4i/GsyFN5G3O08i32tJb28=
+	t=1741328727; cv=none; b=DWrjMgz0p6E9TqJYJhEicdzm6s6tsHPMToyI+wdGSjjL6znbScacDKaBedKVMPEp56zD5lsIVmTqOpLfT3MKtLvKLG61tezOv7CURhwLUAeay8av6CXfOIVNz+j4JM51CrfXHGosGdJrVKvbaNB/RPWGD1OIx+z6rS4BQKvB/kc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741327185; c=relaxed/simple;
-	bh=wwmac+s+ESlIyXNfnNVtMPr0GhgEwFZOhY1IMJmPMZQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fcb8kCx5wUi1cHXYALydCoZv4sIDgPEtDVreFWTyhVVWrhRWxm1OhV1sx40ywzIigYX1xIFXPcvRISpR+ogZyllNLXGALmB4EWbKCuEqOk2B3jvSaEcNi//iYd4AT7pzVB++9nunp9yo6Hfsw8GYSI9QXzdovCMaFGQAJwHgw9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Y23GtGUH; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1741327181;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=7I8JlXAk7XOW8Ec0KDXoqsOGAqhiP+woZaSK8OFzW+A=;
-	b=Y23GtGUH7snKv5PLNOK1WbMqZLI09sdw345e87VF5yfzvB/zAhflbUQmQTPf8N2U71HX42
-	9iJ6OfxCBiKqGj8MEFCfnZc1JK4oC8B6AgkVL4L3HLXDrcT8fwDx3t+wBPGe8HsbMpY1Ot
-	ecJDGe8A2vtpgskccGCGs0JM/0SsYNM=
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Johannes Weiner <hannes@cmpxchg.org>,
-	Michal Hocko <mhocko@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Muchun Song <muchun.song@linux.dev>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-mm@kvack.org,
-	cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Meta kernel team <kernel-team@meta.com>
-Subject: [RFC PATCH] memcg: net: improve charging of incoming network traffic
-Date: Thu,  6 Mar 2025 21:59:36 -0800
-Message-ID: <20250307055936.3988572-1-shakeel.butt@linux.dev>
+	s=arc-20240116; t=1741328727; c=relaxed/simple;
+	bh=IaXFjppS/IoB+IJ+M/BVXjFLMyZOrjULwzmXC5Zs3oQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Sjqq3W2KNyG+nw/1ok3nIXc08vvqlnA56TlB/fb2Q4v37a4q8Rd1kCMdLPA0WK0q0+JZhu8Y37k4TcjbOZXp7ZSjIpigSl8QeHhnxpiqYsddY/xIR78RglkL2wkSTc4sivVUBMXxMaMGcFb/zNo23Pxtox/4aZ5vJN6fpd+2K7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P4vQ7two; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7c3d1664ed5so181489585a.2;
+        Thu, 06 Mar 2025 22:25:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741328724; x=1741933524; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DE4RgttB+ObeTGoRY2FNPNi0ZuWCnd0LsJTM8WKCSPE=;
+        b=P4vQ7twoUHQPmt+m/8VaumAE86PX0xxhzx51Yy3GLM5vqYn1D0mUjNWqiaZZ/sFBXC
+         r73r+JInHMoo1MCgSqyhTehGgAgdQagPkeGhJfPeBNn+mklWXLIOgj4Gpigi5bVZgf6S
+         W1NJbcxT3WWZ3bSb/+q/bQm0CBmUrbFtQIT6rF4R41/l4a83J1EgCiw3zFdQRYQfxtM2
+         gjcgd9vO/KBEkEsRehhyiXgv3pSBdylzFYjYgIOlo3H11gl9krdQV88mUB219G0YwatL
+         rNmSQ+c/HYkbnsL7PcG6zQHrvD/MGFIEMkafAkKql9nN6JNVWlGfaUUsTWbYWn6o78gC
+         r6VQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741328724; x=1741933524;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DE4RgttB+ObeTGoRY2FNPNi0ZuWCnd0LsJTM8WKCSPE=;
+        b=lh+FsdFbGvNU2GGMqEnL2ER4ZEq2aEDbLnQKBobuO8d7MGC8Isf5pJfAcxHZHnKGEQ
+         v7L1Xw16LZXKqk4gzBWLlPsHyFyZsbszbRinDC3OhqgZjICspg/mkt+BqN+hxmeNUXoD
+         XB3Uj+I93aFSTHI5JKYr7udjsDeDsGVRwSJhl80esugeptuMT8SkgThsQIT9t0ZxH1cs
+         YDNbUORV+jmlHEIklKdM3IaG7hs9qVHbV7XTQOUV3ptYTpYnmhmnXLVHdNv34OUmZ9T7
+         3L9oJPjU2CQMKYt4MTE8VuNJmcTTSgTzgq1bSZ53iey1uxOHRsTWqjZbw93iQd6DgntP
+         73kA==
+X-Forwarded-Encrypted: i=1; AJvYcCUnLXNowdW4ulG4TIBS5Y5xqsam+l/2ghqrGy9lVH6BZCwwtPNViEDMTXtEyOthchC0P/q+1ayE@vger.kernel.org, AJvYcCVLU76/PVR+Gl9OouQ4ARF3P4NZjH+7DgtnXXE4hZQJ03Yb0RH4qv4LoNpwRjbmsr7Rzq9lNXM+Y2Q3PMJD@vger.kernel.org, AJvYcCVfgfRMqFuYN/Hs+nxerAjsbYWgj8QsRvq2kk7xjV+dECmvJAh/pPH4joZYGwbbTVNQ0mU5m59bJ8vH@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmNydzGMxm7JHhuzjHeUXooysgKS9HVlEU5+4RHlJu+ZelXHpO
+	PW6paWcrCRJ0GHG02fDMiPx5QfqVxEdd6ADPBd7/LtkmXo9cGD9t
+X-Gm-Gg: ASbGncsPgmqGiQLev/GSzOVaxO3SCCkIaoHv+2hG6TNwQ9Pn2k9FIg9vzHj9ALCTRzq
+	DYQnPmI/V279u5kLDzcJnbiroAqTksVAheSsoetPDKrcFSyNrMaIuUw7+GCG4ThlP4NRVeKl1st
+	JoDGh/SHsRSLEXFUEAKVUTv7PNs1FZmHuVP0EICHrRcE1qYt145omM5UzQPvRWBLMtCcGvjODZn
+	zG6U1xM+HSGEtrL0Abts/e9liG++mux9z0vBJ2/xRMRZaUd9bT3sMexNylCiId3GKq5T/g5+BbC
+	+mFRGZuaMsAerCA6BBF7
+X-Google-Smtp-Source: AGHT+IEvDoykmlC42OAIJsi/QLfT+x2fU7js07z1lL9fYKp71NWDuSXyrrw0QsqRokKnLcIZ4rtbYA==
+X-Received: by 2002:a05:620a:2787:b0:7c3:c199:c3b0 with SMTP id af79cd13be357-7c4e610578fmr376275485a.32.1741328724151;
+        Thu, 06 Mar 2025 22:25:24 -0800 (PST)
+Received: from localhost ([2001:da8:7001:11::cb])
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7c3e533a0e8sm200339585a.9.2025.03.06.22.25.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Mar 2025 22:25:23 -0800 (PST)
+Date: Fri, 7 Mar 2025 14:25:19 +0800
+From: Inochi Amaoto <inochiama@gmail.com>
+To: Michael Turquette <mturquette@baylibre.com>, 
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Chen Wang <unicorn_wang@outlook.com>, Inochi Amaoto <inochiama@gmail.com>, 
+	Richard Cochran <richardcochran@gmail.com>
+Cc: linux-clk@vger.kernel.org, devicetree@vger.kernel.org, 
+	sophgo@lists.linux.dev, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>
+Subject: Re: [PATCH v3 0/2] clk: sophgo: add SG2044 clock controller support
+Message-ID: <gyww3drj2eez2bl3y5ikxy7mqpqpif7cktd3espqs4ve5srjpk@u6h5nzmtkmrb>
+References: <20250226232320.93791-1-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250226232320.93791-1-inochiama@gmail.com>
 
-Memory cgroup accounting is expensive and to reduce the cost, the kernel
-maintains per-cpu charge cache for a single memcg. So, if a charge
-request comes for a different memcg, the kernel will flush the old
-memcg's charge cache and then charge the newer memcg a fixed amount (64
-pages), subtracts the charge request amount and stores the remaining in
-the per-cpu charge cache for the newer memcg.
+On Thu, Feb 27, 2025 at 07:23:17AM +0800, Inochi Amaoto wrote:
+> The clock controller of SG2044 provides multiple clocks for various
+> IPs on the SoC, including PLL, mux, div and gates. As the PLL and
+> div have obvious changed and do not fit the framework of SG2042,
+> a new implement is provided to handle these.
+> 
+> Changed from v2:
+> 1. Applied Chen Wang' tag
+> 2. patch 2: fix author mail infomation
+> 
+> Changed from v1:
+> 1. patch 1: Applied Krzysztof's tag
+> 2. patch 2: Fix the build warning from bot.
+> 
+> Inochi Amaoto (2):
+>   dt-bindings: clock: sophgo: add clock controller for SG2044
+>   clk: sophgo: Add clock controller support for SG2044 SoC
+> 
+>  .../bindings/clock/sophgo,sg2044-clk.yaml     |   40 +
+>  drivers/clk/sophgo/Kconfig                    |   11 +
+>  drivers/clk/sophgo/Makefile                   |    1 +
+>  drivers/clk/sophgo/clk-sg2044.c               | 2271 +++++++++++++++++
+>  drivers/clk/sophgo/clk-sg2044.h               |   62 +
+>  include/dt-bindings/clock/sophgo,sg2044-clk.h |  170 ++
+>  6 files changed, 2555 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/clock/sophgo,sg2044-clk.yaml
+>  create mode 100644 drivers/clk/sophgo/clk-sg2044.c
+>  create mode 100644 drivers/clk/sophgo/clk-sg2044.h
+>  create mode 100644 include/dt-bindings/clock/sophgo,sg2044-clk.h
+> 
+> --
+> 2.48.1
+> 
 
-This mechanism is based on the assumption that the kernel, for locality,
-keep a process on a CPU for long period of time and most of the charge
-requests from that process will be served by that CPU's local charge
-cache.
+If there is no comments anymore, I will collect these patch and send
+a PR to Stephen at rc6 to see whether he will accept it.
 
-However this assumption breaks down for incoming network traffic in a
-multi-tenant machine. We are in the process of running multiple
-workloads on a single machine and if such workloads are network heavy,
-we are seeing very high network memory accounting cost. We have observed
-multiple CPUs spending almost 100% of their time in net_rx_action and
-almost all of that time is spent in memcg accounting of the network
-traffic.
-
-More precisely, net_rx_action is serving packets from multiple workloads
-and is observing/serving mix of packets of these workloads. The memcg
-switch of per-cpu cache is very expensive and we are observing a lot of
-memcg switches on the machine. Almost all the time is being spent on
-charging new memcg and flushing older memcg cache. So, definitely we
-need per-cpu cache that support multiple memcgs for this scenario.
-
-This prototype implements a network specific scope based memcg charge
-cache that supports holding charge for multiple memcgs. However this is
-not the final design and I wanted to start the conversation on this
-topic with some open questions below:
-
-1. Should we keep existing per-cpu single memcg cache?
-2. Should we have a network specific solution similar to this prototype
-   or more general solution?
-3. If we decide to have multi memcg charge cache, what should be the
-   size? Should it be dynamic or static?
-4. Do we really care about performance (throughput) in PREEMPT_RT?
-
-Let me give my opinion on these questions:
-
-A1. We definitely need to evolve the per-cpu charge cache. I am not
-    happy with the irq disabling for memcg charging and stats code. I am
-    planning to move towards two set of stocks, one for in_task() and
-    the other for !in_task() (similar to active_memcg handling) and with
-    that remove the irq disabling from the charge path. In the followup
-    I want to expand this to the obj stocks as well and also remove the
-    irq disabling from that.
-
-A2. I think we need a general solution as I suspect kvfree_rcu_bulk()
-    might be in a similar situation. However I think we can definitely
-    use network specific knowledge to further improve network memory
-    charging. For example, we know kernel uses GFP_ATOMIC for charging
-    incoming traffic which always succeeds. We can exploit this
-    knowledge to further improve network charging throughput.
-
-A3. Here I think we need to start simple and make it more sophisticated
-    as we see more data from production/field from multiple places. This
-    can become complicated very easily. For example the evict policy for
-    memcg charge cache.
-
-A4. I don't think PREEMPT_RT is about throughput but it cares about
-    latency but these memcg charge caches are about throughput. In
-    addition PREEMPT_RT has made memcg code a lot messier (IMO). IMO the
-    PREEMPT_RT kernel should just skip all per-cpu memcg caches
-    including objcg ones and that would make code much simpler.
-
-That is my take and I would really like opinions and suggestions from
-others. BTW I want to resolve this issue asap as this is becoming a
-blocker for multi-tenancy for us.
-
-Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
----
- include/linux/memcontrol.h | 37 +++++++++++++++++
- mm/memcontrol.c            | 83 ++++++++++++++++++++++++++++++++++++++
- net/core/dev.c             |  4 ++
- 3 files changed, 124 insertions(+)
-
-diff --git a/include/linux/memcontrol.h b/include/linux/memcontrol.h
-index 57664e2a8fb7..3aa22b0261be 100644
---- a/include/linux/memcontrol.h
-+++ b/include/linux/memcontrol.h
-@@ -1617,6 +1617,30 @@ extern struct static_key_false memcg_sockets_enabled_key;
- #define mem_cgroup_sockets_enabled static_branch_unlikely(&memcg_sockets_enabled_key)
- void mem_cgroup_sk_alloc(struct sock *sk);
- void mem_cgroup_sk_free(struct sock *sk);
-+
-+struct memcg_skmem_batch {
-+	int size;
-+	struct mem_cgroup *memcg[MEMCG_CHARGE_BATCH];
-+	unsigned int nr_pages[MEMCG_CHARGE_BATCH];
-+};
-+
-+void __mem_cgroup_batch_charge_skmem_begin(struct memcg_skmem_batch *batch);
-+void __mem_cgroup_batch_charge_skmem_end(struct memcg_skmem_batch *batch);
-+
-+static inline void mem_cgroup_batch_charge_skmem_begin(struct memcg_skmem_batch *batch)
-+{
-+	if (cgroup_subsys_on_dfl(memory_cgrp_subsys) &&
-+	   mem_cgroup_sockets_enabled)
-+		__mem_cgroup_batch_charge_skmem_begin(batch);
-+}
-+
-+static inline void mem_cgroup_batch_charge_skmem_end(struct memcg_skmem_batch *batch)
-+{
-+	if (cgroup_subsys_on_dfl(memory_cgrp_subsys) &&
-+	   mem_cgroup_sockets_enabled)
-+		__mem_cgroup_batch_charge_skmem_end(batch);
-+}
-+
- static inline bool mem_cgroup_under_socket_pressure(struct mem_cgroup *memcg)
- {
- #ifdef CONFIG_MEMCG_V1
-@@ -1638,6 +1662,19 @@ void reparent_shrinker_deferred(struct mem_cgroup *memcg);
- #define mem_cgroup_sockets_enabled 0
- static inline void mem_cgroup_sk_alloc(struct sock *sk) { };
- static inline void mem_cgroup_sk_free(struct sock *sk) { };
-+
-+struct memcg_skmem_batch {};
-+
-+static inline void mem_cgroup_batch_charge_skmem_begin(
-+					struct memcg_skmem_batch *batch)
-+{
-+}
-+
-+static inline void mem_cgroup_batch_charge_skmem_end(
-+					struct memcg_skmem_batch *batch)
-+{
-+}
-+
- static inline bool mem_cgroup_under_socket_pressure(struct mem_cgroup *memcg)
- {
- 	return false;
-diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-index 709b16057048..3afca4d055b3 100644
---- a/mm/memcontrol.c
-+++ b/mm/memcontrol.c
-@@ -88,6 +88,7 @@ EXPORT_PER_CPU_SYMBOL_GPL(int_active_memcg);
- 
- /* Socket memory accounting disabled? */
- static bool cgroup_memory_nosocket __ro_after_init;
-+DEFINE_PER_CPU(struct memcg_skmem_batch *, int_skmem_batch);
- 
- /* Kernel memory accounting disabled? */
- static bool cgroup_memory_nokmem __ro_after_init;
-@@ -1775,6 +1776,57 @@ static struct obj_cgroup *drain_obj_stock(struct memcg_stock_pcp *stock);
- static bool obj_stock_flush_required(struct memcg_stock_pcp *stock,
- 				     struct mem_cgroup *root_memcg);
- 
-+static inline bool consume_batch_stock(struct mem_cgroup *memcg,
-+				       unsigned int nr_pages)
-+{
-+	int i;
-+	struct memcg_skmem_batch *batch;
-+
-+	if (IS_ENABLED(CONFIG_PREEMPT_RT) || in_task() ||
-+	    !this_cpu_read(int_skmem_batch))
-+		return false;
-+
-+	batch = this_cpu_read(int_skmem_batch);
-+	for (i = 0; i < batch->size; ++i) {
-+		if (batch->memcg[i] == memcg) {
-+			if (nr_pages <= batch->nr_pages[i]) {
-+				batch->nr_pages[i] -= nr_pages;
-+				return true;
-+			}
-+			return false;
-+		}
-+	}
-+	return false;
-+}
-+
-+static inline bool refill_stock_batch(struct mem_cgroup *memcg,
-+				      unsigned int nr_pages)
-+{
-+	int i;
-+	struct memcg_skmem_batch *batch;
-+
-+	if (IS_ENABLED(CONFIG_PREEMPT_RT) || in_task() ||
-+	    !this_cpu_read(int_skmem_batch))
-+		return false;
-+
-+	batch = this_cpu_read(int_skmem_batch);
-+	for (i = 0; i < batch->size; ++i) {
-+		if (memcg == batch->memcg[i]) {
-+			batch->nr_pages[i] += nr_pages;
-+			return true;
-+		}
-+	}
-+
-+	if (i == MEMCG_CHARGE_BATCH)
-+		return false;
-+
-+	/* i == batch->size */
-+	batch->memcg[i] = memcg;
-+	batch->nr_pages[i] = nr_pages;
-+	batch->size++;
-+	return true;
-+}
-+
- /**
-  * consume_stock: Try to consume stocked charge on this cpu.
-  * @memcg: memcg to consume from.
-@@ -1795,6 +1847,9 @@ static bool consume_stock(struct mem_cgroup *memcg, unsigned int nr_pages,
- 	unsigned long flags;
- 	bool ret = false;
- 
-+	if (consume_batch_stock(memcg, nr_pages))
-+		return true;
-+
- 	if (nr_pages > MEMCG_CHARGE_BATCH)
- 		return ret;
- 
-@@ -1887,6 +1942,9 @@ static void refill_stock(struct mem_cgroup *memcg, unsigned int nr_pages)
- {
- 	unsigned long flags;
- 
-+	if (refill_stock_batch(memcg, nr_pages))
-+		return;
-+
- 	if (!localtry_trylock_irqsave(&memcg_stock.stock_lock, flags)) {
- 		/*
- 		 * In case of unlikely failure to lock percpu stock_lock
-@@ -4894,6 +4952,31 @@ void mem_cgroup_sk_free(struct sock *sk)
- 		css_put(&sk->sk_memcg->css);
- }
- 
-+void __mem_cgroup_batch_charge_skmem_begin(struct memcg_skmem_batch *batch)
-+{
-+	if (IS_ENABLED(CONFIG_PREEMPT_RT) || in_task() ||
-+	    this_cpu_read(int_skmem_batch))
-+		return;
-+
-+	this_cpu_write(int_skmem_batch, batch);
-+}
-+
-+void __mem_cgroup_batch_charge_skmem_end(struct memcg_skmem_batch *batch)
-+{
-+	int i;
-+
-+	if (IS_ENABLED(CONFIG_PREEMPT_RT) || in_task() ||
-+	    batch != this_cpu_read(int_skmem_batch))
-+		return;
-+
-+	this_cpu_write(int_skmem_batch, NULL);
-+	for (i = 0; i < batch->size; ++i) {
-+		if (batch->nr_pages[i])
-+			page_counter_uncharge(&batch->memcg[i]->memory,
-+					      batch->nr_pages[i]);
-+	}
-+}
-+
- /**
-  * mem_cgroup_charge_skmem - charge socket memory
-  * @memcg: memcg to charge
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 0eba6e4f8ccb..846305d019c6 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -7484,9 +7484,12 @@ static __latent_entropy void net_rx_action(void)
- 		usecs_to_jiffies(READ_ONCE(net_hotdata.netdev_budget_usecs));
- 	struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
- 	int budget = READ_ONCE(net_hotdata.netdev_budget);
-+	struct memcg_skmem_batch batch = {};
- 	LIST_HEAD(list);
- 	LIST_HEAD(repoll);
- 
-+	mem_cgroup_batch_charge_skmem_begin(&batch);
-+
- 	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
- start:
- 	sd->in_net_rx_action = true;
-@@ -7542,6 +7545,7 @@ static __latent_entropy void net_rx_action(void)
- 	net_rps_action_and_irq_enable(sd);
- end:
- 	bpf_net_ctx_clear(bpf_net_ctx);
-+	mem_cgroup_batch_charge_skmem_end(&batch);
- }
- 
- struct netdev_adjacent {
--- 
-2.43.5
-
+Regards,
+Inochi
 
