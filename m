@@ -1,92 +1,111 @@
-Return-Path: <netdev+bounces-172834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75A74A56478
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 10:59:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97EB5A56499
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 11:05:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29D283B1F00
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 09:59:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02E4A18979BD
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 10:05:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E70D120CCC2;
-	Fri,  7 Mar 2025 09:59:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB44020D4F4;
+	Fri,  7 Mar 2025 10:05:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="TEDkwNJO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PY2lTVOU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B8F120C48B;
-	Fri,  7 Mar 2025 09:59:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A0320CCCD
+	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 10:05:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741341566; cv=none; b=PNucnn6E/39F/TNhU4FgRZfTM7RXVSGtQlHSj76tO+rxYxolIA2cmaJrkwFHuA4AwfHZFEJQv4U5oGMuQcGlNmhJ3be8/j2XHepnWnZ2XhjfGtJtxT8qj3m5E33CRonLpQdMCl2TFEemYvDfHywWCOVGjVALWMcM5hqS02DYHgE=
+	t=1741341945; cv=none; b=JOftC5X7JRFEQrZ3eDdXhB8JXy1PNt2jcE/tLP9miZBfTXRMjlqARn9WxWuVrD/I+gwFy6+VkgOW7BGl81H6j1N0kwTGf6YuXSdKUPrDYYSs6U8kR0eI82T49tgbpPiBj32GBZCNF2Sb2rib+SABY/6sY+7TimsXGSEi82CakVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741341566; c=relaxed/simple;
-	bh=bfA8hVUxSJvy9YDE+EPsr+c1ObFHqhEoUarM/Yz9DcY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pmi44dcSuttmpM+Qt1bUTc/BnqWUJk1KHSygKTR2qnPc3QuTK8e9xKRXINPXCKeGySvIkrEdV8U+T5JvkJ+WaNDqmZR9MueOHXc0pYG0K9/Gkkh7znaAZTCBN3HBpGtDFU6StFCiNLw+cs7GtaVp6vePniiOTnaZ3kvFSrmWL0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=TEDkwNJO; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tqUU5-0036D2-M7; Fri, 07 Mar 2025 10:59:13 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=bfA8hVUxSJvy9YDE+EPsr+c1ObFHqhEoUarM/Yz9DcY=; b=TEDkwNJOlyK5AS46+EViIZEzzo
-	5cZRYp2AwmoHya56mhGLrGVJiB+YzgQn50Gq3yijrWC8LOe1QtaWjIfhjcj+Cd006V+I/iUqz1x1c
-	BX5cZ5JAqMlOQFZLvjPL87iWfI9pafD5LpmtAVD/sSJbSCoi35oYY180XaS9C+HRqzna0JOeC8cTU
-	8qT0of9KLIfWn3G4O+o+TDfyAMKK9PCBiGahh4DV2ukodLjYMm+kTC7GRGhfIcLyqRCyD8FM6kSti
-	FqYmEF8uBqu3TAGE/HeUCB1iTlpxJSeYY4ZlL4QPbO9wiXAZQu3nDZdSZ0C++Q9I9lLruRLnFM/nu
-	dtVMTavA==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tqUU4-0004ai-O0; Fri, 07 Mar 2025 10:59:12 +0100
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tqUTo-006f6R-S2; Fri, 07 Mar 2025 10:58:56 +0100
-Message-ID: <a96febaf-1d32-47d4-ad18-ce5d689b7bdb@rbox.co>
-Date: Fri, 7 Mar 2025 10:58:55 +0100
+	s=arc-20240116; t=1741341945; c=relaxed/simple;
+	bh=cLIUHCecooBF+rqXN1y9hNQRtLd+eNqLh/ZepiT9yvc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pJJOZ+SnKPHU5ttGz9i2FpOZ8LuPwullNLr6Lwn+nKeBEf6kVAPek1xWgMc2vhqULEYlTxLY6rvpIR0VowUnT0c0BG4lQj9A3NpXGmfIdcxmdHYxJihb+Agon7zSOjwtTRg4s/f3U+e6+QgYh3mqjFpE39Vgc/hjSOMAb9qdrvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PY2lTVOU; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4751507fd08so13203131cf.2
+        for <netdev@vger.kernel.org>; Fri, 07 Mar 2025 02:05:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741341943; x=1741946743; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cLIUHCecooBF+rqXN1y9hNQRtLd+eNqLh/ZepiT9yvc=;
+        b=PY2lTVOUmpopFmQXhO7DiI5ZAJI7p88onM/w2j+BxWKraBEjbo3QSWGfDiVDz5o1fv
+         NbUcYXpnLRJpNFpWZn+x9acXcwnn7mevNZKo5xSvenWnCTQQIuyOrpcwyXUexJonLijg
+         3Cg5/Mte91PnJEeUN32s9sYd8Qi7lOl3nqPFPzHd/ChQENwey7Xt/fej5RZXr5mR6cbJ
+         fhTmQmcFgrp2tQfIwctgLLvCZYVM88Sny1iJnIXch5mgBlmRgH4Xku1UucZ1Brp1sYse
+         OapOYztVfyMC/p6TB60s8x5I8iVLJ+uGzPXYjM+oR0hAnLMXM6mMU2n8zucX4DYMK/7m
+         YNkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741341943; x=1741946743;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cLIUHCecooBF+rqXN1y9hNQRtLd+eNqLh/ZepiT9yvc=;
+        b=skUIhsv6tPNMIYwqnVbPYHVmVb9iO0FXQ9AFfQUNJpmzW+VvRBioinJSjnAM70I923
+         XY8BimFTdxokkdR5Gpja9my1KFaKvZok1gVKWPd8Pw+PCR2fz/u4wNUhMenQjElDbVKK
+         5Nx9RKr4i7dYChBwGBIGmNY4t3kBpLyQUPo/W7WqgJmy1DpQwL8crRUPczhneHN58vXn
+         aMAUsGxaOVGc9P4hRmFGsHv0iJL350KgcRb6LM9VB1JqcySDBqalqgtHdnYeKZqURizG
+         TVFHUOhCrcOqX0laoDmhZtVMCLTn+sCNPUbumXS513ZZEbtSifBJlQw5WFKCOfohOFYb
+         nImg==
+X-Gm-Message-State: AOJu0YzhSzhiyiGSboNJVea/7SExY3lB3kDyZnr4YQ6MwKf4k+Iwy+fa
+	lGnDLhP1PQkVTOE1Q0LoMwgQv4I+JiO2m+Vlqj5/sSUYyqPxBZ+ULpegpt4yq3+eGhtlA2Jl7W6
+	gfRbPlAearKRiJ2x4z+3QAHFun/NggDx/2IGG
+X-Gm-Gg: ASbGncudkzPkexQhOraIF4P9sjtmN5eEerv8ZOHfrFLMw0oxrnNJV0LjrGiNzjtO1c8
+	k++TgCtF8Le3BB+KByJyzWBD+RRpWsDkZ8xx8R2q+D6Rg5rN8ssFIHl89zLt14VTB/nMIc3YuQy
+	G+uKgwhs1c3dWD0Ckr9tZ/9SHMbLw=
+X-Google-Smtp-Source: AGHT+IHhhgfYmDfR+dfbfOK+gHYo9tAPXa+E7+HhogrWrtgmm4wUUjzqFrvGOn2Nf57X1l3dPH++aAIaew17tn3Hwto=
+X-Received: by 2002:a05:622a:18a7:b0:474:f54d:6160 with SMTP id
+ d75a77b69052e-47618aeff89mr37158611cf.46.1741341942755; Fri, 07 Mar 2025
+ 02:05:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] vsock/bpf: Handle EINTR connect() racing against
- sockmap update
-To: Stefano Garzarella <sgarzare@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Bobby Eshleman <bobby.eshleman@bytedance.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org
-References: <20250307-vsock-trans-signal-race-v1-1-3aca3f771fbd@rbox.co>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <20250307-vsock-trans-signal-race-v1-1-3aca3f771fbd@rbox.co>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250307033620.411611-1-willemdebruijn.kernel@gmail.com> <20250307033620.411611-2-willemdebruijn.kernel@gmail.com>
+In-Reply-To: <20250307033620.411611-2-willemdebruijn.kernel@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 7 Mar 2025 11:05:31 +0100
+X-Gm-Features: AQ5f1Jr58XM0aiY94-3k0F5aDfF3R_AruQKSU8fgXUiYD0I18iw5sXk6Gyhql74
+Message-ID: <CANn89i+zJOCutKxgsi0Ubi+Z3VyuR+fSdRuNHf=Tt_QqAQwUFg@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/3] ipv6: remove leftover ip6 cookie initializer
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, horms@kernel.org, 
+	Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Signal delivered during connect() may result in a disconnect of an already
-> TCP_ESTABLISHED socket. Problem is that such established socket might have
-> been placed in a sockmap before the connection was closed. We end up with a
-> SS_UNCONNECTED vsock in a sockmap. And this, combined with the ability to
-> reassign (unconnected) vsock's transport to NULL, breaks the sockmap
-> contract. As manifested by WARN_ON_ONCE.
+On Fri, Mar 7, 2025 at 4:36=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> From: Willem de Bruijn <willemb@google.com>
+>
+> As of the blamed commit ipc6.dontfrag is always initialized at the
+> start of udpv6_sendmsg, by ipcm6_init_sk, to either 0 or 1.
+>
+> Later checks against -1 are no longer needed and the branches are now
+> dead code.
+>
+> The blamed commit had removed those branches. But I had overlooked
+> this one case.
+>
+> UDP has both a lockless fast path and a slower path for corked
+> requests. This branch remained in the fast path.
+>
+> Fixes: 096208592b09 ("ipv6: replace ipcm6_init calls with ipcm6_init_sk")
+> Signed-off-by: Willem de Bruijn <willemb@google.com>
 
-Note that Luigi is currently working on a (vsock test suit) test[1] for a
-related bug, which could be neatly adapted to test this bug as well.
-
-[1]: https://lore.kernel.org/netdev/20250306-test_vsock-v1-0-0320b5accf92@redhat.com/
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
