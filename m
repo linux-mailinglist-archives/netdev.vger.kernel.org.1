@@ -1,92 +1,89 @@
-Return-Path: <netdev+bounces-172945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85946A5692F
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 14:43:51 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D51F7A56934
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 14:44:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FE193A82FF
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 13:43:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 250277AA368
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 13:43:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EA9C21A92F;
-	Fri,  7 Mar 2025 13:43:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCAD121ABA6;
+	Fri,  7 Mar 2025 13:44:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C++tD6am"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oQim2+LC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B77221A44C
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 13:43:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5C221A447
+	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 13:44:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741355027; cv=none; b=lWtlorfkwhK6Sw/PVlLiLnUWjTyHCbbGlvnpufFguu+dUpHfQGXeKVkrTjrzWa6imIonBC50JGF42THdEDMtCmTH3mRZQhW7KPl0thJJNl//Q4nrp6fEo7iFVkHHurpH9XeenesQlH5n5HEotyDb+8Vc8zhNqdHuJ2q4GMMsTgw=
+	t=1741355050; cv=none; b=LbYd9EsJk1hFDdjwpsAZa39g8LldFz+tyLe1s7OPryxoAJ/z2h7AYlhgpcB2+hPA5GBcdcRwz05O3YsD/y0IbZezT5t/hZ7kvK/qX1UuUYTXwEfsNqo8+UCm0arB6oOwKSziVHndzXZnXLROJx8QZs3Ggfn+y5LHF4vSEd1xIes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741355027; c=relaxed/simple;
-	bh=iQePSQa/VmIkiEWwwOhGq4x3G6rNZ0WRU2gH91xIhuc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nFdUZ5lm+fWBBm0oaXFDY7Wf/HLXNXR1iGsDui1TC77MNsABsMxnQrY7pRZrHYHbtnFcpZsHswYf/CQDzPG9SdY63vVkn5yky4dNuxrXQenWqQ3ZyteZ54fa2pgW4YdeDfFq3+K3N/VG12ciRS/8CUHQDC2dlbvzo0ilgHsKuQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=C++tD6am; arc=none smtp.client-ip=209.85.221.49
+	s=arc-20240116; t=1741355050; c=relaxed/simple;
+	bh=gCKy6Z6IWQUo4NVubERjekOLQ8tO2OPPYqCEFVEa+7Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=kpPchmeoCHIStj9Hi7kLi0Rda6sYh+NQof6XIQCCQJ6U8kUjJeG55Q/fDc94qptexlIULDV3cxsdaxn4POKAm3WjqE0ZFgqv2O6llUysEEmNR9La7pje0wPDI86QVhQ2XRKJenhNtVH6SlFe7YZktob6E+ZEotcv9hVqzhDwzFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=oQim2+LC; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-390f69f8083so1589565f8f.0
-        for <netdev@vger.kernel.org>; Fri, 07 Mar 2025 05:43:44 -0800 (PST)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43bdc607c3fso11432545e9.3
+        for <netdev@vger.kernel.org>; Fri, 07 Mar 2025 05:44:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741355023; x=1741959823; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IwXZSVA9uDfpaltBI3c28B0VNZvXdvxIpnZGzFzKNI8=;
-        b=C++tD6amL/AwLpodyfao4oJGIcCZn7m33wOCffq7R++CQWwrVbV8qLF68uvhBDMzmb
-         8GsMJYlDglbeDp95BAg6HfTBJOAR+1LoNuLZdJCuSvMrw63OJnm3CVu3raKrqt61DExV
-         K1o8c9h+QR6nM6SQZX+kcCOHME8Z0hr5ORMqg6Y73kSp6vIFHT+TB83FUyMcIlmwvY55
-         rSBCWhzxMshv9QLlYNcEC8WwlvdEo5DqTjTRaQT29zFinGTp1wpIPCcW/TFMi285vKo0
-         7bseFJ/c6jGFUq0g3iPZMfJrEj99Sc+FhwF+VVSN2RDwNmc3e/C9qZvnXXnTMHXuKaFU
-         RT9w==
+        d=linaro.org; s=google; t=1741355047; x=1741959847; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HKa+tQTLZjzXmIzy+CrH4sUBisOXOqgtBvJQGN22yDs=;
+        b=oQim2+LCLRfTmtd6zEOlGS6EGN4zQu2iGCQ4ks5rZT6WQBb4rO6CkM+0XC+16PUpAB
+         iTfImXdnBmzmyDQkmllG4mIOBNPNeApdB5OyZNeN9RU9WDGBMdnT7gb5BKHsNQn4yg8r
+         fq3MdkB7DVq8GPgvndZMKVNJU3EEmB0npichZlDvAqvs02EI6p+Xx7KUhlM57tI2iXsi
+         WhtpmomlbstYWS+R3V+42MrUl0GUq+BK1nCxqUDXv3UEAct56aEVGC1yaIXLXTIMll+T
+         cg/rxV5bha2T1F/YkPZu/tZLzri2FP+6JCl7ywPcwqsiCyDNf4b5e3OSkOZP4X8nnBC8
+         Kf4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741355023; x=1741959823;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IwXZSVA9uDfpaltBI3c28B0VNZvXdvxIpnZGzFzKNI8=;
-        b=QX+Du0rQGspUaSbMpN2kjMi0Rks0QUqQX/ck5GDUdJ1bGMiPTxqA5hWebk0U17PM6a
-         Xjh0wizscOT756TYCeCyuLjhpRZF5FKni45JFB2kJXidFRKdjco5HCp+sW53nAxbwJfY
-         CH2pyXGNSQn2x6l5sA00Uz6O2wSyL6fjDRvUMjSLDWrNFuMqYPJP6UnKut3BoHc0k/gf
-         mbR5RChGiVuiM/TTA6jJOzbF17sZE8zzaiEaATCH9wKv617lEsvBmIxe1G0OxKNUN1Li
-         F0uDbRGLzdaDkjZlp7bIm6SZMo+JZhnGn3xgKEtu2JUrPpnj10f/DYORx2iAKAaKYgDE
-         p46g==
-X-Forwarded-Encrypted: i=1; AJvYcCU9ouLQmO4cWN1ClyrBfZe5UkGtm3kAAUgWcj+gzklxAugGFF1+3xjmcTeLUSj2SMa90nigBws=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSDC/FKcVT8sRmjEaQOO22WjTRnxXa1A3rZPklbBEAXqc4zNE/
-	Fi4hwm0IGLoMGsciCnT8lxtbv08p+2jE2Y0ho8l3jTlva4/vG9pbFpgQSXaOpCE=
-X-Gm-Gg: ASbGncv9g26zd8XW7EZWAPZRLnzjt6MsARxIVD11xYO2IoIiDgOk9ZrzGY9GPsGe4zd
-	lK1EOIjscQGoXzgy/0t8z84H3RZ3W8GC5Noe/5GiveaN2b/0ylmK9y/08gv0+vVjqeu/Wb1XCJ6
-	6rKFC7ATMHo76U2VQsBUQR5wXXSzK7eOg8C8ikVMx3BSNaN/6ApVVul7yb371UZG13Ya08ROX5o
-	nToBRWmCG46Yobxez3pZB6cRue0YuEfIGOXo4wXAnOi1GhAmPgOaOVwvC1qk5slfBCwKZniS1Oc
-	enYR2ehgIt0APqgG7lLvoHptiEGU+4HQpMCtzejS8+yJKekPpA==
-X-Google-Smtp-Source: AGHT+IFa2alqSGIKkLzzt+zL9Pg3YSFMY41VPpSwlcRRoSojAy2L3BjwP/rTiiK3+AR7CB/I2TIHig==
-X-Received: by 2002:a5d:648b:0:b0:38d:badf:9df5 with SMTP id ffacd0b85a97d-39132d1fc83mr1919454f8f.17.1741355022100;
-        Fri, 07 Mar 2025 05:43:42 -0800 (PST)
+        d=1e100.net; s=20230601; t=1741355047; x=1741959847;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HKa+tQTLZjzXmIzy+CrH4sUBisOXOqgtBvJQGN22yDs=;
+        b=XoK0HXhyWKLkN6AJ3QkXGZ4hrk8zukficZoSuTSNZ2L3hEXIZCrvmcPTtmsD1lV0iX
+         UxLZYj8xFDUdTbR6zuTcRaetF3yf+xcjwAODX1CrQHHO1vP1n7lctQEYqQe4AOHeGacX
+         G9h8enNP4omS4bsJPPlCjkTvmdOj/sN4A2suF3o6xroYEb4V+nFZGG8S7rCBxiNQ5rSS
+         ai7eMa/eRDEGQJ+88W6fzUt9PU4qntf8XP+7cvWXxdTIYEMxP0nO72R0gJEgxfdIxVSD
+         6yfoP44MsuLPtf2JpnShNmUArjX/aPemMchdNzhaaoVhyBvyiIETxuJ77rt2eSx0SzW5
+         YBWw==
+X-Forwarded-Encrypted: i=1; AJvYcCUURPu86If2du2a9Ac9anVZSkEfC8lcqpIK+JXPa4IttDzcGQeNvBUj1EJ5i+Sr6JLiBYcc+5A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxP5hGhJ1HeVJS6FuJ+XBtlGhjSix/YRQ5io5IRDRi9ax/F4bzL
+	YFcrSsvwfmNkfPR272syPtS3y1jmIWXgIK6dYuus334KAgdOtinl+sZQpBCoSH0=
+X-Gm-Gg: ASbGnctVT2qeLHe5IlUYNVlkgiua/ef1q6LD6QZf6qa4eRR1r1shENmTFROkWzp9v3q
+	sfr/b8VVaich5pAg5EMssexlYu13/IZeB8koFruTnHgwq7yB0oEgsm0HnSr4q9lJoyJx2ejh1l5
+	/ovSMTEBPAeJeGcdOiETWuzo70zjZnw6nVt2eSQ7j9JDfWf6SL04Q91l62M6V8xKjQYgNL9sqUq
+	oiOKHYRMQNouQ7KathQpiRs/sUf2SUMLCVRW7QEoxNgFupKend0ToziYiqcfkzC1M4vzL5qTtta
+	sKS+uCNvCJdDpXxQWNBhqivNexr7UWIog/Fe4tf37xP+Q3ZHeA==
+X-Google-Smtp-Source: AGHT+IFsPIR6Knj/ewMaXqXh6YdH08dtxvFyv6VA9rK7sxf3+pKbD8o9J6/llsPPYAyuvcsP8pwyQw==
+X-Received: by 2002:a05:600c:1c10:b0:43b:cb96:3cda with SMTP id 5b1f17b1804b1-43c68703f84mr21047775e9.28.1741355047048;
+        Fri, 07 Mar 2025 05:44:07 -0800 (PST)
 Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-3912c0e1d67sm5380042f8f.74.2025.03.07.05.43.40
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-43bd41c7cc7sm86543445e9.0.2025.03.07.05.44.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Mar 2025 05:43:41 -0800 (PST)
-Date: Fri, 7 Mar 2025 16:43:37 +0300
+        Fri, 07 Mar 2025 05:44:06 -0800 (PST)
+Date: Fri, 7 Mar 2025 16:44:02 +0300
 From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Alexey Dobriyan <adobriyan@gmail.com>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Cc: Simon Horman <horms@verge.net.au>, Julian Anastasov <ja@ssi.bg>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
 	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: less size_t please (was Re: [PATCH net] xfrm: fix integer
- overflow in xfrm_replay_state_esn_len())
-Message-ID: <f5100325-4b43-446c-85c0-6e3535305af6@stanley.mountain>
-References: <03997448-cd88-4b80-ab85-fe1100203339@p183>
- <1ee57015-a2c3-4dd1-99c2-53e9ff50a09f@stanley.mountain>
- <3c8d42ca-fcaf-497d-ac86-cc2fc9cf984f@p183>
+Subject: [PATCH net] ipvs: prevent integer overflow in do_ip_vs_get_ctl()
+Message-ID: <6dddcc45-78db-4659-80a2-3a2758f491a6@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,61 +92,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3c8d42ca-fcaf-497d-ac86-cc2fc9cf984f@p183>
+X-Mailer: git-send-email haha only kidding
 
-On Thu, Feb 06, 2025 at 08:06:55PM +0300, Alexey Dobriyan wrote:
-> On Thu, Jan 30, 2025 at 07:15:15PM +0300, Dan Carpenter wrote:
-> > On Thu, Jan 30, 2025 at 04:44:42PM +0300, Alexey Dobriyan wrote:
-> > > > -static inline unsigned int xfrm_replay_state_esn_len(struct xfrm_replay_state_esn *replay_esn)
-> > > > +static inline size_t xfrm_replay_state_esn_len(struct xfrm_replay_state_esn *replay_esn)
-> > > >  {
-> > > > -	return sizeof(*replay_esn) + replay_esn->bmp_len * sizeof(__u32);
-> > > > +	return size_add(sizeof(*replay_esn), size_mul(replay_esn->bmp_len, sizeof(__u32)));
-> > > 
-> > > Please don't do this.
-> > > 
-> > > You can (and should!) make calculations and check for overflow at the
-> > > same time. It's very efficient.
-> > > 
-> > > > 1) Use size_add() and size_mul().  This change is necessary for 32bit systems.
-> > > 
-> > > This bloats code on 32-bit.
-> > > 
-> > 
-> > I'm not sure I understand.  On 32-bit systems a size_t and an unsigned
-> > int are the same size.  Did you mean to say 64-bit?
-> 
-> It looks like yes.
-> 
-> > Declaring sizes as u32 leads to integer overflows like this one.
-> 
-> No, the problem is unchecked C addition and mixing types which confuses
-> people (in the opposite direction too -- there were fake CVEs because
-> someone thought "size_t len" in write hooks could be big enough).
-> 
-> The answer is to use single type as much as possible and using checked
-> additions on-the-go at every binary operator if possible.
+The get->num_services variable is an unsigned int which is controlled by
+the user.  The struct_size() function ensures that the size calculation
+does not overflow an unsigned long, however, we are saving the result to
+an int so the calculation can overflow.
 
-In the write_hooks examples, we fixed those by moving to size_t.
+Save the result from struct_size() type size_t to fix this integer
+overflow bug.
 
-64bit types are safer because 2**64 is a superset of 2**32.  Anything
-which can overflow 64bits can overflow 32bits.  So obviously 64bits is
-safer.
+Cc: stable@vger.kernel.org
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+ net/netfilter/ipvs/ip_vs_ctl.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-But it's surprising the extent of it.  We avoid using ulong types in
-UAPI because it's a headache for 32bit support.  So normally we get
-an u32 number_items from the user.  That's 4 billion.  It's a small
-number and it's actually pretty hard for it to lead to an integer
-overflow on 64bit systems.  The struct_size() function is basically
-not needed if you're on 64bit and you declare your length variables as
-size_t.
-
-The rest of the kernel has an assumption that sizes are saved in size_t.
-The size_add() and struct_size() macros rely on it.  In networking there
-are a number of functions like sock_kmalloc() which truncate the size
-parameter to int and they just make me itch to look at.
-
-regards,
-dan carpenter
+diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
+index 7d13110ce188..801d65fd8a81 100644
+--- a/net/netfilter/ipvs/ip_vs_ctl.c
++++ b/net/netfilter/ipvs/ip_vs_ctl.c
+@@ -3091,12 +3091,12 @@ do_ip_vs_get_ctl(struct sock *sk, int cmd, void __user *user, int *len)
+ 	case IP_VS_SO_GET_SERVICES:
+ 	{
+ 		struct ip_vs_get_services *get;
+-		int size;
++		size_t size;
+ 
+ 		get = (struct ip_vs_get_services *)arg;
+ 		size = struct_size(get, entrytable, get->num_services);
+ 		if (*len != size) {
+-			pr_err("length: %u != %u\n", *len, size);
++			pr_err("length: %u != %lu\n", *len, size);
+ 			ret = -EINVAL;
+ 			goto out;
+ 		}
+@@ -3132,12 +3132,12 @@ do_ip_vs_get_ctl(struct sock *sk, int cmd, void __user *user, int *len)
+ 	case IP_VS_SO_GET_DESTS:
+ 	{
+ 		struct ip_vs_get_dests *get;
+-		int size;
++		size_t size;
+ 
+ 		get = (struct ip_vs_get_dests *)arg;
+ 		size = struct_size(get, entrytable, get->num_dests);
+ 		if (*len != size) {
+-			pr_err("length: %u != %u\n", *len, size);
++			pr_err("length: %u != %lu\n", *len, size);
+ 			ret = -EINVAL;
+ 			goto out;
+ 		}
+-- 
+2.47.2
 
 
