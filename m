@@ -1,134 +1,188 @@
-Return-Path: <netdev+bounces-172988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B501A56BE0
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 16:23:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C3CBA56BE6
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 16:24:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB35618915FF
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 15:23:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A32B1893E0F
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 15:24:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32B3021CC49;
-	Fri,  7 Mar 2025 15:23:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9D8321CC49;
+	Fri,  7 Mar 2025 15:24:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D5F52ShM"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="OQu1cQ2M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B64972AD02
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 15:23:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E69317583;
+	Fri,  7 Mar 2025 15:24:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741361025; cv=none; b=PKWIt/VXGgodUk+0zLTzTsLrB4ok1HevwZ2xFZP43wLhUj2991FabCoZqbTSsiY14vwWNEVRPqPMSLqhT4xu5flfYtXUBqmfPT0TDUOh8zRQbnIVBF+y0E3D8aZyTeJFZ52EYu+qhiJk34MD4x2VApYd7rsTMliLkm5LZohaDA8=
+	t=1741361077; cv=none; b=sR2IzXV3tfIc0hqI36KeTnPQlHzeJxjFsx7M8kiqxpWNf2oPhfD6jqUgP5wiqt2DusEo323vsXCSR8/X/Xsab5ZM/whEiQyL8mT6CM7m38GWEYiXjPOifhOrsKdkAxuvEM8rGqFMz92pVonsQ1s9lAOm2cqvbFlEuhke2Et2WvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741361025; c=relaxed/simple;
-	bh=tN/AuGb/QnhlDHS2niFT91h1BxsKCv+HE6EkDBgoMs4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mh/O2gZn0ZhpQJ1rPBL7PHbfO9oG/PTXtd8IvbHMZ4zkpIdzpcRc4pMEKJoyd+OlP9aYIVa5rsmb4EKTS1V1kunMOtDHgqQnAOPMZKjZ9aW7bCM2gRrRcZ9O92kl1jKO5sdyRfAuQYtlmGjfNvKpFa//fE9U05OsyiLLTfOg4iA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D5F52ShM; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2ff6a98c638so3827643a91.0
-        for <netdev@vger.kernel.org>; Fri, 07 Mar 2025 07:23:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741361023; x=1741965823; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oaFJPf8Pc6fRJlXR31/LN+nhSuAi3ftvBGQfhyi6CWQ=;
-        b=D5F52ShMfLK6QeM03W3/CUlDo+qP9CSb8/9dsl17Ldpnc2XckXyEMznPDkRInIjGNY
-         29ucTVvM2S8b1KtQBNGubpY+U65L3NfvTFW5NjyvDYn2fSWoWL1sdphY+GCVH1DSSnY2
-         B14ZIN1CxZf/U6660QP/abEKvhthId96L/utApW6U9s2ZuUBDDvoA5TlFaokEtlHM7i1
-         I9DHDImR96QQiQGAeAdLaPeqr7NBWREa/ZhuVLRQTJMVuSQ+4L6yB6itTsfdQ17oBE1O
-         h8WygnHramJNKwI07cB63L0r3cqBLbrFPT55rsyXrqO1Mze4OVi3DFUMv9pgu1xgPGZ3
-         s+Mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741361023; x=1741965823;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oaFJPf8Pc6fRJlXR31/LN+nhSuAi3ftvBGQfhyi6CWQ=;
-        b=kA712zI1FMb2xJ333w7tYmPGD475Qe6kEDEFsacTrN7qU9KSB1Gw00vRn2/fBhnWhy
-         fFfg21yQNboRlwpwSZ11LsK1YPnlTo/djHPpONeaY2axTlw2DkEr3ckDBvhCoeGE9NvH
-         f+2e34emdFODZUSk4/N6DzsDXRtWvkdwDGOsj3Xfi2Rqd/ckSHis2emiMpK+w9Rqpxys
-         9/0wN7sZc/Y/NR4HxqMCFWZR3ZvhQNn7yM189kUCxOUfzoUAKI1q4rWl6CuiFkTdbnmD
-         PJeZXQq4BWR8DX2LU1JFuktdp5aXp6ebbqAFuZW6r0JrXWR3Y0iR/6CerRqN0TjQEWeJ
-         Vgxw==
-X-Forwarded-Encrypted: i=1; AJvYcCUTTL5kwzqK/AgOw6Uwa2/j93ERbIFsz6fWGtlyQ7+3DK1+0cv3GnX3/uYAr4e76ffZXOGqJTc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyc3euiKw8DvCT1qWGM/3WIej3zD11UYMPFfilJVY/Pd4aAlwg2
-	kw7FR1urfF6RvzqtG2B9j9zKdRqTUkLobhrKx6qxODMsJezxHIvzHh4l
-X-Gm-Gg: ASbGncvrfVkZ1Xb37t3bGuX/D1GThJokpsDJi40ggZiClj3rpNnU2872fUKaEYCs25H
-	N1hqrnf49G6EHhlcmLJdj9D2j+pnSxWlTAkIOJWcarNZDhKEjpWFyUkretjSf+DYbpA6zTgEENL
-	FvxS8sUC/a7AiSssI/+IMAJnoJiy29zINj17g7vwmmRBzw+J5dNOXHUFmOhYqVOxs4P+VSuvX3P
-	KyVEQYR2nge6KfjmSPUWStYpZJ8+puNxWZISIjqPISsvFpEmdjmF2zdzbsrl4bWJR5ZnP1xGRf8
-	SCiOryf15m6cCWzIw/LJvsyZhcTYejCAnIx7rRS8SGto
-X-Google-Smtp-Source: AGHT+IHkaYdH+XxHoA3WII4P39Lp26xYB5mM6DFATu8jdyaY/gGP59Y8uxaw4EE7XA+QXCmwupDPvQ==
-X-Received: by 2002:a17:90a:d605:b0:2ee:df70:1ff3 with SMTP id 98e67ed59e1d1-2ff7cd31b16mr7289602a91.0.1741361022745;
-        Fri, 07 Mar 2025 07:23:42 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-2ff4e7ff94fsm5015814a91.36.2025.03.07.07.23.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Mar 2025 07:23:42 -0800 (PST)
-Date: Fri, 7 Mar 2025 07:23:41 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com,
-	syzbot+3da2442641f0c6a705a2@syzkaller.appspotmail.com
-Subject: Re: [PATCH net-next] net: ethtool: use correct device pointer in
- ethnl_default_dump_one()
-Message-ID: <Z8sPfRBBLWRGkyBH@mini-arch>
-References: <20250307083544.1659135-1-edumazet@google.com>
+	s=arc-20240116; t=1741361077; c=relaxed/simple;
+	bh=p+AAle601s8Mkt5jP13A76T+lDUffR7WvVS+F7N+RSE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ptmpuHoSc/Kfz/YuYSJ+VSTvjYxCQ3I/0WQlqhcjZvUxLx0tv/es+kvu8UTX4Ablz7M6l/uVd9bFY6aIc9YScsabxau1lHr/hy+tYtv3nJlYpNAsNjDX7rG1/UBmcfRUxglGtwNznCFhh9nMczj/T6GfAVOod7ksCNni8rDOuOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=OQu1cQ2M; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 527E38vb028354;
+	Fri, 7 Mar 2025 15:24:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=fpXEGy
+	SQym7CPwOOwdiRHKcf9MJxqIIxYTXw8n7IaB0=; b=OQu1cQ2M7OWqlcAdaRN5Yz
+	v2iJgkPtV8ZA2r4GgDhoL3ShW5G8xbOtUPSzN62+6HCCef0KCl1sPv1MeU3PeiyK
+	hAxczM6GZ/6zw07SIPx3o9K7Dzga51b9rjZgQ1l/C0YD4pCypOfiRfegD26jtQQJ
+	BnnFCYHospyqQKK6o0Pc5UZVDd9yTnvrDSOynkIW32HufSYjWq4DBsJoArozwzvE
+	OzaBvphmcYiukEGuYSjm2qpOdFyG9KOmlXYE/UFDJ2xYdOhxBciLQveBxDLZ39nT
+	cvc00sw++yGC6pet6Euva8YGr2Z7a1jli5ctUraSwzE7zq9ixgf/mSVx2jZB0DyQ
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45827p8dmf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 07 Mar 2025 15:24:10 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 527FOARD008923;
+	Fri, 7 Mar 2025 15:24:10 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45827p8dm7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 07 Mar 2025 15:24:10 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 527CKNqq020845;
+	Fri, 7 Mar 2025 15:24:08 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 454djnyh4h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 07 Mar 2025 15:24:08 +0000
+Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 527FO7SF12780042
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 7 Mar 2025 15:24:07 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3ED9858065;
+	Fri,  7 Mar 2025 15:24:07 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C534258052;
+	Fri,  7 Mar 2025 15:24:01 +0000 (GMT)
+Received: from [9.61.252.177] (unknown [9.61.252.177])
+	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  7 Mar 2025 15:24:01 +0000 (GMT)
+Message-ID: <96a959ec-c6a6-4740-a560-34134b2af7f7@linux.ibm.com>
+Date: Fri, 7 Mar 2025 20:54:00 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250307083544.1659135-1-edumazet@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/2] Fix xdp_adjust_frags_tail_grow selftest on powerpc
+Content-Language: en-GB
+To: Saket Kumar Bhaskar <skb99@linux.ibm.com>, bpf@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc: ast@kernel.org, hbathini@linux.ibm.com, andrii@kernel.org,
+        aleksander.lobakin@intel.com, daniel@iogearbox.net,
+        davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
+        martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+        yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org
+References: <cover.1741188826.git.skb99@linux.ibm.com>
+From: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
+In-Reply-To: <cover.1741188826.git.skb99@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: w_vQ1sg3EnNrJ9rwrvqqGpqRrNaPY13f
+X-Proofpoint-GUID: N_JYlXhT-dlVYCS5vQ5ZhKyN0HCa-eA6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-07_06,2025-03-06_04,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 bulkscore=0 clxscore=1011 spamscore=0 mlxlogscore=999
+ malwarescore=0 lowpriorityscore=0 phishscore=0 adultscore=0 suspectscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502100000 definitions=main-2503070111
 
-On 03/07, Eric Dumazet wrote:
-> ethnl_default_dump_one() operates on the device provided in its @dev
-> parameter, not from ctx->req_info->dev.
-> 
-> syzbot reported:
-> 
-> Oops: general protection fault, probably for non-canonical address 0xdffffc0000000197: 0000 [#1] PREEMPT SMP KASAN PTI
-> KASAN: null-ptr-deref in range [0x0000000000000cb8-0x0000000000000cbf]
->  RIP: 0010:netdev_need_ops_lock include/linux/netdevice.h:2792 [inline]
->  RIP: 0010:netdev_lock_ops include/linux/netdevice.h:2803 [inline]
->  RIP: 0010:ethnl_default_dump_one net/ethtool/netlink.c:557 [inline]
->  RIP: 0010:ethnl_default_dumpit+0x447/0xd40 net/ethtool/netlink.c:593
-> Call Trace:
->  <TASK>
->   genl_dumpit+0x10d/0x1b0 net/netlink/genetlink.c:1027
->   netlink_dump+0x64d/0xe10 net/netlink/af_netlink.c:2309
->   __netlink_dump_start+0x5a2/0x790 net/netlink/af_netlink.c:2424
->   genl_family_rcv_msg_dumpit net/netlink/genetlink.c:1076 [inline]
->   genl_family_rcv_msg net/netlink/genetlink.c:1192 [inline]
->   genl_rcv_msg+0x894/0xec0 net/netlink/genetlink.c:1210
->   netlink_rcv_skb+0x206/0x480 net/netlink/af_netlink.c:2534
->   genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
->   netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
->   netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1339
->   netlink_sendmsg+0x8de/0xcb0 net/netlink/af_netlink.c:1883
->   sock_sendmsg_nosec net/socket.c:709 [inline]
->   __sock_sendmsg+0x221/0x270 net/socket.c:724
->   ____sys_sendmsg+0x53a/0x860 net/socket.c:2564
->   ___sys_sendmsg net/socket.c:2618 [inline]
->   __sys_sendmsg+0x269/0x350 net/socket.c:2650
-> 
-> Fixes: 2bcf4772e45a ("net: ethtool: try to protect all callback with netdev instance lock")
-> Reported-by: syzbot+3da2442641f0c6a705a2@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/lkml/67caaf5e.050a0220.15b4b9.007a.GAE@google.com/T/#u
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+On 05/03/25 10:43 pm, Saket Kumar Bhaskar wrote:
+> For platforms on powerpc architecture with a default page size greater
+> than 4096, there was an inconsistency in fragment size calculation.
+> This caused the BPF selftest xdp_adjust_tail/xdp_adjust_frags_tail_grow
+> to fail on powerpc.
+>
+> The issue occurred because the fragment buffer size in
+> bpf_prog_test_run_xdp() was set to 4096, while the actual data size in
+> the fragment within the shared skb was checked against PAGE_SIZE
+> (65536 on powerpc) in min_t, causing it to exceed 4096 and be set
+> accordingly. This discrepancy led to an overflow when
+> bpf_xdp_frags_increase_tail() checked for tailroom, as skb_frag_size(frag)
+> could be greater than rxq->frag_size (when PAGE_SIZE > 4096).
+>
+> This change fixes:
+>
+> 1. test_run by getting the correct arch dependent PAGE_SIZE.
+> 2. selftest by caculating tailroom and getting correct PAGE_SIZE.
+>
+> Changes:
+> v1 -> v2:
+>     * Address comments from Alexander
+>        * Use dynamic page size, cacheline size and size of
+>          struct skb_shared_info to calculate parameters.
+>        * Fixed both test_run and selftest.
+>
+> v1: https://lore.kernel.org/all/20250122183720.1411176-1-skb99@linux.ibm.com/
+>
+> Saket Kumar Bhaskar (2):
+>    bpf, test_run: Replace hardcoded page size with dynamic PAGE_SIZE in
+>      test_run
+>    selftests/bpf: Refactor xdp_adjust_tail selftest with dynamic sizing
+>
+>   .../bpf/prog_tests/xdp_adjust_tail.c          | 160 +++++++++++++-----
+>   .../bpf/progs/test_xdp_adjust_tail_grow.c     |  41 +++--
+>   2 files changed, 149 insertions(+), 52 deletions(-)
+>
+Applied the patch series on the bpf-next and patch works as expected.
+
+
+With Out the Patch:
+
+test_xdp_adjust_frags_tail_grow:PASS:9Kb+10b 0 nsec
+test_xdp_adjust_frags_tail_grow:FAIL:9Kb+10b retval unexpected 9Kb+10b 
+retval: actual 3 != expected 1
+test_xdp_adjust_frags_tail_grow:FAIL:9Kb+10b size unexpected 9Kb+10b 
+size: actual 13097 != expected 9001
+#583/5   xdp_adjust_tail/xdp_adjust_frags_tail_grow:FAIL
+#583     xdp_adjust_tail:FAIL
+Summary: 0/4 PASSED, 0 SKIPPED, 1 FAILED
+
+
+With Patch:
+
+# ./test_progs -t xdp_adjust_tail
+#583/1   xdp_adjust_tail/xdp_adjust_tail_shrink:OK
+#583/2   xdp_adjust_tail/xdp_adjust_tail_grow:OK
+#583/3   xdp_adjust_tail/xdp_adjust_tail_grow2:OK
+#583/4   xdp_adjust_tail/xdp_adjust_frags_tail_shrink:OK
+#583/5   xdp_adjust_tail/xdp_adjust_frags_tail_grow:OK
+#583     xdp_adjust_tail:OK
+Summary: 1/5 PASSED, 0 SKIPPED, 0 FAILED
+
+
+Please add below tag to all the patches in series.
+
+Tested-by: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
+
+
+Regards,
+
+Venkat.
+
 
