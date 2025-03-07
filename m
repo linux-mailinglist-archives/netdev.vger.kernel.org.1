@@ -1,147 +1,123 @@
-Return-Path: <netdev+bounces-172860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1224A56534
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 11:28:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 44011A563C1
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 10:29:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F3C21898DC7
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 10:28:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F03981896E1A
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 09:29:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17C1520E006;
-	Fri,  7 Mar 2025 10:28:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D63252054F1;
+	Fri,  7 Mar 2025 09:28:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="KsoaRTbC"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Jj5z5QL6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83DF820DD71
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 10:28:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 120B81F94C
+	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 09:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741343296; cv=none; b=pS02f1EZ1vueHNTrNAkgl5cr5UD3GcXHzrJG6/JZskRV+idedCQWr77+G/MJ13QgMaHx31uqzPw+ZmT7lJwY1XAtAj06vk5091YpZ85WrMl7BtcshAyMpnhEnLUTOOZ5C9I8SsdMvfsR8SEHjimx0RHxGqg3CbUKFAGh/GvXrpo=
+	t=1741339735; cv=none; b=WzHW+kgIKpF71CG4mKdr73b7nZtNFFjaw9TdVwKh7UjweyJezGZffyVCbnoZoMywpLWMVknub2+AJYZVXqxKEPBJS9p7+zuHjn+vWHGQxSiwDCCJKp9/U0p9rv8vFE/V4qj4YeFzQrbsiNOx1LuRaiTXwSTvG/6KEiNBxgb7pT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741343296; c=relaxed/simple;
-	bh=jrQxx963u0UIh0LMWTyR85DyjzQHKWDA6KlOFHvOOg8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=LzlSS7f9n6e3HzeFuTVSfDU8KecLe2QvZtVaQQSRNEIPOkVI6Xmsmn3jo6Jr9EMo11JtNUswSSCZtdeiYjDeLgI9IlHpl2g8F5Q02N5KC5rK03sZktdwaAfFGzdV77TGib2PTxVRu7HYbhUKhzBEsP2NoNvUkvhQ3J61POw1O3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=KsoaRTbC; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tqTzx-0031mN-Jd; Fri, 07 Mar 2025 10:28:05 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Cc:To:Message-Id:Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Subject:Date:From;
-	bh=7ur2YaFrKmvtBuyp9fEmTVu7+f1jUmCVVpaxPwcaTXY=; b=KsoaRTbCTxrSkkLRLeI5VAYAMf
-	aLXznNbisLgYo+D+hZlu7iXGi8y/SYM0Z+sSW6ROWi2UdoG1xPGfmzzRA0eeUw8YW5x0aCgrm39pY
-	9pt6KTWhNoa2+e4r0BT4o946/VjyWcFlCbStfLi7wwTDj1fx9ZxnsU3CzRNtwnN7c3JbFSihH+mWe
-	e2hgbgDN4Jrozcool9HtDT4NOpCJMNe4nL0KOSJd9WHH7Nr5xu9aDp3yt4phNxPH4bQsuYd0egkld
-	86YPgycwJBM6FXW8fnkckUOJLjj1toRXpa4l8TNpHO4mzh31d7HWB+QGVJp/vJg7lNG1AmxLjvVaQ
-	IY36IjPA==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tqTzw-000212-Pq; Fri, 07 Mar 2025 10:28:04 +0100
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tqTzs-00636i-Hb; Fri, 07 Mar 2025 10:28:00 +0100
-From: Michal Luczaj <mhal@rbox.co>
-Date: Fri, 07 Mar 2025 10:27:50 +0100
-Subject: [PATCH net] vsock/bpf: Handle EINTR connect() racing against
- sockmap update
+	s=arc-20240116; t=1741339735; c=relaxed/simple;
+	bh=6YeoeqWkwCNXJnRk/T6zgTx0/hcyWZyOla3rDPddU7M=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ELommFuoRw4v2aIMIgZOMHKU46qjW7AmUVUlYOe0Nw0v4TuIm6b3AEy7GszQo9tM1noCn4GcPr0N09fR3L1Gn9zBgaiZqfGgaUVpqOe2l1iiorvQoGyy48eIEKlmd2kK909cV3VSnK5/RXa8Bsiy0Ih1dsFKxmBYzvNsfmmCi3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Jj5z5QL6; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-390f69f8083so1400966f8f.0
+        for <netdev@vger.kernel.org>; Fri, 07 Mar 2025 01:28:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1741339732; x=1741944532; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4Ju5ZbvhcNx9BRsCMH0Wbm+2RjeifjUfGKt0f6VkL5g=;
+        b=Jj5z5QL6M2VRGpNNaTVDfm1XFMK0VFQyB29azUW9wibYIS75kkjC7xiPKi+kLHW/hB
+         iEuUtILRLlr0NXptIw2uYX1p5zuPrRgjv2ApLSzpd1kUmdE6opw+gHQ2A4N2Y/yW8lNe
+         wfboyZoRzrPGADWwb5fIurUPHz/eOJCQStW+riumANjjhJz+105AC64W/dYFdSIpyCxm
+         UL4La3YFPcgHJOLVHb0ZV6Ba2uTJT4S3nvwoZoVHifPADB5XQ+dR01COnhrr0Xwvb1cd
+         Rw/0xwzW2EjxGObnEJzw+8GqBSVWgpIJL15883x9N/IlGuoz5/9NReGvbiS6gXgIp2e0
+         RTOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741339732; x=1741944532;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4Ju5ZbvhcNx9BRsCMH0Wbm+2RjeifjUfGKt0f6VkL5g=;
+        b=k0M//UAU6iYj+ykzapziFoLU/ueZnJtt2KZXlPs2xT74U7y0zFTL84gFFZh1eDEmsq
+         mmMYyjVEAzln15ecj6ujI08Ty8MBBJM+j4soY0pz9BfkNbP8YM2VkjPO9JchmocIzmb3
+         VIfqn0j07OKpLwIvgPv83vzpVQu4lWbrL0g/O+TAzNTiANKPWMFOzUFQLicJCrJe0V3/
+         tj2e4LRQ+ZpgFxEZ/3YWCN0JDzhvr2r7FJ0L3/WXV7PKuzmDFV4EXAxl/BZGz3nNJDgi
+         bMfGR9KgZ2sa0VLy9TGMCNaHZn26+6nBDUCtomXxGBZmj+63QUtnupkGety9D3wZRWyh
+         w/7w==
+X-Forwarded-Encrypted: i=1; AJvYcCXwNWxnpXj30r+MyqtWr/O1CIZM7pY8Twnjino+zdO7xo8hgtykFBWcufThkpG2LNCy4ZnM2wM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywf3ky/s6e9vDouJ+Y46gcfOJaIB4Gx+6+/e/HoOo0Bm3RNADgl
+	L9+cYAhQsbaLH6Pdq5iw4CoQPr7EDmUuua7+MVIOei+CsywZDdqj9eW15CESHPw=
+X-Gm-Gg: ASbGncvzN4DOErzwjooYiQv4BSNF8HgERS8lw31PT6V/d45gHZN1T0qmJJqUI2aJbVe
+	vzO/0TUv3B+4PMqZUc4vB/kPP/MmuFnm7mb8evhFBxaxjSCfuQ4gjpfemMOyi4g1UhR8EQBJAeM
+	KunRPe+nrJGGEZNUIjEt3UYua/lw4x2KEeAJ6fk3gAjAS/b+zqiRlQpz+RNIKR2IGg0E+DX9KFT
+	JjqwQER1lUt+9WOOWD4Yc9LIUzSF7iJcjq0jIyM+9ygbwArCa0rlUuhRXb/fA8wLUQPsoh7Jlwb
+	BkkHbnbzU2Zwd4CrqYC6PilmCO/3iwryvmO9+TlC9AKsju1/dw==
+X-Google-Smtp-Source: AGHT+IHy9+4P7rIHGn06Z9Wnp3OaLVatH22AMmyNL2OvUFsznE8mxvWG+6gIV29lYBEOGpcOgyg8oA==
+X-Received: by 2002:a05:6000:1844:b0:391:3110:de46 with SMTP id ffacd0b85a97d-39132d98a83mr1919691f8f.38.1741339732054;
+        Fri, 07 Mar 2025 01:28:52 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-43bdd8b0461sm47647725e9.4.2025.03.07.01.28.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Mar 2025 01:28:51 -0800 (PST)
+Date: Fri, 7 Mar 2025 12:28:48 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Lee Trager <lee@trager.us>
+Cc: Alexander Duyck <alexanderduyck@fb.com>,
+	Jakub Kicinski <kuba@kernel.org>, kernel-team@meta.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH net-next] eth: fbnic: fix memory corruption in
+ fbnic_tlv_attr_get_string()
+Message-ID: <2791d4be-ade4-4e50-9b12-33307d8410f6@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250307-vsock-trans-signal-race-v1-1-3aca3f771fbd@rbox.co>
-X-B4-Tracking: v=1; b=H4sIABW8ymcC/x3MwQqDMAyA4VeRnBeoFafuVYaH0qZdmMSRiAjiu
- 1t2/A7/f4KRMhm8mhOUdjZepaJ9NBA/QQohp2rwzveucz3utsYvbhrE0LhIWFBDJExPn4ehHZO
- bJqj1Tynz8T+/QWiD+bpuojxgE24AAAA=
-X-Change-ID: 20250305-vsock-trans-signal-race-d62f7718d099
-To: Stefano Garzarella <sgarzare@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Bobby Eshleman <bobby.eshleman@bytedance.com>, 
- "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
- Michal Luczaj <mhal@rbox.co>
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
-Signal delivered during connect() may result in a disconnect of an already
-TCP_ESTABLISHED socket. Problem is that such established socket might have
-been placed in a sockmap before the connection was closed. We end up with a
-SS_UNCONNECTED vsock in a sockmap. And this, combined with the ability to
-reassign (unconnected) vsock's transport to NULL, breaks the sockmap
-contract. As manifested by WARN_ON_ONCE.
+This code is trying to ensure that the last byte of the buffer is a NUL
+terminator.  However, the problem is that attr->value[] is an array of
+__le32, not char, so it zeroes out 4 bytes way beyond the end of the
+buffer.  Cast the buffer to char to address this.
 
-Ensure the socket does not stay in sockmap.
-
-WARNING: CPU: 10 PID: 1310 at net/vmw_vsock/vsock_bpf.c:90 vsock_bpf_recvmsg+0xb4b/0xdf0
-CPU: 10 UID: 0 PID: 1310 Comm: a.out Tainted: G        W          6.14.0-rc4+
- sock_recvmsg+0x1b2/0x220
- __sys_recvfrom+0x190/0x270
- __x64_sys_recvfrom+0xdc/0x1b0
- do_syscall_64+0x93/0x1b0
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
-
-Fixes: 634f1a7110b4 ("vsock: support sockmap")
-Signed-off-by: Michal Luczaj <mhal@rbox.co>
+Fixes: e5cf5107c9e4 ("eth: fbnic: Update fbnic_tlv_attr_get_string() to work like nla_strscpy()")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 ---
- net/vmw_vsock/af_vsock.c  | 10 +++++++++-
- net/vmw_vsock/vsock_bpf.c |  1 +
- 2 files changed, 10 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/meta/fbnic/fbnic_tlv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index 7742a9ae0131310bba197830a241541b2cde6123..e5a6d1d413634f414370595c02bcd77664780d8e 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -1581,7 +1581,15 @@ static int vsock_connect(struct socket *sock, struct sockaddr *addr,
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_tlv.c b/drivers/net/ethernet/meta/fbnic/fbnic_tlv.c
+index d558d176e0df..517ed8b2f1cb 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_tlv.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_tlv.c
+@@ -261,7 +261,7 @@ ssize_t fbnic_tlv_attr_get_string(struct fbnic_tlv_msg *attr, char *dst,
+ 		return -E2BIG;
  
- 		if (signal_pending(current)) {
- 			err = sock_intr_errno(timeout);
--			sk->sk_state = sk->sk_state == TCP_ESTABLISHED ? TCP_CLOSING : TCP_CLOSE;
-+			if (sk->sk_state == TCP_ESTABLISHED) {
-+				/* Might have raced with a sockmap update. */
-+				if (sk->sk_prot->unhash)
-+					sk->sk_prot->unhash(sk);
-+
-+				sk->sk_state = TCP_CLOSING;
-+			} else {
-+				sk->sk_state = TCP_CLOSE;
-+			}
- 			sock->state = SS_UNCONNECTED;
- 			vsock_transport_cancel_pkt(vsk);
- 			vsock_remove_connected(vsk);
-diff --git a/net/vmw_vsock/vsock_bpf.c b/net/vmw_vsock/vsock_bpf.c
-index 07b96d56f3a577af71021b1b8132743554996c4f..c68fdaf09046b68254dac3ea70ffbe73dfa45cef 100644
---- a/net/vmw_vsock/vsock_bpf.c
-+++ b/net/vmw_vsock/vsock_bpf.c
-@@ -127,6 +127,7 @@ static void vsock_bpf_rebuild_protos(struct proto *prot, const struct proto *bas
- {
- 	*prot        = *base;
- 	prot->close  = sock_map_close;
-+	prot->unhash = sock_map_unhash;
- 	prot->recvmsg = vsock_bpf_recvmsg;
- 	prot->sock_is_readable = sk_msg_is_readable;
- }
-
----
-base-commit: b1455a45afcf789f98032ec93c16fea0facdec93
-change-id: 20250305-vsock-trans-signal-race-d62f7718d099
-
-Best regards,
+ 	srclen = le16_to_cpu(attr->hdr.len) - sizeof(*attr);
+-	if (srclen > 0 && attr->value[srclen - 1] == '\0')
++	if (srclen > 0 && ((char *)attr->value)[srclen - 1] == '\0')
+ 		srclen--;
+ 
+ 	if (srclen >= dstsize) {
 -- 
-Michal Luczaj <mhal@rbox.co>
+2.47.2
 
 
