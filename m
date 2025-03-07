@@ -1,156 +1,125 @@
-Return-Path: <netdev+bounces-172994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E106A56CAB
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 16:55:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C262A56CC9
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 16:57:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 581881896450
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 15:55:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FCE91786CC
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 15:57:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B7F21E092;
-	Fri,  7 Mar 2025 15:55:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MoNSryUg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 714702206B1;
+	Fri,  7 Mar 2025 15:57:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7833121D58C;
-	Fri,  7 Mar 2025 15:55:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D7EBDF71;
+	Fri,  7 Mar 2025 15:57:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741362917; cv=none; b=An26vNhBwEy2zQMHYU8LUN6HBAjjseR9B7zyIni82wCflsoy4K1p7/C752MlCfA9zpV8//PVv2Qj4wh7Ae9Z0rNub5q85+pNvHs9NmgdSnBSqGIpw3UeuogJohzhd1hPrmxOpl+8+D3yriq+uMtQpvRFIKTinjS7w4r/euEu+eA=
+	t=1741363049; cv=none; b=he6XDGANBm5wvj/VGk7lwy3o0si6lkiBleVPav9K0AfRtHtBggLwZV0atzgdX4UMc1RRfOLXuuIY664JXER+vBbf74M1/b0YFsoFEQ/059ySP/jh7CIMHAjHtxwhNa5GuNh+tEl2d1TpNZtwOlequWudnI4Jh09ilafYwOF8zaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741362917; c=relaxed/simple;
-	bh=tzrS+lI9W7w2w8k6AVE6C+sBU6gvdTLX5BacFbhKkPs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RFS0s25W/Kegb1/hJwypJrcXJNHcTxSBVBoCwOnZZPeLt3UG8F53m0sf23YMlcoVNGBrKXlcE/AXdXHkoZJnIykVvEMh17Iz12rlBqoXap4Xf9p2jTvCpIbCWiuVEzYTRnraziKtlmNOqKUM9UgpqTUK4GQvYdU3tMREvs9uTuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MoNSryUg; arc=none smtp.client-ip=209.85.219.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1741363049; c=relaxed/simple;
+	bh=SxLIPGY5MWaFjbH5jwXnYCzIgIY8IZBhzMTbt9T4+M0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tj1eccqq5DATGjs1/sSoAKcOhp/tLNPk/oUGh7IhE8IFEFs/LPPi75eSap5GR6U3kCq7BKF4oeExJJxHCJzfAAjIA+UUfgrQuLo2taD9olaUifVhAfkGjmoZnju9wzy+eeOTaiiSLGp+iPsOx2GVq456tG1DTxRpLvD5p8CMKXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e549be93d5eso1809081276.1;
-        Fri, 07 Mar 2025 07:55:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741362914; x=1741967714; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IySwQu8sBAq2SiiOusmnVT2gVfPlf25OMd3Kg55m+0M=;
-        b=MoNSryUgYwzQerG+wqBnZ3LwaxBw5rKz1lrFhtPwodTPOWzrJaFLUkB16VDIZ3Osn3
-         IEbbIk0qiamuy5RPiTk/F9+OTn9vVa0s/LJpiJALEeyfnB4GGPyJeuOgqEXFWbYnmGzr
-         RKrmSsmpKryN2PmE8OIJ3ZqsjgIA+tMOwGzdP/rbySqiHj0n+uWKb4JFl4w/+d9ByAZt
-         xDwODih1iWvqoGe+00JY9odyDslhqflV7z6madXRtpagTVq4F9TDnaNi43PiEB7eHzCe
-         DLtF/9aEjdwpX9scT05HRKfRYZF9QRDf3MtXs6PrFJOMGkqPUVpL53Q+1VmrNaDIu75b
-         Hhyg==
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2ff087762bbso3125370a91.3;
+        Fri, 07 Mar 2025 07:57:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741362914; x=1741967714;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IySwQu8sBAq2SiiOusmnVT2gVfPlf25OMd3Kg55m+0M=;
-        b=Sa5P45M01YrxIk2iUH8FYbd5ZuzI4NfbNW9JEw5TLnG76V1qVuEAJBkR/HATHM8DUW
-         J6BRQ481ZQK7ISjHkrC+cIrkmeUvnAgbKApE8tGuPa/AH1T8end/4rPtdtZLXe+N7XK/
-         kHp4TGw94jVWOThwnXPic9atW7IC3vqiRmG+MEvVUToFedIe4FggCZGvpyTlBz3yJmUA
-         W1YnAddg3aRabApA6wm4BgO2dhod16yAgLfKuJhZJo0lRhxVt0h2it81fXmzHbSu/fDT
-         6CQQrcUYboSqps+g9f8yCmTFTuBRohHo6j47fHa57Ye6IJIWHpn337lwTC/1Awr/zXKw
-         Tc6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUhuWYJxV5fBa8kyCJMhqbB1L3XcqMLwdtoQ+byuLKEX6WTiJsLYn8aY7KjoFuIOos1n9s5kmS7@vger.kernel.org, AJvYcCUq393gUss7rzw4GRMC2SmkmcEBNHEbVnl8/4+7eRNF7gQMKcNV5uSoYqlngqq2MJfc932kKzAjlEUJ+Vp4@vger.kernel.org, AJvYcCVo+cd6/iOdkubleklrMUpyYU6cUxrIQoTZ7Ip8bZeL73dIZdrXAv49D/LLqRmtWID4mI1NORYHlfRytPeOCKI=@vger.kernel.org, AJvYcCW7c+uKZUDGiWXG/Ngvx72IhE814vfXzSJiMylH91JsJ9iPigLBClzE3WSkd+wScVSILnxpgMQK6oGSapeq@vger.kernel.org, AJvYcCWGO86lryyZPaLQRm9Lyk9QNfYYkzNfFO9k4mc9BZBrCXcouzJD842GI+rD36B+nhm78xc=@vger.kernel.org, AJvYcCX0j+97TcVPh+Co5rVgE71IinFPEx7UF3GT70qjFFrll+qRSoOf79Iu4nEWFegXrAT0POzxqCSmmF23lPc=@vger.kernel.org, AJvYcCXU1uvyht2x1BjqtB2Z8N8lNyl+bk0xueIjZGqZJuQ/r/6qJW+POeTERqBHKj2PlOnxnWPsj+zpP1qDMe0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnpUb3lo34ZsMPgOZjI6dSQqdILNXqbzmnKMyVkfypdeViQbMg
-	kqS3UleZcuNIjz57AOYqmlE9JK5T3o15wJd9Svr2V9Kk6pb/PuBW
-X-Gm-Gg: ASbGncuheKUa6QfnJC/P9wknbtwLVyRiRiTBO96kNw6dvJcv6U7NL4r/6pgMw3vGIzy
-	mxlRSwfJ/sIg5S4ilj3aBRQ/tiWB3g7eJ2PjeKioC/qLqE/FWs10GdIN8Jj7z/aKDI4x2ipASou
-	ygz83pbH1Q39PPMmgBTcEHg76FxTP2ujDCatDkOzHQ0am1SeDrNxPkHmTfogDKp6RjctJKukyRM
-	5BfhvWOTm51Qwt1Xij3oeMSFKUHadk9S3Ktgg50c04kvr442YQdPUJrvPPtdvwzEo78EIEghSwB
-	oVFPXZ78ZVHdUbmCjvD0A84KhG2mwQo702B8eqas87gX6yzX//ZSSZgV48NEqJlZ6bgZdxrtBJ2
-	57cqS
-X-Google-Smtp-Source: AGHT+IGXsVm03RpeRs7naE92Mk1v2+BdYsqkQh0ckjckzDu/bnevFLrinU7kQnO5Z9/M1SdGBh4guA==
-X-Received: by 2002:a05:6902:2292:b0:e60:c79f:6f6c with SMTP id 3f1490d57ef6-e635c0f80admr4791285276.8.1741362914172;
-        Fri, 07 Mar 2025 07:55:14 -0800 (PST)
-Received: from localhost (c-73-224-175-84.hsd1.fl.comcast.net. [73.224.175.84])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e635e4c8f69sm386658276.42.2025.03.07.07.55.13
+        d=1e100.net; s=20230601; t=1741363046; x=1741967846;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ioESNgWfxiXU5JD8t0Jb69ZxEn0ATTho+YLv7pdcm48=;
+        b=xL+p2l7WFfM9d4hcfDV5aAarHOA6u8f2lrKR6MZHgblk6+Dn9Hq+GhhnbrHYoloBqw
+         dulZXgJI0UiXamj1fm9bxR3TiWUFSkGjqJ+7kNuDxMrz7y6yT6dpXfp34BAnRUyaxcI4
+         uAgVvqtdl6VTiAVk0Gc0kh6NOriVwQAq7NveFBWRQDaCj66lOZ+qFWtSrR3lj7a5Gj8K
+         QDE7qxnnfwk0TN/7QotY+HxACeCDL9jMf7q1BF9AbUMkp814QFhMjGt7OsAal6/qfaxW
+         jVekGJk1r5/pKGxe4HHft8ZLM2Y0Cy9y6FH1RWBqG4pCNIh70BLC3j0YVq7YazNTQT1C
+         Cx8A==
+X-Forwarded-Encrypted: i=1; AJvYcCXekNFeJijWZzg979xMqc1H17DALdsOO3rNCybGJ5H7JNND/6IRYhhG426vThZxBAj7n5m7f+XpuL5sHvU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPiC2a8aJirzIutUnO7O6J/oQy8wfbaxzZTfS1/c4nVvauPnG2
+	R3JPpChjmr8oiABYiqjw6iP8zmnBPeGW3Zvi15/JUZYZ5d83vhmyA+tI
+X-Gm-Gg: ASbGncvStf4s/K7WNKNBDCh5sd2oxXOJayIbvu5sk/yr5m6cs1A8y9jg399qpqJ+aUB
+	ujss3p2S6CC22ly7AtuUT5DqZu0m/ALQj/E/ORIvZjXaYqIoLpfbYHk9dR3+kGcoUWTlCluW7Co
+	EWB9mYzjCQk13x7HmpSUb6jak/rAAcFS/kQ/csOdrlpRenLSxUPJiBKzyWx2zow3ak8BYDcyGp0
+	Vr9loRSpDIv5JVo7znjf+dbp+7OkFNx6k4y0N7TtxKohsg47zo3opX8v/vGoon7cq5ApSUQCjLD
+	taDX6kGs355S8O9LRbBsjk+Xd35JHzHuor9MUSGGmQZs
+X-Google-Smtp-Source: AGHT+IELI3rN3kvPAEHX77hKWOPAf7aE/r9mym2Y+5j5YTj5NowySDBEa18BajbMuxXI3W2bjBQkVg==
+X-Received: by 2002:a17:90b:3950:b0:2ea:a9ac:eee1 with SMTP id 98e67ed59e1d1-2ff7ce82f03mr6410761a91.10.1741363046199;
+        Fri, 07 Mar 2025 07:57:26 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-2ff693f7f0bsm3208118a91.46.2025.03.07.07.57.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Mar 2025 07:55:13 -0800 (PST)
-Date: Fri, 7 Mar 2025 10:55:13 -0500
-From: Yury Norov <yury.norov@gmail.com>
-To: Jiri Slaby <jirislaby@kernel.org>
-Cc: Kuan-Wei Chiu <visitorckw@gmail.com>, tglx@linutronix.de,
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-	x86@kernel.org, jk@ozlabs.org, joel@jms.id.au,
-	eajames@linux.ibm.com, andrzej.hajda@intel.com,
-	neil.armstrong@linaro.org, rfoss@kernel.org,
-	maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-	tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
-	dmitry.torokhov@gmail.com, mchehab@kernel.org,
-	awalls@md.metrocast.net, hverkuil@xs4all.nl,
-	miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
-	louis.peens@corigine.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	parthiban.veerasooran@microchip.com, arend.vanspriel@broadcom.com,
-	johannes@sipsolutions.net, gregkh@linuxfoundation.org,
-	akpm@linux-foundation.org, hpa@zytor.com, alistair@popple.id.au,
-	linux@rasmusvillemoes.dk, Laurent.pinchart@ideasonboard.com,
-	jonas@kwiboo.se, jernej.skrabec@gmail.com, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, linux-fsi@lists.ozlabs.org,
-	dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
-	oss-drivers@corigine.com, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev,
-	brcm80211-dev-list.pdl@broadcom.com, linux-serial@vger.kernel.org,
-	bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw,
-	Yu-Chun Lin <eleanor15x@gmail.com>
-Subject: Re: [PATCH v3 00/16] Introduce and use generic parity16/32/64 helper
-Message-ID: <Z8sW4c5LxV-ITdCi@thinkpad>
-References: <20250306162541.2633025-1-visitorckw@gmail.com>
- <3dfc81eb-caa1-42fe-8fd6-61101de0ef13@kernel.org>
+        Fri, 07 Mar 2025 07:57:25 -0800 (PST)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	horms@kernel.org,
+	donald.hunter@gmail.com,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	andrew+netdev@lunn.ch,
+	jdamato@fastly.com,
+	sdf@fomichev.me,
+	xuanzhuo@linux.alibaba.com,
+	almasrymina@google.com,
+	asml.silence@gmail.com,
+	dw@davidwei.uk
+Subject: [PATCH net-next v1 0/4] net: remove rtnl_lock from the callers of queue APIs
+Date: Fri,  7 Mar 2025 07:57:21 -0800
+Message-ID: <20250307155725.219009-1-sdf@fomichev.me>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3dfc81eb-caa1-42fe-8fd6-61101de0ef13@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Mar 07, 2025 at 07:57:48AM +0100, Jiri Slaby wrote:
-> On 06. 03. 25, 17:25, Kuan-Wei Chiu wrote:
-> > Several parts of the kernel contain redundant implementations of parity
-> > calculations for 16/32/64-bit values. Introduces generic
-> > parity16/32/64() helpers in bitops.h, providing a standardized
-> > and optimized implementation.
-> > 
-> > Subsequent patches refactor various kernel components to replace
-> > open-coded parity calculations with the new helpers, reducing code
-> > duplication and improving maintainability.
-> > 
-> > Co-developed-by: Yu-Chun Lin <eleanor15x@gmail.com>
-> > Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
-> > Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail.com>
-> > ---
-> > In v3, I use parityXX() instead of the parity() macro since the
-> > parity() macro may generate suboptimal code and requires special hacks
-> > to make GCC happy. If anyone still prefers a single parity() macro,
-> > please let me know.
-> 
-> What is suboptimal and where exactly it matters? Have you actually measured
-> it?
+All drivers that use queue management APIs already depend on the netdev
+lock. Ultimately, we want to have most of the paths that work with
+specific netdev to be rtnl_lock-free (ethtool mostly in particular).
+Queue API currently has a much smaller API surface, so start with
+rtnl_lock from it:
 
-I asked exactly this question at least 3 times, and have never
-received perf tests or asm listings - nothing. I've never received
-any comments from driver maintainers about how performance of the
-parity() is important for them, as well.
+- add mutex to each dmabuf binding (to replace rtnl_lock)
+- protect global net_devmem_dmabuf_bindings with a new (global) lock
+- move netdev lock management to the callers of netdev_rx_queue_restart
+  and drop rtnl_lock
 
-With the absence of _any_ feedback, I'm not going to take this series,
-of course, for the reason: overengineering.
+Cc: Mina Almasry <almasrymina@google.com>
 
-With that said, the simplest way would be replacing parity8(u8) with
-parity(u64) 'one size fits all' thing. I even made a one extra step,
-suggesting a macro that would generate a better code for smaller types
-with almost no extra maintenance burden. This is another acceptable
-option to me.
+Stanislav Fomichev (4):
+  net: create netdev_nl_sock to wrap bindings list
+  net: protect net_devmem_dmabuf_bindings by new
+    net_devmem_bindings_mutex
+  net: add granular lock for the netdev netlink socket
+  net: drop rtnl_lock for queue_mgmt operations
 
-Thanks,
-Yury
+ Documentation/netlink/specs/netdev.yaml   |  4 +--
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c |  4 +--
+ drivers/net/netdevsim/netdev.c            |  4 +--
+ include/net/netdev_netlink.h              | 12 +++++++
+ net/core/devmem.c                         | 32 ++++++++---------
+ net/core/netdev-genl-gen.c                |  4 +--
+ net/core/netdev-genl-gen.h                |  6 ++--
+ net/core/netdev-genl.c                    | 42 ++++++++++-------------
+ net/core/netdev_rx_queue.c                | 15 +++-----
+ 9 files changed, 63 insertions(+), 60 deletions(-)
+ create mode 100644 include/net/netdev_netlink.h
+
+-- 
+2.48.1
+
 
