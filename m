@@ -1,158 +1,182 @@
-Return-Path: <netdev+bounces-172921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11CF2A567B6
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 13:18:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2A41A567BB
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 13:21:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54E3D3B399B
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 12:18:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA1107A3AE3
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 12:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2A11218EA1;
-	Fri,  7 Mar 2025 12:18:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2EB521884B;
+	Fri,  7 Mar 2025 12:21:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="Be5SaSGg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G4wbIWD+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5C4149E0E;
-	Fri,  7 Mar 2025 12:18:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B00E184E;
+	Fri,  7 Mar 2025 12:21:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741349907; cv=none; b=CJg8CNWzX1AK9Faf7glpNjWXHtC4I9jL9BE95SwDrr2c4JJzdLQ4fxDLb4bO77ttRqvuE9clJBqAhB26zVJW6TApwgEdh+ElLzXQYMgKlCDABh2d+eh1GvhYr3dwMRJuUWGr6toCtev6u33xc0YdaCk9yH/17SeyKbqerVi14BA=
+	t=1741350085; cv=none; b=bdmUODprUfQjNV6ytpKPdcaIHFG6PxSYQ2X0dnvlyysb7SV3TjiuPbojyEnZaGJhmxklkHeZaE2BzwqGE8pVeo1SfufVreLcHwI5sW1ydcf2SHqEPyd1fSBsrvLuPQj0tOGwmkbosamcSOVye/WLQ+ju3JPCRT9r7gyLztaIUJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741349907; c=relaxed/simple;
-	bh=XBMcxAGP8IpKFfU2qVeDIEJfY/IKzzE1da4HAgQQXc4=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=F4gbQjDWJhM//SqOFijvnGVm0HB+4gNry/JtaEtjp/+fGvrpza8TMkvmsE0Oj5/WVOkaswFwqjCJ56RbiulnEcklrW1K/MGqZXoxX0nj9Twp9Xwp4hVXGbvC7l+4OLTATFd30Qgs4jEmU+SlICV+Ik1jCXubqApvU1kvyAHs9R8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=Be5SaSGg; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [127.0.0.1] ([76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 527CEaSZ216144
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Fri, 7 Mar 2025 04:14:36 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 527CEaSZ216144
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025021701; t=1741349679;
-	bh=jpHguGFzA2ESTQPvqJoIr0NmAS1zWgolyOTrgBL62N8=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=Be5SaSGgmsWvlkd2HRqfzArk9nnQa/gbB2kCd/vi2QEK8XF7tn7E007LPGCySYBmv
-	 IBe4UFr66OEmtiNpObBgvlVSM3dsVFMAmcCg1qk0KnpRrF+aipL4y7W2YaKWxosfjg
-	 cWf5lVQ4b9ZseS/T4Ejdb1zr76nvhUjdua5R2Pch5YNHmdUnn4vc+zzlh64uFhK6vb
-	 WTkqjjxZYMKmKvVthPXAaIt6oPShwbOs2Gi2goJSFgvNUhGes6srmI4eDqrLD0uLkC
-	 /B3MuqYu4V3A5+3QHFJOLT2DdF/UOScSb+vcFfW82sFlWlX0qiCgDEt2HYcKJg4NnR
-	 6SqqnMn8wULdA==
-Date: Fri, 07 Mar 2025 04:14:34 -0800
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: Ingo Molnar <mingo@kernel.org>, Jiri Slaby <jirislaby@kernel.org>
-CC: Kuan-Wei Chiu <visitorckw@gmail.com>, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        jk@ozlabs.org, joel@jms.id.au, eajames@linux.ibm.com,
-        andrzej.hajda@intel.com, neil.armstrong@linaro.org, rfoss@kernel.org,
-        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-        tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
-        dmitry.torokhov@gmail.com, mchehab@kernel.org, awalls@md.metrocast.net,
-        hverkuil@xs4all.nl, miquel.raynal@bootlin.com, richard@nod.at,
-        vigneshr@ti.com, louis.peens@corigine.com, andrew+netdev@lunn.ch,
-        davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-        parthiban.veerasooran@microchip.com, arend.vanspriel@broadcom.com,
-        johannes@sipsolutions.net, gregkh@linuxfoundation.org,
-        yury.norov@gmail.com, akpm@linux-foundation.org, alistair@popple.id.au,
-        linux@rasmusvillemoes.dk, Laurent.pinchart@ideasonboard.com,
-        jonas@kwiboo.se, jernej.skrabec@gmail.com, kuba@kernel.org,
-        linux-kernel@vger.kernel.org, linux-fsi@lists.ozlabs.org,
-        dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
-        oss-drivers@corigine.com, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev,
-        brcm80211-dev-list.pdl@broadcom.com, linux-serial@vger.kernel.org,
-        bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw,
-        Yu-Chun Lin <eleanor15x@gmail.com>
-Subject: Re: [PATCH v3 01/16] bitops: Change parity8() return type to bool
-User-Agent: K-9 Mail for Android
-In-Reply-To: <Z8ri5h-nvNXNp6NB@gmail.com>
-References: <20250306162541.2633025-1-visitorckw@gmail.com> <20250306162541.2633025-2-visitorckw@gmail.com> <9d4b77da-18c5-4551-ae94-a2b9fe78489a@kernel.org> <Z8ra0s9uRoS35brb@gmail.com> <a4040c78-8765-425e-a44e-c374dfc02a9c@kernel.org> <Z8ri5h-nvNXNp6NB@gmail.com>
-Message-ID: <04AA7852-2D68-4B3F-9AA7-51AA57E3D23D@zytor.com>
+	s=arc-20240116; t=1741350085; c=relaxed/simple;
+	bh=n/rX2T7XWYNEB5c47vZqkTQcbFk1cEn+IsmwsxMI8H4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dhTi47U/GUHzmFuMpjObMeJzVwAqLJYqItYwLQTvp4Vp+qfpl6voA73dpR1+WSh3DAQ7RFTefpOblOWT82S/5wro+F0Nvdm/iFWIufRQh8qE615lsrG2VE2VOKIov5Ofxgkmu2fnEliGtA8uN4I/+z4cLl/B1yPxSUuido7te70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G4wbIWD+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 379A9C4CED1;
+	Fri,  7 Mar 2025 12:21:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741350084;
+	bh=n/rX2T7XWYNEB5c47vZqkTQcbFk1cEn+IsmwsxMI8H4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=G4wbIWD+eQgi9iSzdRuy9RPG1IVOA0kvWKjOcAZWjQyfpCe1oTP0d4AyYJJkMI7bx
+	 mV+L+WG/USp4nL+oyGB5fWGwSSXGW+joQxc4Bbmx1VlWr4gw2SPnkAy1uCUAZaT3ud
+	 WR4TQYjFo6KYOLRepnzgHLP1eNhxmRAnTZ27rx98jQMeqWTeyjqF9f8H4hzQ7ESZSJ
+	 QnVzxO2KXa2NJHk3hRPoge4TW4gy0ueua3MjM+7e80Q0cFznNkNf3RZdcNFhPP60cJ
+	 37IY+Bpo6V+lW1w4Xfbma4zKAV0ek411E0sfBy0MH/7n7JlWIIMDfAXZijxfw2xceO
+	 1QmGPueKe804g==
+Date: Fri, 7 Mar 2025 12:21:19 +0000
+From: Simon Horman <horms@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>
+Subject: Re: [PATCH net-next 1/7] net: ethtool: netlink: Allow per-netdevice
+ DUMP operations
+Message-ID: <20250307122119.GE3666230@kernel.org>
+References: <20250305141938.319282-1-maxime.chevallier@bootlin.com>
+ <20250305141938.319282-2-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250305141938.319282-2-maxime.chevallier@bootlin.com>
 
-On March 7, 2025 4:13:26 AM PST, Ingo Molnar <mingo@kernel=2Eorg> wrote:
->
->* Jiri Slaby <jirislaby@kernel=2Eorg> wrote:
->
->> On 07=2E 03=2E 25, 12:38, Ingo Molnar wrote:
->> >=20
->> > * Jiri Slaby <jirislaby@kernel=2Eorg> wrote:
->> >=20
->> > > On 06=2E 03=2E 25, 17:25, Kuan-Wei Chiu wrote:
->> > > > Change return type to bool for better clarity=2E Update the kerne=
-l doc
->> > > > comment accordingly, including fixing "@value" to "@val" and adju=
-sting
->> > > > examples=2E Also mark the function with __attribute_const__ to al=
-low
->> > > > potential compiler optimizations=2E
->> > > >=20
->> > > > Co-developed-by: Yu-Chun Lin <eleanor15x@gmail=2Ecom>
->> > > > Signed-off-by: Yu-Chun Lin <eleanor15x@gmail=2Ecom>
->> > > > Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail=2Ecom>
->> > > > ---
->> > > >    include/linux/bitops=2Eh | 10 +++++-----
->> > > >    1 file changed, 5 insertions(+), 5 deletions(-)
->> > > >=20
->> > > > diff --git a/include/linux/bitops=2Eh b/include/linux/bitops=2Eh
->> > > > index c1cb53cf2f0f=2E=2E44e5765b8bec 100644
->> > > > --- a/include/linux/bitops=2Eh
->> > > > +++ b/include/linux/bitops=2Eh
->> > > > @@ -231,26 +231,26 @@ static inline int get_count_order_long(unsi=
-gned long l)
->> > > >    /**
->> > > >     * parity8 - get the parity of an u8 value
->> > > > - * @value: the value to be examined
->> > > > + * @val: the value to be examined
->> > > >     *
->> > > >     * Determine the parity of the u8 argument=2E
->> > > >     *
->> > > >     * Returns:
->> > > > - * 0 for even parity, 1 for odd parity
->> > > > + * false for even parity, true for odd parity
->> > >=20
->> > > This occurs somehow inverted to me=2E When something is in parity m=
-eans that
->> > > it has equal number of 1s and 0s=2E I=2Ee=2E return true for even d=
-istribution=2E
->> > > Dunno what others think? Or perhaps this should be dubbed odd_parit=
-y() when
->> > > bool is returned? Then you'd return true for odd=2E
->> >=20
->> > OTOH:
->> >=20
->> >   - '0' is an even number and is returned for even parity,
->> >   - '1' is an odd  number and is returned for odd  parity=2E
->>=20
->> Yes, that used to make sense for me=2E For bool/true/false, it no longe=
-r does=2E
->> But as I wrote, it might be only me=2E=2E=2E
->
->No strong opinion on this from me either, I'd guess existing practice=20
->with other parity functions should probably control=2E (If a coherent=20
->praxis exists=2E)=2E
->
->Thanks,
->
->	Ingo
+On Wed, Mar 05, 2025 at 03:19:31PM +0100, Maxime Chevallier wrote:
+> We have a number of netlink commands in the ethnl family that may have
+> multiple objects to dump even for a single net_device, including :
+> 
+>  - PLCA, PSE-PD, phy: one message per PHY device
+>  - tsinfo: one message per timestamp source (netdev + phys)
+>  - rss: One per RSS context
+> 
+> To get this behaviour, these netlink commands need to roll a custom
+> ->dumpit().
+> 
+> To prepare making per-netdev DUMP more generic in ethnl, introduce a
+> member in the ethnl ops to indicate if a given command may allow
+> pernetdev DUMPs (also referred to as filtered DUMPs).
+> 
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> ---
+>  net/ethtool/netlink.c | 45 ++++++++++++++++++++++++++++---------------
+>  net/ethtool/netlink.h |  1 +
+>  2 files changed, 30 insertions(+), 16 deletions(-)
+> 
+> diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
+> index 734849a57369..0815b28ba32f 100644
+> --- a/net/ethtool/netlink.c
+> +++ b/net/ethtool/netlink.c
+> @@ -578,21 +578,34 @@ static int ethnl_default_dumpit(struct sk_buff *skb,
+>  	int ret = 0;
+>  
+>  	rcu_read_lock();
+> -	for_each_netdev_dump(net, dev, ctx->pos_ifindex) {
+> -		dev_hold(dev);
+> +	if (ctx->req_info->dev) {
+> +		dev = ctx->req_info->dev;
+>  		rcu_read_unlock();
+> -
+> -		ret = ethnl_default_dump_one(skb, dev, ctx, genl_info_dump(cb));
+> -
+> +		/* Filtered DUMP request targeted to a single netdev. We already
+> +		 * hold a ref to the netdev from ->start()
+> +		 */
+> +		ret = ethnl_default_dump_one_dev(skb, dev, ctx,
+> +						 genl_info_dump(cb));
 
-Instead of "bool" think of it as "bit" and it makes more sense 
+Hi Maxime,
+
+ethnl_default_dump_one_dev() is called here but it doesn't exist
+until the following patch is applied, which breaks bisection.
+
+>  		rcu_read_lock();
+> -		dev_put(dev);
+> -
+> -		if (ret < 0 && ret != -EOPNOTSUPP) {
+> -			if (likely(skb->len))
+> -				ret = skb->len;
+> -			break;
+> +		netdev_put(ctx->req_info->dev, &ctx->req_info->dev_tracker);
+> +	} else {
+> +		for_each_netdev_dump(net, dev, ctx->pos_ifindex) {
+> +			dev_hold(dev);
+> +			rcu_read_unlock();
+> +
+> +			ret = ethnl_default_dump_one(skb, dev, ctx,
+> +						     genl_info_dump(cb));
+> +
+> +			rcu_read_lock();
+> +			dev_put(dev);
+> +
+> +			if (ret < 0 && ret != -EOPNOTSUPP) {
+> +				if (likely(skb->len))
+> +					ret = skb->len;
+> +				break;
+> +			}
+> +			ret = 0;
+>  		}
+> -		ret = 0;
+>  	}
+>  	rcu_read_unlock();
+>  
+
+...
+
+> diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
+> index ec6ab5443a6f..4db27182741f 100644
+> --- a/net/ethtool/netlink.h
+> +++ b/net/ethtool/netlink.h
+> @@ -388,6 +388,7 @@ struct ethnl_request_ops {
+>  	unsigned int		req_info_size;
+>  	unsigned int		reply_data_size;
+>  	bool			allow_nodev_do;
+> +	bool			allow_pernetdev_dump;
+
+nit: allow_pernetdev_dump should also be added to the Kernel doc for
+     struct ethnl_request_ops
+
+     Flagged by ./scripts/kernel-doc -none
+
+     There also appear to be similar minor issues with subsequent
+     patches in this series.
+
+>  	u8			set_ntf_cmd;
+>  
+>  	int (*parse_request)(struct ethnl_req_info *req_info,
+> -- 
+> 2.48.1
+> 
 
