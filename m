@@ -1,79 +1,81 @@
-Return-Path: <netdev+bounces-172952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C7A8A569F7
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 15:07:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19D2CA56A02
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 15:08:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB8D9179F66
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 14:07:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47E403A21B6
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 14:08:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1F7021B196;
-	Fri,  7 Mar 2025 14:06:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6657421ABCA;
+	Fri,  7 Mar 2025 14:08:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ctpK6XhV"
 X-Original-To: netdev@vger.kernel.org
-Received: from a3.inai.de (a3.inai.de [144.76.212.145])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F164B18DF65;
-	Fri,  7 Mar 2025 14:06:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.212.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA28621A44F
+	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 14:08:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741356414; cv=none; b=AhkccHmQDTj7AaXqWX2HmDHoaIGYgEQMhYql1pHByR0r/u0Yc+yP/wGbKsSkPZyzbqlreErzV1EZCQhn1HbQoxLOBNtqz3AKlFWsEfel0KiHHrlbndB7CkTodrpCCqanwSNVzjEWNxHvCnOfPbn/REe0WGE3MJoEMTLo7zJqrsQ=
+	t=1741356496; cv=none; b=VfxW944j/8F9y3ZL4VE3jym2mNST5/WB0e7jz+Fq+i3AQkrOF4StcDS4ydBHcDdPsggrLY/CmexiR76GxDg8jIUrPiQdsHvTcc49+46NAUoCT7DI49/NDkGE2qtUpgThDLqmVPscTX76M+y/m2B2qxGBdEzMhBmZz46V0yNeWtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741356414; c=relaxed/simple;
-	bh=jLtN1XoC+KbFbaxljC9HVSufCwH5cbdUpS2up+/dMhE=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=OFHKOGRCRni+oayvIXEewGuDz3odSW9Rz1zjhYtzGj+IRhqQxDU/fGmP4tOhwsl/YfUtNfW8sZNQLin9XTnnP6dOXheh7mbk7yvM6s+yVUb7Bgj+egj6KS6eve8QIvsVZy+G/rD1KfuA6bv5US8wRtIhq9M4ZeQ30DTPBnLTuO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inai.de; spf=pass smtp.mailfrom=inai.de; arc=none smtp.client-ip=144.76.212.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inai.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inai.de
-Received: by a3.inai.de (Postfix, from userid 25121)
-	id 2F84B1003BB142; Fri,  7 Mar 2025 15:06:38 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by a3.inai.de (Postfix) with ESMTP id 2DA401100AD650;
-	Fri,  7 Mar 2025 15:06:38 +0100 (CET)
-Date: Fri, 7 Mar 2025 15:06:38 +0100 (CET)
-From: Jan Engelhardt <ej@inai.de>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-cc: "Gustavo A. R. Silva" <gustavo@embeddedor.com>, 
-    Simon Horman <horms@verge.net.au>, Julian Anastasov <ja@ssi.bg>, 
-    Pablo Neira Ayuso <pablo@netfilter.org>, 
-    Jozsef Kadlecsik <kadlec@netfilter.org>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-    lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-    coreteam@netfilter.org, linux-kernel@vger.kernel.org, 
-    kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH net] ipvs: prevent integer overflow in
- do_ip_vs_get_ctl()
-In-Reply-To: <6dddcc45-78db-4659-80a2-3a2758f491a6@stanley.mountain>
-Message-ID: <rp565ps2-86qn-0806-qpss-314qr3r0n700@vanv.qr>
-References: <6dddcc45-78db-4659-80a2-3a2758f491a6@stanley.mountain>
-User-Agent: Alpine 2.26 (LSU 649 2022-06-02)
+	s=arc-20240116; t=1741356496; c=relaxed/simple;
+	bh=Gwrk4ShS14rGl0IDquHggcOfE56FBhXobVQzeIk6fZU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D/V40WoH/1AURYSdux88WCVZe6e/nWwPlH4tuJnPrEOdi/kiDqhx4RihkDd9SNiVJMIc7KWo+1GC27NfLo+XADgGkAKSS8pVsLclXVTCVIfgWL24p1h4bR9kDOSjyz9jWitEL5jFBiOFaGksD8VB12xbYkCGCFZbavJfQsguCgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ctpK6XhV; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=FwP3iiHUdo3WYIE4U/rmzHQQI8mgTeHIwy9gC0VsJR8=; b=ctpK6XhV3YMg2AEEUobFxoscTG
+	YP19Rj4sKMPdFZfgy8tpLZu1OL44A4HNGkT5Vm9gZ0BrSkz8Yz7YKtnCGoSImfRhgbBI/uo8EKfC3
+	FMMnUw4vDkJMpi1ATncwZI7z94sAFsR4Ga21vb52k9IrFdmJKHrOOCLy89O6Xfq5ogTE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tqYMu-0039mE-Io; Fri, 07 Mar 2025 15:08:04 +0100
+Date: Fri, 7 Mar 2025 15:08:04 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next] net: stmmac: remove write-only priv->speed
+Message-ID: <eef38dd5-63f6-4771-bf43-a55ba3ce98e0@lunn.ch>
+References: <E1tqLJJ-005aQm-Mv@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1tqLJJ-005aQm-Mv@rmk-PC.armlinux.org.uk>
 
-
-On Friday 2025-03-07 14:44, Dan Carpenter wrote:
-> 	case IP_VS_SO_GET_SERVICES:
-> 	{
-> 		struct ip_vs_get_services *get;
->-		int size;
->+		size_t size;
+On Fri, Mar 07, 2025 at 12:11:29AM +0000, Russell King (Oracle) wrote:
+> priv->speed is only ever written to in two locations, but never
+> read. Therefore, it serves no useful purpose. Remove this unnecessary
+> struct member.
 > 
-> 		get = (struct ip_vs_get_services *)arg;
-> 		size = struct_size(get, entrytable, get->num_services);
-> 		if (*len != size) {
->-			pr_err("length: %u != %u\n", *len, size);
->+			pr_err("length: %u != %lu\n", *len, size);
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-size_t wants %z not %l.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
