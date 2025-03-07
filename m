@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-172713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9373A55C98
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 02:03:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48506A55C90
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 02:02:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7519F1899598
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 01:02:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2D97177A0F
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 01:02:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F03218FDDC;
-	Fri,  7 Mar 2025 01:00:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2892E1917C7;
+	Fri,  7 Mar 2025 01:00:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cEiaMT+S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oG5KRHUP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E3713D52E;
-	Fri,  7 Mar 2025 01:00:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03571190679
+	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 01:00:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741309201; cv=none; b=apKrNUACLS5y7Acw43f/1aYFVMmf5nC5E0hgl0wrpKShg1yw9Gl5J5aoor9e3dzIx6uyyIn5J89UBllTk6LU+JBHfr2lYLZ8HFgIqzsyP5uyfMbRsxsV8oFgcs5Xtb0HyBONVX+c4FcIgLZ944KToO6sW46dghGEDRH3KMSjngE=
+	t=1741309202; cv=none; b=jreBVEhrF7jP3ZFmoIzR1KVDMzbn05mU7OWTBjYTqpoXjRi/ntZLVttNJ+43UBMp07EzsfX/PGq94p1Xnl3VEBl6R15BnA+LiPaIcsbbOgIGE93THaGDXd76rPSFojYJuRoViBDckgzlJB7ZAv2OjXIkR5liTbxEHZRO8ia14fg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741309201; c=relaxed/simple;
-	bh=DLP1SeRWzG6iJPgv5Efqev3aQLJ91Lz2sSo6cQAKfSg=;
+	s=arc-20240116; t=1741309202; c=relaxed/simple;
+	bh=C7n1sQ9spG0GmsQ8Yj5JaIBoVUh7s4FCjKwZJlcABvc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JgJqY73DyKW8zXY//rmajGwjPY/MMPuz1NvYfaqPxe6QGh3AJiBm5ENGZocvM/C2pFVXdKG84+nRFMf/E/kg7aw1r0yxHRGscFysaeHORd/ErK4UL1sNleGyUVlaq1sTS3WtpXfNkwm+zci8NyGEV5vi2qjMK6TM5vYDVWk/YD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cEiaMT+S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1DA0C4CEFF;
-	Fri,  7 Mar 2025 01:00:00 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=pBRe1z0mP8CZxCmP9HGqizlLwnJ8qLei7ZbUT/nMPN0Zt4CGJ4/0jsn/b+adYEpoN/tijNhvC162j7fGHCsNG8ebVyWkxuYbfvTKvVYyfIYP4KsotgWCX0Fap1sr29kog1ch3xJHj6r/ZRZDFre1QPhoZi9gIUbMUyJVe4F4O4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oG5KRHUP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1675C4CEE0;
+	Fri,  7 Mar 2025 01:00:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741309200;
-	bh=DLP1SeRWzG6iJPgv5Efqev3aQLJ91Lz2sSo6cQAKfSg=;
+	s=k20201202; t=1741309201;
+	bh=C7n1sQ9spG0GmsQ8Yj5JaIBoVUh7s4FCjKwZJlcABvc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cEiaMT+Srjx2UQEHZJHbSimc2CV7OqTXFRuuzTL0I5DwXLcQ9yPaXvQoeEAF0Lk7s
-	 GRd0q8x9HXBjrqfR/z6ccx53s2gH98/9qO/4TT4l5bvUqpzrKgnr0WIPQ3rB/qopyL
-	 +0J0ee+Oi+5bRZtAM2Ew/4wePtajsKRt0mvbLCIMnR7j9y0TjA++MsG3sHHvqqtQgC
-	 kzL5F0jqlRV71nngbLifdNC3uz72oTQeOggMG0hgPrnSJK4DuR5WCttSzK6u0MAOOk
-	 y1jKSCBMowsnNf5aJh85EiXlks7hkG7BoljuQ/5tBsAnkQK8HnCrwo1vtwvqACQANy
-	 gyYLHDJIY67iw==
+	b=oG5KRHUPv45YHsBqGvHYW/tVRtPNgYRr7KMZkD9m4WzlZpbTShBKBRV834D4UV7m4
+	 +Q+GwakRRN2aaCuYVaCT1YjlusQUNp27+LtLVnxDBRiZHBbG49Jlggb6ceSZUhA/Ru
+	 x0M5E/njVRhDQ5kuy2SHjiOXtMKTt/7hK/nUYJWYtRwJgk9Lhcf/wG97Xc//xIwefM
+	 PATlIdcu+VjSu2WceBLnlofN4Rr3WghUKgZbRrk6VD/GjuFgmfU4qamRsBBuWA0yT9
+	 tFhHgc0/QKIp4dNz2A99c0KIoLdILmy7vnM7fID7ZKcUjuIQ4voWT8ajwEn456YcS8
+	 93oaxjzx69K8w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B61380CFF6;
-	Fri,  7 Mar 2025 01:00:35 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C9C380CFF6;
+	Fri,  7 Mar 2025 01:00:36 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftests: openvswitch: don't hardcode the drop
- reason subsys
+Subject: Re: [PATCH net-next] net: airoha: Fix lan4 support in
+ airoha_qdma_get_gdm_port()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174130923400.1838424.14777201199250790985.git-patchwork-notify@kernel.org>
-Date: Fri, 07 Mar 2025 01:00:34 +0000
-References: <20250304180615.945945-1-kuba@kernel.org>
-In-Reply-To: <20250304180615.945945-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
- pshelar@ovn.org, aconole@redhat.com, amorenoz@redhat.com,
- linux-kselftest@vger.kernel.org, dev@openvswitch.org
+ <174130923525.1838424.11881654670329234218.git-patchwork-notify@kernel.org>
+Date: Fri, 07 Mar 2025 01:00:35 +0000
+References: <20250304-airoha-eth-fix-lan4-v1-1-832417da4bb5@kernel.org>
+In-Reply-To: <20250304-airoha-eth-fix-lan4-v1-1-832417da4bb5@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  4 Mar 2025 10:06:15 -0800 you wrote:
-> WiFi removed one of their subsys entries from drop reasons, in
-> commit 286e69677065 ("wifi: mac80211: Drop cooked monitor support")
-> SKB_DROP_REASON_SUBSYS_OPENVSWITCH is now 2 not 3.
-> The drop reasons are not uAPI, read the correct value
-> from debug info.
+On Tue, 04 Mar 2025 15:38:05 +0100 you wrote:
+> EN7581 SoC supports lan{1,4} ports on MT7530 DSA switch. Fix lan4
+> reported value in airoha_qdma_get_gdm_port routine.
 > 
-> We need to enable vmlinux BTF, otherwise pahole needs
-> a few GB of memory to decode the enum name.
+> Fixes: 23020f0493270 ("net: airoha: Introduce ethernet support for EN7581 SoC")
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+>  drivers/net/ethernet/airoha/airoha_eth.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] selftests: openvswitch: don't hardcode the drop reason subsys
-    https://git.kernel.org/netdev/net-next/c/1cc3462159ba
+  - [net-next] net: airoha: Fix lan4 support in airoha_qdma_get_gdm_port()
+    https://git.kernel.org/netdev/net-next/c/35ea4f06fd33
 
 You are awesome, thank you!
 -- 
