@@ -1,348 +1,284 @@
-Return-Path: <netdev+bounces-173106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02124A575CB
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 00:10:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A74F8A575F4
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 00:23:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DBAE1772A0
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 23:10:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2717416772B
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 23:23:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9420258CEB;
-	Fri,  7 Mar 2025 23:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B58AF25A632;
+	Fri,  7 Mar 2025 23:22:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kzCipdkK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RLXN9r5I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E60EB258CD8;
-	Fri,  7 Mar 2025 23:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741389014; cv=none; b=doJ8DXQZde2Z8P7qALF3jYxqVJ16WfBlyASWjj91rIJPcYGb659o2uC7zr4rLjJS//npjh4fa+Jwmhdgb5Gn90uNUlX+xXITXXcS9KwwzWHGYpiBQGtzZUgWN62Ogbsc08i3lq56kqUtpwMaQSy4ABwGVwyiia4UsTEqLAgM4eI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741389014; c=relaxed/simple;
-	bh=GrFpt57Xx7USOU2GNzt22S+rLNLTMrt6HBQMHOCeu6c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dSWn5QooFm/+NNqC5AFY6wZ6Agi3Jr/OJX3jl9TpNphgX0/PwixfV49pYEHbL77VQwogKR3jd/7f8d2nxrsGDPGN6ESRKWdneKhdoy9PKnORstBZfakuj0IAVdaoRC6lWisAbz791dtwebB0HlqWNWarM0b8fLAapI4j3oF8HEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kzCipdkK; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4750c3b0097so20626051cf.0;
-        Fri, 07 Mar 2025 15:10:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741389012; x=1741993812; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iFIrIXVY4U2+XLcq170BNirGCbrx75xgMFuGmKL3d2A=;
-        b=kzCipdkKsW8lwBOjbuRh7pfxBW58fExPf6aRmUzOGAi5R0iK5fmbF5ypclMxyDahAA
-         fkNQpd0TdW4NHbxJKv/zncKQoudFfkuXZK2WBhU6WvMuaGHabC002+LgLxASZvmStQ9Z
-         wpNlq6SB7mEP6zGxn+E/Aktn2tH7HvllaG2WzA/LxxNDSOIVd9JJZqSMxqlCDz38a/iB
-         +jHdv5F2/0KsqzyHcW/686wSpjEOj/6dtvHKg4dW2W2eenQ1SHD58mJwDe9oUT183jM9
-         iUwONWSCT/+GP9P6GIsHEioKGHkAs80QlSp0os4d3+rwMMNEpXZpgw3v0OyevS8bJqVg
-         VVDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741389012; x=1741993812;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iFIrIXVY4U2+XLcq170BNirGCbrx75xgMFuGmKL3d2A=;
-        b=HVmYr/MXgql1kckEcmOxTCVWBIuTQpNw0Cm88DUQbmHoE5lvcYxBOsWPT+dsJ3CD00
-         FjeYnZEK+j0t1Q7T4R7jedhQbR9z+EzpoKbAmcmif6i3g0Ly+mdq4g43eHdti/OE0NO7
-         xA6y8S8HrwsiQsUGcynNGd9JwEWVYEY4zM50T0/9xgiw6uKDFM2Tdx55eH1CGD1nkYZx
-         /Q66a0LcapFvPJwZR3zrM6KI8wb/2bl9UYp4dPhVLudg6taIBHzzhTcn8FmtIF0o0GZX
-         wSGjSARqFpGPJ7DqWPGaMuxPbG1HgTJkck8QZuFJ6sKPVDjR9R0xEIPYzH9bfDxAfL7N
-         APnA==
-X-Forwarded-Encrypted: i=1; AJvYcCU+7EhsF4dxFW6H0N7pjURDTYB/Rmq7XP5yAhUq9JYEx4n/ha2g2CMLa3kJr0B1zHtqbZ88foP7JY4OfwU=@vger.kernel.org, AJvYcCXuQgdGbhkuYkrUcbjwcKzjmMRiaZTui9kXvYyymbh7cBMtfr9junASbJoT2SwMMvoB9JOPbwcd@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEVY804mrIzFI49KdUyktCf4vha2wRhRwrXcHdQu5GGKpRxbqa
-	5OJkNZCkZv+cuK9ZkvJgg4RPlcKc+Mleu1vcdHq8W8oDWpH542XF
-X-Gm-Gg: ASbGncvw+K7Au5RchBUGDQhjnJ3xZTOpF4fIVxSgFPwa2N+t3pR9bGSIevth7KaicW9
-	oIjowYS0miP+gIMA3woR4yifictD0720NRE3+nncT+Zrh1iTJFR9jREc7Xysh83pgisxd160NA1
-	lFxK3UpRsQbHUdKJ1oGn1j56ZQXs836lnc3O/YU8CeG7vaeBK7Co9AY9cMexB0mnvsf2xYaxIRx
-	U49mo1pji9nDxBqiD6VLe0e0RDEFruOAGp2e9X90P9KVWMUu6i4dWqDOdCdH9GaHiGM2AqjZdzk
-	YUxsbtiUJ2SHwh8YkL2uz5x5mWBAiHYlU49p/k5wgCRZOC7QWkQSCTmBr/K9oYhpdURZCKa7k4X
-	FT/AHxJWcnoUuRHu9FPvL+Uz4wD3jU8Kle/Q=
-X-Google-Smtp-Source: AGHT+IEugrRBxIho9xIiWq0vB/+YN93yf2Mere88kc3qzeF0Q6vtoo1+TGPraoWjGTWlD3ETwx2/vQ==
-X-Received: by 2002:a05:6214:20c4:b0:6e1:f40c:b558 with SMTP id 6a1803df08f44-6e9006ae131mr70746666d6.44.1741389011569;
-        Fri, 07 Mar 2025 15:10:11 -0800 (PST)
-Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e8f715b52csm24439536d6.71.2025.03.07.15.10.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Mar 2025 15:10:11 -0800 (PST)
-Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
-	by mailfauth.phl.internal (Postfix) with ESMTP id BA3521200066;
-	Fri,  7 Mar 2025 18:10:10 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-11.internal (MEProxy); Fri, 07 Mar 2025 18:10:10 -0500
-X-ME-Sender: <xms:0nzLZ-KjcH97iJ1BkVYn4YZJfQdpeHIyXazUaQKgy3N3GlNpE2Ro6g>
-    <xme:0nzLZ2LvgM7VRPT_JqPg50ktqh_DPRoffhT6vFXFanYKcBGFk1PIei2GWjsZODCis
-    ZTd3eA5SMja2wHkWw>
-X-ME-Received: <xmr:0nzLZ-tQsGWvNqBf5RWFS0z5b0o1AeP4KQpoWq1xeB3KHB0xdT_AHx2825s>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduudduleegucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
-    vdenucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrih
-    hlrdgtohhmqeenucggtffrrghtthgvrhhnpefhtedvgfdtueekvdekieetieetjeeihedv
-    teehuddujedvkedtkeefgedvvdehtdenucffohhmrghinhepkhgvrhhnvghlrdhorhhgne
-    cuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsghoqhhu
-    nhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieegqdduje
-    ejkeehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigihmvgdr
-    nhgrmhgvpdhnsggprhgtphhtthhopedugedpmhhouggvpehsmhhtphhouhhtpdhrtghpth
-    htoheprhihohhtkhhkrhelkeesghhmrghilhdrtghomhdprhgtphhtthhopegsphesrghl
-    ihgvnhekrdguvgdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpd
-    hrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehh
-    ohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrd
-    horhhgpdhrtghpthhtohepkhhunhhihihusegrmhgriihonhdrtghomhdprhgtphhtthho
-    pehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtth
-    hopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:0nzLZzYCTVzPaQYCRMNzXOTE5ZELiV7m02T5KaPkPar9PK12z8UOtw>
-    <xmx:0nzLZ1Y50pZNvxEu2OApPQ-rVX06R7n-3y-Id4_vqoUZvB1xKgm3Mg>
-    <xmx:0nzLZ_BJNAeAGqnBPS02v-TTv8nkHCvjq5twN7y1TNrBez7T8gA6Xw>
-    <xmx:0nzLZ7asjsccSDfvLbfM8Fz8GfgCx5FDG2Hg6_Pgrl-uZn7vjBW1qg>
-    <xmx:0nzLZ1raYzs5hNaP5RDKHA0crUuzyedteoP9ubmb9PU3CD74U1Y1uQmy>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 7 Mar 2025 18:10:09 -0500 (EST)
-Date: Fri, 7 Mar 2025 15:08:58 -0800
-From: Boqun Feng <boqun.feng@gmail.com>
-To: Ryo Takakura <ryotkkr98@gmail.com>
-Cc: bp@alien8.de, davem@davemloft.net, edumazet@google.com,
-	horms@kernel.org, kuba@kernel.org, kuniyu@amazon.com,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, peterz@infradead.org, x86@kernel.org,
-	Ingo Molnar <mingo@kernel.org>
-Subject: Re: request_irq() with local bh disabled
-Message-ID: <Z8t8imzJVhWyDvhC@boqun-archlinux>
-References: <20250307131319.GBZ8rw74dL4xQXxW-O@fat_crate.local>
- <20250307133946.64685-1-ryotkkr98@gmail.com>
- <Z8sXdDFJTjYbpAcq@tardis>
- <Z8s8AG3oIxerZHjG@boqun-archlinux>
- <Z8tJAJKQP3gtF7EY@boqun-archlinux>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A6C425A33A
+	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 23:22:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741389755; cv=fail; b=ma6j8G5esNQyBiR5+84OaijIqGsFeYkc67bKjaZHLoWxdGRSnWS54Ib/rWlRDkQ20sJ2BgpKwBp9rEWfembbvNTs14nNdMetrgP3CRh6BkDOvJXvlOi0q5KWEERMbgF9SrCN2cuPSqWUrsoKGWuiESc83iY5KmuDdqYf3SA72EI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741389755; c=relaxed/simple;
+	bh=9wP4AMTLQVAezS8yYXqLIEY8x/4Qe/2xmd5KCVBiw5c=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=s50Y5IL9yR7LSlCMjiyqpZ4mMRJHFhLApIP3KMMGTQiJkxM7BfG891v6v1IdLRX+GLkt+hn1ATCSV4P9T2hRs7dFvsjQQF/kaW5oiiW9dwmpomP3PLAMxLqZTAlVUu3/LFTbNbtMRedXkN3MHNuIx66qpwNg8mms1bp6+5Fz4bc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RLXN9r5I; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741389753; x=1772925753;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=9wP4AMTLQVAezS8yYXqLIEY8x/4Qe/2xmd5KCVBiw5c=;
+  b=RLXN9r5IfZSUXXinoS+qIykkSbCbXahbOBrCeFappjl61VMW9qSiLqM4
+   /aSZE8s3SteAwsSnjadrtvym9jddEYfum/yal8CjQMBevQK5680Cpz/6K
+   4er62yCZdllUbUODeSsSNXgaePPIsrCMDvBGGVCmenfXRJr1dLuKH7M+z
+   IUrAkHNGtQURqFLd0HrQK1lf7l7gGj2yhbVbb8r1KHNHFRjR623vyCzVk
+   QJ+KiFHJECRLiMtVAgMhEsYDa8zjWQT3Us6L6Fs3DIceASbauG+JKTn8K
+   vIcw3ZYZKoafKW20JMGdoUQRiz3a/pIzAZbWBBOJa570ZWhnyre3YeB7r
+   w==;
+X-CSE-ConnectionGUID: nH0sy6a1RpqsLSdO91AHoQ==
+X-CSE-MsgGUID: aSQlQWpVSC2qMKHgmHJwpA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11366"; a="42366179"
+X-IronPort-AV: E=Sophos;i="6.14,230,1736841600"; 
+   d="scan'208";a="42366179"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 15:22:32 -0800
+X-CSE-ConnectionGUID: Y3GSf76fRj6FSIOHXBMF1w==
+X-CSE-MsgGUID: tqwDWPOASRW6HbM6hfzPTA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,230,1736841600"; 
+   d="scan'208";a="119634138"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 07 Mar 2025 15:22:32 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Fri, 7 Mar 2025 15:22:31 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Fri, 7 Mar 2025 15:22:31 -0800
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.171)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Fri, 7 Mar 2025 15:22:31 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=QRR4ckKk1++FrZGodg2CQZHb2rbD+h0hVweqRYa3G/lzaIenOTJvNDIRSzFyFnGv1x5iOOowffQPUqTck/YqdasbWMRsPFnDmxyQkAPp9i/qanSjAxGNT1q3kLl5c/oLin82EVvJrA/3+2mQFTndxHCsFfiOJshhFZezMrQg5CIbGnouyNiakuHmrk8443ybu/WUbv6ixf3Wcq+ezzGv9t6zq6dLQW5VHUvwZeDWt32a+oNG4GGEuKr+NrhCKdERAAjN7AI3D8pZv8q+ryci1fmf5QQl5NiAPSOaYsIH36njvxsVRQbk/WVokvrpLzWWKcgtlD0Q+RJFa5T6Voo9Ew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Bu0TonzFKvBEWhJpI1RpqhJfvUTe88K3G4UNmmnTMjs=;
+ b=DFR1Kq7ougM28J9vFW6irjq5WrTlUwCrAQDf/VlfvRtqLE3RIlCtyNiXX7CuVdrFrml8OgpJqDwl1KfCfy04QUSMi3mg1UdzN33Bh10XFi0je2GxUIN0BXO32gmguyR+Bc/lZqzkF11sDcPFidp3D+jbUxbdrm7XV0lPS4C15LZ8uJaxOIWiuz7TA2s7GGQgO85kfZugEumhDMvMhDhLEQ2U46UvO0tClrU2iV7zMZOHow14qN8QB4oI2teObcTotv6hb5ePkXdJEN7dORB1n4899owB1OWOxBoOctOk4efp4EBR27sDa1u2mPTrXtmh3cRyqTdKKAebmfo1WsRK6g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by MW5PR11MB5860.namprd11.prod.outlook.com (2603:10b6:303:19f::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.28; Fri, 7 Mar
+ 2025 23:21:56 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8%4]) with mapi id 15.20.8511.019; Fri, 7 Mar 2025
+ 23:21:56 +0000
+Message-ID: <4809c248-fde6-4c3c-93ca-743238ed6706@intel.com>
+Date: Fri, 7 Mar 2025 15:21:55 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next] ice: use DSN instead of PCI BDF for ice_adapter
+ index
+To: Jiri Pirko <jiri@resnulli.us>
+CC: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+	<netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>, "Aleksandr
+ Loktionov" <aleksandr.loktionov@intel.com>, Karol Kolacinski
+	<karol.kolacinski@intel.com>, Grzegorz Nitka <grzegorz.nitka@intel.com>,
+	Michal Schmidt <mschmidt@redhat.com>, Sergey Temerkhanov
+	<sergey.temerkhanov@intel.com>
+References: <20250306211159.3697-2-przemyslaw.kitszel@intel.com>
+ <28792ae2-bee7-48c9-af5d-2e1ba199558a@intel.com>
+ <vt6wnwcje727xv4agzhkpe5ympcvhtgg7qbaq4hlvw42roji2r@3kwjm4togc7m>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <vt6wnwcje727xv4agzhkpe5ympcvhtgg7qbaq4hlvw42roji2r@3kwjm4togc7m>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0013.namprd03.prod.outlook.com
+ (2603:10b6:303:8f::18) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z8tJAJKQP3gtF7EY@boqun-archlinux>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|MW5PR11MB5860:EE_
+X-MS-Office365-Filtering-Correlation-Id: dc6377c2-8d49-4612-6d06-08dd5dceda3a
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?Nk8xejNIaGN1UjFUTzJQbXVadFdmbUUrOU1MdlBLYWJPN3VaelNjanZKUVVw?=
+ =?utf-8?B?d09LYys0bHdsQUxaWmRBRkRDTWhaNzVXYmNJRDNmQWduMTIrV0E5eHU2WTFN?=
+ =?utf-8?B?NzNwaUpieDA3RFdqLzR6Y2JzaThUb2d4R3hhd2YvRnpSemROM3FoWDhUakwr?=
+ =?utf-8?B?SUtmYnltRTh3ZjlmMkx6Ty8rUHlJVThQOHdwM2RCYWNwMDF5Z3E0M0JlT3dK?=
+ =?utf-8?B?Q3lkVG14bWNpUk8ydWtFOHFmelpXZkc2Szk2T0VWVm0rRmxwdnA1T2dhRlhQ?=
+ =?utf-8?B?cUFLRnA1NTBnU2FLa0dBK0R3amhJamh4UW1sQldacHhlTEYxSmZqN3IyVnNm?=
+ =?utf-8?B?ZkZNQnR1YzJLOTlBR3RDOHFKc1BCd3lzY0Q2ZTBvcUg4czFPNHE1WUNZUksr?=
+ =?utf-8?B?MkRrOFlqL1dFd2dIV2ZzOTNnSDE2bzM2ZHVQSXJ0d1poVjhFSWRBQ21tL2g3?=
+ =?utf-8?B?VzVWQzVZcklHYW81c0xyZnlsY1pZWkNQRWpXTTlmTjdDK000ME1QOTY4THRs?=
+ =?utf-8?B?TTVUTDZwTmtJNUh3eFRXSTh4SWphcmh5SkVnd201OEJxVE05eWZLOE5UMDdw?=
+ =?utf-8?B?Zlo5K3hheU1YWmQwQ0V2YmxMR1VuK3BxbmE3eE05TEVIWFBvaVd5aExNblZB?=
+ =?utf-8?B?OFdmVFJjZmlSc1k4M3pHNkhrWEJUYjkxL1M4dk1Ga0J2MlAyZ1huTkhZNGNq?=
+ =?utf-8?B?cnZiOWsxYVFJUyt5citvaFFaZGFjM3RmNXVROWZYRXRTMllsRGZIOU5BQjFS?=
+ =?utf-8?B?WFVNTVZiZHM1SGRHR0grd1RML25BZnREVWZCZ3hqcmRnZEp6alMzaEN2SUpz?=
+ =?utf-8?B?V2M4aXVaZm0zV2NleURha0sybVA0N1E4TzhLRkpZeGhPVHZjN2gyWGVTNFJ2?=
+ =?utf-8?B?VkdwR1Y1ZmtFYUlJb1VZQ0Vyc3dQOEpTZHZ1Q3J2cEx6OGN5bUFLTDRWekFS?=
+ =?utf-8?B?TE5SMjdKemZIN05XanpOekNzMVc2R0xaODhGbFJjMXZESi9PR2pEYVJvRXJV?=
+ =?utf-8?B?WFh5SnlMSDVOM2twOTY4aG8rSXU4cERDWGx1Z1NWZGVGNDBnVytYZE1jMkV5?=
+ =?utf-8?B?VGo1RWlmaDJuWTJTT2RiSTBVQ1VjeC9aVmtMeEp3MzZ2bkhJSHphaE9wOWhU?=
+ =?utf-8?B?MVczbDVnZ21sM29wZittMGtwMUs3bm4rYmVXb0pZNWZTWTUwNEdJNE81a0ph?=
+ =?utf-8?B?bzg4U1h3cjNVY0hJZHEzUmU2T0tPMnF1RFNLRXpRTlZhOVArTUlWa3RZNkRF?=
+ =?utf-8?B?VGw0bU5WZ2ZDVnpMRHl2T0lnZ055U1Y4cXplZW9CU1Ewek5haWVxalpoRWNa?=
+ =?utf-8?B?NTVDRzBtKzFaa3E0N2plOHNJYWF4WXRsR1RPU0Q0SXZHeW9JZS9JOE1rR2h1?=
+ =?utf-8?B?ZVRjNmNyUHRCOEZpU1VGV3NBMXlJWUQ2cm9wakU5NlpXOVpUUHVkSHJJeUFp?=
+ =?utf-8?B?NkdWMGhMeFJjUEZOcWtyanB1bk1mLzhjdnhPQzBSZXgyVjkxS3NhVFMzbUEv?=
+ =?utf-8?B?T0FjbWU0U1FlaDBPVmFMQVF0Qi9lZjhBT3BaK2tyUkN0Z2ZYUXZ6c3RXQTB2?=
+ =?utf-8?B?R3VYTEFjdlIzMFRrTjJsZmZVM0hUajk5dUdCbm45bzgxdjJZdU1aV3B3cFdH?=
+ =?utf-8?B?ZFB4emlua0RpUU1MeG9Wa3RVcG1STmhPNmoyZXozZ1NKVXBCSkJsN0xxaTBD?=
+ =?utf-8?B?SS9EaVd0bXByWmQwc1NqaFpoZHVTSmdqRTZIVHl1Kzk1NE5EODFjN2dOWFRD?=
+ =?utf-8?B?K0g2dkljUllIRVBqb21kYnovd0Z1OXJPTEdPQzVuSmU4aUtJYy9RRUZ4Qml1?=
+ =?utf-8?B?dHBjRTk1Sm9TellmQTg4ZmVOYUNZd1ZJbXdXMWw3U3FMM21NOTllb1djTTdG?=
+ =?utf-8?Q?9NsK7FdnmlXJp?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VWlZS1NNMVBkRTZYdGtOY2xDRkZpcklzeFlWdG5hVmRPdWhkN1VhTlcxdHpU?=
+ =?utf-8?B?TmhSZVFERmY3eTdScGJSMnkzR0pDc2tiODlZRTBxK2VzTnlheERZaGJZOWhv?=
+ =?utf-8?B?cndFYTkxdWhmWGxxVHFNT00rZUJ0Z29jVWxVeWlaNkFzcmlFNHJpZElpVnlt?=
+ =?utf-8?B?dVJId0hHQUwvYXlERjlXeXZGWExHbFZMK3BzYkk2MmJYQy9VdWNNWHdYTDNK?=
+ =?utf-8?B?RWhyeEhnZHZzT3JJS2dFamxPNk5sUnQ2Q2ZFQnZMQ2VWUzUycTU2bm96NlRz?=
+ =?utf-8?B?Qk0remtZbjFiOGEwaXJCNEdFVUh4b1gvNHk2TmpodVJ0QlVhTDhzMVA3UVYy?=
+ =?utf-8?B?cUZmMXlRRG9FbTZKWXh5SWIyQ3VtUWdYWVpFZkVhcUhncXdCM05CMzZLdXM3?=
+ =?utf-8?B?OWJnNEVsS0JmM1k2M0hwaG9ncUhWdGQzZDUyVTdoRjh3WmV4WHh0ZTlKZnF2?=
+ =?utf-8?B?dUtFQTdibUhJYUpTNzJ2ZVNRWjRsNkZWYUNwWGx0WU9pK0ppRmRBZDBnSW5y?=
+ =?utf-8?B?cXIzY3FwZUFIekQ2QXJRMkhYUTBqdWgwa3AyY0hRTGhhbnN3WXQrSE9ZR0c1?=
+ =?utf-8?B?SzRzOUIxa3dpemJJbjhEV3lQTTc2R3RvNTB2R2I2TlQzaXU0SEw0QkxQbHlM?=
+ =?utf-8?B?VXA3WGF6NStMZ1NPZEF0aXZWdG9lY0tFdUwxSDVraWw1YTNZQzhQVlBieDFC?=
+ =?utf-8?B?eENjc0ptbVBtd093K2w1amhNc0c2cHUzN3BJb3BWMVlyK0hyTVIxc2VqVjAw?=
+ =?utf-8?B?dnAzMUJPK295OUZtODFSK3V6ODEvNzhCaE9jZ0ZidmIwZkJTZzNCbkZ3UjdV?=
+ =?utf-8?B?Mis1ZFAxdE5Gb2tHdytaY3RzQjlwZXZzTXJkRkF5Y1AzQ2V2LzJRWmpYaUp4?=
+ =?utf-8?B?RXJ5dE04b1pMU1orbUpleG4xRzdrRGd4UUdQTWg3RjdnVUYrTzJHQW8xb2JP?=
+ =?utf-8?B?ODR0Qml4T1FkWWswYlhFVU1WUnRVdUthRWlkSU40Tm9OKytzVXV6N1IxZHRt?=
+ =?utf-8?B?TXZGanVESXRmWnNBWFNpelY1cU5NZEVqL01HNDUzRlZ1TGVpeDI2ZElEQVRI?=
+ =?utf-8?B?YTRqazdFVmlxYmZHUm4rTmN4b0Y4RXlxSkVLWWkwMVhGZkRxOGx5eFBULzR2?=
+ =?utf-8?B?QlgyZ2VXMWNJYkdXWFlLWGpYcHJpcUJ2VktNY09Ca3hkczhtbnBOYW5yQitG?=
+ =?utf-8?B?Q1BwdnBlNUt2eVUxVlEyUEpIN0N2dStwRWI0aElEYzl1WCthQnZoZFpYaGZa?=
+ =?utf-8?B?T3pFakc3bjJ3dEVpNTZXUXlQYlMyZ3BjcS9vZ1ZJTk1rZW5mOHk3T3RtOWtQ?=
+ =?utf-8?B?U0lkdUE1R25CU2Q3bzlycTVQUUVDVU9Vd2FXME8zWXRPRTJYc3ZtemlNRlZK?=
+ =?utf-8?B?eG5zRnkvZjdadXEyQjNCL1l1ZldnMEZzNVN0UHdkcDJpZE1FS3hDNGxSNHNp?=
+ =?utf-8?B?K3ZwZ2lFdk42RHRnNVB6d2hiNExUVVVZZUlXRkFSbGM0QnI0WWN5SWpVUXZI?=
+ =?utf-8?B?amxoTzlHa013OXZ0S25yRUh4cHFhVkNyR280TjRnMytIMFRuU2wxS3BJU3hz?=
+ =?utf-8?B?YjVWZ2Nlem9QNXJDS2ppTG40T05rTFovQmhFeS93K0l2MG9uUnVpMVBUNVRJ?=
+ =?utf-8?B?WWJtWTJ4SHE1cHU5U3VYS3d0YjdZcUdnUnkxUlFLWmJ1RE5MeDBUTzZobjJp?=
+ =?utf-8?B?a0YxWXV0L09mbXhGa2VVZjF6dVFiR1ZUVG1Mb2NMeHpXNnZLaG0xeG5CM3dx?=
+ =?utf-8?B?UnJvWG0zNHp3TmxMUnVtcUNRSWFHZWlJakJCMGVrSnZXaHEyV1kyeHBSREh0?=
+ =?utf-8?B?K3czRlBMYkJHU3NzbFdtYW5BL2dCNStRckdiOUt6MHczcVhGVXBtangwaGVu?=
+ =?utf-8?B?bEgyTnI2c0k2aFRzbVAxU3JaaVRBK3lqUWFuYjhiYjRVQXZRUy9XMisvRnoz?=
+ =?utf-8?B?NUJPeE1nM3RWcTdJR1VWbk5uMFEyUCt0VHI5Wk83ZGF6RUNGa1JPcC9Xbkl1?=
+ =?utf-8?B?ckVNQjBqdjIwUFpnV3NtZjRleWJUYWpFcE52eFNDeW5HT0lNRzRZZG9lZWh2?=
+ =?utf-8?B?d21ZZkdmcTZXU1hlanQzeU5sdjZ5bytJVlNMWGdvMGwrN2Z1Njg4UzRPajVB?=
+ =?utf-8?B?cmdIK1U1MEpwaWhaUzl3ZWwxTUx0SXpoc0VRbzJsbnhvTWJFNDhHZUxSMTFG?=
+ =?utf-8?B?WFE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: dc6377c2-8d49-4612-6d06-08dd5dceda3a
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Mar 2025 23:21:56.3990
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kZjtKCjmOtuXjoHR/IFCuDU1rZRPMobn9VXSFHJ/x1hcnGzQBLbXnnhhbAkogLg5mrB5U4PBuHaJjDZ9saaodF1X3Gs1eDaH90VZ4BFRr54=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR11MB5860
+X-OriginatorOrg: intel.com
 
-On Fri, Mar 07, 2025 at 11:29:04AM -0800, Boqun Feng wrote:
-> On Fri, Mar 07, 2025 at 10:33:36AM -0800, Boqun Feng wrote:
-> > On Fri, Mar 07, 2025 at 07:57:40AM -0800, Boqun Feng wrote:
-> > > On Fri, Mar 07, 2025 at 10:39:46PM +0900, Ryo Takakura wrote:
-> > > > Hi Boris,
-> > > > 
-> > > > On Fri, 7 Mar 2025 14:13:19 +0100, Borislav Petkov wrote:
-> > > > >On Fri, Mar 07, 2025 at 09:58:51PM +0900, Ryo Takakura wrote:
-> > > > >> I'm so sorry that the commit caused this problem...
-> > > > >> Please let me know if there is anything that I should do.
-> > > > >
-> > > > >It is gone from the tip tree so you can take your time and try to do it right.
-> > > > >
-> > > > >Peter and/or I could help you reproduce the issue and try to figure out what
-> > > > >needs to change there.
-> > > > >
-> > > > >HTH.
-> > > > 
-> > > > Thank you so much for this. I really appreciate it.
-> > > > I'll once again take a look and try to fix the problem.
-> > > > 
-> > > 
-> > > Looks like we missed cases where
-> > > 
-> > > acquire the lock:
-> > > 
-> > > 	netif_addr_lock_bh():
-> > > 	  local_bh_disable();
-> > > 	  spin_lock_nested();
-> > > 
-> > > release the lock:
-> > > 
-> > > 	netif_addr_unlock_bh():
-> > > 	  spin_unlock_bh(); // <- calling __local_bh_disable_ip() directly
-> > > 
-> > > means we should do the following on top of your changes.
-> > > 
-> > > Regards,
-> > > Boqun
-> > > 
-> > > ------------------->8
-> > > diff --git a/include/linux/bottom_half.h b/include/linux/bottom_half.h
-> > > index 0640a147becd..7553309cbed4 100644
-> > > --- a/include/linux/bottom_half.h
-> > > +++ b/include/linux/bottom_half.h
-> > > @@ -22,7 +22,6 @@ extern struct lockdep_map bh_lock_map;
-> > >  
-> > >  static inline void local_bh_disable(void)
-> > >  {
-> > > -	lock_map_acquire_read(&bh_lock_map);
-> > >  	__local_bh_disable_ip(_THIS_IP_, SOFTIRQ_DISABLE_OFFSET);
-> > >  }
-> > >  
-> > > @@ -31,13 +30,11 @@ extern void __local_bh_enable_ip(unsigned long ip, unsigned int cnt);
-> > >  
-> > >  static inline void local_bh_enable_ip(unsigned long ip)
-> > >  {
-> > > -	lock_map_release(&bh_lock_map);
-> > >  	__local_bh_enable_ip(ip, SOFTIRQ_DISABLE_OFFSET);
-> > >  }
-> > >  
-> > >  static inline void local_bh_enable(void)
-> > >  {
-> > > -	lock_map_release(&bh_lock_map);
-> > >  	__local_bh_enable_ip(_THIS_IP_, SOFTIRQ_DISABLE_OFFSET);
-> > >  }
-> > >  
-> > > diff --git a/kernel/softirq.c b/kernel/softirq.c
-> > > index e864f9ce1dfe..782d5e9753f6 100644
-> > > --- a/kernel/softirq.c
-> > > +++ b/kernel/softirq.c
-> > > @@ -175,6 +175,8 @@ void __local_bh_disable_ip(unsigned long ip, unsigned int cnt)
-> > >  		lockdep_softirqs_off(ip);
-> > >  		raw_local_irq_restore(flags);
-> > >  	}
-> > > +
-> > > +	lock_map_acquire_read(&bh_lock_map);
-> > >  }
-> > >  EXPORT_SYMBOL(__local_bh_disable_ip);
-> > >  
-> > > @@ -183,6 +185,8 @@ static void __local_bh_enable(unsigned int cnt, bool unlock)
-> > >  	unsigned long flags;
-> > >  	int newcnt;
-> > >  
-> > > +	lock_map_release(&bh_lock_map);
-> > > +
-> > >  	DEBUG_LOCKS_WARN_ON(current->softirq_disable_cnt !=
-> > >  			    this_cpu_read(softirq_ctrl.cnt));
-> > >  
-> > > @@ -208,6 +212,8 @@ void __local_bh_enable_ip(unsigned long ip, unsigned int cnt)
-> > >  	u32 pending;
-> > >  	int curcnt;
-> > >  
-> > > +	lock_map_release(&bh_lock_map);
-> > > +
-> > 
-> > Ok, this is not needed because __local_bh_enable() will be called by
-> > __local_bh_enable_ip().
-> > 
+
+
+On 3/7/2025 4:40 AM, Jiri Pirko wrote:
+> Fri, Mar 07, 2025 at 12:53:05AM +0100, jacob.e.keller@intel.com wrote:
+>>
+>>
+>> On 3/6/2025 1:11 PM, Przemek Kitszel wrote:
+>>> Use Device Serial Number instead of PCI bus/device/function for
+>>> index of struct ice_adapter.
+>>> Functions on the same physical device should point to the very same
+>>> ice_adapter instance.
+>>>
+>>> This is not only simplification, but also fixes things up when PF
+>>> is passed to VM (and thus has a random BDF).
+>>>
+>>> Suggested-by: Jacob Keller <jacob.e.keller@intel.com>
+>>> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+>>> Suggested-by: Jiri Pirko <jiri@resnulli.us>
+>>> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+>>> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+>>> ---
+>>
+>> The only caution I have here is that we might run into issues with
+>> pre-production or poorly flashed boards which don't have DSN properly
+>> flashed. This shouldn't be an impact outside of early testing or
+>> mistakes by devs. I think there is a default ID which is almost all 0s
+>> we could check and log a warning to help prevent confusion in such a case?
+>>
+>> A couple systems I've seen have serial numbers like:
+>>
+>>  serial_number 00-00-00-00-00-00-00-00
+>>  serial_number 00-00-00-00-00-00-00-00
+>>
+>> or
+>>
+>>  serial_number 00-01-00-ff-ff-00-00-00
+>>  serial_number 00-01-00-ff-ff-00-00-00
+>>
+>>
+>> In practice I'm not sure how big a deal breaker this is. Properly
+>> initialized boards should have unique IDs, and if you update via
+>> devlink, or any of our standard update tools, it will maintain the ID
+>> across flash. However, during early development, boards were often
+>> flashed manually which could lead to such non-unique IDs.
 > 
-> Hmm.. it's a bit complicated than that because __local_bh_enable() is
-> called twice. We need to remain the lock_map_release() in
-> __local_bh_enable_ip(), remove the lock_map_release() and add another
-> one in ksoftirq_run_end().
-> 
-> Let me think and test more on this.
+> Do we need a workaround for pre-production buggy hw now? Sounds a bit
+> weird tbh.
 > 
 
-So what I have came up so far is as follow:
+I agree that use of the serial number is preferred over BDF for the
+reasons described in this thread.
 
-1. I moved bh_lock_map to only for PREEMPT_RT (since for non-RT we have
-   current softirq context tracking).
-2. I moved lock_map_acquire_read() and lock_map_release() into
-   PREEMPT_RT version of __local_bh_{disable,enable}_ip().
-3. I added a lock_map_release() in ksoftirq_run_end() to release the
-   conceptual bh_lock_map lock.
+But I also know that sometimes the DSN is not available, or is not set
+properly during pre-production and early testing. This could cause
+issues for early development. These issues can likely be worked around
+and should not impact what we do for properly functioning boards.
 
-Let me know how you think about this. Given 2 & 3 needs some reviews
-from PREEMPT_RT, and it's -rc5 already, so I'm going to postpone this
-into 6.16 (I will resend this patch if it looks good to you). Sounds
-good?
+I just want to make it clear on the record, since it is likely that we
+would see this if using an old or badly flashed board, or if we use this
+same scheme on a future hardware (or even just a spin of the ice
+hardware). In those cases, developers might have breaking functionality
+like multiple adapters being tied to the same adapter structure.
 
-Regards,
-Boqun
-------------------------------------------------->8
-Subject: [PATCH] lockdep: Fix wait context check on softirq for PREEMPT_RT
+I *don't* want those to be reported as issues with this code, as they
+are really issues with the flash data. Perhaps we could have some sort
+of warning message to go "this doesn't look right" when the DSN
+capability doesn't exist or when the DSN is 0.
 
-Since commit 0c1d7a2c2d32 ("lockdep: Remove softirq accounting on
-PREEMPT_RT."), the wait context test for mutex usage within
-"in softirq context" fails as it references @softirq_context.
-
-[    0.184549]   | wait context tests |
-[    0.184549]   --------------------------------------------------------------------------
-[    0.184549]                                  | rcu  | raw  | spin |mutex |
-[    0.184549]   --------------------------------------------------------------------------
-[    0.184550]                in hardirq context:  ok  |  ok  |  ok  |  ok  |
-[    0.185083] in hardirq context (not threaded):  ok  |  ok  |  ok  |  ok  |
-[    0.185606]                in softirq context:  ok  |  ok  |  ok  |FAILED|
-
-As a fix, add lockdep map for BH disabled section. This fixes the
-issue by letting us catch cases when local_bh_disable() gets called
-with preemption disabled where local_lock doesn't get acquired.
-In the case of "in softirq context" selftest, local_bh_disable() was
-being called with preemption disable as it's early in the boot.
-
-[boqun: Move the lockdep annotations into __local_bh_*() to avoid false
-positives because of unpaired local_bh_disable() reported by Borislav
-Petkov [1] and Peter Zijlstra [2], and make bh_lock_map only exist for
-PREEMPT_RT]
-
-Signed-off-by: Ryo Takakura <ryotkkr98@gmail.com>
-Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
-Link: https://lore.kernel.org/all/20250306122413.GBZ8mT7Z61Tmgnh5Y9@fat_crate.local/ [1]
-Link: https://lore.kernel.org/lkml/20250307113955.GK16878@noisy.programming.kicks-ass.net/ [2]
-Link: https://lore.kernel.org/r/20250118054900.18639-1-ryotkkr98@gmail.com
----
- kernel/softirq.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
-
-diff --git a/kernel/softirq.c b/kernel/softirq.c
-index 4dae6ac2e83f..3ce136bdcbfe 100644
---- a/kernel/softirq.c
-+++ b/kernel/softirq.c
-@@ -126,6 +126,18 @@ static DEFINE_PER_CPU(struct softirq_ctrl, softirq_ctrl) = {
- 	.lock	= INIT_LOCAL_LOCK(softirq_ctrl.lock),
- };
- 
-+#ifdef CONFIG_DEBUG_LOCK_ALLOC
-+static struct lock_class_key bh_lock_key;
-+struct lockdep_map bh_lock_map = {
-+	.name = "local_bh",
-+	.key = &bh_lock_key,
-+	.wait_type_outer = LD_WAIT_FREE,
-+	.wait_type_inner = LD_WAIT_CONFIG, /* PREEMPT_RT makes BH preemptible. */
-+	.lock_type = LD_LOCK_PERCPU,
-+};
-+EXPORT_SYMBOL_GPL(bh_lock_map);
-+#endif
-+
- /**
-  * local_bh_blocked() - Check for idle whether BH processing is blocked
-  *
-@@ -148,6 +160,8 @@ void __local_bh_disable_ip(unsigned long ip, unsigned int cnt)
- 
- 	WARN_ON_ONCE(in_hardirq());
- 
-+	lock_map_acquire_read(&bh_lock_map);
-+
- 	/* First entry of a task into a BH disabled section? */
- 	if (!current->softirq_disable_cnt) {
- 		if (preemptible()) {
-@@ -211,6 +225,8 @@ void __local_bh_enable_ip(unsigned long ip, unsigned int cnt)
- 	WARN_ON_ONCE(in_hardirq());
- 	lockdep_assert_irqs_enabled();
- 
-+	lock_map_release(&bh_lock_map);
-+
- 	local_irq_save(flags);
- 	curcnt = __this_cpu_read(softirq_ctrl.cnt);
- 
-@@ -261,6 +277,8 @@ static inline void ksoftirqd_run_begin(void)
- /* Counterpart to ksoftirqd_run_begin() */
- static inline void ksoftirqd_run_end(void)
- {
-+	/* pairs with the lock_map_acquire_read() in ksoftirqd_run_begin() */
-+	lock_map_release(&bh_lock_map);
- 	__local_bh_enable(SOFTIRQ_OFFSET, true);
- 	WARN_ON_ONCE(in_interrupt());
- 	local_irq_enable();
--- 
-2.47.1
-
+In the end, the places where this is likely to fail are also the places
+where hopefully the developers are smart enough to know what is going on.
 
