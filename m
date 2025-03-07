@@ -1,91 +1,98 @@
-Return-Path: <netdev+bounces-172992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03EA2A56C91
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 16:49:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E42DA56C97
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 16:50:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7985E3B7A8A
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 15:49:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04A413B59CF
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 15:50:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7AAF21CFFA;
-	Fri,  7 Mar 2025 15:49:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E952121E088;
+	Fri,  7 Mar 2025 15:50:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="pF3LKBhb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZYbTZ+wR"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2061.outbound.protection.outlook.com [40.107.94.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A362DF71
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 15:49:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.61
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741362559; cv=fail; b=YOhxM0zV/N0uoYpJmU0RS41goKDGpWS5qTUUePEicFM+zmkqi+mtp/5yNKLk8H4mIkM0IhcH0WwcSaej47pSNXiZB9dY6JlYVOQd2mva4vaksH7U4PowFT4v3+4iMLEXdWNzcRzlZmlbuHkkvATr9NKu6qeWJW/do0uJS7dqM/8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741362559; c=relaxed/simple;
-	bh=jr/+mRHfBAqvYfSn3DPfbju0zc9DAD36HqaAIM53j0U=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JgeFeCg4m1I25BlpPzwN3tz8qHDSf2VnCQNHBH8HLZol36SAsFrY4KM8z6QL/Qnb3LPoVhzb8J+dfJNfGa1l3+Lqp9/eYQElZwSLH2uvjf4RxO5icOyX7Ifdw48uWLWQw/pzkkQvwPXFM6FdPb8bGbMI18D7KAg5VkIvIriFNlI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=pF3LKBhb; arc=fail smtp.client-ip=40.107.94.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fLvJfSFcaPtSCXjX0jBiiJll3nlbu0yUDlUHgU2WnEfePyiwN3xJfGxKsY2/h+p1bl9Y1wtaSSdKCSB1wxuqLpr5VqYphtGAQIv8u5Kz+IBMSjUU+lprCjwbNuPS4trnXjEYajXDAExsxNLOe7+wBKhjGxQoQT7Fh1qAK1Xv+ZI4ecbLW4ubsR2FR+KLrfeqKntOtbZATPivjKES++DogYxeegN3DODNv/Nt/jIeZAu4PPxpZfN43Oz5NKoYirP8GpfQtLBlYLfq//l5oWtsbv8T7cC/G7f/nnoVN02KeCTUPUNuvdtNMCjj81Q7c/9h+G0j12D5yM/rh6Y9OT+MMA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bI0EUKqgzPOxQQtFP9LYdi9/qNyBZMZwKFpO5IobNZ4=;
- b=uOvzg7OflOYwh/pfYAlDtqHl4cNPrih/RUKuY9HEjPBogZuPCiZ8HEgwQUtjBh3rDxYZMW7w1SymmuquDo3SFcWhz7Dz1LI5UqdugFB7ts4eDIqS/7PnrS+IYJsqHAaVpaUvtlrQR1QAurpk+uPfvu5pCJ2oZaqZms6o+hO17eQLijT2eDl6QAYA8EKK/cvcETbUtJ4IDQS4yYP+ojc6vZ+yJpiBzu6GogjFpsAbbnW/x3juT4iGEwOZGCDthU3dMuGd3O8xEYNQJPQ3oSgk6CjAQJWBNKt4eJl0r1ljkX0XJGlmUTTBlMY0dqoc8EiB8xImF/6jWwhKm6OA4Uk+Ng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bI0EUKqgzPOxQQtFP9LYdi9/qNyBZMZwKFpO5IobNZ4=;
- b=pF3LKBhbj8ExrsK3swF/O/VibJoa8PMlwzwg40FQ1z3ODFiSQgpWERaAna1auAa8hHtr1A9radNglgAqIJy0EQrlunhU6Xm2jn7RofhAIXbwG7s4TVETDgH9Ab2CKWdgzZOM4mtwILJ1g5PuebZVKfKWIF4TJtUkr8IjUKt746w=
-Received: from BYAPR07CA0007.namprd07.prod.outlook.com (2603:10b6:a02:bc::20)
- by SN7PR12MB6840.namprd12.prod.outlook.com (2603:10b6:806:264::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.24; Fri, 7 Mar
- 2025 15:49:15 +0000
-Received: from SJ5PEPF000001EF.namprd05.prod.outlook.com
- (2603:10b6:a02:bc:cafe::cf) by BYAPR07CA0007.outlook.office365.com
- (2603:10b6:a02:bc::20) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8511.19 via Frontend Transport; Fri,
- 7 Mar 2025 15:49:15 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ5PEPF000001EF.mail.protection.outlook.com (10.167.242.203) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8511.15 via Frontend Transport; Fri, 7 Mar 2025 15:49:14 +0000
-Received: from SATLEXMB06.amd.com (10.181.40.147) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 7 Mar
- 2025 09:49:13 -0600
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB06.amd.com
- (10.181.40.147) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 7 Mar
- 2025 09:49:13 -0600
-Received: from xcbecree42x.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39 via Frontend
- Transport; Fri, 7 Mar 2025 09:49:12 -0600
-From: <edward.cree@amd.com>
-To: <linux-net-drivers@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<edumazet@google.com>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>
-CC: Edward Cree <ecree.xilinx@gmail.com>, <habetsm.xilinx@gmail.com>,
-	<netdev@vger.kernel.org>
-Subject: [PATCH net] MAINTAINERS: sfc: remove Martin Habets
-Date: Fri, 7 Mar 2025 15:47:31 +0000
-Message-ID: <20250307154731.211368-1-edward.cree@amd.com>
-X-Mailer: git-send-email 2.27.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82EE921D3F1;
+	Fri,  7 Mar 2025 15:50:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741362639; cv=none; b=gKpH9Qm+ul639W0tH3HLkWh+GvGd9z+qXX9UfzwPX9uSEwZ2gOpLzwxoqUcwSInQIQ0+IZq4o+B9aeq6mE3sGxXAf4hspLm7twb+dAEGcEEol4WaUJfnhxGziXct4obAK5iiqMqOvvC9HbF/Qrnocd4rf9DKwjX9vlJI5PV6Yrk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741362639; c=relaxed/simple;
+	bh=kAXQ+ZzimJPAHAQLd0TOYBjQ15b/og8pUMD+4H5zX1Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=g+RKkwwwhxP2zc8F6T/U/4AdxMojH7rl0J6cunGd3POgpOqXZu8tPV5afVibMRuJ+zr9BAH6DY27BwxDXhOMpdavb7BxHRP2AhEwJaK9SQp7pT6maaCGuTSTI581GzKQ5MzFduunhD9kKU6kZ8c90PT6FHKc+ZIGW1TTXZFSGs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZYbTZ+wR; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-223959039f4so41851545ad.3;
+        Fri, 07 Mar 2025 07:50:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741362638; x=1741967438; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DoxijE6homShQGTn723Kl+zM3ETyZ7atR0+PqV06nBc=;
+        b=ZYbTZ+wR/7Vg8liSfHYz92vQpaNuMLsgu1SvGhmq2OZAfxYXSbyzAYKEheOfkQRpJN
+         3lKXkX9SvKSZlI4J1O8D9qp3hJeDRt2UGucIptX6weSY9G/bh/uSOq5Ougem/b7h3Ki+
+         oR7vnNcqeXEC5EREgaSQt+/s3w+h8j2aWprf7P/76okUrnKHf7SRHMO0KH1qPwHuR6DS
+         yIEB6Y4RNJqoONijmr5L5iaMATH4h3V3sFXQHC6b+8J0Uymc5PVFmc5aWP6tAB47GDM2
+         +wTY4ew0QAuWlwA29qE/pZ0D/x9VEXY40AuLhz0yd5AU+NMbqIVg45lXexTSyLi1FTv2
+         sjPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741362638; x=1741967438;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DoxijE6homShQGTn723Kl+zM3ETyZ7atR0+PqV06nBc=;
+        b=ed30Z9SqIGm9cvGqPG4/ldhZqmUrY9FUOt4OOnDgRxcnvwCunCFOEXZuQcZPX0b1Xa
+         jhuifpPuTY0k8AvTIzY0rEwT2K/GcXMTXafYH6D3uJXeb7jaP9oUPxC5mtB1uwL1wHiv
+         btzBVC1Xb1+IdeBnVPhBYfM0NSQiGub8qwowFP5d32K+gPWvxBu+PKW0rjsF1/HPJRAQ
+         u4r41eHHldxMrkXZl0XZiYeL7yVSSoMWvpCxVfThfJYtzRaTwIeKUelBpMONrh+VgxSI
+         ckRYuGCfps85stoE8Ub3L9t3VtYEXJID7Sq90QOw7Pjy6NzNv1Q2Ruf7PNPBgLCPno1+
+         8Vpw==
+X-Forwarded-Encrypted: i=1; AJvYcCVwOjYzpcDHe95C8DcwY4r95uhZ4ZtKKPSAfi4Tebbz25ucbqqI2kfTPJSp0zRltnjkSt5Qfj5X@vger.kernel.org, AJvYcCX0x3iv04NsxSOjK8FrW81MhCXLkuE/x9vPGBQjaPi5bpfIU56RjpUhCYmfvDtxbZj9nuG1LrePc3BLt+Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyk4DIrx4uQEZvYXVUNICz4yO2EFYI53Z8gCmsLQYD9jfBCC5PI
+	hPBzgkmYbVNIc2p1Gjh42dZ/3FPamjZO8BP4qGmh8O+PWRjBZMiW
+X-Gm-Gg: ASbGnctbfAYK0ryw+OGQlvcy2J3h5Ssmvekei9jMAyuA7YrP1DcQbyBQiutdw7Zf25m
+	R4W/FPSjU5XIKiJuxzo4T+wicZ0aHx6N7UK1bGHhZsnPr+kasFJIWGZ/vrpmHrB8LcuRxlqMBM3
+	kPrViq64uGh9Y5PvilTE2Zgdl+wXqilrgUD7mghRv6lLTbmquxcLvI4VPNq2FN/TvlQdq4QVCQJ
+	Ep+kmUpGQ7XOqaTybwOwpYrELsdYSJnML06YblkDoUYUxP9tu3UHXEjPE/sOb0GyjSzTNQ60gd8
+	GsKa1C5tLXM9D3wWiMB/yb7V++u+UwKdTrZIMT7qSJrClljAz8Y0ontH86nIRRSXk3+i1tFWmtl
+	sFtmIk3ipiQQYQS1JbVJqa7aXEmbHMvU=
+X-Google-Smtp-Source: AGHT+IGmUABBTmY21SyHbc8+cWfQLDaPpbxWyZSUhUPMmDHRqzSjLtNZWiAc3bbejbxxw70wXon1kw==
+X-Received: by 2002:a17:903:2405:b0:224:5b4:b3b9 with SMTP id d9443c01a7336-22428bd551fmr70396515ad.33.1741362637678;
+        Fri, 07 Mar 2025 07:50:37 -0800 (PST)
+Received: from localhost.localdomain (p12284229-ipxg45101marunouchi.tokyo.ocn.ne.jp. [60.39.60.229])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22410a7f8d8sm31409405ad.135.2025.03.07.07.50.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Mar 2025 07:50:37 -0800 (PST)
+From: Ryo Takakura <ryotkkr98@gmail.com>
+To: peterz@infradead.org
+Cc: boqun.feng@gmail.com,
+	bp@alien8.de,
+	davem@davemloft.net,
+	edumazet@google.com,
+	horms@kernel.org,
+	kuba@kernel.org,
+	kuniyu@amazon.com,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	ryotkkr98@gmail.com,
+	x86@kernel.org
+Subject: Re: request_irq() with local bh disabled
+Date: Sat,  8 Mar 2025 00:50:12 +0900
+Message-Id: <20250307155012.84673-1-ryotkkr98@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250307135959.GL16878@noisy.programming.kicks-ass.net>
+References: <20250307135959.GL16878@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,75 +100,28 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001EF:EE_|SN7PR12MB6840:EE_
-X-MS-Office365-Filtering-Correlation-Id: 32acaf9f-f2d3-4e1e-afb9-08dd5d8f9ce2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|36860700013|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?iuq62TFaychfNU419mh0KWvs9dOM6h5LY+tck1P5J9cE3GweMlbBDWaLwhyg?=
- =?us-ascii?Q?S3EADxRK0IPln4PoAqItFcU2UYIJ5hXbIhyhyQh8brW65FQxDtEr6FhS4DvM?=
- =?us-ascii?Q?DeGzCX2h7/9MfdSgHRF51LL+2TsVgietq1yD/mMLcX9GkcihMPuCBwj49Nsz?=
- =?us-ascii?Q?BkaWZgz6qUMa5RSJi2ZmIn37Ae2zEE4R67GZDxgPHtloPE6XOVOTwZvS63pw?=
- =?us-ascii?Q?JfrEXErMHr8+oY+zum68ibbs0kz/KSbK87xc4bsm1SmKcXqi+E0c+rWSj3GG?=
- =?us-ascii?Q?1N46vrRqnoHD+vqPmIcQ8xm0ieFY3UGrzwjqkl2sROWf9kN3CNYra1gj/dDu?=
- =?us-ascii?Q?XSvTvFZ07L+hFUxcRnnkeYL+K/QBZC5fm04thj55T50cDJbckmO9rCpql1bF?=
- =?us-ascii?Q?rsuKUJmMPEY7WRo+jpB6wqROUG6Jkp7mIsuf2aTKaBPgPUQBSxVQWYBGEylh?=
- =?us-ascii?Q?OR8NeDzohWW6Bw26s2Il5EdiezN8aZ6KxhTsYM2Y4igtnIGkiDFAe4Te8Qu+?=
- =?us-ascii?Q?E4MPjrr7OwVxKT/hgaFjVG+ekhHYGZZ2WK9D9heGt9XksddSozS98ICEo03I?=
- =?us-ascii?Q?yzql8tkILeTbDcl+cwHp3cCy9W8mViL++iQW0BCxfUXH8N5sAyi+oSZFq1kU?=
- =?us-ascii?Q?mRS20g+MdesK4B23WyxRx2l7LKYpS6zdCUjVvIOMCfudPI7U1nAWKlvvHxxc?=
- =?us-ascii?Q?DZ3r5XiaPOtf9/cX/P2JNBK6WnZqPhEuyrKNTNKo/mzwEABngB1TqNMtgf06?=
- =?us-ascii?Q?HEaSYjaPS666QgeKfJ2XTeNpVomj6C5VntuBkDN6ehNDoleaQGEDz7BZmBEe?=
- =?us-ascii?Q?byrFjiPGi5hxelKpBNFdFCSKmhp7lI3hNIebyE9xtPu/gVpgmJYlIYEoK4PJ?=
- =?us-ascii?Q?NAFxN29NtwB0rQWdKrRaUipuH7sx06Pd0zhsltht/+tztt1lxGmWqhHs9EIu?=
- =?us-ascii?Q?DC8/gyzmhYwzJqnqAzMc1oOkcDl40yn5d8rsgCTGsTdnKjUwQb6UBxKEAbHh?=
- =?us-ascii?Q?xAYAuxkQhsIyo0WST+qqsxaTWj60JLxvle7K6Nacph2SJN5h1gSgbJ7TbDWT?=
- =?us-ascii?Q?9DIpL3s4O5ibjeobmfpJCJCCm4FzIg6LXz3MN+ZxGdEZpZkJlpqaWYZYFkGg?=
- =?us-ascii?Q?m9gDa3Pl1FJJ8lytpsYmRWuyA6/JBuj/BGyFItURb6+8tzoYT0DS83wOgYni?=
- =?us-ascii?Q?iz9/jG8iKd7fz4z5R/ABLMKlqB+qP9UCmL7KuqPtjUL95TRd1R4MFkkBkuWJ?=
- =?us-ascii?Q?JKOVfGeGCqamG9p6nHKlDm4F0emMnL7Mq9iTfNWF4NoUj0U+JSWH9Vso4vct?=
- =?us-ascii?Q?Y7P32vzIVjRiF+WHZsyDpJKz1ukgEHUGCAbT/Ez5b/y1u8Q7hO31oWEOsv5S?=
- =?us-ascii?Q?10tSUIqOT4qYrPy+YJaPczg2rxexQ6qq73HBdkpFQR3w3ASGD7TmyQ+XMMut?=
- =?us-ascii?Q?RprsxAeNcpUV8RMsyvw+hPpvHPuEcrvzBGr5cK4wY2Nmjjl4u2791kt/0O7D?=
- =?us-ascii?Q?2AlJdzcYx9Iw+UY=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Mar 2025 15:49:14.8568
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 32acaf9f-f2d3-4e1e-afb9-08dd5d8f9ce2
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001EF.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6840
 
-From: Edward Cree <ecree.xilinx@gmail.com>
+Hi Peter,
 
-Martin has left AMD and no longer works on the sfc driver.
+On Fri, 7 Mar 2025 14:59:59 +0100, Peter Zijlstra wrote:
+>On Fri, Mar 07, 2025 at 02:13:19PM +0100, Borislav Petkov wrote:
+>> On Fri, Mar 07, 2025 at 09:58:51PM +0900, Ryo Takakura wrote:
+>> > I'm so sorry that the commit caused this problem...
+>> > Please let me know if there is anything that I should do.
+>> 
+>> It is gone from the tip tree so you can take your time and try to do it right.
+>> 
+>> Peter and/or I could help you reproduce the issue and try to figure out what
+>> needs to change there.
+>
+>.config attached; I used gcc-14.2.0-8 (debian).
+>
+>Simply booting it should reproduce; it goes boom when trying to
+>initialize INET6.
 
-Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
----
- MAINTAINERS | 1 -
- 1 file changed, 1 deletion(-)
+Thanks for the config. I got the error now!
+I'll take a further look later on.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ca11a553d412..07b2d3c7ae5d 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -21502,7 +21502,6 @@ F:	include/linux/slimbus.h
- 
- SFC NETWORK DRIVER
- M:	Edward Cree <ecree.xilinx@gmail.com>
--M:	Martin Habets <habetsm.xilinx@gmail.com>
- L:	netdev@vger.kernel.org
- L:	linux-net-drivers@amd.com
- S:	Maintained
+Sincerely,
+Ryo Takakura
 
