@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-173042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3E39A56F95
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 18:50:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DE4CA56F98
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 18:50:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5DE3D189A974
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 17:50:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B864E175F02
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 17:50:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 057C923E229;
-	Fri,  7 Mar 2025 17:50:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 933AF23E229;
+	Fri,  7 Mar 2025 17:50:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LWl0FdEP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pq2kmCa4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D01D123C8B5;
-	Fri,  7 Mar 2025 17:50:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68CCA217718;
+	Fri,  7 Mar 2025 17:50:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741369800; cv=none; b=FfVM4g5nIBRm+Q2f+QEMzntvVO+Az3j/wi80H83REwUnw4nokNhjzWQPUEPkZFBkOTUcPS5/4vD1+zOt5uiwbzM2Y7RtuYGGoMK3sv1a1Fq1/cpKMSyzqy6T46hnnR6VM69nsqKF4zIprabrNajtiDnuPQkwkxepEWwIadbUvSI=
+	t=1741369851; cv=none; b=XpUE95LISUGVH1w0wMPjAtOSxkkDcXCcXRTDFOjV3bJF6l0tIfiPIpUeTTLAVNtBdsqpzq7R/kxfZwl8a5LtVWpMXewHnbTTEMoLLgQKp2FkDvQ7iBRbae0HIk1B2utGENvm8D0TMgXlSymtjJpjse1WgRUhCyXu0uq3BcRkAgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741369800; c=relaxed/simple;
-	bh=0DZPIe95LWP24lYQH6DTn/rr5jMCk3/IPdeK3fYlyKE=;
+	s=arc-20240116; t=1741369851; c=relaxed/simple;
+	bh=1MWCqxtK8Lpq4HGsdsJhKayhm8VOxpoYt3Qdmn9CKHA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tLhkTQODxg3aAOSLt3jRDt09bUW/xFjtEQt63EH516abRyGf0+c+4PlEyTQRduY4aQzilzZjS0HZ7BwsZqtrY/Db0O0PDMJAOB3METGSzUsZgX/kpr0wLYZ0qntmpLm/oCB6tIEkTsOeUk2XdP+CyB8YC06KUfH1v+kH7WcP+r0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LWl0FdEP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 359F4C4CED1;
-	Fri,  7 Mar 2025 17:50:00 +0000 (UTC)
+	 MIME-Version:Content-Type; b=qbF8HeIRsqtRCBjoYRgI0r5DdrafMHKEYnEX6fhSPE9gBmA3hyty/iV6rJV4M8yOlg0XGJpqyThJ2vJInc7LovwA/QUduSs3KotvegPPvos7vr/xrNbz1ZwKMm18PDuBahl8hULC+VBslGO2lm8isVEHahYd+fAb46WrZ/Ts5vE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pq2kmCa4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67D56C4CED1;
+	Fri,  7 Mar 2025 17:50:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741369800;
-	bh=0DZPIe95LWP24lYQH6DTn/rr5jMCk3/IPdeK3fYlyKE=;
+	s=k20201202; t=1741369850;
+	bh=1MWCqxtK8Lpq4HGsdsJhKayhm8VOxpoYt3Qdmn9CKHA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LWl0FdEPUx7hFd5ydcVHQRcvgNfydg5JuGSCG0WTCGI2vfkumjNIDCp/Li36B9v4A
-	 aWxy6UF0C8jzaLlEsJdwzBkbl9jZfLrYjCbDOPJkw09mgsbUcfS63gCEXYdRAeRKLz
-	 uifN7Z8QusIMQuVXhP+YfgBmAK6vLsglWo+T92Xw9xaAPAz0hZIghMNHQKdC5MaGN4
-	 ulqKirGQXNkZGZ6VAq+kjToS7NYNL++VDVN951Z1oydpNcCwp5us17XdjTKO93SDTd
-	 1jmCa/CIqMagj/ynLm751M/FCxc4uWPbG6G2pRvy1gdqHJROoyzS+p0hvSHNLAxs52
-	 p/TN2qwfSNygg==
-Date: Fri, 7 Mar 2025 09:49:59 -0800
+	b=Pq2kmCa4I11NHxwRTW3/awru5/73mho8HX9w2W8hhsPr6UaGzpZUVLH0pYzGBigMx
+	 tlHnqRcJcKwBFRnsIKeduEukN8HENXvYtFeSk6iEpHIDyJ/VxVpxuTaCLIVDUpdH7N
+	 EATxgTdksBixIviElPlXElnJgZ+nYqlHfi/GmDtW4o6S1X1QN7hpyUsqI3I19H46c2
+	 IYRuC/Ioyv3g20/LuXDIIKbP2xsQdmaMIMiBuRE8jkJCgxp79/0l7Vz237rf3nRFFD
+	 TpIE3GU8zcqiMsbRTkqwDaG6/2ZzfK6a78xywi/h4V9hlQuwW/X/FbPQuIlSx+tZl6
+	 Wc11M1vP2VK5w==
+Date: Fri, 7 Mar 2025 09:50:49 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: Stanislav Fomichev <sdf@fomichev.me>
 Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
@@ -50,12 +50,12 @@ Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
  pavan.chebbi@broadcom.com, andrew+netdev@lunn.ch, jdamato@fastly.com,
  xuanzhuo@linux.alibaba.com, almasrymina@google.com, asml.silence@gmail.com,
  dw@davidwei.uk
-Subject: Re: [PATCH net-next v1 2/4] net: protect net_devmem_dmabuf_bindings
- by new net_devmem_bindings_mutex
-Message-ID: <20250307094959.1df7c914@kernel.org>
-In-Reply-To: <20250307155725.219009-3-sdf@fomichev.me>
+Subject: Re: [PATCH net-next v1 3/4] net: add granular lock for the netdev
+ netlink socket
+Message-ID: <20250307095049.39cba053@kernel.org>
+In-Reply-To: <20250307155725.219009-4-sdf@fomichev.me>
 References: <20250307155725.219009-1-sdf@fomichev.me>
-	<20250307155725.219009-3-sdf@fomichev.me>
+	<20250307155725.219009-4-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,16 +65,9 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri,  7 Mar 2025 07:57:23 -0800 Stanislav Fomichev wrote:
-> In the process of making queue management API rtnl_lock-less, we
-> need a separate lock to protect xa that keeps a global list of bindings.
-> 
-> Also change the ordering of 'posting' binding to
-> net_devmem_dmabuf_bindings: xa_alloc is done after binding is fully
-> initialized (so xa_load lookups fully instantiated bindings) and
-> xa_erase is done as a first step during unbind.
+On Fri,  7 Mar 2025 07:57:24 -0800 Stanislav Fomichev wrote:
+> As we move away from rtnl_lock for queue ops, introduce
+> per-netdev_nl_sock lock.
 
-You're just wrapping the calls to xarray here, is there a plan to use
-this new lock for other things? xarray has a built in spin lock, we
-don't have to protect it.
+What is it protecting?
 
