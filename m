@@ -1,109 +1,123 @@
-Return-Path: <netdev+bounces-172792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49AC5A56087
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 06:56:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0F98A56073
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 06:54:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C5AC1895457
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 05:56:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15C1A172863
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 05:54:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2EB119D081;
-	Fri,  7 Mar 2025 05:56:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00FAC18DB1F;
+	Fri,  7 Mar 2025 05:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="DQj7/Imc"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QnL6+z1i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97BBA19ABD1
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 05:56:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 233441922C6
+	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 05:53:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741326965; cv=none; b=Px2r+NOao0ocE6XS/5y/vc2c9j7HkP536ehz9V+tFPkcJCrFhk+vUSgbT+n9zsz1xdm7wXkcXumsWbNNxZWAFQbKJd4xU0zWEp2DlMlAGrcsmy5yy0yNa8/1YrRM+Hjevt4Z8zQOrD8fpxk7hMmPkpAGnVolwuyEGlnUqMxIvVg=
+	t=1741326837; cv=none; b=IoElteMw+CqnBw89Z5/1EXP9yEsNcMSl37+7gggSQ1xEKho3menl2rDX91U/bxkWcVcKVgpoJkSUrXLJSydNUJRlCX94D0rn2y4uetJpYq6d1NMrDpAavs7gRsIA2X0TNmwC9V3RxENJLL9V1ov0/ME65nKQyNuGI6fUQ3WRhpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741326965; c=relaxed/simple;
-	bh=ceUt8jZh//dgX8toJ1NZG+ydsh7sTZqCCjqSumiEDYg=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TCbKko20c18VSQFGMB1Xr2mv5WaQPBDabOHcHN6GJyfjsiVh17uA1APiy2IMaTaqIgS88yUCCrp59WYla7Fdw/uZ+I5HuzyLZEA5fjWzBqqTRrsiH4LkWZRivmmmu5+uNWBm8fRo6JYEZwfQmt048V2Dd5ZHh5kOK1WQWRMPWIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=DQj7/Imc; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 2ED0320842;
-	Fri,  7 Mar 2025 06:50:51 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tCZBqe1HLdXO; Fri,  7 Mar 2025 06:50:50 +0100 (CET)
-Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id A54EA207BB;
-	Fri,  7 Mar 2025 06:50:50 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com A54EA207BB
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1741326650;
-	bh=29f+pgvqluMPQGFxzIIGwwKsHatu0dtVzGGpc4oGUCU=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=DQj7/Imc29H33JIwqD+S5IqxqDsKmJ2Bf0D755B+T6GfnsjksDuwJk9rsFYLt71Qx
-	 0hm2iLv2Nv04jgfEHtf8z8JAH0VmaZHm7SEbUqyLUvDgtj103ce/a5y7Q97/2qrBId
-	 VSdkmhbC+tUxsBD5m3DF2hT3OGufqhnWk+zneiPZOKia6S5/gl2+hKrq02+HTeFOOK
-	 FDtXcZlzaZw0EaW/F1exfp/dTaARmcKAgbc7TxdXNepNARZ5Ng0tASj+wQpSR36Ujf
-	 er0QOvWhqe+E5fQljOh1jzecxyEMG2fKvZUCoB0BRYtNFS0D9359/JLpATrMiGAOBU
-	 6rkQ9pRIIDHEg==
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 7 Mar 2025 06:50:50 +0100
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 7 Mar
- 2025 06:50:49 +0100
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 8D1A13182D7B; Fri,  7 Mar 2025 06:50:49 +0100 (CET)
-Date: Fri, 7 Mar 2025 06:50:49 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Chiachang Wang <chiachangwang@google.com>
-CC: Leon Romanovsky <leonro@nvidia.com>, <netdev@vger.kernel.org>,
-	<stanleyjhu@google.com>, <yumike@google.comy>
-Subject: Re: [PATCH ipsec v3 1/1] xfrm: Migrate offload configuration
-Message-ID: <Z8qJOVuMr+GamxUO@gauss3.secunet.de>
-References: <20250224061554.1906002-1-chiachangwang@google.com>
- <20250224061554.1906002-2-chiachangwang@google.com>
- <20250224124956.GB53094@unreal>
- <CAOb+sWEdZ-kY6-qnG2u0h_JzeVyrf0b_eT+L=2t-5zCGaXedHA@mail.gmail.com>
+	s=arc-20240116; t=1741326837; c=relaxed/simple;
+	bh=aQfYG8FZfpWlzffLnVm2Nnolyf9dIHwOFtO9wBCaqVg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kapEDZZhbHRmqKzKqYbJ1drC0HHGN0POmeu63mLhcHMXZ95iNlqVXTGPWk+D4L80IzU8fCSbMouexAEc8TXk8Bd2+mJzOY+QBObE6Hajwta0SlKE3GzVyIIGR19xbh2ynojPhtm/Urm3fF6Bl0PmjftTMvV4/CmFuVSt3vhjF0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QnL6+z1i; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1741326824;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=V9+iyQSEK0VITh9i3aNT5fQhLH5irNd+SUG9IphFoss=;
+	b=QnL6+z1ilyWcymF6bNFt3iTsdtgNFESdli83oAiHgPZIo634y2NZGnMo90nM5Ry0dBGMEh
+	xivkNI0Rw2c6tD7L/A2KT7hqbw+7Xw/lIYM5W7OpE1qNcjtEMBP8oObEOuSDfQ9pCg55Gu
+	FFGxSMUCadsz7LqECHlWSRL7r54Pd/g=
+From: Martin KaFai Lau <martin.lau@linux.dev>
+To: David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@kernel.org>,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: pull-request: bpf-next 2025-03-06
+Date: Thu,  6 Mar 2025 21:53:35 -0800
+Message-ID: <20250307055335.441298-1-martin.lau@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <CAOb+sWEdZ-kY6-qnG2u0h_JzeVyrf0b_eT+L=2t-5zCGaXedHA@mail.gmail.com>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Mar 07, 2025 at 01:42:25PM +0800, Chiachang Wang wrote:
-> Hi Leon,
-> 
-> Thank you for your review and suggestions. I noticed your patches
-> haven't been merged into the tree yet. I'm unsure if rebasing my patch
-> onto yours would work correctly with the kernel upstream. It seems
-> your patches are suitable for merging. Since I'm not familiar with the
-> timeline for your patch's inclusion, could you please advise on how
-> long it might take for them to be in the tree? This would help me
-> rebase my patch properly. or there are any other alternative way
-> rather than waiting your patch?
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-Rebase your patch on top of the ipsec-next tree. This is the target tree
-for xfrm changes that will go to -next. Leons patchset is already merged
-into this tree.
+The following pull-request contains BPF updates for your *net-next* tree.
 
-Thanks!
+We've added 6 non-merge commits during the last 13 day(s) which contain
+a total of 6 files changed, 230 insertions(+), 56 deletions(-).
 
+The main changes are:
+
+1) Add XDP metadata support for tun driver, from Marcus Wichelmann.
+
+Please consider pulling these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
+
+Thanks a lot!
+
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Jason Wang, Willem de Bruijn
+
+----------------------------------------------------------------
+
+The following changes since commit b66e19dcf684b21b6d3a1844807bd1df97ad197a:
+
+  Merge branch 'mctp-add-mctp-over-usb-hardware-transport-binding' (2025-02-21 16:45:26 -0800)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
+
+for you to fetch changes up to 72aad21de5f65bea60c3064ad463b3793fb4b1c6:
+
+  Merge branch 'xdp-metadata-support-for-tun-driver' (2025-03-06 12:31:09 -0800)
+
+----------------------------------------------------------------
+bpf-next-for-netdev
+
+----------------------------------------------------------------
+Marcus Wichelmann (6):
+      net: tun: Enable XDP metadata support
+      net: tun: Enable transfer of XDP metadata to skb
+      selftests/bpf: Move open_tuntap to network helpers
+      selftests/bpf: Refactor xdp_context_functional test and bpf program
+      selftests/bpf: Add test for XDP metadata support in tun driver
+      selftests/bpf: Fix file descriptor assertion in open_tuntap helper
+
+Martin KaFai Lau (1):
+      Merge branch 'xdp-metadata-support-for-tun-driver'
+
+ drivers/net/tun.c                                  |  28 +++-
+ tools/testing/selftests/bpf/network_helpers.c      |  28 ++++
+ tools/testing/selftests/bpf/network_helpers.h      |   3 +
+ .../testing/selftests/bpf/prog_tests/lwt_helpers.h |  29 -----
+ .../bpf/prog_tests/xdp_context_test_run.c          | 145 ++++++++++++++++++++-
+ tools/testing/selftests/bpf/progs/test_xdp_meta.c  |  53 +++++---
+ 6 files changed, 230 insertions(+), 56 deletions(-)
 
