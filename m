@@ -1,254 +1,150 @@
-Return-Path: <netdev+bounces-172917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6A56A56748
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 12:58:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA88DA5677C
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 13:06:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 342A91632A1
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 11:58:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 105EE174806
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 12:06:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 613222192F7;
-	Fri,  7 Mar 2025 11:57:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 247E92185BC;
+	Fri,  7 Mar 2025 12:06:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="HXr9F9S3";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="wY+SgcLd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P5va7NwM"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 814CB218EA7;
-	Fri,  7 Mar 2025 11:57:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A6C221767D
+	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 12:06:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741348655; cv=none; b=hghdPosbtNOuzOruSG4WlP6x+uMZb5SAQw0MoB3yzkETOWNiVqXRupwm/hrE82Hz+6DOap69GG2lGSFRmdU3mRI/ies3hEHyQjjSkfTSt4+ldVYChtXqfxYdZuYe7DxHROHa8NBDIEOI9sqEYPTbbM26wniG0CW/u6uWpAhhbyU=
+	t=1741349209; cv=none; b=GFc/m0X1zUQUEulLP478APt5PMkdps3YZ/cNK1ltSILqawHgZuy0eVw7jVyOBK1+CndAXIX1bxEbPb0651vgzD/2wBr3sUv899e410YMwh1BVrhaIVDcRX0Kh3Pa9hYMp+LAx8rB/bol1YuUJw/4lB1qVWQBwXSrdg5+cujrph0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741348655; c=relaxed/simple;
-	bh=Y4KWT/DTp3Q2oe32qtckIDcCF4wXT6rdbzqnfV7npiY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Oy0VtuYmWUTjUQ7q+iimSv77bjvRTDx7Dl8ZLj9tXVuSynMGWAtTW31ckGDpSdVFN5eBof7qpoXVQm/ZGNhZ+bcp8DQaOPD8V4L2tHRzIZ6FqkRkta4IMlra6y7H324vkZoI+o+Ixo1wseO/xwfnFhNFBax+DNCI/7Ggfd2fbhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=HXr9F9S3; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=wY+SgcLd; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1741348650;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q0z4ulBO6aXDtgDZ7oBXWjxFr4VugNd5bSgDi1G2fX0=;
-	b=HXr9F9S3Hz4SgrnOYdNeLMAQK4Ye1pyDA/h6olHO9W7RMF16+GGIR9X+TLQwcH84vdFG+L
-	ahYIKfd1ETx+JFAVZoS/ziLUfnMvcpt4po49+3JOaLPLteQ6ymHnGNAgHAPAP3hGIMCHhe
-	OkIaN+TLRnN0UxqPWm/kRHGkSGiD+vMR3f+jaek0Ymy0MgeDgYYTcgVcErJs6sOGiSvAjj
-	alqp8+AZxTopj+YVdyKhoUxqdna9LLNmLAPSA/3zh19Qnsed3nHiogqfDzXBMhpVPsMlO0
-	p1Vbqurj7DHglIUWTBMEgtU9nJGHRu7aFlvKsVIM66ephvEr2Mhu+NK6/m9uqA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1741348650;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q0z4ulBO6aXDtgDZ7oBXWjxFr4VugNd5bSgDi1G2fX0=;
-	b=wY+SgcLdKqiCS2DEC3lVF2HEpL/AQZAibARp049RbTiiMVxKDErrOAieQ3QCmPUNDZXbcr
-	XZGwPVqA3CtIxWBw==
-To: linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1741349209; c=relaxed/simple;
+	bh=DeTqmEGJpgLjw1WkILyNYBLvvL+fu8TabnQD5UdHxBM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QBi6EV5WqRwiWJzawdk5Txn6/oSKZ4gXXU+GLUbFLj4p+bLBX3qqQxXUbDWi8genLu8M9EkkYFJ6gKK1mKo4DyagSsocMVSirvA7x4ECKwvalABzxKPvRtxWaEFmXa8E/ZjR8YM4s9mznqMivbtIAqF5OI0jYp7kPxi7twACLew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P5va7NwM; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741349207; x=1772885207;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=DeTqmEGJpgLjw1WkILyNYBLvvL+fu8TabnQD5UdHxBM=;
+  b=P5va7NwMTu3FNG3PYly70XEFEmYf9gogkSvCF2PCCwitFczvddvv0LIf
+   OMLypmfNt1TcvF2RNPP2aTJW9Tub2Wz89xDP2nMRSN6b41SUIFsz4WR+m
+   P2W69i8Gv51iXqMeh/ejSIQNJs3WHCHQAhOYufgfEBGNomd4csUKPForw
+   nZentFFTbiMWc/+W2ln0GHXFdXf5nXGhXo4ESFfNgJ9rN+TfjeFQLnOGd
+   7UZoDG+9xGeljlWTXDtyaulsikFv8yB0ys+RG0evJJJwFh6ZA9eXMV/Xh
+   T8qsK2NH/dcMuH2bet8lO7db1wFD8m6bN5v1mYsc2uzKHJYv2iy6Y98Nt
+   A==;
+X-CSE-ConnectionGUID: rQmgkHa9TiquMfOpXCfDtA==
+X-CSE-MsgGUID: nHbJmjDyQgGWHLUUyotIXg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="42250762"
+X-IronPort-AV: E=Sophos;i="6.14,229,1736841600"; 
+   d="scan'208";a="42250762"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 04:06:47 -0800
+X-CSE-ConnectionGUID: 8zz9i99HQRyf+0so0hEGBw==
+X-CSE-MsgGUID: KApKi7SZQC+TTI+NUBhZOg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,229,1736841600"; 
+   d="scan'208";a="119476458"
+Received: from lkp-server02.sh.intel.com (HELO a4747d147074) ([10.239.97.151])
+  by fmviesa008.fm.intel.com with ESMTP; 07 Mar 2025 04:06:46 -0800
+Received: from kbuild by a4747d147074 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tqWTS-0000Qr-0a;
+	Fri, 07 Mar 2025 12:06:42 +0000
+Date: Fri, 7 Mar 2025 20:05:48 +0800
+From: kernel test robot <lkp@intel.com>
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Joe Damato <jdamato@fastly.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Simon Horman <horms@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: [PATCH net-next v2 5/5] page_pool: Convert page_pool_alloc_stats to u64_stats_t.
-Date: Fri,  7 Mar 2025 12:57:22 +0100
-Message-ID: <20250307115722.705311-6-bigeasy@linutronix.de>
-In-Reply-To: <20250307115722.705311-1-bigeasy@linutronix.de>
-References: <20250307115722.705311-1-bigeasy@linutronix.de>
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+	David Ahern <dsahern@kernel.org>
+Subject: Re: [PATCH net-next 2/2] udp_tunnel: use static call for GRO hooks
+ when possible
+Message-ID: <202503071931.FDaDRKvW-lkp@intel.com>
+References: <740cd03d2982943c313de334977e18cc9de1bc3e.1741275846.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <740cd03d2982943c313de334977e18cc9de1bc3e.1741275846.git.pabeni@redhat.com>
 
-Using u64 for statistics can lead to inconsistency on 32bit because an
-update and a read requires to access two 32bit values.
-This can be avoided by using u64_stats_t for the counters and
-u64_stats_sync for the required synchronisation on 32bit platforms. The
-synchronisation is a NOP on 64bit architectures.
+Hi Paolo,
 
-Use u64_stats_t for the counters in page_pool_alloc_stats.
+kernel test robot noticed the following build errors:
 
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
- include/net/page_pool/types.h | 14 ++++++-----
- net/core/page_pool.c          | 47 +++++++++++++++++++++++++----------
- net/core/page_pool_user.c     | 12 ++++-----
- 3 files changed, 48 insertions(+), 25 deletions(-)
+[auto build test ERROR on net-next/main]
 
-diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
-index daf989d01436e..78984b9286c6b 100644
---- a/include/net/page_pool/types.h
-+++ b/include/net/page_pool/types.h
-@@ -96,6 +96,7 @@ struct page_pool_params {
- #ifdef CONFIG_PAGE_POOL_STATS
- /**
-  * struct page_pool_alloc_stats - allocation statistics
-+ * @syncp:	synchronisations point for updates.
-  * @fast:	successful fast path allocations
-  * @slow:	slow path order-0 allocations
-  * @slow_high_order: slow path high order allocations
-@@ -105,12 +106,13 @@ struct page_pool_params {
-  *		the cache due to a NUMA mismatch
-  */
- struct page_pool_alloc_stats {
--	u64 fast;
--	u64 slow;
--	u64 slow_high_order;
--	u64 empty;
--	u64 refill;
--	u64 waive;
-+	struct u64_stats_sync syncp;
-+	u64_stats_t fast;
-+	u64_stats_t slow;
-+	u64_stats_t slow_high_order;
-+	u64_stats_t empty;
-+	u64_stats_t refill;
-+	u64_stats_t waive;
- };
-=20
- /**
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 312bdc5b5a8bf..9f4a390964195 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -42,7 +42,14 @@ static DEFINE_PER_CPU(struct page_pool_recycle_stats, pp=
-_system_recycle_stats) =3D
- };
-=20
- /* alloc_stat_inc is intended to be used in softirq context */
--#define alloc_stat_inc(pool, __stat)	(pool->alloc_stats.__stat++)
-+#define alloc_stat_inc(pool, __stat)						\
-+	do {									\
-+		struct page_pool_alloc_stats *s =3D &pool->alloc_stats;		\
-+		u64_stats_update_begin(&s->syncp);				\
-+		u64_stats_inc(&s->__stat);					\
-+		u64_stats_update_end(&s->syncp);				\
-+	} while (0)
-+
- /* recycle_stat_inc is safe to use when preemption is possible. */
- #define recycle_stat_inc(pool, __stat)							\
- 	do {										\
-@@ -102,19 +109,32 @@ static const char pp_stats_mq[][ETH_GSTRING_LEN] =3D {
- bool page_pool_get_stats(const struct page_pool *pool,
- 			 struct page_pool_stats *stats)
- {
-+	u64 fast, slow, slow_high_order, empty, refill, waive;
-+	const struct page_pool_alloc_stats *alloc_stats;
- 	unsigned int start;
- 	int cpu =3D 0;
-=20
- 	if (!stats)
- 		return false;
-=20
-+	alloc_stats =3D &pool->alloc_stats;
- 	/* The caller is responsible to initialize stats. */
--	stats->alloc_stats.fast +=3D pool->alloc_stats.fast;
--	stats->alloc_stats.slow +=3D pool->alloc_stats.slow;
--	stats->alloc_stats.slow_high_order +=3D pool->alloc_stats.slow_high_order;
--	stats->alloc_stats.empty +=3D pool->alloc_stats.empty;
--	stats->alloc_stats.refill +=3D pool->alloc_stats.refill;
--	stats->alloc_stats.waive +=3D pool->alloc_stats.waive;
-+	do {
-+		start =3D u64_stats_fetch_begin(&alloc_stats->syncp);
-+		fast =3D u64_stats_read(&alloc_stats->fast);
-+		slow =3D u64_stats_read(&alloc_stats->slow);
-+		slow_high_order =3D u64_stats_read(&alloc_stats->slow_high_order);
-+		empty =3D u64_stats_read(&alloc_stats->empty);
-+		refill =3D u64_stats_read(&alloc_stats->refill);
-+		waive =3D u64_stats_read(&alloc_stats->waive);
-+	} while (u64_stats_fetch_retry(&alloc_stats->syncp, start));
-+
-+	u64_stats_add(&stats->alloc_stats.fast, fast);
-+	u64_stats_add(&stats->alloc_stats.slow, slow);
-+	u64_stats_add(&stats->alloc_stats.slow_high_order, slow_high_order);
-+	u64_stats_add(&stats->alloc_stats.empty, empty);
-+	u64_stats_add(&stats->alloc_stats.refill, refill);
-+	u64_stats_add(&stats->alloc_stats.waive, waive);
-=20
- 	for_each_possible_cpu(cpu) {
- 		u64 cached, cache_full, ring, ring_full, released_refcnt;
-@@ -173,12 +193,12 @@ u64 *page_pool_ethtool_stats_get(u64 *data, const voi=
-d *stats)
- {
- 	const struct page_pool_stats *pool_stats =3D stats;
-=20
--	*data++ =3D pool_stats->alloc_stats.fast;
--	*data++ =3D pool_stats->alloc_stats.slow;
--	*data++ =3D pool_stats->alloc_stats.slow_high_order;
--	*data++ =3D pool_stats->alloc_stats.empty;
--	*data++ =3D pool_stats->alloc_stats.refill;
--	*data++ =3D pool_stats->alloc_stats.waive;
-+	*data++ =3D u64_stats_read(&pool_stats->alloc_stats.fast);
-+	*data++ =3D u64_stats_read(&pool_stats->alloc_stats.slow);
-+	*data++ =3D u64_stats_read(&pool_stats->alloc_stats.slow_high_order);
-+	*data++ =3D u64_stats_read(&pool_stats->alloc_stats.empty);
-+	*data++ =3D u64_stats_read(&pool_stats->alloc_stats.refill);
-+	*data++ =3D u64_stats_read(&pool_stats->alloc_stats.waive);
- 	*data++ =3D u64_stats_read(&pool_stats->recycle_stats.cached);
- 	*data++ =3D u64_stats_read(&pool_stats->recycle_stats.cache_full);
- 	*data++ =3D u64_stats_read(&pool_stats->recycle_stats.ring);
-@@ -303,6 +323,7 @@ static int page_pool_init(struct page_pool *pool,
- 		pool->recycle_stats =3D &pp_system_recycle_stats;
- 		pool->system =3D true;
- 	}
-+	u64_stats_init(&pool->alloc_stats.syncp);
- #endif
-=20
- 	if (ptr_ring_init(&pool->ring, ring_qsize, GFP_KERNEL) < 0) {
-diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
-index 0d038c0c8996d..c368cb141147f 100644
---- a/net/core/page_pool_user.c
-+++ b/net/core/page_pool_user.c
-@@ -137,17 +137,17 @@ page_pool_nl_stats_fill(struct sk_buff *rsp, const st=
-ruct page_pool *pool,
- 	nla_nest_end(rsp, nest);
-=20
- 	if (nla_put_uint(rsp, NETDEV_A_PAGE_POOL_STATS_ALLOC_FAST,
--			 stats.alloc_stats.fast) ||
-+			 u64_stats_read(&stats.alloc_stats.fast)) ||
- 	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW,
--			 stats.alloc_stats.slow) ||
-+			 u64_stats_read(&stats.alloc_stats.slow)) ||
- 	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW_HIGH_ORDER,
--			 stats.alloc_stats.slow_high_order) ||
-+			 u64_stats_read(&stats.alloc_stats.slow_high_order)) ||
- 	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_STATS_ALLOC_EMPTY,
--			 stats.alloc_stats.empty) ||
-+			 u64_stats_read(&stats.alloc_stats.empty)) ||
- 	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_STATS_ALLOC_REFILL,
--			 stats.alloc_stats.refill) ||
-+			 u64_stats_read(&stats.alloc_stats.refill)) ||
- 	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_STATS_ALLOC_WAIVE,
--			 stats.alloc_stats.waive) ||
-+			 u64_stats_read(&stats.alloc_stats.waive)) ||
- 	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHED,
- 			 u64_stats_read(&stats.recycle_stats.cached)) ||
- 	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHE_FULL,
---=20
-2.47.2
+url:    https://github.com/intel-lab-lkp/linux/commits/Paolo-Abeni/udp_tunnel-create-a-fast-path-GRO-lookup/20250306-235952
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/740cd03d2982943c313de334977e18cc9de1bc3e.1741275846.git.pabeni%40redhat.com
+patch subject: [PATCH net-next 2/2] udp_tunnel: use static call for GRO hooks when possible
+config: mips-rt305x_defconfig (https://download.01.org/0day-ci/archive/20250307/202503071931.FDaDRKvW-lkp@intel.com/config)
+compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250307/202503071931.FDaDRKvW-lkp@intel.com/reproduce)
 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202503071931.FDaDRKvW-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> net/ipv4/udp_offload.c:172:9: error: incompatible pointer types returning 'struct sk_buff *' from a function with result type 'struct skbuff *' [-Werror,-Wincompatible-pointer-types]
+     172 |         return call_gro_receive_sk(udp_sk(sk)->gro_receive, sk, head, skb);
+         |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> net/ipv4/udp_offload.c:782:5: error: incompatible pointer types assigning to 'struct sk_buff *' from 'struct skbuff *' [-Werror,-Wincompatible-pointer-types]
+     782 |         pp = udp_tunnel_gro_rcv(sk, head, skb);
+         |            ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> net/ipv4/udp_offload.c:932:14: error: use of undeclared identifier 'udp_tunnel_gro_type_lock'; did you mean 'udp_tunnel_gro_rcv'?
+     932 |         mutex_init(&udp_tunnel_gro_type_lock);
+         |                     ^~~~~~~~~~~~~~~~~~~~~~~~
+         |                     udp_tunnel_gro_rcv
+   include/linux/mutex.h:64:16: note: expanded from macro 'mutex_init'
+      64 |         __mutex_init((mutex), #mutex, &__key);                          \
+         |                       ^
+   net/ipv4/udp_offload.c:168:23: note: 'udp_tunnel_gro_rcv' declared here
+     168 | static struct skbuff *udp_tunnel_gro_rcv(struct sock *sk,
+         |                       ^
+>> net/ipv4/udp_offload.c:932:2: error: incompatible pointer types passing 'struct skbuff *(*)(struct sock *, struct list_head *, struct sk_buff *)' to parameter of type 'struct mutex *' [-Werror,-Wincompatible-pointer-types]
+     932 |         mutex_init(&udp_tunnel_gro_type_lock);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/mutex.h:64:15: note: expanded from macro 'mutex_init'
+      64 |         __mutex_init((mutex), #mutex, &__key);                          \
+         |                      ^~~~~~~
+   include/linux/mutex.h:89:40: note: passing argument to parameter 'lock' here
+      89 | extern void __mutex_init(struct mutex *lock, const char *name,
+         |                                        ^
+   4 errors generated.
+
+
+vim +172 net/ipv4/udp_offload.c
+
+   167	
+ > 168	static struct skbuff *udp_tunnel_gro_rcv(struct sock *sk,
+   169						 struct list_head *head,
+   170						 struct sk_buff *skb)
+   171	{
+ > 172		return call_gro_receive_sk(udp_sk(sk)->gro_receive, sk, head, skb);
+   173	}
+   174	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
