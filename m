@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-172996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26451A56CCC
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 16:57:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B602A56CCD
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 16:58:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C99E1786DF
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 15:57:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 684EB178B16
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 15:58:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67CA122155C;
-	Fri,  7 Mar 2025 15:57:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9596221710;
+	Fri,  7 Mar 2025 15:57:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F6F21D3E8;
-	Fri,  7 Mar 2025 15:57:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E111A221547;
+	Fri,  7 Mar 2025 15:57:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741363050; cv=none; b=Fb3zA6CGmeIS+66ou3e4TNNBC+q+r66zSSVqJT4edR62Fvr4Ct+EcTP7zqDK9UZjwqw34vBWX94jfXfNP0JqvBelyK+XzddE/IUrqiUnMJuljgV8JifxH+4O7+6j761sJMJBCdDJbAyGuvAJoubcD0BEllAiWMCyeVwvV8mRBz4=
+	t=1741363051; cv=none; b=AE/8DekubAr0iG943akUzWgbtEHrKaXwRw4DGF6SsOgP3v5otjJl61o2X80SAlJJwmtbexxDDq3q1Q+1IjnvQTY01OLsjXqu+PNmFcUxV4iqiJuqRUUg1m5z+3dE0lCNsDak90pdO2tJbd7DcOCBHnkn17xeWZEi613vBmdScKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741363050; c=relaxed/simple;
-	bh=qju+Hmli1ujUwi/eHfGIMx2HJZ38f7cehV6nsoGzrPo=;
+	s=arc-20240116; t=1741363051; c=relaxed/simple;
+	bh=JniLJibKpEppVkt3pfDVBslPwEadXmwWbzGIt0QUQWk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kNzmvLqzQMeTvA0K34J6a1ZGQ6362SzQ7nvNAe4TYULDvlN1tpXqOwmTax8lmDbKsJ2Z8OdITB83vybNYnnD9WsJf9U62fXhdhuue/ZAZOBd0YIL1wIWte6KDhsLp1V6hTHCydy4Irs8CnUeOKRTMRRKdPAB+lThwkw9Qc3IUHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.174
+	 MIME-Version; b=UX4YIZ6R0rYpiOZn8GsGlM5nZ1wGdLYavOrfTKq6nhVMeEI7PSAzM3FRQZqjMyr1Qm8HKAHI4ezedk4X79kv8u3eKIAFPY1mNEiar3D/tz9Ens7kS+C1GRJe+vngwbCEGJPKH5CaYnl5NxFgwE4oC0iAPAT58ng3l3KJSNSdMbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-22359001f1aso51236105ad.3;
-        Fri, 07 Mar 2025 07:57:28 -0800 (PST)
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2241053582dso11716365ad.1;
+        Fri, 07 Mar 2025 07:57:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741363047; x=1741967847;
+        d=1e100.net; s=20230601; t=1741363049; x=1741967849;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wVxQV/o7jQOh5fqVSpMsD4HSovMAgVf5MADEYdzA/sg=;
-        b=lggxoZPQKIf6nm2fsSVyOChnMiOXhYjKGP1BoJi3RVGFOrqqf9ev8lO7epNbgZjjv3
-         k8CeHId2Ve+Wo/CDcpB44AaHX3eiaKWmhgi9nuYlSsS4DLYIrsGVRAlAk2OKBkN5bFLa
-         dO6tWg+vV3o+65DzzBhpoRDfmHm8ZQxSj09JDWWYid9KyETr/oZeq3ahb0hSIbgJgDdj
-         IjuDDJmFt/1Pc9xcIIO93YbmZCLKvbbZa/g7zvVQvrCMqDBqG1fbWDB11CknJ9IkJ/Cy
-         s9TgYbL/9xOTCGnBAhXMaxbpfkCnmfZ0hdbi4cTZiyC4nY1GUAw79Xx90NhLCkYz4Up5
-         HdBg==
-X-Forwarded-Encrypted: i=1; AJvYcCXEo6TJVmFEIKO+XMv7MIVxS57C51k33L1dU1CHesy2y52avdvphze8kNG7Vbj+gpW+Yoy75Mz988JL8RI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQkKJBC7eOoJIJCJlk1mPE2ojGFpJ2oebzFv8OvZzp0n9FMmLT
-	7wIyNV+1f5WgykrPUIo+MSHjZrzzMSFH+WnKu4PZZgeyQ6sGXDGe4gCf
-X-Gm-Gg: ASbGncs0H0y8UIgSDIVhhlXEVLi4BsN9wmFBAbhb144PHH5JAuXDgqNbgna9ZCEnOp2
-	ICd0Gkbm+kwDCrd9iA2k71xcoKILqVuAwn9l5HP3aqEjgag5u0YpNY2qbZCgCc0K3FIL7UkS3bX
-	pdc3x+Dq2rhTnsZiSFRdG1fJU9rVXIMnDY/lDWTokEsWhVFLBYDJwY3VYnb5Kpkh+lajA2X8ATI
-	kOP2/bMxCfAkfFY0zxHM4/HVSf9DE/bFzLI1SPPvIvsFKzdVPqgwMkT0YuIlznbD/yoAKxshhc2
-	lgJlWTgARWUQBTiaoKppzs4xdV7aFwy+rzR6LR3geaCi
-X-Google-Smtp-Source: AGHT+IEuQhykDNqkZGL2g86S4EFJk8gdinVKZb1LKs3IA6FYGr29hXd6nnPoQT+BI7iTYA8Lwi9Veg==
-X-Received: by 2002:a05:6a00:b51:b0:736:6043:69f9 with SMTP id d2e1a72fcca58-736aaadf584mr5762887b3a.19.1741363047536;
-        Fri, 07 Mar 2025 07:57:27 -0800 (PST)
+        bh=fNf+k9hhNyVSY2O3O8aKeeb+5wxc5hlSdDGv1HkARCE=;
+        b=RehljJckTmUGPW1BLm65w4RifRg6kdAVu5byLN5p8iugQPxYLO5xR+kY1ScpRjIt9T
+         VyhJo/ly8gNBfUPBIx9z17kv55gpuCgFNxN8GwB881BHyMd6wFjwv6s0M13gK7O22Ym2
+         LVBbT0k3bhe3BIYRLtnDZYjqNzIO/syXxWihoYZF/wq1y6Jh7b4chd5fFw6/VZQt1/4q
+         Twk9bXhsMCzChFDABKXJcd10PnsmTMSjD/cWPLvWT22L2R0AyxLGRzlS23aJUJB+tFlq
+         N6DTf2Xxdf8JqNrjs2SBcP38DL8XiSxKGkuLJ/KkQCRG8NNjbt3dzBUDicmQHvhXhumq
+         am1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCW6dOp+PLoyYUAo5rPD+f5QHn4KYdXf0sYBdSb5NlNic5gIpItTNEseJVauUwFS3MYn30GC7RtqNYQLjbU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6MrKppWyhHC7iGmWu0twhUSxMkbCbS8Rl1J3/xXxn2F1uM+1s
+	s6sg/bB6Tp39X3wBssUE032KJPebD6ipBvgiV+uKSTqjKdBj5QoW9lPN
+X-Gm-Gg: ASbGnct4ogE0wQIpvys8xgiISZ1njH6BsF4xl3y7MfOMRWN7VCDYJlQMz9xEg+fRmOM
+	MnTWwKxf2txByBLYOuq34wSoHPXAxrLET2gJmnCjsfFCkW1zvxwSrJixKPEAcres2deap66sr5v
+	tC8bC0qfiw9awm9T0VhmkMaCcwqiB4Dxdo7+wgkUvwjc/BZA6jXLVPG9nmcIwa8dD4cXr5eSiBL
+	AvUIhEWF7kShSFTJ4pO5WajGju7asTk5Oz23A9PIEuUz6GS81bz4N7iwble3Djpu3GN3MvWU2Yg
+	SXinZUq/z0JjTLXf6bIuUo/DwshyPJp7L/yFX2u3uXbx
+X-Google-Smtp-Source: AGHT+IHIlEarVBMAmVMhYTsCxYZWZDmie8Syv0Q2HhlZf5ejT//6e8OjZ/bByE+MuJvWYL1wxcP4Zw==
+X-Received: by 2002:a17:902:f54e:b0:224:7a4:b32 with SMTP id d9443c01a7336-2242888b350mr60240155ad.20.1741363048785;
+        Fri, 07 Mar 2025 07:57:28 -0800 (PST)
 Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-73698538829sm3505998b3a.174.2025.03.07.07.57.26
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-224109e99dfsm31733925ad.91.2025.03.07.07.57.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Mar 2025 07:57:27 -0800 (PST)
+        Fri, 07 Mar 2025 07:57:28 -0800 (PST)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -76,9 +76,9 @@ Cc: davem@davemloft.net,
 	almasrymina@google.com,
 	asml.silence@gmail.com,
 	dw@davidwei.uk
-Subject: [PATCH net-next v1 1/4] net: create netdev_nl_sock to wrap bindings list
-Date: Fri,  7 Mar 2025 07:57:22 -0800
-Message-ID: <20250307155725.219009-2-sdf@fomichev.me>
+Subject: [PATCH net-next v1 2/4] net: protect net_devmem_dmabuf_bindings by new net_devmem_bindings_mutex
+Date: Fri,  7 Mar 2025 07:57:23 -0800
+Message-ID: <20250307155725.219009-3-sdf@fomichev.me>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250307155725.219009-1-sdf@fomichev.me>
 References: <20250307155725.219009-1-sdf@fomichev.me>
@@ -90,156 +90,103 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-No functional changes. Next patches will add more granular locking
-to netdev_nl_sock.
+In the process of making queue management API rtnl_lock-less, we
+need a separate lock to protect xa that keeps a global list of bindings.
+
+Also change the ordering of 'posting' binding to
+net_devmem_dmabuf_bindings: xa_alloc is done after binding is fully
+initialized (so xa_load lookups fully instantiated bindings) and
+xa_erase is done as a first step during unbind.
 
 Cc: Mina Almasry <almasrymina@google.com>
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- Documentation/netlink/specs/netdev.yaml |  4 ++--
- include/net/netdev_netlink.h            | 11 +++++++++++
- net/core/netdev-genl-gen.c              |  4 ++--
- net/core/netdev-genl-gen.h              |  6 +++---
- net/core/netdev-genl.c                  | 19 +++++++++----------
- 5 files changed, 27 insertions(+), 17 deletions(-)
- create mode 100644 include/net/netdev_netlink.h
+ net/core/devmem.c | 29 ++++++++++++++---------------
+ 1 file changed, 14 insertions(+), 15 deletions(-)
 
-diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-index 36f1152bfac3..f5e0750ab71d 100644
---- a/Documentation/netlink/specs/netdev.yaml
-+++ b/Documentation/netlink/specs/netdev.yaml
-@@ -745,8 +745,8 @@ name: netdev
-             - irq-suspend-timeout
+diff --git a/net/core/devmem.c b/net/core/devmem.c
+index 7c6e0b5b6acb..c16cdac46bed 100644
+--- a/net/core/devmem.c
++++ b/net/core/devmem.c
+@@ -25,7 +25,7 @@
  
- kernel-family:
--  headers: [ "linux/list.h"]
--  sock-priv: struct list_head
-+  headers: [ "net/netdev_netlink.h"]
-+  sock-priv: struct netdev_nl_sock
+ /* Device memory support */
  
- mcast-groups:
-   list:
-diff --git a/include/net/netdev_netlink.h b/include/net/netdev_netlink.h
-new file mode 100644
-index 000000000000..1599573d35c9
---- /dev/null
-+++ b/include/net/netdev_netlink.h
-@@ -0,0 +1,11 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __NET_NETDEV_NETLINK_H
-+#define __NET_NETDEV_NETLINK_H
+-/* Protected by rtnl_lock() */
++static DEFINE_MUTEX(net_devmem_bindings_mutex);
+ static DEFINE_XARRAY_FLAGS(net_devmem_dmabuf_bindings, XA_FLAGS_ALLOC1);
+ 
+ static const struct memory_provider_ops dmabuf_devmem_ops;
+@@ -119,6 +119,10 @@ void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding)
+ 	unsigned long xa_idx;
+ 	unsigned int rxq_idx;
+ 
++	mutex_lock(&net_devmem_bindings_mutex);
++	xa_erase(&net_devmem_dmabuf_bindings, binding->id);
++	mutex_unlock(&net_devmem_bindings_mutex);
 +
-+#include <linux/list.h>
-+
-+struct netdev_nl_sock {
-+	struct list_head bindings;
-+};
-+
-+#endif	/* __NET_NETDEV_NETLINK_H */
-diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
-index 996ac6a449eb..739f7b6506a6 100644
---- a/net/core/netdev-genl-gen.c
-+++ b/net/core/netdev-genl-gen.c
-@@ -9,7 +9,7 @@
- #include "netdev-genl-gen.h"
+ 	if (binding->list.next)
+ 		list_del(&binding->list);
  
- #include <uapi/linux/netdev.h>
--#include <linux/list.h>
-+#include <net/netdev_netlink.h>
- 
- /* Integer value ranges */
- static const struct netlink_range_validation netdev_a_page_pool_id_range = {
-@@ -217,7 +217,7 @@ struct genl_family netdev_nl_family __ro_after_init = {
- 	.n_split_ops	= ARRAY_SIZE(netdev_nl_ops),
- 	.mcgrps		= netdev_nl_mcgrps,
- 	.n_mcgrps	= ARRAY_SIZE(netdev_nl_mcgrps),
--	.sock_priv_size	= sizeof(struct list_head),
-+	.sock_priv_size	= sizeof(struct netdev_nl_sock),
- 	.sock_priv_init	= __netdev_nl_sock_priv_init,
- 	.sock_priv_destroy = __netdev_nl_sock_priv_destroy,
- };
-diff --git a/net/core/netdev-genl-gen.h b/net/core/netdev-genl-gen.h
-index e09dd7539ff2..17d39fd64c94 100644
---- a/net/core/netdev-genl-gen.h
-+++ b/net/core/netdev-genl-gen.h
-@@ -10,7 +10,7 @@
- #include <net/genetlink.h>
- 
- #include <uapi/linux/netdev.h>
--#include <linux/list.h>
-+#include <net/netdev_netlink.h>
- 
- /* Common nested types */
- extern const struct nla_policy netdev_page_pool_info_nl_policy[NETDEV_A_PAGE_POOL_IFINDEX + 1];
-@@ -42,7 +42,7 @@ enum {
- 
- extern struct genl_family netdev_nl_family;
- 
--void netdev_nl_sock_priv_init(struct list_head *priv);
--void netdev_nl_sock_priv_destroy(struct list_head *priv);
-+void netdev_nl_sock_priv_init(struct netdev_nl_sock *priv);
-+void netdev_nl_sock_priv_destroy(struct netdev_nl_sock *priv);
- 
- #endif /* _LINUX_NETDEV_GEN_H */
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index 2b774183d31c..a219be90c739 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -829,8 +829,8 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
- {
- 	struct nlattr *tb[ARRAY_SIZE(netdev_queue_id_nl_policy)];
- 	struct net_devmem_dmabuf_binding *binding;
--	struct list_head *sock_binding_list;
- 	u32 ifindex, dmabuf_fd, rxq_idx;
-+	struct netdev_nl_sock *priv;
- 	struct net_device *netdev;
- 	struct sk_buff *rsp;
- 	struct nlattr *attr;
-@@ -845,10 +845,9 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
- 	ifindex = nla_get_u32(info->attrs[NETDEV_A_DEV_IFINDEX]);
- 	dmabuf_fd = nla_get_u32(info->attrs[NETDEV_A_DMABUF_FD]);
- 
--	sock_binding_list = genl_sk_priv_get(&netdev_nl_family,
--					     NETLINK_CB(skb).sk);
--	if (IS_ERR(sock_binding_list))
--		return PTR_ERR(sock_binding_list);
-+	priv = genl_sk_priv_get(&netdev_nl_family, NETLINK_CB(skb).sk);
-+	if (IS_ERR(priv))
-+		return PTR_ERR(priv);
- 
- 	rsp = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
- 	if (!rsp)
-@@ -909,7 +908,7 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
- 			goto err_unbind;
+@@ -133,8 +137,6 @@ void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding)
+ 		WARN_ON(netdev_rx_queue_restart(binding->dev, rxq_idx));
  	}
  
--	list_add(&binding->list, sock_binding_list);
-+	list_add(&binding->list, &priv->bindings);
- 
- 	nla_put_u32(rsp, NETDEV_A_DMABUF_ID, binding->id);
- 	genlmsg_end(rsp, hdr);
-@@ -931,17 +930,17 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
- 	return err;
+-	xa_erase(&net_devmem_dmabuf_bindings, binding->id);
+-
+ 	net_devmem_dmabuf_binding_put(binding);
  }
  
--void netdev_nl_sock_priv_init(struct list_head *priv)
-+void netdev_nl_sock_priv_init(struct netdev_nl_sock *priv)
- {
--	INIT_LIST_HEAD(priv);
-+	INIT_LIST_HEAD(&priv->bindings);
- }
+@@ -220,24 +222,15 @@ net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
+ 	}
  
--void netdev_nl_sock_priv_destroy(struct list_head *priv)
-+void netdev_nl_sock_priv_destroy(struct netdev_nl_sock *priv)
- {
- 	struct net_devmem_dmabuf_binding *binding;
- 	struct net_devmem_dmabuf_binding *temp;
+ 	binding->dev = dev;
+-
+-	err = xa_alloc_cyclic(&net_devmem_dmabuf_bindings, &binding->id,
+-			      binding, xa_limit_32b, &id_alloc_next,
+-			      GFP_KERNEL);
+-	if (err < 0)
+-		goto err_free_binding;
+-
+ 	xa_init_flags(&binding->bound_rxqs, XA_FLAGS_ALLOC);
+-
+ 	refcount_set(&binding->ref, 1);
+-
+ 	binding->dmabuf = dmabuf;
  
--	list_for_each_entry_safe(binding, temp, priv, list) {
-+	list_for_each_entry_safe(binding, temp, &priv->bindings, list) {
- 		rtnl_lock();
- 		net_devmem_unbind_dmabuf(binding);
- 		rtnl_unlock();
+ 	binding->attachment = dma_buf_attach(binding->dmabuf, dev->dev.parent);
+ 	if (IS_ERR(binding->attachment)) {
+ 		err = PTR_ERR(binding->attachment);
+ 		NL_SET_ERR_MSG(extack, "Failed to bind dmabuf to device");
+-		goto err_free_id;
++		goto err_free_binding;
+ 	}
+ 
+ 	binding->sgt = dma_buf_map_attachment_unlocked(binding->attachment,
+@@ -305,6 +298,14 @@ net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
+ 		virtual += len;
+ 	}
+ 
++	mutex_lock(&net_devmem_bindings_mutex);
++	err = xa_alloc_cyclic(&net_devmem_dmabuf_bindings, &binding->id,
++			      binding, xa_limit_32b, &id_alloc_next,
++			      GFP_KERNEL);
++	mutex_unlock(&net_devmem_bindings_mutex);
++	if (err < 0)
++		goto err_free_chunks;
++
+ 	return binding;
+ 
+ err_free_chunks:
+@@ -316,8 +317,6 @@ net_devmem_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
+ 					  DMA_FROM_DEVICE);
+ err_detach:
+ 	dma_buf_detach(dmabuf, binding->attachment);
+-err_free_id:
+-	xa_erase(&net_devmem_dmabuf_bindings, binding->id);
+ err_free_binding:
+ 	kfree(binding);
+ err_put_dmabuf:
 -- 
 2.48.1
 
