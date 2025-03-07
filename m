@@ -1,119 +1,80 @@
-Return-Path: <netdev+bounces-173014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12FADA56E59
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 17:51:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 11912A56E6A
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 17:56:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DD263ADB16
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 16:51:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F21BC3AA400
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 16:55:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC49824113C;
-	Fri,  7 Mar 2025 16:50:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F0B223C8CD;
+	Fri,  7 Mar 2025 16:56:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="sgOBZWc7";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="LAZFv1we"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AVpLkgsm"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F418F24110D;
-	Fri,  7 Mar 2025 16:50:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE6A221D92;
+	Fri,  7 Mar 2025 16:56:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741366251; cv=none; b=qSrJ4d/rd83EqY+jUJwD+t/8dL+gIV97Ee1LjxB/dSCCffEkRztS5CpRNIxCPCh+qGHb3Uv/jf9fHruX78eJZymt6NLEBD3o0nXUFICAxdGYhaWCgdJgzClGEa0AFZ1Sjy84RXl4+BBju+KgXh/Oy3lKyxmckHn7/L5hRG/hUA8=
+	t=1741366560; cv=none; b=KFbZE5m/2AqB/KJ7rZ6+4j+j7EWf/rIUJBO6mKzIIOAz9bXxP0RcyaQk4tCaS/wGM7uqECzI7oKloqF2GQUadsR6hVXTlrUYY+GID5YD43n9n8r5GwPVoUTcpdGuqZEAoswacmzPBBXsX6WL5nE6ZYcY4679vHWH3ZXPd/JA4Kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741366251; c=relaxed/simple;
-	bh=oTdGyM7i17u0BTRapoUbuecK2FRjICILOT2rFoRnWL8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wk3uoeLNsRlQUybYX7BnyPw/uWae9orCmW/tJ9/kaEs7I7RhYjFjFzgGNlswcKbFPcq8avaPm1rgwGTP9FddBJv08IWhp6Dm55k1luhkJw4zXRhmdaPNSsN/qZC2RVmv4gCYtz/Bl9LPfVBqqZCbiLD3G3h1/ua3BUWmsTarfgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=sgOBZWc7; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=LAZFv1we; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Fri, 7 Mar 2025 17:50:46 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1741366247;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dtCpW9oSAbhRWZnZwZUFMaiUwcwgd8ptKJLo6/MTFjk=;
-	b=sgOBZWc7//+ZuPBByA8yhX8d0984jwcL0caP1u8j1NR5Dh5Eeklc0MMfZ1QGCdtqetumux
-	VNyNVKe4lgUQYanG4MB5SHawbbBJWzuI+z8EUhbkgARuj9CXHqYVB31BELHqW3327tydGN
-	33XZg+T56QWhoTLz8ISo3FFlF6Igdt7Rk/6jVycsaS29lT1l9Jf8NaxdQ7ymyP81yFOUlC
-	yH0y2lg/VWLHrMjYk19AOnkfLo3CH3f9jJgo02cAV6lx6Kf3C0tcxsc25RJcfWore1KpfO
-	S0T4iKKTEwNXaETlbrT3lymZGom6jHKnNpsLW9MnVbsRX656ObOeFT4o6RiFMw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1741366247;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dtCpW9oSAbhRWZnZwZUFMaiUwcwgd8ptKJLo6/MTFjk=;
-	b=LAZFv1wens/OV5YHDQQlXnOlo6IN12r29jpVq3Q0EJTq2me81I/wy1IeYkRi7zTX0gdCHj
-	pHKEjOLP9WTnkkAg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Joe Damato <jdamato@fastly.com>, Leon Romanovsky <leon@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Yunsheng Lin <linyunsheng@huawei.com>
-Subject: Re: [PATCH net-next v2 2/5] page_pool: Add per-queue statistics.
-Message-ID: <20250307165046.qZAH0XkD@linutronix.de>
-References: <20250307115722.705311-1-bigeasy@linutronix.de>
- <20250307115722.705311-3-bigeasy@linutronix.de>
- <20250307081135.5ade6e37@kernel.org>
+	s=arc-20240116; t=1741366560; c=relaxed/simple;
+	bh=zm4IUNRU5F9Q7F6IslhySw9XY0LvJZqmHl7UPH2oVUQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HBN34UTWiLbT68FEjBf4A5OrC/2in1y4dFwtPTO1Vsl7N5rSzRbftcpb2ScBCJske6hfW+ZYvzKvroV56lu0uTKTSQiq6fw+FWVViNj5A6y7W84SVlhaX5WJ+4H/CVQ+f7sFgL+RGCVtB/p5i04bdEf+y4YgfPQdgLMmjz0zPXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AVpLkgsm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FB91C4CED1;
+	Fri,  7 Mar 2025 16:55:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741366559;
+	bh=zm4IUNRU5F9Q7F6IslhySw9XY0LvJZqmHl7UPH2oVUQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AVpLkgsm+rJ1/+ojcbOf8+M3KoFzyiiESQHwjozKAPjF8B36+xTNHrBJm+OV0IzoP
+	 9DIl30BifTky83nb+ef9gFAfamPXZoSgWIfmpA9euJYTrs3wu9ivgapJI6JR3gFCA1
+	 CmjG6ORlNPfFLBEhuTr35fy8VNDn2/WcqANJ0KGlI4nwtFgIJwW2aIS2H4i8v4MZV/
+	 5ubKCGk/uJxRELly6gsEXqtT/B4vlKspg7bln92m2n9XTmZwRFUEnruBztw+BLShQq
+	 APwS0a6x/LJuzZQ7QklhKw3O/u2zP8pBoWkBqbqNfww/A8IKi8k251LDbdwJQX11IJ
+	 v5MuibhQrFa/g==
+Date: Fri, 7 Mar 2025 08:55:58 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jonas Karlman <jonas@kwiboo.se>, Andrew Lunn <andrew@lunn.ch>
+Cc: Heiko Stuebner <heiko@sntech.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-rockchip@lists.infradead.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH 2/2] net: stmmac: dwmac-rk: Validate rockchip,grf and
+ php-grf during probe
+Message-ID: <20250307085558.5f8fcb90@kernel.org>
+In-Reply-To: <1dd9e663-561e-4d6c-b9d9-6ded22b9f81b@kwiboo.se>
+References: <20250306210950.1686713-1-jonas@kwiboo.se>
+	<20250306210950.1686713-3-jonas@kwiboo.se>
+	<bab793bb-1cbe-4df6-ba6b-7ac8bfef989d@lunn.ch>
+	<1dd9e663-561e-4d6c-b9d9-6ded22b9f81b@kwiboo.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20250307081135.5ade6e37@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 2025-03-07 08:11:35 [-0800], Jakub Kicinski wrote:
-> On Fri,  7 Mar 2025 12:57:19 +0100 Sebastian Andrzej Siewior wrote:
-> > The mlx5 driver supports per-channel statistics. To make support generic
-> > it is required to have a template to fill the individual channel/ queue.
-> >=20
-> > Provide page_pool_ethtool_stats_get_strings_mq() to fill the strings for
-> > multiple queue.
->=20
-> Sorry to say this is useless as a common helper, you should move it=20
-> to mlx5.
->=20
-> The page pool stats have a standard interface, they are exposed over
-> netlink. If my grep-foo isn't failing me no driver uses the exact
-> strings mlx5 uses. "New drivers" are not supposed to add these stats
-> to ethtool -S, and should just steer users towards the netlink stats.
->=20
-> IOW mlx5 is and will remain the only user of this helper forever.
+On Fri, 7 Mar 2025 00:49:38 +0100 Jonas Karlman wrote:
+> Subject: Re: [PATCH 2/2] net: stmmac: dwmac-rk: Validate rockchip,grf and php-grf during probe
+> 
+> [encrypted.asc  application/octet-stream (3384 bytes)] 
 
-Okay, so per-runqueue stats is not something other/ new drivers are
-interested in?
-The strings are the same, except for the rx%d_ prefix, but yes this
-makes it unique.
-The mlx5 folks seem to be the only one interested in this. The veth
-driver for instance iterates over real_num_rx_queues and adds all
-per-queue stats into one counter. It could also expose this per-runqueue
-as it does with xdp_packets for instance. But then it uses the
-rx_queue_%d prefix=E2=80=A6
-
-I don't care, I just intended to provide some generic facility so we
-don't have every driver rolling its own thing. I have no problem to move
-this to the mlx5 driver.
-
-Sebastian
+Is it just me or does anyone else get blobs from Jonas?
+The list gets text, according to lore.
 
