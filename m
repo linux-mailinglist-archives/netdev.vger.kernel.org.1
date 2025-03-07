@@ -1,89 +1,149 @@
-Return-Path: <netdev+bounces-172687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5831CA55B53
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 01:01:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98A49A55B69
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 01:05:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BFB63B428C
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 00:00:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F27971899C5E
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 00:05:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACE3D20AF9B;
-	Fri,  7 Mar 2025 00:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A947A17F7;
+	Fri,  7 Mar 2025 00:05:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LWLOl93m"
+	dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b="ViDQJMYY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.forwardemail.net (smtp.forwardemail.net [121.127.44.59])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85243205AC3;
-	Fri,  7 Mar 2025 00:00:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A7423AD
+	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 00:05:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=121.127.44.59
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741305618; cv=none; b=Ee17SF1z1P65lfFeObVBkKlNICEPMC0vqBGZm4xyTWZ4pOmxFREaYTjQoq+q6A1CGDV9VkifsIXChFYMv2LZXwB6vOsSc0Bn4DCAW63zw4Ef12oiLwCxK4hDHY3QCu4jKi/r0CM6rkTVQuMH6XKiiiILBsJiUHCwbGD7hWpa2nY=
+	t=1741305947; cv=none; b=P3o/xg762a8oyDQPE+05jDqxFUoGCdpOSKMuaBTfrqRDZ7xLZxCEkNtmFN9VJxZAIWS/YnEP/TLkGLgYA4FkacFmNThhPt45YfcOwx6mNNN+i/gj87AXG5BHsQZal8WF5irKtsx5TW8lL2PxHsW76FgGrPfta4HN7eRq5mzTGB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741305618; c=relaxed/simple;
-	bh=FItWwzoS9Lbo2L/BMi14HcuJ9QdtDuU2oO98zy6iKf8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tPTSRC101CpeFCUaQwE6MNYD6mtknqgJBh8Qi3f2Z1B/giHBNSa+DxEqSiSjW7Dbs6CC56kefZAS8dzEaIHpGTngOLNbanBNTW9qzpHzZ8bws8p4apuhyIQnlE07jb9oG2j5X0B8SD62hc7qnM29TY0ijqMZyoDIVpneRsetp58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LWLOl93m; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9110C4CEE0;
-	Fri,  7 Mar 2025 00:00:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741305618;
-	bh=FItWwzoS9Lbo2L/BMi14HcuJ9QdtDuU2oO98zy6iKf8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LWLOl93mJHqGw4SEHsYpwhbBZukDSnlegW3FMgwkvrkreHweHjKD5bwT5LrDVO0+q
-	 pNrnrSqq6jYccfEfux7FudVqXVoL165wEoCmf/zvAgEvDaEM0ELFYMtJCT4yVCiRMb
-	 vFf63LgLlnPjwozGB+APzxhJljXRGore9DxuHZkDfun+k7jQo+wSv0RmbeWAw+WPIt
-	 LvNEjWSjeamjkkA+QVw05DC62DuKG/cpuXQn0pXlZ9nK67rhibIPnY/XKV87LoxVbk
-	 k2Bmh/fxaUslIyhiwAlvL3YsF5of73d26xmBblqMrIKmgIlINRJFCISEIGlVxHogG6
-	 gScxHHtrRysfQ==
-Date: Thu, 6 Mar 2025 16:00:17 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Willem de Bruijn <willemb@google.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- shuah@kernel.org, petrm@nvidia.com, sdf@fomichev.me,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/2] selftests: drv-net: add path helper for
- net/lib
-Message-ID: <20250306160017.1a385f6e@kernel.org>
-In-Reply-To: <CA+FuTSemTNVZ5MxXkq8T9P=DYm=nSXcJnL7CJBPZNAT_9UFisQ@mail.gmail.com>
-References: <20250306171158.1836674-1-kuba@kernel.org>
-	<CA+FuTSemTNVZ5MxXkq8T9P=DYm=nSXcJnL7CJBPZNAT_9UFisQ@mail.gmail.com>
+	s=arc-20240116; t=1741305947; c=relaxed/simple;
+	bh=3xzndWS90lxvRgrGpXolhhCHNJh+cKO5OpPa3qNLBvU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sbxWOjYrf3u6TXG01GligNNjNs4lIK4eWaxlEonmhfLC6PxJxEtJWxGSPe8/F8E6bkWrilXu/JLvqObVLhJwKtSBOo2IHOzYsCwJKDxkRorzULO5d5q0mjNo3jKDKt099Gr1dt9bdBLoxXWlFgftLmxXRd91YmISxsB7iXr2iqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se; dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b=ViDQJMYY; arc=none smtp.client-ip=121.127.44.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kwiboo.se;
+ h=Content-Transfer-Encoding: Content-Type: In-Reply-To: From: References:
+ Cc: To: Subject: MIME-Version: Date: Message-ID; q=dns/txt;
+ s=fe-e1b5cab7be; t=1741305945;
+ bh=q8v6FqGBLcIgD0IKorolr/eW5VRYMlf3vVnAR1Zl+FQ=;
+ b=ViDQJMYYdD+Pq6EMZf3OAvr3RCwVvT223n+2a9nOCtD/fjtAW63b1b0ibzAXEdD01Tzu8q5X8
+ XMkiU5JGZ8uW8Yo8bXSeJxmKh5x1gJKmBfFGcEP2kCfcZt2/tn8mPBrl3vCTq0GRsZ0MI7hHLy5
+ Z9/FU586O36+yLvB3l2hak0OBrueIZ08p79NdcjsKl/2HZXfdctTh+QaIb/ZxbLapQ7wNcjdtGn
+ pGLL8sTSwRPGAW93avhaJvK3USxXdRU9YQo/sLHrxGK7G19uVbkapN2LJ7MVpxrKcF9bEq+uYvO
+ ivE68qeJ4gVemgltd4Odg+x87P9IGcSlOAvAMEXnnh0w==
+X-Forward-Email-ID: 67ca3854d01a7bf632cb828f
+X-Forward-Email-Sender: rfc822; jonas@kwiboo.se, smtp.forwardemail.net,
+ 121.127.44.59
+X-Forward-Email-Version: 0.4.40
+X-Forward-Email-Website: https://forwardemail.net
+X-Complaints-To: abuse@forwardemail.net
+X-Report-Abuse: abuse@forwardemail.net
+X-Report-Abuse-To: abuse@forwardemail.net
+Message-ID: <003d3726-680a-4e91-89cd-d127bc3b5609@kwiboo.se>
+Date: Fri, 7 Mar 2025 01:05:34 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/4] arm64: dts: rockchip: Add GMAC nodes for RK3528
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiko Stuebner <heiko@sntech.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Yao Zi <ziyao@disroot.org>,
+ linux-rockchip@lists.infradead.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+References: <20250306221402.1704196-1-jonas@kwiboo.se>
+ <20250306221402.1704196-4-jonas@kwiboo.se>
+ <a827e7e9-882a-40c6-9f2c-03d8181dff88@lunn.ch>
+Content-Language: en-US
+From: Jonas Karlman <jonas@kwiboo.se>
+In-Reply-To: <a827e7e9-882a-40c6-9f2c-03d8181dff88@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Thu, 6 Mar 2025 17:22:47 -0500 Willem de Bruijn wrote:
-> > +    def lpath(self, path):
-> > +        """
-> > +        Similar to rpath, but for files in net/lib TARGET.
-> > +        """
-> > +        lib_dir = (Path(__file__).parent / "../../../../net/lib").resolve()
-> > +        return (lib_dir / path).as_posix()
-> > +  
+Hi Andrew,
+
+On 2025-03-06 23:46, Andrew Lunn wrote:
+> On Thu, Mar 06, 2025 at 10:13:56PM +0000, Jonas Karlman wrote:
+>> Rockchip RK3528 has two Ethernet controllers based on Synopsys DWC
+>> Ethernet QoS IP.
+>>
+>> Add device tree nodes for the two Ethernet controllers in RK3528.
+>>
+>> Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
+>> ---
+>> gmac0 is missing the integrated-phy and has not been tested bacause I do
+>> not have any board that use this Ethernet controller.
 > 
-> small nit that one letter acronyms are not the most self describing ;)
-> I would initially read this as local path
+> What do you know about the integrated PHY? Does it use one of the
+> standard phy-modes? RMII? Does the datasheet indicate what address it
+> uses on the MDIO bus? If you know these two bits of information, you
+> can probably add it.
 
-The other option that came to mind was to have one helper called path()
-and pass rel=CONST to it. For example:
+The SoC datasheet lists following:
 
-	prog = cfg.path("xdp_dummy.bpf.o", rel=cfg.NET_LIB)
+  MAC 10/100/1000 Ethernet Controller (gmac1)
+  - Support 10/100/1000 Mbps data transfer rates with the RGMII interfaces
+  - Support 10/100 Mbps data transfer rates with the RMII interfaces
+  - Support both full-duplex and half-duplex operation
+  - Supports IEEE 802.1Q VLAN tag detection for reception frames
+  - Support detection of LAN wake-up frames and AMD Magic Packet frames
+  - Support checking IPv4 header checksum and TCP, UDP, or ICMP checksum
+    encapsulated in IPv4 or IPv6 datagram
+  - Support for TCP Segmentation Offload (TSO) and UDP Fragmentation
+    Offload (UFO)
 
-Thinking about it now we could also store dir directly, which is
-probably most "Pythonic"?
+  MAC 10/100M Ethernet controller and MAC PHY (gmac0)
+  - Support one Ethernet controllers
+  - Support 10/100-Mbps data transfer rates with the RMII interfaces
+  - Support both full-duplex and half-duplex operation
 
-	prog = cfg.net_lib_dir / "xdp_dummy.bpf.o"
+and vendor kernel use following DT node:
 
-Thoughts?
+	phy-mode = "rmii";
+	clock_in_out = "input";
+	phy-handle = <&rmii0_phy>;
+
+	mdio0: mdio {
+		compatible = "snps,dwmac-mdio";
+		#address-cells = <0x1>;
+		#size-cells = <0x0>;
+
+		rmii0_phy: ethernet-phy@2 {
+			compatible = "ethernet-phy-id0044.1400", "ethernet-phy-ieee802.3-c22";
+			reg = <2>;
+			clocks = <&cru CLK_MACPHY>;
+			resets = <&cru SRST_MACPHY>;
+			phy-is-integrated;
+			pinctrl-names = "default";
+			pinctrl-0 = <&fephym0_led_link &fephym0_led_spd>;
+		};
+	};
+
+I could possible add something like that to the device tree, or I could
+drop the entire gmac0 node and instead have it added in a future series.
+
+Regards,
+Jonas
+
+> 
+>     Andrew
+
 
