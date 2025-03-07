@@ -1,139 +1,157 @@
-Return-Path: <netdev+bounces-172957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46B05A56A42
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 15:23:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A019FA56A85
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 15:38:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB039189B170
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 14:23:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CDF0E7A8582
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 14:37:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B20A21B91D;
-	Fri,  7 Mar 2025 14:22:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EE3721B8F5;
+	Fri,  7 Mar 2025 14:38:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bj1vUZRV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U3KIEBIN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA6C921B8EC;
-	Fri,  7 Mar 2025 14:22:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA321547C0
+	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 14:38:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741357378; cv=none; b=cQmQFPKSJg5An6bXC3saVsc1pRUNfXD2NOoIzE+9i6368zdjG2ZQZMivQB5afSBZW7MiPO8CQSF3d0JDKJ+aMk3/6uH4gR/Cog9ljnJa3gEZhZyApsPenL6zgOjIzk2x1BTrNLDBAhSg2E0wunui3v8tg6f4+/YZyqwSx8AhjAU=
+	t=1741358308; cv=none; b=RhQGGEnBFnKnTl4odS+/AQnXl96LOU6riRcv9gVWAxkqZ8OVbaQAGcdpSsUw6dmbMsxQPPvLMnj+ya6XWyi4KEqo2HvK3REab6CZziGR1YZ+CNMcjWcVuR94cBfFpzGYlclI/QggkWLDeNqvbCkoZukoviJIIhBp3KjFjM8vws0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741357378; c=relaxed/simple;
-	bh=GvUKH5oJnoRKKMs29BXEgbZczyorqGQcyFWXcpVYfZc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=thRt67sA+cmwJ2CD9e6Jn3Nfr3vZBbJIaYF62iqcmy74opnke8LFptwqEZVZL39sacMKrQjpQv7icl/AWS5IRp8EZdIr7pl+l7wmsWMgHZLWXHJyI3sY45iMW0Q2qU26XISmwHdq7PUYLwpaf9rNzphr+Mg9sUAB9wV9DHTSnw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bj1vUZRV; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-43bc4b16135so11396445e9.1;
-        Fri, 07 Mar 2025 06:22:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741357375; x=1741962175; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PejxjOLcOPCBsN9OKYEARibmDmaIRCji7dqrz9O8QL0=;
-        b=bj1vUZRVP0olf6N/2u9keEr5PhnHCnZJke8JRdb0+DqU9cNbbUYIXUXUu5wI4l8Nw5
-         tTl5mMKfhcvDtW/viec0DvBizZampfd6SVUXaVfpSpS3DeqJyTMA6X/MAHBi0TYZnMzd
-         hVUsH6LM2k7fbz/DEdVYJR00mel+hwkFn4AMYZEJ4vViqgmnjKNVTsg9NXLuIgDNGwwD
-         5ShHhEvjlMKSboidXXUF4LdwPQaMQtj9Gzt7iLxwJxSw4Qj9jVx+9VovXx8l8CZWGfih
-         Y0IeyyUaJb3QUp4Z/J5J7oB/KS+W7OZ0r2BaEoH1ekoZNZ0Z4PfZtt1FEMJh00+MA5O3
-         riew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741357375; x=1741962175;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PejxjOLcOPCBsN9OKYEARibmDmaIRCji7dqrz9O8QL0=;
-        b=jkDNp5anGxzkIHXjmhC1R595RAJmhcnXpMmqtSthVBRjycHgSpGJj2JhFIBm6EYcdM
-         MG+ARkSTL0ibwen0oW8dZOrxxrwPbO2G0VNBPOkYLcpXVFBYqLgzSzZc/ymKgZ16YV5K
-         EDwmRnnQMHr6EiCkwG7hF51JD08TTqZKfnnJ9tw+E1UA8PrIgTzvEbkp5u8leMkqlTBX
-         Z2yKYbCBwGYve3hYbfeiG9wwutO2TBKpZ9HpEFo+GO5rS9IdYOs7RdJ8GbfbBszOc4LA
-         in8ZbsXihonrRbd/6EgPpjzBgfVodFtim3453RiUap8uXuhNhn3xWXO+xlT29bMG767X
-         m29w==
-X-Forwarded-Encrypted: i=1; AJvYcCVGZSlwzkM8uPG3YRUpFw+RUqvJY7k3hXF+dd48mkRf7sWzDTRl9ckGUZ3EQDQW0xaRrqAtcYIJnzYF0kdt@vger.kernel.org, AJvYcCWLyuMs3Pyp+mWYax32UUjw5PD//PykfkPsQTfvhUS6JV0h8EZoCpPOB2ANlwDDTdlSQp7NZVD9hcxu@vger.kernel.org, AJvYcCWQEQpipsnXZhC8WBAjHqrZ5j+xRmLrybAFX952vr1Ff8lx8U4NZV6HLgGsXpld9Ln3Kz+JdA/C@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVIXKYHwMWvGysPLQcYL3lT81bX2eOFPSyRNzpTEXGnoVeWYTZ
-	oS0D4t6ooW9lKTVZR4etWaYTgO2rX9uIVT0snB5j96IhgMt82aE8
-X-Gm-Gg: ASbGncvcP+8tkuqVdfHorLsLb9bUWeygWvwj0PnTPHiD4AHc+l2XTpOMyISFq6RZ3Do
-	BccJUbyFKbgbQpEg5ieeKXycYOt8AiGVi2AsyB3gfsy2lo5vXVLG6w+yT+2X58deVbd0rX2FtNr
-	Ip2THlUuo8kaCu54I4qGJOaW4w1J+HuV71Q1FCWDXAugmIwvCYGhGLE2+yxzsWIC1kTX4vM+5En
-	muifxqw7YpohdNMBvZjGtsWlyv7mS3tHEswYCrJmGoZlJlHnwzjKaoZftqofYXb/vS9ZZdFLpFW
-	tB9v6KgbU8t4jNiHWlgNVdAMFYuZxbaW3FbwAQcXOfk=
-X-Google-Smtp-Source: AGHT+IHRSH7+mnghk5+K6OY1NH52/2MRSnfqJmNP3IiaQH5tQ5r0hWfDAhatgkUrfGbEuoehDRIFqg==
-X-Received: by 2002:a05:600c:190d:b0:439:99ab:6178 with SMTP id 5b1f17b1804b1-43c601cf229mr24881215e9.6.1741357374842;
-        Fri, 07 Mar 2025 06:22:54 -0800 (PST)
-Received: from legfed1 ([2a00:79c0:614:ea00:1ebe:eb51:3a97:3b47])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bdd948c1bsm51706755e9.36.2025.03.07.06.22.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Mar 2025 06:22:54 -0800 (PST)
-Date: Fri, 7 Mar 2025 15:22:52 +0100
-From: Dimitri Fedrau <dima.fedrau@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: dimitri.fedrau@liebherr.com, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 0/3] net: phy: dp83822: Add support for changing
- the MAC series termination
-Message-ID: <20250307142252.GA2326148@legfed1>
-References: <20250307-dp83822-mac-impedance-v1-0-bdd85a759b45@liebherr.com>
- <6aee57d3-8657-44d6-ac21-9f443ca0924e@lunn.ch>
+	s=arc-20240116; t=1741358308; c=relaxed/simple;
+	bh=N00yLsuQxkV9hEL72Sz1SmfjNvDmdGPrDn6jQvghKrA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=t2/GvYlRKhqxT1ocFM6GYQyvVVn1EDEwf0u+YlIvvQSGBMgvFv44IPz9yGmNJTRho9QT4h1/44u3WshtGaBzH9wO8tQbvC/Rkut7q+1RQItHq+5oaAmt/Xg8aAr3MR+IOLei5l2/gq8EkND9EgAcl7bs+cf92Y330Nsdqm7EYTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U3KIEBIN; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741358307; x=1772894307;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=N00yLsuQxkV9hEL72Sz1SmfjNvDmdGPrDn6jQvghKrA=;
+  b=U3KIEBINmhiy0Yw7y/W4ugbyn2XFl5sqYS+0iKOxyPF5R0f0+UBj//iE
+   Pairuxo3DrdlFcSNFTpG5/gsDCyDW0f2Mpv37hH73IpDzGe7hHn1UiAX6
+   f+TVRIT13FXZqiWNPSSEa4ZL2JcxeJNIDSQGO7rRwpWWPUdH0JrC8ozpr
+   gwngDS8Wc/34tsnZeP3Rm8LDVRWexmoijtqZr7XontY1IOgtRXQQ/odDJ
+   ikWS7vYkNBO0/Vei59CILY4TWdy+SALCmAB28AJ3lvy/z0ifruRIAexkS
+   OFq8sbdwmTYM1dyaN62ntpJh2qIk2aKd5r/TxOzvy6S1x5uo964A6ta9n
+   w==;
+X-CSE-ConnectionGUID: O7Ix/pxUQqWB8XY51nWRjw==
+X-CSE-MsgGUID: fqFJHbLARQCe48ffedEsRg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="42263289"
+X-IronPort-AV: E=Sophos;i="6.14,229,1736841600"; 
+   d="scan'208";a="42263289"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 06:38:26 -0800
+X-CSE-ConnectionGUID: 0H60ko7YTbiXO5R0wtKC7Q==
+X-CSE-MsgGUID: 1q+u1qZBSzGOQwPcY7b5Gw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,229,1736841600"; 
+   d="scan'208";a="142570744"
+Received: from os-delivery.igk.intel.com ([10.102.18.218])
+  by fmviesa002.fm.intel.com with ESMTP; 07 Mar 2025 06:38:23 -0800
+From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org,
+	horms@kernel.org,
+	jiri@nvidia.com,
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Subject: [PATCH iwl-next v6 00/15] ixgbe: Add basic devlink support
+Date: Fri,  7 Mar 2025 15:24:04 +0100
+Message-Id: <20250307142419.314402-1-jedrzej.jagielski@intel.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6aee57d3-8657-44d6-ac21-9f443ca0924e@lunn.ch>
+Content-Transfer-Encoding: 8bit
 
-Am Fri, Mar 07, 2025 at 02:39:32PM +0100 schrieb Andrew Lunn:
-> On Fri, Mar 07, 2025 at 11:30:00AM +0100, Dimitri Fedrau via B4 Relay wrote:
-> > The dp83822 provides the possibility to set the resistance value of the
-> > the MAC series termination. Modifying the resistance to an appropriate
-> > value can reduce signal reflections and therefore improve signal quality.
-> 
-> I have some dumb questions....
-> 
-> By referring to MAC from the perspective of the PHY, do you mean the
-> termination of the bus between the MAC and the PHY? The SGMII SERDES,
-> or RGMII?
->
-- Yes, the perspective is from the PHY.
-- Yes, but only the outputs towards the MAC. Resistors can be saved on
-  the PCB when they are integrated into the PHY.
-- The PHY is able to operate with RGMII, RMII and MII.
+Create devlink specific directory for more convenient future feature
+development.
 
-Should I rename then "mac-series-termination-ohms" to
-"output-mac-series-termination-ohms" or similar ?
+Flashing and reloading are supported only by E610 devices.
 
-> I'm assuming the terminology is direct from the datasheet of the PHY?
-> But since this is a bit of a niche area, no other PHY driver currently
-> supports anythings like this, the terminology is not well known. So it
-> would be good to expand the description, to make it really clear what
-> you are talking about, so if anybody else wants to add the same
-> feature, they make use of the property, not add a new property.
+Introduce basic FW/NVM validation since devlink reload introduces
+possibility of runtime NVM update. Check FW API version, FW recovery mode
+and FW rollback mode. Introduce minimal recovery probe to let user to
+reload the faulty FW when recovery mode is detected.
 
-The datasheet calls it MAC impedance control, that is what someone might
-want to achieve when selecting the proper resistance value. I named it
-"mac-series-termination-ohms" instead to make sure what is done to
-achieve impedance matching.
+This series is based on the series introducing initial E610 device
+support:
+https://lore.kernel.org/intel-wired-lan/20241205084450.4651-1-piotr.kwapulinski@intel.com/
+---
+v3: introduce to the series additional patch touching devlink/dev.c
+v4: introduce to the series additional patch changing netdev allocation
+---
+Andrii Staikov (1):
+  ixgbe: add support for FW rollback mode
 
-Should I add the proper description in the bindings ? Description of the
-properties are somehow short. However will expand the description.
+Jedrzej Jagielski (10):
+  devlink: add value check to devlink_info_version_put()
+  ixgbe: add initial devlink support
+  ixgbe: add handler for devlink .info_get()
+  ixgbe: add .info_get extension specific for E610 devices
+  ixgbe: add E610 functions getting PBA and FW ver info
+  ixgbe: extend .info_get with stored versions
+  ixgbe: add device flash update via devlink
+  ixgbe: add support for devlink reload
+  ixgbe: add FW API version check
+  ixgbe: add E610 implementation of FW recovery mode
 
-Best regards,
-Dimitri Fedrau
+Przemek Kitszel (1):
+  ixgbe: wrap netdev_priv() usage
+
+Slawomir Mrozowicz (3):
+  ixgbe: add E610 functions for acquiring flash data
+  ixgbe: read the OROM version information
+  ixgbe: read the netlist version information
+
+ Documentation/networking/devlink/index.rst    |    1 +
+ Documentation/networking/devlink/ixgbe.rst    |  107 ++
+ drivers/net/ethernet/intel/Kconfig            |    2 +
+ drivers/net/ethernet/intel/ixgbe/Makefile     |    3 +-
+ .../ethernet/intel/ixgbe/devlink/devlink.c    |  582 +++++++
+ .../ethernet/intel/ixgbe/devlink/devlink.h    |   10 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe.h      |   21 +
+ .../net/ethernet/intel/ixgbe/ixgbe_82598.c    |    1 +
+ .../net/ethernet/intel/ixgbe/ixgbe_82599.c    |    1 +
+ .../net/ethernet/intel/ixgbe/ixgbe_common.c   |    1 +
+ .../net/ethernet/intel/ixgbe/ixgbe_dcb_nl.c   |   56 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 1514 +++++++++++++++--
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |   16 +
+ .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  |   86 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_fcoe.c |   12 +-
+ .../ethernet/intel/ixgbe/ixgbe_fw_update.c    |  708 ++++++++
+ .../ethernet/intel/ixgbe/ixgbe_fw_update.h    |   12 +
+ .../net/ethernet/intel/ixgbe/ixgbe_ipsec.c    |   10 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  261 ++-
+ .../net/ethernet/intel/ixgbe/ixgbe_sriov.c    |   16 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |    5 +
+ .../ethernet/intel/ixgbe/ixgbe_type_e610.h    |  161 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c |    1 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c |    1 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c  |    2 +-
+ net/devlink/dev.c                             |    2 +-
+ 26 files changed, 3352 insertions(+), 240 deletions(-)
+ create mode 100644 Documentation/networking/devlink/ixgbe.rst
+ create mode 100644 drivers/net/ethernet/intel/ixgbe/devlink/devlink.c
+ create mode 100644 drivers/net/ethernet/intel/ixgbe/devlink/devlink.h
+ create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_fw_update.c
+ create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_fw_update.h
+
+
+base-commit: 0a5f2afff8673e66160725b8ec8310f47c74f8b9
+-- 
+2.31.1
+
 
