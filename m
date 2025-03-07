@@ -1,346 +1,89 @@
-Return-Path: <netdev+bounces-172686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18E4AA55B2A
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 00:53:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5831CA55B53
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 01:01:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33B667A31FD
-	for <lists+netdev@lfdr.de>; Thu,  6 Mar 2025 23:52:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BFB63B428C
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 00:00:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D9771FC7DA;
-	Thu,  6 Mar 2025 23:53:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACE3D20AF9B;
+	Fri,  7 Mar 2025 00:00:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l6YFVFo/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LWLOl93m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7288519E971
-	for <netdev@vger.kernel.org>; Thu,  6 Mar 2025 23:53:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741305224; cv=fail; b=Ago2mfgZsm2G6vid2NG+qNBm26SjDE4Hx3sgBO5EVHbHRHRCEooNVlDeVhQ5hr1fEprgw58yY8aFzK+G+K/HAklT6CyoY+VbMNsWod9YwxxHWpAHBkyvtDBKE0RsVVvTdNRQpmfmixNaruJconul+0JwwPaQIAh4pJNqd+JPjrk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741305224; c=relaxed/simple;
-	bh=veVb025KiNgow/W9CHPXjlifyW1Het6FPY1qIes+QQ8=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=YZV7z1AggibNPR+XR/kxfff5bai0YCk3P+m1GfvhpJd+qV2GHpvAgJdMsrpn5DMy/5E+yFY2Ko5Kj2DbyrohncZmvbM4/+o7vool9hopFjiUXm9scbPlXe4YXWStdZTDHbwTSL+vSI1lPOl8ge6Wb0I1kOH32MzmbQe0HYmQFIU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l6YFVFo/; arc=fail smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741305222; x=1772841222;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=veVb025KiNgow/W9CHPXjlifyW1Het6FPY1qIes+QQ8=;
-  b=l6YFVFo/eGr2VBsKYe66QJUn6EfZmyGJlMMyj32IjAEhOODu1X1B1l7g
-   AFZTsH4Ga7s/yIIz2ks43iEPnXSau0w+E0O7ZBdPlpTee+O4gLhIRkjxw
-   IzMuAhqbQF9nbwNIw3w+Eqgsqbomn3lnJ6tPHmg/tpHlvGxeUb5NnnHTu
-   jgUcR0xHz6dvCvdIzC9OU8QO+z6Epa5TOxuThoXys6VoHyNkl+12gw4Au
-   94JEb4Z9+5YJqNYuhGeXY9lfNxLv9priCMid1HTi/nn6uDOoSGGC36ydN
-   8UWxQ4R0/hgXhN1eCFESR/NA+gpwdzZZvB6Sl0Wd85wUgnH+DWTaWUcIY
-   Q==;
-X-CSE-ConnectionGUID: QMt1kFH6S/GQ0fVOJlyijw==
-X-CSE-MsgGUID: xuIvRsvfSCmUGayjgp5SNQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="67719279"
-X-IronPort-AV: E=Sophos;i="6.14,227,1736841600"; 
-   d="scan'208";a="67719279"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2025 15:53:32 -0800
-X-CSE-ConnectionGUID: Cb+Ss0pnQn++9z3tDM7iBw==
-X-CSE-MsgGUID: R7JmflqvSQSDgEbuEdjF/Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,227,1736841600"; 
-   d="scan'208";a="124252675"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Mar 2025 15:53:32 -0800
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Thu, 6 Mar 2025 15:53:31 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Thu, 6 Mar 2025 15:53:31 -0800
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.44) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Thu, 6 Mar 2025 15:53:31 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mOCHsPFfWXY5TGu0ZZHMeO66kHb2tDyI1n4NPVVg03KWp8bvRE34HFrBvbNROM3K66h/Ey13fVcv9Zmv6OHjg1CeXCeaNll8kPrMW6O4Q5TjWWDPlxzdQZdM/NHJPcebGj623pJVge5S0P8KoPqRWfhXKtyZL4wuuuhws2A97R4KbQ1YBomamEfm9gJRSjDk8re2v1ulmukGQysfdaCPI4H5Un7jQ90+Sw3YR4H/zsHMKjLFrS/3IKTnKr8AkUNmrQFzwVNKFYKnwwdevj4sNiaO8NkIYt6+gka1oLFL+Wl/z2sZRrJ85FcL/dFCCAXj24pqXOf7bkhEdFZBBTgVdg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tGJxfbYQZr2Rof2vhlLk/3J0Npo7o0eY6VycZ+S2zvc=;
- b=zRH1VHlgXbpAl0hLUPRtVFtZ4z767qPV+5/4VrJJNrkQaRXjB9GwOd9xBlTEYixT9ahijGelohH5V+ew40ay3lQdE0ohSyoK9H/ClGLyjZLTxfkF4DiTtCJbJPcd6IGsfjg0AIDBuWyohEolBAI3/Cx5p6xuKeBCbzMn3m9NcW1veWSj89++5/vZB+oLHnc6ixuGt2Y7RMHOuUouDSR8A++IT2M/9iUHZVyR98l9Mexfroa/SeMqhN5houlFCpj9q7qeo2HBsgdBIM/eSIjdGyd7FiL9zAUsuEAUVPa5lHGTTdBYskbFHVUX0vK+DeEnN2Q4uFe0fEucVAQe+Lzsqw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by SA2PR11MB5145.namprd11.prod.outlook.com (2603:10b6:806:113::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8293.16; Thu, 6 Mar
- 2025 23:53:07 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8%4]) with mapi id 15.20.8511.019; Thu, 6 Mar 2025
- 23:53:07 +0000
-Message-ID: <28792ae2-bee7-48c9-af5d-2e1ba199558a@intel.com>
-Date: Thu, 6 Mar 2025 15:53:05 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next] ice: use DSN instead of PCI BDF for ice_adapter
- index
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>, Tony Nguyen <anthony.l.nguyen@intel.com>
-CC: <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>, Jiri Pirko
-	<jiri@resnulli.us>, Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Karol Kolacinski <karol.kolacinski@intel.com>, Grzegorz Nitka
-	<grzegorz.nitka@intel.com>, Michal Schmidt <mschmidt@redhat.com>, "Sergey
- Temerkhanov" <sergey.temerkhanov@intel.com>
-References: <20250306211159.3697-2-przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20250306211159.3697-2-przemyslaw.kitszel@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW2PR2101CA0012.namprd21.prod.outlook.com
- (2603:10b6:302:1::25) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85243205AC3;
+	Fri,  7 Mar 2025 00:00:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741305618; cv=none; b=Ee17SF1z1P65lfFeObVBkKlNICEPMC0vqBGZm4xyTWZ4pOmxFREaYTjQoq+q6A1CGDV9VkifsIXChFYMv2LZXwB6vOsSc0Bn4DCAW63zw4Ef12oiLwCxK4hDHY3QCu4jKi/r0CM6rkTVQuMH6XKiiiILBsJiUHCwbGD7hWpa2nY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741305618; c=relaxed/simple;
+	bh=FItWwzoS9Lbo2L/BMi14HcuJ9QdtDuU2oO98zy6iKf8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tPTSRC101CpeFCUaQwE6MNYD6mtknqgJBh8Qi3f2Z1B/giHBNSa+DxEqSiSjW7Dbs6CC56kefZAS8dzEaIHpGTngOLNbanBNTW9qzpHzZ8bws8p4apuhyIQnlE07jb9oG2j5X0B8SD62hc7qnM29TY0ijqMZyoDIVpneRsetp58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LWLOl93m; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9110C4CEE0;
+	Fri,  7 Mar 2025 00:00:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741305618;
+	bh=FItWwzoS9Lbo2L/BMi14HcuJ9QdtDuU2oO98zy6iKf8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LWLOl93mJHqGw4SEHsYpwhbBZukDSnlegW3FMgwkvrkreHweHjKD5bwT5LrDVO0+q
+	 pNrnrSqq6jYccfEfux7FudVqXVoL165wEoCmf/zvAgEvDaEM0ELFYMtJCT4yVCiRMb
+	 vFf63LgLlnPjwozGB+APzxhJljXRGore9DxuHZkDfun+k7jQo+wSv0RmbeWAw+WPIt
+	 LvNEjWSjeamjkkA+QVw05DC62DuKG/cpuXQn0pXlZ9nK67rhibIPnY/XKV87LoxVbk
+	 k2Bmh/fxaUslIyhiwAlvL3YsF5of73d26xmBblqMrIKmgIlINRJFCISEIGlVxHogG6
+	 gScxHHtrRysfQ==
+Date: Thu, 6 Mar 2025 16:00:17 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Willem de Bruijn <willemb@google.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ shuah@kernel.org, petrm@nvidia.com, sdf@fomichev.me,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/2] selftests: drv-net: add path helper for
+ net/lib
+Message-ID: <20250306160017.1a385f6e@kernel.org>
+In-Reply-To: <CA+FuTSemTNVZ5MxXkq8T9P=DYm=nSXcJnL7CJBPZNAT_9UFisQ@mail.gmail.com>
+References: <20250306171158.1836674-1-kuba@kernel.org>
+	<CA+FuTSemTNVZ5MxXkq8T9P=DYm=nSXcJnL7CJBPZNAT_9UFisQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SA2PR11MB5145:EE_
-X-MS-Office365-Filtering-Correlation-Id: e6c85198-7ce8-4d46-716c-08dd5d0a0ae7
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?MjdxcVV2elJ4UkRrZ2k3cGlZejBCOVNxQUtONDFzVmRBaWtscEtoczlNc1dJ?=
- =?utf-8?B?OEFOV1hZNVhRWnh1ajFSdDJQWVVUeXF1R3o4SFVrRGVaaVZ2dDA4NWxwcEYr?=
- =?utf-8?B?a0U1Rzh3dFJFWXRjM20zN1g1WVJwcXpqWmxyTWFPbUE4OWUzbXN3QUdYb0s3?=
- =?utf-8?B?eW5mbm5tZGNRWm9rZWVkNTRtRVNqRFZqNTRaMWpJUGk3TVZaUVo0RjdNalpi?=
- =?utf-8?B?c0JBUGdFRjFQOE56Yzl6RmVBRjZranNhbDNMSG8wZ21TbmloVHV5ZG1uQi8z?=
- =?utf-8?B?eU9xZ3BKMEwzZm8xRGNDdUdEZlUvWjhZWThBalBmZVpTMWx4UmdXbDZTY0xX?=
- =?utf-8?B?UTByNlgxM3IrMVhOVmNMb0t2S0MyWDF0K2o3UEMvY09TanRuUGNaZE9kd29h?=
- =?utf-8?B?RENlSk1kM3dBaHEyZ1d6TmtzZnMyNllDM0lkY3dmWWhLN3QwVXh5Z00wZnpO?=
- =?utf-8?B?K2tWWkVEcHdmSlBQYUJPOGhvdnQ1aHdsSFZHY3c2ckpuZ09CbU4yNWQ5UGxB?=
- =?utf-8?B?ck1JdFR2QTlOSWRZcS9TbXVCRytjUjZjSzl4SERLZkduVXY4ZXRablBZMXNH?=
- =?utf-8?B?WTViL0wvRkFDQWVNY1V1YWpnaDIyRmp5dCtibytIbkxlRlM1WXI4dTFuL2VO?=
- =?utf-8?B?UUtWOFZocXc2MWg3TjRRcXN3cE5nSzZHdWtLV3ArT1RmTTJKU2pvZXA5aWVZ?=
- =?utf-8?B?L2QyQVExRm1Ub3VxckpSSUwzTzlLdnZ1L3lHNzFsdTBnUkM4NzlTdU9yNEZL?=
- =?utf-8?B?eWIzemJ4cjByRlVqTVlkN0EyZ0xnNW5JangxVjV3S0RtWnJiNVV3Nll5Yis0?=
- =?utf-8?B?THVSVXpIbWFvNkIzTUJkdzI0UWlJT1BVWHZlcHBsRDRLR3FteGtQRmdaRGFr?=
- =?utf-8?B?NXZPL2Z5T0JWZXcxaHUxdmg3MkFGWm8wd2o5a0tNV2ZFb05NdDdDT1V0VWxu?=
- =?utf-8?B?T2c1cDhlMVNFdFpINEMvL25nNitJdVIxRWhOOVBhZkhTQkVsMUFHVVh1am5R?=
- =?utf-8?B?WFRTc0tNcDJQei9LOXA1L3N5SlZ4STBGaFAvUWExek9iT0phaXFLY0E2UU5S?=
- =?utf-8?B?OUhvVlNWZHVzbytScG9OaUdpbkZvOFF2SlpXTEZoaGVhSUhrN1U3YlJFVTIy?=
- =?utf-8?B?TzJRLzZDV1FBKzc3TzJoKzJkYjdPa045aVBVVUFXMkE4OC8ra0NmRmlrbzBu?=
- =?utf-8?B?dWUwNWtpR1hOeWpHL1VPdlFuK1BvSThNa0hVZjRsNG9ZcFNraWtCQTZiSTRE?=
- =?utf-8?B?ZGxPTWJQelNqZ3phSEFheWFFbm44ZDRUL2x6TEptaDI0TXJKTElrd2RXaXJZ?=
- =?utf-8?B?WjE4YnBCVHZKcDZVdzBNS1Zkd3FQMTIzSTZydE5NYzdMOVZ3WDFhUXRTbkgw?=
- =?utf-8?B?Yno3TkdjMjk3WDBiYnA5ZjFidFA3M1k5OWhSTktqSU9OQ0dqdDNQZ2FGZGhm?=
- =?utf-8?B?WVB2eVFWMncyVG9FKzd3WVJyVVBlbFNjaWZQcnllSFRHb3plWVJQT1dUTi9F?=
- =?utf-8?B?bkMvMHN0NkdINFA1bzJLTXQ2RStkQ2lFTmlWSmlyenRtOU5RR2ZNOXE5aWVR?=
- =?utf-8?B?RS9lTUJmUTQ4UzlTNVdNYzNyTlY1cGZ4ajJMYVNHMHZobURKb2NHMnFHT05K?=
- =?utf-8?B?bmJoKzYyMVhpamREREcvYlA3dUc3QkR2VmppTkREclc5NllNRHVENzNyVEVp?=
- =?utf-8?B?WU0zKzMvRU5BZ05XK3dpVjZjT1NMUkE0OUNwMWp1dEd0dzFXd2RDOWY5dkVG?=
- =?utf-8?B?UzM1SWNLa05qUGgxU1BqVURoMklXUXhpcDQ4eDdkRnRlTWMyREJDSXY1TnBL?=
- =?utf-8?B?QTNTRENZU2Q3bThHa2gzZWhhZVA3ZHpsRW92QmNhVDFvR3lyWktydnNLTVAz?=
- =?utf-8?Q?WXOagOrGpJ8u+?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bUFWM2xneGJJVkZHTkk2dzczZWw4RUFHWm85RUxnekdScExFNGR6VE1VWWNu?=
- =?utf-8?B?bjhBZGN4b0RNNEdtdDlVdDE2dldsV1FGUStSd21aSlVPRzhtNTZKOWlPbTJR?=
- =?utf-8?B?V0RaWUV4bTBKOG5VQXFzL1ZXYTBRWnBLWEtvYVpmZnNQUEpwZVAxUHAyS2hy?=
- =?utf-8?B?UlNsN2F0b01sbFgxeDF0MHBPd2xKTzB1N3lNWldiMnV4bVJ5S3UyMVpWalAr?=
- =?utf-8?B?TnFHYTIrcGJQdXZhclBCVVQyZTE3RUYwVGxXM05IN2FJTGRJai9vV3YwN3ho?=
- =?utf-8?B?U0Y2bHRabmd3bDNvdlF4KzlMVVhoTm5FU05JNUpMMlU3OEJqTkVnVnhGRkwz?=
- =?utf-8?B?R3B2MFdSWlJFU0wwbG45RCt1Y0Q3eVdDK3d6S1A1N0pmdHN1K3c3M3N2R3FK?=
- =?utf-8?B?bHNpUm0yNitKbU9Yam9VUG1iaWtCckYrRU40bmxzenNuL1ErYkJpVURMWi90?=
- =?utf-8?B?UHlMbjYySVd3VW5mZHB6aTNlMjVyd0dFaU8wbnBWRGxzd2R3YVJEcjVWZUE1?=
- =?utf-8?B?UnVqTC9rMEs1NC9sZmZCKzUyazkvRzFpYzNIWG1PaCs5NzI4MkI5L0M1RWlu?=
- =?utf-8?B?Y1dubDNRRjZDdEpJaldyVE1vSGxhOVpMUjNEWHFnSWNnKzM0dDNSUGFtMUtV?=
- =?utf-8?B?UUFGWVZWNnR0dkZNUGV6Tk5FWVFmazQ4NS9xZ1RPTHBwbUNjK1cyNVhkbVc3?=
- =?utf-8?B?cElOcjQxM1hyK1BGVUZxSk1wYWxUYk1xczhQOGkwbE42UFdrSzdlSHVuTTZS?=
- =?utf-8?B?di91YlhuV2JCd01tVWRFUS90c2VSQ0tGUjNzQkVLQWxFNWlDakY0cjZHcUQy?=
- =?utf-8?B?QjE0b2YwSWcrQUd2RG9QNG00ME1UaEc1WlBPNFp2aisyVzFsZjZmQWVrOUYr?=
- =?utf-8?B?SjFYbTFqR1FpdUJYK1UyK1NYbmpxdlBva0xGbXJ6UEp3cEVNWWtFTUxBbFdh?=
- =?utf-8?B?Tk5venh4YW1yNlBUWlBTUGkxcDNRK0REazlsMDE5Mnp1NjdIRnhoOHN5Nm9K?=
- =?utf-8?B?RHg0ZDdXWHFSUkdRV0tKRnUwV3FqZlpSeXh6SDZGSnlxd29zeXUybkt0QzIv?=
- =?utf-8?B?Y1lGalJhbVRVYVRUM1ZvcVppWWh3czBsZTN0dFJWSE5qQStCMEJlM1IxbnJD?=
- =?utf-8?B?YXkwZThyOGRHMVozbUQ1YUV3N2taeUV3YjZCTDZqTnhOblNta1B5THZmNUdG?=
- =?utf-8?B?S1JVZ2ZiV1B6dFVJbHpUWGdtTC80SHZhSnY1V2VTaTd0TkhOd25aSG5xT0dz?=
- =?utf-8?B?aDVpTngvc3dlQVVTbXJ2bXhDbWZBckFnUGF1a3E3VW5RRlVUTmQrZlNKQXRJ?=
- =?utf-8?B?Z1JpUzczeDNNTWU1MkZGa1MxemJ6dWpxaWRUVG5ybVRLaVNCSE5KSk1qWWdj?=
- =?utf-8?B?eExvUVZqS0pab2ZQNnFkdlYwOVZLZ0VPRHJpZkRtbUlFUXA5eS9QVm10UTBv?=
- =?utf-8?B?R2l6dG9mc0pCTGZOWTdyMVZWMUUzVGdiOWZNOTB1QktQOWIxMzNRMThtdEdN?=
- =?utf-8?B?WXZxWWtZMUdqSTRyTmI3emg2Wk9DTExoOXBNcW1JNDdKTlFXeHJPejlSWDA4?=
- =?utf-8?B?VHdGVGkwZW0yb2kwSktOaG9QNjdMb1RjVU0rMCtWRWZpNnpSOGc4b3JnQVNo?=
- =?utf-8?B?QWFUMGVmdnhvTlBTSk5jTGtSVWNhYitUQ0tXY005TUlrVFJVOWkrWUVielFU?=
- =?utf-8?B?ZTZINXNnbmNpaCtIRXRMZFNkTEprM1U2ZGY3TWtFeks0SlY4bi92a3hVRDVN?=
- =?utf-8?B?c25qNGFpN2hzdWJTZ1NNRjF5YURaNGZneHdvRTVjbVNYbU9SbkQ4SWU0U0Jx?=
- =?utf-8?B?Yjlic05saUNwdlRCVngxMFNHNVZ2NERKYkVQRXlXZTJ5enJ4ak9qcUdPWGFu?=
- =?utf-8?B?TUp5aGh3b0E1Umd1ZVhPbmFOL2tSak5NWktobXlHV2lrODhyV21NajJaRWF1?=
- =?utf-8?B?NVV5Y1laYW9Dd1FyR2doWVlYc2tzcC81d3pGanNyOWtPR0NVMUQ0QTNnSmZG?=
- =?utf-8?B?bW5UdERuU01jb2xUMUFrd1kwYWNTaE5mWEtaOS9jU3RGSTdubE5zYklwcktp?=
- =?utf-8?B?VndHNHE0ZjJWU2s0bU12ZjlIY00xUWVRcFVPSU1vTGM1eURPVDNFSGVnbHVp?=
- =?utf-8?B?SEVNNXpDR2E5YkY5NkdxMXdUUzhiaDUraXJzN0owTThOVi9qNkZ6YXUrUzJw?=
- =?utf-8?B?VVE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e6c85198-7ce8-4d46-716c-08dd5d0a0ae7
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2025 23:53:07.3740
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KZ/kCiNotU8BLUgo5vBubnBagY6i+/KfoRNeaEohGLzEaTRfrHrI/W7Lsasi013cO4y7Ox75RznI6V8wUopFjwZSJdUGrncx+CrFAGflQ7k=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB5145
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-
-
-On 3/6/2025 1:11 PM, Przemek Kitszel wrote:
-> Use Device Serial Number instead of PCI bus/device/function for
-> index of struct ice_adapter.
-> Functions on the same physical device should point to the very same
-> ice_adapter instance.
+On Thu, 6 Mar 2025 17:22:47 -0500 Willem de Bruijn wrote:
+> > +    def lpath(self, path):
+> > +        """
+> > +        Similar to rpath, but for files in net/lib TARGET.
+> > +        """
+> > +        lib_dir = (Path(__file__).parent / "../../../../net/lib").resolve()
+> > +        return (lib_dir / path).as_posix()
+> > +  
 > 
-> This is not only simplification, but also fixes things up when PF
-> is passed to VM (and thus has a random BDF).
-> 
-> Suggested-by: Jacob Keller <jacob.e.keller@intel.com>
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Suggested-by: Jiri Pirko <jiri@resnulli.us>
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> ---
+> small nit that one letter acronyms are not the most self describing ;)
+> I would initially read this as local path
 
-The only caution I have here is that we might run into issues with
-pre-production or poorly flashed boards which don't have DSN properly
-flashed. This shouldn't be an impact outside of early testing or
-mistakes by devs. I think there is a default ID which is almost all 0s
-we could check and log a warning to help prevent confusion in such a case?
+The other option that came to mind was to have one helper called path()
+and pass rel=CONST to it. For example:
 
-A couple systems I've seen have serial numbers like:
+	prog = cfg.path("xdp_dummy.bpf.o", rel=cfg.NET_LIB)
 
-  serial_number 00-00-00-00-00-00-00-00
-  serial_number 00-00-00-00-00-00-00-00
+Thinking about it now we could also store dir directly, which is
+probably most "Pythonic"?
 
-or
+	prog = cfg.net_lib_dir / "xdp_dummy.bpf.o"
 
-  serial_number 00-01-00-ff-ff-00-00-00
-  serial_number 00-01-00-ff-ff-00-00-00
-
-
-In practice I'm not sure how big a deal breaker this is. Properly
-initialized boards should have unique IDs, and if you update via
-devlink, or any of our standard update tools, it will maintain the ID
-across flash. However, during early development, boards were often
-flashed manually which could lead to such non-unique IDs.
-
-> CC: Karol Kolacinski <karol.kolacinski@intel.com>
-> CC: Grzegorz Nitka <grzegorz.nitka@intel.com>
-> CC: Michal Schmidt <mschmidt@redhat.com>
-> CC: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_adapter.h |  4 +--
->  drivers/net/ethernet/intel/ice/ice_adapter.c | 29 +++-----------------
->  2 files changed, 6 insertions(+), 27 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.h b/drivers/net/ethernet/intel/ice/ice_adapter.h
-> index e233225848b3..1935163bd32f 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_adapter.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_adapter.h
-> @@ -42,7 +42,7 @@ struct ice_adapter {
->  	struct ice_port_list ports;
->  };
->  
-> -struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev);
-> -void ice_adapter_put(const struct pci_dev *pdev);
-> +struct ice_adapter *ice_adapter_get(struct pci_dev *pdev);
-> +void ice_adapter_put(struct pci_dev *pdev);
->  
->  #endif /* _ICE_ADAPTER_H */
-> diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.c b/drivers/net/ethernet/intel/ice/ice_adapter.c
-> index 01a08cfd0090..b668339ed0ef 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_adapter.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_adapter.c
-> @@ -1,7 +1,6 @@
->  // SPDX-License-Identifier: GPL-2.0-only
->  // SPDX-FileCopyrightText: Copyright Red Hat
->  
-> -#include <linux/bitfield.h>
->  #include <linux/cleanup.h>
->  #include <linux/mutex.h>
->  #include <linux/pci.h>
-> @@ -14,29 +13,9 @@
->  static DEFINE_XARRAY(ice_adapters);
->  static DEFINE_MUTEX(ice_adapters_mutex);
->  
-> -/* PCI bus number is 8 bits. Slot is 5 bits. Domain can have the rest. */
-> -#define INDEX_FIELD_DOMAIN GENMASK(BITS_PER_LONG - 1, 13)
-> -#define INDEX_FIELD_DEV    GENMASK(31, 16)
-> -#define INDEX_FIELD_BUS    GENMASK(12, 5)
-> -#define INDEX_FIELD_SLOT   GENMASK(4, 0)
-> -
-> -static unsigned long ice_adapter_index(const struct pci_dev *pdev)
-> +static unsigned long ice_adapter_index(struct pci_dev *pdev)
->  {
-> -	unsigned int domain = pci_domain_nr(pdev->bus);
-> -
-> -	WARN_ON(domain > FIELD_MAX(INDEX_FIELD_DOMAIN));
-> -
-> -	switch (pdev->device) {
-> -	case ICE_DEV_ID_E825C_BACKPLANE:
-> -	case ICE_DEV_ID_E825C_QSFP:
-> -	case ICE_DEV_ID_E825C_SFP:
-> -	case ICE_DEV_ID_E825C_SGMII:
-> -		return FIELD_PREP(INDEX_FIELD_DEV, pdev->device);
-> -	default:
-> -		return FIELD_PREP(INDEX_FIELD_DOMAIN, domain) |
-> -		       FIELD_PREP(INDEX_FIELD_BUS,    pdev->bus->number) |
-> -		       FIELD_PREP(INDEX_FIELD_SLOT,   PCI_SLOT(pdev->devfn));
-> -	}
-> +	return (unsigned long)pci_get_dsn(pdev);
-
-Much simpler :D
-
->  }
->  
->  static struct ice_adapter *ice_adapter_new(void)
-> @@ -77,7 +56,7 @@ static void ice_adapter_free(struct ice_adapter *adapter)
->   * Return:  Pointer to ice_adapter on success.
->   *          ERR_PTR() on error. -ENOMEM is the only possible error.
->   */
-> -struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev)
-> +struct ice_adapter *ice_adapter_get(struct pci_dev *pdev)
->  {
->  	unsigned long index = ice_adapter_index(pdev);
->  	struct ice_adapter *adapter;
-> @@ -110,7 +89,7 @@ struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev)
->   *
->   * Context: Process, may sleep.
->   */
-> -void ice_adapter_put(const struct pci_dev *pdev)
-> +void ice_adapter_put(struct pci_dev *pdev)
->  {
-
-A bit of a shame that this needs to be non const now.. Could
-pci_get_dsn() be made const? Or does it do something which might modify
-the device somehow?
-
->  	unsigned long index = ice_adapter_index(pdev);
->  	struct ice_adapter *adapter;
-
+Thoughts?
 
