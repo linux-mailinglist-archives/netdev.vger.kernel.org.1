@@ -1,172 +1,235 @@
-Return-Path: <netdev+bounces-173062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9692CA5708E
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 19:30:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 382A2A5709B
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 19:34:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C9233A623C
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 18:30:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5193518939BB
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 18:35:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D4C5241686;
-	Fri,  7 Mar 2025 18:30:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A331C24061B;
+	Fri,  7 Mar 2025 18:34:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LRoRJ+i6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NU7WveBb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08231194C9E;
-	Fri,  7 Mar 2025 18:30:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FECA194C9E;
+	Fri,  7 Mar 2025 18:34:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741372220; cv=none; b=PTMXaOx6sM+Mzdv3d1t3+TUoFEJsY2utKbEBoSAPAiT/GFJkYH6b0qeUbdyazbetr8A721z3WuRULHoiEN29w+xS7gp1C0GSaGSaXsJ0cFz4LGVburw0K1v4myuJP1ehBTucZjzzn15TMa95ICPDUsig1PsoKovuF7saGSTtZSg=
+	t=1741372491; cv=none; b=mUkV7W8Y9Fr5PrZ3XQ45ixBdtCvrlLgqL5Gllz1+G5lyqEj2bOOzKYvIFAacajqdgTeCEpmmiZko9/HjHlk1hjGjCEIsMasJiWfjzuH5MDfPU2ltU261v/kZavHRLZMjbrYQJBggldI7dEJv7avXaFrpQ6S2qXmy6ylLpgEwmYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741372220; c=relaxed/simple;
-	bh=EG2i3mXMsc7HiAgkyOkrmMVNlKKHXZ/6dKrOfBJXUBI=;
+	s=arc-20240116; t=1741372491; c=relaxed/simple;
+	bh=+9gDGcZfqpQByrzcz5GniB5ENASVWayTOdWAGshyqxc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MeahBgH7BVxU3KigZT2S1O7bZRwH86Yas7TnhxOmL81dE8NpksIGoYFyilgjSxrE73pPUJfzDpFwUZ/AFDWF/8P3ohKYq2KSdnW/eT/CKyoQ1dl+EC0PcA+gucE8UWBOQ6oAM5KrIappZqBrjPDdkkBnwUrRaMYRfsRbTNptDRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LRoRJ+i6; arc=none smtp.client-ip=209.85.214.171
+	 Content-Type:Content-Disposition:In-Reply-To; b=oMoufD8TsIdoihfOKgRFwGb/9Zvty8YsimwaaQ3XIJnDjuMHN3tihTo/tRZ4iSXGJbhiK7K6R7joMzfWyNiLKFdEFGxN6XwwrMtDU+wjbLSmaeEizG3Nn2bENRUHJY4wl80ugLJS7WWlO+Nlc4dBP5UkTb9hWelHfM5V5fy74zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NU7WveBb; arc=none smtp.client-ip=209.85.219.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2232aead377so45522305ad.0;
-        Fri, 07 Mar 2025 10:30:18 -0800 (PST)
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6e8f254b875so16595836d6.1;
+        Fri, 07 Mar 2025 10:34:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741372218; x=1741977018; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ADljs+6QUrhT8gv23eyNcU2smhHAIyZh+jPjPfAngag=;
-        b=LRoRJ+i6nmPuw6J4mI0+/g5RuHMKEaRwxKUH0fsnU91Oi+6EqlRgZb9iPMFLJ1AbLf
-         AA3+UiSeaJ0sWQNoDK8xSKSIxbiHUU+T2CqtmZb2SHJQ9L2PtR8nfwbBM5ZIORTedLlj
-         XXZdLyXrkBifLzf3y59opc9DLMeylAxAv9oVvQI3vUZo7RmCj2tqPIvs28zzLeAEquAq
-         MfSqhA7aZHqXUIB9iIBEaOribAeC/32Xsr3iN1QZn4Cg6Ud0aKcsiYnG2XesVyOFjixM
-         PIy3vMEkhpCud1cLg7foEbHbZ8FcNqR3adQRJJAZgiRlAk7KP4NVCsEXekGHZnaJYF8V
-         ONTw==
+        d=gmail.com; s=20230601; t=1741372489; x=1741977289; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=haDsDg9goM1Uf0CHzwm79RjyrC+9rpHKIsMViflMU/Y=;
+        b=NU7WveBbTWuSDzj1xF/sdhidWew4hjiQl3aaBDVy8nAZd014ARpf8uWuEpfXJ73wAu
+         Q1yo65w4sW0OWBJWfXEh9KUEqHbxbnK+dGvT2jd8/iMBDrfeydB7jS0ODmRHirXmky2f
+         lWWO8YglwxB75xhVttGwYY7WZgt7idEDj4r/3ADOS/s6wKKU9LWnT6RLUC5ZDEEQ7QBE
+         V5aWPtPlK/HsVHQo+Oam1XEDpJrrjoN9v59DtmuiEmj3ArQ/06BsNKPhktJ8H2cfCjVi
+         uZh0357LYkL3R3s8dHoYv0x9oMrWv9afPoSRCgHRUWlzuGozo2kQUBD4aDQNE8Q9zaQf
+         jgkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741372218; x=1741977018;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ADljs+6QUrhT8gv23eyNcU2smhHAIyZh+jPjPfAngag=;
-        b=X9o0Ba43rVR2ETS5JIfOsEfjSHfpGLay4W2zyclTijsBzTfzJ6qOglBnUNRWgsdN/A
-         HL8vb1azJpTAiMOx9aSvJT7i/pgp5J+eLlDv8iejWYVdiVMU5KTMJRtOIHEQttmzicVe
-         k0UdjO+UqHkj14o4sNiX3rJWi0F1GeCMdllXFogYMuvWoj9vEr8C86CRYxO5c2Ns3Xy1
-         jta9dY6kT39ui3qRIzNbD8I5ghJGNbT+QZfPWJxYZ0Faf5KY0ayMrzj+xOQWoR+TVtUz
-         fD5T/yHdfDGNpzh8fxu8Uzz8oBSMT2tEa6w/2r7fGf87AJmyGii2V/K2n9JQSXzAlomI
-         wwIA==
-X-Forwarded-Encrypted: i=1; AJvYcCUKmEF+lNUJ304UBMSNrZOIwiXaAax6mSDmor7ApZ7jii6U0gXcE0E5TPlKu3kIggcwvWDmOIIdx5x4o1rzvp8=@vger.kernel.org, AJvYcCUbGTCE6szGWckdylirQfziyTkwq2kAeUnntBnoh6tiMN2vo2KfnqlomjBqBL4UnrHU4qalvKLlLArW70rL@vger.kernel.org, AJvYcCV9XdzGxV/JvCnpEuZhzrHM/en5rKGOoJLoGI708ePS3O0zV3eaAz3wHqeZSlzQfRznFtk=@vger.kernel.org, AJvYcCVUg2eBLF9+v6Y8c8YMyyDPKHTB+oIeWwOV0nao241YtVod9zwgDleEvhnhU6zx0KSaRN8Uitxhgt3L9lw=@vger.kernel.org, AJvYcCVzKEi4vRh8thBe0lCU/mvvMyB5HNdduuzF7Q1k6lIzELT2uOghjbjtLvrzRzbgSOBD/cM0vrOwBLneeLg=@vger.kernel.org, AJvYcCWhkugP8Uy/rwjLO97e5nqMWoVWC97rHA0PQhegUmZKK8GElF5j984oMV79hbMEbHLSTOD8qEvqS++0HmbJ@vger.kernel.org, AJvYcCXQliO0RH4F2IZeXYDjPeE8orqz9hw62/INKWBzGtO0ypR/Dyw7pbvEuR8uKkpVy4zf886drSNg@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMGS03q3GlluOHNogL0a8ztc0jcM1gMuD0Og2hohrKLyr9yiZ0
-	xLdrYIog5AvVGMC8i6Gvy9z+dOfBzuQy5OCJxBhCivm8gOYUzFgi
-X-Gm-Gg: ASbGncsDxeWm+E9bidiY2AAss9EU4j34bh9pSViXuTqmYu4yFmTXfb+k469wwYKyo/l
-	39G0LYXpvw+l3pkZGuwHKPqlfG+QNNMG2M2LsWGUBt4qaCzJcYckSeHWXPd5PcsgL3c00yncy5/
-	D/vluuM2uVJT/dtlxHCddw8Y7JnYe+uKOjGWWozUjHmjEZ6Zpiwx6WLUVDDNFUW5Hq4wJbOK2qX
-	r7srnl5fAUSTK11Z6orbjwK7vrn8mq5H7dseMzE3AgyMntd1PWotEmno2S9QBjxT/VuEUveMsZg
-	q7NBIJQWRfWd9gZb5JQtUwAMIhNbU7IDDrAMLPgjbPvq9sL6vJ7QY7gHlJS2pHbwtFJpItN/
-X-Google-Smtp-Source: AGHT+IHgn9VYVN+pY6VrcRSpGmZ1OnVGCCY/wp+YVj8MkJGAiDKX4lh0yxX6MBBGMkwIe7/wx2wiPQ==
-X-Received: by 2002:a05:6a00:139a:b0:736:520a:58f9 with SMTP id d2e1a72fcca58-736aaadf082mr5830777b3a.17.1741372218220;
-        Fri, 07 Mar 2025 10:30:18 -0800 (PST)
-Received: from visitorckw-System-Product-Name ([140.113.216.168])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-736984f7268sm3588473b3a.116.2025.03.07.10.30.10
+        d=1e100.net; s=20230601; t=1741372489; x=1741977289;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=haDsDg9goM1Uf0CHzwm79RjyrC+9rpHKIsMViflMU/Y=;
+        b=vddouuw4GZBx33hKmFZCW31TjE0h2KE6lRp6x7gGha1GMO0WX5ntFIMRJQLaZb1tBQ
+         TtEnKoXx1MTbdIk3+HX53pnkhQPMZrGFlHv77yeoWRSqyXp38WokJoY3ICRw/tQXvCbR
+         KoHP/GiD4tDAAHu5Bb0SMgZU8siP40KE8vnXSgSXGqFirtqxjMVW9dosBb28+1loetGL
+         oPonWwJWCxhgZexEfZOoHpi+eQ36L4YMYR0nwgxNJ7mPOi2LpebwNteR4XzsrMjG90Na
+         FKs5EtuVAElDrS/s2EzgiQy9s8tll9HvYFaoSKpoMvo9cqIH0sg+sdiNCnMd3ylYC/Cj
+         ivZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUGuO8biFUz7de5SspMqiCERckIBJQoJO8QTKknAh71JoLCYTffCiXNqVo87yNp2w4Qq6AV4OFZZ22DAtE=@vger.kernel.org, AJvYcCVweNnLumdjNj0FJkRY9XJe46+/xr1yZzQYoQ0wyjzCOEkJRYoW9/kHiw7xqZdBgdMDSUixAUF3@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7v5k7CjuiUVFNfZnEjNtox3OT96zFg3QStVxH3XuGTFw5Lp66
+	f4YmhfW7vKWEj8tffCYyMcmJgTqsw93J7PloXWoi0wsFfz4Jrtu6
+X-Gm-Gg: ASbGncsDnw6HtJJ8nPBLh5UBBa3DBkkKTl/UZg1gH8hRHGGOzHNKe9/szreSNwuZOdo
+	3uWYXwretPwD2KxP8/phXC73LOmv+2f/Hlw6qMzdfXqhe9B2Te6oGBbFcHfO4XlV00+42fO9SIE
+	8ZeVm8lrnJLjBhZaGnRwsyGFBNyoacL14T5aEC2lYnnPw8vCwGXleedi/AvYcsD1IJUHIIODpsz
+	uSFkWdCt4viKpb5EYNV46nltW+RrU/49xt3g6RySZ1/mFzRLQLiQGwTjqfE5X9FkJkGPiEX7OCM
+	E8aLbMP4e5rTCXg4Md0qKyJL9jLW0BD37ni/gtn6KADSkw4w0ZARLNvsfk81k0V0lw35AFVhXPv
+	WNdanm1sD5Lal4RCE6Kt19P+QIZ7iy5/BkqE=
+X-Google-Smtp-Source: AGHT+IFLDTDJ/m0lNtsyy0A68/QZ3C8P/SJZ5YIt5SuaIL7ydu9Y1k+o8fmDRJBpD9rUl+4VX2rTSQ==
+X-Received: by 2002:a05:6214:4c11:b0:6e8:fd4d:dba5 with SMTP id 6a1803df08f44-6e90067f388mr44623226d6.33.1741372488754;
+        Fri, 07 Mar 2025 10:34:48 -0800 (PST)
+Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e8f715baaasm22100866d6.85.2025.03.07.10.34.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Mar 2025 10:30:17 -0800 (PST)
-Date: Sat, 8 Mar 2025 02:30:07 +0800
-From: Kuan-Wei Chiu <visitorckw@gmail.com>
-To: Yury Norov <yury.norov@gmail.com>
-Cc: Jiri Slaby <jirislaby@kernel.org>, tglx@linutronix.de, mingo@redhat.com,
-	bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-	jk@ozlabs.org, joel@jms.id.au, eajames@linux.ibm.com,
-	andrzej.hajda@intel.com, neil.armstrong@linaro.org,
-	rfoss@kernel.org, maarten.lankhorst@linux.intel.com,
-	mripard@kernel.org, tzimmermann@suse.de, airlied@gmail.com,
-	simona@ffwll.ch, dmitry.torokhov@gmail.com, mchehab@kernel.org,
-	awalls@md.metrocast.net, hverkuil@xs4all.nl,
-	miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
-	louis.peens@corigine.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	parthiban.veerasooran@microchip.com, arend.vanspriel@broadcom.com,
-	johannes@sipsolutions.net, gregkh@linuxfoundation.org,
-	akpm@linux-foundation.org, hpa@zytor.com, alistair@popple.id.au,
-	linux@rasmusvillemoes.dk, Laurent.pinchart@ideasonboard.com,
-	jonas@kwiboo.se, jernej.skrabec@gmail.com, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, linux-fsi@lists.ozlabs.org,
-	dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
-	oss-drivers@corigine.com, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev,
-	brcm80211-dev-list.pdl@broadcom.com, linux-serial@vger.kernel.org,
-	bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw,
-	Yu-Chun Lin <eleanor15x@gmail.com>
-Subject: Re: [PATCH v3 00/16] Introduce and use generic parity16/32/64 helper
-Message-ID: <Z8s7L+ZCI/yM5qm4@visitorckw-System-Product-Name>
-References: <20250306162541.2633025-1-visitorckw@gmail.com>
- <3dfc81eb-caa1-42fe-8fd6-61101de0ef13@kernel.org>
- <Z8sW4c5LxV-ITdCi@thinkpad>
+        Fri, 07 Mar 2025 10:34:48 -0800 (PST)
+Received: from phl-compute-07.internal (phl-compute-07.phl.internal [10.202.2.47])
+	by mailfauth.phl.internal (Postfix) with ESMTP id D876B120006B;
+	Fri,  7 Mar 2025 13:34:47 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-07.internal (MEProxy); Fri, 07 Mar 2025 13:34:47 -0500
+X-ME-Sender: <xms:RzzLZ2orjrHfV27h54b3fPqjExMjafv9lTs68nssgbeEkAWso9qijQ>
+    <xme:RzzLZ0rUN47xEZzf7DeA0gEVG-TD8C3eXI7ePDroOsP5zPHkTDHp8iyv2DteklI8E
+    zd6pp_EfW8iHjAWbQ>
+X-ME-Received: <xmr:RzzLZ7M3GI46BXnJ7gIKm1Mu1Hl-ZFu6Oy5Mt2gwo_LtaIyIyO8086X3Qjg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduuddufeelucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucenucfjughrpeffhf
+    fvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpeeuohhquhhnucfhvghnghcu
+    oegsohhquhhnrdhfvghnghesghhmrghilhdrtghomheqnecuggftrfgrthhtvghrnhephe
+    dugfduffffteeutddvheeuveelvdfhleelieevtdeguefhgeeuveeiudffiedvnecuvehl
+    uhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsghoqhhunhdomh
+    gvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieegqddujeejkeeh
+    heehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigihmvgdrnhgrmh
+    gvpdhnsggprhgtphhtthhopedufedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohep
+    rhihohhtkhhkrhelkeesghhmrghilhdrtghomhdprhgtphhtthhopegsphesrghlihgvnh
+    ekrdguvgdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghp
+    thhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehhohhrmh
+    hssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
+    pdhrtghpthhtohepkhhunhhihihusegrmhgriihonhdrtghomhdprhgtphhtthhopehlih
+    hnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehn
+    vghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:RzzLZ171QRqxpMMiPdPiEv8B0WA1KakX9NmZPDZsjiSPRJe6c7OjBQ>
+    <xmx:RzzLZ16xc2OX_ruE8YWGKJzaqRwBK0Gzsnnoz5mPjlIv313MwlUIrQ>
+    <xmx:RzzLZ1iVK9GHxKh-ba3DXJA1yj9s3a2a-dEqNGKn9SaD3olmlTF78g>
+    <xmx:RzzLZ_43eaft5SYtZ0R-v-bxekmINh5ogxuxuDmgm_JTaUZM6DfMjQ>
+    <xmx:RzzLZwLYwyHlLw8xsieywpQzlnkh8DAU9S4tTSoD5BAm1nDzRL3-iIF2>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 7 Mar 2025 13:34:47 -0500 (EST)
+Date: Fri, 7 Mar 2025 10:33:36 -0800
+From: Boqun Feng <boqun.feng@gmail.com>
+To: Ryo Takakura <ryotkkr98@gmail.com>
+Cc: bp@alien8.de, davem@davemloft.net, edumazet@google.com,
+	horms@kernel.org, kuba@kernel.org, kuniyu@amazon.com,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, peterz@infradead.org, x86@kernel.org
+Subject: Re: request_irq() with local bh disabled
+Message-ID: <Z8s8AG3oIxerZHjG@boqun-archlinux>
+References: <20250307131319.GBZ8rw74dL4xQXxW-O@fat_crate.local>
+ <20250307133946.64685-1-ryotkkr98@gmail.com>
+ <Z8sXdDFJTjYbpAcq@tardis>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z8sW4c5LxV-ITdCi@thinkpad>
+In-Reply-To: <Z8sXdDFJTjYbpAcq@tardis>
 
-Hi Yury,
-
-On Fri, Mar 07, 2025 at 10:55:13AM -0500, Yury Norov wrote:
-> On Fri, Mar 07, 2025 at 07:57:48AM +0100, Jiri Slaby wrote:
-> > On 06. 03. 25, 17:25, Kuan-Wei Chiu wrote:
-> > > Several parts of the kernel contain redundant implementations of parity
-> > > calculations for 16/32/64-bit values. Introduces generic
-> > > parity16/32/64() helpers in bitops.h, providing a standardized
-> > > and optimized implementation.
-> > > 
-> > > Subsequent patches refactor various kernel components to replace
-> > > open-coded parity calculations with the new helpers, reducing code
-> > > duplication and improving maintainability.
-> > > 
-> > > Co-developed-by: Yu-Chun Lin <eleanor15x@gmail.com>
-> > > Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
-> > > Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail.com>
-> > > ---
-> > > In v3, I use parityXX() instead of the parity() macro since the
-> > > parity() macro may generate suboptimal code and requires special hacks
-> > > to make GCC happy. If anyone still prefers a single parity() macro,
-> > > please let me know.
+On Fri, Mar 07, 2025 at 07:57:40AM -0800, Boqun Feng wrote:
+> On Fri, Mar 07, 2025 at 10:39:46PM +0900, Ryo Takakura wrote:
+> > Hi Boris,
 > > 
-> > What is suboptimal and where exactly it matters? Have you actually measured
-> > it?
+> > On Fri, 7 Mar 2025 14:13:19 +0100, Borislav Petkov wrote:
+> > >On Fri, Mar 07, 2025 at 09:58:51PM +0900, Ryo Takakura wrote:
+> > >> I'm so sorry that the commit caused this problem...
+> > >> Please let me know if there is anything that I should do.
+> > >
+> > >It is gone from the tip tree so you can take your time and try to do it right.
+> > >
+> > >Peter and/or I could help you reproduce the issue and try to figure out what
+> > >needs to change there.
+> > >
+> > >HTH.
+> > 
+> > Thank you so much for this. I really appreciate it.
+> > I'll once again take a look and try to fix the problem.
+> > 
 > 
-> I asked exactly this question at least 3 times, and have never
-> received perf tests or asm listings - nothing. I've never received
-> any comments from driver maintainers about how performance of the
-> parity() is important for them, as well.
+> Looks like we missed cases where
 > 
-To be clear, I use parityXX() was mainly because you dislike the >>
-16 >> 16 hack, and I dislike the #if gcc #else hack—not due to
-performance or generated code considerations.
+> acquire the lock:
+> 
+> 	netif_addr_lock_bh():
+> 	  local_bh_disable();
+> 	  spin_lock_nested();
+> 
+> release the lock:
+> 
+> 	netif_addr_unlock_bh():
+> 	  spin_unlock_bh(); // <- calling __local_bh_disable_ip() directly
+> 
+> means we should do the following on top of your changes.
+> 
+> Regards,
+> Boqun
+> 
+> ------------------->8
+> diff --git a/include/linux/bottom_half.h b/include/linux/bottom_half.h
+> index 0640a147becd..7553309cbed4 100644
+> --- a/include/linux/bottom_half.h
+> +++ b/include/linux/bottom_half.h
+> @@ -22,7 +22,6 @@ extern struct lockdep_map bh_lock_map;
+>  
+>  static inline void local_bh_disable(void)
+>  {
+> -	lock_map_acquire_read(&bh_lock_map);
+>  	__local_bh_disable_ip(_THIS_IP_, SOFTIRQ_DISABLE_OFFSET);
+>  }
+>  
+> @@ -31,13 +30,11 @@ extern void __local_bh_enable_ip(unsigned long ip, unsigned int cnt);
+>  
+>  static inline void local_bh_enable_ip(unsigned long ip)
+>  {
+> -	lock_map_release(&bh_lock_map);
+>  	__local_bh_enable_ip(ip, SOFTIRQ_DISABLE_OFFSET);
+>  }
+>  
+>  static inline void local_bh_enable(void)
+>  {
+> -	lock_map_release(&bh_lock_map);
+>  	__local_bh_enable_ip(_THIS_IP_, SOFTIRQ_DISABLE_OFFSET);
+>  }
+>  
+> diff --git a/kernel/softirq.c b/kernel/softirq.c
+> index e864f9ce1dfe..782d5e9753f6 100644
+> --- a/kernel/softirq.c
+> +++ b/kernel/softirq.c
+> @@ -175,6 +175,8 @@ void __local_bh_disable_ip(unsigned long ip, unsigned int cnt)
+>  		lockdep_softirqs_off(ip);
+>  		raw_local_irq_restore(flags);
+>  	}
+> +
+> +	lock_map_acquire_read(&bh_lock_map);
+>  }
+>  EXPORT_SYMBOL(__local_bh_disable_ip);
+>  
+> @@ -183,6 +185,8 @@ static void __local_bh_enable(unsigned int cnt, bool unlock)
+>  	unsigned long flags;
+>  	int newcnt;
+>  
+> +	lock_map_release(&bh_lock_map);
+> +
+>  	DEBUG_LOCKS_WARN_ON(current->softirq_disable_cnt !=
+>  			    this_cpu_read(softirq_ctrl.cnt));
+>  
+> @@ -208,6 +212,8 @@ void __local_bh_enable_ip(unsigned long ip, unsigned int cnt)
+>  	u32 pending;
+>  	int curcnt;
+>  
+> +	lock_map_release(&bh_lock_map);
+> +
 
-> With the absence of _any_ feedback, I'm not going to take this series,
-> of course, for the reason: overengineering.
-> 
-I'm quite surprised that three separate one-line functions are
-considered overengineering compared to a multi-line approach that
-requires special handling to satisfy gcc.
-
-> With that said, the simplest way would be replacing parity8(u8) with
-> parity(u64) 'one size fits all' thing. I even made a one extra step,
-> suggesting a macro that would generate a better code for smaller types
-> with almost no extra maintenance burden. This is another acceptable
-> option to me.
-> 
-I'm fine with unifying everything to a single parity(u64) function.
-Before I submit the next version, please let me know if anyone has
-objections to this approach.
+Ok, this is not needed because __local_bh_enable() will be called by
+__local_bh_enable_ip().
 
 Regards,
-Kuan-Wei
+Boqun
+
+>  	WARN_ON_ONCE(in_hardirq());
+>  	lockdep_assert_irqs_enabled();
+>  
 
