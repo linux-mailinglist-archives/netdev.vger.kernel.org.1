@@ -1,251 +1,129 @@
-Return-Path: <netdev+bounces-173089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDE55A57234
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 20:40:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCF24A57245
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 20:42:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08580179D53
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 19:40:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51D7B189603E
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 19:42:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB43B25487A;
-	Fri,  7 Mar 2025 19:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E84525487A;
+	Fri,  7 Mar 2025 19:42:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="stPffzks"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IWdkuHeR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E2F1A3035
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 19:40:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA3CC24FC03
+	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 19:42:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741376407; cv=none; b=r6ZhVpS5lkmXGtD2UzScl9WDOyNXAHgImLa18RRUmZ8Qebnn6dqsgwno5snEPZFqKKqSGM1pcAVdQZpEaWcc4k3exn26ZzzLOOe10FAAWsSiizpKZL4cJRDczE8kuZ6ZjhEO5Lu7bO+7S5nmFJXzzKtTek+tLsNFKyqZM7o7cG4=
+	t=1741376539; cv=none; b=HtO4gF2ecf1+trFT7+CgEp4tJBaNVH+2Gb1/CWM8EE8g5LZ81M/IwhifyROXiZtg6ZoE9Vgm6FL2m+ChaXo/xHfyg2+yGae1VhCDsP+qQY45egND610QSuIlyXk9fX7KS+D9FleX00FoM8YncFroPSKfW4jq22WG0UzzXbYsm4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741376407; c=relaxed/simple;
-	bh=oyRMjAqGnfQQHmLgjV78x/4R3peXUKoay360NwNzYfc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XKLN/t0vjWqhehEXTN+f+muNcvtfx9JnylMO6Acxcta5oEFL5aIgJUCzqOJxE40rDE5JuGEV83x6t14LzMJOoMsUSAu64lMCaFR2xRdu9F8zQMMnl6nMXX+HpRsFE4+nrs4voH6xld2KPZVZLbPkIiCc34R6AbyVqBhPtt/36tY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=stPffzks; arc=none smtp.client-ip=209.85.222.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7c3c9f7b1a6so218116185a.1
-        for <netdev@vger.kernel.org>; Fri, 07 Mar 2025 11:40:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741376404; x=1741981204; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CMJaSvLeeirPf/s58yRLtR6M+vJYyaJur+fzyjrXM2U=;
-        b=stPffzksdoNpwHc3we9muxyOOqOrt+0Jyw6f/b1S3+4ODuGCXN0ycP3vAEAkwVh9lX
-         y9V6U6HU3nMlhWa/8qN1cRYLUvw8uO+f9Kmq8jXcJ6xLtq37abdyJlGDOLlX19AJjjjK
-         1Tjpxjb0HtBikICcJhQ1aB6L09KSIT0vnA1ru68uwFHI1QF/ulc0WR+kPJVGjtBE29w5
-         WMoE4ar4IQ5CY3JUXwG9Oo2cnq+cUEpU9ZHQIWlZfa1Wi5DZ75Hh27zzaeFHNWnMC+n0
-         8jANkE0F7mTb8PqAXPwMHCE2BiTHArjzz6JVB1ttuOlyBsZfAnPTijMJpvxBL/tR3PJv
-         yLBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741376404; x=1741981204;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CMJaSvLeeirPf/s58yRLtR6M+vJYyaJur+fzyjrXM2U=;
-        b=PeQlPIoEiAwosZEyYHMOsCpRnj5bKduriy3BCIMzCGAPypcrjGuJuJYTNYDLB3Yg5Y
-         N2zdbe2+5pAi9g3sdpXQrUqmx08pyIT5ESAI76WbIq1L23Tx9k6kgWTj4xaH9A8ndib5
-         ji4U/I6X1aGk0wRkKVGoH6bp2ps8YNMVqDcXr09/dWPhkemhKskfcLkSMYy0410Rcz0V
-         ZWehT1nCv6+ZdXptdqlmY/A9vK61lQMItLarIUilbz9On8VW0Tcf7hkTcSr1oFPPbqIY
-         uRHzKCWKgWHmfepVAy6UplDAmUGa4hWrK5/k/GzKAW4+wkRnvhszU7Uq3xBSjNXhuxsn
-         DmyA==
-X-Gm-Message-State: AOJu0Yx8/mRXFKFJcVKwSsD2VRm5ZKnp7Pz+FHewq0iR7zpqloBUSyHT
-	MayW757g8vyObDET5o6GkkpBcM//SId7x+aSU32R7JdAgdFjMhnFW5lcD2r7FOc64KMriu3CHc2
-	3200UrDHkNg+vx0Nb2nhPzFrFEpIGsbxV8i3t
-X-Gm-Gg: ASbGncsnNDynnRdlnJkeGOXOxGJmXGGfQjNoapMXKY6X9uMlV0azJDrrDpvLHbVGpzX
-	c/mDW1fPGgzQukqJc2fZu20gsJGEExt8oto5b0VRwyuvW2N96pGeCPUK/aIew0gp5xTYMhA/Z2L
-	W9rQt9FqXG1r/1FBS5JV6ZR4qfweM=
-X-Google-Smtp-Source: AGHT+IE9PWhHB/UGbrg+mOKX/PMS2ThEvK4aTWPU5vvRv6A/EIys1lPC14D7fdJ8fcsTZ4R4RcwaGlW6XHLzJHjkluQ=
-X-Received: by 2002:a05:620a:2602:b0:7c0:b018:5934 with SMTP id
- af79cd13be357-7c53c8d9211mr98616385a.27.1741376404299; Fri, 07 Mar 2025
- 11:40:04 -0800 (PST)
+	s=arc-20240116; t=1741376539; c=relaxed/simple;
+	bh=OZkliL2bYezi7a2we+4OxPKOzQpAk3iSHqbABO6VJ4E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=edIEuvjtWuuwUogbUbry62rzJ9z/rnakOHOj4G3BbPnK8fvsHa7RH74MJUmjbp/g5C7TwcduFozP+nXzGJY2R9WCMoQHimZlwGC2ssYT+u6sEDY5t7mSupoGr31rIlbhdb6jLWnNqIbjpG5X8TqY66hwPq+fJ5K0pefRSb8KhcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IWdkuHeR; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Fri, 7 Mar 2025 19:41:59 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1741376525;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hUfk1/2NcSfPN/tpPfLTglczAj9VxtvTU3Ogyf9VQss=;
+	b=IWdkuHeRMDC+9wNq0Lo0/O/5kMk6BYVu38wbtXm8ScUXAhZyee1hoE9gApdp7k2fHqLaEa
+	lSJIMUsgS+5avUY2z2QStbB7g6TAtfdGW26DdBIJvqBW7FbfDuySpBvMwgW+pR60vCGAUR
+	kaRdKLxXImqEfy4bcU+uXr24hZsNnsU=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Shakeel Butt <shakeel.butt@linux.dev>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Michal Hocko <mhocko@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Muchun Song <muchun.song@linux.dev>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-mm@kvack.org, cgroups@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Meta kernel team <kernel-team@meta.com>
+Subject: Re: [RFC PATCH] memcg: net: improve charging of incoming network
+ traffic
+Message-ID: <Z8tMB4i_hBLaSZS1@google.com>
+References: <20250307055936.3988572-1-shakeel.butt@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250305163732.2766420-1-sdf@fomichev.me> <20250305163732.2766420-3-sdf@fomichev.me>
-In-Reply-To: <20250305163732.2766420-3-sdf@fomichev.me>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 7 Mar 2025 20:39:53 +0100
-X-Gm-Features: AQ5f1JrIATmH567IbjVVYL1ZwPo1bnHykRjZCQobzjsXzbFFR_szQbIgdN0rihs
-Message-ID: <CANn89iJemkvpsQ6LgefYvBBC_foXr=1wrwf7QN25wpX-2QZPiQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v10 02/14] net: hold netdev instance lock during
- nft ndo_setup_tc
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, Saeed Mahameed <saeed@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250307055936.3988572-1-shakeel.butt@linux.dev>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Mar 5, 2025 at 5:37=E2=80=AFPM Stanislav Fomichev <sdf@fomichev.me>=
- wrote:
->
-> Introduce new dev_setup_tc for nft ndo_setup_tc paths.
->
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
-> Cc: Saeed Mahameed <saeed@kernel.org>
-> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> ---
->  drivers/net/ethernet/intel/iavf/iavf_main.c |  2 --
->  include/linux/netdevice.h                   |  2 ++
->  net/core/dev.c                              | 18 ++++++++++++++++++
->  net/netfilter/nf_flow_table_offload.c       |  2 +-
->  net/netfilter/nf_tables_offload.c           |  2 +-
->  5 files changed, 22 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/et=
-hernet/intel/iavf/iavf_main.c
-> index 9f4d223dffcf..032e1a58af6f 100644
-> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-> @@ -3894,10 +3894,8 @@ static int __iavf_setup_tc(struct net_device *netd=
-ev, void *type_data)
->         if (test_bit(__IAVF_IN_REMOVE_TASK, &adapter->crit_section))
->                 return 0;
->
-> -       netdev_lock(netdev);
->         netif_set_real_num_rx_queues(netdev, total_qps);
->         netif_set_real_num_tx_queues(netdev, total_qps);
-> -       netdev_unlock(netdev);
->
->         return ret;
->  }
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index 33066b155c84..69951eeb96d2 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -3353,6 +3353,8 @@ int dev_alloc_name(struct net_device *dev, const ch=
-ar *name);
->  int dev_open(struct net_device *dev, struct netlink_ext_ack *extack);
->  void dev_close(struct net_device *dev);
->  void dev_close_many(struct list_head *head, bool unlink);
-> +int dev_setup_tc(struct net_device *dev, enum tc_setup_type type,
-> +                void *type_data);
->  void dev_disable_lro(struct net_device *dev);
->  int dev_loopback_xmit(struct net *net, struct sock *sk, struct sk_buff *=
-newskb);
->  u16 dev_pick_tx_zero(struct net_device *dev, struct sk_buff *skb,
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 7a327c782ea4..57af25683ea1 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -1786,6 +1786,24 @@ void dev_close(struct net_device *dev)
->  }
->  EXPORT_SYMBOL(dev_close);
->
-> +int dev_setup_tc(struct net_device *dev, enum tc_setup_type type,
-> +                void *type_data)
-> +{
-> +       const struct net_device_ops *ops =3D dev->netdev_ops;
-> +       int ret;
-> +
-> +       ASSERT_RTNL();
-> +
-> +       if (!ops->ndo_setup_tc)
-> +               return -EOPNOTSUPP;
-> +
-> +       netdev_lock_ops(dev);
-> +       ret =3D ops->ndo_setup_tc(dev, type, type_data);
-> +       netdev_unlock_ops(dev);
-> +
-> +       return ret;
-> +}
-> +EXPORT_SYMBOL(dev_setup_tc);
->
->  /**
->   *     dev_disable_lro - disable Large Receive Offload on a device
-> diff --git a/net/netfilter/nf_flow_table_offload.c b/net/netfilter/nf_flo=
-w_table_offload.c
-> index e06bc36f49fe..0ec4abded10d 100644
-> --- a/net/netfilter/nf_flow_table_offload.c
-> +++ b/net/netfilter/nf_flow_table_offload.c
-> @@ -1175,7 +1175,7 @@ static int nf_flow_table_offload_cmd(struct flow_bl=
-ock_offload *bo,
->         nf_flow_table_block_offload_init(bo, dev_net(dev), cmd, flowtable=
-,
->                                          extack);
->         down_write(&flowtable->flow_block_lock);
-> -       err =3D dev->netdev_ops->ndo_setup_tc(dev, TC_SETUP_FT, bo);
-> +       err =3D dev_setup_tc(dev, TC_SETUP_FT, bo);
->         up_write(&flowtable->flow_block_lock);
->         if (err < 0)
->                 return err;
-> diff --git a/net/netfilter/nf_tables_offload.c b/net/netfilter/nf_tables_=
-offload.c
-> index 64675f1c7f29..b761899c143c 100644
-> --- a/net/netfilter/nf_tables_offload.c
-> +++ b/net/netfilter/nf_tables_offload.c
-> @@ -390,7 +390,7 @@ static int nft_block_offload_cmd(struct nft_base_chai=
-n *chain,
->
->         nft_flow_block_offload_init(&bo, dev_net(dev), cmd, chain, &extac=
-k);
->
-> -       err =3D dev->netdev_ops->ndo_setup_tc(dev, TC_SETUP_BLOCK, &bo);
-> +       err =3D dev_setup_tc(dev, TC_SETUP_BLOCK, &bo);
->         if (err < 0)
->                 return err;
->
+On Thu, Mar 06, 2025 at 09:59:36PM -0800, Shakeel Butt wrote:
+> Memory cgroup accounting is expensive and to reduce the cost, the kernel
+> maintains per-cpu charge cache for a single memcg. So, if a charge
+> request comes for a different memcg, the kernel will flush the old
+> memcg's charge cache and then charge the newer memcg a fixed amount (64
+> pages), subtracts the charge request amount and stores the remaining in
+> the per-cpu charge cache for the newer memcg.
+> 
+> This mechanism is based on the assumption that the kernel, for locality,
+> keep a process on a CPU for long period of time and most of the charge
+> requests from that process will be served by that CPU's local charge
+> cache.
+> 
+> However this assumption breaks down for incoming network traffic in a
+> multi-tenant machine. We are in the process of running multiple
+> workloads on a single machine and if such workloads are network heavy,
+> we are seeing very high network memory accounting cost. We have observed
+> multiple CPUs spending almost 100% of their time in net_rx_action and
+> almost all of that time is spent in memcg accounting of the network
+> traffic.
+> 
+> More precisely, net_rx_action is serving packets from multiple workloads
+> and is observing/serving mix of packets of these workloads. The memcg
+> switch of per-cpu cache is very expensive and we are observing a lot of
+> memcg switches on the machine. Almost all the time is being spent on
+> charging new memcg and flushing older memcg cache. So, definitely we
+> need per-cpu cache that support multiple memcgs for this scenario.
 
-It seems RTNL was not taken in this path, can you take a look ?
+We've internally faced a different situation on machines with a large
+number of CPUs where the mod_memcg_state(MEMCG_SOCK) call in
+mem_cgroup_[un]charge_skmem() causes latency due to high contention on
+the atomic update in memcg_rstat_updated().
 
-syzbot reported :
+In this case, networking performs a lot of charge/uncharge operations,
+but because we count the absolute magnitude updates in
+memcg_rstat_updated(), we reach the threshold quickly. In practice, a
+lot of these updates cancel each other out so the net change in the
+stats may not be that large.
 
-RTNL: assertion failed at net/core/dev.c (1769)
-WARNING: CPU: 1 PID: 9148 at net/core/dev.c:1769
-dev_setup_tc+0x315/0x360 net/core/dev.c:1769
-Modules linked in:
-CPU: 1 UID: 0 PID: 9148 Comm: syz.3.1494 Not tainted
-6.14.0-rc5-syzkaller-01064-g2525e16a2bae #0
-Hardware name: Google Google Compute Engine/Google Compute Engine,
-BIOS Google 02/12/2025
-RIP: 0010:dev_setup_tc+0x315/0x360 net/core/dev.c:1769
-Code: cc 49 89 ee e8 dc da f7 f7 c6 05 c0 39 5d 06 01 90 48 c7 c7 a0
-5e 2e 8d 48 c7 c6 80 5e 2e 8d ba e9 06 00 00 e8 3c 97 b7 f7 90 <0f> 0b
-90 90 e9 66 fd ff ff 89 d1 80 e1 07 38 c1 0f 8c aa fd ff ff
-RSP: 0018:ffffc9000be3eed0 EFLAGS: 00010246
-RAX: eea924c6092c5700 RBX: 0000000000000000 RCX: 0000000000080000
-RDX: ffffc9000c979000 RSI: 000000000000491b RDI: 000000000000491c
-RBP: ffff88802a810008 R08: ffffffff81818e32 R09: fffffbfff1d3a67c
-R10: dffffc0000000000 R11: fffffbfff1d3a67c R12: ffffc9000be3f070
-R13: ffffffff8d4ab1e0 R14: ffff88802a810008 R15: ffff88802a810000
-FS: 00007fbe7aece6c0(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000110c2b5042 CR3: 0000000024cd0000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
-<TASK>
-nf_flow_table_offload_cmd net/netfilter/nf_flow_table_offload.c:1178 [inlin=
-e]
-nf_flow_table_offload_setup+0x2ff/0x710
-net/netfilter/nf_flow_table_offload.c:1198
-nft_register_flowtable_net_hooks+0x24c/0x570 net/netfilter/nf_tables_api.c:=
-8918
-nf_tables_newflowtable+0x19f4/0x23d0 net/netfilter/nf_tables_api.c:9139
-nfnetlink_rcv_batch net/netfilter/nfnetlink.c:524 [inline]
-nfnetlink_rcv_skb_batch net/netfilter/nfnetlink.c:647 [inline]
-nfnetlink_rcv+0x14e3/0x2ab0 net/netfilter/nfnetlink.c:665
-netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
-netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1339
-netlink_sendmsg+0x8de/0xcb0 net/netlink/af_netlink.c:1883
-sock_sendmsg_nosec net/socket.c:709 [inline]
-__sock_sendmsg+0x221/0x270 net/socket.c:724
-____sys_sendmsg+0x53a/0x860 net/socket.c:2564
-___sys_sendmsg net/socket.c:2618 [inline]
-__sys_sendmsg+0x269/0x350 net/socket.c:2650
-do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fbe79f8d169
+However, not using the absolute value of the updates could cause stat
+updates of irrelevant stats with opposite polarity to cancel out,
+potentially delaying stat updates.
+
+I wonder if we can leverage the batching introduced here to fix this
+problem as well. For example, if the charging in
+mem_cgroup_[un]charge_skmem() is satisfied from this catch, can we avoid
+mod_memcg_state() and only update the stats once at the end of batching?
+
+IIUC the current implementation only covers the RX path, so it will
+reduce the number of calls to mod_memcg_state(), but it won't prevent
+charge/uncharge operations from raising the update counter
+unnecessarily. I wonder if the scope of the batching could be increased
+so that both TX and RX use the same cache, and charge/uncharge
+operations cancel out completely in terms of stat updates.
+
+WDYT?
 
