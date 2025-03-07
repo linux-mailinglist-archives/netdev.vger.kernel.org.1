@@ -1,132 +1,108 @@
-Return-Path: <netdev+bounces-173051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC909A57053
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 19:19:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B831A57063
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 19:22:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 229C6173A86
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 18:19:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87BB93AFBA7
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 18:22:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98C2E19ABC2;
-	Fri,  7 Mar 2025 18:19:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE8B23F434;
+	Fri,  7 Mar 2025 18:22:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hCNvRQvh"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="WMhOKhug"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A8B23C392;
-	Fri,  7 Mar 2025 18:18:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E46721C17B;
+	Fri,  7 Mar 2025 18:22:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741371541; cv=none; b=H6Ie8zdoCh0PEqOha9gUyjjITCMAt8RD3xl5pIDsec5JsElHfd4wzV9YyV/RGb4WKeNERfaWqwZQjMUBCmP8HuImXo+49XMMWWzT4MBV+jiU5DMzoyOMvhYiCI6faaK532ar6GpPD1KllDnt4Uf/ZNOMMk/OlkZ3mvs+v4kF9fQ=
+	t=1741371773; cv=none; b=jZTLuzq1VAcaLp0jXCYmuFifTnvIK1cgi/CRB5foPPFbGSDomqS5wqU4jR564/bl91r9BMKUvwxNgnTxApOayTJmgGslV9RWtaJ9GlNMtuk8rMzKGpOV96rNiLzJeznV5Io8+laCFaCreHK0c4L6xYTE6m67kNgigSmtbXrGmtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741371541; c=relaxed/simple;
-	bh=aq8Wo/8aCbFK4rxRqAt07pPQLjsTUxSY+RTbLI6p1P4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i2I7wwzjhrBamV1GVWpMNmkLKELhuJSyKgqFitb4KLWLPi211zsvVhdA+NZ8hoMBaKynImCoD6ZfxYD0rClzrfJKXNcM1F3kogfM+H6uxDDIewnLi+ja5vMIogzolQBYVWRWMlGMS66nGlO4mCdp9+jSPOBritfZvBBhWfxLTIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hCNvRQvh; arc=none smtp.client-ip=209.85.221.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-523cbce071bso849990e0c.0;
-        Fri, 07 Mar 2025 10:18:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741371539; x=1741976339; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=maGk7Q8fBbZb2d3H7OPJe6h/vgdCD27yZ0lAu/GNzy0=;
-        b=hCNvRQvhqQxhmXku5vKeOqVIL+YEPSJ2xsMdG8y9hZSViKkFZPEk8J9ffYwrlEKg40
-         kUNcg5t34fHhxKM47+B9RSaw4BY4HSGMUnK98CpceeOQFDEA9nkpXxLC8sBBH2NGt+za
-         ePwB08SqoPQL+JEJmb7CXwI0UyOEotFA1Hpi2GQ3SPRnP1l99Zd6nPDpcOUDFAvv7R2i
-         h5zFEDuIUifgyIZVcFEB00g7pdFksgkffdKigIuaxaY5ne2N91Eo3ldPNQKH/HYk+RsO
-         tcg2bfTtux48oYW7xfcTC7Ie/HlD2pANMchp/mDmP4HdHCXJqo04vQEZ/kenZRT7i/VW
-         sVxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741371539; x=1741976339;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=maGk7Q8fBbZb2d3H7OPJe6h/vgdCD27yZ0lAu/GNzy0=;
-        b=HSuKKTH71FkeOHONZP5OGsEdIZk4h5Lf8lOPZwsbFepRH4WkqBahTNt78aVsvSO8ED
-         DPWUFlAyi+dywhEsIiSQ5ijFHDPkQDBzX0YH8jAVqsv0KaPb5AFMKq8FSy4HprxIwtnx
-         Q/KNFp4ZOWTWSgQNlBxNTIJeO16x7Zs2ywVEaMmExR5CLGnObrXeJq9cJe0d1cnUGBNB
-         p4a8+AkCI/UT+4ykgl553hOw1B67+rywCH/13aSFntjar2FAERCwfC5uu/9g+wHSORY9
-         Om9JTdlA6iWRintOi1EyUKCjHFjIu85bcuzICVD6vDLShJBKlaBMFjBT72zlCN/Pblef
-         1SOA==
-X-Forwarded-Encrypted: i=1; AJvYcCXfHYMtPzTA6+S9pmPiM780xQIlvzzmJy/bj8zhr4j+ADeQWYGSj77h7C4w9aJCki9ujqSVHkE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUkp+smI55BnljMTAUwF5lbmRj+nXad4SRyYxz1KpZvbJ0L4pL
-	OfPyvZETpM6/6oO/ZZ6lZHE9PYCRpOLSwp/fA45EUoSKjf43bWwn/bv9XMGY
-X-Gm-Gg: ASbGncvFQ/x9hOX+MDzsetQv4gcQM53exw9jAq1io/Yr51cEjKrXF1wYx90Ro+HiDp4
-	/5qQwqNhSC1gBnnkF2NGUkMDVNw786Xyh27QDr69GUSDh09lUSjR+TS4/tgN1hrWl1a1Z/Kh0Mg
-	kMhXqfV4r3YhXYTIHfzpLVbtCXpq1QhT01C1exAomM+Rj8UWBb0Ptbkk5niQtjuM+BK+FG4zh56
-	vOvSEek7CNfhu/Efxu+rqS5oD4mjlZ9cC759AQmabQbuPN2RCicx4TauKOWNGYx9YR9+ZGcnF0Y
-	vdqufdTWnaY1mclJU5weCbZMKI7CbM7K8FVHKoHJtZfDZlO7PRKe8j695I8ofrlvnQF1BGQjxlE
-	/D2uI6O6aDNhjew==
-X-Google-Smtp-Source: AGHT+IE2ZaqgQosJyZ/JwBXFGrmdu97ZLU+QQoPp/Ch/Vp4gFrY5nWAkip9FleREFNx6VFFBJDXEPA==
-X-Received: by 2002:a05:6122:7ce:b0:523:9ee7:7f8e with SMTP id 71dfb90a1353d-523e414a989mr3852102e0c.4.1741371538784;
-        Fri, 07 Mar 2025 10:18:58 -0800 (PST)
-Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-86d33bbe52esm787345241.7.2025.03.07.10.18.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Mar 2025 10:18:56 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth 2025-03-07
-Date: Fri,  7 Mar 2025 13:18:54 -0500
-Message-ID: <20250307181854.99433-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1741371773; c=relaxed/simple;
+	bh=UhbysGiaH8FQ+ovQ5mfhRgpDsda9xG/VbV10XXNS1tw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I3MJu/dr8BDPEkIpND1pDioSIRsnLjqKGxzrFDaVubYvdRZ1q5ev6TkOQktypmISt/dKgLMtydqBeVreWNZ4+LpZYmzD+msodRHJTXprQh53b+1PJ35BCnOswr/4iIxonS8zNwJKSWUcZjoN7DV9qDjaJZ3AhlQa339EvL/M3TY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=WMhOKhug; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=MWbVuIUV4GkljN1k7GKXrppH1dlxoAA7vzJpSPCNsbU=; b=WMhOKhuglrHkpbV/vRsZcs+D0H
+	zLiPV7i2eS2xvJsy0QnqQ6mVDhonciTp5SLpB27cs0NnxoDn3yM7TG7eV1jDuQaZdcMZhuBUn3Fsa
+	qfRUokBI3yXbTHrB6OJXuykdi02AgOzdCuoESh6jeNdui4Wgbra/wOXOnnPZPiZ55dAdBo7nH54vb
+	408s4a7FJoZ+suIFg0bI01v/KJv1Fg4eWSb91v6g+ab64bDZI/QjTbcCf3psM2U0ukL9L2mkjwct6
+	cMr+fGCgpq9y5z7Dfqn5r7xbKtX9fAZPLc45O60XUV5vmcE0nzlnIuBWreEHZ7MNpwGWE8AywAKeg
+	fJe3EoKw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53270)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tqcLB-0007sw-21;
+	Fri, 07 Mar 2025 18:22:33 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tqcL7-00083J-0h;
+	Fri, 07 Mar 2025 18:22:29 +0000
+Date: Fri, 7 Mar 2025 18:22:29 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jonas Karlman <jonas@kwiboo.se>, Andrew Lunn <andrew@lunn.ch>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-rockchip@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH 2/2] net: stmmac: dwmac-rk: Validate rockchip,grf and
+ php-grf during probe
+Message-ID: <Z8s5ZZyTCpS9xHlA@shell.armlinux.org.uk>
+References: <20250306210950.1686713-1-jonas@kwiboo.se>
+ <20250306210950.1686713-3-jonas@kwiboo.se>
+ <bab793bb-1cbe-4df6-ba6b-7ac8bfef989d@lunn.ch>
+ <1dd9e663-561e-4d6c-b9d9-6ded22b9f81b@kwiboo.se>
+ <20250307085558.5f8fcb90@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250307085558.5f8fcb90@kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-The following changes since commit fc14f9c02639dfbfe3529850eae23aef077939a6:
+On Fri, Mar 07, 2025 at 08:55:58AM -0800, Jakub Kicinski wrote:
+> On Fri, 7 Mar 2025 00:49:38 +0100 Jonas Karlman wrote:
+> > Subject: Re: [PATCH 2/2] net: stmmac: dwmac-rk: Validate rockchip,grf and php-grf during probe
+> > 
+> > [encrypted.asc  application/octet-stream (3384 bytes)] 
+> 
+> Is it just me or does anyone else get blobs from Jonas?
+> The list gets text, according to lore.
 
-  Merge tag 'nf-25-03-06' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf (2025-03-06 17:58:50 -0800)
+Looking at the emails I've received, some which were via the list, some
+which were direct, I don't see anything out of the ordinary - seems to
+just be text/plain here.
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-03-07
-
-for you to fetch changes up to ab6ab707a4d060a51c45fc13e3b2228d5f7c0b87:
-
-  Revert "Bluetooth: hci_core: Fix sleeping function called from invalid context" (2025-03-07 13:03:05 -0500)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - btusb: Configure altsetting for HCI_USER_CHANNEL
- - hci_event: Fix enabling passive scanning
- - revert: "hci_core: Fix sleeping function called from invalid context"
- - SCO: fix sco_conn refcounting on sco_conn_ready
-
-----------------------------------------------------------------
-Hsin-chen Chuang (1):
-      Bluetooth: btusb: Configure altsetting for HCI_USER_CHANNEL
-
-Luiz Augusto von Dentz (2):
-      Bluetooth: hci_event: Fix enabling passive scanning
-      Revert "Bluetooth: hci_core: Fix sleeping function called from invalid context"
-
-Pauli Virtanen (1):
-      Bluetooth: SCO: fix sco_conn refcounting on sco_conn_ready
-
- drivers/bluetooth/Kconfig        |  12 +++++
- drivers/bluetooth/btusb.c        |  41 +++++++++++++++
- include/net/bluetooth/hci_core.h | 108 ++++++++++++++-------------------------
- net/bluetooth/hci_core.c         |  10 ++--
- net/bluetooth/hci_event.c        |  37 ++++++++------
- net/bluetooth/iso.c              |   6 ---
- net/bluetooth/l2cap_core.c       |  12 ++---
- net/bluetooth/rfcomm/core.c      |   6 ---
- net/bluetooth/sco.c              |  25 ++++++---
- 9 files changed, 144 insertions(+), 113 deletions(-)
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
