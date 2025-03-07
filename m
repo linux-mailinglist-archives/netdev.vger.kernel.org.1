@@ -1,190 +1,202 @@
-Return-Path: <netdev+bounces-172805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0676EA561EB
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 08:39:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AA7EA561F5
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 08:43:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03A947A63E9
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 07:38:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0475B3B22E3
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 07:42:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A771F1A5BB6;
-	Fri,  7 Mar 2025 07:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ECFE1A83FB;
+	Fri,  7 Mar 2025 07:42:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="AMDoANXJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E184518B476
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 07:39:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B37941A83EB
+	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 07:42:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741333171; cv=none; b=dEwdFEnHiIPJd45ZRfAUnL8OPyY0dA5v4G3fN3BZ6gGClaqLwVY5uNHz9mLN1F8GElPsaONNf0xaW+nr2VKtgRsYDMEKW6tMVb4yh0emiVHR3npJw2Lz7Syn6rv6drRkjvRqvXhBdY8jSVfqyXBonahwi+NnyCxKV+cMM8Ed4jU=
+	t=1741333375; cv=none; b=STGvBuDsLTAat5uATvDQpJrRE0eACYg0Afkzq1cQNaBANAYCN6vVxBdYH0FpMAt6rsNhKeQ10nndCxlnZRqscthUFjqCNLSM8/yrajEB8n0KxI9bTSVUuOKqJPC9B+X+AcIl4ptsTE5f7B74xsQr/MPYwmzDFY1dRybjfFwzLb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741333171; c=relaxed/simple;
-	bh=HFOr96uzJVOgA3F1Ejo/ufXdkdDy96HL2ss30AGNFL4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=N+d1o/rgHygx5wY4YmazX+tdF3VP4GGmwx++PoZDn+brubcnGA9pjhcKH5k5km87VqbERE8uDCuR3qr3ypX2bWJTeCZbnIrhuBDV/8vRDoJpZ4DMomNcsMNP5ufibRWc4H4/uIC/28Mtg9PgN44hFNIs/BJM/veGUF12Ydtsqso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3ce3bbb2b9dso14081355ab.3
-        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 23:39:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741333169; x=1741937969;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+	s=arc-20240116; t=1741333375; c=relaxed/simple;
+	bh=t//et2Z3gwsmlCE4BktKeI01ti1hs98yzzyOzqkX5Aw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RTy0j2ZaUQZg6llXepP+oRBlYWPFoBj+wsMwsZbXhxflH6sB0lWYZQLPl5oDzTVTXzLnpE2N1W2ZUAprZ1OWb8aWyt6pISNruD9leYi7r19BxQohzNr+4SI1r0snVFnlgfmwpS5pzknryaxOiE+BEb3pinhlhb68Riz1gcJSC6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=AMDoANXJ; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5e539ea490dso2075761a12.0
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 23:42:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1741333372; x=1741938172; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=KKX1UD8UaY3+TFx/rG6mu4yhrmjHNkemFwk644ISkVA=;
-        b=EpMHdXvyJxG3/qMKs3yOHulTJOt1RZt2lBmYksE9JFZ6WvlVo+5X5yiGusLytzQWGX
-         Db7nxBCK+z69JJMrnZxeO9GGIWDasvgElKXtS5IO5KU/765OQs/3a2zS83HDwnCOJAyJ
-         /qVGb5+/oktS72DZTc8aV/Cl0fwBOV/3j1Tpxg88rq0wt/0z0sCGOoehXTn/NdacgcOs
-         P8mo9O+/fDXrKjcQMqE/YhWn6l520qul9uJ4FPBxZ9Y3tiHsamTUygNn2HPw78vT61F1
-         /fRuy4pJzWjygGdRcmmxyM19krZvE+SRnoC+IcMLqeRSNwrQe+ynB6bqsEmAA+O60LLr
-         8jYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXqPVFiYkH9fmPVHI/x0DZUBmeKzNjYGlLZp4VAtnQAlsQPoVh1mze1B7DIiYjFccKJ4j5EbCg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxvwp2keK9qqVHz3Px+lB3qOjwZmCsjYWTFnIqipJQt2Kiq6Fdr
-	5htCtCJokO1TvJZv8Sd3ituMr/xyzy4MhGmr+jyILPwReX+vMVRxbBcNwyNpMsjS46rlIo+I4L4
-	4X9Q4Hm8zqE58vTYXNmyoiWhrpbomatwJctcbOJTckD0D07N+fdBYoP0=
-X-Google-Smtp-Source: AGHT+IEo7WRMFD1Fsxov9bQBeyeVXc7HpSkzBOF8+SScLg5uQ1aWkATDpYOw/+KCQp5CH+iri6Mnk/EZv5wznjdm7TO9Lx7Xh5bR
+        bh=5XD8qhYPMz/D8R07DChHcNjp4dWxmyKArfoz3ubpHOk=;
+        b=AMDoANXJPg7dErpGmHnt4QUQ9mMoimN2AVXutYQDLSO9IWku2fE003A40wf0/IVchO
+         S8l/LuYEAx7r7eB4BLMoOIskt6nzF9yoUSgLZ5bN6CklZ74vqVX+3AicLnRjB3msAhj7
+         OA+LzOwBClLHa3ak7MqF0nwepTGabZI3D/AsgudLvxcYy/FZLHbxFSEbXoiiXpBBRqWE
+         CvczwcJztzjQSyG5SSiAnG19z8d+5OJHD9Yb6ZTUkNwaxHGmTm8rjE3i7sTq5YRArrSG
+         JugWm4AhaOdEY/I+LFWgCvN56jEk0zy2lnULvJ/nUbhzYZNV7IyAAR+Jb3IFgb4IBz9a
+         RfCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741333372; x=1741938172;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5XD8qhYPMz/D8R07DChHcNjp4dWxmyKArfoz3ubpHOk=;
+        b=wcpMOImgfbxVUMJOfv5FsxEJvdpn+QVjLMUffPBgVkrPukUKnll4bjCzXV/wJKGenj
+         2qS8d1noqhpBOzdNKdxv4k3zJWpRWfbKesTNumpN315BLkFT3F6hqFC/TsgyN7nMBYDf
+         LGHjHAlVvLCaZA++4jQk2DpQwzoV9rvMecIDFb6R6vUOdfA2maGNsjKhtT8sslROkdkB
+         0sq+urPYpC9S8SCujQy6mg9C6roznFAfGQL9LdoOb1H4uwDX3W58itBUqH5XtwyV9IXT
+         L0erU88Xt4jphhSR0Yjrxd0tS/47sx93D+wb7BpL/iK1WTTaWRbXodfMi54YzWxr9UFU
+         CAdg==
+X-Forwarded-Encrypted: i=1; AJvYcCWW8vt33GqRmp3XGMPv/Kwez2P5MB0ZP7BgvNkgcQ18nzHk+IW8f9RFDmxzKn34VuuXFpcEw54=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw98PLBfIH9RgEo6IxRtlo8TlQJ0zMg1Hna42jII9PfMqSI6cG0
+	mjnU1dESygZaWuqJmJPK5Sd0KTq8Hio5qbaOIOewtoVJIc+EXcdqPgNfpOAbsfeya9kzIKnmFvJ
+	WKog=
+X-Gm-Gg: ASbGncsRaAKEoja09DCTcZJIIHjefXeD3b9fmgusd3aspL9DQmg70asb4ws2mSXAV8S
+	QDozkhXtl0TBGOhBQcRsMUzn4aPPYrn8sc3Or32ZGiitMeO2aSIWRJzHoBLxF9WeY/UXXFyvari
+	uv35uL1D2IQiYrn/xoQNITrARqzRceeVe633doqqruN5mFFT7vTp8L4eRGOf8hO1opv1uoZsOWX
+	MHRIRfo5iBjwuT2kNgkH46nmh5KxBVQlSMEUjzaf5pkVZU8KEKYxwnPE5kAfwejrptnL8c/kLBq
+	Y7PhOUWO2zoRAvNye4477Gqz7PLzOjjCiZ1ogJy40Xj/22NkdUhcz+4oQGYJouGa6CVWObybhVW
+	o
+X-Google-Smtp-Source: AGHT+IEH13LmOv2SYeD1yfj/wayj59JsykxuHFBkNQDvlFstY/vY9J/NE9qf0IEHfzyAirhV4iNiaQ==
+X-Received: by 2002:a05:6402:40ce:b0:5dc:9589:9f64 with SMTP id 4fb4d7f45d1cf-5e5e22be6abmr6606800a12.13.1741333371314;
+        Thu, 06 Mar 2025 23:42:51 -0800 (PST)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac2399c9062sm226908166b.161.2025.03.06.23.42.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Mar 2025 23:42:50 -0800 (PST)
+Message-ID: <6dd52efd-3367-4a77-8e7b-7f73096bcb3f@blackwall.org>
+Date: Fri, 7 Mar 2025 09:42:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:16ce:b0:3d0:bd5:b863 with SMTP id
- e9e14a558f8ab-3d441a1d665mr27903305ab.20.1741333169078; Thu, 06 Mar 2025
- 23:39:29 -0800 (PST)
-Date: Thu, 06 Mar 2025 23:39:29 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67caa2b1.050a0220.15b4b9.0077.GAE@google.com>
-Subject: [syzbot] [bpf?] general protection fault in bpf_map_offload_map_alloc
-From: syzbot <syzbot+0c7bfd8cf3aecec92708@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com, 
-	yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCHv5 net 1/3] bonding: fix calling sleeping function in spin
+ lock and some race conditions
+To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
+ Jarod Wilson <jarod@redhat.com>,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ Cosmin Ratiu <cratiu@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250307031903.223973-1-liuhangbin@gmail.com>
+ <20250307031903.223973-2-liuhangbin@gmail.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20250307031903.223973-2-liuhangbin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hello,
+On 3/7/25 05:19, Hangbin Liu wrote:
+> The fixed commit placed mutex_lock() inside spin_lock_bh(), which triggers
+> a warning:
+> 
+>   BUG: sleeping function called from invalid context at...
+> 
+> Fix this by moving the IPsec deletion operation to bond_ipsec_free_sa,
+> which is not held by spin_lock_bh().
+> 
+> Additionally, there are also some race conditions as bond_ipsec_del_sa_all()
+> and __xfrm_state_delete could running in parallel without any lock.
+> e.g.
+> 
+>   bond_ipsec_del_sa_all()            __xfrm_state_delete()
+>     - .xdo_dev_state_delete            - bond_ipsec_del_sa()
+>     - .xdo_dev_state_free                - .xdo_dev_state_delete()
+>                                        - bond_ipsec_free_sa()
+>   bond active_slave changes              - .xdo_dev_state_free()
+> 
+>   bond_ipsec_add_sa_all()
+>     - ipsec->xs->xso.real_dev = real_dev;
+>     - xdo_dev_state_add
+> 
+> To fix this, let's add xs->lock during bond_ipsec_del_sa_all(), and delete
+> the IPsec list when the XFRM state is DEAD, which could prevent
+> xdo_dev_state_free() from being triggered again in bond_ipsec_free_sa().
+> 
+> In bond_ipsec_add_sa(), if .xdo_dev_state_add() failed, the xso.real_dev
+> is set without clean. Which will cause trouble if __xfrm_state_delete is
+> called at the same time. Reset the xso.real_dev to NULL if state add failed.
+> 
+> Despite the above fixes, there are still races in bond_ipsec_add_sa()
+> and bond_ipsec_add_sa_all(). If __xfrm_state_delete() is called immediately
+> after we set the xso.real_dev and before .xdo_dev_state_add() is finished,
+> like
+> 
+>   ipsec->xs->xso.real_dev = real_dev;
+>                                        __xfrm_state_delete
+>                                          - bond_ipsec_del_sa()
+>                                            - .xdo_dev_state_delete()
+>                                          - bond_ipsec_free_sa()
+>                                            - .xdo_dev_state_free()
+>   .xdo_dev_state_add()
+> 
+> But there is no good solution yet. So I just added a FIXME note in here
+> and hope we can fix it in future.
+> 
+> Fixes: 2aeeef906d5a ("bonding: change ipsec_lock from spin lock to mutex")
+> Reported-by: Jakub Kicinski <kuba@kernel.org>
+> Closes: https://lore.kernel.org/netdev/20241212062734.182a0164@kernel.org
+> Suggested-by: Cosmin Ratiu <cratiu@nvidia.com>
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+>  drivers/net/bonding/bond_main.c | 69 ++++++++++++++++++++++++---------
+>  1 file changed, 51 insertions(+), 18 deletions(-)
+> 
+> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+> index e45bba240cbc..dd3d0d41d98f 100644
+> --- a/drivers/net/bonding/bond_main.c
+> +++ b/drivers/net/bonding/bond_main.c
+> @@ -506,6 +506,7 @@ static int bond_ipsec_add_sa(struct xfrm_state *xs,
+>  		list_add(&ipsec->list, &bond->ipsec_list);
+>  		mutex_unlock(&bond->ipsec_lock);
+>  	} else {
+> +		xs->xso.real_dev = NULL;
+>  		kfree(ipsec);
+>  	}
+>  out:
+> @@ -541,7 +542,15 @@ static void bond_ipsec_add_sa_all(struct bonding *bond)
+>  		if (ipsec->xs->xso.real_dev == real_dev)
+>  			continue;
+>  
+> +		/* Skip dead xfrm states, they'll be freed later. */
+> +		if (ipsec->xs->km.state == XFRM_STATE_DEAD)
+> +			continue;
 
-syzbot found the following issue on:
+As we commented earlier, reading this state without x->lock is wrong.
 
-HEAD commit:    2525e16a2bae Merge git://git.kernel.org/pub/scm/linux/kern..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=14d18878580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fbc61e4c6e816b7b
-dashboard link: https://syzkaller.appspot.com/bug?extid=0c7bfd8cf3aecec92708
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> +
+>  		ipsec->xs->xso.real_dev = real_dev;
+> +		/* FIXME: there is a race that before .xdo_dev_state_add()
+> +		 * is called, the __xfrm_state_delete() is called in parallel,
+> +		 * which will call .xdo_dev_state_delete() and xdo_dev_state_free()
+> +		 */
+>  		if (real_dev->xfrmdev_ops->xdo_dev_state_add(ipsec->xs, NULL)) {
+>  			slave_warn(bond_dev, real_dev, "%s: failed to add SA\n", __func__);
+>  			ipsec->xs->xso.real_dev = NULL;
+[snip]
 
-Unfortunately, I don't have any reproducer for this issue yet.
+TBH, keeping buggy code with a comment doesn't sound good to me. I'd rather remove this
+support than tell people "good luck, it might crash". It's better to be safe until a
+correct design is in place which takes care of these issues.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/bae047feb57e/disk-2525e16a.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/9f10529c6bdd/vmlinux-2525e16a.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/8dcb6d0a6029/bzImage-2525e16a.xz
+Cheers,
+ Nik
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+0c7bfd8cf3aecec92708@syzkaller.appspotmail.com
-
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000197: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000cb8-0x0000000000000cbf]
-CPU: 1 UID: 0 PID: 9913 Comm: syz.1.1316 Not tainted 6.14.0-rc5-syzkaller-01064-g2525e16a2bae #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-RIP: 0010:netdev_need_ops_lock include/linux/netdevice.h:2792 [inline]
-RIP: 0010:netdev_lock_ops include/linux/netdevice.h:2803 [inline]
-RIP: 0010:bpf_map_offload_map_alloc+0x19a/0x910 kernel/bpf/offload.c:533
-Code: 48 89 44 24 30 42 80 3c 20 00 74 08 48 89 df e8 ac e6 3b 00 48 89 5c 24 18 4c 89 2b 49 8d 9d bd 0c 00 00 48 89 d8 48 c1 e8 03 <42> 0f b6 04 20 84 c0 0f 85 df 06 00 00 0f b6 1b 31 ff 89 de e8 dd
-RSP: 0018:ffffc90002e67bc0 EFLAGS: 00010203
-RAX: 0000000000000197 RBX: 0000000000000cbd RCX: ffff8880307ebc00
-RDX: 0000000000000000 RSI: 0000000067ff0009 RDI: 0000000000000009
-RBP: ffffc90002e67cd8 R08: ffffffff89c99bd3 R09: 1ffffffff207a16e
-R10: dffffc0000000000 R11: fffffbfff207a16f R12: dffffc0000000000
-R13: 0000000000000000 R14: ffff888062af0000 R15: 1ffff920005ccf80
-FS:  00007f142b0266c0(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f142b025f98 CR3: 00000000622c6000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- map_create+0x946/0x11c0 kernel/bpf/syscall.c:1455
- __sys_bpf+0x6d3/0x820 kernel/bpf/syscall.c:5777
- __do_sys_bpf kernel/bpf/syscall.c:5902 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5900 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5900
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f142a18d169
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f142b026038 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 00007f142a3a5fa0 RCX: 00007f142a18d169
-RDX: 0000000000000048 RSI: 0000400000000000 RDI: 0000000000000000
-RBP: 00007f142a20e2a0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000001 R14: 00007f142a3a5fa0 R15: 00007fff7b881dc8
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:netdev_need_ops_lock include/linux/netdevice.h:2792 [inline]
-RIP: 0010:netdev_lock_ops include/linux/netdevice.h:2803 [inline]
-RIP: 0010:bpf_map_offload_map_alloc+0x19a/0x910 kernel/bpf/offload.c:533
-Code: 48 89 44 24 30 42 80 3c 20 00 74 08 48 89 df e8 ac e6 3b 00 48 89 5c 24 18 4c 89 2b 49 8d 9d bd 0c 00 00 48 89 d8 48 c1 e8 03 <42> 0f b6 04 20 84 c0 0f 85 df 06 00 00 0f b6 1b 31 ff 89 de e8 dd
-RSP: 0018:ffffc90002e67bc0 EFLAGS: 00010203
-RAX: 0000000000000197 RBX: 0000000000000cbd RCX: ffff8880307ebc00
-RDX: 0000000000000000 RSI: 0000000067ff0009 RDI: 0000000000000009
-RBP: ffffc90002e67cd8 R08: ffffffff89c99bd3 R09: 1ffffffff207a16e
-R10: dffffc0000000000 R11: fffffbfff207a16f R12: dffffc0000000000
-R13: 0000000000000000 R14: ffff888062af0000 R15: 1ffff920005ccf80
-FS:  00007f142b0266c0(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f9c38c00f98 CR3: 00000000622c6000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	48 89 44 24 30       	mov    %rax,0x30(%rsp)
-   5:	42 80 3c 20 00       	cmpb   $0x0,(%rax,%r12,1)
-   a:	74 08                	je     0x14
-   c:	48 89 df             	mov    %rbx,%rdi
-   f:	e8 ac e6 3b 00       	call   0x3be6c0
-  14:	48 89 5c 24 18       	mov    %rbx,0x18(%rsp)
-  19:	4c 89 2b             	mov    %r13,(%rbx)
-  1c:	49 8d 9d bd 0c 00 00 	lea    0xcbd(%r13),%rbx
-  23:	48 89 d8             	mov    %rbx,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	42 0f b6 04 20       	movzbl (%rax,%r12,1),%eax <-- trapping instruction
-  2f:	84 c0                	test   %al,%al
-  31:	0f 85 df 06 00 00    	jne    0x716
-  37:	0f b6 1b             	movzbl (%rbx),%ebx
-  3a:	31 ff                	xor    %edi,%edi
-  3c:	89 de                	mov    %ebx,%esi
-  3e:	e8                   	.byte 0xe8
-  3f:	dd                   	.byte 0xdd
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
