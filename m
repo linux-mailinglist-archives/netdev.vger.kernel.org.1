@@ -1,327 +1,296 @@
-Return-Path: <netdev+bounces-172870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D7BEA565A1
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 11:41:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0999DA565BA
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 11:51:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ECC837A5FE2
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 10:40:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB58A3B18C2
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 10:51:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21F7E20E302;
-	Fri,  7 Mar 2025 10:41:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67C6120B7EF;
+	Fri,  7 Mar 2025 10:51:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="T0HfLPvk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EXbezgdo"
 X-Original-To: netdev@vger.kernel.org
-Received: from va-1-14.ptr.blmpb.com (va-1-14.ptr.blmpb.com [209.127.230.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4F020E6F2
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 10:41:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.230.14
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741344066; cv=none; b=c/2xdZVh3K3AIKRvcqrEj90e2EqWrcL46rhvZU/4/mpGIEFdvzAvVMiTzzDRnOIV9L+rS1uSgeG3/jJpvgKfsu2YVJVI9+xNW9PDu/5gWXx5h7tAjx/Ulg5ZwlxT9gilor6Ize2YMkYQ6GlZh9pOifw5OwCC2hEWsIUDPoH5YlE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741344066; c=relaxed/simple;
-	bh=V9ryqXo2CF47dIRh18uFDY89hVfy81vfU1544e96CPM=;
-	h=To:Cc:Message-Id:Date:Mime-Version:References:Content-Type:From:
-	 Subject:In-Reply-To; b=h9HYI45T2QURoJgHQP9+qGh+wDXhLpja4lwwI1ZCUtIwKo18zO+5BnR8wNbECCEYBOJP90Ijg9M2Rk5jCipabfRFPnENXzMbDW0H/dMSxTpimqYfxHe4gX4R4UEe7OBwToK3EeewIcUZK6dkaHy7sPA7O/kdRcD4lyTzxTAUQBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=T0HfLPvk; arc=none smtp.client-ip=209.127.230.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=feishu2403070942; d=yunsilicon.com; t=1741344052; h=from:subject:
- mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
- mime-version:in-reply-to:message-id;
- bh=sQpZchRqH24STk9QIJLpNT9JOfjsvF0CuV0A+ZmRlhk=;
- b=T0HfLPvkh2cqXwoER1Ings044n5brWKHNHlQvfeZDtZbIyU/BpNP9D7ao3iWu5AXSvV+uq
- U9sBMT/SpG2JssO5EELGVNA1weQ9PsGdZcyEZH0W+298TZJlPRdvcQDgCKTqGbJEhHmuYO
- KmhEEZx8hbO000bSKJ0hJPxj5/ZsG8McmF6eBimREiHBQ5cuhUQjAvMjTWdJCb/TBAxXpr
- LPPgD5bdFAWIK5rdJRox3ropFjfgNG5xzSeJ1Sx67FBi2ecQ0OiQAhFLCqYJ4SvTvRf8DO
- cEz3JnpDhSq60MGTo4K750dpLt04V4sGW+XlK8aZ339mMTFcfI38XG3C45+Qiw==
-To: <netdev@vger.kernel.org>, <horms@kernel.org>, <kuba@kernel.org>
-Cc: <leon@kernel.org>, <andrew+netdev@lunn.ch>, <pabeni@redhat.com>, 
-	<edumazet@google.com>, <davem@davemloft.net>, 
-	<jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>, 
-	<weihg@yunsilicon.com>, <wanry@yunsilicon.com>, <jacky@yunsilicon.com>, 
-	<parthiban.veerasooran@microchip.com>, <masahiroy@kernel.org>, 
-	<kalesh-anakkur.purayil@broadcom.com>, <geert+renesas@glider.be>
-Message-Id: <eed857bc-1d8f-4d3d-aeaa-868b6957ddca@yunsilicon.com>
-Date: Fri, 7 Mar 2025 18:40:47 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B6C72066F9;
+	Fri,  7 Mar 2025 10:51:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741344699; cv=fail; b=mIzdKcqCRIpxT2bfdCnXuJSAX8PHtCYQLrvc1gjvkvZgnys1rakVH2241IPMSYNm2gCon+1IWgfvIJMdn72PACLzfiLMHj0+rpr5bhDCjEX8h/vRfZoM8Njea94gKswg10hd0+Vc338UV/LmXGMCnm97/0f4cguTJvNUNV1/Heg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741344699; c=relaxed/simple;
+	bh=Qr2M84vBJ9UHs9hLPpR7yX4ookOO+8OP7upCMZTveos=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=LleYi0t5FUBSZBgaVKyyZwrm8Mcp65X39BIV9YPIGElarXmF2L0tpraZbYJhO0unGT8mQGBC+Q75soNafIqBsWOSvZfnkBmhRM4HzORH0Slvag8PzBd15h8U7jOXaHt5Ee9Mkdow/ddhpdBBJaQMkUSJmRJfg/qWi7ya4oXLJw4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EXbezgdo; arc=fail smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741344698; x=1772880698;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=Qr2M84vBJ9UHs9hLPpR7yX4ookOO+8OP7upCMZTveos=;
+  b=EXbezgdozcEohUkejPfhd0tQ+EUlEPB77Z2Ebkdp04TabUSkgEjyKoC+
+   ShuP4EgYPlDWXyh04fHwDrRwZjRle3LTxoTaMcc1eKUBlZE44pzc9JXwB
+   RgeaDgPVQ/kYVE6VYkhyDRZD9tPts+2K5uyAeuJiGTWmIDsFNxf+jfP0W
+   Ggq2ij74cvlWAEg4fd3RWhOR0li2tdiZH2e7g0kSES13BF5/WKT+oLTom
+   HlV1sZHZqHVOPKnUMHajuYmfvXGEVP4fVaRfOrVyJWvIGmuhpCOIy9YBl
+   kIDVqlpc9uUvDhqnzCEpCXe80CKnxxhgxd/CvnpMq+euhtHnExoaaOLFP
+   A==;
+X-CSE-ConnectionGUID: RSwkTYnIQxq0gfE1+Ba4dQ==
+X-CSE-MsgGUID: BQU/WzzoT4y9S/dFjqbBEg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="42618329"
+X-IronPort-AV: E=Sophos;i="6.14,229,1736841600"; 
+   d="scan'208";a="42618329"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 02:51:37 -0800
+X-CSE-ConnectionGUID: +OVyz3w2RgSFS9vmhTgtNw==
+X-CSE-MsgGUID: Rxm+QdJaSwmyQPmvSMXyFA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,229,1736841600"; 
+   d="scan'208";a="124385259"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 02:51:35 -0800
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Fri, 7 Mar 2025 02:51:34 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Fri, 7 Mar 2025 02:51:34 -0800
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.40) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Fri, 7 Mar 2025 02:51:31 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=vHhBf6PvwHVVWzm8Wt1rywTzA9vGTXopEPHBhhiubxeJ2qFFhCo/1j/lu7o7tkKrYCH98XSN6b7sgiWJJo6uCdZSO+iZbD07bh9UxTIpXLlmT7fes1BK6Vy3DQ2pn/LmoZqKZw4HUtpcxvFPwpqch35GU9jsq232/TICuWROSgJVkkp7zh3N4tBIPUnaksZklzGpUZ8BXy4Wild2r4JrDWVJUIHXsReefEat9O9JLLI32+d3v4UAU3SCqESaDtcSMxaMqRKRcwnnxwxDgqWimBM1Ksr6CmQraOSsUtbSRm8EcQCZ6g3XgLEaahkDYuVTL+ZskcGyO4ONas+1CGNtoA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BAmYv35OkCyx4uvc/U7JZ0Kc4MkQKAkdBCE91aOdkjc=;
+ b=hxDEMCfUGLoQeDbpoap3XD6i3lKBcr0F8E7yU7Ds6oJzzyBRtXKeYY9AU+MBYwHmobXotOugB+gfBlZ3vRkouv40zI6bAsJI5wa0Fy1y6zAbmiSKqm1AXDPyDKO/FswOIU+MXJAf4ckVD84htlh+VNlf7i/6ZKx7ai0u9W7JazSqV6Didr5QZbC0ZUeM198FvT/AHrW1nGxgAHx8J3+gAlopqCW7qGVrwIwo6/SizrrELVQ9JlgsCmLbUs6awlOQkuuw09ozbe+xPaD1+MleBgtSzXNyuzoTqgW1FUV3cqnuHV55yw6OhDDqR0/vROCUW0jrx0KeUugspjsCJc+cCA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ MW4PR11MB6572.namprd11.prod.outlook.com (2603:10b6:303:1ee::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.18; Fri, 7 Mar
+ 2025 10:51:29 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca%3]) with mapi id 15.20.8511.017; Fri, 7 Mar 2025
+ 10:51:29 +0000
+Date: Fri, 7 Mar 2025 11:51:18 +0100
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, Michal Kubiak
+	<michal.kubiak@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, "Przemek
+ Kitszel" <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Alexei
+ Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+	"Jesper Dangaard Brouer" <hawk@kernel.org>, John Fastabend
+	<john.fastabend@gmail.com>, Simon Horman <horms@kernel.org>,
+	<bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 07/16] idpf: link NAPIs to queues
+Message-ID: <Z8rPpsAbm9JXOCxZ@boxer>
+References: <20250305162132.1106080-1-aleksander.lobakin@intel.com>
+ <20250305162132.1106080-8-aleksander.lobakin@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250305162132.1106080-8-aleksander.lobakin@intel.com>
+X-ClientProxiedBy: LO4P123CA0357.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:18d::20) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250307100824.555320-1-tianx@yunsilicon.com>
-X-Lms-Return-Path: <lba+267cacd32+58ee53+vger.kernel.org+tianx@yunsilicon.com>
-Content-Type: text/plain; charset=UTF-8
-From: "Xin Tian" <tianx@yunsilicon.com>
-Subject: Re: [PATCH net-next v8 00/14] xsc: ADD Yunsilicon XSC Ethernet Driver
-X-Original-From: Xin Tian <tianx@yunsilicon.com>
-User-Agent: Mozilla Thunderbird
-In-Reply-To: <20250307100824.555320-1-tianx@yunsilicon.com>
-Received: from [127.0.0.1] ([218.1.186.193]) by smtp.feishu.cn with ESMTPS; Fri, 07 Mar 2025 18:40:49 +0800
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|MW4PR11MB6572:EE_
+X-MS-Office365-Filtering-Correlation-Id: a3dac5b4-d9f8-42de-59f6-08dd5d660403
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?XX7e6WYnh0rOXnNb9FmXeyEOtsQDIQfeeG9JLMIjiiFTDR/KkYY3ZbsEFPxW?=
+ =?us-ascii?Q?NgaiYlgnesahtqSdnjCTeufOiDBN3z9eHt2xJoKjlSUOZX6wTJPe6fBwn/gZ?=
+ =?us-ascii?Q?CKGLluQEypVSvaQGhvlzCc9q3Lz7JUpSk71B7eQSmx/JSS24zymayiOdPeOV?=
+ =?us-ascii?Q?eQu3MbFJw3KP1sigDyOaTUELxCCiKGH21pLyEARccYmFuryPgXmgT0fou+jC?=
+ =?us-ascii?Q?R6qcnqarLmNRe9QrNUQjOHGV12TO/AJUEAt4fVxZH87q+rybdBD108XPs31q?=
+ =?us-ascii?Q?Y3EqosDLutQ5wdkYGtB7117tTA5vufe7kOVtLb1qyfgvllR/M2XE0vOPmJIY?=
+ =?us-ascii?Q?lp2v95IxnQuz91e/a8tZxojQ3N6XYNq4UqtlwN7Z8O5xtUZO+IDcpNFSO326?=
+ =?us-ascii?Q?qHp/PROG1FykZsnB5nFu0T/nZwcNeSq+4uOzv+SWblK1TPIj5dv225ymWVnw?=
+ =?us-ascii?Q?mwZuMTJkPOi1x9ZmXpZHfpzlDrJ7ti9ImHZabja1088xT2xvHHnwcnGwd329?=
+ =?us-ascii?Q?JMfbNH7wxje7OHsdP4+V8d6A3qGh6dGJOlgwH2SdwOySSS+81S1Y3Bn86w8u?=
+ =?us-ascii?Q?07DeoXgggFOmWqs7sMhdt8xWz17vfX9t3qzljZ7i9gMt1yaKbXmLcdy/njAz?=
+ =?us-ascii?Q?uAe1lfXdLAFjNjfwtyXyLmpqZcma59w5hv6+Y4tccV5rVi21Q8KKPGSVKnwl?=
+ =?us-ascii?Q?zfwefxFO9Lbrdi8tbEGWBhwcm0aCYRcpE6QB3NHMfFdC1Ps2Fq6CRLo363ph?=
+ =?us-ascii?Q?5b/WH+Hg3Lyan53mkr/34oK8vvmwDS+kuA6XibaTkXJhVGPNrUdrMEJ6o/ae?=
+ =?us-ascii?Q?PUZTzJh8axEYSDDCkfoB1gRPl9OOxCvmx55ZqmIe/BhTO4sKq9bJjyiRXh2C?=
+ =?us-ascii?Q?7fmd2EPfu3G/jyzWpiSvGU7TWGY+9C9a47SYoj/X94gRlx6c0jpts7OU4dqW?=
+ =?us-ascii?Q?AzkUOIHNOBcK2scjY3fs04jA/JPj5tJv9JhMY8pa29t2VD35HWVIM27Tf03Z?=
+ =?us-ascii?Q?IckSPFuyZ6YY6C4DXjBARJ4JFIXcXkm0xPneDXJ7c46kqoLq8YKNbvyVoBEB?=
+ =?us-ascii?Q?TmIzqG4sgf+xHsg7i3iWEdaqZIlK5dBf+m6sV+Dh8Jn2huYTz+QWAc7i3baH?=
+ =?us-ascii?Q?UuBlmIBmyHIJP/er+016Agm0ovs1WzCFxiRiKv932tHWdyLZxrAKGWRtrTLL?=
+ =?us-ascii?Q?AbXjmEgd7jz5Ldniyg8nlt6fXMi3pwKipHOljUVkmIDPkfapfJ0yrTdqU3Bo?=
+ =?us-ascii?Q?TgUuLA3GLNcBKLBJ/8OUsOgAdirhAOykjfUFj71cKsuqakQej2Qu5n05ind3?=
+ =?us-ascii?Q?CQ1XKGX1hE6nuvyjleZYnFm4npH/lVkHijuvfZ4uefNAqet3ZViAd2aDIY54?=
+ =?us-ascii?Q?uCiyNIni96qc9y1/jAKcmn3Vr0rk?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?0gcuRLEURkeNSnukZx2rnGVnnR2Dlm1Caringg5H/GaVJUKQhEZ3q6HdwNZY?=
+ =?us-ascii?Q?bvRVFAA/v/vfHbJyUfQsWB2t1vK5nrSP7OSJYvnXwhmq6wKDm0vr/YjXgAaD?=
+ =?us-ascii?Q?Aka9/cLWz3CDcC6XqoSGJSVHMqTuMhzsytjGkFsu1O23OyXl8UCi+CSoRn5e?=
+ =?us-ascii?Q?vOLWgWq/v8eTtBJQZDF0t2TYHK7fFAQyrH/eOYfPh6SLPY62KN8xNbyv0lmn?=
+ =?us-ascii?Q?Ff5WT32K4vdh7GR9OLmGppuPrgD3qeNKjSXmw6cUTq7a9e9t3ho6xNoXfZU4?=
+ =?us-ascii?Q?PYcPQcqw6uQu7XwhST1YmyD3pOeD96Qa8NJ3NWhmZl7rJOV51j5t+/v2aM79?=
+ =?us-ascii?Q?3yZgtc0KmOtmerKtiwOjrQuKkQ8zYQouF357dY0PShKA2QZrBYmUZDFz6oCI?=
+ =?us-ascii?Q?+kkqTV1GWvuL3yf8+soTdfKfTLlPGa3aGZQLqaYXmzQg/v8JhDOvd0cNZwzX?=
+ =?us-ascii?Q?BNkTFYXOwJw6hXIaYSbE6pdWR8mFfVN7bk7fiBHtPRITRuKayGL9mHXIigzK?=
+ =?us-ascii?Q?IEpdWv6c3OTdKDRm2LjHcvc1G5F5fBhNmsfi58nrYBGhUZgj2rrSXzmBUmT4?=
+ =?us-ascii?Q?bOQ0BDna5nyeJvHBW8DMz1CS0bAyVrCBEb/hHeUDe1K+wX1BlyOceXiRJmaC?=
+ =?us-ascii?Q?nTDZXQ/cBkJb8v5vg+GJnVtN/pTcvJTp1DHhja9vFQ9hg2BcgpTRSh7zXmxV?=
+ =?us-ascii?Q?JAalOlgvmtyE83fVSETQ/ZDFjcjgE1FjezbLTQllGv/gUZqEGyB0yw3c+g5n?=
+ =?us-ascii?Q?isDXr7jARv4o5az1TJrc+FapDU5QRZrSKBuFNlbMoxECsMr/cLnldCile6Fv?=
+ =?us-ascii?Q?sw3LTkL05nn99FWouxewvVyjuo4RgaNChZaiy6nOyAsnpCw1zMxBr5mEbcEO?=
+ =?us-ascii?Q?1+SFWIvlBstsDQ/gpCIm8bv7yjn9xOFBkQj0VSof4tRrU8qq74i/+8JkITJD?=
+ =?us-ascii?Q?GUgI8yu8jrmFFHjY5EpEQQrkk+BjLGbfLVT8T9wb/M7i95/8HFIq89YQLKVz?=
+ =?us-ascii?Q?z2QY8yZ5upXRDgRFYJZnwudz5DG80Oio8NkFYUCi75rgjdLA8vCzW9qvipLI?=
+ =?us-ascii?Q?rXBJUhCii4q97uK6zUEb4XCP/3vZ+P7aCmyznP+Qj9A+WFy2T6Hqf83nqUT0?=
+ =?us-ascii?Q?iiR6x6vosz+/ibQOq8rrOqLxadiL9TGAcCqQz1cPIJDI7pbVhc1l0b+ZDRQe?=
+ =?us-ascii?Q?O19PiiuYY/gKw9aFIpkpe7BNecL6UGK2ZYH1LZnqOO9E7S18PR81wBidxhQ7?=
+ =?us-ascii?Q?PSITi40V9M1RJf14gmlk/t+9fJ+NmwZ4OruihAnCJHdVlmAFR4W3SJ+LzN7F?=
+ =?us-ascii?Q?U2wcBhQ3VYm3GVzTGlWUCEzFDgVfEa0W+b/+OYeWyFwo0Hno+okEJSn9YeiZ?=
+ =?us-ascii?Q?zGhqr0z53g4kAfYeIXHcwLG+oKUCzNXFp7Q6lV/1KAE4K/ygBfMZofM+/rD9?=
+ =?us-ascii?Q?MXUtt1KQNoG86IWRS2et8xiymiSU7ayGEdJOaWtCthj8wvUyjzOaPjz8U14F?=
+ =?us-ascii?Q?swpujn59L/NQ2a1qa5/hTQh80lNusWky1GWwgaERYnwrFZHul6qk/A5s8vnK?=
+ =?us-ascii?Q?t0TU1iLAWPHEBnRSm5B7Jn4xWcvLektCxSr9skDtwAUJ9rDovIzlosMI/3cu?=
+ =?us-ascii?Q?CA=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: a3dac5b4-d9f8-42de-59f6-08dd5d660403
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Mar 2025 10:51:29.3129
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: pnvxfZOesmyGa5CWJH8nHzeCNnAK75tSXeDdyaz1PQY34L00lUNB2LU6oNzVtYufZ7gbxrg3ApUVOgmRMGuG3q7rQjZFhI/u/aO6p5qaMAw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6572
+X-OriginatorOrg: intel.com
 
-Hi, Jakub, Simon, all
+On Wed, Mar 05, 2025 at 05:21:23PM +0100, Alexander Lobakin wrote:
+> Add the missing linking of NAPIs to netdev queues when enabling
+> interrupt vectors in order to support NAPI configuration and
+> interfaces requiring get_rx_queue()->napi to be set (like XSk
+> busy polling).
+> 
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> ---
+>  drivers/net/ethernet/intel/idpf/idpf_txrx.c | 30 +++++++++++++++++++++
+>  1 file changed, 30 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> index 2f221c0abad8..a3f6e8cff7a0 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> @@ -3560,8 +3560,11 @@ void idpf_vport_intr_rel(struct idpf_vport *vport)
+>  static void idpf_vport_intr_rel_irq(struct idpf_vport *vport)
+>  {
+>  	struct idpf_adapter *adapter = vport->adapter;
+> +	bool unlock;
+>  	int vector;
+>  
+> +	unlock = rtnl_trylock();
+> +
+>  	for (vector = 0; vector < vport->num_q_vectors; vector++) {
+>  		struct idpf_q_vector *q_vector = &vport->q_vectors[vector];
+>  		int irq_num, vidx;
+> @@ -3573,8 +3576,23 @@ static void idpf_vport_intr_rel_irq(struct idpf_vport *vport)
+>  		vidx = vport->q_vector_idxs[vector];
+>  		irq_num = adapter->msix_entries[vidx].vector;
+>  
+> +		for (u32 i = 0; i < q_vector->num_rxq; i++)
+> +			netif_queue_set_napi(vport->netdev,
+> +					     q_vector->rx[i]->idx,
+> +					     NETDEV_QUEUE_TYPE_RX,
+> +					     NULL);
+> +
+> +		for (u32 i = 0; i < q_vector->num_txq; i++)
+> +			netif_queue_set_napi(vport->netdev,
+> +					     q_vector->tx[i]->idx,
+> +					     NETDEV_QUEUE_TYPE_TX,
+> +					     NULL);
+> +
 
-Our patch set is quite large, and the feedback so far has mainly focused on
-the first 7 patches, with less attention on the later ones.
+maybe we could have a wrapper for this?
 
-To make it easier to review and merge, I'm considering splitting the 
-patch set
-into two parts: submitting the PCI driver now and the Ethernet driver
-in a later series.
+static void idpf_q_set_napi(struct net_device *netdev,
+			    struct idpf_q_vector *q_vector,
+			    enum netdev_queue_type q_type,
+			    struct napi_struct *napi)
+{
+	u32 q_cnt = q_type == NETDEV_QUEUE_TYPE_RX ? q_vector->num_rxq :
+						     q_vector->num_txq;
+	struct idpf_rx_queue **qs = q_type == NETDEV_QUEUE_TYPE_RX ?
+					      q_vector->rx : q_vector->tx;
 
-Would this approach be better? Is it appropriate to submit a PCI driver
-without actual functionality to net-next?
+	for (u32 i = 0; i < q_cnt; i++)
+		netif_queue_set_napi(netdev, qs[i]->idx, q_type, napi);
+}
 
-Thanks,
-Xin
+idpf_q_set_napi(vport->netdev, q_vector, NETDEV_QUEUE_TYPE_RX, NULL);
+idpf_q_set_napi(vport->netdev, q_vector, NETDEV_QUEUE_TYPE_TX, NULL);
+...
+idpf_q_set_napi(vport->netdev, q_vector, NETDEV_QUEUE_TYPE_RX, &q_vector->napi);
+idpf_q_set_napi(vport->netdev, q_vector, NETDEV_QUEUE_TYPE_TX, &q_vector->napi);
 
 
-On 2025/3/7 18:09, Xin Tian wrote:
-> The patch series adds the xsc driver, which will support the YunSilicon
-> MS/MC/MV series of network cards. These network cards offer support for
-> high-speed Ethernet and RDMA networking, with speeds of up to 200Gbps.
->
-> The Ethernet functionality is implemented by two modules. One is a
-> PCI driver(xsc_pci), which provides PCIe configuration,
-> CMDQ service (communication with firmware), interrupt handling,
-> hardware resource management, and other services, while offering
-> common interfaces for Ethernet and future InfiniBand drivers to
-> utilize hardware resources. The other is an Ethernet driver(xsc_eth),
-> which handles Ethernet interface configuration and data
-> transmission/reception.
->
-> - Patches 1-7 implement the PCI driver
-> - Patches 8-14 implement the Ethernet driver
->
-> This submission is the first phase, which includes the PF-based Ethernet
-> transmit and receive functionality. Once this is merged, we will submit
-> additional patches to implement support for other features, such as SR-IOV,
-> ethtool support, and a new RDMA driver.
->
-> Change v7->v8:
-> Link to v7: https://lore.kernel.org/netdev/20250228154122.216053-1-tianx@yunsilicon.com/
-> 1. add Kconfig NET_VENDOR_YUNSILICON depneds on COMPILE_TEST (Jakub)
-> 2. rm unnecessary "default n" (Jakub)
-> 3. select PAGE_POOL in ETH driver (Jakub)
-> 4. simplify dma_mask set (Jakub)
-> 5. del pci_state and pci_state_mutex (Kalesh)
-> 6. I checked and droped intf_state and int_state_mutex too
-> 7. del some no need lables in patch1 (Kalesh)
-> 8. ensure consistent label naming throughout the patchset (Simon)
-> 9. WARN_ONCE instead of meaningless comments (Simon)
-> 10. nits
->
-> Change v6->v7:
-> Link to v6: https://lore.kernel.org/netdev/20250227082558.151093-1-tianx@yunsilicon.com/
-> 1. use _pool_zalloc/vzalloc instead of (_pool_alloc/vmalloc + memset 0)
-> 2. correct kfree for kvmalloc memory
-> 3. del comment using NULL adapter pointer
-> 4. correct num_dma type to int in xsc_eth_tx.c
-> - Jakub Kicinski
->
-> Change v5->v6:
-> Link to v5: https://lore.kernel.org/netdev/20250224172416.2455751-1-tianx@yunsilicon.com/
-> 1. fix error return in xsc_adev_init
-> - Jakub Kicinski
-> 2. comment style // -> /* ... */
-> 3. remove XSC_ADEV_IDX_MAX, and use ARRAY_SIZE() instead
-> 4. kcalloc for array alloc instead of kzalloc
-> - Leon Romanovsky
-> 5. prefetch/perfetchw to net_prefetch/net_prefetch
-> - Joe Damato
->
-> Changes v4->v5:
-> Link to v4: https://lore.kernel.org/netdev/20250213091402.2067626-1-tianx@yunsilicon.com/
-> 1. free xsc_adev in release callback
-> - Leon Romanovsky
-> 2. Add more detailed description for patches
-> 3. use FIELD_PREP() and FIELD_GET() instead of XSC_SET/GET_FIELD
-> 4. fix sparse complains about endian and types
-> 5. use unsigned types for unsigned values
-> 6. del BITS_PER_LONG == 64 check in xsc_buf_alloc
-> 7. use GENMASK and DIV_ROUND_UP to replace the unclear code
-> - Simon Horman
->
-> Changes v3->v4:
-> Link to v3: https://lore.kernel.org/netdev/20250115102242.3541496-1-tianx@yunsilicon.com/
-> 1. pci_ioremap_bar returns a negative value in pci_init.
-> 2. Adjust the declaration order to follow the reverse xmastree rule.
-> 3. Split lines that exceed 80 columns.
-> 4. Use XSC_SET_FIELD and XSC_GET_FIELD instead of bitfields.
-> - Simon Horman
-> 5. Use big-endian consistently in cmds
-> 6. Add comments for sem and rsv0.
-> 7. Change mode to enum in xsc_cmd, and rename bitmask to cmd_entry_mask.
-> 8. Remove unnecessary header files such as kernel.h and init.h.
-> 9. Add the xsc prefix to function names.
-> 10. Return ENOSPC if alloc_ent fails.
-> 11. Adjust the position of free_cmd.
-> 12. Separate different categories of #include statements with blank lines.
-> 13. Use status instead of admin_status xsc_event_set_port_admin_status_mbox_in
-> - Przemek Kitszel
->
-> Changes v2->v3:
-> Link to v2: https://lore.kernel.org/netdev/20241230101513.3836531-1-tianx@yunsilicon.com/
-> 1. Use auxiliary bus for ethernet functionality.
-> - Leon Romanovsky comments
-> 2. Remove netdev from struct xsc_core_device, as it can be accessed via eth_priv.
-> - Andrew Lunn comments
->
-> Changes v1->v2:
-> Link to v1: https://lore.kernel.org/netdev/20241218105023.2237645-1-tianx@yunsilicon.com/
-> 1. Remove the last two patches to reduce the total code submitted.
-> - Jakub Kicinski comments
-> 2. Remove the custom logging interfaces and switch to using
->     pci_xxx/netdev_xxx logging interfaces. Delete the related
->     module parameters.
-> 3. No use of inline functions in .c files.
-> 4. Remove unnecessary license information.
-> 5. Remove unnecessary void casts.
-> - Andrew Lunn comments
-> 6. Use double underscore (__) for header file macros.
-> 7. Fix the depend field in Kconfig.
-> 8. Add sign-off for co-developers.
-> 9. use string directly in MODULE_DESCRIPTION
-> 10. Fix poor formatting issues in the code.
-> 11. Modify some macros that don't use the XSC_ prefix.
-> 12. Remove unused code from xsc_cmd.h that is not part of this patch series.
-> 13. No comma after items in a complete enum.
-> 14. Use the BIT() macro to define constants related to bit operations.
-> 15. Add comments to clarify names like ver, cqe, eqn, pas, etc.
-> - Przemek Kitszel comments
->
-> Changes v0->v1:
-> 1. name xsc_core_device as xdev instead of dev
-> 2. modify Signed-off-by tag to Co-developed-by
-> 3. remove some obvious comments
-> 4. remove unnecessary zero-init and NULL-init
-> 5. modify bad-named goto labels
-> 6. reordered variable declarations according to the RCT rule
-> - Przemek Kitszel comments
-> 7. add MODULE_DESCRIPTION()
-> - Jeff Johnson comments
-> 8. remove unnecessary dev_info logs
-> 9. replace these magic numbers with #defines in xsc_eth_common.h
-> 10. move code to right place
-> 11. delete unlikely() used in probe
-> 12. remove unnecessary reboot callbacks
-> - Andrew Lunn comments
->
-> Xin Tian (14):
->    xsc: Add xsc driver basic framework
->    xsc: Enable command queue
->    xsc: Add hardware setup APIs
->    xsc: Add qp and cq management
->    xsc: Add eq and alloc
->    xsc: Init pci irq
->    xsc: Init auxiliary device
->    xsc: Add ethernet interface
->    xsc: Init net device
->    xsc: Add eth needed qp and cq apis
->    xsc: ndo_open and ndo_stop
->    xsc: Add ndo_start_xmit
->    xsc: Add eth reception data path
->    xsc: add ndo_get_stats64
->
->   MAINTAINERS                                   |    7 +
->   drivers/net/ethernet/Kconfig                  |    1 +
->   drivers/net/ethernet/Makefile                 |    1 +
->   drivers/net/ethernet/yunsilicon/Kconfig       |   26 +
->   drivers/net/ethernet/yunsilicon/Makefile      |    8 +
->   .../yunsilicon/xsc/common/xsc_auto_hw.h       |   94 +
->   .../ethernet/yunsilicon/xsc/common/xsc_cmd.h  |  630 ++++++
->   .../ethernet/yunsilicon/xsc/common/xsc_cmdq.h |  234 ++
->   .../ethernet/yunsilicon/xsc/common/xsc_core.h |  500 +++++
->   .../yunsilicon/xsc/common/xsc_device.h        |   77 +
->   .../yunsilicon/xsc/common/xsc_driver.h        |   25 +
->   .../ethernet/yunsilicon/xsc/common/xsc_pp.h   |   38 +
->   .../net/ethernet/yunsilicon/xsc/net/Kconfig   |   17 +
->   .../net/ethernet/yunsilicon/xsc/net/Makefile  |    9 +
->   .../net/ethernet/yunsilicon/xsc/net/main.c    | 1984 +++++++++++++++++
->   .../net/ethernet/yunsilicon/xsc/net/xsc_eth.h |   55 +
->   .../yunsilicon/xsc/net/xsc_eth_common.h       |  239 ++
->   .../ethernet/yunsilicon/xsc/net/xsc_eth_rx.c  |  601 +++++
->   .../yunsilicon/xsc/net/xsc_eth_stats.c        |   46 +
->   .../yunsilicon/xsc/net/xsc_eth_stats.h        |   34 +
->   .../ethernet/yunsilicon/xsc/net/xsc_eth_tx.c  |  321 +++
->   .../yunsilicon/xsc/net/xsc_eth_txrx.c         |  188 ++
->   .../yunsilicon/xsc/net/xsc_eth_txrx.h         |   91 +
->   .../ethernet/yunsilicon/xsc/net/xsc_eth_wq.c  |   80 +
->   .../ethernet/yunsilicon/xsc/net/xsc_eth_wq.h  |  187 ++
->   .../net/ethernet/yunsilicon/xsc/net/xsc_pph.h |  180 ++
->   .../ethernet/yunsilicon/xsc/net/xsc_queue.h   |  206 ++
->   .../net/ethernet/yunsilicon/xsc/pci/Kconfig   |   14 +
->   .../net/ethernet/yunsilicon/xsc/pci/Makefile  |   10 +
->   .../net/ethernet/yunsilicon/xsc/pci/adev.c    |  115 +
->   .../net/ethernet/yunsilicon/xsc/pci/adev.h    |   14 +
->   .../net/ethernet/yunsilicon/xsc/pci/alloc.c   |  234 ++
->   .../net/ethernet/yunsilicon/xsc/pci/alloc.h   |   17 +
->   .../net/ethernet/yunsilicon/xsc/pci/cmdq.c    | 1568 +++++++++++++
->   drivers/net/ethernet/yunsilicon/xsc/pci/cq.c  |  155 ++
->   drivers/net/ethernet/yunsilicon/xsc/pci/cq.h  |   14 +
->   drivers/net/ethernet/yunsilicon/xsc/pci/eq.c  |  340 +++
->   drivers/net/ethernet/yunsilicon/xsc/pci/eq.h  |   46 +
->   drivers/net/ethernet/yunsilicon/xsc/pci/hw.c  |  283 +++
->   drivers/net/ethernet/yunsilicon/xsc/pci/hw.h  |   18 +
->   .../net/ethernet/yunsilicon/xsc/pci/main.c    |  326 +++
->   .../net/ethernet/yunsilicon/xsc/pci/pci_irq.c |  426 ++++
->   .../net/ethernet/yunsilicon/xsc/pci/pci_irq.h |   14 +
->   drivers/net/ethernet/yunsilicon/xsc/pci/qp.c  |  194 ++
->   drivers/net/ethernet/yunsilicon/xsc/pci/qp.h  |   14 +
->   .../net/ethernet/yunsilicon/xsc/pci/vport.c   |   32 +
->   46 files changed, 9713 insertions(+)
->   create mode 100644 drivers/net/ethernet/yunsilicon/Kconfig
->   create mode 100644 drivers/net/ethernet/yunsilicon/Makefile
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_auto_hw.h
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_cmd.h
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_cmdq.h
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_device.h
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_driver.h
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_pp.h
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/Kconfig
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/Makefile
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/main.c
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth.h
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_common.h
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_rx.c
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_stats.c
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_stats.h
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_tx.c
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_txrx.c
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_txrx.h
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_wq.c
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_wq.h
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_pph.h
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_queue.h
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/Makefile
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/adev.c
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/adev.h
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/alloc.c
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/alloc.h
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/cmdq.c
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/cq.c
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/cq.h
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/eq.c
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/eq.h
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/hw.c
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/hw.h
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/main.c
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/pci_irq.c
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/pci_irq.h
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/qp.c
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/qp.h
->   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/vport.c
->
-> --
-> 2.43.0
+up to you if you take it, less lines in the end but i don't have strong
+opinion if this should be considered as an improvement or makes code
+harder to follow.
+
+>  		kfree(free_irq(irq_num, q_vector));
+>  	}
+> +
+> +	if (unlock)
+> +		rtnl_unlock();
+>  }
+>  
+>  /**
+> @@ -3760,6 +3778,18 @@ static int idpf_vport_intr_req_irq(struct idpf_vport *vport)
+>  				   "Request_irq failed, error: %d\n", err);
+>  			goto free_q_irqs;
+>  		}
+> +
+> +		for (u32 i = 0; i < q_vector->num_rxq; i++)
+> +			netif_queue_set_napi(vport->netdev,
+> +					     q_vector->rx[i]->idx,
+> +					     NETDEV_QUEUE_TYPE_RX,
+> +					     &q_vector->napi);
+> +
+> +		for (u32 i = 0; i < q_vector->num_txq; i++)
+> +			netif_queue_set_napi(vport->netdev,
+> +					     q_vector->tx[i]->idx,
+> +					     NETDEV_QUEUE_TYPE_TX,
+> +					     &q_vector->napi);
+>  	}
+>  
+>  	return 0;
+> -- 
+> 2.48.1
+> 
 
