@@ -1,170 +1,251 @@
-Return-Path: <netdev+bounces-173091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A89EA5725D
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 20:44:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDE55A57234
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 20:40:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5CED97AC47E
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 19:43:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08580179D53
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 19:40:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78E832580EE;
-	Fri,  7 Mar 2025 19:43:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB43B25487A;
+	Fri,  7 Mar 2025 19:40:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="fHPdtiOS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="stPffzks"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B534B2580D1;
-	Fri,  7 Mar 2025 19:43:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E2F1A3035
+	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 19:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741376585; cv=none; b=AKa/9wZPDRPGtQpP+XzUdtw3SbMxZ53ny6YUK7EtB7GDjWxeMoQUlC7zNDIWR1vMnKdFDnRGcvxBMAk/NdCuGKZlUy1IMZuU1k9fDl2jq/TamCQTuNHnp3VSpigb5vec/bF7IUod6CqPCslMJMDmYuDT/b6B8eIuaUCHxqLjPh0=
+	t=1741376407; cv=none; b=r6ZhVpS5lkmXGtD2UzScl9WDOyNXAHgImLa18RRUmZ8Qebnn6dqsgwno5snEPZFqKKqSGM1pcAVdQZpEaWcc4k3exn26ZzzLOOe10FAAWsSiizpKZL4cJRDczE8kuZ6ZjhEO5Lu7bO+7S5nmFJXzzKtTek+tLsNFKyqZM7o7cG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741376585; c=relaxed/simple;
-	bh=G2eSMS2e9q8SwXL5Z4p69FWUFRoVsDY4SfoyvS5ljgM=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=cEKCxqKmCRhDL072mt1IGqLAUPlCidoUJaZ0Kcihr0yS5M/akc2rcBc9iXkfb09FY2G2wv2Id5r1ovZjpJnU6eJAmf5i9fW+CJGdnReSn0uxz0IVxNNEY6MmVvUKrA/uyfEcn+Weu+ND8TdmE6TniS2o2nDN+vAzHmeyxfOFRTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=fHPdtiOS; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [127.0.0.1] ([76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 527Jde7i398116
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Fri, 7 Mar 2025 11:39:40 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 527Jde7i398116
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025021701; t=1741376383;
-	bh=cO+5YT2XMi/UzC8lhZJSeth7x72+w0kQRpcBJNMS6Ts=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=fHPdtiOSVjdSykmi/mB1spB73R3ivN6H0Ulf7jwPVmevYxtXxnBZr3Iv/Wjl6gu4Q
-	 c2aJ3CtYbosOgfw1LhpaWEy9x7CJcqVCiL9oM6u+leV+apE+5D069ypMUoYQ+sy/Wf
-	 91fo2MFzx6M5FaNHwq7sbvJjzCJXZOHyDCg2kmIZjZe8FjGw9L/KmFoCj72SQTFf65
-	 vhldOnPwe3Hsizp8OwyJMh+1CqfBV3DirGTtBEspDqzU4yHuiPHpZYfUsH3ckbSyXB
-	 HxsUkTpIVyzS0USApyUo2Bt1yuCyHQBjoti6HCBTdRqQsLdFflChYlrMEVTIJaAxv3
-	 YZBS8e8ebrsPA==
-Date: Fri, 07 Mar 2025 11:39:38 -0800
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: David Laight <david.laight.linux@gmail.com>,
-        Jiri Slaby <jirislaby@kernel.org>
-CC: Ingo Molnar <mingo@kernel.org>, Kuan-Wei Chiu <visitorckw@gmail.com>,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, jk@ozlabs.org,
-        joel@jms.id.au, eajames@linux.ibm.com, andrzej.hajda@intel.com,
-        neil.armstrong@linaro.org, rfoss@kernel.org,
-        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-        tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
-        dmitry.torokhov@gmail.com, mchehab@kernel.org, awalls@md.metrocast.net,
-        hverkuil@xs4all.nl, miquel.raynal@bootlin.com, richard@nod.at,
-        vigneshr@ti.com, louis.peens@corigine.com, andrew+netdev@lunn.ch,
-        davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-        parthiban.veerasooran@microchip.com, arend.vanspriel@broadcom.com,
-        johannes@sipsolutions.net, gregkh@linuxfoundation.org,
-        yury.norov@gmail.com, akpm@linux-foundation.org, alistair@popple.id.au,
-        linux@rasmusvillemoes.dk, Laurent.pinchart@ideasonboard.com,
-        jonas@kwiboo.se, jernej.skrabec@gmail.com, kuba@kernel.org,
-        linux-kernel@vger.kernel.org, linux-fsi@lists.ozlabs.org,
-        dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
-        oss-drivers@corigine.com, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev,
-        brcm80211-dev-list.pdl@broadcom.com, linux-serial@vger.kernel.org,
-        bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw,
-        Yu-Chun Lin <eleanor15x@gmail.com>
-Subject: Re: [PATCH v3 01/16] bitops: Change parity8() return type to bool
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20250307193643.28065d2d@pumpkin>
-References: <20250306162541.2633025-1-visitorckw@gmail.com> <20250306162541.2633025-2-visitorckw@gmail.com> <9d4b77da-18c5-4551-ae94-a2b9fe78489a@kernel.org> <Z8ra0s9uRoS35brb@gmail.com> <a4040c78-8765-425e-a44e-c374dfc02a9c@kernel.org> <20250307193643.28065d2d@pumpkin>
-Message-ID: <20B9425B-E824-4FB0-9D91-42FDB04EC3C9@zytor.com>
+	s=arc-20240116; t=1741376407; c=relaxed/simple;
+	bh=oyRMjAqGnfQQHmLgjV78x/4R3peXUKoay360NwNzYfc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XKLN/t0vjWqhehEXTN+f+muNcvtfx9JnylMO6Acxcta5oEFL5aIgJUCzqOJxE40rDE5JuGEV83x6t14LzMJOoMsUSAu64lMCaFR2xRdu9F8zQMMnl6nMXX+HpRsFE4+nrs4voH6xld2KPZVZLbPkIiCc34R6AbyVqBhPtt/36tY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=stPffzks; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7c3c9f7b1a6so218116185a.1
+        for <netdev@vger.kernel.org>; Fri, 07 Mar 2025 11:40:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741376404; x=1741981204; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CMJaSvLeeirPf/s58yRLtR6M+vJYyaJur+fzyjrXM2U=;
+        b=stPffzksdoNpwHc3we9muxyOOqOrt+0Jyw6f/b1S3+4ODuGCXN0ycP3vAEAkwVh9lX
+         y9V6U6HU3nMlhWa/8qN1cRYLUvw8uO+f9Kmq8jXcJ6xLtq37abdyJlGDOLlX19AJjjjK
+         1Tjpxjb0HtBikICcJhQ1aB6L09KSIT0vnA1ru68uwFHI1QF/ulc0WR+kPJVGjtBE29w5
+         WMoE4ar4IQ5CY3JUXwG9Oo2cnq+cUEpU9ZHQIWlZfa1Wi5DZ75Hh27zzaeFHNWnMC+n0
+         8jANkE0F7mTb8PqAXPwMHCE2BiTHArjzz6JVB1ttuOlyBsZfAnPTijMJpvxBL/tR3PJv
+         yLBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741376404; x=1741981204;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CMJaSvLeeirPf/s58yRLtR6M+vJYyaJur+fzyjrXM2U=;
+        b=PeQlPIoEiAwosZEyYHMOsCpRnj5bKduriy3BCIMzCGAPypcrjGuJuJYTNYDLB3Yg5Y
+         N2zdbe2+5pAi9g3sdpXQrUqmx08pyIT5ESAI76WbIq1L23Tx9k6kgWTj4xaH9A8ndib5
+         ji4U/I6X1aGk0wRkKVGoH6bp2ps8YNMVqDcXr09/dWPhkemhKskfcLkSMYy0410Rcz0V
+         ZWehT1nCv6+ZdXptdqlmY/A9vK61lQMItLarIUilbz9On8VW0Tcf7hkTcSr1oFPPbqIY
+         uRHzKCWKgWHmfepVAy6UplDAmUGa4hWrK5/k/GzKAW4+wkRnvhszU7Uq3xBSjNXhuxsn
+         DmyA==
+X-Gm-Message-State: AOJu0Yx8/mRXFKFJcVKwSsD2VRm5ZKnp7Pz+FHewq0iR7zpqloBUSyHT
+	MayW757g8vyObDET5o6GkkpBcM//SId7x+aSU32R7JdAgdFjMhnFW5lcD2r7FOc64KMriu3CHc2
+	3200UrDHkNg+vx0Nb2nhPzFrFEpIGsbxV8i3t
+X-Gm-Gg: ASbGncsnNDynnRdlnJkeGOXOxGJmXGGfQjNoapMXKY6X9uMlV0azJDrrDpvLHbVGpzX
+	c/mDW1fPGgzQukqJc2fZu20gsJGEExt8oto5b0VRwyuvW2N96pGeCPUK/aIew0gp5xTYMhA/Z2L
+	W9rQt9FqXG1r/1FBS5JV6ZR4qfweM=
+X-Google-Smtp-Source: AGHT+IE9PWhHB/UGbrg+mOKX/PMS2ThEvK4aTWPU5vvRv6A/EIys1lPC14D7fdJ8fcsTZ4R4RcwaGlW6XHLzJHjkluQ=
+X-Received: by 2002:a05:620a:2602:b0:7c0:b018:5934 with SMTP id
+ af79cd13be357-7c53c8d9211mr98616385a.27.1741376404299; Fri, 07 Mar 2025
+ 11:40:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+References: <20250305163732.2766420-1-sdf@fomichev.me> <20250305163732.2766420-3-sdf@fomichev.me>
+In-Reply-To: <20250305163732.2766420-3-sdf@fomichev.me>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 7 Mar 2025 20:39:53 +0100
+X-Gm-Features: AQ5f1JrIATmH567IbjVVYL1ZwPo1bnHykRjZCQobzjsXzbFFR_szQbIgdN0rihs
+Message-ID: <CANn89iJemkvpsQ6LgefYvBBC_foXr=1wrwf7QN25wpX-2QZPiQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v10 02/14] net: hold netdev instance lock during
+ nft ndo_setup_tc
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, Saeed Mahameed <saeed@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On March 7, 2025 11:36:43 AM PST, David Laight <david=2Elaight=2Elinux@gmai=
-l=2Ecom> wrote:
->On Fri, 7 Mar 2025 12:42:41 +0100
->Jiri Slaby <jirislaby@kernel=2Eorg> wrote:
+On Wed, Mar 5, 2025 at 5:37=E2=80=AFPM Stanislav Fomichev <sdf@fomichev.me>=
+ wrote:
 >
->> On 07=2E 03=2E 25, 12:38, Ingo Molnar wrote:
->> >=20
->> > * Jiri Slaby <jirislaby@kernel=2Eorg> wrote:
->> >  =20
->> >> On 06=2E 03=2E 25, 17:25, Kuan-Wei Chiu wrote: =20
->> >>> Change return type to bool for better clarity=2E Update the kernel =
-doc
->> >>> comment accordingly, including fixing "@value" to "@val" and adjust=
-ing
->> >>> examples=2E Also mark the function with __attribute_const__ to allo=
-w
->> >>> potential compiler optimizations=2E
->> >>>
->> >>> Co-developed-by: Yu-Chun Lin <eleanor15x@gmail=2Ecom>
->> >>> Signed-off-by: Yu-Chun Lin <eleanor15x@gmail=2Ecom>
->> >>> Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail=2Ecom>
->> >>> ---
->> >>>    include/linux/bitops=2Eh | 10 +++++-----
->> >>>    1 file changed, 5 insertions(+), 5 deletions(-)
->> >>>
->> >>> diff --git a/include/linux/bitops=2Eh b/include/linux/bitops=2Eh
->> >>> index c1cb53cf2f0f=2E=2E44e5765b8bec 100644
->> >>> --- a/include/linux/bitops=2Eh
->> >>> +++ b/include/linux/bitops=2Eh
->> >>> @@ -231,26 +231,26 @@ static inline int get_count_order_long(unsign=
-ed long l)
->> >>>    /**
->> >>>     * parity8 - get the parity of an u8 value
->> >>> - * @value: the value to be examined
->> >>> + * @val: the value to be examined
->> >>>     *
->> >>>     * Determine the parity of the u8 argument=2E
->> >>>     *
->> >>>     * Returns:
->> >>> - * 0 for even parity, 1 for odd parity
->> >>> + * false for even parity, true for odd parity =20
->> >>
->> >> This occurs somehow inverted to me=2E When something is in parity me=
-ans that
->> >> it has equal number of 1s and 0s=2E I=2Ee=2E return true for even di=
-stribution=2E
->> >> Dunno what others think? Or perhaps this should be dubbed odd_parity=
-() when
->> >> bool is returned? Then you'd return true for odd=2E =20
->> >=20
->> > OTOH:
->> >=20
->> >   - '0' is an even number and is returned for even parity,
->> >   - '1' is an odd  number and is returned for odd  parity=2E =20
->>=20
->> Yes, that used to make sense for me=2E For bool/true/false, it no longe=
-r=20
->> does=2E But as I wrote, it might be only me=2E=2E=2E
+> Introduce new dev_setup_tc for nft ndo_setup_tc paths.
 >
->No me as well, I've made the same comment before=2E
->When reading code I don't want to have to look up a function definition=
-=2E
->There is even scope for having parity_odd() and parity_even()=2E
->And, with the version that shifts a constant right you want to invert
->the constant!
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
+> Cc: Saeed Mahameed <saeed@kernel.org>
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> ---
+>  drivers/net/ethernet/intel/iavf/iavf_main.c |  2 --
+>  include/linux/netdevice.h                   |  2 ++
+>  net/core/dev.c                              | 18 ++++++++++++++++++
+>  net/netfilter/nf_flow_table_offload.c       |  2 +-
+>  net/netfilter/nf_tables_offload.c           |  2 +-
+>  5 files changed, 22 insertions(+), 4 deletions(-)
 >
->	David
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/et=
+hernet/intel/iavf/iavf_main.c
+> index 9f4d223dffcf..032e1a58af6f 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+> @@ -3894,10 +3894,8 @@ static int __iavf_setup_tc(struct net_device *netd=
+ev, void *type_data)
+>         if (test_bit(__IAVF_IN_REMOVE_TASK, &adapter->crit_section))
+>                 return 0;
 >
+> -       netdev_lock(netdev);
+>         netif_set_real_num_rx_queues(netdev, total_qps);
+>         netif_set_real_num_tx_queues(netdev, total_qps);
+> -       netdev_unlock(netdev);
 >
+>         return ret;
+>  }
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 33066b155c84..69951eeb96d2 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -3353,6 +3353,8 @@ int dev_alloc_name(struct net_device *dev, const ch=
+ar *name);
+>  int dev_open(struct net_device *dev, struct netlink_ext_ack *extack);
+>  void dev_close(struct net_device *dev);
+>  void dev_close_many(struct list_head *head, bool unlink);
+> +int dev_setup_tc(struct net_device *dev, enum tc_setup_type type,
+> +                void *type_data);
+>  void dev_disable_lro(struct net_device *dev);
+>  int dev_loopback_xmit(struct net *net, struct sock *sk, struct sk_buff *=
+newskb);
+>  u16 dev_pick_tx_zero(struct net_device *dev, struct sk_buff *skb,
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 7a327c782ea4..57af25683ea1 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -1786,6 +1786,24 @@ void dev_close(struct net_device *dev)
+>  }
+>  EXPORT_SYMBOL(dev_close);
 >
+> +int dev_setup_tc(struct net_device *dev, enum tc_setup_type type,
+> +                void *type_data)
+> +{
+> +       const struct net_device_ops *ops =3D dev->netdev_ops;
+> +       int ret;
+> +
+> +       ASSERT_RTNL();
+> +
+> +       if (!ops->ndo_setup_tc)
+> +               return -EOPNOTSUPP;
+> +
+> +       netdev_lock_ops(dev);
+> +       ret =3D ops->ndo_setup_tc(dev, type, type_data);
+> +       netdev_unlock_ops(dev);
+> +
+> +       return ret;
+> +}
+> +EXPORT_SYMBOL(dev_setup_tc);
+>
+>  /**
+>   *     dev_disable_lro - disable Large Receive Offload on a device
+> diff --git a/net/netfilter/nf_flow_table_offload.c b/net/netfilter/nf_flo=
+w_table_offload.c
+> index e06bc36f49fe..0ec4abded10d 100644
+> --- a/net/netfilter/nf_flow_table_offload.c
+> +++ b/net/netfilter/nf_flow_table_offload.c
+> @@ -1175,7 +1175,7 @@ static int nf_flow_table_offload_cmd(struct flow_bl=
+ock_offload *bo,
+>         nf_flow_table_block_offload_init(bo, dev_net(dev), cmd, flowtable=
+,
+>                                          extack);
+>         down_write(&flowtable->flow_block_lock);
+> -       err =3D dev->netdev_ops->ndo_setup_tc(dev, TC_SETUP_FT, bo);
+> +       err =3D dev_setup_tc(dev, TC_SETUP_FT, bo);
+>         up_write(&flowtable->flow_block_lock);
+>         if (err < 0)
+>                 return err;
+> diff --git a/net/netfilter/nf_tables_offload.c b/net/netfilter/nf_tables_=
+offload.c
+> index 64675f1c7f29..b761899c143c 100644
+> --- a/net/netfilter/nf_tables_offload.c
+> +++ b/net/netfilter/nf_tables_offload.c
+> @@ -390,7 +390,7 @@ static int nft_block_offload_cmd(struct nft_base_chai=
+n *chain,
+>
+>         nft_flow_block_offload_init(&bo, dev_net(dev), cmd, chain, &extac=
+k);
+>
+> -       err =3D dev->netdev_ops->ndo_setup_tc(dev, TC_SETUP_BLOCK, &bo);
+> +       err =3D dev_setup_tc(dev, TC_SETUP_BLOCK, &bo);
+>         if (err < 0)
+>                 return err;
 >
 
-Of course, for me, if I saw "parity_odd()" I would think of it as a functi=
-on that caused the parity to become odd, i=2Ee=2E
+It seems RTNL was not taken in this path, can you take a look ?
 
-if (!parity(x))
-  x ^=3D 1 << 7;
+syzbot reported :
+
+RTNL: assertion failed at net/core/dev.c (1769)
+WARNING: CPU: 1 PID: 9148 at net/core/dev.c:1769
+dev_setup_tc+0x315/0x360 net/core/dev.c:1769
+Modules linked in:
+CPU: 1 UID: 0 PID: 9148 Comm: syz.3.1494 Not tainted
+6.14.0-rc5-syzkaller-01064-g2525e16a2bae #0
+Hardware name: Google Google Compute Engine/Google Compute Engine,
+BIOS Google 02/12/2025
+RIP: 0010:dev_setup_tc+0x315/0x360 net/core/dev.c:1769
+Code: cc 49 89 ee e8 dc da f7 f7 c6 05 c0 39 5d 06 01 90 48 c7 c7 a0
+5e 2e 8d 48 c7 c6 80 5e 2e 8d ba e9 06 00 00 e8 3c 97 b7 f7 90 <0f> 0b
+90 90 e9 66 fd ff ff 89 d1 80 e1 07 38 c1 0f 8c aa fd ff ff
+RSP: 0018:ffffc9000be3eed0 EFLAGS: 00010246
+RAX: eea924c6092c5700 RBX: 0000000000000000 RCX: 0000000000080000
+RDX: ffffc9000c979000 RSI: 000000000000491b RDI: 000000000000491c
+RBP: ffff88802a810008 R08: ffffffff81818e32 R09: fffffbfff1d3a67c
+R10: dffffc0000000000 R11: fffffbfff1d3a67c R12: ffffc9000be3f070
+R13: ffffffff8d4ab1e0 R14: ffff88802a810008 R15: ffff88802a810000
+FS: 00007fbe7aece6c0(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000110c2b5042 CR3: 0000000024cd0000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+<TASK>
+nf_flow_table_offload_cmd net/netfilter/nf_flow_table_offload.c:1178 [inlin=
+e]
+nf_flow_table_offload_setup+0x2ff/0x710
+net/netfilter/nf_flow_table_offload.c:1198
+nft_register_flowtable_net_hooks+0x24c/0x570 net/netfilter/nf_tables_api.c:=
+8918
+nf_tables_newflowtable+0x19f4/0x23d0 net/netfilter/nf_tables_api.c:9139
+nfnetlink_rcv_batch net/netfilter/nfnetlink.c:524 [inline]
+nfnetlink_rcv_skb_batch net/netfilter/nfnetlink.c:647 [inline]
+nfnetlink_rcv+0x14e3/0x2ab0 net/netfilter/nfnetlink.c:665
+netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
+netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1339
+netlink_sendmsg+0x8de/0xcb0 net/netlink/af_netlink.c:1883
+sock_sendmsg_nosec net/socket.c:709 [inline]
+__sock_sendmsg+0x221/0x270 net/socket.c:724
+____sys_sendmsg+0x53a/0x860 net/socket.c:2564
+___sys_sendmsg net/socket.c:2618 [inline]
+__sys_sendmsg+0x269/0x350 net/socket.c:2650
+do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fbe79f8d169
 
