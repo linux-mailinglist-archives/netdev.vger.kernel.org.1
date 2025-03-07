@@ -1,108 +1,119 @@
-Return-Path: <netdev+bounces-172977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65265A56AA4
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 15:40:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5884CA56AB0
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 15:42:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64A86189B553
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 14:40:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45CC03AB5D0
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 14:42:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0185221B9F3;
-	Fri,  7 Mar 2025 14:40:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2088C21ABC3;
+	Fri,  7 Mar 2025 14:42:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KN8mUzNQ"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="T39hKfLT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FB1A1922EF
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 14:40:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDB8820E00F;
+	Fri,  7 Mar 2025 14:42:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741358418; cv=none; b=UojROwpd79pHMclnqDDw1641whX+U/2SRN9bPBPbPbB7jwS0c9W+uwyHFoSh0cEYWF1VAOFXXp8IWrw73DhoXKfXrMZMpL1A750d1oyxfRMweECfzQSXJvVQAxgUqurCge5Qzh81oQfab+sx+s5ifZuLz+8xdQH+R26FcS5SE8M=
+	t=1741358550; cv=none; b=eT1AmuGfM6hwMfpD+OHK65FApS64pRqiOWUW2vQ/TauVijCFJjMHzC2viViZN4n4Wr/WucJzALmLwmcaF7GxmGgIC9Lz5oMhMlBAsrCp2LnFhWosDc/zbcqlyiQ3KMTR/+EmcTtqG+gq/xKHyIGOymtw5AbU/lzDm1X6mlp0uJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741358418; c=relaxed/simple;
-	bh=L3buUM6TQI3XhDeJt6OgiTlycBcinvg8tyhfn0nA/dg=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=U3d/Lqxds21MLgYMxKrTdhlsaPztLw5OSAFBZ12yiQGzozLpnGMCTZt94FNvn4SDVrUEF1cDy6zMJmMRp7Y7GAEBnDAVzG3AUJ7Bc4Jz7fhbtGSuFuAf71LEhXo0MMK0qpzZa0Loy0BcIO3GV/6S5jMsUZKWZXqEpJ6eVfn7qkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KN8mUzNQ; arc=none smtp.client-ip=209.85.222.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7c3b63dfee1so214461085a.0
-        for <netdev@vger.kernel.org>; Fri, 07 Mar 2025 06:40:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741358416; x=1741963216; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6CWFKwr2Lfb5XOvjvzAhJugAjU4+k8gQzhYzvDn0wDA=;
-        b=KN8mUzNQO3Eh+ghZEVxoOU0a3fBpm00N03DAVp3e4reHL28dh7nyE+306urXot1+lk
-         Xrs3LShwSjJQ0w8JlHro2lDg6OO1WL1yOD5UOZccDn03irKuTMjkk7atFmL8Seod4vHW
-         vL+wh/pERjfchRUitI914dmL6xkqMfrqRq27B43SWwia0ou218W63ZrBgBK407017g/g
-         WAv0wh2wkwAyotpyW4yBje+JT9qb86SL8RHobJif7G4iLmNCgqoouVFfadH+xOK+P3pu
-         Fn/fmKE6SNKdZiESkWy1myIGO2yJA7INO9jkoWiDIqPnivB2B2h/0XvJC8RR4M8l0OQA
-         SN7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741358416; x=1741963216;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=6CWFKwr2Lfb5XOvjvzAhJugAjU4+k8gQzhYzvDn0wDA=;
-        b=C3ELYLQn7JoRVr2/VbJvhGkVA+IwOhp8E5AUu6k8xv4ZlHVJBYD4/+tLpZrkinAGew
-         83csnwU1hPPShyahb6NvD2WhPjU2W7BUc9iGnE756N4LM35BC6gcEEbmACPxCQoT/9Jd
-         dsn9/2NfwWU4gKMICcs8TUnRpIkIP3GjL/6jAGuFiEN4HzjiAuLc9Jss3r3oBxuZj7qO
-         L7BFV2KM0KaEeqi37PZi9wkkhyKIzN0yL78c2a+EzDZuEb3bfGckb5DC1TWtaDt4j7r+
-         2Qb4Q99kBjNT6hpf92xByEujH83DeXpcVANoDMS0ZbVExmMcfG9LbwiVoWfnFpTgx8kd
-         bhMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXeaThcBgtB84Xcg5s1c2WOnG0WqIGXcvLrVQtKzafYs9Kb0nl1n41THNWaCWTOndi0O0MjXkI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1I2o91qeeRGm/Ml00hsFGpfz0TnhPBl/c06T7r8hx7mFMf4Dw
-	cUjO/bP/z+Av83he/x8yMaAf84ILSB13O56pDJqZ51zqlTojfXTV
-X-Gm-Gg: ASbGnct2bCD9Csd0bcxGwJGJm0k3cu3fFqRzxK9rsxgcrlNRNAmCgCQDgjsNFsXIRlQ
-	WtgYwXxOIOB6qu/sjLb9hA5542wMiuiLE816Su9jOsa3a7MEEZTox6eygCsTJ4ThBWeCtj6roJ5
-	5Im6bLppJqt+6yudnCu8+5PD8S9xUVtqd9e7+n1BOFRTPrkNe55l9c4DKJt6AgF2gB+XDARcgjC
-	MEkY2MlKhJbJubLYoQ/YOJv2NDiARIs3W2WnLr/1vLPlOhNQCQd0XF2Ph2ioAZz5NiQPAAkTPxa
-	DNOHXAv8GKVF1MfWEZGkwriNkBoh3TfqBe3wEhEpIyh581HDESSciZHaYleFLE/voHbBLk3dviU
-	P1ooslqfX6EwlPsxNBO8wFg==
-X-Google-Smtp-Source: AGHT+IFQVtgoBboB7qLgGqSUmGH8YTQsMUsQW4rodHGoVlawLdkC52t0VqwuvM4TKiXWgZAGjlSGeA==
-X-Received: by 2002:a05:620a:2603:b0:7c3:c87c:6755 with SMTP id af79cd13be357-7c4e5ffc200mr579504885a.18.1741358416173;
-        Fri, 07 Mar 2025 06:40:16 -0800 (PST)
-Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c53b8a5afcsm2991285a.97.2025.03.07.06.40.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Mar 2025 06:40:15 -0800 (PST)
-Date: Fri, 07 Mar 2025 09:40:15 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Eric Dumazet <edumazet@google.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, 
- Willem de Bruijn <willemb@google.com>, 
- netdev@vger.kernel.org, 
- eric.dumazet@gmail.com, 
- Eric Dumazet <edumazet@google.com>
-Message-ID: <67cb054f2ed11_a6a3c2942e@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250307102002.2095238-1-edumazet@google.com>
-References: <20250307102002.2095238-1-edumazet@google.com>
-Subject: Re: [PATCH v2 net-next] udp: expand SKB_DROP_REASON_UDP_CSUM use
+	s=arc-20240116; t=1741358550; c=relaxed/simple;
+	bh=2al+86C1+YK+NBuYNt0/3rhz4Sw/x8Fe1REIfwEqqno=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u9uSwlZIDVv3jFY8bAroH/cs7KmquAdNYO38bb0uT5Z8P3IBH2GZED+iZDe3wH3qrn5KWUScDLfmCZjjiHjAgpEiWj9EdjyVt72rKFr416kTOjS+3k2Wf7iFrVG0tKYbTu26RLT6pIWZ2w/jvlMC4l2FT381yXtjbeJQP0+oIbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=T39hKfLT; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=krNBxnNKUCWp+5mj/3kmTd/U8UpzJVpElMWOIj8TMNQ=; b=T39hKfLTKMi2pABySpMCnxwKeL
+	MDnEqGlYjjAtatvrJKKWL/q2thV4RX2SB+BQjmwlDGNCIvC0RheK5GEV0pfv74k46QFvmuTt0QBEJ
+	MnWfPUjjbXKpVP/5fduDamCYjRhh+NlFYKE/JTMJPWGd667QbbGMcA3HmSnupjig6v04OvvKrrBFd
+	TMI1xAdPoK2Ez3B2ivATur4TayzyrpIiXaxWEkEhHC6jaTfkddN5ZlgScjMklEa6qls3O3fBYFFR0
+	ab6QgI4I1a+Rs/1s/5NiiT692Z+wE7tGbXnrBFtOAGFA1Jdj4xUPohGHR9Z1Se10wgxO9HJJv4Fto
+	mpE8Sv8mXXlddo1jjY6Jdpj49UJnTuHlNnrdTL7CvQS+/GvKFnWvRNS+iAuIhxarAcurgihp9zQn/
+	+VyYfmD8abKg+/JY00jWcvSGqqnYoLxG1CL3/sG51zPUS88l/eGlZh2B8P5JGEyxglZYB1Sge8W5a
+	Z90V9xcdP7BwpiKuirr45tj4;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1tqYty-003t3r-02;
+	Fri, 07 Mar 2025 14:42:14 +0000
+Message-ID: <53728c53-5c1a-4f5d-9862-8369e9b9d8d0@samba.org>
+Date: Fri, 7 Mar 2025 15:42:12 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 4/5] net: integrate QUIC build configuration into
+ Kconfig and Makefile
+To: Xin Long <lucien.xin@gmail.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: network dev <netdev@vger.kernel.org>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
+ Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org,
+ Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>,
+ Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
+ kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>,
+ Jeff Layton <jlayton@kernel.org>, Steve Dickson <steved@redhat.com>,
+ Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>,
+ Sabrina Dubroca <sd@queasysnail.net>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Daniel Stenberg <daniel@haxx.se>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <cover.1725935420.git.lucien.xin@gmail.com>
+ <887eb7c776b63c613c6ac270442031be95de62f8.1725935420.git.lucien.xin@gmail.com>
+ <20240911170048.4f6d5bd9@kernel.org>
+ <CADvbK_eOW2sFcedQMzqkQ7yhm--zasgVD-uNhtaWJJLS21s_aQ@mail.gmail.com>
+Content-Language: en-US, de-DE
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <CADvbK_eOW2sFcedQMzqkQ7yhm--zasgVD-uNhtaWJJLS21s_aQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Eric Dumazet wrote:
-> SKB_DROP_REASON_UDP_CSUM can be used in four locations
-> when dropping a packet because of a wrong UDP checksum.
+Am 12.09.24 um 16:57 schrieb Xin Long:
+> On Wed, Sep 11, 2024 at 8:01 PM Jakub Kicinski <kuba@kernel.org> wrote:
+>>
+>> On Mon,  9 Sep 2024 22:30:19 -0400 Xin Long wrote:
+>>> This commit introduces build configurations for QUIC within the networking
+>>> subsystem. The Kconfig and Makefile files in the net directory are updated
+>>> to include options and rules necessary for building QUIC protocol support.
+>>
+>> Don't split out trivial config changes like this, what's the point.
+>> It just make build testing harder.
+> I will move this to the Patch 3/5.
 > 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+>>
+>> Speaking of which, it doesn't build on 32bit:
+>>
+>> ERROR: modpost: "__udivmoddi4" [net/quic/quic.ko] undefined!
+>> ERROR: modpost: "__umoddi3" [net/quic/quic.ko] undefined!
+>> ERROR: modpost: "__udivdi3" [net/quic/quic.ko] undefined!
+> The tests were done on x86_64, aarch64, s390x and ppc64le.
+> Sorry for missing 32bit machines.
+> 
+>>
+>> If you repost before 6.12-rc1 please post as RFC, due to LPC / netconf
+>> we won't have enough time to review for 6.12 even if Linus cuts -rc8.
+> Copy that.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+I'm seeing some activity in https://github.com/lxin/quic/commits/main/
+
+What's the progress on upstreaming this?
+
+Any chance to get this into 6.15?
+
+Thanks!
+metze
 
