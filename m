@@ -1,221 +1,219 @@
-Return-Path: <netdev+bounces-173004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40526A56D0C
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 17:04:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83F65A56D3F
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 17:11:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 557D77A3056
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 16:03:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF513164AF0
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 16:11:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 812062206B6;
-	Fri,  7 Mar 2025 16:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6940E226D0C;
+	Fri,  7 Mar 2025 16:11:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g5I7Rbq5"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="IGmzej1+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2076.outbound.protection.outlook.com [40.107.243.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D43221554
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 16:04:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741363443; cv=none; b=tdeN9LvXxvryzuWFG/FMnn1IYTL32RkusfmV6nsz/fZEhxCb3j9TJCDCk4bQGU7xPRWyfYKAbSKjsiE2PIIk549GqTn6lcLbVHduk+KEdVIzQ912m9uFJyS/2tCncCFIUe13z9BzwVCj2tvdDI3c9gc/RVi5LDrEs9EzhxSmkqw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741363443; c=relaxed/simple;
-	bh=gZylsrGsU2+QM46lUHsO7rxhzSBqbTb5NnU8Clo/Mz4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=q+VmXsjD/kknG/S/iskF51ATKNvyp0js4akR3ViE6sjwLdusFrtt5AoQ0UMzZb3T+X3emIJIBzei+NMLUAefLhgMF8IsP+mFC6RvnW5ye6PoX43HJys57SZduroZ/KpClL+AER/Qmm/eQwBkAAVMcOY4JYymmOrk5GdPHS2Fa7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g5I7Rbq5; arc=none smtp.client-ip=209.85.160.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-474fc025985so42354411cf.1
-        for <netdev@vger.kernel.org>; Fri, 07 Mar 2025 08:04:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741363440; x=1741968240; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=siolQ1RF2fCbfSB3es0raHpPHOWn51foXq/8jtvUiCU=;
-        b=g5I7Rbq5ZZ+mCuZOo+SN8eiexwEgpe8UV1WA154QoWIfSJUPICTcyQi3P4wlB3s7BJ
-         sJUoEr1qdpMOE0amPQ7ttdxpJgH2kFxqmBOjl90AUxoaGWnc9YaJZjnslbyafSgNbm7z
-         t11YqkEjzHDXx2wiHJBJku45xrSF/ICAwNRqat2INQWNAtMASHhlx2ZHymceVwGmJMlt
-         ccXZ+uDOMWgfYyLegkthOET3/yopIYIuGrN+lcltW5pbBx8ihAUkyfh5BeTeZu61htNF
-         Tp2XSfgS83qBx6Fnn42pAn3w0HgLOqYhW73kSs/e78FLAOac8Hbu/c/L7jjCewLQKT2m
-         Yl9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741363440; x=1741968240;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=siolQ1RF2fCbfSB3es0raHpPHOWn51foXq/8jtvUiCU=;
-        b=AFBQD2GMtYT4a4FTsN6x+cxqXw43N5gcbRwSSaduW+1BJH+AioQoZRjHQQ4kZXAosN
-         yLCtiKoM8JFMAtGJRW0jAxjAUNsb7KIrXZ6TQhkEdv0wuCzyoO+NHHQ2qllF9DS8xbh0
-         Bs+wzCwkAneagc8IgROQcBV+Vpj9j+p1wbp0P1HFOby73uFf4ebr8IZdSxZkBvK9yzkY
-         vRvoIBVutoqEKyqR+/YA2npIoO00HH6y1XWYtBt6rrPj2W1dcDpc0UOSfBwysUnJ5MmI
-         MvQaW/MK376UA7irikIs2CsVbPChdBHSGArWsOw0n8EmZmdGWxMBWP2GaD7ijHcTf1pg
-         t0mw==
-X-Forwarded-Encrypted: i=1; AJvYcCXLsxfNBQH1oPBBoTpi95giLJ81f9uOVW7RnSvldTsYQDdR4ekk7yqVaS9f+66yhTPWq9V6sG8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnPLEzntPsFbgvkvJFTLudk3vvR5ys7yB0ndiWDsQBmDXzkPcw
-	Yh598w5nj7uTayTBJM7Ee0cUZu9m7i1g3vbQFZ78N27yCyJgzJvG272dpu4TXzCYzayyEmPLgrA
-	u2JXgw+DnNA==
-X-Google-Smtp-Source: AGHT+IEX0QsmaHRzdXXWpiOHEssJDXlcZyhYlHVBHCMUqKbAYQud2Ech1gyX0JKxepb1aoRf8FAZijN/ByjnfA==
-X-Received: from qtbie20.prod.google.com ([2002:a05:622a:6994:b0:476:60b7:a431])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:5aca:0:b0:471:cfa9:2612 with SMTP id d75a77b69052e-47618add8dbmr56309931cf.32.1741363440634;
- Fri, 07 Mar 2025 08:04:00 -0800 (PST)
-Date: Fri,  7 Mar 2025 16:03:58 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD48D220696;
+	Fri,  7 Mar 2025 16:11:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.76
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741363893; cv=fail; b=h4CnWPCfz61AypLGcmUnwn4ZopAp8zg97A+K30M0cCU5G+KCwZPFq4MSvvnUNf99MuRt8Cf6P1WEkMnUidDaCM86Ala1lxVfjA/8bb3PuIVN7pMzeeV2txsV55rPh2trC9QmvJWt3Fqj6xUoFTkt5dda+DiI0qalXxKmu8oGbCo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741363893; c=relaxed/simple;
+	bh=z828COofRP4MZKJG1DO3Y28eqroxG/4265JXCXrFueY=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=fhHLvm9Rdtku2MJkjGK1kU5LzM/Ta3IUPvuugw42Yrp+cej8iy9UNk/3jE6HCL8nznN1g2nMvB/3+4BfX7wJ71dyC2c7Bw/UXZdzwYDa1CToBtFIgnu3dw04z9k8ItMXVM4Bqke+pLaw5pQJvQr1foHB2sA40z/MlCMxg4qeLwk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=IGmzej1+; arc=fail smtp.client-ip=40.107.243.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=q0EwFDjkstvTqwVK0JY49+ByiQIae9tfiql2rjdyTnLnQxjDk6DXOe21U7FkdcHJ6XJJRzqZixuQtU1pvt8vJGlFJcQEKbzOJ8oT2BCKFWXJTdObZ6yGvAPqnFT6N1C7HoPhsKd/sfYWLltM6Uf08yaPBfUPn6bCC2gY8aiDesGhSRlN+8FmJ/4GO1ik4jbRGzYxfnEPSbxG2zhFpTLISXW4UDCHEIOAMBQaQ8k8WYg7TZLyAPq8mY51KBAHR3vqkM1TYoIcJfd1SGB/GwpIRdEz1FKj4rWztV4PN7e/jMrLi2M01Zs0nDZ9YwqLpqJZ7+3Dy6jRIYS182B7YV6bjg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XBYuoHWs860VfL10nrLLC/KLmKXNfHEYvVGwVj9ipH0=;
+ b=QO0D7N7Z+efjoCWoB8aj+4mxUQhIjF6vW7hhvpZs7HQOZyFAdgG/ibtfoPzuEamQIyFCbMJMfchleaYrB48eNvUM8+MwnSYjbASmferSyPho6w7J62VvvDLq/6qzpvELmHXCzQumEeBU7LmDm2gfNbUzAwJV0pihinK83Xuvi5OWWwRicOauGvD1CFrIUXAJgfspTs22e9HyLpVtGgGBBWpOMrIhSBbtkqFaupn6yiuy3Rhx9dilJQU2/OaHG518J8BsZWMTyDeUZze7zje0MFDojdrOCbI9H5hMSaHExVUMWWdBTFzaN6fGLmN1SOusKgFcud62b21IDcBO1fpt1A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XBYuoHWs860VfL10nrLLC/KLmKXNfHEYvVGwVj9ipH0=;
+ b=IGmzej1++HCGfEgVYgvItJPjG5ewSbClF6VQpc1+084y3SoyXqqCe3o/qAP2bdmZFAe16V1pneo+MpiFId5kmb14qPJDoaQ0wHL/9E/DQFK1uz5TstVkdumCeaIiP8uiwoEWY153nphglw7s3LP27AQp0l4do2qPdTknoxqxky4ErZmIksmQFYD2u/hwzvJ2AjNba2T/dA//+vKw6FfJC39IrinqponjG6qhkb8N4gft/sx24AbXYRKrIeHH3DJdCLE3/5ZeC5XrHHFhL9bZqLBGWTXwVI/w6ZQz2BZxE/Z0gFG33Apzdvp1w2FHTnliJlZV/b7bW+0OZT5cM33I9g==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SJ2PR12MB8784.namprd12.prod.outlook.com (2603:10b6:a03:4d0::11)
+ by CY5PR12MB6479.namprd12.prod.outlook.com (2603:10b6:930:34::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.17; Fri, 7 Mar
+ 2025 16:11:28 +0000
+Received: from SJ2PR12MB8784.namprd12.prod.outlook.com
+ ([fe80::1660:3173:eef6:6cd9]) by SJ2PR12MB8784.namprd12.prod.outlook.com
+ ([fe80::1660:3173:eef6:6cd9%6]) with mapi id 15.20.8511.017; Fri, 7 Mar 2025
+ 16:11:26 +0000
+Message-ID: <29bc7abd-b5cc-4359-8aa6-dbf66e8b70e4@nvidia.com>
+Date: Fri, 7 Mar 2025 16:11:19 +0000
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next v2 0/3] net: stmmac: approach 2 to solve EEE
+ LPI reset issues
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Thierry Reding <treding@nvidia.com>,
+ "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>,
+ "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+References: <Z8m-CRucPxDW5zZK@shell.armlinux.org.uk>
+From: Jon Hunter <jonathanh@nvidia.com>
+Content-Language: en-US
+In-Reply-To: <Z8m-CRucPxDW5zZK@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P302CA0022.GBRP302.PROD.OUTLOOK.COM
+ (2603:10a6:600:2c1::7) To SJ2PR12MB8784.namprd12.prod.outlook.com
+ (2603:10b6:a03:4d0::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.49.0.rc0.332.g42c0ae87b1-goog
-Message-ID: <20250307160358.3153859-1-edumazet@google.com>
-Subject: [PATCH net-next] hamradio: use netdev_lockdep_set_classes() helper
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
-	syzbot <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR12MB8784:EE_|CY5PR12MB6479:EE_
+X-MS-Office365-Filtering-Correlation-Id: be366105-c7db-44ce-3af4-08dd5d92b604
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|10070799003|366016|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?OEpiaHozb3NSSWliVUxaRGNoR1RUcHpteHhPOXJOM3FNUlNBVW5NendONGQ4?=
+ =?utf-8?B?T3g4cHhyWERFejdqOUtTUjhuTG9qV0pCUTZvNE11VEl5d0ZtdVJpWHZZdGJ3?=
+ =?utf-8?B?U05lOVUvTGtNZGdRbndVN1I5OTl0bWZ2TUlnV2t0STU5bTIrdkRIdGtjWXZN?=
+ =?utf-8?B?R0Vka1A5aWxPS0dEc1pHTVZYWEZ6WjE5NnoyZE1vb1lvQkpOZmZCbFphT3pV?=
+ =?utf-8?B?M0ZVTGdlNDNFejhPVEZIRmZLemtaa3ZDZnQ1STZWVFB1MWFUbmI2WWRQSkM4?=
+ =?utf-8?B?Zzc5RWJGYklXdUVFNlVEWGVXRlY4WjRzNUdIa1RPbWRmQVdPcVhlcnIyNmlX?=
+ =?utf-8?B?NmQ1OGxWZkMrRG03MWMxQ3RHVisxbDdha29NV2lUL05nOEdhYXdLbStHdkpK?=
+ =?utf-8?B?aUM0dy9kUFRYRVh2VXJtRXgxOWpFa1JiaElNZ1FLZEJiSXZPUkdvVjZLaWVM?=
+ =?utf-8?B?aWZVSS9XU1lYclVoVGoxNWp4eWtXbnhPNnE3K2h3cmhaN3FNc2h1b1RKK0Z1?=
+ =?utf-8?B?ZjVIaktXVWF5dFV4bG9wTG91Ym5XZkhWd0hpazM0MDEzcG9TbGpkaU5PckJZ?=
+ =?utf-8?B?bWpvQ1BMUEFqU2ttblJpS2EvamVOaHoxRkk1bVllTGxvVUFpVXNmSXJsdmVX?=
+ =?utf-8?B?NnphOEdEZGRPU25EQlZCUmxHVmhhZzlWdXB3dFVoalRoN0ZoOEJtSWtsT2NJ?=
+ =?utf-8?B?TlMrb2lycnFLc1dNTDVUYkVUT1l2SXBzMWU5Qm5yb0MxUXl6OVpCeTJ5UDk4?=
+ =?utf-8?B?QXAvWk55ZkJoZVF0OXRkNGY2UWN0UXdGZmpWSmdpZ1pQM1VYRUZ4clBHMEZn?=
+ =?utf-8?B?NjIyYi8yaGFhMHFNczQ2eVZJOVQ1SlluTUh0bXRMMDhPV0VJbmZnL0ZSM3cy?=
+ =?utf-8?B?SHQ3VXp5NHNKbFNCaDVubG0rRHZtcEMvbHJkYXovWHplSnZndUxieTh4WnM4?=
+ =?utf-8?B?c1RqVHdacnhuSEw3UzdnNTVxb3JRd05nTmQyR3dCeW9KeDRVbTNvNjlPMXRX?=
+ =?utf-8?B?RVZnelB4dXJyNjdkeUhXV3phd1hkUlI0cTcwVE9IZHRpc2NpeVpKK2NoOUd3?=
+ =?utf-8?B?QUxQUVpvaU0rWHF3aDA0QS9uMzNHRit5N3ZnQVFKZWIyYmxWZGx1dEJ1QnZN?=
+ =?utf-8?B?N1NCN1dZTXdWTUJKc2hwVXp6TDJYWVlKODlNMEpnTFpWcjUvelpYZ1F5ekY4?=
+ =?utf-8?B?UTVJK3Q1QkFNNWZWUlFlRVl4eUxrd21iYkkrMG9RZ1A1N2owYTMvcE9BdGF5?=
+ =?utf-8?B?ZFJMWkJiSVFYMythdGFMMXJhWTdOSld1ZGdadnR5bXNNYlIvb0hzeTFPckhh?=
+ =?utf-8?B?ZVcrY05DYmpSYzlwYlQ0NkVrLzZrNUVRZjhKSFBDcmhwQUw3UzAvVzdiMmJZ?=
+ =?utf-8?B?WCtURk9uYVVYOTZXNnRDU0lVWi9sUjdjQjI0UFQrS2Rna0RmVi8yNythNmJB?=
+ =?utf-8?B?WjZjK3NMVmZyc1FQOVZNWGlqd1p5RXh1eWlDY0lidkgwVTk2N01WeTZEQlYr?=
+ =?utf-8?B?TWcybjJ6UWdUZXV0UDlmdUlmNkR6VzNWR0pQd1NpbDl3VElqdkpVY2pYa3E4?=
+ =?utf-8?B?c2ZFYzBUN3RBZWg1ZXFKMHZJeTBnVWVjZVdnR0FsTkY1eVFMM0kvZjBseTgw?=
+ =?utf-8?B?cS9JTS93ajRyVllhdnE3TW0wM0RDeUJRVitOQlVzWkFLYkQrcWw5L1BFSk40?=
+ =?utf-8?B?d2tSdlI4eVdUY1FuM0tRYkRRbHN2bEpSSGhubVlzSlZhcXJ4S2N6dzEyK25J?=
+ =?utf-8?B?Kzh2cUM0eWdQT25GRnhlcDdVTURkSitqTjliQVJmVnJEZmpxWFU4SU9zeXh5?=
+ =?utf-8?B?SS9mcGFKczlyakQyQ0hjV2JKckk0WEdCY2xtL0V1cHZDRkNma3MxTFFaNkt6?=
+ =?utf-8?Q?qQ+5P6M9n7SD+?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR12MB8784.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(10070799003)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?NXA0bFJRTkZMSklmd0pXYTVDanN3U0M2TnZSWEhqanRtZ3d4NFJ1ZHMzL2x4?=
+ =?utf-8?B?VXFnYmRvNDlzaUdmYlFUaFl2TWkxNkR2M2dmWGZVS2FvZFhNbkFlSkZla1Ar?=
+ =?utf-8?B?Mkx0a1dKd3BHZWZKNG9kYzhKVVg0OGdzbFBiSURkRzdNUGRyL3F3OWlUNm1S?=
+ =?utf-8?B?NTV0NFRZb3orSmZFNE9vOFgzQ1ZaMEZxalpBRlJ4VzRKcjJGd1BnV2VKWnpN?=
+ =?utf-8?B?MWgzZVZhTUVPdk8vZUhQNy9jdko5bUF5OFhIcng0eHNQSDF5cU16T1pFOHJ2?=
+ =?utf-8?B?dm5UeUFVMDMrRDEwK05XY3FNaWRLRDBRN3p3aW9ya05Sc0tjSGRyZXRZekZs?=
+ =?utf-8?B?bjIvaUhPbkRBUXp1ekliL1FuN3N4aUpuWmZLVTZHR3hiMzZrR2VpWEJ2MGVN?=
+ =?utf-8?B?SnB6K1hhWFo4Vy9WVXdWdm5qWStKR0w4eU9lQ1hsNXo3ZkovdDFmUDlyUnFU?=
+ =?utf-8?B?WDljcXdDeCtRMU5ITytPdE8vTFphZ2gxUkFWejhSb1hRTUU1QlNXc0xaOEQx?=
+ =?utf-8?B?SWt5bzFvMVVrUEt0T1dhR2EvcGxaL1lQTGZYYUU0RGtsS2d1enJ4ZHg5em54?=
+ =?utf-8?B?THRlU0gzZHovMlhOcDU3eVdzUDhpbjF5SXpua1QrazEvRU43WGhCRTFWakpn?=
+ =?utf-8?B?ZEJLbXB0bW9uYlVSUnphYi9tQURoVkRXQi90SForNGhhdTM3VzFCSGRyT1ln?=
+ =?utf-8?B?TCs0c1hYbzhJNTFHNmlDdnBicjhUUnVpZDFBS1VsMWw1YXVkdm0ydWgvb2tU?=
+ =?utf-8?B?UnpQbWJ0ejF1M0xKbVFaUXR4Vm13ZVpRUURtSFllWFdvWUpPclE5SmRVVFAw?=
+ =?utf-8?B?SDV0dk1PUXhsclY1M1RGR2svRTNVaFl6Y09mV2FGck5aWExGTXhscHJDb3Rq?=
+ =?utf-8?B?WEU4OVJKY1FZK1g3bTJtdjVBRjFjM3ZkYWpYZWdiWUNrRVJXdmZKbTFsbzk4?=
+ =?utf-8?B?T3JGQU5IVklMazl1WVVzdStaZURrQkJaVEtBSFNaZER2WEJIbURpa0hEcG44?=
+ =?utf-8?B?d244NStCTUpsUFdFWjVsaW1iRU94VVlUNlg1UmsxWnQzQ2Y4eDVQeVJsaXpX?=
+ =?utf-8?B?U05XU1ZuMUFKbkgwRFZWVWZ5SGV6RFFTQkF2VC9HdkZkQUZhanMrSTlBU2tD?=
+ =?utf-8?B?S0VsWjFRclpiWEU0NUVZYWNNM1FSRXZHMkFjVmdnTlFxZFpTem9meTdqLy9D?=
+ =?utf-8?B?d3AyRE1ON2V0c0VQM0VYZkEyTi9VWWJsKzdLTWdvajVxaDBpbjJSS2FYSWYv?=
+ =?utf-8?B?UmVxWFdkbjdSM09TajdkZzNMV2lnMCtZSGtNbnRTRWFWSVRvdGd3VytZajFF?=
+ =?utf-8?B?bXZTcnVPUXc2UmY2ZTc4WWV5K0w4c3FOQVpXNG83NS80YlN6cXdLYTRaMDc1?=
+ =?utf-8?B?Q0tYV2hIbm1MakxkU2ZkbHpMMnYyOE5WT29OOEZJZ2JkanFjZ0dKaUJ6UHdi?=
+ =?utf-8?B?MUZRNlVUTUp0Y0xGZU1LQ01Xb2RubDBYMDlJNmMreE4wajA5OXdPQkg1RmdH?=
+ =?utf-8?B?SXZONnJHUnNyS0U2STc5S2pUVTFpUjlIQ1IzcVZld2JQdU5TV2dvbkpJdnhK?=
+ =?utf-8?B?Mi9BWG9tc0RkaGhwbW9mOXlZOEJsNWl5ZUlPbWt5L1dRNWlReVlNTnN2Q1NU?=
+ =?utf-8?B?ZldFNExMN2tIaXF1M044QWMxMTlOU1VMbGhCa1RRdEVDc3pGN21SRFFUN3V5?=
+ =?utf-8?B?OXJRU2JXTVhZMy9OWDdZNTlJVmkrMzhGT01oTFRsMWZPSXM0ZE5rK3UvTWVR?=
+ =?utf-8?B?QTBhSW54U0VuSXpQaVZuTTZ1enFkYktwclI4eUl4aEt2cHlydXpPRmdtbUpX?=
+ =?utf-8?B?WnYzSC9Uc3RYa0NHUkhEeXlmQm45eGdVWnR6STNET1BKRWdnUDZNR3dLVTdG?=
+ =?utf-8?B?ZXBmTmpMblBXWC9vc09wTGltUTBqVEFhdWh6MTdyZ1dFZ3RySXptWmdETUxa?=
+ =?utf-8?B?bUcwWjZDK1ZNY3JGRHVhaDAvRDZSNU9ScVFvaXlrK0ZhTVJ3QWJzWmRlemFo?=
+ =?utf-8?B?S0xqaXAva2pBK3Z4UldoaXlOVWVpV0xDZUFKSkZubkduMUFaWkt4SGJZbTN3?=
+ =?utf-8?B?cVZOK25IS2NHTStVdnVpZlUwNjdHaEdsNllwTndVT1d1M1YvQnVaUDFyYnMw?=
+ =?utf-8?B?NnBqOUJQN2szLzlmNWo4MDdXazF0cDFVM1ptcUg0eHVRRHdhS1RMUTNoVEJt?=
+ =?utf-8?Q?w6vtHqahaV5GP8wKRHWuJoqz+XeBOG0vBscptb5OHfH/?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: be366105-c7db-44ce-3af4-08dd5d92b604
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR12MB8784.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Mar 2025 16:11:26.0173
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZcMktB9DrG7FicFT29tR0fJvholaE1v4YBcnaEJNMi7TyF/PR7KBsUAxivTR7MhSumTnPX0mg5CeOeNcwijDAg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6479
 
-It is time to use netdev_lockdep_set_classes() in bpqether.c
+Hi Russell,
 
-List of related commits:
+On 06/03/2025 15:23, Russell King (Oracle) wrote:
+> Hi,
+> 
+> This is a second approach to solving the STMMAC reset issues caused by
+> the lack of receive clock from the PHY where the media is in low power
+> mode with a PHY that supports receive clock-stop.
+> 
+> The first approach centred around only addressing the issue in the
+> resume path, but it seems to also happen when the platform glue module
+> is removed and re-inserted (Jon - can you check whether that's also
+> the case for you please?)
+> 
+> As this is more targetted, I've dropped the patches from this series
+> which move the call to phylink_resume(), so the link may still come
+> up too early on resume - but that's something I also intend to fix.
+> 
+> This is experimental - so I value test reports for this change.
 
-0bef512012b1 ("net: add netdev_lockdep_set_classes() to virtual drivers")
-c74e1039912e ("net: bridge: use netdev_lockdep_set_classes()")
-9a3c93af5491 ("vlan: use netdev_lockdep_set_classes()")
-0d7dd798fd89 ("net: ipvlan: call netdev_lockdep_set_classes()")
-24ffd752007f ("net: macvlan: call netdev_lockdep_set_classes()")
-78e7a2ae8727 ("net: vrf: call netdev_lockdep_set_classes()")
-d3fff6c443fe ("net: add netdev_lockdep_set_classes() helper")
 
-syzbot reported:
+The subject indicates 3 patches, but I only see 2 patches? Can you 
+confirm if there are 2 or 3?
 
-WARNING: possible recursive locking detected
-6.14.0-rc5-syzkaller-01064-g2525e16a2bae #0 Not tainted
+So far I have only tested to resume case with the 2 patches to make that 
+that is working but on Tegra186, which has been the most problematic, it 
+is not working reliably on top of next-20250305.
 
-dhcpcd/5501 is trying to acquire lock:
- ffff8880797e2d28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2765 [inline]
- ffff8880797e2d28 (&dev->lock){+.+.}-{4:4}, at: register_netdevice+0x12d8/0x1b70 net/core/dev.c:11008
+Cheers,
+Jon
 
-but task is already holding lock:
- ffff88802e530d28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2765 [inline]
- ffff88802e530d28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock_ops include/linux/netdevice.h:2804 [inline]
- ffff88802e530d28 (&dev->lock){+.+.}-{4:4}, at: dev_change_flags+0x120/0x270 net/core/dev_api.c:65
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(&dev->lock);
-  lock(&dev->lock);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-2 locks held by dhcpcd/5501:
-  #0: ffffffff8fed6848 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_net_lock include/linux/rtnetlink.h:130 [inline]
-  #0: ffffffff8fed6848 (rtnl_mutex){+.+.}-{4:4}, at: devinet_ioctl+0x34c/0x1d80 net/ipv4/devinet.c:1121
-  #1: ffff88802e530d28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2765 [inline]
-  #1: ffff88802e530d28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock_ops include/linux/netdevice.h:2804 [inline]
-  #1: ffff88802e530d28 (&dev->lock){+.+.}-{4:4}, at: dev_change_flags+0x120/0x270 net/core/dev_api.c:65
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 5501 Comm: dhcpcd Not tainted 6.14.0-rc5-syzkaller-01064-g2525e16a2bae #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-Call Trace:
- <TASK>
-  __dump_stack lib/dump_stack.c:94 [inline]
-  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
-  print_deadlock_bug+0x483/0x620 kernel/locking/lockdep.c:3039
-  check_deadlock kernel/locking/lockdep.c:3091 [inline]
-  validate_chain+0x15e2/0x5920 kernel/locking/lockdep.c:3893
-  __lock_acquire+0x1397/0x2100 kernel/locking/lockdep.c:5228
-  lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5851
-  __mutex_lock_common kernel/locking/mutex.c:585 [inline]
-  __mutex_lock+0x19c/0x1010 kernel/locking/mutex.c:730
-  netdev_lock include/linux/netdevice.h:2765 [inline]
-  register_netdevice+0x12d8/0x1b70 net/core/dev.c:11008
-  bpq_new_device drivers/net/hamradio/bpqether.c:499 [inline]
-  bpq_device_event+0x4b1/0x8d0 drivers/net/hamradio/bpqether.c:542
-  notifier_call_chain+0x1a5/0x3f0 kernel/notifier.c:85
- __dev_notify_flags+0x207/0x400
-  netif_change_flags+0xf0/0x1a0 net/core/dev.c:9442
-  dev_change_flags+0x146/0x270 net/core/dev_api.c:66
-  devinet_ioctl+0xea2/0x1d80 net/ipv4/devinet.c:1200
-  inet_ioctl+0x3d7/0x4f0 net/ipv4/af_inet.c:1001
-  sock_do_ioctl+0x158/0x460 net/socket.c:1190
-  sock_ioctl+0x626/0x8e0 net/socket.c:1309
-  vfs_ioctl fs/ioctl.c:51 [inline]
-  __do_sys_ioctl fs/ioctl.c:906 [inline]
-  __se_sys_ioctl+0xf5/0x170 fs/ioctl.c:892
-  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Fixes: 7e4d784f5810 ("net: hold netdev instance lock during rtnetlink operations")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- drivers/net/hamradio/bpqether.c | 24 ++----------------------
- 1 file changed, 2 insertions(+), 22 deletions(-)
-
-diff --git a/drivers/net/hamradio/bpqether.c b/drivers/net/hamradio/bpqether.c
-index bac1bb69d63a11922d73a57d69a97eb4cb53c98b..f6b0bfbbc753f6c69d47d9fdd3af0ebcabb21ead 100644
---- a/drivers/net/hamradio/bpqether.c
-+++ b/drivers/net/hamradio/bpqether.c
-@@ -107,27 +107,6 @@ struct bpqdev {
- 
- static LIST_HEAD(bpq_devices);
- 
--/*
-- * bpqether network devices are paired with ethernet devices below them, so
-- * form a special "super class" of normal ethernet devices; split their locks
-- * off into a separate class since they always nest.
-- */
--static struct lock_class_key bpq_netdev_xmit_lock_key;
--static struct lock_class_key bpq_netdev_addr_lock_key;
--
--static void bpq_set_lockdep_class_one(struct net_device *dev,
--				      struct netdev_queue *txq,
--				      void *_unused)
--{
--	lockdep_set_class(&txq->_xmit_lock, &bpq_netdev_xmit_lock_key);
--}
--
--static void bpq_set_lockdep_class(struct net_device *dev)
--{
--	lockdep_set_class(&dev->addr_list_lock, &bpq_netdev_addr_lock_key);
--	netdev_for_each_tx_queue(dev, bpq_set_lockdep_class_one, NULL);
--}
--
- /* ------------------------------------------------------------------------ */
- 
- 
-@@ -454,6 +433,8 @@ static const struct net_device_ops bpq_netdev_ops = {
- 
- static void bpq_setup(struct net_device *dev)
- {
-+	netdev_lockdep_set_classes(dev);
-+
- 	dev->netdev_ops	     = &bpq_netdev_ops;
- 	dev->needs_free_netdev = true;
- 
-@@ -499,7 +480,6 @@ static int bpq_new_device(struct net_device *edev)
- 	err = register_netdevice(ndev);
- 	if (err)
- 		goto error;
--	bpq_set_lockdep_class(ndev);
- 
- 	/* List protected by RTNL */
- 	list_add_rcu(&bpq->bpq_list, &bpq_devices);
 -- 
-2.49.0.rc0.332.g42c0ae87b1-goog
+nvpublic
 
 
