@@ -1,59 +1,56 @@
-Return-Path: <netdev+bounces-173002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA7FFA56D05
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 17:03:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DCD2A56D10
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 17:04:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 164BE3B8982
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 16:01:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EADB3B51EF
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 16:02:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ADC222171F;
-	Fri,  7 Mar 2025 16:01:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61E0C21D3E8;
+	Fri,  7 Mar 2025 16:02:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="iAm6CnqF"
+	dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b="HroZ1FVE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.forwardemail.net (smtp.forwardemail.net [149.28.215.223])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ED0F22172F
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 16:01:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9179E21B8F8
+	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 16:02:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=149.28.215.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741363287; cv=none; b=bhaqHDSLCh4EuX7fzUbSHzwI7peqQHvmlXwReOOXSR9CcYLZEK85d1rnckcPoy79w7pMinvlb57z6+4rNWq7pNzaoIuSPqXzsyJYA+nCKxEW0LHmJ0MWFTl6lrqmDhC90wj8fIW91vnnoFwnIXf3qWn7cB7lqWTM3G/NWyEKxlM=
+	t=1741363347; cv=none; b=T+Xvs3OCcJ2iG1pw3ELAww8BBbLGs4OQfbpPavSRIG9l8NYmBAO8wzNjg9laj5/wGDrHuW7D0bvxE5NzSpMq6Pl9JoH6/VK76BayigI/URcLqrgSZ4HPJxIi1Ac0UaeN2Hn2z39rG1Sa60okRgeAap20gvd9Zzhwws9B4sioCwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741363287; c=relaxed/simple;
-	bh=rJCOlxHbfvrNj286RJQKWtI23KRMVeSeYEa5wk1Uk4o=;
+	s=arc-20240116; t=1741363347; c=relaxed/simple;
+	bh=pl0XdGNLYz9x5NdFwUSgV/y76o1nKr6GfSx+T2FWcDA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EVsLelIZgnsQ0pznrmYR8fQdTegArpfWFF2lGWEKNy8/KizPcwNwpOrsOAh8TukGNyqJf374Avv0I2snVsx8BTOUpy5uXxsZyv2yySe8myiTnsCa/JsMbF0cD78ievDbNa3f2xt/FRr17MWaT/pUqRZ5n8c9zU6I3xXiNWJ2vdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=iAm6CnqF; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tqa8V-003tbj-R2; Fri, 07 Mar 2025 17:01:19 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=YHcxyyCv9TxOQbcYy9LzpkVMgHzsBozwm3s+VLvgWts=; b=iAm6CnqFEgxAUYuRwSR6e3/OqK
-	Oyyn+IMuIfCZsWk7/CHZOooMjXCmnMhEhAjxZ4c4uuwpDpcSAlFdZ6z/yVn1FS8kRbcNJMmCRK3rf
-	FUWzOokan3TT/NMcmeLL7mnUkLZ1APCNKjS0GRBwIwVnZx/3bzHWlDMtfpd2CVki8ea3issArOT4Q
-	S75bQZxRkwGKA0BGttPh3duwBQRk+P2WfDQSjhhkzmaSNvULyXOyVPOM1F9diGYHEPO20C2PYVW7w
-	MBLisSJBqB9HPdJaCLhherPTmiA74PPitnNlOtLcV2uPpr/PLbalSqTwGrPMsSThAA+IWWdHxOtGN
-	cK1/WpJg==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tqa8U-0006nC-EY; Fri, 07 Mar 2025 17:01:19 +0100
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tqa8P-008GEw-PN; Fri, 07 Mar 2025 17:01:13 +0100
-Message-ID: <032764f5-e462-4f42-bfdc-8e31b25ada27@rbox.co>
-Date: Fri, 7 Mar 2025 17:01:11 +0100
+	 In-Reply-To:Content-Type; b=cfUaKGApVeBaqR3qBTIQw23H4U+g6dIiea9kxEBPuAFlp+QpvKQC8YQtuoOHMBRBCmq/Vy5IWID73xVvgrMdMfGboj8xyUjwLI50xu2lT+qbbr8WtKf9JIggdg/l85F4qn0nTdBfWjWw/Mbig8gNUxDc1IZDB42AbxPMkvg9rVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se; dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b=HroZ1FVE; arc=none smtp.client-ip=149.28.215.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kwiboo.se;
+ h=Content-Transfer-Encoding: Content-Type: In-Reply-To: From: References:
+ Cc: To: Subject: MIME-Version: Date: Message-ID; q=dns/txt;
+ s=fe-e1b5cab7be; t=1741363339;
+ bh=aCrPvOluCec+vwfJ2dRCW1m+hFa1hc7eEdH3qmC/0uk=;
+ b=HroZ1FVEb3Ju6eD1H+BtadR1rI7m9tD5k7yR30KBiZsBa3FuDmLSwkWkLCFK1lIYZu9sSLxU0
+ 0ZHddwHu+aUISVWjyWSuoLRx/iQvOqU79EecADPZH/j6Ukf54bswmqH/VcRo4b1rse/gQeNLfHp
+ NZicpfRGHyzBjW0NJNIQ9Av2YKrGTLkHYCG4EuQjSs0LppLJdAAFZ/NJL7EBQuaHchvuqoSgf1v
+ zEf4ijL0+RF1JT0fP6iG8PBfV7/pB3ZEk6YzM8AVxh1ji//v4J1HL+JKIbzR6p6/Y7xF5Bm/HQd
+ nk1g12ZCMaAIiU2NWNh5Pqvte0qrxhCLy6d/tMQi5qig==
+X-Forward-Email-ID: 67cb18782ea74034f8b964f0
+X-Forward-Email-Sender: rfc822; jonas@kwiboo.se, smtp.forwardemail.net,
+ 149.28.215.223
+X-Forward-Email-Version: 0.4.40
+X-Forward-Email-Website: https://forwardemail.net
+X-Complaints-To: abuse@forwardemail.net
+X-Report-Abuse: abuse@forwardemail.net
+X-Report-Abuse-To: abuse@forwardemail.net
+Message-ID: <de2fb6c6-b053-4be9-8c44-2476c5eb26a6@kwiboo.se>
+Date: Fri, 7 Mar 2025 17:01:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,164 +58,114 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] vsock/bpf: Handle EINTR connect() racing against
- sockmap update
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, leonardi@redhat.com
-References: <20250307-vsock-trans-signal-race-v1-1-3aca3f771fbd@rbox.co>
- <a96febaf-1d32-47d4-ad18-ce5d689b7bdb@rbox.co>
- <vhda4sdbp725w7mkhha72u2nt3xpgyv2i4dphdr6lw7745qpuu@7c3lrl4tbomv>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <vhda4sdbp725w7mkhha72u2nt3xpgyv2i4dphdr6lw7745qpuu@7c3lrl4tbomv>
+Subject: Re: [PATCH 1/4] dt-bindings: net: rockchip-dwmac: Add compatible
+ string for RK3528
+To: Conor Dooley <conor@kernel.org>
+Cc: Heiko Stuebner <heiko@sntech.de>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, David Wu <david.wu@rock-chips.com>,
+ Yao Zi <ziyao@disroot.org>, linux-rockchip@lists.infradead.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20250306221402.1704196-1-jonas@kwiboo.se>
+ <20250306221402.1704196-2-jonas@kwiboo.se>
+ <20250307-tipping-womanlike-a1ce2370d8d3@spud>
+Content-Language: en-US
+From: Jonas Karlman <jonas@kwiboo.se>
+In-Reply-To: <20250307-tipping-womanlike-a1ce2370d8d3@spud>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 3/7/25 15:35, Stefano Garzarella wrote:
-> On Fri, Mar 07, 2025 at 10:58:55AM +0100, Michal Luczaj wrote:
->>> Signal delivered during connect() may result in a disconnect of an already
->>> TCP_ESTABLISHED socket. Problem is that such established socket might have
->>> been placed in a sockmap before the connection was closed. We end up with a
->>> SS_UNCONNECTED vsock in a sockmap. And this, combined with the ability to
->>> reassign (unconnected) vsock's transport to NULL, breaks the sockmap
->>> contract. As manifested by WARN_ON_ONCE.
+Hi Conor,
+
+On 2025-03-07 16:42, Conor Dooley wrote:
+> On Thu, Mar 06, 2025 at 10:13:54PM +0000, Jonas Karlman wrote:
+>> Rockchip RK3528 has two Ethernet controllers based on Synopsys DWC
+>> Ethernet QoS IP.
 >>
->> Note that Luigi is currently working on a (vsock test suit) test[1] for a
->> related bug, which could be neatly adapted to test this bug as well.
->> [1]: https://lore.kernel.org/netdev/20250306-test_vsock-v1-0-0320b5accf92@redhat.com/
+>> Add compatible string for the RK3528 variant.
+>>
+>> Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
+>> ---
+>> I was not able to restrict the minItems change to only apply to the new
+>> compatible, please advise on how to properly restrict the minItems
+>> change if needed.
 > 
-> Can you work with Luigi to include the changes in that series?
+> What do you mean by that? As in, what did you try and did not work?
+> Usually you do something like
+> if:
+>   not:
+>     compatible:
+>       contains:
+>         rockchip,rk3528-gmac
+> then:
+>   properties:
+>     clocks:
+>       minItems: 5
+> 
 
-I was just going to wait for Luigi to finish his work (no rush, really) and
-then try to parametrize it.
+Thanks, this seem to work, will use in a v2.
 
-That is unless BPF/sockmap maintainers decide this thread's thing is a
-sockmap thing and should be in tools/testing/selftests/bpf.
+I tried to do something opposite and instead set minItems: 4 when
+compatible contains rockchip,rk3528-gmac:
 
-Below is a repro. If I'm not mistaken, it's basically what Luigi wrote,
-just sprinkled with map_update_elem() and recv().
+if:
+  compatible:
+    contains:
+      rockchip,rk3528-gmac
+then:
+  properties:
+    clocks:
+      minItems: 4
 
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
-#include <pthread.h>
-#include <sys/wait.h>
-#include <sys/socket.h>
-#include <sys/syscall.h>
-#include <linux/bpf.h>
-#include <linux/vm_sockets.h>
+but that resulted in something like:
 
-static void die(const char *msg)
-{
-	perror(msg);
-	exit(-1);
-}
+  rockchip/rk3528-radxa-e20c.dtb: ethernet@ffbe0000: clocks: [[7, 173], [7, 172], [7, 171], [7, 170]] is too short
 
-static int sockmap_create(void)
-{
-	union bpf_attr attr = {
-		.map_type = BPF_MAP_TYPE_SOCKMAP,
-		.key_size = sizeof(int),
-		.value_size = sizeof(int),
-		.max_entries = 1
-	};
-	int map;
+Regards,
+Jonas
 
-	map = syscall(SYS_bpf, BPF_MAP_CREATE, &attr, sizeof(attr));
-	if (map < 0)
-		die("map_create");
-
-	return map;
-}
-
-static void map_update_elem(int fd, int key, int value)
-{
-	union bpf_attr attr = {
-		.map_fd = fd,
-		.key = (uint64_t)&key,
-		.value = (uint64_t)&value,
-		.flags = BPF_ANY
-	};
-
-	(void)syscall(SYS_bpf, BPF_MAP_UPDATE_ELEM, &attr, sizeof(attr));
-}
-
-static void sighandler(int sig)
-{
-	/* nop */
-}
-
-static void *racer(void *c)
-{
-	int map = sockmap_create();
-
-	for (;;) {
-		map_update_elem(map, 0, *(int *)c);
- 		if (kill(0, SIGUSR1) < 0)
- 			die("kill");
- 	}
-}
-
-int main(void)
-{
-	struct sockaddr_vm addr = {
-		.svm_family = AF_VSOCK,
-		.svm_cid = VMADDR_CID_LOCAL,
-		.svm_port = VMADDR_PORT_ANY
-	};
-	socklen_t alen = sizeof(addr);
-	struct sockaddr_vm bad_addr;
-	pthread_t thread;
-	int s, c;
-
-	s = socket(AF_VSOCK, SOCK_SEQPACKET, 0);
-	if (s < 0)
-		die("socket s");
-
-	if (bind(s, (struct sockaddr *)&addr, alen))
-		die("bind");
-
-	if (listen(s, -1))
-		die("listen");
-
-	if (getsockname(s, (struct sockaddr *)&addr, &alen))
-		die("getsockname");
-
-	bad_addr = addr;
-	bad_addr.svm_cid = 0x42424242; /* non-existing */
-
-	if (signal(SIGUSR1, sighandler) == SIG_ERR)
-		die("signal");
-
-	if (pthread_create(&thread, 0, racer, &c))
-		die("pthread_create");
-
-	for (;;) {
-		c = socket(AF_VSOCK, SOCK_SEQPACKET, 0);
-		if (c < 0)
-			die("socket c");
-
-		if (!connect(c, (struct sockaddr *)&addr, alen) ||
-		    errno != EINTR)
-			goto outro;
-
-		if (!connect(c, (struct sockaddr *)&bad_addr, alen) ||
-		    errno != ESOCKTNOSUPPORT)
-			goto outro;
-
-		(void)recv(c, &(char){0}, 1, MSG_DONTWAIT);
-outro:
-		close(accept(s, NULL, NULL));
-		close(c);
-	}
-
-	return 0;
-}
+>>
+>> Also, because snps,dwmac-4.20a is already listed in snps,dwmac.yaml
+>> adding the rockchip,rk3528-gmac compatible did not seem necessary.
+>> ---
+>>  Documentation/devicetree/bindings/net/rockchip-dwmac.yaml | 4 +++-
+>>  1 file changed, 3 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml b/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
+>> index 05a5605f1b51..3c25b49bd78e 100644
+>> --- a/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
+>> +++ b/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
+>> @@ -24,6 +24,7 @@ select:
+>>            - rockchip,rk3366-gmac
+>>            - rockchip,rk3368-gmac
+>>            - rockchip,rk3399-gmac
+>> +          - rockchip,rk3528-gmac
+>>            - rockchip,rk3568-gmac
+>>            - rockchip,rk3576-gmac
+>>            - rockchip,rk3588-gmac
+>> @@ -49,6 +50,7 @@ properties:
+>>                - rockchip,rv1108-gmac
+>>        - items:
+>>            - enum:
+>> +              - rockchip,rk3528-gmac
+>>                - rockchip,rk3568-gmac
+>>                - rockchip,rk3576-gmac
+>>                - rockchip,rk3588-gmac
+>> @@ -56,7 +58,7 @@ properties:
+>>            - const: snps,dwmac-4.20a
+>>  
+>>    clocks:
+>> -    minItems: 5
+>> +    minItems: 4
+>>      maxItems: 8
+>>  
+>>    clock-names:
+>> -- 
+>> 2.48.1
+>>
 
 
