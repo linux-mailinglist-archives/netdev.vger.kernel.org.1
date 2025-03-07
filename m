@@ -1,126 +1,235 @@
-Return-Path: <netdev+bounces-172937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86EACA568DC
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 14:26:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A0A4A568E4
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 14:27:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72C0D3B13D2
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 13:25:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B41E16D787
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 13:27:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18A1D21A422;
-	Fri,  7 Mar 2025 13:26:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B2F721A955;
+	Fri,  7 Mar 2025 13:26:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vp97v42k"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dBcAJNVs"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 339B1156F5D
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 13:25:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A54C1219A91
+	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 13:26:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741353961; cv=none; b=jCCVLc8nYUgi69VZjWzFxDSckcuzHl4sCIszBQaYwuhHjr2OD6I5Xu9vxhWAiChLJlWRuMjuXm4yAO2cdDg+qbB86S1iVkr6pj1K2l1tYsreAzch56y/MIdSn3iOKznmefgOrt66xS3ok1ap0YEin05kZSuVNHz2N1tzfzNjM4M=
+	t=1741353991; cv=none; b=mWI5PxmdwjNQATu+ZpPZSElPDsOeDxLlpF8y6qdjFHOIH4FfIU3bmf20Dl8FXpZVLf3kY75Ywx0k5Sn6W/5jHFiBZWauZ4rWz1HLliLui1EF2JH7RyPYOHm2JL/TIc3LLAin7kHc/Beng0oJuv63VDRHbtzzWagooBiYzw1zyco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741353961; c=relaxed/simple;
-	bh=QjFtvFBCOpKFhZFNQHlsjywHYpBnf+5fShh9rKHlSSM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=HW9CDpVXJdzvLgCViivmU3qwpWhHgZdIp+ORC3xvE808ew6bMNTRzQY1drMh1hQxVfO0fDJgGO+sd32HPn2sQToLMLfvXJZQ3ChlGiNVYA7BG2DvfTrnm0raKJ3MJNup4yRrGk3cM9WviX9NaCJq/SxAWFqzSW5bHXKvcuBlXWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vp97v42k; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741353958;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0XrKagdOJGjtdIULAsDlR0i/bowAYipZ2lwgi9ghdXg=;
-	b=Vp97v42kBblwrwSHcL00vwusvpwSxpWqxlxfwsztjwfnaoUEKaVs91Kt1qDrJU662axtDB
-	5KEPUFh3gM8PP5R9Y+F2uzvMq7RnfYJ8AC8lKy7bDh28Q/K2MaNaiEMes+mbyzh9qeI3N3
-	W7wPNgc0gZmF9829LqTdu4U+UYeL/P4=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-290-QehtcVAxMqi6BFI5QwNntw-1; Fri,
- 07 Mar 2025 08:25:55 -0500
-X-MC-Unique: QehtcVAxMqi6BFI5QwNntw-1
-X-Mimecast-MFC-AGG-ID: QehtcVAxMqi6BFI5QwNntw_1741353953
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6C36419560BB;
-	Fri,  7 Mar 2025 13:25:53 +0000 (UTC)
-Received: from RHTRH0061144 (unknown [10.22.81.152])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8C6B91801747;
-	Fri,  7 Mar 2025 13:25:50 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Matthieu Baerts <matttbe@kernel.org>,  davem@davemloft.net,
-  netdev@vger.kernel.org,  edumazet@google.com,  pabeni@redhat.com,
-  andrew+netdev@lunn.ch,  horms@kernel.org,  linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next] docs: netdev: add a note on selftest posting
-In-Reply-To: <20250306112522.0a2b38b6@kernel.org> (Jakub Kicinski's message of
-	"Thu, 6 Mar 2025 11:25:22 -0800")
-References: <20250306180533.1864075-1-kuba@kernel.org>
-	<ba1afa07-ea24-4ae5-8f65-fc2fc24f1a22@kernel.org>
-	<20250306112522.0a2b38b6@kernel.org>
-Date: Fri, 07 Mar 2025 08:25:48 -0500
-Message-ID: <f7tr0392crn.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1741353991; c=relaxed/simple;
+	bh=JaBU89FKWRGCTWx9dfd6hRY4eU7nX649tfwEAzq/P4c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=umC+8Sh7wv6rmJWTFNYwRgaYEZM3FTUiBGpufVOXffS4oI+wjYUFtfinCnRVzfeaxS/eB+xBNvCk6Gl+9CvkRZAsidVQA8eSrantYym1mPEZIpNQuEz1GvNnqgjeq4kKQ99si1z+NFFJtdnR7XCig73TDuEjxoy/s51+xLxWh0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dBcAJNVs; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741353990; x=1772889990;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=JaBU89FKWRGCTWx9dfd6hRY4eU7nX649tfwEAzq/P4c=;
+  b=dBcAJNVs3RaoG1BdtoGm+voOtfDZuKLuWACK9yDdvPTCNhfzk1Rpltdx
+   Pvfy2hfqbT5/nFxPO0y4z4ovBSBc3l1OsKN1LDvhIKJX4JF9Dah5R+Y7J
+   9HuX8mno7itS2jB51Cgf9naTRB+GVda6qAT8V4pept4P2z0ps3VZwmm6b
+   RWK2R3+pg8+3WC5tBim0qafVQjS+WPU7dZPm39pNprwpH33/kz6yPsIry
+   zzvC2M3ftZwmR+i1lqPWW0Ev9Pf3/9ZfUzcZtj4PZs+Zdc75I9VZxpsek
+   rXlS+2NzDuOWUkPsU/Tzo2xobazxrhBH89LH7U0lORooCe8i3xPePaMG3
+   A==;
+X-CSE-ConnectionGUID: EYHZrY2HQOSof9hzVcOiAw==
+X-CSE-MsgGUID: OZ/j5xZvRqyQcZD4cbBI6w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="53388022"
+X-IronPort-AV: E=Sophos;i="6.14,229,1736841600"; 
+   d="scan'208";a="53388022"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2025 05:26:29 -0800
+X-CSE-ConnectionGUID: tHeIj6rFTu+CxgaAfIjzlg==
+X-CSE-MsgGUID: dUQfI1UjR02M2Bgv2v4JPA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,229,1736841600"; 
+   d="scan'208";a="150119509"
+Received: from enterprise.igk.intel.com ([10.102.20.175])
+  by orviesa002.jf.intel.com with ESMTP; 07 Mar 2025 05:26:26 -0800
+From: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+Subject: [iwl-next v2] ice: refactor the Tx scheduler feature
+Date: Fri,  7 Mar 2025 14:25:56 +0100
+Message-ID: <20250307132555.119902-2-martyna.szapar-mudlaw@linux.intel.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Transfer-Encoding: 8bit
 
-Jakub Kicinski <kuba@kernel.org> writes:
+From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 
-> On Thu, 6 Mar 2025 19:22:49 +0100 Matthieu Baerts wrote:
->> > +Co-posting selftests
->> > +--------------------
->> > +
->> > +Selftests should be part of the same series as the code changes.
->> > +Specifically for fixes both code change and related test should go into
->> > +the same tree (the tests may lack a Fixes tag, which is expected).  
->> 
->> Regarding the Fixes tag in the tests, could we eventually suggest using
->> the same one as for the code change?
->> 
->> Sometimes, I do that to get the corresponding test backported as well,
->> if there are no conflicts. That's good to have an easy way to check if
->> something has been correctly fixed on stable versions as well.
->
-> Hm, that's probably up to the stable team to decide. My intuition
-> is to reserve Fixes tags for fixes, and add another tag if necessary.
+Simplify the code by eliminating an unnecessary wrapper function.
+Previously, ice_devlink_tx_sched_layers_get() acted as a thin wrapper
+around ice_get_tx_topo_user_sel(), adding no real value but increasing
+code complexity. Since both functions were only used once, the wrapper
+was redundant and contributed approximately 20 lines of unnecessary
+code. Remove ice_get_tx_topo_user_sel() and moves its instructions
+directly into ice_devlink_tx_sched_layers_get(), improving readability
+and reducing function jumps, without altering functionality.
 
-+1
+Also remove unnecessary comment and make usage of str_enabled_disabled() in
+ice_init_tx_topology().
 
-You could consider something like "Tests: xxx", but the problem is that
-not every fix will perfectly map to a test, and as noted below, it is
-possible that the fixes don't merge cleanly.  I don't know if there
-would be a good tag that makes sense, really.
+Suggested-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Signed-off-by: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+---
 
-> The mention of the Fixes tag was primarily because of NIPA checks...
-> A bit of a wink and a nod since we try not to speak about NIPA checks.
->
->> The only thing is with the selftests written in Python or Bash: it is
->> easy to get a situation where there are no conflicts, but the
->> modification doesn't work, e.g. some functions or variables are not
->> available, etc. The stable team will then not notice that during their
->> build tests. Not sure if my suggestion is safe to recommend then.
+v1->v2:
+Expanded the commit message with the motivation for the changes, no code modifications.
 
-I also would note that I like the approach where the test cases detect
-if the condition is even possible and [SKIP] if it isn't.  The reason is
-that we can then run the latest and greatest copies of the selftest
-suite against even older kernels.  Reality, it is not always possible to
-do that either - so it probably needs to be case-by-case basis anyway.
+---
 
-> Good point..
+ .../net/ethernet/intel/ice/devlink/devlink.c  | 56 +++++++------------
+ drivers/net/ethernet/intel/ice/ice_ddp.c      |  2 -
+ drivers/net/ethernet/intel/ice/ice_main.c     |  8 +--
+ 3 files changed, 23 insertions(+), 43 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+index fcb199efbea5..2355e21d115c 100644
+--- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
++++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+@@ -529,41 +529,6 @@ ice_devlink_reload_empr_finish(struct ice_pf *pf,
+ 	return 0;
+ }
+ 
+-/**
+- * ice_get_tx_topo_user_sel - Read user's choice from flash
+- * @pf: pointer to pf structure
+- * @layers: value read from flash will be saved here
+- *
+- * Reads user's preference for Tx Scheduler Topology Tree from PFA TLV.
+- *
+- * Return: zero when read was successful, negative values otherwise.
+- */
+-static int ice_get_tx_topo_user_sel(struct ice_pf *pf, uint8_t *layers)
+-{
+-	struct ice_aqc_nvm_tx_topo_user_sel usr_sel = {};
+-	struct ice_hw *hw = &pf->hw;
+-	int err;
+-
+-	err = ice_acquire_nvm(hw, ICE_RES_READ);
+-	if (err)
+-		return err;
+-
+-	err = ice_aq_read_nvm(hw, ICE_AQC_NVM_TX_TOPO_MOD_ID, 0,
+-			      sizeof(usr_sel), &usr_sel, true, true, NULL);
+-	if (err)
+-		goto exit_release_res;
+-
+-	if (usr_sel.data & ICE_AQC_NVM_TX_TOPO_USER_SEL)
+-		*layers = ICE_SCHED_5_LAYERS;
+-	else
+-		*layers = ICE_SCHED_9_LAYERS;
+-
+-exit_release_res:
+-	ice_release_nvm(hw);
+-
+-	return err;
+-}
+-
+ /**
+  * ice_update_tx_topo_user_sel - Save user's preference in flash
+  * @pf: pointer to pf structure
+@@ -610,19 +575,36 @@ static int ice_update_tx_topo_user_sel(struct ice_pf *pf, int layers)
+  * @id: the parameter ID to set
+  * @ctx: context to store the parameter value
+  *
++ * Reads user's preference for Tx Scheduler Topology Tree from PFA TLV.
++ *
+  * Return: zero on success and negative value on failure.
+  */
+ static int ice_devlink_tx_sched_layers_get(struct devlink *devlink, u32 id,
+ 					   struct devlink_param_gset_ctx *ctx)
+ {
++	struct ice_aqc_nvm_tx_topo_user_sel usr_sel = {};
+ 	struct ice_pf *pf = devlink_priv(devlink);
++	struct ice_hw *hw = &pf->hw;
+ 	int err;
+ 
+-	err = ice_get_tx_topo_user_sel(pf, &ctx->val.vu8);
++	err = ice_acquire_nvm(hw, ICE_RES_READ);
+ 	if (err)
+ 		return err;
+ 
+-	return 0;
++	err = ice_aq_read_nvm(hw, ICE_AQC_NVM_TX_TOPO_MOD_ID, 0,
++			      sizeof(usr_sel), &usr_sel, true, true, NULL);
++	if (err)
++		goto exit_release_res;
++
++	if (usr_sel.data & ICE_AQC_NVM_TX_TOPO_USER_SEL)
++		ctx->val.vu8 = ICE_SCHED_5_LAYERS;
++	else
++		ctx->val.vu8 = ICE_SCHED_9_LAYERS;
++
++exit_release_res:
++	ice_release_nvm(hw);
++
++	return err;
+ }
+ 
+ /**
+diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.c b/drivers/net/ethernet/intel/ice/ice_ddp.c
+index 69d5b1a28491..a2f738eaf02e 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ddp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ddp.c
+@@ -2324,8 +2324,6 @@ enum ice_ddp_state ice_copy_and_init_pkg(struct ice_hw *hw, const u8 *buf,
+  * @flags: pointer to descriptor flags
+  * @set: 0-get, 1-set topology
+  *
+- * The function will get or set Tx topology
+- *
+  * Return: zero when set was successful, negative values otherwise.
+  */
+ static int
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index a03e1819e6d5..a55ec9be7b1d 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -4550,10 +4550,10 @@ ice_init_tx_topology(struct ice_hw *hw, const struct firmware *firmware)
+ 	dev = ice_pf_to_dev(pf);
+ 	err = ice_cfg_tx_topo(hw, firmware->data, firmware->size);
+ 	if (!err) {
+-		if (hw->num_tx_sched_layers > num_tx_sched_layers)
+-			dev_info(dev, "Tx scheduling layers switching feature disabled\n");
+-		else
+-			dev_info(dev, "Tx scheduling layers switching feature enabled\n");
++		dev_info(dev, "Tx scheduling layers switching feature %s\n",
++			 str_enabled_disabled(hw->num_tx_sched_layers <=
++					      num_tx_sched_layers));
++
+ 		/* if there was a change in topology ice_cfg_tx_topo triggered
+ 		 * a CORER and we need to re-init hw
+ 		 */
+-- 
+2.47.0
 
 
