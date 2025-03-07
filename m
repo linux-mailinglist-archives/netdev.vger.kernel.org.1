@@ -1,105 +1,155 @@
-Return-Path: <netdev+bounces-172742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9A92A55DB3
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 03:30:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7856A55DC0
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 03:40:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2D8617808A
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 02:30:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17D8F174794
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 02:40:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB2AF188907;
-	Fri,  7 Mar 2025 02:30:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BAFF188735;
+	Fri,  7 Mar 2025 02:39:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DDuc9Wg6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XcyMEv9I"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB06815382E;
-	Fri,  7 Mar 2025 02:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA5D118785D;
+	Fri,  7 Mar 2025 02:39:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741314608; cv=none; b=hFOHl934OcnuSC213kM67NDeD+Ell1x/yBPOx9Z58Fy6ieO7GBV/ilVyolGuu6zOafXeelcvMGYJQ4VbsPaKPRSRY7r9SC5ciAyAnHW/gx2V0NSR0IvaQNLvUX0ipJCW8LlvU4REuepk+ymqW7WFPgxw+ycsruzjbbvMb8trdEE=
+	t=1741315168; cv=none; b=GV27WZDyMiXVuNUs1jFnOLS+MCnLbKPGkboH2V4ZC/sCO0depgF0e9B5Uxvy+DlZKB+i7VBe6jL1drZVPOn7+5T+B4Kd2z9eNa0bae5PyBJOv/D0UtCbQOvNal0JB2R4EwCXkwdrmIg5oSw9mig2skhgcAjsgW2sMDNejWM5IwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741314608; c=relaxed/simple;
-	bh=tn3Z1GgSVn9MZE25OAl4TUe3BRvbI67Yak5zmzCjmao=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tYZRS8bhybXkqhkeopQnI++BmgVKCfaiVE7XFfKm+gRFjy7UpL9iLDndzFnCo841RjlE8tofMtzljCMhHHzZ0ON5BN16WLTZ5X9MrxVpu7FMCCOtVpw+8qoARriGeGKn8p+5156bRnd9NAIw4iK2jS3I0hIx0E2U+3LXHftM9DU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DDuc9Wg6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2ADF2C4CEE0;
-	Fri,  7 Mar 2025 02:30:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741314608;
-	bh=tn3Z1GgSVn9MZE25OAl4TUe3BRvbI67Yak5zmzCjmao=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DDuc9Wg6usaZqyJuY0u9UpSyvd1OwrgUxw5p5L6KrwybVaKC6UgNbKyO5ttuwZ1Er
-	 x0oqYlQjNEZnSLdy3j8XWxHFArz1D2orFu5EdVxE/94i3lHxa4RPVt8vZJibC3J2O5
-	 dJ5tx0JYRiEQYf3gK4NGsfLg8dKfgpMBxdJFBgcu9oWMLPex23rxcyRSNRJGXILsq0
-	 IoAjTFeQS5yAcLrEz3oAxAo9Ln4qJkFHAGBBhL/TL2wz4HFXlrO89p60QXKRi+g1Qi
-	 Ct/KkZc/DdGj8YKzCnZHCEc6fLBfu/TP1NVDADGzzvCS6kO7i0iVtYQDGrsvCFWXL6
-	 YZTWZHjf7L3mg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDB9380CFF6;
-	Fri,  7 Mar 2025 02:30:42 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1741315168; c=relaxed/simple;
+	bh=6OU9bNzpGoUP8m+6t7CMEqs1s2CSGxSHRzD25S3S57U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XoINMAxd9aVKmT6JiqxKq7wnT3SKWvxTuI0YFUsKWWMJj2syb3u0nEgEO4C/wtgaqmVdfl3cLd6bQPn3HvX5CsHwH+L7we8HEoI5ARSgB+G4KIpOPqDhw/m+DH1ly7aXeNp6MLcLmziOVSYQKfSCxBgPfN///vsL1IR3/vQmkDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XcyMEv9I; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2fee4d9c2efso2515642a91.3;
+        Thu, 06 Mar 2025 18:39:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741315166; x=1741919966; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=0d4XpVOjBbNecE/XmRwQFw87n6IpADVfzl27NW7S8cM=;
+        b=XcyMEv9I4r/BZMDwgjJ5W8b9t45sKBExMoYdnoQEDng5YuLvkFvM/XboNNGy1YS89g
+         fBPmXQq6Q1YW7yPyObVkckNgirBchJAsfwf22TK2jooHQqYM5ZNFh7fXLbLDPb0lUjO8
+         rhDtaJBN+b1uSJduBidqHIJDzS2CeoBuESn1fALKvO66gZJppsEIUe0m07c489sXBloz
+         nKADFvh5iPKOjvA6qaq/Yr1Hx4jn9C6Wh971yJWuToDAbxEog0QIMcZESQ3KC8WYMxrw
+         8SyU5NaXiNdfMWIZzWWtCiJN1H9P/z6i7YJclVd5294A9fXaleEO7mjYW8qQ3/GzDKHV
+         p04w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741315166; x=1741919966;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0d4XpVOjBbNecE/XmRwQFw87n6IpADVfzl27NW7S8cM=;
+        b=WqMTcUbrHSIaNJ09U105vDSSZZr3JnOq+YOAExd9pX652moeLTtq5d1UKr9hfTvZvm
+         tmHot1LM24GBWAsr7V2Xvqn/sag1hpciEpBqpASFUtsmYA/SdGzHwWmOmSbn+JtigDwn
+         +V5+xnvW1NFbwGr6qM5HkY/AOli9ykfx8zIO1Br3fQIF5ByOPk9uBJlDXK2HYoJCocmK
+         rxGDBEJxiFKoZjKQ+6yg3GfxpPH18urt7KahPSwp4+JJGvLEMqPiZ93iw8VFz0R3U0Tn
+         jHDBHGQeozssU8BJYgQEoyKlKdvzslBUfMFKHA2TWnmx2+ztSvLwfkOC0VCirxpKjVFp
+         HNMA==
+X-Forwarded-Encrypted: i=1; AJvYcCUCmuirdKSEsKy6M0YeygREpQJqtEeNVpRQ5UMRqHettpxoTpaRlT48SShLMHzJrV+w+olVpcvo6fLVvlc=@vger.kernel.org, AJvYcCVOQGhiSCi1C9yIXPIohLTnRgQjSAT7srMvimd7lRdpZkflduItasWHdprQeSq7P44RBSLQvqKO@vger.kernel.org, AJvYcCVjStzII0q3g7xQQC+QgnYHV7YfqUU471Jhxrgxr73gxqtU36MJDmXXxsQzcCLCn1+EjzDnbiGIgnukF2WOauRf@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpOOxre6u9RBsP1DB+IKZoD4NsF9yDogfAH8vKUPxHM4fdjlGX
+	409L0zoZcMcq1d3f/XDkebA3FJPRqYv58c0QRE0k0DfpckUBDkDE
+X-Gm-Gg: ASbGnctj/ZPhr44r7yP51wBqMHATIM5BOTwM6BAtaIUFbHIuIK+x5rk3baRPBHiSip5
+	knZFMOpVhQ5SMjBUuHxiaOxrq23zHBPfpyUB47q9Bc6YAThnbLfQ7PJL3Qn5CfEcnWx90XH+gsG
+	NR9TKKwGiNZVU9L8GFllyOs4Lxq87gdbeDRx9xAX5koz8dtliZypgAg0cnSf/uPawTrs/x7zQdy
+	+Gfrt7pHrgFYrdzlqqhaeBfqRp8wDyoWrT9BS1XCLfTETFNkfwNCKYlzR/wpIIR7FMgAlZAHsKI
+	s/utqjsb7EnVhrZD/OeXmgx5oofB0/iuVdlZRwKfhWRiV1xEaQ==
+X-Google-Smtp-Source: AGHT+IFIZCp6xuHzpUsYKy0v3LgrML3vB01/8gnmD5Qfx9LBkQTRH+vITz9B5AClpfZbdNC2kQVIgw==
+X-Received: by 2002:a05:6a21:3287:b0:1f3:1b78:ceb2 with SMTP id adf61e73a8af0-1f544ad7944mr2951706637.9.1741315166026;
+        Thu, 06 Mar 2025 18:39:26 -0800 (PST)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-736a336010dsm1378308b3a.59.2025.03.06.18.39.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Mar 2025 18:39:25 -0800 (PST)
+Date: Fri, 7 Mar 2025 02:39:16 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: Petr Machata <petrm@nvidia.com>, "shuah@kernel.org" <shuah@kernel.org>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	Jianbo Liu <jianbol@nvidia.com>,
+	"jarod@redhat.com" <jarod@redhat.com>,
+	"razor@blackwall.org" <razor@blackwall.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"jv@jvosburgh.net" <jv@jvosburgh.net>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"steffen.klassert@secunet.com" <steffen.klassert@secunet.com>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCHv4 net 1/3] bonding: move IPsec deletion to
+ bond_ipsec_free_sa
+Message-ID: <Z8pcVHdEkwk2w0En@fedora>
+References: <20250304131120.31135-1-liuhangbin@gmail.com>
+ <20250304131120.31135-2-liuhangbin@gmail.com>
+ <4108bfd8-b19f-46ea-8820-47dd8fb9ee7c@blackwall.org>
+ <Z8hcFSElK7iF8u9o@fedora>
+ <f9bf79aff80eae232bc16863aa7a3ea56c80069a.camel@nvidia.com>
+ <Z8ls6fAwBtiV_C9b@fedora>
+ <Z8lysOLMnYoknLsW@fedora>
+ <60cfc1af3f85dda740ac19ac06a27880e79c9c1e.camel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next V2 0/6] mlx5 misc enhancements 2025-03-04
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174131464148.1860023.2397596403061740180.git-patchwork-notify@kernel.org>
-Date: Fri, 07 Mar 2025 02:30:41 +0000
-References: <20250304160620.417580-1-tariqt@nvidia.com>
-In-Reply-To: <20250304160620.417580-1-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, saeedm@nvidia.com,
- gal@nvidia.com, leonro@nvidia.com, michal.swiatkowski@linux.intel.com,
- leon@kernel.org, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org
+In-Reply-To: <60cfc1af3f85dda740ac19ac06a27880e79c9c1e.camel@nvidia.com>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 4 Mar 2025 18:06:14 +0200 you wrote:
-> Hi,
+On Thu, Mar 06, 2025 at 01:37:15PM +0000, Cosmin Ratiu wrote:
+> On Thu, 2025-03-06 at 10:02 +0000, Hangbin Liu wrote:
+> > > For bond_ipsec_add_sa_all(), I will move the xso.real_dev =
+> > > real_dev
+> > > after .xdo_dev_state_add() in case the following situation.
 > 
-> This is V2.
-> Find initial version here:
-> https://lore.kernel.org/lkml/20250226114752.104838-1-tariqt@nvidia.com/
+> xso.real_dev needs to be initialized before the call to
+> xdo_dev_state_add, since many of the implementations look in
+> xso.real_dev to determine on which device to operate on.
+> So the ordering should be:
+> - get the lock
+> - set xso.real_dev to real_dev
+> - release the lock
+> - call xdo_dev_state_add
+> - if it fails, reacquire the lock and set the device to NULL.
 > 
-> This series introduces enhancements to the mlx5 core and Eth drivers.
+> Unfortunately, this doesn't seem to protect against the scenario below,
+> as after dropping the spinlock from bond_ipsec_add_sa_all,
+> bond_ipsec_del_sa can freely call xdo_dev_state_delete() on real_dev
+> before xdo_dev_state_add happens.
 > 
-> [...]
+> I don't know what to do in this case...
 
-Here is the summary with links:
-  - [net-next,V2,1/6] net/mlx5: Relocate function declarations from port.h to mlx5_core.h
-    https://git.kernel.org/netdev/net-next/c/a2f61f1db855
-  - [net-next,V2,2/6] net/mlx5: Refactor link speed handling with mlx5_link_info struct
-    https://git.kernel.org/netdev/net-next/c/65a5d3557184
-  - [net-next,V2,3/6] net/mlx5e: Enable lanes configuration when auto-negotiation is off
-    https://git.kernel.org/netdev/net-next/c/7e959797f021
-  - [net-next,V2,4/6] net/mlx5: Lag, Enable Multiport E-Switch offloads on 8 ports LAG
-    https://git.kernel.org/netdev/net-next/c/5aa2e6de86d5
-  - [net-next,V2,5/6] net/mlx5e: Separate address related variables to be in struct
-    https://git.kernel.org/netdev/net-next/c/348ed4b20546
-  - [net-next,V2,6/6] net/mlx5e: Properly match IPsec subnet addresses
-    https://git.kernel.org/netdev/net-next/c/ca7992f52c2c
+Yes, me neither. How about add a note and leave it there until we
+have a solution?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Regards
+Hangbin
+> 
+> > > 
+> > > bond_ipsec_add_sa_all()
+> > > spin_unlock(&ipsec->x->lock);
+> > > ipsec->xs->xso.real_dev = real_dev;
+> > >                                 __xfrm_state_delete x->state = DEAD
+> > >                                   - bond_ipsec_del_sa()
+> > >                                     - .xdo_dev_state_delete()
+> > > .xdo_dev_state_add()
+> 
+> Cosmin.
 
