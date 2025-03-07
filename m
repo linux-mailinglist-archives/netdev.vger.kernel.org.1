@@ -1,99 +1,101 @@
-Return-Path: <netdev+bounces-172709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1403A55C3A
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 01:50:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 738A9A55C49
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 01:55:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A129188EBC7
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 00:50:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F4523A3C76
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 00:55:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BE551494B2;
-	Fri,  7 Mar 2025 00:50:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 721587DA8C;
+	Fri,  7 Mar 2025 00:55:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pLP9O3qu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QrpItbRe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FCB81E868;
-	Fri,  7 Mar 2025 00:50:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 409DB1E868;
+	Fri,  7 Mar 2025 00:55:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741308609; cv=none; b=CpC1tMy/p2SLv9F4/wU882QMxzcXd7yBM7qXtWp146Al7kvf1aN2WVaT8DcxG/IdULKg7Pqtsxl9Ov+/53gLVyPHMJZC1ZO4wHxAKnol6avWLh7uKzLOAUSCqQGykgaiYLLk3aqfFhmhvIaA4Iy05FZv5JnGVW4Z3PlFlO0YGQQ=
+	t=1741308915; cv=none; b=h522Np4KPooqJhkgXZq5UstIp+LGhOHwsbVO/pTBVFsljBBGUw+c+7Zuj8BMdHciO+RLjRXYKrh7mYjmKUoeXxmpkjlSgn1D1jQY7iIvCJWdKO4xAgSLNT8Daf/iTthNG7MWYep3WKQxEOIYH1F0JBSRBbe6Pn3PKOefxawaC7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741308609; c=relaxed/simple;
-	bh=kOI8CLC+3Qf3DKglnyV5Y+WclIFVl7WyF7cg0ZSJCoM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PeOfy9Rk1EKYli1QLkrUfZRo+34rVtKZdBJzK98REqUT6paDxEru4T9/Zp9LPIebd3YjcJGvveeiDHo0lCsIvoiqOk+fIru4A78gOyzdiBQ4m5PN+Lf7nB/zGrMtowWn6nnVuta8QuAv+V9eNpFDqTtmZmcnxnO0BPkia552PVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pLP9O3qu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9335C4CEE8;
-	Fri,  7 Mar 2025 00:50:08 +0000 (UTC)
+	s=arc-20240116; t=1741308915; c=relaxed/simple;
+	bh=xek2BHPVZ26qJOlIwvynXxMSgyWkeMn3liBIClkp3lI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V4/yeyKO0VJek+5gHXcoMgDrY5yItiqfROE7NagW4d4MxElJMYZ402ivbKa+hpj0gW4sgNtEgLXwtPDjU3Hq+etqF7HluTxI0Z5a29tDREduUGT5MlnQ458EPWwYfQBpJxd/dbAXQLWA0lwhZszSkFHvKOyAXIEVJisQ3D1gRB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QrpItbRe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0F97C4CEE0;
+	Fri,  7 Mar 2025 00:55:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741308608;
-	bh=kOI8CLC+3Qf3DKglnyV5Y+WclIFVl7WyF7cg0ZSJCoM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pLP9O3qu7AYmIBZflFZ2syG/M3jrMhSJH2jE8UATLYIRLV3dXOQr7uN0C+73/mGPH
-	 YRklZgyZOtBJd9lja6AvoNtp8ZlvvYS5LxUbKQfG3oRhyCZFS4lcWs8jqboejZsOR4
-	 bbb5XPfS+kP4kh9csN7BV9d2BKMW4L3IfoBOEprryql+NeVqhz++jkp/oJPO/hy9ME
-	 5TfxZxXhHQoOf2VivBe8pJf43fpT3f+gfhXT81Egyf/pkSW/SFT+xMe3mpJ8fWFZQo
-	 1bqf2HVhyAGsGc6HvLYC71wd0wdCavJaFRbUIYvL58uP00lH+oJ1SSb5BlC96fUAno
-	 6YNqTDxsZbpaQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E43380CFF6;
-	Fri,  7 Mar 2025 00:50:43 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1741308914;
+	bh=xek2BHPVZ26qJOlIwvynXxMSgyWkeMn3liBIClkp3lI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QrpItbReJvXV4f5NgW5mLT6raAXR9ILcWXRqNJek5KIcTTvGN4K/B/vomAxa0s7LW
+	 u4aZDEn0nSrDXhaoRTqiVXvn3VaThme6YX8s6fmORw6eDBPiM8AqInegTSJnIygUbN
+	 kmkzeTMC5o/97KmCJg36JTQAlrvaMcAxFirIDLb5xVmPAOJVe3jVwL0fCb3/QRj3A+
+	 wH5k2Okk0ScuJX1DrWC0/L8AYVJCKq8PdMiLFuNuJ8B4IhoS4LvwUN5iu2xUu8z5hV
+	 86lbzUFCHlPP2SMdOd/H4zSLjWAQwKdWKWfq348B2QMnnbe/oMlMH5KgNaN3ZRDPCA
+	 yO7SLVnzsbOzA==
+Date: Thu, 6 Mar 2025 16:55:13 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: MD Danish Anwar <danishanwar@ti.com>
+Cc: Vignesh Raghavendra <vigneshr@ti.com>, Meghana Malladi
+ <m-malladi@ti.com>, Diogo Ivo <diogo.ivo@siemens.com>, Lee Trager
+ <lee@trager.us>, Andrew Lunn <andrew+netdev@lunn.ch>, Roger Quadros
+ <rogerq@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Simon Horman
+ <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
+ <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
+ <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+ <linux-doc@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>
+Subject: Re: [PATCH net-next v2] net: ti: icssg-prueth: Add ICSSG FW Stats
+Message-ID: <20250306165513.541ff46e@kernel.org>
+In-Reply-To: <20250305111608.520042-1-danishanwar@ti.com>
+References: <20250305111608.520042-1-danishanwar@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 1/2] selftests: net: fix error message in bpf_offload
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174130864207.1835493.4219904966399913707.git-patchwork-notify@kernel.org>
-Date: Fri, 07 Mar 2025 00:50:42 +0000
-References: <20250304233204.1139251-1-kuba@kernel.org>
-In-Reply-To: <20250304233204.1139251-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
- linux-kselftest@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Wed, 5 Mar 2025 16:46:08 +0530 MD Danish Anwar wrote:
+> + - ``FW_RTU_PKT_DROP``: Diagnostic error counter which increments when RTU drops a locally injected packet due to port being disabled or rule violation.
+> + - ``FW_Q0_OVERFLOW``: TX overflow counter for queue0
+> + - ``FW_Q1_OVERFLOW``: TX overflow counter for queue1
+> + - ``FW_Q2_OVERFLOW``: TX overflow counter for queue2
+> + - ``FW_Q3_OVERFLOW``: TX overflow counter for queue3
+> + - ``FW_Q4_OVERFLOW``: TX overflow counter for queue4
+> + - ``FW_Q5_OVERFLOW``: TX overflow counter for queue5
+> + - ``FW_Q6_OVERFLOW``: TX overflow counter for queue6
+> + - ``FW_Q7_OVERFLOW``: TX overflow counter for queue7
+...
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Thanks for the docs, it looks good. Now, do all of these get included
+in the standard stats returned by icssg_ndo_get_stats64 ?
+That's the primary source of information for the user regarding packet
+loss.
 
-On Tue,  4 Mar 2025 15:32:03 -0800 you wrote:
-> We hit a following exception on timeout, nmaps is never set:
-> 
->     Test bpftool bound info reporting (own ns)...
->     Traceback (most recent call last):
->       File "/home/virtme/testing-1/tools/testing/selftests/net/./bpf_offload.py", line 1128, in <module>
->         check_dev_info(False, "")
->       File "/home/virtme/testing-1/tools/testing/selftests/net/./bpf_offload.py", line 583, in check_dev_info
->         maps = bpftool_map_list_wait(expected=2, ns=ns)
->       File "/home/virtme/testing-1/tools/testing/selftests/net/./bpf_offload.py", line 215, in bpftool_map_list_wait
->         raise Exception("Time out waiting for map counts to stabilize want %d, have %d" % (expected, nmaps))
->     NameError: name 'nmaps' is not defined
-> 
-> [...]
+>  	if (prueth->pa_stats) {
+>  		for (i = 0; i < ARRAY_SIZE(icssg_all_pa_stats); i++) {
+> -			reg = ICSSG_FW_STATS_BASE +
+> -			      icssg_all_pa_stats[i].offset *
+> -			      PRUETH_NUM_MACS + slice * sizeof(u32);
+> +			reg = icssg_all_pa_stats[i].offset +
+> +			      slice * sizeof(u32);
+>  			regmap_read(prueth->pa_stats, reg, &val);
+>  			emac->pa_stats[i] += val;
 
-Here is the summary with links:
-  - [net-next,1/2] selftests: net: fix error message in bpf_offload
-    https://git.kernel.org/netdev/net-next/c/f9d2f5ddd47c
-  - [net-next,2/2] selftests: net: bpf_offload: add 'libbpf_global' to ignored maps
-    https://git.kernel.org/netdev/net-next/c/56a586961bf8
-
-You are awesome, thank you!
+This gets called by icssg_ndo_get_stats64() which is under RCU 
+protection and nothing else. I don't see any locking here, and
+I hope the regmap doesn't sleep. cat /proc/net/dev to test.
+You probably need to send some fixes to net.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
