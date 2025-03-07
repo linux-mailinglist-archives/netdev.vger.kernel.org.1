@@ -1,149 +1,117 @@
-Return-Path: <netdev+bounces-172946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D51F7A56934
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 14:44:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6A6EA56945
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 14:46:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 250277AA368
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 13:43:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0F95177ABB
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 13:46:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCAD121ABA6;
-	Fri,  7 Mar 2025 13:44:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40FA5219A67;
+	Fri,  7 Mar 2025 13:46:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oQim2+LC"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="vrtbW5Tf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5C221A447
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 13:44:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCB6C2581;
+	Fri,  7 Mar 2025 13:46:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741355050; cv=none; b=LbYd9EsJk1hFDdjwpsAZa39g8LldFz+tyLe1s7OPryxoAJ/z2h7AYlhgpcB2+hPA5GBcdcRwz05O3YsD/y0IbZezT5t/hZ7kvK/qX1UuUYTXwEfsNqo8+UCm0arB6oOwKSziVHndzXZnXLROJx8QZs3Ggfn+y5LHF4vSEd1xIes=
+	t=1741355187; cv=none; b=qAxw9NBrzGysULXewhoF8aHGdde1nLIF4daMPDXJBHEEv8gGKbchMkk0axpYv6w3vJaOpJMcat9pIhFwCSe6k2vR9h7+R3FmlwJsw09JVAA2TFiZ1iy4vQ76+HDaRsKhkxD6Lsw8cAoJ41jipQJQUMp2kTaUK7N+8PS2J60EUt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741355050; c=relaxed/simple;
-	bh=gCKy6Z6IWQUo4NVubERjekOLQ8tO2OPPYqCEFVEa+7Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=kpPchmeoCHIStj9Hi7kLi0Rda6sYh+NQof6XIQCCQJ6U8kUjJeG55Q/fDc94qptexlIULDV3cxsdaxn4POKAm3WjqE0ZFgqv2O6llUysEEmNR9La7pje0wPDI86QVhQ2XRKJenhNtVH6SlFe7YZktob6E+ZEotcv9hVqzhDwzFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=oQim2+LC; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43bdc607c3fso11432545e9.3
-        for <netdev@vger.kernel.org>; Fri, 07 Mar 2025 05:44:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741355047; x=1741959847; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HKa+tQTLZjzXmIzy+CrH4sUBisOXOqgtBvJQGN22yDs=;
-        b=oQim2+LCLRfTmtd6zEOlGS6EGN4zQu2iGCQ4ks5rZT6WQBb4rO6CkM+0XC+16PUpAB
-         iTfImXdnBmzmyDQkmllG4mIOBNPNeApdB5OyZNeN9RU9WDGBMdnT7gb5BKHsNQn4yg8r
-         fq3MdkB7DVq8GPgvndZMKVNJU3EEmB0npichZlDvAqvs02EI6p+Xx7KUhlM57tI2iXsi
-         WhtpmomlbstYWS+R3V+42MrUl0GUq+BK1nCxqUDXv3UEAct56aEVGC1yaIXLXTIMll+T
-         cg/rxV5bha2T1F/YkPZu/tZLzri2FP+6JCl7ywPcwqsiCyDNf4b5e3OSkOZP4X8nnBC8
-         Kf4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741355047; x=1741959847;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HKa+tQTLZjzXmIzy+CrH4sUBisOXOqgtBvJQGN22yDs=;
-        b=XoK0HXhyWKLkN6AJ3QkXGZ4hrk8zukficZoSuTSNZ2L3hEXIZCrvmcPTtmsD1lV0iX
-         UxLZYj8xFDUdTbR6zuTcRaetF3yf+xcjwAODX1CrQHHO1vP1n7lctQEYqQe4AOHeGacX
-         G9h8enNP4omS4bsJPPlCjkTvmdOj/sN4A2suF3o6xroYEb4V+nFZGG8S7rCBxiNQ5rSS
-         ai7eMa/eRDEGQJ+88W6fzUt9PU4qntf8XP+7cvWXxdTIYEMxP0nO72R0gJEgxfdIxVSD
-         6yfoP44MsuLPtf2JpnShNmUArjX/aPemMchdNzhaaoVhyBvyiIETxuJ77rt2eSx0SzW5
-         YBWw==
-X-Forwarded-Encrypted: i=1; AJvYcCUURPu86If2du2a9Ac9anVZSkEfC8lcqpIK+JXPa4IttDzcGQeNvBUj1EJ5i+Sr6JLiBYcc+5A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxP5hGhJ1HeVJS6FuJ+XBtlGhjSix/YRQ5io5IRDRi9ax/F4bzL
-	YFcrSsvwfmNkfPR272syPtS3y1jmIWXgIK6dYuus334KAgdOtinl+sZQpBCoSH0=
-X-Gm-Gg: ASbGnctVT2qeLHe5IlUYNVlkgiua/ef1q6LD6QZf6qa4eRR1r1shENmTFROkWzp9v3q
-	sfr/b8VVaich5pAg5EMssexlYu13/IZeB8koFruTnHgwq7yB0oEgsm0HnSr4q9lJoyJx2ejh1l5
-	/ovSMTEBPAeJeGcdOiETWuzo70zjZnw6nVt2eSQ7j9JDfWf6SL04Q91l62M6V8xKjQYgNL9sqUq
-	oiOKHYRMQNouQ7KathQpiRs/sUf2SUMLCVRW7QEoxNgFupKend0ToziYiqcfkzC1M4vzL5qTtta
-	sKS+uCNvCJdDpXxQWNBhqivNexr7UWIog/Fe4tf37xP+Q3ZHeA==
-X-Google-Smtp-Source: AGHT+IFsPIR6Knj/ewMaXqXh6YdH08dtxvFyv6VA9rK7sxf3+pKbD8o9J6/llsPPYAyuvcsP8pwyQw==
-X-Received: by 2002:a05:600c:1c10:b0:43b:cb96:3cda with SMTP id 5b1f17b1804b1-43c68703f84mr21047775e9.28.1741355047048;
-        Fri, 07 Mar 2025 05:44:07 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-43bd41c7cc7sm86543445e9.0.2025.03.07.05.44.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Mar 2025 05:44:06 -0800 (PST)
-Date: Fri, 7 Mar 2025 16:44:02 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Cc: Simon Horman <horms@verge.net.au>, Julian Anastasov <ja@ssi.bg>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH net] ipvs: prevent integer overflow in do_ip_vs_get_ctl()
-Message-ID: <6dddcc45-78db-4659-80a2-3a2758f491a6@stanley.mountain>
+	s=arc-20240116; t=1741355187; c=relaxed/simple;
+	bh=xe3dq1lMwCjuvas4NThUEA2HM04dL8I/ZpvWQshvHDk=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=jU4019+fDR2xM0MoZt3QU9izQlwkqlSdmoVu56iTFBUXGGXwtkR/zuEMD288yTCu5YUMXR1hTGMH+lzvMoIxem/8CxIAu/1v0Aw8xmHsilt3gQWAHLzjfA1IC8krga3Igd3+RnBos2plJ73zIl99Da7UIuJcI9bLrJ5gFC/OgeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=vrtbW5Tf; arc=none smtp.client-ip=212.227.15.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1741355149; x=1741959949; i=markus.elfring@web.de;
+	bh=xe3dq1lMwCjuvas4NThUEA2HM04dL8I/ZpvWQshvHDk=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=vrtbW5TfKJndneNcCEsATPw+2baTk8MpsW2GdZwgiY7A5P6n4RIEVv5mFz87p0vj
+	 Oge8j2btcIQr+M3yGxbxHBzUK3SAL+R+xtF5zU/s0gYOnRzQT5ahcdM/irLWhfv73
+	 pYRR5NgP2kGtjigBBfGV0MOiQvCkxXWWUm9S7Io3omPiRdeD1Js/B245Opgu4qKdd
+	 OUAj4mXW2quI66zdQ+pzAS/E7G3a+qxIJdD7nlfw4wigURiT8lLYBK3Eg46+wvP8H
+	 6sLlcsB2S01UWlrXexTgdIpLoM8LsgRQ3LMRJStn3oSpDmkF8WAEfrMOrlIbVV8UC
+	 ZTHy9DogR9ibU1FoBA==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.70.70]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MN6FV-1taGDp47oj-00NlvY; Fri, 07
+ Mar 2025 14:45:49 +0100
+Message-ID: <153efbda-0e3c-493a-bbb1-a60341acb557@web.de>
+Date: Fri, 7 Mar 2025 14:45:44 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+User-Agent: Mozilla Thunderbird
+To: vulab@iscas.ac.cn, linux-rdma@vger.kernel.org, netdev@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Tariq Toukan <tariqt@nvidia.com>
+References: <20250307021820.2646-1-vulab@iscas.ac.cn>
+Subject: Re: [PATCH net v4?] net/mlx5: handle errors in
+ mlx5_chains_create_table()
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20250307021820.2646-1-vulab@iscas.ac.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:tmYN2Pjofv/eiFN8bLxU4cNyOa4V1SX0XeJ73cPWkyyhv2sJ43M
+ iJae9DYN8uWgVwUGhoSESz1uk+EEbybfaSwQUIIdd44iYGr5etE5upuzx0A1Bp6441ggAlA
+ M9QJRVr4jWahZLO5F9TaAZIxiYLzaAtgDh/qTl5zhlmwiXXpME2FvU1Je5oRAdwRGuYuI1a
+ iz/l4A5b0DBDDLdhtST5w==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:jYSBPqJ6fR8=;G4NRJm53FT3Ae4/aC4bR2KlNT/0
+ l/apEsQ/2l57MUGUXpGDaERnaq1AOf2v3OVHtD0vKBgiJLE4pqHe6i3FM+Okzwvcy1dQTBIO0
+ /Z/IxFewHKFbi+6BAhJ1GWDOZt0wmn3jHo2GSGzghEe3+B9nnGKcylpvhDEFPc4BJGD+zYOkj
+ WzAOYo/X3/tw63S0pmalZ21qEuw91cHgUp4LEHVMI4tX1odUAu2DCixbYNq/N6YaRQeZbVESs
+ Nf3/8pnN4+SrTu7DJQrSQOMavEpYFpXVV3HM0encZ6n4t6ymaaO/wU7JE4FyMFiaABysgRl/Y
+ v7QSkBghO2d89NH4ONvcMkPWnLD0Myu0OP7n7EfOgOfSeq9KK4DCvFJmVLkiVoXg4sj1yxl41
+ eopPLWOTqzG1yGd6WKf6simSY8YmZxN7lNbGYjFfvgMP7t5iAr/CdFcOWm7u4/69X9D3qk89Y
+ o8Vecf/1xGPnPYR3HgFuwXzkvt0JgXbJ7p2xx+hgeMIpDrBxLHbaZyF9+7LgcoSJO4RrCKE6D
+ sVka5CXqSrsx2j5FzOAuXd1iJWkFR4x+/gqA7AcGa/KLD2/8uhhpd+4taZk8nmILC2AKI3Nhk
+ DmYaM4bsFp9q0kssRBsIbHvqxUEotKaP77KzOTtqRqxTRLswi9MPOV3/VC6Qv5PtZK9eXH1LS
+ +bXHXIdVj56SDCwYZ9hnBSThuNhA/eGRFfM//9XFK6dZmGhd77BsvbjHn0ifTe+wBslZZ0ZxI
+ pVBHitdpcbwQEXPSqAugahpnEG9g8ACfyunh9yRH9ItLLiLJmA94ZrDkL6bxhqm9Sx6IdEPT8
+ UNCV+iWXKk52+BsS4Ly8yIXneiWU3wA69RjYPRb7q0WdaiQFfFTrHokr65HKQCqQrby26FtM5
+ e6ROzd5kfm1QPteOpDYtmO3lEMEsmXfR1aZZj/eKN5kkiSP4U7yCQ9+w1QM2KOyvxxpSdE3C+
+ 6J+5OFYGAYaSRkFBMpzJWaSPL2ctO7LybahJprJl8zaHegoQPhjbw7P1lcVrvshsHJ6Xv6HcC
+ 1DWanzhP/69Y26NawIRIfGbRA7HmkZAsTgzB5CTLd1WMrxLBtue3mRPUO21z1SSRmL4n57OEX
+ hj2q877lDSQebXMLSOsfWC0ZRjIOKE4U1eGoLTJTMjoy6xwm6KQCL1zyHR5ecTp6w613kGAfy
+ AsLmuyt0d/+ihX1pnF9gBjB5p7EkSYDz9fcvLDnr2dzZXb6nL/GgqINidrKCnBY7Ek0d17jjp
+ bDw5xy370+9DaXm7aY4qK92TXMOzWiDEh74e/BQ64BtUU/lsbNVu4rIptOUu0rsRNbTO2KkNA
+ NcFKFwjMyxdyVnhFaE58lrZ6zEBhFPN+/+dXS32nk3jSI/hfnxVNlBYEwXCsmFBalGdAumyS0
+ 5hFJ73QGYvQTJV4M2T3nZWvuDFHKrjBg/r0vNI2lG3zGnl+B1SUW4SsSRokDe48VhSVV/lMsd
+ qFJHeiw==
 
-The get->num_services variable is an unsigned int which is controlled by
-the user.  The struct_size() function ensures that the size calculation
-does not overflow an unsigned long, however, we are saving the result to
-an int so the calculation can overflow.
+I suggest to reconsider the patch version number selection once more.
 
-Save the result from struct_size() type size_t to fix this integer
-overflow bug.
 
-Cc: stable@vger.kernel.org
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- net/netfilter/ipvs/ip_vs_ctl.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+> In mlx5_chains_create_table(), the return value of mlx5_get_fdb_sub_ns()
+> and mlx5_get_flow_namespace() must be checked to prevent NULL pointer
+> dereferences. If either function fails, the function should log error
+> message with mlx5_core_warn() and return error pointer.
 
-diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
-index 7d13110ce188..801d65fd8a81 100644
---- a/net/netfilter/ipvs/ip_vs_ctl.c
-+++ b/net/netfilter/ipvs/ip_vs_ctl.c
-@@ -3091,12 +3091,12 @@ do_ip_vs_get_ctl(struct sock *sk, int cmd, void __user *user, int *len)
- 	case IP_VS_SO_GET_SERVICES:
- 	{
- 		struct ip_vs_get_services *get;
--		int size;
-+		size_t size;
- 
- 		get = (struct ip_vs_get_services *)arg;
- 		size = struct_size(get, entrytable, get->num_services);
- 		if (*len != size) {
--			pr_err("length: %u != %u\n", *len, size);
-+			pr_err("length: %u != %lu\n", *len, size);
- 			ret = -EINVAL;
- 			goto out;
- 		}
-@@ -3132,12 +3132,12 @@ do_ip_vs_get_ctl(struct sock *sk, int cmd, void __user *user, int *len)
- 	case IP_VS_SO_GET_DESTS:
- 	{
- 		struct ip_vs_get_dests *get;
--		int size;
-+		size_t size;
- 
- 		get = (struct ip_vs_get_dests *)arg;
- 		size = struct_size(get, entrytable, get->num_dests);
- 		if (*len != size) {
--			pr_err("length: %u != %u\n", *len, size);
-+			pr_err("length: %u != %lu\n", *len, size);
- 			ret = -EINVAL;
- 			goto out;
- 		}
--- 
-2.47.2
+Please improve such a change description another bit.
 
+See also:
+https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst?h=v6.14-rc5#n94
+
+Regards,
+Markus
 
