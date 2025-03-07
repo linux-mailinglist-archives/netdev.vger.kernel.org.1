@@ -1,111 +1,97 @@
-Return-Path: <netdev+bounces-172740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5204A55D8F
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 03:19:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4303EA55DB1
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 03:30:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01EE7178236
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 02:19:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4095C3B4B11
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 02:29:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1052216C684;
-	Fri,  7 Mar 2025 02:19:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21FE61865EB;
+	Fri,  7 Mar 2025 02:30:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ltWNggIL"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7E61624E0;
-	Fri,  7 Mar 2025 02:19:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA58E17E472;
+	Fri,  7 Mar 2025 02:30:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741313958; cv=none; b=YP4YhDVlrloJN+ufRMbihWrEux8XAbC/7NOfFm+1SQXxhNax9l+DiHJFxRcs0CWaoEu/qGOOL4R+8IqYXyd4P9dJ6E12HQsHtc2sSPT3hSwWw3PUFYy74HGqsQ9MBbCrpfDIHipkIkOu5Rcylhv1sWzhRdTmKcIgNkNHyQEndRA=
+	t=1741314604; cv=none; b=LJ9X4jbx4vDiJX4mEtgtm5xRgXCu9zXJUf3rE9V3sTDkLXwMaAMunA9S9CIXJ8dFEbYOf422BRZcN8+zjv2Cq/fPs1CjSjfLPBfsHK2i2JbGsKggaQBZNC+u1KgV2kZmCEY6MtbaDN83KoW4bnOLCwOUHgHCSYIEUO2xWjYfb10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741313958; c=relaxed/simple;
-	bh=FGi/1apNx15Za9JRlWcziIb/iIghphK92spwdswLCVQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UwTH42G4+s5fjY6gEO+yMoqSiz9vGG9nx1hQCVziZSn4aaSagtu5rOQ3mWy0+LKR/gL91y9+plIlFfbyJrzK+5wVL+LY2mtt6CNN5kgAXTLBnh9xkOyX1XTKHX1hkKl/HGCcHaKbc0qiyqglD44aUh5Fg5z3gq0flqbu3D9JboE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [124.16.141.245])
-	by APP-01 (Coremail) with SMTP id qwCowAAHDm6FV8pnsGkMEw--.19544S2;
-	Fri, 07 Mar 2025 10:18:51 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: saeedm@nvidia.com,
-	leon@kernel.org,
-	tariqt@nvidia.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>
-Subject: [PATCH net v3] net/mlx5: handle errors in mlx5_chains_create_table()
-Date: Fri,  7 Mar 2025 10:18:20 +0800
-Message-ID: <20250307021820.2646-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.42.0.windows.2
+	s=arc-20240116; t=1741314604; c=relaxed/simple;
+	bh=qOYNlxGvpwI9YokRQvVn4Dq14vflRZUeZT6YqYChAlU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=qoRzuFktuMqFfdMKsQIbnTePvy27+cAYMKOTRDHsUq1WOK7qaKbxy+2i827Glpq3M94Z/c1ATyzR5mMatQ5v7ZExGj7RvlJC8HWxdl0wvpttpRHuPRMgfGWx1/mJbB0vj0hYTD4sV7i5k/3u+/gMpLqrx2GfTX7T4u9+mTuwzbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ltWNggIL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D4B3C4CEE0;
+	Fri,  7 Mar 2025 02:30:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741314603;
+	bh=qOYNlxGvpwI9YokRQvVn4Dq14vflRZUeZT6YqYChAlU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ltWNggILIneTHZxHcWxYbdSFa4XKntYI3tr5p9k3MY/bqdK65y6VlJBa2+2OPZA0e
+	 ZydmZ9jf6AG26dDPkqqbcWu5GwIG7zBj/t/fZxiNeut6JRtqryY0D98XQJKoDaAvRW
+	 XeuADTGyFyrkJJyK/EMvkwgwzMuKEG4AVwfbu9+cfD8rL1DurBpde+MeuowOgwfxi7
+	 x3ziWqE022tRYwZbk9LuXk7g7MA/1Z8X60T6uUjw/sA438V1nBsM602uVlYGrDSC3m
+	 NRhZNw1g9bzPZiu6Wcn6k3j0oiCzC3OrsEY/BjnNOU3K0obyC6I/f864d+3xU9zpdc
+	 +rRaGnKrFzoVQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB6E2380CFF6;
+	Fri,  7 Mar 2025 02:30:37 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowAAHDm6FV8pnsGkMEw--.19544S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7uF17XFyfCw1xGryxXF1UWrg_yoW8Xr13pF
-	43AryDWrZ8A348X34UZrWFq34rua1kKa4j9Fs3K3yfZwnrXanrAF1rG34akw1jkryUG39x
-	tFn8A3WUZFZxCFUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr
-	1j6F4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv
-	7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r
-	1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02
-	628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4
-	IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1r
-	MI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJV
-	WUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j
-	6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
-	BIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiDAUOA2fKT08r5wAAsl
+Subject: Re: [PATCH net 1/3] netfilter: nft_ct: Use __refcount_inc() for per-CPU
+ nft_ct_pcpu_template.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174131463678.1860023.9118503742214228840.git-patchwork-notify@kernel.org>
+Date: Fri, 07 Mar 2025 02:30:36 +0000
+References: <20250306153446.46712-2-pablo@netfilter.org>
+In-Reply-To: <20250306153446.46712-2-pablo@netfilter.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, fw@strlen.de, horms@kernel.org
 
-In mlx5_chains_create_table(), the return value of mlx5_get_fdb_sub_ns()
-and mlx5_get_flow_namespace() must be checked to prevent NULL pointer
-dereferences. If either function fails, the function should log error
-message with mlx5_core_warn() and return error pointer.
+Hello:
 
-Fixes: 39ac237ce009 ("net/mlx5: E-Switch, Refactor chains and priorities")
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
-[v1]->[v2]: Add Fixes tag and branch target. Change return value.
-[v2]->[v3]: Change Fixes tag. Move change history.
----
- drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c | 5 +++++
- 1 file changed, 5 insertions(+)
+This series was applied to netdev/net.git (main)
+by Pablo Neira Ayuso <pablo@netfilter.org>:
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
-index a80ecb672f33..711d14dea248 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
-@@ -196,6 +196,11 @@ mlx5_chains_create_table(struct mlx5_fs_chains *chains,
- 		ns = mlx5_get_flow_namespace(chains->dev, chains->ns);
- 	}
- 
-+	if (!ns) {
-+		mlx5_core_warn(chains->dev, "Failed to get flow namespace\n");
-+		return ERR_PTR(-EOPNOTSUPP);
-+	}
-+
- 	ft_attr.autogroup.num_reserved_entries = 2;
- 	ft_attr.autogroup.max_num_groups = chains->group_num;
- 	ft = mlx5_create_auto_grouped_flow_table(ns, &ft_attr);
+On Thu,  6 Mar 2025 16:34:44 +0100 you wrote:
+> From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> 
+> nft_ct_pcpu_template is a per-CPU variable and relies on disabled BH for its
+> locking. The refcounter is read and if its value is set to one then the
+> refcounter is incremented and variable is used - otherwise it is already
+> in use and left untouched.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/3] netfilter: nft_ct: Use __refcount_inc() for per-CPU nft_ct_pcpu_template.
+    https://git.kernel.org/netdev/net/c/5cfe5612ca95
+  - [net,2/3] netfilter: nf_conncount: garbage collection is not skipped when jiffies wrap around
+    https://git.kernel.org/netdev/net/c/df08c94baafb
+  - [net,3/3] netfilter: nf_tables: make destruction work queue pernet
+    https://git.kernel.org/netdev/net/c/fb8286562ecf
+
+You are awesome, thank you!
 -- 
-2.42.0.windows.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
