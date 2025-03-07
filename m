@@ -1,75 +1,85 @@
-Return-Path: <netdev+bounces-173050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12F5DA5703B
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 19:14:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC909A57053
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 19:19:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD9AA3AEB32
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 18:14:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 229C6173A86
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 18:19:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76DF02417D3;
-	Fri,  7 Mar 2025 18:14:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98C2E19ABC2;
+	Fri,  7 Mar 2025 18:19:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VIILVu3z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hCNvRQvh"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A06D123A9A5
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 18:14:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A8B23C392;
+	Fri,  7 Mar 2025 18:18:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741371256; cv=none; b=l5tb/pcYi4nyqXA1+3pgnzm+8qkfa4RbxNmrX6KN+P5tmZcdbCe+9V7JGGoOL4h7sQKmOKbzmYjXWuuU7OGXcyU9bJVhWTGVUZgFLUzxYx0Z/uZSjPbFq7Z33EL8XiTQtG022cvWDK7ZghD5IX35N9Kfq/EU3FhD/NEE3Yc7/Nk=
+	t=1741371541; cv=none; b=H6Ie8zdoCh0PEqOha9gUyjjITCMAt8RD3xl5pIDsec5JsElHfd4wzV9YyV/RGb4WKeNERfaWqwZQjMUBCmP8HuImXo+49XMMWWzT4MBV+jiU5DMzoyOMvhYiCI6faaK532ar6GpPD1KllDnt4Uf/ZNOMMk/OlkZ3mvs+v4kF9fQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741371256; c=relaxed/simple;
-	bh=9HCuc9/cZCdRLQhP9TVaYkD9IZQVvOjtXCfxhd0v04I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=clLwh+mpL5+5wQqxPOV1khSWKp866FejtMi72x/R1233Fz/n8M5oSdKWViKHe11au/S54wl0WVlRaelhgt4u6EZLqWDvhq0TjUaOpo1CoVU6SrbTJTckAIaxZwL8l4CWIwKHra6DtKLYVIH19JmqoQd5+GAXXDlDEv+QANtUgec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VIILVu3z; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741371253;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=j6q6FjeAaWWvWuFA5g6vXkOY/RfLTAxpMkX51ecIu8o=;
-	b=VIILVu3z/0U2X3hihM+TDiZsnkw/8/wiaJlBEPC5x0lhbI1ys6P7I5Q7b18sX0BN3DJMu0
-	K+LX6K7KGTeDu+jGDgkhZNGICkI+VXAxA73TgYcVZaf0uCnqhysWdKkhihWcxYEcxzXF9N
-	A4ObJqGBKTp63IzZSa04e+JWx83chqs=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-542-lyPHRgBcPaCOBG1A7hVC7A-1; Fri,
- 07 Mar 2025 13:14:09 -0500
-X-MC-Unique: lyPHRgBcPaCOBG1A7hVC7A-1
-X-Mimecast-MFC-AGG-ID: lyPHRgBcPaCOBG1A7hVC7A_1741371247
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ABD91180AF56;
-	Fri,  7 Mar 2025 18:14:07 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.34.79])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 316B71828A89;
-	Fri,  7 Mar 2025 18:14:04 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	David Ahern <dsahern@kernel.org>
-Subject: [PATCH v2 net-next 2/2] udp_tunnel: use static call for GRO hooks when possible
-Date: Fri,  7 Mar 2025 19:13:27 +0100
-Message-ID: <8c8263ab59b1e9366f245eec4dfdccd368496e3d.1741338765.git.pabeni@redhat.com>
-In-Reply-To: <cover.1741338765.git.pabeni@redhat.com>
-References: <cover.1741338765.git.pabeni@redhat.com>
+	s=arc-20240116; t=1741371541; c=relaxed/simple;
+	bh=aq8Wo/8aCbFK4rxRqAt07pPQLjsTUxSY+RTbLI6p1P4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i2I7wwzjhrBamV1GVWpMNmkLKELhuJSyKgqFitb4KLWLPi211zsvVhdA+NZ8hoMBaKynImCoD6ZfxYD0rClzrfJKXNcM1F3kogfM+H6uxDDIewnLi+ja5vMIogzolQBYVWRWMlGMS66nGlO4mCdp9+jSPOBritfZvBBhWfxLTIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hCNvRQvh; arc=none smtp.client-ip=209.85.221.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-523cbce071bso849990e0c.0;
+        Fri, 07 Mar 2025 10:18:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741371539; x=1741976339; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=maGk7Q8fBbZb2d3H7OPJe6h/vgdCD27yZ0lAu/GNzy0=;
+        b=hCNvRQvhqQxhmXku5vKeOqVIL+YEPSJ2xsMdG8y9hZSViKkFZPEk8J9ffYwrlEKg40
+         kUNcg5t34fHhxKM47+B9RSaw4BY4HSGMUnK98CpceeOQFDEA9nkpXxLC8sBBH2NGt+za
+         ePwB08SqoPQL+JEJmb7CXwI0UyOEotFA1Hpi2GQ3SPRnP1l99Zd6nPDpcOUDFAvv7R2i
+         h5zFEDuIUifgyIZVcFEB00g7pdFksgkffdKigIuaxaY5ne2N91Eo3ldPNQKH/HYk+RsO
+         tcg2bfTtux48oYW7xfcTC7Ie/HlD2pANMchp/mDmP4HdHCXJqo04vQEZ/kenZRT7i/VW
+         sVxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741371539; x=1741976339;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=maGk7Q8fBbZb2d3H7OPJe6h/vgdCD27yZ0lAu/GNzy0=;
+        b=HSuKKTH71FkeOHONZP5OGsEdIZk4h5Lf8lOPZwsbFepRH4WkqBahTNt78aVsvSO8ED
+         DPWUFlAyi+dywhEsIiSQ5ijFHDPkQDBzX0YH8jAVqsv0KaPb5AFMKq8FSy4HprxIwtnx
+         Q/KNFp4ZOWTWSgQNlBxNTIJeO16x7Zs2ywVEaMmExR5CLGnObrXeJq9cJe0d1cnUGBNB
+         p4a8+AkCI/UT+4ykgl553hOw1B67+rywCH/13aSFntjar2FAERCwfC5uu/9g+wHSORY9
+         Om9JTdlA6iWRintOi1EyUKCjHFjIu85bcuzICVD6vDLShJBKlaBMFjBT72zlCN/Pblef
+         1SOA==
+X-Forwarded-Encrypted: i=1; AJvYcCXfHYMtPzTA6+S9pmPiM780xQIlvzzmJy/bj8zhr4j+ADeQWYGSj77h7C4w9aJCki9ujqSVHkE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUkp+smI55BnljMTAUwF5lbmRj+nXad4SRyYxz1KpZvbJ0L4pL
+	OfPyvZETpM6/6oO/ZZ6lZHE9PYCRpOLSwp/fA45EUoSKjf43bWwn/bv9XMGY
+X-Gm-Gg: ASbGncvFQ/x9hOX+MDzsetQv4gcQM53exw9jAq1io/Yr51cEjKrXF1wYx90Ro+HiDp4
+	/5qQwqNhSC1gBnnkF2NGUkMDVNw786Xyh27QDr69GUSDh09lUSjR+TS4/tgN1hrWl1a1Z/Kh0Mg
+	kMhXqfV4r3YhXYTIHfzpLVbtCXpq1QhT01C1exAomM+Rj8UWBb0Ptbkk5niQtjuM+BK+FG4zh56
+	vOvSEek7CNfhu/Efxu+rqS5oD4mjlZ9cC759AQmabQbuPN2RCicx4TauKOWNGYx9YR9+ZGcnF0Y
+	vdqufdTWnaY1mclJU5weCbZMKI7CbM7K8FVHKoHJtZfDZlO7PRKe8j695I8ofrlvnQF1BGQjxlE
+	/D2uI6O6aDNhjew==
+X-Google-Smtp-Source: AGHT+IE2ZaqgQosJyZ/JwBXFGrmdu97ZLU+QQoPp/Ch/Vp4gFrY5nWAkip9FleREFNx6VFFBJDXEPA==
+X-Received: by 2002:a05:6122:7ce:b0:523:9ee7:7f8e with SMTP id 71dfb90a1353d-523e414a989mr3852102e0c.4.1741371538784;
+        Fri, 07 Mar 2025 10:18:58 -0800 (PST)
+Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-86d33bbe52esm787345241.7.2025.03.07.10.18.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Mar 2025 10:18:56 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [GIT PULL] bluetooth 2025-03-07
+Date: Fri,  7 Mar 2025 13:18:54 -0500
+Message-ID: <20250307181854.99433-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,237 +87,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-It's quite common to have a single UDP tunnel type active in the
-whole system. In such a case we can replace the indirect call for
-the UDP tunnel GRO callback with a static call.
+The following changes since commit fc14f9c02639dfbfe3529850eae23aef077939a6:
 
-Add the related accounting in the control path and switch to static
-call when possible. To keep the code simple use a static array for
-the registered tunnel types, and size such array based on the kernel
-config.
+  Merge tag 'nf-25-03-06' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf (2025-03-06 17:58:50 -0800)
 
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
-v1 -> v2:
- - fix UDP_TUNNEL=n build
----
- include/net/udp_tunnel.h   |   4 ++
- net/ipv4/udp_offload.c     | 140 ++++++++++++++++++++++++++++++++++++-
- net/ipv4/udp_tunnel_core.c |   2 +
- 3 files changed, 145 insertions(+), 1 deletion(-)
+are available in the Git repository at:
 
-diff --git a/include/net/udp_tunnel.h b/include/net/udp_tunnel.h
-index eda0f3e2f65fa..a7b230867eb14 100644
---- a/include/net/udp_tunnel.h
-+++ b/include/net/udp_tunnel.h
-@@ -205,9 +205,11 @@ static inline void udp_tunnel_encap_enable(struct sock *sk)
- 
- #if IS_ENABLED(CONFIG_NET_UDP_TUNNEL)
- void udp_tunnel_update_gro_lookup(struct net *net, struct sock *sk, bool add);
-+void udp_tunnel_update_gro_rcv(struct sock *sk, bool add);
- #else
- static inline void udp_tunnel_update_gro_lookup(struct net *net,
- 						struct sock *sk, bool add) {}
-+static inline void udp_tunnel_update_gro_rcv(struct sock *sk, bool add) {}
- #endif
- 
- static inline void udp_tunnel_cleanup_gro(struct sock *sk)
-@@ -215,6 +217,8 @@ static inline void udp_tunnel_cleanup_gro(struct sock *sk)
- 	struct udp_sock *up = udp_sk(sk);
- 	struct net *net = sock_net(sk);
- 
-+	udp_tunnel_update_gro_rcv(sk, false);
-+
- 	if (!up->tunnel_list.pprev)
- 		return;
- 
-diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index 054d4d4a8927f..f06dd82d28562 100644
---- a/net/ipv4/udp_offload.c
-+++ b/net/ipv4/udp_offload.c
-@@ -15,6 +15,39 @@
- #include <net/udp_tunnel.h>
- 
- #if IS_ENABLED(CONFIG_NET_UDP_TUNNEL)
-+
-+/*
-+ * Dummy GRO tunnel callback; should never be invoked, exists
-+ * mainly to avoid dangling/NULL values for the udp tunnel
-+ * static call.
-+ */
-+static struct sk_buff *dummy_gro_rcv(struct sock *sk,
-+				     struct list_head *head,
-+				     struct sk_buff *skb)
-+{
-+	WARN_ON_ONCE(1);
-+	NAPI_GRO_CB(skb)->flush = 1;
-+	return NULL;
-+}
-+
-+typedef struct sk_buff *(*udp_tunnel_gro_rcv_t)(struct sock *sk,
-+						struct list_head *head,
-+						struct sk_buff *skb);
-+
-+struct udp_tunnel_type_entry {
-+	udp_tunnel_gro_rcv_t gro_receive;
-+	refcount_t count;
-+};
-+
-+#define UDP_MAX_TUNNEL_TYPES (IS_ENABLED(CONFIG_GENEVE) + \
-+			      IS_ENABLED(CONFIG_VXLAN) * 2 + \
-+			      IS_ENABLED(CONFIG_FOE) * 2)
-+
-+DEFINE_STATIC_CALL(udp_tunnel_gro_rcv, dummy_gro_rcv);
-+static DEFINE_STATIC_KEY_FALSE(udp_tunnel_static_call);
-+static struct mutex udp_tunnel_gro_type_lock;
-+static struct udp_tunnel_type_entry udp_tunnel_gro_types[UDP_MAX_TUNNEL_TYPES];
-+static unsigned int udp_tunnel_gro_type_nr;
- static DEFINE_SPINLOCK(udp_tunnel_gro_lock);
- 
- void udp_tunnel_update_gro_lookup(struct net *net, struct sock *sk, bool add)
-@@ -43,6 +76,109 @@ void udp_tunnel_update_gro_lookup(struct net *net, struct sock *sk, bool add)
- 	spin_unlock(&udp_tunnel_gro_lock);
- }
- EXPORT_SYMBOL_GPL(udp_tunnel_update_gro_lookup);
-+
-+void udp_tunnel_update_gro_rcv(struct sock *sk, bool add)
-+{
-+	struct udp_tunnel_type_entry *cur = NULL, *avail = NULL;
-+	struct udp_sock *up = udp_sk(sk);
-+	bool enabled, old_enabled;
-+	int i;
-+
-+	if (!up->gro_receive)
-+		return;
-+
-+	mutex_lock(&udp_tunnel_gro_type_lock);
-+	for (i = 0; i < UDP_MAX_TUNNEL_TYPES; i++) {
-+		if (!refcount_read(&udp_tunnel_gro_types[i].count))
-+			avail = &udp_tunnel_gro_types[i];
-+		else if (udp_tunnel_gro_types[i].gro_receive == up->gro_receive)
-+			cur = &udp_tunnel_gro_types[i];
-+	}
-+	old_enabled = udp_tunnel_gro_type_nr == 1;
-+	if (add) {
-+		/*
-+		 * Update the matching entry, if found, or add a new one
-+		 * if needed
-+		 */
-+		if (cur) {
-+			refcount_inc(&cur->count);
-+			goto out;
-+		}
-+
-+		if (unlikely(!avail)) {
-+			/* Ensure static call will never be enabled */
-+			pr_err_once("Unexpected amount of UDP tunnel types, please update UDP_MAX_TUNNEL_TYPES\n");
-+			udp_tunnel_gro_type_nr = UDP_MAX_TUNNEL_TYPES + 1;
-+			goto out;
-+		}
-+
-+		refcount_set(&avail->count, 1);
-+		avail->gro_receive = up->gro_receive;
-+		udp_tunnel_gro_type_nr++;
-+	} else {
-+		/*
-+		 * The stack cleanups only successfully added tunnel, the
-+		 * lookup on removal should never fail.
-+		 */
-+		if (WARN_ON_ONCE(!cur))
-+			goto out;
-+
-+		if (!refcount_dec_and_test(&cur->count))
-+			goto out;
-+		udp_tunnel_gro_type_nr--;
-+	}
-+
-+	/* Update the static call only when switching status */
-+	enabled = udp_tunnel_gro_type_nr == 1;
-+	if (enabled && !old_enabled) {
-+		for (i = 0; i < UDP_MAX_TUNNEL_TYPES; i++) {
-+			cur = &udp_tunnel_gro_types[i];
-+			if (refcount_read(&cur->count)) {
-+				static_call_update(udp_tunnel_gro_rcv,
-+						   cur->gro_receive);
-+				static_branch_enable(&udp_tunnel_static_call);
-+			}
-+		}
-+	} else if (!enabled && old_enabled) {
-+		static_branch_disable(&udp_tunnel_static_call);
-+		static_call_update(udp_tunnel_gro_rcv, dummy_gro_rcv);
-+	}
-+
-+out:
-+	mutex_unlock(&udp_tunnel_gro_type_lock);
-+}
-+EXPORT_SYMBOL_GPL(udp_tunnel_update_gro_rcv);
-+
-+static void udp_tunnel_gro_init(void)
-+{
-+	mutex_init(&udp_tunnel_gro_type_lock);
-+}
-+
-+static struct sk_buff *udp_tunnel_gro_rcv(struct sock *sk,
-+					  struct list_head *head,
-+					  struct sk_buff *skb)
-+{
-+	if (static_branch_likely(&udp_tunnel_static_call)) {
-+		if (unlikely(gro_recursion_inc_test(skb))) {
-+			NAPI_GRO_CB(skb)->flush |= 1;
-+			return NULL;
-+		}
-+		return static_call(udp_tunnel_gro_rcv)(sk, head, skb);
-+	}
-+	return call_gro_receive_sk(udp_sk(sk)->gro_receive, sk, head, skb);
-+}
-+
-+#else
-+
-+static void udp_tunnel_gro_init(void) {}
-+
-+static struct sk_buff *udp_tunnel_gro_rcv(struct sock *sk,
-+					  struct list_head *head,
-+					  struct sk_buff *skb)
-+{
-+	return call_gro_receive_sk(udp_sk(sk)->gro_receive, sk, head, skb);
-+}
-+
- #endif
- 
- static struct sk_buff *__skb_udp_tunnel_segment(struct sk_buff *skb,
-@@ -654,7 +790,7 @@ struct sk_buff *udp_gro_receive(struct list_head *head, struct sk_buff *skb,
- 
- 	skb_gro_pull(skb, sizeof(struct udphdr)); /* pull encapsulating udp header */
- 	skb_gro_postpull_rcsum(skb, uh, sizeof(struct udphdr));
--	pp = call_gro_receive_sk(udp_sk(sk)->gro_receive, sk, head, skb);
-+	pp = udp_tunnel_gro_rcv(sk, head, skb);
- 
- out:
- 	skb_gro_flush_final(skb, pp, flush);
-@@ -804,5 +940,7 @@ int __init udpv4_offload_init(void)
- 			.gro_complete =	udp4_gro_complete,
- 		},
- 	};
-+
-+	udp_tunnel_gro_init();
- 	return inet_add_offload(&net_hotdata.udpv4_offload, IPPROTO_UDP);
- }
-diff --git a/net/ipv4/udp_tunnel_core.c b/net/ipv4/udp_tunnel_core.c
-index b969c997c89c7..1ebc5daff5bc8 100644
---- a/net/ipv4/udp_tunnel_core.c
-+++ b/net/ipv4/udp_tunnel_core.c
-@@ -90,6 +90,8 @@ void setup_udp_tunnel_sock(struct net *net, struct socket *sock,
- 
- 	udp_tunnel_encap_enable(sk);
- 
-+	udp_tunnel_update_gro_rcv(sock->sk, true);
-+
- 	if (!sk->sk_dport && !sk->sk_bound_dev_if && sk_saddr_any(sock->sk))
- 		udp_tunnel_update_gro_lookup(net, sock->sk, true);
- }
--- 
-2.48.1
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-03-07
 
+for you to fetch changes up to ab6ab707a4d060a51c45fc13e3b2228d5f7c0b87:
+
+  Revert "Bluetooth: hci_core: Fix sleeping function called from invalid context" (2025-03-07 13:03:05 -0500)
+
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - btusb: Configure altsetting for HCI_USER_CHANNEL
+ - hci_event: Fix enabling passive scanning
+ - revert: "hci_core: Fix sleeping function called from invalid context"
+ - SCO: fix sco_conn refcounting on sco_conn_ready
+
+----------------------------------------------------------------
+Hsin-chen Chuang (1):
+      Bluetooth: btusb: Configure altsetting for HCI_USER_CHANNEL
+
+Luiz Augusto von Dentz (2):
+      Bluetooth: hci_event: Fix enabling passive scanning
+      Revert "Bluetooth: hci_core: Fix sleeping function called from invalid context"
+
+Pauli Virtanen (1):
+      Bluetooth: SCO: fix sco_conn refcounting on sco_conn_ready
+
+ drivers/bluetooth/Kconfig        |  12 +++++
+ drivers/bluetooth/btusb.c        |  41 +++++++++++++++
+ include/net/bluetooth/hci_core.h | 108 ++++++++++++++-------------------------
+ net/bluetooth/hci_core.c         |  10 ++--
+ net/bluetooth/hci_event.c        |  37 ++++++++------
+ net/bluetooth/iso.c              |   6 ---
+ net/bluetooth/l2cap_core.c       |  12 ++---
+ net/bluetooth/rfcomm/core.c      |   6 ---
+ net/bluetooth/sco.c              |  25 ++++++---
+ 9 files changed, 144 insertions(+), 113 deletions(-)
 
