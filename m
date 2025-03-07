@@ -1,309 +1,131 @@
-Return-Path: <netdev+bounces-172789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5963BA56024
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 06:42:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1AB7A56026
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 06:42:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 434453A9548
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 05:42:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DE2B17742C
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 05:42:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11F3E166F3D;
-	Fri,  7 Mar 2025 05:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDC3619306F;
+	Fri,  7 Mar 2025 05:42:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P+CRSiFh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NfrvOjfx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA9057FD
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 05:42:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2639F7FD;
+	Fri,  7 Mar 2025 05:42:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741326162; cv=none; b=BeLCTk4GwXej00BFPcerb8DA/qUPkTsyHXzuODFwN1S2s55OKABImoiZcqhJNMzEOg4bqq7QSDX32entTb9OQW+JNi945tcE2QdhmwLd/nX6/aqaj4L5a+Gl97rsJiLOrsdMsdjt9tdPMPlKzivvZmYixZUyHm+MdmT9RfDSXIk=
+	t=1741326167; cv=none; b=ax0CYAoh64Ytb0gBbnZTB6lzc2BLcr6yGm8y3KgqcFYyrNAtM0xmXIsqQF8C/mGYTQ00t3z/c7URDZm9tbzYXBkTM53J9bKYHBrHBrowfh6RbEY/KH4z4mZcNZgvJ/ctsHuByWfj2v8Cap+2JqQYGhRbs6r+K/1IS8FpRMiC/NE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741326162; c=relaxed/simple;
-	bh=q/EmAd4hSTp/mW4YVgEutZ8yewQwUlnZLPCny71tE+E=;
+	s=arc-20240116; t=1741326167; c=relaxed/simple;
+	bh=2VDFGRlYKXRUljBblvdtFlwOOzj13mn547LMTaJP2gE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dy0w93/6M+SgucRyqZsObWgPw7RC0b6ZBocvn+de/RRSv6BymZnkI8CESDuGCo11TC9p/azV8EZ6mXY8z9MDX1w2XIgb3+37FYlLo0SP2tXNz8dCsnWyfVQklkeaHmOondozEmBB8ioqCrAdT3dNflJnN6WOf828S9b3a2/ciAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P+CRSiFh; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-549924bc82aso2723e87.1
-        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 21:42:39 -0800 (PST)
+	 To:Cc:Content-Type; b=bzFzCPXKxwmFzDUniqoJsp8UfHffh0aYbLoQAGexJX2mtVqz+74TyR/BpQtXAqbnG8IKYtDcC0A3tOaQdrg/R4fWIjPhZN4Xz+EYSq7mtXyWE39Upgs288GIDy+hU0nFHerVFDIhsX1bPjpHhyzD4yEh2jUJhPmTcK+Bx1X9P20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NfrvOjfx; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5e4d3f92250so2057813a12.1;
+        Thu, 06 Mar 2025 21:42:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741326158; x=1741930958; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1741326164; x=1741930964; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uDw9oiHRuEGnoLlAxBvRVZT+Z3gwxIerZGJ9YIsCCsY=;
-        b=P+CRSiFhkBfhv5ODUWUyYQmS3joYX1xOtqXeYj83hqDQECvkdPT2OkmtJ1q9lEQudp
-         gHQYPf/1q7rba5eoiYSCFJX71aAArFVmEMZSw2OrnEU9i/BZlpkyZySZF7g2A85nfrNz
-         4+H2m+Iw+cCITYAG5DNmbvHMwF9KJVdGfdSFPrfyD+6ixNn/RkJZ1bpANJXDet03HIlF
-         LNOis0i3guZXjLlP0HTCruTiojAJ/UYzBd27HzWcrNHSmxXT6Qq2hJUPOGKJZ4M61/zm
-         VH24SZ7R39qXR4mFWr6gfOBWdUinakTZYRacIw1bsO6fuvbAytguVkT9pUJkR/Ci3Ky9
-         hGmA==
+        bh=XCCuSIdseDmohQkR/a0WVoB8hKN3v/q9qa5r2iXYOqo=;
+        b=NfrvOjfxEYG/YE8BX4gCmBYij08fYvo1Pa2Tob3y6Ne7hUA9IWwT5fp7rw5DTrZVE6
+         AyxgBC905Vvd/X8F6tP7O80KUItKevWyAays194tUGT8I03OV6ohI0g1vq6/9+u8MSXI
+         XQ4a2huJ9WR1pT7LOm6I/zlmAo2p/STvt/q/oidO04T4nox4fm+sJuNlir0jFnhd2MA0
+         AnPgfisLQdhkpam9PWx8uPJhSlKTuuWIkavMITSEZ5iFinnZLlXk6dz8BkXdzzdAdt44
+         LXWpZOnHgsQ39pFGCxKRiwcMyee17sCP+b6g2lh1013XVj2bsnK6vyL74TBfde/LCtXM
+         0r+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741326158; x=1741930958;
+        d=1e100.net; s=20230601; t=1741326164; x=1741930964;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uDw9oiHRuEGnoLlAxBvRVZT+Z3gwxIerZGJ9YIsCCsY=;
-        b=v4KJOFjInl5gpewRThsxQgJIqHcwWd52Fl58+B+fxa7UHluigfzCWp/KR1ciQy/1Cs
-         J8TOgHURV0hpTJyIiqN/Qocjhtcm250wdo055pEJcyfn9ZCoQWOM+LcuVznijoKZq8t/
-         FmZr4Y9p0hyRAmNw6fVXAPdXNNVb+ge/d9xzXziBq5vr2qA9E6yJlRiKmIS8g1AEfQGr
-         2LspR0Tab1on03eFB7AgOYbr/RwGFiqeusk+9BFCNAvDGCTbtMnu4UcLnvv4bg8AmnpI
-         VQARYrMZ4Xv4aBdyF8KNQ96IXro5RGc0FiX585x6Kk8s9Wa7BCHEMWqqSXHOXLAqZoYH
-         9jrQ==
-X-Gm-Message-State: AOJu0Yx5f7Gc7ERA3/AUi9QO/j5yiAUZK72S6ZIYg8rNdG2Lw6XGJBJc
-	G2hEJZYaraecyV3IpkC8qnzd2KOCtQ0sgbdXfoMsP2iA0AbxV/tNBofk8RBWqTBhKoTEGnhCjUP
-	vuz3Nis1sR/01k2kWIImMt/XNEoE82cSABwxx
-X-Gm-Gg: ASbGncvNMkNJcSqAiKG+gCKjmXTutxweK4eFd4d4Aq7ghg2rUm5hEeyUfXnxMjssw9C
-	kl5zlI35o7HqVtxmacjPMqZZaneIbnCH3vCPuUGhhudMroREF/H6mCBvGX/sdQhND8/XGwW6VXu
-	hU5g7+gGIQRwPz3cVTbFoqsYffOwk5cSCJOhciJYNM5Lz6muiQDTTqHAxc
-X-Google-Smtp-Source: AGHT+IH95QTTw5bO7Ao+hPgPn4qkRdTkWzZBeph1YkD746G1l9cUIKTXz0RW/MygvHUNBdPFKZs8S6v78c56FhFZd9I=
-X-Received: by 2002:a05:6512:1389:b0:543:e3c3:5a5e with SMTP id
- 2adb3069b0e04-54991430d5bmr198992e87.4.1741326157373; Thu, 06 Mar 2025
- 21:42:37 -0800 (PST)
+        bh=XCCuSIdseDmohQkR/a0WVoB8hKN3v/q9qa5r2iXYOqo=;
+        b=tHIeEvm/VrqjqK6ksVhnVxFC8yZflMUFKqQBZtN2DaEKHIeHPHCr1LHW2OL1L2ETwr
+         WKhCV69/0V1AKzrhHzEnw8Kmn2d2/woMYJR0hIrkvAjGYhU0EgcrsXQ6g69MHYUXQq3J
+         fzlIgJkM4kCyqC5NtJOB3of6ikNj/SiCXskDZjA5vs2tOGw3bAixDgvBv9HWV+LIKcst
+         CbKubEbyXZI+TV3XXFAO57dnuLm0EbdRxRpRg9i5yLA3QxiRIyyQ7nX0AgitK//Y/CwZ
+         1SZc1mkS/jFC447UmRJVbvu7ZlCGZHM78Qv7WgK7deOJzRRZj7VH9oxhGQ/MhEXTa1ff
+         XOew==
+X-Forwarded-Encrypted: i=1; AJvYcCUzav3jyNQgEUmwcrD521/dzHvLjo9xlJljYJmw5uhPkZ6DS2T52W26KMu//WW9uPinolzg2RcS@vger.kernel.org, AJvYcCXpx8DBOazZr6kat3/MzKCM5Z9vsNzYbdsnYYNhYfhs/OtY7Ib+xuDKz35ARhP2VvkXkGkW7GEoOV6q0OEfUlw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywxf63KmjiZGnmm/7Wpks1zp+GaTvgAsFMAqqnYRGrOvrKmpBwu
+	TrxGkVBK0jeZyFR5CqJJ5xC55mhQAGcomrhp10GL49fd+vwuslbMprXQ2H1aJzvKjnKp5B/YrUE
+	WndgkQHIU+ZRGuot12yjerIMv13w=
+X-Gm-Gg: ASbGnctZ7SX8vU/sZdGB6kErx6+I1r3coTQrvXwpH+Uzs7CNxXgI5zrxeXPf5MZ4t1T
+	EmEIdp5oinx0HYpZNkWMdRICyfMLptg0TcPdzWHNRHJDnWUcujWg8ld9/NpDzOmBlFLu7Cbrz6M
+	G97XUxohnsu7LTZf6Y+TY5cmga8KU=
+X-Google-Smtp-Source: AGHT+IGZ1N/0BVEIwoeC7pN0a4dU5zNpzeIOnjPo6+wNNho224DKHGoP+JyHqv+hhiNvvcswdXE4FXYOgm6J4PZJDFQ=
+X-Received: by 2002:a05:6402:2808:b0:5e5:71e:8c63 with SMTP id
+ 4fb4d7f45d1cf-5e5e22e5476mr2166342a12.15.1741326164093; Thu, 06 Mar 2025
+ 21:42:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250224061554.1906002-1-chiachangwang@google.com>
- <20250224061554.1906002-2-chiachangwang@google.com> <20250224124956.GB53094@unreal>
-In-Reply-To: <20250224124956.GB53094@unreal>
-From: Chiachang Wang <chiachangwang@google.com>
-Date: Fri, 7 Mar 2025 13:42:25 +0800
-X-Gm-Features: AQ5f1JpdBQmQVO4GSjMGaWz45ZwBNS4SeMu3U9QZ2mkJRksJS6hZt8w9TwWxUk0
-Message-ID: <CAOb+sWEdZ-kY6-qnG2u0h_JzeVyrf0b_eT+L=2t-5zCGaXedHA@mail.gmail.com>
-Subject: Re: [PATCH ipsec v3 1/1] xfrm: Migrate offload configuration
-To: Leon Romanovsky <leonro@nvidia.com>
-Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com, 
-	stanleyjhu@google.com, yumike@google.com
+References: <20250306072422.3303386-1-ap420073@gmail.com> <20250306072422.3303386-2-ap420073@gmail.com>
+ <20250306173523.20b136ea@kernel.org>
+In-Reply-To: <20250306173523.20b136ea@kernel.org>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Fri, 7 Mar 2025 14:42:32 +0900
+X-Gm-Features: AQ5f1Jr7Gp5qqttUDWMqc-W6lQJFcMf1qiuEp95WhQpeUcsi3pljEnW7glUWB6E
+Message-ID: <CAMArcTWmZv+rUi8ci4tbzVz6dW==hDT6njehcd8Lkn44v50gPQ@mail.gmail.com>
+Subject: Re: [PATCH v2 net 1/6] eth: bnxt: fix truesize for mb-xdp-pass case
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
+	andrew+netdev@lunn.ch, michael.chan@broadcom.com, pavan.chebbi@broadcom.com, 
+	horms@kernel.org, shuah@kernel.org, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, almasrymina@google.com, 
+	asml.silence@gmail.com, willemb@google.com, kaiyuanz@google.com, 
+	skhawaja@google.com, sdf@fomichev.me, gospo@broadcom.com, 
+	somnath.kotur@broadcom.com, dw@davidwei.uk
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Leon,
+On Fri, Mar 7, 2025 at 10:35=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
 
-Thank you for your review and suggestions. I noticed your patches
-haven't been merged into the tree yet. I'm unsure if rebasing my patch
-onto yours would work correctly with the kernel upstream. It seems
-your patches are suitable for merging. Since I'm not familiar with the
-timeline for your patch's inclusion, could you please advise on how
-long it might take for them to be in the tree? This would help me
-rebase my patch properly. or there are any other alternative way
-rather than waiting your patch?
+Hi Jakub,
+Thanks a lot for the review!
 
-Appreciate for your help!
+> On Thu,  6 Mar 2025 07:24:17 +0000 Taehee Yoo wrote:
+> > +     struct skb_shared_info sinfo =3D {0};
+>
+> > +             memcpy(&sinfo, xdp_get_shared_info_from_buff(&xdp),
+> > +                    sizeof(struct skb_shared_info));
+>
+> This may be a little expensive, struct skb_shared_info
+> is 320B and we only really need it in a rare occasion
+> of having multi-buf XDP.
 
-Chiachang
+You're right, it's pretty heavy. I didn't think about the total size of
+the shared_info.
 
+>
+> Can we update agg_bufs =3D sinfo->nr_frags after calling
+> bnxt_rx_xdp(), and otherwise go back to something like you v1?
 
-Leon Romanovsky <leonro@nvidia.com> =E6=96=BC 2025=E5=B9=B42=E6=9C=8824=E6=
-=97=A5 =E9=80=B1=E4=B8=80 =E4=B8=8B=E5=8D=888:50=E5=AF=AB=E9=81=93=EF=BC=9A
->
-> On Mon, Feb 24, 2025 at 06:15:54AM +0000, Chiachang Wang wrote:
-> > Add hardware offload configuration to XFRM_MSG_MIGRATE
-> > using an option netlink attribute XFRMA_OFFLOAD_DEV.
-> >
-> > In the existing xfrm_state_migrate(), the xfrm_init_state()
-> > is called assuming no hardware offload by default. Even the
-> > original xfrm_state is configured with offload, the setting will
-> > be reset. If the device is configured with hardware offload,
-> > it's reasonable to allow the device to maintain its hardware
-> > offload mode. But the device will end up with offload disabled
-> > after receiving a migration event when the device migrates the
-> > connection from one netdev to another one.
-> >
-> > The devices that support migration may work with different
-> > underlying networks, such as mobile devices. The hardware setting
-> > should be forwarded to the different netdev based on the
-> > migration configuration. This change provides the capability
-> > for user space to migrate from one netdev to another.
-> >
-> > Test: Tested with kernel test in the Android tree located
-> >       in https://android.googlesource.com/kernel/tests/
-> >       The xfrm_tunnel_test.py under the tests folder in
-> >       particular.
-> > Signed-off-by: Chiachang Wang <chiachangwang@google.com>
-> > ---
-> >
-> > v2 -> v3:
-> > - Modify af_key to fix kbuild error
-> > v1 -> v2:
-> > - Address review feedback to correct the logic in the
-> >   xfrm_state_migrate in the migration offload configuration
-> >   change.
-> > - Revise the commit message for "xfrm: Migrate offload configuration"
-> > ---
-> >  include/net/xfrm.h     |  8 ++++++--
-> >  net/key/af_key.c       |  2 +-
-> >  net/xfrm/xfrm_policy.c |  4 ++--
-> >  net/xfrm/xfrm_state.c  | 14 +++++++++++---
-> >  net/xfrm/xfrm_user.c   | 15 +++++++++++++--
-> >  5 files changed, 33 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-> > index ed4b83696c77..9e916d812af7 100644
-> > --- a/include/net/xfrm.h
-> > +++ b/include/net/xfrm.h
-> > @@ -1876,12 +1876,16 @@ struct xfrm_state *xfrm_migrate_state_find(stru=
-ct xfrm_migrate *m, struct net *n
-> >                                               u32 if_id);
-> >  struct xfrm_state *xfrm_state_migrate(struct xfrm_state *x,
-> >                                     struct xfrm_migrate *m,
-> > -                                   struct xfrm_encap_tmpl *encap);
-> > +                                   struct xfrm_encap_tmpl *encap,
-> > +                                   struct net *net,
-> > +                                   struct xfrm_user_offload *xuo,
-> > +                                   struct netlink_ext_ack *extack);
-> >  int xfrm_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
-> >                struct xfrm_migrate *m, int num_bundles,
-> >                struct xfrm_kmaddress *k, struct net *net,
-> >                struct xfrm_encap_tmpl *encap, u32 if_id,
-> > -              struct netlink_ext_ack *extack);
-> > +              struct netlink_ext_ack *extack,
-> > +              struct xfrm_user_offload *xuo);
-> >  #endif
-> >
-> >  int km_new_mapping(struct xfrm_state *x, xfrm_address_t *ipaddr, __be1=
-6 sport);
-> > diff --git a/net/key/af_key.c b/net/key/af_key.c
-> > index c56bb4f451e6..efc2a91f4c48 100644
-> > --- a/net/key/af_key.c
-> > +++ b/net/key/af_key.c
-> > @@ -2630,7 +2630,7 @@ static int pfkey_migrate(struct sock *sk, struct =
-sk_buff *skb,
-> >       }
-> >
-> >       return xfrm_migrate(&sel, dir, XFRM_POLICY_TYPE_MAIN, m, i,
-> > -                         kma ? &k : NULL, net, NULL, 0, NULL);
-> > +                         kma ? &k : NULL, net, NULL, 0, NULL, NULL);
-> >
-> >   out:
-> >       return err;
-> > diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-> > index 6551e588fe52..82f755e39110 100644
-> > --- a/net/xfrm/xfrm_policy.c
-> > +++ b/net/xfrm/xfrm_policy.c
-> > @@ -4630,7 +4630,7 @@ int xfrm_migrate(const struct xfrm_selector *sel,=
- u8 dir, u8 type,
-> >                struct xfrm_migrate *m, int num_migrate,
-> >                struct xfrm_kmaddress *k, struct net *net,
-> >                struct xfrm_encap_tmpl *encap, u32 if_id,
-> > -              struct netlink_ext_ack *extack)
-> > +              struct netlink_ext_ack *extack, struct xfrm_user_offload=
- *xuo)
-> >  {
-> >       int i, err, nx_cur =3D 0, nx_new =3D 0;
-> >       struct xfrm_policy *pol =3D NULL;
-> > @@ -4663,7 +4663,7 @@ int xfrm_migrate(const struct xfrm_selector *sel,=
- u8 dir, u8 type,
-> >               if ((x =3D xfrm_migrate_state_find(mp, net, if_id))) {
-> >                       x_cur[nx_cur] =3D x;
-> >                       nx_cur++;
-> > -                     xc =3D xfrm_state_migrate(x, mp, encap);
-> > +                     xc =3D xfrm_state_migrate(x, mp, encap, net, xuo,=
- extack);
-> >                       if (xc) {
-> >                               x_new[nx_new] =3D xc;
-> >                               nx_new++;
-> > diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-> > index ad2202fa82f3..0b5f7e90f4f3 100644
-> > --- a/net/xfrm/xfrm_state.c
-> > +++ b/net/xfrm/xfrm_state.c
-> > @@ -2122,22 +2122,30 @@ EXPORT_SYMBOL(xfrm_migrate_state_find);
-> >
-> >  struct xfrm_state *xfrm_state_migrate(struct xfrm_state *x,
-> >                                     struct xfrm_migrate *m,
-> > -                                   struct xfrm_encap_tmpl *encap)
-> > +                                   struct xfrm_encap_tmpl *encap,
-> > +                                   struct net *net,
-> > +                                   struct xfrm_user_offload *xuo,
-> > +                                   struct netlink_ext_ack *extack)
-> >  {
-> >       struct xfrm_state *xc;
-> > -
-> > +     bool offload =3D (xuo);
->
-> There is no need in extra variable, rely on validity of pointer.
->
-> >       xc =3D xfrm_state_clone(x, encap);
-> >       if (!xc)
-> >               return NULL;
-> >
-> >       xc->props.family =3D m->new_family;
-> >
-> > -     if (xfrm_init_state(xc) < 0)
-> > +     if (__xfrm_init_state(xc, true, offload, NULL) < 0)
-> >               goto error;
->
-> Please rebase this patch on top of https://lore.kernel.org/netdev/cover.1=
-739972570.git.leon@kernel.org/
-> The __xfrm_init_state() was changed there. You can use xfrm_init_state()
-> instead.
->
-> >
-> > +     x->km.state =3D XFRM_STATE_VALID;
-> >       memcpy(&xc->id.daddr, &m->new_daddr, sizeof(xc->id.daddr));
-> >       memcpy(&xc->props.saddr, &m->new_saddr, sizeof(xc->props.saddr));
->
-> It should be placed inside xfrm_state_clone() and worth to rename it.
->
-> >
-> > +     /* configure the hardware if offload is requested */
-> > +     if (offload && xfrm_dev_state_add(net, xc, xuo, extack))
-> > +             goto error;
-> > +
-> >       /* add state */
-> >       if (xfrm_addr_equal(&x->id.daddr, &m->new_daddr, m->new_family)) =
-{
-> >               /* a care is needed when the destination address of the
-> > diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-> > index 5877eabe9d95..4c2c74078e65 100644
-> > --- a/net/xfrm/xfrm_user.c
-> > +++ b/net/xfrm/xfrm_user.c
-> > @@ -3069,6 +3069,7 @@ static int xfrm_do_migrate(struct sk_buff *skb, s=
-truct nlmsghdr *nlh,
-> >       int n =3D 0;
-> >       struct net *net =3D sock_net(skb->sk);
-> >       struct xfrm_encap_tmpl  *encap =3D NULL;
-> > +     struct xfrm_user_offload *xuo =3D NULL;
-> >       u32 if_id =3D 0;
-> >
-> >       if (!attrs[XFRMA_MIGRATE]) {
-> > @@ -3099,11 +3100,21 @@ static int xfrm_do_migrate(struct sk_buff *skb,=
- struct nlmsghdr *nlh,
-> >       if (attrs[XFRMA_IF_ID])
-> >               if_id =3D nla_get_u32(attrs[XFRMA_IF_ID]);
-> >
-> > +     if (attrs[XFRMA_OFFLOAD_DEV]) {
-> > +             xuo =3D kmemdup(nla_data(attrs[XFRMA_OFFLOAD_DEV]),
-> > +                           sizeof(*xuo), GFP_KERNEL);
-> > +             if (!xuo) {
-> > +                     err =3D -ENOMEM;
-> > +                     goto error;
-> > +             }
-> > +     }
-> > +
-> >       err =3D xfrm_migrate(&pi->sel, pi->dir, type, m, n, kmp, net, enc=
-ap,
-> > -                        if_id, extack);
-> > +                        if_id, extack, xuo);
-> >
-> > +error:
-> >       kfree(encap);
-> > -
-> > +     kfree(xuo);
-> >       return err;
-> >  }
-> >  #else
-> > --
-> > 2.48.1.601.g30ceb7b040-goog
-> >
-> >
+Okay, I will update agg_bufs with stored sinfo->nr_frags.
+
+> Sorry if I mislead you.
+
+It was my intention, no problem :)
+
+Thanks a lot!
+Taehee Yoo
+
+> --
+> pw-bot: cr
 
