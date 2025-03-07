@@ -1,190 +1,138 @@
-Return-Path: <netdev+bounces-172746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F297CA55E25
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 04:17:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CC8EA55E2C
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 04:19:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 323E01897137
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 03:17:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A813E170481
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 03:19:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 019A218DB19;
-	Fri,  7 Mar 2025 03:17:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 604EA18DB1C;
+	Fri,  7 Mar 2025 03:19:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="XeY620eU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ph8XvFOe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C41829408;
-	Fri,  7 Mar 2025 03:17:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8AE318CBFB;
+	Fri,  7 Mar 2025 03:19:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741317461; cv=none; b=jsLoyJ6GxmDcLYRjYw++8rwdtYNbAMk3vGsyzYo1+zdjt44w1OY5S8xP47Id5Tuj5VqEIgkgQX9HUlqPACiOu4KuSkHOpTLt9+/f+onejQr/8uGwvbPrbw056EunbNe7pga9ZlaWdH1TUMd58zfeWqEZRc1Sdd2GWp1zhHNCJJE=
+	t=1741317558; cv=none; b=BsmbO/saWfIxXJxwQGbl6Qs6xUoRkLoGqwvpI9nB5vzqsKglh5Z3Dl92MnlIfUvJS+KqhOOCzR1Nj4fOAmGE/GYgmCPGjGJAB7P7rga7jPs5KpdDm8Gnrs8PIoGFw2wfTV4h931kQf9jA9i5f1LWLxS0K5vv44wSt2zsJHtBNbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741317461; c=relaxed/simple;
-	bh=SaHWAsYe/9KqOVBf8OkOQT2uuUcRHvd28XQ7nb1mCP0=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=rBWmGO0Sinox3+cbHVtlSt5POPG5Jbzh77JIWDRqIOW45dqoVONeEoKP9us/JF9rfWnLK9z74zEikQcCk0e1SdIU/wb8xeXoQKiWfyOBE53f61kTGj0+Pkp85gVIKC6m+Gx5uaUxO7c1Oot3/RWGBU6K+CB/hlC/6JkkDtKIOSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=XeY620eU; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [127.0.0.1] ([76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 5273EFGO029055
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Thu, 6 Mar 2025 19:14:16 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 5273EFGO029055
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025021701; t=1741317259;
-	bh=hyUZKDF5+ooUtYLzko1Czdm29ayQGeHv7M7tkZymGRA=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=XeY620eULnP2/+TN4Y4Oy+L1kjV0g9g4gLF3bGbxoub6oXCjIocCsux0s9lsBThor
-	 D5MCM8jchD63LZA41Z+zQXpcfDD0kw68ZvT5gJFtkglJP52RigyVCCeTtLHz5T59Sf
-	 BdcfD+nIIh4OJ7E3YNolewxhV+KD9eYVj9gc77UPIV5o6BkuLWAjitNYqDwOVS12jl
-	 DqNQVt47yWF1ZUW8TzhPps1sdTJ6LcbKbxzoFjRF0/a0IBkoL6S6dVIt6/UEGX2S2i
-	 fnnZIzD2De4gOv+3QNiBzF/iHmcOV6iyiEfSH8J1h96iKhLsl8VHaAdju6VU38SRaP
-	 yKG9JyADkfy7g==
-Date: Thu, 06 Mar 2025 19:14:13 -0800
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: Kuan-Wei Chiu <visitorckw@gmail.com>, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        jk@ozlabs.org, joel@jms.id.au, eajames@linux.ibm.com,
-        andrzej.hajda@intel.com, neil.armstrong@linaro.org, rfoss@kernel.org,
-        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-        tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
-        dmitry.torokhov@gmail.com, mchehab@kernel.org, awalls@md.metrocast.net,
-        hverkuil@xs4all.nl, miquel.raynal@bootlin.com, richard@nod.at,
-        vigneshr@ti.com, louis.peens@corigine.com, andrew+netdev@lunn.ch,
-        davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-        parthiban.veerasooran@microchip.com, arend.vanspriel@broadcom.com,
-        johannes@sipsolutions.net, gregkh@linuxfoundation.org,
-        jirislaby@kernel.org, yury.norov@gmail.com, akpm@linux-foundation.org
-CC: alistair@popple.id.au, linux@rasmusvillemoes.dk,
-        Laurent.pinchart@ideasonboard.com, jonas@kwiboo.se,
-        jernej.skrabec@gmail.com, kuba@kernel.org,
-        linux-kernel@vger.kernel.org, linux-fsi@lists.ozlabs.org,
-        dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
-        oss-drivers@corigine.com, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev,
-        brcm80211-dev-list.pdl@broadcom.com, linux-serial@vger.kernel.org,
-        bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw,
-        Yu-Chun Lin <eleanor15x@gmail.com>
-Subject: Re: [PATCH v3 00/16] Introduce and use generic parity16/32/64 helper
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20250306162541.2633025-1-visitorckw@gmail.com>
-References: <20250306162541.2633025-1-visitorckw@gmail.com>
-Message-ID: <F134DC06-54DE-4B8E-8AE0-3740275835C1@zytor.com>
+	s=arc-20240116; t=1741317558; c=relaxed/simple;
+	bh=/6oi7wSIJIu9yoaKPqaE7fOmrgWjLaHaF4QZAeiYf64=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XOJHlbeGPrzzwMM6HGIvfb4+RKB62XZNTNM3pOt3fyGpZtl8ZOc2kr/4hvDUC1d/b5JYpC8DmYqAx8rDEvY7ILMdL+8jHu51v+REI4cNOhqP2VHJ6RxY7qhlVq3gC+oVaRUcu1J6FsBgTf5DrWov+yPPmxHhe7XCokw6qtlUv2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ph8XvFOe; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2234e4b079cso24615105ad.1;
+        Thu, 06 Mar 2025 19:19:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741317556; x=1741922356; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=g0DK/lZwUbq7evCxhu6vzBF9behgLjjOobAObHJFVgo=;
+        b=Ph8XvFOeelnEDwOfNCzXnLjBhf8+sGxjfkRDw0lp4G1FM9eSrtTNvVlQBX2FwaBJO1
+         xhNXduF1kSsmA+2za9t3yhunucRVD5brx/jrSjSNHOWxA72WRvfT9/1nN+37yB5QmY5Y
+         KEEVIn6iCf6scceot2ysrqz6UVzGNvUmTL53VHUCcwBKiujcrTJQLmJoFdnMDctQXVef
+         n0EDqFGc2e7rgfENXEOXvaIuD0QY/VehQJGmiEbwDBgeGnlvAWmmlGgk7sw4c6PtESVo
+         FezNH1qg2u+zIRAKuNZqg62UY/fxiOhDipGtMVMXWe5aAg77eoguiHxKFE9BZYgz9AmG
+         ee+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741317556; x=1741922356;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=g0DK/lZwUbq7evCxhu6vzBF9behgLjjOobAObHJFVgo=;
+        b=b2pqT7k1W2VJrHFs5k/1vvNzsd/rUQYO5gnpQbAkA1xgkjUgS9AdE3VcH6zCbaEoQi
+         oVHO+zbmdui4bJVyqgkKFvIBFz0sRP9gkF/t7riyByCvPKlnAG/eAQx8yd++4UpJXTuJ
+         /33X5NecHBnOGYo4sKBVsF7diTcjN9poDGLJpcuM/6XSmMCf62PQ9dq6v2B8bmNQLxyo
+         Fma7L+R93SxOqp89RtLBMdNhGkjQX5KAzgJ1w632naSndZlERgmVbXRUmBO/MDsFfxe/
+         fRcZ1G84LSewKgLx9IWeWbBPkaycnJ49uVoUeudkoUg3BKIl6nV9XYJyMYtyMCRUJsJn
+         JmLA==
+X-Forwarded-Encrypted: i=1; AJvYcCXLu6XBPXeHdqB2oayQuCSIarR/HKXY84x7HZQNOCxpVHLC7qgt1MA8v0seC+BiPQNsX9lUMzNS8aYTp9lmR726@vger.kernel.org, AJvYcCXrRQxhIjYe+6YHg1GblZa/d3rrYeOt/vvbdznK9pmkqgHCaBMC2wRusD0zl2H0W4jdesHnL9Gknz3EksU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw50zkCgoftcDcbT9xJwYR8yDjdEVRydxhvMhv8N/XXSGBaXzB8
+	ktARM4s+jgWXfoD/cUIuuZ/7bAlmxI9EYPLzk2cUMJby3brctaa9a2ksQLbZkI8Q4A==
+X-Gm-Gg: ASbGncvM6zFpOf5fuO+Kw82D4j3a5wIUd/7n0rCqnS4t2HTBpZI9aH3U0KoD9D1sG5F
+	kgso5FgzCZch2s4ej6ZtiLWff6iTYyg3MgDqSiQKjLc0gXo7aDNomXTSaEf5Plc1mC51d6eM3UR
+	QX+1vayXFQwnk4Bj2/EIU+odJLtIP3QTJdkvHXyq2n+ZDNmKhUYzljm6CNbypR2tjZ3B/3P6MEL
+	1NbOt7XQdUWG9K4xyg3veY840jjox4FVOs9uaJxTQP9tza+ikc7/JgBDah9PeLl1Yw/mnI84oe1
+	6vk8Dm5gXo/GXJ7oHYlBnNk9LTy1B2Qz69dnW7WJlrh8IgL0Dx2AQWcVTdZ0E9xC
+X-Google-Smtp-Source: AGHT+IH+ZDw0vly2IOyYkYtErzzTuxnj+SAqAwUEg7zi6SXNoZLp37GC+HhxjMBwtVZeqnKva9kTlA==
+X-Received: by 2002:a17:902:f686:b0:224:1ec0:8a1d with SMTP id d9443c01a7336-22428ab535bmr25997165ad.30.1741317555631;
+        Thu, 06 Mar 2025 19:19:15 -0800 (PST)
+Received: from fedora.dns.podman ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-224109dd5e2sm20013165ad.15.2025.03.06.19.19.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Mar 2025 19:19:15 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Jianbo Liu <jianbol@nvidia.com>,
+	Jarod Wilson <jarod@redhat.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Cosmin Ratiu <cratiu@nvidia.com>,
+	Petr Machata <petrm@nvidia.com>,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv5 net 0/3] bond: fix xfrm offload issues
+Date: Fri,  7 Mar 2025 03:19:00 +0000
+Message-ID: <20250307031903.223973-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On March 6, 2025 8:25:25 AM PST, Kuan-Wei Chiu <visitorckw@gmail=2Ecom> wro=
-te:
->Several parts of the kernel contain redundant implementations of parity
->calculations for 16/32/64-bit values=2E Introduces generic
->parity16/32/64() helpers in bitops=2Eh, providing a standardized
->and optimized implementation=2E=20
->
->Subsequent patches refactor various kernel components to replace
->open-coded parity calculations with the new helpers, reducing code
->duplication and improving maintainability=2E
->
->Co-developed-by: Yu-Chun Lin <eleanor15x@gmail=2Ecom>
->Signed-off-by: Yu-Chun Lin <eleanor15x@gmail=2Ecom>
->Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail=2Ecom>
->---
->In v3, I use parityXX() instead of the parity() macro since the
->parity() macro may generate suboptimal code and requires special hacks
->to make GCC happy=2E If anyone still prefers a single parity() macro,
->please let me know=2E
->
->Additionally, I changed parityXX() << y users to !!parityXX() << y
->because, unlike C++, C does not guarantee that true casts to int as 1=2E
->
->Changes in v3:
->- Avoid using __builtin_parity=2E
->- Change return type to bool=2E
->- Drop parity() macro=2E
->- Change parityXX() << y to !!parityXX() << y=2E
->
->
->Changes in v2:
->- Provide fallback functions for __builtin_parity() when the compiler
->  decides not to inline it
->- Use __builtin_parity() when no architecture-specific implementation
->  is available
->- Optimize for constant folding when val is a compile-time constant
->- Add a generic parity() macro
->- Drop the x86 bootflag conversion patch since it has been merged into
->  the tip tree
->
->v1: https://lore=2Ekernel=2Eorg/lkml/20250223164217=2E2139331-1-visitorck=
-w@gmail=2Ecom/
->v2: https://lore=2Ekernel=2Eorg/lkml/20250301142409=2E2513835-1-visitorck=
-w@gmail=2Ecom/
->
->Kuan-Wei Chiu (16):
->  bitops: Change parity8() return type to bool
->  bitops: Add parity16(), parity32(), and parity64() helpers
->  media: media/test_drivers: Replace open-coded parity calculation with
->    parity8()
->  media: pci: cx18-av-vbi: Replace open-coded parity calculation with
->    parity8()
->  media: saa7115: Replace open-coded parity calculation with parity8()
->  serial: max3100: Replace open-coded parity calculation with parity8()
->  lib/bch: Replace open-coded parity calculation with parity32()
->  Input: joystick - Replace open-coded parity calculation with
->    parity32()
->  net: ethernet: oa_tc6: Replace open-coded parity calculation with
->    parity32()
->  wifi: brcm80211: Replace open-coded parity calculation with parity32()
->  drm/bridge: dw-hdmi: Replace open-coded parity calculation with
->    parity32()
->  mtd: ssfdc: Replace open-coded parity calculation with parity32()
->  fsi: i2cr: Replace open-coded parity calculation with parity32()
->  fsi: i2cr: Replace open-coded parity calculation with parity64()
->  Input: joystick - Replace open-coded parity calculation with
->    parity64()
->  nfp: bpf: Replace open-coded parity calculation with parity64()
->
-> drivers/fsi/fsi-master-i2cr=2Ec                 | 18 ++-----
-> =2E=2E=2E/drm/bridge/synopsys/dw-hdmi-ahb-audio=2Ec   |  8 +--
-> drivers/input/joystick/grip_mp=2Ec              | 17 +-----
-> drivers/input/joystick/sidewinder=2Ec           | 24 ++-------
-> drivers/media/i2c/saa7115=2Ec                   | 12 +----
-> drivers/media/pci/cx18/cx18-av-vbi=2Ec          | 12 +----
-> =2E=2E=2E/media/test-drivers/vivid/vivid-vbi-gen=2Ec  |  8 +--
-> drivers/mtd/ssfdc=2Ec                           | 20 ++-----
-> drivers/net/ethernet/netronome/nfp/nfp_asm=2Ec  |  7 +--
-> drivers/net/ethernet/oa_tc6=2Ec                 | 19 ++-----
-> =2E=2E=2E/broadcom/brcm80211/brcmsmac/dma=2Ec         | 16 +-----
-> drivers/tty/serial/max3100=2Ec                  |  3 +-
-> include/linux/bitops=2Eh                        | 52 +++++++++++++++++--
-> lib/bch=2Ec                                     | 14 +----
-> 14 files changed, 77 insertions(+), 153 deletions(-)
->
+The first patch fixes the incorrect locks using in bond driver.
+The second patch fixes the xfrm offload feature during setup active-backup
+mode. The third patch add a ipsec offload testing.
 
-!!x is used with a value that is not necessary booleanized already, and is=
- exactly equivalent to (x ? true : false)=2E It is totally redundant on a v=
-alue known to be bool=2E
+v5: use list_for_each_entry_safe() when del item in list (Nikolay Aleksandrov)
+    do not call spin_lock_bh in sleep function xdo_dev_state_free (Nikolay Aleksandrov)
+    set xso.real_dev = NULL to avoid __xfrm_state_delete() is called in parallel()  (Cosmin Ratiu)
+    remove spin lock in bond_ipsec_add_sa_all() as it doesn't resolve the race condition.
+v4: hold xs->lock for bond_ipsec_{del, add}_sa_all (Cosmin Ratiu)
+    use the defer helpers in lib.sh for selftest (Petr Machata)
+v3: move the ipsec deletion to bond_ipsec_free_sa (Cosmin Ratiu)
+v2: do not turn carrier on if bond change link failed (Nikolay Aleksandrov)
+    move the mutex lock to a work queue (Cosmin Ratiu)
 
-If (int)true wasn't inherently 1, then !! wouldn't work either=2E=20
+Hangbin Liu (3):
+  bonding: fix calling sleeping function in spin lock and some race
+    conditions
+  bonding: fix xfrm offload feature setup on active-backup mode
+  selftests: bonding: add ipsec offload test
 
-There was a time when some code would use as a temporary hack:=20
+ drivers/net/bonding/bond_main.c               |  71 +++++---
+ drivers/net/bonding/bond_netlink.c            |  16 +-
+ include/net/bonding.h                         |   1 +
+ .../selftests/drivers/net/bonding/Makefile    |   3 +-
+ .../drivers/net/bonding/bond_ipsec_offload.sh | 154 ++++++++++++++++++
+ .../selftests/drivers/net/bonding/config      |   4 +
+ 6 files changed, 222 insertions(+), 27 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/bonding/bond_ipsec_offload.sh
 
-typedef enum { false, true } bool;
+-- 
+2.46.0
 
-=2E=2E=2E when compiling on pre-C99 compilers; in that case a (bool) case =
-wouldn't necessarily work as expected, whereas !! would=2E Furthermore, unl=
-ike (bool), !! works in the preprocessor=2E
 
