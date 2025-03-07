@@ -1,79 +1,76 @@
-Return-Path: <netdev+bounces-172911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F25E5A56733
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 12:56:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C21AA56740
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 12:57:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A05B1779AE
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 11:56:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3815B3B0E59
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 11:57:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13451217F42;
-	Fri,  7 Mar 2025 11:56:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24B4F21882B;
+	Fri,  7 Mar 2025 11:57:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="LI8JjkJD"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="F6Ki8ji5";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="XY89h6Uj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7988120C00C;
-	Fri,  7 Mar 2025 11:56:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4271221859D;
+	Fri,  7 Mar 2025 11:57:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741348580; cv=none; b=dlGQ90NuvZyNIxm/E+K7EhwIvS9lEDqKe5FpYq3OYPrwyUfUFns8yZLGncp7OgE2qZZRwbPpPlzxM2F2DeW/rd361pG5AzFULuFC0pD7Tnh7441teuIKsQouOM+3YAYrBCh32tn7LWrVoHG1Pupbhzi5FIoLaXJPGtdFa751Os8=
+	t=1741348652; cv=none; b=GJhMRxnvVOTk/e6rUD88A2iZH0yDYRKMTjMqmfCKbnqJPEgLT3D2UGX+aYewh4U4yaHCXV2Vy43k1lx3MeKV2srEwbqpZcd1bKt4rcCrkOBqhPlyDtnxnRbL38XzIGRS5DgHelXWbs66jeunAw8uPppAjyM4nP5J0Cx4E8ZhrUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741348580; c=relaxed/simple;
-	bh=AEoHVhCtPqrNOpazoS/0UO4HDhnndTUwM9XyvDjaMPI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QIA0zhAlSA/4o85r0y9hrnwix8eTMqKho2xqATq34pz6vHh0dz3cvywb7b91UtbDHCvQNFDxonlNhiRKKxFQZ73+lr1IamVH8IPLLA0aWERmCfoVgUUhLfVWN0encR2aK0HfcRLhu6W2H1+eRFHPtohsv6/LRPPVqQAGSqaiLVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=LI8JjkJD; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 6F4CE40E01A0;
-	Fri,  7 Mar 2025 11:56:12 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id qiag8fHRWfvs; Fri,  7 Mar 2025 11:56:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1741348567; bh=skVMfj6F4q0eJCWKQfe1/WbSrZcERS0jUiqPGjIPHBY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LI8JjkJDVMf9Fqun0m6u9iIPesZtZGd6w+kl6L7HGZ0+tqKzX1OjJe0TKdJcp28XX
-	 uKpa0wqQQhjoFeNp3Bw95WUsOWjMS3jCqp2nCEO9dpb5dXBAX6tMpEeuwjaSGHtNdI
-	 Ad9zmvwJ6e7IRylQ3CWIXzopPSh1BTntpfv9vlkrAEMaBPpa+2MmUvnK5sTgu2wXiB
-	 MvK9pWGtV9y2AMOdXd7w99+XQb4MlMtp544PfXsqIZb4ovkxTiTiWT5bAC2aP7czmD
-	 0jkksBpg/S8I5ay4P+l9uD7qqFqHmkv1hZVpRcTVuCA7/1ZXOFQECeG6eaY5TSoj7d
-	 b69zJQ0vwFhLre3V11HPqmMzbyMIc8Kv74HROwNxK8e60mM0w/bSrsx23r0tV41EAD
-	 N2KLPNndkUFTwMv54cha8GTqt/i4Nlv9xIaVgMactqp7ffpBi5xb1zRTsIubUqaMq6
-	 GfZg72FHnnyKX4l+XNWwNUwM7Re67WZhGd2LEUlDSW+4TibkTikAS8L+LGoja+VVZ2
-	 BhTayYOo2m9wKTReY1UN9YeAQUqY35CeSgk9tunjR8hlbEOeX6C3tCckIhMn9VB9KP
-	 PxwP4GnSZ2zVI/n3FwjJzc07ej7qMhV/m71FnRfpedBNLVeYG3nTkyCZHJlbqcINNp
-	 8iFns/3oSoQ8MHJQnRrxwt8I=
-Received: from zn.tnic (pd95303ce.dip0.t-ipconnect.de [217.83.3.206])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 0787140E0214;
-	Fri,  7 Mar 2025 11:55:55 +0000 (UTC)
-Date: Fri, 7 Mar 2025 12:55:50 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Ryo Takakura <ryotkkr98@gmail.com>, Boqun Feng <boqun.feng@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	s=arc-20240116; t=1741348652; c=relaxed/simple;
+	bh=W/Wpv0jBnU3yLXstWDnFlAxNk4PTPAPOKzn4/w5N6EA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nAS6IH1DYplVArAKRlfqv82uXr1LUpthVsFToCar6Jo63w+DfYZZP5bA0V+n2dthPtsX4Jfvtdh9VDx2O76zUnBVwXouB34KazSoOc9+n2LGQWsg7IlzyqhRt9AKODH/QHROlCC9Yz47uO/sZbd4oGMKnmgYDspLEJJE/Xs2Bx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=F6Ki8ji5; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=XY89h6Uj; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1741348648;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=o4NxQAuqs6oBuFAFcLsKPdXIysiB9HWSf5wYtY9oykU=;
+	b=F6Ki8ji5Cg7Cj5X+mkT5v2bBhMT4pWociDFqEgs07rCBVmBn3oP9jiPt6BY+4YNererklD
+	+fyhDtxCnC2Kq+MrPjTLDBjnzRGg4DE0U3blTDed/sHvGPYWumvU0oSWXXS3hypaG2AKqO
+	xbYDGEZgolW7Dg4iHuYCaoffbBoQlrolMzRXHi9oywHzgotxcZU5DTcpvzsZBH5303YI44
+	M0qDWKksqH50yh0+hTk+tONNiGrbUy+75L++h8N+DTqlOjsGTKrxzR4ubHtb5gCAb4qsR1
+	iJymH3B6YAtBKZWbfkvlOk02x2CfBKk32tMsdCM+/esedJNBnRRTD72AK39cwQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1741348648;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=o4NxQAuqs6oBuFAFcLsKPdXIysiB9HWSf5wYtY9oykU=;
+	b=XY89h6Uj7aaea+5yESF2BR1vWA+BpH/4D4ulpTHAzM9GreXt3JIyF4MrmF2avKEIsSYTyD
+	akccuyCNTbmqnUCA==
+To: linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Joe Damato <jdamato@fastly.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
 	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>, linux-kernel@vger.kernel.org,
-	x86-ml <x86@kernel.org>
-Subject: Re: request_irq() with local bh disabled
-Message-ID: <20250307115550.GAZ8rexkba5ryV3zk0@fat_crate.local>
-References: <20250306122413.GBZ8mT7Z61Tmgnh5Y9@fat_crate.local>
- <CANn89iJeHhGQaeRp01HP-KqA65aML+P5ppHjYT_oHSdXbcuzoQ@mail.gmail.com>
- <20250306161912.GFZ8nLAAVKdlx0s4xv@fat_crate.local>
+	Tariq Toukan <tariqt@nvidia.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: [PATCH net-next v2 0/5] page_pool: Convert stats to u64_stats_t.
+Date: Fri,  7 Mar 2025 12:57:17 +0100
+Message-ID: <20250307115722.705311-1-bigeasy@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,82 +78,151 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250306161912.GFZ8nLAAVKdlx0s4xv@fat_crate.local>
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 06, 2025 at 05:19:12PM +0100, Borislav Petkov wrote:
-> On Thu, Mar 06, 2025 at 02:45:16PM +0100, Eric Dumazet wrote:
-> > Hmmm.. not sure why local_bh is considered held..
-> 
-> Yeah, it looks like it is some crap in tip as current mainline is fine.
-> 
-> Lemme see what I can find there.
-> 
-> Thx and sorry for the noise.
+This is a follow-up on
+        https://lore.kernel.org/all/20250213093925.x_ggH1aj@linutronix.de/
 
-As already mentioned by Mr. Z on the tip-bot message thread, below commit
-breaks lockdep.
+to convert the page_pool statistics to u64_stats_t to avoid u64 related
+problems on 32bit architectures.
+While looking over it, the comment for recycle_stat_inc() says that it
+is safe to use in preemptible context. The 32bit update is split into
+two 32bit writes. This is "okay" if the value observed from the current
+CPU but cross CPU reads may observe inconsistencies if the lower part
+overflows and the upper part is not yet written.
+I explained this and added x86-32 assembly in
+	https://lore.kernel.org/all/20250226102703.3F7Aa2oK@linutronix.de/
 
-Reverting it fixes the issue, ofc.
+I don't know if it is ensured that only *one* update can happen because
+the stats are per-CPU and per NAPI device. But there will be now a
+warning on 32bit if this is really attempted in preemptible context.
 
-$ git bisect start
-# status: waiting for both good and bad commits
-# good: [848e076317446f9c663771ddec142d7c2eb4cb43] Merge tag 'hid-for-linus-2025030501' of git://git.kernel.org/pub/scm/linux/kernel/git/hid/hid
-git bisect good 848e076317446f9c663771ddec142d7c2eb4cb43
-# status: waiting for bad commit, 1 good commit known
-# bad: [f4444d22a90c3fb0c825195b4154455d42986f21] Merge remote-tracking branch 'tip/master' into rc5+
-git bisect bad f4444d22a90c3fb0c825195b4154455d42986f21
-# bad: [6714630acf3cae8974e62a810389dcb191ac49af] Merge branch into tip/master: 'sched/core'
-git bisect bad 6714630acf3cae8974e62a810389dcb191ac49af
-# good: [156a8975430b127b5000b9018cb220fddf633164] Merge branch into tip/master: 'irq/core'
-git bisect good 156a8975430b127b5000b9018cb220fddf633164
-# bad: [468fad69db143874eaaeb472816f424e261df570] Merge branch into tip/master: 'locking/core'
-git bisect bad 468fad69db143874eaaeb472816f424e261df570
-# good: [f5de95438834a3bc3ad747f67c9da93cd08e5008] irqchip/renesas-rzv2h: Simplify rzv2h_icu_init()
-git bisect good f5de95438834a3bc3ad747f67c9da93cd08e5008
-# bad: [5fc1506d33db23894e74caf048ba5591f4986767] rust: lockdep: Remove support for dynamically allocated LockClassKeys
-git bisect bad 5fc1506d33db23894e74caf048ba5591f4986767
-# bad: [9b4070d36399ffcadc92c918bd80da036a16faed] locking/lock_events: Add locking events for rtmutex slow paths
-git bisect bad 9b4070d36399ffcadc92c918bd80da036a16faed
-# good: [337369f8ce9e20226402cf139c4f0d3ada7d1705] locking/mutex: Add MUTEX_WARN_ON() into fast path
-git bisect good 337369f8ce9e20226402cf139c4f0d3ada7d1705
-# bad: [8a9d677a395703ef9075c91dd04066be8a553405] lockdep: Fix wait context check on softirq for PREEMPT_RT
-git bisect bad 8a9d677a395703ef9075c91dd04066be8a553405
-# good: [5ddd09863c676935c18c8a13f5afb6d9992cbdeb] locking/rtmutex: Use struct keyword in kernel-doc comment
-git bisect good 5ddd09863c676935c18c8a13f5afb6d9992cbdeb
-# first bad commit: [8a9d677a395703ef9075c91dd04066be8a553405] lockdep: Fix wait context check on softirq for PREEMPT_RT
+The placement of the counters is not affected by this change except on
+32bit where an additional sync member is added. For 64bit pahole output
+changes from
+| struct page_pool_recycle_stats {
+|         u64                        cached;               /*     0     8 */
+|         u64                        cache_full;           /*     8     8 */
+|         u64                        ring;                 /*    16     8 */
+|         u64                        ring_full;            /*    24     8 */
+|         u64                        released_refcnt;      /*    32     8 */
+|=20
+|         /* size: 40, cachelines: 1, members: 5 */
+|         /* last cacheline: 40 bytes */
+| };
 
-Author: Ryo Takakura <ryotkkr98@gmail.com>
-Date:   Sat Jan 18 14:49:00 2025 +0900
+to
+| struct page_pool_recycle_stats {
+|         struct u64_stats_sync      syncp;                /*     0     0 */
+|         u64_stats_t                cached;               /*     0     8 */
+|         u64_stats_t                cache_full;           /*     8     8 */
+|         u64_stats_t                ring;                 /*    16     8 */
+|         u64_stats_t                ring_full;            /*    24     8 */
+|         u64_stats_t                released_refcnt;      /*    32     8 */
+|=20
+|         /* size: 40, cachelines: 1, members: 6 */
+|         /* last cacheline: 40 bytes */
+| };
 
-    lockdep: Fix wait context check on softirq for PREEMPT_RT
-    
-    Since commit 0c1d7a2c2d32 ("lockdep: Remove softirq accounting on
-    PREEMPT_RT."), the wait context test for mutex usage within
-    "in softirq context" fails as it references @softirq_context.
-    
-    [    0.184549]   | wait context tests |
-    [    0.184549]   --------------------------------------------------------------------------
-    [    0.184549]                                  | rcu  | raw  | spin |mutex |
-    [    0.184549]   --------------------------------------------------------------------------
-    [    0.184550]                in hardirq context:  ok  |  ok  |  ok  |  ok  |
-    [    0.185083] in hardirq context (not threaded):  ok  |  ok  |  ok  |  ok  |
-    [    0.185606]                in softirq context:  ok  |  ok  |  ok  |FAILED|
-    
-    As a fix, add lockdep map for BH disabled section. This fixes the
-    issue by letting us catch cases when local_bh_disable() gets called
-    with preemption disabled where local_lock doesn't get acquired.
-    In the case of "in softirq context" selftest, local_bh_disable() was
-    being called with preemption disable as it's early in the boot.
-    
-    Signed-off-by: Ryo Takakura <ryotkkr98@gmail.com>
-    Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
-    Link: https://lore.kernel.org/r/20250118054900.18639-1-ryotkkr98@gmail.com
+On 32bit struct u64_stats_sync grows by 4 bytes (plus addiional 20 with
+lockdep).
 
+For bench_page_pool_simple.ko loops=3D600000000 I neded up with, before:
 
--- 
-Regards/Gruss,
-    Boris.
+| time_bench: Type:for_loop Per elem: 1 cycles(tsc) 0.501 ns (step:0)
+| time_bench: Type:atomic_inc Per elem: 6 cycles(tsc) 3.303 ns (step:0)
+| time_bench: Type:lock Per elem: 28 cycles(tsc) 14.038 ns (step:0)
+| time_bench: Type:u64_stats_inc Per elem: 1 cycles(tsc) 0.565 ns (step:0)
+| time_bench: Type:this_cpu_inc Per elem: 1 cycles(tsc) 0.503 ns (step:0)
+|=20
+| bench_page_pool_simple: time_bench_page_pool01_fast_path(): Cannot use pa=
+ge_pool fast-path
+| time_bench: Type:no-softirq-page_pool01 Per elem: 19 cycles(tsc) 9.526 ns=
+ (step:0)
+| bench_page_pool_simple: time_bench_page_pool02_ptr_ring(): Cannot use pag=
+e_pool fast-path
+| time_bench: Type:no-softirq-page_pool02 Per elem: 46 cycles(tsc) 23.501 n=
+s (step:0)
+| bench_page_pool_simple: time_bench_page_pool03_slow(): Cannot use page_po=
+ol fast-path
+| time_bench: Type:no-softirq-page_pool03 Per elem: 121 cycles(tsc) 60.697 =
+ns (step:0)
+| bench_page_pool_simple: pp_tasklet_handler(): in_serving_softirq fast-path
+| bench_page_pool_simple: time_bench_page_pool01_fast_path(): in_serving_so=
+ftirq fast-path
+| time_bench: Type:tasklet_page_pool01_fast_path Per elem: 19 cycles(tsc) 9=
+.531 ns (step:0)
+| bench_page_pool_simple: time_bench_page_pool02_ptr_ring(): in_serving_sof=
+tirq fast-path
+| time_bench: Type:tasklet_page_pool02_ptr_ring Per elem: 45 cycles(tsc) 22=
+.594 ns (step:0)
+| bench_page_pool_simple: time_bench_page_pool03_slow(): in_serving_softirq=
+ fast-path
+| time_bench: Type:tasklet_page_pool03_slow Per elem: 123 cycles(tsc) 61.96=
+9 ns (step:0)
 
-https://people.kernel.org/tglx/notes-about-netiquette
+after:
+| time_bench: Type:for_loop Per elem: 1 cycles(tsc) 0.501 ns (step:0)
+| time_bench: Type:atomic_inc Per elem: 6 cycles(tsc) 3.324 ns (step:0)
+| time_bench: Type:lock Per elem: 28 cycles(tsc) 14.038 ns (step:0)
+| time_bench: Type:u64_stats_inc Per elem: 1 cycles(tsc) 0.565 ns (step:0)
+| time_bench: Type:this_cpu_inc Per elem: 1 cycles(tsc) 0.506 ns (step:0)
+|=20
+| bench_page_pool_simple: time_bench_page_pool01_fast_path(): Cannot use pa=
+ge_pool fast-path
+| time_bench: Type:no-softirq-page_pool01 Per elem: 18 cycles(tsc) 9.028 ns=
+ (step:0)
+| bench_page_pool_simple: time_bench_page_pool02_ptr_ring(): Cannot use pag=
+e_pool fast-path
+| time_bench: Type:no-softirq-page_pool02 Per elem: 45 cycles(tsc) 22.714 n=
+s (step:0)
+| bench_page_pool_simple: time_bench_page_pool03_slow(): Cannot use page_po=
+ol fast-path
+| time_bench: Type:no-softirq-page_pool03 Per elem: 120 cycles(tsc) 60.428 =
+ns (step:0)
+| bench_page_pool_simple: pp_tasklet_handler(): in_serving_softirq fast-path
+| bench_page_pool_simple: time_bench_page_pool01_fast_path(): in_serving_so=
+ftirq fast-path
+| time_bench: Type:tasklet_page_pool01_fast_path Per elem: 18 cycles(tsc) 9=
+.024 ns (step:0)
+| bench_page_pool_simple: time_bench_page_pool02_ptr_ring(): in_serving_sof=
+tirq fast-path
+| time_bench: Type:tasklet_page_pool02_ptr_ring Per elem: 43 cycles(tsc) 22=
+.028 ns (step:0)
+| bench_page_pool_simple: time_bench_page_pool03_slow(): in_serving_softirq=
+ fast-path
+| time_bench: Type:tasklet_page_pool03_slow Per elem: 121 cycles(tsc) 60.73=
+6 ns (step:0)
+
+v1=E2=80=A6v2: https://lore.kernel.org/all/20250221115221.291006-1-bigeasy@=
+linutronix.de
+  - Clarified the cover mail, added stat for pahole and from bench_page_poo=
+l_simple.ko
+  - Corrected page_pool_alloc_stats vs page_pool_recycle_stats type in
+    the last patch.
+  - Copy the counter values outside of the do {} while loop and add them
+    later.
+  - Redid the mlnx5 patch to make it use generic infrastructure which is
+    now extended as part of this series.
+
+Sebastian Andrzej Siewior (5):
+  page_pool: Provide an empty page_pool_stats for disabled stats.
+  page_pool: Add per-queue statistics.
+  mlx5: Use generic code for page_pool statistics.
+  page_pool: Convert page_pool_recycle_stats to u64_stats_t.
+  page_pool: Convert page_pool_alloc_stats to u64_stats_t.
+
+ Documentation/networking/page_pool.rst        |   6 +-
+ .../ethernet/mellanox/mlx5/core/en_stats.c    |  87 +++----------
+ .../ethernet/mellanox/mlx5/core/en_stats.h    |  30 +----
+ include/linux/u64_stats_sync.h                |   5 +
+ include/net/page_pool/helpers.h               |  11 ++
+ include/net/page_pool/types.h                 |  31 +++--
+ net/core/page_pool.c                          | 122 ++++++++++++++----
+ net/core/page_pool_user.c                     |  22 ++--
+ 8 files changed, 163 insertions(+), 151 deletions(-)
+
+--=20
+2.47.2
+
 
