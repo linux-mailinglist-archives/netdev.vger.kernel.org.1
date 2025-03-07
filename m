@@ -1,190 +1,195 @@
-Return-Path: <netdev+bounces-172787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97F73A55FFB
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 06:29:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE47DA56002
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 06:30:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BB5A3B2E8B
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 05:28:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 535161895713
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 05:30:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E13718FDDF;
-	Fri,  7 Mar 2025 05:29:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1770D2940D;
+	Fri,  7 Mar 2025 05:30:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iFnWZVL8"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="HnD1HDGq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA26C1474A9;
-	Fri,  7 Mar 2025 05:28:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC218BFF
+	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 05:30:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741325340; cv=none; b=Wsl31VKqkFqWjgtbUmLo1pdNTqjDVq7BbhwJWP6SUJ2h/rSvRHXRsoMtF/QTA95Zo74V2kX/l9rW+jSa/BGERYndZ7HtpP+WeRS+7+BCM4qBYKWsWTO6QRRULIDug1g2yvsLkG8u8VD3HshOEHKsH7T+bjlJzk7PuyfadYN9CB4=
+	t=1741325416; cv=none; b=Y2Rc1rMJyLm7KmvOkbfNwxIuCn05BhykECTzZmlMrPRK5wIZkwiUL8JXqAFsREHe6582rNEMNFwqDtXb4OZu5gAt1b/HFgbOlOiz3bWsGo6bhXKArbdJNPDkq9h/Cdg9Ic6FS93x14a6j/IqaxnE0d61TDRtfXoe+DVQ+iimieg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741325340; c=relaxed/simple;
-	bh=E2Y/GlpLCkl4xHcskn4WALbBs9h6FoTrMIP+94YBi9M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QtcOyFxHfxh8kkwLQYIIEKMEb9//A7jTNNPNP4GUAzOEkI0xqKfhke9tGrfFfOeU2pA0sAxARMnoUBcRXfuQ63dMBEtmqfp54aqZsyGLIbUhZ31bDlW/o02I8yZlZqbmEINK589Oo20B/uVQHFOjD6DhLsgxoWbtsky0oy09iDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iFnWZVL8; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741325339; x=1772861339;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=E2Y/GlpLCkl4xHcskn4WALbBs9h6FoTrMIP+94YBi9M=;
-  b=iFnWZVL81DmSExEK3uCbWwDBqjMJlVGdPFTWrFpR7GsWRx7wTLoK/Y1a
-   NbS4ZL3yVKub6KPWb+QVtpQEEhergeHr6fhwrUgJs30ZWes+RbXXmk/cD
-   BT/bwO53A0kKeNvwHBIIKCVUKTiPPeMdx2ojPAJSfilEXA3XT1CEGB16a
-   HpeM55PCrsdAfUvfkRdd0xNVQvM+OrYa2/2sMkvxzjzjCschIUqhyolhr
-   L4g6l6BHzl5qxSDRsps65WLqd/h0kuf/VurSps8iOFwuEPxS48lTR3sM5
-   YYILdfwbxtmfj5jUPyttzdBGp6A0HnXVuDqqiQaILKOjYsbASrtEFQ1ZR
-   A==;
-X-CSE-ConnectionGUID: CacmsbaOR3O2TuB02K8KoQ==
-X-CSE-MsgGUID: qe48wI+ASjyVVjngUuOOcw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="46142865"
-X-IronPort-AV: E=Sophos;i="6.14,228,1736841600"; 
-   d="scan'208";a="46142865"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2025 21:28:57 -0800
-X-CSE-ConnectionGUID: Gav6l5ujTTC3cGO4QrwZ5w==
-X-CSE-MsgGUID: +DtmNiMrS1qMuYKKWLnO6A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,228,1736841600"; 
-   d="scan'208";a="124261411"
-Received: from choongyo-mobl.gar.corp.intel.com (HELO [10.247.53.67]) ([10.247.53.67])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2025 21:28:49 -0800
-Message-ID: <19b78790-d4d3-45db-9b1f-fbe40f8ed795@linux.intel.com>
-Date: Fri, 7 Mar 2025 13:28:46 +0800
+	s=arc-20240116; t=1741325416; c=relaxed/simple;
+	bh=LlKf3tkF+OyHIiNSLi5BcVne10mp1gBFsNmvwqplMX8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pJxwcbPNU2iwoikUdA7uwrxpxvlfYhw6wxwG+hd9mOvJWQezkOXQO7dpPxQMIADgGAjAkI8J/jeZ1MMQglNqQisU/5fuzD2spNMG1nByCl2waJajA4iORwXpzj3T6hXppldgi9owYdqTkxeoWclzo2sdBgPIjVzziD+j6yuFoWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=HnD1HDGq; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5e095d47a25so2670342a12.0
+        for <netdev@vger.kernel.org>; Thu, 06 Mar 2025 21:30:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1741325412; x=1741930212; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=5OdEEX0A1E7fB+WrQ2xLELoD20zZW71WkQ5tEB3gbLc=;
+        b=HnD1HDGqkUM6ZgjI6JxF7zoGhhFMDuLqQrf9ftK5Q0DY98l0QTp++P0HfX/HtxRGVX
+         NwiE36x9QOke4BgzCibVvXHasSMuueQ/HDgU3KEcbVGErKq+eU7ZiWOlYeY2i8DV0702
+         2L9VO5Arsq/VjAHddibIQ/H1UgtY+i10nV4d8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741325412; x=1741930212;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5OdEEX0A1E7fB+WrQ2xLELoD20zZW71WkQ5tEB3gbLc=;
+        b=Yr2vtGNaS4I3GhsrUHUknqXmNRxVc6j4engu/W/V7mniccubKInW7jSQADgyY6oy3U
+         QyGuqLMZ5KScngF7cxcSqnbkjoiGHfGkqBkBaOt/E+4M5ne1MhI8Ysz/DnlpD9xNcS/i
+         2uL+KApfHNtGV7uP5SgkTGiEUo2qIGytR7MI7d20r9YG7Pzg2eUwwSOjKcu+MFuKoFAc
+         5l3PF0g0krN/aLtMLBazAbKT46FJ6pKBsnDWtVUv+WgTOF1ytra6yGGtXzzTZGKcQOQe
+         XbnQtwBF6wm5Z3JAnl/lai6gJOiwxcDdRLEMudSREx5dnQJwFrF0Mv1ia1Zv/uVui/cg
+         jJPg==
+X-Forwarded-Encrypted: i=1; AJvYcCX/Cac0VyB5xp2pAlxuz4HHLzSkbEM4ucy4J4G5kGGbYY1TuR2DT1r43vod7+gWuDQn6t/wpUU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1vMeFzeEWYdUjTrxlE/AEXgEd3SM5OWQPAzmF3Ui8iesIhhMp
+	Wc9pbvm9JZLdVKCd3oL8fH2c81jinJqzhAlurTu4AHE+Iqsdw5gxKXwZPXaNwtDydql8K3wvPbE
+	wBZv34mDQcYFQ4QM5DE8fh8aHitjwxhtXktda
+X-Gm-Gg: ASbGncu5s5IRJTthKerAzcClv3Vh9gyioomQEq9v0yZRh4gLe5bgkG3xKXKDVxTQFxu
+	RrONzLyddtpa+pIOUQKyxjdgofcy74MSr673EUDJ4hIc8nBzpc/g+UUKWWDH3IIsk1mFkU4an77
+	um4o6716hDqWxIaQzr5c0ojtmJ
+X-Google-Smtp-Source: AGHT+IF9px7PYEw8/fYDYFOnHAN6uDxRRBi9sUQuW2XnN9Fy841zOZNT79h/k2WSgiqiuiRe5WLc7VrVsJjhOdra57U=
+X-Received: by 2002:a05:6402:35c3:b0:5e4:d5f2:9748 with SMTP id
+ 4fb4d7f45d1cf-5e5e24b39damr2288931a12.27.1741325412496; Thu, 06 Mar 2025
+ 21:30:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 5/6] net: stmmac: configure SerDes according
- to the interface mode
-To: david.e.box@linux.intel.com, Andy Shevchenko <andy.shevchenko@gmail.com>
-Cc: Simon Horman <horms@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
- Jose Abreu <Jose.Abreu@synopsys.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, "H . Peter Anvin"
- <hpa@zytor.com>, Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
- David E Box <david.e.box@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Jiawen Wu <jiawenwu@trustnetic.com>,
- Mengyuan Lou <mengyuanlou@net-swift.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Hans de Goede <hdegoede@redhat.com>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Serge Semin <fancer.lancer@gmail.com>, x86@kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- platform-driver-x86@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org
-References: <20250227121522.1802832-1-yong.liang.choong@linux.intel.com>
- <20250227121522.1802832-6-yong.liang.choong@linux.intel.com>
- <Z8lLm9Ze9VAx3cE_@surfacebook.localdomain>
- <601c88fb-8ec8-4866-a45d-f28dea6d9625@linux.intel.com>
- <CAHp75VeOKbAsvSuf5+VQnGFmUcN92TNnR2eF1+70h3PjaMdMqA@mail.gmail.com>
- <d7c0094e-7fd3-4113-8d00-91b7a83ffd1f@linux.intel.com>
- <257769403908de3ac6271059e1febee88654fbdc.camel@linux.intel.com>
-Content-Language: en-US
-From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-In-Reply-To: <257769403908de3ac6271059e1febee88654fbdc.camel@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20250305225215.1567043-1-kuba@kernel.org> <CAMArcTWwuQ0F5-oVGVt9j-juqyrVibQObpG1Jvqfjc17CxS7Bg@mail.gmail.com>
+ <20250306072459.658ca8eb@kernel.org> <CACKFLimCb_=c+RUr1mwXe3DAJe6Mg2DK9yYPCqRHtCLGVaGVPA@mail.gmail.com>
+ <CAMArcTXYF5gV+_ukWcE9=_yfyXuNZ99t07CVcQde2n5x0SsH-g@mail.gmail.com>
+In-Reply-To: <CAMArcTXYF5gV+_ukWcE9=_yfyXuNZ99t07CVcQde2n5x0SsH-g@mail.gmail.com>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Thu, 6 Mar 2025 21:30:00 -0800
+X-Gm-Features: AQ5f1Jo-TcPNWleZe7fRGMP6tUnSlmNb_A2OJ6H5w-D3oyE4DyZ1Pr3_VzXczh8
+Message-ID: <CACKFLimQTjLwWyhw4ODD1VM2iW1eCeX1VqpU5ocRm9QRxMHR5w@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 00/10] eth: bnxt: maintain basic pkt/byte
+ counters in SW
+To: Taehee Yoo <ap420073@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, netdev@vger.kernel.org, 
+	edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch, 
+	horms@kernel.org, pavan.chebbi@broadcom.com, przemyslaw.kitszel@intel.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000abd9e6062fb9ea67"
 
+--000000000000abd9e6062fb9ea67
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Mar 6, 2025 at 9:26=E2=80=AFPM Taehee Yoo <ap420073@gmail.com> wrot=
+e:
+>
+> On Fri, Mar 7, 2025 at 4:25=E2=80=AFAM Michael Chan <michael.chan@broadco=
+m.com> wrote:
+> > Yes, we can check if (!bp->bnapi) and return early.
+>
+> Hi Jakub and Michael,
+> Thanks a lot for the review!
+>
+> I checked that early return if the interface is down, It works well
+> without any problem.
+> So if you're okay with it, I would like to add this fix to my current pat=
+chset.
+> https://lore.kernel.org/netdev/20250306072422.3303386-1-ap420073@gmail.co=
+m
+>
 
-On 7/3/2025 4:52 am, David E. Box wrote:
-> On Thu, 2025-03-06 at 20:56 +0800, Choong Yong Liang wrote:
->>
->>
->> On 6/3/2025 5:05 pm, Andy Shevchenko wrote:
->>> On Thu, Mar 6, 2025 at 10:39 AM Choong Yong Liang
->>> <yong.liang.choong@linux.intel.com> wrote:
->>>> On 6/3/2025 3:15 pm, Andy Shevchenko wrote:
->>>>> Thu, Feb 27, 2025 at 08:15:21PM +0800, Choong Yong Liang kirjoitti:
->>> ...
->>>
->>>>>> config DWMAC_INTEL
->>>>>>        default X86
->>>>>>        depends on X86 && STMMAC_ETH && PCI
->>>>>>        depends on COMMON_CLK
->>>>>> +    depends on ACPI
->>>>> Stray and unexplained change. Please, fix it. We don't need the
->>>>> dependencies
->>>>> which are not realised in the compile time.
->>>> The dependency on ACPI is necessary because the intel_pmc_ipc.h header
->>>> relies on ACPI functionality to interact with the Intel PMC.
->>> So, that header has to be fixed as ACPI here is really unneeded
->>> dependency for the cases when somebody (for whatever reasons) want to
->>> build a kernel without ACPI support but with the driver enabled for
->>> let's say PCI device.
->>>
->>>
->>> -- With Best Regards, Andy Shevchenko
->>
->> Hi Andy,
->>
->> Thank you for your feedback, Andy.
->> I appreciate your insights regarding the ACPI dependency.
->> The intel_pmc_ipc.h header is under the ownership of David E Box, who
->> focuses on the platform code, while my focus is on the netdev.
->>
->> Hi David,
->>
->> if you could kindly look into making the ACPI dependency optional in the
->> intel_pmc_ipc.h header, it would be greatly appreciated.
->> I am more than willing to provide any support necessary to ensure a smooth
->> resolution.
-> 
-> Choong you only need put the function under a #if CONFIG_ACPI block and provide
-> an alternative that returns an error when the code is not build. Like this,
-> 
-> #if CONFIG_ACPI
-> static inline int intel_pmc_ipc(struct pmc_ipc_cmd *ipc_cmd, struct pmc_ipc_rbuf
-> *rbuf)
-> {
->     ...
-> }
-> #else
-> static inline int intel_pmc_ipc(struct pmc_ipc_cmd *ipc_cmd, struct pmc_ipc_rbuf
-> *rbuf) { return -ENODEV; }
-> #endif
-> 
-> David
-> 
->>
->> This patch series has already been accepted, but we recognize the
->> importance of addressing this issue in the next patch series for upstream.
->> Our goal is to ensure that the driver can be compiled and function
->> correctly in both ACPI and non-ACPI environments.
->>
->> Thank you both for your understanding and collaboration.
-> 
-> 
-Hi Andy and David,
+Yes, please go ahead and add it.  Thanks.
 
-Thank you for the feedback.
+--000000000000abd9e6062fb9ea67
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-The current ACPI dependency for the config DWMAC_INTEL is necessary, but I 
-agree on making it optional.
-
-Implementing the suggestion from David using the "#if CONFIG_ACPI" approach 
-would address your concern about users who need to build a kernel without 
-ACPI support.
-
-If you are okay with this approach, then I will submit the solution for 
-upstream.
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJgMIIC
+XAIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEIO6/Zsj6PxD/lC+rmDeIFHzCVszbEPnh
+TzL0h3xf5GybMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDMw
+NzA1MzAxMlowXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEB
+AQUABIIBAHyuKkzg3pGAaM+J/E0rdoZyOOpQXBmetbEyCIT3KNo5vBbspHRXmJrjlMfRN/JX/aNS
+TmEaPvyIu547hPiM+iVjBa034z3rnQp4NIYy472bFC06sT6hHlcv70Xr3KqB4ZtHOOjU82Q0QTP1
+IGholmJo4winOoSjl7QLMZb9l3z5hFazlLK4itYUOZRnH+jTsJN+/Ti9NCMz9/XBT72eNz41HV9A
+LXw0o7sFabbrye3YrVQ40CkDR9Yw3fQzjXRw2wI2kkhvY0yVBS72ZyWk66BTenQRPya3zFCLNcAR
+Ponhh1EG6yBXauKoZKP9xQ48V08EGHLk69e2226cnxBOPwo=
+--000000000000abd9e6062fb9ea67--
 
