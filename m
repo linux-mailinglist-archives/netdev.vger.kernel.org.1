@@ -1,168 +1,157 @@
-Return-Path: <netdev+bounces-173092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68DA1A57278
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 20:50:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37821A57286
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 20:53:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A4A8D7A641C
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 19:48:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AB461708FE
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 19:53:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 359B125485E;
-	Fri,  7 Mar 2025 19:49:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1851724DFEF;
+	Fri,  7 Mar 2025 19:53:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Y2tbYJSD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kb5jl3f7"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2643521859D;
-	Fri,  7 Mar 2025 19:49:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540361A4F3C;
+	Fri,  7 Mar 2025 19:53:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741376986; cv=none; b=VAAl9Aq7AHP997w80JCblrRb+XNbPzG3Gvaw+JeB6DGTUeEBS++j9KHr5eZkq9z8bpi+V2X4EwU9q0+tMJar9HobB5ZoJ/ezmlROwkA4sd/T1316YX/0zboCsofmotkbyy9gmlxbvOO/JFID1HukBlTFpnRrLwRrEbkjsLkakRs=
+	t=1741377197; cv=none; b=DWrLWxwZQlqP0YMemrRUK85voiMjnbgac68d5dA6x57YT4QMiAKIU40gYuyHLqaUBpdKQiImKVr/SrA6XubUdzIbHBHYs4rgHPlECDwiERAvm6wBH1GrCrQ4fAsI4K1vq1Wi0lVSuX98AjTCdMKEH4EiJ1RA43AwiDOu5OTQnoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741376986; c=relaxed/simple;
-	bh=TukhM5KfrnykmpRsPrYHap4TTY4YTDzqHtaP7gRPqLM=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SpdvnTlQICin1cJYucEvF+gluLXZVHBD/bNihs2W1Etlinm0HQHZqV8skATXgTH5o4RJaeCpFbfuvsQ5i5mOg/PVWZ1jVxEjv2/p3URMIr12YZJo3FjFrLE5b6f77Hu2ykb5NiwcX/swzDz45eBSZMtAhAdnZkvNDe7+1LHYagU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Y2tbYJSD; arc=none smtp.client-ip=198.47.19.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 527JlIFS4055826
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 7 Mar 2025 13:47:18 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1741376838;
-	bh=7MSwLxTEPEB7snYOzkakSs7OVnf7mnb46OQFG90frxc=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To;
-	b=Y2tbYJSDFXtb3qSItccHoXSTovU+G8ZIHcDkpgt0qh+7JsRIao8dT8ZNiFm+djIOT
-	 mv5xUKzEcQugm2lxrxWpdUuKsJGmA2E7sUR8pccE5cGFJyRIIwjAr8U+ruPqX1wqyH
-	 ARsPzPF1GEpfesp4iIYc6GHzIr+qfutYDJph480w=
-Received: from DFLE115.ent.ti.com (dfle115.ent.ti.com [10.64.6.36])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 527JlIOk107175;
-	Fri, 7 Mar 2025 13:47:18 -0600
-Received: from DFLE102.ent.ti.com (10.64.6.23) by DFLE115.ent.ti.com
- (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 7
- Mar 2025 13:47:17 -0600
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE102.ent.ti.com
- (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 7 Mar 2025 13:47:17 -0600
-Received: from localhost (uda0133052.dhcp.ti.com [128.247.81.232])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 527JlHRK114562;
-	Fri, 7 Mar 2025 13:47:17 -0600
-Date: Fri, 7 Mar 2025 13:47:17 -0600
-From: Nishanth Menon <nm@ti.com>
-To: Parvathi Pudi <parvathi@couthit.com>
-CC: danishanwar <danishanwar@ti.com>, rogerq <rogerq@kernel.org>,
-        andrew+netdev <andrew+netdev@lunn.ch>, davem <davem@davemloft.net>,
-        edumazet
-	<edumazet@google.com>, kuba <kuba@kernel.org>,
-        pabeni <pabeni@redhat.com>, robh <robh@kernel.org>,
-        krzk+dt <krzk+dt@kernel.org>, conor+dt
-	<conor+dt@kernel.org>,
-        ssantosh <ssantosh@kernel.org>,
-        richardcochran
-	<richardcochran@gmail.com>,
-        basharath <basharath@couthit.com>, schnelle
-	<schnelle@linux.ibm.com>,
-        diogo ivo <diogo.ivo@siemens.com>, m-karicheri2
-	<m-karicheri2@ti.com>,
-        horms <horms@kernel.org>, jacob e keller
-	<jacob.e.keller@intel.com>,
-        m-malladi <m-malladi@ti.com>,
-        "javier carrasco
- cruz" <javier.carrasco.cruz@gmail.com>,
-        afd <afd@ti.com>, s-anna
-	<s-anna@ti.com>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        netdev <netdev@vger.kernel.org>,
-        devicetree <devicetree@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        pratheesh <pratheesh@ti.com>, Prajith Jayarajan <prajith@ti.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>, praneeth <praneeth@ti.com>,
-        srk <srk@ti.com>, rogerq <rogerq@ti.com>,
-        krishna
-	<krishna@couthit.com>, pmohan <pmohan@couthit.com>,
-        mohan <mohan@couthit.com>
-Subject: Re: [PATCH net-next v3 00/10] PRU-ICSSM Ethernet Driver
-Message-ID: <20250307194717.isd2yv5qvuwe6jgp@strongly>
-References: <20250214054702.1073139-1-parvathi@couthit.com>
- <20250226184408.d4gpr3uu2dm7oxa2@handwork>
- <506678778.717678.1740740287558.JavaMail.zimbra@couthit.local>
- <1229872038.768025.1741268586173.JavaMail.zimbra@couthit.local>
+	s=arc-20240116; t=1741377197; c=relaxed/simple;
+	bh=LNHS/O5qk8V3R4mU1dNCTKTGoEiRwLqi9UP8XhBs1YI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=N8pErDizUMC8DDxjx4Mvsk30Onu2iDjel45rHtk+6pc6bRX2miV+LlZwuDTt1NKiQlOm6zXzRd1SxKN2jgNWmZvaXSFW4QZEU1A96K1cpudV9C10PX0sceaP4PCucNfg8eAcwYLDAYG62ByyLSg6L4uEqz7lRwSzGQRa2IxEgG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kb5jl3f7; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-438a39e659cso13250065e9.2;
+        Fri, 07 Mar 2025 11:53:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741377194; x=1741981994; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OFjCWoFVVseHqDKPyVju+l4iTZxEMM/BbzUS5g6rWQg=;
+        b=kb5jl3f7XFMcjOTPKOzvk+iJs5Pb5+mKTp9Jyt2MyRfgGGfAPnW81BqWlx+n29EnB5
+         HC/oHdZB9Keqf+rN1ACTB1pNTf37gWpfcE/7uaGzxifp5+50dXAxgk4ixrKutgx4o6Nz
+         CP1wzm5+ZgkxGG5NGzUuW23jgf45WmG4AYyzPgvcJ1jf5cg1pTiwMk1LriCxGqXwKd6e
+         PeExadqaVN57vYQdN21528j1nA+oa8FG5olSGGd+3GKsBR2Szwp+3eYZwJLbTdMtQqzR
+         oTFtz/32/jj/VcQdaqr1S9xRaO3Kwj1SxoEDR5MmtpYBn49CMyz6l3c/xa30XNxceYbP
+         ndvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741377194; x=1741981994;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OFjCWoFVVseHqDKPyVju+l4iTZxEMM/BbzUS5g6rWQg=;
+        b=e4N/cFXpuy7TUqN1tFk+sYWwE9tza69iiCxt+FTi/ZuzVoU73cGRpolPwDdtRFn3P4
+         YzSpLbxPjSKN0wgjyEcBruRpo42996EoXZKq5+t57XgRZ4zO5xSXY1VqDvjMjCTWCNvd
+         Lt4xQQ/PAipcCs2vfb5WJeyzbPJkT9mb6lYrVpy8N9Fvwjx3NH8F2BzoEWdXnWYEEnkq
+         nz9uGSC008nR3FjmMtWT/7kzuKKuZO+9wM//Zf/togdwxe6NU70uusFY3cuTgvuMltkj
+         W4kLC9oC4p14c+fwfW7tpc1cIsfzvJeUo9q7w0CoogIWANX5dQ6TnuwVs+ZTps0gO60F
+         WBRw==
+X-Forwarded-Encrypted: i=1; AJvYcCV1KNS1Wfx5vnaVLLWgCA5a9GYPk1hEDwm6r6pqFHTQk+hMC8ziw+HrDCdRC7adBhmrdj0=@vger.kernel.org, AJvYcCV486pIEFjoKrrvnbJk6kZqOWGY2TEtfIhMlE04LoQEPOJiC8WKapWXCpmT2B8R3XDVzrWjg9wz1eHyHJHX@vger.kernel.org, AJvYcCVSWviZas7P2ndmQzi4ig4Xqul7atnTVgIAmK0EhfsXYIzh1pHLIxOqOk3ErKToQtRJ+xJPsfdOz1RjMIzAQd8=@vger.kernel.org, AJvYcCWb9966QWA7Mt1ol+84XzJyiy3IZ3ApsVkBQ0+gSHLHdFJ3HxZR2Sf9izxFnxyL65YEIhhmzxTlammMbpE=@vger.kernel.org, AJvYcCXa1zqEsfBnK6+tMru9h1ls8GgLtYzi/dBfnGJZk2JNVG/d8PKmiRw/2tHsGVELAfSVU4cEq0r6vh7i+cE=@vger.kernel.org, AJvYcCXcoIxzCONdTPmph2yADDUx/oIGOd5+BMeb+3983oxJWCOjmyRMcikQbPlujiag21i8WGQ7dzBH@vger.kernel.org, AJvYcCXeX1aGXcQWLcuQ/j34AlF3VAK+1yFECddR0b1Xq/Iw7clPhVxlA/i/sfT/pNS3s43K86SFPaIQ2azYr9+q@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCeDQ3XOefdeNwWOyWlt8WAGG2k0lZeOZ5qhkdsj9HSBm8hrpq
+	tcON1DYFTyaqwrYn2iAJG5XfI+0Kz5PVgc5slaNvsHu2iqK8ABQE
+X-Gm-Gg: ASbGncvB0+y8GWDg2jdy2TpXj+sxAopY3CYUSjtsMOa8SgqE/RoghUL+spc/DbkcBoO
+	HfUM5kPWiaQJmRfM+qP/X/rWYoHeThQ62RSOkHeGDjbkGNI7YY5jnHslYZ0iph3Kq6eS9R93lOf
+	rfkDzc8+lIX82i7Qy3E6mE8k5EDmQEOJqLtLqKIQ00I3bUy7B+mZ0+JYWz725/FxUa9P+CbcWib
+	22QIoGKC8lewgbUMxLWFPcv+6rCpf+4fYpQmqQDj1b+tlEZlVHL9WnQklApDuY7KRcz7A4tA7H6
+	Kkwrq1d4uhktFCWpVG81XjFTNFhyGfYCm6FwhhXxTY+ZzB4gnAeNCMHi/kms8R426sRB2hRQ/Ut
+	05RaJTuw=
+X-Google-Smtp-Source: AGHT+IFtUYsYiNnYKhfvrcaN1ioOhGevW7gRyAbgDR19AZMXszweQZgGUKeQX4mOm4dqyM9BgE29Gg==
+X-Received: by 2002:a05:6000:18ab:b0:391:122c:8aa with SMTP id ffacd0b85a97d-39132d96079mr3226538f8f.30.1741377194381;
+        Fri, 07 Mar 2025 11:53:14 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c01d2cdsm6394936f8f.57.2025.03.07.11.53.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Mar 2025 11:53:13 -0800 (PST)
+Date: Fri, 7 Mar 2025 19:53:10 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Andrew Cooper <andrew.cooper3@citrix.com>,
+ Laurent.pinchart@ideasonboard.com, airlied@gmail.com,
+ akpm@linux-foundation.org, alistair@popple.id.au, andrew+netdev@lunn.ch,
+ andrzej.hajda@intel.com, arend.vanspriel@broadcom.com,
+ awalls@md.metrocast.net, bp@alien8.de, bpf@vger.kernel.org,
+ brcm80211-dev-list.pdl@broadcom.com, brcm80211@lists.linux.dev,
+ dave.hansen@linux.intel.com, davem@davemloft.net,
+ dmitry.torokhov@gmail.com, dri-devel@lists.freedesktop.org,
+ eajames@linux.ibm.com, edumazet@google.com, eleanor15x@gmail.com,
+ gregkh@linuxfoundation.org, hverkuil@xs4all.nl, jernej.skrabec@gmail.com,
+ jirislaby@kernel.org, jk@ozlabs.org, joel@jms.id.au,
+ johannes@sipsolutions.net, jonas@kwiboo.se, jserv@ccns.ncku.edu.tw,
+ kuba@kernel.org, linux-fsi@lists.ozlabs.org, linux-input@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mtd@lists.infradead.org, linux-serial@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux@rasmusvillemoes.dk,
+ louis.peens@corigine.com, maarten.lankhorst@linux.intel.com,
+ mchehab@kernel.org, mingo@redhat.com, miquel.raynal@bootlin.com,
+ mripard@kernel.org, neil.armstrong@linaro.org, netdev@vger.kernel.org,
+ oss-drivers@corigine.com, pabeni@redhat.com,
+ parthiban.veerasooran@microchip.com, rfoss@kernel.org, richard@nod.at,
+ simona@ffwll.ch, tglx@linutronix.de, tzimmermann@suse.de, vigneshr@ti.com,
+ visitorckw@gmail.com, x86@kernel.org, yury.norov@gmail.com
+Subject: Re: [PATCH v3 00/16] Introduce and use generic parity16/32/64
+ helper
+Message-ID: <20250307195310.58abff8c@pumpkin>
+In-Reply-To: <5A790652-1B22-4D13-AAC5-5D9931E90903@zytor.com>
+References: <4732F6F6-1D41-4E3F-BE24-E54489BC699C@zytor.com>
+	<efc2ee9d-5382-457f-b471-f3c44b81a190@citrix.com>
+	<5A790652-1B22-4D13-AAC5-5D9931E90903@zytor.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1229872038.768025.1741268586173.JavaMail.zimbra@couthit.local>
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 19:13-20250306, Parvathi Pudi wrote:
-> Hi,
-> 
-> >> On 11:16-20250214, parvathi wrote:
-> >> [...]
-> >>> The patches presented in this series have gone through the patch verification
-> >>> tools and no warnings or errors are reported. Sample test logs verifying the
-> >>> functionality on Linux next kernel are available here:
-> >>> 
-> >>> [Interface up
-> >>> Testing](https://gist.github.com/ParvathiPudi/f481837cc6994e400284cb4b58972804)
-> >>> 
-> >>> [Ping
-> >>> Testing](https://gist.github.com/ParvathiPudi/a121aad402defcef389e93f303d79317)
-> >>> 
-> >>> [Iperf
-> >>> Testing](https://gist.github.com/ParvathiPudi/581db46b0e9814ddb5903bdfee73fc6f)
-> >>> 
-> >> 
-> >> 
-> >> I am looking at
-> >> https://lore.kernel.org/all/20250214085315.1077108-11-parvathi@couthit.com/
-> >> and wondering if i can see the test log for am335x and am47xx to make
-> >> sure that PRUs are functional on those two?
-> >> 
-> > 
-> > In this patch series we have added support for PRU-ICSS on the AM57x SOC.
-> > Hence the test log was only included for the AM57x SOC. We are working in
-> > parallel
-> > to add support for PRU-ICSS on the AM33x and AM43x SOC's as well. We will send
-> > it as
-> > a separate patch series at a later time.
-> > 
-> 
-> Further update:
-> 
-> We have successfully cross compiled the kernel (linux-next) with this patch series
-> for AM335x and AM437x SOC respectively.
-> 
-> Kernel is booting well on both the SOCs and we have verified PRU functionality by
-> loading simple example application (pru_addition.elf) on the PRU cores, by using
-> "remoteproc" driver from mainline kernel.
-> 
-> Below are the logs for the SOCs with boot log and running PRU with elf file specified
-> above:
-> 
-> AM335x test log: <https://gist.github.com/ParvathiPudi/87d7ddf949913b80f022ed99706337ac>
-> AM437x test log: <https://gist.github.com/ParvathiPudi/b2d556829cb4a9e3b6b4c5656dbdd594>
+On Fri, 07 Mar 2025 11:30:35 -0800
+"H. Peter Anvin" <hpa@zytor.com> wrote:
 
+> On March 7, 2025 10:49:56 AM PST, Andrew Cooper <andrew.cooper3@citrix.com> wrote:
+> >> (int)true most definitely is guaranteed to be 1.  
+> >
+> >That's not technically correct any more.
+> >
+> >GCC has introduced hardened bools that intentionally have bit patterns
+> >other than 0 and 1.
+> >
+> >https://gcc.gnu.org/gcc-14/changes.html
+> >
+> >~Andrew  
+> 
+> Bit patterns in memory maybe (not that I can see the Linux kernel using them) but
+> for compiler-generated conversations that's still a given, or the manager isn't C
+> or anything even remotely like it.
+> 
 
-Thanks for testing this, I just got some time to dig further, I will
-respond on the standalone patch
-https://lore.kernel.org/all/20250108125937.10604-2-basharath@couthit.com/
+The whole idea of 'bool' is pretty much broken by design.
+The underlying problem is that values other than 'true' and 'false' can
+always get into 'bool' variables.
 
--- 
-Regards,
-Nishanth Menon
-Key (0xDDB5849D1736249D) / Fingerprint: F8A2 8693 54EB 8232 17A3  1A34 DDB5 849D 1736 249D
+Once that has happened it is all fubar.
+
+Trying to sanitise a value with (say):
+int f(bool v)
+{
+	return (int)v & 1;
+}    
+just doesn't work (see https://www.godbolt.org/z/MEndP3q9j)
+
+I really don't see how using (say) 0xaa and 0x55 helps.
+What happens if the value is wrong? a trap or exception?, good luck recovering
+from that.
+
+	David
 
