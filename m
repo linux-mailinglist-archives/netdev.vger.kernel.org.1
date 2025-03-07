@@ -1,98 +1,111 @@
-Return-Path: <netdev+bounces-172739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 548E3A55D69
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 03:00:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5204A55D8F
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 03:19:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B96BE1894749
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 02:00:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01EE7178236
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 02:19:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 694231624E0;
-	Fri,  7 Mar 2025 01:59:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N5Pqh2+p"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1052216C684;
+	Fri,  7 Mar 2025 02:19:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F67685931;
-	Fri,  7 Mar 2025 01:59:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7E61624E0;
+	Fri,  7 Mar 2025 02:19:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741312799; cv=none; b=uTYDn9FizYOIMO/wNdlMkorE60j8uCy4XH38eWBRa3+g8dofD1YLe6YqMRdhevVhvhgHA8lrjAF7UKMMF8dao49j9W9iPd74AXqLTk/sPnScurUVqlAu4i/q6mrPw2v//0WAFELsJj4wFd7CUtpnVXr2ng9djMwFDToaD6eXF2E=
+	t=1741313958; cv=none; b=YP4YhDVlrloJN+ufRMbihWrEux8XAbC/7NOfFm+1SQXxhNax9l+DiHJFxRcs0CWaoEu/qGOOL4R+8IqYXyd4P9dJ6E12HQsHtc2sSPT3hSwWw3PUFYy74HGqsQ9MBbCrpfDIHipkIkOu5Rcylhv1sWzhRdTmKcIgNkNHyQEndRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741312799; c=relaxed/simple;
-	bh=ulj+vhipmfz34qioaiFLWEsQ+Aq8r+/RSLJ+tVnvt0o=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tBo8NKaw81NeEYu05/o05yvfMweRqw8ROVEYPNfLmiRzHmmAsf0LtR33UHmEvjXVx4u42FSWfF1scgaLpAXzJCB5H4WLQY36MR4fo656SGU4XO+6XMmtZ4ppB//v+LgLGKGVzGODsbi42se+junOYanH5UcWu4fhXDBbUNbFIH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N5Pqh2+p; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A711CC4CEE0;
-	Fri,  7 Mar 2025 01:59:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741312798;
-	bh=ulj+vhipmfz34qioaiFLWEsQ+Aq8r+/RSLJ+tVnvt0o=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=N5Pqh2+p2XL+6S6QKqbBBqoLPRvmmAuyO2i2szgqMImDiNdWeONioiCzTmsjTGmbC
-	 p29GZY9lV/Sg8SCvBoMQ0jMdDb9OR9hHUCb33rY+7J/T8xw9g7CLNfBw/5GOty0e+S
-	 FHCvX3YqkXdI2Otl2KWLtwn/RrNNwlhN3fHNOCPP8dIPZYAM+mHxn9caHI2vXVooyv
-	 GkpZbZgtmEEJR0OPd76Td8BaX5/Lg6EBGih4lYPhqoRJdsYK6DToQNcaPEA9RUghYH
-	 NZaSzn/mLkpjIsh2OuHdfbRAP4z8R19sFhPnUjmDxH+zMJKeCW3Tv6VUIWB12PvPZx
-	 VBDA0x//a+Y6g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34917380CFF6;
-	Fri,  7 Mar 2025 02:00:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1741313958; c=relaxed/simple;
+	bh=FGi/1apNx15Za9JRlWcziIb/iIghphK92spwdswLCVQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UwTH42G4+s5fjY6gEO+yMoqSiz9vGG9nx1hQCVziZSn4aaSagtu5rOQ3mWy0+LKR/gL91y9+plIlFfbyJrzK+5wVL+LY2mtt6CNN5kgAXTLBnh9xkOyX1XTKHX1hkKl/HGCcHaKbc0qiyqglD44aUh5Fg5z3gq0flqbu3D9JboE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [124.16.141.245])
+	by APP-01 (Coremail) with SMTP id qwCowAAHDm6FV8pnsGkMEw--.19544S2;
+	Fri, 07 Mar 2025 10:18:51 +0800 (CST)
+From: Wentao Liang <vulab@iscas.ac.cn>
+To: saeedm@nvidia.com,
+	leon@kernel.org,
+	tariqt@nvidia.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Wentao Liang <vulab@iscas.ac.cn>
+Subject: [PATCH net v3] net/mlx5: handle errors in mlx5_chains_create_table()
+Date: Fri,  7 Mar 2025 10:18:20 +0800
+Message-ID: <20250307021820.2646-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.42.0.windows.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4 0/2] Add perout configuration support in IEP
- driver
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174131283199.1853786.11033321360799820644.git-patchwork-notify@kernel.org>
-Date: Fri, 07 Mar 2025 02:00:31 +0000
-References: <20250304105753.1552159-1-m-malladi@ti.com>
-In-Reply-To: <20250304105753.1552159-1-m-malladi@ti.com>
-To: Meghana Malladi <m-malladi@ti.com>
-Cc: javier.carrasco.cruz@gmail.com, diogo.ivo@siemens.com, horms@kernel.org,
- richardcochran@gmail.com, pabeni@redhat.com, kuba@kernel.org,
- edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, srk@ti.com, vigneshr@ti.com,
- rogerq@kernel.org, danishanwar@ti.com
+X-CM-TRANSID:qwCowAAHDm6FV8pnsGkMEw--.19544S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7uF17XFyfCw1xGryxXF1UWrg_yoW8Xr13pF
+	43AryDWrZ8A348X34UZrWFq34rua1kKa4j9Fs3K3yfZwnrXanrAF1rG34akw1jkryUG39x
+	tFn8A3WUZFZxCFUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr
+	1j6F4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv
+	7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r
+	1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02
+	628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4
+	IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1r
+	MI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJV
+	WUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j
+	6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
+	BIdaVFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiDAUOA2fKT08r5wAAsl
 
-Hello:
+In mlx5_chains_create_table(), the return value of mlx5_get_fdb_sub_ns()
+and mlx5_get_flow_namespace() must be checked to prevent NULL pointer
+dereferences. If either function fails, the function should log error
+message with mlx5_core_warn() and return error pointer.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Fixes: 39ac237ce009 ("net/mlx5: E-Switch, Refactor chains and priorities")
+Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+---
+[v1]->[v2]: Add Fixes tag and branch target. Change return value.
+[v2]->[v3]: Change Fixes tag. Move change history.
+---
+ drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-On Tue, 4 Mar 2025 16:27:51 +0530 you wrote:
-> IEP driver supported both perout and pps signal generation
-> but perout feature is faulty with half-cooked support
-> due to some missing configuration. Hence perout feature is
-> removed as a bug fix. This patch series adds back this feature
-> which configures perout signal based on the arguments passed
-> by the perout request.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v4,1/2] net: ti: icss-iep: Add pwidth configuration for perout signal
-    https://git.kernel.org/netdev/net-next/c/e5b456a14215
-  - [net-next,v4,2/2] net: ti: icss-iep: Add phase offset configuration for perout signal
-    https://git.kernel.org/netdev/net-next/c/220cb1be647a
-
-You are awesome, thank you!
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
+index a80ecb672f33..711d14dea248 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
+@@ -196,6 +196,11 @@ mlx5_chains_create_table(struct mlx5_fs_chains *chains,
+ 		ns = mlx5_get_flow_namespace(chains->dev, chains->ns);
+ 	}
+ 
++	if (!ns) {
++		mlx5_core_warn(chains->dev, "Failed to get flow namespace\n");
++		return ERR_PTR(-EOPNOTSUPP);
++	}
++
+ 	ft_attr.autogroup.num_reserved_entries = 2;
+ 	ft_attr.autogroup.max_num_groups = chains->group_num;
+ 	ft = mlx5_create_auto_grouped_flow_table(ns, &ft_attr);
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.42.0.windows.2
 
 
