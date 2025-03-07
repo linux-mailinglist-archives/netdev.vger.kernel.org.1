@@ -1,131 +1,109 @@
-Return-Path: <netdev+bounces-172790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1AB7A56026
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 06:42:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49AC5A56087
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 06:56:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DE2B17742C
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 05:42:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C5AC1895457
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 05:56:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDC3619306F;
-	Fri,  7 Mar 2025 05:42:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2EB119D081;
+	Fri,  7 Mar 2025 05:56:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NfrvOjfx"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="DQj7/Imc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97BBA19ABD1
+	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 05:56:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741326965; cv=none; b=Px2r+NOao0ocE6XS/5y/vc2c9j7HkP536ehz9V+tFPkcJCrFhk+vUSgbT+n9zsz1xdm7wXkcXumsWbNNxZWAFQbKJd4xU0zWEp2DlMlAGrcsmy5yy0yNa8/1YrRM+Hjevt4Z8zQOrD8fpxk7hMmPkpAGnVolwuyEGlnUqMxIvVg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741326965; c=relaxed/simple;
+	bh=ceUt8jZh//dgX8toJ1NZG+ydsh7sTZqCCjqSumiEDYg=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TCbKko20c18VSQFGMB1Xr2mv5WaQPBDabOHcHN6GJyfjsiVh17uA1APiy2IMaTaqIgS88yUCCrp59WYla7Fdw/uZ+I5HuzyLZEA5fjWzBqqTRrsiH4LkWZRivmmmu5+uNWBm8fRo6JYEZwfQmt048V2Dd5ZHh5kOK1WQWRMPWIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=DQj7/Imc; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 2ED0320842;
+	Fri,  7 Mar 2025 06:50:51 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id tCZBqe1HLdXO; Fri,  7 Mar 2025 06:50:50 +0100 (CET)
+Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2639F7FD;
-	Fri,  7 Mar 2025 05:42:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741326167; cv=none; b=ax0CYAoh64Ytb0gBbnZTB6lzc2BLcr6yGm8y3KgqcFYyrNAtM0xmXIsqQF8C/mGYTQ00t3z/c7URDZm9tbzYXBkTM53J9bKYHBrHBrowfh6RbEY/KH4z4mZcNZgvJ/ctsHuByWfj2v8Cap+2JqQYGhRbs6r+K/1IS8FpRMiC/NE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741326167; c=relaxed/simple;
-	bh=2VDFGRlYKXRUljBblvdtFlwOOzj13mn547LMTaJP2gE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bzFzCPXKxwmFzDUniqoJsp8UfHffh0aYbLoQAGexJX2mtVqz+74TyR/BpQtXAqbnG8IKYtDcC0A3tOaQdrg/R4fWIjPhZN4Xz+EYSq7mtXyWE39Upgs288GIDy+hU0nFHerVFDIhsX1bPjpHhyzD4yEh2jUJhPmTcK+Bx1X9P20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NfrvOjfx; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5e4d3f92250so2057813a12.1;
-        Thu, 06 Mar 2025 21:42:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741326164; x=1741930964; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XCCuSIdseDmohQkR/a0WVoB8hKN3v/q9qa5r2iXYOqo=;
-        b=NfrvOjfxEYG/YE8BX4gCmBYij08fYvo1Pa2Tob3y6Ne7hUA9IWwT5fp7rw5DTrZVE6
-         AyxgBC905Vvd/X8F6tP7O80KUItKevWyAays194tUGT8I03OV6ohI0g1vq6/9+u8MSXI
-         XQ4a2huJ9WR1pT7LOm6I/zlmAo2p/STvt/q/oidO04T4nox4fm+sJuNlir0jFnhd2MA0
-         AnPgfisLQdhkpam9PWx8uPJhSlKTuuWIkavMITSEZ5iFinnZLlXk6dz8BkXdzzdAdt44
-         LXWpZOnHgsQ39pFGCxKRiwcMyee17sCP+b6g2lh1013XVj2bsnK6vyL74TBfde/LCtXM
-         0r+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741326164; x=1741930964;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XCCuSIdseDmohQkR/a0WVoB8hKN3v/q9qa5r2iXYOqo=;
-        b=tHIeEvm/VrqjqK6ksVhnVxFC8yZflMUFKqQBZtN2DaEKHIeHPHCr1LHW2OL1L2ETwr
-         WKhCV69/0V1AKzrhHzEnw8Kmn2d2/woMYJR0hIrkvAjGYhU0EgcrsXQ6g69MHYUXQq3J
-         fzlIgJkM4kCyqC5NtJOB3of6ikNj/SiCXskDZjA5vs2tOGw3bAixDgvBv9HWV+LIKcst
-         CbKubEbyXZI+TV3XXFAO57dnuLm0EbdRxRpRg9i5yLA3QxiRIyyQ7nX0AgitK//Y/CwZ
-         1SZc1mkS/jFC447UmRJVbvu7ZlCGZHM78Qv7WgK7deOJzRRZj7VH9oxhGQ/MhEXTa1ff
-         XOew==
-X-Forwarded-Encrypted: i=1; AJvYcCUzav3jyNQgEUmwcrD521/dzHvLjo9xlJljYJmw5uhPkZ6DS2T52W26KMu//WW9uPinolzg2RcS@vger.kernel.org, AJvYcCXpx8DBOazZr6kat3/MzKCM5Z9vsNzYbdsnYYNhYfhs/OtY7Ib+xuDKz35ARhP2VvkXkGkW7GEoOV6q0OEfUlw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywxf63KmjiZGnmm/7Wpks1zp+GaTvgAsFMAqqnYRGrOvrKmpBwu
-	TrxGkVBK0jeZyFR5CqJJ5xC55mhQAGcomrhp10GL49fd+vwuslbMprXQ2H1aJzvKjnKp5B/YrUE
-	WndgkQHIU+ZRGuot12yjerIMv13w=
-X-Gm-Gg: ASbGnctZ7SX8vU/sZdGB6kErx6+I1r3coTQrvXwpH+Uzs7CNxXgI5zrxeXPf5MZ4t1T
-	EmEIdp5oinx0HYpZNkWMdRICyfMLptg0TcPdzWHNRHJDnWUcujWg8ld9/NpDzOmBlFLu7Cbrz6M
-	G97XUxohnsu7LTZf6Y+TY5cmga8KU=
-X-Google-Smtp-Source: AGHT+IGZ1N/0BVEIwoeC7pN0a4dU5zNpzeIOnjPo6+wNNho224DKHGoP+JyHqv+hhiNvvcswdXE4FXYOgm6J4PZJDFQ=
-X-Received: by 2002:a05:6402:2808:b0:5e5:71e:8c63 with SMTP id
- 4fb4d7f45d1cf-5e5e22e5476mr2166342a12.15.1741326164093; Thu, 06 Mar 2025
- 21:42:44 -0800 (PST)
+	by mx1.secunet.com (Postfix) with ESMTPS id A54EA207BB;
+	Fri,  7 Mar 2025 06:50:50 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com A54EA207BB
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1741326650;
+	bh=29f+pgvqluMPQGFxzIIGwwKsHatu0dtVzGGpc4oGUCU=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=DQj7/Imc29H33JIwqD+S5IqxqDsKmJ2Bf0D755B+T6GfnsjksDuwJk9rsFYLt71Qx
+	 0hm2iLv2Nv04jgfEHtf8z8JAH0VmaZHm7SEbUqyLUvDgtj103ce/a5y7Q97/2qrBId
+	 VSdkmhbC+tUxsBD5m3DF2hT3OGufqhnWk+zneiPZOKia6S5/gl2+hKrq02+HTeFOOK
+	 FDtXcZlzaZw0EaW/F1exfp/dTaARmcKAgbc7TxdXNepNARZ5Ng0tASj+wQpSR36Ujf
+	 er0QOvWhqe+E5fQljOh1jzecxyEMG2fKvZUCoB0BRYtNFS0D9359/JLpATrMiGAOBU
+	 6rkQ9pRIIDHEg==
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 7 Mar 2025 06:50:50 +0100
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 7 Mar
+ 2025 06:50:49 +0100
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 8D1A13182D7B; Fri,  7 Mar 2025 06:50:49 +0100 (CET)
+Date: Fri, 7 Mar 2025 06:50:49 +0100
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Chiachang Wang <chiachangwang@google.com>
+CC: Leon Romanovsky <leonro@nvidia.com>, <netdev@vger.kernel.org>,
+	<stanleyjhu@google.com>, <yumike@google.comy>
+Subject: Re: [PATCH ipsec v3 1/1] xfrm: Migrate offload configuration
+Message-ID: <Z8qJOVuMr+GamxUO@gauss3.secunet.de>
+References: <20250224061554.1906002-1-chiachangwang@google.com>
+ <20250224061554.1906002-2-chiachangwang@google.com>
+ <20250224124956.GB53094@unreal>
+ <CAOb+sWEdZ-kY6-qnG2u0h_JzeVyrf0b_eT+L=2t-5zCGaXedHA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250306072422.3303386-1-ap420073@gmail.com> <20250306072422.3303386-2-ap420073@gmail.com>
- <20250306173523.20b136ea@kernel.org>
-In-Reply-To: <20250306173523.20b136ea@kernel.org>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Fri, 7 Mar 2025 14:42:32 +0900
-X-Gm-Features: AQ5f1Jr7Gp5qqttUDWMqc-W6lQJFcMf1qiuEp95WhQpeUcsi3pljEnW7glUWB6E
-Message-ID: <CAMArcTWmZv+rUi8ci4tbzVz6dW==hDT6njehcd8Lkn44v50gPQ@mail.gmail.com>
-Subject: Re: [PATCH v2 net 1/6] eth: bnxt: fix truesize for mb-xdp-pass case
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
-	andrew+netdev@lunn.ch, michael.chan@broadcom.com, pavan.chebbi@broadcom.com, 
-	horms@kernel.org, shuah@kernel.org, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, almasrymina@google.com, 
-	asml.silence@gmail.com, willemb@google.com, kaiyuanz@google.com, 
-	skhawaja@google.com, sdf@fomichev.me, gospo@broadcom.com, 
-	somnath.kotur@broadcom.com, dw@davidwei.uk
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <CAOb+sWEdZ-kY6-qnG2u0h_JzeVyrf0b_eT+L=2t-5zCGaXedHA@mail.gmail.com>
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-On Fri, Mar 7, 2025 at 10:35=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
+On Fri, Mar 07, 2025 at 01:42:25PM +0800, Chiachang Wang wrote:
+> Hi Leon,
+> 
+> Thank you for your review and suggestions. I noticed your patches
+> haven't been merged into the tree yet. I'm unsure if rebasing my patch
+> onto yours would work correctly with the kernel upstream. It seems
+> your patches are suitable for merging. Since I'm not familiar with the
+> timeline for your patch's inclusion, could you please advise on how
+> long it might take for them to be in the tree? This would help me
+> rebase my patch properly. or there are any other alternative way
+> rather than waiting your patch?
 
-Hi Jakub,
-Thanks a lot for the review!
+Rebase your patch on top of the ipsec-next tree. This is the target tree
+for xfrm changes that will go to -next. Leons patchset is already merged
+into this tree.
 
-> On Thu,  6 Mar 2025 07:24:17 +0000 Taehee Yoo wrote:
-> > +     struct skb_shared_info sinfo =3D {0};
->
-> > +             memcpy(&sinfo, xdp_get_shared_info_from_buff(&xdp),
-> > +                    sizeof(struct skb_shared_info));
->
-> This may be a little expensive, struct skb_shared_info
-> is 320B and we only really need it in a rare occasion
-> of having multi-buf XDP.
+Thanks!
 
-You're right, it's pretty heavy. I didn't think about the total size of
-the shared_info.
-
->
-> Can we update agg_bufs =3D sinfo->nr_frags after calling
-> bnxt_rx_xdp(), and otherwise go back to something like you v1?
-
-Okay, I will update agg_bufs with stored sinfo->nr_frags.
-
-> Sorry if I mislead you.
-
-It was my intention, no problem :)
-
-Thanks a lot!
-Taehee Yoo
-
-> --
-> pw-bot: cr
 
