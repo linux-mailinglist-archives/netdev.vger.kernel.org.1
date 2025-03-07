@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-172741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4303EA55DB1
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 03:30:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9A92A55DB3
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 03:30:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4095C3B4B11
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 02:29:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2D8617808A
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 02:30:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21FE61865EB;
-	Fri,  7 Mar 2025 02:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB2AF188907;
+	Fri,  7 Mar 2025 02:30:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ltWNggIL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DDuc9Wg6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA58E17E472;
-	Fri,  7 Mar 2025 02:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB06815382E;
+	Fri,  7 Mar 2025 02:30:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741314604; cv=none; b=LJ9X4jbx4vDiJX4mEtgtm5xRgXCu9zXJUf3rE9V3sTDkLXwMaAMunA9S9CIXJ8dFEbYOf422BRZcN8+zjv2Cq/fPs1CjSjfLPBfsHK2i2JbGsKggaQBZNC+u1KgV2kZmCEY6MtbaDN83KoW4bnOLCwOUHgHCSYIEUO2xWjYfb10=
+	t=1741314608; cv=none; b=hFOHl934OcnuSC213kM67NDeD+Ell1x/yBPOx9Z58Fy6ieO7GBV/ilVyolGuu6zOafXeelcvMGYJQ4VbsPaKPRSRY7r9SC5ciAyAnHW/gx2V0NSR0IvaQNLvUX0ipJCW8LlvU4REuepk+ymqW7WFPgxw+ycsruzjbbvMb8trdEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741314604; c=relaxed/simple;
-	bh=qOYNlxGvpwI9YokRQvVn4Dq14vflRZUeZT6YqYChAlU=;
+	s=arc-20240116; t=1741314608; c=relaxed/simple;
+	bh=tn3Z1GgSVn9MZE25OAl4TUe3BRvbI67Yak5zmzCjmao=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qoRzuFktuMqFfdMKsQIbnTePvy27+cAYMKOTRDHsUq1WOK7qaKbxy+2i827Glpq3M94Z/c1ATyzR5mMatQ5v7ZExGj7RvlJC8HWxdl0wvpttpRHuPRMgfGWx1/mJbB0vj0hYTD4sV7i5k/3u+/gMpLqrx2GfTX7T4u9+mTuwzbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ltWNggIL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D4B3C4CEE0;
-	Fri,  7 Mar 2025 02:30:03 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=tYZRS8bhybXkqhkeopQnI++BmgVKCfaiVE7XFfKm+gRFjy7UpL9iLDndzFnCo841RjlE8tofMtzljCMhHHzZ0ON5BN16WLTZ5X9MrxVpu7FMCCOtVpw+8qoARriGeGKn8p+5156bRnd9NAIw4iK2jS3I0hIx0E2U+3LXHftM9DU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DDuc9Wg6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2ADF2C4CEE0;
+	Fri,  7 Mar 2025 02:30:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741314603;
-	bh=qOYNlxGvpwI9YokRQvVn4Dq14vflRZUeZT6YqYChAlU=;
+	s=k20201202; t=1741314608;
+	bh=tn3Z1GgSVn9MZE25OAl4TUe3BRvbI67Yak5zmzCjmao=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ltWNggILIneTHZxHcWxYbdSFa4XKntYI3tr5p9k3MY/bqdK65y6VlJBa2+2OPZA0e
-	 ZydmZ9jf6AG26dDPkqqbcWu5GwIG7zBj/t/fZxiNeut6JRtqryY0D98XQJKoDaAvRW
-	 XeuADTGyFyrkJJyK/EMvkwgwzMuKEG4AVwfbu9+cfD8rL1DurBpde+MeuowOgwfxi7
-	 x3ziWqE022tRYwZbk9LuXk7g7MA/1Z8X60T6uUjw/sA438V1nBsM602uVlYGrDSC3m
-	 NRhZNw1g9bzPZiu6Wcn6k3j0oiCzC3OrsEY/BjnNOU3K0obyC6I/f864d+3xU9zpdc
-	 +rRaGnKrFzoVQ==
+	b=DDuc9Wg6usaZqyJuY0u9UpSyvd1OwrgUxw5p5L6KrwybVaKC6UgNbKyO5ttuwZ1Er
+	 x0oqYlQjNEZnSLdy3j8XWxHFArz1D2orFu5EdVxE/94i3lHxa4RPVt8vZJibC3J2O5
+	 dJ5tx0JYRiEQYf3gK4NGsfLg8dKfgpMBxdJFBgcu9oWMLPex23rxcyRSNRJGXILsq0
+	 IoAjTFeQS5yAcLrEz3oAxAo9Ln4qJkFHAGBBhL/TL2wz4HFXlrO89p60QXKRi+g1Qi
+	 Ct/KkZc/DdGj8YKzCnZHCEc6fLBfu/TP1NVDADGzzvCS6kO7i0iVtYQDGrsvCFWXL6
+	 YZTWZHjf7L3mg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB6E2380CFF6;
-	Fri,  7 Mar 2025 02:30:37 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDB9380CFF6;
+	Fri,  7 Mar 2025 02:30:42 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/3] netfilter: nft_ct: Use __refcount_inc() for per-CPU
- nft_ct_pcpu_template.
+Subject: Re: [PATCH net-next V2 0/6] mlx5 misc enhancements 2025-03-04
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174131463678.1860023.9118503742214228840.git-patchwork-notify@kernel.org>
-Date: Fri, 07 Mar 2025 02:30:36 +0000
-References: <20250306153446.46712-2-pablo@netfilter.org>
-In-Reply-To: <20250306153446.46712-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de, horms@kernel.org
+ <174131464148.1860023.2397596403061740180.git-patchwork-notify@kernel.org>
+Date: Fri, 07 Mar 2025 02:30:41 +0000
+References: <20250304160620.417580-1-tariqt@nvidia.com>
+In-Reply-To: <20250304160620.417580-1-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, saeedm@nvidia.com,
+ gal@nvidia.com, leonro@nvidia.com, michal.swiatkowski@linux.intel.com,
+ leon@kernel.org, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu,  6 Mar 2025 16:34:44 +0100 you wrote:
-> From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+On Tue, 4 Mar 2025 18:06:14 +0200 you wrote:
+> Hi,
 > 
-> nft_ct_pcpu_template is a per-CPU variable and relies on disabled BH for its
-> locking. The refcounter is read and if its value is set to one then the
-> refcounter is incremented and variable is used - otherwise it is already
-> in use and left untouched.
+> This is V2.
+> Find initial version here:
+> https://lore.kernel.org/lkml/20250226114752.104838-1-tariqt@nvidia.com/
+> 
+> This series introduces enhancements to the mlx5 core and Eth drivers.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/3] netfilter: nft_ct: Use __refcount_inc() for per-CPU nft_ct_pcpu_template.
-    https://git.kernel.org/netdev/net/c/5cfe5612ca95
-  - [net,2/3] netfilter: nf_conncount: garbage collection is not skipped when jiffies wrap around
-    https://git.kernel.org/netdev/net/c/df08c94baafb
-  - [net,3/3] netfilter: nf_tables: make destruction work queue pernet
-    https://git.kernel.org/netdev/net/c/fb8286562ecf
+  - [net-next,V2,1/6] net/mlx5: Relocate function declarations from port.h to mlx5_core.h
+    https://git.kernel.org/netdev/net-next/c/a2f61f1db855
+  - [net-next,V2,2/6] net/mlx5: Refactor link speed handling with mlx5_link_info struct
+    https://git.kernel.org/netdev/net-next/c/65a5d3557184
+  - [net-next,V2,3/6] net/mlx5e: Enable lanes configuration when auto-negotiation is off
+    https://git.kernel.org/netdev/net-next/c/7e959797f021
+  - [net-next,V2,4/6] net/mlx5: Lag, Enable Multiport E-Switch offloads on 8 ports LAG
+    https://git.kernel.org/netdev/net-next/c/5aa2e6de86d5
+  - [net-next,V2,5/6] net/mlx5e: Separate address related variables to be in struct
+    https://git.kernel.org/netdev/net-next/c/348ed4b20546
+  - [net-next,V2,6/6] net/mlx5e: Properly match IPsec subnet addresses
+    https://git.kernel.org/netdev/net-next/c/ca7992f52c2c
 
 You are awesome, thank you!
 -- 
