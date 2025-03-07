@@ -1,123 +1,146 @@
-Return-Path: <netdev+bounces-172791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0F98A56073
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 06:54:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09408A56092
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 07:02:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15C1A172863
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 05:54:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5D3A3B2149
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 06:02:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00FAC18DB1F;
-	Fri,  7 Mar 2025 05:53:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16DB718DB3A;
+	Fri,  7 Mar 2025 06:02:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QnL6+z1i"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hz9wN5iY"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 233441922C6
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 05:53:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2048B1624F8
+	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 06:02:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741326837; cv=none; b=IoElteMw+CqnBw89Z5/1EXP9yEsNcMSl37+7gggSQ1xEKho3menl2rDX91U/bxkWcVcKVgpoJkSUrXLJSydNUJRlCX94D0rn2y4uetJpYq6d1NMrDpAavs7gRsIA2X0TNmwC9V3RxENJLL9V1ov0/ME65nKQyNuGI6fUQ3WRhpY=
+	t=1741327335; cv=none; b=gIgZB3jWbnQWOrhZ8mqVfxON2DyFsZ4SbIqZ81OJOT9M8x4pxzrrCMg6cV6r7ulmqnE+g82RKdgaK1bVL0D/3uNltuhTzjzYX/3j7DzjLdnCFO2cdrIdLZe78Nm4jqQxPuAXdxUpZiDff83YTXzlLymgNgHGx5jQPor2oa6bgaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741326837; c=relaxed/simple;
-	bh=aQfYG8FZfpWlzffLnVm2Nnolyf9dIHwOFtO9wBCaqVg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kapEDZZhbHRmqKzKqYbJ1drC0HHGN0POmeu63mLhcHMXZ95iNlqVXTGPWk+D4L80IzU8fCSbMouexAEc8TXk8Bd2+mJzOY+QBObE6Hajwta0SlKE3GzVyIIGR19xbh2ynojPhtm/Urm3fF6Bl0PmjftTMvV4/CmFuVSt3vhjF0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QnL6+z1i; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1741326824;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=V9+iyQSEK0VITh9i3aNT5fQhLH5irNd+SUG9IphFoss=;
-	b=QnL6+z1ilyWcymF6bNFt3iTsdtgNFESdli83oAiHgPZIo634y2NZGnMo90nM5Ry0dBGMEh
-	xivkNI0Rw2c6tD7L/A2KT7hqbw+7Xw/lIYM5W7OpE1qNcjtEMBP8oObEOuSDfQ9pCg55Gu
-	FFGxSMUCadsz7LqECHlWSRL7r54Pd/g=
-From: Martin KaFai Lau <martin.lau@linux.dev>
-To: David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf-next 2025-03-06
-Date: Thu,  6 Mar 2025 21:53:35 -0800
-Message-ID: <20250307055335.441298-1-martin.lau@linux.dev>
+	s=arc-20240116; t=1741327335; c=relaxed/simple;
+	bh=ssS2yLuyvtoLCM/MENPJQ5W4+oovXZms8MTFYP3JgBI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V9olYZxr5CQPhwoJ8vfvSHn2JCWW4DQSgwnt5cxln9sD5lBarVXLQJt0fHxyZ1b6PlhHcLGRY1rmBoWKI5vYc4QLSKO5d0Wj/8aOtgy9E18JW06V2hQU8xoQqWIHiax52DR3PJqzxkGzvvwXaXoeDA5FrgR5nWq4ETVlzYVzogw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hz9wN5iY; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741327333; x=1772863333;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ssS2yLuyvtoLCM/MENPJQ5W4+oovXZms8MTFYP3JgBI=;
+  b=hz9wN5iYTTtDCnyzDaOxm+IO6xpF/7Nox884t7z3BIYe/oMyLNXpzpYy
+   3bdRpBklFJtanVhmPrDsOnedqJZH3/RQzBvxnTi0A4jt4OGeAS5h1oOQb
+   unVebAo6Eda+WQIKVqwnMlvyAHzl06Z9F7ozAwBWR0TPFGo5RqFW7j85D
+   fWLiwfeo/6nTmzsLRgyXsOUNDxwu94RlL932LwRvvLsICvnVPQX6CfC/m
+   /mMTskRHkN0KP//ymPHPDmgi2SUoVtzjxwdRGb0Ia41gRFJjx+XpIJXi0
+   7jSTk6wDI/23cyPfYiJhqUoK1ebR/VVMtpAs915e4fExYo2z7MZevgTw0
+   A==;
+X-CSE-ConnectionGUID: G83hnTAKSh6VR8U1oXO63A==
+X-CSE-MsgGUID: t2Lb8ndqSl6YuYKePVQh+Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="59773283"
+X-IronPort-AV: E=Sophos;i="6.14,228,1736841600"; 
+   d="scan'208";a="59773283"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2025 22:02:12 -0800
+X-CSE-ConnectionGUID: +Qv+ViwPSiqObnDp32HgIg==
+X-CSE-MsgGUID: Kdz37tCaRWaUHQp3t9pPYw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="150181763"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2025 22:02:09 -0800
+Date: Fri, 7 Mar 2025 06:58:21 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Emil Tantilov <emil.s.tantilov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	decot@google.com, willemb@google.com, anthony.l.nguyen@intel.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, madhu.chittim@intel.com,
+	Aleksandr.Loktionov@intel.com, yuma@redhat.com, mschmidt@redhat.com
+Subject: Re: [PATCH iwl-net] idpf: fix adapter NULL pointer dereference on
+ reboot
+Message-ID: <Z8qK/Z/8lYtdR2UM@mev-dev.igk.intel.com>
+References: <20250307003956.22018-1-emil.s.tantilov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250307003956.22018-1-emil.s.tantilov@intel.com>
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
+On Thu, Mar 06, 2025 at 04:39:56PM -0800, Emil Tantilov wrote:
+> Driver calls idpf_remove() from idpf_shutdown(), which can end up
+> calling idpf_remove() again when disabling SRIOV.
+> 
 
-The following pull-request contains BPF updates for your *net-next* tree.
+The same is done in other drivers (ice, iavf). Why here it is a problem?
+I am asking because heaving one function to remove is pretty handy.
+Maybe the problem can be fixed by some changes in idpf_remove() instead?
 
-We've added 6 non-merge commits during the last 13 day(s) which contain
-a total of 6 files changed, 230 insertions(+), 56 deletions(-).
-
-The main changes are:
-
-1) Add XDP metadata support for tun driver, from Marcus Wichelmann.
-
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
-
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Jason Wang, Willem de Bruijn
-
-----------------------------------------------------------------
-
-The following changes since commit b66e19dcf684b21b6d3a1844807bd1df97ad197a:
-
-  Merge branch 'mctp-add-mctp-over-usb-hardware-transport-binding' (2025-02-21 16:45:26 -0800)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
-
-for you to fetch changes up to 72aad21de5f65bea60c3064ad463b3793fb4b1c6:
-
-  Merge branch 'xdp-metadata-support-for-tun-driver' (2025-03-06 12:31:09 -0800)
-
-----------------------------------------------------------------
-bpf-next-for-netdev
-
-----------------------------------------------------------------
-Marcus Wichelmann (6):
-      net: tun: Enable XDP metadata support
-      net: tun: Enable transfer of XDP metadata to skb
-      selftests/bpf: Move open_tuntap to network helpers
-      selftests/bpf: Refactor xdp_context_functional test and bpf program
-      selftests/bpf: Add test for XDP metadata support in tun driver
-      selftests/bpf: Fix file descriptor assertion in open_tuntap helper
-
-Martin KaFai Lau (1):
-      Merge branch 'xdp-metadata-support-for-tun-driver'
-
- drivers/net/tun.c                                  |  28 +++-
- tools/testing/selftests/bpf/network_helpers.c      |  28 ++++
- tools/testing/selftests/bpf/network_helpers.h      |   3 +
- .../testing/selftests/bpf/prog_tests/lwt_helpers.h |  29 -----
- .../bpf/prog_tests/xdp_context_test_run.c          | 145 ++++++++++++++++++++-
- tools/testing/selftests/bpf/progs/test_xdp_meta.c  |  53 +++++---
- 6 files changed, 230 insertions(+), 56 deletions(-)
+> echo 1 > /sys/class/net/<netif>/device/sriov_numvfs
+> reboot
+> 
+> BUG: kernel NULL pointer dereference, address: 0000000000000020
+> ...
+> RIP: 0010:idpf_remove+0x22/0x1f0 [idpf]
+> ...
+> ? idpf_remove+0x22/0x1f0 [idpf]
+> ? idpf_remove+0x1e4/0x1f0 [idpf]
+> pci_device_remove+0x3f/0xb0
+> device_release_driver_internal+0x19f/0x200
+> pci_stop_bus_device+0x6d/0x90
+> pci_stop_and_remove_bus_device+0x12/0x20
+> pci_iov_remove_virtfn+0xbe/0x120
+> sriov_disable+0x34/0xe0
+> idpf_sriov_configure+0x58/0x140 [idpf]
+> idpf_remove+0x1b9/0x1f0 [idpf]
+> idpf_shutdown+0x12/0x30 [idpf]
+> pci_device_shutdown+0x35/0x60
+> device_shutdown+0x156/0x200
+> ...
+> 
+> Replace the direct idpf_remove() call in idpf_shutdown() with
+> idpf_vc_core_deinit() and idpf_deinit_dflt_mbx(), which perform
+> the bulk of the cleanup, such as stopping the init task, freeing IRQs,
+> destroying the vports and freeing the mailbox.
+> 
+> Reported-by: Yuying Ma <yuma@redhat.com>
+> Fixes: e850efed5e15 ("idpf: add module register and probe functionality")
+> Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
+> Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
+> ---
+>  drivers/net/ethernet/intel/idpf/idpf_main.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
+> index b6c515d14cbf..bec4a02c5373 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_main.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
+> @@ -87,7 +87,11 @@ static void idpf_remove(struct pci_dev *pdev)
+>   */
+>  static void idpf_shutdown(struct pci_dev *pdev)
+>  {
+> -	idpf_remove(pdev);
+> +	struct idpf_adapter *adapter = pci_get_drvdata(pdev);
+> +
+> +	cancel_delayed_work_sync(&adapter->vc_event_task);
+> +	idpf_vc_core_deinit(adapter);
+> +	idpf_deinit_dflt_mbx(adapter);
+>  
+>  	if (system_state == SYSTEM_POWER_OFF)
+>  		pci_set_power_state(pdev, PCI_D3hot);
+> -- 
+> 2.17.2
 
