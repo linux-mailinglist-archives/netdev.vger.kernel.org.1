@@ -1,210 +1,146 @@
-Return-Path: <netdev+bounces-172934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D072CA568AD
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 14:18:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E4DFA568CD
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 14:24:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A9111896A38
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 13:18:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CDD7169220
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 13:24:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 159DD219E86;
-	Fri,  7 Mar 2025 13:18:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69F56219A6B;
+	Fri,  7 Mar 2025 13:24:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jeWmpXMp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lCaSk0Bg"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3CBE192D68;
-	Fri,  7 Mar 2025 13:18:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C9D118CC10;
+	Fri,  7 Mar 2025 13:24:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741353507; cv=none; b=SEnpVnkH071y8OKXoSfr+HnVp0OWeHcg5Ar7jzbd1cXW4GqBkyT28gfChie+V8ahjZBzzU1ZplpCFS3/PKY3x57D97kg4jP+QGfVPu1Y0qhbWFtKbq2SHpAEE+pWlj9IVXGBleXkynQ9Ig88kcMtN7EA3kCFNTzLA2jx3Cnh8lE=
+	t=1741353868; cv=none; b=NOBT2VNeZ18XsMSWDcSxxeCd6vqyvK5gRJAW+83Omj9VYd3Dcc18Xq7tM7MRYgVu7GUtSYm8PZNecBTt+wQks9mi6YxYDB8G69eXNeuu2Rac6z6yxtdnGTLnGur60lr6UiO5xUaC/L/jeagJyPO54KkK6YpyuFgmMsxK0HYVWdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741353507; c=relaxed/simple;
-	bh=NmvrV27jfwskBu0OegYmLtswPDJriqsgyb5BfkGpunc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M8paQBnQIN8MxOMILxylfFZiYq62oMq40HKb0CuhhwfAFCIqZL/7ZaYHLUGAB6Mk/1SKfyhEERFt+UggrnMp34u1ShwddpnAL5r+xpMUepcJk0z1R4uIInGgBCDWmQswdDxVzTLt3O8IdQnqq/AuGtR8J+m/faCgBR7PWny0saI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jeWmpXMp; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 8E9D344278;
-	Fri,  7 Mar 2025 13:18:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1741353502;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JhRsUH63PXad8fITVdK3UPKSquO0H7HspkXydnx5S/g=;
-	b=jeWmpXMprgtWeYDHc95wJApTWvdfvuDoUAs5l9fQG2MGW/YZYF8PJelhmFIu2P6PTRT4p3
-	c2R14B50m57QNsRgOzXVn5UIB4r5s91NYm6mdrrbBFf9BZs4OWGKLQc5pYk3ofQFBWU+7g
-	MMK90pEgjRH78hUBDI+pDBEUGlKN4u9QeMOTOYg0qd+FNZx0j6CQlIM4gUIqaLua1r1ILZ
-	aoPDeRESYhG0gXq5C/adW7tmeP85n2eKSGkueV5xM22r16ur6E5bTSuKMRaAyOOO8lmZCl
-	rTaHeyfHp+y7AXbKjQ+bSq+BOWBHG472pe4Hop9fD6XTkJ8BkK7+pvIerzXymQ==
-Date: Fri, 7 Mar 2025 14:18:19 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Simon Horman <horms@kernel.org>
-Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, linux-arm-kernel@lists.infradead.org,
- Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina
- <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Vladimir Oltean
- <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
- <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Romain Gantois <romain.gantois@bootlin.com>, Piergiorgio Beruto
- <piergiorgio.beruto@gmail.com>
-Subject: Re: [PATCH net-next 1/7] net: ethtool: netlink: Allow per-netdevice
- DUMP operations
-Message-ID: <20250307141819.55e42ccd@fedora.home>
-In-Reply-To: <20250307122119.GE3666230@kernel.org>
-References: <20250305141938.319282-1-maxime.chevallier@bootlin.com>
-	<20250305141938.319282-2-maxime.chevallier@bootlin.com>
-	<20250307122119.GE3666230@kernel.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1741353868; c=relaxed/simple;
+	bh=6rgP9vhHzDhXIeeMY7SruHis1mPBRaG0gWZB3Xp80Gs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ncqx/GSrCQzMjUb44/5Ew+tiPDoxc7lHaZHbbkfd1V+/76EkLkCOoKKoUUqdhVruXbd67DBHmzMtwNJkL3WFsvmeXgY6Glt7CYudBx5j5ptq4BZvi8ENCAHdkCRiDUy6DPT+2QoEbtpivOyOSCMG6A/TBmN6yNpG+/8N4zT+V4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lCaSk0Bg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDC32C4CED1;
+	Fri,  7 Mar 2025 13:24:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741353867;
+	bh=6rgP9vhHzDhXIeeMY7SruHis1mPBRaG0gWZB3Xp80Gs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lCaSk0BgFKbXTN/gpc8XAwgt9pZFho5e117sCcq3XEsNmU9PqYOCEWQtgsU/DN8ZQ
+	 StcA1jDR4Bg1rjV+2HriRPrI8NGt0WgdoEJNfJDssbiyga41QR6yYbQI8Zn8osHCCF
+	 1DQ92tufIXzpUvr3tHo7l16htVC0OS++echbf66+/HGTqaKlohKw+btkQ4JKTs+3OJ
+	 NKYJHLStdd5v4hoykz+R9IOFDF2Sl5mE5VKs6vYCJTsjXAKrKlm67vGAQgCHAhzkEO
+	 Vm4n+F+VoVsaDGvU+WoyxixxlaHCsdNWDUHXXMncnwY7ub5SRuDLSsFOJPBXoS4+En
+	 G0V9JziINO58w==
+Date: Fri, 7 Mar 2025 13:24:22 +0000
+From: Simon Horman <horms@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Andrei Botila <andrei.botila@oss.nxp.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, s32@nxp.com,
+	Christophe Lizzi <clizzi@redhat.com>,
+	Alberto Ruiz <aruizrui@redhat.com>,
+	Enric Balletbo <eballetb@redhat.com>, stable@vger.kernel.org
+Subject: Re: [PATCH net v2 1/2] net: phy: nxp-c45-tja11xx: add TJA112X PHY
+ configuration errata
+Message-ID: <20250307132422.GH3666230@kernel.org>
+References: <20250304160619.181046-1-andrei.botila@oss.nxp.com>
+ <20250304160619.181046-2-andrei.botila@oss.nxp.com>
+ <7c14179c-0262-47e5-a13e-a53c2061da9b@redhat.com>
+ <f37c7159-528d-4c58-b531-8d66757d2c16@oss.nxp.com>
+ <d09c8547-550d-4ea1-8739-2bcf9e7c3fb0@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduuddtjeejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgdphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvddtpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehku
- hgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d09c8547-550d-4ea1-8739-2bcf9e7c3fb0@lunn.ch>
 
-Hi Simon,
-
-On Fri, 7 Mar 2025 12:21:19 +0000
-Simon Horman <horms@kernel.org> wrote:
-
-> On Wed, Mar 05, 2025 at 03:19:31PM +0100, Maxime Chevallier wrote:
-> > We have a number of netlink commands in the ethnl family that may have
-> > multiple objects to dump even for a single net_device, including :
+On Thu, Mar 06, 2025 at 04:35:12PM +0100, Andrew Lunn wrote:
+> > >> +/* Errata: ES_TJA1120 and ES_TJA1121 Rev. 1.0 — 28 November 2024 Section 3.1 */
+> > >> +static void nxp_c45_tja1120_errata(struct phy_device *phydev)
+> > >> +{
+> > >> +	int silicon_version, sample_type;
+> > >> +	bool macsec_ability;
+> > >> +	int phy_abilities;
+> > >> +	int ret = 0;
+> > >> +
+> > >> +	ret = phy_read_mmd(phydev, MDIO_MMD_VEND1, VEND1_DEVICE_ID3);
+> > >> +	if (ret < 0)
+> > >> +		return;
+> > >> +
+> > >> +	sample_type = FIELD_GET(TJA1120_DEV_ID3_SAMPLE_TYPE, ret);
+> > >> +	if (sample_type != DEVICE_ID3_SAMPLE_TYPE_R)
+> > >> +		return;
+> > >> +
+> > >> +	silicon_version = FIELD_GET(TJA1120_DEV_ID3_SILICON_VERSION, ret);
+> > >> +
+> > >> +	phy_abilities = phy_read_mmd(phydev, MDIO_MMD_VEND1,
+> > >> +				     VEND1_PORT_ABILITIES);
+> > >> +	macsec_ability = !!(phy_abilities & MACSEC_ABILITY);
+> > >> +	if ((!macsec_ability && silicon_version == 2) ||
+> > >> +	    (macsec_ability && silicon_version == 1)) {
+> > >> +		/* TJA1120/TJA1121 PHY configuration errata workaround.
+> > >> +		 * Apply PHY writes sequence before link up.
+> > >> +		 */
+> > >> +		if (!macsec_ability) {
+> > >> +			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x01F8, 0x4b95);
+> > >> +			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x01F9, 0xf3cd);
+> > >> +		} else {
+> > >> +			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x01F8, 0x89c7);
+> > >> +			phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x01F9, 0x0893);
+> > >> +		}
+> > >> +
+> > >> +		phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x0476, 0x58a0);
+> > >> +
+> > >> +		phy_write_mmd(phydev, MDIO_MMD_PMAPMD, 0x8921, 0xa3a);
+> > >> +		phy_write_mmd(phydev, MDIO_MMD_PMAPMD, 0x89F1, 0x16c1);
+> > >> +
+> > >> +		phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x01F8, 0x0);
+> > >> +		phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x01F9, 0x0);
+> > > 
+> > > Please add macro with meaningful names for all the magic numbers used
+> > > above, thanks!
+> > > 
+> > > Paolo
+> > > 
 > > 
-> >  - PLCA, PSE-PD, phy: one message per PHY device
-> >  - tsinfo: one message per timestamp source (netdev + phys)
-> >  - rss: One per RSS context
-> > 
-> > To get this behaviour, these netlink commands need to roll a custom  
-> > ->dumpit().  
-> > 
-> > To prepare making per-netdev DUMP more generic in ethnl, introduce a
-> > member in the ethnl ops to indicate if a given command may allow
-> > pernetdev DUMPs (also referred to as filtered DUMPs).
-> > 
-> > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > ---
-> >  net/ethtool/netlink.c | 45 ++++++++++++++++++++++++++++---------------
-> >  net/ethtool/netlink.h |  1 +
-> >  2 files changed, 30 insertions(+), 16 deletions(-)
-> > 
-> > diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
-> > index 734849a57369..0815b28ba32f 100644
-> > --- a/net/ethtool/netlink.c
-> > +++ b/net/ethtool/netlink.c
-> > @@ -578,21 +578,34 @@ static int ethnl_default_dumpit(struct sk_buff *skb,
-> >  	int ret = 0;
-> >  
-> >  	rcu_read_lock();
-> > -	for_each_netdev_dump(net, dev, ctx->pos_ifindex) {
-> > -		dev_hold(dev);
-> > +	if (ctx->req_info->dev) {
-> > +		dev = ctx->req_info->dev;
-> >  		rcu_read_unlock();
-> > -
-> > -		ret = ethnl_default_dump_one(skb, dev, ctx, genl_info_dump(cb));
-> > -
-> > +		/* Filtered DUMP request targeted to a single netdev. We already
-> > +		 * hold a ref to the netdev from ->start()
-> > +		 */
-> > +		ret = ethnl_default_dump_one_dev(skb, dev, ctx,
-> > +						 genl_info_dump(cb));  
+> > Hello, these registers are not documented in the datasheet or errata sheet.
+> > The access sequence comes 1-to-1 from the errata so I couldn't use macros.
 > 
-> Hi Maxime,
+> Yes, we sometimes just have to accept the drivers are doing magic we
+> have no idea about because the vendor does not want to tell is. All
+> the registers in MDIO_MMD_VEND1 are clearly vendor specific. The
+> MDIO_MMD_PMAPMD registers are also in the range reserved for
+> vendors. So i think we just have to accept it.
+
++1
+
+It can happen that vendors regard such information as IP that they do
+not wish to disclose. Not saying that is the case here. Just saying
+it is one reason that we sometimes have to accept such things.
+So I think what you say above is completely reasonable.
+
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 > 
-> ethnl_default_dump_one_dev() is called here but it doesn't exist
-> until the following patch is applied, which breaks bisection.
-
-Yeah I messed-up in my rebase and bisection broke :(
-
-I'll send a new version in a few days, as Jakub said, let's give some
-time for the netdev_lock series to move forward and go through CI, I'll
-need to rebase on it at some point.
-
+>     Andrew
 > 
-> >  		rcu_read_lock();
-> > -		dev_put(dev);
-> > -
-> > -		if (ret < 0 && ret != -EOPNOTSUPP) {
-> > -			if (likely(skb->len))
-> > -				ret = skb->len;
-> > -			break;
-> > +		netdev_put(ctx->req_info->dev, &ctx->req_info->dev_tracker);
-> > +	} else {
-> > +		for_each_netdev_dump(net, dev, ctx->pos_ifindex) {
-> > +			dev_hold(dev);
-> > +			rcu_read_unlock();
-> > +
-> > +			ret = ethnl_default_dump_one(skb, dev, ctx,
-> > +						     genl_info_dump(cb));
-> > +
-> > +			rcu_read_lock();
-> > +			dev_put(dev);
-> > +
-> > +			if (ret < 0 && ret != -EOPNOTSUPP) {
-> > +				if (likely(skb->len))
-> > +					ret = skb->len;
-> > +				break;
-> > +			}
-> > +			ret = 0;
-> >  		}
-> > -		ret = 0;
-> >  	}
-> >  	rcu_read_unlock();
-> >    
-> 
-> ...
-> 
-> > diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
-> > index ec6ab5443a6f..4db27182741f 100644
-> > --- a/net/ethtool/netlink.h
-> > +++ b/net/ethtool/netlink.h
-> > @@ -388,6 +388,7 @@ struct ethnl_request_ops {
-> >  	unsigned int		req_info_size;
-> >  	unsigned int		reply_data_size;
-> >  	bool			allow_nodev_do;
-> > +	bool			allow_pernetdev_dump;  
-> 
-> nit: allow_pernetdev_dump should also be added to the Kernel doc for
->      struct ethnl_request_ops
-> 
->      Flagged by ./scripts/kernel-doc -none
-> 
->      There also appear to be similar minor issues with subsequent
->      patches in this series.
-
-Ack, I'll make sure the doc is up to date and properly formatted :)
-
-Thanks,
-
-Maxime
-
-> >  	u8			set_ntf_cmd;
-> >  
-> >  	int (*parse_request)(struct ethnl_req_info *req_info,
-> > -- 
-> > 2.48.1
-> >   
-
 
