@@ -1,67 +1,58 @@
-Return-Path: <netdev+bounces-172929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8967BA5686B
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 14:03:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 555BBA5686E
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 14:04:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DE2B16EC97
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 13:03:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA3061884EC3
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 13:04:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E366420F068;
-	Fri,  7 Mar 2025 13:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACE7421766A;
+	Fri,  7 Mar 2025 13:04:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HjLGnbC/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D3A219A9B
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 13:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87FB220968E
+	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 13:04:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741352597; cv=none; b=jKoOdb0TR6fD6A6m1TcfbK7H0+eAw7+kpoXfcI2NGFcVlpY1265kB4nJI3WcdkQlXp9X7pvq9MateLrRPQRXxRRviofS5iOeqj5HWDLX+xzkA6EU6EOpMkGMeAImaXQDswLyrxGymitTdJMa+6NN/nsnJo3x4MTTBmTRZWdQGS0=
+	t=1741352677; cv=none; b=a9ouPmC9h1933abjNeitNRgvoIGpjtvEWLwLee1lu3REEqMt2tkggWKN5xKR/8VTgUYDOl6JTuLTeyAeGPg33a5F/CRfRShG8YVyb/JJO0MKsP4IbGrzj9rNu/wTsmjmhfqQwSyNg76HEz8LVMH4AAc13reLbk6KH7JQQLvNng4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741352597; c=relaxed/simple;
-	bh=9sSfSCNJuGh7+401kQz0K5JyXtMAnDudoCNPfUFhe1A=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=gYCMHSac/Eghl0gHAEQ+kIjfW4IjxbX4PENCNkXK0t9DsyxX2cAx9x2m0JnV7ALlDZK/VAEixilVEcFP08uvrUc9DEaGjD9hIkG76bOXaHM5JB279wq3xlA9HSwAY8xguOuYQ9sXmHembCuDhlHoX9tx2ry7BlSXj7m05XCtJ+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-aaecf50578eso342956666b.2
-        for <netdev@vger.kernel.org>; Fri, 07 Mar 2025 05:03:15 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741352594; x=1741957394;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rbE+feLK/wdrcW3YIi4q9NS5y6sznYh7FGT/9ZOSlLg=;
-        b=EtHgAa7R9CU5F4PdXTkRFz4v/KfMh5/ivDyS5M9djrTvec/OO8mi7RcbTD3aLTtLKz
-         sxresFMvaV9vMaFZojxcSgsQYvLr3KHJBREzc8yp5kLmPzt9U7Nd2TmXl/FDc30qnvJb
-         VsJtKn6M1IybBGbVqzqNelFLBfCOwtBTYbjp1+j6G2Nck4S+P205loOM9fqLX3O6FQT9
-         qd5Z/GIK6H6AiTqyrowV5Di11laRORgYopnyu9fwOhvcQzTmF15xFNCP0ja5s2cHtTIT
-         u2o1ftfZXnRmxAZ7Vn9sItDlul9JfVlVU1mami4eKMeGZmVnF+9sT5P8KyhQ3vQZ+i/X
-         +rKg==
-X-Gm-Message-State: AOJu0YwdTLl1YGfiVMWlrzfLEMTeeYWAQUu+v+6Wt1aoOyduj5/CxoGH
-	8buSN1Slpe2XqmVe2zNpzRahc46HLgHtd+kHUX/3zs6d6/n4o8ESKQDeTQ==
-X-Gm-Gg: ASbGnctHkHR19JViVP9ESx3U7kQd3+Gmg1/L15AF4NBRRWWZ6Ur26Ji1wi6ivnL8V/g
-	rw6Du44zih4qUaB7aqs5FrIRlWQT/iJr0+jWs4YxVQGZ/tQ+56HZmr+x9uoxk9lO7zz2kLkBc3d
-	wJdsgrV3ifryENY5AhKvo07zEV87m7UUrX0f3t/FAN5fE3Gs+6BfLvKt+L5z5NChNYCKTlBCqNo
-	Rza3WyDdOPNk9ttdZGwVhrqd8KM0w9gkqrQzMGvzIXb2WxctyJki31tjqFHR/06A+Wi//tZtfll
-	Mi24IeWCUTyneJpm/nL3rErtuyZemyNBmOg=
-X-Google-Smtp-Source: AGHT+IHTAZKQiwu/aK0inH8jz/Ec06qUrsdwX0njTGh+xdIMJdDLbdaZSxb04h98fbtTUAss+K5V+w==
-X-Received: by 2002:a17:907:c1c:b0:ac2:63b:6a45 with SMTP id a640c23a62f3a-ac252bab1b1mr394060966b.30.1741352593663;
-        Fri, 07 Mar 2025 05:03:13 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:9::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac2399d4802sm276239066b.175.2025.03.07.05.03.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Mar 2025 05:03:13 -0800 (PST)
-Date: Fri, 7 Mar 2025 05:03:11 -0800
-From: Breno Leitao <leitao@debian.org>
-To: eric.dumazet@gmail.com
-Cc: netdev@vger.kernel.org, horms@verge.net.au
-Subject: netpoll: netpoll zap_completion_queue() question
-Message-ID: <20250307-lovely-smiling-honeybee-d15ecc@leitao>
+	s=arc-20240116; t=1741352677; c=relaxed/simple;
+	bh=zwdH5kjc0pp6WgGw7ooJgwfJ9cZrFa4Qa7IBZJ+FcWA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jBR1dwQLTHzppmOfyyQ2ByJzVrUUL/ysZo79/hWMXj1FhD8J5V/DNL164+n2M5aEckcc3xg90P37rLJzEUsTpPZimjpeCsvclqKFw7H/cp3b9yp99WS6VeWBO2LQbqSEHbNpWKmkuzgMJNMKBm8RqysKKMAfZsgrougJoXtAP5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HjLGnbC/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED3DBC4CED1;
+	Fri,  7 Mar 2025 13:04:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741352677;
+	bh=zwdH5kjc0pp6WgGw7ooJgwfJ9cZrFa4Qa7IBZJ+FcWA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HjLGnbC/8F8MuJbDB9cMtyneOj8/xFDB5Lw4mKlw90yvx+CMgX06/HqaLQwYt+zVl
+	 tdfXKKw/g6LElRLiphrDjk6jlxqvhQLS9R5av4tZaI+/Csv/JtpIkIMmAVlyvlIG9W
+	 KPac9xnJuXcmFWHUaHG52h2AjeeN8qY3iFW2MXOSXJB+RNdK6vyrKwmjdXI2/60tMD
+	 /a7ip0nG5Pq+GzpfucyihJroBWuifVSDw/Q4EWjgQna2/0/EHqxlUdJo1JmQB4xkKu
+	 6LQrX1KzJXGyQIymX4292SVyifXZdxS6BA8ZdTuOH6HG0FKSpRxpStnpVttDWopWyg
+	 89hJnvxEGL8/w==
+Date: Fri, 7 Mar 2025 13:04:32 +0000
+From: Simon Horman <horms@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, Dan Carpenter <dan.carpenter@linaro.org>
+Subject: Re: [PATCH net-next] net: airoha: Fix dev->dsa_ptr check in
+ airoha_get_dsa_tag()
+Message-ID: <20250307130432.GF3666230@kernel.org>
+References: <20250306-airoha-flowtable-fixes-v1-1-68d3c1296cdd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,69 +61,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20250306-airoha-flowtable-fixes-v1-1-68d3c1296cdd@kernel.org>
 
-Hello Eric,
+On Thu, Mar 06, 2025 at 11:52:20AM +0100, Lorenzo Bianconi wrote:
+> Fix the following warning reported by Smatch static checker in
+> airoha_get_dsa_tag routine:
+> 
+> drivers/net/ethernet/airoha/airoha_eth.c:1722 airoha_get_dsa_tag()
+> warn: 'dp' isn't an ERR_PTR
+> 
+> dev->dsa_ptr can't be set to an error pointer, it can just be NULL.
+> Remove this check since it is already performed in netdev_uses_dsa().
+> 
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Closes: https://lore.kernel.org/netdev/Z8l3E0lGOcrel07C@lore-desk/T/#m54adc113fcdd8c5e6c5f65ffd60d8e8b1d483d90
+> Fixes: af3cf757d5c9 ("net: airoha: Move DSA tag in DMA descriptor")
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 
-I am looking at netpoll code, specifically at zap_completion_queue(),
-and I saw you tried to get rid of it a while ago with 15e83ed78864d0
-("net: remove zap_completion_queue") but it needed to be reverted.
-
-Unfortunately I didn't get the history behind the revert in the mailing
-lists. Do you remember why it was reverted?
-
-I understand that zap_completion_queue() is being called to potentially
-free some space (by dropping skbs in the completion queue) when trying
-at netpoll TX side when trying to find SKBs.
-
-I am thinking about the patch below, but, I want to check with you since
-you have some context I might be missing.
-
-Thanks
-breno
-
-	Author: Breno Leitao <leitao@debian.org>
-	Date:   Fri Mar 7 04:30:08 2025 -0800
-
-	netpoll: Only zap completion queue under memory pressure
-
-	Optimize the netpoll TX path by removing unnecessary calls to
-	zap_completion_queue() during normal operation. Previously, this
-	function was called unconditionally in the find_skb() path, which
-	unnecessarily slowed down TX processing when system memory was
-	sufficient.
-
-	The completion queue should only be cleared when there's actual
-	memory pressure, such as when:
-
-	1. An SKB was consumed from the pool, and we need to refill the SKB pool
-	(in refill_skbs_work_handler())
-	2. We can't allocate new SKBs during polling (and netpoll_poll_dev() is
-	called (which also calls zap_completion_queue())
-
-	This change improves netpoll TX performance in the common case while
-	maintaining the memory pressure handling capability when needed.
-
-	Signed-off-by: Breno Leitao <leitao@debian.org>
-
-	diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-	index 8a0df2b274a88..83d6c960d2079 100644
-	--- a/net/core/netpoll.c
-	+++ b/net/core/netpoll.c
-	@@ -283,7 +283,6 @@ static struct sk_buff *find_skb(struct netpoll *np, int len, int reserve)
-		int count = 0;
-		struct sk_buff *skb;
-
-	-	zap_completion_queue();
-	repeat:
-
-		skb = alloc_skb(len, GFP_ATOMIC);
-	@@ -628,6 +627,7 @@ static void refill_skbs_work_handler(struct work_struct *work)
-		struct netpoll *np =
-			container_of(work, struct netpoll, refill_wq);
-
-	+	zap_completion_queue();
-		refill_skbs(np);
-	}
-
-PS: This patch works on top of https://lore.kernel.org/all/20250306114826.GX3666230@kernel.org/#r
+Reviewed-by: Simon Horman <horms@kernel.org>
 
