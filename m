@@ -1,128 +1,143 @@
-Return-Path: <netdev+bounces-172689-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DEA4A55B82
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 01:12:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6577A55B8B
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 01:12:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86059178E94
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 00:12:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CEDF189B2A6
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 00:13:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D2E310F2;
-	Fri,  7 Mar 2025 00:12:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F220F611E;
+	Fri,  7 Mar 2025 00:12:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="yoxavBy9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D8wUFWOq"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE43423BB
-	for <netdev@vger.kernel.org>; Fri,  7 Mar 2025 00:12:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC5B23D6D;
+	Fri,  7 Mar 2025 00:12:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741306323; cv=none; b=bfUcocYLpdHo6bdE1z3eoyqDj/vHLkQhk7R+QgE8WOHs+WrjxAUoUS1ipT4z+oQ78l7wuYuV2JeczUAP+K/1iVntiOwDgl6/45ZmctAwt1eTqHxMPo9HC04cdvpm2XpHUuHSRTKLGwh0zdN+5Nph73OWSVIXStReYp4/IYIqdHY=
+	t=1741306371; cv=none; b=lDdWcmSdIHVdDeTIYOXWXXQhAeyC4zUClNN7PaibI6wQxz5plcFnlA9yiIx920txGoCvlDvS9UYgrpcVnS2h7ulimrA+Wuc6lqdZylKLtSk47breoHekGrzh6e+HHehYHilN6p85ngbCtLlby0KlkoIn9GmNGHm/odtoCDXcvNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741306323; c=relaxed/simple;
-	bh=9UWqAQZvTA0l4QWnKhIpg4adxgfC7KT8Y8Jh7sVpEYs=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=oWzrUykAjmLDQipl2dQxzqa2OGicFo5rdRbiJUWr28Hj8vdvOuvic9E0WdFibdr5QZEw5u2PMEQGpdJAGJHvmj0IFd4AxNWgM3VOI0echGDSO1qD8cTXXVpj4c++gr05QyqoGguWgkPjdX+jRgNu4NDMgXD23VYmnum7xKq76IQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=yoxavBy9; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=6aEgnpw6gQBxCmSgxUBsuH9P0cxS5+KhOP2L7j4QauA=; b=yoxavBy9uMeaqY5Luix2nzWH9K
-	jSgO1V/jHBPZ65NR7Fk5R+2DTz30tS2MJUgN16e2mn6pUy1DxEWnUW+nW+hrVsHpJMT/MqrN0OD9h
-	Zhr40BaND0BIuUZVZc4VwsLYASrglP1gWGmeQqytogdFtVSXHrhVWs2GmMFjgsS6oKXad9NoabOpP
-	rTU97JRvvHe46czyKVpBCt52PDxcAKSW66e1+J4Bt0I2pRo8hgh4r8N8xlImqMQhfI7Tjvgwf6tuO
-	1K8tLtoFqE7QjNbWknn/kRWwJmkpo2ZHXtu+svmOKa/aHIp/Y1jBlQwi2n+XIxzWK3rQUZoohsaNa
-	kZpcF4CA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:43876 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tqLJd-0006ft-2l;
-	Fri, 07 Mar 2025 00:11:49 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tqLJJ-005aQm-Mv; Fri, 07 Mar 2025 00:11:29 +0000
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next] net: stmmac: remove write-only priv->speed
+	s=arc-20240116; t=1741306371; c=relaxed/simple;
+	bh=oMm/im6g2Yvfce+8abOgBvZ5Ddw906iLXRtF4jDWO64=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=EqIDxTYikIDBaX/c0CaoI0ppG52GZwRMUXFEtU1QB4mttMhKrbANHrk/Z3GSqVvlVy/vBKNB7kEoCzpDO/kDoLTh9iEJJCzabp5a64QpDlEnpFcFUKfRWTOATfmvaAB6eAoW2tGnLn2z/UjfaQc+C3NXUer0j1vVfQF/JxTOY1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D8wUFWOq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2D253C4CEE0;
+	Fri,  7 Mar 2025 00:12:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741306371;
+	bh=oMm/im6g2Yvfce+8abOgBvZ5Ddw906iLXRtF4jDWO64=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=D8wUFWOqHhG6XsWFwxSj97N81Ez/lf2x75+lYfHXN551OUauXAdjoY7hWpFb5n2QQ
+	 +z3qsnoAknKdqknBwAnTABacFSONYvkUwkrYSMb7aAQExU6EKGXNC2IE1mGgYQRV4Z
+	 NU6X3zWO5+jMm4wthg5oZ2Ux9T0rjzVzOne2gqTSUJyReT/wWqqcGmUWJlULGTSx4K
+	 RWcLEJlikQQYQVz8dWEa+Sw9qeqSWJawYp40NEL5OY7+4pPu+DxQ5bJvEOJ5QnIx5j
+	 oLtaQFfzSTNg1lB8nRK+nY5mBLUSKVB17LYxouhSCX3Mu9nOUEHNLQqAut/K30oKbi
+	 hfSiYQbq5OkcA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1514BC282EC;
+	Fri,  7 Mar 2025 00:12:51 +0000 (UTC)
+From: Satish Kharat via B4 Relay <devnull+satishkh.cisco.com@kernel.org>
+Subject: [PATCH net-next v3 0/8] enic: enable 32, 64 byte cqes and get max
+ rx/tx ring size from hw
+Date: Thu, 06 Mar 2025 19:15:21 -0500
+Message-Id: <20250306-enic_cleanup_and_ext_cq-v3-0-92bc165344cf@cisco.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tqLJJ-005aQm-Mv@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Fri, 07 Mar 2025 00:11:29 +0000
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJk6ymcC/3XNyw7CIBAF0F9pWIsB+kJX/ocxhMfUkihUqKSm6
+ b9LcKEblzd37pkVRQgWIjpWKwqQbLTe5VDvKqRH6a6ArckZMcJawijH4KwW+gbSPSchnRGwzEI
+ /8JDLjitlgPQor6cAg12KfEYOZuzyIbrkZrRx9uFVXiZa+o/O+r96ophgXdNmOLScMqVO2kbt9
+ 9rfi5nY16lJ899h2eEtJw3raiMN/3W2bXsD3TGw6hABAAA=
+X-Change-ID: 20250218-enic_cleanup_and_ext_cq-f21868bbde07
+To: Christian Benvenuti <benve@cisco.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Satish Kharat <satishkh@cisco.com>, Nelson Escobar <neescoba@cisco.com>, 
+ John Daley <johndale@cisco.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1741306525; l=2637;
+ i=satishkh@cisco.com; s=20250226; h=from:subject:message-id;
+ bh=oMm/im6g2Yvfce+8abOgBvZ5Ddw906iLXRtF4jDWO64=;
+ b=wHygnFa9kJOQE+tEfDwwUdI4pFBTj3RodmqhwOh85poUiK+DCVsBbccAsj9bjwyi6pBDsSvnA
+ AH3zHPjqcRUArdsYL73ltsLFgRoXBcSm7p6dUanAhilkGrKoZ6tSJjO
+X-Developer-Key: i=satishkh@cisco.com; a=ed25519;
+ pk=lkxzORFYn5ejiy0kzcsfkpGoXZDcnHMc4n3YK7jJnJo=
+X-Endpoint-Received: by B4 Relay for satishkh@cisco.com/20250226 with
+ auth_id=351
+X-Original-From: Satish Kharat <satishkh@cisco.com>
+Reply-To: satishkh@cisco.com
 
-priv->speed is only ever written to in two locations, but never
-read. Therefore, it serves no useful purpose. Remove this unnecessary
-struct member.
+This series enables using the max rx and tx ring sizes read from hw.
+For newer hw that can be up to 16k entries. This requires bigger
+completion entries for rx queues. This series enables the use of the
+32 and 64 byte completion queues entries for enic rx queues on
+supported hw versions. This is in addition to the exiting (default)
+16 byte rx cqes.
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Signed-off-by: Satish Kharat <satishkh@cisco.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac.h      | 1 -
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 ---
- 2 files changed, 4 deletions(-)
+Changes in v3:
+- Minor: commit message header reformat for some commits
+- Link to v2: https://lore.kernel.org/r/20250304-enic_cleanup_and_ext_cq-v2-0-85804263dad8@cisco.com
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-index 04197496ee87..bddfa0f4aa21 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-@@ -282,7 +282,6 @@ struct stmmac_priv {
- 	/* Generic channel for NAPI */
- 	struct stmmac_channel channel[STMMAC_CH_MAX];
- 
--	int speed;
- 	unsigned int pause_time;
- 	struct mii_bus *mii;
- 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 2ce18f52b717..982b7d82fd53 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -1029,8 +1029,6 @@ static void stmmac_mac_link_up(struct phylink_config *config,
- 		}
- 	}
- 
--	priv->speed = speed;
--
- 	if (priv->plat->fix_mac_speed)
- 		priv->plat->fix_mac_speed(priv->plat->bsp_priv, speed, mode);
- 
-@@ -7859,7 +7857,6 @@ int stmmac_suspend(struct device *dev)
- 	if (stmmac_fpe_supported(priv))
- 		timer_shutdown_sync(&priv->fpe_cfg.verify_timer);
- 
--	priv->speed = SPEED_UNKNOWN;
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(stmmac_suspend);
+Changes in v2:
+- Added net-next to the subject line.
+- Removed inlines from function defs in .c file.
+- Fixed function local variable style issues.
+- Added couple of helper functions to common code.
+- Fixed checkpatch errors and warnings.
+- Link to v1: https://lore.kernel.org/r/20250227-enic_cleanup_and_ext_cq-v1-0-c314f95812bb@cisco.com
+
+---
+Satish Kharat (8):
+      enic: Move function from header file to c file
+      enic: enic rq code reorg
+      enic: enic rq extended cq defines
+      enic: enable rq extended cq support
+      enic: remove unused function cq_enet_wq_desc_dec
+      enic: added enic_wq.c and enic_wq.h
+      enic: cleanup of enic wq request completion path
+      enic: get max rq & wq entries supported by hw, 16K queues
+
+ drivers/net/ethernet/cisco/enic/Makefile       |   2 +-
+ drivers/net/ethernet/cisco/enic/cq_desc.h      |  25 +--
+ drivers/net/ethernet/cisco/enic/cq_enet_desc.h | 142 ++++++---------
+ drivers/net/ethernet/cisco/enic/enic.h         |  13 ++
+ drivers/net/ethernet/cisco/enic/enic_ethtool.c |  12 +-
+ drivers/net/ethernet/cisco/enic/enic_main.c    |  69 ++-----
+ drivers/net/ethernet/cisco/enic/enic_res.c     |  87 +++++++--
+ drivers/net/ethernet/cisco/enic/enic_res.h     |  11 +-
+ drivers/net/ethernet/cisco/enic/enic_rq.c      | 240 ++++++++++++++++++++++---
+ drivers/net/ethernet/cisco/enic/enic_rq.h      |   6 +-
+ drivers/net/ethernet/cisco/enic/enic_wq.c      | 117 ++++++++++++
+ drivers/net/ethernet/cisco/enic/enic_wq.h      |   7 +
+ drivers/net/ethernet/cisco/enic/vnic_cq.h      |  45 +----
+ drivers/net/ethernet/cisco/enic/vnic_devcmd.h  |  19 ++
+ drivers/net/ethernet/cisco/enic/vnic_enet.h    |   5 +
+ drivers/net/ethernet/cisco/enic/vnic_rq.h      |   2 +-
+ drivers/net/ethernet/cisco/enic/vnic_wq.h      |   2 +-
+ 17 files changed, 545 insertions(+), 259 deletions(-)
+---
+base-commit: de7a88b639d488607352a270ef2e052c4442b1b3
+change-id: 20250218-enic_cleanup_and_ext_cq-f21868bbde07
+
+Best regards,
 -- 
-2.30.2
+Satish Kharat <satishkh@cisco.com>
+
 
 
