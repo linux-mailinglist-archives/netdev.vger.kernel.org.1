@@ -1,173 +1,176 @@
-Return-Path: <netdev+bounces-172822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-172828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F380A563B1
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 10:23:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ACDDA5641E
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 10:41:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06DC33B55A1
-	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 09:22:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D42B8188E61E
+	for <lists+netdev@lfdr.de>; Fri,  7 Mar 2025 09:41:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B334207DEB;
-	Fri,  7 Mar 2025 09:22:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HdtNYCoE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24B4F20ADEE;
+	Fri,  7 Mar 2025 09:41:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F35D91E1E10;
-	Fri,  7 Mar 2025 09:22:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D5641A8F97;
+	Fri,  7 Mar 2025 09:41:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741339342; cv=none; b=CqsHdORhFK+i6UmY4XRMfompmSU7xqjymnTlNJYqX6SHafW4UIqKkLPDxC9DE6elbAj+V7sdPmsuZ2VRmfLM4XFWHAK8xoiyX6zx62h9sfzC53/jgpgN9jxLPTqMy2qwWxkPVyxjLF9ok+xSJ6EfBxNEaUAX9zwKtkgCjZHu/FA=
+	t=1741340492; cv=none; b=RFG9b4k9da65RdauouB8ggfGXSpYMBkXElxRz/hEssRaKo/JziAxOSuhWXb6IylxfhYN1u49VLuWw9XYaoOwBR6Xh/Ai2L0yuobU5jcsfv4qzwOz1EOcmkcib6mD6MHhnl95lPbb+53D3zP7CFzWUzwhpqUmmunsXiC1Ks2LcvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741339342; c=relaxed/simple;
-	bh=puks5gz+Z0SWJNwNTjIqnOHXEonpz+7vxTX5Qf8VLug=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qKUsGqO9KOkjTIvncv2uYFMlF5WViR49imQbejTw01tK6CyOF6dJZFXdS4NdR8jhVs9HJZOTP4FO7H9feoAeNVG+TgsuYw5TDrd969Ek7vpUoG/XuTwb9VeAHd+gJV5ON/TSGz40J6dYywytrX4vdofQy/nQL4hJry/q3cGtkbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HdtNYCoE; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2fee4d9c2efso2929231a91.3;
-        Fri, 07 Mar 2025 01:22:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741339339; x=1741944139; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XztObitingC3692I+pBVpdt55S8NywKGMFDoLFkCI1M=;
-        b=HdtNYCoEs1o43u72KKglQ6tmh0SIWEMcIshaywK+7/IAJoELDg+nZ9AGm9kvDFxlS3
-         Ll1siGCp5THynSIOu69bZW7ckkG2S3PN1H/Y5xX0CIYInF/M2FIEr9s67B+JgfYfruRw
-         jkRjhKUCs4PWAmQsxeAPMzXVpgGSpf+JGy58QNXP3zp5I6sh7K/pKg4b5Lv4SFDK2/Cw
-         IUIxezUzCeajk4AwA87XLDF9ZH+dSdOQHizQJr8IV55lPK4xLpP/qNiJZdV8/K9sIMz4
-         RJLU5ijmugjD9c94ip5ooM72Qyz7pcaHkc77NUevlDxgjnqVRncCEVifP6eI1X1nGOkj
-         3rDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741339339; x=1741944139;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XztObitingC3692I+pBVpdt55S8NywKGMFDoLFkCI1M=;
-        b=UTud2MfSOvPnRig6xoN7qMZ3EX0vBw9IkeI7XR+JM+H0jvvJUBN0kHmMtvp/gKelQi
-         Zv1xR/r80b4LNHIfDZe0D6IHbnWnMYiRxTqmNryCjQmko3EucjRWo3HucQdpNOrZcF4w
-         Qu54kLd+3IbTFv0bVYJiZV4iMc1uxcUKZP4Ci/8fs7VYmJ7DRVB7a1cZR4kDKH7Z9ioL
-         P4BCuQJl7vi1socHaCpFLCjKbgxer54p3nNOeRWwMAtD0/uGa8ME+Q424B2I5TLAVo4r
-         ke6kyRG32rooEHFS73UTj5ZgEu4pMaI1LQvQhrgh0W0FsU/Zkc5WZtEkil+Dzl1KOqyA
-         8Wuw==
-X-Forwarded-Encrypted: i=1; AJvYcCUJp/+WXaS2sCJS+GthxvCMie74YOBB9Z1dcY/jWYuLSyzXtbBHAaUDlCulpVHEPE6SkIs3pdh2AY74nNxV@vger.kernel.org, AJvYcCUtR1fXRsiRKZ4uFDIJdYrXzmSO3o9G6s4Z/1X9tXPF2O7CEOjWC7HcRtAiIhfOScHZ3Sua0e04j4JEjsjQ63U=@vger.kernel.org, AJvYcCVdu91V3aFh6QNaQOhW7cUzj6Nq+RsA3OVH6RMFGiEJHnk+KZYkdtglqEVuj64kuOE5rdkfVah9@vger.kernel.org, AJvYcCXSaa6FOb2mj/9HhnGRLHFADHBhqAl81qTfz9dOdeKFzEFwA7u0umjrJ7YxP0z+kBm+IvqpozgkfEV8SxBG@vger.kernel.org, AJvYcCXXqQy/yG1JzBB6S2bBvYejWq6pGj57raKkxWW4xhDZ584gWBwMDeFqNwkXbqGLcwMJ83HmHQAE/PcZLG0=@vger.kernel.org, AJvYcCXaS+fSFMwBDKhqaBbZsv/Pz20x4NfVqaM4RJim4lO88UmsRHutS9Q2Y+VRnWjUIH/WRCI=@vger.kernel.org, AJvYcCXlseOC/5/OPOH19PCwGM0L3P8dcCV7XQBEgN9nsdS6SVtruRv8YUNek9hXrJhY9YHPa81DYYcKyjbYoq4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyT7kcXu8Ivn0NbKq6o0ZnqEQx7PQnJvU9SOZbFU7FPEJgkA5sx
-	+3gsAVkIzKAPBNHbsSVbcalgQiUBg/Z0wbpCCoqXzl+WqU/kdPvq
-X-Gm-Gg: ASbGncs8GvBQKvntRHW6ezDn2j3x+dACIjv47a+2lyv1Mfii/LUCHcZr+TTPPSalYNn
-	sciwoFOdoEZK7RI89JPynnGZrzDpPJNztHUsi61SxbR6jcCpKZZdOXi5asqp0CjzJmbA/jFDFxx
-	exIbilYcqKTts3098POy26YHJy1IVnSBie3zb6/wanjBM/saUG8d0CGTOIFAxaIUQaPILiy2J2S
-	WsSIGRalpvkcODZxJsRbhThemcBQGpfJ1e9aaB3f/WhVPd5AAtFuQ0t6P+JW8dw3UFp3q/3nHI8
-	zqqzGLXvvugHXrqbHbL4WFEvbqXqDUvB4A62d8t8DQmq8IvmGbjhwy2qOlfwnAkeRmaMNS/s
-X-Google-Smtp-Source: AGHT+IGO3Fg5mznURfAXFZCPAiOd6NJZ8MzxOEXeMR65d6OVc42NCiVYA5M/yoTVlsiOwEwCHpbcoQ==
-X-Received: by 2002:a17:90b:3911:b0:2fa:1a23:c01d with SMTP id 98e67ed59e1d1-2ff7ce8b5ffmr4029616a91.21.1741339339019;
-        Fri, 07 Mar 2025 01:22:19 -0800 (PST)
-Received: from visitorckw-System-Product-Name ([140.113.216.168])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ff693e7fb5sm2876725a91.37.2025.03.07.01.22.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Mar 2025 01:22:18 -0800 (PST)
-Date: Fri, 7 Mar 2025 17:22:08 +0800
-From: Kuan-Wei Chiu <visitorckw@gmail.com>
-To: Jiri Slaby <jirislaby@kernel.org>
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, x86@kernel.org, jk@ozlabs.org,
-	joel@jms.id.au, eajames@linux.ibm.com, andrzej.hajda@intel.com,
-	neil.armstrong@linaro.org, rfoss@kernel.org,
-	maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-	tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
-	dmitry.torokhov@gmail.com, mchehab@kernel.org,
-	awalls@md.metrocast.net, hverkuil@xs4all.nl,
-	miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
-	louis.peens@corigine.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	parthiban.veerasooran@microchip.com, arend.vanspriel@broadcom.com,
-	johannes@sipsolutions.net, gregkh@linuxfoundation.org,
-	yury.norov@gmail.com, akpm@linux-foundation.org, hpa@zytor.com,
-	alistair@popple.id.au, linux@rasmusvillemoes.dk,
-	Laurent.pinchart@ideasonboard.com, jonas@kwiboo.se,
-	jernej.skrabec@gmail.com, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, linux-fsi@lists.ozlabs.org,
-	dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
-	oss-drivers@corigine.com, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev,
-	brcm80211-dev-list.pdl@broadcom.com, linux-serial@vger.kernel.org,
-	bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw,
-	Yu-Chun Lin <eleanor15x@gmail.com>
-Subject: Re: [PATCH v3 00/16] Introduce and use generic parity16/32/64 helper
-Message-ID: <Z8q6wPWXImCeGI8P@visitorckw-System-Product-Name>
-References: <20250306162541.2633025-1-visitorckw@gmail.com>
- <3dfc81eb-caa1-42fe-8fd6-61101de0ef13@kernel.org>
+	s=arc-20240116; t=1741340492; c=relaxed/simple;
+	bh=sHnV9GEozz+Opv61zRjqJ4zv0AEgNaF9oXU1zOBaCs4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=ndrwAd1fq7Tsl7riwMoA7E/TYOw/91KKBiHw8TrW5ntAe3r89CEiJrCIsb2RaPziauW74h0qYI1CJ1ZwluBRT7mHQ/B3XozrtKFfms8QfQ9/P+ZkjxsjWd5RjR3UMDbrVSDB2uEAReCvP3Wk0J9vcoiKQmHtrXChmT4NvNW29k0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Z8LQ532WYz1R6Dn;
+	Fri,  7 Mar 2025 17:21:33 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 59CC61402CE;
+	Fri,  7 Mar 2025 17:23:12 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 7 Mar 2025 17:23:11 +0800
+Message-ID: <180818a1-b906-4a0b-89d3-34cb71cc26c9@huawei.com>
+Date: Fri, 7 Mar 2025 17:23:11 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3dfc81eb-caa1-42fe-8fd6-61101de0ef13@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] mm: alloc_pages_bulk: remove assumption of populating
+ only NULL elements
+To: NeilBrown <neilb@suse.de>
+CC: Qu Wenruo <wqu@suse.com>, Yishai Hadas <yishaih@nvidia.com>, Jason
+ Gunthorpe <jgg@ziepe.ca>, Shameer Kolothum
+	<shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>, Chris Mason <clm@fb.com>, Josef
+ Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>, Gao Xiang
+	<xiang@kernel.org>, Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>,
+	Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep Dhavale <dhavale@google.com>,
+	Carlos Maiolino <cem@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>, Jesper Dangaard Brouer
+	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker
+	<anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, Jeff Layton
+	<jlayton@kernel.org>, Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo
+	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Luiz Capitulino
+	<luizcap@redhat.com>, Mel Gorman <mgorman@techsingularity.net>, Dave Chinner
+	<david@fromorbit.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
+	<linux-btrfs@vger.kernel.org>, <linux-erofs@lists.ozlabs.org>,
+	<linux-xfs@vger.kernel.org>, <linux-mm@kvack.org>, <netdev@vger.kernel.org>,
+	<linux-nfs@vger.kernel.org>
+References: <> <f834a7cd-ca0a-4495-a787-134810aa0e4d@huawei.com>
+ <174129565467.33508.7106343513316364028@noble.neil.brown.name>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <174129565467.33508.7106343513316364028@noble.neil.brown.name>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-Hi Jiri,
-
-On Fri, Mar 07, 2025 at 07:57:48AM +0100, Jiri Slaby wrote:
-> On 06. 03. 25, 17:25, Kuan-Wei Chiu wrote:
-> > Several parts of the kernel contain redundant implementations of parity
-> > calculations for 16/32/64-bit values. Introduces generic
-> > parity16/32/64() helpers in bitops.h, providing a standardized
-> > and optimized implementation.
-> > 
-> > Subsequent patches refactor various kernel components to replace
-> > open-coded parity calculations with the new helpers, reducing code
-> > duplication and improving maintainability.
-> > 
-> > Co-developed-by: Yu-Chun Lin <eleanor15x@gmail.com>
-> > Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
-> > Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail.com>
-> > ---
-> > In v3, I use parityXX() instead of the parity() macro since the
-> > parity() macro may generate suboptimal code and requires special hacks
-> > to make GCC happy. If anyone still prefers a single parity() macro,
-> > please let me know.
+On 2025/3/7 5:14, NeilBrown wrote:
+> On Thu, 06 Mar 2025, Yunsheng Lin wrote:
+>> On 2025/3/6 7:41, NeilBrown wrote:
+>>> On Wed, 05 Mar 2025, Yunsheng Lin wrote:
+>>>>
+>>>> For the existing btrfs and sunrpc case, I am agreed that there
+>>>> might be valid use cases too, we just need to discuss how to
+>>>> meet the requirements of different use cases using simpler, more
+>>>> unified and effective APIs.
+>>>
+>>> We don't need "more unified".
+>>
+>> What I meant about 'more unified' is how to avoid duplicated code as
+>> much as possible for two different interfaces with similar‌ functionality.
+>>
+>> The best way I tried to avoid duplicated code as much as possible is
+>> to defragment the page_array before calling the alloc_pages_bulk()
+>> for the use case of btrfs and sunrpc so that alloc_pages_bulk() can
+>> be removed of the assumption populating only NULL elements, so that
+>> the API is simpler and more efficient.
+>>
+>>>
+>>> If there are genuinely two different use cases with clearly different
+>>> needs - even if only slightly different - then it is acceptable to have
+>>> two different interfaces.  Be sure to choose names which emphasise the
+>>> differences.
+>>
+>> The best name I can come up with for the use case of btrfs and sunrpc
+>> is something like alloc_pages_bulk_refill(), any better suggestion about
+>> the naming?
 > 
-> What is suboptimal and where exactly it matters? Have you actually measured
-> it?
+> I think alloc_pages_bulk_refill() is a good name.
 > 
-In the previous thread, David and Yury had different opinions regarding
-the implementation details of the parity() macro. I am trying to find a
-solution that satisfies most people while keeping it as simple as
-possible.
+> So:
+> - alloc_pages_bulk() would be given an uninitialised array of page
+>   pointers and a required count and would return the number of pages
+>   that were allocated
+> - alloc_pages_bulk_refill() would be given an initialised array of page
+>   pointers some of which might be NULL.  It would attempt to allocate
+>   pages for the non-NULL pointers and return the total number of
 
-I cannot point to any specific users who are particularly concerned
-about efficiency, so personally, I am not really concerned about the
-generated code either. However, I am not a fan of the #if gcc #else
-approach, and Yury also mentioned that he does not like the >> 16 >> 16
-hack. At the same time, David pointed out that GCC might generate
-double-register math. Given these concerns, I leaned toward reverting
-to the parityXX() approach.
+You meant 'NULL pointers' instead of 'non-NULL pointers' above?
 
-If you still prefer using the parity() macro, we can revisit and
-discuss its implementation details further.
+>   allocated pages in the array - just like the current
+>   alloc_pages_bulk().
 
-> > Additionally, I changed parityXX() << y users to !!parityXX() << y
-> > because, unlike C++, C does not guarantee that true casts to int as 1.
+I guess 'the total number of allocated pages in the array ' include
+the pages which are already in the array before calling the above
+API?
+
+I guess it is worth mentioning that the current alloc_pages_bulk()
+may return different value with the same size of arrays, but with
+different layout of the same number of NULL pointers.
+For the same size of arrays with different layout for the NULL pointer
+below('*' indicate NULL pointer), and suppose buddy allocator is only
+able to allocate two pages:
+1. P**P*P: will return 4.
+2. P*PP**: will return 5.
+
+If the new API do the page defragmentation, then it will always return
+the same value for different layout of the same number of NULL pointers.
+I guess the new one is the more perfered behavior as it provides a more
+defined semantic.
+
 > 
-> How comes? ANSI C99 exactly states:
-> ===
-> true
-> which expands to the integer constant 1,
-> ===
+> sunrpc could usefully use both of these interfaces.
 > 
-I gave a more detailed response in my reply to Peter. If we can confirm
-that casting bool to int will only result in 1 or 0, I will remove the
-!! hack in the next version.
+> alloc_pages_bulk() could be implemented by initialising the array and
+> then calling alloc_pages_bulk_refill().  Or alloc_pages_bulk_refill()
+> could be implemented by compacting the pages and then calling
+> alloc_pages_bulk().
+> If we could duplicate the code and have two similar but different
+> functions.
+> 
+> The documentation for _refill() should make it clear that the pages
+> might get re-ordered.
 
-Regards,
-Kuan-Wei
+Does 'the pages might get re-ordered' mean defragmenting the page_array?
+If yes, it makes sense to make it clear.
 
+> 
+> Having looked at some of the callers I agree that the current interface
+> is not ideal for many of them, and that providing a simpler interface
+> would help.
+
++1
+
+> 
+> Thanks,
+> NeilBrown
 
