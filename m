@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-173154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74A42A5782F
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 05:00:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A66BBA5783C
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 05:10:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23B8C1899BCE
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 04:00:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D49D11734D9
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 04:10:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 781EA186E2D;
-	Sat,  8 Mar 2025 04:00:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E6915687D;
+	Sat,  8 Mar 2025 04:10:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jI5B6Aqr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I+0o7tKJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50E0F185B67;
-	Sat,  8 Mar 2025 04:00:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34362CAB;
+	Sat,  8 Mar 2025 04:10:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741406413; cv=none; b=APWyWHiw4uikkzuyxbz0+njv88iXOx3CMmTFzmuaqNTI6WGMwfsR2N4mqARTOGWcMNt5Q0o9hsbKUf4lOvNhfr/MLwTPAJJCzTN9g5ZjI+8AEvhy1ER5oQh66IHMFbRnYC9Rdsr2bbRGKdQbHNwpddHijfZ/Kaw9yT2le8ZBZi4=
+	t=1741407003; cv=none; b=YIlz3qJScUjUxUJqLjElD/g5zDkHxWARVcJHfB0pg5Bt7IFEeqMYNTLj30ZnFgzPlTP3EOqfUMmuZtvZ45tom+W7TUFO3OjlAKABfxKRl3BS8iw+Ar1Cu+nMUBbcAqbjxx0t3GCjKNczkOrKtoKcc4TtlvSyM5TZYtsycg8S1D8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741406413; c=relaxed/simple;
-	bh=AKZQcLt8bJjf3yO+2hntp6XSMDsV4hEw7RDBU6jMiv4=;
+	s=arc-20240116; t=1741407003; c=relaxed/simple;
+	bh=fRP8SZLkJrLqavgzqVtzfiFeKnhkJ6/7/snyOvPYj5g=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=eeRyCJbLqpijeTHsHKjQTdCb0MhigAx57d9Sd0M2DfVdYLvx1Q7JCzimo+0IQiGv/1AWwiI1wrqqVdF5wdMHXQLPH5lpnu7rQZatbnq0j8GnO0XMu6KxZ74fWEgoslT/DKbXqU9Y66NsdEE0bb7NTRGNEYYuvo3zRB7zZ/LMZ7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jI5B6Aqr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 253C0C4CEE0;
-	Sat,  8 Mar 2025 04:00:13 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=I1a77TM3FODHWPJUiQjTtwcwkYh10pwSAlye08dHRmcOmEvA4F2Fe5Zo7ikXK2wjbEEleThf8mJs5ZmbG9T7Hv6ji7VPxeVY3RnFR+72p5Kgs1nnYXwN5fD4m9ds8RBAfXDAGjDJI3asQSVf2J/bVwmEuCdyBx8aWbMyhEqShf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I+0o7tKJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62DD7C4CEE0;
+	Sat,  8 Mar 2025 04:10:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741406413;
-	bh=AKZQcLt8bJjf3yO+2hntp6XSMDsV4hEw7RDBU6jMiv4=;
+	s=k20201202; t=1741407002;
+	bh=fRP8SZLkJrLqavgzqVtzfiFeKnhkJ6/7/snyOvPYj5g=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jI5B6Aqrfb/J+Ay8dXgT/W4U0Dc8h4aePqt/97cNKRdGZ/iy9/rkL6GONJHoM9pys
-	 YwyrUvIMBbx3uz6KMX5HOeT6EXgnukN+nCGgx2iGgHrCeGyjzmRLgn3hO7v6S/hG91
-	 Fp7Ss96xhctAC6gq4C6sDTY4le8zHkWGiWCbHDndg4OCoaHcNVNHFMYXBsWTVPe8/p
-	 0wEhfnt8xfz7yWfSR/G68iH022UagG0S7feFcxdyJwZXq5z1UIYRxmSlddtzcyZ0yJ
-	 B0pBFNP5WOJQ/zWZ9VVBZval1FKdRNytK2CzqyForuTJku+YdcHNZbpjjpOSCD89le
-	 IaxAlQX7oGB1w==
+	b=I+0o7tKJxismgEEZ77JdvHUHtLxXFLWRbGCjYhdwE+rvme2UjMYJOQWNSGE3xmHFk
+	 6aGM7mae219HPWQ6rP9U2fjm7JDbE900BQirg7qOI4Lvni8HgMAMSV+C5s/9TVlhe6
+	 hqxmi94piZwOJiqYhOjq1OoScUGHxQTS4bUzyTPVLZruwbxCYyTVYwH/iWV3hllfcM
+	 YYUT6tlp+/aps/VM53C2epSygS6dg7fFniyZP6GTk8PGMqXYeezQwyM4IWlHtQ/UXB
+	 PatdyGWIHue46n0l9M5ylSIBlJO6itBYWD+FZ5JdYkIACYLW3/rqBSvwT6b9SBeaos
+	 PYuukHZT+YvjA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EC160380CFFB;
-	Sat,  8 Mar 2025 04:00:47 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34129380CFFB;
+	Sat,  8 Mar 2025 04:10:37 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] netpoll: Optimize skb refilling on critical path
+Subject: Re: [PATCH net v2] netpoll: hold rcu read lock in __netpoll_send_skb()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174140644649.2570715.2453066021799126950.git-patchwork-notify@kernel.org>
-Date: Sat, 08 Mar 2025 04:00:46 +0000
-References: <20250304-netpoll_refill_v2-v1-1-06e2916a4642@debian.org>
-In-Reply-To: <20250304-netpoll_refill_v2-v1-1-06e2916a4642@debian.org>
+ <174140703601.2576884.2534454406231476474.git-patchwork-notify@kernel.org>
+Date: Sat, 08 Mar 2025 04:10:36 +0000
+References: <20250306-netpoll_rcu_v2-v2-1-bc4f5c51742a@debian.org>
+In-Reply-To: <20250306-netpoll_rcu_v2-v2-1-bc4f5c51742a@debian.org>
 To: Breno Leitao <leitao@debian.org>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-team@meta.com
+ pabeni@redhat.com, horms@kernel.org, amwang@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-team@meta.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 04 Mar 2025 07:50:41 -0800 you wrote:
-> netpoll tries to refill the skb queue on every packet send, independently
-> if packets are being consumed from the pool or not. This was
-> particularly problematic while being called from printk(), where the
-> operation would be done while holding the console lock.
+On Thu, 06 Mar 2025 05:16:18 -0800 you wrote:
+> The function __netpoll_send_skb() is being invoked without holding the
+> RCU read lock. This oversight triggers a warning message when
+> CONFIG_PROVE_RCU_LIST is enabled:
 > 
-> Introduce a more intelligent approach to skb queue management. Instead
-> of constantly attempting to refill the queue, the system now defers
-> refilling to a work queue and only triggers the workqueue when a buffer
-> is actually dequeued. This change significantly reduces operations with
-> the lock held.
+> 	net/core/netpoll.c:330 suspicious rcu_dereference_check() usage!
+> 
+> 	 netpoll_send_skb
+> 	 netpoll_send_udp
+> 	 write_ext_msg
+> 	 console_flush_all
+> 	 console_unlock
+> 	 vprintk_emit
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] netpoll: Optimize skb refilling on critical path
-    https://git.kernel.org/netdev/net-next/c/248f6571fd4c
+  - [net,v2] netpoll: hold rcu read lock in __netpoll_send_skb()
+    https://git.kernel.org/netdev/net/c/505ead7ab77f
 
 You are awesome, thank you!
 -- 
