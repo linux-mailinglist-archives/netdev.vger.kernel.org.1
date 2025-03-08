@@ -1,140 +1,107 @@
-Return-Path: <netdev+bounces-173163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74887A5795A
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 09:55:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77D28A57982
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 10:33:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62EA33B2E20
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 08:54:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6B8F18911D3
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 09:34:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C982A1A3171;
-	Sat,  8 Mar 2025 08:54:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7935318C32C;
+	Sat,  8 Mar 2025 09:33:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E5oOiuDn"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Aj1c93O7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC66322B;
-	Sat,  8 Mar 2025 08:54:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40C682CAB
+	for <netdev@vger.kernel.org>; Sat,  8 Mar 2025 09:33:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741424097; cv=none; b=aJ1n7KJ2buXeDD1NqIpQKL5+BSa1lKzqba9DXY0y8fCmxc6CsIkaUBikSAY84VsVB4W4+mj5AUsIXbKgxmpOq8Mwh5iq1mYOeHGm4ZQoNex7lRN4GrRtXu5JmWCtloE6g3yv5WqobONptx9XGoOHF6lscZoeq51y1hw9Il6cBwQ=
+	t=1741426429; cv=none; b=brgntnw7k7iA+ZHRbQl6EiEvVPIeK9NGccFLs72OMLEFd/IposVYgWE+DGJpuEw7zSk75BPK2Jk5tx5MDIz3tJ9wh/1pc6qouIy3o1dZpyEDwAm45+1F67zYF9+T4OaadjvKOVMXRHc5E9VisrUyT63JQdHYwU+l9/tuqsGfW7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741424097; c=relaxed/simple;
-	bh=9hUfcwgc9NMp39VZsIy/9tZ/bsjGfe3p3+gbAqS06HM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TehFpcsdvjgeNQFSQCQvqlEx4esJGF9PWhgdl1ct4+wmWiYagB3Uvi8mliVKAcryzK4Ln+5MhpYqUZV9mxHAxzmJYcZ8hB+GgdNowhiab2uSd6jpQm84wc0jcKpI/QprKQ8Vf1iZImwk1IHfWYXlzte6oMjR/7vjsvyYhIjMsNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E5oOiuDn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E40AC4CEE0;
-	Sat,  8 Mar 2025 08:54:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741424096;
-	bh=9hUfcwgc9NMp39VZsIy/9tZ/bsjGfe3p3+gbAqS06HM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=E5oOiuDnV7YwOgHL38/5uSUO/+Sg3d22jGakLTxTXe724I4ACInErw/3tBSjLn8mm
-	 t+xSeuOcPeV/PG1sLLls2OvfDNlUFdNlp7pI8ZYnw4wiBOtrPJqfG7Ex24ueSnpIzH
-	 b+CHHofzLdwI0cYRKmjo+wSWAJMWiGhNZ3AxzK8Qo/y4E9EdvTg5hrl5ve2c5lnD3t
-	 NMZ8d9xMWlViaqUKLUTFvCV+g6+X9iYu3NHcA7vw/cJ91UiGvNTPk9GoI3UtrWFbmY
-	 GPJBHLDH5uiJ/AdDLtLMHxgof6AMO6Ae2QazaDB5BLS14UgX3wBx3OT1AxrvlKECVR
-	 Vf8OK1rrDGPDw==
-Date: Sat, 8 Mar 2025 08:54:51 +0000
-From: Simon Horman <horms@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Shuah Khan <shuah@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
-	Jianbo Liu <jianbol@nvidia.com>, Jarod Wilson <jarod@redhat.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Cosmin Ratiu <cratiu@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCHv5 net 1/3] bonding: fix calling sleeping function in spin
- lock and some race conditions
-Message-ID: <20250308085451.GL3666230@kernel.org>
-References: <20250307031903.223973-1-liuhangbin@gmail.com>
- <20250307031903.223973-2-liuhangbin@gmail.com>
+	s=arc-20240116; t=1741426429; c=relaxed/simple;
+	bh=8JRWEPkcbZU8KQBQuODDmLBLljt+c0ZfuR22i+u1KbY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HkUS15lTuROSYD3alEH4uO1GWHAMlayas3CgbgoyJRGt5Co2a27BE3iml0k4LEVso/3/KtNX5myEXzocxw9sdxHySIPO+bkB4lraEP+W8pWIkEvFfVQWkwXolf2boyeJLyJH+j7dpZLS8Gw6MnTBggZ7cAncxXix6m5qqFBHmP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Aj1c93O7; arc=none smtp.client-ip=95.215.58.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <051c66d5-2751-4dfb-88df-3a4a1f86bb71@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1741426424;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PcLw7shfI50Q27EtBRTL5tYuszmcD8BPa3jzuj4PVWg=;
+	b=Aj1c93O7sRk8dZswKp03dAiwaVDyWRxUNH46JEXG7l+hSjozmiJRw5zpy4ygt29cezv+ul
+	STWQ6Hv9r93RqBSByly80mST8NWfh02kVvRubeWM2uu9RhCJPgo7HYrdtIaEYb34NBlrnX
+	4Wbm1UmZIQ7CDJxRI+m8RKrryB8FRyQ=
+Date: Sat, 8 Mar 2025 09:33:40 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250307031903.223973-2-liuhangbin@gmail.com>
+Subject: Re: [PATCH net v2] net: ethtool: tsinfo: Fix dump command
+To: Kory Maincent <kory.maincent@bootlin.com>,
+ "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+References: <20250307091255.463559-1-kory.maincent@bootlin.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250307091255.463559-1-kory.maincent@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Mar 07, 2025 at 03:19:01AM +0000, Hangbin Liu wrote:
+On 07/03/2025 09:12, Kory Maincent wrote:
+> Fix missing initialization of ts_info->phc_index in the dump command,
+> which could cause a netdev interface to incorrectly display a PTP provider
+> at index 0 instead of "none".
+> Fix it by initializing the phc_index to -1.
+> 
+> In the same time, restore missing initialization of ts_info.cmd for the
+> IOCTL case, as it was before the transition from ethnl_default_dumpit to
+> custom ethnl_tsinfo_dumpit.
+> 
+> Also, remove unnecessary zeroing of ts_info, as it is embedded within
+> reply_data, which is fully zeroed two lines earlier.
+> 
+> Fixes: b9e3f7dc9ed95 ("net: ethtool: tsinfo: Enhance tsinfo to support several hwtstamp by net topology")
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> ---
+> 
+> Change in v2:
+> - Remove useless zeroed of ts_info.
+> ---
+>   net/ethtool/tsinfo.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/ethtool/tsinfo.c b/net/ethtool/tsinfo.c
+> index 691be6c445b38..ad3866c5a902b 100644
+> --- a/net/ethtool/tsinfo.c
+> +++ b/net/ethtool/tsinfo.c
+> @@ -290,7 +290,8 @@ static void *ethnl_tsinfo_prepare_dump(struct sk_buff *skb,
+>   	reply_data = ctx->reply_data;
+>   	memset(reply_data, 0, sizeof(*reply_data));
+>   	reply_data->base.dev = dev;
+> -	memset(&reply_data->ts_info, 0, sizeof(reply_data->ts_info));
+> +	reply_data->ts_info.cmd = ETHTOOL_GET_TS_INFO;
+> +	reply_data->ts_info.phc_index = -1;
+>   
+>   	return ehdr;
+>   }
 
-...
-
-> @@ -616,9 +615,22 @@ static void bond_ipsec_del_sa_all(struct bonding *bond)
->  		return;
->  
->  	mutex_lock(&bond->ipsec_lock);
-> -	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
-> -		if (!ipsec->xs->xso.real_dev)
-> +	list_for_each_entry_safe(ipsec, tmp_ipsec, &bond->ipsec_list, list) {
-> +		spin_lock_bh(&ipsec->xs->lock);
-> +		if (!ipsec->xs->xso.real_dev) {
-> +			spin_unlock_bh(&ipsec->xs->lock);
->  			continue;
-> +		}
-> +
-> +		if (ipsec->xs->km.state == XFRM_STATE_DEAD) {
-> +			list_del(&ipsec->list);
-> +			kfree(ipsec);
-
-Hi Hangbin,
-
-Apologies if this was covered elsewhere, but ipsec is kfree'd here...
-
-
-> +			/* Need to free device here, or the xs->xso.real_dev
-> +			 * may changed in bond_ipsec_add_sa_all and free
-> +			 * on old device will never be called.
-> +			 */
-> +			goto next;
-> +		}
->  
->  		if (!real_dev->xfrmdev_ops ||
->  		    !real_dev->xfrmdev_ops->xdo_dev_state_delete ||
-> @@ -626,11 +638,20 @@ static void bond_ipsec_del_sa_all(struct bonding *bond)
->  			slave_warn(bond_dev, real_dev,
->  				   "%s: no slave xdo_dev_state_delete\n",
->  				   __func__);
-> -		} else {
-> -			real_dev->xfrmdev_ops->xdo_dev_state_delete(ipsec->xs);
-> -			if (real_dev->xfrmdev_ops->xdo_dev_state_free)
-> -				real_dev->xfrmdev_ops->xdo_dev_state_free(ipsec->xs);
-> +			spin_unlock_bh(&ipsec->xs->lock);
-> +			continue;
->  		}
-> +
-> +		real_dev->xfrmdev_ops->xdo_dev_state_delete(ipsec->xs);
-> +
-> +next:
-> +		/* set real_dev to NULL in case __xfrm_state_delete() is called in parallel */
-> +		ipsec->xs->xso.real_dev = NULL;
-
-... and the dereferenced here.
-
-Flagged by Smatch.
-
-> +
-> +		/* Unlock before freeing device state, it could sleep. */
-> +		spin_unlock_bh(&ipsec->xs->lock);
-> +		if (real_dev->xfrmdev_ops->xdo_dev_state_free)
-> +			real_dev->xfrmdev_ops->xdo_dev_state_free(ipsec->xs);
->  	}
->  	mutex_unlock(&bond->ipsec_lock);
->  }
-
-...
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
