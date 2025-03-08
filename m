@@ -1,337 +1,192 @@
-Return-Path: <netdev+bounces-173161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6A13A5791F
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 09:10:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30DEAA57942
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 09:30:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B71D170FFA
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 08:10:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67E5A16F96C
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 08:30:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB49D192D68;
-	Sat,  8 Mar 2025 08:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6821A5B8C;
+	Sat,  8 Mar 2025 08:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HpuDRgQB"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="MHdXaqv3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BFE414A627;
-	Sat,  8 Mar 2025 08:10:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA9171AA1E0;
+	Sat,  8 Mar 2025 08:30:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741421419; cv=none; b=IkKm7uVLPwj9T4pb/12VoRdoih69xSbCvbf+vvX41D5/9nRwrT/YAFpVj7AmTIccCL3PnxwqH0Tgfoc8MQ+IoUhWz9QePHp3nEXRUC2Pq5Vv1YD6i7MGFLLFTy2gl2jRQFv+BQfUim2pAb/XPrkguadolPmbflsOJas+/RfN0vI=
+	t=1741422611; cv=none; b=Y86JFlQHcWxoI9gdQAze2/prMsbZjEV5cfhWYWq3SDNZqjM4lOxf2fEWgsPkSlj7mF2nD0o+piH/ojaM05rwnlo+b57RddopIQg9CYHa/WqZMr2ORzRju9zMHYlfrzFi38JfqjvSDv5dsxESdElU0Gb6nSwoK3lJf6EsnbuZewY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741421419; c=relaxed/simple;
-	bh=chpw5mOCqhdaulsI9rU+yap84EtolFeEXcuYZq1Qdiw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BbNQhToOiDmWo9CCcmioONIp1kEymF5F3jeqj9j1JNg3HVVgSPiOcUrRILMiwfscEBYtanXkYT3dg/ZL2BSA2+Vc9IXAcC4c55E7LYYJebMpqO7U9UYNYUVFi+fBrMdFX7W11DiQPpB144J2+POqaN00F+mRcIH3X0qsU8OOW3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HpuDRgQB; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-22401f4d35aso49958385ad.2;
-        Sat, 08 Mar 2025 00:10:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741421416; x=1742026216; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pPfMHrUfIyTeVauZfw7Vd2QUp41Iswo+4/Xq/oJCsFY=;
-        b=HpuDRgQB1EAg6f+2qpjd7BG9wQ16qPzxzcK6pXUgoZqIANm8rOzLbZ80PQhBtbpl91
-         15hjORoXcTpvLj/KKYpf5HSo5eIL7jYWphVQoPPYRDfnVTbS9q9D+OtUrOouvlP8ZKFo
-         u4AO5pFGryjyIlR0gsXUwV7DuuZZesoJerkRa/4gKRWa0DpE1dNm46MF8VnMjyNhHk5z
-         maSQMJr/XAQeQ91GSK2PpYtHM1G3hvdL8IublYR4XMZRrisDYEso+/gqTKO2ydvZVWT1
-         0xadBhsuvYJ4PcCLHZ7IhxQP0pQQkDn6UPD7WH7jCtpk6Gz3rkD/h9ojJuZvg8266Ups
-         da1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741421416; x=1742026216;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pPfMHrUfIyTeVauZfw7Vd2QUp41Iswo+4/Xq/oJCsFY=;
-        b=dzRJyG3Xx35J/iIqhApPBgkIiTjZ6RV8y0dJP1986yzHf3UdJGvaJ1mNZeffD1uyoL
-         MhQqO3Q94IiDCV9wcAVBYL0AE0NH8a20J+SrNySGYlQ22JQZJKHf/CeN1skvmUVlm1Dh
-         vzV9iZdFUSOMpOU/ezgDWIe/hnL0Nb19JJJOBc33WsGKMs1j766Ou8whrJ/iXoKNHW6u
-         UrUTH12lg8+FHR8i4N24ZBx09J+oB3j/lp+nsCxRzsOqlYv1mK7tuBisuz9ShTvYI2+8
-         DOPyYd1XKCmW7SMLXqPUxHI4b4yEh0/Mws+QgBr1zaTLRPFmNgXpuiFfG9AXfFIPkgKb
-         0FsA==
-X-Forwarded-Encrypted: i=1; AJvYcCUu6DBPAHw/RvsjgS+ePERCbgf7y6iaOQqf1dF9IwHKGcKfZgzyZ3pvTkMAQ0+cpi3S4MBaAepwcKcgLas=@vger.kernel.org, AJvYcCWe3WCjHtiEjcrUj1f1C3Jh++NZYdcR0sPqMCIeZwOkS6Z+ThIKbFxQWEvpz2LC0/oFbGj+g1sM@vger.kernel.org
-X-Gm-Message-State: AOJu0YweJvj3e7Vet1+pO7Mw3xLh6wVFbb7Qoc+aiPz295Kyo6Uzo/Rj
-	Pkdn5UraPTYwV6QStGpMRsy1Nw6uBAM8yfsgH9sFrbGWX4HESVh7
-X-Gm-Gg: ASbGncsdNk6fcqTgpJqpba7w+8VBz3ePmYVffBARyqTnNwkiCCIv9I79EKpihBgF1Ie
-	gqtXDujWKQc+y5LQDBNrfPC6np8y7CTZOsfSi/wAwVMF5dj3VIO9bObnpoqeM9hPbt67kqZXllc
-	6ISxRl9PzOT95a+uLX0JITqr5Z+jvPvrqRn0cTWVPw6BGbzNyU4PDgCOw1a6pjWEO/3t+2Stgmb
-	RZ/0aCpLZ08YuHK07PA2jOcmRBmj6qfnn0DT2XF8DXIj0ct6XSfQbFSdlHEWH9RUoE/vNrB1/3J
-	jy2p9LAlzMH3tI2+513PZ96StodG6ZD05jf3+B3LQ4VwUPFeWBuHeSL86tIVE3AL1QXS4rtgTN7
-	32xkRA9xm6tdmr0upHDDOw0v3c/208cU=
-X-Google-Smtp-Source: AGHT+IExQxxzidZsRZvPCkyyUusE5M+qCGYL1MbJaKyQy9hpVDIjFSPVSubIvS0tuRZ2CTYvwEaU5g==
-X-Received: by 2002:a17:903:19ce:b0:223:58ff:c722 with SMTP id d9443c01a7336-22428a96b0emr125049715ad.28.1741421416199;
-        Sat, 08 Mar 2025 00:10:16 -0800 (PST)
-Received: from localhost.localdomain (p12284229-ipxg45101marunouchi.tokyo.ocn.ne.jp. [60.39.60.229])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22410a9dfbfsm42108365ad.209.2025.03.08.00.10.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Mar 2025 00:10:15 -0800 (PST)
-From: Ryo Takakura <ryotkkr98@gmail.com>
-To: boqun.feng@gmail.com
-Cc: bp@alien8.de,
-	davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	kuniyu@amazon.com,
-	linux-kernel@vger.kernel.org,
-	mingo@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	peterz@infradead.org,
-	ryotkkr98@gmail.com,
-	x86@kernel.org
-Subject: Re: request_irq() with local bh disabled
-Date: Sat,  8 Mar 2025 17:09:51 +0900
-Message-Id: <20250308080951.345854-1-ryotkkr98@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <Z8t8imzJVhWyDvhC@boqun-archlinux>
-References: <Z8t8imzJVhWyDvhC@boqun-archlinux>
+	s=arc-20240116; t=1741422611; c=relaxed/simple;
+	bh=ztakW5nBpih7iAkXfJC3k9aEMbM1EWSUb87mpX7JfjI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UcYvVVszYppuVKXbD7K4TbZURXlsCEITA7Gm+T2HD5IKC9DH7/QQ/ZWC/tbHNTtNARn+CxBBcIWAcrJR2Pz/M+TvVIKSGL1KImK+7rPymv1WV5Tct1TN4o1PSvUYG3SmeRoQdKDAbHlPiywTW09H5rJy+M2pe6GI2SpCzdMythw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=MHdXaqv3; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=PM0R2H24/cyZow7Z8RgpWoqPF7f/4ZANkzPJR+Kf3go=; b=MHdXaqv3iIB/h4xkEgnIzDRGPv
+	ITgSYgd00gAYunNpiBEtly4ou5J66MJxKkFrE577M+cEaWeuVrMqUEIRBL4uGsWMs/qd2Omk/sXfn
+	NpytJ2gU/LF2CbD2nd8kNqDK1Pw0IkKFYYcZdyZ3MuGNMHHVhM8e4qhRM2c1dzbWvAsNoRDUdl9QZ
+	WyRTpP8XvqH/UO1MeCyMBRVBoWCJejPX4G3JcFGvF0B01BVE3tH3x5AufgsFlXF1L0v99fLejNx7r
+	BZU39PTdDk3Z1JOLP/jLBODnk/ionC9gDATpqf3YtWBHqqV28GPBvAvFqaIMzwuZlcvnyAodO5sd/
+	43U68Ytw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tqpYo-004odt-22;
+	Sat, 08 Mar 2025 16:29:31 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 08 Mar 2025 16:29:30 +0800
+Date: Sat, 8 Mar 2025 16:29:30 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: David Howells <dhowells@redhat.com>
+Cc: Marc Dionne <marc.dionne@auristor.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [GIT PULL v2] crypto: Add Kerberos crypto lib
+Message-ID: <Z8v_6nEEHdNrYWhL@gondor.apana.org.au>
+References: <3709378.1740991489@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3709378.1740991489@warthog.procyon.org.uk>
 
-Hi Boqun,
-
-Thanks for looking into it.
-
-On Fri, 7 Mar 2025 15:08:58 -0800, Boqun Feng wrote:
->On Fri, Mar 07, 2025 at 11:29:04AM -0800, Boqun Feng wrote:
->> On Fri, Mar 07, 2025 at 10:33:36AM -0800, Boqun Feng wrote:
->> > On Fri, Mar 07, 2025 at 07:57:40AM -0800, Boqun Feng wrote:
->> > > On Fri, Mar 07, 2025 at 10:39:46PM +0900, Ryo Takakura wrote:
->> > > > Hi Boris,
->> > > > 
->> > > > On Fri, 7 Mar 2025 14:13:19 +0100, Borislav Petkov wrote:
->> > > > >On Fri, Mar 07, 2025 at 09:58:51PM +0900, Ryo Takakura wrote:
->> > > > >> I'm so sorry that the commit caused this problem...
->> > > > >> Please let me know if there is anything that I should do.
->> > > > >
->> > > > >It is gone from the tip tree so you can take your time and try to do it right.
->> > > > >
->> > > > >Peter and/or I could help you reproduce the issue and try to figure out what
->> > > > >needs to change there.
->> > > > >
->> > > > >HTH.
->> > > > 
->> > > > Thank you so much for this. I really appreciate it.
->> > > > I'll once again take a look and try to fix the problem.
->> > > > 
->> > > 
->> > > Looks like we missed cases where
->> > > 
->> > > acquire the lock:
->> > > 
->> > > 	netif_addr_lock_bh():
->> > > 	  local_bh_disable();
->> > > 	  spin_lock_nested();
->> > > 
->> > > release the lock:
->> > > 
->> > > 	netif_addr_unlock_bh():
->> > > 	  spin_unlock_bh(); // <- calling __local_bh_disable_ip() directly
-
-I see! I wasn't aware of !PREEMPT_RT differing from PREEMPT_RT 
-where spin_unlock_bh() calls __local_bh_disable_ip() instead of
-local_bh_disable().
-
->> > > means we should do the following on top of your changes.
->> > > 
->> > > Regards,
->> > > Boqun
->> > > 
->> > > ------------------->8
->> > > diff --git a/include/linux/bottom_half.h b/include/linux/bottom_half.h
->> > > index 0640a147becd..7553309cbed4 100644
->> > > --- a/include/linux/bottom_half.h
->> > > +++ b/include/linux/bottom_half.h
->> > > @@ -22,7 +22,6 @@ extern struct lockdep_map bh_lock_map;
->> > >  
->> > >  static inline void local_bh_disable(void)
->> > >  {
->> > > -	lock_map_acquire_read(&bh_lock_map);
->> > >  	__local_bh_disable_ip(_THIS_IP_, SOFTIRQ_DISABLE_OFFSET);
->> > >  }
->> > >  
->> > > @@ -31,13 +30,11 @@ extern void __local_bh_enable_ip(unsigned long ip, unsigned int cnt);
->> > >  
->> > >  static inline void local_bh_enable_ip(unsigned long ip)
->> > >  {
->> > > -	lock_map_release(&bh_lock_map);
->> > >  	__local_bh_enable_ip(ip, SOFTIRQ_DISABLE_OFFSET);
->> > >  }
->> > >  
->> > >  static inline void local_bh_enable(void)
->> > >  {
->> > > -	lock_map_release(&bh_lock_map);
->> > >  	__local_bh_enable_ip(_THIS_IP_, SOFTIRQ_DISABLE_OFFSET);
->> > >  }
->> > >  
->> > > diff --git a/kernel/softirq.c b/kernel/softirq.c
->> > > index e864f9ce1dfe..782d5e9753f6 100644
->> > > --- a/kernel/softirq.c
->> > > +++ b/kernel/softirq.c
->> > > @@ -175,6 +175,8 @@ void __local_bh_disable_ip(unsigned long ip, unsigned int cnt)
->> > >  		lockdep_softirqs_off(ip);
->> > >  		raw_local_irq_restore(flags);
->> > >  	}
->> > > +
->> > > +	lock_map_acquire_read(&bh_lock_map);
->> > >  }
->> > >  EXPORT_SYMBOL(__local_bh_disable_ip);
->> > >  
->> > > @@ -183,6 +185,8 @@ static void __local_bh_enable(unsigned int cnt, bool unlock)
->> > >  	unsigned long flags;
->> > >  	int newcnt;
->> > >  
->> > > +	lock_map_release(&bh_lock_map);
->> > > +
->> > >  	DEBUG_LOCKS_WARN_ON(current->softirq_disable_cnt !=
->> > >  			    this_cpu_read(softirq_ctrl.cnt));
->> > >  
->> > > @@ -208,6 +212,8 @@ void __local_bh_enable_ip(unsigned long ip, unsigned int cnt)
->> > >  	u32 pending;
->> > >  	int curcnt;
->> > >  
->> > > +	lock_map_release(&bh_lock_map);
->> > > +
->> > 
->> > Ok, this is not needed because __local_bh_enable() will be called by
->> > __local_bh_enable_ip().
->> > 
->> 
->> Hmm.. it's a bit complicated than that because __local_bh_enable() is
->> called twice. We need to remain the lock_map_release() in
->> __local_bh_enable_ip(), remove the lock_map_release() and add another
->> one in ksoftirq_run_end().
->> 
->> Let me think and test more on this.
->> 
->
->So what I have came up so far is as follow:
->
->1. I moved bh_lock_map to only for PREEMPT_RT (since for non-RT we have
->   current softirq context tracking).
-
-Sounds good to me.
-
->2. I moved lock_map_acquire_read() and lock_map_release() into
->   PREEMPT_RT version of __local_bh_{disable,enable}_ip().
->3. I added a lock_map_release() in ksoftirq_run_end() to release the
->   conceptual bh_lock_map lock.
-
-I see that __local_bh_enable_ip() and ksoftirq_run_end()
-are the only call sites of __local_bh_enable() on PREEMPT_RT,  
-so this looks good to me as well.
-
->Let me know how you think about this. Given 2 & 3 needs some reviews
->from PREEMPT_RT, and it's -rc5 already, so I'm going to postpone this
->into 6.16 (I will resend this patch if it looks good to you). Sounds
->good?
-
-Sounds good, Thanks!
-
-Sincerely,
-Ryo Takakura
-
->Regards,
->Boqun
->------------------------------------------------->8
->Subject: [PATCH] lockdep: Fix wait context check on softirq for PREEMPT_RT
->
->Since commit 0c1d7a2c2d32 ("lockdep: Remove softirq accounting on
->PREEMPT_RT."), the wait context test for mutex usage within
->"in softirq context" fails as it references @softirq_context.
->
->[    0.184549]   | wait context tests |
->[    0.184549]   --------------------------------------------------------------------------
->[    0.184549]                                  | rcu  | raw  | spin |mutex |
->[    0.184549]   --------------------------------------------------------------------------
->[    0.184550]                in hardirq context:  ok  |  ok  |  ok  |  ok  |
->[    0.185083] in hardirq context (not threaded):  ok  |  ok  |  ok  |  ok  |
->[    0.185606]                in softirq context:  ok  |  ok  |  ok  |FAILED|
->
->As a fix, add lockdep map for BH disabled section. This fixes the
->issue by letting us catch cases when local_bh_disable() gets called
->with preemption disabled where local_lock doesn't get acquired.
->In the case of "in softirq context" selftest, local_bh_disable() was
->being called with preemption disable as it's early in the boot.
->
->[boqun: Move the lockdep annotations into __local_bh_*() to avoid false
->positives because of unpaired local_bh_disable() reported by Borislav
->Petkov [1] and Peter Zijlstra [2], and make bh_lock_map only exist for
->PREEMPT_RT]
->
->Signed-off-by: Ryo Takakura <ryotkkr98@gmail.com>
->Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
->Link: https://lore.kernel.org/all/20250306122413.GBZ8mT7Z61Tmgnh5Y9@fat_crate.local/ [1]
->Link: https://lore.kernel.org/lkml/20250307113955.GK16878@noisy.programming.kicks-ass.net/ [2]
->Link: https://lore.kernel.org/r/20250118054900.18639-1-ryotkkr98@gmail.com
->---
-> kernel/softirq.c | 18 ++++++++++++++++++
-> 1 file changed, 18 insertions(+)
->
->diff --git a/kernel/softirq.c b/kernel/softirq.c
->index 4dae6ac2e83f..3ce136bdcbfe 100644
->--- a/kernel/softirq.c
->+++ b/kernel/softirq.c
->@@ -126,6 +126,18 @@ static DEFINE_PER_CPU(struct softirq_ctrl, softirq_ctrl) = {
-> 	.lock	= INIT_LOCAL_LOCK(softirq_ctrl.lock),
-> };
+On Mon, Mar 03, 2025 at 08:44:49AM +0000, David Howells wrote:
+> Hi Herbert,
 > 
->+#ifdef CONFIG_DEBUG_LOCK_ALLOC
->+static struct lock_class_key bh_lock_key;
->+struct lockdep_map bh_lock_map = {
->+	.name = "local_bh",
->+	.key = &bh_lock_key,
->+	.wait_type_outer = LD_WAIT_FREE,
->+	.wait_type_inner = LD_WAIT_CONFIG, /* PREEMPT_RT makes BH preemptible. */
->+	.lock_type = LD_LOCK_PERCPU,
->+};
->+EXPORT_SYMBOL_GPL(bh_lock_map);
->+#endif
->+
-> /**
->  * local_bh_blocked() - Check for idle whether BH processing is blocked
->  *
->@@ -148,6 +160,8 @@ void __local_bh_disable_ip(unsigned long ip, unsigned int cnt)
+> Could you pull this into the crypto tree please?  v2 is just a rebase onto
+> your cryptodev/master branch.  It does a couple of things:
 > 
-> 	WARN_ON_ONCE(in_hardirq());
+>  (1) Provide an AEAD crypto driver, krb5enc, that mirrors the authenc
+>      driver, but that hashes the plaintext, not the ciphertext.  This was
+>      made a separate module rather than just being a part of the authenc
+>      driver because it has to do all of the constituent operations in the
+>      opposite order - which impacts the async op handling.
 > 
->+	lock_map_acquire_read(&bh_lock_map);
->+
-> 	/* First entry of a task into a BH disabled section? */
-> 	if (!current->softirq_disable_cnt) {
-> 		if (preemptible()) {
->@@ -211,6 +225,8 @@ void __local_bh_enable_ip(unsigned long ip, unsigned int cnt)
-> 	WARN_ON_ONCE(in_hardirq());
-> 	lockdep_assert_irqs_enabled();
+>      Testmgr data is provided for AES+SHA2 and Camellia combinations of
+>      authenc and krb5enc used by the krb5 library.  AES+SHA1 is not
+>      provided as the RFCs don't contain usable test vectors.
 > 
->+	lock_map_release(&bh_lock_map);
->+
-> 	local_irq_save(flags);
-> 	curcnt = __this_cpu_read(softirq_ctrl.cnt);
+>  (2) Provide a Kerberos 5 crypto library.  This is an extract from the
+>      sunrpc driver as that code can be shared between sunrpc/nfs and
+>      rxrpc/afs.  This provides encryption, decryption, get MIC and verify
+>      MIC routines that use and wrap the crypto functions, along with some
+>      functions to provide layout management.
 > 
->@@ -261,6 +277,8 @@ static inline void ksoftirqd_run_begin(void)
-> /* Counterpart to ksoftirqd_run_begin() */
-> static inline void ksoftirqd_run_end(void)
-> {
->+	/* pairs with the lock_map_acquire_read() in ksoftirqd_run_begin() */
->+	lock_map_release(&bh_lock_map);
-> 	__local_bh_enable(SOFTIRQ_OFFSET, true);
-> 	WARN_ON_ONCE(in_interrupt());
-> 	local_irq_enable();
->-- 
->2.47.1
+>      This supports AES+SHA1, AES+SHA2 and Camellia encryption types.
+> 
+>      Self-testing is provided that goes further than is possible with
+>      testmgr, doing subkey derivation as well.
+> 
+> The patches were previously posted here:
+> 
+>     https://lore.kernel.org/r/20250203142343.248839-1-dhowells@redhat.com/
+> 
+> as part of a larger series, but the networking guys would prefer these to
+> go through the crypto tree.  If you want them reposting independently, I
+> can do that.
+> 
+> David
+> ---
+> The following changes since commit 17ec3e71ba797cdb62164fea9532c81b60f47167:
+> 
+>   crypto: lib/Kconfig - Hide arch options from user (2025-03-02 15:21:47 +0800)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/crypto-krb5-20250303
+> 
+> for you to fetch changes up to fc0cf10c04f49ddba1925b630467f49ea993569e:
+> 
+>   crypto/krb5: Implement crypto self-testing (2025-03-02 21:56:47 +0000)
+> 
+> ----------------------------------------------------------------
+> crypto: Add Kerberos crypto lib
+> 
+> ----------------------------------------------------------------
+> David Howells (17):
+>       crypto/krb5: Add API Documentation
+>       crypto/krb5: Add some constants out of sunrpc headers
+>       crypto: Add 'krb5enc' hash and cipher AEAD algorithm
+>       crypto/krb5: Test manager data
+>       crypto/krb5: Implement Kerberos crypto core
+>       crypto/krb5: Add an API to query the layout of the crypto section
+>       crypto/krb5: Add an API to alloc and prepare a crypto object
+>       crypto/krb5: Add an API to perform requests
+>       crypto/krb5: Provide infrastructure and key derivation
+>       crypto/krb5: Implement the Kerberos5 rfc3961 key derivation
+>       crypto/krb5: Provide RFC3961 setkey packaging functions
+>       crypto/krb5: Implement the Kerberos5 rfc3961 encrypt and decrypt functions
+>       crypto/krb5: Implement the Kerberos5 rfc3961 get_mic and verify_mic
+>       crypto/krb5: Implement the AES enctypes from rfc3962
+>       crypto/krb5: Implement the AES enctypes from rfc8009
+>       crypto/krb5: Implement the Camellia enctypes from rfc6803
+>       crypto/krb5: Implement crypto self-testing
+> 
+>  Documentation/crypto/index.rst   |   1 +
+>  Documentation/crypto/krb5.rst    | 262 +++++++++++++
+>  crypto/Kconfig                   |  13 +
+>  crypto/Makefile                  |   3 +
+>  crypto/krb5/Kconfig              |  26 ++
+>  crypto/krb5/Makefile             |  18 +
+>  crypto/krb5/internal.h           | 247 ++++++++++++
+>  crypto/krb5/krb5_api.c           | 452 ++++++++++++++++++++++
+>  crypto/krb5/krb5_kdf.c           | 145 +++++++
+>  crypto/krb5/rfc3961_simplified.c | 797 +++++++++++++++++++++++++++++++++++++++
+>  crypto/krb5/rfc3962_aes.c        | 115 ++++++
+>  crypto/krb5/rfc6803_camellia.c   | 237 ++++++++++++
+>  crypto/krb5/rfc8009_aes2.c       | 362 ++++++++++++++++++
+>  crypto/krb5/selftest.c           | 544 ++++++++++++++++++++++++++
+>  crypto/krb5/selftest_data.c      | 291 ++++++++++++++
+>  crypto/krb5enc.c                 | 504 +++++++++++++++++++++++++
+>  crypto/testmgr.c                 |  16 +
+>  crypto/testmgr.h                 | 351 +++++++++++++++++
+>  include/crypto/authenc.h         |   2 +
+>  include/crypto/krb5.h            | 160 ++++++++
+>  20 files changed, 4546 insertions(+)
+>  create mode 100644 Documentation/crypto/krb5.rst
+>  create mode 100644 crypto/krb5/Kconfig
+>  create mode 100644 crypto/krb5/Makefile
+>  create mode 100644 crypto/krb5/internal.h
+>  create mode 100644 crypto/krb5/krb5_api.c
+>  create mode 100644 crypto/krb5/krb5_kdf.c
+>  create mode 100644 crypto/krb5/rfc3961_simplified.c
+>  create mode 100644 crypto/krb5/rfc3962_aes.c
+>  create mode 100644 crypto/krb5/rfc6803_camellia.c
+>  create mode 100644 crypto/krb5/rfc8009_aes2.c
+>  create mode 100644 crypto/krb5/selftest.c
+>  create mode 100644 crypto/krb5/selftest_data.c
+>  create mode 100644 crypto/krb5enc.c
+>  create mode 100644 include/crypto/krb5.h
+
+All applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
