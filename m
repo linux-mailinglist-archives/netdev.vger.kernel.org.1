@@ -1,161 +1,170 @@
-Return-Path: <netdev+bounces-173169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C3B2A57A33
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 13:44:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3383A57A36
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 13:44:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5ECFE3AD171
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 12:44:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2965F188F222
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 12:44:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EC9E18FDBE;
-	Sat,  8 Mar 2025 12:44:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B7C41B87CB;
+	Sat,  8 Mar 2025 12:44:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jRG3FM2L"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FtohmBtI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C49634;
-	Sat,  8 Mar 2025 12:44:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91B2C189B8D;
+	Sat,  8 Mar 2025 12:44:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741437867; cv=none; b=CGhlxNTKCRcncZNbzbVPOGjtJkjci1/XH4NjZgqKcJm8SnTxfjDBFGiY4ALMJ0EI0DaBuMioEHxYZ/MtzANTI57Jwuffv4SOjeqeuOJfuInas3d/TRgsoNmAmvy+xS5/6+m8gEA3VIgBMQFZZ9n7KNx20066DjOehd8gqcaaZVY=
+	t=1741437879; cv=none; b=spbsZRCp/khzNSGDrjT3TXA02V2sNgCVxqDd2i5MlUQLA26ZDN8DFZjyUt8s4XIcpmR6X61Dl0lHBsPjdGExLcd3hbIImNc2mgCdVyBlCbgYphb/Bce5gTGSS1S9uOe/sBRfIT0X1waTTsIHqRb2MAvs1VI11nwvTI39aHnTgKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741437867; c=relaxed/simple;
-	bh=pJqPba0IGbu2pHFSxdLk99Rp6StXqTh9l6ukWNEkAos=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=YXdsmqKitqpgnXaoSpstmaAvdgXyflsgb8Gts57+LdlBSiTmiZAm7eG/oSD6pitNOkTPs+RzUIe45rVnA5pMMvnSzIkyIxRo9D+AjkJkrDVxT98j2Y3MPDQQ4/JO2vcx78KHqqJeqd8dJCp6WZyHI0V8Gk6am2LEh4IXidBwhQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jRG3FM2L; arc=none smtp.client-ip=209.85.221.46
+	s=arc-20240116; t=1741437879; c=relaxed/simple;
+	bh=oiZsyTEBTkVmd56xryLqtQyTHZrtzcRyjns0FrCyu2c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Xw2JCnRYJw6y3FDutUgAmprZSDeGNDWg4AvmZyl0MqCLtEzfADi4VINDEQYfmtRqIIuB4P0yty7YsKozNPse1b+tVnivn5/AS0bFFCLfHbMkxO1j2gLwOKG3hrrlSA16bwvgX6yR62af24oQV3pJIr1pdMMybYCyKSpDqHKrFC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FtohmBtI; arc=none smtp.client-ip=209.85.221.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3912e96c8e8so1455708f8f.2;
-        Sat, 08 Mar 2025 04:44:25 -0800 (PST)
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-523de538206so977057e0c.2;
+        Sat, 08 Mar 2025 04:44:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741437864; x=1742042664; darn=vger.kernel.org;
-        h=content-disposition:mime-version:reply-to:message-id:subject:cc:to
-         :from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uig2i7uTRlnXp5H7GvTYtQ0HLJywyAMB+6PP/406QV8=;
-        b=jRG3FM2LpzkGF96q5bIWnPRyCEX6GM68u99RQpfDo1zvxiMIX5eywO4hLAwJ+bNhEG
-         ZEYId5iS1j3Bj7XNK1N2NbEHYM4NIJr1vJpv5ZN1uAZlYDALgCL7gbHT2Id+S8CNLA6h
-         8Fz+utEHnaEa0W9PQ6A5kHEFB4Rmi4RPb0cYfPK83qd9O3D9TW2L9O9kXBguOJ/u0yHP
-         WT5jVUHwrqzRaav6QFGg1MxbqoTIEKs2Gyzd/p6qtVUAoz18YfBGaTvQxjLMoCVp0ezY
-         Zx6M6EbvZuZ3kUcY2ZmUHTDOyZXreF4TwpxABRdc7EZqXbN8GtqSDxprZ/9TEs5oxyoM
-         JcxA==
+        d=gmail.com; s=20230601; t=1741437876; x=1742042676; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zjLgCbeUZ/6GtTJFrbqbT4FRb08XIwkOPOeiOc9bwgw=;
+        b=FtohmBtIQW3R1DN9M6WZfS+NLBjX6BE6/R1o997zEz2i2GkQeHtqDnAA5y+WrKRHRL
+         l9iBXBx0rgRTgkAn3P+MxuSi+Z0791vgWam3uMjpSakrBPfgXdLftlnQFU08UHvT1vQG
+         uT4ofPZpk6+465FdwQTCe+EzBH5OltejqybKI4ZtadLhlv/AQQ80nheVaALfD2k31dQ8
+         IbmEOz4VjzgjuoE8yGPavKCHbsZWhcSNGkGcceGe4hkNenQPB+Tw43RbfCPvBnb9Czh6
+         7uCUOTp4z/U/AsytKzZOJzJrCeAzdsVV5enLG8cJSUVrspSZYYjBlSH4NJTpzzP8XnYD
+         QKbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741437864; x=1742042664;
-        h=content-disposition:mime-version:reply-to:message-id:subject:cc:to
-         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uig2i7uTRlnXp5H7GvTYtQ0HLJywyAMB+6PP/406QV8=;
-        b=TH7p1pIZx9v76jYfQcCC2+7hBCtVPJyIUl85J7++IieZYpY9kwJZFAueCkKMuGUqTC
-         2W+xGzH/WKb3z3aYtN6GcLJmqT2ArGlhegeM2oS4ltMg+iuSd7Q8VHtld5V3MFay9NVN
-         wJyCA7jo4qTbOhVqM/3CjXdBA1+0CFvCFo9W2Cr4Qwjhn2crmT62NwzHMpZRECKoN0nM
-         pKCO9RqfF4vMfgYH3pFv7XZHSnfO3F1ox50pAXhSXGV9uHXW44Nc9TtM92kpqG0kNEX5
-         dA2Z3e+r1pBX8HpymhXmj1w+z1qtZzjdukJPKY1X7yKNDZCg5oswdXusDq3dGNw7HfoU
-         95Qg==
-X-Forwarded-Encrypted: i=1; AJvYcCVOxZtkQahDGxEMkr1KLiB2T3wsXuCm7ShZmUiMMEJqGp/Sveh9r+LER/rgnG0bJoyTc9pZAyI1@vger.kernel.org, AJvYcCW27F5aVkVYYrThmGbWjxFOBnhv5oo2onWXTssZNiat88QUVdBd76xhQel8QHU9cnOe1Fcrd2+7jn+MpHM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfELYhiu6oesGw7P2oo8/swNuAiSasyc9SCZYkFBpsy5qb65HE
-	mhQU0DaePJXn99kb9QaHu9tiPzWrCZxrLeQc4ZA4xrpCmdXJ85Dv
-X-Gm-Gg: ASbGncvcg6uKZnAtQ7Swqv4gBktnkXGJFOg0jETUe9nhtxbpDThpiL3Ufbc2ulyldOU
-	oMvrtQ94nr7OyThEJJI7IcFGN9HGh9fXrD8fT8HHhB8d+Hi1izjs1YF6weWDfgvB/2VE3mOBsKL
-	4h196EqQzUTCUFhhanh/eyLegKw8yWrRnx5IrZRaGyUyeBOmqtGw7TsDhEwdhlv6+CD/PrFJWxc
-	NUUkzDOoo/N0dAjjLG4p0hilE7//n7hMdufHWeIn2Dq17AdD42rq+Xj9ExZiHINq33VOySC/lq/
-	ro2RnBC00tZRIxD44+OSGjjlpOhypTlrNTT75Rlje7Y0xJvR
-X-Google-Smtp-Source: AGHT+IHkV/lb9AVigvP0Lt3MfBIidZxhLRWQjKcFBN1ToLeuUBwsl0D8HQXIlxn9Z0Lc4jfaQ1xj+g==
-X-Received: by 2002:a5d:584f:0:b0:391:ffc:2413 with SMTP id ffacd0b85a97d-39132da08b4mr4502606f8f.40.1741437863889;
-        Sat, 08 Mar 2025 04:44:23 -0800 (PST)
-Received: from qasdev.system ([2a02:c7c:6696:8300:f465:a080:411e:5b2d])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c0e2bacsm8695793f8f.78.2025.03.08.04.44.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Mar 2025 04:44:22 -0800 (PST)
-Date: Sat, 8 Mar 2025 12:43:39 +0000
-From: Qasim Ijaz <qasdev00@gmail.com>
-To: Antoine Tenart <atenart@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, jdamato@fastly.com,
-	aleksander.lobakin@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net-sysfs: fix NULL pointer dereference
-Message-ID: <Z8w7ezFX3T01ptjH@qasdev.system>
-Reply-To: 174124876418.4824.8589202932419197412@kwain.smtp.subspace.kernel.org
+        d=1e100.net; s=20230601; t=1741437876; x=1742042676;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zjLgCbeUZ/6GtTJFrbqbT4FRb08XIwkOPOeiOc9bwgw=;
+        b=JGrUwFSUcQDNFmPeyEq3Kq6aVZugskHE5loya8ejApP8zLQCZHjaxAibtbEZnx2wEn
+         aRC6qwOJG1Cffgm1rQe6YOmt2TVrsTfW1QBCfYNIW8A7Os3+FBeC7gw1KyPulzlKvTLU
+         ZrePHI8cD9ZP48d6DRmW1e8I+WUcjMGErAq5Hh2y5tegRZTpnh+8kVSOHu+M5t1Qxf/t
+         kZZKNkFoDU2iUo0vwuaxPKZt+8g/Q4eu2YNNV587ZqWh6kHgADyLyZndKnMDi8EkNREt
+         uIyECaeekB+TW5aJ0gJzB6/Xxeo9MqJRY5lzo0KwEbVcqXnzphwbVVjvYWnZH5MhF/q4
+         ehvA==
+X-Forwarded-Encrypted: i=1; AJvYcCV9hjT7lzegY3PsvmXlklpZgBAyJmPxYXNwf3FRhPoUQwmZvbek8Asf2yf5aXXqDPFCxcvvN6p/luswYHc1xhdaHkU=@vger.kernel.org, AJvYcCVldglEA+cdrngudeJdaNZFDAPjQ3v2r5ecCy+byjTZE+WaiBWAzkHnulkrl/M2TrRG0iTW04oueOhf@vger.kernel.org, AJvYcCX3wQHjHocBFiDrqTsM0mqRzCYVhb2TNAGwxLFca9FX+kEB5bkmGY9KihXBZrBQf/DSGS0RG+KGOSR8/ufs@vger.kernel.org, AJvYcCX7s2uyW5vIspsbOI9V0I7zPZUzwu/kaRwxWcG0+xrWr76+ErQzcdTluDF9k6aUvT0gSd6ozUm3@vger.kernel.org
+X-Gm-Message-State: AOJu0YyerGMeg2IGvZCJ15B2+mHOWYe+mcwCtxRNho6C19VWnRkVgFdU
+	rIXgQp5WYU5wIedeGwFdCbFKCyf+y4sFb3/OiZe4xgCktrfj9VoGoWBabHZI4HHdcGOJUmAUtCs
+	0w+j8DXAVutn46dS9RFRFQVzbuEc=
+X-Gm-Gg: ASbGnct28LFW6FsmpMaK5JS9g9/+Meq8ScPI74VinSOETwG2j68sD0fSklTEo1vXNZR
+	NKLvrrH2n414yZQAyCWXoEIWhUJI9oRcvAYh4+hKuiCGzjfDbs3kScsQszGxf+q61HQ/e9ryUnw
+	/JhoFIgtSOJug/i2sgc7u7G63TdQ==
+X-Google-Smtp-Source: AGHT+IHJoc+bbVexGMHt3VzRWVQSSRDweRZ7P/5FWPHw6sK7R1mQ7CzHweEAnyKr0rBrEq8ztO703tovvpiwIjC/2QU=
+X-Received: by 2002:a05:6122:2011:b0:520:3987:ce0b with SMTP id
+ 71dfb90a1353d-523e3ff3203mr5408627e0c.2.1741437876356; Sat, 08 Mar 2025
+ 04:44:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20250302181808.728734-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250302181808.728734-4-prabhakar.mahadev-lad.rj@bp.renesas.com> <CAMuHMdX-JwWQfU_hOXY5d_YEzGkyEV-VzFYhrCBFhYtTGEOh1Q@mail.gmail.com>
+In-Reply-To: <CAMuHMdX-JwWQfU_hOXY5d_YEzGkyEV-VzFYhrCBFhYtTGEOh1Q@mail.gmail.com>
+From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Date: Sat, 8 Mar 2025 12:44:10 +0000
+X-Gm-Features: AQ5f1JoumiVlqVTPutgb-pY-THcOabxSW8grlOJS_j7um8pQjQvrody7mR7Pc-U
+Message-ID: <CA+V-a8u8KUgv0xOW9Nf=GFVHw8SibsWjx+ZUZ0Vfq5kjdsMAjw@mail.gmail.com>
+Subject: Re: [PATCH 3/3] net: stmmac: Add DWMAC glue layer for Renesas GBETH
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, 
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
+	Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 06, 2025 at 09:12:44AM +0100, Antoine Tenart wrote:
-> Quoting Qasim Ijaz (2025-03-06 00:53:07)
-> > Commit <79c61899b5ee> introduces a potential NULL pointer dereference 
-> > in the sysfs_rtnl_lock() function when initialising kn:
-> > 
-> >         kn = sysfs_break_active_protection(kobj, attr);
-> >         
-> > The commit overlooks the fact that sysfs_break_active_protection can 
-> > return NULL if kernfs_find_and_get() fails to find and get the kernfs_node 
-> > with the given name. 
-> 
-> If it fails to get it, should we let sysfs_rtnl_lock continue is
-> execution?
+Hi Geert,
 
-Hi Antoine, I think I may have misunderstood the code. Yes I do think it
-would probably be better to end the function if
-sysfs_break_active_protection fails. 
+Thank you for the review.
 
-> 
-> > Later on the code calls sysfs_unbreak_active_protection(kn) 
-> > unconditionally, which could lead to a NULL pointer dereference.
-> > 
-> > Resolve this bug by introducing a NULL check before using kn
-> > in the sysfs_unbreak_active_protection() call.
-> 
-> Did you see this in practice? Can you describe what led to this?
-
-I have not seen this in practise but I think in terms of defensive
-programming it could be a good addition to add a check to see if it
-fails. If a function can return NULL then we should check for that, also
-if we look at sysfs_break_active_protection being used throughout the
-kernel there is multiple NULL checks so I think adding one here would be
-handy. 
-
-If you agree would you like me to send another patch where I check for
-failure and end execution right away?
-
-Thanks,
-Qasim
-> 
-> Thanks!
-> Antoine
-> 
-> > Signed-off-by: Qasim Ijaz <qasdev00@gmail.com>
-> > Fixes: 79c61899b5ee ("net-sysfs: remove rtnl_trylock from device attributes")
-> > ---
-> >  net/core/net-sysfs.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-> > index 8d9dc048a548..c5085588e536 100644
-> > --- a/net/core/net-sysfs.c
-> > +++ b/net/core/net-sysfs.c
-> > @@ -117,7 +117,8 @@ static int sysfs_rtnl_lock(struct kobject *kobj, struct attribute *attr,
-> >          * the rtnl lock.
-> >          */
-> >  unbreak:
-> > -       sysfs_unbreak_active_protection(kn);
-> > +       if (kn)
-> > +               sysfs_unbreak_active_protection(kn);
-> >         dev_put(ndev);
-> >  
-> >         return ret;
-> > -- 
-> > 2.39.5
-> > 
+On Thu, Mar 6, 2025 at 1:11=E2=80=AFPM Geert Uytterhoeven <geert@linux-m68k=
+.org> wrote:
+>
+> Hi Prabhakar,
+>
+> On Sun, 2 Mar 2025 at 19:18, Prabhakar <prabhakar.csengg@gmail.com> wrote=
+:
+> > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 > >
-> 
+> > Renesas RZ/V2H(P) SoC is equipped with Synopsys DesignWare Ethernet
+> > Quality-of-Service IP block version 5.20. This commit adds DWMAC glue
+> > layer for the Renesas GBETH found on the RZ/V2H(P) SoC.
+> >
+> > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+>
+> Thanks for your patch!
+>
+> A few early comments...
+>
+> > --- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+> > @@ -131,6 +131,17 @@ config DWMAC_QCOM_ETHQOS
+> >           This selects the Qualcomm ETHQOS glue layer support for the
+> >           stmmac device driver.
+> >
+> > +config DWMAC_RENESAS_GBETH
+> > +       tristate "Renesas RZ/V2H(P) GBETH support"
+> > +       default ARCH_RENESAS
+>
+> This auto-enables DWMAC_RENESAS_GBETH when building a kernel for e.g
+> RZ/N1D, which uses stmmac with DWMAC_RZN1.  So I'll have to disable
+> this explicitly in shmobile_defconfig.  This is not a big issue,
+> we already have similar constructs (DRM_RCAR_USE_MIPI_DSI defaults to
+> DRM_RCAR_DU, but is not used on R-Car Gen1/2).
+>
+I added this based on the recent comments received while add WDT
+support for RZ/G3E.
+
+> > +       depends on OF && (ARCH_RENESAS || COMPILE_TEST)
+> > +       help
+> > +         Support for Gigabit Ethernet Interface (GBETH) on Renesas
+> > +         RZ/V2H(P) SoCs.
+> > +
+> > +         This selects the Renesas RZ/V2H(P) Soc specific glue layer su=
+pport
+> > +         for the stmmac device driver.
+> > +
+> >  config DWMAC_ROCKCHIP
+> >         tristate "Rockchip dwmac support"
+> >         default ARCH_ROCKCHIP
+>
+> > --- /dev/null
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
+>
+> > +static const char *const renesas_gbeth_clks[] __initconst =3D {
+>
+> WARNING: modpost: vmlinux: section mismatch in reference:
+> renesas_gbeth_probe+0x1e0 (section: .text) -> renesas_gbeth_clks
+> (section: .init.rodata)
+>
+> Please drop the __initconst.
+>
+Ok, I will drop that.
+
+Cheers,
+Prabhakar
 
