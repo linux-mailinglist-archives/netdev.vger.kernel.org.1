@@ -1,130 +1,129 @@
-Return-Path: <netdev+bounces-173184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D838A57C03
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 17:35:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A1F1A57C3C
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 18:09:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D0AA3B03D1
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 16:35:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D50D616E939
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 17:08:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8C911E1E12;
-	Sat,  8 Mar 2025 16:35:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8865E1A9B29;
+	Sat,  8 Mar 2025 17:08:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F70o9oYp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ENzzTTAw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62D6D1DF97C;
-	Sat,  8 Mar 2025 16:35:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0410D383A2;
+	Sat,  8 Mar 2025 17:08:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741451736; cv=none; b=qx6oZ29ykkmQ9xHokmb4HLzDebXrpgvvAXHuISJ0E/poVmyrOsawaGVPiYuUPU0U8E+wHu7qffkqgDBedm2YzE7OzkGju5G1ulPZK8KBWg2tX6yO5gqGQ0qFRKAdI7roVod7eQUZNgW4DQOLqM9Ke3cxRDL2IX76NI0jIAvO7Cw=
+	t=1741453736; cv=none; b=XYj+BRwgcKP8Sv8H4jILYuxqmHT0G6go8MFenpIO3Z074mkRTBkuTGir2T5jULIHOprElQSpzrjbHC3l6wJxTe5zyJT/pe0W18iirgp43UlMGizbkZ1mX5GMzM5YQnIcY31utNWj7LDTB93ds5BU0ZjfqwF6Ik83H2xgFcxcofo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741451736; c=relaxed/simple;
-	bh=RIwW7eO1EJwvrd3VVoMhJVapyB6IvOmF9aB7VdpAhZA=;
+	s=arc-20240116; t=1741453736; c=relaxed/simple;
+	bh=YrA7wd8n7NLqEVAxegd9y+Av4QEBqHIaZpXSN7Muc+w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PZqEazYaaiZe0k2QtyGl/Sr4J2Izi0l3yg2MSs+HL2MXNPPqmQm8V8pkWDG5db2iZ6Hvh2/U48O0TPqWtcwN853pUOpy8UeWj+GZowPf1bCu7iHWmTqI3GfjZ0jcE6JbcmQmVJ/4Am0Mk5TaSV9E+4ZweSod17XEge6iRrstPKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F70o9oYp; arc=none smtp.client-ip=209.85.216.44
+	 Content-Type:Content-Disposition:In-Reply-To; b=DEF6dcvRyq34MaveM30oR+xHvIJEwr3jLDaN4bylEjNn+xQPXl6yfXFu7AL+uRgoN1mV3xI+NtZxOaDUK7Jcb39Q26yw/ifyj+1A7oTXi26NWqvm/GTLhM+GT3kcVjEoWrmNB6H5T3BMQofSW6QjvkjoEgUyagI3H/6FKe1J9Dg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ENzzTTAw; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2ff80290e44so3469094a91.0;
-        Sat, 08 Mar 2025 08:35:35 -0800 (PST)
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-224341bbc1dso23699175ad.3;
+        Sat, 08 Mar 2025 09:08:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741451734; x=1742056534; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=E2ixVN08UWIJynEo5bLIccBxGvDmgvF24wCvxvnHlHU=;
-        b=F70o9oYpSWJ5QmWtw+8J2aOuRdrD5j1yLqxVS/BuKz16ZHgh6lN2Clwp94oNI+KsCJ
-         WtdvPDieucUk+jOdir4fI+R9wenkEDMAREfZn2JU+Qn16nPd7IQZAZaWqog0uZWdICeA
-         klzlVQjzKHZXsnHI3I3ex5emY05ZJcqz63RFoeadfjMuDJmPdIP5o/SKsFfFWFpMux8A
-         FeB0HjBKbaAyAOWfI1yOYws0aKCo8M8xxtDyvQOOYOXLreaDaaK6eSazY4sG4gpedlja
-         KvEYAYm15tYzlr1eB0xOTpSGSEqCB9iA/q7v37+TPJaQnnpuXf8oxz7GWzmjyhdiOUj+
-         IGIQ==
+        d=gmail.com; s=20230601; t=1741453734; x=1742058534; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=4IcMf84uhZ1TJoFOuLgOfVe7+B4onn10+WD0mzIT9m4=;
+        b=ENzzTTAwRBwxma4dIAk3Xuti416AORrZnEtmJD7N8fsRX+HVZV882Kw774b8UP+8iV
+         u6qhD69DmObqgC/mLyV9ZefdrWeeCGY1WaKzsMDHFe0s8mPOIdFt1tVFjbVpyvT4EuCE
+         r9R3q4YblY8lmmyEA0BQKZYntBVlpL0XkRy+C/gky4q1F9ujIYFf72UzMB8x6c51haRT
+         JmsocNEQ6jvgmke5ZmapC5OxnDYXS6p2ZfFy4kUV3QJyabJeQvo5PMi9nNrTJUN0MKWe
+         0CSKtXEqGl6GRbaEwS4akZX+IPZssoyS8hnDRnKK+zkoubqRHCWdWvyb16s+77oKDJyB
+         FtTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741451734; x=1742056534;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E2ixVN08UWIJynEo5bLIccBxGvDmgvF24wCvxvnHlHU=;
-        b=XimYeHZSgF0DciO+3Pi9oWDNMphdgYMQ3e8vrjXjSco7bMm7ibWYDIyBCaJYMyKnLL
-         CeJTI72OQRbGQ9xxOYIDc8JAq9dtsyvcPiiYJvvAIxO20D8U+R96w9122gJ+bk1knQNh
-         BPu131iaRT1iWcTCRGGLHYEl9VHqWBLQcL7oDtoOtDQ57vuPjJ32+vTaRSyIEpfZCkcS
-         2lS4/wCmXTvZ+OJk4IBhbAkj88E7MlpZ2tI5hANR2dyFQvBdWKTxV5JW+mC7NFbaRnRO
-         r1UnqJxYzUOfy+rGqCJmPbayxY3ozV5NOXX7xOXSh7L1tTbsZHEeIxPF8aSGng1fM5ha
-         msZw==
-X-Forwarded-Encrypted: i=1; AJvYcCVwhRno8YNxNXsvqSjGhTDtM9qrX5Xk4K2AuY3wuhGxnkgR1dxzB/luxWRh9zsSFhkDTQj3dCVW37DfXuQ=@vger.kernel.org, AJvYcCWVrRgeUk2p9ecGXY+hLwjWRsQSZVfzsMHo/Pl/4nTKV5CxMvicvbpKhQ6ewsgAWzbOxyrlq45d@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSrIwb/3snvoV8t1bwp1WspfkzZIozG3qpHt1Af8lxZqZzmeUn
-	9NYHuV3d5FyMfwK2lgxgQFYNKYu8L0MyaICiKtCj1Gr7CHLwbIy6
-X-Gm-Gg: ASbGncuIhfTskX0BuX2YYTgQBXduBCWX/ux43R+Pw+mkDwlcbSguxScUUsz5ImzexVu
-	yQkpAbjVYSo47KLGePXzhBM8naQ1sHKROfpkDf9PXljvoGiSmpwG6/AgJZUzsrICK6Osemx04MA
-	YEebcINxgTN32ej61hm5jNcGxp7q3GLHHSprYjRmMUaryYFyNwPLlxPKfetExNCFCYM1gWvyLFw
-	lu/5i4Xek0/2pYUKR6seWZXmNMwmcuXH+2qY9v1190+5uBX7d/yepdTgC/viTKnRTScnX2n1+l7
-	rFhJpcpn21yXKYIOkVk78aB/6S7Owq4avJOiXBI3/Z4EBxs=
-X-Google-Smtp-Source: AGHT+IEllU0GwXPBCLuRcx/4+jszmSTr/axljfzv0oTkjgVskpmReKjT67EUiTsOqkWQmkdwuEEi0w==
-X-Received: by 2002:a17:90b:1f88:b0:2fe:b174:31fe with SMTP id 98e67ed59e1d1-2ff7ce7b3c1mr12704804a91.2.1741451734474;
-        Sat, 08 Mar 2025 08:35:34 -0800 (PST)
-Received: from eleanor-wkdl ([140.116.96.203])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-224109ddbdcsm48671545ad.51.2025.03.08.08.35.31
+        d=1e100.net; s=20230601; t=1741453734; x=1742058534;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4IcMf84uhZ1TJoFOuLgOfVe7+B4onn10+WD0mzIT9m4=;
+        b=RzZf1RVpK3IUGpntmJL7I5NY/ov/3K+QjVe/GYWvkGAopE7+IPN4nodNP5xRo6/JNt
+         CGwvZ8mnJGV/0ANrSi78tnUqq3rBknHzzILXzKZUqv2MLkLjfrMZC7CeoG+AO0zJejdz
+         2XDqJYTfvytXhuXOznaMJR6XLOEY3hnUC5lpvF0WvJsUORDFvWz4KgfYisQ6h3RGcAP4
+         jboFNn3LUrnuQAFXPaNs6Z2Yd+KQP70IgKwB7qfUss7kw0ZfNY/Dr/U3i6oMgU+Enod/
+         ShTRkHjuwe5P9VscF+KCa8nrk2Oe7sYKWbQ1C4wBRZUPytaeVcBE+R8uZPZMqqj6KcxK
+         OC6w==
+X-Forwarded-Encrypted: i=1; AJvYcCUuQUWpx3GTfVp1YTaYgqX6XGwgQfarN4YVMA3azqLSBno/LZzFdB4WFrieItq9bIDP4Q32UzpDUbQ=@vger.kernel.org, AJvYcCVI5bp5UB+CivUqCYaKKvIEjVdUDfcdJzYwnc9uaNdmOLcp09rcP1h29md4ciCJ4hySycZa1SzfDGaxzWPcTZQI@vger.kernel.org, AJvYcCX9IXE+h+rT0ueZ1ghXNGRzwN5fWZSQBjyRVpTaayuKbkg2al0Kgk4mg+DRvEjx4ijhKqJOeKlI@vger.kernel.org, AJvYcCXjBMdWkxBMR/Hd8JCdwQaxvdSjitqH23OD0KbM0Zt6iFTXHD7khCWhHBQ3YC9o4fMwk9j8GlPY3fRIfj9Q@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6mIWEKy7BuQBd1rpViUwkjm32qBvfeCEoRtPO8q8vqF5VzmKq
+	7yuXlnNcZz7x3t3sDRqZNq3pboJktkO9fs+Klm+nKw1+LmtF63w=
+X-Gm-Gg: ASbGncvaxlvOBZtA4Sno2DFHt7rsBiGXpd4/6/GTuSlOA3Es6uMNIBsQa73NgUexMRe
+	QUIihyfUrpp/Lwul/agvTeGZdrsngGkEuvUd3fTWFLXDEZDDBOfP3nlqQban9xmplB3LNAsSlrY
+	6QaJ7h4shDMiX4EkFMj9FXif0Qx6HYZcIYe5dbYpQDPuoEsDMEqVTcutfcPDrJ2T1ZFnWjNsgHl
+	bJemhruvf4SYrpGi7jP7lk6LbpxNB8puYdLkI9betjDKPlTJXyHn7Z3NZ17lVrk3ITbGvHs2lIh
+	m+sq9wRmkgps8ufJ7X/7AR8Z4uObhp9v9Gp0h7yxYaDY
+X-Google-Smtp-Source: AGHT+IFRZHlbgFDOueySaqdPee3EawbUTko5dKs36Wbsu+tzE6PWqif1pLkL8NZFxLhvNX2+zZW8Vw==
+X-Received: by 2002:a17:902:f78d:b0:223:5ada:88ff with SMTP id d9443c01a7336-2242889d1c3mr140941825ad.24.1741453734162;
+        Sat, 08 Mar 2025 09:08:54 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22410a7fa3csm48879285ad.110.2025.03.08.09.08.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Mar 2025 08:35:33 -0800 (PST)
-Date: Sun, 9 Mar 2025 00:35:29 +0800
-From: Yu-Chun Lin <eleanor15x@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: shshaikh@marvell.com, manishc@marvell.com, GR-Linux-NIC-Dev@marvell.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, jserv@ccns.ncku.edu.tw,
-	visitorckw@gmail.com
-Subject: Re: [PATCH net-next] qlcnic: Optimize performance by replacing
- rw_lock with spinlock
-Message-ID: <Z8xx0aN4vA7d-73i@eleanor-wkdl>
-References: <20250306163124.127473-1-eleanor15x@gmail.com>
- <20250307132929.GI3666230@kernel.org>
+        Sat, 08 Mar 2025 09:08:53 -0800 (PST)
+Date: Sat, 8 Mar 2025 09:08:52 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	horms@kernel.org, corbet@lwn.net, andrew+netdev@lunn.ch,
+	pablo@netfilter.org, kadlec@netfilter.org
+Subject: Re: [PATCH net-next] net: revert to lockless TC_SETUP_BLOCK and
+ TC_SETUP_FT
+Message-ID: <Z8x5pI0suqOiZPId@mini-arch>
+References: <20250308044726.1193222-1-sdf@fomichev.me>
+ <CANn89iLV6mLh8mWhYket7gBWTX+3TcCrJDA4EU5YU4ebV2nPYw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250307132929.GI3666230@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iLV6mLh8mWhYket7gBWTX+3TcCrJDA4EU5YU4ebV2nPYw@mail.gmail.com>
 
-On Fri, Mar 07, 2025 at 01:29:29PM +0000, Simon Horman wrote:
-> On Fri, Mar 07, 2025 at 12:31:24AM +0800, Yu-Chun Lin wrote:
-> > The 'crb_lock', an rwlock, is only used by writers, making it functionally
-> > equivalent to a spinlock.
-> > 
-> > According to Documentation/locking/spinlocks.rst:
-> > 
-> > "Reader-writer locks require more atomic memory operations than simple
-> > spinlocks. Unless the reader critical section is long, you are better
-> > off just using spinlocks."
-> > 
-> > Since read_lock() is never called, switching to a spinlock reduces
-> > overhead and improves efficiency.
-> > 
-> > Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
+On 03/08, Eric Dumazet wrote:
+> On Sat, Mar 8, 2025 at 5:47 AM Stanislav Fomichev <sdf@fomichev.me> wrote:
+> >
+> > There is a couple of places from which we can arrive to ndo_setup_tc
+> > with TC_SETUP_BLOCK/TC_SETUP_FT:
+> > - netlink
+> > - netlink notifier
+> > - netdev notifier
+> >
+> > Locking netdev too deep in this call chain seems to be problematic
+> > (especially assuming some/all of the call_netdevice_notifiers
+> > NETDEV_UNREGISTER) might soon be running with the instance lock).
+> > Revert to lockless ndo_setup_tc for TC_SETUP_BLOCK/TC_SETUP_FT. NFT
+> > framework already takes care of most of the locking. Document
+> > the assumptions.
+> >
 > 
-> Hi Yu-Chun Lin,
 > 
-> Thanks for your patch.
+> >
+> > Fixes: c4f0f30b424e ("net: hold netdev instance lock during nft ndo_setup_tc")
+> > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 > 
-> My main question is if you have hardware to test this?
-> And if so, was a benefit observed?
+> I think you forgot to mention syzbot.
 > 
-> If not, my feeling is that although your change looks
-> correct, we'd be better off taking the lower risk option
-> of leaving things be.
+> Reported-by: syzbot+0afb4bcf91e5a1afdcad@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/67cb88d1.050a0220.d8275.022d.GAE@google.com/T/#u
 
-Hi Simon
-
-I perform a compile test to ensure correctness. But I don't have the
-hardware to run a full test.
-
-Yu-Chun Lin
+Ah, yes, I was waiting for a repro, but should have attached the proper
+tags, thanks!
 
