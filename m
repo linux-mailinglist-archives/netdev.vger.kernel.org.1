@@ -1,143 +1,232 @@
-Return-Path: <netdev+bounces-173124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8519AA57716
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 02:09:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B137A57796
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 03:05:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7632F3B6C21
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 01:08:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF97B1899740
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 02:05:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 780E980BEC;
-	Sat,  8 Mar 2025 01:08:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D8812CDA5;
+	Sat,  8 Mar 2025 02:05:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="FVrXrqgu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011011.outbound.protection.outlook.com [52.101.70.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 031CABE4F;
-	Sat,  8 Mar 2025 01:08:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741396126; cv=none; b=LGEHisd+sI3IrHJNMERKNCjxnxCd/aL+LXidt0OnTNELZhPEscFM0sru8EjjCg+leSHvSmAUSDDVcBt6Tsf8D7mK6NxtgSJDGxHsvuXF2+cF6fB7BtUH305AbOhPn7c5ffAhuuNM+gz1rccNjevHkZRTH+4XsNlYO69XEBUlWu4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741396126; c=relaxed/simple;
-	bh=wwil/2v41H0XAHT4WhGN3oUbvCK5TX1lOhPw1rpP4vU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KM+pzzL1eJDHxDcUiPnLZVdZ5I5C/nvk9uaNZlRnlBXBT1g7CQMOteNXAFkxagoFKwCYszpIf8XJQfsjDxM5zXRbo++7h9SpJd8/fVMsp1kUSnokyWsWbt5kJ7x4xbOxKl5F6VKvH84APGUN1fBaX8SVmC9kiCIitAE1QT1tt18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2239f8646f6so47136245ad.2;
-        Fri, 07 Mar 2025 17:08:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741396124; x=1742000924;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yZzG6RJCUE4w9vBi92LziU0iLdE8HumGGZ3TnO1HuEk=;
-        b=aaVC623Ez4+gTatItGjvSZyumQFNEdo5ZhpNwhf2TmMWR6darINkVPQCoqNJMbwvU5
-         DUSMENzSFPk7BZmDTM+mV+S5JKSIx9NfgbfOQkaZoXezdt1j4XouA4wI+vajp/XwGV9m
-         h6sxR1bybuHIJlK7uFvLWo6JyIxOTOoIOPoEksMpDP7DbFWstXUKyfEKyR5sECDuUUTK
-         Ah2AQPsAxvfdPlejiDbuqIfc1x2dDxNRDCjHz1PWIU6yD4ZNYzoZNX/sVTUcwLe5FYT7
-         OQnE3jSVh+6m2RfQkZ8wosb5Uq8sUrjo/joqMGRIA6gTzCQYgvWysg1eSNFM5dmfCPax
-         iW5w==
-X-Forwarded-Encrypted: i=1; AJvYcCV5wJuWH9kGcjT+OyyiQFIbL5Rndqw42RWyZgO0E5b3ycOaUx8xBAW2dSJE7z5zL5Rt1rk7ZG1RJ7Pj++o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYeDYNtzKqS8wma7FQEsbcbZy+I82ZcvETpIUetlTMl/ZIbfha
-	2Qgv5KX6tL3LLOIHeas4SdPzN+M7Xay4DE5Go1+gXS6+k75fbRXf3Ie6
-X-Gm-Gg: ASbGncvV4E7Wiw9yyE5OMdzKC0M2ZqCKbonho8gVOVn3TehqqLp3DuCrbbFpK3lo5BW
-	TGdgWPr44dMGU/eXFANNdN8mtyaa3UEhhcQwiPDPFxX3O2/lCXAr11kE8991X5fe8/+OAdyiV6x
-	9hoTpVO75Ivf8CCoaq1ciFDkBWF/LdKOUr7M/S1rMpcgJaDQqC7AKY/IIZlGcY5fnE5ea+k1F88
-	mlR1ERLP+bGla/YmPldFTZzJo/SA8Ee8cmDu+YzK9BWse5czIPk09SkG7D9Y963DjFMAcqx4Y5U
-	KDj/U552ZsGzHZ7cFemXCff3YZrJW43qvIxPEDpNi110
-X-Google-Smtp-Source: AGHT+IFLicPF9DYHopLUsyxSlIIaJHPsUCyq/CCGJkidujAVcbCjmBBrELmykKF33i3geS5NWWBBWw==
-X-Received: by 2002:a17:903:1a05:b0:224:1294:1d26 with SMTP id d9443c01a7336-2242888bf0fmr79353515ad.13.1741396123952;
-        Fri, 07 Mar 2025 17:08:43 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22410a91993sm36754865ad.175.2025.03.07.17.08.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Mar 2025 17:08:43 -0800 (PST)
-From: Stanislav Fomichev <sdf@fomichev.me>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org,
-	michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com,
-	andrew+netdev@lunn.ch,
-	sdf@fomichev.me
-Subject: [PATCH net-next 3/3] eth: bnxt: add missing netdev lock management to bnxt_dl_reload_up
-Date: Fri,  7 Mar 2025 17:08:40 -0800
-Message-ID: <20250308010840.910382-3-sdf@fomichev.me>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250308010840.910382-1-sdf@fomichev.me>
-References: <20250308010840.910382-1-sdf@fomichev.me>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7640514A8B;
+	Sat,  8 Mar 2025 02:05:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741399541; cv=fail; b=Geo9NY2psp+J6Z57MUVlxHLVMMH+Mk7c5rkVQJIUkGvac3pWbgY3Z92b5P/FKUrXPlb/obKtxuSxS7Md8OC4x9Jbl3+RSKAxuZIOgumRCfmaJpD+0zuKqG2hSWZAA3hfqS5/zr5+Lc0etod7Ur2F8/gWm+qqj9G8h4eEOU05qxM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741399541; c=relaxed/simple;
+	bh=ffoPEraNyHghScq0TwmnUBOnvCYjeSwjaUA5TT+GxN0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=g/cXL6j/0kyNmeir2KhBlcFY5gyYU62VC/5IYAbPNivQZV3ySYZnibUd0gb//g6pLSJK8WldXMwymdXfGCw06utFtxjA/KSWM2tZAL1hBvyusW88LtwEWIVjsL9w+5a47X3Mikc2kmyW1kBXRQF+Oz3JGG+Sy3rpOcRwdMuBkOQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=FVrXrqgu; arc=fail smtp.client-ip=52.101.70.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=VodN8Y76iZyL8wzqlYvXBLHDiV9SKplWRvaO+ds6cOz1ZmctDZvSH5LAgM+EoLcUiTN9qwdGd7QHyWm7Tf+lr2BhNr+8gVcFqr632UcoNg09A+mqaM0XxpgAY36P+dAm1/vJ944qEUqcGRabq7nTBo/xPanvkS26nMfR+2/0V3WZBIxef1mbXrUNq6lNCCxqzYq1Fr5zHyrbhr09EtSgZlCnb3L3UNRdvYFURMCL29Cktk4EuFSeGhCjtjjSWXuPuyLhhaDushjA8nk3+Txtrow+xeQi+iW8c+FbhFcHV5BpOidpSEW8Mf1UvGw2PXzdBu0jcsU8tJ8t5eNpByC/TA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=e2PtgFb6B6Nsje0z6HDmc1vvWNo0dV1VutTqdYOm1NE=;
+ b=BU2IiRdfzMmyfSN6+aLw7Xv+6Qd1adJwMy8XkodN3CbdjHZzfTbWPeD7yXKADrh9a2uh5fWhd3iBClZT7sx82FXBdDtr32vnD29TQp3fGyg8QjPDuysGZsN5YeNhnIjI/W9Lycq4WXHsIv5pMRk1wCkdmE7h6Xzm/qNrVO2KYX/7YeEBE2kjxfgI4pphdfDa8zVPUhUWue/hgpSU8fqKgDtqwvLdgX8cR3hR3llhsHsFk6Clfm/NyImktf18DOuqOxmALklyVu0gv1dHYtQLLmaWQCQvQF1Q3kwH0KQTbW/k924RTjoYJeOP6r16JomxPcnltvyprWhp4BcUIIJkXA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=e2PtgFb6B6Nsje0z6HDmc1vvWNo0dV1VutTqdYOm1NE=;
+ b=FVrXrqgu64l0DByk0AVVLgmPJWFD/azs6SNJWOZad8pu+l9guOXhE6tqGdLAoaZFgQL63zM0l5dyJNVIObYws6PblBG/HViPOt3CIEXfs1Iicot6ZPlge7zb3Rh2QM4aTKkrQTJe5RZkWkvXumi0MHotAJnSzOJcpL5Etf4r2vnQA67qRDEYiVIPtQ5v4RcHeMEjaEnamV7xYKQ2LQCdTzsJTZVEfD+YdtKS0qhad8Vwtj9DGSrUYS08oN/TrWrpKH9rqGsB6M0gA/J+z0fRFmHLbL3Se48PQtCC7rdNuEMvg4ffhazSNosGZCTnBTJnp5gtDcwUqjbqchRnci/mKA==
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by AM9PR04MB7668.eurprd04.prod.outlook.com (2603:10a6:20b:2dd::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.20; Sat, 8 Mar
+ 2025 02:05:36 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%5]) with mapi id 15.20.8511.017; Sat, 8 Mar 2025
+ 02:05:36 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean
+	<vladimir.oltean@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "christophe.leroy@csgroup.eu"
+	<christophe.leroy@csgroup.eu>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "imx@lists.linux.dev" <imx@lists.linux.dev>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Subject: RE: [PATCH v3 net-next 01/13] net: enetc: add initial netc-lib driver
+ to support NTMP
+Thread-Topic: [PATCH v3 net-next 01/13] net: enetc: add initial netc-lib
+ driver to support NTMP
+Thread-Index: AQHbjNiMrmwkTzPG206zUiHxDe17mbNmtIkAgAAxcACAAZzhYA==
+Date: Sat, 8 Mar 2025 02:05:35 +0000
+Message-ID:
+ <PAXPR04MB8510771650890E8B7395B2DA88D42@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20250304072201.1332603-1-wei.fang@nxp.com>
+	<20250304072201.1332603-2-wei.fang@nxp.com>
+ <20250306142842.476db52c@kernel.org>
+ <PAXPR04MB85107A1E5990FBB63F12C3B888D52@PAXPR04MB8510.eurprd04.prod.outlook.com>
+In-Reply-To:
+ <PAXPR04MB85107A1E5990FBB63F12C3B888D52@PAXPR04MB8510.eurprd04.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|AM9PR04MB7668:EE_
+x-ms-office365-filtering-correlation-id: 4b63c16b-4bf4-4eb6-e821-08dd5de5b744
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|376014|7416014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?rvb23W07Mos5lUeDZstJUfiTns7O5ZqVmq+HwOcztePtunzfoXOKxV0oTe9h?=
+ =?us-ascii?Q?Hanrh4TRAbkM5+uqgQI35+8ai4CQ892EyFfQCYiaeIy6CkLsl4p8F07kiXok?=
+ =?us-ascii?Q?1ojT93fwU2uRX457EmpE14jd5xalCG64LIdkQKkwP6Jn209Ahb2rm8947wSN?=
+ =?us-ascii?Q?QUxqnrYk3OYhNSFkehIYukOCmtzUd5rBIIxUMX65YdZzY2ijtDbtdlmHrSmu?=
+ =?us-ascii?Q?9HwDMD4P/50HzY77RCMnQQBTyqovQwakuoOrvntg67XfekM1XVWuFmNQkXF/?=
+ =?us-ascii?Q?+WIO0Q2eqcXwsRnN4u2uhb0lrLjcmgpJs4uXEbuQIZWYlqKdjDaFt/C/BFoL?=
+ =?us-ascii?Q?XVW5ARvgepSxvfygJ2HGI0z6lDI1QBgFOeiffXbjutHL7PMZHVRuPjSojy8h?=
+ =?us-ascii?Q?om4RpmA7GbowHWEbhSiWFKj5fJRdZ02G/34aaAHIKiw0qG+LDyhVgLdx0vRJ?=
+ =?us-ascii?Q?wd9DkLFjHl2Z6RMVT6DwgQ+1Ua9k9Pe10VOgihiyvsBt9Fh1pyf8AoS/cEII?=
+ =?us-ascii?Q?uAlo2qaS/fm6kuTvV6l43rEIB5yqFhPsqkC2RFhYGz1q8L1w1tVM6ensvMhr?=
+ =?us-ascii?Q?4IxMQMZpgUmg6W7yycv8LgF4aGtJ25BowmdZc103lMfNUkeYTIxLmkuNF3R/?=
+ =?us-ascii?Q?fRxaE+XEx0ZEAayCREAnXLs5uyBgnL5xFkOu9OPVt4EGaWSQKdaR3Xb7uhzy?=
+ =?us-ascii?Q?IY5xz0g1HOyuWAF18bCeikf8MgAML4LTuKZA3vtYYDTIqgl+WhAMJGzCOQVX?=
+ =?us-ascii?Q?WUf6ziShDDmS0BKI35jg3cJXh38DtdJ2ov2T96lyKrqg2Xkoq2YA5YfAcE6C?=
+ =?us-ascii?Q?CLAvz4sNsVgXgVYnOOwVkh4AtW2VhHtxjJzAS/4iB23KLlRL8Hf5LxeHMt2B?=
+ =?us-ascii?Q?zwOxIiHvNlEbTFwV2aWuapU9fh1aU87MYwym8960BuDuVdu6eL9zcq1KkRob?=
+ =?us-ascii?Q?cZeMB7amFTEjfGGRzbYsh+bJGuO5gEzAXLmBU1x98+lOB0HgUYd9ROUOQ4cn?=
+ =?us-ascii?Q?Ip3jXj6Qoy9Kr2gz3JUtzA1bBPPn5CbYcz6XMyxf7LJgn/ZUrbKduKxajBt2?=
+ =?us-ascii?Q?U5DvL+SguzbZ6uq1EzzOyZtDf8w2DC8oqOQPBXSvSMp8yOWI24unUK6Yz2Gw?=
+ =?us-ascii?Q?q89Tzc45qlHPwu7hhgpl+YFzNHXNSgmTnHtDcTGfqw83VTrbSjisIc0F+Tf3?=
+ =?us-ascii?Q?paxYq50R5PKMD6+U48xleb6cS0eNTZw7UCDXha5sPmFcetCLsjRt+FAsaTJf?=
+ =?us-ascii?Q?79lq6/5xBXbIMFHn/QZd/GWFsmxSl1MNbJtmZi5lQVlp01BEQiEoEFWQEbcx?=
+ =?us-ascii?Q?7wY2mfL4Bhc9Hsesdb/vfeOXgF8D4A1y+6XkJ76xmRsS3ya7gmXw1syc1fPG?=
+ =?us-ascii?Q?37yO2gjsW7DhEf1VP4irIHqfKxMTpXIGxz6OnPaO6hna1OWHX92o9SUCf+YW?=
+ =?us-ascii?Q?mxOOHEd77ZlPa9MQoTgpHJBzjCzj952o?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?uLJ596OwPwJQJADAct7Q+a5yd4gpilvyj0RjzEW5d6xI3MZ1aLgrLAnYLFY+?=
+ =?us-ascii?Q?/sX7cvRFBZUbPYQ2OeI29BQv7CB4j+SBpegOHwKaeAoafLeIJAOBkfrTVu1T?=
+ =?us-ascii?Q?wYLojGcjfun/cuxrUrET2GdaJAKMBS9Iqbg3QZUJzn7cS6Ymr/PQjJpqk5Us?=
+ =?us-ascii?Q?J0MRXwPZLOrJV3i/BZ0ZJNxj/6ANdhEpAIYRaf6nyL4EMzFO+2MWGAyVrCQi?=
+ =?us-ascii?Q?eZCQSIP0r02BbI29QUrY0g8A4IF3fCfcj+c4Sy4RYmTEw0Jl6LWrcuob7xmh?=
+ =?us-ascii?Q?Qb/x3X1v/N97YG9RzV8YlcRSP9bLG+wxyMovimDZGKkis6LxQ0ZLJVJRGzSN?=
+ =?us-ascii?Q?PqXL7vO9XA9UYhaPHRNoKJ+c03Fatt30oWxMcy+CMHdFfIRnQ9Y4iSlNXWlj?=
+ =?us-ascii?Q?CZLRnOAmyhzr3qI3+8qGIcTDmowLedH5yNy54+DxsP0Z5F5EjdLRGriV3esY?=
+ =?us-ascii?Q?ZyT5eXtLLbunNm396WymX3NaMzkP0bLG3lIg9tkl9U4yu0Y/5v2vWnSn6GWr?=
+ =?us-ascii?Q?AGHyBqH65DIpaJu9RgkicgEXfBzxjnbZewCuNJvcGjoIbSXPVjpJVD0XkzTx?=
+ =?us-ascii?Q?/CHPfnhXyp7iYYzrRynE8YrJy9TX3YNjjdTAw9M+ncvi4bQKxF3mmaX/avXz?=
+ =?us-ascii?Q?6gxSbNCS6odnkYDtkHx++ZUc0OUSgpXn6QJCN6hIa1gwZeowpJYoSEwgg6NJ?=
+ =?us-ascii?Q?toV00TZ3VUT1b0Bw+xTf4wWHnZczmZBUYrHrafQUDtQV+XX8DYoSeYDb/C9E?=
+ =?us-ascii?Q?p2kHbEZmhFNRZ4pxMpbou8V6D9oErubEWBLnSs6AxQdbcyExxTy/5rVKrE0B?=
+ =?us-ascii?Q?Cl6IRmuhZGWD2kvhS6llvASvXGEvDgg7bsdRDEAPos2rmRzkp7CtdxAZMK6f?=
+ =?us-ascii?Q?dVmQ9UwxO5Fjtgflx6Pq9cml74xRHpfAgBRxJ1/vXv/gRcOq3lmW8XOV03lG?=
+ =?us-ascii?Q?oAofRot7HzYtowHVK7+WpIbsBNHp034siNqpxw4ALaRbGeMVjzZoSjMNQn/H?=
+ =?us-ascii?Q?cDkxA5OACXUAatOra4HG9yyi7gtvJEV435BM9z/TEGiHUuhbQaDy6wvvEKMy?=
+ =?us-ascii?Q?V8C7JbcRCMo0zCP/wN5cbNiC+/jB7fJmWNbP6/9KUY7FA3mliAKiwOrHL6Ng?=
+ =?us-ascii?Q?WNegSNthSlwlch2//wDgB8noLgQMskicZMX93/urqGNKqEcyJQmaFwtEK1+9?=
+ =?us-ascii?Q?cqs7+PnJ1sPa+l6ElN6NeDDf9vWaJgnB9qsIs6G6bwM8vBkOJnOazGlFfqFF?=
+ =?us-ascii?Q?D14qR461N8YBwtDS9WMjTpzSLfbS1UcWQ6BavceZrrS6Cj4F3EbhYcZBe9ml?=
+ =?us-ascii?Q?vVreVZAYi/hyAwWeLGi0K8XDNMnkoBdbF2oe/IiK72J6wVuIOZycu19b6I3f?=
+ =?us-ascii?Q?17bXgorLMVMh6OthIf65AD8G//6Bh6aR8Mpi+GiBnPSo8BE1vp6ZrtCgFtsA?=
+ =?us-ascii?Q?IJ5/DgztE0dcWceAVCLq2PjIT7/syeOp9hLpyviL6zz9qz/2ff870LL4W5EC?=
+ =?us-ascii?Q?/TfFu57rApDZSeU90+VoOjSMqJd2i0LOrGoxAuvB+xikTZX2wYdoEIV9eg4m?=
+ =?us-ascii?Q?j+lbAa8CeL4WVNTsiUY=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4b63c16b-4bf4-4eb6-e821-08dd5de5b744
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Mar 2025 02:05:35.9994
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: TFems3hoJLgJ3d0gZJxEgaHsiPVl3NcXLJqLyjU3HncN9QGnuv2YU5pr5t77EmKUp++F+aRkc7DYAcPGUUz16A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB7668
 
-bnxt_dl_reload_up is completely missing instance lock management
-which can result in `devlink dev reload` leaving with instance
-lock held. Add the missing calls.
+> > On Tue,  4 Mar 2025 15:21:49 +0800 Wei Fang wrote:
+> > > +config NXP_NETC_LIB
+> > > +	tristate "NETC Library"
+> >
+> > Remove the string after "tristate", the user should not be prompted
+> > to make a choice for this, since the consumers "select" this config
+> > directly.
+> >
+>=20
+> Okay, I will remove it.
+>=20
+> > > +	help
+> > > +	  This module provides common functionalities for both ENETC and NE=
+TC
+> > > +	  Switch, such as NETC Table Management Protocol (NTMP) 2.0,
+> common
+> > tc
+> > > +	  flower and debugfs interfaces and so on.
+> > > +
+> > > +	  If compiled as module (M), the module name is nxp-netc-lib.
+> >
+> > Not sure if the help makes sense for an invisible symbol either.
+>=20
+> Yes, I think it can also be removed. Thanks.
+> >
+> > >  config FSL_ENETC
+> > >  	tristate "ENETC PF driver"
+> > >  	depends on PCI_MSI
+> > > @@ -40,6 +50,7 @@ config NXP_ENETC4
+> > >  	select FSL_ENETC_CORE
+> > >  	select FSL_ENETC_MDIO
+> > >  	select NXP_ENETC_PF_COMMON
+> > > +	select NXP_NETC_LIB
+> > >  	select PHYLINK
+> > >  	select DIMLIB
+> > >  	help
+> >
+> > > +#pragma pack(1)
+> >
+> > please don't blindly pack all structs, only if they are misaligned
+> > or will otherwise have holes.
+>=20
+> Because these structures are in hardware buffer format and need
+> to be aligned, so for convenience, I simply used pack(1). You are right,
+> I should use pack() for structures with holes. Thanks.
+> >
+> > > +#if IS_ENABLED(CONFIG_NXP_NETC_LIB)
+> >
+> > why the ifdef, all callers select the config option
+>=20
+> hm..., there are some interfaces of netc-lib are used in common .c files
+> in downstream, so I used "ifdef" in downstream. Now for the upstream,
+> I'm going to separate them from the common .c files. So yes, we can
+> remove it now.
 
-Also add netdev_assert_locked to make it clear that the up() method
-is running with the instance lock grabbed.
-
-Fixes: 004b5008016a ("eth: bnxt: remove most dependencies on RTNL")
-Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-index b6d6fcd105d7..ea7f789be760 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-@@ -518,6 +518,8 @@ static int bnxt_dl_reload_up(struct devlink *dl, enum devlink_reload_action acti
- 	struct bnxt *bp = bnxt_get_bp_from_dl(dl);
- 	int rc = 0;
- 
-+	netdev_assert_locked(bp->dev);
-+
- 	*actions_performed = 0;
- 	switch (action) {
- 	case DEVLINK_RELOAD_ACTION_DRIVER_REINIT: {
-@@ -542,6 +544,7 @@ static int bnxt_dl_reload_up(struct devlink *dl, enum devlink_reload_action acti
- 		if (!netif_running(bp->dev))
- 			NL_SET_ERR_MSG_MOD(extack,
- 					   "Device is closed, not waiting for reset notice that will never come");
-+		netdev_unlock(bp->dev);
- 		rtnl_unlock();
- 		while (test_bit(BNXT_STATE_FW_ACTIVATE, &bp->state)) {
- 			if (time_after(jiffies, timeout)) {
-@@ -557,6 +560,7 @@ static int bnxt_dl_reload_up(struct devlink *dl, enum devlink_reload_action acti
- 			msleep(50);
- 		}
- 		rtnl_lock();
-+		netdev_lock(bp->dev);
- 		if (!rc)
- 			*actions_performed |= BIT(DEVLINK_RELOAD_ACTION_DRIVER_REINIT);
- 		clear_bit(BNXT_STATE_FW_ACTIVATE, &bp->state);
-@@ -575,10 +579,9 @@ static int bnxt_dl_reload_up(struct devlink *dl, enum devlink_reload_action acti
- 		}
- 		*actions_performed |= BIT(action);
- 	} else if (netif_running(bp->dev)) {
--		netdev_lock(bp->dev);
- 		netif_close(bp->dev);
--		netdev_unlock(bp->dev);
- 	}
-+	netdev_unlock(bp->dev);
- 	rtnl_unlock();
- 	if (action == DEVLINK_RELOAD_ACTION_DRIVER_REINIT)
- 		bnxt_ulp_start(bp, rc);
--- 
-2.48.1
-
+Sorry, I misread the header file. The ifdef in ntmp.h is needed because
+the interfaces in this header file will be used by the enetc-core and
+enetc-vf drivers. For the ENETC v1 (LS1028A platform), it will not select
+NXP_NETC_LIB.
 
