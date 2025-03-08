@@ -1,805 +1,191 @@
-Return-Path: <netdev+bounces-173202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98E47A57DCF
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 20:39:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 797A7A57DF1
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 21:04:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EC433ADB80
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 19:39:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EF703B278A
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 20:04:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE8111EB5C5;
-	Sat,  8 Mar 2025 19:39:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D9231552FD;
+	Sat,  8 Mar 2025 20:04:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gGdYTkBS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GOUhwStM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB439155316;
-	Sat,  8 Mar 2025 19:39:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D9D1ECF
+	for <netdev@vger.kernel.org>; Sat,  8 Mar 2025 20:04:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741462748; cv=none; b=iiYVEWTv9uC4ssel32qCd7GOjci4jTnFVTsgozeOz/T/EXjXVxN1677FbEHNpwB6t9+fPHauKiztF3Nh2nq6gY4NBEnaociFJImXPG8APr0+/juOxLyTX0nIX6WS7PDXD0VQ0TP2xM0rlq/LTa/hM8oCRjQL2wD61eZhYxnTHkI=
+	t=1741464253; cv=none; b=XCwwaNoexDLHqFkQKBsXg3bHgR9ZsnsxKEZSf/L9WWJ3OpkXzfioyTi84Vs03/D9CvX+Sy1PuUxB9g9wf3WGo2Hq1OjlEcgCGiWBTRNb/KGKtspua8yFZ6JlM2EcvRprhGYTqXVl5Fnp3KVjELi9MHV3xdJx4e7M3yXQGzSJ4mU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741462748; c=relaxed/simple;
-	bh=jINclNBT2Wr7tmSpVcDI+rn5eFJlZXxiOwHSOhpGYJs=;
-	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=O/pEQRz04LkyYkVpK3q5wIOCsunjLDtk4YjdXjwxVOZzWrQgvIOKaHjfUDLU2mpWlDm2FvLzflOcD63sq5LmykNt522VgNkMsz/CAcGTz49U3hchAHdcItRjuHunDmq5VrOEwRBR7tiKAQcZTCmxJPP0he5bsCtIBymk8yZoHe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gGdYTkBS; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7c2303a56d6so340064385a.3;
-        Sat, 08 Mar 2025 11:39:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741462745; x=1742067545; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2IWQwhkPuIBucQja63csZ9zvEwpAy8WdkO38UEbtuBY=;
-        b=gGdYTkBST6lxe2qU7mpsr8X2aPCK7n6woZ0X0W7s6zH9E7wdEq2QvBlVo809veYkmN
-         kIfVObdQABTANV00TMNNd4kbHWWtH5+bWavEJWbJYDWoaKLMeWE0tGo5tp10Um8YHrNM
-         gewh9p4fZUntdecacJugkFezwXTnyfEwPgXZ1oqS3Z7ieApKADo1vMXETAuFIFiLIOMC
-         Wt7ZiQoeEF9iTSRgXl2RUbd7sIIBirlvgQoBdf1lb40ZF4d2sReU7lmbVGVko9bljinb
-         qAKRWbkrRqg9XylBDwlQ/mvk9zqvLC7bIBxYVkrMsgdWfau6lSCRB9f6UhJa3KgUxrhT
-         Gbxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741462745; x=1742067545;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2IWQwhkPuIBucQja63csZ9zvEwpAy8WdkO38UEbtuBY=;
-        b=qaYMkXXZ7XN2G4C9q/omoHPQEAbxPaklKH9zfA5bU68w4A0r14G6JOG3gcur/apl85
-         R+JotatjwRdzXVVu32h0pqvI8lCq2ZnCnYGni6yCMzSYbpeY5zcUH6FUrjpWh70S57c7
-         uPr50R8emPqnC+BKbmo7kuQsaQUMFvi2RjwojwYDFIRDdRCzHkZmyP0ZTOopuv9PlIDt
-         bdsXVb2ZWa59tH68XUAwvmJZ2s2qTLOzXx5rOnUcZ/SEPPWlpWI3X7AvSHu5f2yRtuap
-         iEWKUP7IHj9zFLJf1McVgA9MnyTEj6ET7/yew/M9TbOz8nWyvdzCbzokQfj2rzah5HHr
-         nLvA==
-X-Forwarded-Encrypted: i=1; AJvYcCU6PRGeuX+G/OSjQxSgCKmCfD7FmstR7Y621TVJ2TLTi3DdfsHbB8xOnEVVzaTFRVF2QgiTAWJxt+nxK0ik@vger.kernel.org, AJvYcCUIykGgE0OncfGDeEXVmiMiCIx4xlpyJtJU1TI6I3H6Hx/0+SnDbkHXHsH+1Ta6DCuBe975JA6n@vger.kernel.org, AJvYcCVQ8yNmhpJzPxav1LKQbGR1JHSIlTR/2xI8r79HQzEop2Efb0VurR7nb3eiMY+L1mGu9GU=@vger.kernel.org, AJvYcCVrPZYDr/Am1mzcds5tLbDrIJ1qPSWePLmrhxvmQ1zhiv6OaqYrIxB9rMrE0MRb19PMK0yF2+wBDCwb@vger.kernel.org, AJvYcCW4VPN1T0+sp81mHnAxbfLyVOWj/dAgsjXLpzeRYPz8fc5W1B6PBPFyU5Y2P6jex+X06h5dumgl9C1N+36jMb6y@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmFpYLLJH4oEcAEdrR3Umvjr7edX1ReTuVO805QyJiRiSYJYXO
-	VJxMLhGvDZdUV1n7SChVgp5XSvLcxInrGE+q7ZPb7HzzAJh9W8T/
-X-Gm-Gg: ASbGncvDR281chxjCksXS+5iVPg1ojLj4dj4Ugrq/JIpnlE3bocOYQ7VKHXXyeQJkwR
-	D2y+ilnXTB+Mucuxi9MV7clJHtGYhaCzaCoGuoKraIZRHTknqcs3lo0pPU4zg0Rha3MpgpMeKPD
-	WNztv4ws6oJQpWMNJE68HvCg0ffV1ty93ZRx/AIIMI50p+xGGswu9uRyZD/epK6aMDiQDwn1/ZX
-	H2on2idCFwywmkNJwLwQWZzgwjpIHEf+2sWvON60ZSZHUZ5ndZQSysJ/QySuQ89wYu8GKwriFp2
-	KNr0GeoF7q5fFAMzf4PQncmVQv/AicCHy/u+l/4AO0QdbS6b7VO9PVWfNO9LcLKgdUsj+oYMl+T
-	KBUoBGN6bnc1g69zUyNa7sQ==
-X-Google-Smtp-Source: AGHT+IEbAiNkRe5mCRPA6jGEsnKtVdOnwc/WLU1rix96DD9BsiiWGTqjlAollOT6vN0M2UQuU/aCDw==
-X-Received: by 2002:a05:6214:411b:b0:6e6:61f1:458a with SMTP id 6a1803df08f44-6e9005e8f70mr91739796d6.14.1741462745254;
-        Sat, 08 Mar 2025 11:39:05 -0800 (PST)
-Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e8f70909c9sm34277706d6.26.2025.03.08.11.39.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Mar 2025 11:39:04 -0800 (PST)
-Date: Sat, 08 Mar 2025 14:39:04 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>, 
- Jonathan Corbet <corbet@lwn.net>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- "Michael S. Tsirkin" <mst@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- Shuah Khan <shuah@kernel.org>, 
- linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, 
- kvm@vger.kernel.org, 
- virtualization@lists.linux-foundation.org, 
- linux-kselftest@vger.kernel.org, 
- Yuri Benditovich <yuri.benditovich@daynix.com>, 
- Andrew Melnychenko <andrew@daynix.com>, 
- Stephen Hemminger <stephen@networkplumber.org>, 
- gur.stavi@huawei.com, 
- Lei Yang <leiyang@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Akihiko Odaki <akihiko.odaki@daynix.com>
-Message-ID: <67cc9cd8218f1_14b9f9294c4@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250307-rss-v9-5-df76624025eb@daynix.com>
-References: <20250307-rss-v9-0-df76624025eb@daynix.com>
- <20250307-rss-v9-5-df76624025eb@daynix.com>
-Subject: Re: [PATCH net-next v9 5/6] selftest: tun: Add tests for virtio-net
- hashing
+	s=arc-20240116; t=1741464253; c=relaxed/simple;
+	bh=ryLPmpCSdVMe0M26o/lxW0KDr0KYblyjS78RXZj7cjY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=jSdoiQ+LqJnU2gl3DOHqPMdcL+UIiMj1F6DdjZ+fg6cQgux7DRtvzbyxYXeBcGZPxCpyoJz4D9J3uEU+R5kujHhkAO08OspolOfwLAXtRo/soag1riumoG1Aur6SAY+cAk8TEhKwu+aGa1gcW5ogbhoBpBHIxLDu/YQeL8RYDz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GOUhwStM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741464249;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YJ1ng78giZpgZ1pkR/H9sfY5f+t35cP7au54QDB9oqk=;
+	b=GOUhwStMPdZ2LdABQiN//0PTHjcp+MI25FffkdWEnVLIe53gTQ9WzRMrhifRRq18KRPcl2
+	g7h9AI99selThbqwBsphPKuX4kIZXYsG1QhBZusznLxM2O/glNaJs1tS1fV3C58cGtowap
+	1XeTQMWfjwrqeIDsDLN7ARd6vLmi848=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-461-MbNUwnKLPu2TqG3zxzVckQ-1; Sat,
+ 08 Mar 2025 15:04:05 -0500
+X-MC-Unique: MbNUwnKLPu2TqG3zxzVckQ-1
+X-Mimecast-MFC-AGG-ID: MbNUwnKLPu2TqG3zxzVckQ_1741464243
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6D2CA195608A;
+	Sat,  8 Mar 2025 20:04:03 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.81.152])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7507E19560AD;
+	Sat,  8 Mar 2025 20:04:00 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Ilya Maximets <i.maximets@ovn.org>
+Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
+ Abeni <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,
+  dev@openvswitch.org,  linux-kernel@vger.kernel.org,  Pravin B Shelar
+ <pshelar@ovn.org>,  Eelco Chaudron <echaudro@redhat.com>
+Subject: Re: [PATCH net] net: openvswitch: remove misbehaving actions length
+ check
+In-Reply-To: <20250308004609.2881861-1-i.maximets@ovn.org> (Ilya Maximets's
+	message of "Sat, 8 Mar 2025 01:45:59 +0100")
+References: <20250308004609.2881861-1-i.maximets@ovn.org>
+Date: Sat, 08 Mar 2025 15:03:58 -0500
+Message-ID: <f7tmsdv2ssx.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-Akihiko Odaki wrote:
-> The added tests confirm tun can perform RSS and hash reporting, and
-> reject invalid configurations for them.
-> 
-> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> Tested-by: Lei Yang <leiyang@redhat.com>
+Ilya Maximets <i.maximets@ovn.org> writes:
+
+> The actions length check is unreliable and produces different results
+> depending on the initial length of the provided netlink attribute and
+> the composition of the actual actions inside of it.  For example, a
+> user can add 4088 empty clone() actions without triggering -EMSGSIZE,
+> on attempt to add 4089 such actions the operation will fail with the
+> -EMSGSIZE verdict.  However, if another 16 KB of other actions will
+> be *appended* to the previous 4089 clone() actions, the check passes
+> and the flow is successfully installed into the openvswitch datapath.
+>
+> The reason for a such a weird behavior is the way memory is allocated.
+> When ovs_flow_cmd_new() is invoked, it calls ovs_nla_copy_actions(),
+> that in turn calls nla_alloc_flow_actions() with either the actual
+> length of the user-provided actions or the MAX_ACTIONS_BUFSIZE.  The
+> function adds the size of the sw_flow_actions structure and then the
+> actually allocated memory is rounded up to the closest power of two.
+>
+> So, if the user-provided actions are larger than MAX_ACTIONS_BUFSIZE,
+> then MAX_ACTIONS_BUFSIZE + sizeof(*sfa) rounded up is 32K + 24 -> 64K.
+> Later, while copying individual actions, we look at ksize(), which is
+> 64K, so this way the MAX_ACTIONS_BUFSIZE check is not actually
+> triggered and the user can easily allocate almost 64 KB of actions.
+>
+> However, when the initial size is less than MAX_ACTIONS_BUFSIZE, but
+> the actions contain ones that require size increase while copying
+> (such as clone() or sample()), then the limit check will be performed
+> during the reserve_sfa_size() and the user will not be allowed to
+> create actions that yield more than 32 KB internally.
+>
+> This is one part of the problem.  The other part is that it's not
+> actually possible for the userspace application to know beforehand
+> if the particular set of actions will be rejected or not.
+>
+> Certain actions require more space in the internal representation,
+> e.g. an empty clone() takes 4 bytes in the action list passed in by
+> the user, but it takes 12 bytes in the internal representation due
+> to an extra nested attribute, and some actions require less space in
+> the internal representations, e.g. set(tunnel(..)) normally takes
+> 64+ bytes in the action list provided by the user, but only needs to
+> store a single pointer in the internal implementation, since all the
+> data is stored in the tunnel_info structure instead.
+>
+> And the action size limit is applied to the internal representation,
+> not to the action list passed by the user.  So, it's not possible for
+> the userpsace application to predict if the certain combination of
+> actions will be rejected or not, because it is not possible for it to
+> calculate how much space these actions will take in the internal
+> representation without knowing kernel internals.
+>
+> All that is causing random failures in ovs-vswitchd in userspace and
+> inability to handle certain traffic patterns as a result.  For example,
+> it is reported that adding a bit more than a 1100 VMs in an OpenStack
+> setup breaks the network due to OVS not being able to handle ARP
+> traffic anymore in some cases (it tries to install a proper datapath
+> flow, but the kernel rejects it with -EMSGSIZE, even though the action
+> list isn't actually that large.)
+>
+> Kernel behavior must be consistent and predictable in order for the
+> userspace application to use it in a reasonable way.  ovs-vswitchd has
+> a mechanism to re-direct parts of the traffic and partially handle it
+> in userspace if the required action list is oversized, but that doesn't
+> work properly if we can't actually tell if the action list is oversized
+> or not.
+>
+> Solution for this is to check the size of the user-provided actions
+> instead of the internal representation.  This commit just removes the
+> check from the internal part because there is already an implicit size
+> check imposed by the netlink protocol.  The attribute can't be larger
+> than 64 KB.  Realistically, we could reduce the limit to 32 KB, but
+> we'll be risking to break some existing setups that rely on the fact
+> that it's possible to create nearly 64 KB action lists today.
+>
+> Vast majority of flows in real setups are below 100-ish bytes.  So
+> removal of the limit will not change real memory consumption on the
+> system.  The absolutely worst case scenario is if someone adds a flow
+> with 64 KB of empty clone() actions.  That will yield a 192 KB in the
+> internal representation consuming 256 KB block of memory.  However,
+> that list of actions is not meaningful and also a no-op.  Real world
+> very large action lists (that can occur for a rare cases of BUM
+> traffic handling) are unlikely to contain a large number of clones and
+> will likely have a lot of tunnel attributes making the internal
+> representation comparable in size to the original action list.
+> So, it should be fine to just remove the limit.
+>
+> Commit in the 'Fixes' tag is the first one that introduced the
+> difference between internal representation and the user-provided action
+> lists, but there were many more afterwards that lead to the situation
+> we have today.
+>
+> Fixes: 7d5437c709de ("openvswitch: Add tunneling interface.")
+> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
 > ---
->  tools/testing/selftests/net/Makefile |   2 +-
->  tools/testing/selftests/net/tun.c    | 584 ++++++++++++++++++++++++++++++++++-
->  2 files changed, 576 insertions(+), 10 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-> index 73ee88d6b043004be23b444de667a1d99a6045de..9772f691a9a011d99212df32463cdb930cf0a1a0 100644
-> --- a/tools/testing/selftests/net/Makefile
-> +++ b/tools/testing/selftests/net/Makefile
-> @@ -123,6 +123,6 @@ $(OUTPUT)/reuseport_bpf_numa: LDLIBS += -lnuma
->  $(OUTPUT)/tcp_mmap: LDLIBS += -lpthread -lcrypto
->  $(OUTPUT)/tcp_inq: LDLIBS += -lpthread
->  $(OUTPUT)/bind_bhash: LDLIBS += -lpthread
-> -$(OUTPUT)/io_uring_zerocopy_tx: CFLAGS += -I../../../include/
-> +$(OUTPUT)/io_uring_zerocopy_tx $(OUTPUT)/tun: CFLAGS += -I../../../include/
->  
->  include bpf.mk
-> diff --git a/tools/testing/selftests/net/tun.c b/tools/testing/selftests/net/tun.c
-> index 463dd98f2b80b1bdcb398cee43c834e7dc5cf784..acadeea7194eaea9416a605b47f99f7a5f1f80cd 100644
-> --- a/tools/testing/selftests/net/tun.c
-> +++ b/tools/testing/selftests/net/tun.c
-> @@ -2,21 +2,38 @@
->  
->  #define _GNU_SOURCE
->  
-> +#include <endian.h>
->  #include <errno.h>
->  #include <fcntl.h>
-> +#include <sched.h>
-> +#include <stddef.h>
->  #include <stdio.h>
->  #include <stdlib.h>
->  #include <string.h>
->  #include <unistd.h>
-> -#include <linux/if.h>
-> +#include <net/if.h>
-> +#include <netinet/ip.h>
-> +#include <sys/ioctl.h>
-> +#include <sys/socket.h>
-> +#include <linux/compiler.h>
-> +#include <linux/icmp.h>
-> +#include <linux/if_arp.h>
->  #include <linux/if_tun.h>
-> +#include <linux/ipv6.h>
->  #include <linux/netlink.h>
->  #include <linux/rtnetlink.h>
-> -#include <sys/ioctl.h>
-> -#include <sys/socket.h>
-> +#include <linux/sockios.h>
-> +#include <linux/tcp.h>
-> +#include <linux/udp.h>
-> +#include <linux/virtio_net.h>
->  
->  #include "../kselftest_harness.h"
->  
-> +#define TUN_HWADDR_SOURCE { 0x02, 0x00, 0x00, 0x00, 0x00, 0x00 }
-> +#define TUN_HWADDR_DEST { 0x02, 0x00, 0x00, 0x00, 0x00, 0x01 }
-> +#define TUN_IPADDR_SOURCE htonl((172 << 24) | (17 << 16) | 0)
-> +#define TUN_IPADDR_DEST htonl((172 << 24) | (17 << 16) | 1)
-> +
->  static int tun_attach(int fd, char *dev)
->  {
->  	struct ifreq ifr;
-> @@ -39,7 +56,7 @@ static int tun_detach(int fd, char *dev)
->  	return ioctl(fd, TUNSETQUEUE, (void *) &ifr);
->  }
->  
-> -static int tun_alloc(char *dev)
-> +static int tun_alloc(char *dev, short flags)
->  {
->  	struct ifreq ifr;
->  	int fd, err;
-> @@ -52,7 +69,8 @@ static int tun_alloc(char *dev)
->  
->  	memset(&ifr, 0, sizeof(ifr));
->  	strcpy(ifr.ifr_name, dev);
-> -	ifr.ifr_flags = IFF_TAP | IFF_NAPI | IFF_MULTI_QUEUE;
-> +	ifr.ifr_flags = flags | IFF_TAP | IFF_NAPI | IFF_NO_PI |
-> +			IFF_MULTI_QUEUE;
->  
->  	err = ioctl(fd, TUNSETIFF, (void *) &ifr);
->  	if (err < 0) {
-> @@ -64,6 +82,40 @@ static int tun_alloc(char *dev)
->  	return fd;
->  }
->  
-> +static bool tun_add_to_bridge(int local_fd, const char *name)
-> +{
-> +	struct ifreq ifreq = {
-> +		.ifr_name = "xbridge",
-> +		.ifr_ifindex = if_nametoindex(name)
-> +	};
-> +
-> +	if (!ifreq.ifr_ifindex) {
-> +		perror("if_nametoindex");
-> +		return false;
-> +	}
-> +
-> +	if (ioctl(local_fd, SIOCBRADDIF, &ifreq)) {
-> +		perror("SIOCBRADDIF");
-> +		return false;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +static bool tun_set_flags(int local_fd, const char *name, short flags)
-> +{
-> +	struct ifreq ifreq = { .ifr_flags = flags };
-> +
-> +	strcpy(ifreq.ifr_name, name);
-> +
-> +	if (ioctl(local_fd, SIOCSIFFLAGS, &ifreq)) {
-> +		perror("SIOCSIFFLAGS");
-> +		return false;
-> +	}
-> +
-> +	return true;
-> +}
-> +
->  static int tun_delete(char *dev)
->  {
->  	struct {
-> @@ -102,6 +154,156 @@ static int tun_delete(char *dev)
->  	return ret;
->  }
->  
-> +static uint32_t tun_sum(const void *buf, size_t len)
-> +{
-> +	const uint16_t *sbuf = buf;
-> +	uint32_t sum = 0;
-> +
-> +	while (len > 1) {
-> +		sum += *sbuf++;
-> +		len -= 2;
-> +	}
-> +
-> +	if (len)
-> +		sum += *(uint8_t *)sbuf;
-> +
-> +	return sum;
-> +}
-> +
-> +static uint16_t tun_build_ip_check(uint32_t sum)
-> +{
-> +	return ~((sum & 0xffff) + (sum >> 16));
-> +}
-> +
-> +static uint32_t tun_build_ip_pseudo_sum(const void *iphdr)
-> +{
-> +	uint16_t tot_len = ntohs(((struct iphdr *)iphdr)->tot_len);
-> +
-> +	return tun_sum((char *)iphdr + offsetof(struct iphdr, saddr), 8) +
-> +	       htons(((struct iphdr *)iphdr)->protocol) +
-> +	       htons(tot_len - sizeof(struct iphdr));
-> +}
-> +
-> +static uint32_t tun_build_ipv6_pseudo_sum(const void *ipv6hdr)
-> +{
-> +	return tun_sum((char *)ipv6hdr + offsetof(struct ipv6hdr, saddr), 32) +
-> +	       ((struct ipv6hdr *)ipv6hdr)->payload_len +
-> +	       htons(((struct ipv6hdr *)ipv6hdr)->nexthdr);
-> +}
-> +
-> +static void tun_build_ethhdr(struct ethhdr *ethhdr, uint16_t proto)
-> +{
-> +	*ethhdr = (struct ethhdr) {
-> +		.h_dest = TUN_HWADDR_DEST,
-> +		.h_source = TUN_HWADDR_SOURCE,
-> +		.h_proto = htons(proto)
-> +	};
-> +}
-> +
-> +static void tun_build_iphdr(void *dest, uint16_t len, uint8_t protocol)
-> +{
-> +	struct iphdr iphdr = {
-> +		.ihl = sizeof(iphdr) / 4,
-> +		.version = 4,
-> +		.tot_len = htons(sizeof(iphdr) + len),
-> +		.ttl = 255,
-> +		.protocol = protocol,
-> +		.saddr = TUN_IPADDR_SOURCE,
-> +		.daddr = TUN_IPADDR_DEST
-> +	};
-> +
-> +	iphdr.check = tun_build_ip_check(tun_sum(&iphdr, sizeof(iphdr)));
-> +	memcpy(dest, &iphdr, sizeof(iphdr));
-> +}
-> +
-> +static void tun_build_ipv6hdr(void *dest, uint16_t len, uint8_t protocol)
-> +{
-> +	struct ipv6hdr ipv6hdr = {
-> +		.version = 6,
-> +		.payload_len = htons(len),
-> +		.nexthdr = protocol,
-> +		.saddr = {
-> +			.s6_addr32 = {
-> +				htonl(0xffff0000), 0, 0, TUN_IPADDR_SOURCE
-> +			}
-> +		},
-> +		.daddr = {
-> +			.s6_addr32 = {
-> +				htonl(0xffff0000), 0, 0, TUN_IPADDR_DEST
-> +			}
-> +		},
-> +	};
-> +
-> +	memcpy(dest, &ipv6hdr, sizeof(ipv6hdr));
-> +}
-> +
-> +static void tun_build_tcphdr(void *dest, uint32_t sum)
-> +{
-> +	struct tcphdr tcphdr = {
-> +		.source = htons(9),
-> +		.dest = htons(9),
-> +		.fin = 1,
-> +		.doff = sizeof(tcphdr) / 4,
-> +	};
-> +	uint32_t tcp_sum = tun_sum(&tcphdr, sizeof(tcphdr));
-> +
-> +	tcphdr.check = tun_build_ip_check(sum + tcp_sum);
-> +	memcpy(dest, &tcphdr, sizeof(tcphdr));
-> +}
-> +
-> +static void tun_build_udphdr(void *dest, uint32_t sum)
-> +{
-> +	struct udphdr udphdr = {
-> +		.source = htons(9),
-> +		.dest = htons(9),
-> +		.len = htons(sizeof(udphdr)),
-> +	};
-> +	uint32_t udp_sum = tun_sum(&udphdr, sizeof(udphdr));
-> +
-> +	udphdr.check = tun_build_ip_check(sum + udp_sum);
-> +	memcpy(dest, &udphdr, sizeof(udphdr));
-> +}
-> +
-> +static bool tun_vnet_hash_check(int source_fd, const int *dest_fds,
-> +				const void *buffer, size_t len,
-> +				uint8_t flags,
-> +				uint16_t hash_report, uint32_t hash_value)
-> +{
-> +	size_t read_len = sizeof(struct virtio_net_hdr_v1_hash) + len;
-> +	struct virtio_net_hdr_v1_hash *read_buffer;
-> +	struct virtio_net_hdr_v1_hash hdr = {
-> +		.hdr = { .flags = flags },
-> +		.hash_value = htole32(hash_value),
-> +		.hash_report = htole16(hash_report)
-> +	};
-> +	int ret;
-> +	int txq = hash_report ? hash_value & 1 : 2;
-> +
-> +	if (write(source_fd, buffer, len) != len) {
-> +		perror("write");
-> +		return false;
-> +	}
-> +
-> +	read_buffer = malloc(read_len);
-> +	if (!read_buffer) {
-> +		perror("malloc");
-> +		return false;
-> +	}
-> +
-> +	ret = read(dest_fds[txq], read_buffer, read_len);
-> +	if (ret != read_len) {
-> +		perror("read");
-> +		free(read_buffer);
-> +		return false;
-> +	}
-> +
-> +	ret = !memcmp(read_buffer, &hdr, sizeof(*read_buffer)) &&
-> +	      !memcmp(read_buffer + 1, buffer, len);
-> +
-> +	free(read_buffer);
-> +	return ret;
-> +}
-> +
->  FIXTURE(tun)
->  {
->  	char ifname[IFNAMSIZ];
-> @@ -112,10 +314,10 @@ FIXTURE_SETUP(tun)
->  {
->  	memset(self->ifname, 0, sizeof(self->ifname));
->  
-> -	self->fd = tun_alloc(self->ifname);
-> +	self->fd = tun_alloc(self->ifname, 0);
->  	ASSERT_GE(self->fd, 0);
->  
-> -	self->fd2 = tun_alloc(self->ifname);
-> +	self->fd2 = tun_alloc(self->ifname, 0);
->  	ASSERT_GE(self->fd2, 0);
->  }
->  
-> @@ -168,7 +370,7 @@ FIXTURE(tun_deleted)
->  FIXTURE_SETUP(tun_deleted)
->  {
->  	self->ifname[0] = 0;
-> -	self->fd = tun_alloc(self->ifname);
-> +	self->fd = tun_alloc(self->ifname, 0);
->  	ASSERT_LE(0, self->fd);
->  
->  	ASSERT_EQ(0, tun_delete(self->ifname))
-> @@ -233,4 +435,368 @@ TEST_F(tun_deleted, setvnethash)
->  	EXPECT_EQ(EBADFD, errno);
->  }
->  
-> -TEST_HARNESS_MAIN
-> +FIXTURE(tun_vnet_hash)
-> +{
-> +	int local_fd;
-> +	int source_fd;
-> +	int dest_fds[3];
-> +};
-> +
-> +FIXTURE_SETUP(tun_vnet_hash)
-> +{
-> +	static const struct {
-> +		struct tun_vnet_hash hdr;
-> +		struct tun_vnet_hash_rss rss;
-> +		uint16_t rss_indirection_table[2];
-> +		uint8_t rss_key[40];
-> +	} vnet_hash = {
-> +		.hdr = {
-> +			.flags = TUN_VNET_HASH_REPORT | TUN_VNET_HASH_RSS,
-> +			.types = VIRTIO_NET_RSS_HASH_TYPE_IPv4 |
-> +				VIRTIO_NET_RSS_HASH_TYPE_TCPv4 |
-> +				VIRTIO_NET_RSS_HASH_TYPE_UDPv4 |
-> +				VIRTIO_NET_RSS_HASH_TYPE_IPv6 |
-> +				VIRTIO_NET_RSS_HASH_TYPE_TCPv6 |
-> +				VIRTIO_NET_RSS_HASH_TYPE_UDPv6
-> +		},
-> +		.rss = { .indirection_table_mask = 1, .unclassified_queue = 5 },
-> +		.rss_indirection_table = { 3, 4 },
-> +		.rss_key = {
-> +			0x6d, 0x5a, 0x56, 0xda, 0x25, 0x5b, 0x0e, 0xc2,
-> +			0x41, 0x67, 0x25, 0x3d, 0x43, 0xa3, 0x8f, 0xb0,
-> +			0xd0, 0xca, 0x2b, 0xcb, 0xae, 0x7b, 0x30, 0xb4,
-> +			0x77, 0xcb, 0x2d, 0xa3, 0x80, 0x30, 0xf2, 0x0c,
-> +			0x6a, 0x42, 0xb7, 0x3b, 0xbe, 0xac, 0x01, 0xfa
-> +		}
-> +	};
-> +
-> +	struct {
-> +		struct virtio_net_hdr_v1_hash vnet_hdr;
-> +		struct ethhdr ethhdr;
-> +		struct arphdr arphdr;
-> +		unsigned char sender_hwaddr[6];
-> +		uint32_t sender_ipaddr;
-> +		unsigned char target_hwaddr[6];
-> +		uint32_t target_ipaddr;
-> +	} __packed packet = {
-> +		.ethhdr = {
-> +			.h_source = TUN_HWADDR_SOURCE,
-> +			.h_dest = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff },
-> +			.h_proto = htons(ETH_P_ARP)
-> +		},
-> +		.arphdr = {
-> +			.ar_hrd = htons(ARPHRD_ETHER),
-> +			.ar_pro = htons(ETH_P_IP),
-> +			.ar_hln = ETH_ALEN,
-> +			.ar_pln = 4,
-> +			.ar_op = htons(ARPOP_REQUEST)
-> +		},
-> +		.sender_hwaddr = TUN_HWADDR_DEST,
-> +		.sender_ipaddr = TUN_IPADDR_DEST,
-> +		.target_ipaddr = TUN_IPADDR_DEST
-> +	};
-> +
-> +	struct tun_vnet_hash cap;
-> +	char source_ifname[IFNAMSIZ] = "";
-> +	char dest_ifname[IFNAMSIZ] = "";
-> +	int i;
-> +
-> +	self->local_fd = socket(AF_LOCAL, SOCK_STREAM, 0);
-> +	ASSERT_LE(0, self->local_fd);
-> +
-> +	self->source_fd = tun_alloc(source_ifname, 0);
-> +	ASSERT_LE(0, self->source_fd) {
-> +		EXPECT_EQ(0, close(self->local_fd));
-> +	}
-> +
-> +	i = ioctl(self->source_fd, TUNGETVNETHASHCAP, &cap);
-> +	if (i == -1 && errno == EINVAL) {
-> +		EXPECT_EQ(0, close(self->local_fd));
-> +		SKIP(return, "TUNGETVNETHASHCAP not supported");
-> +	}
-> +
-> +	ASSERT_EQ(0, i)
-> +		EXPECT_EQ(0, close(self->local_fd));
-> +
-> +	if ((cap.flags & vnet_hash.hdr.flags) != vnet_hash.hdr.flags) {
-> +		EXPECT_EQ(0, close(self->local_fd));
-> +		SKIP(return, "Lacks some hash flag support");
-> +	}
-> +
-> +	if ((cap.types & vnet_hash.hdr.types) != vnet_hash.hdr.types) {
-> +		EXPECT_EQ(0, close(self->local_fd));
-> +		SKIP(return, "Lacks some hash type support");
-> +	}
-> +
-> +	ASSERT_TRUE(tun_set_flags(self->local_fd, source_ifname, IFF_UP))
-> +		EXPECT_EQ(0, close(self->local_fd));
-> +
-> +	self->dest_fds[0] = tun_alloc(dest_ifname, IFF_VNET_HDR);
-> +	ASSERT_LE(0, self->dest_fds[0]) {
-> +		EXPECT_EQ(0, close(self->source_fd));
-> +		EXPECT_EQ(0, close(self->local_fd));
-> +	}
-> +
-> +	i = sizeof(struct virtio_net_hdr_v1_hash);
-> +	ASSERT_EQ(0, ioctl(self->dest_fds[0], TUNSETVNETHDRSZ, &i)) {
-> +		EXPECT_EQ(0, close(self->dest_fds[0]));
-> +		EXPECT_EQ(0, close(self->source_fd));
-> +		EXPECT_EQ(0, close(self->local_fd));
-> +	}
-> +
-> +	i = 1;
-> +	ASSERT_EQ(0, ioctl(self->dest_fds[0], TUNSETVNETLE, &i)) {
-> +		EXPECT_EQ(0, close(self->dest_fds[0]));
-> +		EXPECT_EQ(0, close(self->source_fd));
-> +		EXPECT_EQ(0, close(self->local_fd));
-> +	}
-> +
-> +	ASSERT_TRUE(tun_set_flags(self->local_fd, dest_ifname, IFF_UP)) {
-> +		EXPECT_EQ(0, close(self->dest_fds[0]));
-> +		EXPECT_EQ(0, close(self->source_fd));
-> +		EXPECT_EQ(0, close(self->local_fd));
-> +	}
-> +
-> +	ASSERT_EQ(sizeof(packet),
-> +		  write(self->dest_fds[0], &packet, sizeof(packet))) {
-> +		EXPECT_EQ(0, close(self->dest_fds[0]));
-> +		EXPECT_EQ(0, close(self->source_fd));
-> +		EXPECT_EQ(0, close(self->local_fd));
-> +	}
-> +
-> +	ASSERT_EQ(0, ioctl(self->dest_fds[0], TUNSETVNETHASH, &vnet_hash)) {
-> +		EXPECT_EQ(0, close(self->dest_fds[0]));
-> +		EXPECT_EQ(0, close(self->source_fd));
-> +		EXPECT_EQ(0, close(self->local_fd));
-> +	}
-> +
-> +	for (i = 1; i < ARRAY_SIZE(self->dest_fds); i++) {
-> +		self->dest_fds[i] = tun_alloc(dest_ifname, IFF_VNET_HDR);
-> +		ASSERT_LE(0, self->dest_fds[i]) {
-> +			while (i) {
-> +				i--;
-> +				EXPECT_EQ(0, close(self->local_fd));
-> +			}
-> +
-> +			EXPECT_EQ(0, close(self->source_fd));
-> +			EXPECT_EQ(0, close(self->local_fd));
-> +		}
-> +	}
-> +
-> +	ASSERT_EQ(0, ioctl(self->local_fd, SIOCBRADDBR, "xbridge")) {
-> +		EXPECT_EQ(0, ioctl(self->local_fd, SIOCBRDELBR, "xbridge"));
-> +
-> +		for (i = 0; i < ARRAY_SIZE(self->dest_fds); i++)
-> +			EXPECT_EQ(0, close(self->dest_fds[i]));
-> +
-> +		EXPECT_EQ(0, close(self->source_fd));
-> +		EXPECT_EQ(0, close(self->local_fd));
-> +	}
-> +
-> +	ASSERT_TRUE(tun_add_to_bridge(self->local_fd, source_ifname)) {
-> +		EXPECT_EQ(0, ioctl(self->local_fd, SIOCBRDELBR, "xbridge"));
-> +
-> +		for (i = 0; i < ARRAY_SIZE(self->dest_fds); i++)
-> +			EXPECT_EQ(0, close(self->dest_fds[i]));
-> +
-> +		EXPECT_EQ(0, close(self->source_fd));
-> +		EXPECT_EQ(0, close(self->local_fd));
-> +	}
-> +
-> +	ASSERT_TRUE(tun_add_to_bridge(self->local_fd, dest_ifname)) {
-> +		EXPECT_EQ(0, ioctl(self->local_fd, SIOCBRDELBR, "xbridge"));
-> +
-> +		for (i = 0; i < ARRAY_SIZE(self->dest_fds); i++)
-> +			EXPECT_EQ(0, close(self->dest_fds[i]));
-> +
-> +		EXPECT_EQ(0, close(self->source_fd));
-> +		EXPECT_EQ(0, close(self->local_fd));
-> +	}
-> +
-> +	ASSERT_TRUE(tun_set_flags(self->local_fd, "xbridge", IFF_UP)) {
-> +		EXPECT_EQ(0, ioctl(self->local_fd, SIOCBRDELBR, "xbridge"));
-> +
-> +		for (i = 0; i < ARRAY_SIZE(self->dest_fds); i++)
-> +			EXPECT_EQ(0, close(self->dest_fds[i]));
-> +
-> +		EXPECT_EQ(0, close(self->source_fd));
-> +		EXPECT_EQ(0, close(self->local_fd));
-> +	}
-> +}
-> +
-> +FIXTURE_TEARDOWN(tun_vnet_hash)
-> +{
-> +	ASSERT_TRUE(tun_set_flags(self->local_fd, "xbridge", 0)) {
-> +		for (size_t i = 0; i < ARRAY_SIZE(self->dest_fds); i++)
-> +			EXPECT_EQ(0, close(self->dest_fds[i]));
-> +
-> +		EXPECT_EQ(0, close(self->source_fd));
-> +		EXPECT_EQ(0, close(self->local_fd));
-> +	}
-> +
-> +	EXPECT_EQ(0, ioctl(self->local_fd, SIOCBRDELBR, "xbridge"));
-> +
-> +	for (size_t i = 0; i < ARRAY_SIZE(self->dest_fds); i++)
-> +		EXPECT_EQ(0, close(self->dest_fds[i]));
-> +
-> +	EXPECT_EQ(0, close(self->source_fd));
-> +	EXPECT_EQ(0, close(self->local_fd));
-> +}
-> +
-> +TEST_F(tun_vnet_hash, unclassified)
-> +{
-> +	struct {
-> +		struct ethhdr ethhdr;
-> +		struct iphdr iphdr;
-> +	} __packed packet;
-> +
-> +	tun_build_ethhdr(&packet.ethhdr, ETH_P_LOOPBACK);
-> +
-> +	EXPECT_TRUE(tun_vnet_hash_check(self->source_fd, self->dest_fds,
-> +					&packet, sizeof(packet), 0,
-> +					VIRTIO_NET_HASH_REPORT_NONE, 0));
-> +}
-> +
-> +TEST_F(tun_vnet_hash, ipv4)
-> +{
-> +	struct {
-> +		struct ethhdr ethhdr;
-> +		struct iphdr iphdr;
-> +	} __packed packet;
-> +
-> +	tun_build_ethhdr(&packet.ethhdr, ETH_P_IP);
-> +	tun_build_iphdr(&packet.iphdr, 0, 253);
-> +
-> +	EXPECT_TRUE(tun_vnet_hash_check(self->source_fd, self->dest_fds,
-> +					&packet, sizeof(packet), 0,
-> +					VIRTIO_NET_HASH_REPORT_IPv4,
-> +					0x6e45d952));
-> +}
-> +
-> +TEST_F(tun_vnet_hash, tcpv4)
-> +{
-> +	struct {
-> +		struct ethhdr ethhdr;
-> +		struct iphdr iphdr;
-> +		struct tcphdr tcphdr;
-> +	} __packed packet;
-> +
-> +	tun_build_ethhdr(&packet.ethhdr, ETH_P_IP);
-> +	tun_build_iphdr(&packet.iphdr, sizeof(struct tcphdr), IPPROTO_TCP);
-> +
-> +	tun_build_tcphdr(&packet.tcphdr,
-> +			 tun_build_ip_pseudo_sum(&packet.iphdr));
-> +
-> +	EXPECT_TRUE(tun_vnet_hash_check(self->source_fd, self->dest_fds,
-> +					&packet, sizeof(packet),
-> +					VIRTIO_NET_HDR_F_DATA_VALID,
-> +					VIRTIO_NET_HASH_REPORT_TCPv4,
-> +					0xfb63539a));
-> +}
-> +
-> +TEST_F(tun_vnet_hash, udpv4)
-> +{
-> +	struct {
-> +		struct ethhdr ethhdr;
-> +		struct iphdr iphdr;
-> +		struct udphdr udphdr;
-> +	} __packed packet;
-> +
-> +	tun_build_ethhdr(&packet.ethhdr, ETH_P_IP);
-> +	tun_build_iphdr(&packet.iphdr, sizeof(struct udphdr), IPPROTO_UDP);
-> +
-> +	tun_build_udphdr(&packet.udphdr,
-> +			 tun_build_ip_pseudo_sum(&packet.iphdr));
-> +
-> +	EXPECT_TRUE(tun_vnet_hash_check(self->source_fd, self->dest_fds,
-> +					&packet, sizeof(packet),
-> +					VIRTIO_NET_HDR_F_DATA_VALID,
-> +					VIRTIO_NET_HASH_REPORT_UDPv4,
-> +					0xfb63539a));
-> +}
-> +
-> +TEST_F(tun_vnet_hash, ipv6)
-> +{
-> +	struct {
-> +		struct ethhdr ethhdr;
-> +		struct ipv6hdr ipv6hdr;
-> +	} __packed packet;
-> +
-> +	tun_build_ethhdr(&packet.ethhdr, ETH_P_IPV6);
-> +	tun_build_ipv6hdr(&packet.ipv6hdr, 0, 253);
-> +
-> +	EXPECT_TRUE(tun_vnet_hash_check(self->source_fd, self->dest_fds,
-> +					&packet, sizeof(packet), 0,
-> +					VIRTIO_NET_HASH_REPORT_IPv6,
-> +					0xd6eb560f));
-> +}
-> +
-> +TEST_F(tun_vnet_hash, tcpv6)
-> +{
-> +	struct {
-> +		struct ethhdr ethhdr;
-> +		struct ipv6hdr ipv6hdr;
-> +		struct tcphdr tcphdr;
-> +	} __packed packet;
-> +
-> +	tun_build_ethhdr(&packet.ethhdr, ETH_P_IPV6);
-> +	tun_build_ipv6hdr(&packet.ipv6hdr, sizeof(struct tcphdr), IPPROTO_TCP);
-> +
-> +	tun_build_tcphdr(&packet.tcphdr,
-> +			 tun_build_ipv6_pseudo_sum(&packet.ipv6hdr));
-> +
-> +	EXPECT_TRUE(tun_vnet_hash_check(self->source_fd, self->dest_fds,
-> +					&packet, sizeof(packet),
-> +					VIRTIO_NET_HDR_F_DATA_VALID,
-> +					VIRTIO_NET_HASH_REPORT_TCPv6,
-> +					0xc2b9f251));
-> +}
-> +
-> +TEST_F(tun_vnet_hash, udpv6)
-> +{
-> +	struct {
-> +		struct ethhdr ethhdr;
-> +		struct ipv6hdr ipv6hdr;
-> +		struct udphdr udphdr;
-> +	} __packed packet;
-> +
-> +	tun_build_ethhdr(&packet.ethhdr, ETH_P_IPV6);
-> +	tun_build_ipv6hdr(&packet.ipv6hdr, sizeof(struct udphdr), IPPROTO_UDP);
-> +
-> +	tun_build_udphdr(&packet.udphdr,
-> +			 tun_build_ipv6_pseudo_sum(&packet.ipv6hdr));
-> +
-> +	EXPECT_TRUE(tun_vnet_hash_check(self->source_fd, self->dest_fds,
-> +					&packet, sizeof(packet),
-> +					VIRTIO_NET_HDR_F_DATA_VALID,
-> +					VIRTIO_NET_HASH_REPORT_UDPv6,
-> +					0xc2b9f251));
-> +}
-> +
-> +int main(int argc, char **argv)
-> +{
-> +	FILE *file;
-> +
-> +	if (unshare(CLONE_NEWNET)) {
-> +		perror("unshare");
-> +		return KSFT_FAIL;
-> +	}
-> +
-> +	file = fopen("/proc/sys/net/ipv6/conf/default/disable_ipv6", "w");
-> +	if (file) {
-> +		if (fputc('1', file) != '1') {
-> +			perror("fputc");
-> +			return KSFT_FAIL;
-> +		}
-> +
-> +		if (fclose(file)) {
-> +			perror("fclose");
-> +			return KSFT_FAIL;
-> +		}
-> +	} else if (errno != ENOENT) {
-> +		perror("fopen");
-> +		return KSFT_FAIL;
-> +	}
 
-What is the purpose of this disable_ipv6?
+Thanks for the detailed explanation.  Do you think it's useful to
+check with selftest:
 
-> +
-> +	return test_harness_run(argc, argv);
-> +}
-> 
-> -- 
-> 2.48.1
-> 
+   # python3 ./ovs-dpctl.py add-dp flbr
+   # python3 ./ovs-dpctl.py add-flow flbr \
+     "in_port(0),eth(),eth_type(0x806),arp()" \
+     $(echo 'print("clone(),"*4089)' | python3)
 
+I think a limit test is probably a good thing to have anyway (although
+after this commit we will rely on netlink limits).
+
+
+Reviewed-by: Aaron Conole <aconole@redhat.com>
 
 
