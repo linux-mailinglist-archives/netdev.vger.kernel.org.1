@@ -1,147 +1,227 @@
-Return-Path: <netdev+bounces-173120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D275A576FC
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 01:38:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E82CA57705
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 01:46:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70C863B3123
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 00:38:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A745176B86
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 00:46:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67BF9BA49;
-	Sat,  8 Mar 2025 00:38:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nsgZnJ4J"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AE68E56F;
+	Sat,  8 Mar 2025 00:46:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
+Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com [209.85.221.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD8568F66;
-	Sat,  8 Mar 2025 00:38:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3E96C2FA;
+	Sat,  8 Mar 2025 00:46:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741394319; cv=none; b=iJSPdIUQJOHDf4bu7G7wXHuR1JsCmJb7uEU1OinF4njltoQVwZlmZJK95GUHNQJB7GrFTFjwOFvzrxEABlPPCg4+8oFKsz9hGCWIsu/VG8YcCsUTHaKr000+Y3ZWenSn/+DC6nnqjIpAl7Wmga0OMNpayYYMmrQNqOpV52PU0Uc=
+	t=1741394778; cv=none; b=NJyDPgy8atTFeVKyPV5NTYbVPTLeiQ2UACqSR9aun33SVUDZG1u4R53kQGDiPkBEGmDfVUUJituAl5hCUnD0BfxOTc5sj79ObgqQ0fwNpAMwDmu/1IMHAk8TCZnq5DZa8QcyhyXT+lQrxUdV7W4zgIuTJpC3z1varD0T6Fo9cOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741394319; c=relaxed/simple;
-	bh=rfOEvkpuqKHGflaRaPxkuW+mrOHN7jdwzCFozlhOXPU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PHaLfiQ1oAk3t8d+FF8jT+lCA53UnwyW6SGGNN3tyjuaN8mgfU+flFdYq70TnSw50mvkyqhfuPh0pdVmiCK6GvcXzsBSZLFHT42vZVvyeCUE0o2f+xBYTsy+u/E7i9RoIAaOnukmaEyruGDnDY15i75oR9HE5CI2Fk4jEAVzfsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nsgZnJ4J; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1741394778; c=relaxed/simple;
+	bh=y1W4e1wYfpdVrT1KOl483GYtqc45OqLl/qLvkC8zYjU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uI21qnVu9MfZ3Ewynpkab7HjKuymoosK5jMMx9kDwdEgIZLk0FqySz879Pr5U5mttQA4cqiYHUaMBR9zpLC88C4RN2XinB3IpIUT6YC5Vs1Zel1AcbrhjlupJlI4eYumSG6AKfIQ3nalEuNfHQtUPztw6VfubXcNAoxnUxOj6IM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3d43c972616so6907725ab.0;
-        Fri, 07 Mar 2025 16:38:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741394317; x=1741999117; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1CzjouSYYDka7fRSAbop5+QmSJVI7Ib11oVwUZA5sKY=;
-        b=nsgZnJ4JX55Ma0fzsw3CwMSZgYovHkPt52cmwOcF584inzHEXLL2ltf3gwdM7Czft7
-         LN0xiA3k5Go6lcseec9SavgPnkfKr2Bw6NYjuYIzy3nVodpPHPoqMNNkP0mfehNOMLTu
-         wa6nD72jtiuihibnSTEClrqGu3tKjK6NiT0LfqCtVgabCiQAbhlEmYuAX5FpgFFuracM
-         P8gDIJm96Bpn3fyRWx+B0Yat9ybCnuoahHFDeBtVRShKnR3verhsTy4viQeUzifqY2DX
-         5n5COMf0d4onvLuM0wdvSetemrDlsMkPicA4aLynYC7IHVAreUwEMmNmrkqTo7AyPl85
-         Y64A==
+Received: by mail-wr1-f67.google.com with SMTP id ffacd0b85a97d-391342fc1f6so1292878f8f.1;
+        Fri, 07 Mar 2025 16:46:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741394317; x=1741999117;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1CzjouSYYDka7fRSAbop5+QmSJVI7Ib11oVwUZA5sKY=;
-        b=jj3kpS7AuLGdk0cHPiLkOnQkgy+glxPs6nL/04syxnDPpj5HlUb2g4kwrdHCQuLdoS
-         b8Ei3yFzsaWF6gZTzdf/qZjUIcM/YJ7kqP3PY47OShN5I73ni8/RJyyTwLzKYIdX0FLT
-         jVYjEimf575GQfh+Iv0WWeBckOG9Jktx3Q1PopowWv8qWG5kT4HaDtabhZEts2GZuJsF
-         YDhnP8in4mEw7rMUXrqWO2zj477gfU311aO5xrpr1LMFBpv6VBKdtoDqrUfjAt5U/JDJ
-         GM3agBn4cfgBnWOUxPyg9jDK1KWVAA9yo4WAhivvIE8JbS0hshOiTQkBbbdmX78WGOl3
-         doiw==
-X-Forwarded-Encrypted: i=1; AJvYcCUx6B+jiYPa9tG2VHszyVb6oogsHyGKggHOdwbt8ho+71B0zj31ZDnNRXxaNgVSPvZDygDuP5z6@vger.kernel.org, AJvYcCWu3xlRE/O/MiMNKFsoj+6fBDXtGVF6EtiK2NeKpxdXuOBMEDsjNr8GhtatYQ5VzN2NTnp8pH4H+bRn@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiXzGo5oRhb1g18D/vgoK6KW2KMgXRW2mEM2g+z13yE1bx23fh
-	CA9LNnxPuF2w9OldQ55lJetjVnCxWB+UZVGBxqsBCncIRNaHXUy/5Qs94mp7ubArAarBBwC0wNg
-	6XE2OvYTEdNWI4UoC0gSUmTXXzjY=
-X-Gm-Gg: ASbGnctxmo22JTIR6nRV/gRlesRuS/45NQ5T3iFUzcRNvrG/MzqE/FXuWCT2f5LgLRe
-	LAPerV31iQR4SEYR2WJzhcD+ZA07Vo3PiJT02xjMHWYlCWgROfLkAvtXT66M7DoFxAdFrouN6gz
-	0sAwzSK77UezG5RpVP+CqNGQMf/w==
-X-Google-Smtp-Source: AGHT+IHYM/Qlg1nUKjuohwFX/f7a9KSc8NsEAec+iIBAQW4nFK5S/30ZBIn4+oslMC1HxbgTUT9icERNZ5V+SOHrvnQ=
-X-Received: by 2002:a05:6e02:3907:b0:3d4:2acc:81fa with SMTP id
- e9e14a558f8ab-3d44ae8e21cmr16955875ab.2.1741394316774; Fri, 07 Mar 2025
- 16:38:36 -0800 (PST)
+        d=1e100.net; s=20230601; t=1741394774; x=1741999574;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LpQ9W6r3A269sn54hKhYIafhwiAez/jqGdPqFLq8ztg=;
+        b=u4fG8MO2BpYwkd2nJynTLAd1Btax2Ob6jUzmAdUayREecFkng5Hjtc5A1HCDSAbsi5
+         piRl3zS6levRKCW5bY4Q3WY4pbLWpITfQHzGiVcbEv6QmMtMjJxWm4bo1u7XpNiZMPCT
+         tsLvDDUqJiF3r2RzfYrgX69N13TPYl/zlXCE08KQVzbYpEwVuC9iq+SZsE5P2PbsAkGT
+         5VrE1XVCIq2L/AVc2G3wtjwpIs4xa1aUqTXYKzMT0b/zdDo9eAWK2CsRt+j83j75S6h/
+         r37IFCCWMx0HieOoWoqB533E0231ovOHQd5yoe174sNX1gIZ7rqp/07VemCxM4jEOSeQ
+         kKrA==
+X-Forwarded-Encrypted: i=1; AJvYcCXkdCx7WWPl6jZ93vfydapOaU/7sZZORCsq5NE8sYfrlAr8U2cJB6b4lAwd0pb1d2DiBWrNdRdsocmNTUs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2GCRHpzSjOGUIOGsqTKiXk8wRqkd5wiamcyY76jrS2tXKRm/8
+	UxbIGQr/jXFDxbIfG6EgoYsQQgbDycRhlWrI8cS1KQ/587NIO63SdWRUWBrK
+X-Gm-Gg: ASbGncs9zJfZJxRGSBRxXv37Z+SFkKi1BW/dxGhGaVSWSStlmPxkM+bMt2D58Q0y/kA
+	vLJfNB4NO924awQWr3zxt0W6L69ych6QVsiDXxIUaKb2dTp3LYPBkKgaf8NFgFyGBjit7GqHWw/
+	6N33FLBQTZe1LSMzLCxPNvKu2cjLDyBs9jocM8RMkT1qyWK8M4TWgV480E+2B8MsneE4IcpwEWu
+	PFGCUF9D8ZZ/S5y2QlhEvtGbD3FGk5vp59DFU++tlrTUKC0uMuBvo5IeQXtLUQBk29j5roa2Og2
+	+6HDQOZEI3ljoe36KqdfpQy69j4/4QQ3PRL++aCdhKcPP9BpApR0lhnYCdkKuO4MBhAXOYDfquM
+	zhW5bshk=
+X-Google-Smtp-Source: AGHT+IGMBvkOP0HsDWpJIUBSXM0T0CXGMaX2xgRyqY9FTDhwupT7f8MHEcd9UI0KpFjphg80zBOA/g==
+X-Received: by 2002:a5d:5f89:0:b0:390:f552:d291 with SMTP id ffacd0b85a97d-39132d68331mr3762833f8f.22.1741394773696;
+        Fri, 07 Mar 2025 16:46:13 -0800 (PST)
+Received: from im-t490s.redhat.com (ip-86-49-44-151.bb.vodafone.cz. [86.49.44.151])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bd426c01bsm98554725e9.2.2025.03.07.16.46.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Mar 2025 16:46:13 -0800 (PST)
+From: Ilya Maximets <i.maximets@ovn.org>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	dev@openvswitch.org,
+	linux-kernel@vger.kernel.org,
+	Pravin B Shelar <pshelar@ovn.org>,
+	Eelco Chaudron <echaudro@redhat.com>,
+	Aaron Conole <aconole@redhat.com>,
+	Ilya Maximets <i.maximets@ovn.org>
+Subject: [PATCH net] net: openvswitch: remove misbehaving actions length check
+Date: Sat,  8 Mar 2025 01:45:59 +0100
+Message-ID: <20250308004609.2881861-1-i.maximets@ovn.org>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1725935420.git.lucien.xin@gmail.com> <887eb7c776b63c613c6ac270442031be95de62f8.1725935420.git.lucien.xin@gmail.com>
- <20240911170048.4f6d5bd9@kernel.org> <CADvbK_eOW2sFcedQMzqkQ7yhm--zasgVD-uNhtaWJJLS21s_aQ@mail.gmail.com>
- <53728c53-5c1a-4f5d-9862-8369e9b9d8d0@samba.org>
-In-Reply-To: <53728c53-5c1a-4f5d-9862-8369e9b9d8d0@samba.org>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Fri, 7 Mar 2025 19:38:25 -0500
-X-Gm-Features: AQ5f1Jqv40IxKhhM_ElltElLnY1_jHNT71hYZr2m5ePLJkbNDUZ9Y0WluKCsZn0
-Message-ID: <CADvbK_fk=ga-i22LtLZik81S64ur8+gfrjrxAD45W9bF2Aa4gQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 4/5] net: integrate QUIC build configuration into
- Kconfig and Makefile
-To: Stefan Metzmacher <metze@samba.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, network dev <netdev@vger.kernel.org>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Moritz Buhl <mbuhl@openbsd.org>, 
-	Tyler Fanelli <tfanelli@redhat.com>, Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
-	Sabrina Dubroca <sd@queasysnail.net>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
-	Daniel Stenberg <daniel@haxx.se>, Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Mar 7, 2025 at 9:42=E2=80=AFAM Stefan Metzmacher <metze@samba.org> =
-wrote:
->
-> Am 12.09.24 um 16:57 schrieb Xin Long:
-> > On Wed, Sep 11, 2024 at 8:01=E2=80=AFPM Jakub Kicinski <kuba@kernel.org=
-> wrote:
-> >>
-> >> On Mon,  9 Sep 2024 22:30:19 -0400 Xin Long wrote:
-> >>> This commit introduces build configurations for QUIC within the netwo=
-rking
-> >>> subsystem. The Kconfig and Makefile files in the net directory are up=
-dated
-> >>> to include options and rules necessary for building QUIC protocol sup=
-port.
-> >>
-> >> Don't split out trivial config changes like this, what's the point.
-> >> It just make build testing harder.
-> > I will move this to the Patch 3/5.
-> >
-> >>
-> >> Speaking of which, it doesn't build on 32bit:
-> >>
-> >> ERROR: modpost: "__udivmoddi4" [net/quic/quic.ko] undefined!
-> >> ERROR: modpost: "__umoddi3" [net/quic/quic.ko] undefined!
-> >> ERROR: modpost: "__udivdi3" [net/quic/quic.ko] undefined!
-> > The tests were done on x86_64, aarch64, s390x and ppc64le.
-> > Sorry for missing 32bit machines.
-> >
-> >>
-> >> If you repost before 6.12-rc1 please post as RFC, due to LPC / netconf
-> >> we won't have enough time to review for 6.12 even if Linus cuts -rc8.
-> > Copy that.
->
-> I'm seeing some activity in https://github.com/lxin/quic/commits/main/
->
-> What's the progress on upstreaming this?
->
-> Any chance to get this into 6.15?
->
-Hi, Stefan, thank you for reaching out.
+The actions length check is unreliable and produces different results
+depending on the initial length of the provided netlink attribute and
+the composition of the actual actions inside of it.  For example, a
+user can add 4088 empty clone() actions without triggering -EMSGSIZE,
+on attempt to add 4089 such actions the operation will fail with the
+-EMSGSIZE verdict.  However, if another 16 KB of other actions will
+be *appended* to the previous 4089 clone() actions, the check passes
+and the flow is successfully installed into the openvswitch datapath.
 
-If 6.14 is released by the end of March, net-next will be closed very soon.
-I think it's very difficult to get it posted and reviewed on time.
-I expected to post v3 some time in April.
+The reason for a such a weird behavior is the way memory is allocated.
+When ovs_flow_cmd_new() is invoked, it calls ovs_nla_copy_actions(),
+that in turn calls nla_alloc_flow_actions() with either the actual
+length of the user-provided actions or the MAX_ACTIONS_BUFSIZE.  The
+function adds the size of the sw_flow_actions structure and then the
+actually allocated memory is rounded up to the closest power of two.
 
-Thanks.
+So, if the user-provided actions are larger than MAX_ACTIONS_BUFSIZE,
+then MAX_ACTIONS_BUFSIZE + sizeof(*sfa) rounded up is 32K + 24 -> 64K.
+Later, while copying individual actions, we look at ksize(), which is
+64K, so this way the MAX_ACTIONS_BUFSIZE check is not actually
+triggered and the user can easily allocate almost 64 KB of actions.
+
+However, when the initial size is less than MAX_ACTIONS_BUFSIZE, but
+the actions contain ones that require size increase while copying
+(such as clone() or sample()), then the limit check will be performed
+during the reserve_sfa_size() and the user will not be allowed to
+create actions that yield more than 32 KB internally.
+
+This is one part of the problem.  The other part is that it's not
+actually possible for the userspace application to know beforehand
+if the particular set of actions will be rejected or not.
+
+Certain actions require more space in the internal representation,
+e.g. an empty clone() takes 4 bytes in the action list passed in by
+the user, but it takes 12 bytes in the internal representation due
+to an extra nested attribute, and some actions require less space in
+the internal representations, e.g. set(tunnel(..)) normally takes
+64+ bytes in the action list provided by the user, but only needs to
+store a single pointer in the internal implementation, since all the
+data is stored in the tunnel_info structure instead.
+
+And the action size limit is applied to the internal representation,
+not to the action list passed by the user.  So, it's not possible for
+the userpsace application to predict if the certain combination of
+actions will be rejected or not, because it is not possible for it to
+calculate how much space these actions will take in the internal
+representation without knowing kernel internals.
+
+All that is causing random failures in ovs-vswitchd in userspace and
+inability to handle certain traffic patterns as a result.  For example,
+it is reported that adding a bit more than a 1100 VMs in an OpenStack
+setup breaks the network due to OVS not being able to handle ARP
+traffic anymore in some cases (it tries to install a proper datapath
+flow, but the kernel rejects it with -EMSGSIZE, even though the action
+list isn't actually that large.)
+
+Kernel behavior must be consistent and predictable in order for the
+userspace application to use it in a reasonable way.  ovs-vswitchd has
+a mechanism to re-direct parts of the traffic and partially handle it
+in userspace if the required action list is oversized, but that doesn't
+work properly if we can't actually tell if the action list is oversized
+or not.
+
+Solution for this is to check the size of the user-provided actions
+instead of the internal representation.  This commit just removes the
+check from the internal part because there is already an implicit size
+check imposed by the netlink protocol.  The attribute can't be larger
+than 64 KB.  Realistically, we could reduce the limit to 32 KB, but
+we'll be risking to break some existing setups that rely on the fact
+that it's possible to create nearly 64 KB action lists today.
+
+Vast majority of flows in real setups are below 100-ish bytes.  So
+removal of the limit will not change real memory consumption on the
+system.  The absolutely worst case scenario is if someone adds a flow
+with 64 KB of empty clone() actions.  That will yield a 192 KB in the
+internal representation consuming 256 KB block of memory.  However,
+that list of actions is not meaningful and also a no-op.  Real world
+very large action lists (that can occur for a rare cases of BUM
+traffic handling) are unlikely to contain a large number of clones and
+will likely have a lot of tunnel attributes making the internal
+representation comparable in size to the original action list.
+So, it should be fine to just remove the limit.
+
+Commit in the 'Fixes' tag is the first one that introduced the
+difference between internal representation and the user-provided action
+lists, but there were many more afterwards that lead to the situation
+we have today.
+
+Fixes: 7d5437c709de ("openvswitch: Add tunneling interface.")
+Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
+---
+ net/openvswitch/flow_netlink.c | 15 +--------------
+ 1 file changed, 1 insertion(+), 14 deletions(-)
+
+diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.c
+index 881ddd3696d5..95e0dd14dc1a 100644
+--- a/net/openvswitch/flow_netlink.c
++++ b/net/openvswitch/flow_netlink.c
+@@ -2317,14 +2317,10 @@ int ovs_nla_put_mask(const struct sw_flow *flow, struct sk_buff *skb)
+ 				OVS_FLOW_ATTR_MASK, true, skb);
+ }
+ 
+-#define MAX_ACTIONS_BUFSIZE	(32 * 1024)
+-
+ static struct sw_flow_actions *nla_alloc_flow_actions(int size)
+ {
+ 	struct sw_flow_actions *sfa;
+ 
+-	WARN_ON_ONCE(size > MAX_ACTIONS_BUFSIZE);
+-
+ 	sfa = kmalloc(kmalloc_size_roundup(sizeof(*sfa) + size), GFP_KERNEL);
+ 	if (!sfa)
+ 		return ERR_PTR(-ENOMEM);
+@@ -2480,15 +2476,6 @@ static struct nlattr *reserve_sfa_size(struct sw_flow_actions **sfa,
+ 
+ 	new_acts_size = max(next_offset + req_size, ksize(*sfa) * 2);
+ 
+-	if (new_acts_size > MAX_ACTIONS_BUFSIZE) {
+-		if ((next_offset + req_size) > MAX_ACTIONS_BUFSIZE) {
+-			OVS_NLERR(log, "Flow action size exceeds max %u",
+-				  MAX_ACTIONS_BUFSIZE);
+-			return ERR_PTR(-EMSGSIZE);
+-		}
+-		new_acts_size = MAX_ACTIONS_BUFSIZE;
+-	}
+-
+ 	acts = nla_alloc_flow_actions(new_acts_size);
+ 	if (IS_ERR(acts))
+ 		return ERR_CAST(acts);
+@@ -3545,7 +3532,7 @@ int ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
+ 	int err;
+ 	u32 mpls_label_count = 0;
+ 
+-	*sfa = nla_alloc_flow_actions(min(nla_len(attr), MAX_ACTIONS_BUFSIZE));
++	*sfa = nla_alloc_flow_actions(nla_len(attr));
+ 	if (IS_ERR(*sfa))
+ 		return PTR_ERR(*sfa);
+ 
+-- 
+2.47.0
+
 
