@@ -1,174 +1,222 @@
-Return-Path: <netdev+bounces-173190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47367A57C94
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 19:04:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BA50A57C99
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 19:05:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8297A16D2B4
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 18:04:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3864C16D1D3
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 18:05:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC1481662EF;
-	Sat,  8 Mar 2025 18:04:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87DB51A8403;
+	Sat,  8 Mar 2025 18:05:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bALZpQ3l"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nosDHBm7"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A85C137E
-	for <netdev@vger.kernel.org>; Sat,  8 Mar 2025 18:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9EAA2A8C1
+	for <netdev@vger.kernel.org>; Sat,  8 Mar 2025 18:05:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741457051; cv=none; b=q4CBZnLPSvkM0zv+zbC30aHiu05Eo/L+uIXTgoelXEl8eIn6yI71IBG6Z7vSFBTHW9537KHOAgJkuSAkOuKrroE74vA0cLUeu0jVHXFxSBADRCG0OgnvbVNutYm/bSj9GOtH6oqi5LPMwgtLLVdOObowU2Pfujs1as+phfkic9o=
+	t=1741457147; cv=none; b=bfK68IM2Jo8cLD7LOaWv54Kns1UzB3ljFv77FHuFvdOdUB0xq0Tav6wRH2wphMaps/Lg5I2+u8lEVmpb2J8yKNid1PyqeyjzmC7NYzA/dTlHfv5SxfoPxb9pPslMKsMe5YPeXInuJozEqrJW6uaQKxzNq6zARMEkt8GFXDTfHNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741457051; c=relaxed/simple;
-	bh=nTe/1FKrZ61wPMXwoiIXUSHwUYTDM2kvMZA2ZukMWhY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=qHMXw5H1n22AnJMk9ytpLvU25kcV4OQU+siCEs3ngXHUXo46Ynr3rxnscphF6cjbujmYQcCzMemlsFVGIN+mdpO0F3/Z39S4FqMtiHKsPitqDE+03+t0sphGPC8WBEK7Oh8vXL8WTJz7nIfVB6gUTcy/2+WusFmJtHPFv4cWOKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bALZpQ3l; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <662c734d-6b5a-4435-8eb4-4d912ba37cf6@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1741457037;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NmpQgy86E1gD6AfEtQJs4ondCL2qcMbQBKlrVz00Ka0=;
-	b=bALZpQ3lifquJythjAjppqtV99PwvNHvVJKB+Wv80juisPtGtPzG1oQ8YLY9UfldNm2fPO
-	UrmC+N3GAUn0mOfPl8Jv+5uYlI9/b8RQM07tBoHeRGbXvkC50H5iu57nHKbcH30TLk5Eaz
-	KVNeUYMbm0zZPK3dZcjP54OdOBGMNUE=
-Date: Sat, 8 Mar 2025 19:03:52 +0100
+	s=arc-20240116; t=1741457147; c=relaxed/simple;
+	bh=Uuhfy5QH6UXAKMCIOkltOl6ViUx163iJRQn7ipMgb34=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VDzkum3DE593ear30h/YJs0C6rkaUGZjE44hG2hKAgoMkW0K32Qjc11uadKQH3NSUEREINviYRg3wIfVokZZhVKGLd31aYP/yNKrHrAwlwcQMxPHB/tPl7x/08sTeXq+rB01KQQCqsHUxQYMXYwBJTq1aMeVrZbmhFbRnC3/J8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nosDHBm7; arc=none smtp.client-ip=209.85.222.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7c2303a56d6so334743385a.3
+        for <netdev@vger.kernel.org>; Sat, 08 Mar 2025 10:05:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741457144; x=1742061944; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aYgIXRvfEDGWKUHb7UP2pmkB9dFTGhBswExBKtuosS8=;
+        b=nosDHBm7q0JNCERGiOiMxFGMIIadkoUZ3h1H18yWIAJMMRLOke0NMh2/43FQXwOdvg
+         ftRY9o2HCf3CZa1eMEvrlwaP4nOC0/SnOV5K47/vWAeKi8WXv7yjIeuvnlmvPqcClnSW
+         lItfFIhzuZuIqiZOl74WmUygCHeGszwpPtMqPHeuPf4eedaRVfNxupbghv/35z15NmYG
+         Xnm27oCy4/ly/lYaPp+9oyA26Zao2M6e4UQtLNpg8fhUi/kWaDnPMmGMi1h23yAcE2uW
+         N3y290IhoJWFPLPE01OsnTUIdc+q3dbTfuXRAi39GBalCLOOZCelD3boG5Mo9HujFQNg
+         S2Qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741457144; x=1742061944;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aYgIXRvfEDGWKUHb7UP2pmkB9dFTGhBswExBKtuosS8=;
+        b=NylJ/TmOG1Gw7oMbO+gAmO17guC1b6nRKo1leo96xKdNm4PniJjtY2cw3VFrCk5K2D
+         4W+LmKbcQDLGEkKhEtvf2TlaQRK4xR9Jnf2v/0ZwgE8B1q9/GNpA5nnTMhxOpiBnOaPn
+         k7rW4RlhBy4pOf9865c+PC4xqDshnfvIAPrug+03zsDsSXrb+Qx7uUbaiX/zA+fFXaaj
+         /nVzE7J2NwG+ZjFf55NoOcdVGE5ZnSVn8cjdmRJBVou+5Wqz8SNAtXpKQ3hXnQFmqAq1
+         cwdWixAAsgJA4MqvD+T15aXgnD229ole5Mg0++7CwHQ7u2haUFh2aulWkdr8Gv7mfFf7
+         /xpA==
+X-Gm-Message-State: AOJu0YwC5ubjEsJD24dFt2f6kI1IYbTnvlnrxA11DUQH9l4sfCDbDNIt
+	w/79jxkjAnBubes7S7rW4+DX1Nkey8ikwbjWW1D7aYlV0Ez+VRnvBLqM1A==
+X-Gm-Gg: ASbGncvQpepULeQ+i1t/bo9XQUdeBP1xQ040IrUw53KuzTs+K8TrvFMZLejlFvJAPlP
+	QkPK4XROsv2ZNvnjP1XALf8Gmp2hV/j30ngSi89zPMAWwwYTmCnptJmn+biikQkKWdC3oReA8VR
+	lfr3Kzsf5i41n3WXgEogMHhbCCas27gy7PHc/O/IcK4ZwTXY4fe5OCPf6qRgmddFyPxMMxiDqER
+	ZZkxMGJk8hE0xw2oOiwJ+kyKGy2vbdhGzI70zTY/APBfYw/GqBSvrTOL9bbYEXbKsxaAZnvWdz1
+	gDtilX/3+uJeTbHNkJbIO/EstuP1eMpVrZy23WFb6LOG4UUGSp4oyRhvsJ77Eui6+yHUyrfudIT
+	s4Cq3p+Xm
+X-Google-Smtp-Source: AGHT+IHBKkiUfMTMDqQJTgLijZD6dZ4lfV/YlmRwAwh3Sx/hipPGEfP7LIqXBxHqt9aV+jy1oZVJ0g==
+X-Received: by 2002:a05:620a:8904:b0:7c5:48bc:8c7d with SMTP id af79cd13be357-7c548bc8f29mr233221085a.36.1741457144393;
+        Sat, 08 Mar 2025 10:05:44 -0800 (PST)
+Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c3e54ff935sm399857585a.89.2025.03.08.10.05.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 08 Mar 2025 10:05:44 -0800 (PST)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	dev@openvswitch.org,
+	ovs-dev@openvswitch.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pravin B Shelar <pshelar@ovn.org>,
+	Ilya Maximets <i.maximets@ovn.org>,
+	Aaron Conole <aconole@redhat.com>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Jianbo Liu <jianbol@nvidia.com>,
+	Florian Westphal <fw@strlen.de>
+Subject: [PATCH net] Revert "openvswitch: switch to per-action label counting in conntrack"
+Date: Sat,  8 Mar 2025 13:05:43 -0500
+Message-ID: <1bdeb2f3a812bca016a225d3de714427b2cd4772.1741457143.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [syzbot] [rdma?] WARNING in rxe_pool_cleanup
-To: syzbot <syzbot+221e213bf17f17e0d6cd@syzkaller.appspotmail.com>,
- jgg@ziepe.ca, leon@kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
- syzkaller-bugs@googlegroups.com, zyjzyj2000@gmail.com
-References: <67a59df3.050a0220.2b1e6.0011.GAE@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <67a59df3.050a0220.2b1e6.0011.GAE@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-在 2025/2/7 6:45, syzbot 写道:
-> syzbot has found a reproducer for the following issue on:
-> 
-> HEAD commit:    bb066fe812d6 Merge tag 'pci-v6.14-fixes-2' of git://git.ke..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=16a973df980000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=1909f2f0d8e641ce
-> dashboard link: https://syzkaller.appspot.com/bug?extid=221e213bf17f17e0d6cd
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11a01df8580000
-> 
-> Downloadable assets:
-> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-bb066fe8.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/ac7155966351/vmlinux-bb066fe8.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/92d6cbf35949/bzImage-bb066fe8.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+221e213bf17f17e0d6cd@syzkaller.appspotmail.com
-> 
-> smc: removing ib device syz0
-> ------------[ cut here ]------------
-> WARNING: CPU: 0 PID: 5645 at drivers/infiniband/sw/rxe/rxe_pool.c:116 rxe_pool_cleanup+0x47/0x50 drivers/infiniband/sw/rxe/rxe_pool.c:116
+Currently, ovs_ct_set_labels() is only called for confirmed conntrack
+entries (ct) within ovs_ct_commit(). However, if the conntrack entry
+does not have the labels_ext extension, attempting to allocate it in
+ovs_ct_get_conn_labels() for a confirmed entry triggers a warning in
+nf_ct_ext_add():
 
-Hi, all
+  WARN_ON(nf_ct_is_confirmed(ct));
 
-I delved into this problem. I found the following in the link 
-https://syzkaller.appspot.com/x/log.txt?x=16a973df980000
+This happens when the conntrack entry is created externally before OVS
+increments net->ct.labels_used. The issue has become more likely since
+commit fcb1aa5163b1 ("openvswitch: switch to per-action label counting
+in conntrack"), which changed to use per-action label counting and
+increment net->ct.labels_used when a flow with ct action is added.
 
-"
-[   73.687051][ T5401] infiniband syz0: set active
-[   73.688993][ T5401] infiniband syz0: added bond0
-[   73.724619][ T5401] RDS/IB: syz0: added 
-   < --- It seems that RDS also used this rxe device in this test.
-[   73.726492][ T5401] smc: adding ib device syz0 with port count 1
-[   73.729145][ T5401] smc:    ib device syz0 port 1 has pnetid
-"
+Since there’s no straightforward way to fully resolve this issue at the
+moment, this reverts the commit to avoid breaking existing use cases.
 
-But when smc releases rxe device, RDS does not release rxe device.
+Fixes: fcb1aa5163b1 ("openvswitch: switch to per-action label counting in conntrack")
+Reported-by: Jianbo Liu <jianbol@nvidia.com>
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+---
+ net/openvswitch/conntrack.c | 30 ++++++++++++++++++------------
+ net/openvswitch/datapath.h  |  3 +++
+ 2 files changed, 21 insertions(+), 12 deletions(-)
 
-The logs are as below
-"
-[   76.652232][ T5401] smc: removing ib device syz0
-[   76.952936][ T5401] ------------[ cut here ]------------
-[   76.955199][ T5401] WARNING: CPU: 0 PID: 5401 at 
-drivers/infiniband/sw/rxe/rxe_pool.c:116 rxe_pool_cleanup+0x47/0x50
-"
-I have no idea about the whole test script. So I just suggest whether 
-this test script remove this RDS initialization because RDS does not do 
-any work in this script.
-
-Or before smc removes ib device syz0, let RDS also release rxe device.
-
-Then let us know whether this problem still occur or not.
-
-Thanks a lot.
-Zhu Yanjun
-
-> Modules linked in:
-> CPU: 0 UID: 0 PID: 5645 Comm: syz.0.16 Not tainted 6.14.0-rc1-syzkaller-00081-gbb066fe812d6 #0
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-> RIP: 0010:rxe_pool_cleanup+0x47/0x50 drivers/infiniband/sw/rxe/rxe_pool.c:116
-> Code: 00 00 fc ff df 80 3c 08 00 74 08 48 89 df e8 10 aa 1a f9 48 83 3b 00 75 0b e8 95 11 b4 f8 5b c3 cc cc cc cc e8 8a 11 b4 f8 90 <0f> 0b 90 5b c3 cc cc cc cc 90 90 90 90 90 90 90 90 90 90 90 90 90
-> RSP: 0018:ffffc9000ce370e8 EFLAGS: 00010293
-> RAX: ffffffff890b4c96 RBX: ffff888052855380 RCX: ffff88801f3e8000
-> RDX: 0000000000000000 RSI: 0000000000000002 RDI: ffff888052855300
-> RBP: 0000000000000002 R08: ffffffff88e3bcc3 R09: 1ffff1100a50a8ee
-> R10: dffffc0000000000 R11: ffffffff89096000 R12: dffffc0000000000
-> R13: dffffc0000000000 R14: ffff888052854658 R15: dffffc0000000000
-> FS:  00007fc32943e6c0(0000) GS:ffff88801fc00000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007fc32943dfe0 CR3: 00000000405a6000 CR4: 0000000000352ef0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->   <TASK>
->   rxe_dealloc+0x33/0x100 drivers/infiniband/sw/rxe/rxe.c:24
->   ib_dealloc_device+0x50/0x200 drivers/infiniband/core/device.c:647
->   __ib_unregister_device+0x366/0x3d0 drivers/infiniband/core/device.c:1520
->   ib_unregister_device_and_put+0xb9/0xf0 drivers/infiniband/core/device.c:1567
->   nldev_dellink+0x2c6/0x310 drivers/infiniband/core/nldev.c:1825
->   rdma_nl_rcv_skb drivers/infiniband/core/netlink.c:239 [inline]
->   rdma_nl_rcv+0x6dd/0x9e0 drivers/infiniband/core/netlink.c:259
->   netlink_unicast_kernel net/netlink/af_netlink.c:1322 [inline]
->   netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1348
->   netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1892
->   sock_sendmsg_nosec net/socket.c:713 [inline]
->   __sock_sendmsg+0x221/0x270 net/socket.c:728
->   ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2568
->   ___sys_sendmsg net/socket.c:2622 [inline]
->   __sys_sendmsg+0x269/0x350 net/socket.c:2654
->   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7fc32858cde9
-> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007fc32943e038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 00007fc3287a6160 RCX: 00007fc32858cde9
-> RDX: 0000000020000000 RSI: 0000200000000000 RDI: 0000000000000004
-> RBP: 00007fc32860e2a0 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> R13: 0000000000000000 R14: 00007fc3287a6160 R15: 00007ffc02559df8
->   </TASK>
-> 
-> 
-> ---
-> If you want syzbot to run the reproducer, reply with:
-> #syz test: git://repo/address.git branch-or-commit-hash
-> If you attach or paste a git patch, syzbot will apply it before testing.
+diff --git a/net/openvswitch/conntrack.c b/net/openvswitch/conntrack.c
+index 3bb4810234aa..e573e9221302 100644
+--- a/net/openvswitch/conntrack.c
++++ b/net/openvswitch/conntrack.c
+@@ -1368,8 +1368,11 @@ bool ovs_ct_verify(struct net *net, enum ovs_key_attr attr)
+ 	    attr == OVS_KEY_ATTR_CT_MARK)
+ 		return true;
+ 	if (IS_ENABLED(CONFIG_NF_CONNTRACK_LABELS) &&
+-	    attr == OVS_KEY_ATTR_CT_LABELS)
+-		return true;
++	    attr == OVS_KEY_ATTR_CT_LABELS) {
++		struct ovs_net *ovs_net = net_generic(net, ovs_net_id);
++
++		return ovs_net->xt_label;
++	}
+ 
+ 	return false;
+ }
+@@ -1378,7 +1381,6 @@ int ovs_ct_copy_action(struct net *net, const struct nlattr *attr,
+ 		       const struct sw_flow_key *key,
+ 		       struct sw_flow_actions **sfa,  bool log)
+ {
+-	unsigned int n_bits = sizeof(struct ovs_key_ct_labels) * BITS_PER_BYTE;
+ 	struct ovs_conntrack_info ct_info;
+ 	const char *helper = NULL;
+ 	u16 family;
+@@ -1407,12 +1409,6 @@ int ovs_ct_copy_action(struct net *net, const struct nlattr *attr,
+ 		return -ENOMEM;
+ 	}
+ 
+-	if (nf_connlabels_get(net, n_bits - 1)) {
+-		nf_ct_tmpl_free(ct_info.ct);
+-		OVS_NLERR(log, "Failed to set connlabel length");
+-		return -EOPNOTSUPP;
+-	}
+-
+ 	if (ct_info.timeout[0]) {
+ 		if (nf_ct_set_timeout(net, ct_info.ct, family, key->ip.proto,
+ 				      ct_info.timeout))
+@@ -1581,7 +1577,6 @@ static void __ovs_ct_free_action(struct ovs_conntrack_info *ct_info)
+ 	if (ct_info->ct) {
+ 		if (ct_info->timeout[0])
+ 			nf_ct_destroy_timeout(ct_info->ct);
+-		nf_connlabels_put(nf_ct_net(ct_info->ct));
+ 		nf_ct_tmpl_free(ct_info->ct);
+ 	}
+ }
+@@ -2006,9 +2001,17 @@ struct genl_family dp_ct_limit_genl_family __ro_after_init = {
+ 
+ int ovs_ct_init(struct net *net)
+ {
+-#if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
++	unsigned int n_bits = sizeof(struct ovs_key_ct_labels) * BITS_PER_BYTE;
+ 	struct ovs_net *ovs_net = net_generic(net, ovs_net_id);
+ 
++	if (nf_connlabels_get(net, n_bits - 1)) {
++		ovs_net->xt_label = false;
++		OVS_NLERR(true, "Failed to set connlabel length");
++	} else {
++		ovs_net->xt_label = true;
++	}
++
++#if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+ 	return ovs_ct_limit_init(net, ovs_net);
+ #else
+ 	return 0;
+@@ -2017,9 +2020,12 @@ int ovs_ct_init(struct net *net)
+ 
+ void ovs_ct_exit(struct net *net)
+ {
+-#if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+ 	struct ovs_net *ovs_net = net_generic(net, ovs_net_id);
+ 
++#if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+ 	ovs_ct_limit_exit(net, ovs_net);
+ #endif
++
++	if (ovs_net->xt_label)
++		nf_connlabels_put(net);
+ }
+diff --git a/net/openvswitch/datapath.h b/net/openvswitch/datapath.h
+index 365b9bb7f546..9ca6231ea647 100644
+--- a/net/openvswitch/datapath.h
++++ b/net/openvswitch/datapath.h
+@@ -160,6 +160,9 @@ struct ovs_net {
+ #if	IS_ENABLED(CONFIG_NETFILTER_CONNCOUNT)
+ 	struct ovs_ct_limit_info *ct_limit_info;
+ #endif
++
++	/* Module reference for configuring conntrack. */
++	bool xt_label;
+ };
+ 
+ /**
+-- 
+2.47.1
 
 
