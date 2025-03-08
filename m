@@ -1,95 +1,92 @@
-Return-Path: <netdev+bounces-173140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E00B7A577FD
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 04:41:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9254A57824
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 04:52:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0156618996D8
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 03:41:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F36C16EBEC
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 03:52:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 001251953BB;
-	Sat,  8 Mar 2025 03:40:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C6417A30A;
+	Sat,  8 Mar 2025 03:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T7MimtaV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T5ucwuau"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBEA0194C86;
-	Sat,  8 Mar 2025 03:40:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DDA7169AE6;
+	Sat,  8 Mar 2025 03:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741405218; cv=none; b=t2nqFa7aq3OGnTWTGllkRfdi2RvNF22HWdDrtvT+uSh2mBoRjHEBcIOYwjLg1huXk0wk7Vg1s6EARl8vYhdBCqKz68SAayOaZ08Y2XwgkymYLcMiF/513ju3mB2wGT61+vTsNneY/l3zV7xfuaniLf6kSkK1lZ9Cuq95+F993zM=
+	t=1741405831; cv=none; b=rstn4bJuPvdN+BfN/9r6FrgiyWWCy/qDyps+BYJAuobBZhANsL9R4sj3pU8p9kNzjNtxnCpm35ooFNTBIBMDm9zChSCK5nFhlSYXpcitHZggv9QcsFULheN18cyG6n1xRXPOyS5gp3/XiMYKhjDHBsfVRBVdlbkpJOiSyca1vxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741405218; c=relaxed/simple;
-	bh=nnK9GgQQvApGvGiUehqlLs+ig3NFS4kx+7YOpbqlyk4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=OwJ172LpVZh+GQjkicwMyRzrTGhCXXkEoRG/ukW/fZ/uVShiYulH8XXS0J4VrH7dhk3iSvk6j1UL3JkvHCQj/ANqZYr5e/CWHYvXwKAoKdkRwiQj5F0LK/Zvzan+hDrorTy/fHctCJOYyFuGh3VWb77q24frYiVmNpxY7LdvGTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T7MimtaV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A281EC4CED1;
-	Sat,  8 Mar 2025 03:40:18 +0000 (UTC)
+	s=arc-20240116; t=1741405831; c=relaxed/simple;
+	bh=thNru/J8O4N9hCvQBln45Ii9nJYq1lZSQziQYfLtouc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=o9bqEsXt+mS6n2jgAay/ZCJHf7pZzHFLPBqBGx7nO7pcdMICFrwVx9GmErz4HqqvPesiz1qDKu16yn9Nz6ebTl7Bk2xw4drQkBRxWwSms2mlrHdSAaVyvBOb5QpbnFA0ia/vi2cI8Z5sEEFSa/zR9ArLjCA8kz8Y7EGPwmgHQeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T5ucwuau; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 577DEC4CEE0;
+	Sat,  8 Mar 2025 03:50:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741405218;
-	bh=nnK9GgQQvApGvGiUehqlLs+ig3NFS4kx+7YOpbqlyk4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=T7MimtaVMIm7WOvAm3yWbEZgfGtq4jJECDUm9oNdvj2h4pP9OZRkDGrPyJ0a848YT
-	 t4i8xmDUTkYcpIIOb8uP0Tz7X7Vqxxh70Z4sXNOVYCWq3LHIzwhrR8nagSy1StnRSB
-	 hFow9sn592hThsSf32dK8lIb6EOw8X6ox2LChzj8CuWEuc9sb4LalVZAarUCio6ab+
-	 lRMFzAkQD0m0n8JsuBEPhTsnc2VJ55jxAEw2D6tmAY28+c4rSybunvpTuF/xT2facm
-	 F6rS31d0RJgdRyRwIdQtYT8Xsni+0KVpWPA6hR0oQ8JbucNivYHj4zxpn5KKYtlxvF
-	 +JyNFLC4AVblw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BE9380CFFB;
-	Sat,  8 Mar 2025 03:40:53 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1741405831;
+	bh=thNru/J8O4N9hCvQBln45Ii9nJYq1lZSQziQYfLtouc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=T5ucwuauqG1W/nrQFZDbIFfy7Pl86HpD+CcU99Kyipq4gMn1T3pPF+f4zA60B+zL/
+	 Qm36MeyVj0Qrr/18aii0vjRP6Jw4wu8Kt87paitKHx7t8Dsr0yUz+67y80AuU7Ejvt
+	 zwJxD+2dScZV3H2nnvmzKIYug4Q9fzhGB9mzjwNGV0/8GAJ0kEdAfDlRQxo2s9hg8q
+	 up1ppFMrfTP5B4bfyv4U8BoeaY8YuV0ewCHXlJuI5PyYq0i+Gpq36/dssFBifEjylw
+	 aTMGo1tkZxpIatqGzPM2uAI9yl4k9LO1oGAO3EJr8TJJ+pjGdbYnEUbGMAZCsJY378
+	 hMeLhM/JuF1uw==
+Date: Fri, 7 Mar 2025 19:50:29 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ decui@microsoft.com, stephen@networkplumber.org, kys@microsoft.com,
+ paulros@microsoft.com, olaf@aepfle.de, vkuznets@redhat.com,
+ davem@davemloft.net, wei.liu@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, leon@kernel.org, longli@microsoft.com,
+ ssengar@linux.microsoft.com, linux-rdma@vger.kernel.org,
+ daniel@iogearbox.net, john.fastabend@gmail.com, bpf@vger.kernel.org,
+ ast@kernel.org, hawk@kernel.org, tglx@linutronix.de,
+ shradhagupta@linux.microsoft.com, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+Subject: Re: [PATCH net] net: mana: Support holes in device list reply msg
+Message-ID: <20250307195029.1dc74f8e@kernel.org>
+In-Reply-To: <1741211181-6990-1-git-send-email-haiyangz@microsoft.com>
+References: <1741211181-6990-1-git-send-email-haiyangz@microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] gve: convert to use netmem for DQO RDA mode
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174140525223.2565853.15946733400929396674.git-patchwork-notify@kernel.org>
-Date: Sat, 08 Mar 2025 03:40:52 +0000
-References: <20250307003905.601175-1-hramamurthy@google.com>
-In-Reply-To: <20250307003905.601175-1-hramamurthy@google.com>
-To: Harshitha Ramamurthy <hramamurthy@google.com>
-Cc: netdev@vger.kernel.org, jeroendb@google.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- pkaligineedi@google.com, shailend@google.com, willemb@google.com,
- ziweixiao@google.com, jacob.e.keller@intel.com, linux-kernel@vger.kernel.org,
- almasrymina@google.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Wed,  5 Mar 2025 13:46:21 -0800 Haiyang Zhang wrote:
+> -	for (i = 0; i < max_num_devs; i++) {
+> +	for (i = 0; i < GDMA_DEV_LIST_SIZE &&
+> +		found_dev < resp.num_of_devs; i++) {
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+unfortunate mis-indent here, it blend with the code.
+checkpatch is right that it should be aligned with opening bracket
 
-On Fri,  7 Mar 2025 00:39:05 +0000 you wrote:
-> To add netmem support to the gve driver, add a union
-> to the struct gve_rx_slot_page_info. netmem_ref is used for
-> DQO queue format's raw DMA addressing(RDA) mode. The struct
-> page is retained for other usecases.
-> 
-> Then, switch to using relevant netmem helper functions for
-> page pool and skb frag management.
-> 
-> [...]
+>  		dev = resp.devs[i];
+>  		dev_type = dev.type;
+>  
+> +		/* Skip empty devices */
+> +		if (dev.as_uint32 == 0)
+> +			continue;
+> +
+> +		found_dev++;
+> +		dev_info(gc->dev, "Got devidx:%u, type:%u, instance:%u\n", i,
+> +			 dev.type, dev.instance);
 
-Here is the summary with links:
-  - [net-next] gve: convert to use netmem for DQO RDA mode
-    https://git.kernel.org/netdev/net-next/c/aa3e360701c3
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Are you sure you want to print this info message for each device,
+each time it's probed? Seems pretty noisy. We generally recommend
+printing about _unusual_ things.
 
