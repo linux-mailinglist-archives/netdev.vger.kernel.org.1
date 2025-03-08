@@ -1,207 +1,163 @@
-Return-Path: <netdev+bounces-173118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC1E3A57672
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 01:01:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D388CA5766E
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 01:01:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D2D11899082
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 00:01:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 243731897B26
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 00:01:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9897F8F5C;
-	Sat,  8 Mar 2025 00:01:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 662E2EEBB;
+	Sat,  8 Mar 2025 00:01:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
+Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1CD2196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DA422F30
 	for <netdev@vger.kernel.org>; Sat,  8 Mar 2025 00:01:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741392085; cv=none; b=PUE3vBSdpPwTVM2dqWvcL30u4Gz54Wk+T1JoWATB9L+KEprMgcF7obwx9shrwpPM332IpdXMFaHY/Eu6YfO0bHVEAhIKL9Ie3YuOS3O+86j/ZVniwCpjGqt416ADOt9MjqP21yWaf9N4Yp/MA0zJ1fUZC3dxdS4+JcrBheMtNA4=
+	t=1741392084; cv=none; b=M868jAbnBPPG22aHJ+/fCX36PU5JpcG/FW8OPVb9P3Re0NPoGNx54trqKxJOBnLKnxJHMfg5sRp3CN4igZYyMY1rjwXe50XktTpYfVAKV4uBUW/ajkqeqDuBqE70N+F9vYVwcJOkve3W9dnb831RnQzny+3b6ivMBUwr3/9xXSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741392085; c=relaxed/simple;
-	bh=N0eKSeVL7+VRhfKRNDp0NxLIQwmlrCDDLmB0QxzSMug=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ZUMcO9YZpMYXuZiI4HMUiUdDSRXID1p4skB78fwvGn/2VMFsZ9SzDu5SWs5rIfYT0QDQbOIclm+zK9pbGCsMH/s8HwN4TgRGFr8D5uMiEmHq6tpOS5sl/MYWRWuO7SSTaOTYB9RMn4Oto9eyWkRfCRly9D5zEB5zQBRCOTiAY1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
+	s=arc-20240116; t=1741392084; c=relaxed/simple;
+	bh=JTb9C0DPic752koVYj+XdYiizzZ92RKNneuOjZaUZPs=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=BMkzAFRQeVHUv3mK51nYYpeqdxeie75M0uc8yHQOz//+QHx9Kfeyi8+23hY/peTOJBVokXdf1ksg8SPsIsxPjMv65DE+6wlTLUfPGnV/Yl/jU3HXc31kCd9eQJA3mmJdeI+i/5pRJxMlzRM5RL0crJPZDdIO6f1s4w6N78ML4js=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-85b30c95536so19056039f.1
+Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-849d26dd331so309219839f.1
         for <netdev@vger.kernel.org>; Fri, 07 Mar 2025 16:01:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741392082; x=1741996882;
+        d=1e100.net; s=20230601; t=1741392081; x=1741996881;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=zeqWouS+SSFmOzj0vligAq58jwoQW/v1su47nD9czv8=;
-        b=tN3PF6+hLN+B7CdHdoV4emaExokqYn8iw9tOfyxnLQ7O/nyRdHZNHBqGeoGSa1uiFW
-         vp5swbu4MvGrxTgnWbwylJUt6LijBAZUTFocVFPHXCQyvUWC+8KltDA9JGXePXYVeW1S
-         yU5R8HxfE+9S3pttVdsDKq5sywnIn+Cd4V4EiSiDAnEMgLrf6Zk2pQvaLieQj3w+Cu9b
-         yy7CxSdABZmHE9pKWqd/qYhoaGjV7aq7eKPoXeMrhTqvq86aNLoFOGCTLtE/bl0IQoZd
-         VNyCjj0Pa98+lks8wJEZ1/vOCnMQE4VxqijU7U+kf9Hp9170J/NIYOfcrjsSdhjkDOPH
-         cHWA==
-X-Forwarded-Encrypted: i=1; AJvYcCXmiYhiHIJjyCjHdybzTdCpprmfvR52g8XBODmBzicYwMs80KL/t5cGbsqZCOA/sONmSkztFFI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8TCJw21jidP/g10IjkqPjACpiOE0GnWqm88OpEVnxq/IWrLJ+
-	ZCGf9F4H0k3E+2AxLGK/wyoS2el3aqtlmNHXl5FaeDBlmwN62D76SSy0coZ7MEhgUqPelW05Tyo
-	dTrCLnzLekvCJuUAwIS+bgwhJEbe7q43t+huEs0X1NbQOP1BkwzIhgek=
-X-Google-Smtp-Source: AGHT+IE2RVxAN/LY5wy/Gi9Cg3zFZnJxLg+/g/jvJkGvV7nk6cVSFYhEwL0YOUHJDLjNEV8tUI9rU044HUQ7z4Y8tCdCJAizeq6H
+        bh=9sRa1wIeMg9ISz07gwI8bn8Bz+hHteqDa9YLweb3Hxw=;
+        b=Eco3o8v9vZzeMkSzAjgQibY3qnEm53HU9OOOeVbTHD1PF9Amb8xUmJk08MzbFP72lJ
+         nwlmuV8NbxBc8MRj42w0uda5Tp4Qi1okhiKJYlDS9ySWnl/IOjqAjFzf9zKmRXq2QUGU
+         OSuUOmJBuArmsT7sIVmJ25ikunoRdrfI6STBIFTzuukdz3KnvqAh7CcrXnCDxH26X/Ib
+         OrFs2vIK7K3RVhZoWVmsbnpkDdUvq9Xef8PaxNCWYUsqtbaREOvXm8LzKkcNxOlBePSZ
+         kUN/VM4LU+KLbXg0lYMIi1q44zlCsYfuDp/13qnZ0QkH5rtdCpU7KMp5diuehi7g86VC
+         I2Ow==
+X-Forwarded-Encrypted: i=1; AJvYcCVSXzhFZ6YkDE7mFUgU+joIx91QfW+lNAerphntTgLvg4JUwOTG94c4bb7PuPErHGj1DrSu5Kk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyITpVVXNcBQ2TdoN9qi+MwVVI4WV0cPcopULof1BzMT+R0nPzg
+	PTdKk6hvmJmnekQ/5eyW5BLmvfzG80pwzsBtG17Vb743KuUC+4E17jzSg9TEBX1YLvSNpMnvSoL
+	054KpUOnUmmG5B94RBrfMn8BPK7AGd9VdJqxmzGatQxnBw8iNrfUrs7Y=
+X-Google-Smtp-Source: AGHT+IH676ZCOgN/MhTUCkWEJaTiT3UDqEeYgcSZDoNksms+A5vyQ2ggHGQcL7JwarDOX8B5onynXCNXVbdH7+D8NBJJVRKNWm8+
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a83:b0:3d3:f27a:9103 with SMTP id
- e9e14a558f8ab-3d44197137fmr69704715ab.1.1741392081681; Fri, 07 Mar 2025
+X-Received: by 2002:a05:6e02:378e:b0:3d4:2ea4:6b87 with SMTP id
+ e9e14a558f8ab-3d44af34fd9mr11591935ab.11.1741392081443; Fri, 07 Mar 2025
  16:01:21 -0800 (PST)
 Date: Fri, 07 Mar 2025 16:01:21 -0800
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67cb88d1.050a0220.d8275.022c.GAE@google.com>
-Subject: [syzbot] [net?] [bcachefs?] KASAN: slab-use-after-free Read in
- ip_skb_dst_mtu (2)
-From: syzbot <syzbot+98d6cedbab2dd7eaa17e@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kent.overstreet@linux.dev, kuba@kernel.org, 
-	linux-bcachefs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Message-ID: <67cb88d1.050a0220.d8275.022b.GAE@google.com>
+Subject: [syzbot] [net?] possible deadlock in register_netdevice
+From: syzbot <syzbot+666871ad20c653deb9a6@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
 Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    03d38806a902 Merge tag 'thermal-6.14-rc5' of git://git.ker..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15952864580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8de9cc84d5960254
-dashboard link: https://syzkaller.appspot.com/bug?extid=98d6cedbab2dd7eaa17e
+HEAD commit:    865eddcf0afb Merge branch 'mlx5-misc-enhancements-2025-03-..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=16d8c878580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=fbc61e4c6e816b7b
+dashboard link: https://syzkaller.appspot.com/bug?extid=666871ad20c653deb9a6
 compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17952864580000
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13896a54580000
 
 Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/3a7779436438/disk-03d38806.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d7e23add8bc8/vmlinux-03d38806.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/b718ff622c01/bzImage-03d38806.xz
-mounted in repro: https://storage.googleapis.com/syzbot-assets/5b20d0f140ec/mount_0.gz
-
-The issue was bisected to:
-
-commit 14152654805256d760315ec24e414363bfa19a06
-Author: Kent Overstreet <kent.overstreet@linux.dev>
-Date:   Mon Nov 25 05:21:27 2024 +0000
-
-    bcachefs: Bad btree roots are now autofix
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13c464b7980000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=102464b7980000
-console output: https://syzkaller.appspot.com/x/log.txt?x=17c464b7980000
+disk image: https://storage.googleapis.com/syzbot-assets/15388530d696/disk-865eddcf.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/dfd22998e59b/vmlinux-865eddcf.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/ecc6b8f2a90d/bzImage-865eddcf.xz
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+98d6cedbab2dd7eaa17e@syzkaller.appspotmail.com
-Fixes: 141526548052 ("bcachefs: Bad btree roots are now autofix")
+Reported-by: syzbot+666871ad20c653deb9a6@syzkaller.appspotmail.com
 
-==================================================================
-BUG: KASAN: slab-use-after-free in sk_fullsock include/net/sock.h:2787 [inline]
-BUG: KASAN: slab-use-after-free in ip_skb_dst_mtu+0xa42/0xbc0 include/net/ip.h:515
-Read of size 1 at addr ffff88805fe4154a by task kworker/1:2/975
+============================================
+WARNING: possible recursive locking detected
+6.14.0-rc5-syzkaller-01096-g865eddcf0afb #0 Not tainted
+--------------------------------------------
+dhcpcd/5501 is trying to acquire lock:
+ffff88807e6fad28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2765 [inline]
+ffff88807e6fad28 (&dev->lock){+.+.}-{4:4}, at: register_netdevice+0x12d8/0x1b70 net/core/dev.c:11008
 
-CPU: 1 UID: 0 PID: 975 Comm: kworker/1:2 Not tainted 6.14.0-rc4-syzkaller-00248-g03d38806a902 #0
+but task is already holding lock:
+ffff88807c708d28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2765 [inline]
+ffff88807c708d28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock_ops include/linux/netdevice.h:2804 [inline]
+ffff88807c708d28 (&dev->lock){+.+.}-{4:4}, at: dev_change_flags+0x120/0x270 net/core/dev_api.c:65
+
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(&dev->lock);
+  lock(&dev->lock);
+
+ *** DEADLOCK ***
+
+ May be due to missing lock nesting notation
+
+2 locks held by dhcpcd/5501:
+ #0: ffffffff8fed6848 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_net_lock include/linux/rtnetlink.h:130 [inline]
+ #0: ffffffff8fed6848 (rtnl_mutex){+.+.}-{4:4}, at: devinet_ioctl+0x34c/0x1d80 net/ipv4/devinet.c:1121
+ #1: ffff88807c708d28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2765 [inline]
+ #1: ffff88807c708d28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock_ops include/linux/netdevice.h:2804 [inline]
+ #1: ffff88807c708d28 (&dev->lock){+.+.}-{4:4}, at: dev_change_flags+0x120/0x270 net/core/dev_api.c:65
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 5501 Comm: dhcpcd Not tainted 6.14.0-rc5-syzkaller-01096-g865eddcf0afb #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-Workqueue: mld mld_dad_work
 Call Trace:
  <TASK>
  __dump_stack lib/dump_stack.c:94 [inline]
  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:408 [inline]
- print_report+0x16e/0x5b0 mm/kasan/report.c:521
- kasan_report+0x143/0x180 mm/kasan/report.c:634
- sk_fullsock include/net/sock.h:2787 [inline]
- ip_skb_dst_mtu+0xa42/0xbc0 include/net/ip.h:515
- __ip_finish_output+0x12b/0x400 net/ipv4/ip_output.c:307
- iptunnel_xmit+0x55d/0x9b0 net/ipv4/ip_tunnel_core.c:82
- udp_tunnel_xmit_skb+0x262/0x3b0 net/ipv4/udp_tunnel_core.c:173
- geneve_xmit_skb drivers/net/geneve.c:916 [inline]
- geneve_xmit+0x210e/0x2bf0 drivers/net/geneve.c:1039
- __netdev_start_xmit include/linux/netdevice.h:5151 [inline]
- netdev_start_xmit include/linux/netdevice.h:5160 [inline]
- xmit_one net/core/dev.c:3800 [inline]
- dev_hard_start_xmit+0x27a/0x7d0 net/core/dev.c:3816
- __dev_queue_xmit+0x1b73/0x3f50 net/core/dev.c:4649
- dev_queue_xmit include/linux/netdevice.h:3313 [inline]
- neigh_hh_output include/net/neighbour.h:523 [inline]
- neigh_output include/net/neighbour.h:537 [inline]
- ip6_finish_output2+0x127d/0x17c0 net/ipv6/ip6_output.c:141
- ip6_finish_output+0x41e/0x840 net/ipv6/ip6_output.c:226
- NF_HOOK+0x9e/0x430 include/linux/netfilter.h:314
- mld_sendpack+0x843/0xdb0 net/ipv6/mcast.c:1868
- mld_dad_work+0x44/0x500 net/ipv6/mcast.c:2308
- process_one_work kernel/workqueue.c:3238 [inline]
- process_scheduled_works+0xabe/0x18e0 kernel/workqueue.c:3319
- worker_thread+0x870/0xd30 kernel/workqueue.c:3400
- kthread+0x7a9/0x920 kernel/kthread.c:464
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-
-Last potentially related work creation:
-------------[ cut here ]------------
-pool index 54431 out of bounds (772) for stack id 8c38d4a0
-WARNING: CPU: 1 PID: 975 at lib/stackdepot.c:452 depot_fetch_stack+0x86/0xc0 lib/stackdepot.c:451
-Modules linked in:
-CPU: 1 UID: 0 PID: 975 Comm: kworker/1:2 Not tainted 6.14.0-rc4-syzkaller-00248-g03d38806a902 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-Workqueue: mld mld_dad_work
-RIP: 0010:depot_fetch_stack+0x86/0xc0 lib/stackdepot.c:451
-Code: 83 7c 18 1c 00 74 38 48 01 d8 eb 24 90 0f 0b 90 44 39 f5 72 ca 90 48 c7 c7 6e af 39 8e 89 ee 44 89 f2 89 d9 e8 fb be 5b fc 90 <0f> 0b 90 90 31 c0 5b 41 5e 5d c3 cc cc cc cc 90 0f 0b 90 eb ef 90
-RSP: 0018:ffffc90003836d28 EFLAGS: 00010046
-RAX: eec25f5fb9356300 RBX: 000000008c38d4a0 RCX: ffff888026575a00
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 000000000000d49f R08: ffffffff81817d42 R09: 1ffff110170e519a
-R10: dffffc0000000000 R11: ffffed10170e519b R12: ffff88805fe4154a
-R13: ffffea00017f9000 R14: 0000000000000304 R15: ffffc90003836df8
-FS:  0000000000000000(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f086af09000 CR3: 00000000798e8000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- stack_depot_fetch lib/stackdepot.c:714 [inline]
- stack_depot_print+0x16/0x50 lib/stackdepot.c:752
- kasan_print_aux_stacks+0x38/0x70 mm/kasan/report_generic.c:199
- describe_object_stacks mm/kasan/report.c:347 [inline]
- describe_object mm/kasan/report.c:353 [inline]
- print_address_description mm/kasan/report.c:412 [inline]
- print_report+0x22b/0x5b0 mm/kasan/report.c:521
- kasan_report+0x143/0x180 mm/kasan/report.c:634
- sk_fullsock include/net/sock.h:2787 [inline]
- ip_skb_dst_mtu+0xa42/0xbc0 include/net/ip.h:515
- __ip_finish_output+0x12b/0x400 net/ipv4/ip_output.c:307
- iptunnel_xmit+0x55d/0x9b0 net/ipv4/ip_tunnel_core.c:82
- udp_tunnel_xmit_skb+0x262/0x3b0 net/ipv4/udp_tunnel_core.c:173
- geneve_xmit_skb drivers/net/geneve.c:916 [inline]
- geneve_xmit+0x210e/0x2bf0 drivers/net/geneve.c:1039
- __netdev_start_xmit include/linux/netdevice.h:5151 [inline]
- netdev_start_xmit include/linux/netdevice.h:5160 [inline]
- xmit_one net/core/dev.c:3800 [inline]
- dev_hard_start_xmit+0x27a/0x7d0 net/core/dev.c:3816
- __dev_queue_xmit+0x1b73/0x3f50 net/core/dev.c:4649
- dev_queue_xmit include/linux/netdevice.h:3313 [inline]
- neigh_hh_output include/net/neighbour.h:523 [inline]
- neigh_output include/net/neighbour.h:537 [inline]
- ip6_finish_output2+0x127d/0x17c0 net/ipv6/ip6_output.c:141
- ip6_finish_output+0x41e/0x840 net/ipv6/ip6_output.c:226
- NF_HOOK+0x9e/0x430 include/linux/netfilter.h:314
- mld_sendpack+0x843/0xdb0 net/ipv6/mcast.c:1868
- mld_dad_work+0x44/0x500 net/ipv6/mcast.c:2308
- process_one_work kernel/workqueue.c:3238 [inline]
- process_scheduled_works+0xabe/0x18e0 kernel/workqueue.c:3319
- worker_thread+0x870/0xd30 kernel/workqueue.c:3400
- kthread+0x7a9/0x920 kernel/kthread.c:464
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ print_deadlock_bug+0x483/0x620 kernel/locking/lockdep.c:3039
+ check_deadlock kernel/locking/lockdep.c:3091 [inline]
+ validate_chain+0x15e2/0x5920 kernel/locking/lockdep.c:3893
+ __lock_acquire+0x1397/0x2100 kernel/locking/lockdep.c:5228
+ lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5851
+ __mutex_lock_common kernel/locking/mutex.c:585 [inline]
+ __mutex_lock+0x19c/0x1010 kernel/locking/mutex.c:730
+ netdev_lock include/linux/netdevice.h:2765 [inline]
+ register_netdevice+0x12d8/0x1b70 net/core/dev.c:11008
+ bpq_new_device drivers/net/hamradio/bpqether.c:499 [inline]
+ bpq_device_event+0x4b1/0x8d0 drivers/net/hamradio/bpqether.c:542
+ notifier_call_chain+0x1a5/0x3f0 kernel/notifier.c:85
+ __dev_notify_flags+0x207/0x400
+ netif_change_flags+0xf0/0x1a0 net/core/dev.c:9442
+ dev_change_flags+0x146/0x270 net/core/dev_api.c:66
+ devinet_ioctl+0xea2/0x1d80 net/ipv4/devinet.c:1200
+ inet_ioctl+0x3d7/0x4f0 net/ipv4/af_inet.c:1001
+ sock_do_ioctl+0x158/0x460 net/socket.c:1190
+ sock_ioctl+0x626/0x8e0 net/socket.c:1309
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:906 [inline]
+ __se_sys_ioctl+0xf5/0x170 fs/ioctl.c:892
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f0cd048dd49
+Code: 5c c3 48 8d 44 24 08 48 89 54 24 e0 48 89 44 24 c0 48 8d 44 24 d0 48 89 44 24 c8 b8 10 00 00 00 c7 44 24 b8 10 00 00 00 0f 05 <41> 89 c0 3d 00 f0 ff ff 76 10 48 8b 15 ae 60 0d 00 f7 d8 41 83 c8
+RSP: 002b:00007ffe158efc78 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f0cd03bf6c0 RCX: 00007f0cd048dd49
+RDX: 00007ffe158ffe68 RSI: 0000000000008914 RDI: 0000000000000018
+RBP: 00007ffe15910028 R08: 00007ffe158ffe28 R09: 00007ffe158ffdd8
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffe158ffe68 R14: 0000000000000028 R15: 0000000000008914
  </TASK>
 
 
@@ -212,7 +168,6 @@ syzbot engineers can be reached at syzkaller@googlegroups.com.
 
 syzbot will keep track of this issue. See:
 https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
 If the report is already addressed, let syzbot know by replying with:
 #syz fix: exact-commit-title
