@@ -1,654 +1,321 @@
-Return-Path: <netdev+bounces-173214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5943CA57EA4
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 22:38:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD828A57EBC
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 22:40:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 349201886AD3
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 21:38:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A6F9E7A2E9F
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 21:39:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BC88214A97;
-	Sat,  8 Mar 2025 21:37:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0D722080FB;
+	Sat,  8 Mar 2025 21:40:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b="t8/PYxPE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kj2Q0edP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.forwardemail.net (smtp.forwardemail.net [149.28.215.223])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F651A5B99
-	for <netdev@vger.kernel.org>; Sat,  8 Mar 2025 21:37:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=149.28.215.223
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 054C81EB5C6
+	for <netdev@vger.kernel.org>; Sat,  8 Mar 2025 21:40:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741469872; cv=none; b=mOiZw1TQuVRSbgjUX+uxr5zw8PD6BrOlF+oAE3oXchHRrImEBHmsYWIzrIUD74oHz7fs9GCgAXMe/GN41Jh7TcqScEfwO3LN4voYZUBLQKIepeZb0AgAePO1O1L3twiXbns0waQViyBGLvP3cc1gCDsqN7qxtzRtRZFHWyMZkvg=
+	t=1741470049; cv=none; b=VEzSt0vrkGDuDq1Lc2tA3/711aVtOWegPnRkoEJT1rh78kQXwt9jDHAA/+PY5wo85rkasHCX0gdFmvcgSz/0qDTX/XWAwzwlVRZdNCFtMW62/KOja4iobzjRvWoat/0rjlCQhDuvFYv42ZsByDR4hfMCe0uspCn6Ct6Mi2SCTWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741469872; c=relaxed/simple;
-	bh=jv4tDZTTwStzQ9+56h0aOCvTHDpGzA9P2QxFXWKT8xc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hZTh6L8gVjXk4f0JVXnweynSSOVV9pRBgzzfgonmfZDquM8VGTPxM03WnvyFt5tPNgIo2ake9E8e6eZydDdMYAKv4yVvj+T0wsnPZvF6cMEN4fALwsWfxjClMGgE0YcrMPy0UoMUMUcPecWsVmsGeoE84VLI0iAbcPOuLHMOz5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se; dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b=t8/PYxPE; arc=none smtp.client-ip=149.28.215.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kwiboo.se;
- h=Content-Transfer-Encoding: MIME-Version: References: In-Reply-To:
- Message-ID: Date: Subject: Cc: To: From; q=dns/txt; s=fe-e1b5cab7be;
- t=1741469870; bh=L3lm2pKDBhxfI+oBj9jTWq06myi7cTrg9V33m4Vwhw8=;
- b=t8/PYxPEosrBzJRdxRWG+r9dr+76n1PkRoU+6zL9WJQfKux2uhsSXQvEI19Vt0/aHsq9Hxx+I
- Pl89EVqVqT0n/YqqZnCdjKSBDUZfbBS3gsezoJRrJiLhqc3l1wMcYnJAsK1hzLjDUbYRTbc4wRC
- 1MqjoKqPMHpOupegwU+RmZM+8WQe7tqiUD3s3KWG0kuU5qIWrT5JSFdH5O2qicRPUKKmB5rkrFR
- RFVIgy0JS5JnekRzeCUfPfrE9MLcvChXgrUWgMOJrGgfscwTJ9qFOVhGxcT4M255Bzi9NOQ13/A
- /CRURd/y0YjY/s0wTnMRU/3meC38/OP/+w6QgVQA4MLw==
-X-Forward-Email-ID: 67ccb8a5bfe70eb1bfc13b47
-X-Forward-Email-Sender: rfc822; jonas@kwiboo.se, smtp.forwardemail.net,
- 149.28.215.223
-X-Forward-Email-Version: 0.4.40
-X-Forward-Email-Website: https://forwardemail.net
-X-Complaints-To: abuse@forwardemail.net
-X-Report-Abuse: abuse@forwardemail.net
-X-Report-Abuse-To: abuse@forwardemail.net
-From: Jonas Karlman <jonas@kwiboo.se>
-To: Heiko Stuebner <heiko@sntech.de>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>
-Cc: Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-rockchip@lists.infradead.org,
-	devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Jonas Karlman <jonas@kwiboo.se>,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: [PATCH v2 3/3] net: stmmac: dwmac-rk: Remove unneeded GRF and peripheral GRF checks
-Date: Sat,  8 Mar 2025 21:37:15 +0000
-Message-ID: <20250308213720.2517944-4-jonas@kwiboo.se>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250308213720.2517944-1-jonas@kwiboo.se>
-References: <20250308213720.2517944-1-jonas@kwiboo.se>
+	s=arc-20240116; t=1741470049; c=relaxed/simple;
+	bh=MnpbY3lPqTN3N+f7uEQ/uYZPGYKjCFw9VN42wnPfzVw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=FeKEGJUDZAn/UHOikwwIwSa/Wem0nGMKJaZTMkEFz6osJzCKYjPVy/PjLRgueGQCWhh6+ymsWt2ZuBVHD/k+X/TiwyBkBczx35KRTbt6E5e2S8U0NTuJWDUGmwo8U+5NCL14kCt6l9NQJ/ElX5Cbi2D3XTQuKc3jdLbHU7xev0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kj2Q0edP; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-2242ade807fso53093875ad.2
+        for <netdev@vger.kernel.org>; Sat, 08 Mar 2025 13:40:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741470047; x=1742074847; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=uIjATFDnbxEoYc4bYwSfSu05Xu1erFBYh/t5wdETKQQ=;
+        b=kj2Q0edPbtmgKs2XHCYIlGQkKinMMLsDDzXG0P2MGNHVGW+5jOervYoO8XSEQlpucZ
+         dukNCcUEPBSVmmJ+Vq4NQTEUuOWWXhlwHyKssdAAALBZ/9fpNLMhUCJL/tbnn3SqS2o2
+         pRJUkCNKp9WrnvwTOjziFKSJqmomvrjR0dRu72FOPwF94TPCe5wLSrSj/Tx8COvyvBnb
+         jYeYEJSOUgxJxftQlCYnX6dFLv116+3FAIjWG1twYnVKZS5M6Y6PRyqplC5/sEWazsEY
+         U67tbUOAaB85gEVRGCJJObBj6NodogQSA7SYkFddQ+lf3mvy5iQ83m/Hm45JYGukVHpD
+         mA4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741470047; x=1742074847;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uIjATFDnbxEoYc4bYwSfSu05Xu1erFBYh/t5wdETKQQ=;
+        b=Bp0rFTZ0exrTju11I3/sG0WpxgbM9m1MDyTTMsPYZUGKxysMSunvo6GIp76DMZ9mAY
+         1c9ggTywLURaFpwlBEMusHkputK+8pon6uKGfb4hBDPUnVwSJ3ELGraqQYlW+u7pA3vw
+         CTTfp9NLAQ7rg+yuFjLb2Q3vT9S+yW62oftOkXazBdwK8Yo3Deq+EqiXTrI9LxxCWLlL
+         1JU99XImzzRP4FhiKGifS4GH8c6Fb+Ev/iKyRPF6U5VdTqLmPk2VPJ0JBp6E8pAPEk98
+         f5xRaskxW2bfd9CoEwd4/uBH7Ri/iLIoGmjrQhemgs4a4h9JfUsgm5Y2b6+x6GhOyvmu
+         itvQ==
+X-Gm-Message-State: AOJu0Yw2vQm7JJ56v9sB/hJKCZbze7dUC852P64xFBcXEug/55knzEAO
+	z7ECAQDWnAfyQMAbwqDmT41ZIHL78ArQVQJcr80yXD6er8HwoIFh/h1dgpbLPmlKvPlmUzi0ysW
+	i8s7fUyT5fVF38AnA7BlZx6sRi/jOEZXIIlWfSj/XTtccxj/XNqndyLn4tdXZ02KsBr3lX3OKYv
+	G5Ap0o+bi7l99CgviSnznZZ7/wpXXNSOAR2oIPToVPLvPKjLGCXmDVpZDlVo4=
+X-Google-Smtp-Source: AGHT+IHkkJOaYv2HGCEzIrvtooW3L04AMRAiYxB2URyJ2E16APOy6jFlUW/An/cuiAToF+V+1Z5ix8knXmujTvv0Zg==
+X-Received: from plbld3.prod.google.com ([2002:a17:902:fac3:b0:220:e7dc:350d])
+ (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:902:e543:b0:223:28a8:6101 with SMTP id d9443c01a7336-22428a9fe42mr101910595ad.29.1741470047048;
+ Sat, 08 Mar 2025 13:40:47 -0800 (PST)
+Date: Sat,  8 Mar 2025 21:40:36 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.rc0.332.g42c0ae87b1-goog
+Message-ID: <20250308214045.1160445-1-almasrymina@google.com>
+Subject: [PATCH net-next v7 0/9] Device memory TCP TX
+From: Mina Almasry <almasrymina@google.com>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, Donald Hunter <donald.hunter@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Jeroen de Borst <jeroendb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	"=?UTF-8?q?Eugenio=20P=C3=A9rez?=" <eperezma@redhat.com>, Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, 
+	asml.silence@gmail.com, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
+	Samiullah Khawaja <skhawaja@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Now that GRF, and peripheral GRF where needed, is validated at probe
-time there is no longer any need to check and log an error in each SoC
-specific operation.
+v7: https://lore.kernel.org/netdev/20250227041209.2031104-1-almasrymina@google.com/
+===
 
-Remove unneeded IS_ERR() checks and early bail out from each SoC
-specific operation.
+Changelog:
+- Check the dmabuf net_iov binding belongs to the device the TX is going
+  out on. (Jakub)
+- Provide detailed inspection of callsites of
+  __skb_frag_ref/skb_page_unref in patch 2's changelog (Jakub)
 
-Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
----
-Changes in v2:
-- Split removal of IS_ERR() checks to its own patch
----
- .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 249 ------------------
- 1 file changed, 249 deletions(-)
+v6: https://lore.kernel.org/netdev/20250222191517.743530-1-almasrymina@google.com/
+===
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index 5615f015c5fe..342463587d06 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -102,13 +102,6 @@ struct rk_priv_data {
- 
- static void px30_set_to_rmii(struct rk_priv_data *bsp_priv)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
--
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "%s: Missing rockchip,grf property\n", __func__);
--		return;
--	}
--
- 	regmap_write(bsp_priv->grf, PX30_GRF_GMAC_CON1,
- 		     PX30_GMAC_PHY_INTF_SEL_RMII);
- }
-@@ -182,13 +175,6 @@ static const struct rk_gmac_ops px30_ops = {
- static void rk3128_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 				int tx_delay, int rx_delay)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
--
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "Missing rockchip,grf property\n");
--		return;
--	}
--
- 	regmap_write(bsp_priv->grf, RK3128_GRF_MAC_CON1,
- 		     RK3128_GMAC_PHY_INTF_SEL_RGMII |
- 		     RK3128_GMAC_RMII_MODE_CLR);
-@@ -200,13 +186,6 @@ static void rk3128_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 
- static void rk3128_set_to_rmii(struct rk_priv_data *bsp_priv)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
--
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "Missing rockchip,grf property\n");
--		return;
--	}
--
- 	regmap_write(bsp_priv->grf, RK3128_GRF_MAC_CON1,
- 		     RK3128_GMAC_PHY_INTF_SEL_RMII | RK3128_GMAC_RMII_MODE);
- }
-@@ -215,11 +194,6 @@ static void rk3128_set_rgmii_speed(struct rk_priv_data *bsp_priv, int speed)
- {
- 	struct device *dev = &bsp_priv->pdev->dev;
- 
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "Missing rockchip,grf property\n");
--		return;
--	}
--
- 	if (speed == 10)
- 		regmap_write(bsp_priv->grf, RK3128_GRF_MAC_CON1,
- 			     RK3128_GMAC_CLK_2_5M);
-@@ -237,11 +211,6 @@ static void rk3128_set_rmii_speed(struct rk_priv_data *bsp_priv, int speed)
- {
- 	struct device *dev = &bsp_priv->pdev->dev;
- 
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "Missing rockchip,grf property\n");
--		return;
--	}
--
- 	if (speed == 10) {
- 		regmap_write(bsp_priv->grf, RK3128_GRF_MAC_CON1,
- 			     RK3128_GMAC_RMII_CLK_2_5M |
-@@ -298,13 +267,6 @@ static const struct rk_gmac_ops rk3128_ops = {
- static void rk3228_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 				int tx_delay, int rx_delay)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
--
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "Missing rockchip,grf property\n");
--		return;
--	}
--
- 	regmap_write(bsp_priv->grf, RK3228_GRF_MAC_CON1,
- 		     RK3228_GMAC_PHY_INTF_SEL_RGMII |
- 		     RK3228_GMAC_RMII_MODE_CLR |
-@@ -317,13 +279,6 @@ static void rk3228_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 
- static void rk3228_set_to_rmii(struct rk_priv_data *bsp_priv)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
--
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "Missing rockchip,grf property\n");
--		return;
--	}
--
- 	regmap_write(bsp_priv->grf, RK3228_GRF_MAC_CON1,
- 		     RK3228_GMAC_PHY_INTF_SEL_RMII |
- 		     RK3228_GMAC_RMII_MODE);
-@@ -336,11 +291,6 @@ static void rk3228_set_rgmii_speed(struct rk_priv_data *bsp_priv, int speed)
- {
- 	struct device *dev = &bsp_priv->pdev->dev;
- 
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "Missing rockchip,grf property\n");
--		return;
--	}
--
- 	if (speed == 10)
- 		regmap_write(bsp_priv->grf, RK3228_GRF_MAC_CON1,
- 			     RK3228_GMAC_CLK_2_5M);
-@@ -358,11 +308,6 @@ static void rk3228_set_rmii_speed(struct rk_priv_data *bsp_priv, int speed)
- {
- 	struct device *dev = &bsp_priv->pdev->dev;
- 
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "Missing rockchip,grf property\n");
--		return;
--	}
--
- 	if (speed == 10)
- 		regmap_write(bsp_priv->grf, RK3228_GRF_MAC_CON1,
- 			     RK3228_GMAC_RMII_CLK_2_5M |
-@@ -420,13 +365,6 @@ static const struct rk_gmac_ops rk3228_ops = {
- static void rk3288_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 				int tx_delay, int rx_delay)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
--
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "Missing rockchip,grf property\n");
--		return;
--	}
--
- 	regmap_write(bsp_priv->grf, RK3288_GRF_SOC_CON1,
- 		     RK3288_GMAC_PHY_INTF_SEL_RGMII |
- 		     RK3288_GMAC_RMII_MODE_CLR);
-@@ -438,13 +376,6 @@ static void rk3288_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 
- static void rk3288_set_to_rmii(struct rk_priv_data *bsp_priv)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
--
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "Missing rockchip,grf property\n");
--		return;
--	}
--
- 	regmap_write(bsp_priv->grf, RK3288_GRF_SOC_CON1,
- 		     RK3288_GMAC_PHY_INTF_SEL_RMII | RK3288_GMAC_RMII_MODE);
- }
-@@ -453,11 +384,6 @@ static void rk3288_set_rgmii_speed(struct rk_priv_data *bsp_priv, int speed)
- {
- 	struct device *dev = &bsp_priv->pdev->dev;
- 
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "Missing rockchip,grf property\n");
--		return;
--	}
--
- 	if (speed == 10)
- 		regmap_write(bsp_priv->grf, RK3288_GRF_SOC_CON1,
- 			     RK3288_GMAC_CLK_2_5M);
-@@ -475,11 +401,6 @@ static void rk3288_set_rmii_speed(struct rk_priv_data *bsp_priv, int speed)
- {
- 	struct device *dev = &bsp_priv->pdev->dev;
- 
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "Missing rockchip,grf property\n");
--		return;
--	}
--
- 	if (speed == 10) {
- 		regmap_write(bsp_priv->grf, RK3288_GRF_SOC_CON1,
- 			     RK3288_GMAC_RMII_CLK_2_5M |
-@@ -512,13 +433,6 @@ static const struct rk_gmac_ops rk3288_ops = {
- 
- static void rk3308_set_to_rmii(struct rk_priv_data *bsp_priv)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
--
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "Missing rockchip,grf property\n");
--		return;
--	}
--
- 	regmap_write(bsp_priv->grf, RK3308_GRF_MAC_CON0,
- 		     RK3308_GMAC_PHY_INTF_SEL_RMII);
- }
-@@ -527,11 +441,6 @@ static void rk3308_set_rmii_speed(struct rk_priv_data *bsp_priv, int speed)
- {
- 	struct device *dev = &bsp_priv->pdev->dev;
- 
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "Missing rockchip,grf property\n");
--		return;
--	}
--
- 	if (speed == 10) {
- 		regmap_write(bsp_priv->grf, RK3308_GRF_MAC_CON0,
- 			     RK3308_GMAC_SPEED_10M);
-@@ -584,13 +493,6 @@ static const struct rk_gmac_ops rk3308_ops = {
- static void rk3328_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 				int tx_delay, int rx_delay)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
--
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "Missing rockchip,grf property\n");
--		return;
--	}
--
- 	regmap_write(bsp_priv->grf, RK3328_GRF_MAC_CON1,
- 		     RK3328_GMAC_PHY_INTF_SEL_RGMII |
- 		     RK3328_GMAC_RMII_MODE_CLR |
-@@ -604,14 +506,8 @@ static void rk3328_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 
- static void rk3328_set_to_rmii(struct rk_priv_data *bsp_priv)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
- 	unsigned int reg;
- 
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "Missing rockchip,grf property\n");
--		return;
--	}
--
- 	reg = bsp_priv->integrated_phy ? RK3328_GRF_MAC_CON2 :
- 		  RK3328_GRF_MAC_CON1;
- 
-@@ -624,11 +520,6 @@ static void rk3328_set_rgmii_speed(struct rk_priv_data *bsp_priv, int speed)
- {
- 	struct device *dev = &bsp_priv->pdev->dev;
- 
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "Missing rockchip,grf property\n");
--		return;
--	}
--
- 	if (speed == 10)
- 		regmap_write(bsp_priv->grf, RK3328_GRF_MAC_CON1,
- 			     RK3328_GMAC_CLK_2_5M);
-@@ -647,11 +538,6 @@ static void rk3328_set_rmii_speed(struct rk_priv_data *bsp_priv, int speed)
- 	struct device *dev = &bsp_priv->pdev->dev;
- 	unsigned int reg;
- 
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "Missing rockchip,grf property\n");
--		return;
--	}
--
- 	reg = bsp_priv->integrated_phy ? RK3328_GRF_MAC_CON2 :
- 		  RK3328_GRF_MAC_CON1;
- 
-@@ -712,13 +598,6 @@ static const struct rk_gmac_ops rk3328_ops = {
- static void rk3366_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 				int tx_delay, int rx_delay)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
--
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "%s: Missing rockchip,grf property\n", __func__);
--		return;
--	}
--
- 	regmap_write(bsp_priv->grf, RK3366_GRF_SOC_CON6,
- 		     RK3366_GMAC_PHY_INTF_SEL_RGMII |
- 		     RK3366_GMAC_RMII_MODE_CLR);
-@@ -730,13 +609,6 @@ static void rk3366_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 
- static void rk3366_set_to_rmii(struct rk_priv_data *bsp_priv)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
--
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "%s: Missing rockchip,grf property\n", __func__);
--		return;
--	}
--
- 	regmap_write(bsp_priv->grf, RK3366_GRF_SOC_CON6,
- 		     RK3366_GMAC_PHY_INTF_SEL_RMII | RK3366_GMAC_RMII_MODE);
- }
-@@ -745,11 +617,6 @@ static void rk3366_set_rgmii_speed(struct rk_priv_data *bsp_priv, int speed)
- {
- 	struct device *dev = &bsp_priv->pdev->dev;
- 
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "%s: Missing rockchip,grf property\n", __func__);
--		return;
--	}
--
- 	if (speed == 10)
- 		regmap_write(bsp_priv->grf, RK3366_GRF_SOC_CON6,
- 			     RK3366_GMAC_CLK_2_5M);
-@@ -767,11 +634,6 @@ static void rk3366_set_rmii_speed(struct rk_priv_data *bsp_priv, int speed)
- {
- 	struct device *dev = &bsp_priv->pdev->dev;
- 
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "%s: Missing rockchip,grf property\n", __func__);
--		return;
--	}
--
- 	if (speed == 10) {
- 		regmap_write(bsp_priv->grf, RK3366_GRF_SOC_CON6,
- 			     RK3366_GMAC_RMII_CLK_2_5M |
-@@ -823,13 +685,6 @@ static const struct rk_gmac_ops rk3366_ops = {
- static void rk3368_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 				int tx_delay, int rx_delay)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
--
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "%s: Missing rockchip,grf property\n", __func__);
--		return;
--	}
--
- 	regmap_write(bsp_priv->grf, RK3368_GRF_SOC_CON15,
- 		     RK3368_GMAC_PHY_INTF_SEL_RGMII |
- 		     RK3368_GMAC_RMII_MODE_CLR);
-@@ -841,13 +696,6 @@ static void rk3368_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 
- static void rk3368_set_to_rmii(struct rk_priv_data *bsp_priv)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
--
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "%s: Missing rockchip,grf property\n", __func__);
--		return;
--	}
--
- 	regmap_write(bsp_priv->grf, RK3368_GRF_SOC_CON15,
- 		     RK3368_GMAC_PHY_INTF_SEL_RMII | RK3368_GMAC_RMII_MODE);
- }
-@@ -856,11 +704,6 @@ static void rk3368_set_rgmii_speed(struct rk_priv_data *bsp_priv, int speed)
- {
- 	struct device *dev = &bsp_priv->pdev->dev;
- 
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "%s: Missing rockchip,grf property\n", __func__);
--		return;
--	}
--
- 	if (speed == 10)
- 		regmap_write(bsp_priv->grf, RK3368_GRF_SOC_CON15,
- 			     RK3368_GMAC_CLK_2_5M);
-@@ -878,11 +721,6 @@ static void rk3368_set_rmii_speed(struct rk_priv_data *bsp_priv, int speed)
- {
- 	struct device *dev = &bsp_priv->pdev->dev;
- 
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "%s: Missing rockchip,grf property\n", __func__);
--		return;
--	}
--
- 	if (speed == 10) {
- 		regmap_write(bsp_priv->grf, RK3368_GRF_SOC_CON15,
- 			     RK3368_GMAC_RMII_CLK_2_5M |
-@@ -934,13 +772,6 @@ static const struct rk_gmac_ops rk3368_ops = {
- static void rk3399_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 				int tx_delay, int rx_delay)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
--
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "%s: Missing rockchip,grf property\n", __func__);
--		return;
--	}
--
- 	regmap_write(bsp_priv->grf, RK3399_GRF_SOC_CON5,
- 		     RK3399_GMAC_PHY_INTF_SEL_RGMII |
- 		     RK3399_GMAC_RMII_MODE_CLR);
-@@ -952,13 +783,6 @@ static void rk3399_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 
- static void rk3399_set_to_rmii(struct rk_priv_data *bsp_priv)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
--
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "%s: Missing rockchip,grf property\n", __func__);
--		return;
--	}
--
- 	regmap_write(bsp_priv->grf, RK3399_GRF_SOC_CON5,
- 		     RK3399_GMAC_PHY_INTF_SEL_RMII | RK3399_GMAC_RMII_MODE);
- }
-@@ -967,11 +791,6 @@ static void rk3399_set_rgmii_speed(struct rk_priv_data *bsp_priv, int speed)
- {
- 	struct device *dev = &bsp_priv->pdev->dev;
- 
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "%s: Missing rockchip,grf property\n", __func__);
--		return;
--	}
--
- 	if (speed == 10)
- 		regmap_write(bsp_priv->grf, RK3399_GRF_SOC_CON5,
- 			     RK3399_GMAC_CLK_2_5M);
-@@ -989,11 +808,6 @@ static void rk3399_set_rmii_speed(struct rk_priv_data *bsp_priv, int speed)
- {
- 	struct device *dev = &bsp_priv->pdev->dev;
- 
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "%s: Missing rockchip,grf property\n", __func__);
--		return;
--	}
--
- 	if (speed == 10) {
- 		regmap_write(bsp_priv->grf, RK3399_GRF_SOC_CON5,
- 			     RK3399_GMAC_RMII_CLK_2_5M |
-@@ -1038,14 +852,8 @@ static const struct rk_gmac_ops rk3399_ops = {
- static void rk3568_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 				int tx_delay, int rx_delay)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
- 	u32 con0, con1;
- 
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "Missing rockchip,grf property\n");
--		return;
--	}
--
- 	con0 = (bsp_priv->id == 1) ? RK3568_GRF_GMAC1_CON0 :
- 				     RK3568_GRF_GMAC0_CON0;
- 	con1 = (bsp_priv->id == 1) ? RK3568_GRF_GMAC1_CON1 :
-@@ -1063,14 +871,8 @@ static void rk3568_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 
- static void rk3568_set_to_rmii(struct rk_priv_data *bsp_priv)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
- 	u32 con1;
- 
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "%s: Missing rockchip,grf property\n", __func__);
--		return;
--	}
--
- 	con1 = (bsp_priv->id == 1) ? RK3568_GRF_GMAC1_CON1 :
- 				     RK3568_GRF_GMAC0_CON1;
- 	regmap_write(bsp_priv->grf, con1, RK3568_GMAC_PHY_INTF_SEL_RMII);
-@@ -1148,14 +950,8 @@ static const struct rk_gmac_ops rk3568_ops = {
- static void rk3576_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 				int tx_delay, int rx_delay)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
- 	unsigned int offset_con;
- 
--	if (IS_ERR(bsp_priv->grf) || IS_ERR(bsp_priv->php_grf)) {
--		dev_err(dev, "Missing rockchip,grf or rockchip,php-grf property\n");
--		return;
--	}
--
- 	offset_con = bsp_priv->id == 1 ? RK3576_GRF_GMAC_CON1 :
- 					 RK3576_GRF_GMAC_CON0;
- 
-@@ -1181,14 +977,8 @@ static void rk3576_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 
- static void rk3576_set_to_rmii(struct rk_priv_data *bsp_priv)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
- 	unsigned int offset_con;
- 
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "%s: Missing rockchip,grf property\n", __func__);
--		return;
--	}
--
- 	offset_con = bsp_priv->id == 1 ? RK3576_GRF_GMAC_CON1 :
- 					 RK3576_GRF_GMAC_CON0;
- 
-@@ -1308,14 +1098,8 @@ static const struct rk_gmac_ops rk3576_ops = {
- static void rk3588_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 				int tx_delay, int rx_delay)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
- 	u32 offset_con, id = bsp_priv->id;
- 
--	if (IS_ERR(bsp_priv->grf) || IS_ERR(bsp_priv->php_grf)) {
--		dev_err(dev, "Missing rockchip,grf or rockchip,php_grf property\n");
--		return;
--	}
--
- 	offset_con = bsp_priv->id == 1 ? RK3588_GRF_GMAC_CON9 :
- 					 RK3588_GRF_GMAC_CON8;
- 
-@@ -1336,13 +1120,6 @@ static void rk3588_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 
- static void rk3588_set_to_rmii(struct rk_priv_data *bsp_priv)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
--
--	if (IS_ERR(bsp_priv->php_grf)) {
--		dev_err(dev, "%s: Missing rockchip,php_grf property\n", __func__);
--		return;
--	}
--
- 	regmap_write(bsp_priv->php_grf, RK3588_GRF_GMAC_CON0,
- 		     RK3588_GMAC_PHY_INTF_SEL_RMII(bsp_priv->id));
- 
-@@ -1426,13 +1203,6 @@ static const struct rk_gmac_ops rk3588_ops = {
- 
- static void rv1108_set_to_rmii(struct rk_priv_data *bsp_priv)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
--
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "%s: Missing rockchip,grf property\n", __func__);
--		return;
--	}
--
- 	regmap_write(bsp_priv->grf, RV1108_GRF_GMAC_CON0,
- 		     RV1108_GMAC_PHY_INTF_SEL_RMII);
- }
-@@ -1441,11 +1211,6 @@ static void rv1108_set_rmii_speed(struct rk_priv_data *bsp_priv, int speed)
- {
- 	struct device *dev = &bsp_priv->pdev->dev;
- 
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "%s: Missing rockchip,grf property\n", __func__);
--		return;
--	}
--
- 	if (speed == 10) {
- 		regmap_write(bsp_priv->grf, RV1108_GRF_GMAC_CON0,
- 			     RV1108_GMAC_RMII_CLK_2_5M |
-@@ -1494,13 +1259,6 @@ static const struct rk_gmac_ops rv1108_ops = {
- static void rv1126_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 				int tx_delay, int rx_delay)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
--
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "Missing rockchip,grf property\n");
--		return;
--	}
--
- 	regmap_write(bsp_priv->grf, RV1126_GRF_GMAC_CON0,
- 		     RV1126_GMAC_PHY_INTF_SEL_RGMII |
- 		     RV1126_GMAC_M0_RXCLK_DLY_ENABLE |
-@@ -1519,13 +1277,6 @@ static void rv1126_set_to_rgmii(struct rk_priv_data *bsp_priv,
- 
- static void rv1126_set_to_rmii(struct rk_priv_data *bsp_priv)
- {
--	struct device *dev = &bsp_priv->pdev->dev;
--
--	if (IS_ERR(bsp_priv->grf)) {
--		dev_err(dev, "%s: Missing rockchip,grf property\n", __func__);
--		return;
--	}
--
- 	regmap_write(bsp_priv->grf, RV1126_GRF_GMAC_CON0,
- 		     RV1126_GMAC_PHY_INTF_SEL_RMII);
- }
+v6 has no major changes. Addressed a few issues from Paolo and David,
+and collected Acks from Stan. Thank you everyone for the review!
+
+Changes:
+- retain behavior to process MSG_FASTOPEN even if the provided cmsg is
+  invalid (Paolo).
+- Rework the freeing of tx_vec slightly (it now has its own err label).
+  (Paolo).
+- Squash the commit that makes dmabuf unbinding scheduled work into the
+  same one which implements the TX path so we don't run into future
+  errors on bisecting (Paolo).
+- Fix/add comments to explain how dmabuf binding refcounting works
+  (David).
+
+v5: https://lore.kernel.org/netdev/20250220020914.895431-1-almasrymina@google.com/
+===
+
+v5 has no major changes; it clears up the relatively minor issues
+pointed out to in v4, and rebases the series on top of net-next to
+resolve the conflict with a patch that raced to the tree. It also
+collects the review tags from v4.
+
+Changes:
+- Rebase to net-next
+- Fix issues in selftest (Stan).
+- Address comments in the devmem and netmem driver docs (Stan and Bagas)
+- Fix zerocopy_fill_skb_from_devmem return error code (Stan).
+
+v4: https://lore.kernel.org/netdev/20250203223916.1064540-1-almasrymina@google.com/
+===
+
+v4 mainly addresses the critical driver support issue surfaced in v3 by
+Paolo and Stan. Drivers aiming to support netmem_tx should make sure not
+to pass the netmem dma-addrs to the dma-mapping APIs, as these dma-addrs
+may come from dma-bufs.
+
+Additionally other feedback from v3 is addressed.
+
+Major changes:
+- Add helpers to handle netmem dma-addrs. Add GVE support for
+  netmem_tx.
+- Fix binding->tx_vec not being freed on error paths during the
+  tx binding.
+- Add a minimal devmem_tx test to devmem.py.
+- Clean up everything obsolete from the cover letter (Paolo).
+
+v3: https://patchwork.kernel.org/project/netdevbpf/list/?series=929401&state=*
+===
+
+Address minor comments from RFCv2 and fix a few build warnings and
+ynl-regen issues. No major changes.
+
+RFC v2: https://patchwork.kernel.org/project/netdevbpf/list/?series=920056&state=*
+=======
+
+RFC v2 addresses much of the feedback from RFC v1. I plan on sending
+something close to this as net-next  reopens, sending it slightly early
+to get feedback if any.
+
+Major changes:
+--------------
+
+- much improved UAPI as suggested by Stan. We now interpret the iov_base
+  of the passed in iov from userspace as the offset into the dmabuf to
+  send from. This removes the need to set iov.iov_base = NULL which may
+  be confusing to users, and enables us to send multiple iovs in the
+  same sendmsg() call. ncdevmem and the docs show a sample use of that.
+
+- Removed the duplicate dmabuf iov_iter in binding->iov_iter. I think
+  this is good improvment as it was confusing to keep track of
+  2 iterators for the same sendmsg, and mistracking both iterators
+  caused a couple of bugs reported in the last iteration that are now
+  resolved with this streamlining.
+
+- Improved test coverage in ncdevmem. Now multiple sendmsg() are tested,
+  and sending multiple iovs in the same sendmsg() is tested.
+
+- Fixed issue where dmabuf unmapping was happening in invalid context
+  (Stan).
+
+====================================================================
+
+The TX path had been dropped from the Device Memory TCP patch series
+post RFCv1 [1], to make that series slightly easier to review. This
+series rebases the implementation of the TX path on top of the
+net_iov/netmem framework agreed upon and merged. The motivation for
+the feature is thoroughly described in the docs & cover letter of the
+original proposal, so I don't repeat the lengthy descriptions here, but
+they are available in [1].
+
+Full outline on usage of the TX path is detailed in the documentation
+included with this series.
+
+Test example is available via the kselftest included in the series as well.
+
+The series is relatively small, as the TX path for this feature largely
+piggybacks on the existing MSG_ZEROCOPY implementation.
+
+Patch Overview:
+---------------
+
+1. Documentation & tests to give high level overview of the feature
+   being added.
+
+1. Add netmem refcounting needed for the TX path.
+
+2. Devmem TX netlink API.
+
+3. Devmem TX net stack implementation.
+
+4. Make dma-buf unbinding scheduled work to handle TX cases where it gets
+   freed from contexts where we can't sleep.
+
+5. Add devmem TX documentation.
+
+6. Add scaffolding enabling driver support for netmem_tx. Add helpers, driver
+feature flag, and docs to enable drivers to declare netmem_tx support.
+
+7. Guard netmem_tx against being enabled against drivers that don't
+   support it.
+
+8. Add devmem_tx selftests. Add TX path to ncdevmem and add a test to
+   devmem.py.
+
+Testing:
+--------
+
+Testing is very similar to devmem TCP RX path. The ncdevmem test used
+for the RX path is now augemented with client functionality to test TX
+path.
+
+* Test Setup:
+
+Kernel: net-next with this RFC and memory provider API cherry-picked
+locally.
+
+Hardware: Google Cloud A3 VMs.
+
+NIC: GVE with header split & RSS & flow steering support.
+
+Performance results are not included with this version, unfortunately.
+I'm having issues running the dma-buf exporter driver against the
+upstream kernel on my test setup. The issues are specific to that
+dma-buf exporter and do not affect this patch series. I plan to follow
+up this series with perf fixes if the tests point to issues once they're
+up and running.
+
+Special thanks to Stan who took a stab at rebasing the TX implementation
+on top of the netmem/net_iov framework merged. Parts of his proposal [2]
+that are reused as-is are forked off into their own patches to give full
+credit.
+
+[1] https://lore.kernel.org/netdev/20240909054318.1809580-1-almasrymina@google.com/
+[2] https://lore.kernel.org/netdev/20240913150913.1280238-2-sdf@fomichev.me/T/#m066dd407fbed108828e2c40ae50e3f4376ef57fd
+
+Cc: sdf@fomichev.me
+Cc: asml.silence@gmail.com
+Cc: dw@davidwei.uk
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Victor Nogueira <victor@mojatatu.com>
+Cc: Pedro Tammela <pctammela@mojatatu.com>
+Cc: Samiullah Khawaja <skhawaja@google.com>
+
+
+Mina Almasry (8):
+  netmem: add niov->type attribute to distinguish different net_iov
+    types
+  net: add get_netmem/put_netmem support
+  net: devmem: Implement TX path
+  net: add devmem TCP TX documentation
+  net: enable driver support for netmem TX
+  gve: add netmem TX support to GVE DQO-RDA mode
+  net: check for driver support in netmem TX
+  selftests: ncdevmem: Implement devmem TCP TX
+
+Stanislav Fomichev (1):
+  net: devmem: TCP tx netlink api
+
+ Documentation/netlink/specs/netdev.yaml       |  12 +
+ Documentation/networking/devmem.rst           | 150 ++++++++-
+ .../networking/net_cachelines/net_device.rst  |   1 +
+ Documentation/networking/netdev-features.rst  |   5 +
+ Documentation/networking/netmem.rst           |  23 +-
+ drivers/net/ethernet/google/gve/gve_main.c    |   4 +
+ drivers/net/ethernet/google/gve/gve_tx_dqo.c  |   8 +-
+ include/linux/netdevice.h                     |   2 +
+ include/linux/skbuff.h                        |  17 +-
+ include/linux/skbuff_ref.h                    |   4 +-
+ include/net/netmem.h                          |  38 ++-
+ include/net/sock.h                            |   1 +
+ include/uapi/linux/netdev.h                   |   1 +
+ net/core/datagram.c                           |  48 ++-
+ net/core/dev.c                                |  33 ++
+ net/core/devmem.c                             | 118 ++++++-
+ net/core/devmem.h                             |  83 ++++-
+ net/core/netdev-genl-gen.c                    |  13 +
+ net/core/netdev-genl-gen.h                    |   1 +
+ net/core/netdev-genl.c                        |  73 ++++-
+ net/core/skbuff.c                             |  48 ++-
+ net/core/sock.c                               |   6 +
+ net/ipv4/ip_output.c                          |   3 +-
+ net/ipv4/tcp.c                                |  50 ++-
+ net/ipv6/ip6_output.c                         |   3 +-
+ net/vmw_vsock/virtio_transport_common.c       |   5 +-
+ tools/include/uapi/linux/netdev.h             |   1 +
+ .../selftests/drivers/net/hw/devmem.py        |  26 +-
+ .../selftests/drivers/net/hw/ncdevmem.c       | 300 +++++++++++++++++-
+ 29 files changed, 1002 insertions(+), 75 deletions(-)
+
+
+base-commit: 8ef890df4031121a94407c84659125cbccd3fdbe
 -- 
-2.48.1
+2.49.0.rc0.332.g42c0ae87b1-goog
 
 
