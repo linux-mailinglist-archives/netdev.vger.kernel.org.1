@@ -1,186 +1,233 @@
-Return-Path: <netdev+bounces-173115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4916BA57664
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 01:00:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC1E3A57672
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 01:01:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 753F9178988
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 00:00:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D2D11899082
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 00:01:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DF6D137E;
-	Sat,  8 Mar 2025 00:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9897F8F5C;
+	Sat,  8 Mar 2025 00:01:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE5C196
-	for <netdev@vger.kernel.org>; Sat,  8 Mar 2025 00:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1CD2196
+	for <netdev@vger.kernel.org>; Sat,  8 Mar 2025 00:01:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741392026; cv=none; b=fnDaDoul1loFHBoeZI+5pccjX9CYU0qBSSL7USp4gKCatQeceCJy2VP3sD2QtnJxgdCwY6cWQnofecQfeSnecjHtYV9oYbvoqzmDzkUhsRjoWLyVZLOEBaeH/N0jhZHnW0Zcx2EmWsJvslY6foM8OwVYxCQbSWYF9iOZb+LerLU=
+	t=1741392085; cv=none; b=PUE3vBSdpPwTVM2dqWvcL30u4Gz54Wk+T1JoWATB9L+KEprMgcF7obwx9shrwpPM332IpdXMFaHY/Eu6YfO0bHVEAhIKL9Ie3YuOS3O+86j/ZVniwCpjGqt416ADOt9MjqP21yWaf9N4Yp/MA0zJ1fUZC3dxdS4+JcrBheMtNA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741392026; c=relaxed/simple;
-	bh=v6slMHCYLzPdcLMFd2g5nZGhK9UmQ+tT7FnDRGrFyPw=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=pQHRZ5RYYYMRmLCIvVth2+jzU3qj/s3wbBuw12wu61zdfowWAzagmfD1zao+na+9YCWAkaeTB6I6k4Qz9I/OEXoFCyKoi4WX3KYPPzKIBoKLv0JBWup5t8HwEc3z18/o1uEVXRXjIfmMXK+BlTpHWFiuzjYbWN4V+zgvl/qTW0A=
+	s=arc-20240116; t=1741392085; c=relaxed/simple;
+	bh=N0eKSeVL7+VRhfKRNDp0NxLIQwmlrCDDLmB0QxzSMug=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ZUMcO9YZpMYXuZiI4HMUiUdDSRXID1p4skB78fwvGn/2VMFsZ9SzDu5SWs5rIfYT0QDQbOIclm+zK9pbGCsMH/s8HwN4TgRGFr8D5uMiEmHq6tpOS5sl/MYWRWuO7SSTaOTYB9RMn4Oto9eyWkRfCRly9D5zEB5zQBRCOTiAY1I=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.79
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-85ae7173dc2so178924239f.3
-        for <netdev@vger.kernel.org>; Fri, 07 Mar 2025 16:00:24 -0800 (PST)
+Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-85b30c95536so19056039f.1
+        for <netdev@vger.kernel.org>; Fri, 07 Mar 2025 16:01:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741392024; x=1741996824;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xBXX9MfaAjMFm+uUXLqcw3Ll98usKwdrx7VRig+czK4=;
-        b=iMlNbo4LZUH+D+EURLzMuZiuGJOPoKnQX8t8iWGkmhV8MJbVMgursNiyhe7H9P8iWM
-         quH7dSlruMSzYgymIrJnbUl6OuMiwDIhoSQwSYNU4bXZCksrSxbTXLzw/w3Be7pHnBmT
-         FS7WFoIEJxJRxRArl14rhMKRvy9Zd6v5Jlb3S1kI2Ws2L2uZf8gXj2i+8wQrVnRHb3j1
-         eoAK2LwvoVhC8QaSZSJ3RLI6GNXpwZiNebzZxU79P9mscf+/WZynxkWyLPe6m93jibjq
-         ayCxyf3bYmnvVCN13ItyNvAdkDRPMa63KVPXgLFYdiRCSL70lZzRYjrafXJB4Ftsu1ZK
-         7IEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXVdeKR2Fj9Md2Fio3lSkfN1XTcAh3bg+eDti2mZisxsXFa8RPi4O89ddkWMrD9wj3bJrDq/Ac=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy36ydToom+UsptAQ/PjIn1uRQQLKbjNWIHKW8KoVWEDiVXazMy
-	VCE5H6qgP8kd/EK4lqrVrgkHQb1bbca4z7NTvUpSwF7w/NtLUE5P4vPxe3MrKLum3NfYT47pY3Y
-	SYTisLd0EMcgmSj1sPj/9JsxgwGhyV4c6m+qYYKA+djjQ1cYRuYoSlM8=
-X-Google-Smtp-Source: AGHT+IFsCt5/96+A7g4F0+REEz4Hpa0jmUnIJQBU6D5Tm4/3jsv1E8JlRjlGeyHaWid99WT/wdXgLIo8xR8P/vHHZ0R/Dq9QfiK1
+        d=1e100.net; s=20230601; t=1741392082; x=1741996882;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zeqWouS+SSFmOzj0vligAq58jwoQW/v1su47nD9czv8=;
+        b=tN3PF6+hLN+B7CdHdoV4emaExokqYn8iw9tOfyxnLQ7O/nyRdHZNHBqGeoGSa1uiFW
+         vp5swbu4MvGrxTgnWbwylJUt6LijBAZUTFocVFPHXCQyvUWC+8KltDA9JGXePXYVeW1S
+         yU5R8HxfE+9S3pttVdsDKq5sywnIn+Cd4V4EiSiDAnEMgLrf6Zk2pQvaLieQj3w+Cu9b
+         yy7CxSdABZmHE9pKWqd/qYhoaGjV7aq7eKPoXeMrhTqvq86aNLoFOGCTLtE/bl0IQoZd
+         VNyCjj0Pa98+lks8wJEZ1/vOCnMQE4VxqijU7U+kf9Hp9170J/NIYOfcrjsSdhjkDOPH
+         cHWA==
+X-Forwarded-Encrypted: i=1; AJvYcCXmiYhiHIJjyCjHdybzTdCpprmfvR52g8XBODmBzicYwMs80KL/t5cGbsqZCOA/sONmSkztFFI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8TCJw21jidP/g10IjkqPjACpiOE0GnWqm88OpEVnxq/IWrLJ+
+	ZCGf9F4H0k3E+2AxLGK/wyoS2el3aqtlmNHXl5FaeDBlmwN62D76SSy0coZ7MEhgUqPelW05Tyo
+	dTrCLnzLekvCJuUAwIS+bgwhJEbe7q43t+huEs0X1NbQOP1BkwzIhgek=
+X-Google-Smtp-Source: AGHT+IE2RVxAN/LY5wy/Gi9Cg3zFZnJxLg+/g/jvJkGvV7nk6cVSFYhEwL0YOUHJDLjNEV8tUI9rU044HUQ7z4Y8tCdCJAizeq6H
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:378d:b0:3d3:ddb3:fe4e with SMTP id
- e9e14a558f8ab-3d441973568mr47435175ab.13.1741392023918; Fri, 07 Mar 2025
- 16:00:23 -0800 (PST)
-Date: Fri, 07 Mar 2025 16:00:23 -0800
-In-Reply-To: <67caaf5e.050a0220.15b4b9.007a.GAE@google.com>
+X-Received: by 2002:a05:6e02:1a83:b0:3d3:f27a:9103 with SMTP id
+ e9e14a558f8ab-3d44197137fmr69704715ab.1.1741392081681; Fri, 07 Mar 2025
+ 16:01:21 -0800 (PST)
+Date: Fri, 07 Mar 2025 16:01:21 -0800
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67cb8897.050a0220.d8275.0228.GAE@google.com>
-Subject: Re: [syzbot] [net?] general protection fault in ethnl_default_dumpit
-From: syzbot <syzbot+3da2442641f0c6a705a2@syzkaller.appspotmail.com>
-To: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	eric.dumazet@gmail.com, horms@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	sdf@fomichev.me, stfomichev@gmail.com, syzkaller-bugs@googlegroups.com
+Message-ID: <67cb88d1.050a0220.d8275.022c.GAE@google.com>
+Subject: [syzbot] [net?] [bcachefs?] KASAN: slab-use-after-free Read in
+ ip_skb_dst_mtu (2)
+From: syzbot <syzbot+98d6cedbab2dd7eaa17e@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	horms@kernel.org, kent.overstreet@linux.dev, kuba@kernel.org, 
+	linux-bcachefs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
-syzbot has found a reproducer for the following issue on:
+Hello,
 
-HEAD commit:    2525e16a2bae Merge git://git.kernel.org/pub/scm/linux/kern..
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=17d9a4b7980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fbc61e4c6e816b7b
-dashboard link: https://syzkaller.appspot.com/bug?extid=3da2442641f0c6a705a2
+syzbot found the following issue on:
+
+HEAD commit:    03d38806a902 Merge tag 'thermal-6.14-rc5' of git://git.ker..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=15952864580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8de9cc84d5960254
+dashboard link: https://syzkaller.appspot.com/bug?extid=98d6cedbab2dd7eaa17e
 compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14b2aa54580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=178283a8580000
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17952864580000
 
 Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/bae047feb57e/disk-2525e16a.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/9f10529c6bdd/vmlinux-2525e16a.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/8dcb6d0a6029/bzImage-2525e16a.xz
+disk image: https://storage.googleapis.com/syzbot-assets/3a7779436438/disk-03d38806.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/d7e23add8bc8/vmlinux-03d38806.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/b718ff622c01/bzImage-03d38806.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/5b20d0f140ec/mount_0.gz
+
+The issue was bisected to:
+
+commit 14152654805256d760315ec24e414363bfa19a06
+Author: Kent Overstreet <kent.overstreet@linux.dev>
+Date:   Mon Nov 25 05:21:27 2024 +0000
+
+    bcachefs: Bad btree roots are now autofix
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13c464b7980000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=102464b7980000
+console output: https://syzkaller.appspot.com/x/log.txt?x=17c464b7980000
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3da2442641f0c6a705a2@syzkaller.appspotmail.com
+Reported-by: syzbot+98d6cedbab2dd7eaa17e@syzkaller.appspotmail.com
+Fixes: 141526548052 ("bcachefs: Bad btree roots are now autofix")
 
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000197: 0000 [#1] PREEMPT SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000cb8-0x0000000000000cbf]
-CPU: 1 UID: 0 PID: 5830 Comm: syz-executor357 Not tainted 6.14.0-rc5-syzkaller-01064-g2525e16a2bae #0
+==================================================================
+BUG: KASAN: slab-use-after-free in sk_fullsock include/net/sock.h:2787 [inline]
+BUG: KASAN: slab-use-after-free in ip_skb_dst_mtu+0xa42/0xbc0 include/net/ip.h:515
+Read of size 1 at addr ffff88805fe4154a by task kworker/1:2/975
+
+CPU: 1 UID: 0 PID: 975 Comm: kworker/1:2 Not tainted 6.14.0-rc4-syzkaller-00248-g03d38806a902 #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-RIP: 0010:netdev_need_ops_lock include/linux/netdevice.h:2792 [inline]
-RIP: 0010:netdev_lock_ops include/linux/netdevice.h:2803 [inline]
-RIP: 0010:ethnl_default_dump_one net/ethtool/netlink.c:557 [inline]
-RIP: 0010:ethnl_default_dumpit+0x447/0xd40 net/ethtool/netlink.c:593
-Code: 49 8b 1f 48 89 d8 48 c1 e8 03 42 80 3c 30 00 74 08 48 89 df e8 ca e6 17 f8 4c 8b 3b 49 8d 9f bd 0c 00 00 48 89 d8 48 c1 e8 03 <42> 0f b6 04 30 84 c0 0f 85 4b 07 00 00 0f b6 1b 31 ff 89 de e8 f0
-RSP: 0018:ffffc9000400f0d8 EFLAGS: 00010203
-RAX: 0000000000000197 RBX: 0000000000000cbd RCX: 0000000000000000
-RDX: 0000000000000000 RSI: ffffffff8c80fdc0 RDI: 0000000000000001
-RBP: ffff888033e5ac00 R08: ffffffff903d0b77 R09: 1ffffffff207a16e
-R10: dffffc0000000000 R11: fffffbfff207a16f R12: ffff888144ad0600
-R13: ffff88802fd3e140 R14: dffffc0000000000 R15: 0000000000000000
-FS:  0000555584194380(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+Workqueue: mld mld_dad_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:408 [inline]
+ print_report+0x16e/0x5b0 mm/kasan/report.c:521
+ kasan_report+0x143/0x180 mm/kasan/report.c:634
+ sk_fullsock include/net/sock.h:2787 [inline]
+ ip_skb_dst_mtu+0xa42/0xbc0 include/net/ip.h:515
+ __ip_finish_output+0x12b/0x400 net/ipv4/ip_output.c:307
+ iptunnel_xmit+0x55d/0x9b0 net/ipv4/ip_tunnel_core.c:82
+ udp_tunnel_xmit_skb+0x262/0x3b0 net/ipv4/udp_tunnel_core.c:173
+ geneve_xmit_skb drivers/net/geneve.c:916 [inline]
+ geneve_xmit+0x210e/0x2bf0 drivers/net/geneve.c:1039
+ __netdev_start_xmit include/linux/netdevice.h:5151 [inline]
+ netdev_start_xmit include/linux/netdevice.h:5160 [inline]
+ xmit_one net/core/dev.c:3800 [inline]
+ dev_hard_start_xmit+0x27a/0x7d0 net/core/dev.c:3816
+ __dev_queue_xmit+0x1b73/0x3f50 net/core/dev.c:4649
+ dev_queue_xmit include/linux/netdevice.h:3313 [inline]
+ neigh_hh_output include/net/neighbour.h:523 [inline]
+ neigh_output include/net/neighbour.h:537 [inline]
+ ip6_finish_output2+0x127d/0x17c0 net/ipv6/ip6_output.c:141
+ ip6_finish_output+0x41e/0x840 net/ipv6/ip6_output.c:226
+ NF_HOOK+0x9e/0x430 include/linux/netfilter.h:314
+ mld_sendpack+0x843/0xdb0 net/ipv6/mcast.c:1868
+ mld_dad_work+0x44/0x500 net/ipv6/mcast.c:2308
+ process_one_work kernel/workqueue.c:3238 [inline]
+ process_scheduled_works+0xabe/0x18e0 kernel/workqueue.c:3319
+ worker_thread+0x870/0xd30 kernel/workqueue.c:3400
+ kthread+0x7a9/0x920 kernel/kthread.c:464
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+Last potentially related work creation:
+------------[ cut here ]------------
+pool index 54431 out of bounds (772) for stack id 8c38d4a0
+WARNING: CPU: 1 PID: 975 at lib/stackdepot.c:452 depot_fetch_stack+0x86/0xc0 lib/stackdepot.c:451
+Modules linked in:
+CPU: 1 UID: 0 PID: 975 Comm: kworker/1:2 Not tainted 6.14.0-rc4-syzkaller-00248-g03d38806a902 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
+Workqueue: mld mld_dad_work
+RIP: 0010:depot_fetch_stack+0x86/0xc0 lib/stackdepot.c:451
+Code: 83 7c 18 1c 00 74 38 48 01 d8 eb 24 90 0f 0b 90 44 39 f5 72 ca 90 48 c7 c7 6e af 39 8e 89 ee 44 89 f2 89 d9 e8 fb be 5b fc 90 <0f> 0b 90 90 31 c0 5b 41 5e 5d c3 cc cc cc cc 90 0f 0b 90 eb ef 90
+RSP: 0018:ffffc90003836d28 EFLAGS: 00010046
+RAX: eec25f5fb9356300 RBX: 000000008c38d4a0 RCX: ffff888026575a00
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 000000000000d49f R08: ffffffff81817d42 R09: 1ffff110170e519a
+R10: dffffc0000000000 R11: ffffed10170e519b R12: ffff88805fe4154a
+R13: ffffea00017f9000 R14: 0000000000000304 R15: ffffc90003836df8
+FS:  0000000000000000(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
 CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000400000000a40 CR3: 00000000352bc000 CR4: 00000000003526f0
+CR2: 00007f086af09000 CR3: 00000000798e8000 CR4: 00000000003526f0
 DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
 DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 Call Trace:
  <TASK>
- genl_dumpit+0x10d/0x1b0 net/netlink/genetlink.c:1027
- netlink_dump+0x64d/0xe10 net/netlink/af_netlink.c:2309
- __netlink_dump_start+0x5a2/0x790 net/netlink/af_netlink.c:2424
- genl_family_rcv_msg_dumpit net/netlink/genetlink.c:1076 [inline]
- genl_family_rcv_msg net/netlink/genetlink.c:1192 [inline]
- genl_rcv_msg+0x894/0xec0 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x206/0x480 net/netlink/af_netlink.c:2534
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
- netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1339
- netlink_sendmsg+0x8de/0xcb0 net/netlink/af_netlink.c:1883
- sock_sendmsg_nosec net/socket.c:709 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:724
- ____sys_sendmsg+0x53a/0x860 net/socket.c:2564
- ___sys_sendmsg net/socket.c:2618 [inline]
- __sys_sendmsg+0x269/0x350 net/socket.c:2650
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fdb90304329
-Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fffa4264738 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fffa4264908 RCX: 00007fdb90304329
-RDX: 0000000000000000 RSI: 0000400000000a40 RDI: 0000000000000003
-RBP: 00007fdb90377610 R08: 0000000000000000 R09: 00007fffa4264908
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
-R13: 00007fffa42648f8 R14: 0000000000000001 R15: 0000000000000001
+ stack_depot_fetch lib/stackdepot.c:714 [inline]
+ stack_depot_print+0x16/0x50 lib/stackdepot.c:752
+ kasan_print_aux_stacks+0x38/0x70 mm/kasan/report_generic.c:199
+ describe_object_stacks mm/kasan/report.c:347 [inline]
+ describe_object mm/kasan/report.c:353 [inline]
+ print_address_description mm/kasan/report.c:412 [inline]
+ print_report+0x22b/0x5b0 mm/kasan/report.c:521
+ kasan_report+0x143/0x180 mm/kasan/report.c:634
+ sk_fullsock include/net/sock.h:2787 [inline]
+ ip_skb_dst_mtu+0xa42/0xbc0 include/net/ip.h:515
+ __ip_finish_output+0x12b/0x400 net/ipv4/ip_output.c:307
+ iptunnel_xmit+0x55d/0x9b0 net/ipv4/ip_tunnel_core.c:82
+ udp_tunnel_xmit_skb+0x262/0x3b0 net/ipv4/udp_tunnel_core.c:173
+ geneve_xmit_skb drivers/net/geneve.c:916 [inline]
+ geneve_xmit+0x210e/0x2bf0 drivers/net/geneve.c:1039
+ __netdev_start_xmit include/linux/netdevice.h:5151 [inline]
+ netdev_start_xmit include/linux/netdevice.h:5160 [inline]
+ xmit_one net/core/dev.c:3800 [inline]
+ dev_hard_start_xmit+0x27a/0x7d0 net/core/dev.c:3816
+ __dev_queue_xmit+0x1b73/0x3f50 net/core/dev.c:4649
+ dev_queue_xmit include/linux/netdevice.h:3313 [inline]
+ neigh_hh_output include/net/neighbour.h:523 [inline]
+ neigh_output include/net/neighbour.h:537 [inline]
+ ip6_finish_output2+0x127d/0x17c0 net/ipv6/ip6_output.c:141
+ ip6_finish_output+0x41e/0x840 net/ipv6/ip6_output.c:226
+ NF_HOOK+0x9e/0x430 include/linux/netfilter.h:314
+ mld_sendpack+0x843/0xdb0 net/ipv6/mcast.c:1868
+ mld_dad_work+0x44/0x500 net/ipv6/mcast.c:2308
+ process_one_work kernel/workqueue.c:3238 [inline]
+ process_scheduled_works+0xabe/0x18e0 kernel/workqueue.c:3319
+ worker_thread+0x870/0xd30 kernel/workqueue.c:3400
+ kthread+0x7a9/0x920 kernel/kthread.c:464
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
  </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:netdev_need_ops_lock include/linux/netdevice.h:2792 [inline]
-RIP: 0010:netdev_lock_ops include/linux/netdevice.h:2803 [inline]
-RIP: 0010:ethnl_default_dump_one net/ethtool/netlink.c:557 [inline]
-RIP: 0010:ethnl_default_dumpit+0x447/0xd40 net/ethtool/netlink.c:593
-Code: 49 8b 1f 48 89 d8 48 c1 e8 03 42 80 3c 30 00 74 08 48 89 df e8 ca e6 17 f8 4c 8b 3b 49 8d 9f bd 0c 00 00 48 89 d8 48 c1 e8 03 <42> 0f b6 04 30 84 c0 0f 85 4b 07 00 00 0f b6 1b 31 ff 89 de e8 f0
-RSP: 0018:ffffc9000400f0d8 EFLAGS: 00010203
-RAX: 0000000000000197 RBX: 0000000000000cbd RCX: 0000000000000000
-RDX: 0000000000000000 RSI: ffffffff8c80fdc0 RDI: 0000000000000001
-RBP: ffff888033e5ac00 R08: ffffffff903d0b77 R09: 1ffffffff207a16e
-R10: dffffc0000000000 R11: fffffbfff207a16f R12: ffff888144ad0600
-R13: ffff88802fd3e140 R14: dffffc0000000000 R15: 0000000000000000
-FS:  0000555584194380(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000000045ad50 CR3: 00000000352bc000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	49 8b 1f             	mov    (%r15),%rbx
-   3:	48 89 d8             	mov    %rbx,%rax
-   6:	48 c1 e8 03          	shr    $0x3,%rax
-   a:	42 80 3c 30 00       	cmpb   $0x0,(%rax,%r14,1)
-   f:	74 08                	je     0x19
-  11:	48 89 df             	mov    %rbx,%rdi
-  14:	e8 ca e6 17 f8       	call   0xf817e6e3
-  19:	4c 8b 3b             	mov    (%rbx),%r15
-  1c:	49 8d 9f bd 0c 00 00 	lea    0xcbd(%r15),%rbx
-  23:	48 89 d8             	mov    %rbx,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	42 0f b6 04 30       	movzbl (%rax,%r14,1),%eax <-- trapping instruction
-  2f:	84 c0                	test   %al,%al
-  31:	0f 85 4b 07 00 00    	jne    0x782
-  37:	0f b6 1b             	movzbl (%rbx),%ebx
-  3a:	31 ff                	xor    %edi,%edi
-  3c:	89 de                	mov    %ebx,%esi
-  3e:	e8                   	.byte 0xe8
-  3f:	f0                   	lock
 
 
 ---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
 If you want syzbot to run the reproducer, reply with:
 #syz test: git://repo/address.git branch-or-commit-hash
 If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
