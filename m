@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-173144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41887A57817
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 04:50:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E85AA57818
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 04:50:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52E393B659E
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 03:50:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 66CF31894EDE
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 03:50:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3296C17A5A4;
-	Sat,  8 Mar 2025 03:50:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23BDA189F36;
+	Sat,  8 Mar 2025 03:50:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rNGImwl5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eqW+DPdf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EFF117A31C
-	for <netdev@vger.kernel.org>; Sat,  8 Mar 2025 03:50:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC19315687D;
+	Sat,  8 Mar 2025 03:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741405805; cv=none; b=PO3Og88/5H4fs9sIK61oSXxcXi0Fb26m3RDJsBvQ9EJM2lqkib/HivPj7qSi8ALp0rYb9l9TR1pARKDismOKmHWR3sZ440ioQ8kij7MrPzoniYQ60IDE2bODMenrASH85gk55348G4Ypsds9n4ALiiTBf3+9AIqsR/q32RBWXL8=
+	t=1741405807; cv=none; b=EiddleOQyV0XifAFN7FGwjfpGRmxIi85ZwqJz3Fqw6x+uQXdzPShiVFDxzpRz81mY3hhzpK1guC3v0t7JY/4k8JEgzZmuUfGLsuD9GWmOBIRGVf13/iebv6gi361nrJuiMGz9F3iohpe/2XeYZiu63+d4QUqIyzn6I454rCFpOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741405805; c=relaxed/simple;
-	bh=6pX5wgcT8yxGzQhgd5SpYimdD5lIbz9rmfrxc1jnpTY=;
+	s=arc-20240116; t=1741405807; c=relaxed/simple;
+	bh=gMTHFRUzvjZvMCwhd15l/Ro9Q3gwPrcUmEHbWd5fiEM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=UtPu8KvD1hy26kLj5zCEhIPrzCFovVLbux0XbWGkO4xHOvZYuxpryKBGeDBK486fZV3Nvr3VVj04B7gxgFm5h1BPVDmO27DFhvLigg6FXorORKaM/hCoXLw0K64vvY69PVVZXAkKyijYqyy/vPnEWKepJNcezh4TB7UjH5odjvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rNGImwl5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0C25C4CEE4;
-	Sat,  8 Mar 2025 03:50:04 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=E4FpbXsUxgxbjg6byTIb4I/hxGKc8jwbkzwJ1BIjRFracNPoBYOgU3h8xsSvW9DpTW5n9BTpJqsLcpjLbJe5TVef99u7O5yMvB40JOU4rFKuL5or7CCIlEgB8zdBX6Q/zOqRzQN7Jo25HPZd9VeTxdh//KIPOGcuELaLRl+cosk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eqW+DPdf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67822C4CEE8;
+	Sat,  8 Mar 2025 03:50:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741405804;
-	bh=6pX5wgcT8yxGzQhgd5SpYimdD5lIbz9rmfrxc1jnpTY=;
+	s=k20201202; t=1741405806;
+	bh=gMTHFRUzvjZvMCwhd15l/Ro9Q3gwPrcUmEHbWd5fiEM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=rNGImwl5TIHsxq3YMdg39BWEVoYcwsNU4kb/yk9FkiWVgpNFXWrxMpSE7HM0mV4Si
-	 JZWi9tMSMDZoLAXtPG+La1yZbz1PfvxFrWmoUdY8P0wuoMIlhmebE8xpL9fOQlfm1t
-	 Smj/GMm0gygpEp+73iIoHOz9sr+K54pKFtcF1y3IbWUtb1aPx/hs0nH89l2N9k4/BR
-	 wlnzRnoF50/nevjqPMbICkm/fzonKROk4bICeIXDKCu/NJHpMrR0tFjWyVUtrn7BMo
-	 GaiSli+H2pwlKv5A8uuLhfYi8rDlPazCkMwwN5OvvQvhRvDN8/TJ+LvKiK8MOh9es7
-	 yb7GS6EoSscUw==
+	b=eqW+DPdfvcU9nRph9O/Z+RsYfUjuIo6T5atEdAj5SCLJZ88pY7KDPTUa5vlUio6+F
+	 1IeAhGF9Ryr0he8i62+xMPVn3P5w6079p5r38b4JSgyFD0hhd5zhOlF42WnVZ4YCwt
+	 4+MoFXDEsNAeH+QtbhBIeNDN9tZjS4f3dn6CDh2e+W3OThA0qo210dOuNTaCJyM4yv
+	 sC5aEDqYJIcs1pN3nJCX8VefDLVj3Tc7ePDNVzxDZNqfIAU/tpLPBk8bJ+QCOLGnmq
+	 F9Jt6nVj6RMK15lDg6Tnmx4HE7dYjRK/OMbqq1yVSGLD2+Y3lM77+ainwN7veI3DXb
+	 FvMqm4Caq+HEg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCC2380CFFB;
-	Sat,  8 Mar 2025 03:50:39 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 341FA380CFFB;
+	Sat,  8 Mar 2025 03:50:41 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: mctp i3c: Copy headers if cloned
+Subject: Re: [PATCH net v2] netmem: prevent TX of unreadable skbs
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174140583824.2568613.9874744418079754263.git-patchwork-notify@kernel.org>
-Date: Sat, 08 Mar 2025 03:50:38 +0000
-References: <20250306-matt-i3c-cow-head-v1-1-d5e6a5495227@codeconstruct.com.au>
-In-Reply-To: <20250306-matt-i3c-cow-head-v1-1-d5e6a5495227@codeconstruct.com.au>
-To: Matt Johnston <matt@codeconstruct.com.au>
-Cc: jk@codeconstruct.com.au, andrew+netdev@lunn.ch, davem@davemloft.net,
+ <174140583973.2568613.2231565890209246697.git-patchwork-notify@kernel.org>
+Date: Sat, 08 Mar 2025 03:50:39 +0000
+References: <20250306215520.1415465-1-almasrymina@google.com>
+In-Reply-To: <20250306215520.1415465-1-almasrymina@google.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, davem@davemloft.net,
  edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netdev@vger.kernel.org
+ stable@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 06 Mar 2025 18:24:18 +0800 you wrote:
-> Use skb_cow_head() prior to modifying the tx skb. This is necessary
-> when the skb has been cloned, to avoid modifying other shared clones.
+On Thu,  6 Mar 2025 21:55:20 +0000 you wrote:
+> Currently on stable trees we have support for netmem/devmem RX but not
+> TX. It is not safe to forward/redirect an RX unreadable netmem packet
+> into the device's TX path, as the device may call dma-mapping APIs on
+> dma addrs that should not be passed to it.
 > 
-> Signed-off-by: Matt Johnston <matt@codeconstruct.com.au>
-> Fixes: c8755b29b58e ("mctp i3c: MCTP I3C driver")
-> ---
->  drivers/net/mctp/mctp-i3c.c | 5 +++++
->  1 file changed, 5 insertions(+)
+> Fix this by preventing the xmit of unreadable skbs.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: mctp i3c: Copy headers if cloned
-    https://git.kernel.org/netdev/net/c/26db9c9ee19c
+  - [net,v2] netmem: prevent TX of unreadable skbs
+    https://git.kernel.org/netdev/net/c/f3600c867c99
 
 You are awesome, thank you!
 -- 
