@@ -1,91 +1,86 @@
-Return-Path: <netdev+bounces-173129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92B88A577E0
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 04:33:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80638A577E2
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 04:33:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88C463B6431
-	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 03:33:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4F16188EF9B
+	for <lists+netdev@lfdr.de>; Sat,  8 Mar 2025 03:33:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FF9112CDA5;
-	Sat,  8 Mar 2025 03:33:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96DBF12CDA5;
+	Sat,  8 Mar 2025 03:33:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="inyxdyag"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y+sN1ikz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ECB38F66;
-	Sat,  8 Mar 2025 03:33:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3471913C8F3
+	for <netdev@vger.kernel.org>; Sat,  8 Mar 2025 03:33:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741404789; cv=none; b=MGWoxmlMT8rPbNd+izUB66QJ3AWQJhdYn/uuJxezv6l6RIU0e3DuND1p775HG3x+cfXXbsGgEe3bhoChfSSvTzsHn/rVMBm16xX5c0328FrxEI1XAwRhomcdUsOg8e0+YuF+8CRxZUBvnfGeg2hq4LVqN+wvPUPgWEjyU7cZDLk=
+	t=1741404824; cv=none; b=njjuPsheNfwX+/zvgGg3NAs1C/QbEf0lVkbhKodLhQ+drWSWFFmHk/5Kdhem55pbfV1QQYfElJVt+K0iyVYlGOlZtknue90d5tsSK3T8skXwtkAKB5uWha0DWZlEEkhbe+V7T79IlNUEeoJFEckLhGNpfU2Pwl+pEfG4DJhwpuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741404789; c=relaxed/simple;
-	bh=J3GOrkHlYe1f1Ad/hqfBmcN6lLCGyERRLaUQ6yh6PBU=;
+	s=arc-20240116; t=1741404824; c=relaxed/simple;
+	bh=4PEh1mJIUnBxdLBuRUJcBOruCY5xb5ne5yALVVu+kEk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RkkVuSokSjyyoJcuq4uVu7HzIgtjU/K1KZmfiqAuigiUoZNUp2tEDICGi1abFFphaxmVttIDnmQFOGTw6SKobJzpRzWxO+EFQhAJZNUgDbJ5rxf5CdHx3yh+/atNvR7p0NTFwBpaWfH431i4NAwOSzepa0wqPIE9kHOoidT6s94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=inyxdyag; arc=none smtp.client-ip=209.85.216.48
+	 Content-Type:Content-Disposition:In-Reply-To; b=JvRAwkRNcrDxkVNjOdGRqiQZajQddh9r48e+6O5je7fo3W6LJbER20xv/DO//4jOJd4GuLzj8wuLDHqcQ0COELmR4s9mk/De7/WoZ6bpnfAX7eOoPLnfr9bF0cK0CBlG4uOhJgeLDgl9MsZn9vEcZA6rG6AnQX1E2LjkCPG+8Zc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y+sN1ikz; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2ff6a98c638so4877270a91.0;
-        Fri, 07 Mar 2025 19:33:07 -0800 (PST)
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-223a7065ff8so23896315ad.0
+        for <netdev@vger.kernel.org>; Fri, 07 Mar 2025 19:33:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741404787; x=1742009587; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1741404822; x=1742009622; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UvgrHzEVnpT8/G3HmHL6s2DUgeJhb4IX0T9xLTixKK0=;
-        b=inyxdyaglmnaUGTgkJPVxFICV3m+PZ5TUcKLW+so57VklDWFcAGHURt/yd99lMlolr
-         QHcLwDhrW1WFGrfr2XLKkdMmuoUNxagZE7RRSuDB8HxHl8cyRfnuj16DHsZvPv4I14NE
-         gkINESDz9Nw7620Za6BJHQju8a9iphambpXA/DujONrEcr+ApeJCVsfMXFt38Pgg1FCW
-         9KR90kdYTjpxWG+FthSohTt1aAS49thzXBBBklM+YH7yGyscEKc1yqJAciRVJH+xV/1j
-         B81I/sI6GoTX4ddHZnKxiCjHLCEXWQ7ifIuVzzMlyNY4zO6IksSuXXj6KtyrqBJp6sZN
-         M3Ww==
+        bh=RUdJzig+QZPaV1OXxrKSicvU1IynWQXK+2hzHoA9ajU=;
+        b=Y+sN1ikzGerVx6LPZTWA1x24587/h25+Hiw2+1gAG/PaP+pr2IlRGE2wAsTkg0VeCf
+         FvilPtyCeRl7a+7CT1bLtrLULNewHGVOzIEC3QFLrAT+DimV4BJbTqe08lv5bDvS6V0h
+         J75KFXlxrzoiND/uiVmWphhY1FW2ZE7HwOR7NU+PqHCMtq3XSA6lY5QJB+Ju/SMVnj+s
+         DAjV+OexZIiZrvg6nCueMP8BR7hD10wvlVkjRzo3fJDy9ZLLtFUNRRe3qcg38jEAF/8X
+         EcfXZ1O62gnknh5TgWnPnDtP8t/j3Z0Ia8jNW0WklD54/EX/JXG6z3FHmIDeitRZ02wM
+         Pd8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741404787; x=1742009587;
+        d=1e100.net; s=20230601; t=1741404822; x=1742009622;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UvgrHzEVnpT8/G3HmHL6s2DUgeJhb4IX0T9xLTixKK0=;
-        b=L3BnQhzhqKtkwtV0CKfycymbj6GwtO8vzMSFyEtdTeVbbIz5ktiuKvfO28/H/RC0AR
-         4RnxKJaJ4/dfO74p8SlVNgaNdfJZQTkzlSxeT5Cyqw9pgTWVNQ//vRg2y4nMHQCOOwWx
-         3qlUgoKxAz1VK4duIrzEqyk/1gUe0kr0VFmFTdLb86C6aJhCzYnIhvTER3d8nJcHCbWZ
-         5cXeLvQb/1yc5KjDuZQ5r2Z3nkgSxcXZm//z6lmbeSrroGHTZaX195fkZ74UNLqyqKUD
-         nWviSFC7Xpy6Q9WwH7wrnu1r9uphzQr31a+RuFkdn5NYg0487bSsQ+Cdrx32zqRrlMsu
-         B8ng==
-X-Forwarded-Encrypted: i=1; AJvYcCWloRRLDVUp8oMS7e23iU4qxKKbj2H21WZU97zRylf3pEKqByrUFdVsRmLk8ePYIGh54EvQfLq8@vger.kernel.org, AJvYcCWvYIeO3eV6nSJHDqL87d8vKoVZ7aicLiitbNOBydaKdxScTZUGfS6GjvE9PK6rAgEPbnlozUyC2voneOg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxeSExuceZYmh4jy37ul+tT0F1ahy40gwYHbT/dO5Xhj3zRgF4c
-	DTPyN5yNtUEJJG6j8u22qAcyyO6PoNv577ugdJCHhGCnnNnhHLk=
-X-Gm-Gg: ASbGnct70mqTDqIuyzFRw4CyHdbj5H/mqDxSO29T5V4G0I6xM4sl+Tzv0/+nkyOL5Nv
-	yU1jZiZvpMRpRX1M+/Bs/iPOvDCRmf9BoFIz3vVhoXowjCc/Pz8xCP4qAo2GBrvMoZqpA8Dg28f
-	GqLLc/FdSRf2w5jyOxGhOAjj1qIR0Sx1MM/6w/O1D/Xa+1EHgwH5vNR5ikE+EN5+vlryWGyLjFS
-	yVy4xRryUgdgIDytDA2GE5eFjw9x9rAvHYemsEXjyBTQ0lE3cfcq8X+KqP6A423qEE0xfRQd1vH
-	etu3hLC8Q479MS0JGWCP5Mx0Q4DTmB2f28Gc5ooBQtov
-X-Google-Smtp-Source: AGHT+IHPRXLJpetfEwSMQ7twdjphQ1M6P53SRY3QIktwMixPny5Lf92aBO0J+9e1YgZJgGzLPwmEoA==
-X-Received: by 2002:a17:90b:390c:b0:2f9:cf97:56a6 with SMTP id 98e67ed59e1d1-2ff7ce63ffbmr10417495a91.14.1741404786689;
-        Fri, 07 Mar 2025 19:33:06 -0800 (PST)
+        bh=RUdJzig+QZPaV1OXxrKSicvU1IynWQXK+2hzHoA9ajU=;
+        b=iMnYBKUSim/lx318eV7NVkLTp4wBTt/12SEKzkyBgkoQIJhOMbLbPoSaH9GmXw8nyU
+         NUKrWBNBORo2vQ5WcV7MRYKs8jCjQaniMlsL3eFiaXHV7lfqjQoymkVfYIYaNavFmv1R
+         rpUjGsuX7bu/oW/iTErKnD70rO03DUr7EM2T5mk5GDfk3guJBYhKuFXZ3Gp6j+V6lTi2
+         yPyIHGoDLxo9CKu9uDY/cnFa3j8l295vPKd2oHIWytdehF33W62PU8H49/rrNq33D5/I
+         5nIDet/20plfmzTqnIGhVuWbto8r7XIyDdvaUPgypNsmyAuwaDDJNXx3v+0ZDUhqLefG
+         A9IA==
+X-Forwarded-Encrypted: i=1; AJvYcCW+Vv7Y2HosCBsNEh2KYG1AgLZH+Xob+RVkKT8hZ9IfrS1s5Xzy2yMFnybe5rYpcdfHeVjEAuM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwD6jWw231hHiX9XAtdGcsFfFRLXnAURJcSFD9LIZkkMsKqf4zz
+	ZYzL9/HL31Al6oSaPvAahTDI0Chk1lm0vDLPpdjkQ5Z2ACTBGf8=
+X-Gm-Gg: ASbGncshhYEWv8a/kSYLP5mZGJdkQ6PMGZJDGQBdOEOzQAcgrjYNmim7hRKuDP+Jo9t
+	esXUAWzp+eFJLAnMJdoXTnESbAU4uBVOXLvn4aANjrkz6FY98bkHHyFfid6U73mLgbfM51jKGJq
+	7ayoC8EaJgHJqG4jwTnVNoxuCnfthW2m04iRcPBmJxXvNr1rZhftFYyjh3BXkwtEy8RhH8OK3FF
+	xg38ZrE0OQOWsKYJtUNI7D2fBzwkR8PHD/16LkBU8FD6hzNQEX5dVUdE6elB0bkTppxRZShxCVW
+	cTImmHkPhNNrP1uVPjkZBRvKidWJi1ppFdI0sYtfkwSJ
+X-Google-Smtp-Source: AGHT+IEOE6afIBoqDfa36fzW84LJo6iNtN8/RPENRbB8lKSW6j1R/rHhmVztSuU5cpFJI5idrQAnug==
+X-Received: by 2002:a05:6a00:843:b0:736:a973:748 with SMTP id d2e1a72fcca58-736aaad3d00mr9459140b3a.22.1741404822275;
+        Fri, 07 Mar 2025 19:33:42 -0800 (PST)
 Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-224109e97d0sm38247115ad.79.2025.03.07.19.33.05
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-736bb029402sm869170b3a.27.2025.03.07.19.33.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Mar 2025 19:33:06 -0800 (PST)
-Date: Fri, 7 Mar 2025 19:33:05 -0800
+        Fri, 07 Mar 2025 19:33:41 -0800 (PST)
+Date: Fri, 7 Mar 2025 19:33:41 -0800
 From: Stanislav Fomichev <stfomichev@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	linux-kernel@vger.kernel.org, horms@kernel.org,
-	donald.hunter@gmail.com, michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com, andrew+netdev@lunn.ch,
-	jdamato@fastly.com, xuanzhuo@linux.alibaba.com,
-	almasrymina@google.com, asml.silence@gmail.com, dw@davidwei.uk
-Subject: Re: [PATCH net-next v1 0/4] net: remove rtnl_lock from the callers
- of queue APIs
-Message-ID: <Z8u6cSJGzUGRFjkX@mini-arch>
-References: <20250307155725.219009-1-sdf@fomichev.me>
- <20250307192234.2f8be6b9@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	sdf@fomichev.me
+Subject: Re: [PATCH net-next] net: move misc netdev_lock flavors to a
+ separate header
+Message-ID: <Z8u6laRzRAoxyXH_@mini-arch>
+References: <20250307183006.2312761-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,30 +89,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250307192234.2f8be6b9@kernel.org>
+In-Reply-To: <20250307183006.2312761-1-kuba@kernel.org>
 
 On 03/07, Jakub Kicinski wrote:
-> On Fri,  7 Mar 2025 07:57:21 -0800 Stanislav Fomichev wrote:
-> > All drivers that use queue management APIs already depend on the netdev
-> > lock. Ultimately, we want to have most of the paths that work with
-> > specific netdev to be rtnl_lock-free (ethtool mostly in particular).
-> > Queue API currently has a much smaller API surface, so start with
-> > rtnl_lock from it:
-> > 
-> > - add mutex to each dmabuf binding (to replace rtnl_lock)
-> > - protect global net_devmem_dmabuf_bindings with a new (global) lock
-> > - move netdev lock management to the callers of netdev_rx_queue_restart
-> >   and drop rtnl_lock
+> Move the more esoteric helpers for netdev instance lock to
+> a dedicated header. This avoids growing netdevice.h to infinity
+> and makes rebuilding the kernel much faster (after touching
+> the header with the helpers).
 > 
-> One more note, looks like this silently conflicts with my:
-> https://lore.kernel.org/all/20250307183006.2312761-1-kuba@kernel.org/
+> The main netdev_lock() / netdev_unlock() functions are used
+> in static inlines in netdevice.h and will probably be used
+> most commonly, so keep them in netdevice.h.
 > 
-> You need to add:
-> 
-> #include <net/netdev_lock.h>
-> 
-> to net/core/netdev_rx_queue.c, otherwise the series together break 
-> the build.
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Noted, thanks!
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
