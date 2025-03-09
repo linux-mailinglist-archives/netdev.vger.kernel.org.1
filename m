@@ -1,175 +1,106 @@
-Return-Path: <netdev+bounces-173389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DE61A58948
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 00:28:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D7DBA58950
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 00:43:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 491B13A709F
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 23:27:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E6CB3A7B83
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 23:42:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0B7C221737;
-	Sun,  9 Mar 2025 23:27:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 465C621A45D;
+	Sun,  9 Mar 2025 23:43:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b="DAHFmvD1"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="dwsqqJrY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.forwardemail.net (smtp.forwardemail.net [149.28.215.223])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22638221DAA
-	for <netdev@vger.kernel.org>; Sun,  9 Mar 2025 23:27:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=149.28.215.223
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 008921CCEDB;
+	Sun,  9 Mar 2025 23:43:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741562823; cv=none; b=r1RXS3kIr9QsYFOtSz8ZmuWOiOuP0iQf7BqjPjvBt0/ZZfbIljSfvrkef/Wx2dMPcOVzyn9+pRt8jmoWtD72S3gp1b7rkeoUNCffe6bHOIUiyTj4Mo9Ts5o7kX35lbvx/7b+jai1BNHCBkatd76eW3oRPZLSCFnpZ/ZG01v0d2U=
+	t=1741563788; cv=none; b=Ps5jymeuQFG6LALKBumdAJaMS3RlYf9jU1Yt5YsAE/3iFR4vjnaQq20Jq8pEBQFwZZ0iroDB5HfKVejS0LcwNOqqle0kKau/hb+eIVdhRcIBDgFB5yMscS6eGtxVWE5/xBm2EflDy2DN8fALh6ggUWEA9azupFUSJj2fwvoacc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741562823; c=relaxed/simple;
-	bh=iU34nURrJ0nfFoR++yWAIoQ4ECPtS2Fypg27n1wyEts=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IwZQ3+T1nzwZZiEWl0J7JmqodlJptuv0q59QEz2H0SJJvzaBz/tKSl6pujoY5kR9XK8BAS6zfVjZNSStE/HSKP7hYZS152fVfsyNHb1JOksc/ZuKrdEdDiR6DRO1EjiV2AKZ1ej1wfaLfGm7NpBPBfkyFM1P2v8cevSsGTmtNo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se; dkim=pass (2048-bit key) header.d=kwiboo.se header.i=@kwiboo.se header.b=DAHFmvD1; arc=none smtp.client-ip=149.28.215.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kwiboo.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.kwiboo.se
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kwiboo.se;
- h=Content-Transfer-Encoding: MIME-Version: References: In-Reply-To:
- Message-ID: Date: Subject: Cc: To: From; q=dns/txt; s=fe-e1b5cab7be;
- t=1741562821; bh=KanAfDw+UyOaqtRYsPqpRbqdHPNczgiApRuHgmm7F4E=;
- b=DAHFmvD1yIzwik/F5yW0aFQrYZGCDfZrX4xRCVqOakfVGeLR8oNb90WCq2TxUoipiK73wBfdH
- ZgBq2K4b2jHUM4yyTD9+LuNlu8idtFlikiNh8zp+gFi07TsOMuG7NNlksB7yo62hg3U66XKTgiT
- pn9A9D/1MalM8vz9chDyzxz5uFvV07MUywDEoaHCtpPVCoBsqmWo4ZodxjwqgZSsRcXKpkoVlz1
- vT8MxWtPSJrfC1Q6CFXPoHIItU7o4Ea9S2QiwYUqTAXKyxbrHpAxUXYFhTPZkaVRqMQwJSAtpit
- lwNQVJ5/igpiSsm9YIyt1Q6Q8ICnOhdh/HYG3AEQdHOg==
-X-Forward-Email-ID: 67ce23bc5209992d7c670edc
-X-Forward-Email-Sender: rfc822; jonas@kwiboo.se, smtp.forwardemail.net,
- 149.28.215.223
-X-Forward-Email-Version: 0.4.40
-X-Forward-Email-Website: https://forwardemail.net
-X-Complaints-To: abuse@forwardemail.net
-X-Report-Abuse: abuse@forwardemail.net
-X-Report-Abuse-To: abuse@forwardemail.net
-From: Jonas Karlman <jonas@kwiboo.se>
-To: Heiko Stuebner <heiko@sntech.de>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>
-Cc: Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	David Wu <david.wu@rock-chips.com>,
-	Yao Zi <ziyao@disroot.org>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-rockchip@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Jonas Karlman <jonas@kwiboo.se>,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: [PATCH v2 5/5] net: stmmac: dwmac-rk: Add initial support for RK3528 integrated PHY
-Date: Sun,  9 Mar 2025 23:26:15 +0000
-Message-ID: <20250309232622.1498084-6-jonas@kwiboo.se>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250309232622.1498084-1-jonas@kwiboo.se>
-References: <20250309232622.1498084-1-jonas@kwiboo.se>
+	s=arc-20240116; t=1741563788; c=relaxed/simple;
+	bh=PvVE9HNj59mpecuBm7xZloSjNqHLHfoojcoFAF8X8Gk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=L9P/8gAA/HLVWKZ7SqVGR/AEtyJ5O7z5t4Sft33Tmr7Ou8zvrhYFE71Tx1MKMUdo7Paxn0MVBOtwj0dRwASHZQXpvySXJN4QkJtH8q6eahLSx20JnBPsFdcnwBkDVW19Ut4r9xay1aLNzaSbiHsJdlxtGQbTRmrTiTpJPnI3N64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=dwsqqJrY; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1trQI9-00APFn-Jy; Mon, 10 Mar 2025 00:42:45 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=UA39vXffBnMW+SSvM+/rFys1woMllWZP1w5Kuj2MQXQ=; b=dwsqqJrY28vfkbNyGknUJD2jhw
+	eUhHlxrvKjF18S3OvAaFe4zZ2eVSubaNOJA2+YaQTRIdyZ6kPSIiZjPPbwIyCktm30OsH2ddXn52G
+	Qwzugu1FCYgdd/jvoZtUFOr8XuyouGsHdUqmjg+sVYmps8osfYbOL2ZBAk5Smun2rrpE2WRuUmAZ4
+	mghvZM6zy03SsYnGo5dtoaLm16sZRn2yumOPRp4rxnUu0vdN+nZKVzKaOfk5Iymqrny78UbodPs1+
+	5S3KivaFKoQIH4dGhOI0+9iy0SWUZOaCNFhcnGJZa+KUSafyaKFwzcn7eLghAThOhG8L9LZoEsz1h
+	OdvOPnWg==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1trQI8-0007qd-KA; Mon, 10 Mar 2025 00:42:44 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1trQHt-004zM5-LR; Mon, 10 Mar 2025 00:42:29 +0100
+Message-ID: <be935429-2125-4fea-844b-abce83f7324e@rbox.co>
+Date: Mon, 10 Mar 2025 00:42:28 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] vsock/bpf: Handle EINTR connect() racing against
+ sockmap update
+To: Stefano Garzarella <sgarzare@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Bobby Eshleman <bobby.eshleman@bytedance.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org
+References: <20250307-vsock-trans-signal-race-v1-1-3aca3f771fbd@rbox.co>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <20250307-vsock-trans-signal-race-v1-1-3aca3f771fbd@rbox.co>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Rockchip RK3528 (and RV1106) has a different integrated PHY compared to
-the integrated PHY on RK3228/RK3328. Current powerup/down operation is
-not compatible with the integrated PHY found in these newer SoCs.
+On 3/7/25 10:27, Michal Luczaj wrote:
+> Signal delivered during connect() may result in a disconnect of an already
+> TCP_ESTABLISHED socket. Problem is that such established socket might have
+> been placed in a sockmap before the connection was closed. We end up with a
+> SS_UNCONNECTED vsock in a sockmap. And this, combined with the ability to
+> reassign (unconnected) vsock's transport to NULL, breaks the sockmap
+> contract. As manifested by WARN_ON_ONCE.
+> 
+> Ensure the socket does not stay in sockmap.
+> 
+> WARNING: CPU: 10 PID: 1310 at net/vmw_vsock/vsock_bpf.c:90 vsock_bpf_recvmsg+0xb4b/0xdf0
+> CPU: 10 UID: 0 PID: 1310 Comm: a.out Tainted: G        W          6.14.0-rc4+
+>  sock_recvmsg+0x1b2/0x220
+>  __sys_recvfrom+0x190/0x270
+>  __x64_sys_recvfrom+0xdc/0x1b0
+>  do_syscall_64+0x93/0x1b0
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> 
+> Fixes: 634f1a7110b4 ("vsock: support sockmap")
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
 
-Add operations to powerup/down the integrated PHY found in RK3528.
-Use helpers that can be used by other GMAC variants in the future.
+This fix is insufficient; warning can be triggered another way. Apologies.
 
-Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
----
-Changes in v2:
-- New patch
-
-This is enough to power up the integrated PHY on RK3528 for MDIO/MII.
-However, a PHY driver is still missing and I do not have any RK3528
-board that make use of this MAC and PHY, so something that can be
-improved upon in the future.
----
- .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 41 +++++++++++++++++++
- 1 file changed, 41 insertions(+)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index 3f096b3ccee8..ab2c872d33e0 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -134,6 +134,35 @@ static void rk_gmac_integrated_ephy_powerdown(struct rk_priv_data *priv)
- 		reset_control_assert(priv->phy_reset);
- }
- 
-+#define RK_FEPHY_SHUTDOWN		GRF_BIT(1)
-+#define RK_FEPHY_POWERUP		GRF_CLR_BIT(1)
-+#define RK_FEPHY_INTERNAL_RMII_SEL	GRF_BIT(6)
-+#define RK_FEPHY_24M_CLK_SEL		(GRF_BIT(8) | GRF_BIT(9))
-+#define RK_FEPHY_PHY_ID			GRF_BIT(11)
-+
-+static void rk_gmac_integrated_fephy_powerup(struct rk_priv_data *priv,
-+					     unsigned int reg)
-+{
-+	reset_control_assert(priv->phy_reset);
-+	usleep_range(20, 30);
-+
-+	regmap_write(priv->grf, reg,
-+		     RK_FEPHY_POWERUP |
-+		     RK_FEPHY_INTERNAL_RMII_SEL |
-+		     RK_FEPHY_24M_CLK_SEL |
-+		     RK_FEPHY_PHY_ID);
-+	usleep_range(10000, 12000);
-+
-+	reset_control_deassert(priv->phy_reset);
-+	usleep_range(50000, 60000);
-+}
-+
-+static void rk_gmac_integrated_fephy_powerdown(struct rk_priv_data *priv,
-+					       unsigned int reg)
-+{
-+	regmap_write(priv->grf, reg, RK_FEPHY_SHUTDOWN);
-+}
-+
- #define PX30_GRF_GMAC_CON1		0x0904
- 
- /* PX30_GRF_GMAC_CON1 */
-@@ -993,12 +1022,24 @@ static void rk3528_set_clock_selection(struct rk_priv_data *bsp_priv,
- 	}
- }
- 
-+static void rk3528_integrated_phy_powerup(struct rk_priv_data *bsp_priv)
-+{
-+	rk_gmac_integrated_fephy_powerup(bsp_priv, RK3528_VO_GRF_MACPHY_CON0);
-+}
-+
-+static void rk3528_integrated_phy_powerdown(struct rk_priv_data *bsp_priv)
-+{
-+	rk_gmac_integrated_fephy_powerdown(bsp_priv, RK3528_VO_GRF_MACPHY_CON0);
-+}
-+
- static const struct rk_gmac_ops rk3528_ops = {
- 	.set_to_rgmii = rk3528_set_to_rgmii,
- 	.set_to_rmii = rk3528_set_to_rmii,
- 	.set_rgmii_speed = rk3528_set_rgmii_speed,
- 	.set_rmii_speed = rk3528_set_rmii_speed,
- 	.set_clock_selection = rk3528_set_clock_selection,
-+	.integrated_phy_powerup = rk3528_integrated_phy_powerup,
-+	.integrated_phy_powerdown = rk3528_integrated_phy_powerdown,
- 	.regs_valid = true,
- 	.regs = {
- 		0xffbd0000, /* gmac0 */
--- 
-2.48.1
+maintainer-netdev.rst says author can do that, so:
+pw-bot: cr
 
 
