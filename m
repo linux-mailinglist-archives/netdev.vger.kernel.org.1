@@ -1,153 +1,171 @@
-Return-Path: <netdev+bounces-173329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A4FEA58589
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 16:57:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8219FA585BC
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 17:11:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9291A16A7F1
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 15:57:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3961188E635
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 16:12:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD8F21DED5E;
-	Sun,  9 Mar 2025 15:57:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F1FB1DF246;
+	Sun,  9 Mar 2025 16:11:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cjXzsOaS"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="AM2/bmW6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 246C61D47C7
-	for <netdev@vger.kernel.org>; Sun,  9 Mar 2025 15:57:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC8B1C1ADB;
+	Sun,  9 Mar 2025 16:11:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741535830; cv=none; b=b1tFDTnpOlW6c8LAtSlSuKvxw9CrdLRPUQ1HZEFS9d/8ZaLD4v87AqrX+lQFrX+tNGhOVly2a5hLc9DbYG+eXd60Qea0i9LK2v94iYVpT2TLOf7wnmL6WJiGnjhOVDY2ysDIPB6dbexHKPn/4uCTkB1HKsNFRWOMH4WytOXJJhk=
+	t=1741536708; cv=none; b=mwwxwWMEcexdIOjuNc0whUnjLUeUh4AGSFnUCVxfPp7FixaMLGXCoNphN4+X7q3Uirq2WPEkVpkzgD22n52C1clwX/OoH/iDRXFjzPh844+pP2ZCwiUUWAcOXepbujCC2wq+XuhCNqHxnsPS3pVDorzc/fllKqtcgyadpqng8v0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741535830; c=relaxed/simple;
-	bh=d/dqbZIOBI3L/39sQjZRTu74WSZOB2fRliCAIzOZdOs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BPa1FusRpFPQSezhPwFwwVdTGIDf8nN9aqS7OiyrDNbmTgcDvFsbevpXwwV/Bbt2nRQ8Zgquov5wxs4DvgExbjUK0CRT5D5z5xsfXqitYSJ1VH7aOVZztoMRJEBwzibcGg2vvexE9hvmnd4KgRj4wj1S5SXuQpPZgPNDZMh17vs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cjXzsOaS; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741535827;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YLUFl2VPA9R+MN8KD36+27nxwaeHXagFx2iScOkxQ7Q=;
-	b=cjXzsOaSFXVN7NjIuUitlnRuttiedqLpFTlx8GDVmPxx0U8xX10VffpQlo23ruvZ5ccjjN
-	L8D09yxjIVmQjQL4JCPZliv7k6vhHvycs+BgnHahTJH7iXcHvFp2lbmL7BcI9bO56M4LnK
-	onaSkmqtcj5Y/YDLLxEQeYvuerQPvGU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-137-VSPy23aGNJWpijcanPt6HA-1; Sun, 09 Mar 2025 11:57:06 -0400
-X-MC-Unique: VSPy23aGNJWpijcanPt6HA-1
-X-Mimecast-MFC-AGG-ID: VSPy23aGNJWpijcanPt6HA_1741535825
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3912fe32b08so1606291f8f.3
-        for <netdev@vger.kernel.org>; Sun, 09 Mar 2025 08:57:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741535825; x=1742140625;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YLUFl2VPA9R+MN8KD36+27nxwaeHXagFx2iScOkxQ7Q=;
-        b=ZRGXNkDa4zlKl1wZBHK4Ke11Qc0IhecJzoPqWisJ4LtxB1gfI5iLBgf882lDwzftwf
-         jZWVyYbsfcaXOL/UBkgJ/DjOIxrYKBvbgXsyFgcCN5bAqaG9820wyjXIQmDydlCmnsei
-         3kjoDvUgZ7hAEErKcY5JXyM5Y8jj/38GniF34SOVsvkvOdUd/Ay29xjBEohee4JQlyJD
-         9MvJN2yuHlHIMTeITU7DW+qClLG3XgzPrnRcvreCpelFtSpJ+XRcGMYGR6Wpm8T4volM
-         JARNYVtSdK5pOJFnvErzU/38c/GlTQwLbfAQGE5Q1ldh+z3f9A4S++VDupAOgUKVzugW
-         +H9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXfg9LA93pRo0wnEjzj5H0MsqGjIPt0F/QV+Bg5qMYAAmqbNYbHXp5LkMsp8FLPXDzh8lUTNxQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXUGoiha9nKkSk5sV/XG/myjjfngWo881PG+MGVAgMQPpqamC5
-	P9mDmFdryh2VVDufkHolgNrHPGEfeE9qja48A51Rm12YiPTUmpVFViVB+sZfaSfhbreVb83BZVQ
-	Nkz6C1RrX2+fhgHf7btbmAyVOvnHitWuWFKmtnxSjb7BKofGpTbFrAQ==
-X-Gm-Gg: ASbGnctMG6so4mmJQxjCHie+u+8lKVHHEkqc+NB4uIcfiVsugNteiOi71ahb7x+9JZv
-	ufuTBn4K4f3ormdZnkDzzFvfrmVc/NsU2uIGhJeNisfkzeOD+NwlkH4NuK/NMjczqFAtn9AaX0h
-	XUovFsVjjXw2nD8X+hQWIDm+YvbDoPXA7mqivZyAjCGgEAJb3MQ2crHekUXcFkrgyI5JH/UGm6z
-	ndt3xE6E+e1QlxGjp8WYP8ktqOyDylAuX96UkuEYzUmsyEnm61KDzNxZ82oVC0rN32u4NJzMiqx
-	ldWTMwbRUWwt4uQWL2rp3T9o8pVTvuCO6ua8zQoWWS91UA==
-X-Received: by 2002:a5d:5e0d:0:b0:391:4231:416 with SMTP id ffacd0b85a97d-39142310601mr1339515f8f.36.1741535825091;
-        Sun, 09 Mar 2025 08:57:05 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFUl5f1t5K8P+0ZYD9alD4Fe65fDoQd/vRvHNN8uYv2+iOUIpuLr4KzZSBB9UsLpO/xt/6UoQ==
-X-Received: by 2002:a5d:5e0d:0:b0:391:4231:416 with SMTP id ffacd0b85a97d-39142310601mr1339510f8f.36.1741535824798;
-        Sun, 09 Mar 2025 08:57:04 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-81-153.dyn.eolo.it. [146.241.81.153])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ce48165c0sm64111615e9.26.2025.03.09.08.57.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 09 Mar 2025 08:57:04 -0700 (PDT)
-Message-ID: <2dfd7292-901c-4155-9c80-954d2b0c7507@redhat.com>
-Date: Sun, 9 Mar 2025 16:57:03 +0100
+	s=arc-20240116; t=1741536708; c=relaxed/simple;
+	bh=cYAeS9+iVeuoEKPY0soxgWjQHLxWo/CJqXIGMP5cXTg=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=LJXxCe+0ePbImRN8BYYIxIpJJEsKz9MAGA9TYTB42dr/CgULJAzTEQdM3Ekey9OZEe6M2AX3so+3Pm2IJE+FcZCwbQDlOiifzXwRCNYFLRxrb/yCOBu/65cyIVvdDIy30HsiFQ5fgYohahjTpTijuOyZ8kpEMUJEwEzV4O8+PfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=AM2/bmW6; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [127.0.0.1] ([76.133.66.138])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 529G7ORJ1263742
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Sun, 9 Mar 2025 09:07:25 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 529G7ORJ1263742
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025021701; t=1741536453;
+	bh=seT44xgoWZ5mbi6YMs1X0xb2oeGYrNPZX+/U1qdQGTg=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=AM2/bmW6qzoT4YywJnfg+kFnRXlll5tS36arYnqSjApIypQlKimmdfCt9YyV+hD5i
+	 dwEfkCUr9AtGwtNwd8jvLKVyhS9+DVOhMt0UxbaU8XLll4G1zqhZUN5wna9XCG0iyW
+	 78qL6sdm7Dmrl0dpbYygV8vUvwurgNltciei2+BotvHSOlc5nLcyRz7FcLa20sqElN
+	 aaLYBYPsfdON+oOvyxzkWw0OSqmFW0xR+GLH1tZOAogct9w6ii64Fkp372iR+MOFjL
+	 L/PbfQo7+FF9HFkiZXRXnx5Nau5yXjNHZfL42nnEtecfgu8tqCoFLf4g4XN6869eDo
+	 eXA4gSO7d9tjA==
+Date: Sun, 09 Mar 2025 09:00:58 -0700
+From: "H. Peter Anvin" <hpa@zytor.com>
+To: Kuan-Wei Chiu <visitorckw@gmail.com>
+CC: David Laight <david.laight.linux@gmail.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        Laurent.pinchart@ideasonboard.com, airlied@gmail.com,
+        akpm@linux-foundation.org, alistair@popple.id.au,
+        andrew+netdev@lunn.ch, andrzej.hajda@intel.com,
+        arend.vanspriel@broadcom.com, awalls@md.metrocast.net, bp@alien8.de,
+        bpf@vger.kernel.org, brcm80211-dev-list.pdl@broadcom.com,
+        brcm80211@lists.linux.dev, dave.hansen@linux.intel.com,
+        davem@davemloft.net, dmitry.torokhov@gmail.com,
+        dri-devel@lists.freedesktop.org, eajames@linux.ibm.com,
+        edumazet@google.com, eleanor15x@gmail.com, gregkh@linuxfoundation.org,
+        hverkuil@xs4all.nl, jernej.skrabec@gmail.com, jirislaby@kernel.org,
+        jk@ozlabs.org, joel@jms.id.au, johannes@sipsolutions.net,
+        jonas@kwiboo.se, jserv@ccns.ncku.edu.tw, kuba@kernel.org,
+        linux-fsi@lists.ozlabs.org, linux-input@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-serial@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linux@rasmusvillemoes.dk,
+        louis.peens@corigine.com, maarten.lankhorst@linux.intel.com,
+        mchehab@kernel.org, mingo@redhat.com, miquel.raynal@bootlin.com,
+        mripard@kernel.org, neil.armstrong@linaro.org, netdev@vger.kernel.org,
+        oss-drivers@corigine.com, pabeni@redhat.com,
+        parthiban.veerasooran@microchip.com, rfoss@kernel.org, richard@nod.at,
+        simona@ffwll.ch, tglx@linutronix.de, tzimmermann@suse.de,
+        vigneshr@ti.com, x86@kernel.org, yury.norov@gmail.com
+Subject: Re: [PATCH v3 00/16] Introduce and use generic parity16/32/64 helper
+User-Agent: K-9 Mail for Android
+In-Reply-To: <Z824SgB9Dt5zdWYc@visitorckw-System-Product-Name>
+References: <4732F6F6-1D41-4E3F-BE24-E54489BC699C@zytor.com> <efc2ee9d-5382-457f-b471-f3c44b81a190@citrix.com> <5A790652-1B22-4D13-AAC5-5D9931E90903@zytor.com> <20250307195310.58abff8c@pumpkin> <EB85C3C1-8A0D-4CB9-B501-BFEABDF3E977@zytor.com> <Z824SgB9Dt5zdWYc@visitorckw-System-Product-Name>
+Message-ID: <EF4335E0-F8EB-4642-BD09-B16BCCF23F95@zytor.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next 2/2] udp_tunnel: use static call for GRO hooks
- when possible
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>
-References: <cover.1741338765.git.pabeni@redhat.com>
- <8c8263ab59b1e9366f245eec4dfdccd368496e3d.1741338765.git.pabeni@redhat.com>
- <67cc8f317e5e0_14b9f9294b5@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <67cc8f317e5e0_14b9f9294b5@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 3/8/25 7:40 PM, Willem de Bruijn wrote:
-> Paolo Abeni wrote:
->> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
->> index 054d4d4a8927f..f06dd82d28562 100644
->> --- a/net/ipv4/udp_offload.c
->> +++ b/net/ipv4/udp_offload.c
->> @@ -15,6 +15,39 @@
->>  #include <net/udp_tunnel.h>
->>  
->>  #if IS_ENABLED(CONFIG_NET_UDP_TUNNEL)
->> +
->> +/*
->> + * Dummy GRO tunnel callback; should never be invoked, exists
->> + * mainly to avoid dangling/NULL values for the udp tunnel
->> + * static call.
->> + */
->> +static struct sk_buff *dummy_gro_rcv(struct sock *sk,
->> +				     struct list_head *head,
->> +				     struct sk_buff *skb)
->> +{
->> +	WARN_ON_ONCE(1);
->> +	NAPI_GRO_CB(skb)->flush = 1;
->> +	return NULL;
->> +}
->> +
->> +typedef struct sk_buff *(*udp_tunnel_gro_rcv_t)(struct sock *sk,
->> +						struct list_head *head,
->> +						struct sk_buff *skb);
->> +
->> +struct udp_tunnel_type_entry {
->> +	udp_tunnel_gro_rcv_t gro_receive;
->> +	refcount_t count;
->> +};
->> +
->> +#define UDP_MAX_TUNNEL_TYPES (IS_ENABLED(CONFIG_GENEVE) + \
->> +			      IS_ENABLED(CONFIG_VXLAN) * 2 + \
->> +			      IS_ENABLED(CONFIG_FOE) * 2)
-> 
-> CONFIG_BAREUDP
+On March 9, 2025 8:48:26 AM PDT, Kuan-Wei Chiu <visitorckw@gmail=2Ecom> wro=
+te:
+>On Fri, Mar 07, 2025 at 12:07:02PM -0800, H=2E Peter Anvin wrote:
+>> On March 7, 2025 11:53:10 AM PST, David Laight <david=2Elaight=2Elinux@=
+gmail=2Ecom> wrote:
+>> >On Fri, 07 Mar 2025 11:30:35 -0800
+>> >"H=2E Peter Anvin" <hpa@zytor=2Ecom> wrote:
+>> >
+>> >> On March 7, 2025 10:49:56 AM PST, Andrew Cooper <andrew=2Ecooper3@ci=
+trix=2Ecom> wrote:
+>> >> >> (int)true most definitely is guaranteed to be 1=2E =20
+>> >> >
+>> >> >That's not technically correct any more=2E
+>> >> >
+>> >> >GCC has introduced hardened bools that intentionally have bit patte=
+rns
+>> >> >other than 0 and 1=2E
+>> >> >
+>> >> >https://gcc=2Egnu=2Eorg/gcc-14/changes=2Ehtml
+>> >> >
+>> >> >~Andrew =20
+>> >>=20
+>> >> Bit patterns in memory maybe (not that I can see the Linux kernel us=
+ing them) but
+>> >> for compiler-generated conversations that's still a given, or the ma=
+nager isn't C
+>> >> or anything even remotely like it=2E
+>> >>=20
+>> >
+>> >The whole idea of 'bool' is pretty much broken by design=2E
+>> >The underlying problem is that values other than 'true' and 'false' ca=
+n
+>> >always get into 'bool' variables=2E
+>> >
+>> >Once that has happened it is all fubar=2E
+>> >
+>> >Trying to sanitise a value with (say):
+>> >int f(bool v)
+>> >{
+>> >	return (int)v & 1;
+>> >}   =20
+>> >just doesn't work (see https://www=2Egodbolt=2Eorg/z/MEndP3q9j)
+>> >
+>> >I really don't see how using (say) 0xaa and 0x55 helps=2E
+>> >What happens if the value is wrong? a trap or exception?, good luck re=
+covering
+>> >from that=2E
+>> >
+>> >	David
+>>=20
+>> Did you just discover GIGO?
+>
+>Thanks for all the suggestions=2E
+>
+>I don't have a strong opinion on the naming or return type=2E I'm still a
+>bit confused about whether I can assume that casting bool to int always
+>results in 0 or 1=2E
+>
+>If that's the case, since most people prefer bool over int as the
+>return type and some are against introducing u1, my current plan is to
+>use the following in the next version:
+>
+>bool parity_odd(u64 val);
+>
+>This keeps the bool return type, renames the function for better
+>clarity, and avoids extra maintenance burden by having just one
+>function=2E
+>
+>If I can't assume that casting bool to int always results in 0 or 1,
+>would it be acceptable to keep the return type as int?
+>
+>Would this work for everyone?
+>
+>Regards,
+>Kuan-Wei
 
-Why? AFAICS BAREUDP does not implement the gro_receive callback. UDP
-tunnel without such callback are irrelevant here.
-
-Thanks,
-
-Paolo
-
+You *CAN* safely assume that bool is an integer type which always has the =
+value 0 or 1=2E
 
