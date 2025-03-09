@@ -1,136 +1,283 @@
-Return-Path: <netdev+bounces-173356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D3A2A58689
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 18:55:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80FC3A58698
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 18:58:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB6ED188573A
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 17:55:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5D813A8065
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 17:57:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 642131DEFCD;
-	Sun,  9 Mar 2025 17:55:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33AF11F09BC;
+	Sun,  9 Mar 2025 17:57:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m3uf0IeA"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="dc5fL2Pa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C4E51EEE0;
-	Sun,  9 Mar 2025 17:55:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7AB1F099B;
+	Sun,  9 Mar 2025 17:57:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741542947; cv=none; b=Bs/047f7w4kOtSrfdbV5Uy7g48MvnNxPY6EFYB5P9Kgr+j9IsbPwEjjqFIEd+Xh3+ip+RuZi1GfsiU3lQW3IIoC0NNMubYtBt76eTZUOcLNAHygc3D9S0m4hRrJlEqiea7lsPexwuYVOxkZmrHXlFZZ59TNz/dOXZUtUkRovl0U=
+	t=1741543066; cv=none; b=FP5TSV231hxC73Jz0nPa7AcJgtuRrqqOlVt4gbtJnBEBq1vL35aVPIK+1nDHzgf+zQQwAz5CgHdy4M19Wt6vOSkptdT4VsRCYc8Vn3a0LwdKxR7s0HnFMgoilubajt25GQDemznsIAVZnhBoKEspbTEkziwKQwVG/jWZ3eeAbeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741542947; c=relaxed/simple;
-	bh=BK2K6qshBsNu2DSOMW7gDWj5xirGoej95oqLtKP/rCE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qHuposz91Zaid5T3ec5jojvIiTatVA/f4W/n2hONstCdUoMNBiqAVO3+DtHp4z0uVTnfj9YuPwKkr3Ny1Vn7fsxG/D/YrWqvqhtZVR1ZQyJBI3BhjPA2nP/nXrpnbvLTurlfoqSuuWIhXln8C1lH3on5VHb+4c79HPDuk/8FDEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m3uf0IeA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56BDFC4CEE3;
-	Sun,  9 Mar 2025 17:55:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741542946;
-	bh=BK2K6qshBsNu2DSOMW7gDWj5xirGoej95oqLtKP/rCE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=m3uf0IeAwipErcnoS0jeHL8URT8QlNHfPmVxATY1ZkewrTrggbtC1LmDll3Ik6sR9
-	 91qAlXzeA9YYZ4GwKwhLdLy7MRil89C9vhlee8xJCiNIE4se5g0IX1bOIRWookbYNe
-	 Py3ssV6hevtDDWfsqliIcGmZsWSdVToaaoZm6mLrMO8KtWJcQNSX+/u9r/7I7LGboW
-	 J1dgbgugS74K3IXa5ikAjmc/99/tOOlt+/WemXRNamPAd80hMoSASgiDWwXK3h1Viu
-	 A7rskPXF/80N6lHWqI7VlrUvaUyxO0SXHaoB25c0SihggbRGvmhPvXs383qCA4p6e6
-	 aps5bs/fZOtLg==
-Message-ID: <15b2aaa9-b31b-457a-b6d3-9674c8dfc817@kernel.org>
-Date: Sun, 9 Mar 2025 18:55:40 +0100
+	s=arc-20240116; t=1741543066; c=relaxed/simple;
+	bh=xsz6OPx6Z9uDP3D+uEqnroPiSIU8yECBlbfjyMtzjAM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PDzCM98lFSKJ7KGydMrnY3pXMjpuZoA5y+DTB1QWbVdybG07AzIvt78pQ6n3SWGeLEaVWDnaT7Vt9n0jg57O00j/csPXuSQlrrC8QdnnxM3+fvXURIlWPvAUuwb91pcTLMN1tSx9T/io+YkEHHZc1nXOHI+lsn6+UUHqGpaR2do=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=dc5fL2Pa; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=dIhdSeA+sKY04sYaP/yGGu7Uf1h3HX4WesIt7XvRbuE=; b=dc5fL2Pap+D9k82kWKY/cDDfZu
+	iYILHTxmGsAQsiVsrzo8CHuB98dMQ38Jm1ctAkrGymRJnBUth5n79xKv46sDqw8cbEjiLTwXHchW2
+	8+MNISEP1foTylRjLfCrDZeiIjG/ZIPzFJkD/wxtw3V/Lr+oeVeS5XBmIVe2fNMiL4cS4fS1SeDKq
+	d9llRg6SOXq/m0zRSmU0RcSsWHI9Z6K2rlHPWnkyTpQjU6xEtLqzxdKk0SEjeyvZnw+u5B/uOiBSR
+	z6QBRB1XDGGTKcMAac9HTmIGLH9JXDB/eNfVW6dn+K4+cR+NmyAd2UeWAvrs9mS79HZaYGj7Vjl2K
+	rnIil4Ug==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42970)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1trKtw-0001ar-2h;
+	Sun, 09 Mar 2025 17:57:24 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1trKts-0001dj-36;
+	Sun, 09 Mar 2025 17:57:21 +0000
+Date: Sun, 9 Mar 2025 17:57:20 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	upstream@airoha.com
+Subject: Re: [net-next PATCH v12 12/13] net: dsa: Add Airoha AN8855 5-Port
+ Gigabit DSA Switch driver
+Message-ID: <Z83WgMeg_IxgbxhO@shell.armlinux.org.uk>
+References: <20250309172717.9067-1-ansuelsmth@gmail.com>
+ <20250309172717.9067-13-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] dt-bindings: net: add enc28j60's irq-gpios node
- description and binding example
-To: Hanyuan Zhao <hanyuan-z@qq.com>, davem@davemloft.net, kuba@kernel.org,
- andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <tencent_8031D017AFE5E266C43F62C916C709009E06@qq.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <tencent_8031D017AFE5E266C43F62C916C709009E06@qq.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250309172717.9067-13-ansuelsmth@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 09/03/2025 08:48, Hanyuan Zhao wrote:
-> This patch allows the kernel to automatically requests the pin, configures
-> it as an input, and converts it to an IRQ number, according to a GPIO
-> phandle specified in device tree. This simplifies the process by
-> eliminating the need to manually define pinctrl and interrupt nodes.
-> Additionally, it is necessary for platforms that do not support pin
-> configuration and properties via the device tree.
-> 
-> Signed-off-by: Hanyuan Zhao <hanyuan-z@qq.com>
+On Sun, Mar 09, 2025 at 06:26:57PM +0100, Christian Marangi wrote:
+> +static int an8855_port_enable(struct dsa_switch *ds, int port,
+> +			      struct phy_device *phy)
+> +{
+> +	struct an8855_priv *priv = ds->priv;
+> +
+> +	return regmap_set_bits(priv->regmap, AN8855_PMCR_P(port),
+> +			       AN8855_PMCR_TX_EN | AN8855_PMCR_RX_EN);
 
-<form letter>
-Please use scripts/get_maintainers.pl to get a list of necessary people
-and lists to CC (and consider --no-git-fallback argument, so you will
-not CC people just because they made one commit years ago). It might
-happen, that command when run on an older kernel, gives you outdated
-entries. Therefore please be sure you base your patches on recent Linux
-kernel.
+Shouldn't you wait for phylink to call your mac_link_up() method?
 
-Tools like b4 or scripts/get_maintainer.pl provide you proper list of
-people, so fix your workflow. Tools might also fail if you work on some
-ancient tree (don't, instead use mainline) or work on fork of kernel
-(don't, instead use mainline). Just use b4 and everything should be
-fine, although remember about `b4 prep --auto-to-cc` if you added new
-patches to the patchset.
-</form letter>
+> +}
+> +
+> +static void an8855_port_disable(struct dsa_switch *ds, int port)
+> +{
+> +	struct an8855_priv *priv = ds->priv;
+> +	int ret;
+> +
+> +	ret = regmap_clear_bits(priv->regmap, AN8855_PMCR_P(port),
+> +				AN8855_PMCR_TX_EN | AN8855_PMCR_RX_EN);
+> +	if (ret)
+> +		dev_err(priv->ds->dev, "failed to disable port: %d\n", ret);
 
-Best regards,
-Krzysztof
+Doesn't the link get set down before this is called? IOW, doesn't
+phylink call your mac_link_down() method first?
+
+...
+
+> +static void an8855_phylink_mac_link_up(struct phylink_config *config,
+> +				       struct phy_device *phydev, unsigned int mode,
+> +				       phy_interface_t interface, int speed,
+> +				       int duplex, bool tx_pause, bool rx_pause)
+> +{
+> +	struct dsa_port *dp = dsa_phylink_to_port(config);
+> +	struct an8855_priv *priv = dp->ds->priv;
+> +	int port = dp->index;
+> +	u32 reg;
+> +
+> +	reg = regmap_read(priv->regmap, AN8855_PMCR_P(port), &reg);
+> +	if (phylink_autoneg_inband(mode)) {
+> +		reg &= ~AN8855_PMCR_FORCE_MODE;
+> +	} else {
+> +		reg |= AN8855_PMCR_FORCE_MODE | AN8855_PMCR_FORCE_LNK;
+> +
+> +		reg &= ~AN8855_PMCR_FORCE_SPEED;
+> +		switch (speed) {
+> +		case SPEED_10:
+> +			reg |= AN8855_PMCR_FORCE_SPEED_10;
+> +			break;
+> +		case SPEED_100:
+> +			reg |= AN8855_PMCR_FORCE_SPEED_100;
+> +			break;
+> +		case SPEED_1000:
+> +			reg |= AN8855_PMCR_FORCE_SPEED_1000;
+> +			break;
+> +		case SPEED_2500:
+> +			reg |= AN8855_PMCR_FORCE_SPEED_2500;
+> +			break;
+> +		case SPEED_5000:
+> +			dev_err(priv->ds->dev, "Missing support for 5G speed. Aborting...\n");
+> +			return;
+> +		}
+> +
+> +		reg &= ~AN8855_PMCR_FORCE_FDX;
+> +		if (duplex == DUPLEX_FULL)
+> +			reg |= AN8855_PMCR_FORCE_FDX;
+> +
+> +		reg &= ~AN8855_PMCR_RX_FC_EN;
+> +		if (rx_pause || dsa_port_is_cpu(dp))
+> +			reg |= AN8855_PMCR_RX_FC_EN;
+> +
+> +		reg &= ~AN8855_PMCR_TX_FC_EN;
+> +		if (rx_pause || dsa_port_is_cpu(dp))
+> +			reg |= AN8855_PMCR_TX_FC_EN;
+> +
+> +		/* Disable any EEE options */
+> +		reg &= ~(AN8855_PMCR_FORCE_EEE5G | AN8855_PMCR_FORCE_EEE2P5G |
+> +			 AN8855_PMCR_FORCE_EEE1G | AN8855_PMCR_FORCE_EEE100);
+
+Why? Maybe consider implementing the phylink tx_lpi functions for EEE
+support.
+
+> +	}
+> +
+> +	reg |= AN8855_PMCR_TX_EN | AN8855_PMCR_RX_EN;
+> +
+> +	regmap_write(priv->regmap, AN8855_PMCR_P(port), reg);
+> +}
+> +
+> +static unsigned int an8855_pcs_inband_caps(struct phylink_pcs *pcs,
+> +					   phy_interface_t interface)
+> +{
+> +	/* SGMII can be configured to use inband with AN result */
+> +	if (interface == PHY_INTERFACE_MODE_SGMII)
+> +		return LINK_INBAND_DISABLE | LINK_INBAND_ENABLE;
+> +
+> +	/* inband is not supported in 2500-baseX and must be disabled */
+> +	return  LINK_INBAND_DISABLE;
+
+Spurious double space.
+
+> +}
+> +
+> +static void an8855_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
+> +				 struct phylink_link_state *state)
+> +{
+> +	struct an8855_priv *priv = container_of(pcs, struct an8855_priv, pcs);
+> +	u32 val;
+> +	int ret;
+> +
+> +	ret = regmap_read(priv->regmap, AN8855_PMSR_P(AN8855_CPU_PORT), &val);
+> +	if (ret < 0) {
+> +		state->link = false;
+> +		return;
+> +	}
+> +
+> +	state->link = !!(val & AN8855_PMSR_LNK);
+> +	state->an_complete = state->link;
+> +	state->duplex = (val & AN8855_PMSR_DPX) ? DUPLEX_FULL :
+> +						  DUPLEX_HALF;
+> +
+> +	switch (val & AN8855_PMSR_SPEED) {
+> +	case AN8855_PMSR_SPEED_10:
+> +		state->speed = SPEED_10;
+> +		break;
+> +	case AN8855_PMSR_SPEED_100:
+> +		state->speed = SPEED_100;
+> +		break;
+> +	case AN8855_PMSR_SPEED_1000:
+> +		state->speed = SPEED_1000;
+> +		break;
+> +	case AN8855_PMSR_SPEED_2500:
+> +		state->speed = SPEED_2500;
+> +		break;
+> +	case AN8855_PMSR_SPEED_5000:
+> +		dev_err(priv->ds->dev, "Missing support for 5G speed. Setting Unknown.\n");
+> +		fallthrough;
+
+Which is wrong now, we have SPEED_5000.
+
+> +	default:
+> +		state->speed = SPEED_UNKNOWN;
+> +		break;
+> +	}
+> +
+> +	if (val & AN8855_PMSR_RX_FC)
+> +		state->pause |= MLO_PAUSE_RX;
+> +	if (val & AN8855_PMSR_TX_FC)
+> +		state->pause |= MLO_PAUSE_TX;
+> +}
+> +
+> +static int an8855_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
+> +			     phy_interface_t interface,
+> +			     const unsigned long *advertising,
+> +			     bool permit_pause_to_mac)
+> +{
+> +	struct an8855_priv *priv = container_of(pcs, struct an8855_priv, pcs);
+> +	u32 val;
+> +	int ret;
+> +
+> +	/*                   !!! WELCOME TO HELL !!!                   */
+> +
+[... hell ...]
+> +	ret = regmap_write(priv->regmap, AN8855_MSG_RX_LIK_STS_2,
+> +			   AN8855_RG_RXFC_AN_BYPASS_P3 |
+> +			   AN8855_RG_RXFC_AN_BYPASS_P2 |
+> +			   AN8855_RG_RXFC_AN_BYPASS_P1 |
+> +			   AN8855_RG_TXFC_AN_BYPASS_P3 |
+> +			   AN8855_RG_TXFC_AN_BYPASS_P2 |
+> +			   AN8855_RG_TXFC_AN_BYPASS_P1 |
+> +			   AN8855_RG_DPX_AN_BYPASS_P3 |
+> +			   AN8855_RG_DPX_AN_BYPASS_P2 |
+> +			   AN8855_RG_DPX_AN_BYPASS_P1 |
+> +			   AN8855_RG_DPX_AN_BYPASS_P0);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return 0;
+
+Is this disruptive to the link if the link is up, and this is called
+(e.g. to change the advertisement rather than switch interface mode).
+If so, please do something about that - e.g. only doing the bulk of
+the configuration if the interface mode has changed.
+
+I guess, however, that as you're only using SGMII with in-band, it
+probably doesn't make much difference, but having similar behaviour
+in the various drivers helps with ongoing maintenance.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
