@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-173298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5152FA584FE
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 15:47:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E598A5850A
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 15:49:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C63C5188E497
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 14:47:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B8AE7A6107
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 14:47:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D4001DF271;
-	Sun,  9 Mar 2025 14:47:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D8F51EF36D;
+	Sun,  9 Mar 2025 14:47:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="shj0L+rf";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="kr8Tss9D"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="sEcL0wgF";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="G7PAERsG"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EAA91DED77;
-	Sun,  9 Mar 2025 14:47:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 329681DEFD6
+	for <netdev@vger.kernel.org>; Sun,  9 Mar 2025 14:47:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741531634; cv=none; b=jK8gNdj0wIHvhj5eChK8l5gFruBjDoWSul/RZOzp/dD7UwVGLvj19bHsGNs1yGd8nw5sVwAI52DOZLULcpvyk5kY8KsbJ2uFBgWDAdY27Oe1QZJTWwwMmuxAml5FbiF9PYxjmoOARvgr9DGq5BebwlvIW/IC1Ngp2IOSSpA+qAU=
+	t=1741531636; cv=none; b=QZ24sA/XQqdTt1SEIAfiUtQjguEBi6pkV5PtAaQUNVlTIr4Evt3uRa+XXHdYbjB3F8TadTr9sSxGo4wsnJiVbIYSyM7ebYMLKCdt5dxn1mEzKBBmMewfc54oc6x1RJpPjDOgqAfhTFBPJhmYiE6SYOPW2uYoT7wPIndf4Qm7NfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741531634; c=relaxed/simple;
-	bh=UH8AuXRcns+Hb/zCkqUa17Lzxgyh0a3LIlYIOxVKbvo=;
+	s=arc-20240116; t=1741531636; c=relaxed/simple;
+	bh=2tMuzYRpDp9lSJ8XtB4kqkyti7XnDfiQ7KZ7k6ycPfs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JpPepKCbEWz60oApj/I8Z7IKc+3sJcvhIzgzmBAlcYb6owzHIFjPIQBkbMVKWUJ0Jjt2H1j0WYguWEpxkIpJStdWsMrm5urNrJsz5lZCGwKrQ3COHOij6/LL5WEY+vMexza6XoZVr/0HaBLfHTV8qzadGonptu4SOdTUMjbghz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=shj0L+rf; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=kr8Tss9D; arc=none smtp.client-ip=193.142.43.55
+	 MIME-Version; b=VFR92zaQCpPoGYtEC8svnYjyUlqbgXwIxp5L6VBbYInODRYwmgO/10YYsZ0siKm68l2Cnei/zmDG/uotMCYpEJzxcOT9mUFYlUDeZk2KIP5J8Uac9ipICUzA2+aOrW3gdS/HzsewYt7zAcysSzRX6qsPc0DlrdHjOHDCri6Dp/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=sEcL0wgF; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=G7PAERsG; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
@@ -39,21 +39,21 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3yIocze9CLkCT8Lv56UF9k2zA0QQ9c/stSYrYUgDtmg=;
-	b=shj0L+rf+mxZa0QLX7gYYWfHS1S1K+f+6pNqDmzk4Sn9UXHPa8rhQt+VF2cGyzLzj+4UOj
-	bIxkDljRbM5CDXkZmIDoHxjh9CNUBtDbxcKqrU9NcTKVXX6gVXyKHYw7lm/Ua6sago9sHt
-	cxqvxB26H6N36O1BuIKn7eNt7aCGmgd8DpZ486EOr5dT/+72J/Z8Q3gVFf2R/CNTaedndT
-	5ipcdBw/E8ykIJngLMFH9zeyTJ4jKIGb1FaTGgNgPBK6dLllOnoqKd4bfdMrGbeo30D/8c
-	bmjWhFggXamk9xJ57R7pNGA8q6uezzGPe+935Osb8SzfGTti1hz5F5BDeeyWDw==
+	bh=Tyj386+KB4t51GKz+vPbzNL5+YMXCrE2N1UPhtwbbZ0=;
+	b=sEcL0wgFcU2gClyYj6HIhSMzvudY3vcXEHDz9vDA9+KDCwMLuHR09cXZK+wV1+Gb6PRisp
+	kGxAgnmDBWmwAGSad7ssMlOZlID6Bhims/olf3z0J/8kbS81ZbY47ULv1NQbNlhPoTE2P5
+	O5xfbVdfLqktBSt40pGExjEacVh7MvAFytHuTDs7CPnhmIejwKYfTBFkudrlGy1lkAtXcI
+	0hpB82c+ahP+Flz0+GRKuxa20hKYV6jpEl61Efn1Szy6tx21FCvwL6YVqEcGRIQzeD5xM5
+	cPgCNk30XANHxK3Di9fv4NkLNyfmJl/v1pyBC3vsQyQldqyrdCgseKAVT4OhRQ==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
 	s=2020e; t=1741531629;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3yIocze9CLkCT8Lv56UF9k2zA0QQ9c/stSYrYUgDtmg=;
-	b=kr8Tss9D0EHTqiI6Q9V85pzh93GJSqSfuy0+K7mgxeiI7ghVpOP04bx4jWyxr8v9XM9P7c
-	rPmLfdhB2CAnc5Aw==
+	bh=Tyj386+KB4t51GKz+vPbzNL5+YMXCrE2N1UPhtwbbZ0=;
+	b=G7PAERsG6CuytzzBW2vahc+cCxY9+tFngjxsPl5N0eSPfC5wgZj/evv2DkVzerYOee/3j/
+	Sr3/Cn+bmG5/nIBQ==
 To: netdev@vger.kernel.org,
 	linux-rt-devel@lists.linux.dev
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -63,13 +63,11 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Simon Horman <horms@kernel.org>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org
-Subject: [PATCH net-next 08/18] netfilter: nf_dup_netdev: Move the recursion counter struct netdev_xmit.
-Date: Sun,  9 Mar 2025 15:46:43 +0100
-Message-ID: <20250309144653.825351-9-bigeasy@linutronix.de>
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH net-next 09/18] xfrm: Use nested-BH locking for nat_keepalive_sk_ipv[46].
+Date: Sun,  9 Mar 2025 15:46:44 +0100
+Message-ID: <20250309144653.825351-10-bigeasy@linutronix.de>
 In-Reply-To: <20250309144653.825351-1-bigeasy@linutronix.de>
 References: <20250309144653.825351-1-bigeasy@linutronix.de>
 Precedence: bulk
@@ -80,83 +78,114 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-nf_dup_skb_recursion is a per-CPU variable and relies on disabled BH for its
-locking. Without per-CPU locking in local_bh_disable() on PREEMPT_RT
-this data structure requires explicit locking.
+nat_keepalive_sk_ipv[46] is a per-CPU variable and relies on disabled BH
+for its locking. Without per-CPU locking in local_bh_disable() on
+PREEMPT_RT this data structure requires explicit locking.
 
-Move nf_dup_skb_recursion to struct netdev_xmit, provide wrappers.
+Use sock_bh_locked which has a sock pointer and a local_lock_t. Use
+local_lock_nested_bh() for locking. This change adds only lockdep
+coverage and does not alter the functional behaviour for !PREEMPT_RT.
 
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org
-Cc: coreteam@netfilter.org
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 ---
- include/linux/netdevice_xmit.h |  3 +++
- net/netfilter/nf_dup_netdev.c  | 22 ++++++++++++++++++----
- 2 files changed, 21 insertions(+), 4 deletions(-)
+ net/xfrm/xfrm_nat_keepalive.c | 30 ++++++++++++++++++++----------
+ 1 file changed, 20 insertions(+), 10 deletions(-)
 
-diff --git a/include/linux/netdevice_xmit.h b/include/linux/netdevice_xmit.h
-index 38325e0702968..3bbbc1a9860a3 100644
---- a/include/linux/netdevice_xmit.h
-+++ b/include/linux/netdevice_xmit.h
-@@ -8,6 +8,9 @@ struct netdev_xmit {
- #ifdef CONFIG_NET_EGRESS
- 	u8  skip_txqueue;
+diff --git a/net/xfrm/xfrm_nat_keepalive.c b/net/xfrm/xfrm_nat_keepalive.c
+index 82f0a301683f0..ebf95d48e86c1 100644
+--- a/net/xfrm/xfrm_nat_keepalive.c
++++ b/net/xfrm/xfrm_nat_keepalive.c
+@@ -9,9 +9,13 @@
+ #include <net/ip6_checksum.h>
+ #include <net/xfrm.h>
+=20
+-static DEFINE_PER_CPU(struct sock *, nat_keepalive_sk_ipv4);
++static DEFINE_PER_CPU(struct sock_bh_locked, nat_keepalive_sk_ipv4) =3D {
++	.bh_lock =3D INIT_LOCAL_LOCK(bh_lock),
++};
+ #if IS_ENABLED(CONFIG_IPV6)
+-static DEFINE_PER_CPU(struct sock *, nat_keepalive_sk_ipv6);
++static DEFINE_PER_CPU(struct sock_bh_locked, nat_keepalive_sk_ipv6) =3D {
++	.bh_lock =3D INIT_LOCAL_LOCK(bh_lock),
++};
  #endif
-+#if IS_ENABLED(CONFIG_NF_DUP_NETDEV)
-+	u8 nf_dup_skb_recursion;
-+#endif
- };
 =20
+ struct nat_keepalive {
+@@ -56,10 +60,12 @@ static int nat_keepalive_send_ipv4(struct sk_buff *skb,
+=20
+ 	skb_dst_set(skb, &rt->dst);
+=20
+-	sk =3D *this_cpu_ptr(&nat_keepalive_sk_ipv4);
++	local_lock_nested_bh(&nat_keepalive_sk_ipv4.bh_lock);
++	sk =3D this_cpu_read(nat_keepalive_sk_ipv4.sock);
+ 	sock_net_set(sk, net);
+ 	err =3D ip_build_and_send_pkt(skb, sk, fl4.saddr, fl4.daddr, NULL, tos);
+ 	sock_net_set(sk, &init_net);
++	local_unlock_nested_bh(&nat_keepalive_sk_ipv4.bh_lock);
+ 	return err;
+ }
+=20
+@@ -89,15 +95,19 @@ static int nat_keepalive_send_ipv6(struct sk_buff *skb,
+ 	fl6.fl6_sport =3D ka->encap_sport;
+ 	fl6.fl6_dport =3D ka->encap_dport;
+=20
+-	sk =3D *this_cpu_ptr(&nat_keepalive_sk_ipv6);
++	local_lock_nested_bh(&nat_keepalive_sk_ipv6.bh_lock);
++	sk =3D this_cpu_read(nat_keepalive_sk_ipv6.sock);
+ 	sock_net_set(sk, net);
+ 	dst =3D ipv6_stub->ipv6_dst_lookup_flow(net, sk, &fl6, NULL);
+-	if (IS_ERR(dst))
++	if (IS_ERR(dst)) {
++		local_unlock_nested_bh(&nat_keepalive_sk_ipv6.bh_lock);
+ 		return PTR_ERR(dst);
++	}
+=20
+ 	skb_dst_set(skb, dst);
+ 	err =3D ipv6_stub->ip6_xmit(sk, skb, &fl6, skb->mark, NULL, 0, 0);
+ 	sock_net_set(sk, &init_net);
++	local_unlock_nested_bh(&nat_keepalive_sk_ipv6.bh_lock);
+ 	return err;
+ }
  #endif
-diff --git a/net/netfilter/nf_dup_netdev.c b/net/netfilter/nf_dup_netdev.c
-index a8e2425e43b0d..fab8b9011098f 100644
---- a/net/netfilter/nf_dup_netdev.c
-+++ b/net/netfilter/nf_dup_netdev.c
-@@ -15,12 +15,26 @@
+@@ -202,7 +212,7 @@ static void nat_keepalive_work(struct work_struct *work)
+ 				      (ctx.next_run - ctx.now) * HZ);
+ }
 =20
- #define NF_RECURSION_LIMIT	2
-=20
--static DEFINE_PER_CPU(u8, nf_dup_skb_recursion);
-+#ifndef CONFIG_PREEMPT_RT
-+static u8 *nf_get_nf_dup_skb_recursion(void)
-+{
-+	return this_cpu_ptr(&softnet_data.xmit.nf_dup_skb_recursion);
-+}
-+#else
-+
-+static u8 *nf_get_nf_dup_skb_recursion(void)
-+{
-+	return &current->net_xmit.nf_dup_skb_recursion;
-+}
-+
-+#endif
-=20
- static void nf_do_netdev_egress(struct sk_buff *skb, struct net_device *de=
-v,
- 				enum nf_dev_hooks hook)
+-static int nat_keepalive_sk_init(struct sock * __percpu *socks,
++static int nat_keepalive_sk_init(struct sock_bh_locked __percpu *socks,
+ 				 unsigned short family)
  {
--	if (__this_cpu_read(nf_dup_skb_recursion) > NF_RECURSION_LIMIT)
-+	u8 *nf_dup_skb_recursion =3D nf_get_nf_dup_skb_recursion();
-+
-+	if (*nf_dup_skb_recursion > NF_RECURSION_LIMIT)
- 		goto err;
+ 	struct sock *sk;
+@@ -214,22 +224,22 @@ static int nat_keepalive_sk_init(struct sock * __perc=
+pu *socks,
+ 		if (err < 0)
+ 			goto err;
 =20
- 	if (hook =3D=3D NF_NETDEV_INGRESS && skb_mac_header_was_set(skb)) {
-@@ -32,9 +46,9 @@ static void nf_do_netdev_egress(struct sk_buff *skb, stru=
-ct net_device *dev,
+-		*per_cpu_ptr(socks, i) =3D sk;
++		per_cpu_ptr(socks, i)->sock =3D sk;
+ 	}
 =20
- 	skb->dev =3D dev;
- 	skb_clear_tstamp(skb);
--	__this_cpu_inc(nf_dup_skb_recursion);
-+	(*nf_dup_skb_recursion)++;
- 	dev_queue_xmit(skb);
--	__this_cpu_dec(nf_dup_skb_recursion);
-+	(*nf_dup_skb_recursion)--;
- 	return;
+ 	return 0;
  err:
- 	kfree_skb(skb);
+ 	for_each_possible_cpu(i)
+-		inet_ctl_sock_destroy(*per_cpu_ptr(socks, i));
++		inet_ctl_sock_destroy(per_cpu_ptr(socks, i)->sock);
+ 	return err;
+ }
+=20
+-static void nat_keepalive_sk_fini(struct sock * __percpu *socks)
++static void nat_keepalive_sk_fini(struct sock_bh_locked __percpu *socks)
+ {
+ 	int i;
+=20
+ 	for_each_possible_cpu(i)
+-		inet_ctl_sock_destroy(*per_cpu_ptr(socks, i));
++		inet_ctl_sock_destroy(per_cpu_ptr(socks, i)->sock);
+ }
+=20
+ void xfrm_nat_keepalive_state_updated(struct xfrm_state *x)
 --=20
 2.47.2
 
