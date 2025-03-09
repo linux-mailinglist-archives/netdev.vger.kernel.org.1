@@ -1,79 +1,81 @@
-Return-Path: <netdev+bounces-173367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A007AA58805
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 21:03:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 929B0A58806
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 21:04:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 774AC168F38
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 20:03:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1DA016A506
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 20:04:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF8CF1FF7CC;
-	Sun,  9 Mar 2025 20:03:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C84CB1DF279;
+	Sun,  9 Mar 2025 20:04:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PGRy8z82"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YtN2py/A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D2FC1DF279
-	for <netdev@vger.kernel.org>; Sun,  9 Mar 2025 20:03:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18AD81DE4F8
+	for <netdev@vger.kernel.org>; Sun,  9 Mar 2025 20:04:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741550599; cv=none; b=Ijyb/9hOxiyj86pJ+tcchh9IDGeEYTBrHB1mZ5WEk/A4QVi4QB/T7kWbOzwIvF50mP4tD8NMSyr7/bt5QwCY1uEuzKopKPWLYFNOwDPGY2CHTjcMitVnlzWkv8s9W1dlHP/JEDnsamOIbbyC4l38f0KdQH1H8SM+RuoDGcMh3z8=
+	t=1741550657; cv=none; b=AiRdrav52M2Gj1efdyabQA2Yre9C6z1AvgYdMN+L+XRIaagd9Nj6M8TunsZMKQD4O6gE+VK6FuvjfK4/OWWMtlHAmd/qAcqbQqmW2JuILIZ9mVRhfORc7X+GREDOAkPNcNiGHgTG22A95/TsL3LUErjuaX+Q5RI0Wu2YtdLYi/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741550599; c=relaxed/simple;
-	bh=uT+xfwLHQk5uheFDJlg5tv6cOVv4CbAFXLVX/VO7NvI=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=j9BZgfU7CUQdPMggeTkLwWS5cJMr/hd8hzTzItYQO+5X5JcnQVvNFyylv/IY9PoVXXrfaNVNbweZB86e3XAQE0oeSlAOXFNgnVduh5FECT74CWAyFbSddzfrSVOrWgSIgSKHgw9ea1vgZ3Kpeyqa5ZnhNz5/P6o/BWWjFm/O1J0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PGRy8z82; arc=none smtp.client-ip=209.85.218.52
+	s=arc-20240116; t=1741550657; c=relaxed/simple;
+	bh=wbr4MY31EKpQ2TX7Ee3BSdhjlYHyQiBSHL/fS5nd5sE=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=CYRcJIPL/6CoITG1VBNSr4tO1P3RUGDGQrzZsKeSTpWQAO1xb6DwNiW5W1mWjVrpM32T4yZiphcTkDUpP1whEa9d9by8RV5CJNGtiGXeBd06DnhyWT6WTiYqB1yW8o684I6BLrtLl7Tv2JHC8Mdwtss7Ebqq+dMLCLKMaHDsYNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YtN2py/A; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-aaec61d0f65so721415566b.1
-        for <netdev@vger.kernel.org>; Sun, 09 Mar 2025 13:03:16 -0700 (PDT)
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5e6c18e2c7dso830887a12.3
+        for <netdev@vger.kernel.org>; Sun, 09 Mar 2025 13:04:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741550595; x=1742155395; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MK78NCwodh9OSm0OmcDNKYVeagWsw6NpPwP8Da6VxLo=;
-        b=PGRy8z82ZZekK7ow6/ZLqP+oy4ahM+9jpcv1NSyhIKrOdObr58L3P29ksS5A15Xpz0
-         OcgFQiRqoZ4LKyt68nFYiHY29D3X4nC2eGpq//XBXRBy8Bcv0usGOElEVV7V6rsWCCUJ
-         hF7WPX5YOw/ibAc9UG+E8xzjhyF4FJBp0HZ+bHYyyplS+ck6NjRGYMbzHdCrbnh0HD0a
-         TgD+jRfqSJoKUA98K/mt9Y8lGzFG10+HA5y8URkoY0Oo61m/dFEAf8RTB264mNrdZLnM
-         IfFuJF+JWCJQAfVGAsixpsHDo9meJAzFVrMUigxVdVEAAc/E/bd0OFarDniWzXU/h84O
-         SwZg==
+        d=gmail.com; s=20230601; t=1741550654; x=1742155454; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=0byt4gDK/kgG9gsQAfI2cA8bWzPc+LU1fgloMyPs1pk=;
+        b=YtN2py/AM977+vi0bGZ2deJOQeNuX7k07jNXWQhKycDtuFHktLieZ1Bdn4WoPDVPtH
+         jxMbYRq9nGaABHWvL3I01lM+Q5zJeSAEjFGs5i8JSDHjPjGW9YuwWj/spMfVyVneuVok
+         8p/5tr4KOT6OYO5ohyXWKeMO2H5a6dRJF9qYUumYBiMJHncSe1AcfvVBNP62vIV+8JQn
+         ScHaRGALJf5+oPMMs9b/K8YY/1wofHyZ6VnWmvr5dCS0fgikopRRFpdqcdAmNSAare9n
+         o6jrzKTflTkVAwXh0Gh9c9D9jnTQQyKNZLpxkzbtFq8kzY8ZmQqFMJAY+bYaZuSNe59u
+         eY+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741550595; x=1742155395;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MK78NCwodh9OSm0OmcDNKYVeagWsw6NpPwP8Da6VxLo=;
-        b=pt8uS51iU0K2hrjWH9c7z2r4SONGCs3kwVZdsTNiaywfqI4TO+F5fgWl6nM2mZVBBv
-         gDgR5eXl+8OABaEATDEsg6TVRk4iWBYkmdLC5ykSYptX/cCuY+lLY8jxpWHAoarHWT/v
-         /CdmvMpZr5Ty6Lqc3FhhFS37p89k0bdXBaa9gr1m2eW2i/N7FEFirgvobQ5rvux/jUxu
-         TOAAhb4shRohG4gYg1kzorxfk3GcWSo7N7rHYFyozPK7KzXEPsRl73MSKL8XI+uljo2J
-         PvQRSx10rKa3Q/vm0cB/urgAUxjK9KQjlhU99Khot39LpkzUv0A+SYx0CtKviq6okx76
-         PveA==
-X-Gm-Message-State: AOJu0Yz/YNODuyAcIqLHIVMdLuBpUfzoh6yXc83wixfTZ6LVVEc61Pn2
-	EFIhUq7yThwc9DZsbKMKwofZnxAL64GyZOas4eJeeHS1LcxrPspv
-X-Gm-Gg: ASbGncsh0D+iZr3qc8kwgsJ8W9mJDb5O9MF1GEsE+oR4HHEMkU9dEj+3McUjew9lE/v
-	H4qPjSsuBuY4y4q/7S7i3f+KKKHoftfCDBa2lBWm8q6hFqOore5ttaJutvi5DkzgD8YPxFp0Hol
-	QOewvzfhwAM/1K7YfDwumaWGNq1Je6+xEEw7HkSxnDsi1q6ZQTFaAy36uE9Irsf0zhhQ2TJWoWW
-	ezzt07BBbG7ClLGTvKuRP9EyOpvMr1N/bCMfWuO1cpeXz7knvY4Nqo/Ar0N/58AwBA+O1nY/iD0
-	+/po/mvVMHDNa4x+qo9nmFP6L88HBPBau6gE2pA+UYqYFGCTXYHvKdQzEcvmmsMF741VaO+xi6t
-	5586wTXcpPUBEDds4YaUJcrNQe2x0ngRwJBRPbCSa16pfxjK+Sjm1aVeLd6nneqB+lZjrLSP2Wd
-	JCxi2EPg14xwuyC37W50+lyTyW1/RFeeQ3gurV
-X-Google-Smtp-Source: AGHT+IEV1Xd9UJUSSWF0QbsGn/Sjttr/g7W9om+mPq9/1K6FztDb+Cc2pyTcbq4CYtF07m15h/an8w==
-X-Received: by 2002:a17:907:7147:b0:abe:c894:5986 with SMTP id a640c23a62f3a-ac252ba0916mr1077315966b.39.1741550595193;
-        Sun, 09 Mar 2025 13:03:15 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1741550654; x=1742155454;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0byt4gDK/kgG9gsQAfI2cA8bWzPc+LU1fgloMyPs1pk=;
+        b=YNgz71kBSxPmJBXJcs3ScuZyqBhc3zQNBq3SK+M4r2d9R1I0Nhj9/fzOIDlvf0NYpb
+         jTagUKd8rUjH+CBHYQjSL1oDCn7mJHDVXHhgr415dwJQ51jLsZTQKtFum8m4wjvGErWF
+         oRCzv60hV4TUdN/PhQtKMuC/EB4bvKSCWJFdaSg4a1HLY8VZdmbpW1vFer80gj9d61SO
+         /LFMW2GMbSwlL4e7AZGof3fm5yy/bs7kSpJbI1zAWadVdnsMn0IYl6shnXPKNhez1kYG
+         NfeI+S1qmIG8OuUWH8dUtvcZ4dx0htY8We5PYrfh/xEM6mGG/xcEpmISR60nF2o6Fr0f
+         4Qwg==
+X-Gm-Message-State: AOJu0YwB4wDkF59cp6FZIlfuyFe+geLeMvm1u+4gHr8Zhw08qTK4EBUQ
+	/WfcRy5cXtm1HKYbSwAkfg37BzopENNLaVo6fMpSgnOROPw+3Gpx
+X-Gm-Gg: ASbGnctlIKH3mi3+FtLAoEJt8m064vWk8lhOE+B4rWa9f7nqFL6FAuMYcvXu4gGHOyg
+	h8VoBAw1vkyf791TmzG0EqwIzw1cHJL33btzYx6jQDMzmkV15pF1OCTEbgnOKiv0oINeHpOESfG
+	7RtvjNT7FB4W07jE+EnbvJZiF52Ejsvf/C5IC8ApG52cAisIEEMUPFErCY9V+zGGeNne/2Dr25a
+	ik6/hw5h/r/7dah3MCnjuABEczaWIw5UtPREtjKdc46ucQg9+2EFMYTTF0aP2umMIZauvGMPync
+	eZ0/Dt6Zl85Uu7RWQqOrwuyi7eYYorkIV4rcG05i0kqRWozdWGXExmiq1mUWWX2pb0rgFkIzF6/
+	gY/WJYUVbhpVC+o7Dv+PByfG/QjUjmeVbKo8vL9y/symbuYrEs0JfkYj8yf91lL/grVqkJFUZDj
+	pyHGPpc4Bwa83+oPR/oqhQsOMR1yWuETfrZ1fH
+X-Google-Smtp-Source: AGHT+IEHewNJn/areRDcx+XY/KvVjsZic58iykixCUtfNPaM/feZI7SLRUnRULwc+kop893PoFNtZA==
+X-Received: by 2002:a17:907:720d:b0:ac1:db49:99b7 with SMTP id a640c23a62f3a-ac252ff84c2mr1398267166b.51.1741550653995;
+        Sun, 09 Mar 2025 13:04:13 -0700 (PDT)
 Received: from ?IPV6:2a02:3100:acdd:4200:b9d3:2874:813c:4af4? (dynamic-2a02-3100-acdd-4200-b9d3-2874-813c-4af4.310.pool.telefonica.de. [2a02:3100:acdd:4200:b9d3:2874:813c:4af4])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-ac29f5d2638sm65925466b.160.2025.03.09.13.03.14
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-ac29d5f1895sm81096366b.16.2025.03.09.13.04.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 09 Mar 2025 13:03:14 -0700 (PDT)
-Message-ID: <b624fcb7-b493-461a-a0b5-9ca7e9d767bc@gmail.com>
-Date: Sun, 9 Mar 2025 21:03:14 +0100
+        Sun, 09 Mar 2025 13:04:13 -0700 (PDT)
+Message-ID: <406c8a20-b62e-4ee3-b174-b566724a0876@gmail.com>
+Date: Sun, 9 Mar 2025 21:04:14 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,15 +83,16 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Content-Language: en-US
+Subject: [PATCH net-next 1/2] net: phy: move PHY package MMD access function
+ declarations from phy.h to phylib.h
+From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Russell King - ARM Linux <linux@armlinux.org.uk>,
  Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
  Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>,
  Jakub Kicinski <kuba@kernel.org>
 Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next 0/2] net: phy: clean up PHY package MMD access
- functions
+References: <b624fcb7-b493-461a-a0b5-9ca7e9d767bc@gmail.com>
+Content-Language: en-US
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
  xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
  sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
@@ -133,22 +136,61 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
  H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
  lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
  OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
+In-Reply-To: <b624fcb7-b493-461a-a0b5-9ca7e9d767bc@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Move declarations of the functions with users to phylib.h, and remove
-unused functions.
+These functions are used by PHY drivers only, therefore move their
+declaration to phylib.h.
 
-Heiner Kallweit (2):
-  net: phy: move PHY package MMD access function declarations from phy.h
-    to phylib.h
-  net: phy: remove unused functions phy_package_[read|write]_mmd
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/net/phy/phylib.h | 6 ++++++
+ include/linux/phy.h      | 8 --------
+ 2 files changed, 6 insertions(+), 8 deletions(-)
 
- drivers/net/phy/phy-core.c | 75 --------------------------------------
- drivers/net/phy/phylib.h   |  6 +++
- include/linux/phy.h        | 16 --------
- 3 files changed, 6 insertions(+), 91 deletions(-)
-
+diff --git a/drivers/net/phy/phylib.h b/drivers/net/phy/phylib.h
+index f0e499fed..c15484a80 100644
+--- a/drivers/net/phy/phylib.h
++++ b/drivers/net/phy/phylib.h
+@@ -15,6 +15,12 @@ int __phy_package_read(struct phy_device *phydev, unsigned int addr_offset,
+ 		       u32 regnum);
+ int __phy_package_write(struct phy_device *phydev, unsigned int addr_offset,
+ 			u32 regnum, u16 val);
++int __phy_package_read_mmd(struct phy_device *phydev,
++			   unsigned int addr_offset, int devad,
++			   u32 regnum);
++int __phy_package_write_mmd(struct phy_device *phydev,
++			    unsigned int addr_offset, int devad,
++			    u32 regnum, u16 val);
+ bool phy_package_init_once(struct phy_device *phydev);
+ bool phy_package_probe_once(struct phy_device *phydev);
+ int phy_package_join(struct phy_device *phydev, int base_addr, size_t priv_size);
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index c4a6385fa..fc028bab1 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -2107,18 +2107,10 @@ int __phy_hwtstamp_set(struct phy_device *phydev,
+ 		       struct kernel_hwtstamp_config *config,
+ 		       struct netlink_ext_ack *extack);
+ 
+-int __phy_package_read_mmd(struct phy_device *phydev,
+-			   unsigned int addr_offset, int devad,
+-			   u32 regnum);
+-
+ int phy_package_read_mmd(struct phy_device *phydev,
+ 			 unsigned int addr_offset, int devad,
+ 			 u32 regnum);
+ 
+-int __phy_package_write_mmd(struct phy_device *phydev,
+-			    unsigned int addr_offset, int devad,
+-			    u32 regnum, u16 val);
+-
+ int phy_package_write_mmd(struct phy_device *phydev,
+ 			  unsigned int addr_offset, int devad,
+ 			  u32 regnum, u16 val);
 -- 
 2.48.1
+
+
 
