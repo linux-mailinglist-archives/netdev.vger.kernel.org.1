@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-173234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E67BA58161
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 08:47:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55F41A58197
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 09:20:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 76F727A2784
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 07:46:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25EEB3AE8B4
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 08:20:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 196A914B092;
-	Sun,  9 Mar 2025 07:47:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D74F217A5BD;
+	Sun,  9 Mar 2025 08:20:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="kHtuooKT"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="lVK7/nlj"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-57-137.mail.qq.com (out162-62-57-137.mail.qq.com [162.62.57.137])
+Received: from out203-205-221-155.mail.qq.com (out203-205-221-155.mail.qq.com [203.205.221.155])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761B217C77;
-	Sun,  9 Mar 2025 07:47:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.137
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175924C70;
+	Sun,  9 Mar 2025 08:20:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741506455; cv=none; b=pTzahQLnug0fBcgRZTk549Z28MjMYw//o+YPhZvt3eLsu+a+Z1HbWmAfUhgPQvfkh+Whg7ZoShTZ96cl/Jph1rv+JkWmjejyBiZkn0k35GcUPeAAEumnuAzrlm3BCc2vGmdry8blz+WzKIcpJlGRUlcMwafgsR8nxvLuk1gRWDY=
+	t=1741508410; cv=none; b=tPGYEeJT5BeqNtIqBq+N9a8gqSzlSlwugdRDeaFEAQufFkwBfKY39tovILq4J6qArwwORPFb17eJQsmnBJFygpN98YaB2rkaaScaOav/yAIBL9ZAKd2XesHqqmhivAkJvT3fViDIG9LJ5Em1J3/+DxkeOGt82u94eCyxuwOXzag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741506455; c=relaxed/simple;
-	bh=qtXCXe+nNyfcyRAulZDFi2Udoq+tbMD7n9+7CwQJoXc=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=To7D+9BbLrppEyB5HVeAXrdhEZt2BwC2pjG6wqkCbzUcihaEzQ0sPUIRA4ab1oxcieTa+ykd24lGGE3b5mrbYms8OzGZNG2YlBKu4zMpdUvFBkrXrVzpqF+FEMpOymMKa0JCLs/MzYFnaLWLCGiONv/L7rhLlwV1yE9Tp7HPtos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=kHtuooKT; arc=none smtp.client-ip=162.62.57.137
+	s=arc-20240116; t=1741508410; c=relaxed/simple;
+	bh=YJd7K01Y9oAxYGKugOPKABLM5bgZH6skQOHXLa+naD0=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=SNn4o1j0xqyDfe7kx2hCT/fWvqY8DN99f5WOzDMvNb9xlvoVjLdQsJs8Zt5tdEsiXjFCL16C/9cY94/3Isl1XroFZa0CXKpsLODyEBvIKmNSSobauzwWxs4Z4CZXPMaF5QsLJSo3Rt0CyxqA+405OC9VjUSr2RjvnJ3+qrrQz9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=lVK7/nlj; arc=none smtp.client-ip=203.205.221.155
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1741506439; bh=UuctHCw54Sbs+GMXZiA+9NBNhsVaLpJkYq7/z98yanc=;
+	t=1741508397; bh=4QtA+Ouj6OoRKOCD+7cWv7slbqgJtrFMVALehC4qc0U=;
 	h=From:To:Cc:Subject:Date;
-	b=kHtuooKT48tsok0BZV5wfYaQo4lrCy2wxYYfyBLLZMdE25Oo64UsKKI9M/J/sbOEu
-	 ceEmh14M0VjEUWUK7J/5KLgHX8gdhvyhDSqH7BdJCus1esA/z2BYetd3Xe2l5lQOL3
-	 P5cRaZ0gUsJaonoTy5QnPRI+Vmz3Yp9+ahCW0zw0=
+	b=lVK7/nljBjPbarDAcbzMMtJbDFS11KDsPdCszCjqVdQqxVTxGODLmsFJHE2NIz8Hc
+	 dV83rFxmyyC5J16tfqQtcjU8hwZVnQuQiztwY1FJsJf2n3ji9y9Lq206wzMs/jsIxe
+	 RgYWUTB5/isKAH6AaN87KKkRBMjPuLIaivbb496s=
 Received: from localhost.localdomain ([59.66.26.122])
-	by newxmesmtplogicsvrszc13-0.qq.com (NewEsmtp) with SMTP
-	id BD13AEE0; Sun, 09 Mar 2025 15:47:17 +0800
-X-QQ-mid: xmsmtpt1741506437ty97nhdku
-Message-ID: <tencent_0A154BBE38E000228C01BE742CB73681FE09@qq.com>
-X-QQ-XMAILINFO: NouDQD3dZCwaaL7UEsvYJy45KdtSWtllmld6g/xFR5bnFZB3OHNNpL+AnFsFCn
-	 5eL0r4MmUInGwGPq3ytPdImyqTee9RnvxXs9dFvi25efOaLjpFRkGY52nhV4jPLTTYhFH0Fg/CFX
-	 JpWCn6Ozzz6XcHh4pJikoOry/g0jBv0idm2Kr/9cUx19Dmf42iQqRBeRv6f1XUkRha3a8Jcv+Hc6
-	 JLWq0x/PKiqcyH8bJVLvAhuN/Bh4+eloxqYwDcgl8UE8Xs+HnaDQ7UM8/tBuid/mIapt9Ux7bkSF
-	 eIp7n52PPc2e2c7XdlxkdRIm2PAVOee51QumLlTPBkJOmEIIaQdAd4oQIZPIo/l0uDOf0WgpBsEf
-	 NjqDNGQV/YhJGBeNiPXL66hO79e9NeuNVmQ2XUB7ewrGMJFwFsqP+kwllDnH2o7hTxs2FEEw7Smy
-	 Nux/fG9SwgsjM973B7j6ENwr4AdfcG2VaTuVLTpHsg3uRCpTWv7LAJJJEE3gggwy1gKY1V3d9+nF
-	 FoEHheeE/KDYhz8FTjOB4AN5yQcEtMhmeZpc5ao3sxa009cnU17P9WhiF2OgWMKcFqK/pqUBnUTV
-	 XgMKMXt3AOUpwam9GweJu1yY9IV/E85fJFWSUZ+B4M2EGAAHbrurK0RDQWif0qmsCDY7B78Lc9FX
-	 mm4AI/YhvFMgo0aVPa97YKKTwDWIFl5Uwi4cBBdi3fp08tn7nECpeLOw6dnRDN0XIMAuB00qbuDB
-	 CY92jN+Sli58OQqwLWA2IYebsTbz3TYYZEjAQsIf+Nt/DtHvJ3o89+6xI7Sx9M58U738SHF5OOEi
-	 EZrmc+CuYiOzvZAxha4LLRNgeAZk6lNUqD8lLSA50gk5wv5+QfT8RTN5ZmHcNtexEjVFaTzmFiYc
-	 fGZS1a3cQNG48fpUAE3AwDKfSUDKO5alV40jy9vugy3dhJ9rk/bt0DVOGeJ1U6CM7wH/peGI3rja
-	 BxkRe8qtPthhmIM2X6rSqi618vJhPtemStqChy5pgt4OQr+SF9xeUN28tvjtUO5ys9hXF+e/c=
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+	by newxmesmtplogicsvrszc16-0.qq.com (NewEsmtp) with SMTP
+	id C36296A9; Sun, 09 Mar 2025 15:48:54 +0800
+X-QQ-mid: xmsmtpt1741506534t5qburu87
+Message-ID: <tencent_8031D017AFE5E266C43F62C916C709009E06@qq.com>
+X-QQ-XMAILINFO: M1rD3f8svNznEc2CaSvmAf4Ta9dC0ocsEd5uActWCQeQAhzP/KMe3RJHaaYeW3
+	 yDZE3VQKEcoEB5K5rnqLVlXRGT3m0sfkN7nRHxj1cUiVqB83PftxbfHlioAZzEyRXESJtVaCuVMK
+	 CCQOyJX7tfbP29TXafJh2e0ct6OPDCiNZp3il7sBRPC57Uq+CIgbD1ZVs1xHPdK7p7umipefS9ul
+	 DugW5NTlBob7n4I3I3+7xzoSsl+bBFcAkIIDHoVCua1nf+GzLZgmqcoTX4vVHtZuDNlLFIX1+NRV
+	 m1E6JA0zCzT/nGF71Xo0/m43JznAiTJWv7xytCqTbYofAUzPTsg5CLgO90Gu1f6kgDYjsXhhzWsW
+	 aLz7t61Ug3Ho1WjAczlYwQ4fwD4DLy7iGc1JJaoPyy6bhRmtxheqUFv637O/rXqc6Vz3M5Ldgwpw
+	 6hbJLyaVqBWhZ4jHoXcFYAJ6awOaQcmXbEkvQVnEBs2rwEAiup3QITUgCk/kDywBIkCY1yaQgpOJ
+	 d8vM0Q1BjLhaj2jKydm2j1haAO9aWCBs+hP3lljgJwM/uPUe4Z23fr5vK9lEUWLAPnq6EujjSdch
+	 uXG5ChCAe1uX1u1JHFm9RKDXHUZW80a742RHW6cEkcJsMq6ldNX/3jjyJzeFN7PE/8UePF0ocSXt
+	 YdkkoYMdmBlzb99nQKozcz5h/NTOisMQ6v6CANl1Dmvkq5Uz5FkEy9J+CHHQWhbZNencRH2c0zIn
+	 AnY8PSb05Czt5dDXVpl4Kqp9jE0RD0mYF5xUtBEs4kSYNV3aWpBtP+qfu577t+h0O6KNGKXR3dHV
+	 D8DbMiVM/+Mld5OuNC995Xy96mmsuzDZgLfE8IwOHIob8vAcy6uPKlhiSahsSo6Ab/zRs50N2awb
+	 XSL+hsLnPKYVS6XMD94CGURh7Lt5oMtqfoJNULkXmYMKuWn+4f0b682dZsap9Mhj98Pb5bCbyR4O
+	 JRh2Pf1N6Sc7GDeb4DcI7AP7flODfIbtOr+T1HGLvwkNO9CxOhWrFElTbANZ31cL5W3c1VvgHy06
+	 l25E2kATZzV+WQXbLI7350ab0Lklc=
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
 From: Hanyuan Zhao <hanyuan-z@qq.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -65,9 +66,9 @@ To: davem@davemloft.net,
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Hanyuan Zhao <hanyuan-z@qq.com>
-Subject: [PATCH 1/2] net: enc28j60: support getting irq number from gpio phandle in the device tree
-Date: Sun,  9 Mar 2025 15:47:08 +0800
-X-OQ-MSGID: <20250309074709.127504-1-hanyuan-z@qq.com>
+Subject: [PATCH 2/2] dt-bindings: net: add enc28j60's irq-gpios node description and binding example
+Date: Sun,  9 Mar 2025 15:48:38 +0800
+X-OQ-MSGID: <20250309074838.128110-1-hanyuan-z@qq.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -86,84 +87,55 @@ configuration and properties via the device tree.
 
 Signed-off-by: Hanyuan Zhao <hanyuan-z@qq.com>
 ---
- drivers/net/ethernet/microchip/enc28j60.c | 25 ++++++++++++++++++-----
- 1 file changed, 20 insertions(+), 5 deletions(-)
+ .../bindings/net/microchip,enc28j60.txt       | 24 +++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/drivers/net/ethernet/microchip/enc28j60.c b/drivers/net/ethernet/microchip/enc28j60.c
-index d6c9491537e4..b3613e45c900 100644
---- a/drivers/net/ethernet/microchip/enc28j60.c
-+++ b/drivers/net/ethernet/microchip/enc28j60.c
-@@ -24,6 +24,7 @@
- #include <linux/skbuff.h>
- #include <linux/delay.h>
- #include <linux/spi/spi.h>
-+#include <linux/of_gpio.h>
- 
- #include "enc28j60_hw.h"
- 
-@@ -1526,6 +1527,7 @@ static int enc28j60_probe(struct spi_device *spi)
- 	struct net_device *dev;
- 	struct enc28j60_net *priv;
- 	int ret = 0;
-+	unsigned long irq_flags = IRQF_ONESHOT;
- 
- 	if (netif_msg_drv(&debug))
- 		dev_info(&spi->dev, "Ethernet driver %s loaded\n", DRV_VERSION);
-@@ -1558,20 +1560,33 @@ static int enc28j60_probe(struct spi_device *spi)
- 		eth_hw_addr_random(dev);
- 	enc28j60_set_hw_macaddr(dev);
- 
-+	if (spi->irq > 0) {
-+		dev->irq = spi->irq;
-+	} else {
-+		/* Try loading device tree property irq-gpios */
-+		struct gpio_desc *irq_gpio_desc = devm_fwnode_gpiod_get_index(&spi->dev,
-+				of_fwnode_handle(spi->dev.of_node), "irq", 0, GPIOD_IN, NULL);
-+		if (IS_ERR(irq_gpio_desc)) {
-+			dev_err(&spi->dev, "unable to get a valid irq gpio\n");
-+			goto error_irq;
-+		}
-+		dev->irq = gpiod_to_irq(irq_gpio_desc);
-+		irq_flags |= IRQF_TRIGGER_FALLING;
-+	}
+diff --git a/Documentation/devicetree/bindings/net/microchip,enc28j60.txt b/Documentation/devicetree/bindings/net/microchip,enc28j60.txt
+index a8275921a896..e6423635e55b 100644
+--- a/Documentation/devicetree/bindings/net/microchip,enc28j60.txt
++++ b/Documentation/devicetree/bindings/net/microchip,enc28j60.txt
+@@ -8,6 +8,8 @@ the SPI master node.
+ Required properties:
+ - compatible: Should be "microchip,enc28j60"
+ - reg: Specify the SPI chip select the ENC28J60 is wired to
 +
- 	/* Board setup must set the relevant edge trigger type;
- 	 * level triggers won't currently work.
- 	 */
--	ret = request_threaded_irq(spi->irq, NULL, enc28j60_irq, IRQF_ONESHOT,
-+	ret = request_threaded_irq(dev->irq, NULL, enc28j60_irq, irq_flags,
- 				   DRV_NAME, priv);
- 	if (ret < 0) {
- 		if (netif_msg_probe(priv))
- 			dev_err(&spi->dev, "request irq %d failed (ret = %d)\n",
--				spi->irq, ret);
-+				dev->irq, ret);
- 		goto error_irq;
- 	}
++Required interrupt properties with pin control subsystem:
+ - interrupts: Specify the interrupt index within the interrupt controller (referred
+               to above in interrupt-parent) and interrupt type. The ENC28J60 natively
+               generates falling edge interrupts, however, additional board logic
+@@ -17,6 +19,14 @@ Required properties:
+              see also generic and your platform specific pinctrl binding
+              documentation.
  
- 	dev->if_port = IF_PORT_10BASET;
--	dev->irq = spi->irq;
- 	dev->netdev_ops = &enc28j60_netdev_ops;
- 	dev->watchdog_timeo = TX_TIMEOUT;
- 	dev->ethtool_ops = &enc28j60_ethtool_ops;
-@@ -1589,7 +1604,7 @@ static int enc28j60_probe(struct spi_device *spi)
- 	return 0;
- 
- error_register:
--	free_irq(spi->irq, priv);
-+	free_irq(dev->irq, priv);
- error_irq:
- 	free_netdev(dev);
- error_alloc:
-@@ -1601,7 +1616,7 @@ static void enc28j60_remove(struct spi_device *spi)
- 	struct enc28j60_net *priv = spi_get_drvdata(spi);
- 
- 	unregister_netdev(priv->netdev);
--	free_irq(spi->irq, priv);
-+	free_irq(priv->netdev->irq, priv);
- 	free_netdev(priv->netdev);
- }
- 
++Required interrupt properties with a single GPIO phandle:
++- irq-gpios: Specify the GPIO pin used as the interrupt line. When this property is
++             set, the kernel automatically requests the pin, configures it as an input,
++             and converts it to an IRQ number. This simplifies the process by
++             eliminating the need to manually define pinctrl and interrupt nodes.
++             Additionally, it is necessary for platforms that do not support pin
++             configuration and properties via the device tree.
++
+ Optional properties:
+ - spi-max-frequency: Maximum frequency of the SPI bus when accessing the ENC28J60.
+   According to the ENC28J80 datasheet, the chip allows a maximum of 20 MHz, however,
+@@ -54,3 +64,17 @@ Example (for NXP i.MX28 with pin control stuff for GPIO irq):
+                         fsl,pull-up = <MXS_PULL_DISABLE>;
+                 };
+         };
++
++Example (if can not configure pin properties via the device tree):
++
++        &spi2 {
++                status = "okay";
++                cs-gpios = <&porta 23 GPIO_ACTIVE_LOW>;
++
++                enc28j60: ethernet@1 {
++                        compatible = "microchip,enc28j60";
++                        reg = <0>;
++                        spi-max-frequency = <12000000>;
++                        irq-gpios = <&porta 24 GPIO_ACTIVE_HIGH>;
++                };
++        };
 -- 
 2.43.0
 
