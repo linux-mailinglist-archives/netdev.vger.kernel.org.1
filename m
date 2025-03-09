@@ -1,153 +1,187 @@
-Return-Path: <netdev+bounces-173310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC12AA58509
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 15:49:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5902AA58532
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 16:02:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31727188C510
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 14:49:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17BA23A5DDD
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 15:02:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94B6A1F09AA;
-	Sun,  9 Mar 2025 14:47:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1830B225D7;
+	Sun,  9 Mar 2025 15:02:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="OACsY6l9";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Ix7/O3Cy"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="IKbqAisr"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC0DA1E98F8;
-	Sun,  9 Mar 2025 14:47:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4DC233E4;
+	Sun,  9 Mar 2025 15:02:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741531638; cv=none; b=FH69F8/E7KTHTPA954BuvzCc2dI/svc8rEnshOrVsWSaruYclU207towOKKdptgmz/SNJ63bFGiCNnTJTtYZCPu3MYSzfxkQEkruWiGjDwi3xzwwcYW/YR3iw2ejVaGC4HxPzmFlG64iE6ZiaomRqnrVFeGauZmK8Qd1Mln2lvE=
+	t=1741532539; cv=none; b=OlnLuAFMeqhObet+/Izb5j9o6MQlE4FtIfhy1wCQT/ad3NV+LaHd3t8naCHY5/cl2U8d/rGASzJas7aBhRqE/BnAFSldFBx4wIxlmvDBJ09xU+NiKJSMoce8J9eAYz+YvV5G6WUNnbLx5Wh7TecR0azUJtFLs8qv+d+SCDDuzes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741531638; c=relaxed/simple;
-	bh=EM/uznQ2YZTtHd2PJqyOgtHEa7X0gpcWflzaAAZAoes=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=n1Cl7A+HpEhSzisCR40nwovk3YxWIPMQHWHznhhDCW7aIVEwZ+TxB3TSqWhVmIZjnkBQH7CUVxtBoahIhFxu47FBdQxjMwUtUvKZOkSkoUaoDwjLW0nwq4tIqde1nWqB17M4P0XeskMN8SuC61+Bv6X3+Ze4x+1sUBTIvcP2CGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=OACsY6l9; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Ix7/O3Cy; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1741531633;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ILRU884p1OAoaunx4VDmaSDgJgpHGl18bni0vDofXnE=;
-	b=OACsY6l9XCBNmnz8p2IxMspoNEZ+22tc4fkJIUoq8KCksZe+eu5ShFI6kD2CPfOjZ8z6Z7
-	zi0gr988bG9nd1r8vjnAjEfSpkPsFdWH2k8aDtQUocAZrlky7tdsY1Y0Kbur2GF63PPbay
-	lyXXgBa4tsQ2tQ9kz4XJhT5Uoximfli4JMRLi7fVt4iyoe/9WRiveVwhECk9Qlj01btE24
-	gXxBhcMeWZ0fMOnbhKnsGFyrym1qP/5xqFMiZHNgFMwffLNZ/kR4+Wd63z6m5Wa693J9se
-	B6DDduKN+lZX/ejgIyHrgnrGTCvFM9esUPWzMQceX34PKp/efy66b3KFHhUYpQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1741531633;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ILRU884p1OAoaunx4VDmaSDgJgpHGl18bni0vDofXnE=;
-	b=Ix7/O3CyoYpZV7DwZk0ANGxA/wE9TXlnVQP3wfC3y5a0xK+i8ISaBE5PoyXK/0tIVlumix
-	e9lpnZtl2Yx2ZXBQ==
-To: netdev@vger.kernel.org,
-	linux-rt-devel@lists.linux.dev
-Cc: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1741532539; c=relaxed/simple;
+	bh=KXCv766NfrWGSxxY7QgQyTEyAtbKQHcBnbr1gGvKdU4=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=UJpiyqTJhQOZnx9Uyo9ubMmQXGEi3Jd/MIQACWqqvBdggT3F8gFcMuDjqFcgxEOco0sYAUacfPzoiPy0A7GCJzYW/xl3iZT3b3WY9tpO6+QScJwxWhmi0foDZ1B+R8lkIlLhTmg8tr5WqkixmFnhVKHXfA3kUzKeDIYrg/POUE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=IKbqAisr; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Za+LA1OFA3Nd33JFQpbK/U5kxK1CIynZXODCjnM+ptQ=; b=IKbqAisrMBTG5hQoXmpz9mfmFp
+	czEhn9WQdzUP58TosHw5zT09od4LfzhxT2RzWkMr2C05YdT3LiYby98WjwqZtRUjMrOo7yYHfjnqk
+	aJfmAB2yQPqvMsmGxYtvPfIbr0gn5HYkVtvJ14blA2Iedb/YlwyPT70jrCZHCx1X54YP2CmYfZC1u
+	9uhhFZDsduuYiSdb3/BWpMe/LBwYWnZRlnpxEuVX9uUU0cActgwbcbc9AWHFL7zGJPMQ954049RV5
+	HcUh+5I5oIS3PbsXm1z1bhvehytWpWdCNLdeZoqLoZaksUVC4JP2V4IMUyxqB1U/ao9jkPJ1iWel3
+	6ppa9JrQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:42288 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1trIAK-0001On-2X;
+	Sun, 09 Mar 2025 15:02:08 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1trIA0-005ntK-FS; Sun, 09 Mar 2025 15:01:48 +0000
+In-Reply-To: <Z82tWYZulV12Pjir@shell.armlinux.org.uk>
+References: <Z82tWYZulV12Pjir@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Conor Dooley <conor@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	devicetree@vger.kernel.org,
+	Emil Renner Berthing <kernel@esmil.dk>,
 	Eric Dumazet <edumazet@google.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
 	Jakub Kicinski <kuba@kernel.org>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	"Lad, Prabhakar" <prabhakar.csengg@gmail.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Minda Chen <minda.chen@starfivetech.com>,
+	netdev@vger.kernel.org,
+	Palmer Dabbelt <palmer@dabbelt.com>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Allison Henderson <allison.henderson@oracle.com>,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH net-next 18/18] rds: Use nested-BH locking for rds_page_remainder.
-Date: Sun,  9 Mar 2025 15:46:53 +0100
-Message-ID: <20250309144653.825351-19-bigeasy@linutronix.de>
-In-Reply-To: <20250309144653.825351-1-bigeasy@linutronix.de>
-References: <20250309144653.825351-1-bigeasy@linutronix.de>
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Rob Herring <robh@kernel.org>
+Subject: [PATCH net-next 1/7] net: stmmac: allow platforms to use PHY tx clock
+ stop capability
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1trIA0-005ntK-FS@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Sun, 09 Mar 2025 15:01:48 +0000
 
-rds_page_remainder is a per-CPU variable and relies on disabled BH for its
-locking. Without per-CPU locking in local_bh_disable() on PREEMPT_RT
-this data structure requires explicit locking.
+Allow platform glue to instruct stmmac to make use of the PHY transmit
+clock stop capability when deciding whether to allow the transmit clock
+from the DWMAC core to be stopped.
 
-Add a local_lock_t to the data structure and use
-local_lock_nested_bh() for locking. This change adds only lockdep
-coverage and does not alter the functional behaviour for !PREEMPT_RT.
-
-Cc: Allison Henderson <allison.henderson@oracle.com>
-Cc: linux-rdma@vger.kernel.org
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- net/rds/page.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h     |  1 +
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c    | 16 ++++++++++++----
+ include/linux/stmmac.h                           |  3 ++-
+ 3 files changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/net/rds/page.c b/net/rds/page.c
-index 58a8548a915a9..afb151eac271c 100644
---- a/net/rds/page.c
-+++ b/net/rds/page.c
-@@ -40,10 +40,12 @@
- struct rds_page_remainder {
- 	struct page	*r_page;
- 	unsigned long	r_offset;
-+	local_lock_t	bh_lock;
- };
-=20
--static
--DEFINE_PER_CPU_SHARED_ALIGNED(struct rds_page_remainder, rds_page_remainde=
-rs);
-+static DEFINE_PER_CPU_SHARED_ALIGNED(struct rds_page_remainder, rds_page_r=
-emainders) =3D {
-+	.bh_lock =3D INIT_LOCAL_LOCK(bh_lock),
-+};
-=20
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+index d87275c1cf23..bddfa0f4aa21 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+@@ -306,6 +306,7 @@ struct stmmac_priv {
+ 	struct timer_list eee_ctrl_timer;
+ 	int lpi_irq;
+ 	u32 tx_lpi_timer;
++	bool tx_lpi_clk_stop;
+ 	bool eee_enabled;
+ 	bool eee_active;
+ 	bool eee_sw_timer_en;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index fa1d7d3a2f43..6f29804148b6 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -457,8 +457,7 @@ static void stmmac_try_to_start_sw_lpi(struct stmmac_priv *priv)
+ 	/* Check and enter in LPI mode */
+ 	if (!priv->tx_path_in_lpi_mode)
+ 		stmmac_set_lpi_mode(priv, priv->hw, STMMAC_LPI_FORCED,
+-			priv->plat->flags & STMMAC_FLAG_EN_TX_LPI_CLOCKGATING,
+-			0);
++				    priv->tx_lpi_clk_stop, 0);
+ }
+ 
  /**
-  * rds_page_remainder_alloc - build up regions of a message.
-@@ -87,6 +89,7 @@ int rds_page_remainder_alloc(struct scatterlist *scat, un=
-signed long bytes,
- 	}
-=20
- 	local_bh_disable();
-+	local_lock_nested_bh(&rds_page_remainders.bh_lock);
- 	rem =3D this_cpu_ptr(&rds_page_remainders);
-=20
- 	while (1) {
-@@ -115,11 +118,13 @@ int rds_page_remainder_alloc(struct scatterlist *scat=
-, unsigned long bytes,
- 		}
-=20
- 		/* alloc if there is nothing for us to use */
-+		local_unlock_nested_bh(&rds_page_remainders.bh_lock);
- 		local_bh_enable();
-=20
- 		page =3D alloc_page(gfp);
-=20
- 		local_bh_disable();
-+		local_lock_nested_bh(&rds_page_remainders.bh_lock);
- 		rem =3D this_cpu_ptr(&rds_page_remainders);
-=20
- 		if (!page) {
-@@ -138,6 +143,7 @@ int rds_page_remainder_alloc(struct scatterlist *scat, =
-unsigned long bytes,
- 		rem->r_offset =3D 0;
- 	}
-=20
-+	local_unlock_nested_bh(&rds_page_remainders.bh_lock);
- 	local_bh_enable();
- out:
- 	rdsdebug("bytes %lu ret %d %p %u %u\n", bytes, ret,
---=20
-2.47.2
+@@ -1104,13 +1103,18 @@ static int stmmac_mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
+ 
+ 	priv->eee_enabled = true;
+ 
++	/* Update the transmit clock stop according to PHY capability if
++	 * the platform allows
++	 */
++	if (priv->plat->flags & STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP)
++		priv->tx_lpi_clk_stop = tx_clk_stop;
++
+ 	stmmac_set_eee_timer(priv, priv->hw, STMMAC_DEFAULT_LIT_LS,
+ 			     STMMAC_DEFAULT_TWT_LS);
+ 
+ 	/* Try to cnfigure the hardware timer. */
+ 	ret = stmmac_set_lpi_mode(priv, priv->hw, STMMAC_LPI_TIMER,
+-				  priv->plat->flags & STMMAC_FLAG_EN_TX_LPI_CLOCKGATING,
+-				  priv->tx_lpi_timer);
++				  priv->tx_lpi_clk_stop, priv->tx_lpi_timer);
+ 
+ 	if (ret) {
+ 		/* Hardware timer mode not supported, or value out of range.
+@@ -1269,6 +1273,10 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
+ 	if (!(priv->plat->flags & STMMAC_FLAG_RX_CLK_RUNS_IN_LPI))
+ 		priv->phylink_config.eee_rx_clk_stop_enable = true;
+ 
++	/* Set the default transmit clock stop bit based on the platform glue */
++	priv->tx_lpi_clk_stop = priv->plat->flags &
++				STMMAC_FLAG_EN_TX_LPI_CLOCKGATING;
++
+ 	mdio_bus_data = priv->plat->mdio_bus_data;
+ 	if (mdio_bus_data)
+ 		priv->phylink_config.default_an_inband =
+diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+index b6f03ab12595..c4ec8bb8144e 100644
+--- a/include/linux/stmmac.h
++++ b/include/linux/stmmac.h
+@@ -183,7 +183,8 @@ struct dwmac4_addrs {
+ #define STMMAC_FLAG_INT_SNAPSHOT_EN		BIT(9)
+ #define STMMAC_FLAG_RX_CLK_RUNS_IN_LPI		BIT(10)
+ #define STMMAC_FLAG_EN_TX_LPI_CLOCKGATING	BIT(11)
+-#define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY	BIT(12)
++#define STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP	BIT(12)
++#define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY	BIT(13)
+ 
+ struct plat_stmmacenet_data {
+ 	int bus_id;
+-- 
+2.30.2
 
 
