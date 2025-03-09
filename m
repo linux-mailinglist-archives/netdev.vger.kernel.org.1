@@ -1,140 +1,125 @@
-Return-Path: <netdev+bounces-173352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F3DDA5865F
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 18:42:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D844A58667
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 18:44:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B36D169230
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 17:42:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA8551881181
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 17:44:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13FD31DE2C4;
-	Sun,  9 Mar 2025 17:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E530C1DF256;
+	Sun,  9 Mar 2025 17:44:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VGV6gQZi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iPdbdrRL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD9B2D528;
-	Sun,  9 Mar 2025 17:42:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC3371CAA76
+	for <netdev@vger.kernel.org>; Sun,  9 Mar 2025 17:44:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741542161; cv=none; b=Pyw6tnD+Jx2jmYCTp5DVSzp/GfolLPdm0GtPntajqtd64fQHhMBvZa08t0DfbYg+GQSyvKSWBU4D9mW6a9Yi5QQYrbxabbh0Xh5Q0Nf24cCXHdpM4p6iua0Wa5H6WdAdY3uqH+TjuX68olo2Qs3PzOnz51F9MW9Ibjm29jTB1C4=
+	t=1741542259; cv=none; b=jA2WKmo2Wk0SQ4LjkhUcX8g3SwEO/BPMCiwTMiIj1fNORwsyanf+Y1Mmo5woIaYy8gjnImzhS4Dfy5DHQH0ALxlDAYdLQQenJJN2/4Kop1RLi+gSbAoAJefyP6gjSU86sd3+i7ECCGrFBnwptEf2drM86An7iNk5yI3IsjlYHTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741542161; c=relaxed/simple;
-	bh=h2TWR4R5v9LgdKy3mRP4nVOO3I7rbrTQMFPj8W+wpFc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i8y/gf7TfpE9z1TzkxfSOraoy5B+oySibQ0R+/B5UsB5OiyXnSL14OcBj9GuZmHzl46tdtgI7hrJWxQ6bJbrusWGsLs+7eOsu15MMUiDNcgbrHJoY/wZGXu9cQ6BN9+8jLDKqiZCPoYLeppeg9WxHlaM+aDSpg0/piKQNxPMbIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VGV6gQZi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94215C4CEE3;
-	Sun,  9 Mar 2025 17:42:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741542161;
-	bh=h2TWR4R5v9LgdKy3mRP4nVOO3I7rbrTQMFPj8W+wpFc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=VGV6gQZiYHw53AWazcfdtbJCxenU9E3XVQTqfv+tpidWqdHIo2sBkjR570wAgS46M
-	 K8pMSwFdJO7Ctjitf9IgMhyk0Kok4Io6/Bg2ZWew5dQPYyf6rjJ4rNrV6A8LPVkm+s
-	 gZW/ZHsAqmHonvl0zRfbbd213AgaTCsB2Aos6MmMZ0tUxX5GAQQoHRLt7sIN5yisaY
-	 h9s74y6e3MDjXR9LKiZSO1c8zsiH+jHiXh6p0DJFxyGBpTuC8SljJ6YMHW0LeEFkIX
-	 PrI6J3QSvghxH/UPA77s6sQbu11R6gzNeCLzMYfMAMqHcWD/pMwqS2hEsmvfd6kSme
-	 5fo8ySyCXeoSA==
-Message-ID: <3ed0aa20-1bed-4dc2-98a9-c3d72a24dbbb@kernel.org>
-Date: Sun, 9 Mar 2025 18:42:24 +0100
+	s=arc-20240116; t=1741542259; c=relaxed/simple;
+	bh=MZFrbPDZGE4WNjB0lXEiGCpTm6y6Xwi3WYpwVwOprME=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QfNI/GggzXr5MkapLCaPgJ4xq+mXTV2TQ+5GexNS1uyPivoG5N2MDiY2rPzmgfyvHQ5wzE7lPjwxCOiKkl+9JAo4auynrP+DMwDUjrwXdWL32EqKZf3bSvWt4wJGvIbwbpaQUrEvrFRSWO3tDaTVJrm1ClJHIFy92ZHJEEwdx2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iPdbdrRL; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741542258; x=1773078258;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=MZFrbPDZGE4WNjB0lXEiGCpTm6y6Xwi3WYpwVwOprME=;
+  b=iPdbdrRLjNh0AiJxdY+J+Og6waJmxizesYfbznREOs3e5ygLXvpd9oFh
+   AHpsKT2dgbIKCaRS58JZedPwstt17O0RRK+owFUF+U7a+rvsKFxH+OMhQ
+   fJK9N2pK/rxrQ8nt4TQii8uezXm1LNSZDKhEl+Xu2j4djqdoP13UPAEb+
+   dTbT3zHFG71bpE+E83qrJ2Qn57pzVxDFSBn2yXlO3b2R1MuSfYZaEYpLE
+   9ZYsu0e6PE51anvWTTwRYhfZj0utRHnsXuknn9XP16alry5m5YESzT8Tk
+   IXauq+es3oK6kq8oR4neJ9NuyiAXcRSFEgciMqLYgkOi0uxfM4ey0Rxuy
+   Q==;
+X-CSE-ConnectionGUID: lhDK8CnJTgWYDYUXLsiHjg==
+X-CSE-MsgGUID: Fs0OUDH1TLuiX8BPPwYQzg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11368"; a="45332792"
+X-IronPort-AV: E=Sophos;i="6.14,234,1736841600"; 
+   d="scan'208";a="45332792"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2025 10:44:17 -0700
+X-CSE-ConnectionGUID: LnNh3bERT0qEUK+qPgGTCg==
+X-CSE-MsgGUID: HKWD8dl0Simz2qNe1UR2bg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,234,1736841600"; 
+   d="scan'208";a="124708920"
+Received: from lkp-server02.sh.intel.com (HELO a4747d147074) ([10.239.97.151])
+  by orviesa003.jf.intel.com with ESMTP; 09 Mar 2025 10:44:14 -0700
+Received: from kbuild by a4747d147074 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1trKh9-0003L6-27;
+	Sun, 09 Mar 2025 17:44:11 +0000
+Date: Mon, 10 Mar 2025 01:43:30 +0800
+From: kernel test robot <lkp@intel.com>
+To: Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>,
+	syzbot+377b71db585c9c705f8e@syzkaller.appspotmail.com
+Subject: Re: [PATCH net] net: lapbether: use netdev_lockdep_set_classes()
+ helper
+Message-ID: <202503100139.oHyPmygJ-lkp@intel.com>
+References: <20250309093930.1359048-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 00/16] Introduce and use generic parity16/32/64 helper
-To: Kuan-Wei Chiu <visitorckw@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>
-Cc: David Laight <david.laight.linux@gmail.com>,
- Andrew Cooper <andrew.cooper3@citrix.com>,
- Laurent.pinchart@ideasonboard.com, airlied@gmail.com,
- akpm@linux-foundation.org, alistair@popple.id.au, andrew+netdev@lunn.ch,
- andrzej.hajda@intel.com, arend.vanspriel@broadcom.com,
- awalls@md.metrocast.net, bp@alien8.de, bpf@vger.kernel.org,
- brcm80211-dev-list.pdl@broadcom.com, brcm80211@lists.linux.dev,
- dave.hansen@linux.intel.com, davem@davemloft.net, dmitry.torokhov@gmail.com,
- dri-devel@lists.freedesktop.org, eajames@linux.ibm.com, edumazet@google.com,
- eleanor15x@gmail.com, gregkh@linuxfoundation.org, hverkuil@xs4all.nl,
- jernej.skrabec@gmail.com, jk@ozlabs.org, joel@jms.id.au,
- johannes@sipsolutions.net, jonas@kwiboo.se, jserv@ccns.ncku.edu.tw,
- kuba@kernel.org, linux-fsi@lists.ozlabs.org, linux-input@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mtd@lists.infradead.org, linux-serial@vger.kernel.org,
- linux-wireless@vger.kernel.org, linux@rasmusvillemoes.dk,
- louis.peens@corigine.com, maarten.lankhorst@linux.intel.com,
- mchehab@kernel.org, mingo@redhat.com, miquel.raynal@bootlin.com,
- mripard@kernel.org, neil.armstrong@linaro.org, netdev@vger.kernel.org,
- oss-drivers@corigine.com, pabeni@redhat.com,
- parthiban.veerasooran@microchip.com, rfoss@kernel.org, richard@nod.at,
- simona@ffwll.ch, tglx@linutronix.de, tzimmermann@suse.de, vigneshr@ti.com,
- x86@kernel.org, yury.norov@gmail.com
-References: <4732F6F6-1D41-4E3F-BE24-E54489BC699C@zytor.com>
- <efc2ee9d-5382-457f-b471-f3c44b81a190@citrix.com>
- <5A790652-1B22-4D13-AAC5-5D9931E90903@zytor.com>
- <20250307195310.58abff8c@pumpkin>
- <EB85C3C1-8A0D-4CB9-B501-BFEABDF3E977@zytor.com>
- <Z824SgB9Dt5zdWYc@visitorckw-System-Product-Name>
-Content-Language: en-US
-From: Jiri Slaby <jirislaby@kernel.org>
-Autocrypt: addr=jirislaby@kernel.org; keydata=
- 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
-In-Reply-To: <Z824SgB9Dt5zdWYc@visitorckw-System-Product-Name>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250309093930.1359048-1-edumazet@google.com>
 
-On 09. 03. 25, 16:48, Kuan-Wei Chiu wrote:
-> Would this work for everyone?
+Hi Eric,
 
-+1 for /me.
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on net/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/net-lapbether-use-netdev_lockdep_set_classes-helper/20250309-174127
+base:   net/main
+patch link:    https://lore.kernel.org/r/20250309093930.1359048-1-edumazet%40google.com
+patch subject: [PATCH net] net: lapbether: use netdev_lockdep_set_classes() helper
+config: i386-buildonly-randconfig-004-20250309 (https://download.01.org/0day-ci/archive/20250310/202503100139.oHyPmygJ-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250310/202503100139.oHyPmygJ-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202503100139.oHyPmygJ-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> drivers/net/wan/lapbether.c:42:10: fatal error: net/netdev_lock.h: No such file or directory
+      42 | #include <net/netdev_lock.h>
+         |          ^~~~~~~~~~~~~~~~~~~
+   compilation terminated.
+
+
+vim +42 drivers/net/wan/lapbether.c
+
+    41	
+  > 42	#include <net/netdev_lock.h>
+    43	#include <net/x25device.h>
+    44	
 
 -- 
-js
-suse labs
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
