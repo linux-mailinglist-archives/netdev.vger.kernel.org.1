@@ -1,199 +1,206 @@
-Return-Path: <netdev+bounces-173232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5127EA5806D
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 04:03:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F8CBA58078
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 04:21:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FC8F3AF252
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 03:03:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A254D3AFAB9
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 03:21:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2780543146;
-	Sun,  9 Mar 2025 03:03:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B873417543;
+	Sun,  9 Mar 2025 03:21:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ST8n8/nj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2065.outbound.protection.outlook.com [40.107.223.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7157B17BD6
-	for <netdev@vger.kernel.org>; Sun,  9 Mar 2025 03:03:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741489404; cv=none; b=P1Zu4Xu24YeuGw5+saAWjUXAICM2G0M3KXzLNoZXKW+YY7+o+rJrgWREbbzKV92UT2ZOvFqIPo/CVeHGVbo2VYjPQ8Y9E6AETrzPh2Rs4t0kbqEidUJ26DZr1ybSX/1FjREg3VER4DtwcBVPVrOn7iAUBXlxB4puV1sIwzT1xQY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741489404; c=relaxed/simple;
-	bh=n0y9uXzRp4nd2UEuB/QpG5DfKUfIZlVoT2ko8vRMXtQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=IO99Ki2cHVVU9DFVbySWMPh1x3KkltxMaYMc5kn+oopU/vOrFr6cS5I2p0JnD/3SC2d6X7qwjr4pCv0GEk8PZTx0LrSpin3tynDXVOz6dPO2mj/z0mxZN7H2oJxfzRE07mEYhc+Xo84JzJK0Apt88sctiyfa+4lyygQc3Jd2Gzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3d44dc8a9b4so7365125ab.3
-        for <netdev@vger.kernel.org>; Sat, 08 Mar 2025 19:03:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741489401; x=1742094201;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=W7lI9vq0dCiuVwqTWFXCoyyGJs3SP4CmmE1ZX50lz3Q=;
-        b=Fffomtxlu7a7wZn59qy75JYOFELWHLn4Nr7/rCdqKCAmNF354zUtxRhedxEQGuI8QN
-         jm/HR0wExg9EextzB5OWp6Y4ZxOsJB8tsfcqdPCeOhpCDigsjcg/QlBEadWTHdE5evhR
-         l12gwFmiuWme14JWpyFqU3a5mba9R3FJTq/tjof/w09t1GT9+3isQRD492outRwsWV+N
-         LXJRBTKdS1kQ/dGfpZcPe8ulNN69RN9dr1R4QHZDx485Sar/g2a8p44HmnLXeSFviXof
-         5VM2wSIL79zO625a8kGXsiYekT0eyM1uMN0OZcpNoQjSYZbBqj1gnt8ybFzwu8WcCVM2
-         fa4w==
-X-Forwarded-Encrypted: i=1; AJvYcCUJEcDTPAAwSD/Raf1IMDjC2cLhUj5rZ3a0DgbNxp2/k/EXTwTce/xUVGyOQ0cZ6DhA1PWfUhU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtrF0NB6y+qFN5C/xMi52OkIx8FiYSaPVEs+lmO4qtKBgz8dkY
-	x67HVxmZKGcaWmdcQ5YzHSb8mD5GbQ3HgN7YD+PuW80E5VqM2MZC0mqPSkFk6LJ7lXAPlCl3LtR
-	vmoHA7xFZoPm+l3V1bEoR7j9n6pJk1ymydx+FARTM2EcXT262Bx61UgU=
-X-Google-Smtp-Source: AGHT+IG867GCeldxqxyB1InYkZ1OBi1osD2Tik2lnZoVzU4Xgi45W3Oz0WkqfyHunVkvAFKAMJAxoOR3M3Fnhirt4SMnNljpgZNz
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15807168DA;
+	Sun,  9 Mar 2025 03:21:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.65
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741490505; cv=fail; b=bFeAc8uddGV6sR68f5ZgvZPHKCugwbWBbg+sUz9XnNPh5iFD9+rej0A4rfuSNFZVawS5qoujRpywN0K80rtAzr9WyiKJfnZw+uei3Zi1qkd2AdFveslsc9v/Bf1sa7nmDEnFMwRtXYpAyreLbLuddlEYwMQ0PEuVVk9XAIL4Qo8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741490505; c=relaxed/simple;
+	bh=Idn7J/pKfXwDfw/zPIRn08takwiBp6KcOnntK/OzDJ8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=WIrEpvG27jFX4dCXQo05Chvkyt0NcdDeMQTMQ1HertIrvoTg+oNLO8Er9wReHIppqONnM2XVtgUCR/0upGpjcGkuO1eL1QIemBhAkaq9aQAPcjJl4n1F8WRXb3kCl43Dbj8Bbc7/cgOH1vnsT6bEED4VytPbRK9IsJeOfwLZql4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ST8n8/nj; arc=fail smtp.client-ip=40.107.223.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=KUl0X0BGQicWfde5wI4oWs4aS8+9b+FXWBzD7HS6vh/tQvGKgU9gaD7EYsQfjZvguideEbUzFTiEXPHnPDNbp3oV98uvRcI4FwazWtYoaRxh54+AkHFyKtYCPaHyMr20b+G4ucGxRQPWOhhWDSzSVJSiM3nuYs9bBHeYiAJJAvfMmXESziMloz2k6xWZdPLIq0nfOdihVu05nX2wbEuJfOpZPRHc4LBsOR2GInvJn1jMXpRhE2KpR36XZ9gngM4gx4B0cq+Tw5vf46Nls2nZDP1PyI71ydtE6mHsLWGKV4dMTt+DQZ13mIOCrQa31e0INXlDbfMjZtnCE+L4RWzTeA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Idn7J/pKfXwDfw/zPIRn08takwiBp6KcOnntK/OzDJ8=;
+ b=o8SPgqytYZZwfjyn0fVEPZj6fiXW6KKFaTSM2Q7Hf5WKP4H8xMzpXDYvuj3Lgj80Y7OW0buHuPGLeA74N0hhiNfJyHmz5knM9SIGL0g6HaVo/4nhdiNwEIQiqpUFy4Y3zwRKk86ZY4DwvLrDbN+AspCMod+huxRSI1Yt1ZkLmpsZWfTxIEyzincqWJPv8Uw2ymrG4sYbGzJ/1EV34q2FDm48NZtj42XnApgxxs1YFwMKOXRDLFfxzoK3I5p83ih6QzZ6wQ+bXrmS+LQQwoxs4dP7zgc4cXBBaHmGHQXsJx7PIDcq7W9raxv/4tDSBbSVVXqw7uxUVwAZ/MJV9Mm2Vw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Idn7J/pKfXwDfw/zPIRn08takwiBp6KcOnntK/OzDJ8=;
+ b=ST8n8/njo+T18tr02i3Pp0s/T6V1A79B+86OrLmDZrrQc0hpG7A44tOHLW73Pp035/BKVdCVeFlpECIhQ/PwVj1TWxagaRV0q10Hjg/l8xgxeF9K1XaMLKf/qhcJpvNgxP6LJKWBEIFBvx8UCFmcvK3epWo0D9qqhCnco5JjqugtiJW/kdIndUw+tct+rkkaP9YrqTLCQ770BGKnfX7mWQbkkZPeNHyuKU3GoCHwycbaFtKOiZaMcYhl6UkjWMC0RN/0fC3Gtvn52F5/7jAms5hrUSGIDgzs5t6TT13rK/OVM8uZKgoTHxCeR+7AZa4B4L8Y32+P4ScnlYZAGGGEQA==
+Received: from CY8PR12MB7195.namprd12.prod.outlook.com (2603:10b6:930:59::11)
+ by BY5PR12MB4210.namprd12.prod.outlook.com (2603:10b6:a03:203::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.26; Sun, 9 Mar
+ 2025 03:21:38 +0000
+Received: from CY8PR12MB7195.namprd12.prod.outlook.com
+ ([fe80::c06c:905a:63f8:9cd]) by CY8PR12MB7195.namprd12.prod.outlook.com
+ ([fe80::c06c:905a:63f8:9cd%3]) with mapi id 15.20.8511.023; Sun, 9 Mar 2025
+ 03:21:37 +0000
+From: Parav Pandit <parav@nvidia.com>
+To: Leon Romanovsky <leon@kernel.org>, Nikolay Aleksandrov
+	<nikolay@enfabrica.net>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"shrijeet@enfabrica.net" <shrijeet@enfabrica.net>, "alex.badea@keysight.com"
+	<alex.badea@keysight.com>, "eric.davis@broadcom.com"
+	<eric.davis@broadcom.com>, "rip.sohan@amd.com" <rip.sohan@amd.com>,
+	"dsahern@kernel.org" <dsahern@kernel.org>, "bmt@zurich.ibm.com"
+	<bmt@zurich.ibm.com>, "roland@enfabrica.net" <roland@enfabrica.net>,
+	"winston.liu@keysight.com" <winston.liu@keysight.com>,
+	"dan.mihailescu@keysight.com" <dan.mihailescu@keysight.com>,
+	"kheib@redhat.com" <kheib@redhat.com>, "parth.v.parikh@keysight.com"
+	<parth.v.parikh@keysight.com>, "davem@redhat.com" <davem@redhat.com>,
+	"ian.ziemba@hpe.com" <ian.ziemba@hpe.com>,
+	"andrew.tauferner@cornelisnetworks.com"
+	<andrew.tauferner@cornelisnetworks.com>, "welch@hpe.com" <welch@hpe.com>,
+	"rakhahari.bhunia@keysight.com" <rakhahari.bhunia@keysight.com>,
+	"kingshuk.mandal@keysight.com" <kingshuk.mandal@keysight.com>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, Jason Gunthorpe
+	<jgg@nvidia.com>
+Subject: RE: [RFC PATCH 00/13] Ultra Ethernet driver introduction
+Thread-Topic: [RFC PATCH 00/13] Ultra Ethernet driver introduction
+Thread-Index: AQHbjuwTiXdUl3rkakim9XZbHzbYobNplw8AgACPWvA=
+Date: Sun, 9 Mar 2025 03:21:37 +0000
+Message-ID:
+ <CY8PR12MB7195F4D67BE6D9A970044572DCD72@CY8PR12MB7195.namprd12.prod.outlook.com>
+References: <20250306230203.1550314-1-nikolay@enfabrica.net>
+ <20250308184650.GV1955273@unreal>
+In-Reply-To: <20250308184650.GV1955273@unreal>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CY8PR12MB7195:EE_|BY5PR12MB4210:EE_
+x-ms-office365-filtering-correlation-id: 37dd5910-7ffb-4ab5-9e5f-08dd5eb980a9
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|7416014|366016|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?XcOmKNFUy8Mhj+8GXkm/5R7HNl4+HmaiMtXAcRxl42ySSv6Pm6Nt443cSMt1?=
+ =?us-ascii?Q?6ulvCktovKb3ywK9EEqejpOoc9oz0YkgXvTkIxt4FtIOW1X9O1GBxQ0mqbXr?=
+ =?us-ascii?Q?dk5oW75OacnMsC2G/ArZxVR4WvH/vfdq5TTNpKgXCkyBgi3FpFgsHHkjORt/?=
+ =?us-ascii?Q?evSowBfodaDNft7G3AORzJDtYgc+IPLas9k22BzjATxrwxm1Qu7ZN4rrvXfG?=
+ =?us-ascii?Q?CmVvc//C57GH8CcpMLVrMlApHIB0Y/0VtAw1SiB8YDxdV9SGTuoT5Fb8y9s5?=
+ =?us-ascii?Q?Y9q76cbsRu2nsYO7il6hFmjOsePWMKdOtC7nnTFV36k5C5U2d6W4V3z1gHZq?=
+ =?us-ascii?Q?Gf4wn+IxYAip7fzUCfL+dwPsA8yPLxkjsZBdMYqWQhMYAttlkNNqgJZ21+YJ?=
+ =?us-ascii?Q?GMAnn/gJKtElmIdmQOUAlOlZ0gjkuT4PBtRvG18ybrn/s8CBH5DapN9kKNjT?=
+ =?us-ascii?Q?lmROQD03ZLg3kzRemG0ca/epvm253MDkek12c1BdElX9F0b2/QUdCQ7d/N+k?=
+ =?us-ascii?Q?/V0CjTq67D77yFeAzJb8uX0Z3qW10zDyL9vpAGdFl9ckiKtWgkcQhvBb5dJd?=
+ =?us-ascii?Q?iKwicyP0yRNDSPeRCzb9cf0UXfUG62u31H+9uAoQe23vp2H5NU5b2gWcRIv7?=
+ =?us-ascii?Q?PmzW2WsOpg1JXg/bDixrZIS2zu2C6StRTFVL2kJcvORopaEu/+T9z5Bn2VA/?=
+ =?us-ascii?Q?dACGBC4BIsnwmzWpaDjX+SwIX4HUKZshZ5oYv315+mzrLLzFIOFnhy/Ri4PW?=
+ =?us-ascii?Q?eKBQHra1PB6O//lzuUd1C+dLb4gm8vvOsiAztnfyp+WIcsN+4S0R7R5yOVpc?=
+ =?us-ascii?Q?16gNg9ZGoJbJPP04YgTh/hTXzin1H5joTgWZ4pdhanG7Hq7IJWcQByFE2aKF?=
+ =?us-ascii?Q?wHU+17VM+FAYPlJXvCEqHRy8e8yiWvfZ3aUDlElNEsUqXSs4pSLYi0EVhjta?=
+ =?us-ascii?Q?+E4L/3Ahh3C6Fi76D9SfHnQr9s6qfu4nNCq+y6Azzfz5y/JSHVuZ+N9pyQA2?=
+ =?us-ascii?Q?ufHhPlHGeb9hS7TR2jNRSb9xCJRzFeQAyEJzmAKd2GH33C0Id4oOu3UJU87k?=
+ =?us-ascii?Q?EtjMmehPyilke6JuC5wuZk12tV1WGI9vPSDSbK+eFtgF2tHy12ADJgM58hH6?=
+ =?us-ascii?Q?OwUPVQTxZPYAXYLiJ9BpD2ZvcytrovFXc55H/bWkMhv8fpQk2QIYbeLCPKjN?=
+ =?us-ascii?Q?j4VpG/nUTC7A6O9APuofzIHggz1xgQ9+nBVHlfUsYFgINKA1wSHIKWav33P1?=
+ =?us-ascii?Q?0h56FBZPjA7A8NiIb/3cWoNPAO0UcJuJhrGdEUledJeZ4khAWEYwwb/sRDI/?=
+ =?us-ascii?Q?C6ZEFf5pFUsNQgGNtaQ1YytNrWLuf/4l15p1ubjzm/aVTE/uzkplcQ/b/zDX?=
+ =?us-ascii?Q?LQsEanY5rM9FCM/IfVYY6G8iGQ01TvGqrL7//EIYwVrjcggeuNA/donA1bPH?=
+ =?us-ascii?Q?7Jc+av8CL4M7bzZspKLGrWtAEPrlVolm?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB7195.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?q9373WsRx1yF/RCmOWV2Am/O+mQvVmdfUZriRPwZpwIUhxJX1Imue2ICqZPx?=
+ =?us-ascii?Q?s4UPj15/Tzl3TSsbv/f+6YNl4TsD24uEx22R+GtRxEO0L76cJv0YndFzfUUR?=
+ =?us-ascii?Q?68n18NRAGtc7KKu+4yqTkZdLNKGG8GbFB+c2KF3wbgn2gFZV6SBst7M2iyXt?=
+ =?us-ascii?Q?uN+CHHTzjh8c/W1/1rlhAYgjz1nvWaVWLkrVHnKwCJy6ucowSN3Xi+9T3/w7?=
+ =?us-ascii?Q?9hqozKST8OHB6SEmZlf6xpyZDC0oNkSkDwMIaSdLR8Hm7/yDXOgqc+lnBDr4?=
+ =?us-ascii?Q?9//yBcGXe1VEcCRey00xlVX6wou25mnL5qbPTDg8gE/JMs8+01X91tKZ7+3h?=
+ =?us-ascii?Q?MUCvcrtwsVuyVLXCw71pS6LY85zLGgRa0piscj8PXJKpyoGDkKkJqfh7utFr?=
+ =?us-ascii?Q?UiwkDtnO5CYtbz9N0SEhl8sU8kzwDRTsx80ZcE4vnBgyduGcFxpu9z4JTdC7?=
+ =?us-ascii?Q?lzJXGDiHdbm+OJ1yCgYKZjuwRz6/WlfiJrVRx4XubQYoBwK5JsI7utwTErTZ?=
+ =?us-ascii?Q?H+GLw5hftc6KIxoVdQJE+RyEuZfGfYNajCPUCD1xamd8TRNJOJE/lyPflGdF?=
+ =?us-ascii?Q?VtDtJsG5bzjo2fFaOiG+Gfe+0zhmzDqrdVqdyeRkt9AezSWNFs4tKrPYNF3H?=
+ =?us-ascii?Q?n0A9zekHRYaMzBAVfSSja8RFAfQrhUtO3qCSV5Gd5Fud15iNRIvev17J9S/I?=
+ =?us-ascii?Q?PeXx9SGvVyEjEC8zGRQOdAwcG7xLToNSbFTyhSRFYKLP9pveUNn96QWQUeBF?=
+ =?us-ascii?Q?ogb5ZOwtfwzmKbYMKe771qgIfMCdL4smUyERWn64C5U3n6+DXNA8E52t1UlF?=
+ =?us-ascii?Q?cGbLKDyFpp2QS6+N8fwU3OCPxAB6xridDr0WHhPEaOb2VV3MVqv5wAYlSK5V?=
+ =?us-ascii?Q?CnQuCUrhZioyVGGftIyokoHmrw0DkA7LRQrIwhPQZ/1z966l/miS5TNUWS35?=
+ =?us-ascii?Q?ZpTz3Hrk5rvO+Fu5hn03CfKYhjlMeJI0cX49PoBYd73v8R63ITA+SsPHdlDi?=
+ =?us-ascii?Q?PbUEqJANP3LGtn4tw3dhqLW1uFFlcS/yucBBLbIPVCRrEWv6QpMdl0VMAuvK?=
+ =?us-ascii?Q?dhelKff7ACqC2wnc9tqFP5SrErjec6vv1jIT9AmoEXmj4wV3EZCXR5bToliw?=
+ =?us-ascii?Q?rXE2TgVceExQJhSHWizWbuoR+67IAGHzAdITwHjkpJz17ZDEoYDH5nrmYKMz?=
+ =?us-ascii?Q?5nqtJ2XZnZ8ywu0HdOg+8foixW5zvc1a6VFUqPNkMUUMH7UByKvU0jKU36eO?=
+ =?us-ascii?Q?htAJhcdHx5whT8w22einn288dnlNr/ubMLI68MAaMjF6k0fON2C5s7CKBJ85?=
+ =?us-ascii?Q?+DIML6YloNNQ4B+AVtKCbBRx8JI8jio3Dlr1OooEVKf6FMo8/nyY+hxiQakc?=
+ =?us-ascii?Q?5kYdDxqfVhO+K2BjooYuA52VdSeupfoiSGe/4vLg0hlWUhn4bifhhpUIJOyA?=
+ =?us-ascii?Q?WcbiTtBCLxSdtMVAOOKMReMtpo4AXmhYOntEQOytliPTqNJPyOEEvVdekPTn?=
+ =?us-ascii?Q?fwsUCJKkR4Ts8jFnTCNHbQUC5zh0H1ggzCgEx5Wlr/NDnWMLzbvFQPMGEesh?=
+ =?us-ascii?Q?bKzCsr4D9mIqAxJ9mXo=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:11:b0:3cf:b87b:8fd4 with SMTP id
- e9e14a558f8ab-3d441a00284mr120387625ab.15.1741489401571; Sat, 08 Mar 2025
- 19:03:21 -0800 (PST)
-Date: Sat, 08 Mar 2025 19:03:21 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67cd04f9.050a0220.14db68.006e.GAE@google.com>
-Subject: [syzbot] [netfilter?] KMSAN: uninit-value in __nf_conncount_add
-From: syzbot <syzbot+83fed965338b573115f7@syzkaller.appspotmail.com>
-To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    48a5eed9ad58 Merge tag 'devicetree-fixes-for-6.14-2' of gi..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=174d8078580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=1d47ea4b9912d894
-dashboard link: https://syzkaller.appspot.com/bug?extid=83fed965338b573115f7
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: i386
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/e13258230ff9/disk-48a5eed9.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/b84f07fdcdb7/vmlinux-48a5eed9.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/9860005c79df/bzImage-48a5eed9.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+83fed965338b573115f7@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in find_or_evict net/netfilter/nf_conncount.c:117 [inline]
-BUG: KMSAN: uninit-value in __nf_conncount_add+0xd9c/0x2850 net/netfilter/nf_conncount.c:143
- find_or_evict net/netfilter/nf_conncount.c:117 [inline]
- __nf_conncount_add+0xd9c/0x2850 net/netfilter/nf_conncount.c:143
- count_tree net/netfilter/nf_conncount.c:438 [inline]
- nf_conncount_count+0x82f/0x1e80 net/netfilter/nf_conncount.c:521
- connlimit_mt+0x7f6/0xbd0 net/netfilter/xt_connlimit.c:72
- __nft_match_eval net/netfilter/nft_compat.c:403 [inline]
- nft_match_eval+0x1a5/0x300 net/netfilter/nft_compat.c:433
- expr_call_ops_eval net/netfilter/nf_tables_core.c:240 [inline]
- nft_do_chain+0x426/0x2290 net/netfilter/nf_tables_core.c:288
- nft_do_chain_ipv4+0x1a5/0x230 net/netfilter/nft_chain_filter.c:23
- nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
- nf_hook_slow+0xf4/0x400 net/netfilter/core.c:626
- nf_hook_slow_list+0x24d/0x860 net/netfilter/core.c:663
- NF_HOOK_LIST include/linux/netfilter.h:350 [inline]
- ip_sublist_rcv+0x17b7/0x17f0 net/ipv4/ip_input.c:633
- ip_list_rcv+0x9ef/0xa40 net/ipv4/ip_input.c:669
- __netif_receive_skb_list_ptype net/core/dev.c:5936 [inline]
- __netif_receive_skb_list_core+0x15c5/0x1670 net/core/dev.c:5983
- __netif_receive_skb_list net/core/dev.c:6035 [inline]
- netif_receive_skb_list_internal+0x1085/0x1700 net/core/dev.c:6126
- netif_receive_skb_list+0x5a/0x460 net/core/dev.c:6178
- xdp_recv_frames net/bpf/test_run.c:280 [inline]
- xdp_test_run_batch net/bpf/test_run.c:361 [inline]
- bpf_test_run_xdp_live+0x2e86/0x3480 net/bpf/test_run.c:390
- bpf_prog_test_run_xdp+0xf1d/0x1ae0 net/bpf/test_run.c:1316
- bpf_prog_test_run+0x5e5/0xa30 kernel/bpf/syscall.c:4407
- __sys_bpf+0x6aa/0xd90 kernel/bpf/syscall.c:5813
- __do_sys_bpf kernel/bpf/syscall.c:5902 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5900 [inline]
- __ia32_sys_bpf+0xa0/0xe0 kernel/bpf/syscall.c:5900
- ia32_sys_call+0x394d/0x4180 arch/x86/include/generated/asm/syscalls_32.h:358
- do_syscall_32_irqs_on arch/x86/entry/common.c:165 [inline]
- __do_fast_syscall_32+0xb0/0x110 arch/x86/entry/common.c:387
- do_fast_syscall_32+0x38/0x80 arch/x86/entry/common.c:412
- do_SYSENTER_32+0x1f/0x30 arch/x86/entry/common.c:450
- entry_SYSENTER_compat_after_hwframe+0x84/0x8e
-
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:4121 [inline]
- slab_alloc_node mm/slub.c:4164 [inline]
- kmem_cache_alloc_noprof+0x915/0xe10 mm/slub.c:4171
- insert_tree net/netfilter/nf_conncount.c:372 [inline]
- count_tree net/netfilter/nf_conncount.c:450 [inline]
- nf_conncount_count+0x1415/0x1e80 net/netfilter/nf_conncount.c:521
- connlimit_mt+0x7f6/0xbd0 net/netfilter/xt_connlimit.c:72
- __nft_match_eval net/netfilter/nft_compat.c:403 [inline]
- nft_match_eval+0x1a5/0x300 net/netfilter/nft_compat.c:433
- expr_call_ops_eval net/netfilter/nf_tables_core.c:240 [inline]
- nft_do_chain+0x426/0x2290 net/netfilter/nf_tables_core.c:288
- nft_do_chain_ipv4+0x1a5/0x230 net/netfilter/nft_chain_filter.c:23
- nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
- nf_hook_slow+0xf4/0x400 net/netfilter/core.c:626
- nf_hook_slow_list+0x24d/0x860 net/netfilter/core.c:663
- NF_HOOK_LIST include/linux/netfilter.h:350 [inline]
- ip_sublist_rcv+0x17b7/0x17f0 net/ipv4/ip_input.c:633
- ip_list_rcv+0x9ef/0xa40 net/ipv4/ip_input.c:669
- __netif_receive_skb_list_ptype net/core/dev.c:5936 [inline]
- __netif_receive_skb_list_core+0x15c5/0x1670 net/core/dev.c:5983
- __netif_receive_skb_list net/core/dev.c:6035 [inline]
- netif_receive_skb_list_internal+0x1085/0x1700 net/core/dev.c:6126
- netif_receive_skb_list+0x5a/0x460 net/core/dev.c:6178
- xdp_recv_frames net/bpf/test_run.c:280 [inline]
- xdp_test_run_batch net/bpf/test_run.c:361 [inline]
- bpf_test_run_xdp_live+0x2e86/0x3480 net/bpf/test_run.c:390
- bpf_prog_test_run_xdp+0xf1d/0x1ae0 net/bpf/test_run.c:1316
- bpf_prog_test_run+0x5e5/0xa30 kernel/bpf/syscall.c:4407
- __sys_bpf+0x6aa/0xd90 kernel/bpf/syscall.c:5813
- __do_sys_bpf kernel/bpf/syscall.c:5902 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5900 [inline]
- __ia32_sys_bpf+0xa0/0xe0 kernel/bpf/syscall.c:5900
- ia32_sys_call+0x394d/0x4180 arch/x86/include/generated/asm/syscalls_32.h:358
- do_syscall_32_irqs_on arch/x86/entry/common.c:165 [inline]
- __do_fast_syscall_32+0xb0/0x110 arch/x86/entry/common.c:387
- do_fast_syscall_32+0x38/0x80 arch/x86/entry/common.c:412
- do_SYSENTER_32+0x1f/0x30 arch/x86/entry/common.c:450
- entry_SYSENTER_compat_after_hwframe+0x84/0x8e
-
-CPU: 0 UID: 0 PID: 15694 Comm: syz.1.15735 Tainted: G        W          6.14.0-rc5-syzkaller-00016-g48a5eed9ad58 #0
-Tainted: [W]=WARN
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-=====================================================
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB7195.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 37dd5910-7ffb-4ab5-9e5f-08dd5eb980a9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Mar 2025 03:21:37.6540
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: F61vss6lfOGXXUoCTH192RtoIHt+fjC5anzy1N5UXZ8SL14T0mCCKaZjCUhyEOpmqL2N5xiifsd65ygCecZAwQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4210
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> From: Leon Romanovsky <leon@kernel.org>
+> Sent: Sunday, March 9, 2025 12:17 AM
+>=20
+> On Fri, Mar 07, 2025 at 01:01:50AM +0200, Nikolay Aleksandrov wrote:
+> > Hi all,
+>=20
+> <...>
+>=20
+> > Ultra Ethernet is a new RDMA transport.
+>=20
+> Awesome, and now please explain why new subsystem is needed when
+> drivers/infiniband already supports at least 5 different RDMA transports
+> (OmniPath, iWARP, Infiniband, RoCE v1 and RoCE v2).
+>=20
+6th transport is drivers/infiniband/hw/efa (srd).
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+> Maybe after this discussion it will be very clear that new subsystem is n=
+eeded,
+> but at least it needs to be stated clearly.
+>=20
+> An please CC RDMA maintainers to any Ultra Ethernet related discussions a=
+s it
+> is more RDMA than Ethernet.
+>=20
+> Thanks
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
