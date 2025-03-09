@@ -1,80 +1,104 @@
-Return-Path: <netdev+bounces-173353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D844A58667
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 18:44:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20109A58669
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 18:45:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA8551881181
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 17:44:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AFCC17A3421
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 17:44:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E530C1DF256;
-	Sun,  9 Mar 2025 17:44:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6C751DE88B;
+	Sun,  9 Mar 2025 17:45:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iPdbdrRL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HB9QplTG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC3371CAA76
-	for <netdev@vger.kernel.org>; Sun,  9 Mar 2025 17:44:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23123F4F1;
+	Sun,  9 Mar 2025 17:45:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741542259; cv=none; b=jA2WKmo2Wk0SQ4LjkhUcX8g3SwEO/BPMCiwTMiIj1fNORwsyanf+Y1Mmo5woIaYy8gjnImzhS4Dfy5DHQH0ALxlDAYdLQQenJJN2/4Kop1RLi+gSbAoAJefyP6gjSU86sd3+i7ECCGrFBnwptEf2drM86An7iNk5yI3IsjlYHTI=
+	t=1741542351; cv=none; b=PhyHle9YucD2x8BdM0DIVbE/e/YjKakL+QAnwlHPKNIIZ98O7jgkC2HF3FjnWHdpEELG83mjrnSO8EBQi9bc1e4f0XiFB60yd5oZV7gnClWmjOK70okTR7nH2VP05c3T8/CmdJo4IuMgDQDqOCHiRBEU13O+f1jfkJmSblBSjHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741542259; c=relaxed/simple;
-	bh=MZFrbPDZGE4WNjB0lXEiGCpTm6y6Xwi3WYpwVwOprME=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QfNI/GggzXr5MkapLCaPgJ4xq+mXTV2TQ+5GexNS1uyPivoG5N2MDiY2rPzmgfyvHQ5wzE7lPjwxCOiKkl+9JAo4auynrP+DMwDUjrwXdWL32EqKZf3bSvWt4wJGvIbwbpaQUrEvrFRSWO3tDaTVJrm1ClJHIFy92ZHJEEwdx2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iPdbdrRL; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741542258; x=1773078258;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=MZFrbPDZGE4WNjB0lXEiGCpTm6y6Xwi3WYpwVwOprME=;
-  b=iPdbdrRLjNh0AiJxdY+J+Og6waJmxizesYfbznREOs3e5ygLXvpd9oFh
-   AHpsKT2dgbIKCaRS58JZedPwstt17O0RRK+owFUF+U7a+rvsKFxH+OMhQ
-   fJK9N2pK/rxrQ8nt4TQii8uezXm1LNSZDKhEl+Xu2j4djqdoP13UPAEb+
-   dTbT3zHFG71bpE+E83qrJ2Qn57pzVxDFSBn2yXlO3b2R1MuSfYZaEYpLE
-   9ZYsu0e6PE51anvWTTwRYhfZj0utRHnsXuknn9XP16alry5m5YESzT8Tk
-   IXauq+es3oK6kq8oR4neJ9NuyiAXcRSFEgciMqLYgkOi0uxfM4ey0Rxuy
-   Q==;
-X-CSE-ConnectionGUID: lhDK8CnJTgWYDYUXLsiHjg==
-X-CSE-MsgGUID: Fs0OUDH1TLuiX8BPPwYQzg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11368"; a="45332792"
-X-IronPort-AV: E=Sophos;i="6.14,234,1736841600"; 
-   d="scan'208";a="45332792"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2025 10:44:17 -0700
-X-CSE-ConnectionGUID: LnNh3bERT0qEUK+qPgGTCg==
-X-CSE-MsgGUID: HKWD8dl0Simz2qNe1UR2bg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,234,1736841600"; 
-   d="scan'208";a="124708920"
-Received: from lkp-server02.sh.intel.com (HELO a4747d147074) ([10.239.97.151])
-  by orviesa003.jf.intel.com with ESMTP; 09 Mar 2025 10:44:14 -0700
-Received: from kbuild by a4747d147074 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1trKh9-0003L6-27;
-	Sun, 09 Mar 2025 17:44:11 +0000
-Date: Mon, 10 Mar 2025 01:43:30 +0800
-From: kernel test robot <lkp@intel.com>
-To: Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, Simon Horman <horms@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>,
-	syzbot+377b71db585c9c705f8e@syzkaller.appspotmail.com
-Subject: Re: [PATCH net] net: lapbether: use netdev_lockdep_set_classes()
- helper
-Message-ID: <202503100139.oHyPmygJ-lkp@intel.com>
-References: <20250309093930.1359048-1-edumazet@google.com>
+	s=arc-20240116; t=1741542351; c=relaxed/simple;
+	bh=Ts4nRRhjYyME+pC7r6xMDOAjdA6nK3OzbkGfMevUYTw=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZVZO8P1b1yU5/Yf3n7zMAgRmi5i/fO02xD39GmGiLJWNZlkJU++lkvibWfJaG3JkxB6TyOlOPw8Z0gbQ2dcw9y/vV5YWCSRLFftSLpvvHZO43IO00ZyG33SDwr7bnEjGnwVCcxypd1EgxRyG2Gbf0itrpJTBM991md+jx3KD9D0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HB9QplTG; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-438a39e659cso19444745e9.2;
+        Sun, 09 Mar 2025 10:45:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741542348; x=1742147148; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=mYVeDPxjhFeZxy0KwWJDY/eKgxnMZAxnPE/IYVsYVHI=;
+        b=HB9QplTGsXH27nqPQ8Y5IY1YVylqDo24WCnOWLL6CF61OwAge7VCx5eHJa9o2R0XNf
+         K2D0ip4rlJCyOok39f+De/KlTNpBQ2c1MMOEuQpQRulxIGMzjkTEmRfHP1ups+lqA3xN
+         p+hJi3yOgRPPYIRziU7D08N7+IFRcmjqMGnnPPLSskQnZed9KfIwmmpAC1ZfBXrkJzHt
+         i7GoeV9uPq5aSYckQgCMcw0kTbS7vptCRjHhrz04SP0Olb638PmZKa7twPMZoXOnFRX2
+         kylaFSWfFh9rSi2g4/nZiXvzoe+SNwFEI2OK0qmEIFhx8S7P4L/jhgi72HnGf22dsNjZ
+         Oa6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741542348; x=1742147148;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mYVeDPxjhFeZxy0KwWJDY/eKgxnMZAxnPE/IYVsYVHI=;
+        b=jW42SiZvW0InLg0oklmsmotbFyWe60Qu2ThZVso1w/OvqfrnldLyVeC6M55W5Y29R5
+         /YCFXIvRHXjX6pe03eLOaokz72Xpa2sn4YogvhiJjV0OHCpvI8EWAau6gL1gdrzhXsZ8
+         mgtL7+nO1Q8VThnE2L/vGaXsscpObUmgCZ8wzQuXfcmlT7xzLy8isJI9PXYOgnbEWX41
+         nDskVf5YhnCwV2h10m4EO74kTsFh/H5INucRG36viUJA5cPIuW5DQ+MbA3CL+oc3jLjl
+         4FYnhxHDfhcAnwTSZRhqmFTpfkAhRfAxhWMs1BE4van6fbgcZwa10zb8P4zcSmPwKefH
+         SKmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU58qDcWrPK2+uieHm3XlEtvTOEbhkgoPM9du7sZ5Yc36bRU1J6Pg/kZXtNc2sKRL6LcRDkTifuvOLs@vger.kernel.org, AJvYcCVxcUaLujUf8qStb84mXBM9Y1DMZu6ATWR1Krz5DHLq5qJ3C6qqgoJ8SHDng8m2weEfcItjcC/D@vger.kernel.org, AJvYcCWGQIkfeo4UCJ4puEGb5j5fIwdJx1kMKUZbaFvR0IyheH+3/G7roWfsQ9aaLLUE+gMnEbxKYHFowk9ap5fz@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6xlS0h70L9kL1edJajXjSr/t870M+wFttlU11aw1bHboZlOzf
+	WgPsgMcxstZOtUsaWHTK8KLOlq2K5wXlRlpqTd2y9UFe7DKt5ik9
+X-Gm-Gg: ASbGncsjP/cPyvD1V9svx0gRQZ5hZ2EFHj6igfNWV1ee3GILxX4i+Nz9kKNnCbw2i7A
+	JhmQ61LKOVQ7Unci0jIXo3peMiB2KxieZPVM0oBMez6LclR/5KC/8LlZa5swknktHE2bCi4zlpG
+	pipynWD2R6EmWAx2PayXtRlfU0WBG+dGwEZKlucYWfWdNaMFlpzy1aSg3YVoD4J+IFeIf4PY39K
+	UIUydt5xk48xLiARsBfemdqjgcsi6SJukulDF4CiWiMTfz6lB5mXFVcDVvUpmHOufuGFncw0P9f
+	eLkiDmEBQ8i5JSIyU0k0VY8jxKt2QF+onAdwG0UkUe6zdwtEGyUOxzMd3C3OvfYExJObZ0181xt
+	Z
+X-Google-Smtp-Source: AGHT+IGp7jEKMgtsCA2TGbrvYbtqFa4WUNvO5evZDxVuTRVZ2MCZ3kALyJRYRl99L7jGJPY9VOa7nA==
+X-Received: by 2002:a5d:64ce:0:b0:391:3bba:7f18 with SMTP id ffacd0b85a97d-3913bba8128mr2360645f8f.12.1741542346719;
+        Sun, 09 Mar 2025 10:45:46 -0700 (PDT)
+Received: from Ansuel-XPS. (93-34-90-129.ip49.fastwebnet.it. [93.34.90.129])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c102e01sm12708957f8f.93.2025.03.09.10.45.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Mar 2025 10:45:45 -0700 (PDT)
+Message-ID: <67cdd3c9.df0a0220.1c827e.b244@mx.google.com>
+X-Google-Original-Message-ID: <Z83TxxTXxVGMYZzu@Ansuel-XPS.>
+Date: Sun, 9 Mar 2025 18:45:43 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	upstream@airoha.com
+Subject: Re: [net-next PATCH v12 07/13] net: mdio: regmap: add support for
+ multiple valid addr
+References: <20250309172717.9067-1-ansuelsmth@gmail.com>
+ <20250309172717.9067-8-ansuelsmth@gmail.com>
+ <Z83RsW1_bzoEWheo@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,43 +107,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250309093930.1359048-1-edumazet@google.com>
+In-Reply-To: <Z83RsW1_bzoEWheo@shell.armlinux.org.uk>
 
-Hi Eric,
+On Sun, Mar 09, 2025 at 05:36:49PM +0000, Russell King (Oracle) wrote:
+> On Sun, Mar 09, 2025 at 06:26:52PM +0100, Christian Marangi wrote:
+> > +/* If a non empty valid_addr_mask is passed, PHY address and
+> > + * read/write register are encoded in the regmap register
+> > + * by placing the register in the first 16 bits and the PHY address
+> > + * right after.
+> > + */
+> > +#define MDIO_REGMAP_PHY_ADDR		GENMASK(20, 16)
+> > +#define MDIO_REGMAP_PHY_REG		GENMASK(15, 0)
+> 
+> Clause 45 PHYs have 5 bits of PHY address, then 5 bits of mmd address,
+> and then 16 bits of register address - significant in that order. Can
+> we adjust the mask for the PHY address later to add the MMD between
+> the PHY address and register number?
+>
 
-kernel test robot noticed the following build errors:
+Honestly to future proof this, I think a good idea might be to add
+helper to encode these info and use Clause 45 format even for C22.
+Maybe we can use an extra bit to signal if the format is C22 or C45.
 
-[auto build test ERROR on net/main]
+BIT(26) 0: C22 1:C45
+GENMASK(25, 21) PHY ADDR
+GENMASK(20, 16) MMD ADDR
+GENMASK(15, 0) REG
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/net-lapbether-use-netdev_lockdep_set_classes-helper/20250309-174127
-base:   net/main
-patch link:    https://lore.kernel.org/r/20250309093930.1359048-1-edumazet%40google.com
-patch subject: [PATCH net] net: lapbether: use netdev_lockdep_set_classes() helper
-config: i386-buildonly-randconfig-004-20250309 (https://download.01.org/0day-ci/archive/20250310/202503100139.oHyPmygJ-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250310/202503100139.oHyPmygJ-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202503100139.oHyPmygJ-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> drivers/net/wan/lapbether.c:42:10: fatal error: net/netdev_lock.h: No such file or directory
-      42 | #include <net/netdev_lock.h>
-         |          ^~~~~~~~~~~~~~~~~~~
-   compilation terminated.
-
-
-vim +42 drivers/net/wan/lapbether.c
-
-    41	
-  > 42	#include <net/netdev_lock.h>
-    43	#include <net/x25device.h>
-    44	
+What do you think?
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+	Ansuel
 
