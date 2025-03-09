@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-173274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4E7DA58434
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 14:24:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CC53A5843C
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 14:27:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BA5A3AD010
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 13:23:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7C43188BCF9
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 13:27:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5E4C1D9587;
-	Sun,  9 Mar 2025 13:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 618D81D88DB;
+	Sun,  9 Mar 2025 13:27:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dVz46CN7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cZ8TR84p"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07722136349;
-	Sun,  9 Mar 2025 13:23:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD7A4690
+	for <netdev@vger.kernel.org>; Sun,  9 Mar 2025 13:27:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741526634; cv=none; b=iLadkb/cLZECY93/3+UenK2YmLHxOuUJ/BnLF2fm7gUlGU5J9/neotwoOVv5UcYlH+6LGqbERyC0+/4NR67EerEpRE55/A4gB+F/qWE5jSLo0/aTSBc+KtX8Aky+IKV+X6wdQXf8CIFhGJQJ5MCG0RDBZJMubLGO9IV+DDSfdeo=
+	t=1741526851; cv=none; b=Ny1KaRgTaM/lgOtWKSnO+9WBm3YjwWJXk7TKi8g1Osbsmcm7lt+P3mANXpwmqcqynsQlk2eoLvD6/aN1o+ieHpb3oQ5YBnNJRjS5nRi/4Kjw7FRkdgUi7P8bPBPlsF9ocsxwLaaxTdaGfjf4KQIHNcmxhvTUDG0tN168kpw4Ez0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741526634; c=relaxed/simple;
-	bh=amviRZAng65qhSPsIn/ez8PlX5/EY5IcXVvOyQBoCh4=;
+	s=arc-20240116; t=1741526851; c=relaxed/simple;
+	bh=voqAZGjLjgBNoXXlkt4DG42P89rivB0LkvylaLqPMdw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rZNGvFCWFmn8to73uMN3GfOjykI1pgpoWD0gAsAaqyv/MgeSi4QgEcTuUKpAkkijCaXTEppVADyJGL8MOIjazSryjWGTiGcWW9ptIaMat+vVneLFz3barGNIWcCItoRDQD0W6+HJwBhL76Br1DCzq61GaOtkYKWAxheslRee0uI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dVz46CN7; arc=none smtp.client-ip=209.85.214.195
+	 In-Reply-To:Content-Type; b=XlBsC94UAFrQEtHyRHNnoi+A8cYvZ7QWyE2nBZ3mBHeSN2xQvMUoc0jmEcUvAYPu8Q3X39suSqHhsLawD480DP9+McwhS4UUHtqAVgDzuLbIYhoTJ6VAgJmbHattrhf8MaskV8WoycqvTzIwFhmO4IxNdS2P2lk1jwP/4R0U5lI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cZ8TR84p; arc=none smtp.client-ip=209.85.214.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-2241053582dso43908715ad.1;
-        Sun, 09 Mar 2025 06:23:52 -0700 (PDT)
+Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-22409077c06so38906665ad.1
+        for <netdev@vger.kernel.org>; Sun, 09 Mar 2025 06:27:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741526632; x=1742131432; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1741526848; x=1742131648; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=78f5GfsZLdHs7HcZYqhufn9bqBeaLB9GfsmUNDdGsAU=;
-        b=dVz46CN7GFk2MohHsYZ1XpOKSfkjB8WZZklFuVu4dwGXHnMq+/+DPo0NDU9RYZ1nmO
-         StWMyWieLWr2EFekLtMfS7OY07T37Wf4p7Yr/k0gtVA8sbmhApmoKVHWdCk05IBBCkO9
-         GXgiiPhpbxyuJuhUXrasukPdW+3Y8tNLNp3da5OPzFGDoJ43XvgzFubu6JKCDTDLvRPV
-         QT10UjAgCd7URCYnsbTb3I35yAVBvjKQqkwzXkVhhiIIcstF/ga2Hgi3NaHEvnut06iQ
-         Zmg7nhaVsPi9r+VH8VlYVXe0xD+YBI/VS3RAkEhQzVLOiKvD8FqlqILpKbYoTiF0Bdli
-         Yo/Q==
+        bh=RcEFCWQYYHxFZExcvX+pJuL+eOu8jZ+IcoamTjSx8g4=;
+        b=cZ8TR84pfnD+kf1kG6f9Y1k8koTaaDG3oGKs3zDwk8rR37P0nYiI3iGThTBoODXKg2
+         Fi1bK1Gm9FYHfUhHyYoRxCdxiRvd/mo48dn0Ca6U5k4VuuPXYJIxfqhQq88rjFbaA/Qx
+         P6rnMmrAbNjkvwzRURDCOBaBczwU/3y3gBv0wZac3zercyACXoiVFMzONWsU/BB/hdFX
+         CXNZNChrjYUBu1lXADxDe2GkjKxumKPcVDOXWU807ImN+EZBg6KZQaDgXVSG2EuAgDIN
+         0tna8lPz3BU6IdGKokxfOOjfT8gNBVmNE2o89rdqBFWE1WOPmMuJ7L9mN4aIdK6WEF3O
+         tETg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741526632; x=1742131432;
+        d=1e100.net; s=20230601; t=1741526848; x=1742131648;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=78f5GfsZLdHs7HcZYqhufn9bqBeaLB9GfsmUNDdGsAU=;
-        b=SLujwD/K5KKk51kaKy78olPD9T8e6LllR8SVwYHfc7zfkoqqwLY0MMPft+4ML8hoNn
-         N1BixI+htVtWc5MqbHGlU5FpozmEh+ep2lK0Wx9D6bkvqF0PIVr5EcRl3YflN6HGYtsh
-         1K3Qz+VSxGwKAS345FSVx/+oz+S46K79gpZY6pmBmhwa/G88fp+02i3OqjKHDn3IVTF2
-         cqSr/iOL0ftXc2Aljn0PinAZWucYSdE4pqKWyZ3TnIrMYvTUW1lcqAvoa+34XGAfrtM5
-         VnZdpnwWlXYDrCANhRYPqQRP1uBUsmxFqCL04ZoxFKTWNamOahfCsajhJmMUHVYUns5g
-         CqjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUw8D/2Etaz6O2DIR3WsW5NuKisN1gOcibV2ejKQmVlbM9lWIbO/yNJ9cQMg/MhGtSRD5j8tywT5UpuZFBA@vger.kernel.org, AJvYcCVBZqjFSShKlA9/tRVoCr1HUIT494t2yd5+6g+7ijnbS/3+plWEZDTrlyA6+l0dhOkkpWCkkKy9@vger.kernel.org, AJvYcCVhEoJRBBhprANid+iS7cJntWMmp+eoEX/oA6homJnG8Ej991mKOVS3SEpVJIeP+0S2pdwDcVLHaWNw@vger.kernel.org, AJvYcCWMRG5l8xdXa7bI53NfScdvdVpFHIjFpGST8U/+U9EGJkW1Cz2KP818KoGYmYS9GQhLgY5LdrJWPVeD7i0=@vger.kernel.org, AJvYcCWl8RCmwfTr+gTFwKNxebdtWgGSII1tCp7IXOFdvBZbRGuw5O0x8PWcklhsr0G9xlD6XP7e0A4auu8Z@vger.kernel.org, AJvYcCXwYhBLoHtWchUPd4dhM4v9zMhoDiPgsloe19pqimPMmFntvkcxWUy5xNxsDq0lEQvKKWU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpO6iAPX6wtQylr6LWtgptxI6xDaAfiQvZU2fpt5oXXNu7DfaI
-	0DSCcb79f0tkyUT1+pA+vZW6QcTUz6j9v41mb3DsdzlrqPmU9Rsv
-X-Gm-Gg: ASbGncvS7V1lS8M83grceIJfnJtzNab7Sk1jqr0fL4Tkm3UKu3qtpkL5gIqaq7FlRaH
-	qbsDgKCnE5lwgPbpfRmFJOsqkgFyXfEB8+ts5+mfvaEkQgYEoA/FaTsTR4Hl6a6jf0LRl/YbfH4
-	h2c2Bc+xtCfeUZJKDENxDq+AiweaYUhs8rXSvF8NyJDQ+2d4p2/VzRZ7ymgFUJaw9b389nQhjar
-	4SWQUgcurn14SMuBYFfzuXBF5REMVu3u7pYbQx4DKSYZ478pCHThsl890USCFLlxZztBdSfC/Xx
-	hrlU76nK2xkRgcXg5mOL36k9pYkpgXs1XknhNE3FTU4UubSg+p/Mlyj77rTAKYRrfBObJvvZMcp
-	1AW38DvjAEA+5gbsEvUrBOwO+SCG8tg7DuctILaZZ
-X-Google-Smtp-Source: AGHT+IFtC936bSg/3HregqNsD+RiIvE+I7Cf0Sja++qaGUNlZeLkZuXJlqOzuqqV2Wpl3dx1MeKXQQ==
-X-Received: by 2002:a17:902:eb81:b0:220:c86d:d7eb with SMTP id d9443c01a7336-22428ab863cmr167985465ad.36.1741526632153;
-        Sun, 09 Mar 2025 06:23:52 -0700 (PDT)
+        bh=RcEFCWQYYHxFZExcvX+pJuL+eOu8jZ+IcoamTjSx8g4=;
+        b=J20LNkywHVnMpDX39PlfuVSe9ZkM+OZHJW8GwepHW6bqW1WYm2fbgPci5ybqvfGAS9
+         rzXfhbDqGJR0h5xQuXfEBwMOGurhorTVa/7NPsHH4xPi6L9LQxU7rbX3zY6m+h+K7Jjy
+         eE/HQtNM/IJx/Eof0YqVpsC2RHnQMw1WqdDL8cJs5slHK3/FzHDzHwp+I7rDCTiCN7AG
+         NzJNV0kvv5Aa24RvICjpsWW2x7UhBccF01lDFvfYddjUs2Fs/4XtGwWy8q6dvQ5oIrME
+         YOCQyZZo2rHvz4H8nJNsgDpbvr2kDb6lH9sXi755VvO4ro1AAyPG1HPAvXCvzr6e5X8H
+         DHgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUwrxegpGTXoHFmCvADx56E92+USSeP5IPvDPEIY+k9wYWzYBYn3CQnutGuG4HnBGW0MLKV1CQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySmzcGHvkmfE76RK75x+De8BL0NTeR2xNZWYQtSewnb2fGNzxC
+	2Z2gCnMZ7el2sROfIgksiH7O4Q6/Ad1+pFdhoHLg2LWoeFAzh/Jf
+X-Gm-Gg: ASbGncsWIuLlYdVJwOSSKOCYq2ox5xo2M/CQqjaWdhVrWQXBf29/nLMcl7rMUcg9u+J
+	/UwfH/s4wyz3jAQlWMkWyUgX65WnHBxfQmMAyMbhCRk9LHsYULSkrYg26zmgnKkJmi+cPY0op3i
+	uAG2b3F9QLo8Vz++Lja7wAYmOyEEESQpfDv7352UOASIbgMuX3MhBNfxovb0H/VQw5pqgERwDo+
+	OR4L3Qdu11TKTPqsJNuc8ZWFOIday8vUJrYXTfOA/qTRxN2NhSK6gSBx719U4y5VrIALh9IoyTG
+	IjxwB1vG0WUvN7nd6QuAaq0CquIv2BKZKco+oGYAWhYWmEjfT4e0qALGs1QhQWcLhLE3ZnbvWNc
+	v35UqOF9zO7gDTSR6OHRDM+eBmkFK5Q==
+X-Google-Smtp-Source: AGHT+IFZ7+BrV2GG3nZGskDU3JjfiErgPSS8b3veSeS0LDFZB/UF/uXXRB6778elDZmORNtRG19MEw==
+X-Received: by 2002:a05:6a21:1519:b0:1f5:7280:1cf7 with SMTP id adf61e73a8af0-1f572802cf6mr2379258637.16.1741526848313;
+        Sun, 09 Mar 2025 06:27:28 -0700 (PDT)
 Received: from ?IPV6:2409:8a55:301b:e120:c508:514a:4065:877? ([2409:8a55:301b:e120:c508:514a:4065:877])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-736d4f20913sm597161b3a.13.2025.03.09.06.23.43
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-736b3f2412csm4146568b3a.175.2025.03.09.06.27.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 09 Mar 2025 06:23:51 -0700 (PDT)
-Message-ID: <7abb0e8c-f565-48f0-a393-8dabbabc3fe2@gmail.com>
-Date: Sun, 9 Mar 2025 21:23:35 +0800
+        Sun, 09 Mar 2025 06:27:27 -0700 (PDT)
+Message-ID: <d84e19c9-be0c-4d23-908b-f5e5ab6f3f3f@gmail.com>
+Date: Sun, 9 Mar 2025 21:27:17 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,130 +82,129 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] mm: alloc_pages_bulk: remove assumption of populating
- only NULL elements
-To: NeilBrown <neilb@suse.de>, Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Qu Wenruo <wqu@suse.com>, Yishai Hadas <yishaih@nvidia.com>,
- Jason Gunthorpe <jgg@ziepe.ca>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- Kevin Tian <kevin.tian@intel.com>,
- Alex Williamson <alex.williamson@redhat.com>, Chris Mason <clm@fb.com>,
- Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>,
- Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
- Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>,
- Sandeep Dhavale <dhavale@google.com>, Carlos Maiolino <cem@kernel.org>,
- "Darrick J. Wong" <djwong@kernel.org>,
+Subject: Re: [RFC PATCH net-next] page_pool: Track DMA-mapped pages and unmap
+ them when destroying the pool
+To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
  Andrew Morton <akpm@linux-foundation.org>,
  Jesper Dangaard Brouer <hawk@kernel.org>,
  Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ "David S. Miller" <davem@davemloft.net>
+Cc: Yunsheng Lin <linyunsheng@huawei.com>,
+ Yonglong Liu <liuyonglong@huawei.com>, Mina Almasry
+ <almasrymina@google.com>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Trond Myklebust <trondmy@kernel.org>,
- Anna Schumaker <anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>,
- Jeff Layton <jlayton@kernel.org>, Olga Kornievskaia <okorniev@redhat.com>,
- Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
- Luiz Capitulino <luizcap@redhat.com>,
- Mel Gorman <mgorman@techsingularity.net>, Dave Chinner
- <david@fromorbit.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
- linux-erofs@lists.ozlabs.org, linux-xfs@vger.kernel.org, linux-mm@kvack.org,
- netdev@vger.kernel.org, linux-nfs@vger.kernel.org
-References: <> <180818a1-b906-4a0b-89d3-34cb71cc26c9@huawei.com>
- <174138137096.33508.11446632870562394754@noble.neil.brown.name>
+ Simon Horman <horms@kernel.org>, linux-mm@kvack.org, netdev@vger.kernel.org
+References: <20250308145500.14046-1-toke@redhat.com>
 Content-Language: en-US
 From: Yunsheng Lin <yunshenglin0825@gmail.com>
-In-Reply-To: <174138137096.33508.11446632870562394754@noble.neil.brown.name>
+In-Reply-To: <20250308145500.14046-1-toke@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 3/8/2025 5:02 AM, NeilBrown wrote:
-
-...
-
->>
->>>    allocated pages in the array - just like the current
->>>    alloc_pages_bulk().
->>
->> I guess 'the total number of allocated pages in the array ' include
->> the pages which are already in the array before calling the above
->> API?
+On 3/8/2025 10:54 PM, Toke Høiland-Jørgensen wrote:
+> When enabling DMA mapping in page_pool, pages are kept DMA mapped until
+> they are released from the pool, to avoid the overhead of re-mapping the
+> pages every time they are used. This causes problems when a device is
+> torn down, because the page pool can't unmap the pages until they are
+> returned to the pool. This causes resource leaks and/or crashes when
+> there are pages still outstanding while the device is torn down, because
+> page_pool will attempt an unmap of a non-existent DMA device on the
+> subsequent page return.
 > 
-> Yes - just what the current function does.
-> Though I don't know that we really need that detail.
-> I think there are three interesting return values:
-> 
-> - hard failure - don't bother trying again soon:   maybe -ENOMEM
-> - success - all pages are allocated:  maybe 0 (or 1?)
-> - partial success - at least one page allocated, ok to try again
->    immediately - maybe -EAGAIN (or 0).
+> To fix this, implement a simple tracking of outstanding dma-mapped pages
+> in page pool using an xarray. This was first suggested by Mina[0], and
+> turns out to be fairly straight forward: We simply store pointers to
+> pages directly in the xarray with xa_alloc() when they are first DMA
+> mapped, and remove them from the array on unmap. Then, when a page pool
+> is torn down, it can simply walk the xarray and unmap all pages still
+> present there before returning, which also allows us to get rid of the
+> get/put_device() calls in page_pool. Using xa_cmpxchg(), no additional
+> synchronisation is needed, as a page will only ever be unmapped once.
 
-Yes, the above makes sense. And I guess returning '-ENOMEM' & '0' &
-'-EAGAIN' seems like a more explicit value.
+The implementation of xa_cmpxchg() seems to take the xa_lock, which
+seems to be a per-Xarray spin_lock.
+Yes, if if we were to take a per-Xarray lock unconditionaly, additional
+synchronisation like rcu doesn't seems to be needed. But it seems an
+excessive overhead for normal packet processing when page_pool_destroy()
+is not called yet?
 
-> 
->>
-
-...
-
->>
-> 
-> If I were do work on this (and I'm not, so you don't have to follow my
-> ideas) I would separate the bulk_alloc into several inline functions and
-> combine them into the different interfaces that you want.  This will
-> result in duplicated object code without duplicated source code.  The
-> object code should be optimal.
-
-Thanks for the detailed suggestion, it seems feasible.
-If the 'add to a linked list' dispose was not removed in the [1],
-I guess it is worth trying.
-But I am not sure if it is still worth it at the cost of the above
-mentioned 'duplicated object code' considering the array defragmenting
-seem to be able to unify the dispose of 'add to end of array' and
-'add to next hole in array'.
-
-I guess I can try with the easier one using array defragmenting first,
-and try below if there is more complicated use case.
-
-1. 
-https://lore.kernel.org/all/f1c75db91d08cafd211eca6a3b199b629d4ffe16.1734991165.git.luizcap@redhat.com/
+Also, we might need a similar locking or synchronisation for the dma
+sync API in order to skip the dma sync API when page_pool_destroy() is
+called too.
 
 > 
-> The parts of the function are:
->   - validity checks - fallback to single page allocation
->   - select zone - fallback to single page allocation
->   - allocate multiple pages in the zone and dispose of them
->   - allocate a single page
+> To avoid having to walk the entire xarray on unmap to find the page
+> reference, we stash the ID assigned by xa_alloc() into the page
+> structure itself, in the field previously called '_pp_mapping_pad' in
+> the page_pool struct inside struct page. This field overlaps with the
+> page->mapping pointer, which may turn out to be problematic, so an
+> alternative is probably needed. Sticking the ID into some of the upper
+> bits of page->pp_magic may work as an alternative, but that requires
+> further investigation. Using the 'mapping' field works well enough as
+> a demonstration for this RFC, though.
+page->pp_magic seems to only have 16 bits space available at most when
+trying to reuse some unused bits in page->pp_magic, as BPF_PTR_POISON
+and STACK_DEPOT_POISON seems to already use 16 bits, so:
+1. For 32 bits system, it seems there is only 16 bits left even if the
+    ILLEGAL_POINTER_VALUE is defined as 0x0.
+2. For 64 bits system, it seems there is only 12 bits left for powerpc
+    as ILLEGAL_POINTER_VALUE is defined as 0x5deadbeef0000000, see
+    arch/powerpc/Kconfig.
+
+So it seems we might need to limit the dma mapping count to 4096 or
+65536?
+
+And to be honest, I am not sure if those 'unused' 12/16 bits can really 
+be reused or not, I guess we might need suggestion from mm and arch
+experts here.
+
 > 
-> The "dispose of them" is one of
->    - add to a linked list
->    - add to end of array
->    - add to next hole in array
+> Since all the tracking is performed on DMA map/unmap, no additional code
+> is needed in the fast path, meaning the performance overhead of this
+> tracking is negligible. The extra memory needed to track the pages is
+> neatly encapsulated inside xarray, which uses the 'struct xa_node'
+> structure to track items. This structure is 576 bytes long, with slots
+> for 64 items, meaning that a full node occurs only 9 bytes of overhead
+> per slot it tracks (in practice, it probably won't be this efficient,
+> but in any case it should be an acceptable overhead).
+
+Even if items is stored sequentially in xa_node at first, is it possible
+that there may be fragmentation in those xa_node when pages are released
+and allocated many times during packet processing? If yes, is there any
+fragmentation info about those xa_node?
+
 > 
-> These three could be inline functions that the "allocate multiple pages"
-> and "allocate single page" functions call.  We can pass these as
-> function arguments and the compile will inline them.
-> I imagine these little function would take one page and return
-> a bool indicating if any more are wanted.
+> [0] https://lore.kernel.org/all/CAHS8izPg7B5DwKfSuzz-iOop_YRbk3Sd6Y4rX7KBG9DcVJcyWg@mail.gmail.com/
 > 
-> The three functions: alloc_bulk_array alloc_bulk_list
-> alloc_bulk_refill_array would each look like:
+> Fixes: ff7d6b27f894 ("page_pool: refurbish version of page_pool code")
+> Reported-by: Yonglong Liu <liuyonglong@huawei.com>
+> Suggested-by: Mina Almasry <almasrymina@google.com>
+> Reviewed-by: Jesper Dangaard Brouer <hawk@kernel.org>
+> Tested-by: Jesper Dangaard Brouer <hawk@kernel.org>
+> Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+> ---
+> This is an alternative to Yunsheng's series. Yunsheng requested I send
+> this as an RFC to better be able to discuss the different approaches; see
+> some initial discussion in[1], also regarding where to store the ID as
+> alluded to above.
+
+As mentioned before, I am not really convinced there is still any
+space left in 'struct page' yet, otherwise we might already use that
+space to fix the DMA address > 32 bits problem in 32 bits system, see
+page_pool_set_dma_addr_netmem().
+
+Also, Using the more space in 'struct page' for the page_pool seems to
+make page_pool more coupled to the mm subsystem, which seems to not
+align with the folios work that is trying to decouple non-mm subsystem
+from the mm subsystem by avoid other subsystem using more of the 'struct
+page' as metadata from the long term point of view.
+
 > 
->    validity checks: do we need to allocate anything?
+> -Toke
 > 
->    if want more than one page &&
->       am allowed to do mulipage (e.g. not __GFP_ACCOUNT) &&
->       zone = choose_zone() {
->          alloc_multi_from_zone(zone, dispose_function)
->    }
->    if nothing allocated
->       alloc_single_page(dispose_function)
+> [1] https://lore.kernel.org/r/40b33879-509a-4c4a-873b-b5d3573b6e14@gmail.com
 > 
-> Each would have a different dispose_function and the initial checks
-> would be quite different, as would the return value.
-> 
-> Thanks for working on this.
-> 
-> NeilBrown
-> 
+
+
 
 
