@@ -1,184 +1,137 @@
-Return-Path: <netdev+bounces-173261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DCD5A583C8
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 12:25:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85D11A583D5
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 12:43:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B87A3AE67C
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 11:25:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04CB7188C5C8
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 11:43:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B1121C700E;
-	Sun,  9 Mar 2025 11:25:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D0A1C1ADB;
+	Sun,  9 Mar 2025 11:43:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LIrTp7md"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aNXbnjar"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAA691ABED9;
-	Sun,  9 Mar 2025 11:25:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 555D62F2A;
+	Sun,  9 Mar 2025 11:43:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741519526; cv=none; b=ZMnIbemCTj0bLm6Nuc1mPLkq2eFArr3tG/GE2EriM39Kxydu3WUhmzkhr73SiJQnkW6/tVDkVIyWdaVampM32OyEllvsVkBg7N+FRemn2Itu+ReVAf4nvuneCui6Ko4uN81/9hhIuSetPYiOuEw3fcxxtKN1m9Mc5lociWY3dBs=
+	t=1741520626; cv=none; b=IyylbTr84KKQg8zuCM0rNH63Fb+BKFV1W8zZb62g8Do1JEmwM/yi6YFFiHqbxL55KEHCA4K0KvDG4nStCdsFSzrS8v0xnfIXgZ6OuqiVBMpobRjA6zB4jsLiIWQ1R6m77O5rchQB5hIVFiYpiBeNgDQDVaoO9/ymWn7fo9d/zOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741519526; c=relaxed/simple;
-	bh=byg4vShXgtYtLB4S77VgFYc0UfrdZG36uUIMAaY903k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W6EhnhAKpvEkAGjKZA785Xgaiy3gJnM/rpNxt3MEW4H7faKuAT5OyC6Y4YSA2cWdeWTiX6fIiJ6Za4BBMX2lhVUxru16kqDrXduydOxUD6SvbYqJIyD3KFwdIvca97gm4+mX6zYVz1U/ggRBxmHo8Peu9kNVSHfkvjWQCvI55/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LIrTp7md; arc=none smtp.client-ip=209.85.221.181
+	s=arc-20240116; t=1741520626; c=relaxed/simple;
+	bh=2sv+Z6u0e63RMs+eEz2YCcrjaLa9sh0py9xQ9g7VzTM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XbavF3MBzKbc/4LlBMhtTw/y4NOgdAG7ON5eZXp0JnJ4tbtBJ+rlfWWd2F7Nx03l7X8jPfPhzGnRSbcUjQD1dfuH8WFeLGFoyYv/vczum/zYOXOgj9X9jDq/FnpGkFOMy5LJoio5/YPGA98dxKisDK+sm1wIUIi+vcIOISvfN8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aNXbnjar; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-523fa0df55dso757889e0c.1;
-        Sun, 09 Mar 2025 04:25:24 -0700 (PDT)
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5e66407963fso776555a12.2;
+        Sun, 09 Mar 2025 04:43:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741519523; x=1742124323; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TREwUQZM0D5lAb+hqBXDy6YM7kTSaLkkzG7KiNixFJI=;
-        b=LIrTp7mdp8yzRR4Xzuj36Jl/a8ib7ceJ2NGQFjaW4q/YJDCQKSd2QPXq7+HE4G8Avx
-         22/T07BlzZ59EPZrLLd01tOwUGHOburMj7x/R/gg2Knb0JB16cfy/JzFKnpretRhtgUI
-         1gJV7syo+abCJa6xUMa6wlKPjneBNSVMoIdhM+Aw8nlDv0+CP3rOh2GJm3FkZHNYr/SM
-         zL03dNwAYLq/8NGhCey9t9UUTfUiD+9IAG96RsqHzZ8WruzrNpogWEIpYypyzq6XYXQ9
-         7PqOsXqx24LepqhD1/dqu8+kUq0k0GIXBREIXwUeBXPLY8OqmxdEarERqOA17w12Dqxk
-         ZvGw==
+        d=gmail.com; s=20230601; t=1741520623; x=1742125423; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=p2Foe3XwhvNs3FCKXrg4j2vvhvp7L38WiHksGts8MLY=;
+        b=aNXbnjartxx66eSX5hpxdMNJDvTqkvlBna3b4MKELTNHj71K5rInqGWeFhPDrAFBVQ
+         y6CdTnbfrv0Tovc5JxJcsmFmKa6S5qc6azUt7Ktbnr2s7NTJBTCZ4T8w07CKTsPRhIf+
+         PrHg7WUjbLeTqOg5hJHjecyw3BhwabcF2D/pQnoO+yMLI+4nvJl6Wizz9tdkbRTtePwu
+         PchsnTIWr4PpgI7MWJFQzS0U83OOxyCJfKE2iTvD/a0VTTeh87zK5ZBOw/kG4QHClUft
+         wQ3GMcRFCbaHk4ERYoTxkFhf9SiwylPw4GsEC9Bn/lXY9BTspQ/pEaOWR8YUM9gD3j5/
+         LlcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741519523; x=1742124323;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TREwUQZM0D5lAb+hqBXDy6YM7kTSaLkkzG7KiNixFJI=;
-        b=EObIDjrgL06Ap4hmWMOQJbUonzE8i+mtNKhifdhNvqpWMneoZsnyojPvTZvkymK8j+
-         ToAgOltD1+c5/OiBZlUGh4PszrxnUC7vw1VZfoBcgppzCLFHx7IIlwVk+7HxUPfa1P4t
-         xRoPs/mbAtC+9fLTEmHq+ffARkyy1A3acKhMAIIAJJFOddEe2w0iBjMA+/frtAIUM1Lw
-         j1uoU1DNxbRUwPkeOwQqc5N3mxrrkLU965pleBZCeafgwilsaBB4JALOf/rCbbOPHV5G
-         6YXtyGMq0g20TwnQTKfWeYjx6+U6Be/KQobxlQnmc2lvhemaUYWwwU4922RH824Aqfii
-         Sc8w==
-X-Forwarded-Encrypted: i=1; AJvYcCUzJNtvgjqWG7vj+Gcxkc+EotTeFsjYNKFWtP33d34REZGXKmP1IPkWS2C+NUduqAJAYW5LJLTApIyY@vger.kernel.org, AJvYcCWGG7ZXzh7o6BsYb2BHyrQYOzil6K39pa5Trun3UsUeRmtOjNF1hNvhkUQ41lJlepS0+ICa1ver@vger.kernel.org, AJvYcCWd3CYl4KfWpJUaTPm5Zns/eQiOfmieu1iV37WOliX9FiB0Gm97UqkX9O3UW4MeCJY8rZzToOZtX9PsNfdA@vger.kernel.org, AJvYcCX7U27SNBqk2Fd29pu3B13/HKqIgY9jpgTKzwggT+f1ncOFM3/NlA4b2INY4Y+eCoWIP/td4lcRfHEzA+2ZmkF3c34=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzmz5SlUWMkDJYCi/EzZlKeAMV+fvgwpLqiizfyPmfr1DKEVcRp
-	Dl7jRHURBO9Lc11gQ9WiyNSjNuhz3pwwDeqqLGlEp+d/Sh/VmXGF5Cu/V4vUgssV5zeD+1mwieJ
-	7WZgvVx1PuPgw9Q0gn0MGQ/OgHko=
-X-Gm-Gg: ASbGncvUT1QJ7a8sKUNOHisoSuX63OkmvIaWJMrCNVL0Ylavqq6xadgv7kQVt0FVmpN
-	eVu2YpPhhqccT/0bnIRuQdbPmipO9PgJvGxTWmVaXHIyo2eQDaHHSFzvgijQ36zfQ6D7T4C5kpw
-	C1+4Pv4yd64hLWE5Y7oYDtM8xQ1ONBaePiw/HFEcfT2TL+gJu5k98wxoknobQ=
-X-Google-Smtp-Source: AGHT+IGR0AMVozaKhd3d0+u/7Mk9Kh42jmVI6oN8E+SFpT9ImqGjcRLWJZakpHMAF4QrZTBEa22qw9mn0qgtUBwRb90=
-X-Received: by 2002:a05:6122:134a:b0:520:4fff:4c85 with SMTP id
- 71dfb90a1353d-523f2813ad1mr3248565e0c.2.1741519523586; Sun, 09 Mar 2025
- 04:25:23 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1741520623; x=1742125423;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=p2Foe3XwhvNs3FCKXrg4j2vvhvp7L38WiHksGts8MLY=;
+        b=WJYGTmdiXVsA/8DC7k0pKlj6QxUW2sFmnUrwlKs1RcmXAML+WIDhTJXoFieiqYYu3h
+         dqBlz1bElhBtoSnOPOl9onXBEzOMQS4KCbDNa/IWRIvLG5tL5byx0AUTApEEKxh9zfsg
+         XyD1TgEdz74hVQFmv2g3Ania26dfzNuWkpbzUXy3m/eq3o0fhuNEhHTLwlyC2pcPorFY
+         LW/0lH3NjQpqlWP66xiZ1RA2lJ/v/AhBYovCYDui3XlooAKyE4bjeiA7ZKlSjcKxA+w2
+         QJEhk9X6bc9mSCKSZtXZR0ER8xthVJ15s+BaJyLDS7Bn5dJ91NH4JxLdOYc2mRkPqV+k
+         QY1A==
+X-Forwarded-Encrypted: i=1; AJvYcCVXRgylh7vyzKiswjv3+Fb0T9in7WPTPaBOqwkPRrXd5LgaGaysIO1xasHAr3CtnGgBy1L+uNAL@vger.kernel.org, AJvYcCWwL9u6OkVlssNuZuCOZn7eD2Ews1IZKE+KaKlrQCf0nY9hHP3cLWFESlNJi847GcXtUr+sM8Ec0YBB@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzt3hhhqfXHN997mth0DGPxj7VeG3OzMmReGI11ZVog/CRZe+Uq
+	KwDSuzqfneAVZBV/hmNdo6ojbHaIajnOYbb+cJ3n4fDqe02+4cot
+X-Gm-Gg: ASbGncv5698k4aO5goLkocRKcGTxIcr7BQr3bs6PYH2U5ux870OgE+IDEZfRbG14AAM
+	lO96qerhlIUmm3EO0cNMhoxgi+VeTzGjihY4/+l9uP8WEof2T9LRzBKAE/gwtx2c6UWrLAxws5U
+	hLBNC44tY6jdU5I2aCM/XRn/Xk5PXCd0YeuIQ4vNW7eD+AAvTkuSDu7S0sVGfJgfVAIwNTNZIUo
+	isJHu29Yz79AvaT3DhvrcatQum7dzt7h7Lr8qOiPF2cxLe5Efc1ZV+r53Mu/DSQJ3o2KZXiI0Qm
+	Zm0dXlB0e8Fo68WXnXbK6ucMO8SepVN8K/s6og3KwnMf7bVyRuV+q2NyQYDHmd3NtQ==
+X-Google-Smtp-Source: AGHT+IGCkQvpCYvt8DAq7HNsPYTi3N6A3lqWQRF/jPpIMAUqN8kHt8G03ChJPrJbXKeLJIlJ8+vj8w==
+X-Received: by 2002:a05:6402:50c9:b0:5e5:db72:122a with SMTP id 4fb4d7f45d1cf-5e5e24d6e07mr10815399a12.20.1741520622082;
+        Sun, 09 Mar 2025 04:43:42 -0700 (PDT)
+Received: from [172.27.60.223] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e5c768fa17sm5153804a12.72.2025.03.09.04.43.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 09 Mar 2025 04:43:41 -0700 (PDT)
+Message-ID: <fd6b1fef-8854-451f-9b7a-94df82adebc4@gmail.com>
+Date: Sun, 9 Mar 2025 13:43:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250308200921.1089980-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250308200921.1089980-4-prabhakar.mahadev-lad.rj@bp.renesas.com> <Z81WVNGlvRNW5JFk@shell.armlinux.org.uk>
-In-Reply-To: <Z81WVNGlvRNW5JFk@shell.armlinux.org.uk>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Sun, 9 Mar 2025 11:24:57 +0000
-X-Gm-Features: AQ5f1JrpW9tO2gRYmEY8YFwebspDqap5CdTH1LumhT26vH3pk-Q75QUajPA10Kw
-Message-ID: <CA+V-a8stuYLJMA5UEKpyLpH1kcgEvA=b5BzUOEaCKcfNtdSSfg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 3/3] net: stmmac: Add DWMAC glue layer for
- Renesas GBETH
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Philipp Zabel <p.zabel@pengutronix.de>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net/mlx5: Avoid unnecessary use of comma
+ operator
+To: Simon Horman <horms@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org, llvm@lists.linux.dev
+References: <20250307-mlx5-comma-v1-1-934deb6927bb@kernel.org>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20250307-mlx5-comma-v1-1-934deb6927bb@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Russell,
 
-Thank you for the review.
 
-On Sun, Mar 9, 2025 at 8:50=E2=80=AFAM Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
->
-> On Sat, Mar 08, 2025 at 08:09:21PM +0000, Prabhakar wrote:
-> > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> >
-> > Add the DWMAC glue layer for the GBETH IP found in the Renesas RZ/V2H(P=
-)
-> > SoC.
-> >
-> > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> > ---
-> > v1->v2
-> > - Dropped __initconst for renesas_gbeth_clks array
-> > - Added clks_config callback
-> > - Dropped STMMAC_FLAG_RX_CLK_RUNS_IN_LPI flag as this needs
-> >   investigation.
->
-> I thought you had got to the bottom of this, and it was a bug in your
-> clock driver?
->
-I have added a fix in the clock driver to ignore CLK_MON bits for
-external clocks. The main reason for dropping this flag was despite
-trying the below i.e. adding phy_eee_rx_clock_stop() just before
-unregister_netdev() in stmmac_dvr_remove() still doesnt stop the Rx
-clocks.
+On 07/03/2025 14:39, Simon Horman wrote:
+> Although it does not seem to have any untoward side-effects,
+> the use of ';' to separate to assignments seems more appropriate than ','.
+> 
+> Flagged by clang-19 -Wcomma
+> 
+> No functional change intended.
+> Compile tested only.
+> 
+> Signed-off-by: Simon Horman <horms@kernel.org>
+> ---
+>   drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
+> index c862dd28c466..e8cc91a9bd82 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_chains.c
+> @@ -700,7 +700,7 @@ mlx5_chains_create_global_table(struct mlx5_fs_chains *chains)
+>   		goto err_ignore;
+>   	}
+>   
+> -	chain = mlx5_chains_get_chain_range(chains),
+> +	chain = mlx5_chains_get_chain_range(chains);
+>   	prio = mlx5_chains_get_prio_range(chains);
+>   	level = mlx5_chains_get_level_range(chains);
+>   
+> 
+> 
 
-         if (ndev->phydev)
-                 phy_eee_rx_clock_stop(ndev->phydev, false);
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 
-Note, on another platform where I can issue a reset to the PHY I
-issued the reset after unbind operation and monitored the Rx clock
-using CLK_MON and I noticed they reported  Rx clocks were OFF. But on
-the current platform I cannot issue a reset to the PHY after unbind
-operation.
-
-> > + * The Rx and Tx clocks are supplied as follows for the GBETH IP.
-> > + *
-> > + *                         Rx / Tx
-> > + *   -------+------------- on / off -------
-> > + *          |
-> > + *          |            Rx-180 / Tx-180
-> > + *          +---- not ---- on / off -------
->
-> Thanks for the diagram.
->
-> > +struct renesas_gbeth {
-> > +     struct device *dev;
-> > +     void __iomem *regs;
-> > +     unsigned int num_clks;
-> > +     struct clk *clk_tx_i;
-> > +     struct clk_bulk_data *clks;
-> > +     struct reset_control *rstc;
-> > +};
->
-> If you stored a pointer to struct plat_stmmacenet_data, then you
-> wouldn't need num_clks, clk_tx_i or clks. If you look at
-> dwmac-dwc-qos-eth.c, I recently added a helper (dwc_eth_find_clk())
-> which could be made generic.
->
-> You can then include the clk_tx_i clock in the bulk clock, and
-> use the helper to set plat_dat->clk_tx_i.
->
-Thanks for the pointer, I'll switch to that.
-
-> > +     plat_dat->flags |=3D STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY |
-> > +                        STMMAC_FLAG_EN_TX_LPI_CLOCKGATING |
->
-> Didn't I send you a patch that provides
-> STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP so we can move towards the PHY
-> saying whether it permits the TX clock to be disabled?
->
-I'll rebase my changes on top of [0]. Do you want me to run any
-specific tests for this?
-
-[0] https://patchwork.kernel.org/project/netdevbpf/patch/E1trCPy-005jZf-Ou@=
-rmk-PC.armlinux.org.uk/
-
-Cheers,
-Prabhakar
+Thanks.
 
