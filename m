@@ -1,114 +1,199 @@
-Return-Path: <netdev+bounces-173231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D0D5A5805C
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 03:51:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5127EA5806D
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 04:03:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 291243AD23F
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 02:51:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FC8F3AF252
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 03:03:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FDA026ACC;
-	Sun,  9 Mar 2025 02:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nignk+6X"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2780543146;
+	Sun,  9 Mar 2025 03:03:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B82A514A85;
-	Sun,  9 Mar 2025 02:51:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7157B17BD6
+	for <netdev@vger.kernel.org>; Sun,  9 Mar 2025 03:03:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741488691; cv=none; b=dbMfTPvf8/r+6zJve6ujcRqlitmiW85TpPe2qUZUQgvTDhxbAY+Nc9TnUUCIMiKP0KhL+gyb5Wgub7G5o6sKKieeCP86Cm3D0gzIcP69ztP3R+1qgbyM5qnfrXYkgXZKTA1DP7ISA72Sus4U3K8mtX1nGgbquGDfcTk3IvuMj+c=
+	t=1741489404; cv=none; b=P1Zu4Xu24YeuGw5+saAWjUXAICM2G0M3KXzLNoZXKW+YY7+o+rJrgWREbbzKV92UT2ZOvFqIPo/CVeHGVbo2VYjPQ8Y9E6AETrzPh2Rs4t0kbqEidUJ26DZr1ybSX/1FjREg3VER4DtwcBVPVrOn7iAUBXlxB4puV1sIwzT1xQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741488691; c=relaxed/simple;
-	bh=+AxKQzQOhFvyAjlz5Ur/xA8zBv34fgRsUJBCR73dObM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uOuagLYWuhf/khAdmwXgRHF5w3W6ND0WL+69prAKh97Twbf2J+27fQilaNs7wmYZc0wLIO6xkyQ4fX/aZhItmWZ+4EILg7CosKSoXJ/UF644H1OvlfvqY7pE0+jTpsTup6EoJ4nSv61WH922DaJ8skj9Gl1QeMZYpe1v4CpRjkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nignk+6X; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741488690; x=1773024690;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=+AxKQzQOhFvyAjlz5Ur/xA8zBv34fgRsUJBCR73dObM=;
-  b=Nignk+6X5m/DDD0/excdVZGpeQaQCZfAVdLlljII+ypjmL25SyV08sVX
-   2Fiqz5fHPTgqq4VtIajNbKlHUQzyI/ncDozDLm9xMeCmfM6UJsDXk7xzE
-   2dE6HDte/5dNGFLuKd6Torls2LxTUCjmGbqS7EgIvUhu53bQafDeaKqDy
-   l5wGVU9B7ZfXB3g+aRSsgEoJkDTSW3ZKFvOhmqZyCGMG9VhZzLqmyi8Nk
-   G0YH0wKToQ641ExRmFrhv1xsCs0JM9dlnTewEB1ODArlfFJTqgq+iFKOG
-   jI+o8HCyb36upvW6plqZqWR71/PRKG9pyVXcHQ9fECWeRW0oiTG6msT8I
-   A==;
-X-CSE-ConnectionGUID: 0SYZgyh+QmC9wMqMn5LRbA==
-X-CSE-MsgGUID: k4cFiNEfTTCxZDKJBv/D9Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11367"; a="41666197"
-X-IronPort-AV: E=Sophos;i="6.14,233,1736841600"; 
-   d="scan'208";a="41666197"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2025 18:51:29 -0800
-X-CSE-ConnectionGUID: HiQhBS2oTKiKQ/8IseH6xA==
-X-CSE-MsgGUID: E3Auo7O4QWawkzLNtPKfXQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,233,1736841600"; 
-   d="scan'208";a="119670936"
-Received: from lkp-server02.sh.intel.com (HELO a4747d147074) ([10.239.97.151])
-  by fmviesa007.fm.intel.com with ESMTP; 08 Mar 2025 18:51:26 -0800
-Received: from kbuild by a4747d147074 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tr6lA-0002aG-0r;
-	Sun, 09 Mar 2025 02:51:24 +0000
-Date: Sun, 9 Mar 2025 10:50:43 +0800
-From: kernel test robot <lkp@intel.com>
-To: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
-	andrew+netdev@lunn.ch, sdf@fomichev.me
-Subject: Re: [PATCH net-next 1/3] eth: bnxt: switch to netif_close
-Message-ID: <202503091014.T0oUWfdo-lkp@intel.com>
-References: <20250308010840.910382-1-sdf@fomichev.me>
+	s=arc-20240116; t=1741489404; c=relaxed/simple;
+	bh=n0y9uXzRp4nd2UEuB/QpG5DfKUfIZlVoT2ko8vRMXtQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=IO99Ki2cHVVU9DFVbySWMPh1x3KkltxMaYMc5kn+oopU/vOrFr6cS5I2p0JnD/3SC2d6X7qwjr4pCv0GEk8PZTx0LrSpin3tynDXVOz6dPO2mj/z0mxZN7H2oJxfzRE07mEYhc+Xo84JzJK0Apt88sctiyfa+4lyygQc3Jd2Gzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3d44dc8a9b4so7365125ab.3
+        for <netdev@vger.kernel.org>; Sat, 08 Mar 2025 19:03:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741489401; x=1742094201;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=W7lI9vq0dCiuVwqTWFXCoyyGJs3SP4CmmE1ZX50lz3Q=;
+        b=Fffomtxlu7a7wZn59qy75JYOFELWHLn4Nr7/rCdqKCAmNF354zUtxRhedxEQGuI8QN
+         jm/HR0wExg9EextzB5OWp6Y4ZxOsJB8tsfcqdPCeOhpCDigsjcg/QlBEadWTHdE5evhR
+         l12gwFmiuWme14JWpyFqU3a5mba9R3FJTq/tjof/w09t1GT9+3isQRD492outRwsWV+N
+         LXJRBTKdS1kQ/dGfpZcPe8ulNN69RN9dr1R4QHZDx485Sar/g2a8p44HmnLXeSFviXof
+         5VM2wSIL79zO625a8kGXsiYekT0eyM1uMN0OZcpNoQjSYZbBqj1gnt8ybFzwu8WcCVM2
+         fa4w==
+X-Forwarded-Encrypted: i=1; AJvYcCUJEcDTPAAwSD/Raf1IMDjC2cLhUj5rZ3a0DgbNxp2/k/EXTwTce/xUVGyOQ0cZ6DhA1PWfUhU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxtrF0NB6y+qFN5C/xMi52OkIx8FiYSaPVEs+lmO4qtKBgz8dkY
+	x67HVxmZKGcaWmdcQ5YzHSb8mD5GbQ3HgN7YD+PuW80E5VqM2MZC0mqPSkFk6LJ7lXAPlCl3LtR
+	vmoHA7xFZoPm+l3V1bEoR7j9n6pJk1ymydx+FARTM2EcXT262Bx61UgU=
+X-Google-Smtp-Source: AGHT+IG867GCeldxqxyB1InYkZ1OBi1osD2Tik2lnZoVzU4Xgi45W3Oz0WkqfyHunVkvAFKAMJAxoOR3M3Fnhirt4SMnNljpgZNz
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250308010840.910382-1-sdf@fomichev.me>
+X-Received: by 2002:a05:6e02:11:b0:3cf:b87b:8fd4 with SMTP id
+ e9e14a558f8ab-3d441a00284mr120387625ab.15.1741489401571; Sat, 08 Mar 2025
+ 19:03:21 -0800 (PST)
+Date: Sat, 08 Mar 2025 19:03:21 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67cd04f9.050a0220.14db68.006e.GAE@google.com>
+Subject: [syzbot] [netfilter?] KMSAN: uninit-value in __nf_conncount_add
+From: syzbot <syzbot+83fed965338b573115f7@syzkaller.appspotmail.com>
+To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Stanislav,
+Hello,
 
-kernel test robot noticed the following build errors:
+syzbot found the following issue on:
 
-[auto build test ERROR on net-next/main]
+HEAD commit:    48a5eed9ad58 Merge tag 'devicetree-fixes-for-6.14-2' of gi..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=174d8078580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1d47ea4b9912d894
+dashboard link: https://syzkaller.appspot.com/bug?extid=83fed965338b573115f7
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: i386
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Stanislav-Fomichev/eth-bnxt-request-unconditional-ops-lock/20250308-091318
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250308010840.910382-1-sdf%40fomichev.me
-patch subject: [PATCH net-next 1/3] eth: bnxt: switch to netif_close
-config: arm-randconfig-004-20250309 (https://download.01.org/0day-ci/archive/20250309/202503091014.T0oUWfdo-lkp@intel.com/config)
-compiler: arm-linux-gnueabi-gcc (GCC) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250309/202503091014.T0oUWfdo-lkp@intel.com/reproduce)
+Unfortunately, I don't have any reproducer for this issue yet.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202503091014.T0oUWfdo-lkp@intel.com/
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/e13258230ff9/disk-48a5eed9.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/b84f07fdcdb7/vmlinux-48a5eed9.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/9860005c79df/bzImage-48a5eed9.xz
 
-All errors (new ones prefixed by >>, old ones prefixed by <<):
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+83fed965338b573115f7@syzkaller.appspotmail.com
 
-WARNING: modpost: missing MODULE_DESCRIPTION() in arch/arm/probes/kprobes/test-kprobes.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in mm/kasan/kasan_test.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in lib/slub_kunit.o
->> ERROR: modpost: "netif_close" [drivers/net/ethernet/broadcom/bnxt/bnxt_en.ko] undefined!
+=====================================================
+BUG: KMSAN: uninit-value in find_or_evict net/netfilter/nf_conncount.c:117 [inline]
+BUG: KMSAN: uninit-value in __nf_conncount_add+0xd9c/0x2850 net/netfilter/nf_conncount.c:143
+ find_or_evict net/netfilter/nf_conncount.c:117 [inline]
+ __nf_conncount_add+0xd9c/0x2850 net/netfilter/nf_conncount.c:143
+ count_tree net/netfilter/nf_conncount.c:438 [inline]
+ nf_conncount_count+0x82f/0x1e80 net/netfilter/nf_conncount.c:521
+ connlimit_mt+0x7f6/0xbd0 net/netfilter/xt_connlimit.c:72
+ __nft_match_eval net/netfilter/nft_compat.c:403 [inline]
+ nft_match_eval+0x1a5/0x300 net/netfilter/nft_compat.c:433
+ expr_call_ops_eval net/netfilter/nf_tables_core.c:240 [inline]
+ nft_do_chain+0x426/0x2290 net/netfilter/nf_tables_core.c:288
+ nft_do_chain_ipv4+0x1a5/0x230 net/netfilter/nft_chain_filter.c:23
+ nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
+ nf_hook_slow+0xf4/0x400 net/netfilter/core.c:626
+ nf_hook_slow_list+0x24d/0x860 net/netfilter/core.c:663
+ NF_HOOK_LIST include/linux/netfilter.h:350 [inline]
+ ip_sublist_rcv+0x17b7/0x17f0 net/ipv4/ip_input.c:633
+ ip_list_rcv+0x9ef/0xa40 net/ipv4/ip_input.c:669
+ __netif_receive_skb_list_ptype net/core/dev.c:5936 [inline]
+ __netif_receive_skb_list_core+0x15c5/0x1670 net/core/dev.c:5983
+ __netif_receive_skb_list net/core/dev.c:6035 [inline]
+ netif_receive_skb_list_internal+0x1085/0x1700 net/core/dev.c:6126
+ netif_receive_skb_list+0x5a/0x460 net/core/dev.c:6178
+ xdp_recv_frames net/bpf/test_run.c:280 [inline]
+ xdp_test_run_batch net/bpf/test_run.c:361 [inline]
+ bpf_test_run_xdp_live+0x2e86/0x3480 net/bpf/test_run.c:390
+ bpf_prog_test_run_xdp+0xf1d/0x1ae0 net/bpf/test_run.c:1316
+ bpf_prog_test_run+0x5e5/0xa30 kernel/bpf/syscall.c:4407
+ __sys_bpf+0x6aa/0xd90 kernel/bpf/syscall.c:5813
+ __do_sys_bpf kernel/bpf/syscall.c:5902 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5900 [inline]
+ __ia32_sys_bpf+0xa0/0xe0 kernel/bpf/syscall.c:5900
+ ia32_sys_call+0x394d/0x4180 arch/x86/include/generated/asm/syscalls_32.h:358
+ do_syscall_32_irqs_on arch/x86/entry/common.c:165 [inline]
+ __do_fast_syscall_32+0xb0/0x110 arch/x86/entry/common.c:387
+ do_fast_syscall_32+0x38/0x80 arch/x86/entry/common.c:412
+ do_SYSENTER_32+0x1f/0x30 arch/x86/entry/common.c:450
+ entry_SYSENTER_compat_after_hwframe+0x84/0x8e
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4121 [inline]
+ slab_alloc_node mm/slub.c:4164 [inline]
+ kmem_cache_alloc_noprof+0x915/0xe10 mm/slub.c:4171
+ insert_tree net/netfilter/nf_conncount.c:372 [inline]
+ count_tree net/netfilter/nf_conncount.c:450 [inline]
+ nf_conncount_count+0x1415/0x1e80 net/netfilter/nf_conncount.c:521
+ connlimit_mt+0x7f6/0xbd0 net/netfilter/xt_connlimit.c:72
+ __nft_match_eval net/netfilter/nft_compat.c:403 [inline]
+ nft_match_eval+0x1a5/0x300 net/netfilter/nft_compat.c:433
+ expr_call_ops_eval net/netfilter/nf_tables_core.c:240 [inline]
+ nft_do_chain+0x426/0x2290 net/netfilter/nf_tables_core.c:288
+ nft_do_chain_ipv4+0x1a5/0x230 net/netfilter/nft_chain_filter.c:23
+ nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
+ nf_hook_slow+0xf4/0x400 net/netfilter/core.c:626
+ nf_hook_slow_list+0x24d/0x860 net/netfilter/core.c:663
+ NF_HOOK_LIST include/linux/netfilter.h:350 [inline]
+ ip_sublist_rcv+0x17b7/0x17f0 net/ipv4/ip_input.c:633
+ ip_list_rcv+0x9ef/0xa40 net/ipv4/ip_input.c:669
+ __netif_receive_skb_list_ptype net/core/dev.c:5936 [inline]
+ __netif_receive_skb_list_core+0x15c5/0x1670 net/core/dev.c:5983
+ __netif_receive_skb_list net/core/dev.c:6035 [inline]
+ netif_receive_skb_list_internal+0x1085/0x1700 net/core/dev.c:6126
+ netif_receive_skb_list+0x5a/0x460 net/core/dev.c:6178
+ xdp_recv_frames net/bpf/test_run.c:280 [inline]
+ xdp_test_run_batch net/bpf/test_run.c:361 [inline]
+ bpf_test_run_xdp_live+0x2e86/0x3480 net/bpf/test_run.c:390
+ bpf_prog_test_run_xdp+0xf1d/0x1ae0 net/bpf/test_run.c:1316
+ bpf_prog_test_run+0x5e5/0xa30 kernel/bpf/syscall.c:4407
+ __sys_bpf+0x6aa/0xd90 kernel/bpf/syscall.c:5813
+ __do_sys_bpf kernel/bpf/syscall.c:5902 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5900 [inline]
+ __ia32_sys_bpf+0xa0/0xe0 kernel/bpf/syscall.c:5900
+ ia32_sys_call+0x394d/0x4180 arch/x86/include/generated/asm/syscalls_32.h:358
+ do_syscall_32_irqs_on arch/x86/entry/common.c:165 [inline]
+ __do_fast_syscall_32+0xb0/0x110 arch/x86/entry/common.c:387
+ do_fast_syscall_32+0x38/0x80 arch/x86/entry/common.c:412
+ do_SYSENTER_32+0x1f/0x30 arch/x86/entry/common.c:450
+ entry_SYSENTER_compat_after_hwframe+0x84/0x8e
+
+CPU: 0 UID: 0 PID: 15694 Comm: syz.1.15735 Tainted: G        W          6.14.0-rc5-syzkaller-00016-g48a5eed9ad58 #0
+Tainted: [W]=WARN
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
