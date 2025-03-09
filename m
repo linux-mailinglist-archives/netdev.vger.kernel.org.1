@@ -1,191 +1,122 @@
-Return-Path: <netdev+bounces-173242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E348BA582B7
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 10:36:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCDD1A582BD
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 10:39:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBCB13AA864
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 09:36:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1594C168916
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 09:39:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C8671A8F71;
-	Sun,  9 Mar 2025 09:36:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B31813AD05;
+	Sun,  9 Mar 2025 09:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ULI/EFqJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C42EE1A5BBC
-	for <netdev@vger.kernel.org>; Sun,  9 Mar 2025 09:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 028071A3177
+	for <netdev@vger.kernel.org>; Sun,  9 Mar 2025 09:39:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741512991; cv=none; b=clfZ4s6P6Gr7lEP1/WSGp93qQC/1Frk88ZEHW33it8qU34eh2stXnIosDW2fRWQxjM+OGxyq2tD8n1YXa/xO+DjsmhOditUKW5/+fWPJSILy0MxRtserPoBRG12Kmpia2D1ARmlIOciaH46MHiGwGIajNRasjbzG0R+kGtYwzDk=
+	t=1741513174; cv=none; b=XP8N8ZtmTBXZU9cEXgXUIGZSUrLOdwN66/OtDbHUwb6SwdWUeCEqhSmm3IR1k9GPEexJ/53p43hD7OUS4ZCKB2zPUIH2crGGJ3t7bHFtsCIR8k/mvgLSkNW8rhas0Z9a/ZSUxysuhGsgm8mW79IX3zeUsqhbWrnTSeGZFkTLdA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741512991; c=relaxed/simple;
-	bh=Us8rGbmPFV8r9kILQZkJiRMErAO862YWq8zDsrOKbkI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=qqWuMHDGXd99S6rGHF1gMD6CwlJb1455Ky9ntgcsTOxgcUmR47pJiP4KWmKiiklq5wvFasKCM/QT8F0U/YdHR252esm1tbHqYq49typj6GS86C3KBAdjOR1q4f66sS9Cj+7Sz2WJxOtdoGwj7HfI8ZF6g66K3dy7qGwe/cMS5/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-85ad875acccso768678839f.3
-        for <netdev@vger.kernel.org>; Sun, 09 Mar 2025 01:36:29 -0800 (PST)
+	s=arc-20240116; t=1741513174; c=relaxed/simple;
+	bh=GnNnoLWvrNzt/V14i42cXk9YuvZjtcgAtlkxYDoXHLI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=aZD5rJWStq4Jz9WjGbZo6enxTCgM3u6B+WhdY/e+ZEfy/57+moZmcPiL/79Pa1TG21BN+TMiNr/MTwB1PIjk2ZAw5LtO8V2GrqAYnrl0pry90ly/oXGW9oNTqlwCh84wMSu+7WClAJ0+skpLQ8YPabUN6cB3Vamc2wcfZg9MbjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ULI/EFqJ; arc=none smtp.client-ip=209.85.219.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-6e905e89798so25844786d6.3
+        for <netdev@vger.kernel.org>; Sun, 09 Mar 2025 01:39:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741513172; x=1742117972; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=BLVAVONPH2ISN2Orc1l44Sb4SE9x2ISZsKj1Uv9z1yM=;
+        b=ULI/EFqJAv/lwVmqigmujf1Vhb6FjsabCZdShEpd+9sOgJ/7cDKgMfAzW0eNRAF9gy
+         U3Cc+bhQiW2PJBC0/FM4pZTk5EBCaJMGsM7JO9J0J17RQ9gX9TSKsibyWOtiT7TBxL+X
+         7ftqyk9tjIgNrd6ICcp1MuFDWwXdCJgf9wAhBiwGErWfnhmIoGqMkFVsguq1Ut65NBI2
+         M4CTDRpX2aHiCNloAFFhXQHg3lfP8E6IQcOIEcWE1b45HKq3jbSGgL/mmL7GoDSmqtdq
+         08y8TkDDjcDookIrVxD5vDDCxwJJYGTU30KGqE51xPzfi0zPL4vRwCPtMde2kPpW2mgE
+         3ovg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741512989; x=1742117789;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+        d=1e100.net; s=20230601; t=1741513172; x=1742117972;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=VXiY6N7OSU76pQp1Pi3Phz+uoYFFIUVn9s/PtSgWyek=;
-        b=dWHbCTdjLra7nx/77dblxYE5/s9Tx09ZbbmYhZhybY7nAqXIibtluYvR+g7fa+Er/j
-         HWKmeSN+j0aCuzo+H58PbtAUs0TN8pVikTSXC53BBpDkB/CQg+dXAyiyTJzh5HKu3gho
-         tW99MF5YhAwzt6RPY9zklyEpEFH1kqoO9SvVSZFUWV/DlgAdGwWO72RDL85r2WT8/3Gz
-         XoNfCpygpze2YkPRT+iSsdzA26S7+LOGnCX8MGyE9v3HjbmeyaEfxEpEp0jLL/pjakqa
-         goqJjfFS2uH0mIjwQEQ7ok6+fLkBEOS3tDrgw1EACtJynmQr6Qyy3/fTMlhoT50mopqo
-         lLFA==
-X-Forwarded-Encrypted: i=1; AJvYcCWy7zMeQmme2JhULfoN+pPE5SB1QNhz1e4ZCnka9P2Gq8bf9EQwYDcng5I2z80dBvX8SQWZlt4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzry8rcEQtk9UwgKADYTzl++u7PO+UMwaQdu7J4n/XweohD9Q/a
-	rUsFb3rnf54wkKE7TYwFvd4UxQsJx/5QLR/V/8xBtlipz4oae7IsxXlgUFwMem4FY78XDD5Elcr
-	jmIS8Xcp3UT++IHJa1Qu92O/8+043KH3Wkma18bfBZV/utpWYTnDznLY=
-X-Google-Smtp-Source: AGHT+IFV+ki/og+ynEYa3x+hrLV2cKzsvxHzX28vc/Gong4u9ZA9/KBYgHozqiuX5HtOfa7I7NHKPQUrWMhUoBdhCEKPTcWehmtm
+        bh=BLVAVONPH2ISN2Orc1l44Sb4SE9x2ISZsKj1Uv9z1yM=;
+        b=OugJpbL5i9lmPv7Ag2zreSS6ClHXzMjhEPQ/c0/d7OlFyqYSEJmgHFgwg9qfurUYen
+         BOshsSwzeg6c8+L7yOd050YgFYxyjktvUZsvGNPb0cLc1CzXjhuPdyVNrOCBSP7XO+Vc
+         /+N2ALjuUBNG1Oh1hAuRvCovDvbxF8UfTZBqI/ntefgooG+ySRZRv/Pn4P1qELnFnZwQ
+         ++XU+w7MH7y2JE3ItaDC/w/sOfd+FWe3S3ncaxNW+EeLcvQul/aw73iWmNEeYJvc1aHT
+         kqLZU2O2ENqGiuEpuFegp7zNNTWnWwSDbRrETyx8etCs7aBNtGlN56Ni+N/+pIzYuy4k
+         CHTw==
+X-Forwarded-Encrypted: i=1; AJvYcCUE+kd0YvCKHb19pPdGYCA6W1yu/h4fjU0ya13+LHgCU5CeVXOnaEgCXZr/MmjUtrMOCeejFmY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxG8LLhMSJHUueqSHXAWzsfV3dTMcdDFOt6TOgLCdpUbbRQiHyM
+	tGBoT6ZXws0ptexV3EHlciFkNxyfehvgdHPg5hLFsm04v0mtQBBL9m5Ct+YG+G921fltDNZNpXE
+	gLOQ7Lb1yrw==
+X-Google-Smtp-Source: AGHT+IGwuMemn8J9CcNzq/t87TxiDu3382GH8nT9Ngg7B5kk9u8P3uA20r6sFK6HfY67+7AUIsq98GbuJ8NnMg==
+X-Received: from qvbny6.prod.google.com ([2002:a05:6214:3986:b0:6e8:9afa:145c])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6214:2425:b0:6e8:9021:9095 with SMTP id 6a1803df08f44-6e90066b6efmr159208556d6.32.1741513171846;
+ Sun, 09 Mar 2025 01:39:31 -0800 (PST)
+Date: Sun,  9 Mar 2025 09:39:30 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1c0b:b0:3d3:d4f0:271d with SMTP id
- e9e14a558f8ab-3d44196ff85mr126243005ab.12.1741512988912; Sun, 09 Mar 2025
- 01:36:28 -0800 (PST)
-Date: Sun, 09 Mar 2025 01:36:28 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67cd611c.050a0220.14db68.0073.GAE@google.com>
-Subject: [syzbot] [x25?] possible deadlock in lapbeth_device_event
-From: syzbot <syzbot+377b71db585c9c705f8e@syzkaller.appspotmail.com>
-To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-x25@vger.kernel.org, 
-	ms@dev.tdt.de, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.rc0.332.g42c0ae87b1-goog
+Message-ID: <20250309093930.1359048-1-edumazet@google.com>
+Subject: [PATCH net] net: lapbether: use netdev_lockdep_set_classes() helper
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
+	syzbot+377b71db585c9c705f8e@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+drivers/net/wan/lapbether.c uses stacked devices.
+Like similar drivers, it must use netdev_lockdep_set_classes()
+to avoid LOCKDEP splats.
 
-syzbot found the following issue on:
+This is similar to commit 9bfc9d65a1dc ("hamradio:
+use netdev_lockdep_set_classes() helper")
 
-HEAD commit:    8ef890df4031 net: move misc netdev_lock flavors to a separ..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=149cd878580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ca99d9d1f4a8ecfa
-dashboard link: https://syzkaller.appspot.com/bug?extid=377b71db585c9c705f8e
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1054d4b7980000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/ed25b0258c8e/disk-8ef890df.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/2989aa28823e/vmlinux-8ef890df.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0e040be79a3d/bzImage-8ef890df.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Fixes: 7e4d784f5810 ("net: hold netdev instance lock during rtnetlink operations")
 Reported-by: syzbot+377b71db585c9c705f8e@syzkaller.appspotmail.com
-
-============================================
-WARNING: possible recursive locking detected
-6.14.0-rc5-syzkaller-01147-g8ef890df4031 #0 Not tainted
---------------------------------------------
-dhcpcd/5500 is trying to acquire lock:
-ffff888031330d28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2731 [inline]
-ffff888031330d28 (&dev->lock){+.+.}-{4:4}, at: netif_napi_add_weight include/linux/netdevice.h:2763 [inline]
-ffff888031330d28 (&dev->lock){+.+.}-{4:4}, at: lapbeth_new_device drivers/net/wan/lapbether.c:415 [inline]
-ffff888031330d28 (&dev->lock){+.+.}-{4:4}, at: lapbeth_device_event+0x766/0xa20 drivers/net/wan/lapbether.c:460
-
-but task is already holding lock:
-ffff88806408cd28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2731 [inline]
-ffff88806408cd28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:40 [inline]
-ffff88806408cd28 (&dev->lock){+.+.}-{4:4}, at: dev_change_flags+0x120/0x270 net/core/dev_api.c:67
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(&dev->lock);
-  lock(&dev->lock);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-2 locks held by dhcpcd/5500:
- #0: ffffffff8fed6908 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_net_lock include/linux/rtnetlink.h:130 [inline]
- #0: ffffffff8fed6908 (rtnl_mutex){+.+.}-{4:4}, at: devinet_ioctl+0x34c/0x1d80 net/ipv4/devinet.c:1121
- #1: ffff88806408cd28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2731 [inline]
- #1: ffff88806408cd28 (&dev->lock){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:40 [inline]
- #1: ffff88806408cd28 (&dev->lock){+.+.}-{4:4}, at: dev_change_flags+0x120/0x270 net/core/dev_api.c:67
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 5500 Comm: dhcpcd Not tainted 6.14.0-rc5-syzkaller-01147-g8ef890df4031 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- print_deadlock_bug+0x483/0x620 kernel/locking/lockdep.c:3039
- check_deadlock kernel/locking/lockdep.c:3091 [inline]
- validate_chain+0x15e2/0x5920 kernel/locking/lockdep.c:3893
- __lock_acquire+0x1397/0x2100 kernel/locking/lockdep.c:5228
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5851
- __mutex_lock_common kernel/locking/mutex.c:585 [inline]
- __mutex_lock+0x19c/0x1010 kernel/locking/mutex.c:730
- netdev_lock include/linux/netdevice.h:2731 [inline]
- netif_napi_add_weight include/linux/netdevice.h:2763 [inline]
- lapbeth_new_device drivers/net/wan/lapbether.c:415 [inline]
- lapbeth_device_event+0x766/0xa20 drivers/net/wan/lapbether.c:460
- notifier_call_chain+0x1a5/0x3f0 kernel/notifier.c:85
- __dev_notify_flags+0x207/0x400
- netif_change_flags+0xf0/0x1a0 net/core/dev.c:9443
- dev_change_flags+0x146/0x270 net/core/dev_api.c:68
- devinet_ioctl+0xea2/0x1d80 net/ipv4/devinet.c:1200
- inet_ioctl+0x3d7/0x4f0 net/ipv4/af_inet.c:1001
- sock_do_ioctl+0x158/0x460 net/socket.c:1190
- sock_ioctl+0x626/0x8e0 net/socket.c:1309
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:906 [inline]
- __se_sys_ioctl+0xf5/0x170 fs/ioctl.c:892
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fcdbbcb2d49
-Code: 5c c3 48 8d 44 24 08 48 89 54 24 e0 48 89 44 24 c0 48 8d 44 24 d0 48 89 44 24 c8 b8 10 00 00 00 c7 44 24 b8 10 00 00 00 0f 05 <41> 89 c0 3d 00 f0 ff ff 76 10 48 8b 15 ae 60 0d 00 f7 d8 41 83 c8
-RSP: 002b:00007ffecf47b768 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007fcdbbbe46c0 RCX: 00007fcdbbcb2d49
-RDX: 00007ffecf48b958 RSI: 0000000000008914 RDI: 000000000000000c
-RBP: 00007ffecf49bb18 R08: 00007ffecf48b918 R09: 00007ffecf48b8c8
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ffecf48b958 R14: 0000000000000028 R15: 0000000000008914
- </TASK>
-
-
+Closes: https://lore.kernel.org/netdev/67cd611c.050a0220.14db68.0073.GAE@google.com/T/#u
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/net/wan/lapbether.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/drivers/net/wan/lapbether.c b/drivers/net/wan/lapbether.c
+index 56326f38fe8a30f45e88cdce7efd43e18041e52a..995a7207bdf8719899bbbe58b84707eb4c2e9c1d 100644
+--- a/drivers/net/wan/lapbether.c
++++ b/drivers/net/wan/lapbether.c
+@@ -39,6 +39,7 @@
+ #include <linux/lapb.h>
+ #include <linux/init.h>
+ 
++#include <net/netdev_lock.h>
+ #include <net/x25device.h>
+ 
+ static const u8 bcast_addr[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+@@ -366,6 +367,7 @@ static const struct net_device_ops lapbeth_netdev_ops = {
+ 
+ static void lapbeth_setup(struct net_device *dev)
+ {
++	netdev_lockdep_set_classes(dev);
+ 	dev->netdev_ops	     = &lapbeth_netdev_ops;
+ 	dev->needs_free_netdev = true;
+ 	dev->type            = ARPHRD_X25;
+-- 
+2.49.0.rc0.332.g42c0ae87b1-goog
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
