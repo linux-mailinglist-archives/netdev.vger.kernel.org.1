@@ -1,244 +1,184 @@
-Return-Path: <netdev+bounces-173260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 596CBA58383
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 11:52:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DCD5A583C8
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 12:25:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB0161896666
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 10:52:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B87A3AE67C
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 11:25:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBA5E1A840D;
-	Sun,  9 Mar 2025 10:49:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B1121C700E;
+	Sun,  9 Mar 2025 11:25:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e6Rfz9ae"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LIrTp7md"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AAE11D8DFE;
-	Sun,  9 Mar 2025 10:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAA691ABED9;
+	Sun,  9 Mar 2025 11:25:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741517357; cv=none; b=mhaZmTbncPoiVKbhdjROEBegJRg4Tlo8UKXZqMxJ9KXPen8VtsQcZeOYjDiwLx7IE6EQzRgHjavJ0ExhjicmCa6QscdoR3kqrFYtWsYee3GYnP38zvwevf7mWuvL+KWATCnD2qR85udwK4Log3jqiemvvXX73econeNbGb+q9sg=
+	t=1741519526; cv=none; b=ZMnIbemCTj0bLm6Nuc1mPLkq2eFArr3tG/GE2EriM39Kxydu3WUhmzkhr73SiJQnkW6/tVDkVIyWdaVampM32OyEllvsVkBg7N+FRemn2Itu+ReVAf4nvuneCui6Ko4uN81/9hhIuSetPYiOuEw3fcxxtKN1m9Mc5lociWY3dBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741517357; c=relaxed/simple;
-	bh=/Rpt0g7Ks3pkE+tta5B9MFjJotESPE0HD7Oeoam8bfk=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZxpWj6NU6oLEesx/4mJZCNpvnYpxdlExnYIiBsZIf0kuxEnhj8NH+ScwtcFdgXnlBjbnoyA+BTX+wkh+fWwWGwnlgYPlfhH+SiMIThvmtmsxUKTu6Au8Vb3TuT0iKtfT2uVew3PC0pKMcye1djNrsKgM7TXoQusAD+I4n6zV6Do=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e6Rfz9ae; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741517357; x=1773053357;
-  h=from:to:subject:date:message-id:in-reply-to:references:
-   mime-version:content-transfer-encoding;
-  bh=/Rpt0g7Ks3pkE+tta5B9MFjJotESPE0HD7Oeoam8bfk=;
-  b=e6Rfz9aeCr5E6/bs1gMK0QBuOLx1GTVLvAtAoIf9o0lnnXFcN8HX8Npe
-   sOFje9CbqRkNvzKbpX4Or9EHtqzHjUibo8+1LqhnFs9QubLpuoygbAI9M
-   vNnE+3PVpi4Vl8jtRwNMexkUXhvO7CpyLqCz1tMpDFJus3q3alZ7e8hrQ
-   MCJpikF1iqrpWYTApSHAKkTIuXjFKyXdnSUxV5l8iyT3gItz39UIVWgdz
-   aGJ8cA2s/Htm0IO41k3mrU21VUGpJQ8gWFwrgieDFph2uZZS4jdYJj/r+
-   rlcG+hOwsxo0ug8tn7Czzv233NZXzfUBpZx7gQOAgpMXMzHX1MNICoYIz
-   Q==;
-X-CSE-ConnectionGUID: 562Ox31gQvmgEC4SpEVxRw==
-X-CSE-MsgGUID: MfZ+2dpdRDKm02aiDh5EEg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11367"; a="42636274"
-X-IronPort-AV: E=Sophos;i="6.14,234,1736841600"; 
-   d="scan'208";a="42636274"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2025 03:49:16 -0700
-X-CSE-ConnectionGUID: pfGT78KETYqlpzGtVGbcyg==
-X-CSE-MsgGUID: Vkjkd0PTT1Gr0ZqdnB9BuQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,234,1736841600"; 
-   d="scan'208";a="124655188"
-Received: from mohdfai2-ilbpg12-1.png.intel.com ([10.88.227.73])
-  by orviesa003.jf.intel.com with ESMTP; 09 Mar 2025 03:49:08 -0700
-From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Furong Xu <0x1207@gmail.com>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Xiaolei Wang <xiaolei.wang@windriver.com>,
-	Suraj Jaiswal <quic_jsuraj@quicinc.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Jesper Nilsson <jesper.nilsson@axis.com>,
-	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	Chwee-Lin Choong <chwee.lin.choong@intel.com>,
-	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	bpf@vger.kernel.org
-Subject: [PATCH iwl-next v9 14/14] igc: add support to get frame preemption statistics via ethtool
-Date: Sun,  9 Mar 2025 06:46:48 -0400
-Message-Id: <20250309104648.3895551-15-faizal.abdul.rahim@linux.intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250309104648.3895551-1-faizal.abdul.rahim@linux.intel.com>
-References: <20250309104648.3895551-1-faizal.abdul.rahim@linux.intel.com>
+	s=arc-20240116; t=1741519526; c=relaxed/simple;
+	bh=byg4vShXgtYtLB4S77VgFYc0UfrdZG36uUIMAaY903k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=W6EhnhAKpvEkAGjKZA785Xgaiy3gJnM/rpNxt3MEW4H7faKuAT5OyC6Y4YSA2cWdeWTiX6fIiJ6Za4BBMX2lhVUxru16kqDrXduydOxUD6SvbYqJIyD3KFwdIvca97gm4+mX6zYVz1U/ggRBxmHo8Peu9kNVSHfkvjWQCvI55/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LIrTp7md; arc=none smtp.client-ip=209.85.221.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-523fa0df55dso757889e0c.1;
+        Sun, 09 Mar 2025 04:25:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741519523; x=1742124323; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TREwUQZM0D5lAb+hqBXDy6YM7kTSaLkkzG7KiNixFJI=;
+        b=LIrTp7mdp8yzRR4Xzuj36Jl/a8ib7ceJ2NGQFjaW4q/YJDCQKSd2QPXq7+HE4G8Avx
+         22/T07BlzZ59EPZrLLd01tOwUGHOburMj7x/R/gg2Knb0JB16cfy/JzFKnpretRhtgUI
+         1gJV7syo+abCJa6xUMa6wlKPjneBNSVMoIdhM+Aw8nlDv0+CP3rOh2GJm3FkZHNYr/SM
+         zL03dNwAYLq/8NGhCey9t9UUTfUiD+9IAG96RsqHzZ8WruzrNpogWEIpYypyzq6XYXQ9
+         7PqOsXqx24LepqhD1/dqu8+kUq0k0GIXBREIXwUeBXPLY8OqmxdEarERqOA17w12Dqxk
+         ZvGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741519523; x=1742124323;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TREwUQZM0D5lAb+hqBXDy6YM7kTSaLkkzG7KiNixFJI=;
+        b=EObIDjrgL06Ap4hmWMOQJbUonzE8i+mtNKhifdhNvqpWMneoZsnyojPvTZvkymK8j+
+         ToAgOltD1+c5/OiBZlUGh4PszrxnUC7vw1VZfoBcgppzCLFHx7IIlwVk+7HxUPfa1P4t
+         xRoPs/mbAtC+9fLTEmHq+ffARkyy1A3acKhMAIIAJJFOddEe2w0iBjMA+/frtAIUM1Lw
+         j1uoU1DNxbRUwPkeOwQqc5N3mxrrkLU965pleBZCeafgwilsaBB4JALOf/rCbbOPHV5G
+         6YXtyGMq0g20TwnQTKfWeYjx6+U6Be/KQobxlQnmc2lvhemaUYWwwU4922RH824Aqfii
+         Sc8w==
+X-Forwarded-Encrypted: i=1; AJvYcCUzJNtvgjqWG7vj+Gcxkc+EotTeFsjYNKFWtP33d34REZGXKmP1IPkWS2C+NUduqAJAYW5LJLTApIyY@vger.kernel.org, AJvYcCWGG7ZXzh7o6BsYb2BHyrQYOzil6K39pa5Trun3UsUeRmtOjNF1hNvhkUQ41lJlepS0+ICa1ver@vger.kernel.org, AJvYcCWd3CYl4KfWpJUaTPm5Zns/eQiOfmieu1iV37WOliX9FiB0Gm97UqkX9O3UW4MeCJY8rZzToOZtX9PsNfdA@vger.kernel.org, AJvYcCX7U27SNBqk2Fd29pu3B13/HKqIgY9jpgTKzwggT+f1ncOFM3/NlA4b2INY4Y+eCoWIP/td4lcRfHEzA+2ZmkF3c34=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzmz5SlUWMkDJYCi/EzZlKeAMV+fvgwpLqiizfyPmfr1DKEVcRp
+	Dl7jRHURBO9Lc11gQ9WiyNSjNuhz3pwwDeqqLGlEp+d/Sh/VmXGF5Cu/V4vUgssV5zeD+1mwieJ
+	7WZgvVx1PuPgw9Q0gn0MGQ/OgHko=
+X-Gm-Gg: ASbGncvUT1QJ7a8sKUNOHisoSuX63OkmvIaWJMrCNVL0Ylavqq6xadgv7kQVt0FVmpN
+	eVu2YpPhhqccT/0bnIRuQdbPmipO9PgJvGxTWmVaXHIyo2eQDaHHSFzvgijQ36zfQ6D7T4C5kpw
+	C1+4Pv4yd64hLWE5Y7oYDtM8xQ1ONBaePiw/HFEcfT2TL+gJu5k98wxoknobQ=
+X-Google-Smtp-Source: AGHT+IGR0AMVozaKhd3d0+u/7Mk9Kh42jmVI6oN8E+SFpT9ImqGjcRLWJZakpHMAF4QrZTBEa22qw9mn0qgtUBwRb90=
+X-Received: by 2002:a05:6122:134a:b0:520:4fff:4c85 with SMTP id
+ 71dfb90a1353d-523f2813ad1mr3248565e0c.2.1741519523586; Sun, 09 Mar 2025
+ 04:25:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250308200921.1089980-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250308200921.1089980-4-prabhakar.mahadev-lad.rj@bp.renesas.com> <Z81WVNGlvRNW5JFk@shell.armlinux.org.uk>
+In-Reply-To: <Z81WVNGlvRNW5JFk@shell.armlinux.org.uk>
+From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Date: Sun, 9 Mar 2025 11:24:57 +0000
+X-Gm-Features: AQ5f1JrpW9tO2gRYmEY8YFwebspDqap5CdTH1LumhT26vH3pk-Q75QUajPA10Kw
+Message-ID: <CA+V-a8stuYLJMA5UEKpyLpH1kcgEvA=b5BzUOEaCKcfNtdSSfg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 3/3] net: stmmac: Add DWMAC glue layer for
+ Renesas GBETH
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Implemented "ethtool --include-statistics --show-mm" callback for IGC.
+Hi Russell,
 
-Tested preemption scenario to check preemption statistics:
-1) Trigger verification handshake on both boards:
-    $ sudo ethtool --set-mm enp1s0 pmac-enabled on
-    $ sudo ethtool --set-mm enp1s0 tx-enabled on
-    $ sudo ethtool --set-mm enp1s0 verify-enabled on
-2) Set preemptible or express queue in taprio for tx board:
-    $ sudo tc qdisc replace dev enp1s0 parent root handle 100 taprio \
-      num_tc 4 map 3 2 1 0 3 3 3 3 3 3 3 3 3 3 3 3 \
-      queues 1@0 1@1 1@2 1@3 base-time 0 sched-entry S F 100000 \
-      fp E E P P
-3) Send large size packets on preemptible queue
-4) Send small size packets on express queue to preempt packets in
-   preemptible queue
-5) Show preemption statistics on the receiving board:
-   $ ethtool --include-statistics --show-mm enp1s0
-     MAC Merge layer state for enp1s0:
-     pMAC enabled: on
-     TX enabled: on
-     TX active: on
-     TX minimum fragment size: 64
-     RX minimum fragment size: 60
-     Verify enabled: on
-     Verify time: 128
-     Max verify time: 128
-     Verification status: SUCCEEDED
-     Statistics:
-      MACMergeFrameAssErrorCount: 0
-      MACMergeFrameSmdErrorCount: 0
-      MACMergeFrameAssOkCount: 511
-      MACMergeFragCountRx: 764
-      MACMergeFragCountTx: 0
-      MACMergeHoldCount: 0
+Thank you for the review.
 
-Co-developed-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Co-developed-by: Chwee-Lin Choong <chwee.lin.choong@intel.com>
-Signed-off-by: Chwee-Lin Choong <chwee.lin.choong@intel.com>
-Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
----
- drivers/net/ethernet/intel/igc/igc_ethtool.c | 40 ++++++++++++++++++++
- drivers/net/ethernet/intel/igc/igc_regs.h    | 16 ++++++++
- 2 files changed, 56 insertions(+)
+On Sun, Mar 9, 2025 at 8:50=E2=80=AFAM Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> On Sat, Mar 08, 2025 at 08:09:21PM +0000, Prabhakar wrote:
+> > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> >
+> > Add the DWMAC glue layer for the GBETH IP found in the Renesas RZ/V2H(P=
+)
+> > SoC.
+> >
+> > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> > ---
+> > v1->v2
+> > - Dropped __initconst for renesas_gbeth_clks array
+> > - Added clks_config callback
+> > - Dropped STMMAC_FLAG_RX_CLK_RUNS_IN_LPI flag as this needs
+> >   investigation.
+>
+> I thought you had got to the bottom of this, and it was a bug in your
+> clock driver?
+>
+I have added a fix in the clock driver to ignore CLK_MON bits for
+external clocks. The main reason for dropping this flag was despite
+trying the below i.e. adding phy_eee_rx_clock_stop() just before
+unregister_netdev() in stmmac_dvr_remove() still doesnt stop the Rx
+clocks.
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-index fd4b4b332309..324a27a5bef9 100644
---- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-@@ -1819,6 +1819,45 @@ static int igc_ethtool_set_mm(struct net_device *netdev,
- 	return igc_tsn_offload_apply(adapter);
- }
- 
-+/**
-+ * igc_ethtool_get_frame_ass_error - Get the frame assembly error count.
-+ * @reg_value: Register value for IGC_PRMEXCPRCNT
-+ * Return: The count of frame assembly errors.
-+ */
-+static u64 igc_ethtool_get_frame_ass_error(u32 reg_value)
-+{
-+	/* Out of order statistics */
-+	u32 ooo_frame_cnt, ooo_frag_cnt;
-+	u32 miss_frame_frag_cnt;
-+
-+	ooo_frame_cnt = FIELD_GET(IGC_PRMEXCPRCNT_OOO_FRAME_CNT, reg_value);
-+	ooo_frag_cnt = FIELD_GET(IGC_PRMEXCPRCNT_OOO_FRAG_CNT, reg_value);
-+	miss_frame_frag_cnt = FIELD_GET(IGC_PRMEXCPRCNT_MISS_FRAME_FRAG_CNT, reg_value);
-+
-+	return ooo_frame_cnt + ooo_frag_cnt + miss_frame_frag_cnt;
-+}
-+
-+static u64 igc_ethtool_get_frame_smd_error(u32 reg_value)
-+{
-+	return FIELD_GET(IGC_PRMEXCPRCNT_OOO_SMDC, reg_value);
-+}
-+
-+static void igc_ethtool_get_mm_stats(struct net_device *dev,
-+				     struct ethtool_mm_stats *stats)
-+{
-+	struct igc_adapter *adapter = netdev_priv(dev);
-+	struct igc_hw *hw = &adapter->hw;
-+	u32 reg_value;
-+
-+	reg_value = rd32(IGC_PRMEXCPRCNT);
-+
-+	stats->MACMergeFrameAssErrorCount = igc_ethtool_get_frame_ass_error(reg_value);
-+	stats->MACMergeFrameSmdErrorCount = igc_ethtool_get_frame_smd_error(reg_value);
-+	stats->MACMergeFrameAssOkCount = rd32(IGC_PRMPTDRCNT);
-+	stats->MACMergeFragCountRx = rd32(IGC_PRMEVNTRCNT);
-+	stats->MACMergeFragCountTx = rd32(IGC_PRMEVNTTCNT);
-+}
-+
- static int igc_ethtool_get_link_ksettings(struct net_device *netdev,
- 					  struct ethtool_link_ksettings *cmd)
- {
-@@ -2115,6 +2154,7 @@ static const struct ethtool_ops igc_ethtool_ops = {
- 	.set_link_ksettings	= igc_ethtool_set_link_ksettings,
- 	.self_test		= igc_ethtool_diag_test,
- 	.get_mm			= igc_ethtool_get_mm,
-+	.get_mm_stats		= igc_ethtool_get_mm_stats,
- 	.set_mm			= igc_ethtool_set_mm,
- };
- 
-diff --git a/drivers/net/ethernet/intel/igc/igc_regs.h b/drivers/net/ethernet/intel/igc/igc_regs.h
-index 12ddc5793651..f343c6bfc6be 100644
---- a/drivers/net/ethernet/intel/igc/igc_regs.h
-+++ b/drivers/net/ethernet/intel/igc/igc_regs.h
-@@ -222,6 +222,22 @@
- 
- #define IGC_FTQF(_n)	(0x059E0 + (4 * (_n)))  /* 5-tuple Queue Fltr */
- 
-+/* Time sync registers - preemption statistics */
-+#define IGC_PRMPTDRCNT		0x04284	/* Good RX Preempted Packets */
-+#define IGC_PRMEVNTTCNT		0x04298	/* TX Preemption event counter */
-+#define IGC_PRMEVNTRCNT		0x0429C	/* RX Preemption event counter */
-+
-+ /* Preemption Exception Counter */
-+ #define IGC_PRMEXCPRCNT				0x42A0
-+/* Received out of order packets with SMD-C */
-+#define IGC_PRMEXCPRCNT_OOO_SMDC			0x000000FF
-+/* Received out of order packets with SMD-C and wrong Frame CNT */
-+#define IGC_PRMEXCPRCNT_OOO_FRAME_CNT			0x0000FF00
-+/* Received out of order packets with SMD-C and wrong Frag CNT */
-+#define IGC_PRMEXCPRCNT_OOO_FRAG_CNT			0x00FF0000
-+/* Received packets with SMD-S and wrong Frag CNT and Frame CNT */
-+#define IGC_PRMEXCPRCNT_MISS_FRAME_FRAG_CNT		0xFF000000
-+
- /* Transmit Scheduling Registers */
- #define IGC_TQAVCTRL		0x3570
- #define IGC_TXQCTL(_n)		(0x3344 + 0x4 * (_n))
--- 
-2.34.1
+         if (ndev->phydev)
+                 phy_eee_rx_clock_stop(ndev->phydev, false);
 
+Note, on another platform where I can issue a reset to the PHY I
+issued the reset after unbind operation and monitored the Rx clock
+using CLK_MON and I noticed they reported  Rx clocks were OFF. But on
+the current platform I cannot issue a reset to the PHY after unbind
+operation.
+
+> > + * The Rx and Tx clocks are supplied as follows for the GBETH IP.
+> > + *
+> > + *                         Rx / Tx
+> > + *   -------+------------- on / off -------
+> > + *          |
+> > + *          |            Rx-180 / Tx-180
+> > + *          +---- not ---- on / off -------
+>
+> Thanks for the diagram.
+>
+> > +struct renesas_gbeth {
+> > +     struct device *dev;
+> > +     void __iomem *regs;
+> > +     unsigned int num_clks;
+> > +     struct clk *clk_tx_i;
+> > +     struct clk_bulk_data *clks;
+> > +     struct reset_control *rstc;
+> > +};
+>
+> If you stored a pointer to struct plat_stmmacenet_data, then you
+> wouldn't need num_clks, clk_tx_i or clks. If you look at
+> dwmac-dwc-qos-eth.c, I recently added a helper (dwc_eth_find_clk())
+> which could be made generic.
+>
+> You can then include the clk_tx_i clock in the bulk clock, and
+> use the helper to set plat_dat->clk_tx_i.
+>
+Thanks for the pointer, I'll switch to that.
+
+> > +     plat_dat->flags |=3D STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY |
+> > +                        STMMAC_FLAG_EN_TX_LPI_CLOCKGATING |
+>
+> Didn't I send you a patch that provides
+> STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP so we can move towards the PHY
+> saying whether it permits the TX clock to be disabled?
+>
+I'll rebase my changes on top of [0]. Do you want me to run any
+specific tests for this?
+
+[0] https://patchwork.kernel.org/project/netdevbpf/patch/E1trCPy-005jZf-Ou@=
+rmk-PC.armlinux.org.uk/
+
+Cheers,
+Prabhakar
 
