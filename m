@@ -1,1224 +1,146 @@
-Return-Path: <netdev+bounces-173239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48BBAA581CD
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 09:41:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35408A58275
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 09:53:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 821B1188AF9A
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 08:41:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D36116AD61
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 08:53:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D758B18FC74;
-	Sun,  9 Mar 2025 08:41:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA53619D882;
+	Sun,  9 Mar 2025 08:51:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vKBO7bWD"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="hPsLJARs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 382C318872D
-	for <netdev@vger.kernel.org>; Sun,  9 Mar 2025 08:41:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B4A11917ED;
+	Sun,  9 Mar 2025 08:51:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741509691; cv=none; b=QeCOGd/TMzbB1k//q0VQQCNF5gQrvyjL8HCWHkc6LAqy9+wzEqDm5Dn1sg254yBdsGPW1+x+Z47uDaOm7d/2nALgn6ogjRL8KDb7Zs3+rz4ST9ICNq2oEHwa+gsNuGZnhYnzBysUlwfrYs48cfI1qW1paCJLfsdl/eAbKI2MVgM=
+	t=1741510265; cv=none; b=oYDRd29gM4eGbApqo7KSmVwl6z2voDIjVEIx7PZGUIw/J5QMrVkTOQFctMU5ib80RG5cagqXlgZy0itwO9DM13zliMwrzFCd+b0G4KpwHfiJQu+n2an3mzi704CGzjVBJNi+Or11lx4cTYe4yHwtTbq9L2T/7cVyTfiTPbcVJos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741509691; c=relaxed/simple;
-	bh=uAzzHTj7oK/QD+1n4KO4qeev36Hh8XsXv2cRbTYW25Q=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=kHe5iZ6EOFJtYNgx12GRRmXn+I51BXbZvPHgx6Oht4UXDhgw3kVPsaOg2NFT6QD8EgoWI6Y7/3pTEgNjBQpMnqzVOuns1sW1KhR4gV+UfDsuEW/Wd9WUH6wBrrBpNbmCS+paonfrc/efwxlOvQlhdD28gAV2hxU40BNl6FwCK90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vKBO7bWD; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ff82dd6de0so2964502a91.0
-        for <netdev@vger.kernel.org>; Sun, 09 Mar 2025 00:41:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741509688; x=1742114488; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=v0b3GISZlOZAZ3BhnwQvhy7RuIcF202x3Kw2L+mXCpM=;
-        b=vKBO7bWDTue6FaAlsg5l4uMKW7Z9yqrXVCb6Dkjarl9utKtrec8Lb/71nVfI3gKhAp
-         iNwcICqkD3s/zwTSrpCYi47cwXcl7gxDDnpm+879WtnoUP8Z4UBm3ZbG5y6XAJn4sfZr
-         OgnmnHEOQ13VL8LESaSX6V1+TZnl03ZrjZwtkS9YK1oCftXahtlqBWT8vNmLpHw2J6sS
-         xaJ+51GCJHKbbRxiOz0BXhZI1x5J8eke+Kt/qe/gRHQiB320zQhrfda0DMsxqzeanG5l
-         Zz2rS2Ty21/0UtK4z+nfqDESkz8qYphltrLZUeU+JtVpHKLXlDtahYzJjbN4c7LFFxpo
-         kWlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741509688; x=1742114488;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v0b3GISZlOZAZ3BhnwQvhy7RuIcF202x3Kw2L+mXCpM=;
-        b=hE2Ey7VBwDFNrzCxq1Aov+gv3c7cz8cRBAStnhnBDioz+4vah2T8BmVDoDQgbH0ugk
-         BBcDKlM8xJmTbX4cMDIBd2Q64+KgCkLCduUSire02USzZCGfRLDI+9UtheVWinbeA49v
-         zyIyZaV/jKZU18qXkhIqyjdxvbrOj4AWXVTqkXKIiwTAeEyxCf5hrGU5qErE2/X3OHrM
-         cnpNCJlZehmR1aMvp9tbNFpnkjSF9UIn+SypCATasQinOT2cg+CsWDS2FWBt6uvRqT7+
-         TLLrsTpqzTgLQODJ+UVqRqoaGPuP3aju3Si9fDvTn4BMPbkJM1zya4rKG7M4kLZiWqaT
-         tyYA==
-X-Gm-Message-State: AOJu0YzMIf9cRclV3GoShWIGUv6MHZd70K0rhb5XNauTIjn+rUwS65Nz
-	imeG/wTCrUt2NVF48PHIa6lZ1ya6/GPBJj/P7nMamRS5tRhgEqDxSazPwv/1gelqe0kBIeIRFev
-	VvF+FKoJgAzKuvAxGNe9/z8Crq7vFfJz0koK7hrGtj2b/t0RcGVWPrwpn5W/eQSyR+DH1R5XjY/
-	Sjaw4xvHcd29g0md2QNKeh4WO5qBzZV1BelOv8N+Ym0LpFLZ67wEPfOMAdEE4=
-X-Google-Smtp-Source: AGHT+IGqKNiKrDt/XRyvcCunMHtn5U4yjk0QeUh5cfi2/+Y4QzpyZpo7sl27MzkA/eVil98iQJsns/LlwWKAcsM8ig==
-X-Received: from pgqs1.prod.google.com ([2002:a65:6901:0:b0:af2:36bf:18c7])
- (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a21:2d04:b0:1f1:b69:9bdd with SMTP id adf61e73a8af0-1f544c87e20mr16609976637.37.1741509688339;
- Sun, 09 Mar 2025 00:41:28 -0800 (PST)
-Date: Sun,  9 Mar 2025 08:41:18 +0000
+	s=arc-20240116; t=1741510265; c=relaxed/simple;
+	bh=5jECTUiw9haCgXbEVQtiLiq0L4+XTURHsaG7ZIr/8KY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YMTEvARjpIOx5E599WZbfYxGf5ZcqvJ/xQ8/nZdEFsGAhSXcmeE9ukAuWdW67ti4xH2I9DUWDVOTsursqHu9zWuwu+EvK6ig+9pCiQHO3uaPwK69GmvJEc9JQGFSx9O4InRJ0yODaAmxEBxdHG6WEdaeTwBFKzIMC/iJjHG9Iy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=hPsLJARs; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=aqRgtvOvtDN3KSFPVIG9hG6fYTTX8Eg1w+wLpj29zgk=; b=hPsLJARs3EKAyDhDslxETQiu0l
+	XSEmcc26ugqnFvHWolkj8IdE3cvotzUBziKngYWlhLEpfYPj9TM/1owsi20dgqGxqMbDg6gbGauQW
+	EIMyhhWyjaIcdm+g//NiJE5prMoOHlvtZ6k0c5vjZgV+s+OykMzWRNbI8Q5vGIBxpfuYDVS4/xSWq
+	a0kvrYdbZ12gu6/4MSshaR1uL+dYrxrfFcIr4+Teek+JKu/IU76EAxX4d/wkTEq4XziRb3Ba0ynOm
+	mX0BfmYa1qGAcgo32hKTZ0KOdt4WUzP2qcAaHxX0zENcLpCa9AcKngUCwsq90B4kw9nLoF0pdSFhS
+	uQ29ZYzA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51030)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1trCMm-00014z-17;
+	Sun, 09 Mar 2025 08:50:36 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1trCMe-0001KD-1v;
+	Sun, 09 Mar 2025 08:50:28 +0000
+Date: Sun, 9 Mar 2025 08:50:28 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Prabhakar <prabhakar.csengg@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH net-next v2 3/3] net: stmmac: Add DWMAC glue layer for
+ Renesas GBETH
+Message-ID: <Z81WVNGlvRNW5JFk@shell.armlinux.org.uk>
+References: <20250308200921.1089980-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250308200921.1089980-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.49.0.rc0.332.g42c0ae87b1-goog
-Message-ID: <20250309084118.3080950-1-almasrymina@google.com>
-Subject: [PATCH RFC net-next v1] page_pool: import Jesper's page_pool benchmark
-From: Mina Almasry <almasrymina@google.com>
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Jakub Kicinski <kuba@kernel.org>, 
-	"=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?=" <toke@toke.dk>, Mina Almasry <almasrymina@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250308200921.1089980-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Jesper Dangaard Brouer <hawk@kernel.org>
+On Sat, Mar 08, 2025 at 08:09:21PM +0000, Prabhakar wrote:
+> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> 
+> Add the DWMAC glue layer for the GBETH IP found in the Renesas RZ/V2H(P)
+> SoC.
+> 
+> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> ---
+> v1->v2
+> - Dropped __initconst for renesas_gbeth_clks array
+> - Added clks_config callback
+> - Dropped STMMAC_FLAG_RX_CLK_RUNS_IN_LPI flag as this needs
+>   investigation.
 
-We frequently consult with Jesper's out-of-tree page_pool benchmark to
-evaluate page_pool changes.
+I thought you had got to the bottom of this, and it was a bug in your
+clock driver?
 
-Consider importing the benchmark into the upstream linux kernel tree so
-that (a) we're all running the same version, (b) pave the way for shared
-improvements, and (c) maybe one day integrate it with nipa, if possible.
+> + * The Rx and Tx clocks are supplied as follows for the GBETH IP.
+> + *
+> + *                         Rx / Tx
+> + *   -------+------------- on / off -------
+> + *          |
+> + *          |            Rx-180 / Tx-180
+> + *          +---- not ---- on / off -------
 
-I imported the bench_page_pool_simple from commit 35b1716d0c30 ("Add
-page_bench06_walk_all"), from this repository:
-https://github.com/netoptimizer/prototype-kernel.git
+Thanks for the diagram.
 
-I imported the benchmark, largely as-is. I only fixed build or
-checkpatch issues.
+> +struct renesas_gbeth {
+> +	struct device *dev;
+> +	void __iomem *regs;
+> +	unsigned int num_clks;
+> +	struct clk *clk_tx_i;
+> +	struct clk_bulk_data *clks;
+> +	struct reset_control *rstc;
+> +};
 
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Toke H=C3=B8iland-J=C3=B8rgensen <toke@toke.dk>
-Cc: netdev@vger.kernel.org
-Signed-off-by: Mina Almasry <almasrymina@google.com>
+If you stored a pointer to struct plat_stmmacenet_data, then you
+wouldn't need num_clks, clk_tx_i or clks. If you look at
+dwmac-dwc-qos-eth.c, I recently added a helper (dwc_eth_find_clk())
+which could be made generic.
 
----
+You can then include the clk_tx_i clock in the bulk clock, and
+use the helper to set plat_dat->clk_tx_i.
 
-RFC discussion points:
-- Desirable to import it?
-- Can the benchmark be imported as-is for an initial version? Or needs
-  lots of modifications?
-- Code location. I retained the location in Jesper's tree, but a path
-  like net/core/bench/ may make more sense.
+> +	plat_dat->flags |= STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY |
+> +			   STMMAC_FLAG_EN_TX_LPI_CLOCKGATING |
 
----
- lib/Kconfig                        |   2 +
- lib/Makefile                       |   2 +
- lib/bench/Kconfig                  |   4 +
- lib/bench/Makefile                 |   3 +
- lib/bench/bench_page_pool_simple.c | 328 ++++++++++++++++++++++
- lib/bench/time_bench.c             | 426 +++++++++++++++++++++++++++++
- lib/bench/time_bench.h             | 259 ++++++++++++++++++
- 7 files changed, 1024 insertions(+)
- create mode 100644 lib/bench/Kconfig
- create mode 100644 lib/bench/Makefile
- create mode 100644 lib/bench/bench_page_pool_simple.c
- create mode 100644 lib/bench/time_bench.c
- create mode 100644 lib/bench/time_bench.h
+Didn't I send you a patch that provides
+STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP so we can move towards the PHY
+saying whether it permits the TX clock to be disabled?
 
-diff --git a/lib/Kconfig b/lib/Kconfig
-index dccb61b7d698..fe9b3f48cf11 100644
---- a/lib/Kconfig
-+++ b/lib/Kconfig
-@@ -758,3 +758,5 @@ config UNION_FIND
-=20
- config MIN_HEAP
- 	bool
-+
-+source "lib/bench/Kconfig"
-diff --git a/lib/Makefile b/lib/Makefile
-index 19ff6993c2bc..1ea2faf275d3 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -133,6 +133,8 @@ CFLAGS_debug_info.o +=3D $(call cc-option, -femit-struc=
-t-debug-detailed=3Dany)
-=20
- obj-y +=3D math/ crypto/
-=20
-+obj-$(CONFIG_BENCH_PAGE_POOL) +=3D bench/
-+
- obj-$(CONFIG_GENERIC_IOMAP) +=3D iomap.o
- obj-$(CONFIG_HAS_IOMEM) +=3D iomap_copy.o devres.o
- obj-$(CONFIG_CHECK_SIGNATURE) +=3D check_signature.o
-diff --git a/lib/bench/Kconfig b/lib/bench/Kconfig
-new file mode 100644
-index 000000000000..a833ff6a622d
---- /dev/null
-+++ b/lib/bench/Kconfig
-@@ -0,0 +1,4 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+config BENCH_PAGE_POOL
-+	tristate "bench page pool"
-+	depends on PAGE_POOL
-diff --git a/lib/bench/Makefile b/lib/bench/Makefile
-new file mode 100644
-index 000000000000..af9a0f89c7c5
---- /dev/null
-+++ b/lib/bench/Makefile
-@@ -0,0 +1,3 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+obj-$(CONFIG_BENCH_PAGE_POOL) +=3D bench_page_pool_simple.o time_bench.o
-diff --git a/lib/bench/bench_page_pool_simple.c b/lib/bench/bench_page_pool=
-_simple.c
-new file mode 100644
-index 000000000000..c35e8d72420c
---- /dev/null
-+++ b/lib/bench/bench_page_pool_simple.c
-@@ -0,0 +1,328 @@
-+/*
-+ * Benchmark module for page_pool.
-+ *
-+ * The complication for benchmarking page_pool is that it depends on runni=
-ng
-+ * under softirq, and will choose a slower path if check in_serving_softir=
-q
-+ * fails.  This module uses tasklet's to workaround this.
-+ */
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+#include <linux/module.h>
-+#include <linux/mutex.h>
-+
-+#include <linux/version.h>
-+#include <net/page_pool/helpers.h>
-+
-+#include <linux/interrupt.h>
-+#include <linux/limits.h>
-+
-+#include "time_bench.h"
-+
-+static int verbose =3D 1;
-+#define MY_POOL_SIZE 1024
-+
-+static inline void _page_pool_put_page(struct page_pool *pool,
-+				       struct page *page, bool allow_direct)
-+{
-+	page_pool_put_page(pool, page, -1, allow_direct);
-+}
-+
-+DEFINE_MUTEX(wait_for_tasklet);
-+
-+/* Makes tests selectable. Useful for perf-record to analyze a single test=
-.
-+ * Hint: Bash shells support writing binary number like: $((2#101010)
-+ *
-+ * # modprobe bench_page_pool_simple run_flags=3D$((2#100))
-+ */
-+static unsigned long run_flags =3D 0xFFFFFFFF;
-+module_param(run_flags, ulong, 0);
-+MODULE_PARM_DESC(run_flags, "Limit which bench test that runs");
-+/* Count the bit number from the enum */
-+enum benchmark_bit {
-+	bit_run_bench_baseline,
-+	bit_run_bench_no_softirq01,
-+	bit_run_bench_no_softirq02,
-+	bit_run_bench_no_softirq03,
-+	bit_run_bench_tasklet01,
-+	bit_run_bench_tasklet02,
-+	bit_run_bench_tasklet03,
-+};
-+#define bit(b)		(1 << (b))
-+#define enabled(b)	((run_flags & (bit(b))))
-+
-+/* notice time_bench is limited to U32_MAX nr loops */
-+static unsigned long loops =3D 10000000;
-+module_param(loops, ulong, 0);
-+MODULE_PARM_DESC(loops, "Specify loops bench will run");
-+
-+/* Timing at the nanosec level, we need to know the overhead
-+ * introduced by the for loop itself */
-+static int time_bench_for_loop(struct time_bench_record *rec, void *data)
-+{
-+	uint64_t loops_cnt =3D 0;
-+	int i;
-+
-+	time_bench_start(rec);
-+	/** Loop to measure **/
-+	for (i =3D 0; i < rec->loops; i++) {
-+		loops_cnt++;
-+		barrier(); /* avoid compiler to optimize this loop */
-+	}
-+	time_bench_stop(rec, loops_cnt);
-+	return loops_cnt;
-+}
-+
-+static int time_bench_atomic_inc(struct time_bench_record *rec, void *data=
-)
-+{
-+	uint64_t loops_cnt =3D 0;
-+	atomic_t cnt;
-+	int i;
-+
-+	atomic_set(&cnt, 0);
-+
-+	time_bench_start(rec);
-+	/** Loop to measure **/
-+	for (i =3D 0; i < rec->loops; i++) {
-+		atomic_inc(&cnt);
-+		barrier(); /* avoid compiler to optimize this loop */
-+	}
-+	loops_cnt =3D atomic_read(&cnt);
-+	time_bench_stop(rec, loops_cnt);
-+	return loops_cnt;
-+}
-+
-+/* The ptr_ping in page_pool uses a spinlock. We need to know the minimum
-+ * overhead of taking+releasing a spinlock, to know the cycles that can be=
- saved
-+ * by e.g. amortizing this via bulking.
-+ */
-+static int time_bench_lock(struct time_bench_record *rec, void *data)
-+{
-+	uint64_t loops_cnt =3D 0;
-+	spinlock_t lock;
-+	int i;
-+
-+	spin_lock_init(&lock);
-+
-+	time_bench_start(rec);
-+	/** Loop to measure **/
-+	for (i =3D 0; i < rec->loops; i++) {
-+		spin_lock(&lock);
-+		loops_cnt++;
-+		barrier(); /* avoid compiler to optimize this loop */
-+		spin_unlock(&lock);
-+	}
-+	time_bench_stop(rec, loops_cnt);
-+	return loops_cnt;
-+}
-+
-+/* Helper for filling some page's into ptr_ring */
-+static void pp_fill_ptr_ring(struct page_pool *pp, int elems)
-+{
-+	gfp_t gfp_mask =3D GFP_ATOMIC; /* GFP_ATOMIC needed when under run softir=
-q */
-+	struct page **array;
-+	int i;
-+
-+	array =3D kzalloc(sizeof(struct page *) * elems, gfp_mask);
-+
-+	for (i =3D 0; i < elems; i++) {
-+		array[i] =3D page_pool_alloc_pages(pp, gfp_mask);
-+	}
-+	for (i =3D 0; i < elems; i++) {
-+		_page_pool_put_page(pp, array[i], false);
-+	}
-+
-+	kfree(array);
-+}
-+
-+enum test_type { type_fast_path, type_ptr_ring, type_page_allocator };
-+
-+/* Depends on compile optimizing this function */
-+static __always_inline int time_bench_page_pool(struct time_bench_record *=
-rec,
-+						void *data, enum test_type type,
-+						const char *func)
-+{
-+	uint64_t loops_cnt =3D 0;
-+	gfp_t gfp_mask =3D GFP_ATOMIC; /* GFP_ATOMIC is not really needed */
-+	int i, err;
-+
-+	struct page_pool *pp;
-+	struct page *page;
-+
-+	struct page_pool_params pp_params =3D {
-+		.order =3D 0,
-+		.flags =3D 0,
-+		.pool_size =3D MY_POOL_SIZE,
-+		.nid =3D NUMA_NO_NODE,
-+		.dev =3D NULL, /* Only use for DMA mapping */
-+		.dma_dir =3D DMA_BIDIRECTIONAL,
-+	};
-+
-+	pp =3D page_pool_create(&pp_params);
-+	if (IS_ERR(pp)) {
-+		err =3D PTR_ERR(pp);
-+		pr_warn("%s: Error(%d) creating page_pool\n", func, err);
-+		goto out;
-+	}
-+	pp_fill_ptr_ring(pp, 64);
-+
-+	if (in_serving_softirq())
-+		pr_warn("%s(): in_serving_softirq fast-path\n", func);
-+	else
-+		pr_warn("%s(): Cannot use page_pool fast-path\n", func);
-+
-+	time_bench_start(rec);
-+	/** Loop to measure **/
-+	for (i =3D 0; i < rec->loops; i++) {
-+		/* Common fast-path alloc, that depend on in_serving_softirq() */
-+		page =3D page_pool_alloc_pages(pp, gfp_mask);
-+		if (!page)
-+			break;
-+		loops_cnt++;
-+		barrier(); /* avoid compiler to optimize this loop */
-+
-+		/* The benchmarks purpose it to test different return paths.
-+		 * Compiler should inline optimize other function calls out
-+		 */
-+		if (type =3D=3D type_fast_path) {
-+			/* Fast-path recycling e.g. XDP_DROP use-case */
-+			page_pool_recycle_direct(pp, page);
-+
-+		} else if (type =3D=3D type_ptr_ring) {
-+			/* Normal return path */
-+			_page_pool_put_page(pp, page, false);
-+
-+		} else if (type =3D=3D type_page_allocator) {
-+			/* Test if not pages are recycled, but instead
-+			 * returned back into systems page allocator
-+			 */
-+			get_page(page); /* cause no-recycling */
-+			_page_pool_put_page(pp, page, false);
-+			put_page(page);
-+		} else {
-+			BUILD_BUG();
-+		}
-+	}
-+	time_bench_stop(rec, loops_cnt);
-+out:
-+	page_pool_destroy(pp);
-+	return loops_cnt;
-+}
-+
-+static int time_bench_page_pool01_fast_path(struct time_bench_record *rec,
-+					    void *data)
-+{
-+	return time_bench_page_pool(rec, data, type_fast_path, __func__);
-+}
-+
-+static int time_bench_page_pool02_ptr_ring(struct time_bench_record *rec,
-+					   void *data)
-+{
-+	return time_bench_page_pool(rec, data, type_ptr_ring, __func__);
-+}
-+
-+static int time_bench_page_pool03_slow(struct time_bench_record *rec,
-+				       void *data)
-+{
-+	return time_bench_page_pool(rec, data, type_page_allocator, __func__);
-+}
-+
-+/* Testing page_pool requires running under softirq.
-+ *
-+ * Running under a tasklet satisfy this, as tasklets are built on top of
-+ * softirq.
-+ */
-+static void pp_tasklet_handler(struct tasklet_struct *t)
-+{
-+	uint32_t nr_loops =3D loops;
-+
-+	if (in_serving_softirq())
-+		pr_warn("%s(): in_serving_softirq fast-path\n",
-+			__func__); // True
-+	else
-+		pr_warn("%s(): Cannot use page_pool fast-path\n", __func__);
-+
-+	if (enabled(bit_run_bench_tasklet01))
-+		time_bench_loop(nr_loops, 0, "tasklet_page_pool01_fast_path",
-+				NULL, time_bench_page_pool01_fast_path);
-+
-+	if (enabled(bit_run_bench_tasklet02))
-+		time_bench_loop(nr_loops, 0, "tasklet_page_pool02_ptr_ring",
-+				NULL, time_bench_page_pool02_ptr_ring);
-+
-+	if (enabled(bit_run_bench_tasklet03))
-+		time_bench_loop(nr_loops, 0, "tasklet_page_pool03_slow", NULL,
-+				time_bench_page_pool03_slow);
-+
-+	mutex_unlock(&wait_for_tasklet); /* Module __init waiting on unlock */
-+}
-+DECLARE_TASKLET_DISABLED(pp_tasklet, pp_tasklet_handler);
-+
-+static void run_tasklet_tests(void)
-+{
-+	tasklet_enable(&pp_tasklet);
-+	/* "Async" schedule tasklet, which runs on the CPU that schedule it */
-+	tasklet_schedule(&pp_tasklet);
-+}
-+
-+static int run_benchmark_tests(void)
-+{
-+	uint32_t nr_loops =3D loops;
-+	int passed_count =3D 0;
-+
-+	/* Baseline tests */
-+	if (enabled(bit_run_bench_baseline)) {
-+		time_bench_loop(nr_loops * 10, 0, "for_loop", NULL,
-+				time_bench_for_loop);
-+		time_bench_loop(nr_loops * 10, 0, "atomic_inc", NULL,
-+				time_bench_atomic_inc);
-+		time_bench_loop(nr_loops, 0, "lock", NULL, time_bench_lock);
-+	}
-+
-+	/* This test cannot activate correct code path, due to no-softirq ctx */
-+	if (enabled(bit_run_bench_no_softirq01))
-+		time_bench_loop(nr_loops, 0, "no-softirq-page_pool01", NULL,
-+				time_bench_page_pool01_fast_path);
-+	if (enabled(bit_run_bench_no_softirq02))
-+		time_bench_loop(nr_loops, 0, "no-softirq-page_pool02", NULL,
-+				time_bench_page_pool02_ptr_ring);
-+	if (enabled(bit_run_bench_no_softirq03))
-+		time_bench_loop(nr_loops, 0, "no-softirq-page_pool03", NULL,
-+				time_bench_page_pool03_slow);
-+
-+	return passed_count;
-+}
-+
-+static int __init bench_page_pool_simple_module_init(void)
-+{
-+	if (verbose)
-+		pr_info("Loaded\n");
-+
-+	if (loops > U32_MAX) {
-+		pr_err("Module param loops(%lu) exceeded U32_MAX(%u)\n", loops,
-+		       U32_MAX);
-+		return -ECHRNG;
-+	}
-+
-+	run_benchmark_tests();
-+
-+	mutex_lock(&wait_for_tasklet);
-+	run_tasklet_tests();
-+	/* Sleep on mutex, waiting for tasklet to release */
-+	mutex_lock(&wait_for_tasklet);
-+
-+	return 0;
-+}
-+module_init(bench_page_pool_simple_module_init);
-+
-+static void __exit bench_page_pool_simple_module_exit(void)
-+{
-+	tasklet_kill(&pp_tasklet);
-+
-+	if (verbose)
-+		pr_info("Unloaded\n");
-+}
-+module_exit(bench_page_pool_simple_module_exit);
-+
-+MODULE_DESCRIPTION("Benchmark of page_pool simple cases");
-+MODULE_AUTHOR("Jesper Dangaard Brouer <netoptimizer@brouer.com>");
-+MODULE_LICENSE("GPL");
-diff --git a/lib/bench/time_bench.c b/lib/bench/time_bench.c
-new file mode 100644
-index 000000000000..4f5314419644
---- /dev/null
-+++ b/lib/bench/time_bench.c
-@@ -0,0 +1,426 @@
-+/*
-+ * Benchmarking code execution time inside the kernel
-+ *
-+ * Copyright (C) 2014, Red Hat, Inc., Jesper Dangaard Brouer
-+ *  for licensing details see kernel-base/COPYING
-+ */
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+#include <linux/module.h>
-+#include <linux/time.h>
-+#include <linux/time_bench.h>
-+
-+#include <linux/perf_event.h> /* perf_event_create_kernel_counter() */
-+
-+/* For concurrency testing */
-+#include <linux/completion.h>
-+#include <linux/sched.h>
-+#include <linux/workqueue.h>
-+#include <linux/kthread.h>
-+
-+static int verbose =3D 1;
-+
-+/** TSC (Time-Stamp Counter) based **
-+ * See: linux/time_bench.h
-+ *  tsc_start_clock() and tsc_stop_clock()
-+ */
-+
-+/** Wall-clock based **
-+ */
-+
-+/** PMU (Performance Monitor Unit) based **
-+ */
-+#define PERF_FORMAT					    \
-+	(PERF_FORMAT_GROUP | PERF_FORMAT_ID |		    \
-+	PERF_FORMAT_TOTAL_TIME_ENABLED |		    \
-+	PERF_FORMAT_TOTAL_TIME_RUNNING)
-+
-+struct raw_perf_event {
-+	uint64_t  config;  /* event */
-+	uint64_t  config1; /* umask */
-+	struct perf_event *save;
-+	char *desc;
-+};
-+
-+/* if HT is enable a maximum of 4 events (5 if one is instructions
-+ * retired can be specified, if HT is disabled a maximum of 8 (9 if
-+ * one is instructions retired) can be specified.
-+ *
-+ * From Table 19-1. Architectural Performance Events
-+ * Architectures Software Developer=E2=80=99s Manual Volume 3: System Prog=
-ramming Guide
-+ */
-+struct raw_perf_event perf_events[] =3D {
-+	{ 0x3c, 0x00, NULL, "Unhalted CPU Cycles" },
-+	{ 0xc0, 0x00, NULL, "Instruction Retired" }
-+};
-+
-+#define NUM_EVTS (sizeof(perf_events) / sizeof(struct raw_perf_event))
-+
-+/* WARNING: PMU config is currently broken!
-+ */
-+bool time_bench_PMU_config(bool enable)
-+{
-+	int i;
-+	struct perf_event_attr perf_conf;
-+	struct perf_event *perf_event;
-+	int cpu;
-+
-+	preempt_disable();
-+	cpu =3D smp_processor_id();
-+	pr_info("DEBUG: cpu:%d\n", cpu);
-+	preempt_enable();
-+
-+	memset(&perf_conf, 0, sizeof(struct perf_event_attr));
-+	perf_conf.type           =3D PERF_TYPE_RAW;
-+	perf_conf.size           =3D sizeof(struct perf_event_attr);
-+	perf_conf.read_format    =3D PERF_FORMAT;
-+	perf_conf.pinned         =3D 1;
-+	perf_conf.exclude_user   =3D 1; /* No userspace events */
-+	perf_conf.exclude_kernel =3D 0; /* Only kernel events */
-+
-+	for (i =3D 0; i < NUM_EVTS; i++) {
-+		perf_conf.disabled =3D enable;
-+		perf_conf.config =3D perf_events[i].config;
-+		perf_conf.config1 =3D perf_events[i].config1;
-+		if (verbose)
-+			pr_info("%s() enable PMU counter: %s\n",
-+				__func__, perf_events[i].desc);
-+		perf_event =3D perf_event_create_kernel_counter(&perf_conf, cpu,
-+						 NULL /* task */,
-+						 NULL /* overflow_handler*/,
-+						 NULL /* context */);
-+		if (perf_event) {
-+			perf_events[i].save =3D perf_event;
-+			pr_info("%s():DEBUG perf_event success\n", __func__);
-+
-+			perf_event_enable(perf_event);
-+		} else {
-+			pr_info("%s():DEBUG perf_event is NULL\n", __func__);
-+		}
-+	}
-+
-+	return true;
-+}
-+EXPORT_SYMBOL_GPL(time_bench_PMU_config);
-+
-+/** Generic functions **
-+ */
-+
-+/* Calculate stats, store results in record */
-+bool time_bench_calc_stats(struct time_bench_record *rec)
-+{
-+#define NANOSEC_PER_SEC 1000000000 /* 10^9 */
-+	uint64_t ns_per_call_tmp_rem =3D 0;
-+	uint32_t ns_per_call_remainder =3D 0;
-+	uint64_t pmc_ipc_tmp_rem =3D 0;
-+	uint32_t pmc_ipc_remainder =3D 0;
-+	uint32_t pmc_ipc_div =3D 0;
-+	uint32_t invoked_cnt_precision =3D 0;
-+	uint32_t invoked_cnt =3D 0; /* 32-bit due to div_u64_rem() */
-+
-+	if (rec->flags & TIME_BENCH_LOOP) {
-+		if (rec->invoked_cnt < 1000) {
-+			pr_err("ERR: need more(>1000) loops(%llu) for timing\n",
-+			       rec->invoked_cnt);
-+			return false;
-+		}
-+		if (rec->invoked_cnt > ((1ULL << 32) - 1)) {
-+			/* div_u64_rem() can only support div with 32bit*/
-+			pr_err("ERR: Invoke cnt(%llu) too big overflow 32bit\n",
-+			       rec->invoked_cnt);
-+			return false;
-+		}
-+		invoked_cnt =3D (uint32_t)rec->invoked_cnt;
-+	}
-+
-+	/* TSC (Time-Stamp Counter) records */
-+	if (rec->flags & TIME_BENCH_TSC) {
-+		rec->tsc_interval =3D rec->tsc_stop - rec->tsc_start;
-+		if (rec->tsc_interval =3D=3D 0) {
-+			pr_err("ABORT: timing took ZERO TSC time\n");
-+			return false;
-+		}
-+		/* Calculate stats */
-+		if (rec->flags & TIME_BENCH_LOOP)
-+			rec->tsc_cycles =3D rec->tsc_interval / invoked_cnt;
-+		else
-+			rec->tsc_cycles =3D rec->tsc_interval;
-+	}
-+
-+	/* Wall-clock time calc */
-+	if (rec->flags & TIME_BENCH_WALLCLOCK) {
-+		rec->time_start =3D rec->ts_start.tv_nsec +
-+				  (NANOSEC_PER_SEC * rec->ts_start.tv_sec);
-+		rec->time_stop =3D rec->ts_stop.tv_nsec +
-+				 (NANOSEC_PER_SEC * rec->ts_stop.tv_sec);
-+		rec->time_interval =3D rec->time_stop - rec->time_start;
-+		if (rec->time_interval =3D=3D 0) {
-+			pr_err("ABORT: timing took ZERO wallclock time\n");
-+			return false;
-+		}
-+		/* Calculate stats */
-+		/*** Division in kernel it tricky ***/
-+		/* Orig: time_sec =3D (time_interval / NANOSEC_PER_SEC); */
-+		/* remainder only correct because NANOSEC_PER_SEC is 10^9 */
-+		rec->time_sec =3D div_u64_rem(rec->time_interval, NANOSEC_PER_SEC,
-+					    &rec->time_sec_remainder);
-+
-+		if (rec->flags & TIME_BENCH_LOOP) {
-+			/*** Division in kernel it tricky ***/
-+			/* Orig: ns =3D ((double)time_interval / invoked_cnt); */
-+			/* First get quotient */
-+			rec->ns_per_call_quotient =3D
-+				div_u64_rem(rec->time_interval, invoked_cnt,
-+					    &ns_per_call_remainder);
-+			/* Now get decimals .xxx precision (incorrect roundup)*/
-+			ns_per_call_tmp_rem =3D ns_per_call_remainder;
-+			invoked_cnt_precision =3D invoked_cnt / 1000;
-+			if (invoked_cnt_precision > 0) {
-+				rec->ns_per_call_decimal =3D
-+					div_u64_rem(ns_per_call_tmp_rem,
-+						    invoked_cnt_precision,
-+						    &ns_per_call_remainder);
-+			}
-+		}
-+	}
-+
-+	/* Performance Monitor Unit (PMU) counters */
-+	if (rec->flags & TIME_BENCH_PMU) {
-+		//FIXME: Overflow handling???
-+		rec->pmc_inst =3D rec->pmc_inst_stop - rec->pmc_inst_start;
-+		rec->pmc_clk =3D rec->pmc_clk_stop - rec->pmc_clk_start;
-+
-+		/* Calc Instruction Per Cycle (IPC) */
-+		/* First get quotient */
-+		rec->pmc_ipc_quotient =3D div_u64_rem(rec->pmc_inst, rec->pmc_clk,
-+						    &pmc_ipc_remainder);
-+		/* Now get decimals .xxx precision (incorrect roundup)*/
-+		pmc_ipc_tmp_rem =3D pmc_ipc_remainder;
-+		pmc_ipc_div =3D rec->pmc_clk / 1000;
-+		if (pmc_ipc_div > 0) {
-+			rec->pmc_ipc_decimal =3D div_u64_rem(pmc_ipc_tmp_rem,
-+							   pmc_ipc_div,
-+							   &pmc_ipc_remainder);
-+		}
-+	}
-+
-+	return true;
-+}
-+EXPORT_SYMBOL_GPL(time_bench_calc_stats);
-+
-+/* Generic function for invoking a loop function and calculating
-+ * execution time stats.  The function being called/timed is assumed
-+ * to perform a tight loop, and update the timing record struct.
-+ */
-+bool time_bench_loop(uint32_t loops, int step, char *txt, void *data,
-+		     int (*func)(struct time_bench_record *record, void *data))
-+{
-+	struct time_bench_record rec;
-+
-+	/* Setup record */
-+	memset(&rec, 0, sizeof(rec)); /* zero func might not update all */
-+	rec.version_abi =3D 1;
-+	rec.loops       =3D loops;
-+	rec.step        =3D step;
-+	rec.flags       =3D (TIME_BENCH_LOOP|TIME_BENCH_TSC|TIME_BENCH_WALLCLOCK)=
-;
-+
-+	/*** Loop function being timed ***/
-+	if (!func(&rec, data)) {
-+		pr_err("ABORT: function being timed failed\n");
-+		return false;
-+	}
-+
-+	if (rec.invoked_cnt < loops)
-+		pr_warn("WARNING: Invoke count(%llu) smaller than loops(%d)\n",
-+			rec.invoked_cnt, loops);
-+
-+	/* Calculate stats */
-+	time_bench_calc_stats(&rec);
-+
-+	pr_info("Type:%s Per elem: %llu cycles(tsc) %llu.%03llu ns (step:%d)"
-+		" - (measurement period time:%llu.%09u sec time_interval:%llu)"
-+		" - (invoke count:%llu tsc_interval:%llu)\n",
-+		txt, rec.tsc_cycles, rec.ns_per_call_quotient,
-+		rec.ns_per_call_decimal, rec.step, rec.time_sec,
-+		rec.time_sec_remainder, rec.time_interval, rec.invoked_cnt,
-+		rec.tsc_interval);
-+	if (rec.flags & TIME_BENCH_PMU) {
-+		pr_info("Type:%s PMU inst/clock"
-+			"%llu/%llu =3D %llu.%03llu IPC (inst per cycle)\n",
-+			txt, rec.pmc_inst, rec.pmc_clk, rec.pmc_ipc_quotient,
-+			rec.pmc_ipc_decimal);
-+	}
-+	return true;
-+}
-+EXPORT_SYMBOL_GPL(time_bench_loop);
-+
-+/* Function getting invoked by kthread */
-+static int invoke_test_on_cpu_func(void *private)
-+{
-+	struct time_bench_cpu *cpu =3D private;
-+	struct time_bench_sync *sync =3D cpu->sync;
-+	cpumask_t newmask =3D CPU_MASK_NONE;
-+	void *data =3D cpu->data;
-+
-+	/* Restrict CPU */
-+	cpumask_set_cpu(cpu->rec.cpu, &newmask);
-+	set_cpus_allowed_ptr(current, &newmask);
-+
-+	/* Synchronize start of concurrency test */
-+	atomic_inc(&sync->nr_tests_running);
-+	wait_for_completion(&sync->start_event);
-+
-+	/* Start benchmark function */
-+	if (!cpu->bench_func(&cpu->rec, data)) {
-+		pr_err("ERROR: function being timed failed on CPU:%d(%d)\n",
-+		       cpu->rec.cpu, smp_processor_id());
-+	} else {
-+		if (verbose)
-+			pr_info("SUCCESS: ran on CPU:%d(%d)\n", cpu->rec.cpu,
-+				smp_processor_id());
-+	}
-+	cpu->did_bench_run =3D true;
-+
-+	/* End test */
-+	atomic_dec(&sync->nr_tests_running);
-+	/*  Wait for kthread_stop() telling us to stop */
-+	while (!kthread_should_stop()) {
-+		set_current_state(TASK_INTERRUPTIBLE);
-+		schedule();
-+	}
-+	__set_current_state(TASK_RUNNING);
-+	return 0;
-+}
-+
-+void time_bench_print_stats_cpumask(const char *desc,
-+				    struct time_bench_cpu *cpu_tasks,
-+				    const struct cpumask *mask)
-+{
-+	uint64_t average =3D 0;
-+	int cpu;
-+	int step =3D 0;
-+	struct sum {
-+		uint64_t tsc_cycles;
-+		int records;
-+	} sum =3D { 0 };
-+
-+	/* Get stats */
-+	for_each_cpu(cpu, mask) {
-+		struct time_bench_cpu *c =3D &cpu_tasks[cpu];
-+		struct time_bench_record *rec =3D &c->rec;
-+
-+		/* Calculate stats */
-+		time_bench_calc_stats(rec);
-+
-+		pr_info("Type:%s CPU(%d) %llu cycles(tsc) %llu.%03llu ns"
-+			" (step:%d)"
-+			" - (measurement period time:%llu.%09u sec time_interval:%llu)"
-+			" - (invoke count:%llu tsc_interval:%llu)\n",
-+			desc, cpu, rec->tsc_cycles, rec->ns_per_call_quotient,
-+			rec->ns_per_call_decimal, rec->step, rec->time_sec,
-+			rec->time_sec_remainder, rec->time_interval,
-+			rec->invoked_cnt, rec->tsc_interval);
-+
-+		/* Collect average */
-+		sum.records++;
-+		sum.tsc_cycles +=3D rec->tsc_cycles;
-+		step =3D rec->step;
-+	}
-+
-+	if (sum.records) /* avoid div-by-zero */
-+		average =3D sum.tsc_cycles / sum.records;
-+	pr_info("Sum Type:%s Average: %llu cycles(tsc) CPUs:%d step:%d\n", desc,
-+		average, sum.records, step);
-+}
-+EXPORT_SYMBOL_GPL(time_bench_print_stats_cpumask);
-+
-+void time_bench_run_concurrent(
-+	uint32_t loops, int step, void *data,
-+	const struct cpumask *mask, /* Support masking outsome CPUs*/
-+	struct time_bench_sync *sync, struct time_bench_cpu *cpu_tasks,
-+	int (*func)(struct time_bench_record *record, void *data))
-+{
-+	int cpu, running =3D 0;
-+
-+	if (verbose) // DEBUG
-+		pr_warn("%s() Started on CPU:%d\n", __func__,
-+			smp_processor_id());
-+
-+	/* Reset sync conditions */
-+	atomic_set(&sync->nr_tests_running, 0);
-+	init_completion(&sync->start_event);
-+
-+	/* Spawn off jobs on all CPUs */
-+	for_each_cpu(cpu, mask) {
-+		struct time_bench_cpu *c =3D &cpu_tasks[cpu];
-+
-+		running++;
-+		c->sync =3D sync; /* Send sync variable along */
-+		c->data =3D data; /* Send opaque along */
-+
-+		/* Init benchmark record */
-+		memset(&c->rec, 0, sizeof(struct time_bench_record));
-+		c->rec.version_abi =3D 1;
-+		c->rec.loops       =3D loops;
-+		c->rec.step        =3D step;
-+		c->rec.flags       =3D (TIME_BENCH_LOOP|TIME_BENCH_TSC|
-+				      TIME_BENCH_WALLCLOCK);
-+		c->rec.cpu =3D cpu;
-+		c->bench_func =3D func;
-+		c->task =3D kthread_run(invoke_test_on_cpu_func, c,
-+				      "time_bench%d", cpu);
-+		if (IS_ERR(c->task)) {
-+			pr_err("%s(): Failed to start test func\n", __func__);
-+			return; /* Argh, what about cleanup?! */
-+		}
-+	}
-+
-+	/* Wait until all processes are running */
-+	while (atomic_read(&sync->nr_tests_running) < running) {
-+		set_current_state(TASK_UNINTERRUPTIBLE);
-+		schedule_timeout(10);
-+	}
-+	/* Kick off all CPU concurrently on completion event */
-+	complete_all(&sync->start_event);
-+
-+	/* Wait for CPUs to finish */
-+	while (atomic_read(&sync->nr_tests_running)) {
-+		set_current_state(TASK_UNINTERRUPTIBLE);
-+		schedule_timeout(10);
-+	}
-+
-+	/* Stop the kthreads */
-+	for_each_cpu(cpu, mask) {
-+		struct time_bench_cpu *c =3D &cpu_tasks[cpu];
-+		kthread_stop(c->task);
-+	}
-+
-+	if (verbose) // DEBUG - happens often, finish on another CPU
-+		pr_warn("%s() Finished on CPU:%d\n", __func__,
-+			smp_processor_id());
-+}
-+EXPORT_SYMBOL_GPL(time_bench_run_concurrent);
-+
-+static int __init time_bench_module_init(void)
-+{
-+	if (verbose)
-+		pr_info("Loaded\n");
-+
-+#ifdef CONFIG_DEBUG_PREEMPT
-+	pr_warn("WARN: CONFIG_DEBUG_PREEMPT is enabled: this affect results\n");
-+#endif
-+
-+	return 0;
-+}
-+module_init(time_bench_module_init);
-+
-+static void __exit time_bench_module_exit(void)
-+{
-+	if (verbose)
-+		pr_info("Unloaded\n");
-+}
-+module_exit(time_bench_module_exit);
-+
-+MODULE_DESCRIPTION("Benchmarking code execution time inside the kernel");
-+MODULE_AUTHOR("Jesper Dangaard Brouer <netoptimizer@brouer.com>");
-+MODULE_LICENSE("GPL");
-diff --git a/lib/bench/time_bench.h b/lib/bench/time_bench.h
-new file mode 100644
-index 000000000000..7b2e63b3347d
---- /dev/null
-+++ b/lib/bench/time_bench.h
-@@ -0,0 +1,259 @@
-+/*
-+ * Benchmarking code execution time inside the kernel
-+ *
-+ * Copyright (C) 2014, Red Hat, Inc., Jesper Dangaard Brouer
-+ *  for licensing details see kernel-base/COPYING
-+ */
-+#ifndef _LINUX_TIME_BENCH_H
-+#define _LINUX_TIME_BENCH_H
-+
-+/* Main structure used for recording a benchmark run */
-+struct time_bench_record {
-+	uint32_t version_abi;
-+	uint32_t loops;		/* Requested loop invocations */
-+	uint32_t step;		/* option for e.g. bulk invocations */
-+
-+	uint32_t flags; 	/* Measurements types enabled */
-+#define TIME_BENCH_LOOP		(1<<0)
-+#define TIME_BENCH_TSC		(1<<1)
-+#define TIME_BENCH_WALLCLOCK	(1<<2)
-+#define TIME_BENCH_PMU		(1<<3)
-+
-+	uint32_t cpu; /* Used when embedded in time_bench_cpu */
-+
-+	/* Records */
-+	uint64_t invoked_cnt; 	/* Returned actual invocations */
-+	uint64_t tsc_start;
-+	uint64_t tsc_stop;
-+	struct timespec64 ts_start;
-+	struct timespec64 ts_stop;
-+	/** PMU counters for instruction and cycles
-+	 * instructions counter including pipelined instructions */
-+	uint64_t pmc_inst_start;
-+	uint64_t pmc_inst_stop;
-+	/* CPU unhalted clock counter */
-+	uint64_t pmc_clk_start;
-+	uint64_t pmc_clk_stop;
-+
-+	/* Result records */
-+	uint64_t tsc_interval;
-+	uint64_t time_start, time_stop, time_interval; /* in nanosec */
-+	uint64_t pmc_inst, pmc_clk;
-+
-+	/* Derived result records */
-+	uint64_t tsc_cycles; // +decimal?
-+	uint64_t ns_per_call_quotient, ns_per_call_decimal;
-+	uint64_t time_sec;
-+	uint32_t time_sec_remainder;
-+	uint64_t pmc_ipc_quotient, pmc_ipc_decimal; /* inst per cycle */
-+};
-+
-+/* For synchronizing parallel CPUs to run concurrently */
-+struct time_bench_sync {
-+	atomic_t nr_tests_running;
-+	struct completion start_event;
-+};
-+
-+/* Keep track of CPUs executing our bench function.
-+ *
-+ * Embed a time_bench_record for storing info per cpu
-+ */
-+struct time_bench_cpu {
-+	struct time_bench_record rec;
-+	struct time_bench_sync *sync; /* back ptr */
-+	struct task_struct *task;
-+	/* "data" opaque could have been placed in time_bench_sync,
-+	 * but to avoid any false sharing, place it per CPU
-+	 */
-+	void *data;
-+	/* Support masking outsome CPUs, mark if it ran */
-+	bool did_bench_run;
-+	/* int cpu; // note CPU stored in time_bench_record */
-+	int (*bench_func)(struct time_bench_record *record, void *data);
-+};
-+
-+/*
-+ * Below TSC assembler code is not compatible with other archs, and
-+ * can also fail on guests if cpu-flags are not correct.
-+ *
-+ * The way TSC reading is used, many iterations, does not require as
-+ * high accuracy as described below (in Intel Doc #324264).
-+ *
-+ * Considering changing to use get_cycles() (#include <asm/timex.h>).
-+ */
-+
-+/** TSC (Time-Stamp Counter) based **
-+ * Recommend reading, to understand details of reading TSC accurately:
-+ *  Intel Doc #324264, "How to Benchmark Code Execution Times on Intel"
-+ *
-+ * Consider getting exclusive ownership of CPU by using:
-+ *   unsigned long flags;
-+ *   preempt_disable();
-+ *   raw_local_irq_save(flags);
-+ *   _your_code_
-+ *   raw_local_irq_restore(flags);
-+ *   preempt_enable();
-+ *
-+ * Clobbered registers: "%rax", "%rbx", "%rcx", "%rdx"
-+ *  RDTSC only change "%rax" and "%rdx" but
-+ *  CPUID clears the high 32-bits of all (rax/rbx/rcx/rdx)
-+ */
-+static __always_inline uint64_t tsc_start_clock(void)
-+{
-+	/* See: Intel Doc #324264 */
-+	unsigned hi, lo;
-+	asm volatile("CPUID\n\t"
-+		     "RDTSC\n\t"
-+		     "mov %%edx, %0\n\t"
-+		     "mov %%eax, %1\n\t"
-+		     : "=3Dr"(hi), "=3Dr"(lo)::"%rax", "%rbx", "%rcx", "%rdx");
-+	//FIXME: on 32bit use clobbered %eax + %edx
-+	return ((uint64_t)lo) | (((uint64_t)hi) << 32);
-+}
-+
-+static __always_inline uint64_t tsc_stop_clock(void)
-+{
-+	/* See: Intel Doc #324264 */
-+	unsigned hi, lo;
-+	asm volatile("RDTSCP\n\t"
-+		     "mov %%edx, %0\n\t"
-+		     "mov %%eax, %1\n\t"
-+		     "CPUID\n\t"
-+		     : "=3Dr"(hi), "=3Dr"(lo)::"%rax", "%rbx", "%rcx", "%rdx");
-+	return ((uint64_t)lo) | (((uint64_t)hi) << 32);
-+}
-+
-+/* Notes for RDTSC and RDTSCP
-+ *
-+ * Hannes found out that __builtin_ia32_rdtsc and
-+ * __builtin_ia32_rdtscp are undocumented available in gcc, so there
-+ * is no need to write inline assembler functions for them any more.
-+ *
-+ *  unsigned long long __builtin_ia32_rdtscp(unsigned int *foo);
-+ *   (where foo is set to: numa_node << 12 | cpu)
-+ *    and
-+ *  unsigned long long __builtin_ia32_rdtsc(void);
-+ *
-+ * Above we combine the calls with CPUID, thus I don't see how this is
-+ * directly appreciable.
-+ */
-+
-+/*
-+inline uint64_t rdtsc(void)
-+{
-+	uint32_t low, high;
-+	asm volatile("rdtsc" : "=3Da" (low), "=3Dd" (high));
-+	return low  | (((uint64_t )high ) << 32);
-+}
-+*/
-+
-+/** Wall-clock based **
-+ *
-+ * use: getnstimeofday()
-+ *  getnstimeofday(&rec->ts_start);
-+ *  getnstimeofday(&rec->ts_stop);
-+ *
-+ * API changed see: Documentation/core-api/timekeeping.rst
-+ *  https://www.kernel.org/doc/html/latest/core-api/timekeeping.html#c.get=
-nstimeofday
-+ *
-+ * We should instead use: ktime_get_real_ts64() is a direct
-+ *  replacement, but consider using monotonic time (ktime_get_ts64())
-+ *  and/or a ktime_t based interface (ktime_get()/ktime_get_real()).
-+ */
-+
-+/** PMU (Performance Monitor Unit) based **
-+ *
-+ * Needed for calculating: Instructions Per Cycle (IPC)
-+ * - The IPC number tell how efficient the CPU pipelining were
-+ */
-+//lookup: perf_event_create_kernel_counter()
-+
-+bool time_bench_PMU_config(bool enable);
-+
-+/* Raw reading via rdpmc() using fixed counters
-+ *
-+ * From: https://github.com/andikleen/simple-pmu
-+ */
-+enum {
-+	FIXED_SELECT =3D (1U << 30), /* =3D=3D 0x40000000 */
-+	FIXED_INST_RETIRED_ANY      =3D 0,
-+	FIXED_CPU_CLK_UNHALTED_CORE =3D 1,
-+	FIXED_CPU_CLK_UNHALTED_REF  =3D 2,
-+};
-+
-+static __always_inline unsigned long long p_rdpmc(unsigned in)
-+{
-+	unsigned d, a;
-+
-+	asm volatile("rdpmc" : "=3Dd" (d), "=3Da" (a) : "c" (in) : "memory");
-+	return ((unsigned long long)d << 32) | a;
-+}
-+
-+/* These PMU counter needs to be enabled, but I don't have the
-+ * configure code implemented.  My current hack is running:
-+ *  sudo perf stat -e cycles:k -e instructions:k insmod lib/ring_queue_tes=
-t.ko
-+ */
-+/* Reading all pipelined instruction */
-+static __always_inline unsigned long long pmc_inst(void)
-+{
-+	return p_rdpmc(FIXED_SELECT | FIXED_INST_RETIRED_ANY);
-+}
-+
-+/* Reading CPU clock cycles */
-+static __always_inline unsigned long long pmc_clk(void)
-+{
-+	return p_rdpmc(FIXED_SELECT | FIXED_CPU_CLK_UNHALTED_CORE);
-+}
-+
-+/* Raw reading via MSR rdmsr() is likely wrong
-+ * FIXME: How can I know which raw MSR registers are conf for what?
-+ */
-+#define MSR_IA32_PCM0 0x400000C1 /* PERFCTR0 */
-+#define MSR_IA32_PCM1 0x400000C2 /* PERFCTR1 */
-+#define MSR_IA32_PCM2 0x400000C3
-+static inline uint64_t msr_inst(unsigned long long *msr_result)
-+{
-+	return rdmsrl_safe(MSR_IA32_PCM0, msr_result);
-+}
-+
-+/** Generic functions **
-+ */
-+bool time_bench_loop(uint32_t loops, int step, char *txt, void *data,
-+		     int (*func)(struct time_bench_record *rec, void *data));
-+bool time_bench_calc_stats(struct time_bench_record *rec);
-+
-+void time_bench_run_concurrent(
-+	uint32_t loops, int step, void *data,
-+	const struct cpumask *mask, /* Support masking outsome CPUs*/
-+	struct time_bench_sync *sync, struct time_bench_cpu *cpu_tasks,
-+	int (*func)(struct time_bench_record *record, void *data));
-+void time_bench_print_stats_cpumask(const char *desc,
-+				    struct time_bench_cpu *cpu_tasks,
-+				    const struct cpumask *mask);
-+
-+//FIXME: use rec->flags to select measurement, should be MACRO
-+static __always_inline void time_bench_start(struct time_bench_record *rec=
-)
-+{
-+	//getnstimeofday(&rec->ts_start);
-+	ktime_get_real_ts64(&rec->ts_start);
-+	if (rec->flags & TIME_BENCH_PMU) {
-+		rec->pmc_inst_start =3D pmc_inst();
-+		rec->pmc_clk_start =3D pmc_clk();
-+	}
-+	rec->tsc_start =3D tsc_start_clock();
-+}
-+
-+static __always_inline void time_bench_stop(struct time_bench_record *rec,
-+					    uint64_t invoked_cnt)
-+{
-+	rec->tsc_stop =3D tsc_stop_clock();
-+	if (rec->flags & TIME_BENCH_PMU) {
-+		rec->pmc_inst_stop =3D pmc_inst();
-+		rec->pmc_clk_stop =3D pmc_clk();
-+	}
-+	//getnstimeofday(&rec->ts_stop);
-+	ktime_get_real_ts64(&rec->ts_stop);
-+	rec->invoked_cnt =3D invoked_cnt;
-+}
-+
-+#endif /* _LINUX_TIME_BENCH_H */
-
-base-commit: 8ef890df4031121a94407c84659125cbccd3fdbe
---=20
-2.49.0.rc0.332.g42c0ae87b1-goog
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
