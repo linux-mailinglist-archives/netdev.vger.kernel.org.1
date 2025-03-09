@@ -1,108 +1,111 @@
-Return-Path: <netdev+bounces-173375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F03D3A58899
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 22:45:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D40E5A5889B
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 22:46:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 431E71693F8
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 21:45:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13E891693D4
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 21:46:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EB8919DF99;
-	Sun,  9 Mar 2025 21:45:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D50F11A9B34;
+	Sun,  9 Mar 2025 21:46:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h64L8BAR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GG6yJvBl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1A716B3B7
-	for <netdev@vger.kernel.org>; Sun,  9 Mar 2025 21:45:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7999916B3B7
+	for <netdev@vger.kernel.org>; Sun,  9 Mar 2025 21:46:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741556745; cv=none; b=k5mkGAxqs8MHXAbXm7klHbWfDgjs72Xz+JxZm92/GY2jHHBjwMAyls1sCgUKETFNP/m4qE9O2jweMpxhsi6MMAlbzd5rR0x3X9jBkqMwhvoCvtXvxPBlNFOd8AsGLfwu0HkrBM/OTLRppk/cIJkMsM63ZVT4r59WUpTBEHDAcUw=
+	t=1741556787; cv=none; b=I2LGpX/rFF4YmQpuwrnNzgdCbSIqOnQySjPoNnzX6KMI/tWd99aNTp8FxanzhNyI25CAIJdVodpJvTswZQ6d/sVCig6Y2hb/rQP/1/KSZX2zGGmRmiLMSVTyNcBOwZG1/6w0RamLpyahsf36aHoD6fUaTr+iUuZTxZ2+B2SOFMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741556745; c=relaxed/simple;
-	bh=UjdLDNfjbZvoQYCHSA/AD9KtY2qv+NY2QQT+7K8wSrA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lnvihaFmRrR58HRmuTQ6vV2p8ISFBdzCrX8l8cJ8n0ymjcSV/mYf6ggUNIrMmzCiRCKCjV/Fj2+oxN9qUvsU1sJMRib3wCq2PYSq9n9lv1BhlXoXU8PIr3A+Q6I+qC5B9hojSN9S6hT+80GqAojHFKNq2WJHGnW+HouLkwT+SI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h64L8BAR; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-225489a0ae6so140485ad.0
-        for <netdev@vger.kernel.org>; Sun, 09 Mar 2025 14:45:43 -0700 (PDT)
+	s=arc-20240116; t=1741556787; c=relaxed/simple;
+	bh=qOk86JjgRkPjSH4Uw7BzviqLUXft4TcAaDe0l/OOuss=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bIAqiwHYTrtfhV5NmRG3JS9HfsnvKApPVjhogIlzTPLM7PVts4Cih5jvx0rl6deEXGhSqpDghJ2mTT/xCa9qYMmgLGul6eIVQUvEWcsxf4nnOxKO+Rb26HnWptoZG4jwNIjIGgeHGARY76pRmzkoZUfKUZb0bGLUwJiBJbGHau4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GG6yJvBl; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-223fb0f619dso65508085ad.1
+        for <netdev@vger.kernel.org>; Sun, 09 Mar 2025 14:46:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741556743; x=1742161543; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UjdLDNfjbZvoQYCHSA/AD9KtY2qv+NY2QQT+7K8wSrA=;
-        b=h64L8BAR87gJeNR0t001HrO4twm2Y43YEKSSsxrAZUiig841djqS6rAbyobupTiTld
-         fqaJoKAjrKj94T+SKiyHY6Elg+F5hEyPDnoUaIhOmsfo9X0E4BZRwjKa3vaUCceYYdsC
-         VQc0Y0Jza5Q8y8eJn8FM06HXM/VaRrYHprLgtI7jk7f+wU6sEPYwWNR3u4QhWS76CGNl
-         vk8kbHEcPKzNO5Vncr3SILeB3UWgYHUS1gspkTpsQ/ufiWn8eRiSdRxHEvdOnPa90UcC
-         GuQkXbxulAphHzDHWQScwNoWUBKHOusVZ5Zp3GkLh9fyY66SgTc5AAs4i/lk8taSjEof
-         oArg==
+        d=gmail.com; s=20230601; t=1741556786; x=1742161586; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=i/BTfmSm8EChEeOhoMUJpcs9FoW8R/xeWAGJbkAAuIg=;
+        b=GG6yJvBlfizbngqjIIETEeG+ScvGVmcDrCrCkUxLp/eRG5DvQ7appx2KgT7qvhxXTz
+         RFTEcHIeyiEIdSZpwiNzkNzHmFnHcRR7dUEY383O9rVfgL7NO8ktJo/V35Y14SOth4HC
+         SgnU5QwschiqCQKIhAYLTOu/kL5knRwZCSksovgfRJtC0HMSjEApZf4g3jrBlRjCDrdN
+         BnrWPDTaU7yopqurDRM5qPwso8hNzzZyYqzD607pklX7YK9Z/yEx23TfW+UAd+3d9FdD
+         2a+yayvD6DUY0mYBRRJW8qMheUg5nVjL4bFIRKzw7tqfZV8IhqSQA7GlvG8LRok3uu5O
+         Mmsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741556743; x=1742161543;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UjdLDNfjbZvoQYCHSA/AD9KtY2qv+NY2QQT+7K8wSrA=;
-        b=wtOtUQhGBmQ+0eQ1tLSr5Xr8B85TLcr3iYI317TNVdfGtqVzWTw/5962PBJsyh9dTG
-         5fBTtRKxlZknqaaPuLbIT9thwHoaZD2tzNrSGvJIN/cJMwiYn7V/C0721ZZs+ARYxQ8x
-         oC8PxY//t+eUIoVjUt4lEkTPgzlmBRaZAsjjHufSaqSMBjvygDNNTAqdTOOSC9iOfKDX
-         PQLb4bRqX/xkwxMAV9l79SFjgpb5kBt2bw2Bt53ipJYfmYRK2+d8HGVpTHA7OSbDEWHN
-         X4WjAEhKuOZsM+YXadGrQ2cP12+SHHD5IInFeJieNxhZ1KE417X10EIdCb8eiprpHtXg
-         5YYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW55BGommOkE/k5hlYdW1dobUDSAt1LaBIgULRIjEOd0+iZ8gnZ/JRm2CieeqjZoPNfWqIdouA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhO7Xvuvi9xqoPrpetExtNbX+ucnY2pRHBnJEdr90bvO1X81vn
-	xkHvaKNRra2rm2EuRFJeUF5Qhe7JZZZOmTMY6ICX8f/Uuez7FKxAuK2VdB16gPyrJgWFwXu1jGX
-	0ieyb8nsZf2SqFALwWg3ZK23M2XhhPHpe17uA
-X-Gm-Gg: ASbGncs0B2wNO6ml9b5LCnt2PdPx8u6I7HhcmsKcsANaopyNqqK9HvcmtJwCRX1fHxl
-	VL6C9ntGhMVIG8A4MzNOUjr0X0wxzI7QMCF8B06/tEpmXfBFGsoAZuMWR7/upcWDCdysrL2PdZa
-	VPF10hXPaTsSlnGkApKg/40RsMJNc=
-X-Google-Smtp-Source: AGHT+IE2p+jDsD0j5SnKQKAip/If8+BtHqBaY7NIMLZUZReCQUCINAqK67F79wf3FLZVxZCUEpde7fx/HaA1cATafu4=
-X-Received: by 2002:a17:902:d490:b0:223:5696:44f5 with SMTP id
- d9443c01a7336-22540e5c2a6mr2765455ad.12.1741556743264; Sun, 09 Mar 2025
- 14:45:43 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1741556786; x=1742161586;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i/BTfmSm8EChEeOhoMUJpcs9FoW8R/xeWAGJbkAAuIg=;
+        b=AVhte1IsG1fftvNIm/QJEBE0eiYdUA1/q8kP1tl5a/HCdZWlwAbCo7OMcAGK8BGg+S
+         3+xD84pHcF7d58g0uEyArKyLKmxzxGiDHzJIgZ1gb1Gs8U7iUUPAJYgj2gpEtcZUPO75
+         3FSSj7L/bxH1pn2UyOTcq3qBAZ0R2YJcz6bqwWgLEE7VAlmoznGFMzuY+4W7Brn+m1Ed
+         7K8SM7jf9UbzFjtRXl90tl91osJcc8AJfzcn+Gnv1dFxzi4G7L8YYrHFL6XwFKVMSrt2
+         k9KdHZYI9zBh/grO3PzH2E9Y3+vnj4bWLu78dQodSmE5Yc3xjqMhl791mlhJkvBbPpO9
+         2BuA==
+X-Forwarded-Encrypted: i=1; AJvYcCUzgWmXTIhFuor9x0ORP9Pbtq98ypMJlHARuqcIaY5ID9lMvnTRbHRR+WGiWyO/3e2NR0otzZk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YywYMwEL+aDiWUQkAfXuP8XDImCRshGaEGx4yFR0luxZ8pR5woe
+	h4QkO3R7EiKMJLxGwEX3n1WmefLo9v3g3zabU25dIrS8iJ7gEgM=
+X-Gm-Gg: ASbGnctWJOHXCFnfW36O0NqpbcgSeW2w9DGFjxp7Mh3ck8jot6qG6MZjB3M/dYX2/MP
+	vw7JpNy7RYh0n2MYvLOh89Gzt3BUdfqETWxJOtqBn71AVcZ7aZjzqjvjwRo9sXxUdX6Y/MEjY88
+	j2cXDyrtBVwii4mJeNmz4xD6Xxwhfyqo71AiwOSu4MdPz/roALTy4dXcR4GMkalCMGeHrgpOWiE
+	XSQMV9oP/m3o6imQemC+yU8S36yBbDbU0AB2x/DGTYkv3goCXrqDBsfAARinN2213ap/Fk3Lrui
+	M7wlc75tmtBZ2JlbwgFb/HRILOuqf1oC4eoUJOeAEn6t113h0+8Bo7Y=
+X-Google-Smtp-Source: AGHT+IGXsuAMwVp7U30tyej31uu8h/qWVgAV6S8SqBU2DT62cr4BlZN/DEbW0V21UkNmJ69Ds+0zOg==
+X-Received: by 2002:a17:902:ce0b:b0:219:e4b0:4286 with SMTP id d9443c01a7336-22428a9e676mr187928105ad.29.1741556785598;
+        Sun, 09 Mar 2025 14:46:25 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-2ff6cefb8f1sm7021279a91.18.2025.03.09.14.46.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Mar 2025 14:46:25 -0700 (PDT)
+Date: Sun, 9 Mar 2025 14:46:24 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com,
+	syzbot+377b71db585c9c705f8e@syzkaller.appspotmail.com
+Subject: Re: [PATCH net] net: lapbether: use netdev_lockdep_set_classes()
+ helper
+Message-ID: <Z84MME6rwU6q9aJa@mini-arch>
+References: <20250309093930.1359048-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250309134219.91670-1-ap420073@gmail.com> <20250309134219.91670-8-ap420073@gmail.com>
-In-Reply-To: <20250309134219.91670-8-ap420073@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Sun, 9 Mar 2025 14:45:30 -0700
-X-Gm-Features: AQ5f1Jo1n20Hcbf99zGlYqtQvtZAYKwrLd33MKVPaIwpybZWFt1Sr6yP1JEeOLs
-Message-ID: <CAHS8izNe4NBbTtordf04uE_+4fz9ut8rcgmNTuCiiZtDdy2M0Q@mail.gmail.com>
-Subject: Re: [PATCH v3 net 7/8] net: devmem: do not WARN conditionally after netdev_rx_queue_restart()
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, andrew+netdev@lunn.ch, michael.chan@broadcom.com, 
-	pavan.chebbi@broadcom.com, horms@kernel.org, shuah@kernel.org, 
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	asml.silence@gmail.com, willemb@google.com, kaiyuanz@google.com, 
-	skhawaja@google.com, sdf@fomichev.me, gospo@broadcom.com, 
-	somnath.kotur@broadcom.com, dw@davidwei.uk, amritha.nambiar@intel.com, 
-	xuanzhuo@linux.alibaba.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250309093930.1359048-1-edumazet@google.com>
 
-On Sun, Mar 9, 2025 at 6:43=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> wrot=
-e:
->
-> When devmem socket is closed, netdev_rx_queue_restart() is called to
-> reset queue by the net_devmem_unbind_dmabuf(). But callback may return
-> -ENETDOWN if the interface is down because queues are already freed
-> when the interface is down so queue reset is not needed.
-> So, it should not warn if the return value is -ENETDOWN.
->
-> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+On 03/09, Eric Dumazet wrote:
+> drivers/net/wan/lapbether.c uses stacked devices.
+> Like similar drivers, it must use netdev_lockdep_set_classes()
+> to avoid LOCKDEP splats.
+> 
+> This is similar to commit 9bfc9d65a1dc ("hamradio:
+> use netdev_lockdep_set_classes() helper")
+> 
+> Fixes: 7e4d784f5810 ("net: hold netdev instance lock during rtnetlink operations")
+> Reported-by: syzbot+377b71db585c9c705f8e@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/67cd611c.050a0220.14db68.0073.GAE@google.com/T/#u
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
