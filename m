@@ -1,156 +1,119 @@
-Return-Path: <netdev+bounces-173371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FAD1A5887D
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 22:18:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 560CAA58890
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 22:41:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 994AD16B026
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 21:18:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24F093AB37A
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 21:41:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E45091AF0BB;
-	Sun,  9 Mar 2025 21:18:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D21A21B185;
+	Sun,  9 Mar 2025 21:41:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=sebastian.reichel@collabora.com header.b="cExVH6ef"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J6iKx+2U"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 185C33208;
-	Sun,  9 Mar 2025 21:18:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741555084; cv=pass; b=GuAOh+JdOru38PirSwzyYI1QQ4bQgfrFhUQIHFhHHgyj7HJ46ZpQjhIiPfVOMTDsXUnXmr29I/BIIphHBiu4FS6xNDeMot7kbxKsW7ZGoStZJvcXheLP9+axoifYxUaONePuvYgzOUXeSkVe7MhGdWPAejQskHbu4TiLwhxJscw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741555084; c=relaxed/simple;
-	bh=ieOYj5InZF+mZjB9/5aIN60Ku2Gh9R9Bl8qSs1rUfk8=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8946118D63E;
+	Sun,  9 Mar 2025 21:41:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741556492; cv=none; b=JFqYNKEAAjuJK5j8IWtosjSU1KqQR3zKExXEYiaOd4yTme66SyDS+Jc2gJ5SLIx8B/sIe3mbuRmmF41WIR23O5h31KfqMwkk7ewSQIp2/XSeWDWLKH7kmkFHpzJSUfc3IDu0oC6OKf9wGXTcjH3SDovbchHMFmRTsnzVYxWdtbY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741556492; c=relaxed/simple;
+	bh=o6UQx+iI1PxTENsRf9cgQ8A+OE5diXM4UlOZmRfCA1E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cyBS/lmW7d5JTGDzaLKw6D2j9es5JN0CE/8XIcZ7BBWP/PTo0geZiXF6tWJkSFjVOvS5wIc3z6GyBhdBZ9x5dYjFjv4lNLMSaOHG7yBSOT+6ODUSA3UI22H0Zq03zCZR29FdRMoYgHwUavyaJQuSDqukgBBdeb0mvXUUEkY3VHM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=sebastian.reichel@collabora.com header.b=cExVH6ef; arc=pass smtp.client-ip=136.143.188.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1741555057; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=TL+le3Fjjl1o4ZHF9iog5whT86KEGyTlV+8Xk5gwUd7Q55AweYktohMQxsXou2Ry5qbuhLD6lHvfVhIAXy+Us5dHhyGXvQcW+YOJdeWP8t66tDR7XiWONEHZI+d/jwvRfQOp+IpEyeBHN7WtC/m0lV6aKwVimkf0iSXjmT9pgeY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1741555057; h=Content-Type:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=FEHqnFFPGOtZDYCXmFfRdj+VMlzCOmjRhnGLeYoAHkA=; 
-	b=HpfqP6iWN8sIOokjz7ipFBUSczQiH/dRDsJu2QNlGteqs0WyMFLMEsnBRBksIsT3oDDIk3kPe2krtPrEAMNx+E4h7LGIGfKjYb2CuWDEkwpJs+EPouoOBjjQgVbr1aTADkAL9yfSR6jKnV9BXYSTx77BPguofmKGLT92C+zEH1c=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=sebastian.reichel@collabora.com;
-	dmarc=pass header.from=<sebastian.reichel@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1741555057;
-	s=zohomail; d=collabora.com; i=sebastian.reichel@collabora.com;
-	h=Date:Date:From:From:To:To:Cc:Cc:Subject:Subject:Message-ID:References:MIME-Version:Content-Type:In-Reply-To:Message-Id:Reply-To;
-	bh=FEHqnFFPGOtZDYCXmFfRdj+VMlzCOmjRhnGLeYoAHkA=;
-	b=cExVH6efvz0/jHzn3PRYqBAlIf7GljmOjGbtiMf1ycGEypHmLDIixUuzvw5B56iL
-	Qg/FH5nfS0RnpY++bLVhpAgwp6o950rneXUbiEXX9n/dq0U/JkvkNphwVA9++Nd5ncm
-	sZfXoAZxvFlmN4wAPGrTK7Ij9GJQj4/Q0FlE1RSM=
-Received: by mx.zohomail.com with SMTPS id 1741555055557728.5348605229481;
-	Sun, 9 Mar 2025 14:17:35 -0700 (PDT)
-Received: by venus (Postfix, from userid 1000)
-	id F36F7180073; Sun, 09 Mar 2025 22:17:29 +0100 (CET)
-Date: Sun, 9 Mar 2025 22:17:29 +0100
-From: Sebastian Reichel <sebastian.reichel@collabora.com>
-To: Jonas Karlman <jonas@kwiboo.se>
-Cc: Heiko Stuebner <heiko@sntech.de>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org, 
-	linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/3] net: stmmac: dwmac-rk: Validate GRF and
- peripheral GRF during probe
-Message-ID: <n6frqyzi2rn3sbzmmerq5ennoo6dn2husrtw3qzbtummpjutc7@2bu2753xrb7a>
-References: <20250308213720.2517944-1-jonas@kwiboo.se>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fStfIqNwtsdtDHU/9DVsD/b2ZI5kSy47dXSy2Kc8fV/+37FVbiMkMVcIOy4+cgGmOcM5tSidYm/g0C4oyMSE/BdQP79hoP5pNjyPGp/3qGyE9Juo7qLP/Q7NSMPw9RqLmPPG1I7mZTXf0vgb0h1MmqYkJ7CiDtTRSBuYsS7tDoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J6iKx+2U; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2ff69365e1dso5114546a91.3;
+        Sun, 09 Mar 2025 14:41:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741556491; x=1742161291; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=c07eWjLH6j3+OrGpuD9gkIMCjymcRYECIhrm80A0D6I=;
+        b=J6iKx+2UilsEnYVtgzVQACcdvCe+oB63Jpv0XtACjk9awwZAH6JpfXvCLG29QFoXD9
+         Dafx+76tdnuJkzsyBqpZzFWd3lSTXShyZtLZdV+SklKixg1jBmHlPrFGluDxwfTXZUyq
+         Q7KgVAGkOBou2hh5NDyl1jADruVK6LRulSUzMcAnoL+22dEI82aIsTn3fJhWlsmi4CwM
+         nprEedpDwLyyeuxG0tCbgyRvZnoSPDx+VpvlNKYWZPfU5hIlZ7R+c+B0K8YQwaHC8Hz5
+         17ebnfL66ZU5hvicy5124OYRUu9YVp9R+x0VRFfa9SVqQH13LeJYtT+mG2h/UtEqxW9A
+         SvOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741556491; x=1742161291;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c07eWjLH6j3+OrGpuD9gkIMCjymcRYECIhrm80A0D6I=;
+        b=UbzbtCSskmjtU2nXvTHs18bvN1sVkgcN/sareVS2kVv30pgdrdRW4yjT99Uzktfnyz
+         r6qiQADfjcak7ox7rtDkZmfC2fJTybaUMW29VL3nMyA4LoU9GF8ao54J5ZYuahDO/HhD
+         ah/TkWiyZHONhvpOMnhw5glUEoVuUepqUDsUt4XCauxBpKpsrM4eOuCxxwaQOB/ACzPW
+         8vvDrKHRyotFPabsNx4FgqxTG1khsKCd94QWh0wBNTv5IOv1mHh3Ep1FFdmcdfK/Eaau
+         7xHxOkhGlzUGLw282lQ5P5BFukCwoA99pPCbQveD0nCS4j54sKiYq/WbbgWVUiTBspik
+         OzYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUE9O3cb9Gm0Uh5Guijku/onj4goXjzb1CGmDQchnA99TMbwafrapLduFWguzdu2DJOQXOAwpKq@vger.kernel.org, AJvYcCVtofK+dpxWKJcJxSebsM4gJhmWmub4ROhQKNeI/tQ1G1H7DyZPkB97qFCW1SSJWvyIzx8b2jiJxL+koslg@vger.kernel.org, AJvYcCWO8mmx71I7A67dyQ9oEjsd4gy8im3qDGUxu1Kx5Fgqo2CG/+M7uF7pSEI01byefNVlXLU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywufkp27OeJSG+yd1vyc/PNmjdTiVcl73FOlVH4rg+wSgE31Hjf
+	B8XNES8cebyubxM1g3LJ0p5UJcm0aYdmyF+2NSPVfEo0xNicr6s=
+X-Gm-Gg: ASbGnctLZ/52LHFkdqe5O0F48d0Lm+dXcj2cG1di8V1q3Rf76Oy/QXa+HsxRCMWdLRC
+	mq5s6Sqf3+7RwbyNKxsdmqrjajmxhH0FOPDr8ocXpsDueFiO7TS3Lp6ol223qjf1gby75egunN0
+	EX5P7LdOROa1Z9tINjR0zGpEaTT+wCOmYPF096B11u+CIQfOUr/wRx5pj6wTWgzsKleFKWLRdfe
+	MudynP8dfLM/d1MZ3HN6KblKij6bYfKna0OyVGFTJRaz2HQMxc2D7p/+2BDktpYzU+TIOHpTkQI
+	+37ZvQCA+TfYDqKCbrg46xW13J5mBMy/sOml9hQ3taO2
+X-Google-Smtp-Source: AGHT+IHu78uYiSH+bwtlIde6inedLIW7x7+YBpWiI/hMJk0BQEDe0T0GX93FOwKSWTp6N2wK/jVDvw==
+X-Received: by 2002:a17:90a:e7ce:b0:2ff:58a4:9db3 with SMTP id 98e67ed59e1d1-2ff7cf25652mr18095392a91.35.1741556490672;
+        Sun, 09 Mar 2025 14:41:30 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22410aba9e2sm64098895ad.255.2025.03.09.14.41.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Mar 2025 14:41:30 -0700 (PDT)
+Date: Sun, 9 Mar 2025 14:41:29 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Kohei Enju <enjuk@amazon.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Kohei Enju <kohei.enju@gmail.com>
+Subject: Re: [PATCH net-next v1] dev: remove netdev_lock() and
+ netdev_lock_ops() in register_netdevice().
+Message-ID: <Z84LCSOcT89TXNt0@mini-arch>
+References: <20250308203835.60633-2-enjuk@amazon.com>
+ <20250308131813.4f8c8f0d@kernel.org>
+ <Z8zHpf6JPfjkC_Sv@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="b5zfvhkwd55d7y42"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250308213720.2517944-1-jonas@kwiboo.se>
-X-Zoho-Virus-Status: 1
-X-Zoho-AV-Stamp: zmail-av-1.4.2/241.192.19
-X-ZohoMailClient: External
+In-Reply-To: <Z8zHpf6JPfjkC_Sv@mini-arch>
 
+On 03/08, Stanislav Fomichev wrote:
+> On 03/08, Jakub Kicinski wrote:
+> > On Sun, 9 Mar 2025 05:37:18 +0900 Kohei Enju wrote:
+> > > Both netdev_lock() and netdev_lock_ops() are called before
+> > > list_netdevice() in register_netdevice().
+> > > No other context can access the struct net_device, so we don't need these
+> > > locks in this context.
+> 
+> That's technically true, but it will set off a bunch of lockdep
+> warnings :-(
+Let me drop it for now from the nipa because it does complain about it:
+https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/24641/67-nl-netdev-py/stderr
 
---b5zfvhkwd55d7y42
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v2 0/3] net: stmmac: dwmac-rk: Validate GRF and
- peripheral GRF during probe
-MIME-Version: 1.0
-
-Hi,
-
-On Sat, Mar 08, 2025 at 09:37:12PM +0000, Jonas Karlman wrote:
-> All Rockchip GMAC variants typically write to GRF regs to control e.g.
-> interface mode, speed and MAC rx/tx delay. Newer SoCs such as RK3576 and
-> RK3588 use a mix of GRF and peripheral GRF regs. These syscon regmaps is
-> located with help of a rockchip,grf and rockchip,php-grf phandle.
->=20
-> However, validating the rockchip,grf and rockchip,php-grf syscon regmap
-> is deferred until e.g. interface mode or speed is configured.
->=20
-> This series change to validate the GRF and peripheral GRF syscon regmap
-> at probe time to help simplify the SoC specific operations.
->=20
-> This should not introduce any backward compatibility issues as all
-> GMAC nodes have been added together with a rockchip,grf phandle (and
-> rockchip,php-grf where required) in their initial commit.
->=20
-> Changes in v2:
-> - Split removal of the IS_ERR() check in each SoC specific operation to
->   a separate patch
-> - Disable rockchip,php-grf in schema for GMAC not requiring it
-> - Add a php_grf_required flag to indicate when peripheral GRF is
->   required
-> - Only lookup rockchip,php-grf phandle when php_grf_required is true
-> - Use ERR_CAST() instead of ERR_PTR()
->=20
-> Jonas Karlman (3):
->   dt-bindings: net: rockchip-dwmac: Require rockchip,grf and
->     rockchip,php-grf
->   net: stmmac: dwmac-rk: Validate GRF and peripheral GRF during probe
->   net: stmmac: dwmac-rk: Remove unneeded GRF and peripheral GRF checks
->=20
->  .../bindings/net/rockchip-dwmac.yaml          |  21 +-
->  .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 270 ++----------------
->  2 files changed, 37 insertions(+), 254 deletions(-)
-
-The series is
-
-Reviewed-by: Sebastian Reichel <sebastian.reichel@collabora.com>
-
--- Sebastian
-
---b5zfvhkwd55d7y42
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAmfOBWIACgkQ2O7X88g7
-+ppXPQ//QTO5/6yllSRnNLdmY8b6+WI244U8KRooF4JYZwUq1OFC/ZlozoNaZrOG
-aqJpTCkevGsaUstJ0sBrLrn/rr+lxkTLn39v7LSLNCEupLM1QikVRQYn7lgLB6rK
-eDgSMEAXAUwux/v3D/wX/470LwLAWnffXX5wDxha7183La0P6JgL2Ue8TC6jyU25
-ULQ4IoCPlGME4z472RngSBuN/g0zZDajgmCBNiRYaCIya07pPOtT/PrVNEYfQ9CS
-oa0t1M/jPDS3VvsJMOmwzxOtiOD9VJxS90xLpphqUei4dyWFu/7aV7GaXEhm9UYb
-/HCeOEBFuXcsNvZitv0oSsQBpbzUKwiS5zKxZFpRyiEMbRuyMLHwajpwdGaHI4Ji
-3iXll3AjBTh+Rc8kEBlzXkcdCJlznz9FGBSkwCWYCSQXm8MuCZ7+cc8rBNgEowbG
-h8mUntbIWKHcIYOjYGDOppdLXsK1D3qxP5GO1t/0cNEqZhWdGeRtK2l2gK4faH7K
-92dtEtDzLzSe/9Awg3txooKrizcuo6L6bl6eopu8bzTNjLPsLAmFtr/vsQBbFVet
-tfJBYiQD7WkYdYpB0NiSIE1w7y6H/YIvjhhqI5yuUBoYVtnzrY4EWt6nHtU1XAl1
-OAQMUaQAf2IIvxGFYDmVtG8bm7rSsLw6RYvmQMluvoviGPs6meY=
-=Fj91
------END PGP SIGNATURE-----
-
---b5zfvhkwd55d7y42--
+---
+pw-bot: cr
 
