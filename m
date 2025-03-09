@@ -1,293 +1,114 @@
-Return-Path: <netdev+bounces-173230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C728AA58009
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 01:33:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D0D5A5805C
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 03:51:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0085116BD30
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 00:33:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 291243AD23F
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 02:51:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6282D4C91;
-	Sun,  9 Mar 2025 00:33:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FDA026ACC;
+	Sun,  9 Mar 2025 02:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YY3TuekF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nignk+6X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78E574A07;
-	Sun,  9 Mar 2025 00:33:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B82A514A85;
+	Sun,  9 Mar 2025 02:51:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741480398; cv=none; b=SkN5MEUerOjEIhaGidC83AMS+PWj/qA2ecl4VblxD7j92WTxlCqG8B+UX1TYXVEAFUgP67oKBG0sOD+ToD5FfKcJA7fdDeyQipc7LHNqeKRoWxQ9LPRKUC9Y3sydwIKawxi3wfU+HyCY0aRDaXxX+n40nRDy5O0qCTtRV0TXawQ=
+	t=1741488691; cv=none; b=dbMfTPvf8/r+6zJve6ujcRqlitmiW85TpPe2qUZUQgvTDhxbAY+Nc9TnUUCIMiKP0KhL+gyb5Wgub7G5o6sKKieeCP86Cm3D0gzIcP69ztP3R+1qgbyM5qnfrXYkgXZKTA1DP7ISA72Sus4U3K8mtX1nGgbquGDfcTk3IvuMj+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741480398; c=relaxed/simple;
-	bh=H5vGGdWJkwimPxQknMpb14wXFyU4qmgXRHQJ9Ps5V7w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mfFNu+39sk2PozKA5Zr3AKCVaJi+HhYoB/8trZ10COX8vpqOWQkJbQQxocSekmLV4e2Gstq53ddZbj1mdKovfGL686PTjN3KroBNwnInegdYOhc30xJKeZUXRGRRVOr9kqumlw4jqgh3q4PyjlKA5YDSfN4Iivv6RHL1IP8D5Cc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YY3TuekF; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3912e96c8e8so1609256f8f.2;
-        Sat, 08 Mar 2025 16:33:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741480394; x=1742085194; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=qPD5zeaLyTv7Qy4hdBTQxNRUyG0FnO7mcXkBMLrnQgo=;
-        b=YY3TuekFIqkBenIBILtjB9Dog1kMoR14a/1PYOXbJb/yKELoA2RXGE+Y3CbJlA6pqM
-         DCt9o5cPjth4dihCaR7upYS5CEARwa6be1sgfyifIqD31izO1OiDSZNEnxCJqS1vZ4JQ
-         w2xEQ7Ian1RJHCr8012Zdn60dUSSYk7dpg3hw248jxYiAFCcpbJ6FF2CxZKFsZ8l8Qnt
-         1yzl8Ozcdr8i+3LwloxDFa6nb73vJB3CBUtvqu0spEk4yX74O3r79myXbIP9FJplfaee
-         +wD3VwjY0zzOnHuEr4X8Ax8np2dKfqCOnrF4U28GqxA6lNDsHpuXfoDXbyrB5P3xqrAZ
-         pf6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741480394; x=1742085194;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qPD5zeaLyTv7Qy4hdBTQxNRUyG0FnO7mcXkBMLrnQgo=;
-        b=isO0sUwkvQxLsCzasz5MAMc7fDyilq6/n4jmBgrb9PeTu8gAMNf5a9zeeM1ifIZDX0
-         6pfJVWV5TpkFH4PXOgHP5H4qPetnKXGMtz0fGsfGTR8Edd+kAqAblBg3HEmp49eshHF8
-         na2bc1sGVcX1BMktlhqlHfCI6bokKzYgZTLSNxiPVMRg8gQDXKKR8fRNK45EduBVGRJS
-         icFi4WhqbffVMTZFiy87fBontViesRSVKu02YBsERALWxUW/rgU7CAOkBeEuUS98+//6
-         0rhktEPxfE/9ZyAvIIdvYKXX3hRZ4YAkj66orCf5ctnYV2vIvOQ6KJAtjsRhZEjU3d8R
-         t0OQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV8vUs+KXkrwAjpWAHfBiNlN3kWjJTehMaiGZTrAFZWZ7A+8Lal71/GeT/9zOlO3cDk+KMY+Tj7@vger.kernel.org, AJvYcCXIItFLpb2lxU/v4idg4C+B86OZxw95uurun1fl/80e27Ibmoi9pNgtehCSPWstNpjUYNEB0X2p41Yhp08=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvAHNEyTEbdOm44/+fMvcPnSjwJAqtamncuFKiyOOl5cTcKPHZ
-	pLlMtPFOmFRZHqW80oGZ2egG9Gitx4VP28RDJctagvkN4axmDqaJ
-X-Gm-Gg: ASbGnct/07ARu1jvrrHbo18g2NflLGW5G1HZAf2opsGVPSNXdeJE0WjYy9KA1C2fmuL
-	GaU4aaXnAP0bpGeklg9j/qDtak7I+OBG93RttWhea6nkwScPSS95arVpDEpHxrt7weMQ7lE4VVP
-	o60vSPFy/H10o5erPQjrvhVYvXm87QNvJeBosSEkofJpB6+s0CPROKtsS/pCOhIUdvJaqQXZgXI
-	dDw8BMIKpkdBNm+m1wdRyPp9Vdo2yhqrP3fXlGC7WUtd3SBp8/iPwjuR8mWCnLo9ywqeonBV2qX
-	JKIQhxx7bM5zviYAZCATJATLVU7JOItpf6OTnzeIpmEr4gxxZ54RdJtMboETCdQF6RMXJxudmQ=
-	=
-X-Google-Smtp-Source: AGHT+IH28MQPA+zgYnEC4J5mfzAYw/utosENTHqe/I9TDxz+92mmLwx5LY/MLbLi26Rzp9G7AsQlAA==
-X-Received: by 2002:a5d:584f:0:b0:391:ffc:2413 with SMTP id ffacd0b85a97d-39132da08b4mr5384923f8f.40.1741480393495;
-        Sat, 08 Mar 2025 16:33:13 -0800 (PST)
-Received: from prasmi.Home ([2a06:5906:61b:2d00:238d:d8a2:7f2b:419e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c1031fdsm9976382f8f.89.2025.03.08.16.33.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Mar 2025 16:33:11 -0800 (PST)
-From: Prabhakar <prabhakar.csengg@gmail.com>
-X-Google-Original-From: Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Kevin Hilman <khilman@baylibre.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"G. Jaya Kumaran" <vineetha.g.jaya.kumaran@intel.com>,
-	Biao Huang <biao.huang@mediatek.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	Linux Team <linux-imx@nxp.com>,
-	David Wu <david.wu@rock-chips.com>,
-	Christophe Roullier <christophe.roullier@foss.st.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	netdev@vger.kernel.org
-Cc: devicetree@vger.kernel.org,
-	linux-amlogic@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev,
-	linux-rockchip@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-mediatek@lists.infradead.org,
-	Prabhakar <prabhakar.csengg@gmail.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: [PATCH net-next] dt-bindings: net: Define interrupt constraints for DWMAC vendor bindings
-Date: Sun,  9 Mar 2025 00:33:01 +0000
-Message-ID: <20250309003301.1152228-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1741488691; c=relaxed/simple;
+	bh=+AxKQzQOhFvyAjlz5Ur/xA8zBv34fgRsUJBCR73dObM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uOuagLYWuhf/khAdmwXgRHF5w3W6ND0WL+69prAKh97Twbf2J+27fQilaNs7wmYZc0wLIO6xkyQ4fX/aZhItmWZ+4EILg7CosKSoXJ/UF644H1OvlfvqY7pE0+jTpsTup6EoJ4nSv61WH922DaJ8skj9Gl1QeMZYpe1v4CpRjkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nignk+6X; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741488690; x=1773024690;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=+AxKQzQOhFvyAjlz5Ur/xA8zBv34fgRsUJBCR73dObM=;
+  b=Nignk+6X5m/DDD0/excdVZGpeQaQCZfAVdLlljII+ypjmL25SyV08sVX
+   2Fiqz5fHPTgqq4VtIajNbKlHUQzyI/ncDozDLm9xMeCmfM6UJsDXk7xzE
+   2dE6HDte/5dNGFLuKd6Torls2LxTUCjmGbqS7EgIvUhu53bQafDeaKqDy
+   l5wGVU9B7ZfXB3g+aRSsgEoJkDTSW3ZKFvOhmqZyCGMG9VhZzLqmyi8Nk
+   G0YH0wKToQ641ExRmFrhv1xsCs0JM9dlnTewEB1ODArlfFJTqgq+iFKOG
+   jI+o8HCyb36upvW6plqZqWR71/PRKG9pyVXcHQ9fECWeRW0oiTG6msT8I
+   A==;
+X-CSE-ConnectionGUID: 0SYZgyh+QmC9wMqMn5LRbA==
+X-CSE-MsgGUID: k4cFiNEfTTCxZDKJBv/D9Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11367"; a="41666197"
+X-IronPort-AV: E=Sophos;i="6.14,233,1736841600"; 
+   d="scan'208";a="41666197"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2025 18:51:29 -0800
+X-CSE-ConnectionGUID: HiQhBS2oTKiKQ/8IseH6xA==
+X-CSE-MsgGUID: E3Auo7O4QWawkzLNtPKfXQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,233,1736841600"; 
+   d="scan'208";a="119670936"
+Received: from lkp-server02.sh.intel.com (HELO a4747d147074) ([10.239.97.151])
+  by fmviesa007.fm.intel.com with ESMTP; 08 Mar 2025 18:51:26 -0800
+Received: from kbuild by a4747d147074 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tr6lA-0002aG-0r;
+	Sun, 09 Mar 2025 02:51:24 +0000
+Date: Sun, 9 Mar 2025 10:50:43 +0800
+From: kernel test robot <lkp@intel.com>
+To: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
+	andrew+netdev@lunn.ch, sdf@fomichev.me
+Subject: Re: [PATCH net-next 1/3] eth: bnxt: switch to netif_close
+Message-ID: <202503091014.T0oUWfdo-lkp@intel.com>
+References: <20250308010840.910382-1-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250308010840.910382-1-sdf@fomichev.me>
 
-From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Hi Stanislav,
 
-The `snps,dwmac.yaml` binding currently sets `maxItems: 3` for the
-`interrupts` and `interrupt-names` properties, but vendor bindings
-selecting `snps,dwmac.yaml` do not impose these limits.
+kernel test robot noticed the following build errors:
 
-Define constraints for `interrupts` and `interrupt-names` properties in
-various DWMAC vendor bindings to ensure proper validation and consistency.
+[auto build test ERROR on net-next/main]
 
-Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
----
-Hi All,
+url:    https://github.com/intel-lab-lkp/linux/commits/Stanislav-Fomichev/eth-bnxt-request-unconditional-ops-lock/20250308-091318
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250308010840.910382-1-sdf%40fomichev.me
+patch subject: [PATCH net-next 1/3] eth: bnxt: switch to netif_close
+config: arm-randconfig-004-20250309 (https://download.01.org/0day-ci/archive/20250309/202503091014.T0oUWfdo-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250309/202503091014.T0oUWfdo-lkp@intel.com/reproduce)
 
-Based on recent patch [0] which increases the interrupts to 11
-and adds `additionalItems: true` its good to have constraints
-to validate the schema. Ive made the changes based on the DT
-binding doc and the users. Ive ran dt binding checks to ensure
-the constraints are valid. Please let me know if you'd like me
-to split this patch or if any of the constraints are incorrect,
-as I don't have documentation for all of these platforms.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202503091014.T0oUWfdo-lkp@intel.com/
 
-https://lore.kernel.org/all/20250308200921.1089980-2-prabhakar.mahadev-lad.rj@bp.renesas.com/
+All errors (new ones prefixed by >>, old ones prefixed by <<):
 
-Cheers, Prabhakar
----
- .../devicetree/bindings/net/amlogic,meson-dwmac.yaml   |  6 ++++++
- .../devicetree/bindings/net/intel,dwmac-plat.yaml      |  6 ++++++
- .../devicetree/bindings/net/mediatek-dwmac.yaml        |  6 ++++++
- .../devicetree/bindings/net/nxp,dwmac-imx.yaml         |  8 ++++++++
- .../devicetree/bindings/net/rockchip-dwmac.yaml        | 10 ++++++++++
- Documentation/devicetree/bindings/net/stm32-dwmac.yaml | 10 ++++++++++
- .../bindings/net/toshiba,visconti-dwmac.yaml           |  6 ++++++
- 7 files changed, 52 insertions(+)
+WARNING: modpost: missing MODULE_DESCRIPTION() in arch/arm/probes/kprobes/test-kprobes.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in mm/kasan/kasan_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in lib/slub_kunit.o
+>> ERROR: modpost: "netif_close" [drivers/net/ethernet/broadcom/bnxt/bnxt_en.ko] undefined!
 
-diff --git a/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml b/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml
-index 798a4c19f18c..0cd78d71768c 100644
---- a/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml
-+++ b/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml
-@@ -152,6 +152,12 @@ properties:
-           The second range is is for the Amlogic specific configuration
-           (for example the PRG_ETHERNET register range on Meson8b and newer)
- 
-+  interrupts:
-+    maxItems: 1
-+
-+  interrupt-names:
-+    const: macirq
-+
- required:
-   - compatible
-   - reg
-diff --git a/Documentation/devicetree/bindings/net/intel,dwmac-plat.yaml b/Documentation/devicetree/bindings/net/intel,dwmac-plat.yaml
-index 42a0bc94312c..62c1da36a2b5 100644
---- a/Documentation/devicetree/bindings/net/intel,dwmac-plat.yaml
-+++ b/Documentation/devicetree/bindings/net/intel,dwmac-plat.yaml
-@@ -41,6 +41,12 @@ properties:
-       - const: ptp_ref
-       - const: tx_clk
- 
-+  interrupts:
-+    maxItems: 1
-+
-+  interrupt-names:
-+    const: macirq
-+
- required:
-   - compatible
-   - clocks
-diff --git a/Documentation/devicetree/bindings/net/mediatek-dwmac.yaml b/Documentation/devicetree/bindings/net/mediatek-dwmac.yaml
-index ed9d845f6008..3aab21b8e8de 100644
---- a/Documentation/devicetree/bindings/net/mediatek-dwmac.yaml
-+++ b/Documentation/devicetree/bindings/net/mediatek-dwmac.yaml
-@@ -64,6 +64,12 @@ properties:
-       - const: rmii_internal
-       - const: mac_cg
- 
-+  interrupts:
-+    maxItems: 1
-+
-+  interrupt-names:
-+    const: macirq
-+
-   power-domains:
-     maxItems: 1
- 
-diff --git a/Documentation/devicetree/bindings/net/nxp,dwmac-imx.yaml b/Documentation/devicetree/bindings/net/nxp,dwmac-imx.yaml
-index 87bc4416eadf..e5db346beca9 100644
---- a/Documentation/devicetree/bindings/net/nxp,dwmac-imx.yaml
-+++ b/Documentation/devicetree/bindings/net/nxp,dwmac-imx.yaml
-@@ -56,6 +56,14 @@ properties:
-         - tx
-         - mem
- 
-+  interrupts:
-+    maxItems: 2
-+
-+  interrupt-names:
-+    items:
-+      - const: macirq
-+      - const: eth_wake_irq
-+
-   intf_mode:
-     $ref: /schemas/types.yaml#/definitions/phandle-array
-     items:
-diff --git a/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml b/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
-index f8a576611d6c..891396140a7f 100644
---- a/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
-+++ b/Documentation/devicetree/bindings/net/rockchip-dwmac.yaml
-@@ -58,6 +58,16 @@ properties:
-               - rockchip,rv1126-gmac
-           - const: snps,dwmac-4.20a
- 
-+  interrupts:
-+    minItems: 1
-+    maxItems: 2
-+
-+  interrupt-names:
-+    minItems: 1
-+    items:
-+      - const: macirq
-+      - const: eth_wake_irq
-+
-   clocks:
-     minItems: 5
-     maxItems: 8
-diff --git a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-index 85cea9966a27..987254900d0d 100644
---- a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-+++ b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-@@ -54,6 +54,16 @@ properties:
-     items:
-       - const: stmmaceth
- 
-+  interrupts:
-+    minItems: 1
-+    maxItems: 2
-+
-+  interrupt-names:
-+    minItems: 1
-+    items:
-+      - const: macirq
-+      - const: eth_wake_irq
-+
-   clocks:
-     minItems: 3
-     items:
-diff --git a/Documentation/devicetree/bindings/net/toshiba,visconti-dwmac.yaml b/Documentation/devicetree/bindings/net/toshiba,visconti-dwmac.yaml
-index 052f636158b3..f0f32e18fc85 100644
---- a/Documentation/devicetree/bindings/net/toshiba,visconti-dwmac.yaml
-+++ b/Documentation/devicetree/bindings/net/toshiba,visconti-dwmac.yaml
-@@ -42,6 +42,12 @@ properties:
-       - const: stmmaceth
-       - const: phy_ref_clk
- 
-+  interrupts:
-+    maxItems: 1
-+
-+  interrupt-names:
-+    const: macirq
-+
- required:
-   - compatible
-   - reg
 -- 
-2.43.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
