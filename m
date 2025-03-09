@@ -1,146 +1,194 @@
-Return-Path: <netdev+bounces-173377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71423A588AE
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 22:57:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EFC84A588B1
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 22:58:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91ADF3A92D9
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 21:57:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C35BD3A555F
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 21:58:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC26821E08D;
-	Sun,  9 Mar 2025 21:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="quyVVZ/s"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4256214218;
+	Sun,  9 Mar 2025 21:58:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E2BD1A3035
-	for <netdev@vger.kernel.org>; Sun,  9 Mar 2025 21:57:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E718184F;
+	Sun,  9 Mar 2025 21:58:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741557446; cv=none; b=SxAIHqiM6W8sq5HdWY+ep7pUCWktarmSs3iDQp0UqqJtGXQaDgdYeXrUjdKfn04BeuRhDI39rcepQohZWTZo7JxMv4l48t3VkRRslvGRExnT7dB2j+iY9ypYC6GqeBB3NAxCBzB//x+xQ3PVM3VBVHQCht5uBoYIPIf3mrOShAA=
+	t=1741557535; cv=none; b=lkEKQLhMyz324W2TiBnUR0yWnnAZ7ZYl6CKf2Jls7Fw/ib7a8WU77gCWavruMBAErrowwaps1PZvY+HD6QeL8w2c5sGOIJuKNoxsrjUpUeSe/zXSkxoleU/uEmOXfbVSg0gSzD9fGyaKTqTzRfBVnexT0vF/SZNwt9O/pYIy83I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741557446; c=relaxed/simple;
-	bh=IOO3vW5DRrzxB4mImWuN0bc3+CxEqFoHgR64CmSjBn0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pGjwe0WjfnieeC0pRlIbs6LDKKFiC8I0oCEag/FIvJUAeFrCH8YxUVlRtBnHwWtU3BYXggAlYvZzNtwF8PdYoXtYr0CmeLP+xVnhHrbmAKyQOm+1YGW12uvPM1X1w3CuhJTS1wg+1o1QwzGw5wUqFWqWyCcha/rbwLOVQu4nyY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=quyVVZ/s; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2242aca53efso152815ad.1
-        for <netdev@vger.kernel.org>; Sun, 09 Mar 2025 14:57:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741557444; x=1742162244; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o2wudePMKO0a7WgcqR4nia6eVNU+3LQ8sE3S2FURcRY=;
-        b=quyVVZ/sTESWfkJT8fIlfwmAjnwee4s2uzpgVkdw0ISkG4tnHV6tkLBOCUS1hWcku6
-         gTuVkMB/DqhfIAFjGObwqUa9Hy2yOkrj2/aPDfvfDA6ts6qjUMErLsYKL+pMaBb073QE
-         vSTi+5W9KjGWORyoo0QgXu5kCeQlwhp+zHZK+zzXwdl07sRhPUKxNTrzjtUNQDo+1pmC
-         4Zv64TzKNtVCZkqm6KzKI/iw7h3H8UH7J+0ZrOytEn3kjbf0T5Gd9CDNQW+geq3YWIOl
-         WZgpMVLhHbHnuWdQGlICOJIBH9D6lvli1dUsQ/QBpftUxriL6F9ftCaYZH9IRW4M2Bn4
-         Dd4g==
+	s=arc-20240116; t=1741557535; c=relaxed/simple;
+	bh=4X/7zgS7ELg+HZ3HeMP8NM2MJngTXfSPwy5i4ADSnrY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GXycVhvizK6P9DTspA138wR/adsHFe/IsmU+WZUszP5MgNoPPOrXjW2CpVEE0hnH5Uy1VRShydt0KWA4q9YycXFkeHpYhPgBv6YWdMaVgTucsG8Ov5e94MhtqA+RaFKM+OsV6O8i78EvSCZaECVGyJkUFyYlUGbDvMjU+T5KCYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-22423adf751so47350785ad.2;
+        Sun, 09 Mar 2025 14:58:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741557444; x=1742162244;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o2wudePMKO0a7WgcqR4nia6eVNU+3LQ8sE3S2FURcRY=;
-        b=hnsOwB9LndWxdQaNEx0sol6DyNQf+BmE/ucKPRJjk/W3JuGPDKNnDItgxFEcaEvanr
-         +NJpIerdijvTVIXdm1K3ZJF2bwOZ9iOsGcvOV4vlEf7faV4Sa40sTgmgHurvd79VD//9
-         2xBjK9KLzZVSaCXFjnfTusCsBAQ+HlMKt6P6l7EDE20PBg09ljIjVicljPq6hAmVusyu
-         CyvPixw9EK4c6f+0m2kScL57lZCvE6ezBWv7Fa1Y9xx9xeSRy/pdL4YSW8OniWu2Wt84
-         i5TVUFiR+m6jkEiJKqOzlrVbs85tgCNntDxkjAi0u7NhrYZshfqRafWb8esvWA432Iun
-         UOvA==
-X-Forwarded-Encrypted: i=1; AJvYcCW+O+c79b4SzOGPPZoV/XoMGWvdKqify48VXNnESeUuHOKa+Ji8A8qYT6QAbzeiAI4sl8663cE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoEyiyGYctJmx/o2wmRt1JrAe+AkQ3obEWM8kJSetYiWvgjLC+
-	giExRfg1JCkYjKI+TuIZ57wZJ3V1/W2eJ0kmdAPh+RpXiZqm5pS8zqazOK2HHPbF/m+cyJMtT2N
-	n1G/MaACqnoSgYzy7ubJdmpv4CxpEnH5fnNxhb7oeByKXUYVJnhxB
-X-Gm-Gg: ASbGncshp34tzH1CX+Lh9uDz3LwZd+I021nnJ/rVM47aFjZHzS8zYCskOBPGLOs5gTC
-	PnBIEVkHrE9feTYIg73lnr2b9U1woH/JFbYRrG17NIDCwRGhoFQTNSQTstyxkzbJQcbTvk0NcpA
-	zRQeyeWgA4OI5q2IapgUSfTwUJ6EE=
-X-Google-Smtp-Source: AGHT+IERm+N9tbCUGGJ+MXH4US5kbkAUzDlwr9J2QPgizF7Pb9AOwPC7JLew53ElFzF260gr1QRtJjUsfw1DEzN1XTQ=
-X-Received: by 2002:a17:903:22cf:b0:215:8723:42d1 with SMTP id
- d9443c01a7336-22540e5a369mr2492205ad.10.1741557443599; Sun, 09 Mar 2025
- 14:57:23 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1741557533; x=1742162333;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/2a7SmoeHEGl5Onz+EkPEONR/nzaHnY5dSapcOuXjhI=;
+        b=SEuW/r67Ejgl/PZ97Bl8itGME3DAvzwH3l4pZ+xW8+H4MJo3wU+JiUugcp6BXPXUQl
+         vpVFTwCHdfMDToy1V3MP415qOJY8h7gq/HMggS+z33Xkcm4cgPMiwPhK6vxWIS5nPgAZ
+         OaaJII1PIAPEc6bt0JKhr5yJ2ESTVW0iWzGnmA0n5v7JzRR2r99O1WGkCjiuNTRKBkM3
+         +N8t0BpqKEIeY1rLh7p0hZguON1alS0E6V4k4ynvwPRlKVwFWURRLHHEGWTfnMTzRG1i
+         DkXIXYteFn5AMGXQX+JhZmeqUCsb44XU51Fp51uLTVGoGGWqXWAoaQTdtwibrkzluzNK
+         hgLg==
+X-Forwarded-Encrypted: i=1; AJvYcCXK5w2Eh8qlS6Nc2MG/Wx7t8yxtNRvGOLhd5o9GZ0434P56iWDLUN4brVxJpmxJNUKiawEz+33m8MUxNsQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjyzoirfpfFs2d0JHcbTVr4PPJy6u/O01MadboeIuUGMSPU0ZE
+	wmAn0Uz0rqjLjPqKzyalPXkIBT8Ohj1yJL9P8P50fsB1CRETkzosumQ7BZ2pmQ==
+X-Gm-Gg: ASbGncvYSzjmJCEUanODbpc0IPUPBcA7qfIAQm+dFLwU+Oaqi7B+F/y5VNCj+stkJWf
+	4sfeS++ggSZmx4PucvoAZo3UT9N5hxmTvqRn9EnZbqQ2xRwoV7yPPqjODHBAUdnhCfCZLjqBmsu
+	DUkq9m1hJTU2TPIUmh7Zm6sW6eNPmm1mBs0qtQyMjhCseR6e6E1IpilHEim4Bt43Lgl2VB79LCu
+	WTw+w7slE2jIiTtvzgO8EKtM5RBhCYgOhlE7LTAZ0TLiU789qpLYq5xSxFHVhoog+38h9eoxM9x
+	EITyTkKtnFAQVk4Ty/ccdG6W2AwwYKdqhDDUiWNG7MC0
+X-Google-Smtp-Source: AGHT+IEIG8or6GL0eh1I/QPMKJErwzbv6I3ycNlqGgoU6gz3cV/s86x613AlIQ8V/6WeUGXMDfXSVg==
+X-Received: by 2002:a05:6a00:1703:b0:736:57cb:f2aa with SMTP id d2e1a72fcca58-736aa9fdbbamr16512880b3a.13.1741557533175;
+        Sun, 09 Mar 2025 14:58:53 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
+        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-af28126d69bsm6340302a12.51.2025.03.09.14.58.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Mar 2025 14:58:52 -0700 (PDT)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	sdf@fomichev.me
+Subject: [PATCH net-next v2 1/3] eth: bnxt: switch to netif_close
+Date: Sun,  9 Mar 2025 14:58:49 -0700
+Message-ID: <20250309215851.2003708-1-sdf@fomichev.me>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250307155725.219009-1-sdf@fomichev.me> <20250307155725.219009-4-sdf@fomichev.me>
- <20250307153456.7c698a1a@kernel.org> <Z8uEiRW91GdYI7sL@mini-arch>
-In-Reply-To: <Z8uEiRW91GdYI7sL@mini-arch>
-From: Mina Almasry <almasrymina@google.com>
-Date: Sun, 9 Mar 2025 14:57:09 -0700
-X-Gm-Features: AQ5f1JqrzUpfGFvobvIHXzlf0odrxpBbx4xi7Bhn9Q73KD7xZh-f11MEcgp2jP4
-Message-ID: <CAHS8izPO2wSReuRz=k1PuXy8RAJuo5pujVMGceQVG7AvwMSVdw@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 3/4] net: add granular lock for the netdev
- netlink socket
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, 
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	linux-kernel@vger.kernel.org, horms@kernel.org, donald.hunter@gmail.com, 
-	michael.chan@broadcom.com, pavan.chebbi@broadcom.com, andrew+netdev@lunn.ch, 
-	jdamato@fastly.com, xuanzhuo@linux.alibaba.com, asml.silence@gmail.com, 
-	dw@davidwei.uk
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Mar 7, 2025 at 3:43=E2=80=AFPM Stanislav Fomichev <stfomichev@gmail=
-.com> wrote:
->
-> On 03/07, Jakub Kicinski wrote:
-> > On Fri,  7 Mar 2025 07:57:24 -0800 Stanislav Fomichev wrote:
-> > > diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-> > > index a219be90c739..8acdeeae24e7 100644
-> > > --- a/net/core/netdev-genl.c
-> > > +++ b/net/core/netdev-genl.c
-> > > @@ -859,6 +859,7 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, s=
-truct genl_info *info)
-> > >             goto err_genlmsg_free;
-> > >     }
-> > >
-> > > +   mutex_lock(&priv->lock);
-> > >     rtnl_lock();
-> > >
-> > >     netdev =3D __dev_get_by_index(genl_info_net(info), ifindex);
-> > > @@ -925,6 +926,7 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, s=
-truct genl_info *info)
-> > >     net_devmem_unbind_dmabuf(binding);
-> > >  err_unlock:
-> > >     rtnl_unlock();
-> > > +   mutex_unlock(&priv->lock);
-> > >  err_genlmsg_free:
-> > >     nlmsg_free(rsp);
-> > >     return err;
-> >
-> > I think you're missing an unlock before successful return here no?
->
-> Yes, thanks! :-( I have tested some of this code with Mina's latest TX + =
-my
-> loopback mode, but it doesn't have any RX tests.. Will try to hack
-> something together to run RX bind before I repost.
+All (error) paths that call dev_close are already holding instance lock,
+so switch to netif_close to avoid the deadlock.
 
-Is the existing RX test not working for you?
+v2:
+- add missing EXPORT_MODULE for netif_close
 
-Also running `./ncdevmem` manually on a driver you have that supports
-devmem will test the binding patch.
+Fixes: 004b5008016a ("eth: bnxt: remove most dependencies on RTNL")
+Reported-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c         | 12 ++++++------
+ drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c |  4 ++--
+ net/core/dev.c                                    |  1 +
+ 3 files changed, 9 insertions(+), 8 deletions(-)
 
-I wonder if we can change list_head to xarray, which manages its own
-locking, instead of list_head plus manual locking. Just an idea, I
-don't have a strong preference here. It may be annoying that xarray do
-lookups by an index, so we have to store the index somewhere. But if
-all we do here is add to the xarray and later loop over it to unbind
-elements, we don't need to store the indexes anywhere.
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index b09171110ec4..66dfaf7e3776 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -12802,7 +12802,7 @@ int bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
+ 		rc = __bnxt_open_nic(bp, irq_re_init, link_re_init);
+ 	if (rc) {
+ 		netdev_err(bp->dev, "nic open fail (rc: %x)\n", rc);
+-		dev_close(bp->dev);
++		netif_close(bp->dev);
+ 	}
+ 	return rc;
+ }
+@@ -12840,7 +12840,7 @@ int bnxt_half_open_nic(struct bnxt *bp)
+ half_open_err:
+ 	bnxt_free_skbs(bp);
+ 	bnxt_free_mem(bp, true);
+-	dev_close(bp->dev);
++	netif_close(bp->dev);
+ 	return rc;
+ }
+ 
+@@ -14195,7 +14195,7 @@ void bnxt_fw_reset(struct bnxt *bp)
+ 			netdev_err(bp->dev, "Firmware reset aborted, rc = %d\n",
+ 				   n);
+ 			clear_bit(BNXT_STATE_IN_FW_RESET, &bp->state);
+-			dev_close(bp->dev);
++			netif_close(bp->dev);
+ 			goto fw_reset_exit;
+ 		} else if (n > 0) {
+ 			u16 vf_tmo_dsecs = n * 10;
+@@ -14810,7 +14810,7 @@ static void bnxt_fw_reset_abort(struct bnxt *bp, int rc)
+ 	if (bp->fw_reset_state != BNXT_FW_RESET_STATE_POLL_VF)
+ 		bnxt_dl_health_fw_status_update(bp, false);
+ 	bp->fw_reset_state = 0;
+-	dev_close(bp->dev);
++	netif_close(bp->dev);
+ }
+ 
+ static void bnxt_fw_reset_task(struct work_struct *work)
+@@ -16276,7 +16276,7 @@ int bnxt_restore_pf_fw_resources(struct bnxt *bp)
+ 
+ 	if (netif_running(bp->dev)) {
+ 		if (rc)
+-			dev_close(bp->dev);
++			netif_close(bp->dev);
+ 		else
+ 			rc = bnxt_open_nic(bp, true, false);
+ 	}
+@@ -16669,7 +16669,7 @@ static void bnxt_shutdown(struct pci_dev *pdev)
+ 		goto shutdown_exit;
+ 
+ 	if (netif_running(dev))
+-		dev_close(dev);
++		netif_close(dev);
+ 
+ 	bnxt_ptp_clear(bp);
+ 	bnxt_clear_int_mode(bp);
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
+index b06fcddfc81c..b6d6fcd105d7 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
+@@ -461,7 +461,7 @@ static int bnxt_dl_reload_down(struct devlink *dl, bool netns_change,
+ 		if (rc) {
+ 			NL_SET_ERR_MSG_MOD(extack, "Failed to deregister");
+ 			if (netif_running(bp->dev))
+-				dev_close(bp->dev);
++				netif_close(bp->dev);
+ 			netdev_unlock(bp->dev);
+ 			rtnl_unlock();
+ 			break;
+@@ -576,7 +576,7 @@ static int bnxt_dl_reload_up(struct devlink *dl, enum devlink_reload_action acti
+ 		*actions_performed |= BIT(action);
+ 	} else if (netif_running(bp->dev)) {
+ 		netdev_lock(bp->dev);
+-		dev_close(bp->dev);
++		netif_close(bp->dev);
+ 		netdev_unlock(bp->dev);
+ 	}
+ 	rtnl_unlock();
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 1cb134ff7327..a9f2dc31ed2c 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -1760,6 +1760,7 @@ void netif_close(struct net_device *dev)
+ 		list_del(&single);
+ 	}
+ }
++EXPORT_SYMBOL(netif_close);
+ 
+ int dev_setup_tc(struct net_device *dev, enum tc_setup_type type,
+ 		 void *type_data)
+-- 
+2.48.1
 
---
-Thanks,
-Mina
 
