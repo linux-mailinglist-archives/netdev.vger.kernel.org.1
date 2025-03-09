@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-173354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20109A58669
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 18:45:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7208A5866C
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 18:48:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AFCC17A3421
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 17:44:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1605416612F
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 17:48:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6C751DE88B;
-	Sun,  9 Mar 2025 17:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 861221A2C0E;
+	Sun,  9 Mar 2025 17:48:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HB9QplTG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UiKEAswy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23123F4F1;
-	Sun,  9 Mar 2025 17:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA73910E5;
+	Sun,  9 Mar 2025 17:48:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741542351; cv=none; b=PhyHle9YucD2x8BdM0DIVbE/e/YjKakL+QAnwlHPKNIIZ98O7jgkC2HF3FjnWHdpEELG83mjrnSO8EBQi9bc1e4f0XiFB60yd5oZV7gnClWmjOK70okTR7nH2VP05c3T8/CmdJo4IuMgDQDqOCHiRBEU13O+f1jfkJmSblBSjHo=
+	t=1741542519; cv=none; b=Vrg92iy6L10We4Zb9RNCLOM1M1ruDwaVwVOWavGsu2P4yM9hScGUl6IqFfnqavplTTTKra1zGC13y9hqjFbjOWpcDgHkOt81C4i2mJpVsyAhFosEtWO4JkNNl2iPT9GG2N0FRH+1WpUvklBSuqvBD1A4jy/kt5eSP0lxftUPvbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741542351; c=relaxed/simple;
-	bh=Ts4nRRhjYyME+pC7r6xMDOAjdA6nK3OzbkGfMevUYTw=;
+	s=arc-20240116; t=1741542519; c=relaxed/simple;
+	bh=IUW6EZm7/oaNBw5RPSdZbbA/T1kczIvutYqS5/DDbTs=;
 	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZVZO8P1b1yU5/Yf3n7zMAgRmi5i/fO02xD39GmGiLJWNZlkJU++lkvibWfJaG3JkxB6TyOlOPw8Z0gbQ2dcw9y/vV5YWCSRLFftSLpvvHZO43IO00ZyG33SDwr7bnEjGnwVCcxypd1EgxRyG2Gbf0itrpJTBM991md+jx3KD9D0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HB9QplTG; arc=none smtp.client-ip=209.85.128.43
+	 Content-Type:Content-Disposition:In-Reply-To; b=QaravzOC20vKiPq9vN4J9KLH+qR9VInt63jJ0gzMS6Xglphvs2ZELWNCOtohNNWwfVruKERb6OL7+qJH8Zki+tpaeQIsC6cppTh8EwIYvKUT28/IzLUmE56FFZB+QlqA42GUzhQJT391LZ4au8FEe6uitmFwaAPghyZfPZVfhKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UiKEAswy; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-438a39e659cso19444745e9.2;
-        Sun, 09 Mar 2025 10:45:49 -0700 (PDT)
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-43bd5644de8so36413735e9.3;
+        Sun, 09 Mar 2025 10:48:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741542348; x=1742147148; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1741542516; x=1742147316; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:subject:cc
          :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=mYVeDPxjhFeZxy0KwWJDY/eKgxnMZAxnPE/IYVsYVHI=;
-        b=HB9QplTGsXH27nqPQ8Y5IY1YVylqDo24WCnOWLL6CF61OwAge7VCx5eHJa9o2R0XNf
-         K2D0ip4rlJCyOok39f+De/KlTNpBQ2c1MMOEuQpQRulxIGMzjkTEmRfHP1ups+lqA3xN
-         p+hJi3yOgRPPYIRziU7D08N7+IFRcmjqMGnnPPLSskQnZed9KfIwmmpAC1ZfBXrkJzHt
-         i7GoeV9uPq5aSYckQgCMcw0kTbS7vptCRjHhrz04SP0Olb638PmZKa7twPMZoXOnFRX2
-         kylaFSWfFh9rSi2g4/nZiXvzoe+SNwFEI2OK0qmEIFhx8S7P4L/jhgi72HnGf22dsNjZ
-         Oa6A==
+        bh=BrmgUU8m2W+dm6XtC7Lvzp3134bSe6hwOO06zK/FM4M=;
+        b=UiKEAswycpI3o/APvDq6IJPC2THpOgNWTA9NMz13b8ag/GU9iV119KIMRKDOOPxpfE
+         80q+J2/We1CJ0+z2uLub9EM/+qNVwm0SAQ4LgFuBFXTJ8hyNf4RbKqKuOGR40aCA/j8y
+         X3HzqzI5EcUa44nAknkGWJRo3346eyxXrKN8ZQZkEPfpVoFcxhLfQ3mLv9FywoUe+IHY
+         qn49VT9e9eeJZP2Qhm8zywV8YJiJAlMh5E58iK0vuxkzMpDVQJ1QrGus43tP3rMDNd+r
+         eBHMsuEMmJK8Hj/+xZF9nFLCqbHhYUoESHKUx1XzuV+Zb94ETZhFRVH7qwVhOzkDGgm8
+         f6BQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741542348; x=1742147148;
+        d=1e100.net; s=20230601; t=1741542516; x=1742147316;
         h=in-reply-to:content-disposition:mime-version:references:subject:cc
          :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mYVeDPxjhFeZxy0KwWJDY/eKgxnMZAxnPE/IYVsYVHI=;
-        b=jW42SiZvW0InLg0oklmsmotbFyWe60Qu2ThZVso1w/OvqfrnldLyVeC6M55W5Y29R5
-         /YCFXIvRHXjX6pe03eLOaokz72Xpa2sn4YogvhiJjV0OHCpvI8EWAau6gL1gdrzhXsZ8
-         mgtL7+nO1Q8VThnE2L/vGaXsscpObUmgCZ8wzQuXfcmlT7xzLy8isJI9PXYOgnbEWX41
-         nDskVf5YhnCwV2h10m4EO74kTsFh/H5INucRG36viUJA5cPIuW5DQ+MbA3CL+oc3jLjl
-         4FYnhxHDfhcAnwTSZRhqmFTpfkAhRfAxhWMs1BE4van6fbgcZwa10zb8P4zcSmPwKefH
-         SKmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU58qDcWrPK2+uieHm3XlEtvTOEbhkgoPM9du7sZ5Yc36bRU1J6Pg/kZXtNc2sKRL6LcRDkTifuvOLs@vger.kernel.org, AJvYcCVxcUaLujUf8qStb84mXBM9Y1DMZu6ATWR1Krz5DHLq5qJ3C6qqgoJ8SHDng8m2weEfcItjcC/D@vger.kernel.org, AJvYcCWGQIkfeo4UCJ4puEGb5j5fIwdJx1kMKUZbaFvR0IyheH+3/G7roWfsQ9aaLLUE+gMnEbxKYHFowk9ap5fz@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6xlS0h70L9kL1edJajXjSr/t870M+wFttlU11aw1bHboZlOzf
-	WgPsgMcxstZOtUsaWHTK8KLOlq2K5wXlRlpqTd2y9UFe7DKt5ik9
-X-Gm-Gg: ASbGncsjP/cPyvD1V9svx0gRQZ5hZ2EFHj6igfNWV1ee3GILxX4i+Nz9kKNnCbw2i7A
-	JhmQ61LKOVQ7Unci0jIXo3peMiB2KxieZPVM0oBMez6LclR/5KC/8LlZa5swknktHE2bCi4zlpG
-	pipynWD2R6EmWAx2PayXtRlfU0WBG+dGwEZKlucYWfWdNaMFlpzy1aSg3YVoD4J+IFeIf4PY39K
-	UIUydt5xk48xLiARsBfemdqjgcsi6SJukulDF4CiWiMTfz6lB5mXFVcDVvUpmHOufuGFncw0P9f
-	eLkiDmEBQ8i5JSIyU0k0VY8jxKt2QF+onAdwG0UkUe6zdwtEGyUOxzMd3C3OvfYExJObZ0181xt
-	Z
-X-Google-Smtp-Source: AGHT+IGp7jEKMgtsCA2TGbrvYbtqFa4WUNvO5evZDxVuTRVZ2MCZ3kALyJRYRl99L7jGJPY9VOa7nA==
-X-Received: by 2002:a5d:64ce:0:b0:391:3bba:7f18 with SMTP id ffacd0b85a97d-3913bba8128mr2360645f8f.12.1741542346719;
-        Sun, 09 Mar 2025 10:45:46 -0700 (PDT)
+        bh=BrmgUU8m2W+dm6XtC7Lvzp3134bSe6hwOO06zK/FM4M=;
+        b=GORj+TY89pUT87ssRz6DUlh3rVg0EeUvsZvYHZ/OLPsSkIbVixE3Z+DUnyVmfNo8fx
+         rys6OP0vq0XabXkWLhhnOraQIh+hgPFqbgoytofjb6RuIOcH4tI7lPWrGvzzgG4oQRs+
+         dZs6xrIjUxgeS8YGyVy/QlkCVvWpAz+cjN+QdY9KaaXrz/elqhabQYXG4toavp0l7pnD
+         +v1LQuOg5i+IG6pcN5X8Qve5MGOHmsFUU6Vqu09VeJcf7kYNOQNbII2GJ0OcLCRZ+uxI
+         NplHVD/oBrmE/g/u0zoJudeJRx4v6BMIcCbfK8Rz/KBFW2LzmD7uKlE4j9nm2fCDzSWZ
+         5SyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU2Dqv0Im8cXz11d3mkaGqUn/VognR3o4f4NsSwKDCbrrtTFUHkUkOI4BTggrmiOuiayBW7SUFg@vger.kernel.org, AJvYcCUkx5/E8v1eIB3egyS5d7Y1Pdr3FWA78qddDg54sXUo1wyNmY9PHQI8WtwvGPmVpNYkhVGgjVAvJBQh@vger.kernel.org, AJvYcCWZCdZRE5PB1NuRryAoscw68wiPApJ+vjDAdjaaySCTUHr7ih/lWS7K06aNpmyox6JUZcf0uIvJGEMAd3GA@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYo6BJjwGG1GxWOEPeWbRkPzIYIb6CW7BIKZ/jR0GoIh70wnC0
+	xyWv46zhRs85LV7SMRUhf+7MmkT0hZi9L5nk6X5OhfALNqlcmtmf
+X-Gm-Gg: ASbGncsOiCwSmQanEvCF0QtE47wnleeJkfFBb8g8swbJ/xqOKuh6iDERfGjzYRmzchi
+	/RSPOtAF4q9hjlV5UWwoBZjPw/U9H99aJbJGBsxL1oOcHgmTJWTUe+X2ic9ze/XXu+a/jdtkIfW
+	GfNeMCTs+s3OEHGvE7xMX/rqwTyBgO3Og9uHJGDH2cYfI94QncyDpLN9r6diYO4SHsM5iNPUQG1
+	yjNX+i0q7EtZw4WN2dnzaGaWpj8Zl1vbp3IrOPmuKThMOAp4gzxUntMkKzNbrDDA7H457ER7q/Y
+	jZCspK0WnLZmX6YCVImgN+vjY8zcN11XP4V1GKGiW/jbrqzwW5aKFHBFnljWBuKnOcslj4gSJEX
+	C
+X-Google-Smtp-Source: AGHT+IFqmRVo6FIysacWzJ33TfZtTvUxXtYg7bp/VcB+skW5kxcsz3otvb9dL4N79FYLMYigyzY4bQ==
+X-Received: by 2002:a05:600c:524a:b0:43c:f75a:eb54 with SMTP id 5b1f17b1804b1-43cf75aed5emr10293205e9.13.1741542516005;
+        Sun, 09 Mar 2025 10:48:36 -0700 (PDT)
 Received: from Ansuel-XPS. (93-34-90-129.ip49.fastwebnet.it. [93.34.90.129])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912c102e01sm12708957f8f.93.2025.03.09.10.45.44
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ce8a493d0sm59519715e9.1.2025.03.09.10.48.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Mar 2025 10:45:45 -0700 (PDT)
-Message-ID: <67cdd3c9.df0a0220.1c827e.b244@mx.google.com>
-X-Google-Original-Message-ID: <Z83TxxTXxVGMYZzu@Ansuel-XPS.>
-Date: Sun, 9 Mar 2025 18:45:43 +0100
+        Sun, 09 Mar 2025 10:48:35 -0700 (PDT)
+Message-ID: <67cdd473.7b0a0220.170541.e2af@mx.google.com>
+X-Google-Original-Message-ID: <Z83UcX4X2gpPogQs@Ansuel-XPS.>
+Date: Sun, 9 Mar 2025 18:48:33 +0100
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: "Russell King (Oracle)" <linux@armlinux.org.uk>
 Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
@@ -94,11 +94,10 @@ Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
 	upstream@airoha.com
-Subject: Re: [net-next PATCH v12 07/13] net: mdio: regmap: add support for
- multiple valid addr
+Subject: Re: [net-next PATCH v12 08/13] net: mdio: regmap: add OF support
 References: <20250309172717.9067-1-ansuelsmth@gmail.com>
- <20250309172717.9067-8-ansuelsmth@gmail.com>
- <Z83RsW1_bzoEWheo@shell.armlinux.org.uk>
+ <20250309172717.9067-9-ansuelsmth@gmail.com>
+ <Z83R9qVfGbSc8bJs@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -107,34 +106,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z83RsW1_bzoEWheo@shell.armlinux.org.uk>
+In-Reply-To: <Z83R9qVfGbSc8bJs@shell.armlinux.org.uk>
 
-On Sun, Mar 09, 2025 at 05:36:49PM +0000, Russell King (Oracle) wrote:
-> On Sun, Mar 09, 2025 at 06:26:52PM +0100, Christian Marangi wrote:
-> > +/* If a non empty valid_addr_mask is passed, PHY address and
-> > + * read/write register are encoded in the regmap register
-> > + * by placing the register in the first 16 bits and the PHY address
-> > + * right after.
-> > + */
-> > +#define MDIO_REGMAP_PHY_ADDR		GENMASK(20, 16)
-> > +#define MDIO_REGMAP_PHY_REG		GENMASK(15, 0)
+On Sun, Mar 09, 2025 at 05:37:58PM +0000, Russell King (Oracle) wrote:
+> On Sun, Mar 09, 2025 at 06:26:53PM +0100, Christian Marangi wrote:
+> > Permit to pass the device node pointer to mdio regmap config and permit
+> > mdio registration with an OF node to support DT PHY probe.
+> > 
+> > With the device node pointer NULL, the normal mdio registration is used.
 > 
-> Clause 45 PHYs have 5 bits of PHY address, then 5 bits of mmd address,
-> and then 16 bits of register address - significant in that order. Can
-> we adjust the mask for the PHY address later to add the MMD between
-> the PHY address and register number?
+> Should this be using a device node, or a fwnode?
+> 
+> It depends _why_ you're adding this, and you omit to state that in the
+> commit description (hint - it should say why!)
 >
 
-Honestly to future proof this, I think a good idea might be to add
-helper to encode these info and use Clause 45 format even for C22.
-Maybe we can use an extra bit to signal if the format is C22 or C45.
+Ugh totally forgot... It should be a device node. The use of the of_
+variant of mdiobus register permits to autoprobe PHY defined in device
+tree.
 
-BIT(26) 0: C22 1:C45
-GENMASK(25, 21) PHY ADDR
-GENMASK(20, 16) MMD ADDR
-GENMASK(15, 0) REG
+The current regmap driver only permit manual probe using the mask value
+so it's problematic for MFD usage with an abstract regmap and PHY
+autoprobe.
 
-What do you think?
+Will add additional info in the commit.
 
 -- 
 	Ansuel
