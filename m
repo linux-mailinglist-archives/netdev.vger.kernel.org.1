@@ -1,163 +1,136 @@
-Return-Path: <netdev+bounces-173265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08FEBA58401
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 13:19:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6C7FA58408
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 13:30:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 748CB188D220
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 12:19:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9336D3AE027
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 12:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C92C01CC8B0;
-	Sun,  9 Mar 2025 12:19:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9577517A30D;
+	Sun,  9 Mar 2025 12:30:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="oX1YZjPS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QjCfz7ga"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE52211C;
-	Sun,  9 Mar 2025 12:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDC037482;
+	Sun,  9 Mar 2025 12:30:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741522763; cv=none; b=Iq7CamF3246UcUAKvleLR6P4vpNCV1WVLjkyo7iVPhbynKsOke3GY2wPWorgotBNVal0WWWM7h2VwSFXAUrMUvNb7Vvd7VBKOd7pNZkqmdJWwuDuj39osreKO/ADGlrJTDVlaQYwtYIj9ePOcVPZIbv6/VQXZl4KOY3RUXlaknk=
+	t=1741523438; cv=none; b=HNB2thsSj3EYFLElZXRxf68NUzPXkhPJiExlUgwj2kBm0I439tE5pZYDTtLh4uc2jUoOW7PcPtPqeYxpY9bd+a2obXBOIiek/l0HNlo7V81ZjR6nO5lrZ1vimI6RLVVg66uCNxIL2O1GCmc9aeyo5TY40gyxE2xx6fCSxhn9N3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741522763; c=relaxed/simple;
-	bh=7sRUR7aLQX7IAeaQn8fJoeQ7LQHllbHbgib8KkJCZIc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gKG8P1qSCCrXYkIOr/qkvbqL4M5krEa5xmbdBPujbAgak/8A4BYFN9QO7rPBUrWPYMr0wPxilS7L0c13jl9fJ21REnVUKRd0ytU+m3AxIxPMBkphmDS5BKimNi4d9bS7/IONId+s/BdFL+29FCr+y5o029sbevZh62JW+2fido4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=oX1YZjPS; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=OMe7X162PbDqxZBfjfEZb0yB4rbjLUrUqRTmqcMmD3s=; b=oX1YZjPSAQKU3UNOsLDu2gjBmb
-	UxrHVxYi7zyyfKsU2/azO2LEFgyG2OVO5dsFHwonypD4Vp0IKKHUNj9I3q6G3Z4krTozlD5tAS01W
-	V0T3EPVX6uxHShf5NQQpXYwRbvd8XBsRDQpwxZAKaFoTIudUk0IblZEW9ftEnDl+Gk+xhn0pWtA4R
-	8IRWI1OJj8V29WT3PF5t+wgA/6uFjTjETvhU/JmWnIxabJRJaDTdv9yVlGedayTA717/p+sfZ55/e
-	ecbvfTgy646NnQC8PAqdNhNlhEvRs/jQtyiDDKuWA0YYpwfT9pl069hoy68F0LhKu3bWmpqc3JuT/
-	26k5FttQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35288)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1trFcT-0001Ht-2w;
-	Sun, 09 Mar 2025 12:19:02 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1trFcN-0001Rl-1P;
-	Sun, 09 Mar 2025 12:18:55 +0000
-Date: Sun, 9 Mar 2025 12:18:55 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH net-next v2 3/3] net: stmmac: Add DWMAC glue layer for
- Renesas GBETH
-Message-ID: <Z82HL6NX0B1SdgPU@shell.armlinux.org.uk>
-References: <20250308200921.1089980-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250308200921.1089980-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <Z81WVNGlvRNW5JFk@shell.armlinux.org.uk>
- <CA+V-a8stuYLJMA5UEKpyLpH1kcgEvA=b5BzUOEaCKcfNtdSSfg@mail.gmail.com>
+	s=arc-20240116; t=1741523438; c=relaxed/simple;
+	bh=wZJjxwV42JCd91jTROSSilGqdgGCZDLMNi4KCRgR/8o=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SdpB3a6fVPhocGtedRTTA7g/M7JdjG5LHHV5GPtOF3KoJ59Loq3hs21VSgB+KcDrKoM00iS+DLMg1zzTEJ68o+YMrm8zhJBr7gLB2puvAhC9DCOLcIpeLiqTDksInT8LRuTbbIafxiLZkv8dWL8vsnGaay99YnvYuTD2ey8N/ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QjCfz7ga; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-abf64aa2a80so639921366b.0;
+        Sun, 09 Mar 2025 05:30:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741523435; x=1742128235; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pqj3TJjhabGigKmi0ouKSehitIwTHPlDh+RYxcgOvx4=;
+        b=QjCfz7gad4bkJ5m8dd6L2evyrfVS1Q00kGn6WzwXSyvaOBPBEdqxFvuIutNBpqkieW
+         qmEZUEyHrc28GXBuJbXDiIus1cdOZO3WQnYfcA2hWugzDw2hZEJPURd8bVM1oyBm7d91
+         p4qzfKD2dotI93P3OanJsC/+aLgHqJw7zrYye767BuCusT2/9IIzUames3aH+QPjBzVJ
+         CGoBTVsfBpL7NavZjF23aec2nsSDANF9YuN6yqHoLEUVrUJBzALz2E6923ceYENoztar
+         YEr7fuJaFmhsSTqn56hBgp/uqZgnqfIYNQ4Dums55FrFtumLokWWKnjX8zMlNtmVPOW/
+         R+7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741523435; x=1742128235;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pqj3TJjhabGigKmi0ouKSehitIwTHPlDh+RYxcgOvx4=;
+        b=q6IHD09PYL1YE5KRsaDQSJx43u5bpprLIncgjA2kpvz3655r81gjY7kHLIUue8Snh0
+         vncnIArjAYAVLDCAhULs/kUQaPM60YDoZ9A6Vu9wT31OR9JcJJXtqK2pNXHi1cWEI8v4
+         nhNwvU0w9Wqfa8nfJ7encCaPqoF3DlvQeMpG4bjXUZQXEHWfR47sTSGuuR8eQGllhae5
+         zr9fwpu67wgcQn7LI0XroDjv3YwUYBhO4mg4Ua7JMOjh9ltM437z+qHl2rSgEg1HTMBA
+         323F2d0SubfC3PoQMAda1SYWPfo/6V39cCXNaD4rHVTU2C/Dirg4kLXJOoUTvi1gzDZZ
+         HodQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX8vWRSl0eZGgKuqhzJTXXWzk+npB9SJLoG8xQfyyfuUzHgweJHLOeQmTGoev4mHk8m3qdQM7k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/fKFt7jlFaOneMKPVe5SnbvNHfalLHf0oc7QN62jFjJmE7JeD
+	yceFbFh5N0PljroldTMHa+YjMmHeG+qXZEqFn83jpEwLpqJKTIvQ
+X-Gm-Gg: ASbGncuPCudlg7T4JhtDSysPJaLVArwAgKv1D80EFrZwr4iCpvftiuBfRJod1Kr2Yps
+	67dqSbTEQR32GmYRQl9FYoyQoP88cpGst+I8AWEy2VR0J/GHqB158R5+M0bHlzz4pA66DFrU3o5
+	mfYy247zh5OOKxCP6/fJBYEPDLMRHEhlLbpfgh2Ne1PDjs6m8Wni4awK5jzAc26bx8E3Hkzeve8
+	CrR017Ec7V0tD1eX+HJ4feHMvLxgyOJPxjxbNLPkGgkMcotHmcGBU6V74xWTHYVpc5QoTzzK9ud
+	FeeI5oeJjxJmIKHQi8CCMsFQg0afu0TgN/bAhgvrM0MO3TlvI0o5bzvoG/S0pIzZf2gNy+Un00q
+	vchncOQ==
+X-Google-Smtp-Source: AGHT+IHKfjhv2KRqi72m86osn1kaV3bKVHiKIXa/2VcOYqS87Xn4ksZV0pNDz8lCjbtDG+Db5af31Q==
+X-Received: by 2002:a17:907:3f9b:b0:ac1:ddaa:2c11 with SMTP id a640c23a62f3a-ac25210ff7emr1172106766b.0.1741523434773;
+        Sun, 09 Mar 2025 05:30:34 -0700 (PDT)
+Received: from KERNELXING-MC1.tencent.com ([213.147.98.98])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac29c19603dsm39144066b.38.2025.03.09.05.30.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Mar 2025 05:30:34 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@fomichev.me,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	horms@kernel.org,
+	kuniyu@amazon.com,
+	ncardwell@google.com
+Cc: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Jason Xing <kerneljasonxing@gmail.com>
+Subject: [PATCH net-next 0/5] tcp: add some RTO MIN and DELACK MAX
+Date: Sun,  9 Mar 2025 13:29:59 +0100
+Message-Id: <20250309123004.85612-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+V-a8stuYLJMA5UEKpyLpH1kcgEvA=b5BzUOEaCKcfNtdSSfg@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Sun, Mar 09, 2025 at 11:24:57AM +0000, Lad, Prabhakar wrote:
-> Hi Russell,
-> 
-> Thank you for the review.
-> 
-> On Sun, Mar 9, 2025 at 8:50 AM Russell King (Oracle)
-> <linux@armlinux.org.uk> wrote:
-> >
-> > On Sat, Mar 08, 2025 at 08:09:21PM +0000, Prabhakar wrote:
-> > > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> > >
-> > > Add the DWMAC glue layer for the GBETH IP found in the Renesas RZ/V2H(P)
-> > > SoC.
-> > >
-> > > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> > > ---
-> > > v1->v2
-> > > - Dropped __initconst for renesas_gbeth_clks array
-> > > - Added clks_config callback
-> > > - Dropped STMMAC_FLAG_RX_CLK_RUNS_IN_LPI flag as this needs
-> > >   investigation.
-> >
-> > I thought you had got to the bottom of this, and it was a bug in your
-> > clock driver?
-> >
-> I have added a fix in the clock driver to ignore CLK_MON bits for
-> external clocks. The main reason for dropping this flag was despite
-> trying the below i.e. adding phy_eee_rx_clock_stop() just before
-> unregister_netdev() in stmmac_dvr_remove() still doesnt stop the Rx
-> clocks.
+Add bpf_getsockopt for RTO MIN and DELACK MAX.
 
-That's not unexpected, because phy_eee_rx_clock_stop() does not control
-a clock gate.
+Add setsockopt/getsockopt for RTO MIN and DELACK MAX.
 
-What phy_eee_rx_clock_stop() does is control the clock stop enable bit
-in the PHY. Please see IEEE 802.3 section 45.2.3.1.4 and other sections
-referred to from that section to gain the appropriate understanding.
+Add corresponding selftests for bpf.
 
-The point of adding the phy_eee_rx_clock_stop() call before
-stmmac_dvr_remove() was to _test_ (and *only as a test* - a point that
-I did stress) to see whether preventing the PHY from stopping it's
-receive clock solved the reset timeout on module reload. This test
-only makes sense if STMMAC_FLAG_RX_CLK_RUNS_IN_LPI has not been set.
+Jason Xing (5):
+  tcp: bpf: support bpf_getsockopt for TCP_BPF_RTO_MIN
+  tcp: bpf: support bpf_getsockopt for TCP_BPF_DELACK_MAX
+  tcp: support TCP_RTO_MIN_US for set/getsockopt use
+  tcp: support TCP_DELACK_MAX_US for set/getsockopt use
+  selftests: add bpf_set/getsockopt() for TCP_BPF_DELACK_MAX and
+    TCP_BPF_RTO_MIN
 
-As I understand it, you have found the real issue why that occurs, so
-it seems there is little need to continue with that test if, and only
-if, everything is now working reliably when removing and re-inserting
-the module.
-
-The key point here is "reliably". The receive side of the link *could*
-enter or exit LPI at *any* moment - it depends in the link partner. If
-the PHY has permission to stop it's receive clock, then this might lead
-to stmmac_reset() timing out because the PHY has stopped it's receive
-clock _if_ the receive-side LPI persists longer than the reset timeout.
-
-At this point, I am not certain what the current situation is. Are you
-now setting STMMAC_FLAG_RX_CLK_RUNS_IN_LPI because it solves a problem?
-If the answer is yes, then there is still a bug in the driver that needs
-to be solved and I've presented several solutions to that.
-
-I want to remove STMMAC_FLAG_RX_CLK_RUNS_IN_LPI from the stmmac driver
-so I'm going to NACK patches that add new uses. Sorry, but we need to
-solve the root problem, and stop hacking around it with flags to change
-behaviours.
+ Documentation/networking/ip-sysctl.rst        |  4 +--
+ include/net/tcp.h                             |  2 +-
+ include/uapi/linux/tcp.h                      |  2 ++
+ net/core/filter.c                             | 22 +++++++++++++
+ net/ipv4/tcp.c                                | 32 +++++++++++++++++--
+ net/ipv4/tcp_output.c                         |  2 +-
+ .../selftests/bpf/progs/setget_sockopt.c      |  2 ++
+ 7 files changed, 60 insertions(+), 6 deletions(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.43.5
+
 
