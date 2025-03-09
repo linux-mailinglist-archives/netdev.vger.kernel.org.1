@@ -1,403 +1,111 @@
-Return-Path: <netdev+bounces-173290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D54EAA5849E
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 14:44:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14428A584F3
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 15:36:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A28B57A5F68
-	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 13:43:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC2CA3A69EA
+	for <lists+netdev@lfdr.de>; Sun,  9 Mar 2025 14:36:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B711DC9AB;
-	Sun,  9 Mar 2025 13:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A6CD1D90C5;
+	Sun,  9 Mar 2025 14:36:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HL1DAG4t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YlOLQg3P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C371DC996;
-	Sun,  9 Mar 2025 13:44:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E50BD1C2DC8;
+	Sun,  9 Mar 2025 14:36:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741527846; cv=none; b=pXrcExgVIsiBcLjklqHxq702p9u6E/3LaD1mP0qIb/oaiGyww0oCxmp5GVhBPvvnCaGXNGF+GXErO43pXYxVTGERTVm6Tiqi3TXaDyTfxT8DickePb4dxxIQF0YgVuh/NlJEOVeWIbcoF5l4i+2PRiZw7fPrUZNxUMjLUyin6Dk=
+	t=1741531005; cv=none; b=pk3ncBXmjm2ABdo3MCl6QbLxnLai8pBkNhFi9OuUXkpRLAl7AkEvaad7TzmGveHRwKE3yDYSDlGRFUkWEPl7A9Yx0XDVjeAaIOQwwS8gTn2S9FU9ysK22KpjY8ClY8Q1XS8rCt0lLvcDCoW3n+CD4Fdj3hEuiEKvM3adEO/huks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741527846; c=relaxed/simple;
-	bh=BetOEpXT4sktIbCCQ2L9DlSwPslXcVObeTItgL1p0Cg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EpGCGAWoEkSD5h5jd3JveRxZOV3NnpF6V6LnsVPD3hj5jlGwyU6Yut2UiffrcBxtAZxxNIsKuMjL/pYVZqbseWazsBG07R+Ax6/hbhzYfCQm+CzWcq2upYJM/jginTD30qBwTRtfKQz9FWeAA4xmL6pBpCe9t3LSSNSwDlqb5cI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HL1DAG4t; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-223fd89d036so64924745ad.1;
-        Sun, 09 Mar 2025 06:44:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741527844; x=1742132644; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kaEFJP+ktkukRwLsnnvs6JN1FNl+ELjQ7TqtkoU4H70=;
-        b=HL1DAG4t/DGcChm+AbOUM3lpERnKM2DWXNIrcqaMaBI2huOOPKCfFYqbrUo+2C7jgp
-         uQ+JuhXpr33quo69QMSHk7C2UVgPLRF0SQYwcdECDh9y+QV1s2kzqJB5Nc81nPOwWslI
-         /PhL9kwDIZfMQPgRCYUrlL+CazsOcxmcTKDyBSKTDUSK+Ri4m5BtySYR+NY4M5wxoWiS
-         6SuMwbCYuwOLE8xcZlFs7WrYT+zWwKiJS2VW8o30vxrD6uOnfsXwQUGbU5fdcM/13AJr
-         HeaYzgUlAaNUCXHjqPM7Z0qRkftg9pbyw2W2Ta0IDEdpEFDqySf7pR7wJLIzS/eXZwYD
-         sftA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741527844; x=1742132644;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kaEFJP+ktkukRwLsnnvs6JN1FNl+ELjQ7TqtkoU4H70=;
-        b=Nua7FkbKVrKYtJ+LlKUScKw7cGpTp16W5pH7OX3puJOseiKFNruK3hGV7sETYSJWbZ
-         xmdEdRnR1Py4L8SD1/XDZffyGspQ5yynW4TF49Pzi8AUjbs6ZGG3qPLdy7Ggc4J2UNvt
-         yfmqxktXctMCPTCWINtm5iMYcsM8wdpq3SlmU9xwnCA43lv7EKp3djV9UH2z3SrZX6kx
-         Bbtyv2a7A6rPl/zP03O9rY6e5FLUwpvGv7DGb3ycQUVEdWRNTOwePa1wrsyUtuHRwKuz
-         LTgpXifH2W2y/es+0EICnMIppYnC6vMtmZb9yjrRsVlDnkyITC6cn8weXJi02BqsChHR
-         CmYw==
-X-Forwarded-Encrypted: i=1; AJvYcCU5MI0CxgD9SOE2ElDNuelMT0tiM3gTnr/ipfiF07Hj7ksYeSIywl+C/8+RgizAlCo+2FtA56Vi9/jY9/HQeYs=@vger.kernel.org, AJvYcCW+L7bU8sC1ZHuOSW3G065RKlHMnSeFhnppAGQ6XkDsQbX7X68RM5r9nWmzlQtmKX2hWxCSvWYB@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5doYSaPkYDgvBxrJiG3wwdtFEk8X27iOkjSw4tu599eA+tcvO
-	+SrJxhSVYZHpQdf5pa5EIaSxDbmjsZlZqzQjLSIHdU3Et9G55H4/
-X-Gm-Gg: ASbGncvMNOLmCQ3oRodWTTyw+/1UicU0mePStfHKOol9qkLnlDNVw5JfM6SLmQLhnKa
-	mHh+8Jlwt4x9WW7ha5unXE8wHyB7CcL0ejbkkU8aUBcfQfq+ex6KCNXq757NwMqi75FIzDEemTi
-	fAGIhfRKibyFKQ7B6pxEqtZ1JEyLMp5Y55212xFy0wfHKGpN1oREAOVg4Lv2nL89DNYpRQG6pOY
-	moOFkpgig3s+RW7pKTknRpDKZNGyLM19lr1agwZvVOSKa+kc0BPSKK1Nlh+it4DO1qdl9oKRhQX
-	97e+Iubke8RH9EmHmS4C3hbqnLhnE6Aei+TKo6WdelK5
-X-Google-Smtp-Source: AGHT+IEfsQvvzA74mKDNozulYmWb1+2TYl1v5p+CMdDWwcrEObDxrU4laIZqnodgLp8lJ8NkNWBp9A==
-X-Received: by 2002:a05:6a21:497:b0:1f1:2a5:1667 with SMTP id adf61e73a8af0-1f544c381e0mr21309623637.32.1741527844524;
-        Sun, 09 Mar 2025 06:44:04 -0700 (PDT)
-Received: from ap.. ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-736c41dda7csm2296841b3a.85.2025.03.09.06.43.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Mar 2025 06:44:03 -0700 (PDT)
-From: Taehee Yoo <ap420073@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com,
-	horms@kernel.org,
-	shuah@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: almasrymina@google.com,
-	asml.silence@gmail.com,
-	willemb@google.com,
-	kaiyuanz@google.com,
-	skhawaja@google.com,
-	sdf@fomichev.me,
-	gospo@broadcom.com,
-	somnath.kotur@broadcom.com,
-	dw@davidwei.uk,
-	amritha.nambiar@intel.com,
-	xuanzhuo@linux.alibaba.com,
-	ap420073@gmail.com
-Subject: [PATCH v3 net 8/8] selftests: drv-net: add xdp cases for ping.py
-Date: Sun,  9 Mar 2025 13:42:19 +0000
-Message-Id: <20250309134219.91670-9-ap420073@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250309134219.91670-1-ap420073@gmail.com>
-References: <20250309134219.91670-1-ap420073@gmail.com>
+	s=arc-20240116; t=1741531005; c=relaxed/simple;
+	bh=DYe8HUJy8kkP+7yQkU7dXVRL2fEX/sK2cxo3m1sVBZ0=;
+	h=Date:From:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hEtWkx1JEamnYWJBHN9RuJDIln4LoTJwmhrMG4xvFHXfJG37itnDpxfsrgze4vFiZKEmYFg7Z1bWc42b8OQDBeOLQ4pNCRNv/Iektyir5XYK0bWRkaVPvlHxShlbSWndmXIEdlBxp7/0AzPR9AJ0Mp5a8prdw2/76N1krXqrvY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YlOLQg3P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F7F1C4CEE3;
+	Sun,  9 Mar 2025 14:36:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741531003;
+	bh=DYe8HUJy8kkP+7yQkU7dXVRL2fEX/sK2cxo3m1sVBZ0=;
+	h=Date:From:Cc:Subject:References:In-Reply-To:From;
+	b=YlOLQg3Pfr5rPOiqsOgcXPYxWoi6EOfz0ffZPeOgQeSIPZSyl04RGttxrXIgpxD8Y
+	 dtF3lqztalSnxpkp7ZUqfT7WuCZCwJe40agWk8hE1naPT24GHuY7gw8HDSZV2B65OJ
+	 HpyrobADB5/Y0G6mMiylDM3GQ6EhQIbLJi2gqhKLv0nZlGV4R0nhkUYoChTKEOjNNv
+	 ABYTituRn62KGX3B6YYEMyF5HNmrvmLhq8nIn+yWXqTKzOl35WD5cuWTBOX4itFFZT
+	 40VAKVlLDLMPHPLdfsvAsCeLrAoSaomd4Y6t+fEzMf1mtzkEbtwCwYbpQ5d5OfHTxm
+	 aEYzYxGQDGe4Q==
+Date: Sun, 9 Mar 2025 04:36:42 -1000
+From: Tejun Heo <tj@kernel.org>
+Cc: kuniyu@amazon.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	cgroups@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Leon Romanovsky <leon@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Christian Brauner <brauner@kernel.org>,
+	Lennart Poettering <mzxreary@0pointer.de>,
+	Luca Boccassi <bluca@debian.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Shuah Khan <shuah@kernel.org>
+Subject: Re: [PATCH net-next 0/4] Add getsockopt(SO_PEERCGROUPID) and fdinfo
+ API to retreive socket's peer cgroup id
+Message-ID: <Z82neltmT_hbEpYy@slm.duckdns.org>
+References: <20250309132821.103046-1-aleksandr.mikhalitsyn@canonical.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250309132821.103046-1-aleksandr.mikhalitsyn@canonical.com>
+84;0;0cTo: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
 
-ping.py has 3 cases, test_v4, test_v6 and test_tcp.
-But these cases are not executed on the XDP environment.
-So, it adds XDP environment, existing tests(test_v4, test_v6, and
-test_tcp) are executed too on the below XDP environment.
-So, it adds XDP cases.
-1. xdp-generic + single-buffer
-2. xdp-generic + multi-buffer
-3. xdp-native + single-buffer
-4. xdp-native + multi-buffer
-5. xdp-offload
+On Sun, Mar 09, 2025 at 02:28:11PM +0100, Alexander Mikhalitsyn wrote:
+> 1. Add socket cgroup id and socket's peer cgroup id in socket's fdinfo
+> 2. Add SO_PEERCGROUPID which allows to retrieve socket's peer cgroup id
+> 3. Add SO_PEERCGROUPID kselftest
+> 
+> Generally speaking, this API allows race-free resolution of socket's peer cgroup id.
+> Currently, to do that SCM_CREDENTIALS/SCM_PIDFD -> pid -> /proc/<pid>/cgroup sequence
+> is used which is racy.
+> 
+> As we don't add any new state to the socket itself there is no potential locking issues
+> or performance problems. We use already existing sk->sk_cgrp_data.
+> 
+> We already have analogical interfaces to retrieve this
+> information:
+> - inet_diag: INET_DIAG_CGROUP_ID
+> - eBPF: bpf_sk_cgroup_id
+> 
+> Having getsockopt() interface makes sense for many applications, because using eBPF is
+> not always an option, while inet_diag has obvious complexety and performance drawbacks
+> if we only want to get this specific info for one specific socket.
+> 
+> Idea comes from UAPI kernel group:
+> https://uapi-group.org/kernel-features/
+> 
+> Huge thanks to Christian Brauner, Lennart Poettering and Luca Boccassi for proposing
+> and exchanging ideas about this.
+> 
+> Git tree:
+> https://github.com/mihalicyn/linux/tree/so_peercgroupid
 
-It also makes test_{v4 | v6 | tcp} sending large size packets. this may
-help to check whether multi-buffer is working or not.
+From cgroup POV:
 
-Note that the physical interface may be down and then up when xdp is
-attached or detached.
-This takes some period to activate traffic. So sleep(10) is
-added if the test interface is the physical interface.
-netdevsim and veth type interfaces skip sleep.
+Acked-by: Tejun Heo <tj@kernel.org>
 
-Signed-off-by: Taehee Yoo <ap420073@gmail.com>
----
+Thanks.
 
-v3:
- - No changes.
-
-v2:
- - Patch added.
-
- tools/testing/selftests/drivers/net/ping.py   | 200 ++++++++++++++++--
- .../testing/selftests/net/lib/xdp_dummy.bpf.c |   6 +
- 2 files changed, 191 insertions(+), 15 deletions(-)
-
-diff --git a/tools/testing/selftests/drivers/net/ping.py b/tools/testing/selftests/drivers/net/ping.py
-index eb83e7b48797..93f4b411b378 100755
---- a/tools/testing/selftests/drivers/net/ping.py
-+++ b/tools/testing/selftests/drivers/net/ping.py
-@@ -1,49 +1,219 @@
- #!/usr/bin/env python3
- # SPDX-License-Identifier: GPL-2.0
- 
-+import os
-+import random, string, time
- from lib.py import ksft_run, ksft_exit
--from lib.py import ksft_eq
--from lib.py import NetDrvEpEnv
-+from lib.py import ksft_eq, KsftSkipEx, KsftFailEx
-+from lib.py import EthtoolFamily, NetDrvEpEnv
- from lib.py import bkg, cmd, wait_port_listen, rand_port
-+from lib.py import ethtool, ip
- 
-+remote_ifname=""
-+no_sleep=False
- 
--def test_v4(cfg) -> None:
-+def _test_v4(cfg) -> None:
-     cfg.require_v4()
- 
-     cmd(f"ping -c 1 -W0.5 {cfg.remote_v4}")
-     cmd(f"ping -c 1 -W0.5 {cfg.v4}", host=cfg.remote)
-+    cmd(f"ping -s 65000 -c 1 -W0.5 {cfg.remote_v4}")
-+    cmd(f"ping -s 65000 -c 1 -W0.5 {cfg.v4}", host=cfg.remote)
- 
--
--def test_v6(cfg) -> None:
-+def _test_v6(cfg) -> None:
-     cfg.require_v6()
- 
--    cmd(f"ping -c 1 -W0.5 {cfg.remote_v6}")
--    cmd(f"ping -c 1 -W0.5 {cfg.v6}", host=cfg.remote)
--
-+    cmd(f"ping -c 1 -W5 {cfg.remote_v6}")
-+    cmd(f"ping -c 1 -W5 {cfg.v6}", host=cfg.remote)
-+    cmd(f"ping -s 65000 -c 1 -W0.5 {cfg.remote_v6}")
-+    cmd(f"ping -s 65000 -c 1 -W0.5 {cfg.v6}", host=cfg.remote)
- 
--def test_tcp(cfg) -> None:
-+def _test_tcp(cfg) -> None:
-     cfg.require_cmd("socat", remote=True)
- 
-     port = rand_port()
-     listen_cmd = f"socat -{cfg.addr_ipver} -t 2 -u TCP-LISTEN:{port},reuseport STDOUT"
- 
-+    test_string = ''.join(random.choice(string.ascii_lowercase) for _ in range(65536))
-     with bkg(listen_cmd, exit_wait=True) as nc:
-         wait_port_listen(port)
- 
--        cmd(f"echo ping | socat -t 2 -u STDIN TCP:{cfg.baddr}:{port}",
-+        cmd(f"echo {test_string} | socat -t 2 -u STDIN TCP:{cfg.baddr}:{port}",
-             shell=True, host=cfg.remote)
--    ksft_eq(nc.stdout.strip(), "ping")
-+    ksft_eq(nc.stdout.strip(), test_string)
- 
-+    test_string = ''.join(random.choice(string.ascii_lowercase) for _ in range(65536))
-     with bkg(listen_cmd, host=cfg.remote, exit_wait=True) as nc:
-         wait_port_listen(port, host=cfg.remote)
- 
--        cmd(f"echo ping | socat -t 2 -u STDIN TCP:{cfg.remote_baddr}:{port}", shell=True)
--    ksft_eq(nc.stdout.strip(), "ping")
--
-+        cmd(f"echo {test_string} | socat -t 2 -u STDIN TCP:{cfg.remote_baddr}:{port}", shell=True)
-+    ksft_eq(nc.stdout.strip(), test_string)
-+
-+def _set_offload_checksum(cfg, netnl, on) -> None:
-+    try:
-+        ethtool(f" -K {cfg.ifname} rx {on} tx {on} ")
-+    except:
-+        return
-+
-+def _set_xdp_generic_sb_on(cfg) -> None:
-+    test_dir = os.path.dirname(os.path.realpath(__file__))
-+    prog = test_dir + "/../../net/lib/xdp_dummy.bpf.o"
-+    cmd(f"ip link set dev {remote_ifname} mtu 1500", shell=True, host=cfg.remote)
-+    cmd(f"ip link set dev {cfg.ifname} mtu 1500 xdpgeneric obj {prog} sec xdp", shell=True)
-+
-+    if no_sleep != True:
-+        time.sleep(10)
-+
-+def _set_xdp_generic_mb_on(cfg) -> None:
-+    test_dir = os.path.dirname(os.path.realpath(__file__))
-+    prog = test_dir + "/../../net/lib/xdp_dummy.bpf.o"
-+    cmd(f"ip link set dev {remote_ifname} mtu 9000", shell=True, host=cfg.remote)
-+    ip("link set dev %s mtu 9000 xdpgeneric obj %s sec xdp.frags" % (cfg.ifname, prog))
-+
-+    if no_sleep != True:
-+        time.sleep(10)
-+
-+def _set_xdp_native_sb_on(cfg) -> None:
-+    test_dir = os.path.dirname(os.path.realpath(__file__))
-+    prog = test_dir + "/../../net/lib/xdp_dummy.bpf.o"
-+    cmd(f"ip link set dev {remote_ifname} mtu 1500", shell=True, host=cfg.remote)
-+    cmd(f"ip -j link set dev {cfg.ifname} mtu 1500 xdp obj {prog} sec xdp", shell=True)
-+    xdp_info = ip("-d link show %s" % (cfg.ifname), json=True)[0]
-+    if xdp_info['xdp']['mode'] != 1:
-+        """
-+        If the interface doesn't support native-mode, it falls back to generic mode.
-+        The mode value 1 is native and 2 is generic.
-+        So it raises an exception if mode is not 1(native mode).
-+        """
-+        raise KsftSkipEx('device does not support native-XDP')
-+
-+    if no_sleep != True:
-+        time.sleep(10)
-+
-+def _set_xdp_native_mb_on(cfg) -> None:
-+    test_dir = os.path.dirname(os.path.realpath(__file__))
-+    prog = test_dir + "/../../net/lib/xdp_dummy.bpf.o"
-+    cmd(f"ip link set dev {remote_ifname} mtu 9000", shell=True, host=cfg.remote)
-+    try:
-+        cmd(f"ip link set dev {cfg.ifname} mtu 9000 xdp obj {prog} sec xdp.frags", shell=True)
-+    except Exception as e:
-+        cmd(f"ip link set dev {remote_ifname} mtu 1500", shell=True, host=cfg.remote)
-+        raise KsftSkipEx('device does not support native-multi-buffer XDP')
-+
-+    if no_sleep != True:
-+        time.sleep(10)
-+
-+def _set_xdp_offload_on(cfg) -> None:
-+    test_dir = os.path.dirname(os.path.realpath(__file__))
-+    prog = test_dir + "/../../net/lib/xdp_dummy.bpf.o"
-+    cmd(f"ip link set dev {cfg.ifname} mtu 1500", shell=True)
-+    try:
-+        cmd(f"ip link set dev {cfg.ifname} xdpoffload obj {prog} sec xdp", shell=True)
-+    except Exception as e:
-+        raise KsftSkipEx('device does not support offloaded XDP')
-+    cmd(f"ip link set dev {remote_ifname} mtu 1500", shell=True, host=cfg.remote)
-+
-+    if no_sleep != True:
-+        time.sleep(10)
-+
-+def get_interface_info(cfg) -> None:
-+    global remote_ifname
-+    global no_sleep
-+
-+    remote_info = cmd(f"ip -4 -o addr show to {cfg.remote_v4} | awk '{{print $2}}'", shell=True, host=cfg.remote).stdout
-+    remote_ifname = remote_info.rstrip('\n')
-+    if remote_ifname == "":
-+        raise KsftFailEx('Can not get remote interface')
-+    local_info = ip("-d link show %s" % (cfg.ifname), json=True)[0]
-+    if 'parentbus' in local_info and local_info['parentbus'] == "netdevsim":
-+        no_sleep=True
-+    if 'linkinfo' in local_info and local_info['linkinfo']['info_kind'] == "veth":
-+        no_sleep=True
-+
-+def set_interface_init(cfg) -> None:
-+    cmd(f"ip link set dev {cfg.ifname} mtu 1500", shell=True)
-+    cmd(f"ip link set dev {cfg.ifname} xdp off ", shell=True)
-+    cmd(f"ip link set dev {cfg.ifname} xdpgeneric off ", shell=True)
-+    cmd(f"ip link set dev {cfg.ifname} xdpoffload off", shell=True)
-+    cmd(f"ip link set dev {remote_ifname} mtu 1500", shell=True, host=cfg.remote)
-+
-+def test_default(cfg, netnl) -> None:
-+    _set_offload_checksum(cfg, netnl, "off")
-+    _test_v4(cfg)
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+    _set_offload_checksum(cfg, netnl, "on")
-+    _test_v4(cfg)
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+
-+def test_xdp_generic_sb(cfg, netnl) -> None:
-+    _set_xdp_generic_sb_on(cfg)
-+    _set_offload_checksum(cfg, netnl, "off")
-+    _test_v4(cfg)
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+    _set_offload_checksum(cfg, netnl, "on")
-+    _test_v4(cfg)
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+    ip("link set dev %s xdpgeneric off" % cfg.ifname)
-+
-+def test_xdp_generic_mb(cfg, netnl) -> None:
-+    _set_xdp_generic_mb_on(cfg)
-+    _set_offload_checksum(cfg, netnl, "off")
-+    _test_v4(cfg)
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+    _set_offload_checksum(cfg, netnl, "on")
-+    _test_v4(cfg)
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+    ip("link set dev %s xdpgeneric off" % cfg.ifname)
-+
-+def test_xdp_native_sb(cfg, netnl) -> None:
-+    _set_xdp_native_sb_on(cfg)
-+    _set_offload_checksum(cfg, netnl, "off")
-+    _test_v4(cfg)
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+    _set_offload_checksum(cfg, netnl, "on")
-+    _test_v4(cfg)
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+    ip("link set dev %s xdp off" % cfg.ifname)
-+
-+def test_xdp_native_mb(cfg, netnl) -> None:
-+    _set_xdp_native_mb_on(cfg)
-+    _set_offload_checksum(cfg, netnl, "off")
-+    _test_v4(cfg)
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+    _set_offload_checksum(cfg, netnl, "on")
-+    _test_v4(cfg)
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+    ip("link set dev %s xdp off" % cfg.ifname)
-+
-+def test_xdp_offload(cfg, netnl) -> None:
-+    _set_xdp_offload_on(cfg)
-+    _test_v4(cfg)
-+    _test_v6(cfg)
-+    _test_tcp(cfg)
-+    ip("link set dev %s xdpoffload off" % cfg.ifname)
- 
- def main() -> None:
-     with NetDrvEpEnv(__file__) as cfg:
--        ksft_run(globs=globals(), case_pfx={"test_"}, args=(cfg, ))
-+        get_interface_info(cfg)
-+        set_interface_init(cfg)
-+        ksft_run([test_default,
-+                  test_xdp_generic_sb,
-+                  test_xdp_generic_mb,
-+                  test_xdp_native_sb,
-+                  test_xdp_native_mb,
-+                  test_xdp_offload],
-+                 args=(cfg, EthtoolFamily()))
-+        set_interface_init(cfg)
-     ksft_exit()
- 
- 
-diff --git a/tools/testing/selftests/net/lib/xdp_dummy.bpf.c b/tools/testing/selftests/net/lib/xdp_dummy.bpf.c
-index d988b2e0cee8..e73fab3edd9f 100644
---- a/tools/testing/selftests/net/lib/xdp_dummy.bpf.c
-+++ b/tools/testing/selftests/net/lib/xdp_dummy.bpf.c
-@@ -10,4 +10,10 @@ int xdp_dummy_prog(struct xdp_md *ctx)
- 	return XDP_PASS;
- }
- 
-+SEC("xdp.frags")
-+int xdp_dummy_prog_frags(struct xdp_md *ctx)
-+{
-+	return XDP_PASS;
-+}
-+
- char _license[] SEC("license") = "GPL";
 -- 
-2.34.1
-
+tejun
 
