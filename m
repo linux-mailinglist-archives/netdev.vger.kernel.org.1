@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-173638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 190BAA5A4C9
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 21:20:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 57B35A5A4CB
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 21:21:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5DDA3A7A7A
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 20:20:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F8653A2EC5
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 20:20:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ED4E1DE2B2;
-	Mon, 10 Mar 2025 20:20:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0DE11E04AD;
+	Mon, 10 Mar 2025 20:20:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dD3Afsbz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rl6O99sA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E69B41D7E3E;
-	Mon, 10 Mar 2025 20:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 910D21DF75D;
+	Mon, 10 Mar 2025 20:20:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741638004; cv=none; b=H147gxjNmyyT30CcTf1FBBeEmMnR1O45YSbP1sigxqveToK0loSRwj2koaOdbOa+qXJj8RsvUNOfpOzCDofdLJTVftAsgJ2klnplBGgfcBFAspT1JvWPHuhND3x3Bdg7nDjjtl76QHzY+UkMnun27n8zStJ5QtD46cQZmXA7hQI=
+	t=1741638008; cv=none; b=T0B3t4p4vP77hq4t25ew0anpdnCR41VCn4p3DwcPJ+jOKTIH2QiEPWm/sOCdU8WJy99plaXfLU1WFzVjiVnYJ87jBVVs/89bKGeSZU5HOJ6w9chKeTeDxnXZd1H35n5wBHcY1kih5M8y1WCcMfZ0bzy55aJknknMIpD7HjBRN3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741638004; c=relaxed/simple;
-	bh=7pdIPCEDL7BN32azht/Sc4BIMnIg+tKYUud4LmRAFpI=;
+	s=arc-20240116; t=1741638008; c=relaxed/simple;
+	bh=HINu/EnpUGJfIOXFDKpL8KvgzfAHGlOd6d1ShDILpy4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=IEUb7HUdpYCMXnr44klKOcGaKHPvrb35RwDslpJnpG/YG/kAcggsyp/uqnFJ1OmpoHVBwdpACkIvlOiaiZm9qXZIBXGPN2I0I2jJ3XOw8UrLrfu4mqfyO2kHqSEhEyhbqfEdOvTxBCeX97pKZlGrIEXEeFCzUdPGJ0nKMEOEcXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dD3Afsbz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6791EC4CEE5;
-	Mon, 10 Mar 2025 20:20:03 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=WtvSn+KLHISF2f30GCH883d9GwlMK+HRiOIuDYDvIuIjfARHj1wXq1WieyMVHaBUhodSW1Po8W2LlVXlDorHeGqwfAVwnLxakdTh5fiUN1TWLrpdEGXhxZoCXTaJ6ycqVpW3ELA0Te7NVlCK6ioKMl3JSkiRejBvE3nSMgbiB+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rl6O99sA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0264AC4CEEF;
+	Mon, 10 Mar 2025 20:20:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741638003;
-	bh=7pdIPCEDL7BN32azht/Sc4BIMnIg+tKYUud4LmRAFpI=;
+	s=k20201202; t=1741638008;
+	bh=HINu/EnpUGJfIOXFDKpL8KvgzfAHGlOd6d1ShDILpy4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dD3Afsbzr9HkwBdwSdxUtuPItd7FQl03EvBe/UfkXYHYfSuIlddJNMfGIKUQJeaPb
-	 AxswXN7iZi8fSndhoOTaTbap4iN8lAKcJzqyMoaBKcGE/K0HdBQkmG7Fww6EwVUURX
-	 miZABuqc5p8E3+mls/tO6TkjBCnqw/hZUWA0UVlGlJC+h+FVrcfdVt5vAeMwYQqP9Q
-	 A18g7k/7rVE9Y6GH53gk0nzr+cOuH6ncYC9fztz4lWVcHCXSE1GjQy62IaB7lXII8M
-	 KH3IhDKZSqtA3Mlp8t2YKnzTKUegSnpSyQI+CumbskLgr3qa9NRGhQJppWYY9kx3FT
-	 mbV3bwTvEneaw==
+	b=rl6O99sAKJTnVYGY+bajYzHLXWp0yGVmfGOe6k8HtKANa1ZTvMMH36O3DaJkFJxLO
+	 hmuegG/s1zZkR/f1qF1QWAUAKdpkw2MxyVWYk7FVOyQLVpdM6p0Xhg349ZJDXemyK1
+	 VrPcXlfmjM48YJ5IroSHSCX3fEbUTGEdLToGrnIcOQvWatmxMc0QNR7Yr1CnmssN9W
+	 LhvcdsDG6KxLi/PFMKS2xaxZbRhAlGNJmXyQ4atNjO4qnN4hmJ88kcF1w5UMairDDb
+	 rNWv3hUc19tvygv3e2eJ/pckktmYdNjZAHgZ2xkqbmpwPBlEmW/ViSr2ShZKg5vujs
+	 qoNFfAGYO1Amg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF00380DBDB;
-	Mon, 10 Mar 2025 20:20:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E50380DBDB;
+	Mon, 10 Mar 2025 20:20:43 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: ethtool: tsinfo: Fix dump command
+Subject: Re: [PATCH net-next v6 0/4] virtio-net: Link queues to NAPIs
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174163803723.3681464.5219456681589472906.git-patchwork-notify@kernel.org>
-Date: Mon, 10 Mar 2025 20:20:37 +0000
-References: <20250307091255.463559-1-kory.maincent@bootlin.com>
-In-Reply-To: <20250307091255.463559-1-kory.maincent@bootlin.com>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- vadim.fedorenko@linux.dev, thomas.petazzoni@bootlin.com, andrew@lunn.ch,
- kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, horms@kernel.org
+ <174163804173.3681464.7169835373797288242.git-patchwork-notify@kernel.org>
+Date: Mon, 10 Mar 2025 20:20:41 +0000
+References: <20250307011215.266806-1-jdamato@fastly.com>
+In-Reply-To: <20250307011215.266806-1-jdamato@fastly.com>
+To: Joe Damato <jdamato@fastly.com>
+Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca,
+ gerhard@engleder-embedded.com, jasowang@redhat.com,
+ xuanzhuo@linux.alibaba.com, kuba@kernel.org, mst@redhat.com,
+ leiyang@redhat.com, ast@kernel.org, andrew+netdev@lunn.ch,
+ bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
+ edumazet@google.com, eperezma@redhat.com, hawk@kernel.org,
+ john.fastabend@gmail.com, linux-kernel@vger.kernel.org, pabeni@redhat.com,
+ virtualization@lists.linux.dev
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  7 Mar 2025 10:12:55 +0100 you wrote:
-> Fix missing initialization of ts_info->phc_index in the dump command,
-> which could cause a netdev interface to incorrectly display a PTP provider
-> at index 0 instead of "none".
-> Fix it by initializing the phc_index to -1.
+On Fri,  7 Mar 2025 01:12:08 +0000 you wrote:
+> Greetings:
 > 
-> In the same time, restore missing initialization of ts_info.cmd for the
-> IOCTL case, as it was before the transition from ethnl_default_dumpit to
-> custom ethnl_tsinfo_dumpit.
+> Welcome to v6. Only patch updated is patch 3. See changelog below.
+> 
+> Jakub recently commented [1] that I should not hold this series on
+> virtio-net linking queues to NAPIs behind other important work that is
+> on-going and suggested I re-spin, so here we are :)
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] net: ethtool: tsinfo: Fix dump command
-    https://git.kernel.org/netdev/net/c/d0a4a1b36d7a
+  - [net-next,v6,1/4] virtio-net: Refactor napi_enable paths
+    https://git.kernel.org/netdev/net-next/c/2af5adf962d4
+  - [net-next,v6,2/4] virtio-net: Refactor napi_disable paths
+    https://git.kernel.org/netdev/net-next/c/986a93045183
+  - [net-next,v6,3/4] virtio-net: Map NAPIs to queues
+    https://git.kernel.org/netdev/net-next/c/e7231f49d526
+  - [net-next,v6,4/4] virtio_net: Use persistent NAPI config
+    https://git.kernel.org/netdev/net-next/c/d5d715207e29
 
 You are awesome, thank you!
 -- 
