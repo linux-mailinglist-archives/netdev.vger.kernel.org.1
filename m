@@ -1,167 +1,159 @@
-Return-Path: <netdev+bounces-173549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BB64A596C1
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 14:53:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CD804A596DF
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 15:00:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C05391886F2C
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 13:53:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 468251889D24
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 14:00:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70EDA22A4EA;
-	Mon, 10 Mar 2025 13:53:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14F5A22C327;
+	Mon, 10 Mar 2025 14:00:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q7r5Wxci"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F9ZeIEGE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3AA42206A6
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 13:53:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E32AC22AE75;
+	Mon, 10 Mar 2025 14:00:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741614791; cv=none; b=UtNPFHx+sqKHeFgailyeG/E67QVexdRwfOYkKWyz9e8WDHlMSeRQ18PslEmM7mMKzspz3bMavd2UYwhuolP1nLu/DhLe49GkjuUh8+gDkb94C7HwRi04S8NBFq1DGclbUqbODltj8MInI88udmqGS8/yG0eTo+MI2LeUqof+9rU=
+	t=1741615204; cv=none; b=l75vNyvfo4isDohRkQuZmBu1GDDsAOvFWfu7w6Sz17fbr+3uMZWxT2uYnCCrLSK2DnORLRD762uaKBDeIePXjUcwcRKULiT36vpLk1wQuxG7pQ/Tq3QFv4LFH6HITSdwTTELy+vVMFURaQ6o0hhMqL8ODmpQQaLgXiBOk1+Z3+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741614791; c=relaxed/simple;
-	bh=O/w5wA572U8ZVaqFgo/awxmCslHGU3ldh7l8AS35QTo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rx1ChwNb4mYe3EpfTIWJUO7eETaRR05EE7RjheDeVueUzCISFskVrqlNDvWogzLRFtgL+wANtbTKnu5f0US882QhDQ0hFTP5HU+IMPa8DO1MPb7RlbJ27OMwQT2ml0zKRPXtQMEq4e5dDBlsJNennyPUHxxlMrYu5OD5F6S/oFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q7r5Wxci; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741614790; x=1773150790;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=O/w5wA572U8ZVaqFgo/awxmCslHGU3ldh7l8AS35QTo=;
-  b=Q7r5WxcifHppYxuC83rxl5XaeBhEbFem6z281O1cz0GG4Mr9ybdgZMYW
-   p7tnBfRigGM3w2GjT6jHKB1idE5mJrqPVvXyzkQmjjUj2fuoOXv4skw5Z
-   1GXB79RA3x9FiAD+Y0wx1XofEOVu+HDgPXksbB3TvFPyTqZRxK5yLs7lE
-   bq26+trnUYkrADVfYMlm8Rp5jPF4SR9oFf+2DBakoytvDAltLXv0GPbTi
-   Le1Ukki4GRWoeT3ic6b8+0clN2BEwgjVZFJnFgnb3n+cypEKOT9AV7+tF
-   SujwN7/WQJkVyNkubp3IfScM2SxR2HXmJHy3oYsql6OXQp5mrm39G7xT1
-   Q==;
-X-CSE-ConnectionGUID: wZKKSj28ROmiUs+dAE6b5A==
-X-CSE-MsgGUID: gX51lje4QKu7mJRStNpzLQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="53988374"
-X-IronPort-AV: E=Sophos;i="6.14,236,1736841600"; 
-   d="scan'208";a="53988374"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 06:53:09 -0700
-X-CSE-ConnectionGUID: 4UHsYB7CQku8kdNw7wyn9A==
-X-CSE-MsgGUID: Q/lcFYIeRpuL5hsUlAOLXg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,236,1736841600"; 
-   d="scan'208";a="119715154"
-Received: from lkp-server02.sh.intel.com (HELO a4747d147074) ([10.239.97.151])
-  by orviesa009.jf.intel.com with ESMTP; 10 Mar 2025 06:53:06 -0700
-Received: from kbuild by a4747d147074 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1trdZ2-0004IC-0W;
-	Mon, 10 Mar 2025 13:53:04 +0000
-Date: Mon, 10 Mar 2025 21:52:13 +0800
-From: kernel test robot <lkp@intel.com>
-To: Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, David Ahern <dsahern@kernel.org>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next 3/4] inet: frags: change inet_frag_kill() to
- defer refcount updates
-Message-ID: <202503102108.U88XuKx1-lkp@intel.com>
-References: <20250309173151.2863314-4-edumazet@google.com>
+	s=arc-20240116; t=1741615204; c=relaxed/simple;
+	bh=gSYZwMocisBf6GSf/MbV+duRQDs+uqL+YJ+GA5Dtolw=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=he3bq1G2Fo3znCDbk+iWDMa0Mj6vAMmVjVPznhiHtRNrpAoniCArpcpS1Ts9Zwp7rnq395NrtB0BryeWNkefiAvHeFEUGqv6uBgjPZpbNxt6ECMF7v5M/YJYtfZtrknyKfJG0LGlkRoP/ciaDEsP3OfNPqj8WmcGbgqUStf9zfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F9ZeIEGE; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7c547932d2eso97045985a.0;
+        Mon, 10 Mar 2025 07:00:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741615200; x=1742220000; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Lp0UIX9QunfnkdCGehvBsQtkasKoKtHRouU8cbcHLEg=;
+        b=F9ZeIEGEdDBvpisow1OOdQqUY9KaC44buEjn7+vx0smFMy5q4RBbIm94a0kL7x2FAx
+         yb1sJFOC2lNRxlZLKyRmko8leFVG1Bg0l6nqtX1LiU9MrSfVKWbC6stndsoyVsnQ77Cw
+         s4Tm0ijU8L6aK4xZ7qaBIGQHUuu426YaOMDXeMe3IC2X7FRK29nXfzAV6C7x9jlcj5p7
+         DoBx3Z+/lsA1Reml2mGjd1jDNRgQtfdYm51eGq9DaQOch0pVYY/TwI4k9/iJtkpO7kGw
+         +/V/ZakNiVozhddezl+NpAZngB7xCnNSQrVHFiPcnqwxUUNslZK1zuDUX4/uadqlyUGD
+         QEHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741615200; x=1742220000;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Lp0UIX9QunfnkdCGehvBsQtkasKoKtHRouU8cbcHLEg=;
+        b=RYinOxLaqDcBjPI+YdBSq6iQUqjzkk8i1W82p7AoHFGJoKy9EFomfozdgcWk7PVGkT
+         a8igwcIoWnJMptW5nM7jdkLI+IpjPvhi2Dat16l/TIQx+4F8D+SPjzkF5lmt/y5uVYJL
+         u3uddfumKqc2WU7OmCPRceJKnVCUDOhM7HOxidLKSOasP0LDJd+MsKgF7xwFLsioFF14
+         FSaBATL+ZkKS5JTgiBiqrfwJfyuei4baQ69nePN83kk9qMTNboVyJdLVR88oEc7rlcPB
+         u0eEg4s7NMQovN6g//i/0p/zRGSOp5ee0xKHIW6iQM0bixmiSfG1jraZJustyk5NDAhQ
+         DPAA==
+X-Forwarded-Encrypted: i=1; AJvYcCV8Pew2CJYolwtKqXnQbRmNYMs8RoOhXKk1eveNGbRPi+ph+hVQA+X+Eo7r8PVIshHK0Mgjs5Ob@vger.kernel.org, AJvYcCVJ21b300k8YCymeg+EpiuZf9EpvKizWfA9TpDHwLq2ufrHDSMwTjUJMpirNbpCWOn3HKma8+0P@vger.kernel.org, AJvYcCX3q8q6K5gN5UROTTLnKbqmUN2uwzp6gxKZ9neH34HWtplAc4ZFP9otloPcl4jlYgH+popnTOvsNqTS88ea@vger.kernel.org, AJvYcCXObE6o9xLDuD0Ka17CPLKiZ1+ih9DZqCXYY5/ANnYxH/tnqeKYAvVqQjvk90yLdmxRjQhuCmSo8G7xz6QlZgiS@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzv3AD0uqlZt5/WIy39qtdrWdpncYxX+0Lg21k7wo3G/7tYqSrH
+	Y+skZN6y6eAjeAI3afJDiyoGEepWCGERARgEkI/1z24A9TBTtuCn
+X-Gm-Gg: ASbGncsk1oOMlI2ExprfbmFvifqEtgQr6viLR/H4qZuoyNV2L7b4JbpsgcuYpcQR4wf
+	SkoTNayPr+mzPuCNqviWJXLwCvo/B6R0sAuX0OWkoOukIrZfG7BWR2hMDf7eniBpbxjvJpfw//2
+	kMvD76FE/oDaRPCl7P03OMo8i/cib+GI8NVZXq5LLA1VlLi9mlmJ91Bbbj6eLRYbreTMb8MnD+V
+	sRvxKQbGBszk1dNrcGPG1LcO8KTz62dsNoYhItGEh52fOFOT+sGbLGEvpIRbg2j3mXpSM5M4d8/
+	pGlVcZHTudiUqqPzM9OQF4DuwNOzlGHj0n6VyO+671tyyofOKcBVi8p4kMsRYbWIMQL1nML5cTF
+	NyPmO0uYNVmpNgY3BnXh3kw==
+X-Google-Smtp-Source: AGHT+IE04BxMTl/bSEdx8th/M++89nsJWl68HA1eP2iCKz4Yd9WxUR09v/+TtJRwQhum3K/hAKLuOw==
+X-Received: by 2002:a05:620a:4386:b0:7c5:5791:1228 with SMTP id af79cd13be357-7c557911359mr308841385a.45.1741615199663;
+        Mon, 10 Mar 2025 06:59:59 -0700 (PDT)
+Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c54984fb6bsm296003285a.67.2025.03.10.06.59.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Mar 2025 06:59:58 -0700 (PDT)
+Date: Mon, 10 Mar 2025 09:59:58 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>, 
+ kuniyu@amazon.com
+Cc: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>, 
+ linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ cgroups@vger.kernel.org, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Leon Romanovsky <leon@kernel.org>, 
+ Arnd Bergmann <arnd@arndb.de>, 
+ Christian Brauner <brauner@kernel.org>, 
+ Lennart Poettering <mzxreary@0pointer.de>, 
+ Luca Boccassi <bluca@debian.org>, 
+ Tejun Heo <tj@kernel.org>, 
+ Johannes Weiner <hannes@cmpxchg.org>, 
+ =?UTF-8?B?TWljaGFsIEtvdXRuw70=?= <mkoutny@suse.com>, 
+ Shuah Khan <shuah@kernel.org>
+Message-ID: <67cef05e7f9c4_2462652947e@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250309132821.103046-5-aleksandr.mikhalitsyn@canonical.com>
+References: <20250309132821.103046-1-aleksandr.mikhalitsyn@canonical.com>
+ <20250309132821.103046-5-aleksandr.mikhalitsyn@canonical.com>
+Subject: Re: [PATCH net-next 4/4] tools/testing/selftests/cgroup: add test for
+ SO_PEERCGROUPID
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250309173151.2863314-4-edumazet@google.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Eric,
+Alexander Mikhalitsyn wrote:
+> Cc: linux-kselftest@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Cc: cgroups@vger.kernel.org
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Willem de Bruijn <willemb@google.com>
+> Cc: Leon Romanovsky <leon@kernel.org>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Christian Brauner <brauner@kernel.org>
+> Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Cc: Lennart Poettering <mzxreary@0pointer.de>
+> Cc: Luca Boccassi <bluca@debian.org>
+> Cc: Tejun Heo <tj@kernel.org>
+> Cc: Johannes Weiner <hannes@cmpxchg.org>
+> Cc: "Michal Koutn=C3=BD" <mkoutny@suse.com>
+> Cc: Shuah Khan <shuah@kernel.org>
+> Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.c=
+om>
+> ---
+>  tools/testing/selftests/cgroup/Makefile       |   2 +
+>  .../selftests/cgroup/test_so_peercgroupid.c   | 308 ++++++++++++++++++=
 
-kernel test robot noticed the following build errors:
+>  2 files changed, 310 insertions(+)
+>  create mode 100644 tools/testing/selftests/cgroup/test_so_peercgroupid=
+.c
+> =
 
-[auto build test ERROR on net-next/main]
+> diff --git a/tools/testing/selftests/cgroup/Makefile b/tools/testing/se=
+lftests/cgroup/Makefile
+> index 1b897152bab6..a932ff068081 100644
+> --- a/tools/testing/selftests/cgroup/Makefile
+> +++ b/tools/testing/selftests/cgroup/Makefile
+> @@ -16,6 +16,7 @@ TEST_GEN_PROGS +=3D test_kill
+>  TEST_GEN_PROGS +=3D test_kmem
+>  TEST_GEN_PROGS +=3D test_memcontrol
+>  TEST_GEN_PROGS +=3D test_pids
+> +TEST_GEN_PROGS +=3D test_so_peercgroupid
+>  TEST_GEN_PROGS +=3D test_zswap
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/inet-frags-add-inet_frag_putn-helper/20250310-013501
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250309173151.2863314-4-edumazet%40google.com
-patch subject: [PATCH net-next 3/4] inet: frags: change inet_frag_kill() to defer refcount updates
-config: x86_64-rhel-9.4 (https://download.01.org/0day-ci/archive/20250310/202503102108.U88XuKx1-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250310/202503102108.U88XuKx1-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202503102108.U88XuKx1-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   net/ieee802154/6lowpan/reassembly.c: In function 'lowpan_frag_rcv':
->> net/ieee802154/6lowpan/reassembly.c:312:23: error: too few arguments to function 'lowpan_frag_queue'
-     312 |                 ret = lowpan_frag_queue(fq, skb, frag_type);
-         |                       ^~~~~~~~~~~~~~~~~
-   net/ieee802154/6lowpan/reassembly.c:86:12: note: declared here
-      86 | static int lowpan_frag_queue(struct lowpan_frag_queue *fq,
-         |            ^~~~~~~~~~~~~~~~~
-
-
-vim +/lowpan_frag_queue +312 net/ieee802154/6lowpan/reassembly.c
-
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  280  
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  281  int lowpan_frag_rcv(struct sk_buff *skb, u8 frag_type)
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  282  {
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  283  	struct lowpan_frag_queue *fq;
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  284  	struct net *net = dev_net(skb->dev);
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  285  	struct lowpan_802154_cb *cb = lowpan_802154_cb(skb);
-f18fa5de5ba7f1d net/ieee802154/6lowpan/reassembly.c Alexander Aring    2018-04-20  286  	struct ieee802154_hdr hdr = {};
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  287  	int err;
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  288  
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  289  	if (ieee802154_hdr_peek_addrs(skb, &hdr) < 0)
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  290  		goto err;
-ae531b9475f62c5 net/ieee802154/reassembly.c         Phoebe Buckheister 2014-03-14  291  
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  292  	err = lowpan_get_cb(skb, frag_type, cb);
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  293  	if (err < 0)
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  294  		goto err;
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  295  
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  296  	if (frag_type == LOWPAN_DISPATCH_FRAG1) {
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  297  		err = lowpan_invoke_frag_rx_handlers(skb);
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  298  		if (err == NET_RX_DROP)
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  299  			goto err;
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  300  	}
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  301  
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  302  	if (cb->d_size > IPV6_MIN_MTU) {
-6697dabe27e0330 net/ieee802154/reassembly.c         Martin Townsend    2014-08-19  303  		net_warn_ratelimited("lowpan_frag_rcv: datagram size exceeds MTU\n");
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  304  		goto err;
-6697dabe27e0330 net/ieee802154/reassembly.c         Martin Townsend    2014-08-19  305  	}
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  306  
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  307  	fq = fq_find(net, cb, &hdr.source, &hdr.dest);
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  308  	if (fq != NULL) {
-aec42e105cebf42 net/ieee802154/6lowpan/reassembly.c Eric Dumazet       2025-03-09  309  		int ret, refs = 1;
-4710d806fcb8251 net/ieee802154/reassembly.c         Varka Bhadram      2014-07-02  310  
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  311  		spin_lock(&fq->q.lock);
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28 @312  		ret = lowpan_frag_queue(fq, skb, frag_type);
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  313  		spin_unlock(&fq->q.lock);
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  314  
-aec42e105cebf42 net/ieee802154/6lowpan/reassembly.c Eric Dumazet       2025-03-09  315  		inet_frag_putn(&fq->q, refs);
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  316  		return ret;
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  317  	}
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  318  
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  319  err:
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  320  	kfree_skb(skb);
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  321  	return -1;
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  322  }
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  323  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+need to add to .gitignore
 
