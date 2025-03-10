@@ -1,201 +1,269 @@
-Return-Path: <netdev+bounces-173535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D730A59521
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 13:51:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C5EAA59537
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 13:54:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8C843B1E06
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:51:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A6C9D188EB70
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:54:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E7B226D1B;
-	Mon, 10 Mar 2025 12:51:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D715228CB2;
+	Mon, 10 Mar 2025 12:54:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="KOXorH2E"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mHj/jkXt"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9545224252;
-	Mon, 10 Mar 2025 12:51:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 552B313CFB6;
+	Mon, 10 Mar 2025 12:54:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741611076; cv=none; b=UmA1+DiYfKQA7sjgdv41tUtOmzgdYEvlY+Z2c1ASUhv8jN5Mf0TxoIFmviRRRW9pczTpc5iIY9rkihdSHJenRVuPGR/IhsU0cAa49X+VIReqGJvXP5U0pyocr36Fvt8BBthQYfHUVilcH8Crpfr4x+Xxd2OiXnzEOUkegSwjO0I=
+	t=1741611244; cv=none; b=Cl9CGpWValorp0uT0IKkzW5O7ae6+oe5pBpuD+iAlJCc2GwYds71ZKr4osCWh0ONCqq/i5pHmTRv/6BQvD6sTiswwjhOh4rj4HGEpc7QWn17XUUkLCFHtCLi6XuyvjsAbQ84qyD1XCSPlaVYpQSMhZB94QXAQBng4aGwzl7CpqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741611076; c=relaxed/simple;
-	bh=UjM8Ysu6ITSvttk3Hg0lMsBTnl6G5ZsqoiI8lIaMSfY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R94VrfqwYY28QfNzdu+Yqnk61B+WRWjTcGhntSz7fHAzfKrSHFZHOnJiGvgsRHm79awL2nZHTimOcJJSCq9K9O4ldiwRImIhFUTBbIU7tNrxjJrzorWe1+mB/XwgUm3LEI/H3I190Y9YoZurk9VzJZmIdtASwDUCPAGW/+iyKPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=KOXorH2E; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 79C3E4418C;
-	Mon, 10 Mar 2025 12:50:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1741611065;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cpwv+O/rfjVyEucu2QcSsIfXnrXMI0PIlcx95yddQ+Y=;
-	b=KOXorH2EviOwBX90oHYpCRsMCj5LPdVecXFwNLwwVwj0tkggBUk9NnZmOXbFHYvcnqlght
-	O7PjNZB4jiUBlpGnwp/tP/DFhgwD/y9k1Ts+6/kKGgMztyKC0YpelTXZTzIRlcIfgONt9c
-	XADOnzvueAuVfDDnfLJHN5gLupxCBUS+VEyt4G8UtBQSiEypJoMB76sDusPvnJiHillDlH
-	LuyNVlreD0iTJ9Cs5I1UFi4oKGR9vxzIpULWuQCludb3PRHIVP8Qkz8lN5S9if6lz55CO4
-	6h0TbAjNfgRqyIAet1J+zopSykvBCRHFS0kUmHGZL8EmATS1+nv9/orTQL244g==
-Date: Mon, 10 Mar 2025 13:50:12 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Philipp Hahn <phahn-oss@avm.de>
-Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org, Leon Schuermann
- <leon@is.currently.online>, Jakub Kicinski <kuba@kernel.org>, Oliver Neukum
- <oliver@neukum.org>
-Subject: Re: [PATCH] cdc_ether|r8152: ThinkPad Hybrid USB-C/A Dock quirk
-Message-ID: <20250310135012.0e5a0791@kmaincent-XPS-13-7390>
-In-Reply-To: <484336aad52d14ccf061b535bc19ef6396ef5120.1741601523.git.p.hahn@avm.de>
-References: <484336aad52d14ccf061b535bc19ef6396ef5120.1741601523.git.p.hahn@avm.de>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1741611244; c=relaxed/simple;
+	bh=mKOW0y7H+d8JdihJ/mXGS3CisQcR/M7PjYl0QDlLLdI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=AO3ZTjEo7wdGQJS0iA3dnwAAEsd9W+Ck1PsuenbNekgSSv3aoA7quaGwOqI3mi1gjkcpyf6HaL1/3nqn44Gj+yqwiJ/hjYHmxUgOecApIo/HHAbnChEux+RJGEnmD8hdo/xppXkqHRDf5iDB+4oM8p5HxX87Gf/EYXeh6BM+CQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mHj/jkXt; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5499c8fa0f3so1714758e87.2;
+        Mon, 10 Mar 2025 05:54:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741611240; x=1742216040; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=URGQNwjZdhyHI49nCxv8neX1u2OWYbpIKZ53BGm8OOk=;
+        b=mHj/jkXtYaHMWlgpJi52YNbMlDpZr+4eB8Dzc5p3PuUzuv5oEzdQKTX8xQffcmvxlL
+         2+mpj0jMWtenB2+GHvPDC5aZvNiJDxTOizvK4H92o7cHcUSpEogcJfQzb7LCN1u5OPl4
+         zkwr4EjkAa7lrjhdWPadebKyXhWhLBGRRrqI8Rj7Csa1gXRaOUD6PhKc6SY+yj4DnMuQ
+         m+0Z5uz5Ydk1xxEdi6XpG49IygE3+GNZFswV4z5UVhPwDXeKqPCvxMW5U/RJD6UPZdvQ
+         5hVI65W3zed9UJ9R9tE3YaB4PxmJFUq2U3tyggk1T7gIXwk1+WsTdJLsaCSzNoucWyAO
+         +/Ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741611240; x=1742216040;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=URGQNwjZdhyHI49nCxv8neX1u2OWYbpIKZ53BGm8OOk=;
+        b=mEAz8vHwB/D6C4YVrQS9uZwKQjpx28Cpdr+oV3RtzAgS0410zi1/t8IOVK2nbO4l/1
+         W2yhrcqnxW5bTY6HkSuf4NdqfQivsujTnpg48m/a43obufLpAgmIlV0wqx4UrKIJreHh
+         qq3lYmkEMp7hcfyqfwibfAGTTyLNpLXvxtlqK3h+WA0/xXoh8QuAWBdT4kHhUHCgDbzZ
+         MxgJZDUFo24bT2LkfDDXUZTspkpH7jjeepuF9rr6WfmhlAv8rGkMfZRaC01ccfFWSCfD
+         Dbsl3MmhrYchyv1b/tbqk3bmGUOOBGdKxRoKgEdJRFJiwqCHNzTUHvRIwFvn2bzVWaXt
+         J5ug==
+X-Forwarded-Encrypted: i=1; AJvYcCV2IJjYbNouNgNCwEowIL5pDxvFQ4X4hQ8s+QqQOSGyVKaGXZ4QEoL7JOz6wlNKLs6XWpX32GaMNx0HIw==@vger.kernel.org, AJvYcCVXuNy2apPbeZkeKwZzfDyMF+8YTOJUchnTQ4jGuxRuV3NMV1fjAcHhi/tzRDEaoE7XTZXUaWW7J3UNQyw=@vger.kernel.org, AJvYcCVlDGx/SglJwPqTveY82X7ngvy4i+eMsWLU/OjB4zgIhrGAxPxhtFOtrmBAXXRockhAbbHB9FsaS9/r@vger.kernel.org, AJvYcCWjaWK7foFSyQjkGvypl5ad8v4wd3fcEQs/s1H67rTcigyjCl4sRdbqth9yE1PsKWa8w3Q6I0HDejdRTJd55sSa5P8=@vger.kernel.org, AJvYcCWuHY7K0k1TKNypc8BhEPBK+LIZ4l0hQzy08dcc2NQICHRPa2h5WIY6qD0Htrp3uSJUUTb6VSaHaPRB@vger.kernel.org, AJvYcCXRmy4PkjcUqrCUZzq+RIMpGqep9+qKnAVuhEBJCz+ZlhI3BonluETNY4v5AYVnukb+XmVSbg1i@vger.kernel.org, AJvYcCXze+T9XCzsbi676opRx133elnyeVxXhQT3QOUXIaADgQcpzJh3YTnp9q4dVrv71nB1QkmLekbXRmF5J6R9@vger.kernel.org
+X-Gm-Message-State: AOJu0YzzCBbj3u8MpfgT1zwLnUd8vBycGr1BzVUoQ1bHB+/cYJtAQcfi
+	14jA0WZjmCdUqkrM7ymjpH3sNefvOBr8UYDiSVhYjsYDom5dWc6O
+X-Gm-Gg: ASbGnct8/ZKDhLQpiAG4rzL9s8k1zjx/EKcNzRgt/Juz+dxcM4+z4TYc2NaMXo9AWe8
+	yMKLYwSExIBX5quZSLkC7TvspahbfgPgZsWjX72doQAvFEHORkx2fgfMXImVxsntM+8BF8MSymD
+	DLw9ZdBYeXeNCWFEIZJUj+wQznfpglBYl5vbTxYnzLJAOeIfNjKoe4GYK4K1GpZwm+qjhmX+G7J
+	1n4oVG8MoNUXVbAi/MrAhljZ5wZwLqHALZdVpibExmK/47z/l795IRZS20RixLz2UsnjFxh7pxy
+	2taM+bBw77ZEqMkjhwCj/dFS6/rlc7HafDR4nu7vE/GnWLHduH4=
+X-Google-Smtp-Source: AGHT+IFA0RtQIyW+e03BOnWNOQUvnrcxE5yBsLBwjPqTi5ZfcZSG1+DhL9uQlcM6UFbaXZyVT+qAtg==
+X-Received: by 2002:a05:6512:2342:b0:549:8b97:75f2 with SMTP id 2adb3069b0e04-54990e2bdd0mr3668356e87.1.1741611240055;
+        Mon, 10 Mar 2025 05:54:00 -0700 (PDT)
+Received: from mva-rohm ([2a10:a5c0:800d:dd00:8fdf:935a:2c85:d703])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5498b1bc4basm1458604e87.164.2025.03.10.05.53.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Mar 2025 05:53:57 -0700 (PDT)
+Date: Mon, 10 Mar 2025 14:53:50 +0200
+From: Matti Vaittinen <mazziesaccount@gmail.com>
+To: Matti Vaittinen <mazziesaccount@gmail.com>,
+	Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>
+Cc: Javier Carrasco <javier.carrasco.cruz@gmail.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Samuel Holland <samuel@sholland.org>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>, netdev@vger.kernel.org,
+	Rob Herring <robh@kernel.org>,
+	Matti Vaittinen <mazziesaccount@gmail.com>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Thomas Bonnefille <thomas.bonnefille@bootlin.com>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Nuno Sa <nuno.sa@analog.com>,
+	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+	linux-media@vger.kernel.org, Jonathan Cameron <jic23@kernel.org>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>, devicetree@vger.kernel.org,
+	Marcelo Schmitt <marcelo.schmitt@analog.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Lars-Peter Clausen <lars@metafoo.de>, linux-acpi@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org, linux-iio@vger.kernel.org,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	linux-kernel@vger.kernel.org, linux-sunxi@lists.linux.dev,
+	Eric Dumazet <edumazet@google.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Olivier Moysan <olivier.moysan@foss.st.com>,
+	Trevor Gamblin <tgamblin@baylibre.com>,
+	Ramona Alexandra Nechita <ramona.nechita@analog.com>,
+	Paul Elder <paul.elder@ideasonboard.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Matteo Martelli <matteomartelli3@gmail.com>,
+	Guillaume Stols <gstols@baylibre.com>,
+	Alisa-Dariana Roman <alisadariana@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Dumitru Ceclan <mitrutzceclan@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	David Lechner <dlechner@baylibre.com>, Chen-Yu Tsai <wens@csie.org>,
+	Daniel Scally <djrscally@gmail.com>
+Subject: [PATCH v6 00/10] Support ROHM BD79124 ADC
+Message-ID: <cover.1741610847.git.mazziesaccount@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="muBpqT72KPU1YOIU"
+Content-Disposition: inline
+
+
+--muBpqT72KPU1YOIU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduudelgedtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeetgeeghfduhefhleelueeuueejjeegueegffdviedtheejieekhedvveejteehnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghdplhgvnhhovhhordgtohhmpdgsohhothhlihhnrdgtohhmnecukfhppeegiedrudekkedrvdefledruddtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepgeeirddukeekrddvfeelrddutddphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepjedprhgtphhtthhopehphhgrhhhnqdhoshhssegrvhhmrdguvgdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhushgssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepl
- hgvohhnsehishdrtghurhhrvghnthhlhidrohhnlhhinhgvpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopeholhhivhgvrhesnhgvuhhkuhhmrdhorhhgpdhrtghpthhtohepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomh
-X-GND-Sasl: kory.maincent@bootlin.com
 
-On Mon, 10 Mar 2025 11:17:35 +0100
-Philipp Hahn <phahn-oss@avm.de> wrote:
+Support ROHM BD79124 ADC.
 
-> Lenovo ThinkPad Hybrid USB-C with USB-A Dock (17ef:a359) is affected by
-> the same problem as the Lenovo Powered USB-C Travel Hub (17ef:721e):
-> Both are based on the Realtek RTL8153B chip used to use the cdc_ether
-> driver. However, using this driver, with the system suspended the device
-> constantly sends pause-frames as soon as the receive buffer fills up.
-> This causes issues with other devices, where some Ethernet switches stop
-> forwarding packets altogether.
->=20
-> Using the Realtek driver (r8152) fixes this issue. Pause frames are no
-> longer sent while the host system is suspended.
+This series adds also couple of IIO ADC helper functions for parsing the
+channel information from the device tree. There are also new helpers
+included for iterating and counting firmware child nodes with a specific
+name.
 
-Please add net-next prefix to your patch as it is not a fix.
+Series does also convert couple of drivers to use these helpers. The
+rzg2l_adc and the sun20i-gpadc are converted to use the new ADC helper.
 
-Also several net maintainers are missing in the Cc. Please use the
-get_maintainers scripts like the following to get list of maintainers:
-./scripts/get_maintainer.pl --norolestats --nogit-fallback *.patch
+The gianfar driver under net and the thp7312 under media/i2c are added as
+first users of the newly added "named child node" -helpers.
 
-With these changes:
-Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
+There has been some discussion about how useful these ADC helpers are,
+and whether they should support also differential and single ended channel
+configurations. This version does not include support for those - with the
+benefit of reduced complexity and easier to use API.
 
-Thank you!
+NOTE: Patches 4,5,9 and 10 are untested as I lack of relevant HW.
+They have been compile tested only.
 
-> Cc: Leon Schuermann <leon@is.currently.online>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Oliver Neukum <oliver@neukum.org> (maintainer:USB CDC ETHERNET DRIVER)
-> Cc: netdev@vger.kernel.org (open list:NETWORKING DRIVERS)
-> Link: https://git.kernel.org/netdev/net/c/cb82a54904a9
-> Link: https://git.kernel.org/netdev/net/c/2284bbd0cf39
-> Link:
-> https://www.lenovo.com/de/de/p/accessories-and-software/docking/docking-u=
-sb-docks/40af0135eu
-> Signed-off-by: Philipp Hahn <phahn-oss@avm.de> ---
->  drivers/net/usb/cdc_ether.c | 7 +++++++
->  drivers/net/usb/r8152.c     | 6 ++++++
->  drivers/net/usb/r8153_ecm.c | 6 ++++++
->  3 files changed, 19 insertions(+)
->=20
-> diff --git a/drivers/net/usb/cdc_ether.c b/drivers/net/usb/cdc_ether.c
-> index a6469235d904..a032c1ded406 100644
-> --- a/drivers/net/usb/cdc_ether.c
-> +++ b/drivers/net/usb/cdc_ether.c
-> @@ -783,6 +783,13 @@ static const struct usb_device_id	products[] =3D {
->  	.driver_info =3D 0,
->  },
-> =20
-> +/* Lenovo ThinkPad Hybrid USB-C with USB-A Dock (40af0135eu, based on
-> Realtek RTL8153) */ +{
-> +	USB_DEVICE_AND_INTERFACE_INFO(LENOVO_VENDOR_ID, 0xa359,
-> USB_CLASS_COMM,
-> +			USB_CDC_SUBCLASS_ETHERNET, USB_CDC_PROTO_NONE),
-> +	.driver_info =3D 0,
-> +},
-> +
->  /* Aquantia AQtion USB to 5GbE Controller (based on AQC111U) */
->  {
->  	USB_DEVICE_AND_INTERFACE_INFO(AQUANTIA_VENDOR_ID, 0xc101,
-> diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-> index 468c73974046..96fa3857d8e2 100644
-> --- a/drivers/net/usb/r8152.c
-> +++ b/drivers/net/usb/r8152.c
-> @@ -785,6 +785,7 @@ enum rtl8152_flags {
->  #define DEVICE_ID_THINKPAD_USB_C_DONGLE			0x720c
->  #define DEVICE_ID_THINKPAD_USB_C_DOCK_GEN2		0xa387
->  #define DEVICE_ID_THINKPAD_USB_C_DOCK_GEN3		0x3062
-> +#define DEVICE_ID_THINKPAD_HYBRID_USB_C_DOCK		0xa359
-> =20
->  struct tally_counter {
->  	__le64	tx_packets;
-> @@ -9787,6 +9788,7 @@ static bool rtl8152_supports_lenovo_macpassthru(str=
-uct
-> usb_device *udev) case DEVICE_ID_THINKPAD_USB_C_DOCK_GEN2:
->  		case DEVICE_ID_THINKPAD_USB_C_DOCK_GEN3:
->  		case DEVICE_ID_THINKPAD_USB_C_DONGLE:
-> +		case DEVICE_ID_THINKPAD_HYBRID_USB_C_DOCK:
->  			return 1;
->  		}
->  	} else if (vendor_id =3D=3D VENDOR_ID_REALTEK && parent_vendor_id =3D=3D
-> VENDOR_ID_LENOVO) { @@ -10064,6 +10066,8 @@ static const struct usb_devic=
-e_id
-> rtl8152_table[] =3D { { USB_DEVICE(VENDOR_ID_MICROSOFT, 0x0927) },
->  	{ USB_DEVICE(VENDOR_ID_MICROSOFT, 0x0c5e) },
->  	{ USB_DEVICE(VENDOR_ID_SAMSUNG, 0xa101) },
-> +
-> +	/* Lenovo */
->  	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x304f) },
->  	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x3054) },
->  	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x3062) },
-> @@ -10074,7 +10078,9 @@ static const struct usb_device_id rtl8152_table[]=
- =3D {
->  	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x720c) },
->  	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x7214) },
->  	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x721e) },
-> +	{ USB_DEVICE(VENDOR_ID_LENOVO,  0xa359) },
->  	{ USB_DEVICE(VENDOR_ID_LENOVO,  0xa387) },
-> +
->  	{ USB_DEVICE(VENDOR_ID_LINKSYS, 0x0041) },
->  	{ USB_DEVICE(VENDOR_ID_NVIDIA,  0x09ff) },
->  	{ USB_DEVICE(VENDOR_ID_TPLINK,  0x0601) },
-> diff --git a/drivers/net/usb/r8153_ecm.c b/drivers/net/usb/r8153_ecm.c
-> index 20b2df8d74ae..8d860dacdf49 100644
-> --- a/drivers/net/usb/r8153_ecm.c
-> +++ b/drivers/net/usb/r8153_ecm.c
-> @@ -135,6 +135,12 @@ static const struct usb_device_id products[] =3D {
->  				      USB_CDC_SUBCLASS_ETHERNET,
-> USB_CDC_PROTO_NONE), .driver_info =3D (unsigned long)&r8153_info,
->  },
-> +/* Lenovo ThinkPad Hybrid USB-C with USB-A Dock (40af0135eu, based on
-> Realtek RTL8153) */ +{
-> +	USB_DEVICE_AND_INTERFACE_INFO(VENDOR_ID_LENOVO, 0xa359,
-> USB_CLASS_COMM,
-> +				      USB_CDC_SUBCLASS_ETHERNET,
-> USB_CDC_PROTO_NONE),
-> +	.driver_info =3D (unsigned long)&r8153_info,
-> +},
-> =20
->  	{ },		/* END */
->  };
+The ROHM BD79124 ADC itself is quite usual stuff. 12-bit, 8-channel ADC
+with threshold monitoring.
+
+Except that:
+ - each ADC input pin can be configured as a general purpose output.
+ - manually starting an ADC conversion and reading the result would
+   require the I2C _master_ to do clock stretching(!) for the duration
+   of the conversion... Let's just say this is not well supported.
+ - IC supports 'autonomous measurement mode' and storing latest results
+   to the result registers. This mode is used by the driver due to the
+   "peculiar" I2C when doing manual reads.
+
+Furthermore, the ADC uses this continuous autonomous measuring,
+and the IC keeps producing new 'out of window' IRQs if measurements are
+out of window - the driver disables the event for 1 seconds when sending
+it to user. This prevents generating storm of events
+
+Revision history:
+v5 =3D> v6:
+ - Drop applied patch
+ - Add *_for_each_named_child_* iterators
+ - Add a patch converting the thp7312 driver to use the new helper
+ - Styling and minor things pointed by reviewers
+
+v4 =3D> v5: Fixes as per various review comments. Most notably:
+ - Drop the patch making the TI's ADC driver to respect device tree.
+ - Add (RFC) patch converting gianfar driver to use new name child-node
+   counting API as suggested by Andy.
+ - Add fwnode_get_child_node_count_named() as suggested by Rob.
+ - rebase to v6.14-rc5
+ More accurate changelog in individual patches.
+
+v3 =3D> v4:
+ - Drop the ADC helper support for differential channels
+ - Drop the ADC helper for getting only channel IDs by fwnode.
+ - "Promote" the function counting the number of child nodes with a
+   specific name to the property.h (As suggested by Jonathan).
+ - Add ADC helpers to a namespace.
+ - Rebase on v6.14-rc3
+ - More minor changes described in individual patches.
+
+v2 =3D> v3:
+ - Restrict BD79124 channel numbers as suggested by Conor and add
+   Conor's Reviewed-by tag.
+ - Support differential and single-ended inputs
+ - Convert couple of existing drivers to use the added ADC helpers
+ - Minor fixes based on reviews
+Link to v2:
+https://lore.kernel.org/all/cover.1738761899.git.mazziesaccount@gmail.com/
+
+RFC v1 =3D> v2:
+ - Drop MFD and pinmux.
+ - Automatically re-enable events after 1 second.
+ - Export fwnode parsing helpers for finding the ADC channels.
+
+---
+
+Matti Vaittinen (10):
+  dt-bindings: ROHM BD79124 ADC/GPO
+  property: Add functions to iterate named child
+  iio: adc: add helpers for parsing ADC nodes
+  iio: adc: rzg2l_adc: Use adc-helpers
+  iio: adc: sun20i-gpadc: Use adc-helpers
+  iio: adc: Support ROHM BD79124 ADC
+  MAINTAINERS: Add IIO ADC helpers
+  MAINTAINERS: Add ROHM BD79124 ADC/GPO
+  net: gianfar: Use device_get_child_node_count_named()
+  media: thp7312: Use helper for iterating named child nodes
+
+ .../bindings/iio/adc/rohm,bd79124.yaml        |  114 ++
+ MAINTAINERS                                   |   12 +
+ drivers/base/property.c                       |   54 +
+ drivers/iio/adc/Kconfig                       |   17 +
+ drivers/iio/adc/Makefile                      |    3 +
+ drivers/iio/adc/industrialio-adc.c            |   79 ++
+ drivers/iio/adc/rohm-bd79124.c                | 1106 +++++++++++++++++
+ drivers/iio/adc/rzg2l_adc.c                   |   38 +-
+ drivers/iio/adc/sun20i-gpadc-iio.c            |   38 +-
+ drivers/media/i2c/thp7312.c                   |    8 +-
+ drivers/net/ethernet/freescale/gianfar.c      |   17 +-
+ include/linux/iio/adc-helpers.h               |   27 +
+ include/linux/property.h                      |   20 +
+ 13 files changed, 1471 insertions(+), 62 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/iio/adc/rohm,bd79124.=
+yaml
+ create mode 100644 drivers/iio/adc/industrialio-adc.c
+ create mode 100644 drivers/iio/adc/rohm-bd79124.c
+ create mode 100644 include/linux/iio/adc-helpers.h
 
 
-
+base-commit: 7eb172143d5508b4da468ed59ee857c6e5e01da6
 --=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+2.48.1
+
+
+--muBpqT72KPU1YOIU
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEIx+f8wZb28fLKEhTeFA3/03aocUFAmfO4NsACgkQeFA3/03a
+ocUrtAf6AkAaWL1Jnt8D97sqQ8s0urKuXJ/Emcn098LL3HXfpGZ3oOnkjn8mfJAa
+Ic6x2BRQXOvDu/hzU3JAm3mPKKFi0Ksp/pFf28GP9hKetp3mmL6juBUdRJeNzNPN
+BqAVFgh+GGv8UT38XCSI/7+bh1i50mU+t12fCDl7m+vXEYA237ulDTN1wWN+Jhd+
+HpAjCsUj7hqY2HRHGecTzWMFGXdjZFGJJzxgqnuo+D1e000IkpHx9/9jejmHPkUK
+ADeKqj0nQCp2LV/Kx8r393w9/MmpSBOD93cjCjHeN6OizuKvesExCkZUJA9BvvaE
+giS8zbsz3QJNWA1MoPkbsNQ26lL2+Q==
+=+1Jo
+-----END PGP SIGNATURE-----
+
+--muBpqT72KPU1YOIU--
 
