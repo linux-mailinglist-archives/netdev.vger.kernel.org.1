@@ -1,199 +1,193 @@
-Return-Path: <netdev+bounces-173488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FD02A592BD
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:29:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95D3FA592D1
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:37:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6014A16B511
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 11:29:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E48D3188DC5F
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 11:37:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9061A21E0AE;
-	Mon, 10 Mar 2025 11:29:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48194221578;
+	Mon, 10 Mar 2025 11:37:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Uv3XnVGC"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JfCtcZ40"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D062228EA
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 11:29:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E200220697
+	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 11:36:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741606148; cv=none; b=IXLPZxQ+T3jhfiLXJRM7Jqc+oQNAxX+/jP2xDLvOSKtcYZygcoJrGOUO+bO/UmAt89n9XzKcUwkwAMK0rQPCgIkF8AXBPOCoEBPnTN3oTthIH/IxCb/SRXmaUsY5Ai80go64XM6ZBsA8cM2+zyxsZqlo5fQlyCosPaUaxdxp5Kw=
+	t=1741606621; cv=none; b=Hh7UlgEfI1P6oG4Pd4TBJyiOwULla5EcOI4jFgCvMMmFGOEgy/tfxcZh1e6IRHcaSyH5resOqVx5LwknAGNYT/AZNKHbjSDx6MfEZYvRstshuX4nwPcEuKMycFIejyWdvmcmXzyJKVlhSiy5ydyP/2/VAVuTJDS/jFbyxk0qHko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741606148; c=relaxed/simple;
-	bh=nzm+QROPgNlTgv5Etl0vu3jI3ntSMxIpJG28wx827bs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g6rzOw+HTQ2tG7+Q4rjIDplVvBUZ2HN6It2IuRqHWWh74fKIeeQKhVG/e1+HJc51pQpuXZM1kmZdcADgVpsi8oqcQ7AioYywj4+lgbTHy7JK7Ehiz7IYa7aEYDGWNc5alE4NJP+CqS5SGS+RsuAfhQj/adW+faQo9QZeIeknOOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Uv3XnVGC; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741606145;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5z0JpiHujt35jhHokiICXA3nb7oZBkAm98GfGBWkb4U=;
-	b=Uv3XnVGCkF4l9TA4GjtkYLGftD7dDc4difzyxayiEGKg99JL+jT5vX8KuHEz22UlOhIZ+w
-	yfCuI5cXbUTOslwoMTCWrYRB9bXJPR+6r3bqytttNGZsoXczGwi2IxG1UgWSsLpXJTXSxQ
-	U2sUPpwXx7aThpMRFNQVXpY9+h+dufU=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-275-5i-7LM4zMbS0LtYIYT4a8A-1; Mon, 10 Mar 2025 07:29:04 -0400
-X-MC-Unique: 5i-7LM4zMbS0LtYIYT4a8A-1
-X-Mimecast-MFC-AGG-ID: 5i-7LM4zMbS0LtYIYT4a8A_1741606143
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43ab5baf62cso27396685e9.0
-        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 04:29:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741606143; x=1742210943;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5z0JpiHujt35jhHokiICXA3nb7oZBkAm98GfGBWkb4U=;
-        b=LTd8mCAXerNt9K5+7KtAUmgJ4y8pp0HHWgGLhwqnd1RVO/q3oFpNvuVyh1FK9vG06c
-         DjxF6xsfnLCT8vJzXDwuQdPttoAMkMXHenkgFPBHrWKppycwBr/Dq6bNmzda5ylVuoQ5
-         jFvPOD/qWsTTTZDwYGagXNAXJYpq2FTO8TZSCR/FVX2qJgliT51OvjFiPcJCPvYsHwvq
-         QbpenmvnrYvWB4iJtaivmRK5dpyhHYFls7V1rfbSMiKbOCV2TFH/18oCE+igL68F7Now
-         5lyDX8rirg7Ib86X8DyoRmzav03ngH2GbniMeE99r+mSw0k817BeQTX1ysEoAXO0klEG
-         N+qQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU3Ck4lN6PcFDjj1sEW/mGk4UGn+e+sF/8gHmZiXbSLfsVEKcb8aEFbZCqoY0VwpAv9MhWeyB4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhmkZzh5UCZXnGea90x4lsCD1kzMerVWh2s6n1sfUbtZEq6vfS
-	ZOf+mo6ACa3+MX5mx3a+B0ylnlTM0ShBYm4Fm8JHeTHVCdcLFWUA3/QAHDL3Bi4oTM+aQkiiZrC
-	jrzHHN/BYz4Ru9FwvPkg39+wDHTpKfdhEmdXMk0KxLAdItEWc1F2a/A==
-X-Gm-Gg: ASbGncsF8O6RE+zjIv7D1jIWRqf+4PFjOL/KGJlnq1zcptuuQAdc7XbjetvI+ZR1yMT
-	MKs3nF57M0KA220NdmOA+coLxIE2VRv2Wb+JZj1c/3NzkkqNKkNCp22eyfjSZRibwLs+zIJouyR
-	H47nAJdCr3jF7e/Ryh6RSeTpyS0Zn0Y67c2eEx/QW39UwgL7O+GAhCBjmL4sClGA5PjT0QaanXR
-	GxRR/0IsL4Guw60QleFAPiuOJxjwkghk4H6UG8IF+gIy81WtTqY0XptnAymvwxa6wq1f4piiLi3
-	HZgD7enlXqncppox1BB3XVMHXVCIVSEMZ7FB0IBmM2o=
-X-Received: by 2002:a05:600c:4448:b0:43b:cf9c:6ffc with SMTP id 5b1f17b1804b1-43c5a5fe767mr77788095e9.12.1741606143344;
-        Mon, 10 Mar 2025 04:29:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE/kS0BlHLMFCXXSJUElGAit73qlmOd3d/94x1AOYxfIpXEmLIKVfuRRgSyDa5RVR/hO4ZeUQ==
-X-Received: by 2002:a05:600c:4448:b0:43b:cf9c:6ffc with SMTP id 5b1f17b1804b1-43c5a5fe767mr77787845e9.12.1741606142963;
-        Mon, 10 Mar 2025 04:29:02 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-65-56.dyn.eolo.it. [146.241.65.56])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ce8a493d0sm80662645e9.1.2025.03.10.04.29.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Mar 2025 04:29:02 -0700 (PDT)
-Message-ID: <0d6ed067-9509-4caf-9404-973ad7ae340f@redhat.com>
-Date: Mon, 10 Mar 2025 12:29:01 +0100
+	s=arc-20240116; t=1741606621; c=relaxed/simple;
+	bh=JaApZ7d/+Ggz2krnVT3vjrpaonIRlghHFizWVFRNLkQ=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=flcKlyDinxk1RB2RhnkSMjdkVf9N8gdPn5bYXc5gS/6O3rdCwbWk82vMd6AZtGPNy/McLqrHu5JLR2/qjB5gnNJtp2LqN44+8k2bicpZyMOKuTV+FE4Fkhz/hWg+Ay8UrajN4YD6nLj124XKoziO64znq4886GQfErjnB+G2RE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JfCtcZ40; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next 1/2] udp_tunnel: create a fastpath GRO lookup.
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>
-References: <cover.1741338765.git.pabeni@redhat.com>
- <800d15eb0bd55fd2863120147e497af36e61e3ca.1741338765.git.pabeni@redhat.com>
- <67cc8e796ee81_14b9f929496@willemb.c.googlers.com.notmuch>
- <4bc191e2-b4f3-4e6b-8c9f-eaa67853aaae@redhat.com>
- <67ce61b338efd_20941f2949f@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <67ce61b338efd_20941f2949f@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1741606607;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oLn3thOLc+VOfKHEltzpNOv/oUESIWK0aGZgVBXpS9g=;
+	b=JfCtcZ40G8NAGBVTYfKtZMCkqctg29fSlsTpEKq0K19h1yqX9qJAQSBSXkrtqusCPMPCmR
+	M4kbtzO/BR1Azsg8Y/n42rgEcUZNono4emHKB0bj4EkSBKGBRoComjlNFEgwYo4LbbvNGZ
+	dJZrZIFA/MyzEHs2Wmxv29knOKuC7Hg=
+Date: Mon, 10 Mar 2025 11:36:44 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
+Message-ID: <78ee737400721758fa67b4f285e8ba61dc6b893b@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH bpf-next v2 1/3] bpf, sockmap: avoid using sk_socket
+ after free
+To: "Michal Luczaj" <mhal@rbox.co>, xiyou.wangcong@gmail.com,
+ john.fastabend@gmail.com, jakub@cloudflare.com, martin.lau@linux.dev
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, andrii@kernel.org,
+ eddyz87@gmail.com, mykolal@fb.com, ast@kernel.org, daniel@iogearbox.net,
+ song@kernel.org, yonghong.song@linux.dev, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
+ sgarzare@redhat.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ mrpre@163.com, cong.wang@bytedance.com,
+ syzbot+dd90a702f518e0eac072@syzkaller.appspotmail.com
+In-Reply-To: <baeca627-e6f1-4d0a-aea5-fa31689edc4d@rbox.co>
+References: <20250228055106.58071-1-jiayuan.chen@linux.dev>
+ <20250228055106.58071-2-jiayuan.chen@linux.dev>
+ <baeca627-e6f1-4d0a-aea5-fa31689edc4d@rbox.co>
+X-Migadu-Flow: FLOW_OUT
 
-On 3/10/25 4:51 AM, Willem de Bruijn wrote:
-> Paolo Abeni wrote:
->> On 3/8/25 7:37 PM, Willem de Bruijn wrote:
->>> Paolo Abeni wrote:
->>>> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
->>>> index 2c0725583be39..054d4d4a8927f 100644
->>>> --- a/net/ipv4/udp_offload.c
->>>> +++ b/net/ipv4/udp_offload.c
->>>> @@ -12,6 +12,38 @@
->>>>  #include <net/udp.h>
->>>>  #include <net/protocol.h>
->>>>  #include <net/inet_common.h>
->>>> +#include <net/udp_tunnel.h>
->>>> +
->>>> +#if IS_ENABLED(CONFIG_NET_UDP_TUNNEL)
->>>> +static DEFINE_SPINLOCK(udp_tunnel_gro_lock);
->>>> +
->>>> +void udp_tunnel_update_gro_lookup(struct net *net, struct sock *sk, bool add)
->>>> +{
->>>> +	bool is_ipv6 = sk->sk_family == AF_INET6;
->>>> +	struct udp_sock *tup, *up = udp_sk(sk);
->>>> +	struct udp_tunnel_gro *udp_tunnel_gro;
->>>> +
->>>> +	spin_lock(&udp_tunnel_gro_lock);
->>>> +	udp_tunnel_gro = &net->ipv4.udp_tunnel_gro[is_ipv6];
->>>> +	if (add)
->>>> +		hlist_add_head(&up->tunnel_list, &udp_tunnel_gro->list);
->>>> +	else
->>>> +		hlist_del_init(&up->tunnel_list);
->>>> +
->>>> +	if (udp_tunnel_gro->list.first &&
->>>> +	    !udp_tunnel_gro->list.first->next) {
->>>> +		tup = hlist_entry(udp_tunnel_gro->list.first, struct udp_sock,
->>>> +				  tunnel_list);
->>>> +
->>>> +		rcu_assign_pointer(udp_tunnel_gro->sk, (struct sock *)tup);
->>>
->>> If the targeted case is a single tunnel, is it worth maintaining the list?
->>>
->>> If I understand correctly, it is only there to choose a fall-back when the
->>> current tup is removed. But complicates the code quite a bit.
->>
->> I'll try to answer the questions on both patches here.
->>
->> I guess in the end there is a relevant amount of personal preferences.
->> Overall accounting is ~20 lines, IMHO it's not much.
-> 
-> In the next patch almost the entire body of udp_tunnel_update_gro_rcv
-> is there to maintain the refcount and list of tunnels.
-> 
-> Agreed that in the end it is subjective. Just that both patches
-> mention optimizing for the common case of a single tunnel type.
-> If you feel strongly, keep the list, of course.
-> 
-> Specific to the implementation
-> 
-> +	if (enabled && !old_enabled) {
-> 
-> Does enabled imply !old_enabled, once we get here? All paths
-> that do not modify udp_tunnel_gro_type_nr goto out.
+March 7, 2025 at 5:45 PM, "Michal Luczaj" <mhal@rbox.co> wrote:
 
-You are right, this can be simplified a bit just checking for the
-current `udp_tunnel_gro_type_nr` value.
+>=20
+>=20On 2/28/25 06:51, Jiayuan Chen wrote:
+>=20
+>=20>=20
+>=20> ...
+> >=20
+>=20>  static void sk_psock_verdict_data_ready(struct sock *sk)
+> >=20
+>=20>  {
+> >=20
+>=20>  - struct socket *sock =3D sk->sk_socket;
+> >=20
+>=20>  + struct socket *sock;
+> >=20
+>=20>  const struct proto_ops *ops;
+> >=20
+>=20>  int copied;
+> >=20
+>=20>=20=20
+>=20>=20
+>=20>  trace_sk_data_ready(sk);
+> >=20
+>=20>=20=20
+>=20>=20
+>=20>  + /* We need RCU to prevent the sk_socket from being released.
+> >=20
+>=20>  + * Especially for Unix sockets, we are currently in the process
+> >=20
+>=20>  + * context and do not have RCU protection.
+> >=20
+>=20>  + */
+> >=20
+>=20>  + rcu_read_lock();
+> >=20
+>=20>  + sock =3D sk->sk_socket;
+> >=20
+>=20>  if (unlikely(!sock))
+> >=20
+>=20>  - return;
+> >=20
+>=20>  + goto unlock;
+> >=20
+>=20>  +
+> >=20
+>=20>  ops =3D READ_ONCE(sock->ops);
+> >=20
+>=20>  if (!ops || !ops->read_skb)
+> >=20
+>=20>  - return;
+> >=20
+>=20>  + goto unlock;
+> >=20
+>=20>  +
+> >=20
+>=20>  copied =3D ops->read_skb(sk, sk_psock_verdict_recv);
+> >=20
+>=20>  if (copied >=3D 0) {
+> >=20
+>=20>  struct sk_psock *psock;
+> >=20
+>=20>=20=20
+>=20>=20
+>=20>  - rcu_read_lock();
+> >=20
+>=20>  psock =3D sk_psock(sk);
+> >=20
+>=20>  if (psock)
+> >=20
+>=20>  sk_psock_data_ready(sk, psock);
+> >=20
+>=20>  - rcu_read_unlock();
+> >=20
+>=20>  }
+> >=20
+>=20>  +unlock:
+> >=20
+>=20>  + rcu_read_unlock();
+> >=20
+>=20>  }
+> >=20
+>=20
+> Hi,
+>=20
+>=20Doesn't sk_psock_handle_skb() (!ingress path) have the same `struct s=
+ocket`
+>=20
+>=20release race issue? Any plans on fixing that one, too?
 
-> 
-> +		for (i = 0; i < UDP_MAX_TUNNEL_TYPES; i++) {
-> +			cur = &udp_tunnel_gro_types[i];
-> +			if (refcount_read(&cur->count)) {
-> +				static_call_update(udp_tunnel_gro_rcv,
-> +						   cur->gro_receive);
-> +				static_branch_enable(&udp_tunnel_static_call);
-> +			}
-> +		}
-> 
-> Can you use avail, rather than walk the list again?
+Yes, the send path logic also has similar issues, and after some hacking,
+I was able to reproduce it. Thanks for providing this information.
+I can fix these together in the next revision of this patchset, anyway,
+this patchset still needs further confirmation from the maintainer.
 
-When we reach the above code due to a tunnel deletion, `avail` will
-point to an unused array entry - that is "available" to store new tunnel
-info. Instead we are looking for the only entry currently in use.
+>=20
+>=20BTW, lockdep (CONFIG_LOCKDEP=3Dy) complains about calling AF_UNIX's
+>=20
+>=20read_skb() under RCU read lock.
+>=20
+>=20Thanks,
+>=20
+>=20Michal
+>
+My environment also has LOCKDEP enabled, but I didn't see similar
+warnings.
+Moreover, RCU assertions are typically written as:
 
-WRT the code complexity in patch 2/2, I attempted a few simplified
-tracking approaches, and the only one leading to measurably simpler code
-requires permanently (up to the next reboot) disabling the optimization
-as soon as any additional tunnel of any type is created in the system
-(child netns included).
+WARN_ON_ONCE(!rcu_read_lock_held())
 
-I think the code complexity delta is worthy avoiding such restriction.
+And when LOCKDEP is not enabled, rcu_read_lock_held() defaults to
+returning 1. So, it's unlikely to trigger a warning due to an RCU lock
+being held.
 
-Thanks,
+Could you provide more of the call stack?
 
-Paolo
-
+Thanks.
 
