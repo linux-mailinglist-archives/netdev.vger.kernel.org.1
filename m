@@ -1,69 +1,60 @@
-Return-Path: <netdev+bounces-173705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E73FAA5A708
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 23:23:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 26306A5A71B
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 23:25:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A799B3A950C
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 22:23:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF8823AEC15
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 22:25:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76BD01E8359;
-	Mon, 10 Mar 2025 22:23:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F4AB202979;
+	Mon, 10 Mar 2025 22:24:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cTNJnPVr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dR3+7L9W"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E8B1E503C;
-	Mon, 10 Mar 2025 22:23:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FFC71EB5EA;
+	Mon, 10 Mar 2025 22:24:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741645404; cv=none; b=Xl1mHSabPshqmQqSi9FHuYtETIDay06Yf9MXDtCr+O89rzsJtQmL9s3mWQcw2JE7d7/igOwNVcOftNbYZz352/kBgQMaIgP7IH4FoCdHmLxbdxIXcmuRFszet8QjruLxlP7+XPxLm0YkXdV0GiWXFeGvTt3hUrBlqfwRvhUXIcI=
+	t=1741645460; cv=none; b=Y2HzNZXwww5Nkl3qEJrGnsHMUbzGjpNSTT5pb89q0FLOLVi1PgSUGGXRitmKzyTXrGdlGQmPleQwDpODzHjNJxgYK2NDOri7cUo1tiERJWSBVXaxrN8iGxRQzeMaqGuZKGq/fsPhP0rmoIZl1FaERvVfcS4WTR/KYPy0PMPJIwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741645404; c=relaxed/simple;
-	bh=UNmm9RS/yfYAKBLQP50xWexf9GUOonoXsXhHuSApK34=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RT/X3YuNJ1LWcUgIhfOtX6ABV8fiUxVnUwmJb80HDkWrAfsXEGFzlVDbrT2UG41d3+8XRbY3f+sBcgDdYnjiRsTdcBlvM7UZtMgTKFZ6gOjeQ1hOwlKV/Iq6UcmkDiFSj0cUoi2FyqiwGdEbR226k4AX1XSkUkfbyu0vvhxVFsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cTNJnPVr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A15F8C4CEE5;
-	Mon, 10 Mar 2025 22:23:23 +0000 (UTC)
+	s=arc-20240116; t=1741645460; c=relaxed/simple;
+	bh=ZZPKfTff+4XkuWzowbB6+5yPpDikqeZUD868ViPhT+E=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=if6K76XqTYkfUvV1ogeDnMG/IwQ9UMx3ZQqNxiZlDed/4vneQvgY2/82nQX+56M9JegbVF1TnM9x7fXDj0tKLSmwU0NxJfuvZJOdNg5ipPyQU2A5eZTobUgou6Lh7ok30YHhtOtAd/3IgbIXKg7ChGBOhoc3ZPOz8BOP6xooX1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dR3+7L9W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F5A9C4CEE5;
+	Mon, 10 Mar 2025 22:24:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741645403;
-	bh=UNmm9RS/yfYAKBLQP50xWexf9GUOonoXsXhHuSApK34=;
+	s=k20201202; t=1741645460;
+	bh=ZZPKfTff+4XkuWzowbB6+5yPpDikqeZUD868ViPhT+E=;
 	h=From:To:Cc:Subject:Date:From;
-	b=cTNJnPVrag8vikQ/xd4lwwXe42aQ7c4ptKLo9D+JnoJE6J+g4XwJqIyNho/ISmOqZ
-	 i4b8qrCHTWWe/zhRfJc8ZBQa5cPaSRtbgvP82UuL6Cqr27OEHLVQgRgDkiEpk3sfHU
-	 QvuUDgX2rZxNwPFgniPGAdGpBxgqDxLctXGxPQofXG3yMFUrZBDDQGdkOYBj5ra10q
-	 bEzjf3Bz5VeGcM9ntYhCICtMpxTVGw9Eaka0W3gQKxz0yDeeTUXPVv3i/l+Uul+SIq
-	 ATfhnqxxwz5zLM9ipN+2gsnjbE/UdGoQQxIAu+z5VcaeoRYjl23W5QD6uPKNNxzCg1
-	 WU9wtjd5Ejt3w==
+	b=dR3+7L9WthtQJP4qMydaejDUY+OiFFgQL3U2Wbfyek52ZuVOIgzCQcxoZADvP2Cl/
+	 WlKD1gcK9ZMCJm8vw9Adcicbwfp0jS9FO+d1ZUd0x4TCmt3s/Af08/D1MO7ZCQAHCr
+	 MEFVQqYd0YOjjzwH2+8891ejkIGgyil6sEbxrkTvXy5fexL+JpTgE3NvVhJK4/gEmt
+	 VK9+jnsLuX2tFPflgnQkoPZKRtmwGmGDlEalVlfhAM4vNqKDYbM5JpJ5nGVWaoJ2mf
+	 zHOVGdRcMWCp7mZvhGuPIIPUKeewSUK8I/HIQR5Uex+dvsVQ+FdDvYhM6vKRHXHWBo
+	 7jfoj+8dZg/wQ==
 From: Kees Cook <kees@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>
+To: Nicolas Ferre <nicolas.ferre@microchip.com>
 Cc: Kees Cook <kees@kernel.org>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Kalle Valo <kvalo@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>,
-	En-Wei Wu <en-wei.wu@canonical.com>,
-	Shaul Triebitz <shaul.triebitz@intel.com>,
-	Alexander Wetzel <alexander@wetzel-home.de>,
-	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
-	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org,
-	kernel test robot <lkp@intel.com>,
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
 	linux-kernel@vger.kernel.org,
-	syzbot+d6eb9cee2885ec06f5e3@syzkaller.appspotmail.com,
 	linux-hardening@vger.kernel.org
-Subject: [PATCH] wifi: mac80211: Add __nonstring annotations for unterminated strings
-Date: Mon, 10 Mar 2025 15:23:19 -0700
-Message-Id: <20250310222318.work.395-kees@kernel.org>
+Subject: [PATCH] net: macb: Truncate TX1519CNT for trailing NUL
+Date: Mon, 10 Mar 2025 15:24:16 -0700
+Message-Id: <20250310222415.work.815-kees@kernel.org>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -71,63 +62,41 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2106; i=kees@kernel.org; h=from:subject:message-id; bh=UNmm9RS/yfYAKBLQP50xWexf9GUOonoXsXhHuSApK34=; b=owGbwMvMwCVmps19z/KJym7G02pJDOnn08Jm5Mbv7ZnbFtIbYnLy2ur4AxyLPTm1JdyVI9ZEX 1t9dEFvRykLgxgXg6yYIkuQnXuci8fb9nD3uYowc1iZQIYwcHEKwEQETzEyvFCy8jum1xtvVu8m rR10a8JCFi6FmIfnlO9tCNbN//osn5Hhu2Pfe6UXPn0mnd4fape8bqw/Kf1OWvH0if3ixusTk3k YAA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1420; i=kees@kernel.org; h=from:subject:message-id; bh=ZZPKfTff+4XkuWzowbB6+5yPpDikqeZUD868ViPhT+E=; b=owGbwMvMwCVmps19z/KJym7G02pJDOnn0yZIsjVuWrednc9NPYRbZMdRxZcL+C4LsBqVmc7oe GxjsJOxo5SFQYyLQVZMkSXIzj3OxeNte7j7XEWYOaxMIEMYuDgFYCKHvzH8DyuoS7U9cLuslTU1 YOLdTZV9m77LRM+x3NcQX7uw8L3oFYZ/eh1sxw6Ib/63dP+XSqVTavXP6idNs//imb8/aHaLqU0 ZMwA=
 X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 
-When a character array without a terminating NUL character has a static
-initializer, GCC 15's -Wunterminated-string-initialization will only
-warn if the array lacks the "nonstring" attribute[1]. Mark the arrays
-with __nonstring to and correctly identify the char array as "not a C
-string" and thereby eliminate the warning.
+GCC 15's -Wunterminated-string-initialization saw that this string was
+being truncated. Adjust the initializer so that the needed final NUL
+character will be present.
 
-Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=117178 [1]
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>
+Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>
 Cc: "David S. Miller" <davem@davemloft.net>
 Cc: Eric Dumazet <edumazet@google.com>
 Cc: Jakub Kicinski <kuba@kernel.org>
 Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Johannes Berg <johannes@sipsolutions.net>
-Cc: Kalle Valo <kvalo@kernel.org>
-Cc: Julia Lawall <Julia.Lawall@inria.fr>
-Cc: En-Wei Wu <en-wei.wu@canonical.com>
-Cc: Shaul Triebitz <shaul.triebitz@intel.com>
-Cc: Alexander Wetzel <alexander@wetzel-home.de>
-Cc: Emmanuel Grumbach <emmanuel.grumbach@intel.com>
-Cc: linux-wireless@vger.kernel.org
 Cc: netdev@vger.kernel.org
 Signed-off-by: Kees Cook <kees@kernel.org>
 ---
- drivers/net/wireless/virtual/virt_wifi.c     | 2 +-
- drivers/net/wireless/zydas/zd1211rw/zd_mac.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/cadence/macb.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/wireless/virtual/virt_wifi.c b/drivers/net/wireless/virtual/virt_wifi.c
-index 4ee374080466..fc122b79301a 100644
---- a/drivers/net/wireless/virtual/virt_wifi.c
-+++ b/drivers/net/wireless/virtual/virt_wifi.c
-@@ -146,7 +146,7 @@ static void virt_wifi_inform_bss(struct wiphy *wiphy)
- 	static const struct {
- 		u8 tag;
- 		u8 len;
--		u8 ssid[8];
-+		u8 ssid[8] __nonstring;
- 	} __packed ssid = {
- 		.tag = WLAN_EID_SSID,
- 		.len = VIRT_WIFI_SSID_LEN,
-diff --git a/drivers/net/wireless/zydas/zd1211rw/zd_mac.c b/drivers/net/wireless/zydas/zd1211rw/zd_mac.c
-index f90c33d19b39..9653dbaac3c0 100644
---- a/drivers/net/wireless/zydas/zd1211rw/zd_mac.c
-+++ b/drivers/net/wireless/zydas/zd1211rw/zd_mac.c
-@@ -21,7 +21,7 @@
- 
- struct zd_reg_alpha2_map {
- 	u32 reg;
--	char alpha2[2];
-+	char alpha2[2] __nonstring;
- };
- 
- static struct zd_reg_alpha2_map reg_alpha2_map[] = {
+diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
+index 2847278d9cd4..9a6acb97c82d 100644
+--- a/drivers/net/ethernet/cadence/macb.h
++++ b/drivers/net/ethernet/cadence/macb.h
+@@ -1067,7 +1067,8 @@ static const struct gem_statistic gem_statistics[] = {
+ 	GEM_STAT_TITLE(TX256CNT, "tx_256_511_byte_frames"),
+ 	GEM_STAT_TITLE(TX512CNT, "tx_512_1023_byte_frames"),
+ 	GEM_STAT_TITLE(TX1024CNT, "tx_1024_1518_byte_frames"),
+-	GEM_STAT_TITLE(TX1519CNT, "tx_greater_than_1518_byte_frames"),
++	GEM_STAT_TITLE(TX1519CNT, "tx_greater_than_1518_byte_frame"),
++
+ 	GEM_STAT_TITLE_BITS(TXURUNCNT, "tx_underrun",
+ 			    GEM_BIT(NDS_TXERR)|GEM_BIT(NDS_TXFIFOERR)),
+ 	GEM_STAT_TITLE_BITS(SNGLCOLLCNT, "tx_single_collision_frames",
 -- 
 2.34.1
 
