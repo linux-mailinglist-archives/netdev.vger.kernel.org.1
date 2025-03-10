@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-173525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 988BCA59485
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 13:30:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39D76A5947B
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 13:29:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5B483A2E99
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:29:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17C9E165CD4
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:29:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F6CB226D02;
-	Mon, 10 Mar 2025 12:28:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94DE8227E8A;
+	Mon, 10 Mar 2025 12:28:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Qm6IXENh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fSqW4TRP"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD698227E94
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 12:28:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA4EB227EB6
+	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 12:28:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741609716; cv=none; b=PGHYpbdmgvS0czZgvJ4SAsQOr/va7AJr2TeAgcLoE3WmbK6RHnRL4sNql+KseO2gJcFVUr0F/VsFF3cgABFfQF065G8y3aZLmGh+3KDpAduIMNUwHdwaZK6YELr2XFoj++naZR0vH+0QilASaNuFr+G8WHa+k7OjsFaBtZgdUKY=
+	t=1741609719; cv=none; b=uBhDZf18/qI9L41XAwzXtpDAP6tIb9dMjJd1uM1qS1Oy4bmPlDWFU4kz7os4o58Ibl9ie+D9hTDI6kxcf1s1f1rmyMCIbODyomugnc/92SLE/tSdzqqtVU5udZGGM/OtCWHwithJwjCdLGCqmMTFOz2Aw3GzXCJVz3TLhXioMdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741609716; c=relaxed/simple;
-	bh=GTk9VP3N8vjJ6Ux0qJ5b3R0Yjtazu9WwJEl6y7bzQZY=;
+	s=arc-20240116; t=1741609719; c=relaxed/simple;
+	bh=/CH9UU6hzZ0ulPSOFaDZUiPy2Hm90+BbN8HITQ7ASd4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NBt0OQXEx39Z7GcRWPGZoMjmFsufKBy7c9nCPp0VeoJgDooISad9WW8C61ecdndvklbgI31wa60Nyr54F9I2lS0kzS3neFFBr/Vpm6QMNXJNVDQtgRBmFPbraLFAGBoM/pf3hoLOsxUHazgQO2YB+V3wHHJy4Kx87H1FQZrzElY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Qm6IXENh; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=bHQFWN9AEck8pnjHCYLIKuVM396vLrz5uoaYi4VLW7mK1GTksBPzZp/0Xvq9D0KfyP4Rl33k8YuHilJ6DN0W+voyS94wxnSAlApXLt40a3R10pCXNqJ3hmwJbJGK5xCMIoFxCbxOlXLn0O7/tvOnBgFoXuFFLGou/qiuW18tJto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fSqW4TRP; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741609714; x=1773145714;
+  t=1741609717; x=1773145717;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=GTk9VP3N8vjJ6Ux0qJ5b3R0Yjtazu9WwJEl6y7bzQZY=;
-  b=Qm6IXENhmn+P6LrnqkhNF734xr3bV9WvLvhO3Iarpfpyi4TjqkFq3S2s
-   jl8aX65+z1jSnZCwK3Hl/+TfwtjnOQimelYaGsa2FZb2LSKab3CPoNTcP
-   9xkGQJYPFrRF7It2O6NstQg7dRNPfKu5Ob/yvKYiWISHcQkcVGctMf7lM
-   2P8D9h+yi8ESpQT9i559SUa7K621h1x9fs6VQtCLtNyLTFgUN1BQF8ebG
-   pclemef6gusA6tRYT4CBy8pt6m12BQ1xYvKRZwYpGVgNjiY0gX+MI4mH6
-   +JuAUM6fMxKe+NxdGtKyVVPJQWPy6oLgHq/Rg9WLyYWxw/oPFTcXA4RxN
-   g==;
-X-CSE-ConnectionGUID: V3F20Y5+QnyZe6fSGv4mcA==
-X-CSE-MsgGUID: GO2w3+LOTNWH5DQaEQ+isQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="53981110"
+  bh=/CH9UU6hzZ0ulPSOFaDZUiPy2Hm90+BbN8HITQ7ASd4=;
+  b=fSqW4TRPqbZHF6yp6/FUT4qvAUhbET/f5D27ZjEuMTX4gwcV0cDDGmG7
+   V/DWTw7t4QUHWnY2my2vG//xW3pSgAuVTDo9h4MgPF/ZoDk4Z1OwLPwGP
+   /b+Jgq2KjwLmeAQUX5mFURC8vlXaE7Kp3MUcNbMm/PD2cktr73nL516Jp
+   J/kHxrwz5xKZuR8aJAg5QKFWFQtVbzqvWBijAMAbLtdKS4LL2+13kGgKK
+   QvmZMuN15UAkOvXZ/tcoFqY//fSeeB29obExSN0XfHIhFZTLBsPZWauwT
+   HwD4poUextZbSwPG/I3eS+tpKsEMTyBuO03HeZgt1AUgDAT9fN0XeUKpT
+   A==;
+X-CSE-ConnectionGUID: opnKoxhzTrKQQKqk8NS4RQ==
+X-CSE-MsgGUID: fCw8nLfwTJKz/eosgij7tA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="53981140"
 X-IronPort-AV: E=Sophos;i="6.14,236,1736841600"; 
-   d="scan'208";a="53981110"
+   d="scan'208";a="53981140"
 Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 05:28:32 -0700
-X-CSE-ConnectionGUID: dwY4hyKnQsae9S83dzqXew==
-X-CSE-MsgGUID: DP3Ri8LiSaORJePDHl+Swg==
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 05:28:36 -0700
+X-CSE-ConnectionGUID: XqccRF4TRt6Qu4qupIgxIA==
+X-CSE-MsgGUID: FuAgZO44Qi6N165e3Gk5fw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.14,236,1736841600"; 
-   d="scan'208";a="119698214"
+   d="scan'208";a="119698254"
 Received: from gklab-003-001.igk.intel.com ([10.211.3.1])
-  by orviesa009.jf.intel.com with ESMTP; 10 Mar 2025 05:28:31 -0700
+  by orviesa009.jf.intel.com with ESMTP; 10 Mar 2025 05:28:35 -0700
 From: Grzegorz Nitka <grzegorz.nitka@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
 	Karol Kolacinski <karol.kolacinski@intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Simon Horman <horms@kernel.org>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Grzegorz Nitka <grzegorz.nitka@intel.com>
-Subject: [PATCH iwl-next v2 1/3] ice: remove SW side band access workaround for E825
-Date: Mon, 10 Mar 2025 13:24:37 +0100
-Message-Id: <20250310122439.3327908-2-grzegorz.nitka@intel.com>
+Subject: [PATCH iwl-next v2 2/3] ice: refactor ice_sbq_msg_dev enum
+Date: Mon, 10 Mar 2025 13:24:38 +0100
+Message-Id: <20250310122439.3327908-3-grzegorz.nitka@intel.com>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <20250310122439.3327908-1-grzegorz.nitka@intel.com>
 References: <20250310122439.3327908-1-grzegorz.nitka@intel.com>
@@ -81,71 +81,143 @@ Content-Transfer-Encoding: 8bit
 
 From: Karol Kolacinski <karol.kolacinski@intel.com>
 
-Due to the bug in FW/NVM autoload mechanism (wrong default
-SB_REM_DEV_CTL register settings), the access to peer PHY and CGU
-clients was disabled by default.
+Rename ice_sbq_msg_dev to ice_sbq_dev_id to reflect the meaning of this
+type more precisely. This enum type describes RDA (Remote Device Access)
+client ids, accessible over SB (Side Band) interface.
+Rename enum elements to make a driver namespace more cleaner and
+consistent with other definitions within SB
+Remove unused 'rmn_x' entries, specific to unsupported E824 device.
+Adjust clients '2' and '13' names (phy_0 and phy_0_peer respectively) to
+be compliant with EAS doc. According to the specification, regardless of
+the complex entity (single or dual), when accessing its own ports,
+they're accessed always as 'phy_0' client. And referred as 'phy_0_peer'
+when handling ports conneced to the other complex.
 
-As the workaround solution, the register value was overwritten by the
-driver at the probe or reset handling.
-Remove workaround as it's not needed anymore. The fix in autoload
-procedure has been provided with NVM 3.80 version.
-
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+Co-developed-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
 Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 23 ---------------------
- 1 file changed, 23 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_common.c  |  2 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c  | 20 ++++++++++----------
+ drivers/net/ethernet/intel/ice/ice_sbq_cmd.h | 11 ++++-------
+ 3 files changed, 15 insertions(+), 18 deletions(-)
 
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index edb1d0f7e187..8f0c72df2a44 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -3434,7 +3434,7 @@ int ice_aq_get_fec_stats(struct ice_hw *hw, u16 pcs_quad, u16 pcs_port,
+ 	msg.msg_addr_low = lower_16_bits(reg_offset);
+ 	msg.msg_addr_high = receiver_id;
+ 	msg.opcode = ice_sbq_msg_rd;
+-	msg.dest_dev = rmn_0;
++	msg.dest_dev = ice_sbq_dev_phy_0;
+ 
+ 	err = ice_sbq_rw_reg(hw, &msg, flag);
+ 	if (err)
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 89bb8461284a..a5df081ffc19 100644
+index a5df081ffc19..eb1893dd8979 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -2630,25 +2630,6 @@ int ice_start_phy_timer_eth56g(struct ice_hw *hw, u8 port)
- 	return 0;
- }
- 
--/**
-- * ice_sb_access_ena_eth56g - Enable SB devices (PHY and others) access
-- * @hw: pointer to HW struct
-- * @enable: Enable or disable access
-- *
-- * Enable sideband devices (PHY and others) access.
-- */
--static void ice_sb_access_ena_eth56g(struct ice_hw *hw, bool enable)
--{
--	u32 val = rd32(hw, PF_SB_REM_DEV_CTL);
--
--	if (enable)
--		val |= BIT(eth56g_phy_0) | BIT(cgu) | BIT(eth56g_phy_1);
--	else
--		val &= ~(BIT(eth56g_phy_0) | BIT(cgu) | BIT(eth56g_phy_1));
--
--	wr32(hw, PF_SB_REM_DEV_CTL, val);
--}
--
- /**
-  * ice_ptp_init_phc_e825 - Perform E825 specific PHC initialization
-  * @hw: pointer to HW struct
-@@ -2659,8 +2640,6 @@ static void ice_sb_access_ena_eth56g(struct ice_hw *hw, bool enable)
-  */
- static int ice_ptp_init_phc_e825(struct ice_hw *hw)
+@@ -240,7 +240,7 @@ static int ice_read_cgu_reg_e82x(struct ice_hw *hw, u32 addr, u32 *val)
  {
--	ice_sb_access_ena_eth56g(hw, true);
--
- 	/* Initialize the Clock Generation Unit */
- 	return ice_init_cgu_e82x(hw);
- }
-@@ -2747,8 +2726,6 @@ static void ice_ptp_init_phy_e825(struct ice_hw *hw)
- 	params->num_phys = 2;
- 	ptp->ports_per_phy = 4;
- 	ptp->num_lports = params->num_phys * ptp->ports_per_phy;
--
--	ice_sb_access_ena_eth56g(hw, true);
+ 	struct ice_sbq_msg_input cgu_msg = {
+ 		.opcode = ice_sbq_msg_rd,
+-		.dest_dev = cgu,
++		.dest_dev = ice_sbq_dev_cgu,
+ 		.msg_addr_low = addr
+ 	};
+ 	int err;
+@@ -272,7 +272,7 @@ static int ice_write_cgu_reg_e82x(struct ice_hw *hw, u32 addr, u32 val)
+ {
+ 	struct ice_sbq_msg_input cgu_msg = {
+ 		.opcode = ice_sbq_msg_wr,
+-		.dest_dev = cgu,
++		.dest_dev = ice_sbq_dev_cgu,
+ 		.msg_addr_low = addr,
+ 		.data = val
+ 	};
+@@ -919,16 +919,16 @@ static void ice_ptp_cfg_sync_delay(const struct ice_hw *hw, u32 delay)
+  *
+  * Return: destination sideband queue PHY device.
+  */
+-static enum ice_sbq_msg_dev ice_ptp_get_dest_dev_e825(struct ice_hw *hw,
+-						      u8 port)
++static enum ice_sbq_dev_id ice_ptp_get_dest_dev_e825(struct ice_hw *hw,
++						     u8 port)
+ {
+ 	/* On a single complex E825, PHY 0 is always destination device phy_0
+ 	 * and PHY 1 is phy_0_peer.
+ 	 */
+ 	if (port >= hw->ptp.ports_per_phy)
+-		return eth56g_phy_1;
++		return ice_sbq_dev_phy_0_peer;
+ 	else
+-		return eth56g_phy_0;
++		return ice_sbq_dev_phy_0;
  }
  
- /* E822 family functions
+ /**
+@@ -2758,7 +2758,7 @@ static void ice_fill_phy_msg_e82x(struct ice_hw *hw,
+ 		msg->msg_addr_high = P_Q1_H(P_4_BASE + offset, phy_port);
+ 	}
+ 
+-	msg->dest_dev = rmn_0;
++	msg->dest_dev = ice_sbq_dev_phy_0;
+ }
+ 
+ /**
+@@ -3081,7 +3081,7 @@ static int ice_fill_quad_msg_e82x(struct ice_hw *hw,
+ 	if (quad >= ICE_GET_QUAD_NUM(hw->ptp.num_lports))
+ 		return -EINVAL;
+ 
+-	msg->dest_dev = rmn_0;
++	msg->dest_dev = ice_sbq_dev_phy_0;
+ 
+ 	if (!(quad % ICE_GET_QUAD_NUM(hw->ptp.ports_per_phy)))
+ 		addr = Q_0_BASE + offset;
+@@ -4800,7 +4800,7 @@ static int ice_read_phy_reg_e810(struct ice_hw *hw, u32 addr, u32 *val)
+ 	msg.msg_addr_low = lower_16_bits(addr);
+ 	msg.msg_addr_high = upper_16_bits(addr);
+ 	msg.opcode = ice_sbq_msg_rd;
+-	msg.dest_dev = rmn_0;
++	msg.dest_dev = ice_sbq_dev_phy_0;
+ 
+ 	err = ice_sbq_rw_reg(hw, &msg, ICE_AQ_FLAG_RD);
+ 	if (err) {
+@@ -4830,7 +4830,7 @@ static int ice_write_phy_reg_e810(struct ice_hw *hw, u32 addr, u32 val)
+ 	msg.msg_addr_low = lower_16_bits(addr);
+ 	msg.msg_addr_high = upper_16_bits(addr);
+ 	msg.opcode = ice_sbq_msg_wr;
+-	msg.dest_dev = rmn_0;
++	msg.dest_dev = ice_sbq_dev_phy_0;
+ 	msg.data = val;
+ 
+ 	err = ice_sbq_rw_reg(hw, &msg, ICE_AQ_FLAG_RD);
+diff --git a/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h b/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
+index 3b0054faf70c..183dd5457d6a 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
++++ b/drivers/net/ethernet/intel/ice/ice_sbq_cmd.h
+@@ -46,13 +46,10 @@ struct ice_sbq_evt_desc {
+ 	u8 data[24];
+ };
+ 
+-enum ice_sbq_msg_dev {
+-	eth56g_phy_0	= 0x02,
+-	rmn_0		= 0x02,
+-	rmn_1		= 0x03,
+-	rmn_2		= 0x04,
+-	cgu		= 0x06,
+-	eth56g_phy_1	= 0x0D,
++enum ice_sbq_dev_id {
++	ice_sbq_dev_phy_0	= 0x02,
++	ice_sbq_dev_cgu		= 0x06,
++	ice_sbq_dev_phy_0_peer	= 0x0D,
+ };
+ 
+ enum ice_sbq_msg_opcode {
 -- 
 2.39.3
 
