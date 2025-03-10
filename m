@@ -1,126 +1,142 @@
-Return-Path: <netdev+bounces-173486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 146D8A592A4
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:21:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E846BA592BB
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:27:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52CDF16BF1F
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 11:21:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79F047A2F1F
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 11:26:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 584A321D5BB;
-	Mon, 10 Mar 2025 11:21:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C31BE21E087;
+	Mon, 10 Mar 2025 11:27:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="bVSCJuES"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KtkeaGIW"
 X-Original-To: netdev@vger.kernel.org
-Received: from nbd.name (nbd.name [46.4.11.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28B17192580;
-	Mon, 10 Mar 2025 11:21:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9501828EA;
+	Mon, 10 Mar 2025 11:27:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741605700; cv=none; b=FWcnZ9Y76KdoAN2IMzAUEtYlSgLNTZYzB47/dkw1qD77FYkO875i7TaSJbDdq64yYZInNYuZCorw3P16f1cAoMTYaBpgcXU4nLGEthZ8eZLe4d34IAFKIQac9qi6wkJM5Qh5zxt5jnkTrZQV1PU7L1Dnr2kyujHwOj1hQ1YUcOw=
+	t=1741606028; cv=none; b=XjF4QtIr+iWlF0iZYEFPMKZ0POTKcucGk991N3/9WWzpFIfIlyD39g2D7S9ExY5nO3M304JeR8rszX6VwNwQNsJDirKoQqr7OZwZeW23athXV7zYZLfN01Q/4L6kcYJwfATxNxechK14t4gR/YyA9SAUIy/BiMRBG71K3Uy+QEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741605700; c=relaxed/simple;
-	bh=bE8tMZAyDMevNCLzxK3lkI0jlkL810w8iRNQz71VWKY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EYOUSmgug0F5WsXqvkvTRhdeq1taTx/OVGzJY+ihGxHcxl4QRphPwI434ovIon7tkyQ4IByv1gvccTrlHh+fSU2hZKM8iWYIhSKTkcLZHzeEhDTeQOFt7R9gOVfZZJLkzG6CI6ar0CTa/rwzDpQPjNDZDOyvuKsZ5RmvUwFx+GI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=bVSCJuES; arc=none smtp.client-ip=46.4.11.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
-	s=20160729; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
-	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=M4FrvF1IcMf9Ag+QFJ2jji+690UfAG0H/9opoj+3sck=; b=bVSCJuES+Sp+HD36dCCRDCPheC
-	YF5G/7s0EqI5MgfKT+CNJ24oL9c85/CB5KB314yk3jvKZjViqKfXp0SgTHgEnyAHwgYYA2nrk0jt8
-	50t2zOH3ZImngl7zl29W8egsWlpCJrIwRFaFNo4+jPT9w2zLa72jUqScRRuNNXKN+frk=;
-Received: from p5b206ef1.dip0.t-ipconnect.de ([91.32.110.241] helo=Maecks.lan)
-	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
-	(Exim 4.96)
-	(envelope-from <nbd@nbd.name>)
-	id 1trbCD-00FdkE-2c;
-	Mon, 10 Mar 2025 12:21:21 +0100
-From: Felix Fietkau <nbd@nbd.name>
-To: netdev@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Willem de Bruijn <willemb@google.com>
-Cc: linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] net: ipv6: fix TCP GSO segmentation with NAT
-Date: Mon, 10 Mar 2025 12:21:20 +0100
-Message-ID: <20250310112121.73654-1-nbd@nbd.name>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1741606028; c=relaxed/simple;
+	bh=/MIwqVro98Ug0D/cRSeHQdD3SSd19RiNWyeW/pyUMfw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s7UgSO0Nu55GIF910iNmMUqaVAh8aUxvARtqU0ofAHJ14a033kY9s/WnZEpK/E2SEH41Xu9a6uuPbQPBIlyUYHokTRcqMCNPQDFl2B4np2i/19pd82K5E28rBmXfjqA/Dj+b82uPtQJk5U6NZkkT1m+QEnx3YhwWdKfEfZLBPV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KtkeaGIW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E8DBC4CEE5;
+	Mon, 10 Mar 2025 11:27:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741606028;
+	bh=/MIwqVro98Ug0D/cRSeHQdD3SSd19RiNWyeW/pyUMfw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KtkeaGIWdUq0zj1BatSHwEJMFaxUh+Th0MCcd/ugd4zMackZUMfik5WTje6eojSuV
+	 B1RV+m9yUJiH6ey/OBHpH14oiFpJxFs4wNGtDJjz/25nCXIXIqVpBg5J02/fU74xu5
+	 6gvbY+o+ZHEexqZNZmK+yt+Gk6OgEB1/8SQpJwNbCBozfgHhQjLfM+1cC1eosRZWbB
+	 wk0krFs2Uz6/nmwR73Z/vUxBKKBN7g9m970HlguhGNuVpTNWpfau1a9uO/sdz9zydv
+	 +qSs7xxX5x1TTQ7Qz6epGCebv4GrIpX0AGxF6RgqwmNFapb5y2/oRZTKw0CR3ndF/z
+	 9SD+Uw4UEw9+g==
+Date: Mon, 10 Mar 2025 12:27:00 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Cc: kuniyu@amazon.com, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, cgroups@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
+	Leon Romanovsky <leon@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Lennart Poettering <mzxreary@0pointer.de>, Luca Boccassi <bluca@debian.org>, Tejun Heo <tj@kernel.org>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
+	Shuah Khan <shuah@kernel.org>
+Subject: Re: [PATCH net-next 0/4] Add getsockopt(SO_PEERCGROUPID) and fdinfo
+ API to retreive socket's peer cgroup id
+Message-ID: <20250310-hinzog-unzweifelhaft-9105447ec12d@brauner>
+References: <20250309132821.103046-1-aleksandr.mikhalitsyn@canonical.com>
+ <20250310-ausdruck-virusinfektion-1b0d467b812c@brauner>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250310-ausdruck-virusinfektion-1b0d467b812c@brauner>
 
-When updating the source/destination address, the TCP/UDP checksum needs to
-be updated as well.
+On Mon, Mar 10, 2025 at 09:52:31AM +0100, Christian Brauner wrote:
+> On Sun, Mar 09, 2025 at 02:28:11PM +0100, Alexander Mikhalitsyn wrote:
+> > 1. Add socket cgroup id and socket's peer cgroup id in socket's fdinfo
+> > 2. Add SO_PEERCGROUPID which allows to retrieve socket's peer cgroup id
+> > 3. Add SO_PEERCGROUPID kselftest
+> > 
+> > Generally speaking, this API allows race-free resolution of socket's peer cgroup id.
+> > Currently, to do that SCM_CREDENTIALS/SCM_PIDFD -> pid -> /proc/<pid>/cgroup sequence
+> > is used which is racy.
+> > 
+> > As we don't add any new state to the socket itself there is no potential locking issues
+> > or performance problems. We use already existing sk->sk_cgrp_data.
+> > 
+> > We already have analogical interfaces to retrieve this
+> > information:
+> > - inet_diag: INET_DIAG_CGROUP_ID
+> > - eBPF: bpf_sk_cgroup_id
+> > 
+> > Having getsockopt() interface makes sense for many applications, because using eBPF is
+> > not always an option, while inet_diag has obvious complexety and performance drawbacks
+> > if we only want to get this specific info for one specific socket.
+> > 
+> > Idea comes from UAPI kernel group:
+> > https://uapi-group.org/kernel-features/
+> > 
+> > Huge thanks to Christian Brauner, Lennart Poettering and Luca Boccassi for proposing
+> > and exchanging ideas about this.
+> 
+> Seems fine to me,
+> Reviewed-by: Christian Brauner <brauner@kernel.org>
 
-Fixes: bee88cd5bd83 ("net: add support for segmenting TCP fraglist GSO packets")
-Signed-off-by: Felix Fietkau <nbd@nbd.name>
----
-v2: move code to make it similar to __tcpv4_gso_segment_list_csum
+One wider conceptual comment.
 
- net/ipv6/tcpv6_offload.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+Starting with v6.15 it is possible to retrieve exit information from
+pidfds even after the task has been reaped. So if someone opens a pidfd
+via pidfd_open() and that task gets reaped by the parent it is possible
+to call PIDFD_INFO_EXIT and you can retrieve the exit status and the
+cgroupid of the task that was reaped. That works even after all task
+linkage has been removed from struct pid.
 
-diff --git a/net/ipv6/tcpv6_offload.c b/net/ipv6/tcpv6_offload.c
-index a45bf17cb2a1..34dd0cee3ba6 100644
---- a/net/ipv6/tcpv6_offload.c
-+++ b/net/ipv6/tcpv6_offload.c
-@@ -94,10 +94,20 @@ INDIRECT_CALLABLE_SCOPE int tcp6_gro_complete(struct sk_buff *skb, int thoff)
- }
- 
- static void __tcpv6_gso_segment_csum(struct sk_buff *seg,
-+				     struct in6_addr *oldip,
-+				     const struct in6_addr *newip,
- 				     __be16 *oldport, __be16 newport)
- {
- 	struct tcphdr *th;
- 
-+	if (!ipv6_addr_equal(oldip, newip)) {
-+		inet_proto_csum_replace16(&th->check, seg,
-+					  oldip->s6_addr32,
-+					  newip->s6_addr32,
-+					  true);
-+		*oldip = *newip;
-+	}
-+
- 	if (*oldport == newport)
- 		return;
- 
-@@ -129,10 +139,10 @@ static struct sk_buff *__tcpv6_gso_segment_list_csum(struct sk_buff *segs)
- 		th2 = tcp_hdr(seg);
- 		iph2 = ipv6_hdr(seg);
- 
--		iph2->saddr = iph->saddr;
--		iph2->daddr = iph->daddr;
--		__tcpv6_gso_segment_csum(seg, &th2->source, th->source);
--		__tcpv6_gso_segment_csum(seg, &th2->dest, th->dest);
-+		__tcpv6_gso_segment_csum(seg, &iph2->saddr, &iph->saddr,
-+					 &th2->source, th->source);
-+		__tcpv6_gso_segment_csum(seg, &iph2->daddr, &iph->daddr,
-+					 &th2->dest, th->dest);
- 	}
- 
- 	return segs;
--- 
-2.47.1
+The system call api doesn't allow the creation of pidfds for reaped
+processes. It wouldn't be possible as the pid number will have already
+been released.
 
+Both SO_PEERPIDFD and SO_PASSPIDFD also don't allow the creation of
+pidfds for already reaped peers or senders.
+
+But that doesn't have to be the case since we always have the struct pid
+available. So it's entirely possible to hand out a pidfd to a reaped
+process if it's guaranteed that exit information is available. If it's
+not then this would be a bug.
+
+The trick is that when a struct pid is stashed it needs to also allocate
+a pidfd inode. That could simply be done by a helper get_pidfs_pid()
+which takes a reference to the struct pid and ensures that space for
+recording exit information is available.
+
+With that done SO_PEERCGROUPID isn't needed per se as it will be
+possible to get the cgroupid and exit status from the pidfd.
+
+From a cursory look that should be possible to do without too much work.
+I'm just pointing this out as an alternative.
+
+There's one restriction that this would be subject to that
+SO_PEERCGROUPID isn't. The SO_PEERCGROUPID is exposed for any process
+whereas PIDFD_GET_INFO ioctls (that includes the PIDFD_INFO_EXIT) option
+is only available for processes within the receivers pid namespace
+hierarchy.
+
+But in any case, enabling pidfds for such reaped processes might still
+be useful since it would mean receivers could get exit information for
+pidfds within their pid namespace hierarchy.
 
