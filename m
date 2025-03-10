@@ -1,86 +1,98 @@
-Return-Path: <netdev+bounces-173448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09136A58E85
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 09:47:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C9F3A58E9A
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 09:52:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAEE33AA785
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 08:47:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12AA1188F3BA
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 08:52:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1505224238;
-	Mon, 10 Mar 2025 08:47:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C91922423A;
+	Mon, 10 Mar 2025 08:52:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CrMMhx6I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jtf3K/bD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91876221F13;
-	Mon, 10 Mar 2025 08:47:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4AB82206B7;
+	Mon, 10 Mar 2025 08:52:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741596457; cv=none; b=aFRxctyTD1yL3erqmai2EJauG92PBriljVWTs/0mZXekZjCs10cjbQYHHW2kBGzN/BEIavVoRGipgKOpdtEEOWWL05vwwSW7EAdvrvO5H2Q/IZSmVUSCIn5LvT7XRW86q3MLvWFLX0kCvq8mg8zXbOJVx2oLBTG1zauv4C6qhaM=
+	t=1741596753; cv=none; b=OLRGlWmF3KVOnf5JgABctZDWGQESEH/qaLO3fTOGf2inL9wZ7TTqqD15fBBzUzdlvOXSie7tP/VH2PNZ9tUs5s4AlyS3IFSHg+P1dOt6JKEBwouQ1sGqqHwJQ//AbcC8Lfzd2b1qNkSsdMcPwEdogYWGBpI0ciCTqzGadqculNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741596457; c=relaxed/simple;
-	bh=LbhKqE9ARKxh5Om8xA8bVJLhSQJDq+eo4FUOXoer76Y=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=TgxV+ulNNIq5eF8ts++ZWvP+sOPtVODCFdXfGVakpZxtUUnmI+msPcWh+IOIlcmDhgecY/x1ZwHFjYscIL4P9ru5VQ74BLVQ8ujMysU8ld4P9u2F00JJ53gQR86Ql/+hWV6AoGN+X4vLYpsaOaKdcb+hiUncUUyRTrVTJkvOmjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CrMMhx6I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77E7FC4CEE5;
-	Mon, 10 Mar 2025 08:47:36 +0000 (UTC)
+	s=arc-20240116; t=1741596753; c=relaxed/simple;
+	bh=Mdk+LfaZKzSC91++o4gVAnoOZq6MJx1kOhdc2+tKXFk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nzEoseR0n27IY7ya8197titUambaBlI/upB7EtEsf4wGteLXrhvpfdLicvhzW/JkhJ2MT93jQasi95m8sLfE+E/ndYjhQjhmbsQz5Tpq3w0xNHAlKY+CkKvFYUxmtZlol/1o2TYfquAG9soteMO9tGfGVjP+2XMh6xB3Vy4rBlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jtf3K/bD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BAB2C4CEE5;
+	Mon, 10 Mar 2025 08:52:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741596457;
-	bh=LbhKqE9ARKxh5Om8xA8bVJLhSQJDq+eo4FUOXoer76Y=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=CrMMhx6IQoxI3nez2E7ZpKbWicXf/UbZ7Pk6EE63+zgZoOb4Ss9Eza95FjqbVoPJp
-	 5mTk6/Yra6xbJK86/DP1KAQUHi+s98bZlJjniKw+0ZuxDJ9ko+DsY+Z3IE1ZVZlgLe
-	 66W9vCxB3ylExfEPG5uIKS7cqGosmqqMPZkLu6Eb/bQItPBsYeAuQq2eB7u7+3iRK7
-	 ehwPCAygY2+Rj4JdUAOqy398XkvTjDYvTbTtLj1tj+uiP7MTTLTtGNS0PDAbotplM8
-	 5bLm+OJ0psm9TpGS2Sq+EQKGqubUJ+xYe6JpSUyHaftidePr8mV5OrjWubQ4AQzQ9C
-	 +WhzWtYP0nPgg==
-From: Leon Romanovsky <leon@kernel.org>
-To: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
-Cc: Gal Pressman <gal@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
- Moshe Shemesh <moshe@nvidia.com>, linux-rdma@vger.kernel.org, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, Cosmin Ratiu <cratiu@nvidia.com>, 
- Yael Chemla <ychemla@nvidia.com>, Leon Romanovsky <leon@kernel.org>
-In-Reply-To: <1741545697-23041-1-git-send-email-tariqt@nvidia.com>
-References: <1741545697-23041-1-git-send-email-tariqt@nvidia.com>
-Subject: Re: [PATCH mlx5-next] net/mlx5: Add IFC bits for PPCNT recovery
- counters group
-Message-Id: <174159645340.444856.147815401586670383.b4-ty@kernel.org>
-Date: Mon, 10 Mar 2025 04:47:33 -0400
+	s=k20201202; t=1741596751;
+	bh=Mdk+LfaZKzSC91++o4gVAnoOZq6MJx1kOhdc2+tKXFk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Jtf3K/bDisJx8+XKAMVgzC52CtUKxkb+9nHEGHASI+wnvIU0ZAxJ3dLYHo3DgWQKi
+	 H3qErqiAu5LpK8LHTJCUZvX2VzhfeDgcBUb/XBPEqivxHMgxHxliQQcicVf6JwG3CZ
+	 OSCMtSP5tJK0uL8X+jxSkJ5BlOUDoFnYedhYUCs59xQAV+u15eebqwu81GtK7aNog3
+	 T6Hyo5O1EUwRQ4I4iF/Uyj7qss3kIY1aI4EWltEhGPmkJKifk5MpoPnrnHZ/boYXfH
+	 qeO5B6INwTMBcVrOwVjGNHTjFa846wr4J+JdaMMWcxpEPTOwJLiq7i0FR37U8fgICi
+	 MkhX8J+qO2+mQ==
+Date: Mon, 10 Mar 2025 09:52:24 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Cc: kuniyu@amazon.com, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, cgroups@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
+	Leon Romanovsky <leon@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Lennart Poettering <mzxreary@0pointer.de>, Luca Boccassi <bluca@debian.org>, Tejun Heo <tj@kernel.org>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>, 
+	Shuah Khan <shuah@kernel.org>
+Subject: Re: [PATCH net-next 0/4] Add getsockopt(SO_PEERCGROUPID) and fdinfo
+ API to retreive socket's peer cgroup id
+Message-ID: <20250310-ausdruck-virusinfektion-1b0d467b812c@brauner>
+References: <20250309132821.103046-1-aleksandr.mikhalitsyn@canonical.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15-dev-37811
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250309132821.103046-1-aleksandr.mikhalitsyn@canonical.com>
 
-
-On Sun, 09 Mar 2025 20:41:37 +0200, Tariq Toukan wrote:
-> Add recovery counters group layout of PPCNT (Ports Performance Counters
-> Register). This group counts recovery events per link. Also add the
-> corresponding bit in PCAM to indicate this group is supported.
+On Sun, Mar 09, 2025 at 02:28:11PM +0100, Alexander Mikhalitsyn wrote:
+> 1. Add socket cgroup id and socket's peer cgroup id in socket's fdinfo
+> 2. Add SO_PEERCGROUPID which allows to retrieve socket's peer cgroup id
+> 3. Add SO_PEERCGROUPID kselftest
 > 
+> Generally speaking, this API allows race-free resolution of socket's peer cgroup id.
+> Currently, to do that SCM_CREDENTIALS/SCM_PIDFD -> pid -> /proc/<pid>/cgroup sequence
+> is used which is racy.
 > 
+> As we don't add any new state to the socket itself there is no potential locking issues
+> or performance problems. We use already existing sk->sk_cgrp_data.
+> 
+> We already have analogical interfaces to retrieve this
+> information:
+> - inet_diag: INET_DIAG_CGROUP_ID
+> - eBPF: bpf_sk_cgroup_id
+> 
+> Having getsockopt() interface makes sense for many applications, because using eBPF is
+> not always an option, while inet_diag has obvious complexety and performance drawbacks
+> if we only want to get this specific info for one specific socket.
+> 
+> Idea comes from UAPI kernel group:
+> https://uapi-group.org/kernel-features/
+> 
+> Huge thanks to Christian Brauner, Lennart Poettering and Luca Boccassi for proposing
+> and exchanging ideas about this.
 
-Applied, thanks!
-
-[1/1] net/mlx5: Add IFC bits for PPCNT recovery counters group
-      https://git.kernel.org/rdma/rdma/c/f550694e88b7b1
-
-Best regards,
--- 
-Leon Romanovsky <leon@kernel.org>
-
+Seems fine to me,
+Reviewed-by: Christian Brauner <brauner@kernel.org>
 
