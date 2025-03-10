@@ -1,188 +1,198 @@
-Return-Path: <netdev+bounces-173429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BFE7A58C69
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 08:02:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B05AA58C6F
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 08:05:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB71616825C
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 07:02:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFBF63A899B
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 07:04:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83C951CD210;
-	Mon, 10 Mar 2025 07:02:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F8101D5AD9;
+	Mon, 10 Mar 2025 07:04:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ruFHXJzs"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="QZRBYT7/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D16291C6FEE
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 07:02:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3238E1D47C3
+	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 07:04:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741590171; cv=none; b=k3t6Wn725ubOHJ2VWnAPUTdZk1gZC0ddbQ9Odc5cFh0eLqDxVpa+OwQ6Wnrb73srP7kdBo6R4GWRM8RNaYEOCBy11K2ssLWqAvUXM11mYuEdiMlzNjPwtmYQd8julEYgD9Pfe/cX/xxMx9h+jt1WSPsvAytPxOsO65yt3TfW4Fw=
+	t=1741590291; cv=none; b=O1ux5AcuokvXiyjlkDET1RBQKEIEIcJ7xM+V60Xm7ftd6cGZOjLqtlzrEOj2ZCdjeLoI3TdhY+iB7JvtDU9UX01vdk5FT7KK5PywggLK64DvOIfvHF6gz5bdjZ4SqChboD8/uCMV0WQm30ReSPIx9XWsAT+aMat2I5cgN3YC7jw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741590171; c=relaxed/simple;
-	bh=wsGKS3Fr04RmYigMGjKeDJiiOm55ccB7rp5ESNSHMtc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mlkCkTT5OZaDcLle7+QNWUuHKv0N0vxatjzQxlTNpcT1U7Cp23RsQQd2EJkLA2Hgmdoa2iSd/cIvXJ8HwNkUy4lsxZzNc3DQLG3CmBQQYHUurOP1x8sRZsPNkrRaFhUK2qYXrlNlXcY71giuFpXXW6dIoIXqNk+07iYRtXb0kJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ruFHXJzs; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-47520132245so29599991cf.2
-        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 00:02:49 -0700 (PDT)
+	s=arc-20240116; t=1741590291; c=relaxed/simple;
+	bh=eSw/Sz1ql/4UPcLEbJRVUH0uYPxF2xmC0A18fnAZuI4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cphCv3Bp2hr3jc5G/KH6VNrkMQ/yi9TflgBCKgCnJyxyz39Cp4yvVI92Gz2AhnIOZ3yZloD/SV9EIs0PTlLYbzyDU5trWM0mNUaFLHR0UCcWTBSZbzbnixfoXoIP2Xd016BR+fQ+3JK5VJfVTlIyufoBldj4RtqRY+drdIYBtLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=QZRBYT7/; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-223378e2b0dso53795815ad.0
+        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 00:04:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741590168; x=1742194968; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=giaMGz9fAIj0nasLN8wHzPqrCDCPt7HgRY0B2DvcrSk=;
-        b=ruFHXJzsT5HXvr6DjFMz4vBE/tmTjjkt1T8Y+orNYf1Tw4LlQ/LFx1ggw11a3ITekl
-         P6E94Jm6EbL/DBsk7hcc05rqdXoTmZSqXA3kQKElXiGQ5OvB8HMz49MavYu7J8aYk8dJ
-         OS4GgB7Lqc2ehM/RNHzSU/u0q4UI+g8tUii6CTFZ/MJD7yBoyY8zKsPEUmRuipDoNN33
-         8CNS207ATEmk81X+5rpkVrwJy9vV6sJAwxC/bXznI9p26T28B43gQKOPRR93YVT8u+5f
-         MAclLUsmrHFHcx6y2qm3o0jqSQFot6eQ7J8YE2o7kN3zGM+HYDB2JVZUNw7AkrF/j60y
-         gDcw==
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1741590288; x=1742195088; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Z4zUjmNxjokxBeO8EjZH90AMO+cgLdiVs95Lgo++StE=;
+        b=QZRBYT7/pUx1N5WjjIh58q+/IinjLV3aq0UR9zGCTNxVna0gfBnE9gUO8W4GuVM9KA
+         aXu0TGNLBTvShFK8ky5kFa+mBCVnbzcSPm6vG9pdeZNO3EyOZ4DBu0fksbpXqnIhuwNL
+         xEsrLyqVKi+jnkBwXgx5FsdLc7LEKJkinZtQGEHh9kZd3bkFzQI+gKlwnuQEg5BQkvkX
+         HxCDTgg0yUZJOLlF8ic1Bi2VoU4YMXRfO9wYbI5HdOdHcSk6mPFQ+UqIAtysplhtjrP8
+         XVw77g1RD0BBt3zcQosaTS1XIvITQ01qguj0TkwT+IoPolx2Hr1pDl6gbOH9qtQMrkr2
+         DbLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741590168; x=1742194968;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=giaMGz9fAIj0nasLN8wHzPqrCDCPt7HgRY0B2DvcrSk=;
-        b=oI2Xn+t5ElkAy65cjn0tlml/Y2ldJ3/8fsLNmictrOxvxEiOf0SJ4JzISgadUtvVcy
-         aHr575RcKTtrhSVB5YejZPiIva31KPYartSeLfghjy0lEcd12i32LvtNM2JKj+i4k3l2
-         m53u7UaEvnzjobEZn+tjZ+EQ5NqhN+eVgzYse0QKP3peiHXvWBExW8oWZJ50DHE3+LOf
-         rK6Ga0+ZIrQZzHxe8QKu9HNFCrM3medIV3MqZYuBPqGkchjJXXlb2J4aGfRl5fU8LNk0
-         gAUn9PX3LT2RaZZUgNSS0VPa0JLDvAvjaasTR+h+PDVvMa/QJzLAXkBEIz7nPh0e0vNv
-         GuUw==
-X-Forwarded-Encrypted: i=1; AJvYcCXNzfFuaoXWEATz8w7NRNyVDlgCF1QHZQaAQGMWsolSNeFvpWYNyJD/ud26vOI3Q2GBoO7uN5Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPb+JQVHOYkTYZf32H2vP/2ZHdw6zSxAboWlglmA4yIcK3Osp/
-	lTPleOROmm3KOeNQNb5ym2ruSuFTfzYdsXOeaeC2W5k57lW6L7W1B86hcGGtS7jlwBrrzq05Pzu
-	rY2F1OsXBKflDpVCGZXAoeUY9WoZ29t77GwDu
-X-Gm-Gg: ASbGnctefOWg1UwGwSdy6k4We2hA1VxarY5+9gUTlj/sDmlbPpbj6xNwNF3QmOhuYOP
-	NPNMFt9qdaY28dtIfj9wmap6Ljl5O1z9j8cZbQq5bMnWN1j7zomNHsFWzCPk8PD7X3PJDfZGO06
-	IdYLiANFIWn+Hdhdz43bTwqYTi2Q==
-X-Google-Smtp-Source: AGHT+IFJOd4jBZTcTRTsGIyLvZXhWoVoSmhput8s2vumSWXEKK7hiyNdtl8nnfloxJ2B+Mtj2MRYgs2139AIqVtLxA8=
-X-Received: by 2002:ac8:5f0f:0:b0:475:9b5:131d with SMTP id
- d75a77b69052e-4761097f7bamr167257151cf.12.1741590168320; Mon, 10 Mar 2025
- 00:02:48 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1741590288; x=1742195088;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z4zUjmNxjokxBeO8EjZH90AMO+cgLdiVs95Lgo++StE=;
+        b=GGpSKTikimG+CS8Zaeq9vpGGIrad8e2zc7+uvgvcmH00//1234Gdhrl0km/C1z5WfV
+         y/0y4SKecdQDvOpcbydtAJF2l+l+8Z6lpxadBZgyRCgh/HhyImbphdPGuZQK/BT5dlLO
+         bhNXJwYEiAZsxJdLqlNbZSQno6P6Cv5oPReNrF+/GSCyXhlKP8DSTasUUTKzpB666Hbw
+         N72naj0mQtBJFE66CEqTqd+XoamQm5WdPhPUa0FMkPPbn1JQER0A2D3s9R9z6ffXuHsU
+         e/1pEUKiNCmQkoVZkbcuiumO87zXcSs0K+rGKO6YbtL38iqkw8in7ysJ7B8mtWQGv/3s
+         7OpA==
+X-Forwarded-Encrypted: i=1; AJvYcCWR1PCRP15Y0b7AsBWrZ9Sgivabm6dKULepxOgLCA1BtqghTucF4/r9vtzTUJ7HWyOPlBgkmsI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAu95v2dUQH5/qQgQH/UoGERN2xNXaZjxWTTEZG5egLsiCaGbv
+	k8jwwnVyai+Caoekg3tUBvewqDFgtYY4wiTWuAHpfOU18FS1m9A/iHVtn0B5IPM=
+X-Gm-Gg: ASbGncvvy91FQiYHTlitxyV/yZNHa+SnevfFdLWlSEiXqWDV9vk9AHMXRNHjFGQ0pvM
+	GVHe/ksbUB7R0G6mE8Xi7qgx0+x0pk80TsHesPwI1mEvBoZODpfomR1VOtbYj4PIbd/xMRXBxrr
+	ez6q/S1U+R+wwX2rF5g6AWm0BqAMfnRM/1K3X0vq8op+qtEtrPA7ar3lYNj8wTkZrEwdl+kGXAD
+	5KtI0j8gc4s/TWfr3QwUKeLB7xj2uc+cLRIXdkBqs3o70D2EcLa2VukUjSQwtC0i73M+/t2wpzk
+	j0qyhghQKfd4oV/w5Mm+iGIWb2rW6CkAI4F/dEX9J8FeYwwCzZA1vfbemw==
+X-Google-Smtp-Source: AGHT+IFkDjhIOqYcqagzT94jgytjjwhSIQTT2o6zqPzPIQtmCm+lioqyAyJhjHPUINzm2ba//BDswA==
+X-Received: by 2002:a17:902:ea07:b0:224:a79:5fe4 with SMTP id d9443c01a7336-2242888681cmr196310675ad.2.1741590288383;
+        Mon, 10 Mar 2025 00:04:48 -0700 (PDT)
+Received: from [157.82.205.237] ([157.82.205.237])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22410a7f93esm70081685ad.142.2025.03.10.00.04.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Mar 2025 00:04:48 -0700 (PDT)
+Message-ID: <2e550452-a716-4c3f-9d5a-3882d2c9912a@daynix.com>
+Date: Mon, 10 Mar 2025 16:04:43 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <FC9BF302-0724-49F3-AD7C-6761D65024A1@Easton24.com>
-In-Reply-To: <FC9BF302-0724-49F3-AD7C-6761D65024A1@Easton24.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 10 Mar 2025 08:02:37 +0100
-X-Gm-Features: AQ5f1JrN8ZxP41V31M-8yqG6yQvKxQyjZqOPrl6XDCknts7GjzyDXy8V9AM6iwg
-Message-ID: <CANn89iL1gca+f=3pJaNqnVk6yRd7q+8g-33NhfXbCzp9TLGLUw@mail.gmail.com>
-Subject: Re: Add sysctl for tcp_delayed_ack
-To: Andrew Easton <Andrew@easton24.com>
-Cc: "David S. Miller" <davem@davemloft.net>, "David S. Ahern" <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	"Linux Kernel Mailing List, Network Subsystem" <netdev@vger.kernel.org>, 
-	"Linux Kernel Mailing List, Sysctl API ABI" <linux-api@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 6/6] vhost/net: Support
+ VIRTIO_NET_F_HASH_REPORT
+To: Jason Wang <jasowang@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Andrew Melnychenko <andrew@daynix.com>,
+ Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
+ Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>
+References: <20250307-rss-v9-0-df76624025eb@daynix.com>
+ <20250307-rss-v9-6-df76624025eb@daynix.com>
+ <CACGkMEuccQ6ah-aZ3tcW1VRuetEoPA_NaLxLT+9fb0uAab8Agg@mail.gmail.com>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <CACGkMEuccQ6ah-aZ3tcW1VRuetEoPA_NaLxLT+9fb0uAab8Agg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 10, 2025 at 2:20=E2=80=AFAM Andrew Easton <Andrew@easton24.com>=
- wrote:
->
-> Subject: Add sysctl for tcp_delayed_ack
->
-> Hi everyone,
+On 2025/03/10 13:43, Jason Wang wrote:
+> On Fri, Mar 7, 2025 at 7:02 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>
+>> VIRTIO_NET_F_HASH_REPORT allows to report hash values calculated on the
+>> host. When VHOST_NET_F_VIRTIO_NET_HDR is employed, it will report no
+>> hash values (i.e., the hash_report member is always set to
+>> VIRTIO_NET_HASH_REPORT_NONE). Otherwise, the values reported by the
+>> underlying socket will be reported.
+>>
+>> VIRTIO_NET_F_HASH_REPORT requires VIRTIO_F_VERSION_1.
+>>
+>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+>> Tested-by: Lei Yang <leiyang@redhat.com>
+>> ---
+>>   drivers/vhost/net.c | 49 +++++++++++++++++++++++++++++--------------------
+>>   1 file changed, 29 insertions(+), 20 deletions(-)
+>>
+>> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+>> index b9b9e9d40951856d881d77ac74331d914473cd56..16b241b44f89820a42c302f3586ea6bb5e0d4289 100644
+>> --- a/drivers/vhost/net.c
+>> +++ b/drivers/vhost/net.c
+>> @@ -73,6 +73,7 @@ enum {
+>>          VHOST_NET_FEATURES = VHOST_FEATURES |
+>>                           (1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
+>>                           (1ULL << VIRTIO_NET_F_MRG_RXBUF) |
+>> +                        (1ULL << VIRTIO_NET_F_HASH_REPORT) |
+>>                           (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
+>>                           (1ULL << VIRTIO_F_RING_RESET)
+>>   };
+>> @@ -1097,9 +1098,11 @@ static void handle_rx(struct vhost_net *net)
+>>                  .msg_controllen = 0,
+>>                  .msg_flags = MSG_DONTWAIT,
+>>          };
+>> -       struct virtio_net_hdr hdr = {
+>> -               .flags = 0,
+>> -               .gso_type = VIRTIO_NET_HDR_GSO_NONE
+>> +       struct virtio_net_hdr_v1_hash hdr = {
+>> +               .hdr = {
+>> +                       .flags = 0,
+>> +                       .gso_type = VIRTIO_NET_HDR_GSO_NONE
+>> +               }
+>>          };
+>>          size_t total_len = 0;
+>>          int err, mergeable;
+>> @@ -1110,7 +1113,6 @@ static void handle_rx(struct vhost_net *net)
+>>          bool set_num_buffers;
+>>          struct socket *sock;
+>>          struct iov_iter fixup;
+>> -       __virtio16 num_buffers;
+>>          int recv_pkts = 0;
+>>
+>>          mutex_lock_nested(&vq->mutex, VHOST_NET_VQ_RX);
+>> @@ -1191,30 +1193,30 @@ static void handle_rx(struct vhost_net *net)
+>>                          vhost_discard_vq_desc(vq, headcount);
+>>                          continue;
+>>                  }
+>> +               hdr.hdr.num_buffers = cpu_to_vhost16(vq, headcount);
+>>                  /* Supply virtio_net_hdr if VHOST_NET_F_VIRTIO_NET_HDR */
+>>                  if (unlikely(vhost_hlen)) {
+>> -                       if (copy_to_iter(&hdr, sizeof(hdr),
+>> -                                        &fixup) != sizeof(hdr)) {
+>> +                       if (copy_to_iter(&hdr, vhost_hlen,
+>> +                                        &fixup) != vhost_hlen) {
+>>                                  vq_err(vq, "Unable to write vnet_hdr "
+>>                                         "at addr %p\n", vq->iov->iov_base);
+>>                                  goto out;
+> 
+> Is this an "issue" specific to RSS/HASH? If it's not, we need a separate patch.
+> 
+> Honestly, I'm not sure if it's too late to fix this.
 
-Hi Andrew
+There is nothing wrong with the current implementation. The current 
+implementation fills the header with zero except num_buffers, which it 
+fills some real value. This functionality is working fine with 
+VIRTIO_NET_F_MRG_RXBUF and VIRTIO_F_VERSION_1, which change the header size.
 
->
-> this is a proposed patch for adding a sysctl for
-> disabling TCP delayed ACK (IETF RFC 1122)  without
-> having to patch software to constantly poke sockets
-> with TCP_QUICKACK which apparently resets on
-> subsequent operations, see tcp(7).
->
-> For my personal computer networks experimenting with
-> globally disabling TCP delayed ACK across two other
-> operating systems seems to have considerably improved
-> congestion control.  (While I propose only anecdotal
-> evidence, there is more to it.  Am open to the
-> ensuing technical discussion, but only if that turns
-> out to be a good use of other people's time.)
->
-> This is my first proposed kernel patch and it is
-> likely missing a whole bunch of details.  For
-> example:
->
-> 1. Where is the TCP ACK delay computed for IPv6?
-> Could not identify this in file net/ipv6/tcp_ipv6.c .
+Now I'm adding VIRTIO_NET_F_HASH_REPORT and it adds the hash_report 
+field, which also needs to be initialized with zero, so I'm making sure 
+vhost_net will also initialize it.
 
-No need to change tcp_ipv6.c
+Regards,
+Akihiko Odaki
 
-Generating ACK is generic, thus code is in net/ipv4
+> 
+> Others look fine.
+> 
+> Thanks
+> 
 
->
-> 2. Perhaps, adding kernel configuration options for
-> the ncurses interface is desireable.  What is a good
-> example to learn from?
-
-No need. per net-ns sysctl and/or per-socket options are far better
-for this case.
-
->
-> 3. Perhaps, setting constants in file
-> include/uapi/linux/sysctl.h may be unnecessary, but I
-> have not found any guidelines on when these CTL
-> numbers are necessary.  Likely, because I did not
-> read the documentation carefully enough.  Any
-> pointers are appreciated.
-
-sysctl.h is absolutely deprecated.
-No need for NET_IPV4_TCP_DELAYED_ACK,
-No ctl_name in 'struct ctl_table'
-
->
-> 4. The default should probably be a value like
-> net.ipv4.tcp_delayed_ack=3D1 that preserves the current
-> behavior and hence is backwards compatible for user
-> space.  A value of net.ipv4.tcp_delayed_ack=3D0 should
-> globally (for IPv4) disable TCP delayed ACK.  Would
-> also like to add the option for IPv6, but see point
-> (1).
->
->
-> In case a similar sysctl has already been proposed
-> and rejected in the past, please point me to the
-> mailing list archives, if that is not too
-> inconvenient.
->
->
-> Which questions have I failed to ask that I should
-> have asked?
->
-> Errors and lack of research are on me.
->
-
-Make sure to compile/test your patch on top of net-next tree, and send
-it inline,
-not as an attachment, so that we can comment on it.
-
-Also next time add benchmark results
-like netperf -t TCP_RR (200 flows)
-of netper/tcp_rr -F 1000
-
-No delaying ACK for small RPC is essentially doubling the number of
-packets to send and receive.
-
-> Thank you for sharing your time.
->
-> Andrew
->
->
->
->
->
 
