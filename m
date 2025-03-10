@@ -1,161 +1,177 @@
-Return-Path: <netdev+bounces-173432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AC70A58C99
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 08:16:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23302A58CBB
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 08:22:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B0EB16A2B2
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 07:16:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDD563ACB51
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 07:22:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64C311CAA6F;
-	Mon, 10 Mar 2025 07:16:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1F3A1D5CC1;
+	Mon, 10 Mar 2025 07:22:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OW53oeos"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CYcBhYn5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 965261A841C
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 07:16:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A721D5AA0;
+	Mon, 10 Mar 2025 07:22:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741590971; cv=none; b=Y4hHfCRfIbPXPX0n9g+JX+X9LxV9d1Dp8OchVh9/524rSFLw+DZI9P8JVeipv+GOzDTfzpxcykvD9RuARXwnVEv0a9DldhfkMRliWq4+DyCutqpb6eq4EMDsTLl2ULtbjilOhnInrz1aqcub5feqhyzHA/59dBqW40TN2cKgEaw=
+	t=1741591354; cv=none; b=a2FgpKIPOPe1RcbILbO3pAmTfl1dn6PTgZH2bRw/N83p97aobos+i0AS2p4Z6VF/zPnWhH6wV6UYywHlztxKP8wuCF6mYAJy/e7aqsyAlWxDr8IiidsT1KMFeMNP/QIe6/eqL/AWjOJ1yptIcEOiVqLXRj3+DL8cDZJx25+BuwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741590971; c=relaxed/simple;
-	bh=csuBSn5lVl8f70Mnaij/6ynbz5qy9pIz5GQEE0jSiyI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Bc872qg0ds9WPLPmNsWEsXoegTQrCYiX+JmXVwpZuTYMntTuF6p+kfY3UwaPfXWoTEeE++k2h/CmrHoMBmqbWbuhtaFuEiutFlqkkLQo4eoaNbxpDtcjehFRnRFHbdT/gQ32zZmuce/1RT8HFkEoCfHpIfXSHQYOOXR1hKgwyac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OW53oeos; arc=none smtp.client-ip=209.85.218.48
+	s=arc-20240116; t=1741591354; c=relaxed/simple;
+	bh=Fus2l9Ft0TiV32NmjoxHIrvAKw6rMkGfP+TzHbeS98U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TLtfiJ6xF0s3UYj+uc+qKbaz/fdKPXL/FUdOOmjmRPf5rthxbCkm7Z7nbAYQl2PwmeKmDJZ7Pq7wHIdq1+YJ210JbnFK3HcWG1SXaEiopeuUb/kiRfJOUx4jMFCavIJlBBhchZRymR++NfX45p3Mk7YUxiTkQf31BvN66Z3X5ps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CYcBhYn5; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-aaf0f1adef8so679007366b.3
-        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 00:16:09 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-22409077c06so49147305ad.1;
+        Mon, 10 Mar 2025 00:22:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741590968; x=1742195768; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OwgVTEUn37oZNIQEypFt+W7Qy+BNbRvPshfrc1JXbF8=;
-        b=OW53oeos1dtuXqgtQLxuqR8qFZ/NXBLxwQZwl3M1bqmU2EtEyL4c80DyjJfOnB+7v9
-         qTlS3tG8d8c0eLclR2u4JHI6KBPpRfqlHmJYXVn4NcHvb6rLGVd1IxFU4aeTmg5R/PQL
-         g/NNCzcgJ+f9VCzihLvFYSncL0R0maJ5brUAQazWX2pQlMQfzmen94+Lpom75HBw3cEv
-         wxZhRi8q3SqX4T1HB8W4BpcPi13MRYJsSuEMSRCdlX5KkgOefDQ0NPk18FyPsEreV0Es
-         CDVJ9Cbls2DqgO275vMi1bg/ICXutZ2ssUuHSod9fy8q36bQVx4OieiUxVxJvGTzHext
-         lb2w==
+        d=gmail.com; s=20230601; t=1741591352; x=1742196152; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mvigK+8shkj3P6iWLfwRxSR7yK+Ypp9JkAFJDRFT3UI=;
+        b=CYcBhYn5MwwYkaFlc5gZA/avDnJ9LjcaZBW9bR2YY6u1lE/CwyTAok9FIR435IKd7O
+         KS6yMj+RXSSmCourrIJFBKtu7LSRrQICq/ioRAK9KFPWHAMbHg7pgED/6thcZDZ7SYd8
+         ka1G8mKtjkggFA26zZpwwy4eLxOfdxHPiKVVPaYqEsoA9AHD0aTsHyxbkg5ZVmE5S4bl
+         rF59t5D3am02qkS8yzCXgK4NDuHmNTF06RdIxvQ+NAPR5+MO+xF6OpekZyRAq7wHJABt
+         0vLE+qCy5EMwqQCx8GlD+Znyk2m1RK7oZ1Ihn1b+WwMp6Gha24lJBeS4C0jVpDowyXVk
+         F9eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741590968; x=1742195768;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OwgVTEUn37oZNIQEypFt+W7Qy+BNbRvPshfrc1JXbF8=;
-        b=QfzKzGDADSPazYNeSbvFO9O3tyivdi+a2yk/zYwhrEH/YS3T7veLa7k8x1MgUCW3EL
-         WTDYYUNxmxho6Rtok3vG3ATVgHDWh1C6sitfZX0JFiHp10DiItbcSChowsMYswW/8rBq
-         1VzUJvlY1gri7/oA91lEWAiHL7Eqm7fivvb13oHZ+xD+vayAfoTW7z3Iv4mxLX+dMQYQ
-         qs0oGxeFGfb7HNE1iRnnutcGlKkl7b+FrSBu4lsaghU+RlOJS8qL5Ja6rOtT5Db/fZRv
-         l2YL9pXVLaCnkh3UAKxyd6ZAJXlOY30W95OxndAIYgOZYV1xGEDbZ+97PeipUS6FomV5
-         XXiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXzQuTnEijBsJvvQ5HKnlBhYBIEVK4BAg1DCNKtFXZigSyJnvvoHbSN4GfoVPYGwAECMdEqecw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7xZhX61hHc+60rufcvYve5DLIdOlmSVQEUpHomwJSySxpOnPg
-	yYXwnzYN3xXT1t6K9+rjav80p2qkO7OztDt+LaPQa7rhS3hhU4Ez
-X-Gm-Gg: ASbGncu1lf/t6ffq4IWw5h695KIzrQMVDcL/qu0S3mogPXih/yaOknRNiH7AUEeZLlk
-	/l74c1Rpio6BmOhNFx52F4sHxMleLareNKulTh59kuPeK1frGuT+bt28yMEMWyGB3hcwm2w18Od
-	xQ4BmnipRMpV3BWHHmYjapwNPT/6OdTy6yQ+0nFQM95wbSEK+OvcMCr/6l/vgxwM6/vfOnHAELq
-	H55kW3yW3JuHmCgXatfDbP8EGV5nINrePWw68ShP8gOQ3B1wa11XVnPHHZTt4hCdgMyz1mdSt6A
-	pTdR9XmMwE//7P1qC1QmYThwD1oD/ergaSDylfgjuEO1gxdf5sjUcDT9TQ==
-X-Google-Smtp-Source: AGHT+IFtQ9pvUKWQLLgKrRGjITDEfqwtZspmeMaNuf381jRmybbOqXpgP4KxMT6jEMOSHh+Nh4Qmew==
-X-Received: by 2002:a17:907:9452:b0:ab6:362b:a83a with SMTP id a640c23a62f3a-ac25274acf4mr1229295866b.8.1741590967593;
-        Mon, 10 Mar 2025 00:16:07 -0700 (PDT)
-Received: from [192.168.116.141] ([148.252.129.108])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e5c733fca8sm6329698a12.4.2025.03.10.00.16.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Mar 2025 00:16:06 -0700 (PDT)
-Message-ID: <765c84e0-1e4d-4e34-aa46-30a385ca8050@gmail.com>
-Date: Mon, 10 Mar 2025 07:17:02 +0000
+        d=1e100.net; s=20230601; t=1741591352; x=1742196152;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mvigK+8shkj3P6iWLfwRxSR7yK+Ypp9JkAFJDRFT3UI=;
+        b=X7ZpzHlJFvEBX56EHTuAc4yrCjYSFeyKr1TG6+RfRWVkDJ9L7zdnZMIHLQZleVqvJW
+         Wsnt/VbwzFp1o+wW5/6C9q8y3KapdPzt133leNU2cMek/R5/CANZCR8t6zS+XNiPVCJc
+         Zrr2ns+uf2DWPO0vF8o4ENOF0IP0hX2HpPAIsL+li2ntbAEPlNMHP73+tcAr6+IwaNdZ
+         2O1RScZ9kG9AtCeObiiFTVWOJ+8OWlfJUYmd/JGopcTed1iz+oBAz8Z5CFp5K/99pVEc
+         EsFcW3g4Ze9TlyXY3Wdh1rLnHv7d5XxAFOrxOHIAQWIsP8czBKERDdC3vMlkV3+bVkHY
+         52EQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUNQhu45uIsqH79w7vSgXyd0fDgcC7AEF1RyMeuDyrYnjoFsH2Q/EdibDUvrhdYRVriGr83l97pm/Ard91ApJ6A@vger.kernel.org, AJvYcCX47GTT47lCG5tvX6gvLU15+3aieTY8YiKWoPN+/GQjMYzKIJMy6ZcXLSrVgM0aBDs0JHY3On3O0LsxVpo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxvOtJWBZYcvxRpeLIcOnP39t9IeAex576d2BjQ2PJZbrvwWZH
+	CI/gvZUE2pB2TEdm2mCjqbt1/UHrsvSTnvzfWfSGeuOs+Hq/gNYR
+X-Gm-Gg: ASbGncvFIusYqsmuBfsbvq//bhb7ZBa38XBPdGOj7ecilt6thVVtJ0l4bON+BjwoLnB
+	ZCr4EHhfnzC8UmORZiiJu56pCFHwLshHMzy0LJvboDtcfBANEryZrxkaUKKj+bsjTxl+1O73ULs
+	j3sni6X/NQvS8KLW1kGNJGERIxjy7QD6MEetuYDXr330JgL22DdlmNhaSI/97EEOSlLMT94O7q9
+	JsdisTGjNoUJyBYxT2BopMivCbY0vPNi0EHWNt7/8wDQdj7D/vrplvwSA4SaFr26373+4sp124G
+	Y9zr6VVJ5PrsIDGFyoeVjMTWZJ10QMdiqLcntL+/9vxMuYokwA==
+X-Google-Smtp-Source: AGHT+IFX+/4blytBZ9bHO9fEHzdnLXvnpR8ggVlMl9RYZvsylnApMBQTkUkf/7epOY70isQLf/BI7g==
+X-Received: by 2002:a17:902:dac7:b0:223:f7ec:f834 with SMTP id d9443c01a7336-22428a9fedemr217827545ad.31.1741591352447;
+        Mon, 10 Mar 2025 00:22:32 -0700 (PDT)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22410aa8b83sm70383355ad.241.2025.03.10.00.22.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Mar 2025 00:22:31 -0700 (PDT)
+Date: Mon, 10 Mar 2025 07:22:21 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Shuah Khan <shuah@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Jianbo Liu <jianbol@nvidia.com>, Jarod Wilson <jarod@redhat.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Cosmin Ratiu <cratiu@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv5 net 1/3] bonding: fix calling sleeping function in spin
+ lock and some race conditions
+Message-ID: <Z86TLTMKNX0NVq2N@fedora>
+References: <20250307031903.223973-1-liuhangbin@gmail.com>
+ <20250307031903.223973-2-liuhangbin@gmail.com>
+ <20250308085451.GL3666230@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next] page_pool: Track DMA-mapped pages and unmap
- them when destroying the pool
-To: Mina Almasry <almasrymina@google.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- David Wei <dw@davidwei.uk>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- "David S. Miller" <davem@davemloft.net>,
- Yunsheng Lin <linyunsheng@huawei.com>, Yonglong Liu
- <liuyonglong@huawei.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, linux-mm@kvack.org, netdev@vger.kernel.org
-References: <20250308145500.14046-1-toke@redhat.com>
- <CAHS8izPLDaF8tdDrXgUp4zLCQ4M+3rz-ncpi8ACxtcAbCNSGrg@mail.gmail.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <CAHS8izPLDaF8tdDrXgUp4zLCQ4M+3rz-ncpi8ACxtcAbCNSGrg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250308085451.GL3666230@kernel.org>
 
-On 3/8/25 19:22, Mina Almasry wrote:
-> On Sat, Mar 8, 2025 at 6:55 AM Toke Høiland-Jørgensen <toke@redhat.com> wrote:
->>
->> When enabling DMA mapping in page_pool, pages are kept DMA mapped until
->> they are released from the pool, to avoid the overhead of re-mapping the
->> pages every time they are used. This causes problems when a device is
->> torn down, because the page pool can't unmap the pages until they are
->> returned to the pool. This causes resource leaks and/or crashes when
->> there are pages still outstanding while the device is torn down, because
->> page_pool will attempt an unmap of a non-existent DMA device on the
->> subsequent page return.
->>
->> To fix this, implement a simple tracking of outstanding dma-mapped pages
->> in page pool using an xarray. This was first suggested by Mina[0], and
->> turns out to be fairly straight forward: We simply store pointers to
->> pages directly in the xarray with xa_alloc() when they are first DMA
->> mapped, and remove them from the array on unmap. Then, when a page pool
->> is torn down, it can simply walk the xarray and unmap all pages still
->> present there before returning, which also allows us to get rid of the
->> get/put_device() calls in page_pool.
+On Sat, Mar 08, 2025 at 08:54:51AM +0000, Simon Horman wrote:
+> On Fri, Mar 07, 2025 at 03:19:01AM +0000, Hangbin Liu wrote:
 > 
->> Using xa_cmpxchg(), no additional
->> synchronisation is needed, as a page will only ever be unmapped once.
->>
->> To avoid having to walk the entire xarray on unmap to find the page
->> reference, we stash the ID assigned by xa_alloc() into the page
->> structure itself, in the field previously called '_pp_mapping_pad' in
->> the page_pool struct inside struct page. This field overlaps with the
->> page->mapping pointer, which may turn out to be problematic, so an
->> alternative is probably needed. Sticking the ID into some of the upper
->> bits of page->pp_magic may work as an alternative, but that requires
->> further investigation. Using the 'mapping' field works well enough as
->> a demonstration for this RFC, though.
->>
->> Since all the tracking is performed on DMA map/unmap, no additional code
->> is needed in the fast path, meaning the performance overhead of this
->> tracking is negligible. The extra memory needed to track the pages is
->> neatly encapsulated inside xarray, which uses the 'struct xa_node'
->> structure to track items. This structure is 576 bytes long, with slots
->> for 64 items, meaning that a full node occurs only 9 bytes of overhead
->> per slot it tracks (in practice, it probably won't be this efficient,
->> but in any case it should be an acceptable overhead).
-...
+> ...
 > 
-> Pavel, David, as an aside, I think we need to propagate this fix to
-> memory providers as a follow up. We probably need a new op in the
-> provider to unmap. Then, in page_pool_scrub, where this patch does an
-> xa_for_each, we need to call that unmap op.
+> > @@ -616,9 +615,22 @@ static void bond_ipsec_del_sa_all(struct bonding *bond)
+> >  		return;
+> >  
+> >  	mutex_lock(&bond->ipsec_lock);
+> > -	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
+> > -		if (!ipsec->xs->xso.real_dev)
+> > +	list_for_each_entry_safe(ipsec, tmp_ipsec, &bond->ipsec_list, list) {
+> > +		spin_lock_bh(&ipsec->xs->lock);
+> > +		if (!ipsec->xs->xso.real_dev) {
+> > +			spin_unlock_bh(&ipsec->xs->lock);
+> >  			continue;
+> > +		}
+> > +
+> > +		if (ipsec->xs->km.state == XFRM_STATE_DEAD) {
+> > +			list_del(&ipsec->list);
+> > +			kfree(ipsec);
+> 
+> Hi Hangbin,
+> 
+> Apologies if this was covered elsewhere, but ipsec is kfree'd here...
 
-Sounds like it, which is the easy part since mps already hold the
-full list of pages available. We just need to be careful unmapping
-all netmems in presense of multiple pools, but that should be fine.
+Oh.. I need to get the xs with xs = ipsec->xs, then hold the xs lock.
 
--- 
-Pavel Begunkov
-
+Thanks
+Hangbin
+> 
+> 
+> > +			/* Need to free device here, or the xs->xso.real_dev
+> > +			 * may changed in bond_ipsec_add_sa_all and free
+> > +			 * on old device will never be called.
+> > +			 */
+> > +			goto next;
+> > +		}
+> >  
+> >  		if (!real_dev->xfrmdev_ops ||
+> >  		    !real_dev->xfrmdev_ops->xdo_dev_state_delete ||
+> > @@ -626,11 +638,20 @@ static void bond_ipsec_del_sa_all(struct bonding *bond)
+> >  			slave_warn(bond_dev, real_dev,
+> >  				   "%s: no slave xdo_dev_state_delete\n",
+> >  				   __func__);
+> > -		} else {
+> > -			real_dev->xfrmdev_ops->xdo_dev_state_delete(ipsec->xs);
+> > -			if (real_dev->xfrmdev_ops->xdo_dev_state_free)
+> > -				real_dev->xfrmdev_ops->xdo_dev_state_free(ipsec->xs);
+> > +			spin_unlock_bh(&ipsec->xs->lock);
+> > +			continue;
+> >  		}
+> > +
+> > +		real_dev->xfrmdev_ops->xdo_dev_state_delete(ipsec->xs);
+> > +
+> > +next:
+> > +		/* set real_dev to NULL in case __xfrm_state_delete() is called in parallel */
+> > +		ipsec->xs->xso.real_dev = NULL;
+> 
+> ... and the dereferenced here.
+> 
+> Flagged by Smatch.
+> 
+> > +
+> > +		/* Unlock before freeing device state, it could sleep. */
+> > +		spin_unlock_bh(&ipsec->xs->lock);
+> > +		if (real_dev->xfrmdev_ops->xdo_dev_state_free)
+> > +			real_dev->xfrmdev_ops->xdo_dev_state_free(ipsec->xs);
+> >  	}
+> >  	mutex_unlock(&bond->ipsec_lock);
+> >  }
+> 
+> ...
 
