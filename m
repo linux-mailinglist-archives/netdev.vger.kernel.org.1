@@ -1,130 +1,288 @@
-Return-Path: <netdev+bounces-173490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91966A592EC
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:43:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24544A592F3
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:45:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 987EE3AC6F3
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 11:42:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5477C16952E
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 11:45:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00F3D221719;
-	Mon, 10 Mar 2025 11:42:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A33CB19F103;
+	Mon, 10 Mar 2025 11:45:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=stackhpc-com.20230601.gappssmtp.com header.i=@stackhpc-com.20230601.gappssmtp.com header.b="BwZYlJn5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WUcA1jfO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37DBA22157D
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 11:42:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A252E21E0BE
+	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 11:45:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741606972; cv=none; b=cYKLj5W5VWWbHfoEX7Ct1OQKd702Nx/nMUYB3m/RJUsYfvVBnYhxHhKam8ZHrNadJkqVbqi6FT72RAYg6y70d/7bfc+eKZ+SdDSXuAxIhVaYxKDeAWBR4tB+yKEGfhNurWKb3nbUNVxUNO/ifC4ueK7iXH4Ha9ArxM235hz21ZA=
+	t=1741607112; cv=none; b=UB6GSAL18FQRVxZx5akvCY7GOjz0ohnlxIkgqckCGGFmTLnsih1Kh4g0hQedGFGW9t7VBgCKLN1uE7YXecXICbF3lpSjioImcbBsmfafH9XpG8fZQw+mz74o2uNU2F/5dYRp2F/5ZbBIwi3hKh+8D+vuoPuRQ+frCMjp2zMUUZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741606972; c=relaxed/simple;
-	bh=rQycO5DG4hnPaHc1MEGcMMiM6ZW+scVlpHqiZIRyIPw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=b1zwLKodXp4NtgRg/+/YbNrFo9YtBxHKz4HaKT2YoCzs//nPyMfmymDWnG4GNk2IPu3sHDGlb6dkYPytkebxsBO2MtQiox7B3Qs41698uzX058vdNdCLECef3BRToiK8dMxoqioBIFvY9NosuNL9StbUq1nrkp6WYKjmd1i43rg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stackhpc.com; spf=pass smtp.mailfrom=stackhpc.com; dkim=pass (2048-bit key) header.d=stackhpc-com.20230601.gappssmtp.com header.i=@stackhpc-com.20230601.gappssmtp.com header.b=BwZYlJn5; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=stackhpc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stackhpc.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2239c066347so67306215ad.2
-        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 04:42:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=stackhpc-com.20230601.gappssmtp.com; s=20230601; t=1741606970; x=1742211770; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=g4E4j1WUYf+OvBoySO8TidMK8V6kgfsxnFNxizqLyeo=;
-        b=BwZYlJn5eeMh+jcFauYX2sWzCl4Z9t39HEAGZra/x7lQt0+7kcFGkgoGOqzfLyuMXE
-         b5gvdpY2aG70sHX7IXP+oztnahwaNH5H47NFQfbAKbAbSEdE5XvOGDaO4xYuH9gWj5gI
-         kOZ2GZqUQ5AuW1c6HnIIZIBmfSUBZMEXDunf7smM7r+aDXWbhM9ZPnsnqTxyoegV03vU
-         oeP8EDBN4RSf+MKyCWk/z+ojzz71y2bJXchcz2UJqCWCmS5ZwFRkLuM8rEbIhCAGhXrs
-         wn7mcZPmpcYqhdAumzWIA+r4pRASaHsvsp0FEpHfwOO0ZcfFcdQ5zFRyi8ZvQznCfMn7
-         IVoA==
+	s=arc-20240116; t=1741607112; c=relaxed/simple;
+	bh=x+WFX7olKDjTcMQvhmFJ+JyUfPsBQ7itCk14a2w6bAc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g/evufLEosi+41C4PrGJWgsQVAzuXnNg7AhYvtegapW5ayd2a28xQh9L+vW4h/Eginlh3j6AHkbxZv4UUIpLHxoCN4v4QKL7SGLxRRYEwiYCyHH2RCcbqVGFNBfAJZj4VVa+/lRrbA2dXxdToF917RyxCjzFVe+QGnInuGE1fKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WUcA1jfO; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741607108;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1QfU9xYM0tace1BiK8/7PTtQnMWCzi3j/O4vQ34r5aI=;
+	b=WUcA1jfOYIFlZaFrdYMnP2OGfUVfVsW6SnLSW4pJYyhlpeYtU/o/+yqHHsiyCAeVD1yNME
+	gInVoDrprPX6eFrNvWymAHjru3sgvWvTte5dOu6o6V+kv1pPd3f+tyZYGdUihrgOvUV/T9
+	vp27Z1gDO13qlimet0ouOGbuSlHc+Bk=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-581-AMWKYf1yM4m6NojJmQARdw-1; Mon, 10 Mar 2025 07:45:07 -0400
+X-MC-Unique: AMWKYf1yM4m6NojJmQARdw-1
+X-Mimecast-MFC-AGG-ID: AMWKYf1yM4m6NojJmQARdw_1741607106
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43935e09897so27470995e9.1
+        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 04:45:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741606970; x=1742211770;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=g4E4j1WUYf+OvBoySO8TidMK8V6kgfsxnFNxizqLyeo=;
-        b=WLZ3ryZ5WlrCgVlH/mhNXwc9W06J8JrtvIcbCzuNG2OhG8MEqqE3dPX366gdOCrgLW
-         /q+gHb0b/CVA7wHpKnbF93+mnA80VD+VsKVf9ktSyURCIaXDmKsijFI3hLTg0kgilu4E
-         pv3ItewmhGNUU9XXCKttntHw/CzyRGBLBct6U/nz4PHzidIk/SxnnoW6U8TSO6CxqrSO
-         yaNfEpID/o4/FxnYgGvj1fxwKoQSUf+yvFZjyq+tX0narIDawIS7pppbjJd4x2I4++An
-         pWJdw2ol/ZlDtu6QReAQm+eTvLWYzGYga0BQKGS7g6BaNPj8kIoa22LJKjonwAT2kcT7
-         WQrA==
-X-Forwarded-Encrypted: i=1; AJvYcCWq5eoRF9B8/cKwy6dM741b2IB4+vflzOWXfGEtnzUUiTZM+SisC3y4seVi8w0LI/uXX/e+r7I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhRPHFeFQjQ5pQwC+4IOrGkONNWvfpSPrebPmZPx2VB/odgcmf
-	0ZD2V83kPqUDrgMYCWlYe+0VIEVlr1nVyT1kollkF5QWnZiU8rL/NPhEFOrdA36E6miBdmjfk3N
-	YrwJJxb5ygoSsA62XshyC94va5CVyJvhkXhLXuw==
-X-Gm-Gg: ASbGncu8flHgJ0AHW2jylY6CD7DSDUT9ri9P+lzRiU/dSLct4TWtKosnKETk5D+YqoS
-	6FOkqPhuQYRrgTUmodKxVQmrE4C2kpjQ/SdakutJQd7dpM0ban6zOsuidZAP/ViqwmRMpups78H
-	QGkGVmsd0NMmEV4Ai9Dxkm0kGteGLY8OvRx9NBFaJ/AeMSjatzKKb113rdjHnSBGhPh6f5ykc=
-X-Google-Smtp-Source: AGHT+IF1kATHZhSdH+l69i/XoyGTeFN4GU2J5QUgxJNSnWMJQlJveSCcLzz6YQhlzT4azTHh1/0QcV5ZPMjjqQy2TXY=
-X-Received: by 2002:a17:90b:380e:b0:2ff:64a0:4a57 with SMTP id
- 98e67ed59e1d1-2ff7ceef536mr17796709a91.26.1741606970455; Mon, 10 Mar 2025
- 04:42:50 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1741607106; x=1742211906;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1QfU9xYM0tace1BiK8/7PTtQnMWCzi3j/O4vQ34r5aI=;
+        b=KEhp850Dm66512P9+jP5EqImgAfwoUKOnGB06uDVQ0BpdScylpSyx5XdH8hBQ5TDVz
+         jsUZoEr9qv+EA28Ojvn2FTIYjt5lez6ToNmpNTEMSO2Xu4ziGPY7wYt4YKADtKJzjZB6
+         s6hakG2sGArrZFELGqIoKLGx34kwU9FIhpjZ0iGzCqq8xolMTAkcxkMnX2SyY5Y44PkQ
+         VVyeLVuzUVlh7y7rR8naQ7V5h3+8Y79JLzuZbwRS6WXgPDToz9hmQCJakF2CoGxurCTQ
+         kaAWCOSwcUrRm5q5PNrERJEbfE+O++E038rc/4aFHNfdOMTqm7VzLytwkPs091FpTMKD
+         XzEg==
+X-Gm-Message-State: AOJu0YzQKQXlPjUhreY2xIM7OD0Yr/41t/FusOIFjrETMqJWcCyOvrmj
+	hh1tqFJtmG2/svZQPKbX9ar6FHaNAnjB96BaGUSb768BWmK2Tk/AMYp6jNBqt9vuM/Nop/YehaA
+	hRqxiRlmqSZPs9xyoDEDt2oaBYAcP9KwcxJrFccRqPkOFouMUXhZKjw==
+X-Gm-Gg: ASbGncu5Dv/GouT8mcJObqMV4thCMiBzUj0r5E1DWw+Odrs4bG9fGP7lV/QsOktjG0C
+	FVKi97WQjQKfYT09Sk/J6jENnr1nsv9G1fLoXs35SI8bmvrRJXqRpxXJziSLsHEeQ1lvp4wFuh0
+	+anc0WyZoVcXDbH0tbkgTBOfCzDh63neGx57kHWjmtQodvebucLuVY1s+TpXQJi7IK1CRkcAy+z
+	3vRTpAKWe3Osdm95lIC4S95QSpqnZ+p48Za+72VvED9Nvf2wy1R7CXW7PXTEmh4SKkBIzMs6ynm
+	q1P8DdtwQ7gntj6JmY5QPm03011QzufdP4hYWW7sjLPHc6yd1p4L7TjTzvs96Lc=
+X-Received: by 2002:a05:600c:3592:b0:43c:fdbe:439b with SMTP id 5b1f17b1804b1-43cfdbe44femr9279725e9.4.1741607105616;
+        Mon, 10 Mar 2025 04:45:05 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFntvyjQYUVUh6Y39qXZJ0Lrweu9SVC2j94JbuIrpaWU6W9u+hEflQeu8um6b92DvHRXziOTQ==
+X-Received: by 2002:a05:600c:3592:b0:43c:fdbe:439b with SMTP id 5b1f17b1804b1-43cfdbe44femr9279245e9.4.1741607105113;
+        Mon, 10 Mar 2025 04:45:05 -0700 (PDT)
+Received: from localhost (net-93-146-37-148.cust.vodafonedsl.it. [93.146.37.148])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ce8a493d0sm81060755e9.1.2025.03.10.04.45.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Mar 2025 04:45:04 -0700 (PDT)
+Date: Mon, 10 Mar 2025 12:45:03 +0100
+From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+To: arthur@arthurfabre.com
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, jakub@cloudflare.com,
+	hawk@kernel.org, yan@cloudflare.com, jbrandeburg@cloudflare.com,
+	thoiland@redhat.com, lbiancon@redhat.com,
+	Arthur Fabre <afabre@cloudflare.com>
+Subject: Re: [PATCH RFC bpf-next 16/20] trait: Support sk_buffs
+Message-ID: <Z87Qv2Jf3p3MeXRC@lore-desk>
+References: <20250305-afabre-traits-010-rfc2-v1-0-d0ecfb869797@cloudflare.com>
+ <20250305-afabre-traits-010-rfc2-v1-16-d0ecfb869797@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250214132453.4108-1-michal.swiatkowski@linux.intel.com>
- <2fcd3d16-c259-4356-82b7-2f1a3ad45dfa@lunn.ch> <Z69MESaQ4cUvIy4z@mev-dev.igk.intel.com>
- <c22f5a47-7fe0-4e83-8a0c-6da78143ceb3@redhat.com>
-In-Reply-To: <c22f5a47-7fe0-4e83-8a0c-6da78143ceb3@redhat.com>
-From: Pierre Riteau <pierre@stackhpc.com>
-Date: Mon, 10 Mar 2025 12:42:13 +0100
-X-Gm-Features: AQ5f1Jr7ptlFvOdXyUd00bt5D7Cqqa_mKBT8ZvAA9JqIA7_Sv1a6OQcN1He8obU
-Message-ID: <CA+ny2sxC2Y7bxhkO7HqX+6E_Myf24_trmCUrroKFkyoce7QC9A@mail.gmail.com>
-Subject: Re: [net v1] devlink: fix xa_alloc_cyclic error handling
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, Andrew Lunn <andrew@lunn.ch>, 
-	netdev@vger.kernel.org, jiri@resnulli.us, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, horms@kernel.org, 
-	Dan Carpenter <error27@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="DfAkXsiRZSBUgOma"
+Content-Disposition: inline
+In-Reply-To: <20250305-afabre-traits-010-rfc2-v1-16-d0ecfb869797@cloudflare.com>
 
-On Tue, 18 Feb 2025 at 12:56, Paolo Abeni <pabeni@redhat.com> wrote:
->
->
->
-> On 2/14/25 2:58 PM, Michal Swiatkowski wrote:
-> > On Fri, Feb 14, 2025 at 02:44:49PM +0100, Andrew Lunn wrote:
-> >> On Fri, Feb 14, 2025 at 02:24:53PM +0100, Michal Swiatkowski wrote:
-> >>> Pierre Riteau <pierre@stackhpc.com> found suspicious handling an error
-> >>> from xa_alloc_cyclic() in scheduler code [1]. The same is done in
-> >>> devlink_rel_alloc().
-> >>
-> >> If the same bug exists twice it might exist more times. Did you find
-> >> this instance by searching the whole tree? Or just networking?
-> >>
-> >> This is also something which would be good to have the static
-> >> analysers check for. I wounder if smatch can check this?
-> >>
-> >>      Andrew
-> >>
-> >
-> > You are right, I checked only net folder and there are two usage like
-> > that in drivers. I will send v2 with wider fixing, thanks.
->
-> While at that, please add the suitable fixes tag(s).
->
-> Thanks,
->
-> Paolo
 
-Hello,
+--DfAkXsiRZSBUgOma
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I haven't seen a v2 patch from Michal Swiatkowski. Would it be okay to
-at least merge this net/devlink/core.c fix for inclusion in 6.14? I
-can send a revised patch adding the Fixes tag. Driver fixes could be
-addressed separately.
+> From: Arthur Fabre <afabre@cloudflare.com>
+>=20
+> Hide the space used by traits from skb_headroom(): that space isn't
+> actually usable.
+>=20
+> Preserve the trait store in pskb_expand_head() by copying it ahead of
+> the new headroom. The struct xdp_frame at the start of the headroom
+> isn't needed anymore, so we can overwrite it with traits, and introduce
+> a new flag to indicate traits are stored at the start of the headroom.
+>=20
+> Cloned skbs share the same packet data and headroom as the original skb,
+> so changes to traits in one would be reflected in the other.
+> Is that ok?
+> Are there cases where we would want a clone to have different traits?
+> For now, prevent clones from using traits.
+>=20
+> Signed-off-by: Arthur Fabre <afabre@cloudflare.com>
+> ---
+>  include/linux/skbuff.h | 25 +++++++++++++++++++++++--
+>  net/core/skbuff.c      | 25 +++++++++++++++++++++++--
+>  2 files changed, 46 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index d7dfee152ebd26ce87a230222e94076aca793adc..886537508789202339c925b56=
+13574de67b7e43c 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -39,6 +39,7 @@
+>  #include <net/net_debug.h>
+>  #include <net/dropreason-core.h>
+>  #include <net/netmem.h>
+> +#include <net/trait.h>
+> =20
+>  /**
+>   * DOC: skb checksums
+> @@ -729,6 +730,8 @@ enum skb_traits_type {
+>  	SKB_TRAITS_NONE,
+>  	/* Trait store in headroom, offset by sizeof(struct xdp_frame) */
+>  	SKB_TRAITS_AFTER_XDP,
+> +	/* Trait store at start of headroom */
+> +	SKB_TRAITS_AT_HEAD,
+>  };
+> =20
+>  /**
+> @@ -1029,7 +1032,7 @@ struct sk_buff {
+>  	__u8			csum_not_inet:1;
+>  #endif
+>  	__u8			unreadable:1;
+> -	__u8			traits_type:1;	/* See enum skb_traits_type */
+> +	__u8			traits_type:2;	/* See enum skb_traits_type */
+>  #if defined(CONFIG_NET_SCHED) || defined(CONFIG_NET_XGRESS)
+>  	__u16			tc_index;	/* traffic control index */
+>  #endif
+> @@ -2836,6 +2839,18 @@ static inline void *pskb_pull(struct sk_buff *skb,=
+ unsigned int len)
+> =20
+>  void skb_condense(struct sk_buff *skb);
+> =20
+> +static inline void *skb_traits(const struct sk_buff *skb)
+> +{
+> +	switch (skb->traits_type) {
+> +	case SKB_TRAITS_AFTER_XDP:
+> +		return skb->head + _XDP_FRAME_SIZE;
+> +	case SKB_TRAITS_AT_HEAD:
+> +		return skb->head;
+> +	default:
+> +		return NULL;
+> +	}
+> +}
+> +
+>  /**
+>   *	skb_headroom - bytes at buffer head
+>   *	@skb: buffer to check
+> @@ -2844,7 +2859,13 @@ void skb_condense(struct sk_buff *skb);
+>   */
+>  static inline unsigned int skb_headroom(const struct sk_buff *skb)
+>  {
+> -	return skb->data - skb->head;
+> +	int trait_size =3D 0;
+> +	void *traits =3D skb_traits(skb);
+> +
+> +	if (traits)
+> +		trait_size =3D traits_size(traits);
+> +
+> +	return skb->data - skb->head - trait_size;
 
-Thanks,
-Pierre
+I am not fully aware of all possible use-cases, but do we really need to
+store hw medata traits (e.g. hw rx checksum or hw rx hash) in the skb
+headroom when we convert the xdp_frame/xdp_buff in the skb? All of these
+fields already have dedicated fields in the skb struct. Moreover, we need
+to set them in order to have a real performance improvements when we execute
+XDP_PASS. Something like:
+
+https://lore.kernel.org/bpf/01ce17910fdd7b693c23132663fa884d5ec7f440.172693=
+5917.git.lorenzo@kernel.org/
+
+Regards,
+Lorenzo
+
+>  }
+> =20
+>  /**
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index 7b03b64fdcb276f68ce881d1d8da8e4c6b897efc..83f58517738e8ff12990c28b0=
+9336ed44f4be32a 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -1515,6 +1515,19 @@ static struct sk_buff *__skb_clone(struct sk_buff =
+*n, struct sk_buff *skb)
+>  	atomic_inc(&(skb_shinfo(skb)->dataref));
+>  	skb->cloned =3D 1;
+> =20
+> +	/* traits would end up shared with the clone,
+> +	 * and edits would be reflected there.
+> +	 *
+> +	 * Is that ok? What if the original skb and the clone take different pa=
+ths?
+> +	 * Does that even happen?
+> +	 *
+> +	 * If that's not ok, we could copy the traits and store them in an exte=
+nsion header
+> +	 * for clones.
+> +	 *
+> +	 * For now, pretend the clone doesn't have any traits.
+> +	 */
+> +	skb->traits_type =3D SKB_TRAITS_NONE;
+> +
+>  	return n;
+>  #undef C
+>  }
+> @@ -2170,7 +2183,7 @@ int pskb_expand_head(struct sk_buff *skb, int nhead=
+, int ntail,
+>  	unsigned int osize =3D skb_end_offset(skb);
+>  	unsigned int size =3D osize + nhead + ntail;
+>  	long off;
+> -	u8 *data;
+> +	u8 *data, *head;
+>  	int i;
+> =20
+>  	BUG_ON(nhead < 0);
+> @@ -2187,10 +2200,18 @@ int pskb_expand_head(struct sk_buff *skb, int nhe=
+ad, int ntail,
+>  		goto nodata;
+>  	size =3D SKB_WITH_OVERHEAD(size);
+> =20
+> +	head =3D skb->head;
+> +	if (skb->traits_type !=3D SKB_TRAITS_NONE) {
+> +		head =3D skb_traits(skb) + traits_size(skb_traits(skb));
+> +		/* struct xdp_frame isn't needed in the headroom, drop it */
+> +		memcpy(data, skb_traits(skb), traits_size(skb_traits(skb)));
+> +		skb->traits_type =3D SKB_TRAITS_AT_HEAD;
+> +	}
+> +
+>  	/* Copy only real data... and, alas, header. This should be
+>  	 * optimized for the cases when header is void.
+>  	 */
+> -	memcpy(data + nhead, skb->head, skb_tail_pointer(skb) - skb->head);
+> +	memcpy(data + nhead, head, skb_tail_pointer(skb) - head);
+> =20
+>  	memcpy((struct skb_shared_info *)(data + size),
+>  	       skb_shinfo(skb),
+>=20
+> --=20
+> 2.43.0
+>=20
+>=20
+
+--DfAkXsiRZSBUgOma
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ87QvwAKCRA6cBh0uS2t
+rOitAQDaUArc6o9q/HqK0/8om4aTm1nmL9iwOsBvkO0dCfMj/QEA7BPhuOjnrmiN
+8084+hmr3sbXUZMHUKF+CnqcWAzuIgw=
+=SlS4
+-----END PGP SIGNATURE-----
+
+--DfAkXsiRZSBUgOma--
+
 
