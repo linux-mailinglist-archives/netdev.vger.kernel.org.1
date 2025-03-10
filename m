@@ -1,106 +1,140 @@
-Return-Path: <netdev+bounces-173545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B5C4A595F2
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 14:18:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F31ADA59678
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 14:38:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A42553ADBF0
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 13:17:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B189B3A7002
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 13:38:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA15A227B95;
-	Mon, 10 Mar 2025 13:17:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l0cy2i+0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EBA322A1E5;
+	Mon, 10 Mar 2025 13:38:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A286DA930;
-	Mon, 10 Mar 2025 13:17:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C5BA227BB9;
+	Mon, 10 Mar 2025 13:38:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741612670; cv=none; b=YHPfoVvsKh2vEvxsTYOP9UznDdDF66oJnY05K2Xn0tEzRUvplejc1+rR9vN6YX1TVjlUar8mkwei7grvmEUCrB9/m1I0g+DA5hakE87a4uFJ0/dWy6O3bGl/7+lTkIt/NYtA55QYKdNYKxqgqkmE1aQcglV4MNSmUYJh3LGKD6Y=
+	t=1741613908; cv=none; b=bLcCKiclVMNqNGpcWXeeJlp/M/3hGoVw4GaUxBoWDL31aG0lNlCEHnCLwwo/8MUjyJBKAXbSdIILX0CQ3albsTz0Kcm+DkPKAdH9GHB/MIvta/yASOopCgfcNgIRQIvYxC5gawBg7loNRAHzuq981/mc6280HoC8BnyFBt4ROzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741612670; c=relaxed/simple;
-	bh=4ZqG39C5Pf1QNEH581g9JUhd773SjHjH1W/XN4R90kM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gXgvkONvj0sDXfMnXs5ZhK3wtgl+96zht5s+68mrWgQ7AvhKh/dJGExB5/AONojgntVxNjnl5Fe4Lak9Nt6t/AiOJN91DLhYsSL4U86FlvFfHXSSqfboLa5bm7Sso00JOTe81vWyKS+cI81EbkWcEnrwWvqcpBQ7Ykd++qVTkBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l0cy2i+0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B87D4C4CEE5;
-	Mon, 10 Mar 2025 13:17:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741612670;
-	bh=4ZqG39C5Pf1QNEH581g9JUhd773SjHjH1W/XN4R90kM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=l0cy2i+02xhEoPTuiAszjprYlougcvywMXyIRcJqQDZN0By0NVslsy8cdRhL46nH7
-	 AvSMgJ3n6XiCG4WhTsSwuKyW73hzeJIzhuoHKcHV4E4V0Ead9RAwWM9lP8hpLh+7x+
-	 Tk6g7mlSZbVD6q3pEzZxS47X/4f1iLVSbqBMbS7719rHlUwmWp+qm//dLCmF/F1EGQ
-	 Y4gz/xfVz+X4pn+qTQdZVEGNncnPjALvI8dGZjMt9/OL5+VV4F/Z/69lsbEjF7I9RF
-	 AbPobtS5X9jKqnUqFXlHHfWK9T0sbEeZotEeGvBbacNk88edjN134aalObDqJRubLb
-	 H5Daac2fyQr7Q==
-Date: Mon, 10 Mar 2025 13:17:45 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com, Phil Elwell <phil@raspberrypi.org>
-Subject: Re: [PATCH net v1 1/1] net: usb: lan78xx: Sanitize return values of
- register read/write functions
-Message-ID: <92b0588d-df0b-4f97-99db-d607de774728@sirena.org.uk>
-References: <20250307101223.3025632-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1741613908; c=relaxed/simple;
+	bh=0Ax/+iGwbiSSSQQ+9gL+4cfvAsARamCLqmPyEjZFHOo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sR2rHTxZ7UJSx3aMhlFDiTUoixyRjVlzGXSl/aq/ag4uetITj1XvPa8AlLb4MQhEu0rNJvAP5Z72iZ70w1MsPaT4S66h/3BuIROz9ta5XqjrUlNapoAE4VVuyYfkhamCLq/iXCb0llJr0fEGhiDhVjyBkMSyoyVbaO62lcFst1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D6784153B;
+	Mon, 10 Mar 2025 06:38:36 -0700 (PDT)
+Received: from donnerap.manchester.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1E9E63F673;
+	Mon, 10 Mar 2025 06:38:22 -0700 (PDT)
+Date: Mon, 10 Mar 2025 13:38:19 +0000
+From: Andre Przywara <andre.przywara@arm.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>, Chen-Yu Tsai <wens@csie.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Jernej Skrabec
+ <jernej.skrabec@gmail.com>, Jerome Brunet <jbrunet@baylibre.com>, Kevin
+ Hilman <khilman@baylibre.com>, linux-amlogic@lists.infradead.org,
+ linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+ linux-mediatek@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, linux-sunxi@lists.linux.dev,
+ Martin Blumenstingl <martin.blumenstingl@googlemail.com>, Matthias Brugger
+ <matthias.bgg@gmail.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Neil
+ Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org, Paolo Abeni
+ <pabeni@redhat.com>, Samuel Holland <samuel@sholland.org>, Vinod Koul
+ <vkoul@kernel.org>
+Subject: Re: [PATCH net-next 8/9] net: stmmac: sun8i: remove
+ of_get_phy_mode()
+Message-ID: <20250310133819.7c2204a6@donnerap.manchester.arm.com>
+In-Reply-To: <E1trbyA-005qYf-Hb@rmk-PC.armlinux.org.uk>
+References: <Z87WVk0NzMUyaxDj@shell.armlinux.org.uk>
+	<E1trbyA-005qYf-Hb@rmk-PC.armlinux.org.uk>
+Organization: ARM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="l3HifBw0bN+3GatU"
-Content-Disposition: inline
-In-Reply-To: <20250307101223.3025632-1-o.rempel@pengutronix.de>
-X-Cookie: You have a truly strong individuality.
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Mon, 10 Mar 2025 12:10:54 +0000
+"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk> wrote:
 
---l3HifBw0bN+3GatU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-On Fri, Mar 07, 2025 at 11:12:23AM +0100, Oleksij Rempel wrote:
-> usb_control_msg() returns the number of transferred bytes or a negative
-> error code. The current implementation propagates the transferred byte
-> count, which is unintended. This affects code paths that assume a
-> boolean success/failure check, such as the EEPROM detection logic.
->=20
-> Fix this by ensuring lan78xx_read_reg() and lan78xx_write_reg() return
-> only 0 on success and preserve negative error codes.
+> devm_stmmac_probe_config_dt() already gets the PHY mode from firmware,
+> which is stored in plat_dat->phy_interface. Therefore, we don't need to
+> get it in platform code.
+> 
+> sun8i was using of_get_phy_mode() to set plat_dat->mac_interface, which
+> defaults to plat_dat->phy_interface when the mac-mode DT property is
+> not present. As nothing in arch/*/boot/dts sets the mac-mode property,
+> it is highly likely that these two will be identical, and thus there
+> is no need for this glue driver to set plat_dat->mac_interface.
 
-Tested-by: Mark Brown <broonie@kernel.org>
+Well, the current sun8i code wouldn't help anyway, because the driver
+would set mac_interface to the value of "phy-mode", not "mac-mode", which
+is strictly speaking a bug.
+But in any case this is indeed redundant, so:
 
-This fixes NFS boot on the Raspberry Pi 3+, it'd be good to get it into
-v6.14.
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
---l3HifBw0bN+3GatU
-Content-Type: application/pgp-signature; name="signature.asc"
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 
------BEGIN PGP SIGNATURE-----
+Cheers,
+Andre
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmfO5ngACgkQJNaLcl1U
-h9CWbgf/YvMxNz/qhTlv3AYOZk5I4nBX9bOxERFS7Sp/H0sDcC610uSKp3TXNPDp
-2s1HDKI6gS3YxuG+qWEe7HVOZPF5TOpN22UIN+s9YJ+eV7/d088hbl5KkwNjfMNc
-W15vBIgEhGcnKMhz0ZZMOURzklFjp7id9s2f5MdU3y5YvCdrFFs/nj4i11JHdpj3
-GkRux67ifQ6t7sEMpGB6Po15zX5A603wYTDuiKZ5MQ/9szUIPjWQTT78UNKN8ZkU
-fALRy0yd3UGWwRAUJYcOm8Oxk3mhePqizm4jDylyHMjVg33gQCW8Hg9hnR8b42pi
-RBBWJu3TwqIsqWGZf+CaDtUAPqWlZQ==
-=XDSV
------END PGP SIGNATURE-----
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c | 8 +-------
+>  1 file changed, 1 insertion(+), 7 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+> index 4b7b2582a120..85723a78793a 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+> @@ -1155,11 +1155,10 @@ static int sun8i_dwmac_probe(struct platform_device *pdev)
+>  	struct stmmac_resources stmmac_res;
+>  	struct sunxi_priv_data *gmac;
+>  	struct device *dev = &pdev->dev;
+> -	phy_interface_t interface;
+> -	int ret;
+>  	struct stmmac_priv *priv;
+>  	struct net_device *ndev;
+>  	struct regmap *regmap;
+> +	int ret;
+>  
+>  	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
+>  	if (ret)
+> @@ -1219,10 +1218,6 @@ static int sun8i_dwmac_probe(struct platform_device *pdev)
+>  		return ret;
+>  	}
+>  
+> -	ret = of_get_phy_mode(dev->of_node, &interface);
+> -	if (ret)
+> -		return -EINVAL;
+> -
+>  	plat_dat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
+>  	if (IS_ERR(plat_dat))
+>  		return PTR_ERR(plat_dat);
+> @@ -1230,7 +1225,6 @@ static int sun8i_dwmac_probe(struct platform_device *pdev)
+>  	/* platform data specifying hardware features and callbacks.
+>  	 * hardware features were copied from Allwinner drivers.
+>  	 */
+> -	plat_dat->mac_interface = interface;
+>  	plat_dat->rx_coe = STMMAC_RX_COE_TYPE2;
+>  	plat_dat->tx_coe = 1;
+>  	plat_dat->flags |= STMMAC_FLAG_HAS_SUN8I;
 
---l3HifBw0bN+3GatU--
 
