@@ -1,218 +1,128 @@
-Return-Path: <netdev+bounces-173408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D569A58B08
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 05:03:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 730B2A58B11
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 05:08:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65759169BF3
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 04:03:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F4837A4A4A
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 04:07:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0140B1B395F;
-	Mon, 10 Mar 2025 04:03:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B38C1BD9CE;
+	Mon, 10 Mar 2025 04:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DfTTKFVa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FQBdQ3m0"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 394B55234
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 04:03:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E73B5188A3B;
+	Mon, 10 Mar 2025 04:08:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741579432; cv=none; b=IP+mcCQVtsFw28GCGO8Jt+2l3K4wPDqpijz6PH5/0yekJIGkazerJ+fnPxPpgPNptnYn4rCtUEgWUxVL8PSZrWbq68oRybWc/tOP9+QSG1giaklub6eGmuqrAZBuR8od8eazbSo22gERjdqA9fIwt8VYs9cPOq+nwiQZuNRhVn0=
+	t=1741579729; cv=none; b=nYb0f+KjQoYCuK39N4rJWarUhgere7Vsu/F1fmjuwwqkA3MnUFxfGsHxAp6IiQBEQw3dqQTTfi3slEcID07tPtwQLtu2+ZmHqAOJPPRdUF7mVn0uCtY4aVEoCS8s4kp71V93+fKU0tWj4G1HrnmLTJvAY2vXVTnuyVWFQdm01s8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741579432; c=relaxed/simple;
-	bh=aHOy1ecN9jlAaMS2M7dcU9gCxoht3SCiGLgSPyDZ63k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Oa4KR0VT9uGG8rqstEdvyuYYyh2kHHbXyHQMfdO2y33fT3ta7Bbx5bsGuXB6y6k1WW8aeIWr+gd7u937rfm0s9p7w2aKRMhEfgPmJHnezYFY3APA9cta6K4LkyAxaw1uieapXm8V5NOE0g1p3AcUEb8Uqz79JbJYu/jYer8N4RM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DfTTKFVa; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741579430;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KgUpYDCvfAICXWh2Ym5jayuE/HfSSdl1/NY4QdmfsrM=;
-	b=DfTTKFVaMfNTYVEolhXdbmgRd0nuBNKM2JGmJ1imuxeflvIeF1VeEjL2heSYuZWo5Ym4k+
-	ifOknskryfB6hA34Q4fo2tsy2yWfIOb34GcG72bwUwaCzg1dnhs1NV56C87OtA2dKX96DT
-	KoAGp1ddatvrElDmTrM+M7sz3+TNIig=
-Received: from mail-vk1-f199.google.com (mail-vk1-f199.google.com
- [209.85.221.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-640-AyG7-iHON7y9GB-ls2eJUw-1; Mon, 10 Mar 2025 00:03:48 -0400
-X-MC-Unique: AyG7-iHON7y9GB-ls2eJUw-1
-X-Mimecast-MFC-AGG-ID: AyG7-iHON7y9GB-ls2eJUw_1741579428
-Received: by mail-vk1-f199.google.com with SMTP id 71dfb90a1353d-523c33cfea8so4944674e0c.1
-        for <netdev@vger.kernel.org>; Sun, 09 Mar 2025 21:03:48 -0700 (PDT)
+	s=arc-20240116; t=1741579729; c=relaxed/simple;
+	bh=fJYoS5wlG8QstMdby11IKTbGL41o3ycq8U79HfpMshw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lVKlfAy6kBRMrD3qae6TVi6q3KcLOTpKPLxc2mM3Zb9qJBlBSBsokpLQac05ZCjzjyOxwFTH1mpiNpqO6TSXARonLB6DU+keQ3zJHC8Zj7mFe7vauRhKjJZnA7rAvbtjUX8ebFb1ksuuJWknj6xNp9IhMRTxZqpU5R4OnO+8iaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FQBdQ3m0; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7c2303a56d6so439836485a.3;
+        Sun, 09 Mar 2025 21:08:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741579727; x=1742184527; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9VOuggK65iHL1WrZt7LgIkYldFFZ7T+Rk2QuSTsMBqc=;
+        b=FQBdQ3m0QJuiE3A7xh7CiR6DUEDSgWd2eYrSpucSak0S+iQ5681go16guNxM8lzUPY
+         exAYQxZCZEfofFZ2w4E6AmVX+JVJw1gervWaMTVM0+Cs/Th05azKQo16t0x+GG0fvuw7
+         W1/xG/ESGPA8c5aogpMUUA9QqoVdVmjUn0RZlzLWs9AQU/zydlth2sKQPaYSHEeWAH2F
+         mCJ7vYhzGeEBIMDwyU7LBW5dV7M8Jd3OVaRvKYkVb4hdrSq3Nt7zUpCYWTG8UKtgzGwD
+         uHMevUExe22+yrD3VFNvxNtplUBNC+shkX33VydZ918F9FlMxsB2sY76cY2fqiSwlK9T
+         vxoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741579428; x=1742184228;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1741579727; x=1742184527;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KgUpYDCvfAICXWh2Ym5jayuE/HfSSdl1/NY4QdmfsrM=;
-        b=Dj6/jt9mZ2CPMFhMMqH9VOjht22LfiTCmcJKCdD5tGSeeYI7nASjsx5tA8/MNfpIPN
-         zmfPU6T8JgwgoyE5oOi+6xUl+ZabnH8UT/BtTu6WL/UOCVyZuoc58X72T5IuCAtXCLmY
-         nvLtGzbGV/8S7svTXd00g9Ef1nZuiDUl+9M1339W8V5Vp9zfCvAeC8IH+CBayQYXAe07
-         bnBujtbVMyFhofpU1MkBAOIegKm2Q5n9mLNxF6Y82rVQGfD0/pvN6S30qWVLBV6yIVg+
-         RhAcb4A6ItG93GudWJ7SSiVg/qDf+MAKAM3bcvqSJXixVEeMwz4S5zhiIeHIJpioQrNi
-         ySqg==
-X-Forwarded-Encrypted: i=1; AJvYcCXyVU5k3/ZVocAf+Gi/PXy1gKFHC6RM2kd6veL274zLo2OiFyRB3osKAxsz2cUk27DH1iXCC7A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz6/6HZ1eKvrhClmG4Ow7t9u6iL3C9WD9+CW3gCP2sSV1vL87Oh
-	f95t1JEYHDO4/xuc5YSZ5alpt2PSU9xMsvnueP/s2hDZ3MuSQGtG4tILtAnq4UJRgAkK1VG8Bmg
-	MUs1yBMdZbS8yv1UlcDBmTh7DG10QOy96SFWi9pV3gtRDedOMCcZZp5K5nHCgyuMm/V4Fi70NDk
-	EoQM+4LfwxPMWbRjUgVEaWMXVd4Rtm
-X-Gm-Gg: ASbGncvjU0c808hhhBVQmY8w2pGk/G1zh5ChEjUeFU5aZXnfpnadQl1+npzyDlDrw7p
-	7VAShqfEuYlkaFGAduSjgn7SK0YtCbKZUmLLRLbgwVJHVYK8eI9RpPC/nP0I5WaC6tufJzYif/A
-	==
-X-Received: by 2002:a05:6102:1625:b0:4bb:c24b:b658 with SMTP id ada2fe7eead31-4c30a6ce291mr6889411137.18.1741579428330;
-        Sun, 09 Mar 2025 21:03:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEWEExs57zlYjvHiKjt0sJdXJFbwo2Zs0LPOPlolmp1grxhBOdO/jBTdI674OxaLt6FioYXJto0Ve0T2qHTIms=
-X-Received: by 2002:a05:6102:1625:b0:4bb:c24b:b658 with SMTP id
- ada2fe7eead31-4c30a6ce291mr6889393137.18.1741579427853; Sun, 09 Mar 2025
- 21:03:47 -0700 (PDT)
+        bh=9VOuggK65iHL1WrZt7LgIkYldFFZ7T+Rk2QuSTsMBqc=;
+        b=rK7JIHJ5ggIapSAZxxbFWHTdV2N40e3nr+xObnZ6CiTCRuN1yLcpv1X1GoSiZodECn
+         qAj0jodZqnCmggqlnZvg0PKyec2fhU7JIrjY1o+lAFBQipdZDFlCGg+mSndiJJrJebCT
+         +/poGWi4CQAe2cR11xrtNJpzwiAAxIDE+GX438XzKeSYa37aWfYqyi028HFreCHauNo7
+         EFbia5uSs5s0FCC6vFb6nsY7w/A74NsVUpX9mBXBOgFY4jTY+XkAZobDFR8hPsgYdyv5
+         YIk2xGAooaz14LjjBt8XRs+fyu/ZUDJjSRy78zchlVCYqHZ7hnGrVhPTd7XmkPqmDzel
+         96OA==
+X-Forwarded-Encrypted: i=1; AJvYcCU5ZcLwMAeceKqJh54cfTQdbcr1GtErWRRX0aZO+HxwoPAphR+2H9vVbjqPP7nBjLz/K4eFtR+ld3dcHLUv@vger.kernel.org, AJvYcCV3hKLU7GrCowYr6PEMxTQmdqxYEDBkm3ON/sw1H6V3B64B3oWxZLXzBVocnvRHX7xvXJVpvy3g@vger.kernel.org, AJvYcCWnYUcr+XdVx+S32l2gcaOVcCV4tKTr/cLwExLM76RsuP5VZptIgA2a/8GUnbUo4n7YDt+Xxcm49WuE@vger.kernel.org
+X-Gm-Message-State: AOJu0YziTVrZ0LetCAfdCttCNLYiNNStt0KrsIttiy6xqryYsWYKyklF
+	GYpUcU8SZR4fcp+zkiwFm+WNbTiUrtY1FnwyNObLsgxJntiBuqkg
+X-Gm-Gg: ASbGncv0q9c0kVkKdXPtTDc8azB4V8MTj2b9mldpoHGG+N9HZOrElOshOsKRDwy+dtl
+	8qHdP+2cAv44L3hTWfXN+tGus7R/nERoO7vpxaZcZ8Et7Yp2ABxgwvE22XC4GvS1VwZrnH0nFtY
+	rH9UBiHRFNnR/6bLZmZ8ovQVwgCqOYm0TGKpyWdg45xICzAYC9gHXmMxrRQ+mURKB4hOTEYvua+
+	/2nZCooL2dipjBsgKYS4USl80iWHsP+9vErRLV+QGzlzeEXqZZRP36cELypfnyEnh1Tb9tBIb8L
+	s+ecYlCw+On7Bj2xa8GZ
+X-Google-Smtp-Source: AGHT+IF48MIEuo2MOFTyOtajCaIZ0VDeA9fTgytDQQC+qHk6FufxDgXmhh2qYRm3u0obvO/2DLZIOQ==
+X-Received: by 2002:a05:620a:278a:b0:7c3:c421:3e92 with SMTP id af79cd13be357-7c4e167830emr1619956585a.10.1741579726778;
+        Sun, 09 Mar 2025 21:08:46 -0700 (PDT)
+Received: from localhost ([2001:da8:7001:11::cb])
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7c557e08ecasm36964685a.98.2025.03.09.21.08.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Mar 2025 21:08:46 -0700 (PDT)
+From: Inochi Amaoto <inochiama@gmail.com>
+To: Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chen Wang <unicorn_wang@outlook.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Inochi Amaoto <inochiama@gmail.com>
+Cc: linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	sophgo@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Yixun Lan <dlan@gentoo.org>,
+	Longbin Li <looong.bin@gmail.com>
+Subject: Re: [PATCH v3 0/2] clk: sophgo: add SG2044 clock controller support
+Date: Mon, 10 Mar 2025 12:08:32 +0800
+Message-ID: <174157953239.287836.12496608762621997429.b4-ty@gmail.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250226232320.93791-1-inochiama@gmail.com>
+References: <20250226232320.93791-1-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250307-rss-v9-0-df76624025eb@daynix.com> <20250307-rss-v9-5-df76624025eb@daynix.com>
-In-Reply-To: <20250307-rss-v9-5-df76624025eb@daynix.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 10 Mar 2025 12:03:35 +0800
-X-Gm-Features: AQ5f1JpUIYkO2z7JqKfhDMFz04EDw9VRlQFOeI99RHje5MrLTIGs-yAN3N8PypE
-Message-ID: <CACGkMEuTwd4+DP1Cb+ZgJtxTiJj4N_NMPHiKusd8a4Tn3+B_3A@mail.gmail.com>
-Subject: Re: [PATCH net-next v9 5/6] selftest: tun: Add tests for virtio-net hashing
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
-	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
-	Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
-	Lei Yang <leiyang@redhat.com>, Simon Horman <horms@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Fri, Mar 7, 2025 at 7:02=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix.=
-com> wrote:
->
-> The added tests confirm tun can perform RSS and hash reporting, and
-> reject invalid configurations for them.
+On Thu, 27 Feb 2025 07:23:17 +0800, Inochi Amaoto wrote:
+> The clock controller of SG2044 provides multiple clocks for various
+> IPs on the SoC, including PLL, mux, div and gates. As the PLL and
+> div have obvious changed and do not fit the framework of SG2042,
+> a new implement is provided to handle these.
+> 
+> Changed from v2:
+> 1. Applied Chen Wang' tag
+> 2. patch 2: fix author mail infomation
+> 
+> [...]
 
-Let's be more verbose here. E.g what's the network topology used here.
+Applied to for-next, thanks!
 
->
-> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> Tested-by: Lei Yang <leiyang@redhat.com>
-> ---
->  tools/testing/selftests/net/Makefile |   2 +-
->  tools/testing/selftests/net/tun.c    | 584 +++++++++++++++++++++++++++++=
-+++++-
->  2 files changed, 576 insertions(+), 10 deletions(-)
->
-> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftes=
-ts/net/Makefile
-> index 73ee88d6b043004be23b444de667a1d99a6045de..9772f691a9a011d99212df324=
-63cdb930cf0a1a0 100644
-> --- a/tools/testing/selftests/net/Makefile
-> +++ b/tools/testing/selftests/net/Makefile
-> @@ -123,6 +123,6 @@ $(OUTPUT)/reuseport_bpf_numa: LDLIBS +=3D -lnuma
->  $(OUTPUT)/tcp_mmap: LDLIBS +=3D -lpthread -lcrypto
->  $(OUTPUT)/tcp_inq: LDLIBS +=3D -lpthread
->  $(OUTPUT)/bind_bhash: LDLIBS +=3D -lpthread
-> -$(OUTPUT)/io_uring_zerocopy_tx: CFLAGS +=3D -I../../../include/
-> +$(OUTPUT)/io_uring_zerocopy_tx $(OUTPUT)/tun: CFLAGS +=3D -I../../../inc=
-lude/
->
->  include bpf.mk
-> diff --git a/tools/testing/selftests/net/tun.c b/tools/testing/selftests/=
-net/tun.c
-> index 463dd98f2b80b1bdcb398cee43c834e7dc5cf784..acadeea7194eaea9416a605b4=
-7f99f7a5f1f80cd 100644
-> --- a/tools/testing/selftests/net/tun.c
-> +++ b/tools/testing/selftests/net/tun.c
-> @@ -2,21 +2,38 @@
->
->  #define _GNU_SOURCE
->
-> +#include <endian.h>
->  #include <errno.h>
->  #include <fcntl.h>
-> +#include <sched.h>
+[1/2] dt-bindings: clock: sophgo: add clock controller for SG2044
+      https://github.com/sophgo/linux/commit/0332ae22ce09ce64f5e54fc2a24ed22073dbeb9d
+[2/2] clk: sophgo: Add clock controller support for SG2044 SoC
+      https://github.com/sophgo/linux/commit/fcee6f2173e7f7fb39f35899faea282fd9b5ea30
 
-Is this needed?
-
-> +#include <stddef.h>
->  #include <stdio.h>
->  #include <stdlib.h>
->  #include <string.h>
->  #include <unistd.h>
-> -#include <linux/if.h>
-> +#include <net/if.h>
-> +#include <netinet/ip.h>
-> +#include <sys/ioctl.h>
-> +#include <sys/socket.h>
-> +#include <linux/compiler.h>
-> +#include <linux/icmp.h>
-> +#include <linux/if_arp.h>
->  #include <linux/if_tun.h>
-> +#include <linux/ipv6.h>
->  #include <linux/netlink.h>
->  #include <linux/rtnetlink.h>
-> -#include <sys/ioctl.h>
-> -#include <sys/socket.h>
-> +#include <linux/sockios.h>
-> +#include <linux/tcp.h>
-> +#include <linux/udp.h>
-> +#include <linux/virtio_net.h>
->
->  #include "../kselftest_harness.h"
->
-> +#define TUN_HWADDR_SOURCE { 0x02, 0x00, 0x00, 0x00, 0x00, 0x00 }
-> +#define TUN_HWADDR_DEST { 0x02, 0x00, 0x00, 0x00, 0x00, 0x01 }
-> +#define TUN_IPADDR_SOURCE htonl((172 << 24) | (17 << 16) | 0)
-> +#define TUN_IPADDR_DEST htonl((172 << 24) | (17 << 16) | 1)
-> +
->  static int tun_attach(int fd, char *dev)
->  {
->         struct ifreq ifr;
-> @@ -39,7 +56,7 @@ static int tun_detach(int fd, char *dev)
->         return ioctl(fd, TUNSETQUEUE, (void *) &ifr);
->  }
->
-> -static int tun_alloc(char *dev)
-> +static int tun_alloc(char *dev, short flags)
->  {
->         struct ifreq ifr;
->         int fd, err;
-> @@ -52,7 +69,8 @@ static int tun_alloc(char *dev)
->
->         memset(&ifr, 0, sizeof(ifr));
->         strcpy(ifr.ifr_name, dev);
-> -       ifr.ifr_flags =3D IFF_TAP | IFF_NAPI | IFF_MULTI_QUEUE;
-> +       ifr.ifr_flags =3D flags | IFF_TAP | IFF_NAPI | IFF_NO_PI |
-> +                       IFF_MULTI_QUEUE;
->
->         err =3D ioctl(fd, TUNSETIFF, (void *) &ifr);
->         if (err < 0) {
-> @@ -64,6 +82,40 @@ static int tun_alloc(char *dev)
->         return fd;
->  }
->
-> +static bool tun_add_to_bridge(int local_fd, const char *name)
-> +{
-
-I wonder if a packet socket is more convenient here.
-
-Thanks
+Thanks,
+Inochi
 
 
