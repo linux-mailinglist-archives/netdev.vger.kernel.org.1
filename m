@@ -1,132 +1,216 @@
-Return-Path: <netdev+bounces-173543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EA00A595A0
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 14:09:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F614A595DE
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 14:15:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99F9D188F85C
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 13:09:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0CA607A7165
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 13:13:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DC2A22A4E8;
-	Mon, 10 Mar 2025 13:08:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DE7A22E015;
+	Mon, 10 Mar 2025 13:11:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="A8BFc6kb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IBgq+m5p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1570022576C;
-	Mon, 10 Mar 2025 13:08:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65DC122A4C9
+	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 13:11:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741612128; cv=none; b=hIirzFdTdKnW4nESTe8u1fqLr0RU+fCyIW/cEM3QedI+9iiqKwXG6gLVwG2JyM2EICBM8MBhC4esv0Fm9LyD+y8xCv3l3S6ty+wN5FFnjZ2wmDkL2bDZ/eovdXAybur8KpstUjrOtPNi2UFymHMcWO5YQyY31I1li4sB10E06aU=
+	t=1741612302; cv=none; b=j6OPdjbuEJ2bfclcwQ+qAgUIVQtiZgG3IJeDqxNFhtVMuyp2ER2Ghpg3Mz91w4tb6gOJ8ryjZe3vk4I2ZIzDt8dFZOJ9GAPv/cDZjZQGvtXGtc0xDlAuQonai5cnBGof6a/FyZuwt4WT4+l5lwC7KvwbS0+/VpvXLKf0nQhIRZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741612128; c=relaxed/simple;
-	bh=rdAP5tZXO/e6X0g9/aj7v6Q8fYYTM/HQGTEow6hWTxU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CF5/1JXXEQXRdxOIoDLkEDIa4pMPxBP94/vvqP+nEcDc+Qzci4/+nSrMkDj0xcUrNTqkhHmkSOOpojhvcHcqouT5fxODaRzCw6SQtYRY8zgdRIrB2w2MPReqFAHv43omfKOw81wD3zKRexB6HfF87RhusUxdk/rrUGNj+d5yH0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=A8BFc6kb; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1trcrp-00Brbe-7O; Mon, 10 Mar 2025 14:08:25 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=YMtG22Pqun0Tp+q9j4j91l8TFa4W5ET+k4wRnt7+fP0=; b=A8BFc6kbFm87pNoML1HwqDmRTf
-	UJA/GzevYwKdN5F5BZrgi//pgOyudJoiTj1cK1jqvTlnhZursG3xtzsBooyMMx4vLOx+Py6kxhz8u
-	hIEVjCM4oc8/5KNIerC9JWvKACQGvBa3WFWLxq6inZH8tyNEnNemy3BsVbvmoAWRn+/snlLvSHaXk
-	ddO8bi7iUrcF5CFLUzM58GA01OsGXH138lYeRHo1EjItfLMyknx62msIBc85WDunVEuay4pTlM87c
-	oHaOor4nkaHnadScKgfH3p4cxyNGqYOaGlUCpKQVr2CTHSgJL4J7b442qLYS5+VhMNWyP9iroaqxJ
-	2zf7qkeA==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1trcrc-0006oZ-M9; Mon, 10 Mar 2025 14:08:13 +0100
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1trcrZ-007B3j-Vc; Mon, 10 Mar 2025 14:08:10 +0100
-Message-ID: <d2d3eff9-23df-4098-87cc-d0ad5fde6e1e@rbox.co>
-Date: Mon, 10 Mar 2025 14:08:07 +0100
+	s=arc-20240116; t=1741612302; c=relaxed/simple;
+	bh=AssBWXIV/ifoG3hrXVd+m7SK7nKuBAWaSW5ZLSzg9hc=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=Q2dbXIfFwiwTkaQEMNog1qMMozVqRPgKO5bY8CbF/EoaDLTvP8XLFMp2dJ0G4NCXU+DXE6LX9DH70e1qPyi7WXiTi8ZdxkwKZGAVchb4WplYJHShmHUgi68KDIpJ9cLGz1000NxPUVUTd5oBRFFDwlr2dmNTg+Uv4KviRPyPBqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IBgq+m5p; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741612299;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=TvRKVxX2V+LpzqeszFyuH8/D6f0FPnNS+mKySUYqqBo=;
+	b=IBgq+m5pxHdjjqX4G5vRZQdVDls+Sre3FzPWVRfJSxdr8aX1Y50SCDHKWWAHyV2SYs8K/5
+	+OxuEpJ2/Sx6/Buvxk6Zh6AstR38Au/Zn6JR1JxVPBkgyL0Utt3HuPV3iJSy8Y48+1Yq9I
+	D1fvvzHu7ws7WW61ZtdGucov4gb/+HQ=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-572-3E19lZTPOVewlYjg6GM7WQ-1; Mon,
+ 10 Mar 2025 09:11:36 -0400
+X-MC-Unique: 3E19lZTPOVewlYjg6GM7WQ-1
+X-Mimecast-MFC-AGG-ID: 3E19lZTPOVewlYjg6GM7WQ_1741612294
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B5D2E19560B7;
+	Mon, 10 Mar 2025 13:11:34 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.61])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6A1ED1956096;
+	Mon, 10 Mar 2025 13:11:32 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org
+cc: dhowells@redhat.com, Christian Brauner <brauner@kernel.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    linux-afs@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: [GIT PULL net-next v4] afs, rxrpc: Clean up refcounting on afs_cell and afs_server records
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v2 1/3] bpf, sockmap: avoid using sk_socket after
- free
-To: Jiayuan Chen <jiayuan.chen@linux.dev>, xiyou.wangcong@gmail.com,
- john.fastabend@gmail.com, jakub@cloudflare.com, martin.lau@linux.dev
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, andrii@kernel.org, eddyz87@gmail.com,
- mykolal@fb.com, ast@kernel.org, daniel@iogearbox.net, song@kernel.org,
- yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, sgarzare@redhat.com,
- netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, mrpre@163.com, cong.wang@bytedance.com,
- syzbot+dd90a702f518e0eac072@syzkaller.appspotmail.com
-References: <20250228055106.58071-1-jiayuan.chen@linux.dev>
- <20250228055106.58071-2-jiayuan.chen@linux.dev>
- <baeca627-e6f1-4d0a-aea5-fa31689edc4d@rbox.co>
- <78ee737400721758fa67b4f285e8ba61dc6b893b@linux.dev>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <78ee737400721758fa67b4f285e8ba61dc6b893b@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <954021.1741612291.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 10 Mar 2025 13:11:31 +0000
+Message-ID: <954022.1741612291@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On 3/10/25 12:36, Jiayuan Chen wrote:
-> March 7, 2025 at 5:45 PM, "Michal Luczaj" <mhal@rbox.co> wrote:
-> ...
->> BTW, lockdep (CONFIG_LOCKDEP=y) complains about calling AF_UNIX's
->> read_skb() under RCU read lock.
->>
-> My environment also has LOCKDEP enabled, but I didn't see similar
-> warnings.
-> Moreover, RCU assertions are typically written as:
-> 
-> WARN_ON_ONCE(!rcu_read_lock_held())
-> 
-> And when LOCKDEP is not enabled, rcu_read_lock_held() defaults to
-> returning 1. So, it's unlikely to trigger a warning due to an RCU lock
-> being held.
-> 
-> Could you provide more of the call stack?
+Hi,
 
-Sure, bpf-next with this series applied, test_progs -t sockmap_basic:
+Could you pull this into the net-next tree please (it has been pulled into
+the vfs tree[1])?  Besides fixing an rmmod bug, the changes made to the AF=
+S
+filesystem make it easier to use the AF_RXRPC RxGK (GSSAPI) security
+class[2].
 
-=============================
-[ BUG: Invalid wait context ]
-6.14.0-rc3+ #111 Tainted: G           OE
------------------------------
-test_progs/37755 is trying to lock:
-ffff88810d9bc3c0 (&u->iolock){+.+.}-{4:4}, at: unix_stream_read_skb+0x30/0x120
-other info that might help us debug this:
-context-{5:5}
-1 lock held by test_progs/37755:
- #0: ffffffff833700e0 (rcu_read_lock){....}-{1:3}, at: sk_psock_verdict_data_ready+0x3e/0x2a0
-stack backtrace:
-CPU: 13 UID: 0 PID: 37755 Comm: test_progs Tainted: G           OE      6.14.0-rc3+ #111
-Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.3-1-1 04/01/2014
-Call Trace:
- dump_stack_lvl+0x68/0x90
- lock_acquire+0xcf/0x2e0
- __mutex_lock+0x9c/0xcc0
- unix_stream_read_skb+0x30/0x120
- sk_psock_verdict_data_ready+0x8d/0x2a0
- unix_stream_sendmsg+0x232/0x640
- __sys_sendto+0x1cd/0x1e0
- __x64_sys_sendto+0x20/0x30
- do_syscall_64+0x93/0x180
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
+More specifically, these changes make it easier to map from the rxrpc_peer
+record back to the afs_server record, thereby making it easier for AF_RXRP=
+C
+to reach out to the AFS filesystem to obtain a token to include in the
+RESPONSE packet sent in reply to the AFS fileserver's security challenge.
+The fileserver can then use this token to set up a secure connection back
+to the client for the purpose of encrypted notifications.
+
+These changes fix an occasional hang that's only really encountered when
+rmmod'ing the kafs module, one of the reasons why I'm proposing it for the
+next merge window rather than immediate upstreaming.  The changes include:
+
+ (1) Remove the "-o autocell" mount option.  This is obsolete with the
+     dynamic root and removing it makes the next patch slightly easier.
+
+ (2) Change how the dynamic root mount is constructed.  Currently, the roo=
+t
+     directory is (de)populated when it is (un)mounted if there are cells
+     already configured and, further, pairs of automount points have to be
+     created/removed each time a cell is added/deleted.
+
+     This is changed so that readdir on the root dir lists all the known
+     cell automount pairs plus the @cell symlinks and the inodes and
+     dentries are constructed by lookup on demand.  This simplifies the
+     cell management code.
+
+ (3) A few improvements to the afs_volume tracepoint.
+
+ (4) A few improvements to the afs_server tracepoint.
+
+ (5) Pass trace info into the afs_lookup_cell() function to allow the trac=
+e
+     log to indicate the purpose of the lookup.
+
+ (6) Remove the 'net' parameter from afs_unuse_cell() as it's superfluous.
+
+ (7) In rxrpc, allow a kernel app (such as kafs) to store a word of
+     information on rxrpc_peer records.
+
+ (8) Use the information stored on the rxrpc_peer record to point to the
+     afs_server record.  This allows the server address lookup to be done
+     away with.
+
+ (9) Simplify the afs_server ref/activity accounting to make each one
+     self-contained and not garbage collected from the cell management wor=
+k
+     item.
+
+(10) Simplify the afs_cell ref/activity accounting to make each one of
+     these also self-contained and not driven by a central management work
+     item.
+
+     The current code was intended to make it such that a single timer for
+     the namespace and one work item per cell could do all the work
+     required to maintain these records.  This, however, made for some
+     sequencing problems when cleaning up these records.  Further, the
+     attempt to pass refs along with timers and work items made getting it
+     right rather tricky when the timer or work item already had a ref
+     attached and now a ref had to be got rid of.
+
+Thanks,
+David
+
+Link: https://lore.kernel.org/r/20250310094206.801057-1-dhowells@redhat.co=
+m/ [1]
+Link: https://web.git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-f=
+s.git/log/?h=3Drxrpc-next [2]
+
+---
+The following changes since commit 1e15510b71c99c6e49134d756df91069f7d1814=
+1:
+
+  Merge tag 'net-6.14-rc5' of git://git.kernel.org/pub/scm/linux/kernel/gi=
+t/netdev/net (2025-02-27 09:32:42 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags=
+/afs-next-20250310
+
+for you to fetch changes up to e2c2cb8ef07affd9f69497ea128fa801240fdf32:
+
+  afs: Simplify cell record handling (2025-03-10 09:47:15 +0000)
+
+----------------------------------------------------------------
+afs: Fix ref leak in rmmod
+
+----------------------------------------------------------------
+David Howells (11):
+      afs: Fix afs_atcell_get_link() to handle RCU pathwalk
+      afs: Remove the "autocell" mount option
+      afs: Change dynroot to create contents on demand
+      afs: Improve afs_volume tracing to display a debug ID
+      afs: Improve server refcount/active count tracing
+      afs: Make afs_lookup_cell() take a trace note
+      afs: Drop the net parameter from afs_unuse_cell()
+      rxrpc: Allow the app to store private data on peer structs
+      afs: Use the per-peer app data provided by rxrpc
+      afs: Fix afs_server ref accounting
+      afs: Simplify cell record handling
+
+ fs/afs/addr_list.c         |  50 ++++
+ fs/afs/cell.c              | 446 ++++++++++++++-------------------
+ fs/afs/cmservice.c         |  82 +------
+ fs/afs/dir.c               |   5 +-
+ fs/afs/dynroot.c           | 501 ++++++++++++++++---------------------
+ fs/afs/fs_probe.c          |  32 ++-
+ fs/afs/fsclient.c          |   4 +-
+ fs/afs/internal.h          | 100 ++++----
+ fs/afs/main.c              |  16 +-
+ fs/afs/mntpt.c             |   5 +-
+ fs/afs/proc.c              |  19 +-
+ fs/afs/rxrpc.c             |   8 +-
+ fs/afs/server.c            | 601 +++++++++++++++++++---------------------=
+-----
+ fs/afs/server_list.c       |   6 +-
+ fs/afs/super.c             |  25 +-
+ fs/afs/vl_alias.c          |   7 +-
+ fs/afs/vl_rotate.c         |   2 +-
+ fs/afs/volume.c            |  15 +-
+ include/net/af_rxrpc.h     |   2 +
+ include/trace/events/afs.h |  83 ++++---
+ net/rxrpc/ar-internal.h    |   1 +
+ net/rxrpc/peer_object.c    |  30 ++-
+ 22 files changed, 927 insertions(+), 1113 deletions(-)
 
 
