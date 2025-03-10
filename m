@@ -1,188 +1,162 @@
-Return-Path: <netdev+bounces-173697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9FEEA5A6CB
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 23:15:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6AF9A5A6D1
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 23:16:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 744193AA20B
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 22:15:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D87B11736BD
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 22:16:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4433E1DE88E;
-	Mon, 10 Mar 2025 22:15:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66FFD1E3DF2;
+	Mon, 10 Mar 2025 22:16:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="khmFllzp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="byXYwimg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DE60382;
-	Mon, 10 Mar 2025 22:15:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35DE0382;
+	Mon, 10 Mar 2025 22:16:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741644954; cv=none; b=Dd9m0dSgltvYdgPBSrHSbsUdgMa+frUXZiPxdK6n3MgBwGEb+H2y+FuiTAfWKCfTiW8SHsN9rLohPF9ra7Zye96x1w1qUx5wCVt3TcMw6kQO+3C8ye2LBh0mqu8Dszz3JMi0Zar6qFe2/4+JD/1dbcyi9pBRGlFx6MpBgawIc6o=
+	t=1741645013; cv=none; b=Itymgt6grRPdJp/T4YlMkAdfe+r0NNLdCwqpuLbXAW+88p8dEiVvEWrOUsLilgb34h/S8NyI+3IBO+5TeTx1RP00CZ9u1MDBt+XrhlhWINzlM7BTtgxBBV/wWlP7nePKg1OQRe/M8Gem/COVHNmr7psfxD8Ya14lcyks8tLSlIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741644954; c=relaxed/simple;
-	bh=MF4s2eEn3ZdqFBAAjM18R0r3cdwRqtwQDWZrbQK3364=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OL9Sdc4enteIsjiZQmVSkRssqfMeC+ncxqDTXzCEo2CYG5iIe+W16HnfHrqiEVoDamzDejDTCPlqf+Aly4ytXiZx+4sZQ+/WERytTHpfvHw6jEPYZ78yf5ay6siTmGHcCUegotxp1ETwEa6Vq/amruL6QZmYPOkcH39VlUUrwRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=khmFllzp; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43cfba466b2so15232695e9.3;
-        Mon, 10 Mar 2025 15:15:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741644951; x=1742249751; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Rc2ZWPVagd462p4IcOz1KfXDbsfsbpoLN4uqC4LzTDw=;
-        b=khmFllzpR4v9dWrIHpae6TiePj53x/gQB3xiu0Qj5fbzi0uc+wml+NB0ptJD8cl+vk
-         5dAXUNQnjDnfDiApxcmRB4Gh75Ye1ToomcD+J0Mt8DF1GQ+UscB2K7diuSNyDF8DJ9mA
-         tJJx02QM1wNbEqD3lx3W3E0mFGxICBtrp6HRBUsgJUGMZifMpgTmfaF6+miyEIEAuj+1
-         C8i+LBwB/w83NiNgC2gzHtIt/Sbwaj8THX37QmfYzugExIFvA53NfOQSW8J9fs6HZJVS
-         pxoeJY9AdOZmV4pHg6t11WLR5EeKawoq/tV90U9Y6B2fm4X98q5C4L0KVWOTDdF0lxyq
-         ckdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741644951; x=1742249751;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Rc2ZWPVagd462p4IcOz1KfXDbsfsbpoLN4uqC4LzTDw=;
-        b=q9qFF7XycYIRxxBUW40hlQOH5DNPLd6ZPwNb/54LoYuZ6pHgGZsWSBU9IzCH2xSLGU
-         lj3gi4HGlQduno+Kz/BxQyUFQetDpSfPf7Rfk/wNw41irI5HpeJefp/o6x782J5jVgYx
-         qSCO6IYibRGJKsNIjLqGsQXhRKJADcAChJCo0WZl1qP8sZOqStyfnIQrv95OE/iZKCLp
-         1OKmS6032NsNJExIMvuEtdnfVHiC9xXqJi5ieBQLRFXSP+G8SfHr9EYWI52xRWdeHfXi
-         uCFGxIqCT25iQC1cdPltrkGMi1Um8c89/aMGts1sHxkRpPheUwPg6gVahpK3Z1y6pgqs
-         tZzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUANR0ETUZphJ1iVidNI/uO08u3d4U7pq20SwAaIWbFIAbPJRyCcHOQDpGKDtqru6BbE6s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtlTlmLbtpCKoFT6C0ds8PDi5XwoNJzJSM2r3WdgII09OxxS6p
-	MZ6BiR5FwACYQwMHSZ7bonZHlkR1UjZaKEo282h4Qb2wX8l4zU5I
-X-Gm-Gg: ASbGnctO6FSinOcXbB0c6xUyU245xf0Z4GoLNxmFo9wa5BA4nfRvy44kw8iDBd0FlBJ
-	+ZNvXRH6kvmP3DYO7EgYgtEVnzR2y0qOaCpI1RDFNGo81P/ZG9LuyhrlUiFY5GlTcCDdUpsM5qC
-	otrgUZxqAf0H8wjATD0u0TxEh5s00/9anhT8kBXv2CQcJTTi47XyEbqBwsCi9F+xZMlMaYpfbnC
-	YxCy0CQtmNYhGdp1p6U4viLvIN+Gu9ZnnDDWg36QnDOdNf6SoOJFIkC9zZkYabDqAkY1sCrHE1R
-	zOE5BZj6WgNuIjzrjYD1hLFhLowv/IJhXStfZUBu1T5Tn0ANZYSeuMFovhSYhsUis1NA5X8lDzz
-	qp/4Xkj0=
-X-Google-Smtp-Source: AGHT+IHzVimTg7b3GFrOvWnyocg9mMANFRC04CWs1WvwAmBZ9h6Jr06n15+O+9cFdqmAiq1PLlJOyQ==
-X-Received: by 2002:a5d:59a8:0:b0:391:2d76:baaa with SMTP id ffacd0b85a97d-39132db1be7mr13345620f8f.46.1741644950648;
-        Mon, 10 Mar 2025 15:15:50 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43cf515c580sm60622075e9.15.2025.03.10.15.15.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Mar 2025 15:15:50 -0700 (PDT)
-Date: Mon, 10 Mar 2025 22:15:48 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: arthur@arthurfabre.com
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, jakub@cloudflare.com,
- hawk@kernel.org, yan@cloudflare.com, jbrandeburg@cloudflare.com,
- thoiland@redhat.com, lbiancon@redhat.com, Arthur Fabre
- <afabre@cloudflare.com>
-Subject: Re: [PATCH RFC bpf-next 05/20] trait: Replace memcpy calls with
- inline copies
-Message-ID: <20250310221548.1c198a2b@pumpkin>
-In-Reply-To: <20250305-afabre-traits-010-rfc2-v1-5-d0ecfb869797@cloudflare.com>
-References: <20250305-afabre-traits-010-rfc2-v1-0-d0ecfb869797@cloudflare.com>
-	<20250305-afabre-traits-010-rfc2-v1-5-d0ecfb869797@cloudflare.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1741645013; c=relaxed/simple;
+	bh=TsIVHhAGzWgkmSmlzL5RUweT57BypUp0vQOzaPl/oNY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=d9QkFXAOVJ9rg+bQcE3mXXqypErEx7QfQzkNnR45RCkxnsZqFQtvWTS7g6vrvCCoChST09Pr2JN1Lh/Ydby6Q1CAWdc0eHDDpXzbCcRFliRU9pAjCqolgzbcYO2Gu6i7fr5vqiUeCJ9Ms+dznYviGmYDyNS8jWICKOdTlHOskc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=byXYwimg; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741645011; x=1773181011;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=TsIVHhAGzWgkmSmlzL5RUweT57BypUp0vQOzaPl/oNY=;
+  b=byXYwimgMfGrMhFZHWRWOyb1xYyw4L29DKyOz6Q8d0pQMrBu04g9+N2Q
+   Ey0GnQ7WSvkoBK7IqidksJnWKXFApfi2loR/7dQaPEvxk9u9AkDYv1T4S
+   D05VxqummNSSJfa779DGi4aWKiDjSd7nSzBo1fzqzoveUzxJyBY4zpTql
+   3cSgsaKyQXsDkSg/SmcihxsCAbZcQc6NvWR9bZ7tZ3F8E8loUpICKz7gF
+   JlQM59ryg78CxR2m3nepY85nTERl1LGC5edSqLtcyXbB5qwWm2f8FKQIW
+   BryKIzfq6Nnrhl0zPdGdOacDHuYTephEIl2BSpZPt4COVir0cYLZHGVJb
+   g==;
+X-CSE-ConnectionGUID: xpzou1/tSnyKBeNJCTs1MA==
+X-CSE-MsgGUID: 9YyUDk9zTEKjxsj+LKCm0A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="46443272"
+X-IronPort-AV: E=Sophos;i="6.14,237,1736841600"; 
+   d="scan'208";a="46443272"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 15:16:50 -0700
+X-CSE-ConnectionGUID: PSw1ICMzSayj7hbOQ+CvGA==
+X-CSE-MsgGUID: wIbL1Gw/TPO+Vxm76VVhhg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,237,1736841600"; 
+   d="scan'208";a="143315031"
+Received: from jekeller-desk.jf.intel.com ([10.166.241.15])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 15:16:50 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH net 0/5] net: ptp: fix egregious supported flag checks
+Date: Mon, 10 Mar 2025 15:16:35 -0700
+Message-Id: <20250310-jk-net-fixes-supported-extts-flags-v1-0-854ffb5f3a96@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAMNkz2cC/x2MwQqDMBAFf0X23IUYDUh/pfQgzdNuW2LIxiKI/
+ +7icWBmdlIUgdK92angLypLMmhvDb3eY5rBEo3JOx9c1zr+fDmh8iQblHXNeSkVkbHVqjz9xlk
+ ZQ9/1cYAPwZONcsGl2+dBFtPzOE4TnFoZeQAAAA==
+X-Change-ID: 20250310-jk-net-fixes-supported-extts-flags-e8434d8e2552
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Richard Cochran <richardcochran@gmail.com>, Ruud Bos <kernel.hbk@gmail.com>, 
+ Paul Barker <paul.barker.ct@bp.renesas.com>, 
+ =?utf-8?q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>, 
+ Bryan Whitehead <bryan.whitehead@microchip.com>, 
+ UNGLinuxDriver@microchip.com, Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, 
+ Florian Fainelli <florian.fainelli@broadcom.com>, 
+ Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ Jonathan Lemon <jonathan.lemon@gmail.com>, Lasse Johnsen <l@ssejohnsen.me>, 
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+ linux-renesas-soc@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>
+X-Mailer: b4 0.14.2
 
-On Wed, 05 Mar 2025 15:32:02 +0100
-arthur@arthurfabre.com wrote:
+In preparation for adding .supported_extts_flags and
+.supported_perout_flags to the ptp_clock_info structure, fix a couple of
+places where drivers get existing flag gets grossly incorrect.
 
-> From: Arthur Fabre <afabre@cloudflare.com>
-> 
-> When copying trait values to or from the caller, the size isn't a
-> constant so memcpy() ends up being a function call.
-> 
-> Replace it with an inline implementation that only handles the sizes we
-> support.
-> 
-> We store values "packed", so they won't necessarily be 4 or 8 byte
-> aligned.
-> 
-> Setting and getting traits is roughly ~40% faster.
-> 
-> Signed-off-by: Arthur Fabre <afabre@cloudflare.com>
-> ---
->  include/net/trait.h | 25 +++++++++++++++++++------
->  1 file changed, 19 insertions(+), 6 deletions(-)
-> 
-> diff --git a/include/net/trait.h b/include/net/trait.h
-> index 536b8a17dbbc091b4d1a4d7b4b21c1e36adea86a..d4581a877bd57a32e2ad032147c906764d6d37f8 100644
-> --- a/include/net/trait.h
-> +++ b/include/net/trait.h
-> @@ -7,6 +7,7 @@
->  #include <linux/errno.h>
->  #include <linux/string.h>
->  #include <linux/bitops.h>
-> +#include <linux/unaligned.h>
->  
->  /* Traits are a very limited KV store, with:
->   * - 64 keys (0-63).
-> @@ -145,23 +146,23 @@ int trait_set(void *traits, void *hard_end, u64 key, const void *val, u64 len, u
->  			memmove(traits + off + len, traits + off, traits_size(traits) - off);
->  	}
->  
-> -	/* Set our value. */
-> -	memcpy(traits + off, val, len);
-> -
-> -	/* Store our length in header. */
->  	u64 encode_len = 0;
-> -
->  	switch (len) {
->  	case 2:
-> +		/* Values are least two bytes, so they'll be two byte aligned */
-> +		*(u16 *)(traits + off) = *(u16 *)val;
->  		encode_len = 1;
->  		break;
->  	case 4:
-> +		put_unaligned(*(u32 *)val, (u32 *)(traits + off));
->  		encode_len = 2;
->  		break;
->  	case 8:
-> +		put_unaligned(*(u64 *)val, (u64 *)(traits + off));
->  		encode_len = 3;
->  		break;
->  	}
-> +
->  	h->high |= (encode_len >> 1) << key;
->  	h->low |= (encode_len & 1) << key;
->  	return 0;
-> @@ -201,7 +202,19 @@ int trait_get(void *traits, u64 key, void *val, u64 val_len)
->  	if (real_len > val_len)
->  		return -ENOSPC;
->  
-> -	memcpy(val, traits + off, real_len);
-> +	switch (real_len) {
-> +	case 2:
-> +		/* Values are least two bytes, so they'll be two byte aligned */
-> +		*(u16 *)val = *(u16 *)(traits + off);
-> +		break;
-> +	case 4:
-> +		*(u32 *)val = get_unaligned((u32 *)(traits + off));
-> +		break;
-> +	case 8:
-> +		*(u64 *)val = get_unaligned((u64 *)(traits + off));
-> +		break;
+The igb driver claims 82580 supports strictly validating PTP_RISING_EDGE
+and PTP_FALLING_EDGE, but doesn't actually check the flags. Fix the driver
+to require that the request match both edges, as this is implied by the
+datasheet description.
 
-Should there be a 'default' in here?
-Possibly just 'return 0'?
+The renesas driver also claims to support strict flag checking, but does
+not actually check the flags either. I do not have the data sheet for this
+device, so I do not know what edge it timestamps. For simplicity, just
+reject all requests with PTP_STRICT_FLAGS. This essentially prevents the
+PTP_EXTTS_REQUEST2 ioctl from working. Updating to correctly validate the
+flags will require someone who has the hardware to confirm the behavior.
 
-> +	}
-> +
->  	return real_len;
->  }
->  
-> 
+The lan743x driver supports (and strictly validates) that the request is
+either PTP_RISING_EDGE or PTP_FALLING_EDGE but not both. However, it does
+not check the flags are one of the known valid flags. Thus, requests for
+PTP_EXT_OFF (and any future flag) will be accepted and misinterpreted. Add
+the appropriate check to reject unsupported PTP_EXT_OFF requests and future
+proof against new flags.
+
+The broadcom PHY driver checks that PTP_PEROUT_PHASE is not set. This
+appears to be an attempt at rejecting unsupported flags. It is not robust
+against flag additions such as the PTP_PEROUT_ONE_SHOT, or anything added
+in the future. Fix this by instead checking against the negation of the
+supported PTP_PEROUT_DUTY_CYCLE instead.
+
+The ptp_ocp driver supports PTP_PEROUT_PHASE and PTP_PEROUT_DUTY_CYCLE, but
+does not check unsupported flags. Add the appropriate check to ensure
+PTP_PEROUT_ONE_SHOT and any future flags are rejected as unsupported.
+
+These are changes compile-tested, but I do not have hardware to validate the
+behavior.
+
+There are a number of other drivers which enable periodic output or
+external timestamp requests, but which do not check flags at all. We could
+go through each of these drivers one-by-one and meticulously add a flag
+check. Instead, these drivers will be covered only by the upcoming
+.supported_extts_flags and .supported_perout_flags checks in a net-next
+series.
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+---
+Jacob Keller (5):
+      igb: reject invalid external timestamp requests for 82580-based HW
+      renesas: reject PTP_STRICT_FLAGS as unsupported
+      net: lan743x: reject unsupported external timestamp requests
+      broadcom: fix supported flag check in periodic output function
+      ptp: ocp: reject unsupported periodic output flags
+
+ drivers/net/ethernet/intel/igb/igb_ptp.c     | 5 +++++
+ drivers/net/ethernet/microchip/lan743x_ptp.c | 6 ++++++
+ drivers/net/ethernet/renesas/ravb_ptp.c      | 3 +--
+ drivers/net/phy/bcm-phy-ptp.c                | 3 ++-
+ drivers/ptp/ptp_ocp.c                        | 4 ++++
+ 5 files changed, 18 insertions(+), 3 deletions(-)
+---
+base-commit: 992ee3ed6e9fdd0be83a7daa5ff738e3cf86047f
+change-id: 20250310-jk-net-fixes-supported-extts-flags-e8434d8e2552
+
+Best regards,
+-- 
+Jacob Keller <jacob.e.keller@intel.com>
 
 
