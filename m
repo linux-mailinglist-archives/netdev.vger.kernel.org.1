@@ -1,218 +1,154 @@
-Return-Path: <netdev+bounces-173413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8ABFAA58B49
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 05:54:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AB80A58B7B
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 06:02:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06B82188AEA1
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 04:54:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D843169148
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 05:02:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5906A1BDA97;
-	Mon, 10 Mar 2025 04:54:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9CCE1B4F17;
+	Mon, 10 Mar 2025 05:02:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YxsUKWEC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iolHTBYT"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68FFE1A23BE
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 04:54:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5327681E;
+	Mon, 10 Mar 2025 05:02:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741582484; cv=none; b=bOZMtca2IsJCtg7zVGLo7OUUoRytkR93USoBcD9J5eRR9XdEHPdR+Sc/naIxaVhe3zahXl6ADKMY8oRRi6oB7dHtUL4cZr8BuNyvs3AoIsfPoHy+gGwPc+q1lyQU0r2EbfYoobEntJ6miCtzd8VnTxFbkZz4U7GlqFQiU5DsW4s=
+	t=1741582963; cv=none; b=knq+smIm/kT4VXi4mHNICRmA1icGFLMrD8sltkRbcEF5ohaEsvFOuTz8ZMpwjenNm14NMOIX7UPvIjLhFyJ+yukS4z9edG1GDFKu/6Z+FjDkzDUfdDGyDQe7/RfLUXbkUWCtqrtXPCWSug2OulnRtI1K8YU7bg4ov/6p1+8pO8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741582484; c=relaxed/simple;
-	bh=Ej3GMGlHpVfzanKsBYzCcPizoBxxPLk+vmAC5dehH98=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dI6B7ZpZiJQrjjGOs7lPGfYWp0HbfKh2TFSsDXgDkohxRU/CMvJrccjjh9usfdIAemNPMQV9vbzaKAzd1nOHJa3Zflv13l7BNVgKt3a/Cc5CId2dDlpwstYHhp8AvlO6wuErEZT5U0X53Bu2+rIjDH5TThwrxJ6FKa/355LDI+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YxsUKWEC; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741582481;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EbceALFOAXDwlrKk6BKJ6uMiVvCY64LvSE/YeKmsmrM=;
-	b=YxsUKWECTRhfU2usd9ltQifPHNpEJsS3pXRXWP5ezzKBSeTOA1YTPgQ6pxhVzp1LXlSs5n
-	ZbFN7lEPl6HC+9+rHVY1LxE3iaYhJiXxmUaAdaEuqYutbglBSqb6KGOfVDNuzkS8FoxHAY
-	lhfUWkqbOaRi/PX7q+H6PakRQinnUzQ=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-308-ZL4wLCtzO-eeo8xswRpGSg-1; Mon, 10 Mar 2025 00:54:39 -0400
-X-MC-Unique: ZL4wLCtzO-eeo8xswRpGSg-1
-X-Mimecast-MFC-AGG-ID: ZL4wLCtzO-eeo8xswRpGSg_1741582479
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2ff78bd3026so5511972a91.1
-        for <netdev@vger.kernel.org>; Sun, 09 Mar 2025 21:54:39 -0700 (PDT)
+	s=arc-20240116; t=1741582963; c=relaxed/simple;
+	bh=SU43BrQ5Geh02OjUAMMlIrjn5xFx5LeabQZf4mR1WtM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PHXk3L2RIxjtgy7rDk/9IXOYfiSOKmSlp5Bw6oEtgQMIV6zqCLh++ISYFwV+kBdihAJUieeF+AAsLmafoSKajxYuEI8BGl64f0by1eXMvYQoyESo50i/KmewjwLNbEkxjSEkaAHFdJYrI93s695YnB8rEdPQj73Ge2HBWDgKhYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iolHTBYT; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2fee05829edso7606130a91.3;
+        Sun, 09 Mar 2025 22:02:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741582961; x=1742187761; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=SZzDAzsMMiTbeu8KMghmpk7edVoPDWNRfqPRmyFyQAM=;
+        b=iolHTBYTSnYhvdXiX5xKNvUODniz/xUJ2neN4ysvGUyJTBDqUr6QP5jlq8yJkysDhU
+         jUXcEp6qoHMCYkYLzRv5ellhvc8w+msPuRu4n/ByJlZ7cnN+mJVG31aV5uYn0K2iIITL
+         tu0n4KiR1uoiKxiLVFgGsKc1HNr+Kktap9eZyWz8ERBTzbQi3KuYNf1BduR6Bx5bsFbJ
+         ecg6eIXqjIpW0hWOgcCVbd930TZgeqgrPdcgwOF20cBT1uR0NAf4vHWT2ZGa864uA0MP
+         wn+8YMXYH8bROeffqSOsYhnUevQz5hJ71Jl2nA7G78ByoIQvdhAc0Syd1aUO0A2orjOa
+         zP6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741582479; x=1742187279;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EbceALFOAXDwlrKk6BKJ6uMiVvCY64LvSE/YeKmsmrM=;
-        b=MwZoSNUgpatqVj5PYTgHHXq8ZPZNhOcVa9JAa3dDYxCf2tSKjDSRwaykxx9eC1LZuM
-         +ejuzc4D0EHXg7CSasw8imqypz/uJOXPtvb+WxV06zdOSN5Qb0HmoSc7K5ioBIqQZr5v
-         vybRb7af09ybfKrNBOZ00pt5TBi0ra94zbLovK+mmqhAz554UD9QPud6Wm5kyM80HlFV
-         CS4MIxVyTFdbIcZ7NPcuuu4kciL3YRFH7lyDwvB8LqQNJ7PNmNshhlXTAkm/bnz2LpDA
-         +y6QFayAAgpBmEG4pXOzUk3X9hH0eBGRth/04f37nIaUlxQpmnAbXV1XOpq/5Ys2q5K2
-         YLnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV6XKhHXZ1F7iwpFO7nvlIdPsrilPk5jIudj1rAPi5VfyOR/yKpxLnXB+bJj3PjVLfrMvLcwLg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMMl4J0odjxBPAbwY1fLeco9uc4r/GjLY93fVnnylW9M/ZE8Vz
-	MMhXH0zXMeG/4M+EdbWBZwP4D5YytLOfdYxfL29E7OKaiMWGQmReja0XC+F1IUxs5OYdKTLiPuD
-	a6sDbFttlxLGx1csLqgT5HAwVWZuEKxm1U8f42ktuD4xB+AtBfW25hcMw1o5q5/20uwyEfy26Aj
-	enUM/qEGWQXln19hZ6b++PTifv81xe
-X-Gm-Gg: ASbGnct2gmCBCx+is56yoLB+0TZFlin7qDGn3NMq1iycLU+VBHJ9v+7ExhziBX0uo2/
-	Se0JBHbAMs9ciI/Z4SH0/gcAYvgvjTG1AYtK9DWUwgb70ctV/iQjYb+M6PG+XdlVWecF3bBSvEw
-	==
-X-Received: by 2002:a17:90b:17c3:b0:2ff:784b:ffe with SMTP id 98e67ed59e1d1-2ff7ce8361fmr20103667a91.11.1741582478657;
-        Sun, 09 Mar 2025 21:54:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEOy4wkubfdY4rmjE4nVYH3EzfIy63HlIimFfPmtjEVryCYR1AfKHQgA7u4tps+tBzTrdofki7L500MLPtq6VE=
-X-Received: by 2002:a17:90b:17c3:b0:2ff:784b:ffe with SMTP id
- 98e67ed59e1d1-2ff7ce8361fmr20103635a91.11.1741582478041; Sun, 09 Mar 2025
- 21:54:38 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1741582961; x=1742187761;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SZzDAzsMMiTbeu8KMghmpk7edVoPDWNRfqPRmyFyQAM=;
+        b=PwWw/FVtX6bZxRrYWr8GpFYt4/9ZTeg1Rn176WPFpvzF0txQsLeWTp8pwGe43CeUq8
+         mjbpGbjXfCpKDqpYbJrYPF0CcNK3Nyo2CxXTW4Whdw5CQWv1ZmsMrAoiE0bs8k9wAhnv
+         MmjjkgRaNihYyPb4/j48pY5pjVW4rEgCdO/onhlzJm1cxbFFaI4HSIcDZS1DgYW30frO
+         IZB1WidVxwC36XPG4Ex9Pz5YdlOVoWuDPozFY0aWy+5oWGGqOfJXTe/jqYWFMOznw6Om
+         N1knXzMXb8PmdW9BaBilXouVmW5tgJBxMtvZ27KqjWSElWctxZb2Wp50lxxX301Ixecq
+         mk/w==
+X-Forwarded-Encrypted: i=1; AJvYcCV711fCGxX9lEgZDP8j43o9LkmmCUXpH3LoDHSoOH/Z4Z+CepP1ep4jffns2lYcB41c3FB+iqk9HkA5kvA=@vger.kernel.org, AJvYcCW8yobucUrHVXCjEBizFU5rguly5wRnoFcigS8QrkZ9Ish09oFKcIVJhMel7Nq3XisoBAGcN+DJ@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVjnQJU12NXUcSC/808YSNmqJYkXZJbGKMt137+X9bTP9YD7Q3
+	uIFJpkYFi6oFu7+UHRolKCWqMKsf78jb2ahdApw4vlW/UQGlwUI=
+X-Gm-Gg: ASbGncsSOEwk9hMLqPciRbUpXuMIEFTTKBqEFlcG+MTzckhlirUtIe3BClQoQPuvzsz
+	yP+pXKyvXuTB49g513tb/+zlKfWOLhO8TFP2Mr5NtXdziT63x0QRDgmzejHAs4GT/1IckLDvrra
+	bNUvplheNUmZupi1G7fOqUUKmipAE4490VMTSvYz0dYnJuDckb+ybna5BQW5P47OwwLv23U+AT3
+	YlfcRn74CqI7E7sOHjMdOBgWU3H2YA6L+TObngIZMDIDCdqgvm5rxpF6Mfbcok6I+pqeiZiFfKa
+	8W9NtNtvJ/yop8pjBCs5pzx2G+bdWFCacBY+xKr8P4Tn
+X-Google-Smtp-Source: AGHT+IG7tzpgs+8t0alOed45KdjVCkt913Wo/UFpJ4Lgl1WT6Inz0OsMgjU+eYKcsC+eo2PA82hv3Q==
+X-Received: by 2002:a17:90b:3804:b0:2ee:edae:75e with SMTP id 98e67ed59e1d1-2ff7ce77a3fmr20079153a91.13.1741582961390;
+        Sun, 09 Mar 2025 22:02:41 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-2ff4e825306sm8880663a91.43.2025.03.09.22.02.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Mar 2025 22:02:40 -0700 (PDT)
+Date: Sun, 9 Mar 2025 22:02:40 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org, horms@kernel.org,
+	donald.hunter@gmail.com, michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com, andrew+netdev@lunn.ch,
+	jdamato@fastly.com, xuanzhuo@linux.alibaba.com,
+	asml.silence@gmail.com, dw@davidwei.uk
+Subject: Re: [PATCH net-next v1 3/4] net: add granular lock for the netdev
+ netlink socket
+Message-ID: <Z85ycDdGXZvJ-CN-@mini-arch>
+References: <20250307155725.219009-1-sdf@fomichev.me>
+ <20250307155725.219009-4-sdf@fomichev.me>
+ <20250307153456.7c698a1a@kernel.org>
+ <Z8uEiRW91GdYI7sL@mini-arch>
+ <CAHS8izPO2wSReuRz=k1PuXy8RAJuo5pujVMGceQVG7AvwMSVdw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250302143259.1221569-1-lulu@redhat.com> <20250302143259.1221569-9-lulu@redhat.com>
- <CACGkMEv7WdOds0D+QtfMSW86TNMAbjcdKvO1x623sLANkE5jig@mail.gmail.com> <20250303122619-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20250303122619-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 10 Mar 2025 12:54:26 +0800
-X-Gm-Features: AQ5f1Jp343rEJyx66YRk5WfInd8kOaRENHB4oOZ_ZHycTTo0oYdMS29y7Ll8IMo
-Message-ID: <CACGkMEtheNa905789WT20=p84HN9-B6=K7XA8dpB6=jJV0kh-g@mail.gmail.com>
-Subject: Re: [PATCH v7 8/8] vhost: Add a KConfig knob to enable IOCTL VHOST_FORK_FROM_OWNER
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Cindy Lu <lulu@redhat.com>, michael.christie@oracle.com, sgarzare@redhat.com, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHS8izPO2wSReuRz=k1PuXy8RAJuo5pujVMGceQVG7AvwMSVdw@mail.gmail.com>
 
-On Tue, Mar 4, 2025 at 1:33=E2=80=AFAM Michael S. Tsirkin <mst@redhat.com> =
-wrote:
->
-> On Mon, Mar 03, 2025 at 01:52:06PM +0800, Jason Wang wrote:
-> > On Sun, Mar 2, 2025 at 10:34=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrot=
-e:
-> > >
-> > > Introduce a new config knob `CONFIG_VHOST_ENABLE_FORK_OWNER_IOCTL`,
-> > > to control the availability of the `VHOST_FORK_FROM_OWNER` ioctl.
-> > > When CONFIG_VHOST_ENABLE_FORK_OWNER_IOCTL is set to n, the ioctl
-> > > is disabled, and any attempt to use it will result in failure.
-> > >
-> > > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> > > ---
-> > >  drivers/vhost/Kconfig | 15 +++++++++++++++
-> > >  drivers/vhost/vhost.c | 11 +++++++++++
-> > >  2 files changed, 26 insertions(+)
-> > >
-> > > diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
-> > > index b455d9ab6f3d..e5b9dcbf31b6 100644
-> > > --- a/drivers/vhost/Kconfig
-> > > +++ b/drivers/vhost/Kconfig
-> > > @@ -95,3 +95,18 @@ config VHOST_CROSS_ENDIAN_LEGACY
-> > >           If unsure, say "N".
-> > >
-> > >  endif
-> > > +
-> > > +config VHOST_ENABLE_FORK_OWNER_IOCTL
-> > > +       bool "Enable IOCTL VHOST_FORK_FROM_OWNER"
-> > > +       default n
-> > > +       help
-> > > +         This option enables the IOCTL VHOST_FORK_FROM_OWNER, which =
-allows
-> > > +         userspace applications to modify the thread mode for vhost =
-devices.
-> > > +
-> > > +          By default, `CONFIG_VHOST_ENABLE_FORK_OWNER_IOCTL` is set =
-to `n`,
-> > > +          meaning the ioctl is disabled and any operation using this=
- ioctl
-> > > +          will fail.
-> > > +          When the configuration is enabled (y), the ioctl becomes
-> > > +          available, allowing users to set the mode if needed.
-> > > +
-> > > +         If unsure, say "N".
-> > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > > index fb0c7fb43f78..09e5e44dc516 100644
-> > > --- a/drivers/vhost/vhost.c
-> > > +++ b/drivers/vhost/vhost.c
-> > > @@ -2294,6 +2294,8 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsig=
-ned int ioctl, void __user *argp)
-> > >                 r =3D vhost_dev_set_owner(d);
-> > >                 goto done;
-> > >         }
-> > > +
-> > > +#ifdef CONFIG_VHOST_ENABLE_FORK_OWNER_IOCTL
-> > >         if (ioctl =3D=3D VHOST_FORK_FROM_OWNER) {
-> > >                 u8 inherit_owner;
-> > >                 /*inherit_owner can only be modified before owner is =
-set*/
-> > > @@ -2313,6 +2315,15 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsi=
-gned int ioctl, void __user *argp)
-> > >                 r =3D 0;
-> > >                 goto done;
-> > >         }
-> > > +
-> > > +#else
-> > > +       if (ioctl =3D=3D VHOST_FORK_FROM_OWNER) {
-> > > +               /* When CONFIG_VHOST_ENABLE_FORK_OWNER_IOCTL is 'n', =
-return error */
-> > > +               r =3D -ENOTTY;
-> > > +               goto done;
-> > > +       }
->
-> why do we need this? won't it fail as any other unsupported ioctl?
->
-> > > +#endif
-> > > +
-> > >         /* You must be the owner to do anything else */
-> > >         r =3D vhost_dev_check_owner(d);
-> > >         if (r)
-> > > --
-> > > 2.45.0
+On 03/09, Mina Almasry wrote:
+> On Fri, Mar 7, 2025 at 3:43 PM Stanislav Fomichev <stfomichev@gmail.com> wrote:
 > >
-> > Do we need to change the default value of the inhert_owner? For example=
-:
-> >
-> > #ifdef CONFIG_VHOST_ENABLE_FORK_OWNER_IOCTL
-> > inherit_owner =3D false;
-> > #else
-> > inherit_onwer =3D true;
-> > #endif
-> >
-> > ?
->
-> I feel it is best to keep the default consistent.
-
-Just want to make sure we are on the same page.
-
-For "default", did you mean inherit_owner =3D false which is consistent
-with behaviour without the vhost task?
-
-Or inherit_onwer =3D true, then the new ioctl to make it false is
-useless. And if legacy applications want kthread behaviour it needs to
-be patched which seems self-contradictory.
-
-> All the kconfig should do, is block the ioctl.
->
-
-Thanks
-
->
-> > Other patches look good to me.
-> >
-> > Thanks
-> >
+> > On 03/07, Jakub Kicinski wrote:
+> > > On Fri,  7 Mar 2025 07:57:24 -0800 Stanislav Fomichev wrote:
+> > > > diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+> > > > index a219be90c739..8acdeeae24e7 100644
+> > > > --- a/net/core/netdev-genl.c
+> > > > +++ b/net/core/netdev-genl.c
+> > > > @@ -859,6 +859,7 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
+> > > >             goto err_genlmsg_free;
+> > > >     }
+> > > >
+> > > > +   mutex_lock(&priv->lock);
+> > > >     rtnl_lock();
+> > > >
+> > > >     netdev = __dev_get_by_index(genl_info_net(info), ifindex);
+> > > > @@ -925,6 +926,7 @@ int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
+> > > >     net_devmem_unbind_dmabuf(binding);
+> > > >  err_unlock:
+> > > >     rtnl_unlock();
+> > > > +   mutex_unlock(&priv->lock);
+> > > >  err_genlmsg_free:
+> > > >     nlmsg_free(rsp);
+> > > >     return err;
 > > >
->
+> > > I think you're missing an unlock before successful return here no?
+> >
+> > Yes, thanks! :-( I have tested some of this code with Mina's latest TX + my
+> > loopback mode, but it doesn't have any RX tests.. Will try to hack
+> > something together to run RX bind before I repost.
+> 
+> Is the existing RX test not working for you?
+> 
+> Also running `./ncdevmem` manually on a driver you have that supports
+> devmem will test the binding patch.
 
+It's a bit of a pita to run everything right now since drivers are
+not in the tree :-(
+ 
+> I wonder if we can change list_head to xarray, which manages its own
+> locking, instead of list_head plus manual locking. Just an idea, I
+> don't have a strong preference here. It may be annoying that xarray do
+> lookups by an index, so we have to store the index somewhere. But if
+> all we do here is add to the xarray and later loop over it to unbind
+> elements, we don't need to store the indexes anywhere.
+
+Yeah, having to keep the index around might be a bit awkward. And
+since this is not a particularly performance sensitive place, let's
+keep it as is for now?
 
