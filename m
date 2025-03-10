@@ -1,159 +1,146 @@
-Return-Path: <netdev+bounces-173418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 675FAA58BBA
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 06:45:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF094A58BDC
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 07:17:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82528168310
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 05:45:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32913188A194
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 06:18:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0E971B4153;
-	Mon, 10 Mar 2025 05:45:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFB45188596;
+	Mon, 10 Mar 2025 06:17:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="igW6/dsp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qsKJ2ex7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3366649641
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 05:45:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A61914F70
+	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 06:17:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741585550; cv=none; b=G71hGEIvGE73jhfLuRD7oinx/zupULh9Qc5fg8kpSx7eaUGbSf0IQa2UhVaB8cemREjezD653a9WZHno5YehOn3ODagC65GQJTm48ZszwghK4SI2VxVfGNpauUSHO6+ROZu9Dpi+kSIHZ5rmxMaQZE4wWuVFqLZoluO4uo8nq3Y=
+	t=1741587468; cv=none; b=m77OzWQnzLHon4FwXoB20RxEZO9D1zcjCmv4ykOFpaJdHZNoxezwvABrnv3Yx96Sz2Blbv9b08K8R4UDjSYEVynScCg1f2lwHlVsmW7peF46fOJGZYKNETWBJnyVtlLlo2UXUqlvDY/sm2Pq1xe6DjfFytNNpvTNlPjk3+HlHn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741585550; c=relaxed/simple;
-	bh=DY82KMX4hDS22dhJw5YHjL/IBpcRs4OLmCAM8hynbgE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aCoKrDjC1Fmqa3lLskCUKOW0yPt4hLtkY0Hqr+uChZUCmaNgKz83a24CQb25VplBEfdCyrNB8bnxRDYA77HtMPh5AJ4WQDwSAcYs8Iv2Wr8ylusMVP9u8gYE4n1RIe8nKA8Dk8xkUFv/q+sof/LurWJbzNM2nHrG/5l/bUc2IkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=igW6/dsp; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2242ac37caeso174875ad.1
-        for <netdev@vger.kernel.org>; Sun, 09 Mar 2025 22:45:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741585548; x=1742190348; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Vdk8JIsy8Nv4wZkNtHkaIEhtB3SE9Fe1TcjLHkiBi6U=;
-        b=igW6/dspWz1lS2s9sdBO5CCJpZtFZxK6GFFFZbwz10Atm6B4Sml3P4umOcIkxumZGg
-         sxlKoei8c9nfyRy+A3cIleGglNu1Mci3Aa3epzGX32FYJtY06YOi0Brpw4weoovzSE30
-         haKfxSamA8bfeoxukOAfcC4Jc+f3cllnYEbPWU8bhHdvkxJG9tKy9z6gBJvGwh0F91fm
-         6MswM6H3PTHYXrqLRK+TwWEJcFFR9IypMEPSMo9svPIDjhrp1FXbrm+idRrn6N+z0xNf
-         Ts4p/Juzq0g3pI22/fbyCCr+DyDg0jnW35u2wnOWNJwE6eGm8S4koiiEH43+M35wiZwi
-         Q1fg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741585548; x=1742190348;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Vdk8JIsy8Nv4wZkNtHkaIEhtB3SE9Fe1TcjLHkiBi6U=;
-        b=F7XXaHzzIwx/kQMK1nM6FNGZuQYUurv5qBbBGOk4jj+xScGTosLw4uNPStSAxiZFC8
-         ZcCI7WNzTAg3CqEKULlJV6jjaoOaeai0nyDdOaHFOc+KCGMf9zWmjswZx8vT1oIdjAWU
-         a36qiHjLc1kl89bcXpfGwXRmmYm2SzP7VUK+QZGdAgDMxVvkybdq8kVif1iZoQZhKYhn
-         IE4WAE4hX6dW8G+nRSe4C9HvZ1oSRvboV5cBks2+e/SRmqbj124s0s71ot29CODE/iqP
-         mbdj0MwKfATUblJAKl5OzfSKCLNfLfjUFyET4BqwIMB9FTazCjawJnTs0jfZfNaTQpy+
-         rdOw==
-X-Forwarded-Encrypted: i=1; AJvYcCUzHaLm78BgIzt0Ms9EEkaIXUW4Iuht5868LgGM9Ak8SXkvJdbiwKD86QKxP+Uv2rAc2Qe8Zi4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+vuiQqawzI4OjyYb1H/my/UKg27S0ZgbnCOEU5dus99gglDFb
-	YiwJb11k7JUUf1zEDzxkrycGrHdcJOJbA4CIOpqZ9x4Fp7Ecuh1OOHbmHCpcphTIdOrgrRoX9CL
-	eYU4b2UVAADpmuNGzGlzNV6Fu3tp3h3UyNPfj
-X-Gm-Gg: ASbGncvuaBIIUiH9Hq+XDtB6+pFuEJm5uMcS0zBv5Rjg2TvPwFR7/nvQ7JLjwnkJnR6
-	HMSqeiX8amunO1cAPdeLXYlwbnTsrwqLH78Utb5/MI6YV9FoHZKKeYlGBotmLWwCtwyPsyRItVt
-	DRqJwb9TkmjXdDAU5F+Wjgz3sYcVc=
-X-Google-Smtp-Source: AGHT+IGxu7wIRTInzBiyf9nxCQSO1GLEfkcPemXrYOYE6jknsHBotxVlbcjDpO1VXJQy29bcwiKlXOFGjf2vqpUHvdI=
-X-Received: by 2002:a17:903:19eb:b0:223:5182:6246 with SMTP id
- d9443c01a7336-22547816b5bmr2494655ad.23.1741585548265; Sun, 09 Mar 2025
- 22:45:48 -0700 (PDT)
+	s=arc-20240116; t=1741587468; c=relaxed/simple;
+	bh=0SMNgqi3AdhAj2HFS0uNPFtaaKuHbp6KlgqwUfkemGk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FDvG70RQXaIlSD9jnJa+97pbSkfdnA6Z/CS43QoFKXeVhG2fdrraBX8E/l8iRqKysvx31a1VMf8vCAn8z3aJzHCrVbtnRu0Lad1/sWxjaEaMDfJIEYIqkIlv+iWgkqebaQcMc6UvVJ00J+yVmOoVFd7LiGqwzDcnNa7EN1i3Lto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qsKJ2ex7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24026C4CEE5;
+	Mon, 10 Mar 2025 06:17:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741587468;
+	bh=0SMNgqi3AdhAj2HFS0uNPFtaaKuHbp6KlgqwUfkemGk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qsKJ2ex7fpaSWjiqIK3UV6fTI+XSSDxySO3gxCZq6VjsiOPaGSDx4OeUmGCxzvYEv
+	 fcbNWEjRLSom1rrs3I2XDB4QZ+AlsJuG6nn8lUNz5drec6WTb/tWCG8olO2kdNAPD5
+	 LQMEC/L/773MhNWLWnLCz85bQ8sxIhX0yVytiLQoS0OyWWHGSp314PxVwRPOkYVuAm
+	 k1ukS5lnMHcLVTJ4GKZJ451oB07dSWMacMzVATxjtXMuKzcSfu3M3ikxvuAK7aV+As
+	 B4wecIdFqqlMy+q4I5+a8zMgXKFbKwdSSHTIO7Ja7w87NTXyI8zLK/loSHsKPowtoo
+	 4JIUf/YhY1BpA==
+Date: Mon, 10 Mar 2025 06:17:37 +0000
+From: Simon Horman <horms@kernel.org>
+To: Amit Cohen <amcohen@nvidia.com>
+Cc: netdev@vger.kernel.org, idosch@nvidia.com, petrm@nvidia.com,
+	jiri@resnulli.us, ivecera@redhat.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	olteanv@gmail.com, tobias@waldekranz.com
+Subject: Re: [PATCH net] net: switchdev: Convert blocking notification chain
+ to a raw one
+Message-ID: <20250310061737.GA4159220@kernel.org>
+References: <20250305121509.631207-1-amcohen@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250307155725.219009-1-sdf@fomichev.me> <20250307155725.219009-4-sdf@fomichev.me>
- <20250307153456.7c698a1a@kernel.org> <Z8uEiRW91GdYI7sL@mini-arch>
- <CAHS8izPO2wSReuRz=k1PuXy8RAJuo5pujVMGceQVG7AvwMSVdw@mail.gmail.com> <Z85ycDdGXZvJ-CN-@mini-arch>
-In-Reply-To: <Z85ycDdGXZvJ-CN-@mini-arch>
-From: Mina Almasry <almasrymina@google.com>
-Date: Sun, 9 Mar 2025 22:45:35 -0700
-X-Gm-Features: AQ5f1Jqk8kOtO3C5Pchm701Kts4Qy4PEDF_B0T63TmnCJ-VfgK7h_5EZzHN_Zng
-Message-ID: <CAHS8izN0e5eXXYD+aPc7hJPa5yAfCQKfwvrMpk=gZ7QuH5CqtQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 3/4] net: add granular lock for the netdev
- netlink socket
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, 
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	linux-kernel@vger.kernel.org, horms@kernel.org, donald.hunter@gmail.com, 
-	michael.chan@broadcom.com, pavan.chebbi@broadcom.com, andrew+netdev@lunn.ch, 
-	jdamato@fastly.com, xuanzhuo@linux.alibaba.com, asml.silence@gmail.com, 
-	dw@davidwei.uk
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250305121509.631207-1-amcohen@nvidia.com>
 
-On Sun, Mar 9, 2025 at 10:02=E2=80=AFPM Stanislav Fomichev <stfomichev@gmai=
-l.com> wrote:
->
-> On 03/09, Mina Almasry wrote:
-> > On Fri, Mar 7, 2025 at 3:43=E2=80=AFPM Stanislav Fomichev <stfomichev@g=
-mail.com> wrote:
-> > >
-> > > On 03/07, Jakub Kicinski wrote:
-> > > > On Fri,  7 Mar 2025 07:57:24 -0800 Stanislav Fomichev wrote:
-> > > > > diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-> > > > > index a219be90c739..8acdeeae24e7 100644
-> > > > > --- a/net/core/netdev-genl.c
-> > > > > +++ b/net/core/netdev-genl.c
-> > > > > @@ -859,6 +859,7 @@ int netdev_nl_bind_rx_doit(struct sk_buff *sk=
-b, struct genl_info *info)
-> > > > >             goto err_genlmsg_free;
-> > > > >     }
-> > > > >
-> > > > > +   mutex_lock(&priv->lock);
-> > > > >     rtnl_lock();
-> > > > >
-> > > > >     netdev =3D __dev_get_by_index(genl_info_net(info), ifindex);
-> > > > > @@ -925,6 +926,7 @@ int netdev_nl_bind_rx_doit(struct sk_buff *sk=
-b, struct genl_info *info)
-> > > > >     net_devmem_unbind_dmabuf(binding);
-> > > > >  err_unlock:
-> > > > >     rtnl_unlock();
-> > > > > +   mutex_unlock(&priv->lock);
-> > > > >  err_genlmsg_free:
-> > > > >     nlmsg_free(rsp);
-> > > > >     return err;
-> > > >
-> > > > I think you're missing an unlock before successful return here no?
-> > >
-> > > Yes, thanks! :-( I have tested some of this code with Mina's latest T=
-X + my
-> > > loopback mode, but it doesn't have any RX tests.. Will try to hack
-> > > something together to run RX bind before I repost.
-> >
-> > Is the existing RX test not working for you?
-> >
-> > Also running `./ncdevmem` manually on a driver you have that supports
-> > devmem will test the binding patch.
->
-> It's a bit of a pita to run everything right now since drivers are
-> not in the tree :-(
->
-> > I wonder if we can change list_head to xarray, which manages its own
-> > locking, instead of list_head plus manual locking. Just an idea, I
-> > don't have a strong preference here. It may be annoying that xarray do
-> > lookups by an index, so we have to store the index somewhere. But if
-> > all we do here is add to the xarray and later loop over it to unbind
-> > elements, we don't need to store the indexes anywhere.
->
-> Yeah, having to keep the index around might be a bit awkward. And
-> since this is not a particularly performance sensitive place, let's
-> keep it as is for now?
+On Wed, Mar 05, 2025 at 02:15:09PM +0200, Amit Cohen wrote:
+> A blocking notification chain uses a read-write semaphore to protect the
+> integrity of the chain. The semaphore is acquired for writing when
+> adding / removing notifiers to / from the chain and acquired for reading
+> when traversing the chain and informing notifiers about an event.
+> 
+> In case of the blocking switchdev notification chain, recursive
+> notifications are possible which leads to the semaphore being acquired
+> twice for reading and to lockdep warnings being generated [1].
+> 
+> Specifically, this can happen when the bridge driver processes a
+> SWITCHDEV_BRPORT_UNOFFLOADED event which causes it to emit notifications
+> about deferred events when calling switchdev_deferred_process().
+> 
+> Fix this by converting the notification chain to a raw notification
+> chain in a similar fashion to the netdev notification chain. Protect
+> the chain using the RTNL mutex by acquiring it when modifying the chain.
+> Events are always informed under the RTNL mutex, but add an assertion in
+> call_switchdev_blocking_notifiers() to make sure this is not violated in
+> the future.
 
-No strong preference from my end.
---=20
-Thanks,
-Mina
+Hi Amit,
+
+As you may be aware there is quite some activity to reduce the reliance on
+RTNL. However, as the events in question are already protected by RTNL
+I think the approach you have taken here is entirely reasonable.
+
+> 
+> Maintain the "blocking" prefix as events are always emitted from process
+> context and listeners are allowed to block.
+> 
+> [1]:
+> WARNING: possible recursive locking detected
+> 6.14.0-rc4-custom-g079270089484 #1 Not tainted
+> --------------------------------------------
+> ip/52731 is trying to acquire lock:
+> ffffffff850918d8 ((switchdev_blocking_notif_chain).rwsem){++++}-{4:4}, at: blocking_notifier_call_chain+0x58/0xa0
+> 
+> but task is already holding lock:
+> ffffffff850918d8 ((switchdev_blocking_notif_chain).rwsem){++++}-{4:4}, at: blocking_notifier_call_chain+0x58/0xa0
+> 
+> other info that might help us debug this:
+> Possible unsafe locking scenario:
+> CPU0
+> ----
+> lock((switchdev_blocking_notif_chain).rwsem);
+> lock((switchdev_blocking_notif_chain).rwsem);
+> 
+> *** DEADLOCK ***
+> May be due to missing lock nesting notation
+> 3 locks held by ip/52731:
+>  #0: ffffffff84f795b0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0x727/0x1dc0
+>  #1: ffffffff8731f628 (&net->rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0x790/0x1dc0
+>  #2: ffffffff850918d8 ((switchdev_blocking_notif_chain).rwsem){++++}-{4:4}, at: blocking_notifier_call_chain+0x58/0xa0
+> 
+> stack backtrace:
+> ...
+> ? __pfx_down_read+0x10/0x10
+> ? __pfx_mark_lock+0x10/0x10
+> ? __pfx_switchdev_port_attr_set_deferred+0x10/0x10
+> blocking_notifier_call_chain+0x58/0xa0
+> switchdev_port_attr_notify.constprop.0+0xb3/0x1b0
+> ? __pfx_switchdev_port_attr_notify.constprop.0+0x10/0x10
+> ? mark_held_locks+0x94/0xe0
+> ? switchdev_deferred_process+0x11a/0x340
+> switchdev_port_attr_set_deferred+0x27/0xd0
+> switchdev_deferred_process+0x164/0x340
+> br_switchdev_port_unoffload+0xc8/0x100 [bridge]
+> br_switchdev_blocking_event+0x29f/0x580 [bridge]
+> notifier_call_chain+0xa2/0x440
+> blocking_notifier_call_chain+0x6e/0xa0
+> switchdev_bridge_port_unoffload+0xde/0x1a0
+> ...
+> 
+> Fixes: f7a70d650b0b6 ("net: bridge: switchdev: Ensure deferred event delivery on unoffload")
+> Signed-off-by: Amit Cohen <amcohen@nvidia.com>
+> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+...
 
