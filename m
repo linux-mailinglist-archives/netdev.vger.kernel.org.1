@@ -1,217 +1,172 @@
-Return-Path: <netdev+bounces-173580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D30A9A59A65
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 16:52:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C25F5A59A74
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 16:57:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F96E16C403
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 15:52:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B939F3A6997
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 15:56:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81357226CFA;
-	Mon, 10 Mar 2025 15:52:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BB0C22E3F1;
+	Mon, 10 Mar 2025 15:57:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arthurfabre.com header.i=@arthurfabre.com header.b="kKLJRbVI";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Hlnpnwaz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n8Pgzb2W"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995CC22069E;
-	Mon, 10 Mar 2025 15:52:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E2DE22B8CA
+	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 15:57:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741621954; cv=none; b=TqC3gjtFLaQ8FRgcoF49ObDmKUYx8pFw5kGXzLgTUnKAnDI8r+uQSRWlr+gEGVfA6gYO8qZlQbl8f6cdAiZaMMYUrNW5Svyz2jbd3eX/OK5w5hKUSXRcs2N+sjRrG4n55419VNJMhsZQE5puoXubuUy7Y0fv0KyvkGsgO15EOgw=
+	t=1741622222; cv=none; b=n61HC+wmlZHtW2mPxN1ol5j26dxAR6q6f6+yUS/qsR8DcrApHc/9IbbUHRe76wZ6NCFm7Ppfh7IWMp91T1Q3v8qrxmPiQ4dDsfjJm3kyAfgt6Mnjk8xAGRi1FU3EcfKriOLOeO4V5TPCUY++qxbhaRqFu2XqsLs5mKo4JuiJgXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741621954; c=relaxed/simple;
-	bh=LLBgJHAWcK8fXF+7yKP/eBHoQ+O33J7NZF81s0WDjWY=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=KVgwcPkbGsvd1Ijstq1p7zzhsw7dk3bpWuBENCvz9UGtQf1jRg1PcRsg6dnYct5NhfZhJ9N73XyPLDmiXvdFD601rlPcwarcYK3j/e9sMr4Ss/jtcYbIQfUYrKE3W4nydmB+bpXQqll6UPZ2ovezdKpYJV4MuAFHWilV7PgKSA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arthurfabre.com; spf=pass smtp.mailfrom=arthurfabre.com; dkim=pass (2048-bit key) header.d=arthurfabre.com header.i=@arthurfabre.com header.b=kKLJRbVI; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Hlnpnwaz; arc=none smtp.client-ip=103.168.172.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arthurfabre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arthurfabre.com
-Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
-	by mailfout.phl.internal (Postfix) with ESMTP id A529C1382D57;
-	Mon, 10 Mar 2025 11:52:31 -0400 (EDT)
-Received: from phl-imap-13 ([10.202.2.103])
-  by phl-compute-02.internal (MEProxy); Mon, 10 Mar 2025 11:52:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arthurfabre.com;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm3;
-	 t=1741621951; x=1741708351; bh=qImRhIDqJuLJMiTBNz81AyZHV8Om9bqb
-	nVSAsfrFHfs=; b=kKLJRbVI8zYE4w9sNgjwsGAtkR+Cz17jZoEkm8scnNSptGjx
-	d480YFfIw/4Imf/pfyVP0nooVqtoaPuxoETohoghVh4EBG0zA2vk0U763TT1ot3P
-	38ASoNdkVksHZfHAuPKfMUH1FHT4yfmvrrMYIBJ4f5rlp81abad0kH7/jrax1We4
-	AoN47lZOs3rbP/KJdI9VgB9MgH2m6BtTNAG22HLL0PtUPsha9sd91zyDhd9AoT5a
-	yBaGItACTv5UYFHTDn85qiUds43/gpCaGUX9pBaZuLvzkobIPjYqs9kS0WxOtN/m
-	W93w7/ETrAvt8iAhfk0kybKL4Nl0G3CRo/yb9w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1741621951; x=
-	1741708351; bh=qImRhIDqJuLJMiTBNz81AyZHV8Om9bqbnVSAsfrFHfs=; b=H
-	lnpnwazEqaTWrLJP3HcFLnQvJ1PdlX+vxiwHN+7gi9DG1rAhttVtzTaZiXBJhyyX
-	tXMp/rvIuMICHBQIZ33IBY02dboBJH+6p+TZsKYoYd0Pv0U5KJAoWqs3yjHu6wyh
-	kZI0yYTmJpgqTliCfSMKV7P8Q6Y2j3Hy9IjHkDjioLCpuxPaIQk391c0vRYAMALH
-	B4JYOUN+61k0TpFoS4kB1C0b5jBaTT09p0rewSgcWZds4UYe81Req0EkCmAAxh1h
-	79zLsLxxX86oAHVeVuCmQ5DhUIwh3YHzvw6ifaGsAlQyNszTfslCAjs38QXTXeob
-	+zeEtyYk2AOxbc2P1FpSA==
-X-ME-Sender: <xms:vwrPZxQr2vr30Frr3Y0Mw5Din0YVhOlGr2Dg9MzqbpTs9ZiFxlDa1w>
-    <xme:vwrPZ6xr_ifFxQAPhCXlAxW9gPhS7vj7JbAuhD_bE8oGExB72wVst97oGvEG_np44
-    _ls_XBF4xcYsdRoQVs>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduudeljeehucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepofgggfgtfffkvefuhffvofhfjgesthhqredt
-    redtjeenucfhrhhomhepfdetrhhthhhurhcuhfgrsghrvgdfuceorghrthhhuhhrsegrrh
-    hthhhurhhfrggsrhgvrdgtohhmqeenucggtffrrghtthgvrhhnpefhfeejgefhhffhveel
-    teehhfffheffvdettdelgfeltefhteelveeuffetfffgjeenucevlhhushhtvghrufhiii
-    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhthhhurhesrghrthhhuhhrfhgr
-    sghrvgdrtghomhdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhpohhuthdprh
-    gtphhtthhopegrfhgrsghrvgestghlohhuughflhgrrhgvrdgtohhmpdhrtghpthhtohep
-    jhgrkhhusgestghlohhuughflhgrrhgvrdgtohhmpdhrtghpthhtohepjhgsrhgrnhguvg
-    gsuhhrghestghlohhuughflhgrrhgvrdgtohhmpdhrtghpthhtohephigrnhestghlohhu
-    ughflhgrrhgvrdgtohhmpdhrtghpthhtohephhgrfihksehkvghrnhgvlhdrohhrghdprh
-    gtphhtthhopehlsghirghntghonhesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhho
-    rhgvnhiiohdrsghirghntghonhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehthh
-    hoihhlrghnugesrhgvughhrghtrdgtohhmpdhrtghpthhtohepsghpfhesvhhgvghrrdhk
-    vghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:vwrPZ224AP5AS0tzHfSRE4PT2auaAxHWZBzgv2VwXajSrbWfh4LqrQ>
-    <xmx:vwrPZ5DgX5u-vaH0Zy07th8iENDYRtFI1HnFi1jGPUGJV-rK132rFw>
-    <xmx:vwrPZ6jBl2y2gChgVJNnmzBbfqmRMawGaIBEmfTSRjYukrNGzjQJPw>
-    <xmx:vwrPZ9oAYUxleEM3EBJVHSWO58tjLkZQL4c66sXcytjBVmRqb4AvRQ>
-    <xmx:vwrPZ1NFbhHwDImxarrfY4FFZlZhpdM2tVK0VxWdrVwIVqFd-W0q3ZTG>
-Feedback-ID: i25f1493c:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 5BDC51F00080; Mon, 10 Mar 2025 11:52:31 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1741622222; c=relaxed/simple;
+	bh=UfzIwipQYZKlD1IFnNP2s2QWol3tOEz3nnLOdVk3cVc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qMg1VwTeSIn+NMh5pzo+MifOnAgMbSDJdbHBvFPDRdIqOeMxgKbnaAO4qIEvsbOKFOgm5UqiQXbk7/NC//r/DVz0IuDTcU0PUoQQ73lloiKH3E76Z7G7x+jSeX1OmDiWxqL5qqW35q1L+fOOULP3yShrXab8fxj7UIO1wC0eyeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n8Pgzb2W; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741622221; x=1773158221;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=UfzIwipQYZKlD1IFnNP2s2QWol3tOEz3nnLOdVk3cVc=;
+  b=n8Pgzb2WOV14A7NUxzKlisL7+yWvmExgEK7NllyK4kWi9XtDGxfzzgk0
+   t6iXnlsNHxXxeBhNhpfZnATHg7RNrAzcdrRRmkxQbSms6zo/gWecCCl5l
+   RDpjmVhoCW/w++1y6rJ4bW0bsp9ATkQ0JBH+/idvkiOKXtXJZQGZRd6gC
+   eNX2pNe3626ph63MdonCrfjRsWX7siNhlROxHCSRAzvFixsBH5wMqk0+j
+   3+ahzQhKjUnpJKcG8Jud/rg5MU+JjiIH61DczgXD3HM0fP5qFrvhXvvtc
+   EUBPPBa3Igy89jy84FYZdciBB+gTSNSFoBEeQBfyDVwGhCgKUZSyRIWKL
+   Q==;
+X-CSE-ConnectionGUID: sHmntlULTyi2Beu5s2VMkQ==
+X-CSE-MsgGUID: 15GO/qbyTbOooLxhB1xG1Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="53614649"
+X-IronPort-AV: E=Sophos;i="6.14,236,1736841600"; 
+   d="scan'208";a="53614649"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 08:57:00 -0700
+X-CSE-ConnectionGUID: c+imipRMR2WxBNHrZmx4uQ==
+X-CSE-MsgGUID: jfQTKGA0TxWiiROmb069Gw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,236,1736841600"; 
+   d="scan'208";a="124931255"
+Received: from lkp-server02.sh.intel.com (HELO a4747d147074) ([10.239.97.151])
+  by orviesa003.jf.intel.com with ESMTP; 10 Mar 2025 08:56:57 -0700
+Received: from kbuild by a4747d147074 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1trfUs-0004Py-39;
+	Mon, 10 Mar 2025 15:56:54 +0000
+Date: Mon, 10 Mar 2025 23:56:46 +0800
+From: kernel test robot <lkp@intel.com>
+To: Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com,
+	Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next 3/4] inet: frags: change inet_frag_kill() to
+ defer refcount updates
+Message-ID: <202503102308.1uTA6Uxr-lkp@intel.com>
+References: <20250309173151.2863314-4-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 10 Mar 2025 16:52:30 +0100
-Message-Id: <D8CPGEGQ4630.2MKAQH44PFCCO@arthurfabre.com>
-Cc: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>, <jakub@cloudflare.com>,
- <hawk@kernel.org>, <yan@cloudflare.com>, <jbrandeburg@cloudflare.com>,
- <thoiland@redhat.com>, <lbiancon@redhat.com>, "Arthur Fabre"
- <afabre@cloudflare.com>
-Subject: Re: [PATCH RFC bpf-next 05/20] trait: Replace memcpy calls with
- inline copies
-From: "Arthur Fabre" <arthur@arthurfabre.com>
-To: "Lorenzo Bianconi" <lorenzo.bianconi@redhat.com>
-X-Mailer: aerc 0.17.0
-References: <20250305-afabre-traits-010-rfc2-v1-0-d0ecfb869797@cloudflare.com> <20250305-afabre-traits-010-rfc2-v1-5-d0ecfb869797@cloudflare.com> <Z87D9GblwWBZjwE-@lore-desk>
-In-Reply-To: <Z87D9GblwWBZjwE-@lore-desk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250309173151.2863314-4-edumazet@google.com>
 
-On Mon Mar 10, 2025 at 11:50 AM CET, Lorenzo Bianconi wrote:
-> > From: Arthur Fabre <afabre@cloudflare.com>
-> >=20
-> > When copying trait values to or from the caller, the size isn't a
-> > constant so memcpy() ends up being a function call.
-> >=20
-> > Replace it with an inline implementation that only handles the sizes we
-> > support.
-> >=20
-> > We store values "packed", so they won't necessarily be 4 or 8 byte
-> > aligned.
-> >=20
-> > Setting and getting traits is roughly ~40% faster.
->
-> Nice! I guess in a formal series this patch can be squashed with patch 1/=
-20
-> (adding some comments).
+Hi Eric,
 
-Happy to squash and add comments instead if that's better :)
+kernel test robot noticed the following build errors:
 
->
-> Regards,
-> Lorenzo
->
-> >=20
-> > Signed-off-by: Arthur Fabre <afabre@cloudflare.com>
-> > ---
-> >  include/net/trait.h | 25 +++++++++++++++++++------
-> >  1 file changed, 19 insertions(+), 6 deletions(-)
-> >=20
-> > diff --git a/include/net/trait.h b/include/net/trait.h
-> > index 536b8a17dbbc091b4d1a4d7b4b21c1e36adea86a..d4581a877bd57a32e2ad032=
-147c906764d6d37f8 100644
-> > --- a/include/net/trait.h
-> > +++ b/include/net/trait.h
-> > @@ -7,6 +7,7 @@
-> >  #include <linux/errno.h>
-> >  #include <linux/string.h>
-> >  #include <linux/bitops.h>
-> > +#include <linux/unaligned.h>
-> > =20
-> >  /* Traits are a very limited KV store, with:
-> >   * - 64 keys (0-63).
-> > @@ -145,23 +146,23 @@ int trait_set(void *traits, void *hard_end, u64 k=
-ey, const void *val, u64 len, u
-> >  			memmove(traits + off + len, traits + off, traits_size(traits) - off=
-);
-> >  	}
-> > =20
-> > -	/* Set our value. */
-> > -	memcpy(traits + off, val, len);
-> > -
-> > -	/* Store our length in header. */
-> >  	u64 encode_len =3D 0;
-> > -
-> >  	switch (len) {
-> >  	case 2:
-> > +		/* Values are least two bytes, so they'll be two byte aligned */
-> > +		*(u16 *)(traits + off) =3D *(u16 *)val;
-> >  		encode_len =3D 1;
-> >  		break;
-> >  	case 4:
-> > +		put_unaligned(*(u32 *)val, (u32 *)(traits + off));
-> >  		encode_len =3D 2;
-> >  		break;
-> >  	case 8:
-> > +		put_unaligned(*(u64 *)val, (u64 *)(traits + off));
-> >  		encode_len =3D 3;
-> >  		break;
-> >  	}
-> > +
-> >  	h->high |=3D (encode_len >> 1) << key;
-> >  	h->low |=3D (encode_len & 1) << key;
-> >  	return 0;
-> > @@ -201,7 +202,19 @@ int trait_get(void *traits, u64 key, void *val, u6=
-4 val_len)
-> >  	if (real_len > val_len)
-> >  		return -ENOSPC;
-> > =20
-> > -	memcpy(val, traits + off, real_len);
-> > +	switch (real_len) {
-> > +	case 2:
-> > +		/* Values are least two bytes, so they'll be two byte aligned */
-> > +		*(u16 *)val =3D *(u16 *)(traits + off);
-> > +		break;
-> > +	case 4:
-> > +		*(u32 *)val =3D get_unaligned((u32 *)(traits + off));
-> > +		break;
-> > +	case 8:
-> > +		*(u64 *)val =3D get_unaligned((u64 *)(traits + off));
-> > +		break;
-> > +	}
-> > +
-> >  	return real_len;
-> >  }
-> > =20
-> >=20
-> > --=20
-> > 2.43.0
-> >=20
-> >=20
+[auto build test ERROR on net-next/main]
 
+url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/inet-frags-add-inet_frag_putn-helper/20250310-013501
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250309173151.2863314-4-edumazet%40google.com
+patch subject: [PATCH net-next 3/4] inet: frags: change inet_frag_kill() to defer refcount updates
+config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/20250310/202503102308.1uTA6Uxr-lkp@intel.com/config)
+compiler: clang version 21.0.0git (https://github.com/llvm/llvm-project e15545cad8297ec7555f26e5ae74a9f0511203e7)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250310/202503102308.1uTA6Uxr-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202503102308.1uTA6Uxr-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> net/ieee802154/6lowpan/reassembly.c:312:45: error: too few arguments to function call, expected 4, have 3
+     312 |                 ret = lowpan_frag_queue(fq, skb, frag_type);
+         |                       ~~~~~~~~~~~~~~~~~                   ^
+   net/ieee802154/6lowpan/reassembly.c:86:12: note: 'lowpan_frag_queue' declared here
+      86 | static int lowpan_frag_queue(struct lowpan_frag_queue *fq,
+         |            ^                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      87 |                              struct sk_buff *skb, u8 frag_type,
+         |                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      88 |                              int *refs)
+         |                              ~~~~~~~~~
+   1 error generated.
+
+
+vim +312 net/ieee802154/6lowpan/reassembly.c
+
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  280  
+72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  281  int lowpan_frag_rcv(struct sk_buff *skb, u8 frag_type)
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  282  {
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  283  	struct lowpan_frag_queue *fq;
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  284  	struct net *net = dev_net(skb->dev);
+72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  285  	struct lowpan_802154_cb *cb = lowpan_802154_cb(skb);
+f18fa5de5ba7f1d net/ieee802154/6lowpan/reassembly.c Alexander Aring    2018-04-20  286  	struct ieee802154_hdr hdr = {};
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  287  	int err;
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  288  
+72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  289  	if (ieee802154_hdr_peek_addrs(skb, &hdr) < 0)
+72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  290  		goto err;
+ae531b9475f62c5 net/ieee802154/reassembly.c         Phoebe Buckheister 2014-03-14  291  
+72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  292  	err = lowpan_get_cb(skb, frag_type, cb);
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  293  	if (err < 0)
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  294  		goto err;
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  295  
+72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  296  	if (frag_type == LOWPAN_DISPATCH_FRAG1) {
+72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  297  		err = lowpan_invoke_frag_rx_handlers(skb);
+72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  298  		if (err == NET_RX_DROP)
+72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  299  			goto err;
+72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  300  	}
+72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  301  
+72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  302  	if (cb->d_size > IPV6_MIN_MTU) {
+6697dabe27e0330 net/ieee802154/reassembly.c         Martin Townsend    2014-08-19  303  		net_warn_ratelimited("lowpan_frag_rcv: datagram size exceeds MTU\n");
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  304  		goto err;
+6697dabe27e0330 net/ieee802154/reassembly.c         Martin Townsend    2014-08-19  305  	}
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  306  
+72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  307  	fq = fq_find(net, cb, &hdr.source, &hdr.dest);
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  308  	if (fq != NULL) {
+aec42e105cebf42 net/ieee802154/6lowpan/reassembly.c Eric Dumazet       2025-03-09  309  		int ret, refs = 1;
+4710d806fcb8251 net/ieee802154/reassembly.c         Varka Bhadram      2014-07-02  310  
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  311  		spin_lock(&fq->q.lock);
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28 @312  		ret = lowpan_frag_queue(fq, skb, frag_type);
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  313  		spin_unlock(&fq->q.lock);
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  314  
+aec42e105cebf42 net/ieee802154/6lowpan/reassembly.c Eric Dumazet       2025-03-09  315  		inet_frag_putn(&fq->q, refs);
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  316  		return ret;
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  317  	}
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  318  
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  319  err:
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  320  	kfree_skb(skb);
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  321  	return -1;
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  322  }
+7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  323  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
