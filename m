@@ -1,133 +1,112 @@
-Return-Path: <netdev+bounces-173521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24C92A59426
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 13:24:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78173A59484
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 13:30:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC95C1881E00
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:24:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CD3D3AC685
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:29:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2A4022577C;
-	Mon, 10 Mar 2025 12:24:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96B07226193;
+	Mon, 10 Mar 2025 12:28:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="SDamcEb6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nm9OIdmc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AB5922423E
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 12:24:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72AF9227E96
+	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 12:28:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741609445; cv=none; b=U5J8UgxKyMcLze7dMZ9QxDd/tqXAsc8RdwbVIgY6riZymkHxbSkE6lBAWsa0p1mdEYBux3HErSS1I2MOE2qnNiOLfPemfLDOlbqwxZgM2A0RsX1DxAihY8hJsMaYLQNYW02e6cg9cG2d8LpXpEtYzzSTblpMUhzy0X9UT3n2c6A=
+	t=1741609713; cv=none; b=P0c+D+TPjzwWhD58DRsL4MzffjS6r2zJaZCO5xLYfEqpki5+aTCDkWqebcqtGljyIYHWFN8y105zRjXqBxPZ10jfehb1XzeNj2Sex/O1WqxEFK3coz7/37rSnhhjMaC2fdOlSWO22EgBwSBO4/qW8nFuFUbcYInQ3jJVHvqnfNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741609445; c=relaxed/simple;
-	bh=oGOK9EiI3o8ci/BwbQ8i0AQPNok/S3nJiHarCLAAfsc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GLglHrVMVClJRKSDox2gKOovaeRJd2n9/W5adfyLn4vh8OyERPC+o8VdXKMZE+2tYmzJludOxLR3jDQl7ka9V6yJ/z+8Rz2GwpwBAKxUQID0ZjbXVDPPETX8r/LRKLTiAWF3dae5YoITC2YOY70UCStntUb6vjk/gm4vtPkl32s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=SDamcEb6; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-43cef035a3bso8316295e9.1
-        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 05:24:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1741609442; x=1742214242; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+WnE/5imR3di2EhHXu2vvarTCh376TFcJuzOP6ZCQZg=;
-        b=SDamcEb6vH76sHB9d0aRU8sCVgjYR3yZsuZkPhItu8B45MGhKg3QQfhel8rg3XB596
-         5mb/iifc+8DiJEJwlQsbvHoD9tHU2SvdQupmT1yh/76OZ4zFgufac2iSnrzkMTqsXEHe
-         M6PhoQqr+bXVoUDl3s0Sln/HmLSeDsL7WzebgNgg16dPzr39lcpX4WV/5SsDMlT289Yf
-         DeUm6EL2Pm+Bgum80PS1PJK+fE8Slmng6heyDy+xR7kkaVwFTWbteVXlbfsUXrfuP8rP
-         Ag3YfTwuB01mflEhshynPFWg3YVE3L8vEpJHSCRLOqS2qiEtP1SpdhQ+36LrOY3v771M
-         WQCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741609442; x=1742214242;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+WnE/5imR3di2EhHXu2vvarTCh376TFcJuzOP6ZCQZg=;
-        b=ZeK2RiV3DcTRrMV/DAkXbiGC3dNgMGMxioxokekwsWNNFhyRcx3s+Ac5sKafZxIbiX
-         I3oL+1cpACOytE4w+ocyH8OpdJq0JnYv80cUGlW7fq3sTCAjqO7CcB+cronqJ9Dth0hH
-         2umalFOye2M1JwVTVtZfdyyunwzntr0KCax+1fdlS2W6la4Z8sn7BvjP0A3kFrRnLQDB
-         o5LiIB8LV5CCy2EL6qiqnHk8cjiYBe2CeteLA8EsItABPzkLwtDnTUDUf9paN5bNeFd0
-         l7xb86YigZi+y0SxgjdonwjhN+6lhNPfKnv09/v2mOWTdShDFvvnrqaveJ5A28u7GMOA
-         lH2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXXxb8CBLMsNRPU4vK3Hv9geKht8dMmBzT7iEqicPfTkEsQxtQFoNYZkJqGDjFJvAol0FY3LnQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy06+b1dS5v6ESOixXX2nfjM6a5mdtR66X82LrxKKqnjRwdT3ve
-	+440hjqE9awmhb/P9M+fzu205csa2606M2/ZMwv18AaALUlAutkU9gVvE4aecT8=
-X-Gm-Gg: ASbGncuq4Jk0RnLxAj9+gL9N9nCFyjmxoUjwniarmAfEVWu5zBEEAOUX8L7EjbB0SPD
-	VSWUAraDjFmcoSBpRlwThtaaatjLgT4sQtfmnxs5rwjw6nzzDOX7kfxNJnZRSe8Rf8CDQGVb/cX
-	iJ5jIsCccu6Uaq3u91RB0rKHbNQ6SIw1F/kgvFu2cSn/bjQ9/kv5z6CiNaGEqMyw/OCeI5cIymB
-	38Yz9+u3kkaNWApGsVh780WGtkHAt2pyD7dQtLDlAiYYpD9XlWPDEgBMNscDevpG/Lp1SeGPNYR
-	VUKpLkQHIcfMywZlzp4umZbLzTHhmYYXm/b83hcb6ZmD+ClDBZpV0R9v1xKoCI+W7rOPhwI=
-X-Google-Smtp-Source: AGHT+IGRKo1cJ5t/lY2j0asL2oDJUhmmPtQ93rExpKoeHtpvDFrye3av9IJEnTSX2X6c/6O1HvKm5Q==
-X-Received: by 2002:a05:600c:350f:b0:43c:f3e4:d6f6 with SMTP id 5b1f17b1804b1-43cf3e4da0bmr31246285e9.31.1741609442303;
-        Mon, 10 Mar 2025 05:24:02 -0700 (PDT)
-Received: from jiri-mlt.client.nvidia.com ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bdd8b04edsm141642335e9.1.2025.03.10.05.23.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Mar 2025 05:24:01 -0700 (PDT)
-Date: Mon, 10 Mar 2025 13:23:53 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: "Temerkhanov, Sergey" <sergey.temerkhanov@intel.com>, 
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Keller, Jacob E" <jacob.e.keller@intel.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>, 
-	"Kolacinski, Karol" <karol.kolacinski@intel.com>, "Nitka, Grzegorz" <grzegorz.nitka@intel.com>, 
-	"Schmidt, Michal" <mschmidt@redhat.com>
-Subject: Re: [PATCH iwl-next] ice: use DSN instead of PCI BDF for ice_adapter
- index
-Message-ID: <ogvnbkqy73hjndtr7ncmuzw7ai2w35w2osaadb2w4sel3pyrry@yqk3csgruxth>
-References: <20250306211159.3697-2-przemyslaw.kitszel@intel.com>
- <pcmfqg3b5wg4cyzzjrpw23c6dwan62567vakbgnmto3khbwysk@dloxz3hqifdf>
- <MW3PR11MB4681A62C71659C430281A15680D52@MW3PR11MB4681.namprd11.prod.outlook.com>
- <144fbab5-0cd6-478a-9500-838cd6303a73@intel.com>
+	s=arc-20240116; t=1741609713; c=relaxed/simple;
+	bh=5GH96/frAS9nSuB3pPuT1iTt5BPHU3MLmaqmyJLzUQk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sj4ODJa818Z34hzCid90qy5oEIJ4EfFQ7fvf2AW74eAS1/Qvao1rVxW2Ip4Jm9RxC0ZZD50OsmlwvZ4I3LxwWL4ND947tpFq4aluQWCOMnypEy9H0PnU3UaNkSd0j/l3fnWBSJP4r+Awxs+lXiBqEZJG6Y5/xBBrCnE1Tkeq6lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nm9OIdmc; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741609711; x=1773145711;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=5GH96/frAS9nSuB3pPuT1iTt5BPHU3MLmaqmyJLzUQk=;
+  b=Nm9OIdmcXLekdWsXDKPjOE6fUJM5CaKkTAxf4/0bD4PMuNCioSdKQnSe
+   vafJ2xYd9JG8KKnZgvRFlLNf09ZBBn28MhBpP2XTUSDCwDlUi1SQWZNTt
+   PlbxN2c54VSuu1opkJNzQGPd2c0RgJKIxofSrXgevq+sPSzOEWL1R/1zb
+   V0Fd/2af6gcZ/lTEjaAsz99Degy5Ln2+AXQwiZEfk8NfZ2gNCjrL+yLbi
+   BXuhYV2iBpk7A4L5cpdVCbunHcu18D0B5gy9/TzECI0xtbGQFpKctODNs
+   A4Khiah6ttgTa2U/j3/L7wfieCZ1qDr7l/8A30nRqhhWk8hgsWz54Ban9
+   w==;
+X-CSE-ConnectionGUID: BHbqH+z+TZ+gtoyRPNYbVg==
+X-CSE-MsgGUID: EE4xosYqSYqTlul3sNhxYg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="53981084"
+X-IronPort-AV: E=Sophos;i="6.14,236,1736841600"; 
+   d="scan'208";a="53981084"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 05:28:29 -0700
+X-CSE-ConnectionGUID: 1BNFu7ApStCZ81TK0l3thw==
+X-CSE-MsgGUID: C3m5+/IpQfS4zwmopqke6A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,236,1736841600"; 
+   d="scan'208";a="119698177"
+Received: from gklab-003-001.igk.intel.com ([10.211.3.1])
+  by orviesa009.jf.intel.com with ESMTP; 10 Mar 2025 05:28:29 -0700
+From: Grzegorz Nitka <grzegorz.nitka@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Grzegorz Nitka <grzegorz.nitka@intel.com>
+Subject: [PATCH iwl-next v2 0/3] E825C timesync dual NAC support
+Date: Mon, 10 Mar 2025 13:24:36 +0100
+Message-Id: <20250310122439.3327908-1-grzegorz.nitka@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <144fbab5-0cd6-478a-9500-838cd6303a73@intel.com>
+Content-Transfer-Encoding: 8bit
 
-Mon, Mar 10, 2025 at 09:40:16AM +0100, przemyslaw.kitszel@intel.com wrote:
->> Subject: Re: [PATCH iwl-next] ice: use DSN instead of PCI BDF for ice_adapter index
->
->regarding -net vs -next, no one have complained that this bug hurts
+This patch series adds full support for timesync operations for E8225C
+devices which are configured in so called 2xNAC mode (Network
+Acceleration Complex). 2xNAC mode is the mode in which IO die
+is housing two complexes and each of them has its own PHY connected
+to it. The complex which controls time transmitter is referred as
+primary complex.
 
-Wait, so we are now waiting for someone to hit the bug and complain,
-before we do fix? Does not make any sense to me.
+The series solves known configuration issues in dual config mode:
+- side-band queue (SBQ) addressing when configuring the ports on the PHY
+  on secondary NAC
+- access to timesync config from the second NAC as only one PF in
+  primary NAC controls time transmitter clock
+
+v1->v2:
+- fixed ice_pf_src_tmr_owned function doc
+- fixed type for lane_num field in ice_hw struct 
+
+Karol Kolacinski (3):
+  ice: remove SW side band access workaround for E825
+  ice: refactor ice_sbq_msg_dev enum
+  ice: enable timesync operation on 2xNAC E825 devices
+
+ drivers/net/ethernet/intel/ice/ice.h         | 60 +++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_common.c  |  8 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c     | 49 +++++++++---
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c  | 82 ++++++++++----------
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h  |  5 --
+ drivers/net/ethernet/intel/ice/ice_sbq_cmd.h | 11 +--
+ drivers/net/ethernet/intel/ice/ice_type.h    |  1 +
+ 7 files changed, 149 insertions(+), 67 deletions(-)
 
 
->
->> > +	return (unsigned long)pci_get_dsn(pdev);
->> 
->> > How do you ensure there is no xarray index collision then you cut the number like this?
->
->The reduction occurs only on "32b" systems, which are unlikely to have
->this device. And any mixing of the upper and lower 4B part still could
->collide.
+base-commit: daa2036c311e81ee32f8cccc8257e3dfd4985f79
+-- 
+2.39.3
 
-Passtrough to 32 bit qemu machine? Even how unlikely is that, you are
-risking a user to hit a bug for newly introduced code without good
-reason. Why?
-
-
->
->> 
->> It is also probably necessary to check if all devices supported by the driver have DSN capability enabled.
->
->I will double check on the SoC you have in mind.
->
->> 
->> Regards,
->> Sergey
->
 
