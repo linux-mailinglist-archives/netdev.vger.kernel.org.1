@@ -1,153 +1,112 @@
-Return-Path: <netdev+bounces-173585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B32F9A59AB3
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 17:13:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DDAAA59AB0
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 17:12:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4801C3A5568
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 16:13:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BAAD16DC2A
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 16:12:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4065122F166;
-	Mon, 10 Mar 2025 16:13:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3537822F166;
+	Mon, 10 Mar 2025 16:12:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="BsvTqQ+L";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="/+nwL9g7"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="c8XRNbMu"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD30F221F26
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 16:13:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 554AD22A7FA
+	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 16:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741623197; cv=none; b=FQJTatOVxflBLO07PXHYdM9qQNLrAJww/VWATpjSsKz1inmmrA9aLt/Vy75aGwLbD6dBAVNP0IQwCk0f2vQOjb2YGH8HOwpabcjmOzK6AUhbUsKZ2F7iA0cn5QP4DkjJBEXL/5rKxIg0gKKuw6rBh6SsTTr8jCLPeW8HgJvQxCU=
+	t=1741623137; cv=none; b=Zy/VenhMZrAfYkPvukfjpSIquHjv3WRrccXGyLBFItb5F/dER9BrdfeMLu7ZcM3VL195fUtwisfQDNw2of1DmWFEjQd6V5VOKkfVyVRoswyZcyeUvEORiHinqI7/Z6KRvAoKoBusgUq9OBJ0naj59xFnzGh4F8q88f9SloGVY90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741623197; c=relaxed/simple;
-	bh=IMsLKn1RPicSoT5hJ9b5CaHf/w5v4Yl0UdAYShh0nak=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=BxC2ubrjZRqM6LpprDP9Z3mfi+aAzyNWW53+tyLTnV/JjkKFUOl1YuFbQedff414YEDuof7OC6eOCVk3SxBoGckaNjONBz91KZeAPzababb/dM+s91rz3fgqMWeUWhd7PylLYSTUri/b+zqDLpMgSWgkMaLp8Oc24tvS3PHEdsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=BsvTqQ+L; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=/+nwL9g7; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1741623193;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SuDLAr3Wz8h6YVwKLam3Jg8MiZdFwWXZx63sMilpWcU=;
-	b=BsvTqQ+Lj3eQ8exZ6bsc8VUnbeMJ82cZ+rGLIw8ddYh3bNhp/XdtV5qN3uBvcbBbs5ajq0
-	fb8tapZDGDidxuQKu8+fy1nPAJkMiCYegN08QhzyyWNTeBkYDd6lGln/A03f0RH+xP6r/w
-	3i+WyjUAj6ZJNDdglecVk7yuUhF75joe41yf2dlDTsYUCTnNijP+YIaQ/PdJ5VQ/SP2Ejg
-	0uMr/dVGe3ePj4r16i/o2kuyVlVrlPY8A7YiZnvFROR20uqLeKkt2NJLFMnRzEQ/IHnOBc
-	5JKABYQesKgZ8yARB5acxgk+xPf06fS1tGFYfIuxTvNKj02jeERemfPz6EMKtg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1741623193;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SuDLAr3Wz8h6YVwKLam3Jg8MiZdFwWXZx63sMilpWcU=;
-	b=/+nwL9g7OwGj9dFMo3X3QFgEydjfhKBddFn0bg66O5vvpKzfT41gIPIhjnkXTPIQs90UCK
-	8QWaSHNsYEdCxwCg==
-To: Joe Damato <jdamato@fastly.com>, Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>, Gerhard Engleder <gerhard@engleder-embedded.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Subject: Re: [PATCH iwl-next v2 2/4] igb: Link queues to NAPI instances
-In-Reply-To: <Z86kBp2m-L-usV0V@LQ3V64L9R2>
-References: <20250217-igb_irq-v2-0-4cb502049ac2@linutronix.de>
- <20250217-igb_irq-v2-2-4cb502049ac2@linutronix.de>
- <f71d5cee-cafc-4ee0-89fc-35614eb06f94@intel.com>
- <Z86kBp2m-L-usV0V@LQ3V64L9R2>
-Date: Mon, 10 Mar 2025 17:10:53 +0100
-Message-ID: <8734fkq31u.fsf@kurt.kurt.home>
+	s=arc-20240116; t=1741623137; c=relaxed/simple;
+	bh=IvZEW7oadttOnYtirjG+CGOy6CBSqxJwamvbzOhlPg8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IdG9feJWMK9ck5c015Jy+zflnkRqxpZM1Sr1AX5WvG3MfI0rplyzykDaxaB9Rf9p3yFzF2q4nkWHMpzYUm/P3e8WJ0n2V8RanHSfAynwZwUrrGNGThYeHom3FVYcHQmqXooTllnSyBdz75tGDLQ7KcN2CC17Vg0skW8EmVaKSRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=c8XRNbMu; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2f9b9c0088fso7467377a91.0
+        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 09:12:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1741623134; x=1742227934; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xVecnfWnXWxvMZWjxALOom+4XRo+wVSJCCxgC0gz0UI=;
+        b=c8XRNbMuVD4rOLQovaKbT4VZzJlCvVJZsAIqAOA6pDskNSLMtHNmLOOtK2b1FkTggm
+         v4ftUqX2QbCu+MftbAmtO0YdXUIDTo+/UIieduVNDmKBrRMs6TCu8V7GJ2pvaYgiprVq
+         jU1/Lr4D0F99IEr1liZqo+7c14ujv0fczFBBaMqNj2OF8tfUQNEe6Qv9mLo6+2+usE6x
+         h6akck0Bobt2rYxL43008F+7tFiCFfMe9tTSU+e/Bbhva76ctvOYfaYDqFlx4jffQWLl
+         WdWKtt2IzjiPccaC73sr4fX2VS2En59a4oGE2jPZz4I0+yuywKmHZSAuudcwp97JBvRN
+         JGCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741623134; x=1742227934;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xVecnfWnXWxvMZWjxALOom+4XRo+wVSJCCxgC0gz0UI=;
+        b=calLIaSTszvehedbvSQKSOaYvBwvRj1jBtYOMfbyjyp6wDkFUHUXY0949My5FvqlYo
+         kqmkJbM+UmDXXw19xeyr4H2UkCr7HswDSL2FUqcEnoPP1/yUGjv78RUH3GVdD5MIcAKG
+         fspcJC4E+HqGLFryyqjsKsX4fHsW0fqzFKCgm6PYqC2LXwDxL/W/Ej06yydoOpPXDget
+         oc4ttlmsfaOrVUSJcfW3irS85/lpwo51RVBnGDl1uSCKsx+TdADlMv1VLRRgUQSiJK5p
+         jia5IWy4XzT6w3Dxl1KjAOjUBIpPSMZvqPyj6iKG02BGRz/jHzRG9Vcn71fw/DtYsNEz
+         fd2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWSg00KiZTOjOcBq4+q1nakE6670pSL3BM/2i8D8j9xefq84mWeXx9epHWyhjHhGzfAMOh9Hoc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5WkkyEzSRM1E7KfrIHWm9tM/BWVw8BrjnUcD9j+JsMUaiGz/E
+	nm+pZP35ilUxBjR+s32mD5xIkDAha6ZKxxIj69pLnFF+DFxTdT9iLQN+m8e1zMcQgxmpQiqmcJu
+	e
+X-Gm-Gg: ASbGncu005QL3n4CmD5vFE09gzOCwyngMWlUUvVOSWISisxk+8UQeTHKgr7UyKDMu9F
+	6RaZmf9Nsicv++tXceKgOzNVsCtADoFl7RpGUaFjs2lHKSPci+asZ6eKp5LSWLkfFwoX1VqVTZ1
+	l2thvcDCQnbPYWD5WNi2Qqp0H99xEioC3dm4vqSU9fHh6Wq2qwlWmgByJcFPwFNVfSAGWAtzHxZ
+	5MvV0I6U1LJ+TdVR7kGIQnCoD75zLrIFFdyXDpmmQ2CCIS1ec1k94sn6NEpH0zV8pT3rCDib4hR
+	VsrJdvyA7dnkkpEyWQLUNIFiHZbPVAy10Z0iZAhc4j0EWJPLbrck+DxFt7FuRJz7vtx4aHXK8TJ
+	UzkuBNw7GtdZGkhfUQEb2rg==
+X-Google-Smtp-Source: AGHT+IE1GmTmI7hdQNhkH/nWpv7HzMbtqk3Y3C1PsJGfdWDAi1M3mIuHt9rxNONYKjL9JWSebv/lXw==
+X-Received: by 2002:a17:90b:2dca:b0:2fa:42f3:e3e4 with SMTP id 98e67ed59e1d1-301004f8003mr99223a91.3.1741623134482;
+        Mon, 10 Mar 2025 09:12:14 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ff4e7ffe18sm10112994a91.31.2025.03.10.09.12.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Mar 2025 09:12:14 -0700 (PDT)
+Date: Mon, 10 Mar 2025 09:12:12 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Denis Kirjanov <kirjanov@gmail.com>
+Cc: dsahern@kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH iproute] libgenl: report a verbose error if rtnl_talk
+ fails
+Message-ID: <20250310091212.7dba57d2@hermes.local>
+In-Reply-To: <20250228133431.20296-1-kirjanov@gmail.com>
+References: <20250228133431.20296-1-kirjanov@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+On Fri, 28 Feb 2025 16:34:31 +0300
+Denis Kirjanov <kirjanov@gmail.com> wrote:
 
-On Mon Mar 10 2025, Joe Damato wrote:
-> On Fri, Mar 07, 2025 at 02:03:44PM -0800, Tony Nguyen wrote:
->> On 2/17/2025 3:31 AM, Kurt Kanzenbach wrote:
->>=20
->> ...
->>=20
->> > diff --git a/drivers/net/ethernet/intel/igb/igb_xsk.c b/drivers/net/et=
-hernet/intel/igb/igb_xsk.c
->> > index 157d43787fa0b55a74714f69e9e7903b695fcf0a..a5ad090dfe94b6afc8194f=
-e39d28cdd51c7067b0 100644
->> > --- a/drivers/net/ethernet/intel/igb/igb_xsk.c
->> > +++ b/drivers/net/ethernet/intel/igb/igb_xsk.c
->> > @@ -45,6 +45,7 @@ static void igb_txrx_ring_disable(struct igb_adapter=
- *adapter, u16 qid)
->> >   	synchronize_net();
->> >   	/* Rx/Tx share the same napi context. */
->> > +	igb_set_queue_napi(adapter, qid, NULL);
->> >   	napi_disable(&rx_ring->q_vector->napi);
->> >   	igb_clean_tx_ring(tx_ring);
->> > @@ -78,6 +79,7 @@ static void igb_txrx_ring_enable(struct igb_adapter =
-*adapter, u16 qid)
->> >   	/* Rx/Tx share the same napi context. */
->> >   	napi_enable(&rx_ring->q_vector->napi);
->> > +	igb_set_queue_napi(adapter, qid, &rx_ring->q_vector->napi);
->> >   }
->> >   struct xsk_buff_pool *igb_xsk_pool(struct igb_adapter *adapter,
->>=20
->> I believe Joe's fix/changes [1] need to be done here as well?
->>=20=20
->> Thanks,
->> Tony
->>=20
->> [1] https://lore.kernel.org/intel-wired-lan/9ddf6293-6cb0-47ea-a0e7-cad7=
-d33c2535@intel.com/T/#m863614df1fb3d1980ad09016b1c9ef4e2f0b074e
->
-> Yes, the code above should be dropped. Sorry I missed that during
-> review - thanks for catching that, Tony.
->
-> Kurt: when you respin this to fix what Tony mentioned, can you also
-> run the test mentioned above?
+> Currenlty rtnl_talk() doesn't give us the reason
+> if it fails.
+> 
+> Signed-off-by: Denis Kirjanov <kirjanov@gmail.com>
+> ---
 
-Hi Tony & Joe,
+Don't think this is needed.
+ - inside rtnl_talk, it already prints (using perror) if it is a kernel reported error
+ - lots of other places call rtnl_talk() what is special about genl
 
-Hm. I did run the test and it succeeded. I'll take a look at it next
-week when I'm back in the office.
+Better to move any required error prints into libnetlink.c
 
-Thanks,
-Kurt
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmfPDw0THGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgn1aD/9tRXm3GqrzZQMU2qpXAYFfWc/58gEw
-fkY47pLpb1Flvgj4npkht1GaGAnrnGQQvVWrDNwktbqj/BUSvFK9SGXBgNUgPSXI
-NmdKoc0ln9sn+BElFyiwSUk9fyappT8phmFLlfkOYPwQl2oRPg6Mri6PDQBfYw+I
-GNoejpbMI5JYnIernngoMbLf4daWa9BLoIuR7k94HO1/NizeWUIuljUFdrLsJ4/K
-hdeLoSbkb26BCZvS3YpfBemWQrU8u6bdWATOC5CPRTnlHfYV3VH+GY6G/Uk3T8E3
-l/2SUk51UlPyMz286miqO2Eozs2OM/+YLNrPqFZ4kT0nDwEuY2UdmA+kVh8effCQ
-EDcxcnpABtUfz0IzoBy0h9PDSYBp0GXM2awtP+9+fz7wt8ctHGdM/1lUuz3NHta7
-B1F48wUNllSVc0Fj4mRXcdk81WZqYZwUt0FjLaSkgBvrx/BqPQg2lufaxS5/VUCw
-RSVNHKVH353aOzY6zV5hZ+sjBY2f4e6RhKFaCsqNOSBcKPOIIfBrF+Egr+cT1STF
-ScDLTkDZAwvmC99IvpJSx0DQprvx0pTZ4nJX0nRgibxHFQLarAhyGPGtAhL4a3wm
-5SfQ//XIwdQfnC9Q6VeLQeAtfGuzuBscVNYKhevC6M01Ya3YzRDGCw9vS/0+vNzV
-Uvu5DPvpy61CoA==
-=mHhc
------END PGP SIGNATURE-----
---=-=-=--
+Even better is to make sure any errors in kernel are using extack to give
+better messages.
 
