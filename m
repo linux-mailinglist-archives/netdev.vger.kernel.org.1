@@ -1,136 +1,127 @@
-Return-Path: <netdev+bounces-173513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DDF9A593E5
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 13:13:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34345A59404
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 13:16:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADD6E16E9B5
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:12:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B1BB188E735
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:14:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25EDD22ACCE;
-	Mon, 10 Mar 2025 12:11:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6364F22579E;
+	Mon, 10 Mar 2025 12:14:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Uc2kSMaJ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fJYw8Hnh"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B3DC22A7E0;
-	Mon, 10 Mar 2025 12:11:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD63322423B;
+	Mon, 10 Mar 2025 12:14:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741608697; cv=none; b=FBMkM1xrxk1cEX3oGM67Hm0i6leNRaPbmm3rymIoNqKYEjJ31Zgpug1FlXqqqFJG2sBlZvEe7SOdPx7lFMHDoq4fHFbZCgFwDRE/oQVIdw3owBoaqW5YcIy+6VdrSOWBDht0EZ0nTNf3ZnGF205HFype8DZLDcU9XthaPy0SaGI=
+	t=1741608862; cv=none; b=Y7BQ/it0Po4XU7X6Psqi3X4JeU9tXzEtKJcJoVaaATZDiHjzAcecMYZz68BRZa8CTlP/VxMMRCzKNy1sObS7X3oPxw0Of02Jzix7wB1yscB0Na+pfc/cIm+4BQqlAtJQeDLVDLUi2OKWfhIFgE3/+Vof15QftBV8Llx/iOLNSHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741608697; c=relaxed/simple;
-	bh=B/Zi8tRRc/t7099IxweCQ9wmr8LBRpEjxc54n0VCEzQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EHt6UeBru2JrCUHnZyT3FNnyt3RobX7MyTLgCnGeqvuzb47VIq6YmqDNJ4S/rFfw2f7Gyg2SENTXCHJDrMGoZ8zxMeIg6BLutB6arQkbYEunhlk45VB3YABLh8+Cppg0PO5Vwe3LZLpVQjGMlGhK5ogtIf5JGBRCvgAKf3bKIeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Uc2kSMaJ; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id BAD8B2111421; Mon, 10 Mar 2025 05:11:34 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com BAD8B2111421
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1741608694;
-	bh=wGlVDMVI7jB0uTeQswp0J7PSuFA8+H1jZy79IJtAwJA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Uc2kSMaJZ2d9mRqMGI9uVePTC1T6zyoq47PuXm1KAkLHEGlSFLadmxyf4t7EhXYgc
-	 qJPXVqjZQYPIo2xrAnGCsPXWyKYE9mxrGdN9iUPi4kEpIJvw3IuVpiQ2eLOYX89j/w
-	 NaqXKPle32JCMKpmqeqjhSGIpPlBxgMUGEnOafQU=
-Date: Mon, 10 Mar 2025 05:11:34 -0700
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	"stephen@networkplumber.org" <stephen@networkplumber.org>,
-	KY Srinivasan <kys@microsoft.com>,
-	Paul Rosswurm <paulros@microsoft.com>,
-	"olaf@aepfle.de" <olaf@aepfle.de>,
-	"vkuznets@redhat.com" <vkuznets@redhat.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"leon@kernel.org" <leon@kernel.org>, Long Li <longli@microsoft.com>,
-	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"ast@kernel.org" <ast@kernel.org>,
-	"hawk@kernel.org" <hawk@kernel.org>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [EXTERNAL] Re: [PATCH net] net: mana: Support holes in device
- list reply msg
-Message-ID: <20250310121134.GA12177@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1741211181-6990-1-git-send-email-haiyangz@microsoft.com>
- <20250307195029.1dc74f8e@kernel.org>
- <MN0PR21MB3437F80F3AD98C82870A9173CAD72@MN0PR21MB3437.namprd21.prod.outlook.com>
+	s=arc-20240116; t=1741608862; c=relaxed/simple;
+	bh=vuWxLW4zopk6VcKQXVcgbQeqQ+HqIL5/riOEkc+yDYU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=duyWPlQ+Nh97GIRtAfh5pzI/zsI1mJt+m5m5s3mRM4nfD5Sksc4FP58L1mTRfwUSLFkkZYQo1/Vtn8AEZKssDR/NnwNdevCrsvaSZFrihnhcsJ4T9nUoqjUDLc1GIv8gf9X95NzMG1jB+MxePOoAQnBAQ1BIr2DAm0uP3qQqXt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fJYw8Hnh; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 922A1443F5;
+	Mon, 10 Mar 2025 12:14:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1741608858;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CNm9BSsOfq9YjNo6tMCG7wnV+C6YM+88UmyM3ASeUTg=;
+	b=fJYw8HnhXuhCIVN13OSw37EfydbxcYN7vD4cPiEwIhg0ewJwR4m5AGcunzenv2lFQXEHXw
+	mnreD61Hvp4HRIX/qRmMigw7T7thB/GbXLTUGueG+M6Td45rLGqbC8HCXJQT1294f/ivHM
+	WkqMX/mMzZt6ehIcOeCh3BXGjMaxXA6qRrZeXPwosH6vicCiWjwQNb8IY8GzlL3ZxhiTXn
+	appYtMEllu/YTF5yRqxF2lRzEpq1nFFVMRn7gtE6nX8RMZLNUgQOve7xZVWAaSIiPd3qNA
+	heRpjAjelZWHnfNKv2h0eBbbM4crWd6ETjsYEws5j1IlfUQjN/O28xY4MzzFhg==
+Date: Mon, 10 Mar 2025 13:14:13 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina
+ <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, Oleksij Rempel <o.rempel@pengutronix.de>, Simon
+ Horman <horms@kernel.org>, Romain Gantois <romain.gantois@bootlin.com>,
+ Piergiorgio Beruto <piergiorgio.beruto@gmail.com>, Stanislav Fomichev
+ <sdf@fomichev.me>
+Subject: Re: [PATCH net-next v2 5/7] net: ethtool: phy: Convert the PHY_GET
+ command to generic phy dump
+Message-ID: <20250310131413.505e676f@kmaincent-XPS-13-7390>
+In-Reply-To: <20250308155440.267782-6-maxime.chevallier@bootlin.com>
+References: <20250308155440.267782-1-maxime.chevallier@bootlin.com>
+	<20250308155440.267782-6-maxime.chevallier@bootlin.com>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <MN0PR21MB3437F80F3AD98C82870A9173CAD72@MN0PR21MB3437.namprd21.prod.outlook.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduudelfedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeegiedrudekkedrvdefledruddtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepgeeirddukeekrddvfeelrddutddphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvddvpdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhop
+ egvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Sun, Mar 09, 2025 at 10:01:33PM +0000, Haiyang Zhang wrote:
-> 
-> 
-> > -----Original Message-----
-> > From: Jakub Kicinski <kuba@kernel.org>
-> > Sent: Friday, March 7, 2025 10:50 PM
-> > To: Haiyang Zhang <haiyangz@microsoft.com>
-> > Cc: linux-hyperv@vger.kernel.org; netdev@vger.kernel.org; Dexuan Cui
-> > <decui@microsoft.com>; stephen@networkplumber.org; KY Srinivasan
-> > <kys@microsoft.com>; Paul Rosswurm <paulros@microsoft.com>;
-> > olaf@aepfle.de; vkuznets@redhat.com; davem@davemloft.net;
-> > wei.liu@kernel.org; edumazet@google.com; pabeni@redhat.com;
-> > leon@kernel.org; Long Li <longli@microsoft.com>;
-> > ssengar@linux.microsoft.com; linux-rdma@vger.kernel.org;
-> > daniel@iogearbox.net; john.fastabend@gmail.com; bpf@vger.kernel.org;
-> > ast@kernel.org; hawk@kernel.org; tglx@linutronix.de;
-> > shradhagupta@linux.microsoft.com; linux-kernel@vger.kernel.org;
-> > stable@vger.kernel.org
-> > Subject: [EXTERNAL] Re: [PATCH net] net: mana: Support holes in device
-> > list reply msg
-> > 
-> > On Wed,  5 Mar 2025 13:46:21 -0800 Haiyang Zhang wrote:
-> > > -	for (i = 0; i < max_num_devs; i++) {
-> > > +	for (i = 0; i < GDMA_DEV_LIST_SIZE &&
-> > > +		found_dev < resp.num_of_devs; i++) {
-> > 
-> > unfortunate mis-indent here, it blend with the code.
-> > checkpatch is right that it should be aligned with opening bracket
-> Will fix it.
-> 
-> > 
-> > >  		dev = resp.devs[i];
-> > >  		dev_type = dev.type;
-> > >
-> > > +		/* Skip empty devices */
-> > > +		if (dev.as_uint32 == 0)
-> > > +			continue;
-> > > +
-> > > +		found_dev++;
-> > > +		dev_info(gc->dev, "Got devidx:%u, type:%u, instance:%u\n", i,
-> > > +			 dev.type, dev.instance);
-> > 
-> > Are you sure you want to print this info message for each device,
-> > each time it's probed? Seems pretty noisy. We generally recommend
-> > printing about _unusual_ things.
-> Ok. I can remove it.
-How about a dev_dbg instead?
-> 
-> Thanks,
-> - Haiyang
+On Sat,  8 Mar 2025 16:54:37 +0100
+Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
+
+> Now that we have an infrastructure in ethnl for perphy DUMPs, we can get
+> rid of the custom ->doit and ->dumpit to deal with PHY listing commands.
+>=20
+> As most of the code was custom, this basically means re-writing how we
+> deal with PHY listing.
+
+Only nitpick ;)
+
+> -static int
+> -ethnl_phy_fill_reply(const struct ethnl_req_info *req_base, struct sk_bu=
+ff
+> *skb) +static int phy_prepare_data(const struct ethnl_req_info *req_info,
+> +			    struct ethnl_reply_data *reply_data,
+> +			    const struct genl_info *info)
+>  {
+> -	struct phy_req_info *req_info =3D PHY_REQINFO(req_base);
+> -	struct phy_device_node *pdn =3D req_info->pdn;
+> -	struct phy_device *phydev =3D pdn->phy;
+> -	enum phy_upstream ptype;
+> +	struct phy_reply_data *rep_data =3D PHY_REPDATA(reply_data);
+> +	struct phy_link_topology *topo =3D reply_data->dev->link_topo;
+> +	struct nlattr **tb =3D info->attrs;
+> +	struct phy_device_node *pdn;
+> +	struct phy_device *phydev;
+ =20
+Reverse xmas tree.
+
+> -	ptype =3D pdn->upstream_type;
+> +	/* RTNL is held by th caller */
+
+Small typo here *the*.
+
+The rest is good for me.
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
