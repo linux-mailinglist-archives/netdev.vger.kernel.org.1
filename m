@@ -1,307 +1,203 @@
-Return-Path: <netdev+bounces-173540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3934A59562
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 13:57:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59DC2A5956A
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 13:59:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E179E16E170
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:57:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C04D3AADA9
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:58:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8B3422A4F8;
-	Mon, 10 Mar 2025 12:57:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5506A229B30;
+	Mon, 10 Mar 2025 12:57:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="IGb/ycba"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mQJyaen2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE28722A4E4
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 12:57:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 703D62288F7;
+	Mon, 10 Mar 2025 12:57:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741611435; cv=none; b=ZLaVJU+mvGJ6yGxFLXNWFnYz+G1kS5zSAxdEdi57jd/5sa+KfY/Q92rGMOwFESvAHFB1qt9VL2giVim1mn9Z7+q3OV+iF56mrybjH5l6HeGPIvicXItm8AtMeInn1xAIzFhim6MJ4jqDS94B+ZwHM0dnW7MMMojj35q9Z1vCuAI=
+	t=1741611454; cv=none; b=KAh4PDYuidlH5Up2NJ/GqZ65/8EupeD9TWT25bbbE/sJLP+NtxEEvnqO8jkfy1rvpfFXFhZWzunF1OKAe7/+EqZfB+lVoRB4rEtd2tgTy8Lrj0N8lVvC2W9ztvTtUogpbO27yJ82tkjJruDc66C5/vAYu3ke6H+39SMeNdceT3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741611435; c=relaxed/simple;
-	bh=vON/EpbQV2KyfCXTBJEmZ7Ad60j+/Pa+ll4x17Dfc6I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fGGxq1JaOBGvZHOl0uiWDy17zVtsal3/NCNkmIjiawgle1c+7iz52CagLeSts2OkwIgKkb3+wk0YXjaA4CfNnUecmmUgMIxChBtKqefISaa8cUufaRphYyujS6w32VsVy1tZK+b6a0gw3gmRd+zA3mblmhJzna4LXi+FgfTi64g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=IGb/ycba; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-abf3d64849dso497125766b.3
-        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 05:57:12 -0700 (PDT)
+	s=arc-20240116; t=1741611454; c=relaxed/simple;
+	bh=XusGCXjnLrO4NIpb4V870oB4yFDARgNHjuBdPCvCho4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l+rzD9/xcMSOyM9Vlj2tBMIjdmiahR/Pzvhc69d9r4tuQczkRlacWyxRQ6epomgYM1tV++9c2zj96O3fUSFor7/pnatmWvZh1nlUcFjfshn6aH7AGTFzCSkNESm4h4dtt5CBNj5Lpvl0N8Zf7HEs5MxBBrlyDHFUSTFDELmrgT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mQJyaen2; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-30bae572157so41846021fa.3;
+        Mon, 10 Mar 2025 05:57:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1741611431; x=1742216231; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZO3QaUbK7LBz+M8DPrG/4mYgNReKPrnhjLtN5pGlqD8=;
-        b=IGb/ycba+Bf9DcKWgBufrd4vujbMgS8OerWEiyDsWcWMMOghjT+v0twRmr/tQo6lWp
-         B6f6CVSo7QWu/uGKginnGeh3t5+UV5fOJirQ7ZNI0+iszpVFwNyrhAJ66/9Ch6PK47uH
-         BfcAd0LfplCAvVRKINk6rfCIPUMqIT3Apq5mz4N421AhFMvmrQXrX7Eq4+Im7Z57dUWO
-         BXMtouIKV+Ld9QtrYz3UCZTW2nhZDVBvhpj8uKqxrph6V20EgMKydUCxgTUQGwMx7lbp
-         yMfMMWgiF3dEPro8NWYyS2c6n5n2R/G2NFSJ6PsVTp1ItcFviWaPN0U7zOH/E3MK2TpE
-         mNSg==
+        d=gmail.com; s=20230601; t=1741611450; x=1742216250; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fpwBD3x8iSJEU67vP+98+iDTZb39NqeaJlJjG/XKE/4=;
+        b=mQJyaen2Zc8q9CW4NkbTp/UCFB4Rl36rrp92iocTn2fdUhA+hns0i+xwEzYFkMEFf+
+         5+SoxbdTJfVHqgHQAAct/fijfQT4tB+NNPhDa14L5p6UWd9jOdHqCyh+khbgOZpdDZHk
+         eUYQclPy++PgxQCLGFp+XTGjnzRz5PrgW0q3XyN3TpXvNDOpHKGdGdzJnwzYXiyZas21
+         GthUDdpISM0YXdjYnDsd2RHSzbQGDGqDMwcgWzqx515RLBBEr7+8y/zhbGe+Cfx5YOz6
+         G4U4acn56BXBHkRJzltjO6YPIpELklRi0ki8cZEOczeyg3aCyZGXzc59ORgk/hmWz0gq
+         eByg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741611431; x=1742216231;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1741611450; x=1742216250;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZO3QaUbK7LBz+M8DPrG/4mYgNReKPrnhjLtN5pGlqD8=;
-        b=pGb1i3JYkgdt/rdiPc8sSeP6sNii8zb9du98DRGiCWuyMahPuEvi8Opm97WP6OOaEo
-         g8YD8zTnOvprsSxyKHVLUe96UDMuURoh6kdbLdZul9nYrRUN8Rt203xVXFnRml/fjMOP
-         GUTJXRtn5pGp5ZCZq0Y2vY4UPb86/H+3ogrhhvaDI07LezsV+f1hY1AJ12dVLvQ5PrV/
-         PBBk34X6o9iFwNzMfe75qWsqcrDuD1szveHzx3ArPGZOIowxh0m0WBpGDgIh7aIPJVHB
-         JAWPtzt6k/bYH9367lgwdroXbwvwMUxp6yCv4N29lCceqFkHz4urZGtfybcnVD+Z1OZj
-         SIXA==
-X-Gm-Message-State: AOJu0YzX1GHSdLb95l9TX6LAf8/PjF4NmM3MIqiro7G2PMrr5gIRRmuf
-	uM2ocgAKXcuQ35vLlEVi2wO9qFKZj93bXc3reldOap3XzcrgocNQ5wJZkUsBbME=
-X-Gm-Gg: ASbGncsXyEh44OnoX6BbOpeErVfS/PBVywpJuaosKkkE5KTFZkS/Rv0vTLuFcKlmjf7
-	ozoujHrnNyuzf2E03ysaDFMcn3J07DZkrAULKevjtu0rH0IIUnDmdAeQRAyJiCsOCRdcAcxcnnc
-	S47f7rUPX5t11NiU0VuggUwugdLK0arudpOr4Uh4TWiMsxjyKc8VM9mzKkPs+bmjSFviG6yUx/s
-	qMC4lrpSS4/4t9P5h6z66mJ2RiPVjemaXjs1Z9u5Nwk09O6j4thWPd2vaBzIu2hWwD0N0CtC9lm
-	279ACLR3f676OyEFRXRIMrrn7Vq6LXGSodwgioCqGObEhJcefK8Nhb90R4KtpxuM49Yzpp268SV
-	aLBLYmvGqt5KES1fkkQ==
-X-Google-Smtp-Source: AGHT+IHsTaxffT+MFbNnmdyJSVwTv9dOvCg922VF/G+130aQ2Uq3QUGcJlmug4ws36WIKoisVsV5bg==
-X-Received: by 2002:a05:6402:430b:b0:5df:25e8:26d2 with SMTP id 4fb4d7f45d1cf-5e5e22a79ccmr32595386a12.5.1741611431032;
-        Mon, 10 Mar 2025 05:57:11 -0700 (PDT)
-Received: from ?IPV6:2001:67c:2fbc:1:c442:18ad:5fc3:3cfc? ([2001:67c:2fbc:1:c442:18ad:5fc3:3cfc])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5e5c733f69csm6778915a12.1.2025.03.10.05.57.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Mar 2025 05:57:10 -0700 (PDT)
-Message-ID: <431c7b94-87ba-4aba-9bc7-e255241dbbdf@openvpn.net>
-Date: Mon, 10 Mar 2025 13:57:09 +0100
+        bh=fpwBD3x8iSJEU67vP+98+iDTZb39NqeaJlJjG/XKE/4=;
+        b=U51Jz5ade3x3gNPfuMbOhKxjR53ed+TUfTyw05cKgceVjZrCcC/4B4VP51AadPQHFk
+         5yf4vjz/YgHaWXYQLze25WhdM9gIiEwpUf7wBJohi8wWgHHAr5rGJz8IRizWKs2dO7BK
+         tIh4UKZtOgDj+zKc7wmNtW708djdkvzPmBRtThgHsTJfK1mPcQer700eo4B4PVlpG21h
+         yzRAkpwy+Vx1xw7wK2UA0DJWKmtRQhakyOn+jlTQJBgbKWF4QmN89B4HYr4d6H+DeNWC
+         p2DeJI/5qUbbfQlwBsOe3qVgx7Ik6IxJxviRVBeEFtOhTgivFSrDmiANh0MmMnP6RJms
+         Qsjg==
+X-Forwarded-Encrypted: i=1; AJvYcCVjOexvvCFodMPZMT3y6GbM1glh6Xv/gxVA9fUqXXd/yQzPl/H3dOOJnrfHqGZ5O4J1v/dsqENwDBnY@vger.kernel.org, AJvYcCWZzZ7HNdXG87wZ2fEciydGS5A2eG3ZBjWR4IEqZxkFPZUfehJHeM+dqNldICG553QIeNKBEjVE@vger.kernel.org, AJvYcCWoF7dfpzss8gQDJTFWlhtlVn52wHGK6xYTAyPRL5Xo7C7QLOU2DGSeNktZ3B56G/FJD0oktHrw3ZL58Tfu@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvITheEUjXhgCBWj+97TA0JSq+1oD0mFKLCqKy0NEBpi+nagmw
+	mIb9rZ1Oyivqm2ZTEHeP1WuZw5SEw0elqL4qD+ZfXkOj+mELj9Y+
+X-Gm-Gg: ASbGncu/gjHZyWrfZp6gxwyjDbprAvLc5xVGSGmhJy8L1uGBGY1S4AG47xiwRzEZ1u3
+	4cTrzIk38fHVcCPTEpTOz9qYxC303HsEzU4zt7h7mjkj6MY2XY3f4gLTrOwz8ADR717pAghk+fZ
+	J/AN8ISChB5zHOS75RZ0fZjnGsR3Njki20QcQ+8wRvYUemvzQWWrAPrbqojU1MTjaItsK0MpKJU
+	H8hvGwqm4m4cjhWuZT15yMhQTq8vM4lZnB7Z9wlRtGkAU1POeaCCzO+NBR8t5/OCij4dcjB7JeZ
+	t9TCgAcoHSBNp9J87nsSCe47y29bmFa+yvLEjdqUP15Fv1AuFH4fitejSe1Urw==
+X-Google-Smtp-Source: AGHT+IGI+4SKzYIDDI/CqOFuISbqcvk/INtbWwZopqKeLbrpPLP1v3bcrvM01tlRht/FIloSf5xc7A==
+X-Received: by 2002:a05:6512:3d15:b0:549:5b54:2c68 with SMTP id 2adb3069b0e04-54990e5daccmr4642748e87.22.1741611450194;
+        Mon, 10 Mar 2025 05:57:30 -0700 (PDT)
+Received: from mva-rohm ([2a10:a5c0:800d:dd00:8fdf:935a:2c85:d703])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5498b0bcf98sm1451461e87.128.2025.03.10.05.57.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Mar 2025 05:57:29 -0700 (PDT)
+Date: Mon, 10 Mar 2025 14:57:26 +0200
+From: Matti Vaittinen <mazziesaccount@gmail.com>
+To: Matti Vaittinen <mazziesaccount@gmail.com>,
+	Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>
+Cc: Jonathan Cameron <jic23@kernel.org>,
+	Lars-Peter Clausen <lars@metafoo.de>, Rob Herring <robh@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Daniel Scally <djrscally@gmail.com>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next v6 09/10] net: gianfar: Use
+  device_get_child_node_count_named()
+Message-ID: <1c4b9b4ceb1995bce76a0ddef0e04ad0d1d81190.1741610847.git.mazziesaccount@gmail.com>
+References: <cover.1741610847.git.mazziesaccount@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v21 18/24] ovpn: add support for peer floating
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-References: <20250304-b4-ovpn-tmp-v21-0-d3cbb74bb581@openvpn.net>
- <20250304-b4-ovpn-tmp-v21-18-d3cbb74bb581@openvpn.net> <Z8dIXjwZ3QmiEcd-@hog>
- <9c919407-fb91-48d7-bf2d-8437c2f3f4da@openvpn.net> <Z8gzbz6YjdeGPqgu@hog>
- <cd9df084-8633-49f0-a851-ed2b1c9946d3@openvpn.net> <Z8iCKvIfFaskshlz@hog>
- <e3def5b5-3450-4ad0-aced-fd80af943c31@openvpn.net> <Z8rGnTaRE_mph_tD@hog>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <Z8rGnTaRE_mph_tD@hog>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-
-On 07/03/2025 11:12, Sabrina Dubroca wrote:
-> 2025-03-06, 11:02:50 +0100, Antonio Quartulli wrote:
->> On 05/03/2025 17:56, Sabrina Dubroca wrote:
->>> 2025-03-05, 14:14:36 +0100, Antonio Quartulli wrote:
->>>> On 05/03/2025 12:20, Sabrina Dubroca wrote:
->>>>> 2025-03-05, 00:19:32 +0100, Antonio Quartulli wrote:
->>>>>> On 04/03/2025 19:37, Sabrina Dubroca wrote:
->>>>>>> 2025-03-04, 01:33:48 +0100, Antonio Quartulli wrote:
->>>>>>>> +void ovpn_peer_endpoints_update(struct ovpn_peer *peer, struct sk_buff *skb)
->>>>>>>> +{
->>>>>>>> +	struct hlist_nulls_head *nhead;
->>>>>>>> +	struct sockaddr_storage ss;
->>>>>>>> +	const u8 *local_ip = NULL;
->>>>>>>> +	struct sockaddr_in6 *sa6;
->>>>>>>> +	struct sockaddr_in *sa;
->>>>>>>> +	struct ovpn_bind *bind;
->>>>>>>> +	size_t salen = 0;
->>>>>>>> +
->>>>>>>> +	spin_lock_bh(&peer->lock);
->>>>>>>> +	bind = rcu_dereference_protected(peer->bind,
->>>>>>>> +					 lockdep_is_held(&peer->lock));
->>>>>>>> +	if (unlikely(!bind))
->>>>>>>> +		goto unlock;
->>>>>>>> +
->>>>>>>> +	switch (skb->protocol) {
->>>>>>>> +	case htons(ETH_P_IP):
->>>>>>>> +		/* float check */
->>>>>>>> +		if (unlikely(!ovpn_bind_skb_src_match(bind, skb))) {
->>>>>>>> +			if (bind->remote.in4.sin_family == AF_INET)
->>>>>>>> +				local_ip = (u8 *)&bind->local;
->>>>>>>
->>>>>>> If I'm reading this correctly, we always reuse the existing local
->>>>>>> address when we have to re-create the bind, even if it doesn't match
->>>>>>> the skb? The "local endpoint update" chunk below is doing that, but
->>>>>>> only if we're keeping the same remote? It'll get updated the next time
->>>>>>> we receive a packet and call ovpn_peer_endpoints_update.
->>>>>>>
->>>>>>> That might irritate the RPF check on the other side, if we still use
->>>>>>> our "old" source to talk to the new dest?
->>>>>>>
->>>>>>>> +			sa = (struct sockaddr_in *)&ss;
->>>>>>>> +			sa->sin_family = AF_INET;
->>>>>>>> +			sa->sin_addr.s_addr = ip_hdr(skb)->saddr;
->>>>>>>> +			sa->sin_port = udp_hdr(skb)->source;
->>>>>>>> +			salen = sizeof(*sa);
->>>>>>>> +			break;
->>>>>>
->>>>>> I think the issue is simply this 'break' above - by removing it, everything
->>>>>> should work as expected.
->>>>>
->>>>> Only if the bind was of the correct family? Checking an IPv4 local
->>>>> address (in the bind) against an IPv6 source address in the packet (or
->>>>> the other way around) isn't going to work well.
->>>>
->>>> Ah I understand what you mean.
->>>>
->>>> The purpose of "local_ip" is to provide a working local endpoint to be used
->>>> with the new remote address.
->>>> However, if the float is switching family we can't re-use the same old local
->>>> endpoint (hence the check).
->>>> In this case we'll learn the "new" local address later.
->>>>
->>>> Does it make sense?
->>>
->>> Sure, but we could have learned it immediately from the packet we just
->>> got, whether we're changing family or not. No need to wait for the
->>> next RX packet to also learn the new local address.
->>
->> Indeed.
->>
->>>
->>> But if we now do a dst_cache_reset with the peer float,
->>> ovpn_udp*_output will have to do a new route/local address lookup and
->>> I guess that should clean up the local address stored in the bind, and
->>> then update the dst_cache with the local address we just found.
->>
->> Right and this may not truly be what we want.
->>
->> If peer X is sending packets to our IP1, we should at least try to reply
->> from the same address.
->>
->> If we have two IPs, IP1 and IP2, and both can be used to reach peer X, we
->> should always try to use the one where we received traffic from X in the
->> first place.
-> 
-> I had a thought that it might not be our prefered address to talk to
-> X, but it would probably be, since we decided to use it (and thus X
-> used it as remote to talk to us).
-
-I am not sure I follow this sentence: I think you are just confirming 
-what I said above (please correct me if I am wrong)?
-
-> 
->> OTOH hand it is also true that with floating detection on both sides, the
->> situation will converge quickly, but there might be a reason why X chose IP1
->> as destination, therefore we should do our best to respect that.
-> 
-> And I guess the primary reason for X to choose IP1 would be "we sent
-> packets to X from IP1".
-
-Probably. It truly depends on who initiated the connection.
-
-> 
->> So, even in case of float, we should still store the local endpoint and
->> attempt fetching a route that takes that into consideration.
->> Which I think is what is happening (assuming we reset the dst_cache on
->> float).
-> 
-> Not at the same time as float, unless ovpn_peer_endpoints_update sets
-> local_ip = ip_hdr(skb)->daddr unconditionally on float?
-> 
-> Otherwise the next route lookup in ovpn_udpX_output will pick whatever
-> source address it wants (which would likely match what's in the
-> received skb during float, so probably fine anyway).
-> 
-
-But that's what the code just below in ovpn_peer_endpoints_update() 
-does, no?
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="uEr4BMf2amfewQlJ"
+Content-Disposition: inline
+In-Reply-To: <cover.1741610847.git.mazziesaccount@gmail.com>
 
 
-  223                 /* local endpoint update */
-  224                 if (unlikely(bind->local.ipv4.s_addr != 
-ip_hdr(skb)->daddr)) {
+--uEr4BMf2amfewQlJ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-...
+We can avoid open-coding the loop construct which counts firmware child
+nodes with a specific name by using the newly added
+device_get_child_node_count_named().
 
-  229                         bind->local.ipv4.s_addr = ip_hdr(skb)->daddr;
+The gianfar driver has such open-coded loop. Replace it with the
+device_get_child_node_count_named().
+
+Suggested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Signed-off-by: Matti Vaittinen <mazziesaccount@gmail.com>
+---
+It's fair to tell the pros and cons of this patch.
+The simplification is there, but it's not a big one. It comes with a cost
+of getting the property.h included in this driver which currently uses
+exclusively the of_* APIs.
+
+NOTE: This patch depends on the patch:
+[2/10] "property: Add functions to iterate named child"
+
+Compile-tested only!
+---
+ drivers/net/ethernet/freescale/gianfar.c | 17 ++++-------------
+ 1 file changed, 4 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/net/ethernet/freescale/gianfar.c b/drivers/net/etherne=
+t/freescale/gianfar.c
+index 435138f4699d..d4ee0fc843be 100644
+--- a/drivers/net/ethernet/freescale/gianfar.c
++++ b/drivers/net/ethernet/freescale/gianfar.c
+@@ -97,6 +97,7 @@
+ #include <linux/phy_fixed.h>
+ #include <linux/of.h>
+ #include <linux/of_net.h>
++#include <linux/property.h>
+=20
+ #include "gianfar.h"
+=20
+@@ -571,18 +572,6 @@ static int gfar_parse_group(struct device_node *np,
+ 	return 0;
+ }
+=20
+-static int gfar_of_group_count(struct device_node *np)
+-{
+-	struct device_node *child;
+-	int num =3D 0;
+-
+-	for_each_available_child_of_node(np, child)
+-		if (of_node_name_eq(child, "queue-group"))
+-			num++;
+-
+-	return num;
+-}
+-
+ /* Reads the controller's registers to determine what interface
+  * connects it to the PHY.
+  */
+@@ -654,8 +643,10 @@ static int gfar_of_init(struct platform_device *ofdev,=
+ struct net_device **pdev)
+ 		num_rx_qs =3D 1;
+ 	} else { /* MQ_MG_MODE */
+ 		/* get the actual number of supported groups */
+-		unsigned int num_grps =3D gfar_of_group_count(np);
++		unsigned int num_grps;
+=20
++		num_grps =3D device_get_named_child_node_count(&ofdev->dev,
++							     "queue-group");
+ 		if (num_grps =3D=3D 0 || num_grps > MAXGROUPS) {
+ 			dev_err(&ofdev->dev, "Invalid # of int groups(%d)\n",
+ 				num_grps);
+--=20
+2.48.1
 
 
->> ovpn_udpX_output() will:
->> * get no rt from the cache
->> * possibly confirm that saddr is ok
->> * fetch the new rt using the provided saddr and daddr
->> * update the cache.
->>
->> That makes sense to me.
->> Would you agree?
-> 
-> With dst_cache reset on float, yes. As long as we have that, the main
-> behavior seems correct to me. (maybe some corner cases will not be
-> handled optimally, but that can be improved later - which is most
-> likely what I've been discussing in these emails :))
+--uEr4BMf2amfewQlJ
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Yeah :)
+-----BEGIN PGP SIGNATURE-----
 
-> 
-> [this could be a useful counter to add in the future: number of floats
-> and local address updates - so the user can check if that's increasing
-> "too often", which would indicate something weird is happening]
+iQEzBAEBCAAdFiEEIx+f8wZb28fLKEhTeFA3/03aocUFAmfO4bYACgkQeFA3/03a
+ocURZgf/YbQQKWUSJXQpAgQKTcEKSgAD9+XsUFtJSYEsmId2FVEx1a+TAwB6sis2
+MuasJQ0Viv4XGR2JGAI195m/vrM7LrBC3RDcPi+lVUBRS/Hd1Bihgb1GB2yHua1B
+RhAGCB7ykW48AdsrdmDzrsyM5G95Q4LYR/1JFxsz67CD/gjEoxXTqVYz7Kh6Bm1p
+tKUrm7haOBT/0kUrAzzcsteqQUZ28DmHn+2e4M8FNtC1Lb7b5CJJ4plECo3j2AG2
+Sk6VByw/WmkYeeoG3ft8an0iUJwuya8WZ+OtpTBoCFi3iFwas3uYTNspfd+c0cUE
+12C4htU0Lt/iXOHQn7ZL3j+LFZRPmw==
+=QxV8
+-----END PGP SIGNATURE-----
 
-ACK, good idea!
-
-Thanks!
-
-Ok, I'll probably wait a little more and then prepare v22.
-
-Cheers,
-
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
-
+--uEr4BMf2amfewQlJ--
 
