@@ -1,90 +1,93 @@
-Return-Path: <netdev+bounces-173590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C27DA59B03
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 17:29:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C336FA59B12
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 17:33:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0E29F7A63FC
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 16:28:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F74D3A6DAB
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 16:32:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 059B619D8A9;
-	Mon, 10 Mar 2025 16:29:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AE061C1F10;
+	Mon, 10 Mar 2025 16:33:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vvb6DHGY"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wk1KH7M0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52D422F174;
-	Mon, 10 Mar 2025 16:29:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65AAA1E519;
+	Mon, 10 Mar 2025 16:32:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741624149; cv=none; b=nkQU/QUXHSirm5vTMDjNEkUuNMmX+y3dVVSI7VAYq31LclgGEoz1n0qv1zloXgEwgHj85WrWiEjGK38OcYf9XOe5tGWFgIdyq5wmQIBV1pMkgqzzGO9vGuQ93PqOQlwjZMFfWvZ15JNksCE5lA8HeUBOX8Bs1SLve+IDbCofFG0=
+	t=1741624380; cv=none; b=OttqO9R4DqRexLuwpGt/vH1MKiDe7e2Z8iBXjqW60p6rr3+9qoDt5vHmx1h9wlG1BrJZJCe83yvJ39jk3TWs/Ks//8MMf2e1AAT5wX5vo80XoI3YZwyWNeHOBgRF1OZ/FMcdwxClOlIXab6igMjPNrlstVkQOW1yd2b3t1gNMYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741624149; c=relaxed/simple;
-	bh=6X4kKS2Mc5Dm8mE+rwaQdY3R3B2gmrkVRohs8z4osZ4=;
-	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
-	 To:Date:Message-ID; b=iFcJURKvKRUgDGyT2XymRUzvBPmBY2hdQbsIYs0GIPevxHMhnuqGpTbHKlMZFHQ86oMXKYslPnWbHxI6YzfzlKkA8Pljv22EEAiCEobWS5eoIpa01RIYCkPoAnhKXVuTl5xAXMZ8khhF8WP2+43rLKAAn/zNSCYvfmZB1pX0a+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vvb6DHGY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1D69C4CEE5;
-	Mon, 10 Mar 2025 16:29:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741624149;
-	bh=6X4kKS2Mc5Dm8mE+rwaQdY3R3B2gmrkVRohs8z4osZ4=;
-	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-	b=Vvb6DHGYi21gTtNoB+Zb+5g+KUtVxXkvP6uz1yoGuy3lJ/YoXhmqlFMXfHSXGLZha
-	 ypplpVQbUm9p3LvLeIGJbUYQOWV1bjyFwDTmg2ZAwCM1fNvlxejZiWQ8Pq2o0G8jr7
-	 CDB5O82agXjMXyUqqmeX/jvLJZl0axmX6A2CakCtSq8RJ1+eSrdEBlXMzkJgWxzEJG
-	 rnIknsH6FlQaDuYjSASCrmR4LoT3CkhkPdxuofzJInjQ+jOtpwFPBg7TNyOSK5Yutn
-	 GVPwcSkLaqC/n08AjkaZGHDAChqK+5qInUwHtPPRS2QfLLHjF3qYA6qVZpfXBlXoCW
-	 kyWwdwE5x+8+Q==
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1741624380; c=relaxed/simple;
+	bh=Kvfc91l2KCRnMxu6n4P8Y+FQRrKgptGelFtGLwt5Uzs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mopX/8Xjkfw+/xyIHbniSJvQI46fDLtJRbCRCGTwSWHuhO7V20Xm/ujZtDUUmta1d6Ox/V2ypjYsZTiN5rwFiTPhkvIYxQKeh0Ad004DpwUUTLGI7kTzhsZSIXsISTb/S5nfLW9/Uk/Tnk++we3OARTYhluk0Ak+bGfmVYXJwFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wk1KH7M0; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=SKPAgvVsARXQJlsa+JzX7lDRyNQEsQ5O09OnW/tTa5A=; b=wk1KH7M085aceyZG7pKgjU6QA2
+	SjJZKcrT9DpYbHa5Eizma9GizYt/6GV7sspdrJor2gaWJCOtXn0UheJV8d6FWtJP0p2h1PWJtrDEA
+	l2l1ZzJkps19MBtDSr7cJUU8RsxTRrEtPwuVUwHkXQ7USyEAMcaqW2yYA9GT4Elrl2WM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1trg3V-0044HZ-1B; Mon, 10 Mar 2025 17:32:41 +0100
+Date: Mon, 10 Mar 2025 17:32:41 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
+Cc: Daniel Golle <daniel@makrotopia.org>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"sander@svanheule.net" <sander@svanheule.net>,
+	"markus.stockhausen@gmx.de" <markus.stockhausen@gmx.de>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next v9] net: mdio: Add RTL9300 MDIO driver
+Message-ID: <f6c7581d-7e4b-4114-bb57-8b009d66c5d2@lunn.ch>
+References: <20250309232536.19141-1-chris.packham@alliedtelesis.co.nz>
+ <Z85A9_Li_4n9vcEG@pidgin.makrotopia.org>
+ <b506b6e9-d5c3-4927-ab2d-e3a241513082@alliedtelesis.co.nz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <Z8w7ezFX3T01ptjH@qasdev.system>
-References: <Z8w7ezFX3T01ptjH@qasdev.system>
-Subject: Re: [PATCH] net-sysfs: fix NULL pointer dereference
-From: Antoine Tenart <atenart@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, jdamato@fastly.com, aleksander.lobakin@intel.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-To: 174124876418.4824.8589202932419197412@kwain.smtp.subspace.kernel.org, Qasim Ijaz <qasdev00@gmail.com>
-Date: Mon, 10 Mar 2025 17:29:05 +0100
-Message-ID: <174162414566.58153.13543967750742784209@kwain>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b506b6e9-d5c3-4927-ab2d-e3a241513082@alliedtelesis.co.nz>
 
-Quoting Qasim Ijaz (2025-03-08 13:43:39)
-> On Thu, Mar 06, 2025 at 09:12:44AM +0100, Antoine Tenart wrote:
-> > Quoting Qasim Ijaz (2025-03-06 00:53:07)
-> >=20
-> > > Later on the code calls sysfs_unbreak_active_protection(kn)=20
-> > > unconditionally, which could lead to a NULL pointer dereference.
-> > >=20
-> > > Resolve this bug by introducing a NULL check before using kn
-> > > in the sysfs_unbreak_active_protection() call.
-> >=20
-> > Did you see this in practice? Can you describe what led to this?
->=20
-> I have not seen this in practise but I think in terms of defensive
-> programming it could be a good addition to add a check to see if it
-> fails. If a function can return NULL then we should check for that, also
-> if we look at sysfs_break_active_protection being used throughout the
-> kernel there is multiple NULL checks so I think adding one here would be
-> handy.=20
+> So far upstream Linux doesn't have generic paged PHY register functions. 
 
-Not everywhere, there are at least two other examples. The only reason
-sysfs_break_active_protection would return NULL is if the attribute
-cannot be found in the kobject's sysfs directory; we got there because
-of that exact attribute in that exact sysfs directory and refcounting
-prevents them from disappearing.
+Yes it does:
 
-We usually do not add a check if there is 0 chance to catch something.
+phy_write_paged() and phy_read_paged().
 
-Thanks,
-Antoine
+These do all the locking to make sure they are atomic with respect to
+other phy read/writes while the page is selected. The driver just
+needs to provide two methods to read the current page and the set the
+current page,
+
+https://elixir.bootlin.com/linux/v6.13.6/source/include/linux/phy.h#L1060
+
+	/** @read_page: Return the current PHY register page number */
+	int (*read_page)(struct phy_device *dev);
+	/** @write_page: Set the current PHY register page number */
+	int (*write_page)(struct phy_device *dev, int page);
+
+Andrew
 
