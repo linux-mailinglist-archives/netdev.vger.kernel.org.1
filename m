@@ -1,203 +1,311 @@
-Return-Path: <netdev+bounces-173538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8E4AA5953D
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 13:54:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C01AA5954C
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 13:56:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0096D188EF20
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:54:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABE70165CC0
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:56:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7654D22A4D3;
-	Mon, 10 Mar 2025 12:54:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01295227EAF;
+	Mon, 10 Mar 2025 12:56:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MwZP10U3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KTKkoM9E"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B175A2288FE
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 12:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F407A3EA76;
+	Mon, 10 Mar 2025 12:56:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741611251; cv=none; b=W4J7TJLr/2JyLlBQcsLBmhntoc26LLjgtX2lOWgwGq4cMQ/+jLJGGq45VED6xTOCmwDgbZbUwGdR936LS3GtVdH1Z5UCC2By0nP4KU3nj2usx5KKJo2Z5ta2nkhkWZ5WCBhPi0uTrF+0YNz6u+5d/P16AxQeqzALwGygVCwhiac=
+	t=1741611365; cv=none; b=Ez8u30hPSD3qrsb4ilpjNgrbzKyytj/Oq7C2oxmOqKdrk+75KUSKlHw/2GNAfM1zLu4+BUC3hfqxk9m0knQ4vt5znBiKFt688LNMwuu1rOgxvf7mFGg2ihZN/BaRGohUhAVwxanzxv9Pexjp+eMnpt/ntEeCLhtYZJ8UB1MmxOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741611251; c=relaxed/simple;
-	bh=xsKwuaT+kl/9LxkTzq9+F+i2EjGR0W72fihNUXW6VbA=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=DUxJNCWt5C9+KsihIFfeiX8K6LVUicr+G+/YmcHQWrg5CAnDwo++HIxSK3FN2Gxs+9knlqXBPwIn5RAs1Ig4Xjn6bBoxMobcK/zqohQYIwQx2ejvVNBhEHuaA7yBiQ5nUgtecix9Oqb6BZElS2QSRYO8P+e0C6ZHDrv8UQR32Rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MwZP10U3; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741611248;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=QOWCKaCbmlFC0Efy5SeEAE0DBijaDRqz9slfsvo05nc=;
-	b=MwZP10U3UgghJctYjGLoMYdrTUou0H1ti/iLdBvdU0DvSseHCcNuCCrWSP9oQxIM3nFate
-	cWGkGIhNTw9UcA1g0GKa68rmVeb9MgObL6pu6BDsmpKAiLbmwF3CM2KUARAK1UwEySNjxG
-	D2CRaW+7mVkh7ui1mmOux5YBpHa4scY=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-155-jIPLHhpaPTWVNadJ5e4jKQ-1; Mon,
- 10 Mar 2025 08:54:03 -0400
-X-MC-Unique: jIPLHhpaPTWVNadJ5e4jKQ-1
-X-Mimecast-MFC-AGG-ID: jIPLHhpaPTWVNadJ5e4jKQ_1741611241
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4531B1955D6C;
-	Mon, 10 Mar 2025 12:54:01 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.61])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DC13B1828A8C;
-	Mon, 10 Mar 2025 12:53:57 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org
-cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Jakub Kicinski <kuba@kernel.org>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-    Simon Horman <horms@kernel.org>,
-    Chuck Lever <chuck.lever@oracle.com>, linux-crypto@vger.kernel.org,
-    linux-afs@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: [GIT PULL net-next] crypto: Add Kerberos crypto lib
+	s=arc-20240116; t=1741611365; c=relaxed/simple;
+	bh=W50C9myyD+f04dNjjlf3vCz4lf/WRKAWpjph/AEznqo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AtlIBXBifl2aU4+cE5A7VV24riJgFfIZmAz/tkFLSu+Pr7PESKMFaHUNofhQhcisT1oF5+CvRjSiNN42V2JMkirBTi2cebPh/FE1th1tIb3qtkBYldlKoIK3NNSvOeXnFM97mBC9nvY0rCGooAv7KWldDMfgk7gGYQZDKOrDk2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KTKkoM9E; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5499bd3084aso1860989e87.0;
+        Mon, 10 Mar 2025 05:56:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741611362; x=1742216162; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tqSie8Pu9UlkmTVB8KCTPHYG/3Uxc6sn89mUIbchqHc=;
+        b=KTKkoM9Et51nyvxx4sHogZU+DMTla7Dv+5oNIhpdIOj9TmXYAFtKytwxzsL1GTUjcZ
+         UtL+dv6n0k0wvUSakkuIDHdtWFR8kNHlVq7xhrFKtxyl4G+H6XXf6tq8dRPFNRKrq+SP
+         HZtvXcVbB0kQXuXMEiJWyQgwsHOoEDCtYkhIs+Tty2rCsfRJWs0LvuqGZva2ilGXc7Lo
+         x/B85THYWzWrnf6chu1Vj4IS8khoEMT2JrL/h9cf9mgL5kGqEXYMjLq/2pCxeIUqDMmU
+         st+8NKJRO276RcmnOvd9z0kHJyasth8WSY3uKL4NeYNDnAnHWL/7ZytrtjmXgLATO71n
+         x/7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741611362; x=1742216162;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tqSie8Pu9UlkmTVB8KCTPHYG/3Uxc6sn89mUIbchqHc=;
+        b=CIctrukcSMpBfZIb57zjRb6uXDia0TNXGSEgbveRXqOzfgjxUQspGpdmJtfgac4Srp
+         JB1KSCmeVptgOUfEBBT8OraVlJIwaO6ZA2OTvG2hEIuZeluvarqPGDXqcUngsv/GECdw
+         uVqGEnaWEaFHoWw5Wc+ZfKiUp3MUDewuM/65IO0y2W2SiNTc7eXBwNgEe4OYtenINn2y
+         PrwtoStKlvYGI04UTArlvtrUM8qTdHP7qZMUlIGpgE2FHrd07dYRsmzRZ9tAVSktJJJS
+         aus1Afwt4vvNM0ApOSa/aiG93AGx/tvWD5/0FfIt80a2lmxGRFkUlDSWfaxi60zYwXxl
+         OLGg==
+X-Forwarded-Encrypted: i=1; AJvYcCV0W9jHQrvZz8cQMxBHBpbSYDLv4M+GZGci5bsPQD+YSGvUosLrO7I4PItiRDXjhtV0U/3MUFdj@vger.kernel.org, AJvYcCVAKb1VCeHtYhms3+IvpqsJN1NXVGnR6y1kILWKZci8HChofvrZjhZlc1qypwCsB/kNwA3ocCSPN3ytBg==@vger.kernel.org, AJvYcCVAyIYVJnBgqH6jYAQjt1yM07ktp0QZjGVqFj0yzK0mrZxEkh3kbseN/2ILzwARQCy4F1gduu1sQwFX@vger.kernel.org, AJvYcCW1WLDoWz95LLjUhRAC2xgwt3NWCPJH8KOqPKoZ/Fcekrjqz+GLCDxAOwc+jDgWqo/IqenQzyhcNmMAKnw5@vger.kernel.org, AJvYcCWuXt+Ic+6LI+7e33mD0wyKRcNoEkBedLm/8xWG973zgDIuLKOxno6KACIXGOADM/H+8EcZ58bbeh4u@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqrqHJeZnlbVLx4rOuHiwe+aF8mWiEhca9QKE2PRIj1WEsmAzl
+	QtivqUeujaNp61XEsK6NLonTNoeYRp1w4GIFP7yBqMW8s+TEs5WF
+X-Gm-Gg: ASbGncvN1XJdZoe9wi2qDpwlcLEoWpDlaVVyC9qtS6H4NXBRoTIjiceNj9aBFFDiu1I
+	TDUCahE4/SxF78MtwQkB1EYVUmWNm8Ah2/FXzR7xw7CwHhRb66IaQrrP9v4hxbaPCkNPNApswds
+	ms0Pz//8iAsrKurpp8FErOjnjqKdLtZ9a9RNqNu98jiW4vO+dD3lyNI4JmT2CmEtitNfm96ttAA
+	PBE0jOf72tJLrlvKc2mlWSoz1l5qYMzqAf4BXsuHSN1JT6MPyxvJSktB9KvOiqvwrcjc6MhLguh
+	7iSXnjJk9k8JBCJguixKRaRdEAMhSajUArVh6BTlnMWTPJu05W0=
+X-Google-Smtp-Source: AGHT+IGhZSWHAvtCtWF+S1BsjEkbqrkDYmcIb4DzzzZPqCMUNu5kqWN7ZmWqkl/XnpG1SgIQ2+ZSNg==
+X-Received: by 2002:a05:6512:3e2a:b0:545:114a:5618 with SMTP id 2adb3069b0e04-54990e29ba2mr4430176e87.7.1741611361580;
+        Mon, 10 Mar 2025 05:56:01 -0700 (PDT)
+Received: from mva-rohm ([2a10:a5c0:800d:dd00:8fdf:935a:2c85:d703])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5498b1c33f1sm1442139e87.226.2025.03.10.05.55.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Mar 2025 05:56:00 -0700 (PDT)
+Date: Mon, 10 Mar 2025 14:55:53 +0200
+From: Matti Vaittinen <mazziesaccount@gmail.com>
+To: Matti Vaittinen <mazziesaccount@gmail.com>,
+	Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>
+Cc: Jonathan Cameron <jic23@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Daniel Scally <djrscally@gmail.com>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Matti Vaittinen <mazziesaccount@gmail.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-iio@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v6 02/10] property: Add functions to iterate named child
+Message-ID: <ff924f640feeb87819d40557f12a04e607894682.1741610847.git.mazziesaccount@gmail.com>
+References: <cover.1741610847.git.mazziesaccount@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <953586.1741611236.1@warthog.procyon.org.uk>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="qGIIpiwQ9PmQialC"
+Content-Disposition: inline
+In-Reply-To: <cover.1741610847.git.mazziesaccount@gmail.com>
+
+
+--qGIIpiwQ9PmQialC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Mar 2025 12:53:56 +0000
-Message-ID: <953587.1741611236@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Hi,
+There are a few use-cases where child nodes with a specific name need to
+be parsed. Code like:
 
-Could you pull this into the net-next tree please (it has been pulled into
-the crypto tree[1])?  This provides the Kerberos-5 crypto parts needed by
-the AF_RXRPC RxGK (GSSAPI) security class.  In the future, it could also b=
-e
-used by NFS and SunRPC as much of the code is abstracted from there.  This
-is a prerequisite for the rxrpc patches[2].
+fwnode_for_each_child_node()
+	if (fwnode_name_eq())
+		...
 
-It does a couple of things:
+can be found from a various drivers/subsystems. Adding a macro for this
+can simplify things a bit.
 
- (1) Provide an AEAD crypto driver, krb5enc, that mirrors the authenc
-     driver, but that hashes the plaintext, not the ciphertext.  This was
-     made a separate module rather than just being a part of the authenc
-     driver because it has to do all of the constituent operations in the
-     opposite order - which impacts the async op handling.
+In a few cases the data from the found nodes is later added to an array,
+which is allocated based on the number of found nodes. One example of
+such use is the IIO subsystem's ADC channel nodes, where the relevant
+nodes are named as channel[@N].
 
-     Testmgr data is provided for AES+SHA2 and Camellia combinations of
-     authenc and krb5enc used by the krb5 library.  AES+SHA1 is not
-     provided as the RFCs don't contain usable test vectors.
+Add a helpers for iterating and counting device's sub-nodes with certain
+name instead, of open-coding this in every user.
 
- (2) Provide a Kerberos 5 crypto library.  This is an extract from the
-     sunrpc driver as that code can be shared between sunrpc/nfs and
-     rxrpc/afs.  This provides encryption, decryption, get MIC and verify
-     MIC routines that use and wrap the crypto functions, along with some
-     functions to provide layout management.
+Suggested-by: Jonathan Cameron <jic23@kernel.org>
+Signed-off-by: Matti Vaittinen <mazziesaccount@gmail.com>
+---
+Revision history:
+v5 =3D> v6:
+ - Add helpers to also iterate through the nodes.
+v4 =3D> v5:
+ - Use given name instead of string 'channel' when counting the nodes
+ - Add also fwnode_get_child_node_count_named() as suggested by Rob.
+v3 =3D> v4:
+ - New patch as suggested by Jonathan, see discussion in:
+https://lore.kernel.org/lkml/20250223161338.5c896280@jic23-huawei/
 
-     This supports AES+SHA1, AES+SHA2 and Camellia encryption types.
-
-     Self-testing is provided that goes further than is possible with
-     testmgr, doing subkey derivation as well.
-
-David
-
-Link: https://lore.kernel.org/linux-crypto/3709378.1740991489@warthog.proc=
-yon.org.uk/ [1]
-Link: https://web.git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-f=
-s.git/log/?h=3Drxrpc-next [2]
+Please note, the checkpatch.pl was not happy about the for_each...()
+macros. I tried to make them to follow the existing convention. I am
+open to suggestions how to improve.
 
 ---
-The following changes since commit 1e15510b71c99c6e49134d756df91069f7d1814=
-1:
+ drivers/base/property.c  | 54 ++++++++++++++++++++++++++++++++++++++++
+ include/linux/property.h | 20 +++++++++++++++
+ 2 files changed, 74 insertions(+)
 
-  Merge tag 'net-6.14-rc5' of git://git.kernel.org/pub/scm/linux/kernel/gi=
-t/netdev/net (2025-02-27 09:32:42 -0800)
+diff --git a/drivers/base/property.c b/drivers/base/property.c
+index c1392743df9c..335262a894f4 100644
+--- a/drivers/base/property.c
++++ b/drivers/base/property.c
+@@ -945,6 +945,60 @@ unsigned int device_get_child_node_count(const struct =
+device *dev)
+ }
+ EXPORT_SYMBOL_GPL(device_get_child_node_count);
+=20
++/**
++ * fwnode_get_named_child_node_count - number of child nodes with given na=
+me
++ * @fwnode: Node which child nodes are counted.
++ * @name: String to match child node name against.
++ *
++ * Scan child nodes and count all the nodes with a specific name. Return t=
+he
++ * number of found nodes. Potential '@number' -ending for scanned names is
++ * ignored. Eg,
++ * device_get_child_node_count(dev, "channel");
++ * would match all the nodes:
++ * channel { }, channel@0 {}, channel@0xabba {}...
++ *
++ * Return: the number of child nodes with a matching name for a given devi=
+ce.
++ */
++unsigned int fwnode_get_named_child_node_count(const struct fwnode_handle =
+*fwnode,
++					       const char *name)
++{
++	struct fwnode_handle *child;
++	unsigned int count =3D 0;
++
++	fwnode_for_each_named_child_node(fwnode, child, name)
++		count++;
++
++	return count;
++}
++EXPORT_SYMBOL_GPL(fwnode_get_named_child_node_count);
++
++/**
++ * device_get_named_child_node_count - number of child nodes with given na=
+me
++ * @dev: Device to count the child nodes for.
++ * @name: String to match child node name against.
++ *
++ * Scan device's child nodes and find all the nodes with a specific name a=
+nd
++ * return the number of found nodes. Potential '@number' -ending for scann=
+ed
++ * names is ignored. Eg,
++ * device_get_child_node_count(dev, "channel");
++ * would match all the nodes:
++ * channel { }, channel@0 {}, channel@0xabba {}...
++ *
++ * Return: the number of child nodes with a matching name for a given devi=
+ce.
++ */
++unsigned int device_get_named_child_node_count(const struct device *dev,
++					       const char *name)
++{
++	struct fwnode_handle *child;
++	unsigned int count =3D 0;
++
++	device_for_each_named_child_node(dev, child, name)
++		count++;
++
++	return count;
++}
++EXPORT_SYMBOL_GPL(device_get_named_child_node_count);
++
+ bool device_dma_supported(const struct device *dev)
+ {
+ 	return fwnode_call_bool_op(dev_fwnode(dev), device_dma_supported);
+diff --git a/include/linux/property.h b/include/linux/property.h
+index e214ecd241eb..6dd9ae83e9a5 100644
+--- a/include/linux/property.h
++++ b/include/linux/property.h
+@@ -167,10 +167,18 @@ struct fwnode_handle *fwnode_get_next_available_child=
+_node(
+ 	for (child =3D fwnode_get_next_child_node(fwnode, NULL); child;	\
+ 	     child =3D fwnode_get_next_child_node(fwnode, child))
+=20
++#define fwnode_for_each_named_child_node(fwnode, child, name)		\
++		fwnode_for_each_child_node(fwnode, child)		\
++			if (!fwnode_name_eq(child, name)) { } else
++
+ #define fwnode_for_each_available_child_node(fwnode, child)		       \
+ 	for (child =3D fwnode_get_next_available_child_node(fwnode, NULL); child;\
+ 	     child =3D fwnode_get_next_available_child_node(fwnode, child))
+=20
++#define fwnode_for_each_available_named_child_node(fwnode, child, name)	\
++		fwnode_for_each_available_child_node(fwnode, child)	\
++			if (!fwnode_name_eq(child, name)) { } else
++
+ struct fwnode_handle *device_get_next_child_node(const struct device *dev,
+ 						 struct fwnode_handle *child);
+=20
+@@ -178,11 +186,19 @@ struct fwnode_handle *device_get_next_child_node(cons=
+t struct device *dev,
+ 	for (child =3D device_get_next_child_node(dev, NULL); child;	\
+ 	     child =3D device_get_next_child_node(dev, child))
+=20
++#define device_for_each_named_child_node(dev, child, name)		\
++		device_for_each_child_node(dev, child)			\
++			if (!fwnode_name_eq(child, name)) { } else
++
+ #define device_for_each_child_node_scoped(dev, child)			\
+ 	for (struct fwnode_handle *child __free(fwnode_handle) =3D	\
+ 		device_get_next_child_node(dev, NULL);			\
+ 	     child; child =3D device_get_next_child_node(dev, child))
+=20
++#define device_for_each_named_child_node_scoped(dev, child, name)	\
++		device_for_each_child_node_scoped(dev, child)		\
++			if (!fwnode_name_eq(child, name)) { } else
++
+ struct fwnode_handle *fwnode_get_named_child_node(const struct fwnode_hand=
+le *fwnode,
+ 						  const char *childname);
+ struct fwnode_handle *device_get_named_child_node(const struct device *dev,
+@@ -209,6 +225,10 @@ int fwnode_irq_get(const struct fwnode_handle *fwnode,=
+ unsigned int index);
+ int fwnode_irq_get_byname(const struct fwnode_handle *fwnode, const char *=
+name);
+=20
+ unsigned int device_get_child_node_count(const struct device *dev);
++unsigned int fwnode_get_named_child_node_count(const struct fwnode_handle =
+*fwnode,
++					       const char *name);
++unsigned int device_get_named_child_node_count(const struct device *dev,
++					       const char *name);
+=20
+ static inline int device_property_read_u8(const struct device *dev,
+ 					  const char *propname, u8 *val)
+--=20
+2.48.1
 
-are available in the Git repository at:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags=
-/crypto-krb5-20250228
+--qGIIpiwQ9PmQialC
+Content-Type: application/pgp-signature; name="signature.asc"
 
-for you to fetch changes up to 0dd8f8533a833eeb8e51034072a59930bcbec725:
+-----BEGIN PGP SIGNATURE-----
 
-  crypto/krb5: Implement crypto self-testing (2025-02-28 09:42:42 +0000)
+iQEzBAEBCAAdFiEEIx+f8wZb28fLKEhTeFA3/03aocUFAmfO4VkACgkQeFA3/03a
+ocXsFAf+LU/OMaLIK90guOZkCXVmdXWtZFayDmc2+XF+caxfZMX94Kw/Mcuk1I/M
+02dvrotcuGJztwgBBt4ZGZNYBm9aJfT5Xo6F4NQkEBrTNPJlgqUbdIIhSK1udrdO
+ecSH1jlN4ccNivYLjGrniD/3HD/FfrPDfejNTNyMmgtypLfigGSU671fM4Dve6Py
+9xdAispXLckAx9GcI/khoMw1H/NHMwEWUl2Lk1JRNQN2mXzPgiXm4YRV67t6mger
+e9VEr86Hxc4f8P4Warlt6V95nx8Mk0LUxJnHohbkULYHGL8KtE37gEYOaVD0riz2
+qb0adk3zTUTrMof2AMgaKds6u5P4rQ==
+=gndi
+-----END PGP SIGNATURE-----
 
-----------------------------------------------------------------
-crypto: Add Kerberos crypto lib
-
-----------------------------------------------------------------
-David Howells (17):
-      crypto/krb5: Add API Documentation
-      crypto/krb5: Add some constants out of sunrpc headers
-      crypto: Add 'krb5enc' hash and cipher AEAD algorithm
-      crypto/krb5: Test manager data
-      crypto/krb5: Implement Kerberos crypto core
-      crypto/krb5: Add an API to query the layout of the crypto section
-      crypto/krb5: Add an API to alloc and prepare a crypto object
-      crypto/krb5: Add an API to perform requests
-      crypto/krb5: Provide infrastructure and key derivation
-      crypto/krb5: Implement the Kerberos5 rfc3961 key derivation
-      crypto/krb5: Provide RFC3961 setkey packaging functions
-      crypto/krb5: Implement the Kerberos5 rfc3961 encrypt and decrypt fun=
-ctions
-      crypto/krb5: Implement the Kerberos5 rfc3961 get_mic and verify_mic
-      crypto/krb5: Implement the AES enctypes from rfc3962
-      crypto/krb5: Implement the AES enctypes from rfc8009
-      crypto/krb5: Implement the Camellia enctypes from rfc6803
-      crypto/krb5: Implement crypto self-testing
-
- Documentation/crypto/index.rst   |   1 +
- Documentation/crypto/krb5.rst    | 262 +++++++++++++
- crypto/Kconfig                   |  13 +
- crypto/Makefile                  |   3 +
- crypto/krb5/Kconfig              |  26 ++
- crypto/krb5/Makefile             |  18 +
- crypto/krb5/internal.h           | 247 ++++++++++++
- crypto/krb5/krb5_api.c           | 452 ++++++++++++++++++++++
- crypto/krb5/krb5_kdf.c           | 145 +++++++
- crypto/krb5/rfc3961_simplified.c | 797 ++++++++++++++++++++++++++++++++++=
-+++++
- crypto/krb5/rfc3962_aes.c        | 115 ++++++
- crypto/krb5/rfc6803_camellia.c   | 237 ++++++++++++
- crypto/krb5/rfc8009_aes2.c       | 362 ++++++++++++++++++
- crypto/krb5/selftest.c           | 544 ++++++++++++++++++++++++++
- crypto/krb5/selftest_data.c      | 291 ++++++++++++++
- crypto/krb5enc.c                 | 504 +++++++++++++++++++++++++
- crypto/testmgr.c                 |  16 +
- crypto/testmgr.h                 | 351 +++++++++++++++++
- include/crypto/authenc.h         |   2 +
- include/crypto/krb5.h            | 160 ++++++++
- 20 files changed, 4546 insertions(+)
- create mode 100644 Documentation/crypto/krb5.rst
- create mode 100644 crypto/krb5/Kconfig
- create mode 100644 crypto/krb5/Makefile
- create mode 100644 crypto/krb5/internal.h
- create mode 100644 crypto/krb5/krb5_api.c
- create mode 100644 crypto/krb5/krb5_kdf.c
- create mode 100644 crypto/krb5/rfc3961_simplified.c
- create mode 100644 crypto/krb5/rfc3962_aes.c
- create mode 100644 crypto/krb5/rfc6803_camellia.c
- create mode 100644 crypto/krb5/rfc8009_aes2.c
- create mode 100644 crypto/krb5/selftest.c
- create mode 100644 crypto/krb5/selftest_data.c
- create mode 100644 crypto/krb5enc.c
- create mode 100644 include/crypto/krb5.h
-
+--qGIIpiwQ9PmQialC--
 
