@@ -1,133 +1,100 @@
-Return-Path: <netdev+bounces-173471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3CB0A59233
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:06:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 58633A59241
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:08:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51C21188ED56
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 11:06:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CA38188F7AA
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 11:08:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F35D226CFF;
-	Mon, 10 Mar 2025 11:06:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D741226D1E;
+	Mon, 10 Mar 2025 11:08:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="EORwAhbX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WEV03034"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40C701B4138;
-	Mon, 10 Mar 2025 11:06:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D505226D08;
+	Mon, 10 Mar 2025 11:08:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741604777; cv=none; b=qx3MQdyDUE2ZDSIumIb5M7SjC0BL7n+gIsBfpOhmOwZ0HelLADswG2/f5kq5/K30MaO2NoynToTmt6a7+Uo9XykjYpLrsabr9cRR2aGYTQWmFrIPqfqRR4AzBorZ/m/lovYd6EQuzSNXGv1YjKxKSVbR9CVg2z5+xkqeh3tYjbw=
+	t=1741604915; cv=none; b=NQcyM3RxJg2T4tSJTrcBEriuWW2YmWhbQS1OYZRNWARx+pF2WlXyzI3Y6qEF84Rn9A0Q3uj+JV6dETXe4Wng3c8cULwufIg08/h0mODdi05CXWCXBw7UwPiXHTxUvPSJ/Eo/Y2B4IzL1bW3Zp1prFPHtg6KO5CvN4PqqktjPP5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741604777; c=relaxed/simple;
-	bh=+vAYszaLuAjc+++c5UH/i1OBbtRd6LtGOcYREzENjkA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HmuZ8DyyTAOF66xUv3V9FXvNy9zbHtDmLpXkm0cKrQwxKvYuAI1wjHnOz282llreAxvKGpqXR5AA6EpnyVOpSpP4ZOuKyEKRMYGKMHMmwVo1JOPmjbieFtmmbderRbasG/f2UwdizDYhyUDQVOsFLk9y/GQ0YH3qA11q4vSgwE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=EORwAhbX; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Iw/s6OMG43ULsx4UXStKq7FqeOmxKAHk2WEArxE2pKc=; b=EORwAhbX8xg68mKTCSZ8Cd4emp
-	72FX7gvakjH7BgEDp4dCeBtZPaJNNudFmrcMoRorA8RboAINJFMXRmz18BuRI6UJOfG6NlXKAnStJ
-	U1Bnz8sje/QPQhE/CsOk8XVVF2PoXdiQRWlXF9NWW22HVFvkHssgad2+BiCfQll4YgFMwGm8R+fXm
-	VaFTmKi+Me65kz+CCSq7Qw6IgNgT2YUC11negNR3qvEFMmsdhU1LzWuRLB4SjEEIElcFl+iS+J8UB
-	yQO4ntjt19o3zayOgCKopfjtDFP7Zdg/LozF+SZ6mkUBHm/Poj9rXthJJLKwvw0NzzvM9yqbfC9sf
-	k8tjv3Ow==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47598)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1traxJ-0002RJ-11;
-	Mon, 10 Mar 2025 11:05:57 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1traxF-0002PQ-1W;
-	Mon, 10 Mar 2025 11:05:53 +0000
-Date: Mon, 10 Mar 2025 11:05:53 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [net-next PATCH v12 12/13] net: dsa: Add Airoha AN8855 5-Port
- Gigabit DSA Switch driver
-Message-ID: <Z87HkcdK2QTjooDK@shell.armlinux.org.uk>
-References: <20250309172717.9067-1-ansuelsmth@gmail.com>
- <20250309172717.9067-13-ansuelsmth@gmail.com>
- <Z83WgMeg_IxgbxhO@shell.armlinux.org.uk>
- <67cec5a9.170a0220.93f86.9dcf@mx.google.com>
+	s=arc-20240116; t=1741604915; c=relaxed/simple;
+	bh=A2ZCjDAI6O3sZex2s/bIzS7B1zXJEc0LS/k3rtBHvOQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=evw8LYD3tsbR8pAmE/D77lS+A2WQlqtPryyK92VT1jcRlueecov+y+QGY2K97aB3UrQoxaBKunnmHqHerGa3HdLLAwqD9ISswpG8njQ2rZ6MpeId18EVVXk/njPRp5Vrk7mqpRuSAaQJjv4zGV7P7zcRFb5jxtLra3tHkU21YPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WEV03034; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36935C4CEE5;
+	Mon, 10 Mar 2025 11:08:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741604913;
+	bh=A2ZCjDAI6O3sZex2s/bIzS7B1zXJEc0LS/k3rtBHvOQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=WEV03034dfzLu7taFEIyuTV2GZetLjAILlbZc0zggxAi3tFwIwnThR0D11jYc85MF
+	 E3Bxp3mKZMwUfamDkiR0GRgDhRDys8ioL/uOcdSim9Kgh+EPdzKqXyKr2gLu6tHjjc
+	 1sDCB6dMS6YcwlQg9D/fRJC0uy9gVDKHFO3PM5qCxc8fTcMKzuTiLEEKOtTKjZuwuV
+	 ulFZTMdpj1qa7t2NtNuUoZOPiRdbrqAE+uOwaAs892w1t88XAedLgj6HZkCs+ESVkZ
+	 9OswdzLFUqVFnA+z8onjU+uEUBjpopjePXL8rieUez/tvSsiTevdBdsVxpnLJqrNUm
+	 e/Htdh3KaOM6Q==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	krakauer@google.com,
+	willemb@google.com,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next] selftests: net: bump GRO timeout for gro/setup_veth
+Date: Mon, 10 Mar 2025 12:08:21 +0100
+Message-ID: <20250310110821.385621-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <67cec5a9.170a0220.93f86.9dcf@mx.google.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 10, 2025 at 11:57:41AM +0100, Christian Marangi wrote:
-> > > +static int an8855_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
-> > > +			     phy_interface_t interface,
-> > > +			     const unsigned long *advertising,
-> > > +			     bool permit_pause_to_mac)
-> > > +{
-> > > +	struct an8855_priv *priv = container_of(pcs, struct an8855_priv, pcs);
-> > > +	u32 val;
-> > > +	int ret;
-> > > +
-> > > +	/*                   !!! WELCOME TO HELL !!!                   */
-> > > +
-> > [... hell ...]
-> 
-> Will drop :( It was an easter egg for the 300 lines to configure PCS.
+Commit 51bef03e1a71 ("selftests/net: deflake GRO tests") recently
+switched to NAPI suspension, and lowered the timeout from 1ms to 100us.
+This started causing flakes in netdev-run CI. Let's bump it to 200us.
+In a quick test of a debug kernel I see failures with 100us, with 200us
+in 5 runs I see 2 completely clean runs and 3 with a single retry
+(GRO test will retry up to 5 times).
 
-That wasn't a request to drop the comment, just that I didn't want to
-include all that in my reply.
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: krakauer@google.com
+CC: willemb@google.com
+CC: shuah@kernel.org
+CC: linux-kselftest@vger.kernel.org
+---
+ tools/testing/selftests/net/setup_veth.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> > I guess, however, that as you're only using SGMII with in-band, it
-> > probably doesn't make much difference, but having similar behaviour
-> > in the various drivers helps with ongoing maintenance.
-> 
-> Do we have some driver that implement the logic of skipping the bulk of
-> configuration if the mode doesn't change?
-
-For many, it doesn't matter, but for e.g. xpcs, there may be a reset
-of the XPCS when the mode changes, and there's workarounds for the
-TXGBE - both of those only happen when the interface mode actually
-changes.
-
-Re-reading my .pcs_config() documentation, I really ought to mention
-that .pcs_config() will be called for both interface mode changes and
-for advertisement changes, and should not disrupt the link when
-nothing has changed.
-
+diff --git a/tools/testing/selftests/net/setup_veth.sh b/tools/testing/selftests/net/setup_veth.sh
+index eb3182066d12..152bf4c65747 100644
+--- a/tools/testing/selftests/net/setup_veth.sh
++++ b/tools/testing/selftests/net/setup_veth.sh
+@@ -11,7 +11,7 @@ setup_veth_ns() {
+ 	local -r ns_mac="$4"
+ 
+ 	[[ -e /var/run/netns/"${ns_name}" ]] || ip netns add "${ns_name}"
+-	echo 100000 > "/sys/class/net/${ns_dev}/gro_flush_timeout"
++	echo 200000 > "/sys/class/net/${ns_dev}/gro_flush_timeout"
+ 	echo 1 > "/sys/class/net/${ns_dev}/napi_defer_hard_irqs"
+ 	ip link set dev "${ns_dev}" netns "${ns_name}" mtu 65535
+ 	ip -netns "${ns_name}" link set dev "${ns_dev}" up
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.48.1
+
 
