@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-173612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6337A5A015
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 18:46:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0AFEA5A007
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 18:46:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00B543A7D9B
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 17:45:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC57F1890C0B
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 17:45:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4445C2356AA;
-	Mon, 10 Mar 2025 17:45:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08828235374;
+	Mon, 10 Mar 2025 17:45:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DEEbijma"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="A+S5s0aJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435D2233D99
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 17:45:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D65F233D9D
+	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 17:45:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741628714; cv=none; b=meUPNRP80wdLWvURS6k0UNjA4ajjeZzxCzFIggjNC6kXjPKiPv1UZ2ID7KUSXxwtZaPe5dCQJEcqlFJqzvUVyGsxJfUa3f938ysKwCHpllptGC57WWYKRs2QXuUjRDf7q7Coc8b9P5LMTs5ZEq8t616AtAYVeVd2X3HkTK2X+a8=
+	t=1741628712; cv=none; b=S9MmLxk5wAIj0b0MzibRsY9e+th27mtzLGSp0qbJYvW7E/HTK+DEpf0bkKhYu2kRMI6MdEbmnfsCMx4D5sq+76wsvQzX+QwZVeW5ITeHdx4aiC7ecInBtkQCD0rXuLDez5rqbHoGQD/ID4xjC0AnaKKpUAuI5cfJQpT5psMmE8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741628714; c=relaxed/simple;
-	bh=L/+W0J1dfdqEu5GoFe8jiLmS1whnnfKjwrYC+E3AwsU=;
+	s=arc-20240116; t=1741628712; c=relaxed/simple;
+	bh=wfZfWdFe8R/2a4rvfWKXB71yglMS89Qef/gmNTvGj+o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=e9w0aL+IlE4f8NpEkhu/YlIZZH1xgV/Yo3NeFbJzql4HbgaY+E9sxTF45IoPNHiekuqw5LYaOsqnEyU3Z3kyY74CkHjQjP8zlLKulvsomL4bxlaLgwNDXcowqQjNqCZdsHc7CEEtsDAxlAJmBqIOQdjiOXyQsQH6VJIbVyt6LB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DEEbijma; arc=none smtp.client-ip=192.198.163.12
+	 MIME-Version; b=rGe7p90XKtaEupowGo4/ujsROevGztclIYuHvetbPATj3b9FgZalM2gdsZbUyc9fM1jdsY5+FemcF3LL/DHlVTdexIthHc0BbFtPGjlntRrWPtfH4g/H0IQL7TVpaXRb0Y4g02+TOF+wgew0NafggfdWQNEMhnf4fe59XpNp+6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A+S5s0aJ; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,28 +36,28 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1741628711; x=1773164711;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=L/+W0J1dfdqEu5GoFe8jiLmS1whnnfKjwrYC+E3AwsU=;
-  b=DEEbijmaN+m+uw78WY27OVP3PZL5nfk+HaCcVVc3wRdkOTDV+bsQ7hBm
-   lQhQRi+tygqrAzkEpZEA2fYH21lk7ivgafbspTDsr5yqRursgzn8+I7nP
-   EnB5msO40oKsJ5N+snY/FULh/as2FKMb/4T3CoCtKrMsPR2xGpi2Ykxvc
-   0jZaSzhcs4elEUDQaZexsuj6S5De4OBx703Y35No7UgfZmePxbitt+zrM
-   g4GfZZQU99BNJkd6eOVufZxX7jzgxXbj5VAqYZHznenar9hZBja3k2BLt
-   gEF1PpVj12w0RfC/ZNpni57DFaN9N2C9jaIv8De1fI4cyRfP2bTfKR4rA
+  bh=wfZfWdFe8R/2a4rvfWKXB71yglMS89Qef/gmNTvGj+o=;
+  b=A+S5s0aJUSs4ugkeWXgag8H1bGm4fVXzm2Wo+8vAL7jh3ck8COxT/i/m
+   fV4SAkpYSsOOrK4Oc2ANfogfUgSCfpYFwKV7okGINqU64BXhrShNEKTpr
+   6ZbjhhYdDkSJi8heiFUIc4l0MlPPqYC+Jog+S1sXgJbyi4/gRF49QuE44
+   w1QeYLH8JheIB5gxL43TXBvj5keA/NHVxg3jZ2rTKeX+HX9NtQnW18YEU
+   K45kf9T/dkUDgBX4mN5pDHeWNB5E9ee5CTHB6iFi8/hfqwKMAZrNgv9iQ
+   /MenBchv5X2yNPPlK0XwA3qSlwW+YmV7r/45JiD3ZeSoz1e8Qz7f/AoAv
    Q==;
-X-CSE-ConnectionGUID: lSkotbqTQH+r9pczgCeLSA==
-X-CSE-MsgGUID: QYwdoE6PQwavFalHQSTZGw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="46549012"
+X-CSE-ConnectionGUID: 06MOvH3TStyTQ54F7BwPSQ==
+X-CSE-MsgGUID: ZYdqRRimTfG+Ib35Veu9VA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="46549024"
 X-IronPort-AV: E=Sophos;i="6.14,236,1736841600"; 
-   d="scan'208";a="46549012"
+   d="scan'208";a="46549024"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 10:45:07 -0700
-X-CSE-ConnectionGUID: zfnkH/iwS6SyBTTWXKuyYQ==
-X-CSE-MsgGUID: GlF7DJbOTtiXXMF9Y8ws5A==
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 10:45:08 -0700
+X-CSE-ConnectionGUID: kLphP5JqR9C4sQJA+7ZaYw==
+X-CSE-MsgGUID: 1HLY68ASRLCGSv2XRBxPYQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.14,236,1736841600"; 
-   d="scan'208";a="120950830"
+   d="scan'208";a="120950835"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa008.jf.intel.com with ESMTP; 10 Mar 2025 10:45:06 -0700
+  by orviesa008.jf.intel.com with ESMTP; 10 Mar 2025 10:45:07 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -65,17 +65,15 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
+Cc: Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
 	anthony.l.nguyen@intel.com,
-	richardcochran@gmail.com,
-	Milena Olech <milena.olech@intel.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
 	Simon Horman <horms@kernel.org>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Bharath R <bharath.r@intel.com>
-Subject: [PATCH net-next 5/6] ixgbe: add PTP support for E610 device
-Date: Mon, 10 Mar 2025 10:44:58 -0700
-Message-ID: <20250310174502.3708121-6-anthony.l.nguyen@intel.com>
+	Jeremiah Lokan <jeremiahx.j.lokan@intel.com>
+Subject: [PATCH net-next 6/6] ixgbe: add support for thermal sensor event reception
+Date: Mon, 10 Mar 2025 10:44:59 -0700
+Message-ID: <20250310174502.3708121-7-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250310174502.3708121-1-anthony.l.nguyen@intel.com>
 References: <20250310174502.3708121-1-anthony.l.nguyen@intel.com>
@@ -87,113 +85,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
 
-Add PTP support for E610 adapter. The E610 is based on X550 and adds
-firmware managed link, enhanced security capabilities and support for
-updated server manageability. It does not introduce any new PTP features
-compared to X550.
+E610 NICs unlike the previous devices utilising ixgbe driver
+are notified in the case of overheating by the FW ACI event.
 
-Reviewed-by: Milena Olech <milena.olech@intel.com>
+In event of overheat when threshold is exceeded, FW suspends all
+traffic and sends overtemp event to the driver. Then driver
+logs appropriate message and disables the adapter instance.
+The card remains in that state until the platform is rebooted.
+
+This approach is a solution to the fact current version of the
+E610 FW doesn't support reading thermal sensor data by the
+SW. So give to user at least any info that overtemp event
+has occurred, without interface disappearing from the OS
+without any note.
+
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Tested-by: Bharath R <bharath.r@intel.com>
+Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Tested-by: Jeremiah Lokan <jeremiahx.j.lokan@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c |  1 +
- drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c     | 13 +++++++++++--
- 2 files changed, 12 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c      | 4 ++++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h | 3 +++
+ 2 files changed, 7 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-index da91c582d439..f03925c1f521 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-@@ -3185,6 +3185,7 @@ static int ixgbe_get_ts_info(struct net_device *dev,
- 	case ixgbe_mac_X550:
- 	case ixgbe_mac_X550EM_x:
- 	case ixgbe_mac_x550em_a:
-+	case ixgbe_mac_e610:
- 		info->rx_filters |= BIT(HWTSTAMP_FILTER_ALL);
- 		break;
- 	case ixgbe_mac_X540:
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c
-index 9339edbd9082..eef25e11d938 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c
-@@ -140,6 +140,7 @@
-  * proper mult and shift to convert the cycles into nanoseconds of time.
-  */
- #define IXGBE_X550_BASE_PERIOD 0xC80000000ULL
-+#define IXGBE_E610_BASE_PERIOD 0x333333333ULL
- #define INCVALUE_MASK	0x7FFFFFFF
- #define ISGN		0x80000000
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+index 467f81239e12..481f917f7ed2 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+@@ -3185,6 +3185,10 @@ static void ixgbe_handle_fw_event(struct ixgbe_adapter *adapter)
+ 		case ixgbe_aci_opc_get_link_status:
+ 			ixgbe_handle_link_status_event(adapter, &event);
+ 			break;
++		case ixgbe_aci_opc_temp_tca_event:
++			e_crit(drv, "%s\n", ixgbe_overheat_msg);
++			ixgbe_down(adapter);
++			break;
+ 		default:
+ 			e_warn(hw, "unknown FW async event captured\n");
+ 			break;
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
+index 8d06ade3c7cd..617e07878e4f 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
+@@ -171,6 +171,9 @@ enum ixgbe_aci_opc {
+ 	ixgbe_aci_opc_done_alt_write			= 0x0904,
+ 	ixgbe_aci_opc_clear_port_alt_write		= 0x0906,
  
-@@ -415,6 +416,7 @@ static void ixgbe_ptp_convert_to_hwtstamp(struct ixgbe_adapter *adapter,
- 	case ixgbe_mac_X550:
- 	case ixgbe_mac_X550EM_x:
- 	case ixgbe_mac_x550em_a:
-+	case ixgbe_mac_e610:
- 		/* Upper 32 bits represent billions of cycles, lower 32 bits
- 		 * represent cycles. However, we use timespec64_to_ns for the
- 		 * correct math even though the units haven't been corrected
-@@ -492,11 +494,13 @@ static int ixgbe_ptp_adjfine_X550(struct ptp_clock_info *ptp, long scaled_ppm)
- 	struct ixgbe_adapter *adapter =
- 			container_of(ptp, struct ixgbe_adapter, ptp_caps);
- 	struct ixgbe_hw *hw = &adapter->hw;
-+	u64 rate, base;
- 	bool neg_adj;
--	u64 rate;
- 	u32 inca;
++	/* TCA Events */
++	ixgbe_aci_opc_temp_tca_event                    = 0x0C94,
++
+ 	/* debug commands */
+ 	ixgbe_aci_opc_debug_dump_internals		= 0xFF08,
  
--	neg_adj = diff_by_scaled_ppm(IXGBE_X550_BASE_PERIOD, scaled_ppm, &rate);
-+	base = hw->mac.type == ixgbe_mac_e610 ? IXGBE_E610_BASE_PERIOD :
-+						IXGBE_X550_BASE_PERIOD;
-+	neg_adj = diff_by_scaled_ppm(base, scaled_ppm, &rate);
- 
- 	/* warn if rate is too large */
- 	if (rate >= INCVALUE_MASK)
-@@ -559,6 +563,7 @@ static int ixgbe_ptp_gettimex(struct ptp_clock_info *ptp,
- 	case ixgbe_mac_X550:
- 	case ixgbe_mac_X550EM_x:
- 	case ixgbe_mac_x550em_a:
-+	case ixgbe_mac_e610:
- 		/* Upper 32 bits represent billions of cycles, lower 32 bits
- 		 * represent cycles. However, we use timespec64_to_ns for the
- 		 * correct math even though the units haven't been corrected
-@@ -1067,6 +1072,7 @@ static int ixgbe_ptp_set_timestamp_mode(struct ixgbe_adapter *adapter,
- 	case ixgbe_mac_X550:
- 	case ixgbe_mac_X550EM_x:
- 	case ixgbe_mac_x550em_a:
-+	case ixgbe_mac_e610:
- 		/* enable timestamping all packets only if at least some
- 		 * packets were requested. Otherwise, play nice and disable
- 		 * timestamping
-@@ -1233,6 +1239,7 @@ void ixgbe_ptp_start_cyclecounter(struct ixgbe_adapter *adapter)
- 		fallthrough;
- 	case ixgbe_mac_x550em_a:
- 	case ixgbe_mac_X550:
-+	case ixgbe_mac_e610:
- 		cc.read = ixgbe_ptp_read_X550;
- 		break;
- 	case ixgbe_mac_X540:
-@@ -1280,6 +1287,7 @@ static void ixgbe_ptp_init_systime(struct ixgbe_adapter *adapter)
- 	case ixgbe_mac_X550EM_x:
- 	case ixgbe_mac_x550em_a:
- 	case ixgbe_mac_X550:
-+	case ixgbe_mac_e610:
- 		tsauxc = IXGBE_READ_REG(hw, IXGBE_TSAUXC);
- 
- 		/* Reset SYSTIME registers to 0 */
-@@ -1407,6 +1415,7 @@ static long ixgbe_ptp_create_clock(struct ixgbe_adapter *adapter)
- 	case ixgbe_mac_X550:
- 	case ixgbe_mac_X550EM_x:
- 	case ixgbe_mac_x550em_a:
-+	case ixgbe_mac_e610:
- 		snprintf(adapter->ptp_caps.name, 16, "%s", netdev->name);
- 		adapter->ptp_caps.owner = THIS_MODULE;
- 		adapter->ptp_caps.max_adj = 30000000;
 -- 
 2.47.1
 
