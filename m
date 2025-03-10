@@ -1,126 +1,154 @@
-Return-Path: <netdev+bounces-173633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C5BFA5A415
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 20:51:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C1D4A5A41E
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 20:53:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 251F23AC19D
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 19:51:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA7EB174D01
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 19:53:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 473A81DD0E1;
-	Mon, 10 Mar 2025 19:51:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AC241DE2A4;
+	Mon, 10 Mar 2025 19:53:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PQbZPvNc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EErT9PAj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BB3C1DA0E1;
-	Mon, 10 Mar 2025 19:51:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1D4C1DB34B
+	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 19:53:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741636289; cv=none; b=kbXUyWu0UeSpctW4CSu4uoobcbYHxObpr6RdMtWlupvMPAgNKyJxF4vYmHgqnqRHHqnCuYmCkOBD+fizxx8F+7JhImFAIEuJ/pFBU1g9c/tKVk0iEciu7EB0sUGbxGYcSZn6z6lXAYsqUfFSFaBJkTge3Vb7UxD/w+6hbEedkmA=
+	t=1741636427; cv=none; b=o2gbHs85yhHNcZPCkff5hlaQeSOcL7Xrq3797N3svmhsNmVOcR+Ty3yRVv5GtnweFdFsBU0pRKeQ11ubC2qZFTje1nWls9nV+LI60CBMiBkT3Q4rHuFKFRRyiAvKzrDtEOniLMSBLyp+uwh0vvx5lBXHmmKcxawPZ29xeYuZq4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741636289; c=relaxed/simple;
-	bh=hUfhzqtt0Avajl2Gkpb8aA0blXMuQz9N4yKLfrTh6fQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SUmoescfrv+t9mbZjCFexuOJwTMvyBONK6JQ852lBKXipQl+A7zrrWPTnO1lqBOai5pj1nnWMFZEHY4XYwMRDTZqZOXPhKMVr2BRGM/6ulK3UDqgzN2LUduK3VFfSGjQzLOt2Db43gSyRo/ic2Nnc+DyqkiAecZ07DeZMZQNQV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PQbZPvNc; arc=none smtp.client-ip=209.85.214.179
+	s=arc-20240116; t=1741636427; c=relaxed/simple;
+	bh=Prtyl7E/OlZQmsd6sENJ+knoOF4yA3rsdozFEUHWSak=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P+Len9O0P6MrpvwfG/ulcy9f5zbauUQcsRZXLONsFswX/Lw3LYqAfwi2WZJxubRriVd+3R043N6PQ1ekTGZGfNjxE5F5P8NknTg+GY5fgeMFJT783VvwObBDLnG9ExshCFzLMJfH8Mkx8BrBFdY6nuo7LXl/WnsqaIMzHgRa24c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EErT9PAj; arc=none smtp.client-ip=209.85.218.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-22337bc9ac3so89522215ad.1;
-        Mon, 10 Mar 2025 12:51:26 -0700 (PDT)
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-aaf900cc7fbso957697166b.3
+        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 12:53:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741636286; x=1742241086; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nQwbuud9J5NqaSGaH7uv9g3ohWXt10gFUVhJ8RTBEmk=;
-        b=PQbZPvNc2X+RiwvU5eBJHOCSw/wSM5vAAteOW/udRKyoVmQXkV9Hn9xo4mDsc71p0u
-         HCuW4IWYjmBng0tOu0CtUp6QJcWUE1+v423SuhZ2OMSLY8I8OJNIwad1U09nGGmFDkTz
-         h7JTjFDS21ZcPOwBa22X3BYWa+EvEo3uPr7BI3HGN7Cx9MLQi4OMIiR2YI1SrUk0LPcd
-         M6oJs/Mlh9WIvWfVOaEogPDZWlIxgAz46XKp6TW0NKlGs/V//WTx0rBnjDVoiBxNVKHP
-         2ilKX/pDs76AEv+6CE42aduhDnO76y7/bdHyK5FcTDR0W8rvLLbJJ24EaSpaJibPTVQF
-         GlLw==
+        d=gmail.com; s=20230601; t=1741636424; x=1742241224; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TxZqrAtWrwXuDZH8ojUwm9VHH8qf76N0gCXHNO5fdEI=;
+        b=EErT9PAjWSmrH6EUgYmo3hAPeq7l2tqwV5aeJ7WjKy1v7ArQ084vSe9XKOrwjiafjE
+         MQHiCcB+6rhM+hbYimamaudu4zhrY58AWQd44zJY/yK5yiyXfRI0Xh7klEoz2LtNv0yT
+         RfWpj5vHAgLIFAwnc2CD6O4h7exPraCqgzx/Yi+OYfql1iuXh9syjHWzGX0O1L6oQxgm
+         t4t8/ICt9c/mGYck2RlKWkWKhRpxBeL4SquooJuuULx15XOeFgKljoiucZiDKohGwxdI
+         +MP+wCT82mQD+ELHelCIv5/XvsNMDhPu83ApcHqBe17kTY15fgmL5iC2FCb6HeL+4T5x
+         d//A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741636286; x=1742241086;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nQwbuud9J5NqaSGaH7uv9g3ohWXt10gFUVhJ8RTBEmk=;
-        b=InfI6Fd++DY1A0EOpiwl3IUfp9buRLJRL4J5x8qyVp5CulXIEIdX+KsomT0AE/QW+t
-         XwEusSJiwhWmkxMlgxrzPZWfNJ1cq8ZnopJhz77LbowyCwQSfeANQK2utO1C9FKGuiXg
-         MYdpzwkYsViSZFLVxz2SFjk5UhbxgsIQfgT5q0l6FPIHfq1bTGe6ibt8QhcYyaNYANAs
-         8HaaIYWuTU2OQFozI/ZcGsqJ1QC8MgANABEJi2a70EsinWKptfUbb1Qb/ZExMPxekzcu
-         9DXbDbzbDSpEs/rC4la9lrDosOx53c4jcCB4r8ltKgPK+h4M6sWK4dpX6rXePUHYAzWs
-         A/9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWJsF/BZeyO5X/Fz2e7Rwnb9AZ6uctWEsIvmudmIqsFU/yXbw9Tj9nlL5rNh2R7wEvRw3o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9AeMCOZ9NV57wHygrji7TdV1AnIMJ4KtK9Jb191ihKmrgV2tc
-	VIagYir3tVfRGCpffS5fj9yw5F9tLsdgALtXfNXBL760GxA7zFvORpFg9w==
-X-Gm-Gg: ASbGncs5Fv5dN0czRfztMqu/9s7G6hQEVV2XzVel2y23gOb3vXvvFhkOFi8xZUywoyK
-	gOgTQ+4EWwT/qDwcvT6wZMi/wX+Z3gyRTnVf+rVEC1KP+ktMhT9ECzivaYs0bfh2+Rsce53Fldc
-	xj1M2xFacP/iJkSRnpVSLB8OGL0NZcQWmrrnrywpCQYhSuR1NKRE/yim8XigwSWH+5icrkzh6c2
-	lhY0OkhZSbCq/alEdatD3AlPC7ncLi00BVoyQl9osBcJbx2DG83/2ZA1L04JE/3hg6HMx7LZRQC
-	uontTci9QelemmxeJ6ayFJhvxb4x6Uvai012pRkYSvR3zJr3
-X-Google-Smtp-Source: AGHT+IGRbu7d4R0IepIDY6cW99/5dGQphm3JEr4Iwj8FKhwlTmuDrgu8A5YVBxcGOqwflE1Sio48ag==
-X-Received: by 2002:a05:6a00:99c:b0:736:4644:86e6 with SMTP id d2e1a72fcca58-736eb7fe8c7mr1241396b3a.12.1741636286277;
-        Mon, 10 Mar 2025 12:51:26 -0700 (PDT)
-Received: from localhost ([129.210.115.104])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-736d4f20913sm2984505b3a.13.2025.03.10.12.51.25
+        d=1e100.net; s=20230601; t=1741636424; x=1742241224;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TxZqrAtWrwXuDZH8ojUwm9VHH8qf76N0gCXHNO5fdEI=;
+        b=WR5pdWJGBxIFv7+AT+2hOAYiHaWVuuHKJRxGUJqvBSngH2pXBIDgP39YGT2j8fIwZs
+         PZu1R78UADxs7ZZdCWmZiRGNQBnRSBVU0rOfuyZXfiyziyK7zJhpngGVYTZYJohcRcR+
+         s0C0h9+ss44AQzMwUlaf+T8zP1ThyD4jNU+LkjL7SoxFkigJrZf1+NZ2b3aSzBFG+5/8
+         wcBfwNXuiWGDenzOYO3RjwMtLbrc/ROdSmC6xW2qzex35eCIOVhsIZQ3cUch645PTlQ8
+         Js2bJn7nkXAB2DcjvS6iSEY9OgUKOu88nTuOoDkzXgap3FonLyGh8Gcu7C0PaGNrCoyx
+         /Zlw==
+X-Gm-Message-State: AOJu0Yxk8xj0Qh9YiUHKuNvNGUdhPmEAur76y8Mg+tKgWVEFwrC+0UVJ
+	2KLJGkorTmIE1p9G+tAnp8/2/OgRZfq9RdpoDCLEkxQpjJNJiylYB79PkA==
+X-Gm-Gg: ASbGncsHpv2q/Dbd7kcjRcsqxIAMIr2AxcUU+3jG9/R0/Jxny7u7zUozXQ6zhdruJTP
+	mBcGovDAMs3TEfLiwvRNEEJczzDmzuNOY0/KH7DdJcqwHwWgzdzGSvVX4FrxYMXUwuXk3tnMtxC
+	1egieZYF3JV+cDIy/CjR7BdvN5+FzSbr/npgiPTLRTaTqSS4heh8kxfb+V8v4pLlfLyriU538bQ
+	MHu6U2QA/vM5yExVm2B/6TsHuwy9z0vNK00YGlXAz/3pSbgD9QZnqjhdd5BTxRvH00iF4MLSC1c
+	cSHQ+u3WQQTpaZDoMaNmYvHfkzo2ZJSpS07TQQ8sk60pDZ+cx8lu8Vz9vOwH+e8ZssMjQphvN+D
+	zynh4J1T7PqYO6kHa+zZh
+X-Google-Smtp-Source: AGHT+IGbTWQ+uyqVLrdNSVOlRJhSkQ4+M66G2boo1JvP0MU+3Tu4TS16mTY8aUimbTvaccv9yWEQJg==
+X-Received: by 2002:a17:907:7e88:b0:ac2:4b9:dff8 with SMTP id a640c23a62f3a-ac2b9e2397dmr107373766b.32.1741636423596;
+        Mon, 10 Mar 2025 12:53:43 -0700 (PDT)
+Received: from fedorarm.. (net-31-156-149-71.cust.vodafonedsl.it. [31.156.149.71])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac2a09ca468sm221142166b.5.2025.03.10.12.53.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Mar 2025 12:51:25 -0700 (PDT)
-Date: Mon, 10 Mar 2025 12:51:24 -0700
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Amery Hung <ameryhung@gmail.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net,
-	andrii@kernel.org, alexei.starovoitov@gmail.com,
-	martin.lau@kernel.org, kuba@kernel.org, edumazet@google.com,
-	cong.wang@bytedance.com, jhs@mojatatu.com, sinquersw@gmail.com,
-	toke@redhat.com, jiri@resnulli.us, stfomichev@gmail.com,
-	ekarani.silvestre@ccc.ufcg.edu.br, yangpeihao@sjtu.edu.cn,
-	yepeilin.cs@gmail.com, kernel-team@meta.com
-Subject: Re: [PATCH bpf-next v4 08/19] bpf: net_sched: Support implementation
- of Qdisc_ops in bpf
-Message-ID: <Z89CvCM7B/Lvkq5K@pop-os.localdomain>
-References: <20250210174336.2024258-1-ameryhung@gmail.com>
- <20250210174336.2024258-9-ameryhung@gmail.com>
+        Mon, 10 Mar 2025 12:53:43 -0700 (PDT)
+From: Matteo Croce <technoboy85@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+	Phil Sutter <phil@nwl.cc>,
+	Matteo Croce <teknoraver@meta.com>
+Subject: [PATCH iproute2-next] color: default to dark color theme
+Date: Mon, 10 Mar 2025 20:53:38 +0100
+Message-ID: <20250310195338.4093-1-technoboy85@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250210174336.2024258-9-ameryhung@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Feb 10, 2025 at 09:43:22AM -0800, Amery Hung wrote:
-> From: Amery Hung <amery.hung@bytedance.com>
-> 
-> Enable users to implement a classless qdisc using bpf. The last few
-> patches in this series has prepared struct_ops to support core operators
-> in Qdisc_ops. The recent advancement in bpf such as allocated
-> objects, bpf list and bpf rbtree has also provided powerful and flexible
-> building blocks to realize sophisticated scheduling algorithms. Therefore,
-> in this patch, we start allowing qdisc to be implemented using bpf
-> struct_ops. Users can implement Qdisc_ops.{enqueue, dequeue, init, reset,
-> and .destroy in Qdisc_ops in bpf and register the qdisc dynamically into
-> the kernel.
-> 
-> Co-developed-by: Cong Wang <cong.wang@bytedance.com>
-> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
-> Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+From: Matteo Croce <teknoraver@meta.com>
 
-Thanks for keeping updating this, Amery! It should be very close to be
-merged. So acking this as TC maintainer:
+The majority of Linux terminals are using a dark background.
+iproute2 tries to detect the color theme via the `COLORFGBG` environment
+variable, and defaults to light background if not set.
 
-Acked-by: Cong Wang <xiyou.wangcong@gmail.com>
+Change the default behaviour to dark background, and while at it change
+the current logic which assumes that the color code is a single digit.
 
-I can't wait for trying it by myself too since it is now completely
-different with my original code. ;-)
+Signed-off-by: Matteo Croce <teknoraver@meta.com>
+---
+ lib/color.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
-Regards,
-Cong
+diff --git a/lib/color.c b/lib/color.c
+index cd0f9f75..b7bb7000 100644
+--- a/lib/color.c
++++ b/lib/color.c
+@@ -72,7 +72,7 @@ static enum color attr_colors_dark[] = {
+ 	C_CLEAR
+ };
+ 
+-static int is_dark_bg;
++static int is_light_bg;
+ static int color_is_enabled;
+ 
+ static void enable_color(void)
+@@ -124,14 +124,15 @@ static void set_color_palette(void)
+ 	char *p = getenv("COLORFGBG");
+ 
+ 	/*
+-	 * COLORFGBG environment variable usually contains either two or three
+-	 * values separated by semicolons; we want the last value in either case.
+-	 * If this value is 0-6 or 8, background is dark.
++	 * COLORFGBG environment variable usually contains either two or three values
++	 * separated by semicolons: if this value is 0-6 or 8, background is dark.
+ 	 */
+-	if (p && (p = strrchr(p, ';')) != NULL
+-		&& ((p[1] >= '0' && p[1] <= '6') || p[1] == '8')
+-		&& p[2] == '\0')
+-		is_dark_bg = 1;
++	if (p && (p = strrchr(p, ';')) != NULL) {
++		int bg = atoi(p + 1);
++
++		if (bg == 7 || (bg >= 9 && bg <= 15))
++			is_light_bg = 1;
++	}
+ }
+ 
+ __attribute__((format(printf, 3, 4)))
+@@ -150,8 +151,8 @@ int color_fprintf(FILE *fp, enum color_attr attr, const char *fmt, ...)
+ 		goto end;
+ 	}
+ 
+-	ret += fprintf(fp, "%s", color_codes[is_dark_bg ?
+-		attr_colors_dark[attr] : attr_colors_light[attr]]);
++	ret += fprintf(fp, "%s", color_codes[is_light_bg ?
++		attr_colors_light[attr] : attr_colors_dark[attr]]);
+ 
+ 	ret += vfprintf(fp, fmt, args);
+ 	ret += fprintf(fp, "%s", color_codes[C_CLEAR]);
+-- 
+2.48.1
+
 
