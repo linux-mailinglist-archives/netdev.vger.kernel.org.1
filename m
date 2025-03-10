@@ -1,81 +1,92 @@
-Return-Path: <netdev+bounces-173466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EA3CA59119
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 11:25:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E0CFA591C9
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 11:51:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC2541883573
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 10:25:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E81616C958
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 10:51:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C7B8226CE8;
-	Mon, 10 Mar 2025 10:25:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C449228CBF;
+	Mon, 10 Mar 2025 10:48:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ghrPLKQU"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fUwfjXp9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E324722689D
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 10:25:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8989E22EE4
+	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 10:48:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741602328; cv=none; b=UcD+hr22OR7IRL82wuDU/81RSw5lmzYNE1zQHrB6F31evIwfWe9mmLwvq9ZnMOfhdFY2I0GGnZ4x821Cg17vg1QZuFsCCiy1WrMRdAYM7DsVu2CDeM2wQQEG4UvYXTInUtu3uyY7ojZAOLoti28mGHQU/+rKV98fvGZzIMZL4P4=
+	t=1741603715; cv=none; b=TlSuqkepPpvNk3PqEgZs7+Q3AVRR4tfxu0vJyuVEQ7phOVtCO7vcD4fQYP8ktDaZChDoCitXo2inIq17tZP7Dv4xYtwewrwOmiUG6gw8iwW1H7ShMy1d3cfniqSCx86r104TtnDGD9PazVTkBbfxWxvDvVXL31Vk7FremSON+tM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741602328; c=relaxed/simple;
-	bh=xIE+UTqb+jLSoTXVrKvvWDu1nRgFSGR/ps2L4wLEKN4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bCfuFV1JG6JiBfVKwdaqsgRv9qAhFnxuWj4fxpi/sHuNI2pqC9bFjU76yhvj2Z0AeXrNYMtCWgipJVlpmWwUd8ihYYzFODLqXrhbVot2Wqs2xjggKxP0QZEeVmmwuyi37ZkZ8ricoPZD3YA4lc9yEJRLaOYe5vDP4CaGC9eA2rQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ghrPLKQU; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741602326; x=1773138326;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=xIE+UTqb+jLSoTXVrKvvWDu1nRgFSGR/ps2L4wLEKN4=;
-  b=ghrPLKQUtHBLWczAHjEr8ASliq06B9Ajj5n2LEvBZC39sAkEIyZw/rM5
-   W53znxUvgF40bZA2M8zKhtm4NKHhd93997EN2WWnuxQy8v0IHSAFToCZI
-   pwt367s6y2exWXCjl8hU1Py8VJTwKAsMkLVe2kVv9H+Kp2pTBp8F5tWew
-   BYvfaozwOYCoAoTF2/xdDXLuPkurX+ZpQfGvoOi5jPxYBwdbfjHnxnfAJ
-   84a/vShoDa7yON6CqMq2exM7+qJgaOoJEVm4tcSIj3t+eSE+FnsRgQJ2t
-   9wRnHUQrCyGbv8COf6cVpakebTA8idCOCydu9Sv/MJoiZZj2Ne5Egys59
-   w==;
-X-CSE-ConnectionGUID: 9FMN4B8rS5auso2+o+nVwg==
-X-CSE-MsgGUID: StpzyboKTl6aNAgMlCcsgQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11368"; a="65042735"
-X-IronPort-AV: E=Sophos;i="6.14,235,1736841600"; 
-   d="scan'208";a="65042735"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 03:25:25 -0700
-X-CSE-ConnectionGUID: eM0+FtaMRhaL38aq7HZauA==
-X-CSE-MsgGUID: KOSUOua0SaOqdGY33wG4+g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,235,1736841600"; 
-   d="scan'208";a="143161859"
-Received: from lkp-server02.sh.intel.com (HELO a4747d147074) ([10.239.97.151])
-  by fmviesa002.fm.intel.com with ESMTP; 10 Mar 2025 03:25:23 -0700
-Received: from kbuild by a4747d147074 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1traK0-00045q-1u;
-	Mon, 10 Mar 2025 10:25:20 +0000
-Date: Mon, 10 Mar 2025 18:24:29 +0800
-From: kernel test robot <lkp@intel.com>
-To: Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Simon Horman <horms@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>,
-	syzbot+377b71db585c9c705f8e@syzkaller.appspotmail.com
-Subject: Re: [PATCH net] net: lapbether: use netdev_lockdep_set_classes()
- helper
-Message-ID: <202503101824.VtjtbcKN-lkp@intel.com>
-References: <20250309093930.1359048-1-edumazet@google.com>
+	s=arc-20240116; t=1741603715; c=relaxed/simple;
+	bh=j4PdO1nu/lOtJhos8w8kwuTN7slIzAII22YRob34W3M=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Xi8zNlJLdn3bjr0SEZ7TTc1QVmOZcHFWzr51BBBtBS38buCruwRccxtU6wqNbtnBhhllZcQnVxtwKGAOp1g0f6kBcOvPoW6/r8nVV9S0q0FWx2MKs0jTcxqlGXAQ5C9wVYMdwld7QbYC0l3tzyvSTdQ7nfMKGbq7+vMxgNzZJi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=fUwfjXp9; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43cfdc2c8c9so1991305e9.2
+        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 03:48:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1741603711; x=1742208511; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RcnXFhBJsspPY81aHKEpyHgRpt8kbK5A2y07Uh+g33g=;
+        b=fUwfjXp9rTFdMI/2jYh2Pa4duCMDN49sgIGYlm0TwNFFy9a2ZRTS1uw6F7bbhYyEkC
+         pJuLv97Ai/ibsz6KBsSfEs1Lj8NBHFuNj26D9ZQortapRgDfYqUulw9Dwd8Ow2KC8Kv+
+         MVRhXW97OTq31uq3smzJpBlNW6UYZXcfifMl+eQsDrItmIFsYp36ykLVMsit6d8QJliy
+         T9upNRfJYVkUTkpkuu++VOD6xK8AFFVhsCwfcAVZq676v/8S2UTS/QgfqkZMl2iqA5/1
+         OsvjAjBK2YVa2t90rOnyIrPoFig+tTS6NVMsYSVb1IbPJFbf5J+R4gm2eCvS1mGXhw6g
+         FGrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741603711; x=1742208511;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RcnXFhBJsspPY81aHKEpyHgRpt8kbK5A2y07Uh+g33g=;
+        b=Cow9muCO6noEE6q1rHyYZSYD0qFVdk2myp+3G/V0I+SI27V8VoAVmdatvHeXDQoN9C
+         snVrIgNtKJ6UavfG2UziEYxTQfCY7SY0McDfCrsXd3gV7f+/d6qM6jRQ+OIeiepajy0w
+         xnwiCDTOBh6uPo3eo954qj6K0bNYIxUbsk7L9BHrW2oRxGjCLpS4Mjsmue8cMUnhJpPL
+         ioqdBhXm9Ru/bCp82MI1jkflixEJdO7Up6YIZuz3wxEs+2PA+N7aF3yyF/0EH9JmD2iL
+         Lte0QTdmbJVJ0wlSA6F6KLCgV7eW5SVR85hM5Uzo15VyambfgCUF2chkt+yTi00gZUtZ
+         JPpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVyO64z0b8Ln144kexTiTr0Se5cgU5sgs1hEFt7/sZgq75t8UHkbcwOvTAtHmsKF+QZFDWMI/g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3P7Be2r7BXQUltGD0/TfFonQB1zDur8pnSfpcHbAHqm939RYw
+	YDuzZrpQpRs5YbUpcCRC0pqx1OI/Z0b44cb8wLzM7IiolnTD/GZ84mARvy/pBDY=
+X-Gm-Gg: ASbGncuN4cA0qcnTW3c5iLcq5Gj//NpngPVwDZILTCgHnijUiQOHxUZRTnfgo9LHUbN
+	1OKXUNTgRHJ+lfEQhQqbYJgesqi/eOkPE3hr26HBO5oXmUGf51wJ6X7fc8goHqF95F5DivBWy4p
+	zv/TqTRZumHl9apoIxbTFtk+ZOuBfa69kkAZgr55zxnEROsq3z2u4iP7pzOyflfZsK+D17ClPSJ
+	9AxTMmARRsAK2pQSdmr24dD4P5l0IQCFlWGwcGBYlQquWDxjdU5dPQBliLKmdrKLCKX1fzHvZJR
+	82IdQXKNtfGDvngqgn7K1xY3PzDFaXhRQniuDC9hKM7bIeF9Wg==
+X-Google-Smtp-Source: AGHT+IEvyQMgaUHnCuYCt+OpJiqkHIstn9Ui2odq4PjFQ9lNSszLbzPKWSr7S0YVwsCBZMsm/36JQg==
+X-Received: by 2002:a05:600c:470d:b0:43c:fab3:4fad with SMTP id 5b1f17b1804b1-43cfab351c6mr15054385e9.16.1741603710881;
+        Mon, 10 Mar 2025 03:48:30 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-43cf27f8ef3sm45737585e9.11.2025.03.10.03.48.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Mar 2025 03:48:30 -0700 (PDT)
+Date: Mon, 10 Mar 2025 13:48:27 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Felix Fietkau <nbd@nbd.name>
+Cc: Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH net] net: ethernet: mediatek: Fix bit field in
+ mtk_set_queue_speed()
+Message-ID: <eaab1b7b-b33b-458b-a89a-81391bd2e6e8@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,61 +95,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250309093930.1359048-1-edumazet@google.com>
+X-Mailer: git-send-email haha only kidding
 
-Hi Eric,
+This was supposed to set "FIELD_PREP(MTK_QTX_SCH_MAX_RATE_WEIGHT, 1)"
+but there was typo and the | operation was missing and which turned
+it into a no-op.
 
-kernel test robot noticed the following build errors:
+Fixes: f63959c7eec3 ("net: ethernet: mtk_eth_soc: implement multi-queue support for per-port queues")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+From static analysis, not tested.
 
-[auto build test ERROR on net/main]
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/net-lapbether-use-netdev_lockdep_set_classes-helper/20250309-174127
-base:   net/main
-patch link:    https://lore.kernel.org/r/20250309093930.1359048-1-edumazet%40google.com
-patch subject: [PATCH net] net: lapbether: use netdev_lockdep_set_classes() helper
-config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20250310/202503101824.VtjtbcKN-lkp@intel.com/config)
-compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250310/202503101824.VtjtbcKN-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202503101824.VtjtbcKN-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from drivers/net/wan/lapbether.c:27:
-   In file included from include/linux/net.h:24:
-   In file included from include/linux/mm.h:2224:
-   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     505 |                            item];
-         |                            ~~~~
-   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     512 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:524:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     524 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     525 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
->> drivers/net/wan/lapbether.c:42:10: fatal error: 'net/netdev_lock.h' file not found
-      42 | #include <net/netdev_lock.h>
-         |          ^~~~~~~~~~~~~~~~~~~
-   3 warnings and 1 error generated.
-
-
-vim +42 drivers/net/wan/lapbether.c
-
-    41	
-  > 42	#include <net/netdev_lock.h>
-    43	#include <net/x25device.h>
-    44	
-
+diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+index 922330b3f4d7..9efef0e860da 100644
+--- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
++++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+@@ -757,7 +757,7 @@ static void mtk_set_queue_speed(struct mtk_eth *eth, unsigned int idx,
+ 		case SPEED_100:
+ 			val |= MTK_QTX_SCH_MAX_RATE_EN |
+ 			       FIELD_PREP(MTK_QTX_SCH_MAX_RATE_MAN, 1) |
+-			       FIELD_PREP(MTK_QTX_SCH_MAX_RATE_EXP, 5);
++			       FIELD_PREP(MTK_QTX_SCH_MAX_RATE_EXP, 5) |
+ 			       FIELD_PREP(MTK_QTX_SCH_MAX_RATE_WEIGHT, 1);
+ 			break;
+ 		case SPEED_1000:
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.47.2
+
 
