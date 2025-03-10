@@ -1,71 +1,60 @@
-Return-Path: <netdev+bounces-173424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AB20A58C18
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 07:33:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2541FA58C1C
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 07:34:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 261353A8549
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 06:33:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 476C8163779
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 06:34:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 932A11C1ADB;
-	Mon, 10 Mar 2025 06:32:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 930891C1F13;
+	Mon, 10 Mar 2025 06:34:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IAeeCfQ5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AdSYkWeH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FDDC38B;
-	Mon, 10 Mar 2025 06:32:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F32D33F9
+	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 06:34:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741588361; cv=none; b=B4dJ5eDaeoGCe4JtUjOgaXL8kz3XUUHMXpdAHsj9SO/PEKwSz9Ou9IOa/jI6FyeaVWlDCadWt1Rq02BmohV9+giWc8RCAaEdpo5tReKdReELndJ/aHAqDbo+WBDnNtnWDbsYaMq/NwWkvpDxTyXuldwq+8nJRyLxdsniC2rjBYo=
+	t=1741588479; cv=none; b=ofdCMsHQgudRrEvgkLlJG6fcXmEyW1ndg+rvo4BtpPG3A9MPcCLyZ9+tERrieJjIf9M7eHzyI2d3lwaQ9BtvHYLWO48rgCyKGqX0e5z38IGXVOdnoet7RaZBSFj2/dJ22gSehw27DqRHnSaCgOyHB7NJ1cqO80pKYDFSELen/yM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741588361; c=relaxed/simple;
-	bh=EUFbqtCL5HuUmUMcDgzovMNMOcqHYTpQD4V/27f19tI=;
+	s=arc-20240116; t=1741588479; c=relaxed/simple;
+	bh=pWWHmE+Y0U5xpVyky0gqce4q0e0EfjTEoGgl+Qjfxzs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HFImXPNz+SymWsES/LMZCuHAFA5iBsXQFWdVQNx8O9ravor0ntap5Z/744devulojmpQlV2c33C8YSPL6Vp+sBiIqPEjsgHQ5+PxEa2umZa0khTF5ymKhk4YDmR6gO+gUYbTuq4Tq4SInFJpxOEZTA/mBix2zK41KJw0Ee+PuiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IAeeCfQ5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C08DC4CEE5;
-	Mon, 10 Mar 2025 06:32:33 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=EVszoHanHV7AUhRovGcxgPXUmZWanS2GHwYQd/70R8YI4CpuHeOOlSxSchNBcg/vUqoqS3Nr09M8khTViNGhsWMoQ9XwG1T3JsiS0YsdaNqWMJ3POm/Xm+C34HEIuVyIqdUS4OMOEUEC9lpmPdy08i/2A0p076M30oxbNJF7MXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AdSYkWeH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B42D2C4CEE5;
+	Mon, 10 Mar 2025 06:34:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741588359;
-	bh=EUFbqtCL5HuUmUMcDgzovMNMOcqHYTpQD4V/27f19tI=;
+	s=k20201202; t=1741588478;
+	bh=pWWHmE+Y0U5xpVyky0gqce4q0e0EfjTEoGgl+Qjfxzs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IAeeCfQ5aG6wEK+82/lMCroHOsh9eITArhIPbTbwHdomFD1iskJihRV1NovpIspBQ
-	 XPIf/RFfZVkMHiAbzgMOlEeg+zSci1qabQNsNJ6kXftClEYqkdi0V6VNXBYiGr1jdc
-	 coikgZFKdcY60HIB98S+Hax/P0qIdVu+ei7LeM8+wXV7O60xwUh0WSsYz5kPYtHK95
-	 zQUFgnchgBXyXaAHh3zhysR+/k6Z7lv4P3HuZLywY3kTUmrEQRIq7hHsZi7qwxxMX/
-	 wVsEBHeukZxtlCwf5hSPh8HXaIYxMOAT6nByLcWkPv0+vDsGo99deagc53gy1iheUz
-	 O5YZ30rrTeFqw==
-Date: Mon, 10 Mar 2025 07:32:26 +0100
+	b=AdSYkWeHn+9xjHGsV1/8Mi1shP4Eaf1WPtiDb1cklR1zLAycf/+qHQ99hZYx/RZ4B
+	 /7jmEgvBwm9XvJy0GQK7q9j79xnNSZGzkUtByybXWnbH56Oo30EHV53AZCtiEIiS4r
+	 6DPUoo2uaPseLGNPaylwniLmdA5o88BbozQifOf8eoV4PcILp/+1X9mcu10VKClqVh
+	 z82q+F7I/e5CozaUiJX8+h94u7K9olCJBdv0ba6AdQuel/ZPQ0sifgh+GqZCzTwsRz
+	 SYwTcsI2Vx/B1SsuYZbxWgGVuVgjfRQEcvl8DPKaCZGTcGnFvsnCfObMHosnS34Zye
+	 uHn9+VZcrVnZg==
+Date: Mon, 10 Mar 2025 07:34:29 +0100
 From: Simon Horman <horms@kernel.org>
-To: Gur Stavi <gur.stavi@huawei.com>
-Cc: Fan Gong <gongfan1@huawei.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Lee Trager <lee@trager.us>,
-	linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-	Bjorn Helgaas <helgaas@kernel.org>,
-	Cai Huoqing <cai.huoqing@linux.dev>, luosifu <luosifu@huawei.com>,
-	Xin Guo <guoxin09@huawei.com>,
-	Shen Chenyang <shenchenyang1@hisilicon.com>,
-	Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
-	Shi Jing <shijing34@huawei.com>,
-	Meny Yossefi <meny.yossefi@huawei.com>,
-	Suman Ghosh <sumang@marvell.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Joe Damato <jdamato@fastly.com>
-Subject: Re: [PATCH net-next v08 1/1] hinic3: module initialization and tx/rx
- logic
-Message-ID: <20250310063226.GE4159220@kernel.org>
-References: <cover.1741247008.git.gur.stavi@huawei.com>
- <fc43342cbb9915da210792edcc8f6bf661b298e9.1741247008.git.gur.stavi@huawei.com>
+To: Xin Tian <tianx@yunsilicon.com>
+Cc: netdev@vger.kernel.org, leon@kernel.org, andrew+netdev@lunn.ch,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	davem@davemloft.net, jeff.johnson@oss.qualcomm.com,
+	przemyslaw.kitszel@intel.com, weihg@yunsilicon.com,
+	wanry@yunsilicon.com, jacky@yunsilicon.com,
+	parthiban.veerasooran@microchip.com, masahiroy@kernel.org,
+	kalesh-anakkur.purayil@broadcom.com, geert+renesas@glider.be
+Subject: Re: [PATCH net-next v8 02/14] xsc: Enable command queue
+Message-ID: <20250310063429.GF4159220@kernel.org>
+References: <20250307100824.555320-1-tianx@yunsilicon.com>
+ <20250307100827.555320-3-tianx@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,260 +63,272 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <fc43342cbb9915da210792edcc8f6bf661b298e9.1741247008.git.gur.stavi@huawei.com>
+In-Reply-To: <20250307100827.555320-3-tianx@yunsilicon.com>
 
-On Thu, Mar 06, 2025 at 09:50:28AM +0200, Gur Stavi wrote:
-> From: Fan Gong <gongfan1@huawei.com>
+On Fri, Mar 07, 2025 at 06:08:29PM +0800, Xin Tian wrote:
+> The command queue is a hardware channel for sending
+> commands between the driver and the firmware.
+> xsc_cmd.h defines the command protocol structures.
+> The logic for command allocation, sending,
+> completion handling, and error handling is implemented
+> in cmdq.c.
 > 
-> This is [1/3] part of hinic3 Ethernet driver initial submission.
-> With this patch hinic3 is a valid kernel module but non-functional
-> driver.
-> 
-> The driver parts contained in this patch:
-> Module initialization.
-> PCI driver registration but with empty id_table.
-> Auxiliary driver registration.
-> Net device_ops registration but open/stop are empty stubs.
-> tx/rx logic.
-> 
-> All major data structures of the driver are fully introduced with the
-> code that uses them but without their initialization code that requires
-> management interface with the hw.
-> 
-> Co-developed-by: Xin Guo <guoxin09@huawei.com>
-> Signed-off-by: Xin Guo <guoxin09@huawei.com>
-> Signed-off-by: Fan Gong <gongfan1@huawei.com>
-> Co-developed-by: Gur Stavi <gur.stavi@huawei.com>
-> Signed-off-by: Gur Stavi <gur.stavi@huawei.com>
+> Co-developed-by: Honggang Wei <weihg@yunsilicon.com>
+> Signed-off-by: Honggang Wei <weihg@yunsilicon.com>
+> Co-developed-by: Lei Yan <jacky@yunsilicon.com>
+> Signed-off-by: Lei Yan <jacky@yunsilicon.com>
+> Signed-off-by: Xin Tian <tianx@yunsilicon.com>
 
-Hi Gur,
+Hi Xin,
 
-I've reviewed this patch paying particular attention to error handling.
-
-Please find some minor feedback below.
+Some minor feedback from my side.
 
 ...
 
-> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_lld.c b/drivers/net/ethernet/huawei/hinic3/hinic3_lld.c
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/cmdq.c b/drivers/net/ethernet/yunsilicon/xsc/pci/cmdq.c
 
 ...
 
-> +static int hinic3_probe_func(struct hinic3_pcidev *pci_adapter)
+> +static int xsc_copy_to_cmd_msg(struct xsc_cmd_msg *to, void *from, int size)
 > +{
-> +	struct pci_dev *pdev = pci_adapter->pdev;
-> +	int err;
+> +	struct xsc_cmd_prot_block *block;
+> +	struct xsc_cmd_mailbox *next;
+> +	int copy;
 > +
-> +	err = hinic3_mapping_bar(pdev, pci_adapter);
-> +	if (err) {
-> +		dev_err(&pdev->dev, "Failed to map bar\n");
-> +		goto err_map_bar;
-> +	}
+> +	if (!to || !from)
+> +		return -ENOMEM;
 > +
-> +	err = hinic3_func_init(pdev, pci_adapter);
-> +	if (err)
-> +		goto err_func_init;
-> +
-> +	return 0;
-> +
-> +err_func_init:
-> +	hinic3_unmapping_bar(pci_adapter);
-> +
-> +err_map_bar:
-> +	dev_err(&pdev->dev, "Pcie device probe function failed\n");
+> +	copy = min_t(int, size, sizeof(to->first.data));
 
-nit: PCIE
+nit: I expect that using min() is sufficient here...
 
-> +	return err;
-> +}
-
-...
-
-> +static int hinic3_sw_init(struct net_device *netdev)
-> +{
-> +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-> +	struct hinic3_hwdev *hwdev = nic_dev->hwdev;
-> +	int err;
+> +	memcpy(to->first.data, from, copy);
+> +	size -= copy;
+> +	from += copy;
 > +
-> +	nic_dev->q_params.sq_depth = HINIC3_SQ_DEPTH;
-> +	nic_dev->q_params.rq_depth = HINIC3_RQ_DEPTH;
+> +	next = to->next;
+> +	while (size) {
+> +		if (!next) {
+> +			WARN_ONCE(1, "Mail box not enough\n");
+> +			return -ENOMEM;
+> +		}
 > +
-> +	/* VF driver always uses random MAC address. During VM migration to a
-> +	 * new device, the new device should learn the VMs old MAC rather than
-> +	 * provide its own MAC. The product design assumes that every VF is
-> +	 * suspectable to migration so the device avoids offering MAC address
-> +	 * to VFs.
-> +	 */
-> +	eth_hw_addr_random(netdev);
-> +	err = hinic3_set_mac(hwdev, netdev->dev_addr, 0,
-> +			     hinic3_global_func_id(hwdev));
-> +	if (err) {
-> +		dev_err(hwdev->dev, "Failed to set default MAC\n");
-> +		goto err_out;
+> +		copy = min_t(int, size, XSC_CMD_DATA_BLOCK_SIZE);
 
-nit: I think it would be slightly nicer to simply return err here
-     and drop the err_out label. This is because there is no
-     unwind to perform in this error case.
+     ... and I'm pretty sure it is sufficient here().
 
-     Likewise for any similar cases that may be in this patch
-     (I didn't spot any so far).
+     Likewise for similar uses of min_t() in this patch.
 
-> +	}
-> +
-> +	err = hinic3_alloc_txrxqs(netdev);
-> +	if (err) {
-> +		dev_err(hwdev->dev, "Failed to alloc qps\n");
-> +		goto err_alloc_qps;
+
+> +		block = next->buf;
+> +		memcpy(block->data, from, copy);
+> +		block->owner_status = 0;
+> +		from += copy;
+> +		size -= copy;
+> +		next = next->next;
 > +	}
 > +
 > +	return 0;
-> +
-> +err_alloc_qps:
-> +	hinic3_del_mac(hwdev, netdev->dev_addr, 0, hinic3_global_func_id(hwdev));
-> +
-> +err_out:
-> +	return err;
-> +}
-> +
-> +static void hinic3_sw_deinit(struct net_device *netdev)
-> +{
-> +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-> +
-> +	hinic3_free_txrxqs(netdev);
-> +	hinic3_del_mac(nic_dev->hwdev, netdev->dev_addr, 0,
-> +		       hinic3_global_func_id(nic_dev->hwdev));
 > +}
 
 ...
 
-> +static int hinic3_nic_probe(struct auxiliary_device *adev,
-> +			    const struct auxiliary_device_id *id)
+> +int xsc_cmd_init(struct xsc_core_device *xdev)
 > +{
-> +	struct hinic3_hwdev *hwdev = hinic3_adev_get_hwdev(adev);
-> +	struct pci_dev *pdev = hwdev->pdev;
-> +	struct hinic3_nic_dev *nic_dev;
-> +	struct net_device *netdev;
-> +	u16 max_qps, glb_func_id;
+> +	int size = sizeof(struct xsc_cmd_prot_block);
+> +	int align = roundup_pow_of_two(size);
+> +	struct xsc_cmd *cmd = &xdev->cmd;
+> +	u32 cmd_h, cmd_l;
+> +	u32 err_stat;
 > +	int err;
+> +	int i;
 > +
-> +	if (!hinic3_support_nic(hwdev)) {
-> +		dev_dbg(&adev->dev, "HW doesn't support nic\n");
-> +		return 0;
-> +	}
+> +	/* now there is 544 cmdq resource, soc using from id 514 */
+> +	cmd->reg.req_pid_addr = HIF_CMDQM_HOST_REQ_PID_MEM_ADDR;
+> +	cmd->reg.req_cid_addr = HIF_CMDQM_HOST_REQ_CID_MEM_ADDR;
+> +	cmd->reg.rsp_pid_addr = HIF_CMDQM_HOST_RSP_PID_MEM_ADDR;
+> +	cmd->reg.rsp_cid_addr = HIF_CMDQM_HOST_RSP_CID_MEM_ADDR;
+> +	cmd->reg.req_buf_h_addr = HIF_CMDQM_HOST_REQ_BUF_BASE_H_ADDR_MEM_ADDR;
+> +	cmd->reg.req_buf_l_addr = HIF_CMDQM_HOST_REQ_BUF_BASE_L_ADDR_MEM_ADDR;
+> +	cmd->reg.rsp_buf_h_addr = HIF_CMDQM_HOST_RSP_BUF_BASE_H_ADDR_MEM_ADDR;
+> +	cmd->reg.rsp_buf_l_addr = HIF_CMDQM_HOST_RSP_BUF_BASE_L_ADDR_MEM_ADDR;
+> +	cmd->reg.msix_vec_addr = HIF_CMDQM_VECTOR_ID_MEM_ADDR;
+> +	cmd->reg.element_sz_addr = HIF_CMDQM_Q_ELEMENT_SZ_REG_ADDR;
+> +	cmd->reg.q_depth_addr = HIF_CMDQM_HOST_Q_DEPTH_REG_ADDR;
+> +	cmd->reg.interrupt_stat_addr = HIF_CMDQM_HOST_VF_ERR_STS_MEM_ADDR;
 > +
-> +	hinic3_adev_event_register(adev, hinic3_nic_event);
+> +	cmd->pool = dma_pool_create("xsc_cmd",
+> +				    &xdev->pdev->dev,
+> +				    size, align, 0);
+> +	if (!cmd->pool)
+> +		return -ENOMEM;
 > +
-> +	glb_func_id = hinic3_global_func_id(hwdev);
-> +	err = hinic3_func_reset(hwdev, glb_func_id, COMM_FUNC_RESET_BIT_NIC);
-> +	if (err) {
-> +		dev_err(&adev->dev, "Failed to reset function\n");
-> +		goto err_undo_event_register;
-> +	}
-> +
-> +	max_qps = hinic3_func_max_qnum(hwdev);
-> +	netdev = alloc_etherdev_mq(sizeof(*nic_dev), max_qps);
-> +	if (!netdev) {
-> +		dev_err(&adev->dev, "Failed to allocate netdev\n");
+> +	cmd->cmd_buf = (void *)__get_free_pages(GFP_ATOMIC, 0);
+> +	if (!cmd->cmd_buf) {
 > +		err = -ENOMEM;
-> +		goto err_undo_event_register;
+> +		goto err_free_pool;
 > +	}
-> +
-> +	nic_dev = netdev_priv(netdev);
-> +	dev_set_drvdata(&adev->dev, nic_dev);
-> +	err = hinic3_init_nic_dev(netdev, hwdev);
-> +	if (err)
-> +		goto err_undo_netdev_alloc;
-> +
-> +	err = hinic3_init_nic_io(nic_dev);
-> +	if (err)
-> +		goto err_undo_netdev_alloc;
-> +
-> +	err = hinic3_sw_init(netdev);
-> +	if (err)
-> +		goto err_sw_init;
-> +
-> +	hinic3_assign_netdev_ops(netdev);
-> +
-> +	netdev_feature_init(netdev);
-> +	err = hinic3_set_default_hw_feature(netdev);
-> +	if (err)
-> +		goto err_set_features;
-> +
-> +	err = register_netdev(netdev);
-> +	if (err) {
+> +	cmd->cq_buf = (void *)__get_free_pages(GFP_ATOMIC, 0);
+> +	if (!cmd->cq_buf) {
 > +		err = -ENOMEM;
-
-Could you clarify why err is being overridden here?
-I would have expected this function to return the
-error returned by register_netdev?
-
-> +		goto err_register_netdev;
+> +		goto err_free_cmd;
 > +	}
 > +
-> +	netif_carrier_off(netdev);
+> +	cmd->dma = dma_map_single(&xdev->pdev->dev, cmd->cmd_buf, PAGE_SIZE,
+> +				  DMA_BIDIRECTIONAL);
+> +	if (dma_mapping_error(&xdev->pdev->dev, cmd->dma)) {
+> +		err = -ENOMEM;
+> +		goto err_free_cq;
+> +	}
+> +
+> +	cmd->cq_dma = dma_map_single(&xdev->pdev->dev, cmd->cq_buf, PAGE_SIZE,
+> +				     DMA_BIDIRECTIONAL);
+> +	if (dma_mapping_error(&xdev->pdev->dev, cmd->cq_dma)) {
+> +		err = -ENOMEM;
+> +		goto err_unmap_cmd;
+> +	}
+> +
+> +	cmd->cmd_pid = readl(XSC_REG_ADDR(xdev, cmd->reg.req_pid_addr));
+> +	cmd->cq_cid = readl(XSC_REG_ADDR(xdev, cmd->reg.rsp_cid_addr));
+> +	cmd->ownerbit_learned = 0;
+> +
+> +	xsc_cmd_handle_rsp_before_reload(cmd, xdev);
+> +
+> +#define ELEMENT_SIZE_LOG	6 /* 64B */
+> +#define Q_DEPTH_LOG		5 /* 32 */
+> +
+> +	cmd->log_sz = Q_DEPTH_LOG;
+> +	cmd->log_stride = readl(XSC_REG_ADDR(xdev, cmd->reg.element_sz_addr));
+> +	writel(1 << cmd->log_sz, XSC_REG_ADDR(xdev, cmd->reg.q_depth_addr));
+> +	if (cmd->log_stride != ELEMENT_SIZE_LOG) {
+> +		dev_err(&xdev->pdev->dev, "firmware failed to init cmdq, log_stride=(%d, %d)\n",
+> +			cmd->log_stride, ELEMENT_SIZE_LOG);
+> +		err = -ENODEV;
+> +		goto err_unmap_cq;
+> +	}
+> +
+> +	if (1 << cmd->log_sz > XSC_MAX_COMMANDS) {
+> +		dev_err(&xdev->pdev->dev, "firmware reports too many outstanding commands %d\n",
+> +			1 << cmd->log_sz);
+> +		err = -EINVAL;
+> +		goto err_unmap_cq;
+> +	}
+> +
+> +	if (cmd->log_sz + cmd->log_stride > PAGE_SHIFT) {
+> +		dev_err(&xdev->pdev->dev, "command queue size overflow\n");
+> +		err = -EINVAL;
+> +		goto err_unmap_cq;
+> +	}
+> +
+> +	cmd->checksum_disabled = 1;
+> +	cmd->max_reg_cmds = (1 << cmd->log_sz) - 1;
+> +	cmd->cmd_entry_mask = (1 << cmd->max_reg_cmds) - 1;
+> +
+> +	spin_lock_init(&cmd->alloc_lock);
+> +	spin_lock_init(&cmd->token_lock);
+> +	spin_lock_init(&cmd->doorbell_lock);
+> +	for (i = 0; i < ARRAY_SIZE(cmd->stats); i++)
+> +		spin_lock_init(&cmd->stats[i].lock);
+> +
+> +	sema_init(&cmd->sem, cmd->max_reg_cmds);
+> +
+> +	cmd_h = (u32)((u64)(cmd->dma) >> 32);
+> +	cmd_l = (u32)(cmd->dma);
+> +	if (cmd_l & 0xfff) {
+> +		dev_err(&xdev->pdev->dev, "invalid command queue address\n");
+> +		err = -ENOMEM;
+> +		goto err_unmap_cq;
+> +	}
+> +
+> +	writel(cmd_h, XSC_REG_ADDR(xdev, cmd->reg.req_buf_h_addr));
+> +	writel(cmd_l, XSC_REG_ADDR(xdev, cmd->reg.req_buf_l_addr));
+> +
+> +	cmd_h = (u32)((u64)(cmd->cq_dma) >> 32);
+> +	cmd_l = (u32)(cmd->cq_dma);
+
+nit: I think you can use upper_32_bits() and lower_32_bits() here.
+
+> +	if (cmd_l & 0xfff) {
+> +		dev_err(&xdev->pdev->dev, "invalid command queue address\n");
+> +		err = -ENOMEM;
+> +		goto err_unmap_cq;
+> +	}
+> +	writel(cmd_h, XSC_REG_ADDR(xdev, cmd->reg.rsp_buf_h_addr));
+> +	writel(cmd_l, XSC_REG_ADDR(xdev, cmd->reg.rsp_buf_l_addr));
+> +
+> +	/* Make sure firmware sees the complete address before we proceed */
+> +	wmb();
+> +
+> +	cmd->mode = XSC_CMD_MODE_POLLING;
+> +	cmd->cmd_status = XSC_CMD_STATUS_NORMAL;
+> +
+> +	err = xsc_create_msg_cache(xdev);
+> +	if (err) {
+> +		dev_err(&xdev->pdev->dev, "failed to create command cache\n");
+> +		goto err_unmap_cq;
+> +	}
+> +
+> +	xsc_set_wqname(xdev);
+> +	cmd->wq = create_singlethread_workqueue(cmd->wq_name);
+> +	if (!cmd->wq) {
+> +		dev_err(&xdev->pdev->dev, "failed to create command workqueue\n");
+> +		err = -ENOMEM;
+> +		goto err_destroy_cache;
+> +	}
+> +
+> +	cmd->cq_task = kthread_create(xsc_cmd_cq_polling,
+> +				      (void *)xdev,
+> +				      "xsc_cmd_cq_polling");
+> +	if (!cmd->cq_task) {
+> +		dev_err(&xdev->pdev->dev, "failed to create cq task\n");
+> +		err = -ENOMEM;
+> +		goto err_destroy_wq;
+> +	}
+> +	wake_up_process(cmd->cq_task);
+> +
+> +	err = xsc_request_pid_cid_mismatch_restore(xdev);
+> +	if (err) {
+> +		dev_err(&xdev->pdev->dev, "request pid,cid wrong, restore failed\n");
+> +		goto err_stop_cq_task;
+> +	}
+> +
+> +	/* clear abnormal state to avoid the impact of previous error */
+> +	err_stat = readl(XSC_REG_ADDR(xdev, xdev->cmd.reg.interrupt_stat_addr));
+> +	if (err_stat) {
+> +		pci_err(xdev->pdev, "err_stat 0x%x when init, clear it\n",
+> +			err_stat);
+> +		writel(0xf,
+> +		       XSC_REG_ADDR(xdev, xdev->cmd.reg.interrupt_stat_addr));
+> +	}
+> +
 > +	return 0;
 > +
-> +err_register_netdev:
-> +	hinic3_update_nic_feature(nic_dev, 0);
-> +	hinic3_set_nic_feature_to_hw(nic_dev);
+> +err_stop_cq_task:
+> +	kthread_stop(cmd->cq_task);
 > +
-> +err_set_features:
-> +	hinic3_sw_deinit(netdev);
+> +err_destroy_wq:
+> +	destroy_workqueue(cmd->wq);
 > +
-> +err_sw_init:
-> +	hinic3_free_nic_io(nic_dev);
+> +err_destroy_cache:
+> +	xsc_destroy_msg_cache(xdev);
 > +
-> +err_undo_netdev_alloc:
-> +	free_netdev(netdev);
+> +err_unmap_cq:
+> +	dma_unmap_single(&xdev->pdev->dev, cmd->cq_dma, PAGE_SIZE,
+> +			 DMA_BIDIRECTIONAL);
 > +
-> +err_undo_event_register:
-> +	hinic3_adev_event_unregister(adev);
-> +	dev_err(&pdev->dev, "NIC service probe failed\n");
+> +err_unmap_cmd:
+> +	dma_unmap_single(&xdev->pdev->dev, cmd->dma, PAGE_SIZE,
+> +			 DMA_BIDIRECTIONAL);
+> +err_free_cq:
+> +	free_pages((unsigned long)cmd->cq_buf, 0);
 > +
-> +	return err;
-> +}
-
-...
-
-> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c b/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
-
-...
-
-> +static int hinic3_change_mtu(struct net_device *netdev, int new_mtu)
-> +{
-> +	int err;
+> +err_free_cmd:
+> +	free_pages((unsigned long)cmd->cmd_buf, 0);
 > +
-> +	err = hinic3_set_port_mtu(netdev, new_mtu);
-> +	if (err) {
-> +		netdev_err(netdev, "Failed to change port mtu to %d\n", new_mtu);
-> +	} else {
-> +		netdev_dbg(netdev, "Change mtu from %u to %d\n", netdev->mtu, new_mtu);
-> +		WRITE_ONCE(netdev->mtu, new_mtu);
-> +	}
+> +err_free_pool:
+> +	dma_pool_destroy(cmd->pool);
 > +
 > +	return err;
-
-The above is straightforward enough, but I do think it would
-be nicer to stick with the idiomatic pattern of keeping the
-non-error paths in the main flow of execution, while
-error paths are handled conditionally.
-
-And also, to keep lines less than 80 columns wide unless
-it reduces readability.
-
-Something like this (completely untested!):
-
-	err = hinic3_set_port_mtu(netdev, new_mtu);
-	if (err) {
-		netdev_err(netdev, "Failed to change port mtu to %d\n",
-			   new_mtu);
-		return err;
-	}
-
-	netdev_dbg(netdev, "Change mtu from %u to %d\n", netdev->mtu, new_mtu);
-	WRITE_ONCE(netdev->mtu, new_mtu);
-
-	return 0;
-
 > +}
 
 ...
