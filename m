@@ -1,108 +1,118 @@
-Return-Path: <netdev+bounces-173592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60C36A59B1C
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 17:35:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B90EAA59B28
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 17:37:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 165B53A5457
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 16:35:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 715A718880BB
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 16:37:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AA24230264;
-	Mon, 10 Mar 2025 16:35:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58D33230988;
+	Mon, 10 Mar 2025 16:37:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="WlAzFezD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="isA2ib1a"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADBF5185B62;
-	Mon, 10 Mar 2025 16:35:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309C31E519;
+	Mon, 10 Mar 2025 16:37:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741624506; cv=none; b=Bo00RsIL/P2ibm6JYUgEKXexw7odfwQqrZRZQqDlWhpiLtIchLlNXs1wUwRNpf8RU943D9bIXtQhOQKAV+zrp3Mg/JjATuQXCCIOTG65iWG9LetfvcqzeDeHprkNPwdRoepEpGnjta0NQe1Ltn9KgzQ43Ljs3pJc1BBuHWYZrJk=
+	t=1741624652; cv=none; b=UihhGZq+WweWWoZbX4AOO5jQRHBEKz3KgDPrIDV81FxZ4mB0LF+wRX2DBEdUKSa/4BlACufueJ2D9wUAEOjEyFgqt6pspMG3vO9OQ2mWuHafVyEsYO2tuz1OwjYHnqdJWfiFaQwlHqe7lYFJ6EVTCMzaZk0YU8CChy5VF9wvu5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741624506; c=relaxed/simple;
-	bh=ZKvVsJ9Jxs6BNf0ZGQzgXFsZmlABP9EO6Vd96lMv61s=;
+	s=arc-20240116; t=1741624652; c=relaxed/simple;
+	bh=gTUrSXfg09Nwvn6NfV7VP8ZhiyGW1oZOs57vjOlXqgQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bwaRAtSKE0eRi8SG+cuXJfSckt01c1dRc6qkP4s6H4gZLFFqkKEtGkzWrHdJz1r7K8IuMG9Aw+ZDPDk8PkwCoZHjbY8VXMneyR9gWiGIyk4gzeyiyJQ/+AP3e4RxSMuZMz9NwiJk/voiy+26AaAY/+goMh8EWhg9I/GTUfQ441k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=WlAzFezD; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=JIY+PmPHLz9u1Q43AC3Utd4UHBNiWYM3sRig9h9ZDIc=; b=WlAzFezD92g8yZE05XlG+QVd9I
-	nDY2cZPRV75FlaCIXRYVuoYV2W8dz61IUOegXJxMGRZgge0sZg9Z2byWtKYHmCMmk+vB7e97XqYAI
-	1FfX8lLDP4Y+COvOjaD+78aYI/QOLKsaa4VbYQBa0PRwgM9pMOOcU2esrFeOOE2SkNmyo+gqYjE2M
-	vz7pOAz3I7822bghlJOtdV7zqxszfaQZT6FWWyCpTAM9rbtpEh0O/RSl7iPr/+Vv/Q+zwChxM+g5j
-	VZT9JY9QNsCUD0xQZajYH+PrVkFiUVaLWWXcZj3pWAODzvPGGLm5ntVBux/wRjuXxlUgvwVG9c9bL
-	ii6q4DHw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38804)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1trg5R-0002wT-1t;
-	Mon, 10 Mar 2025 16:34:41 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1trg5J-0002ch-0i;
-	Mon, 10 Mar 2025 16:34:33 +0000
-Date: Mon, 10 Mar 2025 16:34:33 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
-Cc: Daniel Golle <daniel@makrotopia.org>, "andrew@lunn.ch" <andrew@lunn.ch>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"sander@svanheule.net" <sander@svanheule.net>,
-	"markus.stockhausen@gmx.de" <markus.stockhausen@gmx.de>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next v9] net: mdio: Add RTL9300 MDIO driver
-Message-ID: <Z88Uma90VzLul2we@shell.armlinux.org.uk>
-References: <20250309232536.19141-1-chris.packham@alliedtelesis.co.nz>
- <Z85A9_Li_4n9vcEG@pidgin.makrotopia.org>
- <b506b6e9-d5c3-4927-ab2d-e3a241513082@alliedtelesis.co.nz>
+	 Content-Type:Content-Disposition:In-Reply-To; b=VXuPHVUif72cCTwPdh6OH1UGqPDpWI0mgwPxpOzl1ipzMUjJlffoLmqG0brsc8IBofTnb26FsvCLg/LZKUh6X73SeDXRxakVAB8ntLKgJ+RYBPMkEGumde025r7wrXs8ZENUn/akmS8XGmVXnUoVzuWvIE2mUiYgK0UlFACbwsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=isA2ib1a; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30EABC4CEE5;
+	Mon, 10 Mar 2025 16:37:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741624652;
+	bh=gTUrSXfg09Nwvn6NfV7VP8ZhiyGW1oZOs57vjOlXqgQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=isA2ib1aReU7/YMLC0A167HcEx4jP7QsuD8D2y4izHGn50rEOQFBDYZNSziKJjKDZ
+	 /26GW9HwoehSWRa/6d33Fc8cngSprjxJxZrA4n6n9VOGCNjECpuQeOWVmZzxfmrtV4
+	 qMFiHx1AT0EshM/qKjtN6lsVdN53CY57v2/L0Ztjzd9a1rTe/Vx0dnIrv3uMNSmh9K
+	 hK5KecIm4Hmn+gZtOpdzc39eW5FKGo2b5TMc0yAV29emysm2hYQzguxuUdlnbwcRD/
+	 zUEbNjzMydSPWccmYsjJZXLSxQ+eiHRvav47olH7OLoyaaJDl5ORxzODTZZZHyJuKl
+	 HRNcOENPZvRWA==
+Date: Mon, 10 Mar 2025 16:37:25 +0000
+From: Conor Dooley <conor@kernel.org>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>, devicetree@vger.kernel.org,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Eric Dumazet <edumazet@google.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Minda Chen <minda.chen@starfivetech.com>, netdev@vger.kernel.org,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Rob Herring <robh@kernel.org>,
+	Samin Guo <samin.guo@starfivetech.com>
+Subject: Re: [PATCH net-next 4/7] riscv: dts: starfive: remove
+ "snps,en-tx-lpi-clockgating" property
+Message-ID: <20250310-climatic-monorail-f06784705219@spud>
+References: <Z82tWYZulV12Pjir@shell.armlinux.org.uk>
+ <E1trIAF-005ntc-S5@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="CZyrpZ2HiVDm2QKt"
+Content-Disposition: inline
+In-Reply-To: <E1trIAF-005ntc-S5@rmk-PC.armlinux.org.uk>
+
+
+--CZyrpZ2HiVDm2QKt
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b506b6e9-d5c3-4927-ab2d-e3a241513082@alliedtelesis.co.nz>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 10, 2025 at 02:07:26AM +0000, Chris Packham wrote:
-> So far upstream Linux doesn't have generic paged PHY register functions. 
-> It sounds like that'd be a prerequisite for this.
+On Sun, Mar 09, 2025 at 03:02:03PM +0000, Russell King (Oracle) wrote:
+> Whether the MII transmit clock can be stopped is primarily a property
+> of the PHY (there is a capability bit that should be checked first.)
+> Whether the MAC is capable of stopping the transmit clock is a separate
+> issue, but this is already handled by the core DesignWare MAC code.
+>=20
+> As commit "net: stmmac: starfive: use PHY capability for TX clock stop"
+> adds the flag to use the PHY capability, remove the DT property that is
+> now unecessary.
+>=20
+> Cc: Samin Guo <samin.guo@starfivetech.com>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-If it doesn't, then what are:
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
 
-phy_save_paged()
-phy_select_page()
-phy_restore_page()
-phy_read_paged()
-phy_write_paged()
-phy_modify_paged()
 
-etc?
+--CZyrpZ2HiVDm2QKt
+Content-Type: application/pgp-signature; name="signature.asc"
 
-These are at the _phy_ level because it requires the co-operation of
-the PHY driver to select the page in the PHY (each PHY vendor does
-paging differently.) They aren't a MDIO bus level thing because paging
-doesn't exist at that level.
+-----BEGIN PGP SIGNATURE-----
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZ88VRAAKCRB4tDGHoIJi
+0igTAQCFZVYFhHAngmyoswJyr+9kBc4WZx2CvPHD4XUtMbBjEQEA6wyvNZXw1B0U
+/+2ky25MqZJCRKv33flXhTeDh7fNYw4=
+=M1xu
+-----END PGP SIGNATURE-----
+
+--CZyrpZ2HiVDm2QKt--
 
