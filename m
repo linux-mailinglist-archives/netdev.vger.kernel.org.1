@@ -1,172 +1,126 @@
-Return-Path: <netdev+bounces-173581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C25F5A59A74
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 16:57:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41ED5A59AA1
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 17:05:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B939F3A6997
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 15:56:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E18CE188F33A
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 16:06:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BB0C22E3F1;
-	Mon, 10 Mar 2025 15:57:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AFEF22D4F4;
+	Mon, 10 Mar 2025 16:05:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n8Pgzb2W"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UFdLWwR6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E2DE22B8CA
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 15:57:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB30522D4DE;
+	Mon, 10 Mar 2025 16:05:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741622222; cv=none; b=n61HC+wmlZHtW2mPxN1ol5j26dxAR6q6f6+yUS/qsR8DcrApHc/9IbbUHRe76wZ6NCFm7Ppfh7IWMp91T1Q3v8qrxmPiQ4dDsfjJm3kyAfgt6Mnjk8xAGRi1FU3EcfKriOLOeO4V5TPCUY++qxbhaRqFu2XqsLs5mKo4JuiJgXQ=
+	t=1741622751; cv=none; b=ZPrzYBx+6DKkeoaIculzp4KbGrzs4NZF27nNGYK4/fiJiQRzlbrQtNMLefQTTCaq+lGgDPRutw9ZbgywtbJC9nfid40oFN/iwQ+9wZtWJVdFChqgIl0+uX8UO2SfmpCauz80PClh2K2iATvUZPma/VoPbu0b49upE6v6pNYl8dc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741622222; c=relaxed/simple;
-	bh=UfzIwipQYZKlD1IFnNP2s2QWol3tOEz3nnLOdVk3cVc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qMg1VwTeSIn+NMh5pzo+MifOnAgMbSDJdbHBvFPDRdIqOeMxgKbnaAO4qIEvsbOKFOgm5UqiQXbk7/NC//r/DVz0IuDTcU0PUoQQ73lloiKH3E76Z7G7x+jSeX1OmDiWxqL5qqW35q1L+fOOULP3yShrXab8fxj7UIO1wC0eyeA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n8Pgzb2W; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741622221; x=1773158221;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=UfzIwipQYZKlD1IFnNP2s2QWol3tOEz3nnLOdVk3cVc=;
-  b=n8Pgzb2WOV14A7NUxzKlisL7+yWvmExgEK7NllyK4kWi9XtDGxfzzgk0
-   t6iXnlsNHxXxeBhNhpfZnATHg7RNrAzcdrRRmkxQbSms6zo/gWecCCl5l
-   RDpjmVhoCW/w++1y6rJ4bW0bsp9ATkQ0JBH+/idvkiOKXtXJZQGZRd6gC
-   eNX2pNe3626ph63MdonCrfjRsWX7siNhlROxHCSRAzvFixsBH5wMqk0+j
-   3+ahzQhKjUnpJKcG8Jud/rg5MU+JjiIH61DczgXD3HM0fP5qFrvhXvvtc
-   EUBPPBa3Igy89jy84FYZdciBB+gTSNSFoBEeQBfyDVwGhCgKUZSyRIWKL
-   Q==;
-X-CSE-ConnectionGUID: sHmntlULTyi2Beu5s2VMkQ==
-X-CSE-MsgGUID: 15GO/qbyTbOooLxhB1xG1Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="53614649"
-X-IronPort-AV: E=Sophos;i="6.14,236,1736841600"; 
-   d="scan'208";a="53614649"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 08:57:00 -0700
-X-CSE-ConnectionGUID: c+imipRMR2WxBNHrZmx4uQ==
-X-CSE-MsgGUID: jfQTKGA0TxWiiROmb069Gw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,236,1736841600"; 
-   d="scan'208";a="124931255"
-Received: from lkp-server02.sh.intel.com (HELO a4747d147074) ([10.239.97.151])
-  by orviesa003.jf.intel.com with ESMTP; 10 Mar 2025 08:56:57 -0700
-Received: from kbuild by a4747d147074 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1trfUs-0004Py-39;
-	Mon, 10 Mar 2025 15:56:54 +0000
-Date: Mon, 10 Mar 2025 23:56:46 +0800
-From: kernel test robot <lkp@intel.com>
-To: Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com,
-	Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next 3/4] inet: frags: change inet_frag_kill() to
- defer refcount updates
-Message-ID: <202503102308.1uTA6Uxr-lkp@intel.com>
-References: <20250309173151.2863314-4-edumazet@google.com>
+	s=arc-20240116; t=1741622751; c=relaxed/simple;
+	bh=1sBzCrcWxCos2ucPDzOy8rSIoDUK4uuBb9IVbzpXf6Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QqzcbANwYP6b4CgP1AhJQ0VzbVX+VXdmRTYln3T0ceK74Foe/LntN25CEPxYLyyNHC0SlnvFzJHqrLdFpbXweJqa4kDmdu/zxGTL5LVewcctz7VuENTUU289aN6CeXPobMJTnAxzKsy/cJPD1+TCQYSeyu/bwm5GcJk7oitga6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UFdLWwR6; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43bcc04d4fcso27034305e9.2;
+        Mon, 10 Mar 2025 09:05:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741622748; x=1742227548; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1sBzCrcWxCos2ucPDzOy8rSIoDUK4uuBb9IVbzpXf6Y=;
+        b=UFdLWwR69Mq7wYurBaUVZ8xlw6NHfRTsErBWOwwtDaaMqUvxrpwnAdQVRSQHmlZxvB
+         v7Fxd8ecCd1Skb8HM+T61KQXKZq9Mde4RH3qMYQTAcRUMvTshNvdA59Wvjr0pskQvErx
+         om3H7pg+HPlW00FpKVkekBte/se/RY/bLHZJmDZT0zSixBENkok9Ks+V+7EcC5Hkk/dM
+         12X0F+YOdBHnoljpxqN5Q16pFe9Ki2o3zsEELxL8pBY7SQBSgCblPc7IPXHvS99cbQwL
+         HRuXpM3FqMV3y1mdhMJc076LrIXbwF+0IuNcsspr+zk5SBOU5xvrDsR349uGGoIWXrEN
+         juSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741622748; x=1742227548;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1sBzCrcWxCos2ucPDzOy8rSIoDUK4uuBb9IVbzpXf6Y=;
+        b=V4sdUKgS3aYAmZR23Bqroi1Rh9H+ape/mxACA6whL9mmHpb6na9gZy2HY5efD+q0ce
+         YmXDhDQXlBmZrhh/4zRFbMtIXdvo7gaKaxIaMEJ3WL6XKXoYYinkZtPr1RmAr/nIKMSK
+         aJvSh5BNZaxDWRPqwj3FXNqKd+WnTrgmkNsHAP7szXZZS5tmthEPNRDsgOIOEC3iTxl+
+         6Va29htmdPb6OYY4Dc7rz6Wl5Wpx4QrkXz2JNoRKB2Z3pyc2SblQMGVsqrd/qCLKgM1b
+         O614JCW3kK4Rvwv0xcLKWTfT87QBO9c4vr/DpquG4l2clhX4FM6oqLev2B2v8avZGkhL
+         XgDw==
+X-Forwarded-Encrypted: i=1; AJvYcCVkyQ+z0mKyZyq5v68NodCvECPe4A6HuGAZ8XY3t9vp9RGeoiyHYkea7OHp6YhK10gaWNSkA+Ao/02hQMAD@vger.kernel.org, AJvYcCWLQLtAj8gazEyMeefryfot2oGtJZQmutX/N5SH7INYMSmOgufZyuU9jV4hksnxG+awg0IovCAk@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8OVKDJfR4Dhb9oLcBd7viDwrQeQslYWnOWqTLzhYhemysyZfO
+	xzYEolG8smpUNPneL85bW4JJwERNiKgHchCqOez6YE2LXUaC5u4Z/vC46A==
+X-Gm-Gg: ASbGnctFF1Dbwwus7z3kGg6dDpZRDOoWd1FhOtECPZAmiUX4eet/up6qHWj8MZJwfQ3
+	JwaeLIxDnQxgMT++KKqVdlXj/iEBcyUatlWi4UpSDbxLkngO3YNJwXB+Lh1EF8NFyyqi21PJszq
+	Xpzzkf6mJnqw3yIckXFSHZRUp1gDm5fzCK58THW+RJkYrOHuc4vpWjik5AmUqY7dtQLcz3w9p96
+	79+o1GBnPfme7fPmLp7V5aZpR1wXiaRTNgsEZXdLXXGQEKPOy0WCNGUdyofi06pPpW7XG74R96O
+	uxkrT55UoAkX5ok8vQw/nVx/zmYzuIkhu8Yw/85pZmMM6kYstkPw2gAIYz15SSUeIg2r8Y5VlJE
+	eG9JT8MJ8dl4qCZmSs0iL
+X-Google-Smtp-Source: AGHT+IH1HHf+1OpwkvFsYArfklWxYPjgWRGPYO6MW19aTR4oUCtXkTsxgz2AKwy1itY/6jY/cI2jWA==
+X-Received: by 2002:a05:6000:410a:b0:391:4559:8761 with SMTP id ffacd0b85a97d-39145598929mr2906294f8f.36.1741622747749;
+        Mon, 10 Mar 2025 09:05:47 -0700 (PDT)
+Received: from jernej-laptop.localnet (86-58-6-171.dynamic.telemach.net. [86.58.6.171])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43cfa0723c9sm34686035e9.6.2025.03.10.09.05.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Mar 2025 09:05:47 -0700 (PDT)
+From: Jernej =?UTF-8?B?xaBrcmFiZWM=?= <jernej.skrabec@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Chen-Yu Tsai <wens@csie.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jerome Brunet <jbrunet@baylibre.com>, Kevin Hilman <khilman@baylibre.com>,
+ linux-amlogic@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ linux-arm-msm@vger.kernel.org, linux-mediatek@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, linux-sunxi@lists.linux.dev,
+ Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>, Samuel Holland <samuel@sholland.org>,
+ Vinod Koul <vkoul@kernel.org>
+Subject: Re: [PATCH net-next 9/9] net: stmmac: sunxi: remove of_get_phy_mode()
+Date: Mon, 10 Mar 2025 17:05:45 +0100
+Message-ID: <2774218.mvXUDI8C0e@jernej-laptop>
+In-Reply-To: <E1trbyF-005qYl-Lu@rmk-PC.armlinux.org.uk>
+References:
+ <Z87WVk0NzMUyaxDj@shell.armlinux.org.uk>
+ <E1trbyF-005qYl-Lu@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250309173151.2863314-4-edumazet@google.com>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
 
-Hi Eric,
+Dne ponedeljek, 10. marec 2025 ob 13:10:59 Srednjeevropski standardni =C4=
+=8Das je Russell King (Oracle) napisal(a):
+> devm_stmmac_probe_config_dt() already gets the PHY mode from firmware,
+> which is stored in plat_dat->phy_interface. Therefore, we don't need to
+> get it in platform code.
+>=20
+> Set gmac->interface from plat_dat->phy_interface.
+>=20
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-kernel test robot noticed the following build errors:
+Acked-by: Jernej Skrabec <jernej.skrabec@gmail.com>
 
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/inet-frags-add-inet_frag_putn-helper/20250310-013501
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250309173151.2863314-4-edumazet%40google.com
-patch subject: [PATCH net-next 3/4] inet: frags: change inet_frag_kill() to defer refcount updates
-config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/20250310/202503102308.1uTA6Uxr-lkp@intel.com/config)
-compiler: clang version 21.0.0git (https://github.com/llvm/llvm-project e15545cad8297ec7555f26e5ae74a9f0511203e7)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250310/202503102308.1uTA6Uxr-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202503102308.1uTA6Uxr-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> net/ieee802154/6lowpan/reassembly.c:312:45: error: too few arguments to function call, expected 4, have 3
-     312 |                 ret = lowpan_frag_queue(fq, skb, frag_type);
-         |                       ~~~~~~~~~~~~~~~~~                   ^
-   net/ieee802154/6lowpan/reassembly.c:86:12: note: 'lowpan_frag_queue' declared here
-      86 | static int lowpan_frag_queue(struct lowpan_frag_queue *fq,
-         |            ^                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      87 |                              struct sk_buff *skb, u8 frag_type,
-         |                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      88 |                              int *refs)
-         |                              ~~~~~~~~~
-   1 error generated.
+Best regards,
+Jernej
 
 
-vim +312 net/ieee802154/6lowpan/reassembly.c
-
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  280  
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  281  int lowpan_frag_rcv(struct sk_buff *skb, u8 frag_type)
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  282  {
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  283  	struct lowpan_frag_queue *fq;
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  284  	struct net *net = dev_net(skb->dev);
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  285  	struct lowpan_802154_cb *cb = lowpan_802154_cb(skb);
-f18fa5de5ba7f1d net/ieee802154/6lowpan/reassembly.c Alexander Aring    2018-04-20  286  	struct ieee802154_hdr hdr = {};
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  287  	int err;
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  288  
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  289  	if (ieee802154_hdr_peek_addrs(skb, &hdr) < 0)
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  290  		goto err;
-ae531b9475f62c5 net/ieee802154/reassembly.c         Phoebe Buckheister 2014-03-14  291  
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  292  	err = lowpan_get_cb(skb, frag_type, cb);
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  293  	if (err < 0)
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  294  		goto err;
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  295  
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  296  	if (frag_type == LOWPAN_DISPATCH_FRAG1) {
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  297  		err = lowpan_invoke_frag_rx_handlers(skb);
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  298  		if (err == NET_RX_DROP)
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  299  			goto err;
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  300  	}
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  301  
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  302  	if (cb->d_size > IPV6_MIN_MTU) {
-6697dabe27e0330 net/ieee802154/reassembly.c         Martin Townsend    2014-08-19  303  		net_warn_ratelimited("lowpan_frag_rcv: datagram size exceeds MTU\n");
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  304  		goto err;
-6697dabe27e0330 net/ieee802154/reassembly.c         Martin Townsend    2014-08-19  305  	}
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  306  
-72a5e6bb5120d64 net/ieee802154/6lowpan/reassembly.c Alexander Aring    2015-09-02  307  	fq = fq_find(net, cb, &hdr.source, &hdr.dest);
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  308  	if (fq != NULL) {
-aec42e105cebf42 net/ieee802154/6lowpan/reassembly.c Eric Dumazet       2025-03-09  309  		int ret, refs = 1;
-4710d806fcb8251 net/ieee802154/reassembly.c         Varka Bhadram      2014-07-02  310  
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  311  		spin_lock(&fq->q.lock);
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28 @312  		ret = lowpan_frag_queue(fq, skb, frag_type);
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  313  		spin_unlock(&fq->q.lock);
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  314  
-aec42e105cebf42 net/ieee802154/6lowpan/reassembly.c Eric Dumazet       2025-03-09  315  		inet_frag_putn(&fq->q, refs);
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  316  		return ret;
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  317  	}
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  318  
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  319  err:
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  320  	kfree_skb(skb);
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  321  	return -1;
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  322  }
-7240cdec60b136f net/ieee802154/reassembly.c         Alexander Aring    2014-02-28  323  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
