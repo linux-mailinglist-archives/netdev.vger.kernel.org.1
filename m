@@ -1,96 +1,65 @@
-Return-Path: <netdev+bounces-173595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC06EA59BCE
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 17:57:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2ABFA59BCF
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 17:58:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08DF11631B6
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 16:57:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04810161CE4
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 16:58:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F0E819004A;
-	Mon, 10 Mar 2025 16:57:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EFA8230988;
+	Mon, 10 Mar 2025 16:58:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Zs0y5OWI";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="YcyBU8/T";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Zs0y5OWI";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="YcyBU8/T"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mgQckWjX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA3322D4C3
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 16:57:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4455222D4C3;
+	Mon, 10 Mar 2025 16:58:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741625876; cv=none; b=pLFvL535B8wOp8fwR3r3Pg847j7v0lm4eljT4+SXRYo5sJhb/QzbNbl5i6Gu64fnQpgEHrWUV4ikLJ2mYu8XOSneTmwQHCjgtUkCZyk7OH6pcnRAtUUDmTv92As1xceIvnqyCTBS6Gy+mRM0/sn5VOrfzZtbrOCNffFidE4Yvt0=
+	t=1741625888; cv=none; b=aI8pFoYEdrPxlFixuyuTLTHDbyVrP6YJQQTkgdlSubVywPwmabzOuaC+/9LlqGKkxw9zm/sBbe3HOQIk70thln/IHOoMCdJgDNmnerPq4AktiDWi5Q3E8h9lmPcuFGf15aVTSw4nshXNFDhOwePmEvD5Qjg7ABxIjpC7cIzZguM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741625876; c=relaxed/simple;
-	bh=pyEhOZ4T5wEhluI8BXqIg3KeV59X7Xo0LJIEbsHenXY=;
+	s=arc-20240116; t=1741625888; c=relaxed/simple;
+	bh=1FDqnMxGLcsQkkezE18gJh/6LPBzJwjMsNmthUDDBJY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bf3kQbQYz7jG7WvJHmroPtCbB887KIFoWtawNAblULHsBihY9nDNVfHlknOrD8d+CsUE3LvTrvGYteltExmbIsAe3iJ9ezgyRhykdVTvtg9hQhlhf9oflb0v8d8d9X2i7+NyBoS9/MZobDdmGja7Og3gpZSIDuHKi/PlNGcDhZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Zs0y5OWI; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=YcyBU8/T; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Zs0y5OWI; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=YcyBU8/T; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 206C92116A;
-	Mon, 10 Mar 2025 16:57:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1741625872; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=e4w45nsVxHeXtophxwQSVEyLK4/8e3QpCJr29a0SzxY=;
-	b=Zs0y5OWIMGaKF3QY3KtGKL+PrIhcMj6H+5+6PANETRoJt1VSR0lfFYuedfr2GbiYSwdcR/
-	4tYvJsClRG3SNeZnYA4Tbs7u4AmDFp0tWL4y2VyY4zJjVqAVhBYL9yyFd3dHOt6oR1EySu
-	Yn/6G3OAltAec7LRnMhxTrv2dWCUXn8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1741625872;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=e4w45nsVxHeXtophxwQSVEyLK4/8e3QpCJr29a0SzxY=;
-	b=YcyBU8/T8/9V9L8iiboFv5kiU6Rx8m7MqftYjDlq6jB0qmWVb5UF4jrkPM3JbqusNRssth
-	6oUpG5ux1wY9bOAQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Zs0y5OWI;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="YcyBU8/T"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1741625872; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=e4w45nsVxHeXtophxwQSVEyLK4/8e3QpCJr29a0SzxY=;
-	b=Zs0y5OWIMGaKF3QY3KtGKL+PrIhcMj6H+5+6PANETRoJt1VSR0lfFYuedfr2GbiYSwdcR/
-	4tYvJsClRG3SNeZnYA4Tbs7u4AmDFp0tWL4y2VyY4zJjVqAVhBYL9yyFd3dHOt6oR1EySu
-	Yn/6G3OAltAec7LRnMhxTrv2dWCUXn8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1741625872;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=e4w45nsVxHeXtophxwQSVEyLK4/8e3QpCJr29a0SzxY=;
-	b=YcyBU8/T8/9V9L8iiboFv5kiU6Rx8m7MqftYjDlq6jB0qmWVb5UF4jrkPM3JbqusNRssth
-	6oUpG5ux1wY9bOAQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id F110D139E7;
-	Mon, 10 Mar 2025 16:57:51 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id nw1HOQ8az2f+ZwAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 10 Mar 2025 16:57:51 +0000
-Message-ID: <77fa8d7e-4752-4979-affe-aa45c8d7795a@suse.de>
-Date: Mon, 10 Mar 2025 17:57:51 +0100
+	 In-Reply-To:Content-Type; b=mWhmmbZPdeWZJnyfoKKooqu8OJc8h2wIjPT5MWnfQmOyg6RsyR6spr0oEox6ZIOB5TPO47DkaRayfgk7hUUoThtCzw3oCPVaPQNKCW1nOawSV7vIL37zF0VzDcxiUaoshUDNng5iBJynR/bT6ChoGYTx8eaoUO64O7fWW6kG4ng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mgQckWjX; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741625887; x=1773161887;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=1FDqnMxGLcsQkkezE18gJh/6LPBzJwjMsNmthUDDBJY=;
+  b=mgQckWjXODnYMThEcg7xPAZutL4xL7wTzz/zmgRsSCtDQHecEpPeQTdJ
+   bTa9IrG1OkUr7eONMbcze91+GYRoRhXiGuQ89cJW06niMf4l7Oo3/KnBo
+   9DZNtViWYI3cZdU+Ip5+fvM/Vq9iPhOQQ93Wwz2RV6X0Dwf3MvFjj/Cdc
+   eZgYHeWUFlxVFHp1rcPqQy86bw5MG+ZpUHyuvSVRUdOBC90q5XDO9FhED
+   BNWN95POpXuGsa/3BzpE7G6Yuqh43LuiMrla66GSLC7y0PgFgJRPrV8I6
+   qPVaG1OTg8Nvui9S6Stns2Yncsk1gOZhYIgZ7aQOkF6q9P/fC+KRJnYBk
+   Q==;
+X-CSE-ConnectionGUID: 7eZiw8P8TSup2MmL2oL3IQ==
+X-CSE-MsgGUID: yVcGyEyWQF+48f1+y/RJ5w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="42847458"
+X-IronPort-AV: E=Sophos;i="6.14,236,1736841600"; 
+   d="scan'208";a="42847458"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 09:58:06 -0700
+X-CSE-ConnectionGUID: Y+zzCClDQ0GtFnQM7MVIRA==
+X-CSE-MsgGUID: fMlt3OS9SHCdj+vSrO0jKw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,236,1736841600"; 
+   d="scan'208";a="120570233"
+Received: from dnelso2-mobl.amr.corp.intel.com (HELO [10.125.111.63]) ([10.125.111.63])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 09:58:04 -0700
+Message-ID: <a3b9c248-94de-4237-8ab4-f425bfc66258@intel.com>
+Date: Mon, 10 Mar 2025 09:58:03 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,90 +67,98 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] mm: Decline to manipulate the refcount on a slab page
-To: "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Cc: netdev@vger.kernel.org, Vlastimil Babka <vbabka@suse.cz>
-References: <20250310142750.1209192-1-willy@infradead.org>
+Subject: Re: [PATCH v3 1/6] pds_core: make pdsc_auxbus_dev_del() void
+To: Shannon Nelson <shannon.nelson@amd.com>, jgg@nvidia.com,
+ andrew.gospodarek@broadcom.com, aron.silverton@oracle.com,
+ dan.j.williams@intel.com, daniel.vetter@ffwll.ch, dsahern@kernel.org,
+ gregkh@linuxfoundation.org, hch@infradead.org, itayavr@nvidia.com,
+ jiri@nvidia.com, Jonathan.Cameron@huawei.com, kuba@kernel.org,
+ lbloch@nvidia.com, leonro@nvidia.com, linux-cxl@vger.kernel.org,
+ linux-rdma@vger.kernel.org, netdev@vger.kernel.org, saeedm@nvidia.com
+Cc: brett.creeley@amd.com
+References: <20250307185329.35034-1-shannon.nelson@amd.com>
+ <20250307185329.35034-2-shannon.nelson@amd.com>
 Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20250310142750.1209192-1-willy@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 206C92116A
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCPT_COUNT_THREE(0.00)[3];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -4.51
-X-Spam-Flag: NO
+From: Dave Jiang <dave.jiang@intel.com>
+In-Reply-To: <20250307185329.35034-2-shannon.nelson@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 3/10/25 15:27, Matthew Wilcox (Oracle) wrote:
-> Slab pages now have a refcount of 0, so nobody should be trying to
-> manipulate the refcount on them.  Doing so has little effect; the object
-> could be freed and reallocated to a different purpose, although the slab
-> itself would not be until the refcount was put making it behave rather
-> like TYPESAFE_BY_RCU.
+
+
+On 3/7/25 11:53 AM, Shannon Nelson wrote:
+> Since there really is no useful return, advertising a return value
+> is rather misleading.  Make pdsc_auxbus_dev_del() a void function.
 > 
-> Unfortunately, __iov_iter_get_pages_alloc() does take a refcount.
-> Fix that to not change the refcount, and make put_page() silently not
-> change the refcount.  get_page() warns so that we can fix any other
-> callers that need to be changed.
-> 
-> Long-term, networking needs to stop taking a refcount on the pages that
-> it uses and rely on the caller to hold whatever references are necessary
-> to make the memory stable.  In the medium term, more page types are going
-> to hav a zero refcount, so we'll want to move get_page() and put_page()
-> out of line.
-> 
-> Reported-by: Hannes Reinecke <hare@suse.de>
-> Fixes: 9aec2fb0fd5e (slab: allocate frozen pages)
-> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+> Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+
+Reviewed-by: Dave Jiang <dave.jiang@intel.com>
+
 > ---
->   include/linux/mm.h | 7 ++++++-
->   lib/iov_iter.c     | 8 ++++++--
->   2 files changed, 12 insertions(+), 3 deletions(-)
+>  drivers/net/ethernet/amd/pds_core/auxbus.c  | 7 +------
+>  drivers/net/ethernet/amd/pds_core/core.h    | 2 +-
+>  drivers/net/ethernet/amd/pds_core/devlink.c | 6 ++++--
+>  3 files changed, 6 insertions(+), 9 deletions(-)
 > 
+> diff --git a/drivers/net/ethernet/amd/pds_core/auxbus.c b/drivers/net/ethernet/amd/pds_core/auxbus.c
+> index 2babea110991..78fba368e797 100644
+> --- a/drivers/net/ethernet/amd/pds_core/auxbus.c
+> +++ b/drivers/net/ethernet/amd/pds_core/auxbus.c
+> @@ -175,13 +175,9 @@ static struct pds_auxiliary_dev *pdsc_auxbus_dev_register(struct pdsc *cf,
+>  	return padev;
+>  }
+>  
+> -int pdsc_auxbus_dev_del(struct pdsc *cf, struct pdsc *pf)
+> +void pdsc_auxbus_dev_del(struct pdsc *cf, struct pdsc *pf)
+>  {
+>  	struct pds_auxiliary_dev *padev;
+> -	int err = 0;
+> -
+> -	if (!cf)
+> -		return -ENODEV;
+>  
+>  	mutex_lock(&pf->config_lock);
+>  
+> @@ -195,7 +191,6 @@ int pdsc_auxbus_dev_del(struct pdsc *cf, struct pdsc *pf)
+>  	pf->vfs[cf->vf_id].padev = NULL;
+>  
+>  	mutex_unlock(&pf->config_lock);
+> -	return err;
+>  }
+>  
+>  int pdsc_auxbus_dev_add(struct pdsc *cf, struct pdsc *pf)
+> diff --git a/drivers/net/ethernet/amd/pds_core/core.h b/drivers/net/ethernet/amd/pds_core/core.h
+> index 14522d6d5f86..631a59cfdd7e 100644
+> --- a/drivers/net/ethernet/amd/pds_core/core.h
+> +++ b/drivers/net/ethernet/amd/pds_core/core.h
+> @@ -304,7 +304,7 @@ int pdsc_register_notify(struct notifier_block *nb);
+>  void pdsc_unregister_notify(struct notifier_block *nb);
+>  void pdsc_notify(unsigned long event, void *data);
+>  int pdsc_auxbus_dev_add(struct pdsc *cf, struct pdsc *pf);
+> -int pdsc_auxbus_dev_del(struct pdsc *cf, struct pdsc *pf);
+> +void pdsc_auxbus_dev_del(struct pdsc *cf, struct pdsc *pf);
+>  
+>  void pdsc_process_adminq(struct pdsc_qcq *qcq);
+>  void pdsc_work_thread(struct work_struct *work);
+> diff --git a/drivers/net/ethernet/amd/pds_core/devlink.c b/drivers/net/ethernet/amd/pds_core/devlink.c
+> index 44971e71991f..4e2b92ddef6f 100644
+> --- a/drivers/net/ethernet/amd/pds_core/devlink.c
+> +++ b/drivers/net/ethernet/amd/pds_core/devlink.c
+> @@ -56,8 +56,10 @@ int pdsc_dl_enable_set(struct devlink *dl, u32 id,
+>  	for (vf_id = 0; vf_id < pdsc->num_vfs; vf_id++) {
+>  		struct pdsc *vf = pdsc->vfs[vf_id].vf;
+>  
+> -		err = ctx->val.vbool ? pdsc_auxbus_dev_add(vf, pdsc) :
+> -				       pdsc_auxbus_dev_del(vf, pdsc);
+> +		if (ctx->val.vbool)
+> +			err = pdsc_auxbus_dev_add(vf, pdsc);
+> +		else
+> +			pdsc_auxbus_dev_del(vf, pdsc);
+>  	}
+>  
+>  	return err;
 
-I assume we will have a discussion at LSF around frozen pages/slab
-behaviour?
-It's not just networking, also every driver using iov_alloc_pages() and
-friends is potentially affected.
-And it would be good to clarify rules how these iterators should be
-used.
-
-But that doesn't affect this patch, so:
-
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
