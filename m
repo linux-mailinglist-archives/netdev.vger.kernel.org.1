@@ -1,218 +1,334 @@
-Return-Path: <netdev+bounces-173468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF77FA591EB
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 11:54:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E4CAA59224
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:00:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B0937A3D40
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 10:53:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B26D3AFD54
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 10:58:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6E6B227EB1;
-	Mon, 10 Mar 2025 10:50:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 248AD22A7F2;
+	Mon, 10 Mar 2025 10:57:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iRG5z+v9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jlHxb33F"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26FD4227E81
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 10:50:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2747E22A4F2;
+	Mon, 10 Mar 2025 10:57:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741603841; cv=none; b=W2bNOmKb6cBdVOTvBN1QAT2jHE2qL9u3jPklOdKZ4g5okLeP7wWC6Dn2DHPQOByt2appKxQCFSXnq0iOLFeSSdZusNe80RlorUCuJqGwLx0WiYizORnI4V/EwdgZDmd76BP6rfvjG2AvhlaJ17fT4vf3Ygtn1TslnqESNFQ1PJw=
+	t=1741604270; cv=none; b=cx2JRddgYeo96RmXKvKxA3C+oprUmm/3iUrS/vxi72vqthp405GScbxreY6pH+2SeirKmp5sWAY0TGTjCM+ba/AWcnZ7lQ1LnWiYbVVr0cFaAj3b7YKop8PKu0XHh/psDiVf49z6BVx6y5lt5YQYY0slJmWso5DY1gwmkaD8yMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741603841; c=relaxed/simple;
-	bh=8Ke5r5EWzcOxUSC+3fnaQfDYZktH68rkRSOJseUUTRk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=negSrqMs3GnzmalzGwqe7q5RdZq+G1qHVYHNSn6TacHUoSgpWEwcBwSCS73DJiOd2sSYslF1CiGTSEU9jz5bn9rScyzfhARXrdpR5i6GilkSA+IbUwoiFQKtZySMk2ehqkqSr0UdXI4sMVfU0jM+84CN/Wg9XH+nSz+mWOb8bmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iRG5z+v9; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741603836;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8MDkm0T3YtIhnU9EfRl2HAFi+SIIpJRBoztoRpFsoLM=;
-	b=iRG5z+v9FpKfZRJqO/CraQdhEweidtPb5y5QrnaDJXAWyZyeTXdTZdGXrvPb5mkDdwTsmj
-	Vglr8JThxNEZMf6uTy0csU+eq3zKcGACUS661R6CGndGbahATkU9pOmuy8HlnHC9klsoV5
-	OV1dIGCBfuuQisSnCc0ErTN0ergdask=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-192-cwY9sPzTPFmQTOXzDA1-0g-1; Mon, 10 Mar 2025 06:50:32 -0400
-X-MC-Unique: cwY9sPzTPFmQTOXzDA1-0g-1
-X-Mimecast-MFC-AGG-ID: cwY9sPzTPFmQTOXzDA1-0g_1741603831
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-ac21697a8ebso335155266b.1
-        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 03:50:32 -0700 (PDT)
+	s=arc-20240116; t=1741604270; c=relaxed/simple;
+	bh=uJw9kg+WhrQUC7QeXnlkc/WQDIPvPu+MedSuKX9lsr8=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lp8Bk7aJb0875OV4ZyQECwJdK3bs6YLmaiPbWSMenbPpvtVZVkIhxCVrdS6UkS7xv02u99L5jB0vcL6TGKNXkBF+8aJnbxNf3UjUPMVPGFVF2zcTHwHth3CntNTsjEu0ezKYq3MFYKggQJq5TXt5NKeFBB5mGipHT0L56Polwt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jlHxb33F; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5e677f59438so1883723a12.2;
+        Mon, 10 Mar 2025 03:57:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741604266; x=1742209066; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=xOafrjis4rlmeWlptFsFh4bdDZx32GpWyV/5UBeU/58=;
+        b=jlHxb33FBbeXqj69/Y6HC1kBy3cJPLikdjGq7C/Nv5uVXEnHXawr6dujFDynFkH3fo
+         uzl3X6ZjhAhxjWrw79CUTNqMVkQtHK7z0oDZfgxCznJVDYPMM1vz7qXLUF9uVoBuHCvS
+         bmit1bGA7hSmPmkI1hj2qIE9RJ3salxRFIHKglaqj6toyz9g7PyYVT3f6BvKwkqxlliW
+         BMP1g7V74g5PTAUXQ2AaF6bryPqtT4VSCBcY/3/CDbzgarHSGVu/olllU7L2BMby4AGR
+         b4ZoWeT6bBOd3TATD5/HB6AHcVfVv72QXSh0FVvzMWWB9ww6rpXCSgR+gfaIDHyHhudO
+         lqFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741603831; x=1742208631;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1741604266; x=1742209066;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8MDkm0T3YtIhnU9EfRl2HAFi+SIIpJRBoztoRpFsoLM=;
-        b=vaoL22fcO4+RczN+qGq164X/oy57JVoG1cx/B3JqOOQ/2UO1mEVSwmjag+AQQfLDvY
-         LZ7nwkulmV3aOxQlbFlP1WBYUfF393plgnxImLRbQu39SJfjtWdQ3FXdWF30aLCjmpdd
-         ZVRgJt3OgRk0QFjDeZJ4bCbo9Z2YMxhaPKaSFDvRFNbG8MUQz4M7j0lhdmPXXs8oHwTT
-         mX7D4QicaVmcN7U5+UNgbTQ2jFGBGjMXeSoKYPh/L5tafXI0n+7QIQmicWP5TYeA/XvP
-         iPbi6lZqZbUHA3lYV5vbIZ8OeRDlcLl7Tc+WHnDC0Fn9CBVmC7pNhp24ajwwiQxY9H0A
-         i8tw==
-X-Gm-Message-State: AOJu0Yz7sG9a2qS3zLThdXEBgwark+cvfAnQNOy4ZSpMu/8tuSjF8fDs
-	WYzcjy0bB/MFcNy2oia452y68TizHdEqnJrW6ZCK8/JH3LiKIp+R4R6iftjJDvE+NZh5X3bJSDt
-	nCisN3x50nCU3xg/LdMo4wj4kT6YNxKmxI8K2Bh0OR4iRcUCUkLJ35ojptP2rPQ==
-X-Gm-Gg: ASbGnctsRSCYFIU9xdZfGIkFndAuZcU2DVSgJejPsj8eOMwOtI/oHaMXukQ2AOYwwMS
-	kZZC2q83BqDO1Sj+teG+qDN+LFBv1dpDGVgSY0wyPNBGZHe7yDsS7nbArAB87ZsxjP9Ep7Altzf
-	ZnztE1pN+DsA96iZG0kswoN8ENy2UyRFRJOkEdqglQWXynMjECq9XURnc7V+/K75lSK8BCz9Hla
-	obwG6IIy2fO0IG4kU+BO53NaS7IrAdc0mwzbM7p6bX51BmbN/h4FcS2ldQTJjvoxvT1Bm8rLRMh
-	9xcxmnyLghTpaC6+9i2/+8UV3YnQdDw3qYqwJJn7XUxz71Jtlzw5zR3rsk+kfs0=
-X-Received: by 2002:a17:906:d552:b0:ac1:ea29:4e63 with SMTP id a640c23a62f3a-ac252a866b6mr1232132166b.26.1741603830851;
-        Mon, 10 Mar 2025 03:50:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGADYNhHzwZIzPXp6bWzsZ5qWlfyUFSyr/MLaLS1nArAA9uovbFqyO+deUUGlUpnOt+OH1Vww==
-X-Received: by 2002:a17:906:d552:b0:ac1:ea29:4e63 with SMTP id a640c23a62f3a-ac252a866b6mr1232129566b.26.1741603830418;
-        Mon, 10 Mar 2025 03:50:30 -0700 (PDT)
-Received: from localhost (net-93-146-37-148.cust.vodafonedsl.it. [93.146.37.148])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac239485bf3sm755327266b.63.2025.03.10.03.50.29
+        bh=xOafrjis4rlmeWlptFsFh4bdDZx32GpWyV/5UBeU/58=;
+        b=YE9Ty67KnaPDYQRk4URBS2pgyJlqW+XXj4i4SvtJbpa/MxzAJP/E2OCS+zEGJc83RD
+         JzqROlOnLsi4ZpsteZDy3+z2pNTbmV+Ge/fWgbOBTKN8B8uRUVaVqkb/1MxBsA4GcZMx
+         f8vuyyuIfFlenXPUIRB4eL48y2QZKwyH530/BUhKxSV54yRNKSZNTD6UeJ7kCePx5X7a
+         0q3LcvjegLtycp/05Rii7892ujFfe3f2yO9h8vWlSmOEQs5Gax9d5o17ceyCeHINNgPT
+         4fjMzDzVXdvJH0W98gu0cvhE2rmG+NyUPnA3lftBQ+wmgRfwdS6Dk3Qbl+vqSABdvFe1
+         OeVA==
+X-Forwarded-Encrypted: i=1; AJvYcCWDUMa+n5t6E6B+bkOzVYcS9f7LhA88QVD6AC92DBgO7jpLuMjPFTiwr7WLvNbQEdCJDWGxSsFS@vger.kernel.org, AJvYcCX8S6i7ggDarWaCHNx59T9qSV7s7vsgni0K6WmM8GlB6H3Cwznyx2X+VQO9kquAg6xuwLyLeIJsl95JhsJ7@vger.kernel.org, AJvYcCXsyzP+TVbcZ8IKP32ZxqFEGSXuLYCK+05FVHOBUPMQhqrmnwcXIhRdt3ZRiMtrZZA8bpjUCitTylKo@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxqdr0qa/AEwm8fYfjzDEoNAvWrhiLiSRmE2m49Zpq4kuvxEVqs
+	LD5crBQNkhkKtIfCTeAos6pLBuhrlqlAw9VR99KeK+FLBC5/OCNq
+X-Gm-Gg: ASbGncvrHoOCIQZr8OBOnP0RjUnQcFkSKbxZf0AP8FYA3yNSUGGumbrf6IeT9H7Ur48
+	xKP6790UCsS0+xbJoWUkxfbXTngZQ52zdLhVBQm/+kWr4JD69ho+tKO1s7JTqiFDXz1bYQJkEwf
+	Vr9SzQJh7pQ0bS5rSfrXobioasvh6u9hZc6opEnrYvYuwcufFKApg+4txppebRYY2XDtyw6tmHi
+	NlykuphJtCo6o8JYGQHbO038Q4Au+DFcjbApQkwwdcMgjEzG9BfGsQ18A7tKi1iZGYqunYcxHfL
+	uZXegbu9vfeM7m7mYJXG80wH40779Gz9eFZeMX9hNQ==
+X-Google-Smtp-Source: AGHT+IGLrFwyyNplAxUO1/Ogn4TU95VnBR/ptGo3XUAJNa2IReXJQVvMshhinBV/v52EUsoHkt8Upg==
+X-Received: by 2002:a17:907:94cb:b0:abf:40a2:40c8 with SMTP id a640c23a62f3a-ac252ae1b6emr1330310766b.28.1741604266018;
+        Mon, 10 Mar 2025 03:57:46 -0700 (PDT)
+Received: from Ansuel-XPS. ([85.119.46.8])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac2856445b1sm321901566b.60.2025.03.10.03.57.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Mar 2025 03:50:29 -0700 (PDT)
-Date: Mon, 10 Mar 2025 11:50:28 +0100
-From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
-To: arthur@arthurfabre.com
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, jakub@cloudflare.com,
-	hawk@kernel.org, yan@cloudflare.com, jbrandeburg@cloudflare.com,
-	thoiland@redhat.com, lbiancon@redhat.com,
-	Arthur Fabre <afabre@cloudflare.com>
-Subject: Re: [PATCH RFC bpf-next 05/20] trait: Replace memcpy calls with
- inline copies
-Message-ID: <Z87D9GblwWBZjwE-@lore-desk>
-References: <20250305-afabre-traits-010-rfc2-v1-0-d0ecfb869797@cloudflare.com>
- <20250305-afabre-traits-010-rfc2-v1-5-d0ecfb869797@cloudflare.com>
+        Mon, 10 Mar 2025 03:57:45 -0700 (PDT)
+Message-ID: <67cec5a9.170a0220.93f86.9dcf@mx.google.com>
+X-Google-Original-Message-ID: <Z87FpUEtUUQYB6s-@Ansuel-XPS.>
+Date: Mon, 10 Mar 2025 11:57:41 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	upstream@airoha.com
+Subject: Re: [net-next PATCH v12 12/13] net: dsa: Add Airoha AN8855 5-Port
+ Gigabit DSA Switch driver
+References: <20250309172717.9067-1-ansuelsmth@gmail.com>
+ <20250309172717.9067-13-ansuelsmth@gmail.com>
+ <Z83WgMeg_IxgbxhO@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="8LdxVSwL0xr9PrwX"
-Content-Disposition: inline
-In-Reply-To: <20250305-afabre-traits-010-rfc2-v1-5-d0ecfb869797@cloudflare.com>
-
-
---8LdxVSwL0xr9PrwX
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <Z83WgMeg_IxgbxhO@shell.armlinux.org.uk>
 
-> From: Arthur Fabre <afabre@cloudflare.com>
->=20
-> When copying trait values to or from the caller, the size isn't a
-> constant so memcpy() ends up being a function call.
->=20
-> Replace it with an inline implementation that only handles the sizes we
+On Sun, Mar 09, 2025 at 05:57:20PM +0000, Russell King (Oracle) wrote:
+> On Sun, Mar 09, 2025 at 06:26:57PM +0100, Christian Marangi wrote:
+> > +static int an8855_port_enable(struct dsa_switch *ds, int port,
+> > +			      struct phy_device *phy)
+> > +{
+> > +	struct an8855_priv *priv = ds->priv;
+> > +
+> > +	return regmap_set_bits(priv->regmap, AN8855_PMCR_P(port),
+> > +			       AN8855_PMCR_TX_EN | AN8855_PMCR_RX_EN);
+> 
+> Shouldn't you wait for phylink to call your mac_link_up() method?
+>
+
+Did something change recently for this? I checked the pattern for other
+driver and port enable normally just enable TX/RX traffic for the port.
+
+Any hint for this?
+
+> > +}
+> > +
+> > +static void an8855_port_disable(struct dsa_switch *ds, int port)
+> > +{
+> > +	struct an8855_priv *priv = ds->priv;
+> > +	int ret;
+> > +
+> > +	ret = regmap_clear_bits(priv->regmap, AN8855_PMCR_P(port),
+> > +				AN8855_PMCR_TX_EN | AN8855_PMCR_RX_EN);
+> > +	if (ret)
+> > +		dev_err(priv->ds->dev, "failed to disable port: %d\n", ret);
+> 
+> Doesn't the link get set down before this is called? IOW, doesn't
+> phylink call your mac_link_down() method first?
+> 
+> ...
+> 
+> > +static void an8855_phylink_mac_link_up(struct phylink_config *config,
+> > +				       struct phy_device *phydev, unsigned int mode,
+> > +				       phy_interface_t interface, int speed,
+> > +				       int duplex, bool tx_pause, bool rx_pause)
+> > +{
+> > +	struct dsa_port *dp = dsa_phylink_to_port(config);
+> > +	struct an8855_priv *priv = dp->ds->priv;
+> > +	int port = dp->index;
+> > +	u32 reg;
+> > +
+> > +	reg = regmap_read(priv->regmap, AN8855_PMCR_P(port), &reg);
+> > +	if (phylink_autoneg_inband(mode)) {
+> > +		reg &= ~AN8855_PMCR_FORCE_MODE;
+> > +	} else {
+> > +		reg |= AN8855_PMCR_FORCE_MODE | AN8855_PMCR_FORCE_LNK;
+> > +
+> > +		reg &= ~AN8855_PMCR_FORCE_SPEED;
+> > +		switch (speed) {
+> > +		case SPEED_10:
+> > +			reg |= AN8855_PMCR_FORCE_SPEED_10;
+> > +			break;
+> > +		case SPEED_100:
+> > +			reg |= AN8855_PMCR_FORCE_SPEED_100;
+> > +			break;
+> > +		case SPEED_1000:
+> > +			reg |= AN8855_PMCR_FORCE_SPEED_1000;
+> > +			break;
+> > +		case SPEED_2500:
+> > +			reg |= AN8855_PMCR_FORCE_SPEED_2500;
+> > +			break;
+> > +		case SPEED_5000:
+> > +			dev_err(priv->ds->dev, "Missing support for 5G speed. Aborting...\n");
+> > +			return;
+> > +		}
+> > +
+> > +		reg &= ~AN8855_PMCR_FORCE_FDX;
+> > +		if (duplex == DUPLEX_FULL)
+> > +			reg |= AN8855_PMCR_FORCE_FDX;
+> > +
+> > +		reg &= ~AN8855_PMCR_RX_FC_EN;
+> > +		if (rx_pause || dsa_port_is_cpu(dp))
+> > +			reg |= AN8855_PMCR_RX_FC_EN;
+> > +
+> > +		reg &= ~AN8855_PMCR_TX_FC_EN;
+> > +		if (rx_pause || dsa_port_is_cpu(dp))
+> > +			reg |= AN8855_PMCR_TX_FC_EN;
+> > +
+> > +		/* Disable any EEE options */
+> > +		reg &= ~(AN8855_PMCR_FORCE_EEE5G | AN8855_PMCR_FORCE_EEE2P5G |
+> > +			 AN8855_PMCR_FORCE_EEE1G | AN8855_PMCR_FORCE_EEE100);
+> 
+> Why? Maybe consider implementing the phylink tx_lpi functions for EEE
 > support.
->=20
-> We store values "packed", so they won't necessarily be 4 or 8 byte
-> aligned.
->=20
-> Setting and getting traits is roughly ~40% faster.
+> 
 
-Nice! I guess in a formal series this patch can be squashed with patch 1/20
-(adding some comments).
+Will do, I disabled this as the EEE rework was being approved.
 
-Regards,
-Lorenzo
+> > +	}
+> > +
+> > +	reg |= AN8855_PMCR_TX_EN | AN8855_PMCR_RX_EN;
+> > +
+> > +	regmap_write(priv->regmap, AN8855_PMCR_P(port), reg);
+> > +}
+> > +
+> > +static unsigned int an8855_pcs_inband_caps(struct phylink_pcs *pcs,
+> > +					   phy_interface_t interface)
+> > +{
+> > +	/* SGMII can be configured to use inband with AN result */
+> > +	if (interface == PHY_INTERFACE_MODE_SGMII)
+> > +		return LINK_INBAND_DISABLE | LINK_INBAND_ENABLE;
+> > +
+> > +	/* inband is not supported in 2500-baseX and must be disabled */
+> > +	return  LINK_INBAND_DISABLE;
+> 
+> Spurious double space.
+> 
 
->=20
-> Signed-off-by: Arthur Fabre <afabre@cloudflare.com>
-> ---
->  include/net/trait.h | 25 +++++++++++++++++++------
->  1 file changed, 19 insertions(+), 6 deletions(-)
->=20
-> diff --git a/include/net/trait.h b/include/net/trait.h
-> index 536b8a17dbbc091b4d1a4d7b4b21c1e36adea86a..d4581a877bd57a32e2ad03214=
-7c906764d6d37f8 100644
-> --- a/include/net/trait.h
-> +++ b/include/net/trait.h
-> @@ -7,6 +7,7 @@
->  #include <linux/errno.h>
->  #include <linux/string.h>
->  #include <linux/bitops.h>
-> +#include <linux/unaligned.h>
-> =20
->  /* Traits are a very limited KV store, with:
->   * - 64 keys (0-63).
-> @@ -145,23 +146,23 @@ int trait_set(void *traits, void *hard_end, u64 key=
-, const void *val, u64 len, u
->  			memmove(traits + off + len, traits + off, traits_size(traits) - off);
->  	}
-> =20
-> -	/* Set our value. */
-> -	memcpy(traits + off, val, len);
-> -
-> -	/* Store our length in header. */
->  	u64 encode_len =3D 0;
-> -
->  	switch (len) {
->  	case 2:
-> +		/* Values are least two bytes, so they'll be two byte aligned */
-> +		*(u16 *)(traits + off) =3D *(u16 *)val;
->  		encode_len =3D 1;
->  		break;
->  	case 4:
-> +		put_unaligned(*(u32 *)val, (u32 *)(traits + off));
->  		encode_len =3D 2;
->  		break;
->  	case 8:
-> +		put_unaligned(*(u64 *)val, (u64 *)(traits + off));
->  		encode_len =3D 3;
->  		break;
->  	}
-> +
->  	h->high |=3D (encode_len >> 1) << key;
->  	h->low |=3D (encode_len & 1) << key;
->  	return 0;
-> @@ -201,7 +202,19 @@ int trait_get(void *traits, u64 key, void *val, u64 =
-val_len)
->  	if (real_len > val_len)
->  		return -ENOSPC;
-> =20
-> -	memcpy(val, traits + off, real_len);
-> +	switch (real_len) {
-> +	case 2:
-> +		/* Values are least two bytes, so they'll be two byte aligned */
-> +		*(u16 *)val =3D *(u16 *)(traits + off);
-> +		break;
-> +	case 4:
-> +		*(u32 *)val =3D get_unaligned((u32 *)(traits + off));
-> +		break;
-> +	case 8:
-> +		*(u64 *)val =3D get_unaligned((u64 *)(traits + off));
-> +		break;
-> +	}
-> +
->  	return real_len;
->  }
-> =20
->=20
-> --=20
-> 2.43.0
->=20
->=20
+Will drop.
 
---8LdxVSwL0xr9PrwX
-Content-Type: application/pgp-signature; name="signature.asc"
+> > +}
+> > +
+> > +static void an8855_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
+> > +				 struct phylink_link_state *state)
+> > +{
+> > +	struct an8855_priv *priv = container_of(pcs, struct an8855_priv, pcs);
+> > +	u32 val;
+> > +	int ret;
+> > +
+> > +	ret = regmap_read(priv->regmap, AN8855_PMSR_P(AN8855_CPU_PORT), &val);
+> > +	if (ret < 0) {
+> > +		state->link = false;
+> > +		return;
+> > +	}
+> > +
+> > +	state->link = !!(val & AN8855_PMSR_LNK);
+> > +	state->an_complete = state->link;
+> > +	state->duplex = (val & AN8855_PMSR_DPX) ? DUPLEX_FULL :
+> > +						  DUPLEX_HALF;
+> > +
+> > +	switch (val & AN8855_PMSR_SPEED) {
+> > +	case AN8855_PMSR_SPEED_10:
+> > +		state->speed = SPEED_10;
+> > +		break;
+> > +	case AN8855_PMSR_SPEED_100:
+> > +		state->speed = SPEED_100;
+> > +		break;
+> > +	case AN8855_PMSR_SPEED_1000:
+> > +		state->speed = SPEED_1000;
+> > +		break;
+> > +	case AN8855_PMSR_SPEED_2500:
+> > +		state->speed = SPEED_2500;
+> > +		break;
+> > +	case AN8855_PMSR_SPEED_5000:
+> > +		dev_err(priv->ds->dev, "Missing support for 5G speed. Setting Unknown.\n");
+> > +		fallthrough;
+> 
+> Which is wrong now, we have SPEED_5000.
+> 
 
------BEGIN PGP SIGNATURE-----
+Maybe the comments weren't so clear. The Switch doesn't support the
+speed... Even if it does have bits, the switch doesn't support it. And
+the 2500 speed is really only for the CPU port. The user port are only
+gigabit.
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ87D9AAKCRA6cBh0uS2t
-rKiHAP4ig6AB4OYPje30z4tiswFLGKvRQKjJfOWR/9sexp8ODgEA3c2LJVAALxka
-vA6BEzSCv3QLZX1Pd1LJJjsBU766WAQ=
-=iMCa
------END PGP SIGNATURE-----
+> > +	default:
+> > +		state->speed = SPEED_UNKNOWN;
+> > +		break;
+> > +	}
+> > +
+> > +	if (val & AN8855_PMSR_RX_FC)
+> > +		state->pause |= MLO_PAUSE_RX;
+> > +	if (val & AN8855_PMSR_TX_FC)
+> > +		state->pause |= MLO_PAUSE_TX;
+> > +}
+> > +
+> > +static int an8855_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
+> > +			     phy_interface_t interface,
+> > +			     const unsigned long *advertising,
+> > +			     bool permit_pause_to_mac)
+> > +{
+> > +	struct an8855_priv *priv = container_of(pcs, struct an8855_priv, pcs);
+> > +	u32 val;
+> > +	int ret;
+> > +
+> > +	/*                   !!! WELCOME TO HELL !!!                   */
+> > +
+> [... hell ...]
 
---8LdxVSwL0xr9PrwX--
+Will drop :( It was an easter egg for the 300 lines to configure PCS.
 
+> > +	ret = regmap_write(priv->regmap, AN8855_MSG_RX_LIK_STS_2,
+> > +			   AN8855_RG_RXFC_AN_BYPASS_P3 |
+> > +			   AN8855_RG_RXFC_AN_BYPASS_P2 |
+> > +			   AN8855_RG_RXFC_AN_BYPASS_P1 |
+> > +			   AN8855_RG_TXFC_AN_BYPASS_P3 |
+> > +			   AN8855_RG_TXFC_AN_BYPASS_P2 |
+> > +			   AN8855_RG_TXFC_AN_BYPASS_P1 |
+> > +			   AN8855_RG_DPX_AN_BYPASS_P3 |
+> > +			   AN8855_RG_DPX_AN_BYPASS_P2 |
+> > +			   AN8855_RG_DPX_AN_BYPASS_P1 |
+> > +			   AN8855_RG_DPX_AN_BYPASS_P0);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	return 0;
+> 
+> Is this disruptive to the link if the link is up, and this is called
+> (e.g. to change the advertisement rather than switch interface mode).
+> If so, please do something about that - e.g. only doing the bulk of
+> the configuration if the interface mode has changed.
+
+Airoha confirmed this is not disruptive, applying these config doesn't
+terminate or disrupt the link.
+
+> 
+> I guess, however, that as you're only using SGMII with in-band, it
+> probably doesn't make much difference, but having similar behaviour
+> in the various drivers helps with ongoing maintenance.
+
+Do we have some driver that implement the logic of skipping the bulk of
+configuration if the mode doesn't change?
+
+Maybe we can introduce some kind of additional OP like .init to apply
+the very initial configuration that are not related to the mode.
+Or something like .setup?
+
+-- 
+	Ansuel
 
