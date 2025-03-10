@@ -1,113 +1,133 @@
-Return-Path: <netdev+bounces-173677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B66BA5A5C5
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 22:12:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA385A5A5F3
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 22:16:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D95251720B8
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 21:12:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67EB11887C6F
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 21:16:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5000D1DF739;
-	Mon, 10 Mar 2025 21:12:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B5141DED4B;
+	Mon, 10 Mar 2025 21:16:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="xnW/0qk5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KB1ErfGM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51FD3BA3D
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 21:12:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE0231DE4DF;
+	Mon, 10 Mar 2025 21:16:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741641141; cv=none; b=FRQPtuGhfAejKJYflGt+J9h3UKINRQZppu+fHr5WvHwx77W6x7mhNMqtqzVU9GoLM7QQLFSsSLO5a9iKokML/Ll9gLPeSnBrINapY26QGqacIMKkEaDt6mB56kFTN6Ct19ATRTBy2gsvbTWPRkmp0yxPTVvDYOsJ75BwExFOHGA=
+	t=1741641396; cv=none; b=Z0nQaOsnZJDV39sZsV4v6mV8cTEVWSZPzn/sMCu6FvHxITSCBWSnBA7G5e+0q4OtoDQ94owSO0y+UcgYLktOjD8Pkx/4tTxQdC7J5oV5PKhJb228M/ZC/u5/WXXI0IPBOU2pcmtaGFeElupALbXq+bwsMexb/uQP33l4AJxG3Yc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741641141; c=relaxed/simple;
-	bh=cGVJzjMUyp42V+VtQWNlxdnDpgs0niIX/wnlNzuMPjg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IyKv2iIAGYYI1ws6JnmM9E++bpVkbJc8SgBc4r7w3CWavWaC7o6zFwBk2N6MIeY4aqkrhgvewea1NbCh2wgm7801q4H5uV908MjS3Ur+q7XWtqg05mX4qpkDpsrVdABl8/3mI0yoBOnV8TKYySqCfD+GqgM9OrbDS6+2cS1qd3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=xnW/0qk5; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2ff087762bbso6991862a91.3
-        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 14:12:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1741641138; x=1742245938; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0EnPPvg+1LakhZymMmWGLkPqciceMUvrTTKW76YVVfo=;
-        b=xnW/0qk5RWnpldeLUm16K0LaKbW+7W9KAJyrx7pxPwvmEFhMO2rxqpSHVZxjKDl3T0
-         nHSZvaYVH2WVaAxtN2wzDI4m8hAXgiDtteHDrqMnfSoi/dBoENp9TPHQ5gLSMvyEFflU
-         DNXkc5x8SYVT8C+TakjKSfKgHHVKICgXDrM+Fj8hro3sdY4XfdHDiHTDk1GUeUckATT/
-         oCx2rC3zLfX5ko0jcoFPt8Hip9NwKBDF0SQYzRbB3dEJwxkbqBEs6JtC2KDz0TAFtKbL
-         TJytj0nox394A2Lo4ftpaDbco2EWeMO7z2feuKxNnzWjf/PWKTI7c/Z3ZLec24rLQGIs
-         Yi3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741641138; x=1742245938;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0EnPPvg+1LakhZymMmWGLkPqciceMUvrTTKW76YVVfo=;
-        b=rQQtGNRnKqmVz1M8fdbohmcdZ1eAoxpXX+w/64FOAJBI60hhWIZ1NCMFdlLIuq/SQi
-         sotshhKO2nh6Tg7yqJ3fZDQTX/G8uH9SFfjuc+sBO/K2DQ3TUZYCoInRsSALnJv8bnbG
-         F5HTIS/2NSqanOj+O45Y0DyxDAse2BD6YryL5/HT8hElZUErk5Tfu7FlNAyWtyIHdzo9
-         0CNya/258l+NhHLeWY8LgCNPVuI6obp5DmZcySwvB/Ispb/wxNpkyCLwkfOpr/PeupUW
-         C8fmyRxpSAX6S94dFHK7R7zxMQ9GFPrnmxxTWNj7Xo7DWoapBpi1vUhuA7OjUGC/05Ru
-         lV5A==
-X-Gm-Message-State: AOJu0YzpoiclrixYMabz2MYZMQX4R3spV0iB3fdwQE6TsF4hC2oFfMZw
-	94OQrvoBxaohcn9Kh5eUvoU0G4xkLiehA2ykbfCjXghmxPg7CNLFKm2M2Kgltdg=
-X-Gm-Gg: ASbGncuQaSgj2gNJFPQVxiE2y3hPbFgnHq8cyhurxEYaohs5LA0Q6r7HO5NLrNlut37
-	LUsGhpwdqAorC3BGkudBHHkjaGzBbHRf2u+DAsaEG8fAQsL0Pa9EdqE7rOTvoU2m1goW4LZvjBb
-	ty4RmAt8l+eRLjn9Gi+VNP1jCjtCTsNSkmrSN7QNzDaZNfTYkzOY765npe4xY70EEbEUGoPu+Mt
-	Hiw5tHffPmTq0QJ6raqsEIKiPrWxUnJAqekkTR1Qj1PV1Y5VqIoFecMKDI2YOyBY0hTaSroCNr3
-	W9MdgwQ+IHVK9yuO56cx/M39YVkFID/etMmIJB2kl8FR1G0yQDBPTw01jNDhdfNNoV3RibYVsYm
-	ULSqJwJ57V6IQNo7M6oqz7w==
-X-Google-Smtp-Source: AGHT+IF00RoooKdbRxt3PiF9kvdGXvg2dD3t3rIQ2teY+1iekVnEQLirOKDxpABl4PJXGi1Pio+IEw==
-X-Received: by 2002:a17:90b:2f46:b0:2fa:157e:c790 with SMTP id 98e67ed59e1d1-300ff0aa1cdmr1539160a91.5.1741641138369;
-        Mon, 10 Mar 2025 14:12:18 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ff4e7ff944sm11645969a91.34.2025.03.10.14.12.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Mar 2025 14:12:18 -0700 (PDT)
-Date: Mon, 10 Mar 2025 14:12:16 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Matteo Croce <technoboy85@gmail.com>
-Cc: netdev@vger.kernel.org, Phil Sutter <phil@nwl.cc>, Matteo Croce
- <teknoraver@meta.com>
-Subject: Re: [PATCH iproute2-next v2] color: default to dark color theme
-Message-ID: <20250310141216.5cdfd133@hermes.local>
-In-Reply-To: <20250310203609.4341-1-technoboy85@gmail.com>
-References: <20250310203609.4341-1-technoboy85@gmail.com>
+	s=arc-20240116; t=1741641396; c=relaxed/simple;
+	bh=xhhTO52C/8fG7MDjEfxhWhAUsEKxrB+SaqXmnB/oZGQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AXWDAZcFM5EEhC51cTruMZTgxVCiO2ZBhcDOtTHjcXwrD1nWfzcngTTvFcwsRggyGB4arcFztg+ksedfLes5yrVJdzG3B2UoCHTWVc5c99hwQBiz+jASUMlPerP5rULjc5tBFs63sKiErAAKuLuSf9j78301PopTnkvZ3dZtAAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KB1ErfGM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19C95C4CEE5;
+	Mon, 10 Mar 2025 21:16:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741641395;
+	bh=xhhTO52C/8fG7MDjEfxhWhAUsEKxrB+SaqXmnB/oZGQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KB1ErfGMXqL3eUvY/h60CuKtdRdDzpKgAEjSXuOVZQgYXaX7PjmtRr+7t+hvS6tGy
+	 ytMrx41oPxfH3/0bph5XHgZy28tQ6Iyar2WI4JMjngSuQq9nge7too/D5Lq3Nezlm0
+	 Ev2cu/gKGiY2ajzu5pUo2A/BRY0gQIWXwKyphw6qT7z7sSreM3Suncat5jtP4rMt+a
+	 8Zhi1XgPM3G/xx5GvP1PkwRGVoj8YRnX972OzIo+R+3PskdAyDEgUJqqcOBrRdx7la
+	 7no62gUzvph6vkxPCn7Ai5G55Ys2afIwQ35/d85v/cKcR4Vdd40oLznc/OHhu45KPE
+	 1Tw6Rt5PmnBPQ==
+Date: Mon, 10 Mar 2025 16:16:33 -0500
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Prabhakar <prabhakar.csengg@gmail.com>
+Cc: linux-rockchip@lists.infradead.org,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Fabio Estevam <festevam@gmail.com>,
+	linux-mediatek@lists.infradead.org,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org,
+	"G. Jaya Kumaran" <vineetha.g.jaya.kumaran@intel.com>,
+	netdev@vger.kernel.org, Shawn Guo <shawnguo@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Linux Team <linux-imx@nxp.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Christophe Roullier <christophe.roullier@foss.st.com>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
+	David Wu <david.wu@rock-chips.com>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Kevin Hilman <khilman@baylibre.com>,
+	linux-amlogic@lists.infradead.org,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Biao Huang <biao.huang@mediatek.com>, devicetree@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>, imx@lists.linux.dev
+Subject: Re: [PATCH net-next] dt-bindings: net: Define interrupt constraints
+ for DWMAC vendor bindings
+Message-ID: <174164139310.903652.6069254912704107254.robh@kernel.org>
+References: <20250309003301.1152228-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250309003301.1152228-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-On Mon, 10 Mar 2025 21:36:09 +0100
-Matteo Croce <technoboy85@gmail.com> wrote:
 
-> From: Matteo Croce <teknoraver@meta.com>
+On Sun, 09 Mar 2025 00:33:01 +0000, Prabhakar wrote:
+> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 > 
-> The majority of Linux terminals are using a dark background.
-> iproute2 tries to detect the color theme via the `COLORFGBG` environment
-> variable, and defaults to light background if not set.
->
-
-This is not true. The default gnome terminal color palette is not dark.
-
-> Change the default behaviour to dark background, and while at it change
-> the current logic which assumes that the color code is a single digit.
+> The `snps,dwmac.yaml` binding currently sets `maxItems: 3` for the
+> `interrupts` and `interrupt-names` properties, but vendor bindings
+> selecting `snps,dwmac.yaml` do not impose these limits.
 > 
-> Signed-off-by: Matteo Croce <teknoraver@meta.com>
+> Define constraints for `interrupts` and `interrupt-names` properties in
+> various DWMAC vendor bindings to ensure proper validation and consistency.
+> 
+> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> ---
+> Hi All,
+> 
+> Based on recent patch [0] which increases the interrupts to 11
+> and adds `additionalItems: true` its good to have constraints
+> to validate the schema. Ive made the changes based on the DT
+> binding doc and the users. Ive ran dt binding checks to ensure
+> the constraints are valid. Please let me know if you'd like me
+> to split this patch or if any of the constraints are incorrect,
+> as I don't have documentation for all of these platforms.
+> 
+> https://lore.kernel.org/all/20250308200921.1089980-2-prabhakar.mahadev-lad.rj@bp.renesas.com/
+> 
+> Cheers, Prabhakar
+> ---
+>  .../devicetree/bindings/net/amlogic,meson-dwmac.yaml   |  6 ++++++
+>  .../devicetree/bindings/net/intel,dwmac-plat.yaml      |  6 ++++++
+>  .../devicetree/bindings/net/mediatek-dwmac.yaml        |  6 ++++++
+>  .../devicetree/bindings/net/nxp,dwmac-imx.yaml         |  8 ++++++++
+>  .../devicetree/bindings/net/rockchip-dwmac.yaml        | 10 ++++++++++
+>  Documentation/devicetree/bindings/net/stm32-dwmac.yaml | 10 ++++++++++
+>  .../bindings/net/toshiba,visconti-dwmac.yaml           |  6 ++++++
+>  7 files changed, 52 insertions(+)
+> 
 
-The code was added to follow the conventions of other Linux packages.
-Probably best to do something smarter (like util-linux) or more exactly
-follow what systemd or vim are doing.
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+
 
