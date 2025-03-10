@@ -1,153 +1,99 @@
-Return-Path: <netdev+bounces-173637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90AE9A5A489
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 21:14:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BA59A5A4D1
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 21:21:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42B6F3A7468
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 20:14:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA0E6174DF5
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 20:21:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBD311CB332;
-	Mon, 10 Mar 2025 20:14:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50B3C1E22E9;
+	Mon, 10 Mar 2025 20:20:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C7RP2/Y4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="drS22X/D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E2401D5CDB;
-	Mon, 10 Mar 2025 20:14:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D5911E0E15;
+	Mon, 10 Mar 2025 20:20:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741637683; cv=none; b=kXk37g8iNaWrFt+qFtTrpCcKT2SX4YkgsQYwM9Uk0zpur+5cVz5fAiXqv9rHeJIglmEgifoUhmbHoUP7Tt5Uz9PFvqKqbD770/NxIK3lHbYBrut8tFa53aYuXUmi4mxNz8tIP2iuaRpexe0iZOxHpQZemHECxMLlplim9oAP0yo=
+	t=1741638013; cv=none; b=GZ1wUwivqcAPCtWkKEKXfTt+913J4UH0F+5GiJvfexuTI/6tez3/UCuC8fQAY1fSAq1AHQv0gI8888cWyi982rqCbPT9aekGo5TWrzR4qnaqDxfudBPfWHmKB+Oov8y5HBV0feNdTcQfcfccfpMD3C4EMQEbyC4tmZ8y56eNkiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741637683; c=relaxed/simple;
-	bh=8iEcHXkc9LSURdsHe2A+6jQjFaaSOLr9zyyzvR4j+oM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PrZ4xzy6Ux22+Us+fYJLsK4l1j+02fpEwiFumjkQ51NxdszF83xoPCqX03mY4jYutJElFshfvWTAnZ/94EeLBIApG58aRnk4e5igCtNcj+TDUKUSfWP3qHhDQBp7BDmCIaNT/p0+GUol/cBO4/c0ViHKoeaA7VuRsXprmTrHZUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C7RP2/Y4; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2ff6ae7667dso8921017a91.0;
-        Mon, 10 Mar 2025 13:14:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741637681; x=1742242481; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=8VCJDvDifH6QKwricJgYOLTAKH9PbYZJOyD+3nB9w8A=;
-        b=C7RP2/Y4MS5oFOE67uZDp4SkhsFBw7vn2mbuZIpfDGY3DgLTjew8+fZuqu8btJtf+1
-         u3v4kzPDLaLDL6A0cKBunQuf28LyG91QwBVDcfDNB9kyMawnaCyQXieF3TEblI7USBOI
-         CPiIO6GzHtb5G9ypo34XS2Cnv7kRtDjyLC+0Z6vRsigHPTEcZiik16dxwAgRggSN2gXD
-         tyVDyFYrwhkFBNlTedb2M5mSDWwU8J3QTZ84oSPIWYQLRqkKS5f9iRLSDCiXCdUtp+y1
-         rDsGT/OGe5JOoawH/Y1lpaTAqrRYORit6CJGM++mW0Zx4rXI/4BuhxINtIxsK7kYBweR
-         Y8uA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741637681; x=1742242481;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8VCJDvDifH6QKwricJgYOLTAKH9PbYZJOyD+3nB9w8A=;
-        b=oXN0qLHoLewyyjqV1DnXYSr/lrlbbaEEhccnn4i6DxAB0gw/sXSr8TRK2jk+AFAGxI
-         kydbc12WqMVGVLA1+h5Y/LPUU8SQ5A37Bhqlrhgfina7lOBOH0k75GVn13tblb5uct7b
-         zcUt3YDbOJxMk2FEOk7Xh0H36CGxFYfigbas1dun8Fa3hcfLj2fwJLNNYMZY+l0p5qrp
-         SJa4XMGWoceh3OT5YNSgfDl245GCw51dR5CFloyiPsQB57eftBPvzDGl83FKH7qu45F9
-         phsmDHKGRg+/E41CbsvPoHcKpBjRfBcP27UpQapBGaCaHbUdII5DQL/hfmCdsiNzZcsP
-         Ysqw==
-X-Forwarded-Encrypted: i=1; AJvYcCUbWErZBAT+Kgr6ObIqW4bf8pPTmR85VyUieLmKi2XSF52L0nELJABR7qGfzR0/d1DlXGG508mG@vger.kernel.org, AJvYcCVCHqcb2FWYdz6JCiWV8OGPnAmfdQHGe/5ExujT2nPfN1RhoUt2K6L/P4giCIWhnuF36R0UOemdr5CRz3Uf@vger.kernel.org, AJvYcCWCJKLi53YiL1VSC5Dyb+5BtqVBax9HQ8nHkaK5WHG+HAWurifo80avhRUGTBC0hvYmKIXN4rUhOOyn7aqq@vger.kernel.org, AJvYcCXN+qanx1kXOFLmNHH+fyX0Tm7Adpeeeir/btpnRdhEaw0Vfct4xIT4mg1Y7GTFuENOwjs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJ6rGN7/H+8/cN7woEdD4E3BsCNVGGPMjtU5p0Bt7NBmaFqiQZ
-	gJBgVpopDEYqDLIaqmZyF4oAGf4GoyTqyILWNlgu1Fx4Aa69ufc0
-X-Gm-Gg: ASbGncvGHXWL5sLZknXle1yntwOjVOIHoovlZdsRuPMcYW73QhRQRMb3D3dLxzzipsx
-	k+GH3QIpAL30D+T4mOUHZ62U1uxdas3U/zp8pq23r2y9YWU7skZodlnZWImwLIoy7ouS6XirqnX
-	ldRrZyK3Jf4QHjmyn41J1LPzSx/6PP1ocOxNncuEUZZ6nDVzZ0SdD3EXDiRBEc1CCI/LV8arRFq
-	PMWa1NyIFsE7R2Q+/V7fjaWmMIEQXhHRuKifZ1GIf8PpyqaL8vs1naDdm5ICXfL3aVYo3GVmZEY
-	sjS5Zq3bvuxNMqJRFq+p5ap1jVgvh9ZCMqyq4ZlO/zyJm/d2wqC1TplE2igIWWb3Xw==
-X-Google-Smtp-Source: AGHT+IGGtgGnLtHGp5hJ/nBMAaLcHC95KiwN+PXL01qiy3ZPgyM0bcKKidXs9guWID/UnTwOCCd32g==
-X-Received: by 2002:a17:90b:1a86:b0:2ee:53b3:3f1c with SMTP id 98e67ed59e1d1-2ff7ce59755mr22191888a91.5.1741637681325;
-        Mon, 10 Mar 2025 13:14:41 -0700 (PDT)
-Received: from devvm6277.cco0.facebook.com ([2a03:2880:2ff:5::])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30102709b6asm26289a91.1.2025.03.10.13.14.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Mar 2025 13:14:40 -0700 (PDT)
-Date: Mon, 10 Mar 2025 13:14:38 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, davem@davemloft.net,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org,
-	Jorgen Hansen <jhansen@vmware.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux-foundation.org,
-	linux-hyperv@vger.kernel.org, Dexuan Cui <decui@microsoft.com>,
-	netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
-Subject: Re: [PATCH net-next 0/3] vsock: support network namespace
-Message-ID: <Z89ILjEUU12CuVwk@devvm6277.cco0.facebook.com>
-References: <20200116172428.311437-1-sgarzare@redhat.com>
- <20200427142518.uwssa6dtasrp3bfc@steredhat>
- <224cdc10-1532-7ddc-f113-676d43d8f322@redhat.com>
- <20200428160052.o3ihui4262xogyg4@steredhat>
- <Z8edJjqAqAaV3Vkt@devvm6277.cco0.facebook.com>
- <CACGkMEtTgmFVDU+ftDKEvy31JkV9zLLUv25LrEPKQyzgKiQGSQ@mail.gmail.com>
+	s=arc-20240116; t=1741638013; c=relaxed/simple;
+	bh=oiEDLHboG9k635mQYmv0sZ1NLB6XV+uB6u93veYOWYE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VAv3Bp6zNScH3n1Jzh6YKE/EwwpVbWHi6AqG2goGY+gEyrHCxeJt0n2n/nfNTZw44waEku7NR+2psozfkpKArVpFMx0+UXq72S9thP+R3nYzaOGPhDza1aGf+7dGk9dqiYk6XEUKrscwxnh/Wkz/wQl8xO1cOjkeawF1UxxgrWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=drS22X/D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39574C4CEE5;
+	Mon, 10 Mar 2025 20:20:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741638012;
+	bh=oiEDLHboG9k635mQYmv0sZ1NLB6XV+uB6u93veYOWYE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=drS22X/DU2o4gwHxWv8swD6uzt8Rv2KL+qVhojMrOAIjTnOlTaMJoMJDbPypfm5Ct
+	 thXU0VWdopO/P87hoVr6Rnc9DcO4GemvFktUBpF+Cwecq+mUb4pbZvZEmQ59E/4Ssy
+	 izSA9FTPrSSe2Lq4AsAOhgQNi1rruiVY0f4oHGu/iw3CGz9Hdg2qcp9J+BxLFcJIzi
+	 2YonFBSAECntGQdSG8fToTqLa0KzOg5viGhOBPVfhtwUWgSiIPBf0X6ZRmcFibaFts
+	 k17dwgbPrvowiKrCQV9OPiaeMwFAcnKKmXbHj/NR5aGvnbf/DkHv5DqG3YluC2CZ8E
+	 1Dx5XD5nHXsRg==
+Date: Mon, 10 Mar 2025 20:19:59 +0000
+From: Jonathan Cameron <jic23@kernel.org>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Matti Vaittinen <mazziesaccount@gmail.com>, Matti Vaittinen
+ <matti.vaittinen@fi.rohmeurope.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Daniel Scally <djrscally@gmail.com>, Heikki Krogerus
+ <heikki.krogerus@linux.intel.com>, Sakari Ailus
+ <sakari.ailus@linux.intel.com>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
+ Danilo Krummrich <dakr@kernel.org>, Claudiu Manoil
+ <claudiu.manoil@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-iio@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH v6 02/10] property: Add functions to iterate named child
+Message-ID: <20250310201959.39bad5e1@jic23-huawei>
+In-Reply-To: <Z872bHMRtSglB8pf@smile.fi.intel.com>
+References: <cover.1741610847.git.mazziesaccount@gmail.com>
+	<ff924f640feeb87819d40557f12a04e607894682.1741610847.git.mazziesaccount@gmail.com>
+	<Z872bHMRtSglB8pf@smile.fi.intel.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEtTgmFVDU+ftDKEvy31JkV9zLLUv25LrEPKQyzgKiQGSQ@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 05, 2025 at 01:46:54PM +0800, Jason Wang wrote:
-> On Wed, Mar 5, 2025 at 8:39 AM Bobby Eshleman <bobbyeshleman@gmail.com> wrote:
-> >
-> > On Tue, Apr 28, 2020 at 06:00:52PM +0200, Stefano Garzarella wrote:
-> > > On Tue, Apr 28, 2020 at 04:13:22PM +0800, Jason Wang wrote:
-> >
-> > WRT netdev, do we foresee big gains beyond just leveraging the netdev's
-> > namespace?
+
 > 
-> It's a leverage of the network subsystem (netdevice, steering, uAPI,
-> tracing, probably a lot of others), not only its namespace. It can
-> avoid duplicating existing mechanisms in a vsock specific way. If we
-> manage to do that, namespace support will be a "byproduct".
+> > +			if (!fwnode_name_eq(child, name)) { } else  
 > 
-[...]
+> Ditto.
 > 
-> Yes, it can. I think we need to evaluate both approaches (that's why I
-> raise the approach of reusing netdevice). We can hear from others.
+> Note, I believe this won't get v6.15-rc1, so there will be for_each_if()
+> available and these will become
+
+Unless this cycle goes long (i.e. an rc8) very unlikely I'll sneak
+the series in now due to lack of time to soak in next.
+
 > 
-
-I agree it is worth evaluating. If netdev is being considered, then it
-is probably also worth considering your suggestion from a few years back
-to add these capabilities by building vsock on top of virtio-net [1].
-
-[1] https://lore.kernel.org/all/2747ac1f-390e-99f9-b24e-f179af79a9da@redhat.com/
-
-Considering that the current vsock protocol will only ever be able to
-enjoy a restricted feature set of these other net subsystems due to its
-lack of tolerance for packet loss (e.g., no multiqueue steering, no
-packet scheduling), I wonder if it would be best to a) wait until a user
-requires these capabilities, and b) at that point extend vsock to tolerate
-packet loss (add a seqnum)?
-
-> >
-> > Some other thoughts I had: netdev's flow control features would all have
-> > to be ignored or disabled somehow (I think dev_direct_xmit()?), because
-> > queueing introduces packet loss and the vsock protocol is unable to
-> > survive packet loss.
+> #define fwnode_for_each_named_child_node(fwnode, child, name)	\
+> 	fwnode_for_each_child_node(fwnode, child)		\
+> 		for_each_if(fwnode_name_eq(child, name))
 > 
-> Or just allow it and then configuring a qdisc that may drop packets
-> could be treated as a misconfiguration.
-> 
+> and so on...
 
-That is possible, but when I was playing with vsock qdisc the only one
-that worked was pfifo_fast/pfifo, as the others that I tested async drop
-packets.
+Nice - first time I've seen this :)
 
-Thanks,
-Bobby
+Jonathan
 
