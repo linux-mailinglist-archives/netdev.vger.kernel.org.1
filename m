@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-173452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACD3DA58F41
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 10:16:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A90D0A58F42
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 10:16:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 117D818876E6
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 09:16:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A93B7A23B5
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 09:15:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD8A221F13;
-	Mon, 10 Mar 2025 09:16:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06D48221F13;
+	Mon, 10 Mar 2025 09:16:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pweCGbV2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JjvqmBpy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56432206A4
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 09:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 820EA22371B
+	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 09:16:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741598202; cv=none; b=Or+Z4ABxYH7Qjk6t4BjGMb3fRbntTfGBO946FA6LO+QkrCqJNpmaNOMecsI95YDaSxAwZ09/8ZyTSEq7ry+nVpWGj33Glxeuq+XFJCdFT1wMsdGh6VUBcAjgNVwYcppSPUOUc7TBHH7T2rUVniR+rdr7D1K1qlkLMtuseFDZga4=
+	t=1741598207; cv=none; b=RgzvjiXeZGVQDnU67ZWwgg0bO+wddE3/CF+/dK1rG0o+sfQ1k59HlDlKbpVJ5dBw35or/27/iJEMRRk6qzHsUhgfK1MTSq4T42dZlnp0t8i9NTr+J3IK1v85irTvKOTcZ0BvQTU3aPkrtNKEmTW/TiYK9Z5D/DdGHNuhXHIklZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741598202; c=relaxed/simple;
-	bh=m6Hj03745IExRWTV0910B2G8jRGtXaxWl9KIO6Pemr8=;
+	s=arc-20240116; t=1741598207; c=relaxed/simple;
+	bh=/CoDczrC/PnmqGe073cRpY/sT71Q/uwFa7MgT+GIBno=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qFcb5HHckBWuZLR0Z3VdiffS74pPioUo1i7YJX03/VfoAooWuHs/gk53XD8YCgVIudQcJ93gcnvAHKM11yUQsQ0lA+lfL2ZOg9YZDyhNcPrrPq2+/v7dIdTwcIjogQ9NgBe1UxXs8hORlE9kC5TeTEwqi7EX7uREyAOe2ajEf3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chiachangwang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pweCGbV2; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=RprEjJHWHBk1ZmSf9Ma1J2BUbHlB4JAFyxzk8jkNBv7WQ/Mguq+1JWdQOP1T5flbDdg1WsoX8a2dfKYfNfFdeUrD/PFdAYwYgHzbHZkr6GhrHdsC1FTyx1WM2hPKKGKHilN6iD9Y6t2IxR531GSyOOdUTCX9rjQhvEUTWzN3HPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chiachangwang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JjvqmBpy; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chiachangwang.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-22406ee0243so52432145ad.3
-        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 02:16:40 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff5f3be6e6so6897861a91.1
+        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 02:16:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741598200; x=1742203000; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1741598206; x=1742203006; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RTY2XFn7NVk6fJzb7PfqDb/O7d/Kg7T/tWMPISTqR+c=;
-        b=pweCGbV2GeYh/h9UwsRupEQ1bHMx5rym7KlnjZ8xsWPmwMzg/FdvWSOSKq7nL1d/ly
-         c0JH9te1bmchp7ld2DnUmKVXjjm8vcgaw8qT7PXVmxgOBpqj3+v8TkEN7wnbvLDlARgD
-         O0C4FUWME554NVEllZSGj/9Eg5z0f6a5YZKnnu1AItOHUIwSsS8CRnA3McnfowyGdVyW
-         vT1Vwm3ozsOAJVzLufBJqJY6/JI+UYRlnNI/SwPJQIkqbWsH1a4c7otbhV68nRiyeVEz
-         mu8oCZQ6EDUmJp43yiNrqVTFOVKujsNg8URrDFHlzIPGRr9OWm7NESVlzgUDYohXkEah
-         MYhg==
+        bh=qxFKpSUTYqg1Rc0MBNSslC0niEyRIRznyg/YVs/pgOQ=;
+        b=JjvqmBpyGyEsk4Pyyd3mevY1a+VyHrJ3+Z6mX06eVCiXcU+QuRGEROcIUpiiA1eavU
+         d6AblO8AFTJG4QbdUH6Uq2ZFA5kY/Do1Eah0SXBn0zo/JD/wUNdkG4Z7MzuYbmXT85PX
+         uIHxADfctlq+c6+YwZdBQmNEyxwmGtTI5rVCgLy4tzViM+grt3zmqblYiJp8Fk+SMjoo
+         6b19uVT0mzYtPhg/fHD5OUJYKHEM9j6VNpVbkhvxU++Osy7xbK64Axr4eJU4WlAeAjya
+         nrA5aR5OPf0eRGgIc56AEUMGA9h2nkB9X2S9PimqKr9U/iwY5s51pzHNasYP5XGCPeND
+         gbjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741598200; x=1742203000;
+        d=1e100.net; s=20230601; t=1741598206; x=1742203006;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RTY2XFn7NVk6fJzb7PfqDb/O7d/Kg7T/tWMPISTqR+c=;
-        b=lSgYDpr7MlrjA77Sl1/77G1iTMtXRjQBprnPIYhL2xbF/5eIIt/Mf5SCwe+IYZUebb
-         oWeZ265gpsbDqcGjJ88fXMO/RvlIMpcEEQ04Ylq948vFVK7YNPAPDRo0SxA7JzercFq2
-         7fkHKFANRar/ig3mEcVOYIA3Rr4vchnBXaZ60gy6OG1qN4GVPY4VuYm75gu8tXIxHvRb
-         AGprmZIIFAg5REn1ZsjQLIyuFym83G4z8MqYlwgoVtOs6IliZa6mygEwuGvrtL81X9DL
-         c9FHJfBUCexTuOjIgffE+QawImVLGOsFYs6P/LxbPe/vkC6ZX0nUENymGtXKnC+Dg9IC
-         rITg==
-X-Gm-Message-State: AOJu0YzFJl9YMiXU4jWfWsW2oYv4KOMnxw7o/i/HuU2ro8Xxbw67UdGY
-	Eiao8WJOPY9hQcZaaHKTp1E8PEt4xmjn0F9HtoymbEQK7VVvOnlETFd3tcO6CcFFdb6tgtx3ZxJ
-	S+1VWx0pvFhObZQUaj+/hprNukk2XSaX6SGSewkn8lZGHZYe/WbxunOX+3bG1jUYHO47EQRlie4
-	+/ufFakumRNAMk3RO7NNvSo9pKVUzTESs0IIPibUXjpwVcdbvxeZqvLzZgGBVytovCBEnkuA==
-X-Google-Smtp-Source: AGHT+IFkOVO9u8blAVd7Q43UfcTnoCweRZ4poWWGA+ptoZkeddHsv8MEI5ZuPRZ/4DQ9uO4BuIcdQpPvAg9aNQPX2O7y
-X-Received: from pjur16.prod.google.com ([2002:a17:90a:d410:b0:2fc:2b96:2d4b])
+        bh=qxFKpSUTYqg1Rc0MBNSslC0niEyRIRznyg/YVs/pgOQ=;
+        b=PFTMQ0SQTNc8ZL7tixfSXnwDRLjxx/yxb8bNyGWzNSutbp21dPLCzg1WQ5GH2NUujq
+         T5zd2eMnUYDSMZ2bMJ6F8BKizAalj6oKu/QMF8t35e5H4ZEFUlsWK80lqia9K3r5z12b
+         0nJ9PWNpsYwVqyUsuHZERNcE3rVSzlkrfF6AYBfZAWZUDI6tklACaC2VObctQGluYy3B
+         PbCjwtw9ImsRZrhZiCWSS0eo7hWf6/b19jS29+jybqY9jOem6UfTTbzG7ec8JfxMpmMj
+         S6MDn9DFRdeRAEStZ9cwq7QIPWkeiJE9SFvD3cGdOmlTitG7jQdra4Mry+jz3CX/zYz0
+         zk3g==
+X-Gm-Message-State: AOJu0YzkQl32BhB4RwkDGokeyct5VlZXlM1P05GpY7G2mBLovYwM7TNe
+	eWWNOVk/Y35ciTaj3KoU25p9psesSOcTESPBRbeE7v+OiIeNe3QTJYFbMHRBkzcV1zqfdx5ik3Z
+	sYnhSU2rWnjWKJKy2ZCr736+MFdxMwMlF4/C1HrwdcXEHp0wwiyUZtL0Q9tzekz9UmB5kH0dU+m
+	P6j6JoE0KRrJ5vJnKh/Sw1LTvtQGO1gYgH6SSprdDEYwfVnhaXxjER7vN79Z15q4Rbbc/ihQ==
+X-Google-Smtp-Source: AGHT+IFY/g8nxsG5hvg+E43eCTd5iqNagsd6D8DhlLjOjXOWcI+MuPu6ii8JyrQ97rZX2/ghjOPeY7hmRbZu1QEhc6+P
+X-Received: from pjj12.prod.google.com ([2002:a17:90b:554c:b0:2ea:5be5:da6])
  (user=chiachangwang job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:32c2:b0:224:1074:6393 with SMTP id d9443c01a7336-22428bffe92mr172980815ad.43.1741598199933;
- Mon, 10 Mar 2025 02:16:39 -0700 (PDT)
-Date: Mon, 10 Mar 2025 09:16:19 +0000
+ 2002:a17:90b:1dce:b0:2ff:62f3:5b19 with SMTP id 98e67ed59e1d1-2ff7ce6f0bcmr20385113a91.13.1741598205676;
+ Mon, 10 Mar 2025 02:16:45 -0700 (PDT)
+Date: Mon, 10 Mar 2025 09:16:20 +0000
 In-Reply-To: <20250310091620.2706700-1-chiachangwang@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,30 +74,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250310091620.2706700-1-chiachangwang@google.com>
 X-Mailer: git-send-email 2.49.0.rc0.332.g42c0ae87b1-goog
-Message-ID: <20250310091620.2706700-2-chiachangwang@google.com>
-Subject: [PATCH ipsec-next v4 1/2] xfrm: Migrate offload configuration
+Message-ID: <20250310091620.2706700-3-chiachangwang@google.com>
+Subject: [PATCH ipsec-next v4 2/2] xfrm: Refactor migration setup during the
+ cloning process
 From: Chiachang Wang <chiachangwang@google.com>
 To: netdev@vger.kernel.org, steffen.klassert@secunet.com, leonro@nvidia.com
 Cc: chiachangwang@google.com, stanleyjhu@google.com, yumike@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Add hardware offload configuration to XFRM_MSG_MIGRATE
-using an option netlink attribute XFRMA_OFFLOAD_DEV.
+Previously, migration related setup, such as updating family,
+destination address, and source address, was performed after
+the clone was created in `xfrm_state_migrate`. This change
+moves this setup into the cloning function itself, improving
+code locality and reducing redundancy.
 
-In the existing xfrm_state_migrate(), the xfrm_init_state()
-is called assuming no hardware offload by default. Even the
-original xfrm_state is configured with offload, the setting will
-be reset. If the device is configured with hardware offload,
-it's reasonable to allow the device to maintain its hardware
-offload mode. But the device will end up with offload disabled
-after receiving a migration event when the device migrates the
-connection from one netdev to another one.
-
-The devices that support migration may work with different
-underlying networks, such as mobile devices. The hardware setting
-should be forwarded to the different netdev based on the
-migration configuration. This change provides the capability
-for user space to migrate from one netdev to another.
+The `xfrm_state_clone_and_setup` function now conditionally
+applies the migration parameters from struct xfrm_migrate
+if it is provided. This allows the function to be used both
+for simple cloning and for cloning with migration setup.
 
 Test: Tested with kernel test in the Android tree located
       in https://android.googlesource.com/kernel/tests/
@@ -105,145 +99,58 @@ Test: Tested with kernel test in the Android tree located
       particular.
 Signed-off-by: Chiachang Wang <chiachangwang@google.com>
 ---
- v3 -> v4:
- - Change the target tree to ipsec-next
- - Rebase commit to adopt updated xfrm_init_state()
- - Remove redundant variable to rely on validiaty of pointer
- v2 -> v3:
- - Modify af_key to fix kbuild error
- v1 -> v2:
- - Address review feedback to correct the logic in the
-   xfrm_state_migrate in the migration offload configuration
-   change
- - Revise the commit message for "xfrm: Migrate offload configuration"
----
- include/net/xfrm.h     |  8 ++++++--
- net/key/af_key.c       |  2 +-
- net/xfrm/xfrm_policy.c |  4 ++--
- net/xfrm/xfrm_state.c  |  9 ++++++++-
- net/xfrm/xfrm_user.c   | 15 ++++++++++++---
- 5 files changed, 29 insertions(+), 9 deletions(-)
+ net/xfrm/xfrm_state.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-index 39365fd2ea17..f80cdef43ed5 100644
---- a/include/net/xfrm.h
-+++ b/include/net/xfrm.h
-@@ -1893,12 +1893,16 @@ struct xfrm_state *xfrm_migrate_state_find(struct xfrm_migrate *m, struct net *n
- 						u32 if_id);
- struct xfrm_state *xfrm_state_migrate(struct xfrm_state *x,
- 				      struct xfrm_migrate *m,
--				      struct xfrm_encap_tmpl *encap);
-+				      struct xfrm_encap_tmpl *encap,
-+				      struct net *net,
-+				      struct xfrm_user_offload *xuo,
-+				      struct netlink_ext_ack *extack);
- int xfrm_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
- 		 struct xfrm_migrate *m, int num_bundles,
- 		 struct xfrm_kmaddress *k, struct net *net,
- 		 struct xfrm_encap_tmpl *encap, u32 if_id,
--		 struct netlink_ext_ack *extack);
-+		 struct netlink_ext_ack *extack,
-+		 struct xfrm_user_offload *xuo);
- #endif
-
- int km_new_mapping(struct xfrm_state *x, xfrm_address_t *ipaddr, __be16 sport);
-diff --git a/net/key/af_key.c b/net/key/af_key.c
-index c56bb4f451e6..efc2a91f4c48 100644
---- a/net/key/af_key.c
-+++ b/net/key/af_key.c
-@@ -2630,7 +2630,7 @@ static int pfkey_migrate(struct sock *sk, struct sk_buff *skb,
- 	}
-
- 	return xfrm_migrate(&sel, dir, XFRM_POLICY_TYPE_MAIN, m, i,
--			    kma ? &k : NULL, net, NULL, 0, NULL);
-+			    kma ? &k : NULL, net, NULL, 0, NULL, NULL);
-
-  out:
- 	return err;
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index 6551e588fe52..82f755e39110 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -4630,7 +4630,7 @@ int xfrm_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
- 		 struct xfrm_migrate *m, int num_migrate,
- 		 struct xfrm_kmaddress *k, struct net *net,
- 		 struct xfrm_encap_tmpl *encap, u32 if_id,
--		 struct netlink_ext_ack *extack)
-+		 struct netlink_ext_ack *extack, struct xfrm_user_offload *xuo)
- {
- 	int i, err, nx_cur = 0, nx_new = 0;
- 	struct xfrm_policy *pol = NULL;
-@@ -4663,7 +4663,7 @@ int xfrm_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
- 		if ((x = xfrm_migrate_state_find(mp, net, if_id))) {
- 			x_cur[nx_cur] = x;
- 			nx_cur++;
--			xc = xfrm_state_migrate(x, mp, encap);
-+			xc = xfrm_state_migrate(x, mp, encap, net, xuo, extack);
- 			if (xc) {
- 				x_new[nx_new] = xc;
- 				nx_new++;
 diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 7b1028671144..9cd707362767 100644
+index 9cd707362767..0365daedea32 100644
 --- a/net/xfrm/xfrm_state.c
 +++ b/net/xfrm/xfrm_state.c
-@@ -2120,7 +2120,10 @@ EXPORT_SYMBOL(xfrm_migrate_state_find);
+@@ -1958,8 +1958,9 @@ static inline int clone_security(struct xfrm_state *x, struct xfrm_sec_ctx *secu
+ 	return 0;
+ }
 
- struct xfrm_state *xfrm_state_migrate(struct xfrm_state *x,
- 				      struct xfrm_migrate *m,
--				      struct xfrm_encap_tmpl *encap)
-+				      struct xfrm_encap_tmpl *encap,
-+				      struct net *net,
-+				      struct xfrm_user_offload *xuo,
-+				      struct netlink_ext_ack *extack)
+-static struct xfrm_state *xfrm_state_clone(struct xfrm_state *orig,
+-					   struct xfrm_encap_tmpl *encap)
++static struct xfrm_state *xfrm_state_clone_and_setup(struct xfrm_state *orig,
++					   struct xfrm_encap_tmpl *encap,
++					   struct xfrm_migrate *m)
+ {
+ 	struct net *net = xs_net(orig);
+ 	struct xfrm_state *x = xfrm_state_alloc(net);
+@@ -2058,6 +2059,12 @@ static struct xfrm_state *xfrm_state_clone(struct xfrm_state *orig,
+ 			goto error;
+ 	}
+
++	if (m) {
++		x->props.family = m->new_family;
++		memcpy(&x->id.daddr, &m->new_daddr, sizeof(x->id.daddr));
++		memcpy(&x->props.saddr, &m->new_saddr, sizeof(x->props.saddr));
++	}
++
+ 	return x;
+
+  error:
+@@ -2127,18 +2134,13 @@ struct xfrm_state *xfrm_state_migrate(struct xfrm_state *x,
  {
  	struct xfrm_state *xc;
 
-@@ -2136,6 +2139,10 @@ struct xfrm_state *xfrm_state_migrate(struct xfrm_state *x,
- 	memcpy(&xc->id.daddr, &m->new_daddr, sizeof(xc->id.daddr));
- 	memcpy(&xc->props.saddr, &m->new_saddr, sizeof(xc->props.saddr));
+-	xc = xfrm_state_clone(x, encap);
++	xc = xfrm_state_clone_and_setup(x, encap, m);
+ 	if (!xc)
+ 		return NULL;
 
-+	/* configure the hardware if offload is requested */
-+	if (xuo && xfrm_dev_state_add(net, xc, xuo, extack))
-+		goto error;
-+
- 	/* add state */
- 	if (xfrm_addr_equal(&x->id.daddr, &m->new_daddr, m->new_family)) {
- 		/* a care is needed when the destination address of the
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index 784a2d124749..85383d15d003 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -3069,6 +3069,7 @@ static int xfrm_do_migrate(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	int n = 0;
- 	struct net *net = sock_net(skb->sk);
- 	struct xfrm_encap_tmpl  *encap = NULL;
-+	struct xfrm_user_offload *xuo = NULL;
- 	u32 if_id = 0;
-
- 	if (!attrs[XFRMA_MIGRATE]) {
-@@ -3099,11 +3100,19 @@ static int xfrm_do_migrate(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (attrs[XFRMA_IF_ID])
- 		if_id = nla_get_u32(attrs[XFRMA_IF_ID]);
-
-+	if (attrs[XFRMA_OFFLOAD_DEV]) {
-+		xuo = kmemdup(nla_data(attrs[XFRMA_OFFLOAD_DEV]),
-+			      sizeof(*xuo), GFP_KERNEL);
-+		if (!xuo) {
-+			err = -ENOMEM;
-+			goto error;
-+		}
-+	}
- 	err = xfrm_migrate(&pi->sel, pi->dir, type, m, n, kmp, net, encap,
--			   if_id, extack);
+-	xc->props.family = m->new_family;
 -
-+			   if_id, extack, xuo);
-+error:
- 	kfree(encap);
+ 	if (xfrm_init_state(xc) < 0)
+ 		goto error;
+
+-	memcpy(&xc->id.daddr, &m->new_daddr, sizeof(xc->id.daddr));
+-	memcpy(&xc->props.saddr, &m->new_saddr, sizeof(xc->props.saddr));
 -
-+	kfree(xuo);
- 	return err;
- }
- #else
+ 	/* configure the hardware if offload is requested */
+ 	if (xuo && xfrm_dev_state_add(net, xc, xuo, extack))
+ 		goto error;
 --
 2.49.0.rc0.332.g42c0ae87b1-goog
 
