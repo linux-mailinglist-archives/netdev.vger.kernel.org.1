@@ -1,172 +1,143 @@
-Return-Path: <netdev+bounces-173397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29D96A58A3F
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 03:11:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 299D4A58A60
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 03:19:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E93C73A7D33
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 02:10:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9CD8188901C
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 02:19:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A5C5156861;
-	Mon, 10 Mar 2025 02:10:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 505081581F0;
+	Mon, 10 Mar 2025 02:19:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bHqfK7rd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EtoJGccV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D43E62C9A;
-	Mon, 10 Mar 2025 02:10:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ABF110E5
+	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 02:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741572657; cv=none; b=hd4kyucDNi6lq/nKGLk5kIIJsr71Nh69MrcMfaYhJM0xldszq7NqGPqqVd/cLwkrT4k2tiou/U4zF/GfXOQrggmtESZ4Xsoxc1TAKs/brUSjjBG272ilu5gNTE4Unh0C2LUAol/LXh3fk2zpqRdkK7bCdUKG3XP5nG33zibndzE=
+	t=1741573179; cv=none; b=jWlIBSFqRXgQa/94M3NZikfIh2dDlDX72WJjk5sWxNhTL7s+f9nAXxw7BvQNFKCiOm8zUVphRFO5yMLv26mZqBXil0ITNMSGEyWtzXiYoJHm70TowAHVYNdxO0BLGsW0Q93AHFCmF0Q9tpxjO41aFGiefOsPjZWMfy9sR+SEqKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741572657; c=relaxed/simple;
-	bh=gQ3FVNImk70lsIsYT/2Bexol3lH7poii9vWQ/Q7Skjg=;
+	s=arc-20240116; t=1741573179; c=relaxed/simple;
+	bh=AtJz09iFJfguCxcJpJrTrHp/B802QUOltbOGPdkAKoc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SA2eEtIsrbdg9S6k3tAvObSjLrO2pC7WROOK3IsRtrYcRW0mrSXRkhyVeqWUWlYHwXYVWTHyaqSgZw6TMN5XzFqSYJF6hTDg6xsYvKV0BgyETWef/suSQ6TSTrbWsPQoZIwBVQTyvvUMUvapKaoTPf5SR43Ru7SK9ADb21mkwQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bHqfK7rd; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5e5b572e45cso6472526a12.0;
-        Sun, 09 Mar 2025 19:10:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741572654; x=1742177454; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SVn9TKPYoU1o+zU9Tsd+xvNpNPHPzpLsJr1Dohiegy4=;
-        b=bHqfK7rdL+E+S3jMuJugNxDZIDKnlaM1nYH2kZNL7Tef5DDN7nmEknIfs2tH4pfHeA
-         edfWaY15JghUULadwZLDsK80mvH0GaZUS1dZR95IzSoDOQ3qLTxpMR9LXNZJhrTdAPMm
-         XtBpCxRMnUdGURT4fAmFQMZvmFh/4BDdyqY3dFFJ11J9iff/1KrCXVXtdj3+VVFL+2WK
-         YP6CHqoE0Da1JrZkPIZmyG+zTFKEJJic06s7vQ7XYCzFaRkLK7SWWhwvQSRyQHWEZrUI
-         GFz7aYqjJ5o0OVxvkz54df8Pl/V19RXj2hGJCC98Q42nr3qrr/Dkt55KgVUWQ7HCN8qI
-         9dvw==
+	 To:Cc:Content-Type; b=LfF3hqB11p195O9xDVWl6zg8A/asUhOwQV0IfP01uPIRgarK1q68UH0CkuRanWFd0LI7Pg3bHFuRY4z9W/UPglsUirkuqkhcO0GSv0TYIJonqPdWLSyZNJdqfpOTvIZ6AAyyquKEVsv7vBWp2jLl34gzvYfv7ppaG7ys1Q9J9G4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EtoJGccV; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741573176;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=txux+cFqmLt2vXZPROSLCC6ehPEuq9MQWbslAZa6/aU=;
+	b=EtoJGccVtkwZXncr0ePMaN1dy2y/XKt9+iq7bMIuEzpuPTvhXkEoNgymYEWGvzIru4fdGz
+	JLD/yosWMYRhguQC/jle1Wxruls6atgI8JYpCZSpf68fZNgR9K3Jb9DP8/dWn4OeHAWW5H
+	f9W3jFv8m/P9GvaXMEFHdZAitKPrVEY=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-68-3ydxuuvkMPmWNv88quUaiQ-1; Sun, 09 Mar 2025 22:19:35 -0400
+X-MC-Unique: 3ydxuuvkMPmWNv88quUaiQ-1
+X-Mimecast-MFC-AGG-ID: 3ydxuuvkMPmWNv88quUaiQ_1741573174
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2ff7aecba07so4753305a91.2
+        for <netdev@vger.kernel.org>; Sun, 09 Mar 2025 19:19:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741572654; x=1742177454;
+        d=1e100.net; s=20230601; t=1741573174; x=1742177974;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=SVn9TKPYoU1o+zU9Tsd+xvNpNPHPzpLsJr1Dohiegy4=;
-        b=hmKiIt9zxNCtzF635Jo5u2AuQffOYkCaxtX+0dMiKHvwxnML4RrlsWb9yHv7ueYePz
-         11myhoG25BRyGosbT7uKdoUGEAbgnhPtOFqKspiDo8arkENBMQhkg1EBHfttETrUDJCl
-         XK3Hreza3dP9wLfkPQCrKcooLs8sFcBta8jwPeKywLeW641kUxlU+/XvB0tmBl4wi3a8
-         RUVacgMVemg2MYGf0X2ccS0tstu90rA2orP8v/JtycXNCIgqvBxWfv5zBF9Qre2x+n/h
-         PV2HkV1koolT7+/ChGYD+WKntf3Sn4D+N/NDNCLsOF1arN/UrXRqITQRyb54EQJTdwU8
-         ueKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW0OHMuJDLKglz7Vf7FO9d7mOEJHAGVutNEYgoGiwYwzMQgTbjeW9vJaIB1PBJOTEYj2wImKg8jAMJzKnoaGag=@vger.kernel.org, AJvYcCXU5baf9sMXfwkeCmc46XCDdrB46vDDnQvclOWN+X4JwTPx86zIP30FoQZ0nDJqbLothfP514dh@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtyogG2rIQgo81ufrrgfKTnUSvmhHjRBHQuMKad+QPRquj8NUW
-	6SToioM/Cl7kR5xC5sVUI1GSxe3zhyjNkU/P8cQZ4cxbuAtjJv8BxB/dkv+AZB0VQFcLf8Co6k0
-	uM67l9XywOf3+HbmPXNze+OMPVNY=
-X-Gm-Gg: ASbGncvEJvya4S8yAnnr6t1AfL8MylObGvwnI8hQt9IFi6RjHqYlk00YGG5sQuRP/g9
-	VuW/cBEEkopptCF9wYSFparrGprJRd5VfQXM8RgOQ7PNgUmf0W1a7ykRTCs93wNEGo+62v7yDN6
-	AsQnM0M7+nF9jjb4OgohUz3Eh4pnsm
-X-Google-Smtp-Source: AGHT+IEsQg9+az6t9RgESCFRUsW5+WSuKYH+ZO7HLMLL9nrcOVJoRM9POrAnQ7Hj6UAqFqjcKGC1dDCwaTUKMCODeYM=
-X-Received: by 2002:a05:6402:1e94:b0:5e6:1caf:daa8 with SMTP id
- 4fb4d7f45d1cf-5e61cafdacamr5348541a12.23.1741572653931; Sun, 09 Mar 2025
- 19:10:53 -0700 (PDT)
+        bh=txux+cFqmLt2vXZPROSLCC6ehPEuq9MQWbslAZa6/aU=;
+        b=HHIes0bhZIA3cFwnR23rJ+aMcmJXJMXtvJ7AOVhX2gKu4Zb3H1AaxgzsJHQVlbcugs
+         rTpmWiN7uVSUDjo/jhDY4DDoX+THFtWGHJlL58F43t5zGzQQ41zQ5zJlAHPlBGTid2RX
+         e1aHAPxAtNJ2Dnjyhhv/vTguqLEgnlDHWhj0fPL2X6bmJR120lA/uviZwM85TF0e69vH
+         Un+sf64TXhZhI9tuPEheop4bWi6lDPvD0eLCE0G3btPI58OBFojFm23uCz6/At6k9cDB
+         xRlpJKAeSrsq0OwCvtcowHiO1R4F08THxcBNlwWP+Jg0eIMCKVU23tfBwX/pKuD1ZNPq
+         oWRw==
+X-Gm-Message-State: AOJu0Ywg8dKKifdr5bsTvWjqlyIzUak1Ux+Br6fR5qdxi7eolRy0HoQZ
+	rhzRM+D+YKWudynep9ldbFmCiOfNo3rhm9xSTK4HJ+b1O3VOnH8s3RzL2CcgxxxQfTxpRLPuN9e
+	ykA5ctxOBSGJeDIO+uSwDVVxhAKInYD89owD9rl7X95yvk2PXfPviQMl13v4615a1c4W72EY3tn
+	1a2moMnQm8KmzMfyyQLu9MSowh7A/v
+X-Gm-Gg: ASbGncsNJ27k42MaVraVx/fPH3pGWMxW1j9MxPdVFggqAnQpsIlcSBy1gH2WHRg76Qs
+	gpF3jJhIGrNeFrBg6FaCx8fTwcJLd/3iJWHNoI1/MPWDcFXPc/KAV4c6IuNSply6j0KysnIcTwA
+	==
+X-Received: by 2002:a17:90b:4ad2:b0:2fa:137f:5c5c with SMTP id 98e67ed59e1d1-2ff7ce59712mr17785021a91.1.1741573174026;
+        Sun, 09 Mar 2025 19:19:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFfi1kUcnjN/MGKScrpXZXxg0LHhjJwKWatCBlfrt9ASrGU0RhKt2zcjhKxKIGQsohJlSyTaOwlLcFFR/095Oc=
+X-Received: by 2002:a17:90b:4ad2:b0:2fa:137f:5c5c with SMTP id
+ 98e67ed59e1d1-2ff7ce59712mr17784996a91.1.1741573173619; Sun, 09 Mar 2025
+ 19:19:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250309134219.91670-1-ap420073@gmail.com> <20250309134219.91670-3-ap420073@gmail.com>
- <CAHS8izPH=FkfGjq_+CzGJhZ3Wt06njM2c6HcBK7W1Xv6C8d5xw@mail.gmail.com>
-In-Reply-To: <CAHS8izPH=FkfGjq_+CzGJhZ3Wt06njM2c6HcBK7W1Xv6C8d5xw@mail.gmail.com>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Mon, 10 Mar 2025 11:10:42 +0900
-X-Gm-Features: AQ5f1JpOK6pCnVNWHvOtn-B6POgmO7eE4jwUJPvaIHwt0l_nGAvZ9mFoFskTjfM
-Message-ID: <CAMArcTWv_arQCWSeYehk=uM_=M+Hx0W_2C2cbvogQS+CmJu2aA@mail.gmail.com>
-Subject: Re: [PATCH v3 net 2/8] eth: bnxt: return fail if interface is down in bnxt_queue_mem_alloc()
-To: Mina Almasry <almasrymina@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, andrew+netdev@lunn.ch, michael.chan@broadcom.com, 
-	pavan.chebbi@broadcom.com, horms@kernel.org, shuah@kernel.org, 
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	asml.silence@gmail.com, willemb@google.com, kaiyuanz@google.com, 
-	skhawaja@google.com, sdf@fomichev.me, gospo@broadcom.com, 
-	somnath.kotur@broadcom.com, dw@davidwei.uk, amritha.nambiar@intel.com, 
-	xuanzhuo@linux.alibaba.com
+References: <20250307011215.266806-1-jdamato@fastly.com> <20250307011215.266806-4-jdamato@fastly.com>
+In-Reply-To: <20250307011215.266806-4-jdamato@fastly.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 10 Mar 2025 10:19:22 +0800
+X-Gm-Features: AQ5f1Jqyyv20MK_Tuve32OgEwQce7uxyuKX5GI5kUQGIUUAGsE7tTG42f1QJ5Ec
+Message-ID: <CACGkMEuwTaH9fTXC00633RsiKd9BMZSAaPG17i-+MPagGwn0dQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 3/4] virtio-net: Map NAPIs to queues
+To: Joe Damato <jdamato@fastly.com>
+Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca, 
+	gerhard@engleder-embedded.com, xuanzhuo@linux.alibaba.com, kuba@kernel.org, 
+	mst@redhat.com, leiyang@redhat.com, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>, open list <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 10, 2025 at 6:44=E2=80=AFAM Mina Almasry <almasrymina@google.co=
-m> wrote:
+On Fri, Mar 7, 2025 at 9:12=E2=80=AFAM Joe Damato <jdamato@fastly.com> wrot=
+e:
 >
-
-Hi Mina,
-Thanks a lot for the review!
-
-> On Sun, Mar 9, 2025 at 6:43=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> wr=
-ote:
-> >
-> > The bnxt_queue_mem_alloc() is called to allocate new queue memory when
-> > a queue is restarted.
-> > It internally accesses rx buffer descriptor corresponding to the index.
-> > The rx buffer descriptor is allocated and set when the interface is up
-> > and it's freed when the interface is down.
-> > So, if queue is restarted if interface is down, kernel panic occurs.
-> >
-> > Splat looks like:
-> >  BUG: unable to handle page fault for address: 000000000000b240
-> >  #PF: supervisor read access in kernel mode
-> >  #PF: error_code(0x0000) - not-present page
-> >  PGD 0 P4D 0
-> >  Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
-> >  CPU: 3 UID: 0 PID: 1563 Comm: ncdevmem2 Not tainted 6.14.0-rc2+ #9 844=
-ddba6e7c459cafd0bf4db9a3198e
-> >  Hardware name: ASUS System Product Name/PRIME Z690-P D4, BIOS 0603 11/=
-01/2021
-> >  RIP: 0010:bnxt_queue_mem_alloc+0x3f/0x4e0 [bnxt_en]
-> >  Code: 41 54 4d 89 c4 4d 69 c0 c0 05 00 00 55 48 89 f5 53 48 89 fb 4c 8=
-d b5 40 05 00 00 48 83 ec 15
-> >  RSP: 0018:ffff9dcc83fef9e8 EFLAGS: 00010202
-> >  RAX: ffffffffc0457720 RBX: ffff934ed8d40000 RCX: 0000000000000000
-> >  RDX: 000000000000001f RSI: ffff934ea508f800 RDI: ffff934ea508f808
-> >  RBP: ffff934ea508f800 R08: 000000000000b240 R09: ffff934e84f4b000
-> >  R10: ffff9dcc83fefa30 R11: ffff934e84f4b000 R12: 000000000000001f
-> >  R13: ffff934ed8d40ac0 R14: ffff934ea508fd40 R15: ffff934e84f4b000
-> >  FS:  00007fa73888c740(0000) GS:ffff93559f780000(0000) knlGS:0000000000=
-000000
-> >  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> >  CR2: 000000000000b240 CR3: 0000000145a2e000 CR4: 00000000007506f0
-> >  PKRU: 55555554
-> >  Call Trace:
-> >   <TASK>
-> >   ? __die+0x20/0x70
-> >   ? page_fault_oops+0x15a/0x460
-> >   ? exc_page_fault+0x6e/0x180
-> >   ? asm_exc_page_fault+0x22/0x30
-> >   ? __pfx_bnxt_queue_mem_alloc+0x10/0x10 [bnxt_en 7f85e76f4d724ba07471d=
-7e39d9e773aea6597b7]
-> >   ? bnxt_queue_mem_alloc+0x3f/0x4e0 [bnxt_en 7f85e76f4d724ba07471d7e39d=
-9e773aea6597b7]
-> >   netdev_rx_queue_restart+0xc5/0x240
-> >   net_devmem_bind_dmabuf_to_queue+0xf8/0x200
-> >   netdev_nl_bind_rx_doit+0x3a7/0x450
-> >   genl_family_rcv_msg_doit+0xd9/0x130
-> >   genl_rcv_msg+0x184/0x2b0
-> >   ? __pfx_netdev_nl_bind_rx_doit+0x10/0x10
-> >   ? __pfx_genl_rcv_msg+0x10/0x10
-> >   netlink_rcv_skb+0x54/0x100
-> >   genl_rcv+0x24/0x40
-> > ...
-> >
-> > Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-> > Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+> Use netif_queue_set_napi to map NAPIs to queue IDs so that the mapping
+> can be accessed by user apps. Note that the netif_queue_set_napi
+> currently requires RTNL, so care must be taken to ensure RTNL is held on
+> paths where this API might be reached.
 >
-> Reviewed-by: Mina Almasry <almasrymina@google.com>
+> The paths in the driver where this API can be reached appear to be:
 >
-> Although I wonder if you wanna return -ENETDOWN from other queue API
-> ops, if your driver doesn't handle them.
+>   - ndo_open, ndo_close, which hold RTNL so no driver change is needed.
+>   - rx_pause, rx_resume, tx_pause, tx_resume are reached either via
+>     an ethtool ioctl or via XSK - neither path requires a driver change.
+>   - power management paths (which call open and close), which have been
+>     updated to hold/release RTNL.
+>
+> $ ethtool -i ens4 | grep driver
+> driver: virtio_net
+>
+> $ sudo ethtool -L ens4 combined 4
+>
+> $ ./tools/net/ynl/pyynl/cli.py \
+>        --spec Documentation/netlink/specs/netdev.yaml \
+>        --dump queue-get --json=3D'{"ifindex": 2}'
+> [{'id': 0, 'ifindex': 2, 'napi-id': 8289, 'type': 'rx'},
+>  {'id': 1, 'ifindex': 2, 'napi-id': 8290, 'type': 'rx'},
+>  {'id': 2, 'ifindex': 2, 'napi-id': 8291, 'type': 'rx'},
+>  {'id': 3, 'ifindex': 2, 'napi-id': 8292, 'type': 'rx'},
+>  {'id': 0, 'ifindex': 2, 'type': 'tx'},
+>  {'id': 1, 'ifindex': 2, 'type': 'tx'},
+>  {'id': 2, 'ifindex': 2, 'type': 'tx'},
+>  {'id': 3, 'ifindex': 2, 'type': 'tx'}]
+>
+> Note that virtio_net has TX-only NAPIs which do not have NAPI IDs, so
+> the lack of 'napi-id' in the above output is expected.
+>
+> Signed-off-by: Joe Damato <jdamato@fastly.com>
+> ---
 
-Okay, I will add -ENETDOWN return to the other queue API in the next
-version.
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-Thanks a lot!
-Taehee Yoo
+Thanks
+
 
