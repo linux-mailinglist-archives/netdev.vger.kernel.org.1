@@ -1,281 +1,180 @@
-Return-Path: <netdev+bounces-173497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3361A59348
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:59:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AEC90A59394
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 13:08:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8DF93A6A97
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 11:59:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D840F3AAE34
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:07:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3925822ACCE;
-	Mon, 10 Mar 2025 11:57:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E54AB22ACC6;
+	Mon, 10 Mar 2025 12:06:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="XAGx2M1t"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2079.outbound.protection.outlook.com [40.107.237.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F932288F7
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 11:57:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741607876; cv=none; b=WZ4z6Km9lKZ2JCWHN1xojkVc5wgDWpGNJEXhss+UKgguTXgRz/BRx1+OgMv1owoZ9BihuxAWeW7cOmJz9m1wtUKhhxkzLA9G06pwbAMDuoeKT6Dl4V6JEGJaZBmkKq38kJSCp/+DY13wNpUOIAZD+AmtRISGyw8Yhk1f7TcXxMM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741607876; c=relaxed/simple;
-	bh=Fuvdl0TGF9YX6waEmfb6eHtjb5Ubzg70XEPVxrTVx3E=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lw2mroIgId+5UQFvX/gUbOP6iGyKOdluyXpDW7KessWGbP2XE7hjCgc4QcXP64RhwdBXjcEUB3pHmpV8Xv0FkJNWJXVoTZXgKCj0F6+32CwyQNpl6fuEGAD7s6e2oGwYjEpWMLwgh7ro2vomkJFMfdSxuf8xfnqURh0wMUg/X+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1trblL-0000SA-Cm; Mon, 10 Mar 2025 12:57:39 +0100
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1trblK-004za9-0h;
-	Mon, 10 Mar 2025 12:57:38 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1trblK-003I2Q-0K;
-	Mon, 10 Mar 2025 12:57:38 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Thangaraj Samynathan <Thangaraj.S@microchip.com>,
-	Rengarajan Sundararajan <Rengarajan.S@microchip.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	Phil Elwell <phil@raspberrypi.org>
-Subject: [PATCH net-next v3 7/7] net: usb: lan78xx: Integrate EEE support with phylink LPI API
-Date: Mon, 10 Mar 2025 12:57:37 +0100
-Message-Id: <20250310115737.784047-8-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250310115737.784047-1-o.rempel@pengutronix.de>
-References: <20250310115737.784047-1-o.rempel@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2828822A801;
+	Mon, 10 Mar 2025 12:06:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.79
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741608397; cv=fail; b=XU+/5Bo+06uPlqq6OHWSr5jVwaSvXX5V6COFuY9sPXUyvCQdRUegVf3blQY+hbWikEFLkSLIeFoJ+r6WzqvZzl4IdResQ05wKw0iuPydpQCFGOJTu0m6ZWX0tFZs2Q48Jo+JFSvcx/5glVy1FDaPFAXmXpcgeTfSyTkxmCAIuRM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741608397; c=relaxed/simple;
+	bh=4FCY7zxPuVD/RjOSbmxHOnl2tfMSjAVKfuUDBhxDDh0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jhfsVcdhjg+qxUWjHMI8rkZVuHoxONRgyS5kHqivjP5dEeQwQ0Pq0ZxRTs7MI/PU82aT6XGI33s8JkNO60nvoqnmlE/0VEvfJqNCkJSSYJ3G7iAxzs0O7DTwwl5y5sRd4fo9Nj4rstZwuAYnqSRv/BixMolsqxlHwkyiRYqVhk0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=XAGx2M1t; arc=fail smtp.client-ip=40.107.237.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=dtBQo6+uMfYzhX1L9NoGBCX8vlCFau+GXDIyUbUgbE2w5N8/prZc+xatufqVuRDQT3fe8enUJQFKl3xtsEo/JzVnhAkt9ATAKwz9OEqYLwzw5Y8j4qzunO+IGBBN1jchEVQ1Q/NSlzOgzppfuD7GV2g1mnHZo+UbEgqIwx248JW3+ZJhwlcRlYSz0v0Y9gchM7fnszYNFd3U0yc4Kws1vzgPx9uP+K1TgW4Od3NZ6XtG/1SZOWHtsZb9LZILAUG4rIYOmQ6+9ndIhI2+Ty6IbbL+TByMRmmGJcd5+GfJNA5e3Fe3jZ72ybIAV8ulo6MJ0ONj4EqCy04aekGDlUd4dQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nkaSx5eXLQjoR7q9kuZn5EswxNnvRaE88tmVUKvTaBI=;
+ b=pgEtB+zNg96v9AplS5/TwwFr9QzElOHCYtLux7qiu3vZG9oJaYB5IT9DAew37FPGBJtoRxB76gpAyuRcHuGhVWRX5w1D5Saj5Yyok3xgVVvF28rcwIxVJJ6mT4YlkuUPrXmezQw0M0ExzU28wLlSLA1OLno3OAgQYuqgZmu8IY0FIWRpu9YXZKaZTaW41abmPJUCzxtZz5A3jVjYQTBfr8fRIHHKdB3yWtkf9bLDZRIlopu+jPlqOyusk6Gugnld8QOodN43x20pCfd28Z/kVR1s2DCVwwMQa4/5VOzUZz+pXqOgpJyrASue2A/a3farZksdKGsNRAyUOklu9XsSxA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nkaSx5eXLQjoR7q9kuZn5EswxNnvRaE88tmVUKvTaBI=;
+ b=XAGx2M1tdm0kXyyM96dh3zY9N0Ibu9ZAp2JLMBKhvXMFzw0m3vpIPteey/TA58jKekK1aoS7M3BU3aSJsjaHViPpWJPr3NCOuL4ZKKSRkCGeYMRsI0fnblqSmt+aJ1ITBVPNDJz9OTk+aZRVwgsrz4wG+7IF0Y617zPWjZpNWmt2zUnYMO221B23dAuZxWu2tb3lIcuApWQWU4Q/zUN2TcHDZapPyeLNHjjrKJ/j3ktVe5/uha+lqAjiln3huDLfMZvMirQ0hwdcgNf9xryhdd7XflDc3VypH/NctvtsSOsJlxH7iFhi9YPh0+VhPCq/78TRhBJLk6PXdaZYkFJzwA==
+Received: from SJ0PR05CA0160.namprd05.prod.outlook.com (2603:10b6:a03:339::15)
+ by SN7PR12MB6863.namprd12.prod.outlook.com (2603:10b6:806:264::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.25; Mon, 10 Mar
+ 2025 12:06:29 +0000
+Received: from SJ1PEPF0000231C.namprd03.prod.outlook.com
+ (2603:10b6:a03:339:cafe::d9) by SJ0PR05CA0160.outlook.office365.com
+ (2603:10b6:a03:339::15) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8534.17 via Frontend Transport; Mon,
+ 10 Mar 2025 12:06:29 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SJ1PEPF0000231C.mail.protection.outlook.com (10.167.242.233) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8534.20 via Frontend Transport; Mon, 10 Mar 2025 12:06:28 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 10 Mar
+ 2025 05:06:11 -0700
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Mon, 10 Mar
+ 2025 05:06:10 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.10)
+ with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Mon, 10
+ Mar 2025 05:06:06 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>
+CC: Leon Romanovsky <leon@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, Mark Bloch
+	<mbloch@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
+	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Leon Romanovsky <leonro@nvidia.com>, "Yael
+ Chemla" <ychemla@nvidia.com>
+Subject: [pull-request] mlx5-next updates 2025-03-10
+Date: Mon, 10 Mar 2025 14:04:53 +0200
+Message-ID: <1741608293-41436-1-git-send-email-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.8.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF0000231C:EE_|SN7PR12MB6863:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8dcb38f5-f488-4ecf-e87c-08dd5fcbfd53
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?jmKSTzGm3RE4hHzyGj8zR+TFqLYDkcXOhcgUR39+YEogkJfeQLSjwa2QOlNK?=
+ =?us-ascii?Q?9bJYcPwQA1Kp+WIw7NY6E8qzHT09vNscqFasTeccSJ4Y7i239W0HoLQRd+VV?=
+ =?us-ascii?Q?1c1nOE4YrOVQukA+Cc5yYccFoNoo24OsJJbxNIhL5ioG4pzRUYBwujlEcno2?=
+ =?us-ascii?Q?jvuh7/fmYZGQB+RWQOw8aC+pf1C1eeKpXdEK0qrRhj8c983YFQoWCPHN1jOK?=
+ =?us-ascii?Q?QkInrc4lHDw7K27eQMFBC8R9I60tJbcbQPRzM2fx2mrAxvm5Yv4gRMh9HYyi?=
+ =?us-ascii?Q?6VTCJ923hwMARmPeATVgrJyZmKFi7i/JAp+w516XahuKYSyA/fBVJqZkHyBh?=
+ =?us-ascii?Q?RNlRiJimR41AZH69QEm5cCGTEWLGxeZINuLJZDNy5S6FyYBmWhEa3Q3nwxEk?=
+ =?us-ascii?Q?hA98/dq1CFFc7GJMV3x0hOOiXwkDL3PW4GxyS6smqguhowFxUQvyCbVCch3F?=
+ =?us-ascii?Q?EXU2VjJ9UPsLRBBnlv+cMWfHPy8ceWRzXYVlLSG6wH9TmH3OnarNDG0H6L/i?=
+ =?us-ascii?Q?+EBR6XvaJzbFcznwWITRtW1Dd97uEprxelXScrfXxz94EvPeYVwGrvr24Da3?=
+ =?us-ascii?Q?8K1OBa9ZTkcKUfZM/M0hH/8Ck3Dvi8QYvAhpEmMSamEgqlrxZ3IlgZyFQ+/E?=
+ =?us-ascii?Q?LJr1icf/OLaIb3sWUzvCUEevJV5MZWPY5tIRI+azXqrq1SUaqt/rl7ZSRC/M?=
+ =?us-ascii?Q?gtDStdPznXJnTaHJ2ivnXOVMu89TGePKtTKkS0eSGHF7SswOQLAfCOSvRsdS?=
+ =?us-ascii?Q?koEeUNcDj5NJgdwPbcMZ1dGup0BgW7cqNlfr3qvgZr8E9t9WvgLCRwZZMFk5?=
+ =?us-ascii?Q?T+TVkxpLB0fS9gjtge6C2RVawLY0UxxKa4Zy+BDX8rOF6uLoH9zYbHxKYQLN?=
+ =?us-ascii?Q?zRLBEI/iGEol2Cqq4vpGKdU2+QtdotmvBNTy+sIEtZIY/EmJwvYCoZOd2GhX?=
+ =?us-ascii?Q?a2lS/9GOhX5w0itvDS2lmaU/JftHfp3zSwgLzzNJF70gxGpyixLhkza+eD0s?=
+ =?us-ascii?Q?cD5i0I9cv55aJb+x64X95YVpYglmPqesu3P1yuMrAvU1tLxfoUsLJPDUoy4c?=
+ =?us-ascii?Q?JcHObNfhtJVlV/uhserj0AG73So+HDpuFKUmlflnI8gRGrkUmVSgjnyucGsD?=
+ =?us-ascii?Q?dIrWrEGTvii8XsuFygsNbDHmVXZUwjBo6qFD+BYrz99oysfpDVhwrpNlNDrv?=
+ =?us-ascii?Q?jnareQw4PF03fjd61O0LvMlItYEc9Z6X2Df0HozgtIzkldNl2H8SXnefye9G?=
+ =?us-ascii?Q?iPS3DDcA5P8dtG2GzmWtL2VL47PCFbuM3FzXhpPAySADB+wlM64ewWJvuzgX?=
+ =?us-ascii?Q?F8wZWub+VU+SDC8tKIini+7BGO2jXtFbtBAJSyWJhjT5zZ1cNGZFlT7fsPMB?=
+ =?us-ascii?Q?MNPWs9c1M3BjioFpBlWotUoDfUC1pzQeznMcAvq1E0LVM/sCfeyttAymXdda?=
+ =?us-ascii?Q?2USfxJPYTX+WrmHPbOLSELWrbbj5mhZ0lGE95lWZKK0Zp+jmJEJ/cu4c6RT7?=
+ =?us-ascii?Q?ZW+6PmJJstnFnSE=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Mar 2025 12:06:28.8206
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8dcb38f5-f488-4ecf-e87c-08dd5fcbfd53
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF0000231C.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6863
 
-Refactor Energy-Efficient Ethernet (EEE) support in the LAN78xx driver to
-fully integrate with the phylink Low Power Idle (LPI) API. This includes:
+Hi,
 
-- Replacing direct calls to `phy_ethtool_get_eee` and `phy_ethtool_set_eee`
-  with `phylink_ethtool_get_eee` and `phylink_ethtool_set_eee`.
-- Implementing `.mac_enable_tx_lpi` and `.mac_disable_tx_lpi` to control
-  LPI transitions via phylink.
-- Configuring `lpi_timer_default` to align with recommended values from
-  LAN7800 documentation.
-- ensure EEE is disabled on controller reset
+The following pull-request contains common mlx5 updates for your *net-next* tree.
+Please pull and let me know of any problem.
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
-changes v2:
-- use latest PHYlink TX_LPI API
----
- drivers/net/usb/lan78xx.c | 120 ++++++++++++++++++++++++--------------
- 1 file changed, 76 insertions(+), 44 deletions(-)
+Regards,
+Tariq
 
-diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
-index 3aa916a9ee0b..0400616e1300 100644
---- a/drivers/net/usb/lan78xx.c
-+++ b/drivers/net/usb/lan78xx.c
-@@ -1785,54 +1785,15 @@ static int lan78xx_set_wol(struct net_device *netdev,
- static int lan78xx_get_eee(struct net_device *net, struct ethtool_keee *edata)
- {
- 	struct lan78xx_net *dev = netdev_priv(net);
--	struct phy_device *phydev = net->phydev;
--	int ret;
--	u32 buf;
--
--	ret = usb_autopm_get_interface(dev->intf);
--	if (ret < 0)
--		return ret;
--
--	ret = phy_ethtool_get_eee(phydev, edata);
--	if (ret < 0)
--		goto exit;
- 
--	ret = lan78xx_read_reg(dev, MAC_CR, &buf);
--	if (buf & MAC_CR_EEE_EN_) {
--		/* EEE_TX_LPI_REQ_DLY & tx_lpi_timer are same uSec unit */
--		ret = lan78xx_read_reg(dev, EEE_TX_LPI_REQ_DLY, &buf);
--		edata->tx_lpi_timer = buf;
--	} else {
--		edata->tx_lpi_timer = 0;
--	}
--
--	ret = 0;
--exit:
--	usb_autopm_put_interface(dev->intf);
--
--	return ret;
-+	return phylink_ethtool_get_eee(dev->phylink, edata);
- }
- 
- static int lan78xx_set_eee(struct net_device *net, struct ethtool_keee *edata)
- {
- 	struct lan78xx_net *dev = netdev_priv(net);
--	int ret;
--	u32 buf;
--
--	ret = usb_autopm_get_interface(dev->intf);
--	if (ret < 0)
--		return ret;
--
--	ret = phy_ethtool_set_eee(net->phydev, edata);
--	if (ret < 0)
--		goto out;
--
--	buf = (u32)edata->tx_lpi_timer;
--	ret = lan78xx_write_reg(dev, EEE_TX_LPI_REQ_DLY, buf);
--out:
--	usb_autopm_put_interface(dev->intf);
- 
--	return ret;
-+	return phylink_ethtool_set_eee(dev->phylink, edata);
- }
- 
- static void lan78xx_get_drvinfo(struct net_device *net,
-@@ -2470,10 +2431,59 @@ static void lan78xx_mac_link_up(struct phylink_config *config,
- 		   ERR_PTR(ret));
- }
- 
-+static int lan78xx_mac_eee_enable(struct lan78xx_net *dev, bool enable)
-+{
-+	u32 mac_cr = 0;
-+
-+	if (enable)
-+		mac_cr |= MAC_CR_EEE_EN_;
-+
-+	/* make sure TXEN and RXEN are disabled before reconfiguring MAC */
-+	return lan78xx_update_reg(dev, MAC_CR, MAC_CR_EEE_EN_, mac_cr);
-+}
-+
-+static void lan78xx_mac_disable_tx_lpi(struct phylink_config *config)
-+{
-+	struct net_device *net = to_net_dev(config->dev);
-+	struct lan78xx_net *dev = netdev_priv(net);
-+
-+	lan78xx_mac_eee_enable(dev, false);
-+}
-+
-+static int lan78xx_mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
-+				     bool tx_clk_stop)
-+{
-+	struct net_device *net = to_net_dev(config->dev);
-+	struct lan78xx_net *dev = netdev_priv(net);
-+	int ret;
-+
-+	/* Software should only change this field when Energy Efficient
-+	 * Ethernet Enable (EEEEN) is cleared. We ensure that by clearing
-+	 * EEEEN during probe, and phylink itself guarantees that
-+	 * mac_disable_tx_lpi() will have been previously called.
-+	 */
-+	ret = lan78xx_write_reg(dev, EEE_TX_LPI_REQ_DLY, timer);
-+	if (ret < 0)
-+		goto tx_lpi_fail;
-+
-+	ret = lan78xx_mac_eee_enable(dev, true);
-+	if (ret < 0)
-+		goto tx_lpi_fail;
-+
-+	return 0;
-+
-+tx_lpi_fail:
-+	netdev_err(dev->net, "Failed to enable TX LPI with error %pe\n",
-+		   ERR_PTR(ret));
-+	return ret;
-+}
-+
- static const struct phylink_mac_ops lan78xx_phylink_mac_ops = {
- 	.mac_config = lan78xx_mac_config,
- 	.mac_link_down = lan78xx_mac_link_down,
- 	.mac_link_up = lan78xx_mac_link_up,
-+	.mac_disable_tx_lpi = lan78xx_mac_disable_tx_lpi,
-+	.mac_enable_tx_lpi = lan78xx_mac_enable_tx_lpi,
- };
- 
- static struct phy_device *lan7801_phy_init(struct lan78xx_net *dev)
-@@ -2528,6 +2538,26 @@ static int lan78xx_phylink_setup(struct lan78xx_net *dev)
- 	pc->mac_capabilities = MAC_SYM_PAUSE | MAC_ASYM_PAUSE | MAC_10 |
- 			       MAC_100 | MAC_1000FD;
- 	pc->mac_managed_pm = true;
-+	pc->lpi_capabilities = MAC_100FD | MAC_1000FD;
-+	/*
-+	 * Default TX LPI (Low Power Idle) request delay count is set to 50us.
-+	 *
-+	 * Source: LAN7800 Documentation, DS00001992H, Section 15.1.57, Page 204.
-+	 *
-+	 * Reasoning:
-+	 * According to the application note in the LAN7800 documentation, a
-+	 * zero delay may negatively impact the TX data path’s ability to
-+	 * support Gigabit operation. A value of 50us is recommended as a
-+	 * reasonable default when the part operates at Gigabit speeds,
-+	 * balancing stability and power efficiency in EEE mode. This delay can
-+	 * be increased based on performance testing, as EEE is designed for
-+	 * scenarios with mostly idle links and occasional bursts of full
-+	 * bandwidth transmission. The goal is to ensure reliable Gigabit
-+	 * performance without overly aggressive power optimization during
-+	 * inactive periods.
-+	 */
-+	pc->lpi_timer_default = 50;
-+	pc->eee_enabled_default = true;
- 
- 	if (dev->chipid == ID_REV_CHIP_ID_7801_) {
- 		phy_interface_set_rgmii(pc->supported_interfaces);
-@@ -2538,6 +2568,10 @@ static int lan78xx_phylink_setup(struct lan78xx_net *dev)
- 		link_interface = PHY_INTERFACE_MODE_INTERNAL;
- 	}
- 
-+	memcpy(dev->phylink_config.lpi_interfaces,
-+	       dev->phylink_config.supported_interfaces,
-+	       sizeof(dev->phylink_config.lpi_interfaces));
-+
- 	phylink = phylink_create(pc, dev->net->dev.fwnode,
- 				 link_interface, &lan78xx_phylink_mac_ops);
- 	if (IS_ERR(phylink))
-@@ -2607,8 +2641,6 @@ static int lan78xx_phy_init(struct lan78xx_net *dev)
- 		return ret;
- 	}
- 
--	phy_support_eee(phydev);
--
- 	if (phydev->mdio.dev.of_node) {
- 		u32 reg;
- 		int len;
-@@ -3131,7 +3163,7 @@ static int lan78xx_reset(struct lan78xx_net *dev)
- 	if (ret < 0)
- 		return ret;
- 
--	buf &= ~(MAC_CR_AUTO_DUPLEX_ | MAC_CR_AUTO_SPEED_);
-+	buf &= ~(MAC_CR_AUTO_DUPLEX_ | MAC_CR_AUTO_SPEED_ | MAC_CR_EEE_EN_);
- 
- 	/* LAN7801 only has RGMII mode */
- 	if (dev->chipid == ID_REV_CHIP_ID_7801_)
--- 
-2.39.5
+----------------------------------------------------------------
 
+The following changes since commit 15b103df80b25025040faa8f35164c2595977bdb:
+
+  net/mlx5: fs, add RDMA TRANSPORT steering domain support (2025-03-08 13:22:49 -0500)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git mlx5-next
+
+for you to fetch changes up to f550694e88b7b13b647777f889e03e544d9db60c:
+
+  net/mlx5: Add IFC bits for PPCNT recovery counters group (2025-03-10 04:31:15 -0400)
+
+----------------------------------------------------------------
+Yael Chemla (1):
+      net/mlx5: Add IFC bits for PPCNT recovery counters group
+
+ include/linux/mlx5/device.h   |  1 +
+ include/linux/mlx5/mlx5_ifc.h | 11 ++++++++++-
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
