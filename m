@@ -1,95 +1,103 @@
-Return-Path: <netdev+bounces-173445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1A8DA58E13
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 09:24:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 925CAA58E37
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 09:34:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F6AD7A3A61
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 08:23:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 553833AD1DA
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 08:34:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F4EC223706;
-	Mon, 10 Mar 2025 08:24:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44663221F12;
+	Mon, 10 Mar 2025 08:34:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NeCcaNX7"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="IzOIrQXH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FFFE2236EE;
-	Mon, 10 Mar 2025 08:23:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 475C31401B
+	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 08:34:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741595044; cv=none; b=OKAEigsAajACsPEM7G1aNCKt0zrcWSC0DKks3ckZ4QkXfi0sBVB+Bfu6Kvive1cIQrhi0/UMXrRhR34FtwYBkGVyE9mesGJvU72h0eKuYy/WI4oY1uKHuHhwqGPcS1xi7IXS3rhEE24nfu4m+l6QRaFrr/9ebfMufHG/1qfa6E8=
+	t=1741595661; cv=none; b=tCGCN0xfeIXpZTgq3A8UULQ4LjwSFvQdwWEwF2Yuyl9cSqTQpwyjQWhFmxjsGRVg8evcYatI8E7HNzGZXj/6edfeEjFMSZ9VmSSLSVrUsWnNNjo/3xKofa0i/WX4xO6Yx29MbhRyEF/ZFz/poeZKFU2BDk+srZ9Tbv659PiBf6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741595044; c=relaxed/simple;
-	bh=wDUt90Ru1pIsLbuQaEl1/JJ92mn4IFdSALT9enUC0Zk=;
+	s=arc-20240116; t=1741595661; c=relaxed/simple;
+	bh=pvy46BxG/jCiJ7xhXX3byEdS6V43yZAv3kmnQ09GnVA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fZIKRT3z1zdQ00AsGtLGuvkN7N+ajufz473asw+8/nstr2zEqPGvYCbZzBD9IHhsMqtkQ89BXXaWpnglfuM0mvni/cY6SH32Ae6mTptmLpqPtOnIIMLSYbrWNopFf9y3HRqFxTe7yMJXmdnGntVo3I3kcDMZ6I7TqMPXCqoL0mc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NeCcaNX7; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741595042; x=1773131042;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=wDUt90Ru1pIsLbuQaEl1/JJ92mn4IFdSALT9enUC0Zk=;
-  b=NeCcaNX7i9BJWq4O6CV+jxRS4NbMYDJShewxSWeslW+RqWxkaNIciz9/
-   1oDxIdzkwBl1QmFlNOCIb6fPphpdR0EjsCCO61LwHFyKKMmD/wKEtLE4t
-   tHabTQj6bRWnBfdxn6FK1okU4sYZX8um/Nab0BUivVEb/mc4kl9o3o2MP
-   DGL02yQhXsfRiS4pACU90fDPi98S4Tn43a9fAQp5/hyulF5X/nL9tGbf/
-   6xXC5P9xjJEIi7wbEY8/uCz3p32qpyLceDGYvTEnQSdNtaczbL4zgvT4n
-   07QIRhWzpWkuvd7Pd3AqCN1HJ7oPMyARDPY2oVRIMTXRP2aDVjoIMNsn7
-   Q==;
-X-CSE-ConnectionGUID: FssS8ukdRlintfeHZuHctA==
-X-CSE-MsgGUID: z/qQHn14RzCewYUPudVCww==
-X-IronPort-AV: E=McAfee;i="6700,10204,11368"; a="42452034"
-X-IronPort-AV: E=Sophos;i="6.14,235,1736841600"; 
-   d="scan'208";a="42452034"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 01:23:57 -0700
-X-CSE-ConnectionGUID: +bOE7dHbRoqsk9GwXYWRSQ==
-X-CSE-MsgGUID: uueDdXFiROSxh6W7LvQjPA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,235,1736841600"; 
-   d="scan'208";a="125170132"
-Received: from smile.fi.intel.com ([10.237.72.58])
-  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 01:23:51 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1trYQO-00000001Bqq-066w;
-	Mon, 10 Mar 2025 10:23:48 +0200
-Date: Mon, 10 Mar 2025 10:23:47 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Matti Vaittinen <mazziesaccount@gmail.com>
-Cc: Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>,
-	Jonathan Cameron <jic23@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Daniel Scally <djrscally@gmail.com>,
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-	Sakari Ailus <sakari.ailus@linux.intel.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=QGBkLCJ8lYamcXV6CRkQg7nhycP0IslL9G5d1Tz9QLkrb/41tUWXigyxX1p7oPMWgVhMr1UD10LWwm0v3vn0xL4SkKdle+X5cmC5Fwi1GynpU+fKl+XYYoILEEdyObUek35ZUEUXUTZfJ4g4Al3lyUbdgyVlo+fKY3QvK4pZvZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=IzOIrQXH; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ac2902f7c2aso168018066b.1
+        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 01:34:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1741595657; x=1742200457; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Y2NHSFGieJrXy63h9C9tBiXMMHg1HSP9eRFf8a1NgQY=;
+        b=IzOIrQXHJ0cWTF9ZMdAnaFdMn9AS9zXRqGFqhjH4eQULTSYpICL/v5pTugVLSv1ISQ
+         +WXjT60fHLdc1FkhBPt0j9LCe5j7cElVmt/3hoHXinZoeLKReJzh9LRbMaVAXt38PxwS
+         /kUh8jQk0rIKalXprwYQRJELO6P/L5nWb4Q5k=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741595657; x=1742200457;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y2NHSFGieJrXy63h9C9tBiXMMHg1HSP9eRFf8a1NgQY=;
+        b=SUwBK6R7LSSYSe20aweXrq7ZMeDvk2UhNw+vbfOHDU1MLd+RRCJuwHR20IZ1Ej3hE2
+         vkLh6gsQ97IIPET3TA+1UmbT65PxVNNdsdIgSWb8XZNBm0uwpnRcUsS66FNAY4pwFPqv
+         zz8zrhmMKk/KPHn58ycyH++oyxaR2q6h3sLbfNgsAN8RfBZR6s9wSgflrg6BJp4O0b4R
+         h8P8id0RQhq0wo1gzuR3PLg3r1i06MPjWH1YIk3hckdZf4Bxj/XF6UK7H87z4jsKBVsD
+         MmjxnRel8cUgKtwMir2zNxl7OJpXDf6mmfCnKALblOcKbTc0RJJiRjQTy4/L3wsu3j31
+         Hy4w==
+X-Forwarded-Encrypted: i=1; AJvYcCVNhs6W+Vn/geghYk/xYLiWf07xf1WrdeUY6fGxYbIg3Jgob1OLRs0G5WBMFuIkjOT2Y3miRKs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7KQ806YeaBFixoigeELsbDPAKQ6k8xT8pc5yd7DgWdRqwoObn
+	mMyFeER34Lvswl1EiBblp/PRAaqENe+N/XnIcTBoO1NF+p65LCBF2qIpFtI5RQ+9loqeGWKJPW7
+	Nc+k=
+X-Gm-Gg: ASbGncu5E9S84hY8ORBiHFIPrIWwBCGzauhyIsPIlqLE9NYUveTmSQKqlQiNiYn+x+e
+	Y7lmAMrT7qKrw4Uvix/wHuKqixMTpuFbAGC6Eg8ALEauO9QqSMFAIFSCrBeW3voRiQHA3AXm5CA
+	KMHaemuzMsEcVfrnIaEM23+1DVcROIEaZo0TteipY9XsQAm4VPGNJbowCcd2P0JZqMTgzWeZWFg
+	lSab67uT1z79q4aI1U7VCeBz9dr7fYAYIuT/0FT2p0KPvx6KPgeeKB3DFRQULBfXLys5XZvBFXN
+	UhyEZ4UJurfll1c=
+X-Google-Smtp-Source: AGHT+IFZvLE5+yAuEYdnhKe40tiikkaeysAEk4mht6wIl9eR/eBXPqLfUik9L3YmGwoHc7gh1HsKqw==
+X-Received: by 2002:a17:907:7e92:b0:abb:c647:a4bf with SMTP id a640c23a62f3a-ac252af0495mr1152749666b.23.1741595657509;
+        Mon, 10 Mar 2025 01:34:17 -0700 (PDT)
+Received: from LQ3V64L9R2 ([46.188.239.10])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac283e4d50csm318030966b.175.2025.03.10.01.34.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Mar 2025 01:34:17 -0700 (PDT)
+Date: Mon, 10 Mar 2025 09:34:14 +0100
+From: Joe Damato <jdamato@fastly.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: Kurt Kanzenbach <kurt@linutronix.de>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-iio@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v5 02/10] property: Add functions to count named child
- nodes
-Message-ID: <Z86hk7iXRA5GeOtr@smile.fi.intel.com>
-References: <cover.1740993491.git.mazziesaccount@gmail.com>
- <5e35f44db2b4ed43f75c4c53fd0576df9ad24ab2.1740993491.git.mazziesaccount@gmail.com>
- <Z8WZh5EzFqxvU5rb@smile.fi.intel.com>
- <39cbe817-fef4-405c-b30c-79b592c0bcfe@gmail.com>
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Gerhard Engleder <gerhard@engleder-embedded.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-next v2 2/4] igb: Link queues to NAPI instances
+Message-ID: <Z86kBp2m-L-usV0V@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Gerhard Engleder <gerhard@engleder-embedded.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+References: <20250217-igb_irq-v2-0-4cb502049ac2@linutronix.de>
+ <20250217-igb_irq-v2-2-4cb502049ac2@linutronix.de>
+ <f71d5cee-cafc-4ee0-89fc-35614eb06f94@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,25 +106,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <39cbe817-fef4-405c-b30c-79b592c0bcfe@gmail.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+In-Reply-To: <f71d5cee-cafc-4ee0-89fc-35614eb06f94@intel.com>
 
-On Mon, Mar 10, 2025 at 08:23:15AM +0200, Matti Vaittinen wrote:
-> On 03/03/2025 13:59, Andy Shevchenko wrote:
-> > On Mon, Mar 03, 2025 at 01:31:45PM +0200, Matti Vaittinen wrote:
-
-...
-
-> > Also do we care about secondary fwnodes?
+On Fri, Mar 07, 2025 at 02:03:44PM -0800, Tony Nguyen wrote:
+> On 2/17/2025 3:31 AM, Kurt Kanzenbach wrote:
 > 
-> We have the device_get_child_node_count().
-> device_get_child_node_count_named() should follow the same logic.
+> ...
+> 
+> > diff --git a/drivers/net/ethernet/intel/igb/igb_xsk.c b/drivers/net/ethernet/intel/igb/igb_xsk.c
+> > index 157d43787fa0b55a74714f69e9e7903b695fcf0a..a5ad090dfe94b6afc8194fe39d28cdd51c7067b0 100644
+> > --- a/drivers/net/ethernet/intel/igb/igb_xsk.c
+> > +++ b/drivers/net/ethernet/intel/igb/igb_xsk.c
+> > @@ -45,6 +45,7 @@ static void igb_txrx_ring_disable(struct igb_adapter *adapter, u16 qid)
+> >   	synchronize_net();
+> >   	/* Rx/Tx share the same napi context. */
+> > +	igb_set_queue_napi(adapter, qid, NULL);
+> >   	napi_disable(&rx_ring->q_vector->napi);
+> >   	igb_clean_tx_ring(tx_ring);
+> > @@ -78,6 +79,7 @@ static void igb_txrx_ring_enable(struct igb_adapter *adapter, u16 qid)
+> >   	/* Rx/Tx share the same napi context. */
+> >   	napi_enable(&rx_ring->q_vector->napi);
+> > +	igb_set_queue_napi(adapter, qid, &rx_ring->q_vector->napi);
+> >   }
+> >   struct xsk_buff_pool *igb_xsk_pool(struct igb_adapter *adapter,
+> 
+> I believe Joe's fix/changes [1] need to be done here as well?
+> 
+> Thanks,
+> Tony
+> 
+> [1] https://lore.kernel.org/intel-wired-lan/9ddf6293-6cb0-47ea-a0e7-cad7d33c2535@intel.com/T/#m863614df1fb3d1980ad09016b1c9ef4e2f0b074e
 
-Okay, so we don't care about them right now.
+Yes, the code above should be dropped. Sorry I missed that during
+review - thanks for catching that, Tony.
 
--- 
-With Best Regards,
-Andy Shevchenko
+Kurt: when you respin this to fix what Tony mentioned, can you also
+run the test mentioned above?
 
-
+NETIF=eth0 ./tools/testing/selftests/drivers/net/queues.py
 
