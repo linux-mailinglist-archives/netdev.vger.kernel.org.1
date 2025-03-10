@@ -1,131 +1,255 @@
-Return-Path: <netdev+bounces-173571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D351A5982B
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 15:51:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5D49A59856
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 15:54:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 072BD1889B76
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 14:51:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09EFF3A54ED
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 14:54:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC01722B8A0;
-	Mon, 10 Mar 2025 14:51:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E033D22FDEB;
+	Mon, 10 Mar 2025 14:52:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fUWJnFZ7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iM5EbbfC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F4221E0BC;
-	Mon, 10 Mar 2025 14:51:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E3822D4C6
+	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 14:52:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741618302; cv=none; b=sYBVd84zlhvIDhRLB5uO+zw9CrpA64BkCebsLL2g+0o0zJK+JamQ/y7NV/GJS0tc1Y5y24PB39eXOeyQvOClutrwFshQeCAaMoOaXb1jdemoch2GUFnxSbKaDcdD2LP1wDq5CDUEM/4onPKyJUXfeGk5VJVAu4ik1cQmwMckGPc=
+	t=1741618369; cv=none; b=EIhFO1AjuKJAKKAhvSjiiaja8LzvHHGO0nEOtiehJf+KZ/W4uHy2CvEDRIAA2Epz2M9YH6yXkuxzMYCuCA1NL4jnNBF59eeJajxSU4Q/oDq+BcmcT3UjJ7OnK2DkIZYXIJ6yn+M8zEAuooI8uBSg0KvRu/0BTjlyjd7Uapd26HM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741618302; c=relaxed/simple;
-	bh=zO7kUCe8uLE5ctoZD12xa9sBOGlLFKuMkKgvnrTd5aU=;
+	s=arc-20240116; t=1741618369; c=relaxed/simple;
+	bh=qrGb5lSwU6d/BiTcGEDE0iGBrg7QsIVsQ08BYads/bw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ju/Sohufs8Un8+oxtEyPJlAiCr0iLo7Etef5nJgU7FrtmdO1LqHRKIkC2s+8EC97U2KNz0mbPe4CRhSRgScv0yPsPqWRnsAtRjpQKwFt75lqRMPK71S6ZcAJF/H5pVzVeqOh0jEfGw0xeS68LS7lJcdTM5cWpIZAeV4H6eHQVyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fUWJnFZ7; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741618301; x=1773154301;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=zO7kUCe8uLE5ctoZD12xa9sBOGlLFKuMkKgvnrTd5aU=;
-  b=fUWJnFZ7YG0oFZogoAmkvEdJFLgN6L9w0TmKUMEBospR11rS7/8uJOkP
-   ALanXBM9YiZFV9k4B+Q5JmGzbx2iCOR17s2A+r/PK5+TLcMv4dvi7DaNp
-   E+uRmH46Jq/lymyijsmpJorg7m5s1JOY+GQe1299OR8imno9IhKJoMgfg
-   6JU9ZpkHN9LKRbcFzP7uB1AEwVjKVu0jGkbLU3x1GNfef2UlOp9d2C+HC
-   u3dGv+StD22E9AjN/y0+XxIKvF8NBAU7ha71jdZ4qe90bJtjTr9zNMJaN
-   wxIfLSRaMeHYjMMnXyGzIMmzNpro2PqJkvmwITUiN8Yx/KMj3h1++aSDd
-   A==;
-X-CSE-ConnectionGUID: oBehZy1sSCSeL8BorUFszQ==
-X-CSE-MsgGUID: 82hUhATsTFWGSZ6CdmT1BA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="42525843"
-X-IronPort-AV: E=Sophos;i="6.14,236,1736841600"; 
-   d="scan'208";a="42525843"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 07:51:40 -0700
-X-CSE-ConnectionGUID: kB4eIOiSTMmE6HGJMYaQSA==
-X-CSE-MsgGUID: ov/+pZneR7SBXYD2R0g8zw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,236,1736841600"; 
-   d="scan'208";a="119952590"
-Received: from smile.fi.intel.com ([10.237.72.58])
-  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 07:51:30 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1treTW-00000001HaO-3Qek;
-	Mon, 10 Mar 2025 16:51:26 +0200
-Date: Mon, 10 Mar 2025 16:51:26 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Matti Vaittinen <mazziesaccount@gmail.com>
-Cc: Matti Vaittinen <matti.vaittinen@fi.rohmeurope.com>,
-	Jonathan Cameron <jic23@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Daniel Scally <djrscally@gmail.com>,
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
-	Sakari Ailus <sakari.ailus@linux.intel.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-iio@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v6 02/10] property: Add functions to iterate named child
-Message-ID: <Z878bsd7i-wAuCZ6@smile.fi.intel.com>
-References: <cover.1741610847.git.mazziesaccount@gmail.com>
- <ff924f640feeb87819d40557f12a04e607894682.1741610847.git.mazziesaccount@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tIUVb/DoYMcxP34AAo8JDt7w7qY0yhq6edcF2bQPuclIyZ+2nMZTPnhK0bgFwh6/nTyCTmYyvSFmTY2iNLKOsDJ41iNURM1t3vHXW7cmchde4znyqB/kcPS3QCbtdK5ewH3SKG9tgqet3yMJ5GJzndxAsKLnwPElyvajCN5G/7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iM5EbbfC; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741618366;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tD8i+D5CkT0SBWrgEsAcKH9liSWprjwzpOukP8c/+ok=;
+	b=iM5EbbfCLrKOsdSOPrVGKZkWUJIvkahAlBQlqkXOtBv0TMaZdsI+qqxBe6oLKpGb8Gcfc9
+	bGa2Eqg2XnT5QM7x+OZh2AiqzHBNHlKlybSuR7H+GKgjbf4wApt+qsnqzvM2EbPA+cnRBT
+	OcHXq2Qd6AoC1OrHPaT0MYN3KaEKYM0=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-610-zTsa4vGDPKGFMLk8VUZUpw-1; Mon, 10 Mar 2025 10:52:45 -0400
+X-MC-Unique: zTsa4vGDPKGFMLk8VUZUpw-1
+X-Mimecast-MFC-AGG-ID: zTsa4vGDPKGFMLk8VUZUpw_1741618364
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-390f3652842so2061441f8f.1
+        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 07:52:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741618364; x=1742223164;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tD8i+D5CkT0SBWrgEsAcKH9liSWprjwzpOukP8c/+ok=;
+        b=Kd4kOMHeLrd5gPigAZoFQBl19tTpAXjtYMTk7uSQFA61qB02qazDuQDr0Uj71iBHL6
+         wyi6pOuEVa8N7b2+Me1S56AVkDzC/PE1CPuaax/OwcfxCGsxxhfUbA8lMbtF9xcgmang
+         IrnJgp+V015R7YbdNyEP1z09eBKBpZW9kqeF5neFA6oZAuKhGSuuedUUSCxrHnmIMnI5
+         PzlPL2PxiQvwqL18ORRNaWKIyAa8g4HqabZcXbMisWxbRNSXZsq631vVDhbkRVtNWJKM
+         bbBGziCbbtB/zmLMwyj+c6r5Ut6tvvC7VL5HTyLeQFb2OT9HuJ7OuWFqDQNqt2zK2jju
+         ou8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWFy9ZKp/mWRWAj/hyC4642ZIGHKaEW5y9Yn/fasjhbY/7+CYpZWU57N9yZS0/jWew/pU2gMyw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YygteNiMO6QewkzCZjNHA8A/JcfQMuTufr487GG/yxQguedxikY
+	Wu1emzieQ0myP179HTlsbnPQg9nx5pzKDMBFUzwXqxPo1UQv7+2RWisb6EQQOZDTwBO0Rbh7+UY
+	9Nvs+a0kRalyBUC9HzRYt2Ya0mYGWGmMZfmgASCzafC6B2rNPkWnOFQ==
+X-Gm-Gg: ASbGncvjJVYwMHo6wazTDWL+terJRmCMVGEMw7lX81qX2GtmIIXdszDRmS5EcVFsS9Z
+	dlXnVsbQvJhcNeNPeDRaUvo7YRBA9/suXLW2KlCT/+mOlqwxNY3JtVDUNAMB4jz5GhTG8zuRru0
+	1+KfOCDZi+uGQM1Az9T5NZfx9wqu0bnRoRv+Nx/ZsJMsRLlM4tmZkrA9Cd9dU74wBRuGn2ZY2g5
+	u00QPA8fEKusJqo4CF/bLcwoNOtkIkfwoBTqOXMNyCOGf6qmxtVlTN0wGSSVzCkWlFGyFLzNeWn
+	Ngrs62rRrkdRz7aryNKGP/3xN2Vas8dIXWztHkF3vIosE961VUBSVV9tp+dzPvAu
+X-Received: by 2002:a5d:6482:0:b0:38f:3e39:20ae with SMTP id ffacd0b85a97d-39132dc580amr11065880f8f.43.1741618364033;
+        Mon, 10 Mar 2025 07:52:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEKpz/aRteORGLUQDVzSqjXbJRJcg6+0YPgJ4aq+417+m56Qchn6s2RgghTGP/jggl8UNdbAA==
+X-Received: by 2002:a5d:6482:0:b0:38f:3e39:20ae with SMTP id ffacd0b85a97d-39132dc580amr11065841f8f.43.1741618363514;
+        Mon, 10 Mar 2025 07:52:43 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3912bfdfdfdsm15532372f8f.34.2025.03.10.07.52.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Mar 2025 07:52:43 -0700 (PDT)
+Date: Mon, 10 Mar 2025 15:52:40 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, bpf@vger.kernel.org, leonardi@redhat.com
+Subject: Re: [PATCH net] vsock/bpf: Handle EINTR connect() racing against
+ sockmap update
+Message-ID: <fjy4jaww6xualdudevfuyoavnrbu45cg4d7erv4rttde363xfc@nahglijbl2eg>
+References: <20250307-vsock-trans-signal-race-v1-1-3aca3f771fbd@rbox.co>
+ <a96febaf-1d32-47d4-ad18-ce5d689b7bdb@rbox.co>
+ <vhda4sdbp725w7mkhha72u2nt3xpgyv2i4dphdr6lw7745qpuu@7c3lrl4tbomv>
+ <032764f5-e462-4f42-bfdc-8e31b25ada27@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <ff924f640feeb87819d40557f12a04e607894682.1741610847.git.mazziesaccount@gmail.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+In-Reply-To: <032764f5-e462-4f42-bfdc-8e31b25ada27@rbox.co>
 
-On Mon, Mar 10, 2025 at 02:55:53PM +0200, Matti Vaittinen wrote:
-> There are a few use-cases where child nodes with a specific name need to
-> be parsed. Code like:
-> 
-> fwnode_for_each_child_node()
-> 	if (fwnode_name_eq())
-> 		...
-> 
-> can be found from a various drivers/subsystems. Adding a macro for this
-> can simplify things a bit.
-> 
-> In a few cases the data from the found nodes is later added to an array,
-> which is allocated based on the number of found nodes. One example of
-> such use is the IIO subsystem's ADC channel nodes, where the relevant
-> nodes are named as channel[@N].
-> 
-> Add a helpers for iterating and counting device's sub-nodes with certain
-> name instead, of open-coding this in every user.
+On Fri, Mar 07, 2025 at 05:01:11PM +0100, Michal Luczaj wrote:
+>On 3/7/25 15:35, Stefano Garzarella wrote:
+>> On Fri, Mar 07, 2025 at 10:58:55AM +0100, Michal Luczaj wrote:
+>>>> Signal delivered during connect() may result in a disconnect of an already
+>>>> TCP_ESTABLISHED socket. Problem is that such established socket might have
+>>>> been placed in a sockmap before the connection was closed. We end up with a
+>>>> SS_UNCONNECTED vsock in a sockmap. And this, combined with the ability to
+>>>> reassign (unconnected) vsock's transport to NULL, breaks the sockmap
+>>>> contract. As manifested by WARN_ON_ONCE.
+>>>
+>>> Note that Luigi is currently working on a (vsock test suit) test[1] for a
+>>> related bug, which could be neatly adapted to test this bug as well.
+>>> [1]: https://lore.kernel.org/netdev/20250306-test_vsock-v1-0-0320b5accf92@redhat.com/
+>>
+>> Can you work with Luigi to include the changes in that series?
+>
+>I was just going to wait for Luigi to finish his work (no rush, really) and
+>then try to parametrize it.
 
-> Please note, the checkpatch.pl was not happy about the for_each...()
-> macros. I tried to make them to follow the existing convention. I am
-> open to suggestions how to improve.
+Sure, this is fine, thanks for that!
 
-You also may update .clang-format.
+Stefano
 
--- 
-With Best Regards,
-Andy Shevchenko
-
+>
+>That is unless BPF/sockmap maintainers decide this thread's thing is a
+>sockmap thing and should be in tools/testing/selftests/bpf.
+>
+>Below is a repro. If I'm not mistaken, it's basically what Luigi wrote,
+>just sprinkled with map_update_elem() and recv().
+>
+>#include <stdio.h>
+>#include <stdint.h>
+>#include <stdlib.h>
+>#include <unistd.h>
+>#include <errno.h>
+>#include <pthread.h>
+>#include <sys/wait.h>
+>#include <sys/socket.h>
+>#include <sys/syscall.h>
+>#include <linux/bpf.h>
+>#include <linux/vm_sockets.h>
+>
+>static void die(const char *msg)
+>{
+>	perror(msg);
+>	exit(-1);
+>}
+>
+>static int sockmap_create(void)
+>{
+>	union bpf_attr attr = {
+>		.map_type = BPF_MAP_TYPE_SOCKMAP,
+>		.key_size = sizeof(int),
+>		.value_size = sizeof(int),
+>		.max_entries = 1
+>	};
+>	int map;
+>
+>	map = syscall(SYS_bpf, BPF_MAP_CREATE, &attr, sizeof(attr));
+>	if (map < 0)
+>		die("map_create");
+>
+>	return map;
+>}
+>
+>static void map_update_elem(int fd, int key, int value)
+>{
+>	union bpf_attr attr = {
+>		.map_fd = fd,
+>		.key = (uint64_t)&key,
+>		.value = (uint64_t)&value,
+>		.flags = BPF_ANY
+>	};
+>
+>	(void)syscall(SYS_bpf, BPF_MAP_UPDATE_ELEM, &attr, sizeof(attr));
+>}
+>
+>static void sighandler(int sig)
+>{
+>	/* nop */
+>}
+>
+>static void *racer(void *c)
+>{
+>	int map = sockmap_create();
+>
+>	for (;;) {
+>		map_update_elem(map, 0, *(int *)c);
+> 		if (kill(0, SIGUSR1) < 0)
+> 			die("kill");
+> 	}
+>}
+>
+>int main(void)
+>{
+>	struct sockaddr_vm addr = {
+>		.svm_family = AF_VSOCK,
+>		.svm_cid = VMADDR_CID_LOCAL,
+>		.svm_port = VMADDR_PORT_ANY
+>	};
+>	socklen_t alen = sizeof(addr);
+>	struct sockaddr_vm bad_addr;
+>	pthread_t thread;
+>	int s, c;
+>
+>	s = socket(AF_VSOCK, SOCK_SEQPACKET, 0);
+>	if (s < 0)
+>		die("socket s");
+>
+>	if (bind(s, (struct sockaddr *)&addr, alen))
+>		die("bind");
+>
+>	if (listen(s, -1))
+>		die("listen");
+>
+>	if (getsockname(s, (struct sockaddr *)&addr, &alen))
+>		die("getsockname");
+>
+>	bad_addr = addr;
+>	bad_addr.svm_cid = 0x42424242; /* non-existing */
+>
+>	if (signal(SIGUSR1, sighandler) == SIG_ERR)
+>		die("signal");
+>
+>	if (pthread_create(&thread, 0, racer, &c))
+>		die("pthread_create");
+>
+>	for (;;) {
+>		c = socket(AF_VSOCK, SOCK_SEQPACKET, 0);
+>		if (c < 0)
+>			die("socket c");
+>
+>		if (!connect(c, (struct sockaddr *)&addr, alen) ||
+>		    errno != EINTR)
+>			goto outro;
+>
+>		if (!connect(c, (struct sockaddr *)&bad_addr, alen) ||
+>		    errno != ESOCKTNOSUPPORT)
+>			goto outro;
+>
+>		(void)recv(c, &(char){0}, 1, MSG_DONTWAIT);
+>outro:
+>		close(accept(s, NULL, NULL));
+>		close(c);
+>	}
+>
+>	return 0;
+>}
+>
 
 
