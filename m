@@ -1,220 +1,416 @@
-Return-Path: <netdev+bounces-173554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8988A59718
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 15:09:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3F9AA5972B
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 15:12:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E61D5188A384
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 14:09:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F47B16A758
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 14:12:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F2822A4EF;
-	Mon, 10 Mar 2025 14:09:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55DA322AE5D;
+	Mon, 10 Mar 2025 14:12:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="EQFIjUpq"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="Q7fGuGPD"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EADD71BC3F;
-	Mon, 10 Mar 2025 14:09:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68BA22157A;
+	Mon, 10 Mar 2025 14:12:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741615747; cv=none; b=nWFV79oBPvJQeTEgavwfAC/rXy+h/kUw2vH4YN07ekyQ7UreDvCTss6pQcORweAO14r9u0tVoiQYVWBxRie/Pytt6KHtUIfIO2nFK8t0YOKbdtKGqWv0ERxysojkCNgSFXAtefUu3q2vLby2xC9OGOzyJBu0r8/BAyUYi6GCupw=
+	t=1741615946; cv=none; b=sCyZvoNqcVtrj0LMRspSGXpsiUkSaC4QEvN6FQf4KkkDf1nO6/i7LMDav+qArcZJpQMwoHt7hqfbja293Ll3j2GErl86Vr19Jrvy48/zKgfX1CzO/yrWq7Xok9a6+vuvy8gJLCLP6Fe9JQTuARk4oD2UeawiZKw9zxsciogRbNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741615747; c=relaxed/simple;
-	bh=oRbVaKtnF4PmdP78IKDl4VhfEJ4QclxPJCQxWxPGGZA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KjYEmqX0cWR4DEpJtHejdgJWeu9wk/idiIIV5RlOId5EbVXspGHBojiF1Q4smokX6GALwbz605xVqG2wKw5vL2TncLpXo3D9GFNBiQm26RO7ZXDsdr+W2FUkPDFV67baHvIsXnfpUp+MQE37lz8S3ADJPdk2qJ6QO1w6rlGZ1Ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=EQFIjUpq; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B4FCC442C0;
-	Mon, 10 Mar 2025 14:09:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1741615743;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kQoA35KV6qH9O+kb5ibj+NzTP3DR8xoqxecJpDELOu8=;
-	b=EQFIjUpqzQoXsi5bWv6Yldt1iIxTAre/8DDmloAsguOEM/KAbhHiUKB5SmIY95uftYh2S0
-	ryXaOM0g1bCy4jj3jWqQSHLCIaQuGhaM9w2/AHTYh4kVCOe59zTlIdykZ38nXDwT2ZoCtV
-	vUbkM+zulOMuOGwKa/FaFARPqRjoXbRtOwCp8ApzllhIAS8SHOzpR4SLxjUzOmlRQYV0N8
-	zzWfQnfG60nLg00bq6/g8izWgwCIC0JtDGTugt2m5aNW972BxgoF5138BNUBdWoMTlS92w
-	pqLfd6Vm3xVDC5ktK8S+LFunS0d67Q9n/d0BB75A4A00bSllDCYjdZMwJqysVQ==
-Date: Mon, 10 Mar 2025 15:08:58 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Elad Nachman <enachman@marvell.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Taras Chornyi <taras.chornyi@plvision.eu>,
- "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
- <edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
- "pabeni@redhat.com" <pabeni@redhat.com>, "thomas.petazzoni@bootlin.com"
- <thomas.petazzoni@bootlin.com>, "miquel.raynal@bootlin.com"
- <miquel.raynal@bootlin.com>, "przemyslaw.kitszel@intel.com"
- <przemyslaw.kitszel@intel.com>, "dkirjanov@suse.de" <dkirjanov@suse.de>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [EXTERNAL] Re: [PATCH v2 0/5] Fix prestera driver fail to probe
- twice
-Message-ID: <20250310150858.6bbf4114@kmaincent-XPS-13-7390>
-In-Reply-To: <BN9PR18MB4251B1533E14523AEADBA22FDB342@BN9PR18MB4251.namprd18.prod.outlook.com>
-References: <20240320172008.2989693-1-enachman@marvell.com>
-	<4104387a-d7b5-4029-b822-060ef478c6e3@lunn.ch>
-	<BN9PR18MB42517F8E84C8C18078E45C37DB322@BN9PR18MB4251.namprd18.prod.outlook.com>
-	<89a01616-57c2-4338-b469-695bdc731dee@lunn.ch>
-	<BL1PR18MB42488523A5E05291EA57D0AEDB372@BL1PR18MB4248.namprd18.prod.outlook.com>
-	<6dae31dc-8c4f-4b8d-80e4-120619119326@lunn.ch>
-	<BN9PR18MB4251B1533E14523AEADBA22FDB342@BN9PR18MB4251.namprd18.prod.outlook.com>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1741615946; c=relaxed/simple;
+	bh=VvTbrukqJECgVTvGE9CueOWKZHry7TuKRTj4dDd5LMQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AV9Onvplbnk9Sp1t4vwj2hk/5IVIX3kUDcE1WtfE7n3Q5Q5Q+Oz3F9QLdyGDkOWGu3iUlsJJCrRDFcpo7PW2CvfcOiFGNirZPDsnM+9FDM5Vcpk6Hv/rHj9TOAeEJA/X09CDxwjVorNZTG7/2ysccUrKkYYIOtxl5/Vqv8ySSCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=Q7fGuGPD; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1741615940;
+	bh=VvTbrukqJECgVTvGE9CueOWKZHry7TuKRTj4dDd5LMQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Q7fGuGPDPQQJuuvqwAmmG3YOMdB37C0ASjXgb30wy90gx7lXAsc5rwAnHkoB66KUt
+	 ez18FMdGSvq2oA1gYWklHwyoO4/Egrjat7yUr3NBwkLgh7oPvfzGzSZoGIsdr2IwgD
+	 GeYyjdFXgsk8X9J34l+eXs9DJnFyxCx9JCR0niYPBZZmEDRqIEkSdo99Q3ZxEareA0
+	 8z/bhoA7xanekNn4DVkbLtoyjzYmwGhr3pDw9Oy32aiOCbI5HcMMLzC+qa7AXSB314
+	 rq6/ia07V1BV0upd1PLbPiRk3Jhl0p5elG5jpyxm7KZ+XlnQLrLpyEtkRrNd2vKGM2
+	 BYy25HPKHu/0A==
+Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 16B1F17E0649;
+	Mon, 10 Mar 2025 15:12:20 +0100 (CET)
+Message-ID: <cd8bd504-8d91-4420-8053-10ee814417bf@collabora.com>
+Date: Mon, 10 Mar 2025 15:12:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduudelheehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepudetgefgvddvkeelvdfgteetkeefvdeghfeivdeiudefkefgkefhveeiteelleevnecuffhomhgrihhnpehprhhoohhfphhoihhnthdrtghomhdpkhgvrhhnvghlrdhorhhgpdgsohhothhlihhnrdgtohhmnecukfhppeegiedrudekkedrvdefledruddtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepgeeirddukeekrddvfeelrddutddphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudegpdhrtghpthhtohepvghnrggthhhmrghnsehmrghrvhgvlhhlrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepthgrrhgrshdrtghhohhrnhihihesphhlvhhishhiohhnrdgvuhdprhgtphhtthhop
- egurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomh
-X-GND-Sasl: kory.maincent@bootlin.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 03/26] clk: mediatek: Support voting for mux
+To: Guangjie Song <guangjie.song@mediatek.com>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>
+Cc: linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+ Project_Global_Chrome_Upstream_Group@mediatek.com
+References: <20250307032942.10447-1-guangjie.song@mediatek.com>
+ <20250307032942.10447-4-guangjie.song@mediatek.com>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Content-Language: en-US
+In-Reply-To: <20250307032942.10447-4-guangjie.song@mediatek.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello,=20
+Il 07/03/25 04:26, Guangjie Song ha scritto:
+> Add data fields, defines and ops to support voting for mux.
+> 
 
-I am just coming back to this series of fixes.
-Indeed the 30s in case of probe defer are hard to accept but if it solves t=
-he
-issue for now shouldn't we merge it? Andrew, Jakub what do you think?
+The main thing that is missing here is an answer to an obvious question....
 
-If not, we could at least merge patches 3 to 5 which are unrelated.
+...what are the advantages of hardware voting, and why do we need to use
+HW voting instead of the refcount that is already kept by the common clock
+framework?
 
-Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
+As far as I can see here, the only difference is that the enable/disable
+is more complex, losing more time for polling after writes and nothing else?
+
+Is this to synchronize the clock voting between SCP and AP or what?!
+If this is the answer, I don't see why we should use this HW voter for all
+clocks, since it's simply more expensive (so the clock drivers are wrong as
+they enable the voter for all clocks).
+
+
+> Signed-off-by: Guangjie Song <guangjie.song@mediatek.com>
+> ---
+>   drivers/clk/mediatek/clk-mux.c | 198 ++++++++++++++++++++++++++++++++-
+>   drivers/clk/mediatek/clk-mux.h |  79 +++++++++++++
+>   2 files changed, 275 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/clk/mediatek/clk-mux.c b/drivers/clk/mediatek/clk-mux.c
+> index 60990296450b..8a2c89cb3cd5 100644
+> --- a/drivers/clk/mediatek/clk-mux.c
+> +++ b/drivers/clk/mediatek/clk-mux.c
+> @@ -15,11 +15,13 @@
+>   #include <linux/spinlock.h>
+>   #include <linux/slab.h>
+>   
+> +#include "clk-mtk.h"
+>   #include "clk-mux.h"
+>   
+>   struct mtk_clk_mux {
+>   	struct clk_hw hw;
+>   	struct regmap *regmap;
+> +	struct regmap *vote_regmap;
+>   	const struct mtk_mux *data;
+>   	spinlock_t *lock;
+>   	bool reparent;
+> @@ -30,6 +32,46 @@ static inline struct mtk_clk_mux *to_mtk_clk_mux(struct clk_hw *hw)
+>   	return container_of(hw, struct mtk_clk_mux, hw);
+>   }
+>   
+> +static int mtk_clk_mux_fenc_enable_setclr(struct clk_hw *hw)
+> +{
+> +	struct mtk_clk_mux *mux = to_mtk_clk_mux(hw);
+> +	unsigned long flags = 0;
+> +	u32 val = 0;
+> +	int i = 0;
+> +	int ret = 0;
+> +
+> +	if (mux->lock)
+> +		spin_lock_irqsave(mux->lock, flags);
+> +	else
+> +		__acquire(mux->lock);
+> +
+> +	regmap_write(mux->regmap, mux->data->clr_ofs, BIT(mux->data->gate_shift));
+> +
+> +	while (1) {
+> +		regmap_read(mux->regmap, mux->data->fenc_sta_mon_ofs, &val);
+
+Why are you reinventing the wheel instead of just using regmap_read_poll_timeout()?
+
+> +
+> +		if ((val & BIT(mux->data->fenc_shift)) != 0)
+> +			break;
+> +
+> +		if (i < MTK_WAIT_FENC_DONE_CNT) {
+> +			udelay(MTK_WAIT_FENC_DONE_US);
+> +		} else {
+> +			pr_err("%s wait fenc done timeout\n", clk_hw_get_name(hw));
+> +			ret = -EBUSY;
+> +			break;
+> +		}
+> +
+> +		i++;
+> +	}
+> +
+> +	if (mux->lock)
+> +		spin_unlock_irqrestore(mux->lock, flags);
+> +	else
+> +		__release(mux->lock);
+> +
+> +	return ret;
+> +}
+> +
+>   static int mtk_clk_mux_enable_setclr(struct clk_hw *hw)
+>   {
+>   	struct mtk_clk_mux *mux = to_mtk_clk_mux(hw);
+> @@ -70,6 +112,16 @@ static void mtk_clk_mux_disable_setclr(struct clk_hw *hw)
+>   			BIT(mux->data->gate_shift));
+>   }
+>   
+> +static int mtk_clk_mux_fenc_is_enabled(struct clk_hw *hw)
+> +{
+> +	struct mtk_clk_mux *mux = to_mtk_clk_mux(hw);
+> +	u32 val = 0;
+> +
+> +	regmap_read(mux->regmap, mux->data->fenc_sta_mon_ofs, &val);
+> +
+> +	return (val & BIT(mux->data->fenc_shift)) != 0;
+
+That's just `return val & BIT(mux->data->fenc_shift);` ...
+
+> +}
+> +
+>   static int mtk_clk_mux_is_enabled(struct clk_hw *hw)
+>   {
+>   	struct mtk_clk_mux *mux = to_mtk_clk_mux(hw);
+> @@ -80,6 +132,106 @@ static int mtk_clk_mux_is_enabled(struct clk_hw *hw)
+>   	return (val & BIT(mux->data->gate_shift)) == 0;
+>   }
+>   
+> +static int mtk_clk_vote_mux_is_enabled(struct clk_hw *hw)
+> +{
+> +	struct mtk_clk_mux *mux = to_mtk_clk_mux(hw);
+> +	u32 val = 0;
+> +
+> +	regmap_read(mux->vote_regmap, mux->data->vote_set_ofs, &val);
+> +
+> +	return (val & BIT(mux->data->gate_shift)) != 0;
+
+same
+
+> +}
+> +
+> +static int mtk_clk_vote_mux_is_done(struct clk_hw *hw)
+> +{
+> +	struct mtk_clk_mux *mux = to_mtk_clk_mux(hw);
+> +	u32 val = 0;
+> +
+> +	regmap_read(mux->vote_regmap, mux->data->vote_sta_ofs, &val);
+> +
+> +	return (val & BIT(mux->data->gate_shift)) != 0;
+
+ditto
+
+> +}
+> +
+> +static int mtk_clk_mux_vote_fenc_enable(struct clk_hw *hw)
+> +{
+> +	struct mtk_clk_mux *mux = to_mtk_clk_mux(hw);
+> +	u32 val = 0, val2 = 0;
+> +	bool is_done = false;
+> +	int i = 0;
+> +
+> +	regmap_write(mux->vote_regmap, mux->data->vote_set_ofs, BIT(mux->data->gate_shift));
+> +
+> +	while (!mtk_clk_vote_mux_is_enabled(hw)) {
+> +		if (i < MTK_WAIT_VOTE_PREPARE_CNT) {
+> +			udelay(MTK_WAIT_VOTE_PREPARE_US);
+
+regmap_readl_poll_timeout().....
+
+> +		} else {
+> +			pr_err("%s mux prepare timeout(%x)\n", clk_hw_get_name(hw), val);
+> +			return -EBUSY;
+> +		}
+> +
+> +		i++;
+> +	}
+> +
+> +	i = 0;
+> +
+> +	while (1) {
+> +		if (!is_done)
+> +			regmap_read(mux->vote_regmap, mux->data->vote_sta_ofs, &val);
+> +
+> +		if (((val & BIT(mux->data->gate_shift)) != 0))
+> +			is_done = true;
+> +
+
+and again - twice.
+
+> +		if (is_done) {
+> +			regmap_read(mux->regmap, mux->data->fenc_sta_mon_ofs, &val2);
+> +			if ((val2 & BIT(mux->data->fenc_shift)) != 0)
+> +				break;
+> +		}
+> +
+> +		if (i < MTK_WAIT_VOTE_DONE_CNT) {
+> +			udelay(MTK_WAIT_VOTE_DONE_US);
+> +		} else {
+> +			pr_err("%s mux enable timeout(%x %x)\n", clk_hw_get_name(hw), val, val2);
+> +			return -EBUSY;
+> +		}
+> +
+> +		i++;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static void mtk_clk_mux_vote_disable(struct clk_hw *hw)
+> +{
+> +	struct mtk_clk_mux *mux = to_mtk_clk_mux(hw);
+> +	int i = 0;
+> +
+> +	regmap_write(mux->vote_regmap, mux->data->vote_clr_ofs, BIT(mux->data->gate_shift));
+> +
+> +	while (mtk_clk_vote_mux_is_enabled(hw)) {
+> +		if (i < MTK_WAIT_VOTE_PREPARE_CNT) {
+> +			udelay(MTK_WAIT_VOTE_PREPARE_US);
+> +		} else {
+> +			pr_err("%s mux unprepare timeout\n", clk_hw_get_name(hw));
+> +			return;
+> +		}
+> +
+
+....and again....
+
+> +		i++;
+> +	}
+> +
+> +	i = 0;
+> +
+> +	while (!mtk_clk_vote_mux_is_done(hw)) {
+> +		if (i < MTK_WAIT_VOTE_DONE_CNT) {
+> +			udelay(MTK_WAIT_VOTE_DONE_US);
+> +		} else {
+> +			pr_err("%s mux disable timeout\n", clk_hw_get_name(hw));
+> +			return;
+> +		}
+> +
+> +		i++;
+> +	}
+> +}
+> +
+>   static u8 mtk_clk_mux_get_parent(struct clk_hw *hw)
+>   {
+>   	struct mtk_clk_mux *mux = to_mtk_clk_mux(hw);
+> @@ -151,6 +303,12 @@ static int mtk_clk_mux_determine_rate(struct clk_hw *hw,
+>   	return clk_mux_determine_rate_flags(hw, req, mux->data->flags);
+>   }
+>   
+> +static void mtk_clk_mux_vote_fenc_disable_unused(struct clk_hw *hw)
+> +{
+> +	mtk_clk_mux_vote_fenc_enable(hw);
+> +	mtk_clk_mux_vote_disable(hw);
+
+Why would you need to enable and disable?
+
+If this is not a mistake... this definitely needs a comment in the code.
+
+> +}
+> +
+>   const struct clk_ops mtk_mux_clr_set_upd_ops = {
+>   	.get_parent = mtk_clk_mux_get_parent,
+>   	.set_parent = mtk_clk_mux_set_parent_setclr_lock,
+> @@ -168,9 +326,31 @@ const struct clk_ops mtk_mux_gate_clr_set_upd_ops  = {
+>   };
+>   EXPORT_SYMBOL_GPL(mtk_mux_gate_clr_set_upd_ops);
+>   
+> +const struct clk_ops mtk_mux_gate_fenc_clr_set_upd_ops = {
+> +	.enable = mtk_clk_mux_fenc_enable_setclr,
+> +	.disable = mtk_clk_mux_disable_setclr,
+> +	.is_enabled = mtk_clk_mux_fenc_is_enabled,
+> +	.get_parent = mtk_clk_mux_get_parent,
+> +	.set_parent = mtk_clk_mux_set_parent_setclr_lock,
+> +	.determine_rate = mtk_clk_mux_determine_rate,
+> +};
+> +EXPORT_SYMBOL_GPL(mtk_mux_gate_fenc_clr_set_upd_ops);
+> +
+> +const struct clk_ops mtk_mux_vote_fenc_ops = {
+> +	.enable = mtk_clk_mux_vote_fenc_enable,
+> +	.disable = mtk_clk_mux_vote_disable,
+> +	.is_enabled = mtk_clk_mux_fenc_is_enabled,
+> +	.get_parent = mtk_clk_mux_get_parent,
+> +	.set_parent = mtk_clk_mux_set_parent_setclr_lock,
+> +	.determine_rate = mtk_clk_mux_determine_rate,
+> +	.disable_unused = mtk_clk_mux_vote_fenc_disable_unused,
+> +};
+> +EXPORT_SYMBOL_GPL(mtk_mux_vote_fenc_ops);
+> +
+>   static struct clk_hw *mtk_clk_register_mux(struct device *dev,
+>   					   const struct mtk_mux *mux,
+>   					   struct regmap *regmap,
+> +					   struct regmap *vote_regmap,
+>   					   spinlock_t *lock)
+>   {
+>   	struct mtk_clk_mux *clk_mux;
+> @@ -185,9 +365,17 @@ static struct clk_hw *mtk_clk_register_mux(struct device *dev,
+>   	init.flags = mux->flags;
+>   	init.parent_names = mux->parent_names;
+>   	init.num_parents = mux->num_parents;
+> -	init.ops = mux->ops;
+> +	if (mux->flags & CLK_USE_VOTE) {
+> +		if (vote_regmap)
+> +			init.ops = mux->ops;
+> +		else
+> +			init.ops = mux->dma_ops;
+
+Sorry why is this called dma_ops?!
+That's at least confusing, if not simply wrong.... please explain.
+
+> +	} else {
+> +		init.ops = mux->ops;
+> +	}
+>   
+>   	clk_mux->regmap = regmap;
+> +	clk_mux->vote_regmap = vote_regmap;
+>   	clk_mux->data = mux;
+>   	clk_mux->lock = lock;
+>   	clk_mux->hw.init = &init;
+> @@ -220,6 +408,7 @@ int mtk_clk_register_muxes(struct device *dev,
+>   			   struct clk_hw_onecell_data *clk_data)
+>   {
+>   	struct regmap *regmap;
+> +	struct regmap *vote_regmap = NULL;
+>   	struct clk_hw *hw;
+>   	int i;
+>   
+> @@ -238,8 +427,13 @@ int mtk_clk_register_muxes(struct device *dev,
+>   			continue;
+>   		}
+>   
+> -		hw = mtk_clk_register_mux(dev, mux, regmap, lock);
+> +		if (mux->vote_comp) {
+> +			vote_regmap = syscon_regmap_lookup_by_phandle(node, mux->vote_comp);
+> +			if (IS_ERR(vote_regmap))
+> +				vote_regmap = NULL;
+> +		}
+>   
+> +		hw = mtk_clk_register_mux(dev, mux, regmap, vote_regmap, lock);
+
+...and this change just breaks each and every MediaTek SoC that is currently
+supported upstream.
+
+Please test your changes on older platforms before submitting upstream.
 
 Regards,
+Angelo
 
-
-On Wed, 27 Mar 2024 17:27:41 +0000
-Elad Nachman <enachman@marvell.com> wrote:
-
-> Hi Andrew,
->=20
-> We have made internal technical review of the issues you have raised (ret=
-urn
-> version API, try to get version API before starting to initialize and load
-> the firmware, clear configuration API) versus the delay saved (almost 30
-> seconds minus several seconds to perform and complete the API calls) - ar=
-ound
-> 20 seconds or so.
->=20
-> Existing customers we have talked to seem to be able to cope with the
-> existing delay.
->=20
-> Unfortunately, the amount of coding and testing involved with saving thes=
-e 20
-> seconds or so is beyond our available development manpower at this specif=
-ic
-> point in time.
->=20
-> Unfortunately, we will have to defer making the development you have
-> requested to a later period in time.
->=20
-> Elad.
->=20
->=20
-> > -----Original Message-----
-> > From: Andrew Lunn <andrew@lunn.ch>
-> > Sent: Sunday, March 24, 2024 5:25 PM
-> > To: Elad Nachman <enachman@marvell.com>
-> > Cc: Taras Chornyi <taras.chornyi@plvision.eu>; davem@davemloft.net;
-> > edumazet@google.com; kuba@kernel.org; pabeni@redhat.com;
-> > kory.maincent@bootlin.com; thomas.petazzoni@bootlin.com;
-> > miquel.raynal@bootlin.com; przemyslaw.kitszel@intel.com;
-> > dkirjanov@suse.de; netdev@vger.kernel.org; linux-kernel@vger.kernel.org
-> > Subject: Re: [EXTERNAL] Re: [PATCH v2 0/5] Fix prestera driver fail to =
-probe
-> > twice
-> >  =20
->  [...] =20
-> > problem. =20
->  [...] =20
-> > >
-> > > No, the PoE is the general high level application where he noted the =
-=20
-> > problem. =20
-> > > There is no PoE code nor special PoE resources in the Prestera driver=
-. =20
-> >=20
-> > So here is K=C3=B6ry email:
-> >=20
-> > https://urldefense.proofpoint.com/v2/url?u=3Dhttps-
-> > 3A__lore.kernel.org_netdev_20240208101005.29e8c7f3-40kmaincent-2DXPS-
-> > 2D13-2D7390_T_-
-> > 23mb898bb2a4bf07776d79f1a19b6a8420716ecb4a3&d=3DDwIDAw&c=3DnKjWec2
-> > b6R0mOyPaz7xtfQ&r=3DeTeNTLEK5-
-> > TxXczjOcKPhANIFtlB9pP4lq9qhdlFrwQ&m=3DSD1MhKC11sFmp4Q8l76N_DgGdac
-> > 4aMCTdPsa7Pofb73HEqAGtJ-1p0-
-> > etIyyldC7&s=3DVWat9LPub52H3nUez4itmkpuMipnYD3Ngn-paFC9wd4&e=3D
-> >=20
-> > I don't see why the prestera needs to be involved in PoE itself. It is =
-just
-> > a MAC. PoE happens much lower down in the network stack. Same as Preste=
-ra
-> > uses phylink, it does not need to know about the PHYs or the SFP module=
-s,
-> > phylink manages them, not prestera.
-> >  =20
-> > > The problem was caused because the module exit was lacking the so
-> > > called "switch HW reset" API call which would cause the firmware to
-> > > exit to the firmware loader on the firmware CPU, and move to the state
-> > > in the state machine when it can receive new firmware from the host
-> > > CPU (running the Prestera switchDev driver).
-> > > =20
->  [...] =20
->  [...] =20
->  [...] =20
-> > >
-> > > There is no existing API/ABI for that. =20
-> >=20
-> > Do you at least have the ability to determine if an API call exists or =
-not?
-> > It sounds like your firmware needs extending to support returning the
-> > version. If the API is missing, you know it is 4.1 or older. If it does
-> > exist, it will return 4.2 or higher.
-> >  =20
->  [...] =20
-> > >
-> > > Exactly.
-> > > =20
->  [...] =20
-> > >
-> > > Right. And there is also the configuration. There is no telling what
-> > > kind of Configuration the existing firmware is running. Just using the
-> > > existing firmware Will lead to the situation where Linux kernel side
-> > > will report certain configuration (via ip link / ip addr / tc , etc.)=
- but
-> > > the =20
-> > firmware configuration is completely different.
-> >=20
-> > Well, during probe and -EPRODE_DEFER, linux has no configuration, since=
- the
-> > driver failed to probe. However, for a rmmod/modprobe, the firmware cou=
-ld
-> > have stale configuration. However pretty much every device i've come ac=
-ross
-> > has the concept of a software reset which clears out the configuration.
-> > Seems to be something else your firmware is missing.
-> >=20
-> > 	Andrew =20
-
-
-
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
 
