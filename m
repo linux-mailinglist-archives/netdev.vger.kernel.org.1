@@ -1,121 +1,144 @@
-Return-Path: <netdev+bounces-173651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E896A5A546
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 21:50:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 05FD0A5A561
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 21:58:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47B8D188D020
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 20:50:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A00441888581
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 20:58:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 065831DEFD7;
-	Mon, 10 Mar 2025 20:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E7B1DE8A9;
+	Mon, 10 Mar 2025 20:58:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MJ8Lpdi8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AkMzf03e"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC0AE1D5150;
-	Mon, 10 Mar 2025 20:50:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251411DE899
+	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 20:58:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741639802; cv=none; b=jhlaQx7gLCMEmq9ex/VaQ/ts/09XurSY5M4WRAWOsnCrkMQ6aCjpEE7brB2YBmB+3ukTysfSoikc5URHh4COKd3/R2sxIS6ddJ8CpdUk3rJbnoGgoFSo3TeEMP6+BfwS9kTdpELJ55veywCMEA9bUEfo3fstYhwt5H6Jeydpgto=
+	t=1741640305; cv=none; b=ZVFAi152FbHCd9emTTx6AFMlnuJFEi43nDuP7YbHOj1x73wkdTcV0i4dRL676Sxu191+AYasvW6a4AdL+ckyKtQ3w3sXW22f/1oLyxWyn9hnzDi0HKR5ahoEBnreXnhz4gYMVgx0nRST9MZS/UnCoLBC+dSxivyBAD27f1GtOko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741639802; c=relaxed/simple;
-	bh=CYGGp7rWU103fsuOZ9lJT+vvLji2uulj15ckfU6FoH8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=EIEhcnTe97ltGi7SaGbGm824hyF3PTZ3gPG+lnd54w11sHX2JwovuAi+oj9j75rSHI9hHzbEd2KcUnroabMZxFHq/8dDRju0Y5rauOGlUGLaXgnnsqdk98hph+TE8PWYh3GX7/gWcw34X1j7s+z4K91QnaZNPLBO85RmJyKtbQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MJ8Lpdi8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3340DC4CEE5;
-	Mon, 10 Mar 2025 20:50:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741639802;
-	bh=CYGGp7rWU103fsuOZ9lJT+vvLji2uulj15ckfU6FoH8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MJ8Lpdi8JqpWarA/vc7U1W/52ADRyMA0S/mh6Hm2GpC6B4EQPOLG3SBcUg8kfsoOs
-	 DKe1CbHFk94qKlhl+bT0sPJcAsjkiT2GuwijX62eewVFOTH/Wu0BhjknZ1dnxVX1W1
-	 /QZhos37RMxKDuJLAlMRoBeohecJ6YIFZt25YCQgl0YFWY+teatsBEA/frhbD1cVDq
-	 U1JOF/OkMOBbtCwyslF8m223tiNt+pgsgLMkqmMiixGJr2p/GW35bhpxS4CiMe6Mos
-	 RqTnlkJqPqtwFxn/94a6xizjioB7NfKaADd/KxVAEUDsocHMvmi1BZNZIvVBi4NYHv
-	 bIv6H7fODpEHQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 713A4380AACB;
-	Mon, 10 Mar 2025 20:50:37 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1741640305; c=relaxed/simple;
+	bh=udnmpgjnrnQl/r5rpuVE/OrzhYTIVnFvDMbBeWMLMt4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qO1H9DmAk4PfD44F/d8YaDrE6ciOCHtUo2P3xpwTSMqA1dwyTzdbppuEzKcEZjJ2U/gayjY7nvPJRe5AdBw1BDVztN3I/sHA3HmvN+Oe9/knmXw0810vGR7qCnHJ4WY/K6O6AmqA1hQJ6eLfXmBIE6e6nsePVy4twULFLTjm8GA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AkMzf03e; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-46fcbb96ba9so62281961cf.0
+        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 13:58:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741640302; x=1742245102; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=totOKg+C1RLLbJLz2a3eJ20AMHYupd9oISI8Z8SOtSQ=;
+        b=AkMzf03epSWjqy80O5z7MxSUSAShRvyYv0UYOHknyIWSu0FGOvsO50dZnyJ8JsJlYe
+         HsdXWKPuCjp7upfNh8FfV9ZW0+BMbACJ1CMQF4Hl9aaRR+ts7SfTfJO5CLonquQRL/g7
+         e9p++4wsrMZB6TOCLFZHQ4MOcZ3VFlzXCCEXsodd/JbgPwbpuoWbCTiJYfKvbqVjrpXw
+         1ifpuZOle3+a/PW8NZO+BOL6PxlawEXnjSrxznefBj9RaSOfQeMMPz9sPjo2VEw0baMi
+         U7mPCUgFb77gcU8nlSCIntSRLlwwJIf7Y5H2pHErw6XLZW/LLQBBSjbAQmgcxjJ/zVce
+         XTIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741640302; x=1742245102;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=totOKg+C1RLLbJLz2a3eJ20AMHYupd9oISI8Z8SOtSQ=;
+        b=jTDUvdrGZTnlUnFFlXHZhb4RUhtte8oh5RgYeTl0mZyFeC5Qz9/oslSkh1nF8SPrb6
+         KW6wcAQCx+Kr/WWSrAv+/a9GMfNWbBPQXl66GwEqIdQU41DZlvi7m4Zb0O8img9SxsG6
+         W0DEP/wrJ13d6xa4nG45f2kslzldShAKMwOtF7KQWCB+m1e3v/3lQlcF070lTwi+RL+i
+         UCJL+szBdiDYN10Jrd6XG7g6xZYW6HjOXztCwRtROW5RDMaFXLgmYiHSDHBj4gOXzGwb
+         J5Jb87xdLRI1r1v/h/8gi0OZGnTkEE78e8G8hNxUUQiTJEzsewpnjGSXFaKIgfjKcxVm
+         +H3A==
+X-Forwarded-Encrypted: i=1; AJvYcCXY/6sRJ/8Mnnwvv/Ji7rU2BzpY8TJKILQv0uDM+bsmI9ehc6qOc9NWi0o1sMcvZS12eMi3y5w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5t7pSSWIyeEmnrSK4FcZk2g8bD0SWf+Mm4nIkVe/CdBIxzTAA
+	YS8XvJV6yfad/YPmw5prjRVOv/inJvPFRMoPxckg/vq9kOWWXH0tbfo9KbmTGAUSBlI3MKW8CMZ
+	cEyw0oudqWsI8Pqa9H6N9h37UbtGAH3pRjV/0
+X-Gm-Gg: ASbGnctze/VAfHXo1zDOHxvdsFccwk410uz3bgw+zwHv/XmBHYxRJsnZZiGP11AJzuv
+	1AhMLyyoK6HOjdWcfXXOs7Do+tAd9cISztHW2dPJMHOa6AMZLaxvPg4Ja4ZsnouX+XoAYtNIBs9
+	k9N6UDSIX6Fqb5dpT+wiFHneYzug==
+X-Google-Smtp-Source: AGHT+IH32RBY3KE7CCJKADAXBwm53mo8Ml+vwI8WA7zOwPhLmxmL957w5eo9+eN8sJUuoW1tyGYSiBsYTS0PSCwGitE=
+X-Received: by 2002:a05:622a:209:b0:472:a26:744c with SMTP id
+ d75a77b69052e-4761097d371mr197610591cf.12.1741640301788; Mon, 10 Mar 2025
+ 13:58:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/15] mptcp: pm: code reorganisation
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174163983626.3691119.3217596204968315026.git-patchwork-notify@kernel.org>
-Date: Mon, 10 Mar 2025 20:50:36 +0000
-References: <20250307-net-next-mptcp-pm-reorg-v1-0-abef20ada03b@kernel.org>
-In-Reply-To: <20250307-net-next-mptcp-pm-reorg-v1-0-abef20ada03b@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250309173151.2863314-4-edumazet@google.com> <202503102308.1uTA6Uxr-lkp@intel.com>
+In-Reply-To: <202503102308.1uTA6Uxr-lkp@intel.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 10 Mar 2025 21:58:10 +0100
+X-Gm-Features: AQ5f1Jr884G35uQURzTyL3LRgOkMXY0Q1xmhME8uTd8nuhV72EtVWUaKfRfW8ss
+Message-ID: <CANn89iJqKH8A9+pq_i0HWuhqfq_1gkNCzfdv7=bUQy-cR=msEQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/4] inet: frags: change inet_frag_kill() to
+ defer refcount updates
+To: kernel test robot <lkp@intel.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, 
+	David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Mon, Mar 10, 2025 at 4:57=E2=80=AFPM kernel test robot <lkp@intel.com> w=
+rote:
+>
+> Hi Eric,
+>
+> kernel test robot noticed the following build errors:
+>
+> [auto build test ERROR on net-next/main]
+>
+> url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/inet-=
+frags-add-inet_frag_putn-helper/20250310-013501
+> base:   net-next/main
+> patch link:    https://lore.kernel.org/r/20250309173151.2863314-4-edumaze=
+t%40google.com
+> patch subject: [PATCH net-next 3/4] inet: frags: change inet_frag_kill() =
+to defer refcount updates
+> config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/202=
+50310/202503102308.1uTA6Uxr-lkp@intel.com/config)
+> compiler: clang version 21.0.0git (https://github.com/llvm/llvm-project e=
+15545cad8297ec7555f26e5ae74a9f0511203e7)
+> reproduce (this is a W=3D1 build): (https://download.01.org/0day-ci/archi=
+ve/20250310/202503102308.1uTA6Uxr-lkp@intel.com/reproduce)
+>
+> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
+ion of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202503102308.1uTA6Uxr-lkp=
+@intel.com/
+>
+> All errors (new ones prefixed by >>):
+>
+> >> net/ieee802154/6lowpan/reassembly.c:312:45: error: too few arguments t=
+o function call, expected 4, have 3
+>      312 |                 ret =3D lowpan_frag_queue(fq, skb, frag_type);
+>          |                       ~~~~~~~~~~~~~~~~~                   ^
+>    net/ieee802154/6lowpan/reassembly.c:86:12: note: 'lowpan_frag_queue' d=
+eclared here
+>       86 | static int lowpan_frag_queue(struct lowpan_frag_queue *fq,
+>          |            ^                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>       87 |                              struct sk_buff *skb, u8 frag_type=
+,
+>          |                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
+~
+>       88 |                              int *refs)
+>          |                              ~~~~~~~~~
+>    1 error generated.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Interesting, I thought I had compiled this file.
 
-On Fri, 07 Mar 2025 12:21:44 +0100 you wrote:
-> Before this series, the PM code was dispersed in different places:
-> 
-> - pm.c had common code for all PMs.
-> 
-> - pm_netlink.c was initially only about the in-kernel PM, but ended up
->   also getting exported common helpers, callbacks used by the different
->   PMs, NL events for PM userspace daemon, etc. quite confusing.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,01/15] mptcp: pm: use addr entry for get_local_id
-    https://git.kernel.org/netdev/net-next/c/7462fe22cc74
-  - [net-next,02/15] mptcp: pm: remove '_nl' from mptcp_pm_nl_addr_send_ack
-    https://git.kernel.org/netdev/net-next/c/fac7a6ddc757
-  - [net-next,03/15] mptcp: pm: remove '_nl' from mptcp_pm_nl_mp_prio_send_ack
-    https://git.kernel.org/netdev/net-next/c/d1734987992c
-  - [net-next,04/15] mptcp: pm: remove '_nl' from mptcp_pm_nl_work
-    https://git.kernel.org/netdev/net-next/c/551a9ad7879d
-  - [net-next,05/15] mptcp: pm: remove '_nl' from mptcp_pm_nl_rm_addr_received
-    https://git.kernel.org/netdev/net-next/c/636113918508
-  - [net-next,06/15] mptcp: pm: remove '_nl' from mptcp_pm_nl_subflow_chk_stale()
-    https://git.kernel.org/netdev/net-next/c/550c50bbc2b7
-  - [net-next,07/15] mptcp: pm: remove '_nl' from mptcp_pm_nl_is_init_remote_addr
-    https://git.kernel.org/netdev/net-next/c/498d7d8b75f1
-  - [net-next,08/15] mptcp: pm: kernel: add '_pm' to mptcp_nl_set_flags
-    https://git.kernel.org/netdev/net-next/c/40aa7409d30d
-  - [net-next,09/15] mptcp: pm: avoid calling PM specific code from core
-    https://git.kernel.org/netdev/net-next/c/a17336b2b2e0
-  - [net-next,10/15] mptcp: pm: worker: split in-kernel and common tasks
-    https://git.kernel.org/netdev/net-next/c/a49eb8ae95b8
-  - [net-next,11/15] mptcp: pm: export mptcp_remote_address
-    https://git.kernel.org/netdev/net-next/c/a14673127236
-  - [net-next,12/15] mptcp: pm: move generic helper at the top
-    https://git.kernel.org/netdev/net-next/c/bcc32640ada0
-  - [net-next,13/15] mptcp: pm: move generic PM helpers to pm.c
-    https://git.kernel.org/netdev/net-next/c/e4c28e3d5c09
-  - [net-next,14/15] mptcp: pm: split in-kernel PM specific code
-    https://git.kernel.org/netdev/net-next/c/8617e85e04bd
-  - [net-next,15/15] mptcp: pm: move Netlink PM helpers to pm_netlink.c
-    https://git.kernel.org/netdev/net-next/c/2e7e6e9cda1e
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I will add the missing &refs argument.
 
