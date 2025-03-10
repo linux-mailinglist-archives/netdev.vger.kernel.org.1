@@ -1,74 +1,75 @@
-Return-Path: <netdev+bounces-173621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F46BA5A314
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 19:36:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BE17A5A317
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 19:36:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB5D03A778F
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 18:35:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64CE91886123
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 18:35:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DBE5235BF3;
-	Mon, 10 Mar 2025 18:33:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4784A23AE8B;
+	Mon, 10 Mar 2025 18:33:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="czjrhssW"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="GcsUS+wi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5A323959D
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 18:33:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87261235BF4
+	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 18:33:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741631633; cv=none; b=SO0jJVw92HY7plYuzPCZlfcls+R5oszDhThDVhvnkgMmhvjBUtjTr/EF1QsEcLJqd8qZLkYbTxghUeDC6McvNKMy7CyXR83FoC7xglNuGDE1LnELqkn3nOBSJ2oS9ZzJJdVRnv6pTHN6iaqIHuD3PfqadXMRifWx/yXSnAxeuH4=
+	t=1741631636; cv=none; b=s1N4+CXVT810oYpOTuTq2uua0VCk0/eYxNGZ+xZXTb9Gk0dhfXP6Kawfk8VHuuWPjDLjV6sRazCGAOlr2aDt91iPsZqiGTt/J86hepREKu358XEQAzGgC3KwxBhoJthXWFhMDjiomeY2pF0xIZyIKkHsiytR7beT1nDMErLxLaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741631633; c=relaxed/simple;
-	bh=bTQY8uS+1LYiQ0iWn4H7rJxDNlUKUFObncvvxLaNiEU=;
+	s=arc-20240116; t=1741631636; c=relaxed/simple;
+	bh=0kCosAWUNYDhOko0P47IhiB1D35KseYi4HvQHsi5DWo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SS8pJFBoQB1EyEXmRj1xE9pIDq/5m1Uw5a6jV6yB00wx3z5XDrUAGKoLKWTQOTK0XwN1j6xy1brL2t1pcNv1dQDk0JDPRZw23EvnrvDfp6k/+evQgJxe2rFX5on6GecO/AJbOjJmMzLaAw+dDmxEbHGM7QPmZiC5HcP/Xo12jQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=czjrhssW; arc=none smtp.client-ip=209.85.167.172
+	 MIME-Version; b=MeBim/q5s+CiiG9WpgD3JhlcTjslvMyM8y7hnt2pGTSLzPmK+O2XvXYqA36vgKxmXqxXgml/L4eT5e10lyfJri/LZsZIsl9jLq35Sb1c7Lxvj3XwLmat5hYmArT9K6+PO5G1ANrU4PP/SoayIhM0nEghyqoAMEbm6i0ZheJpvJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=GcsUS+wi; arc=none smtp.client-ip=209.85.167.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3f6eaa017d0so1339547b6e.0
-        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 11:33:51 -0700 (PDT)
+Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3f6aab81647so1247309b6e.3
+        for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 11:33:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1741631630; x=1742236430; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1741631633; x=1742236433; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dQcYm+RNG7NKCnYHBSP17FJo0lK3F8vXn56lJD0Wb0c=;
-        b=czjrhssWBvdu9hpg/zORC+qUOOViI3eVictkf0u88k49mlXtlmqSgbZdBqxyjUWeir
-         btVN7YMguzs4NFxaqBUwyVYWXN/RUI9xgdLHcNK1SDEyB+YCQiMFGI3JvDxDaiZdrTnq
-         PBAgdrw7eqHPiJMuZ2jkN/y3R7ueGE+/8dcZQ=
+        bh=uZFPBdPBNv499Vkhna3146EthQda91AMmoS83ru5sdU=;
+        b=GcsUS+wiurLORlkniHS8C/Qp+lHkxwmedGKS6FJ4ADYSfUY8SekEZE8nbXyRX2V6Ww
+         5dvccVJ/DB+YDgBMKbh4ptVwZ1Y5V+2I9eDlPIGn7HdgBTchl/++pjs6NqnG+Rkxnh01
+         MKbtyjrxkjppqBZLzXD8FzcpUFJk5eElDUS/E=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741631630; x=1742236430;
+        d=1e100.net; s=20230601; t=1741631633; x=1742236433;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dQcYm+RNG7NKCnYHBSP17FJo0lK3F8vXn56lJD0Wb0c=;
-        b=GTxTRgKywhBANQRG9QfWG2x0cEoqZBvJdE4K/Hxg2VqBk7wPipHqGuByEGp78Q0SK/
-         o1aWKN6Cje3nA+Yz3zS9m4+cdf2W2zEvldvNhMGDsfc2lm0SMFSZCCrcf2KT1fNXX1Dw
-         ohCpQiEi8lclPtT79816t0xaMw5tl5q6pAfNK0GElEL9ydqDerY5eg93eL8tD9U6o9rQ
-         wGtv84fhCmTzfeqX+ZfC4KavNrteW1AWPUryEi6ipf9f+WZMXqrfDSziy8HRhAQMfuSL
-         4DvPaEzeRIhFngcayKddgnsa9ajGDPhfqQJGzCXQ2WYw3cKXqgepljmHgXdxOap6droN
-         cM5g==
-X-Gm-Message-State: AOJu0YwQcuCb/y/D5p+wV/+ZCzdMHI69zs6t1DiGKXtmGXS4kboj0gD8
-	syiRFs21pXgLkeP82yr5TxB207JG5Y76JKq1nJKyetT8Wilc9ngKnXtQc4aUZw==
-X-Gm-Gg: ASbGncu7rB/sd0R4GCU8FUV0sWyKakT2LfBMG2Mf+xTK86XJTTGF8XhiQ1/msRYCWlR
-	1bPTK6xZLcgMDi/NBV8yiSpet2tGzsRVydYFOGF2+6vTyjwjieO5s1KO1Oy4en2dRi8G69Nfp0F
-	nD20qvCljCS7Ei693X5hVtMgpLELKyHhSCBOaiZCzKgjOqNLrb3Qdw6oM19f8Z/m8RVx7y+wcDf
-	7wxY6eLL3K2hCwCUAYXvO9mo72oASYIbhaIr1recATl6a31wJzaVsaU0vYu//fCzAbPMMqqQN5Q
-	1nx7u/O7er2ktCgkn1VVMjJp+4DuARM9iWVlJCmhvwEvLVLq38d3i5E0qNno4sWhvborKAE344W
-	xSPIz9V5239bgtN0n7aPs
-X-Google-Smtp-Source: AGHT+IHSOYWY78MSYdtpCChweWwqo+GbEE0ONJtmap4ONc1LiduQMFPXfxdzovh7dl3yrHFFZP4RyA==
-X-Received: by 2002:a05:6808:612:b0:3f6:aad5:eaba with SMTP id 5614622812f47-3f6aad5f162mr4086877b6e.7.1741631630624;
-        Mon, 10 Mar 2025 11:33:50 -0700 (PDT)
+        bh=uZFPBdPBNv499Vkhna3146EthQda91AMmoS83ru5sdU=;
+        b=e9YCIYBiwiFIM6Al+4FjFdrqL9MWXD4aw3IQhR0v79JBIxXj3uoyYNprG7c2boriNt
+         0uU+g70AQmu86hU6sLOMripkWEDubHwrVWxSfNsJjI2ySMCEh9fxX7YFu22F2zNMMUKg
+         swRBBpNqkhp18bmdANpGaTSrPNpJgzD8ObIKh0agBfhuTam6VBNg14g+0PeBKQqcDm8c
+         EVJpdyWsvwSHhD9FkseGbDjbW+fNtWTYqgGS3i40GUCmaphL5I1CWQbuCTAfl5jkN4FZ
+         V/CrLFnHDWKIcoB9S+lbvUtE1IIpIvCXD9j6rD2Kw6mqo9PCoHbtKMgCQkuA5zxyGljw
+         rhcQ==
+X-Gm-Message-State: AOJu0YzMApXG8rhi1Y3E67/kJX73GEGSy2aLzyIwY+Rk8Xl6wpE5sEcR
+	3A7YFnypv5AoNcaiU670PUWsVj5pJYWs7bddw3PEBbwO/MK/VMsDplWmV3QLG17xXl/YncCJK4A
+	=
+X-Gm-Gg: ASbGncuKJ1TYHKHRsniZM7fw9e/8cQioP+AM9g7/t1FVCqpmpQZRG0nfq3f5CCHQKLC
+	YdPtEwzWFOeARpKJSKI1QTGaekWQBnLFBw4x9u4/P7JtJmWJT2nMUm0vIfBAoYtUco53lN5l8p2
+	LCWwB6Hb/TLbo/1HzLsNC19/0TW8MA2WqTiEXvZgJW/e3ktfG20Gqtan7mloyi9TKb9OEncE5hB
+	tJ8f9Q4prCZBempVZx7zVENVJf0SOTOsJPrTZ10bk0CoHE3Ro+F+xi2jrxpEva4mU2X9ntu2z4Q
+	CvhUuKNqtE7iSHd0RCKCajdMeND169NpaefLHHZOoEqu9PmzkS7TNXi8VEq5legu2eieWXGQ2Ja
+	5CUlBOV/9GtuLBMyMhIvW
+X-Google-Smtp-Source: AGHT+IGBqS1id6EOVnTgtrzIrXI2YK79YrqDlJV/y+MJTs+ei9eZFl4Kk8HvV12icISp6icd7/6iEA==
+X-Received: by 2002:a05:6808:2013:b0:3f8:c486:9b27 with SMTP id 5614622812f47-3f8c4869e0emr2739408b6e.22.1741631633409;
+        Mon, 10 Mar 2025 11:33:53 -0700 (PDT)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-3fa33834905sm41814b6e.27.2025.03.10.11.33.49
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-3fa33834905sm41814b6e.27.2025.03.10.11.33.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Mar 2025 11:33:50 -0700 (PDT)
+        Mon, 10 Mar 2025 11:33:52 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -77,10 +78,11 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	andrew+netdev@lunn.ch,
 	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com
-Subject: [PATCH net-next 2/7] bnxt_en: Refactor bnxt_hwrm_nvm_req()
-Date: Mon, 10 Mar 2025 11:31:24 -0700
-Message-ID: <20250310183129.3154117-3-michael.chan@broadcom.com>
+	andrew.gospodarek@broadcom.com,
+	Jiri Pirko <jiri@resnulli.us>
+Subject: [PATCH net-next 3/7] bnxt_en: Add devlink support for ENABLE_ROCE nvm parameter
+Date: Mon, 10 Mar 2025 11:31:25 -0700
+Message-ID: <20250310183129.3154117-4-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.43.4
 In-Reply-To: <20250310183129.3154117-1-michael.chan@broadcom.com>
 References: <20250310183129.3154117-1-michael.chan@broadcom.com>
@@ -92,128 +94,108 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-bnxt_hwrm_nvm_req() first searches the nvm_params[] array for the
-NVM parameter to set or get.  The array entry contains all the
-NVM information about that parameter.  The information is then used
-to send the FW message to set or get the parameter.
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
 
-Refactor it to only do the array search in bnxt_hwrm_nvm_req() and
-pass the array entry to the new function __bnxt_hwrm_nvm_req() to
-send the FW message.  The next patch will be able to use the new
-function.
+Add set/show support for the ENABLE_ROCE NVM parameter to
+enable/disable RoCE for a PF.
 
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Co-developed-by: Michael Chan <michael.chan@broadcom.com>
+Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- .../net/ethernet/broadcom/bnxt/bnxt_devlink.c | 63 ++++++++++---------
- 1 file changed, 33 insertions(+), 30 deletions(-)
+Cc: Jiri Pirko <jiri@resnulli.us>
+---
+ Documentation/networking/devlink/bnxt.rst     |  2 ++
+ .../net/ethernet/broadcom/bnxt/bnxt_devlink.c | 32 +++++++++++++++++++
+ .../net/ethernet/broadcom/bnxt/bnxt_devlink.h |  2 ++
+ 3 files changed, 36 insertions(+)
 
+diff --git a/Documentation/networking/devlink/bnxt.rst b/Documentation/networking/devlink/bnxt.rst
+index a4fb27663cd6..9a8b3d76d11f 100644
+--- a/Documentation/networking/devlink/bnxt.rst
++++ b/Documentation/networking/devlink/bnxt.rst
+@@ -24,6 +24,8 @@ Parameters
+      - Permanent
+    * - ``enable_remote_dev_reset``
+      - Runtime
++   * - ``enable_roce``
++     - Permanent
+ 
+ The ``bnxt`` driver also implements the following driver-specific
+ parameters.
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-index b06fcddfc81c..3c0af8ca50ae 100644
+index 3c0af8ca50ae..56b9012903b4 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
-@@ -1019,37 +1019,19 @@ static int bnxt_dl_info_get(struct devlink *dl, struct devlink_info_req *req,
- 
+@@ -675,6 +675,8 @@ static const struct bnxt_dl_nvm_param nvm_params[] = {
+ 	 NVM_OFF_MSIX_VEC_PER_PF_MAX, BNXT_NVM_SHARED_CFG, 10, 4},
+ 	{DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MIN,
+ 	 NVM_OFF_MSIX_VEC_PER_PF_MIN, BNXT_NVM_SHARED_CFG, 7, 4},
++	{DEVLINK_PARAM_GENERIC_ID_ENABLE_ROCE, NVM_OFF_SUPPORT_RDMA,
++	 BNXT_NVM_FUNC_CFG, 1, 1},
+ 	{BNXT_DEVLINK_PARAM_ID_GRE_VER_CHECK, NVM_OFF_DIS_GRE_VER_CHECK,
+ 	 BNXT_NVM_SHARED_CFG, 1, 1},
+ };
+@@ -1128,6 +1130,32 @@ static int bnxt_dl_nvm_param_set(struct devlink *dl, u32 id,
+ 	return bnxt_hwrm_nvm_req(bp, id, req, &ctx->val);
  }
  
--static int bnxt_hwrm_nvm_req(struct bnxt *bp, u32 param_id, void *msg,
--			     union devlink_param_value *val)
-+static int __bnxt_hwrm_nvm_req(struct bnxt *bp,
-+			       const struct bnxt_dl_nvm_param *nvm, void *msg,
-+			       union devlink_param_value *val)
- {
- 	struct hwrm_nvm_get_variable_input *req = msg;
--	struct bnxt_dl_nvm_param nvm_param;
- 	struct hwrm_err_output *resp;
- 	union bnxt_nvm_data *data;
- 	dma_addr_t data_dma_addr;
--	int idx = 0, rc, i;
--
--	/* Get/Set NVM CFG parameter is supported only on PFs */
--	if (BNXT_VF(bp)) {
--		hwrm_req_drop(bp, req);
--		return -EPERM;
--	}
--
--	for (i = 0; i < ARRAY_SIZE(nvm_params); i++) {
--		if (nvm_params[i].id == param_id) {
--			nvm_param = nvm_params[i];
--			break;
--		}
--	}
--
--	if (i == ARRAY_SIZE(nvm_params)) {
--		hwrm_req_drop(bp, req);
--		return -EOPNOTSUPP;
--	}
-+	int idx = 0, rc;
- 
--	if (nvm_param.dir_type == BNXT_NVM_PORT_CFG)
-+	if (nvm->dir_type == BNXT_NVM_PORT_CFG)
- 		idx = bp->pf.port_id;
--	else if (nvm_param.dir_type == BNXT_NVM_FUNC_CFG)
-+	else if (nvm->dir_type == BNXT_NVM_FUNC_CFG)
- 		idx = bp->pf.fw_fid - BNXT_FIRST_PF_FID;
- 
- 	data = hwrm_req_dma_slice(bp, req, sizeof(*data), &data_dma_addr);
-@@ -1060,23 +1042,23 @@ static int bnxt_hwrm_nvm_req(struct bnxt *bp, u32 param_id, void *msg,
- 	}
- 
- 	req->dest_data_addr = cpu_to_le64(data_dma_addr);
--	req->data_len = cpu_to_le16(nvm_param.nvm_num_bits);
--	req->option_num = cpu_to_le16(nvm_param.offset);
-+	req->data_len = cpu_to_le16(nvm->nvm_num_bits);
-+	req->option_num = cpu_to_le16(nvm->offset);
- 	req->index_0 = cpu_to_le16(idx);
- 	if (idx)
- 		req->dimensions = cpu_to_le16(1);
- 
- 	resp = hwrm_req_hold(bp, req);
- 	if (req->req_type == cpu_to_le16(HWRM_NVM_SET_VARIABLE)) {
--		bnxt_copy_to_nvm_data(data, val, nvm_param.nvm_num_bits,
--				      nvm_param.dl_num_bytes);
-+		bnxt_copy_to_nvm_data(data, val, nvm->nvm_num_bits,
-+				      nvm->dl_num_bytes);
- 		rc = hwrm_req_send(bp, msg);
- 	} else {
- 		rc = hwrm_req_send_silent(bp, msg);
- 		if (!rc) {
- 			bnxt_copy_from_nvm_data(val, data,
--						nvm_param.nvm_num_bits,
--						nvm_param.dl_num_bytes);
-+						nvm->nvm_num_bits,
-+						nvm->dl_num_bytes);
- 		} else {
- 			if (resp->cmd_err ==
- 				NVM_GET_VARIABLE_CMD_ERR_CODE_VAR_NOT_EXIST)
-@@ -1089,6 +1071,27 @@ static int bnxt_hwrm_nvm_req(struct bnxt *bp, u32 param_id, void *msg,
- 	return rc;
- }
- 
-+static int bnxt_hwrm_nvm_req(struct bnxt *bp, u32 param_id, void *msg,
-+			     union devlink_param_value *val)
++static int bnxt_dl_roce_validate(struct devlink *dl, u32 id,
++				 union devlink_param_value val,
++				 struct netlink_ext_ack *extack)
 +{
-+	struct hwrm_nvm_get_variable_input *req = msg;
-+	const struct bnxt_dl_nvm_param *nvm_param;
-+	int i;
++	const struct bnxt_dl_nvm_param nvm_roce_cap = {0, NVM_OFF_RDMA_CAPABLE,
++		BNXT_NVM_SHARED_CFG, 1, 1};
++	struct bnxt *bp = bnxt_get_bp_from_dl(dl);
++	struct hwrm_nvm_get_variable_input *req;
++	union devlink_param_value roce_cap;
++	int rc;
 +
-+	/* Get/Set NVM CFG parameter is supported only on PFs */
-+	if (BNXT_VF(bp)) {
-+		hwrm_req_drop(bp, req);
-+		return -EPERM;
-+	}
++	rc = hwrm_req_init(bp, req, HWRM_NVM_GET_VARIABLE);
++	if (rc)
++		return rc;
 +
-+	for (i = 0; i < ARRAY_SIZE(nvm_params); i++) {
-+		nvm_param = &nvm_params[i];
-+		if (nvm_param->id == param_id)
-+			return __bnxt_hwrm_nvm_req(bp, nvm_param, msg, val);
++	if (__bnxt_hwrm_nvm_req(bp, &nvm_roce_cap, req, &roce_cap)) {
++		NL_SET_ERR_MSG_MOD(extack, "Unable to verify if device is RDMA Capable");
++		return -EINVAL;
 +	}
-+	return -EOPNOTSUPP;
++	if (!roce_cap.vbool) {
++		NL_SET_ERR_MSG_MOD(extack, "Device does not support RDMA");
++		return -EINVAL;
++	}
++	return 0;
 +}
 +
- static int bnxt_dl_nvm_param_get(struct devlink *dl, u32 id,
- 				 struct devlink_param_gset_ctx *ctx)
- {
+ static int bnxt_dl_msix_validate(struct devlink *dl, u32 id,
+ 				 union devlink_param_value val,
+ 				 struct netlink_ext_ack *extack)
+@@ -1192,6 +1220,10 @@ static const struct devlink_param bnxt_dl_params[] = {
+ 			      BIT(DEVLINK_PARAM_CMODE_PERMANENT),
+ 			      bnxt_dl_nvm_param_get, bnxt_dl_nvm_param_set,
+ 			      bnxt_dl_msix_validate),
++	DEVLINK_PARAM_GENERIC(ENABLE_ROCE,
++			      BIT(DEVLINK_PARAM_CMODE_PERMANENT),
++			      bnxt_dl_nvm_param_get, bnxt_dl_nvm_param_set,
++			      bnxt_dl_roce_validate),
+ 	DEVLINK_PARAM_DRIVER(BNXT_DEVLINK_PARAM_ID_GRE_VER_CHECK,
+ 			     "gre_ver_check", DEVLINK_PARAM_TYPE_BOOL,
+ 			     BIT(DEVLINK_PARAM_CMODE_PERMANENT),
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.h
+index b8105065367b..7f45dcd7b287 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.h
+@@ -41,8 +41,10 @@ static inline void bnxt_dl_set_remote_reset(struct devlink *dl, bool value)
+ #define NVM_OFF_MSIX_VEC_PER_PF_MAX	108
+ #define NVM_OFF_MSIX_VEC_PER_PF_MIN	114
+ #define NVM_OFF_IGNORE_ARI		164
++#define NVM_OFF_RDMA_CAPABLE		161
+ #define NVM_OFF_DIS_GRE_VER_CHECK	171
+ #define NVM_OFF_ENABLE_SRIOV		401
++#define NVM_OFF_SUPPORT_RDMA		506
+ #define NVM_OFF_NVM_CFG_VER		602
+ 
+ #define BNXT_NVM_CFG_VER_BITS		8
 -- 
 2.30.1
 
