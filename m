@@ -1,146 +1,284 @@
-Return-Path: <netdev+bounces-173601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 176CAA59BDD
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 18:00:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86ACFA59E21
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 18:28:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67E853A6D39
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 17:00:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96F303A396F
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 17:27:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A052F230BCB;
-	Mon, 10 Mar 2025 16:59:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9A2323535A;
+	Mon, 10 Mar 2025 17:26:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=fiona.klute@gmx.de header.b="lEr+B2TM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BvTMWlw2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50881230988;
-	Mon, 10 Mar 2025 16:59:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B320F22D4C3;
+	Mon, 10 Mar 2025 17:26:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741625992; cv=none; b=lf5H+EPNv01Y0Hd7CQKg/Lqan0G0mBhqXKl/5C3mWJ18dcRS7EuDgeAH4PBQKpPqGRxnFNjjbRuVTKsKmpVVG9m/llu2HpKiwJRaQ5FB3ivR5yi1mHuhnjsBztgZMAD4cM0y1uHOuXfhHlJpcoAlcZl3fMcFNo/f8ncx7Aefs9U=
+	t=1741627590; cv=none; b=FquVOOljwy8JwAvKgq3KPU9pZhrtDGK0KtTnk5PQzxS0j8+rNLGtIDehkD7J04iZ+EEuDNbD04gpjCjrI0DckI8k29xCUF6E93vVz7QD9bsqtlhGguJqtaCZfl/803/JLVSi8hDWz89b+X9DhlUqh/H1gwL/uzLf2P7QOpfqFcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741625992; c=relaxed/simple;
-	bh=km2IGdJt2Zt2W/qgfZG1Lab7vtwETfZ7Ls52FOlKepE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S0k/p8bvr7MYrEOKumr5zcxTg954mDA/OWi0IF2SrUcZJDKGULPkF+CiTZmN6mN5WZrWSOe8RvwDA6rseuOqYlQ4ViPHbQHziTNzNitsdZBOPLxeNKhVisqbwRrFaEOkSP0VEg90MpsqTX+fDUJn/dPrji+l0WGxf/QoJWiAy08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=fiona.klute@gmx.de header.b=lEr+B2TM; arc=none smtp.client-ip=212.227.17.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1741625981; x=1742230781; i=fiona.klute@gmx.de;
-	bh=km2IGdJt2Zt2W/qgfZG1Lab7vtwETfZ7Ls52FOlKepE=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:
-	 MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=lEr+B2TM1og/6h/R/DnZdw0KAubAPCXD6CmmBFRJkoBa/AOYay1Txdn/g1o+y4K3
-	 oXtnPx/5qwXIr6cqzSq3GgMYXbhMN6lPlEqF1NjKEszAEvrsnN3vJmFOJIFZO19ct
-	 7Ck9eH19W+nrOU5zqstS/R4DpAz5T8jiS2+G40KPammcEKzXUqv+smnGqZAZGLcrZ
-	 Ld74SXCrnFQhYGkjj7VAnFky/TjWwHPC4B4klm7p+RK+tHfXcYq23CRcis6tdmWxy
-	 WR7g1h4zttFF5eXZgAYZsjRzUAjN753IlEz0jK/4nmO2Zr/uG9DWmBUCtgbKqRFNo
-	 DCKG1KxKbvUrDSCXIA==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from haruka.home.arpa ([85.22.124.30]) by mail.gmx.net (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MGhyc-1u4LeA3Hne-000h9z; Mon, 10
- Mar 2025 17:59:40 +0100
-From: Fiona Klute <fiona.klute@gmx.de>
-To: netdev@vger.kernel.org
-Cc: Thangaraj Samynathan <Thangaraj.S@microchip.com>,
-	Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-usb@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Fiona Klute <fiona.klute@gmx.de>,
-	kernel-list@raspberrypi.com,
-	stable@vger.kernel.org
-Subject: [PATCH] net: usb: lan78xx: Enforce a minimum interrupt polling period
-Date: Mon, 10 Mar 2025 17:59:31 +0100
-Message-ID: <20250310165932.1201702-1-fiona.klute@gmx.de>
-X-Mailer: git-send-email 2.47.2
+	s=arc-20240116; t=1741627590; c=relaxed/simple;
+	bh=+VfDGrZXmuH8meQqP1LdVcLROKhZqTPiinE518t0uuY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KyxFvo7lMQn024jJApRchFmMzHIWaK/jx9VIdTC34yrGaGVammFmYv6w52+kZ6f69ODjLJqm+dHOrqQF6heIQOMdZX6ZzVDH5UcfrFkYmGfBBYZFqTzufdxhhHRcUM92ckKW3/pHHdvCPdQnDlpjeXvF7BvplO1wVcqRa2RV510=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BvTMWlw2; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741627588; x=1773163588;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=+VfDGrZXmuH8meQqP1LdVcLROKhZqTPiinE518t0uuY=;
+  b=BvTMWlw2iBeFAyNzhqB92Pzc930LC2o5/+5LE+wQhkb1DBIWy7ey0Iim
+   7jQfortmbkuzgHD8qenzyNOO5OEF3jnHKu83SFMkQIuL4KlqOkcV+5TJo
+   /h7cGTt+Tnw+Z/2kuyviwECoLGyifu7+xbEsRkZHxLU3aTf8YgzP1k+oy
+   VdL666gnrAd/oKkZu10nv8SyYotDhKsPYgzdx0s3AECay1KFQlewWAoGV
+   xp2J7aRu0TP46lf5fg1XSvo4DVyqnJ7u40yx4PEPrkTSUsoFY2ynwLC6J
+   aQzFxM+U/PGaUYL50pp/K0/Zbn94LorQJWENQHVPGDZ/07gdesmFQr7nH
+   Q==;
+X-CSE-ConnectionGUID: pvxQGijuQ6uAraM6AEuclw==
+X-CSE-MsgGUID: BAMkM2J+TPWsCsWezpJwdg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="60184179"
+X-IronPort-AV: E=Sophos;i="6.14,236,1736841600"; 
+   d="scan'208";a="60184179"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 10:26:27 -0700
+X-CSE-ConnectionGUID: 8/Z023WDQ+SJhSmkfC2AsA==
+X-CSE-MsgGUID: lwrt/YwASnm3E+vXWQYYtg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,236,1736841600"; 
+   d="scan'208";a="157268983"
+Received: from dnelso2-mobl.amr.corp.intel.com (HELO [10.125.111.63]) ([10.125.111.63])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 10:26:26 -0700
+Message-ID: <68c66882-3a91-4843-b08e-2f9d5d2d0290@intel.com>
+Date: Mon, 10 Mar 2025 10:26:25 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-X-Provags-ID: V03:K1:YYGO+4uzgBGjMBAgVnoBmWV0/iNMfrX+PvlpPtClFX82DXYtx/t
- V0hQLs/Lg7kApN6BGiEWA2n61AMZfA6qQ2HRixcdn8FMqrckdrIS7msv3MwjsuNTBT6VVVw
- ezeEhMzwrdrEDhv1Vh7om3hdSPLUi9GdScYkxG4fKFH/9/vQ9MG2WmoEmnW3QufDVST5mIl
- OgTNEL0HEhBDmFpQBM9kg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:xX8wuS/r/h4=;d3UWide7pAM7x2u3z4E84qqiQ5x
- zTF/zGW9SAqyXGT7WMtqYfz1BzXB2bI2Lvlb5KDs+kByY2s7VNwDvbq/o+UjI0kjd+GbW8Nwp
- SRW/wtSCbA3z0+vC/XHVLQkJvm3meHrdwzUcg9Hx/k+Fdl5SblIwMEiloMaXR0JX9i7nxdsU4
- cSDHar6Pcu51kaYOhT7NOOKM3IIn6SutZYBerYbaxFziII5UzI7WTMHdip6fB9SxVZDOr1k7+
- OoS/L+e2+TZOuCKc9ix0zHspFlX0at0ZQSvpgXNhSnfmkR8Yq/dTF+v7EY4f+FsgbJX0CFzdM
- fhRheSQmLq/99dhgsIJmi+NufP1dyG902rT6xuQJ6odF03O3lwdTRTkxnWOWZpN2pnWmUBK1C
- 4nI5eXidryEpYi4ARlmYxjhN9vMlv4PGhEEMSp4CcMe0SQvquNQ/YzB6CPFkgnZNXjeTpBW0m
- eBf5kD8tSXGlwuQW+vORm7emELY7VyKHDQHte0GRn9preQENFhPev9uQvEVBNzLlk6MHFBTg8
- OmPq4sCqRCdNC3KXKwUvxabN2unP37NjfDjCIUcKnBGD/m4Pgafg/ymrG2isIWGTz2eR2MC+a
- O0iaUdO5qRID0mvN9+jFfk/yqngkZRdFDUhuksYvoLLl1CFz1zU2SgLiSeHgnNB5GsbN0A6ye
- 6B9eHQYjjq1EKmRsQQpweOiT8j0zrlvKT8x2bSoCN6X9OpPbWU3z+YNpjM0UkkTMF9A70iXvR
- voPJwwCcTUD2e2gFaDi96wXKTE3QIvB7zJS+Gxr7ao73R+oIlUfLI7hzsVSx08jy/R88JOncN
- hmT3XnK+XTz9+iOpy8CmF57ktIYKWDzCYbIf4pTniCN8MndXIDJ0mMzepeBQSUz+jwvtvr5Bd
- j0BfyDl9mo+vE+XIcL87TBZDQLryOlf5dwDFIagNLzY0WWrjfbdHho0Pwb6uN87mMPfhLZpVQ
- vTwLWV/hL5X+zuoMLATMbRx2zTg5oVUroB0SYNNHPftpQGCeYPfTBeqFMr8LpKSgD+GgyUmyY
- e0PrOkb+2s/Rqox3SAmeDoGebRTYZg2lj50lYPepP6uGPeA0ucFPe6nQouNYO3Qzr/Fynm+BB
- t6JUy20vmod5O55FsBRMNADKL9UsktvjnV2N0Y/y9VnbtRvr/Et8hL4uOWKoAmTMPZkphkCp/
- KUcFbROOX6OJcsgawpC2GZEVrcJ683iEJGTwKDIPdabCIglh4ovZd1l20gEaqTtdDnH3X9LS0
- Gw+mBZkKugO9oP1WP9hj5sDvkrZtz56v0I6ipZ7xOi0hf/d1llzGZOdS0Jq7UYRRODSd0vH2s
- lnUJT8CKrPbdU46wBPOYDu6KkueS/KedqsHTvvxxrYLTm53Gl+idGzNzDTUTkeRMAXbCg2xDV
- zC6RiRc0YlQYBWZ+G4y0MrHP+k7zA7+Yw6S5I9/6iCLtghs/oEM/bfqJI3O17KSqmYOP7y0h2
- D1jC8zyznKx00Gob7FCyw//fXS0RW6tXXv0yziycjBiql+/Ii
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/6] pds_core: specify auxiliary_device to be created
+To: Shannon Nelson <shannon.nelson@amd.com>, jgg@nvidia.com,
+ andrew.gospodarek@broadcom.com, aron.silverton@oracle.com,
+ dan.j.williams@intel.com, daniel.vetter@ffwll.ch, dsahern@kernel.org,
+ gregkh@linuxfoundation.org, hch@infradead.org, itayavr@nvidia.com,
+ jiri@nvidia.com, Jonathan.Cameron@huawei.com, kuba@kernel.org,
+ lbloch@nvidia.com, leonro@nvidia.com, linux-cxl@vger.kernel.org,
+ linux-rdma@vger.kernel.org, netdev@vger.kernel.org, saeedm@nvidia.com
+Cc: brett.creeley@amd.com
+References: <20250307185329.35034-1-shannon.nelson@amd.com>
+ <20250307185329.35034-3-shannon.nelson@amd.com>
+Content-Language: en-US
+From: Dave Jiang <dave.jiang@intel.com>
+In-Reply-To: <20250307185329.35034-3-shannon.nelson@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-SWYgYSBuZXcgcmVzZXQgZXZlbnQgYXBwZWFycyBiZWZvcmUgdGhlIHByZXZpb3VzIG9uZSBoYXMg
-YmVlbgpwcm9jZXNzZWQsIHRoZSBkZXZpY2UgY2FuIGdldCBzdHVjayBpbnRvIGEgcmVzZXQgbG9v
-cC4gVGhpcyBoYXBwZW5zCnJhcmVseSwgYnV0IGJsb2NrcyB0aGUgZGV2aWNlIHdoZW4gaXQgZG9l
-cywgYW5kIGZsb29kcyB0aGUgbG9nIHdpdGgKbWVzc2FnZXMgbGlrZSB0aGUgZm9sbG93aW5nOgoK
-ICBsYW43OHh4IDItMzoxLjAgZW5wMXMwdTM6IGtldmVudCA0IG1heSBoYXZlIGJlZW4gZHJvcHBl
-ZAoKVGhlIG9ubHkgYml0IHRoYXQgdGhlIGRyaXZlciBwYXlzIGF0dGVudGlvbiB0byBpbiB0aGUg
-aW50ZXJydXB0IGRhdGEKaXMgImxpbmsgd2FzIHJlc2V0Ii4gSWYgdGhlcmUncyBhIGZsYXBwaW5n
-IHN0YXR1cyBiaXQgaW4gdGhhdCBlbmRwb2ludApkYXRhIChzdWNoIGFzIGlmIFBIWSBuZWdvdGlh
-dGlvbiBuZWVkcyBhIGZldyB0cmllcyB0byBnZXQgYSBzdGFibGUKbGluayksIHBvbGxpbmcgYXQg
-YSBzbG93ZXIgcmF0ZSBhbGxvd3MgdGhlIHN0YXRlIHRvIHNldHRsZS4KClRoaXMgaXMgYSBzaW1w
-bGlmaWVkIHZlcnNpb24gb2YgYSBwYXRjaCB0aGF0J3MgYmVlbiBpbiB0aGUgUmFzcGJlcnJ5ClBp
-IGRvd25zdHJlYW0ga2VybmVsIHNpbmNlIHRoZWlyIDQuMTQgYnJhbmNoLCBzZWUgYWxzbzoKaHR0
-cHM6Ly9naXRodWIuY29tL3Jhc3BiZXJyeXBpL2xpbnV4L2lzc3Vlcy8yNDQ3CgpTaWduZWQtb2Zm
-LWJ5OiBGaW9uYSBLbHV0ZSA8ZmlvbmEua2x1dGVAZ214LmRlPgpDYzoga2VybmVsLWxpc3RAcmFz
-cGJlcnJ5cGkuY29tCkNjOiBzdGFibGVAdmdlci5rZXJuZWwub3JnCi0tLQpGb3IgdGhlIHN0YWJs
-ZSBjcmV3OiBJJ3ZlICp0ZXN0ZWQqIHRoZSBwYXRjaCB3aXRoIDYuMTIuNyBhbmQgNi4xMy41IG9u
-CmEgUmV2b2x1dGlvbiBQaSBDb25uZWN0IDQgKFJhc3BiZXJyeSBQaSBDTTQgYmFzZWQgZGV2aWNl
-IHdpdGggYnVpbHQtaW4KTEFONzgwMCBhcyBzZWNvbmQgZXRoZXJuZXQgcG9ydCksIGFjY29yZGlu
-ZyB0byB0aGUgbGlua2VkIGlzc3VlIGZvcgp0aGUgUlBpIGRvd25zdHJlYW0ga2VybmVsIHRoZSBw
-cm9ibGVtIHNob3VsZCBiZSBwcmVzZW50IGluIGFsbAptYWludGFpbmVkIGxvbmd0ZXJtIGtlcm5l
-bCB2ZXJzaW9ucywgdG9vIChiYXNlZCBvbiBob3cgbG9uZyB0aGV5J3ZlCmNhcnJpZWQgYSBwYXRj
-aCkuCgogZHJpdmVycy9uZXQvdXNiL2xhbjc4eHguYyB8IDEyICsrKysrKysrKysrLQogMSBmaWxl
-IGNoYW5nZWQsIDExIGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkKCmRpZmYgLS1naXQgYS9k
-cml2ZXJzL25ldC91c2IvbGFuNzh4eC5jIGIvZHJpdmVycy9uZXQvdXNiL2xhbjc4eHguYwppbmRl
-eCBhOTFiZjljN2UzMWQuLjdiZjAxYTMxYTkzMiAxMDA2NDQKLS0tIGEvZHJpdmVycy9uZXQvdXNi
-L2xhbjc4eHguYworKysgYi9kcml2ZXJzL25ldC91c2IvbGFuNzh4eC5jCkBAIC0xNzMsNiArMTcz
-LDEyIEBACiAjZGVmaW5lIElOVF9FUF9HUElPXzEJCQkoMSkKICNkZWZpbmUgSU5UX0VQX0dQSU9f
-MAkJCSgwKQogCisvKiBoaWdoc3BlZWQgZGV2aWNlLCBzbyBwb2xsaW5nIGludGVydmFsIGlzIGlu
-IG1pY3JvZnJhbWVzIChlaWdodCBwZXIKKyAqIG1pbGxpc2Vjb25kKQorICovCisjZGVmaW5lIElO
-VF9VUkJfTUlDUk9GUkFNRVNfUEVSX01TCTgKKyNkZWZpbmUgTUlOX0lOVF9VUkJfSU5URVJWQUxf
-TVMJCTgKKwogc3RhdGljIGNvbnN0IGNoYXIgbGFuNzh4eF9nc3RyaW5nc1tdW0VUSF9HU1RSSU5H
-X0xFTl0gPSB7CiAJIlJYIEZDUyBFcnJvcnMiLAogCSJSWCBBbGlnbm1lbnQgRXJyb3JzIiwKQEAg
-LTQ1MjcsNyArNDUzMywxMSBAQCBzdGF0aWMgaW50IGxhbjc4eHhfcHJvYmUoc3RydWN0IHVzYl9p
-bnRlcmZhY2UgKmludGYsCiAJaWYgKHJldCA8IDApCiAJCWdvdG8gb3V0NDsKIAotCXBlcmlvZCA9
-IGVwX2ludHItPmRlc2MuYkludGVydmFsOworCXBlcmlvZCA9IG1heChlcF9pbnRyLT5kZXNjLmJJ
-bnRlcnZhbCwKKwkJICAgICBNSU5fSU5UX1VSQl9JTlRFUlZBTF9NUyAqIElOVF9VUkJfTUlDUk9G
-UkFNRVNfUEVSX01TKTsKKwlkZXZfaW5mbygmaW50Zi0+ZGV2LAorCQkgImludGVycnVwdCB1cmIg
-cGVyaW9kIHNldCB0byAlZCwgYkludGVydmFsIGlzICVkXG4iLAorCQkgcGVyaW9kLCBlcF9pbnRy
-LT5kZXNjLmJJbnRlcnZhbCk7CiAJbWF4cCA9IHVzYl9tYXhwYWNrZXQoZGV2LT51ZGV2LCBkZXYt
-PnBpcGVfaW50cik7CiAKIAlkZXYtPnVyYl9pbnRyID0gdXNiX2FsbG9jX3VyYigwLCBHRlBfS0VS
-TkVMKTsKCmJhc2UtY29tbWl0OiBkZDgzNzU3ZjZlNjg2YTIxODg5OTdjYjU4YjU5NzVmNzQ0YmI3
-Nzg2Ci0tIAoyLjQ3LjIKCg==
+
+
+On 3/7/25 11:53 AM, Shannon Nelson wrote:
+> In preparation for adding a new auxiliary_device for the
+> PF, make the vif type an argument to pdsc_auxbus_dev_add().
+
+> We also now pass in the address to where we'll keep the new
+> padev pointer so that the caller can specify where to save it
+> but we can still change it under the mutex and keep the mutex
+> usage within the function.
+
+Please consider changing the commit log to use imperative language and avoid using pronouns such as "we". 
+
+https://www.kernel.org/doc/html/v4.17/process/submitting-patches.html#describe-your-changes
+https://kernelnewbies.org/PatchPhilosophy#:~:text=Please%20read%20that%20whole%20section,it%20into%20the%20git%20history.
+
+Maybe something like:
+Pass in the address of the padev pointer so the caller can specify where to save it. ...
+
+> 
+> Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+
+Reviewed-by: Dave Jiang <dave.jiang@intel.com>
+
+> ---
+>  drivers/net/ethernet/amd/pds_core/auxbus.c  | 37 ++++++++++-----------
+>  drivers/net/ethernet/amd/pds_core/core.h    |  7 ++--
+>  drivers/net/ethernet/amd/pds_core/devlink.c |  5 +--
+>  drivers/net/ethernet/amd/pds_core/main.c    | 11 +++---
+>  4 files changed, 33 insertions(+), 27 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/amd/pds_core/auxbus.c b/drivers/net/ethernet/amd/pds_core/auxbus.c
+> index 78fba368e797..563de9e7ce0a 100644
+> --- a/drivers/net/ethernet/amd/pds_core/auxbus.c
+> +++ b/drivers/net/ethernet/amd/pds_core/auxbus.c
+> @@ -175,29 +175,32 @@ static struct pds_auxiliary_dev *pdsc_auxbus_dev_register(struct pdsc *cf,
+>  	return padev;
+>  }
+>  
+> -void pdsc_auxbus_dev_del(struct pdsc *cf, struct pdsc *pf)
+> +void pdsc_auxbus_dev_del(struct pdsc *cf, struct pdsc *pf,
+> +			 struct pds_auxiliary_dev **pd_ptr)
+>  {
+>  	struct pds_auxiliary_dev *padev;
+>  
+> +	if (!*pd_ptr)
+> +		return;
+> +
+>  	mutex_lock(&pf->config_lock);
+>  
+> -	padev = pf->vfs[cf->vf_id].padev;
+> -	if (padev) {
+> -		pds_client_unregister(pf, padev->client_id);
+> -		auxiliary_device_delete(&padev->aux_dev);
+> -		auxiliary_device_uninit(&padev->aux_dev);
+> -		padev->client_id = 0;
+> -	}
+> -	pf->vfs[cf->vf_id].padev = NULL;
+> +	padev = *pd_ptr;
+> +	pds_client_unregister(pf, padev->client_id);
+> +	auxiliary_device_delete(&padev->aux_dev);
+> +	auxiliary_device_uninit(&padev->aux_dev);
+> +	padev->client_id = 0;
+> +	*pd_ptr = NULL;
+>  
+>  	mutex_unlock(&pf->config_lock);
+>  }
+>  
+> -int pdsc_auxbus_dev_add(struct pdsc *cf, struct pdsc *pf)
+> +int pdsc_auxbus_dev_add(struct pdsc *cf, struct pdsc *pf,
+> +			enum pds_core_vif_types vt,
+> +			struct pds_auxiliary_dev **pd_ptr)
+>  {
+>  	struct pds_auxiliary_dev *padev;
+>  	char devname[PDS_DEVNAME_LEN];
+> -	enum pds_core_vif_types vt;
+>  	unsigned long mask;
+>  	u16 vt_support;
+>  	int client_id;
+> @@ -206,6 +209,9 @@ int pdsc_auxbus_dev_add(struct pdsc *cf, struct pdsc *pf)
+>  	if (!cf)
+>  		return -ENODEV;
+>  
+> +	if (vt >= PDS_DEV_TYPE_MAX)
+> +		return -EINVAL;
+> +
+>  	mutex_lock(&pf->config_lock);
+>  
+>  	mask = BIT_ULL(PDSC_S_FW_DEAD) |
+> @@ -217,17 +223,10 @@ int pdsc_auxbus_dev_add(struct pdsc *cf, struct pdsc *pf)
+>  		goto out_unlock;
+>  	}
+>  
+> -	/* We only support vDPA so far, so it is the only one to
+> -	 * be verified that it is available in the Core device and
+> -	 * enabled in the devlink param.  In the future this might
+> -	 * become a loop for several VIF types.
+> -	 */
+> -
+>  	/* Verify that the type is supported and enabled.  It is not
+>  	 * an error if there is no auxbus device support for this
+>  	 * VF, it just means something else needs to happen with it.
+>  	 */
+> -	vt = PDS_DEV_TYPE_VDPA;
+>  	vt_support = !!le16_to_cpu(pf->dev_ident.vif_types[vt]);
+>  	if (!(vt_support &&
+>  	      pf->viftype_status[vt].supported &&
+> @@ -253,7 +252,7 @@ int pdsc_auxbus_dev_add(struct pdsc *cf, struct pdsc *pf)
+>  		err = PTR_ERR(padev);
+>  		goto out_unlock;
+>  	}
+> -	pf->vfs[cf->vf_id].padev = padev;
+> +	*pd_ptr = padev;
+>  
+>  out_unlock:
+>  	mutex_unlock(&pf->config_lock);
+> diff --git a/drivers/net/ethernet/amd/pds_core/core.h b/drivers/net/ethernet/amd/pds_core/core.h
+> index 631a59cfdd7e..f075e68c64db 100644
+> --- a/drivers/net/ethernet/amd/pds_core/core.h
+> +++ b/drivers/net/ethernet/amd/pds_core/core.h
+> @@ -303,8 +303,11 @@ void pdsc_health_thread(struct work_struct *work);
+>  int pdsc_register_notify(struct notifier_block *nb);
+>  void pdsc_unregister_notify(struct notifier_block *nb);
+>  void pdsc_notify(unsigned long event, void *data);
+> -int pdsc_auxbus_dev_add(struct pdsc *cf, struct pdsc *pf);
+> -void pdsc_auxbus_dev_del(struct pdsc *cf, struct pdsc *pf);
+> +int pdsc_auxbus_dev_add(struct pdsc *cf, struct pdsc *pf,
+> +			enum pds_core_vif_types vt,
+> +			struct pds_auxiliary_dev **pd_ptr);
+> +void pdsc_auxbus_dev_del(struct pdsc *cf, struct pdsc *pf,
+> +			 struct pds_auxiliary_dev **pd_ptr);
+>  
+>  void pdsc_process_adminq(struct pdsc_qcq *qcq);
+>  void pdsc_work_thread(struct work_struct *work);
+> diff --git a/drivers/net/ethernet/amd/pds_core/devlink.c b/drivers/net/ethernet/amd/pds_core/devlink.c
+> index 4e2b92ddef6f..c5c787df61a4 100644
+> --- a/drivers/net/ethernet/amd/pds_core/devlink.c
+> +++ b/drivers/net/ethernet/amd/pds_core/devlink.c
+> @@ -57,9 +57,10 @@ int pdsc_dl_enable_set(struct devlink *dl, u32 id,
+>  		struct pdsc *vf = pdsc->vfs[vf_id].vf;
+>  
+>  		if (ctx->val.vbool)
+> -			err = pdsc_auxbus_dev_add(vf, pdsc);
+> +			err = pdsc_auxbus_dev_add(vf, pdsc, vt_entry->vif_id,
+> +						  &pdsc->vfs[vf_id].padev);
+>  		else
+> -			pdsc_auxbus_dev_del(vf, pdsc);
+> +			pdsc_auxbus_dev_del(vf, pdsc, &pdsc->vfs[vf_id].padev);
+>  	}
+>  
+>  	return err;
+> diff --git a/drivers/net/ethernet/amd/pds_core/main.c b/drivers/net/ethernet/amd/pds_core/main.c
+> index 660268ff9562..a3a68889137b 100644
+> --- a/drivers/net/ethernet/amd/pds_core/main.c
+> +++ b/drivers/net/ethernet/amd/pds_core/main.c
+> @@ -190,7 +190,8 @@ static int pdsc_init_vf(struct pdsc *vf)
+>  	devl_unlock(dl);
+>  
+>  	pf->vfs[vf->vf_id].vf = vf;
+> -	err = pdsc_auxbus_dev_add(vf, pf);
+> +	err = pdsc_auxbus_dev_add(vf, pf, PDS_DEV_TYPE_VDPA,
+> +				  &pf->vfs[vf->vf_id].padev);
+>  	if (err) {
+>  		devl_lock(dl);
+>  		devl_unregister(dl);
+> @@ -417,7 +418,7 @@ static void pdsc_remove(struct pci_dev *pdev)
+>  
+>  		pf = pdsc_get_pf_struct(pdsc->pdev);
+>  		if (!IS_ERR(pf)) {
+> -			pdsc_auxbus_dev_del(pdsc, pf);
+> +			pdsc_auxbus_dev_del(pdsc, pf, &pf->vfs[pdsc->vf_id].padev);
+>  			pf->vfs[pdsc->vf_id].vf = NULL;
+>  		}
+>  	} else {
+> @@ -482,7 +483,8 @@ static void pdsc_reset_prepare(struct pci_dev *pdev)
+>  
+>  		pf = pdsc_get_pf_struct(pdsc->pdev);
+>  		if (!IS_ERR(pf))
+> -			pdsc_auxbus_dev_del(pdsc, pf);
+> +			pdsc_auxbus_dev_del(pdsc, pf,
+> +					    &pf->vfs[pdsc->vf_id].padev);
+>  	}
+>  
+>  	pdsc_unmap_bars(pdsc);
+> @@ -527,7 +529,8 @@ static void pdsc_reset_done(struct pci_dev *pdev)
+>  
+>  		pf = pdsc_get_pf_struct(pdsc->pdev);
+>  		if (!IS_ERR(pf))
+> -			pdsc_auxbus_dev_add(pdsc, pf);
+> +			pdsc_auxbus_dev_add(pdsc, pf, PDS_DEV_TYPE_VDPA,
+> +					    &pf->vfs[pdsc->vf_id].padev);
+>  	}
+>  }
+>  
+
 
