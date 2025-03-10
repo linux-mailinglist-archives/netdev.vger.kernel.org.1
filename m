@@ -1,93 +1,148 @@
-Return-Path: <netdev+bounces-173528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03A61A5948A
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 13:31:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F01CAA5948E
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 13:32:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABBDF1882318
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:31:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0301018856EB
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 12:32:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1150CEEAA;
-	Mon, 10 Mar 2025 12:31:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="erPLNA9w"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2950C17A2E7;
+	Mon, 10 Mar 2025 12:31:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 564A610FD
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 12:31:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F1A322087;
+	Mon, 10 Mar 2025 12:31:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741609906; cv=none; b=a0tiLm4EsBA3r8JTtb8t0CFefkijKeGZAi6FVKXv5wORC0AsPQqWXNwezJWdFaTBUKGEsJ0kfZX6njZSx09hllXhvFWZnr8ahI74t6JX/3/gs5XPE+LGeWvEMy5umv+Erm0h2l63E3SBLEmexxHL/qrq/w4ly+umeJL/Tc2s4QU=
+	t=1741609916; cv=none; b=kyA0T3aoeF0QUBIOXvtDKMxFpUVTiYqAwPm0wVxyXpmRP6xDat2p78cLCUB9nxTwD4zyWMQKn7zt8v6GwKYa6EC0z9Dyg7jsdjx0HbuzMwK4WftNeM/BwmfbebdbdL6pVexXYAxmEKYd8qcmK44akugKZxCbnDGE/KII77NEOuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741609906; c=relaxed/simple;
-	bh=nu7drn/TzYUmOYZnQWuYJ4aSRox44FuTBFdmRujhYRc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=lvOTc3xnH0FKAJOWPQVttYewWDSTwzKkB/g3sLc08tARpXLerwMU6exMyxmvPHnhqBB/A/BMayJqNmOlvJkkoJPHV5OahRttmhNAiaXnyVnR8tkzUN+V9eddmxMAI6gYSGcc1bjZHDzF9kqahP3DgOXMH07t0/7lEer6jLFoXUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=erPLNA9w; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
-	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=itOKGgzpHi7KgaNmFHmHfax9kY4jmtqWEweC2RyI/Og=; b=erPLNA9wWzqDRpmp0jTUNuVy8R
-	jHoaL6nv4fDf/jTi6npkgPDWsRHfZpbV/JUCNy7xFneykv3fIKU8bDnM6pGxIYVpTD2kwzYjJjR4A
-	VQa5K0G93KLS31qrG03TYdVqFV4Z9zOt1lLJFKJqL+tRH4VNi2+Z6gXTLa1kynvf9a+XhqlIT7Zo7
-	ho1BYiMtFsvOVWshin+zBspSykHdSP/bqqBdQs7wq++fc0MPQNBgQxrnXfsBOF+uLtI3Q86BObTUj
-	N/ESrcqixtcf+FSXaP3TKKokW3raS17kxirnnwX423itWxAjrmR4Zv1uI8jmhJ8Z2bFv+frFaKHFq
-	angen7XQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38120)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1trcIB-0002dh-1b;
-	Mon, 10 Mar 2025 12:31:35 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1trcI8-0002TM-19;
-	Mon, 10 Mar 2025 12:31:32 +0000
-Date: Mon, 10 Mar 2025 12:31:32 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 0/2] net: stmmac: avoid unnecessary work in
- stmmac_release()/stmmac_dvr_remove()
-Message-ID: <Z87bpDd7QYYVU0ML@shell.armlinux.org.uk>
+	s=arc-20240116; t=1741609916; c=relaxed/simple;
+	bh=1ZwnqL9ML/dpqcBnkz6H0OCsWG84Kk1V+/wHoG2v/rA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=SZ2RD5RTRQyzCl50C5b1hCJPLs3XXAIIRiTAdY0usw4rfoyhbtiqe6fDErhs6vfzNFb8knWSFr1aBtzbE9Y2Ayq2k2D2pfBsZgOmkVIUPCiI798HTxoNHssl+6R6EEGrk+Hhou9KS33XmYhijB7r0HaEYSCXSK10aXhjbeDAYzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4ZBGSX4JpGzqVYH;
+	Mon, 10 Mar 2025 20:30:20 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 351CC140361;
+	Mon, 10 Mar 2025 20:31:50 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 10 Mar 2025 20:31:49 +0800
+Message-ID: <14170f7f-97d0-40b4-9b07-92e74168e030@huawei.com>
+Date: Mon, 10 Mar 2025 20:31:49 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] mm: alloc_pages_bulk: remove assumption of populating
+ only NULL elements
+To: Gao Xiang <hsiangkao@linux.alibaba.com>, Yunsheng Lin
+	<yunshenglin0825@gmail.com>, Dave Chinner <david@fromorbit.com>
+CC: Yishai Hadas <yishaih@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>, Shameer
+ Kolothum <shameerali.kolothum.thodi@huawei.com>, Kevin Tian
+	<kevin.tian@intel.com>, Alex Williamson <alex.williamson@redhat.com>, Chris
+ Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, David Sterba
+	<dsterba@suse.com>, Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
+	Yue Hu <zbestahu@gmail.com>, Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep
+ Dhavale <dhavale@google.com>, Carlos Maiolino <cem@kernel.org>, "Darrick J.
+ Wong" <djwong@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
+	<ilias.apalodimas@linaro.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Trond Myklebust
+	<trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, Chuck Lever
+	<chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown
+	<neilb@suse.de>, Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo
+	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Luiz Capitulino
+	<luizcap@redhat.com>, Mel Gorman <mgorman@techsingularity.net>,
+	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
+	<linux-kernel@vger.kernel.org>, <linux-btrfs@vger.kernel.org>,
+	<linux-erofs@lists.ozlabs.org>, <linux-xfs@vger.kernel.org>,
+	<linux-mm@kvack.org>, <netdev@vger.kernel.org>, <linux-nfs@vger.kernel.org>
+References: <20250228094424.757465-1-linyunsheng@huawei.com>
+ <Z8a3WSOrlY4n5_37@dread.disaster.area>
+ <91fcdfca-3e7b-417c-ab26-7d5e37853431@huawei.com>
+ <Z8vnKRJlP78DHEk6@dread.disaster.area>
+ <cce03970-d66f-4344-b496-50ecf59483a6@gmail.com>
+ <625983f8-7e52-4f6c-97bb-629596341181@linux.alibaba.com>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <625983f8-7e52-4f6c-97bb-629596341181@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-Hi,
+On 2025/3/10 8:32, Gao Xiang wrote:
 
-This small series is a subset of a RFC I sent earlier. These two
-patches remove code that is unnecessary and/or wrong in these paths.
-Details in each commit.
+...
 
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 5 -----
- 1 file changed, 5 deletions(-)
+>>
+>> Also, it seems the fstests doesn't support erofs yet?
+> 
+> erofs is an read-only filesystem, and almost all xfstests
+> cases is unsuitable for erofs since erofs needs to preset
+> dataset in advance for runtime testing and only
+> read-related interfaces are cared:
+> 
+> You could check erofs-specfic test cases here:
+> https://git.kernel.org/pub/scm/linux/kernel/git/xiang/erofs-utils.git/log/?h=experimental-tests
+> 
+> Also the stress test:
+> https://git.kernel.org/pub/scm/linux/kernel/git/xiang/erofs-utils.git/commit/?id=6fa861e282408f8df9ab1654b77b563444b17ea1
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks.
+
+> 
+> BTW, I don't like your new interface either, I don't know
+> why you must insist on this work now that others are
+> already nak this.  Why do you insist on it so much?
+
+If the idea was not making any sense to me and it was nack'ed
+with clearer reasoning and without any supporting of the idea,
+I would have stopped working on it.
+
+The background I started working at is something like below
+in the commit log:
+"As mentioned in [1], it seems odd to check NULL elements in
+the middle of page bulk allocating, and it seems caller can
+do a better job of bulk allocating pages into a whole array
+sequentially without checking NULL elements first before
+doing the page bulk allocation for most of existing users."
+
+"Remove assumption of populating only NULL elements and treat
+page_array as output parameter like kmem_cache_alloc_bulk().
+Remove the above assumption also enable the caller to not
+zero the array before calling the page bulk allocating API,
+which has about 1~2 ns performance improvement for the test
+case of time_bench_page_pool03_slow() for page_pool in a
+x86 vm system, this reduces some performance impact of
+fixing the DMA API misuse problem in [2], performance
+improves from 87.886 ns to 86.429 ns."
+
+1. https://lore.kernel.org/all/bd8c2f5c-464d-44ab-b607-390a87ea4cd5@huawei.com/
+2. https://lore.kernel.org/all/20250212092552.1779679-1-linyunsheng@huawei.com/
+
+There is no 'must' here, it is just me taking some of my
+hoppy time and some of my work time trying to make the
+alloc_pages_bulk API simpler and more efficient here, and I
+also learnt a lot during that process.
+
+Anyway, if there is still any hard nack after all the
+discussion, it would be good to make it more explicit with
+a clearer reasoning.
 
