@@ -1,281 +1,151 @@
-Return-Path: <netdev+bounces-173402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-173403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47958A58AC1
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 03:59:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEFBEA58AD7
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 04:30:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F264165FC7
-	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 02:59:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7725F3A8E68
+	for <lists+netdev@lfdr.de>; Mon, 10 Mar 2025 03:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 222251AF0C8;
-	Mon, 10 Mar 2025 02:59:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA12F1531E3;
+	Mon, 10 Mar 2025 03:30:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="D3wIStKw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hkUCkDBO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AFBD1AA7A6
-	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 02:59:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD731E492
+	for <netdev@vger.kernel.org>; Mon, 10 Mar 2025 03:30:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741575575; cv=none; b=t4RvfRhOYtBOXHhe1bTNvlmktPn3gz7vtL4FL+2TpT0fogiRyIdXw6sDV2yAPbgV/IRev3ethCRx/gCkYiWq5PYWc/xP3EcACoV5T3d81y/+mRUf7GdTelTCyenOwzgTiPRHX8Gb8ufaYXNWv8raNBOfkLqNomo9+3V2hC4Yed4=
+	t=1741577445; cv=none; b=Jgu9oFlCwNxBMIz+D46wW+FKJY73uP/ufUr2GinjnKhXvx7eJYUXzsUZaQWbyz7QekopIvg1oSJY0Q2IRU7k+4PMzFfhZ4xbiDJDo5T9/Bj9iXLOPritnlmOcpxKlEA6X8zTvGlYShzX9N3jPaTHe9CnRdqkPV6SofYa2EanDCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741575575; c=relaxed/simple;
-	bh=US4gctPjhrGniaWp4oueiagLcUBIwhY9Rbb5IXlLRw0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mc+GhIZjxfBKNVddexFFMib90vj8BOIIxDfS4BqYzXVDquhzosHm5KK01NaZLLKur+k/qMMbbhFm6xo3mMRu4CSg4GVl34Qz44QnbWVw+JNKMXFpnRu43TYdA2sO2lY9BtVxu0JHk014kyqzpzQQbUJX9sEXE4fFJiAWlc0YgKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=D3wIStKw; arc=none smtp.client-ip=209.85.221.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-51eb18130f9so1673240e0c.3
-        for <netdev@vger.kernel.org>; Sun, 09 Mar 2025 19:59:33 -0700 (PDT)
+	s=arc-20240116; t=1741577445; c=relaxed/simple;
+	bh=pBAVhAbOenmyBN7w2xTDDcGrUPzXOAm4iGeRGsPG8+I=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=kHqbnoF6MxNHQETJX4Boj/IWjemlXW18WBYw9jCt6+taIG+vzbyx1WeiHpeImMeT0yR2nAOCnOugWMM8w4Hn9g4cq1x2g8vQWAtwngeBrQgsRvTdvQvjN6Xsw9zKqIjx+ytYcoK7CqUlGdbH6fwvkmXL51N00CGKwRFqaqPJ2Y4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hkUCkDBO; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6e8fb8ad525so33247946d6.3
+        for <netdev@vger.kernel.org>; Sun, 09 Mar 2025 20:30:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1741575572; x=1742180372; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+Rf7wuolIEDOj04kOsglC2QQzgvFDnH62ZKfCXrQQRo=;
-        b=D3wIStKwMux9kH3gwmTVCVmCe9Xrb9+uWrSUvWjS8Dttsc1xtaf5F+o/0zM+oZcupy
-         rI3oPFvW7FipHIZ3qm3gqcimgmiW9TTkZ1fe7fYuyx9AmdnxGXOQ9bGhOxUhTf21vIp+
-         s1+TD0q1s7KPioYyE88U15GdcsHd813T7yjhI=
+        d=gmail.com; s=20230601; t=1741577443; x=1742182243; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xTBP7mJpMAYnIIA+oGvbf7uMZ3kt8bSWJ2Fl4pnoJqY=;
+        b=hkUCkDBOqIdpiN2rcAka7X2eDWVaaIbPtjLdE9q2q3XxlKFTqt4QlSqpEpyMFAl+QJ
+         qm1n9HYUcF3dKFopLBkVPEthJWRwLdXBtGAs8Z4Fpx4o3C2pgZ3Fg7vDYxOdCi7WYbgw
+         Oq7WA5ZeBsUuFD3Ch55NZ+ueK0PbRQAG7AgKN3BWfeRcQSKgU2Al6A7LDCscIVPl3sD6
+         0J53GIDerdsLfnoTVOJS7eRuQPbhv98x1Bk6LDF2gPnvtQyrZ+2RCJJvigehDB9tURFa
+         yVO4LentTCgL62eYzSmJDNr1QIwb9yBGc3rzS1F3gvguGuXdhdMh3FO+bcVYWaArIhw0
+         rzdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741575572; x=1742180372;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+Rf7wuolIEDOj04kOsglC2QQzgvFDnH62ZKfCXrQQRo=;
-        b=Ghd/n4Gx+069lqgg1kC6rL7gQ9mPeqp886FQTdb3CQJ9/BzkxnKrYQDNyYXNfvCHSc
-         wBIbaL160s8mLgyemj3/Nw6yAQXkFTAn4Ef4n/wafjk46wf5NL32+y78wxnHawLgLfgd
-         owp63kgD7VKLzwP65u48wft4E+ABhY6IHnHcwCtJLKwwmLUoU9unT//nkmt3zrI/VSg7
-         F6GeDj5bcA644F0Rg6tjDXYLgIDmc5EGoUf+vzXX5mIij6f3zIbjVFWsPyf8WZZuPvGl
-         BbU/d/27U91qbRkKTqmJ6IY0BXKTkKoiaP4c8w9vIZ9vY50n/5befPVePxv18Y40eZqK
-         GSEA==
-X-Forwarded-Encrypted: i=1; AJvYcCVMBvXzGDBTrCCDf4okcWkGmrLhJGWhOYePbptQIbKC6cMXNxpXTNGm+F9pvSrPZj7/Fz4kbCs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0wDvxslnTOCHKWR3OQj21MmVXR5h9FpbHriEKYfeRDfQbRJfe
-	dp6WWV5L5CERPwyTlF+79Djpdojf1JZN9PTOiSg4i5yLZaanYHlt4DLezWS4CQBzUquEg9sDh4c
-	nks+esyGbdg/bjtO6RsSMZoCXjBn0gTaR3+Xx
-X-Gm-Gg: ASbGncui1k2DPwG1BIhTABJRbgtSkZSH7y0O/rYbS5LjADE+KfM2qbmN3JplHwh51PC
-	k8VQzFx+91V5JViRGSgecgzpLL7pPEc99NsxWZP53F+hG/kv+Xu0zg06bok8K5SokFp6WkLYtCd
-	IoncQTOXw9YZJGU3rwZ5r6W4defoc=
-X-Google-Smtp-Source: AGHT+IExnNzJsw2GMHFOYyty+oivf/aZ1NlnglpPRbiLmYoVlcKD7qt6vkgWwb+w5FpCzl/IX2hhmylTBtU3djsMDp0=
-X-Received: by 2002:a67:e710:0:b0:4bd:22d5:fbd7 with SMTP id
- ada2fe7eead31-4c30a5aa5d5mr7994853137.11.1741575572156; Sun, 09 Mar 2025
- 19:59:32 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1741577443; x=1742182243;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xTBP7mJpMAYnIIA+oGvbf7uMZ3kt8bSWJ2Fl4pnoJqY=;
+        b=EnpNZVzPdOIGQY/BBOI/6xkZiWcDoiNr8SBdr2Rqk5z1GQCJX3rjNHiXMzqAFWWv3B
+         CFF/uRSWBJnYVYjj0Ok2DCOz57AesJndLYHtXTXnk+C2E2SZL6ZlIuZfBMUd1BrMNIjr
+         bPthTj0sqHLffkuWswN18WXfCwMeBLOy5/DOft9NgGBFAxleI/4/rZlkYxUfo651lstJ
+         fceDA1sQVRbV7DHF5OC9uMcrwAJKclxASbZqwltkCEli8j4pdgysbTkKI1yRmSz/1kgs
+         RkMfGDI/o32Y9dWoMZ34wlqmpCOb8ZBjMCLeoIA5kqwA1ym2KlDtNbQwZFfa8fSEaNpM
+         Qj+w==
+X-Forwarded-Encrypted: i=1; AJvYcCW+0l8HNOf/ibIP/M4CIJylsQrrEqksCnOqFzGjRKo8wC8AQ5Yd0dv3X9S/nCnq5BOsVK3kaW8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhC/rJP/P2z+C1pzbZ6qn2W8IGDtiEmbCdaf1WDDQwh/3lAwuD
+	plGBp7CIf8pQBQJqRl2B5qqGQRX2aZJkjfW4AygKfEfAsp3Vjagh
+X-Gm-Gg: ASbGnctwSORxhf62dhejW/+QFSwWtR1gKpkuQI7wU4HG6OZYhgStSFlXoXpXe4ux8kS
+	k3KqROc6VuzgZloKPG4EHksnGpEzWIuEca4SP22JXVUw3xAfKBmc8Qp6Co/R5ivibwXYxfaYuwh
+	AHYSwRWTgBj6LX76Dxyy5QTd07vtX31oNX0t1nVcRtf+rVVfUNGbXjorWm3+nftF/CWpknySqyw
+	8a86Vfx7OAIm+duCnprej6t2CPR/lPG3Lw/U9LpDDUVSWhjTjXeWGWDzfcrLJlO3lSKk+VvlGbO
+	8zEp3HMZQc5/bPEAI2IoI8f+8+9lm4ATzSGrRFYQB3pTAqbvOB81LR4Oy5TnZuMc/zY4+h8qyra
+	CfF/rtfcKkXqBv9kcGZ+fQg==
+X-Google-Smtp-Source: AGHT+IFVNksxr91cwaIdujsMDBCDU7YyU9mq7ou75f5ZyA1EcO4No2dTAjV4WU0PkxocT7iIFxsrUQ==
+X-Received: by 2002:a05:6214:1d24:b0:6e8:fa33:2962 with SMTP id 6a1803df08f44-6e9005db84bmr130505566d6.10.1741577443088;
+        Sun, 09 Mar 2025 20:30:43 -0700 (PDT)
+Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e8f715b718sm50733466d6.91.2025.03.09.20.30.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Mar 2025 20:30:42 -0700 (PDT)
+Date: Sun, 09 Mar 2025 23:30:41 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Simon Horman <horms@kernel.org>, 
+ David Ahern <dsahern@kernel.org>
+Message-ID: <67ce5ce1722a4_20941f294a0@willemb.c.googlers.com.notmuch>
+In-Reply-To: <2dfd7292-901c-4155-9c80-954d2b0c7507@redhat.com>
+References: <cover.1741338765.git.pabeni@redhat.com>
+ <8c8263ab59b1e9366f245eec4dfdccd368496e3d.1741338765.git.pabeni@redhat.com>
+ <67cc8f317e5e0_14b9f9294b5@willemb.c.googlers.com.notmuch>
+ <2dfd7292-901c-4155-9c80-954d2b0c7507@redhat.com>
+Subject: Re: [PATCH v2 net-next 2/2] udp_tunnel: use static call for GRO hooks
+ when possible
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250309134219.91670-1-ap420073@gmail.com> <20250309134219.91670-6-ap420073@gmail.com>
-In-Reply-To: <20250309134219.91670-6-ap420073@gmail.com>
-From: Somnath Kotur <somnath.kotur@broadcom.com>
-Date: Mon, 10 Mar 2025 08:29:20 +0530
-X-Gm-Features: AQ5f1JqjVf-shUj4xVRf3iwBzONNuy49CHEhdfAYn_eDpCGwzEfuIPG-t-SFEfA
-Message-ID: <CAOBf=ms6=2RaeKB4RZ6aneaH12OaoJSTY=R7_cvQvMecA5iudw@mail.gmail.com>
-Subject: Re: [PATCH v3 net 5/8] eth: bnxt: fix kernel panic in the
- bnxt_get_queue_stats{rx | tx}
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, andrew+netdev@lunn.ch, michael.chan@broadcom.com, 
-	pavan.chebbi@broadcom.com, horms@kernel.org, shuah@kernel.org, 
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	almasrymina@google.com, asml.silence@gmail.com, willemb@google.com, 
-	kaiyuanz@google.com, skhawaja@google.com, sdf@fomichev.me, gospo@broadcom.com, 
-	dw@davidwei.uk, amritha.nambiar@intel.com, xuanzhuo@linux.alibaba.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000058b364062ff429ce"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
---00000000000058b364062ff429ce
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Paolo Abeni wrote:
+> On 3/8/25 7:40 PM, Willem de Bruijn wrote:
+> > Paolo Abeni wrote:
+> >> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+> >> index 054d4d4a8927f..f06dd82d28562 100644
+> >> --- a/net/ipv4/udp_offload.c
+> >> +++ b/net/ipv4/udp_offload.c
+> >> @@ -15,6 +15,39 @@
+> >>  #include <net/udp_tunnel.h>
+> >>  
+> >>  #if IS_ENABLED(CONFIG_NET_UDP_TUNNEL)
+> >> +
+> >> +/*
+> >> + * Dummy GRO tunnel callback; should never be invoked, exists
+> >> + * mainly to avoid dangling/NULL values for the udp tunnel
+> >> + * static call.
+> >> + */
+> >> +static struct sk_buff *dummy_gro_rcv(struct sock *sk,
+> >> +				     struct list_head *head,
+> >> +				     struct sk_buff *skb)
+> >> +{
+> >> +	WARN_ON_ONCE(1);
+> >> +	NAPI_GRO_CB(skb)->flush = 1;
+> >> +	return NULL;
+> >> +}
+> >> +
+> >> +typedef struct sk_buff *(*udp_tunnel_gro_rcv_t)(struct sock *sk,
+> >> +						struct list_head *head,
+> >> +						struct sk_buff *skb);
+> >> +
+> >> +struct udp_tunnel_type_entry {
+> >> +	udp_tunnel_gro_rcv_t gro_receive;
+> >> +	refcount_t count;
+> >> +};
+> >> +
+> >> +#define UDP_MAX_TUNNEL_TYPES (IS_ENABLED(CONFIG_GENEVE) + \
+> >> +			      IS_ENABLED(CONFIG_VXLAN) * 2 + \
+> >> +			      IS_ENABLED(CONFIG_FOE) * 2)
+> > 
+> > CONFIG_BAREUDP
+> 
+> Why? AFAICS BAREUDP does not implement the gro_receive callback. UDP
+> tunnel without such callback are irrelevant here.
 
-On Sun, Mar 9, 2025 at 7:13=E2=80=AFPM Taehee Yoo <ap420073@gmail.com> wrot=
-e:
->
-> When qstats-get operation is executed, callbacks of netdev_stats_ops
-> are called. The bnxt_get_queue_stats{rx | tx} collect per-queue stats
-> from sw_stats in the rings.
-> But {rx | tx | cp}_ring are allocated when the interface is up.
-> So, these rings are not allocated when the interface is down.
->
-> The qstats-get is allowed even if the interface is down. However,
-> the bnxt_get_queue_stats{rx | tx}() accesses cp_ring and tx_ring
-> without null check.
-> So, it needs to avoid accessing rings if the interface is down.
->
-> Reproducer:
->  ip link set $interface down
->  ./cli.py --spec netdev.yaml --dump qstats-get
-> OR
->  ip link set $interface down
->  python ./stats.py
->
-> Splat looks like:
->  BUG: kernel NULL pointer dereference, address: 0000000000000000
->  #PF: supervisor read access in kernel mode
->  #PF: error_code(0x0000) - not-present page
->  PGD 1680fa067 P4D 1680fa067 PUD 16be3b067 PMD 0
->  Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
->  CPU: 0 UID: 0 PID: 1495 Comm: python3 Not tainted 6.14.0-rc4+ #32 5cd0f9=
-99d5a15c574ac72b3e4b907341
->  Hardware name: ASUS System Product Name/PRIME Z690-P D4, BIOS 0603 11/01=
-/2021
->  RIP: 0010:bnxt_get_queue_stats_rx+0xf/0x70 [bnxt_en]
->  Code: c6 87 b5 18 00 00 02 eb a2 66 90 90 90 90 90 90 90 90 90 90 90 90 =
-90 90 90 90 90 0f 1f 44 01
->  RSP: 0018:ffffabef43cdb7e0 EFLAGS: 00010282
->  RAX: 0000000000000000 RBX: ffffffffc04c8710 RCX: 0000000000000000
->  RDX: ffffabef43cdb858 RSI: 0000000000000000 RDI: ffff8d504e850000
->  RBP: ffff8d506c9f9c00 R08: 0000000000000004 R09: ffff8d506bcd901c
->  R10: 0000000000000015 R11: ffff8d506bcd9000 R12: 0000000000000000
->  R13: ffffabef43cdb8c0 R14: ffff8d504e850000 R15: 0000000000000000
->  FS:  00007f2c5462b080(0000) GS:ffff8d575f600000(0000) knlGS:000000000000=
-0000
->  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->  CR2: 0000000000000000 CR3: 0000000167fd0000 CR4: 00000000007506f0
->  PKRU: 55555554
->  Call Trace:
->   <TASK>
->   ? __die+0x20/0x70
->   ? page_fault_oops+0x15a/0x460
->   ? sched_balance_find_src_group+0x58d/0xd10
->   ? exc_page_fault+0x6e/0x180
->   ? asm_exc_page_fault+0x22/0x30
->   ? bnxt_get_queue_stats_rx+0xf/0x70 [bnxt_en cdd546fd48563c280cfd30e9647=
-efa420db07bf1]
->   netdev_nl_stats_by_netdev+0x2b1/0x4e0
->   ? xas_load+0x9/0xb0
->   ? xas_find+0x183/0x1d0
->   ? xa_find+0x8b/0xe0
->   netdev_nl_qstats_get_dumpit+0xbf/0x1e0
->   genl_dumpit+0x31/0x90
->   netlink_dump+0x1a8/0x360
->
-> Fixes: af7b3b4adda5 ("eth: bnxt: support per-queue statistics")
-> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
-> ---
->
-> v3:
->  - Patch added.
->
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethe=
-rnet/broadcom/bnxt/bnxt.c
-> index 9afb2c5072b1..bee12d9b57ab 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -15384,6 +15384,9 @@ static void bnxt_get_queue_stats_rx(struct net_de=
-vice *dev, int i,
->         struct bnxt_cp_ring_info *cpr;
->         u64 *sw;
->
-> +       if (!bp->bnapi)
-> +               return;
-> +
->         cpr =3D &bp->bnapi[i]->cp_ring;
->         sw =3D cpr->stats.sw_stats;
->
-> @@ -15407,6 +15410,9 @@ static void bnxt_get_queue_stats_tx(struct net_de=
-vice *dev, int i,
->         struct bnxt_napi *bnapi;
->         u64 *sw;
->
-> +       if (!bp->tx_ring)
-> +               return;
-> +
->         bnapi =3D bp->tx_ring[bp->tx_ring_map[i]].bnapi;
->         sw =3D bnapi->cp_ring.stats.sw_stats;
->
-> --
-> 2.34.1
->
-Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+You're right, of course. I looked at the wrong callback. Sorry.
 
---00000000000058b364062ff429ce
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
 
-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
-nSGLsSobByQoGh1GyLfFTXI7QOGn/6qvrJ7x9Oem5V7miUTD0wGAIozD7MCVoluf5Psa4Q2a5AFV
-gROLty059Ex4oK55Op/0e3Aa/a8hZD/tPBT3WE70owdiCwIDAQABo4IB2zCCAdcwDgYDVR0PAQH/
-BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3VyZS5nbG9i
-YWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEGCCsGAQUF
-BzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAy
-MDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93d3cuZ2xv
-YmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6hjhodHRw
-Oi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNybDAlBgNV
-HREEHjAcgRpzb21uYXRoLmtvdHVyQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAf
-BgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUabMpSsFcjDNUWMvGf76o
-yB7jBJUwDQYJKoZIhvcNAQELBQADggEBAJBDQpQ1TqY57vpQbwtXYP0N01q8J3tfNA/K2vOiNOpv
-IufqZ5WKdKEtmT21nujCeuaCQ6SmpWqCUJVkLd+u/sHR62vCo8j2fb1pTkA7jeuCAuT9YMPRE86M
-sUphsGDq2ylriQ7y5kvl728hZ0Oakm3xUCnZ9DYS/32sFGSZyrCGZipTBnjK4n5uLQ0yekSLACiD
-R0zi4nzkbhwXqDbDaB+Duk52ec/Vj4xuc2uWu9rTmJNVjdk0qu9vh48xcd/BzrlmwY0crGTijAC/
-r4x2/y9OfG0FyVmakU0qwDnZX982aa66tXnKNgae2k20WCDVMM5FPTrbMsQyz6Hrv3bg6qgxggJg
-MIICXAIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYD
-VQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgx6wAr6NdQY0sTG
-G7cwDQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEIN99OftkFrfzeZ/Fvp5G56vbKrEm
-YSJP2E3p8jdmMaN+MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1
-MDMxMDAyNTkzMlowXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsG
-CWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3
-DQEBAQUABIIBAA6v0z/qYSKemBR5tZmAdQh3aQPvAe11Fr2q6A7xT6QmJD6cuj+sla15m6mllBW4
-YwK99bNu7uMnSvxRz2tPv29kLmy3/RR/B7E+rvxdfz/X+OfCYHL4Vxn5kZPRieRays0sr4ELqhA2
-FXKBl3klcDF5n2pWfI1E2idl0ob2jx9BuwbnwpxniNhUgdbHUW7KIB4iXAsC8tWqZjjAgKemE+CO
-+KKQnvPHbNj2lDgTJfOxjH0zxbxkUWmW5XZYCWk40gqMrRATbA9+gXCZ+QOFwSVFWphdOOhQnp6H
-gJJDOfOZJspcPVM2NHaYcFW6kJz2zv8Z5IGWYcpVMXmfPtGwq00=
---00000000000058b364062ff429ce--
 
